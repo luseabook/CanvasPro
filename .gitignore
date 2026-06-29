@@ -20,6 +20,8 @@ demo123/
 
 node_modules/
 npm-debug.log*
+npm-desktop.std*.log
+npm-web.std*.log
 dist/
 dist-obfuscated/
 .electron-runtime/
