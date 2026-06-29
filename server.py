@@ -44,6 +44,7 @@ if CURRENT_DIR not in sys.path:
     sys.path.insert(0, CURRENT_DIR)
 
 from backend.services.hot_update_service import HotUpdateService
+from backend import shortdrama_routes as SHORTDRAMA_ROUTES
 from backend.services.http_route_dispatcher import HttpRouteDispatcher
 from backend.services.config_route_service import ConfigRouteService
 from backend.services.json_file_route_service import JsonFileRouteService
@@ -2641,6 +2642,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         if HTTP_ROUTE_DISPATCHER.handle_post(self, path):
             return
+
+        if path.startswith("/api/shortdrama/"):
+            try:
+                raw = _read_body(self)
+                payload = json.loads(raw.decode("utf-8") or "{}") if raw else {}
+                handled, status, data = SHORTDRAMA_ROUTES.handle(path, payload)
+                if handled:
+                    _json_ok(self, data) if status == 200 else _json_err(self, status, str(data))
+                    return
+            except Exception as e:
+                _json_err(self, 500, f"shortdrama: {e}"); return
 
         if path == "/api/v2/proxy/apimart-upload":
             try:
