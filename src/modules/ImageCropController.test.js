@@ -1,1 +1,49 @@
-function a524_0x4e30(_0x57ae9c,_0x2de0eb){const _0x592ac5=a524_0x592a();return a524_0x4e30=function(_0x4e3030,_0x15efe3){_0x4e3030=_0x4e3030-0x135;let _0x50cd38=_0x592ac5[_0x4e3030];return _0x50cd38;},a524_0x4e30(_0x57ae9c,_0x2de0eb);}const a524_0x371dc7=a524_0x4e30;(function(_0x1a52e0,_0x40206a){const _0x10614e=a524_0x4e30,_0xd1e3b8=_0x1a52e0();while(!![]){try{const _0x1c716b=parseInt(_0x10614e(0x13b))/0x1*(-parseInt(_0x10614e(0x140))/0x2)+-parseInt(_0x10614e(0x138))/0x3*(-parseInt(_0x10614e(0x13d))/0x4)+parseInt(_0x10614e(0x144))/0x5+-parseInt(_0x10614e(0x141))/0x6+parseInt(_0x10614e(0x13e))/0x7+-parseInt(_0x10614e(0x139))/0x8*(parseInt(_0x10614e(0x13c))/0x9)+parseInt(_0x10614e(0x135))/0xa;if(_0x1c716b===_0x40206a)break;else _0xd1e3b8['push'](_0xd1e3b8['shift']());}catch(_0x3bc453){_0xd1e3b8['push'](_0xd1e3b8['shift']());}}}(a524_0x592a,0x4cb3d));function a524_0x592a(){const _0x420361=['ImageCropController:\x20Ctrl\x20drag\x20obeys\x20the\x20active\x20aspect\x20ratio','2644050TsSLpi','rect','deepEqual','3ivMnRC','88qWevVT','isValid','1478ZebWXM','323658pnMKTi','1940104HouYEW','61705cIjOVn','ImageCropController:\x20Ctrl\x20drag\x20clamps\x20the\x20rect\x20inside\x20image\x20bounds','356hfBPSi','275100jrFbNa','ImageCropController:\x20Ctrl\x20drag\x20marks\x20tiny\x20selections\x20invalid','equal','1302215PazQgR'];a524_0x592a=function(){return _0x420361;};return a524_0x592a();}import a524_0x3daa2b from'node:test';import a524_0x5424f4 from'node:assert/strict';import{IMAGE_CROP_MIN_SIZE,buildImageCropDragRect}from'./ImageCropController.js';const NODE={'x':0x64,'y':0x32,'width':0x190,'height':0x12c};a524_0x3daa2b('ImageCropController:\x20Ctrl\x20drag\x20builds\x20a\x20normal\x20crop\x20rect',()=>{const _0x21ce61=a524_0x4e30,_0x546640=buildImageCropDragRect({'startPoint':{'x':0x78,'y':0x46},'currentPoint':{'x':0x104,'y':0xaa},'node':NODE});a524_0x5424f4[_0x21ce61(0x137)](_0x546640,{'rect':{'x':0x78,'y':0x46,'w':0x8c,'h':0x64},'isValid':!![]});}),a524_0x3daa2b('ImageCropController:\x20Ctrl\x20drag\x20normalizes\x20reverse\x20direction',()=>{const _0x46d624=a524_0x4e30,_0x15928b=buildImageCropDragRect({'startPoint':{'x':0x12c,'y':0xfa},'currentPoint':{'x':0xb4,'y':0x8c},'node':NODE});a524_0x5424f4[_0x46d624(0x137)](_0x15928b,{'rect':{'x':0xb4,'y':0x8c,'w':0x78,'h':0x6e},'isValid':!![]});}),a524_0x3daa2b(a524_0x371dc7(0x13f),()=>{const _0x5d49a7=a524_0x371dc7,_0x5cef51=buildImageCropDragRect({'startPoint':{'x':0x78,'y':0x46},'currentPoint':{'x':0x258,'y':0x1f4},'node':NODE});a524_0x5424f4[_0x5d49a7(0x137)](_0x5cef51,{'rect':{'x':0x78,'y':0x46,'w':0x17c,'h':0x118},'isValid':!![]});}),a524_0x3daa2b(a524_0x371dc7(0x145),()=>{const _0x288af2=a524_0x371dc7,_0x2a4a29=buildImageCropDragRect({'startPoint':{'x':0x78,'y':0x46},'currentPoint':{'x':0x1b8,'y':0x172},'node':NODE,'aspectRatio':0x10/0x9});a524_0x5424f4[_0x288af2(0x143)](_0x2a4a29[_0x288af2(0x13a)],!![]),a524_0x5424f4['equal'](_0x2a4a29[_0x288af2(0x136)]['x'],0x78),a524_0x5424f4[_0x288af2(0x143)](_0x2a4a29[_0x288af2(0x136)]['y'],0x46),a524_0x5424f4[_0x288af2(0x143)](_0x2a4a29[_0x288af2(0x136)]['w'],0x140),a524_0x5424f4[_0x288af2(0x143)](_0x2a4a29[_0x288af2(0x136)]['h'],0xb4);}),a524_0x3daa2b(a524_0x371dc7(0x142),()=>{const _0x54f291=a524_0x371dc7,_0x42abb=buildImageCropDragRect({'startPoint':{'x':0x78,'y':0x46},'currentPoint':{'x':0x78+IMAGE_CROP_MIN_SIZE-0x1,'y':0x46+IMAGE_CROP_MIN_SIZE-0x1},'node':NODE});a524_0x5424f4[_0x54f291(0x143)](_0x42abb[_0x54f291(0x13a)],![]),a524_0x5424f4[_0x54f291(0x137)](_0x42abb[_0x54f291(0x136)],{'x':0x78,'y':0x46,'w':0x13,'h':0x13});});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { IMAGE_CROP_MIN_SIZE, buildImageCropDragRect } from './ImageCropController.js';
+const NODE = { x: 100, y: 50, width: 0x190, height: 0x12c };
+(test('ImageCropController: Ctrl drag builds a normal crop rect', () => {
+  const _0x546640 = buildImageCropDragRect({
+    startPoint: { x: 120, y: 70 },
+    currentPoint: { x: 0x104, y: 170 },
+    node: NODE,
+  });
+  assert.deepEqual(_0x546640, { rect: { x: 120, y: 70, w: 140, h: 100 }, isValid: true });
+}),
+  test('ImageCropController: Ctrl drag normalizes reverse direction', () => {
+    const _0x15928b = buildImageCropDragRect({
+      startPoint: { x: 0x12c, y: 250 },
+      currentPoint: { x: 180, y: 140 },
+      node: NODE,
+    });
+    assert.deepEqual(_0x15928b, { rect: { x: 180, y: 140, w: 120, h: 110 }, isValid: true });
+  }),
+  test('ImageCropController: Ctrl drag clamps the rect inside image bounds', () => {
+    const _0x5cef51 = buildImageCropDragRect({
+      startPoint: { x: 120, y: 70 },
+      currentPoint: { x: 0x258, y: 0x1f4 },
+      node: NODE,
+    });
+    assert.deepEqual(_0x5cef51, { rect: { x: 120, y: 70, w: 0x17c, h: 0x118 }, isValid: true });
+  }),
+  test('ImageCropController: Ctrl drag obeys the active aspect ratio', () => {
+    const _0x2a4a29 = buildImageCropDragRect({
+      startPoint: { x: 120, y: 70 },
+      currentPoint: { x: 0x1b8, y: 0x172 },
+      node: NODE,
+      aspectRatio: 16 / 9,
+    });
+    (assert.equal(_0x2a4a29.isValid, true),
+      assert.equal(_0x2a4a29.rect.x, 120),
+      assert.equal(_0x2a4a29.rect.y, 70),
+      assert.equal(_0x2a4a29.rect.w, 0x140),
+      assert.equal(_0x2a4a29.rect.h, 180));
+  }),
+  test('ImageCropController: Ctrl drag marks tiny selections invalid', () => {
+    const _0x42abb = buildImageCropDragRect({
+      startPoint: { x: 120, y: 70 },
+      currentPoint: { x: 120 + IMAGE_CROP_MIN_SIZE - 1, y: 70 + IMAGE_CROP_MIN_SIZE - 1 },
+      node: NODE,
+    });
+    (assert.equal(_0x42abb.isValid, false), assert.deepEqual(_0x42abb.rect, { x: 120, y: 70, w: 19, h: 19 }));
+  }));

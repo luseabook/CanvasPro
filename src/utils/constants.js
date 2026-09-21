@@ -1,1 +1,98 @@
-const a696_0x42050c=a696_0xb41a;(function(_0x4b7329,_0x1de353){const _0x516ab2=a696_0xb41a,_0x3ba364=_0x4b7329();while(!![]){try{const _0x3b0ea2=-parseInt(_0x516ab2(0xc5))/0x1*(-parseInt(_0x516ab2(0xd8))/0x2)+parseInt(_0x516ab2(0xdf))/0x3+-parseInt(_0x516ab2(0xcd))/0x4*(parseInt(_0x516ab2(0xab))/0x5)+-parseInt(_0x516ab2(0xc8))/0x6+parseInt(_0x516ab2(0xb3))/0x7+-parseInt(_0x516ab2(0xb6))/0x8*(parseInt(_0x516ab2(0xa6))/0x9)+parseInt(_0x516ab2(0xc2))/0xa;if(_0x3b0ea2===_0x1de353)break;else _0x3ba364['push'](_0x3ba364['shift']());}catch(_0x33ef8d){_0x3ba364['push'](_0x3ba364['shift']());}}}(a696_0x2a00,0xae9f2));export const DEFAULT_NODE_SIZE={'width':0x118,'height':0xc8};export const ZOOM_LIMITS={'min':0.1,'max':0x3,'default':0x1};export const GRID={'size':0x14,'snapThreshold':0xa};export const MINIMAP={'size':0xc8,'padding':0x258};export const NODE_TYPES={'SOURCE_IMAGE':a696_0x42050c(0xde),'SOURCE_TEXT':a696_0x42050c(0xd3),'SOURCE_AUDIO':a696_0x42050c(0xa9),'SOURCE_VIDEO':a696_0x42050c(0xb8),'AI_GENERATE':a696_0x42050c(0xd4),'AI_GEN_TEXT':a696_0x42050c(0xcb),'AI_GEN_IMAGE':a696_0x42050c(0xbb),'AI_GEN_VIDEO':a696_0x42050c(0xc4),'AI_GEN_AUDIO':a696_0x42050c(0xae),'GROUP':a696_0x42050c(0xca),'DEBUG':'debug','STORYBOARD':a696_0x42050c(0xe4)};export const NODE_TYPE_LABELS={[NODE_TYPES[a696_0x42050c(0xe8)]]:a696_0x42050c(0xb1),[NODE_TYPES['SOURCE_TEXT']]:a696_0x42050c(0xe2),[NODE_TYPES[a696_0x42050c(0xc3)]]:a696_0x42050c(0xce),[NODE_TYPES[a696_0x42050c(0xe3)]]:'源视频',[NODE_TYPES['AI_GENERATE']]:a696_0x42050c(0xbd),[NODE_TYPES[a696_0x42050c(0xba)]]:a696_0x42050c(0xcc),[NODE_TYPES['AI_GEN_IMAGE']]:a696_0x42050c(0xb2),[NODE_TYPES['AI_GEN_VIDEO']]:a696_0x42050c(0xc7),[NODE_TYPES[a696_0x42050c(0xb9)]]:a696_0x42050c(0xc9),[NODE_TYPES[a696_0x42050c(0xd2)]]:'组',[NODE_TYPES['DEBUG']]:'调试',[NODE_TYPES[a696_0x42050c(0xe9)]]:a696_0x42050c(0xbe)};export const THUMBNAIL={'maxWidth':0x320,'maxHeight':0x320,'quality':0.8,'format':a696_0x42050c(0xad)};export const IMAGE_COMPRESSION={'maxDimension':0x320,'quality':0.6,'format':a696_0x42050c(0xad)};export const SUPPORTED_IMAGE_FORMATS=[a696_0x42050c(0xe5),'.jpeg','.png','.gif',a696_0x42050c(0xdb),'.svg',a696_0x42050c(0xaf),a696_0x42050c(0xac)];export const MAX_FILE_SIZE=0xa*0x400*0x400;export const DB_CONFIG={'name':a696_0x42050c(0xb0),'version':0x2,'storeName':'images','thumbnailStoreName':a696_0x42050c(0xe1)};function a696_0x2a00(){const _0x307748=['var(--gold)','9PFDtan','Delete','网络连接失败，请检查网络设置','sourceAudio','/api/v2/images','1142630UWmLNc','.avif','image/jpeg','aiGenAudio','.bmp','TapNowCanvasDB','源图片','AI\x20图像','879907hjeDMD','Meta','NETWORK_ERROR','2975976LALQUc','Ctrl','sourceVideo','AI_GEN_AUDIO','AI_GEN_TEXT','aiGenImage','var(--blue)','AI\x20生成','故事板','UNKNOWN_ERROR','发生未知错误','UNKNOWN','7710120tUpTEJ','SOURCE_AUDIO','aiGenVideo','35589hpCPoi','/api/v2/user/','AI\x20视频','6733872QvOawM','AI\x20音频','group','aiGenText','AI\x20文本','4BDYtyy','源音频','tapnow_user_preferences','Shift','VALIDATION','GROUP','sourceText','aiGenerate','权限不足','var(--indigo)','VALIDATION_ERROR','52KAiuyl','NOT_FOUND','PERMISSION_DENIED','.webp','var(--indigo-text)','var(--red)','sourceImage','1848174kZOacT','NETWORK','thumbnails','源文本','SOURCE_VIDEO','storyboard','.jpg','var(--green)','/api/v2/projects','SOURCE_IMAGE','STORYBOARD','tapnow_recent_files'];a696_0x2a00=function(){return _0x307748;};return a696_0x2a00();}export const STORAGE_KEYS={'SETTINGS':'tapnow_settings','RECENT_FILES':a696_0x42050c(0xa4),'USER_PREFERENCES':a696_0x42050c(0xcf)};export const ANIMATION_DURATION={'fast':0x96,'normal':0x12c,'slow':0x1f4};export const DRAG={'threshold':0x5,'edgeHandleSize':0xc};export const EDGE={'strokeWidth':0x2,'hoverStrokeWidth':0x4,'color':a696_0x42050c(0xd6),'hoverColor':a696_0x42050c(0xdc)};export const API_BASE='';export const API_ENDPOINTS={'USER_FILE':_0x1b2cac=>a696_0x42050c(0xc6)+_0x1b2cac,'PROJECTS':a696_0x42050c(0xe7),'IMAGES':a696_0x42050c(0xaa)};export const REQUEST_TIMEOUT=0x7530;export const MAX_RETRY_COUNT=0x3;export const MODIFIER_KEYS={'CTRL':'Ctrl','SHIFT':a696_0x42050c(0xd0),'ALT':'Alt','META':a696_0x42050c(0xb4)};export const COMMON_SHORTCUTS={'COPY':[a696_0x42050c(0xb7),'C'],'PASTE':[a696_0x42050c(0xb7),'V'],'CUT':[a696_0x42050c(0xb7),'X'],'UNDO':[a696_0x42050c(0xb7),'Z'],'REDO':[a696_0x42050c(0xd0),a696_0x42050c(0xb7),'Z'],'SELECT_ALL':[a696_0x42050c(0xb7),'A'],'SAVE':[a696_0x42050c(0xb7),'S'],'DELETE':[a696_0x42050c(0xa7)],'ESCAPE':['Escape']};function a696_0xb41a(_0x156ce6,_0x137cf2){const _0x2a008a=a696_0x2a00();return a696_0xb41a=function(_0xb41ac9,_0x5334ab){_0xb41ac9=_0xb41ac9-0xa4;let _0x46055e=_0x2a008a[_0xb41ac9];return _0x46055e;},a696_0xb41a(_0x156ce6,_0x137cf2);}export const ERROR_TYPES={'NETWORK':a696_0x42050c(0xb5),'VALIDATION':a696_0x42050c(0xd7),'NOT_FOUND':a696_0x42050c(0xd9),'PERMISSION':a696_0x42050c(0xda),'UNKNOWN':a696_0x42050c(0xbf)};export const ERROR_MESSAGES={[ERROR_TYPES[a696_0x42050c(0xe0)]]:a696_0x42050c(0xa8),[ERROR_TYPES[a696_0x42050c(0xd1)]]:'数据验证失败',[ERROR_TYPES['NOT_FOUND']]:'请求的资源不存在',[ERROR_TYPES['PERMISSION']]:a696_0x42050c(0xd5),[ERROR_TYPES[a696_0x42050c(0xc1)]]:a696_0x42050c(0xc0)};export const THEME_MODES={'LIGHT':'light','DARK':'dark','SYSTEM':'system'};export const COLORS={'primary':a696_0x42050c(0xd6),'primaryHover':'var(--indigo-text)','success':a696_0x42050c(0xe6),'warning':a696_0x42050c(0xa5),'error':a696_0x42050c(0xdd),'info':a696_0x42050c(0xbc)};
+export const DEFAULT_NODE_SIZE = { width: 0x118, height: 200 };
+export const ZOOM_LIMITS = { min: 0.1, max: 3, default: 1 };
+export const GRID = { size: 20, snapThreshold: 10 };
+export const MINIMAP = { size: 200, padding: 0x258 };
+export const NODE_TYPES = {
+  SOURCE_IMAGE: 'sourceImage',
+  SOURCE_TEXT: 'sourceText',
+  SOURCE_AUDIO: 'sourceAudio',
+  SOURCE_VIDEO: 'sourceVideo',
+  AI_GENERATE: 'aiGenerate',
+  AI_GEN_TEXT: 'aiGenText',
+  AI_GEN_IMAGE: 'aiGenImage',
+  AI_GEN_VIDEO: 'aiGenVideo',
+  AI_GEN_AUDIO: 'aiGenAudio',
+  GROUP: 'group',
+  DEBUG: 'debug',
+  STORYBOARD: 'storyboard',
+};
+export const NODE_TYPE_LABELS = {
+  [NODE_TYPES.SOURCE_IMAGE]: '源图片',
+  [NODE_TYPES.SOURCE_TEXT]: '源文本',
+  [NODE_TYPES.SOURCE_AUDIO]: '源音频',
+  [NODE_TYPES.SOURCE_VIDEO]: '源视频',
+  [NODE_TYPES.AI_GENERATE]: 'AI 生成',
+  [NODE_TYPES.AI_GEN_TEXT]: 'AI 文本',
+  [NODE_TYPES.AI_GEN_IMAGE]: 'AI 图像',
+  [NODE_TYPES.AI_GEN_VIDEO]: 'AI 视频',
+  [NODE_TYPES.AI_GEN_AUDIO]: 'AI 音频',
+  [NODE_TYPES.GROUP]: '组',
+  [NODE_TYPES.DEBUG]: '调试',
+  [NODE_TYPES.STORYBOARD]: '故事板',
+};
+export const THUMBNAIL = { maxWidth: 0x320, maxHeight: 0x320, quality: 0.8, format: 'image/jpeg' };
+export const IMAGE_COMPRESSION = { maxDimension: 0x320, quality: 0.6, format: 'image/jpeg' };
+export const SUPPORTED_IMAGE_FORMATS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.avif'];
+export const MAX_FILE_SIZE = 10 * 0x400 * 0x400;
+export const DB_CONFIG = {
+  name: 'TapNowCanvasDB',
+  version: 2,
+  storeName: 'images',
+  thumbnailStoreName: 'thumbnails',
+};
+export const STORAGE_KEYS = {
+  SETTINGS: 'tapnow_settings',
+  RECENT_FILES: 'tapnow_recent_files',
+  USER_PREFERENCES: 'tapnow_user_preferences',
+};
+export const ANIMATION_DURATION = { fast: 150, normal: 0x12c, slow: 0x1f4 };
+export const DRAG = { threshold: 5, edgeHandleSize: 12 };
+export const EDGE = {
+  strokeWidth: 2,
+  hoverStrokeWidth: 4,
+  color: 'var(--indigo)',
+  hoverColor: 'var(--indigo-text)',
+};
+export const API_BASE = '';
+export const API_ENDPOINTS = {
+  USER_FILE: (_0x1b2cac) => '/api/v2/user/' + _0x1b2cac,
+  PROJECTS: '/api/v2/projects',
+  IMAGES: '/api/v2/images',
+};
+export const REQUEST_TIMEOUT = 0x7530;
+export const MAX_RETRY_COUNT = 3;
+export const MODIFIER_KEYS = { CTRL: 'Ctrl', SHIFT: 'Shift', ALT: 'Alt', META: 'Meta' };
+export const COMMON_SHORTCUTS = {
+  COPY: ['Ctrl', 'C'],
+  PASTE: ['Ctrl', 'V'],
+  CUT: ['Ctrl', 'X'],
+  UNDO: ['Ctrl', 'Z'],
+  REDO: ['Shift', 'Ctrl', 'Z'],
+  SELECT_ALL: ['Ctrl', 'A'],
+  SAVE: ['Ctrl', 'S'],
+  DELETE: ['Delete'],
+  ESCAPE: ['Escape'],
+};
+export const ERROR_TYPES = {
+  NETWORK: 'NETWORK_ERROR',
+  VALIDATION: 'VALIDATION_ERROR',
+  NOT_FOUND: 'NOT_FOUND',
+  PERMISSION: 'PERMISSION_DENIED',
+  UNKNOWN: 'UNKNOWN_ERROR',
+};
+export const ERROR_MESSAGES = {
+  [ERROR_TYPES.NETWORK]: '网络连接失败，请检查网络设置',
+  [ERROR_TYPES.VALIDATION]: '数据验证失败',
+  [ERROR_TYPES.NOT_FOUND]: '请求的资源不存在',
+  [ERROR_TYPES.PERMISSION]: '权限不足',
+  [ERROR_TYPES.UNKNOWN]: '发生未知错误',
+};
+export const THEME_MODES = { LIGHT: 'light', DARK: 'dark', SYSTEM: 'system' };
+export const COLORS = {
+  primary: 'var(--indigo)',
+  primaryHover: 'var(--indigo-text)',
+  success: 'var(--green)',
+  warning: 'var(--gold)',
+  error: 'var(--red)',
+  info: 'var(--blue)',
+};

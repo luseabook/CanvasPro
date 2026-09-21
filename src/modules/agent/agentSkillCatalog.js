@@ -1,1 +1,102 @@
-const a444_0x1e0354=a444_0x3c4f;(function(_0x180913,_0x3da95f){const _0x40f636=a444_0x3c4f,_0x3493c4=_0x180913();while(!![]){try{const _0x12ceee=parseInt(_0x40f636(0x1d1))/0x1+parseInt(_0x40f636(0x1e5))/0x2*(-parseInt(_0x40f636(0x1d4))/0x3)+parseInt(_0x40f636(0x1dd))/0x4+parseInt(_0x40f636(0x1f1))/0x5+parseInt(_0x40f636(0x1cf))/0x6+-parseInt(_0x40f636(0x1b9))/0x7*(parseInt(_0x40f636(0x1b8))/0x8)+-parseInt(_0x40f636(0x1d8))/0x9*(parseInt(_0x40f636(0x1ea))/0xa);if(_0x12ceee===_0x3da95f)break;else _0x3493c4['push'](_0x3493c4['shift']());}catch(_0x56262f){_0x3493c4['push'](_0x3493c4['shift']());}}}(a444_0x1a51,0xa9cd0));function a444_0x1a51(){const _0x48946a=['trim','1203643dztvoa','source\x20image','defaultParams','1531317wMhfFO','recommendedModelKind','layout.arrangeGrid','Text\x20to\x20image','279TkZxMF','Image\x20to\x20video','text-to-video','prompt','user\x20wants\x20to\x20animate\x20an\x20image\x20or\x20generate\x20video\x20from\x20selected\x20images','2281252XWrUHX','node.create','image-to-video','layout\x20intent','layout.align','generation.run','user\x20wants\x20to\x20create\x20images\x20from\x20text','object','2PtWSHe','riskLevel','What\x20duration\x20and\x20aspect\x20ratio\x20do\x20you\x20want?','layout.distribute','missingInputQuestions','650690bbiNtV','16:9','Which\x20image\x20should\x20be\x20used\x20as\x20the\x20video\x20reference?','Do\x20you\x20prefer\x20speed,\x20quality,\x20or\x20low\x20cost?','What\x20should\x20happen\x20in\x20the\x20video?','filter','Which\x20nodes\x20should\x20be\x20arranged?','1784480XmGzlO','graph.connect','commands','appliesWhen','Batch\x20layout','text-to-image','1392TZvwCU','3731dDDOtY','What\x20image\x20prompt\x20should\x20be\x20used?','node.setPrompt','video','layout.arrangeColumn','requiredInputs','freeze','node.setParams','node.select','Text\x20to\x20video','user\x20wants\x20to\x20create\x20video\x20from\x20text','batch-layout','layout.arrangeRow','target\x20nodes','map','isArray','user\x20wants\x20to\x20align,\x20distribute,\x20or\x20arrange\x20many\x20canvas\x20nodes','viewport.focusNodes','prompt\x20or\x20motion\x20intent','safe','confirm','Should\x20they\x20be\x20arranged\x20as\x20a\x20row,\x20column,\x20or\x20grid?','7109832ysKpcF'];a444_0x1a51=function(){return _0x48946a;};return a444_0x1a51();}function a444_0x3c4f(_0x44effc,_0x146cfe){const _0x1a5124=a444_0x1a51();return a444_0x3c4f=function(_0x3c4fb2,_0x2d3b54){_0x3c4fb2=_0x3c4fb2-0x1b3;let _0x2a0bd8=_0x1a5124[_0x3c4fb2];return _0x2a0bd8;},a444_0x3c4f(_0x44effc,_0x146cfe);}const textToImageSkill={'schemaVersion':0x1,'id':a444_0x1e0354(0x1b7),'title':a444_0x1e0354(0x1d7),'riskLevel':'confirm','appliesWhen':[a444_0x1e0354(0x1e3)],'requiredInputs':[a444_0x1e0354(0x1db)],'missingInputQuestions':[a444_0x1e0354(0x1ba),a444_0x1e0354(0x1ed)],'recommendedModelKind':'image','defaultParams':{},'commands':[a444_0x1e0354(0x1de),a444_0x1e0354(0x1bb),'node.setParams','generation.run']},textToVideoSkill={'schemaVersion':0x1,'id':a444_0x1e0354(0x1da),'title':a444_0x1e0354(0x1c2),'riskLevel':a444_0x1e0354(0x1cd),'appliesWhen':[a444_0x1e0354(0x1c3)],'requiredInputs':['prompt'],'missingInputQuestions':[a444_0x1e0354(0x1ee),a444_0x1e0354(0x1e7)],'recommendedModelKind':a444_0x1e0354(0x1bc),'defaultParams':{'duration':0x5},'commands':['node.create','node.setPrompt','node.setParams','generation.run']},imageToVideoSkill={'schemaVersion':0x1,'id':a444_0x1e0354(0x1df),'title':a444_0x1e0354(0x1d9),'riskLevel':a444_0x1e0354(0x1cd),'appliesWhen':[a444_0x1e0354(0x1dc)],'requiredInputs':[a444_0x1e0354(0x1d2),a444_0x1e0354(0x1cb)],'missingInputQuestions':[a444_0x1e0354(0x1ec),'How\x20long\x20should\x20the\x20video\x20be?','Do\x20you\x20prefer\x20speed,\x20quality,\x20or\x20low\x20cost?'],'recommendedModelKind':a444_0x1e0354(0x1bc),'defaultParams':{'duration':0x5,'aspectRatio':a444_0x1e0354(0x1eb)},'commands':[a444_0x1e0354(0x1de),a444_0x1e0354(0x1b3),a444_0x1e0354(0x1bb),a444_0x1e0354(0x1c0),a444_0x1e0354(0x1e2)]},batchLayoutSkill={'schemaVersion':0x1,'id':a444_0x1e0354(0x1c4),'title':a444_0x1e0354(0x1b6),'riskLevel':a444_0x1e0354(0x1cc),'appliesWhen':[a444_0x1e0354(0x1c9)],'requiredInputs':[a444_0x1e0354(0x1c6),a444_0x1e0354(0x1e0)],'missingInputQuestions':[a444_0x1e0354(0x1f0),a444_0x1e0354(0x1ce)],'recommendedModelKind':'','defaultParams':{'gap':0x28},'commands':[a444_0x1e0354(0x1c1),a444_0x1e0354(0x1e1),a444_0x1e0354(0x1e8),a444_0x1e0354(0x1c5),a444_0x1e0354(0x1bd),a444_0x1e0354(0x1d6),a444_0x1e0354(0x1ca)]},AGENT_SKILL_ALLOWLIST=Object[a444_0x1e0354(0x1bf)]([textToImageSkill,textToVideoSkill,imageToVideoSkill,batchLayoutSkill]);function normalizeSkill(_0x180da7={}){const _0xb56765=a444_0x1e0354;return{'id':String(_0x180da7['id']||'')['trim'](),'title':String(_0x180da7['title']||'')[_0xb56765(0x1d0)](),'riskLevel':String(_0x180da7[_0xb56765(0x1e6)]||_0xb56765(0x1cc))[_0xb56765(0x1d0)](),'appliesWhen':Array[_0xb56765(0x1c8)](_0x180da7['appliesWhen'])?_0x180da7[_0xb56765(0x1b5)][_0xb56765(0x1c7)](_0x125ba3=>String(_0x125ba3||''))[_0xb56765(0x1ef)](Boolean):[],'requiredInputs':Array['isArray'](_0x180da7[_0xb56765(0x1be)])?_0x180da7[_0xb56765(0x1be)]['map'](_0xb82613=>String(_0xb82613||''))[_0xb56765(0x1ef)](Boolean):[],'missingInputQuestions':Array['isArray'](_0x180da7[_0xb56765(0x1e9)])?_0x180da7['missingInputQuestions']['map'](_0x5d3dd0=>String(_0x5d3dd0||''))[_0xb56765(0x1ef)](Boolean):[],'recommendedModelKind':String(_0x180da7[_0xb56765(0x1d5)]||'')[_0xb56765(0x1d0)](),'defaultParams':_0x180da7[_0xb56765(0x1d3)]&&typeof _0x180da7['defaultParams']===_0xb56765(0x1e4)?{..._0x180da7[_0xb56765(0x1d3)]}:{},'commands':Array[_0xb56765(0x1c8)](_0x180da7[_0xb56765(0x1b4)])?_0x180da7[_0xb56765(0x1b4)][_0xb56765(0x1c7)](_0x255335=>String(_0x255335||''))[_0xb56765(0x1ef)](Boolean):[]};}export function listAgentSkills(){const _0x40fc13=a444_0x1e0354;return AGENT_SKILL_ALLOWLIST[_0x40fc13(0x1c7)](normalizeSkill)[_0x40fc13(0x1ef)](_0x23e37a=>_0x23e37a['id']);}
+const textToImageSkill = {
+    schemaVersion: 1,
+    id: 'text-to-image',
+    title: 'Text to image',
+    riskLevel: 'confirm',
+    appliesWhen: ['user wants to create images from text'],
+    requiredInputs: ['prompt'],
+    missingInputQuestions: [
+      'What image prompt should be used?',
+      'Do you prefer speed, quality, or low cost?',
+    ],
+    recommendedModelKind: 'image',
+    defaultParams: {},
+    commands: ['node.create', 'node.setPrompt', 'node.setParams', 'generation.run'],
+  },
+  textToVideoSkill = {
+    schemaVersion: 1,
+    id: 'text-to-video',
+    title: 'Text to video',
+    riskLevel: 'confirm',
+    appliesWhen: ['user wants to create video from text'],
+    requiredInputs: ['prompt'],
+    missingInputQuestions: [
+      'What should happen in the video?',
+      'What duration and aspect ratio do you want?',
+    ],
+    recommendedModelKind: 'video',
+    defaultParams: { duration: 5 },
+    commands: ['node.create', 'node.setPrompt', 'node.setParams', 'generation.run'],
+  },
+  imageToVideoSkill = {
+    schemaVersion: 1,
+    id: 'image-to-video',
+    title: 'Image to video',
+    riskLevel: 'confirm',
+    appliesWhen: ['user wants to animate an image or generate video from selected images'],
+    requiredInputs: ['source image', 'prompt or motion intent'],
+    missingInputQuestions: [
+      'Which image should be used as the video reference?',
+      'How long should the video be?',
+      'Do you prefer speed, quality, or low cost?',
+    ],
+    recommendedModelKind: 'video',
+    defaultParams: { duration: 5, aspectRatio: '16:9' },
+    commands: ['node.create', 'graph.connect', 'node.setPrompt', 'node.setParams', 'generation.run'],
+  },
+  batchLayoutSkill = {
+    schemaVersion: 1,
+    id: 'batch-layout',
+    title: 'Batch layout',
+    riskLevel: 'safe',
+    appliesWhen: ['user wants to align, distribute, or arrange many canvas nodes'],
+    requiredInputs: ['target nodes', 'layout intent'],
+    missingInputQuestions: [
+      'Which nodes should be arranged?',
+      'Should they be arranged as a row, column, or grid?',
+    ],
+    recommendedModelKind: '',
+    defaultParams: { gap: 40 },
+    commands: [
+      'node.select',
+      'layout.align',
+      'layout.distribute',
+      'layout.arrangeRow',
+      'layout.arrangeColumn',
+      'layout.arrangeGrid',
+      'viewport.focusNodes',
+    ],
+  },
+  AGENT_SKILL_ALLOWLIST = Object.freeze([
+    textToImageSkill,
+    textToVideoSkill,
+    imageToVideoSkill,
+    batchLayoutSkill,
+  ]);
+function normalizeSkill(_0x180da7 = {}) {
+  return {
+    id: String(_0x180da7.id || '').trim(),
+    title: String(_0x180da7.title || '').trim(),
+    riskLevel: String(_0x180da7.riskLevel || 'safe').trim(),
+    appliesWhen: Array.isArray(_0x180da7.appliesWhen)
+      ? _0x180da7.appliesWhen.map((_0x125ba3) => String(_0x125ba3 || '')).filter(Boolean)
+      : [],
+    requiredInputs: Array.isArray(_0x180da7.requiredInputs)
+      ? _0x180da7.requiredInputs.map((_0xb82613) => String(_0xb82613 || '')).filter(Boolean)
+      : [],
+    missingInputQuestions: Array.isArray(_0x180da7.missingInputQuestions)
+      ? _0x180da7.missingInputQuestions.map((_0x5d3dd0) => String(_0x5d3dd0 || '')).filter(Boolean)
+      : [],
+    recommendedModelKind: String(_0x180da7.recommendedModelKind || '').trim(),
+    defaultParams:
+      _0x180da7.defaultParams && typeof _0x180da7.defaultParams === 'object'
+        ? { ..._0x180da7.defaultParams }
+        : {},
+    commands: Array.isArray(_0x180da7.commands)
+      ? _0x180da7.commands.map((_0x255335) => String(_0x255335 || '')).filter(Boolean)
+      : [],
+  };
+}
+export function listAgentSkills() {
+  return AGENT_SKILL_ALLOWLIST.map(normalizeSkill).filter((_0x23e37a) => _0x23e37a.id);
+}

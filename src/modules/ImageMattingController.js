@@ -1,1 +1,1196 @@
-const a531_0x1a57d8=a531_0x5e6a;function a531_0x3f2e(){const _0x689cbf=['paint-white','data:','.act-cancel','image/png','alphaMaskCtx','thumbUrl','replace','_createCheckerboardPattern','round','mattingTooltip','_save','_dirty','_updateToolActive','setTransform','tooltips.','_view','_loadImage','tooltips.brushNormal','errors.canvasExportFailed','1CVFOTg','_createUI','pointerEvents','isArray','_updateView','_resolveNodeImageUrl','createObjectURL','_clear','bucket','\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-matting-btn\x20icon-only\x20act-cancel\x22\x20data-matting-tooltip=\x22cancel\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22><path\x20d=\x22M18\x206L6\x2018M6\x206l12\x2012\x22/></svg></button>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-matting-divider\x22></div>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-matting-btn\x20icon-only\x20tool-btn\x20active\x22\x20data-tool=\x22brush\x22\x20data-brush-mode=\x22normal\x22\x20data-matting-tooltip=\x22brush\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20class=\x22brush-icon-normal\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22><path\x20d=\x22M12\x2020h9\x22/><path\x20d=\x22M16.5\x203.5a2.1\x202.1\x200\x200\x201\x203\x203L7\x2019l-4\x201\x201-4Z\x22/></svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20class=\x22brush-icon-alpha\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22\x20style=\x22display:none\x22><path\x20d=\x22M12\x2020h9\x22/><path\x20d=\x22M16.5\x203.5a2.1\x202.1\x200\x200\x201\x203\x203L7\x2019l-4\x201\x201-4Z\x22/><path\x20d=\x22M3\x203h6v6H3z\x22\x20fill=\x22currentColor\x22\x20fill-opacity=\x220.3\x22/></svg>\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-matting-btn\x20icon-only\x20tool-btn\x22\x20data-tool=\x22eraser\x22\x20data-matting-tooltip=\x22eraser\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22><path\x20d=\x22M20\x2020H7l-5-5a2\x202\x200\x200\x201\x200-2.83l9.17-9.17a2\x202\x200\x200\x201\x202.83\x200L22\x2010a2\x202\x200\x200\x201\x200\x202.83L14.83\x2020\x22/></svg></button>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-matting-btn\x20icon-only\x20tool-btn\x22\x20data-tool=\x22bucket\x22\x20data-matting-tooltip=\x22bucket\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22><path\x20d=\x22M19\x2011l-8-8-8.5\x208.5a2.12\x202.12\x200\x200\x200\x200\x203l4\x204a2.12\x202.12\x200\x200\x200\x203\x200L19\x2011z\x22/><path\x20d=\x22M16\x2014l-3.5\x203.5\x22/><path\x20d=\x22M12\x2018l-2\x202\x22/><path\x20d=\x22M20\x2020l-2-2\x22/></svg></button>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-matting-divider\x22></div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-matting-size\x22><span\x20class=\x22v2-matting-size-value\x22></span><input\x20class=\x22v2-matting-size-range\x22\x20type=\x22range\x22\x20min=\x221\x22\x20max=\x22','maskPreviewUrl','exit','_syncLocaleTexts','imageUrl','_redoStack','showToast','clientY','_normalMaskCanvas','_alphaMaskCanvas','normal','error','height','onload','.act-undo','push','_draft','node','block','contains','min','v2-matting-cursor','catch','unshift','pointerleave','value','concat','mask','295471hxIgxI','forEach','636cjJrki','width','tool','slice','_compositeNormalMask','_cursorHover','toasts.noImage','save','144417GrJFAG','brushMode','1684828ChPzwM','pointerdown','visible','sizeValueEl','isFinite','_render','8qHCzEm','appendChild','340UrRmrw','zoom','imageMatting.','maskSaveToken','button','toasts.saveFailed','globalAlpha','_compositeAlphaMask','--canvas-white','_cursorLast','_isSaving','pointerId','_unsubscribe','fill','getImageData','className','updateNodeData','.act-save','complete','alpha','1246987NaOJtE','setMattingState','maskPolarity','getPropertyValue','draggable','floor','startPoint','fillStyle','filter','cursorEl','maskPreview','#000','active','wheel','nodes','_bindEvents','getContext','target','mask-preview','2057742ZGfeaX','revokeObjectURL','globalCompositeOperation','checkerLight','checkerDark','normalMaskCtx','_prepareAlphaMaskCanvas','remove','dataset','startsWith','pointerup','display','top','toolButtons','naturalWidth','classList','span','anonymous','selectionOverlay','mode:','_renderCommands','brush','_unsubscribeLocale','sizeWorld','putImageData','_syncCursor','preventDefault','restore','tooltips.brushAlphaToggle','v2-matting-container','removeEventListener','#fff','_switchTool','25710GkGplV','sizeRangeEl','_baseMaskCleared','516VrGcoO','boundarySource','canvasEl','_undo','has','stopPropagation','localPath','_waitForImageAndShow','.v2-matting-size-range','subscribeSelector','_onCanvasWheel','find','toasts.cancelled','errors.imageLoadFailed','nodeId','sourceUrl','_invertCanvasBinary','onerror','crossOrigin','setPointerCapture','map','fillRect','querySelectorAll','createElement','v2-matting-overlay','fillRegionCache','_createMaskBaseCanvas','_fillArea','body','[data-matting-tooltip]','toBlob','some','bind','pointermove','matting','_triggerLocalCacheSave','mask_preview','imgEl','textContent','_prepareNormalMaskCanvas','overlayEl','data','viewport','style','containerEl','[Matting]\x20保存失败:','\x22\x20step=\x221\x22></div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-matting-divider\x22></div>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-matting-btn\x20icon-only\x20act-undo\x22\x20data-matting-tooltip=\x22undo\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22><path\x20d=\x22M9\x2014l-4-4\x204-4\x22/><path\x20d=\x22M5\x2010h9a6\x206\x200\x201\x201\x200\x2012h-3\x22/></svg></button>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-matting-btn\x20icon-only\x20act-redo\x22\x20data-matting-tooltip=\x22redo\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22><path\x20d=\x22M15\x2014l4-4-4-4\x22/><path\x20d=\x22M19\x2010H10a6\x206\x200\x201\x200\x200\x2012h3\x22/></svg></button>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-matting-btn\x20icon-only\x20act-clear\x22\x20data-matting-tooltip=\x22clear\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22><path\x20d=\x22M3\x206h18\x22/><path\x20d=\x22M8\x206V4h8v2\x22/><path\x20d=\x22M6\x206l1\x2016h10l1-16\x22/></svg></button>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-matting-btn\x20v2-matting-save\x20act-save\x22\x20data-matting-tooltip=\x22save\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22><path\x20d=\x22M19\x2021H5a2\x202\x200\x200\x201-2-2V7a2\x202\x200\x200\x201\x202-2h11l5\x205v9a2\x202\x200\x200\x201-2\x202Z\x22/><path\x20d=\x22M17\x2021v-8H7v8\x22/><path\x20d=\x22M7\x203v4h8\x22/></svg><span\x20class=\x22v2-matting-save-label\x22></span></button>\x0a\x20\x20\x20\x20','none','drawImage','max','points','toolbarEl','.act-clear','lineJoin','.brush-icon-normal','_normalOverlayCanvas','repeat','_cursorRaf','devicePixelRatio','clientX','eraser','add','_redo','canvas','setSelectedNodes','brushSizePx','pointerenter','images','resize','source-over','naturalHeight','down','png','clearRect','_alphaOverlayCanvas','tooltip','15ByjjCk','type','mode','maskPreviewFill','.brush-icon-alpha','nodeData','lineCap','mainImageIndex','src','--canvas-black','getStateRaw','destination-out','querySelector','_commands','mask-base','trim','click','getState','div','img','_loadExistingMask','122516Phrdgh','auto','addEventListener','v2-matting-img','pop','length','black','createPattern'];a531_0x3f2e=function(){return _0x689cbf;};return a531_0x3f2e();}(function(_0x195646,_0x213f9d){const _0x4569a7=a531_0x5e6a,_0x3a8ee9=_0x195646();while(!![]){try{const _0x4c2d5d=parseInt(_0x4569a7(0x216))/0x1*(parseInt(_0x4569a7(0x247))/0x2)+-parseInt(_0x4569a7(0x1e6))/0x3*(-parseInt(_0x4569a7(0x1fb))/0x4)+-parseInt(_0x4569a7(0x297))/0x5*(parseInt(_0x4569a7(0x23d))/0x6)+-parseInt(_0x4569a7(0x263))/0x7+-parseInt(_0x4569a7(0x24d))/0x8*(parseInt(_0x4569a7(0x276))/0x9)+parseInt(_0x4569a7(0x24f))/0xa*(parseInt(_0x4569a7(0x23b))/0xb)+parseInt(_0x4569a7(0x29a))/0xc*(-parseInt(_0x4569a7(0x245))/0xd);if(_0x4c2d5d===_0x213f9d)break;else _0x3a8ee9['push'](_0x3a8ee9['shift']());}catch(_0x3fdd7f){_0x3a8ee9['push'](_0x3a8ee9['shift']());}}}(a531_0x3f2e,0x75053));import a531_0x697134 from'../core/stores/appStore.js';import{onLocaleChange,t}from'../i18n/index.js';import{saveOutputBlob}from'./project.js';import{generateId,screenToWorld,worldToScreen,isPointInRect}from'../core/math.js';import{commit}from'./history.js';import{buildBinaryBoundaryMask,floodFillRegion,getCachedSealedFillRegion,paintFilledRegion,sealRegionToBoundary}from'./bucketFill.js';import{IMAGE_BRUSH_MAX_SIZE_PX,clampImageBrushSize,drawRoundBrushStroke,getEraserClearLineWidth,getBrushLineWidth,mapBrushPoints,syncCircularBrushCursor}from'./imageEditorBrushStyle.js';import{getPixelToolPalette}from'./pixelToolPalette.js';import{localPathToUrl,normalizeLocalPath,pickResultLocalPath}from'../utils/localMediaPath.js';function a531_0x5e6a(_0x79d078,_0xf295f){const _0x3f2e5b=a531_0x3f2e();return a531_0x5e6a=function(_0x5e6a63,_0x504a53){_0x5e6a63=_0x5e6a63-0x1b5;let _0x4fcb09=_0x3f2e5b[_0x5e6a63];return _0x4fcb09;},a531_0x5e6a(_0x79d078,_0xf295f);}const getCssVar=_0x473875=>getComputedStyle(document['documentElement'])[a531_0x1a57d8(0x266)](_0x473875)[a531_0x1a57d8(0x1f5)](),DEFAULT_MATTING_BRUSH_SIZE_PX=0x28,MAX_MATTING_BRUSH_SIZE_PX=IMAGE_BRUSH_MAX_SIZE_PX,OPAQUE_MASK_PREVIEW_CLEAR=a531_0x1a57d8(0x201);function imageMattingText(_0x214412,_0x5619fb={}){const _0x3fcc3a=a531_0x1a57d8;return t(_0x3fcc3a(0x251)+_0x214412,_0x5619fb);}function clampMattingBrushSize(_0x1c0e18,_0x266794=DEFAULT_MATTING_BRUSH_SIZE_PX){return clampImageBrushSize(_0x1c0e18,_0x266794);}const isFiniteCommandPoint=_0xc87fd4=>Number['isFinite'](Number(_0xc87fd4?.['x']))&&Number[a531_0x1a57d8(0x24b)](Number(_0xc87fd4?.['y'])),hasDrawableStrokePoints=_0x121407=>Array[a531_0x1a57d8(0x219)](_0x121407?.[a531_0x1a57d8(0x1cc)])&&_0x121407[a531_0x1a57d8(0x1cc)][a531_0x1a57d8(0x1b9)](isFiniteCommandPoint),shouldDiscardStrokeCommand=_0x558327=>(_0x558327?.[a531_0x1a57d8(0x1e7)]===a531_0x1a57d8(0x28b)||_0x558327?.[a531_0x1a57d8(0x1e7)]===a531_0x1a57d8(0x1d6))&&!hasDrawableStrokePoints(_0x558327),MATTING_TOOLBAR_HTML=a531_0x1a57d8(0x21f)+MAX_MATTING_BRUSH_SIZE_PX+a531_0x1a57d8(0x1c8),ImageMattingController={'active':![],'nodeId':null,'nodeData':null,'overlayEl':null,'containerEl':null,'imgEl':null,'canvasEl':null,'toolbarEl':null,'sizeValueEl':null,'sizeRangeEl':null,'toolButtons':null,'cursorEl':null,'_cursorHover':![],'_cursorLast':{'x':0x0,'y':0x0},'_cursorRaf':0x0,'_unsubscribe':null,'_commands':[],'_redoStack':[],'_draft':null,'_dirty':![],'_baseMaskCleared':![],'_view':null,'_normalMaskCanvas':null,'_normalOverlayCanvas':null,'_alphaMaskCanvas':null,'_alphaOverlayCanvas':null,'_fillRegionCache':null,'_unsubscribeLocale':null,'_isSaving':![],'init'(_0x5d135b){const _0x4e43e5=a531_0x1a57d8;if(this['active'])return;const _0x5bd6d3=a531_0x697134[_0x4e43e5(0x1f0)](),_0x4acbc3=_0x5bd6d3['nodes']?.[_0x5d135b];if(!_0x4acbc3)return;const _0x35f6f2=this[_0x4e43e5(0x21b)](_0x4acbc3);if(!_0x35f6f2){window[_0x4e43e5(0x225)]?.(imageMattingText(_0x4e43e5(0x243)),'warn');return;}const _0x3c7157=new Set(['brush','eraser',_0x4e43e5(0x21e)]),_0x100e02=_0x3c7157[_0x4e43e5(0x29e)](_0x5bd6d3[_0x4e43e5(0x1bc)]?.[_0x4e43e5(0x23f)])?_0x5bd6d3[_0x4e43e5(0x1bc)][_0x4e43e5(0x23f)]:_0x4e43e5(0x28b),_0x355cf8=clampMattingBrushSize(_0x5bd6d3['matting']?.['brushSizePx']),_0x2d228b=_0x5bd6d3['matting']?.['brushMode']||_0x4e43e5(0x229);this[_0x4e43e5(0x26f)]=!![],this[_0x4e43e5(0x2a8)]=_0x5d135b,this[_0x4e43e5(0x1eb)]=_0x4acbc3,this[_0x4e43e5(0x1f3)]=[],this[_0x4e43e5(0x224)]=[],this[_0x4e43e5(0x22f)]=null,this[_0x4e43e5(0x20e)]=![],this[_0x4e43e5(0x299)]=![],this['_fillRegionCache']=new Map(),this[_0x4e43e5(0x259)]=![],this['_view']={'tool':_0x100e02,'brushSizePx':_0x355cf8,'brushMode':_0x2d228b,'viewport':_0x5bd6d3[_0x4e43e5(0x1c4)],'node':_0x4acbc3},a531_0x697134[_0x4e43e5(0x264)]({'active':!![],'nodeId':_0x5d135b,'tool':_0x100e02,'brushSizePx':_0x355cf8,'brushMode':_0x2d228b}),this[_0x4e43e5(0x217)](_0x35f6f2,{'tool':_0x100e02,'brushSizePx':_0x355cf8,'brushMode':_0x2d228b}),this[_0x4e43e5(0x1fa)](),this[_0x4e43e5(0x272)](),this[_0x4e43e5(0x25b)]=a531_0x697134[_0x4e43e5(0x2a3)](_0x122f7e=>{const _0x1283c8=_0x4e43e5,_0x252e3a=_0x122f7e['nodes']?.[_0x5d135b],_0x487e62=_0x122f7e['viewport']||{'x':0x0,'y':0x0,'zoom':0x1},_0x26ce9c=_0x122f7e[_0x1283c8(0x1bc)]||{};return{'hasNode':!!_0x252e3a,'nx':_0x252e3a?_0x252e3a['x']:0x0,'ny':_0x252e3a?_0x252e3a['y']:0x0,'nw':_0x252e3a?_0x252e3a[_0x1283c8(0x23e)]:0x0,'nh':_0x252e3a?_0x252e3a['height']:0x0,'vx':_0x487e62['x'],'vy':_0x487e62['y'],'vz':_0x487e62[_0x1283c8(0x250)]||0x1,'tool':_0x26ce9c['tool']||_0x1283c8(0x28b),'brushSizePx':clampMattingBrushSize(_0x26ce9c[_0x1283c8(0x1db)]),'brushMode':_0x26ce9c[_0x1283c8(0x246)]||'normal'};},_0x29e448=>{const _0x4c530e=_0x4e43e5;if(!_0x29e448?.['hasNode'])return;this[_0x4c530e(0x212)]={'tool':_0x29e448['tool'],'brushSizePx':_0x29e448[_0x4c530e(0x1db)],'brushMode':_0x29e448['brushMode'],'viewport':{'x':_0x29e448['vx'],'y':_0x29e448['vy'],'zoom':_0x29e448['vz']},'node':{'x':_0x29e448['nx'],'y':_0x29e448['ny'],'width':_0x29e448['nw'],'height':_0x29e448['nh']}},this[_0x4c530e(0x21a)](this[_0x4c530e(0x212)]);}),this[_0x4e43e5(0x2a1)]();},'_waitForImageAndShow'(){const _0x18751b=()=>{const _0x463d8c=a531_0x5e6a;if(this[_0x463d8c(0x1bf)]&&this[_0x463d8c(0x1bf)][_0x463d8c(0x261)]&&this[_0x463d8c(0x1bf)][_0x463d8c(0x284)]>0x0){if(this[_0x463d8c(0x212)])this[_0x463d8c(0x21a)](this[_0x463d8c(0x212)]);requestAnimationFrame(()=>{const _0x5d4c2f=_0x463d8c;if(this['overlayEl'])this[_0x5d4c2f(0x1c2)][_0x5d4c2f(0x285)][_0x5d4c2f(0x1d7)](_0x5d4c2f(0x249));});}else requestAnimationFrame(_0x18751b);};_0x18751b();},'exit'({silent:silent=![]}={}){const _0x3980f5=a531_0x1a57d8;if(!this['active'])return;!silent&&this['_dirty']&&window['showToast']?.(imageMattingText(_0x3980f5(0x2a6)),'ok');this[_0x3980f5(0x26f)]=![],this[_0x3980f5(0x2a8)]=null,this[_0x3980f5(0x1eb)]=null,this[_0x3980f5(0x1f3)]=[],this[_0x3980f5(0x224)]=[],this[_0x3980f5(0x22f)]=null,this['_dirty']=![],this[_0x3980f5(0x227)]=null,this[_0x3980f5(0x1d1)]=null,this[_0x3980f5(0x228)]=null,this['_alphaOverlayCanvas']=null,this[_0x3980f5(0x28c)]?.(),this[_0x3980f5(0x28c)]=null,this['_isSaving']=![],this['_fillRegionCache']=null,a531_0x697134[_0x3980f5(0x264)]({'active':![],'nodeId':null});this[_0x3980f5(0x25b)]&&(this['_unsubscribe'](),this['_unsubscribe']=null);if(this[_0x3980f5(0x1c2)])this[_0x3980f5(0x1c2)][_0x3980f5(0x27d)]();if(this[_0x3980f5(0x1cd)])this[_0x3980f5(0x1cd)][_0x3980f5(0x27d)]();this[_0x3980f5(0x1c2)]=null,this['containerEl']=null,this[_0x3980f5(0x1bf)]=null,this[_0x3980f5(0x29c)]=null,this[_0x3980f5(0x1cd)]=null,this['sizeValueEl']=null,this[_0x3980f5(0x298)]=null,this[_0x3980f5(0x283)]=null,this[_0x3980f5(0x26c)]=null,this['_cursorHover']=![],this[_0x3980f5(0x258)]={'x':0x0,'y':0x0},this[_0x3980f5(0x1d3)]=0x0,this[_0x3980f5(0x212)]=null;},'_createUI'(_0x55a80e,_0x3b1009={}){const _0x18dc90=a531_0x1a57d8,_0x54aa85=document['createElement'](_0x18dc90(0x1f8));_0x54aa85[_0x18dc90(0x25e)]=_0x18dc90(0x2b2);const _0x4cab8b=document['createElement'](_0x18dc90(0x1f8));_0x4cab8b[_0x18dc90(0x25e)]=_0x18dc90(0x293);const _0x3685a2=document[_0x18dc90(0x2b1)]('img');_0x3685a2['className']=_0x18dc90(0x1fe),_0x3685a2[_0x18dc90(0x1ee)]=_0x55a80e,_0x3685a2[_0x18dc90(0x267)]=![];const _0x27efe7=document[_0x18dc90(0x2b1)](_0x18dc90(0x1d9));_0x27efe7[_0x18dc90(0x25e)]='v2-matting-canvas';const _0x20fb67=document[_0x18dc90(0x2b1)](_0x18dc90(0x1f8));_0x20fb67[_0x18dc90(0x25e)]=_0x18dc90(0x234),_0x20fb67[_0x18dc90(0x1c5)][_0x18dc90(0x281)]=_0x18dc90(0x1c9),_0x4cab8b[_0x18dc90(0x24e)](_0x3685a2),_0x4cab8b[_0x18dc90(0x24e)](_0x27efe7),_0x54aa85['appendChild'](_0x20fb67),_0x54aa85[_0x18dc90(0x24e)](_0x4cab8b),document[_0x18dc90(0x1b6)][_0x18dc90(0x24e)](_0x54aa85),this[_0x18dc90(0x1c2)]=_0x54aa85,this[_0x18dc90(0x1c6)]=_0x4cab8b,this[_0x18dc90(0x1bf)]=_0x3685a2,this[_0x18dc90(0x29c)]=_0x27efe7,this['cursorEl']=_0x20fb67;const _0x53d86e=document[_0x18dc90(0x2b1)](_0x18dc90(0x1f8));_0x53d86e[_0x18dc90(0x25e)]='v2-matting-toolbar',_0x53d86e['innerHTML']=MATTING_TOOLBAR_HTML,document[_0x18dc90(0x1b6)]['appendChild'](_0x53d86e),this[_0x18dc90(0x1cd)]=_0x53d86e,this['sizeValueEl']=_0x53d86e['querySelector']('.v2-matting-size-value'),this['sizeRangeEl']=_0x53d86e[_0x18dc90(0x1f2)](_0x18dc90(0x2a2)),this[_0x18dc90(0x283)]=Array['from'](_0x53d86e['querySelectorAll']('.tool-btn')),this['_subscribeLocaleChanges'](),this['_syncLocaleTexts']();const _0x1151f6=clampMattingBrushSize(_0x3b1009[_0x18dc90(0x1db)]),_0x15a38f=_0x3b1009[_0x18dc90(0x23f)]||_0x18dc90(0x28b);this['sizeRangeEl'][_0x18dc90(0x238)]=String(_0x1151f6),this[_0x18dc90(0x24a)][_0x18dc90(0x1c0)]=String(_0x1151f6),this['_updateToolActive'](_0x15a38f,_0x1151f6);if(this[_0x18dc90(0x212)])this[_0x18dc90(0x21a)](this[_0x18dc90(0x212)]);},'_bindEvents'(){const _0x19fc7d=a531_0x1a57d8,_0x238394=_0x701c29=>{const _0x27b641=a531_0x5e6a,_0x3e7810=this[_0x27b641(0x29c)]&&(_0x701c29[_0x27b641(0x274)]===this[_0x27b641(0x29c)]||this['canvasEl'][_0x27b641(0x232)](_0x701c29['target']));if(_0x3e7810){this[_0x27b641(0x2a4)](_0x701c29);return;}_0x701c29[_0x27b641(0x290)](),_0x701c29[_0x27b641(0x29f)]();};this[_0x19fc7d(0x1c2)]['addEventListener'](_0x19fc7d(0x270),_0x238394,{'passive':![]});const _0x3e2524=()=>{const _0x42ca2b=_0x19fc7d;if(this[_0x42ca2b(0x212)])this[_0x42ca2b(0x21a)](this['_view']);};window[_0x19fc7d(0x1fd)](_0x19fc7d(0x1de),_0x3e2524);const _0x338b27=()=>{const _0x4e3e76=_0x19fc7d;window[_0x4e3e76(0x294)](_0x4e3e76(0x1de),_0x3e2524),this[_0x4e3e76(0x1c2)]?.[_0x4e3e76(0x294)](_0x4e3e76(0x270),_0x238394);},_0x39fecb=this[_0x19fc7d(0x221)][_0x19fc7d(0x1ba)](this);this[_0x19fc7d(0x221)]=(_0x3f9c4a={})=>{_0x338b27(),_0x39fecb(_0x3f9c4a);},this[_0x19fc7d(0x1cd)]['addEventListener']('pointerdown',_0x1c7a0b=>_0x1c7a0b[_0x19fc7d(0x29f)]()),this[_0x19fc7d(0x1cd)][_0x19fc7d(0x1f2)](_0x19fc7d(0x205))['addEventListener']('click',_0x43a4ff=>{const _0xe8a2e3=_0x19fc7d;_0x43a4ff[_0xe8a2e3(0x29f)](),this[_0xe8a2e3(0x221)]();}),this[_0x19fc7d(0x283)][_0x19fc7d(0x23c)](_0x266c18=>{const _0x1a19b7=_0x19fc7d;_0x266c18[_0x1a19b7(0x1fd)](_0x1a19b7(0x1f6),_0x4c686c=>{const _0x3a2258=_0x1a19b7;_0x4c686c[_0x3a2258(0x29f)]();const _0x1ffb8c=_0x266c18[_0x3a2258(0x27e)][_0x3a2258(0x23f)];this[_0x3a2258(0x296)](_0x1ffb8c);});}),this[_0x19fc7d(0x298)][_0x19fc7d(0x1fd)]('input',_0x165092=>{const _0x16e96c=_0x19fc7d,_0x10b88c=clampMattingBrushSize(_0x165092[_0x16e96c(0x274)][_0x16e96c(0x238)],0x1);a531_0x697134['setMattingState']({'brushSizePx':_0x10b88c}),this[_0x16e96c(0x24a)][_0x16e96c(0x1c0)]=String(_0x10b88c),this[_0x16e96c(0x28f)]();}),this[_0x19fc7d(0x1cd)][_0x19fc7d(0x1f2)](_0x19fc7d(0x22d))[_0x19fc7d(0x1fd)](_0x19fc7d(0x1f6),_0x339753=>{const _0x3a5e30=_0x19fc7d;_0x339753[_0x3a5e30(0x29f)](),this[_0x3a5e30(0x29d)]();}),this[_0x19fc7d(0x1cd)][_0x19fc7d(0x1f2)]('.act-redo')[_0x19fc7d(0x1fd)](_0x19fc7d(0x1f6),_0x4f242d=>{const _0x285149=_0x19fc7d;_0x4f242d[_0x285149(0x29f)](),this[_0x285149(0x1d8)]();}),this[_0x19fc7d(0x1cd)]['querySelector'](_0x19fc7d(0x1ce))[_0x19fc7d(0x1fd)]('click',_0x125e6d=>{const _0xccdcd3=_0x19fc7d;_0x125e6d[_0xccdcd3(0x29f)](),this[_0xccdcd3(0x21d)]();}),this[_0x19fc7d(0x1cd)][_0x19fc7d(0x1f2)](_0x19fc7d(0x260))[_0x19fc7d(0x1fd)](_0x19fc7d(0x1f6),async _0x5702f9=>{const _0x22351f=_0x19fc7d;_0x5702f9['stopPropagation'](),await this[_0x22351f(0x20d)]();});const _0x14732f=this['canvasEl'][_0x19fc7d(0x273)]('2d');_0x14732f[_0x19fc7d(0x1ec)]=_0x19fc7d(0x20b),_0x14732f[_0x19fc7d(0x1cf)]=_0x19fc7d(0x20b);const _0x34815a={'down':![],'pointerId':null},_0x14c1d7=(_0x4d7886,_0x27b9f1)=>{const _0x4f8b11=_0x19fc7d;this[_0x4f8b11(0x258)]={'x':_0x4d7886,'y':_0x27b9f1};if(this['_cursorRaf'])return;this[_0x4f8b11(0x1d3)]=requestAnimationFrame(()=>{const _0x32a81e=_0x4f8b11;this[_0x32a81e(0x1d3)]=0x0,this[_0x32a81e(0x28f)]();});},_0x11f6e0=(_0x58b864,_0x4be19f,_0x14ca76,_0x8bf57b=0x0)=>{const _0x1a6edc=_0x19fc7d,_0x4ca64e=a531_0x697134[_0x1a6edc(0x1f0)](),_0x5a12bc=_0x4ca64e['nodes']?.[this['nodeId']];if(!_0x5a12bc)return![];const _0x2cb614=screenToWorld(_0x58b864,_0x4be19f,_0x4ca64e['viewport']);if(!isPointInRect(_0x2cb614['x'],_0x2cb614['y'],_0x5a12bc['x'],_0x5a12bc['y'],_0x5a12bc[_0x1a6edc(0x23e)],_0x5a12bc[_0x1a6edc(0x22b)]))return![];const _0x13594f={'x':_0x2cb614['x']-_0x5a12bc['x'],'y':_0x2cb614['y']-_0x5a12bc['y']},_0x45b2d2=_0x4ca64e['matting']?.[_0x1a6edc(0x23f)]||_0x1a6edc(0x28b);if(_0x45b2d2==='bucket'){const _0x32da84=clampMattingBrushSize(_0x4ca64e[_0x1a6edc(0x1bc)]?.[_0x1a6edc(0x1db)]),_0x599f07=_0x32da84/(_0x4ca64e[_0x1a6edc(0x1c4)]['zoom']||0x1);return this[_0x1a6edc(0x1b5)](_0x13594f,_0x599f07),!![];}const _0x3fd9cc=clampMattingBrushSize(_0x4ca64e[_0x1a6edc(0x1bc)]?.[_0x1a6edc(0x1db)]),_0x3a8a23=_0x3fd9cc/(_0x4ca64e[_0x1a6edc(0x1c4)][_0x1a6edc(0x250)]||0x1),_0x255219=_0x4ca64e[_0x1a6edc(0x1bc)]?.['brushMode']||_0x1a6edc(0x229);return _0x45b2d2===_0x1a6edc(0x1d6)?this[_0x1a6edc(0x22f)]={'type':_0x1a6edc(0x1d6),'sizeWorld':_0x3a8a23,'points':[_0x13594f]}:this['_draft']={'type':_0x1a6edc(0x28b),'sizeWorld':_0x3a8a23,'points':[_0x13594f],'mode':_0x255219},_0x34815a[_0x1a6edc(0x1e1)]=!![],_0x34815a[_0x1a6edc(0x25a)]=_0x14ca76,this[_0x1a6edc(0x29c)][_0x1a6edc(0x2ad)](_0x14ca76),this[_0x1a6edc(0x24c)](),!![];},_0x13d8f7=(_0x266245,_0x14d769)=>{const _0x389c59=_0x19fc7d;if(!_0x34815a[_0x389c59(0x1e1)]||!this[_0x389c59(0x22f)])return;const _0x4924d4=a531_0x697134[_0x389c59(0x1f0)](),_0x29a64d=_0x4924d4[_0x389c59(0x271)]?.[this[_0x389c59(0x2a8)]];if(!_0x29a64d)return;const _0x48a96c=screenToWorld(_0x266245,_0x14d769,_0x4924d4[_0x389c59(0x1c4)]),_0x35ea73={'x':_0x48a96c['x']-_0x29a64d['x'],'y':_0x48a96c['y']-_0x29a64d['y']};this['_draft'][_0x389c59(0x1cc)][_0x389c59(0x22e)](_0x35ea73),this[_0x389c59(0x24c)]();},_0x1fdfb1=()=>{const _0x55647c=_0x19fc7d;if(!_0x34815a[_0x55647c(0x1e1)]||!this[_0x55647c(0x22f)])return;const _0x353d12=this[_0x55647c(0x22f)];this[_0x55647c(0x22f)]=null,_0x34815a[_0x55647c(0x1e1)]=![],_0x34815a['pointerId']=null;if(shouldDiscardStrokeCommand(_0x353d12)){this[_0x55647c(0x24c)]();return;}this['_commands'][_0x55647c(0x22e)](_0x353d12),this[_0x55647c(0x224)]=[],this['_dirty']=!![],this[_0x55647c(0x24c)]();};this[_0x19fc7d(0x29c)][_0x19fc7d(0x1fd)](_0x19fc7d(0x248),_0x447c07=>{const _0x5c2537=_0x19fc7d;_0x447c07[_0x5c2537(0x290)](),_0x447c07['stopPropagation'](),_0x14c1d7(_0x447c07[_0x5c2537(0x1d5)],_0x447c07[_0x5c2537(0x226)]),_0x11f6e0(_0x447c07['clientX'],_0x447c07[_0x5c2537(0x226)],_0x447c07[_0x5c2537(0x25a)],_0x447c07[_0x5c2537(0x253)]);}),this[_0x19fc7d(0x29c)][_0x19fc7d(0x1fd)](_0x19fc7d(0x1bb),_0x16334b=>{const _0x11004a=_0x19fc7d;_0x16334b[_0x11004a(0x290)](),_0x16334b['stopPropagation'](),_0x14c1d7(_0x16334b[_0x11004a(0x1d5)],_0x16334b[_0x11004a(0x226)]),_0x13d8f7(_0x16334b[_0x11004a(0x1d5)],_0x16334b[_0x11004a(0x226)]);}),this['canvasEl'][_0x19fc7d(0x1fd)](_0x19fc7d(0x280),_0x3a6e82=>{const _0x5cf5dc=_0x19fc7d;_0x3a6e82[_0x5cf5dc(0x290)](),_0x3a6e82[_0x5cf5dc(0x29f)](),_0x14c1d7(_0x3a6e82[_0x5cf5dc(0x1d5)],_0x3a6e82['clientY']),_0x1fdfb1();}),this[_0x19fc7d(0x29c)][_0x19fc7d(0x1fd)]('pointercancel',_0x75bc35=>{const _0xbc81f8=_0x19fc7d;_0x75bc35[_0xbc81f8(0x290)](),_0x75bc35[_0xbc81f8(0x29f)](),_0x14c1d7(_0x75bc35['clientX'],_0x75bc35[_0xbc81f8(0x226)]),_0x1fdfb1();}),this['canvasEl'][_0x19fc7d(0x1fd)](_0x19fc7d(0x1dc),_0x304e94=>{const _0x51df64=_0x19fc7d;this[_0x51df64(0x242)]=!![],_0x14c1d7(_0x304e94[_0x51df64(0x1d5)],_0x304e94[_0x51df64(0x226)]);}),this['canvasEl'][_0x19fc7d(0x1fd)](_0x19fc7d(0x237),()=>{const _0x3fe4f3=_0x19fc7d;this[_0x3fe4f3(0x242)]=![],this[_0x3fe4f3(0x28f)]();});},'_onCanvasWheel'(_0x8ed980){const _0x2b6f08=a531_0x1a57d8;_0x8ed980[_0x2b6f08(0x290)](),_0x8ed980[_0x2b6f08(0x29f)]();if(!this[_0x2b6f08(0x26f)])return;if(!this[_0x2b6f08(0x242)])return;const _0x2878a4=this[_0x2b6f08(0x212)]?.[_0x2b6f08(0x23f)]||_0x2b6f08(0x28b);if(_0x2878a4!==_0x2b6f08(0x28b)&&_0x2878a4!=='eraser'&&_0x2878a4!==_0x2b6f08(0x21e))return;const _0x1673b9=_0x8ed980['deltaY']||0x0,_0x1da027=_0x1673b9<0x0?0x1:-0x1,_0x505034=clampMattingBrushSize(this[_0x2b6f08(0x212)]?.[_0x2b6f08(0x1db)]),_0x256480=clampMattingBrushSize(_0x505034+_0x1da027*0x2);if(_0x256480===_0x505034)return;a531_0x697134[_0x2b6f08(0x264)]({'brushSizePx':_0x256480});if(this[_0x2b6f08(0x298)])this[_0x2b6f08(0x298)]['value']=String(_0x256480);if(this[_0x2b6f08(0x24a)])this[_0x2b6f08(0x24a)][_0x2b6f08(0x1c0)]=String(_0x256480);this['_syncCursor']();},'_syncCursor'(_0x5a0789=this[a531_0x1a57d8(0x212)]?.['tool']||a531_0x1a57d8(0x28b),_0x3e4aec=this[a531_0x1a57d8(0x212)]?.[a531_0x1a57d8(0x1db)]||DEFAULT_MATTING_BRUSH_SIZE_PX){const _0x5b0eec=a531_0x1a57d8;if(!this[_0x5b0eec(0x26c)])return;syncCircularBrushCursor({'cursorEl':this[_0x5b0eec(0x26c)],'canvasEl':this[_0x5b0eec(0x29c)],'visible':this[_0x5b0eec(0x242)],'tool':_0x5a0789,'allowedTools':[_0x5b0eec(0x28b),_0x5b0eec(0x1d6),_0x5b0eec(0x21e)],'sizePx':_0x3e4aec,'cursorLast':this['_cursorLast']});},'_subscribeLocaleChanges'(){const _0x22b619=a531_0x1a57d8;if(this[_0x22b619(0x28c)])return;this[_0x22b619(0x28c)]=onLocaleChange(()=>this['_syncLocaleTexts']());},'_syncLocaleTexts'(){const _0x4f93cc=a531_0x1a57d8;if(!this[_0x4f93cc(0x1cd)])return;this['toolbarEl'][_0x4f93cc(0x2b0)](_0x4f93cc(0x1b7))[_0x4f93cc(0x23c)](_0x4d2a7b=>{const _0x567d37=_0x4f93cc,_0x2cd96e=_0x4d2a7b['dataset'][_0x567d37(0x20c)];if(!_0x2cd96e)return;let _0x2151e3=imageMattingText(_0x567d37(0x211)+_0x2cd96e);_0x2cd96e==='brush'&&(_0x2151e3=_0x4d2a7b['dataset'][_0x567d37(0x246)]===_0x567d37(0x262)?imageMattingText(_0x567d37(0x292)):imageMattingText(_0x567d37(0x214))),_0x4d2a7b['dataset'][_0x567d37(0x1e5)]=_0x2151e3;});const _0x5ec3c9=this[_0x4f93cc(0x1cd)]['querySelector']('.v2-matting-save-label');_0x5ec3c9&&!this[_0x4f93cc(0x259)]&&(_0x5ec3c9[_0x4f93cc(0x1c0)]=imageMattingText('actions.save'));},'_switchTool'(_0x3cc2f1){const _0x4fa9d4=a531_0x1a57d8,_0x576d16=this['toolButtons'][_0x4fa9d4(0x2a5)](_0x388e83=>_0x388e83[_0x4fa9d4(0x27e)][_0x4fa9d4(0x23f)]===_0x3cc2f1);if(!_0x576d16)return;if(_0x576d16['disabled'])return;const _0x16ac96=a531_0x697134[_0x4fa9d4(0x1f7)](),_0x2339fd=_0x16ac96['matting']?.[_0x4fa9d4(0x23f)];if(_0x3cc2f1===_0x4fa9d4(0x28b)){if(_0x2339fd==='brush'){const _0x1c2770=_0x576d16[_0x4fa9d4(0x27e)][_0x4fa9d4(0x246)]||'normal',_0x1ec52e=_0x1c2770===_0x4fa9d4(0x229)?_0x4fa9d4(0x262):_0x4fa9d4(0x229);_0x576d16['dataset'][_0x4fa9d4(0x246)]=_0x1ec52e,a531_0x697134[_0x4fa9d4(0x264)]({'tool':_0x3cc2f1,'brushMode':_0x1ec52e}),_0x576d16[_0x4fa9d4(0x27e)]['tooltip']=_0x1ec52e===_0x4fa9d4(0x229)?imageMattingText('tooltips.brushNormalToggle'):imageMattingText(_0x4fa9d4(0x292));const _0x193634=_0x576d16['querySelector'](_0x4fa9d4(0x1d0)),_0x1503c8=_0x576d16[_0x4fa9d4(0x1f2)](_0x4fa9d4(0x1ea));_0x193634&&_0x1503c8&&(_0x193634[_0x4fa9d4(0x1c5)][_0x4fa9d4(0x281)]=_0x1ec52e===_0x4fa9d4(0x229)?'block':_0x4fa9d4(0x1c9),_0x1503c8[_0x4fa9d4(0x1c5)]['display']=_0x1ec52e===_0x4fa9d4(0x262)?_0x4fa9d4(0x231):_0x4fa9d4(0x1c9));}else a531_0x697134[_0x4fa9d4(0x264)]({'tool':_0x3cc2f1});}else a531_0x697134[_0x4fa9d4(0x264)]({'tool':_0x3cc2f1});this[_0x4fa9d4(0x20f)]();},'_changeBrushSize'(_0x3f2793){const _0x463863=a531_0x1a57d8,_0x238b78=clampMattingBrushSize(this['_view']?.[_0x463863(0x1db)]),_0x8eb6e7=clampMattingBrushSize(_0x238b78+_0x3f2793);if(_0x8eb6e7!==_0x238b78){a531_0x697134['setMattingState']({'brushSizePx':_0x8eb6e7});if(this['sizeRangeEl'])this[_0x463863(0x298)][_0x463863(0x238)]=String(_0x8eb6e7);if(this[_0x463863(0x24a)])this['sizeValueEl']['textContent']=String(_0x8eb6e7);this[_0x463863(0x28f)]();}},'_updateToolActive'(_0x446c28=this[a531_0x1a57d8(0x212)]?.[a531_0x1a57d8(0x23f)]||a531_0x1a57d8(0x28b),_0x35cf63=this[a531_0x1a57d8(0x212)]?.[a531_0x1a57d8(0x1db)]||DEFAULT_MATTING_BRUSH_SIZE_PX){const _0x3788f3=a531_0x1a57d8;this['toolButtons'][_0x3788f3(0x23c)](_0x3f3678=>{const _0x20f104=_0x3788f3;if(_0x3f3678[_0x20f104(0x27e)][_0x20f104(0x23f)]===_0x446c28)_0x3f3678[_0x20f104(0x285)][_0x20f104(0x1d7)](_0x20f104(0x26f));else _0x3f3678['classList'][_0x20f104(0x27d)](_0x20f104(0x26f));}),this[_0x3788f3(0x28f)](_0x446c28,_0x35cf63);},'_updateView'(_0x496a66){const _0xf5f15=a531_0x1a57d8;if(!this[_0xf5f15(0x26f)])return;const _0x24dead=_0x496a66?.[_0xf5f15(0x230)],_0x58bf89=_0x496a66?.[_0xf5f15(0x1c4)];if(!_0x24dead)return;this[_0xf5f15(0x1eb)]=_0x24dead;const _0x174230=clampMattingBrushSize(_0x496a66?.[_0xf5f15(0x1db)]);if(this[_0xf5f15(0x298)]&&Number(this['sizeRangeEl'][_0xf5f15(0x238)])!==_0x174230)this[_0xf5f15(0x298)][_0xf5f15(0x238)]=String(_0x174230);if(this[_0xf5f15(0x24a)]&&this[_0xf5f15(0x24a)][_0xf5f15(0x1c0)]!==String(_0x174230))this['sizeValueEl'][_0xf5f15(0x1c0)]=String(_0x174230);this[_0xf5f15(0x20f)](_0x496a66?.[_0xf5f15(0x23f)],_0x174230);const _0x31b047=worldToScreen(_0x24dead['x'],_0x24dead['y'],_0x58bf89),_0x2f5af1=Math['round'](_0x24dead['width']*_0x58bf89[_0xf5f15(0x250)]),_0x594f18=Math[_0xf5f15(0x20b)](_0x24dead[_0xf5f15(0x22b)]*_0x58bf89['zoom']);this[_0xf5f15(0x1c6)]['style']['left']=Math[_0xf5f15(0x20b)](_0x31b047['x'])+'px',this[_0xf5f15(0x1c6)][_0xf5f15(0x1c5)]['top']=Math['round'](_0x31b047['y'])+'px',this['containerEl'][_0xf5f15(0x1c5)][_0xf5f15(0x23e)]=_0x2f5af1+'px',this['containerEl'][_0xf5f15(0x1c5)][_0xf5f15(0x22b)]=_0x594f18+'px';const _0xc90c76=window[_0xf5f15(0x1d4)]||0x1,_0xbc1423=Math[_0xf5f15(0x1cb)](0x1,_0x2f5af1),_0x42e824=Math[_0xf5f15(0x1cb)](0x1,_0x594f18);if(this[_0xf5f15(0x29c)]['width']!==Math[_0xf5f15(0x20b)](_0xbc1423*_0xc90c76)||this[_0xf5f15(0x29c)][_0xf5f15(0x22b)]!==Math[_0xf5f15(0x20b)](_0x42e824*_0xc90c76)){this[_0xf5f15(0x29c)][_0xf5f15(0x23e)]=Math[_0xf5f15(0x20b)](_0xbc1423*_0xc90c76),this[_0xf5f15(0x29c)]['height']=Math[_0xf5f15(0x20b)](_0x42e824*_0xc90c76),this['canvasEl'][_0xf5f15(0x1c5)][_0xf5f15(0x23e)]=_0xbc1423+'px',this[_0xf5f15(0x29c)][_0xf5f15(0x1c5)][_0xf5f15(0x22b)]=_0x42e824+'px';const _0x2cd88c=this[_0xf5f15(0x29c)][_0xf5f15(0x273)]('2d');_0x2cd88c[_0xf5f15(0x210)](_0xc90c76,0x0,0x0,_0xc90c76,0x0,0x0),_0x2cd88c[_0xf5f15(0x1ec)]='round',_0x2cd88c[_0xf5f15(0x1cf)]=_0xf5f15(0x20b);}const _0x1a39bf=Math[_0xf5f15(0x1cb)](0xc,Math[_0xf5f15(0x20b)](_0x31b047['y'])-0x36);this['toolbarEl'][_0xf5f15(0x1c5)]['left']=Math[_0xf5f15(0x20b)](_0x31b047['x']+_0x2f5af1/0x2)+'px',this[_0xf5f15(0x1cd)][_0xf5f15(0x1c5)][_0xf5f15(0x282)]=_0x1a39bf+'px',this[_0xf5f15(0x24c)](_0x58bf89);},'_render'(_0x1eb6bd=this[a531_0x1a57d8(0x212)]?.[a531_0x1a57d8(0x1c4)]){const _0x4ae7fc=a531_0x1a57d8;if(!this[_0x4ae7fc(0x26f)]||!this[_0x4ae7fc(0x29c)])return;const _0x44bb81=this[_0x4ae7fc(0x29c)][_0x4ae7fc(0x273)]('2d'),_0x441573=Number(this[_0x4ae7fc(0x29c)]['style']['width'][_0x4ae7fc(0x209)]('px',''))||0x1,_0x283f96=Number(this[_0x4ae7fc(0x29c)][_0x4ae7fc(0x1c5)]['height'][_0x4ae7fc(0x209)]('px',''))||0x1;_0x44bb81['clearRect'](0x0,0x0,_0x441573,_0x283f96);const _0x2dcdfa=this[_0x4ae7fc(0x1f3)],_0xb6a84d=this[_0x4ae7fc(0x1c1)](_0x441573,_0x283f96),_0x5ce53a=this[_0x4ae7fc(0x27c)](_0x441573,_0x283f96);this[_0x4ae7fc(0x28a)](_0x44bb81,_0x1eb6bd,_0x2dcdfa,![],{'normalMaskCtx':_0xb6a84d,'alphaMaskCtx':_0x5ce53a,'boundarySource':_0x2dcdfa});if(this[_0x4ae7fc(0x22f)]){const _0x2a9937=_0x2dcdfa[_0x4ae7fc(0x239)]([this['_draft']]);this[_0x4ae7fc(0x28a)](_0x44bb81,_0x1eb6bd,[this['_draft']],!![],{'normalMaskCtx':_0xb6a84d,'alphaMaskCtx':_0x5ce53a,'boundarySource':_0x2a9937});}this[_0x4ae7fc(0x241)](_0x44bb81,_0x441573,_0x283f96),this[_0x4ae7fc(0x256)](_0x44bb81,_0x1eb6bd,_0x441573,_0x283f96);},'_prepareNormalMaskCanvas'(_0x5074a7,_0x19b332){const _0x7e856=a531_0x1a57d8,_0x34a9fb=Math[_0x7e856(0x1cb)](0x1,Math[_0x7e856(0x20b)](_0x5074a7||0x1)),_0x4376c4=Math[_0x7e856(0x1cb)](0x1,Math['round'](_0x19b332||0x1));if(!this[_0x7e856(0x227)]||this[_0x7e856(0x227)]['width']!==_0x34a9fb||this[_0x7e856(0x227)]['height']!==_0x4376c4){const _0x539ed3=document['createElement'](_0x7e856(0x1d9));_0x539ed3['width']=_0x34a9fb,_0x539ed3[_0x7e856(0x22b)]=_0x4376c4,this['_normalMaskCanvas']=_0x539ed3;}if(!this[_0x7e856(0x1d1)]||this[_0x7e856(0x1d1)][_0x7e856(0x23e)]!==_0x34a9fb||this[_0x7e856(0x1d1)]['height']!==_0x4376c4){const _0x5e78af=document[_0x7e856(0x2b1)](_0x7e856(0x1d9));_0x5e78af[_0x7e856(0x23e)]=_0x34a9fb,_0x5e78af['height']=_0x4376c4,this['_normalOverlayCanvas']=_0x5e78af;}const _0x5a2cc2=this[_0x7e856(0x227)]['getContext']('2d');if(!_0x5a2cc2)return null;return _0x5a2cc2['clearRect'](0x0,0x0,_0x34a9fb,_0x4376c4),_0x5a2cc2[_0x7e856(0x1ec)]=_0x7e856(0x20b),_0x5a2cc2['lineJoin']=_0x7e856(0x20b),_0x5a2cc2;},'_prepareAlphaMaskCanvas'(_0x16deef,_0x4e4e7f){const _0x2f0b63=a531_0x1a57d8,_0x4e4fb1=Math[_0x2f0b63(0x1cb)](0x1,Math['round'](_0x16deef||0x1)),_0x3f2680=Math[_0x2f0b63(0x1cb)](0x1,Math[_0x2f0b63(0x20b)](_0x4e4e7f||0x1));if(!this[_0x2f0b63(0x228)]||this[_0x2f0b63(0x228)][_0x2f0b63(0x23e)]!==_0x4e4fb1||this[_0x2f0b63(0x228)][_0x2f0b63(0x22b)]!==_0x3f2680){const _0x371d10=document[_0x2f0b63(0x2b1)](_0x2f0b63(0x1d9));_0x371d10[_0x2f0b63(0x23e)]=_0x4e4fb1,_0x371d10['height']=_0x3f2680,this['_alphaMaskCanvas']=_0x371d10;}if(!this[_0x2f0b63(0x1e4)]||this[_0x2f0b63(0x1e4)][_0x2f0b63(0x23e)]!==_0x4e4fb1||this[_0x2f0b63(0x1e4)][_0x2f0b63(0x22b)]!==_0x3f2680){const _0x284ad8=document[_0x2f0b63(0x2b1)]('canvas');_0x284ad8['width']=_0x4e4fb1,_0x284ad8[_0x2f0b63(0x22b)]=_0x3f2680,this[_0x2f0b63(0x1e4)]=_0x284ad8;}const _0x5b3cbc=this[_0x2f0b63(0x228)][_0x2f0b63(0x273)]('2d');if(!_0x5b3cbc)return null;return _0x5b3cbc[_0x2f0b63(0x1e3)](0x0,0x0,_0x4e4fb1,_0x3f2680),_0x5b3cbc[_0x2f0b63(0x1ec)]=_0x2f0b63(0x20b),_0x5b3cbc['lineJoin']=_0x2f0b63(0x20b),_0x5b3cbc;},'_compositeNormalMask'(_0x487f19,_0x2b856b,_0x35b641){const _0x499042=a531_0x1a57d8;if(!_0x487f19||!this[_0x499042(0x227)]||!this[_0x499042(0x1d1)])return;const _0x19ec9a=Math['max'](0x1,Number(_0x2b856b)||0x1),_0x48a915=Math[_0x499042(0x1cb)](0x1,Number(_0x35b641)||0x1),_0x593298=this[_0x499042(0x1d1)]['getContext']('2d');if(!_0x593298)return;const _0x17813b=getPixelToolPalette();_0x593298[_0x499042(0x1e3)](0x0,0x0,_0x19ec9a,_0x48a915),_0x593298[_0x499042(0x244)](),_0x593298['globalCompositeOperation']=_0x499042(0x1df),_0x593298[_0x499042(0x255)]=0x1,_0x593298['fillStyle']=_0x17813b[_0x499042(0x1e9)],_0x593298[_0x499042(0x2af)](0x0,0x0,_0x19ec9a,_0x48a915),_0x593298[_0x499042(0x278)]='destination-in',_0x593298['drawImage'](this[_0x499042(0x227)],0x0,0x0,_0x19ec9a,_0x48a915),_0x593298[_0x499042(0x291)](),_0x487f19[_0x499042(0x244)](),_0x487f19[_0x499042(0x278)]=_0x499042(0x1df),_0x487f19[_0x499042(0x255)]=0x1,_0x487f19[_0x499042(0x1ca)](this['_normalOverlayCanvas'],0x0,0x0,_0x19ec9a,_0x48a915),_0x487f19[_0x499042(0x291)]();},'_compositeAlphaMask'(_0x19e0a4,_0x315e86,_0x19a3ae,_0x47247e){const _0x15252f=a531_0x1a57d8;if(!_0x19e0a4||!this[_0x15252f(0x228)]||!this[_0x15252f(0x1e4)])return;const _0x37c22a=Math[_0x15252f(0x1cb)](0x1,Number(_0x19a3ae)||0x1),_0x3120c3=Math[_0x15252f(0x1cb)](0x1,Number(_0x47247e)||0x1),_0x598ae1=this[_0x15252f(0x1e4)][_0x15252f(0x273)]('2d');if(!_0x598ae1)return;_0x598ae1[_0x15252f(0x1e3)](0x0,0x0,_0x37c22a,_0x3120c3);const _0x4cbda0=_0x315e86?.[_0x15252f(0x250)]||0x1,_0x5dcb70=this[_0x15252f(0x20a)](_0x598ae1,_0x4cbda0);_0x598ae1[_0x15252f(0x244)](),_0x598ae1[_0x15252f(0x278)]='source-over',_0x598ae1['globalAlpha']=0.8,_0x598ae1['fillStyle']=_0x5dcb70,_0x598ae1[_0x15252f(0x2af)](0x0,0x0,_0x37c22a,_0x3120c3),_0x598ae1['globalCompositeOperation']='destination-in',_0x598ae1[_0x15252f(0x255)]=0x1,_0x598ae1[_0x15252f(0x1ca)](this['_alphaMaskCanvas'],0x0,0x0,_0x37c22a,_0x3120c3),_0x598ae1[_0x15252f(0x291)](),_0x19e0a4['save'](),_0x19e0a4['globalCompositeOperation']=_0x15252f(0x1df),_0x19e0a4[_0x15252f(0x255)]=0x1,_0x19e0a4['drawImage'](this[_0x15252f(0x1e4)],0x0,0x0,_0x37c22a,_0x3120c3),_0x19e0a4[_0x15252f(0x291)]();},'_renderCommands'(_0x563f4a,_0x5da41c,_0x4ca5f2,_0x3f7f70=![],_0xf710fb={}){const _0x4ea01a=a531_0x1a57d8,_0x452622=_0x5da41c['zoom']||0x1,_0x30522f=Number(this[_0x4ea01a(0x29c)]?.[_0x4ea01a(0x1c5)]?.[_0x4ea01a(0x23e)]?.['replace']('px',''))||0x1,_0x1cf5df=Number(this[_0x4ea01a(0x29c)]?.[_0x4ea01a(0x1c5)]?.[_0x4ea01a(0x22b)]?.['replace']('px',''))||0x1,_0x1fd7e7=getPixelToolPalette(),_0x4868cc=_0xf710fb[_0x4ea01a(0x27b)]||null,_0x549e12=_0xf710fb[_0x4ea01a(0x207)]||null,_0x2e4468=Array[_0x4ea01a(0x219)](_0xf710fb['boundarySource'])?_0xf710fb[_0x4ea01a(0x29b)]:_0x4ca5f2;_0x4ca5f2[_0x4ea01a(0x23c)]((_0x5088c4,_0x422d4e)=>{const _0x4388d7=_0x4ea01a;if(_0x5088c4[_0x4388d7(0x1e7)]===_0x4388d7(0x275)){if(!_0x5088c4[_0x4388d7(0x1f9)])return;const _0x69d3d8=Number(this['canvasEl']?.[_0x4388d7(0x1c5)]?.['width']?.[_0x4388d7(0x209)]('px',''))||0x1,_0x384263=Number(this['canvasEl']?.[_0x4388d7(0x1c5)]?.[_0x4388d7(0x22b)]?.['replace']('px',''))||0x1;_0x563f4a[_0x4388d7(0x244)](),_0x563f4a[_0x4388d7(0x278)]=_0x4388d7(0x1df),_0x563f4a['drawImage'](_0x5088c4[_0x4388d7(0x1f9)],0x0,0x0,_0x69d3d8,_0x384263),_0x563f4a[_0x4388d7(0x291)]();return;}if(_0x5088c4[_0x4388d7(0x1e7)]===_0x4388d7(0x1f4)){if(!_0x5088c4[_0x4388d7(0x1d9)]||!_0x4868cc)return;const _0x2f861b=Number(this[_0x4388d7(0x29c)]?.[_0x4388d7(0x1c5)]?.['width']?.['replace']('px',''))||0x1,_0x2abc32=Number(this[_0x4388d7(0x29c)]?.[_0x4388d7(0x1c5)]?.['height']?.['replace']('px',''))||0x1;_0x4868cc[_0x4388d7(0x244)](),_0x4868cc[_0x4388d7(0x278)]=_0x4388d7(0x1df),_0x4868cc[_0x4388d7(0x1ca)](_0x5088c4[_0x4388d7(0x1d9)],0x0,0x0,_0x2f861b,_0x2abc32),_0x4868cc[_0x4388d7(0x291)]();return;}if(_0x5088c4[_0x4388d7(0x1e7)]===_0x4388d7(0x28b)){_0x563f4a[_0x4388d7(0x244)]();const _0x59cf43=_0x5088c4[_0x4388d7(0x1e8)]===_0x4388d7(0x262),_0x242c7f=mapBrushPoints(_0x5088c4[_0x4388d7(0x1cc)],_0x452622,_0x452622),_0x43c38a=getBrushLineWidth(_0x5088c4[_0x4388d7(0x28d)],_0x452622,_0x4388d7(0x28b));if(_0x59cf43){if(_0x549e12)_0x549e12['save'](),drawRoundBrushStroke(_0x549e12,{'points':_0x242c7f,'lineWidth':_0x43c38a,'strokeStyle':_0x4388d7(0x295),'fillStyle':_0x4388d7(0x295),'globalCompositeOperation':_0x4388d7(0x1df)}),_0x549e12[_0x4388d7(0x291)]();else{const _0xe8a48d=this[_0x4388d7(0x20a)](_0x563f4a,_0x452622);drawRoundBrushStroke(_0x563f4a,{'points':_0x242c7f,'lineWidth':_0x43c38a,'strokeStyle':_0xe8a48d,'fillStyle':_0xe8a48d,'globalCompositeOperation':_0x4388d7(0x1df),'globalAlpha':0.8});}}else _0x4868cc?(_0x4868cc['save'](),drawRoundBrushStroke(_0x4868cc,{'points':_0x242c7f,'lineWidth':_0x43c38a,'strokeStyle':_0x4388d7(0x295),'fillStyle':_0x4388d7(0x295),'globalCompositeOperation':'source-over'}),_0x4868cc[_0x4388d7(0x291)]()):(drawRoundBrushStroke(_0x563f4a,{'points':_0x242c7f,'lineWidth':getEraserClearLineWidth(_0x43c38a),'strokeStyle':OPAQUE_MASK_PREVIEW_CLEAR,'fillStyle':OPAQUE_MASK_PREVIEW_CLEAR,'globalCompositeOperation':_0x4388d7(0x1f1)}),drawRoundBrushStroke(_0x563f4a,{'points':_0x242c7f,'lineWidth':_0x43c38a,'strokeStyle':_0x1fd7e7['maskPreviewFill'],'fillStyle':_0x1fd7e7[_0x4388d7(0x1e9)],'globalCompositeOperation':_0x4388d7(0x1df),'globalAlpha':0x1}));_0x563f4a[_0x4388d7(0x291)]();return;}if(_0x5088c4['type']===_0x4388d7(0x1d6)){const _0x366a01=mapBrushPoints(_0x5088c4['points'],_0x452622,_0x452622),_0x265560=getEraserClearLineWidth(getBrushLineWidth(_0x5088c4[_0x4388d7(0x28d)],_0x452622,_0x4388d7(0x1d6)));_0x563f4a[_0x4388d7(0x244)](),drawRoundBrushStroke(_0x563f4a,{'points':_0x366a01,'lineWidth':_0x265560,'strokeStyle':'#000','fillStyle':_0x4388d7(0x26e),'globalCompositeOperation':'destination-out'}),_0x563f4a[_0x4388d7(0x291)]();_0x4868cc&&(_0x4868cc[_0x4388d7(0x244)](),drawRoundBrushStroke(_0x4868cc,{'points':_0x366a01,'lineWidth':_0x265560,'strokeStyle':'#000','fillStyle':_0x4388d7(0x26e),'globalCompositeOperation':_0x4388d7(0x1f1)}),_0x4868cc[_0x4388d7(0x291)]());_0x549e12&&(_0x549e12[_0x4388d7(0x244)](),drawRoundBrushStroke(_0x549e12,{'points':_0x366a01,'lineWidth':_0x265560,'strokeStyle':'#000','fillStyle':_0x4388d7(0x26e),'globalCompositeOperation':_0x4388d7(0x1f1)}),_0x549e12[_0x4388d7(0x291)]());return;}if(_0x5088c4['type']===_0x4388d7(0x25c)){const _0x96f0b=_0x5088c4[_0x4388d7(0x1e8)]===_0x4388d7(0x262),_0x38b790=Number(_0x5088c4['x']??_0x5088c4[_0x4388d7(0x269)]?.['x'])||0x0,_0x641d38=Number(_0x5088c4['y']??_0x5088c4[_0x4388d7(0x269)]?.['y'])||0x0,_0x232e75=_0x2e4468['indexOf'](_0x5088c4),_0x41f3a0=_0x232e75>=0x0?_0x2e4468[_0x4388d7(0x240)](0x0,_0x232e75):_0x4ca5f2[_0x4388d7(0x240)](0x0,_0x422d4e),_0x14f35d=_0x41f3a0[_0x4388d7(0x26b)](_0x5dc15c=>_0x5dc15c?.[_0x4388d7(0x1e7)]===_0x4388d7(0x28b)||_0x5dc15c?.['type']==='eraser'),_0x184a77=Math[_0x4388d7(0x268)](_0x38b790*_0x452622),_0x242388=Math[_0x4388d7(0x268)](_0x641d38*_0x452622),_0x5b4cfa=getCachedSealedFillRegion({'cache':_0xf710fb[_0x4388d7(0x2b3)]||this['_fillRegionCache'],'width':_0x30522f,'height':_0x1cf5df,'zoom':_0x452622,'fillCommand':_0x5088c4,'boundaryCommands':_0x14f35d,'seedX':_0x184a77,'seedY':_0x242388,'extraKey':_0x4388d7(0x289)+(_0x5088c4['mode']||''),'pointToPixel':_0x1dc63a=>({'x':Number(_0x1dc63a?.['x']||0x0)*_0x452622,'y':Number(_0x1dc63a?.['y']||0x0)*_0x452622}),'getStrokeWidth':_0x3ea12d=>getBrushLineWidth(_0x3ea12d?.[_0x4388d7(0x28d)],_0x452622,_0x3ea12d?.[_0x4388d7(0x1e7)])});if(_0x96f0b){if(_0x549e12)paintFilledRegion(_0x549e12,_0x5b4cfa,_0x30522f,_0x1cf5df,{'fillStyle':'#fff','globalCompositeOperation':_0x4388d7(0x1df),'globalAlpha':0x1});else{const _0xf8b49a=this[_0x4388d7(0x20a)](_0x563f4a,_0x452622);paintFilledRegion(_0x563f4a,_0x5b4cfa,_0x30522f,_0x1cf5df,{'fillStyle':_0xf8b49a,'globalCompositeOperation':_0x4388d7(0x1df),'globalAlpha':0.8});}}else _0x4868cc?paintFilledRegion(_0x4868cc,_0x5b4cfa,_0x30522f,_0x1cf5df,{'fillStyle':_0x4388d7(0x295),'globalCompositeOperation':'source-over'}):(paintFilledRegion(_0x563f4a,_0x5b4cfa,_0x30522f,_0x1cf5df,{'fillStyle':OPAQUE_MASK_PREVIEW_CLEAR,'globalCompositeOperation':_0x4388d7(0x1f1)}),paintFilledRegion(_0x563f4a,_0x5b4cfa,_0x30522f,_0x1cf5df,{'fillStyle':_0x1fd7e7[_0x4388d7(0x288)],'globalCompositeOperation':'source-over'}));return;}});},'_createCheckerboardPattern'(_0x162613,_0x1ec954){const _0x2547c0=a531_0x1a57d8,_0x2bc560=0x8*_0x1ec954,_0x2e3905=document[_0x2547c0(0x2b1)](_0x2547c0(0x1d9));_0x2e3905[_0x2547c0(0x23e)]=_0x2bc560*0x2,_0x2e3905[_0x2547c0(0x22b)]=_0x2bc560*0x2;const _0x24cfc8=_0x2e3905[_0x2547c0(0x273)]('2d'),_0x4391a9=getPixelToolPalette();return _0x24cfc8[_0x2547c0(0x26a)]=_0x4391a9[_0x2547c0(0x279)],_0x24cfc8[_0x2547c0(0x2af)](0x0,0x0,_0x2bc560*0x2,_0x2bc560*0x2),_0x24cfc8[_0x2547c0(0x26a)]=_0x4391a9[_0x2547c0(0x27a)],_0x24cfc8[_0x2547c0(0x2af)](0x0,0x0,_0x2bc560,_0x2bc560),_0x24cfc8[_0x2547c0(0x2af)](_0x2bc560,_0x2bc560,_0x2bc560,_0x2bc560),_0x162613[_0x2547c0(0x202)](_0x2e3905,_0x2547c0(0x1d2));},'_fillArea'(_0x1b3faa,_0x15172a){const _0xa2b513=a531_0x1a57d8,_0x2ef24f=a531_0x697134[_0xa2b513(0x1f7)](),_0x3e3ede=_0x2ef24f[_0xa2b513(0x1bc)]?.[_0xa2b513(0x246)]||_0xa2b513(0x229),_0xab41b1={'type':'fill','x':Number(_0x1b3faa?.['x'])||0x0,'y':Number(_0x1b3faa?.['y'])||0x0,'mode':_0x3e3ede};this[_0xa2b513(0x1f3)][_0xa2b513(0x22e)](_0xab41b1),this[_0xa2b513(0x224)]=[],this[_0xa2b513(0x20e)]=!![],this[_0xa2b513(0x24c)]();},'_undo'(){const _0x4dc86a=a531_0x1a57d8;if(this[_0x4dc86a(0x1f3)]['length']===0x0)return;const _0xe281d6=this[_0x4dc86a(0x1f3)][_0x4dc86a(0x1ff)]();this[_0x4dc86a(0x224)]['push'](_0xe281d6),this[_0x4dc86a(0x20e)]=!![],this[_0x4dc86a(0x24c)]();},'_redo'(){const _0x133180=a531_0x1a57d8;if(this['_redoStack']['length']===0x0)return;const _0x424aa0=this[_0x133180(0x224)][_0x133180(0x1ff)]();this['_commands'][_0x133180(0x22e)](_0x424aa0),this[_0x133180(0x20e)]=!![],this['_render']();},'_clear'(){const _0x9310f3=a531_0x1a57d8;if(this[_0x9310f3(0x1f3)][_0x9310f3(0x200)]===0x0&&this[_0x9310f3(0x224)][_0x9310f3(0x200)]===0x0)return;this[_0x9310f3(0x1f3)]=[],this[_0x9310f3(0x224)]=[],this[_0x9310f3(0x22f)]=null,this['_dirty']=!![],this[_0x9310f3(0x299)]=!![],this['_render']();},async '_save'(){const _0x254e24=a531_0x1a57d8;if(!this[_0x254e24(0x26f)])return;const _0x3200ad=a531_0x697134[_0x254e24(0x1f7)](),_0x34a2ff=_0x3200ad[_0x254e24(0x271)][this[_0x254e24(0x2a8)]];if(!_0x34a2ff)return;const _0x24d12c=this[_0x254e24(0x21b)](_0x34a2ff);if(!_0x24d12c)return;const _0x1ee9b7=this[_0x254e24(0x1cd)][_0x254e24(0x1f2)](_0x254e24(0x260)),_0x4e8055=_0x1ee9b7[_0x254e24(0x1f2)](_0x254e24(0x286)),_0x5e429b=_0x4e8055?_0x4e8055[_0x254e24(0x1c0)]:'';this[_0x254e24(0x259)]=!![];if(_0x4e8055)_0x4e8055[_0x254e24(0x1c0)]=imageMattingText('actions.saving');_0x1ee9b7[_0x254e24(0x1c5)][_0x254e24(0x218)]=_0x254e24(0x1c9);try{const _0x36e423=this[_0x254e24(0x2a8)],_0x3ab4dc=Math[_0x254e24(0x1cb)](0x1,Number(_0x34a2ff[_0x254e24(0x23e)])||0x1),_0x2a260d=Math[_0x254e24(0x1cb)](0x1,Number(_0x34a2ff['height'])||0x1),_0x40b4c1=generateId('mask_save'),_0x32c5e3=this[_0x254e24(0x1f3)][_0x254e24(0x26b)](_0x536e42=>_0x536e42&&(_0x536e42['type']===_0x254e24(0x28b)||_0x536e42[_0x254e24(0x1e7)]==='eraser'||_0x536e42[_0x254e24(0x1e7)]===_0x254e24(0x25c)))[_0x254e24(0x2ae)](_0x4f3bff=>{const _0x2ad573=_0x254e24;if(_0x4f3bff[_0x2ad573(0x1e7)]==='fill')return{'type':_0x2ad573(0x25c),'x':Number(_0x4f3bff['x']??_0x4f3bff[_0x2ad573(0x269)]?.['x'])||0x0,'y':Number(_0x4f3bff['y']??_0x4f3bff['startPoint']?.['y'])||0x0,'mode':_0x4f3bff[_0x2ad573(0x1e8)]};return{'type':_0x4f3bff[_0x2ad573(0x1e7)],'sizeWorld':Number(_0x4f3bff[_0x2ad573(0x28d)])||0x0,'mode':_0x4f3bff['mode'],'points':Array[_0x2ad573(0x219)](_0x4f3bff['points'])?_0x4f3bff[_0x2ad573(0x1cc)][_0x2ad573(0x2ae)](_0x23f042=>({'x':Number(_0x23f042['x']),'y':Number(_0x23f042['y'])})):[]};});if(this['_baseMaskCleared']&&_0x32c5e3[_0x254e24(0x200)]===0x0){a531_0x697134[_0x254e24(0x25f)](_0x36e423,{'mask':'','maskPreview':'','maskPolarity':'','maskPreviewUrl':null,'maskSaveToken':null}),window[_0x254e24(0x1bd)]?.(),this[_0x254e24(0x221)]({'silent':!![]});return;}const _0x5c9f88=this['_baseMaskCleared']?'':normalizeLocalPath(_0x34a2ff?.['mask']),_0x3fb1ca=await new Promise(_0x8baad0=>this[_0x254e24(0x29c)][_0x254e24(0x1b8)](_0x8baad0,_0x254e24(0x206)));if(!_0x3fb1ca)throw new Error(imageMattingText(_0x254e24(0x215)));const _0x336b8f=URL[_0x254e24(0x21c)](_0x3fb1ca);a531_0x697134[_0x254e24(0x25f)](_0x36e423,{'maskPreviewUrl':_0x336b8f,'maskSaveToken':_0x40b4c1}),window['_triggerLocalCacheSave']?.(),this[_0x254e24(0x221)]({'silent':!![]}),(async()=>{const _0x394c58=_0x254e24,_0x474921=await this['_loadImage'](_0x24d12c),_0x3131b2=_0x474921[_0x394c58(0x284)]||_0x474921[_0x394c58(0x23e)],_0x5ac767=_0x474921['naturalHeight']||_0x474921[_0x394c58(0x22b)],_0x5e6b97=Math[_0x394c58(0x1cb)](_0x3ab4dc/_0x3131b2,_0x2a260d/_0x5ac767)||0x1,_0x1d3ed9=_0x3131b2*_0x5e6b97,_0x24dc23=_0x5ac767*_0x5e6b97,_0x2cbba3=(_0x3ab4dc-_0x1d3ed9)/0x2,_0x2f5c97=(_0x2a260d-_0x24dc23)/0x2,_0x50915c=_0x8ab172=>{const _0x2a943f=_0x394c58,_0x369ba5=(Number(_0x8ab172?.['x'])-_0x2cbba3)/_0x5e6b97,_0x48f3cf=(Number(_0x8ab172?.['y'])-_0x2f5c97)/_0x5e6b97;return{'x':Math['max'](0x0,Math[_0x2a943f(0x233)](_0x3131b2-0x1,_0x369ba5)),'y':Math[_0x2a943f(0x1cb)](0x0,Math[_0x2a943f(0x233)](_0x5ac767-0x1,_0x48f3cf))};},_0x58dc90=document[_0x394c58(0x2b1)](_0x394c58(0x1d9));_0x58dc90[_0x394c58(0x23e)]=_0x3131b2,_0x58dc90['height']=_0x5ac767;const _0x1ee56a=_0x58dc90[_0x394c58(0x273)]('2d');_0x1ee56a['imageSmoothingEnabled']=![];const _0x2f2f8a=getCssVar(_0x394c58(0x257)),_0x3cc024=getCssVar(_0x394c58(0x1ef));_0x1ee56a['fillStyle']=_0x3cc024,_0x1ee56a[_0x394c58(0x2af)](0x0,0x0,_0x3131b2,_0x5ac767);if(_0x5c9f88)try{const _0x20f89e=await this[_0x394c58(0x213)](localPathToUrl(_0x5c9f88));_0x1ee56a[_0x394c58(0x1ca)](_0x20f89e,0x0,0x0,_0x3131b2,_0x5ac767);const _0x30c562=a531_0x697134[_0x394c58(0x1f7)]()['nodes']?.[_0x36e423],_0x2253e4=String(_0x30c562?.['maskPolarity']||'')[_0x394c58(0x1f5)]();_0x2253e4!==_0x394c58(0x203)&&this[_0x394c58(0x2aa)](_0x1ee56a);}catch(_0x29bcd1){}const _0x260254=(_0x548bd0,_0x228887,_0x491141=0x1)=>{const _0x245873=_0x394c58,_0x9f59af=(Array[_0x245873(0x219)](_0x548bd0[_0x245873(0x1cc)])?_0x548bd0['points']:[])[_0x245873(0x2ae)](_0x32a0b=>_0x50915c(_0x32a0b));if(!_0x9f59af[_0x245873(0x200)])return;_0x1ee56a[_0x245873(0x244)]();const _0x24f07a=_0x491141>=0x6?_0x245873(0x1d6):_0x245873(0x28b),_0x5c4302=getBrushLineWidth(_0x548bd0[_0x245873(0x28d)],0x1/_0x5e6b97,_0x24f07a);drawRoundBrushStroke(_0x1ee56a,{'points':_0x9f59af,'lineWidth':_0x24f07a===_0x245873(0x1d6)?getEraserClearLineWidth(_0x5c4302):_0x5c4302,'strokeStyle':_0x228887,'fillStyle':_0x228887,'globalCompositeOperation':_0x245873(0x1df)}),_0x1ee56a[_0x245873(0x291)]();};_0x32c5e3[_0x394c58(0x23c)]((_0x249793,_0x4d8f6b)=>{const _0x315a30=_0x394c58;if(!_0x249793)return;if(_0x249793[_0x315a30(0x1e7)]===_0x315a30(0x28b)){_0x260254(_0x249793,_0x2f2f8a,0x1);return;}if(_0x249793[_0x315a30(0x1e7)]===_0x315a30(0x1d6)){_0x260254(_0x249793,_0x3cc024,0x6);return;}if(_0x249793[_0x315a30(0x1e7)]===_0x315a30(0x25c)){const _0x27c9ad=_0x32c5e3['slice'](0x0,_0x4d8f6b)['filter'](_0x256220=>_0x256220?.[_0x315a30(0x1e7)]===_0x315a30(0x28b)||_0x256220?.[_0x315a30(0x1e7)]===_0x315a30(0x1d6)),_0x338a37=buildBinaryBoundaryMask({'width':_0x3131b2,'height':_0x5ac767,'commands':_0x27c9ad,'pointToPixel':_0x318f7a=>{const _0x3f6690=_0x50915c(_0x318f7a||{});return{'x':_0x3f6690['x'],'y':_0x3f6690['y']};},'getStrokeWidth':_0x3cfe92=>getBrushLineWidth(_0x3cfe92?.['sizeWorld'],0x1/_0x5e6b97,_0x3cfe92?.['type'])}),_0xb28f2b=_0x50915c({'x':_0x249793['x'],'y':_0x249793['y']}),_0x2f802b=floodFillRegion(_0x338a37['mask'],_0x338a37[_0x315a30(0x23e)],_0x338a37['height'],Math[_0x315a30(0x268)](_0xb28f2b['x']),Math[_0x315a30(0x268)](_0xb28f2b['y'])),_0x14999a=sealRegionToBoundary(_0x2f802b,_0x338a37[_0x315a30(0x23a)],_0x338a37[_0x315a30(0x23e)],_0x338a37['height']);paintFilledRegion(_0x1ee56a,_0x14999a,_0x3131b2,_0x5ac767,{'fillStyle':_0x2f2f8a,'globalCompositeOperation':'source-over'});return;}});const _0x19908d=_0x1ee56a['getImageData'](0x0,0x0,_0x3131b2,_0x5ac767)[_0x394c58(0x1c3)],_0x558122=Math[_0x394c58(0x1cb)](0x1,Math[_0x394c58(0x268)](Math[_0x394c58(0x1cb)](_0x3131b2,_0x5ac767)/0x100));let _0x5ceb34=![];for(let _0x56177f=0x0;_0x56177f<_0x5ac767&&!_0x5ceb34;_0x56177f+=_0x558122){for(let _0x32c654=0x0;_0x32c654<_0x3131b2;_0x32c654+=_0x558122){const _0x55c3fe=(_0x56177f*_0x3131b2+_0x32c654)*0x4,_0x3c9688=_0x19908d[_0x55c3fe],_0x29da36=_0x19908d[_0x55c3fe+0x1],_0x42fba0=_0x19908d[_0x55c3fe+0x2];if(_0x3c9688>0x5||_0x29da36>0x5||_0x42fba0>0x5){_0x5ceb34=!![];break;}}}if(!_0x5ceb34){const _0x58e44b=a531_0x697134[_0x394c58(0x1f7)]()['nodes']?.[_0x36e423];if(!_0x58e44b||_0x58e44b[_0x394c58(0x252)]!==_0x40b4c1){URL[_0x394c58(0x277)](_0x336b8f);return;}a531_0x697134[_0x394c58(0x25f)](_0x36e423,{'mask':'','maskPreview':'','maskPolarity':'','maskPreviewUrl':null,'maskSaveToken':null}),a531_0x697134[_0x394c58(0x1da)]([_0x36e423]),commit(),URL[_0x394c58(0x277)](_0x336b8f),window[_0x394c58(0x1bd)]?.();return;}const _0x3a3b1c=await new Promise(_0x3b3de4=>_0x58dc90[_0x394c58(0x1b8)](_0x3b3de4,_0x394c58(0x206)));if(!_0x3a3b1c)throw new Error(imageMattingText('errors.canvasExportFailed'));const _0x28efd7=await saveOutputBlob(_0x3a3b1c,{'ext':_0x394c58(0x1e2),'subDir':_0x394c58(0x23a),'kind':_0x394c58(0x23a)}),_0x1b5af1=pickResultLocalPath(_0x28efd7),_0x287bb2=await saveOutputBlob(_0x3fb1ca,{'ext':_0x394c58(0x1e2),'subDir':_0x394c58(0x1be)}),_0x3db1ec=pickResultLocalPath(_0x287bb2),_0x11e29d=a531_0x697134[_0x394c58(0x1f7)]()[_0x394c58(0x271)]?.[_0x36e423];if(!_0x11e29d||_0x11e29d['maskSaveToken']!==_0x40b4c1){URL['revokeObjectURL'](_0x336b8f);return;}a531_0x697134[_0x394c58(0x25f)](_0x36e423,{'mask':_0x1b5af1,'maskPreview':_0x3db1ec,'maskPolarity':_0x394c58(0x203),'maskPreviewUrl':null,'maskSaveToken':null}),a531_0x697134['setSelectedNodes']([_0x36e423]),commit(),URL[_0x394c58(0x277)](_0x336b8f),window[_0x394c58(0x1bd)]?.();})()['catch'](()=>{const _0x24906e=_0x254e24,_0x1b3f2c=a531_0x697134[_0x24906e(0x1f7)]()[_0x24906e(0x271)]?.[_0x36e423];if(!_0x1b3f2c||_0x1b3f2c[_0x24906e(0x252)]!==_0x40b4c1){try{URL[_0x24906e(0x277)](_0x336b8f);}catch(_0x862097){}return;}a531_0x697134['updateNodeData'](_0x36e423,{'maskSaveToken':null}),window['showToast']?.(imageMattingText('toasts.saveFailed'),'error');});}catch(_0x11ed27){console[_0x254e24(0x22a)](_0x254e24(0x1c7),_0x11ed27),window[_0x254e24(0x225)]?.(imageMattingText(_0x254e24(0x254)),'error');}finally{if(_0x4e8055)_0x4e8055[_0x254e24(0x1c0)]=_0x5e429b;_0x1ee9b7['style'][_0x254e24(0x218)]=_0x254e24(0x1fc),this['_isSaving']=![],this[_0x254e24(0x222)]();}},'_resolveNodeImageUrl'(_0x434136){const _0xb065c0=a531_0x1a57d8,_0x17377f=_0x434136[_0xb065c0(0x1ed)]||0x0,_0x5b8397=_0x434136[_0xb065c0(0x1dd)]&&_0x434136[_0xb065c0(0x1dd)][_0x17377f],_0x25a124=_0x434136[_0xb065c0(0x2a0)]||_0x5b8397?.['localPath'],_0x4f8715=localPathToUrl(_0x25a124);if(_0x4f8715)return _0x4f8715;return _0x434136['src']||_0x434136[_0xb065c0(0x2a9)]||_0x434136[_0xb065c0(0x223)]||_0x434136['thumbUrl']||_0x5b8397?.[_0xb065c0(0x223)]||_0x5b8397?.[_0xb065c0(0x208)]||'';},'_invertCanvasBinary'(_0x5314db){const _0x2ff98b=a531_0x1a57d8,_0x4279fc=_0x5314db?.[_0x2ff98b(0x1d9)],_0x469d10=_0x4279fc?.[_0x2ff98b(0x23e)]||0x0,_0x845312=_0x4279fc?.['height']||0x0;if(!_0x469d10||!_0x845312)return;const _0x2cceaf=_0x5314db[_0x2ff98b(0x25d)](0x0,0x0,_0x469d10,_0x845312),_0x40fbf4=_0x2cceaf['data'];for(let _0x53555d=0x0;_0x53555d<_0x40fbf4[_0x2ff98b(0x200)];_0x53555d+=0x4){_0x40fbf4[_0x53555d]=0xff-_0x40fbf4[_0x53555d],_0x40fbf4[_0x53555d+0x1]=0xff-_0x40fbf4[_0x53555d+0x1],_0x40fbf4[_0x53555d+0x2]=0xff-_0x40fbf4[_0x53555d+0x2];}_0x5314db[_0x2ff98b(0x28e)](_0x2cceaf,0x0,0x0);},'_createMaskBaseCanvas'(_0xc5a10e,_0x1cb92f=a531_0x1a57d8(0x203)){const _0x1648ba=a531_0x1a57d8,_0x26eb1f=Math[_0x1648ba(0x1cb)](0x1,Number(_0xc5a10e?.['naturalWidth']||_0xc5a10e?.['width'])||0x1),_0x971eaf=Math['max'](0x1,Number(_0xc5a10e?.[_0x1648ba(0x1e0)]||_0xc5a10e?.[_0x1648ba(0x22b)])||0x1),_0x33f32e=document['createElement'](_0x1648ba(0x1d9));_0x33f32e[_0x1648ba(0x23e)]=_0x26eb1f,_0x33f32e[_0x1648ba(0x22b)]=_0x971eaf;const _0x8dd9b1=_0x33f32e[_0x1648ba(0x273)]('2d',{'willReadFrequently':!![]});if(!_0x8dd9b1)return null;_0x8dd9b1[_0x1648ba(0x1ca)](_0xc5a10e,0x0,0x0,_0x26eb1f,_0x971eaf);const _0x35ba08=_0x8dd9b1[_0x1648ba(0x25d)](0x0,0x0,_0x26eb1f,_0x971eaf),{data:_0x53dd5f}=_0x35ba08,_0x56e591=String(_0x1cb92f||'')[_0x1648ba(0x1f5)]()===_0x1648ba(0x203);for(let _0x40af53=0x0;_0x40af53<_0x53dd5f[_0x1648ba(0x200)];_0x40af53+=0x4){const _0x9974eb=Math[_0x1648ba(0x1cb)](_0x53dd5f[_0x40af53],_0x53dd5f[_0x40af53+0x1],_0x53dd5f[_0x40af53+0x2]),_0x169ef3=_0x56e591?_0x9974eb:0xff-_0x9974eb,_0x48cbee=_0x169ef3>0x5?_0x169ef3:0x0;_0x53dd5f[_0x40af53]=0xff,_0x53dd5f[_0x40af53+0x1]=0xff,_0x53dd5f[_0x40af53+0x2]=0xff,_0x53dd5f[_0x40af53+0x3]=_0x48cbee;}return _0x8dd9b1[_0x1648ba(0x28e)](_0x35ba08,0x0,0x0),_0x33f32e;},'_loadExistingMask'(){const _0x37d3b0=a531_0x1a57d8;if(!this[_0x37d3b0(0x26f)])return;const _0x5a0a20=a531_0x697134[_0x37d3b0(0x1f0)](),_0x50565e=_0x5a0a20[_0x37d3b0(0x271)]?.[this[_0x37d3b0(0x2a8)]],_0x264de7=String(_0x50565e?.['mask']||'')[_0x37d3b0(0x1f5)](),_0x38b0f3=String(_0x50565e?.[_0x37d3b0(0x220)]||_0x50565e?.[_0x37d3b0(0x26d)]||'')[_0x37d3b0(0x1f5)](),_0x3c46af=!!_0x264de7,_0x50c00b=_0x3c46af?_0x264de7:_0x38b0f3;if(!_0x50c00b)return;const _0x4723a2=_0x50c00b[_0x37d3b0(0x27f)]('blob:')||_0x50c00b['startsWith'](_0x37d3b0(0x204))?_0x50c00b:localPathToUrl(_0x50c00b);if(!_0x4723a2)return;(async()=>{const _0x30d7ac=_0x37d3b0,_0x32fae6=await this[_0x30d7ac(0x213)](_0x4723a2);if(!this[_0x30d7ac(0x26f)])return;this[_0x30d7ac(0x1f3)]=this[_0x30d7ac(0x1f3)][_0x30d7ac(0x26b)](_0x33dbe2=>_0x33dbe2?.[_0x30d7ac(0x1e7)]!=='mask-preview'&&_0x33dbe2?.[_0x30d7ac(0x1e7)]!==_0x30d7ac(0x1f4));if(_0x3c46af){const _0x5b22a6=this[_0x30d7ac(0x2b4)](_0x32fae6,_0x50565e?.[_0x30d7ac(0x265)]);if(_0x5b22a6)this[_0x30d7ac(0x1f3)]['unshift']({'type':'mask-base','canvas':_0x5b22a6});}else this[_0x30d7ac(0x1f3)][_0x30d7ac(0x236)]({'type':'mask-preview','img':_0x32fae6});this[_0x30d7ac(0x224)]=[],this[_0x30d7ac(0x24c)]();})()[_0x37d3b0(0x235)](()=>{});},'_loadImage'(_0x1e8791){return new Promise((_0x1a1570,_0x2cc74d)=>{const _0xe98061=a531_0x5e6a,_0x1b4406=new Image();_0x1b4406[_0xe98061(0x2ac)]=_0xe98061(0x287),_0x1b4406[_0xe98061(0x22c)]=()=>_0x1a1570(_0x1b4406),_0x1b4406[_0xe98061(0x2ab)]=()=>_0x2cc74d(new Error(imageMattingText(_0xe98061(0x2a7)))),_0x1b4406[_0xe98061(0x1ee)]=_0x1e8791;});}};export default ImageMattingController;
+import appStore from '../core/stores/appStore.js';
+import { onLocaleChange, t } from '../i18n/index.js';
+import { saveOutputBlob } from './project.js';
+import { generateId, screenToWorld, worldToScreen, isPointInRect } from '../core/math.js';
+import { commit } from './history.js';
+import {
+  buildBinaryBoundaryMask,
+  floodFillRegion,
+  getCachedSealedFillRegion,
+  paintFilledRegion,
+  sealRegionToBoundary,
+} from './bucketFill.js';
+import {
+  IMAGE_BRUSH_MAX_SIZE_PX,
+  clampImageBrushSize,
+  drawRoundBrushStroke,
+  getEraserClearLineWidth,
+  getBrushLineWidth,
+  mapBrushPoints,
+  syncCircularBrushCursor,
+} from './imageEditorBrushStyle.js';
+import { getPixelToolPalette } from './pixelToolPalette.js';
+import { localPathToUrl, normalizeLocalPath, pickResultLocalPath } from '../utils/localMediaPath.js';
+const getCssVar = (_0x473875) =>
+    getComputedStyle(document.documentElement).getPropertyValue(_0x473875).trim(),
+  DEFAULT_MATTING_BRUSH_SIZE_PX = 40,
+  MAX_MATTING_BRUSH_SIZE_PX = IMAGE_BRUSH_MAX_SIZE_PX,
+  OPAQUE_MASK_PREVIEW_CLEAR = 'black';
+function imageMattingText(_0x214412, _0x5619fb = {}) {
+  return t('imageMatting.' + _0x214412, _0x5619fb);
+}
+function clampMattingBrushSize(_0x1c0e18, _0x266794 = DEFAULT_MATTING_BRUSH_SIZE_PX) {
+  return clampImageBrushSize(_0x1c0e18, _0x266794);
+}
+const isFiniteCommandPoint = (_0xc87fd4) =>
+    Number.isFinite(Number(_0xc87fd4?.x)) && Number.isFinite(Number(_0xc87fd4?.y)),
+  hasDrawableStrokePoints = (_0x121407) =>
+    Array.isArray(_0x121407?.points) && _0x121407.points.some(isFiniteCommandPoint),
+  shouldDiscardStrokeCommand = (_0x558327) =>
+    (_0x558327?.type === 'brush' || _0x558327?.type === 'eraser') && !hasDrawableStrokePoints(_0x558327),
+  MATTING_TOOLBAR_HTML =
+    '\n      <button class="v2-matting-btn icon-only act-cancel" data-matting-tooltip="cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M18 6L6 18M6 6l12 12"/></svg></button>\n      <div class="v2-matting-divider"></div>\n      <button class="v2-matting-btn icon-only tool-btn active" data-tool="brush" data-brush-mode="normal" data-matting-tooltip="brush">\n        <svg class="brush-icon-normal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>\n        <svg class="brush-icon-alpha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="display:none"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/><path d="M3 3h6v6H3z" fill="currentColor" fill-opacity="0.3"/></svg>\n      </button>\n      <button class="v2-matting-btn icon-only tool-btn" data-tool="eraser" data-matting-tooltip="eraser"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M20 20H7l-5-5a2 2 0 0 1 0-2.83l9.17-9.17a2 2 0 0 1 2.83 0L22 10a2 2 0 0 1 0 2.83L14.83 20"/></svg></button>\n      <button class="v2-matting-btn icon-only tool-btn" data-tool="bucket" data-matting-tooltip="bucket"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M19 11l-8-8-8.5 8.5a2.12 2.12 0 0 0 0 3l4 4a2.12 2.12 0 0 0 3 0L19 11z"/><path d="M16 14l-3.5 3.5"/><path d="M12 18l-2 2"/><path d="M20 20l-2-2"/></svg></button>\n      <div class="v2-matting-divider"></div>\n      <div class="v2-matting-size"><span class="v2-matting-size-value"></span><input class="v2-matting-size-range" type="range" min="1" max="' +
+    MAX_MATTING_BRUSH_SIZE_PX +
+    '" step="1"></div>\n      <div class="v2-matting-divider"></div>\n      <button class="v2-matting-btn icon-only act-undo" data-matting-tooltip="undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a6 6 0 1 1 0 12h-3"/></svg></button>\n      <button class="v2-matting-btn icon-only act-redo" data-matting-tooltip="redo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M15 14l4-4-4-4"/><path d="M19 10H10a6 6 0 1 0 0 12h3"/></svg></button>\n      <button class="v2-matting-btn icon-only act-clear" data-matting-tooltip="clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 16h10l1-16"/></svg></button>\n      <button class="v2-matting-btn v2-matting-save act-save" data-matting-tooltip="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v4h8"/></svg><span class="v2-matting-save-label"></span></button>\n    ',
+  ImageMattingController = {
+    active: false,
+    nodeId: null,
+    nodeData: null,
+    overlayEl: null,
+    containerEl: null,
+    imgEl: null,
+    canvasEl: null,
+    toolbarEl: null,
+    sizeValueEl: null,
+    sizeRangeEl: null,
+    toolButtons: null,
+    cursorEl: null,
+    _cursorHover: false,
+    _cursorLast: { x: 0, y: 0 },
+    _cursorRaf: 0,
+    _unsubscribe: null,
+    _commands: [],
+    _redoStack: [],
+    _draft: null,
+    _dirty: false,
+    _baseMaskCleared: false,
+    _view: null,
+    _normalMaskCanvas: null,
+    _normalOverlayCanvas: null,
+    _alphaMaskCanvas: null,
+    _alphaOverlayCanvas: null,
+    _fillRegionCache: null,
+    _unsubscribeLocale: null,
+    _isSaving: false,
+    init(_0x5d135b) {
+      if (this.active) return;
+      const _0x5bd6d3 = appStore.getStateRaw(),
+        _0x4acbc3 = _0x5bd6d3.nodes?.[_0x5d135b];
+      if (!_0x4acbc3) return;
+      const _0x35f6f2 = this._resolveNodeImageUrl(_0x4acbc3);
+      if (!_0x35f6f2) {
+        window.showToast?.(imageMattingText('toasts.noImage'), 'warn');
+        return;
+      }
+      const _0x3c7157 = new Set(['brush', 'eraser', 'bucket']),
+        _0x100e02 = _0x3c7157.has(_0x5bd6d3.matting?.tool) ? _0x5bd6d3.matting.tool : 'brush',
+        _0x355cf8 = clampMattingBrushSize(_0x5bd6d3.matting?.brushSizePx),
+        _0x2d228b = _0x5bd6d3.matting?.brushMode || 'normal';
+      ((this.active = true),
+        (this.nodeId = _0x5d135b),
+        (this.nodeData = _0x4acbc3),
+        (this._commands = []),
+        (this._redoStack = []),
+        (this._draft = null),
+        (this._dirty = false),
+        (this._baseMaskCleared = false),
+        (this._fillRegionCache = new Map()),
+        (this._isSaving = false),
+        (this._view = {
+          tool: _0x100e02,
+          brushSizePx: _0x355cf8,
+          brushMode: _0x2d228b,
+          viewport: _0x5bd6d3.viewport,
+          node: _0x4acbc3,
+        }),
+        appStore.setMattingState({
+          active: true,
+          nodeId: _0x5d135b,
+          tool: _0x100e02,
+          brushSizePx: _0x355cf8,
+          brushMode: _0x2d228b,
+        }),
+        this._createUI(_0x35f6f2, { tool: _0x100e02, brushSizePx: _0x355cf8, brushMode: _0x2d228b }),
+        this._loadExistingMask(),
+        this._bindEvents(),
+        (this._unsubscribe = appStore.subscribeSelector(
+          (_0x122f7e) => {
+            const _0x252e3a = _0x122f7e.nodes?.[_0x5d135b],
+              _0x487e62 = _0x122f7e.viewport || { x: 0, y: 0, zoom: 1 },
+              _0x26ce9c = _0x122f7e.matting || {};
+            return {
+              hasNode: !!_0x252e3a,
+              nx: _0x252e3a ? _0x252e3a.x : 0,
+              ny: _0x252e3a ? _0x252e3a.y : 0,
+              nw: _0x252e3a ? _0x252e3a.width : 0,
+              nh: _0x252e3a ? _0x252e3a.height : 0,
+              vx: _0x487e62.x,
+              vy: _0x487e62.y,
+              vz: _0x487e62.zoom || 1,
+              tool: _0x26ce9c.tool || 'brush',
+              brushSizePx: clampMattingBrushSize(_0x26ce9c.brushSizePx),
+              brushMode: _0x26ce9c.brushMode || 'normal',
+            };
+          },
+          (_0x29e448) => {
+            if (!_0x29e448?.hasNode) return;
+            ((this._view = {
+              tool: _0x29e448.tool,
+              brushSizePx: _0x29e448.brushSizePx,
+              brushMode: _0x29e448.brushMode,
+              viewport: { x: _0x29e448.vx, y: _0x29e448.vy, zoom: _0x29e448.vz },
+              node: { x: _0x29e448.nx, y: _0x29e448.ny, width: _0x29e448.nw, height: _0x29e448.nh },
+            }),
+              this._updateView(this._view));
+          },
+        )),
+        this._waitForImageAndShow());
+    },
+    _waitForImageAndShow() {
+      const _0x18751b = () => {
+        if (this.imgEl && this.imgEl.complete && this.imgEl.naturalWidth > 0) {
+          if (this._view) this._updateView(this._view);
+          requestAnimationFrame(() => {
+            if (this.overlayEl) this.overlayEl.classList.add('visible');
+          });
+        } else requestAnimationFrame(_0x18751b);
+      };
+      _0x18751b();
+    },
+    exit({ silent: silent = false } = {}) {
+      if (!this.active) return;
+      !silent && this._dirty && window.showToast?.(imageMattingText('toasts.cancelled'), 'ok');
+      ((this.active = false),
+        (this.nodeId = null),
+        (this.nodeData = null),
+        (this._commands = []),
+        (this._redoStack = []),
+        (this._draft = null),
+        (this._dirty = false),
+        (this._normalMaskCanvas = null),
+        (this._normalOverlayCanvas = null),
+        (this._alphaMaskCanvas = null),
+        (this._alphaOverlayCanvas = null),
+        this._unsubscribeLocale?.(),
+        (this._unsubscribeLocale = null),
+        (this._isSaving = false),
+        (this._fillRegionCache = null),
+        appStore.setMattingState({ active: false, nodeId: null }));
+      this._unsubscribe && (this._unsubscribe(), (this._unsubscribe = null));
+      if (this.overlayEl) this.overlayEl.remove();
+      if (this.toolbarEl) this.toolbarEl.remove();
+      ((this.overlayEl = null),
+        (this.containerEl = null),
+        (this.imgEl = null),
+        (this.canvasEl = null),
+        (this.toolbarEl = null),
+        (this.sizeValueEl = null),
+        (this.sizeRangeEl = null),
+        (this.toolButtons = null),
+        (this.cursorEl = null),
+        (this._cursorHover = false),
+        (this._cursorLast = { x: 0, y: 0 }),
+        (this._cursorRaf = 0),
+        (this._view = null));
+    },
+    _createUI(_0x55a80e, _0x3b1009 = {}) {
+      const _0x54aa85 = document.createElement('div');
+      _0x54aa85.className = 'v2-matting-overlay';
+      const _0x4cab8b = document.createElement('div');
+      _0x4cab8b.className = 'v2-matting-container';
+      const _0x3685a2 = document.createElement('img');
+      ((_0x3685a2.className = 'v2-matting-img'), (_0x3685a2.src = _0x55a80e), (_0x3685a2.draggable = false));
+      const _0x27efe7 = document.createElement('canvas');
+      _0x27efe7.className = 'v2-matting-canvas';
+      const _0x20fb67 = document.createElement('div');
+      ((_0x20fb67.className = 'v2-matting-cursor'),
+        (_0x20fb67.style.display = 'none'),
+        _0x4cab8b.appendChild(_0x3685a2),
+        _0x4cab8b.appendChild(_0x27efe7),
+        _0x54aa85.appendChild(_0x20fb67),
+        _0x54aa85.appendChild(_0x4cab8b),
+        document.body.appendChild(_0x54aa85),
+        (this.overlayEl = _0x54aa85),
+        (this.containerEl = _0x4cab8b),
+        (this.imgEl = _0x3685a2),
+        (this.canvasEl = _0x27efe7),
+        (this.cursorEl = _0x20fb67));
+      const _0x53d86e = document.createElement('div');
+      ((_0x53d86e.className = 'v2-matting-toolbar'),
+        (_0x53d86e.innerHTML = MATTING_TOOLBAR_HTML),
+        document.body.appendChild(_0x53d86e),
+        (this.toolbarEl = _0x53d86e),
+        (this.sizeValueEl = _0x53d86e.querySelector('.v2-matting-size-value')),
+        (this.sizeRangeEl = _0x53d86e.querySelector('.v2-matting-size-range')),
+        (this.toolButtons = Array.from(_0x53d86e.querySelectorAll('.tool-btn'))),
+        this._subscribeLocaleChanges(),
+        this._syncLocaleTexts());
+      const _0x1151f6 = clampMattingBrushSize(_0x3b1009.brushSizePx),
+        _0x15a38f = _0x3b1009.tool || 'brush';
+      ((this.sizeRangeEl.value = String(_0x1151f6)),
+        (this.sizeValueEl.textContent = String(_0x1151f6)),
+        this._updateToolActive(_0x15a38f, _0x1151f6));
+      if (this._view) this._updateView(this._view);
+    },
+    _bindEvents() {
+      const _0x238394 = (_0x701c29) => {
+        const _0x3e7810 =
+          this.canvasEl && (_0x701c29.target === this.canvasEl || this.canvasEl.contains(_0x701c29.target));
+        if (_0x3e7810) {
+          this._onCanvasWheel(_0x701c29);
+          return;
+        }
+        (_0x701c29.preventDefault(), _0x701c29.stopPropagation());
+      };
+      this.overlayEl.addEventListener('wheel', _0x238394, { passive: false });
+      const _0x3e2524 = () => {
+        if (this._view) this._updateView(this._view);
+      };
+      window.addEventListener('resize', _0x3e2524);
+      const _0x338b27 = () => {
+          (window.removeEventListener('resize', _0x3e2524),
+            this.overlayEl?.removeEventListener('wheel', _0x238394));
+        },
+        _0x39fecb = this.exit.bind(this);
+      ((this.exit = (_0x3f9c4a = {}) => {
+        (_0x338b27(), _0x39fecb(_0x3f9c4a));
+      }),
+        this.toolbarEl.addEventListener('pointerdown', (_0x1c7a0b) => _0x1c7a0b.stopPropagation()),
+        this.toolbarEl.querySelector('.act-cancel').addEventListener('click', (_0x43a4ff) => {
+          (_0x43a4ff.stopPropagation(), this.exit());
+        }),
+        this.toolButtons.forEach((_0x266c18) => {
+          _0x266c18.addEventListener('click', (_0x4c686c) => {
+            _0x4c686c.stopPropagation();
+            const _0x1ffb8c = _0x266c18.dataset.tool;
+            this._switchTool(_0x1ffb8c);
+          });
+        }),
+        this.sizeRangeEl.addEventListener('input', (_0x165092) => {
+          const _0x10b88c = clampMattingBrushSize(_0x165092.target.value, 1);
+          (appStore.setMattingState({ brushSizePx: _0x10b88c }),
+            (this.sizeValueEl.textContent = String(_0x10b88c)),
+            this._syncCursor());
+        }),
+        this.toolbarEl.querySelector('.act-undo').addEventListener('click', (_0x339753) => {
+          (_0x339753.stopPropagation(), this._undo());
+        }),
+        this.toolbarEl.querySelector('.act-redo').addEventListener('click', (_0x4f242d) => {
+          (_0x4f242d.stopPropagation(), this._redo());
+        }),
+        this.toolbarEl.querySelector('.act-clear').addEventListener('click', (_0x125e6d) => {
+          (_0x125e6d.stopPropagation(), this._clear());
+        }),
+        this.toolbarEl.querySelector('.act-save').addEventListener('click', async (_0x5702f9) => {
+          (_0x5702f9.stopPropagation(), await this._save());
+        }));
+      const _0x14732f = this.canvasEl.getContext('2d');
+      ((_0x14732f.lineCap = 'round'), (_0x14732f.lineJoin = 'round'));
+      const _0x34815a = { down: false, pointerId: null },
+        _0x14c1d7 = (_0x4d7886, _0x27b9f1) => {
+          this._cursorLast = { x: _0x4d7886, y: _0x27b9f1 };
+          if (this._cursorRaf) return;
+          this._cursorRaf = requestAnimationFrame(() => {
+            ((this._cursorRaf = 0), this._syncCursor());
+          });
+        },
+        _0x11f6e0 = (_0x58b864, _0x4be19f, _0x14ca76, _0x8bf57b = 0) => {
+          const _0x4ca64e = appStore.getStateRaw(),
+            _0x5a12bc = _0x4ca64e.nodes?.[this.nodeId];
+          if (!_0x5a12bc) return false;
+          const _0x2cb614 = screenToWorld(_0x58b864, _0x4be19f, _0x4ca64e.viewport);
+          if (
+            !isPointInRect(
+              _0x2cb614.x,
+              _0x2cb614.y,
+              _0x5a12bc.x,
+              _0x5a12bc.y,
+              _0x5a12bc.width,
+              _0x5a12bc.height,
+            )
+          )
+            return false;
+          const _0x13594f = { x: _0x2cb614.x - _0x5a12bc.x, y: _0x2cb614.y - _0x5a12bc.y },
+            _0x45b2d2 = _0x4ca64e.matting?.tool || 'brush';
+          if (_0x45b2d2 === 'bucket') {
+            const _0x32da84 = clampMattingBrushSize(_0x4ca64e.matting?.brushSizePx),
+              _0x599f07 = _0x32da84 / (_0x4ca64e.viewport.zoom || 1);
+            return (this._fillArea(_0x13594f, _0x599f07), true);
+          }
+          const _0x3fd9cc = clampMattingBrushSize(_0x4ca64e.matting?.brushSizePx),
+            _0x3a8a23 = _0x3fd9cc / (_0x4ca64e.viewport.zoom || 1),
+            _0x255219 = _0x4ca64e.matting?.brushMode || 'normal';
+          return (
+            _0x45b2d2 === 'eraser'
+              ? (this._draft = { type: 'eraser', sizeWorld: _0x3a8a23, points: [_0x13594f] })
+              : (this._draft = { type: 'brush', sizeWorld: _0x3a8a23, points: [_0x13594f], mode: _0x255219 }),
+            (_0x34815a.down = true),
+            (_0x34815a.pointerId = _0x14ca76),
+            this.canvasEl.setPointerCapture(_0x14ca76),
+            this._render(),
+            true
+          );
+        },
+        _0x13d8f7 = (_0x266245, _0x14d769) => {
+          if (!_0x34815a.down || !this._draft) return;
+          const _0x4924d4 = appStore.getStateRaw(),
+            _0x29a64d = _0x4924d4.nodes?.[this.nodeId];
+          if (!_0x29a64d) return;
+          const _0x48a96c = screenToWorld(_0x266245, _0x14d769, _0x4924d4.viewport),
+            _0x35ea73 = { x: _0x48a96c.x - _0x29a64d.x, y: _0x48a96c.y - _0x29a64d.y };
+          (this._draft.points.push(_0x35ea73), this._render());
+        },
+        _0x1fdfb1 = () => {
+          if (!_0x34815a.down || !this._draft) return;
+          const _0x353d12 = this._draft;
+          ((this._draft = null), (_0x34815a.down = false), (_0x34815a.pointerId = null));
+          if (shouldDiscardStrokeCommand(_0x353d12)) {
+            this._render();
+            return;
+          }
+          (this._commands.push(_0x353d12), (this._redoStack = []), (this._dirty = true), this._render());
+        };
+      (this.canvasEl.addEventListener('pointerdown', (_0x447c07) => {
+        (_0x447c07.preventDefault(),
+          _0x447c07.stopPropagation(),
+          _0x14c1d7(_0x447c07.clientX, _0x447c07.clientY),
+          _0x11f6e0(_0x447c07.clientX, _0x447c07.clientY, _0x447c07.pointerId, _0x447c07.button));
+      }),
+        this.canvasEl.addEventListener('pointermove', (_0x16334b) => {
+          (_0x16334b.preventDefault(),
+            _0x16334b.stopPropagation(),
+            _0x14c1d7(_0x16334b.clientX, _0x16334b.clientY),
+            _0x13d8f7(_0x16334b.clientX, _0x16334b.clientY));
+        }),
+        this.canvasEl.addEventListener('pointerup', (_0x3a6e82) => {
+          (_0x3a6e82.preventDefault(),
+            _0x3a6e82.stopPropagation(),
+            _0x14c1d7(_0x3a6e82.clientX, _0x3a6e82.clientY),
+            _0x1fdfb1());
+        }),
+        this.canvasEl.addEventListener('pointercancel', (_0x75bc35) => {
+          (_0x75bc35.preventDefault(),
+            _0x75bc35.stopPropagation(),
+            _0x14c1d7(_0x75bc35.clientX, _0x75bc35.clientY),
+            _0x1fdfb1());
+        }),
+        this.canvasEl.addEventListener('pointerenter', (_0x304e94) => {
+          ((this._cursorHover = true), _0x14c1d7(_0x304e94.clientX, _0x304e94.clientY));
+        }),
+        this.canvasEl.addEventListener('pointerleave', () => {
+          ((this._cursorHover = false), this._syncCursor());
+        }));
+    },
+    _onCanvasWheel(_0x8ed980) {
+      (_0x8ed980.preventDefault(), _0x8ed980.stopPropagation());
+      if (!this.active) return;
+      if (!this._cursorHover) return;
+      const _0x2878a4 = this._view?.tool || 'brush';
+      if (_0x2878a4 !== 'brush' && _0x2878a4 !== 'eraser' && _0x2878a4 !== 'bucket') return;
+      const _0x1673b9 = _0x8ed980.deltaY || 0,
+        _0x1da027 = _0x1673b9 < 0 ? 1 : -1,
+        _0x505034 = clampMattingBrushSize(this._view?.brushSizePx),
+        _0x256480 = clampMattingBrushSize(_0x505034 + _0x1da027 * 2);
+      if (_0x256480 === _0x505034) return;
+      appStore.setMattingState({ brushSizePx: _0x256480 });
+      if (this.sizeRangeEl) this.sizeRangeEl.value = String(_0x256480);
+      if (this.sizeValueEl) this.sizeValueEl.textContent = String(_0x256480);
+      this._syncCursor();
+    },
+    _syncCursor(
+      _0x5a0789 = this._view?.tool || 'brush',
+      _0x3e4aec = this._view?.brushSizePx || DEFAULT_MATTING_BRUSH_SIZE_PX,
+    ) {
+      if (!this.cursorEl) return;
+      syncCircularBrushCursor({
+        cursorEl: this.cursorEl,
+        canvasEl: this.canvasEl,
+        visible: this._cursorHover,
+        tool: _0x5a0789,
+        allowedTools: ['brush', 'eraser', 'bucket'],
+        sizePx: _0x3e4aec,
+        cursorLast: this._cursorLast,
+      });
+    },
+    _subscribeLocaleChanges() {
+      if (this._unsubscribeLocale) return;
+      this._unsubscribeLocale = onLocaleChange(() => this._syncLocaleTexts());
+    },
+    _syncLocaleTexts() {
+      if (!this.toolbarEl) return;
+      this.toolbarEl.querySelectorAll('[data-matting-tooltip]').forEach((_0x4d2a7b) => {
+        const _0x2cd96e = _0x4d2a7b.dataset.mattingTooltip;
+        if (!_0x2cd96e) return;
+        let _0x2151e3 = imageMattingText('tooltips.' + _0x2cd96e);
+        (_0x2cd96e === 'brush' &&
+          (_0x2151e3 =
+            _0x4d2a7b.dataset.brushMode === 'alpha'
+              ? imageMattingText('tooltips.brushAlphaToggle')
+              : imageMattingText('tooltips.brushNormal')),
+          (_0x4d2a7b.dataset.tooltip = _0x2151e3));
+      });
+      const _0x5ec3c9 = this.toolbarEl.querySelector('.v2-matting-save-label');
+      _0x5ec3c9 && !this._isSaving && (_0x5ec3c9.textContent = imageMattingText('actions.save'));
+    },
+    _switchTool(_0x3cc2f1) {
+      const _0x576d16 = this.toolButtons.find((_0x388e83) => _0x388e83.dataset.tool === _0x3cc2f1);
+      if (!_0x576d16) return;
+      if (_0x576d16.disabled) return;
+      const _0x16ac96 = appStore.getState(),
+        _0x2339fd = _0x16ac96.matting?.tool;
+      if (_0x3cc2f1 === 'brush') {
+        if (_0x2339fd === 'brush') {
+          const _0x1c2770 = _0x576d16.dataset.brushMode || 'normal',
+            _0x1ec52e = _0x1c2770 === 'normal' ? 'alpha' : 'normal';
+          ((_0x576d16.dataset.brushMode = _0x1ec52e),
+            appStore.setMattingState({ tool: _0x3cc2f1, brushMode: _0x1ec52e }),
+            (_0x576d16.dataset.tooltip =
+              _0x1ec52e === 'normal'
+                ? imageMattingText('tooltips.brushNormalToggle')
+                : imageMattingText('tooltips.brushAlphaToggle')));
+          const _0x193634 = _0x576d16.querySelector('.brush-icon-normal'),
+            _0x1503c8 = _0x576d16.querySelector('.brush-icon-alpha');
+          _0x193634 &&
+            _0x1503c8 &&
+            ((_0x193634.style.display = _0x1ec52e === 'normal' ? 'block' : 'none'),
+            (_0x1503c8.style.display = _0x1ec52e === 'alpha' ? 'block' : 'none'));
+        } else appStore.setMattingState({ tool: _0x3cc2f1 });
+      } else appStore.setMattingState({ tool: _0x3cc2f1 });
+      this._updateToolActive();
+    },
+    _changeBrushSize(_0x3f2793) {
+      const _0x238b78 = clampMattingBrushSize(this._view?.brushSizePx),
+        _0x8eb6e7 = clampMattingBrushSize(_0x238b78 + _0x3f2793);
+      if (_0x8eb6e7 !== _0x238b78) {
+        appStore.setMattingState({ brushSizePx: _0x8eb6e7 });
+        if (this.sizeRangeEl) this.sizeRangeEl.value = String(_0x8eb6e7);
+        if (this.sizeValueEl) this.sizeValueEl.textContent = String(_0x8eb6e7);
+        this._syncCursor();
+      }
+    },
+    _updateToolActive(
+      _0x446c28 = this._view?.tool || 'brush',
+      _0x35cf63 = this._view?.brushSizePx || DEFAULT_MATTING_BRUSH_SIZE_PX,
+    ) {
+      (this.toolButtons.forEach((_0x3f3678) => {
+        if (_0x3f3678.dataset.tool === _0x446c28) _0x3f3678.classList.add('active');
+        else _0x3f3678.classList.remove('active');
+      }),
+        this._syncCursor(_0x446c28, _0x35cf63));
+    },
+    _updateView(_0x496a66) {
+      if (!this.active) return;
+      const _0x24dead = _0x496a66?.node,
+        _0x58bf89 = _0x496a66?.viewport;
+      if (!_0x24dead) return;
+      this.nodeData = _0x24dead;
+      const _0x174230 = clampMattingBrushSize(_0x496a66?.brushSizePx);
+      if (this.sizeRangeEl && Number(this.sizeRangeEl.value) !== _0x174230)
+        this.sizeRangeEl.value = String(_0x174230);
+      if (this.sizeValueEl && this.sizeValueEl.textContent !== String(_0x174230))
+        this.sizeValueEl.textContent = String(_0x174230);
+      this._updateToolActive(_0x496a66?.tool, _0x174230);
+      const _0x31b047 = worldToScreen(_0x24dead.x, _0x24dead.y, _0x58bf89),
+        _0x2f5af1 = Math.round(_0x24dead.width * _0x58bf89.zoom),
+        _0x594f18 = Math.round(_0x24dead.height * _0x58bf89.zoom);
+      ((this.containerEl.style.left = Math.round(_0x31b047.x) + 'px'),
+        (this.containerEl.style.top = Math.round(_0x31b047.y) + 'px'),
+        (this.containerEl.style.width = _0x2f5af1 + 'px'),
+        (this.containerEl.style.height = _0x594f18 + 'px'));
+      const _0xc90c76 = window.devicePixelRatio || 1,
+        _0xbc1423 = Math.max(1, _0x2f5af1),
+        _0x42e824 = Math.max(1, _0x594f18);
+      if (
+        this.canvasEl.width !== Math.round(_0xbc1423 * _0xc90c76) ||
+        this.canvasEl.height !== Math.round(_0x42e824 * _0xc90c76)
+      ) {
+        ((this.canvasEl.width = Math.round(_0xbc1423 * _0xc90c76)),
+          (this.canvasEl.height = Math.round(_0x42e824 * _0xc90c76)),
+          (this.canvasEl.style.width = _0xbc1423 + 'px'),
+          (this.canvasEl.style.height = _0x42e824 + 'px'));
+        const _0x2cd88c = this.canvasEl.getContext('2d');
+        (_0x2cd88c.setTransform(_0xc90c76, 0, 0, _0xc90c76, 0, 0),
+          (_0x2cd88c.lineCap = 'round'),
+          (_0x2cd88c.lineJoin = 'round'));
+      }
+      const _0x1a39bf = Math.max(12, Math.round(_0x31b047.y) - 54);
+      ((this.toolbarEl.style.left = Math.round(_0x31b047.x + _0x2f5af1 / 2) + 'px'),
+        (this.toolbarEl.style.top = _0x1a39bf + 'px'),
+        this._render(_0x58bf89));
+    },
+    _render(_0x1eb6bd = this._view?.viewport) {
+      if (!this.active || !this.canvasEl) return;
+      const _0x44bb81 = this.canvasEl.getContext('2d'),
+        _0x441573 = Number(this.canvasEl.style.width.replace('px', '')) || 1,
+        _0x283f96 = Number(this.canvasEl.style.height.replace('px', '')) || 1;
+      _0x44bb81.clearRect(0, 0, _0x441573, _0x283f96);
+      const _0x2dcdfa = this._commands,
+        _0xb6a84d = this._prepareNormalMaskCanvas(_0x441573, _0x283f96),
+        _0x5ce53a = this._prepareAlphaMaskCanvas(_0x441573, _0x283f96);
+      this._renderCommands(_0x44bb81, _0x1eb6bd, _0x2dcdfa, false, {
+        normalMaskCtx: _0xb6a84d,
+        alphaMaskCtx: _0x5ce53a,
+        boundarySource: _0x2dcdfa,
+      });
+      if (this._draft) {
+        const _0x2a9937 = _0x2dcdfa.concat([this._draft]);
+        this._renderCommands(_0x44bb81, _0x1eb6bd, [this._draft], true, {
+          normalMaskCtx: _0xb6a84d,
+          alphaMaskCtx: _0x5ce53a,
+          boundarySource: _0x2a9937,
+        });
+      }
+      (this._compositeNormalMask(_0x44bb81, _0x441573, _0x283f96),
+        this._compositeAlphaMask(_0x44bb81, _0x1eb6bd, _0x441573, _0x283f96));
+    },
+    _prepareNormalMaskCanvas(_0x5074a7, _0x19b332) {
+      const _0x34a9fb = Math.max(1, Math.round(_0x5074a7 || 1)),
+        _0x4376c4 = Math.max(1, Math.round(_0x19b332 || 1));
+      if (
+        !this._normalMaskCanvas ||
+        this._normalMaskCanvas.width !== _0x34a9fb ||
+        this._normalMaskCanvas.height !== _0x4376c4
+      ) {
+        const _0x539ed3 = document.createElement('canvas');
+        ((_0x539ed3.width = _0x34a9fb), (_0x539ed3.height = _0x4376c4), (this._normalMaskCanvas = _0x539ed3));
+      }
+      if (
+        !this._normalOverlayCanvas ||
+        this._normalOverlayCanvas.width !== _0x34a9fb ||
+        this._normalOverlayCanvas.height !== _0x4376c4
+      ) {
+        const _0x5e78af = document.createElement('canvas');
+        ((_0x5e78af.width = _0x34a9fb),
+          (_0x5e78af.height = _0x4376c4),
+          (this._normalOverlayCanvas = _0x5e78af));
+      }
+      const _0x5a2cc2 = this._normalMaskCanvas.getContext('2d');
+      if (!_0x5a2cc2) return null;
+      return (
+        _0x5a2cc2.clearRect(0, 0, _0x34a9fb, _0x4376c4),
+        (_0x5a2cc2.lineCap = 'round'),
+        (_0x5a2cc2.lineJoin = 'round'),
+        _0x5a2cc2
+      );
+    },
+    _prepareAlphaMaskCanvas(_0x16deef, _0x4e4e7f) {
+      const _0x4e4fb1 = Math.max(1, Math.round(_0x16deef || 1)),
+        _0x3f2680 = Math.max(1, Math.round(_0x4e4e7f || 1));
+      if (
+        !this._alphaMaskCanvas ||
+        this._alphaMaskCanvas.width !== _0x4e4fb1 ||
+        this._alphaMaskCanvas.height !== _0x3f2680
+      ) {
+        const _0x371d10 = document.createElement('canvas');
+        ((_0x371d10.width = _0x4e4fb1), (_0x371d10.height = _0x3f2680), (this._alphaMaskCanvas = _0x371d10));
+      }
+      if (
+        !this._alphaOverlayCanvas ||
+        this._alphaOverlayCanvas.width !== _0x4e4fb1 ||
+        this._alphaOverlayCanvas.height !== _0x3f2680
+      ) {
+        const _0x284ad8 = document.createElement('canvas');
+        ((_0x284ad8.width = _0x4e4fb1),
+          (_0x284ad8.height = _0x3f2680),
+          (this._alphaOverlayCanvas = _0x284ad8));
+      }
+      const _0x5b3cbc = this._alphaMaskCanvas.getContext('2d');
+      if (!_0x5b3cbc) return null;
+      return (
+        _0x5b3cbc.clearRect(0, 0, _0x4e4fb1, _0x3f2680),
+        (_0x5b3cbc.lineCap = 'round'),
+        (_0x5b3cbc.lineJoin = 'round'),
+        _0x5b3cbc
+      );
+    },
+    _compositeNormalMask(_0x487f19, _0x2b856b, _0x35b641) {
+      if (!_0x487f19 || !this._normalMaskCanvas || !this._normalOverlayCanvas) return;
+      const _0x19ec9a = Math.max(1, Number(_0x2b856b) || 1),
+        _0x48a915 = Math.max(1, Number(_0x35b641) || 1),
+        _0x593298 = this._normalOverlayCanvas.getContext('2d');
+      if (!_0x593298) return;
+      const _0x17813b = getPixelToolPalette();
+      (_0x593298.clearRect(0, 0, _0x19ec9a, _0x48a915),
+        _0x593298.save(),
+        (_0x593298.globalCompositeOperation = 'source-over'),
+        (_0x593298.globalAlpha = 1),
+        (_0x593298.fillStyle = _0x17813b.maskPreviewFill),
+        _0x593298.fillRect(0, 0, _0x19ec9a, _0x48a915),
+        (_0x593298.globalCompositeOperation = 'destination-in'),
+        _0x593298.drawImage(this._normalMaskCanvas, 0, 0, _0x19ec9a, _0x48a915),
+        _0x593298.restore(),
+        _0x487f19.save(),
+        (_0x487f19.globalCompositeOperation = 'source-over'),
+        (_0x487f19.globalAlpha = 1),
+        _0x487f19.drawImage(this._normalOverlayCanvas, 0, 0, _0x19ec9a, _0x48a915),
+        _0x487f19.restore());
+    },
+    _compositeAlphaMask(_0x19e0a4, _0x315e86, _0x19a3ae, _0x47247e) {
+      if (!_0x19e0a4 || !this._alphaMaskCanvas || !this._alphaOverlayCanvas) return;
+      const _0x37c22a = Math.max(1, Number(_0x19a3ae) || 1),
+        _0x3120c3 = Math.max(1, Number(_0x47247e) || 1),
+        _0x598ae1 = this._alphaOverlayCanvas.getContext('2d');
+      if (!_0x598ae1) return;
+      _0x598ae1.clearRect(0, 0, _0x37c22a, _0x3120c3);
+      const _0x4cbda0 = _0x315e86?.zoom || 1,
+        _0x5dcb70 = this._createCheckerboardPattern(_0x598ae1, _0x4cbda0);
+      (_0x598ae1.save(),
+        (_0x598ae1.globalCompositeOperation = 'source-over'),
+        (_0x598ae1.globalAlpha = 0.8),
+        (_0x598ae1.fillStyle = _0x5dcb70),
+        _0x598ae1.fillRect(0, 0, _0x37c22a, _0x3120c3),
+        (_0x598ae1.globalCompositeOperation = 'destination-in'),
+        (_0x598ae1.globalAlpha = 1),
+        _0x598ae1.drawImage(this._alphaMaskCanvas, 0, 0, _0x37c22a, _0x3120c3),
+        _0x598ae1.restore(),
+        _0x19e0a4.save(),
+        (_0x19e0a4.globalCompositeOperation = 'source-over'),
+        (_0x19e0a4.globalAlpha = 1),
+        _0x19e0a4.drawImage(this._alphaOverlayCanvas, 0, 0, _0x37c22a, _0x3120c3),
+        _0x19e0a4.restore());
+    },
+    _renderCommands(_0x563f4a, _0x5da41c, _0x4ca5f2, _0x3f7f70 = false, _0xf710fb = {}) {
+      const _0x452622 = _0x5da41c.zoom || 1,
+        _0x30522f = Number(this.canvasEl?.style?.width?.replace('px', '')) || 1,
+        _0x1cf5df = Number(this.canvasEl?.style?.height?.replace('px', '')) || 1,
+        _0x1fd7e7 = getPixelToolPalette(),
+        _0x4868cc = _0xf710fb.normalMaskCtx || null,
+        _0x549e12 = _0xf710fb.alphaMaskCtx || null,
+        _0x2e4468 = Array.isArray(_0xf710fb.boundarySource) ? _0xf710fb.boundarySource : _0x4ca5f2;
+      _0x4ca5f2.forEach((_0x5088c4, _0x422d4e) => {
+        if (_0x5088c4.type === 'mask-preview') {
+          if (!_0x5088c4.img) return;
+          const _0x69d3d8 = Number(this.canvasEl?.style?.width?.replace('px', '')) || 1,
+            _0x384263 = Number(this.canvasEl?.style?.height?.replace('px', '')) || 1;
+          (_0x563f4a.save(),
+            (_0x563f4a.globalCompositeOperation = 'source-over'),
+            _0x563f4a.drawImage(_0x5088c4.img, 0, 0, _0x69d3d8, _0x384263),
+            _0x563f4a.restore());
+          return;
+        }
+        if (_0x5088c4.type === 'mask-base') {
+          if (!_0x5088c4.canvas || !_0x4868cc) return;
+          const _0x2f861b = Number(this.canvasEl?.style?.width?.replace('px', '')) || 1,
+            _0x2abc32 = Number(this.canvasEl?.style?.height?.replace('px', '')) || 1;
+          (_0x4868cc.save(),
+            (_0x4868cc.globalCompositeOperation = 'source-over'),
+            _0x4868cc.drawImage(_0x5088c4.canvas, 0, 0, _0x2f861b, _0x2abc32),
+            _0x4868cc.restore());
+          return;
+        }
+        if (_0x5088c4.type === 'brush') {
+          _0x563f4a.save();
+          const _0x59cf43 = _0x5088c4.mode === 'alpha',
+            _0x242c7f = mapBrushPoints(_0x5088c4.points, _0x452622, _0x452622),
+            _0x43c38a = getBrushLineWidth(_0x5088c4.sizeWorld, _0x452622, 'brush');
+          if (_0x59cf43) {
+            if (_0x549e12)
+              (_0x549e12.save(),
+                drawRoundBrushStroke(_0x549e12, {
+                  points: _0x242c7f,
+                  lineWidth: _0x43c38a,
+                  strokeStyle: '#fff',
+                  fillStyle: '#fff',
+                  globalCompositeOperation: 'source-over',
+                }),
+                _0x549e12.restore());
+            else {
+              const _0xe8a48d = this._createCheckerboardPattern(_0x563f4a, _0x452622);
+              drawRoundBrushStroke(_0x563f4a, {
+                points: _0x242c7f,
+                lineWidth: _0x43c38a,
+                strokeStyle: _0xe8a48d,
+                fillStyle: _0xe8a48d,
+                globalCompositeOperation: 'source-over',
+                globalAlpha: 0.8,
+              });
+            }
+          } else
+            _0x4868cc
+              ? (_0x4868cc.save(),
+                drawRoundBrushStroke(_0x4868cc, {
+                  points: _0x242c7f,
+                  lineWidth: _0x43c38a,
+                  strokeStyle: '#fff',
+                  fillStyle: '#fff',
+                  globalCompositeOperation: 'source-over',
+                }),
+                _0x4868cc.restore())
+              : (drawRoundBrushStroke(_0x563f4a, {
+                  points: _0x242c7f,
+                  lineWidth: getEraserClearLineWidth(_0x43c38a),
+                  strokeStyle: OPAQUE_MASK_PREVIEW_CLEAR,
+                  fillStyle: OPAQUE_MASK_PREVIEW_CLEAR,
+                  globalCompositeOperation: 'destination-out',
+                }),
+                drawRoundBrushStroke(_0x563f4a, {
+                  points: _0x242c7f,
+                  lineWidth: _0x43c38a,
+                  strokeStyle: _0x1fd7e7.maskPreviewFill,
+                  fillStyle: _0x1fd7e7.maskPreviewFill,
+                  globalCompositeOperation: 'source-over',
+                  globalAlpha: 1,
+                }));
+          _0x563f4a.restore();
+          return;
+        }
+        if (_0x5088c4.type === 'eraser') {
+          const _0x366a01 = mapBrushPoints(_0x5088c4.points, _0x452622, _0x452622),
+            _0x265560 = getEraserClearLineWidth(getBrushLineWidth(_0x5088c4.sizeWorld, _0x452622, 'eraser'));
+          (_0x563f4a.save(),
+            drawRoundBrushStroke(_0x563f4a, {
+              points: _0x366a01,
+              lineWidth: _0x265560,
+              strokeStyle: '#000',
+              fillStyle: '#000',
+              globalCompositeOperation: 'destination-out',
+            }),
+            _0x563f4a.restore());
+          _0x4868cc &&
+            (_0x4868cc.save(),
+            drawRoundBrushStroke(_0x4868cc, {
+              points: _0x366a01,
+              lineWidth: _0x265560,
+              strokeStyle: '#000',
+              fillStyle: '#000',
+              globalCompositeOperation: 'destination-out',
+            }),
+            _0x4868cc.restore());
+          _0x549e12 &&
+            (_0x549e12.save(),
+            drawRoundBrushStroke(_0x549e12, {
+              points: _0x366a01,
+              lineWidth: _0x265560,
+              strokeStyle: '#000',
+              fillStyle: '#000',
+              globalCompositeOperation: 'destination-out',
+            }),
+            _0x549e12.restore());
+          return;
+        }
+        if (_0x5088c4.type === 'fill') {
+          const _0x96f0b = _0x5088c4.mode === 'alpha',
+            _0x38b790 = Number(_0x5088c4.x ?? _0x5088c4.startPoint?.x) || 0,
+            _0x641d38 = Number(_0x5088c4.y ?? _0x5088c4.startPoint?.y) || 0,
+            _0x232e75 = _0x2e4468.indexOf(_0x5088c4),
+            _0x41f3a0 = _0x232e75 >= 0 ? _0x2e4468.slice(0, _0x232e75) : _0x4ca5f2.slice(0, _0x422d4e),
+            _0x14f35d = _0x41f3a0.filter(
+              (_0x5dc15c) => _0x5dc15c?.type === 'brush' || _0x5dc15c?.type === 'eraser',
+            ),
+            _0x184a77 = Math.floor(_0x38b790 * _0x452622),
+            _0x242388 = Math.floor(_0x641d38 * _0x452622),
+            _0x5b4cfa = getCachedSealedFillRegion({
+              cache: _0xf710fb.fillRegionCache || this._fillRegionCache,
+              width: _0x30522f,
+              height: _0x1cf5df,
+              zoom: _0x452622,
+              fillCommand: _0x5088c4,
+              boundaryCommands: _0x14f35d,
+              seedX: _0x184a77,
+              seedY: _0x242388,
+              extraKey: 'mode:' + (_0x5088c4.mode || ''),
+              pointToPixel: (_0x1dc63a) => ({
+                x: Number(_0x1dc63a?.x || 0) * _0x452622,
+                y: Number(_0x1dc63a?.y || 0) * _0x452622,
+              }),
+              getStrokeWidth: (_0x3ea12d) =>
+                getBrushLineWidth(_0x3ea12d?.sizeWorld, _0x452622, _0x3ea12d?.type),
+            });
+          if (_0x96f0b) {
+            if (_0x549e12)
+              paintFilledRegion(_0x549e12, _0x5b4cfa, _0x30522f, _0x1cf5df, {
+                fillStyle: '#fff',
+                globalCompositeOperation: 'source-over',
+                globalAlpha: 1,
+              });
+            else {
+              const _0xf8b49a = this._createCheckerboardPattern(_0x563f4a, _0x452622);
+              paintFilledRegion(_0x563f4a, _0x5b4cfa, _0x30522f, _0x1cf5df, {
+                fillStyle: _0xf8b49a,
+                globalCompositeOperation: 'source-over',
+                globalAlpha: 0.8,
+              });
+            }
+          } else
+            _0x4868cc
+              ? paintFilledRegion(_0x4868cc, _0x5b4cfa, _0x30522f, _0x1cf5df, {
+                  fillStyle: '#fff',
+                  globalCompositeOperation: 'source-over',
+                })
+              : (paintFilledRegion(_0x563f4a, _0x5b4cfa, _0x30522f, _0x1cf5df, {
+                  fillStyle: OPAQUE_MASK_PREVIEW_CLEAR,
+                  globalCompositeOperation: 'destination-out',
+                }),
+                paintFilledRegion(_0x563f4a, _0x5b4cfa, _0x30522f, _0x1cf5df, {
+                  fillStyle: _0x1fd7e7.selectionOverlay,
+                  globalCompositeOperation: 'source-over',
+                }));
+          return;
+        }
+      });
+    },
+    _createCheckerboardPattern(_0x162613, _0x1ec954) {
+      const _0x2bc560 = 8 * _0x1ec954,
+        _0x2e3905 = document.createElement('canvas');
+      ((_0x2e3905.width = _0x2bc560 * 2), (_0x2e3905.height = _0x2bc560 * 2));
+      const _0x24cfc8 = _0x2e3905.getContext('2d'),
+        _0x4391a9 = getPixelToolPalette();
+      return (
+        (_0x24cfc8.fillStyle = _0x4391a9.checkerLight),
+        _0x24cfc8.fillRect(0, 0, _0x2bc560 * 2, _0x2bc560 * 2),
+        (_0x24cfc8.fillStyle = _0x4391a9.checkerDark),
+        _0x24cfc8.fillRect(0, 0, _0x2bc560, _0x2bc560),
+        _0x24cfc8.fillRect(_0x2bc560, _0x2bc560, _0x2bc560, _0x2bc560),
+        _0x162613.createPattern(_0x2e3905, 'repeat')
+      );
+    },
+    _fillArea(_0x1b3faa, _0x15172a) {
+      const _0x2ef24f = appStore.getState(),
+        _0x3e3ede = _0x2ef24f.matting?.brushMode || 'normal',
+        _0xab41b1 = {
+          type: 'fill',
+          x: Number(_0x1b3faa?.x) || 0,
+          y: Number(_0x1b3faa?.y) || 0,
+          mode: _0x3e3ede,
+        };
+      (this._commands.push(_0xab41b1), (this._redoStack = []), (this._dirty = true), this._render());
+    },
+    _undo() {
+      if (this._commands.length === 0) return;
+      const _0xe281d6 = this._commands.pop();
+      (this._redoStack.push(_0xe281d6), (this._dirty = true), this._render());
+    },
+    _redo() {
+      if (this._redoStack.length === 0) return;
+      const _0x424aa0 = this._redoStack.pop();
+      (this._commands.push(_0x424aa0), (this._dirty = true), this._render());
+    },
+    _clear() {
+      if (this._commands.length === 0 && this._redoStack.length === 0) return;
+      ((this._commands = []),
+        (this._redoStack = []),
+        (this._draft = null),
+        (this._dirty = true),
+        (this._baseMaskCleared = true),
+        this._render());
+    },
+    async _save() {
+      if (!this.active) return;
+      const _0x3200ad = appStore.getState(),
+        _0x34a2ff = _0x3200ad.nodes[this.nodeId];
+      if (!_0x34a2ff) return;
+      const _0x24d12c = this._resolveNodeImageUrl(_0x34a2ff);
+      if (!_0x24d12c) return;
+      const _0x1ee9b7 = this.toolbarEl.querySelector('.act-save'),
+        _0x4e8055 = _0x1ee9b7.querySelector('span'),
+        _0x5e429b = _0x4e8055 ? _0x4e8055.textContent : '';
+      this._isSaving = true;
+      if (_0x4e8055) _0x4e8055.textContent = imageMattingText('actions.saving');
+      _0x1ee9b7.style.pointerEvents = 'none';
+      try {
+        const _0x36e423 = this.nodeId,
+          _0x3ab4dc = Math.max(1, Number(_0x34a2ff.width) || 1),
+          _0x2a260d = Math.max(1, Number(_0x34a2ff.height) || 1),
+          _0x40b4c1 = generateId('mask_save'),
+          _0x32c5e3 = this._commands
+            .filter(
+              (_0x536e42) =>
+                _0x536e42 &&
+                (_0x536e42.type === 'brush' || _0x536e42.type === 'eraser' || _0x536e42.type === 'fill'),
+            )
+            .map((_0x4f3bff) => {
+              if (_0x4f3bff.type === 'fill')
+                return {
+                  type: 'fill',
+                  x: Number(_0x4f3bff.x ?? _0x4f3bff.startPoint?.x) || 0,
+                  y: Number(_0x4f3bff.y ?? _0x4f3bff.startPoint?.y) || 0,
+                  mode: _0x4f3bff.mode,
+                };
+              return {
+                type: _0x4f3bff.type,
+                sizeWorld: Number(_0x4f3bff.sizeWorld) || 0,
+                mode: _0x4f3bff.mode,
+                points: Array.isArray(_0x4f3bff.points)
+                  ? _0x4f3bff.points.map((_0x23f042) => ({ x: Number(_0x23f042.x), y: Number(_0x23f042.y) }))
+                  : [],
+              };
+            });
+        if (this._baseMaskCleared && _0x32c5e3.length === 0) {
+          (appStore.updateNodeData(_0x36e423, {
+            mask: '',
+            maskPreview: '',
+            maskPolarity: '',
+            maskPreviewUrl: null,
+            maskSaveToken: null,
+          }),
+            window._triggerLocalCacheSave?.(),
+            this.exit({ silent: true }));
+          return;
+        }
+        const _0x5c9f88 = this._baseMaskCleared ? '' : normalizeLocalPath(_0x34a2ff?.mask),
+          _0x3fb1ca = await new Promise((_0x8baad0) => this.canvasEl.toBlob(_0x8baad0, 'image/png'));
+        if (!_0x3fb1ca) throw new Error(imageMattingText('errors.canvasExportFailed'));
+        const _0x336b8f = URL.createObjectURL(_0x3fb1ca);
+        (appStore.updateNodeData(_0x36e423, { maskPreviewUrl: _0x336b8f, maskSaveToken: _0x40b4c1 }),
+          window._triggerLocalCacheSave?.(),
+          this.exit({ silent: true }),
+          (async () => {
+            const _0x474921 = await this._loadImage(_0x24d12c),
+              _0x3131b2 = _0x474921.naturalWidth || _0x474921.width,
+              _0x5ac767 = _0x474921.naturalHeight || _0x474921.height,
+              _0x5e6b97 = Math.max(_0x3ab4dc / _0x3131b2, _0x2a260d / _0x5ac767) || 1,
+              _0x1d3ed9 = _0x3131b2 * _0x5e6b97,
+              _0x24dc23 = _0x5ac767 * _0x5e6b97,
+              _0x2cbba3 = (_0x3ab4dc - _0x1d3ed9) / 2,
+              _0x2f5c97 = (_0x2a260d - _0x24dc23) / 2,
+              _0x50915c = (_0x8ab172) => {
+                const _0x369ba5 = (Number(_0x8ab172?.x) - _0x2cbba3) / _0x5e6b97,
+                  _0x48f3cf = (Number(_0x8ab172?.y) - _0x2f5c97) / _0x5e6b97;
+                return {
+                  x: Math.max(0, Math.min(_0x3131b2 - 1, _0x369ba5)),
+                  y: Math.max(0, Math.min(_0x5ac767 - 1, _0x48f3cf)),
+                };
+              },
+              _0x58dc90 = document.createElement('canvas');
+            ((_0x58dc90.width = _0x3131b2), (_0x58dc90.height = _0x5ac767));
+            const _0x1ee56a = _0x58dc90.getContext('2d');
+            _0x1ee56a.imageSmoothingEnabled = false;
+            const _0x2f2f8a = getCssVar('--canvas-white'),
+              _0x3cc024 = getCssVar('--canvas-black');
+            ((_0x1ee56a.fillStyle = _0x3cc024), _0x1ee56a.fillRect(0, 0, _0x3131b2, _0x5ac767));
+            if (_0x5c9f88)
+              try {
+                const _0x20f89e = await this._loadImage(localPathToUrl(_0x5c9f88));
+                _0x1ee56a.drawImage(_0x20f89e, 0, 0, _0x3131b2, _0x5ac767);
+                const _0x30c562 = appStore.getState().nodes?.[_0x36e423],
+                  _0x2253e4 = String(_0x30c562?.maskPolarity || '').trim();
+                _0x2253e4 !== 'paint-white' && this._invertCanvasBinary(_0x1ee56a);
+              } catch (_0x29bcd1) {}
+            const _0x260254 = (_0x548bd0, _0x228887, _0x491141 = 1) => {
+              const _0x9f59af = (Array.isArray(_0x548bd0.points) ? _0x548bd0.points : []).map((_0x32a0b) =>
+                _0x50915c(_0x32a0b),
+              );
+              if (!_0x9f59af.length) return;
+              _0x1ee56a.save();
+              const _0x24f07a = _0x491141 >= 6 ? 'eraser' : 'brush',
+                _0x5c4302 = getBrushLineWidth(_0x548bd0.sizeWorld, 1 / _0x5e6b97, _0x24f07a);
+              (drawRoundBrushStroke(_0x1ee56a, {
+                points: _0x9f59af,
+                lineWidth: _0x24f07a === 'eraser' ? getEraserClearLineWidth(_0x5c4302) : _0x5c4302,
+                strokeStyle: _0x228887,
+                fillStyle: _0x228887,
+                globalCompositeOperation: 'source-over',
+              }),
+                _0x1ee56a.restore());
+            };
+            _0x32c5e3.forEach((_0x249793, _0x4d8f6b) => {
+              if (!_0x249793) return;
+              if (_0x249793.type === 'brush') {
+                _0x260254(_0x249793, _0x2f2f8a, 1);
+                return;
+              }
+              if (_0x249793.type === 'eraser') {
+                _0x260254(_0x249793, _0x3cc024, 6);
+                return;
+              }
+              if (_0x249793.type === 'fill') {
+                const _0x27c9ad = _0x32c5e3
+                    .slice(0, _0x4d8f6b)
+                    .filter((_0x256220) => _0x256220?.type === 'brush' || _0x256220?.type === 'eraser'),
+                  _0x338a37 = buildBinaryBoundaryMask({
+                    width: _0x3131b2,
+                    height: _0x5ac767,
+                    commands: _0x27c9ad,
+                    pointToPixel: (_0x318f7a) => {
+                      const _0x3f6690 = _0x50915c(_0x318f7a || {});
+                      return { x: _0x3f6690.x, y: _0x3f6690.y };
+                    },
+                    getStrokeWidth: (_0x3cfe92) =>
+                      getBrushLineWidth(_0x3cfe92?.sizeWorld, 1 / _0x5e6b97, _0x3cfe92?.type),
+                  }),
+                  _0xb28f2b = _0x50915c({ x: _0x249793.x, y: _0x249793.y }),
+                  _0x2f802b = floodFillRegion(
+                    _0x338a37.mask,
+                    _0x338a37.width,
+                    _0x338a37.height,
+                    Math.floor(_0xb28f2b.x),
+                    Math.floor(_0xb28f2b.y),
+                  ),
+                  _0x14999a = sealRegionToBoundary(
+                    _0x2f802b,
+                    _0x338a37.mask,
+                    _0x338a37.width,
+                    _0x338a37.height,
+                  );
+                paintFilledRegion(_0x1ee56a, _0x14999a, _0x3131b2, _0x5ac767, {
+                  fillStyle: _0x2f2f8a,
+                  globalCompositeOperation: 'source-over',
+                });
+                return;
+              }
+            });
+            const _0x19908d = _0x1ee56a.getImageData(0, 0, _0x3131b2, _0x5ac767).data,
+              _0x558122 = Math.max(1, Math.floor(Math.max(_0x3131b2, _0x5ac767) / 0x100));
+            let _0x5ceb34 = false;
+            for (let _0x56177f = 0; _0x56177f < _0x5ac767 && !_0x5ceb34; _0x56177f += _0x558122) {
+              for (let _0x32c654 = 0; _0x32c654 < _0x3131b2; _0x32c654 += _0x558122) {
+                const _0x55c3fe = (_0x56177f * _0x3131b2 + _0x32c654) * 4,
+                  _0x3c9688 = _0x19908d[_0x55c3fe],
+                  _0x29da36 = _0x19908d[_0x55c3fe + 1],
+                  _0x42fba0 = _0x19908d[_0x55c3fe + 2];
+                if (_0x3c9688 > 5 || _0x29da36 > 5 || _0x42fba0 > 5) {
+                  _0x5ceb34 = true;
+                  break;
+                }
+              }
+            }
+            if (!_0x5ceb34) {
+              const _0x58e44b = appStore.getState().nodes?.[_0x36e423];
+              if (!_0x58e44b || _0x58e44b.maskSaveToken !== _0x40b4c1) {
+                URL.revokeObjectURL(_0x336b8f);
+                return;
+              }
+              (appStore.updateNodeData(_0x36e423, {
+                mask: '',
+                maskPreview: '',
+                maskPolarity: '',
+                maskPreviewUrl: null,
+                maskSaveToken: null,
+              }),
+                appStore.setSelectedNodes([_0x36e423]),
+                commit(),
+                URL.revokeObjectURL(_0x336b8f),
+                window._triggerLocalCacheSave?.());
+              return;
+            }
+            const _0x3a3b1c = await new Promise((_0x3b3de4) => _0x58dc90.toBlob(_0x3b3de4, 'image/png'));
+            if (!_0x3a3b1c) throw new Error(imageMattingText('errors.canvasExportFailed'));
+            const _0x28efd7 = await saveOutputBlob(_0x3a3b1c, { ext: 'png', subDir: 'mask', kind: 'mask' }),
+              _0x1b5af1 = pickResultLocalPath(_0x28efd7),
+              _0x287bb2 = await saveOutputBlob(_0x3fb1ca, { ext: 'png', subDir: 'mask_preview' }),
+              _0x3db1ec = pickResultLocalPath(_0x287bb2),
+              _0x11e29d = appStore.getState().nodes?.[_0x36e423];
+            if (!_0x11e29d || _0x11e29d.maskSaveToken !== _0x40b4c1) {
+              URL.revokeObjectURL(_0x336b8f);
+              return;
+            }
+            (appStore.updateNodeData(_0x36e423, {
+              mask: _0x1b5af1,
+              maskPreview: _0x3db1ec,
+              maskPolarity: 'paint-white',
+              maskPreviewUrl: null,
+              maskSaveToken: null,
+            }),
+              appStore.setSelectedNodes([_0x36e423]),
+              commit(),
+              URL.revokeObjectURL(_0x336b8f),
+              window._triggerLocalCacheSave?.());
+          })().catch(() => {
+            const _0x1b3f2c = appStore.getState().nodes?.[_0x36e423];
+            if (!_0x1b3f2c || _0x1b3f2c.maskSaveToken !== _0x40b4c1) {
+              try {
+                URL.revokeObjectURL(_0x336b8f);
+              } catch (_0x862097) {}
+              return;
+            }
+            (appStore.updateNodeData(_0x36e423, { maskSaveToken: null }),
+              window.showToast?.(imageMattingText('toasts.saveFailed'), 'error'));
+          }));
+      } catch (_0x11ed27) {
+        (console.error('[Matting] 保存失败:', _0x11ed27),
+          window.showToast?.(imageMattingText('toasts.saveFailed'), 'error'));
+      } finally {
+        if (_0x4e8055) _0x4e8055.textContent = _0x5e429b;
+        ((_0x1ee9b7.style.pointerEvents = 'auto'), (this._isSaving = false), this._syncLocaleTexts());
+      }
+    },
+    _resolveNodeImageUrl(_0x434136) {
+      const _0x17377f = _0x434136.mainImageIndex || 0,
+        _0x5b8397 = _0x434136.images && _0x434136.images[_0x17377f],
+        _0x25a124 = _0x434136.localPath || _0x5b8397?.localPath,
+        _0x4f8715 = localPathToUrl(_0x25a124);
+      if (_0x4f8715) return _0x4f8715;
+      return (
+        _0x434136.src ||
+        _0x434136.sourceUrl ||
+        _0x434136.imageUrl ||
+        _0x434136.thumbUrl ||
+        _0x5b8397?.imageUrl ||
+        _0x5b8397?.thumbUrl ||
+        ''
+      );
+    },
+    _invertCanvasBinary(_0x5314db) {
+      const _0x4279fc = _0x5314db?.canvas,
+        _0x469d10 = _0x4279fc?.width || 0,
+        _0x845312 = _0x4279fc?.height || 0;
+      if (!_0x469d10 || !_0x845312) return;
+      const _0x2cceaf = _0x5314db.getImageData(0, 0, _0x469d10, _0x845312),
+        _0x40fbf4 = _0x2cceaf.data;
+      for (let _0x53555d = 0; _0x53555d < _0x40fbf4.length; _0x53555d += 4) {
+        ((_0x40fbf4[_0x53555d] = 255 - _0x40fbf4[_0x53555d]),
+          (_0x40fbf4[_0x53555d + 1] = 255 - _0x40fbf4[_0x53555d + 1]),
+          (_0x40fbf4[_0x53555d + 2] = 255 - _0x40fbf4[_0x53555d + 2]));
+      }
+      _0x5314db.putImageData(_0x2cceaf, 0, 0);
+    },
+    _createMaskBaseCanvas(_0xc5a10e, _0x1cb92f = 'paint-white') {
+      const _0x26eb1f = Math.max(1, Number(_0xc5a10e?.naturalWidth || _0xc5a10e?.width) || 1),
+        _0x971eaf = Math.max(1, Number(_0xc5a10e?.naturalHeight || _0xc5a10e?.height) || 1),
+        _0x33f32e = document.createElement('canvas');
+      ((_0x33f32e.width = _0x26eb1f), (_0x33f32e.height = _0x971eaf));
+      const _0x8dd9b1 = _0x33f32e.getContext('2d', { willReadFrequently: true });
+      if (!_0x8dd9b1) return null;
+      _0x8dd9b1.drawImage(_0xc5a10e, 0, 0, _0x26eb1f, _0x971eaf);
+      const _0x35ba08 = _0x8dd9b1.getImageData(0, 0, _0x26eb1f, _0x971eaf),
+        { data: _0x53dd5f } = _0x35ba08,
+        _0x56e591 = String(_0x1cb92f || '').trim() === 'paint-white';
+      for (let _0x40af53 = 0; _0x40af53 < _0x53dd5f.length; _0x40af53 += 4) {
+        const _0x9974eb = Math.max(_0x53dd5f[_0x40af53], _0x53dd5f[_0x40af53 + 1], _0x53dd5f[_0x40af53 + 2]),
+          _0x169ef3 = _0x56e591 ? _0x9974eb : 255 - _0x9974eb,
+          _0x48cbee = _0x169ef3 > 5 ? _0x169ef3 : 0;
+        ((_0x53dd5f[_0x40af53] = 255),
+          (_0x53dd5f[_0x40af53 + 1] = 255),
+          (_0x53dd5f[_0x40af53 + 2] = 255),
+          (_0x53dd5f[_0x40af53 + 3] = _0x48cbee));
+      }
+      return (_0x8dd9b1.putImageData(_0x35ba08, 0, 0), _0x33f32e);
+    },
+    _loadExistingMask() {
+      if (!this.active) return;
+      const _0x5a0a20 = appStore.getStateRaw(),
+        _0x50565e = _0x5a0a20.nodes?.[this.nodeId],
+        _0x264de7 = String(_0x50565e?.mask || '').trim(),
+        _0x38b0f3 = String(_0x50565e?.maskPreviewUrl || _0x50565e?.maskPreview || '').trim(),
+        _0x3c46af = !!_0x264de7,
+        _0x50c00b = _0x3c46af ? _0x264de7 : _0x38b0f3;
+      if (!_0x50c00b) return;
+      const _0x4723a2 =
+        _0x50c00b.startsWith('blob:') || _0x50c00b.startsWith('data:')
+          ? _0x50c00b
+          : localPathToUrl(_0x50c00b);
+      if (!_0x4723a2) return;
+      (async () => {
+        const _0x32fae6 = await this._loadImage(_0x4723a2);
+        if (!this.active) return;
+        this._commands = this._commands.filter(
+          (_0x33dbe2) => _0x33dbe2?.type !== 'mask-preview' && _0x33dbe2?.type !== 'mask-base',
+        );
+        if (_0x3c46af) {
+          const _0x5b22a6 = this._createMaskBaseCanvas(_0x32fae6, _0x50565e?.maskPolarity);
+          if (_0x5b22a6) this._commands.unshift({ type: 'mask-base', canvas: _0x5b22a6 });
+        } else this._commands.unshift({ type: 'mask-preview', img: _0x32fae6 });
+        ((this._redoStack = []), this._render());
+      })().catch(() => {});
+    },
+    _loadImage(_0x1e8791) {
+      return new Promise((_0x1a1570, _0x2cc74d) => {
+        const _0x1b4406 = new Image();
+        ((_0x1b4406.crossOrigin = 'anonymous'),
+          (_0x1b4406.onload = () => _0x1a1570(_0x1b4406)),
+          (_0x1b4406.onerror = () => _0x2cc74d(new Error(imageMattingText('errors.imageLoadFailed')))),
+          (_0x1b4406.src = _0x1e8791));
+      });
+    },
+  };
+export default ImageMattingController;

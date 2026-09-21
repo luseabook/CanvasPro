@@ -1,1 +1,876 @@
-const a447_0x4c6a3e=a447_0xdbbc;(function(_0x385999,_0x4c3131){const _0x1f52d6=a447_0xdbbc,_0x1ee04e=_0x385999();while(!![]){try{const _0x121089=-parseInt(_0x1f52d6(0x2ba))/0x1*(-parseInt(_0x1f52d6(0x2a8))/0x2)+-parseInt(_0x1f52d6(0x275))/0x3*(-parseInt(_0x1f52d6(0x251))/0x4)+-parseInt(_0x1f52d6(0x281))/0x5*(-parseInt(_0x1f52d6(0x2a2))/0x6)+-parseInt(_0x1f52d6(0x27c))/0x7+-parseInt(_0x1f52d6(0x20e))/0x8+-parseInt(_0x1f52d6(0x218))/0x9+-parseInt(_0x1f52d6(0x2fe))/0xa*(parseInt(_0x1f52d6(0x2d5))/0xb);if(_0x121089===_0x4c3131)break;else _0x1ee04e['push'](_0x1ee04e['shift']());}catch(_0x5dc4cf){_0x1ee04e['push'](_0x1ee04e['shift']());}}}(a447_0x1b4f,0x35fd9));import{deleteSelectedPanoramaSceneObject,focusPanoramaSceneSelection,resetPanoramaSceneView,setPanoramaSceneEditing,setPanoramaSceneTool}from'../panoramaSceneNode/sceneNodeActions.js';import{copyNodeMediaToSystemClipboard}from'../mediaClipboard.js';import{startCanvasScreenshot}from'../canvasScreenshot.js';import{markSystemClipboardWrite}from'../clipboard.js';import{applySnapGridEnabled,readSnapGridEnabled}from'../snapGridState.js';import{readGridDotsPref,setGridDotsPref}from'../settings/appearanceSettings.js';import{setSelectionRelatedHighlightPref}from'../settings/canvasAlignmentSettings.js';import{readCommentNoteJumpFocusPref,setImageVideoNodeResizePref,setNodeAvoidOverlapPref,setPromptBoxResizePref,setTitleFollowsCanvasZoomPref,setVideoMetaPref}from'../settings/nodeBehaviorSettings.js';import{resolveJumpZoom}from'../commentNoteJumpShortcut.js';import{toggleSettingsPanel}from'../settings/panelSettings.js';import{toggleSidebarSubmenu}from'../sidebarSubmenuController.js';import{syncPlaySelectedVideos}from'../videoSyncPlayback.js';import{computeNodesWorldBounds,computeViewportForWorldBounds,getAlignableSelectionNodes,screenToWorld}from'../../core/math.js';import{getBrowserViewportRect}from'../../core/viewportFocus.js';function a447_0x1b4f(){const _0x2dd898=['_clearSnapGuideLines','.speed-btn','image-tool-crop','ai-video','panorama-scene-reset-view','v2SnapGuides','create-ai-video','zoom-in','alignFeatureEnabled','isArray','panorama-scene-tool-move','align-feature','open-files','clearSelection','align-feature-toggle','height','media-clip-delete-material','connectionLinesVisible','annotate','save','exit','setSelectedNodes','showToast','panorama-scene-camera-save-6','filter','align-feature-hold-start','appBusinessEvents.toggles.videoMeta.off','panorama-scene-camera-save-8','zoomPercent','.canvas-proj-dropdown','45273qGcCXj','comment-note','redo','image-tool-expand','panorama-scene-camera-save-1','delete_nodes','move','543452INQtls','scale','INPUT','error','.act-clip','605cItZRe','undo','.act-fullscreen','panorama-scene-camera-7','matting','image-tool-multigrid','viewport','mouseTool','storyboard','.act-multiangle','remove','video-tool-clip','appBusinessEvents.toggles.promptBoxResize.on','create-scene-detection','.act-download','toggle-prompt-box-resize','panorama-scene-camera-save-9','selectedNodeIds','panorama-scene-camera-1','video-tool-capture-frame','text-tool-fullscreen','panorama-scene-camera-save-3','video-tool-download','appBusinessEvents.toggles.nodeAvoidOverlap.on','setPickConnectMode','appBusinessEvents.toggles.selectionRelatedHighlight.off','appBusinessEvents.toggles.mediaNodeResize.off','navigate','paste','imageViewerOverlay','.act-crop','_openSaveDialog','setSelection','3918WAzjAg','markViewportPersist','panorama-scene-camera-save-5','.video-snap-btn','call','appBusinessEvents.toggles.titleFollowsZoom.on','2PCdzcv','panorama-scene-camera-4','.act-hd','appBusinessEvents.nodeDefaults.aiVideo','.v2-quote-menu','avatarMenu','.v2-canvas-ctx-menu','minimapWrapper','video-tool-separate-av','activeElement','ms-sync-video-play','panorama-360','ai-image','media-clip','supportsCamera','.act-separate-av','image','btnMinimap','397339TRmHwc','reason','video-tool-hd','panorama-scene-camera-save-4','string','zoom-out','editor-tool-rect','ai-audio','source-audio','appBusinessEvents.toggles.promptBoxResize.off','.prompt-attachment-btn','panorama-scene-camera-create','image-tool-annotate','create-comment-note','contains','includes','aboutOverlay','toggle','style','settingsOverlay','setAnnotateState','getElementById','delete','v2:canvas-paste-request','editor-tool-text','align-feature-hold-end','toggle-connection-lines','7370JSSwYd','bucket','deleteNodes','image-tool-erase','getStateRaw','open','jumpShortcut','appBusinessEvents.toggles.snapGrid.on','_clear','image-tool-download','.media-clip-tool-crop','appBusinessEvents.toggles.snapGuides.on','selector','panorama-scene-camera-3','.download-btn','copy-media','.act-copy','appBusinessEvents.toggles.nodeAvoidOverlap.off','_redo','panorama-scene:capture-shortcut','.act-annotate','warn','panorama-scene-camera-9','.act-erase','source-image','isFinite','panorama360Node','tasks','_switchTool','appBusinessEvents.toggles.videoMeta.on','_setTool','comment-note-jump','min','appBusinessEvents.copyMedia.clipboardUnsupported','appBusinessEvents.toggles.gridDots.off','assets','.act-matting','length','alignPanelVisible','none','nodes','2290aFGjhY','source-text','panorama-scene','active','expanded','updateViewport','editor-tool-eraser','image-tool-hd','create-ai-image','then','nodeModal','ai-text','function','appBusinessEvents.toggles.connectionLines.on','snap-guides','trim','panorama-scene-camera-6','.act-auto-subject','classList','minimap','mousedown','mouse','snapGuidesEnabled','audio-tool-speed','.clip-btn','toggle-node-avoid-overlap','deleteSelectedTextCommand','titleFollowsCanvasZoom','mimeType','activeTool','panorama-scene-camera-save-0','zoom','setAlignPanelVisible','undefined','rotate','audio','setConnectionLinesVisible','toggle-media-node-resize','nodeId','isEditing','_lastMy','editor-tool-bucket','appBusinessEvents.copyMedia.copyFailed','addEventListener','appBusinessEvents.copyMedia.selectSingleImageNode','_undo','no-media','innerWidth','escape-all','toggle-title-follows-zoom','querySelector','640632EDINNs','slice','reset_source_media_size','fit-all','appBusinessEvents.nodeDefaults.sourceText','create_group','appBusinessEvents.toggles.mediaNodeResize.on','blur','pickConnectMode','appBusinessEvents.toggles.titleFollowsZoom.off','718929TDTxYt','appBusinessEvents.toggles.selectionRelatedHighlight.on','setSnapGuidesEnabled','width','brush','open-assets','dispatchEvent','open-task-center','.act-keying','appBusinessEvents.toggles.gridDots.on','panorama-scene-tool-scale','is-audio-clip-mode','video','activate','videoClip','copy','panorama-scene-camera-save-7','appBusinessEvents.nodeDefaults.aiAudio','type','imageVideoNodeResizeEnabled','sceneState','appBusinessEvents.nodeDefaults.sceneDetection','not-supported','rect','editor-tool-brush','display','audio-tool-clip','panorama-scene-camera-0','appBusinessEvents.toggles.snapGuides.off','_lastMx','comment-note-jump::','promptBoxResizeEnabled','create-ai-text','videoKeying','.act-repaint','setAlignPanelAnchorWorld','image-tool-fullscreen','appBusinessEvents.nodeDefaults.aiText','create-text','appBusinessEvents.toggles.connectionLines.off','catch','files','image-tool-multiangle','source-video','max','.act-multigrid','toggle-selection-related-highlight','image-tool-matting','tagName','_v2SaveProjectFromShortcut','group','.v2-node-picker','panorama-scene-tool-rotate','startsWith','click','innerHeight','showVideoMeta','36UJEKPo','keys','text','editor-clear','getState','box-select'];a447_0x1b4f=function(){return _0x2dd898;};return a447_0x1b4f();}import{t}from'../../i18n/index.js';function a447_0xdbbc(_0x1e4209,_0x3b2c67){const _0x1b4fd4=a447_0x1b4f();return a447_0xdbbc=function(_0xdbbcf1,_0x3da0f6){_0xdbbcf1=_0xdbbcf1-0x1ec;let _0x332125=_0x1b4fd4[_0xdbbcf1];return _0x332125;},a447_0xdbbc(_0x1e4209,_0x3b2c67);}const COMMENT_NOTE_JUMP_WORLD_ALIGN=0.5,MEDIA_CLIP_DELETE_MATERIAL_EVENT=a447_0x4c6a3e(0x267);export function createAppBusinessEvents({store:_0x32dcba,wrap:_0x179f20,addShortcutListener:_0x1d32af,executeCommand:_0x53a386,undo:_0x20fac5,redo:_0x1e5260,commit:_0x3205d7,closeShortcuts:_0x1daad8,getNodeDefaultSize:_0x545ff0,getAIGenerationDefaultSizeByType:_0x112324,createNodeAtCursor:_0x4095f1,createImageNodeFromBlob:_0x3deafb,animateViewport:_0x26060e,focusNodeAtZoomPercent:_0x3ba4e5,focusNodes:_0x151171,clearTrackedFocus:_0x52c0ad,handlePasteFromClipboard:_0x5dd9a4,initCanvasContextMenu:_0x2324a4,toggleAgentPanel:_0x15877d,ImageAnnotateController:_0x36c7d5,ImageMattingController:_0x3fac6d,AudioClipController:_0x22bc6d,syncPlaySelectedVideos:_0x14cb73=syncPlaySelectedVideos}={}){const _0x44d824=a447_0x4c6a3e,_0x2f3d51=_0x18796d=>{const _0x6d4a2d=a447_0xdbbc,_0x4a20a8=_0x18796d?.[_0x6d4a2d(0x287)];if(!_0x4a20a8)return null;const _0x3a2f27=Number(window?.[_0x6d4a2d(0x235)]),_0x546c2c=Number(window?.[_0x6d4a2d(0x203)]);if(!Number['isFinite'](_0x3a2f27)||!Number['isFinite'](_0x546c2c))return null;const _0x24bbad=screenToWorld(_0x3a2f27,_0x546c2c,_0x4a20a8);if(!_0x24bbad||!Number[_0x6d4a2d(0x2ee)](_0x24bbad['x'])||!Number[_0x6d4a2d(0x2ee)](_0x24bbad['y']))return null;return{'x':_0x24bbad['x'],'y':_0x24bbad['y']};},_0x2be6a3={'panorama-scene-camera-create':{'selector':'.act-camera','nodeTypes':[_0x44d824(0x300)]},'image-tool-matting':{'selector':_0x44d824(0x2f9),'nodeTypes':['source-image',_0x44d824(0x2b4),'image']},'image-tool-repaint':{'selector':_0x44d824(0x23a),'nodeTypes':[_0x44d824(0x2ed),_0x44d824(0x2b4),'image']},'image-tool-erase':{'selector':_0x44d824(0x2ec),'nodeTypes':['source-image',_0x44d824(0x2b4),_0x44d824(0x2b8)]},'image-tool-hd':{'selector':'.act-hd','nodeTypes':[_0x44d824(0x2ed),_0x44d824(0x2b4),_0x44d824(0x2b8)]},'image-tool-expand':{'selector':'.act-expand','nodeTypes':[_0x44d824(0x2ed),_0x44d824(0x2b4),'image']},'image-tool-auto-subject':{'selector':_0x44d824(0x1ec),'nodeTypes':[_0x44d824(0x2ed),_0x44d824(0x2b4),_0x44d824(0x2b8)]},'image-tool-multigrid':{'selector':_0x44d824(0x245),'nodeTypes':[_0x44d824(0x2ed),_0x44d824(0x2b4),_0x44d824(0x2b8)]},'image-tool-multiangle':{'selector':_0x44d824(0x28a),'nodeTypes':[_0x44d824(0x2ed),_0x44d824(0x2b4),_0x44d824(0x2b8)]},'image-tool-annotate':{'selector':_0x44d824(0x2e9),'nodeTypes':['source-image','ai-image','image']},'image-tool-crop':{'selector':_0x44d824(0x29f),'nodeTypes':[_0x44d824(0x2ed),_0x44d824(0x2b4),'image']},'image-tool-fullscreen':{'selector':'.act-fullscreen','nodeTypes':[_0x44d824(0x2ed),_0x44d824(0x2b4),_0x44d824(0x2b8)]},'image-tool-download':{'selector':_0x44d824(0x28f),'nodeTypes':['source-image',_0x44d824(0x2b4),'image']},'video-tool-clip':{'selector':_0x44d824(0x280),'nodeTypes':['source-video',_0x44d824(0x25a),'video']},'video-tool-separate-av':{'selector':_0x44d824(0x2b7),'nodeTypes':[_0x44d824(0x243),_0x44d824(0x25a),'video']},'video-tool-capture-frame':{'selector':_0x44d824(0x2a5),'nodeTypes':[_0x44d824(0x243),_0x44d824(0x25a),_0x44d824(0x224)]},'video-tool-keying':{'selector':_0x44d824(0x220),'nodeTypes':[_0x44d824(0x243),_0x44d824(0x25a),_0x44d824(0x224)]},'video-tool-hd':{'selector':_0x44d824(0x2aa),'nodeTypes':[_0x44d824(0x243),_0x44d824(0x25a),_0x44d824(0x224)]},'video-tool-fullscreen':{'selector':_0x44d824(0x283),'nodeTypes':[_0x44d824(0x243),'ai-video',_0x44d824(0x224)]},'video-tool-download':{'selector':'.act-download','nodeTypes':[_0x44d824(0x243),_0x44d824(0x25a),'video']},'audio-tool-clip':{'selector':_0x44d824(0x1f3),'nodeTypes':[_0x44d824(0x2c2),'ai-audio',_0x44d824(0x1fe)]},'audio-tool-speed':{'selector':_0x44d824(0x258),'nodeTypes':[_0x44d824(0x2c2),'ai-audio',_0x44d824(0x1fe)]},'audio-tool-download':{'selector':_0x44d824(0x2e3),'nodeTypes':['source-audio',_0x44d824(0x2c1),_0x44d824(0x1fe)]},'clip-tool-crop':{'selector':_0x44d824(0x2df),'nodeTypes':[_0x44d824(0x2b5)]},'text-tool-copy':{'selector':_0x44d824(0x2e5),'nodeTypes':[_0x44d824(0x2ff),'ai-text',_0x44d824(0x253)]},'text-tool-fullscreen':{'selector':'.act-fullscreen','nodeTypes':['source-text',_0x44d824(0x309),_0x44d824(0x253)]}};function _0x21d535(){const _0x3e3a0d=_0x44d824,_0x5a4d25=document[_0x3e3a0d(0x2cf)]('v2-wrap');return!!_0x5a4d25?.['classList'][_0x3e3a0d(0x2c8)](_0x3e3a0d(0x223));}function _0x5a7423(_0x1685fc=_0x32dcba[_0x44d824(0x255)]()){const _0x28afa2=_0x44d824;return!!_0x1685fc[_0x28afa2(0x285)]?.[_0x28afa2(0x301)]||!!_0x1685fc['annotate']?.[_0x28afa2(0x301)]||!!_0x1685fc[_0x28afa2(0x226)]?.[_0x28afa2(0x301)]||!!_0x1685fc[_0x28afa2(0x239)]?.[_0x28afa2(0x301)]||_0x21d535();}function _0x52dfae(_0x21d1aa=_0x32dcba[_0x44d824(0x255)]()){const _0x27d9f2=_0x44d824,_0x292449=Array[_0x27d9f2(0x260)](_0x21d1aa?.[_0x27d9f2(0x292)])?_0x21d1aa[_0x27d9f2(0x292)]:[];if(_0x292449[_0x27d9f2(0x2fa)]!==0x1)return![];const _0x46717c=_0x292449[0x0],_0x382289=_0x21d1aa?.[_0x27d9f2(0x2fd)]?.[_0x46717c]||null;if(_0x382289?.[_0x27d9f2(0x22a)]!==_0x27d9f2(0x2b5)||_0x382289?.['mediaClip']?.[_0x27d9f2(0x302)]!==!![])return![];const _0x4fa3e4=typeof CustomEvent===_0x27d9f2(0x30a)?new CustomEvent(MEDIA_CLIP_DELETE_MATERIAL_EVENT,{'detail':{'nodeId':_0x46717c}}):{'type':MEDIA_CLIP_DELETE_MATERIAL_EVENT,'detail':{'nodeId':_0x46717c}};return window[_0x27d9f2(0x21e)]?.(_0x4fa3e4),!![];}function _0xdb0c98(){const _0x271eec=_0x44d824;let _0x206579=![];(_0x21d535()||_0x22bc6d[_0x271eec(0x301)])&&(_0x22bc6d[_0x271eec(0x26b)]?.({'silent':!![]}),_0x206579=!![]);const _0x4c26a=_0x32dcba[_0x271eec(0x255)]();return _0x4c26a[_0x271eec(0x269)]?.['active']&&(_0x36c7d5['exit']?.({'silent':!![]}),_0x206579=!![]),_0x4c26a[_0x271eec(0x285)]?.['active']&&(_0x3fac6d['exit']?.({'silent':!![]}),_0x206579=!![]),_0x206579;}function _0x4e3545(_0x3f09dc){const _0x23424f=_0x44d824,_0x2d771a=_0x2be6a3[_0x3f09dc];if(!_0x2d771a)return![];const _0x2206d8=_0x32dcba[_0x23424f(0x255)]();if(_0x5a7423(_0x2206d8))return![];const {selectedNodeIds:_0xb099ab,nodes:_0xe91834}=_0x2206d8;if(!Array[_0x23424f(0x260)](_0xb099ab)||_0xb099ab['length']!==0x1)return![];const _0x3f553a=_0xb099ab[0x0],_0x4f1939=_0xe91834?.[_0x3f553a];if(!_0x4f1939||!_0x2d771a['nodeTypes'][_0x23424f(0x2c9)](_0x4f1939[_0x23424f(0x22a)]))return![];const _0x44bc84=document[_0x23424f(0x2cf)](_0x3f553a);if(!_0x44bc84)return![];const _0x317471=_0x44bc84['querySelector'](_0x2d771a[_0x23424f(0x2e1)]);if(!_0x317471)return![];if(_0x3f09dc[_0x23424f(0x24d)]('audio-tool-'))try{const _0x582f64=new PointerEvent('pointerdown',{'bubbles':!![],'cancelable':!![],'pointerType':_0x23424f(0x1f0),'isPrimary':!![],'button':0x0});return _0x317471['dispatchEvent'](_0x582f64),!![];}catch{const _0x3b6d7c=new MouseEvent(_0x23424f(0x1ef),{'bubbles':!![],'cancelable':!![],'button':0x0});return _0x317471['dispatchEvent'](_0x3b6d7c),!![];}if(typeof _0x317471[_0x23424f(0x24e)]!==_0x23424f(0x30a))return![];return _0x317471[_0x23424f(0x24e)](),!![];}function _0x5b8012(){const _0x12e34d=_0x44d824,_0x37b6e5=_0x32dcba[_0x12e34d(0x255)]();if(_0x5a7423(_0x37b6e5))return![];if(_0x37b6e5?.['ui']?.['promptAttachmentButtonHidden']===!![])return![];const _0x2d1e5c=Array[_0x12e34d(0x260)](_0x37b6e5?.[_0x12e34d(0x292)])?_0x37b6e5['selectedNodeIds']:[];if(_0x2d1e5c[_0x12e34d(0x2fa)]!==0x1)return![];const _0x9da8c8=document[_0x12e34d(0x2cf)](_0x2d1e5c[0x0]),_0x4be0b9=_0x9da8c8?.['querySelector']?.(_0x12e34d(0x2c4));if(!_0x4be0b9||typeof _0x4be0b9[_0x12e34d(0x24e)]!==_0x12e34d(0x30a))return![];return _0x4be0b9[_0x12e34d(0x24e)](),!![];}function _0x170b36(){const _0x3fde22=_0x44d824,_0x3ca9db=_0x32dcba[_0x3fde22(0x2d9)]?_0x32dcba[_0x3fde22(0x2d9)]():_0x32dcba[_0x3fde22(0x255)](),_0x48120a=Array[_0x3fde22(0x260)](_0x3ca9db?.['selectedNodeIds'])?_0x3ca9db[_0x3fde22(0x292)]:[];if(_0x48120a[_0x3fde22(0x2fa)]!==0x1)return null;const _0x198281=_0x48120a[0x0],_0x2a18f4=_0x3ca9db?.[_0x3fde22(0x2fd)]?.[_0x198281];if(!_0x2a18f4||_0x2a18f4[_0x3fde22(0x22a)]!==_0x3fde22(0x300)&&_0x2a18f4['type']!==_0x3fde22(0x2b3))return null;const _0x33fa81=_0x2a18f4['type']==='panorama-360'?_0x2a18f4[_0x3fde22(0x2ef)]||null:_0x2a18f4['sceneNode']||null;return{'nodeId':_0x198281,'node':_0x2a18f4,'sceneState':_0x33fa81,'supportsCamera':_0x2a18f4[_0x3fde22(0x22a)]===_0x3fde22(0x300)};}function _0x2329dc({nodeId:_0xc7060a,mode:_0x19fdc4,slot:_0xd38ef5}){const _0x429bb3=_0x44d824,_0x32e5bd=Number(_0xd38ef5);if(!Number['isInteger'](_0x32e5bd)||_0x32e5bd<0x1||_0x32e5bd>0xa)return;window[_0x429bb3(0x21e)](new CustomEvent('panorama-scene:camera-shortcut',{'detail':{'nodeId':_0xc7060a,'mode':_0x19fdc4===_0x429bb3(0x26a)?_0x429bb3(0x26a):_0x429bb3(0x225),'slot':_0x32e5bd}}));}function _0xd35038({nodeId:_0x1b2d89}){const _0x1e892f=_0x44d824,_0xe35cab=String(_0x1b2d89||'')['trim']();if(!_0xe35cab)return;window[_0x1e892f(0x21e)](new CustomEvent(_0x1e892f(0x2e8),{'detail':{'nodeId':_0xe35cab}}));}function _0x18d4e8(_0x2e9746){const _0x3fe061=_0x44d824,_0xb2f0d1=String(_0x2e9746?.[_0x3fe061(0x201)]||'')['trim']();if(!_0xb2f0d1)return;const _0x5f5115=_0x32dcba[_0x3fe061(0x2d9)]?_0x32dcba['getStateRaw']():_0x32dcba[_0x3fe061(0x255)](),_0x4083cc=_0x5f5115?.['nodes']?.[_0xb2f0d1];if(!_0x4083cc)return;if(_0x4083cc[_0x3fe061(0x22a)]!==_0x3fe061(0x300)&&_0x4083cc[_0x3fe061(0x22a)]!==_0x3fe061(0x2b3))return;_0x32dcba[_0x3fe061(0x26c)]?.([_0xb2f0d1]),setPanoramaSceneEditing({'nodeId':_0xb2f0d1,'isEditing':!![],'storeInstance':_0x32dcba});}function _0x2cb79e(){const _0x2fd876=(_0x5c68c6,_0x5cce99=0x320)=>{const _0x1a3e7b=a447_0xdbbc,_0x3b25f9=_0x32dcba['getState'](),_0x20b312=_0x3b25f9?.[_0x1a3e7b(0x2fd)]?.[_0x5c68c6];if(!_0x20b312||_0x20b312[_0x1a3e7b(0x22a)]!=='comment-note')return![];const _0x4ade52=computeNodesWorldBounds(_0x3b25f9?.[_0x1a3e7b(0x2fd)]||{},[_0x5c68c6]),_0x3b2245=getBrowserViewportRect({'windowObject':typeof window!==_0x1a3e7b(0x1fc)?window:undefined,'containerEl':_0x179f20}),{viewportAlignX:_0xbf51c,viewportAlignY:_0x22598b}=readCommentNoteJumpFocusPref(),_0x248bf5=computeViewportForWorldBounds(_0x4ade52,_0x3b2245,{'fixedZoom':resolveJumpZoom(_0x20b312?.[_0x1a3e7b(0x2db)]?.[_0x1a3e7b(0x273)]),'worldAlignX':COMMENT_NOTE_JUMP_WORLD_ALIGN,'worldAlignY':COMMENT_NOTE_JUMP_WORLD_ALIGN,'viewportAlignX':_0xbf51c,'viewportAlignY':_0x22598b});if(!_0x248bf5)return![];_0x52c0ad?.(_0x1a3e7b(0x2f4));const _0x36a268=_0x3b25f9?.['viewport']||{'x':0x0,'y':0x0,'zoom':0x1};if(typeof _0x26060e===_0x1a3e7b(0x30a))return _0x26060e(_0x36a268['x'],_0x36a268['y'],_0x36a268[_0x1a3e7b(0x1fa)],_0x248bf5['x'],_0x248bf5['y'],_0x248bf5[_0x1a3e7b(0x1fa)],_0x5cce99),!![];return _0x32dcba['updateViewport']?.(_0x248bf5['x'],_0x248bf5['y'],_0x248bf5[_0x1a3e7b(0x1fa)]),_0x32dcba[_0x1a3e7b(0x2a3)]?.(),!![];};_0x1d32af(_0x20d5c4=>{const _0x1138f5=a447_0xdbbc;if(typeof _0x20d5c4===_0x1138f5(0x2be)&&_0x20d5c4['startsWith'](_0x1138f5(0x236))){const _0x241e1c=_0x20d5c4[_0x1138f5(0x20f)](_0x1138f5(0x236)[_0x1138f5(0x2fa)]);_0x2fd876(_0x241e1c,0x320);return;}const _0x5a2358=_0x170b36();switch(_0x20d5c4){case'panorama-scene-tool-toggle-mouse':{if(!_0x5a2358?.['sceneState']?.['ui']?.['isEditing'])break;const _0x1feff1=String(_0x5a2358['sceneState']?.['ui']?.[_0x1138f5(0x1f8)]||'')[_0x1138f5(0x30d)](),_0x288b4f=String(_0x5a2358[_0x1138f5(0x22c)]?.['ui']?.[_0x1138f5(0x288)]||_0x5a2358[_0x1138f5(0x22c)]?.['ui']?.[_0x1138f5(0x1f8)]||'')[_0x1138f5(0x30d)](),_0x10260d=_0x1feff1===_0x1138f5(0x27b)||_0x1feff1===_0x1138f5(0x1fd)||_0x1feff1===_0x1138f5(0x27d),_0x537984=_0x10260d?'navigate':_0x288b4f===_0x1138f5(0x256)?_0x1138f5(0x29c):_0x1138f5(0x256);setPanoramaSceneTool({'nodeId':_0x5a2358[_0x1138f5(0x201)],'tool':_0x537984});break;}case _0x1138f5(0x261):case _0x1138f5(0x222):case _0x1138f5(0x24c):{if(!_0x5a2358?.[_0x1138f5(0x22c)]?.['ui']?.[_0x1138f5(0x202)])break;const _0x5d99f9=_0x20d5c4===_0x1138f5(0x261)?_0x1138f5(0x27b):_0x20d5c4===_0x1138f5(0x222)?_0x1138f5(0x27d):'rotate';setPanoramaSceneTool({'nodeId':_0x5a2358[_0x1138f5(0x201)],'tool':_0x5d99f9});break;}case _0x1138f5(0x25b):{if(!_0x5a2358?.[_0x1138f5(0x22c)]?.['ui']?.[_0x1138f5(0x202)])break;resetPanoramaSceneView({'nodeId':_0x5a2358[_0x1138f5(0x201)]});break;}case'panorama-scene-capture':{if(!_0x5a2358?.[_0x1138f5(0x22c)]?.['ui']?.[_0x1138f5(0x202)])break;_0xd35038({'nodeId':_0x5a2358[_0x1138f5(0x201)]});break;}case _0x1138f5(0x2c5):{if(!_0x5a2358?.['sceneState']?.['ui']?.[_0x1138f5(0x202)]||_0x5a2358?.[_0x1138f5(0x2b6)]!==!![])break;_0x4e3545(_0x20d5c4);break;}case _0x1138f5(0x2b2):{const _0x5a64d0=_0x32dcba[_0x1138f5(0x255)](),_0x21a942=Array[_0x1138f5(0x260)](_0x5a64d0?.[_0x1138f5(0x292)])?_0x5a64d0[_0x1138f5(0x292)]:[];_0x21a942['length']>=0x2&&void _0x14cb73({'selectedIds':_0x21a942,'state':_0x5a64d0});break;}case _0x1138f5(0x247):case'image-tool-repaint':case _0x1138f5(0x2d8):case _0x1138f5(0x305):case _0x1138f5(0x278):case'image-tool-auto-subject':case _0x1138f5(0x286):case _0x1138f5(0x242):case _0x1138f5(0x2c6):case _0x1138f5(0x259):case _0x1138f5(0x23c):case _0x1138f5(0x2de):case _0x1138f5(0x28c):case _0x1138f5(0x2b0):case _0x1138f5(0x294):case'video-tool-keying':case _0x1138f5(0x2bc):case'video-tool-fullscreen':case _0x1138f5(0x297):case _0x1138f5(0x232):case _0x1138f5(0x1f2):case'audio-tool-download':case'clip-tool-crop':case'text-tool-copy':case _0x1138f5(0x295):_0x4e3545(_0x20d5c4);break;case _0x1138f5(0x2d0):{const _0x39233a=_0x32dcba[_0x1138f5(0x255)]();if(_0x39233a['annotate']?.['active']){_0x36c7d5?.[_0x1138f5(0x1f5)]?.();break;}if(_0x39233a[_0x1138f5(0x285)]?.['active'])break;if(_0x5a2358?.['sceneState']?.['ui']?.[_0x1138f5(0x202)]){deleteSelectedPanoramaSceneObject({'nodeId':_0x5a2358[_0x1138f5(0x201)]});break;}if(_0x52dfae(_0x39233a))break;const _0x5351b9=_0x39233a[_0x1138f5(0x292)];_0x5351b9[_0x1138f5(0x2fa)]>0x0&&(_0x32dcba[_0x1138f5(0x2d7)](_0x5351b9),_0x32dcba['clearSelection'](),_0x3205d7());break;}case _0x1138f5(0x282):{const _0x57d5e6=_0x32dcba['getState']();if(_0x57d5e6[_0x1138f5(0x269)]?.[_0x1138f5(0x301)])_0x36c7d5['_undo']?.['call'](_0x36c7d5);else _0x57d5e6['matting']?.[_0x1138f5(0x301)]?_0x3fac6d[_0x1138f5(0x208)]?.[_0x1138f5(0x2a6)](_0x3fac6d):(_0x20fac5(),_0x5a2358?.['sceneState']?.['ui']?.[_0x1138f5(0x202)]&&_0x18d4e8(_0x5a2358));break;}case _0x1138f5(0x277):{const _0x274fe4=_0x32dcba['getState']();if(_0x274fe4[_0x1138f5(0x269)]?.[_0x1138f5(0x301)])_0x36c7d5[_0x1138f5(0x2e7)]?.[_0x1138f5(0x2a6)](_0x36c7d5);else _0x274fe4['matting']?.['active']?_0x3fac6d[_0x1138f5(0x2e7)]?.[_0x1138f5(0x2a6)](_0x3fac6d):(_0x1e5260(),_0x5a2358?.[_0x1138f5(0x22c)]?.['ui']?.[_0x1138f5(0x202)]&&_0x18d4e8(_0x5a2358));break;}case'copy':_0x53a386(_0x1138f5(0x227));break;case _0x1138f5(0x2e4):{const _0x3f5b50=_0x32dcba[_0x1138f5(0x255)]()[_0x1138f5(0x292)];if(!Array[_0x1138f5(0x260)](_0x3f5b50)||_0x3f5b50['length']!==0x1){window[_0x1138f5(0x26d)]?.(t('appBusinessEvents.copyMedia.selectSingleImageNode'),_0x1138f5(0x2ea));break;}const _0x187c80=_0x32dcba[_0x1138f5(0x255)]()['nodes']?.[_0x3f5b50[0x0]],_0x40d484=_0x187c80&&(_0x187c80[_0x1138f5(0x22a)]===_0x1138f5(0x2ed)||_0x187c80[_0x1138f5(0x22a)]===_0x1138f5(0x2b4)||_0x187c80[_0x1138f5(0x22a)]===_0x1138f5(0x289));if(!_0x40d484){window[_0x1138f5(0x26d)]?.(t(_0x1138f5(0x207)),_0x1138f5(0x2ea));break;}void copyNodeMediaToSystemClipboard(_0x187c80)[_0x1138f5(0x307)](_0x5abeda=>{const _0x2b5811=_0x1138f5;if(_0x5abeda?.['ok']){markSystemClipboardWrite({'mediaType':String(_0x5abeda?.[_0x2b5811(0x1f7)]||'image/png')}),window[_0x2b5811(0x26d)]?.(t('appBusinessEvents.copyMedia.copied'),'success');return;}if(_0x5abeda?.['reason']===_0x2b5811(0x209)){window[_0x2b5811(0x26d)]?.(t('appBusinessEvents.copyMedia.noMedia'),_0x2b5811(0x2ea));return;}if(_0x5abeda?.[_0x2b5811(0x2bb)]===_0x2b5811(0x22e)){window[_0x2b5811(0x26d)]?.(t(_0x2b5811(0x2f6)),_0x2b5811(0x2ea));return;}window[_0x2b5811(0x26d)]?.(t(_0x2b5811(0x205)),'error');})[_0x1138f5(0x240)](()=>{const _0x15cc18=_0x1138f5;window[_0x15cc18(0x26d)]?.(t('appBusinessEvents.copyMedia.copyFailed'),_0x15cc18(0x27f));});break;}case'canvas-screenshot':{void startCanvasScreenshot({'createImageNodeFromBlob':_0x3deafb,'showToast':(..._0x502d0f)=>window[_0x1138f5(0x26d)]?.(..._0x502d0f)});break;}case'cut':{const _0x412c03=_0x32dcba[_0x1138f5(0x255)]()[_0x1138f5(0x292)];if(Array[_0x1138f5(0x260)](_0x412c03)&&_0x412c03[_0x1138f5(0x2fa)]>0x0){const _0x3aa181=[..._0x412c03];_0x53a386(_0x1138f5(0x227),{'ids':_0x3aa181}),_0x53a386(_0x1138f5(0x27a),{'ids':_0x3aa181});}break;}case _0x1138f5(0x29d):_0x5dd9a4();break;case _0x1138f5(0x24a):_0x53a386(_0x1138f5(0x213));break;case _0x1138f5(0x262):case _0x1138f5(0x265):case _0x1138f5(0x270):case _0x1138f5(0x2d3):{const _0x4f90eb=_0x32dcba[_0x1138f5(0x255)]();if(_0x4f90eb?.['ui']?.[_0x1138f5(0x25f)]===![])break;if(_0x20d5c4===_0x1138f5(0x2d3)){_0x32dcba[_0x1138f5(0x1fb)](![]);break;}const _0x24fdba=Array['isArray'](_0x4f90eb?.[_0x1138f5(0x292)])?_0x4f90eb[_0x1138f5(0x292)]:[];if(_0x24fdba[_0x1138f5(0x2fa)]<0x2)break;const _0x5dbb20=getAlignableSelectionNodes(_0x4f90eb?.[_0x1138f5(0x2fd)]||{},_0x24fdba);if(_0x5dbb20[_0x1138f5(0x2fa)]<0x2)break;if(_0x20d5c4===_0x1138f5(0x270)){const _0x3d1e66=_0x2f3d51(_0x4f90eb);_0x32dcba[_0x1138f5(0x23b)]?.(_0x3d1e66),_0x32dcba[_0x1138f5(0x1fb)](!![]);break;}if(_0x20d5c4===_0x1138f5(0x265)||_0x20d5c4==='align-feature'){const _0x3d28bd=_0x4f90eb?.['ui']?.[_0x1138f5(0x2fb)]===!![];if(_0x3d28bd)_0x32dcba[_0x1138f5(0x1fb)](![]);else{const _0x4d03c8=_0x2f3d51(_0x4f90eb);_0x32dcba[_0x1138f5(0x23b)]?.(_0x4d03c8),_0x32dcba['setAlignPanelVisible'](!![]);}}break;}case'select-all':{const _0x2578b9=_0x32dcba[_0x1138f5(0x255)]()['nodes'];_0x32dcba[_0x1138f5(0x2a1)](Object[_0x1138f5(0x252)](_0x2578b9));break;}case _0x1138f5(0x211):{if(_0x5a2358?.[_0x1138f5(0x22c)]?.['ui']?.[_0x1138f5(0x202)]){focusPanoramaSceneSelection({'nodeId':_0x5a2358['nodeId']});break;}const {nodes:_0x444341,selectedNodeIds:_0x46960a}=_0x32dcba['getState'](),_0x4e5d5a=_0x46960a&&_0x46960a[_0x1138f5(0x2fa)]>0x0?_0x46960a[_0x1138f5(0x26f)](_0x476d73=>_0x444341[_0x476d73]):Object[_0x1138f5(0x252)](_0x444341||{});if(_0x4e5d5a['length']===0x0)break;_0x151171?.(_0x4e5d5a,0x50,0x320);break;}case _0x1138f5(0x1ee):{const _0x66002a=document[_0x1138f5(0x2cf)](_0x1138f5(0x2af)),_0x4eb16c=document[_0x1138f5(0x2cf)](_0x1138f5(0x2b9));if(_0x66002a){_0x66002a[_0x1138f5(0x1ed)][_0x1138f5(0x2cb)]('open');if(_0x4eb16c)_0x4eb16c[_0x1138f5(0x1ed)]['toggle'](_0x1138f5(0x301),_0x66002a[_0x1138f5(0x1ed)][_0x1138f5(0x2c8)](_0x1138f5(0x2da)));}break;}case _0x1138f5(0x25e):case _0x1138f5(0x2bf):{_0x52c0ad?.('shortcut-zoom');const {viewport:_0x4dc325}=_0x32dcba[_0x1138f5(0x255)](),_0x203a7b=_0x20d5c4===_0x1138f5(0x25e)?1.1:0.9,_0x43dca4=Math[_0x1138f5(0x2f5)](0x2,Math[_0x1138f5(0x244)](0.2,_0x4dc325['zoom']*_0x203a7b)),_0x4ecf40=window[_0x1138f5(0x20a)]/0x2,_0x2084d4=window[_0x1138f5(0x24f)]/0x2,_0x127e8e=_0x4ecf40-(_0x4ecf40-_0x4dc325['x'])*(_0x43dca4/_0x4dc325[_0x1138f5(0x1fa)]),_0x53e78d=_0x2084d4-(_0x2084d4-_0x4dc325['y'])*(_0x43dca4/_0x4dc325[_0x1138f5(0x1fa)]);_0x32dcba[_0x1138f5(0x303)](_0x127e8e,_0x53e78d,_0x43dca4);break;}case _0x1138f5(0x30c):{const _0x41834b=_0x32dcba['getState'](),_0x33373e=!(_0x41834b?.['ui']?.[_0x1138f5(0x1f1)]!==![]);_0x32dcba[_0x1138f5(0x21a)](_0x33373e),window[_0x1138f5(0x25c)]=_0x33373e;if(!_0x33373e)window[_0x1138f5(0x257)]?.();window[_0x1138f5(0x21e)](new CustomEvent('v2-snap-guides-changed',{'detail':{'enabled':_0x33373e}})),window[_0x1138f5(0x26d)]?.(_0x33373e?t(_0x1138f5(0x2e0)):t(_0x1138f5(0x234)));break;}case'snap-grid':{const _0x490d14=applySnapGridEnabled(!readSnapGridEnabled());window[_0x1138f5(0x26d)]?.(_0x490d14?t(_0x1138f5(0x2dc)):t('appBusinessEvents.toggles.snapGrid.off'));break;}case'grid-dots':{const _0x54f5d4=setGridDotsPref(!readGridDotsPref());window[_0x1138f5(0x26d)]?.(_0x54f5d4?t(_0x1138f5(0x221)):t(_0x1138f5(0x2f7)));break;}case _0x1138f5(0x2d4):{const _0x5497d1=_0x32dcba[_0x1138f5(0x255)](),_0x19d14e=!(_0x5497d1?.['ui']?.[_0x1138f5(0x268)]!==![]);_0x32dcba[_0x1138f5(0x1ff)](_0x19d14e),window[_0x1138f5(0x21e)](new CustomEvent('v2-connection-lines-visibility-changed',{'detail':{'visible':_0x19d14e}})),window['showToast']?.(_0x19d14e?t(_0x1138f5(0x30b)):t(_0x1138f5(0x23f)));break;}case _0x1138f5(0x246):{const _0x5a8bf5=_0x32dcba[_0x1138f5(0x255)](),_0x5b075e=!(_0x5a8bf5?.['ui']?.['selectionRelatedHighlightEnabled']!==![]);setSelectionRelatedHighlightPref(_0x5b075e,_0x32dcba),window['showToast']?.(_0x5b075e?t(_0x1138f5(0x219)):t(_0x1138f5(0x29a)));break;}case'toggle-video-meta':{const _0x161198=_0x32dcba[_0x1138f5(0x255)](),_0x19a074=!(_0x161198?.['ui']?.[_0x1138f5(0x250)]===!![]);setVideoMetaPref(_0x19a074,_0x32dcba),window[_0x1138f5(0x26d)]?.(_0x19a074?t(_0x1138f5(0x2f2)):t(_0x1138f5(0x271)));break;}case _0x1138f5(0x20c):{const _0x7b23ad=_0x32dcba[_0x1138f5(0x255)](),_0x41f0e3=!(_0x7b23ad?.['ui']?.[_0x1138f5(0x1f6)]===!![]);setTitleFollowsCanvasZoomPref(_0x41f0e3,_0x32dcba),window['showToast']?.(_0x41f0e3?t(_0x1138f5(0x2a7)):t(_0x1138f5(0x217)));break;}case _0x1138f5(0x200):{const _0x4c1b5b=_0x32dcba[_0x1138f5(0x255)](),_0x230e1e=!(_0x4c1b5b?.['ui']?.[_0x1138f5(0x22b)]===!![]);setImageVideoNodeResizePref(_0x230e1e,_0x32dcba),window[_0x1138f5(0x26d)]?.(_0x230e1e?t(_0x1138f5(0x214)):t(_0x1138f5(0x29b)));break;}case _0x1138f5(0x290):{const _0x5907fe=_0x32dcba[_0x1138f5(0x255)](),_0x2cc15d=!(_0x5907fe?.['ui']?.[_0x1138f5(0x237)]!==![]);setPromptBoxResizePref(_0x2cc15d,_0x32dcba),window['showToast']?.(_0x2cc15d?t(_0x1138f5(0x28d)):t(_0x1138f5(0x2c3)));break;}case _0x1138f5(0x1f4):{const _0x388487=!(window['v2NodeAvoidOverlap']!==![]);setNodeAvoidOverlapPref(_0x388487),window['showToast']?.(_0x388487?t(_0x1138f5(0x298)):t(_0x1138f5(0x2e6)));break;}case'reset-media-size':{const _0x4170e6=_0x32dcba['getState']();if(_0x5a7423(_0x4170e6))break;const _0x51df7e=Array['isArray'](_0x4170e6?.['selectedNodeIds'])?_0x4170e6[_0x1138f5(0x292)]:[];if(_0x51df7e['length']===0x0)break;const _0xb0d6f6=_0x51df7e['some'](_0x3cdb12=>{const _0x325b67=_0x1138f5,_0x4ad83a=_0x4170e6?.[_0x325b67(0x2fd)]?.[_0x3cdb12]?.[_0x325b67(0x22a)];return _0x4ad83a==='source-image'||_0x4ad83a===_0x325b67(0x2b4)||_0x4ad83a===_0x325b67(0x243)||_0x4ad83a===_0x325b67(0x25a);});if(!_0xb0d6f6)break;_0x53a386(_0x1138f5(0x210),{'ids':_0x51df7e});break;}case'add-reference':_0x5b8012();break;case _0x1138f5(0x23e):if(_0x32dcba[_0x1138f5(0x255)]()[_0x1138f5(0x285)]?.[_0x1138f5(0x301)])break;{const {width:_0x4bc670,height:_0xcb42e8}=_0x545ff0('source-text');_0x4095f1(_0x1138f5(0x2ff),_0x4bc670,_0xcb42e8,t(_0x1138f5(0x212)));}break;case _0x1138f5(0x2c7):{if(_0x32dcba[_0x1138f5(0x255)]()['matting']?.[_0x1138f5(0x301)])break;const {width:_0xb54c8e,height:_0x589241}=_0x545ff0(_0x1138f5(0x276));_0x4095f1(_0x1138f5(0x276),_0xb54c8e,_0x589241,'');break;}case _0x1138f5(0x238):if(_0x32dcba[_0x1138f5(0x255)]()[_0x1138f5(0x285)]?.[_0x1138f5(0x301)])break;{const _0x1733e0=typeof _0x112324===_0x1138f5(0x30a)?_0x112324('ai-text'):{'width':0x12c,'height':0x12c};_0x4095f1(_0x1138f5(0x309),_0x1733e0['width'],_0x1733e0[_0x1138f5(0x266)],t(_0x1138f5(0x23d)));}break;case _0x1138f5(0x306):if(_0x32dcba[_0x1138f5(0x255)]()['matting']?.[_0x1138f5(0x301)])break;{const _0x37a4ed=typeof _0x112324===_0x1138f5(0x30a)?_0x112324(_0x1138f5(0x2b4)):{'width':0x120,'height':0x120};_0x4095f1(_0x1138f5(0x2b4),_0x37a4ed[_0x1138f5(0x21b)],_0x37a4ed[_0x1138f5(0x266)],t('appBusinessEvents.nodeDefaults.aiImage'));}break;case _0x1138f5(0x25d):if(_0x32dcba[_0x1138f5(0x255)]()[_0x1138f5(0x285)]?.[_0x1138f5(0x301)])break;{const _0x1a04db=typeof _0x112324===_0x1138f5(0x30a)?_0x112324('ai-video'):{'width':0x120,'height':0x120};_0x4095f1(_0x1138f5(0x25a),_0x1a04db[_0x1138f5(0x21b)],_0x1a04db[_0x1138f5(0x266)],t(_0x1138f5(0x2ab)));}break;case'create-ai-audio':if(_0x32dcba[_0x1138f5(0x255)]()[_0x1138f5(0x285)]?.['active'])break;{const _0x3b1222=typeof _0x112324===_0x1138f5(0x30a)?_0x112324('ai-audio'):{'width':0x120,'height':0x120};_0x4095f1(_0x1138f5(0x2c1),_0x3b1222[_0x1138f5(0x21b)],_0x3b1222[_0x1138f5(0x266)],t(_0x1138f5(0x229)));}break;case _0x1138f5(0x28e):if(_0x32dcba[_0x1138f5(0x255)]()[_0x1138f5(0x285)]?.[_0x1138f5(0x301)])break;_0x4095f1('scene-detection',0x190,0x1f4,t(_0x1138f5(0x22d)));break;case _0x1138f5(0x26a):typeof window[_0x1138f5(0x249)]==='function'?window['_v2SaveProjectFromShortcut']():window[_0x1138f5(0x2a0)]?.();break;case'open-settings':{toggleSettingsPanel();break;}case'toggle-agent':{_0x15877d?.();break;}case'open-canvas-projects':toggleSidebarSubmenu('canvas-project');break;case _0x1138f5(0x21d):toggleSidebarSubmenu(_0x1138f5(0x2f8));break;case'open-workflows':toggleSidebarSubmenu('workflows');break;case _0x1138f5(0x263):toggleSidebarSubmenu(_0x1138f5(0x241));break;case _0x1138f5(0x21f):toggleSidebarSubmenu(_0x1138f5(0x2f0));break;case _0x1138f5(0x230):case _0x1138f5(0x2c0):case _0x1138f5(0x304):case _0x1138f5(0x204):case _0x1138f5(0x2d2):{const _0x406ee0=_0x32dcba[_0x1138f5(0x255)](),_0x140a1c=_0x20d5c4===_0x1138f5(0x2c0)?_0x1138f5(0x22f):_0x20d5c4===_0x1138f5(0x304)?'eraser':_0x20d5c4===_0x1138f5(0x204)?_0x1138f5(0x2d6):_0x20d5c4===_0x1138f5(0x2d2)?'text':_0x1138f5(0x21c);if(_0x406ee0[_0x1138f5(0x269)]?.[_0x1138f5(0x301)])_0x36c7d5[_0x1138f5(0x2f3)]?_0x36c7d5[_0x1138f5(0x2f3)][_0x1138f5(0x2a6)](_0x36c7d5,_0x140a1c):_0x32dcba[_0x1138f5(0x2ce)]({'tool':_0x140a1c});else{if(_0x406ee0[_0x1138f5(0x285)]?.[_0x1138f5(0x301)]){if(_0x140a1c===_0x1138f5(0x22f))break;if(document[_0x1138f5(0x2b1)]?.[_0x1138f5(0x248)]===_0x1138f5(0x27e))document['activeElement'][_0x1138f5(0x215)]();_0x3fac6d[_0x1138f5(0x2f1)]?.[_0x1138f5(0x2a6)](_0x3fac6d,_0x140a1c);}}break;}case _0x1138f5(0x254):{const _0x22a916=_0x32dcba[_0x1138f5(0x255)]();if(_0x22a916[_0x1138f5(0x269)]?.[_0x1138f5(0x301)])_0x36c7d5[_0x1138f5(0x2dd)]?.['call'](_0x36c7d5);else _0x22a916[_0x1138f5(0x285)]?.[_0x1138f5(0x301)]&&_0x3fac6d[_0x1138f5(0x2dd)]?.['call'](_0x3fac6d);break;}case _0x1138f5(0x20b):{if(_0xdb0c98())break;if(_0x5a2358?.[_0x1138f5(0x22c)]?.['ui']?.['isEditing']){setPanoramaSceneEditing({'nodeId':_0x5a2358['nodeId'],'isEditing':![]});break;}const {nodes:_0x4ee39f}=_0x32dcba[_0x1138f5(0x255)]();let _0x2fd16c=![];for(const _0xadd367 in _0x4ee39f){_0x4ee39f[_0xadd367][_0x1138f5(0x22a)]===_0x1138f5(0x289)&&_0x4ee39f[_0xadd367][_0x1138f5(0x202)]&&(_0x32dcba['updateNodeData'](_0xadd367,{'isEditing':![]}),_0x2fd16c=!![]);}if(_0x2fd16c)_0x3205d7();const _0x22954b=_0x32dcba[_0x1138f5(0x255)]()[_0x1138f5(0x216)];if(_0x22954b&&_0x22954b[_0x1138f5(0x301)])_0x32dcba[_0x1138f5(0x299)]({'active':![]});_0x1daad8(),_0x36c7d5[_0x1138f5(0x26b)]?.({'silent':!![]}),_0x3fac6d[_0x1138f5(0x26b)]?.({'silent':!![]}),document['getElementById'](_0x1138f5(0x2ad))?.[_0x1138f5(0x1ed)][_0x1138f5(0x28b)](_0x1138f5(0x2da)),document[_0x1138f5(0x20d)](_0x1138f5(0x274))?.[_0x1138f5(0x1ed)][_0x1138f5(0x28b)](_0x1138f5(0x2da)),document[_0x1138f5(0x2cf)](_0x1138f5(0x2ca))&&(document[_0x1138f5(0x2cf)]('aboutOverlay')['style'][_0x1138f5(0x231)]=_0x1138f5(0x2fc)),document[_0x1138f5(0x2cf)]('v2PickerOverlay')?.[_0x1138f5(0x28b)](),document['querySelector'](_0x1138f5(0x2ae))?.[_0x1138f5(0x28b)](),document[_0x1138f5(0x20d)](_0x1138f5(0x24b))?.[_0x1138f5(0x28b)](),document[_0x1138f5(0x20d)](_0x1138f5(0x2ac))?.['remove']();document['getElementById']('nodeMenu')&&(document[_0x1138f5(0x2cf)]('nodeMenu')[_0x1138f5(0x2cc)][_0x1138f5(0x231)]=_0x1138f5(0x2fc));document['getElementById'](_0x1138f5(0x308))&&(document[_0x1138f5(0x2cf)](_0x1138f5(0x308))[_0x1138f5(0x2cc)][_0x1138f5(0x231)]=_0x1138f5(0x2fc));document[_0x1138f5(0x2cf)](_0x1138f5(0x2cd))&&(document[_0x1138f5(0x2cf)](_0x1138f5(0x2cd))[_0x1138f5(0x2cc)][_0x1138f5(0x231)]=_0x1138f5(0x2fc));document[_0x1138f5(0x2cf)](_0x1138f5(0x29e))&&(document['getElementById'](_0x1138f5(0x29e))[_0x1138f5(0x2cc)]['display']=_0x1138f5(0x2fc));_0x32dcba[_0x1138f5(0x1fb)](![]),_0x32dcba[_0x1138f5(0x264)]();break;}case _0x1138f5(0x293):case'panorama-scene-camera-2':case _0x1138f5(0x2e2):case _0x1138f5(0x2a9):case'panorama-scene-camera-5':case _0x1138f5(0x30e):case _0x1138f5(0x284):case'panorama-scene-camera-8':case _0x1138f5(0x2eb):case _0x1138f5(0x233):{if(!_0x5a2358?.[_0x1138f5(0x22c)]?.['ui']?.['isEditing']||_0x5a2358?.[_0x1138f5(0x2b6)]!==!![])break;const _0x258926=_0x20d5c4[_0x1138f5(0x20f)](-0x1),_0x3c56f2=_0x258926==='0'?0xa:Number(_0x258926);_0x2329dc({'nodeId':_0x5a2358['nodeId'],'mode':_0x1138f5(0x225),'slot':_0x3c56f2});break;}case _0x1138f5(0x279):case'panorama-scene-camera-save-2':case _0x1138f5(0x296):case _0x1138f5(0x2bd):case _0x1138f5(0x2a4):case _0x1138f5(0x26e):case _0x1138f5(0x228):case _0x1138f5(0x272):case _0x1138f5(0x291):case _0x1138f5(0x1f9):{if(!_0x5a2358?.[_0x1138f5(0x22c)]?.['ui']?.[_0x1138f5(0x202)]||_0x5a2358?.['supportsCamera']!==!![])break;const _0x30bb1a=_0x20d5c4[_0x1138f5(0x20f)](-0x1),_0x415d15=_0x30bb1a==='0'?0xa:Number(_0x30bb1a);_0x2329dc({'nodeId':_0x5a2358['nodeId'],'mode':'save','slot':_0x415d15});break;}}});}function _0x24ee61(){const _0x5f0c27=_0x44d824;window[_0x5f0c27(0x206)](_0x5f0c27(0x2d1),_0x17a980=>{_0x5dd9a4(_0x17a980?.['detail']||{});});}function _0x56d1f5(){_0x24ee61(),_0x2cb79e(),_0x2324a4?.(_0x179f20);}return{'bindAll':_0x56d1f5,'triggerSelectedNodeToolbarAction':_0x4e3545,'triggerSelectedNodeReferenceButton':_0x5b8012,'exitActiveFeatureModes':_0xdb0c98};}
+import {
+  deleteSelectedPanoramaSceneObject,
+  focusPanoramaSceneSelection,
+  resetPanoramaSceneView,
+  setPanoramaSceneEditing,
+  setPanoramaSceneTool,
+} from '../panoramaSceneNode/sceneNodeActions.js';
+import { copyNodeMediaToSystemClipboard } from '../mediaClipboard.js';
+import { startCanvasScreenshot } from '../canvasScreenshot.js';
+import { markSystemClipboardWrite } from '../clipboard.js';
+import { applySnapGridEnabled, readSnapGridEnabled } from '../snapGridState.js';
+import { readGridDotsPref, setGridDotsPref } from '../settings/appearanceSettings.js';
+import { setSelectionRelatedHighlightPref } from '../settings/canvasAlignmentSettings.js';
+import {
+  readCommentNoteJumpFocusPref,
+  setImageVideoNodeResizePref,
+  setNodeAvoidOverlapPref,
+  setPromptBoxResizePref,
+  setTitleFollowsCanvasZoomPref,
+  setVideoMetaPref,
+} from '../settings/nodeBehaviorSettings.js';
+import { resolveJumpZoom } from '../commentNoteJumpShortcut.js';
+import { toggleSettingsPanel } from '../settings/panelSettings.js';
+import { toggleSidebarSubmenu } from '../sidebarSubmenuController.js';
+import { syncPlaySelectedVideos } from '../videoSyncPlayback.js';
+import {
+  computeNodesWorldBounds,
+  computeViewportForWorldBounds,
+  getAlignableSelectionNodes,
+  screenToWorld,
+} from '../../core/math.js';
+import { getBrowserViewportRect } from '../../core/viewportFocus.js';
+import { t } from '../../i18n/index.js';
+const COMMENT_NOTE_JUMP_WORLD_ALIGN = 0.5,
+  MEDIA_CLIP_DELETE_MATERIAL_EVENT = 'media-clip-delete-material';
+export function createAppBusinessEvents({
+  store: _0x32dcba,
+  wrap: _0x179f20,
+  addShortcutListener: _0x1d32af,
+  executeCommand: _0x53a386,
+  undo: _0x20fac5,
+  redo: _0x1e5260,
+  commit: _0x3205d7,
+  closeShortcuts: _0x1daad8,
+  getNodeDefaultSize: _0x545ff0,
+  getAIGenerationDefaultSizeByType: _0x112324,
+  createNodeAtCursor: _0x4095f1,
+  createImageNodeFromBlob: _0x3deafb,
+  animateViewport: _0x26060e,
+  focusNodeAtZoomPercent: _0x3ba4e5,
+  focusNodes: _0x151171,
+  clearTrackedFocus: _0x52c0ad,
+  handlePasteFromClipboard: _0x5dd9a4,
+  initCanvasContextMenu: _0x2324a4,
+  toggleAgentPanel: _0x15877d,
+  ImageAnnotateController: _0x36c7d5,
+  ImageMattingController: _0x3fac6d,
+  AudioClipController: _0x22bc6d,
+  syncPlaySelectedVideos: _0x14cb73 = syncPlaySelectedVideos,
+} = {}) {
+  const _0x2f3d51 = (_0x18796d) => {
+      const _0x4a20a8 = _0x18796d?.viewport;
+      if (!_0x4a20a8) return null;
+      const _0x3a2f27 = Number(window?._lastMx),
+        _0x546c2c = Number(window?._lastMy);
+      if (!Number.isFinite(_0x3a2f27) || !Number.isFinite(_0x546c2c)) return null;
+      const _0x24bbad = screenToWorld(_0x3a2f27, _0x546c2c, _0x4a20a8);
+      if (!_0x24bbad || !Number.isFinite(_0x24bbad.x) || !Number.isFinite(_0x24bbad.y)) return null;
+      return { x: _0x24bbad.x, y: _0x24bbad.y };
+    },
+    _0x2be6a3 = {
+      'panorama-scene-camera-create': { selector: '.act-camera', nodeTypes: ['panorama-scene'] },
+      'image-tool-matting': { selector: '.act-matting', nodeTypes: ['source-image', 'ai-image', 'image'] },
+      'image-tool-repaint': { selector: '.act-repaint', nodeTypes: ['source-image', 'ai-image', 'image'] },
+      'image-tool-erase': { selector: '.act-erase', nodeTypes: ['source-image', 'ai-image', 'image'] },
+      'image-tool-hd': { selector: '.act-hd', nodeTypes: ['source-image', 'ai-image', 'image'] },
+      'image-tool-expand': { selector: '.act-expand', nodeTypes: ['source-image', 'ai-image', 'image'] },
+      'image-tool-auto-subject': {
+        selector: '.act-auto-subject',
+        nodeTypes: ['source-image', 'ai-image', 'image'],
+      },
+      'image-tool-multigrid': {
+        selector: '.act-multigrid',
+        nodeTypes: ['source-image', 'ai-image', 'image'],
+      },
+      'image-tool-multiangle': {
+        selector: '.act-multiangle',
+        nodeTypes: ['source-image', 'ai-image', 'image'],
+      },
+      'image-tool-annotate': { selector: '.act-annotate', nodeTypes: ['source-image', 'ai-image', 'image'] },
+      'image-tool-crop': { selector: '.act-crop', nodeTypes: ['source-image', 'ai-image', 'image'] },
+      'image-tool-fullscreen': {
+        selector: '.act-fullscreen',
+        nodeTypes: ['source-image', 'ai-image', 'image'],
+      },
+      'image-tool-download': { selector: '.act-download', nodeTypes: ['source-image', 'ai-image', 'image'] },
+      'video-tool-clip': { selector: '.act-clip', nodeTypes: ['source-video', 'ai-video', 'video'] },
+      'video-tool-separate-av': {
+        selector: '.act-separate-av',
+        nodeTypes: ['source-video', 'ai-video', 'video'],
+      },
+      'video-tool-capture-frame': {
+        selector: '.video-snap-btn',
+        nodeTypes: ['source-video', 'ai-video', 'video'],
+      },
+      'video-tool-keying': { selector: '.act-keying', nodeTypes: ['source-video', 'ai-video', 'video'] },
+      'video-tool-hd': { selector: '.act-hd', nodeTypes: ['source-video', 'ai-video', 'video'] },
+      'video-tool-fullscreen': {
+        selector: '.act-fullscreen',
+        nodeTypes: ['source-video', 'ai-video', 'video'],
+      },
+      'video-tool-download': { selector: '.act-download', nodeTypes: ['source-video', 'ai-video', 'video'] },
+      'audio-tool-clip': { selector: '.clip-btn', nodeTypes: ['source-audio', 'ai-audio', 'audio'] },
+      'audio-tool-speed': { selector: '.speed-btn', nodeTypes: ['source-audio', 'ai-audio', 'audio'] },
+      'audio-tool-download': { selector: '.download-btn', nodeTypes: ['source-audio', 'ai-audio', 'audio'] },
+      'clip-tool-crop': { selector: '.media-clip-tool-crop', nodeTypes: ['media-clip'] },
+      'text-tool-copy': { selector: '.act-copy', nodeTypes: ['source-text', 'ai-text', 'text'] },
+      'text-tool-fullscreen': { selector: '.act-fullscreen', nodeTypes: ['source-text', 'ai-text', 'text'] },
+    };
+  function _0x21d535() {
+    const _0x5a4d25 = document.getElementById('v2-wrap');
+    return !!_0x5a4d25?.classList.contains('is-audio-clip-mode');
+  }
+  function _0x5a7423(_0x1685fc = _0x32dcba.getState()) {
+    return (
+      !!_0x1685fc.matting?.active ||
+      !!_0x1685fc.annotate?.active ||
+      !!_0x1685fc.videoClip?.active ||
+      !!_0x1685fc.videoKeying?.active ||
+      _0x21d535()
+    );
+  }
+  function _0x52dfae(_0x21d1aa = _0x32dcba.getState()) {
+    const _0x292449 = Array.isArray(_0x21d1aa?.selectedNodeIds) ? _0x21d1aa.selectedNodeIds : [];
+    if (_0x292449.length !== 1) return false;
+    const _0x46717c = _0x292449[0],
+      _0x382289 = _0x21d1aa?.nodes?.[_0x46717c] || null;
+    if (_0x382289?.type !== 'media-clip' || _0x382289?.mediaClip?.expanded !== true) return false;
+    const _0x4fa3e4 =
+      typeof CustomEvent === 'function'
+        ? new CustomEvent(MEDIA_CLIP_DELETE_MATERIAL_EVENT, { detail: { nodeId: _0x46717c } })
+        : { type: MEDIA_CLIP_DELETE_MATERIAL_EVENT, detail: { nodeId: _0x46717c } };
+    return (window.dispatchEvent?.(_0x4fa3e4), true);
+  }
+  function _0xdb0c98() {
+    let _0x206579 = false;
+    (_0x21d535() || _0x22bc6d.active) && (_0x22bc6d.exit?.({ silent: true }), (_0x206579 = true));
+    const _0x4c26a = _0x32dcba.getState();
+    return (
+      _0x4c26a.annotate?.active && (_0x36c7d5.exit?.({ silent: true }), (_0x206579 = true)),
+      _0x4c26a.matting?.active && (_0x3fac6d.exit?.({ silent: true }), (_0x206579 = true)),
+      _0x206579
+    );
+  }
+  function _0x4e3545(_0x3f09dc) {
+    const _0x2d771a = _0x2be6a3[_0x3f09dc];
+    if (!_0x2d771a) return false;
+    const _0x2206d8 = _0x32dcba.getState();
+    if (_0x5a7423(_0x2206d8)) return false;
+    const { selectedNodeIds: _0xb099ab, nodes: _0xe91834 } = _0x2206d8;
+    if (!Array.isArray(_0xb099ab) || _0xb099ab.length !== 1) return false;
+    const _0x3f553a = _0xb099ab[0],
+      _0x4f1939 = _0xe91834?.[_0x3f553a];
+    if (!_0x4f1939 || !_0x2d771a.nodeTypes.includes(_0x4f1939.type)) return false;
+    const _0x44bc84 = document.getElementById(_0x3f553a);
+    if (!_0x44bc84) return false;
+    const _0x317471 = _0x44bc84.querySelector(_0x2d771a.selector);
+    if (!_0x317471) return false;
+    if (_0x3f09dc.startsWith('audio-tool-'))
+      try {
+        const _0x582f64 = new PointerEvent('pointerdown', {
+          bubbles: true,
+          cancelable: true,
+          pointerType: 'mouse',
+          isPrimary: true,
+          button: 0,
+        });
+        return (_0x317471.dispatchEvent(_0x582f64), true);
+      } catch {
+        const _0x3b6d7c = new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0 });
+        return (_0x317471.dispatchEvent(_0x3b6d7c), true);
+      }
+    if (typeof _0x317471.click !== 'function') return false;
+    return (_0x317471.click(), true);
+  }
+  function _0x5b8012() {
+    const _0x37b6e5 = _0x32dcba.getState();
+    if (_0x5a7423(_0x37b6e5)) return false;
+    if (_0x37b6e5?.ui?.promptAttachmentButtonHidden === true) return false;
+    const _0x2d1e5c = Array.isArray(_0x37b6e5?.selectedNodeIds) ? _0x37b6e5.selectedNodeIds : [];
+    if (_0x2d1e5c.length !== 1) return false;
+    const _0x9da8c8 = document.getElementById(_0x2d1e5c[0]),
+      _0x4be0b9 = _0x9da8c8?.querySelector?.('.prompt-attachment-btn');
+    if (!_0x4be0b9 || typeof _0x4be0b9.click !== 'function') return false;
+    return (_0x4be0b9.click(), true);
+  }
+  function _0x170b36() {
+    const _0x3ca9db = _0x32dcba.getStateRaw ? _0x32dcba.getStateRaw() : _0x32dcba.getState(),
+      _0x48120a = Array.isArray(_0x3ca9db?.selectedNodeIds) ? _0x3ca9db.selectedNodeIds : [];
+    if (_0x48120a.length !== 1) return null;
+    const _0x198281 = _0x48120a[0],
+      _0x2a18f4 = _0x3ca9db?.nodes?.[_0x198281];
+    if (!_0x2a18f4 || (_0x2a18f4.type !== 'panorama-scene' && _0x2a18f4.type !== 'panorama-360')) return null;
+    const _0x33fa81 =
+      _0x2a18f4.type === 'panorama-360' ? _0x2a18f4.panorama360Node || null : _0x2a18f4.sceneNode || null;
+    return {
+      nodeId: _0x198281,
+      node: _0x2a18f4,
+      sceneState: _0x33fa81,
+      supportsCamera: _0x2a18f4.type === 'panorama-scene',
+    };
+  }
+  function _0x2329dc({ nodeId: _0xc7060a, mode: _0x19fdc4, slot: _0xd38ef5 }) {
+    const _0x32e5bd = Number(_0xd38ef5);
+    if (!Number.isInteger(_0x32e5bd) || _0x32e5bd < 1 || _0x32e5bd > 10) return;
+    window.dispatchEvent(
+      new CustomEvent('panorama-scene:camera-shortcut', {
+        detail: { nodeId: _0xc7060a, mode: _0x19fdc4 === 'save' ? 'save' : 'activate', slot: _0x32e5bd },
+      }),
+    );
+  }
+  function _0xd35038({ nodeId: _0x1b2d89 }) {
+    const _0xe35cab = String(_0x1b2d89 || '').trim();
+    if (!_0xe35cab) return;
+    window.dispatchEvent(
+      new CustomEvent('panorama-scene:capture-shortcut', { detail: { nodeId: _0xe35cab } }),
+    );
+  }
+  function _0x18d4e8(_0x2e9746) {
+    const _0xb2f0d1 = String(_0x2e9746?.nodeId || '').trim();
+    if (!_0xb2f0d1) return;
+    const _0x5f5115 = _0x32dcba.getStateRaw ? _0x32dcba.getStateRaw() : _0x32dcba.getState(),
+      _0x4083cc = _0x5f5115?.nodes?.[_0xb2f0d1];
+    if (!_0x4083cc) return;
+    if (_0x4083cc.type !== 'panorama-scene' && _0x4083cc.type !== 'panorama-360') return;
+    (_0x32dcba.setSelectedNodes?.([_0xb2f0d1]),
+      setPanoramaSceneEditing({ nodeId: _0xb2f0d1, isEditing: true, storeInstance: _0x32dcba }));
+  }
+  function _0x2cb79e() {
+    const _0x2fd876 = (_0x5c68c6, _0x5cce99 = 0x320) => {
+      const _0x3b25f9 = _0x32dcba.getState(),
+        _0x20b312 = _0x3b25f9?.nodes?.[_0x5c68c6];
+      if (!_0x20b312 || _0x20b312.type !== 'comment-note') return false;
+      const _0x4ade52 = computeNodesWorldBounds(_0x3b25f9?.nodes || {}, [_0x5c68c6]),
+        _0x3b2245 = getBrowserViewportRect({
+          windowObject: typeof window !== 'undefined' ? window : undefined,
+          containerEl: _0x179f20,
+        }),
+        { viewportAlignX: _0xbf51c, viewportAlignY: _0x22598b } = readCommentNoteJumpFocusPref(),
+        _0x248bf5 = computeViewportForWorldBounds(_0x4ade52, _0x3b2245, {
+          fixedZoom: resolveJumpZoom(_0x20b312?.jumpShortcut?.zoomPercent),
+          worldAlignX: COMMENT_NOTE_JUMP_WORLD_ALIGN,
+          worldAlignY: COMMENT_NOTE_JUMP_WORLD_ALIGN,
+          viewportAlignX: _0xbf51c,
+          viewportAlignY: _0x22598b,
+        });
+      if (!_0x248bf5) return false;
+      _0x52c0ad?.('comment-note-jump');
+      const _0x36a268 = _0x3b25f9?.viewport || { x: 0, y: 0, zoom: 1 };
+      if (typeof _0x26060e === 'function')
+        return (
+          _0x26060e(
+            _0x36a268.x,
+            _0x36a268.y,
+            _0x36a268.zoom,
+            _0x248bf5.x,
+            _0x248bf5.y,
+            _0x248bf5.zoom,
+            _0x5cce99,
+          ),
+          true
+        );
+      return (
+        _0x32dcba.updateViewport?.(_0x248bf5.x, _0x248bf5.y, _0x248bf5.zoom),
+        _0x32dcba.markViewportPersist?.(),
+        true
+      );
+    };
+    _0x1d32af((_0x20d5c4) => {
+      if (typeof _0x20d5c4 === 'string' && _0x20d5c4.startsWith('comment-note-jump::')) {
+        const _0x241e1c = _0x20d5c4.slice('comment-note-jump::'.length);
+        _0x2fd876(_0x241e1c, 0x320);
+        return;
+      }
+      const _0x5a2358 = _0x170b36();
+      switch (_0x20d5c4) {
+        case 'panorama-scene-tool-toggle-mouse': {
+          if (!_0x5a2358?.sceneState?.ui?.isEditing) break;
+          const _0x1feff1 = String(_0x5a2358.sceneState?.ui?.activeTool || '').trim(),
+            _0x288b4f = String(
+              _0x5a2358.sceneState?.ui?.mouseTool || _0x5a2358.sceneState?.ui?.activeTool || '',
+            ).trim(),
+            _0x10260d = _0x1feff1 === 'move' || _0x1feff1 === 'rotate' || _0x1feff1 === 'scale',
+            _0x537984 = _0x10260d ? 'navigate' : _0x288b4f === 'box-select' ? 'navigate' : 'box-select';
+          setPanoramaSceneTool({ nodeId: _0x5a2358.nodeId, tool: _0x537984 });
+          break;
+        }
+        case 'panorama-scene-tool-move':
+        case 'panorama-scene-tool-scale':
+        case 'panorama-scene-tool-rotate': {
+          if (!_0x5a2358?.sceneState?.ui?.isEditing) break;
+          const _0x5d99f9 =
+            _0x20d5c4 === 'panorama-scene-tool-move'
+              ? 'move'
+              : _0x20d5c4 === 'panorama-scene-tool-scale'
+                ? 'scale'
+                : 'rotate';
+          setPanoramaSceneTool({ nodeId: _0x5a2358.nodeId, tool: _0x5d99f9 });
+          break;
+        }
+        case 'panorama-scene-reset-view': {
+          if (!_0x5a2358?.sceneState?.ui?.isEditing) break;
+          resetPanoramaSceneView({ nodeId: _0x5a2358.nodeId });
+          break;
+        }
+        case 'panorama-scene-capture': {
+          if (!_0x5a2358?.sceneState?.ui?.isEditing) break;
+          _0xd35038({ nodeId: _0x5a2358.nodeId });
+          break;
+        }
+        case 'panorama-scene-camera-create': {
+          if (!_0x5a2358?.sceneState?.ui?.isEditing || _0x5a2358?.supportsCamera !== true) break;
+          _0x4e3545(_0x20d5c4);
+          break;
+        }
+        case 'ms-sync-video-play': {
+          const _0x5a64d0 = _0x32dcba.getState(),
+            _0x21a942 = Array.isArray(_0x5a64d0?.selectedNodeIds) ? _0x5a64d0.selectedNodeIds : [];
+          _0x21a942.length >= 2 && void _0x14cb73({ selectedIds: _0x21a942, state: _0x5a64d0 });
+          break;
+        }
+        case 'image-tool-matting':
+        case 'image-tool-repaint':
+        case 'image-tool-erase':
+        case 'image-tool-hd':
+        case 'image-tool-expand':
+        case 'image-tool-auto-subject':
+        case 'image-tool-multigrid':
+        case 'image-tool-multiangle':
+        case 'image-tool-annotate':
+        case 'image-tool-crop':
+        case 'image-tool-fullscreen':
+        case 'image-tool-download':
+        case 'video-tool-clip':
+        case 'video-tool-separate-av':
+        case 'video-tool-capture-frame':
+        case 'video-tool-keying':
+        case 'video-tool-hd':
+        case 'video-tool-fullscreen':
+        case 'video-tool-download':
+        case 'audio-tool-clip':
+        case 'audio-tool-speed':
+        case 'audio-tool-download':
+        case 'clip-tool-crop':
+        case 'text-tool-copy':
+        case 'text-tool-fullscreen':
+          _0x4e3545(_0x20d5c4);
+          break;
+        case 'delete': {
+          const _0x39233a = _0x32dcba.getState();
+          if (_0x39233a.annotate?.active) {
+            _0x36c7d5?.deleteSelectedTextCommand?.();
+            break;
+          }
+          if (_0x39233a.matting?.active) break;
+          if (_0x5a2358?.sceneState?.ui?.isEditing) {
+            deleteSelectedPanoramaSceneObject({ nodeId: _0x5a2358.nodeId });
+            break;
+          }
+          if (_0x52dfae(_0x39233a)) break;
+          const _0x5351b9 = _0x39233a.selectedNodeIds;
+          _0x5351b9.length > 0 && (_0x32dcba.deleteNodes(_0x5351b9), _0x32dcba.clearSelection(), _0x3205d7());
+          break;
+        }
+        case 'undo': {
+          const _0x57d5e6 = _0x32dcba.getState();
+          if (_0x57d5e6.annotate?.active) _0x36c7d5._undo?.call(_0x36c7d5);
+          else
+            _0x57d5e6.matting?.active
+              ? _0x3fac6d._undo?.call(_0x3fac6d)
+              : (_0x20fac5(), _0x5a2358?.sceneState?.ui?.isEditing && _0x18d4e8(_0x5a2358));
+          break;
+        }
+        case 'redo': {
+          const _0x274fe4 = _0x32dcba.getState();
+          if (_0x274fe4.annotate?.active) _0x36c7d5._redo?.call(_0x36c7d5);
+          else
+            _0x274fe4.matting?.active
+              ? _0x3fac6d._redo?.call(_0x3fac6d)
+              : (_0x1e5260(), _0x5a2358?.sceneState?.ui?.isEditing && _0x18d4e8(_0x5a2358));
+          break;
+        }
+        case 'copy':
+          _0x53a386('copy');
+          break;
+        case 'copy-media': {
+          const _0x3f5b50 = _0x32dcba.getState().selectedNodeIds;
+          if (!Array.isArray(_0x3f5b50) || _0x3f5b50.length !== 1) {
+            window.showToast?.(t('appBusinessEvents.copyMedia.selectSingleImageNode'), 'warn');
+            break;
+          }
+          const _0x187c80 = _0x32dcba.getState().nodes?.[_0x3f5b50[0]],
+            _0x40d484 =
+              _0x187c80 &&
+              (_0x187c80.type === 'source-image' ||
+                _0x187c80.type === 'ai-image' ||
+                _0x187c80.type === 'storyboard');
+          if (!_0x40d484) {
+            window.showToast?.(t('appBusinessEvents.copyMedia.selectSingleImageNode'), 'warn');
+            break;
+          }
+          void copyNodeMediaToSystemClipboard(_0x187c80)
+            .then((_0x5abeda) => {
+              if (_0x5abeda?.ok) {
+                (markSystemClipboardWrite({ mediaType: String(_0x5abeda?.mimeType || 'image/png') }),
+                  window.showToast?.(t('appBusinessEvents.copyMedia.copied'), 'success'));
+                return;
+              }
+              if (_0x5abeda?.reason === 'no-media') {
+                window.showToast?.(t('appBusinessEvents.copyMedia.noMedia'), 'warn');
+                return;
+              }
+              if (_0x5abeda?.reason === 'not-supported') {
+                window.showToast?.(t('appBusinessEvents.copyMedia.clipboardUnsupported'), 'warn');
+                return;
+              }
+              window.showToast?.(t('appBusinessEvents.copyMedia.copyFailed'), 'error');
+            })
+            .catch(() => {
+              window.showToast?.(t('appBusinessEvents.copyMedia.copyFailed'), 'error');
+            });
+          break;
+        }
+        case 'canvas-screenshot': {
+          void startCanvasScreenshot({
+            createImageNodeFromBlob: _0x3deafb,
+            showToast: (..._0x502d0f) => window.showToast?.(..._0x502d0f),
+          });
+          break;
+        }
+        case 'cut': {
+          const _0x412c03 = _0x32dcba.getState().selectedNodeIds;
+          if (Array.isArray(_0x412c03) && _0x412c03.length > 0) {
+            const _0x3aa181 = [..._0x412c03];
+            (_0x53a386('copy', { ids: _0x3aa181 }), _0x53a386('delete_nodes', { ids: _0x3aa181 }));
+          }
+          break;
+        }
+        case 'paste':
+          _0x5dd9a4();
+          break;
+        case 'group':
+          _0x53a386('create_group');
+          break;
+        case 'align-feature':
+        case 'align-feature-toggle':
+        case 'align-feature-hold-start':
+        case 'align-feature-hold-end': {
+          const _0x4f90eb = _0x32dcba.getState();
+          if (_0x4f90eb?.ui?.alignFeatureEnabled === false) break;
+          if (_0x20d5c4 === 'align-feature-hold-end') {
+            _0x32dcba.setAlignPanelVisible(false);
+            break;
+          }
+          const _0x24fdba = Array.isArray(_0x4f90eb?.selectedNodeIds) ? _0x4f90eb.selectedNodeIds : [];
+          if (_0x24fdba.length < 2) break;
+          const _0x5dbb20 = getAlignableSelectionNodes(_0x4f90eb?.nodes || {}, _0x24fdba);
+          if (_0x5dbb20.length < 2) break;
+          if (_0x20d5c4 === 'align-feature-hold-start') {
+            const _0x3d1e66 = _0x2f3d51(_0x4f90eb);
+            (_0x32dcba.setAlignPanelAnchorWorld?.(_0x3d1e66), _0x32dcba.setAlignPanelVisible(true));
+            break;
+          }
+          if (_0x20d5c4 === 'align-feature-toggle' || _0x20d5c4 === 'align-feature') {
+            const _0x3d28bd = _0x4f90eb?.ui?.alignPanelVisible === true;
+            if (_0x3d28bd) _0x32dcba.setAlignPanelVisible(false);
+            else {
+              const _0x4d03c8 = _0x2f3d51(_0x4f90eb);
+              (_0x32dcba.setAlignPanelAnchorWorld?.(_0x4d03c8), _0x32dcba.setAlignPanelVisible(true));
+            }
+          }
+          break;
+        }
+        case 'select-all': {
+          const _0x2578b9 = _0x32dcba.getState().nodes;
+          _0x32dcba.setSelection(Object.keys(_0x2578b9));
+          break;
+        }
+        case 'fit-all': {
+          if (_0x5a2358?.sceneState?.ui?.isEditing) {
+            focusPanoramaSceneSelection({ nodeId: _0x5a2358.nodeId });
+            break;
+          }
+          const { nodes: _0x444341, selectedNodeIds: _0x46960a } = _0x32dcba.getState(),
+            _0x4e5d5a =
+              _0x46960a && _0x46960a.length > 0
+                ? _0x46960a.filter((_0x476d73) => _0x444341[_0x476d73])
+                : Object.keys(_0x444341 || {});
+          if (_0x4e5d5a.length === 0) break;
+          _0x151171?.(_0x4e5d5a, 80, 0x320);
+          break;
+        }
+        case 'minimap': {
+          const _0x66002a = document.getElementById('minimapWrapper'),
+            _0x4eb16c = document.getElementById('btnMinimap');
+          if (_0x66002a) {
+            _0x66002a.classList.toggle('open');
+            if (_0x4eb16c) _0x4eb16c.classList.toggle('active', _0x66002a.classList.contains('open'));
+          }
+          break;
+        }
+        case 'zoom-in':
+        case 'zoom-out': {
+          _0x52c0ad?.('shortcut-zoom');
+          const { viewport: _0x4dc325 } = _0x32dcba.getState(),
+            _0x203a7b = _0x20d5c4 === 'zoom-in' ? 1.1 : 0.9,
+            _0x43dca4 = Math.min(2, Math.max(0.2, _0x4dc325.zoom * _0x203a7b)),
+            _0x4ecf40 = window.innerWidth / 2,
+            _0x2084d4 = window.innerHeight / 2,
+            _0x127e8e = _0x4ecf40 - (_0x4ecf40 - _0x4dc325.x) * (_0x43dca4 / _0x4dc325.zoom),
+            _0x53e78d = _0x2084d4 - (_0x2084d4 - _0x4dc325.y) * (_0x43dca4 / _0x4dc325.zoom);
+          _0x32dcba.updateViewport(_0x127e8e, _0x53e78d, _0x43dca4);
+          break;
+        }
+        case 'snap-guides': {
+          const _0x41834b = _0x32dcba.getState(),
+            _0x33373e = !(_0x41834b?.ui?.snapGuidesEnabled !== false);
+          (_0x32dcba.setSnapGuidesEnabled(_0x33373e), (window.v2SnapGuides = _0x33373e));
+          if (!_0x33373e) window._clearSnapGuideLines?.();
+          (window.dispatchEvent(
+            new CustomEvent('v2-snap-guides-changed', { detail: { enabled: _0x33373e } }),
+          ),
+            window.showToast?.(
+              _0x33373e
+                ? t('appBusinessEvents.toggles.snapGuides.on')
+                : t('appBusinessEvents.toggles.snapGuides.off'),
+            ));
+          break;
+        }
+        case 'snap-grid': {
+          const _0x490d14 = applySnapGridEnabled(!readSnapGridEnabled());
+          window.showToast?.(
+            _0x490d14
+              ? t('appBusinessEvents.toggles.snapGrid.on')
+              : t('appBusinessEvents.toggles.snapGrid.off'),
+          );
+          break;
+        }
+        case 'grid-dots': {
+          const _0x54f5d4 = setGridDotsPref(!readGridDotsPref());
+          window.showToast?.(
+            _0x54f5d4
+              ? t('appBusinessEvents.toggles.gridDots.on')
+              : t('appBusinessEvents.toggles.gridDots.off'),
+          );
+          break;
+        }
+        case 'toggle-connection-lines': {
+          const _0x5497d1 = _0x32dcba.getState(),
+            _0x19d14e = !(_0x5497d1?.ui?.connectionLinesVisible !== false);
+          (_0x32dcba.setConnectionLinesVisible(_0x19d14e),
+            window.dispatchEvent(
+              new CustomEvent('v2-connection-lines-visibility-changed', { detail: { visible: _0x19d14e } }),
+            ),
+            window.showToast?.(
+              _0x19d14e
+                ? t('appBusinessEvents.toggles.connectionLines.on')
+                : t('appBusinessEvents.toggles.connectionLines.off'),
+            ));
+          break;
+        }
+        case 'toggle-selection-related-highlight': {
+          const _0x5a8bf5 = _0x32dcba.getState(),
+            _0x5b075e = !(_0x5a8bf5?.ui?.selectionRelatedHighlightEnabled !== false);
+          (setSelectionRelatedHighlightPref(_0x5b075e, _0x32dcba),
+            window.showToast?.(
+              _0x5b075e
+                ? t('appBusinessEvents.toggles.selectionRelatedHighlight.on')
+                : t('appBusinessEvents.toggles.selectionRelatedHighlight.off'),
+            ));
+          break;
+        }
+        case 'toggle-video-meta': {
+          const _0x161198 = _0x32dcba.getState(),
+            _0x19a074 = !(_0x161198?.ui?.showVideoMeta === true);
+          (setVideoMetaPref(_0x19a074, _0x32dcba),
+            window.showToast?.(
+              _0x19a074
+                ? t('appBusinessEvents.toggles.videoMeta.on')
+                : t('appBusinessEvents.toggles.videoMeta.off'),
+            ));
+          break;
+        }
+        case 'toggle-title-follows-zoom': {
+          const _0x7b23ad = _0x32dcba.getState(),
+            _0x41f0e3 = !(_0x7b23ad?.ui?.titleFollowsCanvasZoom === true);
+          (setTitleFollowsCanvasZoomPref(_0x41f0e3, _0x32dcba),
+            window.showToast?.(
+              _0x41f0e3
+                ? t('appBusinessEvents.toggles.titleFollowsZoom.on')
+                : t('appBusinessEvents.toggles.titleFollowsZoom.off'),
+            ));
+          break;
+        }
+        case 'toggle-media-node-resize': {
+          const _0x4c1b5b = _0x32dcba.getState(),
+            _0x230e1e = !(_0x4c1b5b?.ui?.imageVideoNodeResizeEnabled === true);
+          (setImageVideoNodeResizePref(_0x230e1e, _0x32dcba),
+            window.showToast?.(
+              _0x230e1e
+                ? t('appBusinessEvents.toggles.mediaNodeResize.on')
+                : t('appBusinessEvents.toggles.mediaNodeResize.off'),
+            ));
+          break;
+        }
+        case 'toggle-prompt-box-resize': {
+          const _0x5907fe = _0x32dcba.getState(),
+            _0x2cc15d = !(_0x5907fe?.ui?.promptBoxResizeEnabled !== false);
+          (setPromptBoxResizePref(_0x2cc15d, _0x32dcba),
+            window.showToast?.(
+              _0x2cc15d
+                ? t('appBusinessEvents.toggles.promptBoxResize.on')
+                : t('appBusinessEvents.toggles.promptBoxResize.off'),
+            ));
+          break;
+        }
+        case 'toggle-node-avoid-overlap': {
+          const _0x388487 = !(window.v2NodeAvoidOverlap !== false);
+          (setNodeAvoidOverlapPref(_0x388487),
+            window.showToast?.(
+              _0x388487
+                ? t('appBusinessEvents.toggles.nodeAvoidOverlap.on')
+                : t('appBusinessEvents.toggles.nodeAvoidOverlap.off'),
+            ));
+          break;
+        }
+        case 'reset-media-size': {
+          const _0x4170e6 = _0x32dcba.getState();
+          if (_0x5a7423(_0x4170e6)) break;
+          const _0x51df7e = Array.isArray(_0x4170e6?.selectedNodeIds) ? _0x4170e6.selectedNodeIds : [];
+          if (_0x51df7e.length === 0) break;
+          const _0xb0d6f6 = _0x51df7e.some((_0x3cdb12) => {
+            const _0x4ad83a = _0x4170e6?.nodes?.[_0x3cdb12]?.type;
+            return (
+              _0x4ad83a === 'source-image' ||
+              _0x4ad83a === 'ai-image' ||
+              _0x4ad83a === 'source-video' ||
+              _0x4ad83a === 'ai-video'
+            );
+          });
+          if (!_0xb0d6f6) break;
+          _0x53a386('reset_source_media_size', { ids: _0x51df7e });
+          break;
+        }
+        case 'add-reference':
+          _0x5b8012();
+          break;
+        case 'create-text':
+          if (_0x32dcba.getState().matting?.active) break;
+          {
+            const { width: _0x4bc670, height: _0xcb42e8 } = _0x545ff0('source-text');
+            _0x4095f1('source-text', _0x4bc670, _0xcb42e8, t('appBusinessEvents.nodeDefaults.sourceText'));
+          }
+          break;
+        case 'create-comment-note': {
+          if (_0x32dcba.getState().matting?.active) break;
+          const { width: _0xb54c8e, height: _0x589241 } = _0x545ff0('comment-note');
+          _0x4095f1('comment-note', _0xb54c8e, _0x589241, '');
+          break;
+        }
+        case 'create-ai-text':
+          if (_0x32dcba.getState().matting?.active) break;
+          {
+            const _0x1733e0 =
+              typeof _0x112324 === 'function' ? _0x112324('ai-text') : { width: 0x12c, height: 0x12c };
+            _0x4095f1(
+              'ai-text',
+              _0x1733e0.width,
+              _0x1733e0.height,
+              t('appBusinessEvents.nodeDefaults.aiText'),
+            );
+          }
+          break;
+        case 'create-ai-image':
+          if (_0x32dcba.getState().matting?.active) break;
+          {
+            const _0x37a4ed =
+              typeof _0x112324 === 'function' ? _0x112324('ai-image') : { width: 0x120, height: 0x120 };
+            _0x4095f1(
+              'ai-image',
+              _0x37a4ed.width,
+              _0x37a4ed.height,
+              t('appBusinessEvents.nodeDefaults.aiImage'),
+            );
+          }
+          break;
+        case 'create-ai-video':
+          if (_0x32dcba.getState().matting?.active) break;
+          {
+            const _0x1a04db =
+              typeof _0x112324 === 'function' ? _0x112324('ai-video') : { width: 0x120, height: 0x120 };
+            _0x4095f1(
+              'ai-video',
+              _0x1a04db.width,
+              _0x1a04db.height,
+              t('appBusinessEvents.nodeDefaults.aiVideo'),
+            );
+          }
+          break;
+        case 'create-ai-audio':
+          if (_0x32dcba.getState().matting?.active) break;
+          {
+            const _0x3b1222 =
+              typeof _0x112324 === 'function' ? _0x112324('ai-audio') : { width: 0x120, height: 0x120 };
+            _0x4095f1(
+              'ai-audio',
+              _0x3b1222.width,
+              _0x3b1222.height,
+              t('appBusinessEvents.nodeDefaults.aiAudio'),
+            );
+          }
+          break;
+        case 'create-scene-detection':
+          if (_0x32dcba.getState().matting?.active) break;
+          _0x4095f1('scene-detection', 0x190, 0x1f4, t('appBusinessEvents.nodeDefaults.sceneDetection'));
+          break;
+        case 'save':
+          typeof window._v2SaveProjectFromShortcut === 'function'
+            ? window._v2SaveProjectFromShortcut()
+            : window._openSaveDialog?.();
+          break;
+        case 'open-settings': {
+          toggleSettingsPanel();
+          break;
+        }
+        case 'toggle-agent': {
+          _0x15877d?.();
+          break;
+        }
+        case 'open-canvas-projects':
+          toggleSidebarSubmenu('canvas-project');
+          break;
+        case 'open-assets':
+          toggleSidebarSubmenu('assets');
+          break;
+        case 'open-workflows':
+          toggleSidebarSubmenu('workflows');
+          break;
+        case 'open-files':
+          toggleSidebarSubmenu('files');
+          break;
+        case 'open-task-center':
+          toggleSidebarSubmenu('tasks');
+          break;
+        case 'editor-tool-brush':
+        case 'editor-tool-rect':
+        case 'editor-tool-eraser':
+        case 'editor-tool-bucket':
+        case 'editor-tool-text': {
+          const _0x406ee0 = _0x32dcba.getState(),
+            _0x140a1c =
+              _0x20d5c4 === 'editor-tool-rect'
+                ? 'rect'
+                : _0x20d5c4 === 'editor-tool-eraser'
+                  ? 'eraser'
+                  : _0x20d5c4 === 'editor-tool-bucket'
+                    ? 'bucket'
+                    : _0x20d5c4 === 'editor-tool-text'
+                      ? 'text'
+                      : 'brush';
+          if (_0x406ee0.annotate?.active)
+            _0x36c7d5._setTool
+              ? _0x36c7d5._setTool.call(_0x36c7d5, _0x140a1c)
+              : _0x32dcba.setAnnotateState({ tool: _0x140a1c });
+          else {
+            if (_0x406ee0.matting?.active) {
+              if (_0x140a1c === 'rect') break;
+              if (document.activeElement?.tagName === 'INPUT') document.activeElement.blur();
+              _0x3fac6d._switchTool?.call(_0x3fac6d, _0x140a1c);
+            }
+          }
+          break;
+        }
+        case 'editor-clear': {
+          const _0x22a916 = _0x32dcba.getState();
+          if (_0x22a916.annotate?.active) _0x36c7d5._clear?.call(_0x36c7d5);
+          else _0x22a916.matting?.active && _0x3fac6d._clear?.call(_0x3fac6d);
+          break;
+        }
+        case 'escape-all': {
+          if (_0xdb0c98()) break;
+          if (_0x5a2358?.sceneState?.ui?.isEditing) {
+            setPanoramaSceneEditing({ nodeId: _0x5a2358.nodeId, isEditing: false });
+            break;
+          }
+          const { nodes: _0x4ee39f } = _0x32dcba.getState();
+          let _0x2fd16c = false;
+          for (const _0xadd367 in _0x4ee39f) {
+            _0x4ee39f[_0xadd367].type === 'storyboard' &&
+              _0x4ee39f[_0xadd367].isEditing &&
+              (_0x32dcba.updateNodeData(_0xadd367, { isEditing: false }), (_0x2fd16c = true));
+          }
+          if (_0x2fd16c) _0x3205d7();
+          const _0x22954b = _0x32dcba.getState().pickConnectMode;
+          if (_0x22954b && _0x22954b.active) _0x32dcba.setPickConnectMode({ active: false });
+          (_0x1daad8(),
+            _0x36c7d5.exit?.({ silent: true }),
+            _0x3fac6d.exit?.({ silent: true }),
+            document.getElementById('avatarMenu')?.classList.remove('open'),
+            document.querySelector('.canvas-proj-dropdown')?.classList.remove('open'),
+            document.getElementById('aboutOverlay') &&
+              (document.getElementById('aboutOverlay').style.display = 'none'),
+            document.getElementById('v2PickerOverlay')?.remove(),
+            document.querySelector('.v2-canvas-ctx-menu')?.remove(),
+            document.querySelector('.v2-node-picker')?.remove(),
+            document.querySelector('.v2-quote-menu')?.remove());
+          document.getElementById('nodeMenu') && (document.getElementById('nodeMenu').style.display = 'none');
+          document.getElementById('nodeModal') &&
+            (document.getElementById('nodeModal').style.display = 'none');
+          document.getElementById('settingsOverlay') &&
+            (document.getElementById('settingsOverlay').style.display = 'none');
+          document.getElementById('imageViewerOverlay') &&
+            (document.getElementById('imageViewerOverlay').style.display = 'none');
+          (_0x32dcba.setAlignPanelVisible(false), _0x32dcba.clearSelection());
+          break;
+        }
+        case 'panorama-scene-camera-1':
+        case 'panorama-scene-camera-2':
+        case 'panorama-scene-camera-3':
+        case 'panorama-scene-camera-4':
+        case 'panorama-scene-camera-5':
+        case 'panorama-scene-camera-6':
+        case 'panorama-scene-camera-7':
+        case 'panorama-scene-camera-8':
+        case 'panorama-scene-camera-9':
+        case 'panorama-scene-camera-0': {
+          if (!_0x5a2358?.sceneState?.ui?.isEditing || _0x5a2358?.supportsCamera !== true) break;
+          const _0x258926 = _0x20d5c4.slice(-1),
+            _0x3c56f2 = _0x258926 === '0' ? 10 : Number(_0x258926);
+          _0x2329dc({ nodeId: _0x5a2358.nodeId, mode: 'activate', slot: _0x3c56f2 });
+          break;
+        }
+        case 'panorama-scene-camera-save-1':
+        case 'panorama-scene-camera-save-2':
+        case 'panorama-scene-camera-save-3':
+        case 'panorama-scene-camera-save-4':
+        case 'panorama-scene-camera-save-5':
+        case 'panorama-scene-camera-save-6':
+        case 'panorama-scene-camera-save-7':
+        case 'panorama-scene-camera-save-8':
+        case 'panorama-scene-camera-save-9':
+        case 'panorama-scene-camera-save-0': {
+          if (!_0x5a2358?.sceneState?.ui?.isEditing || _0x5a2358?.supportsCamera !== true) break;
+          const _0x30bb1a = _0x20d5c4.slice(-1),
+            _0x415d15 = _0x30bb1a === '0' ? 10 : Number(_0x30bb1a);
+          _0x2329dc({ nodeId: _0x5a2358.nodeId, mode: 'save', slot: _0x415d15 });
+          break;
+        }
+      }
+    });
+  }
+  function _0x24ee61() {
+    window.addEventListener('v2:canvas-paste-request', (_0x17a980) => {
+      _0x5dd9a4(_0x17a980?.detail || {});
+    });
+  }
+  function _0x56d1f5() {
+    (_0x24ee61(), _0x2cb79e(), _0x2324a4?.(_0x179f20));
+  }
+  return {
+    bindAll: _0x56d1f5,
+    triggerSelectedNodeToolbarAction: _0x4e3545,
+    triggerSelectedNodeReferenceButton: _0x5b8012,
+    exitActiveFeatureModes: _0xdb0c98,
+  };
+}

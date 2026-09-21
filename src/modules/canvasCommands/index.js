@@ -1,1 +1,43 @@
-(function(_0x172b23,_0x4aa9b1){var _0x169f2f=a475_0x18b8,_0x38cb68=_0x172b23();while(!![]){try{var _0x18aad7=parseInt(_0x169f2f(0x153))/0x1*(parseInt(_0x169f2f(0x15b))/0x2)+-parseInt(_0x169f2f(0x157))/0x3*(parseInt(_0x169f2f(0x154))/0x4)+-parseInt(_0x169f2f(0x156))/0x5*(-parseInt(_0x169f2f(0x150))/0x6)+parseInt(_0x169f2f(0x15a))/0x7*(parseInt(_0x169f2f(0x158))/0x8)+parseInt(_0x169f2f(0x151))/0x9*(parseInt(_0x169f2f(0x159))/0xa)+parseInt(_0x169f2f(0x14f))/0xb*(parseInt(_0x169f2f(0x152))/0xc)+-parseInt(_0x169f2f(0x155))/0xd;if(_0x18aad7===_0x4aa9b1)break;else _0x38cb68['push'](_0x38cb68['shift']());}catch(_0x29e8b7){_0x38cb68['push'](_0x38cb68['shift']());}}}(a475_0x29db,0x31cb5));import a475_0x552820,{CanvasCommandError,CanvasCommandRegistry,createCanvasCommandError,createCanvasCommandRegistry}from'./commandRegistry.js';import{executeCanvasCommand,executeCanvasCommandPlan,hasCanvasCommandPlanVariableReference}from'./commandExecutor.js';import{createCanvasCommandContext}from'./commandContext.js';import{registerGenerationCommands}from'./generationCommands.js';import{registerGraphCommands}from'./graphCommands.js';import{registerLayoutCommands}from'./layoutCommands.js';import{registerModelParamCommands}from'./modelParamCommands.js';import{registerPromptCommands}from'./promptCommands.js';function a475_0x29db(){var _0x219c96=['85UZDRse','44421CXxaUD','5576aogWjT','2375050ZkCMgL','259bZSIXh','10gpFInS','11cForRp','136926xpvlMg','9ghQtFK','1688232LDsjZC','31721HnUAGj','56XWPETj','7010731tsfiPS'];a475_0x29db=function(){return _0x219c96;};return a475_0x29db();}import{registerSelectionCommands}from'./selectionCommands.js';import{registerViewportCommands}from'./viewportCommands.js';export function registerDefaultCanvasCommands(_0x2d1c8a=a475_0x552820){return registerGraphCommands(_0x2d1c8a),registerSelectionCommands(_0x2d1c8a),registerViewportCommands(_0x2d1c8a),registerPromptCommands(_0x2d1c8a),registerModelParamCommands(_0x2d1c8a),registerLayoutCommands(_0x2d1c8a),registerGenerationCommands(_0x2d1c8a),_0x2d1c8a;}registerDefaultCanvasCommands(a475_0x552820);function a475_0x18b8(_0x4e5378,_0x5824da){var _0x29db54=a475_0x29db();return a475_0x18b8=function(_0x18b869,_0x9a43ff){_0x18b869=_0x18b869-0x14f;var _0x4ad6eb=_0x29db54[_0x18b869];return _0x4ad6eb;},a475_0x18b8(_0x4e5378,_0x5824da);}export{CanvasCommandError,CanvasCommandRegistry,createCanvasCommandContext,createCanvasCommandError,createCanvasCommandRegistry,a475_0x552820 as canvasCommandRegistry,executeCanvasCommand,executeCanvasCommandPlan,hasCanvasCommandPlanVariableReference};
+import commandRegistry, {
+  CanvasCommandError,
+  CanvasCommandRegistry,
+  createCanvasCommandError,
+  createCanvasCommandRegistry,
+} from './commandRegistry.js';
+import {
+  executeCanvasCommand,
+  executeCanvasCommandPlan,
+  hasCanvasCommandPlanVariableReference,
+} from './commandExecutor.js';
+import { createCanvasCommandContext } from './commandContext.js';
+import { registerGenerationCommands } from './generationCommands.js';
+import { registerGraphCommands } from './graphCommands.js';
+import { registerLayoutCommands } from './layoutCommands.js';
+import { registerModelParamCommands } from './modelParamCommands.js';
+import { registerPromptCommands } from './promptCommands.js';
+import { registerSelectionCommands } from './selectionCommands.js';
+import { registerViewportCommands } from './viewportCommands.js';
+export function registerDefaultCanvasCommands(_0x2d1c8a = commandRegistry) {
+  return (
+    registerGraphCommands(_0x2d1c8a),
+    registerSelectionCommands(_0x2d1c8a),
+    registerViewportCommands(_0x2d1c8a),
+    registerPromptCommands(_0x2d1c8a),
+    registerModelParamCommands(_0x2d1c8a),
+    registerLayoutCommands(_0x2d1c8a),
+    registerGenerationCommands(_0x2d1c8a),
+    _0x2d1c8a
+  );
+}
+registerDefaultCanvasCommands(commandRegistry);
+export {
+  CanvasCommandError,
+  CanvasCommandRegistry,
+  createCanvasCommandContext,
+  createCanvasCommandError,
+  createCanvasCommandRegistry,
+  commandRegistry as canvasCommandRegistry,
+  executeCanvasCommand,
+  executeCanvasCommandPlan,
+  hasCanvasCommandPlanVariableReference,
+};

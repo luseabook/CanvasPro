@@ -1,1 +1,1473 @@
-const a153_0x579833=a153_0x1051;(function(_0x398336,_0x232775){const _0x4396e8=a153_0x1051,_0x5c8721=_0x398336();while(!![]){try{const _0x2a4e04=parseInt(_0x4396e8(0x162))/0x1+parseInt(_0x4396e8(0x1c9))/0x2+parseInt(_0x4396e8(0x12d))/0x3+parseInt(_0x4396e8(0x1b2))/0x4*(-parseInt(_0x4396e8(0x1d4))/0x5)+parseInt(_0x4396e8(0x1df))/0x6*(-parseInt(_0x4396e8(0x15d))/0x7)+parseInt(_0x4396e8(0x157))/0x8*(parseInt(_0x4396e8(0x11d))/0x9)+-parseInt(_0x4396e8(0x151))/0xa;if(_0x2a4e04===_0x232775)break;else _0x5c8721['push'](_0x5c8721['shift']());}catch(_0x11e1a1){_0x5c8721['push'](_0x5c8721['shift']());}}}(a153_0x1569,0xa5bbc));import a153_0x258e6d from'node:test';import a153_0x243494 from'node:assert/strict';import{createAIGenerateNodeStateSyncModule,resolveRefImageRenderSources}from'./stateSyncModule.js';import{createAIGenerateNodeUiModule}from'./uiModule.js';function a153_0x1051(_0x3152b4,_0x27c4a0){const _0x156971=a153_0x1569();return a153_0x1051=function(_0x105122,_0x3fb84c){_0x105122=_0x105122-0x10a;let _0x31f469=_0x156971[_0x105122];return _0x31f469;},a153_0x1051(_0x3152b4,_0x27c4a0);}function createButtonStub(){const _0x2c892b=a153_0x1051,_0x975765=new Set([_0x2c892b(0x123)]);return{'disabled':!![],'title':_0x2c892b(0x197),'innerHTML':_0x2c892b(0x130),'style':{'color':_0x2c892b(0x1f3),'cursor':''},'classList':{'add'(_0x1355df){_0x975765['add'](String(_0x1355df||''));},'remove'(_0x21202c){const _0x32fdcc=_0x2c892b;_0x975765[_0x32fdcc(0x1de)](String(_0x21202c||''));},'contains'(_0xf630f6){const _0x18b0ee=_0x2c892b;return _0x975765[_0x18b0ee(0x144)](String(_0xf630f6||''));}}};}function createIdleButtonStub(){const _0xd20871=new Set();return{'disabled':![],'title':'','innerHTML':'','style':{'color':'','cursor':''},'dataset':{},'classList':{'add'(..._0x562a7a){const _0x400e37=a153_0x1051;_0x562a7a[_0x400e37(0x16b)](_0x4643c0=>_0xd20871[_0x400e37(0x1ad)](String(_0x4643c0||'')));},'remove'(..._0xb4ea85){const _0x538f9b=a153_0x1051;_0xb4ea85[_0x538f9b(0x16b)](_0x4ee748=>_0xd20871[_0x538f9b(0x1de)](String(_0x4ee748||'')));},'toggle'(_0x95cec1,_0x3df5e4){const _0x49abed=a153_0x1051,_0x940a2a=String(_0x95cec1||'');if(_0x3df5e4===!![])return _0xd20871[_0x49abed(0x1ad)](_0x940a2a),!![];if(_0x3df5e4===![])return _0xd20871[_0x49abed(0x1de)](_0x940a2a),![];if(_0xd20871[_0x49abed(0x144)](_0x940a2a))return _0xd20871['delete'](_0x940a2a),![];return _0xd20871['add'](_0x940a2a),!![];},'contains'(_0x192c3a){const _0x5b20f8=a153_0x1051;return _0xd20871[_0x5b20f8(0x144)](String(_0x192c3a||''));}},'setAttribute'(_0x5ec390,_0xbe655d){const _0x1f7777=a153_0x1051;this[_0x1f7777(0x1a1)][String(_0x5ec390||'')]=String(_0xbe655d||'');},'removeAttribute'(_0x2f7817){const _0x1898fb=a153_0x1051;delete this[_0x1898fb(0x1a1)][String(_0x2f7817||'')];}};}class FakeClassList{constructor(_0x1631f5){const _0x32afa6=a153_0x1051;this[_0x32afa6(0x14a)]=_0x1631f5;}['_tokens'](){const _0x5eaf7b=a153_0x1051;return String(this[_0x5eaf7b(0x14a)]['className']||'')[_0x5eaf7b(0x147)](/\s+/)[_0x5eaf7b(0x1e8)](Boolean);}[a153_0x579833(0x184)](_0x2f49e9){const _0x184c13=a153_0x579833;return this['_tokens']()[_0x184c13(0x182)](String(_0x2f49e9||''));}[a153_0x579833(0x1ad)](..._0xd11679){const _0x3ec5ba=a153_0x579833,_0x31e5ec=new Set(this[_0x3ec5ba(0x166)]());_0xd11679[_0x3ec5ba(0x16b)](_0x4932d6=>_0x31e5ec[_0x3ec5ba(0x1ad)](String(_0x4932d6||''))),this['owner'][_0x3ec5ba(0x18f)]=Array[_0x3ec5ba(0x1a2)](_0x31e5ec)['join']('\x20');}[a153_0x579833(0x1db)](..._0x3ee8c8){const _0x36bf50=a153_0x579833,_0x5851f0=new Set(_0x3ee8c8[_0x36bf50(0x16e)](_0x50a922=>String(_0x50a922||'')));this[_0x36bf50(0x14a)][_0x36bf50(0x18f)]=this[_0x36bf50(0x166)]()[_0x36bf50(0x1e8)](_0x1584b4=>!_0x5851f0[_0x36bf50(0x144)](_0x1584b4))[_0x36bf50(0x1f4)]('\x20');}[a153_0x579833(0x158)](_0x422156,_0x19072f){const _0x42c6f8=a153_0x579833,_0x11d796=String(_0x422156||''),_0x248362=this[_0x42c6f8(0x184)](_0x11d796),_0x272188=_0x19072f===undefined?!_0x248362:Boolean(_0x19072f);if(_0x272188)this[_0x42c6f8(0x1ad)](_0x11d796);else this[_0x42c6f8(0x1db)](_0x11d796);return _0x272188;}}class FakeElement{constructor({className:className='',dataset:dataset={},tagName:tagName='div'}={}){const _0x170f2c=a153_0x579833;this[_0x170f2c(0x1cc)]=String(tagName||_0x170f2c(0x1b8))[_0x170f2c(0x12e)](),this['className']=className,this[_0x170f2c(0x1a1)]={...dataset},this['style']={},this[_0x170f2c(0x11b)]={},this[_0x170f2c(0x193)]=[],this[_0x170f2c(0x10f)]=null,this[_0x170f2c(0x1ef)]=null,this['listeners']=new Map(),this[_0x170f2c(0x1a9)]=new FakeClassList(this),this['_innerHTML']='';}get['innerHTML'](){const _0x2e069e=a153_0x579833;return this[_0x2e069e(0x12a)];}set[a153_0x579833(0x199)](_0x580516){const _0x25af7f=a153_0x579833;this[_0x25af7f(0x12a)]=String(_0x580516||'');if(!this[_0x25af7f(0x12a)][_0x25af7f(0x182)](_0x25af7f(0x1c4)))return;this['children']=[];const _0x30b2b6=new FakeElement({'className':_0x25af7f(0x164)}),_0x48662e=new FakeElement({'className':_0x25af7f(0x1c4)});this[_0x25af7f(0x176)](_0x30b2b6),this[_0x25af7f(0x176)](_0x48662e),this[_0x25af7f(0x12a)][_0x25af7f(0x182)]('data-ref-slot=\x22replaceTarget\x22')&&_0x48662e[_0x25af7f(0x176)](new FakeElement({'className':_0x25af7f(0x10d),'dataset':{'refSlot':_0x25af7f(0x153),'slot':this[_0x25af7f(0x12a)][_0x25af7f(0x182)](_0x25af7f(0x1e5))?_0x25af7f(0x153):'','kind':this['_innerHTML'][_0x25af7f(0x182)](_0x25af7f(0x1d3))?_0x25af7f(0x1b0):''}})),this['_innerHTML'][_0x25af7f(0x182)](_0x25af7f(0x119))&&_0x48662e[_0x25af7f(0x176)](new FakeElement({'className':_0x25af7f(0x10d),'dataset':{'refSlot':_0x25af7f(0x1ba),'slot':this['_innerHTML'][_0x25af7f(0x182)](_0x25af7f(0x1f5))?_0x25af7f(0x1ba):'','kind':this[_0x25af7f(0x12a)][_0x25af7f(0x182)](_0x25af7f(0x1d3))?'image':''}}));}get[a153_0x579833(0x110)](){const _0x3312f9=a153_0x579833;if(!this['parentNode'])return null;const _0x56ed83=this[_0x3312f9(0x10f)]['children'],_0x16ac73=_0x56ed83['indexOf'](this);return _0x16ac73>=0x0?_0x56ed83[_0x16ac73+0x1]||null:null;}[a153_0x579833(0x176)](_0x46545c){const _0x1ac8fd=a153_0x579833;if(_0x46545c[_0x1ac8fd(0x10f)])_0x46545c['remove']();return this[_0x1ac8fd(0x193)][_0x1ac8fd(0x17c)](_0x46545c),_0x46545c[_0x1ac8fd(0x10f)]=this,_0x46545c[_0x1ac8fd(0x1ef)]=this,_0x46545c;}[a153_0x579833(0x1c2)](_0x53eac6,_0x439788){const _0x480390=a153_0x579833;if(_0x53eac6[_0x480390(0x10f)])_0x53eac6['remove']();const _0x3fc389=_0x439788?this['children'][_0x480390(0x174)](_0x439788):-0x1;if(_0x3fc389>=0x0)this[_0x480390(0x193)][_0x480390(0x112)](_0x3fc389,0x0,_0x53eac6);else this['children'][_0x480390(0x17c)](_0x53eac6);return _0x53eac6[_0x480390(0x10f)]=this,_0x53eac6[_0x480390(0x1ef)]=this,_0x53eac6;}[a153_0x579833(0x1db)](){const _0x46aeeb=a153_0x579833;if(!this['parentNode'])return;const _0x57bbb6=this[_0x46aeeb(0x10f)]['children'],_0x448d8e=_0x57bbb6[_0x46aeeb(0x174)](this);if(_0x448d8e>=0x0)_0x57bbb6['splice'](_0x448d8e,0x1);this['parentNode']=null,this[_0x46aeeb(0x1ef)]=null;}[a153_0x579833(0x11c)](_0x30e228){const _0x26c9d5=a153_0x579833;if(!this['parentNode'])return;const _0x1d4a96=this[_0x26c9d5(0x10f)],_0x149638=_0x1d4a96[_0x26c9d5(0x193)],_0x4cf79a=_0x149638['indexOf'](this);if(_0x4cf79a<0x0)return;if(_0x30e228['parentNode'])_0x30e228[_0x26c9d5(0x1db)]();_0x149638[_0x4cf79a]=_0x30e228,_0x30e228['parentNode']=_0x1d4a96,_0x30e228[_0x26c9d5(0x1ef)]=_0x1d4a96,this['parentNode']=null,this[_0x26c9d5(0x1ef)]=null;}[a153_0x579833(0x1e4)](_0x1b606c,_0x2015a9){const _0x5e9048=a153_0x579833;this[_0x5e9048(0x11b)][String(_0x1b606c)]=String(_0x2015a9);}[a153_0x579833(0x1be)](_0x44c1d5){const _0x435e88=a153_0x579833;return this[_0x435e88(0x11b)][String(_0x44c1d5)];}[a153_0x579833(0x135)](_0x16f127,_0x23aaac){const _0x48c3ba=a153_0x579833;if(!this[_0x48c3ba(0x17d)][_0x48c3ba(0x144)](_0x16f127))this['listeners'][_0x48c3ba(0x115)](_0x16f127,[]);this[_0x48c3ba(0x17d)][_0x48c3ba(0x10e)](_0x16f127)[_0x48c3ba(0x17c)](_0x23aaac);}[a153_0x579833(0x1dd)](_0x162edd,_0x330b10){const _0x1942fd=a153_0x579833;for(const _0x586d5a of this[_0x1942fd(0x17d)]['get'](_0x162edd)||[])_0x586d5a(_0x330b10);}[a153_0x579833(0x117)](_0x1f9102){const _0x32b0b3=a153_0x579833;if(_0x1f9102===_0x32b0b3(0x136))return this[_0x32b0b3(0x1a9)]['contains']('ref-thumb-wrap');if(_0x1f9102===_0x32b0b3(0x172))return this[_0x32b0b3(0x1a9)]['contains'](_0x32b0b3(0x1c4));if(_0x1f9102==='[data-slot]')return!!this['dataset'][_0x32b0b3(0x142)];return matchesFakeSelector(this,_0x1f9102);}[a153_0x579833(0x13c)](_0x1306f6){let _0x1b1923=this;while(_0x1b1923){if(_0x1b1923['matches'](_0x1306f6))return _0x1b1923;_0x1b1923=_0x1b1923['parentElement'];}return null;}['querySelector'](_0x4c94ad){const _0x161357=a153_0x579833;return this[_0x161357(0x18e)](_0x4c94ad)[0x0]||null;}[a153_0x579833(0x18e)](_0xe3a63a){const _0x19fa91=a153_0x579833,_0x3f45bb=[],_0x4e2542=_0x22dedc=>{const _0x3e2297=a153_0x1051;if(matchesFakeSelector(_0x22dedc,_0xe3a63a))_0x3f45bb[_0x3e2297(0x17c)](_0x22dedc);_0x22dedc[_0x3e2297(0x193)]['forEach'](_0x4e2542);};return this['children'][_0x19fa91(0x16b)](_0x4e2542),_0x3f45bb;}}function a153_0x1569(){const _0x2b97ad=['data-slot=\x22replaceTarget\x22','deepEqual','draggable','filter','node-person-replace-v21','output/top-level-thumb.jpg','output/main-display.png','aigenImage\x20state\x20sync:\x20schema\x20adaptive\x20ratio\x20triggers\x20display\x20resize\x20on\x20input\x20change','node-image-order-refresh','_isGenerating','parentElement','runninghubwf','aigenImage\x20state\x20sync:\x20live\x20running\x20state\x20restarts\x20loading\x20after\x20remount','_updateSubmitButtonState','var(--white)','join','data-slot=\x22replacedImage\x22','aigenImage\x20state\x20sync:\x20thumbnail\x20order\x20changes\x20trigger\x20immediate\x20ref\x20bar\x20refresh','is-task-cancel','[data-ref-slot=\x22cref\x22]','aspectRatio','[data-ref-slot=\x22replacedImage\x22]','output/main.png','pending','apimart','idle','runninghub/1994718111704158209','targetId','imageUrl','ref-thumb-wrap\x20ref-upload-slot','get','parentNode','nextSibling','schema-image-node','splice','output/top-level-display.jpg','mainImage','set','node-ref-bar','matches','imageB','data-ref-slot=\x22replacedImage\x22','_renderRefBarImpl','attributes','replaceWith','4275mXszxO','provider','kind','_rhCancelInFlight','https://cdn.example.com/input.png','btnEl','is-rh-busy','ref-upload-slot','node-state-sync-live-running','edgeA','title','nodes','dragend','_innerHTML','generating','equal','3667620iooaaH','toUpperCase','output/ref-thumb.png','<svg\x20style=\x22animation:spin\x201s\x20linear\x20infinite\x22></svg>','node-agnes-image-input-button','edgeId','group','groupEdge::group-output::','addEventListener','.ref-thumb-wrap','node-rh-image-x-fixed-slot','output/nested.png','src-ai-image-2','node-state-sync-dreamina-terminal','output/display.jpg','closest','ai-image','volcengine/seedream-4.0','output/b-display.png','aigenImage\x20state\x20sync:\x20group\x20first\x20output\x20removal\x20triggers\x20adaptive\x20ratio\x20while\x20ref\x20bar\x20hidden','output/thumb.jpg','slot','src-image-2','has','call','output/nested-display.jpg','split','node-image-text-input-button','style','owner','running','runninghub','output/final-thumb.jpg','/output/display.jpg','refImage','/output/final-thumb.jpg','31768590dAYaVY','aigenImage\x20state\x20sync:\x20hover\x20预览缺少\x20displayLocalPath\x20时回退\x20originalLocalPath','replaceTarget','/output/final-display.jpg','output/final-display.jpg','output/first.png','16680tWoKMu','toggle','output/main-thumb.png','blob:legacy-thumb','aigenImage\x20state\x20sync:\x20group\x20output\x20order\x20changes\x20trigger\x20adaptive\x20ratio','apimart/nano-banana-2','343PEJPrj','edgeStyle','failed','aigenImage\x20state\x20sync:\x20modelApi\x20fixed\x20image\x20slots\x20render\x20from\x20manifest','addedEdges','1237544hbjMuS','_dreaminaActiveSubmitId','prompt-attachment-btn','edgeRef','_tokens','aigenImage\x20state\x20sync:\x20RunningHub\x20image\x20X\x20renders\x20one\x20manifest\x20fixed\x20image\x20slot','.prompt-attachment-btn','true','agnes/agnes-image-2.0-flash','forEach','output/style-display.png','values','map','.ref-thumb-wrap.is-drop-allow','is-drop-allow','groupEdge','.ref-thumb-container','/output/top-level-thumb.jpg','indexOf','node-youchuan-fixed-slots','appendChild','aigenImage\x20state\x20sync:\x20anime\x20real\x20image\x20input\x20changes\x20trigger\x20adaptive\x20ratio','aigenImage\x20submit\x20button:\x20Agnes\x20image\x20input\x20can\x20generate\x20without\x20prompt','prompt','sourceId','aigenImage\x20state\x20sync:\x20refSlot\x20changes\x20trigger\x20immediate\x20ref\x20bar\x20refresh','push','listeners','aigenImage\x20state\x20sync:\x20顶层本地字段仍优先于\x20main\x20image','src-ai-image-1','groupOutputSourceOrder','assign','includes','nano-banana-2','contains','node-agnes-image-input-source','drop','update','disabled','edgeMain','sid-terminal','node-image-grsai-finished-button-state','aigenImage\x20submit\x20button:\x20running\x20RH\x20state\x20renders\x20cancel\x20button\x20from\x20unified\x20state','node-youchuan-v7-fixed-slots','querySelectorAll','className','node-apimart-seedream-preserve','model','false','children','edge-agnes-image-input','ref-thumb-wrap','output/a.png','busy','[data-ref-slot=\x22sref\x22]','innerHTML','removeIds','error','source-image','aigenImage\x20ui\x20normalize:\x20APIMart\x20Seedream\x20manifest\x20models\x20are\x20preserved','runninghub/2041177685895946242','output/style.png','styleImage','dataset','from','is-dragging','apimart/seedream-4.0','aigenImage\x20state\x20sync:\x20Midjourney\x20V7\x20renders\x20only\x20main\x20and\x20style\x20fixed\x20slots','aigenImage\x20state\x20sync:\x20列表缩略图优先\x20thumbLocalPath，hover\x20预览优先\x20displayLocalPath','dragstart','runninghub/2044874075721441281','classList','runninghub-model/youchuan-v7','node-person-replace-v3-refresh','dragover','add','match','src-image-legacy-blob','image','edgeB','916ORnujA','dreamina/4.1','output/a-display.png','/output/original.png','aigenImage\x20state\x20sync:\x20ai-image\x20顶层缺失时回退\x20main\x20image\x20的本地派生图','undefined','div','refSlot','replacedImage','edges','imageA','agnes','getAttribute','output/style-thumb.png','gpt-image-2','/output/thumb.jpg','insertBefore','aigenImage\x20submit\x20button:\x20empty\x20editor\x20can\x20generate\x20from\x20non-empty\x20text\x20input','ref-thumb-container','sref','grsai','用文本入参生成一张海报','output/a-thumb.png','2193246MSdBxk','自适应','source-text','tagName','done','doesNotMatch','dreamina','create','/output/previous.png','querySelector','data-kind=\x22image\x22','12575YoQzJF','document','cursor','_normalizeLegacySeedreamModel','length','node-person-replace-v3','output/original.png','remove','[data-ref-slot=\x22imageUrl\x22]','dispatch','delete','14136sXmiKV','node-state-sync-rh-running','aigenImage\x20state\x20sync:\x20running\x20RH\x20task\x20keeps\x20loading\x20when\x20inactive\x20Dreamina\x20fields\x20are\x20done','anime-real-node','volcengine','setAttribute'];a153_0x1569=function(){return _0x2b97ad;};return a153_0x1569();}function matchesFakeSelector(_0x89ffc3,_0x175ba8){const _0x34a331=a153_0x579833;if(_0x175ba8===_0x34a331(0x168))return _0x89ffc3[_0x34a331(0x1a9)]['contains'](_0x34a331(0x164));if(_0x175ba8===_0x34a331(0x172))return _0x89ffc3[_0x34a331(0x1a9)][_0x34a331(0x184)](_0x34a331(0x1c4));if(_0x175ba8===_0x34a331(0x136))return _0x89ffc3['classList']['contains'](_0x34a331(0x195));if(_0x175ba8===_0x34a331(0x16f))return _0x89ffc3[_0x34a331(0x1a9)][_0x34a331(0x184)]('ref-thumb-wrap')&&_0x89ffc3[_0x34a331(0x1a9)][_0x34a331(0x184)](_0x34a331(0x170));const _0x34c6e6=_0x175ba8[_0x34a331(0x1ae)](/^\.ref-upload-slot\[data-ref-slot="([^"]+)"\]$/);if(_0x34c6e6)return _0x89ffc3['classList']['contains']('ref-upload-slot')&&_0x89ffc3['dataset'][_0x34a331(0x1b9)]===_0x34c6e6[0x1];const _0x58c343=_0x175ba8['match'](/^\[data-ref-slot="([^"]+)"\]$/);if(_0x58c343)return _0x89ffc3[_0x34a331(0x1a1)][_0x34a331(0x1b9)]===_0x58c343[0x1];const _0x5ec186=_0x175ba8['match'](/^\[data-slot="([^"]+)"\]$/);if(_0x5ec186)return _0x89ffc3['dataset'][_0x34a331(0x142)]===_0x5ec186[0x1];if(_0x175ba8==='[data-slot]')return!!_0x89ffc3[_0x34a331(0x1a1)]['slot'];return![];}function createDragEvent(_0x2ed3a6){return{'target':_0x2ed3a6,'dataTransfer':{'effectAllowed':'','dropEffect':'','setData'(){}},'preventDefault'(){},'stopPropagation'(){}};}a153_0x258e6d(a153_0x579833(0x1a6),()=>{const _0x579719=a153_0x579833,_0x35c474=resolveRefImageRenderSources({'id':'src-image-1','type':_0x579719(0x19c),'originalLocalPath':_0x579719(0x1da),'displayLocalPath':_0x579719(0x13b),'thumbLocalPath':_0x579719(0x141)});a153_0x243494[_0x579719(0x1e6)](_0x35c474,{'thumbSrc':'/output/thumb.jpg','previewSrc':_0x579719(0x14e)});}),a153_0x258e6d(a153_0x579833(0x152),()=>{const _0x24993d=a153_0x579833,_0x29d376=resolveRefImageRenderSources({'id':_0x24993d(0x143),'type':'source-image','originalLocalPath':_0x24993d(0x1da),'thumbLocalPath':_0x24993d(0x141)});a153_0x243494[_0x24993d(0x1e6)](_0x29d376,{'thumbSrc':_0x24993d(0x1c1),'previewSrc':_0x24993d(0x1b5)});}),a153_0x258e6d(a153_0x579833(0x1b6),()=>{const _0x55353b=a153_0x579833,_0xc8cfd8=resolveRefImageRenderSources({'id':_0x55353b(0x17f),'type':'ai-image','images':[{'localPath':_0x55353b(0x156)},{'originalLocalPath':'output/final.png','displayLocalPath':_0x55353b(0x155),'thumbLocalPath':_0x55353b(0x14d)}],'mainImageIndex':0x1});a153_0x243494['deepEqual'](_0xc8cfd8,{'thumbSrc':_0x55353b(0x150),'previewSrc':_0x55353b(0x154)});}),a153_0x258e6d(a153_0x579833(0x17e),()=>{const _0x5aafce=a153_0x579833,_0x2b1596=resolveRefImageRenderSources({'id':_0x5aafce(0x139),'type':_0x5aafce(0x13d),'localPath':'output/top-level.png','displayLocalPath':_0x5aafce(0x113),'thumbLocalPath':_0x5aafce(0x1ea),'images':[{'originalLocalPath':_0x5aafce(0x138),'displayLocalPath':_0x5aafce(0x146),'thumbLocalPath':'output/nested-thumb.jpg'}],'mainImageIndex':0x0});a153_0x243494['deepEqual'](_0x2b1596,{'thumbSrc':_0x5aafce(0x173),'previewSrc':'/output/top-level-display.jpg'});}),a153_0x258e6d('aigenImage\x20state\x20sync:\x20旧节点只有\x20blob\x20缩略图时\x20hover\x20预览回退到同一张图',()=>{const _0x150fde=a153_0x579833,_0x3ea528=resolveRefImageRenderSources({'id':_0x150fde(0x1af),'type':_0x150fde(0x19c)},{'thumbBlobUrl':_0x150fde(0x15a)});a153_0x243494[_0x150fde(0x1e6)](_0x3ea528,{'thumbSrc':_0x150fde(0x15a),'previewSrc':'blob:legacy-thumb'});}),a153_0x258e6d('aigenImage\x20state\x20sync:\x20terminal\x20Dreamina\x20state\x20clears\x20loading\x20UI',()=>{const _0x17c30b=a153_0x579833,_0xf6838c=globalThis[_0x17c30b(0x1d5)];globalThis[_0x17c30b(0x1d5)]={'activeElement':null};try{const _0x2199a3=_0x17c30b(0x13a),_0x3cf8d8={'selectedNodeIds':[],'pickConnectMode':{},'nodes':{[_0x2199a3]:{'id':_0x2199a3,'model':_0x17c30b(0x1b3),'provider':_0x17c30b(0x1cf)}},'edges':{}};let _0x12757f=0x0,_0x2fb788=0x0,_0x3501df=0x0,_0x195ff4=0x0;const _0x54b6b9=createAIGenerateNodeStateSyncModule({'store':{'getState':()=>_0x3cf8d8,'getIncomingEdges':()=>[]},'getImage':async()=>null,'getDisplayModelName':_0x5a458a=>_0x5a458a,'stopLoading':()=>{_0x12757f+=0x1;}}),_0x2a3e33=Object[_0x17c30b(0x181)](Object[_0x17c30b(0x1d0)](_0x54b6b9),{'nodeId':_0x2199a3,'_data':_0x3cf8d8[_0x17c30b(0x128)][_0x2199a3],'_isGenerating':!![],'_dreaminaActiveSubmitId':_0x17c30b(0x18a),'_refThumbObjectUrls':new Map(),'previewEl':{},'btnEl':createButtonStub(),'promptEl':{'innerHTML':'','innerText':_0x17c30b(0x179)},'_normalizeDreaminaNodeData':_0x58daad=>_0x58daad,'_loadAndDisplayImage':()=>{},'_applyMaskPreview':()=>{},'_applyModelParamVisibility':()=>{},'_stopDreaminaRecovery':()=>{_0x2fb788+=0x1;},'_maybeResumeDreaminaTaskImpl':()=>{_0x3501df+=0x1;},'_updateSubmitButtonState':()=>{_0x195ff4+=0x1;}});_0x54b6b9[_0x17c30b(0x187)][_0x17c30b(0x145)](_0x2a3e33,{'id':_0x2199a3,'model':'dreamina/4.1','provider':_0x17c30b(0x1cf),'jobStatus':_0x17c30b(0x19b),'dreaminaTaskStatus':_0x17c30b(0x19b),'dreaminaTaskPhase':_0x17c30b(0x12b),'isGenerating':![]}),a153_0x243494[_0x17c30b(0x12c)](_0x2a3e33[_0x17c30b(0x1ee)],![]),a153_0x243494['equal'](_0x2a3e33[_0x17c30b(0x163)],''),a153_0x243494[_0x17c30b(0x12c)](_0x12757f,0x1),a153_0x243494[_0x17c30b(0x12c)](_0x2fb788,0x1),a153_0x243494['equal'](_0x3501df,0x0),a153_0x243494[_0x17c30b(0x12c)](_0x195ff4,0x1),a153_0x243494[_0x17c30b(0x12c)](_0x2a3e33['btnEl'][_0x17c30b(0x1a9)]['contains'](_0x17c30b(0x123)),![]),a153_0x243494[_0x17c30b(0x12c)](_0x2a3e33[_0x17c30b(0x122)][_0x17c30b(0x127)],'生成'),a153_0x243494['doesNotMatch'](_0x2a3e33[_0x17c30b(0x122)][_0x17c30b(0x199)],/animation:spin/);}finally{typeof _0xf6838c===_0x17c30b(0x1b7)?delete globalThis['document']:globalThis[_0x17c30b(0x1d5)]=_0xf6838c;}}),a153_0x258e6d(a153_0x579833(0x1e1),()=>{const _0x318a07=a153_0x579833,_0x45f2b2=globalThis['document'];globalThis[_0x318a07(0x1d5)]={'activeElement':null};try{const _0x452646=_0x318a07(0x1e0),_0x2e2c6a={'selectedNodeIds':[],'pickConnectMode':{},'nodes':{[_0x452646]:{'id':_0x452646,'model':_0x318a07(0x1a8),'provider':_0x318a07(0x1f0)}},'edges':{}};let _0xa71e70=0x0,_0x51ea4b=0x0,_0x1b74d4=0x0;const _0x3594fd=createAIGenerateNodeStateSyncModule({'store':{'getState':()=>_0x2e2c6a,'getIncomingEdges':()=>[]},'getImage':async()=>null,'getDisplayModelName':_0x1ea2bf=>_0x1ea2bf,'startLoading':()=>{_0xa71e70+=0x1;},'stopLoading':()=>{_0x51ea4b+=0x1;}}),_0xe1d71b=Object[_0x318a07(0x181)](Object[_0x318a07(0x1d0)](_0x3594fd),{'nodeId':_0x452646,'_data':_0x2e2c6a[_0x318a07(0x128)][_0x452646],'_isGenerating':!![],'_refThumbObjectUrls':new Map(),'previewEl':{},'btnEl':createButtonStub(),'promptEl':{'innerHTML':'','innerText':_0x318a07(0x179)},'_normalizeDreaminaNodeData':_0x3f3217=>_0x3f3217,'_loadAndDisplayImage':()=>{},'_applyMaskPreview':()=>{},'_applyModelParamVisibility':()=>{},'_maybeResumeRunningHubTaskImpl':()=>{_0x1b74d4+=0x1;},'_maybeResumeDreaminaTaskImpl':()=>{},'_maybeResumeAsyncTaskImpl':()=>{},'_updateSubmitButtonState':()=>{}});_0x3594fd[_0x318a07(0x187)][_0x318a07(0x145)](_0xe1d71b,{'id':_0x452646,'model':_0x318a07(0x1a8),'provider':_0x318a07(0x1f0),'imageUrl':_0x318a07(0x1d1),'isGenerating':!![],'jobStatus':'running','rhTaskStatus':_0x318a07(0x1fc),'dreaminaTaskStatus':_0x318a07(0x1fe),'dreaminaTaskPhase':_0x318a07(0x1cd),'asyncTaskStatus':_0x318a07(0x1fe)}),a153_0x243494[_0x318a07(0x12c)](_0xe1d71b[_0x318a07(0x1ee)],!![]),a153_0x243494[_0x318a07(0x12c)](_0xa71e70,0x1),a153_0x243494[_0x318a07(0x12c)](_0x51ea4b,0x0),a153_0x243494['equal'](_0x1b74d4,0x1),a153_0x243494['equal'](_0xe1d71b['btnEl'][_0x318a07(0x1a9)][_0x318a07(0x184)](_0x318a07(0x123)),!![]),a153_0x243494[_0x318a07(0x1ae)](_0xe1d71b[_0x318a07(0x122)][_0x318a07(0x199)],/animation:spin/);}finally{typeof _0x45f2b2===_0x318a07(0x1b7)?delete globalThis[_0x318a07(0x1d5)]:globalThis[_0x318a07(0x1d5)]=_0x45f2b2;}}),a153_0x258e6d(a153_0x579833(0x1f1),()=>{const _0x9a4905=a153_0x579833,_0x1015af=globalThis[_0x9a4905(0x1d5)];globalThis[_0x9a4905(0x1d5)]={'activeElement':null};try{const _0x20c7e7=_0x9a4905(0x125),_0x53cf8a={'selectedNodeIds':[],'pickConnectMode':{},'nodes':{[_0x20c7e7]:{'id':_0x20c7e7,'model':'volcengine/seedream-4.0','provider':'volcengine'}},'edges':{}};let _0x1dfa70=0x0,_0x174fcd=0x0;const _0x432620=createAIGenerateNodeStateSyncModule({'store':{'getState':()=>_0x53cf8a,'getIncomingEdges':()=>[]},'getImage':async()=>null,'getDisplayModelName':_0x8634e7=>_0x8634e7,'startLoading':()=>{_0x1dfa70+=0x1;},'stopLoading':()=>{_0x174fcd+=0x1;}}),_0x433195=Object[_0x9a4905(0x181)](Object[_0x9a4905(0x1d0)](_0x432620),{'nodeId':_0x20c7e7,'_data':_0x53cf8a[_0x9a4905(0x128)][_0x20c7e7],'_isGenerating':![],'_refThumbObjectUrls':new Map(),'previewEl':{},'btnEl':createIdleButtonStub(),'promptEl':{'innerHTML':'','innerText':_0x9a4905(0x179)},'_normalizeDreaminaNodeData':_0x23bca6=>_0x23bca6,'_loadAndDisplayImage':()=>{},'_applyMaskPreview':()=>{},'_applyModelParamVisibility':()=>{},'_maybeResumeRunningHubTaskImpl':()=>{},'_maybeResumeDreaminaTaskImpl':()=>{},'_maybeResumeAsyncTaskImpl':()=>{},'_updateSubmitButtonState':()=>{}});_0x432620[_0x9a4905(0x187)][_0x9a4905(0x145)](_0x433195,{'id':_0x20c7e7,'model':_0x9a4905(0x13e),'provider':_0x9a4905(0x1e3),'isGenerating':!![],'jobStatus':_0x9a4905(0x14b),'generationStartTime':0x3e8,'generationDuration':null}),a153_0x243494['equal'](_0x433195['_isGenerating'],!![]),a153_0x243494[_0x9a4905(0x12c)](_0x1dfa70,0x1),a153_0x243494[_0x9a4905(0x12c)](_0x174fcd,0x0);}finally{typeof _0x1015af===_0x9a4905(0x1b7)?delete globalThis[_0x9a4905(0x1d5)]:globalThis['document']=_0x1015af;}}),a153_0x258e6d(a153_0x579833(0x18c),()=>{const _0x1294ee=a153_0x579833,_0x4e3a46='node-image-rh-running-button-state',_0x1ebd7f={'nodes':{[_0x4e3a46]:{'id':_0x4e3a46,'model':'runninghub/2044874075721441281','provider':_0x1294ee(0x1f0),'rhTaskId':'rh-image-running','rhTaskStatus':_0x1294ee(0x14b),'jobStatus':_0x1294ee(0x14b),'isGenerating':!![]}}},_0x572b02=createAIGenerateNodeUiModule({'store':{'getState':()=>_0x1ebd7f,'getIncomingEdges':()=>[]}}),_0x9e6dbe=Object[_0x1294ee(0x181)](Object[_0x1294ee(0x1d0)](_0x572b02),{'nodeId':_0x4e3a46,'_data':_0x1ebd7f[_0x1294ee(0x128)][_0x4e3a46],'_rhCancelInFlight':![],'promptEl':{'innerText':'prompt'},'btnEl':createIdleButtonStub(),'_isRunninghubWorkflowModel':()=>!![]});_0x572b02[_0x1294ee(0x1f2)][_0x1294ee(0x145)](_0x9e6dbe),a153_0x243494[_0x1294ee(0x12c)](_0x9e6dbe['btnEl'][_0x1294ee(0x188)],![]),a153_0x243494['equal'](_0x9e6dbe[_0x1294ee(0x122)][_0x1294ee(0x149)][_0x1294ee(0x1d6)],''),a153_0x243494['equal'](_0x9e6dbe['btnEl'][_0x1294ee(0x1a9)][_0x1294ee(0x184)]('is-task-cancel'),!![]),a153_0x243494[_0x1294ee(0x1ae)](_0x9e6dbe[_0x1294ee(0x122)][_0x1294ee(0x199)],/v2-task-cancel-spin/),_0x9e6dbe[_0x1294ee(0x120)]=!![],_0x572b02[_0x1294ee(0x1f2)][_0x1294ee(0x145)](_0x9e6dbe),a153_0x243494['equal'](_0x9e6dbe['btnEl'][_0x1294ee(0x188)],!![]),a153_0x243494['equal'](_0x9e6dbe['btnEl']['style'][_0x1294ee(0x1d6)],'var(--unavailable-cursor)'),a153_0x243494[_0x1294ee(0x12c)](_0x9e6dbe[_0x1294ee(0x122)][_0x1294ee(0x1a9)][_0x1294ee(0x184)]('is-task-cancel'),!![]),_0x1ebd7f[_0x1294ee(0x128)][_0x4e3a46]={..._0x1ebd7f[_0x1294ee(0x128)][_0x4e3a46],'rhTaskStatus':_0x1294ee(0x15f),'jobStatus':_0x1294ee(0x19b),'isGenerating':!![]},_0x9e6dbe['_data']=_0x1ebd7f['nodes'][_0x4e3a46],_0x9e6dbe[_0x1294ee(0x120)]=![],_0x572b02[_0x1294ee(0x1f2)][_0x1294ee(0x145)](_0x9e6dbe),a153_0x243494[_0x1294ee(0x12c)](_0x9e6dbe[_0x1294ee(0x122)][_0x1294ee(0x1a9)]['contains'](_0x1294ee(0x1f7)),![]),a153_0x243494[_0x1294ee(0x1ce)](_0x9e6dbe[_0x1294ee(0x122)][_0x1294ee(0x199)],/v2-task-cancel-spin/);}),a153_0x258e6d('aigenImage\x20submit\x20button:\x20finished\x20async\x20status\x20is\x20terminal\x20and\x20unlocks\x20generation',()=>{const _0x1bb51f=a153_0x579833,_0x709995=_0x1bb51f(0x18b),_0x47ebac={'nodes':{[_0x709995]:{'id':_0x709995,'type':_0x1bb51f(0x13d),'model':_0x1bb51f(0x183),'provider':_0x1bb51f(0x1c6),'asyncTaskProvider':'grsai','asyncTaskKind':_0x1bb51f(0x1b0),'asyncTaskId':'task-finished','asyncTaskStatus':'finished','jobStatus':_0x1bb51f(0x14b),'isGenerating':!![]}}},_0x4153c0=createAIGenerateNodeUiModule({'store':{'getState':()=>_0x47ebac,'getIncomingEdges':()=>[]}}),_0x410155=Object[_0x1bb51f(0x181)](Object[_0x1bb51f(0x1d0)](_0x4153c0),{'nodeId':_0x709995,'_data':_0x47ebac[_0x1bb51f(0x128)][_0x709995],'promptEl':{'innerText':_0x1bb51f(0x179)},'btnEl':createIdleButtonStub(),'_isRunninghubWorkflowModel':()=>![]});_0x4153c0[_0x1bb51f(0x1f2)][_0x1bb51f(0x145)](_0x410155),a153_0x243494[_0x1bb51f(0x12c)](_0x410155[_0x1bb51f(0x122)][_0x1bb51f(0x188)],![]),a153_0x243494['equal'](_0x410155[_0x1bb51f(0x122)][_0x1bb51f(0x149)][_0x1bb51f(0x1d6)],''),a153_0x243494[_0x1bb51f(0x1ce)](_0x410155[_0x1bb51f(0x122)][_0x1bb51f(0x199)],/animation:spin/);}),a153_0x258e6d(a153_0x579833(0x1c3),()=>{const _0xcc023a=a153_0x579833,_0x1fc360=_0xcc023a(0x148),_0x5641ce='node-image-text-input-source',_0x19d72e={'nodes':{[_0x1fc360]:{'id':_0x1fc360,'type':_0xcc023a(0x13d),'model':_0xcc023a(0x1c0),'provider':'grsai'},[_0x5641ce]:{'id':_0x5641ce,'type':_0xcc023a(0x1cb),'text':_0xcc023a(0x1c7)}}},_0x293889=[{'id':'edge-image-text-input','sourceId':_0x5641ce,'targetId':_0x1fc360}],_0xb99df5=createAIGenerateNodeUiModule({'store':{'getState':()=>_0x19d72e,'getIncomingEdges':()=>_0x293889}}),_0x3fc97f=Object['assign'](Object['create'](_0xb99df5),{'nodeId':_0x1fc360,'_data':_0x19d72e[_0xcc023a(0x128)][_0x1fc360],'promptEl':{'innerText':'','childNodes':[]},'btnEl':createIdleButtonStub(),'_isRunninghubWorkflowModel':()=>![]});_0xb99df5[_0xcc023a(0x1f2)][_0xcc023a(0x145)](_0x3fc97f),a153_0x243494[_0xcc023a(0x12c)](_0x3fc97f[_0xcc023a(0x122)][_0xcc023a(0x188)],![]),a153_0x243494['equal'](_0x3fc97f['btnEl'][_0xcc023a(0x149)][_0xcc023a(0x1d6)],'');}),a153_0x258e6d(a153_0x579833(0x178),()=>{const _0x1dc0b7=a153_0x579833,_0x2d87d5=_0x1dc0b7(0x131),_0x2290ce=_0x1dc0b7(0x185),_0xe8657f={'nodes':{[_0x2d87d5]:{'id':_0x2d87d5,'type':_0x1dc0b7(0x13d),'model':_0x1dc0b7(0x16a),'provider':_0x1dc0b7(0x1bd)},[_0x2290ce]:{'id':_0x2290ce,'type':'source-image','imageUrl':_0x1dc0b7(0x121)}},'edges':{'edge-agnes-image-input':{'id':_0x1dc0b7(0x194),'sourceId':_0x2290ce,'targetId':_0x2d87d5}}},_0x4bfce4=Object[_0x1dc0b7(0x16d)](_0xe8657f[_0x1dc0b7(0x1bb)]),_0x5c9a8a=createAIGenerateNodeUiModule({'store':{'getState':()=>_0xe8657f,'getIncomingEdges':()=>_0x4bfce4}}),_0x4ba98e=Object[_0x1dc0b7(0x181)](Object[_0x1dc0b7(0x1d0)](_0x5c9a8a),{'nodeId':_0x2d87d5,'_data':_0xe8657f[_0x1dc0b7(0x128)][_0x2d87d5],'promptEl':{'innerText':'','childNodes':[]},'btnEl':createIdleButtonStub(),'_isRunninghubWorkflowModel':()=>![]});_0x5c9a8a['_updateSubmitButtonState'][_0x1dc0b7(0x145)](_0x4ba98e),a153_0x243494[_0x1dc0b7(0x12c)](_0x4ba98e[_0x1dc0b7(0x122)][_0x1dc0b7(0x188)],![]),a153_0x243494['equal'](_0x4ba98e[_0x1dc0b7(0x122)]['style']['cursor'],'');}),a153_0x258e6d(a153_0x579833(0x19d),()=>{const _0x2435fc=a153_0x579833,_0x4e1c81=_0x2435fc(0x190),_0x26f9c6={'nodes':{[_0x4e1c81]:{'id':_0x4e1c81,'model':'apimart/seedream-4.0','provider':_0x2435fc(0x1fd),'imageSize':'4K'}}},_0x50be3c=[],_0x50a697=createAIGenerateNodeUiModule({'store':{'getState':()=>_0x26f9c6,'updateNodeData':(_0x4ff014,_0x418030)=>_0x50be3c[_0x2435fc(0x17c)]({'id':_0x4ff014,'patch':_0x418030})}}),_0x2b7606=Object[_0x2435fc(0x181)](Object[_0x2435fc(0x1d0)](_0x50a697),{'nodeId':_0x4e1c81}),_0x58a07d=_0x50a697[_0x2435fc(0x1d7)][_0x2435fc(0x145)](_0x2b7606,_0x26f9c6['nodes'][_0x4e1c81]);a153_0x243494['equal'](_0x58a07d[_0x2435fc(0x191)],_0x2435fc(0x1a4)),a153_0x243494[_0x2435fc(0x12c)](_0x58a07d[_0x2435fc(0x11e)],_0x2435fc(0x1fd)),a153_0x243494[_0x2435fc(0x12c)](_0x58a07d['imageSize'],'4K'),a153_0x243494[_0x2435fc(0x1e6)](_0x50be3c,[]);}),a153_0x258e6d('aigenImage\x20state\x20sync:\x20person\x20replace\x20V3\x20fixed\x20image\x20slots\x20can\x20swap',async()=>{const _0x451cb0=a153_0x579833,_0x35a46b=globalThis['document'];globalThis[_0x451cb0(0x1d5)]={'createElement':_0x5354a3=>new FakeElement({'tagName':_0x5354a3})};const _0x28e85b=_0x451cb0(0x1d9);try{const _0x43ab1f={'selectedNodeIds':[],'pickConnectMode':{},'nodes':{[_0x28e85b]:{'id':_0x28e85b,'type':_0x451cb0(0x13d),'model':_0x451cb0(0x19e),'provider':'runninghubwf'},'imageA':{'id':'imageA','type':_0x451cb0(0x19c),'thumbLocalPath':'output/a-thumb.png','displayLocalPath':_0x451cb0(0x1b4),'originalLocalPath':_0x451cb0(0x196)},'imageB':{'id':'imageB','type':'source-image','thumbLocalPath':'output/b-thumb.png','displayLocalPath':_0x451cb0(0x13f),'originalLocalPath':'output/b.png'}},'edges':{'edgeA':{'id':_0x451cb0(0x126),'sourceId':_0x451cb0(0x1bc),'targetId':_0x28e85b,'refSlot':_0x451cb0(0x153)},'edgeB':{'id':_0x451cb0(0x1b1),'sourceId':'imageB','targetId':_0x28e85b,'refSlot':'replacedImage'}}},_0x442289=[],_0x8b05a={'getState':()=>_0x43ab1f,'getIncomingEdges':_0x58af13=>Object[_0x451cb0(0x16d)](_0x43ab1f[_0x451cb0(0x1bb)])[_0x451cb0(0x1e8)](_0x28fc0d=>_0x28fc0d[_0x451cb0(0x10b)]===_0x58af13),'updateEdgesBatch'(_0x376e61,_0x33c401){_0x442289['push']({'removeIds':_0x376e61,'addedEdges':_0x33c401});}},_0x587776=createAIGenerateNodeStateSyncModule({'store':_0x8b05a,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}}),_0x4625a0=new FakeElement({'className':_0x451cb0(0x116)}),_0x3eb4e9=Object[_0x451cb0(0x181)](Object['create'](_0x587776),{'nodeId':_0x28e85b,'_data':_0x43ab1f['nodes'][_0x28e85b],'_refThumbObjectUrls':new Map(),'refBarEl':_0x4625a0,'promptEl':{'innerText':'','querySelectorAll':()=>[]}});await _0x587776[_0x451cb0(0x11a)][_0x451cb0(0x145)](_0x3eb4e9);const _0xb86ac4=_0x4625a0[_0x451cb0(0x1d2)]('[data-ref-slot=\x22replaceTarget\x22]'),_0x107e38=_0x4625a0[_0x451cb0(0x1d2)](_0x451cb0(0x1fa)),_0x125490=_0x4625a0[_0x451cb0(0x1d2)](_0x451cb0(0x172));a153_0x243494[_0x451cb0(0x12c)](_0xb86ac4[_0x451cb0(0x1a1)]['slot'],_0x451cb0(0x153)),a153_0x243494['equal'](_0x107e38[_0x451cb0(0x1a1)][_0x451cb0(0x142)],_0x451cb0(0x1ba)),a153_0x243494[_0x451cb0(0x12c)](_0xb86ac4[_0x451cb0(0x1a1)][_0x451cb0(0x11f)],_0x451cb0(0x1b0)),a153_0x243494['equal'](_0x107e38[_0x451cb0(0x1a1)]['kind'],_0x451cb0(0x1b0)),a153_0x243494['equal'](_0xb86ac4[_0x451cb0(0x1be)]('draggable'),'true'),a153_0x243494['equal'](_0x107e38[_0x451cb0(0x1be)](_0x451cb0(0x1e7)),'true'),a153_0x243494[_0x451cb0(0x12c)](_0xb86ac4[_0x451cb0(0x1a9)]['contains'](_0x451cb0(0x124)),![]),a153_0x243494[_0x451cb0(0x12c)](_0x107e38[_0x451cb0(0x1a9)][_0x451cb0(0x184)](_0x451cb0(0x124)),![]),_0x125490[_0x451cb0(0x1dd)](_0x451cb0(0x1a7),createDragEvent(_0xb86ac4)),a153_0x243494[_0x451cb0(0x12c)](_0xb86ac4[_0x451cb0(0x1a9)][_0x451cb0(0x184)](_0x451cb0(0x1a3)),!![]),_0x125490[_0x451cb0(0x1dd)](_0x451cb0(0x1ac),createDragEvent(_0x107e38)),a153_0x243494[_0x451cb0(0x12c)](_0x107e38[_0x451cb0(0x1a9)][_0x451cb0(0x184)](_0x451cb0(0x170)),!![]),a153_0x243494['deepEqual'](_0x125490[_0x451cb0(0x193)][_0x451cb0(0x16e)](_0x4df815=>_0x4df815['dataset'][_0x451cb0(0x132)]||''),[_0x451cb0(0x126),_0x451cb0(0x1b1)]),_0x125490['dispatch'](_0x451cb0(0x186),createDragEvent(_0x107e38)),a153_0x243494[_0x451cb0(0x12c)](_0x107e38[_0x451cb0(0x1a9)][_0x451cb0(0x184)](_0x451cb0(0x170)),![]),_0x125490['dispatch'](_0x451cb0(0x129),createDragEvent(_0xb86ac4)),a153_0x243494[_0x451cb0(0x12c)](_0xb86ac4[_0x451cb0(0x1a9)]['contains'](_0x451cb0(0x1a3)),![]),a153_0x243494[_0x451cb0(0x12c)](_0x442289[_0x451cb0(0x1d8)],0x1),a153_0x243494[_0x451cb0(0x1e6)](_0x442289[0x0][_0x451cb0(0x19a)],['edgeA',_0x451cb0(0x1b1)]),a153_0x243494[_0x451cb0(0x1e6)](_0x442289[0x0][_0x451cb0(0x161)]['map'](_0x5c534f=>[_0x5c534f['id'],_0x5c534f[_0x451cb0(0x1b9)]]),[[_0x451cb0(0x126),'replacedImage'],[_0x451cb0(0x1b1),_0x451cb0(0x153)]]);for(const _0xb0fa64 of _0x442289[0x0][_0x451cb0(0x19a)]){delete _0x43ab1f[_0x451cb0(0x1bb)][_0xb0fa64];}for(const _0x3242ac of _0x442289[0x0][_0x451cb0(0x161)]){_0x43ab1f[_0x451cb0(0x1bb)][_0x3242ac['id']]=_0x3242ac;}await _0x587776[_0x451cb0(0x11a)][_0x451cb0(0x145)](_0x3eb4e9);const _0x2477b2=_0x4625a0[_0x451cb0(0x1d2)]('[data-ref-slot=\x22replaceTarget\x22]'),_0x1c964e=_0x4625a0[_0x451cb0(0x1d2)](_0x451cb0(0x1fa));a153_0x243494[_0x451cb0(0x12c)](_0x2477b2[_0x451cb0(0x1a1)][_0x451cb0(0x132)],_0x451cb0(0x1b1)),a153_0x243494[_0x451cb0(0x12c)](_0x2477b2['dataset'][_0x451cb0(0x17a)],_0x451cb0(0x118)),a153_0x243494[_0x451cb0(0x12c)](_0x1c964e['dataset']['edgeId'],_0x451cb0(0x126)),a153_0x243494[_0x451cb0(0x12c)](_0x1c964e[_0x451cb0(0x1a1)][_0x451cb0(0x17a)],'imageA');}finally{if(typeof _0x35a46b===_0x451cb0(0x1b7))delete globalThis['document'];else globalThis[_0x451cb0(0x1d5)]=_0x35a46b;}}),a153_0x258e6d(a153_0x579833(0x160),async()=>{const _0x4a1771=a153_0x579833,_0x434712=globalThis[_0x4a1771(0x1d5)];globalThis[_0x4a1771(0x1d5)]={'createElement':_0x38c30d=>new FakeElement({'tagName':_0x38c30d})};const _0x541f48=_0x4a1771(0x175);try{const _0x10d4cd={'selectedNodeIds':[_0x541f48],'pickConnectMode':{},'nodes':{[_0x541f48]:{'id':_0x541f48,'type':_0x4a1771(0x13d),'model':'runninghub-model/youchuan-v6','provider':'runninghub'},'mainImage':{'id':'mainImage','type':_0x4a1771(0x19c),'thumbLocalPath':_0x4a1771(0x159),'displayLocalPath':_0x4a1771(0x1eb),'originalLocalPath':_0x4a1771(0x1fb)},'styleImage':{'id':_0x4a1771(0x1a0),'type':_0x4a1771(0x19c),'thumbLocalPath':_0x4a1771(0x1bf),'displayLocalPath':'output/style-display.png','originalLocalPath':_0x4a1771(0x19f)}},'edges':{'edgeMain':{'id':_0x4a1771(0x189),'sourceId':_0x4a1771(0x114),'targetId':_0x541f48,'refSlot':_0x4a1771(0x10c)},'edgeStyle':{'id':_0x4a1771(0x15e),'sourceId':_0x4a1771(0x1a0),'targetId':_0x541f48,'refSlot':'sref'}}},_0xc061d1={'getState':()=>_0x10d4cd,'getStateRaw':()=>_0x10d4cd,'getIncomingEdges':_0x2b8f2b=>Object['values'](_0x10d4cd[_0x4a1771(0x1bb)])['filter'](_0x1895f8=>_0x1895f8[_0x4a1771(0x10b)]===_0x2b8f2b),'updateEdgesBatch'(){}},_0x499dfc=createAIGenerateNodeStateSyncModule({'store':_0xc061d1,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}}),_0x2837ef=new FakeElement({'className':_0x4a1771(0x116)}),_0x7d5e6c=Object[_0x4a1771(0x181)](Object['create'](_0x499dfc),{'nodeId':_0x541f48,'_data':_0x10d4cd[_0x4a1771(0x128)][_0x541f48],'_refThumbObjectUrls':new Map(),'refBarEl':_0x2837ef,'promptEl':{'innerText':'','querySelectorAll':()=>[]}});await _0x499dfc[_0x4a1771(0x11a)][_0x4a1771(0x145)](_0x7d5e6c);const _0xd6504b=_0x2837ef[_0x4a1771(0x1d2)](_0x4a1771(0x1dc)),_0xb32198=_0x2837ef[_0x4a1771(0x1d2)](_0x4a1771(0x1f8)),_0x40e18c=_0x2837ef[_0x4a1771(0x1d2)](_0x4a1771(0x198));a153_0x243494[_0x4a1771(0x12c)](_0xd6504b['dataset']['edgeId'],_0x4a1771(0x189)),a153_0x243494['equal'](_0xd6504b[_0x4a1771(0x1a1)][_0x4a1771(0x11f)],_0x4a1771(0x1b0)),a153_0x243494[_0x4a1771(0x12c)](_0xb32198['classList']['contains']('ref-upload-slot'),!![]),a153_0x243494[_0x4a1771(0x12c)](_0x40e18c[_0x4a1771(0x1a1)][_0x4a1771(0x132)],_0x4a1771(0x15e)),a153_0x243494[_0x4a1771(0x12c)](_0x40e18c['dataset'][_0x4a1771(0x17a)],_0x4a1771(0x1a0));}finally{if(typeof _0x434712==='undefined')delete globalThis[_0x4a1771(0x1d5)];else globalThis[_0x4a1771(0x1d5)]=_0x434712;}}),a153_0x258e6d(a153_0x579833(0x1a5),async()=>{const _0x3c6b0f=a153_0x579833,_0xfabdf8=globalThis['document'];globalThis[_0x3c6b0f(0x1d5)]={'createElement':_0x8ccf66=>new FakeElement({'tagName':_0x8ccf66})};const _0x2666e6=_0x3c6b0f(0x18d);try{const _0x1d5575={'selectedNodeIds':[_0x2666e6],'pickConnectMode':{},'nodes':{[_0x2666e6]:{'id':_0x2666e6,'type':_0x3c6b0f(0x13d),'model':_0x3c6b0f(0x1aa),'provider':_0x3c6b0f(0x14c)},'mainImage':{'id':_0x3c6b0f(0x114),'type':_0x3c6b0f(0x19c),'thumbLocalPath':_0x3c6b0f(0x159),'displayLocalPath':'output/main-display.png','originalLocalPath':'output/main.png'},'styleImage':{'id':_0x3c6b0f(0x1a0),'type':'source-image','thumbLocalPath':_0x3c6b0f(0x1bf),'displayLocalPath':_0x3c6b0f(0x16c),'originalLocalPath':_0x3c6b0f(0x19f)}},'edges':{'edgeMain':{'id':_0x3c6b0f(0x189),'sourceId':_0x3c6b0f(0x114),'targetId':_0x2666e6,'refSlot':'imageUrl'},'edgeStyle':{'id':_0x3c6b0f(0x15e),'sourceId':_0x3c6b0f(0x1a0),'targetId':_0x2666e6,'refSlot':_0x3c6b0f(0x1c5)}}},_0xe38013={'getState':()=>_0x1d5575,'getStateRaw':()=>_0x1d5575,'getIncomingEdges':_0x36d3c9=>Object[_0x3c6b0f(0x16d)](_0x1d5575[_0x3c6b0f(0x1bb)])[_0x3c6b0f(0x1e8)](_0x3c93e2=>_0x3c93e2[_0x3c6b0f(0x10b)]===_0x36d3c9),'updateEdgesBatch'(){}},_0x4efddc=createAIGenerateNodeStateSyncModule({'store':_0xe38013,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}}),_0x1cc0b6=new FakeElement({'className':'node-ref-bar'}),_0x2a21f9=Object[_0x3c6b0f(0x181)](Object[_0x3c6b0f(0x1d0)](_0x4efddc),{'nodeId':_0x2666e6,'_data':_0x1d5575[_0x3c6b0f(0x128)][_0x2666e6],'_refThumbObjectUrls':new Map(),'refBarEl':_0x1cc0b6,'promptEl':{'innerText':'','querySelectorAll':()=>[]}});await _0x4efddc[_0x3c6b0f(0x11a)][_0x3c6b0f(0x145)](_0x2a21f9);const _0x36dcb=_0x1cc0b6[_0x3c6b0f(0x1d2)](_0x3c6b0f(0x1dc)),_0x1ff559=_0x1cc0b6['querySelector'](_0x3c6b0f(0x1f8)),_0x11cdce=_0x1cc0b6[_0x3c6b0f(0x1d2)](_0x3c6b0f(0x198));a153_0x243494[_0x3c6b0f(0x12c)](_0x36dcb[_0x3c6b0f(0x1a1)][_0x3c6b0f(0x132)],_0x3c6b0f(0x189)),a153_0x243494[_0x3c6b0f(0x12c)](_0x36dcb[_0x3c6b0f(0x1a1)][_0x3c6b0f(0x11f)],_0x3c6b0f(0x1b0)),a153_0x243494['equal'](_0x1ff559,null),a153_0x243494[_0x3c6b0f(0x12c)](_0x11cdce[_0x3c6b0f(0x1a1)][_0x3c6b0f(0x132)],_0x3c6b0f(0x15e)),a153_0x243494['equal'](_0x11cdce['dataset'][_0x3c6b0f(0x17a)],_0x3c6b0f(0x1a0));}finally{if(typeof _0xfabdf8===_0x3c6b0f(0x1b7))delete globalThis['document'];else globalThis['document']=_0xfabdf8;}}),a153_0x258e6d(a153_0x579833(0x167),async()=>{const _0x41bc1d=a153_0x579833,_0x457f63=globalThis[_0x41bc1d(0x1d5)];globalThis['document']={'createElement':_0x10438a=>new FakeElement({'tagName':_0x10438a})};const _0x3170ec=_0x41bc1d(0x137);try{const _0x372c4a={'selectedNodeIds':[_0x3170ec],'pickConnectMode':{},'nodes':{[_0x3170ec]:{'id':_0x3170ec,'type':'ai-image','model':'runninghub-model/rhart-image-g','provider':_0x41bc1d(0x14c)},'refImage':{'id':'refImage','type':_0x41bc1d(0x19c),'thumbLocalPath':_0x41bc1d(0x12f),'displayLocalPath':'output/ref-display.png','originalLocalPath':'output/ref.png'}},'edges':{'edgeRef':{'id':_0x41bc1d(0x165),'sourceId':_0x41bc1d(0x14f),'targetId':_0x3170ec,'refSlot':_0x41bc1d(0x10c)}}},_0x291b45={'getState':()=>_0x372c4a,'getStateRaw':()=>_0x372c4a,'getIncomingEdges':_0x1ed13c=>Object[_0x41bc1d(0x16d)](_0x372c4a[_0x41bc1d(0x1bb)])['filter'](_0x33efd1=>_0x33efd1['targetId']===_0x1ed13c),'updateEdgesBatch'(){}},_0x44567c=createAIGenerateNodeStateSyncModule({'store':_0x291b45,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}}),_0x40b651=new FakeElement({'className':_0x41bc1d(0x116)}),_0x3bc42f=Object[_0x41bc1d(0x181)](Object['create'](_0x44567c),{'nodeId':_0x3170ec,'_data':_0x372c4a['nodes'][_0x3170ec],'_refThumbObjectUrls':new Map(),'refBarEl':_0x40b651,'promptEl':{'innerText':'','querySelectorAll':()=>[]}});await _0x44567c[_0x41bc1d(0x11a)]['call'](_0x3bc42f);const _0x139a9b=_0x40b651[_0x41bc1d(0x1d2)](_0x41bc1d(0x1dc)),_0x1fc669=_0x40b651[_0x41bc1d(0x1d2)]('[data-ref-slot=\x22sref\x22]');a153_0x243494[_0x41bc1d(0x12c)](_0x139a9b[_0x41bc1d(0x1a1)][_0x41bc1d(0x132)],_0x41bc1d(0x165)),a153_0x243494[_0x41bc1d(0x12c)](_0x139a9b[_0x41bc1d(0x1a1)]['kind'],'image'),a153_0x243494[_0x41bc1d(0x12c)](_0x1fc669,null);}finally{if(typeof _0x457f63==='undefined')delete globalThis[_0x41bc1d(0x1d5)];else globalThis[_0x41bc1d(0x1d5)]=_0x457f63;}}),a153_0x258e6d(a153_0x579833(0x17b),()=>{const _0x2600e3=a153_0x579833,_0x5d25b3=globalThis['document'],_0x391207=_0x2600e3(0x1ab),_0x571ee4={'selectedNodeIds':[_0x391207],'pickConnectMode':{},'nodes':{[_0x391207]:{'id':_0x391207,'type':'ai-image','model':'runninghub/2041177685895946242','provider':_0x2600e3(0x1f0)},'imageA':{'id':'imageA','type':'source-image','_bizRev':0x1},'imageB':{'id':_0x2600e3(0x118),'type':_0x2600e3(0x19c),'_bizRev':0x1}},'edges':{'edgeA':{'id':'edgeA','sourceId':_0x2600e3(0x1bc),'targetId':_0x391207,'refSlot':_0x2600e3(0x153)},'edgeB':{'id':_0x2600e3(0x1b1),'sourceId':_0x2600e3(0x118),'targetId':_0x391207,'refSlot':_0x2600e3(0x1ba)}}};try{globalThis[_0x2600e3(0x1d5)]={'activeElement':null};const _0x379a21={'getState':()=>_0x571ee4,'getStateRaw':()=>_0x571ee4,'getIncomingEdges':_0x558abe=>Object[_0x2600e3(0x16d)](_0x571ee4[_0x2600e3(0x1bb)])[_0x2600e3(0x1e8)](_0x42135c=>_0x42135c['targetId']===_0x558abe)},_0x20dc03=createAIGenerateNodeStateSyncModule({'store':_0x379a21,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}});let _0x3f6928=0x0;const _0x11c3eb=Object[_0x2600e3(0x181)](Object[_0x2600e3(0x1d0)](_0x20dc03),{'nodeId':_0x391207,'_data':_0x571ee4[_0x2600e3(0x128)][_0x391207],'promptEl':{'innerHTML':'','querySelectorAll':()=>[]},'_normalizeDreaminaNodeData':_0x4dbd41=>_0x4dbd41,'_loadAndDisplayImage':()=>{},'_applyMaskPreview':()=>{},'_applyModelParamVisibility':()=>{},'_updateSubmitButtonState':()=>{},'_renderRefBar':()=>{_0x3f6928+=0x1;}});_0x20dc03[_0x2600e3(0x187)][_0x2600e3(0x145)](_0x11c3eb,_0x571ee4[_0x2600e3(0x128)][_0x391207]),a153_0x243494['equal'](_0x3f6928,0x1),_0x571ee4[_0x2600e3(0x1bb)]['edgeA']={..._0x571ee4[_0x2600e3(0x1bb)][_0x2600e3(0x126)],'refSlot':_0x2600e3(0x1ba)},_0x571ee4[_0x2600e3(0x1bb)][_0x2600e3(0x1b1)]={..._0x571ee4[_0x2600e3(0x1bb)][_0x2600e3(0x1b1)],'refSlot':_0x2600e3(0x153)},_0x20dc03[_0x2600e3(0x187)][_0x2600e3(0x145)](_0x11c3eb,_0x571ee4[_0x2600e3(0x128)][_0x391207]),a153_0x243494[_0x2600e3(0x12c)](_0x3f6928,0x2);}finally{if(typeof _0x5d25b3==='undefined')delete globalThis['document'];else globalThis[_0x2600e3(0x1d5)]=_0x5d25b3;}}),a153_0x258e6d(a153_0x579833(0x1f6),()=>{const _0x344694=a153_0x579833,_0x4d61f4=globalThis[_0x344694(0x1d5)],_0x3628fd=_0x344694(0x1ed),_0x583a8d={'selectedNodeIds':[_0x3628fd],'pickConnectMode':{},'nodes':{[_0x3628fd]:{'id':_0x3628fd,'type':_0x344694(0x13d),'model':_0x344694(0x15c),'provider':_0x344694(0x1fd)},'imageA':{'id':_0x344694(0x1bc),'type':_0x344694(0x19c),'_bizRev':0x1},'imageB':{'id':_0x344694(0x118),'type':_0x344694(0x19c),'_bizRev':0x1}},'edges':{'edgeA':{'id':_0x344694(0x126),'sourceId':_0x344694(0x1bc),'targetId':_0x3628fd},'edgeB':{'id':_0x344694(0x1b1),'sourceId':'imageB','targetId':_0x3628fd}}};try{globalThis['document']={'activeElement':null};const _0xae1aa2={'getState':()=>_0x583a8d,'getStateRaw':()=>_0x583a8d,'getIncomingEdges':_0x127c52=>Object[_0x344694(0x16d)](_0x583a8d[_0x344694(0x1bb)])['filter'](_0x10db6f=>_0x10db6f[_0x344694(0x10b)]===_0x127c52)},_0x579f74=createAIGenerateNodeStateSyncModule({'store':_0xae1aa2,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}});let _0x3ad9ff=0x0;const _0x38c430=Object[_0x344694(0x181)](Object[_0x344694(0x1d0)](_0x579f74),{'nodeId':_0x3628fd,'_data':_0x583a8d[_0x344694(0x128)][_0x3628fd],'promptEl':{'innerHTML':'','querySelectorAll':()=>[]},'_normalizeDreaminaNodeData':_0x3e248d=>_0x3e248d,'_loadAndDisplayImage':()=>{},'_applyMaskPreview':()=>{},'_applyModelParamVisibility':()=>{},'_updateSubmitButtonState':()=>{},'_renderRefBar':()=>{_0x3ad9ff+=0x1;}});_0x579f74[_0x344694(0x187)][_0x344694(0x145)](_0x38c430,_0x583a8d[_0x344694(0x128)][_0x3628fd]),a153_0x243494['equal'](_0x3ad9ff,0x1),_0x583a8d[_0x344694(0x1bb)]={'edgeB':_0x583a8d[_0x344694(0x1bb)][_0x344694(0x1b1)],'edgeA':_0x583a8d['edges'][_0x344694(0x126)]},_0x579f74[_0x344694(0x187)][_0x344694(0x145)](_0x38c430,_0x583a8d[_0x344694(0x128)][_0x3628fd]),a153_0x243494[_0x344694(0x12c)](_0x3ad9ff,0x2);}finally{if(typeof _0x4d61f4===_0x344694(0x1b7))delete globalThis[_0x344694(0x1d5)];else globalThis['document']=_0x4d61f4;}}),a153_0x258e6d('aigenImage\x20state\x20sync:\x20person\x20replace\x20V2.1\x20model\x20keeps\x20empty\x20upload\x20slot',async()=>{const _0x162d18=a153_0x579833,_0x590a0b=globalThis['document'];globalThis[_0x162d18(0x1d5)]={'createElement':_0xead6d5=>new FakeElement({'tagName':_0xead6d5})};const _0x4c2b5f=_0x162d18(0x1e9);try{const _0x544d62={'selectedNodeIds':[],'pickConnectMode':{},'nodes':{[_0x4c2b5f]:{'id':_0x4c2b5f,'type':_0x162d18(0x13d),'model':'runninghub/2050313968069165058','provider':_0x162d18(0x1f0)},'imageA':{'id':_0x162d18(0x1bc),'type':_0x162d18(0x19c),'thumbLocalPath':_0x162d18(0x1c8),'displayLocalPath':'output/a-display.png','originalLocalPath':'output/a.png'}},'edges':{'edgeA':{'id':_0x162d18(0x126),'sourceId':'imageA','targetId':_0x4c2b5f,'refSlot':_0x162d18(0x153)}}},_0x109f91={'getState':()=>_0x544d62,'getIncomingEdges':_0x4d9fa5=>Object[_0x162d18(0x16d)](_0x544d62['edges'])[_0x162d18(0x1e8)](_0x104a1f=>_0x104a1f[_0x162d18(0x10b)]===_0x4d9fa5),'updateEdgesBatch'(){}},_0x8ea6c7=createAIGenerateNodeStateSyncModule({'store':_0x109f91,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}}),_0x5767e7=new FakeElement({'className':_0x162d18(0x116)}),_0x422329=Object[_0x162d18(0x181)](Object[_0x162d18(0x1d0)](_0x8ea6c7),{'nodeId':_0x4c2b5f,'_data':_0x544d62[_0x162d18(0x128)][_0x4c2b5f],'_refThumbObjectUrls':new Map(),'refBarEl':_0x5767e7,'promptEl':{'innerText':'','querySelectorAll':()=>[]}});await _0x8ea6c7['_renderRefBarImpl']['call'](_0x422329);const _0x11b0c0=_0x5767e7['querySelector']('[data-ref-slot=\x22replaceTarget\x22]'),_0x4c88ee=_0x5767e7[_0x162d18(0x1d2)](_0x162d18(0x1fa));a153_0x243494[_0x162d18(0x12c)](_0x11b0c0['classList'][_0x162d18(0x184)](_0x162d18(0x124)),![]),a153_0x243494[_0x162d18(0x12c)](_0x11b0c0[_0x162d18(0x1be)]('draggable'),_0x162d18(0x169)),a153_0x243494[_0x162d18(0x12c)](_0x4c88ee[_0x162d18(0x1a9)][_0x162d18(0x184)](_0x162d18(0x124)),!![]),a153_0x243494[_0x162d18(0x12c)](_0x4c88ee['dataset'][_0x162d18(0x1b9)],_0x162d18(0x1ba)),a153_0x243494[_0x162d18(0x12c)](_0x4c88ee[_0x162d18(0x1a1)]['slot'],_0x162d18(0x1ba)),a153_0x243494['equal'](_0x4c88ee['dataset']['kind'],_0x162d18(0x1b0)),a153_0x243494['equal'](_0x4c88ee[_0x162d18(0x1be)](_0x162d18(0x1e7)),_0x162d18(0x192));}finally{if(typeof _0x590a0b===_0x162d18(0x1b7))delete globalThis['document'];else globalThis[_0x162d18(0x1d5)]=_0x590a0b;}}),a153_0x258e6d(a153_0x579833(0x177),async()=>{const _0x57deac=a153_0x579833,_0xb3bf0c=globalThis[_0x57deac(0x1d5)],_0x3577bb=_0x57deac(0x1e2),_0xdadbc1={'pickConnectMode':{},'nodes':{[_0x3577bb]:{'id':_0x3577bb,'type':_0x57deac(0x13d),'model':_0x57deac(0x10a),'provider':_0x57deac(0x1f0),'aspectRatio':_0x57deac(0x1ca)},'imageA':{'id':_0x57deac(0x1bc),'type':'source-image','width':0x384,'height':0x640,'_bizRev':0x1},'imageB':{'id':'imageB','type':_0x57deac(0x19c),'width':0x640,'height':0x384,'_bizRev':0x1}},'edges':{'edgeA':{'id':_0x57deac(0x126),'sourceId':_0x57deac(0x1bc),'targetId':_0x3577bb}}};try{globalThis[_0x57deac(0x1d5)]={'activeElement':null,'createElement':_0x37ddfa=>new FakeElement({'tagName':_0x37ddfa})};const _0x176c53={'getState':()=>_0xdadbc1,'getIncomingEdges':_0x520aea=>Object['values'](_0xdadbc1[_0x57deac(0x1bb)])['filter'](_0x15d31e=>_0x15d31e[_0x57deac(0x10b)]===_0x520aea)},_0x323957=createAIGenerateNodeStateSyncModule({'store':_0x176c53,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}});let _0x2b0796=0x0;const _0x3dec7c=Object[_0x57deac(0x181)](Object['create'](_0x323957),{'nodeId':_0x3577bb,'_data':_0xdadbc1[_0x57deac(0x128)][_0x3577bb],'refBarEl':new FakeElement(),'_refThumbObjectUrls':new Map(),'runAdaptiveRatio':()=>{_0x2b0796+=0x1;},'promptEl':{'innerText':'','querySelectorAll':()=>[]}});await _0x323957[_0x57deac(0x11a)][_0x57deac(0x145)](_0x3dec7c),await new Promise(_0x3cb921=>setTimeout(_0x3cb921,0x46)),a153_0x243494['equal'](_0x2b0796,0x1),_0xdadbc1[_0x57deac(0x1bb)][_0x57deac(0x126)]={..._0xdadbc1['edges'][_0x57deac(0x126)],'sourceId':_0x57deac(0x118)},await _0x323957[_0x57deac(0x11a)][_0x57deac(0x145)](_0x3dec7c),await new Promise(_0x54c533=>setTimeout(_0x54c533,0x46)),a153_0x243494[_0x57deac(0x12c)](_0x2b0796,0x2);}finally{if(typeof _0xb3bf0c===_0x57deac(0x1b7))delete globalThis[_0x57deac(0x1d5)];else globalThis[_0x57deac(0x1d5)]=_0xb3bf0c;}}),a153_0x258e6d(a153_0x579833(0x15b),async()=>{const _0x3c13db=a153_0x579833,_0x1f8fc7=globalThis['document'],_0x332819=_0x3c13db(0x111),_0x584ca0={'pickConnectMode':{},'nodes':{[_0x332819]:{'id':_0x332819,'type':_0x3c13db(0x13d),'model':'apimart/nano-banana-2','provider':_0x3c13db(0x1fd),'generationParams':{'aspectRatio':_0x3c13db(0x1ca)}},'group':{'id':_0x3c13db(0x133),'type':_0x3c13db(0x133)},'imageA':{'id':_0x3c13db(0x1bc),'type':_0x3c13db(0x19c),'parentId':'group','width':0x384,'height':0x640,'_bizRev':0x1},'imageB':{'id':_0x3c13db(0x118),'type':_0x3c13db(0x19c),'parentId':_0x3c13db(0x133),'width':0x640,'height':0x384,'_bizRev':0x1}},'edges':{'groupEdge':{'id':'groupEdge','sourceId':'group','targetId':_0x332819,'groupOutputSourceOrder':['imageA',_0x3c13db(0x118)]}}},_0x9e15ff=()=>_0x584ca0[_0x3c13db(0x1bb)][_0x3c13db(0x171)][_0x3c13db(0x180)][_0x3c13db(0x16e)](_0x44d013=>({..._0x584ca0[_0x3c13db(0x1bb)][_0x3c13db(0x171)],'id':_0x3c13db(0x134)+_0x44d013,'sourceId':_0x44d013,'isGroupOutput':!![],'outputGroupId':_0x3c13db(0x133),'groupOutputEdgeId':'groupEdge','effectiveTargetId':_0x332819}));try{globalThis[_0x3c13db(0x1d5)]={'activeElement':null,'createElement':_0x5a6d3d=>new FakeElement({'tagName':_0x5a6d3d})};const _0x5b4053={'getState':()=>_0x584ca0,'getIncomingEdges':_0x2ca069=>_0x2ca069===_0x332819?_0x9e15ff():[]},_0x1ba444=createAIGenerateNodeStateSyncModule({'store':_0x5b4053,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}});let _0x100959=0x0;const _0x2c0b46=Object[_0x3c13db(0x181)](Object[_0x3c13db(0x1d0)](_0x1ba444),{'nodeId':_0x332819,'_data':_0x584ca0['nodes'][_0x332819],'refBarEl':new FakeElement(),'_refThumbObjectUrls':new Map(),'runAdaptiveRatio':()=>{_0x100959+=0x1;},'promptEl':{'innerText':'','querySelectorAll':()=>[]}});await _0x1ba444[_0x3c13db(0x11a)][_0x3c13db(0x145)](_0x2c0b46),await new Promise(_0x421f4c=>setTimeout(_0x421f4c,0x46)),a153_0x243494[_0x3c13db(0x12c)](_0x100959,0x1),_0x584ca0['edges'][_0x3c13db(0x171)]={..._0x584ca0[_0x3c13db(0x1bb)][_0x3c13db(0x171)],'groupOutputSourceOrder':[_0x3c13db(0x118),_0x3c13db(0x1bc)]},await _0x1ba444[_0x3c13db(0x11a)][_0x3c13db(0x145)](_0x2c0b46),await new Promise(_0x46d55c=>setTimeout(_0x46d55c,0x46)),a153_0x243494['equal'](_0x100959,0x2);}finally{if(typeof _0x1f8fc7===_0x3c13db(0x1b7))delete globalThis['document'];else globalThis[_0x3c13db(0x1d5)]=_0x1f8fc7;}}),a153_0x258e6d(a153_0x579833(0x140),async()=>{const _0xc7ed04=a153_0x579833,_0x748806=globalThis[_0xc7ed04(0x1d5)],_0x4d6adb='schema-image-node',_0x3563dc={'pickConnectMode':{},'selectedNodeIds':[],'nodes':{[_0x4d6adb]:{'id':_0x4d6adb,'type':'ai-image','model':_0xc7ed04(0x15c),'provider':_0xc7ed04(0x1fd),'generationParams':{'aspectRatio':_0xc7ed04(0x1ca)}},'group':{'id':_0xc7ed04(0x133),'type':_0xc7ed04(0x133)},'imageA':{'id':_0xc7ed04(0x1bc),'type':_0xc7ed04(0x19c),'parentId':_0xc7ed04(0x133),'width':0x384,'height':0x640,'_bizRev':0x1},'imageB':{'id':_0xc7ed04(0x118),'type':_0xc7ed04(0x19c),'parentId':_0xc7ed04(0x133),'width':0x640,'height':0x384,'_bizRev':0x1}},'edges':{'groupEdge':{'id':_0xc7ed04(0x171),'sourceId':'group','targetId':_0x4d6adb,'groupOutputSourceOrder':['imageA','imageB']}}},_0x33d009=()=>_0x3563dc[_0xc7ed04(0x1bb)][_0xc7ed04(0x171)][_0xc7ed04(0x180)][_0xc7ed04(0x1e8)](_0x412029=>_0x3563dc[_0xc7ed04(0x128)][_0x412029]?.['parentId']===_0xc7ed04(0x133))[_0xc7ed04(0x16e)](_0x421dd6=>({..._0x3563dc[_0xc7ed04(0x1bb)][_0xc7ed04(0x171)],'id':_0xc7ed04(0x134)+_0x421dd6,'sourceId':_0x421dd6,'isGroupOutput':!![],'outputGroupId':_0xc7ed04(0x133),'groupOutputEdgeId':_0xc7ed04(0x171),'effectiveTargetId':_0x4d6adb}));try{globalThis[_0xc7ed04(0x1d5)]={'activeElement':null,'createElement':_0x22b251=>new FakeElement({'tagName':_0x22b251})};const _0x421c20={'getState':()=>_0x3563dc,'getIncomingEdges':_0x47c5ff=>_0x47c5ff===_0x4d6adb?_0x33d009():[]},_0x60a7bb=createAIGenerateNodeStateSyncModule({'store':_0x421c20,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{},'getDisplayModelName':_0x57af56=>_0x57af56});let _0x33947d=0x0,_0x1c61a4=0x0;const _0x4c117e=Object[_0xc7ed04(0x181)](Object[_0xc7ed04(0x1d0)](_0x60a7bb),{'nodeId':_0x4d6adb,'_data':_0x3563dc[_0xc7ed04(0x128)][_0x4d6adb],'_root':new FakeElement(),'_refThumbObjectUrls':new Map(),'_normalizeDreaminaNodeData':_0x4a3204=>_0x4a3204,'_loadAndDisplayImage':()=>{},'_applyMaskPreview':()=>{},'_applyModelParamVisibility':()=>{},'_updateSubmitButtonState':()=>{},'_renderRefBar':()=>{_0x1c61a4+=0x1;},'runAdaptiveRatio':()=>{_0x33947d+=0x1;},'promptEl':{'innerHTML':'','innerText':'','querySelectorAll':()=>[]}});_0x60a7bb[_0xc7ed04(0x187)]['call'](_0x4c117e,_0x3563dc[_0xc7ed04(0x128)][_0x4d6adb]),await new Promise(_0x393ec3=>setTimeout(_0x393ec3,0x46)),a153_0x243494['equal'](_0x33947d,0x1),a153_0x243494['equal'](_0x1c61a4,0x0),_0x3563dc[_0xc7ed04(0x128)][_0xc7ed04(0x1bc)]={..._0x3563dc[_0xc7ed04(0x128)][_0xc7ed04(0x1bc)],'parentId':''},_0x60a7bb[_0xc7ed04(0x187)][_0xc7ed04(0x145)](_0x4c117e,_0x3563dc[_0xc7ed04(0x128)][_0x4d6adb]),await new Promise(_0x5a187b=>setTimeout(_0x5a187b,0x46)),a153_0x243494[_0xc7ed04(0x12c)](_0x33947d,0x2),a153_0x243494['equal'](_0x1c61a4,0x0);}finally{if(typeof _0x748806===_0xc7ed04(0x1b7))delete globalThis['document'];else globalThis['document']=_0x748806;}}),a153_0x258e6d(a153_0x579833(0x1ec),async()=>{const _0x4aedcf=a153_0x579833,_0x5d0f3e=globalThis[_0x4aedcf(0x1d5)],_0x1d8c8c='schema-image-node',_0x467780={'pickConnectMode':{},'nodes':{[_0x1d8c8c]:{'id':_0x1d8c8c,'type':'ai-image','model':_0x4aedcf(0x15c),'provider':'apimart','generationParams':{'aspectRatio':_0x4aedcf(0x1ca)}},'imageA':{'id':_0x4aedcf(0x1bc),'type':_0x4aedcf(0x19c),'width':0x384,'height':0x640,'_bizRev':0x1},'imageB':{'id':_0x4aedcf(0x118),'type':_0x4aedcf(0x19c),'width':0x640,'height':0x384,'_bizRev':0x1}},'edges':{'edgeA':{'id':'edgeA','sourceId':_0x4aedcf(0x1bc),'targetId':_0x1d8c8c}}};try{globalThis['document']={'activeElement':null,'createElement':_0x1fb288=>new FakeElement({'tagName':_0x1fb288})};const _0x2128f4={'getState':()=>_0x467780,'getIncomingEdges':_0x48526f=>Object['values'](_0x467780['edges'])[_0x4aedcf(0x1e8)](_0x46697d=>_0x46697d['targetId']===_0x48526f)},_0x419840=createAIGenerateNodeStateSyncModule({'store':_0x2128f4,'getImage':async()=>null,'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}});let _0x350a3c=0x0;const _0x20abc2=Object[_0x4aedcf(0x181)](Object['create'](_0x419840),{'nodeId':_0x1d8c8c,'_data':_0x467780[_0x4aedcf(0x128)][_0x1d8c8c],'refBarEl':new FakeElement(),'_refThumbObjectUrls':new Map(),'runAdaptiveRatio':()=>{_0x350a3c+=0x1;},'promptEl':{'innerText':'','querySelectorAll':()=>[]}});await _0x419840[_0x4aedcf(0x11a)][_0x4aedcf(0x145)](_0x20abc2),await new Promise(_0x4ae5c8=>setTimeout(_0x4ae5c8,0x46)),a153_0x243494[_0x4aedcf(0x12c)](_0x350a3c,0x1),_0x467780[_0x4aedcf(0x128)][_0x1d8c8c]['generationParams'][_0x4aedcf(0x1f9)]='16:9',_0x467780[_0x4aedcf(0x1bb)]['edgeA']={..._0x467780[_0x4aedcf(0x1bb)][_0x4aedcf(0x126)],'sourceId':_0x4aedcf(0x118)},await _0x419840['_renderRefBarImpl']['call'](_0x20abc2),await new Promise(_0x4ad844=>setTimeout(_0x4ad844,0x46)),a153_0x243494[_0x4aedcf(0x12c)](_0x350a3c,0x1);}finally{if(typeof _0x5d0f3e==='undefined')delete globalThis[_0x4aedcf(0x1d5)];else globalThis['document']=_0x5d0f3e;}});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createAIGenerateNodeStateSyncModule, resolveRefImageRenderSources } from './stateSyncModule.js';
+import { createAIGenerateNodeUiModule } from './uiModule.js';
+function createButtonStub() {
+  const _0x975765 = new Set(['is-rh-busy']);
+  return {
+    disabled: true,
+    title: 'busy',
+    innerHTML: '<svg style="animation:spin 1s linear infinite"></svg>',
+    style: { color: 'var(--white)', cursor: '' },
+    classList: {
+      add(_0x1355df) {
+        _0x975765.add(String(_0x1355df || ''));
+      },
+      remove(_0x21202c) {
+        _0x975765.delete(String(_0x21202c || ''));
+      },
+      contains(_0xf630f6) {
+        return _0x975765.has(String(_0xf630f6 || ''));
+      },
+    },
+  };
+}
+function createIdleButtonStub() {
+  const _0xd20871 = new Set();
+  return {
+    disabled: false,
+    title: '',
+    innerHTML: '',
+    style: { color: '', cursor: '' },
+    dataset: {},
+    classList: {
+      add(..._0x562a7a) {
+        _0x562a7a.forEach((_0x4643c0) => _0xd20871.add(String(_0x4643c0 || '')));
+      },
+      remove(..._0xb4ea85) {
+        _0xb4ea85.forEach((_0x4ee748) => _0xd20871.delete(String(_0x4ee748 || '')));
+      },
+      toggle(_0x95cec1, _0x3df5e4) {
+        const _0x940a2a = String(_0x95cec1 || '');
+        if (_0x3df5e4 === true) return (_0xd20871.add(_0x940a2a), true);
+        if (_0x3df5e4 === false) return (_0xd20871.delete(_0x940a2a), false);
+        if (_0xd20871.has(_0x940a2a)) return (_0xd20871.delete(_0x940a2a), false);
+        return (_0xd20871.add(_0x940a2a), true);
+      },
+      contains(_0x192c3a) {
+        return _0xd20871.has(String(_0x192c3a || ''));
+      },
+    },
+    setAttribute(_0x5ec390, _0xbe655d) {
+      this.dataset[String(_0x5ec390 || '')] = String(_0xbe655d || '');
+    },
+    removeAttribute(_0x2f7817) {
+      delete this.dataset[String(_0x2f7817 || '')];
+    },
+  };
+}
+class FakeClassList {
+  constructor(_0x1631f5) {
+    this.owner = _0x1631f5;
+  }
+  ['_tokens']() {
+    return String(this.owner.className || '')
+      .split(/\s+/)
+      .filter(Boolean);
+  }
+  ['contains'](_0x2f49e9) {
+    return this._tokens().includes(String(_0x2f49e9 || ''));
+  }
+  ['add'](..._0xd11679) {
+    const _0x31e5ec = new Set(this._tokens());
+    (_0xd11679.forEach((_0x4932d6) => _0x31e5ec.add(String(_0x4932d6 || ''))),
+      (this.owner.className = Array.from(_0x31e5ec).join(' ')));
+  }
+  ['remove'](..._0x3ee8c8) {
+    const _0x5851f0 = new Set(_0x3ee8c8.map((_0x50a922) => String(_0x50a922 || '')));
+    this.owner.className = this._tokens()
+      .filter((_0x1584b4) => !_0x5851f0.has(_0x1584b4))
+      .join(' ');
+  }
+  ['toggle'](_0x422156, _0x19072f) {
+    const _0x11d796 = String(_0x422156 || ''),
+      _0x248362 = this.contains(_0x11d796),
+      _0x272188 = _0x19072f === undefined ? !_0x248362 : Boolean(_0x19072f);
+    if (_0x272188) this.add(_0x11d796);
+    else this.remove(_0x11d796);
+    return _0x272188;
+  }
+}
+class FakeElement {
+  constructor({ className: className = '', dataset: dataset = {}, tagName: tagName = 'div' } = {}) {
+    ((this.tagName = String(tagName || 'div').toUpperCase()),
+      (this.className = className),
+      (this.dataset = { ...dataset }),
+      (this.style = {}),
+      (this.attributes = {}),
+      (this.children = []),
+      (this.parentNode = null),
+      (this.parentElement = null),
+      (this.listeners = new Map()),
+      (this.classList = new FakeClassList(this)),
+      (this._innerHTML = ''));
+  }
+  get ['innerHTML']() {
+    return this._innerHTML;
+  }
+  set ['innerHTML'](_0x580516) {
+    this._innerHTML = String(_0x580516 || '');
+    if (!this._innerHTML.includes('ref-thumb-container')) return;
+    this.children = [];
+    const _0x30b2b6 = new FakeElement({ className: 'prompt-attachment-btn' }),
+      _0x48662e = new FakeElement({ className: 'ref-thumb-container' });
+    (this.appendChild(_0x30b2b6),
+      this.appendChild(_0x48662e),
+      this._innerHTML.includes('data-ref-slot="replaceTarget"') &&
+        _0x48662e.appendChild(
+          new FakeElement({
+            className: 'ref-thumb-wrap ref-upload-slot',
+            dataset: {
+              refSlot: 'replaceTarget',
+              slot: this._innerHTML.includes('data-slot="replaceTarget"') ? 'replaceTarget' : '',
+              kind: this._innerHTML.includes('data-kind="image"') ? 'image' : '',
+            },
+          }),
+        ),
+      this._innerHTML.includes('data-ref-slot="replacedImage"') &&
+        _0x48662e.appendChild(
+          new FakeElement({
+            className: 'ref-thumb-wrap ref-upload-slot',
+            dataset: {
+              refSlot: 'replacedImage',
+              slot: this._innerHTML.includes('data-slot="replacedImage"') ? 'replacedImage' : '',
+              kind: this._innerHTML.includes('data-kind="image"') ? 'image' : '',
+            },
+          }),
+        ));
+  }
+  get ['nextSibling']() {
+    if (!this.parentNode) return null;
+    const _0x56ed83 = this.parentNode.children,
+      _0x16ac73 = _0x56ed83.indexOf(this);
+    return _0x16ac73 >= 0 ? _0x56ed83[_0x16ac73 + 1] || null : null;
+  }
+  ['appendChild'](_0x46545c) {
+    if (_0x46545c.parentNode) _0x46545c.remove();
+    return (
+      this.children.push(_0x46545c),
+      (_0x46545c.parentNode = this),
+      (_0x46545c.parentElement = this),
+      _0x46545c
+    );
+  }
+  ['insertBefore'](_0x53eac6, _0x439788) {
+    if (_0x53eac6.parentNode) _0x53eac6.remove();
+    const _0x3fc389 = _0x439788 ? this.children.indexOf(_0x439788) : -1;
+    if (_0x3fc389 >= 0) this.children.splice(_0x3fc389, 0, _0x53eac6);
+    else this.children.push(_0x53eac6);
+    return ((_0x53eac6.parentNode = this), (_0x53eac6.parentElement = this), _0x53eac6);
+  }
+  ['remove']() {
+    if (!this.parentNode) return;
+    const _0x57bbb6 = this.parentNode.children,
+      _0x448d8e = _0x57bbb6.indexOf(this);
+    if (_0x448d8e >= 0) _0x57bbb6.splice(_0x448d8e, 1);
+    ((this.parentNode = null), (this.parentElement = null));
+  }
+  ['replaceWith'](_0x30e228) {
+    if (!this.parentNode) return;
+    const _0x1d4a96 = this.parentNode,
+      _0x149638 = _0x1d4a96.children,
+      _0x4cf79a = _0x149638.indexOf(this);
+    if (_0x4cf79a < 0) return;
+    if (_0x30e228.parentNode) _0x30e228.remove();
+    ((_0x149638[_0x4cf79a] = _0x30e228),
+      (_0x30e228.parentNode = _0x1d4a96),
+      (_0x30e228.parentElement = _0x1d4a96),
+      (this.parentNode = null),
+      (this.parentElement = null));
+  }
+  ['setAttribute'](_0x1b606c, _0x2015a9) {
+    this.attributes[String(_0x1b606c)] = String(_0x2015a9);
+  }
+  ['getAttribute'](_0x44c1d5) {
+    return this.attributes[String(_0x44c1d5)];
+  }
+  ['addEventListener'](_0x16f127, _0x23aaac) {
+    if (!this.listeners.has(_0x16f127)) this.listeners.set(_0x16f127, []);
+    this.listeners.get(_0x16f127).push(_0x23aaac);
+  }
+  ['dispatch'](_0x162edd, _0x330b10) {
+    for (const _0x586d5a of this.listeners.get(_0x162edd) || []) _0x586d5a(_0x330b10);
+  }
+  ['matches'](_0x1f9102) {
+    if (_0x1f9102 === '.ref-thumb-wrap') return this.classList.contains('ref-thumb-wrap');
+    if (_0x1f9102 === '.ref-thumb-container') return this.classList.contains('ref-thumb-container');
+    if (_0x1f9102 === '[data-slot]') return !!this.dataset.slot;
+    return matchesFakeSelector(this, _0x1f9102);
+  }
+  ['closest'](_0x1306f6) {
+    let _0x1b1923 = this;
+    while (_0x1b1923) {
+      if (_0x1b1923.matches(_0x1306f6)) return _0x1b1923;
+      _0x1b1923 = _0x1b1923.parentElement;
+    }
+    return null;
+  }
+  ['querySelector'](_0x4c94ad) {
+    return this.querySelectorAll(_0x4c94ad)[0] || null;
+  }
+  ['querySelectorAll'](_0xe3a63a) {
+    const _0x3f45bb = [],
+      _0x4e2542 = (_0x22dedc) => {
+        if (matchesFakeSelector(_0x22dedc, _0xe3a63a)) _0x3f45bb.push(_0x22dedc);
+        _0x22dedc.children.forEach(_0x4e2542);
+      };
+    return (this.children.forEach(_0x4e2542), _0x3f45bb);
+  }
+}
+function matchesFakeSelector(_0x89ffc3, _0x175ba8) {
+  if (_0x175ba8 === '.prompt-attachment-btn') return _0x89ffc3.classList.contains('prompt-attachment-btn');
+  if (_0x175ba8 === '.ref-thumb-container') return _0x89ffc3.classList.contains('ref-thumb-container');
+  if (_0x175ba8 === '.ref-thumb-wrap') return _0x89ffc3.classList.contains('ref-thumb-wrap');
+  if (_0x175ba8 === '.ref-thumb-wrap.is-drop-allow')
+    return _0x89ffc3.classList.contains('ref-thumb-wrap') && _0x89ffc3.classList.contains('is-drop-allow');
+  const _0x34c6e6 = _0x175ba8.match(/^\.ref-upload-slot\[data-ref-slot="([^"]+)"\]$/);
+  if (_0x34c6e6)
+    return _0x89ffc3.classList.contains('ref-upload-slot') && _0x89ffc3.dataset.refSlot === _0x34c6e6[1];
+  const _0x58c343 = _0x175ba8.match(/^\[data-ref-slot="([^"]+)"\]$/);
+  if (_0x58c343) return _0x89ffc3.dataset.refSlot === _0x58c343[1];
+  const _0x5ec186 = _0x175ba8.match(/^\[data-slot="([^"]+)"\]$/);
+  if (_0x5ec186) return _0x89ffc3.dataset.slot === _0x5ec186[1];
+  if (_0x175ba8 === '[data-slot]') return !!_0x89ffc3.dataset.slot;
+  return false;
+}
+function createDragEvent(_0x2ed3a6) {
+  return {
+    target: _0x2ed3a6,
+    dataTransfer: { effectAllowed: '', dropEffect: '', setData() {} },
+    preventDefault() {},
+    stopPropagation() {},
+  };
+}
+(test('aigenImage state sync: 列表缩略图优先 thumbLocalPath，hover 预览优先 displayLocalPath', () => {
+  const _0x35c474 = resolveRefImageRenderSources({
+    id: 'src-image-1',
+    type: 'source-image',
+    originalLocalPath: 'output/original.png',
+    displayLocalPath: 'output/display.jpg',
+    thumbLocalPath: 'output/thumb.jpg',
+  });
+  assert.deepEqual(_0x35c474, { thumbSrc: '/output/thumb.jpg', previewSrc: '/output/display.jpg' });
+}),
+  test('aigenImage state sync: hover 预览缺少 displayLocalPath 时回退 originalLocalPath', () => {
+    const _0x29d376 = resolveRefImageRenderSources({
+      id: 'src-image-2',
+      type: 'source-image',
+      originalLocalPath: 'output/original.png',
+      thumbLocalPath: 'output/thumb.jpg',
+    });
+    assert.deepEqual(_0x29d376, { thumbSrc: '/output/thumb.jpg', previewSrc: '/output/original.png' });
+  }),
+  test('aigenImage state sync: ai-image 顶层缺失时回退 main image 的本地派生图', () => {
+    const _0xc8cfd8 = resolveRefImageRenderSources({
+      id: 'src-ai-image-1',
+      type: 'ai-image',
+      images: [
+        { localPath: 'output/first.png' },
+        {
+          originalLocalPath: 'output/final.png',
+          displayLocalPath: 'output/final-display.jpg',
+          thumbLocalPath: 'output/final-thumb.jpg',
+        },
+      ],
+      mainImageIndex: 1,
+    });
+    assert.deepEqual(_0xc8cfd8, {
+      thumbSrc: '/output/final-thumb.jpg',
+      previewSrc: '/output/final-display.jpg',
+    });
+  }),
+  test('aigenImage state sync: 顶层本地字段仍优先于 main image', () => {
+    const _0x2b1596 = resolveRefImageRenderSources({
+      id: 'src-ai-image-2',
+      type: 'ai-image',
+      localPath: 'output/top-level.png',
+      displayLocalPath: 'output/top-level-display.jpg',
+      thumbLocalPath: 'output/top-level-thumb.jpg',
+      images: [
+        {
+          originalLocalPath: 'output/nested.png',
+          displayLocalPath: 'output/nested-display.jpg',
+          thumbLocalPath: 'output/nested-thumb.jpg',
+        },
+      ],
+      mainImageIndex: 0,
+    });
+    assert.deepEqual(_0x2b1596, {
+      thumbSrc: '/output/top-level-thumb.jpg',
+      previewSrc: '/output/top-level-display.jpg',
+    });
+  }),
+  test('aigenImage state sync: 旧节点只有 blob 缩略图时 hover 预览回退到同一张图', () => {
+    const _0x3ea528 = resolveRefImageRenderSources(
+      { id: 'src-image-legacy-blob', type: 'source-image' },
+      { thumbBlobUrl: 'blob:legacy-thumb' },
+    );
+    assert.deepEqual(_0x3ea528, { thumbSrc: 'blob:legacy-thumb', previewSrc: 'blob:legacy-thumb' });
+  }),
+  test('aigenImage state sync: terminal Dreamina state clears loading UI', () => {
+    const _0xf6838c = globalThis.document;
+    globalThis.document = { activeElement: null };
+    try {
+      const _0x2199a3 = 'node-state-sync-dreamina-terminal',
+        _0x3cf8d8 = {
+          selectedNodeIds: [],
+          pickConnectMode: {},
+          nodes: { [_0x2199a3]: { id: _0x2199a3, model: 'dreamina/4.1', provider: 'dreamina' } },
+          edges: {},
+        };
+      let _0x12757f = 0,
+        _0x2fb788 = 0,
+        _0x3501df = 0,
+        _0x195ff4 = 0;
+      const _0x54b6b9 = createAIGenerateNodeStateSyncModule({
+          store: { getState: () => _0x3cf8d8, getIncomingEdges: () => [] },
+          getImage: async () => null,
+          getDisplayModelName: (_0x5a458a) => _0x5a458a,
+          stopLoading: () => {
+            _0x12757f += 1;
+          },
+        }),
+        _0x2a3e33 = Object.assign(Object.create(_0x54b6b9), {
+          nodeId: _0x2199a3,
+          _data: _0x3cf8d8.nodes[_0x2199a3],
+          _isGenerating: true,
+          _dreaminaActiveSubmitId: 'sid-terminal',
+          _refThumbObjectUrls: new Map(),
+          previewEl: {},
+          btnEl: createButtonStub(),
+          promptEl: { innerHTML: '', innerText: 'prompt' },
+          _normalizeDreaminaNodeData: (_0x58daad) => _0x58daad,
+          _loadAndDisplayImage: () => {},
+          _applyMaskPreview: () => {},
+          _applyModelParamVisibility: () => {},
+          _stopDreaminaRecovery: () => {
+            _0x2fb788 += 1;
+          },
+          _maybeResumeDreaminaTaskImpl: () => {
+            _0x3501df += 1;
+          },
+          _updateSubmitButtonState: () => {
+            _0x195ff4 += 1;
+          },
+        });
+      (_0x54b6b9.update.call(_0x2a3e33, {
+        id: _0x2199a3,
+        model: 'dreamina/4.1',
+        provider: 'dreamina',
+        jobStatus: 'error',
+        dreaminaTaskStatus: 'error',
+        dreaminaTaskPhase: 'generating',
+        isGenerating: false,
+      }),
+        assert.equal(_0x2a3e33._isGenerating, false),
+        assert.equal(_0x2a3e33._dreaminaActiveSubmitId, ''),
+        assert.equal(_0x12757f, 1),
+        assert.equal(_0x2fb788, 1),
+        assert.equal(_0x3501df, 0),
+        assert.equal(_0x195ff4, 1),
+        assert.equal(_0x2a3e33.btnEl.classList.contains('is-rh-busy'), false),
+        assert.equal(_0x2a3e33.btnEl.title, '生成'),
+        assert.doesNotMatch(_0x2a3e33.btnEl.innerHTML, /animation:spin/));
+    } finally {
+      typeof _0xf6838c === 'undefined' ? delete globalThis.document : (globalThis.document = _0xf6838c);
+    }
+  }),
+  test('aigenImage state sync: running RH task keeps loading when inactive Dreamina fields are done', () => {
+    const _0x45f2b2 = globalThis.document;
+    globalThis.document = { activeElement: null };
+    try {
+      const _0x452646 = 'node-state-sync-rh-running',
+        _0x2e2c6a = {
+          selectedNodeIds: [],
+          pickConnectMode: {},
+          nodes: {
+            [_0x452646]: { id: _0x452646, model: 'runninghub/2044874075721441281', provider: 'runninghubwf' },
+          },
+          edges: {},
+        };
+      let _0xa71e70 = 0,
+        _0x51ea4b = 0,
+        _0x1b74d4 = 0;
+      const _0x3594fd = createAIGenerateNodeStateSyncModule({
+          store: { getState: () => _0x2e2c6a, getIncomingEdges: () => [] },
+          getImage: async () => null,
+          getDisplayModelName: (_0x1ea2bf) => _0x1ea2bf,
+          startLoading: () => {
+            _0xa71e70 += 1;
+          },
+          stopLoading: () => {
+            _0x51ea4b += 1;
+          },
+        }),
+        _0xe1d71b = Object.assign(Object.create(_0x3594fd), {
+          nodeId: _0x452646,
+          _data: _0x2e2c6a.nodes[_0x452646],
+          _isGenerating: true,
+          _refThumbObjectUrls: new Map(),
+          previewEl: {},
+          btnEl: createButtonStub(),
+          promptEl: { innerHTML: '', innerText: 'prompt' },
+          _normalizeDreaminaNodeData: (_0x3f3217) => _0x3f3217,
+          _loadAndDisplayImage: () => {},
+          _applyMaskPreview: () => {},
+          _applyModelParamVisibility: () => {},
+          _maybeResumeRunningHubTaskImpl: () => {
+            _0x1b74d4 += 1;
+          },
+          _maybeResumeDreaminaTaskImpl: () => {},
+          _maybeResumeAsyncTaskImpl: () => {},
+          _updateSubmitButtonState: () => {},
+        });
+      (_0x3594fd.update.call(_0xe1d71b, {
+        id: _0x452646,
+        model: 'runninghub/2044874075721441281',
+        provider: 'runninghubwf',
+        imageUrl: '/output/previous.png',
+        isGenerating: true,
+        jobStatus: 'running',
+        rhTaskStatus: 'pending',
+        dreaminaTaskStatus: 'idle',
+        dreaminaTaskPhase: 'done',
+        asyncTaskStatus: 'idle',
+      }),
+        assert.equal(_0xe1d71b._isGenerating, true),
+        assert.equal(_0xa71e70, 1),
+        assert.equal(_0x51ea4b, 0),
+        assert.equal(_0x1b74d4, 1),
+        assert.equal(_0xe1d71b.btnEl.classList.contains('is-rh-busy'), true),
+        assert.match(_0xe1d71b.btnEl.innerHTML, /animation:spin/));
+    } finally {
+      typeof _0x45f2b2 === 'undefined' ? delete globalThis.document : (globalThis.document = _0x45f2b2);
+    }
+  }),
+  test('aigenImage state sync: live running state restarts loading after remount', () => {
+    const _0x1015af = globalThis.document;
+    globalThis.document = { activeElement: null };
+    try {
+      const _0x20c7e7 = 'node-state-sync-live-running',
+        _0x53cf8a = {
+          selectedNodeIds: [],
+          pickConnectMode: {},
+          nodes: { [_0x20c7e7]: { id: _0x20c7e7, model: 'volcengine/seedream-4.0', provider: 'volcengine' } },
+          edges: {},
+        };
+      let _0x1dfa70 = 0,
+        _0x174fcd = 0;
+      const _0x432620 = createAIGenerateNodeStateSyncModule({
+          store: { getState: () => _0x53cf8a, getIncomingEdges: () => [] },
+          getImage: async () => null,
+          getDisplayModelName: (_0x8634e7) => _0x8634e7,
+          startLoading: () => {
+            _0x1dfa70 += 1;
+          },
+          stopLoading: () => {
+            _0x174fcd += 1;
+          },
+        }),
+        _0x433195 = Object.assign(Object.create(_0x432620), {
+          nodeId: _0x20c7e7,
+          _data: _0x53cf8a.nodes[_0x20c7e7],
+          _isGenerating: false,
+          _refThumbObjectUrls: new Map(),
+          previewEl: {},
+          btnEl: createIdleButtonStub(),
+          promptEl: { innerHTML: '', innerText: 'prompt' },
+          _normalizeDreaminaNodeData: (_0x23bca6) => _0x23bca6,
+          _loadAndDisplayImage: () => {},
+          _applyMaskPreview: () => {},
+          _applyModelParamVisibility: () => {},
+          _maybeResumeRunningHubTaskImpl: () => {},
+          _maybeResumeDreaminaTaskImpl: () => {},
+          _maybeResumeAsyncTaskImpl: () => {},
+          _updateSubmitButtonState: () => {},
+        });
+      (_0x432620.update.call(_0x433195, {
+        id: _0x20c7e7,
+        model: 'volcengine/seedream-4.0',
+        provider: 'volcengine',
+        isGenerating: true,
+        jobStatus: 'running',
+        generationStartTime: 0x3e8,
+        generationDuration: null,
+      }),
+        assert.equal(_0x433195._isGenerating, true),
+        assert.equal(_0x1dfa70, 1),
+        assert.equal(_0x174fcd, 0));
+    } finally {
+      typeof _0x1015af === 'undefined' ? delete globalThis.document : (globalThis.document = _0x1015af);
+    }
+  }),
+  test('aigenImage submit button: running RH state renders cancel button from unified state', () => {
+    const _0x4e3a46 = 'node-image-rh-running-button-state',
+      _0x1ebd7f = {
+        nodes: {
+          [_0x4e3a46]: {
+            id: _0x4e3a46,
+            model: 'runninghub/2044874075721441281',
+            provider: 'runninghubwf',
+            rhTaskId: 'rh-image-running',
+            rhTaskStatus: 'running',
+            jobStatus: 'running',
+            isGenerating: true,
+          },
+        },
+      },
+      _0x572b02 = createAIGenerateNodeUiModule({
+        store: { getState: () => _0x1ebd7f, getIncomingEdges: () => [] },
+      }),
+      _0x9e6dbe = Object.assign(Object.create(_0x572b02), {
+        nodeId: _0x4e3a46,
+        _data: _0x1ebd7f.nodes[_0x4e3a46],
+        _rhCancelInFlight: false,
+        promptEl: { innerText: 'prompt' },
+        btnEl: createIdleButtonStub(),
+        _isRunninghubWorkflowModel: () => true,
+      });
+    (_0x572b02._updateSubmitButtonState.call(_0x9e6dbe),
+      assert.equal(_0x9e6dbe.btnEl.disabled, false),
+      assert.equal(_0x9e6dbe.btnEl.style.cursor, ''),
+      assert.equal(_0x9e6dbe.btnEl.classList.contains('is-task-cancel'), true),
+      assert.match(_0x9e6dbe.btnEl.innerHTML, /v2-task-cancel-spin/),
+      (_0x9e6dbe._rhCancelInFlight = true),
+      _0x572b02._updateSubmitButtonState.call(_0x9e6dbe),
+      assert.equal(_0x9e6dbe.btnEl.disabled, true),
+      assert.equal(_0x9e6dbe.btnEl.style.cursor, 'var(--unavailable-cursor)'),
+      assert.equal(_0x9e6dbe.btnEl.classList.contains('is-task-cancel'), true),
+      (_0x1ebd7f.nodes[_0x4e3a46] = {
+        ..._0x1ebd7f.nodes[_0x4e3a46],
+        rhTaskStatus: 'failed',
+        jobStatus: 'error',
+        isGenerating: true,
+      }),
+      (_0x9e6dbe._data = _0x1ebd7f.nodes[_0x4e3a46]),
+      (_0x9e6dbe._rhCancelInFlight = false),
+      _0x572b02._updateSubmitButtonState.call(_0x9e6dbe),
+      assert.equal(_0x9e6dbe.btnEl.classList.contains('is-task-cancel'), false),
+      assert.doesNotMatch(_0x9e6dbe.btnEl.innerHTML, /v2-task-cancel-spin/));
+  }),
+  test('aigenImage submit button: finished async status is terminal and unlocks generation', () => {
+    const _0x709995 = 'node-image-grsai-finished-button-state',
+      _0x47ebac = {
+        nodes: {
+          [_0x709995]: {
+            id: _0x709995,
+            type: 'ai-image',
+            model: 'nano-banana-2',
+            provider: 'grsai',
+            asyncTaskProvider: 'grsai',
+            asyncTaskKind: 'image',
+            asyncTaskId: 'task-finished',
+            asyncTaskStatus: 'finished',
+            jobStatus: 'running',
+            isGenerating: true,
+          },
+        },
+      },
+      _0x4153c0 = createAIGenerateNodeUiModule({
+        store: { getState: () => _0x47ebac, getIncomingEdges: () => [] },
+      }),
+      _0x410155 = Object.assign(Object.create(_0x4153c0), {
+        nodeId: _0x709995,
+        _data: _0x47ebac.nodes[_0x709995],
+        promptEl: { innerText: 'prompt' },
+        btnEl: createIdleButtonStub(),
+        _isRunninghubWorkflowModel: () => false,
+      });
+    (_0x4153c0._updateSubmitButtonState.call(_0x410155),
+      assert.equal(_0x410155.btnEl.disabled, false),
+      assert.equal(_0x410155.btnEl.style.cursor, ''),
+      assert.doesNotMatch(_0x410155.btnEl.innerHTML, /animation:spin/));
+  }),
+  test('aigenImage submit button: empty editor can generate from non-empty text input', () => {
+    const _0x1fc360 = 'node-image-text-input-button',
+      _0x5641ce = 'node-image-text-input-source',
+      _0x19d72e = {
+        nodes: {
+          [_0x1fc360]: { id: _0x1fc360, type: 'ai-image', model: 'gpt-image-2', provider: 'grsai' },
+          [_0x5641ce]: { id: _0x5641ce, type: 'source-text', text: '用文本入参生成一张海报' },
+        },
+      },
+      _0x293889 = [{ id: 'edge-image-text-input', sourceId: _0x5641ce, targetId: _0x1fc360 }],
+      _0xb99df5 = createAIGenerateNodeUiModule({
+        store: { getState: () => _0x19d72e, getIncomingEdges: () => _0x293889 },
+      }),
+      _0x3fc97f = Object.assign(Object.create(_0xb99df5), {
+        nodeId: _0x1fc360,
+        _data: _0x19d72e.nodes[_0x1fc360],
+        promptEl: { innerText: '', childNodes: [] },
+        btnEl: createIdleButtonStub(),
+        _isRunninghubWorkflowModel: () => false,
+      });
+    (_0xb99df5._updateSubmitButtonState.call(_0x3fc97f),
+      assert.equal(_0x3fc97f.btnEl.disabled, false),
+      assert.equal(_0x3fc97f.btnEl.style.cursor, ''));
+  }),
+  test('aigenImage submit button: Agnes image input can generate without prompt', () => {
+    const _0x2d87d5 = 'node-agnes-image-input-button',
+      _0x2290ce = 'node-agnes-image-input-source',
+      _0xe8657f = {
+        nodes: {
+          [_0x2d87d5]: {
+            id: _0x2d87d5,
+            type: 'ai-image',
+            model: 'agnes/agnes-image-2.0-flash',
+            provider: 'agnes',
+          },
+          [_0x2290ce]: { id: _0x2290ce, type: 'source-image', imageUrl: 'https://cdn.example.com/input.png' },
+        },
+        edges: {
+          'edge-agnes-image-input': {
+            id: 'edge-agnes-image-input',
+            sourceId: _0x2290ce,
+            targetId: _0x2d87d5,
+          },
+        },
+      },
+      _0x4bfce4 = Object.values(_0xe8657f.edges),
+      _0x5c9a8a = createAIGenerateNodeUiModule({
+        store: { getState: () => _0xe8657f, getIncomingEdges: () => _0x4bfce4 },
+      }),
+      _0x4ba98e = Object.assign(Object.create(_0x5c9a8a), {
+        nodeId: _0x2d87d5,
+        _data: _0xe8657f.nodes[_0x2d87d5],
+        promptEl: { innerText: '', childNodes: [] },
+        btnEl: createIdleButtonStub(),
+        _isRunninghubWorkflowModel: () => false,
+      });
+    (_0x5c9a8a._updateSubmitButtonState.call(_0x4ba98e),
+      assert.equal(_0x4ba98e.btnEl.disabled, false),
+      assert.equal(_0x4ba98e.btnEl.style.cursor, ''));
+  }),
+  test('aigenImage ui normalize: APIMart Seedream manifest models are preserved', () => {
+    const _0x4e1c81 = 'node-apimart-seedream-preserve',
+      _0x26f9c6 = {
+        nodes: {
+          [_0x4e1c81]: { id: _0x4e1c81, model: 'apimart/seedream-4.0', provider: 'apimart', imageSize: '4K' },
+        },
+      },
+      _0x50be3c = [],
+      _0x50a697 = createAIGenerateNodeUiModule({
+        store: {
+          getState: () => _0x26f9c6,
+          updateNodeData: (_0x4ff014, _0x418030) => _0x50be3c.push({ id: _0x4ff014, patch: _0x418030 }),
+        },
+      }),
+      _0x2b7606 = Object.assign(Object.create(_0x50a697), { nodeId: _0x4e1c81 }),
+      _0x58a07d = _0x50a697._normalizeLegacySeedreamModel.call(_0x2b7606, _0x26f9c6.nodes[_0x4e1c81]);
+    (assert.equal(_0x58a07d.model, 'apimart/seedream-4.0'),
+      assert.equal(_0x58a07d.provider, 'apimart'),
+      assert.equal(_0x58a07d.imageSize, '4K'),
+      assert.deepEqual(_0x50be3c, []));
+  }),
+  test('aigenImage state sync: person replace V3 fixed image slots can swap', async () => {
+    const _0x35a46b = globalThis.document;
+    globalThis.document = { createElement: (_0x5354a3) => new FakeElement({ tagName: _0x5354a3 }) };
+    const _0x28e85b = 'node-person-replace-v3';
+    try {
+      const _0x43ab1f = {
+          selectedNodeIds: [],
+          pickConnectMode: {},
+          nodes: {
+            [_0x28e85b]: {
+              id: _0x28e85b,
+              type: 'ai-image',
+              model: 'runninghub/2041177685895946242',
+              provider: 'runninghubwf',
+            },
+            imageA: {
+              id: 'imageA',
+              type: 'source-image',
+              thumbLocalPath: 'output/a-thumb.png',
+              displayLocalPath: 'output/a-display.png',
+              originalLocalPath: 'output/a.png',
+            },
+            imageB: {
+              id: 'imageB',
+              type: 'source-image',
+              thumbLocalPath: 'output/b-thumb.png',
+              displayLocalPath: 'output/b-display.png',
+              originalLocalPath: 'output/b.png',
+            },
+          },
+          edges: {
+            edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x28e85b, refSlot: 'replaceTarget' },
+            edgeB: { id: 'edgeB', sourceId: 'imageB', targetId: _0x28e85b, refSlot: 'replacedImage' },
+          },
+        },
+        _0x442289 = [],
+        _0x8b05a = {
+          getState: () => _0x43ab1f,
+          getIncomingEdges: (_0x58af13) =>
+            Object.values(_0x43ab1f.edges).filter((_0x28fc0d) => _0x28fc0d.targetId === _0x58af13),
+          updateEdgesBatch(_0x376e61, _0x33c401) {
+            _0x442289.push({ removeIds: _0x376e61, addedEdges: _0x33c401 });
+          },
+        },
+        _0x587776 = createAIGenerateNodeStateSyncModule({
+          store: _0x8b05a,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        }),
+        _0x4625a0 = new FakeElement({ className: 'node-ref-bar' }),
+        _0x3eb4e9 = Object.assign(Object.create(_0x587776), {
+          nodeId: _0x28e85b,
+          _data: _0x43ab1f.nodes[_0x28e85b],
+          _refThumbObjectUrls: new Map(),
+          refBarEl: _0x4625a0,
+          promptEl: { innerText: '', querySelectorAll: () => [] },
+        });
+      await _0x587776._renderRefBarImpl.call(_0x3eb4e9);
+      const _0xb86ac4 = _0x4625a0.querySelector('[data-ref-slot="replaceTarget"]'),
+        _0x107e38 = _0x4625a0.querySelector('[data-ref-slot="replacedImage"]'),
+        _0x125490 = _0x4625a0.querySelector('.ref-thumb-container');
+      (assert.equal(_0xb86ac4.dataset.slot, 'replaceTarget'),
+        assert.equal(_0x107e38.dataset.slot, 'replacedImage'),
+        assert.equal(_0xb86ac4.dataset.kind, 'image'),
+        assert.equal(_0x107e38.dataset.kind, 'image'),
+        assert.equal(_0xb86ac4.getAttribute('draggable'), 'true'),
+        assert.equal(_0x107e38.getAttribute('draggable'), 'true'),
+        assert.equal(_0xb86ac4.classList.contains('ref-upload-slot'), false),
+        assert.equal(_0x107e38.classList.contains('ref-upload-slot'), false),
+        _0x125490.dispatch('dragstart', createDragEvent(_0xb86ac4)),
+        assert.equal(_0xb86ac4.classList.contains('is-dragging'), true),
+        _0x125490.dispatch('dragover', createDragEvent(_0x107e38)),
+        assert.equal(_0x107e38.classList.contains('is-drop-allow'), true),
+        assert.deepEqual(
+          _0x125490.children.map((_0x4df815) => _0x4df815.dataset.edgeId || ''),
+          ['edgeA', 'edgeB'],
+        ),
+        _0x125490.dispatch('drop', createDragEvent(_0x107e38)),
+        assert.equal(_0x107e38.classList.contains('is-drop-allow'), false),
+        _0x125490.dispatch('dragend', createDragEvent(_0xb86ac4)),
+        assert.equal(_0xb86ac4.classList.contains('is-dragging'), false),
+        assert.equal(_0x442289.length, 1),
+        assert.deepEqual(_0x442289[0].removeIds, ['edgeA', 'edgeB']),
+        assert.deepEqual(
+          _0x442289[0].addedEdges.map((_0x5c534f) => [_0x5c534f.id, _0x5c534f.refSlot]),
+          [
+            ['edgeA', 'replacedImage'],
+            ['edgeB', 'replaceTarget'],
+          ],
+        ));
+      for (const _0xb0fa64 of _0x442289[0].removeIds) {
+        delete _0x43ab1f.edges[_0xb0fa64];
+      }
+      for (const _0x3242ac of _0x442289[0].addedEdges) {
+        _0x43ab1f.edges[_0x3242ac.id] = _0x3242ac;
+      }
+      await _0x587776._renderRefBarImpl.call(_0x3eb4e9);
+      const _0x2477b2 = _0x4625a0.querySelector('[data-ref-slot="replaceTarget"]'),
+        _0x1c964e = _0x4625a0.querySelector('[data-ref-slot="replacedImage"]');
+      (assert.equal(_0x2477b2.dataset.edgeId, 'edgeB'),
+        assert.equal(_0x2477b2.dataset.sourceId, 'imageB'),
+        assert.equal(_0x1c964e.dataset.edgeId, 'edgeA'),
+        assert.equal(_0x1c964e.dataset.sourceId, 'imageA'));
+    } finally {
+      if (typeof _0x35a46b === 'undefined') delete globalThis.document;
+      else globalThis.document = _0x35a46b;
+    }
+  }),
+  test('aigenImage state sync: modelApi fixed image slots render from manifest', async () => {
+    const _0x434712 = globalThis.document;
+    globalThis.document = { createElement: (_0x38c30d) => new FakeElement({ tagName: _0x38c30d }) };
+    const _0x541f48 = 'node-youchuan-fixed-slots';
+    try {
+      const _0x10d4cd = {
+          selectedNodeIds: [_0x541f48],
+          pickConnectMode: {},
+          nodes: {
+            [_0x541f48]: {
+              id: _0x541f48,
+              type: 'ai-image',
+              model: 'runninghub-model/youchuan-v6',
+              provider: 'runninghub',
+            },
+            mainImage: {
+              id: 'mainImage',
+              type: 'source-image',
+              thumbLocalPath: 'output/main-thumb.png',
+              displayLocalPath: 'output/main-display.png',
+              originalLocalPath: 'output/main.png',
+            },
+            styleImage: {
+              id: 'styleImage',
+              type: 'source-image',
+              thumbLocalPath: 'output/style-thumb.png',
+              displayLocalPath: 'output/style-display.png',
+              originalLocalPath: 'output/style.png',
+            },
+          },
+          edges: {
+            edgeMain: { id: 'edgeMain', sourceId: 'mainImage', targetId: _0x541f48, refSlot: 'imageUrl' },
+            edgeStyle: { id: 'edgeStyle', sourceId: 'styleImage', targetId: _0x541f48, refSlot: 'sref' },
+          },
+        },
+        _0xc061d1 = {
+          getState: () => _0x10d4cd,
+          getStateRaw: () => _0x10d4cd,
+          getIncomingEdges: (_0x2b8f2b) =>
+            Object.values(_0x10d4cd.edges).filter((_0x1895f8) => _0x1895f8.targetId === _0x2b8f2b),
+          updateEdgesBatch() {},
+        },
+        _0x499dfc = createAIGenerateNodeStateSyncModule({
+          store: _0xc061d1,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        }),
+        _0x2837ef = new FakeElement({ className: 'node-ref-bar' }),
+        _0x7d5e6c = Object.assign(Object.create(_0x499dfc), {
+          nodeId: _0x541f48,
+          _data: _0x10d4cd.nodes[_0x541f48],
+          _refThumbObjectUrls: new Map(),
+          refBarEl: _0x2837ef,
+          promptEl: { innerText: '', querySelectorAll: () => [] },
+        });
+      await _0x499dfc._renderRefBarImpl.call(_0x7d5e6c);
+      const _0xd6504b = _0x2837ef.querySelector('[data-ref-slot="imageUrl"]'),
+        _0xb32198 = _0x2837ef.querySelector('[data-ref-slot="cref"]'),
+        _0x40e18c = _0x2837ef.querySelector('[data-ref-slot="sref"]');
+      (assert.equal(_0xd6504b.dataset.edgeId, 'edgeMain'),
+        assert.equal(_0xd6504b.dataset.kind, 'image'),
+        assert.equal(_0xb32198.classList.contains('ref-upload-slot'), true),
+        assert.equal(_0x40e18c.dataset.edgeId, 'edgeStyle'),
+        assert.equal(_0x40e18c.dataset.sourceId, 'styleImage'));
+    } finally {
+      if (typeof _0x434712 === 'undefined') delete globalThis.document;
+      else globalThis.document = _0x434712;
+    }
+  }),
+  test('aigenImage state sync: Midjourney V7 renders only main and style fixed slots', async () => {
+    const _0xfabdf8 = globalThis.document;
+    globalThis.document = { createElement: (_0x8ccf66) => new FakeElement({ tagName: _0x8ccf66 }) };
+    const _0x2666e6 = 'node-youchuan-v7-fixed-slots';
+    try {
+      const _0x1d5575 = {
+          selectedNodeIds: [_0x2666e6],
+          pickConnectMode: {},
+          nodes: {
+            [_0x2666e6]: {
+              id: _0x2666e6,
+              type: 'ai-image',
+              model: 'runninghub-model/youchuan-v7',
+              provider: 'runninghub',
+            },
+            mainImage: {
+              id: 'mainImage',
+              type: 'source-image',
+              thumbLocalPath: 'output/main-thumb.png',
+              displayLocalPath: 'output/main-display.png',
+              originalLocalPath: 'output/main.png',
+            },
+            styleImage: {
+              id: 'styleImage',
+              type: 'source-image',
+              thumbLocalPath: 'output/style-thumb.png',
+              displayLocalPath: 'output/style-display.png',
+              originalLocalPath: 'output/style.png',
+            },
+          },
+          edges: {
+            edgeMain: { id: 'edgeMain', sourceId: 'mainImage', targetId: _0x2666e6, refSlot: 'imageUrl' },
+            edgeStyle: { id: 'edgeStyle', sourceId: 'styleImage', targetId: _0x2666e6, refSlot: 'sref' },
+          },
+        },
+        _0xe38013 = {
+          getState: () => _0x1d5575,
+          getStateRaw: () => _0x1d5575,
+          getIncomingEdges: (_0x36d3c9) =>
+            Object.values(_0x1d5575.edges).filter((_0x3c93e2) => _0x3c93e2.targetId === _0x36d3c9),
+          updateEdgesBatch() {},
+        },
+        _0x4efddc = createAIGenerateNodeStateSyncModule({
+          store: _0xe38013,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        }),
+        _0x1cc0b6 = new FakeElement({ className: 'node-ref-bar' }),
+        _0x2a21f9 = Object.assign(Object.create(_0x4efddc), {
+          nodeId: _0x2666e6,
+          _data: _0x1d5575.nodes[_0x2666e6],
+          _refThumbObjectUrls: new Map(),
+          refBarEl: _0x1cc0b6,
+          promptEl: { innerText: '', querySelectorAll: () => [] },
+        });
+      await _0x4efddc._renderRefBarImpl.call(_0x2a21f9);
+      const _0x36dcb = _0x1cc0b6.querySelector('[data-ref-slot="imageUrl"]'),
+        _0x1ff559 = _0x1cc0b6.querySelector('[data-ref-slot="cref"]'),
+        _0x11cdce = _0x1cc0b6.querySelector('[data-ref-slot="sref"]');
+      (assert.equal(_0x36dcb.dataset.edgeId, 'edgeMain'),
+        assert.equal(_0x36dcb.dataset.kind, 'image'),
+        assert.equal(_0x1ff559, null),
+        assert.equal(_0x11cdce.dataset.edgeId, 'edgeStyle'),
+        assert.equal(_0x11cdce.dataset.sourceId, 'styleImage'));
+    } finally {
+      if (typeof _0xfabdf8 === 'undefined') delete globalThis.document;
+      else globalThis.document = _0xfabdf8;
+    }
+  }),
+  test('aigenImage state sync: RunningHub image X renders one manifest fixed image slot', async () => {
+    const _0x457f63 = globalThis.document;
+    globalThis.document = { createElement: (_0x10438a) => new FakeElement({ tagName: _0x10438a }) };
+    const _0x3170ec = 'node-rh-image-x-fixed-slot';
+    try {
+      const _0x372c4a = {
+          selectedNodeIds: [_0x3170ec],
+          pickConnectMode: {},
+          nodes: {
+            [_0x3170ec]: {
+              id: _0x3170ec,
+              type: 'ai-image',
+              model: 'runninghub-model/rhart-image-g',
+              provider: 'runninghub',
+            },
+            refImage: {
+              id: 'refImage',
+              type: 'source-image',
+              thumbLocalPath: 'output/ref-thumb.png',
+              displayLocalPath: 'output/ref-display.png',
+              originalLocalPath: 'output/ref.png',
+            },
+          },
+          edges: {
+            edgeRef: { id: 'edgeRef', sourceId: 'refImage', targetId: _0x3170ec, refSlot: 'imageUrl' },
+          },
+        },
+        _0x291b45 = {
+          getState: () => _0x372c4a,
+          getStateRaw: () => _0x372c4a,
+          getIncomingEdges: (_0x1ed13c) =>
+            Object.values(_0x372c4a.edges).filter((_0x33efd1) => _0x33efd1.targetId === _0x1ed13c),
+          updateEdgesBatch() {},
+        },
+        _0x44567c = createAIGenerateNodeStateSyncModule({
+          store: _0x291b45,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        }),
+        _0x40b651 = new FakeElement({ className: 'node-ref-bar' }),
+        _0x3bc42f = Object.assign(Object.create(_0x44567c), {
+          nodeId: _0x3170ec,
+          _data: _0x372c4a.nodes[_0x3170ec],
+          _refThumbObjectUrls: new Map(),
+          refBarEl: _0x40b651,
+          promptEl: { innerText: '', querySelectorAll: () => [] },
+        });
+      await _0x44567c._renderRefBarImpl.call(_0x3bc42f);
+      const _0x139a9b = _0x40b651.querySelector('[data-ref-slot="imageUrl"]'),
+        _0x1fc669 = _0x40b651.querySelector('[data-ref-slot="sref"]');
+      (assert.equal(_0x139a9b.dataset.edgeId, 'edgeRef'),
+        assert.equal(_0x139a9b.dataset.kind, 'image'),
+        assert.equal(_0x1fc669, null));
+    } finally {
+      if (typeof _0x457f63 === 'undefined') delete globalThis.document;
+      else globalThis.document = _0x457f63;
+    }
+  }),
+  test('aigenImage state sync: refSlot changes trigger immediate ref bar refresh', () => {
+    const _0x5d25b3 = globalThis.document,
+      _0x391207 = 'node-person-replace-v3-refresh',
+      _0x571ee4 = {
+        selectedNodeIds: [_0x391207],
+        pickConnectMode: {},
+        nodes: {
+          [_0x391207]: {
+            id: _0x391207,
+            type: 'ai-image',
+            model: 'runninghub/2041177685895946242',
+            provider: 'runninghubwf',
+          },
+          imageA: { id: 'imageA', type: 'source-image', _bizRev: 1 },
+          imageB: { id: 'imageB', type: 'source-image', _bizRev: 1 },
+        },
+        edges: {
+          edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x391207, refSlot: 'replaceTarget' },
+          edgeB: { id: 'edgeB', sourceId: 'imageB', targetId: _0x391207, refSlot: 'replacedImage' },
+        },
+      };
+    try {
+      globalThis.document = { activeElement: null };
+      const _0x379a21 = {
+          getState: () => _0x571ee4,
+          getStateRaw: () => _0x571ee4,
+          getIncomingEdges: (_0x558abe) =>
+            Object.values(_0x571ee4.edges).filter((_0x42135c) => _0x42135c.targetId === _0x558abe),
+        },
+        _0x20dc03 = createAIGenerateNodeStateSyncModule({
+          store: _0x379a21,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        });
+      let _0x3f6928 = 0;
+      const _0x11c3eb = Object.assign(Object.create(_0x20dc03), {
+        nodeId: _0x391207,
+        _data: _0x571ee4.nodes[_0x391207],
+        promptEl: { innerHTML: '', querySelectorAll: () => [] },
+        _normalizeDreaminaNodeData: (_0x4dbd41) => _0x4dbd41,
+        _loadAndDisplayImage: () => {},
+        _applyMaskPreview: () => {},
+        _applyModelParamVisibility: () => {},
+        _updateSubmitButtonState: () => {},
+        _renderRefBar: () => {
+          _0x3f6928 += 1;
+        },
+      });
+      (_0x20dc03.update.call(_0x11c3eb, _0x571ee4.nodes[_0x391207]),
+        assert.equal(_0x3f6928, 1),
+        (_0x571ee4.edges.edgeA = { ..._0x571ee4.edges.edgeA, refSlot: 'replacedImage' }),
+        (_0x571ee4.edges.edgeB = { ..._0x571ee4.edges.edgeB, refSlot: 'replaceTarget' }),
+        _0x20dc03.update.call(_0x11c3eb, _0x571ee4.nodes[_0x391207]),
+        assert.equal(_0x3f6928, 2));
+    } finally {
+      if (typeof _0x5d25b3 === 'undefined') delete globalThis.document;
+      else globalThis.document = _0x5d25b3;
+    }
+  }),
+  test('aigenImage state sync: thumbnail order changes trigger immediate ref bar refresh', () => {
+    const _0x4d61f4 = globalThis.document,
+      _0x3628fd = 'node-image-order-refresh',
+      _0x583a8d = {
+        selectedNodeIds: [_0x3628fd],
+        pickConnectMode: {},
+        nodes: {
+          [_0x3628fd]: {
+            id: _0x3628fd,
+            type: 'ai-image',
+            model: 'apimart/nano-banana-2',
+            provider: 'apimart',
+          },
+          imageA: { id: 'imageA', type: 'source-image', _bizRev: 1 },
+          imageB: { id: 'imageB', type: 'source-image', _bizRev: 1 },
+        },
+        edges: {
+          edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x3628fd },
+          edgeB: { id: 'edgeB', sourceId: 'imageB', targetId: _0x3628fd },
+        },
+      };
+    try {
+      globalThis.document = { activeElement: null };
+      const _0xae1aa2 = {
+          getState: () => _0x583a8d,
+          getStateRaw: () => _0x583a8d,
+          getIncomingEdges: (_0x127c52) =>
+            Object.values(_0x583a8d.edges).filter((_0x10db6f) => _0x10db6f.targetId === _0x127c52),
+        },
+        _0x579f74 = createAIGenerateNodeStateSyncModule({
+          store: _0xae1aa2,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        });
+      let _0x3ad9ff = 0;
+      const _0x38c430 = Object.assign(Object.create(_0x579f74), {
+        nodeId: _0x3628fd,
+        _data: _0x583a8d.nodes[_0x3628fd],
+        promptEl: { innerHTML: '', querySelectorAll: () => [] },
+        _normalizeDreaminaNodeData: (_0x3e248d) => _0x3e248d,
+        _loadAndDisplayImage: () => {},
+        _applyMaskPreview: () => {},
+        _applyModelParamVisibility: () => {},
+        _updateSubmitButtonState: () => {},
+        _renderRefBar: () => {
+          _0x3ad9ff += 1;
+        },
+      });
+      (_0x579f74.update.call(_0x38c430, _0x583a8d.nodes[_0x3628fd]),
+        assert.equal(_0x3ad9ff, 1),
+        (_0x583a8d.edges = { edgeB: _0x583a8d.edges.edgeB, edgeA: _0x583a8d.edges.edgeA }),
+        _0x579f74.update.call(_0x38c430, _0x583a8d.nodes[_0x3628fd]),
+        assert.equal(_0x3ad9ff, 2));
+    } finally {
+      if (typeof _0x4d61f4 === 'undefined') delete globalThis.document;
+      else globalThis.document = _0x4d61f4;
+    }
+  }),
+  test('aigenImage state sync: person replace V2.1 model keeps empty upload slot', async () => {
+    const _0x590a0b = globalThis.document;
+    globalThis.document = { createElement: (_0xead6d5) => new FakeElement({ tagName: _0xead6d5 }) };
+    const _0x4c2b5f = 'node-person-replace-v21';
+    try {
+      const _0x544d62 = {
+          selectedNodeIds: [],
+          pickConnectMode: {},
+          nodes: {
+            [_0x4c2b5f]: {
+              id: _0x4c2b5f,
+              type: 'ai-image',
+              model: 'runninghub/2050313968069165058',
+              provider: 'runninghubwf',
+            },
+            imageA: {
+              id: 'imageA',
+              type: 'source-image',
+              thumbLocalPath: 'output/a-thumb.png',
+              displayLocalPath: 'output/a-display.png',
+              originalLocalPath: 'output/a.png',
+            },
+          },
+          edges: {
+            edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x4c2b5f, refSlot: 'replaceTarget' },
+          },
+        },
+        _0x109f91 = {
+          getState: () => _0x544d62,
+          getIncomingEdges: (_0x4d9fa5) =>
+            Object.values(_0x544d62.edges).filter((_0x104a1f) => _0x104a1f.targetId === _0x4d9fa5),
+          updateEdgesBatch() {},
+        },
+        _0x8ea6c7 = createAIGenerateNodeStateSyncModule({
+          store: _0x109f91,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        }),
+        _0x5767e7 = new FakeElement({ className: 'node-ref-bar' }),
+        _0x422329 = Object.assign(Object.create(_0x8ea6c7), {
+          nodeId: _0x4c2b5f,
+          _data: _0x544d62.nodes[_0x4c2b5f],
+          _refThumbObjectUrls: new Map(),
+          refBarEl: _0x5767e7,
+          promptEl: { innerText: '', querySelectorAll: () => [] },
+        });
+      await _0x8ea6c7._renderRefBarImpl.call(_0x422329);
+      const _0x11b0c0 = _0x5767e7.querySelector('[data-ref-slot="replaceTarget"]'),
+        _0x4c88ee = _0x5767e7.querySelector('[data-ref-slot="replacedImage"]');
+      (assert.equal(_0x11b0c0.classList.contains('ref-upload-slot'), false),
+        assert.equal(_0x11b0c0.getAttribute('draggable'), 'true'),
+        assert.equal(_0x4c88ee.classList.contains('ref-upload-slot'), true),
+        assert.equal(_0x4c88ee.dataset.refSlot, 'replacedImage'),
+        assert.equal(_0x4c88ee.dataset.slot, 'replacedImage'),
+        assert.equal(_0x4c88ee.dataset.kind, 'image'),
+        assert.equal(_0x4c88ee.getAttribute('draggable'), 'false'));
+    } finally {
+      if (typeof _0x590a0b === 'undefined') delete globalThis.document;
+      else globalThis.document = _0x590a0b;
+    }
+  }),
+  test('aigenImage state sync: anime real image input changes trigger adaptive ratio', async () => {
+    const _0xb3bf0c = globalThis.document,
+      _0x3577bb = 'anime-real-node',
+      _0xdadbc1 = {
+        pickConnectMode: {},
+        nodes: {
+          [_0x3577bb]: {
+            id: _0x3577bb,
+            type: 'ai-image',
+            model: 'runninghub/1994718111704158209',
+            provider: 'runninghubwf',
+            aspectRatio: '自适应',
+          },
+          imageA: { id: 'imageA', type: 'source-image', width: 0x384, height: 0x640, _bizRev: 1 },
+          imageB: { id: 'imageB', type: 'source-image', width: 0x640, height: 0x384, _bizRev: 1 },
+        },
+        edges: { edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x3577bb } },
+      };
+    try {
+      globalThis.document = {
+        activeElement: null,
+        createElement: (_0x37ddfa) => new FakeElement({ tagName: _0x37ddfa }),
+      };
+      const _0x176c53 = {
+          getState: () => _0xdadbc1,
+          getIncomingEdges: (_0x520aea) =>
+            Object.values(_0xdadbc1.edges).filter((_0x15d31e) => _0x15d31e.targetId === _0x520aea),
+        },
+        _0x323957 = createAIGenerateNodeStateSyncModule({
+          store: _0x176c53,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        });
+      let _0x2b0796 = 0;
+      const _0x3dec7c = Object.assign(Object.create(_0x323957), {
+        nodeId: _0x3577bb,
+        _data: _0xdadbc1.nodes[_0x3577bb],
+        refBarEl: new FakeElement(),
+        _refThumbObjectUrls: new Map(),
+        runAdaptiveRatio: () => {
+          _0x2b0796 += 1;
+        },
+        promptEl: { innerText: '', querySelectorAll: () => [] },
+      });
+      (await _0x323957._renderRefBarImpl.call(_0x3dec7c),
+        await new Promise((_0x3cb921) => setTimeout(_0x3cb921, 70)),
+        assert.equal(_0x2b0796, 1),
+        (_0xdadbc1.edges.edgeA = { ..._0xdadbc1.edges.edgeA, sourceId: 'imageB' }),
+        await _0x323957._renderRefBarImpl.call(_0x3dec7c),
+        await new Promise((_0x54c533) => setTimeout(_0x54c533, 70)),
+        assert.equal(_0x2b0796, 2));
+    } finally {
+      if (typeof _0xb3bf0c === 'undefined') delete globalThis.document;
+      else globalThis.document = _0xb3bf0c;
+    }
+  }),
+  test('aigenImage state sync: group output order changes trigger adaptive ratio', async () => {
+    const _0x1f8fc7 = globalThis.document,
+      _0x332819 = 'schema-image-node',
+      _0x584ca0 = {
+        pickConnectMode: {},
+        nodes: {
+          [_0x332819]: {
+            id: _0x332819,
+            type: 'ai-image',
+            model: 'apimart/nano-banana-2',
+            provider: 'apimart',
+            generationParams: { aspectRatio: '自适应' },
+          },
+          group: { id: 'group', type: 'group' },
+          imageA: {
+            id: 'imageA',
+            type: 'source-image',
+            parentId: 'group',
+            width: 0x384,
+            height: 0x640,
+            _bizRev: 1,
+          },
+          imageB: {
+            id: 'imageB',
+            type: 'source-image',
+            parentId: 'group',
+            width: 0x640,
+            height: 0x384,
+            _bizRev: 1,
+          },
+        },
+        edges: {
+          groupEdge: {
+            id: 'groupEdge',
+            sourceId: 'group',
+            targetId: _0x332819,
+            groupOutputSourceOrder: ['imageA', 'imageB'],
+          },
+        },
+      },
+      _0x9e15ff = () =>
+        _0x584ca0.edges.groupEdge.groupOutputSourceOrder.map((_0x44d013) => ({
+          ..._0x584ca0.edges.groupEdge,
+          id: 'groupEdge::group-output::' + _0x44d013,
+          sourceId: _0x44d013,
+          isGroupOutput: true,
+          outputGroupId: 'group',
+          groupOutputEdgeId: 'groupEdge',
+          effectiveTargetId: _0x332819,
+        }));
+    try {
+      globalThis.document = {
+        activeElement: null,
+        createElement: (_0x5a6d3d) => new FakeElement({ tagName: _0x5a6d3d }),
+      };
+      const _0x5b4053 = {
+          getState: () => _0x584ca0,
+          getIncomingEdges: (_0x2ca069) => (_0x2ca069 === _0x332819 ? _0x9e15ff() : []),
+        },
+        _0x1ba444 = createAIGenerateNodeStateSyncModule({
+          store: _0x5b4053,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        });
+      let _0x100959 = 0;
+      const _0x2c0b46 = Object.assign(Object.create(_0x1ba444), {
+        nodeId: _0x332819,
+        _data: _0x584ca0.nodes[_0x332819],
+        refBarEl: new FakeElement(),
+        _refThumbObjectUrls: new Map(),
+        runAdaptiveRatio: () => {
+          _0x100959 += 1;
+        },
+        promptEl: { innerText: '', querySelectorAll: () => [] },
+      });
+      (await _0x1ba444._renderRefBarImpl.call(_0x2c0b46),
+        await new Promise((_0x421f4c) => setTimeout(_0x421f4c, 70)),
+        assert.equal(_0x100959, 1),
+        (_0x584ca0.edges.groupEdge = {
+          ..._0x584ca0.edges.groupEdge,
+          groupOutputSourceOrder: ['imageB', 'imageA'],
+        }),
+        await _0x1ba444._renderRefBarImpl.call(_0x2c0b46),
+        await new Promise((_0x46d55c) => setTimeout(_0x46d55c, 70)),
+        assert.equal(_0x100959, 2));
+    } finally {
+      if (typeof _0x1f8fc7 === 'undefined') delete globalThis.document;
+      else globalThis.document = _0x1f8fc7;
+    }
+  }),
+  test('aigenImage state sync: group first output removal triggers adaptive ratio while ref bar hidden', async () => {
+    const _0x748806 = globalThis.document,
+      _0x4d6adb = 'schema-image-node',
+      _0x3563dc = {
+        pickConnectMode: {},
+        selectedNodeIds: [],
+        nodes: {
+          [_0x4d6adb]: {
+            id: _0x4d6adb,
+            type: 'ai-image',
+            model: 'apimart/nano-banana-2',
+            provider: 'apimart',
+            generationParams: { aspectRatio: '自适应' },
+          },
+          group: { id: 'group', type: 'group' },
+          imageA: {
+            id: 'imageA',
+            type: 'source-image',
+            parentId: 'group',
+            width: 0x384,
+            height: 0x640,
+            _bizRev: 1,
+          },
+          imageB: {
+            id: 'imageB',
+            type: 'source-image',
+            parentId: 'group',
+            width: 0x640,
+            height: 0x384,
+            _bizRev: 1,
+          },
+        },
+        edges: {
+          groupEdge: {
+            id: 'groupEdge',
+            sourceId: 'group',
+            targetId: _0x4d6adb,
+            groupOutputSourceOrder: ['imageA', 'imageB'],
+          },
+        },
+      },
+      _0x33d009 = () =>
+        _0x3563dc.edges.groupEdge.groupOutputSourceOrder
+          .filter((_0x412029) => _0x3563dc.nodes[_0x412029]?.parentId === 'group')
+          .map((_0x421dd6) => ({
+            ..._0x3563dc.edges.groupEdge,
+            id: 'groupEdge::group-output::' + _0x421dd6,
+            sourceId: _0x421dd6,
+            isGroupOutput: true,
+            outputGroupId: 'group',
+            groupOutputEdgeId: 'groupEdge',
+            effectiveTargetId: _0x4d6adb,
+          }));
+    try {
+      globalThis.document = {
+        activeElement: null,
+        createElement: (_0x22b251) => new FakeElement({ tagName: _0x22b251 }),
+      };
+      const _0x421c20 = {
+          getState: () => _0x3563dc,
+          getIncomingEdges: (_0x47c5ff) => (_0x47c5ff === _0x4d6adb ? _0x33d009() : []),
+        },
+        _0x60a7bb = createAIGenerateNodeStateSyncModule({
+          store: _0x421c20,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+          getDisplayModelName: (_0x57af56) => _0x57af56,
+        });
+      let _0x33947d = 0,
+        _0x1c61a4 = 0;
+      const _0x4c117e = Object.assign(Object.create(_0x60a7bb), {
+        nodeId: _0x4d6adb,
+        _data: _0x3563dc.nodes[_0x4d6adb],
+        _root: new FakeElement(),
+        _refThumbObjectUrls: new Map(),
+        _normalizeDreaminaNodeData: (_0x4a3204) => _0x4a3204,
+        _loadAndDisplayImage: () => {},
+        _applyMaskPreview: () => {},
+        _applyModelParamVisibility: () => {},
+        _updateSubmitButtonState: () => {},
+        _renderRefBar: () => {
+          _0x1c61a4 += 1;
+        },
+        runAdaptiveRatio: () => {
+          _0x33947d += 1;
+        },
+        promptEl: { innerHTML: '', innerText: '', querySelectorAll: () => [] },
+      });
+      (_0x60a7bb.update.call(_0x4c117e, _0x3563dc.nodes[_0x4d6adb]),
+        await new Promise((_0x393ec3) => setTimeout(_0x393ec3, 70)),
+        assert.equal(_0x33947d, 1),
+        assert.equal(_0x1c61a4, 0),
+        (_0x3563dc.nodes.imageA = { ..._0x3563dc.nodes.imageA, parentId: '' }),
+        _0x60a7bb.update.call(_0x4c117e, _0x3563dc.nodes[_0x4d6adb]),
+        await new Promise((_0x5a187b) => setTimeout(_0x5a187b, 70)),
+        assert.equal(_0x33947d, 2),
+        assert.equal(_0x1c61a4, 0));
+    } finally {
+      if (typeof _0x748806 === 'undefined') delete globalThis.document;
+      else globalThis.document = _0x748806;
+    }
+  }),
+  test('aigenImage state sync: schema adaptive ratio triggers display resize on input change', async () => {
+    const _0x5d0f3e = globalThis.document,
+      _0x1d8c8c = 'schema-image-node',
+      _0x467780 = {
+        pickConnectMode: {},
+        nodes: {
+          [_0x1d8c8c]: {
+            id: _0x1d8c8c,
+            type: 'ai-image',
+            model: 'apimart/nano-banana-2',
+            provider: 'apimart',
+            generationParams: { aspectRatio: '自适应' },
+          },
+          imageA: { id: 'imageA', type: 'source-image', width: 0x384, height: 0x640, _bizRev: 1 },
+          imageB: { id: 'imageB', type: 'source-image', width: 0x640, height: 0x384, _bizRev: 1 },
+        },
+        edges: { edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x1d8c8c } },
+      };
+    try {
+      globalThis.document = {
+        activeElement: null,
+        createElement: (_0x1fb288) => new FakeElement({ tagName: _0x1fb288 }),
+      };
+      const _0x2128f4 = {
+          getState: () => _0x467780,
+          getIncomingEdges: (_0x48526f) =>
+            Object.values(_0x467780.edges).filter((_0x46697d) => _0x46697d.targetId === _0x48526f),
+        },
+        _0x419840 = createAIGenerateNodeStateSyncModule({
+          store: _0x2128f4,
+          getImage: async () => null,
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        });
+      let _0x350a3c = 0;
+      const _0x20abc2 = Object.assign(Object.create(_0x419840), {
+        nodeId: _0x1d8c8c,
+        _data: _0x467780.nodes[_0x1d8c8c],
+        refBarEl: new FakeElement(),
+        _refThumbObjectUrls: new Map(),
+        runAdaptiveRatio: () => {
+          _0x350a3c += 1;
+        },
+        promptEl: { innerText: '', querySelectorAll: () => [] },
+      });
+      (await _0x419840._renderRefBarImpl.call(_0x20abc2),
+        await new Promise((_0x4ae5c8) => setTimeout(_0x4ae5c8, 70)),
+        assert.equal(_0x350a3c, 1),
+        (_0x467780.nodes[_0x1d8c8c].generationParams.aspectRatio = '16:9'),
+        (_0x467780.edges.edgeA = { ..._0x467780.edges.edgeA, sourceId: 'imageB' }),
+        await _0x419840._renderRefBarImpl.call(_0x20abc2),
+        await new Promise((_0x4ad844) => setTimeout(_0x4ad844, 70)),
+        assert.equal(_0x350a3c, 1));
+    } finally {
+      if (typeof _0x5d0f3e === 'undefined') delete globalThis.document;
+      else globalThis.document = _0x5d0f3e;
+    }
+  }));

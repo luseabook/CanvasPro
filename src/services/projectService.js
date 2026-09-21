@@ -1,1 +1,474 @@
-const a686_0x3d2ea5=a686_0x5df2;(function(_0x46ede2,_0x58801b){const _0x221567=a686_0x5df2,_0x498791=_0x46ede2();while(!![]){try{const _0x3b7cb2=parseInt(_0x221567(0x1df))/0x1*(parseInt(_0x221567(0x1d4))/0x2)+-parseInt(_0x221567(0x1c3))/0x3*(parseInt(_0x221567(0x20f))/0x4)+parseInt(_0x221567(0x1c2))/0x5+parseInt(_0x221567(0x1ef))/0x6+parseInt(_0x221567(0x1fd))/0x7+parseInt(_0x221567(0x213))/0x8+-parseInt(_0x221567(0x1c6))/0x9;if(_0x3b7cb2===_0x58801b)break;else _0x498791['push'](_0x498791['shift']());}catch(_0x2aed42){_0x498791['push'](_0x498791['shift']());}}}(a686_0x1888,0x80d9d));import{cropGridTilesToServer,checkLocalMediaExistsOnServer,deleteV2ProjectFromServer,ensureImageDerivativesToServer,fetchRemoteBlob,fetchV2ProjectFromServer,fetchV2ProjectsFromServer,saveV2ProjectToServer,saveOutputFromUrlToServer,saveOutputToServer,uploadFileToServer}from'../../api/projectsV2Api.js';import{sanitizeMultiCanvasDataForPersistence}from'../utils/thumbnailPersistence.js';import{localPathToUrl,normalizeLocalPath,pickResultLocalPath}from'../utils/localMediaPath.js';import{buildImageNodeStorageFields,hasImageDerivativeFields,toLocalPathUrl}from'./imageDerivativeService.js';import{PANORAMA_360_DEFAULT_NAME,PANORAMA_360_NODE_TYPE,PANORAMA_SCENE_DEFAULT_NAME,PANORAMA_SCENE_NODE_TYPE,getPanorama360DefaultName,getPanoramaSceneDefaultName,isPanorama360NodeType,isPanoramaSceneNodeType,normalizePanorama360State,normalizeSceneOnlyPanoramaSceneState}from'../modules/panoramaSceneNode/sceneNode.js';const DEFAULT_PROJECT_NAME=a686_0x3d2ea5(0x202),REMOTE_SAVE_CACHE_LIMIT=0x1f4,_remoteSaveInflight=new Map(),_remoteSaveCache=new Map();function _buildRemoteSaveCacheKey(_0x49c7b4,_0x222dc2,_0x5285f0={}){const _0x5e5d20=a686_0x3d2ea5,_0x2dc9dd=String(_0x222dc2||'')[_0x5e5d20(0x1cb)](),_0x2c240c=String(_0x5285f0?.[_0x5e5d20(0x230)]||(_0x5285f0?.[_0x5e5d20(0x1cc)]?_0x5285f0[_0x5e5d20(0x1cc)]+':'+_0x2dc9dd:_0x2dc9dd))[_0x5e5d20(0x1cb)]();return(String(_0x49c7b4||_0x5e5d20(0x1eb))[_0x5e5d20(0x1cb)]()||_0x5e5d20(0x1eb))+':'+(_0x2c240c||_0x2dc9dd);}function _rememberRemoteSave(_0x104d8f,_0x27561b){const _0x10bd22=a686_0x3d2ea5;if(!_0x104d8f||!_0x27561b||typeof _0x27561b!==_0x10bd22(0x22b))return;_remoteSaveCache[_0x10bd22(0x233)](_0x104d8f,_0x27561b);if(_remoteSaveCache[_0x10bd22(0x21d)]>REMOTE_SAVE_CACHE_LIMIT){const _0x41d47a=_remoteSaveCache['keys']()['next']()[_0x10bd22(0x210)];if(_0x41d47a)_remoteSaveCache[_0x10bd22(0x22f)](_0x41d47a);}}function _runRemoteSaveOnce(_0x35bcf6,_0x3d8f02){const _0x362061=a686_0x3d2ea5;if(_remoteSaveCache[_0x362061(0x1e9)](_0x35bcf6))return Promise[_0x362061(0x1c1)](_remoteSaveCache[_0x362061(0x209)](_0x35bcf6));if(_remoteSaveInflight['has'](_0x35bcf6))return _remoteSaveInflight[_0x362061(0x209)](_0x35bcf6);const _0x45ebbe=Promise[_0x362061(0x1c1)]()[_0x362061(0x1e1)](_0x3d8f02)['then'](_0x529a90=>{return _rememberRemoteSave(_0x35bcf6,_0x529a90),_0x529a90;});return _remoteSaveInflight[_0x362061(0x233)](_0x35bcf6,_0x45ebbe),_0x45ebbe[_0x362061(0x1dd)](()=>{const _0x4bb778=_0x362061;_remoteSaveInflight[_0x4bb778(0x209)](_0x35bcf6)===_0x45ebbe&&_remoteSaveInflight['delete'](_0x35bcf6);})[_0x362061(0x206)](()=>{}),_0x45ebbe;}function _isPlainObject(_0x452dce){const _0x2a1218=a686_0x3d2ea5;return!!_0x452dce&&typeof _0x452dce===_0x2a1218(0x22b)&&!Array['isArray'](_0x452dce);}function _migratePanoramaNodeInPlace(_0x32ad56){const _0x57413d=a686_0x3d2ea5;if(!_isPlainObject(_0x32ad56))return;const _0x506dec=String(_0x32ad56[_0x57413d(0x22c)]||'')[_0x57413d(0x1cb)]();if(isPanorama360NodeType(_0x506dec)){_0x32ad56[_0x57413d(0x22c)]=PANORAMA_360_NODE_TYPE;const _0x37aeee=_isPlainObject(_0x32ad56[_0x57413d(0x1c7)])?_0x32ad56[_0x57413d(0x1c7)]:_0x32ad56['sceneNode'];_0x32ad56[_0x57413d(0x1c7)]=normalizePanorama360State(_0x37aeee),delete _0x32ad56[_0x57413d(0x1e8)];!String(_0x32ad56['name']||'')[_0x57413d(0x1cb)]()&&(_0x32ad56[_0x57413d(0x207)]=getPanorama360DefaultName());return;}if(!isPanoramaSceneNodeType(_0x506dec))return;_0x32ad56[_0x57413d(0x22c)]=PANORAMA_SCENE_NODE_TYPE;const _0x232fd6=_isPlainObject(_0x32ad56[_0x57413d(0x1e8)])?_0x32ad56[_0x57413d(0x1e8)]:_0x32ad56[_0x57413d(0x1c7)],_0x2b0471=normalizeSceneOnlyPanoramaSceneState(_0x232fd6),_0x2a55d5=String(_0x232fd6?.[_0x57413d(0x21a)]||'')[_0x57413d(0x1cb)]()[_0x57413d(0x216)](),_0x422d64=_0x2a55d5==='panorama';if(_0x422d64){_0x32ad56['type']=PANORAMA_360_NODE_TYPE,_0x32ad56['panorama360Node']=normalizePanorama360State(_0x232fd6),delete _0x32ad56[_0x57413d(0x1e8)];const _0x5b1e9f=String(_0x32ad56[_0x57413d(0x207)]||'')[_0x57413d(0x1cb)](),_0x28feb0=getPanoramaSceneDefaultName();(!_0x5b1e9f||_0x5b1e9f===PANORAMA_SCENE_DEFAULT_NAME||_0x5b1e9f===_0x28feb0)&&(_0x32ad56[_0x57413d(0x207)]=getPanorama360DefaultName());return;}_0x32ad56['sceneNode']=_0x2b0471,delete _0x32ad56[_0x57413d(0x1c7)],!String(_0x32ad56['name']||'')['trim']()&&(_0x32ad56[_0x57413d(0x207)]=getPanoramaSceneDefaultName());}function _migrateCanvasDataInPlace(_0x44b60a){const _0x5c36db=a686_0x3d2ea5,_0x1628a3=Array[_0x5c36db(0x1fe)](_0x44b60a?.[_0x5c36db(0x1fb)])?_0x44b60a[_0x5c36db(0x1fb)]:[];for(const _0x3f47a8 of _0x1628a3){if(!_0x3f47a8)continue;if(_0x3f47a8[_0x5c36db(0x219)]&&!Array[_0x5c36db(0x1fe)](_0x3f47a8[_0x5c36db(0x219)]))_0x3f47a8[_0x5c36db(0x219)]=Object[_0x5c36db(0x223)](_0x3f47a8[_0x5c36db(0x219)]);if(_0x3f47a8[_0x5c36db(0x1f8)]&&!Array[_0x5c36db(0x1fe)](_0x3f47a8['edges']))_0x3f47a8[_0x5c36db(0x1f8)]=Object[_0x5c36db(0x223)](_0x3f47a8[_0x5c36db(0x1f8)]);const _0x21abe4=Array[_0x5c36db(0x1fe)](_0x3f47a8[_0x5c36db(0x219)])?_0x3f47a8[_0x5c36db(0x219)]:[];for(const _0x2f4641 of _0x21abe4){_migratePanoramaNodeInPlace(_0x2f4641);}}return _0x44b60a;}const getCssVar=_0x5ddd1b=>getComputedStyle(document[a686_0x3d2ea5(0x22a)])[a686_0x3d2ea5(0x1d1)](_0x5ddd1b)[a686_0x3d2ea5(0x1cb)]();export function resolveCanvasData(_0x5e88f2){const _0x1f927e=a686_0x3d2ea5;if(!_0x5e88f2)return _migrateCanvasDataInPlace({'canvases':[{'id':'canvas_1','name':'默认画布','nodes':[],'edges':[],'viewport':{'x':0x0,'y':0x0,'zoom':1.1}}],'activeCanvasId':'canvas_1'});if(Array[_0x1f927e(0x1fe)](_0x5e88f2[_0x1f927e(0x1fb)])&&_0x5e88f2[_0x1f927e(0x1fb)][_0x1f927e(0x221)]>0x0){let _0x478806=_0x5e88f2[_0x1f927e(0x1be)]||_0x5e88f2[_0x1f927e(0x1fb)][0x0]['id'];const _0x4a367a=_0x5e88f2['canvases']['find'](_0x4c1daa=>_0x4c1daa['id']===_0x478806);if(_0x4a367a&&(!_0x4a367a[_0x1f927e(0x219)]||_0x4a367a['nodes'][_0x1f927e(0x221)]===0x0)){const _0xefbd3c=_0x5e88f2[_0x1f927e(0x1fb)]['find'](_0x405564=>_0x405564['nodes']&&_0x405564['nodes'][_0x1f927e(0x221)]>0x0);if(_0xefbd3c)_0x478806=_0xefbd3c['id'];}return _migrateCanvasDataInPlace({'canvases':_0x5e88f2['canvases'],'activeCanvasId':_0x478806});}let _0x97a7ed=_0x5e88f2[_0x1f927e(0x219)]||_0x5e88f2[_0x1f927e(0x1c4)]||[],_0x449c45=_0x5e88f2[_0x1f927e(0x1f8)]||_0x5e88f2[_0x1f927e(0x228)]||[];if(!Array[_0x1f927e(0x1fe)](_0x97a7ed))_0x97a7ed=Object[_0x1f927e(0x223)](_0x97a7ed);if(!Array[_0x1f927e(0x1fe)](_0x449c45))_0x449c45=Object[_0x1f927e(0x223)](_0x449c45);const _0x5d414a={'id':_0x1f927e(0x1bd),'name':_0x1f927e(0x1d7),'nodes':_0x97a7ed,'edges':_0x449c45,'viewport':_0x5e88f2[_0x1f927e(0x1e5)]||{'x':0x0,'y':0x0,'zoom':1.1}};return _migrateCanvasDataInPlace({'canvases':[_0x5d414a],'activeCanvasId':_0x1f927e(0x1bd)});}export async function loadProject(_0x4e7d52){const _0x1e5dbd=a686_0x3d2ea5;try{const _0x4eec6e=_0x4e7d52[_0x1e5dbd(0x20d)](_0x1e5dbd(0x1e3))?_0x4e7d52:_0x4e7d52+_0x1e5dbd(0x1e3),_0x130c4b=await fetchV2ProjectFromServer(_0x4e7d52);if(!_0x130c4b)return console['warn'](_0x1e5dbd(0x21e)+_0x4eec6e+_0x1e5dbd(0x1d2)),resolveCanvasData({});const _0x673f3b=resolveCanvasData(_0x130c4b);return console[_0x1e5dbd(0x1de)]('[projectService]\x20项目\x20'+_0x4e7d52+_0x1e5dbd(0x236)+_0x673f3b[_0x1e5dbd(0x1fb)]['length']+_0x1e5dbd(0x21c)),_0x673f3b;}catch(_0xfc51ac){return console[_0x1e5dbd(0x1fc)]('[projectService]\x20加载项目异常:',_0xfc51ac),resolveCanvasData({});}}export async function saveProject(_0x3a2cbb,_0x30e137){const _0x42f4a2=a686_0x3d2ea5;try{const _0x166098=sanitizeMultiCanvasDataForPersistence(_0x30e137||{}),_0x59d4fd={'projectName':_0x3a2cbb||DEFAULT_PROJECT_NAME,'activeCanvasId':_0x166098?.[_0x42f4a2(0x1be)]||_0x42f4a2(0x1bd),'canvases':_0x166098?.[_0x42f4a2(0x1fb)]||[]},_0x395f9f=await saveV2ProjectToServer(_0x59d4fd);return _0x395f9f&&_0x395f9f[_0x42f4a2(0x203)]&&(window['_v2CurrentFile']=_0x395f9f[_0x42f4a2(0x1e7)],window[_0x42f4a2(0x243)]=_0x395f9f[_0x42f4a2(0x1e7)][_0x42f4a2(0x20c)](_0x42f4a2(0x1e3),''),_clearElectronRecoverySnapshotAfterSave()),console[_0x42f4a2(0x1de)](_0x42f4a2(0x226)+_0x3a2cbb+'\x20已持久化（'+_0x59d4fd[_0x42f4a2(0x1fb)][_0x42f4a2(0x221)]+_0x42f4a2(0x225)),_0x395f9f;}catch(_0x23e8c7){console[_0x42f4a2(0x1fc)](_0x42f4a2(0x23b),_0x23e8c7);throw _0x23e8c7;}}export async function getProjects(){try{return await fetchV2ProjectsFromServer();}catch{return[];}}export async function deleteProject(_0x51bac5){const _0x1d1b9d=a686_0x3d2ea5;try{return await deleteV2ProjectFromServer(_0x51bac5);}catch(_0x27ca2d){return console[_0x1d1b9d(0x1fc)](_0x1d1b9d(0x237),_0x27ca2d),![];}}function _getElectronImportAsset(){const _0x3a35ff=a686_0x3d2ea5,_0x35ea38=globalThis[_0x3a35ff(0x234)]?.[_0x3a35ff(0x1dc)]?.['importAsset'];return typeof _0x35ea38===_0x3a35ff(0x1f5)?_0x35ea38:null;}function _clearElectronRecoverySnapshotAfterSave(){const _0xccb7c3=a686_0x3d2ea5,_0x5ed114=globalThis[_0xccb7c3(0x234)]?.[_0xccb7c3(0x1dc)]?.[_0xccb7c3(0x1f6)]?.[_0xccb7c3(0x23f)];if(typeof _0x5ed114!=='function')return;void _0x5ed114()[_0xccb7c3(0x206)](_0x5a0468=>{const _0x58b4a7=_0xccb7c3;console[_0x58b4a7(0x1d0)](_0x58b4a7(0x218),_0x5a0468);});}function _getElectronPathForFile(_0x18658d){const _0xa5cd0b=a686_0x3d2ea5;if(!globalThis['window']?.['electronAPI'])return'';const _0x24d4d6=String(_0x18658d?.[_0xa5cd0b(0x1f3)]||'')[_0xa5cd0b(0x1cb)]();if(_0x24d4d6)return _0x24d4d6;const _0x2038a0=globalThis['window'][_0xa5cd0b(0x1dc)][_0xa5cd0b(0x1d8)];if(typeof _0x2038a0!==_0xa5cd0b(0x1f5))return'';try{return String(_0x2038a0(_0x18658d)||'')[_0xa5cd0b(0x1cb)]();}catch{return'';}}async function _importAssetWithElectron(_0x57a5b7,_0x4e6db3){const _0x1d2092=a686_0x3d2ea5,_0x42a35b=_getElectronImportAsset();if(!_0x42a35b||!_0x57a5b7)return null;const _0x17a4ca={'name':_0x57a5b7[_0x1d2092(0x207)]||_0x1d2092(0x21f),'type':_0x57a5b7[_0x1d2092(0x22c)]||'','projectId':_0x4e6db3},_0x45bca8=_getElectronPathForFile(_0x57a5b7);if(_0x45bca8)_0x17a4ca[_0x1d2092(0x1f3)]=_0x45bca8;else{if(typeof _0x57a5b7[_0x1d2092(0x23c)]===_0x1d2092(0x1f5))_0x17a4ca['bytes']=await _0x57a5b7['arrayBuffer']();else return null;}return _normalizeImageSaveResult(await _0x42a35b(_0x17a4ca));}export async function uploadFile(_0xde666e,_0x1e099b){const _0x55f9ba=a686_0x3d2ea5;try{try{const _0x37cace=await _importAssetWithElectron(_0xde666e,_0x1e099b);if(_0x37cace?.[_0x55f9ba(0x203)])return _0x37cace;}catch(_0x564f7c){console[_0x55f9ba(0x1d0)](_0x55f9ba(0x21b),_0x564f7c);}return _normalizeImageSaveResult(await uploadFileToServer(_0xde666e));}catch(_0x5c4397){console['error'](_0x55f9ba(0x20b),_0x5c4397);throw _0x5c4397;}}export async function saveOutputBlob(_0x4fa99c,_0x257948={}){return _normalizeImageSaveResult(await saveOutputToServer(_0x4fa99c,_0x257948));}export async function cropGridTiles(_0x3deaa3={}){const _0xf8af75=a686_0x3d2ea5,_0x49d792=await cropGridTilesToServer(_0x3deaa3);if(!_0x49d792||typeof _0x49d792!=='object')return _0x49d792;const _0x5219b7=Array[_0xf8af75(0x1fe)](_0x49d792[_0xf8af75(0x1e0)])?_0x49d792[_0xf8af75(0x1e0)][_0xf8af75(0x1cf)](_0x1c1f8b=>_normalizeImageSaveResult(_0x1c1f8b)):[];return{..._0x49d792,'tiles':_0x5219b7};}export async function saveOutputFromUrl(_0x9c4364,_0x36746b={}){const _0x23ce62=a686_0x3d2ea5,_0x43daf5=String(_0x9c4364||'')[_0x23ce62(0x1cb)]();if(_0x43daf5[_0x23ce62(0x1cd)](_0x23ce62(0x1d5))||_0x43daf5[_0x23ce62(0x1cd)](_0x23ce62(0x222)))try{const _0x1312b2=await fetchRemoteBlob(_0x43daf5);return await saveOutputBlob(_0x1312b2,_0x36746b);}catch(_0x1ac503){return console['error']('[projectService]\x20本地路径转换\x20Blob\x20失败:',_0x1ac503),{'error':'本地路径转换失败:\x20'+_0x1ac503[_0x23ce62(0x1c8)]};}return _normalizeImageSaveResult(await saveOutputFromUrlToServer({'url':_0x43daf5,..._0x36746b}));}function _guessAudioExtFromUrl(_0x542ab6){const _0x49f2e9=a686_0x3d2ea5;try{const _0x550cd0=new URL(String(_0x542ab6||''),_0x49f2e9(0x231)),_0x158e92=String(_0x550cd0[_0x49f2e9(0x1ec)]||'')['match'](/\.([a-z0-9]{1,5})$/i),_0x1b959c=String(_0x158e92?.[0x1]||'')[_0x49f2e9(0x216)]();if([_0x49f2e9(0x1f4),'mp3',_0x49f2e9(0x208),_0x49f2e9(0x201),'aac',_0x49f2e9(0x212),'opus','wma','amr',_0x49f2e9(0x1f1)]['includes'](_0x1b959c))return _0x1b959c;}catch{}return'';}function _guessAudioExtFromMime(_0xb136a3){const _0x535977=a686_0x3d2ea5,_0x22e7cb=String(_0xb136a3||'')[_0x535977(0x1cb)]()[_0x535977(0x216)]();if(!_0x22e7cb)return'';if(_0x22e7cb===_0x535977(0x211))return _0x535977(0x1f9);if(_0x22e7cb===_0x535977(0x1ca)||_0x22e7cb===_0x535977(0x220))return _0x535977(0x1f4);if(_0x22e7cb==='audio/mp4'||_0x22e7cb===_0x535977(0x232))return _0x535977(0x208);if(_0x22e7cb===_0x535977(0x1f7)||_0x22e7cb===_0x535977(0x1da))return'flac';if(_0x22e7cb===_0x535977(0x1f0))return _0x535977(0x23e);if(_0x22e7cb===_0x535977(0x20e))return _0x535977(0x212);if(_0x22e7cb==='audio/opus')return _0x535977(0x23d);if(_0x22e7cb===_0x535977(0x238))return _0x535977(0x1f1);if(_0x22e7cb===_0x535977(0x1e4))return _0x535977(0x214);return'';}function _toLocalAudioResult(_0x389e23){const _0x21b077=a686_0x3d2ea5,_0x412a02=normalizeLocalPath(_0x389e23?.['localPath']||_0x389e23?.[_0x21b077(0x224)]||_0x389e23?.[_0x21b077(0x1f3)]),_0x185057=localPathToUrl(_0x412a02);return{..._0x389e23&&typeof _0x389e23===_0x21b077(0x22b)?_0x389e23:{},'localPath':_0x412a02,'localUrl':_0x185057};}export async function saveRemoteAudioLocallyDetailed(_0x1f6e6e,_0x113c21={}){const _0x10edf3=a686_0x3d2ea5,_0x3a2cb8=String(_0x1f6e6e||'')[_0x10edf3(0x1cb)]();if(!_0x3a2cb8)throw new Error('保存音频失败:\x20缺少\x20remoteUrl');return _runRemoteSaveOnce(_buildRemoteSaveCacheKey(_0x10edf3(0x205),_0x3a2cb8,_0x113c21),async()=>{const _0x479481=_0x10edf3;if(_0x3a2cb8[_0x479481(0x1cd)](_0x479481(0x1d5))||_0x3a2cb8[_0x479481(0x1cd)](_0x479481(0x222))){const _0x52e649=await fetchRemoteBlob(_0x3a2cb8),_0x486cc3=_guessAudioExtFromMime(_0x52e649?.[_0x479481(0x22c)])||_0x479481(0x1f9);return _toLocalAudioResult(await saveOutputBlob(_0x52e649,{'ext':_0x486cc3,..._0x113c21}));}const _0x369ee0=_guessAudioExtFromUrl(_0x3a2cb8)||_0x479481(0x1f9);try{return _toLocalAudioResult(await saveOutputFromUrl(_0x3a2cb8,{'ext':_0x369ee0,'maxBytes':0x400*0x400*0xc8,..._0x113c21}));}catch{}const _0x5131b9=await fetchRemoteBlob(_0x3a2cb8),_0x4bd2a3=_guessAudioExtFromMime(_0x5131b9?.['type'])||_0x369ee0;return _toLocalAudioResult(await saveOutputBlob(_0x5131b9,{'ext':_0x4bd2a3,..._0x113c21}));});}function a686_0x5df2(_0x1a594c,_0x193270){const _0x1888a8=a686_0x1888();return a686_0x5df2=function(_0x5df233,_0x1cf195){_0x5df233=_0x5df233-0x1bc;let _0xefeaaf=_0x1888a8[_0x5df233];return _0xefeaaf;},a686_0x5df2(_0x1a594c,_0x193270);}function _toLocalUrlFromSaveResult(_0x5a2d64){const _0x1e106b=a686_0x3d2ea5;return localPathToUrl(_0x5a2d64?.[_0x1e106b(0x224)])||localPathToUrl(pickResultLocalPath(_0x5a2d64));}function _normalizeImageSaveResult(_0x41d7b2){const _0x55ab8a=a686_0x3d2ea5;if(!_0x41d7b2||typeof _0x41d7b2!==_0x55ab8a(0x22b))return _0x41d7b2;if(!hasImageDerivativeFields(_0x41d7b2))return _0x41d7b2;const _0x58471d=buildImageNodeStorageFields(_0x41d7b2),_0x119078={..._0x41d7b2,..._0x58471d};return!String(_0x119078['url']||'')['trim']()&&_0x58471d['localPath']&&(_0x119078[_0x55ab8a(0x22e)]=toLocalPathUrl(_0x58471d[_0x55ab8a(0x1c9)])),!String(_0x119078[_0x55ab8a(0x23a)]||'')[_0x55ab8a(0x1cb)]()&&_0x58471d[_0x55ab8a(0x224)]&&(_0x119078[_0x55ab8a(0x23a)]=toLocalPathUrl(_0x58471d[_0x55ab8a(0x224)])),!String(_0x119078[_0x55ab8a(0x215)]||'')['trim']()&&_0x58471d['displayLocalPath']&&(_0x119078[_0x55ab8a(0x215)]=toLocalPathUrl(_0x58471d['displayLocalPath'])),!String(_0x119078['thumbUrl']||'')['trim']()&&_0x58471d[_0x55ab8a(0x242)]&&(_0x119078[_0x55ab8a(0x1ee)]=toLocalPathUrl(_0x58471d[_0x55ab8a(0x242)])),_0x119078;}function _guessImageExtFromUrl(_0xa9d14c){const _0x103380=a686_0x3d2ea5,_0xf74109=String(_0xa9d14c||'')[_0x103380(0x1cb)]();if(!_0xf74109)return'';try{const _0xec7e60=new URL(_0xf74109,window[_0x103380(0x204)][_0x103380(0x229)]),_0x1f0955=String(_0xec7e60[_0x103380(0x1ec)]||''),_0x1cd05f=_0x1f0955[_0x103380(0x1d6)](/\.([a-z0-9]{1,5})$/i),_0x4806bd=(_0x1cd05f?.[0x1]||'')[_0x103380(0x216)]();if(!_0x4806bd)return'';if(_0x4806bd===_0x103380(0x200))return _0x103380(0x1bf);if(_0x4806bd===_0x103380(0x1bf))return _0x103380(0x1bf);if(_0x4806bd===_0x103380(0x227))return _0x103380(0x227);if(_0x4806bd===_0x103380(0x1db))return _0x103380(0x1db);if(_0x4806bd===_0x103380(0x1ed))return _0x103380(0x1ed);return'';}catch{return'';}}export async function ensureLocalImageDerivatives(_0x38fd1b){return _normalizeImageSaveResult(await ensureImageDerivativesToServer({'localPath':_0x38fd1b}));}export async function checkLocalMediaExists(_0x2a8ff8){return await checkLocalMediaExistsOnServer({'localPath':_0x2a8ff8});}function a686_0x1888(){const _0x14a2b4=['pathname','gif','thumbUrl','3860550fiGQha','audio/aac','webm','保存到本地失败','path','wav','function','project','audio/flac','edges','mp3','parse','canvases','error','6329736vvnwCr','isArray','onerror','jpeg','flac','default_v2_project','success','location','audio','catch','name','m4a','get','download','[projectService]\x20文件上传异常:','replace','endsWith','audio/ogg','3756nFIoyR','value','audio/mpeg','ogg','7019672HHWwUk','amr','displayUrl','toLowerCase','appendChild','[projectService]\x20清理恢复快照失败:','nodes','mode','[projectService]\x20Electron\x20素材导入失败，回退上传流程:','\x20个画布页面','size','[projectService]\x20项目文件\x20','asset','audio/x-wav','length','data:','values','originalLocalPath','\x20个画布）','[projectService]\x20项目\x20','png','v2_edges','href','documentElement','object','type','image/webp','url','delete','dedupeKey','http://localhost','audio/x-m4a','set','window','body','\x20已加载，共\x20','[projectService]\x20删除项目失败:','audio/webm','image/png','originalUrl','[projectService]\x20存档异常:','arrayBuffer','opus','aac','clearRecoverySnapshot','文件读取失败','image/jpeg','thumbLocalPath','currentProjectId','removeChild','canvas_1','activeCanvasId','jpg','localUrl','resolve','4058430pgPZbJ','3087lqpOuq','v2_nodes','createElement','19834533NEHZWS','panorama360Node','message','localPath','audio/wav','trim','taskKey','startsWith','image','map','warn','getPropertyValue','\x20不存在，以空数据初始化...','image/gif','1598ccOBrs','blob:','match','默认画布','getPathForFile','createObjectURL','audio/x-flac','webp','electronAPI','finally','log','577Kszmhk','tiles','then','click','.json','audio/amr','viewport','result','filename','sceneNode','has','保存到本地失败:\x20缺少\x20remoteUrl','media'];a686_0x1888=function(){return _0x14a2b4;};return a686_0x1888();}export async function saveRemoteImageLocallyDetailed(_0x1a0b67,_0x47e984,_0x2a03ac={}){const _0x393f20=a686_0x3d2ea5,_0x3146d7=String(_0x1a0b67||'')[_0x393f20(0x1cb)]();if(!_0x3146d7)throw new Error(_0x393f20(0x1ea));return _runRemoteSaveOnce(_buildRemoteSaveCacheKey(_0x393f20(0x1ce),_0x3146d7,_0x2a03ac),async()=>{const _0x57128d=_0x393f20;if(_0x3146d7[_0x57128d(0x1cd)](_0x57128d(0x1d5))||_0x3146d7['startsWith'](_0x57128d(0x222))){try{const _0xfea851=await fetchRemoteBlob(_0x3146d7);let _0x51a88e=_0x57128d(0x227);if(_0xfea851[_0x57128d(0x22c)]===_0x57128d(0x241))_0x51a88e=_0x57128d(0x1bf);else{if(_0xfea851[_0x57128d(0x22c)]==='image/webp')_0x51a88e='webp';else{if(_0xfea851[_0x57128d(0x22c)]===_0x57128d(0x239))_0x51a88e=_0x57128d(0x227);else{if(_0xfea851[_0x57128d(0x22c)]===_0x57128d(0x1d3))_0x51a88e=_0x57128d(0x1ed);}}}const _0x443664=await saveOutputBlob(_0xfea851,{'ext':_0x51a88e,..._0x2a03ac}),_0x16d97c=_toLocalUrlFromSaveResult(_0x443664);if(_0x16d97c)return{..._0x443664,'localUrl':_0x16d97c};}catch{}throw new Error(_0x57128d(0x1f2));}try{const _0x2aa11b=_guessImageExtFromUrl(_0x3146d7)||'png',_0x25e5a9=await saveOutputFromUrl(_0x3146d7,{'ext':_0x2aa11b,'maxBytes':0x400*0x400*0x3c,..._0x2a03ac}),_0x1e7bc5=_toLocalUrlFromSaveResult(_0x25e5a9);if(_0x1e7bc5)return{..._0x25e5a9,'localUrl':_0x1e7bc5};throw new Error('保存到本地失败:\x20服务器未返回\x20url');}catch{}const _0x6111bb=await fetchRemoteBlob(_0x3146d7);let _0x357c2b=_0x57128d(0x227);if(_0x6111bb[_0x57128d(0x22c)]===_0x57128d(0x241))_0x357c2b=_0x57128d(0x1bf);else{if(_0x6111bb[_0x57128d(0x22c)]===_0x57128d(0x22d))_0x357c2b=_0x57128d(0x1db);else{if(_0x6111bb[_0x57128d(0x22c)]==='image/png')_0x357c2b=_0x57128d(0x227);else{if(_0x6111bb[_0x57128d(0x22c)]===_0x57128d(0x1d3))_0x357c2b='gif';}}}const _0x510f77=await saveOutputBlob(_0x6111bb,{'ext':_0x357c2b,..._0x2a03ac}),_0x316629=_toLocalUrlFromSaveResult(_0x510f77);if(_0x316629)return{..._0x510f77,'localUrl':_0x316629};throw new Error(_0x57128d(0x1f2));});}export async function saveRemoteImageLocally(_0x5c3d4f,_0x28f700,_0x195386={}){const _0x4cab3c=a686_0x3d2ea5,_0x5a3b15=await saveRemoteImageLocallyDetailed(_0x5c3d4f,_0x28f700,_0x195386);return String(_0x5a3b15?.[_0x4cab3c(0x1c0)]||'')[_0x4cab3c(0x1cb)]()||_toLocalUrlFromSaveResult(_0x5a3b15);}export function exportProject(_0x4f61c6,_0x37f839){const _0x3ab6c8=a686_0x3d2ea5,_0x4fab6d=new Blob([JSON['stringify'](_0x37f839,null,0x2)],{'type':'application/json'}),_0x355f18=URL[_0x3ab6c8(0x1d9)](_0x4fab6d),_0x38945c=document[_0x3ab6c8(0x1c5)]('a');_0x38945c[_0x3ab6c8(0x229)]=_0x355f18,_0x38945c[_0x3ab6c8(0x20a)]=_0x4f61c6+_0x3ab6c8(0x1e3),document['body'][_0x3ab6c8(0x217)](_0x38945c),_0x38945c[_0x3ab6c8(0x1e2)](),document[_0x3ab6c8(0x235)][_0x3ab6c8(0x1bc)](_0x38945c),URL['revokeObjectURL'](_0x355f18);}export async function importProject(_0xcaee16){return new Promise((_0x56d050,_0x1499ce)=>{const _0x426cd5=a686_0x5df2,_0x1d20e8=new FileReader();_0x1d20e8['onload']=_0x2ad99e=>{const _0x29f230=a686_0x5df2;try{const _0x5677b8=JSON[_0x29f230(0x1fa)](_0x2ad99e['target'][_0x29f230(0x1e6)]),_0xc6554=resolveCanvasData(_0x5677b8);_0x56d050(_0xc6554);}catch(_0x3dc8e7){_0x1499ce(new Error('解析\x20JSON\x20存档失败'));}},_0x1d20e8[_0x426cd5(0x1ff)]=()=>_0x1499ce(new Error(_0x426cd5(0x240))),_0x1d20e8['readAsText'](_0xcaee16);});}
+import {
+  cropGridTilesToServer,
+  checkLocalMediaExistsOnServer,
+  deleteV2ProjectFromServer,
+  ensureImageDerivativesToServer,
+  fetchRemoteBlob,
+  fetchV2ProjectFromServer,
+  fetchV2ProjectsFromServer,
+  saveV2ProjectToServer,
+  saveOutputFromUrlToServer,
+  saveOutputToServer,
+  uploadFileToServer,
+} from '../../api/projectsV2Api.js';
+import { sanitizeMultiCanvasDataForPersistence } from '../utils/thumbnailPersistence.js';
+import { localPathToUrl, normalizeLocalPath, pickResultLocalPath } from '../utils/localMediaPath.js';
+import {
+  buildImageNodeStorageFields,
+  hasImageDerivativeFields,
+  toLocalPathUrl,
+} from './imageDerivativeService.js';
+import {
+  PANORAMA_360_DEFAULT_NAME,
+  PANORAMA_360_NODE_TYPE,
+  PANORAMA_SCENE_DEFAULT_NAME,
+  PANORAMA_SCENE_NODE_TYPE,
+  getPanorama360DefaultName,
+  getPanoramaSceneDefaultName,
+  isPanorama360NodeType,
+  isPanoramaSceneNodeType,
+  normalizePanorama360State,
+  normalizeSceneOnlyPanoramaSceneState,
+} from '../modules/panoramaSceneNode/sceneNode.js';
+const DEFAULT_PROJECT_NAME = 'default_v2_project',
+  REMOTE_SAVE_CACHE_LIMIT = 0x1f4,
+  _remoteSaveInflight = new Map(),
+  _remoteSaveCache = new Map();
+function _buildRemoteSaveCacheKey(_0x49c7b4, _0x222dc2, _0x5285f0 = {}) {
+  const _0x2dc9dd = String(_0x222dc2 || '').trim(),
+    _0x2c240c = String(
+      _0x5285f0?.dedupeKey || (_0x5285f0?.taskKey ? _0x5285f0.taskKey + ':' + _0x2dc9dd : _0x2dc9dd),
+    ).trim();
+  return (String(_0x49c7b4 || 'media').trim() || 'media') + ':' + (_0x2c240c || _0x2dc9dd);
+}
+function _rememberRemoteSave(_0x104d8f, _0x27561b) {
+  if (!_0x104d8f || !_0x27561b || typeof _0x27561b !== 'object') return;
+  _remoteSaveCache.set(_0x104d8f, _0x27561b);
+  if (_remoteSaveCache.size > REMOTE_SAVE_CACHE_LIMIT) {
+    const _0x41d47a = _remoteSaveCache.keys().next().value;
+    if (_0x41d47a) _remoteSaveCache.delete(_0x41d47a);
+  }
+}
+function _runRemoteSaveOnce(_0x35bcf6, _0x3d8f02) {
+  if (_remoteSaveCache.has(_0x35bcf6)) return Promise.resolve(_remoteSaveCache.get(_0x35bcf6));
+  if (_remoteSaveInflight.has(_0x35bcf6)) return _remoteSaveInflight.get(_0x35bcf6);
+  const _0x45ebbe = Promise.resolve()
+    .then(_0x3d8f02)
+    .then((_0x529a90) => {
+      return (_rememberRemoteSave(_0x35bcf6, _0x529a90), _0x529a90);
+    });
+  return (
+    _remoteSaveInflight.set(_0x35bcf6, _0x45ebbe),
+    _0x45ebbe
+      .finally(() => {
+        _remoteSaveInflight.get(_0x35bcf6) === _0x45ebbe && _remoteSaveInflight.delete(_0x35bcf6);
+      })
+      .catch(() => {}),
+    _0x45ebbe
+  );
+}
+function _isPlainObject(_0x452dce) {
+  return !!_0x452dce && typeof _0x452dce === 'object' && !Array.isArray(_0x452dce);
+}
+function _migratePanoramaNodeInPlace(_0x32ad56) {
+  if (!_isPlainObject(_0x32ad56)) return;
+  const _0x506dec = String(_0x32ad56.type || '').trim();
+  if (isPanorama360NodeType(_0x506dec)) {
+    _0x32ad56.type = PANORAMA_360_NODE_TYPE;
+    const _0x37aeee = _isPlainObject(_0x32ad56.panorama360Node)
+      ? _0x32ad56.panorama360Node
+      : _0x32ad56.sceneNode;
+    ((_0x32ad56.panorama360Node = normalizePanorama360State(_0x37aeee)), delete _0x32ad56.sceneNode);
+    !String(_0x32ad56.name || '').trim() && (_0x32ad56.name = getPanorama360DefaultName());
+    return;
+  }
+  if (!isPanoramaSceneNodeType(_0x506dec)) return;
+  _0x32ad56.type = PANORAMA_SCENE_NODE_TYPE;
+  const _0x232fd6 = _isPlainObject(_0x32ad56.sceneNode) ? _0x32ad56.sceneNode : _0x32ad56.panorama360Node,
+    _0x2b0471 = normalizeSceneOnlyPanoramaSceneState(_0x232fd6),
+    _0x2a55d5 = String(_0x232fd6?.mode || '')
+      .trim()
+      .toLowerCase(),
+    _0x422d64 = _0x2a55d5 === 'panorama';
+  if (_0x422d64) {
+    ((_0x32ad56.type = PANORAMA_360_NODE_TYPE),
+      (_0x32ad56.panorama360Node = normalizePanorama360State(_0x232fd6)),
+      delete _0x32ad56.sceneNode);
+    const _0x5b1e9f = String(_0x32ad56.name || '').trim(),
+      _0x28feb0 = getPanoramaSceneDefaultName();
+    (!_0x5b1e9f || _0x5b1e9f === PANORAMA_SCENE_DEFAULT_NAME || _0x5b1e9f === _0x28feb0) &&
+      (_0x32ad56.name = getPanorama360DefaultName());
+    return;
+  }
+  ((_0x32ad56.sceneNode = _0x2b0471),
+    delete _0x32ad56.panorama360Node,
+    !String(_0x32ad56.name || '').trim() && (_0x32ad56.name = getPanoramaSceneDefaultName()));
+}
+function _migrateCanvasDataInPlace(_0x44b60a) {
+  const _0x1628a3 = Array.isArray(_0x44b60a?.canvases) ? _0x44b60a.canvases : [];
+  for (const _0x3f47a8 of _0x1628a3) {
+    if (!_0x3f47a8) continue;
+    if (_0x3f47a8.nodes && !Array.isArray(_0x3f47a8.nodes)) _0x3f47a8.nodes = Object.values(_0x3f47a8.nodes);
+    if (_0x3f47a8.edges && !Array.isArray(_0x3f47a8.edges)) _0x3f47a8.edges = Object.values(_0x3f47a8.edges);
+    const _0x21abe4 = Array.isArray(_0x3f47a8.nodes) ? _0x3f47a8.nodes : [];
+    for (const _0x2f4641 of _0x21abe4) {
+      _migratePanoramaNodeInPlace(_0x2f4641);
+    }
+  }
+  return _0x44b60a;
+}
+const getCssVar = (_0x5ddd1b) =>
+  getComputedStyle(document.documentElement).getPropertyValue(_0x5ddd1b).trim();
+export function resolveCanvasData(_0x5e88f2) {
+  if (!_0x5e88f2)
+    return _migrateCanvasDataInPlace({
+      canvases: [
+        { id: 'canvas_1', name: '默认画布', nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1.1 } },
+      ],
+      activeCanvasId: 'canvas_1',
+    });
+  if (Array.isArray(_0x5e88f2.canvases) && _0x5e88f2.canvases.length > 0) {
+    let _0x478806 = _0x5e88f2.activeCanvasId || _0x5e88f2.canvases[0].id;
+    const _0x4a367a = _0x5e88f2.canvases.find((_0x4c1daa) => _0x4c1daa.id === _0x478806);
+    if (_0x4a367a && (!_0x4a367a.nodes || _0x4a367a.nodes.length === 0)) {
+      const _0xefbd3c = _0x5e88f2.canvases.find((_0x405564) => _0x405564.nodes && _0x405564.nodes.length > 0);
+      if (_0xefbd3c) _0x478806 = _0xefbd3c.id;
+    }
+    return _migrateCanvasDataInPlace({ canvases: _0x5e88f2.canvases, activeCanvasId: _0x478806 });
+  }
+  let _0x97a7ed = _0x5e88f2.nodes || _0x5e88f2.v2_nodes || [],
+    _0x449c45 = _0x5e88f2.edges || _0x5e88f2.v2_edges || [];
+  if (!Array.isArray(_0x97a7ed)) _0x97a7ed = Object.values(_0x97a7ed);
+  if (!Array.isArray(_0x449c45)) _0x449c45 = Object.values(_0x449c45);
+  const _0x5d414a = {
+    id: 'canvas_1',
+    name: '默认画布',
+    nodes: _0x97a7ed,
+    edges: _0x449c45,
+    viewport: _0x5e88f2.viewport || { x: 0, y: 0, zoom: 1.1 },
+  };
+  return _migrateCanvasDataInPlace({ canvases: [_0x5d414a], activeCanvasId: 'canvas_1' });
+}
+export async function loadProject(_0x4e7d52) {
+  try {
+    const _0x4eec6e = _0x4e7d52.endsWith('.json') ? _0x4e7d52 : _0x4e7d52 + '.json',
+      _0x130c4b = await fetchV2ProjectFromServer(_0x4e7d52);
+    if (!_0x130c4b)
+      return (
+        console.warn('[projectService] 项目文件 ' + _0x4eec6e + ' 不存在，以空数据初始化...'),
+        resolveCanvasData({})
+      );
+    const _0x673f3b = resolveCanvasData(_0x130c4b);
+    return (
+      console.log(
+        '[projectService] 项目 ' + _0x4e7d52 + ' 已加载，共 ' + _0x673f3b.canvases.length + ' 个画布页面',
+      ),
+      _0x673f3b
+    );
+  } catch (_0xfc51ac) {
+    return (console.error('[projectService] 加载项目异常:', _0xfc51ac), resolveCanvasData({}));
+  }
+}
+export async function saveProject(_0x3a2cbb, _0x30e137) {
+  try {
+    const _0x166098 = sanitizeMultiCanvasDataForPersistence(_0x30e137 || {}),
+      _0x59d4fd = {
+        projectName: _0x3a2cbb || DEFAULT_PROJECT_NAME,
+        activeCanvasId: _0x166098?.activeCanvasId || 'canvas_1',
+        canvases: _0x166098?.canvases || [],
+      },
+      _0x395f9f = await saveV2ProjectToServer(_0x59d4fd);
+    return (
+      _0x395f9f &&
+        _0x395f9f.success &&
+        ((window._v2CurrentFile = _0x395f9f.filename),
+        (window.currentProjectId = _0x395f9f.filename.replace('.json', '')),
+        _clearElectronRecoverySnapshotAfterSave()),
+      console.log(
+        '[projectService] 项目 ' + _0x3a2cbb + ' 已持久化（' + _0x59d4fd.canvases.length + ' 个画布）',
+      ),
+      _0x395f9f
+    );
+  } catch (_0x23e8c7) {
+    console.error('[projectService] 存档异常:', _0x23e8c7);
+    throw _0x23e8c7;
+  }
+}
+export async function getProjects() {
+  try {
+    return await fetchV2ProjectsFromServer();
+  } catch {
+    return [];
+  }
+}
+export async function deleteProject(_0x51bac5) {
+  try {
+    return await deleteV2ProjectFromServer(_0x51bac5);
+  } catch (_0x27ca2d) {
+    return (console.error('[projectService] 删除项目失败:', _0x27ca2d), false);
+  }
+}
+function _getElectronImportAsset() {
+  const _0x35ea38 = globalThis.window?.electronAPI?.importAsset;
+  return typeof _0x35ea38 === 'function' ? _0x35ea38 : null;
+}
+function _clearElectronRecoverySnapshotAfterSave() {
+  const _0x5ed114 = globalThis.window?.electronAPI?.project?.clearRecoverySnapshot;
+  if (typeof _0x5ed114 !== 'function') return;
+  void _0x5ed114().catch((_0x5a0468) => {
+    console.warn('[projectService] 清理恢复快照失败:', _0x5a0468);
+  });
+}
+function _getElectronPathForFile(_0x18658d) {
+  if (!globalThis.window?.electronAPI) return '';
+  const _0x24d4d6 = String(_0x18658d?.path || '').trim();
+  if (_0x24d4d6) return _0x24d4d6;
+  const _0x2038a0 = globalThis.window.electronAPI.getPathForFile;
+  if (typeof _0x2038a0 !== 'function') return '';
+  try {
+    return String(_0x2038a0(_0x18658d) || '').trim();
+  } catch {
+    return '';
+  }
+}
+async function _importAssetWithElectron(_0x57a5b7, _0x4e6db3) {
+  const _0x42a35b = _getElectronImportAsset();
+  if (!_0x42a35b || !_0x57a5b7) return null;
+  const _0x17a4ca = { name: _0x57a5b7.name || 'asset', type: _0x57a5b7.type || '', projectId: _0x4e6db3 },
+    _0x45bca8 = _getElectronPathForFile(_0x57a5b7);
+  if (_0x45bca8) _0x17a4ca.path = _0x45bca8;
+  else {
+    if (typeof _0x57a5b7.arrayBuffer === 'function') _0x17a4ca.bytes = await _0x57a5b7.arrayBuffer();
+    else return null;
+  }
+  return _normalizeImageSaveResult(await _0x42a35b(_0x17a4ca));
+}
+export async function uploadFile(_0xde666e, _0x1e099b) {
+  try {
+    try {
+      const _0x37cace = await _importAssetWithElectron(_0xde666e, _0x1e099b);
+      if (_0x37cace?.success) return _0x37cace;
+    } catch (_0x564f7c) {
+      console.warn('[projectService] Electron 素材导入失败，回退上传流程:', _0x564f7c);
+    }
+    return _normalizeImageSaveResult(await uploadFileToServer(_0xde666e));
+  } catch (_0x5c4397) {
+    console.error('[projectService] 文件上传异常:', _0x5c4397);
+    throw _0x5c4397;
+  }
+}
+export async function saveOutputBlob(_0x4fa99c, _0x257948 = {}) {
+  return _normalizeImageSaveResult(await saveOutputToServer(_0x4fa99c, _0x257948));
+}
+export async function cropGridTiles(_0x3deaa3 = {}) {
+  const _0x49d792 = await cropGridTilesToServer(_0x3deaa3);
+  if (!_0x49d792 || typeof _0x49d792 !== 'object') return _0x49d792;
+  const _0x5219b7 = Array.isArray(_0x49d792.tiles)
+    ? _0x49d792.tiles.map((_0x1c1f8b) => _normalizeImageSaveResult(_0x1c1f8b))
+    : [];
+  return { ..._0x49d792, tiles: _0x5219b7 };
+}
+export async function saveOutputFromUrl(_0x9c4364, _0x36746b = {}) {
+  const _0x43daf5 = String(_0x9c4364 || '').trim();
+  if (_0x43daf5.startsWith('blob:') || _0x43daf5.startsWith('data:'))
+    try {
+      const _0x1312b2 = await fetchRemoteBlob(_0x43daf5);
+      return await saveOutputBlob(_0x1312b2, _0x36746b);
+    } catch (_0x1ac503) {
+      return (
+        console.error('[projectService] 本地路径转换 Blob 失败:', _0x1ac503),
+        { error: '本地路径转换失败: ' + _0x1ac503.message }
+      );
+    }
+  return _normalizeImageSaveResult(await saveOutputFromUrlToServer({ url: _0x43daf5, ..._0x36746b }));
+}
+function _guessAudioExtFromUrl(_0x542ab6) {
+  try {
+    const _0x550cd0 = new URL(String(_0x542ab6 || ''), 'http://localhost'),
+      _0x158e92 = String(_0x550cd0.pathname || '').match(/\.([a-z0-9]{1,5})$/i),
+      _0x1b959c = String(_0x158e92?.[1] || '').toLowerCase();
+    if (['wav', 'mp3', 'm4a', 'flac', 'aac', 'ogg', 'opus', 'wma', 'amr', 'webm'].includes(_0x1b959c))
+      return _0x1b959c;
+  } catch {}
+  return '';
+}
+function _guessAudioExtFromMime(_0xb136a3) {
+  const _0x22e7cb = String(_0xb136a3 || '')
+    .trim()
+    .toLowerCase();
+  if (!_0x22e7cb) return '';
+  if (_0x22e7cb === 'audio/mpeg') return 'mp3';
+  if (_0x22e7cb === 'audio/wav' || _0x22e7cb === 'audio/x-wav') return 'wav';
+  if (_0x22e7cb === 'audio/mp4' || _0x22e7cb === 'audio/x-m4a') return 'm4a';
+  if (_0x22e7cb === 'audio/flac' || _0x22e7cb === 'audio/x-flac') return 'flac';
+  if (_0x22e7cb === 'audio/aac') return 'aac';
+  if (_0x22e7cb === 'audio/ogg') return 'ogg';
+  if (_0x22e7cb === 'audio/opus') return 'opus';
+  if (_0x22e7cb === 'audio/webm') return 'webm';
+  if (_0x22e7cb === 'audio/amr') return 'amr';
+  return '';
+}
+function _toLocalAudioResult(_0x389e23) {
+  const _0x412a02 = normalizeLocalPath(
+      _0x389e23?.localPath || _0x389e23?.originalLocalPath || _0x389e23?.path,
+    ),
+    _0x185057 = localPathToUrl(_0x412a02);
+  return {
+    ...(_0x389e23 && typeof _0x389e23 === 'object' ? _0x389e23 : {}),
+    localPath: _0x412a02,
+    localUrl: _0x185057,
+  };
+}
+export async function saveRemoteAudioLocallyDetailed(_0x1f6e6e, _0x113c21 = {}) {
+  const _0x3a2cb8 = String(_0x1f6e6e || '').trim();
+  if (!_0x3a2cb8) throw new Error('保存音频失败: 缺少 remoteUrl');
+  return _runRemoteSaveOnce(_buildRemoteSaveCacheKey('audio', _0x3a2cb8, _0x113c21), async () => {
+    if (_0x3a2cb8.startsWith('blob:') || _0x3a2cb8.startsWith('data:')) {
+      const _0x52e649 = await fetchRemoteBlob(_0x3a2cb8),
+        _0x486cc3 = _guessAudioExtFromMime(_0x52e649?.type) || 'mp3';
+      return _toLocalAudioResult(await saveOutputBlob(_0x52e649, { ext: _0x486cc3, ..._0x113c21 }));
+    }
+    const _0x369ee0 = _guessAudioExtFromUrl(_0x3a2cb8) || 'mp3';
+    try {
+      return _toLocalAudioResult(
+        await saveOutputFromUrl(_0x3a2cb8, { ext: _0x369ee0, maxBytes: 0x400 * 0x400 * 200, ..._0x113c21 }),
+      );
+    } catch {}
+    const _0x5131b9 = await fetchRemoteBlob(_0x3a2cb8),
+      _0x4bd2a3 = _guessAudioExtFromMime(_0x5131b9?.type) || _0x369ee0;
+    return _toLocalAudioResult(await saveOutputBlob(_0x5131b9, { ext: _0x4bd2a3, ..._0x113c21 }));
+  });
+}
+function _toLocalUrlFromSaveResult(_0x5a2d64) {
+  return localPathToUrl(_0x5a2d64?.originalLocalPath) || localPathToUrl(pickResultLocalPath(_0x5a2d64));
+}
+function _normalizeImageSaveResult(_0x41d7b2) {
+  if (!_0x41d7b2 || typeof _0x41d7b2 !== 'object') return _0x41d7b2;
+  if (!hasImageDerivativeFields(_0x41d7b2)) return _0x41d7b2;
+  const _0x58471d = buildImageNodeStorageFields(_0x41d7b2),
+    _0x119078 = { ..._0x41d7b2, ..._0x58471d };
+  return (
+    !String(_0x119078.url || '').trim() &&
+      _0x58471d.localPath &&
+      (_0x119078.url = toLocalPathUrl(_0x58471d.localPath)),
+    !String(_0x119078.originalUrl || '').trim() &&
+      _0x58471d.originalLocalPath &&
+      (_0x119078.originalUrl = toLocalPathUrl(_0x58471d.originalLocalPath)),
+    !String(_0x119078.displayUrl || '').trim() &&
+      _0x58471d.displayLocalPath &&
+      (_0x119078.displayUrl = toLocalPathUrl(_0x58471d.displayLocalPath)),
+    !String(_0x119078.thumbUrl || '').trim() &&
+      _0x58471d.thumbLocalPath &&
+      (_0x119078.thumbUrl = toLocalPathUrl(_0x58471d.thumbLocalPath)),
+    _0x119078
+  );
+}
+function _guessImageExtFromUrl(_0xa9d14c) {
+  const _0xf74109 = String(_0xa9d14c || '').trim();
+  if (!_0xf74109) return '';
+  try {
+    const _0xec7e60 = new URL(_0xf74109, window.location.href),
+      _0x1f0955 = String(_0xec7e60.pathname || ''),
+      _0x1cd05f = _0x1f0955.match(/\.([a-z0-9]{1,5})$/i),
+      _0x4806bd = (_0x1cd05f?.[1] || '').toLowerCase();
+    if (!_0x4806bd) return '';
+    if (_0x4806bd === 'jpeg') return 'jpg';
+    if (_0x4806bd === 'jpg') return 'jpg';
+    if (_0x4806bd === 'png') return 'png';
+    if (_0x4806bd === 'webp') return 'webp';
+    if (_0x4806bd === 'gif') return 'gif';
+    return '';
+  } catch {
+    return '';
+  }
+}
+export async function ensureLocalImageDerivatives(_0x38fd1b) {
+  return _normalizeImageSaveResult(await ensureImageDerivativesToServer({ localPath: _0x38fd1b }));
+}
+export async function checkLocalMediaExists(_0x2a8ff8) {
+  return await checkLocalMediaExistsOnServer({ localPath: _0x2a8ff8 });
+}
+export async function saveRemoteImageLocallyDetailed(_0x1a0b67, _0x47e984, _0x2a03ac = {}) {
+  const _0x3146d7 = String(_0x1a0b67 || '').trim();
+  if (!_0x3146d7) throw new Error('保存到本地失败: 缺少 remoteUrl');
+  return _runRemoteSaveOnce(_buildRemoteSaveCacheKey('image', _0x3146d7, _0x2a03ac), async () => {
+    if (_0x3146d7.startsWith('blob:') || _0x3146d7.startsWith('data:')) {
+      try {
+        const _0xfea851 = await fetchRemoteBlob(_0x3146d7);
+        let _0x51a88e = 'png';
+        if (_0xfea851.type === 'image/jpeg') _0x51a88e = 'jpg';
+        else {
+          if (_0xfea851.type === 'image/webp') _0x51a88e = 'webp';
+          else {
+            if (_0xfea851.type === 'image/png') _0x51a88e = 'png';
+            else {
+              if (_0xfea851.type === 'image/gif') _0x51a88e = 'gif';
+            }
+          }
+        }
+        const _0x443664 = await saveOutputBlob(_0xfea851, { ext: _0x51a88e, ..._0x2a03ac }),
+          _0x16d97c = _toLocalUrlFromSaveResult(_0x443664);
+        if (_0x16d97c) return { ..._0x443664, localUrl: _0x16d97c };
+      } catch {}
+      throw new Error('保存到本地失败');
+    }
+    try {
+      const _0x2aa11b = _guessImageExtFromUrl(_0x3146d7) || 'png',
+        _0x25e5a9 = await saveOutputFromUrl(_0x3146d7, {
+          ext: _0x2aa11b,
+          maxBytes: 0x400 * 0x400 * 60,
+          ..._0x2a03ac,
+        }),
+        _0x1e7bc5 = _toLocalUrlFromSaveResult(_0x25e5a9);
+      if (_0x1e7bc5) return { ..._0x25e5a9, localUrl: _0x1e7bc5 };
+      throw new Error('保存到本地失败: 服务器未返回 url');
+    } catch {}
+    const _0x6111bb = await fetchRemoteBlob(_0x3146d7);
+    let _0x357c2b = 'png';
+    if (_0x6111bb.type === 'image/jpeg') _0x357c2b = 'jpg';
+    else {
+      if (_0x6111bb.type === 'image/webp') _0x357c2b = 'webp';
+      else {
+        if (_0x6111bb.type === 'image/png') _0x357c2b = 'png';
+        else {
+          if (_0x6111bb.type === 'image/gif') _0x357c2b = 'gif';
+        }
+      }
+    }
+    const _0x510f77 = await saveOutputBlob(_0x6111bb, { ext: _0x357c2b, ..._0x2a03ac }),
+      _0x316629 = _toLocalUrlFromSaveResult(_0x510f77);
+    if (_0x316629) return { ..._0x510f77, localUrl: _0x316629 };
+    throw new Error('保存到本地失败');
+  });
+}
+export async function saveRemoteImageLocally(_0x5c3d4f, _0x28f700, _0x195386 = {}) {
+  const _0x5a3b15 = await saveRemoteImageLocallyDetailed(_0x5c3d4f, _0x28f700, _0x195386);
+  return String(_0x5a3b15?.localUrl || '').trim() || _toLocalUrlFromSaveResult(_0x5a3b15);
+}
+export function exportProject(_0x4f61c6, _0x37f839) {
+  const _0x4fab6d = new Blob([JSON.stringify(_0x37f839, null, 2)], { type: 'application/json' }),
+    _0x355f18 = URL.createObjectURL(_0x4fab6d),
+    _0x38945c = document.createElement('a');
+  ((_0x38945c.href = _0x355f18),
+    (_0x38945c.download = _0x4f61c6 + '.json'),
+    document.body.appendChild(_0x38945c),
+    _0x38945c.click(),
+    document.body.removeChild(_0x38945c),
+    URL.revokeObjectURL(_0x355f18));
+}
+export async function importProject(_0xcaee16) {
+  return new Promise((_0x56d050, _0x1499ce) => {
+    const _0x1d20e8 = new FileReader();
+    ((_0x1d20e8.onload = (_0x2ad99e) => {
+      try {
+        const _0x5677b8 = JSON.parse(_0x2ad99e.target.result),
+          _0xc6554 = resolveCanvasData(_0x5677b8);
+        _0x56d050(_0xc6554);
+      } catch (_0x3dc8e7) {
+        _0x1499ce(new Error('解析 JSON 存档失败'));
+      }
+    }),
+      (_0x1d20e8.onerror = () => _0x1499ce(new Error('文件读取失败'))),
+      _0x1d20e8.readAsText(_0xcaee16));
+  });
+}

@@ -1,1 +1,1755 @@
-const a129_0x518f3c=a129_0x21b4;(function(_0x2ebb94,_0x2723a0){const _0xcbe68c=a129_0x21b4,_0x29da47=_0x2ebb94();while(!![]){try{const _0x1160d3=-parseInt(_0xcbe68c(0x9e))/0x1*(-parseInt(_0xcbe68c(0x113))/0x2)+parseInt(_0xcbe68c(0x171))/0x3*(parseInt(_0xcbe68c(0x16e))/0x4)+-parseInt(_0xcbe68c(0xed))/0x5*(-parseInt(_0xcbe68c(0x83))/0x6)+parseInt(_0xcbe68c(0x14c))/0x7+-parseInt(_0xcbe68c(0x117))/0x8*(-parseInt(_0xcbe68c(0xba))/0x9)+-parseInt(_0xcbe68c(0x137))/0xa*(parseInt(_0xcbe68c(0x101))/0xb)+-parseInt(_0xcbe68c(0x80))/0xc;if(_0x1160d3===_0x2723a0)break;else _0x29da47['push'](_0x29da47['shift']());}catch(_0x1f1d97){_0x29da47['push'](_0x29da47['shift']());}}}(a129_0x1f34,0xa13b7));import{normalizeWebPreviewFaviconUrl,normalizeWebPreviewUrl}from'../src/modules/webPreviewUrl.js';import{resolveDouyinCurrentPageMedia}from'./douyinWebPreviewResolver.js';const MIN_VIEW_SIZE=0x10,WEB_PREVIEW_IMAGE_DROP_MIME=a129_0x518f3c(0x152),DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID='default',WEB_PREVIEW_PARTITION_PREFIX='persist:ai-canvas-web-preview',READY_SNAPSHOT_IDLE_DELAY_MS=0xb4,POPUP_REGISTRATION_GRACE_MS=0x1388,WEB_PREVIEW_IMAGE_EXTRACTION_LIMIT=0x78,WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT=0x28,WEB_PREVIEW_EXTRACT_MIN_IMAGE_WIDTH=0x60,WEB_PREVIEW_EXTRACT_MIN_IMAGE_HEIGHT=0x60,WEB_PREVIEW_EXTRACT_MIN_IMAGE_AREA=0x2ee0,WEB_PREVIEW_SELECTED_TEXT_LIMIT=0x1388,WEB_PREVIEW_DIRECT_VIDEO_EXTENSION_RE=/\.(?:mp4|webm|mov|m4v|ogv)(?:[?#].*)?$/i,WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE=/\.(?:m3u8|mpd|m4s)(?:[?#].*)?$/i,WEB_PREVIEW_AUTH_POPUP_WIDTH=0x208,WEB_PREVIEW_AUTH_POPUP_HEIGHT=0x2a8,WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH=0x168,WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT=0x1a4,WEB_PREVIEW_AUTH_POPUP_REQUEST_TTL_MS=0x2710,WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX=a129_0x518f3c(0xd2),WEB_PREVIEW_CONTEXT_MENU_BRIDGE_DEDUPE_MS=0x1f4,WEB_PREVIEW_TEXT_ACTION_PROMPT=a129_0x518f3c(0x103),WEB_PREVIEW_TEXT_ACTION_SOURCE=a129_0x518f3c(0x15a),WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT='send-selected-text-to-image',WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT_GENERATE=a129_0x518f3c(0x7f),WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT=a129_0x518f3c(0x16c),WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT_GENERATE=a129_0x518f3c(0x178);function buildWebPreviewDragBridgeScript({nodeId:nodeId='',tabId:tabId='',inputBridgeToken:inputBridgeToken=''}={}){const _0x4713e5=a129_0x518f3c;return _0x4713e5(0x12c)+JSON[_0x4713e5(0x138)](WEB_PREVIEW_IMAGE_DROP_MIME)+_0x4713e5(0x16a)+JSON[_0x4713e5(0x138)](WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX)+';\x0a\x20\x20const\x20INPUT_TOKEN\x20=\x20'+JSON[_0x4713e5(0x138)](String(inputBridgeToken||''))+';\x0a\x20\x20const\x20escapeHtml\x20=\x20(value)\x20=>\x20String(value\x20||\x20\x22\x22).replace(/[&<>\x22\x27]/g,\x20(ch)\x20=>\x20({\x0a\x20\x20\x20\x20\x22&\x22:\x20\x22&amp;\x22,\x0a\x20\x20\x20\x20\x22<\x22:\x20\x22&lt;\x22,\x0a\x20\x20\x20\x20\x22>\x22:\x20\x22&gt;\x22,\x0a\x20\x20\x20\x20\x27\x22\x27:\x20\x22&quot;\x22,\x0a\x20\x20\x20\x20\x22\x27\x22:\x20\x22&#39;\x22,\x0a\x20\x20})[ch]);\x0a\x20\x20const\x20normalizeUrl\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20new\x20URL(String(value\x20||\x20\x22\x22),\x20document.baseURI);\x0a\x20\x20\x20\x20\x20\x20if\x20(url.protocol\x20!==\x20\x22http:\x22\x20&&\x20url.protocol\x20!==\x20\x22https:\x22)\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.username\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.password\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20return\x20url.href;\x0a\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20parseSrcset\x20=\x20(value)\x20=>\x20String(value\x20||\x20\x22\x22)\x0a\x20\x20\x20\x20.split(\x22,\x22)\x0a\x20\x20\x20\x20.map((item)\x20=>\x20normalizeUrl(item.trim().split(/\x5cs+/)[0]\x20||\x20\x22\x22))\x0a\x20\x20\x20\x20.filter(Boolean);\x0a\x20\x20const\x20parseCssUrls\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20urls\x20=\x20[];\x0a\x20\x20\x20\x20const\x20text\x20=\x20String(value\x20||\x20\x22\x22);\x0a\x20\x20\x20\x20const\x20re\x20=\x20/url\x5c(([\x22\x27]?)(.*?)\x5c1\x5c)/g;\x0a\x20\x20\x20\x20let\x20match\x20=\x20null;\x0a\x20\x20\x20\x20while\x20((match\x20=\x20re.exec(text)))\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20normalizeUrl(match[2]\x20||\x20\x22\x22);\x0a\x20\x20\x20\x20\x20\x20if\x20(url)\x20urls.push(url);\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20urls;\x0a\x20\x20};\x0a\x20\x20const\x20getImageUrl\x20=\x20(image)\x20=>\x20normalizeUrl(\x0a\x20\x20\x20\x20image?.currentSrc\x20||\x0a\x20\x20\x20\x20\x20\x20image?.src\x20||\x0a\x20\x20\x20\x20\x20\x20image?.getAttribute?.(\x22src\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20image?.dataset?.src\x20||\x0a\x20\x20\x20\x20\x20\x20image?.dataset?.original\x20||\x0a\x20\x20\x20\x20\x20\x20image?.dataset?.lazySrc\x20||\x0a\x20\x20\x20\x20\x20\x20parseSrcset(image?.srcset\x20||\x20image?.getAttribute?.(\x22srcset\x22)\x20||\x20\x22\x22)[0]\x20||\x0a\x20\x20\x20\x20\x20\x20\x22\x22,\x0a\x20\x20);\x0a\x20\x20const\x20getElementTitle\x20=\x20(element,\x20fallback\x20=\x20\x22\x22)\x20=>\x0a\x20\x20\x20\x20String(\x0a\x20\x20\x20\x20\x20\x20element?.alt\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20element?.title\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20element?.getAttribute?.(\x22aria-label\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20fallback\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20document.title\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x22网页图片\x22,\x0a\x20\x20\x20\x20).slice(0,\x20120);\x0a\x20\x20const\x20findImageElement\x20=\x20(target)\x20=>\x20{\x0a\x20\x20\x20\x20if\x20(!target?.closest)\x20return\x20null;\x0a\x20\x20\x20\x20return\x20(\x0a\x20\x20\x20\x20\x20\x20target.closest(\x22img\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20target.closest(\x22picture\x22)?.querySelector?.(\x22img\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20target.querySelector?.(\x22img,\x20picture\x20img\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20null\x0a\x20\x20\x20\x20);\x0a\x20\x20};\x0a\x20\x20const\x20findBackgroundImageSource\x20=\x20(target)\x20=>\x20{\x0a\x20\x20\x20\x20let\x20element\x20=\x20target?.nodeType\x20===\x201\x20?\x20target\x20:\x20null;\x0a\x20\x20\x20\x20for\x20(let\x20i\x20=\x200;\x20element\x20&&\x20i\x20<\x204;\x20i\x20+=\x201,\x20element\x20=\x20element.parentElement)\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20parseCssUrls(window.getComputedStyle?.(element)?.backgroundImage\x20||\x20\x22\x22)[0];\x0a\x20\x20\x20\x20\x20\x20if\x20(url)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20return\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20element,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20url,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20title:\x20getElementTitle(element),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20width:\x20Math.max(0,\x20Math.round(Number(element.clientWidth\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20height:\x20Math.max(0,\x20Math.round(Number(element.clientHeight\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20};\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20null;\x0a\x20\x20};\x0a\x20\x20const\x20findImageSource\x20=\x20(target)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20image\x20=\x20findImageElement(target);\x0a\x20\x20\x20\x20if\x20(image)\x20return\x20{\x20image,\x20element:\x20image,\x20url:\x20getImageUrl(image)\x20};\x0a\x20\x20\x20\x20return\x20findBackgroundImageSource(target);\x0a\x20\x20};\x0a\x20\x20const\x20findContextImageSource\x20=\x20(event)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20candidates\x20=\x20[];\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20pointElements\x20=\x20document.elementsFromPoint?.(\x0a\x20\x20\x20\x20\x20\x20\x20\x20Number(event?.clientX\x20||\x200)\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20\x20\x20Number(event?.clientY\x20||\x200)\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20);\x0a\x20\x20\x20\x20\x20\x20if\x20(Array.isArray(pointElements))\x20candidates.push(...pointElements);\x0a\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20if\x20(event?.target)\x20candidates.push(event.target);\x0a\x20\x20\x20\x20const\x20seen\x20=\x20new\x20Set();\x0a\x20\x20\x20\x20for\x20(const\x20element\x20of\x20candidates)\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(!element\x20||\x20seen.has(element))\x20continue;\x0a\x20\x20\x20\x20\x20\x20seen.add(element);\x0a\x20\x20\x20\x20\x20\x20const\x20source\x20=\x20findImageSource(element);\x0a\x20\x20\x20\x20\x20\x20if\x20(source?.url)\x20return\x20source;\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20null;\x0a\x20\x20};\x0a\x20\x20const\x20buildImagePayload\x20=\x20(source)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20image\x20=\x20source?.image\x20||\x20null;\x0a\x20\x20\x20\x20const\x20element\x20=\x20source?.element\x20||\x20image\x20||\x20null;\x0a\x20\x20\x20\x20const\x20url\x20=\x20normalizeUrl(source?.url\x20||\x20getImageUrl(image));\x0a\x20\x20\x20\x20if\x20(!url)\x20return\x20null;\x0a\x20\x20\x20\x20const\x20title\x20=\x20getElementTitle(image\x20||\x20element,\x20source?.title);\x0a\x20\x20\x20\x20const\x20pageUrl\x20=\x20normalizeUrl(location.href);\x0a\x20\x20\x20\x20return\x20{\x0a\x20\x20\x20\x20\x20\x20kind:\x20\x22image\x22,\x0a\x20\x20\x20\x20\x20\x20url,\x0a\x20\x20\x20\x20\x20\x20title,\x0a\x20\x20\x20\x20\x20\x20sourceUrl:\x20pageUrl,\x0a\x20\x20\x20\x20\x20\x20pageUrl,\x0a\x20\x20\x20\x20\x20\x20nodeId:\x20'+JSON[_0x4713e5(0x138)](toNodeId(nodeId))+',\x0a\x20\x20\x20\x20\x20\x20tabId:\x20'+JSON[_0x4713e5(0x138)](toTabId(tabId))+_0x4713e5(0x10f);}function buildWebPreviewContextImageProbeScript({nodeId:nodeId='',tabId:tabId='',x:x=0x0,y:y=0x0}={}){const _0x4b64d0=a129_0x518f3c,_0x14b906=Math[_0x4b64d0(0x140)](0x0,Math[_0x4b64d0(0x165)](Number(x||0x0)||0x0)),_0x1b55e7=Math['max'](0x0,Math[_0x4b64d0(0x165)](Number(y||0x0)||0x0));return _0x4b64d0(0x97)+JSON['stringify'](toNodeId(nodeId))+_0x4b64d0(0x15b)+JSON['stringify'](toTabId(tabId))+_0x4b64d0(0xae)+_0x14b906+_0x4b64d0(0xf1)+_0x1b55e7+_0x4b64d0(0x10b);}function buildWebPreviewImageExtractionScript({nodeId:nodeId='',tabId:tabId=''}={}){const _0x29ad85=a129_0x518f3c;return'\x0a(()\x20=>\x20{\x0a\x20\x20const\x20MAX\x20=\x20'+WEB_PREVIEW_IMAGE_EXTRACTION_LIMIT+_0x29ad85(0x17f)+WEB_PREVIEW_EXTRACT_MIN_IMAGE_WIDTH+_0x29ad85(0x10e)+WEB_PREVIEW_EXTRACT_MIN_IMAGE_HEIGHT+_0x29ad85(0xb1)+WEB_PREVIEW_EXTRACT_MIN_IMAGE_AREA+';\x0a\x20\x20const\x20nodeId\x20=\x20'+JSON[_0x29ad85(0x138)](toNodeId(nodeId))+_0x29ad85(0x15b)+JSON[_0x29ad85(0x138)](toTabId(tabId))+_0x29ad85(0x92);}function buildWebPreviewVideoExtractionScript({nodeId:nodeId='',tabId:tabId=''}={}){const _0x5964ce=a129_0x518f3c;return'\x0a(()\x20=>\x20{\x0a\x20\x20const\x20MAX\x20=\x20'+WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT+_0x5964ce(0xdc)+WEB_PREVIEW_DIRECT_VIDEO_EXTENSION_RE+_0x5964ce(0x179)+WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE+_0x5964ce(0xa8)+JSON[_0x5964ce(0x138)](toNodeId(nodeId))+_0x5964ce(0x15b)+JSON[_0x5964ce(0x138)](toTabId(tabId))+';\x0a\x20\x20const\x20normalizeUrl\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20new\x20URL(String(value\x20||\x20\x22\x22),\x20document.baseURI);\x0a\x20\x20\x20\x20\x20\x20if\x20(url.protocol\x20!==\x20\x22http:\x22\x20&&\x20url.protocol\x20!==\x20\x22https:\x22)\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.username\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.password\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20return\x20url.href;\x0a\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20isDirectVideoUrl\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20DIRECT_VIDEO_RE.test(new\x20URL(value).pathname);\x0a\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20false;\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20isStreamMediaUrl\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20STREAM_MEDIA_RE.test(new\x20URL(value).pathname);\x0a\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20false;\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20pageUrl\x20=\x20normalizeUrl(location.href);\x0a\x20\x20const\x20pageTitle\x20=\x20String(document.title\x20||\x20\x22\x22).slice(0,\x20160);\x0a\x20\x20const\x20seen\x20=\x20new\x20Set();\x0a\x20\x20const\x20videos\x20=\x20[];\x0a\x20\x20const\x20douyinDetailApiUrls\x20=\x20[];\x0a\x20\x20const\x20douyinDetailApiSeen\x20=\x20new\x20Set();\x0a\x20\x20const\x20DOUYIN_DETAIL_API_RE\x20=\x20/\x5c/aweme\x5c/v1\x5c/web\x5c/aweme\x5c/detail\x5c//i;\x0a\x20\x20const\x20pushDouyinDetailApiUrl\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20normalizedUrl\x20=\x20normalizeUrl(value);\x0a\x20\x20\x20\x20if\x20(!normalizedUrl\x20||\x20douyinDetailApiSeen.has(normalizedUrl))\x20return;\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20parsed\x20=\x20new\x20URL(normalizedUrl);\x0a\x20\x20\x20\x20\x20\x20const\x20host\x20=\x20parsed.hostname.toLowerCase();\x0a\x20\x20\x20\x20\x20\x20const\x20isDouyinHost\x20=\x0a\x20\x20\x20\x20\x20\x20\x20\x20host\x20===\x20\x22douyin.com\x22\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20host.endsWith(\x22.douyin.com\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20host\x20===\x20\x22iesdouyin.com\x22\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20host.endsWith(\x22.iesdouyin.com\x22);\x0a\x20\x20\x20\x20\x20\x20if\x20(!isDouyinHost\x20||\x20!DOUYIN_DETAIL_API_RE.test(parsed.pathname))\x20return;\x0a\x20\x20\x20\x20\x20\x20if\x20(!/\x5cd{15,25}/.test(parsed.searchParams.get(\x22aweme_id\x22)\x20||\x20\x22\x22))\x20return;\x0a\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20return;\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20douyinDetailApiSeen.add(normalizedUrl);\x0a\x20\x20\x20\x20douyinDetailApiUrls.push(normalizedUrl);\x0a\x20\x20};\x0a\x20\x20const\x20finiteNumber\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20n\x20=\x20Number(value);\x0a\x20\x20\x20\x20return\x20Number.isFinite(n)\x20&&\x20n\x20>\x200\x20?\x20n\x20:\x200;\x0a\x20\x20};\x0a\x20\x20const\x20push\x20=\x20(url,\x20source\x20=\x20{})\x20=>\x20{\x0a\x20\x20\x20\x20const\x20normalizedUrl\x20=\x20normalizeUrl(url);\x0a\x20\x20\x20\x20if\x20(!normalizedUrl\x20||\x20seen.has(normalizedUrl)\x20||\x20videos.length\x20>=\x20MAX)\x20return;\x0a\x20\x20\x20\x20if\x20(isStreamMediaUrl(normalizedUrl))\x20return;\x0a\x20\x20\x20\x20const\x20type\x20=\x20String(source.type\x20||\x20\x22\x22).trim().toLowerCase();\x0a\x20\x20\x20\x20const\x20recognizable\x20=\x20Boolean(\x0a\x20\x20\x20\x20\x20\x20source.fromVideo\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20type.startsWith(\x22video/\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20isDirectVideoUrl(normalizedUrl),\x0a\x20\x20\x20\x20);\x0a\x20\x20\x20\x20if\x20(!recognizable)\x20return;\x0a\x20\x20\x20\x20seen.add(normalizedUrl);\x0a\x20\x20\x20\x20videos.push({\x0a\x20\x20\x20\x20\x20\x20kind:\x20\x22video\x22,\x0a\x20\x20\x20\x20\x20\x20url:\x20normalizedUrl,\x0a\x20\x20\x20\x20\x20\x20title:\x20String(source.title\x20||\x20pageTitle\x20||\x20\x22网页视频\x22).slice(0,\x20160),\x0a\x20\x20\x20\x20\x20\x20pageUrl,\x0a\x20\x20\x20\x20\x20\x20pageTitle,\x0a\x20\x20\x20\x20\x20\x20nodeId,\x0a\x20\x20\x20\x20\x20\x20tabId,\x0a\x20\x20\x20\x20\x20\x20width:\x20Math.max(0,\x20Math.round(finiteNumber(source.width))),\x0a\x20\x20\x20\x20\x20\x20height:\x20Math.max(0,\x20Math.round(finiteNumber(source.height))),\x0a\x20\x20\x20\x20\x20\x20duration:\x20finiteNumber(source.duration),\x0a\x20\x20\x20\x20\x20\x20sourceType:\x20String(source.sourceType\x20||\x20\x22media\x22).slice(0,\x2040),\x0a\x20\x20\x20\x20\x20\x20mimeType:\x20type,\x0a\x20\x20\x20\x20});\x0a\x20\x20};\x0a\x20\x20for\x20(const\x20video\x20of\x20Array.from(document.querySelectorAll(\x22video\x22)))\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20const\x20title\x20=\x0a\x20\x20\x20\x20\x20\x20video.getAttribute(\x22aria-label\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20video.getAttribute(\x22title\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20video.getAttribute(\x22alt\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20pageTitle\x20||\x0a\x20\x20\x20\x20\x20\x20\x22网页视频\x22;\x0a\x20\x20\x20\x20const\x20source\x20=\x20{\x0a\x20\x20\x20\x20\x20\x20fromVideo:\x20true,\x0a\x20\x20\x20\x20\x20\x20sourceType:\x20\x22video\x22,\x0a\x20\x20\x20\x20\x20\x20title,\x0a\x20\x20\x20\x20\x20\x20width:\x20video.videoWidth\x20||\x20video.clientWidth\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20height:\x20video.videoHeight\x20||\x20video.clientHeight\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20duration:\x20video.duration,\x0a\x20\x20\x20\x20};\x0a\x20\x20\x20\x20push(video.currentSrc\x20||\x20video.src\x20||\x20video.getAttribute(\x22src\x22)\x20||\x20\x22\x22,\x20source);\x0a\x20\x20\x20\x20for\x20(const\x20sourceEl\x20of\x20Array.from(video.querySelectorAll(\x22source[src]\x22)))\x20{\x0a\x20\x20\x20\x20\x20\x20push(sourceEl.getAttribute(\x22src\x22)\x20||\x20\x22\x22,\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20...source,\x0a\x20\x20\x20\x20\x20\x20\x20\x20type:\x20sourceEl.getAttribute(\x22type\x22)\x20||\x20\x22\x22,\x0a\x20\x20\x20\x20\x20\x20\x20\x20sourceType:\x20\x22video-source\x22,\x0a\x20\x20\x20\x20\x20\x20});\x0a\x20\x20\x20\x20}\x0a\x20\x20}\x0a\x20\x20for\x20(const\x20sourceEl\x20of\x20Array.from(document.querySelectorAll(\x22source[src]\x22)))\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20const\x20type\x20=\x20sourceEl.getAttribute(\x22type\x22)\x20||\x20\x22\x22;\x0a\x20\x20\x20\x20if\x20(!String(type).toLowerCase().startsWith(\x22video/\x22))\x20continue;\x0a\x20\x20\x20\x20const\x20media\x20=\x20sourceEl.closest?.(\x22video\x22);\x0a\x20\x20\x20\x20push(sourceEl.getAttribute(\x22src\x22)\x20||\x20\x22\x22,\x20{\x0a\x20\x20\x20\x20\x20\x20fromVideo:\x20true,\x0a\x20\x20\x20\x20\x20\x20type,\x0a\x20\x20\x20\x20\x20\x20sourceType:\x20\x22source\x22,\x0a\x20\x20\x20\x20\x20\x20title:\x20media?.getAttribute?.(\x22title\x22)\x20||\x20pageTitle\x20||\x20\x22网页视频\x22,\x0a\x20\x20\x20\x20\x20\x20width:\x20media?.videoWidth\x20||\x20media?.clientWidth\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20height:\x20media?.videoHeight\x20||\x20media?.clientHeight\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20duration:\x20media?.duration,\x0a\x20\x20\x20\x20});\x0a\x20\x20}\x0a\x20\x20for\x20(const\x20link\x20of\x20Array.from(document.querySelectorAll(\x22a[href]\x22)))\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20const\x20href\x20=\x20link.getAttribute(\x22href\x22)\x20||\x20\x22\x22;\x0a\x20\x20\x20\x20const\x20normalizedUrl\x20=\x20normalizeUrl(href);\x0a\x20\x20\x20\x20if\x20(!normalizedUrl\x20||\x20!isDirectVideoUrl(normalizedUrl)\x20||\x20isStreamMediaUrl(normalizedUrl))\x20continue;\x0a\x20\x20\x20\x20push(normalizedUrl,\x20{\x0a\x20\x20\x20\x20\x20\x20sourceType:\x20\x22link\x22,\x0a\x20\x20\x20\x20\x20\x20title:\x20link.textContent?.trim()\x20||\x20link.getAttribute(\x22title\x22)\x20||\x20pageTitle\x20||\x20\x22网页视频\x22,\x0a\x20\x20\x20\x20});\x0a\x20\x20}\x0a\x20\x20for\x20(const\x20el\x20of\x20Array.from(document.querySelectorAll(\x22[data-src],\x20[data-url],\x20[data-video-src]\x22)))\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20const\x20candidates\x20=\x20[\x0a\x20\x20\x20\x20\x20\x20el.getAttribute(\x22data-video-src\x22),\x0a\x20\x20\x20\x20\x20\x20el.getAttribute(\x22data-play-url\x22),\x0a\x20\x20\x20\x20\x20\x20el.getAttribute(\x22data-video-url\x22),\x0a\x20\x20\x20\x20\x20\x20el.getAttribute(\x22data-src\x22),\x0a\x20\x20\x20\x20\x20\x20el.getAttribute(\x22data-url\x22),\x0a\x20\x20\x20\x20];\x0a\x20\x20\x20\x20for\x20(const\x20candidate\x20of\x20candidates)\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20\x20\x20const\x20normalizedUrl\x20=\x20normalizeUrl(candidate);\x0a\x20\x20\x20\x20\x20\x20if\x20(!normalizedUrl\x20||\x20!isDirectVideoUrl(normalizedUrl)\x20||\x20isStreamMediaUrl(normalizedUrl))\x20continue;\x0a\x20\x20\x20\x20\x20\x20push(normalizedUrl,\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20sourceType:\x20\x22data-attribute\x22,\x0a\x20\x20\x20\x20\x20\x20\x20\x20title:\x20el.getAttribute(\x22aria-label\x22)\x20||\x20el.getAttribute(\x22title\x22)\x20||\x20pageTitle\x20||\x20\x22网页视频\x22,\x0a\x20\x20\x20\x20\x20\x20\x20\x20width:\x20el.clientWidth\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20\x20\x20height:\x20el.clientHeight\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20});\x0a\x20\x20\x20\x20}\x0a\x20\x20}\x0a\x20\x20for\x20(const\x20resource\x20of\x20Array.from(performance?.getEntriesByType?.(\x22resource\x22)\x20||\x20[]))\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20const\x20normalizedUrl\x20=\x20normalizeUrl(resource?.name);\x0a\x20\x20\x20\x20if\x20(!normalizedUrl\x20||\x20isStreamMediaUrl(normalizedUrl))\x20continue;\x0a\x20\x20\x20\x20pushDouyinDetailApiUrl(normalizedUrl);\x0a\x20\x20\x20\x20const\x20initiatorType\x20=\x20String(resource?.initiatorType\x20||\x20\x22\x22).trim().toLowerCase();\x0a\x20\x20\x20\x20const\x20fromMediaResource\x20=\x0a\x20\x20\x20\x20\x20\x20initiatorType\x20===\x20\x22video\x22\x20||\x0a\x20\x20\x20\x20\x20\x20initiatorType\x20===\x20\x22media\x22\x20||\x0a\x20\x20\x20\x20\x20\x20initiatorType\x20===\x20\x22source\x22;\x0a\x20\x20\x20\x20if\x20(!fromMediaResource\x20&&\x20!isDirectVideoUrl(normalizedUrl))\x20continue;\x0a\x20\x20\x20\x20push(normalizedUrl,\x20{\x0a\x20\x20\x20\x20\x20\x20fromVideo:\x20fromMediaResource,\x0a\x20\x20\x20\x20\x20\x20sourceType:\x20\x22video-resource\x22,\x0a\x20\x20\x20\x20\x20\x20title:\x20pageTitle\x20||\x20\x22网页视频\x22,\x0a\x20\x20\x20\x20});\x0a\x20\x20}\x0a\x20\x20const\x20normalizeEmbeddedUrl\x20=\x20(value)\x20=>\x0a\x20\x20\x20\x20normalizeUrl(\x0a\x20\x20\x20\x20\x20\x20String(value\x20||\x20\x22\x22)\x0a\x20\x20\x20\x20\x20\x20\x20\x20.replace(/\x5c\x5cu002[fF]/g,\x20\x22/\x22)\x0a\x20\x20\x20\x20\x20\x20\x20\x20.replace(/\x5c\x5c\x5c//g,\x20\x22/\x22),\x0a\x20\x20\x20\x20);\x0a\x20\x20const\x20embeddedUrlRe\x20=\x20/https?:\x5c\x5c?\x5c/\x5c\x5c?\x5c/[^\x22\x27\x5cs<>]+/g;\x0a\x20\x20for\x20(const\x20script\x20of\x20Array.from(document.scripts\x20||\x20[]))\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20const\x20text\x20=\x20String(script.textContent\x20||\x20\x22\x22).slice(0,\x20400000);\x0a\x20\x20\x20\x20let\x20match\x20=\x20null;\x0a\x20\x20\x20\x20while\x20((match\x20=\x20embeddedUrlRe.exec(text)))\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20\x20\x20const\x20normalizedUrl\x20=\x20normalizeEmbeddedUrl(match[0]);\x0a\x20\x20\x20\x20\x20\x20pushDouyinDetailApiUrl(normalizedUrl);\x0a\x20\x20\x20\x20\x20\x20if\x20(!normalizedUrl\x20||\x20!isDirectVideoUrl(normalizedUrl)\x20||\x20isStreamMediaUrl(normalizedUrl))\x20continue;\x0a\x20\x20\x20\x20\x20\x20push(normalizedUrl,\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20sourceType:\x20\x22embedded-url\x22,\x0a\x20\x20\x20\x20\x20\x20\x20\x20title:\x20pageTitle\x20||\x20\x22网页视频\x22,\x0a\x20\x20\x20\x20\x20\x20});\x0a\x20\x20\x20\x20}\x0a\x20\x20}\x0a\x20\x20const\x20STRUCTURED_VIDEO_SOURCE_TYPE\x20=\x20\x22structured-data\x22;\x0a\x20\x20const\x20DOUYIN_DETAIL_SOURCE_TYPE\x20=\x20\x22douyin-detail\x22;\x0a\x20\x20const\x20STRUCTURED_VIDEO_KEY_RE\x20=\x0a\x20\x20\x20\x20/(?:video|play|download|stream|dash|media|aweme|xigua|note|vod|mp4|h264|h265|hevc|url[_-]?list|backup[_-]?urls|masterurl|baseurl|playurl|downloadurl)/i;\x0a\x20\x20const\x20STRUCTURED_URL_KEY_RE\x20=\x0a\x20\x20\x20\x20/^(?:url|uri|src|source|playurl|play_url|playaddr|play_addr|downloadurl|download_url|downloadaddr|download_addr|masterurl|master_url|baseurl|base_url|mainurl|main_url|file|contenturl)$/i;\x0a\x20\x20const\x20NON_VIDEO_ASSET_RE\x20=\x20/.(?:png|jpe?g|webp|gif|bmp|svg|avif|css|js)(?:[?#].*)?$/i;\x0a\x20\x20const\x20KNOWN_STATE_KEYS\x20=\x20[\x0a\x20\x20\x20\x20\x22__INITIAL_STATE__\x22,\x0a\x20\x20\x20\x20\x22__NEXT_DATA__\x22,\x0a\x20\x20\x20\x20\x22__NUXT__\x22,\x0a\x20\x20\x20\x20\x22__APOLLO_STATE__\x22,\x0a\x20\x20\x20\x20\x22__INITIAL_PROPS__\x22,\x0a\x20\x20\x20\x20\x22RENDER_DATA\x22,\x0a\x20\x20\x20\x20\x22SIGI_STATE\x22,\x0a\x20\x20\x20\x20\x22SSR_RENDER_DATA\x22,\x0a\x20\x20];\x0a\x20\x20const\x20unescapeStructuredUrlText\x20=\x20(value)\x20=>\x0a\x20\x20\x20\x20String(value\x20||\x20\x22\x22)\x0a\x20\x20\x20\x20\x20\x20.replace(/\x5c\x5cu002[fF]/g,\x20\x22/\x22)\x0a\x20\x20\x20\x20\x20\x20.replace(/\x5c\x5cu0026/g,\x20\x22&\x22)\x0a\x20\x20\x20\x20\x20\x20.replace(/\x5c\x5cu003[dD]/g,\x20\x22=\x22)\x0a\x20\x20\x20\x20\x20\x20.replace(/\x5c\x5c\x5c//g,\x20\x22/\x22)\x0a\x20\x20\x20\x20\x20\x20.replace(/&amp;/g,\x20\x22&\x22);\x0a\x20\x20const\x20extractUrlsFromText\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20text\x20=\x20unescapeStructuredUrlText(value).trim();\x0a\x20\x20\x20\x20if\x20(!text)\x20return\x20[];\x0a\x20\x20\x20\x20const\x20urls\x20=\x20[];\x0a\x20\x20\x20\x20const\x20direct\x20=\x20normalizeUrl(text);\x0a\x20\x20\x20\x20if\x20(direct)\x20urls.push(direct);\x0a\x20\x20\x20\x20const\x20urlRe\x20=\x20/https?:\x5c/\x5c/[^\x22\x27\x5cs<>]+/g;\x0a\x20\x20\x20\x20let\x20match\x20=\x20null;\x0a\x20\x20\x20\x20while\x20((match\x20=\x20urlRe.exec(text)))\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20normalizeUrl(match[0]);\x0a\x20\x20\x20\x20\x20\x20if\x20(url)\x20urls.push(url);\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20Array.from(new\x20Set(urls));\x0a\x20\x20};\x0a\x20\x20const\x20isNonVideoAssetUrl\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20NON_VIDEO_ASSET_RE.test(new\x20URL(value).pathname);\x0a\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20false;\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20hasStructuredVideoContext\x20=\x20(path\x20=\x20[])\x20=>\x0a\x20\x20\x20\x20path.some((key)\x20=>\x20STRUCTURED_VIDEO_KEY_RE.test(String(key\x20||\x20\x22\x22)));\x0a\x20\x20const\x20readStructuredNumber\x20=\x20(object,\x20keys)\x20=>\x20{\x0a\x20\x20\x20\x20if\x20(!object\x20||\x20typeof\x20object\x20!==\x20\x22object\x22)\x20return\x200;\x0a\x20\x20\x20\x20for\x20(const\x20key\x20of\x20keys)\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20value\x20=\x20finiteNumber(object[key]);\x0a\x20\x20\x20\x20\x20\x20if\x20(value)\x20return\x20value;\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x200;\x0a\x20\x20};\x0a\x20\x20const\x20normalizeDouyinDuration\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20duration\x20=\x20finiteNumber(value);\x0a\x20\x20\x20\x20if\x20(!duration)\x20return\x200;\x0a\x20\x20\x20\x20return\x20duration\x20>=\x201000\x20?\x20duration\x20/\x201000\x20:\x20duration;\x0a\x20\x20};\x0a\x20\x20const\x20pickLastStructuredUrl\x20=\x20(items)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20urls\x20=\x20[];\x0a\x20\x20\x20\x20const\x20list\x20=\x20Array.isArray(items)\x20?\x20items\x20:\x20[items];\x0a\x20\x20\x20\x20for\x20(const\x20item\x20of\x20list)\x20{\x0a\x20\x20\x20\x20\x20\x20urls.push(...extractUrlsFromText(item));\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20urls.filter(Boolean).at(-1)\x20||\x20\x22\x22;\x0a\x20\x20};\x0a\x20\x20const\x20readDouyinAddressUrl\x20=\x20(address)\x20=>\x20{\x0a\x20\x20\x20\x20if\x20(!address)\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20if\x20(typeof\x20address\x20===\x20\x22string\x22)\x20return\x20pickLastStructuredUrl(address);\x0a\x20\x20\x20\x20if\x20(typeof\x20address\x20!==\x20\x22object\x22)\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20const\x20urlList\x20=\x20Array.isArray(address.url_list)\x0a\x20\x20\x20\x20\x20\x20?\x20address.url_list\x0a\x20\x20\x20\x20\x20\x20:\x20Array.isArray(address.urlList)\x0a\x20\x20\x20\x20\x20\x20\x20\x20?\x20address.urlList\x0a\x20\x20\x20\x20\x20\x20\x20\x20:\x20[];\x0a\x20\x20\x20\x20return\x20(\x0a\x20\x20\x20\x20\x20\x20pickLastStructuredUrl(urlList)\x20||\x0a\x20\x20\x20\x20\x20\x20pickLastStructuredUrl(address.url)\x20||\x0a\x20\x20\x20\x20\x20\x20pickLastStructuredUrl(address.uri)\x20||\x0a\x20\x20\x20\x20\x20\x20pickLastStructuredUrl(address.main_url)\x20||\x0a\x20\x20\x20\x20\x20\x20pickLastStructuredUrl(address.mainUrl)\x0a\x20\x20\x20\x20);\x0a\x20\x20};\x0a\x20\x20const\x20hasDouyinVideoAddress\x20=\x20(video)\x20=>\x0a\x20\x20\x20\x20Boolean(\x0a\x20\x20\x20\x20\x20\x20video\x20&&\x0a\x20\x20\x20\x20\x20\x20\x20\x20typeof\x20video\x20===\x20\x22object\x22\x20&&\x0a\x20\x20\x20\x20\x20\x20\x20\x20(video.play_addr_h264\x20||\x20video.play_addr_256\x20||\x20video.play_addr\x20||\x20video.download_addr),\x0a\x20\x20\x20\x20);\x0a\x20\x20const\x20readDouyinVideoUrl\x20=\x20(video)\x20=>\x20{\x0a\x20\x20\x20\x20if\x20(!hasDouyinVideoAddress(video))\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20const\x20sources\x20=\x20[video.play_addr_h264,\x20video.play_addr_256,\x20video.play_addr,\x20video.download_addr];\x0a\x20\x20\x20\x20for\x20(const\x20source\x20of\x20sources)\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20readDouyinAddressUrl(source);\x0a\x20\x20\x20\x20\x20\x20if\x20(url)\x20return\x20url;\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20\x22\x22;\x0a\x20\x20};\x0a\x20\x20const\x20readDouyinTitle\x20=\x20(aweme)\x20=>\x0a\x20\x20\x20\x20String(\x0a\x20\x20\x20\x20\x20\x20aweme?.desc\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20aweme?.item_title\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20aweme?.share_info?.share_title\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20pageTitle\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x22网页视频\x22,\x0a\x20\x20\x20\x20)\x0a\x20\x20\x20\x20\x20\x20.trim()\x0a\x20\x20\x20\x20\x20\x20.slice(0,\x20160);\x0a\x20\x20const\x20pushDouyinAwemeDetail\x20=\x20(aweme)\x20=>\x20{\x0a\x20\x20\x20\x20if\x20(!aweme\x20||\x20typeof\x20aweme\x20!==\x20\x22object\x22\x20||\x20!hasDouyinVideoAddress(aweme.video))\x20return;\x0a\x20\x20\x20\x20const\x20url\x20=\x20readDouyinVideoUrl(aweme.video);\x0a\x20\x20\x20\x20if\x20(!url\x20||\x20isStreamMediaUrl(url)\x20||\x20isNonVideoAssetUrl(url))\x20return;\x0a\x20\x20\x20\x20push(url,\x20{\x0a\x20\x20\x20\x20\x20\x20fromVideo:\x20true,\x0a\x20\x20\x20\x20\x20\x20sourceType:\x20DOUYIN_DETAIL_SOURCE_TYPE,\x0a\x20\x20\x20\x20\x20\x20title:\x20readDouyinTitle(aweme),\x0a\x20\x20\x20\x20\x20\x20width:\x20readStructuredNumber(aweme.video,\x20[\x22width\x22,\x20\x22w\x22,\x20\x22videoWidth\x22]),\x0a\x20\x20\x20\x20\x20\x20height:\x20readStructuredNumber(aweme.video,\x20[\x22height\x22,\x20\x22h\x22,\x20\x22videoHeight\x22]),\x0a\x20\x20\x20\x20\x20\x20duration:\x20normalizeDouyinDuration(\x0a\x20\x20\x20\x20\x20\x20\x20\x20aweme.video.duration\x20||\x20aweme.duration\x20||\x20aweme.video.videoDuration,\x0a\x20\x20\x20\x20\x20\x20),\x0a\x20\x20\x20\x20});\x0a\x20\x20};\x0a\x20\x20const\x20visitedDouyinDetailObjects\x20=\x20new\x20WeakSet();\x0a\x20\x20const\x20scanDouyinAwemeDetails\x20=\x20(value,\x20depth\x20=\x200)\x20=>\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX\x20||\x20depth\x20>\x2010\x20||\x20!value\x20||\x20typeof\x20value\x20!==\x20\x22object\x22)\x20return;\x0a\x20\x20\x20\x20if\x20(visitedDouyinDetailObjects.has(value))\x20return;\x0a\x20\x20\x20\x20visitedDouyinDetailObjects.add(value);\x0a\x20\x20\x20\x20if\x20(value.aweme_detail)\x20pushDouyinAwemeDetail(value.aweme_detail);\x0a\x20\x20\x20\x20if\x20(Array.isArray(value.aweme_list))\x20{\x0a\x20\x20\x20\x20\x20\x20for\x20(const\x20aweme\x20of\x20value.aweme_list)\x20pushDouyinAwemeDetail(aweme);\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20if\x20(hasDouyinVideoAddress(value.video))\x20pushDouyinAwemeDetail(value);\x0a\x20\x20\x20\x20for\x20(const\x20key\x20of\x20Object.keys(value).slice(0,\x20180))\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20\x20\x20const\x20item\x20=\x20value[key];\x0a\x20\x20\x20\x20\x20\x20if\x20(item\x20&&\x20typeof\x20item\x20===\x20\x22object\x22)\x20scanDouyinAwemeDetails(item,\x20depth\x20+\x201);\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20pushStructuredVideoUrl\x20=\x20(url,\x20source\x20=\x20{})\x20=>\x20{\x0a\x20\x20\x20\x20const\x20normalizedUrl\x20=\x20normalizeUrl(url);\x0a\x20\x20\x20\x20if\x20(!normalizedUrl\x20||\x20isStreamMediaUrl(normalizedUrl)\x20||\x20isNonVideoAssetUrl(normalizedUrl))\x20{\x0a\x20\x20\x20\x20\x20\x20return;\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20if\x20(!isDirectVideoUrl(normalizedUrl))\x20return;\x0a\x20\x20\x20\x20push(normalizedUrl,\x20{\x0a\x20\x20\x20\x20\x20\x20fromVideo:\x20true,\x0a\x20\x20\x20\x20\x20\x20sourceType:\x20STRUCTURED_VIDEO_SOURCE_TYPE,\x0a\x20\x20\x20\x20\x20\x20title:\x20source.title\x20||\x20pageTitle\x20||\x20\x22网页视频\x22,\x0a\x20\x20\x20\x20\x20\x20width:\x20source.width\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20height:\x20source.height\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20duration:\x20source.duration\x20||\x200,\x0a\x20\x20\x20\x20});\x0a\x20\x20};\x0a\x20\x20const\x20visitedStructuredObjects\x20=\x20new\x20WeakSet();\x0a\x20\x20let\x20structuredObjectCount\x20=\x200;\x0a\x20\x20const\x20walkStructuredMedia\x20=\x20(value,\x20path\x20=\x20[],\x20depth\x20=\x200,\x20inheritedContext\x20=\x20false)\x20=>\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX\x20||\x20structuredObjectCount\x20>\x203000\x20||\x20depth\x20>\x2010)\x20return;\x0a\x20\x20\x20\x20if\x20(typeof\x20value\x20===\x20\x22string\x22)\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20context\x20=\x0a\x20\x20\x20\x20\x20\x20\x20\x20inheritedContext\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20hasStructuredVideoContext(path)\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20STRUCTURED_URL_KEY_RE.test(String(path.at(-1)\x20||\x20\x22\x22));\x0a\x20\x20\x20\x20\x20\x20if\x20(!context)\x20return;\x0a\x20\x20\x20\x20\x20\x20for\x20(const\x20url\x20of\x20extractUrlsFromText(value))\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20pushStructuredVideoUrl(url,\x20{\x20hasStructuredVideoContext:\x20context\x20});\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20return;\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20if\x20(!value\x20||\x20typeof\x20value\x20!==\x20\x22object\x22)\x20return;\x0a\x20\x20\x20\x20if\x20(visitedStructuredObjects.has(value))\x20return;\x0a\x20\x20\x20\x20visitedStructuredObjects.add(value);\x0a\x20\x20\x20\x20structuredObjectCount\x20+=\x201;\x0a\x0a\x20\x20\x20\x20const\x20keys\x20=\x20Object.keys(value).slice(0,\x20180);\x0a\x20\x20\x20\x20const\x20objectContext\x20=\x0a\x20\x20\x20\x20\x20\x20inheritedContext\x20||\x0a\x20\x20\x20\x20\x20\x20hasStructuredVideoContext(path)\x20||\x0a\x20\x20\x20\x20\x20\x20keys.some((key)\x20=>\x20STRUCTURED_VIDEO_KEY_RE.test(key));\x0a\x20\x20\x20\x20const\x20dimensions\x20=\x20{\x0a\x20\x20\x20\x20\x20\x20width:\x20readStructuredNumber(value,\x20[\x22width\x22,\x20\x22w\x22,\x20\x22videoWidth\x22]),\x0a\x20\x20\x20\x20\x20\x20height:\x20readStructuredNumber(value,\x20[\x22height\x22,\x20\x22h\x22,\x20\x22videoHeight\x22]),\x0a\x20\x20\x20\x20\x20\x20duration:\x20readStructuredNumber(value,\x20[\x22duration\x22,\x20\x22durationSec\x22,\x20\x22videoDuration\x22]),\x0a\x20\x20\x20\x20};\x0a\x20\x20\x20\x20for\x20(const\x20key\x20of\x20keys)\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20\x20\x20const\x20item\x20=\x20value[key];\x0a\x20\x20\x20\x20\x20\x20const\x20nextPath\x20=\x20path.concat(key);\x0a\x20\x20\x20\x20\x20\x20const\x20keyContext\x20=\x0a\x20\x20\x20\x20\x20\x20\x20\x20objectContext\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20STRUCTURED_VIDEO_KEY_RE.test(key)\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20STRUCTURED_URL_KEY_RE.test(key);\x0a\x20\x20\x20\x20\x20\x20if\x20(typeof\x20item\x20===\x20\x22string\x22)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20if\x20(!keyContext)\x20continue;\x0a\x20\x20\x20\x20\x20\x20\x20\x20for\x20(const\x20url\x20of\x20extractUrlsFromText(item))\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20pushStructuredVideoUrl(url,\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20...dimensions,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20hasStructuredVideoContext:\x20keyContext,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20});\x0a\x20\x20\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20\x20\x20continue;\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20if\x20(item\x20&&\x20typeof\x20item\x20===\x20\x22object\x22)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20walkStructuredMedia(item,\x20nextPath,\x20depth\x20+\x201,\x20keyContext);\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20tryParseStructuredJson\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20text\x20=\x20String(value\x20||\x20\x22\x22).trim();\x0a\x20\x20\x20\x20if\x20(!text)\x20return\x20null;\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20JSON.parse(text);\x0a\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20JSON.parse(decodeURIComponent(text));\x0a\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20return\x20null;\x0a\x20\x20};\x0a\x20\x20const\x20extractJsonValueAt\x20=\x20(text,\x20startIndex)\x20=>\x20{\x0a\x20\x20\x20\x20let\x20index\x20=\x20Math.max(0,\x20Number(startIndex\x20||\x200)\x20||\x200);\x0a\x20\x20\x20\x20while\x20(index\x20<\x20text.length\x20&&\x20/\x5cs/.test(text[index]))\x20index\x20+=\x201;\x0a\x20\x20\x20\x20const\x20open\x20=\x20text[index];\x0a\x20\x20\x20\x20const\x20close\x20=\x20open\x20===\x20\x22{\x22\x20?\x20\x22}\x22\x20:\x20open\x20===\x20\x22[\x22\x20?\x20\x22]\x22\x20:\x20\x22\x22;\x0a\x20\x20\x20\x20if\x20(!close)\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20let\x20depth\x20=\x200;\x0a\x20\x20\x20\x20let\x20quote\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20let\x20escaped\x20=\x20false;\x0a\x20\x20\x20\x20for\x20(let\x20i\x20=\x20index;\x20i\x20<\x20text.length;\x20i\x20+=\x201)\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20ch\x20=\x20text[i];\x0a\x20\x20\x20\x20\x20\x20if\x20(quote)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20if\x20(escaped)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20escaped\x20=\x20false;\x0a\x20\x20\x20\x20\x20\x20\x20\x20}\x20else\x20if\x20(ch\x20===\x20\x22\x5c\x5c\x22)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20escaped\x20=\x20true;\x0a\x20\x20\x20\x20\x20\x20\x20\x20}\x20else\x20if\x20(ch\x20===\x20quote)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20quote\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20\x20\x20continue;\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20if\x20(ch\x20===\x20\x27\x22\x27\x20||\x20ch\x20===\x20\x22\x27\x22)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20quote\x20=\x20ch;\x0a\x20\x20\x20\x20\x20\x20\x20\x20continue;\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20if\x20(ch\x20===\x20open)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20depth\x20+=\x201;\x0a\x20\x20\x20\x20\x20\x20}\x20else\x20if\x20(ch\x20===\x20close)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20depth\x20-=\x201;\x0a\x20\x20\x20\x20\x20\x20\x20\x20if\x20(depth\x20===\x200)\x20return\x20text.slice(index,\x20i\x20+\x201);\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20\x22\x22;\x0a\x20\x20};\x0a\x20\x20const\x20scanStructuredScriptText\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20text\x20=\x20String(value\x20||\x20\x22\x22).slice(0,\x20800000);\x0a\x20\x20\x20\x20const\x20parsed\x20=\x20tryParseStructuredJson(text);\x0a\x20\x20\x20\x20if\x20(parsed)\x20{\x0a\x20\x20\x20\x20\x20\x20scanDouyinAwemeDetails(parsed);\x0a\x20\x20\x20\x20\x20\x20walkStructuredMedia(parsed,\x20[\x22script-json\x22]);\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20const\x20decodedText\x20=\x20unescapeStructuredUrlText(text);\x0a\x20\x20\x20\x20const\x20decoded\x20=\x20decodedText\x20!==\x20text\x20?\x20tryParseStructuredJson(decodedText)\x20:\x20null;\x0a\x20\x20\x20\x20if\x20(decoded)\x20{\x0a\x20\x20\x20\x20\x20\x20scanDouyinAwemeDetails(decoded);\x0a\x20\x20\x20\x20\x20\x20walkStructuredMedia(decoded,\x20[\x22script-json-decoded\x22]);\x0a\x20\x20\x20\x20}\x0a\x0a\x20\x20\x20\x20const\x20keyRe\x20=\x0a\x20\x20\x20\x20\x20\x20/[\x22\x27]?(aweme_detail|video_info(?:_v2)?|video|play_addr(?:_h(?:264|265)|_256)?|download_addr|url_list|backup_urls|dash|stream)[\x22\x27]?\x5cs*:/gi;\x0a\x20\x20\x20\x20let\x20match\x20=\x20null;\x0a\x20\x20\x20\x20let\x20scanned\x20=\x200;\x0a\x20\x20\x20\x20while\x20((match\x20=\x20keyRe.exec(decodedText))\x20&&\x20scanned\x20<\x20120\x20&&\x20videos.length\x20<\x20MAX)\x20{\x0a\x20\x20\x20\x20\x20\x20scanned\x20+=\x201;\x0a\x20\x20\x20\x20\x20\x20const\x20colonIndex\x20=\x20decodedText.indexOf(\x22:\x22,\x20match.index);\x0a\x20\x20\x20\x20\x20\x20const\x20jsonValue\x20=\x20extractJsonValueAt(decodedText,\x20colonIndex\x20+\x201);\x0a\x20\x20\x20\x20\x20\x20const\x20partial\x20=\x20tryParseStructuredJson(jsonValue);\x0a\x20\x20\x20\x20\x20\x20if\x20(partial)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20scanDouyinAwemeDetails(partial);\x0a\x20\x20\x20\x20\x20\x20\x20\x20walkStructuredMedia(partial,\x20[match[1]]);\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20for\x20(const\x20key\x20of\x20KNOWN_STATE_KEYS)\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20value\x20=\x20window[key];\x0a\x20\x20\x20\x20\x20\x20if\x20(typeof\x20value\x20===\x20\x22string\x22)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20const\x20parsed\x20=\x20tryParseStructuredJson(unescapeStructuredUrlText(value));\x0a\x20\x20\x20\x20\x20\x20\x20\x20if\x20(parsed)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20scanDouyinAwemeDetails(parsed);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20walkStructuredMedia(parsed,\x20[key]);\x0a\x20\x20\x20\x20\x20\x20\x20\x20}\x20else\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20walkStructuredMedia(value,\x20[key]);\x0a\x20\x20\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20}\x20else\x20if\x20(value\x20&&\x20typeof\x20value\x20===\x20\x22object\x22)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20scanDouyinAwemeDetails(value);\x0a\x20\x20\x20\x20\x20\x20\x20\x20walkStructuredMedia(value,\x20[key]);\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20}\x0a\x20\x20for\x20(const\x20script\x20of\x20Array.from(document.scripts\x20||\x20[]))\x20{\x0a\x20\x20\x20\x20if\x20(videos.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20const\x20type\x20=\x20String(script.type\x20||\x20script.getAttribute?.(\x22type\x22)\x20||\x20\x22\x22).toLowerCase();\x0a\x20\x20\x20\x20const\x20id\x20=\x20String(script.id\x20||\x20\x22\x22).toLowerCase();\x0a\x20\x20\x20\x20const\x20shouldScan\x20=\x0a\x20\x20\x20\x20\x20\x20type.includes(\x22json\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20id.includes(\x22data\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20id.includes(\x22state\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20/play_addr|download_addr|url_list|backup_urls|video_info|aweme_detail/i.test(script.textContent\x20||\x20\x22\x22);\x0a\x20\x20\x20\x20if\x20(!shouldScan)\x20continue;\x0a\x20\x20\x20\x20scanStructuredScriptText(script.textContent\x20||\x20\x22\x22);\x0a\x20\x20}\x0a\x20\x20return\x20{\x20ok:\x20true,\x20videos,\x20douyinDetailApiUrls,\x20pageUrl,\x20pageTitle\x20};\x0a})()\x0a';}function buildWebPreviewReferenceSnapshotScript(){const _0x116bc4=a129_0x518f3c;return _0x116bc4(0x107)+WEB_PREVIEW_SELECTED_TEXT_LIMIT+_0x116bc4(0xac);}function toNodeId(_0x589926){const _0x9a578e=a129_0x518f3c;return String(_0x589926||'')[_0x9a578e(0x13c)]();}function toTabId(_0xd65d44){const _0x3de35f=a129_0x518f3c;return String(_0xd65d44||'default')[_0x3de35f(0x13c)]()||_0x3de35f(0xc3);}function normalizeExtractedImageDimension(_0x2b270c){const _0x24f267=a129_0x518f3c;return Math[_0x24f267(0x140)](0x0,Math[_0x24f267(0x165)](Number(_0x2b270c||0x0)||0x0));}function hasExtractableImageSize(_0x35463f,_0x26eb34){const _0x2be2d7=normalizeExtractedImageDimension(_0x35463f),_0x56f8c4=normalizeExtractedImageDimension(_0x26eb34);if(!_0x2be2d7||!_0x56f8c4)return!![];return _0x2be2d7>=WEB_PREVIEW_EXTRACT_MIN_IMAGE_WIDTH&&_0x56f8c4>=WEB_PREVIEW_EXTRACT_MIN_IMAGE_HEIGHT&&_0x2be2d7*_0x56f8c4>=WEB_PREVIEW_EXTRACT_MIN_IMAGE_AREA;}function filterExtractedImageCandidates(_0x7dd748=[]){const _0x25a094=a129_0x518f3c;if(!Array['isArray'](_0x7dd748))return[];return _0x7dd748[_0x25a094(0x143)](_0x342fb2=>hasExtractableImageSize(_0x342fb2?.[_0x25a094(0xaa)],_0x342fb2?.[_0x25a094(0x11d)]));}function normalizeExtractedMediaUrl(_0x11a4b7){const _0x826661=a129_0x518f3c,_0x59f658=String(_0x11a4b7||'')[_0x826661(0x13c)]();if(!_0x59f658)return'';try{const _0x83af7e=new URL(_0x59f658);if(_0x83af7e[_0x826661(0x106)]!==_0x826661(0xc5)&&_0x83af7e['protocol']!==_0x826661(0x9b))return'';return _0x83af7e['username']='',_0x83af7e[_0x826661(0x8d)]='',_0x83af7e[_0x826661(0xd6)];}catch{return'';}}function isDirectVideoMediaUrl(_0xe62d4d){const _0x569682=a129_0x518f3c,_0xfe26d=normalizeExtractedMediaUrl(_0xe62d4d);if(!_0xfe26d)return![];try{const _0x356677=new URL(_0xfe26d)[_0x569682(0x13d)];return WEB_PREVIEW_DIRECT_VIDEO_EXTENSION_RE['test'](_0x356677)&&!WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE[_0x569682(0x173)](_0x356677);}catch{return![];}}function filterExtractedVideoCandidates(_0x34b004=[]){const _0x44a754=a129_0x518f3c;if(!Array['isArray'](_0x34b004))return[];const _0x10fc1b=new Set(),_0x331d8d=[];for(const _0x509da3 of _0x34b004){const _0x28d61f=normalizeExtractedMediaUrl(_0x509da3?.[_0x44a754(0xdb)]);if(!_0x28d61f||_0x10fc1b[_0x44a754(0xfb)](_0x28d61f))continue;let _0x2a060a='';try{_0x2a060a=new URL(_0x28d61f)[_0x44a754(0x13d)];}catch{}if(WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE[_0x44a754(0x173)](_0x2a060a))continue;const _0x305566=String(_0x509da3?.[_0x44a754(0x167)]||'')[_0x44a754(0x13c)]()[_0x44a754(0xc2)](),_0xb69fe0=String(_0x509da3?.[_0x44a754(0x109)]||_0x44a754(0x169))[_0x44a754(0x13c)]()['toLowerCase'](),_0xfb0a3=_0x305566[_0x44a754(0x87)](_0x44a754(0x158))||isDirectVideoMediaUrl(_0x28d61f)||_0xb69fe0===_0x44a754(0xfd)||_0xb69fe0===_0x44a754(0x149)||_0xb69fe0===_0x44a754(0x164)||_0xb69fe0==='video-resource'||_0xb69fe0===_0x44a754(0xa4);if(!_0xfb0a3)continue;_0x10fc1b['add'](_0x28d61f),_0x331d8d[_0x44a754(0x10c)]({'kind':_0x44a754(0xfd),'url':_0x28d61f,'title':String(_0x509da3?.[_0x44a754(0xe6)]||_0x509da3?.[_0x44a754(0x161)]||_0x44a754(0xd0))[_0x44a754(0x13c)]()[_0x44a754(0xb7)](0x0,0xa0),'pageUrl':normalizeExtractedMediaUrl(_0x509da3?.['pageUrl']),'pageTitle':String(_0x509da3?.[_0x44a754(0x161)]||'')[_0x44a754(0x13c)]()[_0x44a754(0xb7)](0x0,0xa0),'nodeId':String(_0x509da3?.[_0x44a754(0x108)]||'')[_0x44a754(0x13c)](),'tabId':String(_0x509da3?.['tabId']||'')[_0x44a754(0x13c)](),'width':Math['max'](0x0,Math[_0x44a754(0x165)](Number(_0x509da3?.[_0x44a754(0xaa)]||0x0)||0x0)),'height':Math[_0x44a754(0x140)](0x0,Math['round'](Number(_0x509da3?.[_0x44a754(0x11d)]||0x0)||0x0)),'duration':Math[_0x44a754(0x140)](0x0,Number(_0x509da3?.[_0x44a754(0x134)]||0x0)||0x0),'sourceType':_0xb69fe0['slice'](0x0,0x28),'mimeType':_0x305566});if(_0x331d8d[_0x44a754(0x153)]>=WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT)break;}return _0x331d8d;}function mergeExtractedImageCandidates(..._0x24522f){const _0x429cdd=a129_0x518f3c,_0x1dbec3=new Set(),_0x14383d=[];for(const _0x36f848 of _0x24522f){for(const _0x268507 of filterExtractedImageCandidates(_0x36f848)){const _0x510d3f=normalizeExtractedMediaUrl(_0x268507?.[_0x429cdd(0xdb)]);if(!_0x510d3f||_0x1dbec3[_0x429cdd(0xfb)](_0x510d3f))continue;_0x1dbec3[_0x429cdd(0xa1)](_0x510d3f),_0x14383d[_0x429cdd(0x10c)]({..._0x268507,'url':_0x510d3f});if(_0x14383d[_0x429cdd(0x153)]>=WEB_PREVIEW_IMAGE_EXTRACTION_LIMIT)return _0x14383d;}}return _0x14383d;}function mergeExtractedVideoCandidates(..._0x27b371){const _0x44ed7e=a129_0x518f3c,_0x1cbbfe=new Set(),_0x69b750=[];for(const _0x11285b of _0x27b371){for(const _0xe7bfe8 of filterExtractedVideoCandidates(_0x11285b)){if(!_0xe7bfe8?.['url']||_0x1cbbfe[_0x44ed7e(0xfb)](_0xe7bfe8[_0x44ed7e(0xdb)]))continue;_0x1cbbfe[_0x44ed7e(0xa1)](_0xe7bfe8[_0x44ed7e(0xdb)]),_0x69b750[_0x44ed7e(0x10c)](_0xe7bfe8);if(_0x69b750[_0x44ed7e(0x153)]>=WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT)return _0x69b750;}}return _0x69b750;}function toEntryKey(_0x3cd291,_0x5a0876=a129_0x518f3c(0xc3)){return toNodeId(_0x3cd291)+'\x0a'+toTabId(_0x5a0876);}function toBrowserProfileId(_0x5540b2){const _0x573a05=a129_0x518f3c,_0x3be42d=String(_0x5540b2||'')[_0x573a05(0x13c)]()[_0x573a05(0xe5)](/[^a-zA-Z0-9_-]/g,'-')['replace'](/-+/g,'-')[_0x573a05(0xe5)](/^-|-$/g,'')[_0x573a05(0xb7)](0x0,0x50);return _0x3be42d||DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID;}function toPersistentPartitionId(_0x1293f0){return WEB_PREVIEW_PARTITION_PREFIX+'-'+toBrowserProfileId(_0x1293f0);}function isBlankPopupUrl(_0x4f06d7){const _0x502298=a129_0x518f3c,_0x2b3b7b=String(_0x4f06d7||'')[_0x502298(0x13c)]()[_0x502298(0xc2)]();return!_0x2b3b7b||_0x2b3b7b==='about:blank'||_0x2b3b7b[_0x502298(0x87)](_0x502298(0xb3))||_0x2b3b7b[_0x502298(0x87)](_0x502298(0x98));}function isGoogleAccountsUrl(_0x56d664){const _0x4bed70=a129_0x518f3c,_0x114dac=normalizeWebPreviewUrl(_0x56d664);if(!_0x114dac)return![];try{const _0x2e1aac=new URL(_0x114dac)[_0x4bed70(0xe1)][_0x4bed70(0xc2)]();return _0x2e1aac===_0x4bed70(0x183)||_0x2e1aac['startsWith']('accounts.google.');}catch{return![];}}function shouldUseNativeAuthPopup(_0x10430b){return isBlankPopupUrl(_0x10430b)||isGoogleAccountsUrl(_0x10430b);}function normalizeBounds(_0x2540fe={}){const _0x3fd1f0=a129_0x518f3c,_0x5972a1=Math[_0x3fd1f0(0x165)](Number(_0x2540fe['x'])),_0x404407=Math[_0x3fd1f0(0x165)](Number(_0x2540fe['y'])),_0x262634=Math[_0x3fd1f0(0x165)](Number(_0x2540fe['width'])),_0x3c2364=Math[_0x3fd1f0(0x165)](Number(_0x2540fe['height']));if(!Number[_0x3fd1f0(0xd8)](_0x5972a1)||!Number[_0x3fd1f0(0xd8)](_0x404407)||!Number[_0x3fd1f0(0xd8)](_0x262634)||!Number[_0x3fd1f0(0xd8)](_0x3c2364)||_0x262634<MIN_VIEW_SIZE||_0x3c2364<MIN_VIEW_SIZE)return null;return{'x':_0x5972a1,'y':_0x404407,'width':_0x262634,'height':_0x3c2364};}function normalizeZoomFactor(_0xe135b6){const _0x8b5ab0=a129_0x518f3c,_0x1fa5f1=Number(_0xe135b6);if(!Number['isFinite'](_0x1fa5f1)||_0x1fa5f1<=0x0)return 0x1;return Math[_0x8b5ab0(0x9d)](0x5,Math[_0x8b5ab0(0x140)](0.25,_0x1fa5f1));}function a129_0x1f34(){const _0x2c7f7b=['canGoForward',';\x0a\x20\x20const\x20contextY\x20=\x20','separator','web_preview.douyin_media_resolve_failed','当前\x20Electron\x20环境不支持\x20WebContentsView','setBounds','Web\x20preview\x20loadURL\x20failed','titleText','Web\x20preview\x20reference\x20capture\x20failed','没有上一页','detailApiUrls','has','views','video','keys','parse','error','22121urnLlZ','Web\x20preview\x20context\x20image\x20probe\x20failed','send-selected-text','getBounds','tabIds','protocol','\x0a(()\x20=>\x20{\x0a\x20\x20const\x20normalizeUrl\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20new\x20URL(String(value\x20||\x20\x22\x22),\x20document.baseURI);\x0a\x20\x20\x20\x20\x20\x20if\x20(url.protocol\x20!==\x20\x22http:\x22\x20&&\x20url.protocol\x20!==\x20\x22https:\x22)\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.username\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.password\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20return\x20url.href;\x0a\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20selectedText\x20=\x20String(window.getSelection?.().toString?.()\x20||\x20\x22\x22).trim();\x0a\x20\x20return\x20{\x0a\x20\x20\x20\x20ok:\x20true,\x0a\x20\x20\x20\x20pageUrl:\x20normalizeUrl(location.href),\x0a\x20\x20\x20\x20pageTitle:\x20String(document.title\x20||\x20\x22\x22).slice(0,\x20160),\x0a\x20\x20\x20\x20selectedText:\x20selectedText.slice(0,\x20','nodeId','sourceType','contextY',';\x0a\x20\x20const\x20normalizeUrl\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20new\x20URL(String(value\x20||\x20\x22\x22),\x20document.baseURI);\x0a\x20\x20\x20\x20\x20\x20if\x20(url.protocol\x20!==\x20\x22http:\x22\x20&&\x20url.protocol\x20!==\x20\x22https:\x22)\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.username\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.password\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20return\x20url.href;\x0a\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20pageUrl\x20=\x20normalizeUrl(location.href);\x0a\x20\x20const\x20pageTitle\x20=\x20String(document.title\x20||\x20\x22\x22).slice(0,\x20160);\x0a\x20\x20const\x20parseSrcset\x20=\x20(value)\x20=>\x20String(value\x20||\x20\x22\x22)\x0a\x20\x20\x20\x20.split(\x22,\x22)\x0a\x20\x20\x20\x20.map((item)\x20=>\x20normalizeUrl(item.trim().split(/\x5cs+/)[0]\x20||\x20\x22\x22))\x0a\x20\x20\x20\x20.filter(Boolean);\x0a\x20\x20const\x20parseCssUrls\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20urls\x20=\x20[];\x0a\x20\x20\x20\x20const\x20text\x20=\x20String(value\x20||\x20\x22\x22);\x0a\x20\x20\x20\x20const\x20re\x20=\x20/url\x5c(([\x22\x27]?)(.*?)\x5c1\x5c)/g;\x0a\x20\x20\x20\x20let\x20match\x20=\x20null;\x0a\x20\x20\x20\x20while\x20((match\x20=\x20re.exec(text)))\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20normalizeUrl(match[2]\x20||\x20\x22\x22);\x0a\x20\x20\x20\x20\x20\x20if\x20(url)\x20urls.push(url);\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20urls;\x0a\x20\x20};\x0a\x20\x20const\x20getImageUrl\x20=\x20(image)\x20=>\x20normalizeUrl(\x0a\x20\x20\x20\x20image?.currentSrc\x20||\x0a\x20\x20\x20\x20\x20\x20image?.src\x20||\x0a\x20\x20\x20\x20\x20\x20image?.getAttribute?.(\x22src\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20image?.dataset?.src\x20||\x0a\x20\x20\x20\x20\x20\x20image?.dataset?.original\x20||\x0a\x20\x20\x20\x20\x20\x20image?.dataset?.lazySrc\x20||\x0a\x20\x20\x20\x20\x20\x20parseSrcset(image?.srcset\x20||\x20image?.getAttribute?.(\x22srcset\x22)\x20||\x20\x22\x22)[0]\x20||\x0a\x20\x20\x20\x20\x20\x20\x22\x22,\x0a\x20\x20);\x0a\x20\x20const\x20getElementTitle\x20=\x20(element,\x20fallback\x20=\x20\x22\x22)\x20=>\x0a\x20\x20\x20\x20String(\x0a\x20\x20\x20\x20\x20\x20element?.alt\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20element?.title\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20element?.getAttribute?.(\x22aria-label\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20fallback\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20pageTitle\x20||\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x22网页图片\x22,\x0a\x20\x20\x20\x20).slice(0,\x20160);\x0a\x20\x20const\x20findImageElement\x20=\x20(target)\x20=>\x20{\x0a\x20\x20\x20\x20if\x20(!target?.closest)\x20return\x20null;\x0a\x20\x20\x20\x20return\x20(\x0a\x20\x20\x20\x20\x20\x20target.closest(\x22img\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20target.closest(\x22picture\x22)?.querySelector?.(\x22img\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20target.querySelector?.(\x22img,\x20picture\x20img\x22)\x20||\x0a\x20\x20\x20\x20\x20\x20null\x0a\x20\x20\x20\x20);\x0a\x20\x20};\x0a\x20\x20const\x20findBackgroundImageSource\x20=\x20(target)\x20=>\x20{\x0a\x20\x20\x20\x20let\x20element\x20=\x20target?.nodeType\x20===\x201\x20?\x20target\x20:\x20null;\x0a\x20\x20\x20\x20for\x20(let\x20i\x20=\x200;\x20element\x20&&\x20i\x20<\x204;\x20i\x20+=\x201,\x20element\x20=\x20element.parentElement)\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20parseCssUrls(window.getComputedStyle?.(element)?.backgroundImage\x20||\x20\x22\x22)[0];\x0a\x20\x20\x20\x20\x20\x20if\x20(url)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20return\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20element,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20url,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20title:\x20getElementTitle(element),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20width:\x20Math.max(0,\x20Math.round(Number(element.clientWidth\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20height:\x20Math.max(0,\x20Math.round(Number(element.clientHeight\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20};\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20null;\x0a\x20\x20};\x0a\x20\x20const\x20findImageSource\x20=\x20(target)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20image\x20=\x20findImageElement(target);\x0a\x20\x20\x20\x20if\x20(image)\x20return\x20{\x20image,\x20element:\x20image,\x20url:\x20getImageUrl(image)\x20};\x0a\x20\x20\x20\x20return\x20findBackgroundImageSource(target);\x0a\x20\x20};\x0a\x20\x20const\x20findContextImageSource\x20=\x20()\x20=>\x20{\x0a\x20\x20\x20\x20const\x20candidates\x20=\x20[];\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20pointElements\x20=\x20document.elementsFromPoint?.(contextX,\x20contextY);\x0a\x20\x20\x20\x20\x20\x20if\x20(Array.isArray(pointElements))\x20candidates.push(...pointElements);\x0a\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20const\x20seen\x20=\x20new\x20Set();\x0a\x20\x20\x20\x20for\x20(const\x20element\x20of\x20candidates)\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(!element\x20||\x20seen.has(element))\x20continue;\x0a\x20\x20\x20\x20\x20\x20seen.add(element);\x0a\x20\x20\x20\x20\x20\x20const\x20source\x20=\x20findImageSource(element);\x0a\x20\x20\x20\x20\x20\x20if\x20(source?.url)\x20return\x20source;\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20null;\x0a\x20\x20};\x0a\x20\x20const\x20buildImagePayload\x20=\x20(source)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20image\x20=\x20source?.image\x20||\x20null;\x0a\x20\x20\x20\x20const\x20element\x20=\x20source?.element\x20||\x20image\x20||\x20null;\x0a\x20\x20\x20\x20const\x20url\x20=\x20normalizeUrl(source?.url\x20||\x20getImageUrl(image));\x0a\x20\x20\x20\x20if\x20(!url)\x20return\x20null;\x0a\x20\x20\x20\x20return\x20{\x0a\x20\x20\x20\x20\x20\x20kind:\x20\x22image\x22,\x0a\x20\x20\x20\x20\x20\x20url,\x0a\x20\x20\x20\x20\x20\x20title:\x20getElementTitle(image\x20||\x20element,\x20source?.title),\x0a\x20\x20\x20\x20\x20\x20alt:\x20String(image?.alt\x20||\x20\x22\x22).slice(0,\x20160),\x0a\x20\x20\x20\x20\x20\x20pageUrl,\x0a\x20\x20\x20\x20\x20\x20pageTitle,\x0a\x20\x20\x20\x20\x20\x20nodeId,\x0a\x20\x20\x20\x20\x20\x20tabId,\x0a\x20\x20\x20\x20\x20\x20contextX,\x0a\x20\x20\x20\x20\x20\x20contextY,\x0a\x20\x20\x20\x20\x20\x20width:\x20Math.max(0,\x20Math.round(Number(source?.width\x20||\x20image?.naturalWidth\x20||\x20image?.width\x20||\x20element?.clientWidth\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20height:\x20Math.max(0,\x20Math.round(Number(source?.height\x20||\x20image?.naturalHeight\x20||\x20image?.height\x20||\x20element?.clientHeight\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20};\x0a\x20\x20};\x0a\x20\x20const\x20stored\x20=\x20window.__AI_CANVAS_WEB_PREVIEW_LAST_CONTEXT_IMAGE__;\x0a\x20\x20if\x20(stored?.url)\x20{\x0a\x20\x20\x20\x20return\x20{\x0a\x20\x20\x20\x20\x20\x20ok:\x20true,\x0a\x20\x20\x20\x20\x20\x20image:\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20...stored,\x0a\x20\x20\x20\x20\x20\x20\x20\x20pageTitle:\x20String(stored.pageTitle\x20||\x20pageTitle\x20||\x20\x22\x22).slice(0,\x20160),\x0a\x20\x20\x20\x20\x20\x20\x20\x20contextX,\x0a\x20\x20\x20\x20\x20\x20\x20\x20contextY,\x0a\x20\x20\x20\x20\x20\x20},\x0a\x20\x20\x20\x20\x20\x20pageUrl,\x0a\x20\x20\x20\x20\x20\x20pageTitle,\x0a\x20\x20\x20\x20};\x0a\x20\x20}\x0a\x20\x20const\x20payload\x20=\x20buildImagePayload(findContextImageSource());\x0a\x20\x20return\x20{\x20ok:\x20!!payload,\x20image:\x20payload,\x20pageUrl,\x20pageTitle\x20};\x0a})()\x0a','push','readySnapshotPending',';\x0a\x20\x20const\x20MIN_HEIGHT\x20=\x20',',\x0a\x20\x20\x20\x20\x20\x20width:\x20Math.max(0,\x20Math.round(Number(source?.width\x20||\x20image?.naturalWidth\x20||\x20image?.width\x20||\x20element?.clientWidth\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20height:\x20Math.max(0,\x20Math.round(Number(source?.height\x20||\x20image?.naturalHeight\x20||\x20image?.height\x20||\x20element?.clientHeight\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20};\x0a\x20\x20};\x0a\x20\x20const\x20emitImageContextMenuRequest\x20=\x20(payload,\x20event)\x20=>\x20{\x0a\x20\x20\x20\x20if\x20(!payload?.url\x20||\x20!INPUT_TOKEN)\x20return;\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20console.info(\x0a\x20\x20\x20\x20\x20\x20\x20\x20INPUT_PREFIX\x20+\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20JSON.stringify({\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20...payload,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20token:\x20INPUT_TOKEN,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type:\x20\x22image-context-menu\x22,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20contextX:\x20Math.max(0,\x20Math.round(Number(event?.clientX\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20contextY:\x20Math.max(0,\x20Math.round(Number(event?.clientY\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20}),\x0a\x20\x20\x20\x20\x20\x20);\x0a\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20};\x0a\x20\x20if\x20(!window.__AI_CANVAS_WEB_PREVIEW_CONTEXT_IMAGE_BRIDGE__)\x20{\x0a\x20\x20\x20\x20Object.defineProperty(window,\x20\x22__AI_CANVAS_WEB_PREVIEW_CONTEXT_IMAGE_BRIDGE__\x22,\x20{\x0a\x20\x20\x20\x20\x20\x20value:\x20true,\x0a\x20\x20\x20\x20\x20\x20configurable:\x20false,\x0a\x20\x20\x20\x20});\x0a\x20\x20\x20\x20const\x20handleContextImageMenu\x20=\x20(event)\x20=>\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(event.__AI_CANVAS_WEB_PREVIEW_CONTEXT_IMAGE_HANDLED__)\x20return;\x0a\x20\x20\x20\x20\x20\x20const\x20payload\x20=\x20buildImagePayload(findContextImageSource(event));\x0a\x20\x20\x20\x20\x20\x20window.__AI_CANVAS_WEB_PREVIEW_LAST_CONTEXT_IMAGE__\x20=\x20payload\x0a\x20\x20\x20\x20\x20\x20\x20\x20?\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20...payload,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20contextX:\x20Math.max(0,\x20Math.round(Number(event.clientX\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20contextY:\x20Math.max(0,\x20Math.round(Number(event.clientY\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20capturedAt:\x20Date.now(),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20\x20\x20:\x20null;\x0a\x20\x20\x20\x20\x20\x20if\x20(!payload?.url)\x20return;\x0a\x20\x20\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20Object.defineProperty(event,\x20\x22__AI_CANVAS_WEB_PREVIEW_CONTEXT_IMAGE_HANDLED__\x22,\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20value:\x20true,\x0a\x20\x20\x20\x20\x20\x20\x20\x20});\x0a\x20\x20\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20\x20\x20try\x20{\x20event.preventDefault();\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20\x20\x20try\x20{\x20event.stopPropagation();\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20\x20\x20try\x20{\x20event.stopImmediatePropagation?.();\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20\x20\x20emitImageContextMenuRequest(payload,\x20event);\x0a\x20\x20\x20\x20};\x0a\x20\x20\x20\x20window.addEventListener(\x22contextmenu\x22,\x20handleContextImageMenu,\x20true);\x0a\x20\x20\x20\x20document.addEventListener(\x22contextmenu\x22,\x20handleContextImageMenu,\x20true);\x0a\x20\x20}\x0a\x20\x20if\x20(!hasDragBridge)\x20{\x0a\x20\x20\x20\x20document.addEventListener(\x22dragstart\x22,\x20(event)\x20=>\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20payloadObject\x20=\x20buildImagePayload(findImageSource(event.target));\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20payloadObject?.url\x20||\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20if\x20(!url\x20||\x20!event.dataTransfer)\x20return;\x0a\x20\x20\x20\x20\x20\x20const\x20title\x20=\x20payloadObject.title\x20||\x20\x22网页图片\x22;\x0a\x20\x20\x20\x20\x20\x20const\x20payload\x20=\x20JSON.stringify(payloadObject);\x0a\x20\x20\x20\x20\x20\x20try\x20{\x20event.dataTransfer.setData(MIME,\x20payload);\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20\x20\x20try\x20{\x20event.dataTransfer.setData(\x22text/uri-list\x22,\x20url);\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20\x20\x20try\x20{\x20event.dataTransfer.setData(\x22text/plain\x22,\x20url);\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20event.dataTransfer.setData(\x22text/html\x22,\x20\x27<img\x20src=\x22\x27\x20+\x20escapeHtml(url)\x20+\x20\x27\x22\x20alt=\x22\x27\x20+\x20escapeHtml(title)\x20+\x20\x27\x22>\x27);\x0a\x20\x20\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20\x20\x20event.dataTransfer.effectAllowed\x20=\x20\x22copy\x22;\x0a\x20\x20\x20\x20},\x20true);\x0a\x20\x20}\x0a\x20\x20if\x20(!window.__AI_CANVAS_WEB_PREVIEW_INPUT_BRIDGE__\x20&&\x20INPUT_TOKEN)\x20{\x0a\x20\x20\x20\x20Object.defineProperty(window,\x20\x22__AI_CANVAS_WEB_PREVIEW_INPUT_BRIDGE__\x22,\x20{\x0a\x20\x20\x20\x20\x20\x20value:\x20true,\x0a\x20\x20\x20\x20\x20\x20configurable:\x20false,\x0a\x20\x20\x20\x20});\x0a\x20\x20\x20\x20let\x20spaceHeld\x20=\x20false;\x0a\x20\x20\x20\x20let\x20lastPanStartAt\x20=\x200;\x0a\x20\x20\x20\x20let\x20lastPanStartButton\x20=\x20-1;\x0a\x20\x20\x20\x20const\x20isSpaceKey\x20=\x20(event)\x20=>\x0a\x20\x20\x20\x20\x20\x20event?.code\x20===\x20\x22Space\x22\x20||\x0a\x20\x20\x20\x20\x20\x20event?.key\x20===\x20\x22\x20\x22\x20||\x0a\x20\x20\x20\x20\x20\x20event?.key\x20===\x20\x22Spacebar\x22\x20||\x0a\x20\x20\x20\x20\x20\x20event?.key\x20===\x20\x22Space\x22;\x0a\x20\x20\x20\x20const\x20setSpaceHeld\x20=\x20(held)\x20=>\x20{\x0a\x20\x20\x20\x20\x20\x20spaceHeld\x20=\x20held\x20===\x20true;\x0a\x20\x20\x20\x20};\x0a\x20\x20\x20\x20document.addEventListener(\x22keydown\x22,\x20(event)\x20=>\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(isSpaceKey(event))\x20setSpaceHeld(true);\x0a\x20\x20\x20\x20},\x20true);\x0a\x20\x20\x20\x20document.addEventListener(\x22keyup\x22,\x20(event)\x20=>\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(isSpaceKey(event))\x20setSpaceHeld(false);\x0a\x20\x20\x20\x20},\x20true);\x0a\x20\x20\x20\x20window.addEventListener(\x22blur\x22,\x20()\x20=>\x20setSpaceHeld(false),\x20true);\x0a\x20\x20\x20\x20const\x20emitPanStartPreview\x20=\x20(event)\x20=>\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20button\x20=\x20Number(event?.button);\x0a\x20\x20\x20\x20\x20\x20const\x20isMiddle\x20=\x20button\x20===\x201;\x0a\x20\x20\x20\x20\x20\x20const\x20isLeft\x20=\x20button\x20===\x200;\x0a\x20\x20\x20\x20\x20\x20if\x20(!isMiddle\x20&&\x20!isLeft)\x20return;\x0a\x20\x20\x20\x20\x20\x20const\x20now\x20=\x20Date.now();\x0a\x20\x20\x20\x20\x20\x20if\x20(button\x20===\x20lastPanStartButton\x20&&\x20now\x20-\x20lastPanStartAt\x20<\x2032)\x20return;\x0a\x20\x20\x20\x20\x20\x20lastPanStartAt\x20=\x20now;\x0a\x20\x20\x20\x20\x20\x20lastPanStartButton\x20=\x20button;\x0a\x20\x20\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20console.info(\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20INPUT_PREFIX\x20+\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20JSON.stringify({\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20token:\x20INPUT_TOKEN,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type:\x20\x22pan-start-preview\x22,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20button,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20spaceHeld:\x20isLeft\x20&&\x20spaceHeld\x20===\x20true,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20buttons:\x20Number(event?.buttons\x20||\x200)\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20clientX:\x20Math.max(0,\x20Math.round(Number(event?.clientX\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20clientY:\x20Math.max(0,\x20Math.round(Number(event?.clientY\x20||\x200)\x20||\x200)),\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20}),\x0a\x20\x20\x20\x20\x20\x20\x20\x20);\x0a\x20\x20\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20};\x0a\x20\x20\x20\x20window.addEventListener(\x22pointerdown\x22,\x20emitPanStartPreview,\x20true);\x0a\x20\x20\x20\x20window.addEventListener(\x22mousedown\x22,\x20emitPanStartPreview,\x20true);\x0a\x20\x20\x20\x20document.addEventListener(\x22pointerdown\x22,\x20emitPanStartPreview,\x20true);\x0a\x20\x20\x20\x20document.addEventListener(\x22mousedown\x22,\x20emitPanStartPreview,\x20true);\x0a\x20\x20}\x0a\x20\x20return\x20true;\x0a})()\x0a','copy','goForward','pageURL','164gtslxe','map','网页地址无效','string','1868624NtEQCs','extract-failed','sourceUrl','pendingPopup','extract-videos','abs','height','setVisible','readySnapshotTimer','executeJavaScript','loadIssuedUrl','web-contents-view','reverse-image-prompt-generate','toString','setZoomFactor','delete','resolve','生成文本','lastBridgeImageContextMenuX','visible','tabId','\x0a(()\x20=>\x20{\x0a\x20\x20const\x20hasDragBridge\x20=\x20!!window.__AI_CANVAS_WEB_PREVIEW_DRAG_BRIDGE__;\x0a\x20\x20if\x20(!hasDragBridge)\x20{\x0a\x20\x20\x20\x20Object.defineProperty(window,\x20\x22__AI_CANVAS_WEB_PREVIEW_DRAG_BRIDGE__\x22,\x20{\x0a\x20\x20\x20\x20\x20\x20value:\x20true,\x0a\x20\x20\x20\x20\x20\x20configurable:\x20false,\x0a\x20\x20\x20\x20});\x0a\x20\x20}\x0a\x20\x20const\x20MIME\x20=\x20','snapshotReady','main','did-navigate-in-page','all','nodeIds','deny','message','duration','Login\x20popup\x20load\x20failed','navigated','2850whbgeU','stringify','extract-images','lastBridgeImageContextMenuAt','popup-','trim','pathname','freezeHiddenWithSnapshot','isPopup','max','pendingRegistrationUntil','freezeToken','filter','web_preview.extract_images_failed','web_preview.snapshot_failed','now','setWindowOpenHandler','extract-media','video-source','web_preview.extract_videos_failed','unsupported-action','2350292XylcPJ','clientY','failed','image','removeChildView','Web\x20preview\x20snapshot\x20capture\x20failed','application/x-ai-canvas-web-preview-image','length','no-history','webContents','popupWindow','webUrl','video/','Web\x20preview\x20video\x20extraction\x20failed','send-selected-text-source',';\x0a\x20\x20const\x20tabId\x20=\x20','warn','reverse-image-prompt','loadURL','反推提示词-生成','missing-node','pageTitle','snapshotStaleAfterLoad','attached','source','round','will-download','mimeType','srcURL','media',';\x0a\x20\x20const\x20INPUT_PREFIX\x20=\x20','webPreview:event','send-selected-text-to-video','images','4PVXELH','will-navigate','ready','987966gLnZfS','capturePage','test','pendingZoomFactor','function','web_preview.drag_bridge_failed','token','send-selected-text-to-video-generate',';\x0a\x20\x20const\x20STREAM_MEDIA_RE\x20=\x20','will-frame-navigate','selected','destroyed','getTitle','Douyin\x20media\x20resolver\x20failed',';\x0a\x20\x20const\x20MIN_WIDTH\x20=\x20','preventDefault','主窗口尚未就绪','没有下一页','accounts.google.com','get','snapshotEpoch','Web\x20preview\x20drag\x20bridge\x20injection\x20failed','loaded','hasSnapshot','favicon','Web\x20preview\x20context\x20menu\x20failed','send-selected-text-to-image-generate','22655040eSleha','did-create-window','catch','2753412QZBfUj','douyinDetailApiUrls','send-image-to-canvas','浏览器节点仅允许打开\x20http/https\x20链接','startsWith','isDestroyed','holdSnapshotOnNextLoadStart','bounds','missing-view','forward','password','browserProfileId','deferZoomFactor','contentView','finally',';\x0a\x20\x20const\x20normalizeUrl\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20new\x20URL(String(value\x20||\x20\x22\x22),\x20document.baseURI);\x0a\x20\x20\x20\x20\x20\x20if\x20(url.protocol\x20!==\x20\x22http:\x22\x20&&\x20url.protocol\x20!==\x20\x22https:\x22)\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.username\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20url.password\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20return\x20url.href;\x0a\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20}\x0a\x20\x20};\x0a\x20\x20const\x20parseSrcset\x20=\x20(value)\x20=>\x20String(value\x20||\x20\x22\x22)\x0a\x20\x20\x20\x20.split(\x22,\x22)\x0a\x20\x20\x20\x20.map((item)\x20=>\x20normalizeUrl(item.trim().split(/\x5cs+/)[0]\x20||\x20\x22\x22))\x0a\x20\x20\x20\x20.filter(Boolean);\x0a\x20\x20const\x20parseCssUrls\x20=\x20(value)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20urls\x20=\x20[];\x0a\x20\x20\x20\x20const\x20text\x20=\x20String(value\x20||\x20\x22\x22);\x0a\x20\x20\x20\x20const\x20re\x20=\x20/url\x5c(([\x22\x27]?)(.*?)\x5c1\x5c)/g;\x0a\x20\x20\x20\x20let\x20match\x20=\x20null;\x0a\x20\x20\x20\x20while\x20((match\x20=\x20re.exec(text)))\x20{\x0a\x20\x20\x20\x20\x20\x20const\x20url\x20=\x20normalizeUrl(match[2]);\x0a\x20\x20\x20\x20\x20\x20if\x20(url)\x20urls.push(url);\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20urls;\x0a\x20\x20};\x0a\x20\x20const\x20pageUrl\x20=\x20normalizeUrl(location.href);\x0a\x20\x20const\x20pageTitle\x20=\x20String(document.title\x20||\x20\x22\x22).slice(0,\x20160);\x0a\x20\x20const\x20seen\x20=\x20new\x20Set();\x0a\x20\x20const\x20images\x20=\x20[];\x0a\x20\x20const\x20hasExtractableSize\x20=\x20(width,\x20height)\x20=>\x20{\x0a\x20\x20\x20\x20const\x20safeWidth\x20=\x20Math.max(0,\x20Math.round(Number(width\x20||\x200)\x20||\x200));\x0a\x20\x20\x20\x20const\x20safeHeight\x20=\x20Math.max(0,\x20Math.round(Number(height\x20||\x200)\x20||\x200));\x0a\x20\x20\x20\x20if\x20(!safeWidth\x20||\x20!safeHeight)\x20return\x20true;\x0a\x20\x20\x20\x20return\x20safeWidth\x20>=\x20MIN_WIDTH\x20&&\x20safeHeight\x20>=\x20MIN_HEIGHT\x20&&\x20safeWidth\x20*\x20safeHeight\x20>=\x20MIN_AREA;\x0a\x20\x20};\x0a\x20\x20const\x20push\x20=\x20(url,\x20source\x20=\x20{})\x20=>\x20{\x0a\x20\x20\x20\x20const\x20normalizedUrl\x20=\x20normalizeUrl(url);\x0a\x20\x20\x20\x20const\x20width\x20=\x20Math.max(0,\x20Math.round(Number(source.width\x20||\x200)\x20||\x200));\x0a\x20\x20\x20\x20const\x20height\x20=\x20Math.max(0,\x20Math.round(Number(source.height\x20||\x200)\x20||\x200));\x0a\x20\x20\x20\x20if\x20(!normalizedUrl\x20||\x20!hasExtractableSize(width,\x20height)\x20||\x20seen.has(normalizedUrl)\x20||\x20images.length\x20>=\x20MAX)\x20return;\x0a\x20\x20\x20\x20seen.add(normalizedUrl);\x0a\x20\x20\x20\x20images.push({\x0a\x20\x20\x20\x20\x20\x20url:\x20normalizedUrl,\x0a\x20\x20\x20\x20\x20\x20title:\x20String(source.title\x20||\x20pageTitle\x20||\x20\x22网页图片\x22).slice(0,\x20160),\x0a\x20\x20\x20\x20\x20\x20alt:\x20String(source.alt\x20||\x20\x22\x22).slice(0,\x20160),\x0a\x20\x20\x20\x20\x20\x20width,\x0a\x20\x20\x20\x20\x20\x20height,\x0a\x20\x20\x20\x20\x20\x20pageUrl,\x0a\x20\x20\x20\x20\x20\x20pageTitle,\x0a\x20\x20\x20\x20\x20\x20nodeId,\x0a\x20\x20\x20\x20\x20\x20tabId,\x0a\x20\x20\x20\x20});\x0a\x20\x20};\x0a\x20\x20for\x20(const\x20img\x20of\x20Array.from(document.images\x20||\x20[]))\x20{\x0a\x20\x20\x20\x20if\x20(images.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20const\x20title\x20=\x20img.alt\x20||\x20img.title\x20||\x20img.getAttribute(\x22aria-label\x22)\x20||\x20pageTitle\x20||\x20\x22网页图片\x22;\x0a\x20\x20\x20\x20const\x20source\x20=\x20{\x0a\x20\x20\x20\x20\x20\x20title,\x0a\x20\x20\x20\x20\x20\x20alt:\x20img.alt\x20||\x20\x22\x22,\x0a\x20\x20\x20\x20\x20\x20width:\x20img.naturalWidth\x20||\x20img.width\x20||\x20img.clientWidth\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20height:\x20img.naturalHeight\x20||\x20img.height\x20||\x20img.clientHeight\x20||\x200,\x0a\x20\x20\x20\x20};\x0a\x20\x20\x20\x20push(img.currentSrc\x20||\x20img.src\x20||\x20img.getAttribute(\x22src\x22)\x20||\x20img.dataset?.src\x20||\x20\x22\x22,\x20source);\x0a\x20\x20\x20\x20for\x20(const\x20url\x20of\x20parseSrcset(img.srcset\x20||\x20img.getAttribute(\x22srcset\x22)\x20||\x20\x22\x22))\x20push(url,\x20source);\x0a\x20\x20\x20\x20const\x20picture\x20=\x20img.closest?.(\x22picture\x22);\x0a\x20\x20\x20\x20for\x20(const\x20sourceEl\x20of\x20Array.from(picture?.querySelectorAll?.(\x22source[srcset]\x22)\x20||\x20[]))\x20{\x0a\x20\x20\x20\x20\x20\x20for\x20(const\x20url\x20of\x20parseSrcset(sourceEl.getAttribute(\x22srcset\x22)\x20||\x20\x22\x22))\x20push(url,\x20source);\x0a\x20\x20\x20\x20}\x0a\x20\x20}\x0a\x20\x20for\x20(const\x20el\x20of\x20Array.from(document.querySelectorAll(\x22body\x20*\x22)))\x20{\x0a\x20\x20\x20\x20if\x20(images.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20let\x20backgroundImage\x20=\x20\x22\x22;\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20backgroundImage\x20=\x20getComputedStyle(el).backgroundImage;\x0a\x20\x20\x20\x20}\x20catch\x20{}\x0a\x20\x20\x20\x20for\x20(const\x20url\x20of\x20parseCssUrls(backgroundImage))\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20(images.length\x20>=\x20MAX)\x20break;\x0a\x20\x20\x20\x20\x20\x20push(url,\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20title:\x20el.getAttribute?.(\x22aria-label\x22)\x20||\x20el.getAttribute?.(\x22title\x22)\x20||\x20pageTitle\x20||\x20\x22网页图片\x22,\x0a\x20\x20\x20\x20\x20\x20\x20\x20width:\x20el.clientWidth\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20\x20\x20height:\x20el.clientHeight\x20||\x200,\x0a\x20\x20\x20\x20\x20\x20});\x0a\x20\x20\x20\x20}\x0a\x20\x20}\x0a\x20\x20return\x20{\x20ok:\x20true,\x20images,\x20pageUrl,\x20pageTitle\x20};\x0a})()\x0a','web_preview.load_failed','view','random','allow','\x0a(()\x20=>\x20{\x0a\x20\x20const\x20nodeId\x20=\x20','about:blank?','canvasSpaceHeld','open-popup','https:','setTimeout','min','15814QxCVkG','unknown-action','pageUrl','add','object','popup','douyin-detail','pan-start-preview','did-start-loading','登录窗口尚未就绪',';\x0a\x20\x20const\x20nodeId\x20=\x20','alt','width','capture-failed','),\x0a\x20\x20};\x0a})()\x0a','web_preview.context_menu_failed',';\x0a\x20\x20const\x20contextX\x20=\x20','includes','contextX',';\x0a\x20\x20const\x20MIN_AREA\x20=\x20','type','about:blank#','requestedUrl','goBack','expiresAt','slice','closed','partition','27bbcOeJ','isArray','then','did-navigate','button','reload','clientX','action','toLowerCase','default','发送到视频节点','http:','canGoBack','set','setPermissionRequestHandler','snapshotUrl','发送到文本节点','reloadIgnoringCache','did-fail-load','网页图片','popupOpened','toDataURL','网页视频','selectionText','__AI_CANVAS_WEB_PREVIEW_INPUT__:','bind','toISOString','size','href','some','isFinite','snapshotPending','disposing','url',';\x0a\x20\x20const\x20DIRECT_VIDEO_RE\x20=\x20','网页加载失败','web_preview.context_image_probe_failed','videos','mediaType','hostname','fetchedCount','snapshot','zoomFactor','replace','title','addChildView','blocked','close','frozen','destroy','snapshotFreezeToken','5AfJXIW','spaceHeld','session'];a129_0x1f34=function(){return _0x2c7f7b;};return a129_0x1f34();}function boundsEqual(_0x4e7d26,_0x56ee0b){const _0x1fbc4a=a129_0x518f3c;return _0x4e7d26?.['x']===_0x56ee0b?.['x']&&_0x4e7d26?.['y']===_0x56ee0b?.['y']&&_0x4e7d26?.['width']===_0x56ee0b?.[_0x1fbc4a(0xaa)]&&_0x4e7d26?.['height']===_0x56ee0b?.['height'];}function zoomFactorEqual(_0x376555,_0x218eb0){return Math['abs'](Number(_0x376555||0x1)-Number(_0x218eb0||0x1))<0.001;}function getViewsPayload(_0x10e29c){const _0x573413=a129_0x518f3c;return Array[_0x573413(0xbb)](_0x10e29c?.[_0x573413(0xfc)])?_0x10e29c[_0x573413(0xfc)]:[];}function getNavigationState(_0x53edee){const _0x860119=a129_0x518f3c;return{'canGoBack':Boolean(_0x53edee?.['canGoBack']?.()),'canGoForward':Boolean(_0x53edee?.[_0x860119(0xf0)]?.())};}function createInputBridgeToken(){const _0x284af2=a129_0x518f3c;return Date[_0x284af2(0x146)]()[_0x284af2(0x124)](0x24)+'-'+Math[_0x284af2(0x95)]()[_0x284af2(0x124)](0x24)[_0x284af2(0xb7)](0x2);}function a129_0x21b4(_0x80a388,_0x364ae2){const _0x1f3470=a129_0x1f34();return a129_0x21b4=function(_0x21b428,_0x5a53d1){_0x21b428=_0x21b428-0x7b;let _0x4336df=_0x1f3470[_0x21b428];return _0x4336df;},a129_0x21b4(_0x80a388,_0x364ae2);}function getConsoleMessageFromArgs(_0x2cd3c6=[]){const _0x17a3ac=a129_0x518f3c;for(const _0x557bbc of _0x2cd3c6){if(typeof _0x557bbc==='string')return _0x557bbc;if(_0x557bbc&&typeof _0x557bbc[_0x17a3ac(0x133)]===_0x17a3ac(0x116))return _0x557bbc[_0x17a3ac(0x133)];}return'';}function parseWebPreviewInputBridgeMessage(_0x2a9b1b=''){const _0xd14bbc=a129_0x518f3c,_0x372f5e=String(_0x2a9b1b||'');if(!_0x372f5e[_0xd14bbc(0x87)](WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX))return null;try{const _0x1d34ab=JSON[_0xd14bbc(0xff)](_0x372f5e['slice'](WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX[_0xd14bbc(0x153)]));if(_0x1d34ab?.[_0xd14bbc(0xb2)]!=='pan-start-preview'&&_0x1d34ab?.[_0xd14bbc(0xb2)]!=='image-context-menu')return null;return _0x1d34ab;}catch{return null;}}export function createWebPreviewViewManager({WebContentsView:_0x355d44,BrowserWindow:_0x34553a,getMainWindow:_0x56e63b,openExternalUrl:_0x2351f8,createContextMenu:_0x215916,logDiagnosticEvent:_0x58bf66,resolveDouyinMedia:resolveDouyinMedia=resolveDouyinCurrentPageMedia,setTimeoutFn:setTimeoutFn=globalThis[a129_0x518f3c(0x9c)]?.[a129_0x518f3c(0xd3)](globalThis),clearTimeoutFn:clearTimeoutFn=globalThis['clearTimeout']?.['bind'](globalThis),readySnapshotDelayMs:readySnapshotDelayMs=READY_SNAPSHOT_IDLE_DELAY_MS}={}){const _0x2f40c1=a129_0x518f3c,_0x1c905a=new Map(),_0x12e803=new Set(),_0x3606bd=new Set();let _0x5bfabb=0x0;function _0x5dc532(){const _0x4debed=a129_0x21b4,_0x5b3516=typeof _0x56e63b===_0x4debed(0x175)?_0x56e63b():null;return _0x5b3516&&!_0x5b3516['isDestroyed']?.()?_0x5b3516:null;}function _0x1d234c(_0x2c25d5,_0x2c1132,_0x107160=''){const _0x5cc9fc=a129_0x21b4,_0x3cab9c=_0x5dc532();if(!_0x3cab9c?.[_0x5cc9fc(0x155)]||_0x3cab9c[_0x5cc9fc(0x155)][_0x5cc9fc(0x88)]?.())return;_0x3cab9c[_0x5cc9fc(0x155)]['send'](_0x5cc9fc(0x16b),{'nodeId':_0x2c25d5,..._0x107160?{'tabId':_0x107160}:{},..._0x2c1132});}function _0x2effdd(_0x4f297c,_0x4fadda,_0x19249a=''){const _0x156880=a129_0x21b4;_0x1d234c(_0x4f297c,{'type':'blocked','url':String(_0x4fadda||''),'message':_0x156880(0x86)},_0x19249a);}function _0x2086ef(_0x21541e,_0xb4d20d,_0x4408e5=''){_0x1d234c(_0x21541e,{'type':'navigation-state',...getNavigationState(_0xb4d20d)},_0x4408e5);}function _0x2c7d3b(_0x5f2b12){const _0x52a3d9=a129_0x21b4;let _0x12ece='';do{_0x5bfabb+=0x1,_0x12ece=_0x52a3d9(0x13b)+Date[_0x52a3d9(0x146)]()+'-'+_0x5bfabb;}while(_0x1c905a[_0x52a3d9(0xfb)](toEntryKey(_0x5f2b12,_0x12ece)));return _0x12ece;}function _0x498445(_0x2fe80b){return{'nodeIntegration':![],'contextIsolation':!![],'sandbox':!![],'partition':_0x2fe80b};}function _0x4e4462(_0x942a0=[]){if(!Array['isArray'](_0x942a0))return'';for(const _0x5d2284 of _0x942a0){const _0x32b075=normalizeWebPreviewFaviconUrl(_0x5d2284);if(_0x32b075)return _0x32b075;}return'';}function _0x3ffd65(_0x51549d){const _0x20a50b=a129_0x21b4;if(!_0x51549d?.['readySnapshotTimer'])return;clearTimeoutFn?.(_0x51549d[_0x20a50b(0x11f)]),_0x51549d[_0x20a50b(0x11f)]=null;}function _0x43c9ed(_0x2cf322,_0x4dd7a2,_0x1b1a02,_0x29aa5e,_0xca8841='',_0x5e06ba=_0x4dd7a2?.[_0x2f40c1(0x185)]||0x0){const _0x31e78b=_0x2f40c1,_0x509720=_0x4dd7a2?.[_0x31e78b(0x94)]?.[_0x31e78b(0x155)];if(!_0x509720||_0x509720[_0x31e78b(0x88)]?.())return![];if(typeof _0x509720[_0x31e78b(0x172)]!==_0x31e78b(0x175))return![];const _0x68023d=_0xca8841||_0x4dd7a2?.[_0x31e78b(0xdb)]||_0x4dd7a2?.[_0x31e78b(0xb4)]||'';let _0x41ff69=null;try{_0x41ff69=_0x509720[_0x31e78b(0x172)]();}catch(_0x15689e){return _0x58bf66?.({'type':'web_preview.snapshot_failed','level':_0x31e78b(0x15c),'source':_0x31e78b(0x12e),'message':_0x31e78b(0x151),'error':_0x15689e,'context':{'nodeId':_0x2cf322,'freezeToken':_0x1b1a02}}),![];}return Promise[_0x31e78b(0x127)](_0x41ff69)[_0x31e78b(0xbc)](_0xe625f4=>{const _0x184449=_0x31e78b,_0xa4505c=_0xe625f4?.[_0x184449(0xcf)]?.();if(!_0xa4505c)return;if(_0x4dd7a2&&_0x4dd7a2[_0x184449(0x185)]!==_0x5e06ba)return;if(_0x68023d&&_0x4dd7a2?.['requestedUrl']&&_0x4dd7a2[_0x184449(0xb4)]!==_0x68023d)return;_0x4dd7a2[_0x184449(0x7c)]=!![],_0x4dd7a2[_0x184449(0xc9)]=_0x68023d,_0x4dd7a2[_0x184449(0xec)]=String(_0x1b1a02||''),_0x1d234c(_0x2cf322,{'type':_0x184449(0xe3),'dataUrl':_0xa4505c,'freezeToken':_0x1b1a02,'width':_0x4dd7a2[_0x184449(0x8a)]?.['width']||0x0,'height':_0x4dd7a2[_0x184449(0x8a)]?.['height']||0x0},_0x4dd7a2[_0x184449(0x12b)]);})[_0x31e78b(0x82)](_0xcd3b2=>{const _0x2cd259=_0x31e78b;_0x58bf66?.({'type':_0x2cd259(0x145),'level':_0x2cd259(0x15c),'source':_0x2cd259(0x12e),'message':_0x2cd259(0x151),'error':_0xcd3b2,'context':{'nodeId':_0x2cf322,'freezeToken':_0x1b1a02}});})[_0x31e78b(0x91)](()=>{_0x29aa5e?.();}),!![];}function _0x4bacd8(_0x25a671,_0x4a4b52,_0x9ac552=_0x4a4b52?.[_0x2f40c1(0x185)]||0x0){const _0x3dafb0=_0x2f40c1,_0x3bf7de=_0x4a4b52?.[_0x3dafb0(0xdb)]||_0x4a4b52?.[_0x3dafb0(0xb4)]||'';if(!_0x4a4b52?.[_0x3dafb0(0x8a)]||!_0x3bf7de||_0x4a4b52[_0x3dafb0(0x10d)])return![];if(_0x4a4b52[_0x3dafb0(0x7c)]&&_0x4a4b52[_0x3dafb0(0xc9)]===_0x3bf7de)return![];_0x4a4b52[_0x3dafb0(0x10d)]=!![];const _0x41c121=_0x43c9ed(_0x25a671,_0x4a4b52,_0x3dafb0(0x170),()=>{const _0x4a1256=_0x3dafb0;_0x4a4b52[_0x4a1256(0x10d)]=![];},_0x3bf7de,_0x9ac552);if(!_0x41c121)_0x4a4b52['readySnapshotPending']=![];return _0x41c121;}function _0x48366a(_0x217c4c,_0x2ccba1){const _0x27bcd0=_0x2f40c1,_0x371759=_0x2ccba1?.['url']||_0x2ccba1?.[_0x27bcd0(0xb4)]||'';if(!_0x2ccba1?.[_0x27bcd0(0x7b)]||!_0x2ccba1[_0x27bcd0(0x8a)]||!_0x371759||_0x2ccba1['visible']!==!![]||_0x2ccba1[_0x27bcd0(0x142)]||_0x2ccba1['readySnapshotPending']||_0x2ccba1['readySnapshotTimer'])return![];if(_0x2ccba1['hasSnapshot']&&_0x2ccba1[_0x27bcd0(0xc9)]===_0x371759)return![];if(typeof setTimeoutFn!==_0x27bcd0(0x175))return _0x4bacd8(_0x217c4c,_0x2ccba1);const _0x19b731=_0x2ccba1[_0x27bcd0(0x185)],_0x4df026=Math[_0x27bcd0(0x140)](0x0,Number(readySnapshotDelayMs)||0x0);return _0x2ccba1[_0x27bcd0(0x11f)]=setTimeoutFn(()=>{const _0x38c2af=_0x27bcd0;_0x2ccba1[_0x38c2af(0x11f)]=null;const _0x201b1a=_0x1c905a['get'](toEntryKey(_0x217c4c,_0x2ccba1['tabId'])),_0x26fa29=_0x201b1a?.[_0x38c2af(0xdb)]||_0x201b1a?.['requestedUrl']||'';if(_0x201b1a!==_0x2ccba1||_0x201b1a[_0x38c2af(0x185)]!==_0x19b731||_0x26fa29!==_0x371759||_0x201b1a['loaded']!==!![]||_0x201b1a['visible']!==!![])return;if(_0x201b1a[_0x38c2af(0x142)]){_0x48366a(_0x217c4c,_0x201b1a);return;}_0x4bacd8(_0x217c4c,_0x201b1a,_0x19b731);},_0x4df026),!![];}function _0x1c562e(_0x2e0d0d,_0x6782a4,_0x126b1c='',_0x260861=''){const _0x42163c=_0x2f40c1;if(typeof _0x6782a4?.[_0x42163c(0x120)]!==_0x42163c(0x175))return;_0x6782a4[_0x42163c(0x120)](buildWebPreviewDragBridgeScript({'nodeId':_0x2e0d0d,'tabId':_0x126b1c,'inputBridgeToken':_0x260861}),!![])['catch'](_0x4e81f5=>{const _0x3df895=_0x42163c;_0x58bf66?.({'type':_0x3df895(0x176),'level':_0x3df895(0x15c),'source':_0x3df895(0x12e),'message':_0x3df895(0x186),'error':_0x4e81f5,'context':{'nodeId':_0x2e0d0d,'tabId':_0x126b1c}});});}function _0x11dc9a(_0x10834d,_0x38851e,_0x2b3ef5,_0x590174={},_0x9a6a75=WEB_PREVIEW_TEXT_ACTION_PROMPT){const _0x5ac145=_0x2f40c1,_0x4cd87a=String(_0x590174?.[_0x5ac145(0xd1)]||'')[_0x5ac145(0x13c)]();if(!_0x4cd87a)return![];const _0x44236b=_0x1c905a[_0x5ac145(0x184)](toEntryKey(_0x10834d,_0x38851e)),_0x207e51=normalizeWebPreviewUrl(_0x590174?.[_0x5ac145(0x112)])||normalizeWebPreviewUrl(_0x44236b?.[_0x5ac145(0xdb)])||normalizeWebPreviewUrl(_0x44236b?.[_0x5ac145(0xb4)])||'',_0x1ad6e0=String(_0x2b3ef5?.[_0x5ac145(0x17d)]?.()||'')[_0x5ac145(0x13c)]();return _0x1d234c(_0x10834d,{'type':_0x9a6a75,'text':_0x4cd87a[_0x5ac145(0xb7)](0x0,WEB_PREVIEW_SELECTED_TEXT_LIMIT),'pageUrl':_0x207e51,'webSourceTitle':_0x1ad6e0['slice'](0x0,0xa0),'contextX':Math[_0x5ac145(0x140)](0x0,Math[_0x5ac145(0x165)](Number(_0x590174?.['x']||0x0)||0x0)),'contextY':Math[_0x5ac145(0x140)](0x0,Math[_0x5ac145(0x165)](Number(_0x590174?.['y']||0x0)||0x0))},_0x38851e),!![];}function _0x3b0073(_0x5b92f3,_0x4a95d3={}){const _0xc5668d=_0x2f40c1,_0x341a95=String(_0x4a95d3?.[_0xc5668d(0xd1)]||'')[_0xc5668d(0x13c)]();if(!_0x341a95)return![];try{if(typeof _0x5b92f3?.['copy']==='function')return _0x5b92f3[_0xc5668d(0x110)](),!![];}catch{}return![];}function _0x22062d(_0x4efb15){const _0x56ec89=_0x2f40c1;return Math[_0x56ec89(0x140)](0x0,Math[_0x56ec89(0x165)](Number(_0x4efb15||0x0)||0x0));}function _0x1590b6(_0x82a6ad={},_0xbada99=null){const _0x58be3c=_0x2f40c1,_0x251f1b=normalizeWebPreviewUrl(_0x82a6ad?.['pageUrl'])||normalizeWebPreviewUrl(_0x82a6ad?.[_0x58be3c(0x119)])||normalizeWebPreviewUrl(_0xbada99?.['url'])||normalizeWebPreviewUrl(_0xbada99?.[_0x58be3c(0xb4)])||'';return{'mediaType':_0x58be3c(0x14f),'srcURL':normalizeWebPreviewUrl(_0x82a6ad?.[_0x58be3c(0xdb)])||'','titleText':String(_0x82a6ad?.[_0x58be3c(0xe6)]||_0x82a6ad?.[_0x58be3c(0xa9)]||'')['trim']()[_0x58be3c(0xb7)](0x0,0xa0),'pageURL':_0x251f1b,'frameURL':_0x251f1b,'x':_0x22062d(_0x82a6ad?.[_0x58be3c(0xb0)]??_0x82a6ad?.[_0x58be3c(0xc0)]),'y':_0x22062d(_0x82a6ad?.[_0x58be3c(0x10a)]??_0x82a6ad?.[_0x58be3c(0x14d)])};}function _0x14012e(_0x5dc544,_0x277b8b={}){const _0xacab6c=_0x2f40c1;if(!_0x5dc544)return;_0x5dc544[_0xacab6c(0x13a)]=Date['now'](),_0x5dc544[_0xacab6c(0x129)]=_0x22062d(_0x277b8b?.['x']),_0x5dc544['lastBridgeImageContextMenuY']=_0x22062d(_0x277b8b?.['y']);}function _0xc484e6(_0x18be15,_0x5592ba={}){const _0x40f486=_0x2f40c1,_0x272c81=Number(_0x18be15?.[_0x40f486(0x13a)]||0x0);if(!_0x272c81||Date[_0x40f486(0x146)]()-_0x272c81>WEB_PREVIEW_CONTEXT_MENU_BRIDGE_DEDUPE_MS)return![];const _0x5c2cbf=_0x22062d(_0x5592ba?.['x']),_0x2e38a0=_0x22062d(_0x5592ba?.['y']);return Math[_0x40f486(0x11c)](_0x5c2cbf-_0x22062d(_0x18be15?.['lastBridgeImageContextMenuX']))<=0x2&&Math['abs'](_0x2e38a0-_0x22062d(_0x18be15?.['lastBridgeImageContextMenuY']))<=0x2;}function _0x166451(_0xdce18d,_0x2b4599,_0x5767c6,_0x4f046c={},_0x496151=null){const _0x3c1d7a=_0x2f40c1,_0xe50aec=String(_0x4f046c?.[_0x3c1d7a(0xe0)]||'')['toLowerCase']()===_0x3c1d7a(0x14f)||Boolean(_0x496151?.[_0x3c1d7a(0xdb)]);if(!_0xe50aec)return null;const _0x1a34cf=normalizeWebPreviewUrl(_0x496151?.[_0x3c1d7a(0xdb)]||_0x4f046c?.[_0x3c1d7a(0x168)]);if(!_0x1a34cf)return null;const _0x1d464e=_0x1c905a[_0x3c1d7a(0x184)](toEntryKey(_0xdce18d,_0x2b4599)),_0x42dcc4=normalizeWebPreviewUrl(_0x496151?.[_0x3c1d7a(0xa0)])||normalizeWebPreviewUrl(_0x4f046c?.['pageURL'])||normalizeWebPreviewUrl(_0x4f046c?.['frameURL'])||normalizeWebPreviewUrl(_0x1d464e?.[_0x3c1d7a(0xdb)])||normalizeWebPreviewUrl(_0x1d464e?.[_0x3c1d7a(0xb4)])||'',_0x271998=String(_0x496151?.[_0x3c1d7a(0x161)]||_0x5767c6?.[_0x3c1d7a(0x17d)]?.()||'')[_0x3c1d7a(0x13c)]()['slice'](0x0,0xa0),_0x461b2b=String(_0x496151?.[_0x3c1d7a(0xe6)]||_0x496151?.[_0x3c1d7a(0xa9)]||_0x4f046c?.[_0x3c1d7a(0xf7)]||_0x271998||_0x3c1d7a(0xcd))[_0x3c1d7a(0x13c)]()[_0x3c1d7a(0xb7)](0x0,0xa0),_0x2e1e3b={'kind':_0x3c1d7a(0x14f),'url':_0x1a34cf,'title':_0x461b2b,'pageUrl':_0x42dcc4,'pageTitle':_0x271998,'nodeId':_0xdce18d,'tabId':_0x2b4599,'contextX':Math['max'](0x0,Math[_0x3c1d7a(0x165)](Number(_0x4f046c?.['x']||0x0)||0x0)),'contextY':Math[_0x3c1d7a(0x140)](0x0,Math[_0x3c1d7a(0x165)](Number(_0x4f046c?.['y']||0x0)||0x0))},_0xc93ef5=Math[_0x3c1d7a(0x140)](0x0,Math[_0x3c1d7a(0x165)](Number(_0x496151?.[_0x3c1d7a(0xaa)]||0x0)||0x0)),_0x428141=Math['max'](0x0,Math[_0x3c1d7a(0x165)](Number(_0x496151?.['height']||0x0)||0x0));if(_0xc93ef5)_0x2e1e3b[_0x3c1d7a(0xaa)]=_0xc93ef5;if(_0x428141)_0x2e1e3b['height']=_0x428141;return _0x2e1e3b;}async function _0x1057ab(_0xcace14,_0x2ac15a,_0x5c9c84,_0x15d0c0={}){const _0x416749=_0x2f40c1;if(typeof _0x5c9c84?.[_0x416749(0x120)]!==_0x416749(0x175))return null;try{const _0x3e231c=await _0x5c9c84[_0x416749(0x120)](buildWebPreviewContextImageProbeScript({'nodeId':_0xcace14,'tabId':_0x2ac15a,'x':_0x15d0c0?.['x'],'y':_0x15d0c0?.['y']}),!![]),_0x44c938=_0x3e231c?.['image']&&typeof _0x3e231c[_0x416749(0x14f)]===_0x416749(0xa2)?_0x3e231c[_0x416749(0x14f)]:_0x3e231c;return _0x166451(_0xcace14,_0x2ac15a,_0x5c9c84,_0x15d0c0,_0x44c938);}catch(_0x395512){return _0x58bf66?.({'type':_0x416749(0xde),'level':'warn','source':_0x416749(0x12e),'message':_0x416749(0x102),'error':_0x395512,'context':{'nodeId':_0xcace14,'tabId':_0x2ac15a}}),null;}}async function _0x1f568d(_0xff0eb9,_0x28b325,_0x127f35,_0x3f5954={}){const _0x1ec2a0=_0x2f40c1;if(String(_0x3f5954?.[_0x1ec2a0(0xe0)]||'')[_0x1ec2a0(0xc2)]()!==_0x1ec2a0(0x14f))return null;const _0xff25=await _0x1057ab(_0xff0eb9,_0x28b325,_0x127f35,_0x3f5954);return _0xff25||_0x166451(_0xff0eb9,_0x28b325,_0x127f35,_0x3f5954);}function _0x3d099e(_0x143ee5,_0xd2324a,_0x1b8d64,_0x875e1=_0x2f40c1(0x85)){if(!_0x1b8d64)return![];return _0x1d234c(_0x143ee5,{..._0x1b8d64,'type':_0x875e1},_0xd2324a),!![];}async function _0x5ad7e3(_0x5f445f,_0x282a4c,_0x1a6073,_0x55562e={}){const _0x30dcdd=_0x2f40c1;if(typeof _0x215916!=='function')return;const _0x31890=[],_0x453203=await _0x1f568d(_0x5f445f,_0x282a4c,_0x1a6073,_0x55562e);_0x453203&&_0x31890[_0x30dcdd(0x10c)]({'label':'加入到画布','click':()=>_0x3d099e(_0x5f445f,_0x282a4c,_0x453203,'send-image-to-canvas')},{'label':'反推提示词-创建','click':()=>_0x3d099e(_0x5f445f,_0x282a4c,_0x453203,_0x30dcdd(0x15d))},{'label':_0x30dcdd(0x15f),'click':()=>_0x3d099e(_0x5f445f,_0x282a4c,_0x453203,_0x30dcdd(0x123))});const _0x1e1603=String(_0x55562e?.['selectionText']||'')['trim']();if(_0x1e1603){if(_0x31890[_0x30dcdd(0x153)])_0x31890[_0x30dcdd(0x10c)]({'type':_0x30dcdd(0xf2)});_0x31890[_0x30dcdd(0x10c)]({'label':'复制文本','click':()=>_0x3b0073(_0x1a6073,_0x55562e)},{'label':_0x30dcdd(0xca),'submenu':[{'label':'源节点','click':()=>_0x11dc9a(_0x5f445f,_0x282a4c,_0x1a6073,_0x55562e,WEB_PREVIEW_TEXT_ACTION_SOURCE)},{'label':_0x30dcdd(0x128),'click':()=>_0x11dc9a(_0x5f445f,_0x282a4c,_0x1a6073,_0x55562e,WEB_PREVIEW_TEXT_ACTION_PROMPT)}]},{'label':'发送到图像节点','submenu':[{'label':'创建','click':()=>_0x11dc9a(_0x5f445f,_0x282a4c,_0x1a6073,_0x55562e,WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT)},{'label':'生成','click':()=>_0x11dc9a(_0x5f445f,_0x282a4c,_0x1a6073,_0x55562e,WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT_GENERATE)}]},{'label':_0x30dcdd(0xc4),'submenu':[{'label':'创建','click':()=>_0x11dc9a(_0x5f445f,_0x282a4c,_0x1a6073,_0x55562e,WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT)},{'label':'生成','click':()=>_0x11dc9a(_0x5f445f,_0x282a4c,_0x1a6073,_0x55562e,WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT_GENERATE)}]});}if(!_0x31890[_0x30dcdd(0x153)])return;const _0x27e664=_0x215916(_0x31890);_0x27e664?.[_0x30dcdd(0xa3)]?.({'window':_0x5dc532()});}function _0x3d29e9(_0x290681,_0x5898e9,_0x294b26,_0x79c90){const _0x4ef0a1=_0x2f40c1;if(!_0x294b26?.[_0x4ef0a1(0x13f)]||_0x294b26['popupOpened']||!_0x79c90)return![];return _0x294b26[_0x4ef0a1(0xce)]=!![],_0x294b26['pendingPopup']=![],_0x294b26[_0x4ef0a1(0xdb)]=_0x79c90,_0x294b26['requestedUrl']=_0x79c90,_0x1d234c(_0x290681,{'type':_0x4ef0a1(0x9a),'url':_0x79c90,'popupTabId':_0x5898e9},_0x294b26['openerTabId']||''),!![];}function _0x3a3360(_0x3cc126,_0x5f17c2,_0x42c41c){const _0x55f508=_0x2f40c1;if(!_0x42c41c?.[_0x55f508(0x13f)]||_0x42c41c[_0x55f508(0xce)])return![];return _0x42c41c[_0x55f508(0xce)]=!![],_0x42c41c[_0x55f508(0x11a)]=!![],_0x42c41c[_0x55f508(0xdb)]='',_0x42c41c[_0x55f508(0xb4)]='',_0x1d234c(_0x3cc126,{'type':_0x55f508(0x9a),'url':'','popupTabId':_0x5f17c2,'pendingPopup':!![]},_0x42c41c['openerTabId']||''),!![];}function _0xa8aae3(_0x3ab0b3){const _0x2805fb=_0x2f40c1,_0xbc3f15=_0x5dc532(),_0x32f241={'parent':_0xbc3f15||undefined,'modal':![],'show':!![],'width':WEB_PREVIEW_AUTH_POPUP_WIDTH,'height':WEB_PREVIEW_AUTH_POPUP_HEIGHT,'minWidth':WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH,'minHeight':WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT,'title':'Login','autoHideMenuBar':!![],'webPreferences':_0x498445(_0x3ab0b3)},_0x3bf8b3=_0xbc3f15?.[_0x2805fb(0x104)]?.();if(_0x3bf8b3&&Number[_0x2805fb(0xd8)](_0x3bf8b3['x'])&&Number[_0x2805fb(0xd8)](_0x3bf8b3['y'])&&Number['isFinite'](_0x3bf8b3['width'])&&Number[_0x2805fb(0xd8)](_0x3bf8b3['height'])&&_0x3bf8b3[_0x2805fb(0xaa)]>WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH&&_0x3bf8b3[_0x2805fb(0x11d)]>WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT){const _0x5178d0=Math['min'](WEB_PREVIEW_AUTH_POPUP_WIDTH,Math[_0x2805fb(0x140)](WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH,_0x3bf8b3['width']-0x30)),_0x39cb6d=Math[_0x2805fb(0x9d)](WEB_PREVIEW_AUTH_POPUP_HEIGHT,Math['max'](WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT,_0x3bf8b3[_0x2805fb(0x11d)]-0x30));_0x32f241[_0x2805fb(0xaa)]=_0x5178d0,_0x32f241['height']=_0x39cb6d,_0x32f241['x']=Math[_0x2805fb(0x165)](_0x3bf8b3['x']+(_0x3bf8b3[_0x2805fb(0xaa)]-_0x5178d0)/0x2),_0x32f241['y']=Math[_0x2805fb(0x165)](_0x3bf8b3['y']+(_0x3bf8b3[_0x2805fb(0x11d)]-_0x39cb6d)/0x2);}return _0x32f241;}function _0x25b490(_0xd39145=()=>!![]){const _0x42b549=_0x2f40c1;for(const _0x3859d2 of[..._0x3606bd]){if(_0xd39145(_0x3859d2))_0x3606bd['delete'](_0x3859d2);}for(const _0x5510ca of[..._0x12e803]){if(!_0xd39145(_0x5510ca))continue;_0x12e803[_0x42b549(0x126)](_0x5510ca);try{_0x5510ca[_0x42b549(0x156)]?.[_0x42b549(0x88)]?.()!==!![]&&_0x5510ca[_0x42b549(0x156)]?.[_0x42b549(0xe9)]?.();}catch{}}}function _0x55abeb(){const _0x4b9adf=_0x2f40c1,_0x4194e7=Date[_0x4b9adf(0x146)]();for(const _0x24036d of[..._0x3606bd]){if(_0x24036d[_0x4b9adf(0xb6)]<=_0x4194e7)_0x3606bd['delete'](_0x24036d);}}function _0x26304f({nodeId:_0x22d63f,tabId:_0x3c473a,partition:_0x48ad32}){_0x55abeb();const _0xbb37d4={'nodeId':_0x22d63f,'tabId':_0x3c473a,'partition':_0x48ad32,'expiresAt':Date['now']()+WEB_PREVIEW_AUTH_POPUP_REQUEST_TTL_MS};return _0x3606bd['add'](_0xbb37d4),_0xbb37d4;}function _0x5065da({nodeId:_0x3344ab,tabId:_0x8c8766,url:_0x2e8539}){const _0x39251e=_0x2f40c1;_0x55abeb();let _0x6d1537=null;for(const _0x43c0a3 of _0x3606bd){if(_0x43c0a3[_0x39251e(0x108)]!==_0x3344ab||_0x43c0a3[_0x39251e(0x12b)]!==_0x8c8766)continue;_0x6d1537=_0x43c0a3;if(shouldUseNativeAuthPopup(_0x2e8539))break;}if(_0x6d1537)_0x3606bd[_0x39251e(0x126)](_0x6d1537);return _0x6d1537;}function _0x162ea0({nodeId:_0x52ba67,tabId:_0x24333d,partition:_0x2e0d2a,webContents:_0x22cc2d}){const _0x289a05=_0x2f40c1;_0x22cc2d[_0x289a05(0x147)]?.(({url:_0x4c3701}={})=>{const _0x1d5c6c=normalizeWebPreviewUrl(_0x4c3701);if(!_0x1d5c6c&&!isBlankPopupUrl(_0x4c3701))return _0x2effdd(_0x52ba67,_0x4c3701,_0x24333d),{'action':'deny'};return{'action':'allow','outlivesOpener':!![],'overrideBrowserWindowOptions':{'webPreferences':_0x498445(_0x2e0d2a)}};});const _0x1bcb5f=(_0x5b4996,_0x408dc3)=>{const _0x3691f4=_0x289a05;if(isBlankPopupUrl(_0x408dc3)||normalizeWebPreviewUrl(_0x408dc3))return;_0x5b4996?.[_0x3691f4(0x180)]?.(),_0x2effdd(_0x52ba67,_0x408dc3,_0x24333d);},_0x4df50d=(_0x1829a7,_0x2a068c,..._0x16c16b)=>{const _0x2606b1=_0x289a05,_0x344b53=_0x16c16b[_0x2606b1(0xd7)](_0x2d783f=>_0x2d783f===!![]);if(!_0x344b53)return;_0x1bcb5f(_0x1829a7,_0x2a068c);};_0x22cc2d['on']?.('will-navigate',_0x1bcb5f),_0x22cc2d['on']?.(_0x289a05(0x17a),_0x4df50d),_0x22cc2d['on']?.('did-fail-load',(_0xdb9ea6,_0x1ed6df,_0x4e6354,_0x549ffb)=>{const _0x594352=_0x289a05;_0x1d234c(_0x52ba67,{'type':_0x594352(0x14e),'url':String(_0x549ffb||''),'errorCode':_0x1ed6df,'message':String(_0x4e6354||_0x594352(0x135))},_0x24333d);});const _0x5622f9=_0x22cc2d['session'];_0x5622f9?.[_0x289a05(0xc8)]?.((_0x3f1e70,_0x65bc67,_0x47e2b3)=>{_0x47e2b3(![]);}),_0x5622f9?.['on']?.(_0x289a05(0x166),_0x4b3513=>{const _0x1101c2=_0x289a05;_0x4b3513?.[_0x1101c2(0x180)]?.();});}function _0x572875({nodeId:_0x7f24ac,tabId:_0x2a9eaa,partition:_0x39a0b1,popupWindow:_0x502c9a}){const _0x91a8d7=_0x2f40c1,_0x2c4ab0=_0x502c9a?.[_0x91a8d7(0x155)];if(!_0x502c9a||!_0x2c4ab0)return![];const _0x31b714={'nodeId':_0x7f24ac,'tabId':_0x2a9eaa,'popupWindow':_0x502c9a};_0x12e803[_0x91a8d7(0xa1)](_0x31b714);const _0x34fcfb=()=>_0x12e803['delete'](_0x31b714);return _0x502c9a['on']?.(_0x91a8d7(0xb8),_0x34fcfb),_0x2c4ab0['on']?.(_0x91a8d7(0x17c),_0x34fcfb),_0x162ea0({'nodeId':_0x7f24ac,'tabId':_0x2a9eaa,'partition':_0x39a0b1,'webContents':_0x2c4ab0}),!![];}function _0x353ff1(_0x42a8eb,_0x1b318f,_0x40e4f6,_0x1f23bd=''){const _0x63587=_0x2f40c1;_0x40e4f6['setWindowOpenHandler']?.(({url:_0x31d705}={})=>{const _0x429bbf=a129_0x21b4,_0x1daafe=normalizeWebPreviewUrl(_0x31d705),_0x2528ab=isBlankPopupUrl(_0x31d705);if(!_0x1daafe&&!_0x2528ab)return _0x2effdd(_0x42a8eb,_0x31d705,_0x1b318f),{'action':_0x429bbf(0x132)};const _0x3f10a8=_0x1c905a['get'](toEntryKey(_0x42a8eb,_0x1b318f)),_0x460f7b=_0x2c7d3b(_0x42a8eb),_0xe47a71=_0x3f10a8?.['browserProfileId']||DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID,_0x177c0f=_0x3f10a8?.[_0x429bbf(0xb9)]||toPersistentPartitionId(_0xe47a71);if(shouldUseNativeAuthPopup(_0x31d705)&&typeof _0x34553a===_0x429bbf(0x175))return _0x26304f({'nodeId':_0x42a8eb,'tabId':_0x1b318f,'partition':_0x177c0f}),{'action':_0x429bbf(0x96),'outlivesOpener':!![],'overrideBrowserWindowOptions':_0xa8aae3(_0x177c0f)};if(typeof _0x355d44!=='function'){if(_0x1daafe)_0x1d234c(_0x42a8eb,{'type':_0x429bbf(0x9a),'url':_0x1daafe},_0x1b318f);return{'action':_0x429bbf(0x132)};}return{'action':_0x429bbf(0x96),'outlivesOpener':!![],'overrideBrowserWindowOptions':{'webPreferences':_0x498445(_0x177c0f)},'createWindow':()=>{const _0x3d08e5=_0x429bbf,_0xaf7251=_0x275599({'nodeId':_0x42a8eb,'tabId':_0x460f7b,'browserProfileId':_0xe47a71,'partition':_0x177c0f,'url':_0x1daafe||'','openerTabId':_0x1b318f});if(_0x1daafe)_0x3d29e9(_0x42a8eb,_0x460f7b,_0xaf7251,_0x1daafe);else _0x3a3360(_0x42a8eb,_0x460f7b,_0xaf7251);return _0xaf7251[_0x3d08e5(0x94)][_0x3d08e5(0x155)];}};}),_0x40e4f6['on']?.(_0x63587(0x81),(_0x25d916,_0x1f6973={})=>{const _0x18fb74=_0x63587,_0x334e63=_0x5065da({'nodeId':_0x42a8eb,'tabId':_0x1b318f,'url':_0x1f6973?.['url']});if(!_0x334e63)return;_0x572875({'nodeId':_0x42a8eb,'tabId':_0x1b318f,'partition':_0x334e63[_0x18fb74(0xb9)],'popupWindow':_0x25d916});});const _0x1eb29f=(_0x496851,_0xda85e2)=>{const _0x3e2874=_0x63587,_0x1fd1b4=_0x1c905a[_0x3e2874(0x184)](toEntryKey(_0x42a8eb,_0x1b318f));if(_0x1fd1b4?.[_0x3e2874(0x13f)]&&isBlankPopupUrl(_0xda85e2)&&!_0x1fd1b4[_0x3e2874(0xb4)])return;if(normalizeWebPreviewUrl(_0xda85e2))return;_0x496851?.[_0x3e2874(0x180)]?.(),_0x2effdd(_0x42a8eb,_0xda85e2,_0x1b318f);},_0x2eff02=(_0xe5fdb5,_0x22d7c7,..._0x48f7dd)=>{const _0x4a2ec0=_0x63587,_0x3dbb35=_0x48f7dd[_0x4a2ec0(0xd7)](_0x3de78a=>_0x3de78a===!![]);if(!_0x3dbb35)return;_0x1eb29f(_0xe5fdb5,_0x22d7c7);};_0x40e4f6['on']?.(_0x63587(0x16f),_0x1eb29f),_0x40e4f6['on']?.('will-frame-navigate',_0x2eff02),_0x40e4f6['on']?.('dom-ready',()=>_0x1c562e(_0x42a8eb,_0x40e4f6,_0x1b318f,_0x1f23bd)),_0x40e4f6['on']?.(_0x63587(0xa6),()=>{const _0x4e6e1e=_0x63587,_0x26765b=_0x1c905a['get'](toEntryKey(_0x42a8eb,_0x1b318f));let _0x4f0084='',_0xe477a4=![];if(_0x26765b){const _0x449ec5=_0x26765b[_0x4e6e1e(0xdb)]||_0x26765b[_0x4e6e1e(0xb4)]||'';_0x4f0084=_0x449ec5;const _0x2d24a6=_0x26765b[_0x4e6e1e(0x89)]===!![]&&_0x26765b['hasSnapshot']===!![]&&_0x26765b[_0x4e6e1e(0xc9)]&&_0x26765b[_0x4e6e1e(0xc9)]===_0x449ec5;_0xe477a4=Boolean(_0x2d24a6),_0x3ffd65(_0x26765b),_0x26765b[_0x4e6e1e(0x185)]+=0x1,_0x26765b['loaded']=![],_0xe477a4?_0x26765b[_0x4e6e1e(0x162)]=!![]:(_0x26765b[_0x4e6e1e(0x7c)]=![],_0x26765b[_0x4e6e1e(0xc9)]='',_0x26765b['snapshotFreezeToken']='',_0x26765b[_0x4e6e1e(0x162)]=![]),_0x26765b[_0x4e6e1e(0x10d)]=![],_0x26765b['holdSnapshotOnNextLoadStart']=![];}_0x1d234c(_0x42a8eb,{'type':'loading','url':_0x4f0084,'holdSnapshot':_0xe477a4},_0x1b318f);}),_0x40e4f6['on']?.('did-stop-loading',()=>{const _0x5409ba=_0x63587;_0x1c562e(_0x42a8eb,_0x40e4f6,_0x1b318f,_0x1f23bd),_0x1d234c(_0x42a8eb,{'type':'loaded'},_0x1b318f),_0x2086ef(_0x42a8eb,_0x40e4f6,_0x1b318f);const _0x3dc90a=_0x1c905a[_0x5409ba(0x184)](toEntryKey(_0x42a8eb,_0x1b318f));_0x3dc90a&&(_0x3dc90a['loaded']=!![],_0x3dc90a[_0x5409ba(0x162)]&&(_0x3dc90a['hasSnapshot']=![],_0x3dc90a[_0x5409ba(0xc9)]='',_0x3dc90a[_0x5409ba(0xec)]='',_0x3dc90a[_0x5409ba(0x162)]=![]),_0x48366a(_0x42a8eb,_0x3dc90a));}),_0x40e4f6['on']?.(_0x63587(0xcc),(_0x55d131,_0x23dcea,_0x508011,_0x26301b)=>{const _0x2d168c=_0x63587;_0x1d234c(_0x42a8eb,{'type':_0x2d168c(0x14e),'url':String(_0x26301b||''),'errorCode':_0x23dcea,'message':String(_0x508011||_0x2d168c(0xdd))},_0x1b318f);}),_0x40e4f6['on']?.(_0x63587(0xbd),(_0x1d7286,_0x56116e)=>{const _0x27aeb8=_0x63587,_0x3c328e=_0x1c905a[_0x27aeb8(0x184)](toEntryKey(_0x42a8eb,_0x1b318f));if(_0x3c328e?.[_0x27aeb8(0x13f)]&&isBlankPopupUrl(_0x56116e)&&!_0x3c328e[_0x27aeb8(0xb4)])return;const _0xbd3f10=normalizeWebPreviewUrl(_0x56116e)||String(_0x56116e||''),_0x5ae8d8=normalizeWebPreviewUrl(_0xbd3f10);if(_0x3c328e&&_0x5ae8d8){if(_0x3d29e9(_0x42a8eb,_0x1b318f,_0x3c328e,_0x5ae8d8))return;const _0x557d51=_0x3c328e[_0x27aeb8(0x11a)]===!![];_0x3c328e[_0x27aeb8(0xdb)]=_0x5ae8d8;if(_0x557d51)_0x3c328e[_0x27aeb8(0xb4)]=_0x5ae8d8;_0x3c328e[_0x27aeb8(0x121)]=_0x5ae8d8,_0x3c328e['pendingPopup']=![];}_0x1d234c(_0x42a8eb,{'type':'navigated','url':_0xbd3f10},_0x1b318f),_0x2086ef(_0x42a8eb,_0x40e4f6,_0x1b318f);}),_0x40e4f6['on']?.(_0x63587(0x12f),(_0x4ed6a4,_0x52850f,_0x277b27)=>{const _0x1423f4=_0x63587;if(_0x277b27===![])return;const _0x3d4324=_0x1c905a[_0x1423f4(0x184)](toEntryKey(_0x42a8eb,_0x1b318f));if(_0x3d4324?.[_0x1423f4(0x13f)]&&isBlankPopupUrl(_0x52850f)&&!_0x3d4324[_0x1423f4(0xb4)])return;const _0x59ab99=normalizeWebPreviewUrl(_0x52850f)||String(_0x52850f||''),_0xef71e=normalizeWebPreviewUrl(_0x59ab99);if(_0x3d4324&&_0xef71e){if(_0x3d29e9(_0x42a8eb,_0x1b318f,_0x3d4324,_0xef71e))return;const _0x33db1d=_0x3d4324['pendingPopup']===!![];_0x3d4324[_0x1423f4(0xdb)]=_0xef71e;if(_0x33db1d)_0x3d4324[_0x1423f4(0xb4)]=_0xef71e;_0x3d4324[_0x1423f4(0x121)]=_0xef71e,_0x3d4324[_0x1423f4(0x11a)]=![];}_0x1d234c(_0x42a8eb,{'type':_0x1423f4(0x136),'url':_0x59ab99},_0x1b318f),_0x2086ef(_0x42a8eb,_0x40e4f6,_0x1b318f);}),_0x40e4f6['on']?.('page-favicon-updated',(_0x13fefe,_0x4dece1)=>{const _0x6687dc=_0x63587,_0x10f672=_0x4e4462(_0x4dece1);if(!_0x10f672)return;_0x1d234c(_0x42a8eb,{'type':_0x6687dc(0x7d),'faviconUrl':_0x10f672},_0x1b318f);}),_0x40e4f6['on']?.('context-menu',(_0x5528fe,_0x4dd48f)=>{const _0x20cb31=_0x63587,_0x9d85ea=_0x1c905a['get'](toEntryKey(_0x42a8eb,_0x1b318f));if(_0xc484e6(_0x9d85ea,_0x4dd48f))return;void _0x5ad7e3(_0x42a8eb,_0x1b318f,_0x40e4f6,_0x4dd48f)[_0x20cb31(0x82)](_0x5cf492=>{const _0x4b4b40=_0x20cb31;_0x58bf66?.({'type':_0x4b4b40(0xad),'level':_0x4b4b40(0x15c),'source':'main','message':_0x4b4b40(0x7e),'error':_0x5cf492,'context':{'nodeId':_0x42a8eb,'tabId':_0x1b318f}});});}),_0x40e4f6['on']?.('console-message',(..._0x524db1)=>{const _0x29dbca=_0x63587,_0x3e2ff5=parseWebPreviewInputBridgeMessage(getConsoleMessageFromArgs(_0x524db1));if(!_0x3e2ff5)return;const _0xeaae87=_0x1c905a[_0x29dbca(0x184)](toEntryKey(_0x42a8eb,_0x1b318f));if(!_0xeaae87||_0x3e2ff5[_0x29dbca(0x177)]!==_0xeaae87['inputBridgeToken'])return;if(_0x3e2ff5[_0x29dbca(0xb2)]==='image-context-menu'){const _0xee9309=_0x1590b6(_0x3e2ff5,_0xeaae87);_0x14012e(_0xeaae87,_0xee9309),void _0x5ad7e3(_0x42a8eb,_0x1b318f,_0x40e4f6,_0xee9309)[_0x29dbca(0x82)](_0x22143d=>{const _0x3db412=_0x29dbca;_0x58bf66?.({'type':_0x3db412(0xad),'level':_0x3db412(0x15c),'source':_0x3db412(0x12e),'message':_0x3db412(0x7e),'error':_0x22143d,'context':{'nodeId':_0x42a8eb,'tabId':_0x1b318f,'source':'bridge'}});});return;}const _0x870033=Number(_0x3e2ff5[_0x29dbca(0xbe)]),_0x346b62=_0x870033===0x1,_0x5beb5b=_0x870033===0x0&&(_0x3e2ff5[_0x29dbca(0xee)]===!![]||_0xeaae87['canvasSpaceHeld']===!![]);if(!_0x346b62&&!_0x5beb5b)return;_0x1d234c(_0x42a8eb,{'type':_0x29dbca(0xa5),'source':_0x29dbca(0x122),'button':_0x870033,'spaceHeld':_0x5beb5b,'clientX':Math['max'](0x0,Math[_0x29dbca(0x165)](Number(_0x3e2ff5['clientX']||0x0)||0x0)),'clientY':Math[_0x29dbca(0x140)](0x0,Math[_0x29dbca(0x165)](Number(_0x3e2ff5[_0x29dbca(0x14d)]||0x0)||0x0))},_0x1b318f);}),_0x40e4f6['on']?.(_0x63587(0x17c),()=>{const _0x26e725=_0x63587,_0x2ead5f=toEntryKey(_0x42a8eb,_0x1b318f),_0x5606a3=_0x1c905a[_0x26e725(0x184)](_0x2ead5f);if(!_0x5606a3||_0x5606a3[_0x26e725(0xda)])return;const _0x2a0862=_0x5dc532();try{_0x2a0862?.[_0x26e725(0x90)]?.[_0x26e725(0x150)]?.(_0x5606a3['view']);}catch{}_0x3ffd65(_0x5606a3),_0x1c905a[_0x26e725(0x126)](_0x2ead5f);if(_0x5606a3[_0x26e725(0x13f)])_0x1d234c(_0x42a8eb,{'type':_0x26e725(0xb8)},_0x1b318f);});const _0x47b492=_0x40e4f6[_0x63587(0xef)];_0x47b492?.['setPermissionRequestHandler']?.((_0x13bbe0,_0x327868,_0x1a178d)=>{_0x1a178d(![]);}),_0x47b492?.['on']?.(_0x63587(0x166),_0x437b6a=>{const _0x40f393=_0x63587;_0x437b6a?.[_0x40f393(0x180)]?.();});}function _0x2ad4a7({nodeId:_0x5f0fde,tabId:_0x35e0ee,browserProfileId:_0x355de2,partition:_0x3bfd4d,view:_0x545ecb,url:url='',isPopup:isPopup=![],openerTabId:openerTabId='',pendingRegistrationUntil:pendingRegistrationUntil=0x0}){const _0x5044bd=_0x2f40c1;_0x545ecb[_0x5044bd(0x11e)]?.(![]);const _0x168fae=createInputBridgeToken(),_0x52fdc8={'nodeId':_0x5f0fde,'tabId':_0x35e0ee,'browserProfileId':_0x355de2,'partition':_0x3bfd4d,'view':_0x545ecb,'url':url,'requestedUrl':url,'loadIssuedUrl':'','attached':![],'bounds':null,'visible':![],'selected':![],'freezeToken':'','snapshotPending':![],'freezeHiddenWithSnapshot':![],'readySnapshotPending':![],'readySnapshotTimer':null,'holdSnapshotOnNextLoadStart':![],'snapshotStaleAfterLoad':![],'snapshotEpoch':0x0,'loaded':![],'hasSnapshot':![],'snapshotUrl':'','snapshotFreezeToken':'','zoomFactor':0x1,'canvasSpaceHeld':![],'inputBridgeToken':_0x168fae,'isPopup':isPopup,'openerTabId':openerTabId,'popupOpened':!isPopup,'pendingPopup':![],'disposing':![],'pendingRegistrationUntil':pendingRegistrationUntil};return _0x1c905a[_0x5044bd(0xc7)](toEntryKey(_0x5f0fde,_0x35e0ee),_0x52fdc8),_0x353ff1(_0x5f0fde,_0x35e0ee,_0x545ecb[_0x5044bd(0x155)],_0x168fae),_0x52fdc8;}function _0xabe491(_0x2cfd9d,_0x5b5aed,_0x5bd30b){const _0x147a4f=_0x2f40c1;if(typeof _0x355d44!=='function')throw new Error(_0x147a4f(0xf4));const _0x2f2c94=toBrowserProfileId(_0x5bd30b),_0x5a6d38=toPersistentPartitionId(_0x2f2c94),_0x47d5ab=new _0x355d44({'webPreferences':_0x498445(_0x5a6d38)});return _0x2ad4a7({'nodeId':_0x2cfd9d,'tabId':_0x5b5aed,'browserProfileId':_0x2f2c94,'partition':_0x5a6d38,'view':_0x47d5ab});}function _0x275599({nodeId:_0x20108f,tabId:_0xa257cc,browserProfileId:_0x1ef3e7,partition:_0x136719,url:_0x4c9509,openerTabId:openerTabId=''}){const _0x5e5b2a=_0x2f40c1,_0x1da35e=toBrowserProfileId(_0x1ef3e7),_0x259073=_0x136719||toPersistentPartitionId(_0x1da35e),_0x181353=new _0x355d44({'webPreferences':_0x498445(_0x259073)});return _0x2ad4a7({'nodeId':_0x20108f,'tabId':_0xa257cc,'browserProfileId':_0x1da35e,'partition':_0x259073,'view':_0x181353,'url':_0x4c9509,'isPopup':!![],'openerTabId':openerTabId,'pendingRegistrationUntil':Date[_0x5e5b2a(0x146)]()+POPUP_REGISTRATION_GRACE_MS});}function _0x105729(_0x520b37){const _0x184707=_0x2f40c1,_0x32fb63=_0x1c905a[_0x184707(0x184)](_0x520b37);if(!_0x32fb63)return![];const _0x54300c=_0x5dc532();_0x25b490(_0x980e3a=>_0x980e3a['nodeId']===_0x32fb63[_0x184707(0x108)]&&_0x980e3a[_0x184707(0x12b)]===_0x32fb63[_0x184707(0x12b)]);try{_0x54300c?.[_0x184707(0x90)]?.[_0x184707(0x150)]?.(_0x32fb63[_0x184707(0x94)]);}catch{}_0x3ffd65(_0x32fb63),_0x32fb63[_0x184707(0x163)]=![],_0x32fb63[_0x184707(0x12a)]=![],_0x32fb63[_0x184707(0xda)]=!![];try{!_0x32fb63[_0x184707(0x94)]?.[_0x184707(0x155)]?.['isDestroyed']?.()&&_0x32fb63['view']?.['webContents']?.[_0x184707(0xeb)]?.();}catch{}return _0x1c905a['delete'](_0x520b37),!![];}function _0x3a676c(_0x633e0b,_0x4ffd44=null){const _0x5777fb=_0x2f40c1;if(_0x4ffd44!==null&&typeof _0x4ffd44!=='undefined')return _0x105729(toEntryKey(_0x633e0b,_0x4ffd44));let _0x4eb406=![];for(const [_0x3971b2,_0x345564]of[..._0x1c905a]){if(_0x345564[_0x5777fb(0x108)]===_0x633e0b&&_0x105729(_0x3971b2))_0x4eb406=!![];}return _0x4eb406;}function _0x327c1e(_0x31262c){const _0x31e9cd=_0x2f40c1,_0x4a2cf8=_0x1c905a[_0x31e9cd(0x184)](_0x31262c);if(!_0x4a2cf8)return;_0x4a2cf8['visible']!==![]&&(_0x4a2cf8[_0x31e9cd(0x94)]?.[_0x31e9cd(0x11e)]?.(![]),_0x4a2cf8[_0x31e9cd(0x12a)]=![]);}async function _0x3b094b(_0x45f938={}){const _0x46d903=_0x2f40c1,_0x8ed6e0=_0x5dc532();if(!_0x8ed6e0?.[_0x46d903(0x90)])return{'ok':![],'error':_0x46d903(0x181)};const _0x2c5ad9=new Set(),_0x322874=getViewsPayload(_0x45f938);let _0x1e4fe0=0x0,_0x106334=![];const _0x24f220=[];for(const _0x55ca0c of _0x322874){const _0x26df43=toNodeId(_0x55ca0c?.[_0x46d903(0x108)]);if(!_0x26df43)continue;const _0x25dde8=toTabId(_0x55ca0c?.[_0x46d903(0x12b)]),_0xc3d922=toEntryKey(_0x26df43,_0x25dde8);_0x2c5ad9[_0x46d903(0xa1)](_0xc3d922);const _0x532acb=normalizeWebPreviewUrl(_0x55ca0c?.[_0x46d903(0x157)]||_0x55ca0c?.[_0x46d903(0xdb)]);if(!_0x532acb){if(_0x55ca0c?.['pendingPopup']===!![]){const _0x16eb67=_0x1c905a[_0x46d903(0x184)](_0xc3d922);if(!_0x16eb67?.[_0x46d903(0x13f)]||_0x16eb67['requestedUrl']){_0x1d234c(_0x26df43,{'type':_0x46d903(0x14e),'message':_0x46d903(0xa7)},_0x25dde8);continue;}if(_0x55ca0c?.[_0x46d903(0x12a)]===![]){_0x327c1e(_0xc3d922);continue;}const _0x4da650=normalizeBounds(_0x55ca0c?.['bounds']);if(!_0x4da650){_0x327c1e(_0xc3d922);continue;}_0x16eb67['pendingRegistrationUntil']=0x0;const _0x169c5d=Boolean(_0x55ca0c?.[_0x46d903(0x17b)]);_0x16eb67['selected']!==_0x169c5d&&(_0x16eb67[_0x46d903(0x17b)]=_0x169c5d,_0x106334=!![]);_0x16eb67[_0x46d903(0x99)]=_0x55ca0c?.[_0x46d903(0x99)]===!![];!_0x16eb67[_0x46d903(0x163)]&&(_0x8ed6e0[_0x46d903(0x90)][_0x46d903(0xe7)](_0x16eb67[_0x46d903(0x94)]),_0x16eb67[_0x46d903(0x163)]=!![],_0x106334=!![]);_0x24f220[_0x46d903(0x10c)](_0xc3d922);!boundsEqual(_0x16eb67[_0x46d903(0x8a)],_0x4da650)&&(_0x16eb67[_0x46d903(0x8a)]=_0x4da650,_0x16eb67[_0x46d903(0x94)][_0x46d903(0xf5)](_0x4da650));const _0x55865f=normalizeZoomFactor(_0x55ca0c?.['zoomFactor']);_0x16eb67[_0x46d903(0x174)]=_0x55865f;_0x55ca0c?.[_0x46d903(0x8f)]!==!![]&&!zoomFactorEqual(_0x16eb67[_0x46d903(0xe4)],_0x55865f)&&(_0x16eb67[_0x46d903(0xe4)]=_0x55865f,_0x16eb67[_0x46d903(0x94)]['webContents']['setZoomFactor']?.(_0x55865f));_0x16eb67['visible']!==!![]&&(_0x16eb67[_0x46d903(0x94)][_0x46d903(0x11e)]?.(!![]),_0x16eb67[_0x46d903(0x12a)]=!![]);_0x1e4fe0+=0x1;continue;}_0x105729(_0xc3d922),_0x1d234c(_0x26df43,{'type':_0x46d903(0x14e),'message':_0x46d903(0x115)},_0x25dde8);continue;}if(_0x55ca0c?.[_0x46d903(0x12a)]===![]){const _0x2b9b5a=_0x1c905a[_0x46d903(0x184)](_0xc3d922);if(_0x2b9b5a)_0x2b9b5a[_0x46d903(0x141)]=0x0;_0x327c1e(_0xc3d922);continue;}const _0x1af614=normalizeBounds(_0x55ca0c?.[_0x46d903(0x8a)]);if(!_0x1af614){_0x327c1e(_0xc3d922);continue;}const _0x15b977=toBrowserProfileId(_0x55ca0c?.[_0x46d903(0x8e)]),_0x480de7=toPersistentPartitionId(_0x15b977);let _0x3ffe16=_0x1c905a['get'](_0xc3d922);_0x3ffe16&&_0x3ffe16[_0x46d903(0xb9)]!==_0x480de7&&(_0x105729(_0xc3d922),_0x3ffe16=null,_0x106334=!![]);!_0x3ffe16&&(_0x3ffe16=_0xabe491(_0x26df43,_0x25dde8,_0x15b977),_0x106334=!![]);_0x3ffe16[_0x46d903(0x141)]=0x0;const _0x2dff6a=Boolean(_0x55ca0c?.[_0x46d903(0x17b)]);_0x3ffe16[_0x46d903(0x17b)]!==_0x2dff6a&&(_0x3ffe16[_0x46d903(0x17b)]=_0x2dff6a,_0x106334=!![]);_0x3ffe16[_0x46d903(0x99)]=_0x55ca0c?.[_0x46d903(0x99)]===!![];!_0x3ffe16[_0x46d903(0x163)]&&(_0x8ed6e0[_0x46d903(0x90)][_0x46d903(0xe7)](_0x3ffe16[_0x46d903(0x94)]),_0x3ffe16[_0x46d903(0x163)]=!![],_0x106334=!![]);_0x24f220[_0x46d903(0x10c)](_0xc3d922);const _0x3d52d9=String(_0x55ca0c?.['freezeToken']||'0'),_0x113f0b=_0x55ca0c?.[_0x46d903(0xea)]===!![]&&_0x3ffe16['requestedUrl']===_0x532acb;if(_0x113f0b){_0x3ffd65(_0x3ffe16);_0x3ffe16[_0x46d903(0x142)]!==_0x3d52d9&&(_0x3ffe16[_0x46d903(0x142)]=_0x3d52d9,_0x3ffe16[_0x46d903(0x13e)]=![]);const _0x53fdf9=_0x3ffe16[_0x46d903(0x7c)]===!![]&&_0x3ffe16[_0x46d903(0xc9)]===_0x532acb,_0x1c57c1=_0x53fdf9&&(_0x55ca0c?.[_0x46d903(0x12d)]===!![]||_0x3ffe16['freezeHiddenWithSnapshot']===!![]);if(_0x1c57c1)_0x3ffe16[_0x46d903(0xd9)]=![],_0x3ffe16[_0x46d903(0x13e)]=!![],_0x327c1e(_0xc3d922);else{_0x3ffe16['freezeHiddenWithSnapshot']=![];!boundsEqual(_0x3ffe16['bounds'],_0x1af614)&&(_0x3ffe16[_0x46d903(0x8a)]=_0x1af614,_0x3ffe16['view'][_0x46d903(0xf5)](_0x1af614));_0x3ffe16[_0x46d903(0x12a)]!==!![]&&(_0x3ffe16[_0x46d903(0x94)][_0x46d903(0x11e)]?.(!![]),_0x3ffe16[_0x46d903(0x12a)]=!![]);const _0x3c8472=_0x3ffe16[_0x46d903(0x7c)]===!![]&&_0x3ffe16[_0x46d903(0xc9)]===_0x532acb&&_0x3ffe16['snapshotFreezeToken']===_0x3d52d9;if(_0x55ca0c?.['snapshotHold']!==!![]&&_0x3ffe16[_0x46d903(0xd9)]!==!![]&&!_0x3c8472){const _0x7c9735=_0x43c9ed(_0x26df43,_0x3ffe16,_0x3d52d9,()=>{const _0x5b08bd=_0x46d903,_0x9eb472=_0x1c905a[_0x5b08bd(0x184)](_0xc3d922);if(_0x9eb472===_0x3ffe16)_0x9eb472[_0x5b08bd(0xd9)]=![];},_0x532acb);_0x3ffe16[_0x46d903(0xd9)]=_0x7c9735;}}_0x1e4fe0+=0x1;continue;}_0x3ffe16[_0x46d903(0x142)]='',_0x3ffe16[_0x46d903(0xd9)]=![],_0x3ffe16[_0x46d903(0x13e)]=![];!boundsEqual(_0x3ffe16[_0x46d903(0x8a)],_0x1af614)&&(_0x3ffe16[_0x46d903(0x8a)]=_0x1af614,_0x3ffe16['view']['setBounds'](_0x1af614));const _0x2179d7=normalizeZoomFactor(_0x55ca0c?.[_0x46d903(0xe4)]);_0x3ffe16[_0x46d903(0x174)]=_0x2179d7;_0x55ca0c?.[_0x46d903(0x8f)]!==!![]&&!zoomFactorEqual(_0x3ffe16[_0x46d903(0xe4)],_0x2179d7)&&(_0x3ffe16[_0x46d903(0xe4)]=_0x2179d7,_0x3ffe16[_0x46d903(0x94)]['webContents'][_0x46d903(0x125)]?.(_0x2179d7));_0x3ffe16['visible']!==!![]&&(_0x3ffe16['view'][_0x46d903(0x11e)]?.(!![]),_0x3ffe16[_0x46d903(0x12a)]=!![]);_0x48366a(_0x26df43,_0x3ffe16),_0x1e4fe0+=0x1;const _0x48cbbb=_0x3ffe16[_0x46d903(0xdb)]===_0x532acb||_0x3ffe16[_0x46d903(0x121)]===_0x532acb,_0x2e12b1=_0x3ffe16['requestedUrl']!==_0x532acb&&!_0x48cbbb||_0x3ffe16[_0x46d903(0x13f)]&&_0x3ffe16['requestedUrl']===_0x532acb&&_0x3ffe16[_0x46d903(0x121)]!==_0x532acb&&_0x3ffe16['loaded']!==!![];!_0x2e12b1&&_0x3ffe16[_0x46d903(0xb4)]!==_0x532acb&&_0x48cbbb&&(_0x3ffe16[_0x46d903(0xb4)]=_0x532acb);if(_0x2e12b1){_0x3ffd65(_0x3ffe16),_0x3ffe16['requestedUrl']=_0x532acb,_0x3ffe16['url']=_0x532acb,_0x3ffe16[_0x46d903(0x121)]=_0x532acb,_0x3ffe16[_0x46d903(0x185)]+=0x1,_0x3ffe16[_0x46d903(0x7b)]=![],_0x3ffe16[_0x46d903(0x7c)]=![],_0x3ffe16[_0x46d903(0xc9)]='',_0x3ffe16[_0x46d903(0xec)]='',_0x3ffe16[_0x46d903(0x10d)]=![],_0x3ffe16['holdSnapshotOnNextLoadStart']=![],_0x3ffe16[_0x46d903(0x162)]=![];try{const _0x9c6748=_0x3ffe16[_0x46d903(0x94)]['webContents'][_0x46d903(0x15e)](_0x532acb);_0x9c6748&&typeof _0x9c6748['catch']===_0x46d903(0x175)&&void _0x9c6748[_0x46d903(0x82)](_0x51a388=>{const _0x31085e=_0x46d903;_0x58bf66?.({'type':_0x31085e(0x93),'level':_0x31085e(0x15c),'source':_0x31085e(0x12e),'message':'Web\x20preview\x20loadURL\x20failed','error':_0x51a388,'context':{'nodeId':_0x26df43,'tabId':_0x25dde8}}),_0x1d234c(_0x26df43,{'type':_0x31085e(0x14e),'url':_0x532acb,'message':String(_0x51a388?.[_0x31085e(0x133)]||'网页加载失败')},_0x25dde8);});}catch(_0x5a0fa3){_0x58bf66?.({'type':'web_preview.load_failed','level':_0x46d903(0x15c),'source':'main','message':_0x46d903(0xf6),'error':_0x5a0fa3,'context':{'nodeId':_0x26df43,'tabId':_0x25dde8}}),_0x1d234c(_0x26df43,{'type':_0x46d903(0x14e),'url':_0x532acb,'message':String(_0x5a0fa3?.['message']||_0x46d903(0xdd))},_0x25dde8);}}}if(_0x106334)for(const _0x3fcb0e of _0x24f220){const _0x78abb9=_0x1c905a['get'](_0x3fcb0e);_0x78abb9?.[_0x46d903(0x94)]&&_0x78abb9[_0x46d903(0x163)]&&_0x8ed6e0[_0x46d903(0x90)][_0x46d903(0xe7)](_0x78abb9[_0x46d903(0x94)]);}const _0x513cbd=Date[_0x46d903(0x146)]();for(const _0x5b7186 of[..._0x1c905a[_0x46d903(0xfe)]()]){if(_0x2c5ad9['has'](_0x5b7186))continue;const _0x1c6ecd=_0x1c905a[_0x46d903(0x184)](_0x5b7186);if(_0x1c6ecd?.[_0x46d903(0x141)]>_0x513cbd)continue;_0x105729(_0x5b7186);}return{'ok':!![],'count':_0x1c905a[_0x46d903(0xd5)],'visibleCount':_0x1e4fe0};}function _0x553cd7(_0x1bcc5d={}){const _0x52688f=_0x2f40c1,_0x1907c5=Array[_0x52688f(0xbb)](_0x1bcc5d?.[_0x52688f(0x131)])?_0x1bcc5d[_0x52688f(0x131)]['map'](toNodeId)[_0x52688f(0x143)](Boolean):[],_0x504920=Array['isArray'](_0x1bcc5d?.[_0x52688f(0x105)])?_0x1bcc5d['tabIds'][_0x52688f(0x114)](toTabId)[_0x52688f(0x143)](Boolean):[];let _0x400be3=0x0;if(_0x1907c5[_0x52688f(0x153)]>0x0&&_0x504920['length']>0x0){for(const _0x34ca7f of _0x1907c5){for(const _0x489a0 of _0x504920){if(_0x3a676c(_0x34ca7f,_0x489a0))_0x400be3+=0x1;}}_0x25b490(_0xb819d7=>_0x1907c5[_0x52688f(0xaf)](_0xb819d7[_0x52688f(0x108)])&&_0x504920['includes'](_0xb819d7['tabId']));}else{if(_0x1907c5[_0x52688f(0x153)]>0x0){for(const _0x1fb228 of _0x1907c5){for(const [_0xa602ef,_0xd922d8]of[..._0x1c905a]){if(_0xd922d8[_0x52688f(0x108)]===_0x1fb228&&_0x105729(_0xa602ef))_0x400be3+=0x1;}}_0x25b490(_0x4047e2=>_0x1907c5['includes'](_0x4047e2[_0x52688f(0x108)]));}else{for(const _0x19f320 of[..._0x1c905a[_0x52688f(0xfe)]()]){if(_0x105729(_0x19f320))_0x400be3+=0x1;}_0x25b490();}}return{'ok':!![],'disposed':_0x400be3};}function _0x241b14(_0xec8643,_0x1378c7,_0x215305){const _0x261d27=_0x2f40c1;return Promise[_0x261d27(0x127)](_0xec8643[_0x261d27(0x120)](buildWebPreviewImageExtractionScript({'nodeId':_0x1378c7,'tabId':_0x215305}),!![]))[_0x261d27(0xbc)](_0x567774=>({'ok':!![],'images':filterExtractedImageCandidates(_0x567774?.[_0x261d27(0x16d)]),'pageUrl':String(_0x567774?.[_0x261d27(0xa0)]||''),'pageTitle':String(_0x567774?.[_0x261d27(0x161)]||'')}))[_0x261d27(0x82)](_0x3d63c6=>{const _0x12e3ae=_0x261d27;return _0x58bf66?.({'type':_0x12e3ae(0x144),'level':_0x12e3ae(0x15c),'source':_0x12e3ae(0x12e),'message':'Web\x20preview\x20image\x20extraction\x20failed','error':_0x3d63c6,'context':{'nodeId':_0x1378c7,'tabId':_0x215305}}),{'ok':![],'error':_0x12e3ae(0x118),'images':[]};});}function _0x479d6b(_0x4c1e0f,_0x54ee39,_0x5065a9){const _0xa6c00a=_0x2f40c1;return Promise[_0xa6c00a(0x127)](_0x4c1e0f[_0xa6c00a(0x120)](buildWebPreviewVideoExtractionScript({'nodeId':_0x54ee39,'tabId':_0x5065a9}),!![]))[_0xa6c00a(0xbc)](_0x402fdf=>({'ok':!![],'videos':filterExtractedVideoCandidates(_0x402fdf?.[_0xa6c00a(0xdf)]),'douyinDetailApiUrls':Array[_0xa6c00a(0xbb)](_0x402fdf?.[_0xa6c00a(0x84)])?_0x402fdf['douyinDetailApiUrls']:[],'pageUrl':String(_0x402fdf?.[_0xa6c00a(0xa0)]||''),'pageTitle':String(_0x402fdf?.[_0xa6c00a(0x161)]||'')}))[_0xa6c00a(0x82)](_0x27318d=>{const _0x63d52f=_0xa6c00a;return _0x58bf66?.({'type':_0x63d52f(0x14a),'level':_0x63d52f(0x15c),'source':_0x63d52f(0x12e),'message':_0x63d52f(0x159),'error':_0x27318d,'context':{'nodeId':_0x54ee39,'tabId':_0x5065a9}}),{'ok':![],'error':_0x63d52f(0x118),'videos':[],'douyinDetailApiUrls':[]};});}function _0x21c775(_0x4df4da={}){const _0x5983b0=_0x2f40c1,_0x1e307c=toNodeId(_0x4df4da?.['nodeId']),_0x4ad2b0=toTabId(_0x4df4da?.[_0x5983b0(0x12b)]),_0x1ecec4=String(_0x4df4da?.[_0x5983b0(0xc1)]||'')[_0x5983b0(0x13c)]();if(!_0x1e307c)return{'ok':![],'error':_0x5983b0(0x160)};const _0x267105=_0x1c905a['get'](toEntryKey(_0x1e307c,_0x4ad2b0));if(!_0x267105?.[_0x5983b0(0x94)]?.[_0x5983b0(0x155)]||_0x267105['view']['webContents'][_0x5983b0(0x88)]?.())return{'ok':![],'error':_0x5983b0(0x8b)};const _0x2ed066=_0x267105[_0x5983b0(0x94)][_0x5983b0(0x155)];if(_0x1ecec4==='back'){if(!_0x2ed066[_0x5983b0(0xc6)]?.())return _0x1d234c(_0x1e307c,{'type':_0x5983b0(0xe8),'message':_0x5983b0(0xf9)},_0x4ad2b0),{'ok':![],'error':_0x5983b0(0x154),...getNavigationState(_0x2ed066)};_0x2ed066[_0x5983b0(0xb5)]?.();}else{if(_0x1ecec4===_0x5983b0(0x8c)){if(!_0x2ed066[_0x5983b0(0xf0)]?.())return _0x1d234c(_0x1e307c,{'type':'blocked','message':_0x5983b0(0x182)},_0x4ad2b0),{'ok':![],'error':_0x5983b0(0x154),...getNavigationState(_0x2ed066)};_0x2ed066[_0x5983b0(0x111)]?.();}else{if(_0x1ecec4===_0x5983b0(0xbf)){const _0x12e63f=_0x267105[_0x5983b0(0xdb)]||_0x267105[_0x5983b0(0xb4)]||'';_0x267105['holdSnapshotOnNextLoadStart']=Boolean(_0x267105[_0x5983b0(0x7c)]===!![]&&_0x267105[_0x5983b0(0xc9)]&&_0x12e63f&&_0x267105['snapshotUrl']===_0x12e63f),_0x267105[_0x5983b0(0x162)]=![];if(typeof _0x2ed066[_0x5983b0(0xcb)]===_0x5983b0(0x175))_0x2ed066['reloadIgnoringCache']();else{if(typeof _0x2ed066[_0x5983b0(0xbf)]===_0x5983b0(0x175))_0x2ed066[_0x5983b0(0xbf)]();else(_0x267105[_0x5983b0(0xdb)]||_0x267105['requestedUrl'])&&void _0x2ed066['loadURL']?.(_0x267105[_0x5983b0(0xdb)]||_0x267105[_0x5983b0(0xb4)]);}}else{if(_0x1ecec4===_0x5983b0(0x148)){if(typeof _0x2ed066[_0x5983b0(0x120)]!==_0x5983b0(0x175))return{'ok':![],'error':'unsupported-action'};return Promise['all']([_0x241b14(_0x2ed066,_0x1e307c,_0x4ad2b0),_0x479d6b(_0x2ed066,_0x1e307c,_0x4ad2b0)])['then'](async([_0x35da39,_0x164471])=>{const _0x5aa06f=_0x5983b0;if(_0x35da39?.['ok']===![]&&_0x164471?.['ok']===![])return{'ok':![],'error':'extract-failed'};const _0x533cd8=String(_0x164471?.[_0x5aa06f(0xa0)]||_0x35da39?.[_0x5aa06f(0xa0)]||_0x267105[_0x5aa06f(0xdb)]||_0x267105[_0x5aa06f(0xb4)]||''),_0x38f44c=String(_0x164471?.[_0x5aa06f(0x161)]||_0x35da39?.[_0x5aa06f(0x161)]||'');let _0x12e192={'images':[],'videos':[],'detailApiUrls':[],'fetchedCount':0x0};if(typeof resolveDouyinMedia===_0x5aa06f(0x175))try{_0x12e192=await resolveDouyinMedia({'pageUrl':_0x533cd8,'pageTitle':_0x38f44c,'nodeId':_0x1e307c,'tabId':_0x4ad2b0,'imageResult':_0x35da39,'videoResult':_0x164471,'webContents':_0x2ed066,'logDiagnosticEvent':_0x58bf66})||_0x12e192;}catch(_0x21e31c){_0x58bf66?.({'type':_0x5aa06f(0xf3),'level':'warn','source':_0x5aa06f(0x12e),'message':_0x5aa06f(0x17e),'error':_0x21e31c,'context':{'nodeId':_0x1e307c,'tabId':_0x4ad2b0,'pageUrl':_0x533cd8}});}return{'ok':!![],'action':_0x1ecec4,..._0x4df4da?.[_0x5aa06f(0x12b)]?{'tabId':_0x4ad2b0}:{},'images':mergeExtractedImageCandidates(_0x12e192?.[_0x5aa06f(0x16d)],_0x35da39?.['images']),'videos':mergeExtractedVideoCandidates(_0x12e192?.['videos'],_0x164471?.[_0x5aa06f(0xdf)]),'pageUrl':_0x533cd8,'pageTitle':_0x38f44c,'douyin':{'detailApiUrls':Array['isArray'](_0x12e192?.[_0x5aa06f(0xfa)])?_0x12e192[_0x5aa06f(0xfa)]:[],'fetchedCount':Number(_0x12e192?.[_0x5aa06f(0xe2)]||0x0)||0x0},...getNavigationState(_0x2ed066)};});}else{if(_0x1ecec4===_0x5983b0(0x139)){if(typeof _0x2ed066[_0x5983b0(0x120)]!==_0x5983b0(0x175))return{'ok':![],'error':_0x5983b0(0x14b)};return _0x241b14(_0x2ed066,_0x1e307c,_0x4ad2b0)[_0x5983b0(0xbc)](_0xfb719d=>_0xfb719d['ok']===![]?{'ok':![],'error':_0xfb719d[_0x5983b0(0x100)]||'extract-failed'}:{'ok':!![],'action':_0x1ecec4,..._0x4df4da?.['tabId']?{'tabId':_0x4ad2b0}:{},'images':_0xfb719d[_0x5983b0(0x16d)],'pageUrl':String(_0xfb719d['pageUrl']||_0x267105[_0x5983b0(0xdb)]||_0x267105[_0x5983b0(0xb4)]||''),'pageTitle':String(_0xfb719d?.[_0x5983b0(0x161)]||''),...getNavigationState(_0x2ed066)});}else{if(_0x1ecec4===_0x5983b0(0x11b)){if(typeof _0x2ed066[_0x5983b0(0x120)]!==_0x5983b0(0x175))return{'ok':![],'error':'unsupported-action'};return _0x479d6b(_0x2ed066,_0x1e307c,_0x4ad2b0)[_0x5983b0(0xbc)](_0x1f4d94=>_0x1f4d94['ok']===![]?{'ok':![],'error':_0x1f4d94[_0x5983b0(0x100)]||'extract-failed'}:{'ok':!![],'action':_0x1ecec4,..._0x4df4da?.[_0x5983b0(0x12b)]?{'tabId':_0x4ad2b0}:{},'videos':_0x1f4d94[_0x5983b0(0xdf)],'pageUrl':String(_0x1f4d94[_0x5983b0(0xa0)]||_0x267105[_0x5983b0(0xdb)]||_0x267105[_0x5983b0(0xb4)]||''),'pageTitle':String(_0x1f4d94?.[_0x5983b0(0x161)]||''),...getNavigationState(_0x2ed066)});}else{if(_0x1ecec4==='capture-reference'){if(typeof _0x2ed066[_0x5983b0(0x120)]!=='function'||typeof _0x2ed066[_0x5983b0(0x172)]!==_0x5983b0(0x175))return{'ok':![],'error':'unsupported-action'};return Promise[_0x5983b0(0x130)]([Promise[_0x5983b0(0x127)](_0x2ed066['executeJavaScript'](buildWebPreviewReferenceSnapshotScript(),!![])),Promise[_0x5983b0(0x127)](_0x2ed066[_0x5983b0(0x172)]())[_0x5983b0(0xbc)](_0x3be182=>_0x3be182?.[_0x5983b0(0xcf)]?.()||'')])[_0x5983b0(0xbc)](([_0x19c577,_0x4e03f7])=>({'ok':!![],'action':_0x1ecec4,..._0x4df4da?.['tabId']?{'tabId':_0x4ad2b0}:{},'pageUrl':String(_0x19c577?.['pageUrl']||_0x267105[_0x5983b0(0xdb)]||_0x267105['requestedUrl']||''),'pageTitle':String(_0x19c577?.[_0x5983b0(0x161)]||_0x2ed066[_0x5983b0(0x17d)]?.()||''),'selectedText':String(_0x19c577?.['selectedText']||'')[_0x5983b0(0xb7)](0x0,WEB_PREVIEW_SELECTED_TEXT_LIMIT),'screenshotDataUrl':String(_0x4e03f7||''),'capturedAt':new Date()[_0x5983b0(0xd4)](),...getNavigationState(_0x2ed066)}))['catch'](_0x3eb877=>{const _0x2cbffd=_0x5983b0;return _0x58bf66?.({'type':'web_preview.capture_reference_failed','level':_0x2cbffd(0x15c),'source':'main','message':_0x2cbffd(0xf8),'error':_0x3eb877,'context':{'nodeId':_0x1e307c,'tabId':_0x4ad2b0}}),{'ok':![],'error':_0x2cbffd(0xab)};});}else return{'ok':![],'error':_0x5983b0(0x9f)};}}}}}}return _0x2086ef(_0x1e307c,_0x2ed066,_0x4ad2b0),{'ok':!![],'action':_0x1ecec4,..._0x4df4da?.['tabId']?{'tabId':_0x4ad2b0}:{},...getNavigationState(_0x2ed066)};}return{'syncViews':_0x3b094b,'disposeViews':_0x553cd7,'controlView':_0x21c775,'getEntryCount':()=>_0x1c905a[_0x2f40c1(0xd5)],'_getEntry':(_0xae540b,_0xe81c0e=_0x2f40c1(0xc3))=>_0x1c905a[_0x2f40c1(0x184)](toEntryKey(_0xae540b,_0xe81c0e))};}
+import { normalizeWebPreviewFaviconUrl, normalizeWebPreviewUrl } from '../src/modules/webPreviewUrl.js';
+import { resolveDouyinCurrentPageMedia } from './douyinWebPreviewResolver.js';
+const MIN_VIEW_SIZE = 16,
+  WEB_PREVIEW_IMAGE_DROP_MIME = 'application/x-ai-canvas-web-preview-image',
+  DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID = 'default',
+  WEB_PREVIEW_PARTITION_PREFIX = 'persist:ai-canvas-web-preview',
+  READY_SNAPSHOT_IDLE_DELAY_MS = 180,
+  POPUP_REGISTRATION_GRACE_MS = 0x1388,
+  WEB_PREVIEW_IMAGE_EXTRACTION_LIMIT = 120,
+  WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT = 40,
+  WEB_PREVIEW_EXTRACT_MIN_IMAGE_WIDTH = 96,
+  WEB_PREVIEW_EXTRACT_MIN_IMAGE_HEIGHT = 96,
+  WEB_PREVIEW_EXTRACT_MIN_IMAGE_AREA = 0x2ee0,
+  WEB_PREVIEW_SELECTED_TEXT_LIMIT = 0x1388,
+  WEB_PREVIEW_DIRECT_VIDEO_EXTENSION_RE = /\.(?:mp4|webm|mov|m4v|ogv)(?:[?#].*)?$/i,
+  WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE = /\.(?:m3u8|mpd|m4s)(?:[?#].*)?$/i,
+  WEB_PREVIEW_AUTH_POPUP_WIDTH = 0x208,
+  WEB_PREVIEW_AUTH_POPUP_HEIGHT = 0x2a8,
+  WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH = 0x168,
+  WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT = 0x1a4,
+  WEB_PREVIEW_AUTH_POPUP_REQUEST_TTL_MS = 0x2710,
+  WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX = '__AI_CANVAS_WEB_PREVIEW_INPUT__:',
+  WEB_PREVIEW_CONTEXT_MENU_BRIDGE_DEDUPE_MS = 0x1f4,
+  WEB_PREVIEW_TEXT_ACTION_PROMPT = 'send-selected-text',
+  WEB_PREVIEW_TEXT_ACTION_SOURCE = 'send-selected-text-source',
+  WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT = 'send-selected-text-to-image',
+  WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT_GENERATE = 'send-selected-text-to-image-generate',
+  WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT = 'send-selected-text-to-video',
+  WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT_GENERATE = 'send-selected-text-to-video-generate';
+function buildWebPreviewDragBridgeScript({
+  nodeId: nodeId = '',
+  tabId: tabId = '',
+  inputBridgeToken: inputBridgeToken = '',
+} = {}) {
+  return (
+    '\n(() => {\n  const hasDragBridge = !!window.__AI_CANVAS_WEB_PREVIEW_DRAG_BRIDGE__;\n  if (!hasDragBridge) {\n    Object.defineProperty(window, "__AI_CANVAS_WEB_PREVIEW_DRAG_BRIDGE__", {\n      value: true,\n      configurable: false,\n    });\n  }\n  const MIME = ' +
+    JSON.stringify(WEB_PREVIEW_IMAGE_DROP_MIME) +
+    ';\n  const INPUT_PREFIX = ' +
+    JSON.stringify(WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX) +
+    ';\n  const INPUT_TOKEN = ' +
+    JSON.stringify(String(inputBridgeToken || '')) +
+    ';\n  const escapeHtml = (value) => String(value || "").replace(/[&<>"\']/g, (ch) => ({\n    "&": "&amp;",\n    "<": "&lt;",\n    ">": "&gt;",\n    \'"\': "&quot;",\n    "\'": "&#39;",\n  })[ch]);\n  const normalizeUrl = (value) => {\n    try {\n      const url = new URL(String(value || ""), document.baseURI);\n      if (url.protocol !== "http:" && url.protocol !== "https:") return "";\n      url.username = "";\n      url.password = "";\n      return url.href;\n    } catch {\n      return "";\n    }\n  };\n  const parseSrcset = (value) => String(value || "")\n    .split(",")\n    .map((item) => normalizeUrl(item.trim().split(/\\s+/)[0] || ""))\n    .filter(Boolean);\n  const parseCssUrls = (value) => {\n    const urls = [];\n    const text = String(value || "");\n    const re = /url\\((["\']?)(.*?)\\1\\)/g;\n    let match = null;\n    while ((match = re.exec(text))) {\n      const url = normalizeUrl(match[2] || "");\n      if (url) urls.push(url);\n    }\n    return urls;\n  };\n  const getImageUrl = (image) => normalizeUrl(\n    image?.currentSrc ||\n      image?.src ||\n      image?.getAttribute?.("src") ||\n      image?.dataset?.src ||\n      image?.dataset?.original ||\n      image?.dataset?.lazySrc ||\n      parseSrcset(image?.srcset || image?.getAttribute?.("srcset") || "")[0] ||\n      "",\n  );\n  const getElementTitle = (element, fallback = "") =>\n    String(\n      element?.alt ||\n        element?.title ||\n        element?.getAttribute?.("aria-label") ||\n        fallback ||\n        document.title ||\n        "网页图片",\n    ).slice(0, 120);\n  const findImageElement = (target) => {\n    if (!target?.closest) return null;\n    return (\n      target.closest("img") ||\n      target.closest("picture")?.querySelector?.("img") ||\n      target.querySelector?.("img, picture img") ||\n      null\n    );\n  };\n  const findBackgroundImageSource = (target) => {\n    let element = target?.nodeType === 1 ? target : null;\n    for (let i = 0; element && i < 4; i += 1, element = element.parentElement) {\n      const url = parseCssUrls(window.getComputedStyle?.(element)?.backgroundImage || "")[0];\n      if (url) {\n        return {\n          element,\n          url,\n          title: getElementTitle(element),\n          width: Math.max(0, Math.round(Number(element.clientWidth || 0) || 0)),\n          height: Math.max(0, Math.round(Number(element.clientHeight || 0) || 0)),\n        };\n      }\n    }\n    return null;\n  };\n  const findImageSource = (target) => {\n    const image = findImageElement(target);\n    if (image) return { image, element: image, url: getImageUrl(image) };\n    return findBackgroundImageSource(target);\n  };\n  const findContextImageSource = (event) => {\n    const candidates = [];\n    try {\n      const pointElements = document.elementsFromPoint?.(\n        Number(event?.clientX || 0) || 0,\n        Number(event?.clientY || 0) || 0,\n      );\n      if (Array.isArray(pointElements)) candidates.push(...pointElements);\n    } catch {}\n    if (event?.target) candidates.push(event.target);\n    const seen = new Set();\n    for (const element of candidates) {\n      if (!element || seen.has(element)) continue;\n      seen.add(element);\n      const source = findImageSource(element);\n      if (source?.url) return source;\n    }\n    return null;\n  };\n  const buildImagePayload = (source) => {\n    const image = source?.image || null;\n    const element = source?.element || image || null;\n    const url = normalizeUrl(source?.url || getImageUrl(image));\n    if (!url) return null;\n    const title = getElementTitle(image || element, source?.title);\n    const pageUrl = normalizeUrl(location.href);\n    return {\n      kind: "image",\n      url,\n      title,\n      sourceUrl: pageUrl,\n      pageUrl,\n      nodeId: ' +
+    JSON.stringify(toNodeId(nodeId)) +
+    ',\n      tabId: ' +
+    JSON.stringify(toTabId(tabId)) +
+    ',\n      width: Math.max(0, Math.round(Number(source?.width || image?.naturalWidth || image?.width || element?.clientWidth || 0) || 0)),\n      height: Math.max(0, Math.round(Number(source?.height || image?.naturalHeight || image?.height || element?.clientHeight || 0) || 0)),\n    };\n  };\n  const emitImageContextMenuRequest = (payload, event) => {\n    if (!payload?.url || !INPUT_TOKEN) return;\n    try {\n      console.info(\n        INPUT_PREFIX +\n          JSON.stringify({\n            ...payload,\n            token: INPUT_TOKEN,\n            type: "image-context-menu",\n            contextX: Math.max(0, Math.round(Number(event?.clientX || 0) || 0)),\n            contextY: Math.max(0, Math.round(Number(event?.clientY || 0) || 0)),\n          }),\n      );\n    } catch {}\n  };\n  if (!window.__AI_CANVAS_WEB_PREVIEW_CONTEXT_IMAGE_BRIDGE__) {\n    Object.defineProperty(window, "__AI_CANVAS_WEB_PREVIEW_CONTEXT_IMAGE_BRIDGE__", {\n      value: true,\n      configurable: false,\n    });\n    const handleContextImageMenu = (event) => {\n      if (event.__AI_CANVAS_WEB_PREVIEW_CONTEXT_IMAGE_HANDLED__) return;\n      const payload = buildImagePayload(findContextImageSource(event));\n      window.__AI_CANVAS_WEB_PREVIEW_LAST_CONTEXT_IMAGE__ = payload\n        ? {\n            ...payload,\n            contextX: Math.max(0, Math.round(Number(event.clientX || 0) || 0)),\n            contextY: Math.max(0, Math.round(Number(event.clientY || 0) || 0)),\n            capturedAt: Date.now(),\n          }\n        : null;\n      if (!payload?.url) return;\n      try {\n        Object.defineProperty(event, "__AI_CANVAS_WEB_PREVIEW_CONTEXT_IMAGE_HANDLED__", {\n          value: true,\n        });\n      } catch {}\n      try { event.preventDefault(); } catch {}\n      try { event.stopPropagation(); } catch {}\n      try { event.stopImmediatePropagation?.(); } catch {}\n      emitImageContextMenuRequest(payload, event);\n    };\n    window.addEventListener("contextmenu", handleContextImageMenu, true);\n    document.addEventListener("contextmenu", handleContextImageMenu, true);\n  }\n  if (!hasDragBridge) {\n    document.addEventListener("dragstart", (event) => {\n      const payloadObject = buildImagePayload(findImageSource(event.target));\n      const url = payloadObject?.url || "";\n      if (!url || !event.dataTransfer) return;\n      const title = payloadObject.title || "网页图片";\n      const payload = JSON.stringify(payloadObject);\n      try { event.dataTransfer.setData(MIME, payload); } catch {}\n      try { event.dataTransfer.setData("text/uri-list", url); } catch {}\n      try { event.dataTransfer.setData("text/plain", url); } catch {}\n      try {\n        event.dataTransfer.setData("text/html", \'<img src="\' + escapeHtml(url) + \'" alt="\' + escapeHtml(title) + \'">\');\n      } catch {}\n      event.dataTransfer.effectAllowed = "copy";\n    }, true);\n  }\n  if (!window.__AI_CANVAS_WEB_PREVIEW_INPUT_BRIDGE__ && INPUT_TOKEN) {\n    Object.defineProperty(window, "__AI_CANVAS_WEB_PREVIEW_INPUT_BRIDGE__", {\n      value: true,\n      configurable: false,\n    });\n    let spaceHeld = false;\n    let lastPanStartAt = 0;\n    let lastPanStartButton = -1;\n    const isSpaceKey = (event) =>\n      event?.code === "Space" ||\n      event?.key === " " ||\n      event?.key === "Spacebar" ||\n      event?.key === "Space";\n    const setSpaceHeld = (held) => {\n      spaceHeld = held === true;\n    };\n    document.addEventListener("keydown", (event) => {\n      if (isSpaceKey(event)) setSpaceHeld(true);\n    }, true);\n    document.addEventListener("keyup", (event) => {\n      if (isSpaceKey(event)) setSpaceHeld(false);\n    }, true);\n    window.addEventListener("blur", () => setSpaceHeld(false), true);\n    const emitPanStartPreview = (event) => {\n      const button = Number(event?.button);\n      const isMiddle = button === 1;\n      const isLeft = button === 0;\n      if (!isMiddle && !isLeft) return;\n      const now = Date.now();\n      if (button === lastPanStartButton && now - lastPanStartAt < 32) return;\n      lastPanStartAt = now;\n      lastPanStartButton = button;\n      try {\n        console.info(\n          INPUT_PREFIX +\n            JSON.stringify({\n              token: INPUT_TOKEN,\n              type: "pan-start-preview",\n              button,\n              spaceHeld: isLeft && spaceHeld === true,\n              buttons: Number(event?.buttons || 0) || 0,\n              clientX: Math.max(0, Math.round(Number(event?.clientX || 0) || 0)),\n              clientY: Math.max(0, Math.round(Number(event?.clientY || 0) || 0)),\n            }),\n        );\n      } catch {}\n    };\n    window.addEventListener("pointerdown", emitPanStartPreview, true);\n    window.addEventListener("mousedown", emitPanStartPreview, true);\n    document.addEventListener("pointerdown", emitPanStartPreview, true);\n    document.addEventListener("mousedown", emitPanStartPreview, true);\n  }\n  return true;\n})()\n'
+  );
+}
+function buildWebPreviewContextImageProbeScript({
+  nodeId: nodeId = '',
+  tabId: tabId = '',
+  x: x = 0,
+  y: y = 0,
+} = {}) {
+  const _0x14b906 = Math.max(0, Math.round(Number(x || 0) || 0)),
+    _0x1b55e7 = Math.max(0, Math.round(Number(y || 0) || 0));
+  return (
+    '\n(() => {\n  const nodeId = ' +
+    JSON.stringify(toNodeId(nodeId)) +
+    ';\n  const tabId = ' +
+    JSON.stringify(toTabId(tabId)) +
+    ';\n  const contextX = ' +
+    _0x14b906 +
+    ';\n  const contextY = ' +
+    _0x1b55e7 +
+    ';\n  const normalizeUrl = (value) => {\n    try {\n      const url = new URL(String(value || ""), document.baseURI);\n      if (url.protocol !== "http:" && url.protocol !== "https:") return "";\n      url.username = "";\n      url.password = "";\n      return url.href;\n    } catch {\n      return "";\n    }\n  };\n  const pageUrl = normalizeUrl(location.href);\n  const pageTitle = String(document.title || "").slice(0, 160);\n  const parseSrcset = (value) => String(value || "")\n    .split(",")\n    .map((item) => normalizeUrl(item.trim().split(/\\s+/)[0] || ""))\n    .filter(Boolean);\n  const parseCssUrls = (value) => {\n    const urls = [];\n    const text = String(value || "");\n    const re = /url\\((["\']?)(.*?)\\1\\)/g;\n    let match = null;\n    while ((match = re.exec(text))) {\n      const url = normalizeUrl(match[2] || "");\n      if (url) urls.push(url);\n    }\n    return urls;\n  };\n  const getImageUrl = (image) => normalizeUrl(\n    image?.currentSrc ||\n      image?.src ||\n      image?.getAttribute?.("src") ||\n      image?.dataset?.src ||\n      image?.dataset?.original ||\n      image?.dataset?.lazySrc ||\n      parseSrcset(image?.srcset || image?.getAttribute?.("srcset") || "")[0] ||\n      "",\n  );\n  const getElementTitle = (element, fallback = "") =>\n    String(\n      element?.alt ||\n        element?.title ||\n        element?.getAttribute?.("aria-label") ||\n        fallback ||\n        pageTitle ||\n        "网页图片",\n    ).slice(0, 160);\n  const findImageElement = (target) => {\n    if (!target?.closest) return null;\n    return (\n      target.closest("img") ||\n      target.closest("picture")?.querySelector?.("img") ||\n      target.querySelector?.("img, picture img") ||\n      null\n    );\n  };\n  const findBackgroundImageSource = (target) => {\n    let element = target?.nodeType === 1 ? target : null;\n    for (let i = 0; element && i < 4; i += 1, element = element.parentElement) {\n      const url = parseCssUrls(window.getComputedStyle?.(element)?.backgroundImage || "")[0];\n      if (url) {\n        return {\n          element,\n          url,\n          title: getElementTitle(element),\n          width: Math.max(0, Math.round(Number(element.clientWidth || 0) || 0)),\n          height: Math.max(0, Math.round(Number(element.clientHeight || 0) || 0)),\n        };\n      }\n    }\n    return null;\n  };\n  const findImageSource = (target) => {\n    const image = findImageElement(target);\n    if (image) return { image, element: image, url: getImageUrl(image) };\n    return findBackgroundImageSource(target);\n  };\n  const findContextImageSource = () => {\n    const candidates = [];\n    try {\n      const pointElements = document.elementsFromPoint?.(contextX, contextY);\n      if (Array.isArray(pointElements)) candidates.push(...pointElements);\n    } catch {}\n    const seen = new Set();\n    for (const element of candidates) {\n      if (!element || seen.has(element)) continue;\n      seen.add(element);\n      const source = findImageSource(element);\n      if (source?.url) return source;\n    }\n    return null;\n  };\n  const buildImagePayload = (source) => {\n    const image = source?.image || null;\n    const element = source?.element || image || null;\n    const url = normalizeUrl(source?.url || getImageUrl(image));\n    if (!url) return null;\n    return {\n      kind: "image",\n      url,\n      title: getElementTitle(image || element, source?.title),\n      alt: String(image?.alt || "").slice(0, 160),\n      pageUrl,\n      pageTitle,\n      nodeId,\n      tabId,\n      contextX,\n      contextY,\n      width: Math.max(0, Math.round(Number(source?.width || image?.naturalWidth || image?.width || element?.clientWidth || 0) || 0)),\n      height: Math.max(0, Math.round(Number(source?.height || image?.naturalHeight || image?.height || element?.clientHeight || 0) || 0)),\n    };\n  };\n  const stored = window.__AI_CANVAS_WEB_PREVIEW_LAST_CONTEXT_IMAGE__;\n  if (stored?.url) {\n    return {\n      ok: true,\n      image: {\n        ...stored,\n        pageTitle: String(stored.pageTitle || pageTitle || "").slice(0, 160),\n        contextX,\n        contextY,\n      },\n      pageUrl,\n      pageTitle,\n    };\n  }\n  const payload = buildImagePayload(findContextImageSource());\n  return { ok: !!payload, image: payload, pageUrl, pageTitle };\n})()\n'
+  );
+}
+function buildWebPreviewImageExtractionScript({ nodeId: nodeId = '', tabId: tabId = '' } = {}) {
+  return (
+    '\n(() => {\n  const MAX = ' +
+    WEB_PREVIEW_IMAGE_EXTRACTION_LIMIT +
+    ';\n  const MIN_WIDTH = ' +
+    WEB_PREVIEW_EXTRACT_MIN_IMAGE_WIDTH +
+    ';\n  const MIN_HEIGHT = ' +
+    WEB_PREVIEW_EXTRACT_MIN_IMAGE_HEIGHT +
+    ';\n  const MIN_AREA = ' +
+    WEB_PREVIEW_EXTRACT_MIN_IMAGE_AREA +
+    ';\n  const nodeId = ' +
+    JSON.stringify(toNodeId(nodeId)) +
+    ';\n  const tabId = ' +
+    JSON.stringify(toTabId(tabId)) +
+    ';\n  const normalizeUrl = (value) => {\n    try {\n      const url = new URL(String(value || ""), document.baseURI);\n      if (url.protocol !== "http:" && url.protocol !== "https:") return "";\n      url.username = "";\n      url.password = "";\n      return url.href;\n    } catch {\n      return "";\n    }\n  };\n  const parseSrcset = (value) => String(value || "")\n    .split(",")\n    .map((item) => normalizeUrl(item.trim().split(/\\s+/)[0] || ""))\n    .filter(Boolean);\n  const parseCssUrls = (value) => {\n    const urls = [];\n    const text = String(value || "");\n    const re = /url\\((["\']?)(.*?)\\1\\)/g;\n    let match = null;\n    while ((match = re.exec(text))) {\n      const url = normalizeUrl(match[2]);\n      if (url) urls.push(url);\n    }\n    return urls;\n  };\n  const pageUrl = normalizeUrl(location.href);\n  const pageTitle = String(document.title || "").slice(0, 160);\n  const seen = new Set();\n  const images = [];\n  const hasExtractableSize = (width, height) => {\n    const safeWidth = Math.max(0, Math.round(Number(width || 0) || 0));\n    const safeHeight = Math.max(0, Math.round(Number(height || 0) || 0));\n    if (!safeWidth || !safeHeight) return true;\n    return safeWidth >= MIN_WIDTH && safeHeight >= MIN_HEIGHT && safeWidth * safeHeight >= MIN_AREA;\n  };\n  const push = (url, source = {}) => {\n    const normalizedUrl = normalizeUrl(url);\n    const width = Math.max(0, Math.round(Number(source.width || 0) || 0));\n    const height = Math.max(0, Math.round(Number(source.height || 0) || 0));\n    if (!normalizedUrl || !hasExtractableSize(width, height) || seen.has(normalizedUrl) || images.length >= MAX) return;\n    seen.add(normalizedUrl);\n    images.push({\n      url: normalizedUrl,\n      title: String(source.title || pageTitle || "网页图片").slice(0, 160),\n      alt: String(source.alt || "").slice(0, 160),\n      width,\n      height,\n      pageUrl,\n      pageTitle,\n      nodeId,\n      tabId,\n    });\n  };\n  for (const img of Array.from(document.images || [])) {\n    if (images.length >= MAX) break;\n    const title = img.alt || img.title || img.getAttribute("aria-label") || pageTitle || "网页图片";\n    const source = {\n      title,\n      alt: img.alt || "",\n      width: img.naturalWidth || img.width || img.clientWidth || 0,\n      height: img.naturalHeight || img.height || img.clientHeight || 0,\n    };\n    push(img.currentSrc || img.src || img.getAttribute("src") || img.dataset?.src || "", source);\n    for (const url of parseSrcset(img.srcset || img.getAttribute("srcset") || "")) push(url, source);\n    const picture = img.closest?.("picture");\n    for (const sourceEl of Array.from(picture?.querySelectorAll?.("source[srcset]") || [])) {\n      for (const url of parseSrcset(sourceEl.getAttribute("srcset") || "")) push(url, source);\n    }\n  }\n  for (const el of Array.from(document.querySelectorAll("body *"))) {\n    if (images.length >= MAX) break;\n    let backgroundImage = "";\n    try {\n      backgroundImage = getComputedStyle(el).backgroundImage;\n    } catch {}\n    for (const url of parseCssUrls(backgroundImage)) {\n      if (images.length >= MAX) break;\n      push(url, {\n        title: el.getAttribute?.("aria-label") || el.getAttribute?.("title") || pageTitle || "网页图片",\n        width: el.clientWidth || 0,\n        height: el.clientHeight || 0,\n      });\n    }\n  }\n  return { ok: true, images, pageUrl, pageTitle };\n})()\n'
+  );
+}
+function buildWebPreviewVideoExtractionScript({ nodeId: nodeId = '', tabId: tabId = '' } = {}) {
+  return (
+    '\n(() => {\n  const MAX = ' +
+    WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT +
+    ';\n  const DIRECT_VIDEO_RE = ' +
+    WEB_PREVIEW_DIRECT_VIDEO_EXTENSION_RE +
+    ';\n  const STREAM_MEDIA_RE = ' +
+    WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE +
+    ';\n  const nodeId = ' +
+    JSON.stringify(toNodeId(nodeId)) +
+    ';\n  const tabId = ' +
+    JSON.stringify(toTabId(tabId)) +
+    ';\n  const normalizeUrl = (value) => {\n    try {\n      const url = new URL(String(value || ""), document.baseURI);\n      if (url.protocol !== "http:" && url.protocol !== "https:") return "";\n      url.username = "";\n      url.password = "";\n      return url.href;\n    } catch {\n      return "";\n    }\n  };\n  const isDirectVideoUrl = (value) => {\n    try {\n      return DIRECT_VIDEO_RE.test(new URL(value).pathname);\n    } catch {\n      return false;\n    }\n  };\n  const isStreamMediaUrl = (value) => {\n    try {\n      return STREAM_MEDIA_RE.test(new URL(value).pathname);\n    } catch {\n      return false;\n    }\n  };\n  const pageUrl = normalizeUrl(location.href);\n  const pageTitle = String(document.title || "").slice(0, 160);\n  const seen = new Set();\n  const videos = [];\n  const douyinDetailApiUrls = [];\n  const douyinDetailApiSeen = new Set();\n  const DOUYIN_DETAIL_API_RE = /\\/aweme\\/v1\\/web\\/aweme\\/detail\\//i;\n  const pushDouyinDetailApiUrl = (value) => {\n    const normalizedUrl = normalizeUrl(value);\n    if (!normalizedUrl || douyinDetailApiSeen.has(normalizedUrl)) return;\n    try {\n      const parsed = new URL(normalizedUrl);\n      const host = parsed.hostname.toLowerCase();\n      const isDouyinHost =\n        host === "douyin.com" ||\n        host.endsWith(".douyin.com") ||\n        host === "iesdouyin.com" ||\n        host.endsWith(".iesdouyin.com");\n      if (!isDouyinHost || !DOUYIN_DETAIL_API_RE.test(parsed.pathname)) return;\n      if (!/\\d{15,25}/.test(parsed.searchParams.get("aweme_id") || "")) return;\n    } catch {\n      return;\n    }\n    douyinDetailApiSeen.add(normalizedUrl);\n    douyinDetailApiUrls.push(normalizedUrl);\n  };\n  const finiteNumber = (value) => {\n    const n = Number(value);\n    return Number.isFinite(n) && n > 0 ? n : 0;\n  };\n  const push = (url, source = {}) => {\n    const normalizedUrl = normalizeUrl(url);\n    if (!normalizedUrl || seen.has(normalizedUrl) || videos.length >= MAX) return;\n    if (isStreamMediaUrl(normalizedUrl)) return;\n    const type = String(source.type || "").trim().toLowerCase();\n    const recognizable = Boolean(\n      source.fromVideo ||\n        type.startsWith("video/") ||\n        isDirectVideoUrl(normalizedUrl),\n    );\n    if (!recognizable) return;\n    seen.add(normalizedUrl);\n    videos.push({\n      kind: "video",\n      url: normalizedUrl,\n      title: String(source.title || pageTitle || "网页视频").slice(0, 160),\n      pageUrl,\n      pageTitle,\n      nodeId,\n      tabId,\n      width: Math.max(0, Math.round(finiteNumber(source.width))),\n      height: Math.max(0, Math.round(finiteNumber(source.height))),\n      duration: finiteNumber(source.duration),\n      sourceType: String(source.sourceType || "media").slice(0, 40),\n      mimeType: type,\n    });\n  };\n  for (const video of Array.from(document.querySelectorAll("video"))) {\n    if (videos.length >= MAX) break;\n    const title =\n      video.getAttribute("aria-label") ||\n      video.getAttribute("title") ||\n      video.getAttribute("alt") ||\n      pageTitle ||\n      "网页视频";\n    const source = {\n      fromVideo: true,\n      sourceType: "video",\n      title,\n      width: video.videoWidth || video.clientWidth || 0,\n      height: video.videoHeight || video.clientHeight || 0,\n      duration: video.duration,\n    };\n    push(video.currentSrc || video.src || video.getAttribute("src") || "", source);\n    for (const sourceEl of Array.from(video.querySelectorAll("source[src]"))) {\n      push(sourceEl.getAttribute("src") || "", {\n        ...source,\n        type: sourceEl.getAttribute("type") || "",\n        sourceType: "video-source",\n      });\n    }\n  }\n  for (const sourceEl of Array.from(document.querySelectorAll("source[src]"))) {\n    if (videos.length >= MAX) break;\n    const type = sourceEl.getAttribute("type") || "";\n    if (!String(type).toLowerCase().startsWith("video/")) continue;\n    const media = sourceEl.closest?.("video");\n    push(sourceEl.getAttribute("src") || "", {\n      fromVideo: true,\n      type,\n      sourceType: "source",\n      title: media?.getAttribute?.("title") || pageTitle || "网页视频",\n      width: media?.videoWidth || media?.clientWidth || 0,\n      height: media?.videoHeight || media?.clientHeight || 0,\n      duration: media?.duration,\n    });\n  }\n  for (const link of Array.from(document.querySelectorAll("a[href]"))) {\n    if (videos.length >= MAX) break;\n    const href = link.getAttribute("href") || "";\n    const normalizedUrl = normalizeUrl(href);\n    if (!normalizedUrl || !isDirectVideoUrl(normalizedUrl) || isStreamMediaUrl(normalizedUrl)) continue;\n    push(normalizedUrl, {\n      sourceType: "link",\n      title: link.textContent?.trim() || link.getAttribute("title") || pageTitle || "网页视频",\n    });\n  }\n  for (const el of Array.from(document.querySelectorAll("[data-src], [data-url], [data-video-src]"))) {\n    if (videos.length >= MAX) break;\n    const candidates = [\n      el.getAttribute("data-video-src"),\n      el.getAttribute("data-play-url"),\n      el.getAttribute("data-video-url"),\n      el.getAttribute("data-src"),\n      el.getAttribute("data-url"),\n    ];\n    for (const candidate of candidates) {\n      if (videos.length >= MAX) break;\n      const normalizedUrl = normalizeUrl(candidate);\n      if (!normalizedUrl || !isDirectVideoUrl(normalizedUrl) || isStreamMediaUrl(normalizedUrl)) continue;\n      push(normalizedUrl, {\n        sourceType: "data-attribute",\n        title: el.getAttribute("aria-label") || el.getAttribute("title") || pageTitle || "网页视频",\n        width: el.clientWidth || 0,\n        height: el.clientHeight || 0,\n      });\n    }\n  }\n  for (const resource of Array.from(performance?.getEntriesByType?.("resource") || [])) {\n    if (videos.length >= MAX) break;\n    const normalizedUrl = normalizeUrl(resource?.name);\n    if (!normalizedUrl || isStreamMediaUrl(normalizedUrl)) continue;\n    pushDouyinDetailApiUrl(normalizedUrl);\n    const initiatorType = String(resource?.initiatorType || "").trim().toLowerCase();\n    const fromMediaResource =\n      initiatorType === "video" ||\n      initiatorType === "media" ||\n      initiatorType === "source";\n    if (!fromMediaResource && !isDirectVideoUrl(normalizedUrl)) continue;\n    push(normalizedUrl, {\n      fromVideo: fromMediaResource,\n      sourceType: "video-resource",\n      title: pageTitle || "网页视频",\n    });\n  }\n  const normalizeEmbeddedUrl = (value) =>\n    normalizeUrl(\n      String(value || "")\n        .replace(/\\\\u002[fF]/g, "/")\n        .replace(/\\\\\\//g, "/"),\n    );\n  const embeddedUrlRe = /https?:\\\\?\\/\\\\?\\/[^"\'\\s<>]+/g;\n  for (const script of Array.from(document.scripts || [])) {\n    if (videos.length >= MAX) break;\n    const text = String(script.textContent || "").slice(0, 400000);\n    let match = null;\n    while ((match = embeddedUrlRe.exec(text))) {\n      if (videos.length >= MAX) break;\n      const normalizedUrl = normalizeEmbeddedUrl(match[0]);\n      pushDouyinDetailApiUrl(normalizedUrl);\n      if (!normalizedUrl || !isDirectVideoUrl(normalizedUrl) || isStreamMediaUrl(normalizedUrl)) continue;\n      push(normalizedUrl, {\n        sourceType: "embedded-url",\n        title: pageTitle || "网页视频",\n      });\n    }\n  }\n  const STRUCTURED_VIDEO_SOURCE_TYPE = "structured-data";\n  const DOUYIN_DETAIL_SOURCE_TYPE = "douyin-detail";\n  const STRUCTURED_VIDEO_KEY_RE =\n    /(?:video|play|download|stream|dash|media|aweme|xigua|note|vod|mp4|h264|h265|hevc|url[_-]?list|backup[_-]?urls|masterurl|baseurl|playurl|downloadurl)/i;\n  const STRUCTURED_URL_KEY_RE =\n    /^(?:url|uri|src|source|playurl|play_url|playaddr|play_addr|downloadurl|download_url|downloadaddr|download_addr|masterurl|master_url|baseurl|base_url|mainurl|main_url|file|contenturl)$/i;\n  const NON_VIDEO_ASSET_RE = /.(?:png|jpe?g|webp|gif|bmp|svg|avif|css|js)(?:[?#].*)?$/i;\n  const KNOWN_STATE_KEYS = [\n    "__INITIAL_STATE__",\n    "__NEXT_DATA__",\n    "__NUXT__",\n    "__APOLLO_STATE__",\n    "__INITIAL_PROPS__",\n    "RENDER_DATA",\n    "SIGI_STATE",\n    "SSR_RENDER_DATA",\n  ];\n  const unescapeStructuredUrlText = (value) =>\n    String(value || "")\n      .replace(/\\\\u002[fF]/g, "/")\n      .replace(/\\\\u0026/g, "&")\n      .replace(/\\\\u003[dD]/g, "=")\n      .replace(/\\\\\\//g, "/")\n      .replace(/&amp;/g, "&");\n  const extractUrlsFromText = (value) => {\n    const text = unescapeStructuredUrlText(value).trim();\n    if (!text) return [];\n    const urls = [];\n    const direct = normalizeUrl(text);\n    if (direct) urls.push(direct);\n    const urlRe = /https?:\\/\\/[^"\'\\s<>]+/g;\n    let match = null;\n    while ((match = urlRe.exec(text))) {\n      const url = normalizeUrl(match[0]);\n      if (url) urls.push(url);\n    }\n    return Array.from(new Set(urls));\n  };\n  const isNonVideoAssetUrl = (value) => {\n    try {\n      return NON_VIDEO_ASSET_RE.test(new URL(value).pathname);\n    } catch {\n      return false;\n    }\n  };\n  const hasStructuredVideoContext = (path = []) =>\n    path.some((key) => STRUCTURED_VIDEO_KEY_RE.test(String(key || "")));\n  const readStructuredNumber = (object, keys) => {\n    if (!object || typeof object !== "object") return 0;\n    for (const key of keys) {\n      const value = finiteNumber(object[key]);\n      if (value) return value;\n    }\n    return 0;\n  };\n  const normalizeDouyinDuration = (value) => {\n    const duration = finiteNumber(value);\n    if (!duration) return 0;\n    return duration >= 1000 ? duration / 1000 : duration;\n  };\n  const pickLastStructuredUrl = (items) => {\n    const urls = [];\n    const list = Array.isArray(items) ? items : [items];\n    for (const item of list) {\n      urls.push(...extractUrlsFromText(item));\n    }\n    return urls.filter(Boolean).at(-1) || "";\n  };\n  const readDouyinAddressUrl = (address) => {\n    if (!address) return "";\n    if (typeof address === "string") return pickLastStructuredUrl(address);\n    if (typeof address !== "object") return "";\n    const urlList = Array.isArray(address.url_list)\n      ? address.url_list\n      : Array.isArray(address.urlList)\n        ? address.urlList\n        : [];\n    return (\n      pickLastStructuredUrl(urlList) ||\n      pickLastStructuredUrl(address.url) ||\n      pickLastStructuredUrl(address.uri) ||\n      pickLastStructuredUrl(address.main_url) ||\n      pickLastStructuredUrl(address.mainUrl)\n    );\n  };\n  const hasDouyinVideoAddress = (video) =>\n    Boolean(\n      video &&\n        typeof video === "object" &&\n        (video.play_addr_h264 || video.play_addr_256 || video.play_addr || video.download_addr),\n    );\n  const readDouyinVideoUrl = (video) => {\n    if (!hasDouyinVideoAddress(video)) return "";\n    const sources = [video.play_addr_h264, video.play_addr_256, video.play_addr, video.download_addr];\n    for (const source of sources) {\n      const url = readDouyinAddressUrl(source);\n      if (url) return url;\n    }\n    return "";\n  };\n  const readDouyinTitle = (aweme) =>\n    String(\n      aweme?.desc ||\n        aweme?.item_title ||\n        aweme?.share_info?.share_title ||\n        pageTitle ||\n        "网页视频",\n    )\n      .trim()\n      .slice(0, 160);\n  const pushDouyinAwemeDetail = (aweme) => {\n    if (!aweme || typeof aweme !== "object" || !hasDouyinVideoAddress(aweme.video)) return;\n    const url = readDouyinVideoUrl(aweme.video);\n    if (!url || isStreamMediaUrl(url) || isNonVideoAssetUrl(url)) return;\n    push(url, {\n      fromVideo: true,\n      sourceType: DOUYIN_DETAIL_SOURCE_TYPE,\n      title: readDouyinTitle(aweme),\n      width: readStructuredNumber(aweme.video, ["width", "w", "videoWidth"]),\n      height: readStructuredNumber(aweme.video, ["height", "h", "videoHeight"]),\n      duration: normalizeDouyinDuration(\n        aweme.video.duration || aweme.duration || aweme.video.videoDuration,\n      ),\n    });\n  };\n  const visitedDouyinDetailObjects = new WeakSet();\n  const scanDouyinAwemeDetails = (value, depth = 0) => {\n    if (videos.length >= MAX || depth > 10 || !value || typeof value !== "object") return;\n    if (visitedDouyinDetailObjects.has(value)) return;\n    visitedDouyinDetailObjects.add(value);\n    if (value.aweme_detail) pushDouyinAwemeDetail(value.aweme_detail);\n    if (Array.isArray(value.aweme_list)) {\n      for (const aweme of value.aweme_list) pushDouyinAwemeDetail(aweme);\n    }\n    if (hasDouyinVideoAddress(value.video)) pushDouyinAwemeDetail(value);\n    for (const key of Object.keys(value).slice(0, 180)) {\n      if (videos.length >= MAX) break;\n      const item = value[key];\n      if (item && typeof item === "object") scanDouyinAwemeDetails(item, depth + 1);\n    }\n  };\n  const pushStructuredVideoUrl = (url, source = {}) => {\n    const normalizedUrl = normalizeUrl(url);\n    if (!normalizedUrl || isStreamMediaUrl(normalizedUrl) || isNonVideoAssetUrl(normalizedUrl)) {\n      return;\n    }\n    if (!isDirectVideoUrl(normalizedUrl)) return;\n    push(normalizedUrl, {\n      fromVideo: true,\n      sourceType: STRUCTURED_VIDEO_SOURCE_TYPE,\n      title: source.title || pageTitle || "网页视频",\n      width: source.width || 0,\n      height: source.height || 0,\n      duration: source.duration || 0,\n    });\n  };\n  const visitedStructuredObjects = new WeakSet();\n  let structuredObjectCount = 0;\n  const walkStructuredMedia = (value, path = [], depth = 0, inheritedContext = false) => {\n    if (videos.length >= MAX || structuredObjectCount > 3000 || depth > 10) return;\n    if (typeof value === "string") {\n      const context =\n        inheritedContext ||\n        hasStructuredVideoContext(path) ||\n        STRUCTURED_URL_KEY_RE.test(String(path.at(-1) || ""));\n      if (!context) return;\n      for (const url of extractUrlsFromText(value)) {\n        pushStructuredVideoUrl(url, { hasStructuredVideoContext: context });\n      }\n      return;\n    }\n    if (!value || typeof value !== "object") return;\n    if (visitedStructuredObjects.has(value)) return;\n    visitedStructuredObjects.add(value);\n    structuredObjectCount += 1;\n\n    const keys = Object.keys(value).slice(0, 180);\n    const objectContext =\n      inheritedContext ||\n      hasStructuredVideoContext(path) ||\n      keys.some((key) => STRUCTURED_VIDEO_KEY_RE.test(key));\n    const dimensions = {\n      width: readStructuredNumber(value, ["width", "w", "videoWidth"]),\n      height: readStructuredNumber(value, ["height", "h", "videoHeight"]),\n      duration: readStructuredNumber(value, ["duration", "durationSec", "videoDuration"]),\n    };\n    for (const key of keys) {\n      if (videos.length >= MAX) break;\n      const item = value[key];\n      const nextPath = path.concat(key);\n      const keyContext =\n        objectContext ||\n        STRUCTURED_VIDEO_KEY_RE.test(key) ||\n        STRUCTURED_URL_KEY_RE.test(key);\n      if (typeof item === "string") {\n        if (!keyContext) continue;\n        for (const url of extractUrlsFromText(item)) {\n          pushStructuredVideoUrl(url, {\n            ...dimensions,\n            hasStructuredVideoContext: keyContext,\n          });\n        }\n        continue;\n      }\n      if (item && typeof item === "object") {\n        walkStructuredMedia(item, nextPath, depth + 1, keyContext);\n      }\n    }\n  };\n  const tryParseStructuredJson = (value) => {\n    const text = String(value || "").trim();\n    if (!text) return null;\n    try {\n      return JSON.parse(text);\n    } catch {}\n    try {\n      return JSON.parse(decodeURIComponent(text));\n    } catch {}\n    return null;\n  };\n  const extractJsonValueAt = (text, startIndex) => {\n    let index = Math.max(0, Number(startIndex || 0) || 0);\n    while (index < text.length && /\\s/.test(text[index])) index += 1;\n    const open = text[index];\n    const close = open === "{" ? "}" : open === "[" ? "]" : "";\n    if (!close) return "";\n    let depth = 0;\n    let quote = "";\n    let escaped = false;\n    for (let i = index; i < text.length; i += 1) {\n      const ch = text[i];\n      if (quote) {\n        if (escaped) {\n          escaped = false;\n        } else if (ch === "\\\\") {\n          escaped = true;\n        } else if (ch === quote) {\n          quote = "";\n        }\n        continue;\n      }\n      if (ch === \'"\' || ch === "\'") {\n        quote = ch;\n        continue;\n      }\n      if (ch === open) {\n        depth += 1;\n      } else if (ch === close) {\n        depth -= 1;\n        if (depth === 0) return text.slice(index, i + 1);\n      }\n    }\n    return "";\n  };\n  const scanStructuredScriptText = (value) => {\n    const text = String(value || "").slice(0, 800000);\n    const parsed = tryParseStructuredJson(text);\n    if (parsed) {\n      scanDouyinAwemeDetails(parsed);\n      walkStructuredMedia(parsed, ["script-json"]);\n    }\n    const decodedText = unescapeStructuredUrlText(text);\n    const decoded = decodedText !== text ? tryParseStructuredJson(decodedText) : null;\n    if (decoded) {\n      scanDouyinAwemeDetails(decoded);\n      walkStructuredMedia(decoded, ["script-json-decoded"]);\n    }\n\n    const keyRe =\n      /["\']?(aweme_detail|video_info(?:_v2)?|video|play_addr(?:_h(?:264|265)|_256)?|download_addr|url_list|backup_urls|dash|stream)["\']?\\s*:/gi;\n    let match = null;\n    let scanned = 0;\n    while ((match = keyRe.exec(decodedText)) && scanned < 120 && videos.length < MAX) {\n      scanned += 1;\n      const colonIndex = decodedText.indexOf(":", match.index);\n      const jsonValue = extractJsonValueAt(decodedText, colonIndex + 1);\n      const partial = tryParseStructuredJson(jsonValue);\n      if (partial) {\n        scanDouyinAwemeDetails(partial);\n        walkStructuredMedia(partial, [match[1]]);\n      }\n    }\n  };\n  for (const key of KNOWN_STATE_KEYS) {\n    if (videos.length >= MAX) break;\n    try {\n      const value = window[key];\n      if (typeof value === "string") {\n        const parsed = tryParseStructuredJson(unescapeStructuredUrlText(value));\n        if (parsed) {\n          scanDouyinAwemeDetails(parsed);\n          walkStructuredMedia(parsed, [key]);\n        } else {\n          walkStructuredMedia(value, [key]);\n        }\n      } else if (value && typeof value === "object") {\n        scanDouyinAwemeDetails(value);\n        walkStructuredMedia(value, [key]);\n      }\n    } catch {}\n  }\n  for (const script of Array.from(document.scripts || [])) {\n    if (videos.length >= MAX) break;\n    const type = String(script.type || script.getAttribute?.("type") || "").toLowerCase();\n    const id = String(script.id || "").toLowerCase();\n    const shouldScan =\n      type.includes("json") ||\n      id.includes("data") ||\n      id.includes("state") ||\n      /play_addr|download_addr|url_list|backup_urls|video_info|aweme_detail/i.test(script.textContent || "");\n    if (!shouldScan) continue;\n    scanStructuredScriptText(script.textContent || "");\n  }\n  return { ok: true, videos, douyinDetailApiUrls, pageUrl, pageTitle };\n})()\n'
+  );
+}
+function buildWebPreviewReferenceSnapshotScript() {
+  return (
+    '\n(() => {\n  const normalizeUrl = (value) => {\n    try {\n      const url = new URL(String(value || ""), document.baseURI);\n      if (url.protocol !== "http:" && url.protocol !== "https:") return "";\n      url.username = "";\n      url.password = "";\n      return url.href;\n    } catch {\n      return "";\n    }\n  };\n  const selectedText = String(window.getSelection?.().toString?.() || "").trim();\n  return {\n    ok: true,\n    pageUrl: normalizeUrl(location.href),\n    pageTitle: String(document.title || "").slice(0, 160),\n    selectedText: selectedText.slice(0, ' +
+    WEB_PREVIEW_SELECTED_TEXT_LIMIT +
+    '),\n  };\n})()\n'
+  );
+}
+function toNodeId(_0x589926) {
+  return String(_0x589926 || '').trim();
+}
+function toTabId(_0xd65d44) {
+  return String(_0xd65d44 || 'default').trim() || 'default';
+}
+function normalizeExtractedImageDimension(_0x2b270c) {
+  return Math.max(0, Math.round(Number(_0x2b270c || 0) || 0));
+}
+function hasExtractableImageSize(_0x35463f, _0x26eb34) {
+  const _0x2be2d7 = normalizeExtractedImageDimension(_0x35463f),
+    _0x56f8c4 = normalizeExtractedImageDimension(_0x26eb34);
+  if (!_0x2be2d7 || !_0x56f8c4) return true;
+  return (
+    _0x2be2d7 >= WEB_PREVIEW_EXTRACT_MIN_IMAGE_WIDTH &&
+    _0x56f8c4 >= WEB_PREVIEW_EXTRACT_MIN_IMAGE_HEIGHT &&
+    _0x2be2d7 * _0x56f8c4 >= WEB_PREVIEW_EXTRACT_MIN_IMAGE_AREA
+  );
+}
+function filterExtractedImageCandidates(_0x7dd748 = []) {
+  if (!Array.isArray(_0x7dd748)) return [];
+  return _0x7dd748.filter((_0x342fb2) => hasExtractableImageSize(_0x342fb2?.width, _0x342fb2?.height));
+}
+function normalizeExtractedMediaUrl(_0x11a4b7) {
+  const _0x59f658 = String(_0x11a4b7 || '').trim();
+  if (!_0x59f658) return '';
+  try {
+    const _0x83af7e = new URL(_0x59f658);
+    if (_0x83af7e.protocol !== 'http:' && _0x83af7e.protocol !== 'https:') return '';
+    return ((_0x83af7e.username = ''), (_0x83af7e.password = ''), _0x83af7e.href);
+  } catch {
+    return '';
+  }
+}
+function isDirectVideoMediaUrl(_0xe62d4d) {
+  const _0xfe26d = normalizeExtractedMediaUrl(_0xe62d4d);
+  if (!_0xfe26d) return false;
+  try {
+    const _0x356677 = new URL(_0xfe26d).pathname;
+    return (
+      WEB_PREVIEW_DIRECT_VIDEO_EXTENSION_RE.test(_0x356677) &&
+      !WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE.test(_0x356677)
+    );
+  } catch {
+    return false;
+  }
+}
+function filterExtractedVideoCandidates(_0x34b004 = []) {
+  if (!Array.isArray(_0x34b004)) return [];
+  const _0x10fc1b = new Set(),
+    _0x331d8d = [];
+  for (const _0x509da3 of _0x34b004) {
+    const _0x28d61f = normalizeExtractedMediaUrl(_0x509da3?.url);
+    if (!_0x28d61f || _0x10fc1b.has(_0x28d61f)) continue;
+    let _0x2a060a = '';
+    try {
+      _0x2a060a = new URL(_0x28d61f).pathname;
+    } catch {}
+    if (WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE.test(_0x2a060a)) continue;
+    const _0x305566 = String(_0x509da3?.mimeType || '')
+        .trim()
+        .toLowerCase(),
+      _0xb69fe0 = String(_0x509da3?.sourceType || 'media')
+        .trim()
+        .toLowerCase(),
+      _0xfb0a3 =
+        _0x305566.startsWith('video/') ||
+        isDirectVideoMediaUrl(_0x28d61f) ||
+        _0xb69fe0 === 'video' ||
+        _0xb69fe0 === 'video-source' ||
+        _0xb69fe0 === 'source' ||
+        _0xb69fe0 === 'video-resource' ||
+        _0xb69fe0 === 'douyin-detail';
+    if (!_0xfb0a3) continue;
+    (_0x10fc1b.add(_0x28d61f),
+      _0x331d8d.push({
+        kind: 'video',
+        url: _0x28d61f,
+        title: String(_0x509da3?.title || _0x509da3?.pageTitle || '网页视频')
+          .trim()
+          .slice(0, 160),
+        pageUrl: normalizeExtractedMediaUrl(_0x509da3?.pageUrl),
+        pageTitle: String(_0x509da3?.pageTitle || '')
+          .trim()
+          .slice(0, 160),
+        nodeId: String(_0x509da3?.nodeId || '').trim(),
+        tabId: String(_0x509da3?.tabId || '').trim(),
+        width: Math.max(0, Math.round(Number(_0x509da3?.width || 0) || 0)),
+        height: Math.max(0, Math.round(Number(_0x509da3?.height || 0) || 0)),
+        duration: Math.max(0, Number(_0x509da3?.duration || 0) || 0),
+        sourceType: _0xb69fe0.slice(0, 40),
+        mimeType: _0x305566,
+      }));
+    if (_0x331d8d.length >= WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT) break;
+  }
+  return _0x331d8d;
+}
+function mergeExtractedImageCandidates(..._0x24522f) {
+  const _0x1dbec3 = new Set(),
+    _0x14383d = [];
+  for (const _0x36f848 of _0x24522f) {
+    for (const _0x268507 of filterExtractedImageCandidates(_0x36f848)) {
+      const _0x510d3f = normalizeExtractedMediaUrl(_0x268507?.url);
+      if (!_0x510d3f || _0x1dbec3.has(_0x510d3f)) continue;
+      (_0x1dbec3.add(_0x510d3f), _0x14383d.push({ ..._0x268507, url: _0x510d3f }));
+      if (_0x14383d.length >= WEB_PREVIEW_IMAGE_EXTRACTION_LIMIT) return _0x14383d;
+    }
+  }
+  return _0x14383d;
+}
+function mergeExtractedVideoCandidates(..._0x27b371) {
+  const _0x1cbbfe = new Set(),
+    _0x69b750 = [];
+  for (const _0x11285b of _0x27b371) {
+    for (const _0xe7bfe8 of filterExtractedVideoCandidates(_0x11285b)) {
+      if (!_0xe7bfe8?.url || _0x1cbbfe.has(_0xe7bfe8.url)) continue;
+      (_0x1cbbfe.add(_0xe7bfe8.url), _0x69b750.push(_0xe7bfe8));
+      if (_0x69b750.length >= WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT) return _0x69b750;
+    }
+  }
+  return _0x69b750;
+}
+function toEntryKey(_0x3cd291, _0x5a0876 = 'default') {
+  return toNodeId(_0x3cd291) + '\n' + toTabId(_0x5a0876);
+}
+function toBrowserProfileId(_0x5540b2) {
+  const _0x3be42d = String(_0x5540b2 || '')
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 80);
+  return _0x3be42d || DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID;
+}
+function toPersistentPartitionId(_0x1293f0) {
+  return WEB_PREVIEW_PARTITION_PREFIX + '-' + toBrowserProfileId(_0x1293f0);
+}
+function isBlankPopupUrl(_0x4f06d7) {
+  const _0x2b3b7b = String(_0x4f06d7 || '')
+    .trim()
+    .toLowerCase();
+  return (
+    !_0x2b3b7b ||
+    _0x2b3b7b === 'about:blank' ||
+    _0x2b3b7b.startsWith('about:blank#') ||
+    _0x2b3b7b.startsWith('about:blank?')
+  );
+}
+function isGoogleAccountsUrl(_0x56d664) {
+  const _0x114dac = normalizeWebPreviewUrl(_0x56d664);
+  if (!_0x114dac) return false;
+  try {
+    const _0x2e1aac = new URL(_0x114dac).hostname.toLowerCase();
+    return _0x2e1aac === 'accounts.google.com' || _0x2e1aac.startsWith('accounts.google.');
+  } catch {
+    return false;
+  }
+}
+function shouldUseNativeAuthPopup(_0x10430b) {
+  return isBlankPopupUrl(_0x10430b) || isGoogleAccountsUrl(_0x10430b);
+}
+function normalizeBounds(_0x2540fe = {}) {
+  const _0x5972a1 = Math.round(Number(_0x2540fe.x)),
+    _0x404407 = Math.round(Number(_0x2540fe.y)),
+    _0x262634 = Math.round(Number(_0x2540fe.width)),
+    _0x3c2364 = Math.round(Number(_0x2540fe.height));
+  if (
+    !Number.isFinite(_0x5972a1) ||
+    !Number.isFinite(_0x404407) ||
+    !Number.isFinite(_0x262634) ||
+    !Number.isFinite(_0x3c2364) ||
+    _0x262634 < MIN_VIEW_SIZE ||
+    _0x3c2364 < MIN_VIEW_SIZE
+  )
+    return null;
+  return { x: _0x5972a1, y: _0x404407, width: _0x262634, height: _0x3c2364 };
+}
+function normalizeZoomFactor(_0xe135b6) {
+  const _0x1fa5f1 = Number(_0xe135b6);
+  if (!Number.isFinite(_0x1fa5f1) || _0x1fa5f1 <= 0) return 1;
+  return Math.min(5, Math.max(0.25, _0x1fa5f1));
+}
+function boundsEqual(_0x4e7d26, _0x56ee0b) {
+  return (
+    _0x4e7d26?.x === _0x56ee0b?.x &&
+    _0x4e7d26?.y === _0x56ee0b?.y &&
+    _0x4e7d26?.width === _0x56ee0b?.width &&
+    _0x4e7d26?.height === _0x56ee0b?.height
+  );
+}
+function zoomFactorEqual(_0x376555, _0x218eb0) {
+  return Math.abs(Number(_0x376555 || 1) - Number(_0x218eb0 || 1)) < 0.001;
+}
+function getViewsPayload(_0x10e29c) {
+  return Array.isArray(_0x10e29c?.views) ? _0x10e29c.views : [];
+}
+function getNavigationState(_0x53edee) {
+  return { canGoBack: Boolean(_0x53edee?.canGoBack?.()), canGoForward: Boolean(_0x53edee?.canGoForward?.()) };
+}
+function createInputBridgeToken() {
+  return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+}
+function getConsoleMessageFromArgs(_0x2cd3c6 = []) {
+  for (const _0x557bbc of _0x2cd3c6) {
+    if (typeof _0x557bbc === 'string') return _0x557bbc;
+    if (_0x557bbc && typeof _0x557bbc.message === 'string') return _0x557bbc.message;
+  }
+  return '';
+}
+function parseWebPreviewInputBridgeMessage(_0x2a9b1b = '') {
+  const _0x372f5e = String(_0x2a9b1b || '');
+  if (!_0x372f5e.startsWith(WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX)) return null;
+  try {
+    const _0x1d34ab = JSON.parse(_0x372f5e.slice(WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX.length));
+    if (_0x1d34ab?.type !== 'pan-start-preview' && _0x1d34ab?.type !== 'image-context-menu') return null;
+    return _0x1d34ab;
+  } catch {
+    return null;
+  }
+}
+export function createWebPreviewViewManager({
+  WebContentsView: _0x355d44,
+  BrowserWindow: _0x34553a,
+  getMainWindow: _0x56e63b,
+  openExternalUrl: _0x2351f8,
+  createContextMenu: _0x215916,
+  logDiagnosticEvent: _0x58bf66,
+  resolveDouyinMedia: resolveDouyinMedia = resolveDouyinCurrentPageMedia,
+  setTimeoutFn: setTimeoutFn = globalThis.setTimeout?.bind(globalThis),
+  clearTimeoutFn: clearTimeoutFn = globalThis.clearTimeout?.bind(globalThis),
+  readySnapshotDelayMs: readySnapshotDelayMs = READY_SNAPSHOT_IDLE_DELAY_MS,
+} = {}) {
+  const _0x1c905a = new Map(),
+    _0x12e803 = new Set(),
+    _0x3606bd = new Set();
+  let _0x5bfabb = 0;
+  function _0x5dc532() {
+    const _0x5b3516 = typeof _0x56e63b === 'function' ? _0x56e63b() : null;
+    return _0x5b3516 && !_0x5b3516.isDestroyed?.() ? _0x5b3516 : null;
+  }
+  function _0x1d234c(_0x2c25d5, _0x2c1132, _0x107160 = '') {
+    const _0x3cab9c = _0x5dc532();
+    if (!_0x3cab9c?.webContents || _0x3cab9c.webContents.isDestroyed?.()) return;
+    _0x3cab9c.webContents.send('webPreview:event', {
+      nodeId: _0x2c25d5,
+      ...(_0x107160 ? { tabId: _0x107160 } : {}),
+      ..._0x2c1132,
+    });
+  }
+  function _0x2effdd(_0x4f297c, _0x4fadda, _0x19249a = '') {
+    _0x1d234c(
+      _0x4f297c,
+      { type: 'blocked', url: String(_0x4fadda || ''), message: '浏览器节点仅允许打开 http/https 链接' },
+      _0x19249a,
+    );
+  }
+  function _0x2086ef(_0x21541e, _0xb4d20d, _0x4408e5 = '') {
+    _0x1d234c(_0x21541e, { type: 'navigation-state', ...getNavigationState(_0xb4d20d) }, _0x4408e5);
+  }
+  function _0x2c7d3b(_0x5f2b12) {
+    let _0x12ece = '';
+    do {
+      ((_0x5bfabb += 1), (_0x12ece = 'popup-' + Date.now() + '-' + _0x5bfabb));
+    } while (_0x1c905a.has(toEntryKey(_0x5f2b12, _0x12ece)));
+    return _0x12ece;
+  }
+  function _0x498445(_0x2fe80b) {
+    return { nodeIntegration: false, contextIsolation: true, sandbox: true, partition: _0x2fe80b };
+  }
+  function _0x4e4462(_0x942a0 = []) {
+    if (!Array.isArray(_0x942a0)) return '';
+    for (const _0x5d2284 of _0x942a0) {
+      const _0x32b075 = normalizeWebPreviewFaviconUrl(_0x5d2284);
+      if (_0x32b075) return _0x32b075;
+    }
+    return '';
+  }
+  function _0x3ffd65(_0x51549d) {
+    if (!_0x51549d?.readySnapshotTimer) return;
+    (clearTimeoutFn?.(_0x51549d.readySnapshotTimer), (_0x51549d.readySnapshotTimer = null));
+  }
+  function _0x43c9ed(
+    _0x2cf322,
+    _0x4dd7a2,
+    _0x1b1a02,
+    _0x29aa5e,
+    _0xca8841 = '',
+    _0x5e06ba = _0x4dd7a2?.snapshotEpoch || 0,
+  ) {
+    const _0x509720 = _0x4dd7a2?.view?.webContents;
+    if (!_0x509720 || _0x509720.isDestroyed?.()) return false;
+    if (typeof _0x509720.capturePage !== 'function') return false;
+    const _0x68023d = _0xca8841 || _0x4dd7a2?.url || _0x4dd7a2?.requestedUrl || '';
+    let _0x41ff69 = null;
+    try {
+      _0x41ff69 = _0x509720.capturePage();
+    } catch (_0x15689e) {
+      return (
+        _0x58bf66?.({
+          type: 'web_preview.snapshot_failed',
+          level: 'warn',
+          source: 'main',
+          message: 'Web preview snapshot capture failed',
+          error: _0x15689e,
+          context: { nodeId: _0x2cf322, freezeToken: _0x1b1a02 },
+        }),
+        false
+      );
+    }
+    return (
+      Promise.resolve(_0x41ff69)
+        .then((_0xe625f4) => {
+          const _0xa4505c = _0xe625f4?.toDataURL?.();
+          if (!_0xa4505c) return;
+          if (_0x4dd7a2 && _0x4dd7a2.snapshotEpoch !== _0x5e06ba) return;
+          if (_0x68023d && _0x4dd7a2?.requestedUrl && _0x4dd7a2.requestedUrl !== _0x68023d) return;
+          ((_0x4dd7a2.hasSnapshot = true),
+            (_0x4dd7a2.snapshotUrl = _0x68023d),
+            (_0x4dd7a2.snapshotFreezeToken = String(_0x1b1a02 || '')),
+            _0x1d234c(
+              _0x2cf322,
+              {
+                type: 'snapshot',
+                dataUrl: _0xa4505c,
+                freezeToken: _0x1b1a02,
+                width: _0x4dd7a2.bounds?.width || 0,
+                height: _0x4dd7a2.bounds?.height || 0,
+              },
+              _0x4dd7a2.tabId,
+            ));
+        })
+        .catch((_0xcd3b2) => {
+          _0x58bf66?.({
+            type: 'web_preview.snapshot_failed',
+            level: 'warn',
+            source: 'main',
+            message: 'Web preview snapshot capture failed',
+            error: _0xcd3b2,
+            context: { nodeId: _0x2cf322, freezeToken: _0x1b1a02 },
+          });
+        })
+        .finally(() => {
+          _0x29aa5e?.();
+        }),
+      true
+    );
+  }
+  function _0x4bacd8(_0x25a671, _0x4a4b52, _0x9ac552 = _0x4a4b52?.snapshotEpoch || 0) {
+    const _0x3bf7de = _0x4a4b52?.url || _0x4a4b52?.requestedUrl || '';
+    if (!_0x4a4b52?.bounds || !_0x3bf7de || _0x4a4b52.readySnapshotPending) return false;
+    if (_0x4a4b52.hasSnapshot && _0x4a4b52.snapshotUrl === _0x3bf7de) return false;
+    _0x4a4b52.readySnapshotPending = true;
+    const _0x41c121 = _0x43c9ed(
+      _0x25a671,
+      _0x4a4b52,
+      'ready',
+      () => {
+        _0x4a4b52.readySnapshotPending = false;
+      },
+      _0x3bf7de,
+      _0x9ac552,
+    );
+    if (!_0x41c121) _0x4a4b52.readySnapshotPending = false;
+    return _0x41c121;
+  }
+  function _0x48366a(_0x217c4c, _0x2ccba1) {
+    const _0x371759 = _0x2ccba1?.url || _0x2ccba1?.requestedUrl || '';
+    if (
+      !_0x2ccba1?.loaded ||
+      !_0x2ccba1.bounds ||
+      !_0x371759 ||
+      _0x2ccba1.visible !== true ||
+      _0x2ccba1.freezeToken ||
+      _0x2ccba1.readySnapshotPending ||
+      _0x2ccba1.readySnapshotTimer
+    )
+      return false;
+    if (_0x2ccba1.hasSnapshot && _0x2ccba1.snapshotUrl === _0x371759) return false;
+    if (typeof setTimeoutFn !== 'function') return _0x4bacd8(_0x217c4c, _0x2ccba1);
+    const _0x19b731 = _0x2ccba1.snapshotEpoch,
+      _0x4df026 = Math.max(0, Number(readySnapshotDelayMs) || 0);
+    return (
+      (_0x2ccba1.readySnapshotTimer = setTimeoutFn(() => {
+        _0x2ccba1.readySnapshotTimer = null;
+        const _0x201b1a = _0x1c905a.get(toEntryKey(_0x217c4c, _0x2ccba1.tabId)),
+          _0x26fa29 = _0x201b1a?.url || _0x201b1a?.requestedUrl || '';
+        if (
+          _0x201b1a !== _0x2ccba1 ||
+          _0x201b1a.snapshotEpoch !== _0x19b731 ||
+          _0x26fa29 !== _0x371759 ||
+          _0x201b1a.loaded !== true ||
+          _0x201b1a.visible !== true
+        )
+          return;
+        if (_0x201b1a.freezeToken) {
+          _0x48366a(_0x217c4c, _0x201b1a);
+          return;
+        }
+        _0x4bacd8(_0x217c4c, _0x201b1a, _0x19b731);
+      }, _0x4df026)),
+      true
+    );
+  }
+  function _0x1c562e(_0x2e0d0d, _0x6782a4, _0x126b1c = '', _0x260861 = '') {
+    if (typeof _0x6782a4?.executeJavaScript !== 'function') return;
+    _0x6782a4
+      .executeJavaScript(
+        buildWebPreviewDragBridgeScript({ nodeId: _0x2e0d0d, tabId: _0x126b1c, inputBridgeToken: _0x260861 }),
+        true,
+      )
+      .catch((_0x4e81f5) => {
+        _0x58bf66?.({
+          type: 'web_preview.drag_bridge_failed',
+          level: 'warn',
+          source: 'main',
+          message: 'Web preview drag bridge injection failed',
+          error: _0x4e81f5,
+          context: { nodeId: _0x2e0d0d, tabId: _0x126b1c },
+        });
+      });
+  }
+  function _0x11dc9a(
+    _0x10834d,
+    _0x38851e,
+    _0x2b3ef5,
+    _0x590174 = {},
+    _0x9a6a75 = WEB_PREVIEW_TEXT_ACTION_PROMPT,
+  ) {
+    const _0x4cd87a = String(_0x590174?.selectionText || '').trim();
+    if (!_0x4cd87a) return false;
+    const _0x44236b = _0x1c905a.get(toEntryKey(_0x10834d, _0x38851e)),
+      _0x207e51 =
+        normalizeWebPreviewUrl(_0x590174?.pageURL) ||
+        normalizeWebPreviewUrl(_0x44236b?.url) ||
+        normalizeWebPreviewUrl(_0x44236b?.requestedUrl) ||
+        '',
+      _0x1ad6e0 = String(_0x2b3ef5?.getTitle?.() || '').trim();
+    return (
+      _0x1d234c(
+        _0x10834d,
+        {
+          type: _0x9a6a75,
+          text: _0x4cd87a.slice(0, WEB_PREVIEW_SELECTED_TEXT_LIMIT),
+          pageUrl: _0x207e51,
+          webSourceTitle: _0x1ad6e0.slice(0, 160),
+          contextX: Math.max(0, Math.round(Number(_0x590174?.x || 0) || 0)),
+          contextY: Math.max(0, Math.round(Number(_0x590174?.y || 0) || 0)),
+        },
+        _0x38851e,
+      ),
+      true
+    );
+  }
+  function _0x3b0073(_0x5b92f3, _0x4a95d3 = {}) {
+    const _0x341a95 = String(_0x4a95d3?.selectionText || '').trim();
+    if (!_0x341a95) return false;
+    try {
+      if (typeof _0x5b92f3?.copy === 'function') return (_0x5b92f3.copy(), true);
+    } catch {}
+    return false;
+  }
+  function _0x22062d(_0x4efb15) {
+    return Math.max(0, Math.round(Number(_0x4efb15 || 0) || 0));
+  }
+  function _0x1590b6(_0x82a6ad = {}, _0xbada99 = null) {
+    const _0x251f1b =
+      normalizeWebPreviewUrl(_0x82a6ad?.pageUrl) ||
+      normalizeWebPreviewUrl(_0x82a6ad?.sourceUrl) ||
+      normalizeWebPreviewUrl(_0xbada99?.url) ||
+      normalizeWebPreviewUrl(_0xbada99?.requestedUrl) ||
+      '';
+    return {
+      mediaType: 'image',
+      srcURL: normalizeWebPreviewUrl(_0x82a6ad?.url) || '',
+      titleText: String(_0x82a6ad?.title || _0x82a6ad?.alt || '')
+        .trim()
+        .slice(0, 160),
+      pageURL: _0x251f1b,
+      frameURL: _0x251f1b,
+      x: _0x22062d(_0x82a6ad?.contextX ?? _0x82a6ad?.clientX),
+      y: _0x22062d(_0x82a6ad?.contextY ?? _0x82a6ad?.clientY),
+    };
+  }
+  function _0x14012e(_0x5dc544, _0x277b8b = {}) {
+    if (!_0x5dc544) return;
+    ((_0x5dc544.lastBridgeImageContextMenuAt = Date.now()),
+      (_0x5dc544.lastBridgeImageContextMenuX = _0x22062d(_0x277b8b?.x)),
+      (_0x5dc544.lastBridgeImageContextMenuY = _0x22062d(_0x277b8b?.y)));
+  }
+  function _0xc484e6(_0x18be15, _0x5592ba = {}) {
+    const _0x272c81 = Number(_0x18be15?.lastBridgeImageContextMenuAt || 0);
+    if (!_0x272c81 || Date.now() - _0x272c81 > WEB_PREVIEW_CONTEXT_MENU_BRIDGE_DEDUPE_MS) return false;
+    const _0x5c2cbf = _0x22062d(_0x5592ba?.x),
+      _0x2e38a0 = _0x22062d(_0x5592ba?.y);
+    return (
+      Math.abs(_0x5c2cbf - _0x22062d(_0x18be15?.lastBridgeImageContextMenuX)) <= 2 &&
+      Math.abs(_0x2e38a0 - _0x22062d(_0x18be15?.lastBridgeImageContextMenuY)) <= 2
+    );
+  }
+  function _0x166451(_0xdce18d, _0x2b4599, _0x5767c6, _0x4f046c = {}, _0x496151 = null) {
+    const _0xe50aec = String(_0x4f046c?.mediaType || '').toLowerCase() === 'image' || Boolean(_0x496151?.url);
+    if (!_0xe50aec) return null;
+    const _0x1a34cf = normalizeWebPreviewUrl(_0x496151?.url || _0x4f046c?.srcURL);
+    if (!_0x1a34cf) return null;
+    const _0x1d464e = _0x1c905a.get(toEntryKey(_0xdce18d, _0x2b4599)),
+      _0x42dcc4 =
+        normalizeWebPreviewUrl(_0x496151?.pageUrl) ||
+        normalizeWebPreviewUrl(_0x4f046c?.pageURL) ||
+        normalizeWebPreviewUrl(_0x4f046c?.frameURL) ||
+        normalizeWebPreviewUrl(_0x1d464e?.url) ||
+        normalizeWebPreviewUrl(_0x1d464e?.requestedUrl) ||
+        '',
+      _0x271998 = String(_0x496151?.pageTitle || _0x5767c6?.getTitle?.() || '')
+        .trim()
+        .slice(0, 160),
+      _0x461b2b = String(
+        _0x496151?.title || _0x496151?.alt || _0x4f046c?.titleText || _0x271998 || '网页图片',
+      )
+        .trim()
+        .slice(0, 160),
+      _0x2e1e3b = {
+        kind: 'image',
+        url: _0x1a34cf,
+        title: _0x461b2b,
+        pageUrl: _0x42dcc4,
+        pageTitle: _0x271998,
+        nodeId: _0xdce18d,
+        tabId: _0x2b4599,
+        contextX: Math.max(0, Math.round(Number(_0x4f046c?.x || 0) || 0)),
+        contextY: Math.max(0, Math.round(Number(_0x4f046c?.y || 0) || 0)),
+      },
+      _0xc93ef5 = Math.max(0, Math.round(Number(_0x496151?.width || 0) || 0)),
+      _0x428141 = Math.max(0, Math.round(Number(_0x496151?.height || 0) || 0));
+    if (_0xc93ef5) _0x2e1e3b.width = _0xc93ef5;
+    if (_0x428141) _0x2e1e3b.height = _0x428141;
+    return _0x2e1e3b;
+  }
+  async function _0x1057ab(_0xcace14, _0x2ac15a, _0x5c9c84, _0x15d0c0 = {}) {
+    if (typeof _0x5c9c84?.executeJavaScript !== 'function') return null;
+    try {
+      const _0x3e231c = await _0x5c9c84.executeJavaScript(
+          buildWebPreviewContextImageProbeScript({
+            nodeId: _0xcace14,
+            tabId: _0x2ac15a,
+            x: _0x15d0c0?.x,
+            y: _0x15d0c0?.y,
+          }),
+          true,
+        ),
+        _0x44c938 = _0x3e231c?.image && typeof _0x3e231c.image === 'object' ? _0x3e231c.image : _0x3e231c;
+      return _0x166451(_0xcace14, _0x2ac15a, _0x5c9c84, _0x15d0c0, _0x44c938);
+    } catch (_0x395512) {
+      return (
+        _0x58bf66?.({
+          type: 'web_preview.context_image_probe_failed',
+          level: 'warn',
+          source: 'main',
+          message: 'Web preview context image probe failed',
+          error: _0x395512,
+          context: { nodeId: _0xcace14, tabId: _0x2ac15a },
+        }),
+        null
+      );
+    }
+  }
+  async function _0x1f568d(_0xff0eb9, _0x28b325, _0x127f35, _0x3f5954 = {}) {
+    if (String(_0x3f5954?.mediaType || '').toLowerCase() !== 'image') return null;
+    const _0xff25 = await _0x1057ab(_0xff0eb9, _0x28b325, _0x127f35, _0x3f5954);
+    return _0xff25 || _0x166451(_0xff0eb9, _0x28b325, _0x127f35, _0x3f5954);
+  }
+  function _0x3d099e(_0x143ee5, _0xd2324a, _0x1b8d64, _0x875e1 = 'send-image-to-canvas') {
+    if (!_0x1b8d64) return false;
+    return (_0x1d234c(_0x143ee5, { ..._0x1b8d64, type: _0x875e1 }, _0xd2324a), true);
+  }
+  async function _0x5ad7e3(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e = {}) {
+    if (typeof _0x215916 !== 'function') return;
+    const _0x31890 = [],
+      _0x453203 = await _0x1f568d(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e);
+    _0x453203 &&
+      _0x31890.push(
+        {
+          label: '加入到画布',
+          click: () => _0x3d099e(_0x5f445f, _0x282a4c, _0x453203, 'send-image-to-canvas'),
+        },
+        {
+          label: '反推提示词-创建',
+          click: () => _0x3d099e(_0x5f445f, _0x282a4c, _0x453203, 'reverse-image-prompt'),
+        },
+        {
+          label: '反推提示词-生成',
+          click: () => _0x3d099e(_0x5f445f, _0x282a4c, _0x453203, 'reverse-image-prompt-generate'),
+        },
+      );
+    const _0x1e1603 = String(_0x55562e?.selectionText || '').trim();
+    if (_0x1e1603) {
+      if (_0x31890.length) _0x31890.push({ type: 'separator' });
+      _0x31890.push(
+        { label: '复制文本', click: () => _0x3b0073(_0x1a6073, _0x55562e) },
+        {
+          label: '发送到文本节点',
+          submenu: [
+            {
+              label: '源节点',
+              click: () =>
+                _0x11dc9a(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e, WEB_PREVIEW_TEXT_ACTION_SOURCE),
+            },
+            {
+              label: '生成文本',
+              click: () =>
+                _0x11dc9a(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e, WEB_PREVIEW_TEXT_ACTION_PROMPT),
+            },
+          ],
+        },
+        {
+          label: '发送到图像节点',
+          submenu: [
+            {
+              label: '创建',
+              click: () =>
+                _0x11dc9a(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e, WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT),
+            },
+            {
+              label: '生成',
+              click: () =>
+                _0x11dc9a(
+                  _0x5f445f,
+                  _0x282a4c,
+                  _0x1a6073,
+                  _0x55562e,
+                  WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT_GENERATE,
+                ),
+            },
+          ],
+        },
+        {
+          label: '发送到视频节点',
+          submenu: [
+            {
+              label: '创建',
+              click: () =>
+                _0x11dc9a(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e, WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT),
+            },
+            {
+              label: '生成',
+              click: () =>
+                _0x11dc9a(
+                  _0x5f445f,
+                  _0x282a4c,
+                  _0x1a6073,
+                  _0x55562e,
+                  WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT_GENERATE,
+                ),
+            },
+          ],
+        },
+      );
+    }
+    if (!_0x31890.length) return;
+    const _0x27e664 = _0x215916(_0x31890);
+    _0x27e664?.popup?.({ window: _0x5dc532() });
+  }
+  function _0x3d29e9(_0x290681, _0x5898e9, _0x294b26, _0x79c90) {
+    if (!_0x294b26?.isPopup || _0x294b26.popupOpened || !_0x79c90) return false;
+    return (
+      (_0x294b26.popupOpened = true),
+      (_0x294b26.pendingPopup = false),
+      (_0x294b26.url = _0x79c90),
+      (_0x294b26.requestedUrl = _0x79c90),
+      _0x1d234c(
+        _0x290681,
+        { type: 'open-popup', url: _0x79c90, popupTabId: _0x5898e9 },
+        _0x294b26.openerTabId || '',
+      ),
+      true
+    );
+  }
+  function _0x3a3360(_0x3cc126, _0x5f17c2, _0x42c41c) {
+    if (!_0x42c41c?.isPopup || _0x42c41c.popupOpened) return false;
+    return (
+      (_0x42c41c.popupOpened = true),
+      (_0x42c41c.pendingPopup = true),
+      (_0x42c41c.url = ''),
+      (_0x42c41c.requestedUrl = ''),
+      _0x1d234c(
+        _0x3cc126,
+        { type: 'open-popup', url: '', popupTabId: _0x5f17c2, pendingPopup: true },
+        _0x42c41c.openerTabId || '',
+      ),
+      true
+    );
+  }
+  function _0xa8aae3(_0x3ab0b3) {
+    const _0xbc3f15 = _0x5dc532(),
+      _0x32f241 = {
+        parent: _0xbc3f15 || undefined,
+        modal: false,
+        show: true,
+        width: WEB_PREVIEW_AUTH_POPUP_WIDTH,
+        height: WEB_PREVIEW_AUTH_POPUP_HEIGHT,
+        minWidth: WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH,
+        minHeight: WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT,
+        title: 'Login',
+        autoHideMenuBar: true,
+        webPreferences: _0x498445(_0x3ab0b3),
+      },
+      _0x3bf8b3 = _0xbc3f15?.getBounds?.();
+    if (
+      _0x3bf8b3 &&
+      Number.isFinite(_0x3bf8b3.x) &&
+      Number.isFinite(_0x3bf8b3.y) &&
+      Number.isFinite(_0x3bf8b3.width) &&
+      Number.isFinite(_0x3bf8b3.height) &&
+      _0x3bf8b3.width > WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH &&
+      _0x3bf8b3.height > WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT
+    ) {
+      const _0x5178d0 = Math.min(
+          WEB_PREVIEW_AUTH_POPUP_WIDTH,
+          Math.max(WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH, _0x3bf8b3.width - 48),
+        ),
+        _0x39cb6d = Math.min(
+          WEB_PREVIEW_AUTH_POPUP_HEIGHT,
+          Math.max(WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT, _0x3bf8b3.height - 48),
+        );
+      ((_0x32f241.width = _0x5178d0),
+        (_0x32f241.height = _0x39cb6d),
+        (_0x32f241.x = Math.round(_0x3bf8b3.x + (_0x3bf8b3.width - _0x5178d0) / 2)),
+        (_0x32f241.y = Math.round(_0x3bf8b3.y + (_0x3bf8b3.height - _0x39cb6d) / 2)));
+    }
+    return _0x32f241;
+  }
+  function _0x25b490(_0xd39145 = () => true) {
+    for (const _0x3859d2 of [..._0x3606bd]) {
+      if (_0xd39145(_0x3859d2)) _0x3606bd.delete(_0x3859d2);
+    }
+    for (const _0x5510ca of [..._0x12e803]) {
+      if (!_0xd39145(_0x5510ca)) continue;
+      _0x12e803.delete(_0x5510ca);
+      try {
+        _0x5510ca.popupWindow?.isDestroyed?.() !== true && _0x5510ca.popupWindow?.close?.();
+      } catch {}
+    }
+  }
+  function _0x55abeb() {
+    const _0x4194e7 = Date.now();
+    for (const _0x24036d of [..._0x3606bd]) {
+      if (_0x24036d.expiresAt <= _0x4194e7) _0x3606bd.delete(_0x24036d);
+    }
+  }
+  function _0x26304f({ nodeId: _0x22d63f, tabId: _0x3c473a, partition: _0x48ad32 }) {
+    _0x55abeb();
+    const _0xbb37d4 = {
+      nodeId: _0x22d63f,
+      tabId: _0x3c473a,
+      partition: _0x48ad32,
+      expiresAt: Date.now() + WEB_PREVIEW_AUTH_POPUP_REQUEST_TTL_MS,
+    };
+    return (_0x3606bd.add(_0xbb37d4), _0xbb37d4);
+  }
+  function _0x5065da({ nodeId: _0x3344ab, tabId: _0x8c8766, url: _0x2e8539 }) {
+    _0x55abeb();
+    let _0x6d1537 = null;
+    for (const _0x43c0a3 of _0x3606bd) {
+      if (_0x43c0a3.nodeId !== _0x3344ab || _0x43c0a3.tabId !== _0x8c8766) continue;
+      _0x6d1537 = _0x43c0a3;
+      if (shouldUseNativeAuthPopup(_0x2e8539)) break;
+    }
+    if (_0x6d1537) _0x3606bd.delete(_0x6d1537);
+    return _0x6d1537;
+  }
+  function _0x162ea0({ nodeId: _0x52ba67, tabId: _0x24333d, partition: _0x2e0d2a, webContents: _0x22cc2d }) {
+    _0x22cc2d.setWindowOpenHandler?.(({ url: _0x4c3701 } = {}) => {
+      const _0x1d5c6c = normalizeWebPreviewUrl(_0x4c3701);
+      if (!_0x1d5c6c && !isBlankPopupUrl(_0x4c3701))
+        return (_0x2effdd(_0x52ba67, _0x4c3701, _0x24333d), { action: 'deny' });
+      return {
+        action: 'allow',
+        outlivesOpener: true,
+        overrideBrowserWindowOptions: { webPreferences: _0x498445(_0x2e0d2a) },
+      };
+    });
+    const _0x1bcb5f = (_0x5b4996, _0x408dc3) => {
+        if (isBlankPopupUrl(_0x408dc3) || normalizeWebPreviewUrl(_0x408dc3)) return;
+        (_0x5b4996?.preventDefault?.(), _0x2effdd(_0x52ba67, _0x408dc3, _0x24333d));
+      },
+      _0x4df50d = (_0x1829a7, _0x2a068c, ..._0x16c16b) => {
+        const _0x344b53 = _0x16c16b.some((_0x2d783f) => _0x2d783f === true);
+        if (!_0x344b53) return;
+        _0x1bcb5f(_0x1829a7, _0x2a068c);
+      };
+    (_0x22cc2d.on?.('will-navigate', _0x1bcb5f),
+      _0x22cc2d.on?.('will-frame-navigate', _0x4df50d),
+      _0x22cc2d.on?.('did-fail-load', (_0xdb9ea6, _0x1ed6df, _0x4e6354, _0x549ffb) => {
+        _0x1d234c(
+          _0x52ba67,
+          {
+            type: 'failed',
+            url: String(_0x549ffb || ''),
+            errorCode: _0x1ed6df,
+            message: String(_0x4e6354 || 'Login popup load failed'),
+          },
+          _0x24333d,
+        );
+      }));
+    const _0x5622f9 = _0x22cc2d.session;
+    (_0x5622f9?.setPermissionRequestHandler?.((_0x3f1e70, _0x65bc67, _0x47e2b3) => {
+      _0x47e2b3(false);
+    }),
+      _0x5622f9?.on?.('will-download', (_0x4b3513) => {
+        _0x4b3513?.preventDefault?.();
+      }));
+  }
+  function _0x572875({ nodeId: _0x7f24ac, tabId: _0x2a9eaa, partition: _0x39a0b1, popupWindow: _0x502c9a }) {
+    const _0x2c4ab0 = _0x502c9a?.webContents;
+    if (!_0x502c9a || !_0x2c4ab0) return false;
+    const _0x31b714 = { nodeId: _0x7f24ac, tabId: _0x2a9eaa, popupWindow: _0x502c9a };
+    _0x12e803.add(_0x31b714);
+    const _0x34fcfb = () => _0x12e803.delete(_0x31b714);
+    return (
+      _0x502c9a.on?.('closed', _0x34fcfb),
+      _0x2c4ab0.on?.('destroyed', _0x34fcfb),
+      _0x162ea0({ nodeId: _0x7f24ac, tabId: _0x2a9eaa, partition: _0x39a0b1, webContents: _0x2c4ab0 }),
+      true
+    );
+  }
+  function _0x353ff1(_0x42a8eb, _0x1b318f, _0x40e4f6, _0x1f23bd = '') {
+    (_0x40e4f6.setWindowOpenHandler?.(({ url: _0x31d705 } = {}) => {
+      const _0x1daafe = normalizeWebPreviewUrl(_0x31d705),
+        _0x2528ab = isBlankPopupUrl(_0x31d705);
+      if (!_0x1daafe && !_0x2528ab) return (_0x2effdd(_0x42a8eb, _0x31d705, _0x1b318f), { action: 'deny' });
+      const _0x3f10a8 = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f)),
+        _0x460f7b = _0x2c7d3b(_0x42a8eb),
+        _0xe47a71 = _0x3f10a8?.browserProfileId || DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID,
+        _0x177c0f = _0x3f10a8?.partition || toPersistentPartitionId(_0xe47a71);
+      if (shouldUseNativeAuthPopup(_0x31d705) && typeof _0x34553a === 'function')
+        return (
+          _0x26304f({ nodeId: _0x42a8eb, tabId: _0x1b318f, partition: _0x177c0f }),
+          { action: 'allow', outlivesOpener: true, overrideBrowserWindowOptions: _0xa8aae3(_0x177c0f) }
+        );
+      if (typeof _0x355d44 !== 'function') {
+        if (_0x1daafe) _0x1d234c(_0x42a8eb, { type: 'open-popup', url: _0x1daafe }, _0x1b318f);
+        return { action: 'deny' };
+      }
+      return {
+        action: 'allow',
+        outlivesOpener: true,
+        overrideBrowserWindowOptions: { webPreferences: _0x498445(_0x177c0f) },
+        createWindow: () => {
+          const _0xaf7251 = _0x275599({
+            nodeId: _0x42a8eb,
+            tabId: _0x460f7b,
+            browserProfileId: _0xe47a71,
+            partition: _0x177c0f,
+            url: _0x1daafe || '',
+            openerTabId: _0x1b318f,
+          });
+          if (_0x1daafe) _0x3d29e9(_0x42a8eb, _0x460f7b, _0xaf7251, _0x1daafe);
+          else _0x3a3360(_0x42a8eb, _0x460f7b, _0xaf7251);
+          return _0xaf7251.view.webContents;
+        },
+      };
+    }),
+      _0x40e4f6.on?.('did-create-window', (_0x25d916, _0x1f6973 = {}) => {
+        const _0x334e63 = _0x5065da({ nodeId: _0x42a8eb, tabId: _0x1b318f, url: _0x1f6973?.url });
+        if (!_0x334e63) return;
+        _0x572875({
+          nodeId: _0x42a8eb,
+          tabId: _0x1b318f,
+          partition: _0x334e63.partition,
+          popupWindow: _0x25d916,
+        });
+      }));
+    const _0x1eb29f = (_0x496851, _0xda85e2) => {
+        const _0x1fd1b4 = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
+        if (_0x1fd1b4?.isPopup && isBlankPopupUrl(_0xda85e2) && !_0x1fd1b4.requestedUrl) return;
+        if (normalizeWebPreviewUrl(_0xda85e2)) return;
+        (_0x496851?.preventDefault?.(), _0x2effdd(_0x42a8eb, _0xda85e2, _0x1b318f));
+      },
+      _0x2eff02 = (_0xe5fdb5, _0x22d7c7, ..._0x48f7dd) => {
+        const _0x3dbb35 = _0x48f7dd.some((_0x3de78a) => _0x3de78a === true);
+        if (!_0x3dbb35) return;
+        _0x1eb29f(_0xe5fdb5, _0x22d7c7);
+      };
+    (_0x40e4f6.on?.('will-navigate', _0x1eb29f),
+      _0x40e4f6.on?.('will-frame-navigate', _0x2eff02),
+      _0x40e4f6.on?.('dom-ready', () => _0x1c562e(_0x42a8eb, _0x40e4f6, _0x1b318f, _0x1f23bd)),
+      _0x40e4f6.on?.('did-start-loading', () => {
+        const _0x26765b = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
+        let _0x4f0084 = '',
+          _0xe477a4 = false;
+        if (_0x26765b) {
+          const _0x449ec5 = _0x26765b.url || _0x26765b.requestedUrl || '';
+          _0x4f0084 = _0x449ec5;
+          const _0x2d24a6 =
+            _0x26765b.holdSnapshotOnNextLoadStart === true &&
+            _0x26765b.hasSnapshot === true &&
+            _0x26765b.snapshotUrl &&
+            _0x26765b.snapshotUrl === _0x449ec5;
+          ((_0xe477a4 = Boolean(_0x2d24a6)),
+            _0x3ffd65(_0x26765b),
+            (_0x26765b.snapshotEpoch += 1),
+            (_0x26765b.loaded = false),
+            _0xe477a4
+              ? (_0x26765b.snapshotStaleAfterLoad = true)
+              : ((_0x26765b.hasSnapshot = false),
+                (_0x26765b.snapshotUrl = ''),
+                (_0x26765b.snapshotFreezeToken = ''),
+                (_0x26765b.snapshotStaleAfterLoad = false)),
+            (_0x26765b.readySnapshotPending = false),
+            (_0x26765b.holdSnapshotOnNextLoadStart = false));
+        }
+        _0x1d234c(_0x42a8eb, { type: 'loading', url: _0x4f0084, holdSnapshot: _0xe477a4 }, _0x1b318f);
+      }),
+      _0x40e4f6.on?.('did-stop-loading', () => {
+        (_0x1c562e(_0x42a8eb, _0x40e4f6, _0x1b318f, _0x1f23bd),
+          _0x1d234c(_0x42a8eb, { type: 'loaded' }, _0x1b318f),
+          _0x2086ef(_0x42a8eb, _0x40e4f6, _0x1b318f));
+        const _0x3dc90a = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
+        _0x3dc90a &&
+          ((_0x3dc90a.loaded = true),
+          _0x3dc90a.snapshotStaleAfterLoad &&
+            ((_0x3dc90a.hasSnapshot = false),
+            (_0x3dc90a.snapshotUrl = ''),
+            (_0x3dc90a.snapshotFreezeToken = ''),
+            (_0x3dc90a.snapshotStaleAfterLoad = false)),
+          _0x48366a(_0x42a8eb, _0x3dc90a));
+      }),
+      _0x40e4f6.on?.('did-fail-load', (_0x55d131, _0x23dcea, _0x508011, _0x26301b) => {
+        _0x1d234c(
+          _0x42a8eb,
+          {
+            type: 'failed',
+            url: String(_0x26301b || ''),
+            errorCode: _0x23dcea,
+            message: String(_0x508011 || '网页加载失败'),
+          },
+          _0x1b318f,
+        );
+      }),
+      _0x40e4f6.on?.('did-navigate', (_0x1d7286, _0x56116e) => {
+        const _0x3c328e = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
+        if (_0x3c328e?.isPopup && isBlankPopupUrl(_0x56116e) && !_0x3c328e.requestedUrl) return;
+        const _0xbd3f10 = normalizeWebPreviewUrl(_0x56116e) || String(_0x56116e || ''),
+          _0x5ae8d8 = normalizeWebPreviewUrl(_0xbd3f10);
+        if (_0x3c328e && _0x5ae8d8) {
+          if (_0x3d29e9(_0x42a8eb, _0x1b318f, _0x3c328e, _0x5ae8d8)) return;
+          const _0x557d51 = _0x3c328e.pendingPopup === true;
+          _0x3c328e.url = _0x5ae8d8;
+          if (_0x557d51) _0x3c328e.requestedUrl = _0x5ae8d8;
+          ((_0x3c328e.loadIssuedUrl = _0x5ae8d8), (_0x3c328e.pendingPopup = false));
+        }
+        (_0x1d234c(_0x42a8eb, { type: 'navigated', url: _0xbd3f10 }, _0x1b318f),
+          _0x2086ef(_0x42a8eb, _0x40e4f6, _0x1b318f));
+      }),
+      _0x40e4f6.on?.('did-navigate-in-page', (_0x4ed6a4, _0x52850f, _0x277b27) => {
+        if (_0x277b27 === false) return;
+        const _0x3d4324 = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
+        if (_0x3d4324?.isPopup && isBlankPopupUrl(_0x52850f) && !_0x3d4324.requestedUrl) return;
+        const _0x59ab99 = normalizeWebPreviewUrl(_0x52850f) || String(_0x52850f || ''),
+          _0xef71e = normalizeWebPreviewUrl(_0x59ab99);
+        if (_0x3d4324 && _0xef71e) {
+          if (_0x3d29e9(_0x42a8eb, _0x1b318f, _0x3d4324, _0xef71e)) return;
+          const _0x33db1d = _0x3d4324.pendingPopup === true;
+          _0x3d4324.url = _0xef71e;
+          if (_0x33db1d) _0x3d4324.requestedUrl = _0xef71e;
+          ((_0x3d4324.loadIssuedUrl = _0xef71e), (_0x3d4324.pendingPopup = false));
+        }
+        (_0x1d234c(_0x42a8eb, { type: 'navigated', url: _0x59ab99 }, _0x1b318f),
+          _0x2086ef(_0x42a8eb, _0x40e4f6, _0x1b318f));
+      }),
+      _0x40e4f6.on?.('page-favicon-updated', (_0x13fefe, _0x4dece1) => {
+        const _0x10f672 = _0x4e4462(_0x4dece1);
+        if (!_0x10f672) return;
+        _0x1d234c(_0x42a8eb, { type: 'favicon', faviconUrl: _0x10f672 }, _0x1b318f);
+      }),
+      _0x40e4f6.on?.('context-menu', (_0x5528fe, _0x4dd48f) => {
+        const _0x9d85ea = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
+        if (_0xc484e6(_0x9d85ea, _0x4dd48f)) return;
+        void _0x5ad7e3(_0x42a8eb, _0x1b318f, _0x40e4f6, _0x4dd48f).catch((_0x5cf492) => {
+          _0x58bf66?.({
+            type: 'web_preview.context_menu_failed',
+            level: 'warn',
+            source: 'main',
+            message: 'Web preview context menu failed',
+            error: _0x5cf492,
+            context: { nodeId: _0x42a8eb, tabId: _0x1b318f },
+          });
+        });
+      }),
+      _0x40e4f6.on?.('console-message', (..._0x524db1) => {
+        const _0x3e2ff5 = parseWebPreviewInputBridgeMessage(getConsoleMessageFromArgs(_0x524db1));
+        if (!_0x3e2ff5) return;
+        const _0xeaae87 = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
+        if (!_0xeaae87 || _0x3e2ff5.token !== _0xeaae87.inputBridgeToken) return;
+        if (_0x3e2ff5.type === 'image-context-menu') {
+          const _0xee9309 = _0x1590b6(_0x3e2ff5, _0xeaae87);
+          (_0x14012e(_0xeaae87, _0xee9309),
+            void _0x5ad7e3(_0x42a8eb, _0x1b318f, _0x40e4f6, _0xee9309).catch((_0x22143d) => {
+              _0x58bf66?.({
+                type: 'web_preview.context_menu_failed',
+                level: 'warn',
+                source: 'main',
+                message: 'Web preview context menu failed',
+                error: _0x22143d,
+                context: { nodeId: _0x42a8eb, tabId: _0x1b318f, source: 'bridge' },
+              });
+            }));
+          return;
+        }
+        const _0x870033 = Number(_0x3e2ff5.button),
+          _0x346b62 = _0x870033 === 1,
+          _0x5beb5b = _0x870033 === 0 && (_0x3e2ff5.spaceHeld === true || _0xeaae87.canvasSpaceHeld === true);
+        if (!_0x346b62 && !_0x5beb5b) return;
+        _0x1d234c(
+          _0x42a8eb,
+          {
+            type: 'pan-start-preview',
+            source: 'web-contents-view',
+            button: _0x870033,
+            spaceHeld: _0x5beb5b,
+            clientX: Math.max(0, Math.round(Number(_0x3e2ff5.clientX || 0) || 0)),
+            clientY: Math.max(0, Math.round(Number(_0x3e2ff5.clientY || 0) || 0)),
+          },
+          _0x1b318f,
+        );
+      }),
+      _0x40e4f6.on?.('destroyed', () => {
+        const _0x2ead5f = toEntryKey(_0x42a8eb, _0x1b318f),
+          _0x5606a3 = _0x1c905a.get(_0x2ead5f);
+        if (!_0x5606a3 || _0x5606a3.disposing) return;
+        const _0x2a0862 = _0x5dc532();
+        try {
+          _0x2a0862?.contentView?.removeChildView?.(_0x5606a3.view);
+        } catch {}
+        (_0x3ffd65(_0x5606a3), _0x1c905a.delete(_0x2ead5f));
+        if (_0x5606a3.isPopup) _0x1d234c(_0x42a8eb, { type: 'closed' }, _0x1b318f);
+      }));
+    const _0x47b492 = _0x40e4f6.session;
+    (_0x47b492?.setPermissionRequestHandler?.((_0x13bbe0, _0x327868, _0x1a178d) => {
+      _0x1a178d(false);
+    }),
+      _0x47b492?.on?.('will-download', (_0x437b6a) => {
+        _0x437b6a?.preventDefault?.();
+      }));
+  }
+  function _0x2ad4a7({
+    nodeId: _0x5f0fde,
+    tabId: _0x35e0ee,
+    browserProfileId: _0x355de2,
+    partition: _0x3bfd4d,
+    view: _0x545ecb,
+    url: url = '',
+    isPopup: isPopup = false,
+    openerTabId: openerTabId = '',
+    pendingRegistrationUntil: pendingRegistrationUntil = 0,
+  }) {
+    _0x545ecb.setVisible?.(false);
+    const _0x168fae = createInputBridgeToken(),
+      _0x52fdc8 = {
+        nodeId: _0x5f0fde,
+        tabId: _0x35e0ee,
+        browserProfileId: _0x355de2,
+        partition: _0x3bfd4d,
+        view: _0x545ecb,
+        url: url,
+        requestedUrl: url,
+        loadIssuedUrl: '',
+        attached: false,
+        bounds: null,
+        visible: false,
+        selected: false,
+        freezeToken: '',
+        snapshotPending: false,
+        freezeHiddenWithSnapshot: false,
+        readySnapshotPending: false,
+        readySnapshotTimer: null,
+        holdSnapshotOnNextLoadStart: false,
+        snapshotStaleAfterLoad: false,
+        snapshotEpoch: 0,
+        loaded: false,
+        hasSnapshot: false,
+        snapshotUrl: '',
+        snapshotFreezeToken: '',
+        zoomFactor: 1,
+        canvasSpaceHeld: false,
+        inputBridgeToken: _0x168fae,
+        isPopup: isPopup,
+        openerTabId: openerTabId,
+        popupOpened: !isPopup,
+        pendingPopup: false,
+        disposing: false,
+        pendingRegistrationUntil: pendingRegistrationUntil,
+      };
+    return (
+      _0x1c905a.set(toEntryKey(_0x5f0fde, _0x35e0ee), _0x52fdc8),
+      _0x353ff1(_0x5f0fde, _0x35e0ee, _0x545ecb.webContents, _0x168fae),
+      _0x52fdc8
+    );
+  }
+  function _0xabe491(_0x2cfd9d, _0x5b5aed, _0x5bd30b) {
+    if (typeof _0x355d44 !== 'function') throw new Error('当前 Electron 环境不支持 WebContentsView');
+    const _0x2f2c94 = toBrowserProfileId(_0x5bd30b),
+      _0x5a6d38 = toPersistentPartitionId(_0x2f2c94),
+      _0x47d5ab = new _0x355d44({ webPreferences: _0x498445(_0x5a6d38) });
+    return _0x2ad4a7({
+      nodeId: _0x2cfd9d,
+      tabId: _0x5b5aed,
+      browserProfileId: _0x2f2c94,
+      partition: _0x5a6d38,
+      view: _0x47d5ab,
+    });
+  }
+  function _0x275599({
+    nodeId: _0x20108f,
+    tabId: _0xa257cc,
+    browserProfileId: _0x1ef3e7,
+    partition: _0x136719,
+    url: _0x4c9509,
+    openerTabId: openerTabId = '',
+  }) {
+    const _0x1da35e = toBrowserProfileId(_0x1ef3e7),
+      _0x259073 = _0x136719 || toPersistentPartitionId(_0x1da35e),
+      _0x181353 = new _0x355d44({ webPreferences: _0x498445(_0x259073) });
+    return _0x2ad4a7({
+      nodeId: _0x20108f,
+      tabId: _0xa257cc,
+      browserProfileId: _0x1da35e,
+      partition: _0x259073,
+      view: _0x181353,
+      url: _0x4c9509,
+      isPopup: true,
+      openerTabId: openerTabId,
+      pendingRegistrationUntil: Date.now() + POPUP_REGISTRATION_GRACE_MS,
+    });
+  }
+  function _0x105729(_0x520b37) {
+    const _0x32fb63 = _0x1c905a.get(_0x520b37);
+    if (!_0x32fb63) return false;
+    const _0x54300c = _0x5dc532();
+    _0x25b490((_0x980e3a) => _0x980e3a.nodeId === _0x32fb63.nodeId && _0x980e3a.tabId === _0x32fb63.tabId);
+    try {
+      _0x54300c?.contentView?.removeChildView?.(_0x32fb63.view);
+    } catch {}
+    (_0x3ffd65(_0x32fb63),
+      (_0x32fb63.attached = false),
+      (_0x32fb63.visible = false),
+      (_0x32fb63.disposing = true));
+    try {
+      !_0x32fb63.view?.webContents?.isDestroyed?.() && _0x32fb63.view?.webContents?.destroy?.();
+    } catch {}
+    return (_0x1c905a.delete(_0x520b37), true);
+  }
+  function _0x3a676c(_0x633e0b, _0x4ffd44 = null) {
+    if (_0x4ffd44 !== null && typeof _0x4ffd44 !== 'undefined')
+      return _0x105729(toEntryKey(_0x633e0b, _0x4ffd44));
+    let _0x4eb406 = false;
+    for (const [_0x3971b2, _0x345564] of [..._0x1c905a]) {
+      if (_0x345564.nodeId === _0x633e0b && _0x105729(_0x3971b2)) _0x4eb406 = true;
+    }
+    return _0x4eb406;
+  }
+  function _0x327c1e(_0x31262c) {
+    const _0x4a2cf8 = _0x1c905a.get(_0x31262c);
+    if (!_0x4a2cf8) return;
+    _0x4a2cf8.visible !== false && (_0x4a2cf8.view?.setVisible?.(false), (_0x4a2cf8.visible = false));
+  }
+  async function _0x3b094b(_0x45f938 = {}) {
+    const _0x8ed6e0 = _0x5dc532();
+    if (!_0x8ed6e0?.contentView) return { ok: false, error: '主窗口尚未就绪' };
+    const _0x2c5ad9 = new Set(),
+      _0x322874 = getViewsPayload(_0x45f938);
+    let _0x1e4fe0 = 0,
+      _0x106334 = false;
+    const _0x24f220 = [];
+    for (const _0x55ca0c of _0x322874) {
+      const _0x26df43 = toNodeId(_0x55ca0c?.nodeId);
+      if (!_0x26df43) continue;
+      const _0x25dde8 = toTabId(_0x55ca0c?.tabId),
+        _0xc3d922 = toEntryKey(_0x26df43, _0x25dde8);
+      _0x2c5ad9.add(_0xc3d922);
+      const _0x532acb = normalizeWebPreviewUrl(_0x55ca0c?.webUrl || _0x55ca0c?.url);
+      if (!_0x532acb) {
+        if (_0x55ca0c?.pendingPopup === true) {
+          const _0x16eb67 = _0x1c905a.get(_0xc3d922);
+          if (!_0x16eb67?.isPopup || _0x16eb67.requestedUrl) {
+            _0x1d234c(_0x26df43, { type: 'failed', message: '登录窗口尚未就绪' }, _0x25dde8);
+            continue;
+          }
+          if (_0x55ca0c?.visible === false) {
+            _0x327c1e(_0xc3d922);
+            continue;
+          }
+          const _0x4da650 = normalizeBounds(_0x55ca0c?.bounds);
+          if (!_0x4da650) {
+            _0x327c1e(_0xc3d922);
+            continue;
+          }
+          _0x16eb67.pendingRegistrationUntil = 0;
+          const _0x169c5d = Boolean(_0x55ca0c?.selected);
+          _0x16eb67.selected !== _0x169c5d && ((_0x16eb67.selected = _0x169c5d), (_0x106334 = true));
+          _0x16eb67.canvasSpaceHeld = _0x55ca0c?.canvasSpaceHeld === true;
+          !_0x16eb67.attached &&
+            (_0x8ed6e0.contentView.addChildView(_0x16eb67.view),
+            (_0x16eb67.attached = true),
+            (_0x106334 = true));
+          _0x24f220.push(_0xc3d922);
+          !boundsEqual(_0x16eb67.bounds, _0x4da650) &&
+            ((_0x16eb67.bounds = _0x4da650), _0x16eb67.view.setBounds(_0x4da650));
+          const _0x55865f = normalizeZoomFactor(_0x55ca0c?.zoomFactor);
+          _0x16eb67.pendingZoomFactor = _0x55865f;
+          _0x55ca0c?.deferZoomFactor !== true &&
+            !zoomFactorEqual(_0x16eb67.zoomFactor, _0x55865f) &&
+            ((_0x16eb67.zoomFactor = _0x55865f), _0x16eb67.view.webContents.setZoomFactor?.(_0x55865f));
+          _0x16eb67.visible !== true && (_0x16eb67.view.setVisible?.(true), (_0x16eb67.visible = true));
+          _0x1e4fe0 += 1;
+          continue;
+        }
+        (_0x105729(_0xc3d922), _0x1d234c(_0x26df43, { type: 'failed', message: '网页地址无效' }, _0x25dde8));
+        continue;
+      }
+      if (_0x55ca0c?.visible === false) {
+        const _0x2b9b5a = _0x1c905a.get(_0xc3d922);
+        if (_0x2b9b5a) _0x2b9b5a.pendingRegistrationUntil = 0;
+        _0x327c1e(_0xc3d922);
+        continue;
+      }
+      const _0x1af614 = normalizeBounds(_0x55ca0c?.bounds);
+      if (!_0x1af614) {
+        _0x327c1e(_0xc3d922);
+        continue;
+      }
+      const _0x15b977 = toBrowserProfileId(_0x55ca0c?.browserProfileId),
+        _0x480de7 = toPersistentPartitionId(_0x15b977);
+      let _0x3ffe16 = _0x1c905a.get(_0xc3d922);
+      _0x3ffe16 &&
+        _0x3ffe16.partition !== _0x480de7 &&
+        (_0x105729(_0xc3d922), (_0x3ffe16 = null), (_0x106334 = true));
+      !_0x3ffe16 && ((_0x3ffe16 = _0xabe491(_0x26df43, _0x25dde8, _0x15b977)), (_0x106334 = true));
+      _0x3ffe16.pendingRegistrationUntil = 0;
+      const _0x2dff6a = Boolean(_0x55ca0c?.selected);
+      _0x3ffe16.selected !== _0x2dff6a && ((_0x3ffe16.selected = _0x2dff6a), (_0x106334 = true));
+      _0x3ffe16.canvasSpaceHeld = _0x55ca0c?.canvasSpaceHeld === true;
+      !_0x3ffe16.attached &&
+        (_0x8ed6e0.contentView.addChildView(_0x3ffe16.view), (_0x3ffe16.attached = true), (_0x106334 = true));
+      _0x24f220.push(_0xc3d922);
+      const _0x3d52d9 = String(_0x55ca0c?.freezeToken || '0'),
+        _0x113f0b = _0x55ca0c?.frozen === true && _0x3ffe16.requestedUrl === _0x532acb;
+      if (_0x113f0b) {
+        _0x3ffd65(_0x3ffe16);
+        _0x3ffe16.freezeToken !== _0x3d52d9 &&
+          ((_0x3ffe16.freezeToken = _0x3d52d9), (_0x3ffe16.freezeHiddenWithSnapshot = false));
+        const _0x53fdf9 = _0x3ffe16.hasSnapshot === true && _0x3ffe16.snapshotUrl === _0x532acb,
+          _0x1c57c1 =
+            _0x53fdf9 && (_0x55ca0c?.snapshotReady === true || _0x3ffe16.freezeHiddenWithSnapshot === true);
+        if (_0x1c57c1)
+          ((_0x3ffe16.snapshotPending = false),
+            (_0x3ffe16.freezeHiddenWithSnapshot = true),
+            _0x327c1e(_0xc3d922));
+        else {
+          _0x3ffe16.freezeHiddenWithSnapshot = false;
+          !boundsEqual(_0x3ffe16.bounds, _0x1af614) &&
+            ((_0x3ffe16.bounds = _0x1af614), _0x3ffe16.view.setBounds(_0x1af614));
+          _0x3ffe16.visible !== true && (_0x3ffe16.view.setVisible?.(true), (_0x3ffe16.visible = true));
+          const _0x3c8472 =
+            _0x3ffe16.hasSnapshot === true &&
+            _0x3ffe16.snapshotUrl === _0x532acb &&
+            _0x3ffe16.snapshotFreezeToken === _0x3d52d9;
+          if (_0x55ca0c?.snapshotHold !== true && _0x3ffe16.snapshotPending !== true && !_0x3c8472) {
+            const _0x7c9735 = _0x43c9ed(
+              _0x26df43,
+              _0x3ffe16,
+              _0x3d52d9,
+              () => {
+                const _0x9eb472 = _0x1c905a.get(_0xc3d922);
+                if (_0x9eb472 === _0x3ffe16) _0x9eb472.snapshotPending = false;
+              },
+              _0x532acb,
+            );
+            _0x3ffe16.snapshotPending = _0x7c9735;
+          }
+        }
+        _0x1e4fe0 += 1;
+        continue;
+      }
+      ((_0x3ffe16.freezeToken = ''),
+        (_0x3ffe16.snapshotPending = false),
+        (_0x3ffe16.freezeHiddenWithSnapshot = false));
+      !boundsEqual(_0x3ffe16.bounds, _0x1af614) &&
+        ((_0x3ffe16.bounds = _0x1af614), _0x3ffe16.view.setBounds(_0x1af614));
+      const _0x2179d7 = normalizeZoomFactor(_0x55ca0c?.zoomFactor);
+      _0x3ffe16.pendingZoomFactor = _0x2179d7;
+      _0x55ca0c?.deferZoomFactor !== true &&
+        !zoomFactorEqual(_0x3ffe16.zoomFactor, _0x2179d7) &&
+        ((_0x3ffe16.zoomFactor = _0x2179d7), _0x3ffe16.view.webContents.setZoomFactor?.(_0x2179d7));
+      _0x3ffe16.visible !== true && (_0x3ffe16.view.setVisible?.(true), (_0x3ffe16.visible = true));
+      (_0x48366a(_0x26df43, _0x3ffe16), (_0x1e4fe0 += 1));
+      const _0x48cbbb = _0x3ffe16.url === _0x532acb || _0x3ffe16.loadIssuedUrl === _0x532acb,
+        _0x2e12b1 =
+          (_0x3ffe16.requestedUrl !== _0x532acb && !_0x48cbbb) ||
+          (_0x3ffe16.isPopup &&
+            _0x3ffe16.requestedUrl === _0x532acb &&
+            _0x3ffe16.loadIssuedUrl !== _0x532acb &&
+            _0x3ffe16.loaded !== true);
+      !_0x2e12b1 && _0x3ffe16.requestedUrl !== _0x532acb && _0x48cbbb && (_0x3ffe16.requestedUrl = _0x532acb);
+      if (_0x2e12b1) {
+        (_0x3ffd65(_0x3ffe16),
+          (_0x3ffe16.requestedUrl = _0x532acb),
+          (_0x3ffe16.url = _0x532acb),
+          (_0x3ffe16.loadIssuedUrl = _0x532acb),
+          (_0x3ffe16.snapshotEpoch += 1),
+          (_0x3ffe16.loaded = false),
+          (_0x3ffe16.hasSnapshot = false),
+          (_0x3ffe16.snapshotUrl = ''),
+          (_0x3ffe16.snapshotFreezeToken = ''),
+          (_0x3ffe16.readySnapshotPending = false),
+          (_0x3ffe16.holdSnapshotOnNextLoadStart = false),
+          (_0x3ffe16.snapshotStaleAfterLoad = false));
+        try {
+          const _0x9c6748 = _0x3ffe16.view.webContents.loadURL(_0x532acb);
+          _0x9c6748 &&
+            typeof _0x9c6748.catch === 'function' &&
+            void _0x9c6748.catch((_0x51a388) => {
+              (_0x58bf66?.({
+                type: 'web_preview.load_failed',
+                level: 'warn',
+                source: 'main',
+                message: 'Web preview loadURL failed',
+                error: _0x51a388,
+                context: { nodeId: _0x26df43, tabId: _0x25dde8 },
+              }),
+                _0x1d234c(
+                  _0x26df43,
+                  { type: 'failed', url: _0x532acb, message: String(_0x51a388?.message || '网页加载失败') },
+                  _0x25dde8,
+                ));
+            });
+        } catch (_0x5a0fa3) {
+          (_0x58bf66?.({
+            type: 'web_preview.load_failed',
+            level: 'warn',
+            source: 'main',
+            message: 'Web preview loadURL failed',
+            error: _0x5a0fa3,
+            context: { nodeId: _0x26df43, tabId: _0x25dde8 },
+          }),
+            _0x1d234c(
+              _0x26df43,
+              { type: 'failed', url: _0x532acb, message: String(_0x5a0fa3?.message || '网页加载失败') },
+              _0x25dde8,
+            ));
+        }
+      }
+    }
+    if (_0x106334)
+      for (const _0x3fcb0e of _0x24f220) {
+        const _0x78abb9 = _0x1c905a.get(_0x3fcb0e);
+        _0x78abb9?.view && _0x78abb9.attached && _0x8ed6e0.contentView.addChildView(_0x78abb9.view);
+      }
+    const _0x513cbd = Date.now();
+    for (const _0x5b7186 of [..._0x1c905a.keys()]) {
+      if (_0x2c5ad9.has(_0x5b7186)) continue;
+      const _0x1c6ecd = _0x1c905a.get(_0x5b7186);
+      if (_0x1c6ecd?.pendingRegistrationUntil > _0x513cbd) continue;
+      _0x105729(_0x5b7186);
+    }
+    return { ok: true, count: _0x1c905a.size, visibleCount: _0x1e4fe0 };
+  }
+  function _0x553cd7(_0x1bcc5d = {}) {
+    const _0x1907c5 = Array.isArray(_0x1bcc5d?.nodeIds)
+        ? _0x1bcc5d.nodeIds.map(toNodeId).filter(Boolean)
+        : [],
+      _0x504920 = Array.isArray(_0x1bcc5d?.tabIds) ? _0x1bcc5d.tabIds.map(toTabId).filter(Boolean) : [];
+    let _0x400be3 = 0;
+    if (_0x1907c5.length > 0 && _0x504920.length > 0) {
+      for (const _0x34ca7f of _0x1907c5) {
+        for (const _0x489a0 of _0x504920) {
+          if (_0x3a676c(_0x34ca7f, _0x489a0)) _0x400be3 += 1;
+        }
+      }
+      _0x25b490((_0xb819d7) => _0x1907c5.includes(_0xb819d7.nodeId) && _0x504920.includes(_0xb819d7.tabId));
+    } else {
+      if (_0x1907c5.length > 0) {
+        for (const _0x1fb228 of _0x1907c5) {
+          for (const [_0xa602ef, _0xd922d8] of [..._0x1c905a]) {
+            if (_0xd922d8.nodeId === _0x1fb228 && _0x105729(_0xa602ef)) _0x400be3 += 1;
+          }
+        }
+        _0x25b490((_0x4047e2) => _0x1907c5.includes(_0x4047e2.nodeId));
+      } else {
+        for (const _0x19f320 of [..._0x1c905a.keys()]) {
+          if (_0x105729(_0x19f320)) _0x400be3 += 1;
+        }
+        _0x25b490();
+      }
+    }
+    return { ok: true, disposed: _0x400be3 };
+  }
+  function _0x241b14(_0xec8643, _0x1378c7, _0x215305) {
+    return Promise.resolve(
+      _0xec8643.executeJavaScript(
+        buildWebPreviewImageExtractionScript({ nodeId: _0x1378c7, tabId: _0x215305 }),
+        true,
+      ),
+    )
+      .then((_0x567774) => ({
+        ok: true,
+        images: filterExtractedImageCandidates(_0x567774?.images),
+        pageUrl: String(_0x567774?.pageUrl || ''),
+        pageTitle: String(_0x567774?.pageTitle || ''),
+      }))
+      .catch((_0x3d63c6) => {
+        return (
+          _0x58bf66?.({
+            type: 'web_preview.extract_images_failed',
+            level: 'warn',
+            source: 'main',
+            message: 'Web preview image extraction failed',
+            error: _0x3d63c6,
+            context: { nodeId: _0x1378c7, tabId: _0x215305 },
+          }),
+          { ok: false, error: 'extract-failed', images: [] }
+        );
+      });
+  }
+  function _0x479d6b(_0x4c1e0f, _0x54ee39, _0x5065a9) {
+    return Promise.resolve(
+      _0x4c1e0f.executeJavaScript(
+        buildWebPreviewVideoExtractionScript({ nodeId: _0x54ee39, tabId: _0x5065a9 }),
+        true,
+      ),
+    )
+      .then((_0x402fdf) => ({
+        ok: true,
+        videos: filterExtractedVideoCandidates(_0x402fdf?.videos),
+        douyinDetailApiUrls: Array.isArray(_0x402fdf?.douyinDetailApiUrls)
+          ? _0x402fdf.douyinDetailApiUrls
+          : [],
+        pageUrl: String(_0x402fdf?.pageUrl || ''),
+        pageTitle: String(_0x402fdf?.pageTitle || ''),
+      }))
+      .catch((_0x27318d) => {
+        return (
+          _0x58bf66?.({
+            type: 'web_preview.extract_videos_failed',
+            level: 'warn',
+            source: 'main',
+            message: 'Web preview video extraction failed',
+            error: _0x27318d,
+            context: { nodeId: _0x54ee39, tabId: _0x5065a9 },
+          }),
+          { ok: false, error: 'extract-failed', videos: [], douyinDetailApiUrls: [] }
+        );
+      });
+  }
+  function _0x21c775(_0x4df4da = {}) {
+    const _0x1e307c = toNodeId(_0x4df4da?.nodeId),
+      _0x4ad2b0 = toTabId(_0x4df4da?.tabId),
+      _0x1ecec4 = String(_0x4df4da?.action || '').trim();
+    if (!_0x1e307c) return { ok: false, error: 'missing-node' };
+    const _0x267105 = _0x1c905a.get(toEntryKey(_0x1e307c, _0x4ad2b0));
+    if (!_0x267105?.view?.webContents || _0x267105.view.webContents.isDestroyed?.())
+      return { ok: false, error: 'missing-view' };
+    const _0x2ed066 = _0x267105.view.webContents;
+    if (_0x1ecec4 === 'back') {
+      if (!_0x2ed066.canGoBack?.())
+        return (
+          _0x1d234c(_0x1e307c, { type: 'blocked', message: '没有上一页' }, _0x4ad2b0),
+          { ok: false, error: 'no-history', ...getNavigationState(_0x2ed066) }
+        );
+      _0x2ed066.goBack?.();
+    } else {
+      if (_0x1ecec4 === 'forward') {
+        if (!_0x2ed066.canGoForward?.())
+          return (
+            _0x1d234c(_0x1e307c, { type: 'blocked', message: '没有下一页' }, _0x4ad2b0),
+            { ok: false, error: 'no-history', ...getNavigationState(_0x2ed066) }
+          );
+        _0x2ed066.goForward?.();
+      } else {
+        if (_0x1ecec4 === 'reload') {
+          const _0x12e63f = _0x267105.url || _0x267105.requestedUrl || '';
+          ((_0x267105.holdSnapshotOnNextLoadStart = Boolean(
+            _0x267105.hasSnapshot === true &&
+            _0x267105.snapshotUrl &&
+            _0x12e63f &&
+            _0x267105.snapshotUrl === _0x12e63f,
+          )),
+            (_0x267105.snapshotStaleAfterLoad = false));
+          if (typeof _0x2ed066.reloadIgnoringCache === 'function') _0x2ed066.reloadIgnoringCache();
+          else {
+            if (typeof _0x2ed066.reload === 'function') _0x2ed066.reload();
+            else
+              (_0x267105.url || _0x267105.requestedUrl) &&
+                void _0x2ed066.loadURL?.(_0x267105.url || _0x267105.requestedUrl);
+          }
+        } else {
+          if (_0x1ecec4 === 'extract-media') {
+            if (typeof _0x2ed066.executeJavaScript !== 'function')
+              return { ok: false, error: 'unsupported-action' };
+            return Promise.all([
+              _0x241b14(_0x2ed066, _0x1e307c, _0x4ad2b0),
+              _0x479d6b(_0x2ed066, _0x1e307c, _0x4ad2b0),
+            ]).then(async ([_0x35da39, _0x164471]) => {
+              if (_0x35da39?.ok === false && _0x164471?.ok === false)
+                return { ok: false, error: 'extract-failed' };
+              const _0x533cd8 = String(
+                  _0x164471?.pageUrl || _0x35da39?.pageUrl || _0x267105.url || _0x267105.requestedUrl || '',
+                ),
+                _0x38f44c = String(_0x164471?.pageTitle || _0x35da39?.pageTitle || '');
+              let _0x12e192 = { images: [], videos: [], detailApiUrls: [], fetchedCount: 0 };
+              if (typeof resolveDouyinMedia === 'function')
+                try {
+                  _0x12e192 =
+                    (await resolveDouyinMedia({
+                      pageUrl: _0x533cd8,
+                      pageTitle: _0x38f44c,
+                      nodeId: _0x1e307c,
+                      tabId: _0x4ad2b0,
+                      imageResult: _0x35da39,
+                      videoResult: _0x164471,
+                      webContents: _0x2ed066,
+                      logDiagnosticEvent: _0x58bf66,
+                    })) || _0x12e192;
+                } catch (_0x21e31c) {
+                  _0x58bf66?.({
+                    type: 'web_preview.douyin_media_resolve_failed',
+                    level: 'warn',
+                    source: 'main',
+                    message: 'Douyin media resolver failed',
+                    error: _0x21e31c,
+                    context: { nodeId: _0x1e307c, tabId: _0x4ad2b0, pageUrl: _0x533cd8 },
+                  });
+                }
+              return {
+                ok: true,
+                action: _0x1ecec4,
+                ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
+                images: mergeExtractedImageCandidates(_0x12e192?.images, _0x35da39?.images),
+                videos: mergeExtractedVideoCandidates(_0x12e192?.videos, _0x164471?.videos),
+                pageUrl: _0x533cd8,
+                pageTitle: _0x38f44c,
+                douyin: {
+                  detailApiUrls: Array.isArray(_0x12e192?.detailApiUrls) ? _0x12e192.detailApiUrls : [],
+                  fetchedCount: Number(_0x12e192?.fetchedCount || 0) || 0,
+                },
+                ...getNavigationState(_0x2ed066),
+              };
+            });
+          } else {
+            if (_0x1ecec4 === 'extract-images') {
+              if (typeof _0x2ed066.executeJavaScript !== 'function')
+                return { ok: false, error: 'unsupported-action' };
+              return _0x241b14(_0x2ed066, _0x1e307c, _0x4ad2b0).then((_0xfb719d) =>
+                _0xfb719d.ok === false
+                  ? { ok: false, error: _0xfb719d.error || 'extract-failed' }
+                  : {
+                      ok: true,
+                      action: _0x1ecec4,
+                      ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
+                      images: _0xfb719d.images,
+                      pageUrl: String(_0xfb719d.pageUrl || _0x267105.url || _0x267105.requestedUrl || ''),
+                      pageTitle: String(_0xfb719d?.pageTitle || ''),
+                      ...getNavigationState(_0x2ed066),
+                    },
+              );
+            } else {
+              if (_0x1ecec4 === 'extract-videos') {
+                if (typeof _0x2ed066.executeJavaScript !== 'function')
+                  return { ok: false, error: 'unsupported-action' };
+                return _0x479d6b(_0x2ed066, _0x1e307c, _0x4ad2b0).then((_0x1f4d94) =>
+                  _0x1f4d94.ok === false
+                    ? { ok: false, error: _0x1f4d94.error || 'extract-failed' }
+                    : {
+                        ok: true,
+                        action: _0x1ecec4,
+                        ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
+                        videos: _0x1f4d94.videos,
+                        pageUrl: String(_0x1f4d94.pageUrl || _0x267105.url || _0x267105.requestedUrl || ''),
+                        pageTitle: String(_0x1f4d94?.pageTitle || ''),
+                        ...getNavigationState(_0x2ed066),
+                      },
+                );
+              } else {
+                if (_0x1ecec4 === 'capture-reference') {
+                  if (
+                    typeof _0x2ed066.executeJavaScript !== 'function' ||
+                    typeof _0x2ed066.capturePage !== 'function'
+                  )
+                    return { ok: false, error: 'unsupported-action' };
+                  return Promise.all([
+                    Promise.resolve(
+                      _0x2ed066.executeJavaScript(buildWebPreviewReferenceSnapshotScript(), true),
+                    ),
+                    Promise.resolve(_0x2ed066.capturePage()).then(
+                      (_0x3be182) => _0x3be182?.toDataURL?.() || '',
+                    ),
+                  ])
+                    .then(([_0x19c577, _0x4e03f7]) => ({
+                      ok: true,
+                      action: _0x1ecec4,
+                      ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
+                      pageUrl: String(_0x19c577?.pageUrl || _0x267105.url || _0x267105.requestedUrl || ''),
+                      pageTitle: String(_0x19c577?.pageTitle || _0x2ed066.getTitle?.() || ''),
+                      selectedText: String(_0x19c577?.selectedText || '').slice(
+                        0,
+                        WEB_PREVIEW_SELECTED_TEXT_LIMIT,
+                      ),
+                      screenshotDataUrl: String(_0x4e03f7 || ''),
+                      capturedAt: new Date().toISOString(),
+                      ...getNavigationState(_0x2ed066),
+                    }))
+                    .catch((_0x3eb877) => {
+                      return (
+                        _0x58bf66?.({
+                          type: 'web_preview.capture_reference_failed',
+                          level: 'warn',
+                          source: 'main',
+                          message: 'Web preview reference capture failed',
+                          error: _0x3eb877,
+                          context: { nodeId: _0x1e307c, tabId: _0x4ad2b0 },
+                        }),
+                        { ok: false, error: 'capture-failed' }
+                      );
+                    });
+                } else return { ok: false, error: 'unknown-action' };
+              }
+            }
+          }
+        }
+      }
+    }
+    return (
+      _0x2086ef(_0x1e307c, _0x2ed066, _0x4ad2b0),
+      {
+        ok: true,
+        action: _0x1ecec4,
+        ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
+        ...getNavigationState(_0x2ed066),
+      }
+    );
+  }
+  return {
+    syncViews: _0x3b094b,
+    disposeViews: _0x553cd7,
+    controlView: _0x21c775,
+    getEntryCount: () => _0x1c905a.size,
+    _getEntry: (_0xae540b, _0xe81c0e = 'default') => _0x1c905a.get(toEntryKey(_0xae540b, _0xe81c0e)),
+  };
+}

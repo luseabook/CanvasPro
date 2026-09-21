@@ -1,1 +1,625 @@
-const a276_0x83dc88=a276_0x2b48;(function(_0x540376,_0x5a2c3f){const _0x31aa31=a276_0x2b48,_0xb25e48=_0x540376();while(!![]){try{const _0x340c9d=parseInt(_0x31aa31(0x155))/0x1+parseInt(_0x31aa31(0x13b))/0x2+-parseInt(_0x31aa31(0x1cf))/0x3*(parseInt(_0x31aa31(0x14f))/0x4)+parseInt(_0x31aa31(0x1cd))/0x5*(-parseInt(_0x31aa31(0x18c))/0x6)+parseInt(_0x31aa31(0x169))/0x7*(parseInt(_0x31aa31(0x1ad))/0x8)+parseInt(_0x31aa31(0x19b))/0x9+parseInt(_0x31aa31(0x190))/0xa;if(_0x340c9d===_0x5a2c3f)break;else _0xb25e48['push'](_0xb25e48['shift']());}catch(_0x455ae1){_0xb25e48['push'](_0xb25e48['shift']());}}}(a276_0x456d,0x87bea));import a276_0x54a907 from'../core/stores/appStore.js';import{onLocaleChange,t}from'../i18n/index.js';import{uploadFile}from'../modules/project.js';import{cancelAudioSeparationTaskForNode,getRunningAudioSeparationTaskForNode,maybeResumeAudioSeparationLeader,runAudioSeparationFromNode}from'../modules/AudioSeparationController.js';import{registerStaticInnerHTML,setStaticInnerHTML}from'../utils/dom.js';import{startLoading,stopLoading}from'../modules/loadingOverlay.js';import a276_0x21aa1a from'../modules/AudioClipController.js';import{SOURCE_AUDIO_TOOLBAR_HTML}from'./NodeToolbarConfig.js';import{deferWaveformPathUntilAudioReady,getWaveformBarsPathFromPersistedUrl,getWaveformBarsPathFromUrl}from'../utils/audioWaveform.js';import{createAudioPlaybackProgressController}from'../utils/audioPlaybackProgress.js';function a276_0x456d(){const _0x20af92=['style','addEventListener','527490AEzTxn','upload.failedRetry','AbortError','hypot','.media-card','音频上传失败:','playbackRate','http://www.w3.org/2000/svg','_data','load','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22node-card\x20media-card\x20audio-card\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22waveform\x20waveform-bg\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20width=\x22100%\x22\x20height=\x2280\x22\x20viewBox=\x220\x200\x20200\x2080\x22\x20preserveAspectRatio=\x22none\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<path\x20d=\x22','textContent','files','full','_playBtn','duration','dragging','_card','innerText','download.missingAudio','4oDYwWt','_downloadBtn','_hint','map','_clipBtn','padStart','462999RhMfEe','stopPropagation','reset','clientX','generationStartTime','rect','height','_loadAudio','length','.act-clip,\x20.clip-btn','.act-speed,\x20.speed-btn','destroy','_label','_isUploading','preventDefault','_ensureWaveform','function','closest','toolbar.cancelAudioSeparation','_timeEl','7DTdLFt','ended','_cancelDeferredWaveform','0:00','currentProjectId','localPath','activeElement','_clearAudioElementSource','_isAudioElementReady','audioDuration','\x22\x20stroke=\x22var(--blue)\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<path\x20d=\x22M0,40\x20L200,40\x22\x20stroke=\x22var(--blue)\x22\x20stroke-width=\x221\x22\x20stroke-dasharray=\x222\x204\x22\x20opacity=\x220.4\x22/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22waveform\x20waveform-unplayed\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20width=\x22100%\x22\x20height=\x2280\x22\x20viewBox=\x220\x200\x20200\x2080\x22\x20preserveAspectRatio=\x22none\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<path\x20d=\x22','_waveBgPath','.media-progress-line','_uploadBtn','onloadedmetadata','_wavePlayed','max','getElementById','currentTime','pointerup','warn','waveformLocalPath','_syncLocaleTexts','.media-progress-bar','display','assetId','upload.uploading','target','type','div','createElement','_waveKey','_stopAudioForExternalPlayback','unmount','_progressController','6gRdMAT','_setUploadButtonLabel','_syncGeneratingUi','_getAudioElementSource','70700gfmvxI','_separateBtn','generationDuration','_fmt','_resolveAudioSrc','replace','static','_bar','catch','.waveform-bg\x20svg\x20path','.audio-player','5471919XVxXKv','_rememberAudioDuration','_subscribeLocaleChanges','audio/*','oncanplay','from','_setIcon','appendChild','_speedBtn','nodes','_clearResolvedAudioTimer','_waveToken','block','_input','true','name','click','value','5176096EkoqAC','pointerdown','keys','pause','_playAudio','error','input','abs','none','_currentSrc','preload','_bindAudioLoadHandlers','.act-download,\x20.download-btn','_unsubscribeLocale','clientY','_syncKnownAudioDurationUi','_waveFgPath','onloadeddata','_rewindEndedAudioIfNeeded','childNodes','trim','v2-node-component','mediaTaskProgress','querySelectorAll','showToast','cloneNode','setAttribute','_readAudioDurationSec','.audio-play-btn','disabled','_getAudioElementCurrentSource','update','3249965jFFAXN','.upload-btn','2348442zoFijb','isConnected','onplaying','svg','_unregisterAudioPlaybackClient','renameNode','_waveformLocalPath','left','then','floor','min','accept','dataset','change','getState','hideLine','file','mediaTaskStatus','pointerEvents','_prepareAudio','readyState','play','firstChild','width','replaceChildren','querySelector','attach','updateNodeData','_seekTo','_applyResolvedAudioDuration','createElementNS','polygon','getBoundingClientRect','mount','__v2_name_el','.node-floating-toolbar','removeAttribute','default_v2_project','mediaTaskKind','removeChild','auto','sync','_audio','ondurationchange','_isSeeking','_probeAudioDurationIfNeeded','status','_audioDurationProbeToken','points','paused','seeked','isFinite','dblclick','className'];a276_0x456d=function(){return _0x20af92;};return a276_0x456d();}import{loadAudioDurationMetadataSec,normalizeAudioDurationSec,pickAudioDurationSec}from'../services/audioMetadataService.js';function a276_0x2b48(_0x1e7689,_0x594e68){const _0x456d6e=a276_0x456d();return a276_0x2b48=function(_0x2b48fe,_0x4fff43){_0x2b48fe=_0x2b48fe-0x124;let _0x267845=_0x456d6e[_0x2b48fe];return _0x267845;},a276_0x2b48(_0x1e7689,_0x594e68);}import{beginAudioPlayback,registerAudioPlaybackClient}from'../modules/audioPlaybackCoordinator.js';import{resolveCanvasAudioUrl}from'../services/canvasMediaLocalService.js';import{attachMediaElementPlaybackSource,clearDesktopMediaPlaybackSourceMetadata,getMediaElementCurrentSource,getMediaElementPlaybackSourceKey,isMediaElementPlaybackSource}from'../services/desktopMediaBlobSource.js';import{shouldShowGenerationResultLoadingUi}from'../core/generationTaskUiState.js';import{localPathToUrl,pickResultLocalPath,urlToLocalPath}from'../utils/localMediaPath.js';import{bindRunningHubToolbarTaskButton}from'./nodeToolbar/runningHubToolbarTaskButton.js';import{bindAudioDownloadAction}from'./nodeToolbar/audioActions/downloadAction.js';const WAVE='M10,40\x20L10,40\x20M15,30\x20L15,50\x20M20,20\x20L20,60\x20M25,35\x20L25,45\x20M30,25\x20L30,55\x20M35,15\x20L35,65\x20M40,30\x20L40,50\x20M45,38\x20L45,42\x20M50,22\x20L50,58\x20M55,18\x20L55,62\x20M60,28\x20L60,52\x20M65,32\x20L65,48\x20M70,24\x20L70,56\x20M75,36\x20L75,44\x20M80,20\x20L80,60\x20M85,16\x20L85,64\x20M90,26\x20L90,54\x20M95,34\x20L95,46\x20M100,22\x20L100,58\x20M105,18\x20L105,62\x20M110,30\x20L110,50\x20M115,38\x20L115,42\x20M120,15\x20L120,65\x20M125,25\x20L125,55\x20M130,35\x20L130,45\x20M135,20\x20L135,60\x20M140,30\x20L140,50\x20M145,40\x20L145,40\x20M150,25\x20L150,55\x20M155,15\x20L155,65\x20M160,30\x20L160,50\x20M165,38\x20L165,42\x20M170,22\x20L170,58\x20M175,18\x20L175,62\x20M180,28\x20L180,52\x20M185,32\x20L185,48\x20M190,24\x20L190,56';function sourceAudioText(_0x54d1c1,_0x26ff9f={}){return t('sourceAudioNode.'+_0x54d1c1,_0x26ff9f);}const _SOURCE_AUDIO_NODE_TEMPLATE_ID='node:source-audio';registerStaticInnerHTML(_SOURCE_AUDIO_NODE_TEMPLATE_ID,SOURCE_AUDIO_TOOLBAR_HTML+a276_0x83dc88(0x145)+WAVE+a276_0x83dc88(0x173)+WAVE+'\x22\x20stroke=\x22var(--blue)\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<path\x20d=\x22M0,40\x20L200,40\x22\x20stroke=\x22var(--blue)\x22\x20stroke-width=\x221\x22\x20stroke-dasharray=\x222\x204\x22\x20opacity=\x220.4\x22/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22media-progress-line\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22media-progress-bar\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22node-upload-hint\x20audio-upload-hint\x20source-upload-hint\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22upload-btn\x20audio-upload-btn\x20source-upload-btn\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20width=\x2214\x22\x20height=\x2214\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222.5\x22><path\x20d=\x22M21\x2015v4a2\x202\x200\x200\x201-2\x202H5a2\x202\x200\x200\x201-2-2v-4\x22/><polyline\x20points=\x2217\x208\x2012\x203\x207\x208\x22/><line\x20x1=\x2212\x22\x20y1=\x223\x22\x20x2=\x2212\x22\x20y2=\x2215\x22/></svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22audio-controls\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22audio-play-btn\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20width=\x2212\x22\x20height=\x2212\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22currentColor\x22><polygon\x20points=\x225\x203\x2019\x2012\x205\x2021\x205\x203\x22/></svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22audio-time-wrap\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22audio-time-display\x22>0:00\x20/\x200:00</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<audio\x20class=\x22audio-player\x22></audio>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22node-port\x20out-port\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22node-resizer\x22></div>\x0a\x20\x20\x20\x20\x20\x20</div>');export class SourceAudioNode{constructor(_0x4a4aa2){const _0x6df751=a276_0x83dc88;this[_0x6df751(0x143)]=_0x4a4aa2,this['el']=document[_0x6df751(0x187)](_0x6df751(0x186)),this['id']=_0x4a4aa2['id'],this['el'][_0x6df751(0x138)]=_0x6df751(0x1c2),this[_0x6df751(0x1b6)]=null,this['_objUrl']=null,this[_0x6df751(0x188)]=null,this[_0x6df751(0x1d5)]='',this[_0x6df751(0x1a6)]=0x0,this[_0x6df751(0x16b)]=null,this[_0x6df751(0x18b)]=null,this['_audioDurationProbeToken']=0x0,this[_0x6df751(0x162)]=![],this[_0x6df751(0x1ba)]=null;}[a276_0x83dc88(0x194)](_0x46bd6b){return resolveCanvasAudioUrl(_0x46bd6b);}[a276_0x83dc88(0x124)](){const _0x1993d4=a276_0x83dc88;this[_0x1993d4(0x19d)]();const _0x451953=this['el'];setStaticInnerHTML(_0x451953,_SOURCE_AUDIO_NODE_TEMPLATE_ID),this[_0x1993d4(0x14c)]=_0x451953[_0x1993d4(0x1e8)](_0x1993d4(0x13f)),this[_0x1993d4(0x12d)]=_0x451953[_0x1993d4(0x1e8)](_0x1993d4(0x19a)),this['_audio'][_0x1993d4(0x1b7)]='none',this[_0x1993d4(0x149)]=_0x451953[_0x1993d4(0x1e8)](_0x1993d4(0x1c9)),this[_0x1993d4(0x168)]=_0x451953[_0x1993d4(0x1e8)]('.audio-time-display'),this[_0x1993d4(0x197)]=_0x451953[_0x1993d4(0x1e8)](_0x1993d4(0x180)),this[_0x1993d4(0x178)]=_0x451953[_0x1993d4(0x1e8)]('.waveform-unplayed'),this['_progressLine']=_0x451953[_0x1993d4(0x1e8)](_0x1993d4(0x175)),this[_0x1993d4(0x151)]=_0x451953[_0x1993d4(0x1e8)]('.node-upload-hint'),this[_0x1993d4(0x176)]=_0x451953[_0x1993d4(0x1e8)]('.upload-btn'),this[_0x1993d4(0x153)]=_0x451953[_0x1993d4(0x1e8)](_0x1993d4(0x15e)),this[_0x1993d4(0x191)]=_0x451953['querySelector']('.act-separate,\x20.separate-btn'),this[_0x1993d4(0x1a3)]=_0x451953[_0x1993d4(0x1e8)](_0x1993d4(0x15f)),this[_0x1993d4(0x150)]=_0x451953[_0x1993d4(0x1e8)](_0x1993d4(0x1b9)),this[_0x1993d4(0x17f)]();{const _0x4b2fbc=_0x451953[_0x1993d4(0x1c4)](_0x1993d4(0x199));this['_waveBgPath']=_0x4b2fbc&&_0x4b2fbc[_0x1993d4(0x15d)]?_0x4b2fbc[0x0]:null;const _0xe06562=_0x451953[_0x1993d4(0x1c4)]('.waveform-unplayed\x20svg\x20path');this[_0x1993d4(0x1bd)]=_0xe06562&&_0xe06562[_0x1993d4(0x15d)]?_0xe06562[0x0]:null;}this[_0x1993d4(0x18b)]=createAudioPlaybackProgressController({'audioEl':this[_0x1993d4(0x12d)],'wavePlayedEl':this[_0x1993d4(0x178)],'progressLineEl':this['_progressLine'],'timeEl':this['_timeEl'],'trackEl':this['_bar'],'formatTime':_0x25aebd=>this[_0x1993d4(0x193)](_0x25aebd),'shouldSuppressSync':()=>this[_0x1993d4(0x12f)]||this[_0x1993d4(0x197)]?.[_0x1993d4(0x1db)][_0x1993d4(0x14b)]===_0x1993d4(0x1a9)})[_0x1993d4(0x1e9)]();const _0x12e2f2=_0x451953[_0x1993d4(0x1e8)](_0x1993d4(0x126));if(_0x12e2f2)_0x12e2f2['addEventListener'](_0x1993d4(0x1ae),_0x5c81f3=>_0x5c81f3['stopPropagation']());this[_0x1993d4(0x1a8)]=document[_0x1993d4(0x187)](_0x1993d4(0x1b3)),this[_0x1993d4(0x1a8)][_0x1993d4(0x185)]=_0x1993d4(0x1df),this[_0x1993d4(0x1a8)][_0x1993d4(0x1da)]=_0x1993d4(0x19e),this['_input']['style'][_0x1993d4(0x181)]=_0x1993d4(0x1b5),_0x451953[_0x1993d4(0x1a2)](this[_0x1993d4(0x1a8)]),this[_0x1993d4(0x176)][_0x1993d4(0x13a)]('pointerdown',_0x511158=>{const _0x46ba85=_0x1993d4;_0x511158[_0x46ba85(0x156)](),this[_0x46ba85(0x1a8)][_0x46ba85(0x1ab)]();}),this['_card'][_0x1993d4(0x13a)](_0x1993d4(0x137),_0x24038e=>{_0x24038e['stopPropagation']();});let _0x95cab0={'x':0x0,'y':0x0};this[_0x1993d4(0x14c)][_0x1993d4(0x13a)]('pointerdown',_0x57c7fe=>{const _0x113321=_0x1993d4;if(_0x57c7fe[_0x113321(0x184)][_0x113321(0x166)](_0x113321(0x180)))return;_0x95cab0={'x':_0x57c7fe[_0x113321(0x158)],'y':_0x57c7fe[_0x113321(0x1bb)]};}),this['_card']['addEventListener'](_0x1993d4(0x17c),_0xf191d2=>{const _0x22c96c=_0x1993d4;if(_0xf191d2[_0x22c96c(0x184)][_0x22c96c(0x166)]('.media-progress-bar')||_0xf191d2['target'][_0x22c96c(0x166)](_0x22c96c(0x1c9))||_0xf191d2['target']['closest'](_0x22c96c(0x1ce))||_0xf191d2[_0x22c96c(0x184)]['closest'](_0x22c96c(0x126)))return;const _0xcdb31=Math[_0x22c96c(0x13e)](_0xf191d2['clientX']-_0x95cab0['x'],_0xf191d2['clientY']-_0x95cab0['y']);if(_0xcdb31<0x5){const _0x2a4dc7=this[_0x22c96c(0x14c)]['getBoundingClientRect'](),_0x18eff9=Math['max'](0x0,Math[_0x22c96c(0x1d9)](0x1,(_0xf191d2[_0x22c96c(0x158)]-_0x2a4dc7[_0x22c96c(0x1d6)])/_0x2a4dc7[_0x22c96c(0x1e6)])),_0x2b5c00=this[_0x22c96c(0x1c8)]();if(this[_0x22c96c(0x12d)]&&_0x2b5c00>0x0){const _0x1bfaa3=_0x18eff9*_0x2b5c00;this[_0x22c96c(0x12d)][_0x22c96c(0x17b)]=_0x1bfaa3,this[_0x22c96c(0x18b)]?.[_0x22c96c(0x12c)]({'currentTime':_0x1bfaa3,'duration':_0x2b5c00,'force':!![],'showLine':!![]});}}}),this[_0x1993d4(0x197)]?.[_0x1993d4(0x13a)]('click',_0x4977f3=>{const _0x5f268b=_0x1993d4;this['_seekTo'](_0x4977f3[_0x5f268b(0x158)]);}),this[_0x1993d4(0x1a8)]['addEventListener'](_0x1993d4(0x1dc),async _0x5e4a2c=>{const _0x1b8788=_0x1993d4,_0x520f43=_0x5e4a2c['target'][_0x1b8788(0x147)][0x0];if(!_0x520f43)return;startLoading(this['_card'],{'variant':_0x1b8788(0x196)}),this['_progressController']?.[_0x1b8788(0x157)]();const _0x2614d5=Array[_0x1b8788(0x1a0)](this[_0x1b8788(0x176)][_0x1b8788(0x1c0)])[_0x1b8788(0x152)](_0x2db3af=>_0x2db3af[_0x1b8788(0x1c6)](!![]));this[_0x1b8788(0x162)]=!![],this[_0x1b8788(0x176)]['textContent']=sourceAudioText(_0x1b8788(0x183)),this[_0x1b8788(0x176)]['style'][_0x1b8788(0x1e1)]=_0x1b8788(0x1b5);try{const _0xc12924=window[_0x1b8788(0x16d)]||_0x1b8788(0x128),_0xc8d4e9=await uploadFile(_0x520f43,_0xc12924),_0x4f8f28=_0x520f43[_0x1b8788(0x1aa)][_0x1b8788(0x195)](/\.[^/.]+$/,'');a276_0x54a907[_0x1b8788(0x1d4)](this['id'],_0x4f8f28);const _0x101a17=document[_0x1b8788(0x17a)](this['id']),_0x37c373=_0x101a17?.[_0x1b8788(0x125)];if(_0x37c373)_0x37c373[_0x1b8788(0x146)]=_0x4f8f28;const _0x5e289a=_0xc8d4e9['url'],_0x3265c7=pickResultLocalPath(_0xc8d4e9)||urlToLocalPath(_0x5e289a);a276_0x54a907['updateNodeData'](this['id'],{'src':_0x5e289a,'localPath':_0x3265c7,'audioDuration':Number(_0xc8d4e9['audioDuration']||_0xc8d4e9[_0x1b8788(0x14a)]||0x0)||0x0,'assetId':_0xc8d4e9[_0x1b8788(0x182)]||'','originalLocalPath':_0xc8d4e9['originalLocalPath']||_0xc8d4e9[_0x1b8788(0x16e)]||'','waveformLocalPath':_0xc8d4e9[_0x1b8788(0x17e)]||'','derivativeStatus':_0xc8d4e9['derivativeStatus']||_0xc8d4e9[_0x1b8788(0x131)]||'','mediaTaskId':_0xc8d4e9['mediaTaskId']||'','mediaTaskKind':_0xc8d4e9[_0x1b8788(0x129)]||'','mediaTaskStatus':_0xc8d4e9[_0x1b8788(0x1e0)]||'','mediaTaskProgress':Number(_0xc8d4e9[_0x1b8788(0x1c3)]||0x0)||0x0,'mediaTaskError':_0xc8d4e9['mediaTaskError']||'','fileName':_0xc8d4e9['filename']||_0x520f43[_0x1b8788(0x1aa)]});}catch(_0x6f5c8){console[_0x1b8788(0x1b2)](_0x1b8788(0x140),_0x6f5c8),window[_0x1b8788(0x1c5)](sourceAudioText(_0x1b8788(0x13c))),stopLoading(this[_0x1b8788(0x14c)]),this[_0x1b8788(0x1b6)]&&this[_0x1b8788(0x18b)]?.[_0x1b8788(0x12c)]({'force':!![],'showLine':!![]});}finally{this[_0x1b8788(0x176)][_0x1b8788(0x1e7)](..._0x2614d5['map'](_0x3c5f71=>_0x3c5f71[_0x1b8788(0x1c6)](!![]))),this[_0x1b8788(0x176)][_0x1b8788(0x139)][_0x1b8788(0x1e1)]=_0x1b8788(0x12b),this[_0x1b8788(0x162)]=![],this['_syncLocaleTexts'](),this[_0x1b8788(0x1a8)][_0x1b8788(0x1ac)]='';}}),this[_0x1993d4(0x149)]['addEventListener'](_0x1993d4(0x1ae),_0x2b7b93=>{const _0x4fc93b=_0x1993d4;_0x2b7b93[_0x4fc93b(0x156)](),this[_0x4fc93b(0x12d)][_0x4fc93b(0x134)]&&this[_0x4fc93b(0x1b6)]?this['_playAudio']():this[_0x4fc93b(0x12d)][_0x4fc93b(0x1b0)]();});const _0x1503da=[0x1,1.25,1.5,0x2];let _0x5993cb=0x0;this[_0x1993d4(0x1a3)]?.[_0x1993d4(0x13a)]('pointerdown',_0x47c313=>{const _0x53cc31=_0x1993d4;_0x47c313[_0x53cc31(0x156)](),_0x5993cb=(_0x5993cb+0x1)%_0x1503da[_0x53cc31(0x15d)];const _0x4d67b1=_0x1503da[_0x5993cb];this['_audio'][_0x53cc31(0x141)]=_0x4d67b1,this[_0x53cc31(0x1a3)][_0x53cc31(0x146)]=_0x4d67b1['toFixed'](0x1)+'x';}),this[_0x1993d4(0x153)]?.[_0x1993d4(0x13a)](_0x1993d4(0x1ae),_0x331a2a=>{const _0x85ff57=_0x1993d4;_0x331a2a[_0x85ff57(0x156)](),a276_0x21aa1a['init'](this['id']);}),bindRunningHubToolbarTaskButton({'button':this['_separateBtn'],'getTask':()=>getRunningAudioSeparationTaskForNode(this['id']),'cancelTask':()=>cancelAudioSeparationTaskForNode(this['id'],{'notify':!![]}),'cancelTooltip':sourceAudioText(_0x1993d4(0x167)),'eventTypes':['pointerdown',_0x1993d4(0x1ab)]}),this[_0x1993d4(0x191)]?.['addEventListener']('pointerdown',_0x20be1f=>{const _0xb11cdf=_0x1993d4;if(getRunningAudioSeparationTaskForNode(this['id'])){_0x20be1f[_0xb11cdf(0x163)](),_0x20be1f[_0xb11cdf(0x156)](),void cancelAudioSeparationTaskForNode(this['id'],{'notify':!![]});return;}_0x20be1f[_0xb11cdf(0x156)](),void runAudioSeparationFromNode(this['id']);}),bindAudioDownloadAction({'button':this[_0x1993d4(0x150)],'getNodeData':()=>a276_0x54a907[_0x1993d4(0x1dd)]()[_0x1993d4(0x1a4)]?.[this['id']]||this[_0x1993d4(0x143)]||{},'getAudioElement':()=>this[_0x1993d4(0x12d)],'notifyMissing':()=>window[_0x1993d4(0x1c5)]?.(sourceAudioText(_0x1993d4(0x14e)),_0x1993d4(0x17d))}),this[_0x1993d4(0x12d)][_0x1993d4(0x13a)](_0x1993d4(0x1e4),()=>this[_0x1993d4(0x1a1)](![])),this[_0x1993d4(0x12d)]['addEventListener'](_0x1993d4(0x1b0),()=>this[_0x1993d4(0x1a1)](!![])),this['_unregisterAudioPlaybackClient']?.(),this[_0x1993d4(0x1d3)]=registerAudioPlaybackClient(this['id'],{'stopForExternalPlayback':()=>this[_0x1993d4(0x189)]()});const _0x2fbe95=this[_0x1993d4(0x194)](this[_0x1993d4(0x143)]);if(_0x2fbe95){this[_0x1993d4(0x1e2)](_0x2fbe95);if(this[_0x1993d4(0x151)])this[_0x1993d4(0x151)][_0x1993d4(0x139)][_0x1993d4(0x181)]=_0x1993d4(0x1a7);}else{this['_progressController']?.[_0x1993d4(0x157)]();if(this['_hint'])this[_0x1993d4(0x151)]['style'][_0x1993d4(0x181)]=_0x1993d4(0x1a7);}return this[_0x1993d4(0x18e)](this['_data'],_0x2fbe95),maybeResumeAudioSeparationLeader(this['id']),_0x451953;}[a276_0x83dc88(0x18e)](_0x567c4d,_0x2168b7){const _0x28ae12=a276_0x83dc88,_0x57bc3b=shouldShowGenerationResultLoadingUi(_0x567c4d,{'hasResult':!!_0x2168b7});if(this['_uploadBtn'])this['_uploadBtn'][_0x28ae12(0x1ca)]=_0x57bc3b;if(_0x57bc3b){startLoading(this[_0x28ae12(0x14c)],{'variant':_0x28ae12(0x148)});if(this[_0x28ae12(0x151)])this[_0x28ae12(0x151)][_0x28ae12(0x139)][_0x28ae12(0x181)]='none';return;}stopLoading(this['_card']),this[_0x28ae12(0x1a5)](_0x567c4d,_0x2168b7);if(!_0x2168b7&&this['_hint'])this[_0x28ae12(0x151)][_0x28ae12(0x139)]['display']=_0x28ae12(0x1a7);}[a276_0x83dc88(0x1a5)](_0xb20585,_0x2ab07f){const _0x1d863c=a276_0x83dc88;if(!_0x2ab07f||!_0xb20585||typeof _0xb20585!=='object')return;if(!_0xb20585['generationStartTime']&&_0xb20585['generationDuration']==null)return;const _0x41d575=a276_0x54a907[_0x1d863c(0x1dd)]()[_0x1d863c(0x1a4)]?.[this['id']];if(!_0x41d575)return;const _0x57e2df={};if(_0x41d575['generationStartTime'])_0x57e2df[_0x1d863c(0x159)]=null;if(_0x41d575[_0x1d863c(0x192)]!=null)_0x57e2df[_0x1d863c(0x192)]=null;if(_0x41d575['isGenerating']===!![])_0x57e2df['isGenerating']=![];Object[_0x1d863c(0x1af)](_0x57e2df)[_0x1d863c(0x15d)]>0x0&&a276_0x54a907[_0x1d863c(0x1ea)](this['id'],_0x57e2df);}[a276_0x83dc88(0x1eb)](_0xffd931){const _0x48d4fa=a276_0x83dc88,_0x138286=this[_0x48d4fa(0x1c8)]();if(!this['_audio']||_0x138286<=0x0)return;const _0x581f69=this[_0x48d4fa(0x197)][_0x48d4fa(0x1ef)]();if(_0x581f69[_0x48d4fa(0x1e6)]===0x0)return;let _0x3a2293=(_0xffd931-_0x581f69[_0x48d4fa(0x1d6)])/_0x581f69[_0x48d4fa(0x1e6)];_0x3a2293=Math[_0x48d4fa(0x179)](0x0,Math['min'](0x1,_0x3a2293));const _0x17eba8=_0x3a2293*_0x138286;if(!isFinite(_0x17eba8))return;this[_0x48d4fa(0x12f)]=!![],this['_audio'][_0x48d4fa(0x17b)]=_0x17eba8,this[_0x48d4fa(0x18b)]?.[_0x48d4fa(0x12c)]({'currentTime':_0x17eba8,'duration':_0x138286,'force':!![],'showLine':!![]}),this[_0x48d4fa(0x12d)]['addEventListener'](_0x48d4fa(0x135),()=>{const _0x56bb62=_0x48d4fa;this[_0x56bb62(0x12f)]=![],this[_0x56bb62(0x18b)]?.[_0x56bb62(0x12c)]({'force':!![],'showLine':!![]});},{'once':!![]});}[a276_0x83dc88(0x18f)](){return getMediaElementPlaybackSourceKey(this['_audio']);}['_getAudioElementCurrentSource'](){return getMediaElementCurrentSource(this['_audio']);}[a276_0x83dc88(0x171)](){const _0x165b52=a276_0x83dc88;if(!this[_0x165b52(0x12d)]||!this[_0x165b52(0x1cb)]())return![];const _0x3b8b97=Number(this[_0x165b52(0x12d)][_0x165b52(0x1e3)]||0x0);return _0x3b8b97>=0x2;}[a276_0x83dc88(0x1c8)](){const _0x3208a6=a276_0x83dc88,_0x4c8b38=normalizeAudioDurationSec(this[_0x3208a6(0x12d)]?.[_0x3208a6(0x14a)]),_0x78d400=a276_0x54a907['getState']()[_0x3208a6(0x1a4)]?.[this['id']],_0x27ef64=pickAudioDurationSec(_0x78d400?.[_0x3208a6(0x172)],!_0x78d400?this[_0x3208a6(0x143)]?.['audioDuration']:0x0);if(_0x27ef64>0x0){if(!(_0x4c8b38>0x0))return _0x27ef64;const _0x2fe276=Math[_0x3208a6(0x179)](0x1,_0x27ef64*0.25);if(Math[_0x3208a6(0x1b4)](_0x27ef64-_0x4c8b38)>_0x2fe276)return _0x27ef64;}return _0x4c8b38;}[a276_0x83dc88(0x1bc)]({currentTime:currentTime=0x0,showLine:showLine=![]}={}){const _0x16fa7e=a276_0x83dc88,_0x114567=this[_0x16fa7e(0x1c8)]();if(!(_0x114567>0x0))return![];const _0x44d989=Number(currentTime),_0xee0fb3=Number[_0x16fa7e(0x136)](_0x44d989)?Math['max'](0x0,Math[_0x16fa7e(0x1d9)](_0x44d989,_0x114567)):0x0,_0x550581=this[_0x16fa7e(0x18b)]?.[_0x16fa7e(0x12c)]({'currentTime':_0xee0fb3,'duration':_0x114567,'force':!![],'showLine':showLine});if(!showLine)this[_0x16fa7e(0x18b)]?.[_0x16fa7e(0x1de)]?.();return!_0x550581&&this[_0x16fa7e(0x168)]&&(this[_0x16fa7e(0x168)][_0x16fa7e(0x146)]=this[_0x16fa7e(0x193)](_0xee0fb3)+'\x20/\x20'+this[_0x16fa7e(0x193)](_0x114567)),!![];}[a276_0x83dc88(0x1ec)](_0x8a4586,_0x5c4313=this[a276_0x83dc88(0x1b6)]){const _0x4636ea=a276_0x83dc88;if(_0x5c4313&&this[_0x4636ea(0x1b6)]!==_0x5c4313)return![];const _0x5c3a49=normalizeAudioDurationSec(_0x8a4586);if(!(_0x5c3a49>0x0))return![];const _0x34173d=a276_0x54a907['getState']()[_0x4636ea(0x1a4)]?.[this['id']],_0x2fc6a5=pickAudioDurationSec(_0x34173d?.[_0x4636ea(0x172)],this[_0x4636ea(0x143)]?.[_0x4636ea(0x172)]);if(_0x2fc6a5>0x0){if(Math['abs'](_0x2fc6a5-_0x5c3a49)<=0.001)return this[_0x4636ea(0x1bc)]({'currentTime':this['_audio']?.['currentTime']||0x0,'showLine':Number(this[_0x4636ea(0x12d)]?.['currentTime']||0x0)>0x0});const _0x5b08fe=Math[_0x4636ea(0x179)](0x1,_0x2fc6a5*0.25);if(Math['abs'](_0x2fc6a5-_0x5c3a49)>_0x5b08fe)return![];}return _0x34173d?(a276_0x54a907['updateNodeData'](this['id'],{'audioDuration':_0x5c3a49}),this[_0x4636ea(0x143)]={...this[_0x4636ea(0x143)]||{},'audioDuration':_0x5c3a49},this[_0x4636ea(0x1bc)]({'currentTime':this[_0x4636ea(0x12d)]?.[_0x4636ea(0x17b)]||0x0,'showLine':Number(this[_0x4636ea(0x12d)]?.[_0x4636ea(0x17b)]||0x0)>0x0})):(this['_data']={...this[_0x4636ea(0x143)]||{},'audioDuration':_0x5c3a49},this[_0x4636ea(0x1bc)]({'currentTime':this[_0x4636ea(0x12d)]?.[_0x4636ea(0x17b)]||0x0,'showLine':Number(this[_0x4636ea(0x12d)]?.[_0x4636ea(0x17b)]||0x0)>0x0})),!![];}[a276_0x83dc88(0x130)](_0x7dac29){const _0x4cdcd7=a276_0x83dc88,_0x229c22=String(_0x7dac29||'')[_0x4cdcd7(0x1c1)]();if(!_0x229c22||this[_0x4cdcd7(0x1c8)]()>0x0)return;const _0x59c86a=(this[_0x4cdcd7(0x132)]||0x0)+0x1;this[_0x4cdcd7(0x132)]=_0x59c86a,void loadAudioDurationMetadataSec(_0x229c22)[_0x4cdcd7(0x1d7)](_0x395e2c=>{const _0x1e82b8=_0x4cdcd7;if(this[_0x1e82b8(0x132)]!==_0x59c86a||this[_0x1e82b8(0x1b6)]!==_0x229c22)return;this[_0x1e82b8(0x1ec)](_0x395e2c,_0x229c22);});}[a276_0x83dc88(0x1bf)](){const _0x109af5=a276_0x83dc88;if(!this[_0x109af5(0x12d)])return;const _0x26a005=this[_0x109af5(0x1c8)]();if(!(_0x26a005>0x0))return;const _0x304675=Number(this[_0x109af5(0x12d)][_0x109af5(0x17b)]||0x0),_0x4df770=Number[_0x109af5(0x136)](_0x304675)&&_0x304675>=_0x26a005-0.05;if(this[_0x109af5(0x12d)][_0x109af5(0x16a)]!==!![]&&!_0x4df770)return;try{this[_0x109af5(0x12d)][_0x109af5(0x17b)]=0x0;}catch{}this[_0x109af5(0x18b)]?.['sync']({'currentTime':0x0,'duration':_0x26a005,'force':!![],'showLine':!![]});}['_clearAudioElementSource'](){const _0x664cc2=a276_0x83dc88;if(!this[_0x664cc2(0x12d)])return;try{this[_0x664cc2(0x12d)]['pause']?.();}catch{}this[_0x664cc2(0x12d)][_0x664cc2(0x127)]?.('src'),clearDesktopMediaPlaybackSourceMetadata(this['_audio']),this[_0x664cc2(0x12d)][_0x664cc2(0x1b7)]=_0x664cc2(0x1b5);try{this['_audio'][_0x664cc2(0x144)]?.();}catch{}}[a276_0x83dc88(0x1b8)](_0x1d635d){const _0x21d147=a276_0x83dc88;if(!this['_audio'])return;const _0x3d9eff=()=>{const _0x1dc052=a276_0x2b48;if(this[_0x1dc052(0x1b6)]===_0x1d635d)this['_rememberAudioDuration'](_0x1d635d);};this['_audio'][_0x21d147(0x177)]=_0x3d9eff,this[_0x21d147(0x12d)][_0x21d147(0x12e)]=_0x3d9eff;const _0x45bba0=()=>{const _0x2beae8=_0x21d147;this[_0x2beae8(0x1b6)]===_0x1d635d&&(this[_0x2beae8(0x19c)](_0x1d635d),stopLoading(this[_0x2beae8(0x14c)]));};this['_audio'][_0x21d147(0x1be)]=_0x45bba0,this[_0x21d147(0x12d)][_0x21d147(0x19f)]=_0x45bba0,this[_0x21d147(0x12d)][_0x21d147(0x1d1)]=_0x45bba0,this[_0x21d147(0x12d)]['onerror']=()=>{const _0x15bd4f=_0x21d147;if(this[_0x15bd4f(0x1b6)]===_0x1d635d)stopLoading(this[_0x15bd4f(0x14c)]);};}[a276_0x83dc88(0x1e2)](_0x45a0b5){const _0x4b9d0c=a276_0x83dc88;if(!_0x45a0b5){typeof this[_0x4b9d0c(0x16b)]==='function'&&(this[_0x4b9d0c(0x16b)](),this[_0x4b9d0c(0x16b)]=null);this[_0x4b9d0c(0x170)](),this['_currentSrc']=null,this[_0x4b9d0c(0x18b)]?.['reset'](),this[_0x4b9d0c(0x132)]+=0x1,stopLoading(this[_0x4b9d0c(0x14c)]);return;}const _0x351e7d=this['_currentSrc'],_0x62c5e=_0x351e7d!==_0x45a0b5;_0x62c5e&&this[_0x4b9d0c(0x18b)]?.[_0x4b9d0c(0x157)]();this['_currentSrc']=_0x45a0b5;if(_0x62c5e&&_0x351e7d){const _0x4e8974=a276_0x54a907[_0x4b9d0c(0x1dd)]()[_0x4b9d0c(0x1a4)]?.[this['id']];Number(_0x4e8974?.[_0x4b9d0c(0x172)]||0x0)>0x0&&a276_0x54a907[_0x4b9d0c(0x1ea)](this['id'],{'audioDuration':0x0});}this[_0x4b9d0c(0x18f)]()&&this[_0x4b9d0c(0x170)]();this['_audio'][_0x4b9d0c(0x1b7)]=_0x4b9d0c(0x1b5),this[_0x4b9d0c(0x1b8)](_0x45a0b5);!this['_syncKnownAudioDurationUi']({'currentTime':0x0,'showLine':![]})&&this['_probeAudioDurationIfNeeded'](_0x45a0b5);stopLoading(this[_0x4b9d0c(0x14c)]),void this['_ensureWaveform'](_0x45a0b5,{'persistedOnly':!![]});if(this[_0x4b9d0c(0x151)])this[_0x4b9d0c(0x151)]['style'][_0x4b9d0c(0x181)]=_0x4b9d0c(0x1a7);}async[a276_0x83dc88(0x15c)](_0x1c628a,{showLoading:showLoading=!![]}={}){const _0x2900a0=a276_0x83dc88;if(!_0x1c628a)return this['_prepareAudio'](''),![];const _0x2ff857=this['_currentSrc'],_0x1d8c17=_0x2ff857!==_0x1c628a;_0x1d8c17&&this['_progressController']?.['reset']();this['_currentSrc']=_0x1c628a;const _0x5f5ade=!!this[_0x2900a0(0x1cb)](),_0x5d15c0=!isMediaElementPlaybackSource(this['_audio'],_0x1c628a)||!_0x5f5ade;this[_0x2900a0(0x1b8)](_0x1c628a);if(!_0x5d15c0&&this[_0x2900a0(0x171)]()){if(this[_0x2900a0(0x12d)][_0x2900a0(0x1b7)]!==_0x2900a0(0x12b))this['_audio']['preload']=_0x2900a0(0x12b);return stopLoading(this[_0x2900a0(0x14c)]),!![];}if(showLoading&&_0x5d15c0)startLoading(this[_0x2900a0(0x14c)],{'variant':_0x2900a0(0x196)});if(!_0x5d15c0){if(this[_0x2900a0(0x12d)][_0x2900a0(0x1b7)]!=='auto')this[_0x2900a0(0x12d)][_0x2900a0(0x1b7)]=_0x2900a0(0x12b);try{this[_0x2900a0(0x12d)]['load']?.();}catch{}}else await attachMediaElementPlaybackSource(this[_0x2900a0(0x12d)],_0x1c628a,{'preload':'auto','warmRanges':![]});if(this[_0x2900a0(0x171)]())stopLoading(this[_0x2900a0(0x14c)]);typeof this['_cancelDeferredWaveform']==='function'&&(this[_0x2900a0(0x16b)](),this['_cancelDeferredWaveform']=null);this[_0x2900a0(0x16b)]=deferWaveformPathUntilAudioReady(this[_0x2900a0(0x12d)],()=>{const _0x58d937=_0x2900a0;this[_0x58d937(0x16b)]=null;if(this[_0x58d937(0x1b6)]!==_0x1c628a)return;void this[_0x58d937(0x164)](_0x1c628a);});if(this[_0x2900a0(0x151)])this['_hint'][_0x2900a0(0x139)][_0x2900a0(0x181)]='block';return!![];}async[a276_0x83dc88(0x164)](_0x1a56ff,{persistedOnly:persistedOnly=![]}={}){const _0xd100db=a276_0x83dc88,_0x11a117=String(_0x1a56ff||'')[_0xd100db(0x1c1)]();if(!_0x11a117)return;const _0x541862=++this[_0xd100db(0x1a6)];this[_0xd100db(0x188)]=_0x11a117;const _0x1766e5=localPathToUrl(this[_0xd100db(0x143)]?.[_0xd100db(0x17e)]);this['_waveformLocalPath']=String(this[_0xd100db(0x143)]?.[_0xd100db(0x17e)]||'')['trim']();const _0x1940d9={'width':0xc8,'height':0x50,'samples':0xbe};let _0x5e3a59='';_0x1766e5&&(_0x5e3a59=await getWaveformBarsPathFromPersistedUrl(_0x1766e5,_0x1940d9));!_0x5e3a59&&!persistedOnly&&(_0x5e3a59=await getWaveformBarsPathFromUrl(_0x11a117,_0x1940d9));if(!this['_audio']||!this['el']||!this['el'][_0xd100db(0x1d0)])return;if(_0x541862!==this['_waveToken'])return;if(!_0x5e3a59)return;if(this['_waveBgPath'])this[_0xd100db(0x174)]['setAttribute']('d',_0x5e3a59);if(this['_waveFgPath'])this['_waveFgPath'][_0xd100db(0x1c7)]('d',_0x5e3a59);}['_fmt'](_0x53310d){const _0x401dda=a276_0x83dc88;if(!_0x53310d||isNaN(_0x53310d))return _0x401dda(0x16c);return Math[_0x401dda(0x1d8)](_0x53310d/0x3c)+':'+String(Math[_0x401dda(0x1d8)](_0x53310d%0x3c))[_0x401dda(0x154)](0x2,'0');}[a276_0x83dc88(0x1a1)](_0x16a5e9){const _0x40f79f=a276_0x83dc88,_0x2a214b=this[_0x40f79f(0x149)][_0x40f79f(0x1e8)](_0x40f79f(0x1d2));if(!_0x2a214b)return;const _0x3e1f2c=_0x40f79f(0x142);while(_0x2a214b[_0x40f79f(0x1e5)])_0x2a214b[_0x40f79f(0x12a)](_0x2a214b[_0x40f79f(0x1e5)]);if(_0x16a5e9){const _0x1618cd=document['createElementNS'](_0x3e1f2c,_0x40f79f(0x1ee));_0x1618cd['setAttribute'](_0x40f79f(0x133),'5\x203\x2019\x2012\x205\x2021\x205\x203'),_0x2a214b[_0x40f79f(0x1a2)](_0x1618cd);}else{const _0x4f6c40=document[_0x40f79f(0x1ed)](_0x3e1f2c,_0x40f79f(0x15a));_0x4f6c40['setAttribute']('x','6'),_0x4f6c40[_0x40f79f(0x1c7)]('y','4'),_0x4f6c40[_0x40f79f(0x1c7)]('width','4'),_0x4f6c40['setAttribute'](_0x40f79f(0x15b),'16');const _0x100821=document[_0x40f79f(0x1ed)](_0x3e1f2c,_0x40f79f(0x15a));_0x100821[_0x40f79f(0x1c7)]('x','14'),_0x100821[_0x40f79f(0x1c7)]('y','4'),_0x100821[_0x40f79f(0x1c7)](_0x40f79f(0x1e6),'4'),_0x100821['setAttribute'](_0x40f79f(0x15b),'16'),_0x2a214b[_0x40f79f(0x1a2)](_0x4f6c40),_0x2a214b[_0x40f79f(0x1a2)](_0x100821);}}[a276_0x83dc88(0x1cc)](_0x3f9345){const _0x32f7ae=a276_0x83dc88;this[_0x32f7ae(0x143)]=_0x3f9345;if(!this[_0x32f7ae(0x12d)])return;const _0xaa0765=this['_resolveAudioSrc'](_0x3f9345);this[_0x32f7ae(0x18e)](_0x3f9345,_0xaa0765);if(_0xaa0765&&_0xaa0765!==this[_0x32f7ae(0x1b6)])this[_0x32f7ae(0x1e2)](_0xaa0765);else{if(_0xaa0765)!this[_0x32f7ae(0x1bc)]({'currentTime':this[_0x32f7ae(0x12d)]?.[_0x32f7ae(0x17b)]||0x0,'showLine':Number(this[_0x32f7ae(0x12d)]?.[_0x32f7ae(0x17b)]||0x0)>0x0})&&this['_probeAudioDurationIfNeeded'](_0xaa0765),String(_0x3f9345?.['waveformLocalPath']||'')[_0x32f7ae(0x1c1)]()&&String(_0x3f9345?.[_0x32f7ae(0x17e)]||'')[_0x32f7ae(0x1c1)]()!==this[_0x32f7ae(0x1d5)]&&void this['_ensureWaveform'](_0xaa0765,{'persistedOnly':!![]});else!_0xaa0765&&(typeof this['_cancelDeferredWaveform']===_0x32f7ae(0x165)&&(this['_cancelDeferredWaveform'](),this['_cancelDeferredWaveform']=null),this['_clearAudioElementSource'](),this['_currentSrc']=null,this[_0x32f7ae(0x18b)]?.[_0x32f7ae(0x157)](),this['_audioDurationProbeToken']+=0x1,this[_0x32f7ae(0x151)]&&(this[_0x32f7ae(0x151)][_0x32f7ae(0x139)][_0x32f7ae(0x181)]=shouldShowGenerationResultLoadingUi(_0x3f9345)?_0x32f7ae(0x1b5):_0x32f7ae(0x1a7)));}maybeResumeAudioSeparationLeader(this['id']),this[_0x32f7ae(0x161)]&&_0x3f9345[_0x32f7ae(0x1aa)]&&document[_0x32f7ae(0x16f)]!==this[_0x32f7ae(0x161)]&&(this[_0x32f7ae(0x161)][_0x32f7ae(0x14d)]=_0x3f9345[_0x32f7ae(0x1aa)]);}async[a276_0x83dc88(0x1b1)](){const _0x43d512=a276_0x83dc88;if(!this['_audio']||!this[_0x43d512(0x1b6)])return;beginAudioPlayback(this['id']),await this[_0x43d512(0x15c)](this['_currentSrc'],{'showLoading':!![]}),this['_rewindEndedAudioIfNeeded']();const _0x12af44=this[_0x43d512(0x12d)]['play']();_0x12af44&&typeof _0x12af44['catch']===_0x43d512(0x165)?_0x12af44[_0x43d512(0x1d7)](()=>{const _0xc4c1b2=_0x43d512;this[_0xc4c1b2(0x19c)](),stopLoading(this[_0xc4c1b2(0x14c)]);})[_0x43d512(0x198)](_0x2de02f=>{const _0x1567b7=_0x43d512;stopLoading(this[_0x1567b7(0x14c)]);if(_0x2de02f?.['name']===_0x1567b7(0x13d))return;console[_0x1567b7(0x17d)]('[source-audio]\x20play\x20failed:',_0x2de02f);}):stopLoading(this[_0x43d512(0x14c)]);}[a276_0x83dc88(0x189)](){const _0x3dbbc2=a276_0x83dc88;if(!this[_0x3dbbc2(0x12d)])return;typeof this[_0x3dbbc2(0x16b)]===_0x3dbbc2(0x165)&&(this[_0x3dbbc2(0x16b)](),this[_0x3dbbc2(0x16b)]=null);try{this[_0x3dbbc2(0x12d)][_0x3dbbc2(0x1b0)]?.();}catch{}!this['_getAudioElementCurrentSource']()&&this[_0x3dbbc2(0x18b)]?.[_0x3dbbc2(0x157)](),stopLoading(this['_card']),this['_setIcon'](!![]);}[a276_0x83dc88(0x19c)](_0x5ea5c5=this[a276_0x83dc88(0x1b6)]){const _0x3c3135=a276_0x83dc88;if(!this[_0x3c3135(0x12d)]||_0x5ea5c5&&this[_0x3c3135(0x1b6)]!==_0x5ea5c5)return;const _0x500f8e=this[_0x3c3135(0x1c8)]();if(!(_0x500f8e>0x0))return;this[_0x3c3135(0x1ec)](_0x500f8e,_0x5ea5c5);}[a276_0x83dc88(0x19d)](){const _0x17fcf6=a276_0x83dc88;if(this[_0x17fcf6(0x1ba)])return;this['_unsubscribeLocale']=onLocaleChange(()=>this[_0x17fcf6(0x17f)]());}[a276_0x83dc88(0x18d)](_0x53492d){const _0x3f1e7f=a276_0x83dc88;if(!this[_0x3f1e7f(0x176)])return;const _0x5824bf=this[_0x3f1e7f(0x176)]['querySelector'](_0x3f1e7f(0x1d2))?.['cloneNode'](!![]);this[_0x3f1e7f(0x176)][_0x3f1e7f(0x1e7)]();if(_0x5824bf)this[_0x3f1e7f(0x176)]['appendChild'](_0x5824bf);this[_0x3f1e7f(0x176)][_0x3f1e7f(0x1a2)](document['createTextNode']('\x20'+_0x53492d));}[a276_0x83dc88(0x17f)](){const _0x1540e2=a276_0x83dc88;if(!this[_0x1540e2(0x176)])return;if(this['_isUploading']){this[_0x1540e2(0x176)]['textContent']=sourceAudioText(_0x1540e2(0x183));return;}this[_0x1540e2(0x18d)](sourceAudioText('upload.button'));}[a276_0x83dc88(0x18a)](){const _0x3cb27e=a276_0x83dc88;this['_unsubscribeLocale']?.(),this[_0x3cb27e(0x1ba)]=null,this[_0x3cb27e(0x1d3)]?.(),this[_0x3cb27e(0x1d3)]=null,this[_0x3cb27e(0x18b)]?.[_0x3cb27e(0x160)](),this['_progressController']=null,typeof this[_0x3cb27e(0x16b)]===_0x3cb27e(0x165)&&(this[_0x3cb27e(0x16b)](),this['_cancelDeferredWaveform']=null),this['_clearAudioElementSource']();}}
+import appStore from '../core/stores/appStore.js';
+import { onLocaleChange, t } from '../i18n/index.js';
+import { uploadFile } from '../modules/project.js';
+import {
+  cancelAudioSeparationTaskForNode,
+  getRunningAudioSeparationTaskForNode,
+  maybeResumeAudioSeparationLeader,
+  runAudioSeparationFromNode,
+} from '../modules/AudioSeparationController.js';
+import { registerStaticInnerHTML, setStaticInnerHTML } from '../utils/dom.js';
+import { startLoading, stopLoading } from '../modules/loadingOverlay.js';
+import AudioClipController from '../modules/AudioClipController.js';
+import { SOURCE_AUDIO_TOOLBAR_HTML } from './NodeToolbarConfig.js';
+import {
+  deferWaveformPathUntilAudioReady,
+  getWaveformBarsPathFromPersistedUrl,
+  getWaveformBarsPathFromUrl,
+} from '../utils/audioWaveform.js';
+import { createAudioPlaybackProgressController } from '../utils/audioPlaybackProgress.js';
+import {
+  loadAudioDurationMetadataSec,
+  normalizeAudioDurationSec,
+  pickAudioDurationSec,
+} from '../services/audioMetadataService.js';
+import { beginAudioPlayback, registerAudioPlaybackClient } from '../modules/audioPlaybackCoordinator.js';
+import { resolveCanvasAudioUrl } from '../services/canvasMediaLocalService.js';
+import {
+  attachMediaElementPlaybackSource,
+  clearDesktopMediaPlaybackSourceMetadata,
+  getMediaElementCurrentSource,
+  getMediaElementPlaybackSourceKey,
+  isMediaElementPlaybackSource,
+} from '../services/desktopMediaBlobSource.js';
+import { shouldShowGenerationResultLoadingUi } from '../core/generationTaskUiState.js';
+import { localPathToUrl, pickResultLocalPath, urlToLocalPath } from '../utils/localMediaPath.js';
+import { bindRunningHubToolbarTaskButton } from './nodeToolbar/runningHubToolbarTaskButton.js';
+import { bindAudioDownloadAction } from './nodeToolbar/audioActions/downloadAction.js';
+const WAVE =
+  'M10,40 L10,40 M15,30 L15,50 M20,20 L20,60 M25,35 L25,45 M30,25 L30,55 M35,15 L35,65 M40,30 L40,50 M45,38 L45,42 M50,22 L50,58 M55,18 L55,62 M60,28 L60,52 M65,32 L65,48 M70,24 L70,56 M75,36 L75,44 M80,20 L80,60 M85,16 L85,64 M90,26 L90,54 M95,34 L95,46 M100,22 L100,58 M105,18 L105,62 M110,30 L110,50 M115,38 L115,42 M120,15 L120,65 M125,25 L125,55 M130,35 L130,45 M135,20 L135,60 M140,30 L140,50 M145,40 L145,40 M150,25 L150,55 M155,15 L155,65 M160,30 L160,50 M165,38 L165,42 M170,22 L170,58 M175,18 L175,62 M180,28 L180,52 M185,32 L185,48 M190,24 L190,56';
+function sourceAudioText(_0x54d1c1, _0x26ff9f = {}) {
+  return t('sourceAudioNode.' + _0x54d1c1, _0x26ff9f);
+}
+const _SOURCE_AUDIO_NODE_TEMPLATE_ID = 'node:source-audio';
+registerStaticInnerHTML(
+  _SOURCE_AUDIO_NODE_TEMPLATE_ID,
+  SOURCE_AUDIO_TOOLBAR_HTML +
+    '\n        <div class="node-card media-card audio-card">\n        <div class="waveform waveform-bg">\n          <svg width="100%" height="80" viewBox="0 0 200 80" preserveAspectRatio="none">\n            <path d="' +
+    WAVE +
+    '" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"/>\n            <path d="M0,40 L200,40" stroke="var(--blue)" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>\n          </svg>\n        </div>\n        <div class="waveform waveform-unplayed">\n          <svg width="100%" height="80" viewBox="0 0 200 80" preserveAspectRatio="none">\n            <path d="' +
+    WAVE +
+    '" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"/>\n            <path d="M0,40 L200,40" stroke="var(--blue)" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>\n          </svg>\n        </div>\n        <div class="media-progress-line"></div>\n        <div class="media-progress-bar"></div>\n        \n        <div class="node-upload-hint audio-upload-hint source-upload-hint">\n          <button type="button" class="upload-btn audio-upload-btn source-upload-btn">\n            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>\n          </button>\n        </div>\n\n        <div class="audio-controls">\n           <button type="button" class="audio-play-btn">\n              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>\n           </button>\n           <div class="audio-time-wrap">\n             <span class="audio-time-display">0:00 / 0:00</span>\n           </div>\n        </div>\n        <audio class="audio-player"></audio>\n        <div class="node-port out-port"></div>\n        <div class="node-resizer"></div>\n      </div>',
+);
+export class SourceAudioNode {
+  constructor(_0x4a4aa2) {
+    ((this._data = _0x4a4aa2),
+      (this.el = document.createElement('div')),
+      (this.id = _0x4a4aa2.id),
+      (this.el.className = 'v2-node-component'),
+      (this._currentSrc = null),
+      (this._objUrl = null),
+      (this._waveKey = null),
+      (this._waveformLocalPath = ''),
+      (this._waveToken = 0),
+      (this._cancelDeferredWaveform = null),
+      (this._progressController = null),
+      (this._audioDurationProbeToken = 0),
+      (this._isUploading = false),
+      (this._unsubscribeLocale = null));
+  }
+  ['_resolveAudioSrc'](_0x46bd6b) {
+    return resolveCanvasAudioUrl(_0x46bd6b);
+  }
+  ['mount']() {
+    this._subscribeLocaleChanges();
+    const _0x451953 = this.el;
+    (setStaticInnerHTML(_0x451953, _SOURCE_AUDIO_NODE_TEMPLATE_ID),
+      (this._card = _0x451953.querySelector('.media-card')),
+      (this._audio = _0x451953.querySelector('.audio-player')),
+      (this._audio.preload = 'none'),
+      (this._playBtn = _0x451953.querySelector('.audio-play-btn')),
+      (this._timeEl = _0x451953.querySelector('.audio-time-display')),
+      (this._bar = _0x451953.querySelector('.media-progress-bar')),
+      (this._wavePlayed = _0x451953.querySelector('.waveform-unplayed')),
+      (this._progressLine = _0x451953.querySelector('.media-progress-line')),
+      (this._hint = _0x451953.querySelector('.node-upload-hint')),
+      (this._uploadBtn = _0x451953.querySelector('.upload-btn')),
+      (this._clipBtn = _0x451953.querySelector('.act-clip, .clip-btn')),
+      (this._separateBtn = _0x451953.querySelector('.act-separate, .separate-btn')),
+      (this._speedBtn = _0x451953.querySelector('.act-speed, .speed-btn')),
+      (this._downloadBtn = _0x451953.querySelector('.act-download, .download-btn')),
+      this._syncLocaleTexts());
+    {
+      const _0x4b2fbc = _0x451953.querySelectorAll('.waveform-bg svg path');
+      this._waveBgPath = _0x4b2fbc && _0x4b2fbc.length ? _0x4b2fbc[0] : null;
+      const _0xe06562 = _0x451953.querySelectorAll('.waveform-unplayed svg path');
+      this._waveFgPath = _0xe06562 && _0xe06562.length ? _0xe06562[0] : null;
+    }
+    this._progressController = createAudioPlaybackProgressController({
+      audioEl: this._audio,
+      wavePlayedEl: this._wavePlayed,
+      progressLineEl: this._progressLine,
+      timeEl: this._timeEl,
+      trackEl: this._bar,
+      formatTime: (_0x25aebd) => this._fmt(_0x25aebd),
+      shouldSuppressSync: () => this._isSeeking || this._bar?.dataset.dragging === 'true',
+    }).attach();
+    const _0x12e2f2 = _0x451953.querySelector('.node-floating-toolbar');
+    if (_0x12e2f2) _0x12e2f2.addEventListener('pointerdown', (_0x5c81f3) => _0x5c81f3.stopPropagation());
+    ((this._input = document.createElement('input')),
+      (this._input.type = 'file'),
+      (this._input.accept = 'audio/*'),
+      (this._input.style.display = 'none'),
+      _0x451953.appendChild(this._input),
+      this._uploadBtn.addEventListener('pointerdown', (_0x511158) => {
+        (_0x511158.stopPropagation(), this._input.click());
+      }),
+      this._card.addEventListener('dblclick', (_0x24038e) => {
+        _0x24038e.stopPropagation();
+      }));
+    let _0x95cab0 = { x: 0, y: 0 };
+    (this._card.addEventListener('pointerdown', (_0x57c7fe) => {
+      if (_0x57c7fe.target.closest('.media-progress-bar')) return;
+      _0x95cab0 = { x: _0x57c7fe.clientX, y: _0x57c7fe.clientY };
+    }),
+      this._card.addEventListener('pointerup', (_0xf191d2) => {
+        if (
+          _0xf191d2.target.closest('.media-progress-bar') ||
+          _0xf191d2.target.closest('.audio-play-btn') ||
+          _0xf191d2.target.closest('.upload-btn') ||
+          _0xf191d2.target.closest('.node-floating-toolbar')
+        )
+          return;
+        const _0xcdb31 = Math.hypot(_0xf191d2.clientX - _0x95cab0.x, _0xf191d2.clientY - _0x95cab0.y);
+        if (_0xcdb31 < 5) {
+          const _0x2a4dc7 = this._card.getBoundingClientRect(),
+            _0x18eff9 = Math.max(0, Math.min(1, (_0xf191d2.clientX - _0x2a4dc7.left) / _0x2a4dc7.width)),
+            _0x2b5c00 = this._readAudioDurationSec();
+          if (this._audio && _0x2b5c00 > 0) {
+            const _0x1bfaa3 = _0x18eff9 * _0x2b5c00;
+            ((this._audio.currentTime = _0x1bfaa3),
+              this._progressController?.sync({
+                currentTime: _0x1bfaa3,
+                duration: _0x2b5c00,
+                force: true,
+                showLine: true,
+              }));
+          }
+        }
+      }),
+      this._bar?.addEventListener('click', (_0x4977f3) => {
+        this._seekTo(_0x4977f3.clientX);
+      }),
+      this._input.addEventListener('change', async (_0x5e4a2c) => {
+        const _0x520f43 = _0x5e4a2c.target.files[0];
+        if (!_0x520f43) return;
+        (startLoading(this._card, { variant: 'static' }), this._progressController?.reset());
+        const _0x2614d5 = Array.from(this._uploadBtn.childNodes).map((_0x2db3af) =>
+          _0x2db3af.cloneNode(true),
+        );
+        ((this._isUploading = true),
+          (this._uploadBtn.textContent = sourceAudioText('upload.uploading')),
+          (this._uploadBtn.style.pointerEvents = 'none'));
+        try {
+          const _0xc12924 = window.currentProjectId || 'default_v2_project',
+            _0xc8d4e9 = await uploadFile(_0x520f43, _0xc12924),
+            _0x4f8f28 = _0x520f43.name.replace(/\.[^/.]+$/, '');
+          appStore.renameNode(this.id, _0x4f8f28);
+          const _0x101a17 = document.getElementById(this.id),
+            _0x37c373 = _0x101a17?.__v2_name_el;
+          if (_0x37c373) _0x37c373.textContent = _0x4f8f28;
+          const _0x5e289a = _0xc8d4e9.url,
+            _0x3265c7 = pickResultLocalPath(_0xc8d4e9) || urlToLocalPath(_0x5e289a);
+          appStore.updateNodeData(this.id, {
+            src: _0x5e289a,
+            localPath: _0x3265c7,
+            audioDuration: Number(_0xc8d4e9.audioDuration || _0xc8d4e9.duration || 0) || 0,
+            assetId: _0xc8d4e9.assetId || '',
+            originalLocalPath: _0xc8d4e9.originalLocalPath || _0xc8d4e9.localPath || '',
+            waveformLocalPath: _0xc8d4e9.waveformLocalPath || '',
+            derivativeStatus: _0xc8d4e9.derivativeStatus || _0xc8d4e9.status || '',
+            mediaTaskId: _0xc8d4e9.mediaTaskId || '',
+            mediaTaskKind: _0xc8d4e9.mediaTaskKind || '',
+            mediaTaskStatus: _0xc8d4e9.mediaTaskStatus || '',
+            mediaTaskProgress: Number(_0xc8d4e9.mediaTaskProgress || 0) || 0,
+            mediaTaskError: _0xc8d4e9.mediaTaskError || '',
+            fileName: _0xc8d4e9.filename || _0x520f43.name,
+          });
+        } catch (_0x6f5c8) {
+          (console.error('音频上传失败:', _0x6f5c8),
+            window.showToast(sourceAudioText('upload.failedRetry')),
+            stopLoading(this._card),
+            this._currentSrc && this._progressController?.sync({ force: true, showLine: true }));
+        } finally {
+          (this._uploadBtn.replaceChildren(..._0x2614d5.map((_0x3c5f71) => _0x3c5f71.cloneNode(true))),
+            (this._uploadBtn.style.pointerEvents = 'auto'),
+            (this._isUploading = false),
+            this._syncLocaleTexts(),
+            (this._input.value = ''));
+        }
+      }),
+      this._playBtn.addEventListener('pointerdown', (_0x2b7b93) => {
+        (_0x2b7b93.stopPropagation(),
+          this._audio.paused && this._currentSrc ? this._playAudio() : this._audio.pause());
+      }));
+    const _0x1503da = [1, 1.25, 1.5, 2];
+    let _0x5993cb = 0;
+    (this._speedBtn?.addEventListener('pointerdown', (_0x47c313) => {
+      (_0x47c313.stopPropagation(), (_0x5993cb = (_0x5993cb + 1) % _0x1503da.length));
+      const _0x4d67b1 = _0x1503da[_0x5993cb];
+      ((this._audio.playbackRate = _0x4d67b1), (this._speedBtn.textContent = _0x4d67b1.toFixed(1) + 'x'));
+    }),
+      this._clipBtn?.addEventListener('pointerdown', (_0x331a2a) => {
+        (_0x331a2a.stopPropagation(), AudioClipController.init(this.id));
+      }),
+      bindRunningHubToolbarTaskButton({
+        button: this._separateBtn,
+        getTask: () => getRunningAudioSeparationTaskForNode(this.id),
+        cancelTask: () => cancelAudioSeparationTaskForNode(this.id, { notify: true }),
+        cancelTooltip: sourceAudioText('toolbar.cancelAudioSeparation'),
+        eventTypes: ['pointerdown', 'click'],
+      }),
+      this._separateBtn?.addEventListener('pointerdown', (_0x20be1f) => {
+        if (getRunningAudioSeparationTaskForNode(this.id)) {
+          (_0x20be1f.preventDefault(),
+            _0x20be1f.stopPropagation(),
+            void cancelAudioSeparationTaskForNode(this.id, { notify: true }));
+          return;
+        }
+        (_0x20be1f.stopPropagation(), void runAudioSeparationFromNode(this.id));
+      }),
+      bindAudioDownloadAction({
+        button: this._downloadBtn,
+        getNodeData: () => appStore.getState().nodes?.[this.id] || this._data || {},
+        getAudioElement: () => this._audio,
+        notifyMissing: () => window.showToast?.(sourceAudioText('download.missingAudio'), 'warn'),
+      }),
+      this._audio.addEventListener('play', () => this._setIcon(false)),
+      this._audio.addEventListener('pause', () => this._setIcon(true)),
+      this._unregisterAudioPlaybackClient?.(),
+      (this._unregisterAudioPlaybackClient = registerAudioPlaybackClient(this.id, {
+        stopForExternalPlayback: () => this._stopAudioForExternalPlayback(),
+      })));
+    const _0x2fbe95 = this._resolveAudioSrc(this._data);
+    if (_0x2fbe95) {
+      this._prepareAudio(_0x2fbe95);
+      if (this._hint) this._hint.style.display = 'block';
+    } else {
+      this._progressController?.reset();
+      if (this._hint) this._hint.style.display = 'block';
+    }
+    return (
+      this._syncGeneratingUi(this._data, _0x2fbe95),
+      maybeResumeAudioSeparationLeader(this.id),
+      _0x451953
+    );
+  }
+  ['_syncGeneratingUi'](_0x567c4d, _0x2168b7) {
+    const _0x57bc3b = shouldShowGenerationResultLoadingUi(_0x567c4d, { hasResult: !!_0x2168b7 });
+    if (this._uploadBtn) this._uploadBtn.disabled = _0x57bc3b;
+    if (_0x57bc3b) {
+      startLoading(this._card, { variant: 'full' });
+      if (this._hint) this._hint.style.display = 'none';
+      return;
+    }
+    (stopLoading(this._card), this._clearResolvedAudioTimer(_0x567c4d, _0x2168b7));
+    if (!_0x2168b7 && this._hint) this._hint.style.display = 'block';
+  }
+  ['_clearResolvedAudioTimer'](_0xb20585, _0x2ab07f) {
+    if (!_0x2ab07f || !_0xb20585 || typeof _0xb20585 !== 'object') return;
+    if (!_0xb20585.generationStartTime && _0xb20585.generationDuration == null) return;
+    const _0x41d575 = appStore.getState().nodes?.[this.id];
+    if (!_0x41d575) return;
+    const _0x57e2df = {};
+    if (_0x41d575.generationStartTime) _0x57e2df.generationStartTime = null;
+    if (_0x41d575.generationDuration != null) _0x57e2df.generationDuration = null;
+    if (_0x41d575.isGenerating === true) _0x57e2df.isGenerating = false;
+    Object.keys(_0x57e2df).length > 0 && appStore.updateNodeData(this.id, _0x57e2df);
+  }
+  ['_seekTo'](_0xffd931) {
+    const _0x138286 = this._readAudioDurationSec();
+    if (!this._audio || _0x138286 <= 0) return;
+    const _0x581f69 = this._bar.getBoundingClientRect();
+    if (_0x581f69.width === 0) return;
+    let _0x3a2293 = (_0xffd931 - _0x581f69.left) / _0x581f69.width;
+    _0x3a2293 = Math.max(0, Math.min(1, _0x3a2293));
+    const _0x17eba8 = _0x3a2293 * _0x138286;
+    if (!isFinite(_0x17eba8)) return;
+    ((this._isSeeking = true),
+      (this._audio.currentTime = _0x17eba8),
+      this._progressController?.sync({
+        currentTime: _0x17eba8,
+        duration: _0x138286,
+        force: true,
+        showLine: true,
+      }),
+      this._audio.addEventListener(
+        'seeked',
+        () => {
+          ((this._isSeeking = false), this._progressController?.sync({ force: true, showLine: true }));
+        },
+        { once: true },
+      ));
+  }
+  ['_getAudioElementSource']() {
+    return getMediaElementPlaybackSourceKey(this._audio);
+  }
+  ['_getAudioElementCurrentSource']() {
+    return getMediaElementCurrentSource(this._audio);
+  }
+  ['_isAudioElementReady']() {
+    if (!this._audio || !this._getAudioElementCurrentSource()) return false;
+    const _0x3b8b97 = Number(this._audio.readyState || 0);
+    return _0x3b8b97 >= 2;
+  }
+  ['_readAudioDurationSec']() {
+    const _0x4c8b38 = normalizeAudioDurationSec(this._audio?.duration),
+      _0x78d400 = appStore.getState().nodes?.[this.id],
+      _0x27ef64 = pickAudioDurationSec(_0x78d400?.audioDuration, !_0x78d400 ? this._data?.audioDuration : 0);
+    if (_0x27ef64 > 0) {
+      if (!(_0x4c8b38 > 0)) return _0x27ef64;
+      const _0x2fe276 = Math.max(1, _0x27ef64 * 0.25);
+      if (Math.abs(_0x27ef64 - _0x4c8b38) > _0x2fe276) return _0x27ef64;
+    }
+    return _0x4c8b38;
+  }
+  ['_syncKnownAudioDurationUi']({ currentTime: currentTime = 0, showLine: showLine = false } = {}) {
+    const _0x114567 = this._readAudioDurationSec();
+    if (!(_0x114567 > 0)) return false;
+    const _0x44d989 = Number(currentTime),
+      _0xee0fb3 = Number.isFinite(_0x44d989) ? Math.max(0, Math.min(_0x44d989, _0x114567)) : 0,
+      _0x550581 = this._progressController?.sync({
+        currentTime: _0xee0fb3,
+        duration: _0x114567,
+        force: true,
+        showLine: showLine,
+      });
+    if (!showLine) this._progressController?.hideLine?.();
+    return (
+      !_0x550581 &&
+        this._timeEl &&
+        (this._timeEl.textContent = this._fmt(_0xee0fb3) + ' / ' + this._fmt(_0x114567)),
+      true
+    );
+  }
+  ['_applyResolvedAudioDuration'](_0x8a4586, _0x5c4313 = this._currentSrc) {
+    if (_0x5c4313 && this._currentSrc !== _0x5c4313) return false;
+    const _0x5c3a49 = normalizeAudioDurationSec(_0x8a4586);
+    if (!(_0x5c3a49 > 0)) return false;
+    const _0x34173d = appStore.getState().nodes?.[this.id],
+      _0x2fc6a5 = pickAudioDurationSec(_0x34173d?.audioDuration, this._data?.audioDuration);
+    if (_0x2fc6a5 > 0) {
+      if (Math.abs(_0x2fc6a5 - _0x5c3a49) <= 0.001)
+        return this._syncKnownAudioDurationUi({
+          currentTime: this._audio?.currentTime || 0,
+          showLine: Number(this._audio?.currentTime || 0) > 0,
+        });
+      const _0x5b08fe = Math.max(1, _0x2fc6a5 * 0.25);
+      if (Math.abs(_0x2fc6a5 - _0x5c3a49) > _0x5b08fe) return false;
+    }
+    return (
+      _0x34173d
+        ? (appStore.updateNodeData(this.id, { audioDuration: _0x5c3a49 }),
+          (this._data = { ...(this._data || {}), audioDuration: _0x5c3a49 }),
+          this._syncKnownAudioDurationUi({
+            currentTime: this._audio?.currentTime || 0,
+            showLine: Number(this._audio?.currentTime || 0) > 0,
+          }))
+        : ((this._data = { ...(this._data || {}), audioDuration: _0x5c3a49 }),
+          this._syncKnownAudioDurationUi({
+            currentTime: this._audio?.currentTime || 0,
+            showLine: Number(this._audio?.currentTime || 0) > 0,
+          })),
+      true
+    );
+  }
+  ['_probeAudioDurationIfNeeded'](_0x7dac29) {
+    const _0x229c22 = String(_0x7dac29 || '').trim();
+    if (!_0x229c22 || this._readAudioDurationSec() > 0) return;
+    const _0x59c86a = (this._audioDurationProbeToken || 0) + 1;
+    ((this._audioDurationProbeToken = _0x59c86a),
+      void loadAudioDurationMetadataSec(_0x229c22).then((_0x395e2c) => {
+        if (this._audioDurationProbeToken !== _0x59c86a || this._currentSrc !== _0x229c22) return;
+        this._applyResolvedAudioDuration(_0x395e2c, _0x229c22);
+      }));
+  }
+  ['_rewindEndedAudioIfNeeded']() {
+    if (!this._audio) return;
+    const _0x26a005 = this._readAudioDurationSec();
+    if (!(_0x26a005 > 0)) return;
+    const _0x304675 = Number(this._audio.currentTime || 0),
+      _0x4df770 = Number.isFinite(_0x304675) && _0x304675 >= _0x26a005 - 0.05;
+    if (this._audio.ended !== true && !_0x4df770) return;
+    try {
+      this._audio.currentTime = 0;
+    } catch {}
+    this._progressController?.sync({ currentTime: 0, duration: _0x26a005, force: true, showLine: true });
+  }
+  ['_clearAudioElementSource']() {
+    if (!this._audio) return;
+    try {
+      this._audio.pause?.();
+    } catch {}
+    (this._audio.removeAttribute?.('src'),
+      clearDesktopMediaPlaybackSourceMetadata(this._audio),
+      (this._audio.preload = 'none'));
+    try {
+      this._audio.load?.();
+    } catch {}
+  }
+  ['_bindAudioLoadHandlers'](_0x1d635d) {
+    if (!this._audio) return;
+    const _0x3d9eff = () => {
+      if (this._currentSrc === _0x1d635d) this._rememberAudioDuration(_0x1d635d);
+    };
+    ((this._audio.onloadedmetadata = _0x3d9eff), (this._audio.ondurationchange = _0x3d9eff));
+    const _0x45bba0 = () => {
+      this._currentSrc === _0x1d635d && (this._rememberAudioDuration(_0x1d635d), stopLoading(this._card));
+    };
+    ((this._audio.onloadeddata = _0x45bba0),
+      (this._audio.oncanplay = _0x45bba0),
+      (this._audio.onplaying = _0x45bba0),
+      (this._audio.onerror = () => {
+        if (this._currentSrc === _0x1d635d) stopLoading(this._card);
+      }));
+  }
+  ['_prepareAudio'](_0x45a0b5) {
+    if (!_0x45a0b5) {
+      typeof this._cancelDeferredWaveform === 'function' &&
+        (this._cancelDeferredWaveform(), (this._cancelDeferredWaveform = null));
+      (this._clearAudioElementSource(),
+        (this._currentSrc = null),
+        this._progressController?.reset(),
+        (this._audioDurationProbeToken += 1),
+        stopLoading(this._card));
+      return;
+    }
+    const _0x351e7d = this._currentSrc,
+      _0x62c5e = _0x351e7d !== _0x45a0b5;
+    _0x62c5e && this._progressController?.reset();
+    this._currentSrc = _0x45a0b5;
+    if (_0x62c5e && _0x351e7d) {
+      const _0x4e8974 = appStore.getState().nodes?.[this.id];
+      Number(_0x4e8974?.audioDuration || 0) > 0 && appStore.updateNodeData(this.id, { audioDuration: 0 });
+    }
+    this._getAudioElementSource() && this._clearAudioElementSource();
+    ((this._audio.preload = 'none'), this._bindAudioLoadHandlers(_0x45a0b5));
+    !this._syncKnownAudioDurationUi({ currentTime: 0, showLine: false }) &&
+      this._probeAudioDurationIfNeeded(_0x45a0b5);
+    (stopLoading(this._card), void this._ensureWaveform(_0x45a0b5, { persistedOnly: true }));
+    if (this._hint) this._hint.style.display = 'block';
+  }
+  async ['_loadAudio'](_0x1c628a, { showLoading: showLoading = true } = {}) {
+    if (!_0x1c628a) return (this._prepareAudio(''), false);
+    const _0x2ff857 = this._currentSrc,
+      _0x1d8c17 = _0x2ff857 !== _0x1c628a;
+    _0x1d8c17 && this._progressController?.reset();
+    this._currentSrc = _0x1c628a;
+    const _0x5f5ade = !!this._getAudioElementCurrentSource(),
+      _0x5d15c0 = !isMediaElementPlaybackSource(this._audio, _0x1c628a) || !_0x5f5ade;
+    this._bindAudioLoadHandlers(_0x1c628a);
+    if (!_0x5d15c0 && this._isAudioElementReady()) {
+      if (this._audio.preload !== 'auto') this._audio.preload = 'auto';
+      return (stopLoading(this._card), true);
+    }
+    if (showLoading && _0x5d15c0) startLoading(this._card, { variant: 'static' });
+    if (!_0x5d15c0) {
+      if (this._audio.preload !== 'auto') this._audio.preload = 'auto';
+      try {
+        this._audio.load?.();
+      } catch {}
+    } else
+      await attachMediaElementPlaybackSource(this._audio, _0x1c628a, { preload: 'auto', warmRanges: false });
+    if (this._isAudioElementReady()) stopLoading(this._card);
+    typeof this._cancelDeferredWaveform === 'function' &&
+      (this._cancelDeferredWaveform(), (this._cancelDeferredWaveform = null));
+    this._cancelDeferredWaveform = deferWaveformPathUntilAudioReady(this._audio, () => {
+      this._cancelDeferredWaveform = null;
+      if (this._currentSrc !== _0x1c628a) return;
+      void this._ensureWaveform(_0x1c628a);
+    });
+    if (this._hint) this._hint.style.display = 'block';
+    return true;
+  }
+  async ['_ensureWaveform'](_0x1a56ff, { persistedOnly: persistedOnly = false } = {}) {
+    const _0x11a117 = String(_0x1a56ff || '').trim();
+    if (!_0x11a117) return;
+    const _0x541862 = ++this._waveToken;
+    this._waveKey = _0x11a117;
+    const _0x1766e5 = localPathToUrl(this._data?.waveformLocalPath);
+    this._waveformLocalPath = String(this._data?.waveformLocalPath || '').trim();
+    const _0x1940d9 = { width: 200, height: 80, samples: 190 };
+    let _0x5e3a59 = '';
+    _0x1766e5 && (_0x5e3a59 = await getWaveformBarsPathFromPersistedUrl(_0x1766e5, _0x1940d9));
+    !_0x5e3a59 && !persistedOnly && (_0x5e3a59 = await getWaveformBarsPathFromUrl(_0x11a117, _0x1940d9));
+    if (!this._audio || !this.el || !this.el.isConnected) return;
+    if (_0x541862 !== this._waveToken) return;
+    if (!_0x5e3a59) return;
+    if (this._waveBgPath) this._waveBgPath.setAttribute('d', _0x5e3a59);
+    if (this._waveFgPath) this._waveFgPath.setAttribute('d', _0x5e3a59);
+  }
+  ['_fmt'](_0x53310d) {
+    if (!_0x53310d || isNaN(_0x53310d)) return '0:00';
+    return Math.floor(_0x53310d / 60) + ':' + String(Math.floor(_0x53310d % 60)).padStart(2, '0');
+  }
+  ['_setIcon'](_0x16a5e9) {
+    const _0x2a214b = this._playBtn.querySelector('svg');
+    if (!_0x2a214b) return;
+    const _0x3e1f2c = 'http://www.w3.org/2000/svg';
+    while (_0x2a214b.firstChild) _0x2a214b.removeChild(_0x2a214b.firstChild);
+    if (_0x16a5e9) {
+      const _0x1618cd = document.createElementNS(_0x3e1f2c, 'polygon');
+      (_0x1618cd.setAttribute('points', '5 3 19 12 5 21 5 3'), _0x2a214b.appendChild(_0x1618cd));
+    } else {
+      const _0x4f6c40 = document.createElementNS(_0x3e1f2c, 'rect');
+      (_0x4f6c40.setAttribute('x', '6'),
+        _0x4f6c40.setAttribute('y', '4'),
+        _0x4f6c40.setAttribute('width', '4'),
+        _0x4f6c40.setAttribute('height', '16'));
+      const _0x100821 = document.createElementNS(_0x3e1f2c, 'rect');
+      (_0x100821.setAttribute('x', '14'),
+        _0x100821.setAttribute('y', '4'),
+        _0x100821.setAttribute('width', '4'),
+        _0x100821.setAttribute('height', '16'),
+        _0x2a214b.appendChild(_0x4f6c40),
+        _0x2a214b.appendChild(_0x100821));
+    }
+  }
+  ['update'](_0x3f9345) {
+    this._data = _0x3f9345;
+    if (!this._audio) return;
+    const _0xaa0765 = this._resolveAudioSrc(_0x3f9345);
+    this._syncGeneratingUi(_0x3f9345, _0xaa0765);
+    if (_0xaa0765 && _0xaa0765 !== this._currentSrc) this._prepareAudio(_0xaa0765);
+    else {
+      if (_0xaa0765)
+        (!this._syncKnownAudioDurationUi({
+          currentTime: this._audio?.currentTime || 0,
+          showLine: Number(this._audio?.currentTime || 0) > 0,
+        }) && this._probeAudioDurationIfNeeded(_0xaa0765),
+          String(_0x3f9345?.waveformLocalPath || '').trim() &&
+            String(_0x3f9345?.waveformLocalPath || '').trim() !== this._waveformLocalPath &&
+            void this._ensureWaveform(_0xaa0765, { persistedOnly: true }));
+      else
+        !_0xaa0765 &&
+          (typeof this._cancelDeferredWaveform === 'function' &&
+            (this._cancelDeferredWaveform(), (this._cancelDeferredWaveform = null)),
+          this._clearAudioElementSource(),
+          (this._currentSrc = null),
+          this._progressController?.reset(),
+          (this._audioDurationProbeToken += 1),
+          this._hint &&
+            (this._hint.style.display = shouldShowGenerationResultLoadingUi(_0x3f9345) ? 'none' : 'block'));
+    }
+    (maybeResumeAudioSeparationLeader(this.id),
+      this._label &&
+        _0x3f9345.name &&
+        document.activeElement !== this._label &&
+        (this._label.innerText = _0x3f9345.name));
+  }
+  async ['_playAudio']() {
+    if (!this._audio || !this._currentSrc) return;
+    (beginAudioPlayback(this.id),
+      await this._loadAudio(this._currentSrc, { showLoading: true }),
+      this._rewindEndedAudioIfNeeded());
+    const _0x12af44 = this._audio.play();
+    _0x12af44 && typeof _0x12af44.catch === 'function'
+      ? _0x12af44
+          .then(() => {
+            (this._rememberAudioDuration(), stopLoading(this._card));
+          })
+          .catch((_0x2de02f) => {
+            stopLoading(this._card);
+            if (_0x2de02f?.name === 'AbortError') return;
+            console.warn('[source-audio] play failed:', _0x2de02f);
+          })
+      : stopLoading(this._card);
+  }
+  ['_stopAudioForExternalPlayback']() {
+    if (!this._audio) return;
+    typeof this._cancelDeferredWaveform === 'function' &&
+      (this._cancelDeferredWaveform(), (this._cancelDeferredWaveform = null));
+    try {
+      this._audio.pause?.();
+    } catch {}
+    (!this._getAudioElementCurrentSource() && this._progressController?.reset(),
+      stopLoading(this._card),
+      this._setIcon(true));
+  }
+  ['_rememberAudioDuration'](_0x5ea5c5 = this._currentSrc) {
+    if (!this._audio || (_0x5ea5c5 && this._currentSrc !== _0x5ea5c5)) return;
+    const _0x500f8e = this._readAudioDurationSec();
+    if (!(_0x500f8e > 0)) return;
+    this._applyResolvedAudioDuration(_0x500f8e, _0x5ea5c5);
+  }
+  ['_subscribeLocaleChanges']() {
+    if (this._unsubscribeLocale) return;
+    this._unsubscribeLocale = onLocaleChange(() => this._syncLocaleTexts());
+  }
+  ['_setUploadButtonLabel'](_0x53492d) {
+    if (!this._uploadBtn) return;
+    const _0x5824bf = this._uploadBtn.querySelector('svg')?.cloneNode(true);
+    this._uploadBtn.replaceChildren();
+    if (_0x5824bf) this._uploadBtn.appendChild(_0x5824bf);
+    this._uploadBtn.appendChild(document.createTextNode(' ' + _0x53492d));
+  }
+  ['_syncLocaleTexts']() {
+    if (!this._uploadBtn) return;
+    if (this._isUploading) {
+      this._uploadBtn.textContent = sourceAudioText('upload.uploading');
+      return;
+    }
+    this._setUploadButtonLabel(sourceAudioText('upload.button'));
+  }
+  ['unmount']() {
+    (this._unsubscribeLocale?.(),
+      (this._unsubscribeLocale = null),
+      this._unregisterAudioPlaybackClient?.(),
+      (this._unregisterAudioPlaybackClient = null),
+      this._progressController?.destroy(),
+      (this._progressController = null),
+      typeof this._cancelDeferredWaveform === 'function' &&
+        (this._cancelDeferredWaveform(), (this._cancelDeferredWaveform = null)),
+      this._clearAudioElementSource());
+  }
+}

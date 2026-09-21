@@ -91,14 +91,34 @@ CREATE INDEX idx_workdata_episode ON o_agentWorkData(episodesId);
 `;
   // better-sqlite3 执行单条语句,逐条跑;包一层事务保证 17 表原子建成。
   await knex.transaction(async (trx) => {
-    for (const stmt of sql.split(';').map((s) => s.trim()).filter(Boolean)) {
+    for (const stmt of sql
+      .split(';')
+      .map((s) => s.trim())
+      .filter(Boolean)) {
       await trx.raw(stmt);
     }
   });
 };
 
 exports.down = async function down(knex) {
-  for (const t of ['o_agentWorkData','o_tasks','o_videoTrack','o_video','o_image','o_assets2Storyboard',
-    'o_storyboard','o_assetsRole2Audio','o_scriptAssets','o_assets','o_script','o_eventChapter',
-    'o_event','o_novel','o_setting','o_user','o_project']) await knex.raw(`DROP TABLE IF EXISTS ${t}`);
+  for (const t of [
+    'o_agentWorkData',
+    'o_tasks',
+    'o_videoTrack',
+    'o_video',
+    'o_image',
+    'o_assets2Storyboard',
+    'o_storyboard',
+    'o_assetsRole2Audio',
+    'o_scriptAssets',
+    'o_assets',
+    'o_script',
+    'o_eventChapter',
+    'o_event',
+    'o_novel',
+    'o_setting',
+    'o_user',
+    'o_project',
+  ])
+    await knex.raw(`DROP TABLE IF EXISTS ${t}`);
 };

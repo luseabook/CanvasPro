@@ -1,1 +1,52 @@
-const a266_0x5e1558=a266_0x2589;function a266_0x2589(_0x196b20,_0x464331){const _0x5bab7d=a266_0x5bab();return a266_0x2589=function(_0x258991,_0x55bcc2){_0x258991=_0x258991-0xdd;let _0x59c489=_0x5bab7d[_0x258991];return _0x59c489;},a266_0x2589(_0x196b20,_0x464331);}(function(_0x15d77f,_0xda6c13){const _0x5e9acd=a266_0x2589,_0x332c7d=_0x15d77f();while(!![]){try{const _0x5c662c=parseInt(_0x5e9acd(0xf2))/0x1*(-parseInt(_0x5e9acd(0xec))/0x2)+-parseInt(_0x5e9acd(0xeb))/0x3+-parseInt(_0x5e9acd(0xf3))/0x4+parseInt(_0x5e9acd(0xf5))/0x5+parseInt(_0x5e9acd(0xef))/0x6*(-parseInt(_0x5e9acd(0xdf))/0x7)+parseInt(_0x5e9acd(0xe3))/0x8*(parseInt(_0x5e9acd(0xe7))/0x9)+parseInt(_0x5e9acd(0xee))/0xa*(parseInt(_0x5e9acd(0xe5))/0xb);if(_0x5c662c===_0xda6c13)break;else _0x332c7d['push'](_0x332c7d['shift']());}catch(_0x40e605){_0x332c7d['push'](_0x332c7d['shift']());}}}(a266_0x5bab,0xbdd4f));import{createToolbarDivider,createToolbarHtml,createToolbarIconButton}from'../nodeToolbar/buttonFactory.js';import{t}from'../../i18n/index.js';function panoramaSceneText(_0x4054f7,_0x5bbc84={}){const _0x569e33=a266_0x2589;return t(_0x569e33(0xe4)+_0x4054f7,_0x5bbc84);}const ICONS={'edit':a266_0x5e1558(0xf0),'upload':a266_0x5e1558(0xe0),'fullscreen':a266_0x5e1558(0xe8),'collapseToggle':a266_0x5e1558(0xe1)};export const PANORAMA_SCENE_TOOLBAR_HTML=createToolbarHtml({'toolbarClass':a266_0x5e1558(0xe9),'items':[createToolbarIconButton({'action':'enter-edit','tooltip':panoramaSceneText(a266_0x5e1558(0xf1)),'label':panoramaSceneText('toolbar.edit'),'iconSvg':ICONS['edit'],'extraClass':a266_0x5e1558(0xed)}),createToolbarDivider(),createToolbarIconButton({'action':'upload-panorama','tooltip':panoramaSceneText(a266_0x5e1558(0xdd)),'label':panoramaSceneText('toolbar.uploadPanorama'),'iconSvg':ICONS[a266_0x5e1558(0xf4)],'extraClass':a266_0x5e1558(0xed)}),createToolbarIconButton({'action':a266_0x5e1558(0xe2),'tooltip':panoramaSceneText(a266_0x5e1558(0xde)),'label':panoramaSceneText(a266_0x5e1558(0xde)),'iconSvg':ICONS[a266_0x5e1558(0xe2)],'extraClass':a266_0x5e1558(0xed)}),createToolbarIconButton({'action':a266_0x5e1558(0xe6),'tooltip':panoramaSceneText('toolbar.collapse'),'label':panoramaSceneText('toolbar.collapse'),'iconSvg':ICONS['collapseToggle'],'extraClass':a266_0x5e1558(0xea)})]});function a266_0x5bab(){const _0x48f344=['2nDuDaD','4333360sEKOzD','upload','2101715uybGBv','toolbar.uploadPanorama','toolbar.fullscreen','1351MvZBvz','<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2216\x22\x20height=\x2216\x22><path\x20d=\x22M12\x2016V4\x22/><path\x20d=\x22m7\x209\x205-5\x205\x205\x22/><path\x20d=\x22M4\x2020h16\x22/></svg>','<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2216\x22\x20height=\x2216\x22><path\x20d=\x22m6\x2015\x206-6\x206\x206\x22/></svg>','fullscreen','168aCOrna','panoramaSceneNode.','1255903rtCQpw','collapse-node','380529NDzOoG','<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2216\x22\x20height=\x2216\x22><path\x20d=\x22M8\x203H5a2\x202\x200\x200\x200-2\x202v3m18\x200V5a2\x202\x200\x200\x200-2-2h-3m0\x2018h3a2\x202\x200\x200\x200\x202-2v-3M3\x2016v3a2\x202\x200\x200\x200\x202\x202h3\x22/></svg>','v2-panorama-scene-toolbar','panorama-scene-toolbar-btn\x20panorama-scene-toolbar-btn--collapse','1650552SgBcNl','262970wWgAgl','panorama-scene-toolbar-btn','170nUFDGp','17880RPDpTZ','<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2216\x22\x20height=\x2216\x22><path\x20d=\x22M12\x2020h9\x22/><path\x20d=\x22M16.5\x203.5a2.12\x202.12\x200\x200\x201\x203\x203L7\x2019l-4\x201\x201-4z\x22/></svg>','toolbar.edit'];a266_0x5bab=function(){return _0x48f344;};return a266_0x5bab();}
+import {
+  createToolbarDivider,
+  createToolbarHtml,
+  createToolbarIconButton,
+} from '../nodeToolbar/buttonFactory.js';
+import { t } from '../../i18n/index.js';
+function panoramaSceneText(_0x4054f7, _0x5bbc84 = {}) {
+  return t('panoramaSceneNode.' + _0x4054f7, _0x5bbc84);
+}
+const ICONS = {
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  upload:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></svg>',
+  fullscreen:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>',
+  collapseToggle:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="m6 15 6-6 6 6"/></svg>',
+};
+export const PANORAMA_SCENE_TOOLBAR_HTML = createToolbarHtml({
+  toolbarClass: 'v2-panorama-scene-toolbar',
+  items: [
+    createToolbarIconButton({
+      action: 'enter-edit',
+      tooltip: panoramaSceneText('toolbar.edit'),
+      label: panoramaSceneText('toolbar.edit'),
+      iconSvg: ICONS.edit,
+      extraClass: 'panorama-scene-toolbar-btn',
+    }),
+    createToolbarDivider(),
+    createToolbarIconButton({
+      action: 'upload-panorama',
+      tooltip: panoramaSceneText('toolbar.uploadPanorama'),
+      label: panoramaSceneText('toolbar.uploadPanorama'),
+      iconSvg: ICONS.upload,
+      extraClass: 'panorama-scene-toolbar-btn',
+    }),
+    createToolbarIconButton({
+      action: 'fullscreen',
+      tooltip: panoramaSceneText('toolbar.fullscreen'),
+      label: panoramaSceneText('toolbar.fullscreen'),
+      iconSvg: ICONS.fullscreen,
+      extraClass: 'panorama-scene-toolbar-btn',
+    }),
+    createToolbarIconButton({
+      action: 'collapse-node',
+      tooltip: panoramaSceneText('toolbar.collapse'),
+      label: panoramaSceneText('toolbar.collapse'),
+      iconSvg: ICONS.collapseToggle,
+      extraClass: 'panorama-scene-toolbar-btn panorama-scene-toolbar-btn--collapse',
+    }),
+  ],
+});

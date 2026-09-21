@@ -1,1 +1,1278 @@
-const a20_0x4bb430=a20_0x3c84;(function(_0x27d1f5,_0x298270){const _0x24a992=a20_0x3c84,_0x5e5c07=_0x27d1f5();while(!![]){try{const _0x159303=-parseInt(_0x24a992(0x10e))/0x1+parseInt(_0x24a992(0x129))/0x2*(-parseInt(_0x24a992(0x18b))/0x3)+-parseInt(_0x24a992(0x16f))/0x4+-parseInt(_0x24a992(0x152))/0x5*(parseInt(_0x24a992(0xe9))/0x6)+parseInt(_0x24a992(0x143))/0x7*(parseInt(_0x24a992(0x123))/0x8)+-parseInt(_0x24a992(0x1ad))/0x9+parseInt(_0x24a992(0x199))/0xa;if(_0x159303===_0x298270)break;else _0x5e5c07['push'](_0x5e5c07['shift']());}catch(_0x568af3){_0x5e5c07['push'](_0x5e5c07['shift']());}}}(a20_0x4961,0x9089d));import a20_0x8a25e7 from'node:test';import a20_0x184bc3 from'node:assert/strict';import{buildGenerateTextRequest,generateText}from'./aiTextApi.js';import{clearApiConfig}from'./configApi.js';function jsonResponse(_0x10b1c5,_0x596c8e=0xc8){const _0x2ef4b4=a20_0x3c84;return new Response(JSON[_0x2ef4b4(0x14f)](_0x10b1c5),{'status':_0x596c8e,'headers':{'Content-Type':_0x2ef4b4(0x13a)}});}function imageResponse(_0x5c9921,_0x564ce9=a20_0x4bb430(0x1ac)){return new Response(new Blob([_0x5c9921],{'type':_0x564ce9}),{'status':0xc8,'headers':{'Content-Type':_0x564ce9}});}async function readUploadMarker(_0x2f6a41){const _0x46c4b0=a20_0x4bb430;if(!_0x2f6a41||typeof _0x2f6a41[_0x46c4b0(0x118)]!==_0x46c4b0(0x159))return'';for(const [_0x192e9f,_0x555ba6]of _0x2f6a41['entries']()){if(_0x192e9f!==_0x46c4b0(0x157))continue;if(_0x555ba6&&typeof _0x555ba6[_0x46c4b0(0x194)]===_0x46c4b0(0x159))return await _0x555ba6[_0x46c4b0(0x194)]();}return'';}function isTelegraphProxyUpload(_0x167a6e){const _0x14ecde=a20_0x4bb430,_0x2fdd66=String(_0x167a6e||'');if(!_0x2fdd66[_0x14ecde(0xd0)]('/api/v2/proxy/upload?'))return![];const _0x5aa1b2=_0x2fdd66[_0x14ecde(0x147)](_0x2fdd66[_0x14ecde(0x156)]('?')+0x1);return new URLSearchParams(_0x5aa1b2)[_0x14ecde(0xb3)](_0x14ecde(0xef))===_0x14ecde(0xcf);}async function withMockFetch(_0xfb40fb,_0x1e8445){const _0x57119b=a20_0x4bb430,_0x2b36cb=globalThis[_0x57119b(0x190)];clearApiConfig(),globalThis[_0x57119b(0x190)]=_0xfb40fb;try{return await _0x1e8445();}finally{globalThis['fetch']=_0x2b36cb,clearApiConfig();}}async function withImmediateTimers(_0x1a3f91){const _0x2a7b62=a20_0x4bb430,_0x53f7bc=globalThis[_0x2a7b62(0x132)];globalThis[_0x2a7b62(0x132)]=(_0x4c4441,_0x4a2a81,..._0x1974ae)=>{if(typeof _0x4c4441==='function')_0x4c4441(..._0x1974ae);return 0x0;};try{return await _0x1a3f91();}finally{globalThis[_0x2a7b62(0x132)]=_0x53f7bc;}}async function withMockCanvasComposition(_0x4b78d3){const _0x5b3e83=a20_0x4bb430,_0x12ab69=globalThis[_0x5b3e83(0x127)],_0x38e167=globalThis['OffscreenCanvas'];globalThis[_0x5b3e83(0x127)]=async()=>({'width':0x280,'height':0x1e0,'close'(){}}),globalThis[_0x5b3e83(0xd1)]=class _0x1c3d68{constructor(_0x5be392,_0x3dafcb){const _0x4cde79=_0x5b3e83;this[_0x4cde79(0xd6)]=_0x5be392,this[_0x4cde79(0x119)]=_0x3dafcb,this['_ctx']={'fillStyle':'','strokeStyle':'','lineWidth':0x1,'font':'','textAlign':'','textBaseline':'','fillRect'(){},'drawImage'(){},'strokeRect'(){},'fillText'(){}};}['getContext'](){const _0x2704ff=_0x5b3e83;return this[_0x2704ff(0x131)];}async[_0x5b3e83(0x11e)](){const _0x31f952=_0x5b3e83;return new Blob(['merged-runninghub-image'],{'type':_0x31f952(0x1ac)});}};try{return await _0x4b78d3();}finally{globalThis[_0x5b3e83(0x127)]=_0x12ab69,globalThis[_0x5b3e83(0xd1)]=_0x38e167;}}const RUNNINGHUB_FLASH_MODEL=a20_0x4bb430(0xcc),RUNNINGHUB_PRO_MODEL=a20_0x4bb430(0x1b3),RUNNINGHUB_QWEN36_PLUS_MODEL=a20_0x4bb430(0x191),RUNNINGHUB_QWEN3_VL_MODEL=a20_0x4bb430(0xdc),RUNNINGHUB_IMAGE_URL='https://www.runninghub.cn/example/input.png';function a20_0x4961(){const _0xa3924=['https://ark.cn-beijing.volces.com/api/v3','k_volcengine','application/json','data:\x20{\x22id\x22:\x22chatcmpl-qwen-sse\x22,\x22choices\x22:[{\x22delta\x22:{\x22role\x22:\x22assistant\x22}}]}','aiTextApi:\x20grsai\x20OpenAI-compatible\x20multimodal\x20text\x20requests\x20use\x20proxy/completions','domestic2','token_grsai','image_url','https://grsai.dakka.com.cn/client/resource/newUploadTokenZH','https://api.aishuch.com/v1/chat/completions','qwen-vl-image','7FLcHCK','https://upload.apimart.ai/files/existing.mp4','searchParams','headers','slice','fetch\x20failed','https://www.runninghub.cn/uploaded/merged-sheet.png','imageUrls','apimart/gemini-3.5-flash','\x20with\x20','volcengine-image','/local/second-ok.png','stringify','runninghub.model-api.rhart-text-g-3-flash-cv.v1','aiTextApi:\x20grsai\x20partial\x20image\x20upload\x20failure\x20keeps\x20mention\x20slots\x20from\x20shifting','2433745NKcLlX','/api/v2/proxy/apimart-upload','https://upload.grsai.example.com','aiTextApi:\x20RunningHUB\x20LLM\x20文本模型走官方\x20chat\x20completions\x20端点','indexOf','file','https://cdn.apimart.ai/files/first.png','function','https://www.runninghub.cn/openapi/v2/query','trim','Please\x20inspect\x20@图片1\x20and\x20keep\x20the\x20trailing\x20text.','https://api.apimart.ai','model','input_image','content','aiTextApi:\x20RunningHUB\x20文本请求缺图时会直接报错','taskId','aiTextApi:\x20Volcengine\x20media\x20inputs\x20upload\x20through\x20Ark\x20Files\x20API','parse','gemini-future-unregistered','message','stop','aiTextApi:\x20APIMart\x20Gemini\x20菜单裸模型名会归一化并使用\x20GPT\x20格式','preprocess_configs[video][fps]','endsWith','hello','task_text_failed','video/mp4','doubao-seed-2-0-lite-260428','692272QhWGgK','equal','/api/v2/proxy/upload?','chatcmpl-qwen-direct','url','https://ark-project.tos-cn-beijing.volces.com/doc_video/ark_vlm_video_input.mp4','识别\x20@图片1\x20中的文字','/uploaded-custom-second.png','doubao-seed-2-0-mini-260428','分析\x20@图片1','/local/rh-bad-key.png','input','isArray','gpt-5.4-mini','doubao-seed-2-0-pro-260215','apimart-second','https://ark.cn-beijing.volces.com/api/v3/responses','RUNNING','executionId','custom-image-2','https://ark.cn-beijing.volces.com/api/v3/files','unexpected\x20fetch\x20url:\x20','prompt','A\x20@图片1\x20B\x20','data:\x20{\x22choices\x22:[{\x22delta\x22:{\x22content\x22:\x22SSE\x20文本\x22},\x22finish_reason\x22:\x22stop\x22}]}','filter','请总结\x20','aiTextApi:\x20APIMart\x20Gemini\x20图片请求统一使用\x20GPT\x20image_url\x20格式','3ELPxVY','A\x20@图片1\x20B\x20@图片2\x20C','先看\x20','aiTextApi:\x20OpenAI\x20兼容文本请求会透传\x20systemPrompt','https://www.runninghub.cn/uploaded/download-url-image.png','fetch','qwen/qwen3.6-plus','name','grsai','text','text/event-stream','apimart/gemini-3.1-pro-preview','aiTextApi:\x20bare\x20unknown\x20model\x20no\x20longer\x20defaults\x20to\x20GRSAI','Please\x20inspect\x20','29288490tvJrwJ','用户剧情','https://www.runninghub.cn','compare\x20','data:\x20[DONE]','k_custom_openai_compatible','请描述图片内容','Bearer\x20k_volcengine','\x20中的文字','https://www.runninghub.cn/openapi/v2/rhart-text-g-3-pro-preview-cv/image-to-text','rejects','https://grsai.dakka.com.cn','Authorization','Bearer\x20k_runninghub_model','RunningHUB\x20文本结果','apiKey','rh-upload-image','https://api.openai-compatible.local','contentType','image/png','8867871BtsejU','payload_key_should_not_win','/local/rh-upload.png','https://api.apimart.ai/v1/chat/completions','openai-image','deepEqual','runninghub-model/rhart-text-g-3-pro-preview-cv/image-to-text','https://telegra.ph/uploaded-custom-first.png','adapterTrace','/local/first.png','只输出合法\x20JSON。','input_text','get','aiTextApi:\x20custom\x20provider\x20多图请求会按顺序映射为多个\x20image_url','aiTextApi:\x20ppio\x20text\x20manifest\x20uses\x20OpenAI-compatible\x20endpoint','https://upload.apimart.ai/files/existing.webp','识别\x20','https://cdn.grsai.example.com','\x20and\x20keep\x20the\x20trailing\x20text.','/local/first-failed.png','custom','https://llm.runninghub.cn/v1/chat/completions','分析\x20','aiTextApi:\x20Volcengine\x20local\x20video\x20inputs\x20upload\x20through\x20Ark\x20Files\x20API','apimart-first','aiTextApi:\x20RunningHUB\x20文本生成会在任务成功后返回\x20results[0].text','https://api.ppinfra.com','uploaded/grsai-ref.png','system','keys','FAILED','Qwen\x20chat\x20completion\x20result\x20should\x20not\x20poll\x20task\x20query','请综合分析这些图片','join','aiTextApi:\x20APIMart\x20已上传\x20CDN\x20图片使用\x20GPT\x20image_url\x20且不会重复上传','grsai/unregistered-text-model','aiTextApi:\x20unregistered\x20provider\x20model\x20fails\x20without\x20legacy\x20routing\x20fallback','runninghub-model/rhart-text-g-3-flash-preview-cv/image-to-text','kimi-k2-instruct','active','https://telegra.ph/upload','startsWith','OffscreenCanvas','plain\x20text\x20prompt','body','k_apimart','fileExtension','width','/unexpected-telegraph-ref.png','请详细分析\x20','bad_task','grsai-image-2','aiTextApi:\x20generateText\x20via\x20grsai\x20proxy\x20strips\x20think\x20tags\x20from\x20multimodal\x20responses','qwen/qwen3-vl-235b-a22b-instruct','user_data','https://cdn.grsai.example.com/uploaded/grsai-ref-2.png','data:\x20{\x22choices\x22:[{\x22delta\x22:{\x22content\x22:\x22Qwen\x20\x22}}]}','length','/api/v2/proxy/completions','custom-image-1','k_ppio','Qwen\x20直接文本结果','apimart/kimi-k2-instruct','请总结\x20@视频1','/local/ref.png','aiTextApi:\x20OpenAI\x20兼容请求会把\x20@图片\x20映射为\x20image_url，并保留前后文本','6Rlufkb','https://ark.cn-beijing.volces.com/api/v3/files/file-video-1','先看\x20@图片1\x20再总结\x20@视频1\x20的内容。','file-image-1','https://telegra.ph/uploaded-custom-second.png','请详细描述图片','apiUrl','gemini-3.1-pro-preview','apimart/gemini-3-flash-preview-nothinking','https://telegra.ph/uploaded-openai-ref.png','aiTextApi:\x20APIMart\x20GPT\x20文本格式遇到已上传视频参考也会明确报错','imageUrl','aiTextApi:\x20APIMart\x20GPT\x20格式多图上传按\x20@图片编号映射','/uploaded-openai-ref.png','apimart/gpt-5.4-mini','<think>internal\x20reasoning</think>\x0a红色','doubao-seed-2-0-pro','task_text_1','gemini-3.1-pro','先看\x20@图片2\x20再看\x20@图片1','png','k_runninghub_model','https://www.runninghub.cn/uploaded/qwen-vl.png','ark_vlm_video_input.mp4','rh-bad-key-image','volcengine-video','openai','runninghub.model-api.text.qwen3-6-plus.v1','k_openai','https://cdn.apimart.ai/files/second.png','runninghub','gpt-4.1-mini','target','https://grsai.dakka.com.cn/v1','push','gpt-5.5','apimart','970862xJViap','qwen/qwen3.5-397b-a17b','aiTextApi:\x20Volcengine\x20Doubao\x20Seed\x20text\x20models\x20use\x20Ark\x20Responses\x20API','/local/qwen-vl.png','\x20的细节。','fromEntries','input_video','/api/config','volcengine/doubao-seed-2-0-pro-260215','aiTextApi:\x20APIMart\x20new\x20text\x20models\x20strip\x20provider\x20prefix\x20for\x20wire\x20model','entries','height','http://local','https://api.ppinfra.com/openai/v1','file-video-1','messages','convertToBlob','describe','k_runninghub_workflow_only','aiTextApi:\x20RunningHUB\x20LLM\x20原始\x20SSE\x20会合并\x20delta\x20文本后直接返回','https://cdn.apimart.ai/files/gemini-ref.png','7539784lPjlLM','https://www.runninghub.cn/openapi/v2/rhart-text-g-3-flash-preview-cv/image-to-text','/api/v2/proxy/image','source','createImageBitmap','/local/second.png','1326590SJQEIW','manifest','aiTextApi:\x20RunningHUB\x20多图文本请求会先合成再上传为单个\x20imageUrl','k_grsai','k_runninghub','file-local-video','gemini-image','gemini-3-pro','_ctx','setTimeout','volcengine','grsai-image','/local/ref.mp4','sort','compare\x20@图片1\x20with\x20@图片2'];a20_0x4961=function(){return _0xa3924;};return a20_0x4961();}function a20_0x3c84(_0x2fc2b8,_0x5d9d83){const _0x49611a=a20_0x4961();return a20_0x3c84=function(_0x3c84bd,_0x22826a){_0x3c84bd=_0x3c84bd-0xaf;let _0x347616=_0x49611a[_0x3c84bd];return _0x347616;},a20_0x3c84(_0x2fc2b8,_0x5d9d83);}a20_0x8a25e7(a20_0x4bb430(0xe8),async()=>{await withMockFetch(async _0x32c132=>{const _0x5e4d10=a20_0x3c84,_0x325a7e=String(_0x32c132||'');if(_0x325a7e===_0x5e4d10(0x115))return jsonResponse({'providers':{'openai':{'apiUrl':'https://api.openai.com','apiKey':_0x5e4d10(0x105)}}});if(_0x325a7e===_0x5e4d10(0xe7))return imageResponse(_0x5e4d10(0x1b1));if(isTelegraphProxyUpload(_0x325a7e))return jsonResponse([{'src':_0x5e4d10(0xf6)}]);throw new Error(_0x5e4d10(0x184)+_0x325a7e);},async()=>{const _0x383ae9=a20_0x3c84,_0x37a411=await buildGenerateTextRequest({'provider':_0x383ae9(0x103),'model':_0x383ae9(0x108),'prompt':'请详细分析\x20@图片1\x20，并保留这句文字。','inputUrls':[_0x383ae9(0xe7)]});a20_0x184bc3[_0x383ae9(0x170)](_0x37a411[_0x383ae9(0x173)],'/api/v2/proxy/completions'),a20_0x184bc3[_0x383ae9(0x170)](_0x37a411['body'][_0x383ae9(0xef)],'https://api.openai.com/v1'),a20_0x184bc3[_0x383ae9(0x170)](_0x37a411['body']['model'],_0x383ae9(0x108));const _0x2b1f4e=_0x37a411[_0x383ae9(0xd3)]['messages'][0x1]['content'];a20_0x184bc3['ok'](Array[_0x383ae9(0x17b)](_0x2b1f4e)),a20_0x184bc3['deepEqual'](_0x2b1f4e,[{'type':_0x383ae9(0x194),'text':_0x383ae9(0xd8)},{'type':_0x383ae9(0x13f),'image_url':{'url':_0x383ae9(0xf2)}},{'type':_0x383ae9(0x194),'text':'\x20，并保留这句文字。'}]);});}),a20_0x8a25e7(a20_0x4bb430(0x110),async()=>{await withMockFetch(async _0x544e5d=>{const _0x67659e=a20_0x3c84,_0x52aee7=String(_0x544e5d||'');if(_0x52aee7===_0x67659e(0x115))return jsonResponse({'providers':{'volcengine':{'apiUrl':'https://ark.cn-beijing.volces.com/api/v3','apiKey':_0x67659e(0x139)}}});throw new Error(_0x67659e(0x184)+_0x52aee7);},async()=>{const _0x537311=a20_0x3c84,_0x8e15f1=[[_0x537311(0x116),_0x537311(0x17d)],[_0x537311(0x177),_0x537311(0x177)],['doubao-seed-2-0-lite-260428',_0x537311(0x16e)]];for(const [_0x2dc19e,_0x32b054]of _0x8e15f1){const _0x319a0c=await buildGenerateTextRequest({'provider':_0x537311(0x133),'model':_0x2dc19e,'prompt':_0x537311(0xd2)});a20_0x184bc3[_0x537311(0x170)](_0x319a0c[_0x537311(0x173)],_0x537311(0xe1)),a20_0x184bc3[_0x537311(0x170)](_0x319a0c[_0x537311(0xd3)]['apiUrl'],_0x537311(0x17f)),a20_0x184bc3['equal'](_0x319a0c[_0x537311(0xd3)][_0x537311(0x1a8)],_0x537311(0x139)),a20_0x184bc3[_0x537311(0x170)](_0x319a0c[_0x537311(0xd3)][_0x537311(0x15e)],_0x32b054),a20_0x184bc3[_0x537311(0x1b2)](_0x319a0c[_0x537311(0xd3)][_0x537311(0x17a)],[{'role':'user','content':[{'type':_0x537311(0xb2),'text':_0x537311(0xd2)}]}]);}});}),a20_0x8a25e7(a20_0x4bb430(0x163),async()=>{const _0x2f1f67=a20_0x4bb430,_0x17aa90=_0x2f1f67(0x174),_0x47206f=_0x2f1f67(0xe7),_0x409e1d=[];await withMockFetch(async(_0x54fc9d,_0x341ad6={})=>{const _0x1cbd92=_0x2f1f67,_0x3b878b=String(_0x54fc9d||'');if(_0x3b878b===_0x1cbd92(0x115))return jsonResponse({'providers':{'volcengine':{'apiUrl':_0x1cbd92(0x138),'apiKey':_0x1cbd92(0x139)}}});if(_0x3b878b===_0x47206f)return imageResponse(_0x1cbd92(0x14d));if(_0x3b878b===_0x17aa90)return imageResponse(_0x1cbd92(0x102),_0x1cbd92(0x16d));if(_0x3b878b[_0x1cbd92(0xd0)](_0x1cbd92(0x171))){a20_0x184bc3[_0x1cbd92(0x170)](_0x341ad6[_0x1cbd92(0x146)]?.[_0x1cbd92(0x1a5)],'Bearer\x20k_volcengine');const _0x2df476=new URL('http://local'+_0x3b878b)[_0x1cbd92(0x145)][_0x1cbd92(0xb3)](_0x1cbd92(0xef));a20_0x184bc3['equal'](_0x2df476,_0x1cbd92(0x183));const _0x4a5caa=Object['fromEntries'](_0x341ad6[_0x1cbd92(0xd3)]['entries']());a20_0x184bc3['equal'](_0x4a5caa['purpose'],'user_data'),_0x409e1d[_0x1cbd92(0x10b)](_0x4a5caa['file']?.[_0x1cbd92(0x192)]||'');const _0x423032=await _0x4a5caa[_0x1cbd92(0x157)]['text']();if(_0x423032===_0x1cbd92(0x14d))return jsonResponse({'object':'file','id':_0x1cbd92(0xec),'status':_0x1cbd92(0xce),'purpose':_0x1cbd92(0xdd)});if(_0x423032===_0x1cbd92(0x102))return a20_0x184bc3[_0x1cbd92(0x170)](_0x4a5caa[_0x1cbd92(0x169)],'0.3'),jsonResponse({'object':_0x1cbd92(0x157),'id':'file-video-1','status':'processing','purpose':'user_data'});}if(_0x3b878b[_0x1cbd92(0xd0)]('/api/v2/proxy/task?')){a20_0x184bc3['equal'](_0x341ad6['headers']?.[_0x1cbd92(0x1a5)],_0x1cbd92(0x1a0));const _0x5ec475=new URL(_0x1cbd92(0x11a)+_0x3b878b)[_0x1cbd92(0x145)][_0x1cbd92(0xb3)](_0x1cbd92(0xef));return a20_0x184bc3['equal'](_0x5ec475,_0x1cbd92(0xea)),jsonResponse({'object':'file','id':_0x1cbd92(0x11c),'status':'active','purpose':_0x1cbd92(0xdd)});}throw new Error(_0x1cbd92(0x184)+_0x3b878b);},async()=>{const _0x46b835=_0x2f1f67,_0x36d8ea=_0x46b835(0x174),_0x3d33d5=await buildGenerateTextRequest({'provider':_0x46b835(0x133),'model':'volcengine/doubao-seed-2-0-pro-260215','prompt':_0x46b835(0xeb),'inputUrls':[_0x47206f,_0x36d8ea],'inputImageUrls':[_0x47206f],'inputVideoUrls':[_0x36d8ea]});a20_0x184bc3[_0x46b835(0x170)](_0x3d33d5[_0x46b835(0xd3)][_0x46b835(0x15e)],_0x46b835(0x17d)),a20_0x184bc3[_0x46b835(0x1b2)](_0x3d33d5[_0x46b835(0xd3)][_0x46b835(0x17a)][0x0]['content'],[{'type':_0x46b835(0xb2),'text':_0x46b835(0x18d)},{'type':_0x46b835(0x15f),'file_id':_0x46b835(0xec)},{'type':'input_text','text':'\x20再总结\x20'},{'type':_0x46b835(0x114),'file_id':_0x46b835(0x11c)},{'type':_0x46b835(0xb2),'text':'\x20的内容。'}]),a20_0x184bc3[_0x46b835(0x1b2)](_0x409e1d[_0x46b835(0x136)](),['ref.png',_0x46b835(0x100)][_0x46b835(0x136)]());});}),a20_0x8a25e7(a20_0x4bb430(0xbe),async()=>{await withMockFetch(async(_0xea5f58,_0x4aedaa={})=>{const _0x1a2004=a20_0x3c84,_0x203d7f=String(_0xea5f58||'');if(_0x203d7f===_0x1a2004(0x115))return jsonResponse({'providers':{'volcengine':{'apiUrl':_0x1a2004(0x138),'apiKey':_0x1a2004(0x139)}}});if(_0x203d7f[_0x1a2004(0x16a)](_0x1a2004(0x135)))return imageResponse('local-volcengine-video',_0x1a2004(0x16d));if(_0x203d7f['startsWith'](_0x1a2004(0x171))){const _0x3ee4d1=Object[_0x1a2004(0x113)](_0x4aedaa[_0x1a2004(0xd3)][_0x1a2004(0x118)]());return a20_0x184bc3[_0x1a2004(0x170)](await _0x3ee4d1[_0x1a2004(0x157)][_0x1a2004(0x194)](),'local-volcengine-video'),jsonResponse({'object':_0x1a2004(0x157),'id':_0x1a2004(0x12e),'status':_0x1a2004(0xce)});}throw new Error(_0x1a2004(0x184)+_0x203d7f);},async()=>{const _0x2da2e5=a20_0x3c84,_0x311da2=await buildGenerateTextRequest({'provider':_0x2da2e5(0x133),'model':_0x2da2e5(0x116),'prompt':_0x2da2e5(0xe6),'inputUrls':[_0x2da2e5(0x135)],'inputVideoUrls':[_0x2da2e5(0x135)]});a20_0x184bc3[_0x2da2e5(0x1b2)](_0x311da2['body'][_0x2da2e5(0x17a)][0x0][_0x2da2e5(0x160)],[{'type':'input_text','text':_0x2da2e5(0x189)},{'type':_0x2da2e5(0x114),'file_id':_0x2da2e5(0x12e)}]);});}),a20_0x8a25e7(a20_0x4bb430(0xb4),async()=>{await withMockFetch(async(_0x3257c1,_0x581567={})=>{const _0x3c1af7=a20_0x3c84,_0x4f8188=String(_0x3257c1||'');if(_0x4f8188===_0x3c1af7(0x115))return jsonResponse({'providers':{'openai':{'apiUrl':'https://ark.cn-beijing.volces.com/api/v3','apiKey':'k_custom_openai_compatible'}}});if(_0x4f8188===_0x3c1af7(0xb0))return imageResponse(_0x3c1af7(0xe2));if(_0x4f8188==='/local/second.png')return imageResponse(_0x3c1af7(0x182));if(isTelegraphProxyUpload(_0x4f8188)){const _0x125985=await readUploadMarker(_0x581567[_0x3c1af7(0xd3)]);if(_0x125985===_0x3c1af7(0xe2))return jsonResponse([{'src':'/uploaded-custom-first.png'}]);if(_0x125985==='custom-image-2')return jsonResponse([{'src':_0x3c1af7(0x176)}]);}throw new Error('unexpected\x20fetch\x20url:\x20'+_0x4f8188);},async()=>{const _0x2f4948=a20_0x3c84,_0x442a97=await buildGenerateTextRequest({'provider':'custom','model':_0x2f4948(0xf9),'prompt':_0x2f4948(0x137),'inputUrls':[_0x2f4948(0xb0),_0x2f4948(0x128)]});a20_0x184bc3['equal'](_0x442a97[_0x2f4948(0x173)],'/api/v2/proxy/completions'),a20_0x184bc3[_0x2f4948(0x170)](_0x442a97[_0x2f4948(0xd3)][_0x2f4948(0xef)],'https://ark.cn-beijing.volces.com/api/v3'),a20_0x184bc3[_0x2f4948(0x170)](_0x442a97[_0x2f4948(0xd3)]['apiKey'],_0x2f4948(0x19e)),a20_0x184bc3[_0x2f4948(0x170)](_0x442a97['body']['model'],_0x2f4948(0xf9)),a20_0x184bc3[_0x2f4948(0x1b2)](_0x442a97[_0x2f4948(0xd3)]['messages'][0x1][_0x2f4948(0x160)],[{'type':_0x2f4948(0x194),'text':_0x2f4948(0x19c)},{'type':_0x2f4948(0x13f),'image_url':{'url':_0x2f4948(0x1b4)}},{'type':_0x2f4948(0x194),'text':_0x2f4948(0x14c)},{'type':_0x2f4948(0x13f),'image_url':{'url':_0x2f4948(0xed)}}]);});}),a20_0x8a25e7('aiTextApi:\x20custom\x20provider\x20纯文本请求保持字符串\x20content',async()=>{await withMockFetch(async _0x19582c=>{const _0x57714c=a20_0x3c84,_0x4b3774=String(_0x19582c||'');if(_0x4b3774==='/api/config')return jsonResponse({'providers':{'openai':{'apiUrl':'https://ark.cn-beijing.volces.com/api/v3','apiKey':'k_custom_openai_compatible'}}});throw new Error(_0x57714c(0x184)+_0x4b3774);},async()=>{const _0x2ca425=a20_0x3c84,_0xc98ba=await buildGenerateTextRequest({'provider':_0x2ca425(0xbb),'model':_0x2ca425(0xf9),'prompt':'only\x20text\x20prompt'});a20_0x184bc3[_0x2ca425(0x170)](_0xc98ba[_0x2ca425(0x173)],_0x2ca425(0xe1)),a20_0x184bc3[_0x2ca425(0x170)](_0xc98ba[_0x2ca425(0xd3)][_0x2ca425(0xef)],_0x2ca425(0x138)),a20_0x184bc3[_0x2ca425(0x170)](_0xc98ba[_0x2ca425(0xd3)][_0x2ca425(0x11d)][0x1][_0x2ca425(0x160)],'only\x20text\x20prompt');});}),a20_0x8a25e7(a20_0x4bb430(0x18e),async()=>{await withMockFetch(async _0x36e50f=>{const _0x18c2b5=a20_0x3c84,_0x938f95=String(_0x36e50f||'');if(_0x938f95===_0x18c2b5(0x115))return jsonResponse({'providers':{'openai':{'apiUrl':_0x18c2b5(0x1aa),'apiKey':'k_custom_openai_compatible'}}});throw new Error('unexpected\x20fetch\x20url:\x20'+_0x938f95);},async()=>{const _0x4f96a4=a20_0x3c84,_0x32c1bc=await buildGenerateTextRequest({'provider':_0x4f96a4(0xbb),'model':'gpt-compatible','prompt':_0x4f96a4(0x19a),'systemPrompt':'只输出合法\x20JSON。'});a20_0x184bc3[_0x4f96a4(0x170)](_0x32c1bc[_0x4f96a4(0x173)],_0x4f96a4(0xe1)),a20_0x184bc3[_0x4f96a4(0x170)](_0x32c1bc[_0x4f96a4(0xd3)][_0x4f96a4(0x11d)][0x0]['role'],_0x4f96a4(0xc3)),a20_0x184bc3[_0x4f96a4(0x170)](_0x32c1bc['body']['messages'][0x0][_0x4f96a4(0x160)],_0x4f96a4(0xb1)),a20_0x184bc3[_0x4f96a4(0x170)](_0x32c1bc[_0x4f96a4(0xd3)][_0x4f96a4(0x11d)][0x1]['content'],_0x4f96a4(0x19a));});}),a20_0x8a25e7(a20_0x4bb430(0xcb),async()=>{await withMockFetch(async _0x2df8d6=>{const _0x411efe=a20_0x3c84,_0x59bcf1=String(_0x2df8d6||'');if(_0x59bcf1===_0x411efe(0x115))return jsonResponse({'providers':{'grsai':{'apiUrl':_0x411efe(0x1a4),'apiKey':_0x411efe(0x12c)}}});throw new Error(_0x411efe(0x184)+_0x59bcf1);},async()=>{const _0x1b9f95=a20_0x3c84;await a20_0x184bc3[_0x1b9f95(0x1a3)](()=>buildGenerateTextRequest({'provider':_0x1b9f95(0x193),'model':_0x1b9f95(0xca),'prompt':_0x1b9f95(0x16b)}),/GRSAI text model API manifest missing: grsai\/unregistered-text-model/);});}),a20_0x8a25e7(a20_0x4bb430(0x197),async()=>{await withMockFetch(async _0x3c16e8=>{const _0x5c75f6=a20_0x3c84,_0x49bca4=String(_0x3c16e8||'');if(_0x49bca4===_0x5c75f6(0x115))return jsonResponse({'providers':{}});throw new Error(_0x5c75f6(0x184)+_0x49bca4);},async()=>{const _0x411e37=a20_0x3c84;await a20_0x184bc3[_0x411e37(0x1a3)](()=>buildGenerateTextRequest({'model':_0x411e37(0x165),'prompt':'hello'}),/Text model API manifest missing: gemini-future-unregistered/);});}),a20_0x8a25e7(a20_0x4bb430(0x117),async()=>{const _0x4b49af=a20_0x4bb430,_0xc7817f=[[_0x4b49af(0xe5),'kimi-k2-instruct'],['apimart/gpt-5.5',_0x4b49af(0x10c)],[_0x4b49af(0xf7),_0x4b49af(0x17c)],[_0x4b49af(0x14b),'gemini-3.5-flash']];await withMockFetch(async _0x478a91=>{const _0x3a92df=_0x4b49af,_0x303b7e=String(_0x478a91||'');if(_0x303b7e===_0x3a92df(0x115))return jsonResponse({'providers':{'apimart':{'apiUrl':'https://api.apimart.ai','apiKey':'k_apimart'}}});throw new Error('unexpected\x20fetch\x20url:\x20'+_0x303b7e);},async()=>{const _0x1e4eef=_0x4b49af;for(const [_0x356098,_0x4dae3f]of _0xc7817f){const _0x2cf885=await buildGenerateTextRequest({'provider':_0x1e4eef(0x10d),'model':_0x356098,'prompt':_0x1e4eef(0xd2)});a20_0x184bc3['equal'](_0x2cf885[_0x1e4eef(0x173)],_0x1e4eef(0xe1)),a20_0x184bc3[_0x1e4eef(0x170)](_0x2cf885['body'][_0x1e4eef(0xef)],_0x1e4eef(0x1b0)),a20_0x184bc3[_0x1e4eef(0x170)](_0x2cf885['body'][_0x1e4eef(0x15e)],_0x4dae3f),a20_0x184bc3['equal'](_0x2cf885[_0x1e4eef(0xd3)][_0x1e4eef(0x11d)][0x1][_0x1e4eef(0x160)],_0x1e4eef(0xd2));}});}),a20_0x8a25e7('aiTextApi:\x20APIMart\x20routeId\x20domestic2\x20builds\x20aishuch\x20chat\x20endpoint',async()=>{await withMockFetch(async _0x5255c5=>{const _0x31ced4=a20_0x3c84,_0x530ba9=String(_0x5255c5||'');if(_0x530ba9===_0x31ced4(0x115))return jsonResponse({'providers':{'apimart':{'routeId':_0x31ced4(0x13d),'apiKey':_0x31ced4(0xd4)}}});throw new Error(_0x31ced4(0x184)+_0x530ba9);},async()=>{const _0x381f84=a20_0x3c84,_0x5021dd=await buildGenerateTextRequest({'provider':'apimart','model':_0x381f84(0xe5),'prompt':_0x381f84(0xd2)});a20_0x184bc3[_0x381f84(0x170)](_0x5021dd['url'],_0x381f84(0xe1)),a20_0x184bc3['equal'](_0x5021dd['body'][_0x381f84(0xef)],_0x381f84(0x141)),a20_0x184bc3[_0x381f84(0x170)](_0x5021dd[_0x381f84(0xd3)][_0x381f84(0x15e)],_0x381f84(0xcd));});}),a20_0x8a25e7(a20_0x4bb430(0x18a),async()=>{await withMockFetch(async(_0x24ed60,_0x29d674={})=>{const _0x24f30d=a20_0x3c84,_0x2d3e81=String(_0x24ed60||'');if(_0x2d3e81===_0x24f30d(0x115))return jsonResponse({'providers':{'apimart':{'apiUrl':_0x24f30d(0x15d),'apiKey':_0x24f30d(0xd4)}}});if(_0x2d3e81===_0x24f30d(0xe7))return imageResponse(_0x24f30d(0x12f));if(_0x2d3e81===_0x24f30d(0x153)){const _0x104b97=Object['fromEntries'](_0x29d674[_0x24f30d(0xd3)][_0x24f30d(0x118)]());return a20_0x184bc3[_0x24f30d(0x170)](_0x104b97[_0x24f30d(0x1ab)],'image/png'),a20_0x184bc3[_0x24f30d(0x170)](_0x104b97[_0x24f30d(0xd5)],_0x24f30d(0xfd)),a20_0x184bc3[_0x24f30d(0x170)](await _0x104b97['file'][_0x24f30d(0x194)](),'gemini-image'),jsonResponse({'cdnUrl':_0x24f30d(0x122)});}throw new Error(_0x24f30d(0x184)+_0x2d3e81);},async()=>{const _0x352f57=a20_0x3c84,_0x4db10b=await buildGenerateTextRequest({'provider':_0x352f57(0x10d),'model':_0x352f57(0x196),'prompt':'分析\x20@图片1\x20的细节。','inputUrls':[_0x352f57(0xe7)]});a20_0x184bc3[_0x352f57(0x170)](_0x4db10b[_0x352f57(0x173)],_0x352f57(0xe1)),a20_0x184bc3['equal'](_0x4db10b[_0x352f57(0xd3)][_0x352f57(0xef)],_0x352f57(0x1b0)),a20_0x184bc3[_0x352f57(0x170)](_0x4db10b['body'][_0x352f57(0x15e)],_0x352f57(0xf0));const _0x1f75e0=_0x4db10b[_0x352f57(0xd3)][_0x352f57(0x11d)][0x1]['content'];a20_0x184bc3['deepEqual'](_0x1f75e0[0x0],{'type':_0x352f57(0x194),'text':_0x352f57(0xbd)}),a20_0x184bc3['deepEqual'](_0x1f75e0[0x1],{'type':_0x352f57(0x13f),'image_url':{'url':'https://cdn.apimart.ai/files/gemini-ref.png'}}),a20_0x184bc3['deepEqual'](_0x1f75e0[0x2],{'type':'text','text':_0x352f57(0x112)});});}),a20_0x8a25e7(a20_0x4bb430(0x168),async()=>{await withMockFetch(async(_0x3d3ca8,_0x190f69={})=>{const _0x21bcd8=a20_0x3c84,_0x1b01c0=String(_0x3d3ca8||'');if(_0x1b01c0===_0x21bcd8(0x115))return jsonResponse({'providers':{'apimart':{'apiUrl':_0x21bcd8(0x15d),'apiKey':_0x21bcd8(0xd4)}}});if(_0x1b01c0===_0x21bcd8(0xe7))return imageResponse(_0x21bcd8(0x12f));if(_0x1b01c0===_0x21bcd8(0x153)){const _0x2f2428=Object[_0x21bcd8(0x113)](_0x190f69[_0x21bcd8(0xd3)]['entries']());return a20_0x184bc3[_0x21bcd8(0x170)](await _0x2f2428[_0x21bcd8(0x157)][_0x21bcd8(0x194)](),'gemini-image'),jsonResponse({'cdnUrl':_0x21bcd8(0x122)});}throw new Error(_0x21bcd8(0x184)+_0x1b01c0);},async()=>{const _0x43b3d2=a20_0x3c84,_0x91e3cb=await buildGenerateTextRequest({'provider':_0x43b3d2(0x10d),'model':_0x43b3d2(0xf0),'prompt':_0x43b3d2(0x178),'inputUrls':[_0x43b3d2(0xe7)],'inputImageUrls':[_0x43b3d2(0xe7)]});a20_0x184bc3[_0x43b3d2(0x170)](_0x91e3cb['body'][_0x43b3d2(0xef)],'https://api.apimart.ai/v1/chat/completions'),a20_0x184bc3[_0x43b3d2(0x170)](_0x91e3cb[_0x43b3d2(0xd3)][_0x43b3d2(0x15e)],'gemini-3.1-pro-preview'),a20_0x184bc3[_0x43b3d2(0x1b2)](_0x91e3cb[_0x43b3d2(0xd3)]['messages'][0x1][_0x43b3d2(0x160)][0x1],{'type':'image_url','image_url':{'url':'https://cdn.apimart.ai/files/gemini-ref.png'}});});}),a20_0x8a25e7(a20_0x4bb430(0xc9),async()=>{await withMockFetch(async _0x6ab156=>{const _0x5ee801=a20_0x3c84,_0xe48c02=String(_0x6ab156||'');if(_0xe48c02==='/api/config')return jsonResponse({'providers':{'apimart':{'apiUrl':_0x5ee801(0x15d),'apiKey':'k_apimart'}}});throw new Error(_0x5ee801(0x184)+_0xe48c02);},async()=>{const _0x5edad5=a20_0x3c84,_0x1ea9b7=await buildGenerateTextRequest({'provider':'apimart','model':_0x5edad5(0xf1),'prompt':_0x5edad5(0x178),'inputUrls':[_0x5edad5(0xb6)],'inputImageUrls':[_0x5edad5(0xb6)]});a20_0x184bc3[_0x5edad5(0x170)](_0x1ea9b7[_0x5edad5(0xd3)][_0x5edad5(0xef)],'https://api.apimart.ai/v1/chat/completions'),a20_0x184bc3['deepEqual'](_0x1ea9b7['body'][_0x5edad5(0x11d)][0x1][_0x5edad5(0x160)],[{'type':_0x5edad5(0x194),'text':_0x5edad5(0xbd)},{'type':_0x5edad5(0x13f),'image_url':{'url':_0x5edad5(0xb6)}}]);});}),a20_0x8a25e7(a20_0x4bb430(0xf5),async()=>{await withMockFetch(async(_0x44697f,_0x56342c={})=>{const _0x1f6540=a20_0x3c84,_0x27c6d5=String(_0x44697f||'');if(_0x27c6d5==='/api/config')return jsonResponse({'providers':{'apimart':{'apiUrl':_0x1f6540(0x15d),'apiKey':_0x1f6540(0xd4)}}});if(_0x27c6d5===_0x1f6540(0xb0))return imageResponse(_0x1f6540(0xbf));if(_0x27c6d5===_0x1f6540(0x128))return imageResponse(_0x1f6540(0x17e));if(_0x27c6d5==='/api/v2/proxy/apimart-upload'){const _0x255194=Object[_0x1f6540(0x113)](_0x56342c['body'][_0x1f6540(0x118)]()),_0x97c4f6=await _0x255194[_0x1f6540(0x157)][_0x1f6540(0x194)]();if(_0x97c4f6==='apimart-first')return jsonResponse({'cdnUrl':_0x1f6540(0x158)});if(_0x97c4f6===_0x1f6540(0x17e))return jsonResponse({'cdnUrl':'https://cdn.apimart.ai/files/second.png'});}throw new Error('unexpected\x20fetch\x20url:\x20'+_0x27c6d5);},async()=>{const _0x426af9=a20_0x3c84,_0x1fcda8=await buildGenerateTextRequest({'provider':'apimart','model':_0x426af9(0xf1),'prompt':_0x426af9(0xfc),'inputUrls':[_0x426af9(0xb0),_0x426af9(0x128)],'inputImageUrls':[_0x426af9(0xb0),_0x426af9(0x128)]});a20_0x184bc3[_0x426af9(0x170)](_0x1fcda8[_0x426af9(0xd3)]['apiUrl'],_0x426af9(0x1b0)),a20_0x184bc3[_0x426af9(0x1b2)](_0x1fcda8[_0x426af9(0xd3)][_0x426af9(0x11d)][0x1]['content'],[{'type':'text','text':_0x426af9(0x18d)},{'type':_0x426af9(0x13f),'image_url':{'url':_0x426af9(0x106)}},{'type':_0x426af9(0x194),'text':'\x20再看\x20'},{'type':_0x426af9(0x13f),'image_url':{'url':_0x426af9(0x158)}}]);});}),a20_0x8a25e7('aiTextApi:\x20APIMart\x20GPT\x20文本格式遇到视频参考会明确报错',async()=>{await withMockFetch(async _0x5e244b=>{const _0x515e6c=a20_0x3c84,_0x36f809=String(_0x5e244b||'');if(_0x36f809===_0x515e6c(0x115))return jsonResponse({'providers':{'apimart':{'apiUrl':_0x515e6c(0x15d),'apiKey':_0x515e6c(0xd4)}}});throw new Error(_0x515e6c(0x184)+_0x36f809);},async()=>{const _0x5ba67c=a20_0x3c84;await a20_0x184bc3[_0x5ba67c(0x1a3)](()=>buildGenerateTextRequest({'provider':_0x5ba67c(0x10d),'model':'apimart/gemini-3-flash-preview-nothinking','prompt':'分析\x20@视频1\x20的内容。','inputUrls':[_0x5ba67c(0x135)],'inputVideoUrls':[_0x5ba67c(0x135)]}),/APIMart 文本模型已统一使用 GPT 图文格式/);});}),a20_0x8a25e7(a20_0x4bb430(0xf3),async()=>{await withMockFetch(async _0x3de90d=>{const _0x53f3b4=a20_0x3c84,_0x443473=String(_0x3de90d||'');if(_0x443473===_0x53f3b4(0x115))return jsonResponse({'providers':{'apimart':{'apiUrl':_0x53f3b4(0x15d),'apiKey':_0x53f3b4(0xd4)}}});throw new Error('unexpected\x20fetch\x20url:\x20'+_0x443473);},async()=>{const _0x3a2881=a20_0x3c84;await a20_0x184bc3[_0x3a2881(0x1a3)](()=>buildGenerateTextRequest({'provider':_0x3a2881(0x10d),'model':_0x3a2881(0xf1),'prompt':'分析\x20@视频1','inputUrls':[_0x3a2881(0x144)],'inputVideoUrls':['https://upload.apimart.ai/files/existing.mp4']}),/APIMart 文本模型已统一使用 GPT 图文格式/);});}),a20_0x8a25e7('aiTextApi:\x20RunningHUB\x20单图文本请求会走图片代理并优先使用\x20modelApiKey',async()=>{await withMockFetch(async _0x310015=>{const _0x10ea11=a20_0x3c84,_0x477861=String(_0x310015||'');if(_0x477861===_0x10ea11(0x115))return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x10ea11(0x19b),'apiKey':'k_runninghub','modelApiKey':'k_runninghub_model'}}});throw new Error(_0x10ea11(0x184)+_0x477861);},async()=>{const _0x2d25af=a20_0x3c84,_0x4ec91b=await buildGenerateTextRequest({'provider':'runninghub','model':RUNNINGHUB_FLASH_MODEL,'apiKey':_0x2d25af(0x1ae),'prompt':_0x2d25af(0x19f),'inputImageUrls':[RUNNINGHUB_IMAGE_URL]});a20_0x184bc3[_0x2d25af(0x170)](_0x4ec91b[_0x2d25af(0x173)],_0x2d25af(0x125)),a20_0x184bc3[_0x2d25af(0x170)](_0x4ec91b[_0x2d25af(0xd3)]['apiUrl'],_0x2d25af(0x124)),a20_0x184bc3[_0x2d25af(0x170)](_0x4ec91b[_0x2d25af(0xd3)]['apiKey'],'k_runninghub_model'),a20_0x184bc3[_0x2d25af(0x170)](_0x4ec91b[_0x2d25af(0xd3)][_0x2d25af(0x185)],_0x2d25af(0x19f)),a20_0x184bc3[_0x2d25af(0x170)](_0x4ec91b[_0x2d25af(0xd3)]['imageUrl'],RUNNINGHUB_IMAGE_URL),a20_0x184bc3[_0x2d25af(0x170)](_0x4ec91b['adapterTrace']?.[_0x2d25af(0x126)],'manifest'),a20_0x184bc3[_0x2d25af(0x170)](_0x4ec91b[_0x2d25af(0xaf)]?.[_0x2d25af(0x181)],_0x2d25af(0x150)),a20_0x184bc3[_0x2d25af(0x1b2)](Object[_0x2d25af(0xc4)](_0x4ec91b[_0x2d25af(0xd3)])['sort'](),[_0x2d25af(0x1a8),_0x2d25af(0xef),_0x2d25af(0xf4),_0x2d25af(0x185)]);});}),a20_0x8a25e7(a20_0x4bb430(0x155),async()=>{await withMockFetch(async _0x15bcee=>{const _0x3fe5e2=a20_0x3c84,_0x3806de=String(_0x15bcee||'');if(_0x3806de==='/api/config')return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x3fe5e2(0x19b),'apiKey':_0x3fe5e2(0x12d),'modelApiKey':_0x3fe5e2(0xfe)}}});throw new Error('unexpected\x20fetch\x20url:\x20'+_0x3806de);},async()=>{const _0x29fda0=a20_0x3c84,_0xf8b15d=await buildGenerateTextRequest({'provider':_0x29fda0(0x107),'model':RUNNINGHUB_QWEN36_PLUS_MODEL,'apiKey':_0x29fda0(0x1ae),'prompt':'plain\x20text\x20prompt'});a20_0x184bc3[_0x29fda0(0x170)](_0xf8b15d[_0x29fda0(0x173)],_0x29fda0(0xe1)),a20_0x184bc3[_0x29fda0(0x170)](_0xf8b15d['body'][_0x29fda0(0xef)],'https://llm.runninghub.cn/v1/chat/completions'),a20_0x184bc3['equal'](_0xf8b15d[_0x29fda0(0xd3)][_0x29fda0(0x1a8)],_0x29fda0(0xfe)),a20_0x184bc3['equal'](_0xf8b15d['body']['model'],RUNNINGHUB_QWEN36_PLUS_MODEL),a20_0x184bc3[_0x29fda0(0x170)](_0xf8b15d[_0x29fda0(0xd3)]['messages'][0x1][_0x29fda0(0x160)],_0x29fda0(0xd2)),a20_0x184bc3['equal'](_0xf8b15d[_0x29fda0(0xaf)]?.['source'],_0x29fda0(0x12a)),a20_0x184bc3[_0x29fda0(0x170)](_0xf8b15d[_0x29fda0(0xaf)]?.[_0x29fda0(0x181)],_0x29fda0(0x104));});}),a20_0x8a25e7('aiTextApi:\x20RunningHUB\x20LLM\x20直接返回\x20choices\x20时不会把\x20chat\x20id\x20当\x20taskId\x20轮询',async()=>{const _0x22e2a9=a20_0x4bb430,_0xfef2d0=[];await withMockFetch(async(_0xc64244,_0x4e47cc={})=>{const _0x24051f=a20_0x3c84,_0x35d90f=String(_0xc64244||'');_0xfef2d0['push']({'target':_0x35d90f,'options':_0x4e47cc});if(_0x35d90f===_0x24051f(0x115))return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x24051f(0x19b),'apiKey':_0x24051f(0x12d),'modelApiKey':_0x24051f(0xfe)}}});if(_0x35d90f==='/api/v2/proxy/completions')return jsonResponse({'id':_0x24051f(0x172),'object':'chat.completion','choices':[{'message':{'role':'assistant','content':'Qwen\x20直接文本结果'},'finish_reason':_0x24051f(0x167)}]});if(_0x35d90f==='/api/v2/proxy/image')throw new Error(_0x24051f(0xc6));throw new Error(_0x24051f(0x184)+_0x35d90f);},async()=>{const _0x5ed308=a20_0x3c84,_0x4bb3b7=await generateText({'provider':_0x5ed308(0x107),'model':RUNNINGHUB_QWEN36_PLUS_MODEL,'prompt':'plain\x20text\x20prompt'});a20_0x184bc3[_0x5ed308(0x170)](_0x4bb3b7['text'],_0x5ed308(0xe4));}),a20_0x184bc3['equal'](_0xfef2d0['filter'](_0x2674a1=>_0x2674a1[_0x22e2a9(0x109)]===_0x22e2a9(0xe1))[_0x22e2a9(0xe0)],0x1),a20_0x184bc3[_0x22e2a9(0x170)](_0xfef2d0['filter'](_0x5f486c=>_0x5f486c['target']==='/api/v2/proxy/image')[_0x22e2a9(0xe0)],0x0);}),a20_0x8a25e7(a20_0x4bb430(0x121),async()=>{await withMockFetch(async _0x1cfd2c=>{const _0x16a96c=a20_0x3c84,_0x1c151c=String(_0x1cfd2c||'');if(_0x1c151c==='/api/config')return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x16a96c(0x19b),'apiKey':_0x16a96c(0x12d),'modelApiKey':'k_runninghub_model'}}});if(_0x1c151c==='/api/v2/proxy/completions')return new Response([_0x16a96c(0x13b),_0x16a96c(0xdf),_0x16a96c(0x187),_0x16a96c(0x19d),''][_0x16a96c(0xc8)]('\x0a\x0a'),{'status':0xc8,'headers':{'Content-Type':_0x16a96c(0x195)}});if(_0x1c151c===_0x16a96c(0x125))throw new Error('Qwen\x20SSE\x20result\x20should\x20not\x20poll\x20task\x20query');throw new Error(_0x16a96c(0x184)+_0x1c151c);},async()=>{const _0x4a56ea=a20_0x3c84,_0x1b98a1=await generateText({'provider':_0x4a56ea(0x107),'model':RUNNINGHUB_QWEN36_PLUS_MODEL,'prompt':_0x4a56ea(0xd2)});a20_0x184bc3['equal'](_0x1b98a1[_0x4a56ea(0x194)],'Qwen\x20SSE\x20文本');});}),a20_0x8a25e7('aiTextApi:\x20RunningHUB\x20Qwen3-VL\x20文本节点支持图像入参',async()=>{await withMockFetch(async(_0x5bc521,_0x21e1d0={})=>{const _0x4c935b=a20_0x3c84,_0xd15cab=String(_0x5bc521||'');if(_0xd15cab==='/api/config')return jsonResponse({'providers':{'runninghub':{'apiUrl':'https://www.runninghub.cn','apiKey':_0x4c935b(0x12d),'modelApiKey':_0x4c935b(0xfe)}}});if(_0xd15cab===_0x4c935b(0x111))return imageResponse(_0x4c935b(0x142));if(_0xd15cab[_0x4c935b(0xd0)](_0x4c935b(0x171)))return a20_0x184bc3['equal'](_0x21e1d0[_0x4c935b(0x146)]?.[_0x4c935b(0x1a5)],_0x4c935b(0x1a6)),jsonResponse({'code':0x0,'data':{'download_url':_0x4c935b(0xff)}});throw new Error(_0x4c935b(0x184)+_0xd15cab);},async()=>{const _0x5e791d=a20_0x3c84,_0x114a69=await buildGenerateTextRequest({'provider':'runninghub','model':RUNNINGHUB_QWEN3_VL_MODEL,'prompt':_0x5e791d(0x175),'inputUrls':[_0x5e791d(0x111)],'inputImageUrls':[_0x5e791d(0x111)]});a20_0x184bc3[_0x5e791d(0x170)](_0x114a69[_0x5e791d(0x173)],_0x5e791d(0xe1)),a20_0x184bc3['equal'](_0x114a69['body'][_0x5e791d(0xef)],_0x5e791d(0xbc)),a20_0x184bc3['equal'](_0x114a69[_0x5e791d(0xd3)][_0x5e791d(0x15e)],RUNNINGHUB_QWEN3_VL_MODEL),a20_0x184bc3[_0x5e791d(0x1b2)](_0x114a69[_0x5e791d(0xd3)][_0x5e791d(0x11d)][0x1]['content'],[{'type':'text','text':_0x5e791d(0xb7)},{'type':_0x5e791d(0x13f),'image_url':{'url':_0x5e791d(0xff)}},{'type':_0x5e791d(0x194),'text':_0x5e791d(0x1a1)}]);});}),a20_0x8a25e7('aiTextApi:\x20RunningHUB\x20local\x20single\x20image\x20uses\x20shared\x20upload\x20helper',async()=>{await withMockFetch(async(_0x9f84d6,_0x456ec2={})=>{const _0x1c12f1=a20_0x3c84,_0x5b4f1c=String(_0x9f84d6||'');if(_0x5b4f1c===_0x1c12f1(0x115))return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x1c12f1(0x19b),'apiKey':_0x1c12f1(0x12d),'modelApiKey':_0x1c12f1(0xfe)}}});if(_0x5b4f1c===_0x1c12f1(0x1af))return imageResponse(_0x1c12f1(0x1a9));if(_0x5b4f1c[_0x1c12f1(0xd0)]('/api/v2/proxy/upload?'))return a20_0x184bc3['equal'](_0x456ec2[_0x1c12f1(0x146)]?.[_0x1c12f1(0x1a5)],_0x1c12f1(0x1a6)),jsonResponse({'code':0x0,'data':{'download_url':_0x1c12f1(0x18f)}});throw new Error(_0x1c12f1(0x184)+_0x5b4f1c);},async()=>{const _0x439491=a20_0x3c84,_0x57c587=await buildGenerateTextRequest({'provider':_0x439491(0x107),'model':RUNNINGHUB_FLASH_MODEL,'prompt':_0x439491(0x11f),'inputImageUrls':[_0x439491(0x1af)]});a20_0x184bc3[_0x439491(0x170)](_0x57c587[_0x439491(0xd3)]['imageUrl'],_0x439491(0x18f));});}),a20_0x8a25e7('aiTextApi:\x20RunningHUB\x20local\x20single\x20image\x20upload\x20failure\x20reports\x20provider\x20error',async()=>{await withMockFetch(async(_0x598f77,_0x340764={})=>{const _0x5b8e66=a20_0x3c84,_0x117604=String(_0x598f77||'');if(_0x117604===_0x5b8e66(0x115))return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x5b8e66(0x19b),'apiKey':_0x5b8e66(0x12d),'modelApiKey':_0x5b8e66(0xfe)}}});if(_0x117604===_0x5b8e66(0x179))return imageResponse(_0x5b8e66(0x101));if(_0x117604[_0x5b8e66(0xd0)](_0x5b8e66(0x171)))return a20_0x184bc3[_0x5b8e66(0x170)](_0x340764[_0x5b8e66(0x146)]?.[_0x5b8e66(0x1a5)],'Bearer\x20k_runninghub_model'),jsonResponse({'code':0x191,'errorMessage':'invalid\x20model\x20api\x20key'});throw new Error(_0x5b8e66(0x184)+_0x117604);},async()=>{const _0x26c61d=a20_0x3c84;await a20_0x184bc3[_0x26c61d(0x1a3)](()=>buildGenerateTextRequest({'provider':_0x26c61d(0x107),'model':RUNNINGHUB_FLASH_MODEL,'prompt':_0x26c61d(0x11f),'inputImageUrls':[_0x26c61d(0x179)]}),/RunningHUB .*invalid model api key.*401/);});}),a20_0x8a25e7('aiTextApi:\x20RunningHUB\x20model\x20API\x20does\x20not\x20fall\x20back\x20to\x20workflow\x20apiKey',async()=>{await withMockFetch(async _0x3e1b8a=>{const _0x46c918=a20_0x3c84,_0x108f1d=String(_0x3e1b8a||'');if(_0x108f1d===_0x46c918(0x115))return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x46c918(0x19b),'apiKey':_0x46c918(0x120)}}});throw new Error('unexpected\x20fetch\x20url:\x20'+_0x108f1d);},async()=>{const _0xab7548=a20_0x3c84;await a20_0x184bc3[_0xab7548(0x1a3)](()=>buildGenerateTextRequest({'provider':_0xab7548(0x107),'model':RUNNINGHUB_FLASH_MODEL,'prompt':_0xab7548(0x11f),'inputImageUrls':[RUNNINGHUB_IMAGE_URL]}),/API Key/);});}),a20_0x8a25e7(a20_0x4bb430(0x12b),async()=>{const _0x4c6f49=a20_0x4bb430,_0x1438ef=[];await withMockFetch(async(_0x50b10a,_0x41883b={})=>{const _0x3e7390=a20_0x3c84,_0x43fb7c=String(_0x50b10a||'');_0x1438ef[_0x3e7390(0x10b)]({'target':_0x43fb7c,'options':_0x41883b});if(_0x43fb7c==='/api/config')return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x3e7390(0x19b),'apiKey':'k_runninghub','modelApiKey':_0x3e7390(0xfe)}}});if(_0x43fb7c===_0x3e7390(0xb0)||_0x43fb7c==='/local/second.png')return imageResponse(_0x43fb7c);if(_0x43fb7c[_0x3e7390(0xd0)](_0x3e7390(0x171)))return a20_0x184bc3[_0x3e7390(0x170)](_0x41883b[_0x3e7390(0x146)]?.[_0x3e7390(0x1a5)],_0x3e7390(0x1a6)),jsonResponse({'code':0x0,'data':{'download_url':'https://www.runninghub.cn/uploaded/merged-sheet.png'}});throw new Error(_0x3e7390(0x184)+_0x43fb7c);},async()=>{await withMockCanvasComposition(async()=>{const _0x59673a=a20_0x3c84,_0x178413=await buildGenerateTextRequest({'provider':_0x59673a(0x107),'model':RUNNINGHUB_PRO_MODEL,'prompt':_0x59673a(0xc7),'inputImageUrls':[_0x59673a(0xb0),_0x59673a(0x128)]});a20_0x184bc3[_0x59673a(0x170)](_0x178413[_0x59673a(0x173)],'/api/v2/proxy/image'),a20_0x184bc3[_0x59673a(0x170)](_0x178413['body']['apiUrl'],'https://www.runninghub.cn/openapi/v2/rhart-text-g-3-pro-preview-cv/image-to-text'),a20_0x184bc3[_0x59673a(0x170)](_0x178413[_0x59673a(0xd3)][_0x59673a(0x1a8)],_0x59673a(0xfe)),a20_0x184bc3['equal'](_0x178413[_0x59673a(0xd3)][_0x59673a(0x185)],_0x59673a(0xc7)),a20_0x184bc3['equal'](_0x178413[_0x59673a(0xd3)][_0x59673a(0xf4)],_0x59673a(0x149)),a20_0x184bc3[_0x59673a(0x170)](_0x178413['body'][_0x59673a(0x14a)],undefined);});});const _0x2d02d4=_0x1438ef[_0x4c6f49(0x188)](_0x62a07c=>_0x62a07c[_0x4c6f49(0x109)]===_0x4c6f49(0xb0)||_0x62a07c['target']===_0x4c6f49(0x128));a20_0x184bc3['equal'](_0x2d02d4['length'],0x2);const _0x500c08=_0x1438ef[_0x4c6f49(0x188)](_0x4fbe7a=>_0x4fbe7a[_0x4c6f49(0x109)][_0x4c6f49(0xd0)]('/api/v2/proxy/upload?'));a20_0x184bc3[_0x4c6f49(0x170)](_0x500c08[_0x4c6f49(0xe0)],0x1);}),a20_0x8a25e7(a20_0x4bb430(0x161),async()=>{await withMockFetch(async _0x2a6c8e=>{const _0x2f3d1b=a20_0x3c84,_0x22f3e1=String(_0x2a6c8e||'');if(_0x22f3e1===_0x2f3d1b(0x115))return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x2f3d1b(0x19b),'apiKey':'k_runninghub','modelApiKey':'k_runninghub_model'}}});throw new Error(_0x2f3d1b(0x184)+_0x22f3e1);},async()=>{const _0x33a5bd=a20_0x3c84;await a20_0x184bc3[_0x33a5bd(0x1a3)](()=>buildGenerateTextRequest({'provider':_0x33a5bd(0x107),'model':RUNNINGHUB_FLASH_MODEL,'prompt':_0x33a5bd(0x19f)}),_0x731d5c=>{const _0x25d078=_0x33a5bd;return a20_0x184bc3['ok'](_0x731d5c instanceof Error),a20_0x184bc3['ok'](String(_0x731d5c[_0x25d078(0x166)]||'')[_0x25d078(0x15b)]()[_0x25d078(0xe0)]>0x0),!![];});});}),a20_0x8a25e7(a20_0x4bb430(0xc0),async()=>{const _0x4ee88a=a20_0x4bb430,_0x25336d=[];await withMockFetch(async(_0x463d3f,_0x245d75={})=>{const _0x5f18fa=a20_0x3c84,_0x571512=String(_0x463d3f||'');_0x25336d[_0x5f18fa(0x10b)]({'target':_0x571512,'options':_0x245d75});if(_0x571512==='/api/config')return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x5f18fa(0x19b),'apiKey':_0x5f18fa(0x12d),'modelApiKey':'k_runninghub_model'}}});if(_0x571512===_0x5f18fa(0x125)){const _0x16f8de=JSON['parse'](String(_0x245d75[_0x5f18fa(0xd3)]||'{}'));if(_0x16f8de[_0x5f18fa(0xef)]===_0x5f18fa(0x1a2))return jsonResponse({'taskId':_0x5f18fa(0xfa),'status':_0x5f18fa(0x180),'errorCode':'','errorMessage':''});if(_0x16f8de[_0x5f18fa(0xef)]===_0x5f18fa(0x15a))return a20_0x184bc3[_0x5f18fa(0x170)](_0x16f8de[_0x5f18fa(0x162)],_0x5f18fa(0xfa)),a20_0x184bc3[_0x5f18fa(0x170)](_0x16f8de[_0x5f18fa(0x1a8)],_0x5f18fa(0xfe)),jsonResponse({'taskId':_0x5f18fa(0xfa),'status':'SUCCESS','errorCode':'','errorMessage':'','results':[{'url':null,'outputType':'text','text':_0x5f18fa(0x1a7)}]});}throw new Error(_0x5f18fa(0x184)+_0x571512);},async()=>{await withImmediateTimers(async()=>{const _0x8d1a0b=a20_0x3c84,_0x4e8bc5=await generateText({'provider':'runninghub','model':RUNNINGHUB_PRO_MODEL,'prompt':_0x8d1a0b(0xee),'inputImageUrls':[RUNNINGHUB_IMAGE_URL]});a20_0x184bc3[_0x8d1a0b(0x170)](_0x4e8bc5['text'],_0x8d1a0b(0x1a7));});});const _0x1bcb08=_0x25336d['filter'](_0x87cf47=>_0x87cf47[_0x4ee88a(0x109)]==='/api/v2/proxy/image');a20_0x184bc3[_0x4ee88a(0x170)](_0x1bcb08[_0x4ee88a(0xe0)],0x2);}),a20_0x8a25e7('aiTextApi:\x20RunningHUB\x20任务失败时会抛出轮询错误',async()=>{await withMockFetch(async(_0x440373,_0x2cf648={})=>{const _0x29383a=a20_0x3c84,_0x50ba88=String(_0x440373||'');if(_0x50ba88===_0x29383a(0x115))return jsonResponse({'providers':{'runninghub':{'apiUrl':_0x29383a(0x19b),'apiKey':_0x29383a(0x12d),'modelApiKey':_0x29383a(0xfe)}}});if(_0x50ba88===_0x29383a(0x125)){const _0x23d405=JSON[_0x29383a(0x164)](String(_0x2cf648['body']||'{}'));if(_0x23d405[_0x29383a(0xef)]===_0x29383a(0x124))return jsonResponse({'taskId':_0x29383a(0x16c),'status':_0x29383a(0x180),'errorCode':'','errorMessage':''});if(_0x23d405['apiUrl']==='https://www.runninghub.cn/openapi/v2/query')return jsonResponse({'taskId':_0x29383a(0x16c),'status':_0x29383a(0xc5),'errorCode':_0x29383a(0xd9),'errorMessage':'task\x20failed'});}throw new Error('unexpected\x20fetch\x20url:\x20'+_0x50ba88);},async()=>{await withImmediateTimers(async()=>{const _0xe9c56c=a20_0x3c84;await a20_0x184bc3[_0xe9c56c(0x1a3)](()=>generateText({'provider':_0xe9c56c(0x107),'model':RUNNINGHUB_FLASH_MODEL,'prompt':'请描述图片','inputImageUrls':[RUNNINGHUB_IMAGE_URL]}),/task failed/);});});}),a20_0x8a25e7(a20_0x4bb430(0x13c),async()=>{let _0x1bd50f=![];await withMockFetch(async _0x17936e=>{const _0x244201=a20_0x3c84,_0x59c21e=String(_0x17936e||'');if(_0x59c21e===_0x244201(0x115))return jsonResponse({'providers':{'grsai':{'apiUrl':'https://grsai.dakka.com.cn','apiKey':'k_grsai'}}});if(_0x59c21e===_0x244201(0xe7))return imageResponse(_0x244201(0x134));if(isTelegraphProxyUpload(_0x59c21e))return _0x1bd50f=!![],jsonResponse([{'src':_0x244201(0xd7)}]);if(_0x59c21e===_0x244201(0x140))return jsonResponse({'data':{'token':_0x244201(0x13e),'key':'uploaded/grsai-ref.png','url':_0x244201(0x154),'domain':'https://cdn.grsai.example.com'}});if(_0x59c21e===_0x244201(0x154))return jsonResponse({'ok':!![]});throw new Error(_0x244201(0x184)+_0x59c21e);},async()=>{const _0x312887=a20_0x3c84,_0x81877a=await buildGenerateTextRequest({'provider':_0x312887(0x193),'model':_0x312887(0xfb),'prompt':_0x312887(0x15c),'inputUrls':[_0x312887(0xe7)]});a20_0x184bc3[_0x312887(0x170)](_0x81877a[_0x312887(0x173)],_0x312887(0xe1)),a20_0x184bc3['equal'](_0x81877a[_0x312887(0xd3)][_0x312887(0xef)],_0x312887(0x10a)),a20_0x184bc3[_0x312887(0x170)](_0x81877a[_0x312887(0xd3)][_0x312887(0x1a8)],'k_grsai'),a20_0x184bc3[_0x312887(0x170)](_0x81877a[_0x312887(0xd3)]['model'],_0x312887(0xfb));const _0x35060a=_0x81877a[_0x312887(0xd3)][_0x312887(0x11d)][0x1]['content'];a20_0x184bc3['ok'](Array['isArray'](_0x35060a)),a20_0x184bc3[_0x312887(0x1b2)](_0x35060a,[{'type':_0x312887(0x194),'text':_0x312887(0x198)},{'type':_0x312887(0x13f),'image_url':{'url':'https://cdn.grsai.example.com/uploaded/grsai-ref.png'}},{'type':'text','text':_0x312887(0xb9)}]),a20_0x184bc3[_0x312887(0x170)](_0x1bd50f,![]);});}),a20_0x8a25e7(a20_0x4bb430(0xb5),async()=>{await withMockFetch(async _0x2b791d=>{const _0x260ba6=a20_0x3c84,_0x90bf49=String(_0x2b791d||'');if(_0x90bf49===_0x260ba6(0x115))return jsonResponse({'providers':{'ppio':{'apiUrl':_0x260ba6(0xc1),'apiKey':_0x260ba6(0xe3)}}});throw new Error(_0x260ba6(0x184)+_0x90bf49);},async()=>{const _0x10cd14=a20_0x3c84,_0x527e18=await buildGenerateTextRequest({'provider':'ppio','model':_0x10cd14(0x10f),'prompt':_0x10cd14(0xd2)});a20_0x184bc3[_0x10cd14(0x170)](_0x527e18[_0x10cd14(0x173)],_0x10cd14(0xe1)),a20_0x184bc3[_0x10cd14(0x170)](_0x527e18['body'][_0x10cd14(0xef)],_0x10cd14(0x11b)),a20_0x184bc3[_0x10cd14(0x170)](_0x527e18['body'][_0x10cd14(0x1a8)],_0x10cd14(0xe3)),a20_0x184bc3[_0x10cd14(0x170)](_0x527e18['body'][_0x10cd14(0x15e)],'qwen/qwen3.5-397b-a17b'),a20_0x184bc3[_0x10cd14(0x170)](_0x527e18['body']['messages'][0x1][_0x10cd14(0x160)],'plain\x20text\x20prompt');});}),a20_0x8a25e7(a20_0x4bb430(0xdb),async()=>{let _0x51d4bc=null;await withMockFetch(async(_0x40b932,_0x5148ad={})=>{const _0x2eaee5=a20_0x3c84,_0x5543a1=String(_0x40b932||'');if(_0x5543a1===_0x2eaee5(0x115))return jsonResponse({'providers':{'grsai':{'apiUrl':_0x2eaee5(0x1a4),'apiKey':_0x2eaee5(0x12c)}}});if(_0x5543a1===_0x2eaee5(0xe7))return imageResponse(_0x2eaee5(0x134));if(_0x5543a1===_0x2eaee5(0x140))return jsonResponse({'data':{'token':'token_grsai','key':_0x2eaee5(0xc2),'url':_0x2eaee5(0x154),'domain':_0x2eaee5(0xb8)}});if(_0x5543a1===_0x2eaee5(0x154))return jsonResponse({'ok':!![]});if(_0x5543a1===_0x2eaee5(0xe1))return _0x51d4bc=JSON[_0x2eaee5(0x164)](String(_0x5148ad[_0x2eaee5(0xd3)]||'{}')),jsonResponse({'choices':[{'message':{'content':_0x2eaee5(0xf8)}}]});throw new Error('unexpected\x20fetch\x20url:\x20'+_0x5543a1);},async()=>{const _0x38d7d4=a20_0x3c84,_0x4a0385=await generateText({'provider':_0x38d7d4(0x193),'model':_0x38d7d4(0x130),'prompt':'这张图的主颜色是什么？只回答颜色。','inputUrls':[_0x38d7d4(0xe7)]});a20_0x184bc3[_0x38d7d4(0x170)](_0x4a0385[_0x38d7d4(0x194)],'红色'),a20_0x184bc3[_0x38d7d4(0x170)](_0x51d4bc?.['apiUrl'],'https://grsai.dakka.com.cn/v1'),a20_0x184bc3[_0x38d7d4(0x170)](_0x51d4bc?.[_0x38d7d4(0x15e)],_0x38d7d4(0x130)),a20_0x184bc3['ok'](Array[_0x38d7d4(0x17b)](_0x51d4bc?.[_0x38d7d4(0x11d)]?.[0x1]?.['content']));});}),a20_0x8a25e7(a20_0x4bb430(0x151),async()=>{await withMockFetch(async _0x1ff3f1=>{const _0xbb8582=a20_0x3c84,_0x193953=String(_0x1ff3f1||'');if(_0x193953==='/api/config')return jsonResponse({'providers':{'grsai':{'apiUrl':_0xbb8582(0x1a4),'apiKey':_0xbb8582(0x12c)}}});if(_0x193953===_0xbb8582(0xba))throw new Error(_0xbb8582(0x148));if(_0x193953==='/local/second-ok.png')return imageResponse(_0xbb8582(0xda));if(_0x193953==='https://grsai.dakka.com.cn/client/resource/newUploadTokenZH')return jsonResponse({'data':{'token':_0xbb8582(0x13e),'key':'uploaded/grsai-ref-2.png','url':_0xbb8582(0x154),'domain':_0xbb8582(0xb8)}});if(_0x193953===_0xbb8582(0x154))return jsonResponse({'ok':!![]});throw new Error(_0xbb8582(0x184)+_0x193953);},async()=>{const _0x4154e5=a20_0x3c84,_0x492bac=await buildGenerateTextRequest({'provider':'grsai','model':'gemini-3.1-pro','prompt':_0x4154e5(0x18c),'inputUrls':['/local/first-failed.png',_0x4154e5(0x14e)]});a20_0x184bc3[_0x4154e5(0x1b2)](_0x492bac[_0x4154e5(0xd3)][_0x4154e5(0x11d)][0x1][_0x4154e5(0x160)],[{'type':_0x4154e5(0x194),'text':_0x4154e5(0x186)},{'type':_0x4154e5(0x13f),'image_url':{'url':_0x4154e5(0xde)}},{'type':_0x4154e5(0x194),'text':'\x20C'}]);});});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { buildGenerateTextRequest, generateText } from './aiTextApi.js';
+import { clearApiConfig } from './configApi.js';
+function jsonResponse(_0x10b1c5, _0x596c8e = 200) {
+  return new Response(JSON.stringify(_0x10b1c5), {
+    status: _0x596c8e,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+function imageResponse(_0x5c9921, _0x564ce9 = 'image/png') {
+  return new Response(new Blob([_0x5c9921], { type: _0x564ce9 }), {
+    status: 200,
+    headers: { 'Content-Type': _0x564ce9 },
+  });
+}
+async function readUploadMarker(_0x2f6a41) {
+  if (!_0x2f6a41 || typeof _0x2f6a41.entries !== 'function') return '';
+  for (const [_0x192e9f, _0x555ba6] of _0x2f6a41.entries()) {
+    if (_0x192e9f !== 'file') continue;
+    if (_0x555ba6 && typeof _0x555ba6.text === 'function') return await _0x555ba6.text();
+  }
+  return '';
+}
+function isTelegraphProxyUpload(_0x167a6e) {
+  const _0x2fdd66 = String(_0x167a6e || '');
+  if (!_0x2fdd66.startsWith('/api/v2/proxy/upload?')) return false;
+  const _0x5aa1b2 = _0x2fdd66.slice(_0x2fdd66.indexOf('?') + 1);
+  return new URLSearchParams(_0x5aa1b2).get('apiUrl') === 'https://telegra.ph/upload';
+}
+async function withMockFetch(_0xfb40fb, _0x1e8445) {
+  const _0x2b36cb = globalThis.fetch;
+  (clearApiConfig(), (globalThis.fetch = _0xfb40fb));
+  try {
+    return await _0x1e8445();
+  } finally {
+    ((globalThis.fetch = _0x2b36cb), clearApiConfig());
+  }
+}
+async function withImmediateTimers(_0x1a3f91) {
+  const _0x53f7bc = globalThis.setTimeout;
+  globalThis.setTimeout = (_0x4c4441, _0x4a2a81, ..._0x1974ae) => {
+    if (typeof _0x4c4441 === 'function') _0x4c4441(..._0x1974ae);
+    return 0;
+  };
+  try {
+    return await _0x1a3f91();
+  } finally {
+    globalThis.setTimeout = _0x53f7bc;
+  }
+}
+async function withMockCanvasComposition(_0x4b78d3) {
+  const _0x12ab69 = globalThis.createImageBitmap,
+    _0x38e167 = globalThis.OffscreenCanvas;
+  ((globalThis.createImageBitmap = async () => ({ width: 0x280, height: 0x1e0, close() {} })),
+    (globalThis.OffscreenCanvas = class _0x1c3d68 {
+      constructor(_0x5be392, _0x3dafcb) {
+        ((this.width = _0x5be392),
+          (this.height = _0x3dafcb),
+          (this._ctx = {
+            fillStyle: '',
+            strokeStyle: '',
+            lineWidth: 1,
+            font: '',
+            textAlign: '',
+            textBaseline: '',
+            fillRect() {},
+            drawImage() {},
+            strokeRect() {},
+            fillText() {},
+          }));
+      }
+      ['getContext']() {
+        return this._ctx;
+      }
+      async ['convertToBlob']() {
+        return new Blob(['merged-runninghub-image'], { type: 'image/png' });
+      }
+    }));
+  try {
+    return await _0x4b78d3();
+  } finally {
+    ((globalThis.createImageBitmap = _0x12ab69), (globalThis.OffscreenCanvas = _0x38e167));
+  }
+}
+const RUNNINGHUB_FLASH_MODEL = 'runninghub-model/rhart-text-g-3-flash-preview-cv/image-to-text',
+  RUNNINGHUB_PRO_MODEL = 'runninghub-model/rhart-text-g-3-pro-preview-cv/image-to-text',
+  RUNNINGHUB_QWEN36_PLUS_MODEL = 'qwen/qwen3.6-plus',
+  RUNNINGHUB_QWEN3_VL_MODEL = 'qwen/qwen3-vl-235b-a22b-instruct',
+  RUNNINGHUB_IMAGE_URL = 'https://www.runninghub.cn/example/input.png';
+(test('aiTextApi: OpenAI 兼容请求会把 @图片 映射为 image_url，并保留前后文本', async () => {
+  await withMockFetch(
+    async (_0x32c132) => {
+      const _0x325a7e = String(_0x32c132 || '');
+      if (_0x325a7e === '/api/config')
+        return jsonResponse({
+          providers: { openai: { apiUrl: 'https://api.openai.com', apiKey: 'k_openai' } },
+        });
+      if (_0x325a7e === '/local/ref.png') return imageResponse('openai-image');
+      if (isTelegraphProxyUpload(_0x325a7e)) return jsonResponse([{ src: '/uploaded-openai-ref.png' }]);
+      throw new Error('unexpected fetch url: ' + _0x325a7e);
+    },
+    async () => {
+      const _0x37a411 = await buildGenerateTextRequest({
+        provider: 'openai',
+        model: 'gpt-4.1-mini',
+        prompt: '请详细分析 @图片1 ，并保留这句文字。',
+        inputUrls: ['/local/ref.png'],
+      });
+      (assert.equal(_0x37a411.url, '/api/v2/proxy/completions'),
+        assert.equal(_0x37a411.body.apiUrl, 'https://api.openai.com/v1'),
+        assert.equal(_0x37a411.body.model, 'gpt-4.1-mini'));
+      const _0x2b1f4e = _0x37a411.body.messages[1].content;
+      (assert.ok(Array.isArray(_0x2b1f4e)),
+        assert.deepEqual(_0x2b1f4e, [
+          { type: 'text', text: '请详细分析 ' },
+          { type: 'image_url', image_url: { url: 'https://telegra.ph/uploaded-openai-ref.png' } },
+          { type: 'text', text: ' ，并保留这句文字。' },
+        ]));
+    },
+  );
+}),
+  test('aiTextApi: Volcengine Doubao Seed text models use Ark Responses API', async () => {
+    await withMockFetch(
+      async (_0x544e5d) => {
+        const _0x52aee7 = String(_0x544e5d || '');
+        if (_0x52aee7 === '/api/config')
+          return jsonResponse({
+            providers: {
+              volcengine: { apiUrl: 'https://ark.cn-beijing.volces.com/api/v3', apiKey: 'k_volcengine' },
+            },
+          });
+        throw new Error('unexpected fetch url: ' + _0x52aee7);
+      },
+      async () => {
+        const _0x8e15f1 = [
+          ['volcengine/doubao-seed-2-0-pro-260215', 'doubao-seed-2-0-pro-260215'],
+          ['doubao-seed-2-0-mini-260428', 'doubao-seed-2-0-mini-260428'],
+          ['doubao-seed-2-0-lite-260428', 'doubao-seed-2-0-lite-260428'],
+        ];
+        for (const [_0x2dc19e, _0x32b054] of _0x8e15f1) {
+          const _0x319a0c = await buildGenerateTextRequest({
+            provider: 'volcengine',
+            model: _0x2dc19e,
+            prompt: 'plain text prompt',
+          });
+          (assert.equal(_0x319a0c.url, '/api/v2/proxy/completions'),
+            assert.equal(_0x319a0c.body.apiUrl, 'https://ark.cn-beijing.volces.com/api/v3/responses'),
+            assert.equal(_0x319a0c.body.apiKey, 'k_volcengine'),
+            assert.equal(_0x319a0c.body.model, _0x32b054),
+            assert.deepEqual(_0x319a0c.body.input, [
+              { role: 'user', content: [{ type: 'input_text', text: 'plain text prompt' }] },
+            ]));
+        }
+      },
+    );
+  }),
+  test('aiTextApi: Volcengine media inputs upload through Ark Files API', async () => {
+    const _0x17aa90 = 'https://ark-project.tos-cn-beijing.volces.com/doc_video/ark_vlm_video_input.mp4',
+      _0x47206f = '/local/ref.png',
+      _0x409e1d = [];
+    await withMockFetch(
+      async (_0x54fc9d, _0x341ad6 = {}) => {
+        const _0x3b878b = String(_0x54fc9d || '');
+        if (_0x3b878b === '/api/config')
+          return jsonResponse({
+            providers: {
+              volcengine: { apiUrl: 'https://ark.cn-beijing.volces.com/api/v3', apiKey: 'k_volcengine' },
+            },
+          });
+        if (_0x3b878b === _0x47206f) return imageResponse('volcengine-image');
+        if (_0x3b878b === _0x17aa90) return imageResponse('volcengine-video', 'video/mp4');
+        if (_0x3b878b.startsWith('/api/v2/proxy/upload?')) {
+          assert.equal(_0x341ad6.headers?.Authorization, 'Bearer k_volcengine');
+          const _0x2df476 = new URL('http://local' + _0x3b878b).searchParams.get('apiUrl');
+          assert.equal(_0x2df476, 'https://ark.cn-beijing.volces.com/api/v3/files');
+          const _0x4a5caa = Object.fromEntries(_0x341ad6.body.entries());
+          (assert.equal(_0x4a5caa.purpose, 'user_data'), _0x409e1d.push(_0x4a5caa.file?.name || ''));
+          const _0x423032 = await _0x4a5caa.file.text();
+          if (_0x423032 === 'volcengine-image')
+            return jsonResponse({
+              object: 'file',
+              id: 'file-image-1',
+              status: 'active',
+              purpose: 'user_data',
+            });
+          if (_0x423032 === 'volcengine-video')
+            return (
+              assert.equal(_0x4a5caa['preprocess_configs[video][fps]'], '0.3'),
+              jsonResponse({ object: 'file', id: 'file-video-1', status: 'processing', purpose: 'user_data' })
+            );
+        }
+        if (_0x3b878b.startsWith('/api/v2/proxy/task?')) {
+          assert.equal(_0x341ad6.headers?.Authorization, 'Bearer k_volcengine');
+          const _0x5ec475 = new URL('http://local' + _0x3b878b).searchParams.get('apiUrl');
+          return (
+            assert.equal(_0x5ec475, 'https://ark.cn-beijing.volces.com/api/v3/files/file-video-1'),
+            jsonResponse({ object: 'file', id: 'file-video-1', status: 'active', purpose: 'user_data' })
+          );
+        }
+        throw new Error('unexpected fetch url: ' + _0x3b878b);
+      },
+      async () => {
+        const _0x36d8ea = 'https://ark-project.tos-cn-beijing.volces.com/doc_video/ark_vlm_video_input.mp4',
+          _0x3d33d5 = await buildGenerateTextRequest({
+            provider: 'volcengine',
+            model: 'volcengine/doubao-seed-2-0-pro-260215',
+            prompt: '先看 @图片1 再总结 @视频1 的内容。',
+            inputUrls: [_0x47206f, _0x36d8ea],
+            inputImageUrls: [_0x47206f],
+            inputVideoUrls: [_0x36d8ea],
+          });
+        (assert.equal(_0x3d33d5.body.model, 'doubao-seed-2-0-pro-260215'),
+          assert.deepEqual(_0x3d33d5.body.input[0].content, [
+            { type: 'input_text', text: '先看 ' },
+            { type: 'input_image', file_id: 'file-image-1' },
+            { type: 'input_text', text: ' 再总结 ' },
+            { type: 'input_video', file_id: 'file-video-1' },
+            { type: 'input_text', text: ' 的内容。' },
+          ]),
+          assert.deepEqual(_0x409e1d.sort(), ['ref.png', 'ark_vlm_video_input.mp4'].sort()));
+      },
+    );
+  }),
+  test('aiTextApi: Volcengine local video inputs upload through Ark Files API', async () => {
+    await withMockFetch(
+      async (_0xea5f58, _0x4aedaa = {}) => {
+        const _0x203d7f = String(_0xea5f58 || '');
+        if (_0x203d7f === '/api/config')
+          return jsonResponse({
+            providers: {
+              volcengine: { apiUrl: 'https://ark.cn-beijing.volces.com/api/v3', apiKey: 'k_volcengine' },
+            },
+          });
+        if (_0x203d7f.endsWith('/local/ref.mp4')) return imageResponse('local-volcengine-video', 'video/mp4');
+        if (_0x203d7f.startsWith('/api/v2/proxy/upload?')) {
+          const _0x3ee4d1 = Object.fromEntries(_0x4aedaa.body.entries());
+          return (
+            assert.equal(await _0x3ee4d1.file.text(), 'local-volcengine-video'),
+            jsonResponse({ object: 'file', id: 'file-local-video', status: 'active' })
+          );
+        }
+        throw new Error('unexpected fetch url: ' + _0x203d7f);
+      },
+      async () => {
+        const _0x311da2 = await buildGenerateTextRequest({
+          provider: 'volcengine',
+          model: 'volcengine/doubao-seed-2-0-pro-260215',
+          prompt: '请总结 @视频1',
+          inputUrls: ['/local/ref.mp4'],
+          inputVideoUrls: ['/local/ref.mp4'],
+        });
+        assert.deepEqual(_0x311da2.body.input[0].content, [
+          { type: 'input_text', text: '请总结 ' },
+          { type: 'input_video', file_id: 'file-local-video' },
+        ]);
+      },
+    );
+  }),
+  test('aiTextApi: custom provider 多图请求会按顺序映射为多个 image_url', async () => {
+    await withMockFetch(
+      async (_0x3257c1, _0x581567 = {}) => {
+        const _0x4f8188 = String(_0x3257c1 || '');
+        if (_0x4f8188 === '/api/config')
+          return jsonResponse({
+            providers: {
+              openai: {
+                apiUrl: 'https://ark.cn-beijing.volces.com/api/v3',
+                apiKey: 'k_custom_openai_compatible',
+              },
+            },
+          });
+        if (_0x4f8188 === '/local/first.png') return imageResponse('custom-image-1');
+        if (_0x4f8188 === '/local/second.png') return imageResponse('custom-image-2');
+        if (isTelegraphProxyUpload(_0x4f8188)) {
+          const _0x125985 = await readUploadMarker(_0x581567.body);
+          if (_0x125985 === 'custom-image-1') return jsonResponse([{ src: '/uploaded-custom-first.png' }]);
+          if (_0x125985 === 'custom-image-2') return jsonResponse([{ src: '/uploaded-custom-second.png' }]);
+        }
+        throw new Error('unexpected fetch url: ' + _0x4f8188);
+      },
+      async () => {
+        const _0x442a97 = await buildGenerateTextRequest({
+          provider: 'custom',
+          model: 'doubao-seed-2-0-pro',
+          prompt: 'compare @图片1 with @图片2',
+          inputUrls: ['/local/first.png', '/local/second.png'],
+        });
+        (assert.equal(_0x442a97.url, '/api/v2/proxy/completions'),
+          assert.equal(_0x442a97.body.apiUrl, 'https://ark.cn-beijing.volces.com/api/v3'),
+          assert.equal(_0x442a97.body.apiKey, 'k_custom_openai_compatible'),
+          assert.equal(_0x442a97.body.model, 'doubao-seed-2-0-pro'),
+          assert.deepEqual(_0x442a97.body.messages[1].content, [
+            { type: 'text', text: 'compare ' },
+            { type: 'image_url', image_url: { url: 'https://telegra.ph/uploaded-custom-first.png' } },
+            { type: 'text', text: ' with ' },
+            { type: 'image_url', image_url: { url: 'https://telegra.ph/uploaded-custom-second.png' } },
+          ]));
+      },
+    );
+  }),
+  test('aiTextApi: custom provider 纯文本请求保持字符串 content', async () => {
+    await withMockFetch(
+      async (_0x19582c) => {
+        const _0x4b3774 = String(_0x19582c || '');
+        if (_0x4b3774 === '/api/config')
+          return jsonResponse({
+            providers: {
+              openai: {
+                apiUrl: 'https://ark.cn-beijing.volces.com/api/v3',
+                apiKey: 'k_custom_openai_compatible',
+              },
+            },
+          });
+        throw new Error('unexpected fetch url: ' + _0x4b3774);
+      },
+      async () => {
+        const _0xc98ba = await buildGenerateTextRequest({
+          provider: 'custom',
+          model: 'doubao-seed-2-0-pro',
+          prompt: 'only text prompt',
+        });
+        (assert.equal(_0xc98ba.url, '/api/v2/proxy/completions'),
+          assert.equal(_0xc98ba.body.apiUrl, 'https://ark.cn-beijing.volces.com/api/v3'),
+          assert.equal(_0xc98ba.body.messages[1].content, 'only text prompt'));
+      },
+    );
+  }),
+  test('aiTextApi: OpenAI 兼容文本请求会透传 systemPrompt', async () => {
+    await withMockFetch(
+      async (_0x36e50f) => {
+        const _0x938f95 = String(_0x36e50f || '');
+        if (_0x938f95 === '/api/config')
+          return jsonResponse({
+            providers: {
+              openai: { apiUrl: 'https://api.openai-compatible.local', apiKey: 'k_custom_openai_compatible' },
+            },
+          });
+        throw new Error('unexpected fetch url: ' + _0x938f95);
+      },
+      async () => {
+        const _0x32c1bc = await buildGenerateTextRequest({
+          provider: 'custom',
+          model: 'gpt-compatible',
+          prompt: '用户剧情',
+          systemPrompt: '只输出合法 JSON。',
+        });
+        (assert.equal(_0x32c1bc.url, '/api/v2/proxy/completions'),
+          assert.equal(_0x32c1bc.body.messages[0].role, 'system'),
+          assert.equal(_0x32c1bc.body.messages[0].content, '只输出合法 JSON。'),
+          assert.equal(_0x32c1bc.body.messages[1].content, '用户剧情'));
+      },
+    );
+  }),
+  test('aiTextApi: unregistered provider model fails without legacy routing fallback', async () => {
+    await withMockFetch(
+      async (_0x2df8d6) => {
+        const _0x59bcf1 = String(_0x2df8d6 || '');
+        if (_0x59bcf1 === '/api/config')
+          return jsonResponse({
+            providers: { grsai: { apiUrl: 'https://grsai.dakka.com.cn', apiKey: 'k_grsai' } },
+          });
+        throw new Error('unexpected fetch url: ' + _0x59bcf1);
+      },
+      async () => {
+        await assert.rejects(
+          () =>
+            buildGenerateTextRequest({
+              provider: 'grsai',
+              model: 'grsai/unregistered-text-model',
+              prompt: 'hello',
+            }),
+          /GRSAI text model API manifest missing: grsai\/unregistered-text-model/,
+        );
+      },
+    );
+  }),
+  test('aiTextApi: bare unknown model no longer defaults to GRSAI', async () => {
+    await withMockFetch(
+      async (_0x3c16e8) => {
+        const _0x49bca4 = String(_0x3c16e8 || '');
+        if (_0x49bca4 === '/api/config') return jsonResponse({ providers: {} });
+        throw new Error('unexpected fetch url: ' + _0x49bca4);
+      },
+      async () => {
+        await assert.rejects(
+          () => buildGenerateTextRequest({ model: 'gemini-future-unregistered', prompt: 'hello' }),
+          /Text model API manifest missing: gemini-future-unregistered/,
+        );
+      },
+    );
+  }),
+  test('aiTextApi: APIMart new text models strip provider prefix for wire model', async () => {
+    const _0xc7817f = [
+      ['apimart/kimi-k2-instruct', 'kimi-k2-instruct'],
+      ['apimart/gpt-5.5', 'gpt-5.5'],
+      ['apimart/gpt-5.4-mini', 'gpt-5.4-mini'],
+      ['apimart/gemini-3.5-flash', 'gemini-3.5-flash'],
+    ];
+    await withMockFetch(
+      async (_0x478a91) => {
+        const _0x303b7e = String(_0x478a91 || '');
+        if (_0x303b7e === '/api/config')
+          return jsonResponse({
+            providers: { apimart: { apiUrl: 'https://api.apimart.ai', apiKey: 'k_apimart' } },
+          });
+        throw new Error('unexpected fetch url: ' + _0x303b7e);
+      },
+      async () => {
+        for (const [_0x356098, _0x4dae3f] of _0xc7817f) {
+          const _0x2cf885 = await buildGenerateTextRequest({
+            provider: 'apimart',
+            model: _0x356098,
+            prompt: 'plain text prompt',
+          });
+          (assert.equal(_0x2cf885.url, '/api/v2/proxy/completions'),
+            assert.equal(_0x2cf885.body.apiUrl, 'https://api.apimart.ai/v1/chat/completions'),
+            assert.equal(_0x2cf885.body.model, _0x4dae3f),
+            assert.equal(_0x2cf885.body.messages[1].content, 'plain text prompt'));
+        }
+      },
+    );
+  }),
+  test('aiTextApi: APIMart routeId domestic2 builds aishuch chat endpoint', async () => {
+    await withMockFetch(
+      async (_0x5255c5) => {
+        const _0x530ba9 = String(_0x5255c5 || '');
+        if (_0x530ba9 === '/api/config')
+          return jsonResponse({ providers: { apimart: { routeId: 'domestic2', apiKey: 'k_apimart' } } });
+        throw new Error('unexpected fetch url: ' + _0x530ba9);
+      },
+      async () => {
+        const _0x5021dd = await buildGenerateTextRequest({
+          provider: 'apimart',
+          model: 'apimart/kimi-k2-instruct',
+          prompt: 'plain text prompt',
+        });
+        (assert.equal(_0x5021dd.url, '/api/v2/proxy/completions'),
+          assert.equal(_0x5021dd.body.apiUrl, 'https://api.aishuch.com/v1/chat/completions'),
+          assert.equal(_0x5021dd.body.model, 'kimi-k2-instruct'));
+      },
+    );
+  }),
+  test('aiTextApi: APIMart Gemini 图片请求统一使用 GPT image_url 格式', async () => {
+    await withMockFetch(
+      async (_0x24ed60, _0x29d674 = {}) => {
+        const _0x2d3e81 = String(_0x24ed60 || '');
+        if (_0x2d3e81 === '/api/config')
+          return jsonResponse({
+            providers: { apimart: { apiUrl: 'https://api.apimart.ai', apiKey: 'k_apimart' } },
+          });
+        if (_0x2d3e81 === '/local/ref.png') return imageResponse('gemini-image');
+        if (_0x2d3e81 === '/api/v2/proxy/apimart-upload') {
+          const _0x104b97 = Object.fromEntries(_0x29d674.body.entries());
+          return (
+            assert.equal(_0x104b97.contentType, 'image/png'),
+            assert.equal(_0x104b97.fileExtension, 'png'),
+            assert.equal(await _0x104b97.file.text(), 'gemini-image'),
+            jsonResponse({ cdnUrl: 'https://cdn.apimart.ai/files/gemini-ref.png' })
+          );
+        }
+        throw new Error('unexpected fetch url: ' + _0x2d3e81);
+      },
+      async () => {
+        const _0x4db10b = await buildGenerateTextRequest({
+          provider: 'apimart',
+          model: 'apimart/gemini-3.1-pro-preview',
+          prompt: '分析 @图片1 的细节。',
+          inputUrls: ['/local/ref.png'],
+        });
+        (assert.equal(_0x4db10b.url, '/api/v2/proxy/completions'),
+          assert.equal(_0x4db10b.body.apiUrl, 'https://api.apimart.ai/v1/chat/completions'),
+          assert.equal(_0x4db10b.body.model, 'gemini-3.1-pro-preview'));
+        const _0x1f75e0 = _0x4db10b.body.messages[1].content;
+        (assert.deepEqual(_0x1f75e0[0], { type: 'text', text: '分析 ' }),
+          assert.deepEqual(_0x1f75e0[1], {
+            type: 'image_url',
+            image_url: { url: 'https://cdn.apimart.ai/files/gemini-ref.png' },
+          }),
+          assert.deepEqual(_0x1f75e0[2], { type: 'text', text: ' 的细节。' }));
+      },
+    );
+  }),
+  test('aiTextApi: APIMart Gemini 菜单裸模型名会归一化并使用 GPT 格式', async () => {
+    await withMockFetch(
+      async (_0x3d3ca8, _0x190f69 = {}) => {
+        const _0x1b01c0 = String(_0x3d3ca8 || '');
+        if (_0x1b01c0 === '/api/config')
+          return jsonResponse({
+            providers: { apimart: { apiUrl: 'https://api.apimart.ai', apiKey: 'k_apimart' } },
+          });
+        if (_0x1b01c0 === '/local/ref.png') return imageResponse('gemini-image');
+        if (_0x1b01c0 === '/api/v2/proxy/apimart-upload') {
+          const _0x2f2428 = Object.fromEntries(_0x190f69.body.entries());
+          return (
+            assert.equal(await _0x2f2428.file.text(), 'gemini-image'),
+            jsonResponse({ cdnUrl: 'https://cdn.apimart.ai/files/gemini-ref.png' })
+          );
+        }
+        throw new Error('unexpected fetch url: ' + _0x1b01c0);
+      },
+      async () => {
+        const _0x91e3cb = await buildGenerateTextRequest({
+          provider: 'apimart',
+          model: 'gemini-3.1-pro-preview',
+          prompt: '分析 @图片1',
+          inputUrls: ['/local/ref.png'],
+          inputImageUrls: ['/local/ref.png'],
+        });
+        (assert.equal(_0x91e3cb.body.apiUrl, 'https://api.apimart.ai/v1/chat/completions'),
+          assert.equal(_0x91e3cb.body.model, 'gemini-3.1-pro-preview'),
+          assert.deepEqual(_0x91e3cb.body.messages[1].content[1], {
+            type: 'image_url',
+            image_url: { url: 'https://cdn.apimart.ai/files/gemini-ref.png' },
+          }));
+      },
+    );
+  }),
+  test('aiTextApi: APIMart 已上传 CDN 图片使用 GPT image_url 且不会重复上传', async () => {
+    await withMockFetch(
+      async (_0x6ab156) => {
+        const _0xe48c02 = String(_0x6ab156 || '');
+        if (_0xe48c02 === '/api/config')
+          return jsonResponse({
+            providers: { apimart: { apiUrl: 'https://api.apimart.ai', apiKey: 'k_apimart' } },
+          });
+        throw new Error('unexpected fetch url: ' + _0xe48c02);
+      },
+      async () => {
+        const _0x1ea9b7 = await buildGenerateTextRequest({
+          provider: 'apimart',
+          model: 'apimart/gemini-3-flash-preview-nothinking',
+          prompt: '分析 @图片1',
+          inputUrls: ['https://upload.apimart.ai/files/existing.webp'],
+          inputImageUrls: ['https://upload.apimart.ai/files/existing.webp'],
+        });
+        (assert.equal(_0x1ea9b7.body.apiUrl, 'https://api.apimart.ai/v1/chat/completions'),
+          assert.deepEqual(_0x1ea9b7.body.messages[1].content, [
+            { type: 'text', text: '分析 ' },
+            { type: 'image_url', image_url: { url: 'https://upload.apimart.ai/files/existing.webp' } },
+          ]));
+      },
+    );
+  }),
+  test('aiTextApi: APIMart GPT 格式多图上传按 @图片编号映射', async () => {
+    await withMockFetch(
+      async (_0x44697f, _0x56342c = {}) => {
+        const _0x27c6d5 = String(_0x44697f || '');
+        if (_0x27c6d5 === '/api/config')
+          return jsonResponse({
+            providers: { apimart: { apiUrl: 'https://api.apimart.ai', apiKey: 'k_apimart' } },
+          });
+        if (_0x27c6d5 === '/local/first.png') return imageResponse('apimart-first');
+        if (_0x27c6d5 === '/local/second.png') return imageResponse('apimart-second');
+        if (_0x27c6d5 === '/api/v2/proxy/apimart-upload') {
+          const _0x255194 = Object.fromEntries(_0x56342c.body.entries()),
+            _0x97c4f6 = await _0x255194.file.text();
+          if (_0x97c4f6 === 'apimart-first')
+            return jsonResponse({ cdnUrl: 'https://cdn.apimart.ai/files/first.png' });
+          if (_0x97c4f6 === 'apimart-second')
+            return jsonResponse({ cdnUrl: 'https://cdn.apimart.ai/files/second.png' });
+        }
+        throw new Error('unexpected fetch url: ' + _0x27c6d5);
+      },
+      async () => {
+        const _0x1fcda8 = await buildGenerateTextRequest({
+          provider: 'apimart',
+          model: 'apimart/gemini-3-flash-preview-nothinking',
+          prompt: '先看 @图片2 再看 @图片1',
+          inputUrls: ['/local/first.png', '/local/second.png'],
+          inputImageUrls: ['/local/first.png', '/local/second.png'],
+        });
+        (assert.equal(_0x1fcda8.body.apiUrl, 'https://api.apimart.ai/v1/chat/completions'),
+          assert.deepEqual(_0x1fcda8.body.messages[1].content, [
+            { type: 'text', text: '先看 ' },
+            { type: 'image_url', image_url: { url: 'https://cdn.apimart.ai/files/second.png' } },
+            { type: 'text', text: ' 再看 ' },
+            { type: 'image_url', image_url: { url: 'https://cdn.apimart.ai/files/first.png' } },
+          ]));
+      },
+    );
+  }),
+  test('aiTextApi: APIMart GPT 文本格式遇到视频参考会明确报错', async () => {
+    await withMockFetch(
+      async (_0x5e244b) => {
+        const _0x36f809 = String(_0x5e244b || '');
+        if (_0x36f809 === '/api/config')
+          return jsonResponse({
+            providers: { apimart: { apiUrl: 'https://api.apimart.ai', apiKey: 'k_apimart' } },
+          });
+        throw new Error('unexpected fetch url: ' + _0x36f809);
+      },
+      async () => {
+        await assert.rejects(
+          () =>
+            buildGenerateTextRequest({
+              provider: 'apimart',
+              model: 'apimart/gemini-3-flash-preview-nothinking',
+              prompt: '分析 @视频1 的内容。',
+              inputUrls: ['/local/ref.mp4'],
+              inputVideoUrls: ['/local/ref.mp4'],
+            }),
+          /APIMart 文本模型已统一使用 GPT 图文格式/,
+        );
+      },
+    );
+  }),
+  test('aiTextApi: APIMart GPT 文本格式遇到已上传视频参考也会明确报错', async () => {
+    await withMockFetch(
+      async (_0x3de90d) => {
+        const _0x443473 = String(_0x3de90d || '');
+        if (_0x443473 === '/api/config')
+          return jsonResponse({
+            providers: { apimart: { apiUrl: 'https://api.apimart.ai', apiKey: 'k_apimart' } },
+          });
+        throw new Error('unexpected fetch url: ' + _0x443473);
+      },
+      async () => {
+        await assert.rejects(
+          () =>
+            buildGenerateTextRequest({
+              provider: 'apimart',
+              model: 'apimart/gemini-3-flash-preview-nothinking',
+              prompt: '分析 @视频1',
+              inputUrls: ['https://upload.apimart.ai/files/existing.mp4'],
+              inputVideoUrls: ['https://upload.apimart.ai/files/existing.mp4'],
+            }),
+          /APIMart 文本模型已统一使用 GPT 图文格式/,
+        );
+      },
+    );
+  }),
+  test('aiTextApi: RunningHUB 单图文本请求会走图片代理并优先使用 modelApiKey', async () => {
+    await withMockFetch(
+      async (_0x310015) => {
+        const _0x477861 = String(_0x310015 || '');
+        if (_0x477861 === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        throw new Error('unexpected fetch url: ' + _0x477861);
+      },
+      async () => {
+        const _0x4ec91b = await buildGenerateTextRequest({
+          provider: 'runninghub',
+          model: RUNNINGHUB_FLASH_MODEL,
+          apiKey: 'payload_key_should_not_win',
+          prompt: '请描述图片内容',
+          inputImageUrls: [RUNNINGHUB_IMAGE_URL],
+        });
+        (assert.equal(_0x4ec91b.url, '/api/v2/proxy/image'),
+          assert.equal(
+            _0x4ec91b.body.apiUrl,
+            'https://www.runninghub.cn/openapi/v2/rhart-text-g-3-flash-preview-cv/image-to-text',
+          ),
+          assert.equal(_0x4ec91b.body.apiKey, 'k_runninghub_model'),
+          assert.equal(_0x4ec91b.body.prompt, '请描述图片内容'),
+          assert.equal(_0x4ec91b.body.imageUrl, RUNNINGHUB_IMAGE_URL),
+          assert.equal(_0x4ec91b.adapterTrace?.source, 'manifest'),
+          assert.equal(
+            _0x4ec91b.adapterTrace?.executionId,
+            'runninghub.model-api.rhart-text-g-3-flash-cv.v1',
+          ),
+          assert.deepEqual(Object.keys(_0x4ec91b.body).sort(), ['apiKey', 'apiUrl', 'imageUrl', 'prompt']));
+      },
+    );
+  }),
+  test('aiTextApi: RunningHUB LLM 文本模型走官方 chat completions 端点', async () => {
+    await withMockFetch(
+      async (_0x15bcee) => {
+        const _0x3806de = String(_0x15bcee || '');
+        if (_0x3806de === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        throw new Error('unexpected fetch url: ' + _0x3806de);
+      },
+      async () => {
+        const _0xf8b15d = await buildGenerateTextRequest({
+          provider: 'runninghub',
+          model: RUNNINGHUB_QWEN36_PLUS_MODEL,
+          apiKey: 'payload_key_should_not_win',
+          prompt: 'plain text prompt',
+        });
+        (assert.equal(_0xf8b15d.url, '/api/v2/proxy/completions'),
+          assert.equal(_0xf8b15d.body.apiUrl, 'https://llm.runninghub.cn/v1/chat/completions'),
+          assert.equal(_0xf8b15d.body.apiKey, 'k_runninghub_model'),
+          assert.equal(_0xf8b15d.body.model, RUNNINGHUB_QWEN36_PLUS_MODEL),
+          assert.equal(_0xf8b15d.body.messages[1].content, 'plain text prompt'),
+          assert.equal(_0xf8b15d.adapterTrace?.source, 'manifest'),
+          assert.equal(_0xf8b15d.adapterTrace?.executionId, 'runninghub.model-api.text.qwen3-6-plus.v1'));
+      },
+    );
+  }),
+  test('aiTextApi: RunningHUB LLM 直接返回 choices 时不会把 chat id 当 taskId 轮询', async () => {
+    const _0xfef2d0 = [];
+    (await withMockFetch(
+      async (_0xc64244, _0x4e47cc = {}) => {
+        const _0x35d90f = String(_0xc64244 || '');
+        _0xfef2d0.push({ target: _0x35d90f, options: _0x4e47cc });
+        if (_0x35d90f === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        if (_0x35d90f === '/api/v2/proxy/completions')
+          return jsonResponse({
+            id: 'chatcmpl-qwen-direct',
+            object: 'chat.completion',
+            choices: [
+              { message: { role: 'assistant', content: 'Qwen 直接文本结果' }, finish_reason: 'stop' },
+            ],
+          });
+        if (_0x35d90f === '/api/v2/proxy/image')
+          throw new Error('Qwen chat completion result should not poll task query');
+        throw new Error('unexpected fetch url: ' + _0x35d90f);
+      },
+      async () => {
+        const _0x4bb3b7 = await generateText({
+          provider: 'runninghub',
+          model: RUNNINGHUB_QWEN36_PLUS_MODEL,
+          prompt: 'plain text prompt',
+        });
+        assert.equal(_0x4bb3b7.text, 'Qwen 直接文本结果');
+      },
+    ),
+      assert.equal(
+        _0xfef2d0.filter((_0x2674a1) => _0x2674a1.target === '/api/v2/proxy/completions').length,
+        1,
+      ),
+      assert.equal(_0xfef2d0.filter((_0x5f486c) => _0x5f486c.target === '/api/v2/proxy/image').length, 0));
+  }),
+  test('aiTextApi: RunningHUB LLM 原始 SSE 会合并 delta 文本后直接返回', async () => {
+    await withMockFetch(
+      async (_0x1cfd2c) => {
+        const _0x1c151c = String(_0x1cfd2c || '');
+        if (_0x1c151c === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        if (_0x1c151c === '/api/v2/proxy/completions')
+          return new Response(
+            [
+              'data: {"id":"chatcmpl-qwen-sse","choices":[{"delta":{"role":"assistant"}}]}',
+              'data: {"choices":[{"delta":{"content":"Qwen "}}]}',
+              'data: {"choices":[{"delta":{"content":"SSE 文本"},"finish_reason":"stop"}]}',
+              'data: [DONE]',
+              '',
+            ].join('\n\n'),
+            { status: 200, headers: { 'Content-Type': 'text/event-stream' } },
+          );
+        if (_0x1c151c === '/api/v2/proxy/image')
+          throw new Error('Qwen SSE result should not poll task query');
+        throw new Error('unexpected fetch url: ' + _0x1c151c);
+      },
+      async () => {
+        const _0x1b98a1 = await generateText({
+          provider: 'runninghub',
+          model: RUNNINGHUB_QWEN36_PLUS_MODEL,
+          prompt: 'plain text prompt',
+        });
+        assert.equal(_0x1b98a1.text, 'Qwen SSE 文本');
+      },
+    );
+  }),
+  test('aiTextApi: RunningHUB Qwen3-VL 文本节点支持图像入参', async () => {
+    await withMockFetch(
+      async (_0x5bc521, _0x21e1d0 = {}) => {
+        const _0xd15cab = String(_0x5bc521 || '');
+        if (_0xd15cab === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        if (_0xd15cab === '/local/qwen-vl.png') return imageResponse('qwen-vl-image');
+        if (_0xd15cab.startsWith('/api/v2/proxy/upload?'))
+          return (
+            assert.equal(_0x21e1d0.headers?.Authorization, 'Bearer k_runninghub_model'),
+            jsonResponse({
+              code: 0,
+              data: { download_url: 'https://www.runninghub.cn/uploaded/qwen-vl.png' },
+            })
+          );
+        throw new Error('unexpected fetch url: ' + _0xd15cab);
+      },
+      async () => {
+        const _0x114a69 = await buildGenerateTextRequest({
+          provider: 'runninghub',
+          model: RUNNINGHUB_QWEN3_VL_MODEL,
+          prompt: '识别 @图片1 中的文字',
+          inputUrls: ['/local/qwen-vl.png'],
+          inputImageUrls: ['/local/qwen-vl.png'],
+        });
+        (assert.equal(_0x114a69.url, '/api/v2/proxy/completions'),
+          assert.equal(_0x114a69.body.apiUrl, 'https://llm.runninghub.cn/v1/chat/completions'),
+          assert.equal(_0x114a69.body.model, RUNNINGHUB_QWEN3_VL_MODEL),
+          assert.deepEqual(_0x114a69.body.messages[1].content, [
+            { type: 'text', text: '识别 ' },
+            { type: 'image_url', image_url: { url: 'https://www.runninghub.cn/uploaded/qwen-vl.png' } },
+            { type: 'text', text: ' 中的文字' },
+          ]));
+      },
+    );
+  }),
+  test('aiTextApi: RunningHUB local single image uses shared upload helper', async () => {
+    await withMockFetch(
+      async (_0x9f84d6, _0x456ec2 = {}) => {
+        const _0x5b4f1c = String(_0x9f84d6 || '');
+        if (_0x5b4f1c === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        if (_0x5b4f1c === '/local/rh-upload.png') return imageResponse('rh-upload-image');
+        if (_0x5b4f1c.startsWith('/api/v2/proxy/upload?'))
+          return (
+            assert.equal(_0x456ec2.headers?.Authorization, 'Bearer k_runninghub_model'),
+            jsonResponse({
+              code: 0,
+              data: { download_url: 'https://www.runninghub.cn/uploaded/download-url-image.png' },
+            })
+          );
+        throw new Error('unexpected fetch url: ' + _0x5b4f1c);
+      },
+      async () => {
+        const _0x57c587 = await buildGenerateTextRequest({
+          provider: 'runninghub',
+          model: RUNNINGHUB_FLASH_MODEL,
+          prompt: 'describe',
+          inputImageUrls: ['/local/rh-upload.png'],
+        });
+        assert.equal(_0x57c587.body.imageUrl, 'https://www.runninghub.cn/uploaded/download-url-image.png');
+      },
+    );
+  }),
+  test('aiTextApi: RunningHUB local single image upload failure reports provider error', async () => {
+    await withMockFetch(
+      async (_0x598f77, _0x340764 = {}) => {
+        const _0x117604 = String(_0x598f77 || '');
+        if (_0x117604 === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        if (_0x117604 === '/local/rh-bad-key.png') return imageResponse('rh-bad-key-image');
+        if (_0x117604.startsWith('/api/v2/proxy/upload?'))
+          return (
+            assert.equal(_0x340764.headers?.Authorization, 'Bearer k_runninghub_model'),
+            jsonResponse({ code: 0x191, errorMessage: 'invalid model api key' })
+          );
+        throw new Error('unexpected fetch url: ' + _0x117604);
+      },
+      async () => {
+        await assert.rejects(
+          () =>
+            buildGenerateTextRequest({
+              provider: 'runninghub',
+              model: RUNNINGHUB_FLASH_MODEL,
+              prompt: 'describe',
+              inputImageUrls: ['/local/rh-bad-key.png'],
+            }),
+          /RunningHUB .*invalid model api key.*401/,
+        );
+      },
+    );
+  }),
+  test('aiTextApi: RunningHUB model API does not fall back to workflow apiKey', async () => {
+    await withMockFetch(
+      async (_0x3e1b8a) => {
+        const _0x108f1d = String(_0x3e1b8a || '');
+        if (_0x108f1d === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: { apiUrl: 'https://www.runninghub.cn', apiKey: 'k_runninghub_workflow_only' },
+            },
+          });
+        throw new Error('unexpected fetch url: ' + _0x108f1d);
+      },
+      async () => {
+        await assert.rejects(
+          () =>
+            buildGenerateTextRequest({
+              provider: 'runninghub',
+              model: RUNNINGHUB_FLASH_MODEL,
+              prompt: 'describe',
+              inputImageUrls: [RUNNINGHUB_IMAGE_URL],
+            }),
+          /API Key/,
+        );
+      },
+    );
+  }),
+  test('aiTextApi: RunningHUB 多图文本请求会先合成再上传为单个 imageUrl', async () => {
+    const _0x1438ef = [];
+    await withMockFetch(
+      async (_0x50b10a, _0x41883b = {}) => {
+        const _0x43fb7c = String(_0x50b10a || '');
+        _0x1438ef.push({ target: _0x43fb7c, options: _0x41883b });
+        if (_0x43fb7c === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        if (_0x43fb7c === '/local/first.png' || _0x43fb7c === '/local/second.png')
+          return imageResponse(_0x43fb7c);
+        if (_0x43fb7c.startsWith('/api/v2/proxy/upload?'))
+          return (
+            assert.equal(_0x41883b.headers?.Authorization, 'Bearer k_runninghub_model'),
+            jsonResponse({
+              code: 0,
+              data: { download_url: 'https://www.runninghub.cn/uploaded/merged-sheet.png' },
+            })
+          );
+        throw new Error('unexpected fetch url: ' + _0x43fb7c);
+      },
+      async () => {
+        await withMockCanvasComposition(async () => {
+          const _0x178413 = await buildGenerateTextRequest({
+            provider: 'runninghub',
+            model: RUNNINGHUB_PRO_MODEL,
+            prompt: '请综合分析这些图片',
+            inputImageUrls: ['/local/first.png', '/local/second.png'],
+          });
+          (assert.equal(_0x178413.url, '/api/v2/proxy/image'),
+            assert.equal(
+              _0x178413.body.apiUrl,
+              'https://www.runninghub.cn/openapi/v2/rhart-text-g-3-pro-preview-cv/image-to-text',
+            ),
+            assert.equal(_0x178413.body.apiKey, 'k_runninghub_model'),
+            assert.equal(_0x178413.body.prompt, '请综合分析这些图片'),
+            assert.equal(_0x178413.body.imageUrl, 'https://www.runninghub.cn/uploaded/merged-sheet.png'),
+            assert.equal(_0x178413.body.imageUrls, undefined));
+        });
+      },
+    );
+    const _0x2d02d4 = _0x1438ef.filter(
+      (_0x62a07c) => _0x62a07c.target === '/local/first.png' || _0x62a07c.target === '/local/second.png',
+    );
+    assert.equal(_0x2d02d4.length, 2);
+    const _0x500c08 = _0x1438ef.filter((_0x4fbe7a) => _0x4fbe7a.target.startsWith('/api/v2/proxy/upload?'));
+    assert.equal(_0x500c08.length, 1);
+  }),
+  test('aiTextApi: RunningHUB 文本请求缺图时会直接报错', async () => {
+    await withMockFetch(
+      async (_0x2a6c8e) => {
+        const _0x22f3e1 = String(_0x2a6c8e || '');
+        if (_0x22f3e1 === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        throw new Error('unexpected fetch url: ' + _0x22f3e1);
+      },
+      async () => {
+        await assert.rejects(
+          () =>
+            buildGenerateTextRequest({
+              provider: 'runninghub',
+              model: RUNNINGHUB_FLASH_MODEL,
+              prompt: '请描述图片内容',
+            }),
+          (_0x731d5c) => {
+            return (
+              assert.ok(_0x731d5c instanceof Error),
+              assert.ok(String(_0x731d5c.message || '').trim().length > 0),
+              true
+            );
+          },
+        );
+      },
+    );
+  }),
+  test('aiTextApi: RunningHUB 文本生成会在任务成功后返回 results[0].text', async () => {
+    const _0x25336d = [];
+    await withMockFetch(
+      async (_0x463d3f, _0x245d75 = {}) => {
+        const _0x571512 = String(_0x463d3f || '');
+        _0x25336d.push({ target: _0x571512, options: _0x245d75 });
+        if (_0x571512 === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        if (_0x571512 === '/api/v2/proxy/image') {
+          const _0x16f8de = JSON.parse(String(_0x245d75.body || '{}'));
+          if (
+            _0x16f8de.apiUrl ===
+            'https://www.runninghub.cn/openapi/v2/rhart-text-g-3-pro-preview-cv/image-to-text'
+          )
+            return jsonResponse({
+              taskId: 'task_text_1',
+              status: 'RUNNING',
+              errorCode: '',
+              errorMessage: '',
+            });
+          if (_0x16f8de.apiUrl === 'https://www.runninghub.cn/openapi/v2/query')
+            return (
+              assert.equal(_0x16f8de.taskId, 'task_text_1'),
+              assert.equal(_0x16f8de.apiKey, 'k_runninghub_model'),
+              jsonResponse({
+                taskId: 'task_text_1',
+                status: 'SUCCESS',
+                errorCode: '',
+                errorMessage: '',
+                results: [{ url: null, outputType: 'text', text: 'RunningHUB 文本结果' }],
+              })
+            );
+        }
+        throw new Error('unexpected fetch url: ' + _0x571512);
+      },
+      async () => {
+        await withImmediateTimers(async () => {
+          const _0x4e8bc5 = await generateText({
+            provider: 'runninghub',
+            model: RUNNINGHUB_PRO_MODEL,
+            prompt: '请详细描述图片',
+            inputImageUrls: [RUNNINGHUB_IMAGE_URL],
+          });
+          assert.equal(_0x4e8bc5.text, 'RunningHUB 文本结果');
+        });
+      },
+    );
+    const _0x1bcb08 = _0x25336d.filter((_0x87cf47) => _0x87cf47.target === '/api/v2/proxy/image');
+    assert.equal(_0x1bcb08.length, 2);
+  }),
+  test('aiTextApi: RunningHUB 任务失败时会抛出轮询错误', async () => {
+    await withMockFetch(
+      async (_0x440373, _0x2cf648 = {}) => {
+        const _0x50ba88 = String(_0x440373 || '');
+        if (_0x50ba88 === '/api/config')
+          return jsonResponse({
+            providers: {
+              runninghub: {
+                apiUrl: 'https://www.runninghub.cn',
+                apiKey: 'k_runninghub',
+                modelApiKey: 'k_runninghub_model',
+              },
+            },
+          });
+        if (_0x50ba88 === '/api/v2/proxy/image') {
+          const _0x23d405 = JSON.parse(String(_0x2cf648.body || '{}'));
+          if (
+            _0x23d405.apiUrl ===
+            'https://www.runninghub.cn/openapi/v2/rhart-text-g-3-flash-preview-cv/image-to-text'
+          )
+            return jsonResponse({
+              taskId: 'task_text_failed',
+              status: 'RUNNING',
+              errorCode: '',
+              errorMessage: '',
+            });
+          if (_0x23d405.apiUrl === 'https://www.runninghub.cn/openapi/v2/query')
+            return jsonResponse({
+              taskId: 'task_text_failed',
+              status: 'FAILED',
+              errorCode: 'bad_task',
+              errorMessage: 'task failed',
+            });
+        }
+        throw new Error('unexpected fetch url: ' + _0x50ba88);
+      },
+      async () => {
+        await withImmediateTimers(async () => {
+          await assert.rejects(
+            () =>
+              generateText({
+                provider: 'runninghub',
+                model: RUNNINGHUB_FLASH_MODEL,
+                prompt: '请描述图片',
+                inputImageUrls: [RUNNINGHUB_IMAGE_URL],
+              }),
+            /task failed/,
+          );
+        });
+      },
+    );
+  }),
+  test('aiTextApi: grsai OpenAI-compatible multimodal text requests use proxy/completions', async () => {
+    let _0x1bd50f = false;
+    await withMockFetch(
+      async (_0x17936e) => {
+        const _0x59c21e = String(_0x17936e || '');
+        if (_0x59c21e === '/api/config')
+          return jsonResponse({
+            providers: { grsai: { apiUrl: 'https://grsai.dakka.com.cn', apiKey: 'k_grsai' } },
+          });
+        if (_0x59c21e === '/local/ref.png') return imageResponse('grsai-image');
+        if (isTelegraphProxyUpload(_0x59c21e))
+          return ((_0x1bd50f = true), jsonResponse([{ src: '/unexpected-telegraph-ref.png' }]));
+        if (_0x59c21e === 'https://grsai.dakka.com.cn/client/resource/newUploadTokenZH')
+          return jsonResponse({
+            data: {
+              token: 'token_grsai',
+              key: 'uploaded/grsai-ref.png',
+              url: 'https://upload.grsai.example.com',
+              domain: 'https://cdn.grsai.example.com',
+            },
+          });
+        if (_0x59c21e === 'https://upload.grsai.example.com') return jsonResponse({ ok: true });
+        throw new Error('unexpected fetch url: ' + _0x59c21e);
+      },
+      async () => {
+        const _0x81877a = await buildGenerateTextRequest({
+          provider: 'grsai',
+          model: 'gemini-3.1-pro',
+          prompt: 'Please inspect @图片1 and keep the trailing text.',
+          inputUrls: ['/local/ref.png'],
+        });
+        (assert.equal(_0x81877a.url, '/api/v2/proxy/completions'),
+          assert.equal(_0x81877a.body.apiUrl, 'https://grsai.dakka.com.cn/v1'),
+          assert.equal(_0x81877a.body.apiKey, 'k_grsai'),
+          assert.equal(_0x81877a.body.model, 'gemini-3.1-pro'));
+        const _0x35060a = _0x81877a.body.messages[1].content;
+        (assert.ok(Array.isArray(_0x35060a)),
+          assert.deepEqual(_0x35060a, [
+            { type: 'text', text: 'Please inspect ' },
+            { type: 'image_url', image_url: { url: 'https://cdn.grsai.example.com/uploaded/grsai-ref.png' } },
+            { type: 'text', text: ' and keep the trailing text.' },
+          ]),
+          assert.equal(_0x1bd50f, false));
+      },
+    );
+  }),
+  test('aiTextApi: ppio text manifest uses OpenAI-compatible endpoint', async () => {
+    await withMockFetch(
+      async (_0x2b791d) => {
+        const _0x90bf49 = String(_0x2b791d || '');
+        if (_0x90bf49 === '/api/config')
+          return jsonResponse({
+            providers: { ppio: { apiUrl: 'https://api.ppinfra.com', apiKey: 'k_ppio' } },
+          });
+        throw new Error('unexpected fetch url: ' + _0x90bf49);
+      },
+      async () => {
+        const _0x527e18 = await buildGenerateTextRequest({
+          provider: 'ppio',
+          model: 'qwen/qwen3.5-397b-a17b',
+          prompt: 'plain text prompt',
+        });
+        (assert.equal(_0x527e18.url, '/api/v2/proxy/completions'),
+          assert.equal(_0x527e18.body.apiUrl, 'https://api.ppinfra.com/openai/v1'),
+          assert.equal(_0x527e18.body.apiKey, 'k_ppio'),
+          assert.equal(_0x527e18.body.model, 'qwen/qwen3.5-397b-a17b'),
+          assert.equal(_0x527e18.body.messages[1].content, 'plain text prompt'));
+      },
+    );
+  }),
+  test('aiTextApi: generateText via grsai proxy strips think tags from multimodal responses', async () => {
+    let _0x51d4bc = null;
+    await withMockFetch(
+      async (_0x40b932, _0x5148ad = {}) => {
+        const _0x5543a1 = String(_0x40b932 || '');
+        if (_0x5543a1 === '/api/config')
+          return jsonResponse({
+            providers: { grsai: { apiUrl: 'https://grsai.dakka.com.cn', apiKey: 'k_grsai' } },
+          });
+        if (_0x5543a1 === '/local/ref.png') return imageResponse('grsai-image');
+        if (_0x5543a1 === 'https://grsai.dakka.com.cn/client/resource/newUploadTokenZH')
+          return jsonResponse({
+            data: {
+              token: 'token_grsai',
+              key: 'uploaded/grsai-ref.png',
+              url: 'https://upload.grsai.example.com',
+              domain: 'https://cdn.grsai.example.com',
+            },
+          });
+        if (_0x5543a1 === 'https://upload.grsai.example.com') return jsonResponse({ ok: true });
+        if (_0x5543a1 === '/api/v2/proxy/completions')
+          return (
+            (_0x51d4bc = JSON.parse(String(_0x5148ad.body || '{}'))),
+            jsonResponse({ choices: [{ message: { content: '<think>internal reasoning</think>\n红色' } }] })
+          );
+        throw new Error('unexpected fetch url: ' + _0x5543a1);
+      },
+      async () => {
+        const _0x4a0385 = await generateText({
+          provider: 'grsai',
+          model: 'gemini-3-pro',
+          prompt: '这张图的主颜色是什么？只回答颜色。',
+          inputUrls: ['/local/ref.png'],
+        });
+        (assert.equal(_0x4a0385.text, '红色'),
+          assert.equal(_0x51d4bc?.apiUrl, 'https://grsai.dakka.com.cn/v1'),
+          assert.equal(_0x51d4bc?.model, 'gemini-3-pro'),
+          assert.ok(Array.isArray(_0x51d4bc?.messages?.[1]?.content)));
+      },
+    );
+  }),
+  test('aiTextApi: grsai partial image upload failure keeps mention slots from shifting', async () => {
+    await withMockFetch(
+      async (_0x1ff3f1) => {
+        const _0x193953 = String(_0x1ff3f1 || '');
+        if (_0x193953 === '/api/config')
+          return jsonResponse({
+            providers: { grsai: { apiUrl: 'https://grsai.dakka.com.cn', apiKey: 'k_grsai' } },
+          });
+        if (_0x193953 === '/local/first-failed.png') throw new Error('fetch failed');
+        if (_0x193953 === '/local/second-ok.png') return imageResponse('grsai-image-2');
+        if (_0x193953 === 'https://grsai.dakka.com.cn/client/resource/newUploadTokenZH')
+          return jsonResponse({
+            data: {
+              token: 'token_grsai',
+              key: 'uploaded/grsai-ref-2.png',
+              url: 'https://upload.grsai.example.com',
+              domain: 'https://cdn.grsai.example.com',
+            },
+          });
+        if (_0x193953 === 'https://upload.grsai.example.com') return jsonResponse({ ok: true });
+        throw new Error('unexpected fetch url: ' + _0x193953);
+      },
+      async () => {
+        const _0x492bac = await buildGenerateTextRequest({
+          provider: 'grsai',
+          model: 'gemini-3.1-pro',
+          prompt: 'A @图片1 B @图片2 C',
+          inputUrls: ['/local/first-failed.png', '/local/second-ok.png'],
+        });
+        assert.deepEqual(_0x492bac.body.messages[1].content, [
+          { type: 'text', text: 'A @图片1 B ' },
+          { type: 'image_url', image_url: { url: 'https://cdn.grsai.example.com/uploaded/grsai-ref-2.png' } },
+          { type: 'text', text: ' C' },
+        ]);
+      },
+    );
+  }));

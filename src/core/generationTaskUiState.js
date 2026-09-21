@@ -1,1 +1,146 @@
-const a345_0x4caa06=a345_0x4a14;(function(_0x25bfa6,_0x4049f8){const _0x4341be=a345_0x4a14,_0x2be61d=_0x25bfa6();while(!![]){try{const _0x4721df=parseInt(_0x4341be(0xfb))/0x1+parseInt(_0x4341be(0xe9))/0x2*(-parseInt(_0x4341be(0xfe))/0x3)+parseInt(_0x4341be(0x10c))/0x4*(parseInt(_0x4341be(0xf1))/0x5)+-parseInt(_0x4341be(0xf6))/0x6+-parseInt(_0x4341be(0xf4))/0x7+-parseInt(_0x4341be(0x10f))/0x8*(parseInt(_0x4341be(0xf5))/0x9)+parseInt(_0x4341be(0x10a))/0xa;if(_0x4721df===_0x4049f8)break;else _0x2be61d['push'](_0x2be61d['shift']());}catch(_0x57c05d){_0x2be61d['push'](_0x2be61d['shift']());}}}(a345_0xb0a3,0x7248a));function a345_0xb0a3(){const _0x4292f4=['1066162QEAwIl','waiting','success','running','queueing','idle','includes','fail','5HezMEm','asyncTaskId','map','1171590dPwDLv','74754KejtAw','3417444JmfPYv','push','completed','dreaminaTaskLabel','var(--unavailable-cursor)','555762KGYIJo','succeeded','rhTaskRecovering','3vVhdQE','toLowerCase','in_progress','submitting','mediaTaskError','rhStatusMessage','some','dreaminaTaskPhase','dreaminaSubmitId','failed','rhTaskStatus','recovering','7949880tGnvym','asyncTaskRecovering','1582748Hsolvb','object','filter','8KvWObr','freeze','trim','error','asyncTaskStatus','dreaminaTaskStatus','generating','isGenerating','statusMessage','cancelled','done','dreaminaTaskRecovering','jobStatus','rhTaskId','queued','pending'];a345_0xb0a3=function(){return _0x4292f4;};return a345_0xb0a3();}const RUNNING_STATUSES=new Set(['running','processing',a345_0x4caa06(0x115),a345_0x4caa06(0x100),'in-progress']),QUEUED_STATUSES=new Set([a345_0x4caa06(0xe8),a345_0x4caa06(0xe7),a345_0x4caa06(0xed),a345_0x4caa06(0xea),'submitted']),SUBMITTING_STATUSES=new Set([a345_0x4caa06(0x101),'submit']),SUCCESS_STATUSES=new Set([a345_0x4caa06(0xeb),a345_0x4caa06(0xfc),a345_0x4caa06(0xf8),'complete',a345_0x4caa06(0xe3),'finished','finish']),ERROR_STATUSES=new Set(['error',a345_0x4caa06(0x107),a345_0x4caa06(0xf0)]),CANCELLED_STATUSES=new Set([a345_0x4caa06(0xe2),'canceled']),RECOVERING_FIELDS=Object['freeze'](['rhTaskRecovering',a345_0x4caa06(0xe4),a345_0x4caa06(0x10b)]),STATUS_FIELDS=Object[a345_0x4caa06(0x110)]([a345_0x4caa06(0xe5),a345_0x4caa06(0x108),a345_0x4caa06(0x114),a345_0x4caa06(0x105),a345_0x4caa06(0x113),'mediaTaskStatus']),MESSAGE_FIELDS=Object[a345_0x4caa06(0x110)](['jobError',a345_0x4caa06(0x103),a345_0x4caa06(0xf9),'asyncTaskError',a345_0x4caa06(0x102),a345_0x4caa06(0x112),a345_0x4caa06(0xe1)]),IDLE_STATUSES=new Set([a345_0x4caa06(0xee),'']);function normalizeStatus(_0x323e1b){const _0xde48b5=a345_0x4caa06;return String(_0x323e1b||'')[_0xde48b5(0x111)]()[_0xde48b5(0xff)]();}function isNonIdleStatus(_0x366c48){return!IDLE_STATUSES['has'](normalizeStatus(_0x366c48));}function hasActiveTaskFamily(_0x553657){const _0x419659=a345_0x4caa06;if(!_0x553657||typeof _0x553657!==_0x419659(0x10d))return![];return _0x553657['rhTaskRecovering']===!![]||_0x553657[_0x419659(0xe4)]===!![]||_0x553657[_0x419659(0x10b)]===!![]||!!String(_0x553657[_0x419659(0xe6)]||'')[_0x419659(0x111)]()||!!String(_0x553657[_0x419659(0x106)]||'')[_0x419659(0x111)]()||!!String(_0x553657[_0x419659(0xf2)]||'')[_0x419659(0x111)]()||isNonIdleStatus(_0x553657[_0x419659(0x108)])||isNonIdleStatus(_0x553657[_0x419659(0x114)])||isNonIdleStatus(_0x553657[_0x419659(0x113)]);}function collectStatuses(_0x1c86a9){const _0x33fb12=a345_0x4caa06;if(!_0x1c86a9||typeof _0x1c86a9!==_0x33fb12(0x10d))return[];if(hasActiveTaskFamily(_0x1c86a9)){const _0x89983=[_0x1c86a9[_0x33fb12(0xe5)]];return(_0x1c86a9[_0x33fb12(0xfd)]===!![]||!!String(_0x1c86a9['rhTaskId']||'')[_0x33fb12(0x111)]()||isNonIdleStatus(_0x1c86a9['rhTaskStatus']))&&_0x89983[_0x33fb12(0xf7)](_0x1c86a9[_0x33fb12(0x108)]),(_0x1c86a9['dreaminaTaskRecovering']===!![]||!!String(_0x1c86a9[_0x33fb12(0x106)]||'')[_0x33fb12(0x111)]()||isNonIdleStatus(_0x1c86a9[_0x33fb12(0x114)]))&&_0x89983[_0x33fb12(0xf7)](_0x1c86a9[_0x33fb12(0x114)],_0x1c86a9[_0x33fb12(0x105)]),(_0x1c86a9['asyncTaskRecovering']===!![]||!!String(_0x1c86a9[_0x33fb12(0xf2)]||'')[_0x33fb12(0x111)]()||isNonIdleStatus(_0x1c86a9['asyncTaskStatus']))&&_0x89983[_0x33fb12(0xf7)](_0x1c86a9[_0x33fb12(0x113)]),_0x89983[_0x33fb12(0xf3)](normalizeStatus)[_0x33fb12(0x10e)](Boolean);}return STATUS_FIELDS[_0x33fb12(0xf3)](_0x4a8f30=>normalizeStatus(_0x1c86a9[_0x4a8f30]))[_0x33fb12(0x10e)](Boolean);}function hasAnyStatus(_0xa4a3b4,_0x4d5355){return _0xa4a3b4['some'](_0x2daa4d=>_0x4d5355['has'](_0x2daa4d));}function hasRecoveringFlag(_0x29b1d6){const _0x416a22=a345_0x4caa06;if(!_0x29b1d6||typeof _0x29b1d6!==_0x416a22(0x10d))return![];return RECOVERING_FIELDS[_0x416a22(0x104)](_0x2d9191=>_0x29b1d6[_0x2d9191]===!![]);}export function resolveGenerationUiState(_0x59c44d){const _0x3fec1b=a345_0x4caa06,_0x19446e=collectStatuses(_0x59c44d);if(hasAnyStatus(_0x19446e,ERROR_STATUSES))return _0x3fec1b(0x112);if(hasAnyStatus(_0x19446e,CANCELLED_STATUSES))return _0x3fec1b(0xe2);if(hasAnyStatus(_0x19446e,SUCCESS_STATUSES))return _0x3fec1b(0xeb);if(hasRecoveringFlag(_0x59c44d))return _0x3fec1b(0x109);if(hasAnyStatus(_0x19446e,RUNNING_STATUSES))return'running';if(hasAnyStatus(_0x19446e,QUEUED_STATUSES))return _0x3fec1b(0xe7);if(hasAnyStatus(_0x19446e,SUBMITTING_STATUSES))return'submitting';if(_0x59c44d?.[_0x3fec1b(0x116)]===!![])return'running';return _0x3fec1b(0xee);}export function isTaskRunning(_0x41e2f0){const _0x3ae247=a345_0x4caa06;return[_0x3ae247(0x101),'queued',_0x3ae247(0xec),_0x3ae247(0x109)]['includes'](resolveGenerationUiState(_0x41e2f0));}export function isTaskTerminal(_0x597c02){const _0x130565=a345_0x4caa06;return['success',_0x130565(0x112),'cancelled'][_0x130565(0xef)](resolveGenerationUiState(_0x597c02));}function a345_0x4a14(_0x153262,_0x57bbbe){const _0xb0a3f1=a345_0xb0a3();return a345_0x4a14=function(_0x4a1462,_0x1cd6e4){_0x4a1462=_0x4a1462-0xe1;let _0x55b2a1=_0xb0a3f1[_0x4a1462];return _0x55b2a1;},a345_0x4a14(_0x153262,_0x57bbbe);}export function isTaskFailed(_0x4459cd){const _0x54c89b=a345_0x4caa06;return resolveGenerationUiState(_0x4459cd)===_0x54c89b(0x112);}export function isTaskCancelled(_0x516e3b){const _0x4806f1=a345_0x4caa06;return resolveGenerationUiState(_0x516e3b)===_0x4806f1(0xe2);}export function shouldShowGenerationBusyUi(_0x2e5e5f){return isTaskRunning(_0x2e5e5f);}export function shouldShowGenerationResultLoadingUi(_0x1d14dc,{hasResult:hasResult=![]}={}){return hasResult!==!![]&&shouldShowGenerationBusyUi(_0x1d14dc);}export function shouldAllowCancel(_0x38b886,{cancellable:cancellable=![],cancelInFlight:cancelInFlight=![]}={}){return cancellable===!![]&&isTaskRunning(_0x38b886)&&cancelInFlight!==!![];}export function resolveGenerationButtonMode(_0xa12ef2,{cancellable:cancellable=![],cancelInFlight:cancelInFlight=![]}={}){const _0x4fd15c=a345_0x4caa06,_0x216f88=resolveGenerationUiState(_0xa12ef2),_0xd344e7=isTaskRunning(_0xa12ef2),_0x270e21=shouldAllowCancel(_0xa12ef2,{'cancellable':cancellable,'cancelInFlight':cancelInFlight});return{'state':_0x216f88,'busy':_0xd344e7,'canCancel':_0x270e21,'disabled':_0xd344e7?!_0x270e21||cancelInFlight===!![]:![],'cursor':_0xd344e7&&(!_0x270e21||cancelInFlight===!![])?_0x4fd15c(0xfa):''};}export function getTaskMessage(_0x2c40f2){const _0x54b0ba=a345_0x4caa06;if(!_0x2c40f2||typeof _0x2c40f2!=='object')return'';for(const _0x470bfa of MESSAGE_FIELDS){const _0x112e49=String(_0x2c40f2[_0x470bfa]||'')[_0x54b0ba(0x111)]();if(_0x112e49)return _0x112e49;}return'';}export function isDreaminaTaskTerminal(_0x2c53c0){const _0x4766d6=a345_0x4caa06,_0x32db93=[normalizeStatus(_0x2c53c0?.[_0x4766d6(0x114)]),normalizeStatus(_0x2c53c0?.[_0x4766d6(0x105)])][_0x4766d6(0x10e)](Boolean);return hasAnyStatus(_0x32db93,ERROR_STATUSES)||hasAnyStatus(_0x32db93,CANCELLED_STATUSES)||hasAnyStatus(_0x32db93,SUCCESS_STATUSES);}
+const RUNNING_STATUSES = new Set(['running', 'processing', 'generating', 'in_progress', 'in-progress']),
+  QUEUED_STATUSES = new Set(['pending', 'queued', 'queueing', 'waiting', 'submitted']),
+  SUBMITTING_STATUSES = new Set(['submitting', 'submit']),
+  SUCCESS_STATUSES = new Set(['success', 'succeeded', 'completed', 'complete', 'done', 'finished', 'finish']),
+  ERROR_STATUSES = new Set(['error', 'failed', 'fail']),
+  CANCELLED_STATUSES = new Set(['cancelled', 'canceled']),
+  RECOVERING_FIELDS = Object.freeze(['rhTaskRecovering', 'dreaminaTaskRecovering', 'asyncTaskRecovering']),
+  STATUS_FIELDS = Object.freeze([
+    'jobStatus',
+    'rhTaskStatus',
+    'dreaminaTaskStatus',
+    'dreaminaTaskPhase',
+    'asyncTaskStatus',
+    'mediaTaskStatus',
+  ]),
+  MESSAGE_FIELDS = Object.freeze([
+    'jobError',
+    'rhStatusMessage',
+    'dreaminaTaskLabel',
+    'asyncTaskError',
+    'mediaTaskError',
+    'error',
+    'statusMessage',
+  ]),
+  IDLE_STATUSES = new Set(['idle', '']);
+function normalizeStatus(_0x323e1b) {
+  return String(_0x323e1b || '')
+    .trim()
+    .toLowerCase();
+}
+function isNonIdleStatus(_0x366c48) {
+  return !IDLE_STATUSES.has(normalizeStatus(_0x366c48));
+}
+function hasActiveTaskFamily(_0x553657) {
+  if (!_0x553657 || typeof _0x553657 !== 'object') return false;
+  return (
+    _0x553657.rhTaskRecovering === true ||
+    _0x553657.dreaminaTaskRecovering === true ||
+    _0x553657.asyncTaskRecovering === true ||
+    !!String(_0x553657.rhTaskId || '').trim() ||
+    !!String(_0x553657.dreaminaSubmitId || '').trim() ||
+    !!String(_0x553657.asyncTaskId || '').trim() ||
+    isNonIdleStatus(_0x553657.rhTaskStatus) ||
+    isNonIdleStatus(_0x553657.dreaminaTaskStatus) ||
+    isNonIdleStatus(_0x553657.asyncTaskStatus)
+  );
+}
+function collectStatuses(_0x1c86a9) {
+  if (!_0x1c86a9 || typeof _0x1c86a9 !== 'object') return [];
+  if (hasActiveTaskFamily(_0x1c86a9)) {
+    const _0x89983 = [_0x1c86a9.jobStatus];
+    return (
+      (_0x1c86a9.rhTaskRecovering === true ||
+        !!String(_0x1c86a9.rhTaskId || '').trim() ||
+        isNonIdleStatus(_0x1c86a9.rhTaskStatus)) &&
+        _0x89983.push(_0x1c86a9.rhTaskStatus),
+      (_0x1c86a9.dreaminaTaskRecovering === true ||
+        !!String(_0x1c86a9.dreaminaSubmitId || '').trim() ||
+        isNonIdleStatus(_0x1c86a9.dreaminaTaskStatus)) &&
+        _0x89983.push(_0x1c86a9.dreaminaTaskStatus, _0x1c86a9.dreaminaTaskPhase),
+      (_0x1c86a9.asyncTaskRecovering === true ||
+        !!String(_0x1c86a9.asyncTaskId || '').trim() ||
+        isNonIdleStatus(_0x1c86a9.asyncTaskStatus)) &&
+        _0x89983.push(_0x1c86a9.asyncTaskStatus),
+      _0x89983.map(normalizeStatus).filter(Boolean)
+    );
+  }
+  return STATUS_FIELDS.map((_0x4a8f30) => normalizeStatus(_0x1c86a9[_0x4a8f30])).filter(Boolean);
+}
+function hasAnyStatus(_0xa4a3b4, _0x4d5355) {
+  return _0xa4a3b4.some((_0x2daa4d) => _0x4d5355.has(_0x2daa4d));
+}
+function hasRecoveringFlag(_0x29b1d6) {
+  if (!_0x29b1d6 || typeof _0x29b1d6 !== 'object') return false;
+  return RECOVERING_FIELDS.some((_0x2d9191) => _0x29b1d6[_0x2d9191] === true);
+}
+export function resolveGenerationUiState(_0x59c44d) {
+  const _0x19446e = collectStatuses(_0x59c44d);
+  if (hasAnyStatus(_0x19446e, ERROR_STATUSES)) return 'error';
+  if (hasAnyStatus(_0x19446e, CANCELLED_STATUSES)) return 'cancelled';
+  if (hasAnyStatus(_0x19446e, SUCCESS_STATUSES)) return 'success';
+  if (hasRecoveringFlag(_0x59c44d)) return 'recovering';
+  if (hasAnyStatus(_0x19446e, RUNNING_STATUSES)) return 'running';
+  if (hasAnyStatus(_0x19446e, QUEUED_STATUSES)) return 'queued';
+  if (hasAnyStatus(_0x19446e, SUBMITTING_STATUSES)) return 'submitting';
+  if (_0x59c44d?.isGenerating === true) return 'running';
+  return 'idle';
+}
+export function isTaskRunning(_0x41e2f0) {
+  return ['submitting', 'queued', 'running', 'recovering'].includes(resolveGenerationUiState(_0x41e2f0));
+}
+export function isTaskTerminal(_0x597c02) {
+  return ['success', 'error', 'cancelled'].includes(resolveGenerationUiState(_0x597c02));
+}
+export function isTaskFailed(_0x4459cd) {
+  return resolveGenerationUiState(_0x4459cd) === 'error';
+}
+export function isTaskCancelled(_0x516e3b) {
+  return resolveGenerationUiState(_0x516e3b) === 'cancelled';
+}
+export function shouldShowGenerationBusyUi(_0x2e5e5f) {
+  return isTaskRunning(_0x2e5e5f);
+}
+export function shouldShowGenerationResultLoadingUi(_0x1d14dc, { hasResult: hasResult = false } = {}) {
+  return hasResult !== true && shouldShowGenerationBusyUi(_0x1d14dc);
+}
+export function shouldAllowCancel(
+  _0x38b886,
+  { cancellable: cancellable = false, cancelInFlight: cancelInFlight = false } = {},
+) {
+  return cancellable === true && isTaskRunning(_0x38b886) && cancelInFlight !== true;
+}
+export function resolveGenerationButtonMode(
+  _0xa12ef2,
+  { cancellable: cancellable = false, cancelInFlight: cancelInFlight = false } = {},
+) {
+  const _0x216f88 = resolveGenerationUiState(_0xa12ef2),
+    _0xd344e7 = isTaskRunning(_0xa12ef2),
+    _0x270e21 = shouldAllowCancel(_0xa12ef2, { cancellable: cancellable, cancelInFlight: cancelInFlight });
+  return {
+    state: _0x216f88,
+    busy: _0xd344e7,
+    canCancel: _0x270e21,
+    disabled: _0xd344e7 ? !_0x270e21 || cancelInFlight === true : false,
+    cursor: _0xd344e7 && (!_0x270e21 || cancelInFlight === true) ? 'var(--unavailable-cursor)' : '',
+  };
+}
+export function getTaskMessage(_0x2c40f2) {
+  if (!_0x2c40f2 || typeof _0x2c40f2 !== 'object') return '';
+  for (const _0x470bfa of MESSAGE_FIELDS) {
+    const _0x112e49 = String(_0x2c40f2[_0x470bfa] || '').trim();
+    if (_0x112e49) return _0x112e49;
+  }
+  return '';
+}
+export function isDreaminaTaskTerminal(_0x2c53c0) {
+  const _0x32db93 = [
+    normalizeStatus(_0x2c53c0?.dreaminaTaskStatus),
+    normalizeStatus(_0x2c53c0?.dreaminaTaskPhase),
+  ].filter(Boolean);
+  return (
+    hasAnyStatus(_0x32db93, ERROR_STATUSES) ||
+    hasAnyStatus(_0x32db93, CANCELLED_STATUSES) ||
+    hasAnyStatus(_0x32db93, SUCCESS_STATUSES)
+  );
+}

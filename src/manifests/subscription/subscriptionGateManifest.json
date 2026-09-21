@@ -5,7 +5,7 @@
       "key": "runninghubVideoV54",
       "modelId": "runninghub/2041741496667348994",
       "workflowId": "2041741496667348994",
-      "displayName": "\u89c6\u9891\u7f16\u8f91V5.4",
+      "displayName": "视频编辑V5.4",
       "aliases": [
         "video_edit_v54",
         "video_edit.pro"
@@ -54,7 +54,7 @@
       "key": "runninghubVideoHd",
       "modelId": "runninghub/2047787809091620866",
       "workflowId": "2047787809091620866",
-      "displayName": "\u89c6\u9891\u9ad8\u6e05",
+      "displayName": "视频高清",
       "aliases": [
         "video_hd_vip",
         "video_hd.pro",
@@ -71,7 +71,7 @@
       "key": "runninghubCommercialDigitalHuman",
       "modelId": "runninghub/2055639633148563458",
       "workflowId": "2055639633148563458",
-      "displayName": "\u5546\u4e1a\u7ea7\u6570\u5b57\u4eba",
+      "displayName": "商业级数字人",
       "aliases": [
         "commercial_digital_human",
         "commercial_digital_human.pro",
@@ -82,7 +82,7 @@
       "key": "runninghubAdvancedVoiceClone",
       "modelId": "runninghub/2050165249344585729",
       "workflowId": "2050165249344585729",
-      "displayName": "\u8fdb\u9636\u58f0\u97f3\u514b\u9686",
+      "displayName": "进阶声音克隆",
       "aliases": [
         "advanced_voice_clone",
         "voice_clone.pro",
@@ -99,7 +99,7 @@
       "key": "dreaminaVideoVip",
       "modelId": "dreamina/video_vip",
       "workflowId": "",
-      "displayName": "\u5373\u68a6\u89c6\u9891",
+      "displayName": "即梦视频",
       "aliases": [
         "dreamina_video_vip",
         "dreamina.video_vip"

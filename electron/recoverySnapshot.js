@@ -1,1 +1,72 @@
-function a119_0x443f(){const _0x6d32a0=['close','reason','isDestroyed','requestSnapshot','logEvent','1356775FmgSki','Recovery\x20snapshot\x20before\x20close\x20failed','success','4pWKrYk','1630JLGBsS','hasUnsavedChanges','window-close','window-unavailable','76GBgzps','299bvLiku','877518rAoZjU','getRendererProjectState','timeout','14FOeqpM','1766616PuySSm','stringify','race','main','(()\x20=>\x20{\x0a\x20\x20\x20\x20const\x20writer\x20=\x20window.__aiCanvasWriteRecoverySnapshotForClose;\x0a\x20\x20\x20\x20if\x20(typeof\x20writer\x20!==\x20\x22function\x22)\x20{\x0a\x20\x20\x20\x20\x20\x20return\x20{\x20success:\x20false,\x20reason:\x20\x22writer-unavailable\x22\x20};\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20return\x20Promise.resolve(writer(','149976BAanlN','webContents',')).catch((error)\x20=>\x20({\x0a\x20\x20\x20\x20\x20\x20success:\x20false,\x0a\x20\x20\x20\x20\x20\x20error:\x20String(error\x20&&\x20error.message\x20?\x20error.message\x20:\x20error),\x0a\x20\x20\x20\x20}));\x0a\x20\x20})()','2136099SBYqzf','37458YJFbtT','shouldBypassClose','then','function','warn','88sCdgmd'];a119_0x443f=function(){return _0x6d32a0;};return a119_0x443f();}function a119_0x4fd3(_0x29111a,_0x2553d1){const _0x443f3c=a119_0x443f();return a119_0x4fd3=function(_0x4fd3b0,_0x2a7629){_0x4fd3b0=_0x4fd3b0-0x11e;let _0x433228=_0x443f3c[_0x4fd3b0];return _0x433228;},a119_0x4fd3(_0x29111a,_0x2553d1);}(function(_0x53b249,_0x5a4c10){const _0xe4583e=a119_0x4fd3,_0xe9b9d2=_0x53b249();while(!![]){try{const _0x4f43fa=-parseInt(_0xe4583e(0x126))/0x1*(parseInt(_0xe4583e(0x125))/0x2)+-parseInt(_0xe4583e(0x133))/0x3+-parseInt(_0xe4583e(0x120))/0x4*(-parseInt(_0xe4583e(0x13f))/0x5)+-parseInt(_0xe4583e(0x127))/0x6+-parseInt(_0xe4583e(0x12a))/0x7*(-parseInt(_0xe4583e(0x12b))/0x8)+parseInt(_0xe4583e(0x134))/0x9*(parseInt(_0xe4583e(0x121))/0xa)+parseInt(_0xe4583e(0x139))/0xb*(-parseInt(_0xe4583e(0x130))/0xc);if(_0x4f43fa===_0x5a4c10)break;else _0xe9b9d2['push'](_0xe9b9d2['shift']());}catch(_0x5d39ec){_0xe9b9d2['push'](_0xe9b9d2['shift']());}}}(a119_0x443f,0x66f97));const DEFAULT_CLOSE_RECOVERY_TIMEOUT_MS=0x9c4;function delay(_0x3f3fab){return new Promise(_0x2f8570=>{setTimeout(_0x2f8570,_0x3f3fab);});}export async function requestRendererRecoverySnapshot(_0x589313,_0x4bbf5e='window-close',{timeoutMs:timeoutMs=DEFAULT_CLOSE_RECOVERY_TIMEOUT_MS}={}){const _0x1876b6=a119_0x4fd3;if(!_0x589313||_0x589313[_0x1876b6(0x13c)]())return{'success':![],'reason':_0x1876b6(0x124)};const _0x401782=_0x1876b6(0x12f)+JSON[_0x1876b6(0x12c)](_0x4bbf5e)+_0x1876b6(0x132);return await Promise[_0x1876b6(0x12d)]([_0x589313[_0x1876b6(0x131)]['executeJavaScript'](_0x401782,!![]),delay(timeoutMs)[_0x1876b6(0x136)](()=>({'success':![],'reason':_0x1876b6(0x129)}))]);}export function installRecoverySnapshotBeforeClose(_0x212f51,_0x5ef38e={}){const _0x24ac28=a119_0x4fd3;if(!_0x212f51)return;const _0x1bb744=typeof _0x5ef38e['getRendererProjectState']===_0x24ac28(0x137)?_0x5ef38e[_0x24ac28(0x128)]:()=>({}),_0x29fbc3=typeof _0x5ef38e['shouldBypassClose']===_0x24ac28(0x137)?_0x5ef38e[_0x24ac28(0x135)]:()=>![],_0x38a9a0=typeof _0x5ef38e[_0x24ac28(0x13d)]==='function'?_0x5ef38e[_0x24ac28(0x13d)]:requestRendererRecoverySnapshot,_0x16f3cd=typeof _0x5ef38e[_0x24ac28(0x13e)]==='function'?_0x5ef38e['logEvent']:()=>{};let _0xa642a8=![],_0x434767=![];_0x212f51['on'](_0x24ac28(0x13a),_0x2400e4=>{const _0x40f9f5=_0x24ac28;if(_0x29fbc3())return;if(_0xa642a8){_0xa642a8=![];return;}const _0x1a8233=_0x1bb744();if(_0x1a8233?.[_0x40f9f5(0x122)]!==!![])return;_0x2400e4['preventDefault']();if(_0x434767)return;_0x434767=!![],void((async()=>{const _0x59ebf9=_0x40f9f5;try{const _0x5d2506=await _0x38a9a0(_0x212f51,_0x59ebf9(0x123));_0x5d2506?.[_0x59ebf9(0x11f)]===![]&&_0x16f3cd({'type':'project.recovery_snapshot_before_close_failed','level':_0x59ebf9(0x138),'source':_0x59ebf9(0x12e),'message':_0x59ebf9(0x11e),'context':{'reason':_0x5d2506[_0x59ebf9(0x13b)]||'','error':_0x5d2506['error']||''}});}catch(_0x373eb8){_0x16f3cd({'type':'project.recovery_snapshot_before_close_failed','level':_0x59ebf9(0x138),'source':_0x59ebf9(0x12e),'message':_0x59ebf9(0x11e),'error':_0x373eb8});}finally{_0x434767=![],_0xa642a8=!![];if(!_0x212f51['isDestroyed']())_0x212f51['close']();}})());});}
+const DEFAULT_CLOSE_RECOVERY_TIMEOUT_MS = 0x9c4;
+function delay(_0x3f3fab) {
+  return new Promise((_0x2f8570) => {
+    setTimeout(_0x2f8570, _0x3f3fab);
+  });
+}
+export async function requestRendererRecoverySnapshot(
+  _0x589313,
+  _0x4bbf5e = 'window-close',
+  { timeoutMs: timeoutMs = DEFAULT_CLOSE_RECOVERY_TIMEOUT_MS } = {},
+) {
+  if (!_0x589313 || _0x589313.isDestroyed()) return { success: false, reason: 'window-unavailable' };
+  const _0x401782 =
+    '(() => {\n    const writer = window.__aiCanvasWriteRecoverySnapshotForClose;\n    if (typeof writer !== "function") {\n      return { success: false, reason: "writer-unavailable" };\n    }\n    return Promise.resolve(writer(' +
+    JSON.stringify(_0x4bbf5e) +
+    ')).catch((error) => ({\n      success: false,\n      error: String(error && error.message ? error.message : error),\n    }));\n  })()';
+  return await Promise.race([
+    _0x589313.webContents.executeJavaScript(_0x401782, true),
+    delay(timeoutMs).then(() => ({ success: false, reason: 'timeout' })),
+  ]);
+}
+export function installRecoverySnapshotBeforeClose(_0x212f51, _0x5ef38e = {}) {
+  if (!_0x212f51) return;
+  const _0x1bb744 =
+      typeof _0x5ef38e.getRendererProjectState === 'function'
+        ? _0x5ef38e.getRendererProjectState
+        : () => ({}),
+    _0x29fbc3 = typeof _0x5ef38e.shouldBypassClose === 'function' ? _0x5ef38e.shouldBypassClose : () => false,
+    _0x38a9a0 =
+      typeof _0x5ef38e.requestSnapshot === 'function'
+        ? _0x5ef38e.requestSnapshot
+        : requestRendererRecoverySnapshot,
+    _0x16f3cd = typeof _0x5ef38e.logEvent === 'function' ? _0x5ef38e.logEvent : () => {};
+  let _0xa642a8 = false,
+    _0x434767 = false;
+  _0x212f51.on('close', (_0x2400e4) => {
+    if (_0x29fbc3()) return;
+    if (_0xa642a8) {
+      _0xa642a8 = false;
+      return;
+    }
+    const _0x1a8233 = _0x1bb744();
+    if (_0x1a8233?.hasUnsavedChanges !== true) return;
+    _0x2400e4.preventDefault();
+    if (_0x434767) return;
+    ((_0x434767 = true),
+      void (async () => {
+        try {
+          const _0x5d2506 = await _0x38a9a0(_0x212f51, 'window-close');
+          _0x5d2506?.success === false &&
+            _0x16f3cd({
+              type: 'project.recovery_snapshot_before_close_failed',
+              level: 'warn',
+              source: 'main',
+              message: 'Recovery snapshot before close failed',
+              context: { reason: _0x5d2506.reason || '', error: _0x5d2506.error || '' },
+            });
+        } catch (_0x373eb8) {
+          _0x16f3cd({
+            type: 'project.recovery_snapshot_before_close_failed',
+            level: 'warn',
+            source: 'main',
+            message: 'Recovery snapshot before close failed',
+            error: _0x373eb8,
+          });
+        } finally {
+          ((_0x434767 = false), (_0xa642a8 = true));
+          if (!_0x212f51.isDestroyed()) _0x212f51.close();
+        }
+      })());
+  });
+}

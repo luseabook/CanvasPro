@@ -1,1 +1,79 @@
-const a204_0x513a8d=a204_0x1008;(function(_0x59d870,_0x296a43){const _0x26a8ac=a204_0x1008,_0x162fdc=_0x59d870();while(!![]){try{const _0x5e7d91=parseInt(_0x26a8ac(0x97))/0x1*(-parseInt(_0x26a8ac(0x9a))/0x2)+-parseInt(_0x26a8ac(0xaf))/0x3*(parseInt(_0x26a8ac(0x9b))/0x4)+-parseInt(_0x26a8ac(0x9d))/0x5*(-parseInt(_0x26a8ac(0x9f))/0x6)+parseInt(_0x26a8ac(0xa4))/0x7*(-parseInt(_0x26a8ac(0xb2))/0x8)+parseInt(_0x26a8ac(0xb3))/0x9+-parseInt(_0x26a8ac(0xb6))/0xa+parseInt(_0x26a8ac(0xab))/0xb;if(_0x5e7d91===_0x296a43)break;else _0x162fdc['push'](_0x162fdc['shift']());}catch(_0x3f91a9){_0x162fdc['push'](_0x162fdc['shift']());}}}(a204_0x2b6b,0x66067));import{toNumber}from'./mediaClipUtils.js';export const MEDIA_CLIP_WAVEFORM_WIDTH=0xc8;export const MEDIA_CLIP_WAVEFORM_HEIGHT=0x50;export const MEDIA_CLIP_WAVEFORM_SAMPLES=0xbe;const SVG_NS=a204_0x513a8d(0x8c);export function makeButton(_0x20e8ea,_0x521bbd,_0x1100e1){const _0x551367=a204_0x513a8d,_0x327959=document[_0x551367(0xa2)](_0x551367(0x92));return _0x327959['type']=_0x551367(0x92),_0x327959['className']=_0x20e8ea,_0x327959[_0x551367(0x8e)]=_0x521bbd,_0x327959[_0x551367(0xb7)]('aria-label',_0x521bbd),_0x327959[_0x551367(0x96)]=_0x1100e1,_0x327959;}function a204_0x2b6b(){const _0x5124ec=['is-placeholder','966LJardD','96qGNNny','class','5SQVoEX','durationSec','2927406lvRxEc','string','0\x200\x2024\x2024','createElement','\x0a\x20\x20\x20\x20<path\x20class=\x22media-clip-connect-cursor\x22\x20d=\x22M4\x204l7.07\x2016.97\x202.51-7.39\x207.39-2.51L4\x204z\x22\x20/>\x0a\x20\x20\x20\x20<circle\x20class=\x22media-clip-connect-dot\x22\x20cx=\x2220\x22\x20cy=\x2220\x22\x20r=\x222.5\x22\x20/>\x0a\x20\x20\x20\x20<path\x20class=\x22media-clip-connect-line\x22\x20d=\x22M12\x2012\x20Q\x2017\x2012\x2019\x2018\x22\x20stroke-dasharray=\x223\x203\x22\x20/>\x0a\x20\x20','7dmUIvv','createElementNS','\x0a\x20\x20\x20\x20<svg\x20width=\x2218\x22\x20height=\x2218\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22>\x0a\x20\x20\x20\x20\x20\x20','appendChild','isInteger','min','className','5439016EIKtmo','toFixed','endSec','classList','7788NhtiSs','add','round','5178248EtKYar','2886750ggSMNv','abs','svg','1712800tEYMAM','setAttribute','http://www.w3.org/2000/svg','0\x200\x20','title','aria-label','innerHTML','max','button','viewBox','trunc','\x0a\x20\x20\x20\x20</svg>\x0a\x20\x20','textContent','9ftpznK','media-clip-connect-icon'];a204_0x2b6b=function(){return _0x5124ec;};return a204_0x2b6b();}export function iconButton(_0x55ae10,_0x4208b1,_0x935149){const _0x19e000=a204_0x513a8d,_0x19dc4d=document[_0x19e000(0xa2)](_0x19e000(0x92));return _0x19dc4d['type']='button',_0x19dc4d[_0x19e000(0xaa)]=_0x55ae10,_0x19dc4d['title']=_0x4208b1,_0x19dc4d[_0x19e000(0xb7)](_0x19e000(0x8f),_0x4208b1),_0x19dc4d[_0x19e000(0x90)]=_0x19e000(0xa6)+_0x935149+_0x19e000(0x95),_0x19dc4d;}function a204_0x1008(_0x2e96ed,_0x4824a7){const _0x2b6b54=a204_0x2b6b();return a204_0x1008=function(_0x10087a,_0x11c6be){_0x10087a=_0x10087a-0x8c;let _0x3b9d5e=_0x2b6b54[_0x10087a];return _0x3b9d5e;},a204_0x1008(_0x2e96ed,_0x4824a7);}export function createConnectCursorIcon(){const _0x14982f=a204_0x513a8d,_0x49f881=document[_0x14982f(0xa5)]('http://www.w3.org/2000/svg',_0x14982f(0xb5));return _0x49f881[_0x14982f(0xb7)](_0x14982f(0x9c),_0x14982f(0x98)),_0x49f881['setAttribute'](_0x14982f(0x93),_0x14982f(0xa1)),_0x49f881[_0x14982f(0xb7)]('aria-hidden','true'),_0x49f881[_0x14982f(0x90)]=_0x14982f(0xa3),_0x49f881;}export function createMediaClipSvgElement(_0x147626){const _0x2a6038=a204_0x513a8d;return document[_0x2a6038(0xa5)]?.(SVG_NS,_0x147626)||document['createElement'](_0x147626);}export function setMediaClipSvgClass(_0x1fc232,_0x5f0abe){const _0x36baf9=a204_0x513a8d;_0x1fc232?.[_0x36baf9(0xb7)]?.(_0x36baf9(0x9c),_0x5f0abe);try{typeof _0x1fc232?.['className']===_0x36baf9(0xa0)&&(_0x1fc232[_0x36baf9(0xaa)]=_0x5f0abe);}catch{}}export function getMediaClipWaveformViewBox(){const _0x239e7e=a204_0x513a8d;return _0x239e7e(0x8d)+MEDIA_CLIP_WAVEFORM_WIDTH+'\x20'+MEDIA_CLIP_WAVEFORM_HEIGHT;}export function getMediaClipWaveformViewport(_0x4445dd={}){const _0x3237e6=a204_0x513a8d,_0x453f1b=Math[_0x3237e6(0x91)](0x0,toNumber(_0x4445dd[_0x3237e6(0x9e)],0x0),toNumber(_0x4445dd[_0x3237e6(0xad)],0x0));if(!(_0x453f1b>0x0))return{'widthPct':0x64,'marginLeftPct':0x0};const _0x37821f=Math[_0x3237e6(0x91)](0x0,Math[_0x3237e6(0xa9)](_0x453f1b,toNumber(_0x4445dd['startSec'],0x0))),_0x307ddc=Math['max'](_0x37821f+0.001,Math['min'](_0x453f1b,toNumber(_0x4445dd[_0x3237e6(0xad)],_0x453f1b))),_0x353b7e=Math[_0x3237e6(0x91)](0.001,_0x307ddc-_0x37821f),_0x3661db=Math[_0x3237e6(0x91)](0x1,_0x453f1b/_0x353b7e);return{'widthPct':Math[_0x3237e6(0xb1)](_0x3661db*0x186a0)/0x3e8,'marginLeftPct':Math[_0x3237e6(0xb1)](_0x37821f/_0x353b7e*0x186a0)/0x3e8};}export function formatWaveformPct(_0x6efb92=0x0){const _0x304d98=a204_0x513a8d,_0x4fee96=toNumber(_0x6efb92,0x0);if(Math[_0x304d98(0xb4)](_0x4fee96)<0.001)return'0';return Number[_0x304d98(0xa8)](_0x4fee96)?String(_0x4fee96):_0x4fee96[_0x304d98(0xac)](0x3);}export function fillFilmstripPlaceholder(_0x50585e,_0x20f796=0x6){const _0x53dff4=a204_0x513a8d;if(!_0x50585e)return;_0x50585e[_0x53dff4(0xae)][_0x53dff4(0xb0)](_0x53dff4(0x99)),_0x50585e['replaceChildren']();const _0x528e53=Math[_0x53dff4(0x91)](0x1,Math[_0x53dff4(0x94)](toNumber(_0x20f796,0x6)));for(let _0x1fe9ee=0x0;_0x1fe9ee<_0x528e53;_0x1fe9ee+=0x1){const _0x31d184=document[_0x53dff4(0xa2)]('span');_0x31d184[_0x53dff4(0xaa)]='media-clip-filmstrip-frame',_0x50585e[_0x53dff4(0xa7)](_0x31d184);}}
+import { toNumber } from './mediaClipUtils.js';
+export const MEDIA_CLIP_WAVEFORM_WIDTH = 200;
+export const MEDIA_CLIP_WAVEFORM_HEIGHT = 80;
+export const MEDIA_CLIP_WAVEFORM_SAMPLES = 190;
+const SVG_NS = 'http://www.w3.org/2000/svg';
+export function makeButton(_0x20e8ea, _0x521bbd, _0x1100e1) {
+  const _0x327959 = document.createElement('button');
+  return (
+    (_0x327959.type = 'button'),
+    (_0x327959.className = _0x20e8ea),
+    (_0x327959.title = _0x521bbd),
+    _0x327959.setAttribute('aria-label', _0x521bbd),
+    (_0x327959.textContent = _0x1100e1),
+    _0x327959
+  );
+}
+export function iconButton(_0x55ae10, _0x4208b1, _0x935149) {
+  const _0x19dc4d = document.createElement('button');
+  return (
+    (_0x19dc4d.type = 'button'),
+    (_0x19dc4d.className = _0x55ae10),
+    (_0x19dc4d.title = _0x4208b1),
+    _0x19dc4d.setAttribute('aria-label', _0x4208b1),
+    (_0x19dc4d.innerHTML =
+      '\n    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n      ' +
+      _0x935149 +
+      '\n    </svg>\n  '),
+    _0x19dc4d
+  );
+}
+export function createConnectCursorIcon() {
+  const _0x49f881 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  return (
+    _0x49f881.setAttribute('class', 'media-clip-connect-icon'),
+    _0x49f881.setAttribute('viewBox', '0 0 24 24'),
+    _0x49f881.setAttribute('aria-hidden', 'true'),
+    (_0x49f881.innerHTML =
+      '\n    <path class="media-clip-connect-cursor" d="M4 4l7.07 16.97 2.51-7.39 7.39-2.51L4 4z" />\n    <circle class="media-clip-connect-dot" cx="20" cy="20" r="2.5" />\n    <path class="media-clip-connect-line" d="M12 12 Q 17 12 19 18" stroke-dasharray="3 3" />\n  '),
+    _0x49f881
+  );
+}
+export function createMediaClipSvgElement(_0x147626) {
+  return document.createElementNS?.(SVG_NS, _0x147626) || document.createElement(_0x147626);
+}
+export function setMediaClipSvgClass(_0x1fc232, _0x5f0abe) {
+  _0x1fc232?.setAttribute?.('class', _0x5f0abe);
+  try {
+    typeof _0x1fc232?.className === 'string' && (_0x1fc232.className = _0x5f0abe);
+  } catch {}
+}
+export function getMediaClipWaveformViewBox() {
+  return '0 0 ' + MEDIA_CLIP_WAVEFORM_WIDTH + ' ' + MEDIA_CLIP_WAVEFORM_HEIGHT;
+}
+export function getMediaClipWaveformViewport(_0x4445dd = {}) {
+  const _0x453f1b = Math.max(0, toNumber(_0x4445dd.durationSec, 0), toNumber(_0x4445dd.endSec, 0));
+  if (!(_0x453f1b > 0)) return { widthPct: 100, marginLeftPct: 0 };
+  const _0x37821f = Math.max(0, Math.min(_0x453f1b, toNumber(_0x4445dd.startSec, 0))),
+    _0x307ddc = Math.max(_0x37821f + 0.001, Math.min(_0x453f1b, toNumber(_0x4445dd.endSec, _0x453f1b))),
+    _0x353b7e = Math.max(0.001, _0x307ddc - _0x37821f),
+    _0x3661db = Math.max(1, _0x453f1b / _0x353b7e);
+  return {
+    widthPct: Math.round(_0x3661db * 0x186a0) / 0x3e8,
+    marginLeftPct: Math.round((_0x37821f / _0x353b7e) * 0x186a0) / 0x3e8,
+  };
+}
+export function formatWaveformPct(_0x6efb92 = 0) {
+  const _0x4fee96 = toNumber(_0x6efb92, 0);
+  if (Math.abs(_0x4fee96) < 0.001) return '0';
+  return Number.isInteger(_0x4fee96) ? String(_0x4fee96) : _0x4fee96.toFixed(3);
+}
+export function fillFilmstripPlaceholder(_0x50585e, _0x20f796 = 6) {
+  if (!_0x50585e) return;
+  (_0x50585e.classList.add('is-placeholder'), _0x50585e.replaceChildren());
+  const _0x528e53 = Math.max(1, Math.trunc(toNumber(_0x20f796, 6)));
+  for (let _0x1fe9ee = 0; _0x1fe9ee < _0x528e53; _0x1fe9ee += 1) {
+    const _0x31d184 = document.createElement('span');
+    ((_0x31d184.className = 'media-clip-filmstrip-frame'), _0x50585e.appendChild(_0x31d184));
+  }
+}

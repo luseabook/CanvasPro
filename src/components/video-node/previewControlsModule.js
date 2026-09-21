@@ -1,1 +1,660 @@
-(function(_0x304745,_0x8c85f7){const _0x4a9678=a315_0x4e00,_0x405f4f=_0x304745();while(!![]){try{const _0x1a395d=parseInt(_0x4a9678(0x138))/0x1+-parseInt(_0x4a9678(0x11d))/0x2*(-parseInt(_0x4a9678(0x1cd))/0x3)+parseInt(_0x4a9678(0x123))/0x4*(parseInt(_0x4a9678(0x146))/0x5)+parseInt(_0x4a9678(0x17d))/0x6*(parseInt(_0x4a9678(0x1c6))/0x7)+parseInt(_0x4a9678(0x143))/0x8+-parseInt(_0x4a9678(0x1ac))/0x9+-parseInt(_0x4a9678(0x1d1))/0xa*(parseInt(_0x4a9678(0x18e))/0xb);if(_0x1a395d===_0x8c85f7)break;else _0x405f4f['push'](_0x405f4f['shift']());}catch(_0xfdd99f){_0x405f4f['push'](_0x405f4f['shift']());}}}(a315_0x1781,0xad5e1));function a315_0x1781(){const _0x237202=['floor','isFinite','_muteIconMutedEl','setAttribute','length','click','none','videoFrameExtraction.localSaveFailed','getStateRaw','now','muted','var(--media-control-time-text)','scale(0.92)','center','getState','_isProgressDragging','flex','0:00','display','videoFrameExtraction.shownButSaveFailed','pointermove','40258BRKRIy','source-image','_isMuted','<rect\x20x=\x226\x22\x20y=\x225\x22\x20width=\x224\x22\x20height=\x2214\x22\x20rx=\x221\x22></rect><rect\x20x=\x2214\x22\x20y=\x225\x22\x20width=\x224\x22\x20height=\x2214\x22\x20rx=\x221\x22></rect>','displayLocalPath','warning','17672zAIAlm','round','sourceVideoNode.controls.captureFrame','then','showToast','_progressFillEl','_syncVideoControlsFromVideo','var(--media-control-progress-fill)','originalLocalPath','fill','URL','play','_playPreviewVideoWithRecovery','icon-unmuted','video-snap-btn','videoHeight','_hoverManualPause','_data','isActiveFor','_isProgressSeeking','addNode','1171517bsZeUr','12px','getAttribute','video-play-btn','_getActiveVideoDuration','_setCenterIndicatorIcon','querySelectorAll','height','10px','media-progress-fill','http://www.w3.org/2000/svg','3655064LwsyJs','altKey','title','635ZwAOZj','pointer','_resolveVideoMetaSrcFromVideoData','videoFrameExtraction.videoNotLoaded','_snapBtnEl','prototype','_autoPlayToken','videos','video-controls','mainVideoIndex','media-progress-bar','absolute','_maybeFetchVideoMeta','trunc','paused','innerHTML','videoWidth','18px','32px','_updatePlayIcon','videoFrameExtraction.capturedFrameName','classList','className','add','0\x200\x2024\x2024','<svg\x20width=\x2218\x22\x20height=\x2218\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><path\x20d=\x22M23\x2019a2\x202\x200\x200\x201-2\x202H3a2\x202\x200\x200\x201-2-2V8a2\x202\x200\x200\x201\x202-2h4l2-3h6l2\x203h4a2\x202\x200\x200\x201\x202\x202z\x22></path><circle\x20cx=\x2212\x22\x20cy=\x2213\x22\x20r=\x224\x22></circle></svg>','video-mute-btn','sourceVideoNode.controls.toggleMute','seekable','info','_timeCurrentEl','message','stroke-width','_progressBarEl','_centerIndicatorInnerEl','max','_setPreviewMuted','createElementNS','2px','[AIGenVideoNode]\x20save\x20captured\x20frame\x20failed:','gen-video-center-indicator','opacity\x200.2s','var(--media-control-button-bg)','videoDuration','var(--canvas-white)','updateNodeData','_seekActiveVideoByPos','textContent','_multiLayerEls','blob','videoFrameExtraction.captureUnsupported','<polygon\x20points=\x2211\x205\x206\x209\x202\x209\x202\x2015\x206\x2015\x2011\x2019\x2011\x205\x22></polygon><line\x20x1=\x2223\x22\x20y1=\x221\x22\x20x2=\x221\x22\x20y2=\x2223\x22></line><line\x20x1=\x2215.54\x22\x20y1=\x228.46\x22\x20x2=\x2219.07\x22\x20y2=\x2212\x22></line>','currentTime','fileName','catch','12GgfpJk','rect','blur(var(--media-control-blur))','color','pointerdown','preventDefault','videoEl','icon-muted','createElement','left','_ensurePreviewVideoOverlays','_toggleVideoPlayPause','1px\x20solid\x20var(--media-control-center-border)','window','<polygon\x20points=\x226\x204\x2020\x2012\x206\x2020\x206\x204\x22></polygon>','4px','stopPropagation','209AywLnY','_hideCenterIndicator','isNoResult','_syncMuteBtnIcon','var(--media-control-progress-track)','_isManualLoopPlayback','_ensureVideoSrcFor','64px','loop','-3px','video','_lastMainIdx','end','snapSeq','min','removeEventListener','src-img-','_showPausedCenterIndicator','_timeTotalEl','currentColor','relative','span','src','_centerIndicatorTimer','_captureCurrentFrameFromActiveVideo','assign','opacity','_setVideoOverlaysVisible','_playBtnEl','opacity\x200.18s\x20ease,\x20transform\x200.18s\x20ease','12375288jDwSqo','scale(1)','_applyMuteStateToPreviewVideos','svg','error','originalWidth','clientX','var(--media-control-button-text)','addEventListener','ai_video_frame','nodes','function','nodeId','isArray','_muteIconUnmutedEl','style','transform','width','previewEl','div','_muteBtnEl','_centerIndicatorEl','originalHeight','videoFps','5\x203\x2019\x2012\x205\x2021\x205\x203','_fmtVideoTime','3973529QAgkbq','polygon','appendChild','_getActivePreviewVideoEl','localPath','stroke','warn','93HiOuhY','duration','pause','_flashCenterIndicator','980860sGwCPD','_isManualControl','viewBox','100%','50%','_controlsEl','forEach'];a315_0x1781=function(){return _0x237202;};return a315_0x1781();}import{captureVideoFrameSnapshot,getVideoFrameSource,isVideoFrameReady,saveVideoFrameSnapshot,waitForVideoFrame}from'../videoFrameCapture.js';import{t}from'../../i18n/index.js';import{buildVideoMutedPatch,resolveVideoMutedPreference}from'./videoMuteState.js';function a315_0x4e00(_0x3e88d7,_0x5f343b){const _0x178141=a315_0x1781();return a315_0x4e00=function(_0x4e0056,_0x3ee3ed){_0x4e0056=_0x4e0056-0x104;let _0x562ed6=_0x178141[_0x4e0056];return _0x562ed6;},a315_0x4e00(_0x3e88d7,_0x5f343b);}function previewControlsText(_0x5dee15,_0x231605={}){return t(_0x5dee15,_0x231605);}function createCapturePreviewUrl(_0x343fcc){const _0xcb1ba1=a315_0x4e00,_0x1af522=globalThis[_0xcb1ba1(0x18a)]?.[_0xcb1ba1(0x12d)]||globalThis[_0xcb1ba1(0x12d)];if(!_0x343fcc||typeof _0x1af522?.['createObjectURL']!=='function')return'';try{return _0x1af522['createObjectURL'](_0x343fcc);}catch{return'';}}export function createVideoNodePreviewControlsModule(_0xf6b3e){const _0x31f4d1=a315_0x4e00,{store:_0x239343,saveOutputBlob:_0x2a722b,VideoKeyingController:_0x11b51c,getAutoMediaSizeByShortSide:_0x323bfe,buildSourceMediaNodePayload:_0x424437,calcSafeSpawnPosNearNode:_0x231b5b}=_0xf6b3e;class _0x5558ca{[_0x31f4d1(0x187)](){const _0x29bd2a=_0x31f4d1;if(!this[_0x29bd2a(0x1be)])return;this['_syncMutedStateFromNodeData'](this[_0x29bd2a(0x134)]);if(!this[_0x29bd2a(0x1c0)]){const _0x4d4f4d=document[_0x29bd2a(0x185)](_0x29bd2a(0x1bf));_0x4d4f4d[_0x29bd2a(0x15c)]=_0x29bd2a(0x160),_0x4d4f4d['title']=previewControlsText(_0x29bd2a(0x161)),Object['assign'](_0x4d4f4d[_0x29bd2a(0x1bb)],{'position':'absolute','top':_0x29bd2a(0x139),'left':_0x29bd2a(0x139),'background':_0x29bd2a(0x170),'borderRadius':_0x29bd2a(0x105),'width':'32px','height':_0x29bd2a(0x158),'display':_0x29bd2a(0x118),'alignItems':_0x29bd2a(0x115),'justifyContent':_0x29bd2a(0x115),'color':_0x29bd2a(0x1b3),'cursor':'pointer','zIndex':'12','backdropFilter':_0x29bd2a(0x17f),'userSelect':_0x29bd2a(0x10e)});const _0x1cbb76=document[_0x29bd2a(0x16b)](_0x29bd2a(0x142),_0x29bd2a(0x1af));_0x1cbb76[_0x29bd2a(0x10b)](_0x29bd2a(0x1bd),'16'),_0x1cbb76[_0x29bd2a(0x10b)]('height','16'),_0x1cbb76[_0x29bd2a(0x10b)](_0x29bd2a(0x1d3),_0x29bd2a(0x15e)),_0x1cbb76[_0x29bd2a(0x10b)](_0x29bd2a(0x12c),_0x29bd2a(0x10e)),_0x1cbb76[_0x29bd2a(0x10b)](_0x29bd2a(0x1cb),_0x29bd2a(0x1a1)),_0x1cbb76[_0x29bd2a(0x10b)](_0x29bd2a(0x166),'2'),_0x1cbb76[_0x29bd2a(0x15b)]['add'](_0x29bd2a(0x130)),_0x1cbb76[_0x29bd2a(0x155)]='<polygon\x20points=\x2211\x205\x206\x209\x202\x209\x202\x2015\x206\x2015\x2011\x2019\x2011\x205\x22></polygon><path\x20d=\x22M19.07\x204.93a10\x2010\x200\x200\x201\x200\x2014.14M15.54\x208.46a5\x205\x200\x200\x201\x200\x207.07\x22></path>';const _0x2ecb78=document[_0x29bd2a(0x16b)](_0x29bd2a(0x142),_0x29bd2a(0x1af));_0x2ecb78[_0x29bd2a(0x10b)](_0x29bd2a(0x1bd),'16'),_0x2ecb78[_0x29bd2a(0x10b)]('height','16'),_0x2ecb78[_0x29bd2a(0x10b)]('viewBox',_0x29bd2a(0x15e)),_0x2ecb78[_0x29bd2a(0x10b)](_0x29bd2a(0x12c),_0x29bd2a(0x10e)),_0x2ecb78[_0x29bd2a(0x10b)](_0x29bd2a(0x1cb),'currentColor'),_0x2ecb78[_0x29bd2a(0x10b)](_0x29bd2a(0x166),'2'),_0x2ecb78[_0x29bd2a(0x15b)][_0x29bd2a(0x15d)](_0x29bd2a(0x184)),_0x2ecb78[_0x29bd2a(0x155)]=_0x29bd2a(0x179),_0x4d4f4d[_0x29bd2a(0x1c8)](_0x1cbb76),_0x4d4f4d[_0x29bd2a(0x1c8)](_0x2ecb78),_0x4d4f4d['addEventListener'](_0x29bd2a(0x181),_0x4dfd7f=>_0x4dfd7f['stopPropagation']()),_0x4d4f4d[_0x29bd2a(0x1b4)](_0x29bd2a(0x10d),_0x3c1fa7=>{const _0x25a9f8=_0x29bd2a;_0x3c1fa7['stopPropagation'](),this[_0x25a9f8(0x16a)](!this[_0x25a9f8(0x11f)],{'persist':!![]}),this[_0x25a9f8(0x1ae)](),this[_0x25a9f8(0x191)]();}),this[_0x29bd2a(0x1be)][_0x29bd2a(0x1c8)](_0x4d4f4d),this[_0x29bd2a(0x1c0)]=_0x4d4f4d,this['_muteIconUnmutedEl']=_0x1cbb76,this[_0x29bd2a(0x10a)]=_0x2ecb78,this['_syncMuteBtnIcon']();}if(!this[_0x29bd2a(0x1c1)]){const _0x322f55=document[_0x29bd2a(0x185)](_0x29bd2a(0x1bf));_0x322f55['className']=_0x29bd2a(0x16e),Object[_0x29bd2a(0x1a7)](_0x322f55['style'],{'position':_0x29bd2a(0x151),'inset':'0','display':_0x29bd2a(0x118),'alignItems':_0x29bd2a(0x115),'justifyContent':_0x29bd2a(0x115),'pointerEvents':_0x29bd2a(0x10e),'zIndex':'11'});const _0x301da8=document[_0x29bd2a(0x185)](_0x29bd2a(0x1bf));Object[_0x29bd2a(0x1a7)](_0x301da8[_0x29bd2a(0x1bb)],{'width':_0x29bd2a(0x195),'height':_0x29bd2a(0x195),'borderRadius':_0x29bd2a(0x157),'background':'var(--media-control-center-bg)','border':_0x29bd2a(0x189),'display':'flex','alignItems':'center','justifyContent':_0x29bd2a(0x115),'color':_0x29bd2a(0x1b3),'opacity':'0','transform':_0x29bd2a(0x114),'transition':_0x29bd2a(0x1ab)}),_0x322f55[_0x29bd2a(0x1c8)](_0x301da8),this['previewEl'][_0x29bd2a(0x1c8)](_0x322f55),this[_0x29bd2a(0x1c1)]=_0x322f55,this[_0x29bd2a(0x168)]=_0x301da8;}if(!this[_0x29bd2a(0x106)]){const _0x1b5c57=document['createElement'](_0x29bd2a(0x1bf));_0x1b5c57['className']=_0x29bd2a(0x14e),Object['assign'](_0x1b5c57['style'],{'position':_0x29bd2a(0x151),'bottom':'0','left':'0','width':'100%','padding':'16px\x2016px','display':'flex','alignItems':_0x29bd2a(0x115),'gap':_0x29bd2a(0x139),'background':'var(--media-control-overlay-bg)','zIndex':'12','opacity':'1','transition':_0x29bd2a(0x16f)});const _0x5c4380=document[_0x29bd2a(0x185)](_0x29bd2a(0x1bf));_0x5c4380[_0x29bd2a(0x15c)]=_0x29bd2a(0x13b),Object[_0x29bd2a(0x1a7)](_0x5c4380[_0x29bd2a(0x1bb)],{'cursor':_0x29bd2a(0x147),'color':'var(--media-control-button-text)','display':'flex','alignItems':_0x29bd2a(0x115)});const _0xb19887=document[_0x29bd2a(0x185)]('span');_0xb19887['className']='video-time-current',Object['assign'](_0xb19887[_0x29bd2a(0x1bb)],{'color':_0x29bd2a(0x113),'fontSize':'12px','fontVariantNumeric':'tabular-nums'}),_0xb19887['textContent']=_0x29bd2a(0x119);const _0x2adf5f=document['createElement'](_0x29bd2a(0x1bf));_0x2adf5f[_0x29bd2a(0x15c)]=_0x29bd2a(0x150),Object[_0x29bd2a(0x1a7)](_0x2adf5f[_0x29bd2a(0x1bb)],{'flex':'1','height':_0x29bd2a(0x18c),'background':_0x29bd2a(0x192),'borderRadius':'2px','cursor':_0x29bd2a(0x147),'position':_0x29bd2a(0x1a2)});const _0x2d1bac=document[_0x29bd2a(0x185)](_0x29bd2a(0x1bf));_0x2d1bac[_0x29bd2a(0x15c)]=_0x29bd2a(0x141),Object[_0x29bd2a(0x1a7)](_0x2d1bac[_0x29bd2a(0x1bb)],{'width':'0%','height':_0x29bd2a(0x104),'background':_0x29bd2a(0x12a),'borderRadius':_0x29bd2a(0x16c),'pointerEvents':_0x29bd2a(0x10e),'position':'relative'});const _0x55d8fb=document[_0x29bd2a(0x185)](_0x29bd2a(0x1bf));_0x55d8fb[_0x29bd2a(0x15c)]='media-progress-knob',Object[_0x29bd2a(0x1a7)](_0x55d8fb['style'],{'width':_0x29bd2a(0x140),'height':_0x29bd2a(0x140),'background':_0x29bd2a(0x12a),'borderRadius':'50%','position':_0x29bd2a(0x151),'right':'-5px','top':_0x29bd2a(0x197),'boxShadow':'0\x200\x204px\x20var(--media-control-knob-shadow)'}),_0x2d1bac['appendChild'](_0x55d8fb),_0x2adf5f[_0x29bd2a(0x1c8)](_0x2d1bac);const _0x46ceff=document[_0x29bd2a(0x185)](_0x29bd2a(0x1a3));_0x46ceff[_0x29bd2a(0x15c)]='video-time-total',Object[_0x29bd2a(0x1a7)](_0x46ceff['style'],{'color':_0x29bd2a(0x113),'fontSize':_0x29bd2a(0x139),'fontVariantNumeric':'tabular-nums'}),_0x46ceff[_0x29bd2a(0x175)]=_0x29bd2a(0x119);const _0x34d800=document['createElement']('div');_0x34d800[_0x29bd2a(0x15c)]=_0x29bd2a(0x131),_0x34d800[_0x29bd2a(0x145)]=previewControlsText(_0x29bd2a(0x125)),Object[_0x29bd2a(0x1a7)](_0x34d800[_0x29bd2a(0x1bb)],{'cursor':_0x29bd2a(0x147),'color':_0x29bd2a(0x1b3),'display':_0x29bd2a(0x118),'alignItems':'center'}),_0x34d800['innerHTML']=_0x29bd2a(0x15f),_0x1b5c57[_0x29bd2a(0x1c8)](_0x5c4380),_0x1b5c57[_0x29bd2a(0x1c8)](_0xb19887),_0x1b5c57[_0x29bd2a(0x1c8)](_0x2adf5f),_0x1b5c57[_0x29bd2a(0x1c8)](_0x46ceff),_0x1b5c57[_0x29bd2a(0x1c8)](_0x34d800),_0x1b5c57[_0x29bd2a(0x1b4)](_0x29bd2a(0x181),_0x540c5a=>_0x540c5a[_0x29bd2a(0x18d)]()),_0x1b5c57['addEventListener'](_0x29bd2a(0x10d),_0x5bebee=>_0x5bebee[_0x29bd2a(0x18d)]()),_0x5c4380[_0x29bd2a(0x1b4)](_0x29bd2a(0x10d),_0x1c4f10=>{const _0xda1b6b=_0x29bd2a;_0x1c4f10['stopPropagation']();if(_0x11b51c['isActiveFor'](this['nodeId']))return;const _0x4d9ec3=this['_getActivePreviewVideoEl']();if(!_0x4d9ec3)return;this['_toggleVideoPlayPause'](_0x4d9ec3,{'loop':_0x1c4f10[_0xda1b6b(0x144)]===!![]}),this['_syncVideoControlsFromVideo'](_0x4d9ec3);});const _0x438046=_0x1a9ee0=>{const _0x44d5e6=_0x29bd2a;if(!this[_0x44d5e6(0x167)])return 0x0;const _0x3783e3=this[_0x44d5e6(0x167)]['getBoundingClientRect'](),_0x24a799=_0x3783e3[_0x44d5e6(0x1bd)]||0x0;if(!_0x24a799)return 0x0;const _0x5f3c53=_0x1a9ee0[_0x44d5e6(0x1b2)]-_0x3783e3[_0x44d5e6(0x186)];if(!Number['isFinite'](_0x5f3c53))return 0x0;return Math[_0x44d5e6(0x169)](0x0,Math[_0x44d5e6(0x19c)](0x1,_0x5f3c53/_0x24a799));},_0x421745=_0x116487=>{const _0x143072=_0x29bd2a;if(this['_progressFillEl'])this[_0x143072(0x128)][_0x143072(0x1bb)][_0x143072(0x1bd)]=_0x116487*0x64+'%';const _0x2d55c8=this[_0x143072(0x1c9)](),_0x5877e1=this[_0x143072(0x13c)](_0x2d55c8);this[_0x143072(0x164)]&&_0x5877e1>0x0&&(this[_0x143072(0x164)][_0x143072(0x175)]=this['_fmtVideoTime'](_0x116487*_0x5877e1));},_0x4c504d=_0x30e57f=>{const _0x2a5537=_0x29bd2a,_0xf059fc=this[_0x2a5537(0x1c9)]();this[_0x2a5537(0x174)](_0xf059fc,_0x30e57f);};_0x2adf5f[_0x29bd2a(0x1b4)](_0x29bd2a(0x181),_0x308037=>{const _0xe5704a=_0x29bd2a;_0x308037['stopPropagation'](),_0x308037[_0xe5704a(0x182)]();if(_0x11b51c[_0xe5704a(0x135)](this[_0xe5704a(0x1b8)]))return;const _0x56f9c4=this[_0xe5704a(0x1c9)]();if(!_0x56f9c4)return;const _0x2218ca=!!String(_0x56f9c4['getAttribute'](_0xe5704a(0x1a4))||'')['trim']();this[_0xe5704a(0x1d2)]=!![],this['_isManualLoopPlayback']=![],_0x56f9c4[_0xe5704a(0x196)]=![],this[_0xe5704a(0x14c)]++,this[_0xe5704a(0x133)]=!![],_0x56f9c4[_0xe5704a(0x1cf)]();if(!_0x2218ca){this[_0xe5704a(0x194)](_0x56f9c4)[_0xe5704a(0x126)](_0x2fd41a=>{if(!_0x2fd41a)return;const _0x20a4e1=_0x438046(_0x308037);_0x421745(_0x20a4e1),_0x4c504d(_0x20a4e1);});return;}this['_isProgressDragging']=!![];const _0x1ae6ce=_0x438046(_0x308037);_0x421745(_0x1ae6ce),_0x4c504d(_0x1ae6ce);const _0x175954=_0x1242e4=>{const _0x67f590=_0x438046(_0x1242e4);_0x421745(_0x67f590),_0x4c504d(_0x67f590);},_0x8dc115=_0x2193c0=>{const _0x58c154=_0xe5704a;_0x2193c0[_0x58c154(0x18d)](),this['_isProgressDragging']=![],window[_0x58c154(0x19d)](_0x58c154(0x11c),_0x175954,!![]),window['removeEventListener']('pointerup',_0x8dc115,!![]);const _0x5a34f8=this['_getActivePreviewVideoEl']();this[_0x58c154(0x129)](_0x5a34f8);};window[_0xe5704a(0x1b4)](_0xe5704a(0x11c),_0x175954,!![]),window[_0xe5704a(0x1b4)]('pointerup',_0x8dc115,!![]);}),_0x34d800['addEventListener']('click',_0x5ea6ae=>{const _0x264f3e=_0x29bd2a;_0x5ea6ae['stopPropagation']();if(_0x11b51c[_0x264f3e(0x135)](this[_0x264f3e(0x1b8)]))return;void this[_0x264f3e(0x1a6)]();}),this['previewEl'][_0x29bd2a(0x1c8)](_0x1b5c57),this[_0x29bd2a(0x106)]=_0x1b5c57,this[_0x29bd2a(0x1aa)]=_0x5c4380,this[_0x29bd2a(0x164)]=_0xb19887,this[_0x29bd2a(0x1a0)]=_0x46ceff,this['_progressBarEl']=_0x2adf5f,this[_0x29bd2a(0x128)]=_0x2d1bac,this[_0x29bd2a(0x14a)]=_0x34d800,this[_0x29bd2a(0x159)](!![]);}this[_0x29bd2a(0x1a9)](!this[_0x29bd2a(0x190)]);}['_setVideoOverlaysVisible'](_0x2dfe53){const _0x344519=_0x31f4d1,_0x458fbf=_0x239343[_0x344519(0x116)]()[_0x344519(0x1b6)]?.[this[_0x344519(0x1b8)]]||this[_0x344519(0x134)]||{},_0x364327=!!_0x458fbf['isVideosExpanded'],_0x35dc06=!!_0x2dfe53&&!_0x364327&&!_0x11b51c[_0x344519(0x135)](this[_0x344519(0x1b8)]);if(this['_muteBtnEl'])this[_0x344519(0x1c0)][_0x344519(0x1bb)]['display']=_0x35dc06?_0x344519(0x118):'none';if(this[_0x344519(0x1c1)])this[_0x344519(0x1c1)]['style']['display']=_0x35dc06?_0x344519(0x118):_0x344519(0x10e);if(this[_0x344519(0x106)])this[_0x344519(0x106)][_0x344519(0x1bb)]['display']=_0x35dc06?_0x344519(0x118):_0x344519(0x10e);if(_0x35dc06)this['_syncVideoControlsFromVideo'](this[_0x344519(0x1c9)]());}['_syncMuteBtnIconImpl'](){const _0x139cbb=_0x31f4d1;if(!this[_0x139cbb(0x10a)]||!this[_0x139cbb(0x1ba)])return;this[_0x139cbb(0x10a)]['style'][_0x139cbb(0x11a)]=this[_0x139cbb(0x11f)]?'':_0x139cbb(0x10e),this[_0x139cbb(0x1ba)][_0x139cbb(0x1bb)][_0x139cbb(0x11a)]=this[_0x139cbb(0x11f)]?_0x139cbb(0x10e):'';}['_syncMutedStateFromNodeData'](_0x47473b=this[_0x31f4d1(0x134)]){const _0x7620ae=_0x31f4d1;this[_0x7620ae(0x11f)]=resolveVideoMutedPreference(_0x47473b),this[_0x7620ae(0x1ae)](),this[_0x7620ae(0x191)]();}['_setPreviewMuted'](_0x243296,{persist:persist=![]}={}){const _0x28609=_0x31f4d1;this[_0x28609(0x11f)]=!!_0x243296;if(!persist)return;const _0x7cc7bb=_0x239343[_0x28609(0x116)]()[_0x28609(0x1b6)]?.[this[_0x28609(0x1b8)]]||this[_0x28609(0x134)]||{},_0x474246=buildVideoMutedPatch(_0x7cc7bb,this['_isMuted']);if(!_0x474246||typeof _0x239343[_0x28609(0x173)]!=='function')return;_0x239343[_0x28609(0x173)](this[_0x28609(0x1b8)],_0x474246),this[_0x28609(0x134)]={..._0x7cc7bb,..._0x474246};}[_0x31f4d1(0x1ae)](){const _0x431885=_0x31f4d1;if(!this[_0x431885(0x1be)])return;const _0x2ca679=this[_0x431885(0x134)]&&Number[_0x431885(0x109)](Number(this[_0x431885(0x134)][_0x431885(0x14f)]))?Number(this[_0x431885(0x134)]['mainVideoIndex']):Number['isFinite'](Number(this[_0x431885(0x199)]))?Number(this[_0x431885(0x199)]):0x0,_0x1886d9=Math[_0x431885(0x169)](0x0,Math[_0x431885(0x153)](_0x2ca679)),_0x5d3ffb=Array[_0x431885(0x1b9)](this[_0x431885(0x176)])&&this[_0x431885(0x176)]['length']>0x0;if(_0x5d3ffb){for(let _0x262f0d=0x0;_0x262f0d<this[_0x431885(0x176)][_0x431885(0x10c)];_0x262f0d++){const _0x1f3908=this[_0x431885(0x176)][_0x262f0d];if(!_0x1f3908)continue;_0x1f3908['muted']=_0x262f0d===_0x1886d9?!!this[_0x431885(0x11f)]:!![];}this['_expandPanel']&&this['_expandPanel'][_0x431885(0x13e)](_0x431885(0x198))['forEach'](_0x3204ee=>{const _0x5db2f1=_0x431885;_0x3204ee[_0x5db2f1(0x112)]=!![];});return;}this['previewEl'][_0x431885(0x13e)](_0x431885(0x198))[_0x431885(0x107)](_0x33d082=>{const _0x225aba=_0x431885;_0x33d082[_0x225aba(0x112)]=!!this['_isMuted'];});}[_0x31f4d1(0x13d)](_0x33417d){const _0x433e42=_0x31f4d1;if(!this[_0x433e42(0x168)])return;const _0x245a6a=document['createElementNS'](_0x433e42(0x142),_0x433e42(0x1af));_0x245a6a[_0x433e42(0x10b)](_0x433e42(0x1bd),'28'),_0x245a6a[_0x433e42(0x10b)](_0x433e42(0x13f),'28'),_0x245a6a[_0x433e42(0x10b)](_0x433e42(0x1d3),_0x433e42(0x15e)),_0x245a6a[_0x433e42(0x10b)](_0x433e42(0x12c),_0x433e42(0x1a1)),_0x245a6a[_0x433e42(0x1bb)][_0x433e42(0x180)]=_0x433e42(0x172),_0x33417d===_0x433e42(0x12e)?_0x245a6a['innerHTML']=_0x433e42(0x18b):_0x245a6a['innerHTML']=_0x433e42(0x120),this[_0x433e42(0x168)][_0x433e42(0x155)]='',this['_centerIndicatorInnerEl']['appendChild'](_0x245a6a);}[_0x31f4d1(0x19f)](){const _0x1c666c=_0x31f4d1;if(!this[_0x1c666c(0x168)])return;this[_0x1c666c(0x1a5)]&&(clearTimeout(this[_0x1c666c(0x1a5)]),this[_0x1c666c(0x1a5)]=null),this['_setCenterIndicatorIcon'](_0x1c666c(0x12e)),this['_centerIndicatorInnerEl'][_0x1c666c(0x1bb)][_0x1c666c(0x1a8)]='1',this['_centerIndicatorInnerEl'][_0x1c666c(0x1bb)]['transform']=_0x1c666c(0x1ad);}[_0x31f4d1(0x18f)](){const _0x4585e6=_0x31f4d1;if(!this[_0x4585e6(0x168)])return;this[_0x4585e6(0x1a5)]&&(clearTimeout(this[_0x4585e6(0x1a5)]),this[_0x4585e6(0x1a5)]=null),this[_0x4585e6(0x168)]['style'][_0x4585e6(0x1a8)]='0',this[_0x4585e6(0x168)][_0x4585e6(0x1bb)][_0x4585e6(0x1bc)]=_0x4585e6(0x114);}['_flashCenterIndicator'](_0x3952ba){const _0x19fd47=_0x31f4d1;if(!this[_0x19fd47(0x168)])return;this[_0x19fd47(0x1a5)]&&(clearTimeout(this[_0x19fd47(0x1a5)]),this[_0x19fd47(0x1a5)]=null),this[_0x19fd47(0x13d)](_0x3952ba),this[_0x19fd47(0x168)][_0x19fd47(0x1bb)][_0x19fd47(0x1a8)]='1',this[_0x19fd47(0x168)][_0x19fd47(0x1bb)][_0x19fd47(0x1bc)]='scale(1)',this[_0x19fd47(0x1a5)]=setTimeout(()=>{const _0x11466b=_0x19fd47;if(!this[_0x11466b(0x168)])return;if(_0x3952ba===_0x11466b(0x1cf))this[_0x11466b(0x19f)]();else this[_0x11466b(0x18f)]();this[_0x11466b(0x1a5)]=null;},0x208);}[_0x31f4d1(0x1c9)](){const _0x16142c=_0x31f4d1,_0x43ab36=this[_0x16142c(0x134)]&&Number['isFinite'](Number(this[_0x16142c(0x134)][_0x16142c(0x14f)]))?Number(this[_0x16142c(0x134)][_0x16142c(0x14f)]):Number[_0x16142c(0x109)](Number(this['_lastMainIdx']))?Number(this[_0x16142c(0x199)]):0x0,_0x256b32=Math[_0x16142c(0x169)](0x0,Math[_0x16142c(0x153)](_0x43ab36));if(Array[_0x16142c(0x1b9)](this[_0x16142c(0x176)])&&this[_0x16142c(0x176)]['length']>0x0)return this[_0x16142c(0x176)][_0x256b32]||this[_0x16142c(0x176)][0x0]||this[_0x16142c(0x183)]||null;return this['videoEl']||null;}[_0x31f4d1(0x188)](_0x22381f,_0x5e8b07={}){const _0x7c830b=_0x31f4d1;if(!_0x22381f)return;const _0x9c6e0f=_0x5e8b07?.[_0x7c830b(0x196)]===!![];this['_isManualControl']=!![],this[_0x7c830b(0x14c)]++;const _0x2a0336=!!String(_0x22381f[_0x7c830b(0x13a)](_0x7c830b(0x1a4))||'')['trim']();if(_0x22381f[_0x7c830b(0x154)]){this['_hoverManualPause']=![],this['_isManualLoopPlayback']=_0x9c6e0f,_0x22381f[_0x7c830b(0x196)]=_0x9c6e0f;if(typeof this[_0x7c830b(0x12f)]==='function'){void this[_0x7c830b(0x12f)](_0x22381f,{'reason':'manual','shouldContinue':()=>this['_isManualControl']===!![]})['then'](_0x3f207d=>{const _0x3fcec6=_0x7c830b;if(!_0x3f207d){this[_0x3fcec6(0x193)]=![],_0x22381f[_0x3fcec6(0x196)]=![];return;}this[_0x3fcec6(0x1d0)](_0x3fcec6(0x12e)),this[_0x3fcec6(0x129)](_0x22381f);});return;}if(!_0x2a0336){this[_0x7c830b(0x194)](_0x22381f)[_0x7c830b(0x126)](_0x1e2437=>{const _0x2e1056=_0x7c830b;if(!_0x1e2437){this[_0x2e1056(0x193)]=![],_0x22381f['loop']=![];return;}const _0x3ba625=_0x22381f[_0x2e1056(0x12e)]();_0x3ba625&&typeof _0x3ba625['catch']===_0x2e1056(0x1b7)&&_0x3ba625[_0x2e1056(0x17c)](()=>{const _0x30e387=_0x2e1056;this[_0x30e387(0x193)]=![],_0x22381f[_0x30e387(0x196)]=![];}),this[_0x2e1056(0x1d0)](_0x2e1056(0x12e)),this['_syncVideoControlsFromVideo'](_0x22381f);});return;}const _0x3a7b5e=_0x22381f['play']();_0x3a7b5e&&typeof _0x3a7b5e[_0x7c830b(0x17c)]===_0x7c830b(0x1b7)&&_0x3a7b5e['catch'](()=>{const _0x1b32e4=_0x7c830b;this[_0x1b32e4(0x193)]=![],_0x22381f[_0x1b32e4(0x196)]=![];}),this[_0x7c830b(0x1d0)](_0x7c830b(0x12e)),this[_0x7c830b(0x129)](_0x22381f);}else this[_0x7c830b(0x133)]=!![],this[_0x7c830b(0x193)]=![],_0x22381f['loop']=![],_0x22381f['pause'](),this[_0x7c830b(0x19f)](),this[_0x7c830b(0x129)](_0x22381f);}[_0x31f4d1(0x159)](_0x2d773a){const _0x1ad30b=_0x31f4d1;if(!this[_0x1ad30b(0x1aa)])return;this[_0x1ad30b(0x1aa)]['replaceChildren']();const _0x5c398a='http://www.w3.org/2000/svg',_0x340af6=document[_0x1ad30b(0x16b)](_0x5c398a,_0x1ad30b(0x1af));_0x340af6[_0x1ad30b(0x10b)](_0x1ad30b(0x1bd),'16'),_0x340af6[_0x1ad30b(0x10b)]('height','16'),_0x340af6[_0x1ad30b(0x10b)]('viewBox',_0x1ad30b(0x15e)),_0x340af6['setAttribute'](_0x1ad30b(0x12c),_0x1ad30b(0x1a1));if(_0x2d773a){const _0x293cef=document[_0x1ad30b(0x16b)](_0x5c398a,_0x1ad30b(0x1c7));_0x293cef[_0x1ad30b(0x10b)]('points',_0x1ad30b(0x1c4)),_0x340af6[_0x1ad30b(0x1c8)](_0x293cef);}else{const _0x50d5e2=document['createElementNS'](_0x5c398a,_0x1ad30b(0x17e));_0x50d5e2[_0x1ad30b(0x10b)]('x','6'),_0x50d5e2['setAttribute']('y','4'),_0x50d5e2[_0x1ad30b(0x10b)](_0x1ad30b(0x1bd),'4'),_0x50d5e2[_0x1ad30b(0x10b)](_0x1ad30b(0x13f),'16');const _0x4f8482=document[_0x1ad30b(0x16b)](_0x5c398a,_0x1ad30b(0x17e));_0x4f8482[_0x1ad30b(0x10b)]('x','14'),_0x4f8482[_0x1ad30b(0x10b)]('y','4'),_0x4f8482[_0x1ad30b(0x10b)]('width','4'),_0x4f8482[_0x1ad30b(0x10b)](_0x1ad30b(0x13f),'16'),_0x340af6['appendChild'](_0x50d5e2),_0x340af6[_0x1ad30b(0x1c8)](_0x4f8482);}this[_0x1ad30b(0x1aa)][_0x1ad30b(0x1c8)](_0x340af6);}[_0x31f4d1(0x1c5)](_0x32893a){const _0x876567=_0x31f4d1,_0x4a1f38=Number(_0x32893a);if(!Number[_0x876567(0x109)](_0x4a1f38)||_0x4a1f38<=0x0)return _0x876567(0x119);return Math[_0x876567(0x108)](_0x4a1f38/0x3c)+':'+String(Math[_0x876567(0x108)](_0x4a1f38%0x3c))['padStart'](0x2,'0');}[_0x31f4d1(0x13c)](_0x273d50){const _0x1920a8=_0x31f4d1;if(_0x273d50){const _0x2851f8=Number(_0x273d50[_0x1920a8(0x1ce)]);if(Number[_0x1920a8(0x109)](_0x2851f8)&&_0x2851f8>0x0)return _0x2851f8;const _0x287b27=_0x273d50[_0x1920a8(0x162)];if(_0x287b27&&_0x287b27[_0x1920a8(0x10c)]){const _0x6536d8=Number(_0x287b27[_0x1920a8(0x19a)](_0x287b27['length']-0x1));if(Number['isFinite'](_0x6536d8)&&_0x6536d8>0x0)return _0x6536d8;}}const _0x2f0641=Number(this[_0x1920a8(0x134)]?.[_0x1920a8(0x171)]);if(Number[_0x1920a8(0x109)](_0x2f0641)&&_0x2f0641>0x0)return _0x2f0641;return 0x0;}[_0x31f4d1(0x129)](_0x2aac8e){const _0xe156e1=_0x31f4d1;if(!this[_0xe156e1(0x106)]||!this[_0xe156e1(0x1aa)]||!this[_0xe156e1(0x128)])return;const _0x338302=_0x2aac8e||this['_getActivePreviewVideoEl']();if(!_0x338302){this[_0xe156e1(0x159)](!![]),this[_0xe156e1(0x128)][_0xe156e1(0x1bb)]['width']='0%';if(this[_0xe156e1(0x164)])this[_0xe156e1(0x164)][_0xe156e1(0x175)]=_0xe156e1(0x119);if(this[_0xe156e1(0x1a0)])this[_0xe156e1(0x1a0)][_0xe156e1(0x175)]=_0xe156e1(0x119);return;}const _0x50a10c=this[_0xe156e1(0x13c)](_0x338302),_0x417fa8=Math[_0xe156e1(0x169)](0x0,Number(_0x338302[_0xe156e1(0x17a)])||0x0),_0xf71913=_0x50a10c>0x0?Math[_0xe156e1(0x169)](0x0,Math[_0xe156e1(0x19c)](0x1,_0x417fa8/_0x50a10c)):0x0;if(!this[_0xe156e1(0x117)]&&!this[_0xe156e1(0x136)]){this[_0xe156e1(0x128)][_0xe156e1(0x1bb)][_0xe156e1(0x1bd)]=_0xf71913*0x64+'%';if(this[_0xe156e1(0x164)])this[_0xe156e1(0x164)][_0xe156e1(0x175)]=this[_0xe156e1(0x1c5)](_0x417fa8);}if(this['_timeTotalEl'])this['_timeTotalEl'][_0xe156e1(0x175)]=this[_0xe156e1(0x1c5)](_0x50a10c);this['_updatePlayIcon'](!!_0x338302[_0xe156e1(0x154)]);}['_seekActiveVideoByPos'](_0x37b024,_0x15d232){const _0xb39570=_0x31f4d1,_0x179671=_0x37b024||this[_0xb39570(0x1c9)]();if(!_0x179671)return;const _0x5be06b=this[_0xb39570(0x13c)](_0x179671);if(!Number[_0xb39570(0x109)](_0x5be06b)||_0x5be06b<=0x0)return;const _0x521f67=Math[_0xb39570(0x169)](0x0,Math['min'](0x1,Number(_0x15d232)||0x0)),_0x3fe0c1=_0x521f67*_0x5be06b;this['_isProgressSeeking']=!![];const _0x418fbd=++this['_progressSeekToken'];_0x179671[_0xb39570(0x17a)]=_0x3fe0c1;if(this[_0xb39570(0x128)])this[_0xb39570(0x128)][_0xb39570(0x1bb)]['width']=_0x521f67*0x64+'%';if(this[_0xb39570(0x164)])this[_0xb39570(0x164)][_0xb39570(0x175)]=this[_0xb39570(0x1c5)](_0x3fe0c1);queueMicrotask(()=>{if(_0x418fbd!==this['_progressSeekToken'])return;this['_isProgressSeeking']=![],this['_syncVideoControlsFromVideo'](_0x179671);});}async[_0x31f4d1(0x1a6)](){const _0x2980bf=_0x31f4d1,_0x3d01e3=this[_0x2980bf(0x1c9)]();if(!_0x3d01e3)return;if(!getVideoFrameSource(_0x3d01e3)){const _0x48154=await this[_0x2980bf(0x194)](_0x3d01e3);if(!_0x48154){window[_0x2980bf(0x127)]?.(previewControlsText(_0x2980bf(0x149)),_0x2980bf(0x163));return;}}if(!isVideoFrameReady(_0x3d01e3)){const _0xe89bfc=await waitForVideoFrame(_0x3d01e3);if(!_0xe89bfc){window[_0x2980bf(0x127)]?.(previewControlsText(_0x2980bf(0x149)),_0x2980bf(0x163));return;}}const _0x31709b=_0x3d01e3[_0x2980bf(0x156)]||0x0,_0x46673f=_0x3d01e3[_0x2980bf(0x132)]||0x0;if(!_0x31709b||!_0x46673f)return;let _0x9f93f3=null;try{_0x9f93f3=await captureVideoFrameSnapshot(_0x3d01e3,{'fileNamePrefix':_0x2980bf(0x1b5)});}catch(_0x419ef5){console[_0x2980bf(0x1cc)]('[AIGenVideoNode]\x20capture\x20frame\x20failed:',_0x419ef5),window[_0x2980bf(0x127)]?.(previewControlsText(_0x2980bf(0x178)),_0x2980bf(0x1b0));return;}if(!_0x9f93f3?.[_0x2980bf(0x177)])return;const _0xcf4e44=_0x239343[_0x2980bf(0x116)]()[_0x2980bf(0x1b6)][this[_0x2980bf(0x1b8)]];if(!_0xcf4e44)return;const _0xa3b57c=Number(_0xcf4e44[_0x2980bf(0x1c3)]),_0x5107b8=Number(_0xcf4e44['videoFrameCount']),_0x2ad1c7=Number(_0xcf4e44['videoDuration'])>0x0?Number(_0xcf4e44[_0x2980bf(0x171)]):this['_getActiveVideoDuration'](_0x3d01e3),_0x35f0b5=Number['isFinite'](_0xa3b57c)&&_0xa3b57c>0x0?_0xa3b57c:Number[_0x2980bf(0x109)](_0x5107b8)&&_0x5107b8>0x0&&Number[_0x2980bf(0x109)](_0x2ad1c7)&&_0x2ad1c7>0x0?_0x5107b8/_0x2ad1c7:0x0;let _0x108933=0x0;if(Number[_0x2980bf(0x109)](_0x35f0b5)&&_0x35f0b5>0x0)_0x108933=Math['floor'](Math[_0x2980bf(0x169)](0x0,Number(_0x3d01e3[_0x2980bf(0x17a)])||0x0)*_0x35f0b5)+0x1,Number[_0x2980bf(0x109)](_0x5107b8)&&_0x5107b8>0x0?_0x108933=Math[_0x2980bf(0x169)](0x1,Math[_0x2980bf(0x19c)](Math[_0x2980bf(0x124)](_0x5107b8),_0x108933)):_0x108933=Math['max'](0x1,_0x108933);else{const _0x32016d=Math[_0x2980bf(0x169)](0x1,Math['floor'](Number(_0xcf4e44[_0x2980bf(0x19b)])||0x0)+0x1);_0x108933=_0x32016d,_0x239343[_0x2980bf(0x173)](this[_0x2980bf(0x1b8)],{'snapSeq':_0x32016d});const _0x4fe063=Array[_0x2980bf(0x1b9)](_0xcf4e44[_0x2980bf(0x14d)])&&_0xcf4e44[_0x2980bf(0x14d)][Math['max'](0x0,Number(_0xcf4e44[_0x2980bf(0x14f)])||0x0)]||(Array[_0x2980bf(0x1b9)](_0xcf4e44[_0x2980bf(0x14d)])?_0xcf4e44['videos'][0x0]:null)||_0xcf4e44,_0x54155f=this[_0x2980bf(0x148)](_0x4fe063);if(_0x54155f)this[_0x2980bf(0x152)](_0x54155f);}const _0x101d09=_0x323bfe(_0x31709b,_0x46673f),_0x492461=_0x231b5b(_0x239343['getState']()[_0x2980bf(0x1b6)],_0xcf4e44,_0x101d09[_0x2980bf(0x1bd)],_0x101d09[_0x2980bf(0x13f)]),_0x4b773e=_0x2980bf(0x19e)+Date[_0x2980bf(0x111)](),_0x2aee8a=createCapturePreviewUrl(_0x9f93f3[_0x2980bf(0x177)]);_0x239343[_0x2980bf(0x137)](_0x424437({'id':_0x4b773e,'type':_0x2980bf(0x11e),'name':previewControlsText(_0x2980bf(0x15a),{'frameIndex':_0x108933}),'capturePreviewUrl':_0x2aee8a,'captureSavePending':!![],'captureSaveError':null,'originalWidth':_0x9f93f3[_0x2980bf(0x1b1)],'originalHeight':_0x9f93f3[_0x2980bf(0x1c2)],'fileName':_0x9f93f3[_0x2980bf(0x17b)],'x':_0x492461['x'],'y':_0x492461['y'],'width':_0x101d09[_0x2980bf(0x1bd)],'height':_0x101d09[_0x2980bf(0x13f)],'needsAutoResize':![]})),saveVideoFrameSnapshot(_0x9f93f3,_0x2a722b)[_0x2980bf(0x126)](_0x33b1a9=>{const _0x4a3902=_0x2980bf;if(!_0x239343['getStateRaw']()[_0x4a3902(0x1b6)]?.[_0x4b773e])return;_0x239343[_0x4a3902(0x173)](_0x4b773e,{'src':_0x33b1a9[_0x4a3902(0x1a4)],'localPath':_0x33b1a9[_0x4a3902(0x1ca)],'originalLocalPath':_0x33b1a9[_0x4a3902(0x12b)],'displayLocalPath':_0x33b1a9[_0x4a3902(0x121)],'thumbLocalPath':_0x33b1a9['thumbLocalPath'],'originalWidth':_0x33b1a9[_0x4a3902(0x1b1)],'originalHeight':_0x33b1a9[_0x4a3902(0x1c2)],'fileName':_0x33b1a9[_0x4a3902(0x17b)],'captureSavePending':![],'captureSaveError':null});})[_0x2980bf(0x17c)](_0x404f92=>{const _0x10f0dd=_0x2980bf,_0x3387eb=String(_0x404f92?.[_0x10f0dd(0x165)]||previewControlsText(_0x10f0dd(0x10f)));console[_0x10f0dd(0x1cc)](_0x10f0dd(0x16d),_0x404f92),_0x239343[_0x10f0dd(0x110)]()[_0x10f0dd(0x1b6)]?.[_0x4b773e]&&_0x239343[_0x10f0dd(0x173)](_0x4b773e,{'captureSavePending':![],'captureSaveError':_0x3387eb}),window['showToast']?.(previewControlsText(_0x10f0dd(0x11b)),_0x10f0dd(0x122));});}}return _0x5558ca[_0x31f4d1(0x14b)];}
+import {
+  captureVideoFrameSnapshot,
+  getVideoFrameSource,
+  isVideoFrameReady,
+  saveVideoFrameSnapshot,
+  waitForVideoFrame,
+} from '../videoFrameCapture.js';
+import { t } from '../../i18n/index.js';
+import { buildVideoMutedPatch, resolveVideoMutedPreference } from './videoMuteState.js';
+function previewControlsText(_0x5dee15, _0x231605 = {}) {
+  return t(_0x5dee15, _0x231605);
+}
+function createCapturePreviewUrl(_0x343fcc) {
+  const _0x1af522 = globalThis.window?.URL || globalThis.URL;
+  if (!_0x343fcc || typeof _0x1af522?.createObjectURL !== 'function') return '';
+  try {
+    return _0x1af522.createObjectURL(_0x343fcc);
+  } catch {
+    return '';
+  }
+}
+export function createVideoNodePreviewControlsModule(_0xf6b3e) {
+  const {
+    store: _0x239343,
+    saveOutputBlob: _0x2a722b,
+    VideoKeyingController: _0x11b51c,
+    getAutoMediaSizeByShortSide: _0x323bfe,
+    buildSourceMediaNodePayload: _0x424437,
+    calcSafeSpawnPosNearNode: _0x231b5b,
+  } = _0xf6b3e;
+  class _0x5558ca {
+    ['_ensurePreviewVideoOverlays']() {
+      if (!this.previewEl) return;
+      this._syncMutedStateFromNodeData(this._data);
+      if (!this._muteBtnEl) {
+        const _0x4d4f4d = document.createElement('div');
+        ((_0x4d4f4d.className = 'video-mute-btn'),
+          (_0x4d4f4d.title = previewControlsText('sourceVideoNode.controls.toggleMute')),
+          Object.assign(_0x4d4f4d.style, {
+            position: 'absolute',
+            top: '12px',
+            left: '12px',
+            background: 'var(--media-control-button-bg)',
+            borderRadius: '50%',
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--media-control-button-text)',
+            cursor: 'pointer',
+            zIndex: '12',
+            backdropFilter: 'blur(var(--media-control-blur))',
+            userSelect: 'none',
+          }));
+        const _0x1cbb76 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        (_0x1cbb76.setAttribute('width', '16'),
+          _0x1cbb76.setAttribute('height', '16'),
+          _0x1cbb76.setAttribute('viewBox', '0 0 24 24'),
+          _0x1cbb76.setAttribute('fill', 'none'),
+          _0x1cbb76.setAttribute('stroke', 'currentColor'),
+          _0x1cbb76.setAttribute('stroke-width', '2'),
+          _0x1cbb76.classList.add('icon-unmuted'),
+          (_0x1cbb76.innerHTML =
+            '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>'));
+        const _0x2ecb78 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        (_0x2ecb78.setAttribute('width', '16'),
+          _0x2ecb78.setAttribute('height', '16'),
+          _0x2ecb78.setAttribute('viewBox', '0 0 24 24'),
+          _0x2ecb78.setAttribute('fill', 'none'),
+          _0x2ecb78.setAttribute('stroke', 'currentColor'),
+          _0x2ecb78.setAttribute('stroke-width', '2'),
+          _0x2ecb78.classList.add('icon-muted'),
+          (_0x2ecb78.innerHTML =
+            '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="1" x2="1" y2="23"></line><line x1="15.54" y1="8.46" x2="19.07" y2="12"></line>'),
+          _0x4d4f4d.appendChild(_0x1cbb76),
+          _0x4d4f4d.appendChild(_0x2ecb78),
+          _0x4d4f4d.addEventListener('pointerdown', (_0x4dfd7f) => _0x4dfd7f.stopPropagation()),
+          _0x4d4f4d.addEventListener('click', (_0x3c1fa7) => {
+            (_0x3c1fa7.stopPropagation(),
+              this._setPreviewMuted(!this._isMuted, { persist: true }),
+              this._applyMuteStateToPreviewVideos(),
+              this._syncMuteBtnIcon());
+          }),
+          this.previewEl.appendChild(_0x4d4f4d),
+          (this._muteBtnEl = _0x4d4f4d),
+          (this._muteIconUnmutedEl = _0x1cbb76),
+          (this._muteIconMutedEl = _0x2ecb78),
+          this._syncMuteBtnIcon());
+      }
+      if (!this._centerIndicatorEl) {
+        const _0x322f55 = document.createElement('div');
+        ((_0x322f55.className = 'gen-video-center-indicator'),
+          Object.assign(_0x322f55.style, {
+            position: 'absolute',
+            inset: '0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            zIndex: '11',
+          }));
+        const _0x301da8 = document.createElement('div');
+        (Object.assign(_0x301da8.style, {
+          width: '64px',
+          height: '64px',
+          borderRadius: '18px',
+          background: 'var(--media-control-center-bg)',
+          border: '1px solid var(--media-control-center-border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--media-control-button-text)',
+          opacity: '0',
+          transform: 'scale(0.92)',
+          transition: 'opacity 0.18s ease, transform 0.18s ease',
+        }),
+          _0x322f55.appendChild(_0x301da8),
+          this.previewEl.appendChild(_0x322f55),
+          (this._centerIndicatorEl = _0x322f55),
+          (this._centerIndicatorInnerEl = _0x301da8));
+      }
+      if (!this._controlsEl) {
+        const _0x1b5c57 = document.createElement('div');
+        ((_0x1b5c57.className = 'video-controls'),
+          Object.assign(_0x1b5c57.style, {
+            position: 'absolute',
+            bottom: '0',
+            left: '0',
+            width: '100%',
+            padding: '16px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            background: 'var(--media-control-overlay-bg)',
+            zIndex: '12',
+            opacity: '1',
+            transition: 'opacity 0.2s',
+          }));
+        const _0x5c4380 = document.createElement('div');
+        ((_0x5c4380.className = 'video-play-btn'),
+          Object.assign(_0x5c4380.style, {
+            cursor: 'pointer',
+            color: 'var(--media-control-button-text)',
+            display: 'flex',
+            alignItems: 'center',
+          }));
+        const _0xb19887 = document.createElement('span');
+        ((_0xb19887.className = 'video-time-current'),
+          Object.assign(_0xb19887.style, {
+            color: 'var(--media-control-time-text)',
+            fontSize: '12px',
+            fontVariantNumeric: 'tabular-nums',
+          }),
+          (_0xb19887.textContent = '0:00'));
+        const _0x2adf5f = document.createElement('div');
+        ((_0x2adf5f.className = 'media-progress-bar'),
+          Object.assign(_0x2adf5f.style, {
+            flex: '1',
+            height: '4px',
+            background: 'var(--media-control-progress-track)',
+            borderRadius: '2px',
+            cursor: 'pointer',
+            position: 'relative',
+          }));
+        const _0x2d1bac = document.createElement('div');
+        ((_0x2d1bac.className = 'media-progress-fill'),
+          Object.assign(_0x2d1bac.style, {
+            width: '0%',
+            height: '100%',
+            background: 'var(--media-control-progress-fill)',
+            borderRadius: '2px',
+            pointerEvents: 'none',
+            position: 'relative',
+          }));
+        const _0x55d8fb = document.createElement('div');
+        ((_0x55d8fb.className = 'media-progress-knob'),
+          Object.assign(_0x55d8fb.style, {
+            width: '10px',
+            height: '10px',
+            background: 'var(--media-control-progress-fill)',
+            borderRadius: '50%',
+            position: 'absolute',
+            right: '-5px',
+            top: '-3px',
+            boxShadow: '0 0 4px var(--media-control-knob-shadow)',
+          }),
+          _0x2d1bac.appendChild(_0x55d8fb),
+          _0x2adf5f.appendChild(_0x2d1bac));
+        const _0x46ceff = document.createElement('span');
+        ((_0x46ceff.className = 'video-time-total'),
+          Object.assign(_0x46ceff.style, {
+            color: 'var(--media-control-time-text)',
+            fontSize: '12px',
+            fontVariantNumeric: 'tabular-nums',
+          }),
+          (_0x46ceff.textContent = '0:00'));
+        const _0x34d800 = document.createElement('div');
+        ((_0x34d800.className = 'video-snap-btn'),
+          (_0x34d800.title = previewControlsText('sourceVideoNode.controls.captureFrame')),
+          Object.assign(_0x34d800.style, {
+            cursor: 'pointer',
+            color: 'var(--media-control-button-text)',
+            display: 'flex',
+            alignItems: 'center',
+          }),
+          (_0x34d800.innerHTML =
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>'),
+          _0x1b5c57.appendChild(_0x5c4380),
+          _0x1b5c57.appendChild(_0xb19887),
+          _0x1b5c57.appendChild(_0x2adf5f),
+          _0x1b5c57.appendChild(_0x46ceff),
+          _0x1b5c57.appendChild(_0x34d800),
+          _0x1b5c57.addEventListener('pointerdown', (_0x540c5a) => _0x540c5a.stopPropagation()),
+          _0x1b5c57.addEventListener('click', (_0x5bebee) => _0x5bebee.stopPropagation()),
+          _0x5c4380.addEventListener('click', (_0x1c4f10) => {
+            _0x1c4f10.stopPropagation();
+            if (_0x11b51c.isActiveFor(this.nodeId)) return;
+            const _0x4d9ec3 = this._getActivePreviewVideoEl();
+            if (!_0x4d9ec3) return;
+            (this._toggleVideoPlayPause(_0x4d9ec3, { loop: _0x1c4f10.altKey === true }),
+              this._syncVideoControlsFromVideo(_0x4d9ec3));
+          }));
+        const _0x438046 = (_0x1a9ee0) => {
+            if (!this._progressBarEl) return 0;
+            const _0x3783e3 = this._progressBarEl.getBoundingClientRect(),
+              _0x24a799 = _0x3783e3.width || 0;
+            if (!_0x24a799) return 0;
+            const _0x5f3c53 = _0x1a9ee0.clientX - _0x3783e3.left;
+            if (!Number.isFinite(_0x5f3c53)) return 0;
+            return Math.max(0, Math.min(1, _0x5f3c53 / _0x24a799));
+          },
+          _0x421745 = (_0x116487) => {
+            if (this._progressFillEl) this._progressFillEl.style.width = _0x116487 * 100 + '%';
+            const _0x2d55c8 = this._getActivePreviewVideoEl(),
+              _0x5877e1 = this._getActiveVideoDuration(_0x2d55c8);
+            this._timeCurrentEl &&
+              _0x5877e1 > 0 &&
+              (this._timeCurrentEl.textContent = this._fmtVideoTime(_0x116487 * _0x5877e1));
+          },
+          _0x4c504d = (_0x30e57f) => {
+            const _0xf059fc = this._getActivePreviewVideoEl();
+            this._seekActiveVideoByPos(_0xf059fc, _0x30e57f);
+          };
+        (_0x2adf5f.addEventListener('pointerdown', (_0x308037) => {
+          (_0x308037.stopPropagation(), _0x308037.preventDefault());
+          if (_0x11b51c.isActiveFor(this.nodeId)) return;
+          const _0x56f9c4 = this._getActivePreviewVideoEl();
+          if (!_0x56f9c4) return;
+          const _0x2218ca = !!String(_0x56f9c4.getAttribute('src') || '').trim();
+          ((this._isManualControl = true),
+            (this._isManualLoopPlayback = false),
+            (_0x56f9c4.loop = false),
+            this._autoPlayToken++,
+            (this._hoverManualPause = true),
+            _0x56f9c4.pause());
+          if (!_0x2218ca) {
+            this._ensureVideoSrcFor(_0x56f9c4).then((_0x2fd41a) => {
+              if (!_0x2fd41a) return;
+              const _0x20a4e1 = _0x438046(_0x308037);
+              (_0x421745(_0x20a4e1), _0x4c504d(_0x20a4e1));
+            });
+            return;
+          }
+          this._isProgressDragging = true;
+          const _0x1ae6ce = _0x438046(_0x308037);
+          (_0x421745(_0x1ae6ce), _0x4c504d(_0x1ae6ce));
+          const _0x175954 = (_0x1242e4) => {
+              const _0x67f590 = _0x438046(_0x1242e4);
+              (_0x421745(_0x67f590), _0x4c504d(_0x67f590));
+            },
+            _0x8dc115 = (_0x2193c0) => {
+              (_0x2193c0.stopPropagation(),
+                (this._isProgressDragging = false),
+                window.removeEventListener('pointermove', _0x175954, true),
+                window.removeEventListener('pointerup', _0x8dc115, true));
+              const _0x5a34f8 = this._getActivePreviewVideoEl();
+              this._syncVideoControlsFromVideo(_0x5a34f8);
+            };
+          (window.addEventListener('pointermove', _0x175954, true),
+            window.addEventListener('pointerup', _0x8dc115, true));
+        }),
+          _0x34d800.addEventListener('click', (_0x5ea6ae) => {
+            _0x5ea6ae.stopPropagation();
+            if (_0x11b51c.isActiveFor(this.nodeId)) return;
+            void this._captureCurrentFrameFromActiveVideo();
+          }),
+          this.previewEl.appendChild(_0x1b5c57),
+          (this._controlsEl = _0x1b5c57),
+          (this._playBtnEl = _0x5c4380),
+          (this._timeCurrentEl = _0xb19887),
+          (this._timeTotalEl = _0x46ceff),
+          (this._progressBarEl = _0x2adf5f),
+          (this._progressFillEl = _0x2d1bac),
+          (this._snapBtnEl = _0x34d800),
+          this._updatePlayIcon(true));
+      }
+      this._setVideoOverlaysVisible(!this.isNoResult);
+    }
+    ['_setVideoOverlaysVisible'](_0x2dfe53) {
+      const _0x458fbf = _0x239343.getState().nodes?.[this.nodeId] || this._data || {},
+        _0x364327 = !!_0x458fbf.isVideosExpanded,
+        _0x35dc06 = !!_0x2dfe53 && !_0x364327 && !_0x11b51c.isActiveFor(this.nodeId);
+      if (this._muteBtnEl) this._muteBtnEl.style.display = _0x35dc06 ? 'flex' : 'none';
+      if (this._centerIndicatorEl) this._centerIndicatorEl.style.display = _0x35dc06 ? 'flex' : 'none';
+      if (this._controlsEl) this._controlsEl.style.display = _0x35dc06 ? 'flex' : 'none';
+      if (_0x35dc06) this._syncVideoControlsFromVideo(this._getActivePreviewVideoEl());
+    }
+    ['_syncMuteBtnIconImpl']() {
+      if (!this._muteIconMutedEl || !this._muteIconUnmutedEl) return;
+      ((this._muteIconMutedEl.style.display = this._isMuted ? '' : 'none'),
+        (this._muteIconUnmutedEl.style.display = this._isMuted ? 'none' : ''));
+    }
+    ['_syncMutedStateFromNodeData'](_0x47473b = this._data) {
+      ((this._isMuted = resolveVideoMutedPreference(_0x47473b)),
+        this._applyMuteStateToPreviewVideos(),
+        this._syncMuteBtnIcon());
+    }
+    ['_setPreviewMuted'](_0x243296, { persist: persist = false } = {}) {
+      this._isMuted = !!_0x243296;
+      if (!persist) return;
+      const _0x7cc7bb = _0x239343.getState().nodes?.[this.nodeId] || this._data || {},
+        _0x474246 = buildVideoMutedPatch(_0x7cc7bb, this._isMuted);
+      if (!_0x474246 || typeof _0x239343.updateNodeData !== 'function') return;
+      (_0x239343.updateNodeData(this.nodeId, _0x474246), (this._data = { ..._0x7cc7bb, ..._0x474246 }));
+    }
+    ['_applyMuteStateToPreviewVideos']() {
+      if (!this.previewEl) return;
+      const _0x2ca679 =
+          this._data && Number.isFinite(Number(this._data.mainVideoIndex))
+            ? Number(this._data.mainVideoIndex)
+            : Number.isFinite(Number(this._lastMainIdx))
+              ? Number(this._lastMainIdx)
+              : 0,
+        _0x1886d9 = Math.max(0, Math.trunc(_0x2ca679)),
+        _0x5d3ffb = Array.isArray(this._multiLayerEls) && this._multiLayerEls.length > 0;
+      if (_0x5d3ffb) {
+        for (let _0x262f0d = 0; _0x262f0d < this._multiLayerEls.length; _0x262f0d++) {
+          const _0x1f3908 = this._multiLayerEls[_0x262f0d];
+          if (!_0x1f3908) continue;
+          _0x1f3908.muted = _0x262f0d === _0x1886d9 ? !!this._isMuted : true;
+        }
+        this._expandPanel &&
+          this._expandPanel.querySelectorAll('video').forEach((_0x3204ee) => {
+            _0x3204ee.muted = true;
+          });
+        return;
+      }
+      this.previewEl.querySelectorAll('video').forEach((_0x33d082) => {
+        _0x33d082.muted = !!this._isMuted;
+      });
+    }
+    ['_setCenterIndicatorIcon'](_0x33417d) {
+      if (!this._centerIndicatorInnerEl) return;
+      const _0x245a6a = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      (_0x245a6a.setAttribute('width', '28'),
+        _0x245a6a.setAttribute('height', '28'),
+        _0x245a6a.setAttribute('viewBox', '0 0 24 24'),
+        _0x245a6a.setAttribute('fill', 'currentColor'),
+        (_0x245a6a.style.color = 'var(--canvas-white)'),
+        _0x33417d === 'play'
+          ? (_0x245a6a.innerHTML = '<polygon points="6 4 20 12 6 20 6 4"></polygon>')
+          : (_0x245a6a.innerHTML =
+              '<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>'),
+        (this._centerIndicatorInnerEl.innerHTML = ''),
+        this._centerIndicatorInnerEl.appendChild(_0x245a6a));
+    }
+    ['_showPausedCenterIndicator']() {
+      if (!this._centerIndicatorInnerEl) return;
+      (this._centerIndicatorTimer &&
+        (clearTimeout(this._centerIndicatorTimer), (this._centerIndicatorTimer = null)),
+        this._setCenterIndicatorIcon('play'),
+        (this._centerIndicatorInnerEl.style.opacity = '1'),
+        (this._centerIndicatorInnerEl.style.transform = 'scale(1)'));
+    }
+    ['_hideCenterIndicator']() {
+      if (!this._centerIndicatorInnerEl) return;
+      (this._centerIndicatorTimer &&
+        (clearTimeout(this._centerIndicatorTimer), (this._centerIndicatorTimer = null)),
+        (this._centerIndicatorInnerEl.style.opacity = '0'),
+        (this._centerIndicatorInnerEl.style.transform = 'scale(0.92)'));
+    }
+    ['_flashCenterIndicator'](_0x3952ba) {
+      if (!this._centerIndicatorInnerEl) return;
+      (this._centerIndicatorTimer &&
+        (clearTimeout(this._centerIndicatorTimer), (this._centerIndicatorTimer = null)),
+        this._setCenterIndicatorIcon(_0x3952ba),
+        (this._centerIndicatorInnerEl.style.opacity = '1'),
+        (this._centerIndicatorInnerEl.style.transform = 'scale(1)'),
+        (this._centerIndicatorTimer = setTimeout(() => {
+          if (!this._centerIndicatorInnerEl) return;
+          if (_0x3952ba === 'pause') this._showPausedCenterIndicator();
+          else this._hideCenterIndicator();
+          this._centerIndicatorTimer = null;
+        }, 0x208)));
+    }
+    ['_getActivePreviewVideoEl']() {
+      const _0x43ab36 =
+          this._data && Number.isFinite(Number(this._data.mainVideoIndex))
+            ? Number(this._data.mainVideoIndex)
+            : Number.isFinite(Number(this._lastMainIdx))
+              ? Number(this._lastMainIdx)
+              : 0,
+        _0x256b32 = Math.max(0, Math.trunc(_0x43ab36));
+      if (Array.isArray(this._multiLayerEls) && this._multiLayerEls.length > 0)
+        return this._multiLayerEls[_0x256b32] || this._multiLayerEls[0] || this.videoEl || null;
+      return this.videoEl || null;
+    }
+    ['_toggleVideoPlayPause'](_0x22381f, _0x5e8b07 = {}) {
+      if (!_0x22381f) return;
+      const _0x9c6e0f = _0x5e8b07?.loop === true;
+      ((this._isManualControl = true), this._autoPlayToken++);
+      const _0x2a0336 = !!String(_0x22381f.getAttribute('src') || '').trim();
+      if (_0x22381f.paused) {
+        ((this._hoverManualPause = false),
+          (this._isManualLoopPlayback = _0x9c6e0f),
+          (_0x22381f.loop = _0x9c6e0f));
+        if (typeof this._playPreviewVideoWithRecovery === 'function') {
+          void this._playPreviewVideoWithRecovery(_0x22381f, {
+            reason: 'manual',
+            shouldContinue: () => this._isManualControl === true,
+          }).then((_0x3f207d) => {
+            if (!_0x3f207d) {
+              ((this._isManualLoopPlayback = false), (_0x22381f.loop = false));
+              return;
+            }
+            (this._flashCenterIndicator('play'), this._syncVideoControlsFromVideo(_0x22381f));
+          });
+          return;
+        }
+        if (!_0x2a0336) {
+          this._ensureVideoSrcFor(_0x22381f).then((_0x1e2437) => {
+            if (!_0x1e2437) {
+              ((this._isManualLoopPlayback = false), (_0x22381f.loop = false));
+              return;
+            }
+            const _0x3ba625 = _0x22381f.play();
+            (_0x3ba625 &&
+              typeof _0x3ba625.catch === 'function' &&
+              _0x3ba625.catch(() => {
+                ((this._isManualLoopPlayback = false), (_0x22381f.loop = false));
+              }),
+              this._flashCenterIndicator('play'),
+              this._syncVideoControlsFromVideo(_0x22381f));
+          });
+          return;
+        }
+        const _0x3a7b5e = _0x22381f.play();
+        (_0x3a7b5e &&
+          typeof _0x3a7b5e.catch === 'function' &&
+          _0x3a7b5e.catch(() => {
+            ((this._isManualLoopPlayback = false), (_0x22381f.loop = false));
+          }),
+          this._flashCenterIndicator('play'),
+          this._syncVideoControlsFromVideo(_0x22381f));
+      } else
+        ((this._hoverManualPause = true),
+          (this._isManualLoopPlayback = false),
+          (_0x22381f.loop = false),
+          _0x22381f.pause(),
+          this._showPausedCenterIndicator(),
+          this._syncVideoControlsFromVideo(_0x22381f));
+    }
+    ['_updatePlayIcon'](_0x2d773a) {
+      if (!this._playBtnEl) return;
+      this._playBtnEl.replaceChildren();
+      const _0x5c398a = 'http://www.w3.org/2000/svg',
+        _0x340af6 = document.createElementNS(_0x5c398a, 'svg');
+      (_0x340af6.setAttribute('width', '16'),
+        _0x340af6.setAttribute('height', '16'),
+        _0x340af6.setAttribute('viewBox', '0 0 24 24'),
+        _0x340af6.setAttribute('fill', 'currentColor'));
+      if (_0x2d773a) {
+        const _0x293cef = document.createElementNS(_0x5c398a, 'polygon');
+        (_0x293cef.setAttribute('points', '5 3 19 12 5 21 5 3'), _0x340af6.appendChild(_0x293cef));
+      } else {
+        const _0x50d5e2 = document.createElementNS(_0x5c398a, 'rect');
+        (_0x50d5e2.setAttribute('x', '6'),
+          _0x50d5e2.setAttribute('y', '4'),
+          _0x50d5e2.setAttribute('width', '4'),
+          _0x50d5e2.setAttribute('height', '16'));
+        const _0x4f8482 = document.createElementNS(_0x5c398a, 'rect');
+        (_0x4f8482.setAttribute('x', '14'),
+          _0x4f8482.setAttribute('y', '4'),
+          _0x4f8482.setAttribute('width', '4'),
+          _0x4f8482.setAttribute('height', '16'),
+          _0x340af6.appendChild(_0x50d5e2),
+          _0x340af6.appendChild(_0x4f8482));
+      }
+      this._playBtnEl.appendChild(_0x340af6);
+    }
+    ['_fmtVideoTime'](_0x32893a) {
+      const _0x4a1f38 = Number(_0x32893a);
+      if (!Number.isFinite(_0x4a1f38) || _0x4a1f38 <= 0) return '0:00';
+      return Math.floor(_0x4a1f38 / 60) + ':' + String(Math.floor(_0x4a1f38 % 60)).padStart(2, '0');
+    }
+    ['_getActiveVideoDuration'](_0x273d50) {
+      if (_0x273d50) {
+        const _0x2851f8 = Number(_0x273d50.duration);
+        if (Number.isFinite(_0x2851f8) && _0x2851f8 > 0) return _0x2851f8;
+        const _0x287b27 = _0x273d50.seekable;
+        if (_0x287b27 && _0x287b27.length) {
+          const _0x6536d8 = Number(_0x287b27.end(_0x287b27.length - 1));
+          if (Number.isFinite(_0x6536d8) && _0x6536d8 > 0) return _0x6536d8;
+        }
+      }
+      const _0x2f0641 = Number(this._data?.videoDuration);
+      if (Number.isFinite(_0x2f0641) && _0x2f0641 > 0) return _0x2f0641;
+      return 0;
+    }
+    ['_syncVideoControlsFromVideo'](_0x2aac8e) {
+      if (!this._controlsEl || !this._playBtnEl || !this._progressFillEl) return;
+      const _0x338302 = _0x2aac8e || this._getActivePreviewVideoEl();
+      if (!_0x338302) {
+        (this._updatePlayIcon(true), (this._progressFillEl.style.width = '0%'));
+        if (this._timeCurrentEl) this._timeCurrentEl.textContent = '0:00';
+        if (this._timeTotalEl) this._timeTotalEl.textContent = '0:00';
+        return;
+      }
+      const _0x50a10c = this._getActiveVideoDuration(_0x338302),
+        _0x417fa8 = Math.max(0, Number(_0x338302.currentTime) || 0),
+        _0xf71913 = _0x50a10c > 0 ? Math.max(0, Math.min(1, _0x417fa8 / _0x50a10c)) : 0;
+      if (!this._isProgressDragging && !this._isProgressSeeking) {
+        this._progressFillEl.style.width = _0xf71913 * 100 + '%';
+        if (this._timeCurrentEl) this._timeCurrentEl.textContent = this._fmtVideoTime(_0x417fa8);
+      }
+      if (this._timeTotalEl) this._timeTotalEl.textContent = this._fmtVideoTime(_0x50a10c);
+      this._updatePlayIcon(!!_0x338302.paused);
+    }
+    ['_seekActiveVideoByPos'](_0x37b024, _0x15d232) {
+      const _0x179671 = _0x37b024 || this._getActivePreviewVideoEl();
+      if (!_0x179671) return;
+      const _0x5be06b = this._getActiveVideoDuration(_0x179671);
+      if (!Number.isFinite(_0x5be06b) || _0x5be06b <= 0) return;
+      const _0x521f67 = Math.max(0, Math.min(1, Number(_0x15d232) || 0)),
+        _0x3fe0c1 = _0x521f67 * _0x5be06b;
+      this._isProgressSeeking = true;
+      const _0x418fbd = ++this._progressSeekToken;
+      _0x179671.currentTime = _0x3fe0c1;
+      if (this._progressFillEl) this._progressFillEl.style.width = _0x521f67 * 100 + '%';
+      if (this._timeCurrentEl) this._timeCurrentEl.textContent = this._fmtVideoTime(_0x3fe0c1);
+      queueMicrotask(() => {
+        if (_0x418fbd !== this._progressSeekToken) return;
+        ((this._isProgressSeeking = false), this._syncVideoControlsFromVideo(_0x179671));
+      });
+    }
+    async ['_captureCurrentFrameFromActiveVideo']() {
+      const _0x3d01e3 = this._getActivePreviewVideoEl();
+      if (!_0x3d01e3) return;
+      if (!getVideoFrameSource(_0x3d01e3)) {
+        const _0x48154 = await this._ensureVideoSrcFor(_0x3d01e3);
+        if (!_0x48154) {
+          window.showToast?.(previewControlsText('videoFrameExtraction.videoNotLoaded'), 'info');
+          return;
+        }
+      }
+      if (!isVideoFrameReady(_0x3d01e3)) {
+        const _0xe89bfc = await waitForVideoFrame(_0x3d01e3);
+        if (!_0xe89bfc) {
+          window.showToast?.(previewControlsText('videoFrameExtraction.videoNotLoaded'), 'info');
+          return;
+        }
+      }
+      const _0x31709b = _0x3d01e3.videoWidth || 0,
+        _0x46673f = _0x3d01e3.videoHeight || 0;
+      if (!_0x31709b || !_0x46673f) return;
+      let _0x9f93f3 = null;
+      try {
+        _0x9f93f3 = await captureVideoFrameSnapshot(_0x3d01e3, { fileNamePrefix: 'ai_video_frame' });
+      } catch (_0x419ef5) {
+        (console.warn('[AIGenVideoNode] capture frame failed:', _0x419ef5),
+          window.showToast?.(previewControlsText('videoFrameExtraction.captureUnsupported'), 'error'));
+        return;
+      }
+      if (!_0x9f93f3?.blob) return;
+      const _0xcf4e44 = _0x239343.getState().nodes[this.nodeId];
+      if (!_0xcf4e44) return;
+      const _0xa3b57c = Number(_0xcf4e44.videoFps),
+        _0x5107b8 = Number(_0xcf4e44.videoFrameCount),
+        _0x2ad1c7 =
+          Number(_0xcf4e44.videoDuration) > 0
+            ? Number(_0xcf4e44.videoDuration)
+            : this._getActiveVideoDuration(_0x3d01e3),
+        _0x35f0b5 =
+          Number.isFinite(_0xa3b57c) && _0xa3b57c > 0
+            ? _0xa3b57c
+            : Number.isFinite(_0x5107b8) && _0x5107b8 > 0 && Number.isFinite(_0x2ad1c7) && _0x2ad1c7 > 0
+              ? _0x5107b8 / _0x2ad1c7
+              : 0;
+      let _0x108933 = 0;
+      if (Number.isFinite(_0x35f0b5) && _0x35f0b5 > 0)
+        ((_0x108933 = Math.floor(Math.max(0, Number(_0x3d01e3.currentTime) || 0) * _0x35f0b5) + 1),
+          Number.isFinite(_0x5107b8) && _0x5107b8 > 0
+            ? (_0x108933 = Math.max(1, Math.min(Math.round(_0x5107b8), _0x108933)))
+            : (_0x108933 = Math.max(1, _0x108933)));
+      else {
+        const _0x32016d = Math.max(1, Math.floor(Number(_0xcf4e44.snapSeq) || 0) + 1);
+        ((_0x108933 = _0x32016d), _0x239343.updateNodeData(this.nodeId, { snapSeq: _0x32016d }));
+        const _0x4fe063 =
+            (Array.isArray(_0xcf4e44.videos) &&
+              _0xcf4e44.videos[Math.max(0, Number(_0xcf4e44.mainVideoIndex) || 0)]) ||
+            (Array.isArray(_0xcf4e44.videos) ? _0xcf4e44.videos[0] : null) ||
+            _0xcf4e44,
+          _0x54155f = this._resolveVideoMetaSrcFromVideoData(_0x4fe063);
+        if (_0x54155f) this._maybeFetchVideoMeta(_0x54155f);
+      }
+      const _0x101d09 = _0x323bfe(_0x31709b, _0x46673f),
+        _0x492461 = _0x231b5b(_0x239343.getState().nodes, _0xcf4e44, _0x101d09.width, _0x101d09.height),
+        _0x4b773e = 'src-img-' + Date.now(),
+        _0x2aee8a = createCapturePreviewUrl(_0x9f93f3.blob);
+      (_0x239343.addNode(
+        _0x424437({
+          id: _0x4b773e,
+          type: 'source-image',
+          name: previewControlsText('videoFrameExtraction.capturedFrameName', { frameIndex: _0x108933 }),
+          capturePreviewUrl: _0x2aee8a,
+          captureSavePending: true,
+          captureSaveError: null,
+          originalWidth: _0x9f93f3.originalWidth,
+          originalHeight: _0x9f93f3.originalHeight,
+          fileName: _0x9f93f3.fileName,
+          x: _0x492461.x,
+          y: _0x492461.y,
+          width: _0x101d09.width,
+          height: _0x101d09.height,
+          needsAutoResize: false,
+        }),
+      ),
+        saveVideoFrameSnapshot(_0x9f93f3, _0x2a722b)
+          .then((_0x33b1a9) => {
+            if (!_0x239343.getStateRaw().nodes?.[_0x4b773e]) return;
+            _0x239343.updateNodeData(_0x4b773e, {
+              src: _0x33b1a9.src,
+              localPath: _0x33b1a9.localPath,
+              originalLocalPath: _0x33b1a9.originalLocalPath,
+              displayLocalPath: _0x33b1a9.displayLocalPath,
+              thumbLocalPath: _0x33b1a9.thumbLocalPath,
+              originalWidth: _0x33b1a9.originalWidth,
+              originalHeight: _0x33b1a9.originalHeight,
+              fileName: _0x33b1a9.fileName,
+              captureSavePending: false,
+              captureSaveError: null,
+            });
+          })
+          .catch((_0x404f92) => {
+            const _0x3387eb = String(
+              _0x404f92?.message || previewControlsText('videoFrameExtraction.localSaveFailed'),
+            );
+            (console.warn('[AIGenVideoNode] save captured frame failed:', _0x404f92),
+              _0x239343.getStateRaw().nodes?.[_0x4b773e] &&
+                _0x239343.updateNodeData(_0x4b773e, {
+                  captureSavePending: false,
+                  captureSaveError: _0x3387eb,
+                }),
+              window.showToast?.(previewControlsText('videoFrameExtraction.shownButSaveFailed'), 'warning'));
+          }));
+    }
+  }
+  return _0x5558ca.prototype;
+}

@@ -1,1 +1,403 @@
-(function(_0x2e4d70,_0x25683e){const _0x4c706a=a275_0x71f4,_0x4877f7=_0x2e4d70();while(!![]){try{const _0x1505d0=-parseInt(_0x4c706a(0x1a0))/0x1*(parseInt(_0x4c706a(0x140))/0x2)+parseInt(_0x4c706a(0x17b))/0x3*(parseInt(_0x4c706a(0x14d))/0x4)+-parseInt(_0x4c706a(0x175))/0x5+parseInt(_0x4c706a(0x1c4))/0x6+parseInt(_0x4c706a(0x195))/0x7+-parseInt(_0x4c706a(0x1a4))/0x8*(parseInt(_0x4c706a(0x146))/0x9)+-parseInt(_0x4c706a(0x1c8))/0xa;if(_0x1505d0===_0x25683e)break;else _0x4877f7['push'](_0x4877f7['shift']());}catch(_0x524249){_0x4877f7['push'](_0x4877f7['shift']());}}}(a275_0x586c,0x4c59d));import{buildGenerateTextRequest}from'../../api/aiTextApi.js';import a275_0x6b9699 from'../core/stores/appStore.js';import{getDisplayModelName}from'../modules/providers.js';function a275_0x71f4(_0xdf20b5,_0x93bed4){const _0x586cfa=a275_0x586c();return a275_0x71f4=function(_0x71f4f2,_0x482d94){_0x71f4f2=_0x71f4f2-0x138;let _0x509cb1=_0x586cfa[_0x71f4f2];return _0x509cb1;},a275_0x71f4(_0xdf20b5,_0x93bed4);}import{bindRefThumbHoverPreview}from'../modules/refThumbHoverPreview.js';import{checkSlashTrigger,handleSlashKeyboardNavigation}from'../modules/slashMenu.js';import{activateMenuKeyboard}from'../modules/floatingMenuKeyboard.js';import{_checkAtTrigger,_handleMentionMenuKeyboard,_handlePillHover,_handlePillKeyboard,_handlePillOut,_rehydratePromptPills,_syncEdgesOrderFromPills,flushPromptHtmlCommit,handlePromptPaste,handlePromptSelectAll,schedulePromptHtmlCommit,shouldSubmitPromptByKeyboard}from'../modules/nodePromptShared.js';import{sanitizePromptHtml}from'../utils/dom.js';import{DEBUG_WRENCH_ICON_HTML,formatFinalApiDebugRequest}from'../utils/debugRequestPreview.js';import{buildTextModelSmallIconHTML,buildTextProviderMenuGroupsHTML}from'./aigenText/apimartTextModelMenu.js';import{getCustomTextModels,saveCustomTextModels}from'./aigenText/customTextModels.js';import{setupPromptBoxResize,syncPromptBoxSizeFromData}from'./aigenText/promptBoxResizeUi.js';import{createPromptAttachmentButtonHTML}from'./refAttachmentButton.js';import{bindNodeFooterController,bindNodeModelMenuTrigger,closeNodeFooterMenus}from'./shared/nodeFooterControls.js';import{t}from'../i18n/index.js';function a275_0x586c(){const _0x143cff=['values','message','value','Enter','2893289SVIqKb','replaceChildren','style','firstElementChild','entries','_onGenerate','addModel','replace','defaultModel','replaceWith','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','111595GgCAMO','debug','createElement','modelMenu','40lcxZWX','promptEl','floating-menu-item\x20custom-model-add','_promptInputWrap','display','mouseenter','img,\x20svg,\x20div','_data','.prompt-attachment-btn','function','classList','button','innerHTML','provider','.custom-model-label','model','warn','node-menu-icon','is-resizable','_syncPromptBoxSizeFromData','input','true','&quot;','dataset','addNode','map','closest','left','\x20active','node-menu-icon-small','nodeId','now','2542704LGbiRZ','removeAttribute','trim','contentEditable','4089720gRrQbW','text-model-icon','\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22img-model-wrap\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22img-pill-btn\x20img-model-btn-trigger\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','custom-model-confirm','getStateRaw','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20width=\x2210\x22\x20height=\x2210\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20class=\x22node-menu-caret\x22><polyline\x20points=\x226\x209\x2012\x2015\x2018\x209\x22></polyline></svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22floating-menu\x20img-model-menu\x20node-model-menu\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','mouseleave','.img-model-wrap','show','btnEl','btnTitle','showToast','buildRequestFailed','className','<div\x20class=\x22text-model-icon-small\x20text-model-icon-badge\x22>OA</div>','.floating-menu-label','\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>','&gt;','.grsai-submenu','textContent','_pickConnectHandled','pointerdown','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20class=\x22custom-model-add-icon\x22\x20width=\x2214\x22\x20height=\x2214\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><line\x20x1=\x2212\x22\x20y1=\x225\x22\x20x2=\x2212\x22\x20y2=\x2219\x22/><line\x20x1=\x225\x22\x20y1=\x2212\x22\x20x2=\x2219\x22\x20y2=\x2212\x22/></svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22custom-model-add-label\x22>','getState','span','_flushPromptHtmlCommit','height','text-model-icon-small','mouseover','generate','.runninghub-submenu','focus','tagName','click','keydown','stopPropagation','nodes','querySelector','.apimart-submenu','.img-model-menu','custom-model-del','</span>','refBarEl','remove','2AIOVBn','text','add','&lt;','title','prompt-submit\x20debug-wrench-btn','130599djWurv','cloneNode','keyup','querySelectorAll','debugNodeName','.custom-submenu','.floating-menu-item','4ClhKKC','fmi-content','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20width=\x2210\x22\x20height=\x2210\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222.5\x22\x20class=\x22node-menu-caret\x22><polyline\x20points=\x229\x2018\x2015\x2012\x209\x206\x22></polyline></svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22custom-submenu\x20node-model-submenu\x20node-menu-submenu\x22></div>','_promptPanel','customModelSubtitle','type','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22img-model-label\x22>','updateNodeData','div','find','modelWrap','pickConnectMode','contains','isArray','node-ref-bar','.ppio-submenu','img-model-pills','edgeId','debugApiParams','error','sourceNodeId','toLowerCase','paste','push','_updateSubmitButtonState','custom-model-input','providers','appendChild','.agnes-submenu','storyboardScript','target','.prompt-textarea','onSelect','promptPlaceholder','floating-menu-item\x20custom-model-item','custom','keypress','key','preventDefault','.fmi-title','2406640rpzMcS','<div\x20class=\x22text-model-icon-small\x20text-model-icon-badge\x22>AI</div>','prompt-actions','_unbindRefThumbHoverPreview','freeze','innerText','1650216CESLij','prompt-input-wrapper','text-model-icon\x20text-model-icon-badge\x20custom-model-icon','setAttribute','openai','placeholder','active','removeEdge','modelNamePlaceholder','prompt-textarea\x20custom-textarea','spellcheck','custom-model-separator','_buildPayload','prompt-submit\x20img-gen-btn','.prompt-attachment-btn,\x20.ref-thumb-delete','width','forEach','customModelTitle','prompt','<svg\x20width=\x2214\x22\x20height=\x2214\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><line\x20x1=\x2212\x22\x20y1=\x2219\x22\x20x2=\x2212\x22\x20y2=\x225\x22/><polyline\x20points=\x225\x2012\x2012\x205\x2019\x2012\x22/></svg>','addEventListener','debugParamsShown'];a275_0x586c=function(){return _0x143cff;};return a275_0x586c();}function sharedPromptPanelText(_0x1f57d9,_0x24b19c={}){return t('sharedPromptPanel.'+_0x1f57d9,_0x24b19c);}function escapeSharedPromptPanelHtml(_0x46405c){const _0x469678=a275_0x71f4;return String(_0x46405c??'')[_0x469678(0x19c)](/&/g,'&amp;')['replace'](/</g,_0x469678(0x143))[_0x469678(0x19c)](/>/g,_0x469678(0x1d9))['replace'](/"/g,_0x469678(0x1ba));}export function buildSharedPromptPanel(_0x5d755f,_0x2b31e5={}){const _0x23c7cb=a275_0x71f4,_0x3540f7=document[_0x23c7cb(0x1a2)](_0x23c7cb(0x155));_0x3540f7['className']='text-prompt-panel',_0x5d755f[_0x23c7cb(0x150)]=_0x3540f7;const _0x5ac97c=()=>typeof a275_0x6b9699[_0x23c7cb(0x1cc)]===_0x23c7cb(0x1ad)?a275_0x6b9699['getStateRaw']():a275_0x6b9699['getState']();_0x3540f7[_0x23c7cb(0x18f)](_0x23c7cb(0x1dd),_0x29bc7b=>{_0x29bc7b['stopPropagation']();}),_0x3540f7['addEventListener']('dblclick',_0x117260=>{const _0x1ff630=_0x23c7cb;!_0x117260[_0x1ff630(0x16b)][_0x1ff630(0x1be)](_0x1ff630(0x16c))&&(_0x117260['preventDefault'](),_0x117260['stopPropagation']());}),_0x5d755f[_0x23c7cb(0x13e)]=document[_0x23c7cb(0x1a2)](_0x23c7cb(0x155)),_0x5d755f[_0x23c7cb(0x13e)][_0x23c7cb(0x1d5)]=_0x23c7cb(0x15b),_0x3540f7[_0x23c7cb(0x168)](_0x5d755f[_0x23c7cb(0x13e)]),_0x5d755f[_0x23c7cb(0x13e)][_0x23c7cb(0x18f)]('click',_0x5dc040=>{const _0x5ed253=_0x23c7cb,_0x28d2c4=_0x5dc040['target'][_0x5ed253(0x1be)]('.ref-thumb-delete');if(_0x28d2c4){_0x5dc040[_0x5ed253(0x1eb)](),_0x5dc040[_0x5ed253(0x173)]();const _0x37ef2d=_0x28d2c4[_0x5ed253(0x1be)]('.ref-thumb-wrap')?.[_0x5ed253(0x1bb)][_0x5ed253(0x15e)];if(_0x37ef2d)a275_0x6b9699[_0x5ed253(0x182)](_0x37ef2d);return;}const _0x4185f9=_0x5dc040[_0x5ed253(0x16b)]['closest'](_0x5ed253(0x1ac));if(!_0x4185f9)return;if(_0x5dc040[_0x5ed253(0x1dc)])return;_0x5dc040['stopPropagation'](),_0x5dc040[_0x5ed253(0x173)]();const _0x3801f8=a275_0x6b9699[_0x5ed253(0x1df)]()[_0x5ed253(0x158)];_0x3801f8&&_0x3801f8[_0x5ed253(0x181)]&&_0x3801f8[_0x5ed253(0x161)]===_0x5d755f['nodeId']?a275_0x6b9699['setPickConnectMode']({'active':![]}):a275_0x6b9699['setPickConnectMode']({'active':!![],'sourceNodeId':_0x5d755f[_0x5ed253(0x1c2)],'handleDirection':_0x5ed253(0x1bf)});}),_0x5d755f[_0x23c7cb(0x13e)]['addEventListener'](_0x23c7cb(0x1dd),_0x53c95d=>{const _0x598183=_0x23c7cb;if(_0x53c95d[_0x598183(0x16b)][_0x598183(0x1be)](_0x598183(0x189)))_0x53c95d[_0x598183(0x1eb)]();}),_0x5d755f[_0x23c7cb(0x178)]?.(),_0x5d755f[_0x23c7cb(0x178)]=bindRefThumbHoverPreview(_0x5d755f[_0x23c7cb(0x13e)]);const _0x33dc6d=document[_0x23c7cb(0x1a2)](_0x23c7cb(0x155));_0x33dc6d[_0x23c7cb(0x1d5)]=_0x23c7cb(0x17c),_0x33dc6d[_0x23c7cb(0x1ae)][_0x23c7cb(0x142)](_0x23c7cb(0x1b6)),_0x5d755f[_0x23c7cb(0x1a7)]=_0x33dc6d,_0x5d755f[_0x23c7cb(0x1a5)]=document[_0x23c7cb(0x1a2)]('div'),_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x1d5)]=_0x23c7cb(0x184),_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x1c7)]=_0x23c7cb(0x1b9),_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x185)]=![],_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x1bb)][_0x23c7cb(0x180)]=_0x2b31e5[_0x23c7cb(0x180)]||sharedPromptPanelText(_0x23c7cb(0x16e)),_0x5d755f[_0x23c7cb(0x1e1)]=()=>flushPromptHtmlCommit(_0x5d755f),_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x18f)](_0x23c7cb(0x1b8),_0x464516=>{const _0x2341f1=_0x23c7cb;schedulePromptHtmlCommit(_0x5d755f),_checkAtTrigger(_0x5d755f,_0x464516),checkSlashTrigger(_0x464516,{'promptEl':_0x5d755f['promptEl'],'nodeType':_0x5d755f[_0x2341f1(0x1ab)]?.[_0x2341f1(0x152)],'nodeId':_0x5d755f['nodeId'],'onGenerate':(_0x5c7517,_0xa1fffe)=>_0x5d755f[_0x2341f1(0x19a)]?.(_0x5c7517,_0xa1fffe)}),_syncEdgesOrderFromPills(_0x5d755f),_0x5d755f[_0x2341f1(0x165)]?.();}),_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x18f)]('blur',()=>{flushPromptHtmlCommit(_0x5d755f);}),_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x18f)](_0x23c7cb(0x1e4),_0x5c39ba=>_handlePillHover(_0x5c39ba,_0x5d755f)),_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x18f)]('mouseout',_0x1fa78c=>_handlePillOut(_0x1fa78c,_0x5d755f)),_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x18f)](_0x23c7cb(0x1ea),_0x3e5c0d=>{const _0x4de5e8=_0x23c7cb;if(handlePromptSelectAll(_0x5d755f,_0x3e5c0d))return;if(_handleMentionMenuKeyboard(_0x3e5c0d))return;if(handleSlashKeyboardNavigation(_0x3e5c0d))return;if(shouldSubmitPromptByKeyboard(_0x3e5c0d)){_0x3e5c0d['preventDefault'](),flushPromptHtmlCommit(_0x5d755f),_0x5d755f[_0x4de5e8(0x1d1)]?.[_0x4de5e8(0x1e9)]();return;}_handlePillKeyboard(_0x5d755f,_0x3e5c0d);}),_0x5d755f[_0x23c7cb(0x1a5)][_0x23c7cb(0x18f)](_0x23c7cb(0x163),_0x214e52=>{handlePromptPaste(_0x5d755f,_0x214e52);});_0x5d755f[_0x23c7cb(0x1ab)][_0x23c7cb(0x18d)]&&(_0x5d755f[_0x23c7cb(0x1a5)]['innerHTML']=sanitizePromptHtml(_0x5d755f[_0x23c7cb(0x1ab)][_0x23c7cb(0x18d)]),_rehydratePromptPills(_0x5d755f));_0x33dc6d[_0x23c7cb(0x168)](_0x5d755f[_0x23c7cb(0x1a5)]),_0x5d755f[_0x23c7cb(0x1b7)]=(_0x515bb3=_0x5d755f['_data'])=>syncPromptBoxSizeFromData(_0x5d755f,_0x515bb3),_0x5d755f['_syncPromptBoxSizeFromData'](_0x5d755f[_0x23c7cb(0x1ab)]),setupPromptBoxResize(_0x5d755f,{'store':a275_0x6b9699,'getStateSnapshot':_0x5ac97c}),_0x3540f7[_0x23c7cb(0x168)](_0x33dc6d);const _0x3def85=document['createElement'](_0x23c7cb(0x155));_0x3def85[_0x23c7cb(0x1d5)]='prompt-panel-footer\x20text-prompt-actions';const _0x3ae255=[];if(_0x2b31e5?.[_0x23c7cb(0x1a3)]){const _0x1bc4b1=_0x2b31e5[_0x23c7cb(0x1a3)],_0x54a050=String(_0x1bc4b1[_0x23c7cb(0x1b1)]||'volcengine')[_0x23c7cb(0x1c6)](),_0x11e587=Array[_0x23c7cb(0x15a)](_0x1bc4b1[_0x23c7cb(0x167)])?_0x1bc4b1[_0x23c7cb(0x167)][_0x23c7cb(0x1bd)](_0x1edf95=>String(_0x1edf95)[_0x23c7cb(0x162)]()):null,_0x3b705e=_0x1bc4b1['allowCustomModels']!==![],_0x1aaeee=String(_0x1bc4b1[_0x23c7cb(0x1b3)]||_0x5d755f['_data']?.[_0x23c7cb(0x1b3)]||_0x5d755f['_data']?.[_0x23c7cb(0x16a)]?.['model']||_0x1bc4b1[_0x23c7cb(0x19d)]||'')['trim'](),_0xa802cf=()=>{const _0x4e50bc=_0x23c7cb,_0x316bca=buildTextModelSmallIconHTML(_0x1aaeee);if(_0x316bca)return _0x316bca;if(_0x54a050===_0x4e50bc(0x170)||_0x54a050===_0x4e50bc(0x17f))return _0x4e50bc(0x1d6);return _0x4e50bc(0x176);},_0x540959=document[_0x23c7cb(0x1a2)](_0x23c7cb(0x155));_0x540959[_0x23c7cb(0x1d5)]=_0x23c7cb(0x15d),_0x540959[_0x23c7cb(0x1b0)]=_0x23c7cb(0x1ca)+_0xa802cf()+_0x23c7cb(0x153)+getDisplayModelName(_0x1aaeee)+_0x23c7cb(0x1cd)+(_0x3b705e?'<div\x20class=\x22custom-group-header\x20floating-menu-item\x20node-menu-group-header\x22\x20data-custom-toggle\x20data-node-menu-submenu=\x22.custom-submenu\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22text-model-icon\x20text-model-icon-badge\x22>OA</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fmi-content\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fmi-title\x22>'+escapeSharedPromptPanelHtml(sharedPromptPanelText(_0x23c7cb(0x18c)))+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fmi-sub\x22>'+escapeSharedPromptPanelHtml(sharedPromptPanelText(_0x23c7cb(0x151)))+_0x23c7cb(0x14f):'')+_0x23c7cb(0x19f)+buildTextProviderMenuGroupsHTML(_0x1aaeee,{'providers':_0x11e587})+_0x23c7cb(0x1d8),_0x3def85[_0x23c7cb(0x168)](_0x540959);const _0x29eebf=_0x540959['querySelector'](_0x23c7cb(0x1cf)),_0x7b5c77=_0x540959[_0x23c7cb(0x139)]('.img-model-btn-trigger'),_0x50c93b=_0x540959[_0x23c7cb(0x139)](_0x23c7cb(0x13b)),_0x2c407f=_0x540959['querySelector']('.img-model-label'),_0x5eb5dc=Object[_0x23c7cb(0x179)]({'grsai':_0x50c93b?.[_0x23c7cb(0x139)](_0x23c7cb(0x1da)),'ppio':_0x50c93b?.[_0x23c7cb(0x139)](_0x23c7cb(0x15c)),'apimart':_0x50c93b?.[_0x23c7cb(0x139)](_0x23c7cb(0x13a)),'agnes':_0x50c93b?.[_0x23c7cb(0x139)](_0x23c7cb(0x169)),'runninghub':_0x50c93b?.[_0x23c7cb(0x139)](_0x23c7cb(0x1e6)),'volcengine':_0x50c93b?.[_0x23c7cb(0x139)]('.volcengine-submenu')}),_0x38bebc=_0x19f75c=>{const _0x307c84=_0x23c7cb,_0x362e3c=_0x19f75c?.[_0x307c84(0x139)](_0x307c84(0x1aa)),_0xfd8373=_0x7b5c77?.[_0x307c84(0x198)];if(!_0xfd8373||!_0x362e3c||_0x362e3c['classList']?.[_0x307c84(0x159)](_0x307c84(0x14e)))return;const _0x404783=_0x362e3c[_0x307c84(0x147)](!![]);_0x404783[_0x307c84(0x1c5)]?.('style'),_0x404783[_0x307c84(0x1ae)]?.[_0x307c84(0x13f)](_0x307c84(0x1c9),_0x307c84(0x1b5)),_0x404783[_0x307c84(0x1ae)]?.[_0x307c84(0x142)](_0x307c84(0x1e3)),_0x404783[_0x307c84(0x1e8)]?.['toLowerCase']()==='svg'&&(_0x404783[_0x307c84(0x17e)](_0x307c84(0x18a),'12'),_0x404783[_0x307c84(0x17e)](_0x307c84(0x1e2),'12'),_0x404783['classList'][_0x307c84(0x142)](_0x307c84(0x1c1))),_0xfd8373[_0x307c84(0x19e)](_0x404783);},_0x198acd=(_0x3a2bca,_0x4a09e0,_0x214788)=>{const _0x331a4f=_0x23c7cb,_0x4c82ed=String(_0x3a2bca?.[_0x331a4f(0x1bb)]?.[_0x331a4f(0x193)]||'')['trim']();if(!_0x4c82ed)return;const _0x25a62d=String(_0x3a2bca[_0x331a4f(0x1bb)][_0x331a4f(0x1b1)]||_0x4a09e0||_0x54a050)[_0x331a4f(0x1c6)](),_0x5268e9=_0x3a2bca[_0x331a4f(0x139)](_0x331a4f(0x174))||_0x3a2bca[_0x331a4f(0x139)](_0x331a4f(0x1d7))||_0x3a2bca[_0x331a4f(0x139)](_0x331a4f(0x1b2));if(_0x2c407f)_0x2c407f[_0x331a4f(0x1db)]=_0x5268e9?.[_0x331a4f(0x1db)]||_0x4c82ed;_0x50c93b?.[_0x331a4f(0x149)](_0x331a4f(0x14c))[_0x331a4f(0x18b)](_0x1588a2=>_0x1588a2[_0x331a4f(0x1ae)][_0x331a4f(0x13f)]('active')),_0x3a2bca['classList']['add']('active'),_0x50c93b?.[_0x331a4f(0x1ae)][_0x331a4f(0x13f)](_0x331a4f(0x1d0));if(_0x214788)_0x214788[_0x331a4f(0x197)][_0x331a4f(0x1a8)]='none';_0x38bebc(_0x3a2bca),typeof _0x1bc4b1['onSelect']===_0x331a4f(0x1ad)?_0x1bc4b1[_0x331a4f(0x16d)]({'modelId':_0x4c82ed,'provider':_0x25a62d,'item':_0x3a2bca,'self':_0x5d755f}):a275_0x6b9699[_0x331a4f(0x154)](_0x5d755f[_0x331a4f(0x1c2)],{'model':_0x4c82ed,'provider':_0x25a62d});};_0x50c93b?.['addEventListener']('click',_0x492954=>{const _0x182f77=_0x23c7cb,_0x1c8a3b=_0x492954[_0x182f77(0x16b)]?.[_0x182f77(0x1be)]?.('.floating-menu-item');if(!_0x1c8a3b||!_0x50c93b['contains'](_0x1c8a3b))return;if(!_0x1c8a3b[_0x182f77(0x1bb)][_0x182f77(0x193)])return;const _0x427d9d=Object[_0x182f77(0x199)](_0x5eb5dc)[_0x182f77(0x156)](([,_0x229978])=>_0x229978?.[_0x182f77(0x159)](_0x1c8a3b));if(_0x427d9d){_0x492954[_0x182f77(0x1eb)](),_0x198acd(_0x1c8a3b,_0x427d9d[0x0],_0x427d9d[0x1]);return;}if(!_0x3b705e)return;const _0x5236ad=_0x50c93b[_0x182f77(0x139)](_0x182f77(0x14b));_0x5236ad?.[_0x182f77(0x159)](_0x1c8a3b)&&(_0x492954['stopPropagation'](),_0x198acd(_0x1c8a3b,_0x182f77(0x170),_0x5236ad));});const _0x27424c=_0x50c93b?.[_0x23c7cb(0x139)](_0x23c7cb(0x14b));_0x3b705e&&_0x27424c?.[_0x23c7cb(0x18f)](_0x23c7cb(0x1dd),_0x2fe1bf=>{const _0x15ca3c=_0x23c7cb;_0x2fe1bf[_0x15ca3c(0x1eb)]();});const _0x1ed5ae=()=>{const _0x4dcbd8=_0x23c7cb;if(!_0x3b705e||!_0x27424c)return;const _0x48f484=getCustomTextModels(),_0x52942f=_0x5d755f[_0x4dcbd8(0x1ab)]?.['model']||'';_0x27424c[_0x4dcbd8(0x196)](),_0x48f484[_0x4dcbd8(0x18b)]((_0x26d373,_0x59459a)=>{const _0xd5289c=_0x4dcbd8,_0xcee038=document[_0xd5289c(0x1a2)](_0xd5289c(0x155));_0xcee038[_0xd5289c(0x1d5)]=_0xd5289c(0x16f)+(_0x52942f===_0x26d373?_0xd5289c(0x1c0):''),_0xcee038[_0xd5289c(0x1bb)][_0xd5289c(0x193)]=_0x26d373;const _0x2cfddb=document[_0xd5289c(0x1a2)](_0xd5289c(0x155));_0x2cfddb[_0xd5289c(0x1d5)]=_0xd5289c(0x17d),_0x2cfddb[_0xd5289c(0x1db)]='OA';const _0x3face1=document['createElement']('span');_0x3face1[_0xd5289c(0x1d5)]='custom-model-label',_0x3face1['textContent']=_0x26d373;const _0x196a7d=document[_0xd5289c(0x1a2)](_0xd5289c(0x1e0));_0x196a7d[_0xd5289c(0x1d5)]=_0xd5289c(0x13c),_0x196a7d[_0xd5289c(0x1db)]='×',_0xcee038[_0xd5289c(0x168)](_0x2cfddb),_0xcee038[_0xd5289c(0x168)](_0x3face1),_0xcee038[_0xd5289c(0x168)](_0x196a7d),_0xcee038[_0xd5289c(0x18f)](_0xd5289c(0x1a9),()=>{const _0x468eb0=_0xd5289c;_0x196a7d['classList'][_0x468eb0(0x142)](_0x468eb0(0x1d0));}),_0xcee038[_0xd5289c(0x18f)](_0xd5289c(0x1ce),()=>{const _0x3fb8c9=_0xd5289c;_0x196a7d[_0x3fb8c9(0x1ae)][_0x3fb8c9(0x13f)](_0x3fb8c9(0x1d0));}),_0x196a7d['addEventListener'](_0xd5289c(0x1e9),_0xfca84a=>{_0xfca84a['stopPropagation'](),saveCustomTextModels(getCustomTextModels()['filter']((_0x15b03f,_0x40880e)=>_0x40880e!==_0x59459a)),_0x1ed5ae();}),_0x27424c['appendChild'](_0xcee038);});if(_0x48f484['length']>0x0){const _0x28fa3f=document[_0x4dcbd8(0x1a2)](_0x4dcbd8(0x155));_0x28fa3f[_0x4dcbd8(0x1d5)]=_0x4dcbd8(0x186),_0x27424c['appendChild'](_0x28fa3f);}const _0x320539=document[_0x4dcbd8(0x1a2)]('div');_0x320539[_0x4dcbd8(0x1d5)]=_0x4dcbd8(0x1a6),_0x320539[_0x4dcbd8(0x1b0)]=_0x4dcbd8(0x1de)+escapeSharedPromptPanelHtml(sharedPromptPanelText(_0x4dcbd8(0x19b)))+_0x4dcbd8(0x13d),_0x320539[_0x4dcbd8(0x18f)](_0x4dcbd8(0x1e9),_0x1e9689=>{const _0x100a0d=_0x4dcbd8;_0x1e9689[_0x100a0d(0x1eb)](),_0x320539[_0x100a0d(0x196)](),_0x320539[_0x100a0d(0x1ae)]['add']('editing');const _0x4c9169=document['createElement'](_0x100a0d(0x1b8));_0x4c9169['type']=_0x100a0d(0x141),_0x4c9169[_0x100a0d(0x180)]=sharedPromptPanelText(_0x100a0d(0x183)),_0x4c9169['className']=_0x100a0d(0x166);const _0x508ccf=document[_0x100a0d(0x1a2)](_0x100a0d(0x1af));_0x508ccf[_0x100a0d(0x152)]=_0x100a0d(0x1af),_0x508ccf[_0x100a0d(0x1db)]=sharedPromptPanelText('confirm'),_0x508ccf[_0x100a0d(0x1d5)]=_0x100a0d(0x1cb);const _0x3f93b5=()=>{const _0xf33da8=_0x100a0d,_0x256af2=_0x4c9169[_0xf33da8(0x193)][_0xf33da8(0x1c6)]();if(!_0x256af2)return;const _0x18d414=getCustomTextModels();!_0x18d414['includes'](_0x256af2)&&(_0x18d414['push'](_0x256af2),saveCustomTextModels(_0x18d414)),_0x1ed5ae();};_0x4c9169[_0x100a0d(0x18f)](_0x100a0d(0x1ea),_0x12ffb7=>{const _0x1dfb2c=_0x100a0d;_0x12ffb7['stopPropagation']();if(_0x12ffb7[_0x1dfb2c(0x172)]===_0x1dfb2c(0x194))_0x3f93b5();}),_0x4c9169[_0x100a0d(0x18f)](_0x100a0d(0x148),_0x45261f=>_0x45261f[_0x100a0d(0x1eb)]()),_0x4c9169[_0x100a0d(0x18f)](_0x100a0d(0x171),_0x43c98c=>_0x43c98c[_0x100a0d(0x1eb)]()),_0x4c9169[_0x100a0d(0x18f)](_0x100a0d(0x1e9),_0x53c7b1=>_0x53c7b1[_0x100a0d(0x1eb)]()),_0x508ccf[_0x100a0d(0x18f)]('click',_0x46f79b=>{const _0x2a1f72=_0x100a0d;_0x46f79b[_0x2a1f72(0x1eb)](),_0x3f93b5();}),_0x320539[_0x100a0d(0x168)](_0x4c9169),_0x320539[_0x100a0d(0x168)](_0x508ccf),_0x4c9169[_0x100a0d(0x1e7)]();}),_0x27424c[_0x4dcbd8(0x168)](_0x320539);};if(_0x3b705e)_0x1ed5ae();const _0x28fdd6=bindNodeModelMenuTrigger({'root':_0x3def85,'trigger':_0x7b5c77,'menu':_0x50c93b,'closeOthers':()=>closeNodeFooterMenus(_0x3def85,_0x50c93b),'activateMenuKeyboard':activateMenuKeyboard}),_0x10d92e=bindNodeFooterController(_0x3def85);_0x3ae255[_0x23c7cb(0x164)](_0x28fdd6,_0x10d92e),_0x5d755f[_0x23c7cb(0x157)]=_0x29eebf;}const _0x3f517d=document['createElement'](_0x23c7cb(0x155));_0x3f517d[_0x23c7cb(0x1d5)]=_0x23c7cb(0x177);const _0x39155e=document[_0x23c7cb(0x1a2)]('button');return _0x39155e[_0x23c7cb(0x152)]=_0x23c7cb(0x1af),_0x39155e['className']=_0x23c7cb(0x145),_0x39155e[_0x23c7cb(0x144)]=sharedPromptPanelText(_0x23c7cb(0x15f)),_0x39155e[_0x23c7cb(0x1b0)]=DEBUG_WRENCH_ICON_HTML,_0x39155e[_0x23c7cb(0x18f)](_0x23c7cb(0x1e9),async _0x330a10=>{const _0x5d8a00=_0x23c7cb;_0x330a10[_0x5d8a00(0x1eb)](),flushPromptHtmlCommit(_0x5d755f);let _0x390bcc;if(typeof _0x5d755f[_0x5d8a00(0x187)]===_0x5d8a00(0x1ad))_0x390bcc=await _0x5d755f[_0x5d8a00(0x187)]();else{const _0x39fe64=_0x5d755f['promptEl']?.[_0x5d8a00(0x17a)]?.['trim']()||'';_0x390bcc={'prompt':_0x39fe64,'nodeType':_0x5d755f[_0x5d8a00(0x1ab)][_0x5d8a00(0x152)]};}if(!_0x390bcc)return;try{const _0x4e130a=await buildGenerateTextRequest(_0x390bcc),_0x2af40f=formatFinalApiDebugRequest(_0x4e130a),_0x19920c=a275_0x6b9699[_0x5d8a00(0x1df)](),_0x127026=_0x5d755f['_data']['x']+(_0x5d755f[_0x5d8a00(0x1ab)][_0x5d8a00(0x18a)]||0x17c)+0x32,_0x2369db=_0x5d755f[_0x5d8a00(0x1ab)]['y'];let _0x44385b=Object[_0x5d8a00(0x191)](_0x19920c[_0x5d8a00(0x138)])[_0x5d8a00(0x156)](_0x4d7b41=>_0x4d7b41[_0x5d8a00(0x152)]===_0x5d8a00(0x1a1));!_0x44385b?a275_0x6b9699[_0x5d8a00(0x1bc)]({'id':'debug-'+Date[_0x5d8a00(0x1c3)](),'type':'debug','x':_0x127026,'y':_0x2369db,'width':0x17c,'height':0x12c,'name':sharedPromptPanelText(_0x5d8a00(0x14a)),'outputText':_0x2af40f}):a275_0x6b9699[_0x5d8a00(0x154)](_0x44385b['id'],{'outputText':_0x2af40f,'x':_0x127026,'y':_0x2369db}),window['showToast']?.(sharedPromptPanelText(_0x5d8a00(0x190)),_0x5d8a00(0x1b4));}catch(_0x5ab476){window[_0x5d8a00(0x1d3)]?.(sharedPromptPanelText(_0x5d8a00(0x1d4),{'error':_0x5ab476[_0x5d8a00(0x192)]}),_0x5d8a00(0x160));}}),_0x5d755f[_0x23c7cb(0x1d1)]=document[_0x23c7cb(0x1a2)](_0x23c7cb(0x1af)),_0x5d755f[_0x23c7cb(0x1d1)][_0x23c7cb(0x152)]='button',_0x5d755f[_0x23c7cb(0x1d1)]['className']=_0x23c7cb(0x188),_0x5d755f[_0x23c7cb(0x1d1)]['title']=_0x2b31e5[_0x23c7cb(0x1d2)]||sharedPromptPanelText(_0x23c7cb(0x1e5)),_0x5d755f[_0x23c7cb(0x1d1)]['innerHTML']=_0x23c7cb(0x18e),_0x5d755f['btnEl'][_0x23c7cb(0x18f)](_0x23c7cb(0x1e9),_0x3f57c0=>{const _0x501bfe=_0x23c7cb;_0x3f57c0[_0x501bfe(0x1eb)](),flushPromptHtmlCommit(_0x5d755f),_0x5d755f[_0x501bfe(0x19a)]?.();}),_0x3f517d[_0x23c7cb(0x168)](_0x39155e),_0x3f517d[_0x23c7cb(0x168)](_0x5d755f[_0x23c7cb(0x1d1)]),_0x3def85[_0x23c7cb(0x168)](_0x3f517d),_0x3540f7[_0x23c7cb(0x168)](_0x3def85),_0x5d755f['_sharedPanelCleanup']=()=>{const _0x22c8b5=_0x23c7cb;_0x3ae255[_0x22c8b5(0x18b)](_0x2226a5=>_0x2226a5?.());},_0x5d755f[_0x23c7cb(0x165)]?.(),_0x3540f7;}
+import { buildGenerateTextRequest } from '../../api/aiTextApi.js';
+import appStore from '../core/stores/appStore.js';
+import { getDisplayModelName } from '../modules/providers.js';
+import { bindRefThumbHoverPreview } from '../modules/refThumbHoverPreview.js';
+import { checkSlashTrigger, handleSlashKeyboardNavigation } from '../modules/slashMenu.js';
+import { activateMenuKeyboard } from '../modules/floatingMenuKeyboard.js';
+import {
+  _checkAtTrigger,
+  _handleMentionMenuKeyboard,
+  _handlePillHover,
+  _handlePillKeyboard,
+  _handlePillOut,
+  _rehydratePromptPills,
+  _syncEdgesOrderFromPills,
+  flushPromptHtmlCommit,
+  handlePromptPaste,
+  handlePromptSelectAll,
+  schedulePromptHtmlCommit,
+  shouldSubmitPromptByKeyboard,
+} from '../modules/nodePromptShared.js';
+import { sanitizePromptHtml } from '../utils/dom.js';
+import { DEBUG_WRENCH_ICON_HTML, formatFinalApiDebugRequest } from '../utils/debugRequestPreview.js';
+import {
+  buildTextModelSmallIconHTML,
+  buildTextProviderMenuGroupsHTML,
+} from './aigenText/apimartTextModelMenu.js';
+import { getCustomTextModels, saveCustomTextModels } from './aigenText/customTextModels.js';
+import { setupPromptBoxResize, syncPromptBoxSizeFromData } from './aigenText/promptBoxResizeUi.js';
+import { createPromptAttachmentButtonHTML } from './refAttachmentButton.js';
+import {
+  bindNodeFooterController,
+  bindNodeModelMenuTrigger,
+  closeNodeFooterMenus,
+} from './shared/nodeFooterControls.js';
+import { t } from '../i18n/index.js';
+function sharedPromptPanelText(_0x1f57d9, _0x24b19c = {}) {
+  return t('sharedPromptPanel.' + _0x1f57d9, _0x24b19c);
+}
+function escapeSharedPromptPanelHtml(_0x46405c) {
+  return String(_0x46405c ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+export function buildSharedPromptPanel(_0x5d755f, _0x2b31e5 = {}) {
+  const _0x3540f7 = document.createElement('div');
+  ((_0x3540f7.className = 'text-prompt-panel'), (_0x5d755f._promptPanel = _0x3540f7));
+  const _0x5ac97c = () =>
+    typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
+  (_0x3540f7.addEventListener('pointerdown', (_0x29bc7b) => {
+    _0x29bc7b.stopPropagation();
+  }),
+    _0x3540f7.addEventListener('dblclick', (_0x117260) => {
+      !_0x117260.target.closest('.prompt-textarea') &&
+        (_0x117260.preventDefault(), _0x117260.stopPropagation());
+    }),
+    (_0x5d755f.refBarEl = document.createElement('div')),
+    (_0x5d755f.refBarEl.className = 'node-ref-bar'),
+    _0x3540f7.appendChild(_0x5d755f.refBarEl),
+    _0x5d755f.refBarEl.addEventListener('click', (_0x5dc040) => {
+      const _0x28d2c4 = _0x5dc040.target.closest('.ref-thumb-delete');
+      if (_0x28d2c4) {
+        (_0x5dc040.stopPropagation(), _0x5dc040.preventDefault());
+        const _0x37ef2d = _0x28d2c4.closest('.ref-thumb-wrap')?.dataset.edgeId;
+        if (_0x37ef2d) appStore.removeEdge(_0x37ef2d);
+        return;
+      }
+      const _0x4185f9 = _0x5dc040.target.closest('.prompt-attachment-btn');
+      if (!_0x4185f9) return;
+      if (_0x5dc040._pickConnectHandled) return;
+      (_0x5dc040.stopPropagation(), _0x5dc040.preventDefault());
+      const _0x3801f8 = appStore.getState().pickConnectMode;
+      _0x3801f8 && _0x3801f8.active && _0x3801f8.sourceNodeId === _0x5d755f.nodeId
+        ? appStore.setPickConnectMode({ active: false })
+        : appStore.setPickConnectMode({
+            active: true,
+            sourceNodeId: _0x5d755f.nodeId,
+            handleDirection: 'left',
+          });
+    }),
+    _0x5d755f.refBarEl.addEventListener('pointerdown', (_0x53c95d) => {
+      if (_0x53c95d.target.closest('.prompt-attachment-btn, .ref-thumb-delete')) _0x53c95d.stopPropagation();
+    }),
+    _0x5d755f._unbindRefThumbHoverPreview?.(),
+    (_0x5d755f._unbindRefThumbHoverPreview = bindRefThumbHoverPreview(_0x5d755f.refBarEl)));
+  const _0x33dc6d = document.createElement('div');
+  ((_0x33dc6d.className = 'prompt-input-wrapper'),
+    _0x33dc6d.classList.add('is-resizable'),
+    (_0x5d755f._promptInputWrap = _0x33dc6d),
+    (_0x5d755f.promptEl = document.createElement('div')),
+    (_0x5d755f.promptEl.className = 'prompt-textarea custom-textarea'),
+    (_0x5d755f.promptEl.contentEditable = 'true'),
+    (_0x5d755f.promptEl.spellcheck = false),
+    (_0x5d755f.promptEl.dataset.placeholder =
+      _0x2b31e5.placeholder || sharedPromptPanelText('promptPlaceholder')),
+    (_0x5d755f._flushPromptHtmlCommit = () => flushPromptHtmlCommit(_0x5d755f)),
+    _0x5d755f.promptEl.addEventListener('input', (_0x464516) => {
+      (schedulePromptHtmlCommit(_0x5d755f),
+        _checkAtTrigger(_0x5d755f, _0x464516),
+        checkSlashTrigger(_0x464516, {
+          promptEl: _0x5d755f.promptEl,
+          nodeType: _0x5d755f._data?.type,
+          nodeId: _0x5d755f.nodeId,
+          onGenerate: (_0x5c7517, _0xa1fffe) => _0x5d755f._onGenerate?.(_0x5c7517, _0xa1fffe),
+        }),
+        _syncEdgesOrderFromPills(_0x5d755f),
+        _0x5d755f._updateSubmitButtonState?.());
+    }),
+    _0x5d755f.promptEl.addEventListener('blur', () => {
+      flushPromptHtmlCommit(_0x5d755f);
+    }),
+    _0x5d755f.promptEl.addEventListener('mouseover', (_0x5c39ba) => _handlePillHover(_0x5c39ba, _0x5d755f)),
+    _0x5d755f.promptEl.addEventListener('mouseout', (_0x1fa78c) => _handlePillOut(_0x1fa78c, _0x5d755f)),
+    _0x5d755f.promptEl.addEventListener('keydown', (_0x3e5c0d) => {
+      if (handlePromptSelectAll(_0x5d755f, _0x3e5c0d)) return;
+      if (_handleMentionMenuKeyboard(_0x3e5c0d)) return;
+      if (handleSlashKeyboardNavigation(_0x3e5c0d)) return;
+      if (shouldSubmitPromptByKeyboard(_0x3e5c0d)) {
+        (_0x3e5c0d.preventDefault(), flushPromptHtmlCommit(_0x5d755f), _0x5d755f.btnEl?.click());
+        return;
+      }
+      _handlePillKeyboard(_0x5d755f, _0x3e5c0d);
+    }),
+    _0x5d755f.promptEl.addEventListener('paste', (_0x214e52) => {
+      handlePromptPaste(_0x5d755f, _0x214e52);
+    }));
+  _0x5d755f._data.prompt &&
+    ((_0x5d755f.promptEl.innerHTML = sanitizePromptHtml(_0x5d755f._data.prompt)),
+    _rehydratePromptPills(_0x5d755f));
+  (_0x33dc6d.appendChild(_0x5d755f.promptEl),
+    (_0x5d755f._syncPromptBoxSizeFromData = (_0x515bb3 = _0x5d755f._data) =>
+      syncPromptBoxSizeFromData(_0x5d755f, _0x515bb3)),
+    _0x5d755f._syncPromptBoxSizeFromData(_0x5d755f._data),
+    setupPromptBoxResize(_0x5d755f, { store: appStore, getStateSnapshot: _0x5ac97c }),
+    _0x3540f7.appendChild(_0x33dc6d));
+  const _0x3def85 = document.createElement('div');
+  _0x3def85.className = 'prompt-panel-footer text-prompt-actions';
+  const _0x3ae255 = [];
+  if (_0x2b31e5?.modelMenu) {
+    const _0x1bc4b1 = _0x2b31e5.modelMenu,
+      _0x54a050 = String(_0x1bc4b1.provider || 'volcengine').trim(),
+      _0x11e587 = Array.isArray(_0x1bc4b1.providers)
+        ? _0x1bc4b1.providers.map((_0x1edf95) => String(_0x1edf95).toLowerCase())
+        : null,
+      _0x3b705e = _0x1bc4b1.allowCustomModels !== false,
+      _0x1aaeee = String(
+        _0x1bc4b1.model ||
+          _0x5d755f._data?.model ||
+          _0x5d755f._data?.storyboardScript?.model ||
+          _0x1bc4b1.defaultModel ||
+          '',
+      ).trim(),
+      _0xa802cf = () => {
+        const _0x316bca = buildTextModelSmallIconHTML(_0x1aaeee);
+        if (_0x316bca) return _0x316bca;
+        if (_0x54a050 === 'custom' || _0x54a050 === 'openai')
+          return '<div class="text-model-icon-small text-model-icon-badge">OA</div>';
+        return '<div class="text-model-icon-small text-model-icon-badge">AI</div>';
+      },
+      _0x540959 = document.createElement('div');
+    ((_0x540959.className = 'img-model-pills'),
+      (_0x540959.innerHTML =
+        '\n      <div class="img-model-wrap">\n        <button type="button" class="img-pill-btn img-model-btn-trigger">\n          ' +
+        _0xa802cf() +
+        '\n          <span class="img-model-label">' +
+        getDisplayModelName(_0x1aaeee) +
+        '</span>\n          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="node-menu-caret"><polyline points="6 9 12 15 18 9"></polyline></svg>\n        </button>\n        <div class="floating-menu img-model-menu node-model-menu">\n          ' +
+        (_0x3b705e
+          ? '<div class="custom-group-header floating-menu-item node-menu-group-header" data-custom-toggle data-node-menu-submenu=".custom-submenu">\n            <div class="text-model-icon text-model-icon-badge">OA</div>\n            <div class="fmi-content">\n              <div class="fmi-title">' +
+            escapeSharedPromptPanelHtml(sharedPromptPanelText('customModelTitle')) +
+            '</div>\n              <div class="fmi-sub">' +
+            escapeSharedPromptPanelHtml(sharedPromptPanelText('customModelSubtitle')) +
+            '</div>\n            </div>\n            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="node-menu-caret"><polyline points="9 18 15 12 9 6"></polyline></svg>\n          </div>\n          <div class="custom-submenu node-model-submenu node-menu-submenu"></div>'
+          : '') +
+        '\n          ' +
+        buildTextProviderMenuGroupsHTML(_0x1aaeee, { providers: _0x11e587 }) +
+        '\n        </div>\n      </div>'),
+      _0x3def85.appendChild(_0x540959));
+    const _0x29eebf = _0x540959.querySelector('.img-model-wrap'),
+      _0x7b5c77 = _0x540959.querySelector('.img-model-btn-trigger'),
+      _0x50c93b = _0x540959.querySelector('.img-model-menu'),
+      _0x2c407f = _0x540959.querySelector('.img-model-label'),
+      _0x5eb5dc = Object.freeze({
+        grsai: _0x50c93b?.querySelector('.grsai-submenu'),
+        ppio: _0x50c93b?.querySelector('.ppio-submenu'),
+        apimart: _0x50c93b?.querySelector('.apimart-submenu'),
+        agnes: _0x50c93b?.querySelector('.agnes-submenu'),
+        runninghub: _0x50c93b?.querySelector('.runninghub-submenu'),
+        volcengine: _0x50c93b?.querySelector('.volcengine-submenu'),
+      }),
+      _0x38bebc = (_0x19f75c) => {
+        const _0x362e3c = _0x19f75c?.querySelector('img, svg, div'),
+          _0xfd8373 = _0x7b5c77?.firstElementChild;
+        if (!_0xfd8373 || !_0x362e3c || _0x362e3c.classList?.contains('fmi-content')) return;
+        const _0x404783 = _0x362e3c.cloneNode(true);
+        (_0x404783.removeAttribute?.('style'),
+          _0x404783.classList?.remove('text-model-icon', 'node-menu-icon'),
+          _0x404783.classList?.add('text-model-icon-small'),
+          _0x404783.tagName?.toLowerCase() === 'svg' &&
+            (_0x404783.setAttribute('width', '12'),
+            _0x404783.setAttribute('height', '12'),
+            _0x404783.classList.add('node-menu-icon-small')),
+          _0xfd8373.replaceWith(_0x404783));
+      },
+      _0x198acd = (_0x3a2bca, _0x4a09e0, _0x214788) => {
+        const _0x4c82ed = String(_0x3a2bca?.dataset?.value || '').trim();
+        if (!_0x4c82ed) return;
+        const _0x25a62d = String(_0x3a2bca.dataset.provider || _0x4a09e0 || _0x54a050).trim(),
+          _0x5268e9 =
+            _0x3a2bca.querySelector('.fmi-title') ||
+            _0x3a2bca.querySelector('.floating-menu-label') ||
+            _0x3a2bca.querySelector('.custom-model-label');
+        if (_0x2c407f) _0x2c407f.textContent = _0x5268e9?.textContent || _0x4c82ed;
+        (_0x50c93b
+          ?.querySelectorAll('.floating-menu-item')
+          .forEach((_0x1588a2) => _0x1588a2.classList.remove('active')),
+          _0x3a2bca.classList.add('active'),
+          _0x50c93b?.classList.remove('show'));
+        if (_0x214788) _0x214788.style.display = 'none';
+        (_0x38bebc(_0x3a2bca),
+          typeof _0x1bc4b1.onSelect === 'function'
+            ? _0x1bc4b1.onSelect({
+                modelId: _0x4c82ed,
+                provider: _0x25a62d,
+                item: _0x3a2bca,
+                self: _0x5d755f,
+              })
+            : appStore.updateNodeData(_0x5d755f.nodeId, { model: _0x4c82ed, provider: _0x25a62d }));
+      };
+    _0x50c93b?.addEventListener('click', (_0x492954) => {
+      const _0x1c8a3b = _0x492954.target?.closest?.('.floating-menu-item');
+      if (!_0x1c8a3b || !_0x50c93b.contains(_0x1c8a3b)) return;
+      if (!_0x1c8a3b.dataset.value) return;
+      const _0x427d9d = Object.entries(_0x5eb5dc).find(([, _0x229978]) => _0x229978?.contains(_0x1c8a3b));
+      if (_0x427d9d) {
+        (_0x492954.stopPropagation(), _0x198acd(_0x1c8a3b, _0x427d9d[0], _0x427d9d[1]));
+        return;
+      }
+      if (!_0x3b705e) return;
+      const _0x5236ad = _0x50c93b.querySelector('.custom-submenu');
+      _0x5236ad?.contains(_0x1c8a3b) &&
+        (_0x492954.stopPropagation(), _0x198acd(_0x1c8a3b, 'custom', _0x5236ad));
+    });
+    const _0x27424c = _0x50c93b?.querySelector('.custom-submenu');
+    _0x3b705e &&
+      _0x27424c?.addEventListener('pointerdown', (_0x2fe1bf) => {
+        _0x2fe1bf.stopPropagation();
+      });
+    const _0x1ed5ae = () => {
+      if (!_0x3b705e || !_0x27424c) return;
+      const _0x48f484 = getCustomTextModels(),
+        _0x52942f = _0x5d755f._data?.model || '';
+      (_0x27424c.replaceChildren(),
+        _0x48f484.forEach((_0x26d373, _0x59459a) => {
+          const _0xcee038 = document.createElement('div');
+          ((_0xcee038.className =
+            'floating-menu-item custom-model-item' + (_0x52942f === _0x26d373 ? ' active' : '')),
+            (_0xcee038.dataset.value = _0x26d373));
+          const _0x2cfddb = document.createElement('div');
+          ((_0x2cfddb.className = 'text-model-icon text-model-icon-badge custom-model-icon'),
+            (_0x2cfddb.textContent = 'OA'));
+          const _0x3face1 = document.createElement('span');
+          ((_0x3face1.className = 'custom-model-label'), (_0x3face1.textContent = _0x26d373));
+          const _0x196a7d = document.createElement('span');
+          ((_0x196a7d.className = 'custom-model-del'),
+            (_0x196a7d.textContent = '×'),
+            _0xcee038.appendChild(_0x2cfddb),
+            _0xcee038.appendChild(_0x3face1),
+            _0xcee038.appendChild(_0x196a7d),
+            _0xcee038.addEventListener('mouseenter', () => {
+              _0x196a7d.classList.add('show');
+            }),
+            _0xcee038.addEventListener('mouseleave', () => {
+              _0x196a7d.classList.remove('show');
+            }),
+            _0x196a7d.addEventListener('click', (_0xfca84a) => {
+              (_0xfca84a.stopPropagation(),
+                saveCustomTextModels(
+                  getCustomTextModels().filter((_0x15b03f, _0x40880e) => _0x40880e !== _0x59459a),
+                ),
+                _0x1ed5ae());
+            }),
+            _0x27424c.appendChild(_0xcee038));
+        }));
+      if (_0x48f484.length > 0) {
+        const _0x28fa3f = document.createElement('div');
+        ((_0x28fa3f.className = 'custom-model-separator'), _0x27424c.appendChild(_0x28fa3f));
+      }
+      const _0x320539 = document.createElement('div');
+      ((_0x320539.className = 'floating-menu-item custom-model-add'),
+        (_0x320539.innerHTML =
+          '\n        <svg class="custom-model-add-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>\n        <span class="custom-model-add-label">' +
+          escapeSharedPromptPanelHtml(sharedPromptPanelText('addModel')) +
+          '</span>'),
+        _0x320539.addEventListener('click', (_0x1e9689) => {
+          (_0x1e9689.stopPropagation(), _0x320539.replaceChildren(), _0x320539.classList.add('editing'));
+          const _0x4c9169 = document.createElement('input');
+          ((_0x4c9169.type = 'text'),
+            (_0x4c9169.placeholder = sharedPromptPanelText('modelNamePlaceholder')),
+            (_0x4c9169.className = 'custom-model-input'));
+          const _0x508ccf = document.createElement('button');
+          ((_0x508ccf.type = 'button'),
+            (_0x508ccf.textContent = sharedPromptPanelText('confirm')),
+            (_0x508ccf.className = 'custom-model-confirm'));
+          const _0x3f93b5 = () => {
+            const _0x256af2 = _0x4c9169.value.trim();
+            if (!_0x256af2) return;
+            const _0x18d414 = getCustomTextModels();
+            (!_0x18d414.includes(_0x256af2) && (_0x18d414.push(_0x256af2), saveCustomTextModels(_0x18d414)),
+              _0x1ed5ae());
+          };
+          (_0x4c9169.addEventListener('keydown', (_0x12ffb7) => {
+            _0x12ffb7.stopPropagation();
+            if (_0x12ffb7.key === 'Enter') _0x3f93b5();
+          }),
+            _0x4c9169.addEventListener('keyup', (_0x45261f) => _0x45261f.stopPropagation()),
+            _0x4c9169.addEventListener('keypress', (_0x43c98c) => _0x43c98c.stopPropagation()),
+            _0x4c9169.addEventListener('click', (_0x53c7b1) => _0x53c7b1.stopPropagation()),
+            _0x508ccf.addEventListener('click', (_0x46f79b) => {
+              (_0x46f79b.stopPropagation(), _0x3f93b5());
+            }),
+            _0x320539.appendChild(_0x4c9169),
+            _0x320539.appendChild(_0x508ccf),
+            _0x4c9169.focus());
+        }),
+        _0x27424c.appendChild(_0x320539));
+    };
+    if (_0x3b705e) _0x1ed5ae();
+    const _0x28fdd6 = bindNodeModelMenuTrigger({
+        root: _0x3def85,
+        trigger: _0x7b5c77,
+        menu: _0x50c93b,
+        closeOthers: () => closeNodeFooterMenus(_0x3def85, _0x50c93b),
+        activateMenuKeyboard: activateMenuKeyboard,
+      }),
+      _0x10d92e = bindNodeFooterController(_0x3def85);
+    (_0x3ae255.push(_0x28fdd6, _0x10d92e), (_0x5d755f.modelWrap = _0x29eebf));
+  }
+  const _0x3f517d = document.createElement('div');
+  _0x3f517d.className = 'prompt-actions';
+  const _0x39155e = document.createElement('button');
+  return (
+    (_0x39155e.type = 'button'),
+    (_0x39155e.className = 'prompt-submit debug-wrench-btn'),
+    (_0x39155e.title = sharedPromptPanelText('debugApiParams')),
+    (_0x39155e.innerHTML = DEBUG_WRENCH_ICON_HTML),
+    _0x39155e.addEventListener('click', async (_0x330a10) => {
+      (_0x330a10.stopPropagation(), flushPromptHtmlCommit(_0x5d755f));
+      let _0x390bcc;
+      if (typeof _0x5d755f._buildPayload === 'function') _0x390bcc = await _0x5d755f._buildPayload();
+      else {
+        const _0x39fe64 = _0x5d755f.promptEl?.innerText?.trim() || '';
+        _0x390bcc = { prompt: _0x39fe64, nodeType: _0x5d755f._data.type };
+      }
+      if (!_0x390bcc) return;
+      try {
+        const _0x4e130a = await buildGenerateTextRequest(_0x390bcc),
+          _0x2af40f = formatFinalApiDebugRequest(_0x4e130a),
+          _0x19920c = appStore.getState(),
+          _0x127026 = _0x5d755f._data.x + (_0x5d755f._data.width || 0x17c) + 50,
+          _0x2369db = _0x5d755f._data.y;
+        let _0x44385b = Object.values(_0x19920c.nodes).find((_0x4d7b41) => _0x4d7b41.type === 'debug');
+        (!_0x44385b
+          ? appStore.addNode({
+              id: 'debug-' + Date.now(),
+              type: 'debug',
+              x: _0x127026,
+              y: _0x2369db,
+              width: 0x17c,
+              height: 0x12c,
+              name: sharedPromptPanelText('debugNodeName'),
+              outputText: _0x2af40f,
+            })
+          : appStore.updateNodeData(_0x44385b.id, { outputText: _0x2af40f, x: _0x127026, y: _0x2369db }),
+          window.showToast?.(sharedPromptPanelText('debugParamsShown'), 'warn'));
+      } catch (_0x5ab476) {
+        window.showToast?.(
+          sharedPromptPanelText('buildRequestFailed', { error: _0x5ab476.message }),
+          'error',
+        );
+      }
+    }),
+    (_0x5d755f.btnEl = document.createElement('button')),
+    (_0x5d755f.btnEl.type = 'button'),
+    (_0x5d755f.btnEl.className = 'prompt-submit img-gen-btn'),
+    (_0x5d755f.btnEl.title = _0x2b31e5.btnTitle || sharedPromptPanelText('generate')),
+    (_0x5d755f.btnEl.innerHTML =
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>'),
+    _0x5d755f.btnEl.addEventListener('click', (_0x3f57c0) => {
+      (_0x3f57c0.stopPropagation(), flushPromptHtmlCommit(_0x5d755f), _0x5d755f._onGenerate?.());
+    }),
+    _0x3f517d.appendChild(_0x39155e),
+    _0x3f517d.appendChild(_0x5d755f.btnEl),
+    _0x3def85.appendChild(_0x3f517d),
+    _0x3540f7.appendChild(_0x3def85),
+    (_0x5d755f._sharedPanelCleanup = () => {
+      _0x3ae255.forEach((_0x2226a5) => _0x2226a5?.());
+    }),
+    _0x5d755f._updateSubmitButtonState?.(),
+    _0x3540f7
+  );
+}

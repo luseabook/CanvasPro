@@ -1,1 +1,128 @@
-function a236_0xe5ca(){const _0x4faf59=['29740bADRqI','source-text-1','storyboardScript','分镜脚本','storyboard-script','4814046CFAfQo','3393410Penrgs','storyboardScriptAction:\x20creates\x20and\x20connects\x20a\x20storyboard\x20script\x20node','328uqZIXX','selectedNodeIds','should\x20not\x20connect','4BAGNQY','source-video','prompt','955872opcLhM','name','storyboard-script-2','outputs/video.mp4','2PoNBkT','25088JyvXna','957982dYQXgS','equal','storyboardScriptAction:\x20video\x20source\x20seeds\x20default\x20storyboard\x20prompt','storyboard-script-video','storyboard-script-1','deepEqual','2475CsjdUL','edges','video','sourceMode','source-video-1','match','push','1172478izLLrn','source-text'];a236_0xe5ca=function(){return _0x4faf59;};return a236_0xe5ca();}const a236_0x19c372=a236_0x19d3;(function(_0x370277,_0x469bfd){const _0x1b823d=a236_0x19d3,_0x2a0796=_0x370277();while(!![]){try{const _0x13d888=parseInt(_0x1b823d(0x124))/0x1*(parseInt(_0x1b823d(0x126))/0x2)+parseInt(_0x1b823d(0x120))/0x3+-parseInt(_0x1b823d(0x11d))/0x4*(parseInt(_0x1b823d(0x118))/0x5)+parseInt(_0x1b823d(0x110))/0x6+-parseInt(_0x1b823d(0x125))/0x7*(parseInt(_0x1b823d(0x11a))/0x8)+parseInt(_0x1b823d(0x117))/0x9+-parseInt(_0x1b823d(0x112))/0xa*(parseInt(_0x1b823d(0x109))/0xb);if(_0x13d888===_0x469bfd)break;else _0x2a0796['push'](_0x2a0796['shift']());}catch(_0x326ee9){_0x2a0796['push'](_0x2a0796['shift']());}}}(a236_0xe5ca,0x7d089));import a236_0xa9c76d from'node:test';import a236_0x449348 from'node:assert/strict';import{createConnectedStoryboardScriptNode,VIDEO_STORYBOARD_SCRIPT_DEFAULT_PROMPT}from'./storyboardScriptAction.js';import{STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG}from'./storyboardScriptToolbarIcon.js';function createFakeStore(_0x390677){const _0x423e63=[];let _0x1f0e88=[];return{'edges':_0x423e63,get 'selectedNodeIds'(){return _0x1f0e88;},'getStateRaw'(){return{'nodes':_0x390677};},'addNode'(_0x21702d){_0x390677[_0x21702d['id']]=_0x21702d;},'deleteNodes'(_0x50c494){for(const _0x510428 of _0x50c494)delete _0x390677[_0x510428];},'setSelectedNodes'(_0x58482e){_0x1f0e88=_0x58482e;}};}function a236_0x19d3(_0x4c8430,_0x45221d){const _0xe5ca60=a236_0xe5ca();return a236_0x19d3=function(_0x19d3b7,_0x3d9f71){_0x19d3b7=_0x19d3b7-0x108;let _0x2747ac=_0xe5ca60[_0x19d3b7];return _0x2747ac;},a236_0x19d3(_0x4c8430,_0x45221d);}a236_0xa9c76d(a236_0x19c372(0x119),()=>{const _0x5935dd=a236_0x19c372,_0x4133fb={'source-text-1':{'id':_0x5935dd(0x113),'type':_0x5935dd(0x111),'x':0xa,'y':0x14,'width':0x104,'height':0x78,'content':'story'}},_0x2a2e26=createFakeStore(_0x4133fb);let _0x1f4c1a=0x0;const _0x4bb8e3=createConnectedStoryboardScriptNode({'sourceNodeId':'source-text-1','storeInstance':_0x2a2e26,'generateId':()=>_0x5935dd(0x12a),'calcSafeSpawnPosNearNode':()=>({'x':0x190,'y':0x14}),'isValidConnectionFn':()=>!![],'addEdgeWithPolicies':({sourceId:_0x3263ae,targetId:_0x7ab332})=>{const _0x307e60=_0x5935dd;return _0x2a2e26['edges'][_0x307e60(0x10f)]({'sourceId':_0x3263ae,'targetId':_0x7ab332}),!![];},'commit':()=>{_0x1f4c1a+=0x1;}});a236_0x449348[_0x5935dd(0x108)](_0x4bb8e3,{'ok':!![],'nodeId':'storyboard-script-1'}),a236_0x449348['equal'](_0x4133fb[_0x5935dd(0x12a)]['type'],_0x5935dd(0x116)),a236_0x449348[_0x5935dd(0x127)](_0x4133fb[_0x5935dd(0x12a)][_0x5935dd(0x121)],_0x5935dd(0x115)),a236_0x449348[_0x5935dd(0x108)](_0x2a2e26[_0x5935dd(0x10a)],[{'sourceId':_0x5935dd(0x113),'targetId':_0x5935dd(0x12a)}]),a236_0x449348[_0x5935dd(0x108)](_0x2a2e26[_0x5935dd(0x11b)],[_0x5935dd(0x12a)]),a236_0x449348[_0x5935dd(0x127)](_0x1f4c1a,0x1);}),a236_0xa9c76d('storyboardScriptAction:\x20does\x20not\x20create\x20node\x20when\x20connection\x20is\x20invalid',()=>{const _0x3b7a6b=a236_0x19c372,_0x20c459={'source-video-1':{'id':_0x3b7a6b(0x10d),'type':_0x3b7a6b(0x11e),'x':0x0,'y':0x0,'width':0x12c,'height':0xb4}},_0x3912d7=createFakeStore(_0x20c459),_0x565f91=createConnectedStoryboardScriptNode({'sourceNodeId':_0x3b7a6b(0x10d),'storeInstance':_0x3912d7,'generateId':()=>_0x3b7a6b(0x122),'calcSafeSpawnPosNearNode':()=>({'x':0x1a4,'y':0x0}),'isValidConnectionFn':()=>![],'addEdgeWithPolicies':()=>{const _0x55aebb=_0x3b7a6b;throw new Error(_0x55aebb(0x11c));},'commit':()=>{throw new Error('should\x20not\x20commit');}});a236_0x449348[_0x3b7a6b(0x108)](_0x565f91,{'ok':![],'reason':'invalid-connection'}),a236_0x449348[_0x3b7a6b(0x127)](_0x20c459[_0x3b7a6b(0x122)],undefined);}),a236_0xa9c76d(a236_0x19c372(0x128),()=>{const _0x5b76c1=a236_0x19c372,_0x4ee297={'source-video-1':{'id':'source-video-1','type':'source-video','x':0x0,'y':0x0,'width':0x12c,'height':0xb4,'localPath':_0x5b76c1(0x123)}},_0x4eed30=createFakeStore(_0x4ee297),_0x11c0a5=createConnectedStoryboardScriptNode({'sourceNodeId':'source-video-1','storeInstance':_0x4eed30,'generateId':()=>_0x5b76c1(0x129),'calcSafeSpawnPosNearNode':()=>({'x':0x1a4,'y':0x0}),'isValidConnectionFn':()=>!![],'addEdgeWithPolicies':({sourceId:_0x1c3fc2,targetId:_0xa86b4c})=>{const _0x4a273c=_0x5b76c1;return _0x4eed30['edges'][_0x4a273c(0x10f)]({'sourceId':_0x1c3fc2,'targetId':_0xa86b4c}),!![];},'commit':()=>{}});a236_0x449348[_0x5b76c1(0x127)](_0x11c0a5['ok'],!![]),a236_0x449348[_0x5b76c1(0x127)](_0x4ee297[_0x5b76c1(0x129)][_0x5b76c1(0x11f)],VIDEO_STORYBOARD_SCRIPT_DEFAULT_PROMPT),a236_0x449348[_0x5b76c1(0x127)](_0x4ee297[_0x5b76c1(0x129)]['storyboardScript'][_0x5b76c1(0x11f)],VIDEO_STORYBOARD_SCRIPT_DEFAULT_PROMPT),a236_0x449348[_0x5b76c1(0x127)](_0x4ee297[_0x5b76c1(0x129)][_0x5b76c1(0x114)][_0x5b76c1(0x10c)],_0x5b76c1(0x10b));}),a236_0xa9c76d('storyboardScriptAction:\x20toolbar\x20icon\x20uses\x20storyboard\x20table\x20glyph',()=>{const _0x60cd6d=a236_0x19c372;a236_0x449348[_0x60cd6d(0x10e)](STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG,/<rect x="3" y="4"/),a236_0x449348['match'](STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG,/<path d="M3 9h18"/),a236_0x449348[_0x60cd6d(0x10e)](STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG,/<path d="M8 4v16"/);});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  createConnectedStoryboardScriptNode,
+  VIDEO_STORYBOARD_SCRIPT_DEFAULT_PROMPT,
+} from './storyboardScriptAction.js';
+import { STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG } from './storyboardScriptToolbarIcon.js';
+function createFakeStore(_0x390677) {
+  const _0x423e63 = [];
+  let _0x1f0e88 = [];
+  return {
+    edges: _0x423e63,
+    get selectedNodeIds() {
+      return _0x1f0e88;
+    },
+    getStateRaw() {
+      return { nodes: _0x390677 };
+    },
+    addNode(_0x21702d) {
+      _0x390677[_0x21702d.id] = _0x21702d;
+    },
+    deleteNodes(_0x50c494) {
+      for (const _0x510428 of _0x50c494) delete _0x390677[_0x510428];
+    },
+    setSelectedNodes(_0x58482e) {
+      _0x1f0e88 = _0x58482e;
+    },
+  };
+}
+(test('storyboardScriptAction: creates and connects a storyboard script node', () => {
+  const _0x4133fb = {
+      'source-text-1': {
+        id: 'source-text-1',
+        type: 'source-text',
+        x: 10,
+        y: 20,
+        width: 0x104,
+        height: 120,
+        content: 'story',
+      },
+    },
+    _0x2a2e26 = createFakeStore(_0x4133fb);
+  let _0x1f4c1a = 0;
+  const _0x4bb8e3 = createConnectedStoryboardScriptNode({
+    sourceNodeId: 'source-text-1',
+    storeInstance: _0x2a2e26,
+    generateId: () => 'storyboard-script-1',
+    calcSafeSpawnPosNearNode: () => ({ x: 0x190, y: 20 }),
+    isValidConnectionFn: () => true,
+    addEdgeWithPolicies: ({ sourceId: _0x3263ae, targetId: _0x7ab332 }) => {
+      return (_0x2a2e26.edges.push({ sourceId: _0x3263ae, targetId: _0x7ab332 }), true);
+    },
+    commit: () => {
+      _0x1f4c1a += 1;
+    },
+  });
+  (assert.deepEqual(_0x4bb8e3, { ok: true, nodeId: 'storyboard-script-1' }),
+    assert.equal(_0x4133fb['storyboard-script-1'].type, 'storyboard-script'),
+    assert.equal(_0x4133fb['storyboard-script-1'].name, '分镜脚本'),
+    assert.deepEqual(_0x2a2e26.edges, [{ sourceId: 'source-text-1', targetId: 'storyboard-script-1' }]),
+    assert.deepEqual(_0x2a2e26.selectedNodeIds, ['storyboard-script-1']),
+    assert.equal(_0x1f4c1a, 1));
+}),
+  test('storyboardScriptAction: does not create node when connection is invalid', () => {
+    const _0x20c459 = {
+        'source-video-1': {
+          id: 'source-video-1',
+          type: 'source-video',
+          x: 0,
+          y: 0,
+          width: 0x12c,
+          height: 180,
+        },
+      },
+      _0x3912d7 = createFakeStore(_0x20c459),
+      _0x565f91 = createConnectedStoryboardScriptNode({
+        sourceNodeId: 'source-video-1',
+        storeInstance: _0x3912d7,
+        generateId: () => 'storyboard-script-2',
+        calcSafeSpawnPosNearNode: () => ({ x: 0x1a4, y: 0 }),
+        isValidConnectionFn: () => false,
+        addEdgeWithPolicies: () => {
+          throw new Error('should not connect');
+        },
+        commit: () => {
+          throw new Error('should not commit');
+        },
+      });
+    (assert.deepEqual(_0x565f91, { ok: false, reason: 'invalid-connection' }),
+      assert.equal(_0x20c459['storyboard-script-2'], undefined));
+  }),
+  test('storyboardScriptAction: video source seeds default storyboard prompt', () => {
+    const _0x4ee297 = {
+        'source-video-1': {
+          id: 'source-video-1',
+          type: 'source-video',
+          x: 0,
+          y: 0,
+          width: 0x12c,
+          height: 180,
+          localPath: 'outputs/video.mp4',
+        },
+      },
+      _0x4eed30 = createFakeStore(_0x4ee297),
+      _0x11c0a5 = createConnectedStoryboardScriptNode({
+        sourceNodeId: 'source-video-1',
+        storeInstance: _0x4eed30,
+        generateId: () => 'storyboard-script-video',
+        calcSafeSpawnPosNearNode: () => ({ x: 0x1a4, y: 0 }),
+        isValidConnectionFn: () => true,
+        addEdgeWithPolicies: ({ sourceId: _0x1c3fc2, targetId: _0xa86b4c }) => {
+          return (_0x4eed30.edges.push({ sourceId: _0x1c3fc2, targetId: _0xa86b4c }), true);
+        },
+        commit: () => {},
+      });
+    (assert.equal(_0x11c0a5.ok, true),
+      assert.equal(_0x4ee297['storyboard-script-video'].prompt, VIDEO_STORYBOARD_SCRIPT_DEFAULT_PROMPT),
+      assert.equal(
+        _0x4ee297['storyboard-script-video'].storyboardScript.prompt,
+        VIDEO_STORYBOARD_SCRIPT_DEFAULT_PROMPT,
+      ),
+      assert.equal(_0x4ee297['storyboard-script-video'].storyboardScript.sourceMode, 'video'));
+  }),
+  test('storyboardScriptAction: toolbar icon uses storyboard table glyph', () => {
+    (assert.match(STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG, /<rect x="3" y="4"/),
+      assert.match(STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG, /<path d="M3 9h18"/),
+      assert.match(STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG, /<path d="M8 4v16"/));
+  }));

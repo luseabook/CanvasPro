@@ -24,7 +24,7 @@ jobs:
   build-mac-arm64:
     runs-on: macos-15
     steps:
-      - name: Checkout obfuscated release repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Assert Apple Silicon runner

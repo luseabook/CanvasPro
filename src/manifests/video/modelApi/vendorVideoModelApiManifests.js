@@ -1,1 +1,4808 @@
-const a422_0x45d8b9=a422_0x2455;(function(_0xe34ae7,_0x3055f4){const _0x454773=a422_0x2455,_0x59db1d=_0xe34ae7();while(!![]){try{const _0x13dc75=-parseInt(_0x454773(0x267))/0x1+parseInt(_0x454773(0x4d8))/0x2+parseInt(_0x454773(0x242))/0x3*(-parseInt(_0x454773(0x2f5))/0x4)+parseInt(_0x454773(0x289))/0x5*(parseInt(_0x454773(0x493))/0x6)+-parseInt(_0x454773(0x354))/0x7+-parseInt(_0x454773(0x1ec))/0x8*(parseInt(_0x454773(0x2dc))/0x9)+-parseInt(_0x454773(0x4e7))/0xa*(-parseInt(_0x454773(0x379))/0xb);if(_0x13dc75===_0x3055f4)break;else _0x59db1d['push'](_0x59db1d['shift']());}catch(_0x10bef1){_0x59db1d['push'](_0x59db1d['shift']());}}}(a422_0x45a2,0x9fda6));const VIDEO_DURATION_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x2df),'type':'slider','placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x4b9),'label':a422_0x45d8b9(0x259),'defaultValue':0x5,'min':0x4,'max':0xf,'step':0x1}),VIDEO_RESOLUTION_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x228),'type':a422_0x45d8b9(0x368),'placement':'resolution','label':'视频分辨率','defaultValue':a422_0x45d8b9(0x229),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x229),'label':a422_0x45d8b9(0x229)}),Object[a422_0x45d8b9(0x321)]({'value':'1080P','label':a422_0x45d8b9(0x3cd)})])}),APIMART_VIDEO_ADAPTIVE_RATIO_VALUE='自适应',APIMART_VIDEO_ADAPTIVE_RATIO_OPTION=Object[a422_0x45d8b9(0x321)]({'value':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'label':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE}),VIDEO_RATIO_FIELD=Object[a422_0x45d8b9(0x321)]({'id':'aspectRatio','displayRole':a422_0x45d8b9(0x1f9),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x228),'label':'比例','defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'options':Object[a422_0x45d8b9(0x321)]([APIMART_VIDEO_ADAPTIVE_RATIO_OPTION,Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x2ef),'label':'16:9'}),Object['freeze']({'value':a422_0x45d8b9(0x3f5),'label':a422_0x45d8b9(0x3f5)}),Object['freeze']({'value':a422_0x45d8b9(0x2b6),'label':a422_0x45d8b9(0x2b6)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x3ac),'label':'4:3'}),Object['freeze']({'value':a422_0x45d8b9(0x2b7),'label':a422_0x45d8b9(0x2b7)})])}),APIMART_VIDEO_FOOTER_PLACEMENT_ORDER=Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x260),'resolution']),VIDEO_MODE_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x260),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x3f1),'label':a422_0x45d8b9(0x3ad),'defaultValue':'std','options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x413),'label':'标准'}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x211),'label':'专业'})])}),VIDEO_AUDIO_FIELD=Object[a422_0x45d8b9(0x321)]({'id':'audio','type':a422_0x45d8b9(0x4e6),'placement':'advanced','variant':a422_0x45d8b9(0x376),'label':a422_0x45d8b9(0x21a),'defaultValue':![]}),VIDEO_WATERMARK_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x43a),'type':a422_0x45d8b9(0x4e6),'placement':'advanced','variant':a422_0x45d8b9(0x376),'label':a422_0x45d8b9(0x1d5),'defaultValue':![]}),VIDEO_WATERMARK_CN_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_WATERMARK_FIELD,'label':a422_0x45d8b9(0x1d5)}),VIDEO_SEED_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x1e8),'type':a422_0x45d8b9(0x334),'placement':a422_0x45d8b9(0x23b),'variant':'randomSeedRow','label':'随机种子','defaultValue':a422_0x45d8b9(0x44a),'randomSeedMin':0x0,'randomSeedMax':0x7fffffff}),VIDEO_NEGATIVE_PROMPT_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x1e4),'type':a422_0x45d8b9(0x2c5),'placement':a422_0x45d8b9(0x23b),'variant':'advancedRow','label':a422_0x45d8b9(0x457),'defaultValue':'none'}),VIDEO_PROMPT_EXTEND_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x46a),'type':a422_0x45d8b9(0x4e6),'placement':a422_0x45d8b9(0x23b),'variant':a422_0x45d8b9(0x376),'label':a422_0x45d8b9(0x2eb),'defaultValue':!![]}),VIDEO_PROMPT_OPTIMIZER_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x20e),'type':a422_0x45d8b9(0x4e6),'placement':a422_0x45d8b9(0x23b),'variant':a422_0x45d8b9(0x376),'label':a422_0x45d8b9(0x248),'defaultValue':!![]}),VIDEO_FAST_PRETREATMENT_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x34b),'type':'toggle','placement':a422_0x45d8b9(0x23b),'variant':'advancedRow','label':a422_0x45d8b9(0x31f),'defaultValue':![]}),VIDEO_ENABLE_GIF_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x4a3),'type':a422_0x45d8b9(0x4e6),'placement':a422_0x45d8b9(0x23b),'variant':a422_0x45d8b9(0x376),'label':'启用\x20GIF\x20输出格式','defaultValue':![]}),VIDEO_AUDIO_SETTING_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x1d6),'type':a422_0x45d8b9(0x368),'placement':'advanced','variant':'advancedRow','label':a422_0x45d8b9(0x206),'defaultValue':a422_0x45d8b9(0x266),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x266),'label':'自动生成'}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x402),'label':a422_0x45d8b9(0x261)})])}),VIDEO_SHOT_TYPE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x34d),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x23b),'variant':a422_0x45d8b9(0x376),'label':'镜头类型','defaultValue':a422_0x45d8b9(0x4ca),'options':Object['freeze']([Object['freeze']({'value':'single','label':a422_0x45d8b9(0x2a1)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x33f),'label':a422_0x45d8b9(0x329)})])}),KLING_V3_AUDIO_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_AUDIO_FIELD,'label':a422_0x45d8b9(0x4a1)}),KLING_V3_NEGATIVE_PROMPT_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_NEGATIVE_PROMPT_FIELD,'defaultValue':a422_0x45d8b9(0x3ae),'defaultValueAliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x412)])}),KLING_V3_MODE_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x228),'type':a422_0x45d8b9(0x368),'placement':'resolution','variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x2b8),'defaultValue':'std','options':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'value':a422_0x45d8b9(0x413),'label':a422_0x45d8b9(0x229)}),Object['freeze']({'value':a422_0x45d8b9(0x211),'label':'1080P'}),Object[a422_0x45d8b9(0x321)]({'value':'4k','label':'4K'})])}),KLING_O1_QUALITY_FIELD=Object[a422_0x45d8b9(0x321)]({...KLING_V3_MODE_FIELD,'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x413),'label':a422_0x45d8b9(0x229)}),Object['freeze']({'value':'pro','label':a422_0x45d8b9(0x3cd)})])}),KLING_O1_KEEP_ORIGINAL_SOUND_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x436),'type':a422_0x45d8b9(0x4e6),'placement':a422_0x45d8b9(0x23b),'variant':'advancedRow','label':'保留原声','description':'仅接入编辑视频或特征参考视频时生效。','defaultValue':![]}),KLING_V3_MULTI_SHOT_PLACEHOLDER_FIELD=Object[a422_0x45d8b9(0x321)]({'id':'multi_shot','type':'toggle','placement':a422_0x45d8b9(0x23b),'variant':a422_0x45d8b9(0x376),'label':'多镜头分镜模式','description':a422_0x45d8b9(0x49b),'defaultValue':![],'disabled':!![]}),VEO3_MODEL_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x260),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':'sectionMenu','label':'模型选择','description':a422_0x45d8b9(0x342),'defaultValue':a422_0x45d8b9(0x43b),'options':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'value':a422_0x45d8b9(0x43b),'label':'fast'}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x278),'label':a422_0x45d8b9(0x278)})])}),VEO3_GENERATION_TYPE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x3b0),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x3ad),'description':a422_0x45d8b9(0x449),'defaultValue':a422_0x45d8b9(0x1df),'options':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'value':a422_0x45d8b9(0x1df),'label':a422_0x45d8b9(0x461)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x336),'label':'参考图','disableWhen':{'field':'mode','value':a422_0x45d8b9(0x278)}})])}),VEO3_FRAME_HELP_TOOLTIP=[a422_0x45d8b9(0x216),a422_0x45d8b9(0x298),a422_0x45d8b9(0x4db),a422_0x45d8b9(0x4eb),a422_0x45d8b9(0x408)][a422_0x45d8b9(0x486)]('\x0a'),VEO3_REFERENCE_HELP_TOOLTIP=[a422_0x45d8b9(0x414),a422_0x45d8b9(0x2fe),'[[red:放\x201-3\x20张参考图]]：参考人物、主体、风格或场景，不会固定成开头和结尾。','重点写清\x20[[red:想生成什么动作和镜头]]；quality\x20档不支持参考图。',a422_0x45d8b9(0x360)][a422_0x45d8b9(0x486)]('\x0a'),VEO3_FRAME_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x1da),VEO3_REFERENCE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x286),VEO3_FIXED_DURATION_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x2df),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x3f1),'label':a422_0x45d8b9(0x259),'defaultValue':0x8,'readOnly':!![],'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':0x8,'label':'8s'})])}),VEO3_ENABLE_GIF_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_ENABLE_GIF_FIELD,'label':a422_0x45d8b9(0x218)}),RUNNINGHUB_VEO3_CHANNEL_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x347),'type':a422_0x45d8b9(0x368),'placement':'mode','variant':'sectionMenu','label':a422_0x45d8b9(0x1dc),'description':'官方稳定版更稳；低价渠道版成本更低但可能不稳定。','defaultValue':a422_0x45d8b9(0x496),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x496),'label':a422_0x45d8b9(0x4af)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x3e1),'label':a422_0x45d8b9(0x284)})])}),RUNNINGHUB_VEO3_MODEL_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x260),'type':a422_0x45d8b9(0x368),'placement':'mode','variant':'sectionMenu','label':a422_0x45d8b9(0x300),'defaultValue':a422_0x45d8b9(0x43b),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':'fast','label':a422_0x45d8b9(0x1e1)}),Object[a422_0x45d8b9(0x321)]({'value':'pro','label':'Pro\x20版'}),Object[a422_0x45d8b9(0x321)]({'value':'lite','label':a422_0x45d8b9(0x498),'disableWhen':Object['freeze']({'field':a422_0x45d8b9(0x347),'value':a422_0x45d8b9(0x496)})})])}),RUNNINGHUB_VEO3_GENERATION_TYPE_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x3b0),'type':a422_0x45d8b9(0x368),'placement':'mode','variant':a422_0x45d8b9(0x39d),'label':'模式选择','description':a422_0x45d8b9(0x205),'defaultValue':a422_0x45d8b9(0x1df),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x1df),'label':a422_0x45d8b9(0x461)}),Object[a422_0x45d8b9(0x321)]({'value':'reference','label':'参考图','disableWhen':Object[a422_0x45d8b9(0x321)]({'any':Object['freeze']([Object['freeze']({'field':a422_0x45d8b9(0x347),'value':a422_0x45d8b9(0x496)}),Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x260),'value':a422_0x45d8b9(0x3c6)})])})}),Object['freeze']({'value':a422_0x45d8b9(0x490),'label':a422_0x45d8b9(0x2a0),'disableWhen':Object[a422_0x45d8b9(0x321)]({'any':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x347),'value':a422_0x45d8b9(0x496)}),Object[a422_0x45d8b9(0x321)]({'field':'mode','value':a422_0x45d8b9(0x3c6)})])})})])}),RUNNINGHUB_VEO3_DURATION_FIELD=Object['freeze']({...createFooterDurationSliderOptionsField({'values':[0x4,0x6,0x8],'defaultValue':0x8,'label':'视频时长（秒）'}),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x490)})}),RUNNINGHUB_VEO3_GENERATE_AUDIO_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x47a),'type':'toggle','placement':a422_0x45d8b9(0x23b),'variant':'advancedRow','label':a422_0x45d8b9(0x21a),'defaultValue':![],'hideWhen':Object[a422_0x45d8b9(0x321)]({'any':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x347),'value':a422_0x45d8b9(0x496)}),Object[a422_0x45d8b9(0x321)]({'field':'generation_type','value':'extend'})])})}),RUNNINGHUB_VEO3_FIXED_INPUT_SLOTS=Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧图','description':a422_0x45d8b9(0x2a2),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'values':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x336),a422_0x45d8b9(0x490)])})}),Object['freeze']({'id':a422_0x45d8b9(0x31a),'kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x2b5),'description':a422_0x45d8b9(0x451),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'values':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x336),a422_0x45d8b9(0x490)])})}),Object[a422_0x45d8b9(0x321)]({'id':'referenceImage','kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x4cf),'description':'官方\x20Fast\x20/\x20Pro\x20参考生视频，支持\x201-3\x20张参考图。','showWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x336)})}),Object['freeze']({'id':a422_0x45d8b9(0x2aa),'kind':'video','label':'续写视频','description':'官方\x20Fast\x20/\x20Pro\x20视频续写使用的原视频。','showWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x490)})})]),RUNNINGHUB_VEO3_FRAME_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x43d),RUNNINGHUB_VEO3_REFERENCE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x3b6),RUNNINGHUB_VEO3_EXTEND_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x42c),RUNNINGHUB_VEO3_FRAME_HELP_TOOLTIP=['RunningHub\x20Veo3','[[red:不放图]]：文生视频。',a422_0x45d8b9(0x4dd),a422_0x45d8b9(0x4a4),a422_0x45d8b9(0x409)][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_VEO3_REFERENCE_HELP_TOOLTIP=[a422_0x45d8b9(0x337),a422_0x45d8b9(0x4a7),'[[red:低价版和\x20Lite]]：官方文档未提供参考图接口，已在\x20UI\x20中禁用。',a422_0x45d8b9(0x3ee)][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_VEO3_EXTEND_HELP_TOOLTIP=[a422_0x45d8b9(0x231),a422_0x45d8b9(0x3e6),'[[red:低价版和\x20Lite]]：官方文档未提供\x20video-extend\x20接口，已在\x20UI\x20中禁用。','请求只提交\x20video\x20和\x20resolution。'][a422_0x45d8b9(0x486)]('\x0a'),VIDU_Q3_GENERATION_MODE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x273),'type':a422_0x45d8b9(0x368),'placement':'mode','variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x3ad),'defaultValue':'video','options':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x391),'label':a422_0x45d8b9(0x46e)}),Object['freeze']({'value':'reference','label':a422_0x45d8b9(0x251)})])}),VIDU_Q3_MODEL_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x260),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x300),'defaultValue':a422_0x45d8b9(0x484),'description':a422_0x45d8b9(0x2d4),'options':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'value':a422_0x45d8b9(0x484),'label':'Turbo\x20版','disableWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x273),'value':a422_0x45d8b9(0x336)})}),Object['freeze']({'value':a422_0x45d8b9(0x21c),'label':a422_0x45d8b9(0x1d7),'disableWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x273),'value':a422_0x45d8b9(0x336)})}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x478),'label':a422_0x45d8b9(0x221),'disableWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x273),'value':'video'})}),Object['freeze']({'value':a422_0x45d8b9(0x239),'label':a422_0x45d8b9(0x473),'disableWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x273),'value':a422_0x45d8b9(0x391)})})])}),VIDU_Q3_AUDIO_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_AUDIO_FIELD,'defaultValue':!![],'hideWhen':Object['freeze']({'field':'vidu_q3_generation_mode','value':a422_0x45d8b9(0x336)})}),VIDU_Q3_HELP_TOOLTIP=['Vidu\x20Q3\x20视频生成','[[red:视频生成]]：Turbo\x20/\x20Pro，支持文生、图生、首尾帧，最多\x202\x20张图；传图时比例由图片决定。',a422_0x45d8b9(0x324)][a422_0x45d8b9(0x486)]('\x0a'),GROK_IMAGINE_QUALITY_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x278),'type':'segmented','placement':a422_0x45d8b9(0x228),'variant':a422_0x45d8b9(0x3f1),'label':a422_0x45d8b9(0x303),'defaultValue':a422_0x45d8b9(0x31e),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':'480p','label':a422_0x45d8b9(0x31e)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x4ad),'label':a422_0x45d8b9(0x4ad)})])}),GROK_IMAGINE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x246),GROK_IMAGINE_HELP_TOOLTIP=[a422_0x45d8b9(0x32e),a422_0x45d8b9(0x36c),'[[red:放\x201-7\x20张图]]：图生视频，参考图需为公网可访问\x20URL。','时长支持\x206-30\x20秒，质量支持\x20480p\x20/\x20720p。'][a422_0x45d8b9(0x486)]('\x0a'),GEMINI_OMNI_FLASH_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x271),GEMINI_OMNI_FLASH_HELP_TOOLTIP=[a422_0x45d8b9(0x4d4),a422_0x45d8b9(0x36c),a422_0x45d8b9(0x258),a422_0x45d8b9(0x43c),a422_0x45d8b9(0x45c)]['join']('\x0a'),HAILUO_02_PROMPT_EXAMPLE=a422_0x45d8b9(0x452),HAILUO_02_HELP_TOOLTIP=['Hailuo-02\x20适用场景','[[red:不放图]]：文生视频，适合快速把一句场景描述变成短视频。',a422_0x45d8b9(0x365),a422_0x45d8b9(0x2c7),'[[red:1080p\x20只做\x205\x20秒]]；想做\x2010\x20秒就用\x20512p\x20或\x20768p。',a422_0x45d8b9(0x47b)][a422_0x45d8b9(0x486)]('\x0a'),HAILUO_23_PROMPT_EXAMPLE=a422_0x45d8b9(0x452),HAILUO_23_HELP_TOOLTIP=[a422_0x45d8b9(0x2ca),'[[red:标准版不放图]]：文生视频，适合快速把一句场景描述变成短视频。',a422_0x45d8b9(0x4d1),a422_0x45d8b9(0x3a9),a422_0x45d8b9(0x3ca),'提示词例子：画面中的猫咪向镜头奔跑，镜头缓缓推进，草地和阳光有电影感。'][a422_0x45d8b9(0x486)]('\x0a'),HAILUO_23_MODEL_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x260),'type':'segmented','placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x300),'description':'标准版支持文生和图生视频。\x0aFast\x20版必须接入首帧图片，生成更快。','defaultValue':a422_0x45d8b9(0x2c8),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x2c8),'label':a422_0x45d8b9(0x221)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x43b),'label':a422_0x45d8b9(0x1e1)})])}),RUNNINGHUB_HAILUO_02_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x4c5),RUNNINGHUB_HAILUO_02_HELP_TOOLTIP=[a422_0x45d8b9(0x3f3),a422_0x45d8b9(0x385),a422_0x45d8b9(0x2b9),a422_0x45d8b9(0x443),a422_0x45d8b9(0x3a2),a422_0x45d8b9(0x277)][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_HAILUO_02_QUALITY_FIELD=Object[a422_0x45d8b9(0x321)]({'id':'rh_hailuo_02_quality','type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x228),'variant':'sectionMenu','label':a422_0x45d8b9(0x303),'description':'标准版支持文生、图生和首尾帧；Pro\x20版支持文生/首帧图生；Fast\x20版必须接首帧。','defaultValue':a422_0x45d8b9(0x2c8),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':'standard','label':a422_0x45d8b9(0x221),'selectedLabel':'标准\x20768P'}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x211),'label':'Pro\x20版','selectedLabel':a422_0x45d8b9(0x36f)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x43b),'label':a422_0x45d8b9(0x1e1),'selectedLabel':a422_0x45d8b9(0x37f),'tooltip':a422_0x45d8b9(0x485)})])}),RUNNINGHUB_HAILUO_02_DURATION_FIELD=Object[a422_0x45d8b9(0x321)]({...createFooterDurationSliderOptionsField({'values':[0x6,0xa],'defaultValue':0x6,'label':'视频时长（秒）'}),'hideWhen':Object['freeze']({'field':a422_0x45d8b9(0x2f2),'value':'pro'})}),RUNNINGHUB_HAILUO_02_ENABLE_PROMPT_EXPANSION_FIELD=Object[a422_0x45d8b9(0x321)]({'id':'enablePromptExpansion','type':'toggle','placement':a422_0x45d8b9(0x23b),'variant':'advancedRow','label':a422_0x45d8b9(0x2eb),'defaultValue':!![]}),RUNNINGHUB_HAILUO_02_FIXED_INPUT_SLOTS=Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧','description':a422_0x45d8b9(0x1e2)}),Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x31a),'kind':'image','label':'尾帧','description':'仅标准版首尾帧可用。','hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x2f2),'values':Object['freeze'](['pro',a422_0x45d8b9(0x43b)])})})]),RUNNINGHUB_HAILUO_23_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x319),RUNNINGHUB_HAILUO_23_HELP_TOOLTIP=['RunningHub\x20Hailuo\x202.3',a422_0x45d8b9(0x385),'[[red:标准版放\x201\x20张首帧]]：图生视频，把图片作为视频起点。',a422_0x45d8b9(0x482),a422_0x45d8b9(0x306),'[[red:Fast\x20Pro\x20版]]：必须接\x201\x20张首帧图，1080P，固定\x206\x20秒。'][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_HAILUO_23_QUALITY_FIELD=Object[a422_0x45d8b9(0x321)]({'id':'rh_hailuo_23_quality','type':a422_0x45d8b9(0x368),'placement':'resolution','variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x303),'description':a422_0x45d8b9(0x375),'defaultValue':a422_0x45d8b9(0x2c8),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x2c8),'label':a422_0x45d8b9(0x221),'selectedLabel':a422_0x45d8b9(0x437)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x211),'label':a422_0x45d8b9(0x1d7),'selectedLabel':a422_0x45d8b9(0x36f)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x43b),'label':a422_0x45d8b9(0x1e1),'selectedLabel':a422_0x45d8b9(0x37f),'tooltip':'Fast\x20版仅支持图生视频，必须接入首帧。'}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x397),'label':a422_0x45d8b9(0x4d3),'selectedLabel':'Fast\x20Pro\x201080P','tooltip':a422_0x45d8b9(0x406)})])}),RUNNINGHUB_HAILUO_23_DURATION_FIELD=Object[a422_0x45d8b9(0x321)]({...createFooterDurationSliderOptionsField({'values':[0x6,0xa],'defaultValue':0x6,'label':a422_0x45d8b9(0x235)}),'hideWhen':Object['freeze']({'field':'rh_hailuo_23_quality','values':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x211),a422_0x45d8b9(0x397)])})}),RUNNINGHUB_HAILUO_23_FIXED_INPUT_SLOTS=Object['freeze']([Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧','description':'图生视频起始帧；Fast\x20/\x20Fast\x20Pro\x20必填。'})]),HAPPYHORSE_TEXT_HELP_TOOLTIP=[a422_0x45d8b9(0x367),a422_0x45d8b9(0x462),a422_0x45d8b9(0x3c9),a422_0x45d8b9(0x47f)][a422_0x45d8b9(0x486)]('\x0a'),HAPPYHORSE_IMAGE_HELP_TOOLTIP=[a422_0x45d8b9(0x2f6),a422_0x45d8b9(0x465),'[[red:没入参时]]：仍然是文生视频，只按提示词生成。','适合人物转身、表情变化、镜头推进这类从一张图开始的变化。',a422_0x45d8b9(0x27b)][a422_0x45d8b9(0x486)]('\x0a'),HAPPYHORSE_REFERENCE_HELP_TOOLTIP=[a422_0x45d8b9(0x2de),a422_0x45d8b9(0x39f),a422_0x45d8b9(0x35c),a422_0x45d8b9(0x48b),a422_0x45d8b9(0x36b)][a422_0x45d8b9(0x486)]('\x0a'),HAPPYHORSE_EDIT_HELP_TOOLTIP=[a422_0x45d8b9(0x396),a422_0x45d8b9(0x2fd),a422_0x45d8b9(0x35c),a422_0x45d8b9(0x378),a422_0x45d8b9(0x421)]['join']('\x0a'),HAPPYHORSE_HELP_TOOLTIP=HAPPYHORSE_TEXT_HELP_TOOLTIP,HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x279),HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x2a5),HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x41e),HAPPYHORSE_EDIT_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x250),HAPPYHORSE_MODE_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x435),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x3ad),'description':HAPPYHORSE_HELP_TOOLTIP,'defaultValue':'image','options':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'value':a422_0x45d8b9(0x266),'label':a422_0x45d8b9(0x3ad),'displayLabel':a422_0x45d8b9(0x3ad),'hidden':!![]}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x44a),'label':'图生视频'}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x336),'label':a422_0x45d8b9(0x374)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x32d),'label':a422_0x45d8b9(0x4bd)})])}),HAPPYHORSE_AUDIO_SETTING_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_AUDIO_SETTING_FIELD,'label':'音频设置','tooltip':'仅视频编辑模式生效：自动生成音频或保留原视频音轨。','options':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'value':a422_0x45d8b9(0x266),'label':a422_0x45d8b9(0x297)}),Object[a422_0x45d8b9(0x321)]({'value':'origin','label':a422_0x45d8b9(0x479)})])}),HAPPYHORSE_WATERMARK_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_WATERMARK_FIELD,'label':a422_0x45d8b9(0x1d5)}),HAPPYHORSE_SEED_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_SEED_FIELD,'label':a422_0x45d8b9(0x1d2)});function createHappyHorseFixedSlot({id:_0x3e62cb,kind:_0xfd9fed,label:_0x2d7c77,mode:_0x2554ae,description:_0x5812a5}){const _0xa6acea=a422_0x45d8b9;return Object[_0xa6acea(0x321)]({'id':_0x3e62cb,'kind':_0xfd9fed,'label':_0x2d7c77,'description':_0x5812a5,'showWhen':Object[_0xa6acea(0x321)]({'field':'happyhorse_mode','value':_0x2554ae})});}const HAPPYHORSE_FIXED_INPUT_SLOTS=Object['freeze']([createHappyHorseFixedSlot({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x4cf),'mode':a422_0x45d8b9(0x44a),'description':a422_0x45d8b9(0x2af)}),createHappyHorseFixedSlot({'id':a422_0x45d8b9(0x355),'kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x4cf),'mode':'reference','description':a422_0x45d8b9(0x243)}),createHappyHorseFixedSlot({'id':'editVideo','kind':'video','label':a422_0x45d8b9(0x41b),'mode':a422_0x45d8b9(0x32d),'description':a422_0x45d8b9(0x1e6)}),createHappyHorseFixedSlot({'id':a422_0x45d8b9(0x210),'kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x4cf),'mode':a422_0x45d8b9(0x32d),'description':'视频编辑可选参考图'})]),RUNNINGHUB_SEEDANCE_2_MODEL_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x44d),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':'sectionMenu','label':a422_0x45d8b9(0x300),'defaultValue':a422_0x45d8b9(0x43b),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x43b),'label':a422_0x45d8b9(0x1e1)}),Object[a422_0x45d8b9(0x321)]({'value':'standard','label':'标准版'})])}),RUNNINGHUB_SEEDANCE_2_MODE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x203),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':'sectionMenu','label':a422_0x45d8b9(0x3ad),'defaultValue':a422_0x45d8b9(0x201),'options':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'value':a422_0x45d8b9(0x201),'label':a422_0x45d8b9(0x2ed)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x35e),'label':a422_0x45d8b9(0x34e)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x49c),'label':a422_0x45d8b9(0x461)}),Object[a422_0x45d8b9(0x321)]({'value':'multimodal2video','label':a422_0x45d8b9(0x37a)})])}),VOLCENGINE_SEEDANCE_2_MODE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x4e3),'type':a422_0x45d8b9(0x368),'placement':'mode','variant':a422_0x45d8b9(0x3f1),'label':'模式','defaultValue':a422_0x45d8b9(0x318),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':'multimodal2video','label':a422_0x45d8b9(0x37a),'selectedLabel':a422_0x45d8b9(0x37a)}),Object[a422_0x45d8b9(0x321)]({'value':'frames2video','label':'首尾帧','selectedLabel':a422_0x45d8b9(0x461)})])}),RUNNINGHUB_SEEDANCE_2_RESOLUTION_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x228),'displayRole':a422_0x45d8b9(0x228),'type':'segmented','placement':a422_0x45d8b9(0x228),'variant':'pillMenu','qualityRatioLabelOrder':a422_0x45d8b9(0x4c2),'label':a422_0x45d8b9(0x450),'defaultValue':a422_0x45d8b9(0x4ad),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x31e),'label':a422_0x45d8b9(0x31e),'groupLabel':a422_0x45d8b9(0x2a9)}),Object[a422_0x45d8b9(0x321)]({'value':'720p','label':'720p','groupLabel':a422_0x45d8b9(0x2a9)}),Object['freeze']({'value':a422_0x45d8b9(0x24c),'label':a422_0x45d8b9(0x24c),'groupLabel':a422_0x45d8b9(0x2a9)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x28f),'label':a422_0x45d8b9(0x28f),'groupLabel':a422_0x45d8b9(0x4ab)}),Object[a422_0x45d8b9(0x321)]({'value':'2k','label':'2k','groupLabel':a422_0x45d8b9(0x4ab)}),Object['freeze']({'value':'4k','label':'4k','groupLabel':a422_0x45d8b9(0x4ab)})])}),RUNNINGHUB_SEEDANCE_2_GENERATE_AUDIO_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x47a),'type':a422_0x45d8b9(0x4e6),'placement':a422_0x45d8b9(0x23b),'variant':a422_0x45d8b9(0x376),'label':a422_0x45d8b9(0x21a),'defaultValue':!![]}),RUNNINGHUB_SEEDANCE_2_WEB_SEARCH_FIELD=Object[a422_0x45d8b9(0x321)]({'id':'webSearch','type':a422_0x45d8b9(0x4e6),'placement':a422_0x45d8b9(0x23b),'variant':'advancedRow','label':a422_0x45d8b9(0x49e),'defaultValue':![],'showWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x203),'value':'text2video'})}),RUNNINGHUB_SEEDANCE_2_REAL_PERSON_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x42d),'type':a422_0x45d8b9(0x4e6),'placement':a422_0x45d8b9(0x23b),'variant':a422_0x45d8b9(0x376),'label':a422_0x45d8b9(0x393),'defaultValue':![]});function createVolcengineSeedance2ResolutionField({include1080p:include1080p=!![]}={}){const _0x39d9ae=a422_0x45d8b9,_0x10d210=[Object[_0x39d9ae(0x321)]({'value':_0x39d9ae(0x31e),'label':'480p'}),Object[_0x39d9ae(0x321)]({'value':_0x39d9ae(0x4ad),'label':_0x39d9ae(0x4ad)})];return include1080p&&_0x10d210[_0x39d9ae(0x226)](Object['freeze']({'value':'1080p','label':_0x39d9ae(0x28f)})),Object[_0x39d9ae(0x321)]({'id':_0x39d9ae(0x228),'displayRole':'resolution','type':'segmented','placement':_0x39d9ae(0x228),'variant':_0x39d9ae(0x3f1),'qualityRatioLabelOrder':_0x39d9ae(0x4c2),'label':_0x39d9ae(0x450),'defaultValue':_0x39d9ae(0x4ad),'options':Object[_0x39d9ae(0x321)](_0x10d210)});}const VOLCENGINE_SEEDANCE_2_RATIO_FIELD=Object['freeze']({'id':'aspectRatio','displayRole':a422_0x45d8b9(0x1f9),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x228),'variant':a422_0x45d8b9(0x3f1),'label':'比例','defaultValue':a422_0x45d8b9(0x2ec),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x2ec),'label':a422_0x45d8b9(0x274)}),Object[a422_0x45d8b9(0x321)]({'value':'16:9','label':a422_0x45d8b9(0x2ef)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x3f5),'label':a422_0x45d8b9(0x3f5)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x2b6),'label':'1:1'}),Object['freeze']({'value':'4:3','label':a422_0x45d8b9(0x3ac)}),Object['freeze']({'value':a422_0x45d8b9(0x2b7),'label':a422_0x45d8b9(0x2b7)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x458),'label':a422_0x45d8b9(0x458)})])}),VOLCENGINE_SEEDANCE_2_GENERATE_AUDIO_FIELD=Object['freeze']({...RUNNINGHUB_SEEDANCE_2_GENERATE_AUDIO_FIELD,'defaultValue':!![]}),VOLCENGINE_SEEDANCE_2_SEED_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_SEED_FIELD,'defaultValue':'random'});function createRunningHubSeedance2FixedSlot({id:_0x5ce218,kind:_0x14e836,label:_0x180d60,mode:_0x1ee1ec,modes:_0x162c39,description:_0x3cc15d,displayOrder:_0x19ab08}){const _0x477c08=a422_0x45d8b9,_0x111025=Object[_0x477c08(0x321)]((Array[_0x477c08(0x491)](_0x162c39)?_0x162c39:[_0x1ee1ec])['map'](_0x42a6ea=>String(_0x42a6ea||'')[_0x477c08(0x24e)]())[_0x477c08(0x1f6)](Boolean)),_0x44c9ff=_0x111025[_0x477c08(0x372)]>0x1?Object[_0x477c08(0x321)]({'field':_0x477c08(0x203),'values':_0x111025}):Object[_0x477c08(0x321)]({'field':_0x477c08(0x203),'value':_0x111025[0x0]||''});return Object['freeze']({'id':_0x5ce218,'kind':_0x14e836,'label':_0x180d60,'description':_0x3cc15d,'displayOrder':_0x19ab08,'showWhen':_0x44c9ff});}const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS=Object[a422_0x45d8b9(0x321)]([createRunningHubSeedance2FixedSlot({'id':'firstFrame','kind':a422_0x45d8b9(0x44a),'label':'首帧','modes':[a422_0x45d8b9(0x35e),'frames2video'],'displayOrder':0xa,'description':a422_0x45d8b9(0x2ff)}),createRunningHubSeedance2FixedSlot({'id':a422_0x45d8b9(0x31a),'kind':a422_0x45d8b9(0x44a),'label':'尾帧','mode':a422_0x45d8b9(0x49c),'displayOrder':0x14,'description':a422_0x45d8b9(0x3be)}),createRunningHubSeedance2FixedSlot({'id':'referenceVideo','kind':a422_0x45d8b9(0x391),'label':a422_0x45d8b9(0x41b),'mode':'multimodal2video','displayOrder':0x1e,'description':a422_0x45d8b9(0x32c)}),createRunningHubSeedance2FixedSlot({'id':'referenceImage','kind':'image','label':a422_0x45d8b9(0x4cf),'mode':a422_0x45d8b9(0x318),'displayOrder':0x28,'description':'全能参考模式的参考图片'}),createRunningHubSeedance2FixedSlot({'id':'referenceAudio','kind':a422_0x45d8b9(0x24f),'label':a422_0x45d8b9(0x38d),'mode':a422_0x45d8b9(0x318),'displayOrder':0x32,'description':'可选，需搭配参考图片或参考视频'})]),RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER='描述要生成的视频内容、动作、镜头和风格。',RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x285),RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x240),RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x41c),RUNNINGHUB_SEEDANCE_2_HELP_TOOLTIP=['RunningHub\x20Seedance\x202.0','模型选择：Fast\x20版\x20/\x20标准版。','模式：文生视频\x20/\x20图生视频\x20/\x20首尾帧\x20/\x20全能参考。',a422_0x45d8b9(0x25b),a422_0x45d8b9(0x4b5)]['join']('\x0a'),VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP=[a422_0x45d8b9(0x4a6),a422_0x45d8b9(0x202),a422_0x45d8b9(0x3b4),a422_0x45d8b9(0x3ea),a422_0x45d8b9(0x43e)][a422_0x45d8b9(0x486)]('\x0a'),WAN27_HELP_TOOLTIP=[a422_0x45d8b9(0x350),a422_0x45d8b9(0x36e),a422_0x45d8b9(0x1ef),a422_0x45d8b9(0x1f1),a422_0x45d8b9(0x399)][a422_0x45d8b9(0x486)]('\x0a'),WAN27_IMAGE_HELP_TOOLTIP=[a422_0x45d8b9(0x28c),'[[red:没入参时]]：只写提示词，就是文生视频。','[[red:接\x201\x20张首帧]]：从这张图开始生成视频。',a422_0x45d8b9(0x3fd),a422_0x45d8b9(0x29f),a422_0x45d8b9(0x438)][a422_0x45d8b9(0x486)]('\x0a'),WAN27_VIDEO_HELP_TOOLTIP=[a422_0x45d8b9(0x4df),a422_0x45d8b9(0x1db),a422_0x45d8b9(0x462),a422_0x45d8b9(0x34c),a422_0x45d8b9(0x3b7)]['join']('\x0a'),WAN27_REFERENCE_HELP_TOOLTIP=[a422_0x45d8b9(0x2d9),a422_0x45d8b9(0x223),'[[red:音频需搭配参考图]]：作为角色声音参考使用。',a422_0x45d8b9(0x3b3),a422_0x45d8b9(0x269)]['join']('\x0a'),WAN27_EDIT_HELP_TOOLTIP=[a422_0x45d8b9(0x236),a422_0x45d8b9(0x1de),a422_0x45d8b9(0x364),a422_0x45d8b9(0x439),a422_0x45d8b9(0x287)]['join']('\x0a'),WAN27_IMAGE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x247),WAN27_VIDEO_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x403),WAN27_REFERENCE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x272),WAN27_EDIT_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x4b4),KLING_V3_HELP_TOOLTIP=[a422_0x45d8b9(0x36d),a422_0x45d8b9(0x4ba),a422_0x45d8b9(0x4c4),a422_0x45d8b9(0x3fd),a422_0x45d8b9(0x316),a422_0x45d8b9(0x363),a422_0x45d8b9(0x290)][a422_0x45d8b9(0x486)]('\x0a'),KLING_V3_PROMPT_PLACEHOLDER='不接素材时描述文生视频；接首帧/尾帧时描述\x20@图片1\x20到\x20@图片2\x20的变化。例如：@图片1\x20中的猫咪缓缓向前走，最后过渡到\x20@图片2\x20的画面，电影质感。',KLING_V3_OMNI_IMAGE_HELP_TOOLTIP=[a422_0x45d8b9(0x348),a422_0x45d8b9(0x462),a422_0x45d8b9(0x4c4),a422_0x45d8b9(0x3fd),a422_0x45d8b9(0x316),a422_0x45d8b9(0x2a7)][a422_0x45d8b9(0x486)]('\x0a'),KLING_V3_OMNI_REFERENCE_HELP_TOOLTIP=[a422_0x45d8b9(0x3af),'[[red:接参考图或参考视频]]：参考主体、动作、风格或场景生成新视频。','参考视频会作为特征参考；有参考视频时不会发送生成有声视频参数。',a422_0x45d8b9(0x423)][a422_0x45d8b9(0x486)]('\x0a'),KLING_V3_OMNI_EDIT_HELP_TOOLTIP=[a422_0x45d8b9(0x3ce),a422_0x45d8b9(0x209),a422_0x45d8b9(0x428),'提示词例子：将原视频改成夜晚赛博朋克街道风格，保留人物动作，增加霓虹灯和雨水反光。'][a422_0x45d8b9(0x486)]('\x0a'),KLING_V3_OMNI_HELP_TOOLTIP=KLING_V3_OMNI_IMAGE_HELP_TOOLTIP,KLING_V3_OMNI_IMAGE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x351),KLING_V3_OMNI_REFERENCE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x474),KLING_V3_OMNI_EDIT_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x2f0),KLING_V3_OMNI_MODE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':'kling_v3_omni_mode','type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x3ad),'description':'图生视频：首尾帧或文生视频。\x0a参考生视频：参考图或参考视频。\x0a视频编辑：基于原视频编辑。','defaultValue':a422_0x45d8b9(0x44a),'options':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x44a),'label':'图生视频'}),Object['freeze']({'value':'reference','label':a422_0x45d8b9(0x251)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x32d),'label':a422_0x45d8b9(0x4bd)})])});function createKlingV3OmniFixedSlot({id:_0x33a53c,kind:_0x44c221,label:_0x615e4f,mode:_0x4a48f5,description:_0xcfd057,displayOrder:_0x4eb06b}){const _0x524eb6=a422_0x45d8b9;return Object['freeze']({'id':_0x33a53c,'kind':_0x44c221,'label':_0x615e4f,'description':_0xcfd057,'displayOrder':_0x4eb06b,'showWhen':Object[_0x524eb6(0x321)]({'field':_0x524eb6(0x359),'value':_0x4a48f5})});}const KLING_V3_OMNI_FIXED_INPUT_SLOTS=Object[a422_0x45d8b9(0x321)]([createKlingV3OmniFixedSlot({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧','mode':a422_0x45d8b9(0x44a),'displayOrder':0xa,'description':a422_0x45d8b9(0x2d8)}),createKlingV3OmniFixedSlot({'id':a422_0x45d8b9(0x31a),'kind':a422_0x45d8b9(0x44a),'label':'尾帧','mode':a422_0x45d8b9(0x44a),'displayOrder':0x14,'description':a422_0x45d8b9(0x3b9)}),createKlingV3OmniFixedSlot({'id':a422_0x45d8b9(0x355),'kind':a422_0x45d8b9(0x44a),'label':'参考图','mode':a422_0x45d8b9(0x336),'displayOrder':0x1e,'description':a422_0x45d8b9(0x22e)}),createKlingV3OmniFixedSlot({'id':a422_0x45d8b9(0x2a8),'kind':a422_0x45d8b9(0x391),'label':'参考视频','mode':'reference','displayOrder':0x28,'description':a422_0x45d8b9(0x2f4)}),createKlingV3OmniFixedSlot({'id':a422_0x45d8b9(0x217),'kind':a422_0x45d8b9(0x391),'label':a422_0x45d8b9(0x39a),'mode':'edit','displayOrder':0x32,'description':'视频编辑使用的原视频'})]),KLING_O1_HELP_TOOLTIP=[a422_0x45d8b9(0x36a),a422_0x45d8b9(0x2d6),'[[red:参考图片]]：最多\x202\x20张；如果同时接特征参考视频，只使用第\x201\x20张参考图片。','[[red:编辑视频\x20/\x20特征参考视频]]：两个视频槽互斥，只能接其中一个；视频需\x203-10\x20秒。',a422_0x45d8b9(0x3ba)]['join']('\x0a'),KLING_O1_PROMPT_PLACEHOLDER='描述视频内容，按\x20@\x20引用参考图片。例如：让\x20@图片1\x20中的人物向镜头挥手，随后走向\x20@图片2\x20中的街景；接编辑视频时描述要改什么画面或风格。',KLING_O1_FIXED_INPUT_SLOTS=Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x217),'kind':'video','label':a422_0x45d8b9(0x1fe),'description':a422_0x45d8b9(0x225),'displayOrder':0xa}),Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x468),'kind':a422_0x45d8b9(0x391),'label':a422_0x45d8b9(0x3df),'description':a422_0x45d8b9(0x22a),'displayOrder':0x14}),Object['freeze']({'id':'referenceImage','kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x420),'description':a422_0x45d8b9(0x44c),'displayOrder':0x1e})]),KLING_O1_VIDEO_EXCLUSIVE_GROUPS=Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'id':'klingO1VideoInput','slots':Object['freeze']([a422_0x45d8b9(0x217),a422_0x45d8b9(0x468)]),'max':0x1})]),RUNNINGHUB_KLING_O1_GENERATION_MODE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x309),'type':a422_0x45d8b9(0x368),'placement':'mode','variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x3ad),'description':'视频生成：支持文生、图生、首尾帧。\x0a参考生视频：接\x201-7\x20张参考图和\x201\x20个参考视频。','defaultValue':a422_0x45d8b9(0x1df),'options':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'value':a422_0x45d8b9(0x1df),'label':a422_0x45d8b9(0x46e)}),Object[a422_0x45d8b9(0x321)]({'value':'reference','label':a422_0x45d8b9(0x251)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x32d),'label':a422_0x45d8b9(0x4bd)})])}),RUNNINGHUB_KLING_O1_RATIO_FIELD=Object['freeze']({...VIDEO_RATIO_FIELD,'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'options':Object[a422_0x45d8b9(0x321)]([APIMART_VIDEO_ADAPTIVE_RATIO_OPTION,Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x2ef),'label':'16:9'}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x3f5),'label':a422_0x45d8b9(0x3f5)}),Object['freeze']({'value':a422_0x45d8b9(0x2b6),'label':a422_0x45d8b9(0x2b6)})])}),RUNNINGHUB_KLING_O1_KEEP_ORIGINAL_SOUND_FIELD=Object[a422_0x45d8b9(0x321)]({...KLING_O1_KEEP_ORIGINAL_SOUND_FIELD,'showWhen':Object['freeze']({'field':a422_0x45d8b9(0x309),'values':Object['freeze']([a422_0x45d8b9(0x336),a422_0x45d8b9(0x32d)])})}),RUNNINGHUB_KLING_O1_FRAME_HELP_TOOLTIP=[a422_0x45d8b9(0x2bb),'[[red:不接图]]：走文生视频接口。',a422_0x45d8b9(0x1ed),a422_0x45d8b9(0x2bf),a422_0x45d8b9(0x3fc)][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_KLING_O1_REFERENCE_HELP_TOOLTIP=[a422_0x45d8b9(0x422),a422_0x45d8b9(0x377),'[[red:保留原声]]：开启后提交\x20keepOriginalSound。','提示词例子：参考\x20@图片1\x20的角色外观和\x20@视频1\x20的动作节奏，生成夜晚街道行走镜头。'][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_KLING_O1_EDIT_HELP_TOOLTIP=[a422_0x45d8b9(0x456),a422_0x45d8b9(0x2b0),'[[red:保留原声]]：开启后提交\x20keepOriginalSound。','提示词里直接描述要修改的画面、元素或风格。'][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_KLING_O1_HELP_TOOLTIP=RUNNINGHUB_KLING_O1_FRAME_HELP_TOOLTIP,RUNNINGHUB_KLING_O1_FRAME_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x351),RUNNINGHUB_KLING_O1_REFERENCE_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x325),RUNNINGHUB_KLING_O1_EDIT_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x21f);function createRunningHubKlingO1FixedSlot({id:_0x30c2b5,kind:_0x24d9ac,label:_0x36c071,mode:_0x418c05,description:_0xb5d6bd,displayOrder:_0x389cf1}){const _0xb8bc39=a422_0x45d8b9,_0x26fc27=_0x418c05===_0xb8bc39(0x336)||_0x418c05===_0xb8bc39(0x32d)?{'showWhen':Object[_0xb8bc39(0x321)]({'field':_0xb8bc39(0x309),'value':_0x418c05})}:{'hideWhen':Object['freeze']({'field':_0xb8bc39(0x309),'values':Object['freeze']([_0xb8bc39(0x336),_0xb8bc39(0x32d)])})};return Object[_0xb8bc39(0x321)]({'id':_0x30c2b5,'kind':_0x24d9ac,'label':_0x36c071,'description':_0xb5d6bd,'displayOrder':_0x389cf1,..._0x26fc27});}const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS=Object[a422_0x45d8b9(0x321)]([createRunningHubKlingO1FixedSlot({'id':'firstFrame','kind':'image','label':'首帧','mode':a422_0x45d8b9(0x1df),'displayOrder':0xa,'description':a422_0x45d8b9(0x361)}),createRunningHubKlingO1FixedSlot({'id':a422_0x45d8b9(0x31a),'kind':a422_0x45d8b9(0x44a),'label':'尾帧','mode':a422_0x45d8b9(0x1df),'displayOrder':0x14,'description':a422_0x45d8b9(0x268)}),createRunningHubKlingO1FixedSlot({'id':a422_0x45d8b9(0x217),'kind':'video','label':'编辑视频','mode':'edit','displayOrder':0x1e,'description':a422_0x45d8b9(0x4b6)}),createRunningHubKlingO1FixedSlot({'id':a422_0x45d8b9(0x2a8),'kind':a422_0x45d8b9(0x391),'label':a422_0x45d8b9(0x41b),'mode':a422_0x45d8b9(0x336),'displayOrder':0x28,'description':'参考生视频必填，作为动作或镜头特征参考'}),createRunningHubKlingO1FixedSlot({'id':'referenceImage','kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x4cf),'mode':'reference','displayOrder':0x32,'description':a422_0x45d8b9(0x3a5)})]),RUNNINGHUB_KLING_O3_MODEL_FIELD=Object[a422_0x45d8b9(0x321)]({...KLING_V3_MODE_FIELD,'id':a422_0x45d8b9(0x228),'placement':a422_0x45d8b9(0x228),'label':'质量','description':a422_0x45d8b9(0x3f2),'defaultValue':'std'}),RUNNINGHUB_KLING_O3_MODE_FIELD=Object[a422_0x45d8b9(0x321)]({...KLING_V3_OMNI_MODE_FIELD,'description':a422_0x45d8b9(0x398)}),RUNNINGHUB_KLING_O3_RATIO_FIELD=Object[a422_0x45d8b9(0x321)]({...createAspectRatioField({'options':['16:9',a422_0x45d8b9(0x3f5),'1:1']}),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x359),'value':a422_0x45d8b9(0x32d)})}),RUNNINGHUB_KLING_O3_DURATION_FIELD=Object['freeze']({...createFooterDurationField({'defaultValue':0x5,'min':0x3,'max':0xf}),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':'kling_v3_omni_mode','value':'edit'})}),RUNNINGHUB_KLING_O3_AUDIO_FIELD=Object[a422_0x45d8b9(0x321)]({...KLING_V3_AUDIO_FIELD,'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':'kling_v3_omni_mode','value':a422_0x45d8b9(0x32d)})}),RUNNINGHUB_KLING_O3_KEEP_ORIGINAL_SOUND_FIELD=Object[a422_0x45d8b9(0x321)]({...KLING_O1_KEEP_ORIGINAL_SOUND_FIELD,'showWhen':Object['freeze']({'field':a422_0x45d8b9(0x359),'values':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x336),a422_0x45d8b9(0x32d)])})}),RUNNINGHUB_KLING_O3_SHOT_TYPE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x3a1),'type':a422_0x45d8b9(0x368),'placement':'advanced','variant':'advancedRow','label':'镜头类型','defaultValue':a422_0x45d8b9(0x264),'options':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x264),'label':a422_0x45d8b9(0x2bc)}),Object['freeze']({'value':a422_0x45d8b9(0x358),'label':'智能'})]),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x359),'value':'edit'})}),RUNNINGHUB_KLING_O3_FRAME_HELP_TOOLTIP=[a422_0x45d8b9(0x431),a422_0x45d8b9(0x419),a422_0x45d8b9(0x253),a422_0x45d8b9(0x453),'标准版\x20/\x20专业版\x20/\x204K\x20可在模型选择里切换。'][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_KLING_O3_REFERENCE_HELP_TOOLTIP=[a422_0x45d8b9(0x356),a422_0x45d8b9(0x4a8),'[[red:可选参考视频]]：有参考视频时最多使用\x204\x20张参考图。',a422_0x45d8b9(0x442)][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_KLING_O3_EDIT_HELP_TOOLTIP=[a422_0x45d8b9(0x4b8),a422_0x45d8b9(0x26c),a422_0x45d8b9(0x40f),a422_0x45d8b9(0x3dc)]['join']('\x0a'),RUNNINGHUB_KLING_O3_HELP_TOOLTIP=RUNNINGHUB_KLING_O3_FRAME_HELP_TOOLTIP,RUNNINGHUB_KLING_O3_FRAME_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x351),RUNNINGHUB_KLING_O3_REFERENCE_PROMPT_PLACEHOLDER='描述参考图或参考视频要生成的新画面。例如：参考\x20@图片1\x20的角色外观和\x20@视频1\x20的动作节奏，生成夜晚街道行走镜头。',RUNNINGHUB_KLING_O3_EDIT_PROMPT_PLACEHOLDER='描述要对原视频做什么编辑，可接参考图补充风格。例如：将原视频改成夜晚赛博朋克街道风格，保留人物动作和镜头节奏。';function createRunningHubKlingO3FixedSlot({id:_0x1b817b,kind:_0x4dc716,label:_0x290524,mode:_0x4aafdd,description:_0x5d5ed1,displayOrder:_0x53c213,hideWhen:hideWhen=null}){const _0x2a1d96=a422_0x45d8b9;return Object[_0x2a1d96(0x321)]({'id':_0x1b817b,'kind':_0x4dc716,'label':_0x290524,'description':_0x5d5ed1,'displayOrder':_0x53c213,'showWhen':Object[_0x2a1d96(0x321)]({'field':_0x2a1d96(0x359),'value':_0x4aafdd}),...hideWhen?{'hideWhen':Object['freeze'](hideWhen)}:{}});}const RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS=Object['freeze']([createRunningHubKlingO3FixedSlot({'id':a422_0x45d8b9(0x212),'kind':'image','label':'首帧','mode':a422_0x45d8b9(0x44a),'displayOrder':0xa,'description':'图生视频使用的起始图片'}),createRunningHubKlingO3FixedSlot({'id':a422_0x45d8b9(0x31a),'kind':a422_0x45d8b9(0x44a),'label':'尾帧','mode':a422_0x45d8b9(0x44a),'displayOrder':0x14,'description':a422_0x45d8b9(0x4e5),'hideWhen':{'field':'resolution','value':'4k'}}),createRunningHubKlingO3FixedSlot({'id':a422_0x45d8b9(0x2a8),'kind':a422_0x45d8b9(0x391),'label':'参考视频','mode':a422_0x45d8b9(0x336),'displayOrder':0x1e,'description':a422_0x45d8b9(0x214)}),createRunningHubKlingO3FixedSlot({'id':a422_0x45d8b9(0x355),'kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x4cf),'mode':'reference','displayOrder':0x28,'description':a422_0x45d8b9(0x3a5)}),createRunningHubKlingO3FixedSlot({'id':a422_0x45d8b9(0x217),'kind':a422_0x45d8b9(0x391),'label':a422_0x45d8b9(0x39a),'mode':a422_0x45d8b9(0x32d),'displayOrder':0x32,'description':a422_0x45d8b9(0x24b)}),createRunningHubKlingO3FixedSlot({'id':a422_0x45d8b9(0x210),'kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x4cf),'mode':a422_0x45d8b9(0x32d),'displayOrder':0x3c,'description':a422_0x45d8b9(0x291)})]),RUNNINGHUB_KLING_V3_PROMPT_PLACEHOLDER=a422_0x45d8b9(0x3cc),RUNNINGHUB_KLING_V3_HELP_TOOLTIP=[a422_0x45d8b9(0x33a),a422_0x45d8b9(0x419),a422_0x45d8b9(0x253),a422_0x45d8b9(0x2e8),a422_0x45d8b9(0x24d)][a422_0x45d8b9(0x486)]('\x0a'),RUNNINGHUB_KLING_V3_MODEL_FIELD=Object[a422_0x45d8b9(0x321)]({...KLING_V3_MODE_FIELD,'label':a422_0x45d8b9(0x300),'description':a422_0x45d8b9(0x1ee)}),RUNNINGHUB_KLING_V3_RATIO_FIELD=Object[a422_0x45d8b9(0x321)]({...createAspectRatioField({'options':[a422_0x45d8b9(0x2ef),a422_0x45d8b9(0x3f5),a422_0x45d8b9(0x2b6)]})}),RUNNINGHUB_KLING_V3_CFG_SCALE_FIELD=Object['freeze']({'id':a422_0x45d8b9(0x2cf),'type':a422_0x45d8b9(0x382),'placement':'advanced','variant':'advancedRow','label':'CFG\x20引导系数','description':a422_0x45d8b9(0x481),'defaultValue':0.5,'min':0x0,'max':0x1,'step':0.1}),RUNNINGHUB_KLING_V3_SHOT_TYPE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x3a1),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x23b),'variant':'advancedRow','label':a422_0x45d8b9(0x323),'defaultValue':a422_0x45d8b9(0x264),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':'customize','label':a422_0x45d8b9(0x2bc)}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x358),'label':'智能'})])}),RUNNINGHUB_KLING_V3_FIXED_INPUT_SLOTS=Object[a422_0x45d8b9(0x321)]([Object['freeze']({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧','description':'图生视频使用的起始图片。','displayOrder':0xa}),Object[a422_0x45d8b9(0x321)]({'id':'lastFrame','kind':a422_0x45d8b9(0x44a),'label':'尾帧','description':'std/pro\x20可选，4K\x20当前文档未公开尾帧字段。','displayOrder':0x14,'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x228),'value':'4k'})})]),WAN27_MODE_FIELD=Object['freeze']({'id':'wan27_mode','type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x3ad),'description':WAN27_HELP_TOOLTIP,'defaultValue':a422_0x45d8b9(0x44a),'options':Object['freeze']([Object['freeze']({'value':'image','label':a422_0x45d8b9(0x34e)}),Object['freeze']({'value':'video','label':a422_0x45d8b9(0x2a0)}),Object[a422_0x45d8b9(0x321)]({'value':'reference','label':a422_0x45d8b9(0x251)}),Object['freeze']({'value':a422_0x45d8b9(0x32d),'label':'视频编辑'})])}),WAN27_PROMPT_EXTEND_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_PROMPT_EXTEND_FIELD,'label':a422_0x45d8b9(0x3e0)}),WAN27_NEGATIVE_PROMPT_FIELD=Object['freeze']({...VIDEO_NEGATIVE_PROMPT_FIELD,'label':a422_0x45d8b9(0x48d),'defaultValue':'模糊、变形、低质量'}),VIDU_Q3_VIDEO_PROMPT_PLACEHOLDER='不接图时描述文生视频；接\x20@图片1\x20是首帧，接\x20@图片1\x20+\x20@图片2\x20是首尾帧。例如：@图片1\x20中的人物缓缓转身微笑，最后过渡到\x20@图片2\x20的构图。',VIDU_Q3_REFERENCE_PROMPT_PLACEHOLDER='描述参考图的动作和镜头，外观由参考图决定。可用\x20@图片1、@图片2\x20指代素材。例如：@图片1\x20和\x20@图片2\x20中的角色在湖边相拥，镜头缓慢环绕。';function createWan27FixedSlot({id:_0xc49347,kind:_0x4d0779,label:_0x1e70d8,mode:_0x39d579,description:_0x52006c,displayOrder:_0xaf9096,showWhen:_0x4a6695}){const _0x12d8e7=a422_0x45d8b9,_0x5ffd38=Array[_0x12d8e7(0x491)](_0x39d579)?_0x39d579['map'](_0x18a6aa=>String(_0x18a6aa||'')[_0x12d8e7(0x24e)]())[_0x12d8e7(0x1f6)](Boolean):[String(_0x39d579||'')[_0x12d8e7(0x24e)]()]['filter'](Boolean),_0x54ea21=[];_0x54ea21[_0x12d8e7(0x226)](_0x5ffd38[_0x12d8e7(0x372)]>0x1?Object['freeze']({'field':_0x12d8e7(0x415),'values':Object['freeze'](_0x5ffd38)}):Object[_0x12d8e7(0x321)]({'field':_0x12d8e7(0x415),'value':_0x5ffd38[0x0]||''}));const _0x1aa3ec=_0x4a6695||(_0x54ea21[_0x12d8e7(0x372)]>0x1?Object[_0x12d8e7(0x321)]({'all':Object[_0x12d8e7(0x321)](_0x54ea21)}):_0x54ea21[0x0]);return Object[_0x12d8e7(0x321)]({'id':_0xc49347,'kind':_0x4d0779,'label':_0x1e70d8,'description':_0x52006c,'displayOrder':_0xaf9096,'showWhen':_0x1aa3ec});}const WAN27_FIXED_INPUT_SLOTS=Object[a422_0x45d8b9(0x321)]([createWan27FixedSlot({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧','mode':'image','displayOrder':0xa,'description':a422_0x45d8b9(0x2d8)}),createWan27FixedSlot({'id':a422_0x45d8b9(0x31a),'kind':a422_0x45d8b9(0x44a),'label':'尾帧','mode':a422_0x45d8b9(0x44a),'displayOrder':0x14,'description':a422_0x45d8b9(0x3b9)}),createWan27FixedSlot({'id':a422_0x45d8b9(0x24f),'kind':a422_0x45d8b9(0x24f),'label':'音频','mode':a422_0x45d8b9(0x44a),'displayOrder':0x46,'description':'可选，2-30\x20秒且不超过\x2015MB'}),createWan27FixedSlot({'id':a422_0x45d8b9(0x4b1),'kind':a422_0x45d8b9(0x391),'label':a422_0x45d8b9(0x440),'mode':a422_0x45d8b9(0x391),'displayOrder':0x1e,'description':a422_0x45d8b9(0x3bd)}),createWan27FixedSlot({'id':a422_0x45d8b9(0x355),'kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x4cf),'mode':a422_0x45d8b9(0x336),'displayOrder':0x28,'description':a422_0x45d8b9(0x22e)}),createWan27FixedSlot({'id':a422_0x45d8b9(0x2a8),'kind':a422_0x45d8b9(0x391),'label':'参考视频','mode':Object[a422_0x45d8b9(0x321)](['reference',a422_0x45d8b9(0x32d)]),'displayOrder':0x3c,'description':'参考生视频使用的参考视频'}),createWan27FixedSlot({'id':'originalVideo','kind':a422_0x45d8b9(0x391),'label':a422_0x45d8b9(0x39a),'mode':a422_0x45d8b9(0x32d),'displayOrder':0x32,'description':a422_0x45d8b9(0x46f)}),createWan27FixedSlot({'id':'referenceAudio','kind':a422_0x45d8b9(0x24f),'label':'音频','mode':'reference','displayOrder':0x46,'description':'可选，参考生视频使用的音色音频，2-30\x20秒且不超过\x2015MB'})]),RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS=Object[a422_0x45d8b9(0x321)]([createWan27FixedSlot({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧','mode':'image','displayOrder':0xa,'description':a422_0x45d8b9(0x2d8)}),createWan27FixedSlot({'id':a422_0x45d8b9(0x31a),'kind':'image','label':'尾帧','mode':a422_0x45d8b9(0x44a),'displayOrder':0x14,'description':a422_0x45d8b9(0x3b9)}),createWan27FixedSlot({'id':'audio','kind':a422_0x45d8b9(0x24f),'label':'音频','mode':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x44a),a422_0x45d8b9(0x391)]),'displayOrder':0x46,'description':a422_0x45d8b9(0x487)}),createWan27FixedSlot({'id':a422_0x45d8b9(0x4b1),'kind':'video','label':'续写视频','mode':'video','displayOrder':0x1e,'description':a422_0x45d8b9(0x3bd)}),createWan27FixedSlot({'id':a422_0x45d8b9(0x355),'kind':'image','label':'参考图','mode':a422_0x45d8b9(0x336),'displayOrder':0x28,'description':a422_0x45d8b9(0x22e)}),createWan27FixedSlot({'id':a422_0x45d8b9(0x2a8),'kind':'video','label':a422_0x45d8b9(0x41b),'mode':a422_0x45d8b9(0x336),'displayOrder':0x32,'description':a422_0x45d8b9(0x310)}),createWan27FixedSlot({'id':'originalVideo','kind':'video','label':a422_0x45d8b9(0x39a),'mode':a422_0x45d8b9(0x32d),'displayOrder':0x32,'description':a422_0x45d8b9(0x46f)}),createWan27FixedSlot({'id':a422_0x45d8b9(0x210),'kind':a422_0x45d8b9(0x44a),'label':'参考图','mode':a422_0x45d8b9(0x32d),'displayOrder':0x3c,'description':a422_0x45d8b9(0x31b)})]);function a422_0x2455(_0x1fdda8,_0x576532){const _0x45a2d4=a422_0x45a2();return a422_0x2455=function(_0x24557d,_0x13d8bb){_0x24557d=_0x24557d-0x1d2;let _0x421919=_0x45a2d4[_0x24557d];return _0x421919;},a422_0x2455(_0x1fdda8,_0x576532);}function freezeOption(_0x5bcd1f){const _0x316e89=a422_0x45d8b9;if(_0x5bcd1f&&typeof _0x5bcd1f===_0x316e89(0x3c8)&&!Array[_0x316e89(0x491)](_0x5bcd1f))return Object[_0x316e89(0x321)]({..._0x5bcd1f});return Object['freeze']({'value':_0x5bcd1f,'label':String(_0x5bcd1f)});}function isAdaptiveRatioOptionValue(_0x363729){const _0x18e0d4=a422_0x45d8b9,_0x39a04f=String(_0x363729??'')['trim'](),_0x30d7b9=_0x39a04f['toLowerCase']();return _0x39a04f===APIMART_VIDEO_ADAPTIVE_RATIO_VALUE||_0x30d7b9==='auto'||_0x30d7b9===_0x18e0d4(0x2ec)||_0x30d7b9===_0x18e0d4(0x4d6);}function withAdaptiveRatioOption(_0xff2bcb=[]){const _0x3caf8b=a422_0x45d8b9,_0x33bbf4=Array['isArray'](_0xff2bcb)?_0xff2bcb:[],_0x2bfe4a=_0x33bbf4[_0x3caf8b(0x2ee)](_0x4b066a=>isAdaptiveRatioOptionValue(_0x4b066a?.[_0x3caf8b(0x4a2)]??_0x4b066a));return _0x2bfe4a?_0x33bbf4:[APIMART_VIDEO_ADAPTIVE_RATIO_OPTION,..._0x33bbf4];}function createSegmentedField({id:_0x5efdef,label:_0x111a06,defaultValue:_0x4e3d0a,options:_0x482a82,placement:placement=a422_0x45d8b9(0x260),variant:variant=a422_0x45d8b9(0x3f1)}){const _0x3081e7=a422_0x45d8b9;return Object[_0x3081e7(0x321)]({'id':_0x5efdef,'type':'segmented','placement':placement,'variant':variant,'label':_0x111a06,'defaultValue':_0x4e3d0a,'options':Object[_0x3081e7(0x321)](_0x482a82[_0x3081e7(0x400)](freezeOption))});}function createDurationField({defaultValue:defaultValue=0x5,min:min=0x4,max:max=0xf,label:label=VIDEO_DURATION_FIELD[a422_0x45d8b9(0x341)]}={}){const _0x7e6978=a422_0x45d8b9;return Object[_0x7e6978(0x321)]({...VIDEO_DURATION_FIELD,'label':label,'defaultValue':defaultValue,'min':min,'max':max});}function createDurationSliderOptionsField({values:_0x1b9bd5,defaultValue:defaultValue=_0x1b9bd5?.[0x0],label:label=VIDEO_DURATION_FIELD[a422_0x45d8b9(0x341)],optionOverridesByValue:optionOverridesByValue=null}={}){const _0x3c5f91=a422_0x45d8b9,_0x3a9316=(Array['isArray'](_0x1b9bd5)?_0x1b9bd5:[])[_0x3c5f91(0x400)](_0x5307c4=>Number(_0x5307c4))[_0x3c5f91(0x1f6)](Number['isFinite']),_0x196930=_0x3a9316[0x0]??Number(defaultValue)??0x1,_0x174bb4=_0x3a9316[_0x3a9316[_0x3c5f91(0x372)]-0x1]??_0x196930;return Object[_0x3c5f91(0x321)]({...VIDEO_DURATION_FIELD,'label':label,'defaultValue':defaultValue,'min':_0x196930,'max':_0x174bb4,'step':0x1,'options':Object[_0x3c5f91(0x321)](_0x3a9316[_0x3c5f91(0x400)](_0x1d4672=>Object[_0x3c5f91(0x321)]({'value':_0x1d4672,'label':_0x1d4672+'s','displayLabel':_0x1d4672+'S',...optionOverridesByValue?.[_0x1d4672]||{}})))});}function createDurationOptionsField(_0x2a20e6,_0x28dac6=_0x2a20e6[0x0]){const _0x120fe0=a422_0x45d8b9;return createSegmentedField({'id':_0x120fe0(0x2df),'label':VIDEO_DURATION_FIELD[_0x120fe0(0x341)],'defaultValue':_0x28dac6,'options':_0x2a20e6[_0x120fe0(0x400)](_0x292649=>({'value':_0x292649,'label':_0x292649+'s','displayLabel':_0x292649+'S'}))});}function withResolutionPlacement(_0x2e985f){const _0x3b20ef=a422_0x45d8b9;return Object[_0x3b20ef(0x321)]({..._0x2e985f,'placement':_0x3b20ef(0x228)});}function createFooterDurationField(_0x2b2e7c={}){return withResolutionPlacement(createDurationField(_0x2b2e7c));}function createFooterDurationSliderOptionsField(_0x795d18={}){return withResolutionPlacement(createDurationSliderOptionsField(_0x795d18));}function createResolutionField({label:label=VIDEO_RESOLUTION_FIELD['label'],defaultValue:defaultValue=a422_0x45d8b9(0x229),options:options=[a422_0x45d8b9(0x229),a422_0x45d8b9(0x3cd)]}={}){const _0x366471=a422_0x45d8b9;return Object[_0x366471(0x321)]({...VIDEO_RESOLUTION_FIELD,'label':label,'defaultValue':defaultValue,'options':Object[_0x366471(0x321)](options[_0x366471(0x400)](freezeOption))});}function createAspectRatioField({label:label=VIDEO_RATIO_FIELD[a422_0x45d8b9(0x341)],defaultValue:defaultValue=APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,options:options=[a422_0x45d8b9(0x2ef),'9:16','1:1',a422_0x45d8b9(0x3ac),a422_0x45d8b9(0x2b7)]}={}){const _0x48ae49=a422_0x45d8b9;return Object[_0x48ae49(0x321)]({...VIDEO_RATIO_FIELD,'label':label,'defaultValue':defaultValue,'options':Object['freeze'](withAdaptiveRatioOption(options)[_0x48ae49(0x400)](freezeOption))});}function createVideoMenuExtension(_0x37d9cc,_0x1ae2ea=''){const _0x2a63f0=a422_0x45d8b9;return Object[_0x2a63f0(0x321)]({'videoMenu':Object[_0x2a63f0(0x321)]({'role':'apimartModel','order':_0x37d9cc,'subtitle':_0x1ae2ea})});}function createVideoInputSlots({image:image=0x9,video:video=0x3,audio:audio=0x3,minImage:minImage=0x0,fixedSlots:fixedSlots=null,exclusiveGroups:exclusiveGroups=null,cycleFixedInputWhenFull:cycleFixedInputWhenFull=![]}={}){const _0x3a28cb=a422_0x45d8b9,_0x36046d=[_0x3a28cb(0x334)],_0x3b5a6b={};image>0x0&&(_0x36046d['push']('image'),_0x3b5a6b[_0x3a28cb(0x44a)]=image);video>0x0&&(_0x36046d[_0x3a28cb(0x226)](_0x3a28cb(0x391)),_0x3b5a6b['video']=video);audio>0x0&&(_0x36046d['push'](_0x3a28cb(0x24f)),_0x3b5a6b[_0x3a28cb(0x24f)]=audio);const _0x4f0518={'allowedKinds':Object[_0x3a28cb(0x321)](_0x36046d),'minByKind':Object[_0x3a28cb(0x321)]({'text':0x0,...minImage>0x0?{'image':minImage}:{}}),'maxByKind':Object[_0x3a28cb(0x321)](_0x3b5a6b)};return Array['isArray'](fixedSlots)&&fixedSlots[_0x3a28cb(0x372)]>0x0&&(_0x4f0518[_0x3a28cb(0x255)]=Object[_0x3a28cb(0x321)](fixedSlots[_0x3a28cb(0x400)](_0x44995b=>Object[_0x3a28cb(0x321)]({..._0x44995b})))),Array[_0x3a28cb(0x491)](exclusiveGroups)&&exclusiveGroups['length']>0x0&&(_0x4f0518[_0x3a28cb(0x1d8)]=Object['freeze'](exclusiveGroups[_0x3a28cb(0x400)](_0xdd9462=>Object[_0x3a28cb(0x321)]({..._0xdd9462,'slots':Object[_0x3a28cb(0x321)]((Array['isArray'](_0xdd9462?.[_0x3a28cb(0x35b)])?_0xdd9462[_0x3a28cb(0x35b)]:[])['map'](_0x37088d=>String(_0x37088d||'')['trim']())['filter'](Boolean))})))),cycleFixedInputWhenFull===!![]&&(_0x4f0518[_0x3a28cb(0x311)]=!![]),Object[_0x3a28cb(0x321)](_0x4f0518);}const VIDEO_SIZE_RATIO_POLICY=Object['freeze']({'capability':a422_0x45d8b9(0x2e3)}),SEEDANCE_VIDEO_RATIO_POLICY=Object[a422_0x45d8b9(0x321)]({'capability':a422_0x45d8b9(0x2e3),'ratios':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2b6),'3:4',a422_0x45d8b9(0x2ef),a422_0x45d8b9(0x3ac),a422_0x45d8b9(0x3f5),a422_0x45d8b9(0x458)])}),VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY=Object['freeze']({...SEEDANCE_VIDEO_RATIO_POLICY,'preserveAdaptive':!![]});function freezeBodyMapping(_0x4b2d72){const _0x1fd2f7=a422_0x45d8b9;return Object[_0x1fd2f7(0x321)](_0x4b2d72[_0x1fd2f7(0x400)](_0x52df84=>Object[_0x1fd2f7(0x321)]({..._0x52df84,...Array[_0x1fd2f7(0x491)](_0x52df84[_0x1fd2f7(0x492)])?{'field':Object['freeze'](_0x52df84[_0x1fd2f7(0x492)])}:{}})));}const APIMART_VIDEO_BASE_BODY_MAPPING=Object[a422_0x45d8b9(0x321)]([Object['freeze']({'path':'model','from':a422_0x45d8b9(0x33d)}),Object['freeze']({'path':a422_0x45d8b9(0x2c4),'from':'prompt'})]);function createApimartVideoBodyMapping(_0x5384f2=[]){return freezeBodyMapping([...APIMART_VIDEO_BASE_BODY_MAPPING,..._0x5384f2]);}const APIMART_VIDEO_LEGACY_BODY_MAPPING=Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'path':'model','from':a422_0x45d8b9(0x33d)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2c4),'from':a422_0x45d8b9(0x2c4)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2e3),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x1fd),a422_0x45d8b9(0x1f9),a422_0x45d8b9(0x2e3)]),'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'transform':a422_0x45d8b9(0x349),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x278),'from':a422_0x45d8b9(0x2f9),'field':a422_0x45d8b9(0x22b),'defaultValue':a422_0x45d8b9(0x2c8)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2df),'from':a422_0x45d8b9(0x2f9),'field':a422_0x45d8b9(0x2df),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':'resolution','from':a422_0x45d8b9(0x2f9),'field':'resolution','omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x37c),'from':a422_0x45d8b9(0x283),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x3a4),'from':a422_0x45d8b9(0x470),'transform':a422_0x45d8b9(0x48c),'omitWhenEmpty':!![]})]),APIMART_VIDEO_ASPECT_RATIO_ENTRY=Object['freeze']({'path':'aspect_ratio','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.aspectRatio','aspectRatio',a422_0x45d8b9(0x4e8)]),'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'transform':a422_0x45d8b9(0x349),'omitWhenEmpty':!![]}),APIMART_VIDEO_SIZE_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2e3),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x1fd),'aspectRatio','size']),'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'transform':a422_0x45d8b9(0x349),'omitWhenEmpty':!![]}),APIMART_VIDEO_DURATION_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2df),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.duration',a422_0x45d8b9(0x2df)]),'omitWhenEmpty':!![]}),APIMART_VIDEO_RESOLUTION_UPPER_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x228),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x229),'transform':a422_0x45d8b9(0x244)}),APIMART_VIDEO_RESOLUTION_UPPER_1080_ENTRY=Object[a422_0x45d8b9(0x321)]({...APIMART_VIDEO_RESOLUTION_UPPER_ENTRY,'defaultValue':'1080P'}),APIMART_VIDEO_RESOLUTION_LOWER_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':'resolution','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x4ad),'transform':a422_0x45d8b9(0x3c3)}),APIMART_VIDEO_RESOLUTION_VEO3_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x228),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x370),'resolution']),'defaultValue':'720p','transform':a422_0x45d8b9(0x3c1)}),APIMART_VIDEO_RESOLUTION_4K_ENTRY=Object[a422_0x45d8b9(0x321)]({...APIMART_VIDEO_RESOLUTION_VEO3_ENTRY}),APIMART_VIDEO_RESOLUTION_VIDU_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x228),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x4ad),'transform':a422_0x45d8b9(0x49f)}),APIMART_VIDEO_IMAGE_URLS_ENTRY=Object['freeze']({'path':'image_urls','from':a422_0x45d8b9(0x283),'omitWhenEmpty':!![]}),APIMART_VIDEO_VEO3_IMAGE_URLS_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x37c),'from':'inputImages','omitWhenEmpty':!![]}),APIMART_VIDEO_AUDIO_URL_ENTRY=Object['freeze']({'path':a422_0x45d8b9(0x2fa),'from':a422_0x45d8b9(0x25f),'transform':a422_0x45d8b9(0x48c),'omitWhenEmpty':!![]}),APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x1e4),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x362),a422_0x45d8b9(0x1e4)]),'transform':a422_0x45d8b9(0x4e9),'omitWhenEmpty':!![]}),APIMART_VIDEO_SEED_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x1e8),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2a3),a422_0x45d8b9(0x1e8)]),'transform':a422_0x45d8b9(0x4be),'omitWhenEmpty':!![]}),APIMART_VIDEO_AUDIO_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x24f),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.audio','audio']),'defaultValue':![],'transform':'booleanParam'}),APIMART_VIDEO_KEEP_ORIGINAL_SOUND_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':'keep_original_sound','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x427),a422_0x45d8b9(0x436)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),APIMART_VIDEO_AUDIO_TRUE_ENTRY=Object[a422_0x45d8b9(0x321)]({...APIMART_VIDEO_AUDIO_ENTRY,'defaultValue':!![]}),APIMART_VIDEO_WATERMARK_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x43a),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x35f),a422_0x45d8b9(0x43a)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),APIMART_VIDEO_PROMPT_EXTEND_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x46a),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x430),'prompt_extend']),'defaultValue':!![],'transform':'booleanParam'}),APIMART_VIDEO_ENABLE_GIF_ENTRY=Object['freeze']({'path':a422_0x45d8b9(0x4a3),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x28a),a422_0x45d8b9(0x4a3)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),APIMART_VIDEO_PROMPT_OPTIMIZER_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x20e),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2e4),a422_0x45d8b9(0x20e)]),'defaultValue':!![],'transform':a422_0x45d8b9(0x417)}),APIMART_VIDEO_FAST_PRETREATMENT_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':'fast_pretreatment','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x49a),a422_0x45d8b9(0x34b)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),APIMART_VIDEO_GENERATION_TYPE_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':'generation_type','from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x292),a422_0x45d8b9(0x3b0)]),'defaultValue':a422_0x45d8b9(0x1df),'omitWhenEmpty':!![]}),APIMART_VIDEO_SHOT_TYPE_ENTRY=Object[a422_0x45d8b9(0x321)]({'path':'shot_type','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x3e9),a422_0x45d8b9(0x34d)]),'defaultValue':a422_0x45d8b9(0x4ca)}),APIMART_VIDEO_VEO3_BODY_MAPPING=createApimartVideoBodyMapping([APIMART_VIDEO_ASPECT_RATIO_ENTRY,APIMART_VIDEO_GENERATION_TYPE_ENTRY,APIMART_VIDEO_DURATION_ENTRY,APIMART_VIDEO_RESOLUTION_VEO3_ENTRY,APIMART_VIDEO_VEO3_IMAGE_URLS_ENTRY,APIMART_VIDEO_ENABLE_GIF_ENTRY]),APIMART_VIDEO_HAILUO_02_BODY_MAPPING=createApimartVideoBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x228),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.resolution',a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x241),'transform':a422_0x45d8b9(0x34a)}),Object[a422_0x45d8b9(0x321)]({'path':'duration','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.duration',a422_0x45d8b9(0x2df)]),'defaultValue':0x5,'transform':a422_0x45d8b9(0x2f7)}),Object[a422_0x45d8b9(0x321)]({'path':'first_frame_image','from':'inputImages','transform':a422_0x45d8b9(0x48c),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x20b),'from':'inputImages','transform':a422_0x45d8b9(0x3bb),'omitWhenEmpty':!![]}),APIMART_VIDEO_PROMPT_OPTIMIZER_ENTRY,APIMART_VIDEO_FAST_PRETREATMENT_ENTRY,APIMART_VIDEO_WATERMARK_ENTRY]),APIMART_VIDEO_HAILUO_23_BODY_MAPPING=createApimartVideoBodyMapping([Object['freeze']({'path':a422_0x45d8b9(0x228),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x370),'resolution']),'defaultValue':a422_0x45d8b9(0x241),'transform':a422_0x45d8b9(0x373)}),Object['freeze']({'path':a422_0x45d8b9(0x2df),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x25e),a422_0x45d8b9(0x2df)]),'defaultValue':0x6,'transform':a422_0x45d8b9(0x4b0)}),Object['freeze']({'path':a422_0x45d8b9(0x3f7),'from':a422_0x45d8b9(0x283),'transform':a422_0x45d8b9(0x48c),'omitWhenEmpty':!![]}),APIMART_VIDEO_PROMPT_OPTIMIZER_ENTRY,APIMART_VIDEO_FAST_PRETREATMENT_ENTRY,APIMART_VIDEO_WATERMARK_ENTRY]),APIMART_VIDEO_HAPPYHORSE_BODY_MAPPING=createApimartVideoBodyMapping([APIMART_VIDEO_SIZE_ENTRY,APIMART_VIDEO_DURATION_ENTRY,APIMART_VIDEO_RESOLUTION_UPPER_1080_ENTRY,APIMART_VIDEO_WATERMARK_ENTRY,APIMART_VIDEO_SEED_ENTRY]),RUNNINGHUB_VIDEO_HAPPYHORSE_BODY_MAPPING=freezeBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2c4),'from':a422_0x45d8b9(0x2c4)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x435),'from':'param','field':Object['freeze'](['generationParams.happyhorse_mode',a422_0x45d8b9(0x435)]),'defaultValue':a422_0x45d8b9(0x266)}),Object['freeze']({'path':'resolution','from':a422_0x45d8b9(0x2f9),'field':Object['freeze'](['generationParams.resolution',a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x3cd),'transform':a422_0x45d8b9(0x227)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2df),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x25e),a422_0x45d8b9(0x2df)]),'defaultValue':0x5,'transform':a422_0x45d8b9(0x262)}),Object['freeze']({'path':a422_0x45d8b9(0x1f9),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x1fd),a422_0x45d8b9(0x1f9)]),'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'transform':a422_0x45d8b9(0x249),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x3ef),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x1e0),a422_0x45d8b9(0x39b),a422_0x45d8b9(0x1d6),a422_0x45d8b9(0x3ef)]),'defaultValue':a422_0x45d8b9(0x266),'transform':a422_0x45d8b9(0x280),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x1e8),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2a3),'seed']),'transform':a422_0x45d8b9(0x4be),'omitWhenEmpty':!![]})]),RUNNINGHUB_VIDEO_SEEDANCE_2_BODY_MAPPING=freezeBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2c4),'from':a422_0x45d8b9(0x2c4)}),Object[a422_0x45d8b9(0x321)]({'path':'rh_seedance_2_model','from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x4ce),'rh_seedance_2_model']),'defaultValue':'fast'}),Object[a422_0x45d8b9(0x321)]({'path':'rh_seedance_2_mode','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x276),a422_0x45d8b9(0x203)]),'defaultValue':'text2video'}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x228),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.resolution',a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x4ad),'transform':'runninghubSeedance2Resolution'}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2df),'from':'param','field':Object['freeze']([a422_0x45d8b9(0x25e),a422_0x45d8b9(0x2df)]),'defaultValue':0x5,'transform':'runninghubSeedance2Duration'}),Object[a422_0x45d8b9(0x321)]({'path':'ratio','from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x1fd),a422_0x45d8b9(0x1f9),'ratio']),'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'transform':a422_0x45d8b9(0x2fb)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x47a),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x313),'generateAudio']),'defaultValue':!![],'transform':a422_0x45d8b9(0x417)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x213),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.webSearch',a422_0x45d8b9(0x213)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),Object['freeze']({'path':'realPersonMode','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x464),a422_0x45d8b9(0x42d)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x471),'from':a422_0x45d8b9(0x469),'value':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x4cb)])}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x238),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x2dd),a422_0x45d8b9(0x238)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),Object['freeze']({'path':a422_0x45d8b9(0x1e8),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2a3),a422_0x45d8b9(0x1e8)]),'transform':a422_0x45d8b9(0x4be),'omitWhenEmpty':!![]})]),APIMART_VIDEO_WAN27_BODY_MAPPING=createApimartVideoBodyMapping([APIMART_VIDEO_SIZE_ENTRY,APIMART_VIDEO_DURATION_ENTRY,APIMART_VIDEO_RESOLUTION_UPPER_1080_ENTRY,APIMART_VIDEO_IMAGE_URLS_ENTRY,APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY,Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x3ff),'from':a422_0x45d8b9(0x470),'omitWhenEmpty':!![]}),APIMART_VIDEO_AUDIO_URL_ENTRY,APIMART_VIDEO_PROMPT_EXTEND_ENTRY,APIMART_VIDEO_WATERMARK_ENTRY,APIMART_VIDEO_SEED_ENTRY]),APIMART_VIDEO_KLING_4K_BODY_MAPPING=createApimartVideoBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x260),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.mode',a422_0x45d8b9(0x260)]),'defaultValue':a422_0x45d8b9(0x413),'transform':a422_0x45d8b9(0x331)}),APIMART_VIDEO_DURATION_ENTRY,APIMART_VIDEO_ASPECT_RATIO_ENTRY,APIMART_VIDEO_IMAGE_URLS_ENTRY,APIMART_VIDEO_AUDIO_ENTRY,APIMART_VIDEO_WATERMARK_ENTRY,APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY]),APIMART_VIDEO_KLING_V3_BODY_MAPPING=createApimartVideoBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':'mode','from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x413),'transform':a422_0x45d8b9(0x331)}),APIMART_VIDEO_DURATION_ENTRY,APIMART_VIDEO_ASPECT_RATIO_ENTRY,APIMART_VIDEO_IMAGE_URLS_ENTRY,APIMART_VIDEO_AUDIO_ENTRY,APIMART_VIDEO_WATERMARK_ENTRY,APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY]),APIMART_VIDEO_KLING_O1_BODY_MAPPING=createApimartVideoBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x260),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x413),'transform':a422_0x45d8b9(0x454)}),APIMART_VIDEO_DURATION_ENTRY,APIMART_VIDEO_ASPECT_RATIO_ENTRY,APIMART_VIDEO_IMAGE_URLS_ENTRY,APIMART_VIDEO_KEEP_ORIGINAL_SOUND_ENTRY]),RUNNINGHUB_VIDEO_KLING_O1_BODY_MAPPING=freezeBodyMapping([Object['freeze']({'path':'prompt','from':a422_0x45d8b9(0x2c4)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x309),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x25c),a422_0x45d8b9(0x309)]),'defaultValue':a422_0x45d8b9(0x1df)}),Object['freeze']({'path':a422_0x45d8b9(0x260),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x413),'transform':a422_0x45d8b9(0x1fb)}),Object[a422_0x45d8b9(0x321)]({'path':'aspectRatio','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x1fd),'aspectRatio']),'defaultValue':a422_0x45d8b9(0x3f5),'transform':a422_0x45d8b9(0x3da)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2df),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.duration',a422_0x45d8b9(0x2df)]),'defaultValue':0x5,'transform':a422_0x45d8b9(0x46d)}),Object['freeze']({'path':a422_0x45d8b9(0x4a9),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x233),a422_0x45d8b9(0x427),a422_0x45d8b9(0x4a9),a422_0x45d8b9(0x436)]),'defaultValue':![],'transform':'booleanParam'})]),RUNNINGHUB_VIDEO_KLING_O3_BODY_MAPPING=freezeBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2c4),'from':'prompt'}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x359),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x4c3),a422_0x45d8b9(0x359)]),'defaultValue':a422_0x45d8b9(0x44a)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x332),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':'std','transform':a422_0x45d8b9(0x30b)}),Object[a422_0x45d8b9(0x321)]({'path':'aspectRatio','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.aspectRatio',a422_0x45d8b9(0x1f9)]),'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'transform':a422_0x45d8b9(0x395),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':'duration','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.duration',a422_0x45d8b9(0x2df)]),'defaultValue':0x5,'transform':a422_0x45d8b9(0x3d2)}),Object['freeze']({'path':'sound','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x407),a422_0x45d8b9(0x357),a422_0x45d8b9(0x24f),a422_0x45d8b9(0x37b)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x4a9),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.keepOriginalSound',a422_0x45d8b9(0x427),a422_0x45d8b9(0x4a9),'keep_original_sound']),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x37e),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x22f),a422_0x45d8b9(0x3fa),'multiShot',a422_0x45d8b9(0x3ec)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),Object['freeze']({'path':'shotType','from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x48f),a422_0x45d8b9(0x3a1)]),'defaultValue':'customize','transform':a422_0x45d8b9(0x31c)})]),RUNNINGHUB_VIDEO_KLING_V3_BODY_MAPPING=freezeBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':'prompt','from':a422_0x45d8b9(0x2c4)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x460),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x413),'transform':'runninghubKlingV3Model'}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x1f9),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x1fd),a422_0x45d8b9(0x1f9)]),'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'transform':'runninghubKlingV3AspectRatio','omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2df),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x25e),a422_0x45d8b9(0x2df)]),'defaultValue':0x5,'transform':a422_0x45d8b9(0x2ba)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2cf),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2bd),'cfgScale']),'defaultValue':0.5,'transform':'runninghubKlingV3CfgScale'}),Object['freeze']({'path':'sound','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x407),'generationParams.sound',a422_0x45d8b9(0x24f),a422_0x45d8b9(0x37b)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x37e),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x22f),'generationParams.multi_shot','multiShot','multi_shot']),'defaultValue':![],'transform':a422_0x45d8b9(0x417)}),Object[a422_0x45d8b9(0x321)]({'path':'shotType','from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x48f),a422_0x45d8b9(0x3a1)]),'defaultValue':a422_0x45d8b9(0x264),'transform':a422_0x45d8b9(0x3b1)}),Object['freeze']({'path':a422_0x45d8b9(0x208),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x362),a422_0x45d8b9(0x3c0),a422_0x45d8b9(0x1e4),'negativePrompt']),'transform':a422_0x45d8b9(0x4e9),'omitWhenEmpty':!![]})]),RUNNINGHUB_VIDEO_VEO3_BODY_MAPPING=freezeBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2c4),'from':a422_0x45d8b9(0x2c4)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x347),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.rh_veo3_channel',a422_0x45d8b9(0x347)]),'defaultValue':a422_0x45d8b9(0x496)}),Object['freeze']({'path':'mode','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x245),a422_0x45d8b9(0x260)]),'defaultValue':a422_0x45d8b9(0x43b)}),Object[a422_0x45d8b9(0x321)]({'path':'generation_type','from':'param','field':Object[a422_0x45d8b9(0x321)](['generationParams.generation_type',a422_0x45d8b9(0x3b0)]),'defaultValue':'frame'}),Object['freeze']({'path':a422_0x45d8b9(0x228),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.resolution','resolution']),'defaultValue':a422_0x45d8b9(0x4ad),'transform':a422_0x45d8b9(0x41a)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x1f9),'from':'param','field':Object['freeze'](['generationParams.aspectRatio','aspectRatio']),'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'transform':'runninghubVeo3AspectRatio','omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2df),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.duration',a422_0x45d8b9(0x2df)]),'defaultValue':0x8,'transform':'runninghubVeo3Duration'}),Object['freeze']({'path':'generateAudio','from':a422_0x45d8b9(0x2f9),'field':Object['freeze'](['generationParams.generateAudio',a422_0x45d8b9(0x340),'generateAudio',a422_0x45d8b9(0x2d0)]),'defaultValue':![],'transform':a422_0x45d8b9(0x417)})]),RUNNINGHUB_VIDEO_WAN27_BODY_MAPPING=freezeBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2c4),'from':a422_0x45d8b9(0x2c4)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x415),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x24a),a422_0x45d8b9(0x415)]),'defaultValue':'image'}),Object['freeze']({'path':a422_0x45d8b9(0x228),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x229),'transform':a422_0x45d8b9(0x234)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x1f9),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.aspectRatio',a422_0x45d8b9(0x1f9)]),'defaultValue':APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,'transform':a422_0x45d8b9(0x2c6),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2df),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x25e),a422_0x45d8b9(0x2df)]),'defaultValue':0x5,'transform':a422_0x45d8b9(0x480)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x30c),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x430),a422_0x45d8b9(0x45f),a422_0x45d8b9(0x46a),'promptExtend']),'defaultValue':!![],'transform':a422_0x45d8b9(0x417)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x208),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x362),a422_0x45d8b9(0x3c0),a422_0x45d8b9(0x1e4),a422_0x45d8b9(0x208)]),'transform':a422_0x45d8b9(0x4e9),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x47c),'from':a422_0x45d8b9(0x25f),'transform':a422_0x45d8b9(0x48c),'omitWhenEmpty':!![]})]),RUNNINGHUB_VIDEO_HAILUO_02_BODY_MAPPING=freezeBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2c4),'from':a422_0x45d8b9(0x2c4)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2f2),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x3bf),'rh_hailuo_02_quality']),'defaultValue':a422_0x45d8b9(0x2c8)}),Object['freeze']({'path':'duration','from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x25e),a422_0x45d8b9(0x2df)]),'defaultValue':0x6,'transform':'runninghubHailuo02Duration'}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x295),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x299),a422_0x45d8b9(0x433),a422_0x45d8b9(0x295),a422_0x45d8b9(0x2f1)]),'defaultValue':!![],'transform':a422_0x45d8b9(0x417)})]),RUNNINGHUB_VIDEO_HAILUO_23_BODY_MAPPING=freezeBodyMapping([Object['freeze']({'path':a422_0x45d8b9(0x2c4),'from':a422_0x45d8b9(0x2c4)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x3d0),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x25a),a422_0x45d8b9(0x3d0)]),'defaultValue':'standard'}),Object['freeze']({'path':a422_0x45d8b9(0x2df),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x25e),a422_0x45d8b9(0x2df)]),'defaultValue':0x6,'transform':'runninghubHailuo23Duration'}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x295),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze'](['generationParams.enablePromptExpansion','generationParams.enable_prompt_expansion',a422_0x45d8b9(0x295),a422_0x45d8b9(0x2f1)]),'defaultValue':!![],'transform':a422_0x45d8b9(0x417)})]),APIMART_VIDEO_VIDU_BODY_MAPPING=createApimartVideoBodyMapping([Object['freeze']({...APIMART_VIDEO_DURATION_ENTRY,'defaultValue':0x5,'transform':a422_0x45d8b9(0x387)}),APIMART_VIDEO_RESOLUTION_VIDU_ENTRY,APIMART_VIDEO_ASPECT_RATIO_ENTRY,APIMART_VIDEO_IMAGE_URLS_ENTRY,APIMART_VIDEO_AUDIO_TRUE_ENTRY,APIMART_VIDEO_SEED_ENTRY]),APIMART_VIDEO_GROK_IMAGINE_BODY_MAPPING=createApimartVideoBodyMapping([APIMART_VIDEO_SIZE_ENTRY,Object[a422_0x45d8b9(0x321)]({...APIMART_VIDEO_DURATION_ENTRY,'defaultValue':0x6,'transform':Object[a422_0x45d8b9(0x321)]({'name':a422_0x45d8b9(0x3ed),'min':0x6,'max':0x1e,'fallback':0x6})}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x278),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x4ec),a422_0x45d8b9(0x278)]),'defaultValue':'480p'}),APIMART_VIDEO_IMAGE_URLS_ENTRY]),APIMART_VIDEO_OMNI_FLASH_BODY_MAPPING=createApimartVideoBodyMapping([Object[a422_0x45d8b9(0x321)]({...APIMART_VIDEO_DURATION_ENTRY,'defaultValue':0x6}),APIMART_VIDEO_RESOLUTION_4K_ENTRY,APIMART_VIDEO_ASPECT_RATIO_ENTRY,Object[a422_0x45d8b9(0x321)]({...APIMART_VIDEO_IMAGE_URLS_ENTRY,'transform':Object['freeze']({'name':'imageCountOptions','allowedCounts':Object[a422_0x45d8b9(0x321)]([0x1,0x3]),'label':a422_0x45d8b9(0x4d4)})}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x3ff),'from':'inputVideos','omitWhenEmpty':!![]})]),VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING=freezeBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x2c4),'from':a422_0x45d8b9(0x2c4)}),Object['freeze']({'path':a422_0x45d8b9(0x4e3),'from':a422_0x45d8b9(0x2f9),'field':Object['freeze']([a422_0x45d8b9(0x499),a422_0x45d8b9(0x4e3)]),'defaultValue':'multimodal2video'}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x228),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x370),a422_0x45d8b9(0x228)]),'defaultValue':a422_0x45d8b9(0x4ad)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x1f4),'from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x1fd),a422_0x45d8b9(0x1f9),a422_0x45d8b9(0x1f4)]),'defaultValue':a422_0x45d8b9(0x2ec)}),Object[a422_0x45d8b9(0x321)]({'path':'duration','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x25e),a422_0x45d8b9(0x2df)]),'defaultValue':0x5}),Object[a422_0x45d8b9(0x321)]({'path':'generate_audio','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x313),a422_0x45d8b9(0x340),a422_0x45d8b9(0x47a),'generate_audio']),'defaultValue':!![]}),Object['freeze']({'path':a422_0x45d8b9(0x1e8),'from':'param','field':Object['freeze']([a422_0x45d8b9(0x2a3),a422_0x45d8b9(0x1e8)]),'omitWhenEmpty':!![]})]),APIMART_VIDEO_RESPONSE_MAPPING=Object['freeze']({'taskIdPath':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x32b),a422_0x45d8b9(0x2d2),a422_0x45d8b9(0x44b)]),'statusPath':a422_0x45d8b9(0x257),'errorPath':a422_0x45d8b9(0x3d5),'resultPaths':Object[a422_0x45d8b9(0x321)](['result.videos[].url',a422_0x45d8b9(0x483),'results[].videoUrl',a422_0x45d8b9(0x38a),a422_0x45d8b9(0x3d3)])}),RUNNINGHUB_VIDEO_RESPONSE_MAPPING=Object[a422_0x45d8b9(0x321)]({'taskIdPath':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x44b),a422_0x45d8b9(0x2c2),a422_0x45d8b9(0x26d)]),'statusPath':'status','errorPath':a422_0x45d8b9(0x343),'resultPaths':Object[a422_0x45d8b9(0x321)](['results[].url',a422_0x45d8b9(0x49d),a422_0x45d8b9(0x1fa),a422_0x45d8b9(0x3d3)])}),VOLCENGINE_VIDEO_RESPONSE_MAPPING=Object[a422_0x45d8b9(0x321)]({'taskIdPath':Object[a422_0x45d8b9(0x321)](['id',a422_0x45d8b9(0x2cd)]),'statusPath':a422_0x45d8b9(0x257),'errorPath':a422_0x45d8b9(0x1d4),'resultPaths':Object['freeze'](['content.video_url',a422_0x45d8b9(0x4a0),a422_0x45d8b9(0x296),a422_0x45d8b9(0x4b2)])}),APIMART_VIDEO_TASK_POLLING=Object[a422_0x45d8b9(0x321)]({'mode':a422_0x45d8b9(0x327),'method':a422_0x45d8b9(0x30d),'urlTemplate':a422_0x45d8b9(0x2c9),'headersMode':'bearer'}),VOLCENGINE_VIDEO_TASK_POLLING=Object['freeze']({'mode':'task-proxy','method':a422_0x45d8b9(0x30d),'urlTemplate':a422_0x45d8b9(0x288),'headersMode':a422_0x45d8b9(0x35d)}),APIMART_SEEDANCE_VIDEO_RESOLVERS=Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x330)}),APIMART_OMNI_FLASH_VIDEO_RESOLVERS=Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x2c3)}),VOLCENGINE_SEEDANCE_VIDEO_RESOLVERS=Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x335)}),APIMART_SEEDANCE_2_0_VIDEO_POLICY=Object[a422_0x45d8b9(0x321)]({'ratioField':a422_0x45d8b9(0x2e3),'defaultResolution':a422_0x45d8b9(0x4ad),'supportsVideoReferences':!![],'supportsAudioReferences':!![],'maxRoleImageCount':0x2,'maxImageCount':0x9,'maxVideoReferenceCount':0x3,'maxAudioReferenceCount':0x3,'privateAvatarAssets':Object['freeze']({'enabled':!![],'provider':'apimart','capability':a422_0x45d8b9(0x3e3),'models':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2b3),a422_0x45d8b9(0x441)])})}),VOLCENGINE_SEEDANCE_IMAGE_INPUT_UPLOAD_POLICY=Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x425),'inputKinds':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x44a)]),'applyInputQualityProfile':!![],'strictUpload':!![]}),VOLCENGINE_SEEDANCE_VIDEO_INPUT_UPLOAD_POLICY=Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x4bb),'inputKinds':Object['freeze']([a422_0x45d8b9(0x391)]),'strictUpload':!![]}),VOLCENGINE_SEEDANCE_AUDIO_INPUT_UPLOAD_POLICY=Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x4bb),'inputKinds':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x24f)]),'strictUpload':!![]}),VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY=Object[a422_0x45d8b9(0x321)]({'defaultRatio':a422_0x45d8b9(0x2ec),'defaultResolution':a422_0x45d8b9(0x4ad),'maxImageCount':0x9,'maxVideoReferenceCount':0x3,'maxAudioReferenceCount':0x3,'minDuration':0x4,'maxDuration':0xf}),APIMART_SEEDANCE_1_5_VIDEO_POLICY=Object['freeze']({'ratioField':a422_0x45d8b9(0x4e8),'defaultResolution':a422_0x45d8b9(0x4ad),'supportsVideoReferences':![],'supportsAudioReferences':![],'maxRoleImageCount':0x2,'maxImageCount':0x2,'supportsGenerateAudioParam':!![],'supportsCameraFixedParam':!![]}),APIMART_SEEDANCE_1_0_FAST_VIDEO_POLICY=Object['freeze']({'ratioField':a422_0x45d8b9(0x4e8),'defaultResolution':a422_0x45d8b9(0x28f),'supportsVideoReferences':![],'supportsAudioReferences':![],'maxRoleImageCount':0x1,'maxImageCount':0x1,'roleImageLimitError':a422_0x45d8b9(0x495)}),APIMART_SEEDANCE_1_0_QUALITY_VIDEO_POLICY=Object['freeze']({'ratioField':a422_0x45d8b9(0x4e8),'defaultResolution':a422_0x45d8b9(0x28f),'supportsVideoReferences':![],'supportsAudioReferences':![],'maxRoleImageCount':0x2,'maxImageCount':0x1});function createSeedanceVideoExecutionExtensions(_0x4d1488){const _0x4ba2f1=a422_0x45d8b9;return Object[_0x4ba2f1(0x321)]({...APIMART_SEEDANCE_VIDEO_RESOLVERS,'seedanceVideo':_0x4d1488});}function createVolcengineSeedanceVideoExecutionExtensions(_0x1b6fd1){return Object['freeze']({...VOLCENGINE_SEEDANCE_VIDEO_RESOLVERS,'seedanceVideo':_0x1b6fd1,'imageInputUpload':VOLCENGINE_SEEDANCE_IMAGE_INPUT_UPLOAD_POLICY,'videoInputUpload':VOLCENGINE_SEEDANCE_VIDEO_INPUT_UPLOAD_POLICY,'audioInputUpload':VOLCENGINE_SEEDANCE_AUDIO_INPUT_UPLOAD_POLICY});}const APIMART_SEEDANCE_DEFAULT_TASK_TYPES=Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x201),a422_0x45d8b9(0x35e),a422_0x45d8b9(0x49c),a422_0x45d8b9(0x318)]),APIMART_SEEDANCE_NO_FAST_FRAMES_TASK_TYPES=Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x201),'image2video',a422_0x45d8b9(0x318)]),APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK=Object[a422_0x45d8b9(0x321)]({'text2video':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x31e),a422_0x45d8b9(0x4ad),a422_0x45d8b9(0x28f)]),'image2video':Object['freeze']([a422_0x45d8b9(0x31e),a422_0x45d8b9(0x4ad),a422_0x45d8b9(0x28f)]),'frames2video':Object['freeze']([a422_0x45d8b9(0x31e),a422_0x45d8b9(0x4ad),'1080p']),'multimodal2video':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x31e),a422_0x45d8b9(0x4ad),a422_0x45d8b9(0x28f)])}),APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK=Object[a422_0x45d8b9(0x321)]({'text2video':Object['freeze']([a422_0x45d8b9(0x31e),a422_0x45d8b9(0x4ad)]),'image2video':Object[a422_0x45d8b9(0x321)](['480p',a422_0x45d8b9(0x4ad)]),'frames2video':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x31e),a422_0x45d8b9(0x4ad)]),'multimodal2video':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x31e),a422_0x45d8b9(0x4ad)])}),APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK=Object['freeze']({'text2video':Object[a422_0x45d8b9(0x321)]({'min':0x4,'max':0xf,'step':0x1}),'image2video':Object[a422_0x45d8b9(0x321)]({'min':0x4,'max':0xf,'step':0x1}),'frames2video':Object[a422_0x45d8b9(0x321)]({'min':0x4,'max':0xf,'step':0x1}),'multimodal2video':Object[a422_0x45d8b9(0x321)]({'min':0x4,'max':0xf,'step':0x1})}),APIMART_SEEDANCE_1_5_DURATION_BY_TASK=Object[a422_0x45d8b9(0x321)]({'text2video':Object['freeze']({'min':0x4,'max':0xc,'step':0x1}),'image2video':Object['freeze']({'min':0x4,'max':0xc,'step':0x1}),'frames2video':Object[a422_0x45d8b9(0x321)]({'min':0x4,'max':0xc,'step':0x1}),'multimodal2video':Object[a422_0x45d8b9(0x321)]({'min':0x4,'max':0xc,'step':0x1})}),APIMART_SEEDANCE_1_0_DURATION_BY_TASK=Object['freeze']({'text2video':Object[a422_0x45d8b9(0x321)]({'min':0x2,'max':0xc,'step':0x1}),'image2video':Object['freeze']({'min':0x2,'max':0xc,'step':0x1}),'frames2video':Object['freeze']({'min':0x2,'max':0xc,'step':0x1}),'multimodal2video':Object[a422_0x45d8b9(0x321)]({'min':0x2,'max':0xc,'step':0x1})}),APIMART_SEEDANCE_RATIO_FIELD=createAspectRatioField({'options':['16:9',a422_0x45d8b9(0x3f5),a422_0x45d8b9(0x2b6),a422_0x45d8b9(0x3ac),a422_0x45d8b9(0x2b7),a422_0x45d8b9(0x458)]}),APIMART_SEEDANCE_FAST_FIELDS=Object[a422_0x45d8b9(0x321)]([createResolutionField({'defaultValue':a422_0x45d8b9(0x4ad),'options':[a422_0x45d8b9(0x31e),a422_0x45d8b9(0x4ad)]}),APIMART_SEEDANCE_RATIO_FIELD,createFooterDurationField()]),APIMART_SEEDANCE_STANDARD_FIELDS=Object['freeze']([createResolutionField({'defaultValue':a422_0x45d8b9(0x4ad),'options':[a422_0x45d8b9(0x31e),a422_0x45d8b9(0x4ad),a422_0x45d8b9(0x28f)]}),APIMART_SEEDANCE_RATIO_FIELD,createFooterDurationField()]);function freezeFields(_0x710d7b){const _0x59ea1b=a422_0x45d8b9;return Object[_0x59ea1b(0x321)](_0x710d7b[_0x59ea1b(0x400)](_0x120bba=>Object[_0x59ea1b(0x321)](_0x120bba)));}function createVideoModelApiManifest({modelId:_0x1793db,executionId:_0x3476c7,displayName:_0x1070e5,provider:provider=a422_0x45d8b9(0x4bb),aliases:aliases=null,icon:icon='AM',description:description=null,extensions:extensions=null,fields:fields=[VIDEO_RESOLUTION_FIELD,VIDEO_RATIO_FIELD,createFooterDurationField()],inputSlots:inputSlots=createVideoInputSlots(),ratioPolicy:ratioPolicy=VIDEO_SIZE_RATIO_POLICY,prompt:prompt=null,help:help=null,footerPlacementOrder:footerPlacementOrder=APIMART_VIDEO_FOOTER_PLACEMENT_ORDER}){const _0x42a4b7=a422_0x45d8b9,_0x453787=Array['isArray'](footerPlacementOrder)?footerPlacementOrder[_0x42a4b7(0x400)](_0x39e2c7=>String(_0x39e2c7||'')[_0x42a4b7(0x24e)]())['filter'](Boolean):[],_0x45c8eb={'schemaVersion':_0x42a4b7(0x44e),'modelId':_0x1793db,...Array['isArray'](aliases)?{'aliases':aliases}:{},'provider':provider,'kind':'video','adapterType':_0x42a4b7(0x30f),'executionId':_0x3476c7,'displayName':_0x1070e5,'icon':icon,'description':description||(provider===_0x42a4b7(0x4bb)?'APIMart\x20video\x20model\x20API':_0x1070e5+_0x42a4b7(0x237)),'inputSlots':inputSlots,'uiSchema':Object[_0x42a4b7(0x321)]({'fields':freezeFields(fields),..._0x453787['length']?{'footerPlacementOrder':Object['freeze'](_0x453787)}:{}}),...prompt&&typeof prompt===_0x42a4b7(0x3c8)?{'prompt':Object[_0x42a4b7(0x321)](prompt)}:{},...help&&typeof help===_0x42a4b7(0x3c8)?{'help':Object[_0x42a4b7(0x321)](help)}:{},'async':!![],'cancellable':![],'outputType':_0x42a4b7(0x391),'extensions':Object[_0x42a4b7(0x321)]({'ratioPolicy':ratioPolicy})};return extensions&&typeof extensions===_0x42a4b7(0x3c8)&&(_0x45c8eb['extensions']=Object[_0x42a4b7(0x321)]({'ratioPolicy':ratioPolicy,...extensions})),Object[_0x42a4b7(0x321)](_0x45c8eb);}function a422_0x45a2(){const _0x4ebf05=['即梦视频','model','apimart/seedance-2.0-fast-face','multi','generationParams.generate_audio','label','veo3.1-fast\x20-\x20快速生成模型，适用于快速预览和迭代\x0aveo3.1-quality\x20-\x20高质量生成模型，适用于最终制作','errorMessage','apimart.model-api.video.doubao-seedance-1-pro-quality.v1','volcengineOfficial','apimart/omni-flash-ext','rh_veo3_channel','Kling\x20V3\x20Omni\x20图生视频','apimartVideoRatio','apimartHailuoVideoResolution','fast_pretreatment','[[red:视频超过\x2010\x20秒]]：生成前会拦截。','shot_type','图生视频','写清楚视频内容和动作；上传图片时，说清楚图片里的主体怎么动。','Wan2.7\x20模式说明','不接素材时描述文生视频；接首帧/尾帧时可用\x20@图片1\x20/\x20@图片2\x20指代。例如：让\x20@图片1\x20中的人物向镜头挥手，随后过渡到\x20@图片2\x20的街景。','doubao-seedance-2.0-face','runninghubHailuo23Video','4206118dPCLnH','referenceImage','RunningHub\x20Kling\x20O3\x20参考生视频','generationParams.sound','intelligence','kling_v3_omni_mode','executionId','slots','[[red:没入参时]]：仍然是文生视频，只按提示词生成。','bearer','image2video','generationParams.watermark','提示词例子：参考图中的机器人在未来街道上奔跑，镜头低角度跟拍，背景灯牌快速掠过，速度感强。','图生视频或首尾帧使用的起始图片','generationParams.negative_prompt','标准\x20/\x20专业\x20/\x204K\x20可在参数区选择；多镜头分镜模式暂未开放。','[[red:参考视频可选]]：用来补充目标动作或风格参考。','[[red:放\x201\x20张首帧]]：图生视频，把这张图当开头，适合人物转身、表情变化、镜头推进。','Text/image\x20to\x20video','HappyHorse\x201.0\x20文生视频','segmented','1080p\x20仅支持\x205\x20秒','Kling\x20Video\x20O1\x20视频生成','提示词例子：参考图中的角色在未来城市中行走，镜头从侧面缓慢环绕，灯光有电影感。','[[red:不放图]]：文生视频，只按提示词生成。','Kling\x20V3\x20视频生成','图生视频：可接首帧、尾帧和音频；没入参时就是文生视频。','Pro\x201080P','generationParams.resolution','apimart/seedance-1.0-pro-quality','length','apimartHailuo23VideoResolution','参考图生视频','标准版支持文生/图生；Pro\x20文生/图生固定\x205\x20秒；Fast/Fast\x20Pro\x20必须接首帧。','advancedRow','[[red:必须接\x201-7\x20张参考图\x20+\x201\x20个参考视频]]：参考图用于主体/风格，参考视频用于动作或镜头特征。','适合改风格、换场景、增强画面，或让原视频更贴近参考图。','55bPzsaW','全能参考','sound','image_urls','kling-v1-5-gen-video','multiShot','Fast\x20768P','3:2','apimart/seedance-2.0','slider','apimart/seedance-1-5-pro','apimart.model-api.video.veo3-fast.v1','[[red:标准版不放图]]：文生视频，支持\x206\x20秒或\x2010\x20秒。','stepper','apimartViduVideoDuration','/openapi/v2/rhart-video/sparkvideo-2.0-fast/text-to-video','provider','results[].url','RunningHub\x20Seedance\x202.0\x20model\x20API','上传多张图：说清楚这些图之间的关系。例：第一张作为开始，第二张作为目标，中间自然变化，光线和人物保持一致。','参考音频','例：从第一张自然过渡到目标画面，人物保持同一个人，镜头角度一致，动作顺滑自然。','apimart.model-api.video.kling-v3.v1','8888','video','runninghub-model/kling-o3-std','真人模式','alibaba/happyhorse-1.0','runninghubKlingO3AspectRatio','HappyHorse\x201.0\x20视频编辑','fastPro','视频生成：支持文生、图生、首尾帧。\x0a参考生视频：接\x201-7\x20张参考图，可选\x201\x20个参考视频。\x0a视频编辑：基于原视频编辑，std/pro\x20可用。','视频编辑：接原视频，可再接参考视频。','原视频','generationParams.audioSetting','doubao-seedance-2-0-mini-260615','sectionMenu','可选。放入后作为最后一张图控制结尾。','[[red:接\x201-9\x20张参考图]]：参考人物、主体、风格或场景，生成全新画面。','apimart/veo3-fast','shotType','[[red:Pro\x20版]]：文生或首帧图生，1080P\x20质量，接口不接尾帧。','apimart/hailuo-02','video_url','参考生视频使用，支持\x201-7\x20张参考图','agnesVideoNumFrames','首帧图','random','[[red:Fast\x20版必须放\x201\x20张首帧]]：更快生成，适合已有首帧的快速预览。','alibaba/wan-2.7','apimartHappyHorseVideo','4:3','模式选择','模糊,\x20低画质,\x20变形','Kling\x20V3\x20Omni\x20参考生视频','generation_type','runninghubKlingV3ShotType','runninghubKlingO3VideoEndpoint','提示词里可以用图\x201、视频\x201\x20指代对应入参。','无入参时只使用提示词；首尾帧模式接\x201\x20张图时按首帧输入处理。','seedance2-standard','描述参考图主体的动作、场景和镜头；可用\x201-3\x20张参考图保持人物、主体或风格。','提示词例子：延续原视频里的镜头，人物继续向前走，镜头跟随，动作自然衔接。','Luma\x20Ray\x20V2','可选，图生视频使用的尾帧图片','提示词例子：让@图片1中的人物向镜头挥手，随后走向@图片2中的街景，镜头缓慢推进。','second','inputSlots','视频续写使用，不能超过\x2010\x20秒','首尾帧生成的结束图片','generationParams.rh_hailuo_02_quality','generationParams.negativePrompt','apimartVeo3VideoResolution','推理步数','apimartVideoResolutionLower','resultTaskIdPath','运镜指令；使用示例：','lite','apimart.model-api.video.grok-imagine-1.v1','object','适合直接生成新画面、动作和镜头。','[[red:1080p\x20只做\x206\x20秒]]；想做\x2010\x20秒就用\x20768p。','apimart/kling-v1-5','不接素材时描述文生视频；接首帧或首尾帧时描述动作、运镜和过渡。4K\x20图生当前只使用首帧。','1080P','Kling\x20V3\x20Omni\x20视频编辑','apimart/happyhorse-1.0','rh_hailuo_23_quality','Seedance\x202.0\x20Face','runninghubKlingO3Duration','url','apimart/wan2.7','error','runninghub-model/seedance-2.0-fast','doubao-seedance-1-5-pro','/openapi/v2/minimax/hailuo-2.3/t2v-standard','apimart.model-api.video.doubao-seedance-1-5-pro.v1','runninghubKlingO1AspectRatio','Fast\x20/\x20Standard,\x20T2V\x20/\x20I2V\x20/\x20Frames\x20/\x20Multimodal','[[red:4K\x20不支持编辑]]：请选择标准版或专业版。','content-generation-task','Seedance\x201.0\x20Pro\x20Quality','特征参考视频','prompt\x20智能改写','official','images/RH.png','seedance2PrivateAvatar','runninghub.model-api.video.hailuo-2-3.v1','文生\x20/\x20图生\x20/\x20首尾帧\x20/\x20Fast\x20图生','[[red:官方\x20Fast\x20/\x20Pro]]：支持\x201\x20个原视频。','volcengine.model-api.video.seedance-2-mini.v1','width','generationParams.shot_type','分辨率：Fast\x20版支持\x20480p、720p；标准版支持\x20480p、720p、1080p。','描述首帧画面怎么动；如果放了尾帧，再说明中间怎么自然过渡。','multi_shot','integerRange','适合角色一致性、主体参考和风格延续。','audioSetting','Seedance\x201.5\x20Pro','pillMenu','720P=std，1080P=pro，4K=4K\x20版。','RunningHub\x20Hailuo\x2002','apimartKlingV3OmniVideo','9:16','RunningHub\x20MiniMax\x20Hailuo\x202.3\x20model\x20API','first_frame_image','minimax/hailuo-2.3','apimart.model-api.video.doubao-seedance-2-fast-face.v1','generationParams.multi_shot','seedance2-fast','提示词例子：@图片1\x20中的人物慢慢转身，最后过渡到\x20@图片2\x20的夜晚街景，电影感，镜头缓慢推进。','[[red:接首帧\x20+\x20尾帧]]：第一张是开头，第二张是结尾，中间变化由模型补。','火山方舟\x20Mini\x20版，参数同\x20Seedance\x202.0','video_urls','map','volcengine/doubao-seedance-2-0','origin','描述原视频要如何续写。例如：继续向前走，镜头跟随，保持原视频里的动作节奏和画面风格。','runninghub-model/wan2.7','seed_mode','Fast\x20Pro\x20版仅支持图生视频，固定\x206\x20秒。','generationParams.audio','提示词例子：女孩从照片里的姿势慢慢转身看向镜头，阳光穿过窗帘，头发轻轻飘动，电影感，慢动作。','官方\x20Fast\x20/\x20Pro\x20暂按文生、图生、参考图接入；官方首尾帧请选\x20Lite。','data.video_url','runninghub-model/hailuo23','全能参考：不上传图就按文字生成；上传一张或多张图时，会参考这些图片来生成视频。\x0a首尾帧：至少上传首帧图；如果再上传尾帧图，会按开始和结尾自动补出顺滑变化。','apimart/doubao-seedance-1-0-pro-quality','540p','[[red:可选参考图]]：用于补充目标风格、主体或局部参考。','frame_rate','/v1/videos','none','std','VEO3\x20参考图模式','wan27_mode','火山方舟快速版，480p\x20/\x20720p','booleanParam','runninghub-model/minimax-hailuo-02','[[red:不接图]]：走文生视频接口。','runninghubVeo3Resolution','参考视频','用\x20@图片1、@视频1\x20指代参考素材，描述主体、动作、声音和镜头关系。','视频起始帧图片；Fast\x20版必填','描述参考图之间的主体、场景和动作关系。例如：@图片1\x20中的主角在\x20@图片2\x20的场景中奔跑，随后拿起\x20@图片3\x20中的道具，保持3D卡通风格，动作流畅。','agnesVideoWidth','参考图片','提示词例子：把原视频改成夜晚赛博朋克街道风格，保留人物动作，增加霓虹灯和雨水反光。','RunningHub\x20Kling\x20O1\x20参考生视频','提示词例子：参考图中的角色走进参考视频的街道场景，镜头从侧面缓慢跟拍，灯光有电影感。','images/volcengine.svg','freeImageHost','apimart.model-api.video.doubao-seedance-2-face.v1','generationParams.keep_original_sound','[[red:不能同时接首尾帧]]：视频编辑模式只使用原视频作为基础输入。','veo3.1-quality','Veo3','apimart.model-api.video.minimax-hailuo.v1','视频续写按官方接口提交原视频和分辨率，不提交提示词。','realPersonMode','apimart.model-api.video.luma-ray-v2.v1','output.video_url','generationParams.prompt_extend','RunningHub\x20Kling\x20O3\x20视频生成','MiniMax-Hailuo-2.3','generationParams.enable_prompt_expansion','火山方舟\x20Seedance\x202.0\x20model\x20API','happyhorse_mode','keep_original_sound','标准\x20768P','提示词例子：一只猫咪在草地上追逐蝴蝶，阳光明媚，镜头慢慢推进，慢动作。','[[red:原视频\x202-10\x20秒]]：超过会在生成前拦截。','watermark','fast','[[red:放\x203\x20张图]]：参考图融合；不支持\x202\x20张图首尾帧模式。','描述画面内容、动作和镜头；接首尾帧时写清从首帧到尾帧的变化。','全能参考最多\x209\x20图、3\x20视频、3\x20音频；音频需搭配图片或视频。','Seedance\x20系列，文生/图生/首尾帧参考素材','续写视频','doubao-seedance-2.0-fast','[[red:保留原声]]：开启后提交\x20keepOriginalSound。','[[red:标准版放\x202\x20张首尾帧]]：控制开头和结尾。','runninghubHailuo23VideoEndpoint','responseMapping','Vidu\x20Q3\x20Turbo\x20/\x20Pro\x20/\x20Standard\x20/\x20Mix','apimart.model-api.video.doubao-seedance-2-fast.v1','火山方舟\x20Seedance\x202.0\x20Mini\x20model\x20API','首尾帧：使用首帧/尾帧素材生成视频。\x0a参考图：使用参考图素材生成视频。\x0aveo3.1-quality\x20模型不支持参考图模式。','image','taskId','O1\x20提示词里可用\x20@图片1\x20/\x20@图片2\x20引用，提交时会转换为\x20<<<image_N>>>。','rh_seedance_2_model','1.0','runninghub-model/kling-v30','分辨率','首尾帧生视频结束帧。','[推进]一只猫咪在花园中奔跑，镜头缓缓推进特写','[[red:接首帧\x20+\x20尾帧]]：std/pro\x20走首尾帧图生视频；4K\x20文档只公开首帧字段，暂只使用首帧。','apimartKlingVideoMode','video-generation','RunningHub\x20Kling\x20O1\x20视频编辑','负向提示词','21:9','apimart.model-api.video.kling-o1.v1','volcengine','wan2.7','时长支持\x204\x20/\x206\x20/\x208\x20/\x2010\x20秒，分辨率支持\x20720p\x20/\x201080p\x20/\x204K。','modelId','from','generationParams.promptExtend','rh_kling_v3_model','首尾帧','[[red:没入参时]]：只写提示词，就是文生视频。','Seedance\x202.0\x20Fast\x20Face','generationParams.realPersonMode','[[red:接\x201\x20张图]]：把这张图当视频起点，让画面动起来。','apimart.model-api.video.doubao-seedance-2.v1','Agnes\x20Video\x20用法\x0a','featureReferenceVideo','constant','prompt_extend','kling-v3-omni','APIMart\x20快速真人版，支持真人素材上传','runninghubKlingO1Duration','视频生成','视频编辑使用的原视频，需为\x202-10\x20秒','inputVideos','conversionSlots','/contents/generations/tasks','Mix\x20版','用\x20@图片1、@视频1\x20指代参考素材。例如：参考\x20@图片1\x20的角色外观和\x20@视频1\x20的镜头风格，生成夜晚街道行走视频。','rhart-video/sparkvideo-2.0','APIMart\x20快速版，支持文生、图生、首尾帧与参考素材','runninghub-model/kling-o3','viduq3','保留原视频音轨','generateAudio','提示词例子：画面从白天逐渐过渡到夜晚，天空颜色慢慢变深，城市灯光依次亮起，镜头缓慢推进。','audioUrl','apimartDreaminaEntry','Kling\x20v3\x20Omni','提示词例子：一只白色小狗在草地上奔跑，镜头低角度跟拍，阳光明亮，慢动作。','runninghubWan27Duration','RunningHub\x20Kling\x20V3.0\x20支持\x200-1，默认\x200.5。','[[red:Pro\x20版]]：文生或首帧图生，1080P\x20质量，固定\x205\x20秒，不传\x20duration。','data.result.videos[].url','viduq3-turbo','Fast\x20版仅支持图生视频，必须接入首帧。','join','可选，文生、图生或视频续写使用的音频','Seedance\x202.0\x20Fast','Vidu\x20Q3','APIMart\x20真人标准版，支持真人素材上传与\x201080p','适合统一角色或风格，多张图可以给更多外观参考。','first','反向提示词','endpoint','generationParams.shotType','extend','isArray','field','24dXRwFH','runninghub-model/kling-v3-0','Seedance\x201.0\x20Pro\x20Fast\x20does\x20not\x20support\x20last-frame\x20input','lowCost','Kling\x20O3','Lite\x20版','generationParams.volcengine_seedance_2_mode','generationParams.fast_pretreatment','暂未开放，后续接入分镜参数后启用。','frames2video','results[].videoUrl','联网搜索','apimartViduVideoResolution','content.videoUrl','生成有声视频','value','enable_gif','[[red:放\x202\x20张图]]：低价\x20Fast\x20/\x20Pro\x20或官方\x20Lite\x20走首尾帧接口。','output.video','火山方舟\x20Seedance\x202.0','[[red:官方\x20Fast\x20/\x20Pro]]：支持\x201-3\x20张参考图。','[[red:接\x201-7\x20张参考图]]：用于保持主体、风格或场景一致。','keepOriginalSound','Agnes\x20AI\x20text-to-video\x20and\x20image-to-video\x20model\x20API','超分辨率','volcengine/seedance-2.0-mini','720p','至少上传首帧图，再说清楚画面怎么动；可选上传尾帧图控制结尾。\x0a','低价版','apimartHailuo23VideoDuration','sourceVideo','data.content.videoUrl','runninghub-model/hailuo-23','描述要对原视频做什么编辑，可用参考图补充风格。例如：将背景替换为雪山场景，保留人物动作和镜头节奏。','图生需\x201\x20张图；首尾帧需\x202\x20张图；全能参考最多\x209\x20图、3\x20视频、3\x20音频。','官方\x20edit-video\x20使用的原视频','runninghubModel','RunningHub\x20Kling\x20O3\x20视频编辑','durationPill','[[red:不放图]]：只写提示词，就是文生视频。','apimart','runninghubKlingO3Video','视频编辑','apimartOptionalInteger','agnesVideo','runninghub-model/wan-2.7','写法很简单：谁或什么、在哪里、做什么、镜头怎么动、光线和风格。\x0a','fieldFirst','generationParams.kling_v3_omni_mode','[[red:接\x201\x20张首帧]]：从这张图开始生成视频。','描述视频内容和镜头变化。例如：[推进]一只猫咪在花园中奔跑，镜头缓缓推进特写。','grok-imagine-1.0-video-apimart','runninghub.model-api.video.kling-v3.v1','volcengine/doubao-seedance-2-0-fast-260128','/openapi/v2/minimax/hailuo-02/t2v-standard','single','all','apimartModel','taskPolling','generationParams.rh_seedance_2_model','参考图','floor','[[red:标准版放\x201\x20张首帧]]：图生视频，把这张图当开头，适合人物转身、表情变化、镜头推进。','Kling\x20O1','Fast\x20Pro','Gemini\x20Omni\x20Flash','help','default','runninghubSeedance2VideoEndpoint','897542YQJbXw','agnes/agnes-video-v2.0','apimart/seedance-1.0-pro-fast','[[red:放\x201\x20张图]]：就是普通图生视频，把这张图当作视频起点。','视频结束帧图片','[[red:放\x201\x20张图]]：图生视频，把图片作为视频起点。','apimart/doubao-seedance-1-5-pro','Wan2.7\x20视频续写','VEO3.1\x20Fast\x20/\x20Quality','num_inference_steps','全能视频\x20V3.1，官方\x20/\x20低价渠道','volcengine_seedance_2_mode','/openapi/v2/kling-video-o1/text-to-video','可选，std/pro\x20首尾帧使用的结束图片','toggle','5111770WJgoqr','aspect_ratio','apimartOptionalText','runninghub-model/rhart-video-v31','[[red:放\x202\x20张图]]：第一张是开头，第二张是结尾，VEO3\x20补中间变化。','generationParams.quality','doubao-seedance-2.0-fast-face','随机种子','agnes_video_mode','error.message','添加水印','audio_setting','Pro\x20版','exclusiveGroups','apimart.model-api.video.doubao-seedance-1-pro-fast.v1','描述首帧到尾帧的变化。例如：首帧中的女孩慢慢转身看向镜头，尾帧定格在微笑特写，阳光穿过窗帘，电影感，慢动作。','[[red:接\x201\x20个续写视频]]：在原视频后继续往下生成。','渠道版本','RunningHub\x20Kling\x20O1\x20model\x20API','[[red:接\x201\x20个原视频]]：在原视频基础上改画面、换背景或改风格。','frame','generationParams.audio_setting','Fast\x20版','图生视频起始帧；Fast\x20版必填。','apimart/doubao-seedance-2.0-face','negative_prompt','executionExtensions','视频编辑使用的参考视频','endpointMode','seed','512p','runninghubKlingO1VideoEndpoint','agnes.model-api.video.agnes-video-v2.v1','1592yhxgTD','[[red:接\x201\x20张首帧]]：走图生视频接口，把这张图作为视频起点。','std=720P，pro=1080P，4K=Kling\x20V3.0\x204K。','视频续写：接\x201\x20个续写视频；没入参时就是文生视频。','veo3.1-fast','参考生视频：接参考图或参考视频；音频需搭配参考图。','apimartHailuo23Video','runninghub.model-api.video.veo3.v1','ratio','kling-video-o1','filter','volcengine/seedance-2.0-fast','message','aspectRatio','data.results[].url','runninghubKlingVideoMode','T2V\x20/\x20I2V\x20/\x20R2V\x20/\x20Edit','generationParams.aspectRatio','编辑视频','application/json','/openapi/v2/kling-video-o3-std/text-to-video','text2video','模式：全能参考\x20/\x20首尾帧。','rh_seedance_2_mode','上传1张图：说清楚图片里哪些地方要动，哪些要保持。例：人物轻微呼吸，头发随风动，背景灯光轻轻闪，脸和衣服保持一致。\x0a','首尾帧：支持文生、图生、首尾帧。\x0a参考图：官方\x20Fast\x20/\x20Pro\x20支持\x201-3\x20张参考图。\x0a视频续写：官方\x20Fast\x20/\x20Pro\x20支持\x201\x20个原视频。','音频设置','/openapi/v2/kling-v3.0-std/text-to-video','negativePrompt','[[red:接\x201\x20个原视频]]：在原视频基础上改画面、换风格或调整内容。','runninghub-model/happyhorse','last_frame_image','std\x20/\x20pro\x20/\x204K，文生\x20/\x20图生\x20/\x20首尾帧','apimart/doubao-seedance-2.0','prompt_optimizer','随机：每次生成都会换一个值，画面更有变化。\x0a固定：一直使用当前数字，方便复现相近效果。\x0a可以左右拖动数字修改，点“随机”会立即换一个值。','editRefImage','pro','firstFrame','webSearch','参考生视频可选，作为动作或镜头特征参考','extensions','VEO3\x20首尾帧模式','editVideo','启用\x20GIF\x20输出格式','APIMart\x20标准版，质量优先，支持\x201080p','生成音频','agnesVideoHeight','viduq3-pro','apimart/seedance-2.0-fast','runninghub-model/hailuo-02','描述要对原视频做的编辑。例如：移除背景路人，将晴天改为电影感雨夜，并保持人物动作连贯。','runninghub-model/sparkvideo-2.0','标准版','agnes-video-v2.0','[[red:接参考图或参考视频]]：参考主体、动作、风格或场景，生成新视频。','runninghub-model/hailuo02','待编辑的原视频，需\x203-10\x20秒；与特征参考视频互斥。','push','runninghubHappyHorseResolution','resolution','720P','作为特征参考的视频，需\x203-10\x20秒；与编辑视频互斥。','videoSize','seedance2-mini','runninghub-model/kling-video-o1','参考生视频使用的参考图片','generationParams.multiShot','runninghub.model-api.video.hailuo-02.v1','RunningHub\x20Veo3\x20视频续写','num_frames','generationParams.keepOriginalSound','runninghubWan27Resolution','视频时长（秒）','Wan2.7\x20视频编辑','\x20video\x20model\x20API','returnLastFrame','viduq3-mix','MiniMax-Hailuo-2.3-Fast','advanced','runninghub-model/alibaba-wan-2.7','apimart/doubao-seedance-2.0-fast-face','普通用户保持默认就好。想让画面多打磨几轮，可以填整数；数值越高通常越慢。留空或\x20none\x20使用模型默认。','data.url','描述首帧到尾帧的过渡动作、节奏和镜头关系。','768p','16992tYtUBs','参考图生视频的参考图片','apimartVideoResolutionUpper','generationParams.mode','描述视频内容、动作和镜头；接入参考图时会按参考图生成动态视频。','不接素材时描述文生视频；接首帧/尾帧时描述动作、运镜和过渡。例如：人物缓缓站起身，向镜头走来；或镜头从海边缓慢移向山顶。','自动优化提示词','runninghubHappyHorseAspectRatio','generationParams.wan27_mode','视频编辑必填，作为待编辑原视频','native1080p','版本选择对应\x20RunningHub\x20的\x20std\x20/\x20pro\x20/\x204K\x20endpoint。','trim','audio','描述如何改写源视频，可用参考图补充风格。例如：把视频中的角色换成卡通风格，保留原有动作和节奏。','参考生视频','apimart/viduq3','[[red:接\x201\x20张首帧]]：走图生视频接口。','apimart/minimax-hailuo-2.3','fixedSlots','runninghub.model-api.video.wan2-7.v1','status','[[red:放\x201\x20张图]]：单图生视频，把图片作为视觉参考。','视频时长','generationParams.rh_hailuo_23_quality','分辨率：480p、720p、native1080p\x20为原生输出；1080p、2k、4k\x20为基于\x20720p\x20原生生成后超分放大。','generationParams.rh_kling_o1_generation_mode','VEO3','generationParams.duration','inputAudios','mode','保留原音','runninghubHappyHorseDuration','apimartKlingO1Video','customize','agnesVideoSeed','auto','1164509IQccUn','可选，首尾帧使用的结束图片','提示词例子：图\x201\x20中的人物来到视频\x201\x20的街道场景中，环顾四周，镜头从侧面缓慢跟拍。','RunningHub\x20全能视频\x20V3.1\x20/\x20Veo3\x20model\x20API','keyframes','[[red:接\x201\x20个原视频]]：基于原视频按提示词编辑画面。','data[].taskId','APIMart\x201.5\x20Pro，支持文生、图生、首尾帧与生成音频参数','runninghubWan27VideoEndpoint','minimax/hailuo-02','描述视频内容、动作、环境和镜头；可接入\x201\x20张或\x203\x20张参考图。','用\x20@图片1、@图片2、@视频1\x20指代参考素材。例如：@图片1\x20中的人物来到\x20@图片2\x20的场景中，学习\x20@图片3\x20的动作，保持角色一致。','vidu_q3_generation_mode','自适应','1080p\x20仅支持\x206\x20秒','generationParams.rh_seedance_2_mode','[[red:Fast\x20版]]：必须接\x201\x20张首帧图，适合快速预览。','quality','描述要生成的视频内容。例如：夕阳下的海边公路，慢镜头推进，电影感画面。','generationParams.agnes_video_mode','提示词例子：画面中的女孩慢慢转身看向镜头，发丝被风吹动，背景轻微虚化。','Hailuo\x202.3','apimart.model-api.video.viduq3.v1','Agnes\x20Video\x20V2.0','apimartViduQ3Video','runninghubHappyHorseAudioSetting','doubao-seedance-1-0-pro-fast','runninghub-model/seedance-2.0','inputImages','官方版','描述参考图中主体如何运动，以及镜头和画面变化。','描述参考图主体的动作和镜头。例如：参考图中的机器人在未来街道上奔跑，低角度跟拍，背景灯牌快速掠过，速度感强。','提示词例子：将原视频背景替换为雪山场景，保留人物动作，整体变成电影感冷色调。','{baseUrl}/contents/generations/tasks/{taskId}','892050lbRBtF','generationParams.enable_gif','apimart/grok-imagine-1.0','Wan2.7\x20图生视频','Seedance\x201.0\x20Pro\x20Fast','runninghubWan27Video','1080p','提示词例子：女孩从照片里的姿势慢慢转身看向镜头，镜头缓慢推进，阳光穿过窗帘，电影感。','视频编辑可选，用于补充风格或主体参考','generationParams.generation_type','视频起始帧图片','Kling\x20V1.5','enablePromptExpansion','data.content.video_url','自动生成音频','[[red:不放图]]：就是文生视频，只按提示词生成。','generationParams.enablePromptExpansion','runninghub-model/seedance2.0','runninghub','doubao-seedance-2-0-fast-260128','doubao-seedance-2-0-260128','Seedance\x202.0','[[red:接音频]]：可作为背景或驱动音频，2-30\x20秒且不超过\x2015MB。','视频续写','单镜头','图生视频起始帧；低价版或官方\x20Lite\x20可接尾帧。','generationParams.seed','resolvedRatioLabel','描述首帧图要如何动起来。例如：让图片中的场景动起来，镜头缓慢推近，主体轻微转身，电影感。','runninghub-model/veo3.1','提示词例子：画面中的女孩慢慢转身看向镜头，镜头缓慢推进，窗外阳光穿过窗帘，电影感。','referenceVideo','原生输出分辨率','extendVideo','__agnes_seed_mode_hidden','runninghub-model/minimax-hailuo-2.3','不上传图片：只靠文字生成视频。例：年轻宇航员走过红色沙漠星球，风吹起尘土，镜头慢慢跟随，夕阳光，写实科幻感。\x0a','写清楚谁或什么、在哪里、做什么、镜头怎么动；可按\x20@\x20引用图片。','图生视频使用的参考图','[[red:接\x201\x20个原视频]]：走官方\x20edit-video\x20接口。','apimart/minimax-hailuo','apimart/doubao-seedance-1-0-pro-fast','doubao-seedance-2.0','runninghub-model/minimax-hailuo','尾帧图','1:1','3:4','视频分辨率','[[red:标准版放\x201\x20张首帧]]：图生视频，把图片作为视频起点。','runninghubKlingV3Duration','RunningHub\x20Kling\x20O1\x20视频生成','自定义','generationParams.cfgScale','runninghub-model/minimax-hailuo-23','[[red:接首帧\x20+\x20尾帧]]：走首尾帧接口，中间变化由\x20O1\x20补齐。','apimart/doubao-seedance-2.0-fast','文生\x20/\x20图生\x20/\x20参考\x20/\x20续写\x20/\x20编辑','data.taskId','apimartOmniFlashVideo','prompt','textarea','runninghubWan27AspectRatio','[[red:放\x202\x20张首尾帧]]：控制开头和结尾，适合白天到夜晚、近景到远景这类明确转场。','standard','{baseUrl}/v1/tasks/{taskId}?language=zh','Hailuo\x202.3\x20适用场景','runninghubKlingV3VideoEndpoint','描述视频内容，支持运镜指令。例如：','data.id','apimart.model-api.video.kling-v1-5.v1','cfgScale','generate_audio','icon','task_id','apimart/luma-ray-v2','视频生成：viduq3-turbo\x20/\x20viduq3-pro。\x0a参考生视频：viduq3\x20/\x20viduq3-mix。','runninghub-model/veo3','[[red:@图片引用]]：O1\x20会把\x20@图片1\x20/\x20@图片2\x20解析为\x20<<<image_1>>>\x20/\x20<<<image_2>>>，用于在提示词中精确引用图片。','/v1/videos/generations','图生视频使用的首帧图片','Wan2.7\x20参考生视频','apimart/kling-v3','标准\x20/\x20Fast；使用示例：','30789SWLmjM','generationParams.returnLastFrame','HappyHorse\x201.0\x20参考图生视频','duration','apimart/minimax-hailuo-02','runninghub.model-api.video.kling-o3.v1','slice','size','generationParams.prompt_optimizer','volcengine/seedance-2.0','generationParams.num_inference_steps','displayName','[[red:接首帧\x20+\x20尾帧]]：std/pro\x20走首尾帧图生视频；4K\x20文档只公开\x20imageUrl，暂只使用首帧。','火山方舟\x20Seedance\x202.0\x20Fast\x20model\x20API','runninghub-model/happyhorse-1.0','提示词扩写','adaptive','文生视频','some','16:9','描述如何编辑原视频，可接参考图补充风格。例如：将原视频改成夜晚赛博朋克街道风格，保留人物动作和镜头节奏。','enable_prompt_expansion','rh_hailuo_02_quality','Kling\x20V3.0','参考生视频使用的特征参考视频','436glxuJY','HappyHorse\x201.0\x20图生视频','apimartHailuoVideoDuration','runninghub-model/rhart-video-v3.1','param','audio_url','runninghubSeedance2Ratio','ratioPill','[[red:接\x201\x20个视频]]：在原视频基础上改画面或动作，可再接最多\x205\x20张参考图。','[[red:不放参考图]]：就是文生视频，只按提示词生成。','图生或首尾帧生成的起始图片','模型选择','Hailuo\x2002','extra_body.image','视频质量','Seedance\x202.0\x20Mini','volcengine/doubao-seedance-2-0-260128','[[red:Fast\x20版]]：必须接\x201\x20张首帧图，768P，支持\x206\x20秒或\x2010\x20秒。','Kling\x20v3','APIMart\x201.0\x20快速版，适合预览和迭代','rh_kling_o1_generation_mode','RunningHub\x20Kling\x20O3\x20model\x20API','runninghubKlingO3Model','promptExtend','GET','apimart/seedance-1.5-pro','modelApi','参考生视频使用的参考视频','cycleFixedInputWhenFull','runninghub-model/kling-o3-video','generationParams.generateAudio','文生\x20/\x20单图\x20/\x20参考视频\x20/\x203\x20图融合','videoUrl','[[red:生成有声视频]]：在高级设置打开音频，让模型同时生成声音。','runninghub-model/happyhorse-1','multimodal2video','描述视频内容和镜头变化。例如：[推进]画面中的猫咪向镜头奔跑，镜头缓缓推进，草地和阳光有电影感。','lastFrame','视频编辑可选参考图，最多\x203\x20张','runninghubKlingO3ShotType','apimart.model-api.video.wan2-7.v1','480p','快速预处理','RunningHub\x20MiniMax\x20Hailuo\x2002\x20model\x20API','freeze','RunningHub\x20Alibaba\x20Wan\x202.7\x20model\x20API','镜头类型','[[red:参考生视频]]：Standard\x20/\x20Mix，必须接入\x201-7\x20张参考图，适合角色一致性和风格延续。','描述参考图和参考视频要生成的新画面。例如：参考\x20@图片1\x20的角色外观和\x20@视频1\x20的动作节奏，生成夜晚街道行走镜头。','call','task-proxy','runninghubVeo3VideoEndpoint','多镜头','HappyHorse\x201.0','data[].task_id','全能参考模式的参考视频','edit','Grok\x20Imagine\x201.0','seedance-video-generation','apimartSeedanceVideo','apimartKlingVideoMode4k','rh_kling_o3_model','volcengine/doubao-seedance-2-0-fast','text','volcengineSeedance2Video','reference','RunningHub\x20Veo3\x20参考图模式','fixed','Wan\x202.7','RunningHub\x20Kling\x20V3.0','kling-v3'];a422_0x45a2=function(){return _0x4ebf05;};return a422_0x45a2();}function createVideoExecutionManifest({id:_0x5d74f1,model:_0x2e87ba,provider:provider=a422_0x45d8b9(0x4bb),endpoint:endpoint=a422_0x45d8b9(0x2d7),endpointMode:endpointMode=a422_0x45d8b9(0x455),extensions:extensions=null,bodyMapping:bodyMapping=APIMART_VIDEO_LEGACY_BODY_MAPPING,modeModels:modeModels=null,responseMapping:responseMapping=APIMART_VIDEO_RESPONSE_MAPPING,taskPolling:taskPolling=APIMART_VIDEO_TASK_POLLING,resultTaskIdPath:resultTaskIdPath='task_id',resultUrlFields:resultUrlFields=Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x315),a422_0x45d8b9(0x3a4),a422_0x45d8b9(0x3d3)])}){const _0xb0dc5f=a422_0x45d8b9,_0x226420=Object['freeze']({...taskPolling?{'taskPolling':taskPolling}:{},...extensions&&typeof extensions===_0xb0dc5f(0x3c8)?extensions:{}});return Object['freeze']({'schemaVersion':_0xb0dc5f(0x44e),'id':_0x5d74f1,'provider':provider,'kind':_0xb0dc5f(0x391),'adapterType':'modelApi','endpoint':endpoint,'endpointMode':endpointMode,'method':'POST','model':_0x2e87ba,...modeModels?{'modeModels':Object[_0xb0dc5f(0x321)](modeModels)}:{},'extensions':_0x226420,'headers':Object[_0xb0dc5f(0x321)]({'Content-Type':_0xb0dc5f(0x1ff)}),'bodyMapping':bodyMapping,'responseMapping':responseMapping,'result':Object[_0xb0dc5f(0x321)]({'taskIdPath':resultTaskIdPath,'urlFields':Object['freeze'](resultUrlFields)})});}const APIMART_VIDEO_MODELS=Object[a422_0x45d8b9(0x321)]([Object['freeze']({'modelId':a422_0x45d8b9(0x2d3),'executionId':a422_0x45d8b9(0x42e),'displayName':a422_0x45d8b9(0x3b8),'model':'luma-ray-v2'}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x3a0),'executionId':a422_0x45d8b9(0x384),'displayName':a422_0x45d8b9(0x25d),'model':a422_0x45d8b9(0x1f0),'modeModels':Object['freeze']({'fast':a422_0x45d8b9(0x1f0),'quality':a422_0x45d8b9(0x429)}),'fields':Object[a422_0x45d8b9(0x321)]([VEO3_MODEL_FIELD,VEO3_GENERATION_TYPE_FIELD,createResolutionField({'label':a422_0x45d8b9(0x2b8),'defaultValue':'720p','options':[a422_0x45d8b9(0x4ad),{'value':'1080p','label':a422_0x45d8b9(0x28f),'disableWhen':{'field':'enable_gif','value':!![]}},{'value':'4k','label':'4K','disableWhen':{'field':'enable_gif','value':!![]}}]}),Object[a422_0x45d8b9(0x321)]({...createAspectRatioField({'label':'比例','options':['16:9',a422_0x45d8b9(0x3f5)]}),'hideWhen':Object['freeze']({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x490)})}),withResolutionPlacement(VEO3_FIXED_DURATION_FIELD),VEO3_ENABLE_GIF_FIELD]),'inputSlots':createVideoInputSlots({'image':0x3,'video':0x0,'audio':0x0,'fixedSlots':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x3a7),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x336)})}),Object['freeze']({'id':'lastFrame','kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x2b5),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x336)})})])}),'bodyMapping':APIMART_VIDEO_VEO3_BODY_MAPPING,'executionExtensions':Object['freeze']({'bodyResolver':'apimartVeo3Video'}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':VEO3_FRAME_PROMPT_PLACEHOLDER,'variants':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'generation_type','value':'frame'}),'placeholder':VEO3_FRAME_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x336)}),'placeholder':VEO3_REFERENCE_PROMPT_PLACEHOLDER})])}),'help':Object['freeze']({'tooltip':VEO3_FRAME_HELP_TOOLTIP,'variants':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x1df)}),'tooltip':VEO3_FRAME_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x336)}),'tooltip':VEO3_REFERENCE_HELP_TOOLTIP})])}),'extensions':createVideoMenuExtension(0x1e,a422_0x45d8b9(0x4e0))}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x28b),'executionId':a422_0x45d8b9(0x3c7),'displayName':a422_0x45d8b9(0x32e),'model':a422_0x45d8b9(0x4c6),'fields':Object[a422_0x45d8b9(0x321)]([createAspectRatioField({'defaultValue':a422_0x45d8b9(0x2ef),'options':[a422_0x45d8b9(0x2ef),a422_0x45d8b9(0x3f5),'1:1',a422_0x45d8b9(0x380),'2:3']}),createFooterDurationField({'defaultValue':0x6,'min':0x6,'max':0x1e}),GROK_IMAGINE_QUALITY_FIELD]),'inputSlots':createVideoInputSlots({'image':0x7,'video':0x0,'audio':0x0}),'bodyMapping':APIMART_VIDEO_GROK_IMAGINE_BODY_MAPPING,'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':GROK_IMAGINE_PROMPT_PLACEHOLDER}),'help':Object['freeze']({'tooltip':GROK_IMAGINE_HELP_TOOLTIP}),'extensions':createVideoMenuExtension(0x23,'文生\x20/\x20图生，最多\x207\x20张参考图')}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x346),'executionId':'apimart.model-api.video.omni-flash-ext.v1','displayName':a422_0x45d8b9(0x4d4),'model':'Omni-Flash-Ext','fields':Object[a422_0x45d8b9(0x321)]([createAspectRatioField({'defaultValue':a422_0x45d8b9(0x2ef),'options':['16:9',a422_0x45d8b9(0x3f5)]}),createFooterDurationSliderOptionsField({'values':[0x4,0x6,0x8,0xa],'defaultValue':0x6}),createResolutionField({'label':a422_0x45d8b9(0x2b8),'defaultValue':a422_0x45d8b9(0x4ad),'options':[a422_0x45d8b9(0x4ad),'1080p','4k']})]),'inputSlots':createVideoInputSlots({'image':0x3,'video':0x1,'audio':0x0}),'bodyMapping':APIMART_VIDEO_OMNI_FLASH_BODY_MAPPING,'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':GEMINI_OMNI_FLASH_PROMPT_PLACEHOLDER}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':GEMINI_OMNI_FLASH_HELP_TOOLTIP}),'executionExtensions':APIMART_OMNI_FLASH_VIDEO_RESOLVERS,'extensions':createVideoMenuExtension(0x24,a422_0x45d8b9(0x314))}),Object['freeze']({'modelId':a422_0x45d8b9(0x2b1),'executionId':a422_0x45d8b9(0x42b),'displayName':a422_0x45d8b9(0x301),'aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x3a3),a422_0x45d8b9(0x2e0)]),'model':'MiniMax-Hailuo-02','fields':Object[a422_0x45d8b9(0x321)]([createResolutionField({'label':a422_0x45d8b9(0x2b8),'defaultValue':a422_0x45d8b9(0x241),'options':[a422_0x45d8b9(0x1e9),'768p',Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x28f),'label':'1080p','tooltip':a422_0x45d8b9(0x369)})]}),createAspectRatioField({'options':[]}),createFooterDurationSliderOptionsField({'values':[0x5,0xa],'defaultValue':0x5,'label':a422_0x45d8b9(0x235),'optionOverridesByValue':Object[a422_0x45d8b9(0x321)]({0xa:Object['freeze']({'disableWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x228),'value':a422_0x45d8b9(0x28f)})})})}),VIDEO_PROMPT_OPTIMIZER_FIELD,VIDEO_FAST_PRETREATMENT_FIELD,VIDEO_WATERMARK_CN_FIELD]),'inputSlots':createVideoInputSlots({'image':0x2,'video':0x0,'audio':0x0,'fixedSlots':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'id':'firstFrame','kind':'image','label':'首帧','description':a422_0x45d8b9(0x293)}),Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x31a),'kind':a422_0x45d8b9(0x44a),'label':'尾帧','description':a422_0x45d8b9(0x4dc)})])}),'bodyMapping':APIMART_VIDEO_HAILUO_02_BODY_MAPPING,'executionExtensions':Object['freeze']({'bodyResolver':'apimartHailuo02Video'}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':a422_0x45d8b9(0x2cc)+HAILUO_02_PROMPT_EXAMPLE}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':HAILUO_02_HELP_TOOLTIP}),'extensions':createVideoMenuExtension(0x5a,a422_0x45d8b9(0x3c5)+HAILUO_02_PROMPT_EXAMPLE)}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x254),'executionId':'apimart.model-api.video.minimax-hailuo-2-3.v1','displayName':a422_0x45d8b9(0x27c),'model':a422_0x45d8b9(0x432),'modeModels':Object['freeze']({'standard':a422_0x45d8b9(0x432),'fast':a422_0x45d8b9(0x23a)}),'fields':Object[a422_0x45d8b9(0x321)]([HAILUO_23_MODEL_FIELD,createResolutionField({'label':'视频分辨率','defaultValue':a422_0x45d8b9(0x241),'options':[a422_0x45d8b9(0x241),Object['freeze']({'value':'1080p','label':a422_0x45d8b9(0x28f),'tooltip':a422_0x45d8b9(0x275)})]}),createAspectRatioField({'options':[]}),createFooterDurationSliderOptionsField({'values':[0x6,0xa],'defaultValue':0x6,'optionOverridesByValue':Object[a422_0x45d8b9(0x321)]({0xa:Object[a422_0x45d8b9(0x321)]({'disableWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x228),'value':'1080p'})})})}),VIDEO_PROMPT_OPTIMIZER_FIELD,VIDEO_FAST_PRETREATMENT_FIELD,VIDEO_WATERMARK_CN_FIELD]),'inputSlots':createVideoInputSlots({'image':0x1,'video':0x0,'audio':0x0,'fixedSlots':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧','description':a422_0x45d8b9(0x41d)})])}),'bodyMapping':APIMART_VIDEO_HAILUO_23_BODY_MAPPING,'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x1f2)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':a422_0x45d8b9(0x2cc)+HAILUO_23_PROMPT_EXAMPLE}),'help':Object['freeze']({'tooltip':HAILUO_23_HELP_TOOLTIP}),'extensions':createVideoMenuExtension(0x50,a422_0x45d8b9(0x2db)+HAILUO_23_PROMPT_EXAMPLE)}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x3cf),'executionId':'apimart.model-api.video.happyhorse-1.v1','displayName':'HappyHorse\x201.0','model':'happyhorse-1.0','fields':Object['freeze']([HAPPYHORSE_MODE_FIELD,createResolutionField({'label':'视频分辨率','defaultValue':a422_0x45d8b9(0x3cd)}),createAspectRatioField(),createFooterDurationField({'defaultValue':0x5,'min':0x3,'max':0xf,'label':a422_0x45d8b9(0x259)}),HAPPYHORSE_AUDIO_SETTING_FIELD,HAPPYHORSE_WATERMARK_FIELD,HAPPYHORSE_SEED_FIELD]),'inputSlots':createVideoInputSlots({'image':0x9,'video':0x1,'audio':0x0,'fixedSlots':HAPPYHORSE_FIXED_INPUT_SLOTS,'cycleFixedInputWhenFull':!![]}),'bodyMapping':APIMART_VIDEO_HAPPYHORSE_BODY_MAPPING,'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x3ab)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x435),'value':'auto'}),'placeholder':HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x435),'value':'image'}),'placeholder':HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x435),'value':a422_0x45d8b9(0x336)}),'placeholder':HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x435),'value':a422_0x45d8b9(0x32d)}),'placeholder':HAPPYHORSE_EDIT_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':HAPPYHORSE_HELP_TOOLTIP,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'happyhorse_mode','value':a422_0x45d8b9(0x266)}),'tooltip':HAPPYHORSE_TEXT_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x435),'value':a422_0x45d8b9(0x44a)}),'tooltip':HAPPYHORSE_IMAGE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x435),'value':a422_0x45d8b9(0x336)}),'tooltip':HAPPYHORSE_REFERENCE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'happyhorse_mode','value':'edit'}),'tooltip':HAPPYHORSE_EDIT_HELP_TOOLTIP})])}),'extensions':Object['freeze']({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':a422_0x45d8b9(0x4cc),'order':0x14,'label':a422_0x45d8b9(0x32a),'subtitle':a422_0x45d8b9(0x1fc)})})}),Object['freeze']({'modelId':a422_0x45d8b9(0x3d4),'executionId':a422_0x45d8b9(0x31d),'displayName':a422_0x45d8b9(0x339),'model':a422_0x45d8b9(0x45b),'fields':Object[a422_0x45d8b9(0x321)]([WAN27_MODE_FIELD,createResolutionField({'defaultValue':a422_0x45d8b9(0x3cd)}),createAspectRatioField(),createFooterDurationField({'defaultValue':0x5,'min':0x2,'max':0xf}),WAN27_PROMPT_EXTEND_FIELD,VIDEO_WATERMARK_FIELD,VIDEO_SEED_FIELD,WAN27_NEGATIVE_PROMPT_FIELD]),'inputSlots':createVideoInputSlots({'image':0x5,'video':0x5,'audio':0x1,'fixedSlots':WAN27_FIXED_INPUT_SLOTS}),'bodyMapping':APIMART_VIDEO_WAN27_BODY_MAPPING,'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':'apimartWan27Video'}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':WAN27_IMAGE_PROMPT_PLACEHOLDER,'variants':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':a422_0x45d8b9(0x44a)}),'placeholder':WAN27_IMAGE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':a422_0x45d8b9(0x391)}),'placeholder':WAN27_VIDEO_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'wan27_mode','value':'reference'}),'placeholder':WAN27_REFERENCE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':'edit'}),'placeholder':WAN27_EDIT_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':WAN27_HELP_TOOLTIP,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':'image'}),'tooltip':WAN27_IMAGE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':a422_0x45d8b9(0x391)}),'tooltip':WAN27_VIDEO_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x415),'value':a422_0x45d8b9(0x336)}),'tooltip':WAN27_REFERENCE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':'edit'}),'tooltip':WAN27_EDIT_HELP_TOOLTIP})])}),'extensions':createVideoMenuExtension(0x28,'文生\x20/\x20图生\x20/\x20参考\x20/\x20续写\x20/\x20编辑')}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x3cb),'executionId':a422_0x45d8b9(0x2ce),'displayName':a422_0x45d8b9(0x294),'model':a422_0x45d8b9(0x37d)}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x2da),'executionId':a422_0x45d8b9(0x38f),'displayName':'Kling\x20V3','model':'kling-v3','fields':Object[a422_0x45d8b9(0x321)]([KLING_V3_MODE_FIELD,createAspectRatioField({'options':[a422_0x45d8b9(0x2ef),'9:16',a422_0x45d8b9(0x2b6)]}),createFooterDurationField({'defaultValue':0x5,'min':0x3,'max':0xf}),KLING_V3_AUDIO_FIELD,KLING_V3_MULTI_SHOT_PLACEHOLDER_FIELD,VIDEO_WATERMARK_FIELD,KLING_V3_NEGATIVE_PROMPT_FIELD]),'inputSlots':createVideoInputSlots({'image':0x2,'video':0x0,'audio':0x0,'fixedSlots':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧','description':'图生视频使用的首帧图片'}),Object[a422_0x45d8b9(0x321)]({'id':'lastFrame','kind':a422_0x45d8b9(0x44a),'label':'尾帧','description':a422_0x45d8b9(0x3b9)})])}),'bodyMapping':APIMART_VIDEO_KLING_V3_BODY_MAPPING,'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':KLING_V3_PROMPT_PLACEHOLDER}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':KLING_V3_HELP_TOOLTIP}),'extensions':createVideoMenuExtension(0x3c,a422_0x45d8b9(0x307))}),Object[a422_0x45d8b9(0x321)]({'modelId':'apimart/kling-v3-omni','executionId':'apimart.model-api.video.kling-v3-omni.v1','displayName':'Kling\x20V3\x20Omni','model':a422_0x45d8b9(0x46b),'fields':Object[a422_0x45d8b9(0x321)]([KLING_V3_OMNI_MODE_FIELD,KLING_V3_MODE_FIELD,createAspectRatioField({'options':[a422_0x45d8b9(0x2ef),a422_0x45d8b9(0x3f5),'1:1']}),createFooterDurationField({'defaultValue':0x5,'min':0x3,'max':0xf}),KLING_V3_AUDIO_FIELD,KLING_V3_MULTI_SHOT_PLACEHOLDER_FIELD,VIDEO_WATERMARK_FIELD,KLING_V3_NEGATIVE_PROMPT_FIELD]),'inputSlots':createVideoInputSlots({'image':0x2,'video':0x1,'audio':0x0,'fixedSlots':KLING_V3_OMNI_FIXED_INPUT_SLOTS}),'bodyMapping':APIMART_VIDEO_KLING_V3_BODY_MAPPING,'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x3f4)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':KLING_V3_OMNI_IMAGE_PROMPT_PLACEHOLDER,'variants':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'kling_v3_omni_mode','value':a422_0x45d8b9(0x44a)}),'placeholder':KLING_V3_OMNI_IMAGE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x359),'value':a422_0x45d8b9(0x336)}),'placeholder':KLING_V3_OMNI_REFERENCE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x359),'value':'edit'}),'placeholder':KLING_V3_OMNI_EDIT_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':KLING_V3_OMNI_HELP_TOOLTIP,'variants':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x359),'value':'image'}),'tooltip':KLING_V3_OMNI_IMAGE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'kling_v3_omni_mode','value':a422_0x45d8b9(0x336)}),'tooltip':KLING_V3_OMNI_REFERENCE_HELP_TOOLTIP}),Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':'kling_v3_omni_mode','value':a422_0x45d8b9(0x32d)}),'tooltip':KLING_V3_OMNI_EDIT_HELP_TOOLTIP})])}),'extensions':createVideoMenuExtension(0x32,a422_0x45d8b9(0x47e))}),Object[a422_0x45d8b9(0x321)]({'modelId':'apimart/kling-video-o1','executionId':a422_0x45d8b9(0x459),'displayName':a422_0x45d8b9(0x4d2),'model':a422_0x45d8b9(0x1f5),'fields':Object['freeze']([KLING_O1_QUALITY_FIELD,createAspectRatioField({'options':[a422_0x45d8b9(0x2ef),a422_0x45d8b9(0x3f5),a422_0x45d8b9(0x2b6)]}),createFooterDurationSliderOptionsField({'values':[0x5,0xa],'defaultValue':0x5}),KLING_O1_KEEP_ORIGINAL_SOUND_FIELD]),'inputSlots':createVideoInputSlots({'image':0x2,'video':0x1,'audio':0x0,'fixedSlots':KLING_O1_FIXED_INPUT_SLOTS,'exclusiveGroups':KLING_O1_VIDEO_EXCLUSIVE_GROUPS}),'bodyMapping':APIMART_VIDEO_KLING_O1_BODY_MAPPING,'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x263)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':KLING_O1_PROMPT_PLACEHOLDER}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':KLING_O1_HELP_TOOLTIP}),'extensions':createVideoMenuExtension(0x46,a422_0x45d8b9(0x4d2))}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x252),'executionId':a422_0x45d8b9(0x27d),'displayName':a422_0x45d8b9(0x489),'model':a422_0x45d8b9(0x484),'modeModels':Object[a422_0x45d8b9(0x321)]({'viduq3-turbo':'viduq3-turbo','viduq3-pro':'viduq3-pro','viduq3':'viduq3','viduq3-mix':'viduq3-mix'}),'fields':Object[a422_0x45d8b9(0x321)]([VIDU_Q3_MODEL_FIELD,VIDU_Q3_GENERATION_MODE_FIELD,createResolutionField({'defaultValue':a422_0x45d8b9(0x4ad),'options':[Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x40e),'label':a422_0x45d8b9(0x40e),'disableWhen':Object['freeze']({'all':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'field':a422_0x45d8b9(0x273),'value':a422_0x45d8b9(0x336)}),Object[a422_0x45d8b9(0x321)]({'field':'mode','value':a422_0x45d8b9(0x239)})])})}),'720p','1080p']}),createAspectRatioField(),createFooterDurationField({'defaultValue':0x5,'min':0x1,'max':0x10}),VIDU_Q3_AUDIO_FIELD,VIDEO_SEED_FIELD]),'inputSlots':createVideoInputSlots({'image':0x7,'video':0x0,'audio':0x0,'fixedSlots':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'id':'firstFrame','kind':'image','label':a422_0x45d8b9(0x3a7),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x273),'value':a422_0x45d8b9(0x336)})}),Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x31a),'kind':'image','label':a422_0x45d8b9(0x2b5),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x273),'value':a422_0x45d8b9(0x336)})})])}),'bodyMapping':APIMART_VIDEO_VIDU_BODY_MAPPING,'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x27f)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':VIDU_Q3_VIDEO_PROMPT_PLACEHOLDER,'variants':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x273),'value':'video'}),'placeholder':VIDU_Q3_VIDEO_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':'vidu_q3_generation_mode','value':'reference'}),'placeholder':VIDU_Q3_REFERENCE_PROMPT_PLACEHOLDER})])}),'help':Object['freeze']({'tooltip':VIDU_Q3_HELP_TOOLTIP}),'extensions':createVideoMenuExtension(0x64,a422_0x45d8b9(0x446))}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x2c0),'executionId':a422_0x45d8b9(0x447),'displayName':a422_0x45d8b9(0x488),'aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x21d)]),'model':a422_0x45d8b9(0x441),'endpointMode':a422_0x45d8b9(0x32f),'fields':APIMART_SEEDANCE_FAST_FIELDS,'executionExtensions':createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_0_VIDEO_POLICY),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':a422_0x45d8b9(0x47d),'order':0xa,'label':a422_0x45d8b9(0x33c),'subtitle':a422_0x45d8b9(0x43f)}),'dreaminaStyleVideo':Object[a422_0x45d8b9(0x321)]({'order':0xa,'counterpartKey':'seedance2-fast','title':a422_0x45d8b9(0x488),'subtitle':a422_0x45d8b9(0x476),'taskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'defaultForTaskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK})})}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x20d),'executionId':a422_0x45d8b9(0x466),'displayName':'Seedance\x202.0','aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x381)]),'model':a422_0x45d8b9(0x2b3),'endpointMode':a422_0x45d8b9(0x32f),'fields':APIMART_SEEDANCE_STANDARD_FIELDS,'executionExtensions':createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_0_VIDEO_POLICY),'extensions':Object['freeze']({'dreaminaStyleVideo':Object[a422_0x45d8b9(0x321)]({'order':0x14,'counterpartKey':a422_0x45d8b9(0x3b5),'title':a422_0x45d8b9(0x29e),'subtitle':a422_0x45d8b9(0x219),'taskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK})})}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x23d),'executionId':a422_0x45d8b9(0x3f9),'displayName':a422_0x45d8b9(0x463),'aliases':Object['freeze']([a422_0x45d8b9(0x33e)]),'model':a422_0x45d8b9(0x4ed),'endpointMode':a422_0x45d8b9(0x32f),'fields':APIMART_SEEDANCE_FAST_FIELDS,'executionExtensions':createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_0_VIDEO_POLICY),'extensions':Object[a422_0x45d8b9(0x321)]({'dreaminaStyleVideo':Object[a422_0x45d8b9(0x321)]({'order':0x1e,'counterpartKey':a422_0x45d8b9(0x3fb),'title':a422_0x45d8b9(0x463),'subtitle':a422_0x45d8b9(0x46c),'taskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK})})}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x1e3),'executionId':a422_0x45d8b9(0x426),'displayName':a422_0x45d8b9(0x3d1),'aliases':Object[a422_0x45d8b9(0x321)](['apimart/seedance-2.0-face']),'model':a422_0x45d8b9(0x352),'endpointMode':'seedance-video-generation','fields':APIMART_SEEDANCE_STANDARD_FIELDS,'executionExtensions':createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_0_VIDEO_POLICY),'extensions':Object[a422_0x45d8b9(0x321)]({'dreaminaStyleVideo':Object[a422_0x45d8b9(0x321)]({'order':0x28,'counterpartKey':a422_0x45d8b9(0x3b5),'title':a422_0x45d8b9(0x3d1),'subtitle':a422_0x45d8b9(0x48a),'taskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK})})}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x4de),'executionId':a422_0x45d8b9(0x3d9),'displayName':'Seedance\x201.5\x20Pro','aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x30e),a422_0x45d8b9(0x383)]),'model':a422_0x45d8b9(0x3d7),'endpointMode':a422_0x45d8b9(0x32f),'fields':APIMART_SEEDANCE_STANDARD_FIELDS,'executionExtensions':createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_1_5_VIDEO_POLICY),'extensions':Object['freeze']({'dreaminaStyleVideo':Object['freeze']({'order':0x32,'title':a422_0x45d8b9(0x3f0),'subtitle':a422_0x45d8b9(0x26e),'taskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_1_5_DURATION_BY_TASK})})}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x2b2),'executionId':a422_0x45d8b9(0x1d9),'displayName':a422_0x45d8b9(0x28d),'aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x4da),'apimart/seedance-1-0-pro-fast']),'model':a422_0x45d8b9(0x281),'endpointMode':a422_0x45d8b9(0x32f),'fields':APIMART_SEEDANCE_STANDARD_FIELDS,'executionExtensions':createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_1_0_FAST_VIDEO_POLICY),'extensions':Object[a422_0x45d8b9(0x321)]({'dreaminaStyleVideo':Object[a422_0x45d8b9(0x321)]({'order':0x3c,'title':a422_0x45d8b9(0x28d),'subtitle':a422_0x45d8b9(0x308),'taskTypes':APIMART_SEEDANCE_NO_FAST_FRAMES_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_1_0_DURATION_BY_TASK})})}),Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x40d),'executionId':a422_0x45d8b9(0x344),'displayName':a422_0x45d8b9(0x3de),'aliases':Object['freeze']([a422_0x45d8b9(0x371),'apimart/seedance-1-0-pro-quality']),'model':'doubao-seedance-1-0-pro-quality','endpointMode':a422_0x45d8b9(0x32f),'fields':APIMART_SEEDANCE_STANDARD_FIELDS,'executionExtensions':createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_1_0_QUALITY_VIDEO_POLICY),'extensions':Object[a422_0x45d8b9(0x321)]({'dreaminaStyleVideo':Object[a422_0x45d8b9(0x321)]({'order':0x46,'title':a422_0x45d8b9(0x3de),'subtitle':'APIMart\x201.0\x20高质量版，支持首尾帧','taskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_1_0_DURATION_BY_TASK})})})]),RUNNINGHUB_VIDEO_MODELS=Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x29b),'modelId':a422_0x45d8b9(0x22d),'executionId':'runninghub.model-api.video.kling-o1.v1','displayName':a422_0x45d8b9(0x4d2),'icon':a422_0x45d8b9(0x3e2),'description':a422_0x45d8b9(0x1dd),'model':'kling-video-o1','endpoint':a422_0x45d8b9(0x4e4),'fields':Object[a422_0x45d8b9(0x321)]([RUNNINGHUB_KLING_O1_GENERATION_MODE_FIELD,KLING_O1_QUALITY_FIELD,RUNNINGHUB_KLING_O1_RATIO_FIELD,createFooterDurationSliderOptionsField({'values':[0x5,0xa],'defaultValue':0x5}),RUNNINGHUB_KLING_O1_KEEP_ORIGINAL_SOUND_FIELD]),'inputSlots':createVideoInputSlots({'image':0x7,'video':0x1,'audio':0x0,'fixedSlots':RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS}),'bodyMapping':RUNNINGHUB_VIDEO_KLING_O1_BODY_MAPPING,'responseMapping':RUNNINGHUB_VIDEO_RESPONSE_MAPPING,'taskPolling':null,'resultTaskIdPath':a422_0x45d8b9(0x44b),'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':'runninghubKlingO1Video','endpointResolver':a422_0x45d8b9(0x1ea)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_KLING_O1_FRAME_PROMPT_PLACEHOLDER,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x309),'value':a422_0x45d8b9(0x1df)}),'placeholder':RUNNINGHUB_KLING_O1_FRAME_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x309),'value':a422_0x45d8b9(0x336)}),'placeholder':RUNNINGHUB_KLING_O1_REFERENCE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x309),'value':a422_0x45d8b9(0x32d)}),'placeholder':RUNNINGHUB_KLING_O1_EDIT_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':RUNNINGHUB_KLING_O1_HELP_TOOLTIP,'variants':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x309),'value':a422_0x45d8b9(0x1df)}),'tooltip':RUNNINGHUB_KLING_O1_FRAME_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x309),'value':a422_0x45d8b9(0x336)}),'tooltip':RUNNINGHUB_KLING_O1_REFERENCE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x309),'value':a422_0x45d8b9(0x32d)}),'tooltip':RUNNINGHUB_KLING_O1_EDIT_HELP_TOOLTIP})])}),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':a422_0x45d8b9(0x4b7),'order':0x46,'label':a422_0x45d8b9(0x4d2),'subtitle':'文生\x20/\x20图生\x20/\x20首尾帧\x20/\x20参考\x20/\x20编辑'})})}),Object['freeze']({'provider':'runninghub','modelId':'runninghub-model/kling-v3','executionId':a422_0x45d8b9(0x4c7),'displayName':a422_0x45d8b9(0x2f3),'aliases':Object[a422_0x45d8b9(0x321)](['runninghub-model/kling-v3.0',a422_0x45d8b9(0x44f),a422_0x45d8b9(0x494)]),'icon':a422_0x45d8b9(0x3e2),'description':'RunningHub\x20Kling\x20V3.0\x20model\x20API','model':a422_0x45d8b9(0x33b),'endpoint':a422_0x45d8b9(0x207),'fields':Object['freeze']([RUNNINGHUB_KLING_V3_MODEL_FIELD,RUNNINGHUB_KLING_V3_RATIO_FIELD,createFooterDurationField({'defaultValue':0x5,'min':0x3,'max':0xf}),KLING_V3_AUDIO_FIELD,RUNNINGHUB_KLING_V3_CFG_SCALE_FIELD,RUNNINGHUB_KLING_V3_SHOT_TYPE_FIELD,KLING_V3_NEGATIVE_PROMPT_FIELD]),'inputSlots':createVideoInputSlots({'image':0x2,'video':0x0,'audio':0x0,'fixedSlots':RUNNINGHUB_KLING_V3_FIXED_INPUT_SLOTS}),'bodyMapping':RUNNINGHUB_VIDEO_KLING_V3_BODY_MAPPING,'responseMapping':RUNNINGHUB_VIDEO_RESPONSE_MAPPING,'taskPolling':null,'resultTaskIdPath':a422_0x45d8b9(0x44b),'executionExtensions':Object['freeze']({'bodyResolver':'runninghubKlingV3Video','endpointResolver':a422_0x45d8b9(0x2cb)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_KLING_V3_PROMPT_PLACEHOLDER}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':RUNNINGHUB_KLING_V3_HELP_TOOLTIP}),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':a422_0x45d8b9(0x4b7),'order':0x3c,'label':'Kling\x20V3.0','subtitle':a422_0x45d8b9(0x20c)})})}),Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x29b),'modelId':a422_0x45d8b9(0x477),'executionId':a422_0x45d8b9(0x2e1),'displayName':a422_0x45d8b9(0x497),'aliases':Object[a422_0x45d8b9(0x321)](['runninghub-model/kling-video-o3',a422_0x45d8b9(0x312),a422_0x45d8b9(0x392)]),'icon':'images/RH.png','description':a422_0x45d8b9(0x30a),'model':'kling-video-o3','endpoint':a422_0x45d8b9(0x200),'fields':Object[a422_0x45d8b9(0x321)]([RUNNINGHUB_KLING_O3_MODEL_FIELD,RUNNINGHUB_KLING_O3_MODE_FIELD,RUNNINGHUB_KLING_O3_RATIO_FIELD,RUNNINGHUB_KLING_O3_DURATION_FIELD,RUNNINGHUB_KLING_O3_AUDIO_FIELD,RUNNINGHUB_KLING_O3_KEEP_ORIGINAL_SOUND_FIELD,RUNNINGHUB_KLING_O3_SHOT_TYPE_FIELD]),'inputSlots':createVideoInputSlots({'image':0x7,'video':0x1,'audio':0x0,'fixedSlots':RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS}),'bodyMapping':RUNNINGHUB_VIDEO_KLING_O3_BODY_MAPPING,'responseMapping':RUNNINGHUB_VIDEO_RESPONSE_MAPPING,'taskPolling':null,'resultTaskIdPath':a422_0x45d8b9(0x44b),'executionExtensions':Object['freeze']({'bodyResolver':a422_0x45d8b9(0x4bc),'endpointResolver':a422_0x45d8b9(0x3b2)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_KLING_O3_FRAME_PROMPT_PLACEHOLDER,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x359),'value':a422_0x45d8b9(0x44a)}),'placeholder':RUNNINGHUB_KLING_O3_FRAME_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'kling_v3_omni_mode','value':a422_0x45d8b9(0x336)}),'placeholder':RUNNINGHUB_KLING_O3_REFERENCE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x359),'value':a422_0x45d8b9(0x32d)}),'placeholder':RUNNINGHUB_KLING_O3_EDIT_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':RUNNINGHUB_KLING_O3_HELP_TOOLTIP,'variants':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x359),'value':a422_0x45d8b9(0x44a)}),'tooltip':RUNNINGHUB_KLING_O3_FRAME_HELP_TOOLTIP}),Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x359),'value':a422_0x45d8b9(0x336)}),'tooltip':RUNNINGHUB_KLING_O3_REFERENCE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x359),'value':a422_0x45d8b9(0x32d)}),'tooltip':RUNNINGHUB_KLING_O3_EDIT_HELP_TOOLTIP})])}),'extensions':Object['freeze']({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':a422_0x45d8b9(0x4b7),'order':0x32,'label':'Kling\x20O3','subtitle':'std\x20/\x20pro\x20/\x204K，文生\x20/\x20图生\x20/\x20参考\x20/\x20编辑'})})}),Object['freeze']({'provider':a422_0x45d8b9(0x29b),'modelId':a422_0x45d8b9(0x282),'executionId':'runninghub.model-api.video.seedance-2.v1','displayName':a422_0x45d8b9(0x29e),'aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x29a),'runninghub-model/seedance-2',a422_0x45d8b9(0x220),a422_0x45d8b9(0x3d6)]),'icon':a422_0x45d8b9(0x3e2),'description':a422_0x45d8b9(0x38b),'model':a422_0x45d8b9(0x475),'endpoint':a422_0x45d8b9(0x388),'endpointMode':a422_0x45d8b9(0x32f),'fields':Object['freeze']([RUNNINGHUB_SEEDANCE_2_MODEL_FIELD,RUNNINGHUB_SEEDANCE_2_MODE_FIELD,RUNNINGHUB_SEEDANCE_2_RESOLUTION_FIELD,Object['freeze']({...createAspectRatioField({'options':[a422_0x45d8b9(0x2ef),a422_0x45d8b9(0x3ac),'1:1',a422_0x45d8b9(0x2b7),a422_0x45d8b9(0x3f5),a422_0x45d8b9(0x458)]}),'variant':a422_0x45d8b9(0x3f1)}),createFooterDurationSliderOptionsField({'values':[0x4,0x5,0x6,0x7,0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf],'defaultValue':0x5}),RUNNINGHUB_SEEDANCE_2_GENERATE_AUDIO_FIELD,RUNNINGHUB_SEEDANCE_2_WEB_SEARCH_FIELD,RUNNINGHUB_SEEDANCE_2_REAL_PERSON_FIELD,VIDEO_SEED_FIELD]),'inputSlots':createVideoInputSlots({'image':0x9,'video':0x3,'audio':0x3,'fixedSlots':RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS,'cycleFixedInputWhenFull':!![]}),'bodyMapping':RUNNINGHUB_VIDEO_SEEDANCE_2_BODY_MAPPING,'responseMapping':RUNNINGHUB_VIDEO_RESPONSE_MAPPING,'taskPolling':null,'resultTaskIdPath':'taskId','executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':'runninghubSeedance2Video','endpointResolver':a422_0x45d8b9(0x4d7)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x203),'value':a422_0x45d8b9(0x201)}),'placeholder':RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER}),Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x203),'value':a422_0x45d8b9(0x35e)}),'placeholder':RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x203),'value':a422_0x45d8b9(0x49c)}),'placeholder':RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x203),'value':a422_0x45d8b9(0x318)}),'placeholder':RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER})])}),'help':Object['freeze']({'tooltip':RUNNINGHUB_SEEDANCE_2_HELP_TOOLTIP}),'extensions':Object['freeze']({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':a422_0x45d8b9(0x4b7),'order':0xa,'label':a422_0x45d8b9(0x29e),'subtitle':a422_0x45d8b9(0x3db)})})}),Object['freeze']({'provider':'runninghub','modelId':a422_0x45d8b9(0x2ea),'executionId':'runninghub.model-api.video.happyhorse-1.v1','displayName':'HappyHorse\x201.0','aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x20a),a422_0x45d8b9(0x317),'runninghub-model/alibaba-happyhorse-1.0']),'icon':a422_0x45d8b9(0x3e2),'description':'RunningHub\x20Alibaba\x20HappyHorse\x201.0\x20model\x20API','model':a422_0x45d8b9(0x394),'endpoint':'/openapi/v2/alibaba/happyhorse-1.0/text-to-video','fields':Object[a422_0x45d8b9(0x321)]([HAPPYHORSE_MODE_FIELD,createResolutionField({'label':a422_0x45d8b9(0x2b8),'defaultValue':'1080P'}),createAspectRatioField(),createFooterDurationField({'defaultValue':0x5,'min':0x3,'max':0xf,'label':a422_0x45d8b9(0x259)}),HAPPYHORSE_AUDIO_SETTING_FIELD,HAPPYHORSE_SEED_FIELD]),'inputSlots':createVideoInputSlots({'image':0x9,'video':0x1,'audio':0x0,'fixedSlots':HAPPYHORSE_FIXED_INPUT_SLOTS,'cycleFixedInputWhenFull':!![]}),'bodyMapping':RUNNINGHUB_VIDEO_HAPPYHORSE_BODY_MAPPING,'responseMapping':RUNNINGHUB_VIDEO_RESPONSE_MAPPING,'taskPolling':null,'resultTaskIdPath':a422_0x45d8b9(0x44b),'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':'runninghubHappyHorseVideo','endpointResolver':'runninghubHappyHorseVideoEndpoint'}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,'variants':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x435),'value':a422_0x45d8b9(0x266)}),'placeholder':HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x435),'value':a422_0x45d8b9(0x44a)}),'placeholder':HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER}),Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':'happyhorse_mode','value':a422_0x45d8b9(0x336)}),'placeholder':HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x435),'value':'edit'}),'placeholder':HAPPYHORSE_EDIT_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':HAPPYHORSE_HELP_TOOLTIP,'variants':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x435),'value':a422_0x45d8b9(0x266)}),'tooltip':HAPPYHORSE_TEXT_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'happyhorse_mode','value':a422_0x45d8b9(0x44a)}),'tooltip':HAPPYHORSE_IMAGE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x435),'value':'reference'}),'tooltip':HAPPYHORSE_REFERENCE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x435),'value':a422_0x45d8b9(0x32d)}),'tooltip':HAPPYHORSE_EDIT_HELP_TOOLTIP})])}),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':'runninghubModel','order':0x14,'label':a422_0x45d8b9(0x32a),'subtitle':a422_0x45d8b9(0x1fc)})})}),Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x29b),'modelId':a422_0x45d8b9(0x2d5),'executionId':a422_0x45d8b9(0x1f3),'displayName':a422_0x45d8b9(0x42a),'aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2a6),a422_0x45d8b9(0x2f8),a422_0x45d8b9(0x4ea)]),'icon':a422_0x45d8b9(0x3e2),'description':a422_0x45d8b9(0x26a),'model':'rhart-video-v3.1','endpoint':'/openapi/v2/rhart-video-v3.1-fast/text-to-video','fields':Object[a422_0x45d8b9(0x321)]([RUNNINGHUB_VEO3_CHANNEL_FIELD,RUNNINGHUB_VEO3_MODEL_FIELD,RUNNINGHUB_VEO3_GENERATION_TYPE_FIELD,createResolutionField({'label':a422_0x45d8b9(0x2b8),'defaultValue':a422_0x45d8b9(0x4ad),'options':[a422_0x45d8b9(0x4ad),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x28f),'label':a422_0x45d8b9(0x28f),'disableWhen':Object['freeze']({'field':a422_0x45d8b9(0x347),'value':a422_0x45d8b9(0x496)})}),Object[a422_0x45d8b9(0x321)]({'value':'4k','label':'4K','disableWhen':Object[a422_0x45d8b9(0x321)]({'any':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'field':a422_0x45d8b9(0x347),'value':'lowCost'}),Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x260),'value':a422_0x45d8b9(0x3c6)})])})})]}),createAspectRatioField({'label':'比例','options':['16:9',a422_0x45d8b9(0x3f5)]}),RUNNINGHUB_VEO3_DURATION_FIELD,RUNNINGHUB_VEO3_GENERATE_AUDIO_FIELD]),'inputSlots':createVideoInputSlots({'image':0x3,'video':0x1,'audio':0x0,'fixedSlots':RUNNINGHUB_VEO3_FIXED_INPUT_SLOTS}),'bodyMapping':RUNNINGHUB_VIDEO_VEO3_BODY_MAPPING,'responseMapping':RUNNINGHUB_VIDEO_RESPONSE_MAPPING,'taskPolling':null,'resultTaskIdPath':'taskId','executionExtensions':Object['freeze']({'bodyResolver':'runninghubVeo3Video','endpointResolver':a422_0x45d8b9(0x328)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_VEO3_FRAME_PROMPT_PLACEHOLDER,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x1df)}),'placeholder':RUNNINGHUB_VEO3_FRAME_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x336)}),'placeholder':RUNNINGHUB_VEO3_REFERENCE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':'extend'}),'placeholder':RUNNINGHUB_VEO3_EXTEND_PROMPT_PLACEHOLDER})])}),'help':Object['freeze']({'tooltip':RUNNINGHUB_VEO3_FRAME_HELP_TOOLTIP,'variants':Object[a422_0x45d8b9(0x321)]([Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':'frame'}),'tooltip':RUNNINGHUB_VEO3_FRAME_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x336)}),'tooltip':RUNNINGHUB_VEO3_REFERENCE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x3b0),'value':a422_0x45d8b9(0x490)}),'tooltip':RUNNINGHUB_VEO3_EXTEND_HELP_TOOLTIP})])}),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':'runninghubModel','order':0x1e,'label':a422_0x45d8b9(0x42a),'subtitle':a422_0x45d8b9(0x4e2)})})}),Object[a422_0x45d8b9(0x321)]({'provider':'runninghub','modelId':a422_0x45d8b9(0x404),'executionId':a422_0x45d8b9(0x256),'displayName':a422_0x45d8b9(0x339),'aliases':Object['freeze'](['runninghub-model/wan27',a422_0x45d8b9(0x4c0),a422_0x45d8b9(0x23c)]),'icon':'images/RH.png','description':a422_0x45d8b9(0x322),'model':a422_0x45d8b9(0x3aa),'endpoint':'/openapi/v2/alibaba/wan-2.7/text-to-video','fields':Object[a422_0x45d8b9(0x321)]([WAN27_MODE_FIELD,createResolutionField({'defaultValue':a422_0x45d8b9(0x229)}),createAspectRatioField(),createFooterDurationField({'defaultValue':0x5,'min':0x2,'max':0xf}),WAN27_PROMPT_EXTEND_FIELD,WAN27_NEGATIVE_PROMPT_FIELD]),'inputSlots':createVideoInputSlots({'image':0x5,'video':0x5,'audio':0x1,'fixedSlots':RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS}),'bodyMapping':RUNNINGHUB_VIDEO_WAN27_BODY_MAPPING,'responseMapping':RUNNINGHUB_VIDEO_RESPONSE_MAPPING,'taskPolling':null,'resultTaskIdPath':a422_0x45d8b9(0x44b),'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x28e),'endpointResolver':a422_0x45d8b9(0x26f)}),'prompt':Object['freeze']({'placeholder':WAN27_IMAGE_PROMPT_PLACEHOLDER,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'wan27_mode','value':a422_0x45d8b9(0x44a)}),'placeholder':WAN27_IMAGE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':a422_0x45d8b9(0x391)}),'placeholder':WAN27_VIDEO_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x415),'value':'reference'}),'placeholder':WAN27_REFERENCE_PROMPT_PLACEHOLDER}),Object['freeze']({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':a422_0x45d8b9(0x32d)}),'placeholder':WAN27_EDIT_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':WAN27_HELP_TOOLTIP,'variants':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'wan27_mode','value':a422_0x45d8b9(0x44a)}),'tooltip':WAN27_IMAGE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':'video'}),'tooltip':WAN27_VIDEO_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x415),'value':'reference'}),'tooltip':WAN27_REFERENCE_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x415),'value':a422_0x45d8b9(0x32d)}),'tooltip':WAN27_EDIT_HELP_TOOLTIP})])}),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':a422_0x45d8b9(0x4b7),'order':0x28,'label':'Wan\x202.7','subtitle':a422_0x45d8b9(0x2c1)})})}),Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x29b),'modelId':a422_0x45d8b9(0x21e),'executionId':a422_0x45d8b9(0x230),'displayName':a422_0x45d8b9(0x301),'aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x224),a422_0x45d8b9(0x2b4),a422_0x45d8b9(0x418)]),'icon':'images/RH.png','description':a422_0x45d8b9(0x320),'model':a422_0x45d8b9(0x270),'endpoint':a422_0x45d8b9(0x4c9),'fields':Object['freeze']([RUNNINGHUB_HAILUO_02_QUALITY_FIELD,RUNNINGHUB_HAILUO_02_DURATION_FIELD,RUNNINGHUB_HAILUO_02_ENABLE_PROMPT_EXPANSION_FIELD]),'inputSlots':createVideoInputSlots({'image':0x2,'video':0x0,'audio':0x0,'fixedSlots':RUNNINGHUB_HAILUO_02_FIXED_INPUT_SLOTS}),'bodyMapping':RUNNINGHUB_VIDEO_HAILUO_02_BODY_MAPPING,'responseMapping':RUNNINGHUB_VIDEO_RESPONSE_MAPPING,'taskPolling':null,'resultTaskIdPath':a422_0x45d8b9(0x44b),'executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':'runninghubHailuo02Video','endpointResolver':'runninghubHailuo02VideoEndpoint'}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_HAILUO_02_PROMPT_PLACEHOLDER}),'help':Object['freeze']({'tooltip':RUNNINGHUB_HAILUO_02_HELP_TOOLTIP}),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object['freeze']({'role':a422_0x45d8b9(0x4b7),'order':0x5a,'label':a422_0x45d8b9(0x301),'subtitle':a422_0x45d8b9(0x3e5)})})}),Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x29b),'modelId':'runninghub-model/hailuo-2.3','executionId':a422_0x45d8b9(0x3e4),'displayName':a422_0x45d8b9(0x27c),'aliases':Object['freeze']([a422_0x45d8b9(0x40b),a422_0x45d8b9(0x4b3),a422_0x45d8b9(0x2ac),a422_0x45d8b9(0x2be)]),'icon':a422_0x45d8b9(0x3e2),'description':a422_0x45d8b9(0x3f6),'model':a422_0x45d8b9(0x3f8),'endpoint':a422_0x45d8b9(0x3d8),'fields':Object['freeze']([RUNNINGHUB_HAILUO_23_QUALITY_FIELD,RUNNINGHUB_HAILUO_23_DURATION_FIELD,RUNNINGHUB_HAILUO_02_ENABLE_PROMPT_EXPANSION_FIELD]),'inputSlots':createVideoInputSlots({'image':0x1,'video':0x0,'audio':0x0,'fixedSlots':RUNNINGHUB_HAILUO_23_FIXED_INPUT_SLOTS}),'bodyMapping':RUNNINGHUB_VIDEO_HAILUO_23_BODY_MAPPING,'responseMapping':RUNNINGHUB_VIDEO_RESPONSE_MAPPING,'taskPolling':null,'resultTaskIdPath':a422_0x45d8b9(0x44b),'executionExtensions':Object['freeze']({'bodyResolver':a422_0x45d8b9(0x353),'endpointResolver':a422_0x45d8b9(0x444)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_HAILUO_23_PROMPT_PLACEHOLDER}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':RUNNINGHUB_HAILUO_23_HELP_TOOLTIP}),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':a422_0x45d8b9(0x4b7),'order':0x50,'label':a422_0x45d8b9(0x27c),'subtitle':'文生\x20/\x20图生\x20/\x20Pro\x20/\x20Fast'})})})]),VOLCENGINE_SEEDANCE_2_COMMON_FIELDS=Object[a422_0x45d8b9(0x321)]([VOLCENGINE_SEEDANCE_2_MODE_FIELD,VOLCENGINE_SEEDANCE_2_RATIO_FIELD,createFooterDurationField({'defaultValue':0x5,'min':0x4,'max':0xf}),VOLCENGINE_SEEDANCE_2_GENERATE_AUDIO_FIELD,VOLCENGINE_SEEDANCE_2_SEED_FIELD]),VOLCENGINE_SEEDANCE_2_INPUT_SLOTS=createVideoInputSlots({'image':0x9,'video':0x3,'audio':0x3}),VOLCENGINE_VIDEO_MODELS=Object['freeze']([Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x45a),'modelId':a422_0x45d8b9(0x1f7),'executionId':'volcengine.model-api.video.seedance-2-fast.v1','displayName':a422_0x45d8b9(0x488),'aliases':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x333),a422_0x45d8b9(0x4c8)]),'icon':'images/volcengine.svg','description':a422_0x45d8b9(0x2e9),'model':a422_0x45d8b9(0x29c),'endpoint':a422_0x45d8b9(0x472),'endpointMode':'content-generation-task','ratioPolicy':VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,'fields':Object[a422_0x45d8b9(0x321)]([VOLCENGINE_SEEDANCE_2_MODE_FIELD,createVolcengineSeedance2ResolutionField({'include1080p':![]}),...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS[a422_0x45d8b9(0x2e2)](0x1)]),'inputSlots':VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,'bodyMapping':VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,'responseMapping':VOLCENGINE_VIDEO_RESPONSE_MAPPING,'taskPolling':VOLCENGINE_VIDEO_TASK_POLLING,'resultTaskIdPath':'id','executionExtensions':createVolcengineSeedanceVideoExecutionExtensions(VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,'variants':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x4e3),'value':a422_0x45d8b9(0x201)}),'placeholder':RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x4e3),'value':a422_0x45d8b9(0x35e)}),'placeholder':RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x4e3),'value':'frames2video'}),'placeholder':RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':'volcengine_seedance_2_mode','value':a422_0x45d8b9(0x318)}),'placeholder':RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP}),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':a422_0x45d8b9(0x345),'order':0xa,'label':'火山方舟','subtitle':'Seedance\x202.0\x20官方\x20API','iconAlt':a422_0x45d8b9(0x45a)}),'dreaminaStyleVideo':Object['freeze']({'order':0xa,'title':a422_0x45d8b9(0x488),'subtitle':a422_0x45d8b9(0x416),'counterpartKey':'seedance2-fast','taskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'defaultForTaskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK})})}),Object[a422_0x45d8b9(0x321)]({'provider':a422_0x45d8b9(0x45a),'modelId':a422_0x45d8b9(0x2e5),'executionId':'volcengine.model-api.video.seedance-2.v1','displayName':a422_0x45d8b9(0x29e),'aliases':Object['freeze']([a422_0x45d8b9(0x401),a422_0x45d8b9(0x305)]),'icon':a422_0x45d8b9(0x424),'description':a422_0x45d8b9(0x434),'model':a422_0x45d8b9(0x29d),'endpoint':a422_0x45d8b9(0x472),'endpointMode':a422_0x45d8b9(0x3dd),'ratioPolicy':VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,'fields':Object[a422_0x45d8b9(0x321)]([VOLCENGINE_SEEDANCE_2_MODE_FIELD,createVolcengineSeedance2ResolutionField({'include1080p':!![]}),...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS[a422_0x45d8b9(0x2e2)](0x1)]),'inputSlots':VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,'bodyMapping':VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,'responseMapping':VOLCENGINE_VIDEO_RESPONSE_MAPPING,'taskPolling':VOLCENGINE_VIDEO_TASK_POLLING,'resultTaskIdPath':'id','executionExtensions':createVolcengineSeedanceVideoExecutionExtensions(VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'volcengine_seedance_2_mode','value':a422_0x45d8b9(0x201)}),'placeholder':RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':'volcengine_seedance_2_mode','value':a422_0x45d8b9(0x35e)}),'placeholder':RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':'volcengine_seedance_2_mode','value':a422_0x45d8b9(0x49c)}),'placeholder':RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x4e3),'value':a422_0x45d8b9(0x318)}),'placeholder':RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP}),'extensions':Object['freeze']({'dreaminaStyleVideo':Object[a422_0x45d8b9(0x321)]({'order':0x14,'title':a422_0x45d8b9(0x29e),'subtitle':'火山方舟标准版，支持\x201080p','counterpartKey':a422_0x45d8b9(0x3b5),'taskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK})})}),Object['freeze']({'provider':a422_0x45d8b9(0x45a),'modelId':a422_0x45d8b9(0x4ac),'executionId':a422_0x45d8b9(0x3e7),'displayName':a422_0x45d8b9(0x304),'icon':a422_0x45d8b9(0x424),'description':a422_0x45d8b9(0x448),'model':a422_0x45d8b9(0x39c),'endpoint':a422_0x45d8b9(0x472),'endpointMode':a422_0x45d8b9(0x3dd),'ratioPolicy':VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,'fields':Object[a422_0x45d8b9(0x321)]([VOLCENGINE_SEEDANCE_2_MODE_FIELD,createVolcengineSeedance2ResolutionField({'include1080p':!![]}),...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](0x1)]),'inputSlots':VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,'bodyMapping':VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,'responseMapping':VOLCENGINE_VIDEO_RESPONSE_MAPPING,'taskPolling':VOLCENGINE_VIDEO_TASK_POLLING,'resultTaskIdPath':'id','executionExtensions':createVolcengineSeedanceVideoExecutionExtensions(VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,'variants':Object['freeze']([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x4e3),'value':a422_0x45d8b9(0x201)}),'placeholder':RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x4e3),'value':'image2video'}),'placeholder':RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x4e3),'value':'frames2video'}),'placeholder':RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER}),Object['freeze']({'when':Object['freeze']({'field':'volcengine_seedance_2_mode','value':a422_0x45d8b9(0x318)}),'placeholder':RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP}),'extensions':Object[a422_0x45d8b9(0x321)]({'dreaminaStyleVideo':Object['freeze']({'order':0x1e,'title':'Seedance\x202.0\x20Mini','subtitle':a422_0x45d8b9(0x3fe),'counterpartKey':a422_0x45d8b9(0x22c),'taskTypes':APIMART_SEEDANCE_DEFAULT_TASK_TYPES,'resolutionOptionsByTaskType':APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,'durationRangeByTaskType':APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK})})})]),AGNES_VIDEO_MODE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x1d3),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x260),'variant':a422_0x45d8b9(0x39d),'label':a422_0x45d8b9(0x3ad),'description':a422_0x45d8b9(0x40c),'defaultValue':a422_0x45d8b9(0x336),'options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':'reference','label':'全能参考'}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x26b),'label':a422_0x45d8b9(0x461)})])}),AGNES_VIDEO_FRAME_RATE=0x18,AGNES_VIDEO_MIN_SECONDS=0x2,AGNES_VIDEO_MIN_FRAMES=AGNES_VIDEO_MIN_SECONDS*AGNES_VIDEO_FRAME_RATE+0x1,AGNES_VIDEO_MAX_FRAMES=0x1b9,AGNES_VIDEO_MAX_SECONDS=Number(((AGNES_VIDEO_MAX_FRAMES-0x1)/AGNES_VIDEO_FRAME_RATE)['toFixed'](0x1)),AGNES_VIDEO_DURATION_VALUES=Object[a422_0x45d8b9(0x321)]([...Array[a422_0x45d8b9(0x45e)]({'length':Math[a422_0x45d8b9(0x4d0)](AGNES_VIDEO_MAX_SECONDS)-AGNES_VIDEO_MIN_SECONDS+0x1},(_0x18910d,_0x178765)=>AGNES_VIDEO_MIN_SECONDS+_0x178765),...Number['isInteger'](AGNES_VIDEO_MAX_SECONDS)?[]:[AGNES_VIDEO_MAX_SECONDS]]),AGNES_VIDEO_HELP_TOOLTIP=a422_0x45d8b9(0x467)+a422_0x45d8b9(0x4c1)+a422_0x45d8b9(0x2ad)+a422_0x45d8b9(0x204)+a422_0x45d8b9(0x38c),AGNES_VIDEO_KEYFRAMES_HELP_TOOLTIP='首尾帧用法\x0a'+a422_0x45d8b9(0x4ae)+a422_0x45d8b9(0x38e),AGNES_VIDEO_NEGATIVE_PROMPT_DEFAULT='low\x20quality,\x20blurry,\x20distorted,\x20deformed,\x20bad\x20anatomy,\x20extra\x20limbs,\x20extra\x20fingers,\x20watermark,\x20text,\x20logo',AGNES_VIDEO_RATIO_FIELD=Object[a422_0x45d8b9(0x321)]({...createAspectRatioField({'defaultValue':a422_0x45d8b9(0x380),'options':[a422_0x45d8b9(0x380),a422_0x45d8b9(0x2ef),'9:16',a422_0x45d8b9(0x2b6),a422_0x45d8b9(0x3ac),a422_0x45d8b9(0x2b7)]}),'variant':a422_0x45d8b9(0x2fc)}),AGNES_VIDEO_DURATION_FIELD=createFooterDurationSliderOptionsField({'values':AGNES_VIDEO_DURATION_VALUES,'defaultValue':0x5,'label':a422_0x45d8b9(0x259)}),AGNES_VIDEO_SEED_FIELD=Object['freeze']({...VIDEO_SEED_FIELD,'type':a422_0x45d8b9(0x386),'defaultValue':'8888','min':0x0,'max':0x7fffffff,'step':0x1,'randomSeedModeField':a422_0x45d8b9(0x405),'randomSeedDefaultMode':a422_0x45d8b9(0x3a8),'randomizeOnSubmit':!![],'description':a422_0x45d8b9(0x20f)}),AGNES_VIDEO_SEED_MODE_FIELD=Object[a422_0x45d8b9(0x321)]({'id':a422_0x45d8b9(0x405),'type':a422_0x45d8b9(0x368),'placement':a422_0x45d8b9(0x23b),'label':'种子模式','defaultValue':'random','options':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'value':'random','label':'随机'}),Object[a422_0x45d8b9(0x321)]({'value':a422_0x45d8b9(0x338),'label':'固定'})]),'hideWhen':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x2ab),'value':''})}),AGNES_VIDEO_NEGATIVE_PROMPT_FIELD=Object[a422_0x45d8b9(0x321)]({...VIDEO_NEGATIVE_PROMPT_FIELD,'defaultValue':AGNES_VIDEO_NEGATIVE_PROMPT_DEFAULT,'description':'默认已填常规排除项，会尽量避开低画质、模糊、变形、水印和多余文字。你也可以改成自己的要求；留空或\x20none\x20表示不额外限制。'}),AGNES_VIDEO_INFERENCE_STEPS_FIELD=Object[a422_0x45d8b9(0x321)]({'id':'num_inference_steps','type':a422_0x45d8b9(0x334),'placement':a422_0x45d8b9(0x23b),'variant':a422_0x45d8b9(0x376),'label':a422_0x45d8b9(0x3c2),'description':a422_0x45d8b9(0x23e),'defaultValue':'none'}),AGNES_VIDEO_INPUT_SLOTS=createVideoInputSlots({'image':0x9,'video':0x0,'audio':0x0,'fixedSlots':Object['freeze']([Object['freeze']({'id':a422_0x45d8b9(0x212),'kind':a422_0x45d8b9(0x44a),'label':'首帧图','description':'首尾帧模式下作为第一张图；只放首帧也可以生成。','required':!![],'showWhen':Object[a422_0x45d8b9(0x321)]({'field':'agnes_video_mode','value':a422_0x45d8b9(0x26b)})}),Object['freeze']({'id':a422_0x45d8b9(0x31a),'kind':a422_0x45d8b9(0x44a),'label':a422_0x45d8b9(0x2b5),'description':a422_0x45d8b9(0x39e),'required':![],'showWhen':Object[a422_0x45d8b9(0x321)]({'field':'agnes_video_mode','value':a422_0x45d8b9(0x26b)})})])}),AGNES_VIDEO_BODY_MAPPING=createApimartVideoBodyMapping([Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x3e8),'from':'param','field':Object[a422_0x45d8b9(0x321)](['generationParams.aspectRatio',a422_0x45d8b9(0x2a4),a422_0x45d8b9(0x1f9)]),'defaultValue':'3:2','transform':a422_0x45d8b9(0x41f)}),Object['freeze']({'path':'height','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.aspectRatio','resolvedRatioLabel',a422_0x45d8b9(0x1f9)]),'defaultValue':a422_0x45d8b9(0x380),'transform':a422_0x45d8b9(0x21b)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x232),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)](['generationParams.duration','duration']),'defaultValue':0x5,'transform':Object['freeze']({'name':a422_0x45d8b9(0x3a6),'frameRate':AGNES_VIDEO_FRAME_RATE,'min':AGNES_VIDEO_MIN_FRAMES,'max':AGNES_VIDEO_MAX_FRAMES})}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x410),'from':a422_0x45d8b9(0x469),'value':AGNES_VIDEO_FRAME_RATE}),Object[a422_0x45d8b9(0x321)]({'path':'seed','from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2a3),a422_0x45d8b9(0x1e8)]),'defaultValue':a422_0x45d8b9(0x390),'transform':Object[a422_0x45d8b9(0x321)]({'name':a422_0x45d8b9(0x265),'modeField':'seed_mode','defaultMode':a422_0x45d8b9(0x3a8),'min':0x0,'max':0x7fffffff}),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':'negative_prompt','from':'param','field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x362),a422_0x45d8b9(0x3c0),'negative_prompt',a422_0x45d8b9(0x208)]),'defaultValue':AGNES_VIDEO_NEGATIVE_PROMPT_DEFAULT,'transform':a422_0x45d8b9(0x4e9),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x4e1),'from':a422_0x45d8b9(0x2f9),'field':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x2e6),'generationParams.numInferenceSteps',a422_0x45d8b9(0x4e1),'numInferenceSteps']),'defaultValue':a422_0x45d8b9(0x412),'transform':a422_0x45d8b9(0x4be),'omitWhenEmpty':!![]}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x1d3),'from':a422_0x45d8b9(0x2f9),'field':a422_0x45d8b9(0x27a),'defaultValue':a422_0x45d8b9(0x336)}),Object[a422_0x45d8b9(0x321)]({'path':a422_0x45d8b9(0x302),'from':a422_0x45d8b9(0x283),'omitWhenEmpty':!![]})]),AGNES_VIDEO_RESPONSE_MAPPING=Object[a422_0x45d8b9(0x321)]({'taskIdPath':Object[a422_0x45d8b9(0x321)](['id',a422_0x45d8b9(0x2d2),a422_0x45d8b9(0x2cd)]),'statusPath':a422_0x45d8b9(0x257),'errorPath':Object[a422_0x45d8b9(0x321)](['error.message',a422_0x45d8b9(0x1f8),a422_0x45d8b9(0x3d5)]),'resultPaths':Object[a422_0x45d8b9(0x321)]([a422_0x45d8b9(0x3a4),a422_0x45d8b9(0x40a),'result.video_url',a422_0x45d8b9(0x4a5),a422_0x45d8b9(0x42f),a422_0x45d8b9(0x3d3),a422_0x45d8b9(0x23f)])}),AGNES_VIDEO_TASK_POLLING=Object[a422_0x45d8b9(0x321)]({'mode':'task-proxy','method':a422_0x45d8b9(0x30d),'urlTemplate':'{baseUrl}/v1/videos/{taskId}','headersMode':a422_0x45d8b9(0x35d)}),AGNES_VIDEO_MODELS=Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'modelId':a422_0x45d8b9(0x4d9),'executionId':a422_0x45d8b9(0x1eb),'displayName':a422_0x45d8b9(0x27e),'provider':'agnes','icon':'AG','model':a422_0x45d8b9(0x222),'endpoint':a422_0x45d8b9(0x411),'endpointMode':'video-generation','description':a422_0x45d8b9(0x4aa),'fields':Object[a422_0x45d8b9(0x321)]([AGNES_VIDEO_MODE_FIELD,AGNES_VIDEO_RATIO_FIELD,AGNES_VIDEO_DURATION_FIELD,AGNES_VIDEO_SEED_FIELD,AGNES_VIDEO_SEED_MODE_FIELD,AGNES_VIDEO_NEGATIVE_PROMPT_FIELD,AGNES_VIDEO_INFERENCE_STEPS_FIELD]),'inputSlots':AGNES_VIDEO_INPUT_SLOTS,'bodyMapping':AGNES_VIDEO_BODY_MAPPING,'responseMapping':AGNES_VIDEO_RESPONSE_MAPPING,'taskPolling':AGNES_VIDEO_TASK_POLLING,'resultTaskIdPath':'id','executionExtensions':Object[a422_0x45d8b9(0x321)]({'bodyResolver':a422_0x45d8b9(0x4bf)}),'prompt':Object[a422_0x45d8b9(0x321)]({'placeholder':a422_0x45d8b9(0x2ae),'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x1d3),'value':a422_0x45d8b9(0x336)}),'placeholder':a422_0x45d8b9(0x34f)}),Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':'agnes_video_mode','value':a422_0x45d8b9(0x26b)}),'placeholder':a422_0x45d8b9(0x3eb)})])}),'help':Object[a422_0x45d8b9(0x321)]({'tooltip':AGNES_VIDEO_HELP_TOOLTIP,'variants':Object[a422_0x45d8b9(0x321)]([Object[a422_0x45d8b9(0x321)]({'when':Object['freeze']({'field':a422_0x45d8b9(0x1d3),'value':a422_0x45d8b9(0x336)}),'tooltip':AGNES_VIDEO_HELP_TOOLTIP}),Object[a422_0x45d8b9(0x321)]({'when':Object[a422_0x45d8b9(0x321)]({'field':a422_0x45d8b9(0x1d3),'value':a422_0x45d8b9(0x26b)}),'tooltip':AGNES_VIDEO_KEYFRAMES_HELP_TOOLTIP})])}),'extensions':Object[a422_0x45d8b9(0x321)]({'videoMenu':Object[a422_0x45d8b9(0x321)]({'role':'agnesModel','order':0xa,'label':a422_0x45d8b9(0x27e),'subtitle':a422_0x45d8b9(0x366)})})})]),VENDOR_VIDEO_MODELS=Object[a422_0x45d8b9(0x321)]([...APIMART_VIDEO_MODELS,...RUNNINGHUB_VIDEO_MODELS,...VOLCENGINE_VIDEO_MODELS,...AGNES_VIDEO_MODELS]);function isSeedanceVideoManifest(_0x57b27b){const _0x1fee64=a422_0x45d8b9;return _0x57b27b?.[_0x1fee64(0x1e7)]===_0x1fee64(0x32f)||_0x57b27b?.[_0x1fee64(0x1e5)]?.['bodyResolver']==='volcengineSeedance2Video';}function getVideoManifestRatioPolicy(_0x44ab51){if(_0x44ab51?.['ratioPolicy'])return _0x44ab51['ratioPolicy'];return isSeedanceVideoManifest(_0x44ab51)?SEEDANCE_VIDEO_RATIO_POLICY:VIDEO_SIZE_RATIO_POLICY;}export const vendorVideoModelApiModelManifests=Object['freeze'](VENDOR_VIDEO_MODELS[a422_0x45d8b9(0x400)](_0x4931db=>createVideoModelApiManifest({'modelId':_0x4931db[a422_0x45d8b9(0x45d)],'executionId':_0x4931db[a422_0x45d8b9(0x35a)],'displayName':_0x4931db[a422_0x45d8b9(0x2e7)],'provider':_0x4931db[a422_0x45d8b9(0x389)]||a422_0x45d8b9(0x4bb),'aliases':_0x4931db['aliases'],'icon':_0x4931db[a422_0x45d8b9(0x2d1)]||'AM','description':_0x4931db['description'],'fields':_0x4931db['fields'],'inputSlots':_0x4931db[a422_0x45d8b9(0x3bc)],'prompt':_0x4931db[a422_0x45d8b9(0x2c4)],'help':_0x4931db[a422_0x45d8b9(0x4d5)],'footerPlacementOrder':_0x4931db['footerPlacementOrder'],'extensions':Object[a422_0x45d8b9(0x321)]({..._0x4931db[a422_0x45d8b9(0x215)]||{},'ratioPolicy':getVideoManifestRatioPolicy(_0x4931db)}),'ratioPolicy':getVideoManifestRatioPolicy(_0x4931db)})));export const vendorVideoModelApiExecutionManifests=Object[a422_0x45d8b9(0x321)](VENDOR_VIDEO_MODELS['map'](_0x3a850d=>createVideoExecutionManifest({'id':_0x3a850d['executionId'],'model':_0x3a850d['model'],'provider':_0x3a850d[a422_0x45d8b9(0x389)]||a422_0x45d8b9(0x4bb),'endpoint':_0x3a850d[a422_0x45d8b9(0x48e)]||a422_0x45d8b9(0x2d7),'endpointMode':_0x3a850d[a422_0x45d8b9(0x1e7)],'extensions':_0x3a850d[a422_0x45d8b9(0x1e5)],'bodyMapping':_0x3a850d['bodyMapping'],'modeModels':_0x3a850d['modeModels'],'responseMapping':_0x3a850d[a422_0x45d8b9(0x445)]||APIMART_VIDEO_RESPONSE_MAPPING,'taskPolling':Object['prototype']['hasOwnProperty'][a422_0x45d8b9(0x326)](_0x3a850d,a422_0x45d8b9(0x4cd))?_0x3a850d[a422_0x45d8b9(0x4cd)]:APIMART_VIDEO_TASK_POLLING,'resultTaskIdPath':_0x3a850d[a422_0x45d8b9(0x3c4)]||a422_0x45d8b9(0x2d2)})));
+const VIDEO_DURATION_FIELD = Object.freeze({
+    id: 'duration',
+    type: 'slider',
+    placement: 'mode',
+    variant: 'durationPill',
+    label: '视频时长',
+    defaultValue: 5,
+    min: 4,
+    max: 15,
+    step: 1,
+  }),
+  VIDEO_RESOLUTION_FIELD = Object.freeze({
+    id: 'resolution',
+    type: 'segmented',
+    placement: 'resolution',
+    label: '视频分辨率',
+    defaultValue: '720P',
+    options: Object.freeze([
+      Object.freeze({ value: '720P', label: '720P' }),
+      Object.freeze({ value: '1080P', label: '1080P' }),
+    ]),
+  }),
+  APIMART_VIDEO_ADAPTIVE_RATIO_VALUE = '自适应',
+  APIMART_VIDEO_ADAPTIVE_RATIO_OPTION = Object.freeze({
+    value: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+    label: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+  }),
+  VIDEO_RATIO_FIELD = Object.freeze({
+    id: 'aspectRatio',
+    displayRole: 'aspectRatio',
+    type: 'segmented',
+    placement: 'resolution',
+    label: '比例',
+    defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+    options: Object.freeze([
+      APIMART_VIDEO_ADAPTIVE_RATIO_OPTION,
+      Object.freeze({ value: '16:9', label: '16:9' }),
+      Object.freeze({ value: '9:16', label: '9:16' }),
+      Object.freeze({ value: '1:1', label: '1:1' }),
+      Object.freeze({ value: '4:3', label: '4:3' }),
+      Object.freeze({ value: '3:4', label: '3:4' }),
+    ]),
+  }),
+  APIMART_VIDEO_FOOTER_PLACEMENT_ORDER = Object.freeze(['mode', 'resolution']),
+  VIDEO_MODE_FIELD = Object.freeze({
+    id: 'mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'pillMenu',
+    label: '模式选择',
+    defaultValue: 'std',
+    options: Object.freeze([
+      Object.freeze({ value: 'std', label: '标准' }),
+      Object.freeze({ value: 'pro', label: '专业' }),
+    ]),
+  }),
+  VIDEO_AUDIO_FIELD = Object.freeze({
+    id: 'audio',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '生成音频',
+    defaultValue: false,
+  }),
+  VIDEO_WATERMARK_FIELD = Object.freeze({
+    id: 'watermark',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '添加水印',
+    defaultValue: false,
+  }),
+  VIDEO_WATERMARK_CN_FIELD = Object.freeze({ ...VIDEO_WATERMARK_FIELD, label: '添加水印' }),
+  VIDEO_SEED_FIELD = Object.freeze({
+    id: 'seed',
+    type: 'text',
+    placement: 'advanced',
+    variant: 'randomSeedRow',
+    label: '随机种子',
+    defaultValue: 'image',
+    randomSeedMin: 0,
+    randomSeedMax: 0x7fffffff,
+  }),
+  VIDEO_NEGATIVE_PROMPT_FIELD = Object.freeze({
+    id: 'negative_prompt',
+    type: 'textarea',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '负向提示词',
+    defaultValue: 'none',
+  }),
+  VIDEO_PROMPT_EXTEND_FIELD = Object.freeze({
+    id: 'prompt_extend',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '提示词扩写',
+    defaultValue: true,
+  }),
+  VIDEO_PROMPT_OPTIMIZER_FIELD = Object.freeze({
+    id: 'prompt_optimizer',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '自动优化提示词',
+    defaultValue: true,
+  }),
+  VIDEO_FAST_PRETREATMENT_FIELD = Object.freeze({
+    id: 'fast_pretreatment',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '快速预处理',
+    defaultValue: false,
+  }),
+  VIDEO_ENABLE_GIF_FIELD = Object.freeze({
+    id: 'enable_gif',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '启用 GIF 输出格式',
+    defaultValue: false,
+  }),
+  VIDEO_AUDIO_SETTING_FIELD = Object.freeze({
+    id: 'audio_setting',
+    type: 'segmented',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '音频设置',
+    defaultValue: 'auto',
+    options: Object.freeze([
+      Object.freeze({ value: 'auto', label: '自动生成' }),
+      Object.freeze({ value: 'origin', label: '保留原音' }),
+    ]),
+  }),
+  VIDEO_SHOT_TYPE_FIELD = Object.freeze({
+    id: 'shot_type',
+    type: 'segmented',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '镜头类型',
+    defaultValue: 'single',
+    options: Object.freeze([
+      Object.freeze({ value: 'single', label: '单镜头' }),
+      Object.freeze({ value: 'multi', label: '多镜头' }),
+    ]),
+  }),
+  KLING_V3_AUDIO_FIELD = Object.freeze({ ...VIDEO_AUDIO_FIELD, label: '生成有声视频' }),
+  KLING_V3_NEGATIVE_PROMPT_FIELD = Object.freeze({
+    ...VIDEO_NEGATIVE_PROMPT_FIELD,
+    defaultValue: '模糊, 低画质, 变形',
+    defaultValueAliases: Object.freeze(['none']),
+  }),
+  KLING_V3_MODE_FIELD = Object.freeze({
+    id: 'resolution',
+    type: 'segmented',
+    placement: 'resolution',
+    variant: 'sectionMenu',
+    label: '视频分辨率',
+    defaultValue: 'std',
+    options: Object.freeze([
+      Object.freeze({ value: 'std', label: '720P' }),
+      Object.freeze({ value: 'pro', label: '1080P' }),
+      Object.freeze({ value: '4k', label: '4K' }),
+    ]),
+  }),
+  KLING_O1_QUALITY_FIELD = Object.freeze({
+    ...KLING_V3_MODE_FIELD,
+    options: Object.freeze([
+      Object.freeze({ value: 'std', label: '720P' }),
+      Object.freeze({ value: 'pro', label: '1080P' }),
+    ]),
+  }),
+  KLING_O1_KEEP_ORIGINAL_SOUND_FIELD = Object.freeze({
+    id: 'keep_original_sound',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '保留原声',
+    description: '仅接入编辑视频或特征参考视频时生效。',
+    defaultValue: false,
+  }),
+  KLING_V3_MULTI_SHOT_PLACEHOLDER_FIELD = Object.freeze({
+    id: 'multi_shot',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '多镜头分镜模式',
+    description: '暂未开放，后续接入分镜参数后启用。',
+    defaultValue: false,
+    disabled: true,
+  }),
+  VEO3_MODEL_FIELD = Object.freeze({
+    id: 'mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模型选择',
+    description:
+      'veo3.1-fast - 快速生成模型，适用于快速预览和迭代\nveo3.1-quality - 高质量生成模型，适用于最终制作',
+    defaultValue: 'fast',
+    options: Object.freeze([
+      Object.freeze({ value: 'fast', label: 'fast' }),
+      Object.freeze({ value: 'quality', label: 'quality' }),
+    ]),
+  }),
+  VEO3_GENERATION_TYPE_FIELD = Object.freeze({
+    id: 'generation_type',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模式选择',
+    description:
+      '首尾帧：使用首帧/尾帧素材生成视频。\n参考图：使用参考图素材生成视频。\nveo3.1-quality 模型不支持参考图模式。',
+    defaultValue: 'frame',
+    options: Object.freeze([
+      Object.freeze({ value: 'frame', label: '首尾帧' }),
+      Object.freeze({
+        value: 'reference',
+        label: '参考图',
+        disableWhen: { field: 'mode', value: 'quality' },
+      }),
+    ]),
+  }),
+  VEO3_FRAME_HELP_TOOLTIP = [
+    'VEO3 首尾帧模式',
+    '[[red:不放图]]：就是文生视频，只按提示词生成。',
+    '[[red:放 1 张图]]：就是普通图生视频，把这张图当作视频起点。',
+    '[[red:放 2 张图]]：第一张是开头，第二张是结尾，VEO3 补中间变化。',
+    '提示词例子：女孩从照片里的姿势慢慢转身看向镜头，阳光穿过窗帘，头发轻轻飘动，电影感，慢动作。',
+  ].join('\n'),
+  VEO3_REFERENCE_HELP_TOOLTIP = [
+    'VEO3 参考图模式',
+    '[[red:不放参考图]]：就是文生视频，只按提示词生成。',
+    '[[red:放 1-3 张参考图]]：参考人物、主体、风格或场景，不会固定成开头和结尾。',
+    '重点写清 [[red:想生成什么动作和镜头]]；quality 档不支持参考图。',
+    '提示词例子：参考图中的机器人在未来街道上奔跑，镜头低角度跟拍，背景灯牌快速掠过，速度感强。',
+  ].join('\n'),
+  VEO3_FRAME_PROMPT_PLACEHOLDER =
+    '描述首帧到尾帧的变化。例如：首帧中的女孩慢慢转身看向镜头，尾帧定格在微笑特写，阳光穿过窗帘，电影感，慢动作。',
+  VEO3_REFERENCE_PROMPT_PLACEHOLDER =
+    '描述参考图主体的动作和镜头。例如：参考图中的机器人在未来街道上奔跑，低角度跟拍，背景灯牌快速掠过，速度感强。',
+  VEO3_FIXED_DURATION_FIELD = Object.freeze({
+    id: 'duration',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'pillMenu',
+    label: '视频时长',
+    defaultValue: 8,
+    readOnly: true,
+    options: Object.freeze([Object.freeze({ value: 8, label: '8s' })]),
+  }),
+  VEO3_ENABLE_GIF_FIELD = Object.freeze({ ...VIDEO_ENABLE_GIF_FIELD, label: '启用 GIF 输出格式' }),
+  RUNNINGHUB_VEO3_CHANNEL_FIELD = Object.freeze({
+    id: 'rh_veo3_channel',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '渠道版本',
+    description: '官方稳定版更稳；低价渠道版成本更低但可能不稳定。',
+    defaultValue: 'lowCost',
+    options: Object.freeze([
+      Object.freeze({ value: 'lowCost', label: '低价版' }),
+      Object.freeze({ value: 'official', label: '官方版' }),
+    ]),
+  }),
+  RUNNINGHUB_VEO3_MODEL_FIELD = Object.freeze({
+    id: 'mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模型选择',
+    defaultValue: 'fast',
+    options: Object.freeze([
+      Object.freeze({ value: 'fast', label: 'Fast 版' }),
+      Object.freeze({ value: 'pro', label: 'Pro 版' }),
+      Object.freeze({
+        value: 'lite',
+        label: 'Lite 版',
+        disableWhen: Object.freeze({ field: 'rh_veo3_channel', value: 'lowCost' }),
+      }),
+    ]),
+  }),
+  RUNNINGHUB_VEO3_GENERATION_TYPE_FIELD = Object.freeze({
+    id: 'generation_type',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模式选择',
+    description:
+      '首尾帧：支持文生、图生、首尾帧。\n参考图：官方 Fast / Pro 支持 1-3 张参考图。\n视频续写：官方 Fast / Pro 支持 1 个原视频。',
+    defaultValue: 'frame',
+    options: Object.freeze([
+      Object.freeze({ value: 'frame', label: '首尾帧' }),
+      Object.freeze({
+        value: 'reference',
+        label: '参考图',
+        disableWhen: Object.freeze({
+          any: Object.freeze([
+            Object.freeze({ field: 'rh_veo3_channel', value: 'lowCost' }),
+            Object.freeze({ field: 'mode', value: 'lite' }),
+          ]),
+        }),
+      }),
+      Object.freeze({
+        value: 'extend',
+        label: '视频续写',
+        disableWhen: Object.freeze({
+          any: Object.freeze([
+            Object.freeze({ field: 'rh_veo3_channel', value: 'lowCost' }),
+            Object.freeze({ field: 'mode', value: 'lite' }),
+          ]),
+        }),
+      }),
+    ]),
+  }),
+  RUNNINGHUB_VEO3_DURATION_FIELD = Object.freeze({
+    ...createFooterDurationSliderOptionsField({
+      values: [4, 6, 8],
+      defaultValue: 8,
+      label: '视频时长（秒）',
+    }),
+    hideWhen: Object.freeze({ field: 'generation_type', value: 'extend' }),
+  }),
+  RUNNINGHUB_VEO3_GENERATE_AUDIO_FIELD = Object.freeze({
+    id: 'generateAudio',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '生成音频',
+    defaultValue: false,
+    hideWhen: Object.freeze({
+      any: Object.freeze([
+        Object.freeze({ field: 'rh_veo3_channel', value: 'lowCost' }),
+        Object.freeze({ field: 'generation_type', value: 'extend' }),
+      ]),
+    }),
+  }),
+  RUNNINGHUB_VEO3_FIXED_INPUT_SLOTS = Object.freeze([
+    Object.freeze({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧图',
+      description: '图生视频起始帧；低价版或官方 Lite 可接尾帧。',
+      hideWhen: Object.freeze({ field: 'generation_type', values: Object.freeze(['reference', 'extend']) }),
+    }),
+    Object.freeze({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧图',
+      description: '首尾帧生视频结束帧。',
+      hideWhen: Object.freeze({ field: 'generation_type', values: Object.freeze(['reference', 'extend']) }),
+    }),
+    Object.freeze({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图',
+      description: '官方 Fast / Pro 参考生视频，支持 1-3 张参考图。',
+      showWhen: Object.freeze({ field: 'generation_type', value: 'reference' }),
+    }),
+    Object.freeze({
+      id: 'extendVideo',
+      kind: 'video',
+      label: '续写视频',
+      description: '官方 Fast / Pro 视频续写使用的原视频。',
+      showWhen: Object.freeze({ field: 'generation_type', value: 'extend' }),
+    }),
+  ]),
+  RUNNINGHUB_VEO3_FRAME_PROMPT_PLACEHOLDER = '描述画面内容、动作和镜头；接首尾帧时写清从首帧到尾帧的变化。',
+  RUNNINGHUB_VEO3_REFERENCE_PROMPT_PLACEHOLDER =
+    '描述参考图主体的动作、场景和镜头；可用 1-3 张参考图保持人物、主体或风格。',
+  RUNNINGHUB_VEO3_EXTEND_PROMPT_PLACEHOLDER = '视频续写按官方接口提交原视频和分辨率，不提交提示词。',
+  RUNNINGHUB_VEO3_FRAME_HELP_TOOLTIP = [
+    'RunningHub Veo3',
+    '[[red:不放图]]：文生视频。',
+    '[[red:放 1 张图]]：图生视频，把图片作为视频起点。',
+    '[[red:放 2 张图]]：低价 Fast / Pro 或官方 Lite 走首尾帧接口。',
+    '官方 Fast / Pro 暂按文生、图生、参考图接入；官方首尾帧请选 Lite。',
+  ].join('\n'),
+  RUNNINGHUB_VEO3_REFERENCE_HELP_TOOLTIP = [
+    'RunningHub Veo3 参考图模式',
+    '[[red:官方 Fast / Pro]]：支持 1-3 张参考图。',
+    '[[red:低价版和 Lite]]：官方文档未提供参考图接口，已在 UI 中禁用。',
+    '适合角色一致性、主体参考和风格延续。',
+  ].join('\n'),
+  RUNNINGHUB_VEO3_EXTEND_HELP_TOOLTIP = [
+    'RunningHub Veo3 视频续写',
+    '[[red:官方 Fast / Pro]]：支持 1 个原视频。',
+    '[[red:低价版和 Lite]]：官方文档未提供 video-extend 接口，已在 UI 中禁用。',
+    '请求只提交 video 和 resolution。',
+  ].join('\n'),
+  VIDU_Q3_GENERATION_MODE_FIELD = Object.freeze({
+    id: 'vidu_q3_generation_mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模式选择',
+    defaultValue: 'video',
+    options: Object.freeze([
+      Object.freeze({ value: 'video', label: '视频生成' }),
+      Object.freeze({ value: 'reference', label: '参考生视频' }),
+    ]),
+  }),
+  VIDU_Q3_MODEL_FIELD = Object.freeze({
+    id: 'mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模型选择',
+    defaultValue: 'viduq3-turbo',
+    description: '视频生成：viduq3-turbo / viduq3-pro。\n参考生视频：viduq3 / viduq3-mix。',
+    options: Object.freeze([
+      Object.freeze({
+        value: 'viduq3-turbo',
+        label: 'Turbo 版',
+        disableWhen: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+      }),
+      Object.freeze({
+        value: 'viduq3-pro',
+        label: 'Pro 版',
+        disableWhen: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+      }),
+      Object.freeze({
+        value: 'viduq3',
+        label: '标准版',
+        disableWhen: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'video' }),
+      }),
+      Object.freeze({
+        value: 'viduq3-mix',
+        label: 'Mix 版',
+        disableWhen: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'video' }),
+      }),
+    ]),
+  }),
+  VIDU_Q3_AUDIO_FIELD = Object.freeze({
+    ...VIDEO_AUDIO_FIELD,
+    defaultValue: true,
+    hideWhen: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+  }),
+  VIDU_Q3_HELP_TOOLTIP = [
+    'Vidu Q3 视频生成',
+    '[[red:视频生成]]：Turbo / Pro，支持文生、图生、首尾帧，最多 2 张图；传图时比例由图片决定。',
+    '[[red:参考生视频]]：Standard / Mix，必须接入 1-7 张参考图，适合角色一致性和风格延续。',
+  ].join('\n'),
+  GROK_IMAGINE_QUALITY_FIELD = Object.freeze({
+    id: 'quality',
+    type: 'segmented',
+    placement: 'resolution',
+    variant: 'pillMenu',
+    label: '视频质量',
+    defaultValue: '480p',
+    options: Object.freeze([
+      Object.freeze({ value: '480p', label: '480p' }),
+      Object.freeze({ value: '720p', label: '720p' }),
+    ]),
+  }),
+  GROK_IMAGINE_PROMPT_PLACEHOLDER = '描述视频内容、动作和镜头；接入参考图时会按参考图生成动态视频。',
+  GROK_IMAGINE_HELP_TOOLTIP = [
+    'Grok Imagine 1.0',
+    '[[red:不放图]]：文生视频，只按提示词生成。',
+    '[[red:放 1-7 张图]]：图生视频，参考图需为公网可访问 URL。',
+    '时长支持 6-30 秒，质量支持 480p / 720p。',
+  ].join('\n'),
+  GEMINI_OMNI_FLASH_PROMPT_PLACEHOLDER = '描述视频内容、动作、环境和镜头；可接入 1 张或 3 张参考图。',
+  GEMINI_OMNI_FLASH_HELP_TOOLTIP = [
+    'Gemini Omni Flash',
+    '[[red:不放图]]：文生视频，只按提示词生成。',
+    '[[red:放 1 张图]]：单图生视频，把图片作为视觉参考。',
+    '[[red:放 3 张图]]：参考图融合；不支持 2 张图首尾帧模式。',
+    '时长支持 4 / 6 / 8 / 10 秒，分辨率支持 720p / 1080p / 4K。',
+  ].join('\n'),
+  HAILUO_02_PROMPT_EXAMPLE = '[推进]一只猫咪在花园中奔跑，镜头缓缓推进特写',
+  HAILUO_02_HELP_TOOLTIP = [
+    'Hailuo-02 适用场景',
+    '[[red:不放图]]：文生视频，适合快速把一句场景描述变成短视频。',
+    '[[red:放 1 张首帧]]：图生视频，把这张图当开头，适合人物转身、表情变化、镜头推进。',
+    '[[red:放 2 张首尾帧]]：控制开头和结尾，适合白天到夜晚、近景到远景这类明确转场。',
+    '[[red:1080p 只做 5 秒]]；想做 10 秒就用 512p 或 768p。',
+    '提示词例子：画面从白天逐渐过渡到夜晚，天空颜色慢慢变深，城市灯光依次亮起，镜头缓慢推进。',
+  ].join('\n'),
+  HAILUO_23_PROMPT_EXAMPLE = '[推进]一只猫咪在花园中奔跑，镜头缓缓推进特写',
+  HAILUO_23_HELP_TOOLTIP = [
+    'Hailuo 2.3 适用场景',
+    '[[red:标准版不放图]]：文生视频，适合快速把一句场景描述变成短视频。',
+    '[[red:标准版放 1 张首帧]]：图生视频，把这张图当开头，适合人物转身、表情变化、镜头推进。',
+    '[[red:Fast 版必须放 1 张首帧]]：更快生成，适合已有首帧的快速预览。',
+    '[[red:1080p 只做 6 秒]]；想做 10 秒就用 768p。',
+    '提示词例子：画面中的猫咪向镜头奔跑，镜头缓缓推进，草地和阳光有电影感。',
+  ].join('\n'),
+  HAILUO_23_MODEL_FIELD = Object.freeze({
+    id: 'mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模型选择',
+    description: '标准版支持文生和图生视频。\nFast 版必须接入首帧图片，生成更快。',
+    defaultValue: 'standard',
+    options: Object.freeze([
+      Object.freeze({ value: 'standard', label: '标准版' }),
+      Object.freeze({ value: 'fast', label: 'Fast 版' }),
+    ]),
+  }),
+  RUNNINGHUB_HAILUO_02_PROMPT_PLACEHOLDER =
+    '描述视频内容和镜头变化。例如：[推进]一只猫咪在花园中奔跑，镜头缓缓推进特写。',
+  RUNNINGHUB_HAILUO_02_HELP_TOOLTIP = [
+    'RunningHub Hailuo 02',
+    '[[red:标准版不放图]]：文生视频，支持 6 秒或 10 秒。',
+    '[[red:标准版放 1 张首帧]]：图生视频，把图片作为视频起点。',
+    '[[red:标准版放 2 张首尾帧]]：控制开头和结尾。',
+    '[[red:Pro 版]]：文生或首帧图生，1080P 质量，接口不接尾帧。',
+    '[[red:Fast 版]]：必须接 1 张首帧图，适合快速预览。',
+  ].join('\n'),
+  RUNNINGHUB_HAILUO_02_QUALITY_FIELD = Object.freeze({
+    id: 'rh_hailuo_02_quality',
+    type: 'segmented',
+    placement: 'resolution',
+    variant: 'sectionMenu',
+    label: '视频质量',
+    description: '标准版支持文生、图生和首尾帧；Pro 版支持文生/首帧图生；Fast 版必须接首帧。',
+    defaultValue: 'standard',
+    options: Object.freeze([
+      Object.freeze({ value: 'standard', label: '标准版', selectedLabel: '标准 768P' }),
+      Object.freeze({ value: 'pro', label: 'Pro 版', selectedLabel: 'Pro 1080P' }),
+      Object.freeze({
+        value: 'fast',
+        label: 'Fast 版',
+        selectedLabel: 'Fast 768P',
+        tooltip: 'Fast 版仅支持图生视频，必须接入首帧。',
+      }),
+    ]),
+  }),
+  RUNNINGHUB_HAILUO_02_DURATION_FIELD = Object.freeze({
+    ...createFooterDurationSliderOptionsField({ values: [6, 10], defaultValue: 6, label: '视频时长（秒）' }),
+    hideWhen: Object.freeze({ field: 'rh_hailuo_02_quality', value: 'pro' }),
+  }),
+  RUNNINGHUB_HAILUO_02_ENABLE_PROMPT_EXPANSION_FIELD = Object.freeze({
+    id: 'enablePromptExpansion',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '提示词扩写',
+    defaultValue: true,
+  }),
+  RUNNINGHUB_HAILUO_02_FIXED_INPUT_SLOTS = Object.freeze([
+    Object.freeze({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      description: '图生视频起始帧；Fast 版必填。',
+    }),
+    Object.freeze({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧',
+      description: '仅标准版首尾帧可用。',
+      hideWhen: Object.freeze({ field: 'rh_hailuo_02_quality', values: Object.freeze(['pro', 'fast']) }),
+    }),
+  ]),
+  RUNNINGHUB_HAILUO_23_PROMPT_PLACEHOLDER =
+    '描述视频内容和镜头变化。例如：[推进]画面中的猫咪向镜头奔跑，镜头缓缓推进，草地和阳光有电影感。',
+  RUNNINGHUB_HAILUO_23_HELP_TOOLTIP = [
+    'RunningHub Hailuo 2.3',
+    '[[red:标准版不放图]]：文生视频，支持 6 秒或 10 秒。',
+    '[[red:标准版放 1 张首帧]]：图生视频，把图片作为视频起点。',
+    '[[red:Pro 版]]：文生或首帧图生，1080P 质量，固定 5 秒，不传 duration。',
+    '[[red:Fast 版]]：必须接 1 张首帧图，768P，支持 6 秒或 10 秒。',
+    '[[red:Fast Pro 版]]：必须接 1 张首帧图，1080P，固定 6 秒。',
+  ].join('\n'),
+  RUNNINGHUB_HAILUO_23_QUALITY_FIELD = Object.freeze({
+    id: 'rh_hailuo_23_quality',
+    type: 'segmented',
+    placement: 'resolution',
+    variant: 'sectionMenu',
+    label: '视频质量',
+    description: '标准版支持文生/图生；Pro 文生/图生固定 5 秒；Fast/Fast Pro 必须接首帧。',
+    defaultValue: 'standard',
+    options: Object.freeze([
+      Object.freeze({ value: 'standard', label: '标准版', selectedLabel: '标准 768P' }),
+      Object.freeze({ value: 'pro', label: 'Pro 版', selectedLabel: 'Pro 1080P' }),
+      Object.freeze({
+        value: 'fast',
+        label: 'Fast 版',
+        selectedLabel: 'Fast 768P',
+        tooltip: 'Fast 版仅支持图生视频，必须接入首帧。',
+      }),
+      Object.freeze({
+        value: 'fastPro',
+        label: 'Fast Pro',
+        selectedLabel: 'Fast Pro 1080P',
+        tooltip: 'Fast Pro 版仅支持图生视频，固定 6 秒。',
+      }),
+    ]),
+  }),
+  RUNNINGHUB_HAILUO_23_DURATION_FIELD = Object.freeze({
+    ...createFooterDurationSliderOptionsField({ values: [6, 10], defaultValue: 6, label: '视频时长（秒）' }),
+    hideWhen: Object.freeze({ field: 'rh_hailuo_23_quality', values: Object.freeze(['pro', 'fastPro']) }),
+  }),
+  RUNNINGHUB_HAILUO_23_FIXED_INPUT_SLOTS = Object.freeze([
+    Object.freeze({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      description: '图生视频起始帧；Fast / Fast Pro 必填。',
+    }),
+  ]),
+  HAPPYHORSE_TEXT_HELP_TOOLTIP = [
+    'HappyHorse 1.0 文生视频',
+    '[[red:没入参时]]：只写提示词，就是文生视频。',
+    '适合直接生成新画面、动作和镜头。',
+    '提示词例子：一只白色小狗在草地上奔跑，镜头低角度跟拍，阳光明亮，慢动作。',
+  ].join('\n'),
+  HAPPYHORSE_IMAGE_HELP_TOOLTIP = [
+    'HappyHorse 1.0 图生视频',
+    '[[red:接 1 张图]]：把这张图当视频起点，让画面动起来。',
+    '[[red:没入参时]]：仍然是文生视频，只按提示词生成。',
+    '适合人物转身、表情变化、镜头推进这类从一张图开始的变化。',
+    '提示词例子：画面中的女孩慢慢转身看向镜头，发丝被风吹动，背景轻微虚化。',
+  ].join('\n'),
+  HAPPYHORSE_REFERENCE_HELP_TOOLTIP = [
+    'HappyHorse 1.0 参考图生视频',
+    '[[red:接 1-9 张参考图]]：参考人物、主体、风格或场景，生成全新画面。',
+    '[[red:没入参时]]：仍然是文生视频，只按提示词生成。',
+    '适合统一角色或风格，多张图可以给更多外观参考。',
+    '提示词例子：参考图中的角色在未来城市中行走，镜头从侧面缓慢环绕，灯光有电影感。',
+  ].join('\n'),
+  HAPPYHORSE_EDIT_HELP_TOOLTIP = [
+    'HappyHorse 1.0 视频编辑',
+    '[[red:接 1 个视频]]：在原视频基础上改画面或动作，可再接最多 5 张参考图。',
+    '[[red:没入参时]]：仍然是文生视频，只按提示词生成。',
+    '适合改风格、换场景、增强画面，或让原视频更贴近参考图。',
+    '提示词例子：把原视频改成夜晚赛博朋克街道风格，保留人物动作，增加霓虹灯和雨水反光。',
+  ].join('\n'),
+  HAPPYHORSE_HELP_TOOLTIP = HAPPYHORSE_TEXT_HELP_TOOLTIP,
+  HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER =
+    '描述要生成的视频内容。例如：夕阳下的海边公路，慢镜头推进，电影感画面。',
+  HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER =
+    '描述首帧图要如何动起来。例如：让图片中的场景动起来，镜头缓慢推近，主体轻微转身，电影感。',
+  HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER =
+    '描述参考图之间的主体、场景和动作关系。例如：@图片1 中的主角在 @图片2 的场景中奔跑，随后拿起 @图片3 中的道具，保持3D卡通风格，动作流畅。',
+  HAPPYHORSE_EDIT_PROMPT_PLACEHOLDER =
+    '描述如何改写源视频，可用参考图补充风格。例如：把视频中的角色换成卡通风格，保留原有动作和节奏。',
+  HAPPYHORSE_MODE_FIELD = Object.freeze({
+    id: 'happyhorse_mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模式选择',
+    description: HAPPYHORSE_HELP_TOOLTIP,
+    defaultValue: 'image',
+    options: Object.freeze([
+      Object.freeze({ value: 'auto', label: '模式选择', displayLabel: '模式选择', hidden: true }),
+      Object.freeze({ value: 'image', label: '图生视频' }),
+      Object.freeze({ value: 'reference', label: '参考图生视频' }),
+      Object.freeze({ value: 'edit', label: '视频编辑' }),
+    ]),
+  }),
+  HAPPYHORSE_AUDIO_SETTING_FIELD = Object.freeze({
+    ...VIDEO_AUDIO_SETTING_FIELD,
+    label: '音频设置',
+    tooltip: '仅视频编辑模式生效：自动生成音频或保留原视频音轨。',
+    options: Object.freeze([
+      Object.freeze({ value: 'auto', label: '自动生成音频' }),
+      Object.freeze({ value: 'origin', label: '保留原视频音轨' }),
+    ]),
+  }),
+  HAPPYHORSE_WATERMARK_FIELD = Object.freeze({ ...VIDEO_WATERMARK_FIELD, label: '添加水印' }),
+  HAPPYHORSE_SEED_FIELD = Object.freeze({ ...VIDEO_SEED_FIELD, label: '随机种子' });
+function createHappyHorseFixedSlot({
+  id: _0x3e62cb,
+  kind: _0xfd9fed,
+  label: _0x2d7c77,
+  mode: _0x2554ae,
+  description: _0x5812a5,
+}) {
+  return Object.freeze({
+    id: _0x3e62cb,
+    kind: _0xfd9fed,
+    label: _0x2d7c77,
+    description: _0x5812a5,
+    showWhen: Object.freeze({ field: 'happyhorse_mode', value: _0x2554ae }),
+  });
+}
+const HAPPYHORSE_FIXED_INPUT_SLOTS = Object.freeze([
+    createHappyHorseFixedSlot({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '参考图',
+      mode: 'image',
+      description: '图生视频使用的参考图',
+    }),
+    createHappyHorseFixedSlot({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'reference',
+      description: '参考图生视频的参考图片',
+    }),
+    createHappyHorseFixedSlot({
+      id: 'editVideo',
+      kind: 'video',
+      label: '参考视频',
+      mode: 'edit',
+      description: '视频编辑使用的参考视频',
+    }),
+    createHappyHorseFixedSlot({
+      id: 'editRefImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'edit',
+      description: '视频编辑可选参考图',
+    }),
+  ]),
+  RUNNINGHUB_SEEDANCE_2_MODEL_FIELD = Object.freeze({
+    id: 'rh_seedance_2_model',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模型选择',
+    defaultValue: 'fast',
+    options: Object.freeze([
+      Object.freeze({ value: 'fast', label: 'Fast 版' }),
+      Object.freeze({ value: 'standard', label: '标准版' }),
+    ]),
+  }),
+  RUNNINGHUB_SEEDANCE_2_MODE_FIELD = Object.freeze({
+    id: 'rh_seedance_2_mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模式选择',
+    defaultValue: 'text2video',
+    options: Object.freeze([
+      Object.freeze({ value: 'text2video', label: '文生视频' }),
+      Object.freeze({ value: 'image2video', label: '图生视频' }),
+      Object.freeze({ value: 'frames2video', label: '首尾帧' }),
+      Object.freeze({ value: 'multimodal2video', label: '全能参考' }),
+    ]),
+  }),
+  VOLCENGINE_SEEDANCE_2_MODE_FIELD = Object.freeze({
+    id: 'volcengine_seedance_2_mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'pillMenu',
+    label: '模式',
+    defaultValue: 'multimodal2video',
+    options: Object.freeze([
+      Object.freeze({ value: 'multimodal2video', label: '全能参考', selectedLabel: '全能参考' }),
+      Object.freeze({ value: 'frames2video', label: '首尾帧', selectedLabel: '首尾帧' }),
+    ]),
+  }),
+  RUNNINGHUB_SEEDANCE_2_RESOLUTION_FIELD = Object.freeze({
+    id: 'resolution',
+    displayRole: 'resolution',
+    type: 'segmented',
+    placement: 'resolution',
+    variant: 'pillMenu',
+    qualityRatioLabelOrder: 'fieldFirst',
+    label: '分辨率',
+    defaultValue: '720p',
+    options: Object.freeze([
+      Object.freeze({ value: '480p', label: '480p', groupLabel: '原生输出分辨率' }),
+      Object.freeze({ value: '720p', label: '720p', groupLabel: '原生输出分辨率' }),
+      Object.freeze({ value: 'native1080p', label: 'native1080p', groupLabel: '原生输出分辨率' }),
+      Object.freeze({ value: '1080p', label: '1080p', groupLabel: '超分辨率' }),
+      Object.freeze({ value: '2k', label: '2k', groupLabel: '超分辨率' }),
+      Object.freeze({ value: '4k', label: '4k', groupLabel: '超分辨率' }),
+    ]),
+  }),
+  RUNNINGHUB_SEEDANCE_2_GENERATE_AUDIO_FIELD = Object.freeze({
+    id: 'generateAudio',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '生成音频',
+    defaultValue: true,
+  }),
+  RUNNINGHUB_SEEDANCE_2_WEB_SEARCH_FIELD = Object.freeze({
+    id: 'webSearch',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '联网搜索',
+    defaultValue: false,
+    showWhen: Object.freeze({ field: 'rh_seedance_2_mode', value: 'text2video' }),
+  }),
+  RUNNINGHUB_SEEDANCE_2_REAL_PERSON_FIELD = Object.freeze({
+    id: 'realPersonMode',
+    type: 'toggle',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '真人模式',
+    defaultValue: false,
+  });
+function createVolcengineSeedance2ResolutionField({ include1080p: include1080p = true } = {}) {
+  const _0x10d210 = [
+    Object.freeze({ value: '480p', label: '480p' }),
+    Object.freeze({ value: '720p', label: '720p' }),
+  ];
+  return (
+    include1080p && _0x10d210.push(Object.freeze({ value: '1080p', label: '1080p' })),
+    Object.freeze({
+      id: 'resolution',
+      displayRole: 'resolution',
+      type: 'segmented',
+      placement: 'resolution',
+      variant: 'pillMenu',
+      qualityRatioLabelOrder: 'fieldFirst',
+      label: '分辨率',
+      defaultValue: '720p',
+      options: Object.freeze(_0x10d210),
+    })
+  );
+}
+const VOLCENGINE_SEEDANCE_2_RATIO_FIELD = Object.freeze({
+    id: 'aspectRatio',
+    displayRole: 'aspectRatio',
+    type: 'segmented',
+    placement: 'resolution',
+    variant: 'pillMenu',
+    label: '比例',
+    defaultValue: 'adaptive',
+    options: Object.freeze([
+      Object.freeze({ value: 'adaptive', label: '自适应' }),
+      Object.freeze({ value: '16:9', label: '16:9' }),
+      Object.freeze({ value: '9:16', label: '9:16' }),
+      Object.freeze({ value: '1:1', label: '1:1' }),
+      Object.freeze({ value: '4:3', label: '4:3' }),
+      Object.freeze({ value: '3:4', label: '3:4' }),
+      Object.freeze({ value: '21:9', label: '21:9' }),
+    ]),
+  }),
+  VOLCENGINE_SEEDANCE_2_GENERATE_AUDIO_FIELD = Object.freeze({
+    ...RUNNINGHUB_SEEDANCE_2_GENERATE_AUDIO_FIELD,
+    defaultValue: true,
+  }),
+  VOLCENGINE_SEEDANCE_2_SEED_FIELD = Object.freeze({ ...VIDEO_SEED_FIELD, defaultValue: 'random' });
+function createRunningHubSeedance2FixedSlot({
+  id: _0x5ce218,
+  kind: _0x14e836,
+  label: _0x180d60,
+  mode: _0x1ee1ec,
+  modes: _0x162c39,
+  description: _0x3cc15d,
+  displayOrder: _0x19ab08,
+}) {
+  const _0x111025 = Object.freeze(
+      (Array.isArray(_0x162c39) ? _0x162c39 : [_0x1ee1ec])
+        .map((_0x42a6ea) => String(_0x42a6ea || '').trim())
+        .filter(Boolean),
+    ),
+    _0x44c9ff =
+      _0x111025.length > 1
+        ? Object.freeze({ field: 'rh_seedance_2_mode', values: _0x111025 })
+        : Object.freeze({ field: 'rh_seedance_2_mode', value: _0x111025[0] || '' });
+  return Object.freeze({
+    id: _0x5ce218,
+    kind: _0x14e836,
+    label: _0x180d60,
+    description: _0x3cc15d,
+    displayOrder: _0x19ab08,
+    showWhen: _0x44c9ff,
+  });
+}
+const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS = Object.freeze([
+    createRunningHubSeedance2FixedSlot({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      modes: ['image2video', 'frames2video'],
+      displayOrder: 10,
+      description: '图生或首尾帧生成的起始图片',
+    }),
+    createRunningHubSeedance2FixedSlot({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧',
+      mode: 'frames2video',
+      displayOrder: 20,
+      description: '首尾帧生成的结束图片',
+    }),
+    createRunningHubSeedance2FixedSlot({
+      id: 'referenceVideo',
+      kind: 'video',
+      label: '参考视频',
+      mode: 'multimodal2video',
+      displayOrder: 30,
+      description: '全能参考模式的参考视频',
+    }),
+    createRunningHubSeedance2FixedSlot({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'multimodal2video',
+      displayOrder: 40,
+      description: '全能参考模式的参考图片',
+    }),
+    createRunningHubSeedance2FixedSlot({
+      id: 'referenceAudio',
+      kind: 'audio',
+      label: '参考音频',
+      mode: 'multimodal2video',
+      displayOrder: 50,
+      description: '可选，需搭配参考图片或参考视频',
+    }),
+  ]),
+  RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER = '描述要生成的视频内容、动作、镜头和风格。',
+  RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER = '描述参考图中主体如何运动，以及镜头和画面变化。',
+  RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER = '描述首帧到尾帧的过渡动作、节奏和镜头关系。',
+  RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER =
+    '用 @图片1、@视频1 指代参考素材，描述主体、动作、声音和镜头关系。',
+  RUNNINGHUB_SEEDANCE_2_HELP_TOOLTIP = [
+    'RunningHub Seedance 2.0',
+    '模型选择：Fast 版 / 标准版。',
+    '模式：文生视频 / 图生视频 / 首尾帧 / 全能参考。',
+    '分辨率：480p、720p、native1080p 为原生输出；1080p、2k、4k 为基于 720p 原生生成后超分放大。',
+    '图生需 1 张图；首尾帧需 2 张图；全能参考最多 9 图、3 视频、3 音频。',
+  ].join('\n'),
+  VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP = [
+    '火山方舟 Seedance 2.0',
+    '模式：全能参考 / 首尾帧。',
+    '无入参时只使用提示词；首尾帧模式接 1 张图时按首帧输入处理。',
+    '分辨率：Fast 版支持 480p、720p；标准版支持 480p、720p、1080p。',
+    '全能参考最多 9 图、3 视频、3 音频；音频需搭配图片或视频。',
+  ].join('\n'),
+  WAN27_HELP_TOOLTIP = [
+    'Wan2.7 模式说明',
+    '图生视频：可接首帧、尾帧和音频；没入参时就是文生视频。',
+    '视频续写：接 1 个续写视频；没入参时就是文生视频。',
+    '参考生视频：接参考图或参考视频；音频需搭配参考图。',
+    '视频编辑：接原视频，可再接参考视频。',
+  ].join('\n'),
+  WAN27_IMAGE_HELP_TOOLTIP = [
+    'Wan2.7 图生视频',
+    '[[red:没入参时]]：只写提示词，就是文生视频。',
+    '[[red:接 1 张首帧]]：从这张图开始生成视频。',
+    '[[red:接首帧 + 尾帧]]：第一张是开头，第二张是结尾，中间变化由模型补。',
+    '[[red:接音频]]：可作为背景或驱动音频，2-30 秒且不超过 15MB。',
+    '提示词例子：一只猫咪在草地上追逐蝴蝶，阳光明媚，镜头慢慢推进，慢动作。',
+  ].join('\n'),
+  WAN27_VIDEO_HELP_TOOLTIP = [
+    'Wan2.7 视频续写',
+    '[[red:接 1 个续写视频]]：在原视频后继续往下生成。',
+    '[[red:没入参时]]：只写提示词，就是文生视频。',
+    '[[red:视频超过 10 秒]]：生成前会拦截。',
+    '提示词例子：延续原视频里的镜头，人物继续向前走，镜头跟随，动作自然衔接。',
+  ].join('\n'),
+  WAN27_REFERENCE_HELP_TOOLTIP = [
+    'Wan2.7 参考生视频',
+    '[[red:接参考图或参考视频]]：参考主体、动作、风格或场景，生成新视频。',
+    '[[red:音频需搭配参考图]]：作为角色声音参考使用。',
+    '提示词里可以用图 1、视频 1 指代对应入参。',
+    '提示词例子：图 1 中的人物来到视频 1 的街道场景中，环顾四周，镜头从侧面缓慢跟拍。',
+  ].join('\n'),
+  WAN27_EDIT_HELP_TOOLTIP = [
+    'Wan2.7 视频编辑',
+    '[[red:接 1 个原视频]]：在原视频基础上改画面、换背景或改风格。',
+    '[[red:参考视频可选]]：用来补充目标动作或风格参考。',
+    '[[red:原视频 2-10 秒]]：超过会在生成前拦截。',
+    '提示词例子：将原视频背景替换为雪山场景，保留人物动作，整体变成电影感冷色调。',
+  ].join('\n'),
+  WAN27_IMAGE_PROMPT_PLACEHOLDER =
+    '不接素材时描述文生视频；接首帧/尾帧时描述动作、运镜和过渡。例如：人物缓缓站起身，向镜头走来；或镜头从海边缓慢移向山顶。',
+  WAN27_VIDEO_PROMPT_PLACEHOLDER =
+    '描述原视频要如何续写。例如：继续向前走，镜头跟随，保持原视频里的动作节奏和画面风格。',
+  WAN27_REFERENCE_PROMPT_PLACEHOLDER =
+    '用 @图片1、@图片2、@视频1 指代参考素材。例如：@图片1 中的人物来到 @图片2 的场景中，学习 @图片3 的动作，保持角色一致。',
+  WAN27_EDIT_PROMPT_PLACEHOLDER =
+    '描述要对原视频做什么编辑，可用参考图补充风格。例如：将背景替换为雪山场景，保留人物动作和镜头节奏。',
+  KLING_V3_HELP_TOOLTIP = [
+    'Kling V3 视频生成',
+    '[[red:不放图]]：只写提示词，就是文生视频。',
+    '[[red:接 1 张首帧]]：从这张图开始生成视频。',
+    '[[red:接首帧 + 尾帧]]：第一张是开头，第二张是结尾，中间变化由模型补。',
+    '[[red:生成有声视频]]：在高级设置打开音频，让模型同时生成声音。',
+    '标准 / 专业 / 4K 可在参数区选择；多镜头分镜模式暂未开放。',
+    '提示词例子：女孩从照片里的姿势慢慢转身看向镜头，镜头缓慢推进，阳光穿过窗帘，电影感。',
+  ].join('\n'),
+  KLING_V3_PROMPT_PLACEHOLDER =
+    '不接素材时描述文生视频；接首帧/尾帧时描述 @图片1 到 @图片2 的变化。例如：@图片1 中的猫咪缓缓向前走，最后过渡到 @图片2 的画面，电影质感。',
+  KLING_V3_OMNI_IMAGE_HELP_TOOLTIP = [
+    'Kling V3 Omni 图生视频',
+    '[[red:没入参时]]：只写提示词，就是文生视频。',
+    '[[red:接 1 张首帧]]：从这张图开始生成视频。',
+    '[[red:接首帧 + 尾帧]]：第一张是开头，第二张是结尾，中间变化由模型补。',
+    '[[red:生成有声视频]]：在高级设置打开音频，让模型同时生成声音。',
+    '提示词例子：画面中的女孩慢慢转身看向镜头，镜头缓慢推进，窗外阳光穿过窗帘，电影感。',
+  ].join('\n'),
+  KLING_V3_OMNI_REFERENCE_HELP_TOOLTIP = [
+    'Kling V3 Omni 参考生视频',
+    '[[red:接参考图或参考视频]]：参考主体、动作、风格或场景生成新视频。',
+    '参考视频会作为特征参考；有参考视频时不会发送生成有声视频参数。',
+    '提示词例子：参考图中的角色走进参考视频的街道场景，镜头从侧面缓慢跟拍，灯光有电影感。',
+  ].join('\n'),
+  KLING_V3_OMNI_EDIT_HELP_TOOLTIP = [
+    'Kling V3 Omni 视频编辑',
+    '[[red:接 1 个原视频]]：在原视频基础上改画面、换风格或调整内容。',
+    '[[red:不能同时接首尾帧]]：视频编辑模式只使用原视频作为基础输入。',
+    '提示词例子：将原视频改成夜晚赛博朋克街道风格，保留人物动作，增加霓虹灯和雨水反光。',
+  ].join('\n'),
+  KLING_V3_OMNI_HELP_TOOLTIP = KLING_V3_OMNI_IMAGE_HELP_TOOLTIP,
+  KLING_V3_OMNI_IMAGE_PROMPT_PLACEHOLDER =
+    '不接素材时描述文生视频；接首帧/尾帧时可用 @图片1 / @图片2 指代。例如：让 @图片1 中的人物向镜头挥手，随后过渡到 @图片2 的街景。',
+  KLING_V3_OMNI_REFERENCE_PROMPT_PLACEHOLDER =
+    '用 @图片1、@视频1 指代参考素材。例如：参考 @图片1 的角色外观和 @视频1 的镜头风格，生成夜晚街道行走视频。',
+  KLING_V3_OMNI_EDIT_PROMPT_PLACEHOLDER =
+    '描述如何编辑原视频，可接参考图补充风格。例如：将原视频改成夜晚赛博朋克街道风格，保留人物动作和镜头节奏。',
+  KLING_V3_OMNI_MODE_FIELD = Object.freeze({
+    id: 'kling_v3_omni_mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模式选择',
+    description: '图生视频：首尾帧或文生视频。\n参考生视频：参考图或参考视频。\n视频编辑：基于原视频编辑。',
+    defaultValue: 'image',
+    options: Object.freeze([
+      Object.freeze({ value: 'image', label: '图生视频' }),
+      Object.freeze({ value: 'reference', label: '参考生视频' }),
+      Object.freeze({ value: 'edit', label: '视频编辑' }),
+    ]),
+  });
+function createKlingV3OmniFixedSlot({
+  id: _0x33a53c,
+  kind: _0x44c221,
+  label: _0x615e4f,
+  mode: _0x4a48f5,
+  description: _0xcfd057,
+  displayOrder: _0x4eb06b,
+}) {
+  return Object.freeze({
+    id: _0x33a53c,
+    kind: _0x44c221,
+    label: _0x615e4f,
+    description: _0xcfd057,
+    displayOrder: _0x4eb06b,
+    showWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: _0x4a48f5 }),
+  });
+}
+const KLING_V3_OMNI_FIXED_INPUT_SLOTS = Object.freeze([
+    createKlingV3OmniFixedSlot({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      mode: 'image',
+      displayOrder: 10,
+      description: '图生视频使用的首帧图片',
+    }),
+    createKlingV3OmniFixedSlot({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧',
+      mode: 'image',
+      displayOrder: 20,
+      description: '可选，图生视频使用的尾帧图片',
+    }),
+    createKlingV3OmniFixedSlot({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'reference',
+      displayOrder: 30,
+      description: '参考生视频使用的参考图片',
+    }),
+    createKlingV3OmniFixedSlot({
+      id: 'referenceVideo',
+      kind: 'video',
+      label: '参考视频',
+      mode: 'reference',
+      displayOrder: 40,
+      description: '参考生视频使用的特征参考视频',
+    }),
+    createKlingV3OmniFixedSlot({
+      id: 'editVideo',
+      kind: 'video',
+      label: '原视频',
+      mode: 'edit',
+      displayOrder: 50,
+      description: '视频编辑使用的原视频',
+    }),
+  ]),
+  KLING_O1_HELP_TOOLTIP = [
+    'Kling Video O1 视频生成',
+    '[[red:@图片引用]]：O1 会把 @图片1 / @图片2 解析为 <<<image_1>>> / <<<image_2>>>，用于在提示词中精确引用图片。',
+    '[[red:参考图片]]：最多 2 张；如果同时接特征参考视频，只使用第 1 张参考图片。',
+    '[[red:编辑视频 / 特征参考视频]]：两个视频槽互斥，只能接其中一个；视频需 3-10 秒。',
+    '提示词例子：让@图片1中的人物向镜头挥手，随后走向@图片2中的街景，镜头缓慢推进。',
+  ].join('\n'),
+  KLING_O1_PROMPT_PLACEHOLDER =
+    '描述视频内容，按 @ 引用参考图片。例如：让 @图片1 中的人物向镜头挥手，随后走向 @图片2 中的街景；接编辑视频时描述要改什么画面或风格。',
+  KLING_O1_FIXED_INPUT_SLOTS = Object.freeze([
+    Object.freeze({
+      id: 'editVideo',
+      kind: 'video',
+      label: '编辑视频',
+      description: '待编辑的原视频，需 3-10 秒；与特征参考视频互斥。',
+      displayOrder: 10,
+    }),
+    Object.freeze({
+      id: 'featureReferenceVideo',
+      kind: 'video',
+      label: '特征参考视频',
+      description: '作为特征参考的视频，需 3-10 秒；与编辑视频互斥。',
+      displayOrder: 20,
+    }),
+    Object.freeze({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图片',
+      description: 'O1 提示词里可用 @图片1 / @图片2 引用，提交时会转换为 <<<image_N>>>。',
+      displayOrder: 30,
+    }),
+  ]),
+  KLING_O1_VIDEO_EXCLUSIVE_GROUPS = Object.freeze([
+    Object.freeze({
+      id: 'klingO1VideoInput',
+      slots: Object.freeze(['editVideo', 'featureReferenceVideo']),
+      max: 1,
+    }),
+  ]),
+  RUNNINGHUB_KLING_O1_GENERATION_MODE_FIELD = Object.freeze({
+    id: 'rh_kling_o1_generation_mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模式选择',
+    description: '视频生成：支持文生、图生、首尾帧。\n参考生视频：接 1-7 张参考图和 1 个参考视频。',
+    defaultValue: 'frame',
+    options: Object.freeze([
+      Object.freeze({ value: 'frame', label: '视频生成' }),
+      Object.freeze({ value: 'reference', label: '参考生视频' }),
+      Object.freeze({ value: 'edit', label: '视频编辑' }),
+    ]),
+  }),
+  RUNNINGHUB_KLING_O1_RATIO_FIELD = Object.freeze({
+    ...VIDEO_RATIO_FIELD,
+    defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+    options: Object.freeze([
+      APIMART_VIDEO_ADAPTIVE_RATIO_OPTION,
+      Object.freeze({ value: '16:9', label: '16:9' }),
+      Object.freeze({ value: '9:16', label: '9:16' }),
+      Object.freeze({ value: '1:1', label: '1:1' }),
+    ]),
+  }),
+  RUNNINGHUB_KLING_O1_KEEP_ORIGINAL_SOUND_FIELD = Object.freeze({
+    ...KLING_O1_KEEP_ORIGINAL_SOUND_FIELD,
+    showWhen: Object.freeze({
+      field: 'rh_kling_o1_generation_mode',
+      values: Object.freeze(['reference', 'edit']),
+    }),
+  }),
+  RUNNINGHUB_KLING_O1_FRAME_HELP_TOOLTIP = [
+    'RunningHub Kling O1 视频生成',
+    '[[red:不接图]]：走文生视频接口。',
+    '[[red:接 1 张首帧]]：走图生视频接口，把这张图作为视频起点。',
+    '[[red:接首帧 + 尾帧]]：走首尾帧接口，中间变化由 O1 补齐。',
+    '提示词例子：@图片1 中的人物慢慢转身，最后过渡到 @图片2 的夜晚街景，电影感，镜头缓慢推进。',
+  ].join('\n'),
+  RUNNINGHUB_KLING_O1_REFERENCE_HELP_TOOLTIP = [
+    'RunningHub Kling O1 参考生视频',
+    '[[red:必须接 1-7 张参考图 + 1 个参考视频]]：参考图用于主体/风格，参考视频用于动作或镜头特征。',
+    '[[red:保留原声]]：开启后提交 keepOriginalSound。',
+    '提示词例子：参考 @图片1 的角色外观和 @视频1 的动作节奏，生成夜晚街道行走镜头。',
+  ].join('\n'),
+  RUNNINGHUB_KLING_O1_EDIT_HELP_TOOLTIP = [
+    'RunningHub Kling O1 视频编辑',
+    '[[red:接 1 个原视频]]：走官方 edit-video 接口。',
+    '[[red:保留原声]]：开启后提交 keepOriginalSound。',
+    '提示词里直接描述要修改的画面、元素或风格。',
+  ].join('\n'),
+  RUNNINGHUB_KLING_O1_HELP_TOOLTIP = RUNNINGHUB_KLING_O1_FRAME_HELP_TOOLTIP,
+  RUNNINGHUB_KLING_O1_FRAME_PROMPT_PLACEHOLDER =
+    '不接素材时描述文生视频；接首帧/尾帧时可用 @图片1 / @图片2 指代。例如：让 @图片1 中的人物向镜头挥手，随后过渡到 @图片2 的街景。',
+  RUNNINGHUB_KLING_O1_REFERENCE_PROMPT_PLACEHOLDER =
+    '描述参考图和参考视频要生成的新画面。例如：参考 @图片1 的角色外观和 @视频1 的动作节奏，生成夜晚街道行走镜头。',
+  RUNNINGHUB_KLING_O1_EDIT_PROMPT_PLACEHOLDER =
+    '描述要对原视频做的编辑。例如：移除背景路人，将晴天改为电影感雨夜，并保持人物动作连贯。';
+function createRunningHubKlingO1FixedSlot({
+  id: _0x30c2b5,
+  kind: _0x24d9ac,
+  label: _0x36c071,
+  mode: _0x418c05,
+  description: _0xb5d6bd,
+  displayOrder: _0x389cf1,
+}) {
+  const _0x26fc27 =
+    _0x418c05 === 'reference' || _0x418c05 === 'edit'
+      ? { showWhen: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: _0x418c05 }) }
+      : {
+          hideWhen: Object.freeze({
+            field: 'rh_kling_o1_generation_mode',
+            values: Object.freeze(['reference', 'edit']),
+          }),
+        };
+  return Object.freeze({
+    id: _0x30c2b5,
+    kind: _0x24d9ac,
+    label: _0x36c071,
+    description: _0xb5d6bd,
+    displayOrder: _0x389cf1,
+    ..._0x26fc27,
+  });
+}
+const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS = Object.freeze([
+    createRunningHubKlingO1FixedSlot({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      mode: 'frame',
+      displayOrder: 10,
+      description: '图生视频或首尾帧使用的起始图片',
+    }),
+    createRunningHubKlingO1FixedSlot({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧',
+      mode: 'frame',
+      displayOrder: 20,
+      description: '可选，首尾帧使用的结束图片',
+    }),
+    createRunningHubKlingO1FixedSlot({
+      id: 'editVideo',
+      kind: 'video',
+      label: '编辑视频',
+      mode: 'edit',
+      displayOrder: 30,
+      description: '官方 edit-video 使用的原视频',
+    }),
+    createRunningHubKlingO1FixedSlot({
+      id: 'referenceVideo',
+      kind: 'video',
+      label: '参考视频',
+      mode: 'reference',
+      displayOrder: 40,
+      description: '参考生视频必填，作为动作或镜头特征参考',
+    }),
+    createRunningHubKlingO1FixedSlot({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'reference',
+      displayOrder: 50,
+      description: '参考生视频使用，支持 1-7 张参考图',
+    }),
+  ]),
+  RUNNINGHUB_KLING_O3_MODEL_FIELD = Object.freeze({
+    ...KLING_V3_MODE_FIELD,
+    id: 'resolution',
+    placement: 'resolution',
+    label: '质量',
+    description: '720P=std，1080P=pro，4K=4K 版。',
+    defaultValue: 'std',
+  }),
+  RUNNINGHUB_KLING_O3_MODE_FIELD = Object.freeze({
+    ...KLING_V3_OMNI_MODE_FIELD,
+    description:
+      '视频生成：支持文生、图生、首尾帧。\n参考生视频：接 1-7 张参考图，可选 1 个参考视频。\n视频编辑：基于原视频编辑，std/pro 可用。',
+  }),
+  RUNNINGHUB_KLING_O3_RATIO_FIELD = Object.freeze({
+    ...createAspectRatioField({ options: ['16:9', '9:16', '1:1'] }),
+    hideWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
+  }),
+  RUNNINGHUB_KLING_O3_DURATION_FIELD = Object.freeze({
+    ...createFooterDurationField({ defaultValue: 5, min: 3, max: 15 }),
+    hideWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
+  }),
+  RUNNINGHUB_KLING_O3_AUDIO_FIELD = Object.freeze({
+    ...KLING_V3_AUDIO_FIELD,
+    hideWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
+  }),
+  RUNNINGHUB_KLING_O3_KEEP_ORIGINAL_SOUND_FIELD = Object.freeze({
+    ...KLING_O1_KEEP_ORIGINAL_SOUND_FIELD,
+    showWhen: Object.freeze({ field: 'kling_v3_omni_mode', values: Object.freeze(['reference', 'edit']) }),
+  }),
+  RUNNINGHUB_KLING_O3_SHOT_TYPE_FIELD = Object.freeze({
+    id: 'shotType',
+    type: 'segmented',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '镜头类型',
+    defaultValue: 'customize',
+    options: Object.freeze([
+      Object.freeze({ value: 'customize', label: '自定义' }),
+      Object.freeze({ value: 'intelligence', label: '智能' }),
+    ]),
+    hideWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
+  }),
+  RUNNINGHUB_KLING_O3_FRAME_HELP_TOOLTIP = [
+    'RunningHub Kling O3 视频生成',
+    '[[red:不接图]]：走文生视频接口。',
+    '[[red:接 1 张首帧]]：走图生视频接口。',
+    '[[red:接首帧 + 尾帧]]：std/pro 走首尾帧图生视频；4K 文档只公开首帧字段，暂只使用首帧。',
+    '标准版 / 专业版 / 4K 可在模型选择里切换。',
+  ].join('\n'),
+  RUNNINGHUB_KLING_O3_REFERENCE_HELP_TOOLTIP = [
+    'RunningHub Kling O3 参考生视频',
+    '[[red:接 1-7 张参考图]]：用于保持主体、风格或场景一致。',
+    '[[red:可选参考视频]]：有参考视频时最多使用 4 张参考图。',
+    '[[red:保留原声]]：开启后提交 keepOriginalSound。',
+  ].join('\n'),
+  RUNNINGHUB_KLING_O3_EDIT_HELP_TOOLTIP = [
+    'RunningHub Kling O3 视频编辑',
+    '[[red:接 1 个原视频]]：基于原视频按提示词编辑画面。',
+    '[[red:可选参考图]]：用于补充目标风格、主体或局部参考。',
+    '[[red:4K 不支持编辑]]：请选择标准版或专业版。',
+  ].join('\n'),
+  RUNNINGHUB_KLING_O3_HELP_TOOLTIP = RUNNINGHUB_KLING_O3_FRAME_HELP_TOOLTIP,
+  RUNNINGHUB_KLING_O3_FRAME_PROMPT_PLACEHOLDER =
+    '不接素材时描述文生视频；接首帧/尾帧时可用 @图片1 / @图片2 指代。例如：让 @图片1 中的人物向镜头挥手，随后过渡到 @图片2 的街景。',
+  RUNNINGHUB_KLING_O3_REFERENCE_PROMPT_PLACEHOLDER =
+    '描述参考图或参考视频要生成的新画面。例如：参考 @图片1 的角色外观和 @视频1 的动作节奏，生成夜晚街道行走镜头。',
+  RUNNINGHUB_KLING_O3_EDIT_PROMPT_PLACEHOLDER =
+    '描述要对原视频做什么编辑，可接参考图补充风格。例如：将原视频改成夜晚赛博朋克街道风格，保留人物动作和镜头节奏。';
+function createRunningHubKlingO3FixedSlot({
+  id: _0x1b817b,
+  kind: _0x4dc716,
+  label: _0x290524,
+  mode: _0x4aafdd,
+  description: _0x5d5ed1,
+  displayOrder: _0x53c213,
+  hideWhen: hideWhen = null,
+}) {
+  return Object.freeze({
+    id: _0x1b817b,
+    kind: _0x4dc716,
+    label: _0x290524,
+    description: _0x5d5ed1,
+    displayOrder: _0x53c213,
+    showWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: _0x4aafdd }),
+    ...(hideWhen ? { hideWhen: Object.freeze(hideWhen) } : {}),
+  });
+}
+const RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS = Object.freeze([
+    createRunningHubKlingO3FixedSlot({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      mode: 'image',
+      displayOrder: 10,
+      description: '图生视频使用的起始图片',
+    }),
+    createRunningHubKlingO3FixedSlot({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧',
+      mode: 'image',
+      displayOrder: 20,
+      description: '可选，std/pro 首尾帧使用的结束图片',
+      hideWhen: { field: 'resolution', value: '4k' },
+    }),
+    createRunningHubKlingO3FixedSlot({
+      id: 'referenceVideo',
+      kind: 'video',
+      label: '参考视频',
+      mode: 'reference',
+      displayOrder: 30,
+      description: '参考生视频可选，作为动作或镜头特征参考',
+    }),
+    createRunningHubKlingO3FixedSlot({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'reference',
+      displayOrder: 40,
+      description: '参考生视频使用，支持 1-7 张参考图',
+    }),
+    createRunningHubKlingO3FixedSlot({
+      id: 'editVideo',
+      kind: 'video',
+      label: '原视频',
+      mode: 'edit',
+      displayOrder: 50,
+      description: '视频编辑必填，作为待编辑原视频',
+    }),
+    createRunningHubKlingO3FixedSlot({
+      id: 'editRefImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'edit',
+      displayOrder: 60,
+      description: '视频编辑可选，用于补充风格或主体参考',
+    }),
+  ]),
+  RUNNINGHUB_KLING_V3_PROMPT_PLACEHOLDER =
+    '不接素材时描述文生视频；接首帧或首尾帧时描述动作、运镜和过渡。4K 图生当前只使用首帧。',
+  RUNNINGHUB_KLING_V3_HELP_TOOLTIP = [
+    'RunningHub Kling V3.0',
+    '[[red:不接图]]：走文生视频接口。',
+    '[[red:接 1 张首帧]]：走图生视频接口。',
+    '[[red:接首帧 + 尾帧]]：std/pro 走首尾帧图生视频；4K 文档只公开 imageUrl，暂只使用首帧。',
+    '版本选择对应 RunningHub 的 std / pro / 4K endpoint。',
+  ].join('\n'),
+  RUNNINGHUB_KLING_V3_MODEL_FIELD = Object.freeze({
+    ...KLING_V3_MODE_FIELD,
+    label: '模型选择',
+    description: 'std=720P，pro=1080P，4K=Kling V3.0 4K。',
+  }),
+  RUNNINGHUB_KLING_V3_RATIO_FIELD = Object.freeze({
+    ...createAspectRatioField({ options: ['16:9', '9:16', '1:1'] }),
+  }),
+  RUNNINGHUB_KLING_V3_CFG_SCALE_FIELD = Object.freeze({
+    id: 'cfgScale',
+    type: 'slider',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: 'CFG 引导系数',
+    description: 'RunningHub Kling V3.0 支持 0-1，默认 0.5。',
+    defaultValue: 0.5,
+    min: 0,
+    max: 1,
+    step: 0.1,
+  }),
+  RUNNINGHUB_KLING_V3_SHOT_TYPE_FIELD = Object.freeze({
+    id: 'shotType',
+    type: 'segmented',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '镜头类型',
+    defaultValue: 'customize',
+    options: Object.freeze([
+      Object.freeze({ value: 'customize', label: '自定义' }),
+      Object.freeze({ value: 'intelligence', label: '智能' }),
+    ]),
+  }),
+  RUNNINGHUB_KLING_V3_FIXED_INPUT_SLOTS = Object.freeze([
+    Object.freeze({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      description: '图生视频使用的起始图片。',
+      displayOrder: 10,
+    }),
+    Object.freeze({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧',
+      description: 'std/pro 可选，4K 当前文档未公开尾帧字段。',
+      displayOrder: 20,
+      hideWhen: Object.freeze({ field: 'resolution', value: '4k' }),
+    }),
+  ]),
+  WAN27_MODE_FIELD = Object.freeze({
+    id: 'wan27_mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模式选择',
+    description: WAN27_HELP_TOOLTIP,
+    defaultValue: 'image',
+    options: Object.freeze([
+      Object.freeze({ value: 'image', label: '图生视频' }),
+      Object.freeze({ value: 'video', label: '视频续写' }),
+      Object.freeze({ value: 'reference', label: '参考生视频' }),
+      Object.freeze({ value: 'edit', label: '视频编辑' }),
+    ]),
+  }),
+  WAN27_PROMPT_EXTEND_FIELD = Object.freeze({ ...VIDEO_PROMPT_EXTEND_FIELD, label: 'prompt 智能改写' }),
+  WAN27_NEGATIVE_PROMPT_FIELD = Object.freeze({
+    ...VIDEO_NEGATIVE_PROMPT_FIELD,
+    label: '反向提示词',
+    defaultValue: '模糊、变形、低质量',
+  }),
+  VIDU_Q3_VIDEO_PROMPT_PLACEHOLDER =
+    '不接图时描述文生视频；接 @图片1 是首帧，接 @图片1 + @图片2 是首尾帧。例如：@图片1 中的人物缓缓转身微笑，最后过渡到 @图片2 的构图。',
+  VIDU_Q3_REFERENCE_PROMPT_PLACEHOLDER =
+    '描述参考图的动作和镜头，外观由参考图决定。可用 @图片1、@图片2 指代素材。例如：@图片1 和 @图片2 中的角色在湖边相拥，镜头缓慢环绕。';
+function createWan27FixedSlot({
+  id: _0xc49347,
+  kind: _0x4d0779,
+  label: _0x1e70d8,
+  mode: _0x39d579,
+  description: _0x52006c,
+  displayOrder: _0xaf9096,
+  showWhen: _0x4a6695,
+}) {
+  const _0x5ffd38 = Array.isArray(_0x39d579)
+      ? _0x39d579.map((_0x18a6aa) => String(_0x18a6aa || '').trim()).filter(Boolean)
+      : [String(_0x39d579 || '').trim()].filter(Boolean),
+    _0x54ea21 = [];
+  _0x54ea21.push(
+    _0x5ffd38.length > 1
+      ? Object.freeze({ field: 'wan27_mode', values: Object.freeze(_0x5ffd38) })
+      : Object.freeze({ field: 'wan27_mode', value: _0x5ffd38[0] || '' }),
+  );
+  const _0x1aa3ec =
+    _0x4a6695 || (_0x54ea21.length > 1 ? Object.freeze({ all: Object.freeze(_0x54ea21) }) : _0x54ea21[0]);
+  return Object.freeze({
+    id: _0xc49347,
+    kind: _0x4d0779,
+    label: _0x1e70d8,
+    description: _0x52006c,
+    displayOrder: _0xaf9096,
+    showWhen: _0x1aa3ec,
+  });
+}
+const WAN27_FIXED_INPUT_SLOTS = Object.freeze([
+    createWan27FixedSlot({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      mode: 'image',
+      displayOrder: 10,
+      description: '图生视频使用的首帧图片',
+    }),
+    createWan27FixedSlot({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧',
+      mode: 'image',
+      displayOrder: 20,
+      description: '可选，图生视频使用的尾帧图片',
+    }),
+    createWan27FixedSlot({
+      id: 'audio',
+      kind: 'audio',
+      label: '音频',
+      mode: 'image',
+      displayOrder: 70,
+      description: '可选，2-30 秒且不超过 15MB',
+    }),
+    createWan27FixedSlot({
+      id: 'sourceVideo',
+      kind: 'video',
+      label: '续写视频',
+      mode: 'video',
+      displayOrder: 30,
+      description: '视频续写使用，不能超过 10 秒',
+    }),
+    createWan27FixedSlot({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'reference',
+      displayOrder: 40,
+      description: '参考生视频使用的参考图片',
+    }),
+    createWan27FixedSlot({
+      id: 'referenceVideo',
+      kind: 'video',
+      label: '参考视频',
+      mode: Object.freeze(['reference', 'edit']),
+      displayOrder: 60,
+      description: '参考生视频使用的参考视频',
+    }),
+    createWan27FixedSlot({
+      id: 'originalVideo',
+      kind: 'video',
+      label: '原视频',
+      mode: 'edit',
+      displayOrder: 50,
+      description: '视频编辑使用的原视频，需为 2-10 秒',
+    }),
+    createWan27FixedSlot({
+      id: 'referenceAudio',
+      kind: 'audio',
+      label: '音频',
+      mode: 'reference',
+      displayOrder: 70,
+      description: '可选，参考生视频使用的音色音频，2-30 秒且不超过 15MB',
+    }),
+  ]),
+  RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS = Object.freeze([
+    createWan27FixedSlot({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      mode: 'image',
+      displayOrder: 10,
+      description: '图生视频使用的首帧图片',
+    }),
+    createWan27FixedSlot({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧',
+      mode: 'image',
+      displayOrder: 20,
+      description: '可选，图生视频使用的尾帧图片',
+    }),
+    createWan27FixedSlot({
+      id: 'audio',
+      kind: 'audio',
+      label: '音频',
+      mode: Object.freeze(['image', 'video']),
+      displayOrder: 70,
+      description: '可选，文生、图生或视频续写使用的音频',
+    }),
+    createWan27FixedSlot({
+      id: 'sourceVideo',
+      kind: 'video',
+      label: '续写视频',
+      mode: 'video',
+      displayOrder: 30,
+      description: '视频续写使用，不能超过 10 秒',
+    }),
+    createWan27FixedSlot({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'reference',
+      displayOrder: 40,
+      description: '参考生视频使用的参考图片',
+    }),
+    createWan27FixedSlot({
+      id: 'referenceVideo',
+      kind: 'video',
+      label: '参考视频',
+      mode: 'reference',
+      displayOrder: 50,
+      description: '参考生视频使用的参考视频',
+    }),
+    createWan27FixedSlot({
+      id: 'originalVideo',
+      kind: 'video',
+      label: '原视频',
+      mode: 'edit',
+      displayOrder: 50,
+      description: '视频编辑使用的原视频，需为 2-10 秒',
+    }),
+    createWan27FixedSlot({
+      id: 'editRefImage',
+      kind: 'image',
+      label: '参考图',
+      mode: 'edit',
+      displayOrder: 60,
+      description: '视频编辑可选参考图，最多 3 张',
+    }),
+  ]);
+function freezeOption(_0x5bcd1f) {
+  if (_0x5bcd1f && typeof _0x5bcd1f === 'object' && !Array.isArray(_0x5bcd1f))
+    return Object.freeze({ ..._0x5bcd1f });
+  return Object.freeze({ value: _0x5bcd1f, label: String(_0x5bcd1f) });
+}
+function isAdaptiveRatioOptionValue(_0x363729) {
+  const _0x39a04f = String(_0x363729 ?? '').trim(),
+    _0x30d7b9 = _0x39a04f.toLowerCase();
+  return (
+    _0x39a04f === APIMART_VIDEO_ADAPTIVE_RATIO_VALUE ||
+    _0x30d7b9 === 'auto' ||
+    _0x30d7b9 === 'adaptive' ||
+    _0x30d7b9 === 'default'
+  );
+}
+function withAdaptiveRatioOption(_0xff2bcb = []) {
+  const _0x33bbf4 = Array.isArray(_0xff2bcb) ? _0xff2bcb : [],
+    _0x2bfe4a = _0x33bbf4.some((_0x4b066a) => isAdaptiveRatioOptionValue(_0x4b066a?.value ?? _0x4b066a));
+  return _0x2bfe4a ? _0x33bbf4 : [APIMART_VIDEO_ADAPTIVE_RATIO_OPTION, ..._0x33bbf4];
+}
+function createSegmentedField({
+  id: _0x5efdef,
+  label: _0x111a06,
+  defaultValue: _0x4e3d0a,
+  options: _0x482a82,
+  placement: placement = 'mode',
+  variant: variant = 'pillMenu',
+}) {
+  return Object.freeze({
+    id: _0x5efdef,
+    type: 'segmented',
+    placement: placement,
+    variant: variant,
+    label: _0x111a06,
+    defaultValue: _0x4e3d0a,
+    options: Object.freeze(_0x482a82.map(freezeOption)),
+  });
+}
+function createDurationField({
+  defaultValue: defaultValue = 5,
+  min: min = 4,
+  max: max = 15,
+  label: label = VIDEO_DURATION_FIELD.label,
+} = {}) {
+  return Object.freeze({
+    ...VIDEO_DURATION_FIELD,
+    label: label,
+    defaultValue: defaultValue,
+    min: min,
+    max: max,
+  });
+}
+function createDurationSliderOptionsField({
+  values: _0x1b9bd5,
+  defaultValue: defaultValue = _0x1b9bd5?.[0],
+  label: label = VIDEO_DURATION_FIELD.label,
+  optionOverridesByValue: optionOverridesByValue = null,
+} = {}) {
+  const _0x3a9316 = (Array.isArray(_0x1b9bd5) ? _0x1b9bd5 : [])
+      .map((_0x5307c4) => Number(_0x5307c4))
+      .filter(Number.isFinite),
+    _0x196930 = _0x3a9316[0] ?? Number(defaultValue) ?? 1,
+    _0x174bb4 = _0x3a9316[_0x3a9316.length - 1] ?? _0x196930;
+  return Object.freeze({
+    ...VIDEO_DURATION_FIELD,
+    label: label,
+    defaultValue: defaultValue,
+    min: _0x196930,
+    max: _0x174bb4,
+    step: 1,
+    options: Object.freeze(
+      _0x3a9316.map((_0x1d4672) =>
+        Object.freeze({
+          value: _0x1d4672,
+          label: _0x1d4672 + 's',
+          displayLabel: _0x1d4672 + 'S',
+          ...(optionOverridesByValue?.[_0x1d4672] || {}),
+        }),
+      ),
+    ),
+  });
+}
+function createDurationOptionsField(_0x2a20e6, _0x28dac6 = _0x2a20e6[0]) {
+  return createSegmentedField({
+    id: 'duration',
+    label: VIDEO_DURATION_FIELD.label,
+    defaultValue: _0x28dac6,
+    options: _0x2a20e6.map((_0x292649) => ({
+      value: _0x292649,
+      label: _0x292649 + 's',
+      displayLabel: _0x292649 + 'S',
+    })),
+  });
+}
+function withResolutionPlacement(_0x2e985f) {
+  return Object.freeze({ ..._0x2e985f, placement: 'resolution' });
+}
+function createFooterDurationField(_0x2b2e7c = {}) {
+  return withResolutionPlacement(createDurationField(_0x2b2e7c));
+}
+function createFooterDurationSliderOptionsField(_0x795d18 = {}) {
+  return withResolutionPlacement(createDurationSliderOptionsField(_0x795d18));
+}
+function createResolutionField({
+  label: label = VIDEO_RESOLUTION_FIELD.label,
+  defaultValue: defaultValue = '720P',
+  options: options = ['720P', '1080P'],
+} = {}) {
+  return Object.freeze({
+    ...VIDEO_RESOLUTION_FIELD,
+    label: label,
+    defaultValue: defaultValue,
+    options: Object.freeze(options.map(freezeOption)),
+  });
+}
+function createAspectRatioField({
+  label: label = VIDEO_RATIO_FIELD.label,
+  defaultValue: defaultValue = APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+  options: options = ['16:9', '9:16', '1:1', '4:3', '3:4'],
+} = {}) {
+  return Object.freeze({
+    ...VIDEO_RATIO_FIELD,
+    label: label,
+    defaultValue: defaultValue,
+    options: Object.freeze(withAdaptiveRatioOption(options).map(freezeOption)),
+  });
+}
+function createVideoMenuExtension(_0x37d9cc, _0x1ae2ea = '') {
+  return Object.freeze({
+    videoMenu: Object.freeze({ role: 'apimartModel', order: _0x37d9cc, subtitle: _0x1ae2ea }),
+  });
+}
+function createVideoInputSlots({
+  image: image = 9,
+  video: video = 3,
+  audio: audio = 3,
+  minImage: minImage = 0,
+  fixedSlots: fixedSlots = null,
+  exclusiveGroups: exclusiveGroups = null,
+  cycleFixedInputWhenFull: cycleFixedInputWhenFull = false,
+} = {}) {
+  const _0x36046d = ['text'],
+    _0x3b5a6b = {};
+  image > 0 && (_0x36046d.push('image'), (_0x3b5a6b.image = image));
+  video > 0 && (_0x36046d.push('video'), (_0x3b5a6b.video = video));
+  audio > 0 && (_0x36046d.push('audio'), (_0x3b5a6b.audio = audio));
+  const _0x4f0518 = {
+    allowedKinds: Object.freeze(_0x36046d),
+    minByKind: Object.freeze({ text: 0, ...(minImage > 0 ? { image: minImage } : {}) }),
+    maxByKind: Object.freeze(_0x3b5a6b),
+  };
+  return (
+    Array.isArray(fixedSlots) &&
+      fixedSlots.length > 0 &&
+      (_0x4f0518.fixedSlots = Object.freeze(fixedSlots.map((_0x44995b) => Object.freeze({ ..._0x44995b })))),
+    Array.isArray(exclusiveGroups) &&
+      exclusiveGroups.length > 0 &&
+      (_0x4f0518.exclusiveGroups = Object.freeze(
+        exclusiveGroups.map((_0xdd9462) =>
+          Object.freeze({
+            ..._0xdd9462,
+            slots: Object.freeze(
+              (Array.isArray(_0xdd9462?.slots) ? _0xdd9462.slots : [])
+                .map((_0x37088d) => String(_0x37088d || '').trim())
+                .filter(Boolean),
+            ),
+          }),
+        ),
+      )),
+    cycleFixedInputWhenFull === true && (_0x4f0518.cycleFixedInputWhenFull = true),
+    Object.freeze(_0x4f0518)
+  );
+}
+const VIDEO_SIZE_RATIO_POLICY = Object.freeze({ capability: 'size' }),
+  SEEDANCE_VIDEO_RATIO_POLICY = Object.freeze({
+    capability: 'size',
+    ratios: Object.freeze(['1:1', '3:4', '16:9', '4:3', '9:16', '21:9']),
+  }),
+  VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY = Object.freeze({
+    ...SEEDANCE_VIDEO_RATIO_POLICY,
+    preserveAdaptive: true,
+  });
+function freezeBodyMapping(_0x4b2d72) {
+  return Object.freeze(
+    _0x4b2d72.map((_0x52df84) =>
+      Object.freeze({
+        ..._0x52df84,
+        ...(Array.isArray(_0x52df84.field) ? { field: Object.freeze(_0x52df84.field) } : {}),
+      }),
+    ),
+  );
+}
+const APIMART_VIDEO_BASE_BODY_MAPPING = Object.freeze([
+  Object.freeze({ path: 'model', from: 'model' }),
+  Object.freeze({ path: 'prompt', from: 'prompt' }),
+]);
+function createApimartVideoBodyMapping(_0x5384f2 = []) {
+  return freezeBodyMapping([...APIMART_VIDEO_BASE_BODY_MAPPING, ..._0x5384f2]);
+}
+const APIMART_VIDEO_LEGACY_BODY_MAPPING = Object.freeze([
+    Object.freeze({ path: 'model', from: 'model' }),
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'size',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio', 'size']),
+      defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+      transform: 'apimartVideoRatio',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({ path: 'quality', from: 'param', field: 'videoSize', defaultValue: 'standard' }),
+    Object.freeze({ path: 'duration', from: 'param', field: 'duration', omitWhenEmpty: true }),
+    Object.freeze({ path: 'resolution', from: 'param', field: 'resolution', omitWhenEmpty: true }),
+    Object.freeze({ path: 'image_urls', from: 'inputImages', omitWhenEmpty: true }),
+    Object.freeze({ path: 'video_url', from: 'inputVideos', transform: 'first', omitWhenEmpty: true }),
+  ]),
+  APIMART_VIDEO_ASPECT_RATIO_ENTRY = Object.freeze({
+    path: 'aspect_ratio',
+    from: 'param',
+    field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio', 'aspect_ratio']),
+    defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+    transform: 'apimartVideoRatio',
+    omitWhenEmpty: true,
+  }),
+  APIMART_VIDEO_SIZE_ENTRY = Object.freeze({
+    path: 'size',
+    from: 'param',
+    field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio', 'size']),
+    defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+    transform: 'apimartVideoRatio',
+    omitWhenEmpty: true,
+  }),
+  APIMART_VIDEO_DURATION_ENTRY = Object.freeze({
+    path: 'duration',
+    from: 'param',
+    field: Object.freeze(['generationParams.duration', 'duration']),
+    omitWhenEmpty: true,
+  }),
+  APIMART_VIDEO_RESOLUTION_UPPER_ENTRY = Object.freeze({
+    path: 'resolution',
+    from: 'param',
+    field: Object.freeze(['generationParams.resolution', 'resolution']),
+    defaultValue: '720P',
+    transform: 'apimartVideoResolutionUpper',
+  }),
+  APIMART_VIDEO_RESOLUTION_UPPER_1080_ENTRY = Object.freeze({
+    ...APIMART_VIDEO_RESOLUTION_UPPER_ENTRY,
+    defaultValue: '1080P',
+  }),
+  APIMART_VIDEO_RESOLUTION_LOWER_ENTRY = Object.freeze({
+    path: 'resolution',
+    from: 'param',
+    field: Object.freeze(['generationParams.resolution', 'resolution']),
+    defaultValue: '720p',
+    transform: 'apimartVideoResolutionLower',
+  }),
+  APIMART_VIDEO_RESOLUTION_VEO3_ENTRY = Object.freeze({
+    path: 'resolution',
+    from: 'param',
+    field: Object.freeze(['generationParams.resolution', 'resolution']),
+    defaultValue: '720p',
+    transform: 'apimartVeo3VideoResolution',
+  }),
+  APIMART_VIDEO_RESOLUTION_4K_ENTRY = Object.freeze({ ...APIMART_VIDEO_RESOLUTION_VEO3_ENTRY }),
+  APIMART_VIDEO_RESOLUTION_VIDU_ENTRY = Object.freeze({
+    path: 'resolution',
+    from: 'param',
+    field: Object.freeze(['generationParams.resolution', 'resolution']),
+    defaultValue: '720p',
+    transform: 'apimartViduVideoResolution',
+  }),
+  APIMART_VIDEO_IMAGE_URLS_ENTRY = Object.freeze({
+    path: 'image_urls',
+    from: 'inputImages',
+    omitWhenEmpty: true,
+  }),
+  APIMART_VIDEO_VEO3_IMAGE_URLS_ENTRY = Object.freeze({
+    path: 'image_urls',
+    from: 'inputImages',
+    omitWhenEmpty: true,
+  }),
+  APIMART_VIDEO_AUDIO_URL_ENTRY = Object.freeze({
+    path: 'audio_url',
+    from: 'inputAudios',
+    transform: 'first',
+    omitWhenEmpty: true,
+  }),
+  APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY = Object.freeze({
+    path: 'negative_prompt',
+    from: 'param',
+    field: Object.freeze(['generationParams.negative_prompt', 'negative_prompt']),
+    transform: 'apimartOptionalText',
+    omitWhenEmpty: true,
+  }),
+  APIMART_VIDEO_SEED_ENTRY = Object.freeze({
+    path: 'seed',
+    from: 'param',
+    field: Object.freeze(['generationParams.seed', 'seed']),
+    transform: 'apimartOptionalInteger',
+    omitWhenEmpty: true,
+  }),
+  APIMART_VIDEO_AUDIO_ENTRY = Object.freeze({
+    path: 'audio',
+    from: 'param',
+    field: Object.freeze(['generationParams.audio', 'audio']),
+    defaultValue: false,
+    transform: 'booleanParam',
+  }),
+  APIMART_VIDEO_KEEP_ORIGINAL_SOUND_ENTRY = Object.freeze({
+    path: 'keep_original_sound',
+    from: 'param',
+    field: Object.freeze(['generationParams.keep_original_sound', 'keep_original_sound']),
+    defaultValue: false,
+    transform: 'booleanParam',
+  }),
+  APIMART_VIDEO_AUDIO_TRUE_ENTRY = Object.freeze({ ...APIMART_VIDEO_AUDIO_ENTRY, defaultValue: true }),
+  APIMART_VIDEO_WATERMARK_ENTRY = Object.freeze({
+    path: 'watermark',
+    from: 'param',
+    field: Object.freeze(['generationParams.watermark', 'watermark']),
+    defaultValue: false,
+    transform: 'booleanParam',
+  }),
+  APIMART_VIDEO_PROMPT_EXTEND_ENTRY = Object.freeze({
+    path: 'prompt_extend',
+    from: 'param',
+    field: Object.freeze(['generationParams.prompt_extend', 'prompt_extend']),
+    defaultValue: true,
+    transform: 'booleanParam',
+  }),
+  APIMART_VIDEO_ENABLE_GIF_ENTRY = Object.freeze({
+    path: 'enable_gif',
+    from: 'param',
+    field: Object.freeze(['generationParams.enable_gif', 'enable_gif']),
+    defaultValue: false,
+    transform: 'booleanParam',
+  }),
+  APIMART_VIDEO_PROMPT_OPTIMIZER_ENTRY = Object.freeze({
+    path: 'prompt_optimizer',
+    from: 'param',
+    field: Object.freeze(['generationParams.prompt_optimizer', 'prompt_optimizer']),
+    defaultValue: true,
+    transform: 'booleanParam',
+  }),
+  APIMART_VIDEO_FAST_PRETREATMENT_ENTRY = Object.freeze({
+    path: 'fast_pretreatment',
+    from: 'param',
+    field: Object.freeze(['generationParams.fast_pretreatment', 'fast_pretreatment']),
+    defaultValue: false,
+    transform: 'booleanParam',
+  }),
+  APIMART_VIDEO_GENERATION_TYPE_ENTRY = Object.freeze({
+    path: 'generation_type',
+    from: 'param',
+    field: Object.freeze(['generationParams.generation_type', 'generation_type']),
+    defaultValue: 'frame',
+    omitWhenEmpty: true,
+  }),
+  APIMART_VIDEO_SHOT_TYPE_ENTRY = Object.freeze({
+    path: 'shot_type',
+    from: 'param',
+    field: Object.freeze(['generationParams.shot_type', 'shot_type']),
+    defaultValue: 'single',
+  }),
+  APIMART_VIDEO_VEO3_BODY_MAPPING = createApimartVideoBodyMapping([
+    APIMART_VIDEO_ASPECT_RATIO_ENTRY,
+    APIMART_VIDEO_GENERATION_TYPE_ENTRY,
+    APIMART_VIDEO_DURATION_ENTRY,
+    APIMART_VIDEO_RESOLUTION_VEO3_ENTRY,
+    APIMART_VIDEO_VEO3_IMAGE_URLS_ENTRY,
+    APIMART_VIDEO_ENABLE_GIF_ENTRY,
+  ]),
+  APIMART_VIDEO_HAILUO_02_BODY_MAPPING = createApimartVideoBodyMapping([
+    Object.freeze({
+      path: 'resolution',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: '768p',
+      transform: 'apimartHailuoVideoResolution',
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+      transform: 'apimartHailuoVideoDuration',
+    }),
+    Object.freeze({
+      path: 'first_frame_image',
+      from: 'inputImages',
+      transform: 'first',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'last_frame_image',
+      from: 'inputImages',
+      transform: 'second',
+      omitWhenEmpty: true,
+    }),
+    APIMART_VIDEO_PROMPT_OPTIMIZER_ENTRY,
+    APIMART_VIDEO_FAST_PRETREATMENT_ENTRY,
+    APIMART_VIDEO_WATERMARK_ENTRY,
+  ]),
+  APIMART_VIDEO_HAILUO_23_BODY_MAPPING = createApimartVideoBodyMapping([
+    Object.freeze({
+      path: 'resolution',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: '768p',
+      transform: 'apimartHailuo23VideoResolution',
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 6,
+      transform: 'apimartHailuo23VideoDuration',
+    }),
+    Object.freeze({
+      path: 'first_frame_image',
+      from: 'inputImages',
+      transform: 'first',
+      omitWhenEmpty: true,
+    }),
+    APIMART_VIDEO_PROMPT_OPTIMIZER_ENTRY,
+    APIMART_VIDEO_FAST_PRETREATMENT_ENTRY,
+    APIMART_VIDEO_WATERMARK_ENTRY,
+  ]),
+  APIMART_VIDEO_HAPPYHORSE_BODY_MAPPING = createApimartVideoBodyMapping([
+    APIMART_VIDEO_SIZE_ENTRY,
+    APIMART_VIDEO_DURATION_ENTRY,
+    APIMART_VIDEO_RESOLUTION_UPPER_1080_ENTRY,
+    APIMART_VIDEO_WATERMARK_ENTRY,
+    APIMART_VIDEO_SEED_ENTRY,
+  ]),
+  RUNNINGHUB_VIDEO_HAPPYHORSE_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'happyhorse_mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.happyhorse_mode', 'happyhorse_mode']),
+      defaultValue: 'auto',
+    }),
+    Object.freeze({
+      path: 'resolution',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: '1080P',
+      transform: 'runninghubHappyHorseResolution',
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+      transform: 'runninghubHappyHorseDuration',
+    }),
+    Object.freeze({
+      path: 'aspectRatio',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio']),
+      defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+      transform: 'runninghubHappyHorseAspectRatio',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'audioSetting',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.audio_setting',
+        'generationParams.audioSetting',
+        'audio_setting',
+        'audioSetting',
+      ]),
+      defaultValue: 'auto',
+      transform: 'runninghubHappyHorseAudioSetting',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'seed',
+      from: 'param',
+      field: Object.freeze(['generationParams.seed', 'seed']),
+      transform: 'apimartOptionalInteger',
+      omitWhenEmpty: true,
+    }),
+  ]),
+  RUNNINGHUB_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'rh_seedance_2_model',
+      from: 'param',
+      field: Object.freeze(['generationParams.rh_seedance_2_model', 'rh_seedance_2_model']),
+      defaultValue: 'fast',
+    }),
+    Object.freeze({
+      path: 'rh_seedance_2_mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.rh_seedance_2_mode', 'rh_seedance_2_mode']),
+      defaultValue: 'text2video',
+    }),
+    Object.freeze({
+      path: 'resolution',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: '720p',
+      transform: 'runninghubSeedance2Resolution',
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+      transform: 'runninghubSeedance2Duration',
+    }),
+    Object.freeze({
+      path: 'ratio',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio', 'ratio']),
+      defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+      transform: 'runninghubSeedance2Ratio',
+    }),
+    Object.freeze({
+      path: 'generateAudio',
+      from: 'param',
+      field: Object.freeze(['generationParams.generateAudio', 'generateAudio']),
+      defaultValue: true,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({
+      path: 'webSearch',
+      from: 'param',
+      field: Object.freeze(['generationParams.webSearch', 'webSearch']),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({
+      path: 'realPersonMode',
+      from: 'param',
+      field: Object.freeze(['generationParams.realPersonMode', 'realPersonMode']),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({ path: 'conversionSlots', from: 'constant', value: Object.freeze(['all']) }),
+    Object.freeze({
+      path: 'returnLastFrame',
+      from: 'param',
+      field: Object.freeze(['generationParams.returnLastFrame', 'returnLastFrame']),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({
+      path: 'seed',
+      from: 'param',
+      field: Object.freeze(['generationParams.seed', 'seed']),
+      transform: 'apimartOptionalInteger',
+      omitWhenEmpty: true,
+    }),
+  ]),
+  APIMART_VIDEO_WAN27_BODY_MAPPING = createApimartVideoBodyMapping([
+    APIMART_VIDEO_SIZE_ENTRY,
+    APIMART_VIDEO_DURATION_ENTRY,
+    APIMART_VIDEO_RESOLUTION_UPPER_1080_ENTRY,
+    APIMART_VIDEO_IMAGE_URLS_ENTRY,
+    APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY,
+    Object.freeze({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: true }),
+    APIMART_VIDEO_AUDIO_URL_ENTRY,
+    APIMART_VIDEO_PROMPT_EXTEND_ENTRY,
+    APIMART_VIDEO_WATERMARK_ENTRY,
+    APIMART_VIDEO_SEED_ENTRY,
+  ]),
+  APIMART_VIDEO_KLING_4K_BODY_MAPPING = createApimartVideoBodyMapping([
+    Object.freeze({
+      path: 'mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.mode', 'mode']),
+      defaultValue: 'std',
+      transform: 'apimartKlingVideoMode4k',
+    }),
+    APIMART_VIDEO_DURATION_ENTRY,
+    APIMART_VIDEO_ASPECT_RATIO_ENTRY,
+    APIMART_VIDEO_IMAGE_URLS_ENTRY,
+    APIMART_VIDEO_AUDIO_ENTRY,
+    APIMART_VIDEO_WATERMARK_ENTRY,
+    APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY,
+  ]),
+  APIMART_VIDEO_KLING_V3_BODY_MAPPING = createApimartVideoBodyMapping([
+    Object.freeze({
+      path: 'mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: 'std',
+      transform: 'apimartKlingVideoMode4k',
+    }),
+    APIMART_VIDEO_DURATION_ENTRY,
+    APIMART_VIDEO_ASPECT_RATIO_ENTRY,
+    APIMART_VIDEO_IMAGE_URLS_ENTRY,
+    APIMART_VIDEO_AUDIO_ENTRY,
+    APIMART_VIDEO_WATERMARK_ENTRY,
+    APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY,
+  ]),
+  APIMART_VIDEO_KLING_O1_BODY_MAPPING = createApimartVideoBodyMapping([
+    Object.freeze({
+      path: 'mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: 'std',
+      transform: 'apimartKlingVideoMode',
+    }),
+    APIMART_VIDEO_DURATION_ENTRY,
+    APIMART_VIDEO_ASPECT_RATIO_ENTRY,
+    APIMART_VIDEO_IMAGE_URLS_ENTRY,
+    APIMART_VIDEO_KEEP_ORIGINAL_SOUND_ENTRY,
+  ]),
+  RUNNINGHUB_VIDEO_KLING_O1_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'rh_kling_o1_generation_mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.rh_kling_o1_generation_mode', 'rh_kling_o1_generation_mode']),
+      defaultValue: 'frame',
+    }),
+    Object.freeze({
+      path: 'mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: 'std',
+      transform: 'runninghubKlingVideoMode',
+    }),
+    Object.freeze({
+      path: 'aspectRatio',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio']),
+      defaultValue: '9:16',
+      transform: 'runninghubKlingO1AspectRatio',
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+      transform: 'runninghubKlingO1Duration',
+    }),
+    Object.freeze({
+      path: 'keepOriginalSound',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.keepOriginalSound',
+        'generationParams.keep_original_sound',
+        'keepOriginalSound',
+        'keep_original_sound',
+      ]),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+  ]),
+  RUNNINGHUB_VIDEO_KLING_O3_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'kling_v3_omni_mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.kling_v3_omni_mode', 'kling_v3_omni_mode']),
+      defaultValue: 'image',
+    }),
+    Object.freeze({
+      path: 'rh_kling_o3_model',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: 'std',
+      transform: 'runninghubKlingO3Model',
+    }),
+    Object.freeze({
+      path: 'aspectRatio',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio']),
+      defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+      transform: 'runninghubKlingO3AspectRatio',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+      transform: 'runninghubKlingO3Duration',
+    }),
+    Object.freeze({
+      path: 'sound',
+      from: 'param',
+      field: Object.freeze(['generationParams.audio', 'generationParams.sound', 'audio', 'sound']),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({
+      path: 'keepOriginalSound',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.keepOriginalSound',
+        'generationParams.keep_original_sound',
+        'keepOriginalSound',
+        'keep_original_sound',
+      ]),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({
+      path: 'multiShot',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.multiShot',
+        'generationParams.multi_shot',
+        'multiShot',
+        'multi_shot',
+      ]),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({
+      path: 'shotType',
+      from: 'param',
+      field: Object.freeze(['generationParams.shotType', 'shotType']),
+      defaultValue: 'customize',
+      transform: 'runninghubKlingO3ShotType',
+    }),
+  ]),
+  RUNNINGHUB_VIDEO_KLING_V3_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'rh_kling_v3_model',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: 'std',
+      transform: 'runninghubKlingV3Model',
+    }),
+    Object.freeze({
+      path: 'aspectRatio',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio']),
+      defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+      transform: 'runninghubKlingV3AspectRatio',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+      transform: 'runninghubKlingV3Duration',
+    }),
+    Object.freeze({
+      path: 'cfgScale',
+      from: 'param',
+      field: Object.freeze(['generationParams.cfgScale', 'cfgScale']),
+      defaultValue: 0.5,
+      transform: 'runninghubKlingV3CfgScale',
+    }),
+    Object.freeze({
+      path: 'sound',
+      from: 'param',
+      field: Object.freeze(['generationParams.audio', 'generationParams.sound', 'audio', 'sound']),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({
+      path: 'multiShot',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.multiShot',
+        'generationParams.multi_shot',
+        'multiShot',
+        'multi_shot',
+      ]),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({
+      path: 'shotType',
+      from: 'param',
+      field: Object.freeze(['generationParams.shotType', 'shotType']),
+      defaultValue: 'customize',
+      transform: 'runninghubKlingV3ShotType',
+    }),
+    Object.freeze({
+      path: 'negativePrompt',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.negative_prompt',
+        'generationParams.negativePrompt',
+        'negative_prompt',
+        'negativePrompt',
+      ]),
+      transform: 'apimartOptionalText',
+      omitWhenEmpty: true,
+    }),
+  ]),
+  RUNNINGHUB_VIDEO_VEO3_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'rh_veo3_channel',
+      from: 'param',
+      field: Object.freeze(['generationParams.rh_veo3_channel', 'rh_veo3_channel']),
+      defaultValue: 'lowCost',
+    }),
+    Object.freeze({
+      path: 'mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.mode', 'mode']),
+      defaultValue: 'fast',
+    }),
+    Object.freeze({
+      path: 'generation_type',
+      from: 'param',
+      field: Object.freeze(['generationParams.generation_type', 'generation_type']),
+      defaultValue: 'frame',
+    }),
+    Object.freeze({
+      path: 'resolution',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: '720p',
+      transform: 'runninghubVeo3Resolution',
+    }),
+    Object.freeze({
+      path: 'aspectRatio',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio']),
+      defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+      transform: 'runninghubVeo3AspectRatio',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 8,
+      transform: 'runninghubVeo3Duration',
+    }),
+    Object.freeze({
+      path: 'generateAudio',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.generateAudio',
+        'generationParams.generate_audio',
+        'generateAudio',
+        'generate_audio',
+      ]),
+      defaultValue: false,
+      transform: 'booleanParam',
+    }),
+  ]),
+  RUNNINGHUB_VIDEO_WAN27_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'wan27_mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.wan27_mode', 'wan27_mode']),
+      defaultValue: 'image',
+    }),
+    Object.freeze({
+      path: 'resolution',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: '720P',
+      transform: 'runninghubWan27Resolution',
+    }),
+    Object.freeze({
+      path: 'aspectRatio',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio']),
+      defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
+      transform: 'runninghubWan27AspectRatio',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+      transform: 'runninghubWan27Duration',
+    }),
+    Object.freeze({
+      path: 'promptExtend',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.prompt_extend',
+        'generationParams.promptExtend',
+        'prompt_extend',
+        'promptExtend',
+      ]),
+      defaultValue: true,
+      transform: 'booleanParam',
+    }),
+    Object.freeze({
+      path: 'negativePrompt',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.negative_prompt',
+        'generationParams.negativePrompt',
+        'negative_prompt',
+        'negativePrompt',
+      ]),
+      transform: 'apimartOptionalText',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({ path: 'audioUrl', from: 'inputAudios', transform: 'first', omitWhenEmpty: true }),
+  ]),
+  RUNNINGHUB_VIDEO_HAILUO_02_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'rh_hailuo_02_quality',
+      from: 'param',
+      field: Object.freeze(['generationParams.rh_hailuo_02_quality', 'rh_hailuo_02_quality']),
+      defaultValue: 'standard',
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 6,
+      transform: 'runninghubHailuo02Duration',
+    }),
+    Object.freeze({
+      path: 'enablePromptExpansion',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.enablePromptExpansion',
+        'generationParams.enable_prompt_expansion',
+        'enablePromptExpansion',
+        'enable_prompt_expansion',
+      ]),
+      defaultValue: true,
+      transform: 'booleanParam',
+    }),
+  ]),
+  RUNNINGHUB_VIDEO_HAILUO_23_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'rh_hailuo_23_quality',
+      from: 'param',
+      field: Object.freeze(['generationParams.rh_hailuo_23_quality', 'rh_hailuo_23_quality']),
+      defaultValue: 'standard',
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 6,
+      transform: 'runninghubHailuo23Duration',
+    }),
+    Object.freeze({
+      path: 'enablePromptExpansion',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.enablePromptExpansion',
+        'generationParams.enable_prompt_expansion',
+        'enablePromptExpansion',
+        'enable_prompt_expansion',
+      ]),
+      defaultValue: true,
+      transform: 'booleanParam',
+    }),
+  ]),
+  APIMART_VIDEO_VIDU_BODY_MAPPING = createApimartVideoBodyMapping([
+    Object.freeze({
+      ...APIMART_VIDEO_DURATION_ENTRY,
+      defaultValue: 5,
+      transform: 'apimartViduVideoDuration',
+    }),
+    APIMART_VIDEO_RESOLUTION_VIDU_ENTRY,
+    APIMART_VIDEO_ASPECT_RATIO_ENTRY,
+    APIMART_VIDEO_IMAGE_URLS_ENTRY,
+    APIMART_VIDEO_AUDIO_TRUE_ENTRY,
+    APIMART_VIDEO_SEED_ENTRY,
+  ]),
+  APIMART_VIDEO_GROK_IMAGINE_BODY_MAPPING = createApimartVideoBodyMapping([
+    APIMART_VIDEO_SIZE_ENTRY,
+    Object.freeze({
+      ...APIMART_VIDEO_DURATION_ENTRY,
+      defaultValue: 6,
+      transform: Object.freeze({ name: 'integerRange', min: 6, max: 30, fallback: 6 }),
+    }),
+    Object.freeze({
+      path: 'quality',
+      from: 'param',
+      field: Object.freeze(['generationParams.quality', 'quality']),
+      defaultValue: '480p',
+    }),
+    APIMART_VIDEO_IMAGE_URLS_ENTRY,
+  ]),
+  APIMART_VIDEO_OMNI_FLASH_BODY_MAPPING = createApimartVideoBodyMapping([
+    Object.freeze({ ...APIMART_VIDEO_DURATION_ENTRY, defaultValue: 6 }),
+    APIMART_VIDEO_RESOLUTION_4K_ENTRY,
+    APIMART_VIDEO_ASPECT_RATIO_ENTRY,
+    Object.freeze({
+      ...APIMART_VIDEO_IMAGE_URLS_ENTRY,
+      transform: Object.freeze({
+        name: 'imageCountOptions',
+        allowedCounts: Object.freeze([1, 3]),
+        label: 'Gemini Omni Flash',
+      }),
+    }),
+    Object.freeze({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: true }),
+  ]),
+  VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
+      path: 'volcengine_seedance_2_mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.volcengine_seedance_2_mode', 'volcengine_seedance_2_mode']),
+      defaultValue: 'multimodal2video',
+    }),
+    Object.freeze({
+      path: 'resolution',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: '720p',
+    }),
+    Object.freeze({
+      path: 'ratio',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio', 'ratio']),
+      defaultValue: 'adaptive',
+    }),
+    Object.freeze({
+      path: 'duration',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+    }),
+    Object.freeze({
+      path: 'generate_audio',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.generateAudio',
+        'generationParams.generate_audio',
+        'generateAudio',
+        'generate_audio',
+      ]),
+      defaultValue: true,
+    }),
+    Object.freeze({
+      path: 'seed',
+      from: 'param',
+      field: Object.freeze(['generationParams.seed', 'seed']),
+      omitWhenEmpty: true,
+    }),
+  ]),
+  APIMART_VIDEO_RESPONSE_MAPPING = Object.freeze({
+    taskIdPath: Object.freeze(['data[].task_id', 'task_id', 'taskId']),
+    statusPath: 'status',
+    errorPath: 'error',
+    resultPaths: Object.freeze([
+      'result.videos[].url',
+      'data.result.videos[].url',
+      'results[].videoUrl',
+      'results[].url',
+      'url',
+    ]),
+  }),
+  RUNNINGHUB_VIDEO_RESPONSE_MAPPING = Object.freeze({
+    taskIdPath: Object.freeze(['taskId', 'data.taskId', 'data[].taskId']),
+    statusPath: 'status',
+    errorPath: 'errorMessage',
+    resultPaths: Object.freeze(['results[].url', 'results[].videoUrl', 'data.results[].url', 'url']),
+  }),
+  VOLCENGINE_VIDEO_RESPONSE_MAPPING = Object.freeze({
+    taskIdPath: Object.freeze(['id', 'data.id']),
+    statusPath: 'status',
+    errorPath: 'error.message',
+    resultPaths: Object.freeze([
+      'content.video_url',
+      'content.videoUrl',
+      'data.content.video_url',
+      'data.content.videoUrl',
+    ]),
+  }),
+  APIMART_VIDEO_TASK_POLLING = Object.freeze({
+    mode: 'task-proxy',
+    method: 'GET',
+    urlTemplate: '{baseUrl}/v1/tasks/{taskId}?language=zh',
+    headersMode: 'bearer',
+  }),
+  VOLCENGINE_VIDEO_TASK_POLLING = Object.freeze({
+    mode: 'task-proxy',
+    method: 'GET',
+    urlTemplate: '{baseUrl}/contents/generations/tasks/{taskId}',
+    headersMode: 'bearer',
+  }),
+  APIMART_SEEDANCE_VIDEO_RESOLVERS = Object.freeze({ bodyResolver: 'apimartSeedanceVideo' }),
+  APIMART_OMNI_FLASH_VIDEO_RESOLVERS = Object.freeze({ bodyResolver: 'apimartOmniFlashVideo' }),
+  VOLCENGINE_SEEDANCE_VIDEO_RESOLVERS = Object.freeze({ bodyResolver: 'volcengineSeedance2Video' }),
+  APIMART_SEEDANCE_2_0_VIDEO_POLICY = Object.freeze({
+    ratioField: 'size',
+    defaultResolution: '720p',
+    supportsVideoReferences: true,
+    supportsAudioReferences: true,
+    maxRoleImageCount: 2,
+    maxImageCount: 9,
+    maxVideoReferenceCount: 3,
+    maxAudioReferenceCount: 3,
+    privateAvatarAssets: Object.freeze({
+      enabled: true,
+      provider: 'apimart',
+      capability: 'seedance2PrivateAvatar',
+      models: Object.freeze(['doubao-seedance-2.0', 'doubao-seedance-2.0-fast']),
+    }),
+  }),
+  VOLCENGINE_SEEDANCE_IMAGE_INPUT_UPLOAD_POLICY = Object.freeze({
+    provider: 'freeImageHost',
+    inputKinds: Object.freeze(['image']),
+    applyInputQualityProfile: true,
+    strictUpload: true,
+  }),
+  VOLCENGINE_SEEDANCE_VIDEO_INPUT_UPLOAD_POLICY = Object.freeze({
+    provider: 'apimart',
+    inputKinds: Object.freeze(['video']),
+    strictUpload: true,
+  }),
+  VOLCENGINE_SEEDANCE_AUDIO_INPUT_UPLOAD_POLICY = Object.freeze({
+    provider: 'apimart',
+    inputKinds: Object.freeze(['audio']),
+    strictUpload: true,
+  }),
+  VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY = Object.freeze({
+    defaultRatio: 'adaptive',
+    defaultResolution: '720p',
+    maxImageCount: 9,
+    maxVideoReferenceCount: 3,
+    maxAudioReferenceCount: 3,
+    minDuration: 4,
+    maxDuration: 15,
+  }),
+  APIMART_SEEDANCE_1_5_VIDEO_POLICY = Object.freeze({
+    ratioField: 'aspect_ratio',
+    defaultResolution: '720p',
+    supportsVideoReferences: false,
+    supportsAudioReferences: false,
+    maxRoleImageCount: 2,
+    maxImageCount: 2,
+    supportsGenerateAudioParam: true,
+    supportsCameraFixedParam: true,
+  }),
+  APIMART_SEEDANCE_1_0_FAST_VIDEO_POLICY = Object.freeze({
+    ratioField: 'aspect_ratio',
+    defaultResolution: '1080p',
+    supportsVideoReferences: false,
+    supportsAudioReferences: false,
+    maxRoleImageCount: 1,
+    maxImageCount: 1,
+    roleImageLimitError: 'Seedance 1.0 Pro Fast does not support last-frame input',
+  }),
+  APIMART_SEEDANCE_1_0_QUALITY_VIDEO_POLICY = Object.freeze({
+    ratioField: 'aspect_ratio',
+    defaultResolution: '1080p',
+    supportsVideoReferences: false,
+    supportsAudioReferences: false,
+    maxRoleImageCount: 2,
+    maxImageCount: 1,
+  });
+function createSeedanceVideoExecutionExtensions(_0x4d1488) {
+  return Object.freeze({ ...APIMART_SEEDANCE_VIDEO_RESOLVERS, seedanceVideo: _0x4d1488 });
+}
+function createVolcengineSeedanceVideoExecutionExtensions(_0x1b6fd1) {
+  return Object.freeze({
+    ...VOLCENGINE_SEEDANCE_VIDEO_RESOLVERS,
+    seedanceVideo: _0x1b6fd1,
+    imageInputUpload: VOLCENGINE_SEEDANCE_IMAGE_INPUT_UPLOAD_POLICY,
+    videoInputUpload: VOLCENGINE_SEEDANCE_VIDEO_INPUT_UPLOAD_POLICY,
+    audioInputUpload: VOLCENGINE_SEEDANCE_AUDIO_INPUT_UPLOAD_POLICY,
+  });
+}
+const APIMART_SEEDANCE_DEFAULT_TASK_TYPES = Object.freeze([
+    'text2video',
+    'image2video',
+    'frames2video',
+    'multimodal2video',
+  ]),
+  APIMART_SEEDANCE_NO_FAST_FRAMES_TASK_TYPES = Object.freeze([
+    'text2video',
+    'image2video',
+    'multimodal2video',
+  ]),
+  APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK = Object.freeze({
+    text2video: Object.freeze(['480p', '720p', '1080p']),
+    image2video: Object.freeze(['480p', '720p', '1080p']),
+    frames2video: Object.freeze(['480p', '720p', '1080p']),
+    multimodal2video: Object.freeze(['480p', '720p', '1080p']),
+  }),
+  APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK = Object.freeze({
+    text2video: Object.freeze(['480p', '720p']),
+    image2video: Object.freeze(['480p', '720p']),
+    frames2video: Object.freeze(['480p', '720p']),
+    multimodal2video: Object.freeze(['480p', '720p']),
+  }),
+  APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK = Object.freeze({
+    text2video: Object.freeze({ min: 4, max: 15, step: 1 }),
+    image2video: Object.freeze({ min: 4, max: 15, step: 1 }),
+    frames2video: Object.freeze({ min: 4, max: 15, step: 1 }),
+    multimodal2video: Object.freeze({ min: 4, max: 15, step: 1 }),
+  }),
+  APIMART_SEEDANCE_1_5_DURATION_BY_TASK = Object.freeze({
+    text2video: Object.freeze({ min: 4, max: 12, step: 1 }),
+    image2video: Object.freeze({ min: 4, max: 12, step: 1 }),
+    frames2video: Object.freeze({ min: 4, max: 12, step: 1 }),
+    multimodal2video: Object.freeze({ min: 4, max: 12, step: 1 }),
+  }),
+  APIMART_SEEDANCE_1_0_DURATION_BY_TASK = Object.freeze({
+    text2video: Object.freeze({ min: 2, max: 12, step: 1 }),
+    image2video: Object.freeze({ min: 2, max: 12, step: 1 }),
+    frames2video: Object.freeze({ min: 2, max: 12, step: 1 }),
+    multimodal2video: Object.freeze({ min: 2, max: 12, step: 1 }),
+  }),
+  APIMART_SEEDANCE_RATIO_FIELD = createAspectRatioField({
+    options: ['16:9', '9:16', '1:1', '4:3', '3:4', '21:9'],
+  }),
+  APIMART_SEEDANCE_FAST_FIELDS = Object.freeze([
+    createResolutionField({ defaultValue: '720p', options: ['480p', '720p'] }),
+    APIMART_SEEDANCE_RATIO_FIELD,
+    createFooterDurationField(),
+  ]),
+  APIMART_SEEDANCE_STANDARD_FIELDS = Object.freeze([
+    createResolutionField({ defaultValue: '720p', options: ['480p', '720p', '1080p'] }),
+    APIMART_SEEDANCE_RATIO_FIELD,
+    createFooterDurationField(),
+  ]);
+function freezeFields(_0x710d7b) {
+  return Object.freeze(_0x710d7b.map((_0x120bba) => Object.freeze(_0x120bba)));
+}
+function createVideoModelApiManifest({
+  modelId: _0x1793db,
+  executionId: _0x3476c7,
+  displayName: _0x1070e5,
+  provider: provider = 'apimart',
+  aliases: aliases = null,
+  icon: icon = 'AM',
+  description: description = null,
+  extensions: extensions = null,
+  fields: fields = [VIDEO_RESOLUTION_FIELD, VIDEO_RATIO_FIELD, createFooterDurationField()],
+  inputSlots: inputSlots = createVideoInputSlots(),
+  ratioPolicy: ratioPolicy = VIDEO_SIZE_RATIO_POLICY,
+  prompt: prompt = null,
+  help: help = null,
+  footerPlacementOrder: footerPlacementOrder = APIMART_VIDEO_FOOTER_PLACEMENT_ORDER,
+}) {
+  const _0x453787 = Array.isArray(footerPlacementOrder)
+      ? footerPlacementOrder.map((_0x39e2c7) => String(_0x39e2c7 || '').trim()).filter(Boolean)
+      : [],
+    _0x45c8eb = {
+      schemaVersion: '1.0',
+      modelId: _0x1793db,
+      ...(Array.isArray(aliases) ? { aliases: aliases } : {}),
+      provider: provider,
+      kind: 'video',
+      adapterType: 'modelApi',
+      executionId: _0x3476c7,
+      displayName: _0x1070e5,
+      icon: icon,
+      description:
+        description || (provider === 'apimart' ? 'APIMart video model API' : _0x1070e5 + ' video model API'),
+      inputSlots: inputSlots,
+      uiSchema: Object.freeze({
+        fields: freezeFields(fields),
+        ...(_0x453787.length ? { footerPlacementOrder: Object.freeze(_0x453787) } : {}),
+      }),
+      ...(prompt && typeof prompt === 'object' ? { prompt: Object.freeze(prompt) } : {}),
+      ...(help && typeof help === 'object' ? { help: Object.freeze(help) } : {}),
+      async: true,
+      cancellable: false,
+      outputType: 'video',
+      extensions: Object.freeze({ ratioPolicy: ratioPolicy }),
+    };
+  return (
+    extensions &&
+      typeof extensions === 'object' &&
+      (_0x45c8eb.extensions = Object.freeze({ ratioPolicy: ratioPolicy, ...extensions })),
+    Object.freeze(_0x45c8eb)
+  );
+}
+function createVideoExecutionManifest({
+  id: _0x5d74f1,
+  model: _0x2e87ba,
+  provider: provider = 'apimart',
+  endpoint: endpoint = '/v1/videos/generations',
+  endpointMode: endpointMode = 'video-generation',
+  extensions: extensions = null,
+  bodyMapping: bodyMapping = APIMART_VIDEO_LEGACY_BODY_MAPPING,
+  modeModels: modeModels = null,
+  responseMapping: responseMapping = APIMART_VIDEO_RESPONSE_MAPPING,
+  taskPolling: taskPolling = APIMART_VIDEO_TASK_POLLING,
+  resultTaskIdPath: resultTaskIdPath = 'task_id',
+  resultUrlFields: resultUrlFields = Object.freeze(['videoUrl', 'video_url', 'url']),
+}) {
+  const _0x226420 = Object.freeze({
+    ...(taskPolling ? { taskPolling: taskPolling } : {}),
+    ...(extensions && typeof extensions === 'object' ? extensions : {}),
+  });
+  return Object.freeze({
+    schemaVersion: '1.0',
+    id: _0x5d74f1,
+    provider: provider,
+    kind: 'video',
+    adapterType: 'modelApi',
+    endpoint: endpoint,
+    endpointMode: endpointMode,
+    method: 'POST',
+    model: _0x2e87ba,
+    ...(modeModels ? { modeModels: Object.freeze(modeModels) } : {}),
+    extensions: _0x226420,
+    headers: Object.freeze({ 'Content-Type': 'application/json' }),
+    bodyMapping: bodyMapping,
+    responseMapping: responseMapping,
+    result: Object.freeze({ taskIdPath: resultTaskIdPath, urlFields: Object.freeze(resultUrlFields) }),
+  });
+}
+const APIMART_VIDEO_MODELS = Object.freeze([
+    Object.freeze({
+      modelId: 'apimart/luma-ray-v2',
+      executionId: 'apimart.model-api.video.luma-ray-v2.v1',
+      displayName: 'Luma Ray V2',
+      model: 'luma-ray-v2',
+    }),
+    Object.freeze({
+      modelId: 'apimart/veo3-fast',
+      executionId: 'apimart.model-api.video.veo3-fast.v1',
+      displayName: 'VEO3',
+      model: 'veo3.1-fast',
+      modeModels: Object.freeze({ fast: 'veo3.1-fast', quality: 'veo3.1-quality' }),
+      fields: Object.freeze([
+        VEO3_MODEL_FIELD,
+        VEO3_GENERATION_TYPE_FIELD,
+        createResolutionField({
+          label: '视频分辨率',
+          defaultValue: '720p',
+          options: [
+            '720p',
+            { value: '1080p', label: '1080p', disableWhen: { field: 'enable_gif', value: true } },
+            { value: '4k', label: '4K', disableWhen: { field: 'enable_gif', value: true } },
+          ],
+        }),
+        Object.freeze({
+          ...createAspectRatioField({ label: '比例', options: ['16:9', '9:16'] }),
+          hideWhen: Object.freeze({ field: 'generation_type', value: 'extend' }),
+        }),
+        withResolutionPlacement(VEO3_FIXED_DURATION_FIELD),
+        VEO3_ENABLE_GIF_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 3,
+        video: 0,
+        audio: 0,
+        fixedSlots: Object.freeze([
+          Object.freeze({
+            id: 'firstFrame',
+            kind: 'image',
+            label: '首帧图',
+            hideWhen: Object.freeze({ field: 'generation_type', value: 'reference' }),
+          }),
+          Object.freeze({
+            id: 'lastFrame',
+            kind: 'image',
+            label: '尾帧图',
+            hideWhen: Object.freeze({ field: 'generation_type', value: 'reference' }),
+          }),
+        ]),
+      }),
+      bodyMapping: APIMART_VIDEO_VEO3_BODY_MAPPING,
+      executionExtensions: Object.freeze({ bodyResolver: 'apimartVeo3Video' }),
+      prompt: Object.freeze({
+        placeholder: VEO3_FRAME_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'frame' }),
+            placeholder: VEO3_FRAME_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'reference' }),
+            placeholder: VEO3_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: VEO3_FRAME_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'frame' }),
+            tooltip: VEO3_FRAME_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'reference' }),
+            tooltip: VEO3_REFERENCE_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: createVideoMenuExtension(30, 'VEO3.1 Fast / Quality'),
+    }),
+    Object.freeze({
+      modelId: 'apimart/grok-imagine-1.0',
+      executionId: 'apimart.model-api.video.grok-imagine-1.v1',
+      displayName: 'Grok Imagine 1.0',
+      model: 'grok-imagine-1.0-video-apimart',
+      fields: Object.freeze([
+        createAspectRatioField({ defaultValue: '16:9', options: ['16:9', '9:16', '1:1', '3:2', '2:3'] }),
+        createFooterDurationField({ defaultValue: 6, min: 6, max: 30 }),
+        GROK_IMAGINE_QUALITY_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({ image: 7, video: 0, audio: 0 }),
+      bodyMapping: APIMART_VIDEO_GROK_IMAGINE_BODY_MAPPING,
+      prompt: Object.freeze({ placeholder: GROK_IMAGINE_PROMPT_PLACEHOLDER }),
+      help: Object.freeze({ tooltip: GROK_IMAGINE_HELP_TOOLTIP }),
+      extensions: createVideoMenuExtension(35, '文生 / 图生，最多 7 张参考图'),
+    }),
+    Object.freeze({
+      modelId: 'apimart/omni-flash-ext',
+      executionId: 'apimart.model-api.video.omni-flash-ext.v1',
+      displayName: 'Gemini Omni Flash',
+      model: 'Omni-Flash-Ext',
+      fields: Object.freeze([
+        createAspectRatioField({ defaultValue: '16:9', options: ['16:9', '9:16'] }),
+        createFooterDurationSliderOptionsField({ values: [4, 6, 8, 10], defaultValue: 6 }),
+        createResolutionField({
+          label: '视频分辨率',
+          defaultValue: '720p',
+          options: ['720p', '1080p', '4k'],
+        }),
+      ]),
+      inputSlots: createVideoInputSlots({ image: 3, video: 1, audio: 0 }),
+      bodyMapping: APIMART_VIDEO_OMNI_FLASH_BODY_MAPPING,
+      prompt: Object.freeze({ placeholder: GEMINI_OMNI_FLASH_PROMPT_PLACEHOLDER }),
+      help: Object.freeze({ tooltip: GEMINI_OMNI_FLASH_HELP_TOOLTIP }),
+      executionExtensions: APIMART_OMNI_FLASH_VIDEO_RESOLVERS,
+      extensions: createVideoMenuExtension(36, '文生 / 单图 / 参考视频 / 3 图融合'),
+    }),
+    Object.freeze({
+      modelId: 'apimart/minimax-hailuo',
+      executionId: 'apimart.model-api.video.minimax-hailuo.v1',
+      displayName: 'Hailuo 02',
+      aliases: Object.freeze(['apimart/hailuo-02', 'apimart/minimax-hailuo-02']),
+      model: 'MiniMax-Hailuo-02',
+      fields: Object.freeze([
+        createResolutionField({
+          label: '视频分辨率',
+          defaultValue: '768p',
+          options: [
+            '512p',
+            '768p',
+            Object.freeze({ value: '1080p', label: '1080p', tooltip: '1080p 仅支持 5 秒' }),
+          ],
+        }),
+        createAspectRatioField({ options: [] }),
+        createFooterDurationSliderOptionsField({
+          values: [5, 10],
+          defaultValue: 5,
+          label: '视频时长（秒）',
+          optionOverridesByValue: Object.freeze({
+            10: Object.freeze({ disableWhen: Object.freeze({ field: 'resolution', value: '1080p' }) }),
+          }),
+        }),
+        VIDEO_PROMPT_OPTIMIZER_FIELD,
+        VIDEO_FAST_PRETREATMENT_FIELD,
+        VIDEO_WATERMARK_CN_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 2,
+        video: 0,
+        audio: 0,
+        fixedSlots: Object.freeze([
+          Object.freeze({ id: 'firstFrame', kind: 'image', label: '首帧', description: '视频起始帧图片' }),
+          Object.freeze({ id: 'lastFrame', kind: 'image', label: '尾帧', description: '视频结束帧图片' }),
+        ]),
+      }),
+      bodyMapping: APIMART_VIDEO_HAILUO_02_BODY_MAPPING,
+      executionExtensions: Object.freeze({ bodyResolver: 'apimartHailuo02Video' }),
+      prompt: Object.freeze({ placeholder: '描述视频内容，支持运镜指令。例如：' + HAILUO_02_PROMPT_EXAMPLE }),
+      help: Object.freeze({ tooltip: HAILUO_02_HELP_TOOLTIP }),
+      extensions: createVideoMenuExtension(90, '运镜指令；使用示例：' + HAILUO_02_PROMPT_EXAMPLE),
+    }),
+    Object.freeze({
+      modelId: 'apimart/minimax-hailuo-2.3',
+      executionId: 'apimart.model-api.video.minimax-hailuo-2-3.v1',
+      displayName: 'Hailuo 2.3',
+      model: 'MiniMax-Hailuo-2.3',
+      modeModels: Object.freeze({ standard: 'MiniMax-Hailuo-2.3', fast: 'MiniMax-Hailuo-2.3-Fast' }),
+      fields: Object.freeze([
+        HAILUO_23_MODEL_FIELD,
+        createResolutionField({
+          label: '视频分辨率',
+          defaultValue: '768p',
+          options: ['768p', Object.freeze({ value: '1080p', label: '1080p', tooltip: '1080p 仅支持 6 秒' })],
+        }),
+        createAspectRatioField({ options: [] }),
+        createFooterDurationSliderOptionsField({
+          values: [6, 10],
+          defaultValue: 6,
+          optionOverridesByValue: Object.freeze({
+            10: Object.freeze({ disableWhen: Object.freeze({ field: 'resolution', value: '1080p' }) }),
+          }),
+        }),
+        VIDEO_PROMPT_OPTIMIZER_FIELD,
+        VIDEO_FAST_PRETREATMENT_FIELD,
+        VIDEO_WATERMARK_CN_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 1,
+        video: 0,
+        audio: 0,
+        fixedSlots: Object.freeze([
+          Object.freeze({
+            id: 'firstFrame',
+            kind: 'image',
+            label: '首帧',
+            description: '视频起始帧图片；Fast 版必填',
+          }),
+        ]),
+      }),
+      bodyMapping: APIMART_VIDEO_HAILUO_23_BODY_MAPPING,
+      executionExtensions: Object.freeze({ bodyResolver: 'apimartHailuo23Video' }),
+      prompt: Object.freeze({ placeholder: '描述视频内容，支持运镜指令。例如：' + HAILUO_23_PROMPT_EXAMPLE }),
+      help: Object.freeze({ tooltip: HAILUO_23_HELP_TOOLTIP }),
+      extensions: createVideoMenuExtension(80, '标准 / Fast；使用示例：' + HAILUO_23_PROMPT_EXAMPLE),
+    }),
+    Object.freeze({
+      modelId: 'apimart/happyhorse-1.0',
+      executionId: 'apimart.model-api.video.happyhorse-1.v1',
+      displayName: 'HappyHorse 1.0',
+      model: 'happyhorse-1.0',
+      fields: Object.freeze([
+        HAPPYHORSE_MODE_FIELD,
+        createResolutionField({ label: '视频分辨率', defaultValue: '1080P' }),
+        createAspectRatioField(),
+        createFooterDurationField({ defaultValue: 5, min: 3, max: 15, label: '视频时长' }),
+        HAPPYHORSE_AUDIO_SETTING_FIELD,
+        HAPPYHORSE_WATERMARK_FIELD,
+        HAPPYHORSE_SEED_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 9,
+        video: 1,
+        audio: 0,
+        fixedSlots: HAPPYHORSE_FIXED_INPUT_SLOTS,
+        cycleFixedInputWhenFull: true,
+      }),
+      bodyMapping: APIMART_VIDEO_HAPPYHORSE_BODY_MAPPING,
+      executionExtensions: Object.freeze({ bodyResolver: 'apimartHappyHorseVideo' }),
+      prompt: Object.freeze({
+        placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
+            placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
+            placeholder: HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
+            placeholder: HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'edit' }),
+            placeholder: HAPPYHORSE_EDIT_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: HAPPYHORSE_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
+            tooltip: HAPPYHORSE_TEXT_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
+            tooltip: HAPPYHORSE_IMAGE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
+            tooltip: HAPPYHORSE_REFERENCE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'edit' }),
+            tooltip: HAPPYHORSE_EDIT_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'apimartModel',
+          order: 20,
+          label: 'HappyHorse 1.0',
+          subtitle: 'T2V / I2V / R2V / Edit',
+        }),
+      }),
+    }),
+    Object.freeze({
+      modelId: 'apimart/wan2.7',
+      executionId: 'apimart.model-api.video.wan2-7.v1',
+      displayName: 'Wan 2.7',
+      model: 'wan2.7',
+      fields: Object.freeze([
+        WAN27_MODE_FIELD,
+        createResolutionField({ defaultValue: '1080P' }),
+        createAspectRatioField(),
+        createFooterDurationField({ defaultValue: 5, min: 2, max: 15 }),
+        WAN27_PROMPT_EXTEND_FIELD,
+        VIDEO_WATERMARK_FIELD,
+        VIDEO_SEED_FIELD,
+        WAN27_NEGATIVE_PROMPT_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 5,
+        video: 5,
+        audio: 1,
+        fixedSlots: WAN27_FIXED_INPUT_SLOTS,
+      }),
+      bodyMapping: APIMART_VIDEO_WAN27_BODY_MAPPING,
+      executionExtensions: Object.freeze({ bodyResolver: 'apimartWan27Video' }),
+      prompt: Object.freeze({
+        placeholder: WAN27_IMAGE_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'image' }),
+            placeholder: WAN27_IMAGE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'video' }),
+            placeholder: WAN27_VIDEO_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'reference' }),
+            placeholder: WAN27_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'edit' }),
+            placeholder: WAN27_EDIT_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: WAN27_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'image' }),
+            tooltip: WAN27_IMAGE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'video' }),
+            tooltip: WAN27_VIDEO_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'reference' }),
+            tooltip: WAN27_REFERENCE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'edit' }),
+            tooltip: WAN27_EDIT_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: createVideoMenuExtension(40, '文生 / 图生 / 参考 / 续写 / 编辑'),
+    }),
+    Object.freeze({
+      modelId: 'apimart/kling-v1-5',
+      executionId: 'apimart.model-api.video.kling-v1-5.v1',
+      displayName: 'Kling V1.5',
+      model: 'kling-v1-5-gen-video',
+    }),
+    Object.freeze({
+      modelId: 'apimart/kling-v3',
+      executionId: 'apimart.model-api.video.kling-v3.v1',
+      displayName: 'Kling V3',
+      model: 'kling-v3',
+      fields: Object.freeze([
+        KLING_V3_MODE_FIELD,
+        createAspectRatioField({ options: ['16:9', '9:16', '1:1'] }),
+        createFooterDurationField({ defaultValue: 5, min: 3, max: 15 }),
+        KLING_V3_AUDIO_FIELD,
+        KLING_V3_MULTI_SHOT_PLACEHOLDER_FIELD,
+        VIDEO_WATERMARK_FIELD,
+        KLING_V3_NEGATIVE_PROMPT_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 2,
+        video: 0,
+        audio: 0,
+        fixedSlots: Object.freeze([
+          Object.freeze({
+            id: 'firstFrame',
+            kind: 'image',
+            label: '首帧',
+            description: '图生视频使用的首帧图片',
+          }),
+          Object.freeze({
+            id: 'lastFrame',
+            kind: 'image',
+            label: '尾帧',
+            description: '可选，图生视频使用的尾帧图片',
+          }),
+        ]),
+      }),
+      bodyMapping: APIMART_VIDEO_KLING_V3_BODY_MAPPING,
+      prompt: Object.freeze({ placeholder: KLING_V3_PROMPT_PLACEHOLDER }),
+      help: Object.freeze({ tooltip: KLING_V3_HELP_TOOLTIP }),
+      extensions: createVideoMenuExtension(60, 'Kling v3'),
+    }),
+    Object.freeze({
+      modelId: 'apimart/kling-v3-omni',
+      executionId: 'apimart.model-api.video.kling-v3-omni.v1',
+      displayName: 'Kling V3 Omni',
+      model: 'kling-v3-omni',
+      fields: Object.freeze([
+        KLING_V3_OMNI_MODE_FIELD,
+        KLING_V3_MODE_FIELD,
+        createAspectRatioField({ options: ['16:9', '9:16', '1:1'] }),
+        createFooterDurationField({ defaultValue: 5, min: 3, max: 15 }),
+        KLING_V3_AUDIO_FIELD,
+        KLING_V3_MULTI_SHOT_PLACEHOLDER_FIELD,
+        VIDEO_WATERMARK_FIELD,
+        KLING_V3_NEGATIVE_PROMPT_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 2,
+        video: 1,
+        audio: 0,
+        fixedSlots: KLING_V3_OMNI_FIXED_INPUT_SLOTS,
+      }),
+      bodyMapping: APIMART_VIDEO_KLING_V3_BODY_MAPPING,
+      executionExtensions: Object.freeze({ bodyResolver: 'apimartKlingV3OmniVideo' }),
+      prompt: Object.freeze({
+        placeholder: KLING_V3_OMNI_IMAGE_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'image' }),
+            placeholder: KLING_V3_OMNI_IMAGE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'reference' }),
+            placeholder: KLING_V3_OMNI_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
+            placeholder: KLING_V3_OMNI_EDIT_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: KLING_V3_OMNI_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'image' }),
+            tooltip: KLING_V3_OMNI_IMAGE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'reference' }),
+            tooltip: KLING_V3_OMNI_REFERENCE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
+            tooltip: KLING_V3_OMNI_EDIT_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: createVideoMenuExtension(50, 'Kling v3 Omni'),
+    }),
+    Object.freeze({
+      modelId: 'apimart/kling-video-o1',
+      executionId: 'apimart.model-api.video.kling-o1.v1',
+      displayName: 'Kling O1',
+      model: 'kling-video-o1',
+      fields: Object.freeze([
+        KLING_O1_QUALITY_FIELD,
+        createAspectRatioField({ options: ['16:9', '9:16', '1:1'] }),
+        createFooterDurationSliderOptionsField({ values: [5, 10], defaultValue: 5 }),
+        KLING_O1_KEEP_ORIGINAL_SOUND_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 2,
+        video: 1,
+        audio: 0,
+        fixedSlots: KLING_O1_FIXED_INPUT_SLOTS,
+        exclusiveGroups: KLING_O1_VIDEO_EXCLUSIVE_GROUPS,
+      }),
+      bodyMapping: APIMART_VIDEO_KLING_O1_BODY_MAPPING,
+      executionExtensions: Object.freeze({ bodyResolver: 'apimartKlingO1Video' }),
+      prompt: Object.freeze({ placeholder: KLING_O1_PROMPT_PLACEHOLDER }),
+      help: Object.freeze({ tooltip: KLING_O1_HELP_TOOLTIP }),
+      extensions: createVideoMenuExtension(70, 'Kling O1'),
+    }),
+    Object.freeze({
+      modelId: 'apimart/viduq3',
+      executionId: 'apimart.model-api.video.viduq3.v1',
+      displayName: 'Vidu Q3',
+      model: 'viduq3-turbo',
+      modeModels: Object.freeze({
+        'viduq3-turbo': 'viduq3-turbo',
+        'viduq3-pro': 'viduq3-pro',
+        viduq3: 'viduq3',
+        'viduq3-mix': 'viduq3-mix',
+      }),
+      fields: Object.freeze([
+        VIDU_Q3_MODEL_FIELD,
+        VIDU_Q3_GENERATION_MODE_FIELD,
+        createResolutionField({
+          defaultValue: '720p',
+          options: [
+            Object.freeze({
+              value: '540p',
+              label: '540p',
+              disableWhen: Object.freeze({
+                all: Object.freeze([
+                  Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+                  Object.freeze({ field: 'mode', value: 'viduq3-mix' }),
+                ]),
+              }),
+            }),
+            '720p',
+            '1080p',
+          ],
+        }),
+        createAspectRatioField(),
+        createFooterDurationField({ defaultValue: 5, min: 1, max: 16 }),
+        VIDU_Q3_AUDIO_FIELD,
+        VIDEO_SEED_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 7,
+        video: 0,
+        audio: 0,
+        fixedSlots: Object.freeze([
+          Object.freeze({
+            id: 'firstFrame',
+            kind: 'image',
+            label: '首帧图',
+            hideWhen: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+          }),
+          Object.freeze({
+            id: 'lastFrame',
+            kind: 'image',
+            label: '尾帧图',
+            hideWhen: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+          }),
+        ]),
+      }),
+      bodyMapping: APIMART_VIDEO_VIDU_BODY_MAPPING,
+      executionExtensions: Object.freeze({ bodyResolver: 'apimartViduQ3Video' }),
+      prompt: Object.freeze({
+        placeholder: VIDU_Q3_VIDEO_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'video' }),
+            placeholder: VIDU_Q3_VIDEO_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+            placeholder: VIDU_Q3_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({ tooltip: VIDU_Q3_HELP_TOOLTIP }),
+      extensions: createVideoMenuExtension(100, 'Vidu Q3 Turbo / Pro / Standard / Mix'),
+    }),
+    Object.freeze({
+      modelId: 'apimart/doubao-seedance-2.0-fast',
+      executionId: 'apimart.model-api.video.doubao-seedance-2-fast.v1',
+      displayName: 'Seedance 2.0 Fast',
+      aliases: Object.freeze(['apimart/seedance-2.0-fast']),
+      model: 'doubao-seedance-2.0-fast',
+      endpointMode: 'seedance-video-generation',
+      fields: APIMART_SEEDANCE_FAST_FIELDS,
+      executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_0_VIDEO_POLICY),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'apimartDreaminaEntry',
+          order: 10,
+          label: '即梦视频',
+          subtitle: 'Seedance 系列，文生/图生/首尾帧参考素材',
+        }),
+        dreaminaStyleVideo: Object.freeze({
+          order: 10,
+          counterpartKey: 'seedance2-fast',
+          title: 'Seedance 2.0 Fast',
+          subtitle: 'APIMart 快速版，支持文生、图生、首尾帧与参考素材',
+          taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          defaultForTaskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+    Object.freeze({
+      modelId: 'apimart/doubao-seedance-2.0',
+      executionId: 'apimart.model-api.video.doubao-seedance-2.v1',
+      displayName: 'Seedance 2.0',
+      aliases: Object.freeze(['apimart/seedance-2.0']),
+      model: 'doubao-seedance-2.0',
+      endpointMode: 'seedance-video-generation',
+      fields: APIMART_SEEDANCE_STANDARD_FIELDS,
+      executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_0_VIDEO_POLICY),
+      extensions: Object.freeze({
+        dreaminaStyleVideo: Object.freeze({
+          order: 20,
+          counterpartKey: 'seedance2-standard',
+          title: 'Seedance 2.0',
+          subtitle: 'APIMart 标准版，质量优先，支持 1080p',
+          taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+    Object.freeze({
+      modelId: 'apimart/doubao-seedance-2.0-fast-face',
+      executionId: 'apimart.model-api.video.doubao-seedance-2-fast-face.v1',
+      displayName: 'Seedance 2.0 Fast Face',
+      aliases: Object.freeze(['apimart/seedance-2.0-fast-face']),
+      model: 'doubao-seedance-2.0-fast-face',
+      endpointMode: 'seedance-video-generation',
+      fields: APIMART_SEEDANCE_FAST_FIELDS,
+      executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_0_VIDEO_POLICY),
+      extensions: Object.freeze({
+        dreaminaStyleVideo: Object.freeze({
+          order: 30,
+          counterpartKey: 'seedance2-fast',
+          title: 'Seedance 2.0 Fast Face',
+          subtitle: 'APIMart 快速真人版，支持真人素材上传',
+          taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+    Object.freeze({
+      modelId: 'apimart/doubao-seedance-2.0-face',
+      executionId: 'apimart.model-api.video.doubao-seedance-2-face.v1',
+      displayName: 'Seedance 2.0 Face',
+      aliases: Object.freeze(['apimart/seedance-2.0-face']),
+      model: 'doubao-seedance-2.0-face',
+      endpointMode: 'seedance-video-generation',
+      fields: APIMART_SEEDANCE_STANDARD_FIELDS,
+      executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_0_VIDEO_POLICY),
+      extensions: Object.freeze({
+        dreaminaStyleVideo: Object.freeze({
+          order: 40,
+          counterpartKey: 'seedance2-standard',
+          title: 'Seedance 2.0 Face',
+          subtitle: 'APIMart 真人标准版，支持真人素材上传与 1080p',
+          taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+    Object.freeze({
+      modelId: 'apimart/doubao-seedance-1-5-pro',
+      executionId: 'apimart.model-api.video.doubao-seedance-1-5-pro.v1',
+      displayName: 'Seedance 1.5 Pro',
+      aliases: Object.freeze(['apimart/seedance-1.5-pro', 'apimart/seedance-1-5-pro']),
+      model: 'doubao-seedance-1-5-pro',
+      endpointMode: 'seedance-video-generation',
+      fields: APIMART_SEEDANCE_STANDARD_FIELDS,
+      executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_1_5_VIDEO_POLICY),
+      extensions: Object.freeze({
+        dreaminaStyleVideo: Object.freeze({
+          order: 50,
+          title: 'Seedance 1.5 Pro',
+          subtitle: 'APIMart 1.5 Pro，支持文生、图生、首尾帧与生成音频参数',
+          taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_1_5_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+    Object.freeze({
+      modelId: 'apimart/doubao-seedance-1-0-pro-fast',
+      executionId: 'apimart.model-api.video.doubao-seedance-1-pro-fast.v1',
+      displayName: 'Seedance 1.0 Pro Fast',
+      aliases: Object.freeze(['apimart/seedance-1.0-pro-fast', 'apimart/seedance-1-0-pro-fast']),
+      model: 'doubao-seedance-1-0-pro-fast',
+      endpointMode: 'seedance-video-generation',
+      fields: APIMART_SEEDANCE_STANDARD_FIELDS,
+      executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_1_0_FAST_VIDEO_POLICY),
+      extensions: Object.freeze({
+        dreaminaStyleVideo: Object.freeze({
+          order: 60,
+          title: 'Seedance 1.0 Pro Fast',
+          subtitle: 'APIMart 1.0 快速版，适合预览和迭代',
+          taskTypes: APIMART_SEEDANCE_NO_FAST_FRAMES_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_1_0_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+    Object.freeze({
+      modelId: 'apimart/doubao-seedance-1-0-pro-quality',
+      executionId: 'apimart.model-api.video.doubao-seedance-1-pro-quality.v1',
+      displayName: 'Seedance 1.0 Pro Quality',
+      aliases: Object.freeze(['apimart/seedance-1.0-pro-quality', 'apimart/seedance-1-0-pro-quality']),
+      model: 'doubao-seedance-1-0-pro-quality',
+      endpointMode: 'seedance-video-generation',
+      fields: APIMART_SEEDANCE_STANDARD_FIELDS,
+      executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_1_0_QUALITY_VIDEO_POLICY),
+      extensions: Object.freeze({
+        dreaminaStyleVideo: Object.freeze({
+          order: 70,
+          title: 'Seedance 1.0 Pro Quality',
+          subtitle: 'APIMart 1.0 高质量版，支持首尾帧',
+          taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_1_0_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+  ]),
+  RUNNINGHUB_VIDEO_MODELS = Object.freeze([
+    Object.freeze({
+      provider: 'runninghub',
+      modelId: 'runninghub-model/kling-video-o1',
+      executionId: 'runninghub.model-api.video.kling-o1.v1',
+      displayName: 'Kling O1',
+      icon: 'images/RH.png',
+      description: 'RunningHub Kling O1 model API',
+      model: 'kling-video-o1',
+      endpoint: '/openapi/v2/kling-video-o1/text-to-video',
+      fields: Object.freeze([
+        RUNNINGHUB_KLING_O1_GENERATION_MODE_FIELD,
+        KLING_O1_QUALITY_FIELD,
+        RUNNINGHUB_KLING_O1_RATIO_FIELD,
+        createFooterDurationSliderOptionsField({ values: [5, 10], defaultValue: 5 }),
+        RUNNINGHUB_KLING_O1_KEEP_ORIGINAL_SOUND_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 7,
+        video: 1,
+        audio: 0,
+        fixedSlots: RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS,
+      }),
+      bodyMapping: RUNNINGHUB_VIDEO_KLING_O1_BODY_MAPPING,
+      responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
+      taskPolling: null,
+      resultTaskIdPath: 'taskId',
+      executionExtensions: Object.freeze({
+        bodyResolver: 'runninghubKlingO1Video',
+        endpointResolver: 'runninghubKlingO1VideoEndpoint',
+      }),
+      prompt: Object.freeze({
+        placeholder: RUNNINGHUB_KLING_O1_FRAME_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'frame' }),
+            placeholder: RUNNINGHUB_KLING_O1_FRAME_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'reference' }),
+            placeholder: RUNNINGHUB_KLING_O1_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'edit' }),
+            placeholder: RUNNINGHUB_KLING_O1_EDIT_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: RUNNINGHUB_KLING_O1_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'frame' }),
+            tooltip: RUNNINGHUB_KLING_O1_FRAME_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'reference' }),
+            tooltip: RUNNINGHUB_KLING_O1_REFERENCE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'edit' }),
+            tooltip: RUNNINGHUB_KLING_O1_EDIT_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'runninghubModel',
+          order: 70,
+          label: 'Kling O1',
+          subtitle: '文生 / 图生 / 首尾帧 / 参考 / 编辑',
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'runninghub',
+      modelId: 'runninghub-model/kling-v3',
+      executionId: 'runninghub.model-api.video.kling-v3.v1',
+      displayName: 'Kling V3.0',
+      aliases: Object.freeze([
+        'runninghub-model/kling-v3.0',
+        'runninghub-model/kling-v30',
+        'runninghub-model/kling-v3-0',
+      ]),
+      icon: 'images/RH.png',
+      description: 'RunningHub Kling V3.0 model API',
+      model: 'kling-v3',
+      endpoint: '/openapi/v2/kling-v3.0-std/text-to-video',
+      fields: Object.freeze([
+        RUNNINGHUB_KLING_V3_MODEL_FIELD,
+        RUNNINGHUB_KLING_V3_RATIO_FIELD,
+        createFooterDurationField({ defaultValue: 5, min: 3, max: 15 }),
+        KLING_V3_AUDIO_FIELD,
+        RUNNINGHUB_KLING_V3_CFG_SCALE_FIELD,
+        RUNNINGHUB_KLING_V3_SHOT_TYPE_FIELD,
+        KLING_V3_NEGATIVE_PROMPT_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 2,
+        video: 0,
+        audio: 0,
+        fixedSlots: RUNNINGHUB_KLING_V3_FIXED_INPUT_SLOTS,
+      }),
+      bodyMapping: RUNNINGHUB_VIDEO_KLING_V3_BODY_MAPPING,
+      responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
+      taskPolling: null,
+      resultTaskIdPath: 'taskId',
+      executionExtensions: Object.freeze({
+        bodyResolver: 'runninghubKlingV3Video',
+        endpointResolver: 'runninghubKlingV3VideoEndpoint',
+      }),
+      prompt: Object.freeze({ placeholder: RUNNINGHUB_KLING_V3_PROMPT_PLACEHOLDER }),
+      help: Object.freeze({ tooltip: RUNNINGHUB_KLING_V3_HELP_TOOLTIP }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'runninghubModel',
+          order: 60,
+          label: 'Kling V3.0',
+          subtitle: 'std / pro / 4K，文生 / 图生 / 首尾帧',
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'runninghub',
+      modelId: 'runninghub-model/kling-o3',
+      executionId: 'runninghub.model-api.video.kling-o3.v1',
+      displayName: 'Kling O3',
+      aliases: Object.freeze([
+        'runninghub-model/kling-video-o3',
+        'runninghub-model/kling-o3-video',
+        'runninghub-model/kling-o3-std',
+      ]),
+      icon: 'images/RH.png',
+      description: 'RunningHub Kling O3 model API',
+      model: 'kling-video-o3',
+      endpoint: '/openapi/v2/kling-video-o3-std/text-to-video',
+      fields: Object.freeze([
+        RUNNINGHUB_KLING_O3_MODEL_FIELD,
+        RUNNINGHUB_KLING_O3_MODE_FIELD,
+        RUNNINGHUB_KLING_O3_RATIO_FIELD,
+        RUNNINGHUB_KLING_O3_DURATION_FIELD,
+        RUNNINGHUB_KLING_O3_AUDIO_FIELD,
+        RUNNINGHUB_KLING_O3_KEEP_ORIGINAL_SOUND_FIELD,
+        RUNNINGHUB_KLING_O3_SHOT_TYPE_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 7,
+        video: 1,
+        audio: 0,
+        fixedSlots: RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS,
+      }),
+      bodyMapping: RUNNINGHUB_VIDEO_KLING_O3_BODY_MAPPING,
+      responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
+      taskPolling: null,
+      resultTaskIdPath: 'taskId',
+      executionExtensions: Object.freeze({
+        bodyResolver: 'runninghubKlingO3Video',
+        endpointResolver: 'runninghubKlingO3VideoEndpoint',
+      }),
+      prompt: Object.freeze({
+        placeholder: RUNNINGHUB_KLING_O3_FRAME_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'image' }),
+            placeholder: RUNNINGHUB_KLING_O3_FRAME_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'reference' }),
+            placeholder: RUNNINGHUB_KLING_O3_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
+            placeholder: RUNNINGHUB_KLING_O3_EDIT_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: RUNNINGHUB_KLING_O3_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'image' }),
+            tooltip: RUNNINGHUB_KLING_O3_FRAME_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'reference' }),
+            tooltip: RUNNINGHUB_KLING_O3_REFERENCE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
+            tooltip: RUNNINGHUB_KLING_O3_EDIT_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'runninghubModel',
+          order: 50,
+          label: 'Kling O3',
+          subtitle: 'std / pro / 4K，文生 / 图生 / 参考 / 编辑',
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'runninghub',
+      modelId: 'runninghub-model/seedance-2.0',
+      executionId: 'runninghub.model-api.video.seedance-2.v1',
+      displayName: 'Seedance 2.0',
+      aliases: Object.freeze([
+        'runninghub-model/seedance2.0',
+        'runninghub-model/seedance-2',
+        'runninghub-model/sparkvideo-2.0',
+        'runninghub-model/seedance-2.0-fast',
+      ]),
+      icon: 'images/RH.png',
+      description: 'RunningHub Seedance 2.0 model API',
+      model: 'rhart-video/sparkvideo-2.0',
+      endpoint: '/openapi/v2/rhart-video/sparkvideo-2.0-fast/text-to-video',
+      endpointMode: 'seedance-video-generation',
+      fields: Object.freeze([
+        RUNNINGHUB_SEEDANCE_2_MODEL_FIELD,
+        RUNNINGHUB_SEEDANCE_2_MODE_FIELD,
+        RUNNINGHUB_SEEDANCE_2_RESOLUTION_FIELD,
+        Object.freeze({
+          ...createAspectRatioField({ options: ['16:9', '4:3', '1:1', '3:4', '9:16', '21:9'] }),
+          variant: 'pillMenu',
+        }),
+        createFooterDurationSliderOptionsField({
+          values: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+          defaultValue: 5,
+        }),
+        RUNNINGHUB_SEEDANCE_2_GENERATE_AUDIO_FIELD,
+        RUNNINGHUB_SEEDANCE_2_WEB_SEARCH_FIELD,
+        RUNNINGHUB_SEEDANCE_2_REAL_PERSON_FIELD,
+        VIDEO_SEED_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 9,
+        video: 3,
+        audio: 3,
+        fixedSlots: RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS,
+        cycleFixedInputWhenFull: true,
+      }),
+      bodyMapping: RUNNINGHUB_VIDEO_SEEDANCE_2_BODY_MAPPING,
+      responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
+      taskPolling: null,
+      resultTaskIdPath: 'taskId',
+      executionExtensions: Object.freeze({
+        bodyResolver: 'runninghubSeedance2Video',
+        endpointResolver: 'runninghubSeedance2VideoEndpoint',
+      }),
+      prompt: Object.freeze({
+        placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'text2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'image2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'frames2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'multimodal2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({ tooltip: RUNNINGHUB_SEEDANCE_2_HELP_TOOLTIP }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'runninghubModel',
+          order: 10,
+          label: 'Seedance 2.0',
+          subtitle: 'Fast / Standard, T2V / I2V / Frames / Multimodal',
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'runninghub',
+      modelId: 'runninghub-model/happyhorse-1.0',
+      executionId: 'runninghub.model-api.video.happyhorse-1.v1',
+      displayName: 'HappyHorse 1.0',
+      aliases: Object.freeze([
+        'runninghub-model/happyhorse',
+        'runninghub-model/happyhorse-1',
+        'runninghub-model/alibaba-happyhorse-1.0',
+      ]),
+      icon: 'images/RH.png',
+      description: 'RunningHub Alibaba HappyHorse 1.0 model API',
+      model: 'alibaba/happyhorse-1.0',
+      endpoint: '/openapi/v2/alibaba/happyhorse-1.0/text-to-video',
+      fields: Object.freeze([
+        HAPPYHORSE_MODE_FIELD,
+        createResolutionField({ label: '视频分辨率', defaultValue: '1080P' }),
+        createAspectRatioField(),
+        createFooterDurationField({ defaultValue: 5, min: 3, max: 15, label: '视频时长' }),
+        HAPPYHORSE_AUDIO_SETTING_FIELD,
+        HAPPYHORSE_SEED_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 9,
+        video: 1,
+        audio: 0,
+        fixedSlots: HAPPYHORSE_FIXED_INPUT_SLOTS,
+        cycleFixedInputWhenFull: true,
+      }),
+      bodyMapping: RUNNINGHUB_VIDEO_HAPPYHORSE_BODY_MAPPING,
+      responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
+      taskPolling: null,
+      resultTaskIdPath: 'taskId',
+      executionExtensions: Object.freeze({
+        bodyResolver: 'runninghubHappyHorseVideo',
+        endpointResolver: 'runninghubHappyHorseVideoEndpoint',
+      }),
+      prompt: Object.freeze({
+        placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
+            placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
+            placeholder: HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
+            placeholder: HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'edit' }),
+            placeholder: HAPPYHORSE_EDIT_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: HAPPYHORSE_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
+            tooltip: HAPPYHORSE_TEXT_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
+            tooltip: HAPPYHORSE_IMAGE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
+            tooltip: HAPPYHORSE_REFERENCE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'happyhorse_mode', value: 'edit' }),
+            tooltip: HAPPYHORSE_EDIT_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'runninghubModel',
+          order: 20,
+          label: 'HappyHorse 1.0',
+          subtitle: 'T2V / I2V / R2V / Edit',
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'runninghub',
+      modelId: 'runninghub-model/veo3',
+      executionId: 'runninghub.model-api.video.veo3.v1',
+      displayName: 'Veo3',
+      aliases: Object.freeze([
+        'runninghub-model/veo3.1',
+        'runninghub-model/rhart-video-v3.1',
+        'runninghub-model/rhart-video-v31',
+      ]),
+      icon: 'images/RH.png',
+      description: 'RunningHub 全能视频 V3.1 / Veo3 model API',
+      model: 'rhart-video-v3.1',
+      endpoint: '/openapi/v2/rhart-video-v3.1-fast/text-to-video',
+      fields: Object.freeze([
+        RUNNINGHUB_VEO3_CHANNEL_FIELD,
+        RUNNINGHUB_VEO3_MODEL_FIELD,
+        RUNNINGHUB_VEO3_GENERATION_TYPE_FIELD,
+        createResolutionField({
+          label: '视频分辨率',
+          defaultValue: '720p',
+          options: [
+            '720p',
+            Object.freeze({
+              value: '1080p',
+              label: '1080p',
+              disableWhen: Object.freeze({ field: 'rh_veo3_channel', value: 'lowCost' }),
+            }),
+            Object.freeze({
+              value: '4k',
+              label: '4K',
+              disableWhen: Object.freeze({
+                any: Object.freeze([
+                  Object.freeze({ field: 'rh_veo3_channel', value: 'lowCost' }),
+                  Object.freeze({ field: 'mode', value: 'lite' }),
+                ]),
+              }),
+            }),
+          ],
+        }),
+        createAspectRatioField({ label: '比例', options: ['16:9', '9:16'] }),
+        RUNNINGHUB_VEO3_DURATION_FIELD,
+        RUNNINGHUB_VEO3_GENERATE_AUDIO_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 3,
+        video: 1,
+        audio: 0,
+        fixedSlots: RUNNINGHUB_VEO3_FIXED_INPUT_SLOTS,
+      }),
+      bodyMapping: RUNNINGHUB_VIDEO_VEO3_BODY_MAPPING,
+      responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
+      taskPolling: null,
+      resultTaskIdPath: 'taskId',
+      executionExtensions: Object.freeze({
+        bodyResolver: 'runninghubVeo3Video',
+        endpointResolver: 'runninghubVeo3VideoEndpoint',
+      }),
+      prompt: Object.freeze({
+        placeholder: RUNNINGHUB_VEO3_FRAME_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'frame' }),
+            placeholder: RUNNINGHUB_VEO3_FRAME_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'reference' }),
+            placeholder: RUNNINGHUB_VEO3_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'extend' }),
+            placeholder: RUNNINGHUB_VEO3_EXTEND_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: RUNNINGHUB_VEO3_FRAME_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'frame' }),
+            tooltip: RUNNINGHUB_VEO3_FRAME_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'reference' }),
+            tooltip: RUNNINGHUB_VEO3_REFERENCE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'extend' }),
+            tooltip: RUNNINGHUB_VEO3_EXTEND_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'runninghubModel',
+          order: 30,
+          label: 'Veo3',
+          subtitle: '全能视频 V3.1，官方 / 低价渠道',
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'runninghub',
+      modelId: 'runninghub-model/wan2.7',
+      executionId: 'runninghub.model-api.video.wan2-7.v1',
+      displayName: 'Wan 2.7',
+      aliases: Object.freeze([
+        'runninghub-model/wan27',
+        'runninghub-model/wan-2.7',
+        'runninghub-model/alibaba-wan-2.7',
+      ]),
+      icon: 'images/RH.png',
+      description: 'RunningHub Alibaba Wan 2.7 model API',
+      model: 'alibaba/wan-2.7',
+      endpoint: '/openapi/v2/alibaba/wan-2.7/text-to-video',
+      fields: Object.freeze([
+        WAN27_MODE_FIELD,
+        createResolutionField({ defaultValue: '720P' }),
+        createAspectRatioField(),
+        createFooterDurationField({ defaultValue: 5, min: 2, max: 15 }),
+        WAN27_PROMPT_EXTEND_FIELD,
+        WAN27_NEGATIVE_PROMPT_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 5,
+        video: 5,
+        audio: 1,
+        fixedSlots: RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS,
+      }),
+      bodyMapping: RUNNINGHUB_VIDEO_WAN27_BODY_MAPPING,
+      responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
+      taskPolling: null,
+      resultTaskIdPath: 'taskId',
+      executionExtensions: Object.freeze({
+        bodyResolver: 'runninghubWan27Video',
+        endpointResolver: 'runninghubWan27VideoEndpoint',
+      }),
+      prompt: Object.freeze({
+        placeholder: WAN27_IMAGE_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'image' }),
+            placeholder: WAN27_IMAGE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'video' }),
+            placeholder: WAN27_VIDEO_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'reference' }),
+            placeholder: WAN27_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'edit' }),
+            placeholder: WAN27_EDIT_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: WAN27_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'image' }),
+            tooltip: WAN27_IMAGE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'video' }),
+            tooltip: WAN27_VIDEO_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'reference' }),
+            tooltip: WAN27_REFERENCE_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'wan27_mode', value: 'edit' }),
+            tooltip: WAN27_EDIT_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'runninghubModel',
+          order: 40,
+          label: 'Wan 2.7',
+          subtitle: '文生 / 图生 / 参考 / 续写 / 编辑',
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'runninghub',
+      modelId: 'runninghub-model/hailuo-02',
+      executionId: 'runninghub.model-api.video.hailuo-02.v1',
+      displayName: 'Hailuo 02',
+      aliases: Object.freeze([
+        'runninghub-model/hailuo02',
+        'runninghub-model/minimax-hailuo',
+        'runninghub-model/minimax-hailuo-02',
+      ]),
+      icon: 'images/RH.png',
+      description: 'RunningHub MiniMax Hailuo 02 model API',
+      model: 'minimax/hailuo-02',
+      endpoint: '/openapi/v2/minimax/hailuo-02/t2v-standard',
+      fields: Object.freeze([
+        RUNNINGHUB_HAILUO_02_QUALITY_FIELD,
+        RUNNINGHUB_HAILUO_02_DURATION_FIELD,
+        RUNNINGHUB_HAILUO_02_ENABLE_PROMPT_EXPANSION_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 2,
+        video: 0,
+        audio: 0,
+        fixedSlots: RUNNINGHUB_HAILUO_02_FIXED_INPUT_SLOTS,
+      }),
+      bodyMapping: RUNNINGHUB_VIDEO_HAILUO_02_BODY_MAPPING,
+      responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
+      taskPolling: null,
+      resultTaskIdPath: 'taskId',
+      executionExtensions: Object.freeze({
+        bodyResolver: 'runninghubHailuo02Video',
+        endpointResolver: 'runninghubHailuo02VideoEndpoint',
+      }),
+      prompt: Object.freeze({ placeholder: RUNNINGHUB_HAILUO_02_PROMPT_PLACEHOLDER }),
+      help: Object.freeze({ tooltip: RUNNINGHUB_HAILUO_02_HELP_TOOLTIP }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'runninghubModel',
+          order: 90,
+          label: 'Hailuo 02',
+          subtitle: '文生 / 图生 / 首尾帧 / Fast 图生',
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'runninghub',
+      modelId: 'runninghub-model/hailuo-2.3',
+      executionId: 'runninghub.model-api.video.hailuo-2-3.v1',
+      displayName: 'Hailuo 2.3',
+      aliases: Object.freeze([
+        'runninghub-model/hailuo23',
+        'runninghub-model/hailuo-23',
+        'runninghub-model/minimax-hailuo-2.3',
+        'runninghub-model/minimax-hailuo-23',
+      ]),
+      icon: 'images/RH.png',
+      description: 'RunningHub MiniMax Hailuo 2.3 model API',
+      model: 'minimax/hailuo-2.3',
+      endpoint: '/openapi/v2/minimax/hailuo-2.3/t2v-standard',
+      fields: Object.freeze([
+        RUNNINGHUB_HAILUO_23_QUALITY_FIELD,
+        RUNNINGHUB_HAILUO_23_DURATION_FIELD,
+        RUNNINGHUB_HAILUO_02_ENABLE_PROMPT_EXPANSION_FIELD,
+      ]),
+      inputSlots: createVideoInputSlots({
+        image: 1,
+        video: 0,
+        audio: 0,
+        fixedSlots: RUNNINGHUB_HAILUO_23_FIXED_INPUT_SLOTS,
+      }),
+      bodyMapping: RUNNINGHUB_VIDEO_HAILUO_23_BODY_MAPPING,
+      responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
+      taskPolling: null,
+      resultTaskIdPath: 'taskId',
+      executionExtensions: Object.freeze({
+        bodyResolver: 'runninghubHailuo23Video',
+        endpointResolver: 'runninghubHailuo23VideoEndpoint',
+      }),
+      prompt: Object.freeze({ placeholder: RUNNINGHUB_HAILUO_23_PROMPT_PLACEHOLDER }),
+      help: Object.freeze({ tooltip: RUNNINGHUB_HAILUO_23_HELP_TOOLTIP }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'runninghubModel',
+          order: 80,
+          label: 'Hailuo 2.3',
+          subtitle: '文生 / 图生 / Pro / Fast',
+        }),
+      }),
+    }),
+  ]),
+  VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object.freeze([
+    VOLCENGINE_SEEDANCE_2_MODE_FIELD,
+    VOLCENGINE_SEEDANCE_2_RATIO_FIELD,
+    createFooterDurationField({ defaultValue: 5, min: 4, max: 15 }),
+    VOLCENGINE_SEEDANCE_2_GENERATE_AUDIO_FIELD,
+    VOLCENGINE_SEEDANCE_2_SEED_FIELD,
+  ]),
+  VOLCENGINE_SEEDANCE_2_INPUT_SLOTS = createVideoInputSlots({ image: 9, video: 3, audio: 3 }),
+  VOLCENGINE_VIDEO_MODELS = Object.freeze([
+    Object.freeze({
+      provider: 'volcengine',
+      modelId: 'volcengine/seedance-2.0-fast',
+      executionId: 'volcengine.model-api.video.seedance-2-fast.v1',
+      displayName: 'Seedance 2.0 Fast',
+      aliases: Object.freeze([
+        'volcengine/doubao-seedance-2-0-fast',
+        'volcengine/doubao-seedance-2-0-fast-260128',
+      ]),
+      icon: 'images/volcengine.svg',
+      description: '火山方舟 Seedance 2.0 Fast model API',
+      model: 'doubao-seedance-2-0-fast-260128',
+      endpoint: '/contents/generations/tasks',
+      endpointMode: 'content-generation-task',
+      ratioPolicy: VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
+      fields: Object.freeze([
+        VOLCENGINE_SEEDANCE_2_MODE_FIELD,
+        createVolcengineSeedance2ResolutionField({ include1080p: false }),
+        ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS.slice(1),
+      ]),
+      inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
+      bodyMapping: VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,
+      responseMapping: VOLCENGINE_VIDEO_RESPONSE_MAPPING,
+      taskPolling: VOLCENGINE_VIDEO_TASK_POLLING,
+      resultTaskIdPath: 'id',
+      executionExtensions: createVolcengineSeedanceVideoExecutionExtensions(
+        VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY,
+      ),
+      prompt: Object.freeze({
+        placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'volcengineOfficial',
+          order: 10,
+          label: '火山方舟',
+          subtitle: 'Seedance 2.0 官方 API',
+          iconAlt: 'volcengine',
+        }),
+        dreaminaStyleVideo: Object.freeze({
+          order: 10,
+          title: 'Seedance 2.0 Fast',
+          subtitle: '火山方舟快速版，480p / 720p',
+          counterpartKey: 'seedance2-fast',
+          taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          defaultForTaskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'volcengine',
+      modelId: 'volcengine/seedance-2.0',
+      executionId: 'volcengine.model-api.video.seedance-2.v1',
+      displayName: 'Seedance 2.0',
+      aliases: Object.freeze(['volcengine/doubao-seedance-2-0', 'volcengine/doubao-seedance-2-0-260128']),
+      icon: 'images/volcengine.svg',
+      description: '火山方舟 Seedance 2.0 model API',
+      model: 'doubao-seedance-2-0-260128',
+      endpoint: '/contents/generations/tasks',
+      endpointMode: 'content-generation-task',
+      ratioPolicy: VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
+      fields: Object.freeze([
+        VOLCENGINE_SEEDANCE_2_MODE_FIELD,
+        createVolcengineSeedance2ResolutionField({ include1080p: true }),
+        ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS.slice(1),
+      ]),
+      inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
+      bodyMapping: VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,
+      responseMapping: VOLCENGINE_VIDEO_RESPONSE_MAPPING,
+      taskPolling: VOLCENGINE_VIDEO_TASK_POLLING,
+      resultTaskIdPath: 'id',
+      executionExtensions: createVolcengineSeedanceVideoExecutionExtensions(
+        VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY,
+      ),
+      prompt: Object.freeze({
+        placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
+      extensions: Object.freeze({
+        dreaminaStyleVideo: Object.freeze({
+          order: 20,
+          title: 'Seedance 2.0',
+          subtitle: '火山方舟标准版，支持 1080p',
+          counterpartKey: 'seedance2-standard',
+          taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+    Object.freeze({
+      provider: 'volcengine',
+      modelId: 'volcengine/seedance-2.0-mini',
+      executionId: 'volcengine.model-api.video.seedance-2-mini.v1',
+      displayName: 'Seedance 2.0 Mini',
+      icon: 'images/volcengine.svg',
+      description: '火山方舟 Seedance 2.0 Mini model API',
+      model: 'doubao-seedance-2-0-mini-260615',
+      endpoint: '/contents/generations/tasks',
+      endpointMode: 'content-generation-task',
+      ratioPolicy: VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
+      fields: Object.freeze([
+        VOLCENGINE_SEEDANCE_2_MODE_FIELD,
+        createVolcengineSeedance2ResolutionField({ include1080p: true }),
+        ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS.slice(1),
+      ]),
+      inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
+      bodyMapping: VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,
+      responseMapping: VOLCENGINE_VIDEO_RESPONSE_MAPPING,
+      taskPolling: VOLCENGINE_VIDEO_TASK_POLLING,
+      resultTaskIdPath: 'id',
+      executionExtensions: createVolcengineSeedanceVideoExecutionExtensions(
+        VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY,
+      ),
+      prompt: Object.freeze({
+        placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
+            placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
+          }),
+        ]),
+      }),
+      help: Object.freeze({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
+      extensions: Object.freeze({
+        dreaminaStyleVideo: Object.freeze({
+          order: 30,
+          title: 'Seedance 2.0 Mini',
+          subtitle: '火山方舟 Mini 版，参数同 Seedance 2.0',
+          counterpartKey: 'seedance2-mini',
+          taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
+          resolutionOptionsByTaskType: APIMART_SEEDANCE_STANDARD_RESOLUTION_BY_TASK,
+          durationRangeByTaskType: APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK,
+        }),
+      }),
+    }),
+  ]),
+  AGNES_VIDEO_MODE_FIELD = Object.freeze({
+    id: 'agnes_video_mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '模式选择',
+    description:
+      '全能参考：不上传图就按文字生成；上传一张或多张图时，会参考这些图片来生成视频。\n首尾帧：至少上传首帧图；如果再上传尾帧图，会按开始和结尾自动补出顺滑变化。',
+    defaultValue: 'reference',
+    options: Object.freeze([
+      Object.freeze({ value: 'reference', label: '全能参考' }),
+      Object.freeze({ value: 'keyframes', label: '首尾帧' }),
+    ]),
+  }),
+  AGNES_VIDEO_FRAME_RATE = 24,
+  AGNES_VIDEO_MIN_SECONDS = 2,
+  AGNES_VIDEO_MIN_FRAMES = AGNES_VIDEO_MIN_SECONDS * AGNES_VIDEO_FRAME_RATE + 1,
+  AGNES_VIDEO_MAX_FRAMES = 0x1b9,
+  AGNES_VIDEO_MAX_SECONDS = Number(((AGNES_VIDEO_MAX_FRAMES - 1) / AGNES_VIDEO_FRAME_RATE).toFixed(1)),
+  AGNES_VIDEO_DURATION_VALUES = Object.freeze([
+    ...Array.from(
+      { length: Math.floor(AGNES_VIDEO_MAX_SECONDS) - AGNES_VIDEO_MIN_SECONDS + 1 },
+      (_0x18910d, _0x178765) => AGNES_VIDEO_MIN_SECONDS + _0x178765,
+    ),
+    ...(Number.isInteger(AGNES_VIDEO_MAX_SECONDS) ? [] : [AGNES_VIDEO_MAX_SECONDS]),
+  ]),
+  AGNES_VIDEO_HELP_TOOLTIP =
+    'Agnes Video 用法\n' +
+    '写法很简单：谁或什么、在哪里、做什么、镜头怎么动、光线和风格。\n' +
+    '不上传图片：只靠文字生成视频。例：年轻宇航员走过红色沙漠星球，风吹起尘土，镜头慢慢跟随，夕阳光，写实科幻感。\n' +
+    '上传1张图：说清楚图片里哪些地方要动，哪些要保持。例：人物轻微呼吸，头发随风动，背景灯光轻轻闪，脸和衣服保持一致。\n' +
+    '上传多张图：说清楚这些图之间的关系。例：第一张作为开始，第二张作为目标，中间自然变化，光线和人物保持一致。',
+  AGNES_VIDEO_KEYFRAMES_HELP_TOOLTIP =
+    '首尾帧用法\n' +
+    '至少上传首帧图，再说清楚画面怎么动；可选上传尾帧图控制结尾。\n' +
+    '例：从第一张自然过渡到目标画面，人物保持同一个人，镜头角度一致，动作顺滑自然。',
+  AGNES_VIDEO_NEGATIVE_PROMPT_DEFAULT =
+    'low quality, blurry, distorted, deformed, bad anatomy, extra limbs, extra fingers, watermark, text, logo',
+  AGNES_VIDEO_RATIO_FIELD = Object.freeze({
+    ...createAspectRatioField({ defaultValue: '3:2', options: ['3:2', '16:9', '9:16', '1:1', '4:3', '3:4'] }),
+    variant: 'ratioPill',
+  }),
+  AGNES_VIDEO_DURATION_FIELD = createFooterDurationSliderOptionsField({
+    values: AGNES_VIDEO_DURATION_VALUES,
+    defaultValue: 5,
+    label: '视频时长',
+  }),
+  AGNES_VIDEO_SEED_FIELD = Object.freeze({
+    ...VIDEO_SEED_FIELD,
+    type: 'stepper',
+    defaultValue: '8888',
+    min: 0,
+    max: 0x7fffffff,
+    step: 1,
+    randomSeedModeField: 'seed_mode',
+    randomSeedDefaultMode: 'random',
+    randomizeOnSubmit: true,
+    description:
+      '随机：每次生成都会换一个值，画面更有变化。\n固定：一直使用当前数字，方便复现相近效果。\n可以左右拖动数字修改，点“随机”会立即换一个值。',
+  }),
+  AGNES_VIDEO_SEED_MODE_FIELD = Object.freeze({
+    id: 'seed_mode',
+    type: 'segmented',
+    placement: 'advanced',
+    label: '种子模式',
+    defaultValue: 'random',
+    options: Object.freeze([
+      Object.freeze({ value: 'random', label: '随机' }),
+      Object.freeze({ value: 'fixed', label: '固定' }),
+    ]),
+    hideWhen: Object.freeze({ field: '__agnes_seed_mode_hidden', value: '' }),
+  }),
+  AGNES_VIDEO_NEGATIVE_PROMPT_FIELD = Object.freeze({
+    ...VIDEO_NEGATIVE_PROMPT_FIELD,
+    defaultValue: AGNES_VIDEO_NEGATIVE_PROMPT_DEFAULT,
+    description:
+      '默认已填常规排除项，会尽量避开低画质、模糊、变形、水印和多余文字。你也可以改成自己的要求；留空或 none 表示不额外限制。',
+  }),
+  AGNES_VIDEO_INFERENCE_STEPS_FIELD = Object.freeze({
+    id: 'num_inference_steps',
+    type: 'text',
+    placement: 'advanced',
+    variant: 'advancedRow',
+    label: '推理步数',
+    description:
+      '普通用户保持默认就好。想让画面多打磨几轮，可以填整数；数值越高通常越慢。留空或 none 使用模型默认。',
+    defaultValue: 'none',
+  }),
+  AGNES_VIDEO_INPUT_SLOTS = createVideoInputSlots({
+    image: 9,
+    video: 0,
+    audio: 0,
+    fixedSlots: Object.freeze([
+      Object.freeze({
+        id: 'firstFrame',
+        kind: 'image',
+        label: '首帧图',
+        description: '首尾帧模式下作为第一张图；只放首帧也可以生成。',
+        required: true,
+        showWhen: Object.freeze({ field: 'agnes_video_mode', value: 'keyframes' }),
+      }),
+      Object.freeze({
+        id: 'lastFrame',
+        kind: 'image',
+        label: '尾帧图',
+        description: '可选。放入后作为最后一张图控制结尾。',
+        required: false,
+        showWhen: Object.freeze({ field: 'agnes_video_mode', value: 'keyframes' }),
+      }),
+    ]),
+  }),
+  AGNES_VIDEO_BODY_MAPPING = createApimartVideoBodyMapping([
+    Object.freeze({
+      path: 'width',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'resolvedRatioLabel', 'aspectRatio']),
+      defaultValue: '3:2',
+      transform: 'agnesVideoWidth',
+    }),
+    Object.freeze({
+      path: 'height',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'resolvedRatioLabel', 'aspectRatio']),
+      defaultValue: '3:2',
+      transform: 'agnesVideoHeight',
+    }),
+    Object.freeze({
+      path: 'num_frames',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+      transform: Object.freeze({
+        name: 'agnesVideoNumFrames',
+        frameRate: AGNES_VIDEO_FRAME_RATE,
+        min: AGNES_VIDEO_MIN_FRAMES,
+        max: AGNES_VIDEO_MAX_FRAMES,
+      }),
+    }),
+    Object.freeze({ path: 'frame_rate', from: 'constant', value: AGNES_VIDEO_FRAME_RATE }),
+    Object.freeze({
+      path: 'seed',
+      from: 'param',
+      field: Object.freeze(['generationParams.seed', 'seed']),
+      defaultValue: '8888',
+      transform: Object.freeze({
+        name: 'agnesVideoSeed',
+        modeField: 'seed_mode',
+        defaultMode: 'random',
+        min: 0,
+        max: 0x7fffffff,
+      }),
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'negative_prompt',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.negative_prompt',
+        'generationParams.negativePrompt',
+        'negative_prompt',
+        'negativePrompt',
+      ]),
+      defaultValue: AGNES_VIDEO_NEGATIVE_PROMPT_DEFAULT,
+      transform: 'apimartOptionalText',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'num_inference_steps',
+      from: 'param',
+      field: Object.freeze([
+        'generationParams.num_inference_steps',
+        'generationParams.numInferenceSteps',
+        'num_inference_steps',
+        'numInferenceSteps',
+      ]),
+      defaultValue: 'none',
+      transform: 'apimartOptionalInteger',
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({
+      path: 'agnes_video_mode',
+      from: 'param',
+      field: 'generationParams.agnes_video_mode',
+      defaultValue: 'reference',
+    }),
+    Object.freeze({ path: 'extra_body.image', from: 'inputImages', omitWhenEmpty: true }),
+  ]),
+  AGNES_VIDEO_RESPONSE_MAPPING = Object.freeze({
+    taskIdPath: Object.freeze(['id', 'task_id', 'data.id']),
+    statusPath: 'status',
+    errorPath: Object.freeze(['error.message', 'message', 'error']),
+    resultPaths: Object.freeze([
+      'video_url',
+      'data.video_url',
+      'result.video_url',
+      'output.video',
+      'output.video_url',
+      'url',
+      'data.url',
+    ]),
+  }),
+  AGNES_VIDEO_TASK_POLLING = Object.freeze({
+    mode: 'task-proxy',
+    method: 'GET',
+    urlTemplate: '{baseUrl}/v1/videos/{taskId}',
+    headersMode: 'bearer',
+  }),
+  AGNES_VIDEO_MODELS = Object.freeze([
+    Object.freeze({
+      modelId: 'agnes/agnes-video-v2.0',
+      executionId: 'agnes.model-api.video.agnes-video-v2.v1',
+      displayName: 'Agnes Video V2.0',
+      provider: 'agnes',
+      icon: 'AG',
+      model: 'agnes-video-v2.0',
+      endpoint: '/v1/videos',
+      endpointMode: 'video-generation',
+      description: 'Agnes AI text-to-video and image-to-video model API',
+      fields: Object.freeze([
+        AGNES_VIDEO_MODE_FIELD,
+        AGNES_VIDEO_RATIO_FIELD,
+        AGNES_VIDEO_DURATION_FIELD,
+        AGNES_VIDEO_SEED_FIELD,
+        AGNES_VIDEO_SEED_MODE_FIELD,
+        AGNES_VIDEO_NEGATIVE_PROMPT_FIELD,
+        AGNES_VIDEO_INFERENCE_STEPS_FIELD,
+      ]),
+      inputSlots: AGNES_VIDEO_INPUT_SLOTS,
+      bodyMapping: AGNES_VIDEO_BODY_MAPPING,
+      responseMapping: AGNES_VIDEO_RESPONSE_MAPPING,
+      taskPolling: AGNES_VIDEO_TASK_POLLING,
+      resultTaskIdPath: 'id',
+      executionExtensions: Object.freeze({ bodyResolver: 'agnesVideo' }),
+      prompt: Object.freeze({
+        placeholder: '写清楚谁或什么、在哪里、做什么、镜头怎么动；可按 @ 引用图片。',
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'agnes_video_mode', value: 'reference' }),
+            placeholder: '写清楚视频内容和动作；上传图片时，说清楚图片里的主体怎么动。',
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'agnes_video_mode', value: 'keyframes' }),
+            placeholder: '描述首帧画面怎么动；如果放了尾帧，再说明中间怎么自然过渡。',
+          }),
+        ]),
+      }),
+      help: Object.freeze({
+        tooltip: AGNES_VIDEO_HELP_TOOLTIP,
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'agnes_video_mode', value: 'reference' }),
+            tooltip: AGNES_VIDEO_HELP_TOOLTIP,
+          }),
+          Object.freeze({
+            when: Object.freeze({ field: 'agnes_video_mode', value: 'keyframes' }),
+            tooltip: AGNES_VIDEO_KEYFRAMES_HELP_TOOLTIP,
+          }),
+        ]),
+      }),
+      extensions: Object.freeze({
+        videoMenu: Object.freeze({
+          role: 'agnesModel',
+          order: 10,
+          label: 'Agnes Video V2.0',
+          subtitle: 'Text/image to video',
+        }),
+      }),
+    }),
+  ]),
+  VENDOR_VIDEO_MODELS = Object.freeze([
+    ...APIMART_VIDEO_MODELS,
+    ...RUNNINGHUB_VIDEO_MODELS,
+    ...VOLCENGINE_VIDEO_MODELS,
+    ...AGNES_VIDEO_MODELS,
+  ]);
+function isSeedanceVideoManifest(_0x57b27b) {
+  return (
+    _0x57b27b?.endpointMode === 'seedance-video-generation' ||
+    _0x57b27b?.executionExtensions?.bodyResolver === 'volcengineSeedance2Video'
+  );
+}
+function getVideoManifestRatioPolicy(_0x44ab51) {
+  if (_0x44ab51?.ratioPolicy) return _0x44ab51.ratioPolicy;
+  return isSeedanceVideoManifest(_0x44ab51) ? SEEDANCE_VIDEO_RATIO_POLICY : VIDEO_SIZE_RATIO_POLICY;
+}
+export const vendorVideoModelApiModelManifests = Object.freeze(
+  VENDOR_VIDEO_MODELS.map((_0x4931db) =>
+    createVideoModelApiManifest({
+      modelId: _0x4931db.modelId,
+      executionId: _0x4931db.executionId,
+      displayName: _0x4931db.displayName,
+      provider: _0x4931db.provider || 'apimart',
+      aliases: _0x4931db.aliases,
+      icon: _0x4931db.icon || 'AM',
+      description: _0x4931db.description,
+      fields: _0x4931db.fields,
+      inputSlots: _0x4931db.inputSlots,
+      prompt: _0x4931db.prompt,
+      help: _0x4931db.help,
+      footerPlacementOrder: _0x4931db.footerPlacementOrder,
+      extensions: Object.freeze({
+        ...(_0x4931db.extensions || {}),
+        ratioPolicy: getVideoManifestRatioPolicy(_0x4931db),
+      }),
+      ratioPolicy: getVideoManifestRatioPolicy(_0x4931db),
+    }),
+  ),
+);
+export const vendorVideoModelApiExecutionManifests = Object.freeze(
+  VENDOR_VIDEO_MODELS.map((_0x3a850d) =>
+    createVideoExecutionManifest({
+      id: _0x3a850d.executionId,
+      model: _0x3a850d.model,
+      provider: _0x3a850d.provider || 'apimart',
+      endpoint: _0x3a850d.endpoint || '/v1/videos/generations',
+      endpointMode: _0x3a850d.endpointMode,
+      extensions: _0x3a850d.executionExtensions,
+      bodyMapping: _0x3a850d.bodyMapping,
+      modeModels: _0x3a850d.modeModels,
+      responseMapping: _0x3a850d.responseMapping || APIMART_VIDEO_RESPONSE_MAPPING,
+      taskPolling: Object.prototype.hasOwnProperty.call(_0x3a850d, 'taskPolling')
+        ? _0x3a850d.taskPolling
+        : APIMART_VIDEO_TASK_POLLING,
+      resultTaskIdPath: _0x3a850d.resultTaskIdPath || 'task_id',
+    }),
+  ),
+);

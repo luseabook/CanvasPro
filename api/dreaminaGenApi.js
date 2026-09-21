@@ -1,1 +1,877 @@
-const a37_0x3e7ef7=a37_0x2b84;(function(_0x5a1f39,_0x49f307){const _0x288f37=a37_0x2b84,_0x225887=_0x5a1f39();while(!![]){try{const _0x18fb37=parseInt(_0x288f37(0x201))/0x1*(parseInt(_0x288f37(0x1e4))/0x2)+parseInt(_0x288f37(0x210))/0x3+parseInt(_0x288f37(0x244))/0x4*(-parseInt(_0x288f37(0x28f))/0x5)+-parseInt(_0x288f37(0x212))/0x6+-parseInt(_0x288f37(0x24a))/0x7+parseInt(_0x288f37(0x265))/0x8+-parseInt(_0x288f37(0x23d))/0x9;if(_0x18fb37===_0x49f307)break;else _0x225887['push'](_0x225887['shift']());}catch(_0x3870ee){_0x225887['push'](_0x225887['shift']());}}}(a37_0x2d61,0xb6170));import{requester}from'./requester.js';import{runTaskSingleFlight}from'./taskSingleFlight.js';import{ensureDreaminaVideoModelForTask,getDreaminaVideoModelVersion,normalizeDreaminaVideoDuration,normalizeDreaminaVideoAspectRatio,normalizeDreaminaVideoModel,normalizeDreaminaVideoResolution,normalizeDreaminaVideoRouteMode,resolveDreaminaVideoTaskType,validateDreaminaVideoRouteSelection}from'../src/modules/dreaminaVideoModelHelper.js';import{localPathToUrl,normalizeLocalPath}from'../src/utils/localMediaPath.js';const DREAMINA_SUBMIT_TIMEOUT=0xafc8,DREAMINA_QUERY_TIMEOUT=0xea60,DREAMINA_POLL_INTERVAL=0x7d0,DREAMINA_MAX_WAIT=0xa*0x3c*0x3e8,DREAMINA_QUERY_RETRIES=0x2,DREAMINA_QUERY_RETRY_DELAY=0x15e,DREAMINA_MAX_TRANSIENT_ERRORS=0xc;export const DREAMINA_POLL_TIMEOUT_CODE=a37_0x3e7ef7(0x25b);const DREAMINA_QUEUE_HINTS=[a37_0x3e7ef7(0x1f4),'queued',a37_0x3e7ef7(0x295),'wait',a37_0x3e7ef7(0x21e)],DREAMINA_TRANSIENT_ERROR_HINTS=[a37_0x3e7ef7(0x1d0),a37_0x3e7ef7(0x273),a37_0x3e7ef7(0x280),'超时','网络','network','connect',a37_0x3e7ef7(0x29e),a37_0x3e7ef7(0x22c),a37_0x3e7ef7(0x22e),'enotfound',a37_0x3e7ef7(0x291),'temporary',a37_0x3e7ef7(0x229),'暂时','稍后',a37_0x3e7ef7(0x25f),a37_0x3e7ef7(0x296),a37_0x3e7ef7(0x1eb),'too\x20many\x20requests',a37_0x3e7ef7(0x262),'500',a37_0x3e7ef7(0x24c),'503',a37_0x3e7ef7(0x29f)];function toStatus(_0x34514c){const _0x201126=a37_0x3e7ef7,_0x32d0d1=String(_0x34514c||'')[_0x201126(0x23e)]()[_0x201126(0x260)]();if(['success','succeeded',_0x201126(0x2b8),_0x201126(0x2ba),_0x201126(0x20d)][_0x201126(0x27f)](_0x32d0d1))return'success';if([_0x201126(0x2a9),'failed',_0x201126(0x1ce)][_0x201126(0x27f)](_0x32d0d1))return _0x201126(0x276);if(['cancelled','canceled'][_0x201126(0x27f)](_0x32d0d1))return'cancelled';return _0x201126(0x21e);}function collectPayloadObjects(..._0x12d875){const _0x3a3348=a37_0x3e7ef7,_0x2a69cd=[],_0x48d228=new Set(),_0x2a5f0e=(_0x3e1ba9,_0x2a6214=0x0)=>{const _0x1e998c=a37_0x2b84;if(!_0x3e1ba9||_0x2a6214>0x5)return;if(Array['isArray'](_0x3e1ba9)){_0x3e1ba9['forEach'](_0x3e6f27=>_0x2a5f0e(_0x3e6f27,_0x2a6214+0x1));return;}if(typeof _0x3e1ba9!==_0x1e998c(0x248))return;if(_0x48d228[_0x1e998c(0x24d)](_0x3e1ba9))return;_0x48d228[_0x1e998c(0x2a3)](_0x3e1ba9),_0x2a69cd[_0x1e998c(0x283)](_0x3e1ba9),['data',_0x1e998c(0x1ee),_0x1e998c(0x1f1),_0x1e998c(0x29b),_0x1e998c(0x1da),_0x1e998c(0x254)]['forEach'](_0x274571=>_0x2a5f0e(_0x3e1ba9[_0x274571],_0x2a6214+0x1));};return _0x12d875[_0x3a3348(0x1f6)](_0x1d005a=>_0x2a5f0e(_0x1d005a,0x0)),_0x2a69cd;}function a37_0x2b84(_0x589e2e,_0x11e19c){const _0x2d61e6=a37_0x2d61();return a37_0x2b84=function(_0x2b8415,_0x67dae1){_0x2b8415=_0x2b8415-0x1b9;let _0x3416ee=_0x2d61e6[_0x2b8415];return _0x3416ee;},a37_0x2b84(_0x589e2e,_0x11e19c);}function firstPayloadString(_0x5df285,_0x45b102){const _0x370ca1=a37_0x3e7ef7;for(const _0x4b0460 of _0x5df285){for(const _0x236721 of _0x45b102){const _0x2c0756=String(_0x4b0460?.[_0x236721]||'')[_0x370ca1(0x23e)]();if(_0x2c0756)return _0x2c0756;}}return'';}function extractDreaminaRawStatus(_0x24abba,_0x51aaee){const _0xc0a1a2=a37_0x3e7ef7,_0x528e39=collectPayloadObjects(_0x24abba,_0x51aaee)[_0xc0a1a2(0x1ff)](_0x17fa60=>firstPayloadString([_0x17fa60],[_0xc0a1a2(0x1bc),_0xc0a1a2(0x204),_0xc0a1a2(0x230)])[_0xc0a1a2(0x260)]())['filter'](Boolean);if(_0x528e39[_0xc0a1a2(0x221)](_0x5c2ac4=>[_0xc0a1a2(0x2a9),'failed',_0xc0a1a2(0x1ce)][_0xc0a1a2(0x27f)](_0x5c2ac4)))return _0xc0a1a2(0x276);if(_0x528e39[_0xc0a1a2(0x221)](_0x2defb3=>[_0xc0a1a2(0x20e),_0xc0a1a2(0x241),'done',_0xc0a1a2(0x2ba),_0xc0a1a2(0x20d)][_0xc0a1a2(0x27f)](_0x2defb3)))return _0xc0a1a2(0x20e);return'';}function extractDreaminaRawFailReason(_0x33d8ad,_0x1cca88){const _0x225b20=a37_0x3e7ef7;return firstPayloadString(collectPayloadObjects(_0x33d8ad,_0x1cca88),[_0x225b20(0x2bf),'fail_reason',_0x225b20(0x1c5),_0x225b20(0x1e5)]);}function extractDreaminaRawErrorMessage(_0x16c027,_0x38ba5f){const _0x1bbdec=a37_0x3e7ef7;return firstPayloadString(collectPayloadObjects(_0x16c027,_0x38ba5f),['error',_0x1bbdec(0x202),_0x1bbdec(0x1e9),_0x1bbdec(0x259)]);}function isDreaminaTerminalFailureMessage(_0x2b864b){const _0x3b9cde=a37_0x3e7ef7,_0x17f12e=String(_0x2b864b||'')[_0x3b9cde(0x23e)]()[_0x3b9cde(0x260)]();if(!_0x17f12e)return![];return['失败',_0x3b9cde(0x285),_0x3b9cde(0x205),'安全审核','违规','敏感',_0x3b9cde(0x2ae),'拦截','风控',_0x3b9cde(0x276),_0x3b9cde(0x20f),_0x3b9cde(0x1ce),_0x3b9cde(0x1ca),_0x3b9cde(0x21b),'content\x20filter',_0x3b9cde(0x1bd),'sensitive',_0x3b9cde(0x257),_0x3b9cde(0x2a6),_0x3b9cde(0x1cb)][_0x3b9cde(0x221)](_0x58bde0=>_0x17f12e[_0x3b9cde(0x27f)](_0x58bde0));}function normalizeResolutionType(_0x111c12){const _0x334658=a37_0x3e7ef7,_0xd6e63e=String(_0x111c12||'')[_0x334658(0x23e)]();if(!_0xd6e63e)return'';return _0xd6e63e['toLowerCase']();}function toTrimmedArray(_0x36971b){if(!Array['isArray'](_0x36971b))return[];const _0xd3597f=[];return _0x36971b['forEach'](_0x105390=>{const _0x3f732e=a37_0x2b84,_0x155655=String(_0x105390||'')[_0x3f732e(0x23e)]();if(_0x155655)_0xd3597f[_0x3f732e(0x283)](_0x155655);}),_0xd3597f;}function basenameFromPath(_0x5af682){const _0x44d8fa=a37_0x3e7ef7,_0x6bc77=String(_0x5af682||'')[_0x44d8fa(0x23e)]()['replace'](/\\/g,'/');if(!_0x6bc77)return'';return _0x6bc77[_0x44d8fa(0x1e8)]('/')[_0x44d8fa(0x20b)](Boolean)[_0x44d8fa(0x217)]()||'';}function a37_0x2d61(){const _0x288324=['onTaskId','queued','result','outputs','generating','queryResult','EAI_AGAIN','video_url','queue','images','forEach','prompt','download','intervalMs','url','/api/v2/dreamina/image2image','自适应','ENOTFOUND','videoList','map','fileList','26LmTgEo','errorMessage','taskKind','gen_status','内容安全','/api/v2/dreamina/image2video','/api/v2/dreamina/video_queue/cancel','onProgress','queue_status','max','filter','results','finished','success','failure','4221906uCrNEA','localPath','3025878FrZoow','resolution','audios','queueLength','video_list','pop','reference','文生视频需要填写提示词','resolutionType','content\x20safety','installId','dreamina','pending','resource','imageInfos','some','requiredModelId','contactText','videoUrl','client.timeout','即梦任务查询连续异常（','uri','onTaskMeta','temporarily','localUrl','file','socket','output','econn','image_url','genStatus','dreaminaTaskType','生成中','downloads','download_path','mediaList','last','toString','originalImageUrl','transitionPrompts','downloadUrl','do\x20request:','mimeType','1361187grIELy','trim','image_infos','/api/v2/dreamina/text2image','succeeded','即梦图片生成失败','即梦官方生成接口响应超时，本次没有拿到任务ID。网页可用不代表\x20CLI\x20生成接口稳定，请稍后重试；如果连续出现，请切换网络/代理或重新登录即梦后再试。','8cwbegc','全能参考至少需要\x201\x20个图片或视频参考','已完成','length','object','syncing','9869419oLpaya','ratio','502','has','请将视频裁剪到\x20','stringify','type','两张图的多帧叙事需要提示词','coverUrl','源音频','tasks','imageSize','code','flagged','multimodal2video','msg','mime_type','DREAMINA_POLL_TIMEOUT','modelVersion','dreamina/','localUri','busy','toLowerCase','trunc','429','awaiting\x20headers','即梦任务处理超时（已等待约\x20','3320232GlDUVT','application/json','text2video','auto','即梦任务处理超时，请稍后重试','即梦视频生成完成，但没有可用输出','filePath','toUpperCase','resources','file_url','retries','DNS_ERROR','entries','signal','time\x20out','mode','provider','failed','body','media','data','submitId','请将音频裁剪到\x20','\x20次），请稍后重试','now','videoInfos','includes','timed\x20out','\x20秒，超出即梦允许范围（','ECONNRESET','push','resultImageUrl','审核未通过','CANCELLED','model','首帧生视频至少需要\x201\x20张图片','时长\x20','inputUrls','download_url','SERVER_ERROR','autoDownload','content','313380BqTtbY','kind','eai_again','multiframe2video','media_list','slice','waiting','service\x20unavailable','test','多帧叙事的每段\x20transition\x20prompt\x20都不能为空','videos','files','listTask','image_list','raw','connection','504','queueIndex','image2video','取消即梦视频队列任务失败','add','1:1','result_image_url','blocked','cause','dreaminaRouteMode','fail','首帧生视频需要填写提示词','path','\x20分钟）','TIMEOUT','不符合','queue_length','local_path','/api/v2/dreamina/query_result?','submitId\x20不能为空','every','image2image','ETIMEDOUT','contactUrl','image','done','original_image_url','finish','text2image','排队中','RATE_LIMIT','originImageUrl','failReason','/api/v2/dreamina/multiframe2video','/api/v2/dreamina/frames2video','isFinite','AbortError','即梦图片任务提交失败','videoResolution','status','violation','/api/v2/dreamina/multimodal2video','file_list','cancelled','context\x20deadline\x20exceeded','SERVICE_UNAVAILABLE','subscriptionStatus','多帧叙事至少需要\x202\x20张图片','failureReason','首尾帧模式需要填写提示词','ECONNREFUSED','startsWith','function','review\x20failed','not\x20allowed','video','audio','error','reasonCode','timeout','失败：','frames2video','NETWORK_ERROR','transitionDurations','/api/v2/dreamina/text2video','queueStatus','retryDelay','正在同步结果','aborted','task','即梦视频生成失败','name','maxTransientErrors','medias','dreaminaReturnedError','match','\x20秒以内后再上传。','DREAMINA_QUERY_TRANSIENT_EXHAUSTED','isArray','85718LFWIEq','failure_reason','local_uri','aspectRatio','split','message','cover_url','rate\x20limit'];a37_0x2d61=function(){return _0x288324;};return a37_0x2d61();}export function normalizeDreaminaErrorMessage(_0x5ac19b){const _0x30901b=a37_0x3e7ef7,_0x26cad5=String(_0x5ac19b||'')[_0x30901b(0x23e)]();if(!_0x26cad5)return'';const _0x469540=_0x26cad5[_0x30901b(0x260)]();if(_0x469540['includes'](_0x30901b(0x23b))&&(_0x469540[_0x30901b(0x27f)](_0x30901b(0x1c1))||_0x469540['includes'](_0x30901b(0x225))||_0x469540['includes'](_0x30901b(0x263))))return _0x30901b(0x243);let _0x2ebc21=_0x26cad5[_0x30901b(0x1e0)](/upload resource\s+"([^"]+)"\s*:\s*upload (video|audio)\s*:\s*duration\s+([0-9.]+)\s+seconds\s+is\s+out\s+of\s+allowed\s+range\s+\[\s*([0-9.]+)\s*,\s*([0-9.]+)\s*\]/i);!_0x2ebc21&&(_0x2ebc21=_0x26cad5[_0x30901b(0x1e0)](/upload (video|audio)\s*:\s*duration\s+([0-9.]+)\s+seconds\s+is\s+out\s+of\s+allowed\s+range\s+\[\s*([0-9.]+)\s*,\s*([0-9.]+)\s*\]/i),_0x2ebc21&&(_0x2ebc21=['','',..._0x2ebc21[_0x30901b(0x294)](0x1)]));if(_0x2ebc21){const [,_0xf83356,_0x219c96,_0x4444b5,_0x3583f3,_0x425ca1]=_0x2ebc21,_0x56d6e1=String(_0x219c96||'')['toLowerCase']()===_0x30901b(0x1cd),_0x323b85=basenameFromPath(_0xf83356),_0x5a5bc5=_0x56d6e1?_0x30901b(0x253):'源视频',_0x2dd1c0=_0x323b85?'“'+_0x323b85+'”':_0x5a5bc5,_0x774d1=_0x56d6e1?_0x30901b(0x27b)+_0x425ca1+_0x30901b(0x1e1):_0x30901b(0x24e)+_0x425ca1+'\x20秒以内，建议裁到\x2014.9\x20秒后再上传。';return'上传'+_0x5a5bc5+_0x30901b(0x1d1)+_0x2dd1c0+_0x30901b(0x289)+_0x4444b5+_0x30901b(0x281)+_0x3583f3+'-'+_0x425ca1+'\x20秒）。'+_0x774d1;}return _0x26cad5;}function normalizeDreaminaThrownError(_0x4af0d7){if(_0x4af0d7&&typeof _0x4af0d7==='object'){const _0x3bb803=normalizeDreaminaErrorMessage(_0x4af0d7['message']);if(_0x3bb803)_0x4af0d7['message']=_0x3bb803;}return _0x4af0d7;}function normalizeModelVersion(_0x532308){const _0x1918f0=a37_0x3e7ef7,_0x4e8ffe=String(_0x532308?.['modelVersion']||'')[_0x1918f0(0x23e)]();if(_0x4e8ffe)return _0x4e8ffe;const _0x4bf07e=String(_0x532308?.['model']||'')[_0x1918f0(0x23e)]();if(!_0x4bf07e[_0x1918f0(0x1c8)](_0x1918f0(0x25d)))return'';const _0xa9c393=_0x4bf07e[_0x1918f0(0x294)](_0x1918f0(0x25d)['length'])[_0x1918f0(0x23e)]();if(_0xa9c393===_0x1918f0(0x2bb)||_0xa9c393===_0x1918f0(0x2b4)||_0xa9c393===_0x1918f0(0x267)||_0xa9c393===_0x1918f0(0x2a1))return'';return _0xa9c393;}function normalizeDreaminaRatio(_0x30a6d3,_0x22917b){const _0xff383b=a37_0x3e7ef7,_0x2ea4e4=String(_0x30a6d3?.[_0xff383b(0x1e7)]||'')[_0xff383b(0x23e)]();if(!_0x2ea4e4)return'';if(_0x2ea4e4===_0xff383b(0x1fc)||_0x2ea4e4===_0xff383b(0x268))return _0x22917b?'':_0xff383b(0x2a4);return _0x2ea4e4;}function toLocalPath(_0xcfa09f){return normalizeLocalPath(_0xcfa09f);}function toLocalUrl(_0x49266c){return localPathToUrl(_0x49266c);}function normalizeOutputsArray(_0x584433){const _0x2c2b0a=a37_0x3e7ef7,_0xe4db=[],_0x2fd137=new Set(),_0x4dd696=new Set([_0x2c2b0a(0x279),_0x2c2b0a(0x1ee),_0x2c2b0a(0x20c),_0x2c2b0a(0x22d),_0x2c2b0a(0x1ef),_0x2c2b0a(0x29d),_0x2c2b0a(0x1f1),_0x2c2b0a(0x2b7),_0x2c2b0a(0x1f5),_0x2c2b0a(0x29c),'imageList',_0x2c2b0a(0x23f),_0x2c2b0a(0x220),'video',_0x2c2b0a(0x299),_0x2c2b0a(0x216),_0x2c2b0a(0x1fe),'video_infos',_0x2c2b0a(0x27e),_0x2c2b0a(0x278),_0x2c2b0a(0x1de),_0x2c2b0a(0x293),_0x2c2b0a(0x235),_0x2c2b0a(0x22b),_0x2c2b0a(0x29a),_0x2c2b0a(0x1bf),_0x2c2b0a(0x200),_0x2c2b0a(0x21f),_0x2c2b0a(0x26d),_0x2c2b0a(0x1f8),_0x2c2b0a(0x233),_0x2c2b0a(0x28e),'contents']),_0x31d08e=['url',_0x2c2b0a(0x227),_0x2c2b0a(0x28b),_0x2c2b0a(0x23a),_0x2c2b0a(0x26e),'fileUrl','media_url','mediaUrl',_0x2c2b0a(0x22f),'imageUrl','origin_image_url',_0x2c2b0a(0x2be),_0x2c2b0a(0x2b9),_0x2c2b0a(0x238),_0x2c2b0a(0x2a5),_0x2c2b0a(0x284),_0x2c2b0a(0x1f3),'videoUrl',_0x2c2b0a(0x1ea),_0x2c2b0a(0x252),'src'],_0x1829e1=[_0x2c2b0a(0x2b0),_0x2c2b0a(0x211),_0x2c2b0a(0x2ab),'file_path',_0x2c2b0a(0x26b),_0x2c2b0a(0x234),'downloadPath',_0x2c2b0a(0x1e6),_0x2c2b0a(0x25e)],_0x1977eb=(_0x4b1704,_0x3bbf1c)=>{const _0x543fab=_0x2c2b0a;for(const _0x3f1f73 of _0x3bbf1c){const _0x47dee7=String(_0x4b1704?.[_0x3f1f73]||'')[_0x543fab(0x23e)]();if(_0x47dee7)return _0x47dee7;}return'';},_0x4566b2=_0x477dc7=>{const _0x1e9e70=_0x2c2b0a;if(!_0x477dc7||typeof _0x477dc7!==_0x1e9e70(0x248))return;const _0x24d692=_0x1977eb(_0x477dc7,_0x31d08e),_0x1a1ead=_0x1977eb(_0x477dc7,_0x1829e1),_0xe016cf=String(_0x477dc7?.[_0x1e9e70(0x23c)]||_0x477dc7?.[_0x1e9e70(0x25a)]||'')['trim']();if(!_0x24d692&&!_0x1a1ead)return;const _0x40129a=[_0x24d692,_0x1a1ead,_0xe016cf]['join']('|');if(_0x2fd137['has'](_0x40129a))return;_0x2fd137['add'](_0x40129a),_0xe4db[_0x1e9e70(0x283)](_0x477dc7);},_0x387ccf=_0x23d8f7=>{const _0x4feef1=_0x2c2b0a,_0x4ab50c=String(_0x23d8f7||'')['trim'](),_0x85220a=_0x4ab50c[_0x4feef1(0x260)]();if(_0x85220a[_0x4feef1(0x27f)]('input')||_0x85220a[_0x4feef1(0x27f)](_0x4feef1(0x218))||_0x85220a[_0x4feef1(0x27f)](_0x4feef1(0x1f7)))return![];return _0x4dd696['has'](_0x4ab50c)||_0x85220a[_0x4feef1(0x27f)](_0x4feef1(0x22d))||_0x85220a[_0x4feef1(0x27f)](_0x4feef1(0x1ee))||_0x85220a[_0x4feef1(0x27f)]('image')||_0x85220a[_0x4feef1(0x27f)]('video')||_0x85220a[_0x4feef1(0x27f)]('media')||_0x85220a[_0x4feef1(0x27f)](_0x4feef1(0x22b))||_0x85220a[_0x4feef1(0x27f)](_0x4feef1(0x1fa))||_0x85220a[_0x4feef1(0x27f)]('uri');},_0x370181=(_0x5f405a,_0x4800b6=0x0)=>{const _0x2b65d0=_0x2c2b0a;if(!_0x5f405a||_0x4800b6>0x8)return;if(typeof _0x5f405a==='string'){const _0x342cc1=_0x5f405a[_0x2b65d0(0x23e)]();if(/^https?:\/\//i[_0x2b65d0(0x297)](_0x342cc1))_0x4566b2({'url':_0x342cc1});return;}if(Array[_0x2b65d0(0x1e3)](_0x5f405a)){_0x5f405a['forEach'](_0x5c8ea8=>_0x370181(_0x5c8ea8,_0x4800b6+0x1));return;}if(typeof _0x5f405a!==_0x2b65d0(0x248))return;_0x4566b2({'url':_0x1977eb(_0x5f405a,_0x31d08e),'localPath':_0x1977eb(_0x5f405a,_0x1829e1),'mimeType':String(_0x5f405a?.[_0x2b65d0(0x23c)]||_0x5f405a?.[_0x2b65d0(0x25a)]||'')[_0x2b65d0(0x23e)]()}),Object[_0x2b65d0(0x271)](_0x5f405a)[_0x2b65d0(0x1f6)](([_0x3c4526,_0x46187f])=>{if(_0x387ccf(_0x3c4526))_0x370181(_0x46187f,_0x4800b6+0x1);});};return _0x370181(_0x584433),_0xe4db[_0x2c2b0a(0x1ff)](_0x137c56=>{const _0x1ce005=_0x2c2b0a,_0x394da7=toLocalPath(_0x137c56?.['localPath']);return{'url':String(_0x137c56?.[_0x1ce005(0x1fa)]||'')[_0x1ce005(0x23e)](),'localPath':_0x394da7,'localUrl':toLocalUrl(_0x394da7),'mimeType':String(_0x137c56?.[_0x1ce005(0x23c)]||'')[_0x1ce005(0x23e)]()};})[_0x2c2b0a(0x20b)](_0x49490f=>_0x49490f[_0x2c2b0a(0x1fa)]||_0x49490f[_0x2c2b0a(0x211)]);}function hasDreaminaUsableOutputs(_0x54b357){const _0x147f2f=a37_0x3e7ef7;return normalizeOutputsArray(_0x54b357)[_0x147f2f(0x247)]>0x0;}function normalizeQueueMetric(_0x490b14){const _0xb737fb=a37_0x3e7ef7,_0x21ebf0=Number(_0x490b14);if(!Number[_0xb737fb(0x2c2)](_0x21ebf0)||_0x21ebf0<0x0)return null;return Math['trunc'](_0x21ebf0);}function normalizeQueueStatus(_0x578a43){const _0x36369d=a37_0x3e7ef7;return String(_0x578a43||'')['trim']()[_0x36369d(0x260)]();}function isDreaminaQueuedState(_0x4d0f10,_0x404fe0){const _0x27a44d=a37_0x3e7ef7;if(_0x4d0f10!==_0x27a44d(0x21e))return![];if(!_0x404fe0)return![];return DREAMINA_QUEUE_HINTS['some'](_0x45bf4a=>_0x404fe0[_0x27a44d(0x27f)](_0x45bf4a));}function phaseToLabel(_0xf5f4bb,_0x1cfd03=''){const _0x3a02ff=a37_0x3e7ef7;if(_0xf5f4bb===_0x3a02ff(0x1ed))return _0x3a02ff(0x2bc);if(_0xf5f4bb===_0x3a02ff(0x1f0))return _0x3a02ff(0x232);if(_0xf5f4bb===_0x3a02ff(0x249))return _0x3a02ff(0x1d8);if(_0xf5f4bb==='done')return _0x3a02ff(0x246);if(_0xf5f4bb==='failed')return String(_0x1cfd03||'')[_0x3a02ff(0x23e)]()||'查询失败';return'处理中';}function sleep(_0x52adf7){return new Promise(_0x175441=>setTimeout(_0x175441,_0x52adf7));}function includesTransientHint(_0x12ea7b){const _0x2985a6=a37_0x3e7ef7,_0x489ff9=String(_0x12ea7b||'')[_0x2985a6(0x23e)]()[_0x2985a6(0x260)]();if(!_0x489ff9)return![];return DREAMINA_TRANSIENT_ERROR_HINTS['some'](_0x4ff3f6=>_0x489ff9['includes'](_0x4ff3f6));}function isTransientDreaminaError(_0x2dd701){const _0x536d4e=a37_0x3e7ef7;if(_0x2dd701?.[_0x536d4e(0x1df)]===!![])return![];const _0x225a21=String(_0x2dd701?.[_0x536d4e(0x256)]||'')['trim']()[_0x536d4e(0x26c)](),_0x511f0c=String(_0x2dd701?.[_0x536d4e(0x250)]||'')[_0x536d4e(0x23e)]()[_0x536d4e(0x26c)](),_0x4639f1=Number(_0x2dd701?.['status']);if(_0x225a21===_0x536d4e(0x2ad)||_0x225a21===_0x536d4e(0x2b5)||_0x225a21===_0x536d4e(0x282)||_0x225a21===_0x536d4e(0x1c7)||_0x225a21===_0x536d4e(0x1fd)||_0x225a21===_0x536d4e(0x1f2))return!![];if(_0x511f0c===_0x536d4e(0x2ad)||_0x511f0c===_0x536d4e(0x1d3)||_0x511f0c===_0x536d4e(0x270)||_0x511f0c===_0x536d4e(0x2bd)||_0x511f0c===_0x536d4e(0x28c)||_0x511f0c===_0x536d4e(0x1c2))return!![];if(_0x4639f1===0x1ad||_0x4639f1>=0x1f4)return!![];return includesTransientHint(_0x2dd701?.[_0x536d4e(0x1e9)]||_0x2dd701);}export function normalizeDreaminaTaskSnapshot(_0x40ad60,_0x34da21={}){const _0xcdb586=a37_0x3e7ef7,_0x5ae155=String(_0x34da21?.[_0xcdb586(0x27a)]||_0x40ad60?.['submitId']||_0x40ad60?.[_0xcdb586(0x29d)]?.[_0xcdb586(0x27a)]||'')[_0xcdb586(0x23e)](),_0x38e2ef=normalizeOutputsArray(_0x40ad60),_0x3cf608=toStatus(_0x40ad60?.[_0xcdb586(0x1bc)]),_0x2ba222=_0x40ad60?.[_0xcdb586(0x29d)]&&typeof _0x40ad60[_0xcdb586(0x29d)]===_0xcdb586(0x248)&&!Array[_0xcdb586(0x1e3)](_0x40ad60[_0xcdb586(0x29d)])?_0x40ad60['raw']:{},_0x263c1f=extractDreaminaRawStatus(_0x40ad60,_0x2ba222),_0x3f5321=normalizeQueueStatus(_0x2ba222[_0xcdb586(0x209)]||_0x2ba222[_0xcdb586(0x1d6)]||_0x40ad60?.[_0xcdb586(0x1d6)]),_0x41de93=normalizeQueueMetric(_0x2ba222['queue_idx']??_0x2ba222[_0xcdb586(0x2a0)]??_0x40ad60?.['queueIndex']),_0x331232=normalizeQueueMetric(_0x2ba222[_0xcdb586(0x2af)]??_0x2ba222['queueLength']??_0x40ad60?.[_0xcdb586(0x215)]),_0x217e55=extractDreaminaRawFailReason(_0x40ad60,_0x2ba222),_0x5bee9f=extractDreaminaRawErrorMessage(_0x40ad60,_0x2ba222),_0x568804=_0x263c1f===_0xcdb586(0x276)||_0x3cf608===_0xcdb586(0x276),_0x47fb63=_0x568804||isDreaminaTerminalFailureMessage(_0x5bee9f)?_0x5bee9f:'',_0x392964=_0x217e55||_0x47fb63,_0x483152=_0x568804||_0x392964?'failed':_0x263c1f||_0x3cf608;let _0x47feb1=_0xcdb586(0x1f0);if(_0x483152===_0xcdb586(0x276))_0x47feb1=_0xcdb586(0x276);else{if(_0x483152===_0xcdb586(0x1c0))_0x47feb1=_0xcdb586(0x1c0);else{if(_0x483152===_0xcdb586(0x20e))_0x47feb1=_0x38e2ef[_0xcdb586(0x247)]>0x0?_0xcdb586(0x2b8):_0xcdb586(0x249);else isDreaminaQueuedState(_0x483152,_0x3f5321)&&(_0x47feb1=_0xcdb586(0x1ed));}}const _0x1f85af=_0x483152===_0xcdb586(0x276)?'failed':_0x483152==='cancelled'?_0xcdb586(0x1c0):_0x483152===_0xcdb586(0x20e)&&_0x38e2ef['length']>0x0?_0xcdb586(0x20e):_0xcdb586(0x21e);return{'submitId':_0x5ae155,'status':_0x1f85af,'phase':_0x47feb1,'label':phaseToLabel(_0x47feb1,_0x392964),'queueStatus':_0x3f5321,'queueIndex':_0x41de93,'queueLength':_0x331232,'outputs':_0x38e2ef,'failReason':_0x392964,'raw':_0x2ba222,'isTerminal':_0x47feb1===_0xcdb586(0x2b8)||_0x47feb1===_0xcdb586(0x276)||_0x47feb1===_0xcdb586(0x1c0),'hasOutputs':_0x38e2ef[_0xcdb586(0x247)]>0x0,'lastCheckedAt':Date[_0xcdb586(0x27d)]()};}function postJson(_0x3ad9e9,_0x240920){const _0x19e5d4=a37_0x3e7ef7;return requester({'url':_0x3ad9e9,'method':'POST','provider':'dreamina','timeout':DREAMINA_SUBMIT_TIMEOUT,'headers':{'Content-Type':_0x19e5d4(0x266)},'body':JSON[_0x19e5d4(0x24f)](_0x240920||{})});}export async function submitDreaminaText2Image(_0x121c94){const _0x17ed67=a37_0x3e7ef7;return postJson(_0x17ed67(0x240),_0x121c94);}export async function submitDreaminaImage2Image(_0x1b5e3c){const _0x1c3b09=a37_0x3e7ef7;return postJson(_0x1c3b09(0x1fb),_0x1b5e3c);}export async function submitDreaminaText2Video(_0x34c72d){const _0x507c05=a37_0x3e7ef7;return postJson(_0x507c05(0x1d5),_0x34c72d);}export async function submitDreaminaImage2Video(_0x5e7887){const _0x43ac9b=a37_0x3e7ef7;return postJson(_0x43ac9b(0x206),_0x5e7887);}export async function submitDreaminaFrames2Video(_0x26b937){const _0x8515f3=a37_0x3e7ef7;return postJson(_0x8515f3(0x2c1),_0x26b937);}export async function submitDreaminaMultiframe2Video(_0x20ba2e){const _0xb5f193=a37_0x3e7ef7;return postJson(_0xb5f193(0x2c0),_0x20ba2e);}export async function submitDreaminaMultimodal2Video(_0x331091){const _0x2b11b9=a37_0x3e7ef7;return postJson(_0x2b11b9(0x1be),_0x331091);}export async function cancelDreaminaVideoQueueTask(_0x17ba96){const _0x31f1e6=a37_0x3e7ef7,_0x20fcf4=String(_0x17ba96||'')['trim']();if(!_0x20fcf4)throw new Error(_0x31f1e6(0x2b2));const _0x52163b=await postJson(_0x31f1e6(0x207),{'submitId':_0x20fcf4});if(_0x52163b?.[_0x31f1e6(0x20e)]===![])throw new Error(_0x52163b?.[_0x31f1e6(0x1e9)]||_0x31f1e6(0x2a2));return _0x52163b||{};}export async function queryDreaminaResult(_0x543e96,_0x516f85={}){const _0x5ec134=a37_0x3e7ef7,_0x113098=String(_0x543e96||'')['trim']();if(!_0x113098)throw new Error('submitId\x20不能为空');const _0x18bc29=_0x516f85?.[_0x5ec134(0x28d)]!==![],_0x34687e=new URLSearchParams({'submitId':_0x113098,'autoDownload':_0x18bc29?'1':'0'}),_0xac9dea=await requester({'url':_0x5ec134(0x2b1)+_0x34687e[_0x5ec134(0x237)](),'method':'GET','provider':'dreamina','timeout':DREAMINA_QUERY_TIMEOUT,'retries':Number[_0x5ec134(0x2c2)](Number(_0x516f85?.[_0x5ec134(0x26f)]))?Math[_0x5ec134(0x20a)](0x0,Math['trunc'](Number(_0x516f85['retries']))):DREAMINA_QUERY_RETRIES,'retryDelay':Number[_0x5ec134(0x2c2)](Number(_0x516f85?.[_0x5ec134(0x1d7)]))?Math['max'](0x0,Math[_0x5ec134(0x261)](Number(_0x516f85['retryDelay']))):DREAMINA_QUERY_RETRY_DELAY});if(_0xac9dea?.[_0x5ec134(0x20e)]===![]){const _0x27a5a7=new Error(normalizeDreaminaErrorMessage(_0xac9dea?.[_0x5ec134(0x1e9)])||'即梦任务查询失败');_0x27a5a7[_0x5ec134(0x256)]='DREAMINA_RETURNED_ERROR',_0x27a5a7['dreaminaReturnedError']=!![];throw _0x27a5a7;}return _0xac9dea||{};}async function pollDreaminaUntilDoneOnce(_0x22bdfc,_0x1b46ce={}){const _0x4050ba=a37_0x3e7ef7,_0x13ffc5=Number(_0x1b46ce?.['maxWaitMs']||DREAMINA_MAX_WAIT),_0x228560=Number(_0x1b46ce?.[_0x4050ba(0x1f9)]||DREAMINA_POLL_INTERVAL),_0x597444=Number['isFinite'](Number(_0x1b46ce?.[_0x4050ba(0x1dd)]))?Math[_0x4050ba(0x20a)](0x0,Math[_0x4050ba(0x261)](Number(_0x1b46ce[_0x4050ba(0x1dd)]))):DREAMINA_MAX_TRANSIENT_ERRORS,_0x35cf6f=Date[_0x4050ba(0x27d)]();let _0x292081=null,_0x131116=0x0;while(Date['now']()-_0x35cf6f<_0x13ffc5){if(_0x1b46ce?.[_0x4050ba(0x272)]?.[_0x4050ba(0x1d9)])throw new Error(_0x4050ba(0x286));let _0x297e7b=null;try{_0x292081=await queryDreaminaResult(_0x22bdfc,{'autoDownload':!![]}),_0x297e7b=normalizeDreaminaTaskSnapshot(_0x292081,{'submitId':_0x22bdfc});}catch(_0x457d30){if(_0x1b46ce?.[_0x4050ba(0x272)]?.[_0x4050ba(0x1d9)]||_0x457d30?.[_0x4050ba(0x1dc)]===_0x4050ba(0x1b9)||_0x457d30?.['message']===_0x4050ba(0x286))throw _0x457d30;if(isTransientDreaminaError(_0x457d30)){_0x131116+=0x1;if(_0x131116>_0x597444){const _0x55905f=new Error(_0x4050ba(0x226)+_0x131116+_0x4050ba(0x27c));_0x55905f['code']=_0x4050ba(0x1e2),_0x55905f[_0x4050ba(0x27a)]=String(_0x22bdfc||'')['trim'](),_0x55905f[_0x4050ba(0x2a7)]=_0x457d30;throw _0x55905f;}await sleep(_0x228560);continue;}throw _0x457d30;}_0x131116=0x0;typeof _0x1b46ce?.[_0x4050ba(0x208)]===_0x4050ba(0x1c9)&&await _0x1b46ce[_0x4050ba(0x208)](_0x297e7b);const _0x21fc15=toStatus(_0x297e7b?.[_0x4050ba(0x1bc)]);if(_0x21fc15===_0x4050ba(0x1c0))throw new Error('CANCELLED');if(_0x21fc15===_0x4050ba(0x276))return _0x292081;if(_0x21fc15===_0x4050ba(0x20e)&&hasDreaminaUsableOutputs(_0x292081))return _0x292081;await sleep(_0x228560);}try{const _0x5d7561=await queryDreaminaResult(_0x22bdfc,{'autoDownload':!![]}),_0x2745ca=normalizeDreaminaTaskSnapshot(_0x5d7561,{'submitId':_0x22bdfc});typeof _0x1b46ce?.['onProgress']==='function'&&await _0x1b46ce['onProgress'](_0x2745ca);const _0x3f02dc=toStatus(_0x2745ca?.[_0x4050ba(0x1bc)]);if(_0x3f02dc==='cancelled')throw new Error(_0x4050ba(0x286));if(_0x3f02dc===_0x4050ba(0x276))return _0x5d7561;if(_0x3f02dc===_0x4050ba(0x20e)&&hasDreaminaUsableOutputs(_0x5d7561))return _0x5d7561;_0x292081=_0x5d7561;}catch(_0x41cf9b){throw _0x41cf9b;}const _0x154556=Number[_0x4050ba(0x2c2)](_0x13ffc5)&&_0x13ffc5>0x0?Math[_0x4050ba(0x20a)](0x1,Math['ceil'](_0x13ffc5/0xea60)):0x0,_0x327d2f=new Error(_0x154556>0x0?_0x4050ba(0x264)+_0x154556+_0x4050ba(0x2ac):_0x4050ba(0x269));_0x327d2f[_0x4050ba(0x256)]=DREAMINA_POLL_TIMEOUT_CODE,_0x327d2f['submitId']=String(_0x22bdfc||'')[_0x4050ba(0x23e)]();throw _0x327d2f;}export async function pollDreaminaUntilDone(_0x22a191,_0x220e56={}){const _0x3b5104=a37_0x3e7ef7,_0x44480d=String(_0x22a191||'')[_0x3b5104(0x23e)](),_0x5e517b=String(_0x220e56?.[_0x3b5104(0x203)]||_0x220e56?.[_0x3b5104(0x290)]||_0x3b5104(0x1da))[_0x3b5104(0x23e)]()||'task';return runTaskSingleFlight({'provider':_0x3b5104(0x21d),'kind':_0x5e517b,'submitId':_0x44480d},()=>pollDreaminaUntilDoneOnce(_0x44480d,_0x220e56));}export async function runDreaminaImageGeneration(_0x3656d5,_0x2b6425={}){const _0x5e1fb3=a37_0x3e7ef7,_0x314e66=String(_0x3656d5?.[_0x5e1fb3(0x1f7)]||'')[_0x5e1fb3(0x23e)](),_0x40979e=Array['isArray'](_0x3656d5?.[_0x5e1fb3(0x28a)])?_0x3656d5[_0x5e1fb3(0x28a)][_0x5e1fb3(0x20b)](Boolean):[],_0x457d15=_0x40979e['length']>0x0,_0x3fb593=normalizeDreaminaRatio(_0x3656d5,_0x457d15),_0x5b3db6=normalizeResolutionType(_0x3656d5?.[_0x5e1fb3(0x255)]),_0x310703=normalizeModelVersion(_0x3656d5),_0x111928={'prompt':_0x314e66};if(_0x3fb593)_0x111928[_0x5e1fb3(0x24b)]=_0x3fb593;if(_0x5b3db6)_0x111928[_0x5e1fb3(0x21a)]=_0x5b3db6;if(_0x310703)_0x111928[_0x5e1fb3(0x25c)]=_0x310703;let _0x4c1796=null;_0x40979e[_0x5e1fb3(0x247)]>0x0?_0x4c1796=await submitDreaminaImage2Image({'images':_0x40979e,..._0x111928}):_0x4c1796=await submitDreaminaText2Image({..._0x111928});if(_0x4c1796?.[_0x5e1fb3(0x20e)]===![])throw new Error(normalizeDreaminaErrorMessage(_0x4c1796?.[_0x5e1fb3(0x1e9)])||_0x5e1fb3(0x1ba));const _0x24abf7=String(_0x4c1796?.[_0x5e1fb3(0x27a)]||'')[_0x5e1fb3(0x23e)]();if(!_0x24abf7)throw new Error('即梦图片任务提交失败：未返回\x20submitId');_0x2b6425?.[_0x5e1fb3(0x228)]?.({'taskId':_0x24abf7,'submitId':_0x24abf7,'provider':_0x5e1fb3(0x21d),'kind':_0x5e1fb3(0x2b7)}),_0x2b6425?.[_0x5e1fb3(0x1ec)]?.(_0x24abf7);const _0x3997ab=await pollDreaminaUntilDone(_0x24abf7,{..._0x2b6425,'taskKind':_0x5e1fb3(0x2b7)}),_0x410e8a=normalizeDreaminaTaskSnapshot(_0x3997ab,{'submitId':_0x24abf7});if(_0x410e8a?.['phase']===_0x5e1fb3(0x276))throw new Error(normalizeDreaminaErrorMessage(_0x410e8a?.[_0x5e1fb3(0x2bf)])||_0x5e1fb3(0x242));const _0x443914=Array[_0x5e1fb3(0x1e3)](_0x410e8a?.['outputs'])?_0x410e8a[_0x5e1fb3(0x1ef)]:[];if(!_0x443914['length'])throw new Error('即梦图片生成完成，但没有可用输出');return _0x443914[_0x5e1fb3(0x1ff)](_0x46f964=>{const _0xc73b1f=_0x5e1fb3,_0x12996e=_0x46f964[_0xc73b1f(0x22a)]||_0x46f964[_0xc73b1f(0x1fa)];return{'sourceId':null,'thumbId':null,'sourceUrl':_0x46f964[_0xc73b1f(0x1fa)]||_0x12996e,'thumbUrl':_0x12996e,'imageUrl':_0x12996e,'localPath':_0x46f964[_0xc73b1f(0x211)]||''};});}export function buildDreaminaVideoSubmitRequest(_0x2688fb={}){const _0x71699a=a37_0x3e7ef7,_0x57efa7=toTrimmedArray(Array['isArray'](_0x2688fb?.[_0x71699a(0x1f5)])&&_0x2688fb[_0x71699a(0x1f5)]['length']?_0x2688fb[_0x71699a(0x1f5)]:_0x2688fb?.[_0x71699a(0x28a)]),_0x579872=toTrimmedArray(_0x2688fb?.['videos']),_0x1ce01f=toTrimmedArray(_0x2688fb?.[_0x71699a(0x214)]),_0x46191=normalizeDreaminaVideoRouteMode(_0x2688fb?.[_0x71699a(0x2a8)],_0x2688fb?.[_0x71699a(0x274)]),_0x3ce060=String(_0x2688fb?.[_0x71699a(0x231)]||'')[_0x71699a(0x23e)]()||resolveDreaminaVideoTaskType({'routeMode':_0x46191,'imageCount':_0x57efa7[_0x71699a(0x247)],'videoCount':_0x579872[_0x71699a(0x247)],'audioCount':_0x1ce01f[_0x71699a(0x247)]}),_0x97891e=validateDreaminaVideoRouteSelection({'routeMode':_0x46191,'taskType':_0x3ce060,'imageCount':_0x57efa7[_0x71699a(0x247)],'videoCount':_0x579872[_0x71699a(0x247)],'audioCount':_0x1ce01f[_0x71699a(0x247)]});if(_0x97891e)throw new Error(_0x97891e);const _0x182299=String(_0x2688fb?.['prompt']||'')['trim'](),_0x4d6bae=normalizeDreaminaVideoModel(_0x2688fb?.[_0x71699a(0x287)],_0x2688fb?.[_0x71699a(0x275)]),_0x321e0f=ensureDreaminaVideoModelForTask(_0x3ce060,_0x4d6bae,_0x71699a(0x21d))||_0x4d6bae,_0x409047=String(_0x2688fb?.[_0x71699a(0x25c)]||'')[_0x71699a(0x23e)]()||getDreaminaVideoModelVersion(_0x321e0f,_0x71699a(0x21d))||normalizeModelVersion(_0x2688fb),_0x530533=String(_0x2688fb?.['installId']||'')[_0x71699a(0x23e)](),_0x2fe2b6=normalizeDreaminaVideoResolution(_0x3ce060,_0x321e0f,_0x2688fb?.[_0x71699a(0x1bb)]||_0x2688fb?.['videoSize']||_0x2688fb?.[_0x71699a(0x213)],'dreamina'),_0xbbbca5=normalizeDreaminaVideoAspectRatio(_0x2688fb?.[_0x71699a(0x1e7)]),_0x589e18=normalizeDreaminaVideoDuration(_0x3ce060,_0x321e0f,_0x2688fb?.['duration'],_0x71699a(0x21d));if(_0x3ce060==='text2video'){if(!_0x182299)throw new Error(_0x71699a(0x219));return{'taskType':_0x3ce060,'url':_0x71699a(0x1d5),'body':{'prompt':_0x182299,'duration':_0x589e18,'ratio':_0xbbbca5,'videoResolution':_0x2fe2b6,..._0x530533?{'installId':_0x530533}:{},..._0x409047?{'modelVersion':_0x409047}:{}}};}if(_0x3ce060===_0x71699a(0x2a1)){const _0x493d18=String(_0x2688fb?.['image']||_0x57efa7[0x0]||'')[_0x71699a(0x23e)]();if(!_0x182299)throw new Error(_0x71699a(0x2aa));if(!_0x493d18)throw new Error(_0x71699a(0x288));return{'taskType':_0x3ce060,'url':_0x71699a(0x206),'body':{'image':_0x493d18,'prompt':_0x182299,'duration':_0x589e18,'videoResolution':_0x2fe2b6,..._0x530533?{'installId':_0x530533}:{},..._0x409047?{'modelVersion':_0x409047}:{}}};}if(_0x3ce060===_0x71699a(0x1d2)){const _0x5e3c46=String(_0x2688fb?.['first']||_0x57efa7[0x0]||'')[_0x71699a(0x23e)](),_0x2d1a52=String(_0x2688fb?.[_0x71699a(0x236)]||_0x57efa7[0x1]||'')[_0x71699a(0x23e)]();if(!_0x182299)throw new Error(_0x71699a(0x1c6));if(!_0x5e3c46||!_0x2d1a52)throw new Error('首尾帧模式至少需要\x202\x20张图片');return{'taskType':_0x3ce060,'url':_0x71699a(0x2c1),'body':{'first':_0x5e3c46,'last':_0x2d1a52,'prompt':_0x182299,'duration':_0x589e18,'videoResolution':_0x2fe2b6,..._0x530533?{'installId':_0x530533}:{},..._0x409047?{'modelVersion':_0x409047}:{}}};}if(_0x3ce060===_0x71699a(0x292)){const _0x289c7a=_0x57efa7[_0x71699a(0x294)](0x0,0x14);if(_0x289c7a[_0x71699a(0x247)]<0x2)throw new Error(_0x71699a(0x1c4));const _0x5d08fc=Array[_0x71699a(0x1e3)](_0x2688fb?.[_0x71699a(0x239)])?_0x2688fb[_0x71699a(0x239)]['map'](_0x5d26ec=>String(_0x5d26ec||'')['trim']()):[],_0x237bc0=Array[_0x71699a(0x1e3)](_0x2688fb?.['transitionDurations'])?_0x2688fb[_0x71699a(0x1d4)]:[],_0x308db9=Math['max'](0x0,_0x289c7a['length']-0x1),_0x598f69=[],_0x1c9081=[];for(let _0x255b82=0x0;_0x255b82<_0x308db9;_0x255b82+=0x1){_0x598f69[_0x71699a(0x283)](String(_0x5d08fc[_0x255b82]||'')[_0x71699a(0x23e)]()||_0x182299);const _0x24c290=Number(_0x237bc0[_0x255b82]);_0x1c9081[_0x71699a(0x283)](Number[_0x71699a(0x2c2)](_0x24c290)&&_0x24c290>0x0?Math[_0x71699a(0x20a)](0x1,Math[_0x71699a(0x261)](_0x24c290)):0x3);}const _0x596ea0={'images':_0x289c7a};if(_0x530533)_0x596ea0[_0x71699a(0x21c)]=_0x530533;if(_0x289c7a[_0x71699a(0x247)]===0x2){if(!(_0x598f69[0x0]||_0x182299))throw new Error(_0x71699a(0x251));_0x596ea0[_0x71699a(0x1f7)]=_0x598f69[0x0]||_0x182299,_0x596ea0['duration']=_0x1c9081[0x0]||_0x589e18||0x3;}else{if(!_0x598f69[_0x71699a(0x2b3)](_0x3609c9=>String(_0x3609c9||'')['trim']()))throw new Error(_0x71699a(0x298));_0x596ea0[_0x71699a(0x239)]=_0x598f69,_0x596ea0[_0x71699a(0x1d4)]=_0x1c9081;}return{'taskType':_0x3ce060,'url':'/api/v2/dreamina/multiframe2video','body':_0x596ea0};}if(_0x3ce060===_0x71699a(0x258)){if(!_0x57efa7['length']&&!_0x579872[_0x71699a(0x247)])throw new Error(_0x71699a(0x245));return{'taskType':_0x3ce060,'url':'/api/v2/dreamina/multimodal2video','body':{'images':_0x57efa7,'videos':_0x579872,'audios':_0x1ce01f,'prompt':_0x182299,'duration':_0x589e18,'ratio':_0xbbbca5,'videoResolution':_0x2fe2b6,..._0x530533?{'installId':_0x530533}:{},..._0x409047?{'modelVersion':_0x409047}:{}}};}throw new Error('未识别的即梦视频任务类型');}export async function runDreaminaVideoGeneration(_0x8eea56,_0x4d389d={}){const _0x3721c3=a37_0x3e7ef7,_0x296447=buildDreaminaVideoSubmitRequest(_0x8eea56||{});let _0x1c9f82=null;try{if(_0x296447[_0x3721c3(0x1fa)]===_0x3721c3(0x1d5))_0x1c9f82=await submitDreaminaText2Video(_0x296447[_0x3721c3(0x277)]);else{if(_0x296447[_0x3721c3(0x1fa)]===_0x3721c3(0x206))_0x1c9f82=await submitDreaminaImage2Video(_0x296447[_0x3721c3(0x277)]);else{if(_0x296447[_0x3721c3(0x1fa)]===_0x3721c3(0x2c1))_0x1c9f82=await submitDreaminaFrames2Video(_0x296447[_0x3721c3(0x277)]);else{if(_0x296447['url']==='/api/v2/dreamina/multiframe2video')_0x1c9f82=await submitDreaminaMultiframe2Video(_0x296447[_0x3721c3(0x277)]);else{if(_0x296447['url']===_0x3721c3(0x1be))_0x1c9f82=await submitDreaminaMultimodal2Video(_0x296447['body']);else throw new Error('未知的即梦视频请求路由');}}}}}catch(_0x41d438){throw normalizeDreaminaThrownError(_0x41d438);}if(_0x1c9f82?.['success']===![]){const _0xf189db=new Error(normalizeDreaminaErrorMessage(_0x1c9f82?.['message'])||'即梦视频任务提交失败');if(_0x1c9f82?.['code']!=null)_0xf189db[_0x3721c3(0x256)]=String(_0x1c9f82[_0x3721c3(0x256)]||'');_0x1c9f82?.[_0x3721c3(0x222)]!=null&&(_0xf189db[_0x3721c3(0x222)]=String(_0x1c9f82[_0x3721c3(0x222)]||'')['trim']());_0x1c9f82?.[_0x3721c3(0x1c3)]!=null&&(_0xf189db[_0x3721c3(0x1c3)]=String(_0x1c9f82[_0x3721c3(0x1c3)]||'')['trim']());_0x1c9f82?.[_0x3721c3(0x1cf)]!=null&&(_0xf189db[_0x3721c3(0x1cf)]=String(_0x1c9f82['reasonCode']||'')['trim']());_0xf189db[_0x3721c3(0x223)]=String(_0x1c9f82?.[_0x3721c3(0x223)]||'')[_0x3721c3(0x23e)](),_0xf189db[_0x3721c3(0x2b6)]=String(_0x1c9f82?.[_0x3721c3(0x2b6)]||'')[_0x3721c3(0x23e)]();throw _0xf189db;}const _0x3433b6=String(_0x1c9f82?.['submitId']||'')[_0x3721c3(0x23e)]();if(!_0x3433b6)throw new Error('即梦视频任务提交失败：未返回\x20submitId');_0x4d389d?.[_0x3721c3(0x228)]?.({'taskId':_0x3433b6,'submitId':_0x3433b6,'provider':'dreamina','kind':'video'}),_0x4d389d?.[_0x3721c3(0x1ec)]?.(_0x3433b6);const _0x56bb1a=await pollDreaminaUntilDone(_0x3433b6,{..._0x4d389d,'taskKind':_0x3721c3(0x1cc)}),_0x1f3e0f=normalizeDreaminaTaskSnapshot(_0x56bb1a,{'submitId':_0x3433b6});if(_0x1f3e0f?.['phase']==='failed')throw new Error(normalizeDreaminaErrorMessage(_0x1f3e0f?.[_0x3721c3(0x2bf)])||_0x3721c3(0x1db));const _0x32d4f9=Array[_0x3721c3(0x1e3)](_0x1f3e0f?.['outputs'])?_0x1f3e0f[_0x3721c3(0x1ef)]:[];if(!_0x32d4f9[_0x3721c3(0x247)])throw new Error(_0x3721c3(0x26a));const _0x57aad8=_0x32d4f9[_0x3721c3(0x1ff)](_0x301892=>({'videoUrl':_0x301892['localUrl']||_0x301892[_0x3721c3(0x1fa)],'localPath':_0x301892[_0x3721c3(0x211)]||''}));return{'isBatch':_0x57aad8[_0x3721c3(0x247)]>0x1,'videos':_0x57aad8,'videoUrl':_0x57aad8[0x0]?.[_0x3721c3(0x224)]||'','localPath':_0x57aad8[0x0]?.[_0x3721c3(0x211)]||''};}
+import { requester } from './requester.js';
+import { runTaskSingleFlight } from './taskSingleFlight.js';
+import {
+  ensureDreaminaVideoModelForTask,
+  getDreaminaVideoModelVersion,
+  normalizeDreaminaVideoDuration,
+  normalizeDreaminaVideoAspectRatio,
+  normalizeDreaminaVideoModel,
+  normalizeDreaminaVideoResolution,
+  normalizeDreaminaVideoRouteMode,
+  resolveDreaminaVideoTaskType,
+  validateDreaminaVideoRouteSelection,
+} from '../src/modules/dreaminaVideoModelHelper.js';
+import { localPathToUrl, normalizeLocalPath } from '../src/utils/localMediaPath.js';
+const DREAMINA_SUBMIT_TIMEOUT = 0xafc8,
+  DREAMINA_QUERY_TIMEOUT = 0xea60,
+  DREAMINA_POLL_INTERVAL = 0x7d0,
+  DREAMINA_MAX_WAIT = 10 * 60 * 0x3e8,
+  DREAMINA_QUERY_RETRIES = 2,
+  DREAMINA_QUERY_RETRY_DELAY = 0x15e,
+  DREAMINA_MAX_TRANSIENT_ERRORS = 12;
+export const DREAMINA_POLL_TIMEOUT_CODE = 'DREAMINA_POLL_TIMEOUT';
+const DREAMINA_QUEUE_HINTS = ['queue', 'queued', 'waiting', 'wait', 'pending'],
+  DREAMINA_TRANSIENT_ERROR_HINTS = [
+    'timeout',
+    'time out',
+    'timed out',
+    '超时',
+    '网络',
+    'network',
+    'connect',
+    'connection',
+    'socket',
+    'econn',
+    'enotfound',
+    'eai_again',
+    'temporary',
+    'temporarily',
+    '暂时',
+    '稍后',
+    'busy',
+    'service unavailable',
+    'rate limit',
+    'too many requests',
+    '429',
+    '500',
+    '502',
+    '503',
+    '504',
+  ];
+function toStatus(_0x34514c) {
+  const _0x32d0d1 = String(_0x34514c || '')
+    .trim()
+    .toLowerCase();
+  if (['success', 'succeeded', 'done', 'finish', 'finished'].includes(_0x32d0d1)) return 'success';
+  if (['fail', 'failed', 'error'].includes(_0x32d0d1)) return 'failed';
+  if (['cancelled', 'canceled'].includes(_0x32d0d1)) return 'cancelled';
+  return 'pending';
+}
+function collectPayloadObjects(..._0x12d875) {
+  const _0x2a69cd = [],
+    _0x48d228 = new Set(),
+    _0x2a5f0e = (_0x3e1ba9, _0x2a6214 = 0) => {
+      if (!_0x3e1ba9 || _0x2a6214 > 5) return;
+      if (Array.isArray(_0x3e1ba9)) {
+        _0x3e1ba9.forEach((_0x3e6f27) => _0x2a5f0e(_0x3e6f27, _0x2a6214 + 1));
+        return;
+      }
+      if (typeof _0x3e1ba9 !== 'object') return;
+      if (_0x48d228.has(_0x3e1ba9)) return;
+      (_0x48d228.add(_0x3e1ba9),
+        _0x2a69cd.push(_0x3e1ba9),
+        ['data', 'result', 'queryResult', 'listTask', 'task', 'tasks'].forEach((_0x274571) =>
+          _0x2a5f0e(_0x3e1ba9[_0x274571], _0x2a6214 + 1),
+        ));
+    };
+  return (_0x12d875.forEach((_0x1d005a) => _0x2a5f0e(_0x1d005a, 0)), _0x2a69cd);
+}
+function firstPayloadString(_0x5df285, _0x45b102) {
+  for (const _0x4b0460 of _0x5df285) {
+    for (const _0x236721 of _0x45b102) {
+      const _0x2c0756 = String(_0x4b0460?.[_0x236721] || '').trim();
+      if (_0x2c0756) return _0x2c0756;
+    }
+  }
+  return '';
+}
+function extractDreaminaRawStatus(_0x24abba, _0x51aaee) {
+  const _0x528e39 = collectPayloadObjects(_0x24abba, _0x51aaee)
+    .map((_0x17fa60) => firstPayloadString([_0x17fa60], ['status', 'gen_status', 'genStatus']).toLowerCase())
+    .filter(Boolean);
+  if (_0x528e39.some((_0x5c2ac4) => ['fail', 'failed', 'error'].includes(_0x5c2ac4))) return 'failed';
+  if (
+    _0x528e39.some((_0x2defb3) => ['success', 'succeeded', 'done', 'finish', 'finished'].includes(_0x2defb3))
+  )
+    return 'success';
+  return '';
+}
+function extractDreaminaRawFailReason(_0x33d8ad, _0x1cca88) {
+  return firstPayloadString(collectPayloadObjects(_0x33d8ad, _0x1cca88), [
+    'failReason',
+    'fail_reason',
+    'failureReason',
+    'failure_reason',
+  ]);
+}
+function extractDreaminaRawErrorMessage(_0x16c027, _0x38ba5f) {
+  return firstPayloadString(collectPayloadObjects(_0x16c027, _0x38ba5f), [
+    'error',
+    'errorMessage',
+    'message',
+    'msg',
+  ]);
+}
+function isDreaminaTerminalFailureMessage(_0x2b864b) {
+  const _0x17f12e = String(_0x2b864b || '')
+    .trim()
+    .toLowerCase();
+  if (!_0x17f12e) return false;
+  return [
+    '失败',
+    '审核未通过',
+    '内容安全',
+    '安全审核',
+    '违规',
+    '敏感',
+    '不符合',
+    '拦截',
+    '风控',
+    'failed',
+    'failure',
+    'error',
+    'review failed',
+    'content safety',
+    'content filter',
+    'violation',
+    'sensitive',
+    'flagged',
+    'blocked',
+    'not allowed',
+  ].some((_0x58bde0) => _0x17f12e.includes(_0x58bde0));
+}
+function normalizeResolutionType(_0x111c12) {
+  const _0xd6e63e = String(_0x111c12 || '').trim();
+  if (!_0xd6e63e) return '';
+  return _0xd6e63e.toLowerCase();
+}
+function toTrimmedArray(_0x36971b) {
+  if (!Array.isArray(_0x36971b)) return [];
+  const _0xd3597f = [];
+  return (
+    _0x36971b.forEach((_0x105390) => {
+      const _0x155655 = String(_0x105390 || '').trim();
+      if (_0x155655) _0xd3597f.push(_0x155655);
+    }),
+    _0xd3597f
+  );
+}
+function basenameFromPath(_0x5af682) {
+  const _0x6bc77 = String(_0x5af682 || '')
+    .trim()
+    .replace(/\\/g, '/');
+  if (!_0x6bc77) return '';
+  return _0x6bc77.split('/').filter(Boolean).pop() || '';
+}
+export function normalizeDreaminaErrorMessage(_0x5ac19b) {
+  const _0x26cad5 = String(_0x5ac19b || '').trim();
+  if (!_0x26cad5) return '';
+  const _0x469540 = _0x26cad5.toLowerCase();
+  if (
+    _0x469540.includes('do request:') &&
+    (_0x469540.includes('context deadline exceeded') ||
+      _0x469540.includes('client.timeout') ||
+      _0x469540.includes('awaiting headers'))
+  )
+    return '即梦官方生成接口响应超时，本次没有拿到任务ID。网页可用不代表 CLI 生成接口稳定，请稍后重试；如果连续出现，请切换网络/代理或重新登录即梦后再试。';
+  let _0x2ebc21 = _0x26cad5.match(
+    /upload resource\s+"([^"]+)"\s*:\s*upload (video|audio)\s*:\s*duration\s+([0-9.]+)\s+seconds\s+is\s+out\s+of\s+allowed\s+range\s+\[\s*([0-9.]+)\s*,\s*([0-9.]+)\s*\]/i,
+  );
+  !_0x2ebc21 &&
+    ((_0x2ebc21 = _0x26cad5.match(
+      /upload (video|audio)\s*:\s*duration\s+([0-9.]+)\s+seconds\s+is\s+out\s+of\s+allowed\s+range\s+\[\s*([0-9.]+)\s*,\s*([0-9.]+)\s*\]/i,
+    )),
+    _0x2ebc21 && (_0x2ebc21 = ['', '', ..._0x2ebc21.slice(1)]));
+  if (_0x2ebc21) {
+    const [, _0xf83356, _0x219c96, _0x4444b5, _0x3583f3, _0x425ca1] = _0x2ebc21,
+      _0x56d6e1 = String(_0x219c96 || '').toLowerCase() === 'audio',
+      _0x323b85 = basenameFromPath(_0xf83356),
+      _0x5a5bc5 = _0x56d6e1 ? '源音频' : '源视频',
+      _0x2dd1c0 = _0x323b85 ? '“' + _0x323b85 + '”' : _0x5a5bc5,
+      _0x774d1 = _0x56d6e1
+        ? '请将音频裁剪到 ' + _0x425ca1 + ' 秒以内后再上传。'
+        : '请将视频裁剪到 ' + _0x425ca1 + ' 秒以内，建议裁到 14.9 秒后再上传。';
+    return (
+      '上传' +
+      _0x5a5bc5 +
+      '失败：' +
+      _0x2dd1c0 +
+      '时长 ' +
+      _0x4444b5 +
+      ' 秒，超出即梦允许范围（' +
+      _0x3583f3 +
+      '-' +
+      _0x425ca1 +
+      ' 秒）。' +
+      _0x774d1
+    );
+  }
+  return _0x26cad5;
+}
+function normalizeDreaminaThrownError(_0x4af0d7) {
+  if (_0x4af0d7 && typeof _0x4af0d7 === 'object') {
+    const _0x3bb803 = normalizeDreaminaErrorMessage(_0x4af0d7.message);
+    if (_0x3bb803) _0x4af0d7.message = _0x3bb803;
+  }
+  return _0x4af0d7;
+}
+function normalizeModelVersion(_0x532308) {
+  const _0x4e8ffe = String(_0x532308?.modelVersion || '').trim();
+  if (_0x4e8ffe) return _0x4e8ffe;
+  const _0x4bf07e = String(_0x532308?.model || '').trim();
+  if (!_0x4bf07e.startsWith('dreamina/')) return '';
+  const _0xa9c393 = _0x4bf07e.slice('dreamina/'.length).trim();
+  if (
+    _0xa9c393 === 'text2image' ||
+    _0xa9c393 === 'image2image' ||
+    _0xa9c393 === 'text2video' ||
+    _0xa9c393 === 'image2video'
+  )
+    return '';
+  return _0xa9c393;
+}
+function normalizeDreaminaRatio(_0x30a6d3, _0x22917b) {
+  const _0x2ea4e4 = String(_0x30a6d3?.aspectRatio || '').trim();
+  if (!_0x2ea4e4) return '';
+  if (_0x2ea4e4 === '自适应' || _0x2ea4e4 === 'auto') return _0x22917b ? '' : '1:1';
+  return _0x2ea4e4;
+}
+function toLocalPath(_0xcfa09f) {
+  return normalizeLocalPath(_0xcfa09f);
+}
+function toLocalUrl(_0x49266c) {
+  return localPathToUrl(_0x49266c);
+}
+function normalizeOutputsArray(_0x584433) {
+  const _0xe4db = [],
+    _0x2fd137 = new Set(),
+    _0x4dd696 = new Set([
+      'data',
+      'result',
+      'results',
+      'output',
+      'outputs',
+      'raw',
+      'queryResult',
+      'image',
+      'images',
+      'image_list',
+      'imageList',
+      'image_infos',
+      'imageInfos',
+      'video',
+      'videos',
+      'video_list',
+      'videoList',
+      'video_infos',
+      'videoInfos',
+      'media',
+      'medias',
+      'media_list',
+      'mediaList',
+      'file',
+      'files',
+      'file_list',
+      'fileList',
+      'resource',
+      'resources',
+      'download',
+      'downloads',
+      'content',
+      'contents',
+    ]),
+    _0x31d08e = [
+      'url',
+      'uri',
+      'download_url',
+      'downloadUrl',
+      'file_url',
+      'fileUrl',
+      'media_url',
+      'mediaUrl',
+      'image_url',
+      'imageUrl',
+      'origin_image_url',
+      'originImageUrl',
+      'original_image_url',
+      'originalImageUrl',
+      'result_image_url',
+      'resultImageUrl',
+      'video_url',
+      'videoUrl',
+      'cover_url',
+      'coverUrl',
+      'src',
+    ],
+    _0x1829e1 = [
+      'local_path',
+      'localPath',
+      'path',
+      'file_path',
+      'filePath',
+      'download_path',
+      'downloadPath',
+      'local_uri',
+      'localUri',
+    ],
+    _0x1977eb = (_0x4b1704, _0x3bbf1c) => {
+      for (const _0x3f1f73 of _0x3bbf1c) {
+        const _0x47dee7 = String(_0x4b1704?.[_0x3f1f73] || '').trim();
+        if (_0x47dee7) return _0x47dee7;
+      }
+      return '';
+    },
+    _0x4566b2 = (_0x477dc7) => {
+      if (!_0x477dc7 || typeof _0x477dc7 !== 'object') return;
+      const _0x24d692 = _0x1977eb(_0x477dc7, _0x31d08e),
+        _0x1a1ead = _0x1977eb(_0x477dc7, _0x1829e1),
+        _0xe016cf = String(_0x477dc7?.mimeType || _0x477dc7?.mime_type || '').trim();
+      if (!_0x24d692 && !_0x1a1ead) return;
+      const _0x40129a = [_0x24d692, _0x1a1ead, _0xe016cf].join('|');
+      if (_0x2fd137.has(_0x40129a)) return;
+      (_0x2fd137.add(_0x40129a), _0xe4db.push(_0x477dc7));
+    },
+    _0x387ccf = (_0x23d8f7) => {
+      const _0x4ab50c = String(_0x23d8f7 || '').trim(),
+        _0x85220a = _0x4ab50c.toLowerCase();
+      if (_0x85220a.includes('input') || _0x85220a.includes('reference') || _0x85220a.includes('prompt'))
+        return false;
+      return (
+        _0x4dd696.has(_0x4ab50c) ||
+        _0x85220a.includes('output') ||
+        _0x85220a.includes('result') ||
+        _0x85220a.includes('image') ||
+        _0x85220a.includes('video') ||
+        _0x85220a.includes('media') ||
+        _0x85220a.includes('file') ||
+        _0x85220a.includes('url') ||
+        _0x85220a.includes('uri')
+      );
+    },
+    _0x370181 = (_0x5f405a, _0x4800b6 = 0) => {
+      if (!_0x5f405a || _0x4800b6 > 8) return;
+      if (typeof _0x5f405a === 'string') {
+        const _0x342cc1 = _0x5f405a.trim();
+        if (/^https?:\/\//i.test(_0x342cc1)) _0x4566b2({ url: _0x342cc1 });
+        return;
+      }
+      if (Array.isArray(_0x5f405a)) {
+        _0x5f405a.forEach((_0x5c8ea8) => _0x370181(_0x5c8ea8, _0x4800b6 + 1));
+        return;
+      }
+      if (typeof _0x5f405a !== 'object') return;
+      (_0x4566b2({
+        url: _0x1977eb(_0x5f405a, _0x31d08e),
+        localPath: _0x1977eb(_0x5f405a, _0x1829e1),
+        mimeType: String(_0x5f405a?.mimeType || _0x5f405a?.mime_type || '').trim(),
+      }),
+        Object.entries(_0x5f405a).forEach(([_0x3c4526, _0x46187f]) => {
+          if (_0x387ccf(_0x3c4526)) _0x370181(_0x46187f, _0x4800b6 + 1);
+        }));
+    };
+  return (
+    _0x370181(_0x584433),
+    _0xe4db
+      .map((_0x137c56) => {
+        const _0x394da7 = toLocalPath(_0x137c56?.localPath);
+        return {
+          url: String(_0x137c56?.url || '').trim(),
+          localPath: _0x394da7,
+          localUrl: toLocalUrl(_0x394da7),
+          mimeType: String(_0x137c56?.mimeType || '').trim(),
+        };
+      })
+      .filter((_0x49490f) => _0x49490f.url || _0x49490f.localPath)
+  );
+}
+function hasDreaminaUsableOutputs(_0x54b357) {
+  return normalizeOutputsArray(_0x54b357).length > 0;
+}
+function normalizeQueueMetric(_0x490b14) {
+  const _0x21ebf0 = Number(_0x490b14);
+  if (!Number.isFinite(_0x21ebf0) || _0x21ebf0 < 0) return null;
+  return Math.trunc(_0x21ebf0);
+}
+function normalizeQueueStatus(_0x578a43) {
+  return String(_0x578a43 || '')
+    .trim()
+    .toLowerCase();
+}
+function isDreaminaQueuedState(_0x4d0f10, _0x404fe0) {
+  if (_0x4d0f10 !== 'pending') return false;
+  if (!_0x404fe0) return false;
+  return DREAMINA_QUEUE_HINTS.some((_0x45bf4a) => _0x404fe0.includes(_0x45bf4a));
+}
+function phaseToLabel(_0xf5f4bb, _0x1cfd03 = '') {
+  if (_0xf5f4bb === 'queued') return '排队中';
+  if (_0xf5f4bb === 'generating') return '生成中';
+  if (_0xf5f4bb === 'syncing') return '正在同步结果';
+  if (_0xf5f4bb === 'done') return '已完成';
+  if (_0xf5f4bb === 'failed') return String(_0x1cfd03 || '').trim() || '查询失败';
+  return '处理中';
+}
+function sleep(_0x52adf7) {
+  return new Promise((_0x175441) => setTimeout(_0x175441, _0x52adf7));
+}
+function includesTransientHint(_0x12ea7b) {
+  const _0x489ff9 = String(_0x12ea7b || '')
+    .trim()
+    .toLowerCase();
+  if (!_0x489ff9) return false;
+  return DREAMINA_TRANSIENT_ERROR_HINTS.some((_0x4ff3f6) => _0x489ff9.includes(_0x4ff3f6));
+}
+function isTransientDreaminaError(_0x2dd701) {
+  if (_0x2dd701?.dreaminaReturnedError === true) return false;
+  const _0x225a21 = String(_0x2dd701?.code || '')
+      .trim()
+      .toUpperCase(),
+    _0x511f0c = String(_0x2dd701?.type || '')
+      .trim()
+      .toUpperCase(),
+    _0x4639f1 = Number(_0x2dd701?.status);
+  if (
+    _0x225a21 === 'TIMEOUT' ||
+    _0x225a21 === 'ETIMEDOUT' ||
+    _0x225a21 === 'ECONNRESET' ||
+    _0x225a21 === 'ECONNREFUSED' ||
+    _0x225a21 === 'ENOTFOUND' ||
+    _0x225a21 === 'EAI_AGAIN'
+  )
+    return true;
+  if (
+    _0x511f0c === 'TIMEOUT' ||
+    _0x511f0c === 'NETWORK_ERROR' ||
+    _0x511f0c === 'DNS_ERROR' ||
+    _0x511f0c === 'RATE_LIMIT' ||
+    _0x511f0c === 'SERVER_ERROR' ||
+    _0x511f0c === 'SERVICE_UNAVAILABLE'
+  )
+    return true;
+  if (_0x4639f1 === 0x1ad || _0x4639f1 >= 0x1f4) return true;
+  return includesTransientHint(_0x2dd701?.message || _0x2dd701);
+}
+export function normalizeDreaminaTaskSnapshot(_0x40ad60, _0x34da21 = {}) {
+  const _0x5ae155 = String(
+      _0x34da21?.submitId || _0x40ad60?.submitId || _0x40ad60?.raw?.submitId || '',
+    ).trim(),
+    _0x38e2ef = normalizeOutputsArray(_0x40ad60),
+    _0x3cf608 = toStatus(_0x40ad60?.status),
+    _0x2ba222 =
+      _0x40ad60?.raw && typeof _0x40ad60.raw === 'object' && !Array.isArray(_0x40ad60.raw)
+        ? _0x40ad60.raw
+        : {},
+    _0x263c1f = extractDreaminaRawStatus(_0x40ad60, _0x2ba222),
+    _0x3f5321 = normalizeQueueStatus(
+      _0x2ba222.queue_status || _0x2ba222.queueStatus || _0x40ad60?.queueStatus,
+    ),
+    _0x41de93 = normalizeQueueMetric(_0x2ba222.queue_idx ?? _0x2ba222.queueIndex ?? _0x40ad60?.queueIndex),
+    _0x331232 = normalizeQueueMetric(
+      _0x2ba222.queue_length ?? _0x2ba222.queueLength ?? _0x40ad60?.queueLength,
+    ),
+    _0x217e55 = extractDreaminaRawFailReason(_0x40ad60, _0x2ba222),
+    _0x5bee9f = extractDreaminaRawErrorMessage(_0x40ad60, _0x2ba222),
+    _0x568804 = _0x263c1f === 'failed' || _0x3cf608 === 'failed',
+    _0x47fb63 = _0x568804 || isDreaminaTerminalFailureMessage(_0x5bee9f) ? _0x5bee9f : '',
+    _0x392964 = _0x217e55 || _0x47fb63,
+    _0x483152 = _0x568804 || _0x392964 ? 'failed' : _0x263c1f || _0x3cf608;
+  let _0x47feb1 = 'generating';
+  if (_0x483152 === 'failed') _0x47feb1 = 'failed';
+  else {
+    if (_0x483152 === 'cancelled') _0x47feb1 = 'cancelled';
+    else {
+      if (_0x483152 === 'success') _0x47feb1 = _0x38e2ef.length > 0 ? 'done' : 'syncing';
+      else isDreaminaQueuedState(_0x483152, _0x3f5321) && (_0x47feb1 = 'queued');
+    }
+  }
+  const _0x1f85af =
+    _0x483152 === 'failed'
+      ? 'failed'
+      : _0x483152 === 'cancelled'
+        ? 'cancelled'
+        : _0x483152 === 'success' && _0x38e2ef.length > 0
+          ? 'success'
+          : 'pending';
+  return {
+    submitId: _0x5ae155,
+    status: _0x1f85af,
+    phase: _0x47feb1,
+    label: phaseToLabel(_0x47feb1, _0x392964),
+    queueStatus: _0x3f5321,
+    queueIndex: _0x41de93,
+    queueLength: _0x331232,
+    outputs: _0x38e2ef,
+    failReason: _0x392964,
+    raw: _0x2ba222,
+    isTerminal: _0x47feb1 === 'done' || _0x47feb1 === 'failed' || _0x47feb1 === 'cancelled',
+    hasOutputs: _0x38e2ef.length > 0,
+    lastCheckedAt: Date.now(),
+  };
+}
+function postJson(_0x3ad9e9, _0x240920) {
+  return requester({
+    url: _0x3ad9e9,
+    method: 'POST',
+    provider: 'dreamina',
+    timeout: DREAMINA_SUBMIT_TIMEOUT,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(_0x240920 || {}),
+  });
+}
+export async function submitDreaminaText2Image(_0x121c94) {
+  return postJson('/api/v2/dreamina/text2image', _0x121c94);
+}
+export async function submitDreaminaImage2Image(_0x1b5e3c) {
+  return postJson('/api/v2/dreamina/image2image', _0x1b5e3c);
+}
+export async function submitDreaminaText2Video(_0x34c72d) {
+  return postJson('/api/v2/dreamina/text2video', _0x34c72d);
+}
+export async function submitDreaminaImage2Video(_0x5e7887) {
+  return postJson('/api/v2/dreamina/image2video', _0x5e7887);
+}
+export async function submitDreaminaFrames2Video(_0x26b937) {
+  return postJson('/api/v2/dreamina/frames2video', _0x26b937);
+}
+export async function submitDreaminaMultiframe2Video(_0x20ba2e) {
+  return postJson('/api/v2/dreamina/multiframe2video', _0x20ba2e);
+}
+export async function submitDreaminaMultimodal2Video(_0x331091) {
+  return postJson('/api/v2/dreamina/multimodal2video', _0x331091);
+}
+export async function cancelDreaminaVideoQueueTask(_0x17ba96) {
+  const _0x20fcf4 = String(_0x17ba96 || '').trim();
+  if (!_0x20fcf4) throw new Error('submitId 不能为空');
+  const _0x52163b = await postJson('/api/v2/dreamina/video_queue/cancel', { submitId: _0x20fcf4 });
+  if (_0x52163b?.success === false) throw new Error(_0x52163b?.message || '取消即梦视频队列任务失败');
+  return _0x52163b || {};
+}
+export async function queryDreaminaResult(_0x543e96, _0x516f85 = {}) {
+  const _0x113098 = String(_0x543e96 || '').trim();
+  if (!_0x113098) throw new Error('submitId 不能为空');
+  const _0x18bc29 = _0x516f85?.autoDownload !== false,
+    _0x34687e = new URLSearchParams({ submitId: _0x113098, autoDownload: _0x18bc29 ? '1' : '0' }),
+    _0xac9dea = await requester({
+      url: '/api/v2/dreamina/query_result?' + _0x34687e.toString(),
+      method: 'GET',
+      provider: 'dreamina',
+      timeout: DREAMINA_QUERY_TIMEOUT,
+      retries: Number.isFinite(Number(_0x516f85?.retries))
+        ? Math.max(0, Math.trunc(Number(_0x516f85.retries)))
+        : DREAMINA_QUERY_RETRIES,
+      retryDelay: Number.isFinite(Number(_0x516f85?.retryDelay))
+        ? Math.max(0, Math.trunc(Number(_0x516f85.retryDelay)))
+        : DREAMINA_QUERY_RETRY_DELAY,
+    });
+  if (_0xac9dea?.success === false) {
+    const _0x27a5a7 = new Error(normalizeDreaminaErrorMessage(_0xac9dea?.message) || '即梦任务查询失败');
+    ((_0x27a5a7.code = 'DREAMINA_RETURNED_ERROR'), (_0x27a5a7.dreaminaReturnedError = true));
+    throw _0x27a5a7;
+  }
+  return _0xac9dea || {};
+}
+async function pollDreaminaUntilDoneOnce(_0x22bdfc, _0x1b46ce = {}) {
+  const _0x13ffc5 = Number(_0x1b46ce?.maxWaitMs || DREAMINA_MAX_WAIT),
+    _0x228560 = Number(_0x1b46ce?.intervalMs || DREAMINA_POLL_INTERVAL),
+    _0x597444 = Number.isFinite(Number(_0x1b46ce?.maxTransientErrors))
+      ? Math.max(0, Math.trunc(Number(_0x1b46ce.maxTransientErrors)))
+      : DREAMINA_MAX_TRANSIENT_ERRORS,
+    _0x35cf6f = Date.now();
+  let _0x292081 = null,
+    _0x131116 = 0;
+  while (Date.now() - _0x35cf6f < _0x13ffc5) {
+    if (_0x1b46ce?.signal?.aborted) throw new Error('CANCELLED');
+    let _0x297e7b = null;
+    try {
+      ((_0x292081 = await queryDreaminaResult(_0x22bdfc, { autoDownload: true })),
+        (_0x297e7b = normalizeDreaminaTaskSnapshot(_0x292081, { submitId: _0x22bdfc })));
+    } catch (_0x457d30) {
+      if (
+        _0x1b46ce?.signal?.aborted ||
+        _0x457d30?.name === 'AbortError' ||
+        _0x457d30?.message === 'CANCELLED'
+      )
+        throw _0x457d30;
+      if (isTransientDreaminaError(_0x457d30)) {
+        _0x131116 += 1;
+        if (_0x131116 > _0x597444) {
+          const _0x55905f = new Error('即梦任务查询连续异常（' + _0x131116 + ' 次），请稍后重试');
+          ((_0x55905f.code = 'DREAMINA_QUERY_TRANSIENT_EXHAUSTED'),
+            (_0x55905f.submitId = String(_0x22bdfc || '').trim()),
+            (_0x55905f.cause = _0x457d30));
+          throw _0x55905f;
+        }
+        await sleep(_0x228560);
+        continue;
+      }
+      throw _0x457d30;
+    }
+    _0x131116 = 0;
+    typeof _0x1b46ce?.onProgress === 'function' && (await _0x1b46ce.onProgress(_0x297e7b));
+    const _0x21fc15 = toStatus(_0x297e7b?.status);
+    if (_0x21fc15 === 'cancelled') throw new Error('CANCELLED');
+    if (_0x21fc15 === 'failed') return _0x292081;
+    if (_0x21fc15 === 'success' && hasDreaminaUsableOutputs(_0x292081)) return _0x292081;
+    await sleep(_0x228560);
+  }
+  try {
+    const _0x5d7561 = await queryDreaminaResult(_0x22bdfc, { autoDownload: true }),
+      _0x2745ca = normalizeDreaminaTaskSnapshot(_0x5d7561, { submitId: _0x22bdfc });
+    typeof _0x1b46ce?.onProgress === 'function' && (await _0x1b46ce.onProgress(_0x2745ca));
+    const _0x3f02dc = toStatus(_0x2745ca?.status);
+    if (_0x3f02dc === 'cancelled') throw new Error('CANCELLED');
+    if (_0x3f02dc === 'failed') return _0x5d7561;
+    if (_0x3f02dc === 'success' && hasDreaminaUsableOutputs(_0x5d7561)) return _0x5d7561;
+    _0x292081 = _0x5d7561;
+  } catch (_0x41cf9b) {
+    throw _0x41cf9b;
+  }
+  const _0x154556 =
+      Number.isFinite(_0x13ffc5) && _0x13ffc5 > 0 ? Math.max(1, Math.ceil(_0x13ffc5 / 0xea60)) : 0,
+    _0x327d2f = new Error(
+      _0x154556 > 0 ? '即梦任务处理超时（已等待约 ' + _0x154556 + ' 分钟）' : '即梦任务处理超时，请稍后重试',
+    );
+  ((_0x327d2f.code = DREAMINA_POLL_TIMEOUT_CODE), (_0x327d2f.submitId = String(_0x22bdfc || '').trim()));
+  throw _0x327d2f;
+}
+export async function pollDreaminaUntilDone(_0x22a191, _0x220e56 = {}) {
+  const _0x44480d = String(_0x22a191 || '').trim(),
+    _0x5e517b = String(_0x220e56?.taskKind || _0x220e56?.kind || 'task').trim() || 'task';
+  return runTaskSingleFlight({ provider: 'dreamina', kind: _0x5e517b, submitId: _0x44480d }, () =>
+    pollDreaminaUntilDoneOnce(_0x44480d, _0x220e56),
+  );
+}
+export async function runDreaminaImageGeneration(_0x3656d5, _0x2b6425 = {}) {
+  const _0x314e66 = String(_0x3656d5?.prompt || '').trim(),
+    _0x40979e = Array.isArray(_0x3656d5?.inputUrls) ? _0x3656d5.inputUrls.filter(Boolean) : [],
+    _0x457d15 = _0x40979e.length > 0,
+    _0x3fb593 = normalizeDreaminaRatio(_0x3656d5, _0x457d15),
+    _0x5b3db6 = normalizeResolutionType(_0x3656d5?.imageSize),
+    _0x310703 = normalizeModelVersion(_0x3656d5),
+    _0x111928 = { prompt: _0x314e66 };
+  if (_0x3fb593) _0x111928.ratio = _0x3fb593;
+  if (_0x5b3db6) _0x111928.resolutionType = _0x5b3db6;
+  if (_0x310703) _0x111928.modelVersion = _0x310703;
+  let _0x4c1796 = null;
+  _0x40979e.length > 0
+    ? (_0x4c1796 = await submitDreaminaImage2Image({ images: _0x40979e, ..._0x111928 }))
+    : (_0x4c1796 = await submitDreaminaText2Image({ ..._0x111928 }));
+  if (_0x4c1796?.success === false)
+    throw new Error(normalizeDreaminaErrorMessage(_0x4c1796?.message) || '即梦图片任务提交失败');
+  const _0x24abf7 = String(_0x4c1796?.submitId || '').trim();
+  if (!_0x24abf7) throw new Error('即梦图片任务提交失败：未返回 submitId');
+  (_0x2b6425?.onTaskMeta?.({ taskId: _0x24abf7, submitId: _0x24abf7, provider: 'dreamina', kind: 'image' }),
+    _0x2b6425?.onTaskId?.(_0x24abf7));
+  const _0x3997ab = await pollDreaminaUntilDone(_0x24abf7, { ..._0x2b6425, taskKind: 'image' }),
+    _0x410e8a = normalizeDreaminaTaskSnapshot(_0x3997ab, { submitId: _0x24abf7 });
+  if (_0x410e8a?.phase === 'failed')
+    throw new Error(normalizeDreaminaErrorMessage(_0x410e8a?.failReason) || '即梦图片生成失败');
+  const _0x443914 = Array.isArray(_0x410e8a?.outputs) ? _0x410e8a.outputs : [];
+  if (!_0x443914.length) throw new Error('即梦图片生成完成，但没有可用输出');
+  return _0x443914.map((_0x46f964) => {
+    const _0x12996e = _0x46f964.localUrl || _0x46f964.url;
+    return {
+      sourceId: null,
+      thumbId: null,
+      sourceUrl: _0x46f964.url || _0x12996e,
+      thumbUrl: _0x12996e,
+      imageUrl: _0x12996e,
+      localPath: _0x46f964.localPath || '',
+    };
+  });
+}
+export function buildDreaminaVideoSubmitRequest(_0x2688fb = {}) {
+  const _0x57efa7 = toTrimmedArray(
+      Array.isArray(_0x2688fb?.images) && _0x2688fb.images.length ? _0x2688fb.images : _0x2688fb?.inputUrls,
+    ),
+    _0x579872 = toTrimmedArray(_0x2688fb?.videos),
+    _0x1ce01f = toTrimmedArray(_0x2688fb?.audios),
+    _0x46191 = normalizeDreaminaVideoRouteMode(_0x2688fb?.dreaminaRouteMode, _0x2688fb?.mode),
+    _0x3ce060 =
+      String(_0x2688fb?.dreaminaTaskType || '').trim() ||
+      resolveDreaminaVideoTaskType({
+        routeMode: _0x46191,
+        imageCount: _0x57efa7.length,
+        videoCount: _0x579872.length,
+        audioCount: _0x1ce01f.length,
+      }),
+    _0x97891e = validateDreaminaVideoRouteSelection({
+      routeMode: _0x46191,
+      taskType: _0x3ce060,
+      imageCount: _0x57efa7.length,
+      videoCount: _0x579872.length,
+      audioCount: _0x1ce01f.length,
+    });
+  if (_0x97891e) throw new Error(_0x97891e);
+  const _0x182299 = String(_0x2688fb?.prompt || '').trim(),
+    _0x4d6bae = normalizeDreaminaVideoModel(_0x2688fb?.model, _0x2688fb?.provider),
+    _0x321e0f = ensureDreaminaVideoModelForTask(_0x3ce060, _0x4d6bae, 'dreamina') || _0x4d6bae,
+    _0x409047 =
+      String(_0x2688fb?.modelVersion || '').trim() ||
+      getDreaminaVideoModelVersion(_0x321e0f, 'dreamina') ||
+      normalizeModelVersion(_0x2688fb),
+    _0x530533 = String(_0x2688fb?.installId || '').trim(),
+    _0x2fe2b6 = normalizeDreaminaVideoResolution(
+      _0x3ce060,
+      _0x321e0f,
+      _0x2688fb?.videoResolution || _0x2688fb?.videoSize || _0x2688fb?.resolution,
+      'dreamina',
+    ),
+    _0xbbbca5 = normalizeDreaminaVideoAspectRatio(_0x2688fb?.aspectRatio),
+    _0x589e18 = normalizeDreaminaVideoDuration(_0x3ce060, _0x321e0f, _0x2688fb?.duration, 'dreamina');
+  if (_0x3ce060 === 'text2video') {
+    if (!_0x182299) throw new Error('文生视频需要填写提示词');
+    return {
+      taskType: _0x3ce060,
+      url: '/api/v2/dreamina/text2video',
+      body: {
+        prompt: _0x182299,
+        duration: _0x589e18,
+        ratio: _0xbbbca5,
+        videoResolution: _0x2fe2b6,
+        ...(_0x530533 ? { installId: _0x530533 } : {}),
+        ...(_0x409047 ? { modelVersion: _0x409047 } : {}),
+      },
+    };
+  }
+  if (_0x3ce060 === 'image2video') {
+    const _0x493d18 = String(_0x2688fb?.image || _0x57efa7[0] || '').trim();
+    if (!_0x182299) throw new Error('首帧生视频需要填写提示词');
+    if (!_0x493d18) throw new Error('首帧生视频至少需要 1 张图片');
+    return {
+      taskType: _0x3ce060,
+      url: '/api/v2/dreamina/image2video',
+      body: {
+        image: _0x493d18,
+        prompt: _0x182299,
+        duration: _0x589e18,
+        videoResolution: _0x2fe2b6,
+        ...(_0x530533 ? { installId: _0x530533 } : {}),
+        ...(_0x409047 ? { modelVersion: _0x409047 } : {}),
+      },
+    };
+  }
+  if (_0x3ce060 === 'frames2video') {
+    const _0x5e3c46 = String(_0x2688fb?.first || _0x57efa7[0] || '').trim(),
+      _0x2d1a52 = String(_0x2688fb?.last || _0x57efa7[1] || '').trim();
+    if (!_0x182299) throw new Error('首尾帧模式需要填写提示词');
+    if (!_0x5e3c46 || !_0x2d1a52) throw new Error('首尾帧模式至少需要 2 张图片');
+    return {
+      taskType: _0x3ce060,
+      url: '/api/v2/dreamina/frames2video',
+      body: {
+        first: _0x5e3c46,
+        last: _0x2d1a52,
+        prompt: _0x182299,
+        duration: _0x589e18,
+        videoResolution: _0x2fe2b6,
+        ...(_0x530533 ? { installId: _0x530533 } : {}),
+        ...(_0x409047 ? { modelVersion: _0x409047 } : {}),
+      },
+    };
+  }
+  if (_0x3ce060 === 'multiframe2video') {
+    const _0x289c7a = _0x57efa7.slice(0, 20);
+    if (_0x289c7a.length < 2) throw new Error('多帧叙事至少需要 2 张图片');
+    const _0x5d08fc = Array.isArray(_0x2688fb?.transitionPrompts)
+        ? _0x2688fb.transitionPrompts.map((_0x5d26ec) => String(_0x5d26ec || '').trim())
+        : [],
+      _0x237bc0 = Array.isArray(_0x2688fb?.transitionDurations) ? _0x2688fb.transitionDurations : [],
+      _0x308db9 = Math.max(0, _0x289c7a.length - 1),
+      _0x598f69 = [],
+      _0x1c9081 = [];
+    for (let _0x255b82 = 0; _0x255b82 < _0x308db9; _0x255b82 += 1) {
+      _0x598f69.push(String(_0x5d08fc[_0x255b82] || '').trim() || _0x182299);
+      const _0x24c290 = Number(_0x237bc0[_0x255b82]);
+      _0x1c9081.push(Number.isFinite(_0x24c290) && _0x24c290 > 0 ? Math.max(1, Math.trunc(_0x24c290)) : 3);
+    }
+    const _0x596ea0 = { images: _0x289c7a };
+    if (_0x530533) _0x596ea0.installId = _0x530533;
+    if (_0x289c7a.length === 2) {
+      if (!(_0x598f69[0] || _0x182299)) throw new Error('两张图的多帧叙事需要提示词');
+      ((_0x596ea0.prompt = _0x598f69[0] || _0x182299), (_0x596ea0.duration = _0x1c9081[0] || _0x589e18 || 3));
+    } else {
+      if (!_0x598f69.every((_0x3609c9) => String(_0x3609c9 || '').trim()))
+        throw new Error('多帧叙事的每段 transition prompt 都不能为空');
+      ((_0x596ea0.transitionPrompts = _0x598f69), (_0x596ea0.transitionDurations = _0x1c9081));
+    }
+    return { taskType: _0x3ce060, url: '/api/v2/dreamina/multiframe2video', body: _0x596ea0 };
+  }
+  if (_0x3ce060 === 'multimodal2video') {
+    if (!_0x57efa7.length && !_0x579872.length) throw new Error('全能参考至少需要 1 个图片或视频参考');
+    return {
+      taskType: _0x3ce060,
+      url: '/api/v2/dreamina/multimodal2video',
+      body: {
+        images: _0x57efa7,
+        videos: _0x579872,
+        audios: _0x1ce01f,
+        prompt: _0x182299,
+        duration: _0x589e18,
+        ratio: _0xbbbca5,
+        videoResolution: _0x2fe2b6,
+        ...(_0x530533 ? { installId: _0x530533 } : {}),
+        ...(_0x409047 ? { modelVersion: _0x409047 } : {}),
+      },
+    };
+  }
+  throw new Error('未识别的即梦视频任务类型');
+}
+export async function runDreaminaVideoGeneration(_0x8eea56, _0x4d389d = {}) {
+  const _0x296447 = buildDreaminaVideoSubmitRequest(_0x8eea56 || {});
+  let _0x1c9f82 = null;
+  try {
+    if (_0x296447.url === '/api/v2/dreamina/text2video')
+      _0x1c9f82 = await submitDreaminaText2Video(_0x296447.body);
+    else {
+      if (_0x296447.url === '/api/v2/dreamina/image2video')
+        _0x1c9f82 = await submitDreaminaImage2Video(_0x296447.body);
+      else {
+        if (_0x296447.url === '/api/v2/dreamina/frames2video')
+          _0x1c9f82 = await submitDreaminaFrames2Video(_0x296447.body);
+        else {
+          if (_0x296447.url === '/api/v2/dreamina/multiframe2video')
+            _0x1c9f82 = await submitDreaminaMultiframe2Video(_0x296447.body);
+          else {
+            if (_0x296447.url === '/api/v2/dreamina/multimodal2video')
+              _0x1c9f82 = await submitDreaminaMultimodal2Video(_0x296447.body);
+            else throw new Error('未知的即梦视频请求路由');
+          }
+        }
+      }
+    }
+  } catch (_0x41d438) {
+    throw normalizeDreaminaThrownError(_0x41d438);
+  }
+  if (_0x1c9f82?.success === false) {
+    const _0xf189db = new Error(normalizeDreaminaErrorMessage(_0x1c9f82?.message) || '即梦视频任务提交失败');
+    if (_0x1c9f82?.code != null) _0xf189db.code = String(_0x1c9f82.code || '');
+    _0x1c9f82?.requiredModelId != null &&
+      (_0xf189db.requiredModelId = String(_0x1c9f82.requiredModelId || '').trim());
+    _0x1c9f82?.subscriptionStatus != null &&
+      (_0xf189db.subscriptionStatus = String(_0x1c9f82.subscriptionStatus || '').trim());
+    _0x1c9f82?.reasonCode != null && (_0xf189db.reasonCode = String(_0x1c9f82.reasonCode || '').trim());
+    ((_0xf189db.contactText = String(_0x1c9f82?.contactText || '').trim()),
+      (_0xf189db.contactUrl = String(_0x1c9f82?.contactUrl || '').trim()));
+    throw _0xf189db;
+  }
+  const _0x3433b6 = String(_0x1c9f82?.submitId || '').trim();
+  if (!_0x3433b6) throw new Error('即梦视频任务提交失败：未返回 submitId');
+  (_0x4d389d?.onTaskMeta?.({ taskId: _0x3433b6, submitId: _0x3433b6, provider: 'dreamina', kind: 'video' }),
+    _0x4d389d?.onTaskId?.(_0x3433b6));
+  const _0x56bb1a = await pollDreaminaUntilDone(_0x3433b6, { ..._0x4d389d, taskKind: 'video' }),
+    _0x1f3e0f = normalizeDreaminaTaskSnapshot(_0x56bb1a, { submitId: _0x3433b6 });
+  if (_0x1f3e0f?.phase === 'failed')
+    throw new Error(normalizeDreaminaErrorMessage(_0x1f3e0f?.failReason) || '即梦视频生成失败');
+  const _0x32d4f9 = Array.isArray(_0x1f3e0f?.outputs) ? _0x1f3e0f.outputs : [];
+  if (!_0x32d4f9.length) throw new Error('即梦视频生成完成，但没有可用输出');
+  const _0x57aad8 = _0x32d4f9.map((_0x301892) => ({
+    videoUrl: _0x301892.localUrl || _0x301892.url,
+    localPath: _0x301892.localPath || '',
+  }));
+  return {
+    isBatch: _0x57aad8.length > 1,
+    videos: _0x57aad8,
+    videoUrl: _0x57aad8[0]?.videoUrl || '',
+    localPath: _0x57aad8[0]?.localPath || '',
+  };
+}

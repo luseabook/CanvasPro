@@ -1,1 +1,2192 @@
-const a459_0x12ef8c=a459_0x5da1;(function(_0x51f72a,_0x31bc86){const _0x22a235=a459_0x5da1,_0x2d2bd2=_0x51f72a();while(!![]){try{const _0x10940b=parseInt(_0x22a235(0x355))/0x1*(-parseInt(_0x22a235(0x2ef))/0x2)+-parseInt(_0x22a235(0x38e))/0x3+-parseInt(_0x22a235(0x296))/0x4+-parseInt(_0x22a235(0x2b0))/0x5*(parseInt(_0x22a235(0x2b8))/0x6)+-parseInt(_0x22a235(0x256))/0x7*(parseInt(_0x22a235(0x262))/0x8)+parseInt(_0x22a235(0x2de))/0x9+-parseInt(_0x22a235(0x3c7))/0xa*(-parseInt(_0x22a235(0x36e))/0xb);if(_0x10940b===_0x31bc86)break;else _0x2d2bd2['push'](_0x2d2bd2['shift']());}catch(_0x1a2cad){_0x2d2bd2['push'](_0x2d2bd2['shift']());}}}(a459_0x40e1,0x7b2c3));import a459_0x26716c from'../core/stores/appStore.js';import{findAvailablePosition,generateId,screenToWorld}from'../core/math.js';function a459_0x5da1(_0x5e3baf,_0x570216){const _0x40e142=a459_0x40e1();return a459_0x5da1=function(_0x5da196,_0x568edc){_0x5da196=_0x5da196-0x1c0;let _0x87ca66=_0x40e142[_0x5da196];return _0x87ca66;},a459_0x5da1(_0x5e3baf,_0x570216);}import{getImage}from'./storage.js';import{fetchAssetsFromServer,fetchAssetCategoriesFromServer,saveAssetToServer,saveAssetCategoriesToServer,deleteAssetFromServer,saveAssetThumbToServer}from'../../api/projectsV2Api.js';import{registerSidebarSubmenu}from'./sidebarSubmenuController.js';import{removeAssetMentionAsset,setAssetMentionAssets,upsertAssetMentionAsset}from'./assetMentionRegistry.js';import{createReferenceFallbackThumbHtml}from'./referenceThumbnailFallback.js';import{localPathToUrl}from'../utils/localMediaPath.js';import{attachMediaElementPlaybackSource}from'../services/desktopMediaBlobSource.js';import{createTopAlignedAssetNodes,shouldTopAlignRestoredAsset}from'./assetRestoreLayout.js';import{getLocale,t}from'../i18n/index.js';import{preloadCanvasImage}from'./canvasMediaScheduler.js';const DEFAULT_ASSET_CATEGORIES=['人物','场景','物品'],ASSET_CATEGORY_LIMIT=0xa,HIDDEN_ASSET_CATEGORIES=[a459_0x12ef8c(0x2a2)],HIDDEN_ASSET_KINDS=[a459_0x12ef8c(0x3b3)],ASSET_CATEGORY_I18N_KEYS=Object['freeze']({'人物':a459_0x12ef8c(0x307),'场景':a459_0x12ef8c(0x3bc),'物品':a459_0x12ef8c(0x351),'出图历史':a459_0x12ef8c(0x2f3),'自定义':a459_0x12ef8c(0x3aa)});function assetManagerText(_0x98cfea,_0x10bf1c={}){const _0x134eb1=a459_0x12ef8c;return t(_0x134eb1(0x29c)+_0x98cfea,_0x10bf1c);}function _formatAssetCategoryLabel(_0x33357e){const _0x5e9ae9=a459_0x12ef8c,_0x4b40a3=String(_0x33357e||'')['trim'](),_0x3e3cf0=ASSET_CATEGORY_I18N_KEYS[_0x4b40a3];return _0x3e3cf0?assetManagerText(_0x5e9ae9(0x232)+_0x3e3cf0):_0x4b40a3;}function _escapeHtml(_0x2606d3){const _0x2eda3c=a459_0x12ef8c;return String(_0x2606d3??'')['replaceAll']('&','&amp;')[_0x2eda3c(0x39e)]('<',_0x2eda3c(0x236))[_0x2eda3c(0x39e)]('>','&gt;')[_0x2eda3c(0x39e)]('\x22',_0x2eda3c(0x347))['replaceAll']('\x27','&#39;');}function _clonePlain(_0x4cfd8c,_0x31a68a){const _0x1a9aec=a459_0x12ef8c;if(_0x4cfd8c==null)return _0x31a68a;try{return JSON[_0x1a9aec(0x1c7)](JSON[_0x1a9aec(0x1e3)](_0x4cfd8c));}catch(_0x1e5809){return _0x31a68a;}}function _normalizeAssetType(_0x45aff0){const _0xcfc8ce=a459_0x12ef8c,_0x51b3cd=String(_0x45aff0||'');if(_0x51b3cd===_0xcfc8ce(0x206)||_0x51b3cd===_0xcfc8ce(0x3a2)||_0x51b3cd===_0xcfc8ce(0x37d))return'text';if(_0x51b3cd==='audio'||_0x51b3cd===_0xcfc8ce(0x39f)||_0x51b3cd==='ai-audio')return'audio';if(_0x51b3cd===_0xcfc8ce(0x24f)||_0x51b3cd==='source-video'||_0x51b3cd===_0xcfc8ce(0x2a1))return'video';if(_0x51b3cd===_0xcfc8ce(0x20e)||_0x51b3cd==='source-image'||_0x51b3cd===_0xcfc8ce(0x283))return _0xcfc8ce(0x20e);return _0xcfc8ce(0x2e9);}function a459_0x40e1(){const _0x2dce24=['muted','[data-custom-category=\x271\x27]','style','#asset-create-category-trigger','find','displayLocalPath','createPanel.updateTab','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-field\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-label\x22>','type','targetId','.m4v','auto','removeEventListener','video','_cancelRenameAsset','asset-add-all','_createPanelState','forEach','coverUrl','.v2-asset-create-cover','99120VZBHyS','replaceChildren','#asset-sidebar-tabs-shell','customCategoryDraft','_bindCreatePanelEvents','\x22\x20draggable=\x22false\x22\x20/>','createPanel.noMatchedAssets','createPanel','toLocaleString','createPanel.join','.v2-asset-sidebar-tabs-nav--prev','_sidebarTabsLayoutRaf','8UCAaQR','_getFilteredUpdateAssets','_scheduleSidebarRender','is-delete-shaking','idx','thumbType','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-asset-sidebar-tab-text\x22>','errors.assetJoinFailed','sort','is-detail-view','_playCreateAssetFly','click','map','.v2-asset-update-item','_isHiddenAssetCategory','updateSearchKeyword','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20hidden\x0a\x20\x20\x20\x20\x20\x20\x20\x20>‹</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-sidebar-tabs\x22\x20id=\x22asset-sidebar-tabs\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','</div></div>','innerWidth','animate','create','getAttribute','value','innerHTML','加载全局资产失败','Escape','keydown','cancel',':scope\x20>\x20.v2-asset-item-name','scroll','none','\x20selected','_thumbPreloadSet','ai-image','includes','保存资产分类失败','removeAttribute','<div\x20class=\x22v2-asset-update-empty\x22>','<img\x20src=\x22','detail.meta',':scope\x20>\x20.v2-asset-empty','url','then','translate(','_videoThumbInFlight','videoWidth','batch','.v2-asset-create-tab','_createPanelDropdownEl','_captureVideoFirstFrameDataUrl','_runVideoThumbJobs','<div\x20class=\x22v2-asset-select-item\x20v2-asset-select-item--custom\x22\x20data-custom-category=\x221\x22>','2587376tlenrD','v2-asset-create-backdrop\x20show','textContent','#asset-sidebar-tabs','toasts.assetAdded','cat','assetManager.','back','_openAssetId','loadToCanvas','_normalizeAssetEntity','ai-video','出图历史','is-at-end','_renderSidebarTabs','createPanel.creating','_deleteUserCategory','display','_normalizeCategoryName','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-update-layout\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-update-picker\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22search\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-update-search\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22asset-update-search\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20placeholder=\x22','v2-asset-cover-cell','setAttribute','_buildAssetPayloadFromSelection','_updateSidebarTabsOverflowHint','appendChild','_resolveCreatePanelCover','2969495HdyDcg','coverInfo','errors.selectAssetToJoin','thumbUrl','_normalizeUserCategories','updateConfirmOpen','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','stopPropagation','6JUutjk','createPanel.assetNamePlaceholder','v2-asset-item-load','showCreatePanel','_getUpdateListCategory','addEdge','errors.assetUpdateFailed','v2-asset-empty','[data-ui-action]','blob:','left','classList','currentTime','_getAssetCategories',':scope\x20>\x20img','createdAt','thumbKind','order','some','_renderSidebarTabsHtml','.v2-asset-sidebar-tab','_thumbDecodePromiseMap','title','加载资产分类失败','uiAction',':scope\x20>\x20.v2-asset-item-load','_syncSidebarTabsViewport','.v2-asset-sidebar-tabs-nav--next','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20value=\x22','cloneNode','coverType','localPath','toLowerCase','cubic-bezier(0.2,\x200,\x200,\x201)','eager','activeTab','unknownTime','sourceId','6368922OLhbNN','items','firstElementChild','edges','asset-tabs-scroll-prev','data:','v2-asset-thumb-img','nodes','createPanel.confirmOverwrite','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-right\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-field\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-label\x22>','_syncUpdateSelectionForCategory','other','v2-asset-detail-btn','max','\x22\x20alt=\x22','catch','#asset-sidebar-content','13420JsNrjA','pendingSrc','_createDefaultPanelState','createPanel.updateTitle','history','warn','#asset-update-search','pointerdown','loadAssetsFromServer','updatedAt','.v2-asset-item','overwrite','_renamingAssetId','v2-asset-detail','section','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-update-editor\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','_getVisibleAssetCardsInList','v2-asset-select-dropdown','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22v2-asset-create-select-trigger\x22\x20id=\x22asset-create-category-trigger\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20id=\x22asset-create-category-val\x22>','v2-asset-subitem-type','\x20v2-asset-create-footer--update','_submitCreatePanel','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20width=\x2212\x22\x20height=\x228\x22\x20viewBox=\x220\x200\x2012\x208\x22\x20fill=\x22none\x22\x20xmlns=\x22http://www.w3.org/2000/svg\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<path\x20d=\x22M1\x201.5L6\x206.5L11\x201.5\x22\x20stroke=\x22var(--white-40)\x22\x20stroke-width=\x221.5\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','people','offsetLeft',':scope\x20>\x20.v2-asset-view-detail','hideSidebarPanel','\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-sidebar-tabs-nav\x20v2-asset-sidebar-tabs-nav--next\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-ui-action=\x22asset-tabs-scroll-next\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20aria-label=\x22','is-new','height','assetId','push','showToast','v2-asset-subitem-name','addNode','addEventListener','createPanel.currentSelection','_captureRectsById','right','crossOrigin','coverHtml','errors.assetCreateFailed','string','.v2-asset-back','getContext','smooth','_videoThumbTimer','showSidebarPanel','v2-asset-item-name','contains','toggle','Enter','imageUrl','join','add','confirm','className','newAsset','\x20active','_findCategoryByName','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','createPanel.assetName','.webm','length','val','object','_newAssetPulseId','_getCanvasCenterWorld','_joinCreatePanelToAsset','revokeObjectURL','asset-delete-confirm','v2-asset-view-list','isArray','brightness(1)','alt','_scheduleVideoThumbJobs','name','setSelectedNodes','v2-asset-cover-grid','_preloadThumb','categoryHasAssets','loading','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-mode=\x22create\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20>','button','nodeData','btnAssets','replace','&quot;','v2-asset-icon',':scope\x20>\x20.v2-asset-view-list','coverAlt',':scope\x20>\x20.v2-asset-cover-cell','selectedAssetId','floor','categoryLimit','_isManagedAsset','createPanel.categoryNamePlaceholder','objects','blur','\x22>×</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-tabs\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-create-tab','hidden','24QoyvEA','createPanelBackdrop','get','preload','select','key','getElementById','role','show','</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','success','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22v2-asset-create-close\x22\x20data-ui-action=\x22asset-create-close\x22\x20aria-label=\x22','toDataURL','minY','edge','_scrollSidebarTabs','\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-sidebar-header\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22v2-asset-back\x22\x20data-ui-action=\x22asset-back\x22\x20aria-label=\x22','_createPanelDropdownOutsideHandler','has-overflow','customCategories','size','min','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20value=\x22','renderSidebarContent','querySelector','5577Rwrulf','v2-asset-detail-cover','videoHeight','_getMentionEligibleAssets','errors.selectAssetToUpdate','clientWidth','<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-create-btn\x20v2-asset-create-btn--secondary\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22asset-join-submit\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','v2-asset-detail-section','brightness(1.2)','<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20aria-hidden=\x22true\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22><path\x20d=\x22M16.5\x205.5a7.5\x207.5\x200\x201\x200-1\x2013.5\x22/><path\x20d=\x22M12\x2014h6v6\x22/><path\x20d=\x22m18\x2014-6\x206\x22/></svg>','_playFlip','scrollTo','\x22\x20id=\x22asset-create-cover-img\x22\x20draggable=\x22false\x22\x20/>','errors.nameRequired','<div\x20class=\x22v2-asset-select-item','ai-text','scrollWidth','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-update-thumb\x22>','_isVideoMediaSrc','px,','toasts.subAssetAdded','finally','.sidebar-floating','sidebarPanel','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','.mkv','_playDeleteShake','_syncTabsFromAssets','_addUserCategory','endsWith','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>','audio','942852NCpIhL','selectedIds','scrollLeft','categoryDeleteFailed','toLocaleLowerCase','thumbnailAlt','_categoryKey','types.','scale(1)','_assetCardPool','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-sidebar-tabs-shell\x22\x20id=\x22asset-sidebar-tabs-shell\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-sidebar-tabs-nav\x20v2-asset-sidebar-tabs-nav--prev\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-ui-action=\x22asset-tabs-scroll-prev\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20aria-label=\x22','v2-asset-detail-meta','icon','(prefers-reduced-motion:\x20reduce)','translate(0,0)\x20scale(1)','\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-footer','replaceAll','source-audio','onfinish','innerHeight','source-text','numeric','detail.childAssetName','assets','restoreAssetToCanvas','focus','#asset-sidebar-content\x20>\x20.v2-asset-view-list','_isDefaultCategory','custom','v2-asset-subgrid','tabsNextAria','mode',':scope\x20>\x20.v2-asset-item','tabs','asset-tabs-scroll-next','round','dataset','generation-history','_createPanelCoverObjectUrl','_setCreatePanelState','v2-asset-create-panel','[data-ui-action=\x27asset-create-close\x27]','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-cover\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','resolve','delete','uncategorized','scenes','top','_commitRenameAsset','is-editing','toasts.assetJoined','detail.empty','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-update-list\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','div','duration','px)\x20scale(','from','30120cOuEuf','dialog','_getCreatePanelCategories','toasts.renamed','getState','<div\x20class=\x22v2-asset-icon\x20v2-asset-icon--other\x22\x20aria-hidden=\x22true\x22>\x0a\x20\x20\x20\x20<svg\x20class=\x22v2-asset-icon-svg\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22var(--text-muted)\x22\x20stroke-width=\x221.5\x22>\x0a\x20\x20\x20\x20\x20\x20<rect\x20x=\x223\x22\x20y=\x223\x22\x20width=\x2218\x22\x20height=\x2218\x22\x20rx=\x222\x22\x20/>\x0a\x20\x20\x20\x20</svg>\x0a\x20\x20</div>','_sidebarRenderRaf','empty','data:image/','#asset-sidebar-title-text','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','createPanel.category','asset','v2-asset-detail-section-title','saving','<div\x20class=\x22v2-asset-create-confirm\x22>','</div>','isFinite','function','matchMedia','input','_getSelectedAssetNodes','canvas','clientHeight','#asset-category-custom-input','category','parse','offsetWidth','#asset-create-category-val','setTimeout','startsWith','submitted','asset-delete-open','asset-back','v2-asset-item-delete-confirm-btn\x20v2-asset-item-delete-confirm-btn--neutral','getBoundingClientRect','seeked','filter','deleteFailed','.mp4','v2-asset-create-fly','trim',':scope\x20>\x20button','_pulseTimer','v2-asset-detail-title','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20>','draggable','</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-create-tab','<div\x20class=\x22v2-asset-select-custom-row\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22text\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-select-custom-input\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22asset-category-custom-input\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20placeholder=\x22','_isUserCategory','target','matches','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-mode=\x22update\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20>','v2-asset-create-body\x20v2-asset-create-body--update','stringify','_deleteAsset','_queueSidebarTabsLayoutSync','isConnected','requestAnimationFrame','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-source-panel\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-source-header\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-source-title\x22>','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-asset-id=\x22','</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-modal-body\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','now','remove','update','playsInline','#asset-create-name','_syncCreatePanelDraftFromTarget','assetAlt','v2-asset-sidebar-panel','createPanel.overwrite','\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20','img','body','savingAction','categorySaveFailed','[data-ui-action=\x27asset-category-delete\x27]','deleteCategory','createPanel.create','categories.custom','has','.v2-asset-sidebar-tab.active','_getSelectedAssetEdges','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22text\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22asset-create-name\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20placeholder=\x22','detail.content','2-digit','true','_setThumbContent',':scope\x20>\x20.v2-asset-item,\x20:scope\x20>\x20.v2-asset-empty','text','_pendingDeleteAssetId','v2-asset-item','aria-label','thumbId','drawImage','set','createElement','image','_createPanelKeydownHandler','bottom','_beginRenameAsset','thumbLocalPath','userCategories','v2-asset-item-delete','error','draft','cancelAnimationFrame','unnamedAsset','_upsertLocalAsset','\x22\x20data-cat=\x22','createPanel.joining','<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-category-delete\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-ui-action=\x22asset-category-delete\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-cat=\x22',':scope\x20>\x20input.v2-asset-item-name-input','preventDefault','thumbSrc',':scope\x20>\x20.v2-asset-item-delete','span','disabled','active','px,\x20','_saveUserCategories','async','_calcNodesBBox','v2-asset-subitem-summary','querySelectorAll','<div\x20class=\x22v2-asset-create-error\x22\x20role=\x22alert\x22>','aria-modal','_getSortedAssets','childElementCount','width','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','asset-category-delete','load','categories.','src','.v2-asset-subitem','errors.noSavableNodes','&lt;','.v2-asset-select-item[data-val]','kind','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20title=\x22',':scope\x20>\x20.v2-asset-detail-actions,\x20:scope\x20>\x20.v2-asset-subgrid','v2-asset-subitem-thumb','currentTarget','_renderCreatePanelContent','closeCreatePanel','asset-delete-cancel','closest','append'];a459_0x40e1=function(){return _0x2dce24;};return a459_0x40e1();}function _formatAssetTypeLabel(_0x2a6df4){const _0xeaad3a=a459_0x12ef8c,_0x97aa06=_normalizeAssetType(_0x2a6df4);return assetManagerText(_0xeaad3a(0x395)+_0x97aa06);}function _resolveNodeStableThumbSrc(_0x21d99c){const _0x4842a2=a459_0x12ef8c;if(!_0x21d99c)return'';const _0x2fcc4b=_0x21d99c[_0x4842a2(0x212)]||_0x21d99c[_0x4842a2(0x247)]||_0x21d99c[_0x4842a2(0x2d7)]||_0x21d99c['originalLocalPath'];if(_0x2fcc4b)return localPathToUrl(_0x2fcc4b)||(String(_0x2fcc4b)[_0x4842a2(0x1cb)]('/')?String(_0x2fcc4b):'/'+String(_0x2fcc4b)[_0x4842a2(0x346)](/^\/+/,''));if(_0x21d99c[_0x4842a2(0x2b3)]&&typeof _0x21d99c[_0x4842a2(0x2b3)]===_0x4842a2(0x31a))return _0x21d99c[_0x4842a2(0x2b3)];return String(_0x21d99c['src']||_0x21d99c[_0x4842a2(0x324)]||'');}function _renderAssetIcon(_0x4fea63){const _0x3a97e7=a459_0x12ef8c,_0x24905d=_normalizeAssetType(_0x4fea63);if(_0x24905d===_0x3a97e7(0x206))return createReferenceFallbackThumbHtml('text',_0x3a97e7(0x348));if(_0x24905d===_0x3a97e7(0x38d))return createReferenceFallbackThumbHtml(_0x3a97e7(0x38d),_0x3a97e7(0x348));if(_0x24905d===_0x3a97e7(0x24f))return'<div\x20class=\x22v2-asset-icon\x20v2-asset-icon--video\x22\x20aria-hidden=\x22true\x22>\x0a\x20\x20\x20\x20\x20\x20<svg\x20class=\x22v2-asset-icon-svg\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22currentColor\x22\x20opacity=\x220.5\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<polygon\x20points=\x225\x203\x2019\x2012\x205\x2021\x205\x203\x22\x20/>\x0a\x20\x20\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20</div>';return _0x3a97e7(0x3cc);}function _buildAssetItem(_0xf3bc34){const _0xbddeab=a459_0x12ef8c,_0x24c8d4=_0xf3bc34?.[_0xbddeab(0x24a)]||_0xbddeab(0x2e9),_0x1eae17=_resolveNodeStableThumbSrc(_0xf3bc34);return{'type':_0x24c8d4,'name':_0xf3bc34?.[_0xbddeab(0x33c)]||'','thumbSrc':_0x1eae17||'','nodeData':_0xf3bc34};}function _sortAssetsByUpdatedTime(_0x5808f2){const _0x1bbf04=a459_0x12ef8c;return[...Array[_0x1bbf04(0x338)](_0x5808f2)?_0x5808f2:[]][_0x1bbf04(0x26a)]((_0x4393c2,_0x4115e6)=>{const _0x714d6e=_0x1bbf04,_0x1b0b29=Number(_0x4393c2?.['updatedAt']||_0x4393c2?.[_0x714d6e(0x2c7)]||0x0),_0x411c1f=Number(_0x4115e6?.[_0x714d6e(0x2f8)]||_0x4115e6?.[_0x714d6e(0x2c7)]||0x0);return _0x411c1f-_0x1b0b29;});}function _formatAssetDateTime(_0x5ed43b){const _0x513176=a459_0x12ef8c,_0x25aff8=Number(_0x5ed43b);if(!Number['isFinite'](_0x25aff8)||_0x25aff8<=0x0)return assetManagerText(_0x513176(0x2dc));return new Date(_0x25aff8)[_0x513176(0x25e)](getLocale(),{'year':_0x513176(0x3a3),'month':_0x513176(0x202),'day':'2-digit','hour':'2-digit','minute':_0x513176(0x202)});}class AssetManager{constructor(){const _0xbab055=a459_0x12ef8c;this[_0xbab055(0x25d)]=null,this[_0xbab055(0x356)]=null,this[_0xbab055(0x20f)]=null,this['_createPanelDropdownOutsideHandler']=null,this['_createPanelDropdownEl']=null,this[_0xbab055(0x3b4)]='',this[_0xbab055(0x252)]=null,this[_0xbab055(0x385)]=null,this['_openAssetId']=null,this['_thumbPreloadSet']=new Set(),this[_0xbab055(0x2cd)]=new Map(),this[_0xbab055(0x28e)]=new Set(),this[_0xbab055(0x31e)]=0x0,this[_0xbab055(0x3cd)]=0x0,this['_pendingDeleteAssetId']='',this['_renamingAssetId']='',this['_newAssetPulseId']='',this['_sidebarTabsLayoutRaf']=0x0,this[_0xbab055(0x2db)]='人物',this[_0xbab055(0x3af)]=[...DEFAULT_ASSET_CATEGORIES],this['userCategories']=[],this[_0xbab055(0x3a5)]=[],this['initSidebarPanel'](),this['loadAssetCategoriesFromServer'](),this[_0xbab055(0x2f7)]();}['_getSortedAssets'](){const _0xf11d8f=a459_0x12ef8c;return _sortAssetsByUpdatedTime((this[_0xf11d8f(0x3a5)]||[])[_0xf11d8f(0x1d2)](_0x344b38=>this['_isManagedAsset'](_0x344b38)));}[a459_0x12ef8c(0x2a8)](_0x482a13){const _0x46ab05=a459_0x12ef8c;return String(_0x482a13||'')[_0x46ab05(0x1d6)]();}[a459_0x12ef8c(0x394)](_0x349693){const _0x326c65=a459_0x12ef8c;return this[_0x326c65(0x2a8)](_0x349693)[_0x326c65(0x392)]();}[a459_0x12ef8c(0x3a9)](_0x393f4f){const _0x42ce5d=a459_0x12ef8c;return!!this[_0x42ce5d(0x32b)](_0x393f4f,DEFAULT_ASSET_CATEGORIES);}[a459_0x12ef8c(0x270)](_0x137728){const _0x13443d=a459_0x12ef8c;return!!this[_0x13443d(0x32b)](_0x137728,HIDDEN_ASSET_CATEGORIES);}[a459_0x12ef8c(0x34f)](_0x21212b){const _0x420828=a459_0x12ef8c;if(!_0x21212b||typeof _0x21212b!==_0x420828(0x331))return![];if(HIDDEN_ASSET_KINDS[_0x420828(0x284)](String(_0x21212b?.[_0x420828(0x238)]||'')[_0x420828(0x1d6)]()[_0x420828(0x2d8)]()))return![];return!this['_isHiddenAssetCategory'](_0x21212b?.['category']);}[a459_0x12ef8c(0x32b)](_0x4bb53d,_0x2e3fb9=this[a459_0x12ef8c(0x3af)]){const _0x409931=a459_0x12ef8c,_0x33670d=this[_0x409931(0x394)](_0x4bb53d);if(!_0x33670d)return'';return(_0x2e3fb9||[])[_0x409931(0x246)](_0x51aecc=>this[_0x409931(0x394)](_0x51aecc)===_0x33670d)||'';}[a459_0x12ef8c(0x2b4)](_0x309796=[]){const _0x587638=a459_0x12ef8c,_0x2fae04=[],_0x2f9432=_0x97ea14=>{const _0x41a828=a459_0x5da1,_0x44cf53=this[_0x41a828(0x2a8)](_0x97ea14);if(!_0x44cf53)return;if(this['_isDefaultCategory'](_0x44cf53)||this[_0x41a828(0x270)](_0x44cf53))return;if(this[_0x41a828(0x32b)](_0x44cf53,_0x2fae04))return;if(DEFAULT_ASSET_CATEGORIES[_0x41a828(0x32f)]+_0x2fae04[_0x41a828(0x32f)]>=ASSET_CATEGORY_LIMIT)return;_0x2fae04['push'](_0x44cf53);};return(Array[_0x587638(0x338)](_0x309796)?_0x309796:[])[_0x587638(0x253)](_0x2f9432),_0x2fae04;}['_isUserCategory'](_0x1a2a4c){const _0x4d4da8=a459_0x12ef8c;return!!this['_findCategoryByName'](_0x1a2a4c,this[_0x4d4da8(0x213)]);}['_getAssetCategories'](_0x25147c=''){const _0x2f0e0c=a459_0x12ef8c,_0x46948d=[],_0x54ed94=_0x34e983=>{const _0x45de1f=a459_0x5da1,_0x3b65a4=this['_normalizeCategoryName'](_0x34e983);if(!_0x3b65a4)return;if(this[_0x45de1f(0x270)](_0x3b65a4))return;if(this[_0x45de1f(0x32b)](_0x3b65a4,_0x46948d))return;if(_0x46948d['length']>=ASSET_CATEGORY_LIMIT)return;_0x46948d[_0x45de1f(0x30f)](_0x3b65a4);};DEFAULT_ASSET_CATEGORIES[_0x2f0e0c(0x253)](_0x54ed94);for(const _0x1bfd1f of this[_0x2f0e0c(0x213)]||[]){_0x54ed94(_0x1bfd1f);}for(const _0x57f8e1 of this[_0x2f0e0c(0x22c)]()){_0x54ed94(_0x57f8e1?.['category']);}return _0x54ed94(_0x25147c),_0x46948d;}[a459_0x12ef8c(0x389)](){const _0x962c95=a459_0x12ef8c;this['tabs']=this[_0x962c95(0x2c5)](),!this[_0x962c95(0x32b)](this[_0x962c95(0x2db)],this[_0x962c95(0x3af)])&&(this[_0x962c95(0x2db)]=DEFAULT_ASSET_CATEGORIES[0x0],this[_0x962c95(0x29e)]=null);}[a459_0x12ef8c(0x2cb)](){const _0x57f8dc=a459_0x12ef8c;return(this[_0x57f8dc(0x3af)]||[])[_0x57f8dc(0x26e)](_0x2e5f34=>{const _0x244486=_0x57f8dc,_0x21f89a=this[_0x244486(0x394)](_0x2e5f34)===this[_0x244486(0x394)](this[_0x244486(0x2db)])?_0x244486(0x32a):'',_0x3b0ded=_escapeHtml(_0x2e5f34),_0x17e8af=_escapeHtml(_formatAssetCategoryLabel(_0x2e5f34)),_0x6b48bb=this['_isUserCategory'](_0x2e5f34)?_0x244486(0x21c)+_0x3b0ded+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20aria-label=\x22'+_escapeHtml(assetManagerText('deleteCategoryAria',{'category':_formatAssetCategoryLabel(_0x2e5f34)}))+_0x244486(0x239)+_escapeHtml(assetManagerText(_0x244486(0x1fa)))+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20>×</button>':'';return'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-sidebar-tab'+_0x21f89a+_0x244486(0x21a)+_0x3b0ded+_0x244486(0x268)+_0x17e8af+_0x244486(0x3d1)+_0x6b48bb+_0x244486(0x386);})[_0x57f8dc(0x325)]('');}[a459_0x12ef8c(0x2a4)](){const _0x1c3b97=a459_0x12ef8c,_0x34feab=this[_0x1c3b97(0x385)]?.[_0x1c3b97(0x36d)](_0x1c3b97(0x299));if(!_0x34feab)return;_0x34feab['innerHTML']=this[_0x1c3b97(0x2cb)](),this[_0x1c3b97(0x1e5)]();}[a459_0x12ef8c(0x1e5)](){const _0x29f0ca=a459_0x12ef8c;if(!this[_0x29f0ca(0x385)])return;this[_0x29f0ca(0x261)]&&window[_0x29f0ca(0x217)]?.(this[_0x29f0ca(0x261)]),this[_0x29f0ca(0x261)]=window[_0x29f0ca(0x1e7)](()=>{const _0x263961=_0x29f0ca;this[_0x263961(0x261)]=0x0,this[_0x263961(0x2d2)]();});}['_syncSidebarTabsViewport'](){const _0x4841d2=a459_0x12ef8c,_0x5407ef=this[_0x4841d2(0x385)]?.[_0x4841d2(0x36d)]('#asset-sidebar-tabs');if(!_0x5407ef)return;const _0x564864=_0x5407ef[_0x4841d2(0x36d)](_0x4841d2(0x1fe));if(_0x564864&&_0x5407ef['clientWidth']>0x0){if(this['_isDefaultCategory'](this['activeTab']))_0x5407ef[_0x4841d2(0x390)]=0x0;else{const _0x16ea4b=_0x564864[_0x4841d2(0x308)],_0x152f92=_0x16ea4b+_0x564864[_0x4841d2(0x1c8)],_0x13ec00=_0x5407ef['scrollLeft'],_0x5a562e=_0x13ec00+_0x5407ef['clientWidth'];if(_0x16ea4b<_0x13ec00)_0x5407ef[_0x4841d2(0x390)]=_0x16ea4b;else _0x152f92>_0x5a562e&&(_0x5407ef[_0x4841d2(0x390)]=_0x152f92-_0x5407ef[_0x4841d2(0x373)]);}}this[_0x4841d2(0x2ad)]();}[a459_0x12ef8c(0x2ad)](){const _0x299656=a459_0x12ef8c,_0x4d2f6e=this['sidebarPanel']?.[_0x299656(0x36d)](_0x299656(0x258)),_0x4d83f6=this['sidebarPanel']?.[_0x299656(0x36d)](_0x299656(0x299));if(!_0x4d2f6e||!_0x4d83f6)return;const _0x1b5fa7=Math[_0x299656(0x2eb)](0x0,_0x4d83f6[_0x299656(0x37e)]-_0x4d83f6[_0x299656(0x373)]),_0x134890=_0x1b5fa7>0x2,_0x4c12e3=!_0x134890||_0x4d83f6[_0x299656(0x390)]<=0x2,_0xa96830=!_0x134890||_0x4d83f6[_0x299656(0x390)]>=_0x1b5fa7-0x2;_0x4d2f6e['classList'][_0x299656(0x322)](_0x299656(0x367),_0x134890),_0x4d2f6e[_0x299656(0x2c3)][_0x299656(0x322)]('is-at-start',_0x4c12e3),_0x4d2f6e[_0x299656(0x2c3)][_0x299656(0x322)](_0x299656(0x2a3),_0xa96830);const _0x120680=_0x4d2f6e[_0x299656(0x36d)](_0x299656(0x260)),_0x392da5=_0x4d2f6e[_0x299656(0x36d)](_0x299656(0x2d3));if(_0x120680)_0x120680['hidden']=!_0x134890||_0x4c12e3;if(_0x392da5)_0x392da5[_0x299656(0x354)]=!_0x134890||_0xa96830;}['_scrollSidebarTabs'](_0x13355c=0x1){const _0x218527=a459_0x12ef8c,_0x515da1=this[_0x218527(0x385)]?.[_0x218527(0x36d)]('#asset-sidebar-tabs');if(!_0x515da1)return;const _0x190a27=Math[_0x218527(0x2eb)](0x1,Math[_0x218527(0x34d)](_0x515da1[_0x218527(0x373)]*0.75)),_0x3c723e=_0x515da1[_0x218527(0x390)]+_0x190a27*(_0x13355c<0x0?-0x1:0x1);typeof _0x515da1[_0x218527(0x379)]===_0x218527(0x3d9)?_0x515da1[_0x218527(0x379)]({'left':_0x3c723e,'behavior':_0x218527(0x31d)}):_0x515da1[_0x218527(0x390)]=_0x3c723e,window['setTimeout'](()=>this[_0x218527(0x2ad)](),0xdc);}[a459_0x12ef8c(0x3c9)](){const _0xd665c9=a459_0x12ef8c,_0x199e2d=this[_0xd665c9(0x2c5)](),_0x29434f=_0x424c12=>{const _0x5502d0=_0xd665c9,_0x5a581c=this[_0x5502d0(0x2a8)](_0x424c12);if(!_0x5a581c)return;if(this[_0x5502d0(0x32b)](_0x5a581c,_0x199e2d))return;_0x199e2d[_0x5502d0(0x30f)](_0x5a581c);};for(const _0x550833 of this['_createPanelState']?.[_0xd665c9(0x368)]||[]){_0x29434f(_0x550833);}return _0x29434f(this[_0xd665c9(0x252)]?.[_0xd665c9(0x216)]?.['category']||this[_0xd665c9(0x2db)]),_0x199e2d;}['_canAddCustomCategory'](){const _0x236f54=a459_0x12ef8c;return this[_0x236f54(0x3c9)]()['length']<ASSET_CATEGORY_LIMIT;}async['loadAssetCategoriesFromServer'](){const _0x3a44b1=a459_0x12ef8c;try{const _0x2ac2fe=await fetchAssetCategoriesFromServer();this['userCategories']=this[_0x3a44b1(0x2b4)](_0x2ac2fe),this['_syncTabsFromAssets'](),this[_0x3a44b1(0x2a4)](),this[_0x3a44b1(0x385)]?.[_0x3a44b1(0x2c3)][_0x3a44b1(0x321)](_0x3a44b1(0x35d))&&this[_0x3a44b1(0x36c)]();}catch(_0x376d20){console['error'](_0x3a44b1(0x2cf),_0x376d20);}}async['_saveUserCategories'](){const _0x39933d=a459_0x12ef8c,_0x4a06ce=this[_0x39933d(0x2b4)](this['userCategories']);this[_0x39933d(0x213)]=_0x4a06ce,await saveAssetCategoriesToServer(_0x4a06ce);}[a459_0x12ef8c(0x38a)](_0x2c9848){const _0x35afd5=a459_0x12ef8c,_0x487b4b=this['_normalizeCategoryName'](_0x2c9848);if(!_0x487b4b||this[_0x35afd5(0x3a9)](_0x487b4b)||this[_0x35afd5(0x270)](_0x487b4b))return'';const _0x5e8ca8=this[_0x35afd5(0x32b)](_0x487b4b,this[_0x35afd5(0x213)]);if(_0x5e8ca8)return _0x5e8ca8;if(this['_getAssetCategories']()[_0x35afd5(0x32f)]>=ASSET_CATEGORY_LIMIT)return window[_0x35afd5(0x310)]?.(assetManagerText(_0x35afd5(0x34e),{'limit':ASSET_CATEGORY_LIMIT}),_0x35afd5(0x2f4)),'';return this[_0x35afd5(0x213)]=this[_0x35afd5(0x2b4)]([...this[_0x35afd5(0x213)],_0x487b4b]),this[_0x35afd5(0x389)](),this['_renderSidebarTabs'](),void this['_saveUserCategories']()['catch'](_0x499895=>{const _0x136bc3=_0x35afd5;console[_0x136bc3(0x215)](_0x136bc3(0x285),_0x499895),window[_0x136bc3(0x310)]?.(assetManagerText(_0x136bc3(0x1f8)),_0x136bc3(0x215));}),_0x487b4b;}[a459_0x12ef8c(0x371)](){const _0x2a2fbb=a459_0x12ef8c;return this[_0x2a2fbb(0x22c)]()['filter'](_0x56c3d3=>this[_0x2a2fbb(0x32b)](_0x56c3d3?.[_0x2a2fbb(0x1c6)],this[_0x2a2fbb(0x3af)]));}[a459_0x12ef8c(0x2a0)](_0x31b72b){const _0x40d55f=a459_0x12ef8c;if(!_0x31b72b||typeof _0x31b72b!==_0x40d55f(0x331))return null;const _0xe74003={..._0x31b72b},_0x1d9fa1=Number(_0xe74003['createdAt']||0x0),_0x4a80cf=Number(_0xe74003[_0x40d55f(0x2f8)]||_0x1d9fa1||0x0);_0x1d9fa1>0x0?_0xe74003['createdAt']=_0x1d9fa1:delete _0xe74003[_0x40d55f(0x2c7)];if(_0x4a80cf>0x0)_0xe74003['updatedAt']=_0x4a80cf;else _0x1d9fa1>0x0&&(_0xe74003[_0x40d55f(0x2f8)]=_0x1d9fa1);return!_0xe74003[_0x40d55f(0x254)]&&Array[_0x40d55f(0x338)](_0xe74003[_0x40d55f(0x2e5)])&&_0xe74003[_0x40d55f(0x2e5)][0x0]&&(_0xe74003[_0x40d55f(0x254)]=_resolveNodeStableThumbSrc(_0xe74003[_0x40d55f(0x2e5)][0x0])),!Array[_0x40d55f(0x338)](_0xe74003[_0x40d55f(0x2df)])&&Array[_0x40d55f(0x338)](_0xe74003[_0x40d55f(0x2e5)])&&(_0xe74003[_0x40d55f(0x2df)]=_0xe74003[_0x40d55f(0x2e5)][_0x40d55f(0x26e)](_0x6ff292=>_buildAssetItem(_0x6ff292))),_0xe74003;}[a459_0x12ef8c(0x219)](_0x5aa009){const _0x3cdf25=a459_0x12ef8c,_0x24f2b3=this[_0x3cdf25(0x2a0)](_0x5aa009);if(!_0x24f2b3?.['id'])return;const _0x58f8e6=Array[_0x3cdf25(0x338)](this[_0x3cdf25(0x3a5)])?this[_0x3cdf25(0x3a5)]:[],_0x4f5cde=_0x58f8e6[_0x3cdf25(0x1d2)](_0x874125=>String(_0x874125?.['id']||'')!==String(_0x24f2b3['id']));this[_0x3cdf25(0x3a5)]=_sortAssetsByUpdatedTime([_0x24f2b3,..._0x4f5cde]),this[_0x3cdf25(0x389)](),this[_0x3cdf25(0x2a4)](),this[_0x3cdf25(0x32b)](_0x24f2b3['category'],this[_0x3cdf25(0x3af)])?upsertAssetMentionAsset(_0x24f2b3):removeAssetMentionAsset(_0x24f2b3['id']);}[a459_0x12ef8c(0x1c2)](_0x52dbbf){const _0x488e42=a459_0x12ef8c,_0x48010c=Array['isArray'](_0x52dbbf)?_0x52dbbf:[],_0x2ae02e=a459_0x26716c[_0x488e42(0x3cb)]();return _0x48010c[_0x488e42(0x26e)](_0x30fc2b=>_0x2ae02e[_0x488e42(0x2e5)][_0x30fc2b])['filter'](Boolean);}[a459_0x12ef8c(0x1ff)](_0x5a1154){const _0xed387c=a459_0x12ef8c,_0x3ded93=Array[_0xed387c(0x338)](_0x5a1154)?_0x5a1154:[],_0x37cb83=new Set(_0x3ded93),_0x1e537c=a459_0x26716c[_0xed387c(0x3cb)]();return Object['values'](_0x1e537c[_0xed387c(0x2e1)]||{})['filter'](_0x7f9c4c=>_0x37cb83[_0xed387c(0x1fd)](_0x7f9c4c?.[_0xed387c(0x2dd)])&&_0x37cb83[_0xed387c(0x1fd)](_0x7f9c4c?.[_0xed387c(0x24b)]));}async[a459_0x12ef8c(0x2af)](_0x1dd6de){const _0x5999b4=a459_0x12ef8c;let _0x3a9c82='';const _0x590a1d=_0x1dd6de?.[_0x5999b4(0x24a)]||_0x5999b4(0x2e9);if(_0x1dd6de?.['thumbId']){const _0x2726bf=await getImage(_0x1dd6de[_0x5999b4(0x20a)]);_0x2726bf&&(this[_0x5999b4(0x3b4)]=URL['createObjectURL'](_0x2726bf),_0x3a9c82=this[_0x5999b4(0x3b4)]);}return!_0x3a9c82&&(_0x3a9c82=_resolveNodeStableThumbSrc(_0x1dd6de)),{'coverUrl':_0x3a9c82,'coverType':_0x590a1d,'coverHtml':_0x3a9c82?_0x5999b4(0x288)+_0x3a9c82+'\x22\x20alt=\x22'+_escapeHtml(assetManagerText(_0x5999b4(0x34a)))+_0x5999b4(0x37a):_renderAssetIcon(_0x590a1d)};}[a459_0x12ef8c(0x2ac)](_0x2010aa,_0x38ffe5={}){const _0x30dfea=a459_0x12ef8c,_0x59dc24=this[_0x30dfea(0x1c2)](_0x2010aa),_0x20d3e3=_0x59dc24[0x0]||null,_0x43fc96=Date[_0x30dfea(0x1eb)](),_0x391739=String(_0x38ffe5['name']||'')[_0x30dfea(0x1d6)]()||assetManagerText(_0x30dfea(0x218)),_0x339456=String(_0x38ffe5[_0x30dfea(0x1c6)]||'')[_0x30dfea(0x1d6)]()||this[_0x30dfea(0x2db)],_0x4ccd2b=_0x20d3e3?.['type']||'other',_0x200809=_resolveNodeStableThumbSrc(_0x20d3e3),_0x2c0639=String(_0x38ffe5['id']||'')[_0x30dfea(0x1d6)](),_0x4cbad9=Number(_0x38ffe5[_0x30dfea(0x2c7)]||_0x43fc96)||_0x43fc96,_0x136834=Number(_0x38ffe5['updatedAt']||_0x43fc96)||_0x43fc96;return{'id':_0x2c0639||generateId(_0x30dfea(0x3d3)),'name':_0x391739,'category':_0x339456,'coverUrl':_0x200809,'coverType':_0x4ccd2b,'items':_0x59dc24[_0x30dfea(0x26e)](_0x49b88a=>_buildAssetItem(_0x49b88a)),'nodes':_0x59dc24,'edges':this[_0x30dfea(0x1ff)](_0x2010aa),'createdAt':_0x4cbad9,'updatedAt':_0x136834};}['_buildAssetAppendPayload'](_0x480639,_0x85a5a5,_0x573264={}){const _0x1e53ab=a459_0x12ef8c,_0xd3187e=this['_getSelectedAssetNodes'](_0x85a5a5),_0x3b5cec=this[_0x1e53ab(0x1ff)](_0x85a5a5),_0x2c8c9e=Date[_0x1e53ab(0x1eb)](),_0x1eca6a={},_0x1491dc=_0xd3187e[_0x1e53ab(0x26e)](_0xe1a177=>{const _0x2c861e=_0x1e53ab,_0x41bfbe=_clonePlain(_0xe1a177,{..._0xe1a177}),_0x2ef80f=String(_0x41bfbe['id']||''),_0x4e891c=generateId(_0x41bfbe[_0x2c861e(0x24a)]);if(_0x2ef80f)_0x1eca6a[_0x2ef80f]=_0x4e891c;return _0x41bfbe['id']=_0x4e891c,_0x41bfbe;}),_0x3f3cd8=_0x3b5cec['map'](_0x1e8274=>{const _0x1b87f2=_0x1e53ab,_0x2651e0=_clonePlain(_0x1e8274,{..._0x1e8274});_0x2651e0['id']=generateId(_0x1b87f2(0x363));if(_0x1eca6a[_0x2651e0['sourceId']])_0x2651e0['sourceId']=_0x1eca6a[_0x2651e0[_0x1b87f2(0x2dd)]];if(_0x1eca6a[_0x2651e0['targetId']])_0x2651e0['targetId']=_0x1eca6a[_0x2651e0[_0x1b87f2(0x24b)]];return _0x2651e0;}),_0xf983b=Array[_0x1e53ab(0x338)](_0x480639?.[_0x1e53ab(0x2e5)])?_clonePlain(_0x480639['nodes'],[]):[],_0x535c65=Array[_0x1e53ab(0x338)](_0x480639?.['items'])?_clonePlain(_0x480639[_0x1e53ab(0x2df)],[]):_0xf983b[_0x1e53ab(0x26e)](_0x41f17f=>_buildAssetItem(_0x41f17f)),_0x538207=Array[_0x1e53ab(0x338)](_0x480639?.['edges'])?_clonePlain(_0x480639[_0x1e53ab(0x2e1)],[]):[],_0x11bbfd=_0x1491dc[0x0]||null,_0x4cfd2a=_0x11bbfd?_resolveNodeStableThumbSrc(_0x11bbfd):'',_0x2458ad=_0x480639?.[_0x1e53ab(0x254)]||_0x4cfd2a,_0x231cb4=_0x480639?.[_0x1e53ab(0x2d6)]||_0x11bbfd?.[_0x1e53ab(0x24a)]||'other';return{..._0x480639||{},'id':_0x480639?.['id'],'name':String(_0x573264['name']||'')[_0x1e53ab(0x1d6)]()||assetManagerText(_0x1e53ab(0x218)),'category':String(_0x573264[_0x1e53ab(0x1c6)]||'')[_0x1e53ab(0x1d6)]()||this[_0x1e53ab(0x2db)],'coverUrl':_0x2458ad,'coverType':_0x231cb4,'items':[..._0x535c65,..._0x1491dc[_0x1e53ab(0x26e)](_0x4412aa=>_buildAssetItem(_0x4412aa))],'nodes':[..._0xf983b,..._0x1491dc],'edges':[..._0x538207,..._0x3f3cd8],'createdAt':Number(_0x480639?.[_0x1e53ab(0x2c7)]||_0x480639?.['updatedAt']||_0x2c8c9e)||_0x2c8c9e,'updatedAt':Number(_0x573264['updatedAt']||_0x2c8c9e)||_0x2c8c9e};}[a459_0x12ef8c(0x2f1)](_0x45e9ff,_0x4618c3){const _0x1aa1b9=a459_0x12ef8c;return{'selectedIds':[..._0x45e9ff],'mode':_0x1aa1b9(0x276),'selectedAssetId':'','updateSearchKeyword':'','updateConfirmOpen':![],'customCategoryEditing':![],'customCategoryDraft':'','customCategories':[],'error':'','saving':![],'savingAction':'','draft':{'name':assetManagerText(_0x1aa1b9(0x329)),'category':this[_0x1aa1b9(0x2db)]},'coverInfo':_0x4618c3||{'coverUrl':'','coverType':_0x1aa1b9(0x2e9),'coverHtml':_renderAssetIcon(_0x1aa1b9(0x2e9))}};}[a459_0x12ef8c(0x3b5)](_0x9f6d08={}){const _0x1c4843=a459_0x12ef8c;if(!this[_0x1c4843(0x252)])return;const _0x530ce4=this[_0x1c4843(0x252)],_0x2694bc=_0x9f6d08['draft']?{..._0x530ce4['draft']||{},..._0x9f6d08[_0x1c4843(0x216)]}:_0x530ce4[_0x1c4843(0x216)];this['_createPanelState']={..._0x530ce4,..._0x9f6d08,'draft':_0x2694bc};}['_getUpdateListCategory'](){const _0x2ed695=a459_0x12ef8c,_0x38fecd=this['_normalizeCategoryName'](this['_createPanelState']?.[_0x2ed695(0x216)]?.[_0x2ed695(0x1c6)]);if(this['_createPanelState']?.[_0x2ed695(0x3ad)]===_0x2ed695(0x1ed)&&_0x38fecd)return _0x38fecd;return this[_0x2ed695(0x32b)](this[_0x2ed695(0x2db)],this[_0x2ed695(0x3af)])||this[_0x2ed695(0x2db)];}[a459_0x12ef8c(0x263)](_0x2a0ccf=''){const _0x4a54cd=a459_0x12ef8c,_0x4fba2a=String(_0x2a0ccf||'')[_0x4a54cd(0x1d6)]()[_0x4a54cd(0x2d8)](),_0xb61890=this[_0x4a54cd(0x394)](this[_0x4a54cd(0x2bc)]()),_0x3009cf=this['_getSortedAssets']()[_0x4a54cd(0x1d2)](_0x1e8a94=>this[_0x4a54cd(0x394)](_0x1e8a94?.['category'])===_0xb61890);if(!_0x4fba2a)return _0x3009cf;return _0x3009cf[_0x4a54cd(0x1d2)](_0x348a53=>String(_0x348a53?.[_0x4a54cd(0x33c)]||'')[_0x4a54cd(0x2d8)]()['includes'](_0x4fba2a));}[a459_0x12ef8c(0x1f0)](_0x33357f){const _0x1aa68b=a459_0x12ef8c;this[_0x1aa68b(0x3b5)]({'draft':{'name':String(_0x33357f?.['name']||'')[_0x1aa68b(0x1d6)]()||assetManagerText('unnamedAsset'),'category':String(_0x33357f?.[_0x1aa68b(0x1c6)]||'')['trim']()||this[_0x1aa68b(0x2db)]},'selectedAssetId':String(_0x33357f?.['id']||''),'updateConfirmOpen':![],'customCategoryEditing':![],'customCategoryDraft':'','error':''});}[a459_0x12ef8c(0x2e8)](_0x4495df){const _0x1bedf5=a459_0x12ef8c;if(this[_0x1bedf5(0x252)]?.[_0x1bedf5(0x3ad)]!=='update')return;const _0x456df1=this[_0x1bedf5(0x2a8)](_0x4495df)||this[_0x1bedf5(0x2db)];this['_setCreatePanelState']({'draft':{'category':_0x456df1},'selectedAssetId':'','updateSearchKeyword':'','updateConfirmOpen':![],'error':''});const _0x189541=this[_0x1bedf5(0x263)]()[0x0]||null;if(!_0x189541)return;this[_0x1bedf5(0x3b5)]({'draft':{'name':String(_0x189541?.[_0x1bedf5(0x33c)]||'')[_0x1bedf5(0x1d6)]()||assetManagerText(_0x1bedf5(0x218)),'category':String(_0x189541?.[_0x1bedf5(0x1c6)]||'')[_0x1bedf5(0x1d6)]()||_0x456df1},'selectedAssetId':String(_0x189541?.['id']||'')});}[a459_0x12ef8c(0x23d)](){const _0x3f2b36=a459_0x12ef8c,_0x439522=this[_0x3f2b36(0x25d)],_0x59add5=this[_0x3f2b36(0x252)];if(!_0x439522||!_0x59add5)return;const _0x397d2e=_0x59add5[_0x3f2b36(0x2b1)]?.[_0x3f2b36(0x318)]||_renderAssetIcon(_0x59add5[_0x3f2b36(0x2b1)]?.[_0x3f2b36(0x2d6)]||_0x3f2b36(0x2e9)),_0x5deff9=_0x59add5[_0x3f2b36(0x3ad)]==='update'?assetManagerText(_0x3f2b36(0x2f2)):assetManagerText('createPanel.createTitle'),_0x2d94d0=Array[_0x3f2b36(0x338)](_0x59add5['selectedIds'])?_0x59add5[_0x3f2b36(0x38f)][_0x3f2b36(0x32f)]:0x0,_0x2f0aa4=_0x59add5[_0x3f2b36(0x3d5)]?_0x59add5['mode']===_0x3f2b36(0x1ed)&&_0x59add5[_0x3f2b36(0x1f7)]===_0x3f2b36(0x325)?assetManagerText(_0x3f2b36(0x1f3)):_0x59add5[_0x3f2b36(0x3ad)]==='update'?assetManagerText('createPanel.saving'):assetManagerText(_0x3f2b36(0x2a5)):_0x59add5[_0x3f2b36(0x3ad)]===_0x3f2b36(0x1ed)?_0x59add5[_0x3f2b36(0x2b5)]?assetManagerText(_0x3f2b36(0x2e6)):assetManagerText(_0x3f2b36(0x1f3)):assetManagerText(_0x3f2b36(0x1fb)),_0x5bdd4f=_0x59add5['saving']&&_0x59add5['savingAction']==='join'?assetManagerText(_0x3f2b36(0x21b)):assetManagerText(_0x3f2b36(0x25f)),_0xec53f0=this[_0x3f2b36(0x263)](_0x59add5['updateSearchKeyword']),_0x540d50=_0xec53f0['find'](_0x25b048=>String(_0x25b048?.['id']||'')===_0x59add5[_0x3f2b36(0x34c)])||null,_0x444a96=this[_0x3f2b36(0x2bc)](),_0x46a2a9=_0x59add5[_0x3f2b36(0x215)]?_0x3f2b36(0x22a)+_escapeHtml(_0x59add5['error'])+_0x3f2b36(0x3d7):'',_0x3d6c8e=_0x59add5[_0x3f2b36(0x3ad)]===_0x3f2b36(0x1ed)&&_0x59add5['updateConfirmOpen']&&_0x540d50?_0x3f2b36(0x3d6)+_escapeHtml(assetManagerText('createPanel.confirmOverwriteAsset',{'name':_0x540d50[_0x3f2b36(0x33c)]||assetManagerText('unnamedAsset')}))+_0x3f2b36(0x3d7):'',_0x28bcea=_0x59add5[_0x3f2b36(0x3ad)]===_0x3f2b36(0x1ed)?_0x3f2b36(0x2a9)+_escapeHtml(assetManagerText('createPanel.searchAssets',{'category':_formatAssetCategoryLabel(_0x444a96)}))+_0x3f2b36(0x2d4)+_escapeHtml(_0x59add5[_0x3f2b36(0x271)]||'')+_0x3f2b36(0x3c2)+(_0xec53f0['length']===0x0?_0x3f2b36(0x287)+(String(_0x59add5['updateSearchKeyword']||'')[_0x3f2b36(0x1d6)]()?_escapeHtml(assetManagerText(_0x3f2b36(0x25c))):_escapeHtml(assetManagerText('createPanel.noCategoryAssets',{'category':_formatAssetCategoryLabel(_0x444a96)})))+_0x3f2b36(0x3d7):_0xec53f0[_0x3f2b36(0x26e)](_0x3ea43b=>{const _0x4f279e=_0x3f2b36,_0x4035c6=String(_0x3ea43b?.['id']||'')===_0x59add5[_0x4f279e(0x34c)]?'\x20active':'',_0x40166d=_0x3ea43b?.[_0x4f279e(0x254)]?_0x4f279e(0x288)+_escapeHtml(_0x3ea43b[_0x4f279e(0x254)])+_0x4f279e(0x2ec)+_escapeHtml(_0x3ea43b?.[_0x4f279e(0x33c)]||assetManagerText(_0x4f279e(0x1f1)))+_0x4f279e(0x25b):_renderAssetIcon(_0x3ea43b?.[_0x4f279e(0x2d6)]||_0x4f279e(0x2e9));return'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-update-item'+_0x4035c6+_0x4f279e(0x1e9)+_escapeHtml(_0x3ea43b['id'])+_0x4f279e(0x37f)+_0x40166d+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-update-info\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>'+_escapeHtml(_0x3ea43b[_0x4f279e(0x33c)]||assetManagerText('unnamedAsset'))+_0x4f279e(0x38c)+_formatAssetDateTime(_0x3ea43b[_0x4f279e(0x2f8)]||_0x3ea43b['createdAt'])+_0x4f279e(0x35e);})[_0x3f2b36(0x325)](''))+_0x3f2b36(0x2fe):'',_0x3fe105=_0x59add5['mode']===_0x3f2b36(0x1ed)?_0x3f2b36(0x273):'',_0x5611bb=_0x59add5[_0x3f2b36(0x3ad)]===_0x3f2b36(0x1ed),_0x68aa61=_0x5611bb?_0x3f2b36(0x1e2):'v2-asset-create-body',_0x276e58=_0x5611bb?'':_0x3f2b36(0x1e8)+assetManagerText(_0x3f2b36(0x314))+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-source-scope\x22>'+assetManagerText('createPanel.selectedNodes',{'count':_0x2d94d0})+_0x3f2b36(0x3b8)+_0x397d2e+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20';_0x439522[_0x3f2b36(0x279)]='\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-header\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-title\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-asset-create-header-text\x22>'+_0x5deff9+_0x3f2b36(0x360)+_escapeHtml(assetManagerText('close'))+_0x3f2b36(0x353)+(_0x59add5[_0x3f2b36(0x3ad)]==='create'?_0x3f2b36(0x32a):'')+_0x3f2b36(0x342)+assetManagerText('createPanel.createTab')+_0x3f2b36(0x1dc)+(_0x59add5['mode']===_0x3f2b36(0x1ed)?'\x20active':'')+_0x3f2b36(0x1e1)+assetManagerText(_0x3f2b36(0x248))+_0x3f2b36(0x1ea)+_0x28bcea+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22'+_0x68aa61+_0x3f2b36(0x306)+_0x276e58+_0x3f2b36(0x2e7)+assetManagerText(_0x3f2b36(0x32d))+_0x3f2b36(0x200)+_escapeHtml(assetManagerText(_0x3f2b36(0x2b9)))+_0x3f2b36(0x2d4)+_escapeHtml(_0x59add5[_0x3f2b36(0x216)]?.['name']||'')+_0x3f2b36(0x249)+assetManagerText(_0x3f2b36(0x3d2))+_0x3f2b36(0x301)+_escapeHtml(_formatAssetCategoryLabel(_0x59add5[_0x3f2b36(0x216)]?.[_0x3f2b36(0x1c6)]||this[_0x3f2b36(0x2db)]))+_0x3f2b36(0x305)+_0x46a2a9+_0x3f2b36(0x2b6)+_0x3d6c8e+_0x3f2b36(0x22f)+_0x3fe105+_0x3f2b36(0x39d)+(_0x5611bb?_0x3f2b36(0x303):'')+'\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-create-btn\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22asset-create-submit\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+(_0x59add5[_0x3f2b36(0x3d5)]?_0x3f2b36(0x222):'')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20>'+_0x2f0aa4+'</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+(_0x5611bb?_0x3f2b36(0x374)+(_0x59add5[_0x3f2b36(0x3d5)]?'disabled':'')+_0x3f2b36(0x1da)+_0x5bdd4f+'</button>':'')+_0x3f2b36(0x1f4),this[_0x3f2b36(0x25a)]();}[a459_0x12ef8c(0x25a)](){const _0x503bf0=a459_0x12ef8c,_0x35b712=this[_0x503bf0(0x25d)],_0x12128b=this[_0x503bf0(0x252)];if(!_0x35b712||!_0x12128b)return;_0x35b712[_0x503bf0(0x36d)](_0x503bf0(0x3b7))?.['addEventListener'](_0x503bf0(0x26d),()=>{const _0x215ced=_0x503bf0;this[_0x215ced(0x23e)]();});const _0x48c446=_0x35b712[_0x503bf0(0x36d)](_0x503bf0(0x245)),_0x4ecd10=_0x35b712[_0x503bf0(0x36d)](_0x503bf0(0x1c9));this['_createPanelDropdownOutsideHandler']&&(document[_0x503bf0(0x24e)]('pointerdown',this['_createPanelDropdownOutsideHandler']),this['_createPanelDropdownOutsideHandler']=null);this['_createPanelDropdownEl']&&(this['_createPanelDropdownEl']['remove'](),this[_0x503bf0(0x292)]=null);if(_0x48c446&&_0x4ecd10){const _0x56be99=document[_0x503bf0(0x20d)](_0x503bf0(0x3c3));_0x56be99[_0x503bf0(0x328)]=_0x503bf0(0x300);const _0x5e9a48=()=>{const _0x22efdc=_0x503bf0,_0x1ffe72=this[_0x22efdc(0x252)]?.[_0x22efdc(0x216)]?.[_0x22efdc(0x1c6)]||this[_0x22efdc(0x2db)],_0x263efa=this[_0x22efdc(0x3c9)]()[_0x22efdc(0x26e)](_0x225f05=>{const _0xc343e2=_0x22efdc,_0x1806b1=this['_categoryKey'](_0x225f05)===this[_0xc343e2(0x394)](_0x1ffe72)?_0xc343e2(0x281):'',_0x1cf72e=_escapeHtml(_0x225f05),_0x16191b=_escapeHtml(_formatAssetCategoryLabel(_0x225f05));return _0xc343e2(0x37c)+_0x1806b1+'\x22\x20data-val=\x22'+_0x1cf72e+'\x22>'+_0x16191b+_0xc343e2(0x3d7);})[_0x22efdc(0x325)](''),_0x2334aa=this['_canAddCustomCategory']()?this[_0x22efdc(0x252)]?.['customCategoryEditing']?_0x22efdc(0x1dd)+_escapeHtml(assetManagerText(_0x22efdc(0x350)))+_0x22efdc(0x36b)+_escapeHtml(this[_0x22efdc(0x252)]?.[_0x22efdc(0x259)]||'')+_0x22efdc(0x32c):_0x22efdc(0x295)+assetManagerText(_0x22efdc(0x1fc))+_0x22efdc(0x3d7):'';_0x56be99[_0x22efdc(0x279)]=_0x263efa+_0x2334aa;},_0x138a38=()=>{const _0x4d9f64=_0x503bf0,_0x181092=_0x56be99[_0x4d9f64(0x36d)](_0x4d9f64(0x1c5)),_0x29332c=_0x181092?.['value']??this[_0x4d9f64(0x252)]?.[_0x4d9f64(0x259)]??'',_0xc269a2=this[_0x4d9f64(0x2a8)](_0x29332c);if(!_0xc269a2){this[_0x4d9f64(0x3b5)]({'customCategoryEditing':![],'customCategoryDraft':''}),_0x5e9a48();return;}const _0x972e73=this[_0x4d9f64(0x3c9)](),_0x2ad351=this['_findCategoryByName'](_0xc269a2,_0x972e73);if(!_0x2ad351&&_0x972e73['length']>=ASSET_CATEGORY_LIMIT){window['showToast']?.(assetManagerText('categoryLimit',{'limit':ASSET_CATEGORY_LIMIT}),_0x4d9f64(0x2f4));return;}const _0x3a54dc=_0x2ad351||this[_0x4d9f64(0x38a)](_0xc269a2);if(!_0x3a54dc)return;const _0xe5b3=[...this[_0x4d9f64(0x252)]?.[_0x4d9f64(0x368)]||[]];!_0x2ad351&&!this[_0x4d9f64(0x32b)](_0x3a54dc,_0xe5b3)&&_0xe5b3['push'](_0x3a54dc);this[_0x4d9f64(0x3b5)]({'draft':{'category':_0x3a54dc},'customCategoryEditing':![],'customCategoryDraft':'','customCategories':_0xe5b3,'updateConfirmOpen':![],'error':''});this[_0x4d9f64(0x252)]?.['mode']==='update'&&this[_0x4d9f64(0x2e8)](_0x3a54dc);_0x4ecd10[_0x4d9f64(0x298)]=_formatAssetCategoryLabel(_0x3a54dc);if(this['_createPanelState']?.[_0x4d9f64(0x3ad)]==='update'){_0x216f59(),this[_0x4d9f64(0x23d)]();return;}_0x5e9a48();};_0x5e9a48(),document[_0x503bf0(0x1f6)]['appendChild'](_0x56be99),this['_createPanelDropdownEl']=_0x56be99;const _0x216f59=()=>{const _0x2105e8=_0x503bf0;_0x56be99['classList'][_0x2105e8(0x1ec)]('show'),_0x48c446[_0x2105e8(0x2c3)][_0x2105e8(0x1ec)](_0x2105e8(0x223));};_0x48c446[_0x503bf0(0x313)](_0x503bf0(0x26d),_0x16c0fd=>{const _0x237d3b=_0x503bf0;_0x16c0fd[_0x237d3b(0x2b7)]();if(_0x56be99[_0x237d3b(0x2c3)][_0x237d3b(0x321)](_0x237d3b(0x35d))){_0x216f59();return;}const _0x5c8370=_0x48c446[_0x237d3b(0x1d0)]();_0x56be99['style'][_0x237d3b(0x2c2)]=_0x5c8370[_0x237d3b(0x2c2)]+'px',_0x56be99[_0x237d3b(0x244)][_0x237d3b(0x3bd)]=_0x5c8370['bottom']+0x4+'px',_0x56be99[_0x237d3b(0x244)]['width']=_0x5c8370['width']+'px',_0x56be99[_0x237d3b(0x2c3)][_0x237d3b(0x326)](_0x237d3b(0x35d)),_0x48c446[_0x237d3b(0x2c3)][_0x237d3b(0x326)](_0x237d3b(0x223));}),_0x56be99['addEventListener'](_0x503bf0(0x26d),_0xad59e9=>{const _0x19bae7=_0x503bf0,_0x2f9bce=_0xad59e9[_0x19bae7(0x1df)][_0x19bae7(0x240)](_0x19bae7(0x243));if(_0x2f9bce){this[_0x19bae7(0x3b5)]({'customCategoryEditing':!![],'customCategoryDraft':'','error':''}),_0x5e9a48(),window[_0x19bae7(0x1e7)](()=>{const _0x2c6d20=_0x19bae7;_0x56be99['querySelector'](_0x2c6d20(0x1c5))?.[_0x2c6d20(0x3a7)]();});return;}const _0x23c1c2=_0xad59e9[_0x19bae7(0x1df)][_0x19bae7(0x240)](_0x19bae7(0x237));if(!_0x23c1c2)return;const _0x296bd4=this[_0x19bae7(0x2a8)](_0x23c1c2[_0x19bae7(0x3b2)][_0x19bae7(0x330)])||this[_0x19bae7(0x2db)];this[_0x19bae7(0x252)]?.[_0x19bae7(0x3ad)]===_0x19bae7(0x1ed)?(this['_setCreatePanelState']({'customCategoryEditing':![],'customCategoryDraft':''}),this['_syncUpdateSelectionForCategory'](_0x296bd4)):this[_0x19bae7(0x3b5)]({'draft':{'category':_0x296bd4},'customCategoryEditing':![],'customCategoryDraft':'','updateConfirmOpen':![],'error':''}),_0x216f59(),this[_0x19bae7(0x23d)]();}),_0x56be99[_0x503bf0(0x313)](_0x503bf0(0x1c1),_0x5d2d95=>{const _0x451e25=_0x503bf0;if(!_0x5d2d95['target'][_0x451e25(0x1e0)]('#asset-category-custom-input'))return;this[_0x451e25(0x3b5)]({'customCategoryDraft':_0x5d2d95['target'][_0x451e25(0x278)]||''});}),_0x56be99[_0x503bf0(0x313)]('keydown',_0x14d486=>{const _0x37c76e=_0x503bf0;if(!_0x14d486[_0x37c76e(0x1df)][_0x37c76e(0x1e0)]('#asset-category-custom-input'))return;if(_0x14d486[_0x37c76e(0x35a)]===_0x37c76e(0x323)){_0x14d486[_0x37c76e(0x21e)](),_0x138a38();return;}_0x14d486[_0x37c76e(0x35a)]===_0x37c76e(0x27b)&&(_0x14d486[_0x37c76e(0x21e)](),this[_0x37c76e(0x3b5)]({'customCategoryEditing':![],'customCategoryDraft':''}),_0x5e9a48());}),_0x56be99[_0x503bf0(0x313)]('focusout',_0x3b5137=>{const _0x548d15=_0x503bf0;if(!_0x3b5137['target']['matches'](_0x548d15(0x1c5)))return;_0x138a38();});const _0x54b56f=_0x44d569=>{const _0x3aac5a=_0x503bf0;!_0x56be99['contains'](_0x44d569[_0x3aac5a(0x1df)])&&!_0x48c446[_0x3aac5a(0x321)](_0x44d569['target'])&&_0x216f59();};this[_0x503bf0(0x366)]=_0x54b56f,document[_0x503bf0(0x313)](_0x503bf0(0x2f6),_0x54b56f);}_0x35b712[_0x503bf0(0x229)](_0x503bf0(0x291))[_0x503bf0(0x253)](_0x1fdf7e=>{const _0x5ba678=_0x503bf0;_0x1fdf7e[_0x5ba678(0x313)](_0x5ba678(0x26d),()=>{const _0xb7c09d=_0x5ba678,_0x4c46af=_0x1fdf7e[_0xb7c09d(0x3b2)][_0xb7c09d(0x3ad)]==='update'?_0xb7c09d(0x1ed):_0xb7c09d(0x276);if(_0x4c46af===this['_createPanelState']?.[_0xb7c09d(0x3ad)])return;this[_0xb7c09d(0x3b5)]({'mode':_0x4c46af,'updateConfirmOpen':![],'customCategoryEditing':![],'customCategoryDraft':'','error':''});if(_0x4c46af===_0xb7c09d(0x1ed)&&!this['_createPanelState']?.[_0xb7c09d(0x34c)]){const _0x21b7b3=this['_getFilteredUpdateAssets']()[0x0]||null;_0x21b7b3&&this[_0xb7c09d(0x1f0)](_0x21b7b3);}this[_0xb7c09d(0x23d)]();});});const _0x2dde57=_0x35b712[_0x503bf0(0x36d)](_0x503bf0(0x1ef));_0x2dde57&&_0x2dde57[_0x503bf0(0x313)](_0x503bf0(0x1c1),_0x4d6238=>{const _0x34d3d2=_0x503bf0;this[_0x34d3d2(0x3b5)]({'draft':{'name':_0x4d6238[_0x34d3d2(0x1df)][_0x34d3d2(0x278)]||''},'updateConfirmOpen':![],'error':''});});const _0x5b4246=_0x35b712[_0x503bf0(0x36d)](_0x503bf0(0x2f5));_0x5b4246&&_0x5b4246[_0x503bf0(0x313)](_0x503bf0(0x1c1),_0x1aaf70=>{const _0x5acdab=_0x503bf0;this[_0x5acdab(0x3b5)]({'updateSearchKeyword':_0x1aaf70['target'][_0x5acdab(0x278)]||'','updateConfirmOpen':![],'error':''}),this['_renderCreatePanelContent']();});_0x35b712[_0x503bf0(0x229)](_0x503bf0(0x26f))[_0x503bf0(0x253)](_0x3d8be1=>{const _0x2bad23=_0x503bf0;_0x3d8be1['addEventListener'](_0x2bad23(0x26d),()=>{const _0x1c8d47=_0x2bad23,_0x5e6e91=String(_0x3d8be1[_0x1c8d47(0x3b2)]['assetId']||''),_0x272171=this[_0x1c8d47(0x22c)]()[_0x1c8d47(0x246)](_0x1d31e7=>String(_0x1d31e7?.['id']||'')===_0x5e6e91);if(!_0x272171)return;this[_0x1c8d47(0x1f0)](_0x272171),this[_0x1c8d47(0x23d)]();});});const _0x382b0e=_0x35b712[_0x503bf0(0x36d)]('#asset-create-submit');_0x382b0e&&_0x382b0e[_0x503bf0(0x313)](_0x503bf0(0x26d),()=>{const _0x1cf620=_0x503bf0;this[_0x1cf620(0x304)]();});const _0xecf11d=_0x35b712[_0x503bf0(0x36d)]('#asset-join-submit');_0xecf11d&&_0xecf11d[_0x503bf0(0x313)](_0x503bf0(0x26d),()=>{const _0x40173f=_0x503bf0;this[_0x40173f(0x334)]();});}async['_submitCreatePanel'](){const _0x55a10b=a459_0x12ef8c,_0x587e02=this['_createPanelState'],_0xef7db9=this[_0x55a10b(0x25d)];if(!_0x587e02||!_0xef7db9||_0x587e02[_0x55a10b(0x3d5)])return;const _0xa2a58b=Array[_0x55a10b(0x338)](_0x587e02[_0x55a10b(0x38f)])?_0x587e02[_0x55a10b(0x38f)]:[],_0x393ef4=this['_getSelectedAssetNodes'](_0xa2a58b);if(!_0x393ef4[_0x55a10b(0x32f)]){this['_setCreatePanelState']({'error':assetManagerText(_0x55a10b(0x235))}),this['_renderCreatePanelContent']();return;}const _0x183f39=String(this['_createPanelState']?.[_0x55a10b(0x216)]?.[_0x55a10b(0x33c)]||'')[_0x55a10b(0x1d6)]()||assetManagerText(_0x55a10b(0x218)),_0x3d4782=String(this[_0x55a10b(0x252)]?.[_0x55a10b(0x216)]?.[_0x55a10b(0x1c6)]||'')[_0x55a10b(0x1d6)]()||this[_0x55a10b(0x2db)];if(_0x587e02[_0x55a10b(0x3ad)]===_0x55a10b(0x1ed)){const _0x1b5f7a=this[_0x55a10b(0x263)]()[_0x55a10b(0x246)](_0x1e799a=>String(_0x1e799a?.['id']||'')===String(_0x587e02[_0x55a10b(0x34c)]||''));if(!_0x1b5f7a){this['_setCreatePanelState']({'error':assetManagerText(_0x55a10b(0x372))}),this[_0x55a10b(0x23d)]();return;}if(!_0x587e02[_0x55a10b(0x2b5)]){this['_setCreatePanelState']({'updateConfirmOpen':!![],'error':''}),this['_renderCreatePanelContent']();return;}const _0x4ecf8c=this[_0x55a10b(0x2ac)](_0xa2a58b,{'id':_0x1b5f7a['id'],'name':_0x183f39,'category':_0x3d4782,'createdAt':_0x1b5f7a['createdAt']||_0x1b5f7a['updatedAt']||Date['now'](),'updatedAt':Date[_0x55a10b(0x1eb)]()});this[_0x55a10b(0x3b5)]({'saving':!![],'savingAction':_0x55a10b(0x2fa),'error':''}),this[_0x55a10b(0x23d)]();try{await saveAssetToServer(_0x4ecf8c),this[_0x55a10b(0x219)](_0x4ecf8c),this[_0x55a10b(0x33b)](),this[_0x55a10b(0x29e)]=String(_0x4ecf8c['id']||'')===this[_0x55a10b(0x29e)]?_0x4ecf8c['id']:this[_0x55a10b(0x29e)],window['showToast']?.(assetManagerText('toasts.assetUpdated'),'success'),this[_0x55a10b(0x23e)](),this[_0x55a10b(0x385)]?.['classList']['contains'](_0x55a10b(0x35d))&&this[_0x55a10b(0x36c)]();}catch(_0x23a32e){this[_0x55a10b(0x3b5)]({'saving':![],'savingAction':'','error':assetManagerText(_0x55a10b(0x2be))}),this[_0x55a10b(0x23d)](),console['error'](_0x23a32e),window['showToast']?.(assetManagerText(_0x55a10b(0x2be)),'error');}return;}const _0x1c81e5=this[_0x55a10b(0x2ac)](_0xa2a58b,{'name':_0x183f39,'category':_0x3d4782,'createdAt':Date[_0x55a10b(0x1eb)](),'updatedAt':Date['now']()});this[_0x55a10b(0x3b5)]({'saving':!![],'savingAction':_0x55a10b(0x276),'error':''}),this[_0x55a10b(0x23d)]();try{await saveAssetToServer(_0x1c81e5),this[_0x55a10b(0x219)](_0x1c81e5),this[_0x55a10b(0x33b)](),window[_0x55a10b(0x310)]?.(assetManagerText('toasts.assetCreated'),'success'),this['_playCreateAssetFly'](_0xef7db9),this[_0x55a10b(0x23e)](),this['sidebarPanel']?.[_0x55a10b(0x2c3)][_0x55a10b(0x321)](_0x55a10b(0x35d))&&(this['_newAssetPulseId']=String(_0x1c81e5['id']||''),this[_0x55a10b(0x36c)]());}catch(_0x155824){this[_0x55a10b(0x3b5)]({'saving':![],'savingAction':'','error':assetManagerText(_0x55a10b(0x319))}),this[_0x55a10b(0x23d)](),console[_0x55a10b(0x215)](_0x155824),window[_0x55a10b(0x310)]?.(assetManagerText('errors.assetCreateFailed'),_0x55a10b(0x215));}}async['_joinCreatePanelToAsset'](){const _0x8dabd8=a459_0x12ef8c,_0xd752d8=this[_0x8dabd8(0x252)],_0x3e17ce=this[_0x8dabd8(0x25d)];if(!_0xd752d8||!_0x3e17ce||_0xd752d8['saving'])return;const _0xe38283=Array[_0x8dabd8(0x338)](_0xd752d8[_0x8dabd8(0x38f)])?_0xd752d8[_0x8dabd8(0x38f)]:[],_0x1e3b91=this[_0x8dabd8(0x1c2)](_0xe38283);if(!_0x1e3b91[_0x8dabd8(0x32f)]){this[_0x8dabd8(0x3b5)]({'error':assetManagerText('errors.noJoinableNodes')}),this['_renderCreatePanelContent']();return;}const _0x1e52c6=this[_0x8dabd8(0x263)]()['find'](_0x1e781a=>String(_0x1e781a?.['id']||'')===String(_0xd752d8['selectedAssetId']||''));if(!_0x1e52c6){this[_0x8dabd8(0x3b5)]({'error':assetManagerText(_0x8dabd8(0x2b2))}),this[_0x8dabd8(0x23d)]();return;}const _0xb598e9=String(this['_createPanelState']?.[_0x8dabd8(0x216)]?.[_0x8dabd8(0x33c)]||'')[_0x8dabd8(0x1d6)]()||assetManagerText('unnamedAsset'),_0x5b208b=String(this[_0x8dabd8(0x252)]?.[_0x8dabd8(0x216)]?.[_0x8dabd8(0x1c6)]||'')[_0x8dabd8(0x1d6)]()||this[_0x8dabd8(0x2db)],_0x4b4996=this['_buildAssetAppendPayload'](_0x1e52c6,_0xe38283,{'name':_0xb598e9,'category':_0x5b208b,'updatedAt':Date[_0x8dabd8(0x1eb)]()});this[_0x8dabd8(0x3b5)]({'saving':!![],'savingAction':_0x8dabd8(0x325),'updateConfirmOpen':![],'error':''}),this[_0x8dabd8(0x23d)]();try{await saveAssetToServer(_0x4b4996),this[_0x8dabd8(0x219)](_0x4b4996),this[_0x8dabd8(0x33b)](),this[_0x8dabd8(0x29e)]=String(_0x4b4996['id']||'')===this['_openAssetId']?_0x4b4996['id']:this[_0x8dabd8(0x29e)],window['showToast']?.(assetManagerText(_0x8dabd8(0x3c0)),'success'),this[_0x8dabd8(0x23e)](),this[_0x8dabd8(0x385)]?.[_0x8dabd8(0x2c3)][_0x8dabd8(0x321)](_0x8dabd8(0x35d))&&this['renderSidebarContent']();}catch(_0x313be5){this[_0x8dabd8(0x3b5)]({'saving':![],'savingAction':'','error':assetManagerText(_0x8dabd8(0x269))}),this['_renderCreatePanelContent'](),console[_0x8dabd8(0x215)](_0x313be5),window[_0x8dabd8(0x310)]?.(assetManagerText(_0x8dabd8(0x269)),_0x8dabd8(0x215));}}[a459_0x12ef8c(0x333)](){const _0x2fd0ad=a459_0x12ef8c,{viewport:_0x4c05ac}=a459_0x26716c[_0x2fd0ad(0x3cb)](),_0x5a0ed6=window['innerWidth']/0x2,_0xf09185=window['innerHeight']/0x2,_0x4f1c5a=document['documentElement']?.[_0x2fd0ad(0x373)]||window[_0x2fd0ad(0x274)]||0x0,_0x8207d5=document['documentElement']?.[_0x2fd0ad(0x1c4)]||window[_0x2fd0ad(0x3a1)]||0x0;if(!_0x4f1c5a||!_0x8207d5)return screenToWorld(_0x5a0ed6,_0xf09185,_0x4c05ac);let _0x29d7d8=0x0,_0x22e4cf=0x0,_0x46d1f4=_0x4f1c5a,_0x593c6e=_0x8207d5;const _0x4aeaee=[],_0x21c8f4=document[_0x2fd0ad(0x36d)]('header');if(_0x21c8f4)_0x4aeaee[_0x2fd0ad(0x30f)](_0x21c8f4);const _0x1a0399=document[_0x2fd0ad(0x36d)](_0x2fd0ad(0x384));if(_0x1a0399)_0x4aeaee['push'](_0x1a0399);if(this[_0x2fd0ad(0x385)]?.['classList']?.[_0x2fd0ad(0x321)](_0x2fd0ad(0x35d)))_0x4aeaee[_0x2fd0ad(0x30f)](this['sidebarPanel']);const _0x3c4157=0x8;for(const _0x1708f4 of _0x4aeaee){if(!_0x1708f4?.[_0x2fd0ad(0x1e6)])continue;const _0x586765=_0x1708f4[_0x2fd0ad(0x1d0)](),_0x1f8aad=Math['max'](_0x29d7d8,_0x586765[_0x2fd0ad(0x2c2)]),_0x568195=Math[_0x2fd0ad(0x2eb)](_0x22e4cf,_0x586765['top']),_0x48f894=Math['min'](_0x46d1f4,_0x586765[_0x2fd0ad(0x316)]),_0x497890=Math['min'](_0x593c6e,_0x586765[_0x2fd0ad(0x210)]);if(_0x48f894<=_0x1f8aad||_0x497890<=_0x568195)continue;if(_0x586765[_0x2fd0ad(0x2c2)]<=_0x29d7d8+_0x3c4157&&_0x586765[_0x2fd0ad(0x316)]>_0x29d7d8+_0x3c4157){_0x29d7d8=Math[_0x2fd0ad(0x2eb)](_0x29d7d8,_0x586765[_0x2fd0ad(0x316)]);continue;}if(_0x586765[_0x2fd0ad(0x316)]>=_0x46d1f4-_0x3c4157&&_0x586765[_0x2fd0ad(0x2c2)]<_0x46d1f4-_0x3c4157){_0x46d1f4=Math['min'](_0x46d1f4,_0x586765[_0x2fd0ad(0x2c2)]);continue;}if(_0x586765[_0x2fd0ad(0x3bd)]<=_0x22e4cf+_0x3c4157&&_0x586765[_0x2fd0ad(0x210)]>_0x22e4cf+_0x3c4157){_0x22e4cf=Math[_0x2fd0ad(0x2eb)](_0x22e4cf,_0x586765[_0x2fd0ad(0x210)]);continue;}if(_0x586765[_0x2fd0ad(0x210)]>=_0x593c6e-_0x3c4157&&_0x586765[_0x2fd0ad(0x3bd)]<_0x593c6e-_0x3c4157){_0x593c6e=Math[_0x2fd0ad(0x36a)](_0x593c6e,_0x586765[_0x2fd0ad(0x3bd)]);continue;}}const _0x5ac355=_0x46d1f4-_0x29d7d8,_0x45083d=_0x593c6e-_0x22e4cf,_0x2ab7a3=_0x5ac355>0x28?_0x29d7d8+_0x5ac355/0x2:_0x5a0ed6,_0x3e65ff=_0x45083d>0x28?_0x22e4cf+_0x45083d/0x2:_0xf09185;return screenToWorld(_0x2ab7a3,_0x3e65ff,_0x4c05ac);}[a459_0x12ef8c(0x227)](_0x244830){const _0x5147d3=a459_0x12ef8c;let _0x9ed139=Infinity,_0x1c13a6=Infinity,_0x1abb96=-Infinity,_0x3fdb1b=-Infinity;for(const _0x470a1d of _0x244830||[]){if(!_0x470a1d)continue;const _0x20bca8=Number(_0x470a1d['x'])||0x0,_0x3b6c14=Number(_0x470a1d['y'])||0x0,_0x4a86b7=Number(_0x470a1d[_0x5147d3(0x22e)]??_0x470a1d['w'])||0x64,_0x400f1e=Number(_0x470a1d[_0x5147d3(0x30d)]??_0x470a1d['h'])||0x64;_0x9ed139=Math['min'](_0x9ed139,_0x20bca8),_0x1c13a6=Math['min'](_0x1c13a6,_0x3b6c14),_0x1abb96=Math[_0x5147d3(0x2eb)](_0x1abb96,_0x20bca8+_0x4a86b7),_0x3fdb1b=Math[_0x5147d3(0x2eb)](_0x3fdb1b,_0x3b6c14+_0x400f1e);}if(!Number['isFinite'](_0x9ed139)||!Number['isFinite'](_0x1c13a6))return{'minX':0x0,'minY':0x0,'maxX':0x0,'maxY':0x0,'w':0x0,'h':0x0,'cx':0x0,'cy':0x0};const _0x490479=Math[_0x5147d3(0x2eb)](0x0,_0x1abb96-_0x9ed139),_0x1dc7f5=Math['max'](0x0,_0x3fdb1b-_0x1c13a6);return{'minX':_0x9ed139,'minY':_0x1c13a6,'maxX':_0x1abb96,'maxY':_0x3fdb1b,'w':_0x490479,'h':_0x1dc7f5,'cx':_0x9ed139+_0x490479/0x2,'cy':_0x1c13a6+_0x1dc7f5/0x2};}[a459_0x12ef8c(0x33f)](_0x5aed0d){const _0x5a7aec=a459_0x12ef8c,_0x1386b7=String(_0x5aed0d||'');if(!_0x1386b7)return;if(_0x1386b7[_0x5a7aec(0x1cb)](_0x5a7aec(0x2e3)))return;if(this[_0x5a7aec(0x282)][_0x5a7aec(0x1fd)](_0x1386b7))return;this[_0x5a7aec(0x282)][_0x5a7aec(0x326)](_0x1386b7),this['_ensureThumbDecoded'](_0x1386b7);}['_ensureThumbDecoded'](_0x3c2fa1){const _0x28a6df=a459_0x12ef8c,_0x31a1f6=String(_0x3c2fa1||'');if(!_0x31a1f6)return Promise[_0x28a6df(0x3b9)](![]);if(_0x31a1f6[_0x28a6df(0x1cb)](_0x28a6df(0x2e3)))return Promise[_0x28a6df(0x3b9)](!![]);const _0x238e40=this[_0x28a6df(0x2cd)]['get'](_0x31a1f6);if(_0x238e40)return _0x238e40;const _0x2676b9=preloadCanvasImage(_0x31a1f6,{'priority':0x14,'fetchPriority':_0x28a6df(0x24d)})['then'](()=>!![],()=>![]);return this[_0x28a6df(0x2cd)][_0x28a6df(0x20c)](_0x31a1f6,_0x2676b9),_0x2676b9;}[a459_0x12ef8c(0x380)](_0x460364){const _0x4116f9=a459_0x12ef8c,_0x248f70=String(_0x460364||'')[_0x4116f9(0x2d8)]();return _0x248f70['endsWith'](_0x4116f9(0x1d4))||_0x248f70[_0x4116f9(0x38b)](_0x4116f9(0x32e))||_0x248f70[_0x4116f9(0x38b)]('.mov')||_0x248f70[_0x4116f9(0x38b)](_0x4116f9(0x387))||_0x248f70[_0x4116f9(0x38b)](_0x4116f9(0x24c));}async[a459_0x12ef8c(0x293)](_0x481384){const _0x5e2a82=String(_0x481384||'');if(!_0x5e2a82)return'';return await new Promise(_0x485fae=>{const _0x45130b=a459_0x5da1,_0x63a578=document['createElement']('video');_0x63a578[_0x45130b(0x358)]=_0x45130b(0x24d),_0x63a578[_0x45130b(0x242)]=!![],_0x63a578[_0x45130b(0x1ee)]=!![],_0x63a578[_0x45130b(0x317)]='anonymous';const _0x255fc1=()=>{const _0x2bde84=_0x45130b;_0x63a578[_0x2bde84(0x286)](_0x2bde84(0x233)),_0x63a578[_0x2bde84(0x231)]();},_0x132110=()=>{_0x255fc1(),_0x485fae('');},_0x3cad86=async()=>{const _0x2a5ec1=_0x45130b;try{const _0x1cf013=Number[_0x2a5ec1(0x3d8)](_0x63a578['duration'])?_0x63a578[_0x2a5ec1(0x3c4)]:0x0,_0x3d2134=_0x1cf013>0x0?Math[_0x2a5ec1(0x36a)](0.08,Math['max'](0x0,_0x1cf013-0.08)):0x0,_0x454740=()=>{const _0x2ee858=_0x2a5ec1;try{const _0x58f5ac=_0x63a578[_0x2ee858(0x28f)]||0x0,_0x13d33a=_0x63a578[_0x2ee858(0x370)]||0x0;if(!_0x58f5ac||!_0x13d33a)return _0x132110();const _0x1ed68d=0x140,_0x9bd9f2=0x140,_0x5d975e=Math[_0x2ee858(0x36a)](0x1,_0x1ed68d/_0x58f5ac,_0x9bd9f2/_0x13d33a),_0x157b43=Math[_0x2ee858(0x2eb)](0x1,Math[_0x2ee858(0x3b1)](_0x58f5ac*_0x5d975e)),_0x5d35a2=Math[_0x2ee858(0x2eb)](0x1,Math[_0x2ee858(0x3b1)](_0x13d33a*_0x5d975e)),_0x3ccef5=document['createElement'](_0x2ee858(0x1c3));_0x3ccef5[_0x2ee858(0x22e)]=_0x157b43,_0x3ccef5[_0x2ee858(0x30d)]=_0x5d35a2;const _0x2d81c9=_0x3ccef5[_0x2ee858(0x31c)]('2d');_0x2d81c9[_0x2ee858(0x20b)](_0x63a578,0x0,0x0,_0x157b43,_0x5d35a2);const _0x462e82=_0x3ccef5[_0x2ee858(0x361)]('image/jpeg',0.82);_0x255fc1(),_0x485fae(_0x462e82);}catch(_0x307f58){_0x132110();}finally{_0x63a578[_0x2ee858(0x24e)](_0x2ee858(0x1d1),_0x454740);}};_0x63a578['addEventListener'](_0x2a5ec1(0x1d1),_0x454740,{'once':!![]}),_0x63a578[_0x2a5ec1(0x2c4)]=_0x3d2134;}catch(_0x3de478){_0x132110();}};_0x63a578[_0x45130b(0x313)]('error',_0x132110,{'once':!![]}),_0x63a578['addEventListener']('loadeddata',_0x3cad86,{'once':!![]}),attachMediaElementPlaybackSource(_0x63a578,_0x5e2a82,{'preload':_0x45130b(0x24d)})[_0x45130b(0x2ed)](()=>{const _0x2f5d5b=_0x45130b;if(!String(_0x63a578[_0x2f5d5b(0x277)](_0x2f5d5b(0x233))||_0x63a578[_0x2f5d5b(0x233)]||'')[_0x2f5d5b(0x1d6)]()){_0x63a578[_0x2f5d5b(0x233)]=_0x5e2a82;try{_0x63a578[_0x2f5d5b(0x231)]?.();}catch{}}});});}[a459_0x12ef8c(0x33b)](){const _0x4733d6=a459_0x12ef8c;if(this[_0x4733d6(0x31e)])return;this[_0x4733d6(0x31e)]=window[_0x4733d6(0x1ca)](()=>{const _0x23528e=_0x4733d6;this['_videoThumbTimer']=0x0,this[_0x23528e(0x294)]();},0x0);}['_scheduleSidebarRender'](){const _0x519b65=a459_0x12ef8c;if(!this[_0x519b65(0x385)]?.[_0x519b65(0x2c3)][_0x519b65(0x321)]('show'))return;if(this['_renamingAssetId'])return;if(this[_0x519b65(0x3cd)])return;this[_0x519b65(0x3cd)]=window[_0x519b65(0x1e7)](()=>{const _0x6c86d9=_0x519b65;this[_0x6c86d9(0x3cd)]=0x0;if(!this['sidebarPanel']?.[_0x6c86d9(0x2c3)][_0x6c86d9(0x321)](_0x6c86d9(0x35d)))return;if(this[_0x6c86d9(0x2fb)])return;this[_0x6c86d9(0x36c)]();});}[a459_0x12ef8c(0x211)](_0x144035){const _0x310e03=a459_0x12ef8c,_0xf7efdf=String(_0x144035||'');if(!_0xf7efdf)return;if(this[_0x310e03(0x207)])this[_0x310e03(0x207)]='';this[_0x310e03(0x2fb)]=_0xf7efdf,this[_0x310e03(0x36c)]();}[a459_0x12ef8c(0x250)](){const _0x3aa923=a459_0x12ef8c;if(!this['_renamingAssetId'])return;this[_0x3aa923(0x2fb)]='',this['renderSidebarContent']();}async[a459_0x12ef8c(0x3be)](_0x251222,_0x33f8a0){const _0x1b1f1d=a459_0x12ef8c,_0x214c6e=String(_0x251222||''),_0x7b1f92=String(_0x33f8a0||'')[_0x1b1f1d(0x1d6)]();if(!_0x214c6e)return;if(!_0x7b1f92){window[_0x1b1f1d(0x310)]?.(assetManagerText(_0x1b1f1d(0x37b)),_0x1b1f1d(0x215));return;}const _0x48ca3d=(this['assets']||[])[_0x1b1f1d(0x246)](_0x433456=>String(_0x433456?.['id']||'')===_0x214c6e);if(!_0x48ca3d)return;const _0x49ee62=String(_0x48ca3d?.['name']||''),_0x36fd81=_0x48ca3d?.[_0x1b1f1d(0x2f8)];if(_0x49ee62===_0x7b1f92){this['_renamingAssetId']='',this[_0x1b1f1d(0x36c)]();return;}_0x48ca3d[_0x1b1f1d(0x33c)]=_0x7b1f92,_0x48ca3d[_0x1b1f1d(0x2f8)]=Date[_0x1b1f1d(0x1eb)]();try{await saveAssetToServer(_0x48ca3d),this[_0x1b1f1d(0x219)](_0x48ca3d),window[_0x1b1f1d(0x310)]?.(assetManagerText(_0x1b1f1d(0x3ca)),_0x1b1f1d(0x35f));}catch(_0x5a62c9){_0x48ca3d['name']=_0x49ee62,_0x48ca3d['updatedAt']=_0x36fd81,window[_0x1b1f1d(0x310)]?.(assetManagerText('errors.renameFailed'),_0x1b1f1d(0x215));}finally{this[_0x1b1f1d(0x2fb)]='',this['renderSidebarContent']();}}async[a459_0x12ef8c(0x294)](){const _0x189bea=a459_0x12ef8c;let _0x4503f0=0x2;for(const _0x3edacb of this[_0x189bea(0x3a5)]||[]){if(_0x4503f0<=0x0)break;const _0x48722b=String(_0x3edacb?.['id']||'')[_0x189bea(0x1d6)]();if(!_0x48722b)continue;const _0x1fd73b=Array[_0x189bea(0x338)](_0x3edacb?.[_0x189bea(0x2df)])?_0x3edacb['items']:[];for(let _0x566220=0x0;_0x566220<_0x1fd73b[_0x189bea(0x32f)];_0x566220++){if(_0x4503f0<=0x0)break;const _0x3fcaec=_0x1fd73b[_0x566220],_0x4d4ba7=_normalizeAssetType(_0x3fcaec?.['type']);if(_0x4d4ba7!==_0x189bea(0x24f))continue;const _0xcb40b1=String(_0x3fcaec?.['thumbSrc']||'');if(_0xcb40b1&&!this[_0x189bea(0x380)](_0xcb40b1))continue;const _0x31190a=_0x48722b+':'+_0x566220;if(this[_0x189bea(0x28e)][_0x189bea(0x1fd)](_0x31190a))continue;this['_videoThumbInFlight'][_0x189bea(0x326)](_0x31190a),_0x4503f0-=0x1;const _0x1c0487=_0xcb40b1||_resolveNodeStableThumbSrc(_0x3fcaec?.[_0x189bea(0x344)]);this[_0x189bea(0x293)](_0x1c0487)[_0x189bea(0x28c)](async _0x4ef4ad=>{const _0x424cb6=_0x189bea;if(!String(_0x4ef4ad||'')['startsWith'](_0x424cb6(0x3cf)))return;const _0x3b941e=await saveAssetThumbToServer({'assetId':_0x48722b,'key':String(_0x566220),'dataUrl':_0x4ef4ad}),_0x68fb8b=String(_0x3b941e?.[_0x424cb6(0x28b)]||'');if(!_0x68fb8b)return;_0x3fcaec[_0x424cb6(0x21f)]=_0x68fb8b;if(!_0x3edacb[_0x424cb6(0x254)]&&_0x566220===0x0)_0x3edacb['coverUrl']=_0x68fb8b;await saveAssetToServer(_0x3edacb),upsertAssetMentionAsset(_0x3edacb),this[_0x424cb6(0x385)]?.[_0x424cb6(0x2c3)][_0x424cb6(0x321)](_0x424cb6(0x35d))&&this[_0x424cb6(0x264)]();})[_0x189bea(0x2ed)](()=>{})[_0x189bea(0x383)](()=>{const _0x2820f0=_0x189bea;this['_videoThumbInFlight'][_0x2820f0(0x3ba)](_0x31190a);});}}}async[a459_0x12ef8c(0x2f7)](){const _0x4c4917=a459_0x12ef8c;try{const _0x464b70=await fetchAssetsFromServer();this['assets']=_sortAssetsByUpdatedTime((Array[_0x4c4917(0x338)](_0x464b70)?_0x464b70:[])[_0x4c4917(0x26e)](_0x26d5c2=>this[_0x4c4917(0x2a0)](_0x26d5c2))['filter'](Boolean)),this[_0x4c4917(0x389)](),this[_0x4c4917(0x2a4)](),this[_0x4c4917(0x3a5)][_0x4c4917(0x253)](_0x45a1b8=>{const _0x5149f9=_0x4c4917;!_0x45a1b8[_0x5149f9(0x254)]&&_0x45a1b8['nodes']&&_0x45a1b8['nodes'][0x0]&&(_0x45a1b8[_0x5149f9(0x254)]=_resolveNodeStableThumbSrc(_0x45a1b8[_0x5149f9(0x2e5)][0x0]));if(Array[_0x5149f9(0x338)](_0x45a1b8[_0x5149f9(0x2df)]))_0x45a1b8[_0x5149f9(0x2df)][_0x5149f9(0x253)](_0x5408e3=>{const _0x4058d0=_0x5149f9;!_0x5408e3[_0x4058d0(0x21f)]&&_0x5408e3[_0x4058d0(0x344)]&&(_0x5408e3[_0x4058d0(0x21f)]=_resolveNodeStableThumbSrc(_0x5408e3[_0x4058d0(0x344)]));});else Array[_0x5149f9(0x338)](_0x45a1b8[_0x5149f9(0x2e5)])&&(_0x45a1b8['items']=_0x45a1b8[_0x5149f9(0x2e5)][_0x5149f9(0x26e)](_0x3c6ddd=>_buildAssetItem(_0x3c6ddd)));}),setAssetMentionAssets(this[_0x4c4917(0x371)]());let _0x49140b=0x0;for(const _0x111f53 of this['assets']){if(_0x49140b>=0x20)break;_0x111f53?.[_0x4c4917(0x254)]&&(this[_0x4c4917(0x33f)](_0x111f53['coverUrl']),_0x49140b+=0x1);const _0x32d106=Array[_0x4c4917(0x338)](_0x111f53?.[_0x4c4917(0x2df)])?_0x111f53[_0x4c4917(0x2df)]:[];for(const _0x266b58 of _0x32d106){if(_0x49140b>=0x20)break;_0x266b58?.[_0x4c4917(0x21f)]&&(this[_0x4c4917(0x33f)](_0x266b58[_0x4c4917(0x21f)]),_0x49140b+=0x1);}}this['_scheduleVideoThumbJobs'](),this[_0x4c4917(0x385)]&&this[_0x4c4917(0x385)]['classList'][_0x4c4917(0x321)](_0x4c4917(0x35d))&&this[_0x4c4917(0x36c)]();}catch(_0x35d395){console[_0x4c4917(0x215)](_0x4c4917(0x27a),_0x35d395);}}async[a459_0x12ef8c(0x2bb)](_0x342ca2,_0x1ae58f,_0x1235c2={}){const _0x43ade2=a459_0x12ef8c;if(!_0x342ca2||_0x342ca2[_0x43ade2(0x32f)]===0x0)return;void _0x1ae58f,void _0x1235c2,this[_0x43ade2(0x23e)]();const _0x126549=document[_0x43ade2(0x20d)](_0x43ade2(0x3c3));_0x126549[_0x43ade2(0x328)]=_0x43ade2(0x297);const _0x378271=document['createElement']('div');_0x378271[_0x43ade2(0x328)]=_0x43ade2(0x3b6),_0x378271[_0x43ade2(0x2ab)](_0x43ade2(0x35c),_0x43ade2(0x3c8)),_0x378271['setAttribute'](_0x43ade2(0x22b),_0x43ade2(0x203)),_0x378271['setAttribute'](_0x43ade2(0x209),assetManagerText('title'));const _0x1e32e4=a459_0x26716c[_0x43ade2(0x3cb)](),_0x29f5bc=_0x1e32e4[_0x43ade2(0x2e5)][_0x342ca2[0x0]];_0x126549[_0x43ade2(0x2ae)](_0x378271),document['body'][_0x43ade2(0x2ae)](_0x126549),this[_0x43ade2(0x356)]=_0x126549,this[_0x43ade2(0x25d)]=_0x378271;const _0x20a37f=await this[_0x43ade2(0x2af)](_0x29f5bc);if(!this[_0x43ade2(0x25d)]||this['createPanel']!==_0x378271){String(this['_createPanelCoverObjectUrl']||'')[_0x43ade2(0x1cb)](_0x43ade2(0x2c1))&&URL[_0x43ade2(0x335)](this['_createPanelCoverObjectUrl']);this[_0x43ade2(0x3b4)]='';return;}this[_0x43ade2(0x252)]=this[_0x43ade2(0x2f1)](_0x342ca2,_0x20a37f),this[_0x43ade2(0x23d)](),_0x126549[_0x43ade2(0x313)](_0x43ade2(0x2f6),_0x1818b6=>{const _0x27cf95=_0x43ade2;if(_0x1818b6[_0x27cf95(0x1df)]===_0x126549)this['closeCreatePanel']();}),this[_0x43ade2(0x20f)]=_0x5e3a36=>{const _0x237c24=_0x43ade2;if(_0x5e3a36[_0x237c24(0x35a)]!==_0x237c24(0x27b))return;if(this[_0x237c24(0x292)]?.[_0x237c24(0x321)](_0x5e3a36[_0x237c24(0x1df)]))return;this['closeCreatePanel']();},document['addEventListener'](_0x43ade2(0x27c),this[_0x43ade2(0x20f)]);}[a459_0x12ef8c(0x26c)](_0x146c8b){const _0x492d61=a459_0x12ef8c,_0x33f3d4=window[_0x492d61(0x1c0)]?.(_0x492d61(0x39b))?.['matches'];if(_0x33f3d4)return;const _0x8fd558=_0x146c8b&&_0x146c8b[_0x492d61(0x1e6)]?_0x146c8b:this[_0x492d61(0x25d)];if(!_0x8fd558?.[_0x492d61(0x1e6)])return;const _0x4c60c6=_0x8fd558[_0x492d61(0x36d)](_0x492d61(0x255)),_0x3602b6=_0x4c60c6?.[_0x492d61(0x2e0)];if(!_0x3602b6)return;const _0x24247e=_0x3602b6['getBoundingClientRect']();if(!_0x24247e[_0x492d61(0x22e)]||!_0x24247e[_0x492d61(0x30d)])return;const _0x7d6506=document['getElementById'](_0x492d61(0x345)),_0x215bc0=_0x7d6506?.[_0x492d61(0x1d0)]?.();if(!_0x215bc0)return;const _0x2c7f6f=document[_0x492d61(0x20d)](_0x492d61(0x3c3));_0x2c7f6f[_0x492d61(0x328)]=_0x492d61(0x1d5),_0x2c7f6f[_0x492d61(0x244)][_0x492d61(0x2c2)]=_0x24247e[_0x492d61(0x2c2)]+'px',_0x2c7f6f['style'][_0x492d61(0x3bd)]=_0x24247e[_0x492d61(0x3bd)]+'px',_0x2c7f6f[_0x492d61(0x244)][_0x492d61(0x22e)]=_0x24247e['width']+'px',_0x2c7f6f[_0x492d61(0x244)][_0x492d61(0x30d)]=_0x24247e[_0x492d61(0x30d)]+'px';const _0x40d5d0=_0x3602b6[_0x492d61(0x2d5)](!![]);if(_0x40d5d0?.['id'])_0x40d5d0[_0x492d61(0x286)]('id');_0x2c7f6f[_0x492d61(0x2ae)](_0x40d5d0),document[_0x492d61(0x1f6)][_0x492d61(0x2ae)](_0x2c7f6f);const _0x3e1a40=_0x24247e[_0x492d61(0x2c2)]+_0x24247e['width']/0x2,_0x41e94f=_0x24247e[_0x492d61(0x3bd)]+_0x24247e['height']/0x2,_0xccf294=_0x215bc0[_0x492d61(0x2c2)]+_0x215bc0[_0x492d61(0x22e)]/0x2,_0x19d253=_0x215bc0[_0x492d61(0x3bd)]+_0x215bc0['height']/0x2,_0x21b414=_0xccf294-_0x3e1a40,_0x32e45e=_0x19d253-_0x41e94f,_0x179875=0.12,_0x599e86=_0x2c7f6f['animate']([{'transform':_0x492d61(0x39c),'opacity':0x1},{'transform':_0x492d61(0x28d)+_0x21b414+_0x492d61(0x381)+_0x32e45e+_0x492d61(0x3c5)+_0x179875+')','opacity':0.2}],{'duration':0x208,'easing':'cubic-bezier(0.2,\x200,\x200,\x201)'});_0x599e86[_0x492d61(0x3a0)]=()=>{const _0x55b57b=_0x492d61;_0x2c7f6f[_0x55b57b(0x1ec)](),_0x7d6506?.[_0x55b57b(0x275)]&&_0x7d6506[_0x55b57b(0x275)]([{'transform':_0x55b57b(0x396),'filter':_0x55b57b(0x339)},{'transform':'scale(1.08)','filter':_0x55b57b(0x376)},{'transform':'scale(1)','filter':_0x55b57b(0x339)}],{'duration':0x104,'easing':_0x55b57b(0x2d9)});};}[a459_0x12ef8c(0x23e)](){const _0x4d5d37=a459_0x12ef8c;this[_0x4d5d37(0x366)]&&(document[_0x4d5d37(0x24e)](_0x4d5d37(0x2f6),this[_0x4d5d37(0x366)]),this[_0x4d5d37(0x366)]=null),this[_0x4d5d37(0x292)]&&(this[_0x4d5d37(0x292)]['remove'](),this[_0x4d5d37(0x292)]=null),this[_0x4d5d37(0x20f)]&&(document[_0x4d5d37(0x24e)](_0x4d5d37(0x27c),this[_0x4d5d37(0x20f)]),this[_0x4d5d37(0x20f)]=null),this['_createPanelCoverObjectUrl']&&(String(this[_0x4d5d37(0x3b4)])[_0x4d5d37(0x1cb)]('blob:')&&URL[_0x4d5d37(0x335)](this[_0x4d5d37(0x3b4)]),this['_createPanelCoverObjectUrl']=''),this[_0x4d5d37(0x25d)]&&(this[_0x4d5d37(0x25d)][_0x4d5d37(0x1ec)](),this[_0x4d5d37(0x25d)]=null),this[_0x4d5d37(0x356)]&&(this['createPanelBackdrop']['remove'](),this['createPanelBackdrop']=null),this[_0x4d5d37(0x252)]=null;}['initSidebarPanel'](){const _0x4bbaf9=a459_0x12ef8c;this['sidebarPanel']=document[_0x4bbaf9(0x20d)](_0x4bbaf9(0x3c3)),this['sidebarPanel'][_0x4bbaf9(0x328)]=_0x4bbaf9(0x1f2),this[_0x4bbaf9(0x385)][_0x4bbaf9(0x279)]=_0x4bbaf9(0x365)+_escapeHtml(assetManagerText(_0x4bbaf9(0x29d)))+'\x22>‹</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-sidebar-title\x22\x20id=\x22asset-sidebar-title\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-asset-sidebar-title-text\x22\x20id=\x22asset-sidebar-title-text\x22>'+assetManagerText('title')+_0x4bbaf9(0x398)+_escapeHtml(assetManagerText('tabsPrevAria'))+_0x4bbaf9(0x272)+this['_renderSidebarTabsHtml']()+_0x4bbaf9(0x30b)+_escapeHtml(assetManagerText(_0x4bbaf9(0x3ac)))+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20hidden\x0a\x20\x20\x20\x20\x20\x20\x20\x20>›</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-sidebar-content\x22\x20id=\x22asset-sidebar-content\x22></div>\x0a\x20\x20\x20\x20';const _0x1acabe=document['querySelector']('.sidebar-floating');_0x1acabe?_0x1acabe[_0x4bbaf9(0x2ae)](this['sidebarPanel']):document[_0x4bbaf9(0x1f6)][_0x4bbaf9(0x2ae)](this[_0x4bbaf9(0x385)]);const _0x183fc2=this[_0x4bbaf9(0x385)]['querySelector'](_0x4bbaf9(0x299));_0x183fc2['addEventListener'](_0x4bbaf9(0x26d),_0x3f3d3a=>{const _0x2bba0d=_0x4bbaf9;if(_0x3f3d3a['target']['closest'](_0x2bba0d(0x1f9)))return;const _0x3e278c=_0x3f3d3a[_0x2bba0d(0x1df)][_0x2bba0d(0x240)]('.v2-asset-sidebar-tab');_0x3e278c&&(this[_0x2bba0d(0x2fb)]='',this[_0x2bba0d(0x207)]='',this[_0x2bba0d(0x2db)]=_0x3e278c[_0x2bba0d(0x3b2)][_0x2bba0d(0x29b)],this[_0x2bba0d(0x29e)]=null,_0x183fc2['querySelectorAll'](_0x2bba0d(0x2cc))[_0x2bba0d(0x253)](_0x26bcb3=>_0x26bcb3[_0x2bba0d(0x2c3)][_0x2bba0d(0x1ec)](_0x2bba0d(0x223))),_0x3e278c[_0x2bba0d(0x2c3)][_0x2bba0d(0x326)](_0x2bba0d(0x223)),this['renderSidebarContent']());}),_0x183fc2[_0x4bbaf9(0x313)](_0x4bbaf9(0x27f),()=>this[_0x4bbaf9(0x2ad)](),{'passive':!![]}),this[_0x4bbaf9(0x385)]['addEventListener'](_0x4bbaf9(0x26d),_0x2919a5=>{const _0x5af5d0=_0x4bbaf9,_0x837586=_0x2919a5[_0x5af5d0(0x1df)][_0x5af5d0(0x240)](_0x5af5d0(0x2c0)),_0x5b6083=_0x837586?.[_0x5af5d0(0x3b2)]?.[_0x5af5d0(0x2d0)]||'';if(_0x5b6083===_0x5af5d0(0x2e2)){_0x2919a5[_0x5af5d0(0x21e)](),_0x2919a5[_0x5af5d0(0x2b7)](),this[_0x5af5d0(0x364)](-0x1);return;}if(_0x5b6083===_0x5af5d0(0x3b0)){_0x2919a5['preventDefault'](),_0x2919a5[_0x5af5d0(0x2b7)](),this['_scrollSidebarTabs'](0x1);return;}if(_0x5b6083===_0x5af5d0(0x230)){_0x2919a5['preventDefault'](),_0x2919a5['stopPropagation']();const _0x52d561=_0x837586?.[_0x5af5d0(0x3b2)]?.[_0x5af5d0(0x29b)];if(_0x52d561)void this[_0x5af5d0(0x2a6)](_0x52d561);return;}if(_0x5b6083===_0x5af5d0(0x1ce)){this[_0x5af5d0(0x2fb)]='',this[_0x5af5d0(0x207)]='',this[_0x5af5d0(0x29e)]=null,this[_0x5af5d0(0x36c)]();return;}if(_0x5b6083===_0x5af5d0(0x1cd)){_0x2919a5[_0x5af5d0(0x21e)](),_0x2919a5[_0x5af5d0(0x2b7)](),this[_0x5af5d0(0x2fb)]='';const _0x50b551=_0x837586?.[_0x5af5d0(0x3b2)]?.[_0x5af5d0(0x30e)];if(!_0x50b551)return;this[_0x5af5d0(0x207)]=_0x50b551,this[_0x5af5d0(0x36c)]();return;}if(_0x5b6083===_0x5af5d0(0x23f)){_0x2919a5[_0x5af5d0(0x21e)](),_0x2919a5[_0x5af5d0(0x2b7)](),this['_pendingDeleteAssetId']='',this[_0x5af5d0(0x36c)]();return;}if(_0x5b6083==='asset-delete-confirm'){_0x2919a5['preventDefault'](),_0x2919a5[_0x5af5d0(0x2b7)]();const _0x26834b=_0x837586?.[_0x5af5d0(0x3b2)]?.[_0x5af5d0(0x30e)];if(!_0x26834b)return;this['_pendingDeleteAssetId']='',this['_deleteAsset'](_0x26834b);return;}if(_0x5b6083===_0x5af5d0(0x251)){_0x2919a5[_0x5af5d0(0x21e)](),_0x2919a5[_0x5af5d0(0x2b7)](),this[_0x5af5d0(0x2fb)]='',this[_0x5af5d0(0x207)]='';const _0x4a105b=_0x837586?.['dataset']?.['assetId'];if(_0x4a105b)this['restoreAssetToCanvas'](_0x4a105b);return;}const _0x46c996=_0x2919a5[_0x5af5d0(0x1df)][_0x5af5d0(0x240)](_0x5af5d0(0x234));if(_0x46c996){const _0x55d74d=_0x46c996[_0x5af5d0(0x3b2)][_0x5af5d0(0x30e)],_0x812042=Number(_0x46c996[_0x5af5d0(0x3b2)][_0x5af5d0(0x266)]);if(_0x55d74d&&Number[_0x5af5d0(0x3d8)](_0x812042))this['_restoreAssetSubItem'](_0x55d74d,_0x812042);return;}const _0x273d5a=_0x2919a5[_0x5af5d0(0x1df)][_0x5af5d0(0x240)](_0x5af5d0(0x2f9));_0x273d5a&&_0x273d5a[_0x5af5d0(0x3b2)]?.['id']&&(this['_renamingAssetId']='',this[_0x5af5d0(0x207)]='',this['_openAssetId']=_0x273d5a[_0x5af5d0(0x3b2)]['id'],this['renderSidebarContent']());});const _0x1cd4b8=document[_0x4bbaf9(0x35b)](_0x4bbaf9(0x345));if(_0x1cd4b8){let _0x3cb123=![];const _0x2b9ddb=()=>{const _0x1c3ad5=_0x4bbaf9;!this[_0x1c3ad5(0x385)][_0x1c3ad5(0x2c3)]['contains'](_0x1c3ad5(0x35d))&&this[_0x1c3ad5(0x31f)](),!_0x3cb123&&(_0x3cb123=!![],this[_0x1c3ad5(0x2f7)]()[_0x1c3ad5(0x383)](()=>{_0x3cb123=![];}));};registerSidebarSubmenu({'key':_0x4bbaf9(0x3a5),'button':_0x1cd4b8,'panel':this[_0x4bbaf9(0x385)],'open':_0x2b9ddb,'close':()=>this[_0x4bbaf9(0x30a)](),'isOpen':()=>this[_0x4bbaf9(0x385)]['classList'][_0x4bbaf9(0x321)](_0x4bbaf9(0x35d))});}}['showSidebarPanel'](){const _0x24b1d3=a459_0x12ef8c;this[_0x24b1d3(0x36c)](),this[_0x24b1d3(0x385)][_0x24b1d3(0x2c3)][_0x24b1d3(0x326)]('show');}[a459_0x12ef8c(0x30a)](){const _0x3807f4=a459_0x12ef8c;this[_0x3807f4(0x385)][_0x3807f4(0x2c3)][_0x3807f4(0x1ec)](_0x3807f4(0x35d)),document[_0x3807f4(0x35b)]('btnAssets')?.[_0x3807f4(0x2c3)][_0x3807f4(0x1ec)]('active');}['_getVisibleAssetCardsInList'](){const _0x11d5d6=a459_0x12ef8c,_0x312254=this[_0x11d5d6(0x385)]?.[_0x11d5d6(0x36d)](_0x11d5d6(0x3a8));if(!_0x312254)return{'listView':null,'cards':[]};const _0x8eff01=Array[_0x11d5d6(0x3c6)](_0x312254[_0x11d5d6(0x229)](_0x11d5d6(0x3ae)))[_0x11d5d6(0x1d2)](_0x18a75c=>_0x18a75c['style']['display']!==_0x11d5d6(0x280));return{'listView':_0x312254,'cards':_0x8eff01};}['_captureRectsById'](_0x38a036){const _0x42ec7d=a459_0x12ef8c,_0x52b523=new Map();for(const _0x411d63 of _0x38a036){const _0x21c490=String(_0x411d63[_0x42ec7d(0x3b2)]?.['id']||'');if(!_0x21c490)continue;_0x52b523['set'](_0x21c490,_0x411d63['getBoundingClientRect']());}return _0x52b523;}[a459_0x12ef8c(0x378)](_0x498563,_0x2d524d){const _0x1ec2ba=a459_0x12ef8c;if(!_0x498563||!_0x2d524d?.[_0x1ec2ba(0x369)])return;const _0x26e1da=Array['from'](_0x498563['querySelectorAll'](_0x1ec2ba(0x3ae)))[_0x1ec2ba(0x1d2)](_0x2b1a95=>_0x2b1a95[_0x1ec2ba(0x244)][_0x1ec2ba(0x2a7)]!==_0x1ec2ba(0x280)),_0x5b0c96=new Map();for(const _0x12a82f of _0x26e1da){const _0x1c8809=String(_0x12a82f[_0x1ec2ba(0x3b2)]?.['id']||'');if(!_0x1c8809)continue;_0x5b0c96[_0x1ec2ba(0x20c)](_0x1c8809,_0x12a82f[_0x1ec2ba(0x1d0)]());}for(const _0x1f0547 of _0x26e1da){const _0x5d6803=String(_0x1f0547[_0x1ec2ba(0x3b2)]?.['id']||'');if(!_0x5d6803)continue;const _0x1dd597=_0x2d524d[_0x1ec2ba(0x357)](_0x5d6803),_0x29ae7d=_0x5b0c96[_0x1ec2ba(0x357)](_0x5d6803);if(!_0x1dd597||!_0x29ae7d)continue;const _0x2221f9=_0x1dd597[_0x1ec2ba(0x2c2)]-_0x29ae7d['left'],_0x4d15c5=_0x1dd597[_0x1ec2ba(0x3bd)]-_0x29ae7d['top'];if(!_0x2221f9&&!_0x4d15c5)continue;_0x1f0547['animate']([{'transform':'translate('+_0x2221f9+_0x1ec2ba(0x224)+_0x4d15c5+'px)'},{'transform':'translate(0,\x200)'}],{'duration':0xdc,'easing':_0x1ec2ba(0x2d9)});}}[a459_0x12ef8c(0x388)](_0x4b5e94){const _0x3a8d68=a459_0x12ef8c;if(!_0x4b5e94)return;_0x4b5e94[_0x3a8d68(0x2c3)]['remove'](_0x3a8d68(0x265)),void _0x4b5e94['offsetWidth'],_0x4b5e94[_0x3a8d68(0x2c3)][_0x3a8d68(0x326)](_0x3a8d68(0x265)),window['setTimeout'](()=>{const _0x1e276b=_0x3a8d68;if(_0x4b5e94[_0x1e276b(0x1e6)])_0x4b5e94[_0x1e276b(0x2c3)][_0x1e276b(0x1ec)](_0x1e276b(0x265));},0xf0);}async[a459_0x12ef8c(0x1e4)](_0x1d8d6e){const _0x1db5cb=a459_0x12ef8c,_0xba435d=String(_0x1d8d6e||'');if(!_0xba435d)return;const {listView:_0x58e672,cards:_0x42f908}=this[_0x1db5cb(0x2ff)](),_0x2806c1=this[_0x1db5cb(0x315)](_0x42f908);try{await deleteAssetFromServer(_0xba435d);}catch(_0x126e76){window['showToast']?.(assetManagerText(_0x1db5cb(0x1d3)),_0x1db5cb(0x215));return;}this['assets']=(this[_0x1db5cb(0x3a5)]||[])[_0x1db5cb(0x1d2)](_0x4a86be=>String(_0x4a86be?.['id']||'')!==_0xba435d),this[_0x1db5cb(0x389)](),this['_renderSidebarTabs'](),removeAssetMentionAsset(_0xba435d);if(this[_0x1db5cb(0x29e)]===_0xba435d)this['_openAssetId']=null;const _0x1320bf=this[_0x1db5cb(0x397)]?.[_0x1db5cb(0x357)]?.(_0xba435d);if(_0x1320bf?.['isConnected'])_0x1320bf[_0x1db5cb(0x1ec)]();this[_0x1db5cb(0x397)]?.['delete']?.(_0xba435d),this['renderSidebarContent'](),window[_0x1db5cb(0x1e7)](()=>{const _0x2ea96d=_0x1db5cb;window[_0x2ea96d(0x1e7)](()=>{const _0x42d8e0=_0x2ea96d,{listView:_0x3c0177}=this['_getVisibleAssetCardsInList']();this[_0x42d8e0(0x378)](_0x3c0177,_0x2806c1);});});}async[a459_0x12ef8c(0x2a6)](_0x3339ae){const _0x410da4=a459_0x12ef8c,_0x2bed5d=this[_0x410da4(0x2a8)](_0x3339ae);if(!_0x2bed5d||!this[_0x410da4(0x1de)](_0x2bed5d))return;const _0x2aeaca=this[_0x410da4(0x22c)]()[_0x410da4(0x2ca)](_0xd1d955=>this[_0x410da4(0x394)](_0xd1d955?.[_0x410da4(0x1c6)])===this[_0x410da4(0x394)](_0x2bed5d));if(_0x2aeaca){window[_0x410da4(0x310)]?.(assetManagerText(_0x410da4(0x340)),_0x410da4(0x2f4));return;}const _0x214ec4=[...this['userCategories']];this[_0x410da4(0x213)]=_0x214ec4[_0x410da4(0x1d2)](_0x2aa5c2=>this[_0x410da4(0x394)](_0x2aa5c2)!==this[_0x410da4(0x394)](_0x2bed5d));this['_categoryKey'](this[_0x410da4(0x2db)])===this[_0x410da4(0x394)](_0x2bed5d)&&(this[_0x410da4(0x2db)]=DEFAULT_ASSET_CATEGORIES[0x0],this['_openAssetId']=null);this[_0x410da4(0x389)](),this[_0x410da4(0x2a4)](),this[_0x410da4(0x36c)]();try{await this[_0x410da4(0x225)](),window['showToast']?.(assetManagerText('categoryDeleted'),_0x410da4(0x35f));}catch(_0x3a1d37){this[_0x410da4(0x213)]=_0x214ec4,this[_0x410da4(0x389)](),this[_0x410da4(0x2a4)](),this[_0x410da4(0x36c)](),console[_0x410da4(0x215)](_0x3a1d37),window[_0x410da4(0x310)]?.(assetManagerText(_0x410da4(0x391)),_0x410da4(0x215));}}[a459_0x12ef8c(0x204)](_0x797c42,_0x862772,_0x78f2c){const _0x47e4cb=a459_0x12ef8c;if(!_0x797c42)return;const _0x4a83f3=String(_0x862772||''),_0x4ba1d3=_normalizeAssetType(_0x78f2c);if(_0x4a83f3&&!(_0x4ba1d3===_0x47e4cb(0x24f)&&this[_0x47e4cb(0x380)](_0x4a83f3))){const _0x4c1b8d=_0x797c42[_0x47e4cb(0x3b2)][_0x47e4cb(0x21f)]||'';if(_0x797c42['dataset']['thumbKind']===_0x47e4cb(0x1f5)&&_0x4c1b8d===_0x4a83f3)return;if(_0x797c42[_0x47e4cb(0x3b2)]['pendingSrc']===_0x4a83f3)return;_0x797c42['childElementCount']===0x0&&_0x797c42['dataset'][_0x47e4cb(0x2c8)]!=='img'&&(_0x797c42[_0x47e4cb(0x3b2)][_0x47e4cb(0x2c8)]=_0x47e4cb(0x39a),_0x797c42[_0x47e4cb(0x3b2)][_0x47e4cb(0x267)]=String(_0x78f2c||_0x47e4cb(0x2e9)),_0x797c42[_0x47e4cb(0x3b2)][_0x47e4cb(0x21f)]='',_0x797c42[_0x47e4cb(0x279)]=_renderAssetIcon(_0x78f2c));_0x797c42[_0x47e4cb(0x3b2)][_0x47e4cb(0x2f0)]=_0x4a83f3,this['_ensureThumbDecoded'](_0x4a83f3)[_0x47e4cb(0x28c)](_0x31748c=>{const _0x117f2c=_0x47e4cb;if(!_0x31748c){if(_0x797c42[_0x117f2c(0x3b2)][_0x117f2c(0x2f0)]===_0x4a83f3)_0x797c42[_0x117f2c(0x3b2)]['pendingSrc']='';return;}if(!_0x797c42[_0x117f2c(0x1e6)])return;if(_0x797c42[_0x117f2c(0x3b2)][_0x117f2c(0x2f0)]!==_0x4a83f3)return;_0x797c42['dataset'][_0x117f2c(0x2f0)]='';let _0x47e7e8=_0x797c42[_0x117f2c(0x36d)](_0x117f2c(0x2c6));!_0x47e7e8?(_0x47e7e8=document[_0x117f2c(0x20d)](_0x117f2c(0x1f5)),_0x47e7e8[_0x117f2c(0x33a)]=assetManagerText(_0x117f2c(0x393)),_0x47e7e8[_0x117f2c(0x1db)]=![],_0x47e7e8['decoding']=_0x117f2c(0x226),_0x47e7e8[_0x117f2c(0x341)]=_0x117f2c(0x2da),_0x47e7e8[_0x117f2c(0x328)]=_0x117f2c(0x2e4)):_0x47e7e8[_0x117f2c(0x2c3)][_0x117f2c(0x326)](_0x117f2c(0x2e4));if(_0x47e7e8[_0x117f2c(0x277)](_0x117f2c(0x233))!==_0x4a83f3)_0x47e7e8[_0x117f2c(0x2ab)]('src',_0x4a83f3);_0x797c42['dataset'][_0x117f2c(0x2c8)]='img',_0x797c42[_0x117f2c(0x3b2)][_0x117f2c(0x21f)]=_0x4a83f3,(_0x797c42[_0x117f2c(0x2e0)]!==_0x47e7e8||_0x797c42[_0x117f2c(0x22d)]!==0x1)&&_0x797c42['replaceChildren'](_0x47e7e8);});return;}const _0x34c42a=String(_0x78f2c||_0x47e4cb(0x2e9));if(_0x797c42[_0x47e4cb(0x3b2)][_0x47e4cb(0x2c8)]===_0x47e4cb(0x39a)&&_0x797c42[_0x47e4cb(0x3b2)]['thumbType']===_0x34c42a)return;_0x797c42['dataset'][_0x47e4cb(0x2c8)]=_0x47e4cb(0x39a),_0x797c42[_0x47e4cb(0x3b2)]['thumbType']=_0x34c42a,_0x797c42[_0x47e4cb(0x3b2)][_0x47e4cb(0x21f)]='',_0x797c42[_0x47e4cb(0x3b2)]['pendingSrc']='',_0x797c42['innerHTML']=_renderAssetIcon(_0x34c42a);}['renderSidebarContent'](){const _0x3720b2=a459_0x12ef8c,_0x31ce06=this[_0x3720b2(0x385)]?.[_0x3720b2(0x36d)](_0x3720b2(0x2ee));if(!_0x31ce06)return;const _0x44e62c=this['sidebarPanel'][_0x3720b2(0x36d)](_0x3720b2(0x3d0)),_0x26d245=this[_0x3720b2(0x385)]['querySelector'](_0x3720b2(0x31b));this['_renderSidebarTabs']();const _0x520aa9=()=>{const _0x3156f9=_0x3720b2;let _0x5448d6=_0x31ce06[_0x3156f9(0x36d)](_0x3156f9(0x349));!_0x5448d6&&(_0x5448d6=document[_0x3156f9(0x20d)](_0x3156f9(0x3c3)),_0x5448d6[_0x3156f9(0x328)]=_0x3156f9(0x337),_0x31ce06[_0x3156f9(0x2ae)](_0x5448d6));let _0x37d17e=_0x31ce06[_0x3156f9(0x36d)](_0x3156f9(0x309));return!_0x37d17e&&(_0x37d17e=document[_0x3156f9(0x20d)](_0x3156f9(0x3c3)),_0x37d17e[_0x3156f9(0x328)]='v2-asset-view-detail',_0x31ce06['appendChild'](_0x37d17e)),_0x31ce06[_0x3156f9(0x229)](_0x3156f9(0x205))[_0x3156f9(0x253)](_0x812138=>_0x5448d6['appendChild'](_0x812138)),_0x31ce06[_0x3156f9(0x229)](_0x3156f9(0x23a))['forEach'](_0x4b967d=>_0x37d17e[_0x3156f9(0x2ae)](_0x4b967d)),{'listView':_0x5448d6,'detailView':_0x37d17e};},{listView:_0x58c425,detailView:_0x5a5ec9}=_0x520aa9(),_0x438d98=(_0x2efd17,_0x270fc3,_0x5e55f4)=>this['_setThumbContent'](_0x2efd17,_0x270fc3,_0x5e55f4),_0x53b169=_0x3b192e=>{const _0x3b7224=_0x3720b2;let _0x94ea55=_0x3b192e[_0x3b7224(0x36d)](':scope\x20>\x20.v2-asset-cover-grid');if(!_0x94ea55){_0x94ea55=document[_0x3b7224(0x20d)](_0x3b7224(0x3c3)),_0x94ea55[_0x3b7224(0x328)]=_0x3b7224(0x33e);for(let _0x3a3b27=0x0;_0x3a3b27<0x4;_0x3a3b27++){const _0x9883c0=document[_0x3b7224(0x20d)](_0x3b7224(0x3c3));_0x9883c0[_0x3b7224(0x328)]='v2-asset-cover-cell',_0x94ea55[_0x3b7224(0x2ae)](_0x9883c0);}_0x3b192e[_0x3b7224(0x257)](_0x94ea55);}else{const _0x2c30cf=_0x94ea55[_0x3b7224(0x229)](_0x3b7224(0x34b));for(let _0x5a7ca5=_0x2c30cf[_0x3b7224(0x32f)];_0x5a7ca5<0x4;_0x5a7ca5++){const _0x14f48b=document['createElement'](_0x3b7224(0x3c3));_0x14f48b[_0x3b7224(0x328)]=_0x3b7224(0x2aa),_0x94ea55['appendChild'](_0x14f48b);}}return _0x94ea55;},_0x117776=(_0x238478,_0x2ce531)=>{const _0x17f804=_0x3720b2;let _0x155cb7=_0x238478[_0x17f804(0x36d)](_0x17f804(0x2d1)),_0x4fc64d=_0x238478[_0x17f804(0x36d)](_0x17f804(0x220)),_0x28bde7=_0x238478['querySelector'](':scope\x20>\x20.v2-asset-item-delete-confirm'),_0x373710=_0x238478[_0x17f804(0x36d)](':scope\x20>\x20.v2-asset-item-cover'),_0x558e15=_0x238478['querySelector'](_0x17f804(0x27e));!_0x155cb7&&(_0x155cb7=document[_0x17f804(0x20d)]('button'),_0x155cb7[_0x17f804(0x24a)]='button',_0x155cb7[_0x17f804(0x328)]=_0x17f804(0x2ba),_0x155cb7['dataset'][_0x17f804(0x2d0)]=_0x17f804(0x251),_0x155cb7[_0x17f804(0x2ce)]=assetManagerText(_0x17f804(0x29f)),_0x155cb7[_0x17f804(0x2ab)](_0x17f804(0x209),assetManagerText(_0x17f804(0x29f))),_0x155cb7[_0x17f804(0x279)]=_0x17f804(0x377),_0x238478[_0x17f804(0x2ae)](_0x155cb7));!_0x4fc64d&&(_0x4fc64d=document[_0x17f804(0x20d)]('button'),_0x4fc64d['type']=_0x17f804(0x343),_0x4fc64d['className']=_0x17f804(0x214),_0x4fc64d[_0x17f804(0x3b2)]['uiAction']='asset-delete-open',_0x4fc64d[_0x17f804(0x2ab)](_0x17f804(0x209),assetManagerText('deleteAsset')),_0x4fc64d[_0x17f804(0x279)]='<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20aria-hidden=\x22true\x22><path\x20fill=\x22currentColor\x22\x20d=\x22M9\x203h6l1\x202h5v2H3V5h5l1-2zm1\x206h2v10h-2V9zm4\x200h2v10h-2V9zM7\x209h2v10H7V9z\x22/></svg>',_0x238478[_0x17f804(0x2ae)](_0x4fc64d));if(!_0x28bde7){_0x28bde7=document[_0x17f804(0x20d)](_0x17f804(0x3c3)),_0x28bde7[_0x17f804(0x328)]='v2-asset-item-delete-confirm',_0x28bde7[_0x17f804(0x354)]=!![],_0x28bde7[_0x17f804(0x313)](_0x17f804(0x26d),_0x41553b=>{const _0x2632a9=_0x17f804;if(_0x41553b[_0x2632a9(0x1df)]!==_0x28bde7)return;_0x41553b[_0x2632a9(0x2b7)](),this[_0x2632a9(0x207)]='',this[_0x2632a9(0x36c)]();});const _0xf072b7=document[_0x17f804(0x20d)](_0x17f804(0x343));_0xf072b7[_0x17f804(0x24a)]=_0x17f804(0x343),_0xf072b7['className']='v2-asset-item-delete-confirm-btn\x20v2-asset-item-delete-confirm-btn--danger',_0xf072b7['dataset'][_0x17f804(0x2d0)]=_0x17f804(0x336),_0xf072b7[_0x17f804(0x298)]='✔',_0xf072b7[_0x17f804(0x2ab)]('aria-label',assetManagerText(_0x17f804(0x327)));const _0x560fe6=document['createElement'](_0x17f804(0x343));_0x560fe6[_0x17f804(0x24a)]=_0x17f804(0x343),_0x560fe6[_0x17f804(0x328)]=_0x17f804(0x1cf),_0x560fe6['dataset']['uiAction']=_0x17f804(0x23f),_0x560fe6[_0x17f804(0x298)]='×',_0x560fe6['setAttribute'](_0x17f804(0x209),assetManagerText(_0x17f804(0x27d))),_0x28bde7[_0x17f804(0x2ae)](_0xf072b7),_0x28bde7[_0x17f804(0x2ae)](_0x560fe6),_0x238478['appendChild'](_0x28bde7);}const _0x31351f=String(_0x2ce531?.['id']||'');_0x155cb7[_0x17f804(0x3b2)][_0x17f804(0x30e)]=_0x31351f,_0x155cb7[_0x17f804(0x222)]=!Array[_0x17f804(0x338)](_0x2ce531?.[_0x17f804(0x2e5)])||_0x2ce531['nodes'][_0x17f804(0x32f)]===0x0,_0x4fc64d['dataset'][_0x17f804(0x30e)]=_0x31351f,_0x28bde7['querySelectorAll'](_0x17f804(0x1d7))[_0x17f804(0x253)](_0x374cf5=>{const _0x13b107=_0x17f804;_0x374cf5[_0x13b107(0x3b2)][_0x13b107(0x30e)]=_0x31351f;});const _0x3ac0d6=this['_pendingDeleteAssetId']===_0x31351f;_0x4fc64d['hidden']=_0x3ac0d6,_0x28bde7['hidden']=!_0x3ac0d6;!_0x373710&&(_0x373710=document['createElement'](_0x17f804(0x3c3)),_0x373710[_0x17f804(0x328)]='v2-asset-item-cover',_0x238478['appendChild'](_0x373710));!_0x558e15&&(_0x558e15=document[_0x17f804(0x20d)](_0x17f804(0x3c3)),_0x558e15[_0x17f804(0x328)]=_0x17f804(0x320),_0x558e15[_0x17f804(0x313)](_0x17f804(0x26d),_0x2fcc3b=>{const _0x3b1e14=_0x17f804;_0x2fcc3b['stopPropagation']();const _0x5480e5=_0x2fcc3b[_0x3b1e14(0x23c)]?.[_0x3b1e14(0x240)]?.(_0x3b1e14(0x2f9)),_0x144238=_0x5480e5?.['dataset']?.['id']||'';this[_0x3b1e14(0x211)](_0x144238);}),_0x238478[_0x17f804(0x2ae)](_0x558e15));const _0x4c935d=String(_0x2ce531?.[_0x17f804(0x33c)]||'');if(this[_0x17f804(0x2fb)]===_0x31351f){_0x558e15[_0x17f804(0x2c3)][_0x17f804(0x326)](_0x17f804(0x3bf));let _0x30f35e=_0x558e15[_0x17f804(0x36d)](_0x17f804(0x21d));!_0x30f35e&&(_0x30f35e=document[_0x17f804(0x20d)](_0x17f804(0x1c1)),_0x30f35e['type']=_0x17f804(0x206),_0x30f35e[_0x17f804(0x328)]='v2-asset-item-name-input',_0x30f35e[_0x17f804(0x313)](_0x17f804(0x26d),_0x3d39ce=>_0x3d39ce[_0x17f804(0x2b7)]()),_0x30f35e[_0x17f804(0x313)](_0x17f804(0x27c),_0x17724c=>{const _0x52bec3=_0x17f804;if(_0x17724c['key']==='Enter'){_0x17724c[_0x52bec3(0x21e)](),_0x17724c['stopPropagation'](),_0x30f35e[_0x52bec3(0x3b2)][_0x52bec3(0x1cc)]='1',this[_0x52bec3(0x3be)](_0x31351f,_0x30f35e['value']);return;}_0x17724c[_0x52bec3(0x35a)]==='Escape'&&(_0x17724c[_0x52bec3(0x21e)](),_0x17724c[_0x52bec3(0x2b7)](),this[_0x52bec3(0x250)]());}),_0x30f35e[_0x17f804(0x313)](_0x17f804(0x352),()=>{const _0xf0e4a4=_0x17f804;if(_0x30f35e[_0xf0e4a4(0x3b2)][_0xf0e4a4(0x1cc)]==='1')return;this[_0xf0e4a4(0x3be)](_0x31351f,_0x30f35e['value']);}),_0x558e15[_0x17f804(0x257)](_0x30f35e));if(_0x30f35e[_0x17f804(0x278)]!==_0x4c935d)_0x30f35e[_0x17f804(0x278)]=_0x4c935d;if(_0x30f35e['getAttribute'](_0x17f804(0x209))!==assetManagerText('createPanel.assetName'))_0x30f35e[_0x17f804(0x2ab)](_0x17f804(0x209),assetManagerText(_0x17f804(0x32d)));window['requestAnimationFrame'](()=>{const _0x2db9b0=_0x17f804;if(!_0x30f35e[_0x2db9b0(0x1e6)])return;try{_0x30f35e[_0x2db9b0(0x3a7)](),_0x30f35e[_0x2db9b0(0x359)]?.();}catch(_0x5a7682){}});}else{if(_0x558e15[_0x17f804(0x2c3)][_0x17f804(0x321)](_0x17f804(0x3bf)))_0x558e15[_0x17f804(0x2c3)][_0x17f804(0x1ec)](_0x17f804(0x3bf));const _0x1fda48=_0x558e15[_0x17f804(0x36d)](_0x17f804(0x21d));if(_0x1fda48)_0x558e15[_0x17f804(0x257)]();if(_0x558e15[_0x17f804(0x298)]!==_0x4c935d)_0x558e15[_0x17f804(0x298)]=_0x4c935d;if(_0x558e15[_0x17f804(0x277)](_0x17f804(0x2ce))!==_0x4c935d)_0x558e15[_0x17f804(0x2ab)](_0x17f804(0x2ce),_0x4c935d);}const _0x14f876=Array[_0x17f804(0x338)](_0x2ce531?.[_0x17f804(0x2df)])?_0x2ce531[_0x17f804(0x2df)]:Array[_0x17f804(0x338)](_0x2ce531?.[_0x17f804(0x2e5)])?_0x2ce531['nodes'][_0x17f804(0x26e)](_0x831417=>_buildAssetItem(_0x831417)):[];if(_0x14f876['length']>0x0){const _0x57769c=_0x53b169(_0x373710),_0x261887=_0x57769c[_0x17f804(0x229)](_0x17f804(0x34b));for(let _0x3ae982=0x0;_0x3ae982<0x4;_0x3ae982++){const _0x35e985=_0x14f876[_0x3ae982];if(!_0x35e985){const _0x5ef89d=_0x261887[_0x3ae982];_0x5ef89d&&(_0x5ef89d[_0x17f804(0x3b2)]['thumbKind']=_0x17f804(0x3ce),_0x5ef89d[_0x17f804(0x3b2)]['thumbType']='',_0x5ef89d['dataset']['thumbSrc']='',_0x5ef89d[_0x17f804(0x3b2)][_0x17f804(0x2f0)]='',_0x5ef89d[_0x17f804(0x257)]());continue;}_0x438d98(_0x261887[_0x3ae982],_0x35e985['thumbSrc'],_0x35e985[_0x17f804(0x24a)]);}return;}_0x2ce531?.[_0x17f804(0x254)]?_0x438d98(_0x373710,_0x2ce531[_0x17f804(0x254)],_0x2ce531[_0x17f804(0x2d6)]):_0x438d98(_0x373710,'',_0x2ce531?.['coverType']||_0x17f804(0x2e9));},_0x57590b=this[_0x3720b2(0x22c)]()[_0x3720b2(0x1d2)](_0x5b3a4d=>this['_categoryKey'](_0x5b3a4d?.[_0x3720b2(0x1c6)])===this['_categoryKey'](this[_0x3720b2(0x2db)]));if(this[_0x3720b2(0x29e)]){const _0x3bdfdc=_0x57590b[_0x3720b2(0x246)](_0x3a209=>_0x3a209['id']===this['_openAssetId']);if(!_0x3bdfdc){this['_openAssetId']=null,this[_0x3720b2(0x36c)]();return;}if(_0x44e62c)_0x44e62c[_0x3720b2(0x298)]=_0x3bdfdc[_0x3720b2(0x33c)]||assetManagerText('title');if(_0x26d245)_0x26d245[_0x3720b2(0x2c3)]['add']('show');this[_0x3720b2(0x385)][_0x3720b2(0x2c3)][_0x3720b2(0x326)](_0x3720b2(0x26b)),_0x58c425[_0x3720b2(0x244)]['display']=_0x3720b2(0x280),_0x5a5ec9[_0x3720b2(0x244)][_0x3720b2(0x2a7)]='';const _0x23e35b=Array[_0x3720b2(0x338)](_0x3bdfdc?.[_0x3720b2(0x2df)])?_0x3bdfdc['items']:Array[_0x3720b2(0x338)](_0x3bdfdc?.[_0x3720b2(0x2e5)])?_0x3bdfdc['nodes']['map'](_0x486d01=>_buildAssetItem(_0x486d01)):[];_0x5a5ec9[_0x3720b2(0x257)]();const _0xcd7008=document[_0x3720b2(0x20d)](_0x3720b2(0x3c3));_0xcd7008[_0x3720b2(0x328)]=_0x3720b2(0x2fc);const _0x25140a=document[_0x3720b2(0x20d)](_0x3720b2(0x3c3));_0x25140a[_0x3720b2(0x328)]=_0x3720b2(0x36f),_0xcd7008[_0x3720b2(0x2ae)](_0x25140a);if(_0x23e35b[_0x3720b2(0x32f)]>0x0){const _0x111a76=_0x53b169(_0x25140a),_0x42881d=_0x111a76[_0x3720b2(0x229)](_0x3720b2(0x34b));for(let _0x1d3dec=0x0;_0x1d3dec<0x4;_0x1d3dec++){const _0x330428=_0x23e35b[_0x1d3dec];if(_0x330428)_0x438d98(_0x42881d[_0x1d3dec],_0x330428[_0x3720b2(0x21f)],_0x330428[_0x3720b2(0x24a)]);else _0x42881d[_0x1d3dec]&&_0x42881d[_0x1d3dec][_0x3720b2(0x257)]();}}else _0x438d98(_0x25140a,_0x3bdfdc?.[_0x3720b2(0x254)],_0x3bdfdc?.[_0x3720b2(0x2d6)]||_0x3720b2(0x2e9));const _0x51b12d=document['createElement']('div');_0x51b12d[_0x3720b2(0x328)]=_0x3720b2(0x1d9),_0x51b12d['textContent']=_0x3bdfdc[_0x3720b2(0x33c)]||assetManagerText('unnamedAsset'),_0xcd7008[_0x3720b2(0x2ae)](_0x51b12d);const _0x4e76bf=document[_0x3720b2(0x20d)](_0x3720b2(0x3c3));_0x4e76bf[_0x3720b2(0x328)]=_0x3720b2(0x399);const _0x267f85=Array[_0x3720b2(0x338)](_0x3bdfdc?.[_0x3720b2(0x2e5)])?_0x3bdfdc[_0x3720b2(0x2e5)][_0x3720b2(0x32f)]:_0x23e35b['length'];_0x4e76bf[_0x3720b2(0x298)]=assetManagerText(_0x3720b2(0x289),{'category':_0x3bdfdc['category']?_formatAssetCategoryLabel(_0x3bdfdc[_0x3720b2(0x1c6)]):assetManagerText(_0x3720b2(0x3bb)),'count':_0x267f85,'time':_formatAssetDateTime(_0x3bdfdc[_0x3720b2(0x2f8)]||_0x3bdfdc['createdAt'])}),_0xcd7008[_0x3720b2(0x2ae)](_0x4e76bf);const _0x5bc227=document[_0x3720b2(0x20d)](_0x3720b2(0x2fd));_0x5bc227['className']=_0x3720b2(0x375);const _0x25d6b9=document[_0x3720b2(0x20d)](_0x3720b2(0x3c3));_0x25d6b9['className']=_0x3720b2(0x3d4),_0x25d6b9[_0x3720b2(0x298)]=assetManagerText(_0x3720b2(0x201)),_0x5bc227[_0x3720b2(0x2ae)](_0x25d6b9);const _0x1c109f=document['createElement'](_0x3720b2(0x3c3));_0x1c109f[_0x3720b2(0x328)]=_0x3720b2(0x3ab);if(_0x23e35b[_0x3720b2(0x32f)]===0x0){const _0x3e1b3d=document[_0x3720b2(0x20d)](_0x3720b2(0x3c3));_0x3e1b3d[_0x3720b2(0x328)]='v2-asset-empty',_0x3e1b3d[_0x3720b2(0x298)]=assetManagerText(_0x3720b2(0x3c1)),_0x1c109f[_0x3720b2(0x2ae)](_0x3e1b3d);}else for(let _0x2a19f3=0x0;_0x2a19f3<_0x23e35b[_0x3720b2(0x32f)];_0x2a19f3++){const _0x1fcd78=_0x23e35b[_0x2a19f3],_0x3cc406=document[_0x3720b2(0x20d)]('button');_0x3cc406['type']=_0x3720b2(0x343),_0x3cc406[_0x3720b2(0x328)]='v2-asset-subitem',_0x3cc406['dataset'][_0x3720b2(0x30e)]=_0x3bdfdc['id'],_0x3cc406[_0x3720b2(0x3b2)][_0x3720b2(0x266)]=String(_0x2a19f3);const _0x635957=document['createElement'](_0x3720b2(0x3c3));_0x635957[_0x3720b2(0x328)]=_0x3720b2(0x23b),_0x438d98(_0x635957,_0x1fcd78?.[_0x3720b2(0x21f)],_0x1fcd78?.[_0x3720b2(0x24a)]);const _0x32baa6=document['createElement']('div');_0x32baa6[_0x3720b2(0x328)]='v2-asset-subitem-info';const _0x28da0a=document[_0x3720b2(0x20d)](_0x3720b2(0x221));_0x28da0a[_0x3720b2(0x328)]=_0x3720b2(0x302),_0x28da0a[_0x3720b2(0x298)]=_formatAssetTypeLabel(_0x1fcd78?.[_0x3720b2(0x24a)]);const _0x32d3bb=document['createElement']('div');_0x32d3bb['className']=_0x3720b2(0x311);const _0x58c091=String(_0x1fcd78?.['name']||_0x1fcd78?.['type']||assetManagerText(_0x3720b2(0x3a4),{'index':_0x2a19f3+0x1}));_0x32d3bb['textContent']=_0x58c091,_0x32d3bb[_0x3720b2(0x2ce)]=_0x58c091;const _0x3782b8=document[_0x3720b2(0x20d)]('div');_0x3782b8['className']=_0x3720b2(0x228),_0x3782b8[_0x3720b2(0x298)]=assetManagerText('detail.clickToAdd'),_0x32baa6[_0x3720b2(0x241)](_0x28da0a,_0x32d3bb,_0x3782b8),_0x3cc406[_0x3720b2(0x241)](_0x635957,_0x32baa6),_0x1c109f[_0x3720b2(0x2ae)](_0x3cc406);}_0x5bc227[_0x3720b2(0x2ae)](_0x1c109f),_0xcd7008[_0x3720b2(0x2ae)](_0x5bc227);const _0x263fe9=document[_0x3720b2(0x20d)](_0x3720b2(0x3c3));_0x263fe9[_0x3720b2(0x328)]='v2-asset-detail-actions';const _0x194b60=document[_0x3720b2(0x20d)](_0x3720b2(0x343));_0x194b60[_0x3720b2(0x24a)]=_0x3720b2(0x343),_0x194b60[_0x3720b2(0x328)]=_0x3720b2(0x2ea),_0x194b60[_0x3720b2(0x3b2)][_0x3720b2(0x2d0)]=_0x3720b2(0x251),_0x194b60[_0x3720b2(0x3b2)][_0x3720b2(0x30e)]=_0x3bdfdc['id'],_0x194b60[_0x3720b2(0x298)]=assetManagerText(_0x3720b2(0x29f)),_0x263fe9[_0x3720b2(0x2ae)](_0x194b60),_0xcd7008[_0x3720b2(0x2ae)](_0x263fe9),_0x5a5ec9[_0x3720b2(0x2ae)](_0xcd7008);return;}if(_0x44e62c)_0x44e62c[_0x3720b2(0x298)]=assetManagerText(_0x3720b2(0x2ce));if(_0x26d245)_0x26d245['classList']['remove'](_0x3720b2(0x35d));this[_0x3720b2(0x385)][_0x3720b2(0x2c3)][_0x3720b2(0x1ec)](_0x3720b2(0x26b)),_0x58c425[_0x3720b2(0x244)]['display']='',_0x5a5ec9[_0x3720b2(0x244)]['display']=_0x3720b2(0x280),_0x5a5ec9['replaceChildren']();let _0xd1c7cd=_0x58c425[_0x3720b2(0x36d)](_0x3720b2(0x28a));!_0xd1c7cd&&(_0xd1c7cd=document[_0x3720b2(0x20d)](_0x3720b2(0x3c3)),_0xd1c7cd['className']=_0x3720b2(0x2bf),_0x58c425[_0x3720b2(0x2ae)](_0xd1c7cd));const _0x6dce59=this[_0x3720b2(0x22c)]();let _0x22558a=0x0,_0x2f2a3e=0x0;for(const _0x1a51b4 of _0x6dce59){const _0x43b454=String(_0x1a51b4?.['id']||'');if(!_0x43b454)continue;let _0x4b492b=this['_assetCardPool']?.[_0x3720b2(0x357)]?.(_0x43b454);if(!_0x4b492b){_0x4b492b=document[_0x3720b2(0x20d)]('div'),_0x4b492b[_0x3720b2(0x328)]=_0x3720b2(0x208),_0x4b492b[_0x3720b2(0x3b2)]['id']=_0x43b454;if(!this[_0x3720b2(0x397)])this['_assetCardPool']=new Map();this[_0x3720b2(0x397)][_0x3720b2(0x20c)](_0x43b454,_0x4b492b);}if(_0x4b492b['parentElement']!==_0x58c425)_0x58c425[_0x3720b2(0x2ae)](_0x4b492b);const _0x5b6d9c=this[_0x3720b2(0x394)](_0x1a51b4?.[_0x3720b2(0x1c6)])===this[_0x3720b2(0x394)](this[_0x3720b2(0x2db)]);_0x4b492b[_0x3720b2(0x244)][_0x3720b2(0x2a7)]=_0x5b6d9c?'':_0x3720b2(0x280),_0x5b6d9c&&(_0x4b492b[_0x3720b2(0x244)][_0x3720b2(0x2c9)]=String(_0x2f2a3e++),_0x117776(_0x4b492b,_0x1a51b4),this[_0x3720b2(0x332)]&&this[_0x3720b2(0x332)]===_0x43b454&&(this[_0x3720b2(0x332)]='',window[_0x3720b2(0x1e7)](()=>{const _0x3aac33=_0x3720b2;if(!_0x4b492b[_0x3aac33(0x1e6)])return;_0x4b492b[_0x3aac33(0x2c3)][_0x3aac33(0x326)](_0x3aac33(0x30c));const _0x5872cd=window[_0x3aac33(0x1ca)](()=>{const _0x48b369=_0x3aac33;if(_0x4b492b['isConnected'])_0x4b492b[_0x48b369(0x2c3)][_0x48b369(0x1ec)](_0x48b369(0x30c));},0x28a);_0x4b492b['dataset'][_0x3aac33(0x1d8)]=String(_0x5872cd);})),_0x22558a+=0x1);}_0xd1c7cd['style']['display']=_0x22558a===0x0?'':_0x3720b2(0x280),_0x22558a===0x0&&(_0xd1c7cd['textContent']=assetManagerText('emptyCategory',{'category':_formatAssetCategoryLabel(this[_0x3720b2(0x2db)])}),_0xd1c7cd['style'][_0x3720b2(0x2c9)]='0');}['_restoreAssetSubItem'](_0x40fb7c,_0x26d6ef){const _0x500953=a459_0x12ef8c,_0x984169=(this[_0x500953(0x3a5)]||[])['find'](_0x33215d=>_0x33215d['id']===_0x40fb7c);if(!_0x984169||!Array[_0x500953(0x338)](_0x984169[_0x500953(0x2e5)]))return;const _0x4385cf=_0x984169[_0x500953(0x2e5)][_0x26d6ef];if(!_0x4385cf)return;const _0x3c8683=this['_getCanvasCenterWorld'](),_0x4e2325=Number(_0x4385cf['width']??_0x4385cf['w'])||0xf0,_0x9a6659=Number(_0x4385cf[_0x500953(0x30d)]??_0x4385cf['h'])||0xf0,_0x5a4431=_0x3c8683['x']-_0x4e2325/0x2,_0x2daac8=_0x3c8683['y']-_0x9a6659/0x2,_0x4f1325=findAvailablePosition(a459_0x26716c['getState']()[_0x500953(0x2e5)],_0x5a4431,_0x2daac8,_0x4e2325,_0x9a6659,0x18,_0x500953(0x316));a459_0x26716c[_0x500953(0x290)](()=>{const _0x1921a3=_0x500953,_0x499696=JSON[_0x1921a3(0x1c7)](JSON[_0x1921a3(0x1e3)](_0x4385cf));_0x499696['id']=generateId(_0x499696[_0x1921a3(0x24a)]),_0x499696['x']=_0x4f1325['x'],_0x499696['y']=_0x4f1325['y'],a459_0x26716c[_0x1921a3(0x312)](_0x499696),a459_0x26716c[_0x1921a3(0x33d)]([_0x499696['id']]);}),window[_0x500953(0x310)]?.(assetManagerText(_0x500953(0x382)),_0x500953(0x35f));}[a459_0x12ef8c(0x3a6)](_0x22ccdb){const _0x5d3ec2=a459_0x12ef8c,_0x1dc858=(this[_0x5d3ec2(0x3a5)]||[])[_0x5d3ec2(0x246)](_0x561d49=>_0x561d49['id']===_0x22ccdb);if(!_0x1dc858||!_0x1dc858[_0x5d3ec2(0x2e5)])return;const _0x284920=shouldTopAlignRestoredAsset(_0x1dc858[_0x5d3ec2(0x2e5)],_0x1dc858[_0x5d3ec2(0x2e1)])?createTopAlignedAssetNodes(_0x1dc858[_0x5d3ec2(0x2e5)],0x18):_0x1dc858['nodes'],_0x11f110=this[_0x5d3ec2(0x333)](),_0x5c2764=this['_calcNodesBBox'](_0x284920),_0x7d8e81=_0x11f110['x']-_0x5c2764['cx'],_0xdb03ff=_0x11f110['y']-_0x5c2764['cy'],_0x5f09a1=_0x5c2764['minX']+_0x7d8e81,_0x2a0429=_0x5c2764[_0x5d3ec2(0x362)]+_0xdb03ff,_0x5dcc8f=findAvailablePosition(a459_0x26716c['getState']()[_0x5d3ec2(0x2e5)],_0x5f09a1,_0x2a0429,Math[_0x5d3ec2(0x2eb)](0x1,_0x5c2764['w']),Math[_0x5d3ec2(0x2eb)](0x1,_0x5c2764['h']),0x18,'right'),_0xfcd317=_0x7d8e81+(_0x5dcc8f['x']-_0x5f09a1),_0x56c946=_0xdb03ff+(_0x5dcc8f['y']-_0x2a0429);a459_0x26716c[_0x5d3ec2(0x290)](()=>{const _0x29e48f=_0x5d3ec2,_0x238c09={};_0x284920[_0x29e48f(0x253)](_0x9228dc=>{const _0x34b808=_0x29e48f,_0x5e1612=JSON[_0x34b808(0x1c7)](JSON[_0x34b808(0x1e3)](_0x9228dc)),_0x40a906=_0x5e1612['id'],_0x26a465=generateId(_0x5e1612['type']);_0x238c09[_0x40a906]=_0x26a465,_0x5e1612['id']=_0x26a465,_0x5e1612['x']=(Number(_0x5e1612['x'])||0x0)+_0xfcd317,_0x5e1612['y']=(Number(_0x5e1612['y'])||0x0)+_0x56c946,a459_0x26716c[_0x34b808(0x312)](_0x5e1612);}),_0x1dc858[_0x29e48f(0x2e1)]&&_0x1dc858['edges']['forEach'](_0x1bd6d8=>{const _0x2fd1ce=_0x29e48f,_0x439ff7=JSON['parse'](JSON[_0x2fd1ce(0x1e3)](_0x1bd6d8));_0x439ff7['id']=generateId(_0x2fd1ce(0x363));if(_0x238c09[_0x439ff7[_0x2fd1ce(0x2dd)]])_0x439ff7['sourceId']=_0x238c09[_0x439ff7[_0x2fd1ce(0x2dd)]];if(_0x238c09[_0x439ff7[_0x2fd1ce(0x24b)]])_0x439ff7[_0x2fd1ce(0x24b)]=_0x238c09[_0x439ff7['targetId']];a459_0x26716c[_0x2fd1ce(0x2bd)](_0x439ff7);}),a459_0x26716c[_0x29e48f(0x33d)](Object['values'](_0x238c09));}),window['showToast']?.(assetManagerText(_0x5d3ec2(0x29a)),_0x5d3ec2(0x35f));}}export const assetManager=new AssetManager();
+import appStore from '../core/stores/appStore.js';
+import { findAvailablePosition, generateId, screenToWorld } from '../core/math.js';
+import { getImage } from './storage.js';
+import {
+  fetchAssetsFromServer,
+  fetchAssetCategoriesFromServer,
+  saveAssetToServer,
+  saveAssetCategoriesToServer,
+  deleteAssetFromServer,
+  saveAssetThumbToServer,
+} from '../../api/projectsV2Api.js';
+import { registerSidebarSubmenu } from './sidebarSubmenuController.js';
+import {
+  removeAssetMentionAsset,
+  setAssetMentionAssets,
+  upsertAssetMentionAsset,
+} from './assetMentionRegistry.js';
+import { createReferenceFallbackThumbHtml } from './referenceThumbnailFallback.js';
+import { localPathToUrl } from '../utils/localMediaPath.js';
+import { attachMediaElementPlaybackSource } from '../services/desktopMediaBlobSource.js';
+import { createTopAlignedAssetNodes, shouldTopAlignRestoredAsset } from './assetRestoreLayout.js';
+import { getLocale, t } from '../i18n/index.js';
+import { preloadCanvasImage } from './canvasMediaScheduler.js';
+const DEFAULT_ASSET_CATEGORIES = ['人物', '场景', '物品'],
+  ASSET_CATEGORY_LIMIT = 10,
+  HIDDEN_ASSET_CATEGORIES = ['出图历史'],
+  HIDDEN_ASSET_KINDS = ['generation-history'],
+  ASSET_CATEGORY_I18N_KEYS = Object.freeze({
+    人物: 'people',
+    场景: 'scenes',
+    物品: 'objects',
+    出图历史: 'history',
+    自定义: 'custom',
+  });
+function assetManagerText(_0x98cfea, _0x10bf1c = {}) {
+  return t('assetManager.' + _0x98cfea, _0x10bf1c);
+}
+function _formatAssetCategoryLabel(_0x33357e) {
+  const _0x4b40a3 = String(_0x33357e || '').trim(),
+    _0x3e3cf0 = ASSET_CATEGORY_I18N_KEYS[_0x4b40a3];
+  return _0x3e3cf0 ? assetManagerText('categories.' + _0x3e3cf0) : _0x4b40a3;
+}
+function _escapeHtml(_0x2606d3) {
+  return String(_0x2606d3 ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+function _clonePlain(_0x4cfd8c, _0x31a68a) {
+  if (_0x4cfd8c == null) return _0x31a68a;
+  try {
+    return JSON.parse(JSON.stringify(_0x4cfd8c));
+  } catch (_0x1e5809) {
+    return _0x31a68a;
+  }
+}
+function _normalizeAssetType(_0x45aff0) {
+  const _0x51b3cd = String(_0x45aff0 || '');
+  if (_0x51b3cd === 'text' || _0x51b3cd === 'source-text' || _0x51b3cd === 'ai-text') return 'text';
+  if (_0x51b3cd === 'audio' || _0x51b3cd === 'source-audio' || _0x51b3cd === 'ai-audio') return 'audio';
+  if (_0x51b3cd === 'video' || _0x51b3cd === 'source-video' || _0x51b3cd === 'ai-video') return 'video';
+  if (_0x51b3cd === 'image' || _0x51b3cd === 'source-image' || _0x51b3cd === 'ai-image') return 'image';
+  return 'other';
+}
+function _formatAssetTypeLabel(_0x2a6df4) {
+  const _0x97aa06 = _normalizeAssetType(_0x2a6df4);
+  return assetManagerText('types.' + _0x97aa06);
+}
+function _resolveNodeStableThumbSrc(_0x21d99c) {
+  if (!_0x21d99c) return '';
+  const _0x2fcc4b =
+    _0x21d99c.thumbLocalPath ||
+    _0x21d99c.displayLocalPath ||
+    _0x21d99c.localPath ||
+    _0x21d99c.originalLocalPath;
+  if (_0x2fcc4b)
+    return (
+      localPathToUrl(_0x2fcc4b) ||
+      (String(_0x2fcc4b).startsWith('/') ? String(_0x2fcc4b) : '/' + String(_0x2fcc4b).replace(/^\/+/, ''))
+    );
+  if (_0x21d99c.thumbUrl && typeof _0x21d99c.thumbUrl === 'string') return _0x21d99c.thumbUrl;
+  return String(_0x21d99c.src || _0x21d99c.imageUrl || '');
+}
+function _renderAssetIcon(_0x4fea63) {
+  const _0x24905d = _normalizeAssetType(_0x4fea63);
+  if (_0x24905d === 'text') return createReferenceFallbackThumbHtml('text', 'v2-asset-icon');
+  if (_0x24905d === 'audio') return createReferenceFallbackThumbHtml('audio', 'v2-asset-icon');
+  if (_0x24905d === 'video')
+    return '<div class="v2-asset-icon v2-asset-icon--video" aria-hidden="true">\n      <svg class="v2-asset-icon-svg" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">\n        <polygon points="5 3 19 12 5 21 5 3" />\n      </svg>\n    </div>';
+  return '<div class="v2-asset-icon v2-asset-icon--other" aria-hidden="true">\n    <svg class="v2-asset-icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5">\n      <rect x="3" y="3" width="18" height="18" rx="2" />\n    </svg>\n  </div>';
+}
+function _buildAssetItem(_0xf3bc34) {
+  const _0x24c8d4 = _0xf3bc34?.type || 'other',
+    _0x1eae17 = _resolveNodeStableThumbSrc(_0xf3bc34);
+  return { type: _0x24c8d4, name: _0xf3bc34?.name || '', thumbSrc: _0x1eae17 || '', nodeData: _0xf3bc34 };
+}
+function _sortAssetsByUpdatedTime(_0x5808f2) {
+  return [...(Array.isArray(_0x5808f2) ? _0x5808f2 : [])].sort((_0x4393c2, _0x4115e6) => {
+    const _0x1b0b29 = Number(_0x4393c2?.updatedAt || _0x4393c2?.createdAt || 0),
+      _0x411c1f = Number(_0x4115e6?.updatedAt || _0x4115e6?.createdAt || 0);
+    return _0x411c1f - _0x1b0b29;
+  });
+}
+function _formatAssetDateTime(_0x5ed43b) {
+  const _0x25aff8 = Number(_0x5ed43b);
+  if (!Number.isFinite(_0x25aff8) || _0x25aff8 <= 0) return assetManagerText('unknownTime');
+  return new Date(_0x25aff8).toLocaleString(getLocale(), {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+class AssetManager {
+  constructor() {
+    ((this.createPanel = null),
+      (this.createPanelBackdrop = null),
+      (this._createPanelKeydownHandler = null),
+      (this._createPanelDropdownOutsideHandler = null),
+      (this._createPanelDropdownEl = null),
+      (this._createPanelCoverObjectUrl = ''),
+      (this._createPanelState = null),
+      (this.sidebarPanel = null),
+      (this._openAssetId = null),
+      (this._thumbPreloadSet = new Set()),
+      (this._thumbDecodePromiseMap = new Map()),
+      (this._videoThumbInFlight = new Set()),
+      (this._videoThumbTimer = 0),
+      (this._sidebarRenderRaf = 0),
+      (this._pendingDeleteAssetId = ''),
+      (this._renamingAssetId = ''),
+      (this._newAssetPulseId = ''),
+      (this._sidebarTabsLayoutRaf = 0),
+      (this.activeTab = '人物'),
+      (this.tabs = [...DEFAULT_ASSET_CATEGORIES]),
+      (this.userCategories = []),
+      (this.assets = []),
+      this.initSidebarPanel(),
+      this.loadAssetCategoriesFromServer(),
+      this.loadAssetsFromServer());
+  }
+  ['_getSortedAssets']() {
+    return _sortAssetsByUpdatedTime(
+      (this.assets || []).filter((_0x344b38) => this._isManagedAsset(_0x344b38)),
+    );
+  }
+  ['_normalizeCategoryName'](_0x482a13) {
+    return String(_0x482a13 || '').trim();
+  }
+  ['_categoryKey'](_0x349693) {
+    return this._normalizeCategoryName(_0x349693).toLocaleLowerCase();
+  }
+  ['_isDefaultCategory'](_0x393f4f) {
+    return !!this._findCategoryByName(_0x393f4f, DEFAULT_ASSET_CATEGORIES);
+  }
+  ['_isHiddenAssetCategory'](_0x137728) {
+    return !!this._findCategoryByName(_0x137728, HIDDEN_ASSET_CATEGORIES);
+  }
+  ['_isManagedAsset'](_0x21212b) {
+    if (!_0x21212b || typeof _0x21212b !== 'object') return false;
+    if (
+      HIDDEN_ASSET_KINDS.includes(
+        String(_0x21212b?.kind || '')
+          .trim()
+          .toLowerCase(),
+      )
+    )
+      return false;
+    return !this._isHiddenAssetCategory(_0x21212b?.category);
+  }
+  ['_findCategoryByName'](_0x4bb53d, _0x2e3fb9 = this.tabs) {
+    const _0x33670d = this._categoryKey(_0x4bb53d);
+    if (!_0x33670d) return '';
+    return (_0x2e3fb9 || []).find((_0x51aecc) => this._categoryKey(_0x51aecc) === _0x33670d) || '';
+  }
+  ['_normalizeUserCategories'](_0x309796 = []) {
+    const _0x2fae04 = [],
+      _0x2f9432 = (_0x97ea14) => {
+        const _0x44cf53 = this._normalizeCategoryName(_0x97ea14);
+        if (!_0x44cf53) return;
+        if (this._isDefaultCategory(_0x44cf53) || this._isHiddenAssetCategory(_0x44cf53)) return;
+        if (this._findCategoryByName(_0x44cf53, _0x2fae04)) return;
+        if (DEFAULT_ASSET_CATEGORIES.length + _0x2fae04.length >= ASSET_CATEGORY_LIMIT) return;
+        _0x2fae04.push(_0x44cf53);
+      };
+    return ((Array.isArray(_0x309796) ? _0x309796 : []).forEach(_0x2f9432), _0x2fae04);
+  }
+  ['_isUserCategory'](_0x1a2a4c) {
+    return !!this._findCategoryByName(_0x1a2a4c, this.userCategories);
+  }
+  ['_getAssetCategories'](_0x25147c = '') {
+    const _0x46948d = [],
+      _0x54ed94 = (_0x34e983) => {
+        const _0x3b65a4 = this._normalizeCategoryName(_0x34e983);
+        if (!_0x3b65a4) return;
+        if (this._isHiddenAssetCategory(_0x3b65a4)) return;
+        if (this._findCategoryByName(_0x3b65a4, _0x46948d)) return;
+        if (_0x46948d.length >= ASSET_CATEGORY_LIMIT) return;
+        _0x46948d.push(_0x3b65a4);
+      };
+    DEFAULT_ASSET_CATEGORIES.forEach(_0x54ed94);
+    for (const _0x1bfd1f of this.userCategories || []) {
+      _0x54ed94(_0x1bfd1f);
+    }
+    for (const _0x57f8e1 of this._getSortedAssets()) {
+      _0x54ed94(_0x57f8e1?.category);
+    }
+    return (_0x54ed94(_0x25147c), _0x46948d);
+  }
+  ['_syncTabsFromAssets']() {
+    ((this.tabs = this._getAssetCategories()),
+      !this._findCategoryByName(this.activeTab, this.tabs) &&
+        ((this.activeTab = DEFAULT_ASSET_CATEGORIES[0]), (this._openAssetId = null)));
+  }
+  ['_renderSidebarTabsHtml']() {
+    return (this.tabs || [])
+      .map((_0x2e5f34) => {
+        const _0x21f89a = this._categoryKey(_0x2e5f34) === this._categoryKey(this.activeTab) ? ' active' : '',
+          _0x3b0ded = _escapeHtml(_0x2e5f34),
+          _0x17e8af = _escapeHtml(_formatAssetCategoryLabel(_0x2e5f34)),
+          _0x6b48bb = this._isUserCategory(_0x2e5f34)
+            ? '<button\n              type="button"\n              class="v2-asset-category-delete"\n              data-ui-action="asset-category-delete"\n              data-cat="' +
+              _0x3b0ded +
+              '"\n              aria-label="' +
+              _escapeHtml(
+                assetManagerText('deleteCategoryAria', { category: _formatAssetCategoryLabel(_0x2e5f34) }),
+              ) +
+              '"\n              title="' +
+              _escapeHtml(assetManagerText('deleteCategory')) +
+              '"\n            >×</button>'
+            : '';
+        return (
+          '\n          <div class="v2-asset-sidebar-tab' +
+          _0x21f89a +
+          '" data-cat="' +
+          _0x3b0ded +
+          '">\n            <span class="v2-asset-sidebar-tab-text">' +
+          _0x17e8af +
+          '</span>\n            ' +
+          _0x6b48bb +
+          '\n          </div>\n        '
+        );
+      })
+      .join('');
+  }
+  ['_renderSidebarTabs']() {
+    const _0x34feab = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
+    if (!_0x34feab) return;
+    ((_0x34feab.innerHTML = this._renderSidebarTabsHtml()), this._queueSidebarTabsLayoutSync());
+  }
+  ['_queueSidebarTabsLayoutSync']() {
+    if (!this.sidebarPanel) return;
+    (this._sidebarTabsLayoutRaf && window.cancelAnimationFrame?.(this._sidebarTabsLayoutRaf),
+      (this._sidebarTabsLayoutRaf = window.requestAnimationFrame(() => {
+        ((this._sidebarTabsLayoutRaf = 0), this._syncSidebarTabsViewport());
+      })));
+  }
+  ['_syncSidebarTabsViewport']() {
+    const _0x5407ef = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
+    if (!_0x5407ef) return;
+    const _0x564864 = _0x5407ef.querySelector('.v2-asset-sidebar-tab.active');
+    if (_0x564864 && _0x5407ef.clientWidth > 0) {
+      if (this._isDefaultCategory(this.activeTab)) _0x5407ef.scrollLeft = 0;
+      else {
+        const _0x16ea4b = _0x564864.offsetLeft,
+          _0x152f92 = _0x16ea4b + _0x564864.offsetWidth,
+          _0x13ec00 = _0x5407ef.scrollLeft,
+          _0x5a562e = _0x13ec00 + _0x5407ef.clientWidth;
+        if (_0x16ea4b < _0x13ec00) _0x5407ef.scrollLeft = _0x16ea4b;
+        else _0x152f92 > _0x5a562e && (_0x5407ef.scrollLeft = _0x152f92 - _0x5407ef.clientWidth);
+      }
+    }
+    this._updateSidebarTabsOverflowHint();
+  }
+  ['_updateSidebarTabsOverflowHint']() {
+    const _0x4d2f6e = this.sidebarPanel?.querySelector('#asset-sidebar-tabs-shell'),
+      _0x4d83f6 = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
+    if (!_0x4d2f6e || !_0x4d83f6) return;
+    const _0x1b5fa7 = Math.max(0, _0x4d83f6.scrollWidth - _0x4d83f6.clientWidth),
+      _0x134890 = _0x1b5fa7 > 2,
+      _0x4c12e3 = !_0x134890 || _0x4d83f6.scrollLeft <= 2,
+      _0xa96830 = !_0x134890 || _0x4d83f6.scrollLeft >= _0x1b5fa7 - 2;
+    (_0x4d2f6e.classList.toggle('has-overflow', _0x134890),
+      _0x4d2f6e.classList.toggle('is-at-start', _0x4c12e3),
+      _0x4d2f6e.classList.toggle('is-at-end', _0xa96830));
+    const _0x120680 = _0x4d2f6e.querySelector('.v2-asset-sidebar-tabs-nav--prev'),
+      _0x392da5 = _0x4d2f6e.querySelector('.v2-asset-sidebar-tabs-nav--next');
+    if (_0x120680) _0x120680.hidden = !_0x134890 || _0x4c12e3;
+    if (_0x392da5) _0x392da5.hidden = !_0x134890 || _0xa96830;
+  }
+  ['_scrollSidebarTabs'](_0x13355c = 1) {
+    const _0x515da1 = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
+    if (!_0x515da1) return;
+    const _0x190a27 = Math.max(1, Math.floor(_0x515da1.clientWidth * 0.75)),
+      _0x3c723e = _0x515da1.scrollLeft + _0x190a27 * (_0x13355c < 0 ? -1 : 1);
+    (typeof _0x515da1.scrollTo === 'function'
+      ? _0x515da1.scrollTo({ left: _0x3c723e, behavior: 'smooth' })
+      : (_0x515da1.scrollLeft = _0x3c723e),
+      window.setTimeout(() => this._updateSidebarTabsOverflowHint(), 220));
+  }
+  ['_getCreatePanelCategories']() {
+    const _0x199e2d = this._getAssetCategories(),
+      _0x29434f = (_0x424c12) => {
+        const _0x5a581c = this._normalizeCategoryName(_0x424c12);
+        if (!_0x5a581c) return;
+        if (this._findCategoryByName(_0x5a581c, _0x199e2d)) return;
+        _0x199e2d.push(_0x5a581c);
+      };
+    for (const _0x550833 of this._createPanelState?.customCategories || []) {
+      _0x29434f(_0x550833);
+    }
+    return (_0x29434f(this._createPanelState?.draft?.category || this.activeTab), _0x199e2d);
+  }
+  ['_canAddCustomCategory']() {
+    return this._getCreatePanelCategories().length < ASSET_CATEGORY_LIMIT;
+  }
+  async ['loadAssetCategoriesFromServer']() {
+    try {
+      const _0x2ac2fe = await fetchAssetCategoriesFromServer();
+      ((this.userCategories = this._normalizeUserCategories(_0x2ac2fe)),
+        this._syncTabsFromAssets(),
+        this._renderSidebarTabs(),
+        this.sidebarPanel?.classList.contains('show') && this.renderSidebarContent());
+    } catch (_0x376d20) {
+      console.error('加载资产分类失败', _0x376d20);
+    }
+  }
+  async ['_saveUserCategories']() {
+    const _0x4a06ce = this._normalizeUserCategories(this.userCategories);
+    ((this.userCategories = _0x4a06ce), await saveAssetCategoriesToServer(_0x4a06ce));
+  }
+  ['_addUserCategory'](_0x2c9848) {
+    const _0x487b4b = this._normalizeCategoryName(_0x2c9848);
+    if (!_0x487b4b || this._isDefaultCategory(_0x487b4b) || this._isHiddenAssetCategory(_0x487b4b)) return '';
+    const _0x5e8ca8 = this._findCategoryByName(_0x487b4b, this.userCategories);
+    if (_0x5e8ca8) return _0x5e8ca8;
+    if (this._getAssetCategories().length >= ASSET_CATEGORY_LIMIT)
+      return (
+        window.showToast?.(assetManagerText('categoryLimit', { limit: ASSET_CATEGORY_LIMIT }), 'warn'),
+        ''
+      );
+    return (
+      (this.userCategories = this._normalizeUserCategories([...this.userCategories, _0x487b4b])),
+      this._syncTabsFromAssets(),
+      this._renderSidebarTabs(),
+      void this._saveUserCategories().catch((_0x499895) => {
+        (console.error('保存资产分类失败', _0x499895),
+          window.showToast?.(assetManagerText('categorySaveFailed'), 'error'));
+      }),
+      _0x487b4b
+    );
+  }
+  ['_getMentionEligibleAssets']() {
+    return this._getSortedAssets().filter((_0x56c3d3) =>
+      this._findCategoryByName(_0x56c3d3?.category, this.tabs),
+    );
+  }
+  ['_normalizeAssetEntity'](_0x31b72b) {
+    if (!_0x31b72b || typeof _0x31b72b !== 'object') return null;
+    const _0xe74003 = { ..._0x31b72b },
+      _0x1d9fa1 = Number(_0xe74003.createdAt || 0),
+      _0x4a80cf = Number(_0xe74003.updatedAt || _0x1d9fa1 || 0);
+    _0x1d9fa1 > 0 ? (_0xe74003.createdAt = _0x1d9fa1) : delete _0xe74003.createdAt;
+    if (_0x4a80cf > 0) _0xe74003.updatedAt = _0x4a80cf;
+    else _0x1d9fa1 > 0 && (_0xe74003.updatedAt = _0x1d9fa1);
+    return (
+      !_0xe74003.coverUrl &&
+        Array.isArray(_0xe74003.nodes) &&
+        _0xe74003.nodes[0] &&
+        (_0xe74003.coverUrl = _resolveNodeStableThumbSrc(_0xe74003.nodes[0])),
+      !Array.isArray(_0xe74003.items) &&
+        Array.isArray(_0xe74003.nodes) &&
+        (_0xe74003.items = _0xe74003.nodes.map((_0x6ff292) => _buildAssetItem(_0x6ff292))),
+      _0xe74003
+    );
+  }
+  ['_upsertLocalAsset'](_0x5aa009) {
+    const _0x24f2b3 = this._normalizeAssetEntity(_0x5aa009);
+    if (!_0x24f2b3?.id) return;
+    const _0x58f8e6 = Array.isArray(this.assets) ? this.assets : [],
+      _0x4f5cde = _0x58f8e6.filter((_0x874125) => String(_0x874125?.id || '') !== String(_0x24f2b3.id));
+    ((this.assets = _sortAssetsByUpdatedTime([_0x24f2b3, ..._0x4f5cde])),
+      this._syncTabsFromAssets(),
+      this._renderSidebarTabs(),
+      this._findCategoryByName(_0x24f2b3.category, this.tabs)
+        ? upsertAssetMentionAsset(_0x24f2b3)
+        : removeAssetMentionAsset(_0x24f2b3.id));
+  }
+  ['_getSelectedAssetNodes'](_0x52dbbf) {
+    const _0x48010c = Array.isArray(_0x52dbbf) ? _0x52dbbf : [],
+      _0x2ae02e = appStore.getState();
+    return _0x48010c.map((_0x30fc2b) => _0x2ae02e.nodes[_0x30fc2b]).filter(Boolean);
+  }
+  ['_getSelectedAssetEdges'](_0x5a1154) {
+    const _0x3ded93 = Array.isArray(_0x5a1154) ? _0x5a1154 : [],
+      _0x37cb83 = new Set(_0x3ded93),
+      _0x1e537c = appStore.getState();
+    return Object.values(_0x1e537c.edges || {}).filter(
+      (_0x7f9c4c) => _0x37cb83.has(_0x7f9c4c?.sourceId) && _0x37cb83.has(_0x7f9c4c?.targetId),
+    );
+  }
+  async ['_resolveCreatePanelCover'](_0x1dd6de) {
+    let _0x3a9c82 = '';
+    const _0x590a1d = _0x1dd6de?.type || 'other';
+    if (_0x1dd6de?.thumbId) {
+      const _0x2726bf = await getImage(_0x1dd6de.thumbId);
+      _0x2726bf &&
+        ((this._createPanelCoverObjectUrl = URL.createObjectURL(_0x2726bf)),
+        (_0x3a9c82 = this._createPanelCoverObjectUrl));
+    }
+    return (
+      !_0x3a9c82 && (_0x3a9c82 = _resolveNodeStableThumbSrc(_0x1dd6de)),
+      {
+        coverUrl: _0x3a9c82,
+        coverType: _0x590a1d,
+        coverHtml: _0x3a9c82
+          ? '<img src="' +
+            _0x3a9c82 +
+            '" alt="' +
+            _escapeHtml(assetManagerText('coverAlt')) +
+            '" id="asset-create-cover-img" draggable="false" />'
+          : _renderAssetIcon(_0x590a1d),
+      }
+    );
+  }
+  ['_buildAssetPayloadFromSelection'](_0x2010aa, _0x38ffe5 = {}) {
+    const _0x59dc24 = this._getSelectedAssetNodes(_0x2010aa),
+      _0x20d3e3 = _0x59dc24[0] || null,
+      _0x43fc96 = Date.now(),
+      _0x391739 = String(_0x38ffe5.name || '').trim() || assetManagerText('unnamedAsset'),
+      _0x339456 = String(_0x38ffe5.category || '').trim() || this.activeTab,
+      _0x4ccd2b = _0x20d3e3?.type || 'other',
+      _0x200809 = _resolveNodeStableThumbSrc(_0x20d3e3),
+      _0x2c0639 = String(_0x38ffe5.id || '').trim(),
+      _0x4cbad9 = Number(_0x38ffe5.createdAt || _0x43fc96) || _0x43fc96,
+      _0x136834 = Number(_0x38ffe5.updatedAt || _0x43fc96) || _0x43fc96;
+    return {
+      id: _0x2c0639 || generateId('asset'),
+      name: _0x391739,
+      category: _0x339456,
+      coverUrl: _0x200809,
+      coverType: _0x4ccd2b,
+      items: _0x59dc24.map((_0x49b88a) => _buildAssetItem(_0x49b88a)),
+      nodes: _0x59dc24,
+      edges: this._getSelectedAssetEdges(_0x2010aa),
+      createdAt: _0x4cbad9,
+      updatedAt: _0x136834,
+    };
+  }
+  ['_buildAssetAppendPayload'](_0x480639, _0x85a5a5, _0x573264 = {}) {
+    const _0xd3187e = this._getSelectedAssetNodes(_0x85a5a5),
+      _0x3b5cec = this._getSelectedAssetEdges(_0x85a5a5),
+      _0x2c8c9e = Date.now(),
+      _0x1eca6a = {},
+      _0x1491dc = _0xd3187e.map((_0xe1a177) => {
+        const _0x41bfbe = _clonePlain(_0xe1a177, { ..._0xe1a177 }),
+          _0x2ef80f = String(_0x41bfbe.id || ''),
+          _0x4e891c = generateId(_0x41bfbe.type);
+        if (_0x2ef80f) _0x1eca6a[_0x2ef80f] = _0x4e891c;
+        return ((_0x41bfbe.id = _0x4e891c), _0x41bfbe);
+      }),
+      _0x3f3cd8 = _0x3b5cec.map((_0x1e8274) => {
+        const _0x2651e0 = _clonePlain(_0x1e8274, { ..._0x1e8274 });
+        _0x2651e0.id = generateId('edge');
+        if (_0x1eca6a[_0x2651e0.sourceId]) _0x2651e0.sourceId = _0x1eca6a[_0x2651e0.sourceId];
+        if (_0x1eca6a[_0x2651e0.targetId]) _0x2651e0.targetId = _0x1eca6a[_0x2651e0.targetId];
+        return _0x2651e0;
+      }),
+      _0xf983b = Array.isArray(_0x480639?.nodes) ? _clonePlain(_0x480639.nodes, []) : [],
+      _0x535c65 = Array.isArray(_0x480639?.items)
+        ? _clonePlain(_0x480639.items, [])
+        : _0xf983b.map((_0x41f17f) => _buildAssetItem(_0x41f17f)),
+      _0x538207 = Array.isArray(_0x480639?.edges) ? _clonePlain(_0x480639.edges, []) : [],
+      _0x11bbfd = _0x1491dc[0] || null,
+      _0x4cfd2a = _0x11bbfd ? _resolveNodeStableThumbSrc(_0x11bbfd) : '',
+      _0x2458ad = _0x480639?.coverUrl || _0x4cfd2a,
+      _0x231cb4 = _0x480639?.coverType || _0x11bbfd?.type || 'other';
+    return {
+      ...(_0x480639 || {}),
+      id: _0x480639?.id,
+      name: String(_0x573264.name || '').trim() || assetManagerText('unnamedAsset'),
+      category: String(_0x573264.category || '').trim() || this.activeTab,
+      coverUrl: _0x2458ad,
+      coverType: _0x231cb4,
+      items: [..._0x535c65, ..._0x1491dc.map((_0x4412aa) => _buildAssetItem(_0x4412aa))],
+      nodes: [..._0xf983b, ..._0x1491dc],
+      edges: [..._0x538207, ..._0x3f3cd8],
+      createdAt: Number(_0x480639?.createdAt || _0x480639?.updatedAt || _0x2c8c9e) || _0x2c8c9e,
+      updatedAt: Number(_0x573264.updatedAt || _0x2c8c9e) || _0x2c8c9e,
+    };
+  }
+  ['_createDefaultPanelState'](_0x45e9ff, _0x4618c3) {
+    return {
+      selectedIds: [..._0x45e9ff],
+      mode: 'create',
+      selectedAssetId: '',
+      updateSearchKeyword: '',
+      updateConfirmOpen: false,
+      customCategoryEditing: false,
+      customCategoryDraft: '',
+      customCategories: [],
+      error: '',
+      saving: false,
+      savingAction: '',
+      draft: { name: assetManagerText('newAsset'), category: this.activeTab },
+      coverInfo: _0x4618c3 || { coverUrl: '', coverType: 'other', coverHtml: _renderAssetIcon('other') },
+    };
+  }
+  ['_setCreatePanelState'](_0x9f6d08 = {}) {
+    if (!this._createPanelState) return;
+    const _0x530ce4 = this._createPanelState,
+      _0x2694bc = _0x9f6d08.draft ? { ...(_0x530ce4.draft || {}), ..._0x9f6d08.draft } : _0x530ce4.draft;
+    this._createPanelState = { ..._0x530ce4, ..._0x9f6d08, draft: _0x2694bc };
+  }
+  ['_getUpdateListCategory']() {
+    const _0x38fecd = this._normalizeCategoryName(this._createPanelState?.draft?.category);
+    if (this._createPanelState?.mode === 'update' && _0x38fecd) return _0x38fecd;
+    return this._findCategoryByName(this.activeTab, this.tabs) || this.activeTab;
+  }
+  ['_getFilteredUpdateAssets'](_0x2a0ccf = '') {
+    const _0x4fba2a = String(_0x2a0ccf || '')
+        .trim()
+        .toLowerCase(),
+      _0xb61890 = this._categoryKey(this._getUpdateListCategory()),
+      _0x3009cf = this._getSortedAssets().filter(
+        (_0x1e8a94) => this._categoryKey(_0x1e8a94?.category) === _0xb61890,
+      );
+    if (!_0x4fba2a) return _0x3009cf;
+    return _0x3009cf.filter((_0x348a53) =>
+      String(_0x348a53?.name || '')
+        .toLowerCase()
+        .includes(_0x4fba2a),
+    );
+  }
+  ['_syncCreatePanelDraftFromTarget'](_0x33357f) {
+    this._setCreatePanelState({
+      draft: {
+        name: String(_0x33357f?.name || '').trim() || assetManagerText('unnamedAsset'),
+        category: String(_0x33357f?.category || '').trim() || this.activeTab,
+      },
+      selectedAssetId: String(_0x33357f?.id || ''),
+      updateConfirmOpen: false,
+      customCategoryEditing: false,
+      customCategoryDraft: '',
+      error: '',
+    });
+  }
+  ['_syncUpdateSelectionForCategory'](_0x4495df) {
+    if (this._createPanelState?.mode !== 'update') return;
+    const _0x456df1 = this._normalizeCategoryName(_0x4495df) || this.activeTab;
+    this._setCreatePanelState({
+      draft: { category: _0x456df1 },
+      selectedAssetId: '',
+      updateSearchKeyword: '',
+      updateConfirmOpen: false,
+      error: '',
+    });
+    const _0x189541 = this._getFilteredUpdateAssets()[0] || null;
+    if (!_0x189541) return;
+    this._setCreatePanelState({
+      draft: {
+        name: String(_0x189541?.name || '').trim() || assetManagerText('unnamedAsset'),
+        category: String(_0x189541?.category || '').trim() || _0x456df1,
+      },
+      selectedAssetId: String(_0x189541?.id || ''),
+    });
+  }
+  ['_renderCreatePanelContent']() {
+    const _0x439522 = this.createPanel,
+      _0x59add5 = this._createPanelState;
+    if (!_0x439522 || !_0x59add5) return;
+    const _0x397d2e =
+        _0x59add5.coverInfo?.coverHtml || _renderAssetIcon(_0x59add5.coverInfo?.coverType || 'other'),
+      _0x5deff9 =
+        _0x59add5.mode === 'update'
+          ? assetManagerText('createPanel.updateTitle')
+          : assetManagerText('createPanel.createTitle'),
+      _0x2d94d0 = Array.isArray(_0x59add5.selectedIds) ? _0x59add5.selectedIds.length : 0,
+      _0x2f0aa4 = _0x59add5.saving
+        ? _0x59add5.mode === 'update' && _0x59add5.savingAction === 'join'
+          ? assetManagerText('createPanel.overwrite')
+          : _0x59add5.mode === 'update'
+            ? assetManagerText('createPanel.saving')
+            : assetManagerText('createPanel.creating')
+        : _0x59add5.mode === 'update'
+          ? _0x59add5.updateConfirmOpen
+            ? assetManagerText('createPanel.confirmOverwrite')
+            : assetManagerText('createPanel.overwrite')
+          : assetManagerText('createPanel.create'),
+      _0x5bdd4f =
+        _0x59add5.saving && _0x59add5.savingAction === 'join'
+          ? assetManagerText('createPanel.joining')
+          : assetManagerText('createPanel.join'),
+      _0xec53f0 = this._getFilteredUpdateAssets(_0x59add5.updateSearchKeyword),
+      _0x540d50 =
+        _0xec53f0.find((_0x25b048) => String(_0x25b048?.id || '') === _0x59add5.selectedAssetId) || null,
+      _0x444a96 = this._getUpdateListCategory(),
+      _0x46a2a9 = _0x59add5.error
+        ? '<div class="v2-asset-create-error" role="alert">' + _escapeHtml(_0x59add5.error) + '</div>'
+        : '',
+      _0x3d6c8e =
+        _0x59add5.mode === 'update' && _0x59add5.updateConfirmOpen && _0x540d50
+          ? '<div class="v2-asset-create-confirm">' +
+            _escapeHtml(
+              assetManagerText('createPanel.confirmOverwriteAsset', {
+                name: _0x540d50.name || assetManagerText('unnamedAsset'),
+              }),
+            ) +
+            '</div>'
+          : '',
+      _0x28bcea =
+        _0x59add5.mode === 'update'
+          ? '\n          <div class="v2-asset-update-layout">\n            <div class="v2-asset-update-picker">\n              <input\n                type="search"\n                class="v2-asset-update-search"\n                id="asset-update-search"\n                placeholder="' +
+            _escapeHtml(
+              assetManagerText('createPanel.searchAssets', {
+                category: _formatAssetCategoryLabel(_0x444a96),
+              }),
+            ) +
+            '"\n                value="' +
+            _escapeHtml(_0x59add5.updateSearchKeyword || '') +
+            '"\n              />\n              <div class="v2-asset-update-list">\n                ' +
+            (_0xec53f0.length === 0
+              ? '<div class="v2-asset-update-empty">' +
+                (String(_0x59add5.updateSearchKeyword || '').trim()
+                  ? _escapeHtml(assetManagerText('createPanel.noMatchedAssets'))
+                  : _escapeHtml(
+                      assetManagerText('createPanel.noCategoryAssets', {
+                        category: _formatAssetCategoryLabel(_0x444a96),
+                      }),
+                    )) +
+                '</div>'
+              : _0xec53f0
+                  .map((_0x3ea43b) => {
+                    const _0x4035c6 =
+                        String(_0x3ea43b?.id || '') === _0x59add5.selectedAssetId ? ' active' : '',
+                      _0x40166d = _0x3ea43b?.coverUrl
+                        ? '<img src="' +
+                          _escapeHtml(_0x3ea43b.coverUrl) +
+                          '" alt="' +
+                          _escapeHtml(_0x3ea43b?.name || assetManagerText('assetAlt')) +
+                          '" draggable="false" />'
+                        : _renderAssetIcon(_0x3ea43b?.coverType || 'other');
+                    return (
+                      '\n                            <button\n                              type="button"\n                              class="v2-asset-update-item' +
+                      _0x4035c6 +
+                      '"\n                              data-asset-id="' +
+                      _escapeHtml(_0x3ea43b.id) +
+                      '"\n                            >\n                              <div class="v2-asset-update-thumb">' +
+                      _0x40166d +
+                      '</div>\n                              <div class="v2-asset-update-info">\n                                <span>' +
+                      _escapeHtml(_0x3ea43b.name || assetManagerText('unnamedAsset')) +
+                      '</span>\n                                <small>' +
+                      _formatAssetDateTime(_0x3ea43b.updatedAt || _0x3ea43b.createdAt) +
+                      '</small>\n                              </div>\n                            </button>\n                          '
+                    );
+                  })
+                  .join('')) +
+            '\n              </div>\n            </div>\n            <div class="v2-asset-update-editor">\n        '
+          : '',
+      _0x3fe105 = _0x59add5.mode === 'update' ? '</div></div>' : '',
+      _0x5611bb = _0x59add5.mode === 'update',
+      _0x68aa61 = _0x5611bb ? 'v2-asset-create-body v2-asset-create-body--update' : 'v2-asset-create-body',
+      _0x276e58 = _0x5611bb
+        ? ''
+        : '\n        <div class="v2-asset-create-source-panel">\n          <div class="v2-asset-create-source-header">\n            <div class="v2-asset-create-source-title">' +
+          assetManagerText('createPanel.currentSelection') +
+          '</div>\n            <div class="v2-asset-create-source-scope">' +
+          assetManagerText('createPanel.selectedNodes', { count: _0x2d94d0 }) +
+          '</div>\n          </div>\n          <div class="v2-asset-create-cover">\n            ' +
+          _0x397d2e +
+          '\n          </div>\n        </div>\n      ';
+    ((_0x439522.innerHTML =
+      '\n      <div class="v2-asset-create-header">\n        <div class="v2-asset-create-title">\n          <span class="v2-asset-create-header-text">' +
+      _0x5deff9 +
+      '</span>\n        </div>\n        <button type="button" class="v2-asset-create-close" data-ui-action="asset-create-close" aria-label="' +
+      _escapeHtml(assetManagerText('close')) +
+      '">×</button>\n      </div>\n      <div class="v2-asset-create-tabs">\n        <button\n          type="button"\n          class="v2-asset-create-tab' +
+      (_0x59add5.mode === 'create' ? ' active' : '') +
+      '"\n          data-mode="create"\n        >' +
+      assetManagerText('createPanel.createTab') +
+      '</button>\n        <button\n          type="button"\n          class="v2-asset-create-tab' +
+      (_0x59add5.mode === 'update' ? ' active' : '') +
+      '"\n          data-mode="update"\n        >' +
+      assetManagerText('createPanel.updateTab') +
+      '</button>\n      </div>\n      <div class="v2-asset-create-modal-body">\n        ' +
+      _0x28bcea +
+      '\n        <div class="' +
+      _0x68aa61 +
+      '">\n          ' +
+      _0x276e58 +
+      '\n          <div class="v2-asset-create-right">\n            <div class="v2-asset-create-field">\n              <div class="v2-asset-create-label">' +
+      assetManagerText('createPanel.assetName') +
+      '</div>\n              <input\n                type="text"\n                id="asset-create-name"\n                placeholder="' +
+      _escapeHtml(assetManagerText('createPanel.assetNamePlaceholder')) +
+      '"\n                value="' +
+      _escapeHtml(_0x59add5.draft?.name || '') +
+      '"\n              />\n            </div>\n            <div class="v2-asset-create-field">\n              <div class="v2-asset-create-label">' +
+      assetManagerText('createPanel.category') +
+      '</div>\n              <button type="button" class="v2-asset-create-select-trigger" id="asset-create-category-trigger">\n                <span id="asset-create-category-val">' +
+      _escapeHtml(_formatAssetCategoryLabel(_0x59add5.draft?.category || this.activeTab)) +
+      '</span>\n                <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">\n                  <path d="M1 1.5L6 6.5L11 1.5" stroke="var(--white-40)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n                </svg>\n              </button>\n            </div>\n            ' +
+      _0x46a2a9 +
+      '\n            ' +
+      _0x3d6c8e +
+      '\n          </div>\n        </div>\n        ' +
+      _0x3fe105 +
+      '\n      </div>\n      <div class="v2-asset-create-footer' +
+      (_0x5611bb ? ' v2-asset-create-footer--update' : '') +
+      '">\n        <button\n          type="button"\n          class="v2-asset-create-btn"\n          id="asset-create-submit"\n          ' +
+      (_0x59add5.saving ? 'disabled' : '') +
+      '\n        >' +
+      _0x2f0aa4 +
+      '</button>\n        ' +
+      (_0x5611bb
+        ? '<button\n                type="button"\n                class="v2-asset-create-btn v2-asset-create-btn--secondary"\n                id="asset-join-submit"\n                ' +
+          (_0x59add5.saving ? 'disabled' : '') +
+          '\n              >' +
+          _0x5bdd4f +
+          '</button>'
+        : '') +
+      '\n      </div>\n    '),
+      this._bindCreatePanelEvents());
+  }
+  ['_bindCreatePanelEvents']() {
+    const _0x35b712 = this.createPanel,
+      _0x12128b = this._createPanelState;
+    if (!_0x35b712 || !_0x12128b) return;
+    _0x35b712.querySelector("[data-ui-action='asset-create-close']")?.addEventListener('click', () => {
+      this.closeCreatePanel();
+    });
+    const _0x48c446 = _0x35b712.querySelector('#asset-create-category-trigger'),
+      _0x4ecd10 = _0x35b712.querySelector('#asset-create-category-val');
+    this._createPanelDropdownOutsideHandler &&
+      (document.removeEventListener('pointerdown', this._createPanelDropdownOutsideHandler),
+      (this._createPanelDropdownOutsideHandler = null));
+    this._createPanelDropdownEl &&
+      (this._createPanelDropdownEl.remove(), (this._createPanelDropdownEl = null));
+    if (_0x48c446 && _0x4ecd10) {
+      const _0x56be99 = document.createElement('div');
+      _0x56be99.className = 'v2-asset-select-dropdown';
+      const _0x5e9a48 = () => {
+          const _0x1ffe72 = this._createPanelState?.draft?.category || this.activeTab,
+            _0x263efa = this._getCreatePanelCategories()
+              .map((_0x225f05) => {
+                const _0x1806b1 =
+                    this._categoryKey(_0x225f05) === this._categoryKey(_0x1ffe72) ? ' selected' : '',
+                  _0x1cf72e = _escapeHtml(_0x225f05),
+                  _0x16191b = _escapeHtml(_formatAssetCategoryLabel(_0x225f05));
+                return (
+                  '<div class="v2-asset-select-item' +
+                  _0x1806b1 +
+                  '" data-val="' +
+                  _0x1cf72e +
+                  '">' +
+                  _0x16191b +
+                  '</div>'
+                );
+              })
+              .join(''),
+            _0x2334aa = this._canAddCustomCategory()
+              ? this._createPanelState?.customCategoryEditing
+                ? '<div class="v2-asset-select-custom-row">\n                <input\n                  type="text"\n                  class="v2-asset-select-custom-input"\n                  id="asset-category-custom-input"\n                  placeholder="' +
+                  _escapeHtml(assetManagerText('createPanel.categoryNamePlaceholder')) +
+                  '"\n                  value="' +
+                  _escapeHtml(this._createPanelState?.customCategoryDraft || '') +
+                  '"\n                />\n              </div>'
+                : '<div class="v2-asset-select-item v2-asset-select-item--custom" data-custom-category="1">' +
+                  assetManagerText('categories.custom') +
+                  '</div>'
+              : '';
+          _0x56be99.innerHTML = _0x263efa + _0x2334aa;
+        },
+        _0x138a38 = () => {
+          const _0x181092 = _0x56be99.querySelector('#asset-category-custom-input'),
+            _0x29332c = _0x181092?.value ?? this._createPanelState?.customCategoryDraft ?? '',
+            _0xc269a2 = this._normalizeCategoryName(_0x29332c);
+          if (!_0xc269a2) {
+            (this._setCreatePanelState({ customCategoryEditing: false, customCategoryDraft: '' }),
+              _0x5e9a48());
+            return;
+          }
+          const _0x972e73 = this._getCreatePanelCategories(),
+            _0x2ad351 = this._findCategoryByName(_0xc269a2, _0x972e73);
+          if (!_0x2ad351 && _0x972e73.length >= ASSET_CATEGORY_LIMIT) {
+            window.showToast?.(assetManagerText('categoryLimit', { limit: ASSET_CATEGORY_LIMIT }), 'warn');
+            return;
+          }
+          const _0x3a54dc = _0x2ad351 || this._addUserCategory(_0xc269a2);
+          if (!_0x3a54dc) return;
+          const _0xe5b3 = [...(this._createPanelState?.customCategories || [])];
+          !_0x2ad351 && !this._findCategoryByName(_0x3a54dc, _0xe5b3) && _0xe5b3.push(_0x3a54dc);
+          this._setCreatePanelState({
+            draft: { category: _0x3a54dc },
+            customCategoryEditing: false,
+            customCategoryDraft: '',
+            customCategories: _0xe5b3,
+            updateConfirmOpen: false,
+            error: '',
+          });
+          this._createPanelState?.mode === 'update' && this._syncUpdateSelectionForCategory(_0x3a54dc);
+          _0x4ecd10.textContent = _formatAssetCategoryLabel(_0x3a54dc);
+          if (this._createPanelState?.mode === 'update') {
+            (_0x216f59(), this._renderCreatePanelContent());
+            return;
+          }
+          _0x5e9a48();
+        };
+      (_0x5e9a48(), document.body.appendChild(_0x56be99), (this._createPanelDropdownEl = _0x56be99));
+      const _0x216f59 = () => {
+        (_0x56be99.classList.remove('show'), _0x48c446.classList.remove('active'));
+      };
+      (_0x48c446.addEventListener('click', (_0x16c0fd) => {
+        _0x16c0fd.stopPropagation();
+        if (_0x56be99.classList.contains('show')) {
+          _0x216f59();
+          return;
+        }
+        const _0x5c8370 = _0x48c446.getBoundingClientRect();
+        ((_0x56be99.style.left = _0x5c8370.left + 'px'),
+          (_0x56be99.style.top = _0x5c8370.bottom + 4 + 'px'),
+          (_0x56be99.style.width = _0x5c8370.width + 'px'),
+          _0x56be99.classList.add('show'),
+          _0x48c446.classList.add('active'));
+      }),
+        _0x56be99.addEventListener('click', (_0xad59e9) => {
+          const _0x2f9bce = _0xad59e9.target.closest("[data-custom-category='1']");
+          if (_0x2f9bce) {
+            (this._setCreatePanelState({ customCategoryEditing: true, customCategoryDraft: '', error: '' }),
+              _0x5e9a48(),
+              window.requestAnimationFrame(() => {
+                _0x56be99.querySelector('#asset-category-custom-input')?.focus();
+              }));
+            return;
+          }
+          const _0x23c1c2 = _0xad59e9.target.closest('.v2-asset-select-item[data-val]');
+          if (!_0x23c1c2) return;
+          const _0x296bd4 = this._normalizeCategoryName(_0x23c1c2.dataset.val) || this.activeTab;
+          (this._createPanelState?.mode === 'update'
+            ? (this._setCreatePanelState({ customCategoryEditing: false, customCategoryDraft: '' }),
+              this._syncUpdateSelectionForCategory(_0x296bd4))
+            : this._setCreatePanelState({
+                draft: { category: _0x296bd4 },
+                customCategoryEditing: false,
+                customCategoryDraft: '',
+                updateConfirmOpen: false,
+                error: '',
+              }),
+            _0x216f59(),
+            this._renderCreatePanelContent());
+        }),
+        _0x56be99.addEventListener('input', (_0x5d2d95) => {
+          if (!_0x5d2d95.target.matches('#asset-category-custom-input')) return;
+          this._setCreatePanelState({ customCategoryDraft: _0x5d2d95.target.value || '' });
+        }),
+        _0x56be99.addEventListener('keydown', (_0x14d486) => {
+          if (!_0x14d486.target.matches('#asset-category-custom-input')) return;
+          if (_0x14d486.key === 'Enter') {
+            (_0x14d486.preventDefault(), _0x138a38());
+            return;
+          }
+          _0x14d486.key === 'Escape' &&
+            (_0x14d486.preventDefault(),
+            this._setCreatePanelState({ customCategoryEditing: false, customCategoryDraft: '' }),
+            _0x5e9a48());
+        }),
+        _0x56be99.addEventListener('focusout', (_0x3b5137) => {
+          if (!_0x3b5137.target.matches('#asset-category-custom-input')) return;
+          _0x138a38();
+        }));
+      const _0x54b56f = (_0x44d569) => {
+        !_0x56be99.contains(_0x44d569.target) && !_0x48c446.contains(_0x44d569.target) && _0x216f59();
+      };
+      ((this._createPanelDropdownOutsideHandler = _0x54b56f),
+        document.addEventListener('pointerdown', _0x54b56f));
+    }
+    _0x35b712.querySelectorAll('.v2-asset-create-tab').forEach((_0x1fdf7e) => {
+      _0x1fdf7e.addEventListener('click', () => {
+        const _0x4c46af = _0x1fdf7e.dataset.mode === 'update' ? 'update' : 'create';
+        if (_0x4c46af === this._createPanelState?.mode) return;
+        this._setCreatePanelState({
+          mode: _0x4c46af,
+          updateConfirmOpen: false,
+          customCategoryEditing: false,
+          customCategoryDraft: '',
+          error: '',
+        });
+        if (_0x4c46af === 'update' && !this._createPanelState?.selectedAssetId) {
+          const _0x21b7b3 = this._getFilteredUpdateAssets()[0] || null;
+          _0x21b7b3 && this._syncCreatePanelDraftFromTarget(_0x21b7b3);
+        }
+        this._renderCreatePanelContent();
+      });
+    });
+    const _0x2dde57 = _0x35b712.querySelector('#asset-create-name');
+    _0x2dde57 &&
+      _0x2dde57.addEventListener('input', (_0x4d6238) => {
+        this._setCreatePanelState({
+          draft: { name: _0x4d6238.target.value || '' },
+          updateConfirmOpen: false,
+          error: '',
+        });
+      });
+    const _0x5b4246 = _0x35b712.querySelector('#asset-update-search');
+    _0x5b4246 &&
+      _0x5b4246.addEventListener('input', (_0x1aaf70) => {
+        (this._setCreatePanelState({
+          updateSearchKeyword: _0x1aaf70.target.value || '',
+          updateConfirmOpen: false,
+          error: '',
+        }),
+          this._renderCreatePanelContent());
+      });
+    _0x35b712.querySelectorAll('.v2-asset-update-item').forEach((_0x3d8be1) => {
+      _0x3d8be1.addEventListener('click', () => {
+        const _0x5e6e91 = String(_0x3d8be1.dataset.assetId || ''),
+          _0x272171 = this._getSortedAssets().find((_0x1d31e7) => String(_0x1d31e7?.id || '') === _0x5e6e91);
+        if (!_0x272171) return;
+        (this._syncCreatePanelDraftFromTarget(_0x272171), this._renderCreatePanelContent());
+      });
+    });
+    const _0x382b0e = _0x35b712.querySelector('#asset-create-submit');
+    _0x382b0e &&
+      _0x382b0e.addEventListener('click', () => {
+        this._submitCreatePanel();
+      });
+    const _0xecf11d = _0x35b712.querySelector('#asset-join-submit');
+    _0xecf11d &&
+      _0xecf11d.addEventListener('click', () => {
+        this._joinCreatePanelToAsset();
+      });
+  }
+  async ['_submitCreatePanel']() {
+    const _0x587e02 = this._createPanelState,
+      _0xef7db9 = this.createPanel;
+    if (!_0x587e02 || !_0xef7db9 || _0x587e02.saving) return;
+    const _0xa2a58b = Array.isArray(_0x587e02.selectedIds) ? _0x587e02.selectedIds : [],
+      _0x393ef4 = this._getSelectedAssetNodes(_0xa2a58b);
+    if (!_0x393ef4.length) {
+      (this._setCreatePanelState({ error: assetManagerText('errors.noSavableNodes') }),
+        this._renderCreatePanelContent());
+      return;
+    }
+    const _0x183f39 =
+        String(this._createPanelState?.draft?.name || '').trim() || assetManagerText('unnamedAsset'),
+      _0x3d4782 = String(this._createPanelState?.draft?.category || '').trim() || this.activeTab;
+    if (_0x587e02.mode === 'update') {
+      const _0x1b5f7a = this._getFilteredUpdateAssets().find(
+        (_0x1e799a) => String(_0x1e799a?.id || '') === String(_0x587e02.selectedAssetId || ''),
+      );
+      if (!_0x1b5f7a) {
+        (this._setCreatePanelState({ error: assetManagerText('errors.selectAssetToUpdate') }),
+          this._renderCreatePanelContent());
+        return;
+      }
+      if (!_0x587e02.updateConfirmOpen) {
+        (this._setCreatePanelState({ updateConfirmOpen: true, error: '' }), this._renderCreatePanelContent());
+        return;
+      }
+      const _0x4ecf8c = this._buildAssetPayloadFromSelection(_0xa2a58b, {
+        id: _0x1b5f7a.id,
+        name: _0x183f39,
+        category: _0x3d4782,
+        createdAt: _0x1b5f7a.createdAt || _0x1b5f7a.updatedAt || Date.now(),
+        updatedAt: Date.now(),
+      });
+      (this._setCreatePanelState({ saving: true, savingAction: 'overwrite', error: '' }),
+        this._renderCreatePanelContent());
+      try {
+        (await saveAssetToServer(_0x4ecf8c),
+          this._upsertLocalAsset(_0x4ecf8c),
+          this._scheduleVideoThumbJobs(),
+          (this._openAssetId =
+            String(_0x4ecf8c.id || '') === this._openAssetId ? _0x4ecf8c.id : this._openAssetId),
+          window.showToast?.(assetManagerText('toasts.assetUpdated'), 'success'),
+          this.closeCreatePanel(),
+          this.sidebarPanel?.classList.contains('show') && this.renderSidebarContent());
+      } catch (_0x23a32e) {
+        (this._setCreatePanelState({
+          saving: false,
+          savingAction: '',
+          error: assetManagerText('errors.assetUpdateFailed'),
+        }),
+          this._renderCreatePanelContent(),
+          console.error(_0x23a32e),
+          window.showToast?.(assetManagerText('errors.assetUpdateFailed'), 'error'));
+      }
+      return;
+    }
+    const _0x1c81e5 = this._buildAssetPayloadFromSelection(_0xa2a58b, {
+      name: _0x183f39,
+      category: _0x3d4782,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    (this._setCreatePanelState({ saving: true, savingAction: 'create', error: '' }),
+      this._renderCreatePanelContent());
+    try {
+      (await saveAssetToServer(_0x1c81e5),
+        this._upsertLocalAsset(_0x1c81e5),
+        this._scheduleVideoThumbJobs(),
+        window.showToast?.(assetManagerText('toasts.assetCreated'), 'success'),
+        this._playCreateAssetFly(_0xef7db9),
+        this.closeCreatePanel(),
+        this.sidebarPanel?.classList.contains('show') &&
+          ((this._newAssetPulseId = String(_0x1c81e5.id || '')), this.renderSidebarContent()));
+    } catch (_0x155824) {
+      (this._setCreatePanelState({
+        saving: false,
+        savingAction: '',
+        error: assetManagerText('errors.assetCreateFailed'),
+      }),
+        this._renderCreatePanelContent(),
+        console.error(_0x155824),
+        window.showToast?.(assetManagerText('errors.assetCreateFailed'), 'error'));
+    }
+  }
+  async ['_joinCreatePanelToAsset']() {
+    const _0xd752d8 = this._createPanelState,
+      _0x3e17ce = this.createPanel;
+    if (!_0xd752d8 || !_0x3e17ce || _0xd752d8.saving) return;
+    const _0xe38283 = Array.isArray(_0xd752d8.selectedIds) ? _0xd752d8.selectedIds : [],
+      _0x1e3b91 = this._getSelectedAssetNodes(_0xe38283);
+    if (!_0x1e3b91.length) {
+      (this._setCreatePanelState({ error: assetManagerText('errors.noJoinableNodes') }),
+        this._renderCreatePanelContent());
+      return;
+    }
+    const _0x1e52c6 = this._getFilteredUpdateAssets().find(
+      (_0x1e781a) => String(_0x1e781a?.id || '') === String(_0xd752d8.selectedAssetId || ''),
+    );
+    if (!_0x1e52c6) {
+      (this._setCreatePanelState({ error: assetManagerText('errors.selectAssetToJoin') }),
+        this._renderCreatePanelContent());
+      return;
+    }
+    const _0xb598e9 =
+        String(this._createPanelState?.draft?.name || '').trim() || assetManagerText('unnamedAsset'),
+      _0x5b208b = String(this._createPanelState?.draft?.category || '').trim() || this.activeTab,
+      _0x4b4996 = this._buildAssetAppendPayload(_0x1e52c6, _0xe38283, {
+        name: _0xb598e9,
+        category: _0x5b208b,
+        updatedAt: Date.now(),
+      });
+    (this._setCreatePanelState({ saving: true, savingAction: 'join', updateConfirmOpen: false, error: '' }),
+      this._renderCreatePanelContent());
+    try {
+      (await saveAssetToServer(_0x4b4996),
+        this._upsertLocalAsset(_0x4b4996),
+        this._scheduleVideoThumbJobs(),
+        (this._openAssetId =
+          String(_0x4b4996.id || '') === this._openAssetId ? _0x4b4996.id : this._openAssetId),
+        window.showToast?.(assetManagerText('toasts.assetJoined'), 'success'),
+        this.closeCreatePanel(),
+        this.sidebarPanel?.classList.contains('show') && this.renderSidebarContent());
+    } catch (_0x313be5) {
+      (this._setCreatePanelState({
+        saving: false,
+        savingAction: '',
+        error: assetManagerText('errors.assetJoinFailed'),
+      }),
+        this._renderCreatePanelContent(),
+        console.error(_0x313be5),
+        window.showToast?.(assetManagerText('errors.assetJoinFailed'), 'error'));
+    }
+  }
+  ['_getCanvasCenterWorld']() {
+    const { viewport: _0x4c05ac } = appStore.getState(),
+      _0x5a0ed6 = window.innerWidth / 2,
+      _0xf09185 = window.innerHeight / 2,
+      _0x4f1c5a = document.documentElement?.clientWidth || window.innerWidth || 0,
+      _0x8207d5 = document.documentElement?.clientHeight || window.innerHeight || 0;
+    if (!_0x4f1c5a || !_0x8207d5) return screenToWorld(_0x5a0ed6, _0xf09185, _0x4c05ac);
+    let _0x29d7d8 = 0,
+      _0x22e4cf = 0,
+      _0x46d1f4 = _0x4f1c5a,
+      _0x593c6e = _0x8207d5;
+    const _0x4aeaee = [],
+      _0x21c8f4 = document.querySelector('header');
+    if (_0x21c8f4) _0x4aeaee.push(_0x21c8f4);
+    const _0x1a0399 = document.querySelector('.sidebar-floating');
+    if (_0x1a0399) _0x4aeaee.push(_0x1a0399);
+    if (this.sidebarPanel?.classList?.contains('show')) _0x4aeaee.push(this.sidebarPanel);
+    const _0x3c4157 = 8;
+    for (const _0x1708f4 of _0x4aeaee) {
+      if (!_0x1708f4?.isConnected) continue;
+      const _0x586765 = _0x1708f4.getBoundingClientRect(),
+        _0x1f8aad = Math.max(_0x29d7d8, _0x586765.left),
+        _0x568195 = Math.max(_0x22e4cf, _0x586765.top),
+        _0x48f894 = Math.min(_0x46d1f4, _0x586765.right),
+        _0x497890 = Math.min(_0x593c6e, _0x586765.bottom);
+      if (_0x48f894 <= _0x1f8aad || _0x497890 <= _0x568195) continue;
+      if (_0x586765.left <= _0x29d7d8 + _0x3c4157 && _0x586765.right > _0x29d7d8 + _0x3c4157) {
+        _0x29d7d8 = Math.max(_0x29d7d8, _0x586765.right);
+        continue;
+      }
+      if (_0x586765.right >= _0x46d1f4 - _0x3c4157 && _0x586765.left < _0x46d1f4 - _0x3c4157) {
+        _0x46d1f4 = Math.min(_0x46d1f4, _0x586765.left);
+        continue;
+      }
+      if (_0x586765.top <= _0x22e4cf + _0x3c4157 && _0x586765.bottom > _0x22e4cf + _0x3c4157) {
+        _0x22e4cf = Math.max(_0x22e4cf, _0x586765.bottom);
+        continue;
+      }
+      if (_0x586765.bottom >= _0x593c6e - _0x3c4157 && _0x586765.top < _0x593c6e - _0x3c4157) {
+        _0x593c6e = Math.min(_0x593c6e, _0x586765.top);
+        continue;
+      }
+    }
+    const _0x5ac355 = _0x46d1f4 - _0x29d7d8,
+      _0x45083d = _0x593c6e - _0x22e4cf,
+      _0x2ab7a3 = _0x5ac355 > 40 ? _0x29d7d8 + _0x5ac355 / 2 : _0x5a0ed6,
+      _0x3e65ff = _0x45083d > 40 ? _0x22e4cf + _0x45083d / 2 : _0xf09185;
+    return screenToWorld(_0x2ab7a3, _0x3e65ff, _0x4c05ac);
+  }
+  ['_calcNodesBBox'](_0x244830) {
+    let _0x9ed139 = Infinity,
+      _0x1c13a6 = Infinity,
+      _0x1abb96 = -Infinity,
+      _0x3fdb1b = -Infinity;
+    for (const _0x470a1d of _0x244830 || []) {
+      if (!_0x470a1d) continue;
+      const _0x20bca8 = Number(_0x470a1d.x) || 0,
+        _0x3b6c14 = Number(_0x470a1d.y) || 0,
+        _0x4a86b7 = Number(_0x470a1d.width ?? _0x470a1d.w) || 100,
+        _0x400f1e = Number(_0x470a1d.height ?? _0x470a1d.h) || 100;
+      ((_0x9ed139 = Math.min(_0x9ed139, _0x20bca8)),
+        (_0x1c13a6 = Math.min(_0x1c13a6, _0x3b6c14)),
+        (_0x1abb96 = Math.max(_0x1abb96, _0x20bca8 + _0x4a86b7)),
+        (_0x3fdb1b = Math.max(_0x3fdb1b, _0x3b6c14 + _0x400f1e)));
+    }
+    if (!Number.isFinite(_0x9ed139) || !Number.isFinite(_0x1c13a6))
+      return { minX: 0, minY: 0, maxX: 0, maxY: 0, w: 0, h: 0, cx: 0, cy: 0 };
+    const _0x490479 = Math.max(0, _0x1abb96 - _0x9ed139),
+      _0x1dc7f5 = Math.max(0, _0x3fdb1b - _0x1c13a6);
+    return {
+      minX: _0x9ed139,
+      minY: _0x1c13a6,
+      maxX: _0x1abb96,
+      maxY: _0x3fdb1b,
+      w: _0x490479,
+      h: _0x1dc7f5,
+      cx: _0x9ed139 + _0x490479 / 2,
+      cy: _0x1c13a6 + _0x1dc7f5 / 2,
+    };
+  }
+  ['_preloadThumb'](_0x5aed0d) {
+    const _0x1386b7 = String(_0x5aed0d || '');
+    if (!_0x1386b7) return;
+    if (_0x1386b7.startsWith('data:')) return;
+    if (this._thumbPreloadSet.has(_0x1386b7)) return;
+    (this._thumbPreloadSet.add(_0x1386b7), this._ensureThumbDecoded(_0x1386b7));
+  }
+  ['_ensureThumbDecoded'](_0x3c2fa1) {
+    const _0x31a1f6 = String(_0x3c2fa1 || '');
+    if (!_0x31a1f6) return Promise.resolve(false);
+    if (_0x31a1f6.startsWith('data:')) return Promise.resolve(true);
+    const _0x238e40 = this._thumbDecodePromiseMap.get(_0x31a1f6);
+    if (_0x238e40) return _0x238e40;
+    const _0x2676b9 = preloadCanvasImage(_0x31a1f6, { priority: 20, fetchPriority: 'auto' }).then(
+      () => true,
+      () => false,
+    );
+    return (this._thumbDecodePromiseMap.set(_0x31a1f6, _0x2676b9), _0x2676b9);
+  }
+  ['_isVideoMediaSrc'](_0x460364) {
+    const _0x248f70 = String(_0x460364 || '').toLowerCase();
+    return (
+      _0x248f70.endsWith('.mp4') ||
+      _0x248f70.endsWith('.webm') ||
+      _0x248f70.endsWith('.mov') ||
+      _0x248f70.endsWith('.mkv') ||
+      _0x248f70.endsWith('.m4v')
+    );
+  }
+  async ['_captureVideoFirstFrameDataUrl'](_0x481384) {
+    const _0x5e2a82 = String(_0x481384 || '');
+    if (!_0x5e2a82) return '';
+    return await new Promise((_0x485fae) => {
+      const _0x63a578 = document.createElement('video');
+      ((_0x63a578.preload = 'auto'),
+        (_0x63a578.muted = true),
+        (_0x63a578.playsInline = true),
+        (_0x63a578.crossOrigin = 'anonymous'));
+      const _0x255fc1 = () => {
+          (_0x63a578.removeAttribute('src'), _0x63a578.load());
+        },
+        _0x132110 = () => {
+          (_0x255fc1(), _0x485fae(''));
+        },
+        _0x3cad86 = async () => {
+          try {
+            const _0x1cf013 = Number.isFinite(_0x63a578.duration) ? _0x63a578.duration : 0,
+              _0x3d2134 = _0x1cf013 > 0 ? Math.min(0.08, Math.max(0, _0x1cf013 - 0.08)) : 0,
+              _0x454740 = () => {
+                try {
+                  const _0x58f5ac = _0x63a578.videoWidth || 0,
+                    _0x13d33a = _0x63a578.videoHeight || 0;
+                  if (!_0x58f5ac || !_0x13d33a) return _0x132110();
+                  const _0x1ed68d = 0x140,
+                    _0x9bd9f2 = 0x140,
+                    _0x5d975e = Math.min(1, _0x1ed68d / _0x58f5ac, _0x9bd9f2 / _0x13d33a),
+                    _0x157b43 = Math.max(1, Math.round(_0x58f5ac * _0x5d975e)),
+                    _0x5d35a2 = Math.max(1, Math.round(_0x13d33a * _0x5d975e)),
+                    _0x3ccef5 = document.createElement('canvas');
+                  ((_0x3ccef5.width = _0x157b43), (_0x3ccef5.height = _0x5d35a2));
+                  const _0x2d81c9 = _0x3ccef5.getContext('2d');
+                  _0x2d81c9.drawImage(_0x63a578, 0, 0, _0x157b43, _0x5d35a2);
+                  const _0x462e82 = _0x3ccef5.toDataURL('image/jpeg', 0.82);
+                  (_0x255fc1(), _0x485fae(_0x462e82));
+                } catch (_0x307f58) {
+                  _0x132110();
+                } finally {
+                  _0x63a578.removeEventListener('seeked', _0x454740);
+                }
+              };
+            (_0x63a578.addEventListener('seeked', _0x454740, { once: true }),
+              (_0x63a578.currentTime = _0x3d2134));
+          } catch (_0x3de478) {
+            _0x132110();
+          }
+        };
+      (_0x63a578.addEventListener('error', _0x132110, { once: true }),
+        _0x63a578.addEventListener('loadeddata', _0x3cad86, { once: true }),
+        attachMediaElementPlaybackSource(_0x63a578, _0x5e2a82, { preload: 'auto' }).catch(() => {
+          if (!String(_0x63a578.getAttribute('src') || _0x63a578.src || '').trim()) {
+            _0x63a578.src = _0x5e2a82;
+            try {
+              _0x63a578.load?.();
+            } catch {}
+          }
+        }));
+    });
+  }
+  ['_scheduleVideoThumbJobs']() {
+    if (this._videoThumbTimer) return;
+    this._videoThumbTimer = window.setTimeout(() => {
+      ((this._videoThumbTimer = 0), this._runVideoThumbJobs());
+    }, 0);
+  }
+  ['_scheduleSidebarRender']() {
+    if (!this.sidebarPanel?.classList.contains('show')) return;
+    if (this._renamingAssetId) return;
+    if (this._sidebarRenderRaf) return;
+    this._sidebarRenderRaf = window.requestAnimationFrame(() => {
+      this._sidebarRenderRaf = 0;
+      if (!this.sidebarPanel?.classList.contains('show')) return;
+      if (this._renamingAssetId) return;
+      this.renderSidebarContent();
+    });
+  }
+  ['_beginRenameAsset'](_0x144035) {
+    const _0xf7efdf = String(_0x144035 || '');
+    if (!_0xf7efdf) return;
+    if (this._pendingDeleteAssetId) this._pendingDeleteAssetId = '';
+    ((this._renamingAssetId = _0xf7efdf), this.renderSidebarContent());
+  }
+  ['_cancelRenameAsset']() {
+    if (!this._renamingAssetId) return;
+    ((this._renamingAssetId = ''), this.renderSidebarContent());
+  }
+  async ['_commitRenameAsset'](_0x251222, _0x33f8a0) {
+    const _0x214c6e = String(_0x251222 || ''),
+      _0x7b1f92 = String(_0x33f8a0 || '').trim();
+    if (!_0x214c6e) return;
+    if (!_0x7b1f92) {
+      window.showToast?.(assetManagerText('errors.nameRequired'), 'error');
+      return;
+    }
+    const _0x48ca3d = (this.assets || []).find((_0x433456) => String(_0x433456?.id || '') === _0x214c6e);
+    if (!_0x48ca3d) return;
+    const _0x49ee62 = String(_0x48ca3d?.name || ''),
+      _0x36fd81 = _0x48ca3d?.updatedAt;
+    if (_0x49ee62 === _0x7b1f92) {
+      ((this._renamingAssetId = ''), this.renderSidebarContent());
+      return;
+    }
+    ((_0x48ca3d.name = _0x7b1f92), (_0x48ca3d.updatedAt = Date.now()));
+    try {
+      (await saveAssetToServer(_0x48ca3d),
+        this._upsertLocalAsset(_0x48ca3d),
+        window.showToast?.(assetManagerText('toasts.renamed'), 'success'));
+    } catch (_0x5a62c9) {
+      ((_0x48ca3d.name = _0x49ee62),
+        (_0x48ca3d.updatedAt = _0x36fd81),
+        window.showToast?.(assetManagerText('errors.renameFailed'), 'error'));
+    } finally {
+      ((this._renamingAssetId = ''), this.renderSidebarContent());
+    }
+  }
+  async ['_runVideoThumbJobs']() {
+    let _0x4503f0 = 2;
+    for (const _0x3edacb of this.assets || []) {
+      if (_0x4503f0 <= 0) break;
+      const _0x48722b = String(_0x3edacb?.id || '').trim();
+      if (!_0x48722b) continue;
+      const _0x1fd73b = Array.isArray(_0x3edacb?.items) ? _0x3edacb.items : [];
+      for (let _0x566220 = 0; _0x566220 < _0x1fd73b.length; _0x566220++) {
+        if (_0x4503f0 <= 0) break;
+        const _0x3fcaec = _0x1fd73b[_0x566220],
+          _0x4d4ba7 = _normalizeAssetType(_0x3fcaec?.type);
+        if (_0x4d4ba7 !== 'video') continue;
+        const _0xcb40b1 = String(_0x3fcaec?.thumbSrc || '');
+        if (_0xcb40b1 && !this._isVideoMediaSrc(_0xcb40b1)) continue;
+        const _0x31190a = _0x48722b + ':' + _0x566220;
+        if (this._videoThumbInFlight.has(_0x31190a)) continue;
+        (this._videoThumbInFlight.add(_0x31190a), (_0x4503f0 -= 1));
+        const _0x1c0487 = _0xcb40b1 || _resolveNodeStableThumbSrc(_0x3fcaec?.nodeData);
+        this._captureVideoFirstFrameDataUrl(_0x1c0487)
+          .then(async (_0x4ef4ad) => {
+            if (!String(_0x4ef4ad || '').startsWith('data:image/')) return;
+            const _0x3b941e = await saveAssetThumbToServer({
+                assetId: _0x48722b,
+                key: String(_0x566220),
+                dataUrl: _0x4ef4ad,
+              }),
+              _0x68fb8b = String(_0x3b941e?.url || '');
+            if (!_0x68fb8b) return;
+            _0x3fcaec.thumbSrc = _0x68fb8b;
+            if (!_0x3edacb.coverUrl && _0x566220 === 0) _0x3edacb.coverUrl = _0x68fb8b;
+            (await saveAssetToServer(_0x3edacb),
+              upsertAssetMentionAsset(_0x3edacb),
+              this.sidebarPanel?.classList.contains('show') && this._scheduleSidebarRender());
+          })
+          .catch(() => {})
+          .finally(() => {
+            this._videoThumbInFlight.delete(_0x31190a);
+          });
+      }
+    }
+  }
+  async ['loadAssetsFromServer']() {
+    try {
+      const _0x464b70 = await fetchAssetsFromServer();
+      ((this.assets = _sortAssetsByUpdatedTime(
+        (Array.isArray(_0x464b70) ? _0x464b70 : [])
+          .map((_0x26d5c2) => this._normalizeAssetEntity(_0x26d5c2))
+          .filter(Boolean),
+      )),
+        this._syncTabsFromAssets(),
+        this._renderSidebarTabs(),
+        this.assets.forEach((_0x45a1b8) => {
+          !_0x45a1b8.coverUrl &&
+            _0x45a1b8.nodes &&
+            _0x45a1b8.nodes[0] &&
+            (_0x45a1b8.coverUrl = _resolveNodeStableThumbSrc(_0x45a1b8.nodes[0]));
+          if (Array.isArray(_0x45a1b8.items))
+            _0x45a1b8.items.forEach((_0x5408e3) => {
+              !_0x5408e3.thumbSrc &&
+                _0x5408e3.nodeData &&
+                (_0x5408e3.thumbSrc = _resolveNodeStableThumbSrc(_0x5408e3.nodeData));
+            });
+          else
+            Array.isArray(_0x45a1b8.nodes) &&
+              (_0x45a1b8.items = _0x45a1b8.nodes.map((_0x3c6ddd) => _buildAssetItem(_0x3c6ddd)));
+        }),
+        setAssetMentionAssets(this._getMentionEligibleAssets()));
+      let _0x49140b = 0;
+      for (const _0x111f53 of this.assets) {
+        if (_0x49140b >= 32) break;
+        _0x111f53?.coverUrl && (this._preloadThumb(_0x111f53.coverUrl), (_0x49140b += 1));
+        const _0x32d106 = Array.isArray(_0x111f53?.items) ? _0x111f53.items : [];
+        for (const _0x266b58 of _0x32d106) {
+          if (_0x49140b >= 32) break;
+          _0x266b58?.thumbSrc && (this._preloadThumb(_0x266b58.thumbSrc), (_0x49140b += 1));
+        }
+      }
+      (this._scheduleVideoThumbJobs(),
+        this.sidebarPanel && this.sidebarPanel.classList.contains('show') && this.renderSidebarContent());
+    } catch (_0x35d395) {
+      console.error('加载全局资产失败', _0x35d395);
+    }
+  }
+  async ['showCreatePanel'](_0x342ca2, _0x1ae58f, _0x1235c2 = {}) {
+    if (!_0x342ca2 || _0x342ca2.length === 0) return;
+    (void _0x1ae58f, void _0x1235c2, this.closeCreatePanel());
+    const _0x126549 = document.createElement('div');
+    _0x126549.className = 'v2-asset-create-backdrop show';
+    const _0x378271 = document.createElement('div');
+    ((_0x378271.className = 'v2-asset-create-panel'),
+      _0x378271.setAttribute('role', 'dialog'),
+      _0x378271.setAttribute('aria-modal', 'true'),
+      _0x378271.setAttribute('aria-label', assetManagerText('title')));
+    const _0x1e32e4 = appStore.getState(),
+      _0x29f5bc = _0x1e32e4.nodes[_0x342ca2[0]];
+    (_0x126549.appendChild(_0x378271),
+      document.body.appendChild(_0x126549),
+      (this.createPanelBackdrop = _0x126549),
+      (this.createPanel = _0x378271));
+    const _0x20a37f = await this._resolveCreatePanelCover(_0x29f5bc);
+    if (!this.createPanel || this.createPanel !== _0x378271) {
+      String(this._createPanelCoverObjectUrl || '').startsWith('blob:') &&
+        URL.revokeObjectURL(this._createPanelCoverObjectUrl);
+      this._createPanelCoverObjectUrl = '';
+      return;
+    }
+    ((this._createPanelState = this._createDefaultPanelState(_0x342ca2, _0x20a37f)),
+      this._renderCreatePanelContent(),
+      _0x126549.addEventListener('pointerdown', (_0x1818b6) => {
+        if (_0x1818b6.target === _0x126549) this.closeCreatePanel();
+      }),
+      (this._createPanelKeydownHandler = (_0x5e3a36) => {
+        if (_0x5e3a36.key !== 'Escape') return;
+        if (this._createPanelDropdownEl?.contains(_0x5e3a36.target)) return;
+        this.closeCreatePanel();
+      }),
+      document.addEventListener('keydown', this._createPanelKeydownHandler));
+  }
+  ['_playCreateAssetFly'](_0x146c8b) {
+    const _0x33f3d4 = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    if (_0x33f3d4) return;
+    const _0x8fd558 = _0x146c8b && _0x146c8b.isConnected ? _0x146c8b : this.createPanel;
+    if (!_0x8fd558?.isConnected) return;
+    const _0x4c60c6 = _0x8fd558.querySelector('.v2-asset-create-cover'),
+      _0x3602b6 = _0x4c60c6?.firstElementChild;
+    if (!_0x3602b6) return;
+    const _0x24247e = _0x3602b6.getBoundingClientRect();
+    if (!_0x24247e.width || !_0x24247e.height) return;
+    const _0x7d6506 = document.getElementById('btnAssets'),
+      _0x215bc0 = _0x7d6506?.getBoundingClientRect?.();
+    if (!_0x215bc0) return;
+    const _0x2c7f6f = document.createElement('div');
+    ((_0x2c7f6f.className = 'v2-asset-create-fly'),
+      (_0x2c7f6f.style.left = _0x24247e.left + 'px'),
+      (_0x2c7f6f.style.top = _0x24247e.top + 'px'),
+      (_0x2c7f6f.style.width = _0x24247e.width + 'px'),
+      (_0x2c7f6f.style.height = _0x24247e.height + 'px'));
+    const _0x40d5d0 = _0x3602b6.cloneNode(true);
+    if (_0x40d5d0?.id) _0x40d5d0.removeAttribute('id');
+    (_0x2c7f6f.appendChild(_0x40d5d0), document.body.appendChild(_0x2c7f6f));
+    const _0x3e1a40 = _0x24247e.left + _0x24247e.width / 2,
+      _0x41e94f = _0x24247e.top + _0x24247e.height / 2,
+      _0xccf294 = _0x215bc0.left + _0x215bc0.width / 2,
+      _0x19d253 = _0x215bc0.top + _0x215bc0.height / 2,
+      _0x21b414 = _0xccf294 - _0x3e1a40,
+      _0x32e45e = _0x19d253 - _0x41e94f,
+      _0x179875 = 0.12,
+      _0x599e86 = _0x2c7f6f.animate(
+        [
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          {
+            transform: 'translate(' + _0x21b414 + 'px,' + _0x32e45e + 'px) scale(' + _0x179875 + ')',
+            opacity: 0.2,
+          },
+        ],
+        { duration: 0x208, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
+      );
+    _0x599e86.onfinish = () => {
+      (_0x2c7f6f.remove(),
+        _0x7d6506?.animate &&
+          _0x7d6506.animate(
+            [
+              { transform: 'scale(1)', filter: 'brightness(1)' },
+              { transform: 'scale(1.08)', filter: 'brightness(1.2)' },
+              { transform: 'scale(1)', filter: 'brightness(1)' },
+            ],
+            { duration: 0x104, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
+          ));
+    };
+  }
+  ['closeCreatePanel']() {
+    (this._createPanelDropdownOutsideHandler &&
+      (document.removeEventListener('pointerdown', this._createPanelDropdownOutsideHandler),
+      (this._createPanelDropdownOutsideHandler = null)),
+      this._createPanelDropdownEl &&
+        (this._createPanelDropdownEl.remove(), (this._createPanelDropdownEl = null)),
+      this._createPanelKeydownHandler &&
+        (document.removeEventListener('keydown', this._createPanelKeydownHandler),
+        (this._createPanelKeydownHandler = null)),
+      this._createPanelCoverObjectUrl &&
+        (String(this._createPanelCoverObjectUrl).startsWith('blob:') &&
+          URL.revokeObjectURL(this._createPanelCoverObjectUrl),
+        (this._createPanelCoverObjectUrl = '')),
+      this.createPanel && (this.createPanel.remove(), (this.createPanel = null)),
+      this.createPanelBackdrop && (this.createPanelBackdrop.remove(), (this.createPanelBackdrop = null)),
+      (this._createPanelState = null));
+  }
+  ['initSidebarPanel']() {
+    ((this.sidebarPanel = document.createElement('div')),
+      (this.sidebarPanel.className = 'v2-asset-sidebar-panel'),
+      (this.sidebarPanel.innerHTML =
+        '\n      <div class="v2-asset-sidebar-header">\n        <button type="button" class="v2-asset-back" data-ui-action="asset-back" aria-label="' +
+        _escapeHtml(assetManagerText('back')) +
+        '">‹</button>\n        <div class="v2-asset-sidebar-title" id="asset-sidebar-title">\n          <span class="v2-asset-sidebar-title-text" id="asset-sidebar-title-text">' +
+        assetManagerText('title') +
+        '</span>\n        </div>\n      </div>\n      <div class="v2-asset-sidebar-tabs-shell" id="asset-sidebar-tabs-shell">\n        <button\n          type="button"\n          class="v2-asset-sidebar-tabs-nav v2-asset-sidebar-tabs-nav--prev"\n          data-ui-action="asset-tabs-scroll-prev"\n          aria-label="' +
+        _escapeHtml(assetManagerText('tabsPrevAria')) +
+        '"\n          hidden\n        >‹</button>\n        <div class="v2-asset-sidebar-tabs" id="asset-sidebar-tabs">\n          ' +
+        this._renderSidebarTabsHtml() +
+        '\n        </div>\n        <button\n          type="button"\n          class="v2-asset-sidebar-tabs-nav v2-asset-sidebar-tabs-nav--next"\n          data-ui-action="asset-tabs-scroll-next"\n          aria-label="' +
+        _escapeHtml(assetManagerText('tabsNextAria')) +
+        '"\n          hidden\n        >›</button>\n      </div>\n      <div class="v2-asset-sidebar-content" id="asset-sidebar-content"></div>\n    '));
+    const _0x1acabe = document.querySelector('.sidebar-floating');
+    _0x1acabe ? _0x1acabe.appendChild(this.sidebarPanel) : document.body.appendChild(this.sidebarPanel);
+    const _0x183fc2 = this.sidebarPanel.querySelector('#asset-sidebar-tabs');
+    (_0x183fc2.addEventListener('click', (_0x3f3d3a) => {
+      if (_0x3f3d3a.target.closest("[data-ui-action='asset-category-delete']")) return;
+      const _0x3e278c = _0x3f3d3a.target.closest('.v2-asset-sidebar-tab');
+      _0x3e278c &&
+        ((this._renamingAssetId = ''),
+        (this._pendingDeleteAssetId = ''),
+        (this.activeTab = _0x3e278c.dataset.cat),
+        (this._openAssetId = null),
+        _0x183fc2
+          .querySelectorAll('.v2-asset-sidebar-tab')
+          .forEach((_0x26bcb3) => _0x26bcb3.classList.remove('active')),
+        _0x3e278c.classList.add('active'),
+        this.renderSidebarContent());
+    }),
+      _0x183fc2.addEventListener('scroll', () => this._updateSidebarTabsOverflowHint(), { passive: true }),
+      this.sidebarPanel.addEventListener('click', (_0x2919a5) => {
+        const _0x837586 = _0x2919a5.target.closest('[data-ui-action]'),
+          _0x5b6083 = _0x837586?.dataset?.uiAction || '';
+        if (_0x5b6083 === 'asset-tabs-scroll-prev') {
+          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation(), this._scrollSidebarTabs(-1));
+          return;
+        }
+        if (_0x5b6083 === 'asset-tabs-scroll-next') {
+          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation(), this._scrollSidebarTabs(1));
+          return;
+        }
+        if (_0x5b6083 === 'asset-category-delete') {
+          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation());
+          const _0x52d561 = _0x837586?.dataset?.cat;
+          if (_0x52d561) void this._deleteUserCategory(_0x52d561);
+          return;
+        }
+        if (_0x5b6083 === 'asset-back') {
+          ((this._renamingAssetId = ''),
+            (this._pendingDeleteAssetId = ''),
+            (this._openAssetId = null),
+            this.renderSidebarContent());
+          return;
+        }
+        if (_0x5b6083 === 'asset-delete-open') {
+          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation(), (this._renamingAssetId = ''));
+          const _0x50b551 = _0x837586?.dataset?.assetId;
+          if (!_0x50b551) return;
+          ((this._pendingDeleteAssetId = _0x50b551), this.renderSidebarContent());
+          return;
+        }
+        if (_0x5b6083 === 'asset-delete-cancel') {
+          (_0x2919a5.preventDefault(),
+            _0x2919a5.stopPropagation(),
+            (this._pendingDeleteAssetId = ''),
+            this.renderSidebarContent());
+          return;
+        }
+        if (_0x5b6083 === 'asset-delete-confirm') {
+          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation());
+          const _0x26834b = _0x837586?.dataset?.assetId;
+          if (!_0x26834b) return;
+          ((this._pendingDeleteAssetId = ''), this._deleteAsset(_0x26834b));
+          return;
+        }
+        if (_0x5b6083 === 'asset-add-all') {
+          (_0x2919a5.preventDefault(),
+            _0x2919a5.stopPropagation(),
+            (this._renamingAssetId = ''),
+            (this._pendingDeleteAssetId = ''));
+          const _0x4a105b = _0x837586?.dataset?.assetId;
+          if (_0x4a105b) this.restoreAssetToCanvas(_0x4a105b);
+          return;
+        }
+        const _0x46c996 = _0x2919a5.target.closest('.v2-asset-subitem');
+        if (_0x46c996) {
+          const _0x55d74d = _0x46c996.dataset.assetId,
+            _0x812042 = Number(_0x46c996.dataset.idx);
+          if (_0x55d74d && Number.isFinite(_0x812042)) this._restoreAssetSubItem(_0x55d74d, _0x812042);
+          return;
+        }
+        const _0x273d5a = _0x2919a5.target.closest('.v2-asset-item');
+        _0x273d5a &&
+          _0x273d5a.dataset?.id &&
+          ((this._renamingAssetId = ''),
+          (this._pendingDeleteAssetId = ''),
+          (this._openAssetId = _0x273d5a.dataset.id),
+          this.renderSidebarContent());
+      }));
+    const _0x1cd4b8 = document.getElementById('btnAssets');
+    if (_0x1cd4b8) {
+      let _0x3cb123 = false;
+      const _0x2b9ddb = () => {
+        (!this.sidebarPanel.classList.contains('show') && this.showSidebarPanel(),
+          !_0x3cb123 &&
+            ((_0x3cb123 = true),
+            this.loadAssetsFromServer().finally(() => {
+              _0x3cb123 = false;
+            })));
+      };
+      registerSidebarSubmenu({
+        key: 'assets',
+        button: _0x1cd4b8,
+        panel: this.sidebarPanel,
+        open: _0x2b9ddb,
+        close: () => this.hideSidebarPanel(),
+        isOpen: () => this.sidebarPanel.classList.contains('show'),
+      });
+    }
+  }
+  ['showSidebarPanel']() {
+    (this.renderSidebarContent(), this.sidebarPanel.classList.add('show'));
+  }
+  ['hideSidebarPanel']() {
+    (this.sidebarPanel.classList.remove('show'),
+      document.getElementById('btnAssets')?.classList.remove('active'));
+  }
+  ['_getVisibleAssetCardsInList']() {
+    const _0x312254 = this.sidebarPanel?.querySelector('#asset-sidebar-content > .v2-asset-view-list');
+    if (!_0x312254) return { listView: null, cards: [] };
+    const _0x8eff01 = Array.from(_0x312254.querySelectorAll(':scope > .v2-asset-item')).filter(
+      (_0x18a75c) => _0x18a75c.style.display !== 'none',
+    );
+    return { listView: _0x312254, cards: _0x8eff01 };
+  }
+  ['_captureRectsById'](_0x38a036) {
+    const _0x52b523 = new Map();
+    for (const _0x411d63 of _0x38a036) {
+      const _0x21c490 = String(_0x411d63.dataset?.id || '');
+      if (!_0x21c490) continue;
+      _0x52b523.set(_0x21c490, _0x411d63.getBoundingClientRect());
+    }
+    return _0x52b523;
+  }
+  ['_playFlip'](_0x498563, _0x2d524d) {
+    if (!_0x498563 || !_0x2d524d?.size) return;
+    const _0x26e1da = Array.from(_0x498563.querySelectorAll(':scope > .v2-asset-item')).filter(
+        (_0x2b1a95) => _0x2b1a95.style.display !== 'none',
+      ),
+      _0x5b0c96 = new Map();
+    for (const _0x12a82f of _0x26e1da) {
+      const _0x1c8809 = String(_0x12a82f.dataset?.id || '');
+      if (!_0x1c8809) continue;
+      _0x5b0c96.set(_0x1c8809, _0x12a82f.getBoundingClientRect());
+    }
+    for (const _0x1f0547 of _0x26e1da) {
+      const _0x5d6803 = String(_0x1f0547.dataset?.id || '');
+      if (!_0x5d6803) continue;
+      const _0x1dd597 = _0x2d524d.get(_0x5d6803),
+        _0x29ae7d = _0x5b0c96.get(_0x5d6803);
+      if (!_0x1dd597 || !_0x29ae7d) continue;
+      const _0x2221f9 = _0x1dd597.left - _0x29ae7d.left,
+        _0x4d15c5 = _0x1dd597.top - _0x29ae7d.top;
+      if (!_0x2221f9 && !_0x4d15c5) continue;
+      _0x1f0547.animate(
+        [
+          { transform: 'translate(' + _0x2221f9 + 'px, ' + _0x4d15c5 + 'px)' },
+          { transform: 'translate(0, 0)' },
+        ],
+        { duration: 220, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
+      );
+    }
+  }
+  ['_playDeleteShake'](_0x4b5e94) {
+    if (!_0x4b5e94) return;
+    (_0x4b5e94.classList.remove('is-delete-shaking'),
+      void _0x4b5e94.offsetWidth,
+      _0x4b5e94.classList.add('is-delete-shaking'),
+      window.setTimeout(() => {
+        if (_0x4b5e94.isConnected) _0x4b5e94.classList.remove('is-delete-shaking');
+      }, 240));
+  }
+  async ['_deleteAsset'](_0x1d8d6e) {
+    const _0xba435d = String(_0x1d8d6e || '');
+    if (!_0xba435d) return;
+    const { listView: _0x58e672, cards: _0x42f908 } = this._getVisibleAssetCardsInList(),
+      _0x2806c1 = this._captureRectsById(_0x42f908);
+    try {
+      await deleteAssetFromServer(_0xba435d);
+    } catch (_0x126e76) {
+      window.showToast?.(assetManagerText('deleteFailed'), 'error');
+      return;
+    }
+    ((this.assets = (this.assets || []).filter((_0x4a86be) => String(_0x4a86be?.id || '') !== _0xba435d)),
+      this._syncTabsFromAssets(),
+      this._renderSidebarTabs(),
+      removeAssetMentionAsset(_0xba435d));
+    if (this._openAssetId === _0xba435d) this._openAssetId = null;
+    const _0x1320bf = this._assetCardPool?.get?.(_0xba435d);
+    if (_0x1320bf?.isConnected) _0x1320bf.remove();
+    (this._assetCardPool?.delete?.(_0xba435d),
+      this.renderSidebarContent(),
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          const { listView: _0x3c0177 } = this._getVisibleAssetCardsInList();
+          this._playFlip(_0x3c0177, _0x2806c1);
+        });
+      }));
+  }
+  async ['_deleteUserCategory'](_0x3339ae) {
+    const _0x2bed5d = this._normalizeCategoryName(_0x3339ae);
+    if (!_0x2bed5d || !this._isUserCategory(_0x2bed5d)) return;
+    const _0x2aeaca = this._getSortedAssets().some(
+      (_0xd1d955) => this._categoryKey(_0xd1d955?.category) === this._categoryKey(_0x2bed5d),
+    );
+    if (_0x2aeaca) {
+      window.showToast?.(assetManagerText('categoryHasAssets'), 'warn');
+      return;
+    }
+    const _0x214ec4 = [...this.userCategories];
+    this.userCategories = _0x214ec4.filter(
+      (_0x2aa5c2) => this._categoryKey(_0x2aa5c2) !== this._categoryKey(_0x2bed5d),
+    );
+    this._categoryKey(this.activeTab) === this._categoryKey(_0x2bed5d) &&
+      ((this.activeTab = DEFAULT_ASSET_CATEGORIES[0]), (this._openAssetId = null));
+    (this._syncTabsFromAssets(), this._renderSidebarTabs(), this.renderSidebarContent());
+    try {
+      (await this._saveUserCategories(), window.showToast?.(assetManagerText('categoryDeleted'), 'success'));
+    } catch (_0x3a1d37) {
+      ((this.userCategories = _0x214ec4),
+        this._syncTabsFromAssets(),
+        this._renderSidebarTabs(),
+        this.renderSidebarContent(),
+        console.error(_0x3a1d37),
+        window.showToast?.(assetManagerText('categoryDeleteFailed'), 'error'));
+    }
+  }
+  ['_setThumbContent'](_0x797c42, _0x862772, _0x78f2c) {
+    if (!_0x797c42) return;
+    const _0x4a83f3 = String(_0x862772 || ''),
+      _0x4ba1d3 = _normalizeAssetType(_0x78f2c);
+    if (_0x4a83f3 && !(_0x4ba1d3 === 'video' && this._isVideoMediaSrc(_0x4a83f3))) {
+      const _0x4c1b8d = _0x797c42.dataset.thumbSrc || '';
+      if (_0x797c42.dataset.thumbKind === 'img' && _0x4c1b8d === _0x4a83f3) return;
+      if (_0x797c42.dataset.pendingSrc === _0x4a83f3) return;
+      _0x797c42.childElementCount === 0 &&
+        _0x797c42.dataset.thumbKind !== 'img' &&
+        ((_0x797c42.dataset.thumbKind = 'icon'),
+        (_0x797c42.dataset.thumbType = String(_0x78f2c || 'other')),
+        (_0x797c42.dataset.thumbSrc = ''),
+        (_0x797c42.innerHTML = _renderAssetIcon(_0x78f2c)));
+      ((_0x797c42.dataset.pendingSrc = _0x4a83f3),
+        this._ensureThumbDecoded(_0x4a83f3).then((_0x31748c) => {
+          if (!_0x31748c) {
+            if (_0x797c42.dataset.pendingSrc === _0x4a83f3) _0x797c42.dataset.pendingSrc = '';
+            return;
+          }
+          if (!_0x797c42.isConnected) return;
+          if (_0x797c42.dataset.pendingSrc !== _0x4a83f3) return;
+          _0x797c42.dataset.pendingSrc = '';
+          let _0x47e7e8 = _0x797c42.querySelector(':scope > img');
+          !_0x47e7e8
+            ? ((_0x47e7e8 = document.createElement('img')),
+              (_0x47e7e8.alt = assetManagerText('thumbnailAlt')),
+              (_0x47e7e8.draggable = false),
+              (_0x47e7e8.decoding = 'async'),
+              (_0x47e7e8.loading = 'eager'),
+              (_0x47e7e8.className = 'v2-asset-thumb-img'))
+            : _0x47e7e8.classList.add('v2-asset-thumb-img');
+          if (_0x47e7e8.getAttribute('src') !== _0x4a83f3) _0x47e7e8.setAttribute('src', _0x4a83f3);
+          ((_0x797c42.dataset.thumbKind = 'img'),
+            (_0x797c42.dataset.thumbSrc = _0x4a83f3),
+            (_0x797c42.firstElementChild !== _0x47e7e8 || _0x797c42.childElementCount !== 1) &&
+              _0x797c42.replaceChildren(_0x47e7e8));
+        }));
+      return;
+    }
+    const _0x34c42a = String(_0x78f2c || 'other');
+    if (_0x797c42.dataset.thumbKind === 'icon' && _0x797c42.dataset.thumbType === _0x34c42a) return;
+    ((_0x797c42.dataset.thumbKind = 'icon'),
+      (_0x797c42.dataset.thumbType = _0x34c42a),
+      (_0x797c42.dataset.thumbSrc = ''),
+      (_0x797c42.dataset.pendingSrc = ''),
+      (_0x797c42.innerHTML = _renderAssetIcon(_0x34c42a)));
+  }
+  ['renderSidebarContent']() {
+    const _0x31ce06 = this.sidebarPanel?.querySelector('#asset-sidebar-content');
+    if (!_0x31ce06) return;
+    const _0x44e62c = this.sidebarPanel.querySelector('#asset-sidebar-title-text'),
+      _0x26d245 = this.sidebarPanel.querySelector('.v2-asset-back');
+    this._renderSidebarTabs();
+    const _0x520aa9 = () => {
+        let _0x5448d6 = _0x31ce06.querySelector(':scope > .v2-asset-view-list');
+        !_0x5448d6 &&
+          ((_0x5448d6 = document.createElement('div')),
+          (_0x5448d6.className = 'v2-asset-view-list'),
+          _0x31ce06.appendChild(_0x5448d6));
+        let _0x37d17e = _0x31ce06.querySelector(':scope > .v2-asset-view-detail');
+        return (
+          !_0x37d17e &&
+            ((_0x37d17e = document.createElement('div')),
+            (_0x37d17e.className = 'v2-asset-view-detail'),
+            _0x31ce06.appendChild(_0x37d17e)),
+          _0x31ce06
+            .querySelectorAll(':scope > .v2-asset-item, :scope > .v2-asset-empty')
+            .forEach((_0x812138) => _0x5448d6.appendChild(_0x812138)),
+          _0x31ce06
+            .querySelectorAll(':scope > .v2-asset-detail-actions, :scope > .v2-asset-subgrid')
+            .forEach((_0x4b967d) => _0x37d17e.appendChild(_0x4b967d)),
+          { listView: _0x5448d6, detailView: _0x37d17e }
+        );
+      },
+      { listView: _0x58c425, detailView: _0x5a5ec9 } = _0x520aa9(),
+      _0x438d98 = (_0x2efd17, _0x270fc3, _0x5e55f4) => this._setThumbContent(_0x2efd17, _0x270fc3, _0x5e55f4),
+      _0x53b169 = (_0x3b192e) => {
+        let _0x94ea55 = _0x3b192e.querySelector(':scope > .v2-asset-cover-grid');
+        if (!_0x94ea55) {
+          ((_0x94ea55 = document.createElement('div')), (_0x94ea55.className = 'v2-asset-cover-grid'));
+          for (let _0x3a3b27 = 0; _0x3a3b27 < 4; _0x3a3b27++) {
+            const _0x9883c0 = document.createElement('div');
+            ((_0x9883c0.className = 'v2-asset-cover-cell'), _0x94ea55.appendChild(_0x9883c0));
+          }
+          _0x3b192e.replaceChildren(_0x94ea55);
+        } else {
+          const _0x2c30cf = _0x94ea55.querySelectorAll(':scope > .v2-asset-cover-cell');
+          for (let _0x5a7ca5 = _0x2c30cf.length; _0x5a7ca5 < 4; _0x5a7ca5++) {
+            const _0x14f48b = document.createElement('div');
+            ((_0x14f48b.className = 'v2-asset-cover-cell'), _0x94ea55.appendChild(_0x14f48b));
+          }
+        }
+        return _0x94ea55;
+      },
+      _0x117776 = (_0x238478, _0x2ce531) => {
+        let _0x155cb7 = _0x238478.querySelector(':scope > .v2-asset-item-load'),
+          _0x4fc64d = _0x238478.querySelector(':scope > .v2-asset-item-delete'),
+          _0x28bde7 = _0x238478.querySelector(':scope > .v2-asset-item-delete-confirm'),
+          _0x373710 = _0x238478.querySelector(':scope > .v2-asset-item-cover'),
+          _0x558e15 = _0x238478.querySelector(':scope > .v2-asset-item-name');
+        !_0x155cb7 &&
+          ((_0x155cb7 = document.createElement('button')),
+          (_0x155cb7.type = 'button'),
+          (_0x155cb7.className = 'v2-asset-item-load'),
+          (_0x155cb7.dataset.uiAction = 'asset-add-all'),
+          (_0x155cb7.title = assetManagerText('loadToCanvas')),
+          _0x155cb7.setAttribute('aria-label', assetManagerText('loadToCanvas')),
+          (_0x155cb7.innerHTML =
+            '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 5.5a7.5 7.5 0 1 0-1 13.5"/><path d="M12 14h6v6"/><path d="m18 14-6 6"/></svg>'),
+          _0x238478.appendChild(_0x155cb7));
+        !_0x4fc64d &&
+          ((_0x4fc64d = document.createElement('button')),
+          (_0x4fc64d.type = 'button'),
+          (_0x4fc64d.className = 'v2-asset-item-delete'),
+          (_0x4fc64d.dataset.uiAction = 'asset-delete-open'),
+          _0x4fc64d.setAttribute('aria-label', assetManagerText('deleteAsset')),
+          (_0x4fc64d.innerHTML =
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 3h6l1 2h5v2H3V5h5l1-2zm1 6h2v10h-2V9zm4 0h2v10h-2V9zM7 9h2v10H7V9z"/></svg>'),
+          _0x238478.appendChild(_0x4fc64d));
+        if (!_0x28bde7) {
+          ((_0x28bde7 = document.createElement('div')),
+            (_0x28bde7.className = 'v2-asset-item-delete-confirm'),
+            (_0x28bde7.hidden = true),
+            _0x28bde7.addEventListener('click', (_0x41553b) => {
+              if (_0x41553b.target !== _0x28bde7) return;
+              (_0x41553b.stopPropagation(), (this._pendingDeleteAssetId = ''), this.renderSidebarContent());
+            }));
+          const _0xf072b7 = document.createElement('button');
+          ((_0xf072b7.type = 'button'),
+            (_0xf072b7.className =
+              'v2-asset-item-delete-confirm-btn v2-asset-item-delete-confirm-btn--danger'),
+            (_0xf072b7.dataset.uiAction = 'asset-delete-confirm'),
+            (_0xf072b7.textContent = '✔'),
+            _0xf072b7.setAttribute('aria-label', assetManagerText('confirm')));
+          const _0x560fe6 = document.createElement('button');
+          ((_0x560fe6.type = 'button'),
+            (_0x560fe6.className =
+              'v2-asset-item-delete-confirm-btn v2-asset-item-delete-confirm-btn--neutral'),
+            (_0x560fe6.dataset.uiAction = 'asset-delete-cancel'),
+            (_0x560fe6.textContent = '×'),
+            _0x560fe6.setAttribute('aria-label', assetManagerText('cancel')),
+            _0x28bde7.appendChild(_0xf072b7),
+            _0x28bde7.appendChild(_0x560fe6),
+            _0x238478.appendChild(_0x28bde7));
+        }
+        const _0x31351f = String(_0x2ce531?.id || '');
+        ((_0x155cb7.dataset.assetId = _0x31351f),
+          (_0x155cb7.disabled = !Array.isArray(_0x2ce531?.nodes) || _0x2ce531.nodes.length === 0),
+          (_0x4fc64d.dataset.assetId = _0x31351f),
+          _0x28bde7.querySelectorAll(':scope > button').forEach((_0x374cf5) => {
+            _0x374cf5.dataset.assetId = _0x31351f;
+          }));
+        const _0x3ac0d6 = this._pendingDeleteAssetId === _0x31351f;
+        ((_0x4fc64d.hidden = _0x3ac0d6), (_0x28bde7.hidden = !_0x3ac0d6));
+        !_0x373710 &&
+          ((_0x373710 = document.createElement('div')),
+          (_0x373710.className = 'v2-asset-item-cover'),
+          _0x238478.appendChild(_0x373710));
+        !_0x558e15 &&
+          ((_0x558e15 = document.createElement('div')),
+          (_0x558e15.className = 'v2-asset-item-name'),
+          _0x558e15.addEventListener('click', (_0x2fcc3b) => {
+            _0x2fcc3b.stopPropagation();
+            const _0x5480e5 = _0x2fcc3b.currentTarget?.closest?.('.v2-asset-item'),
+              _0x144238 = _0x5480e5?.dataset?.id || '';
+            this._beginRenameAsset(_0x144238);
+          }),
+          _0x238478.appendChild(_0x558e15));
+        const _0x4c935d = String(_0x2ce531?.name || '');
+        if (this._renamingAssetId === _0x31351f) {
+          _0x558e15.classList.add('is-editing');
+          let _0x30f35e = _0x558e15.querySelector(':scope > input.v2-asset-item-name-input');
+          !_0x30f35e &&
+            ((_0x30f35e = document.createElement('input')),
+            (_0x30f35e.type = 'text'),
+            (_0x30f35e.className = 'v2-asset-item-name-input'),
+            _0x30f35e.addEventListener('click', (_0x3d39ce) => _0x3d39ce.stopPropagation()),
+            _0x30f35e.addEventListener('keydown', (_0x17724c) => {
+              if (_0x17724c.key === 'Enter') {
+                (_0x17724c.preventDefault(),
+                  _0x17724c.stopPropagation(),
+                  (_0x30f35e.dataset.submitted = '1'),
+                  this._commitRenameAsset(_0x31351f, _0x30f35e.value));
+                return;
+              }
+              _0x17724c.key === 'Escape' &&
+                (_0x17724c.preventDefault(), _0x17724c.stopPropagation(), this._cancelRenameAsset());
+            }),
+            _0x30f35e.addEventListener('blur', () => {
+              if (_0x30f35e.dataset.submitted === '1') return;
+              this._commitRenameAsset(_0x31351f, _0x30f35e.value);
+            }),
+            _0x558e15.replaceChildren(_0x30f35e));
+          if (_0x30f35e.value !== _0x4c935d) _0x30f35e.value = _0x4c935d;
+          if (_0x30f35e.getAttribute('aria-label') !== assetManagerText('createPanel.assetName'))
+            _0x30f35e.setAttribute('aria-label', assetManagerText('createPanel.assetName'));
+          window.requestAnimationFrame(() => {
+            if (!_0x30f35e.isConnected) return;
+            try {
+              (_0x30f35e.focus(), _0x30f35e.select?.());
+            } catch (_0x5a7682) {}
+          });
+        } else {
+          if (_0x558e15.classList.contains('is-editing')) _0x558e15.classList.remove('is-editing');
+          const _0x1fda48 = _0x558e15.querySelector(':scope > input.v2-asset-item-name-input');
+          if (_0x1fda48) _0x558e15.replaceChildren();
+          if (_0x558e15.textContent !== _0x4c935d) _0x558e15.textContent = _0x4c935d;
+          if (_0x558e15.getAttribute('title') !== _0x4c935d) _0x558e15.setAttribute('title', _0x4c935d);
+        }
+        const _0x14f876 = Array.isArray(_0x2ce531?.items)
+          ? _0x2ce531.items
+          : Array.isArray(_0x2ce531?.nodes)
+            ? _0x2ce531.nodes.map((_0x831417) => _buildAssetItem(_0x831417))
+            : [];
+        if (_0x14f876.length > 0) {
+          const _0x57769c = _0x53b169(_0x373710),
+            _0x261887 = _0x57769c.querySelectorAll(':scope > .v2-asset-cover-cell');
+          for (let _0x3ae982 = 0; _0x3ae982 < 4; _0x3ae982++) {
+            const _0x35e985 = _0x14f876[_0x3ae982];
+            if (!_0x35e985) {
+              const _0x5ef89d = _0x261887[_0x3ae982];
+              _0x5ef89d &&
+                ((_0x5ef89d.dataset.thumbKind = 'empty'),
+                (_0x5ef89d.dataset.thumbType = ''),
+                (_0x5ef89d.dataset.thumbSrc = ''),
+                (_0x5ef89d.dataset.pendingSrc = ''),
+                _0x5ef89d.replaceChildren());
+              continue;
+            }
+            _0x438d98(_0x261887[_0x3ae982], _0x35e985.thumbSrc, _0x35e985.type);
+          }
+          return;
+        }
+        _0x2ce531?.coverUrl
+          ? _0x438d98(_0x373710, _0x2ce531.coverUrl, _0x2ce531.coverType)
+          : _0x438d98(_0x373710, '', _0x2ce531?.coverType || 'other');
+      },
+      _0x57590b = this._getSortedAssets().filter(
+        (_0x5b3a4d) => this._categoryKey(_0x5b3a4d?.category) === this._categoryKey(this.activeTab),
+      );
+    if (this._openAssetId) {
+      const _0x3bdfdc = _0x57590b.find((_0x3a209) => _0x3a209.id === this._openAssetId);
+      if (!_0x3bdfdc) {
+        ((this._openAssetId = null), this.renderSidebarContent());
+        return;
+      }
+      if (_0x44e62c) _0x44e62c.textContent = _0x3bdfdc.name || assetManagerText('title');
+      if (_0x26d245) _0x26d245.classList.add('show');
+      (this.sidebarPanel.classList.add('is-detail-view'),
+        (_0x58c425.style.display = 'none'),
+        (_0x5a5ec9.style.display = ''));
+      const _0x23e35b = Array.isArray(_0x3bdfdc?.items)
+        ? _0x3bdfdc.items
+        : Array.isArray(_0x3bdfdc?.nodes)
+          ? _0x3bdfdc.nodes.map((_0x486d01) => _buildAssetItem(_0x486d01))
+          : [];
+      _0x5a5ec9.replaceChildren();
+      const _0xcd7008 = document.createElement('div');
+      _0xcd7008.className = 'v2-asset-detail';
+      const _0x25140a = document.createElement('div');
+      ((_0x25140a.className = 'v2-asset-detail-cover'), _0xcd7008.appendChild(_0x25140a));
+      if (_0x23e35b.length > 0) {
+        const _0x111a76 = _0x53b169(_0x25140a),
+          _0x42881d = _0x111a76.querySelectorAll(':scope > .v2-asset-cover-cell');
+        for (let _0x1d3dec = 0; _0x1d3dec < 4; _0x1d3dec++) {
+          const _0x330428 = _0x23e35b[_0x1d3dec];
+          if (_0x330428) _0x438d98(_0x42881d[_0x1d3dec], _0x330428.thumbSrc, _0x330428.type);
+          else _0x42881d[_0x1d3dec] && _0x42881d[_0x1d3dec].replaceChildren();
+        }
+      } else _0x438d98(_0x25140a, _0x3bdfdc?.coverUrl, _0x3bdfdc?.coverType || 'other');
+      const _0x51b12d = document.createElement('div');
+      ((_0x51b12d.className = 'v2-asset-detail-title'),
+        (_0x51b12d.textContent = _0x3bdfdc.name || assetManagerText('unnamedAsset')),
+        _0xcd7008.appendChild(_0x51b12d));
+      const _0x4e76bf = document.createElement('div');
+      _0x4e76bf.className = 'v2-asset-detail-meta';
+      const _0x267f85 = Array.isArray(_0x3bdfdc?.nodes) ? _0x3bdfdc.nodes.length : _0x23e35b.length;
+      ((_0x4e76bf.textContent = assetManagerText('detail.meta', {
+        category: _0x3bdfdc.category
+          ? _formatAssetCategoryLabel(_0x3bdfdc.category)
+          : assetManagerText('uncategorized'),
+        count: _0x267f85,
+        time: _formatAssetDateTime(_0x3bdfdc.updatedAt || _0x3bdfdc.createdAt),
+      })),
+        _0xcd7008.appendChild(_0x4e76bf));
+      const _0x5bc227 = document.createElement('section');
+      _0x5bc227.className = 'v2-asset-detail-section';
+      const _0x25d6b9 = document.createElement('div');
+      ((_0x25d6b9.className = 'v2-asset-detail-section-title'),
+        (_0x25d6b9.textContent = assetManagerText('detail.content')),
+        _0x5bc227.appendChild(_0x25d6b9));
+      const _0x1c109f = document.createElement('div');
+      _0x1c109f.className = 'v2-asset-subgrid';
+      if (_0x23e35b.length === 0) {
+        const _0x3e1b3d = document.createElement('div');
+        ((_0x3e1b3d.className = 'v2-asset-empty'),
+          (_0x3e1b3d.textContent = assetManagerText('detail.empty')),
+          _0x1c109f.appendChild(_0x3e1b3d));
+      } else
+        for (let _0x2a19f3 = 0; _0x2a19f3 < _0x23e35b.length; _0x2a19f3++) {
+          const _0x1fcd78 = _0x23e35b[_0x2a19f3],
+            _0x3cc406 = document.createElement('button');
+          ((_0x3cc406.type = 'button'),
+            (_0x3cc406.className = 'v2-asset-subitem'),
+            (_0x3cc406.dataset.assetId = _0x3bdfdc.id),
+            (_0x3cc406.dataset.idx = String(_0x2a19f3)));
+          const _0x635957 = document.createElement('div');
+          ((_0x635957.className = 'v2-asset-subitem-thumb'),
+            _0x438d98(_0x635957, _0x1fcd78?.thumbSrc, _0x1fcd78?.type));
+          const _0x32baa6 = document.createElement('div');
+          _0x32baa6.className = 'v2-asset-subitem-info';
+          const _0x28da0a = document.createElement('span');
+          ((_0x28da0a.className = 'v2-asset-subitem-type'),
+            (_0x28da0a.textContent = _formatAssetTypeLabel(_0x1fcd78?.type)));
+          const _0x32d3bb = document.createElement('div');
+          _0x32d3bb.className = 'v2-asset-subitem-name';
+          const _0x58c091 = String(
+            _0x1fcd78?.name ||
+              _0x1fcd78?.type ||
+              assetManagerText('detail.childAssetName', { index: _0x2a19f3 + 1 }),
+          );
+          ((_0x32d3bb.textContent = _0x58c091), (_0x32d3bb.title = _0x58c091));
+          const _0x3782b8 = document.createElement('div');
+          ((_0x3782b8.className = 'v2-asset-subitem-summary'),
+            (_0x3782b8.textContent = assetManagerText('detail.clickToAdd')),
+            _0x32baa6.append(_0x28da0a, _0x32d3bb, _0x3782b8),
+            _0x3cc406.append(_0x635957, _0x32baa6),
+            _0x1c109f.appendChild(_0x3cc406));
+        }
+      (_0x5bc227.appendChild(_0x1c109f), _0xcd7008.appendChild(_0x5bc227));
+      const _0x263fe9 = document.createElement('div');
+      _0x263fe9.className = 'v2-asset-detail-actions';
+      const _0x194b60 = document.createElement('button');
+      ((_0x194b60.type = 'button'),
+        (_0x194b60.className = 'v2-asset-detail-btn'),
+        (_0x194b60.dataset.uiAction = 'asset-add-all'),
+        (_0x194b60.dataset.assetId = _0x3bdfdc.id),
+        (_0x194b60.textContent = assetManagerText('loadToCanvas')),
+        _0x263fe9.appendChild(_0x194b60),
+        _0xcd7008.appendChild(_0x263fe9),
+        _0x5a5ec9.appendChild(_0xcd7008));
+      return;
+    }
+    if (_0x44e62c) _0x44e62c.textContent = assetManagerText('title');
+    if (_0x26d245) _0x26d245.classList.remove('show');
+    (this.sidebarPanel.classList.remove('is-detail-view'),
+      (_0x58c425.style.display = ''),
+      (_0x5a5ec9.style.display = 'none'),
+      _0x5a5ec9.replaceChildren());
+    let _0xd1c7cd = _0x58c425.querySelector(':scope > .v2-asset-empty');
+    !_0xd1c7cd &&
+      ((_0xd1c7cd = document.createElement('div')),
+      (_0xd1c7cd.className = 'v2-asset-empty'),
+      _0x58c425.appendChild(_0xd1c7cd));
+    const _0x6dce59 = this._getSortedAssets();
+    let _0x22558a = 0,
+      _0x2f2a3e = 0;
+    for (const _0x1a51b4 of _0x6dce59) {
+      const _0x43b454 = String(_0x1a51b4?.id || '');
+      if (!_0x43b454) continue;
+      let _0x4b492b = this._assetCardPool?.get?.(_0x43b454);
+      if (!_0x4b492b) {
+        ((_0x4b492b = document.createElement('div')),
+          (_0x4b492b.className = 'v2-asset-item'),
+          (_0x4b492b.dataset.id = _0x43b454));
+        if (!this._assetCardPool) this._assetCardPool = new Map();
+        this._assetCardPool.set(_0x43b454, _0x4b492b);
+      }
+      if (_0x4b492b.parentElement !== _0x58c425) _0x58c425.appendChild(_0x4b492b);
+      const _0x5b6d9c = this._categoryKey(_0x1a51b4?.category) === this._categoryKey(this.activeTab);
+      ((_0x4b492b.style.display = _0x5b6d9c ? '' : 'none'),
+        _0x5b6d9c &&
+          ((_0x4b492b.style.order = String(_0x2f2a3e++)),
+          _0x117776(_0x4b492b, _0x1a51b4),
+          this._newAssetPulseId &&
+            this._newAssetPulseId === _0x43b454 &&
+            ((this._newAssetPulseId = ''),
+            window.requestAnimationFrame(() => {
+              if (!_0x4b492b.isConnected) return;
+              _0x4b492b.classList.add('is-new');
+              const _0x5872cd = window.setTimeout(() => {
+                if (_0x4b492b.isConnected) _0x4b492b.classList.remove('is-new');
+              }, 0x28a);
+              _0x4b492b.dataset._pulseTimer = String(_0x5872cd);
+            })),
+          (_0x22558a += 1)));
+    }
+    ((_0xd1c7cd.style.display = _0x22558a === 0 ? '' : 'none'),
+      _0x22558a === 0 &&
+        ((_0xd1c7cd.textContent = assetManagerText('emptyCategory', {
+          category: _formatAssetCategoryLabel(this.activeTab),
+        })),
+        (_0xd1c7cd.style.order = '0')));
+  }
+  ['_restoreAssetSubItem'](_0x40fb7c, _0x26d6ef) {
+    const _0x984169 = (this.assets || []).find((_0x33215d) => _0x33215d.id === _0x40fb7c);
+    if (!_0x984169 || !Array.isArray(_0x984169.nodes)) return;
+    const _0x4385cf = _0x984169.nodes[_0x26d6ef];
+    if (!_0x4385cf) return;
+    const _0x3c8683 = this._getCanvasCenterWorld(),
+      _0x4e2325 = Number(_0x4385cf.width ?? _0x4385cf.w) || 240,
+      _0x9a6659 = Number(_0x4385cf.height ?? _0x4385cf.h) || 240,
+      _0x5a4431 = _0x3c8683.x - _0x4e2325 / 2,
+      _0x2daac8 = _0x3c8683.y - _0x9a6659 / 2,
+      _0x4f1325 = findAvailablePosition(
+        appStore.getState().nodes,
+        _0x5a4431,
+        _0x2daac8,
+        _0x4e2325,
+        _0x9a6659,
+        24,
+        'right',
+      );
+    (appStore.batch(() => {
+      const _0x499696 = JSON.parse(JSON.stringify(_0x4385cf));
+      ((_0x499696.id = generateId(_0x499696.type)),
+        (_0x499696.x = _0x4f1325.x),
+        (_0x499696.y = _0x4f1325.y),
+        appStore.addNode(_0x499696),
+        appStore.setSelectedNodes([_0x499696.id]));
+    }),
+      window.showToast?.(assetManagerText('toasts.subAssetAdded'), 'success'));
+  }
+  ['restoreAssetToCanvas'](_0x22ccdb) {
+    const _0x1dc858 = (this.assets || []).find((_0x561d49) => _0x561d49.id === _0x22ccdb);
+    if (!_0x1dc858 || !_0x1dc858.nodes) return;
+    const _0x284920 = shouldTopAlignRestoredAsset(_0x1dc858.nodes, _0x1dc858.edges)
+        ? createTopAlignedAssetNodes(_0x1dc858.nodes, 24)
+        : _0x1dc858.nodes,
+      _0x11f110 = this._getCanvasCenterWorld(),
+      _0x5c2764 = this._calcNodesBBox(_0x284920),
+      _0x7d8e81 = _0x11f110.x - _0x5c2764.cx,
+      _0xdb03ff = _0x11f110.y - _0x5c2764.cy,
+      _0x5f09a1 = _0x5c2764.minX + _0x7d8e81,
+      _0x2a0429 = _0x5c2764.minY + _0xdb03ff,
+      _0x5dcc8f = findAvailablePosition(
+        appStore.getState().nodes,
+        _0x5f09a1,
+        _0x2a0429,
+        Math.max(1, _0x5c2764.w),
+        Math.max(1, _0x5c2764.h),
+        24,
+        'right',
+      ),
+      _0xfcd317 = _0x7d8e81 + (_0x5dcc8f.x - _0x5f09a1),
+      _0x56c946 = _0xdb03ff + (_0x5dcc8f.y - _0x2a0429);
+    (appStore.batch(() => {
+      const _0x238c09 = {};
+      (_0x284920.forEach((_0x9228dc) => {
+        const _0x5e1612 = JSON.parse(JSON.stringify(_0x9228dc)),
+          _0x40a906 = _0x5e1612.id,
+          _0x26a465 = generateId(_0x5e1612.type);
+        ((_0x238c09[_0x40a906] = _0x26a465),
+          (_0x5e1612.id = _0x26a465),
+          (_0x5e1612.x = (Number(_0x5e1612.x) || 0) + _0xfcd317),
+          (_0x5e1612.y = (Number(_0x5e1612.y) || 0) + _0x56c946),
+          appStore.addNode(_0x5e1612));
+      }),
+        _0x1dc858.edges &&
+          _0x1dc858.edges.forEach((_0x1bd6d8) => {
+            const _0x439ff7 = JSON.parse(JSON.stringify(_0x1bd6d8));
+            _0x439ff7.id = generateId('edge');
+            if (_0x238c09[_0x439ff7.sourceId]) _0x439ff7.sourceId = _0x238c09[_0x439ff7.sourceId];
+            if (_0x238c09[_0x439ff7.targetId]) _0x439ff7.targetId = _0x238c09[_0x439ff7.targetId];
+            appStore.addEdge(_0x439ff7);
+          }),
+        appStore.setSelectedNodes(Object.values(_0x238c09)));
+    }),
+      window.showToast?.(assetManagerText('toasts.assetAdded'), 'success'));
+  }
+}
+export const assetManager = new AssetManager();

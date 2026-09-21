@@ -1,1 +1,21 @@
-const a265_0x55165a=a265_0x2b2c;function a265_0x333d(){const _0x21a694=['toolbar.switchEnvironment','1529589sbefya','<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2216\x22\x20height=\x2216\x22><path\x20d=\x22M21\x2012.8A9\x209\x200\x201\x201\x2011.2\x203\x207\x207\x200\x200\x200\x2021\x2012.8Z\x22/><path\x20d=\x22M12\x202v2M12\x2020v2M4.9\x204.9l1.4\x201.4M17.7\x2017.7l1.4\x201.4\x22/></svg>','77nFAuQz','v2-panorama-scene-corner-toolbar','693521dySNia','259ikEWnq','2386760RCiNVf','5PvmwLz','environment-toggle','2uauUva','toolbar.switchToNight','7631955txGfJV','panoramaSceneNode.','44964WokFfv','environment','3823424RmQUgP','5909728PmjKBX'];a265_0x333d=function(){return _0x21a694;};return a265_0x333d();}(function(_0x6b82bb,_0x30628d){const _0x28d6e4=a265_0x2b2c,_0x34bdb6=_0x6b82bb();while(!![]){try{const _0x4f9eab=parseInt(_0x28d6e4(0x1c0))/0x1+parseInt(_0x28d6e4(0x1c5))/0x2*(parseInt(_0x28d6e4(0x1ce))/0x3)+-parseInt(_0x28d6e4(0x1cb))/0x4*(-parseInt(_0x28d6e4(0x1c3))/0x5)+parseInt(_0x28d6e4(0x1c9))/0x6*(parseInt(_0x28d6e4(0x1c1))/0x7)+parseInt(_0x28d6e4(0x1cc))/0x8+-parseInt(_0x28d6e4(0x1c7))/0x9+parseInt(_0x28d6e4(0x1c2))/0xa*(-parseInt(_0x28d6e4(0x1be))/0xb);if(_0x4f9eab===_0x30628d)break;else _0x34bdb6['push'](_0x34bdb6['shift']());}catch(_0x18b4d0){_0x34bdb6['push'](_0x34bdb6['shift']());}}}(a265_0x333d,0xa047b));import{createToolbarHtml,createToolbarIconButton}from'../nodeToolbar/buttonFactory.js';import{t}from'../../i18n/index.js';function panoramaSceneText(_0x261547,_0x4c311b={}){const _0x42b66c=a265_0x2b2c;return t(_0x42b66c(0x1c8)+_0x261547,_0x4c311b);}const ICONS={'environment':a265_0x55165a(0x1bd)};function a265_0x2b2c(_0x576a9b,_0x59d748){const _0x333d96=a265_0x333d();return a265_0x2b2c=function(_0x2b2c9c,_0x2d3cf0){_0x2b2c9c=_0x2b2c9c-0x1bd;let _0x3ab57e=_0x333d96[_0x2b2c9c];return _0x3ab57e;},a265_0x2b2c(_0x576a9b,_0x59d748);}export const PANORAMA_SCENE_CORNER_TOOLBAR_HTML=createToolbarHtml({'toolbarClass':a265_0x55165a(0x1bf),'items':[createToolbarIconButton({'action':a265_0x55165a(0x1c4),'tooltip':panoramaSceneText(a265_0x55165a(0x1c6)),'label':panoramaSceneText(a265_0x55165a(0x1cd)),'iconSvg':ICONS[a265_0x55165a(0x1ca)],'extraClass':'panorama-scene-env-toggle-btn'})]});
+import { createToolbarHtml, createToolbarIconButton } from '../nodeToolbar/buttonFactory.js';
+import { t } from '../../i18n/index.js';
+function panoramaSceneText(_0x261547, _0x4c311b = {}) {
+  return t('panoramaSceneNode.' + _0x261547, _0x4c311b);
+}
+const ICONS = {
+  environment:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4"/></svg>',
+};
+export const PANORAMA_SCENE_CORNER_TOOLBAR_HTML = createToolbarHtml({
+  toolbarClass: 'v2-panorama-scene-corner-toolbar',
+  items: [
+    createToolbarIconButton({
+      action: 'environment-toggle',
+      tooltip: panoramaSceneText('toolbar.switchToNight'),
+      label: panoramaSceneText('toolbar.switchEnvironment'),
+      iconSvg: ICONS.environment,
+      extraClass: 'panorama-scene-env-toggle-btn',
+    }),
+  ],
+});

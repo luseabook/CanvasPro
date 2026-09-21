@@ -1,1 +1,3208 @@
-function a156_0x33f2(_0xc0d8aa,_0x2c4ebc){const _0x395495=a156_0x3954();return a156_0x33f2=function(_0x33f2d0,_0x7c4c24){_0x33f2d0=_0x33f2d0-0x1a7;let _0x43c401=_0x395495[_0x33f2d0];return _0x43c401;},a156_0x33f2(_0xc0d8aa,_0x2c4ebc);}const a156_0x263711=a156_0x33f2;(function(_0x13ebc1,_0x31fe14){const _0x1e6954=a156_0x33f2,_0xcce9a0=_0x13ebc1();while(!![]){try{const _0x17393f=parseInt(_0x1e6954(0x3ab))/0x1*(parseInt(_0x1e6954(0x3bf))/0x2)+-parseInt(_0x1e6954(0x322))/0x3*(-parseInt(_0x1e6954(0x2e3))/0x4)+-parseInt(_0x1e6954(0x2a9))/0x5*(parseInt(_0x1e6954(0x2d3))/0x6)+-parseInt(_0x1e6954(0x375))/0x7+parseInt(_0x1e6954(0x374))/0x8+-parseInt(_0x1e6954(0x3c8))/0x9*(parseInt(_0x1e6954(0x288))/0xa)+-parseInt(_0x1e6954(0x32d))/0xb*(parseInt(_0x1e6954(0x39a))/0xc);if(_0x17393f===_0x31fe14)break;else _0xcce9a0['push'](_0xcce9a0['shift']());}catch(_0x10bd1d){_0xcce9a0['push'](_0xcce9a0['shift']());}}}(a156_0x3954,0x3de3e));import a156_0x4dda2b from'node:test';import a156_0x588d64 from'node:assert/strict';import{createAIGenerateNodeTaskOrchestrationModule}from'./taskOrchestrationModule.js';import{_resetPreviewRuntimeForTests,isPreviewNodeLoading,stopPreviewNodeLoading}from'../../modules/previewMode.js';import{createFakePreviewContainer,installPreviewDomStubs}from'../../../tests/testPreviewDom.js';import{_resetAssetMentionRegistryForTests,setAssetMentionAssets}from'../../modules/assetMentionRegistry.js';import{getModelManifest}from'../../manifests/index.js';import{shouldShowGenerationBusyUi}from'../../core/generationTaskUiState.js';import{DEFAULT_LOCALE,setLocale}from'../../i18n/index.js';const originalWindow=globalThis[a156_0x263711(0x3c4)],originalDocument=globalThis[a156_0x263711(0x358)],originalNodeCtor=globalThis[a156_0x263711(0x2c3)],restorePreviewDom=installPreviewDomStubs();if(!globalThis[a156_0x263711(0x3c4)])globalThis[a156_0x263711(0x3c4)]={};typeof globalThis[a156_0x263711(0x3c4)][a156_0x263711(0x1e2)]!==a156_0x263711(0x221)&&(globalThis[a156_0x263711(0x3c4)]['showToast']=()=>{});!globalThis['Node']&&(globalThis[a156_0x263711(0x2c3)]={'TEXT_NODE':0x3,'ELEMENT_NODE':0x1});!globalThis[a156_0x263711(0x358)]&&(globalThis[a156_0x263711(0x358)]={'getElementById':()=>null});a156_0x4dda2b['after'](()=>{const _0xfe6dcb=a156_0x263711;_resetPreviewRuntimeForTests(),typeof originalWindow===_0xfe6dcb(0x3b0)?delete globalThis['window']:globalThis[_0xfe6dcb(0x3c4)]=originalWindow,typeof originalDocument===_0xfe6dcb(0x3b0)?delete globalThis['document']:globalThis[_0xfe6dcb(0x358)]=originalDocument,typeof originalNodeCtor===_0xfe6dcb(0x3b0)?delete globalThis[_0xfe6dcb(0x2c3)]:globalThis[_0xfe6dcb(0x2c3)]=originalNodeCtor,restorePreviewDom();}),a156_0x4dda2b[a156_0x263711(0x2dc)](()=>{_resetPreviewRuntimeForTests(),_resetAssetMentionRegistryForTests();});function a156_0x3954(){const _0x59d8e4=['aigenImage\x20task\x20orchestration:\x20ai-text\x20入参无输出时使用\x20prompt\x20作为文本内容','_cancelRunningHubWorkflowTask','edge-source-alias-en','node-youchuan-main','output/resumed.png','node-person-replace-ratio-','resolvedRatioLabel','aigenImage\x20task\x20orchestration:\x20无入参时自适应优先使用显示区域比例','nano-banana-2','aigenImage\x20task\x20orchestration:\x20GRSAI\x20有参考图+自适应时透传\x20API\x20auto','node-ai-image-model-resume-','data/uploads/original.png','async-task-3','delete','edge-3','_asyncResumePromise','aigenImage\x20task\x20orchestration:\x20Dreamina\x20生成入参保留原图本地路径','/data/uploads/source.png','aigenImage\x20task\x20orchestration:\x20modelApi\x20fixed\x20image\x20slots\x20produce\x20inputUrlsBySlot','runninghub-model/rhart-image-g-2-official','DEV_MODE','asset-hidden-image','image','node-ai-image-throw-error','/data/assets/person2.png','node-person-replace-','aigenImage\x20task\x20orchestration:\x20GRSAI\x20GPT\x20image\x202\x20常规模式只保留\x201K','innerHTML','node-ref-image-source-original-first','runninghubwf','991960xuIsQY','high','nano-banana-pro','aigenImage\x20task\x20orchestration:\x20APIMart\x20GPT\x20image\x202\x204K\x20不生成非法比例','rhStatusMessage','generating','assign','/data/assets/hidden-person.png','4:3','rhTaskId','aigenImage\x20task\x20orchestration:\x20Agnes\x20image\x20start\x20clears\x20stale\x20task\x20family\x20terminal\x20states','https://cdn.example.com/input.png','CANCELLED','runninghub/1994718111704158209','keep\x20identity','apimart/qwen-image-2.0','repeatable\x20prompt','https://img.example.com/seedream-ref.png','裸模型默认走\x20grsai','data/uploads/ref.png','syncing','https://img.example.com/dreamina-thumb.png','runninghub-model\x20使用\x20modelApiKey','_dreaminaActiveSubmitId','node-ai-image-template-use-user-input','aigenImage\x20task\x20orchestration:\x20API\x20throw\x20会结束加载并标记失败','runninghub','aigenImage\x20task\x20orchestration:\x20模型族恢复分类稳定','mode','isArray','node-ai-image-dreamina-original-first','rh-task-1','asset','5AnEYdA','aigenImage\x20task\x20orchestration:\x20GRSAI\x20Nanobanana2\x20CL\x20keeps\x20CL\x20and\x20disables\x204K\x20payload','https://img.example.com/ref-grsai-169.png','prompt_extend','inputUrls','replaceTarget','node-ai-image-nb-pro-vip-','aigenImage\x20task\x20orchestration:\x20RunningHub\x20GPT\x20image\x202\x20official\x20保留\x201K','asyncTaskId','length','dreamina/4.1','async-task-4','edge-ai-original-first','fields','node-ref-woman-image','aigenImage\x20task\x20orchestration:\x20APIMart\x20Wan\x202.7\x20收集图片入参并按入参比例自适应','source-text','aigenImage\x20task\x20orchestration:\x20Volcengine\x20直连生成不伪装成异步任务','portrait','node-ai-image-gpt-image-2-vip-mode-','node-ai-image-missing-task-id','node-ref-image-dreamina-1','edit\x20@图片1','add','aigenImage\x20task\x20orchestration:\x20Qwen\x20image\x20edit\x20requires\x20at\x20least\x20one\x20reference\x20image','name','Node','abort','_onGenerate','dm-task-1','call','edge-rh-workflow-ref','node-ai-image-rh-nano-1','https://img.example.com/main-thumb.png','-edge-target','GRSAI\x20无法解析图片地址','/data/uploads/sref.png','rhTaskRecovering','fromEntries','previewEl','aigenImage\x20task\x20orchestration:\x20GRSAI\x20GPT\x20image\x202\x204K\x20保留官方支持比例','node-ai-image-rh-nano-2','586074qwzzKm','ppio/seedream-5.0-lite','/output/c.png','aigenImage\x20task\x20orchestration:\x20APIMart\x20GPT\x20image\x202\x20透传新增比例','dm-task-status-error','node-ai-image-gpt-image-2-1k-','sid-dreamina-progress-fail','node-ai-image-qwen-edit-no-ref','node-ref-apimart-seedream-auto','afterEach','aspectRatio','ppio/seedream-4.0','edge-cref','google_search','mountain','node-ai-image-2','9844UYWgvv','data/assets/hidden-person.png','inputUrlsBySlot','prototype','/output/async-resumed.png','ai-image','normal','data/uploads/alias-original.png','provider','node-ai-image-preview-loading','rhQwenEditMode','runninghub-model/rhart-image-v1','output/dreamina-resumed.png','sref','k_runninghub','retry\x20with\x20Agnes','aigenImage\x20task\x20orchestration:\x20_buildResumePayload\x20按模型前缀推断\x20provider\x20与\x20key','depth','aigenImage\x20task\x20orchestration:\x20APIMart\x20Qwen\x20image\x202.0\x20使用文档比例和生成数量','qwen-ref-2','dreamina','node-ai-image-static-template-linked-text','outputFormat','apimart/seedream-4.0','cat','21:9','node-ref-image-grsai-input-first','夜雨中的街道追逐','edge-agnes-image','onTaskMeta','aigenImage\x20task\x20orchestration:\x20GRSAI\x20未设置\x20aspectRatio\x20时默认\x20API\x20auto','/output/agnes-retry.png','故事/描述：雨夜赛博街区','rhStatusCode','/output/resumed.png','node-youchuan-v6-slots','https://img.example.com/dreamina-non-standard.png','grsai-direct-','input-media','k_runninghub_model','aigenImage\x20task\x20orchestration:\x20GRSAI\x20GPT\x20image\x202\x20VIP\x20模式保留全部画质','_isAsyncRecoverableRunningTask','data/uploads/target.png','aigenImage\x20task\x20orchestration:\x20async\x20recovery\x20writes\x20terminal\x20state\x20through\x20runtime','rh-image-resume-success','node-rh-workflow-ref','PREVIEW_MODE','node-youchuan-v7-sref','localPath','RUNNING','node-ai-image-hidden-asset','/output/resumed-thumb.png','data/uploads/v7-main.png','data/uploads/node-local.png','node-ai-image-apimart-seedream-auto','google_image_search','PPIO\x20模型推断为\x20ppio','node-ai-image-async-runtime-recovery','_stopAsyncRecovery','APIMart\x20任务报错：找不到任务\x20id','node-ai-image-rh-gpt2-official','node-ai-image-ai-original-first','apimart','390kpzNvp','expectedProvider','\x20的女人替换到\x20','aigenImage\x20task\x20orchestration:\x20thumbnail\x20reorder\x20keeps\x20inputUrls\x20aligned\x20with\x20image\x20labels','data/uploads/main.png','node-ai-image-object-error','suppressAspectRatio','/data/uploads/qwen-2.png','/data/uploads/main-original.png','polish\x20the\x20reference','node-rh-image-x-slot','11JdDZDm','node-ai-image-rh-cancel-visible','aigenImage\x20task\x20orchestration:\x20预览模式下点击生成只启动假加载不发请求','apimart/wan2.7-image','/output/retry.png','node-ai-image-fallback-2','slice','generation\x20failed:\x20final\x20generation\x20failed','https://cdn.apimart.ai/ref-wan.png','filter','/output/dreamina-resumed-thumb.png','startsWith','dreamina/5.0','_updateSubmitButtonState','async-task-1','doesNotMatch','node-ai-image-dreamina-runtime-recovery','nano-banana','data/uploads/woman.png','/output/a.png','node-ai-image-grsai-manifest-mode-','.png','ppio','aborted','generationDuration','雨夜赛博街区','aigenImage\x20task\x20orchestration:\x20RunningHub\x20工作流模型可空提示词生成','https://img.example.com/success.png','@图片1\x20and\x20@图片2','node-ai-image-recovery-matrix','node-ai-image-unmount-preserves-task','cancelled','edge-qwen-','aigenImage\x20task\x20orchestration:\x20Dreamina\x20自适应\x20+\x20无图像入参时\x20fallback\x20为\x201:1','success','numImages','ref-pill','-edge-source','https://img.example.com/node-thumb.png','push','running','aigenImage\x20task\x20orchestration:\x20persisted\x20Dreamina\x20running\x20task\x20resumes\x20even\x20with\x20fresh\x20lastChecked','aigenImage\x20task\x20orchestration:\x20GRSAI\x20nanobanana\x20cleans\x20legacy\x20UI\x20params','document','data/uploads/display.webp','data/uploads/cref.png','ai-text','generationStartTime','output/c.png','node-ai-image-template-default-fallback','qwen-ref-4','aigenImage\x20task\x20orchestration:\x20Dreamina\x20自适应\x20+\x20非标准比例映射最近支持比例','node-youchuan-v7-slots','textContent','model','_attrs','includes','k_agnes','_maybeResumeAsyncTaskImpl','dreaminaTaskPhase','9:21','size','node-ref-image-2','-source','data/uploads/source.png','node-ai-image-apimart-wan','aigenImage\x20task\x20orchestration:\x20asset\x20image\x20mentions\x20send\x20type\x20placeholders\x20in\x20prompt\x20order','prompt','previous\x20failure','/data/uploads/v7-sref.png','_rhResumePromise','3021840TOctCo','1832397ANOjNK','rhResolution','targetId','node-ai-image-success','node-ref-image-source-alias-en','_dreaminaResumePromise','node-ai-image-grsai-input-first','output/async-resumed.png','node-ai-image-apimart-error','expectedModel','/output/volcengine.png','node-ai-image-rh-gpt2-official-1k','aigenImage\x20task\x20orchestration:\x20PPIO\x20有参考图+自适应时不设置\x20suppressAspectRatio','aigenImage\x20task\x20orchestration:\x20GRSAI\x20NanobananaPRO\x20legacy\x20VIP/4K\x20uses\x20supported\x20payload','请先在设置里填写火山方舟\x20API\x20Key','rhQwenFirstImageMode','/data/uploads/target.png','rhTaskStatus','sid-dreamina-persisted-fail','official','https://img.example.com/ref.png','node-youchuan-sref','_buildResumePayload','hasOwnProperty','node-ai-image-source-alias-en','isGenerating','old-rh-task','k_runninghub_workflow_only','vip','replacedImage','node-ai-image-nb2-cl-','已完成','adaptiveSource','node-ai-image-runninghub-model-no-key-fallback','grsai','mainImageIndex','/data/uploads/qwen-1.png','2103804tIOuHm','edge-sref','故事/描述：一段简短剧情','nodeType','edge-linked-text-static-template','node-ref-text-3','_isGenerating','runninghub/2050313968069165058','node-ai-image-reordered-thumb-labels','自适应','addEventListener','cancelled\x20by\x20user','9:16','node-ai-image-3','node-ai-image-text-prompt-ref','k_dreamina','gpt-image-2','1rfiNTE','node-ai-text-prompt-ref','aigenImage\x20task\x20orchestration:\x20grsai\x20有入参时自适应保持\x20API\x20auto','qwen2509','data/uploads/dreamina-display.webp','undefined','grsai/seedream-4.0','aigenImage\x20task\x20orchestration:\x20RunningHub\x20cancel\x20writes\x20visible\x20interruption\x20message','failed','ratioCapability','aigenImage\x20task\x20orchestration:\x20running\x20RH\x20store\x20state\x20cancels\x20even\x20when\x20local\x20flag\x20is\x20stale','set','ark-direct-response-1','object','asyncTaskRecovering','aigenImage\x20task\x20orchestration:\x20RunningHub\x20GPT\x20image\x202\x20official\x20使用扩展比例','aigenImage\x20task\x20orchestration:\x20Dreamina\x20failed\x20progress\x20finalizes\x20and\x20stops\x20loading','cref','disabled','/output/grsai-direct-2.png','578002YVnEVK','btnEl','SPAN','uiSchema','aigenImage\x20task\x20orchestration:\x20图像内置对象预设无输入时不生成','window','output/a.png','edit','async-image-resume-pause','18LYgIWR','node-ai-image-grsai-pro-manifest-mode-','/data/uploads/dreamina-original.png','node-ai-image-asset-mentions','apimart/gpt-image-2','_data','aigenImage\x20task\x20orchestration:\x20Volcengine\x20缺少\x20API\x20Key\x20时生成前拦截','agnes','hello','rhAnimeRealResolution','aigenImage\x20task\x20orchestration:\x20unmount\x20aborts\x20local\x20generation\x20polling','\x20and\x20','imageUrl','data/uploads/v7-sref.png','sid-dreamina-fail','static','dimensions','signal','volcengine','replace','edge-v7-sref','async-task-5','node-ref-apimart-wan','aigenImage\x20task\x20orchestration:\x20缺少\x20taskId\x20错误会结束加载并标记失败','asyncTaskStatus','dreamina/4.5','imageSize','text','create','ELEMENT_NODE','endsWith','_maybeResumeDreaminaTaskImpl','runninghub-model/rhart-image-v1-official','请先添加至少一张参考图再生成','async-task-2','runninghub/','agnes/agnes-image-2.1-flash','generationParams','edge-source-original-first','/data/assets/person1.png','/output/async-resumed-thumb.png','error','person','缺少异步图片任务ID，无法恢复','asyncTaskProvider','batchSize','equal','_rhApiKey','k_ppio','jobStatus','node-ai-image-apimart-seedream-5-lite','edge-dreamina-original-first','aigenImage\x20task\x20orchestration:\x20person\x20replace\x20payload\x20uses\x20refSlot\x20order\x20for\x20manifest\x20model\x20ids','now','/data/uploads/scene.png','split','pro','edge-woman-second-after-drag','source-text-for-static-template','/output/b.png','生成中','aigenImage\x20task\x20orchestration:\x20mixed\x20batch\x20failure\x20keeps\x20successful\x20images','aigenImage\x20task\x20orchestration:\x20Dreamina\x20自适应\x20+\x2016:9\x20入参图透传\x2016:9','aigenImage\x20task\x20orchestration:\x20开发者模式下\x20/预设\x20仅回填最终提示词不直接生成','aigenImage\x20task\x20orchestration:\x20async\x20recovery\x20local\x20abort\x20keeps\x20timer\x20running','/output/dreamina-resumed.png','data/uploads/dreamina-thumb.webp','node-ai-image-default-adaptive','expectedApiKey','plus','runninghub-model/youchuan-v6','apimart/z-image-turbo','sid-dreamina-reentrant-fail','来自生成文本节点的提示词\x0a主体画面','_persistDreaminaResumeCache','apiKey','default','is-rh-busy','node-rh-image-x-ref','/output/grsai-direct-','aigenImage\x20task\x20orchestration:\x20stale\x20Dreamina\x20running\x20task\x20resumes\x20and\x20surfaces\x20fail\x20reason','k_apimart','aigenImage\x20task\x20orchestration:\x20Agnes\x20image\x20input\x20starts\x20loading\x20without\x20prompt','dreaminaTaskLabel','dreaminaSubmitId','showToast','apimart/seedream-5.0-lite','data/uploads/scene.png','https://ark.example.com/volcengine.png','node-ai-image-apimart-gpt-image-2-4k','grsai-direct-2','-target','node-ai-image-apimart-gpt-image-2-4k-auto','/output/agnes.png','runninghub/2041177685895946242','idle','map','pending','nodes','policy\x20rejected','edge-image-x-main','thumbUrl','node-ai-image-grsai-nano-clean-legacy-params','async-image-resume-success','video','node-ai-image-real-media-size','故事/描述：{用户输入\x20||\x20一段简短剧情}','https://img.example.com/thumb.png','runninghub/2044874075721441281','aigenImage\x20task\x20orchestration:\x20非\x20NanoBanana\x20模型自适应无参考图按显示区域映射','updateNodeData','rh-task-2','deepEqual','node-ai-image-dreamina-2','aigenImage\x20task\x20orchestration:\x20RunningHub\x20NanoBanana\x20自适应无参考图时非标准\x201700x900\x20就近映射\x2016:9','_buildPayload','childNodes','node-ai-image-non-nano-1','rhModelRoute','edge-scene-first-after-drag','node-ai-image-source-original-first','display','aigenImage\x20task\x20orchestration:\x20async\x20pending\x20且无\x20taskId\x20时触发兜底重提','data/uploads/main-local.png','node-ai-image-dreamina-persisted-recovery','rhInstanceType','https://img.example.com/ref-ppio.png','_persistAsyncResumeCache','match','aigenImage\x20task\x20orchestration:\x20Qwen\x20image\x20edit\x20reads\x20schema\x20params\x20and\x20normalizes\x20unsupported\x204K\x20size','edge-ai-image-text-prompt','dreaminaTaskRecovering','rh-running','/data/uploads/main.png','node-ai-image-apimart-gpt-image-2-ratio','edge-dreamina-1','node-ai-image-apimart-manifest-params','2:1','/output/test.png','/data/uploads/cref.png','nano-banana-pro-vip','dm-task-error','warn','data/uploads/dreamina-original.png','images','edge-apimart-seedream-auto','runninghub/2050306122774532097','1:8','function','k_grsai','low','asset-people','5058','edge-dreamina-2','person1','edge-apimart-wan','nano-banana-pro-vt','node-ai-image-static-template-empty','auto','node-ai-image-grsai-repeat-success','/data/uploads/image-x-ref.png','qwen-ref-1','k_runninghub_wf','PPIO\x20创建任务失败','Dreamina\x20manifest\x20模型按\x20provider\x20执行','1:1','node-ai-image-dreamina-progress-fail','@图片2\x20的女人替换到\x20@图片1\x20的场景里面','故事/描述：夜雨中的街道追逐','nano-banana-2-cl','_isDreaminaRecoverableRunningTask','aigenImage\x20task\x20orchestration:\x20自适应入参优先使用真实媒体尺寸','aigenImage\x20task\x20orchestration:\x20APIMart\x20GPT\x20image\x202\x204K\x20自适应只解析到可用比例','aigenImage\x20task\x20orchestration:\x20Dreamina\x20recovery\x20does\x20not\x20abort\x20itself\x20on\x20reentrant\x20state\x20update','@图片1','tagName','sid-dreamina-success','node-ai-image-rh-workflow-empty-prompt','/output/ok.png','old-async-task','output/b.png','node-ref-ai-image-original-first','dreaminaTaskStatus','edge-main','classList','rh-cancel-visible','trim','k_rh','onProgress','aigenImage\x20task\x20orchestration:\x20source-image\x20生成入参优先使用原图本地路径','source-image','_rhAbortController','aigenImage\x20task\x20orchestration:\x20GRSAI\x20direct\x20success\x20unlocks\x20repeated\x20generation','unmount','/data/uploads/v7-main.png','data/uploads/thumb.webp','请输入提示词或添加参考图片','node-ai-image-qwen-edit-defaults','aigenImage\x20task\x20orchestration:\x20RunningHub\x20image\x20X\x20single\x20fixed\x20slot\x20produces\x20imageUrl\x20input','_isRunningHubRecoverableRunningTask','正在同步结果','4:5','node-ai-image-gpt-image-2-4k-fallback','node-ai-image-apimart-qwen-image','done','aigenImage\x20task\x20orchestration:\x20ai-image\x20生成入参优先使用主图原图本地路径','/output/success.png','resolve','aigenImage\x20task\x20orchestration:\x20APIMart\x20Z-Image-Turbo\x20自适应转为真实比例并透传智能改写','aigenImage\x20task\x20orchestration:\x20manifest\x20GRSAI\x20pro\x20modes\x20keep\x20VT/CL/VIP\x20and\x20normalize\x204K','16:9','data/assets/person1.png','https://img.example.com/node-source.png','主体画面','retry\x20this\x20image','k_test','submitted','apimart/nano-banana-2','promptEl','jobError','node-ref-scene-image'];a156_0x3954=function(){return _0x59d8e4;};return a156_0x3954();}function createStore(_0x23e6ce,_0x22775f=[]){return{'getState'(){return _0x23e6ce;},'getIncomingEdges'(_0x280853){const _0x57284d=a156_0x33f2;return _0x22775f['filter'](_0x19d0db=>_0x19d0db[_0x57284d(0x377)]===_0x280853);},'updateNodeData'(_0x4a6565,_0x13e050){const _0x34be61=a156_0x33f2,_0x283b6e=_0x23e6ce[_0x34be61(0x1ef)]?.[_0x4a6565]||{};_0x23e6ce[_0x34be61(0x1ef)][_0x4a6565]={..._0x283b6e,..._0x13e050};}};}function createPromptTextNode(_0x349bef=''){return{'nodeType':Node['TEXT_NODE'],'textContent':String(_0x349bef||'')};}function createPromptElementNode({tagName:tagName=a156_0x263711(0x3c1),className:className='',dataset:dataset={},textContent:textContent='',childNodes:childNodes=[]}={}){const _0x3a9c95=a156_0x263711,_0x5c839b=String(className||'')[_0x3a9c95(0x1c4)](/\s+/)[_0x3a9c95(0x336)](Boolean);return{'nodeType':Node[_0x3a9c95(0x1aa)],'tagName':tagName,'className':className,'classList':{'contains'(_0x1f1df4){return _0x5c839b['includes'](String(_0x1f1df4||''));}},'dataset':{...dataset},'textContent':String(textContent||''),'childNodes':Array['isArray'](childNodes)?childNodes:[]};}function createAssetPromptPillNode(_0x76067a,_0x2b1490,_0x4facf5,_0xf532c3){const _0x32fa9f=a156_0x263711;return createPromptElementNode({'className':_0x32fa9f(0x351),'dataset':{'label':String(_0x76067a||''),'refOrigin':_0x32fa9f(0x2a8),'assetId':String(_0x2b1490||''),'assetIndex':String(_0x4facf5),'refType':String(_0xf532c3||'')},'textContent':String(_0x76067a||'')});}function createNodePromptPillNode(_0x10841b,_0x8a9efc,_0x104338=a156_0x263711(0x280)){const _0x2d8cdf=a156_0x263711;return createPromptElementNode({'className':_0x2d8cdf(0x351),'dataset':{'label':String(_0x10841b||''),'nodeId':String(_0x8a9efc||''),'refType':String(_0x104338||'')},'textContent':String(_0x10841b||'')});}function collectPromptInnerText(_0xf1dcd3){const _0x44de75=a156_0x263711;return(Array[_0x44de75(0x2a5)](_0xf1dcd3)?_0xf1dcd3:[])['map'](_0x1a16d6=>{const _0x9b09b1=_0x44de75,_0x8d2ec=Number(_0x1a16d6?.[_0x9b09b1(0x39d)]);if(_0x8d2ec===Node['TEXT_NODE'])return String(_0x1a16d6?.[_0x9b09b1(0x362)]||'');if(_0x8d2ec!==Node[_0x9b09b1(0x1aa)])return'';if(String(_0x1a16d6?.[_0x9b09b1(0x23c)]||'')['toUpperCase']()==='BR')return'\x0a';const _0x236c68=Array['isArray'](_0x1a16d6?.['childNodes'])?_0x1a16d6[_0x9b09b1(0x201)]:[];if(_0x236c68[_0x9b09b1(0x2b2)]>0x0)return collectPromptInnerText(_0x236c68);return String(_0x1a16d6?.['textContent']||'');})['join']('');}function createPromptEl(_0x66b7e6='test\x20prompt'){if(Array['isArray'](_0x66b7e6)){const _0x315e06=collectPromptInnerText(_0x66b7e6);return{'innerText':_0x315e06,'textContent':_0x315e06,'childNodes':_0x66b7e6};}return{'innerText':_0x66b7e6,'textContent':_0x66b7e6,'childNodes':[createPromptTextNode(_0x66b7e6)]};}function createButtonStub(){const _0x2a6594=new Set();return{'disabled':![],'title':'','innerHTML':'','style':{'color':'','cursor':''},'_attrs':new Map(),'classList':{'add'(_0xd0c089){const _0x2d1b41=a156_0x33f2;_0x2a6594[_0x2d1b41(0x2c0)](String(_0xd0c089||''));},'remove'(_0x4d024d){const _0x27acaf=a156_0x33f2;_0x2a6594[_0x27acaf(0x277)](String(_0x4d024d||''));},'contains'(_0x25cd51){return _0x2a6594['has'](String(_0x25cd51||''));}},'setAttribute'(_0x35f30c,_0x50b156){const _0x56d6c7=a156_0x33f2;this[_0x56d6c7(0x364)][_0x56d6c7(0x3b6)](String(_0x35f30c||''),String(_0x50b156||''));},'removeAttribute'(_0x4894c0){const _0x4108eb=a156_0x33f2;this[_0x4108eb(0x364)]['delete'](String(_0x4894c0||''));}};}function createTestContext({targetId:_0x463842,nodeData:_0x235d21,nodes:nodes={},incomingEdges:incomingEdges=[],promptText:promptText=a156_0x263711(0x2e1),promptEl:promptEl=null,ensureConfigImpl:ensureConfigImpl=async()=>{},getProviderConfigImpl:getProviderConfigImpl=()=>({'apiKey':a156_0x263711(0x264)}),isRunninghubWorkflowModelImpl:isRunninghubWorkflowModelImpl=null,apiImpl:apiImpl={'generateImage':async()=>({'imageUrl':a156_0x263711(0x217)})},startLoadingImpl:startLoadingImpl=()=>{},stopLoadingImpl:stopLoadingImpl=()=>{},storeImpl:storeImpl=null,stateOverride:stateOverride=null}){const _0x49d7e0=a156_0x263711,_0x15b2e7=_0x1a69ba=>{const _0x1fa40b=a156_0x33f2,_0x392ac2=getModelManifest(_0x1a69ba?.[_0x1fa40b(0x363)]),_0x49c3e5=Array[_0x1fa40b(0x2a5)](_0x392ac2?.[_0x1fa40b(0x3c2)]?.[_0x1fa40b(0x2b6)])?_0x392ac2['uiSchema']['fields']:[];if(!_0x49c3e5[_0x1fa40b(0x2b2)])return{..._0x1a69ba};const _0x45e693=_0x1a69ba?.[_0x1fa40b(0x1b2)]&&typeof _0x1a69ba[_0x1fa40b(0x1b2)]===_0x1fa40b(0x3b8)&&!Array['isArray'](_0x1a69ba[_0x1fa40b(0x1b2)])?{..._0x1a69ba[_0x1fa40b(0x1b2)]}:{};return _0x49c3e5['forEach'](_0x2c5b89=>{const _0x447e3e=_0x1fa40b,_0x53c510=String(_0x2c5b89?.['id']||'')[_0x447e3e(0x247)]();_0x53c510&&_0x45e693[_0x53c510]===undefined&&Object[_0x447e3e(0x2e6)][_0x447e3e(0x38c)][_0x447e3e(0x2c7)](_0x1a69ba,_0x53c510)&&(_0x45e693[_0x53c510]=_0x1a69ba[_0x53c510]);}),{..._0x1a69ba,'generationParams':_0x45e693};},_0x2ea73b=stateOverride||{'nodes':{...nodes,[_0x463842]:_0x15b2e7(_0x235d21)}};if(!_0x2ea73b['nodes']||typeof _0x2ea73b['nodes']!==_0x49d7e0(0x3b8))_0x2ea73b[_0x49d7e0(0x1ef)]={};!_0x2ea73b[_0x49d7e0(0x1ef)]?.[_0x463842]&&(_0x2ea73b[_0x49d7e0(0x1ef)][_0x463842]=_0x15b2e7(_0x235d21));const _0x27e9a9=storeImpl||createStore(_0x2ea73b,incomingEdges),_0x143726=createAIGenerateNodeTaskOrchestrationModule({'store':_0x27e9a9,'getRefKindByNodeType':_0x19d98d=>_0x19d98d===_0x49d7e0(0x24b)||_0x19d98d==='image'||_0x19d98d===_0x49d7e0(0x2e8)?_0x49d7e0(0x280):_0x19d98d===_0x49d7e0(0x2b9)||_0x19d98d===_0x49d7e0(0x35b)?_0x49d7e0(0x1a8):null,'getImage':async()=>null,'ensureConfig':ensureConfigImpl,'getProviderConfig':getProviderConfigImpl,'api':apiImpl,'startLoading':startLoadingImpl,'stopLoading':stopLoadingImpl}),_0x54d314=Object[_0x49d7e0(0x28e)](Object[_0x49d7e0(0x1a9)](_0x143726),{'nodeId':_0x463842,'_data':_0x2ea73b[_0x49d7e0(0x1ef)][_0x463842],'promptEl':promptEl||createPromptEl(promptText),'_isRunninghubWorkflowModel'(_0xd384da,_0x220fbc){const _0x527cd6=_0x49d7e0;if(typeof isRunninghubWorkflowModelImpl===_0x527cd6(0x221))return isRunninghubWorkflowModelImpl(_0xd384da,_0x220fbc);return![];}});return{'ctx':_0x54d314,'proto':_0x143726,'state':_0x2ea73b,'store':_0x27e9a9};}a156_0x4dda2b(a156_0x263711(0x3b5),async()=>{const _0x176f9e=a156_0x263711,_0x33c700='node-image-running-store-cancels',{proto:_0x407f65,ctx:_0x2893e5,state:_0x1e5801}=createTestContext({'targetId':_0x33c700,'nodeData':{'id':_0x33c700,'model':_0x176f9e(0x1f9),'provider':_0x176f9e(0x287),'rhTaskId':_0x176f9e(0x211),'rhTaskStatus':_0x176f9e(0x355),'jobStatus':'running','isGenerating':!![]},'isRunninghubWorkflowModelImpl':()=>!![]});let _0x5926a8=0x0,_0x21c3b6=0x0;_0x2893e5['_isGenerating']=![],_0x2893e5[_0x176f9e(0x26b)]=async()=>{_0x5926a8+=0x1;},_0x2893e5[_0x176f9e(0x2c5)]=async()=>{_0x21c3b6+=0x1;},_0x1e5801[_0x176f9e(0x1ef)][_0x33c700]={..._0x1e5801[_0x176f9e(0x1ef)][_0x33c700],'rhTaskId':_0x176f9e(0x211),'rhTaskStatus':'running','jobStatus':_0x176f9e(0x355),'isGenerating':!![]},await _0x407f65['_handleGenerateOrCancel'][_0x176f9e(0x2c7)](_0x2893e5),a156_0x588d64['equal'](_0x5926a8,0x1),a156_0x588d64['equal'](_0x21c3b6,0x0);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20/预设模板在空输入时回退默认值且不残留占位符',async()=>{const _0x63faad=a156_0x263711,_0x2c3ffc=_0x63faad(0x35e),{proto:_0x350dc2,ctx:_0x334ba3}=createTestContext({'targetId':_0x2c3ffc,'nodeData':{'id':_0x2c3ffc,'model':_0x63faad(0x229),'provider':_0x63faad(0x397),'aspectRatio':_0x63faad(0x232),'imageSize':'2K','batchSize':0x1},'promptText':''}),_0x291ae3=await _0x350dc2[_0x63faad(0x200)][_0x63faad(0x2c7)](_0x334ba3,_0x63faad(0x1f7));a156_0x588d64['ok'](_0x291ae3),a156_0x588d64['equal'](_0x291ae3[_0x63faad(0x370)],_0x63faad(0x39c)),a156_0x588d64['equal'](_0x291ae3[_0x63faad(0x370)][_0x63faad(0x365)]('{{'),![]);}),a156_0x4dda2b(a156_0x263711(0x3c3),async()=>{const _0x255b77=a156_0x263711,_0x771e1=globalThis[_0x255b77(0x3c4)][_0x255b77(0x1e2)],_0x4b6d43=[];globalThis[_0x255b77(0x3c4)][_0x255b77(0x1e2)]=(_0x31ea5a,_0x15cd91)=>{const _0x481c89=_0x255b77;_0x4b6d43[_0x481c89(0x354)]({'message':_0x31ea5a,'type':_0x15cd91});};try{const _0x1ad5f4=_0x255b77(0x22a),{proto:_0x265777,ctx:_0x45cecb}=createTestContext({'targetId':_0x1ad5f4,'nodeData':{'id':_0x1ad5f4,'model':'nano-banana-pro-vt','provider':_0x255b77(0x397),'aspectRatio':_0x255b77(0x232),'imageSize':'2K','batchSize':0x1},'promptText':''}),_0x5257c8=await _0x265777[_0x255b77(0x200)][_0x255b77(0x2c7)](_0x45cecb,{'type':_0x255b77(0x3d7),'text':_0x255b77(0x1f7),'requireInput':!![],'emptyInputMessage':_0x255b77(0x251)});a156_0x588d64[_0x255b77(0x1bb)](_0x5257c8,null),a156_0x588d64[_0x255b77(0x1fd)](_0x4b6d43,[{'message':_0x255b77(0x251),'type':_0x255b77(0x21b)}]);}finally{globalThis[_0x255b77(0x3c4)]['showToast']=_0x771e1;}}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20图像内置对象预设使用连线文本入参',async()=>{const _0x37df87=a156_0x263711,_0x278721=_0x37df87(0x2f8),_0x57177c=_0x37df87(0x1c7),{proto:_0x1b6fe,ctx:_0x6f1c54}=createTestContext({'targetId':_0x278721,'nodeData':{'id':_0x278721,'model':_0x37df87(0x229),'provider':_0x37df87(0x397),'aspectRatio':_0x37df87(0x232),'imageSize':'2K','batchSize':0x1},'nodes':{[_0x57177c]:{'id':_0x57177c,'type':_0x37df87(0x35b),'outputText':_0x37df87(0x346)}},'incomingEdges':[{'id':_0x37df87(0x39e),'sourceId':_0x57177c,'targetId':_0x278721}],'promptText':''}),_0x39c64f=await _0x1b6fe[_0x37df87(0x200)][_0x37df87(0x2c7)](_0x6f1c54,{'type':_0x37df87(0x3d7),'text':_0x37df87(0x1f7),'requireInput':!![],'emptyInputMessage':_0x37df87(0x251)});a156_0x588d64['ok'](_0x39c64f),a156_0x588d64['equal'](_0x39c64f[_0x37df87(0x370)],_0x37df87(0x303));}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20/预设模板在有输入时注入用户输入且不残留占位符',async()=>{const _0x3ca561=a156_0x263711,_0xa502de=_0x3ca561(0x2a0),{proto:_0x186bcb,ctx:_0x50f0e4}=createTestContext({'targetId':_0xa502de,'nodeData':{'id':_0xa502de,'model':_0x3ca561(0x229),'provider':'grsai','aspectRatio':_0x3ca561(0x232),'imageSize':'2K','batchSize':0x1},'promptText':_0x3ca561(0x2fe)}),_0x2e3217=await _0x186bcb[_0x3ca561(0x200)][_0x3ca561(0x2c7)](_0x50f0e4,_0x3ca561(0x1f7));a156_0x588d64['ok'](_0x2e3217),a156_0x588d64[_0x3ca561(0x1bb)](_0x2e3217[_0x3ca561(0x370)],_0x3ca561(0x235)),a156_0x588d64['equal'](_0x2e3217['prompt']['includes']('{{'),![]);}),a156_0x4dda2b(a156_0x263711(0x1cc),async()=>{const _0x5c771b=a156_0x263711,_0x397cc1=globalThis[_0x5c771b(0x3c4)][_0x5c771b(0x27e)];globalThis[_0x5c771b(0x3c4)][_0x5c771b(0x27e)]=!![];try{const _0x2d305a='node-ai-image-template-dev-preview';let _0x439887=![];const {proto:_0x5110b3,ctx:_0x5679c1,state:_0x386929}=createTestContext({'targetId':_0x2d305a,'nodeData':{'id':_0x2d305a,'model':_0x5c771b(0x229),'provider':_0x5c771b(0x397),'aspectRatio':_0x5c771b(0x232),'imageSize':'2K','batchSize':0x1},'promptText':_0x5c771b(0x2fe),'apiImpl':{'generateImage':async()=>{const _0x5c322e=_0x5c771b;return _0x439887=!![],{'imageUrl':_0x5c322e(0x217)};}}});await _0x5110b3[_0x5c771b(0x2c5)][_0x5c771b(0x2c7)](_0x5679c1,_0x5c771b(0x1f7)),a156_0x588d64[_0x5c771b(0x1bb)](_0x439887,![]),a156_0x588d64['equal'](_0x386929[_0x5c771b(0x1ef)][_0x2d305a]['prompt'],'故事/描述：夜雨中的街道追逐'),a156_0x588d64[_0x5c771b(0x1bb)](_0x5679c1[_0x5c771b(0x267)][_0x5c771b(0x285)],_0x5c771b(0x235));}finally{globalThis[_0x5c771b(0x3c4)][_0x5c771b(0x27e)]=_0x397cc1;}}),a156_0x4dda2b(a156_0x263711(0x32f),async()=>{const _0x1c7390=a156_0x263711,_0x266bad=globalThis[_0x1c7390(0x3c4)]['PREVIEW_MODE'];globalThis['window'][_0x1c7390(0x311)]=!![];try{const _0x454a99=_0x1c7390(0x2ec);let _0x284389=![];const {proto:_0x53d376,ctx:_0x382ff5}=createTestContext({'targetId':_0x454a99,'nodeData':{'id':_0x454a99,'model':'nano-banana-pro-vt','provider':_0x1c7390(0x397),'aspectRatio':_0x1c7390(0x232),'imageSize':'2K','batchSize':0x1},'apiImpl':{'generateImage':async()=>{const _0x1a3611=_0x1c7390;return _0x284389=!![],{'imageUrl':_0x1a3611(0x217)};}}});_0x382ff5[_0x1c7390(0x2d0)]=createFakePreviewContainer(),_0x382ff5[_0x1c7390(0x3c0)]=createButtonStub(),await _0x53d376[_0x1c7390(0x2c5)]['call'](_0x382ff5),a156_0x588d64[_0x1c7390(0x1bb)](_0x284389,![]),a156_0x588d64[_0x1c7390(0x1bb)](isPreviewNodeLoading(_0x454a99),!![]),a156_0x588d64[_0x1c7390(0x1bb)](_0x382ff5['btnEl'][_0x1c7390(0x3bd)],!![]),a156_0x588d64[_0x1c7390(0x20d)](_0x382ff5[_0x1c7390(0x3c0)][_0x1c7390(0x285)],/animation:spin/),stopPreviewNodeLoading(_0x454a99),a156_0x588d64[_0x1c7390(0x1bb)](_0x382ff5[_0x1c7390(0x3c0)][_0x1c7390(0x3bd)],![]),a156_0x588d64[_0x1c7390(0x33c)](_0x382ff5[_0x1c7390(0x3c0)][_0x1c7390(0x285)],/animation:spin/);}finally{globalThis[_0x1c7390(0x3c4)][_0x1c7390(0x311)]=_0x266bad;}}),a156_0x4dda2b(a156_0x263711(0x36f),async()=>{const _0x3b6422=a156_0x263711,_0x2937d3=_0x3b6422(0x3cb);setAssetMentionAssets([{'id':'asset-people','items':[{'name':_0x3b6422(0x227),'type':_0x3b6422(0x24b),'nodeData':{'type':_0x3b6422(0x24b),'originalLocalPath':_0x3b6422(0x260)}},{'name':'person2','type':'source-image','nodeData':{'type':'source-image','originalLocalPath':'data/assets/person2.png'}}]}]);const {proto:_0x31b53d,ctx:_0x468b11}=createTestContext({'targetId':_0x2937d3,'nodeData':{'id':_0x2937d3,'model':_0x3b6422(0x229),'provider':_0x3b6422(0x397),'aspectRatio':_0x3b6422(0x232),'imageSize':'2K','batchSize':0x1},'promptEl':createPromptEl([createAssetPromptPillNode(_0x3b6422(0x227),_0x3b6422(0x224),0x0,_0x3b6422(0x280)),createPromptTextNode(_0x3b6422(0x3d3)),createAssetPromptPillNode('person2',_0x3b6422(0x224),0x1,_0x3b6422(0x280))])}),_0x32cfcb=await _0x31b53d[_0x3b6422(0x200)][_0x3b6422(0x2c7)](_0x468b11);a156_0x588d64['equal'](_0x32cfcb[_0x3b6422(0x370)],_0x3b6422(0x349)),a156_0x588d64[_0x3b6422(0x1fd)](_0x32cfcb[_0x3b6422(0x2ad)],[_0x3b6422(0x1b4),_0x3b6422(0x282)]);}),a156_0x4dda2b(a156_0x263711(0x325),async()=>{const _0xc0073d=a156_0x263711,_0xf1d53f=_0xc0073d(0x3a2),_0x5f5720=_0xc0073d(0x269),_0x55c55a=_0xc0073d(0x2b7),{proto:_0x5cd927,ctx:_0x4b9473}=createTestContext({'targetId':_0xf1d53f,'nodeData':{'id':_0xf1d53f,'model':_0xc0073d(0x3cc),'provider':_0xc0073d(0x321),'aspectRatio':_0xc0073d(0x232),'imageSize':'1K','batchSize':0x1,'generationParams':{'mode':'official','aspectRatio':_0xc0073d(0x232),'imageSize':'1K'}},'nodes':{[_0x5f5720]:{'id':_0x5f5720,'type':_0xc0073d(0x24b),'originalLocalPath':_0xc0073d(0x1e4),'width':0x640,'height':0x384},[_0x55c55a]:{'id':_0x55c55a,'type':_0xc0073d(0x24b),'originalLocalPath':_0xc0073d(0x33f),'width':0x384,'height':0x640}},'incomingEdges':[{'id':_0xc0073d(0x204),'sourceId':_0x5f5720,'targetId':_0xf1d53f},{'id':_0xc0073d(0x1c6),'sourceId':_0x55c55a,'targetId':_0xf1d53f}],'promptEl':createPromptEl([createNodePromptPillNode('@图片2',_0x55c55a,_0xc0073d(0x280)),createPromptTextNode(_0xc0073d(0x324)),createNodePromptPillNode(_0xc0073d(0x23b),_0x5f5720,_0xc0073d(0x280)),createPromptTextNode('\x20的场景里面')])}),_0x2a4e44=await _0x5cd927[_0xc0073d(0x200)][_0xc0073d(0x2c7)](_0x4b9473);a156_0x588d64['equal'](_0x2a4e44[_0xc0073d(0x370)],_0xc0073d(0x234)),a156_0x588d64[_0xc0073d(0x1fd)](_0x2a4e44['inputUrls'],[_0xc0073d(0x1c3),'/data/uploads/woman.png']);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20RunningHub\x20workflow\x20payload\x20reads\x20hidden\x20image\x20asset\x20refs',async()=>{const _0x430cd5=a156_0x263711,_0x291f30=_0x430cd5(0x315);setAssetMentionAssets([{'id':'asset-hidden-image','items':[{'name':_0x430cd5(0x1b7),'type':_0x430cd5(0x24b),'nodeData':{'type':_0x430cd5(0x24b),'originalLocalPath':_0x430cd5(0x2e4)}}]}]);const {proto:_0x54a1bf,ctx:_0x1dbb70}=createTestContext({'targetId':_0x291f30,'nodeData':{'id':_0x291f30,'model':_0x430cd5(0x295),'provider':_0x430cd5(0x287),'aspectRatio':_0x430cd5(0x232),'batchSize':0x1,'generationParams':{'rhAnimeRealResolution':0x6e0,'rhInstanceType':_0x430cd5(0x1d2)},'promptAssetInputRefs':[{'assetId':_0x430cd5(0x27f),'itemIndex':0x0,'type':'image'}]},'promptText':_0x430cd5(0x2bb)}),_0x301cf5=await _0x54a1bf[_0x430cd5(0x200)][_0x430cd5(0x2c7)](_0x1dbb70);a156_0x588d64[_0x430cd5(0x1bb)](_0x301cf5[_0x430cd5(0x370)],_0x430cd5(0x2bb)),a156_0x588d64[_0x430cd5(0x1bb)](_0x301cf5[_0x430cd5(0x3d1)],0x6e0),a156_0x588d64[_0x430cd5(0x1bb)](_0x301cf5[_0x430cd5(0x376)],0x6e0),a156_0x588d64[_0x430cd5(0x1bb)](_0x301cf5['rhInstanceType'],'plus'),a156_0x588d64['deepEqual'](_0x301cf5[_0x430cd5(0x2ad)],[_0x430cd5(0x28f)]);}),a156_0x4dda2b(a156_0x263711(0x1c1),async()=>{const _0x455b7d=a156_0x263711,_0x131b97=[_0x455b7d(0x1eb),_0x455b7d(0x3a1)];for(const _0x412792 of _0x131b97){const _0xddcd13=_0x455b7d(0x283)+_0x412792[_0x455b7d(0x333)](-0x4),_0xc51146=_0xddcd13+_0x455b7d(0x1e8),_0x1c362b=_0xddcd13+_0x455b7d(0x36c),{proto:_0x80facd,ctx:_0x3aaecf}=createTestContext({'targetId':_0xddcd13,'nodeData':{'id':_0xddcd13,'model':_0x412792,'provider':_0x455b7d(0x287),'aspectRatio':_0x455b7d(0x232),'batchSize':0x1,'generationParams':{'rhResolution':_0x412792['endsWith'](_0x455b7d(0x225))?0x500:0x640,'rhInstanceType':_0x455b7d(0x1d2)}},'nodes':{[_0xc51146]:{'id':_0xc51146,'type':_0x455b7d(0x24b),'originalLocalPath':_0x455b7d(0x30d)},[_0x1c362b]:{'id':_0x1c362b,'type':'source-image','originalLocalPath':_0x455b7d(0x36d)}},'incomingEdges':[{'id':_0xddcd13+_0x455b7d(0x352),'sourceId':_0x1c362b,'targetId':_0xddcd13,'refSlot':'replacedImage'},{'id':_0xddcd13+_0x455b7d(0x2cb),'sourceId':_0xc51146,'targetId':_0xddcd13,'refSlot':_0x455b7d(0x2ae)}],'promptText':_0x455b7d(0x3db)}),_0x582435=await _0x80facd[_0x455b7d(0x200)][_0x455b7d(0x2c7)](_0x3aaecf);a156_0x588d64[_0x455b7d(0x1fd)](_0x582435[_0x455b7d(0x2ad)],[_0x455b7d(0x385),'/data/uploads/source.png'],_0x412792),a156_0x588d64[_0x455b7d(0x1bb)](_0x582435[_0x455b7d(0x376)],_0x412792[_0x455b7d(0x1ab)](_0x455b7d(0x225))?0x500:0x640),a156_0x588d64[_0x455b7d(0x1bb)](_0x582435['rhInstanceType'],'plus');}}),a156_0x4dda2b(a156_0x263711(0x27c),async()=>{const _0x162a97=a156_0x263711,_0x21f6a6=_0x162a97(0x306),_0x8f3a1e=_0x162a97(0x26d),_0xdbae4e='node-youchuan-cref',_0x8792bb=_0x162a97(0x38a),{proto:_0x1b0a07,ctx:_0x362172}=createTestContext({'targetId':_0x21f6a6,'nodeData':{'id':_0x21f6a6,'type':_0x162a97(0x2e8),'model':_0x162a97(0x1d3),'provider':_0x162a97(0x2a2),'generationParams':{'aspectRatio':_0x162a97(0x232),'quality':'1'}},'nodes':{[_0x8f3a1e]:{'id':_0x8f3a1e,'type':_0x162a97(0x24b),'originalLocalPath':_0x162a97(0x326)},[_0xdbae4e]:{'id':_0xdbae4e,'type':_0x162a97(0x24b),'originalLocalPath':_0x162a97(0x35a)},[_0x8792bb]:{'id':_0x8792bb,'type':_0x162a97(0x24b),'originalLocalPath':'data/uploads/sref.png'}},'incomingEdges':[{'id':_0x162a97(0x39b),'sourceId':_0x8792bb,'targetId':_0x21f6a6,'refSlot':_0x162a97(0x2f0)},{'id':_0x162a97(0x244),'sourceId':_0x8f3a1e,'targetId':_0x21f6a6,'refSlot':'imageUrl'},{'id':_0x162a97(0x2df),'sourceId':_0xdbae4e,'targetId':_0x21f6a6,'refSlot':_0x162a97(0x3bc)}],'promptText':_0x162a97(0x2bb),'getProviderConfigImpl':()=>({'modelApiKey':'mk'})}),_0x2465f1=await _0x1b0a07[_0x162a97(0x200)][_0x162a97(0x2c7)](_0x362172);a156_0x588d64[_0x162a97(0x1fd)](_0x2465f1[_0x162a97(0x2e5)],{'imageUrl':_0x162a97(0x212),'cref':_0x162a97(0x218),'sref':_0x162a97(0x2cd)}),a156_0x588d64[_0x162a97(0x1fd)](_0x2465f1[_0x162a97(0x2ad)],[_0x162a97(0x2cd),_0x162a97(0x212),_0x162a97(0x218)]);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20Midjourney\x20V7\x20fixed\x20image\x20slots\x20omit\x20missing\x20role\x20slot',async()=>{const _0x2241d1=a156_0x263711,_0x4d242a=_0x2241d1(0x361),_0x33fc28='node-youchuan-v7-main',_0x4a4ecb=_0x2241d1(0x312),{proto:_0x3bd89f,ctx:_0x46098b}=createTestContext({'targetId':_0x4d242a,'nodeData':{'id':_0x4d242a,'type':_0x2241d1(0x2e8),'model':'runninghub-model/youchuan-v7','provider':'runninghub','generationParams':{'aspectRatio':_0x2241d1(0x232),'quality':'1'}},'nodes':{[_0x33fc28]:{'id':_0x33fc28,'type':_0x2241d1(0x24b),'originalLocalPath':_0x2241d1(0x317)},[_0x4a4ecb]:{'id':_0x4a4ecb,'type':_0x2241d1(0x24b),'originalLocalPath':_0x2241d1(0x3d5)}},'incomingEdges':[{'id':_0x2241d1(0x3dc),'sourceId':_0x4a4ecb,'targetId':_0x4d242a,'refSlot':_0x2241d1(0x2f0)},{'id':'edge-v7-main','sourceId':_0x33fc28,'targetId':_0x4d242a,'refSlot':_0x2241d1(0x3d4)}],'promptText':'portrait','getProviderConfigImpl':()=>({'modelApiKey':'mk'})}),_0x164941=await _0x3bd89f[_0x2241d1(0x200)][_0x2241d1(0x2c7)](_0x46098b);a156_0x588d64[_0x2241d1(0x1fd)](_0x164941[_0x2241d1(0x2e5)],{'imageUrl':_0x2241d1(0x24f),'sref':_0x2241d1(0x372)}),a156_0x588d64[_0x2241d1(0x1bb)](_0x164941[_0x2241d1(0x2e5)]['cref'],undefined),a156_0x588d64['deepEqual'](_0x164941['inputUrls'],[_0x2241d1(0x372),_0x2241d1(0x24f)]);}),a156_0x4dda2b(a156_0x263711(0x253),async()=>{const _0x1ceee5=a156_0x263711,_0x379b1d=_0x1ceee5(0x32c),_0x1a0d54=_0x1ceee5(0x1db),{proto:_0x1082b7,ctx:_0xa1ca95}=createTestContext({'targetId':_0x379b1d,'nodeData':{'id':_0x379b1d,'type':_0x1ceee5(0x2e8),'model':'runninghub-model/rhart-image-g','provider':_0x1ceee5(0x2a2)},'nodes':{[_0x1a0d54]:{'id':_0x1a0d54,'type':_0x1ceee5(0x24b),'originalLocalPath':'data/uploads/image-x-ref.png'}},'incomingEdges':[{'id':_0x1ceee5(0x1f1),'sourceId':_0x1a0d54,'targetId':_0x379b1d,'refSlot':_0x1ceee5(0x3d4)}],'promptText':_0x1ceee5(0x32b),'getProviderConfigImpl':()=>({'modelApiKey':'mk'})}),_0x1518e6=await _0x1082b7[_0x1ceee5(0x200)][_0x1ceee5(0x2c7)](_0xa1ca95);a156_0x588d64[_0x1ceee5(0x1fd)](_0x1518e6[_0x1ceee5(0x2e5)],{'imageUrl':'/data/uploads/image-x-ref.png'}),a156_0x588d64[_0x1ceee5(0x1fd)](_0x1518e6['inputUrls'],[_0x1ceee5(0x22d)]),a156_0x588d64['equal'](_0x1518e6[_0x1ceee5(0x2eb)],_0x1ceee5(0x2a2)),a156_0x588d64[_0x1ceee5(0x1bb)](_0x1518e6[_0x1ceee5(0x203)],_0x1ceee5(0x223)),a156_0x588d64[_0x1ceee5(0x1bb)](_0x1518e6['imageSize'],'1K'),a156_0x588d64[_0x1ceee5(0x1bb)](_0x1518e6['aspectRatio'],_0x1ceee5(0x232)),a156_0x588d64[_0x1ceee5(0x1bb)](_0x1518e6[_0x1ceee5(0x1ba)],0x1),a156_0x588d64[_0x1ceee5(0x1bb)](_0x1518e6[_0x1ceee5(0x350)],undefined),a156_0x588d64['equal'](_0x1518e6[_0x1ceee5(0x2f9)],undefined),a156_0x588d64[_0x1ceee5(0x1bb)](_0x1518e6[_0x1ceee5(0x328)],undefined);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20person\x20replace\x20adaptive\x20ratio\x20uses\x20manifest\x20source\x20slot',async()=>{const _0x521079=a156_0x263711,_0x2ee65c=['runninghub/2041177685895946242','runninghub/2050313968069165058'];for(const _0x58b38c of _0x2ee65c){const _0x1cc149=_0x521079(0x26f)+_0x58b38c[_0x521079(0x333)](-0x4),_0x3cd286=_0x1cc149+_0x521079(0x1e8),_0x1b5325=_0x1cc149+_0x521079(0x36c),{proto:_0x20ffb8,ctx:_0x1fdf3b}=createTestContext({'targetId':_0x1cc149,'nodeData':{'id':_0x1cc149,'model':_0x58b38c,'provider':'runninghubwf','batchSize':0x1,'generationParams':{'rhResolution':_0x58b38c['endsWith'](_0x521079(0x225))?0x500:0x640}},'nodes':{[_0x3cd286]:{'id':_0x3cd286,'type':_0x521079(0x24b),'originalLocalPath':_0x521079(0x30d),'width':0x640,'height':0x384},[_0x1b5325]:{'id':_0x1b5325,'type':_0x521079(0x24b),'originalLocalPath':'data/uploads/source.png','width':0x384,'height':0x640}},'incomingEdges':[{'id':_0x1cc149+_0x521079(0x2cb),'sourceId':_0x3cd286,'targetId':_0x1cc149,'refSlot':_0x521079(0x2ae)},{'id':_0x1cc149+_0x521079(0x352),'sourceId':_0x1b5325,'targetId':_0x1cc149,'refSlot':_0x521079(0x392)}],'promptText':'replace'}),_0x5e89c4=await _0x20ffb8[_0x521079(0x200)]['call'](_0x1fdf3b);a156_0x588d64['deepEqual'](_0x5e89c4['inputUrls'],[_0x521079(0x385),_0x521079(0x27b)],_0x58b38c),a156_0x588d64[_0x521079(0x1bb)](_0x5e89c4['resolvedRatioLabel'],_0x521079(0x3a6),_0x58b38c),a156_0x588d64[_0x521079(0x1bb)](_0x5e89c4[_0x521079(0x395)],_0x521079(0x309),_0x58b38c);}}),a156_0x4dda2b(a156_0x263711(0x273),async()=>{const _0x480253=a156_0x263711,_0x25f5f2='node-ai-image-1',_0x5eff4c='node-ref-image-1',{proto:_0x57cbb0,ctx:_0x476626}=createTestContext({'targetId':_0x25f5f2,'nodeData':{'model':_0x480253(0x229),'provider':_0x480253(0x397),'aspectRatio':_0x480253(0x3a3),'imageSize':'2K','batchSize':0x1},'nodes':{[_0x5eff4c]:{'id':_0x5eff4c,'type':'source-image','imageUrl':_0x480253(0x389),'width':0x640,'height':0x384}},'incomingEdges':[{'id':'edge-1','sourceId':_0x5eff4c,'targetId':_0x25f5f2,'refSlot':''}]}),_0x3be02d=await _0x57cbb0[_0x480253(0x200)][_0x480253(0x2c7)](_0x476626);a156_0x588d64[_0x480253(0x1bb)](_0x3be02d[_0x480253(0x2dd)],_0x480253(0x22b)),a156_0x588d64[_0x480253(0x1bb)](_0x3be02d[_0x480253(0x328)],undefined),a156_0x588d64[_0x480253(0x1bb)](_0x3be02d[_0x480253(0x270)],_0x480253(0x22b)),a156_0x588d64[_0x480253(0x1bb)](_0x3be02d[_0x480253(0x395)],_0x480253(0x309)),a156_0x588d64['equal'](_0x3be02d[_0x480253(0x3b4)],'aspectRatio'),a156_0x588d64['deepEqual'](_0x3be02d['inputUrls'],[_0x480253(0x389)]);}),a156_0x4dda2b(a156_0x263711(0x24a),async()=>{const _0x319c72=a156_0x263711,_0x4bcd3d=_0x319c72(0x205),_0x269c23=_0x319c72(0x286),{proto:_0x4f27f0,ctx:_0x27125a}=createTestContext({'targetId':_0x4bcd3d,'nodeData':{'id':_0x4bcd3d,'model':'nano-banana-pro-vt','provider':'grsai','aspectRatio':'1:1','imageSize':'2K','batchSize':0x1},'nodes':{[_0x269c23]:{'id':_0x269c23,'type':_0x319c72(0x24b),'originalLocalPath':_0x319c72(0x275),'displayLocalPath':_0x319c72(0x359),'thumbLocalPath':_0x319c72(0x250),'thumbUrl':_0x319c72(0x1f8),'width':0x640,'height':0x384}},'incomingEdges':[{'id':_0x319c72(0x1b3),'sourceId':_0x269c23,'targetId':_0x4bcd3d,'refSlot':''}]}),_0x379f0c=await _0x4f27f0[_0x319c72(0x200)][_0x319c72(0x2c7)](_0x27125a);a156_0x588d64[_0x319c72(0x1fd)](_0x379f0c[_0x319c72(0x2ad)],['/data/uploads/original.png']);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20localized\x20reference\x20parser\x20keeps\x20Chinese\x20aliases\x20in\x20English\x20locale',async()=>{const _0x291b3f=a156_0x263711;setLocale('en-US',{'persist':![],'notify':![]});try{const _0x20dc39=_0x291b3f(0x38d),_0xca6d65=_0x291b3f(0x379),{proto:_0x57b892,ctx:_0x5f3115}=createTestContext({'targetId':_0x20dc39,'nodeData':{'id':_0x20dc39,'model':_0x291b3f(0x229),'provider':'grsai','aspectRatio':_0x291b3f(0x232),'imageSize':'2K','batchSize':0x1},'nodes':{[_0xca6d65]:{'id':_0xca6d65,'type':'source-image','originalLocalPath':_0x291b3f(0x2ea)}},'incomingEdges':[{'id':_0x291b3f(0x26c),'sourceId':_0xca6d65,'targetId':_0x20dc39,'refSlot':''}],'promptText':_0x291b3f(0x2bf)}),_0x2eac15=await _0x57b892[_0x291b3f(0x200)][_0x291b3f(0x2c7)](_0x5f3115);a156_0x588d64[_0x291b3f(0x1fd)](_0x2eac15[_0x291b3f(0x2ad)],['/data/uploads/alias-original.png']);}finally{setLocale(DEFAULT_LOCALE,{'persist':![],'notify':![]});}}),a156_0x4dda2b(a156_0x263711(0x25a),async()=>{const _0x15cf3a=a156_0x263711,_0x2705d9=_0x15cf3a(0x320),_0xcb078c=_0x15cf3a(0x242),{proto:_0x5a7690,ctx:_0x3a9bd9}=createTestContext({'targetId':_0x2705d9,'nodeData':{'id':_0x2705d9,'model':_0x15cf3a(0x229),'provider':_0x15cf3a(0x397),'aspectRatio':'1:1','imageSize':'2K','batchSize':0x1},'nodes':{[_0xcb078c]:{'id':_0xcb078c,'type':_0x15cf3a(0x2e8),'mainImageIndex':0x1,'localPath':_0x15cf3a(0x318),'sourceUrl':_0x15cf3a(0x261),'thumbUrl':_0x15cf3a(0x353),'images':[{'originalLocalPath':'data/uploads/other-original.png'},{'originalLocalPath':'data/uploads/main-original.png','localPath':_0x15cf3a(0x208),'sourceUrl':'https://img.example.com/main-source.png','thumbUrl':_0x15cf3a(0x2ca)}],'width':0x4b0,'height':0x4b0}},'incomingEdges':[{'id':_0x15cf3a(0x2b5),'sourceId':_0xcb078c,'targetId':_0x2705d9,'refSlot':''}]}),_0x19ae8a=await _0x5a7690[_0x15cf3a(0x200)][_0x15cf3a(0x2c7)](_0x3a9bd9);a156_0x588d64[_0x15cf3a(0x1fd)](_0x19ae8a[_0x15cf3a(0x2ad)],[_0x15cf3a(0x32a)]);}),a156_0x4dda2b(a156_0x263711(0x381),async()=>{const _0x3a7a92=a156_0x263711,_0x327749=_0x3a7a92(0x2e2),_0x5d8ef6=_0x3a7a92(0x36b),{proto:_0x3cf21c,ctx:_0x56b05b}=createTestContext({'targetId':_0x327749,'nodeData':{'model':_0x3a7a92(0x2d4),'aspectRatio':_0x3a7a92(0x3a3),'imageSize':'2K','batchSize':0x1},'nodes':{[_0x5d8ef6]:{'id':_0x5d8ef6,'type':'source-image','imageUrl':_0x3a7a92(0x20b),'width':0x438,'height':0x546}},'incomingEdges':[{'id':'edge-2','sourceId':_0x5d8ef6,'targetId':_0x327749,'refSlot':''}]}),_0x25eafa=await _0x3cf21c[_0x3a7a92(0x200)]['call'](_0x56b05b),_0x44b20f=await _0x3cf21c['_buildResumePayload'][_0x3a7a92(0x2c7)](_0x56b05b,_0x56b05b[_0x3a7a92(0x3cd)]);a156_0x588d64[_0x3a7a92(0x1bb)](_0x25eafa[_0x3a7a92(0x2dd)],_0x3a7a92(0x256)),a156_0x588d64[_0x3a7a92(0x1bb)](_0x25eafa[_0x3a7a92(0x328)],undefined),a156_0x588d64[_0x3a7a92(0x1bb)](_0x25eafa[_0x3a7a92(0x2eb)],_0x3a7a92(0x343)),a156_0x588d64[_0x3a7a92(0x1bb)](_0x44b20f[_0x3a7a92(0x2eb)],_0x3a7a92(0x343)),a156_0x588d64[_0x3a7a92(0x1fd)](_0x25eafa[_0x3a7a92(0x2ad)],[_0x3a7a92(0x20b)]);}),a156_0x4dda2b(a156_0x263711(0x3ad),async()=>{const _0x25835c=a156_0x263711,_0x37097d=_0x25835c(0x37b),_0x423912=_0x25835c(0x2fd),{proto:_0x477314,ctx:_0x209a3e}=createTestContext({'targetId':_0x37097d,'nodeData':{'id':_0x37097d,'model':_0x25835c(0x229),'provider':_0x25835c(0x397),'aspectRatio':_0x25835c(0x3a3),'imageSize':'2K','batchSize':0x1,'width':0x384,'height':0x384},'nodes':{[_0x423912]:{'id':_0x423912,'type':_0x25835c(0x24b),'imageUrl':_0x25835c(0x2ab),'width':0x640,'height':0x384}},'incomingEdges':[{'id':'edge-grsai-input-first','sourceId':_0x423912,'targetId':_0x37097d,'refSlot':''}]}),_0x2543f4=await _0x477314[_0x25835c(0x200)][_0x25835c(0x2c7)](_0x209a3e);a156_0x588d64[_0x25835c(0x1bb)](_0x2543f4[_0x25835c(0x2eb)],_0x25835c(0x397)),a156_0x588d64[_0x25835c(0x1bb)](_0x2543f4[_0x25835c(0x2dd)],_0x25835c(0x22b)),a156_0x588d64[_0x25835c(0x1bb)](_0x2543f4['resolvedRatioLabel'],_0x25835c(0x22b)),a156_0x588d64[_0x25835c(0x1bb)](_0x2543f4[_0x25835c(0x395)],_0x25835c(0x309));}),a156_0x4dda2b(a156_0x263711(0x301),async()=>{const _0xb59748=a156_0x263711,_0x44ccfb=_0xb59748(0x1d0),{proto:_0x41c34e,ctx:_0x56db7b}=createTestContext({'targetId':_0x44ccfb,'nodeData':{'id':_0x44ccfb,'model':_0xb59748(0x229),'provider':_0xb59748(0x397),'imageSize':'2K','batchSize':0x1,'width':0x640,'height':0x384},'incomingEdges':[]}),_0x49813a=await _0x41c34e[_0xb59748(0x200)][_0xb59748(0x2c7)](_0x56db7b);a156_0x588d64[_0xb59748(0x1bb)](_0x49813a[_0xb59748(0x2dd)],_0xb59748(0x22b)),a156_0x588d64['equal'](_0x49813a[_0xb59748(0x270)],_0xb59748(0x22b)),a156_0x588d64[_0xb59748(0x1bb)](_0x49813a['adaptiveSource'],_0xb59748(0x206));}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20自适应无图像入参时使用显示区域比例映射',async()=>{const _0x1f5f5e=a156_0x263711,_0x308128=_0x1f5f5e(0x3a7),_0x328f0c=_0x1f5f5e(0x39f),{proto:_0x1e086a,ctx:_0x5e4a91}=createTestContext({'targetId':_0x308128,'nodeData':{'id':_0x308128,'model':'ppio/seedream-5.0-lite','aspectRatio':_0x1f5f5e(0x3a3),'imageSize':'2K','batchSize':0x1,'width':0x6a4,'height':0x384},'nodes':{[_0x328f0c]:{'id':_0x328f0c,'type':_0x1f5f5e(0x2b9),'text':_0x1f5f5e(0x3d0),'width':0x834,'height':0x12c}},'incomingEdges':[{'id':_0x1f5f5e(0x278),'sourceId':_0x328f0c,'targetId':_0x308128,'refSlot':''}]}),_0x31d026=await _0x1e086a['_buildPayload']['call'](_0x5e4a91);a156_0x588d64[_0x1f5f5e(0x1bb)](_0x31d026[_0x1f5f5e(0x2dd)],'16:9'),a156_0x588d64['equal'](_0x31d026['adaptiveSource'],_0x1f5f5e(0x206)),a156_0x588d64[_0x1f5f5e(0x1bb)](_0x31d026[_0x1f5f5e(0x270)],_0x1f5f5e(0x25f));}),a156_0x4dda2b(a156_0x263711(0x26a),async()=>{const _0x310531=a156_0x263711,_0x37c429=_0x310531(0x3a8),_0x3ca58e=_0x310531(0x3ac),{proto:_0x32d555,ctx:_0x9549a4}=createTestContext({'targetId':_0x37c429,'nodeData':{'id':_0x37c429,'model':_0x310531(0x2d4),'aspectRatio':_0x310531(0x232),'imageSize':'2K','batchSize':0x1},'nodes':{[_0x3ca58e]:{'id':_0x3ca58e,'type':_0x310531(0x35b),'prompt':'来自生成文本节点的提示词'}},'incomingEdges':[{'id':_0x310531(0x20f),'sourceId':_0x3ca58e,'targetId':_0x37c429,'refSlot':''}],'promptText':_0x310531(0x262)}),_0x1ddc07=await _0x32d555[_0x310531(0x200)][_0x310531(0x2c7)](_0x9549a4);a156_0x588d64[_0x310531(0x1bb)](_0x1ddc07['prompt'],_0x310531(0x1d6)),a156_0x588d64[_0x310531(0x1fd)](_0x1ddc07[_0x310531(0x2ad)],[]);}),a156_0x4dda2b(a156_0x263711(0x1cb),async()=>{const _0x17f8c8=a156_0x263711,_0x50c2fb='node-ai-image-dreamina-1',_0x257d0c=_0x17f8c8(0x2be),{proto:_0x5045b7,ctx:_0x486c73}=createTestContext({'targetId':_0x50c2fb,'nodeData':{'model':'dreamina/5.0','provider':'dreamina','aspectRatio':_0x17f8c8(0x3a3),'imageSize':'2K','batchSize':0x1},'nodes':{[_0x257d0c]:{'id':_0x257d0c,'type':_0x17f8c8(0x24b),'imageUrl':'https://img.example.com/dreamina-169.png','width':0x640,'height':0x384}},'incomingEdges':[{'id':_0x17f8c8(0x214),'sourceId':_0x257d0c,'targetId':_0x50c2fb,'refSlot':''}]}),_0x5974e5=await _0x5045b7[_0x17f8c8(0x200)][_0x17f8c8(0x2c7)](_0x486c73);a156_0x588d64[_0x17f8c8(0x1bb)](_0x5974e5['provider'],_0x17f8c8(0x2f7)),a156_0x588d64['equal'](_0x5974e5[_0x17f8c8(0x2dd)],_0x17f8c8(0x25f));}),a156_0x4dda2b(a156_0x263711(0x238),async()=>{const _0x5a9a98=a156_0x263711,_0x5f2a98=_0x5a9a98(0x1f6),_0x63e467='node-ref-image-real-media-size',{proto:_0x37969c,ctx:_0x15c760}=createTestContext({'targetId':_0x5f2a98,'nodeData':{'model':'dreamina/5.0','provider':'dreamina','aspectRatio':'自适应','imageSize':'2K','batchSize':0x1,'width':0x640,'height':0x384},'nodes':{[_0x63e467]:{'id':_0x63e467,'type':_0x5a9a98(0x24b),'imageUrl':'https://img.example.com/portrait-real.png','width':0x640,'height':0x384,'imageWidth':0x384,'imageHeight':0x640}},'incomingEdges':[{'id':'edge-real-media-size','sourceId':_0x63e467,'targetId':_0x5f2a98,'refSlot':''}]}),_0x39c41f=await _0x37969c[_0x5a9a98(0x200)][_0x5a9a98(0x2c7)](_0x15c760);a156_0x588d64[_0x5a9a98(0x1bb)](_0x39c41f[_0x5a9a98(0x2eb)],_0x5a9a98(0x2f7)),a156_0x588d64[_0x5a9a98(0x1bb)](_0x39c41f[_0x5a9a98(0x2dd)],'9:16'),a156_0x588d64['equal'](_0x39c41f['resolvedRatioLabel'],_0x5a9a98(0x3a6)),a156_0x588d64['equal'](_0x39c41f[_0x5a9a98(0x395)],_0x5a9a98(0x309));}),a156_0x4dda2b(a156_0x263711(0x27a),async()=>{const _0x4eddfe=a156_0x263711,_0x3d382a=_0x4eddfe(0x2a6),_0xd3ccee='node-ref-image-dreamina-original-first',{proto:_0x1b8680,ctx:_0x8d2670}=createTestContext({'targetId':_0x3d382a,'nodeData':{'id':_0x3d382a,'model':_0x4eddfe(0x339),'provider':_0x4eddfe(0x2f7),'aspectRatio':'自适应','imageSize':'2K','batchSize':0x1},'nodes':{[_0xd3ccee]:{'id':_0xd3ccee,'type':_0x4eddfe(0x24b),'originalLocalPath':_0x4eddfe(0x21c),'displayLocalPath':_0x4eddfe(0x3af),'thumbLocalPath':_0x4eddfe(0x1cf),'thumbUrl':_0x4eddfe(0x29d),'width':0x640,'height':0x384}},'incomingEdges':[{'id':_0x4eddfe(0x1c0),'sourceId':_0xd3ccee,'targetId':_0x3d382a,'refSlot':''}]}),_0x4f210c=await _0x1b8680[_0x4eddfe(0x200)][_0x4eddfe(0x2c7)](_0x8d2670);a156_0x588d64['equal'](_0x4f210c[_0x4eddfe(0x2eb)],_0x4eddfe(0x2f7)),a156_0x588d64[_0x4eddfe(0x1fd)](_0x4f210c[_0x4eddfe(0x2ad)],[_0x4eddfe(0x3ca)]);}),a156_0x4dda2b(a156_0x263711(0x360),async()=>{const _0x3b064e=a156_0x263711,_0x23eb46=_0x3b064e(0x1fe),_0x2847e9='node-ref-image-dreamina-2',{proto:_0x17b0ad,ctx:_0x3337d7}=createTestContext({'targetId':_0x23eb46,'nodeData':{'model':_0x3b064e(0x3e1),'provider':_0x3b064e(0x2f7),'aspectRatio':_0x3b064e(0x3a3),'imageSize':'2K','batchSize':0x1},'nodes':{[_0x2847e9]:{'id':_0x2847e9,'type':'source-image','imageUrl':_0x3b064e(0x307),'width':0x4e2,'height':0x3e8}},'incomingEdges':[{'id':_0x3b064e(0x226),'sourceId':_0x2847e9,'targetId':_0x23eb46,'refSlot':''}]}),_0x17182a=await _0x17b0ad['_buildPayload'][_0x3b064e(0x2c7)](_0x3337d7);a156_0x588d64[_0x3b064e(0x1bb)](_0x17182a[_0x3b064e(0x2eb)],_0x3b064e(0x2f7)),a156_0x588d64[_0x3b064e(0x1bb)](_0x17182a[_0x3b064e(0x2dd)],_0x3b064e(0x290));}),a156_0x4dda2b(a156_0x263711(0x34e),async()=>{const _0x1221a1=a156_0x263711,_0x3c1adf='node-ai-image-dreamina-3',{proto:_0x2a690b,ctx:_0x14879e}=createTestContext({'targetId':_0x3c1adf,'nodeData':{'model':_0x1221a1(0x2b3),'provider':_0x1221a1(0x2f7),'aspectRatio':_0x1221a1(0x3a3),'imageSize':'2K','batchSize':0x1},'nodes':{},'incomingEdges':[]}),_0x59bce7=await _0x2a690b[_0x1221a1(0x200)][_0x1221a1(0x2c7)](_0x14879e);a156_0x588d64[_0x1221a1(0x1bb)](_0x59bce7[_0x1221a1(0x2eb)],'dreamina'),a156_0x588d64[_0x1221a1(0x1bb)](_0x59bce7[_0x1221a1(0x2dd)],_0x1221a1(0x232));}),a156_0x4dda2b(a156_0x263711(0x271),async()=>{const _0x5ae3a8=a156_0x263711,_0x58542c='node-ai-image-display-ratio',{proto:_0x7889db,ctx:_0xb8b8f0}=createTestContext({'targetId':_0x58542c,'nodeData':{'id':_0x58542c,'model':_0x5ae3a8(0x339),'provider':_0x5ae3a8(0x2f7),'aspectRatio':_0x5ae3a8(0x3a3),'imageSize':'2K','batchSize':0x1,'width':0x5dc,'height':0x384},'incomingEdges':[]}),_0xd0d818=await _0x7889db[_0x5ae3a8(0x200)][_0x5ae3a8(0x2c7)](_0xb8b8f0);a156_0x588d64[_0x5ae3a8(0x1bb)](_0xd0d818[_0x5ae3a8(0x2dd)],_0x5ae3a8(0x25f)),a156_0x588d64[_0x5ae3a8(0x1bb)](_0xd0d818[_0x5ae3a8(0x395)],_0x5ae3a8(0x206)),a156_0x588d64['equal'](_0xd0d818[_0x5ae3a8(0x270)],_0x5ae3a8(0x25f));}),a156_0x4dda2b(a156_0x263711(0x207),async()=>{const _0x502543=a156_0x263711,_0x297ef7='node-ai-image-fallback-1',{proto:_0x1f98a3,ctx:_0x383997}=createTestContext({'targetId':_0x297ef7,'nodeData':{'model':'ppio/seedream-4.0','provider':_0x502543(0x343),'asyncTaskProvider':_0x502543(0x343),'asyncTaskKind':_0x502543(0x280),'asyncTaskStatus':_0x502543(0x1ee),'asyncTaskId':'','generationStartTime':Date[_0x502543(0x1c2)]()-0x320,'generationDuration':null,'images':[]}});let _0x32f30a=0x0;_0x383997[_0x502543(0x2c5)]=async()=>{_0x32f30a+=0x1;},_0x383997[_0x502543(0x31d)]=()=>{},_0x383997[_0x502543(0x3a0)]=![],await _0x1f98a3[_0x502543(0x367)][_0x502543(0x2c7)](_0x383997),a156_0x588d64['equal'](_0x32f30a,0x1);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20async\x20pending\x20且无\x20taskId\x20但已有结果时不触发重提',async()=>{const _0x2807d0=a156_0x263711,_0x44d452=_0x2807d0(0x332),{proto:_0x1ed43c,ctx:_0x4b7e86}=createTestContext({'targetId':_0x44d452,'nodeData':{'model':_0x2807d0(0x2de),'provider':_0x2807d0(0x343),'asyncTaskProvider':_0x2807d0(0x343),'asyncTaskKind':_0x2807d0(0x280),'asyncTaskStatus':_0x2807d0(0x1ee),'asyncTaskId':'','generationStartTime':Date[_0x2807d0(0x1c2)]()-0x320,'generationDuration':null,'imageUrl':_0x2807d0(0x23f),'images':[{'imageUrl':_0x2807d0(0x23f)}]}});let _0x597a2e=0x0,_0x2b1454=0x0;_0x4b7e86[_0x2807d0(0x2c5)]=async()=>{_0x597a2e+=0x1;},_0x4b7e86[_0x2807d0(0x31d)]=()=>{_0x2b1454+=0x1;},_0x4b7e86[_0x2807d0(0x3a0)]=![],await _0x1ed43c[_0x2807d0(0x367)][_0x2807d0(0x2c7)](_0x4b7e86),a156_0x588d64[_0x2807d0(0x1bb)](_0x597a2e,0x0),a156_0x588d64[_0x2807d0(0x1bb)](_0x2b1454,0x1);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20RunningHub\x20recovery\x20writes\x20terminal\x20state\x20through\x20runtime',async()=>{const _0x53102b=a156_0x263711,_0xbaee84='node-ai-image-rh-runtime-recovery',_0x3d1244=Date[_0x53102b(0x1c2)]()-0xea60,{proto:_0x567ff6,ctx:_0x5e179d,state:_0x55f681}=createTestContext({'targetId':_0xbaee84,'nodeData':{'id':_0xbaee84,'model':_0x53102b(0x295),'provider':_0x53102b(0x287),'rhTaskId':_0x53102b(0x30f),'rhTaskStatus':'running','rhTaskStartedAt':_0x3d1244,'rhTaskUseOpenapiQuery':!![],'generationStartTime':_0x3d1244,'generationDuration':null,'isGenerating':!![],'images':[]},'isRunninghubWorkflowModelImpl':()=>!![],'apiImpl':{'resumeRunningHubImageTask':async(_0x3b44b3,_0x5093a9,_0x425f0d)=>{const _0x2f537b=_0x53102b;return a156_0x588d64[_0x2f537b(0x1bb)](_0x3b44b3,'rh-image-resume-success'),a156_0x588d64[_0x2f537b(0x1bb)](_0x5093a9[_0x2f537b(0x2eb)],'runninghubwf'),a156_0x588d64['equal'](_0x425f0d['useOpenapiQuery'],!![]),{'images':[{'imageUrl':_0x2f537b(0x305),'thumbUrl':_0x2f537b(0x316),'localPath':'output/resumed.png'}]};}}});_0x5e179d[_0x53102b(0x3a0)]=![],_0x5e179d['_buildResumePayload']=async()=>({'model':_0x53102b(0x295),'provider':_0x53102b(0x287),'apiKey':'k_rh'}),_0x5e179d['_persistRunningHubResumeCache']=()=>{},_0x5e179d[_0x53102b(0x33a)]=()=>{},await _0x567ff6['_maybeResumeRunningHubTaskImpl'][_0x53102b(0x2c7)](_0x5e179d);_0x5e179d['_rhResumePromise']&&await _0x5e179d[_0x53102b(0x373)];const _0x205ad0=_0x55f681[_0x53102b(0x1ef)][_0xbaee84];a156_0x588d64['equal'](_0x205ad0[_0x53102b(0x38e)],![]),a156_0x588d64['equal'](_0x205ad0[_0x53102b(0x1be)],_0x53102b(0x34f)),a156_0x588d64[_0x53102b(0x1bb)](_0x205ad0['rhTaskId'],_0x53102b(0x30f)),a156_0x588d64[_0x53102b(0x1bb)](_0x205ad0[_0x53102b(0x386)],_0x53102b(0x34f)),a156_0x588d64[_0x53102b(0x1bb)](_0x205ad0[_0x53102b(0x2ce)],![]),a156_0x588d64[_0x53102b(0x1bb)](_0x205ad0[_0x53102b(0x3d4)],_0x53102b(0x305)),a156_0x588d64[_0x53102b(0x1bb)](_0x205ad0[_0x53102b(0x1f2)],_0x53102b(0x316)),a156_0x588d64[_0x53102b(0x1bb)](_0x205ad0[_0x53102b(0x313)],_0x53102b(0x26e));}),a156_0x4dda2b(a156_0x263711(0x30e),async()=>{const _0x59d0e3=a156_0x263711,_0x5a8497=_0x59d0e3(0x31c),_0x396722=Date['now']()-0xea60;let _0x2ee9c5=0x0;const {proto:_0x1131ed,ctx:_0x25edac,state:_0x26f0ac}=createTestContext({'targetId':_0x5a8497,'nodeData':{'id':_0x5a8497,'model':_0x59d0e3(0x2de),'provider':_0x59d0e3(0x343),'asyncTaskProvider':_0x59d0e3(0x343),'asyncTaskKind':_0x59d0e3(0x280),'asyncTaskId':_0x59d0e3(0x1f4),'asyncTaskStatus':_0x59d0e3(0x355),'asyncTaskStartedAt':_0x396722,'generationStartTime':_0x396722,'generationDuration':null,'isGenerating':!![],'images':[]},'apiImpl':{'resumeAsyncImageTask':async(_0x20aefb,_0x9d0401,_0x193c15)=>{const _0x143c41=_0x59d0e3;return _0x2ee9c5+=0x1,a156_0x588d64[_0x143c41(0x1bb)](_0x20aefb,_0x143c41(0x1f4)),a156_0x588d64['equal'](_0x9d0401[_0x143c41(0x2eb)],'ppio'),a156_0x588d64['ok'](_0x193c15?.[_0x143c41(0x3d9)]),{'images':[{'imageUrl':_0x143c41(0x2e7),'thumbUrl':'/output/async-resumed-thumb.png','localPath':_0x143c41(0x37c)}]};}}});_0x25edac['_isGenerating']=![],_0x25edac[_0x59d0e3(0x38b)]=async()=>({'model':_0x59d0e3(0x2de),'provider':'ppio','apiKey':'k_ppio'}),_0x25edac[_0x59d0e3(0x20c)]=()=>{},_0x25edac['_updateSubmitButtonState']=()=>{},await _0x1131ed['_maybeResumeAsyncTaskImpl'][_0x59d0e3(0x2c7)](_0x25edac);_0x25edac[_0x59d0e3(0x279)]&&await _0x25edac[_0x59d0e3(0x279)];const _0x32686c=_0x26f0ac[_0x59d0e3(0x1ef)][_0x5a8497];a156_0x588d64[_0x59d0e3(0x1bb)](_0x2ee9c5,0x1),a156_0x588d64[_0x59d0e3(0x1bb)](_0x32686c[_0x59d0e3(0x38e)],![]),a156_0x588d64[_0x59d0e3(0x1bb)](_0x32686c[_0x59d0e3(0x1be)],_0x59d0e3(0x34f)),a156_0x588d64['equal'](_0x32686c[_0x59d0e3(0x2b1)],'async-image-resume-success'),a156_0x588d64['equal'](_0x32686c['asyncTaskStatus'],_0x59d0e3(0x34f)),a156_0x588d64['equal'](_0x32686c[_0x59d0e3(0x1b9)],_0x59d0e3(0x343)),a156_0x588d64[_0x59d0e3(0x1bb)](_0x32686c['asyncTaskKind'],_0x59d0e3(0x280)),a156_0x588d64['equal'](_0x32686c[_0x59d0e3(0x3b9)],![]),a156_0x588d64[_0x59d0e3(0x1bb)](_0x32686c[_0x59d0e3(0x3d4)],_0x59d0e3(0x2e7)),a156_0x588d64[_0x59d0e3(0x1bb)](_0x32686c[_0x59d0e3(0x1f2)],_0x59d0e3(0x1b5)),a156_0x588d64[_0x59d0e3(0x1bb)](_0x32686c['localPath'],'output/async-resumed.png');}),a156_0x4dda2b(a156_0x263711(0x1cd),async()=>{const _0x168707=a156_0x263711,_0x3b227f='node-ai-image-async-runtime-pause',_0x1f8a8b=Date[_0x168707(0x1c2)]()-0xea60;let _0xdc5bdd=null;const {proto:_0x572912,ctx:_0x1d9881,state:_0x39acb1}=createTestContext({'targetId':_0x3b227f,'nodeData':{'id':_0x3b227f,'model':_0x168707(0x2de),'provider':_0x168707(0x343),'asyncTaskProvider':_0x168707(0x343),'asyncTaskKind':'image','asyncTaskId':_0x168707(0x3c7),'asyncTaskStatus':_0x168707(0x355),'asyncTaskStartedAt':_0x1f8a8b,'generationStartTime':_0x1f8a8b,'generationDuration':null,'isGenerating':!![],'images':[]},'apiImpl':{'resumeAsyncImageTask':async(_0x36f6ba,_0x4c36cb,_0x3e1751)=>new Promise((_0x414ed3,_0x174ee7)=>{const _0x10b9d5=_0x168707;_0xdc5bdd=_0x3e1751?.[_0x10b9d5(0x3d9)]||null,_0xdc5bdd?.[_0x10b9d5(0x3a4)]?.(_0x10b9d5(0x2c4),()=>{const _0x263cc0=_0x10b9d5,_0x3892f8=new Error(_0x263cc0(0x294));_0x3892f8[_0x263cc0(0x2c2)]='AbortError',_0x174ee7(_0x3892f8);});})}});_0x1d9881[_0x168707(0x3a0)]=![],_0x1d9881['_buildResumePayload']=async()=>({'model':_0x168707(0x2de),'provider':'ppio','apiKey':'k_ppio'}),_0x1d9881[_0x168707(0x20c)]=()=>{},_0x1d9881[_0x168707(0x33a)]=()=>{},await _0x572912[_0x168707(0x367)][_0x168707(0x2c7)](_0x1d9881);for(let _0x482d25=0x0;_0x482d25<0x5&&!_0xdc5bdd;_0x482d25+=0x1){await new Promise(_0x291881=>setImmediate(_0x291881));}a156_0x588d64['ok'](_0xdc5bdd);const _0x755cd3=_0x1d9881[_0x168707(0x279)];_0x1d9881['_stopAsyncRecovery'](![]);if(_0x755cd3)await _0x755cd3;const _0x2005e2=_0x39acb1[_0x168707(0x1ef)][_0x3b227f];a156_0x588d64['equal'](_0x2005e2['isGenerating'],!![]),a156_0x588d64[_0x168707(0x1bb)](_0x2005e2['jobStatus'],_0x168707(0x355)),a156_0x588d64[_0x168707(0x1bb)](_0x2005e2[_0x168707(0x35c)],_0x1f8a8b),a156_0x588d64['equal'](_0x2005e2['generationDuration'],null),a156_0x588d64[_0x168707(0x1bb)](_0x2005e2[_0x168707(0x2b1)],_0x168707(0x3c7)),a156_0x588d64[_0x168707(0x1bb)](_0x2005e2[_0x168707(0x3e0)],'running'),a156_0x588d64[_0x168707(0x1bb)](_0x2005e2['asyncTaskRecovering'],![]);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20Dreamina\x20recovery\x20writes\x20terminal\x20state\x20through\x20runtime',async()=>{const _0x48134d=a156_0x263711,_0x8e60bd=_0x48134d(0x33d),_0x132abc=Date['now']()-0xea60;let _0x5d18f6=0x0;const {proto:_0x1be6f3,ctx:_0x2ad89c,state:_0x2d4450}=createTestContext({'targetId':_0x8e60bd,'nodeData':{'id':_0x8e60bd,'model':_0x48134d(0x2b3),'provider':'dreamina','dreaminaSubmitId':_0x48134d(0x23d),'dreaminaTaskStatus':_0x48134d(0x1ee),'dreaminaTaskPhase':_0x48134d(0x28d),'dreaminaTaskLabel':'生成中','dreaminaTaskStartedAt':_0x132abc,'dreaminaTaskLastCheckedAt':Date[_0x48134d(0x1c2)]()-0x7530,'dreaminaTaskRecovering':![],'generationStartTime':_0x132abc,'generationDuration':null,'isGenerating':!![],'images':[]},'apiImpl':{'resumeDreaminaImageTask':async(_0x2bc526,_0x19d122,_0x23a2e0)=>{const _0x3c1704=_0x48134d;return _0x5d18f6+=0x1,a156_0x588d64[_0x3c1704(0x1bb)](_0x2bc526,_0x3c1704(0x23d)),a156_0x588d64[_0x3c1704(0x1bb)](_0x19d122[_0x3c1704(0x2eb)],_0x3c1704(0x2f7)),a156_0x588d64['ok'](_0x23a2e0?.[_0x3c1704(0x3d9)]),{'imageUrl':_0x3c1704(0x1ce),'thumbUrl':_0x3c1704(0x337),'localPath':_0x3c1704(0x2ef)};}}});_0x2ad89c[_0x48134d(0x3a0)]=![],_0x2ad89c[_0x48134d(0x38b)]=async()=>({'model':_0x48134d(0x2b3),'provider':_0x48134d(0x2f7)}),_0x2ad89c[_0x48134d(0x1d7)]=()=>{},_0x2ad89c[_0x48134d(0x33a)]=()=>{},await _0x1be6f3[_0x48134d(0x1ac)]['call'](_0x2ad89c);_0x2ad89c[_0x48134d(0x37a)]&&await _0x2ad89c[_0x48134d(0x37a)];const _0x642bc1=_0x2d4450[_0x48134d(0x1ef)][_0x8e60bd];a156_0x588d64[_0x48134d(0x1bb)](_0x5d18f6,0x1),a156_0x588d64['equal'](_0x642bc1['isGenerating'],![]),a156_0x588d64[_0x48134d(0x1bb)](_0x642bc1[_0x48134d(0x1be)],_0x48134d(0x34f)),a156_0x588d64[_0x48134d(0x1bb)](_0x642bc1[_0x48134d(0x1e1)],_0x48134d(0x23d)),a156_0x588d64[_0x48134d(0x1bb)](_0x642bc1['dreaminaTaskStatus'],_0x48134d(0x34f)),a156_0x588d64[_0x48134d(0x1bb)](_0x642bc1[_0x48134d(0x368)],_0x48134d(0x259)),a156_0x588d64[_0x48134d(0x1bb)](_0x642bc1[_0x48134d(0x1e0)],_0x48134d(0x394)),a156_0x588d64[_0x48134d(0x1bb)](_0x642bc1[_0x48134d(0x210)],![]),a156_0x588d64['equal'](_0x642bc1[_0x48134d(0x3d4)],_0x48134d(0x1ce)),a156_0x588d64['equal'](_0x642bc1[_0x48134d(0x1f2)],_0x48134d(0x337)),a156_0x588d64[_0x48134d(0x1bb)](_0x642bc1[_0x48134d(0x313)],_0x48134d(0x2ef));}),a156_0x4dda2b(a156_0x263711(0x1dd),async()=>{const _0x2cbaca=a156_0x263711,_0x7475c4='node-ai-image-dreamina-stale-recovery',_0x4fae83=Date['now']()-0xea60,{proto:_0x2c3bc0,ctx:_0x1d1fb2,state:_0x3a846a}=createTestContext({'targetId':_0x7475c4,'nodeData':{'id':_0x7475c4,'model':_0x2cbaca(0x2b3),'provider':_0x2cbaca(0x2f7),'dreaminaSubmitId':_0x2cbaca(0x3d6),'dreaminaTaskStatus':_0x2cbaca(0x1ee),'dreaminaTaskPhase':_0x2cbaca(0x28d),'dreaminaTaskLabel':_0x2cbaca(0x1c9),'dreaminaTaskStartedAt':_0x4fae83,'dreaminaTaskLastCheckedAt':Date[_0x2cbaca(0x1c2)]()-0x7530,'dreaminaTaskRecovering':![],'generationStartTime':_0x4fae83,'generationDuration':null,'isGenerating':!![],'images':[]},'apiImpl':{'resumeDreaminaImageTask':async _0x270264=>{const _0x39efea=_0x2cbaca;a156_0x588d64[_0x39efea(0x1bb)](_0x270264,'sid-dreamina-fail');throw new Error(_0x39efea(0x334));}}});_0x1d1fb2[_0x2cbaca(0x3a0)]=!![],_0x1d1fb2['_buildResumePayload']=async()=>({'model':'dreamina/4.1','provider':_0x2cbaca(0x2f7)}),_0x1d1fb2['_persistDreaminaResumeCache']=()=>{},_0x1d1fb2[_0x2cbaca(0x33a)]=()=>{},await _0x2c3bc0[_0x2cbaca(0x1ac)][_0x2cbaca(0x2c7)](_0x1d1fb2),a156_0x588d64['ok'](_0x1d1fb2[_0x2cbaca(0x37a)]),await _0x1d1fb2[_0x2cbaca(0x37a)];const _0x1b14eb=_0x3a846a[_0x2cbaca(0x1ef)][_0x7475c4];a156_0x588d64[_0x2cbaca(0x1bb)](_0x1b14eb[_0x2cbaca(0x38e)],![]),a156_0x588d64[_0x2cbaca(0x1bb)](_0x1b14eb[_0x2cbaca(0x1be)],_0x2cbaca(0x1b6)),a156_0x588d64['equal'](_0x1b14eb['jobError'],_0x2cbaca(0x334)),a156_0x588d64['equal'](_0x1b14eb[_0x2cbaca(0x243)],_0x2cbaca(0x3b3)),a156_0x588d64[_0x2cbaca(0x1bb)](_0x1b14eb[_0x2cbaca(0x368)],_0x2cbaca(0x3b3)),a156_0x588d64[_0x2cbaca(0x1bb)](_0x1b14eb[_0x2cbaca(0x1e0)],_0x2cbaca(0x334)),a156_0x588d64['equal'](_0x1b14eb[_0x2cbaca(0x210)],![]);}),a156_0x4dda2b(a156_0x263711(0x356),async()=>{const _0x21c3fb=a156_0x263711,_0x5d171f=_0x21c3fb(0x209),_0x59e59b=Date['now']()-0xea60,{proto:_0x2a15e8,ctx:_0x2a5c1a,state:_0x4e0ce3}=createTestContext({'targetId':_0x5d171f,'nodeData':{'id':_0x5d171f,'model':'dreamina/4.1','provider':_0x21c3fb(0x2f7),'dreaminaSubmitId':_0x21c3fb(0x387),'dreaminaTaskStatus':_0x21c3fb(0x1ee),'dreaminaTaskPhase':_0x21c3fb(0x29c),'dreaminaTaskLabel':_0x21c3fb(0x255),'dreaminaTaskStartedAt':_0x59e59b,'dreaminaTaskLastCheckedAt':Date[_0x21c3fb(0x1c2)](),'dreaminaTaskRecovering':![],'generationStartTime':_0x59e59b,'generationDuration':null,'isGenerating':!![],'images':[]},'apiImpl':{'resumeDreaminaImageTask':async _0x4efc45=>{const _0x347829=_0x21c3fb;a156_0x588d64['equal'](_0x4efc45,_0x347829(0x387));throw new Error(_0x347829(0x334));}}});_0x2a5c1a[_0x21c3fb(0x3a0)]=!![],_0x2a5c1a[_0x21c3fb(0x29f)]='',_0x2a5c1a[_0x21c3fb(0x38b)]=async()=>({'model':'dreamina/4.1','provider':_0x21c3fb(0x2f7)}),_0x2a5c1a[_0x21c3fb(0x1d7)]=()=>{},_0x2a5c1a[_0x21c3fb(0x33a)]=()=>{},await _0x2a15e8['_maybeResumeDreaminaTaskImpl'][_0x21c3fb(0x2c7)](_0x2a5c1a),a156_0x588d64['ok'](_0x2a5c1a[_0x21c3fb(0x37a)]),await _0x2a5c1a[_0x21c3fb(0x37a)];const _0x50629b=_0x4e0ce3[_0x21c3fb(0x1ef)][_0x5d171f];a156_0x588d64['equal'](_0x50629b[_0x21c3fb(0x38e)],![]),a156_0x588d64['equal'](_0x50629b[_0x21c3fb(0x1be)],_0x21c3fb(0x1b6)),a156_0x588d64[_0x21c3fb(0x1bb)](_0x50629b[_0x21c3fb(0x243)],_0x21c3fb(0x3b3)),a156_0x588d64[_0x21c3fb(0x1bb)](_0x50629b[_0x21c3fb(0x368)],'failed');}),a156_0x4dda2b(a156_0x263711(0x23a),async()=>{const _0x183384=a156_0x263711,_0x187ab1='node-ai-image-dreamina-reentrant-recovery',_0x275580=Date[_0x183384(0x1c2)]()-0xea60,{proto:_0x3ec7d6,ctx:_0x6e037e,state:_0x17c723,store:_0x347420}=createTestContext({'targetId':_0x187ab1,'nodeData':{'id':_0x187ab1,'model':_0x183384(0x2b3),'provider':_0x183384(0x2f7),'dreaminaSubmitId':_0x183384(0x1d5),'dreaminaTaskStatus':'pending','dreaminaTaskPhase':_0x183384(0x28d),'dreaminaTaskLabel':_0x183384(0x1c9),'dreaminaTaskStartedAt':_0x275580,'dreaminaTaskLastCheckedAt':Date[_0x183384(0x1c2)]()-0x7530,'dreaminaTaskRecovering':![],'generationStartTime':_0x275580,'generationDuration':null,'isGenerating':!![],'images':[]},'apiImpl':{'resumeDreaminaImageTask':async _0x5c3777=>{const _0x1c68f1=_0x183384;a156_0x588d64[_0x1c68f1(0x1bb)](_0x5c3777,'sid-dreamina-reentrant-fail'),await Promise[_0x1c68f1(0x25c)]();throw new Error(_0x1c68f1(0x334));}}});_0x6e037e['_isGenerating']=!![],_0x6e037e[_0x183384(0x38b)]=async()=>({'model':_0x183384(0x2b3),'provider':_0x183384(0x2f7)}),_0x6e037e[_0x183384(0x1d7)]=()=>{},_0x6e037e[_0x183384(0x33a)]=()=>{};const _0x14ddbf=_0x347420[_0x183384(0x1fb)]['bind'](_0x347420);let _0xe7fd4a=![];_0x347420['updateNodeData']=(_0x3e0428,_0x2fbee6)=>{const _0x26cdd2=_0x183384;_0x14ddbf(_0x3e0428,_0x2fbee6),!_0xe7fd4a&&_0x2fbee6?.[_0x26cdd2(0x210)]===!![]&&(_0xe7fd4a=!![],void _0x3ec7d6[_0x26cdd2(0x1ac)][_0x26cdd2(0x2c7)](_0x6e037e));},await _0x3ec7d6[_0x183384(0x1ac)][_0x183384(0x2c7)](_0x6e037e),await _0x6e037e[_0x183384(0x37a)];const _0x49c049=_0x17c723[_0x183384(0x1ef)][_0x187ab1];a156_0x588d64['equal'](_0xe7fd4a,!![]),a156_0x588d64[_0x183384(0x1bb)](_0x49c049[_0x183384(0x38e)],![]),a156_0x588d64[_0x183384(0x1bb)](_0x49c049[_0x183384(0x1be)],_0x183384(0x1b6)),a156_0x588d64[_0x183384(0x1bb)](_0x49c049['dreaminaTaskStatus'],_0x183384(0x3b3)),a156_0x588d64['equal'](_0x49c049[_0x183384(0x210)],![]);}),a156_0x4dda2b(a156_0x263711(0x3bb),async()=>{const _0x487fe5=a156_0x263711,_0x575287=_0x487fe5(0x233),_0x4fb274={};let _0x1f2c82=0x0,_0x4d6034=0x0;const {proto:_0x58db53,ctx:_0x4b0a18,state:_0x2429ec}=createTestContext({'targetId':_0x575287,'nodeData':{'id':_0x575287,'model':_0x487fe5(0x2b3),'provider':'dreamina','aspectRatio':_0x487fe5(0x232),'imageSize':'2K','batchSize':0x1},'apiImpl':{'generateImage':async(_0x2c856c,_0x49f881={})=>{const _0x53c1bd=_0x487fe5;_0x49f881['onTaskMeta']?.({'taskId':_0x53c1bd(0x2d9)}),_0x49f881[_0x53c1bd(0x249)]?.({'submitId':'sid-dreamina-progress-fail','status':'failed','phase':_0x53c1bd(0x3b3),'label':'policy\x20rejected','failReason':_0x53c1bd(0x1f0),'raw':{'status':'failed'}});const _0x171aa3=_0x2429ec[_0x53c1bd(0x1ef)][_0x575287];a156_0x588d64[_0x53c1bd(0x1bb)](_0x171aa3[_0x53c1bd(0x38e)],![]),a156_0x588d64['equal'](_0x171aa3[_0x53c1bd(0x1be)],_0x53c1bd(0x1b6)),a156_0x588d64['equal'](_0x171aa3[_0x53c1bd(0x268)],_0x53c1bd(0x1f0)),a156_0x588d64[_0x53c1bd(0x1bb)](_0x171aa3[_0x53c1bd(0x243)],_0x53c1bd(0x3b3)),a156_0x588d64[_0x53c1bd(0x1bb)](_0x171aa3['dreaminaTaskPhase'],'failed'),a156_0x588d64['equal'](_0x4d6034,0x1);throw new Error(_0x53c1bd(0x1f0));}},'startLoadingImpl':_0x54dcd9=>{a156_0x588d64['equal'](_0x54dcd9,_0x4fb274),_0x1f2c82+=0x1;},'stopLoadingImpl':_0x93455b=>{a156_0x588d64['equal'](_0x93455b,_0x4fb274),_0x4d6034+=0x1;}});_0x4b0a18[_0x487fe5(0x2d0)]=_0x4fb274,_0x4b0a18[_0x487fe5(0x3c0)]=createButtonStub(),_0x4b0a18[_0x487fe5(0x33a)]=()=>{},await _0x58db53[_0x487fe5(0x2c5)][_0x487fe5(0x2c7)](_0x4b0a18);const _0x36d4da=_0x2429ec[_0x487fe5(0x1ef)][_0x575287];a156_0x588d64[_0x487fe5(0x1bb)](_0x1f2c82,0x1),a156_0x588d64['ok'](_0x4d6034>=0x1),a156_0x588d64[_0x487fe5(0x1bb)](_0x4b0a18[_0x487fe5(0x3a0)],![]),a156_0x588d64['equal'](_0x4b0a18[_0x487fe5(0x3c0)][_0x487fe5(0x245)]['contains'](_0x487fe5(0x1da)),![]),a156_0x588d64[_0x487fe5(0x33c)](_0x4b0a18[_0x487fe5(0x3c0)][_0x487fe5(0x285)],/animation:spin/),a156_0x588d64[_0x487fe5(0x1bb)](_0x36d4da[_0x487fe5(0x38e)],![]),a156_0x588d64[_0x487fe5(0x1bb)](_0x36d4da[_0x487fe5(0x1be)],_0x487fe5(0x1b6)),a156_0x588d64[_0x487fe5(0x1bb)](_0x36d4da[_0x487fe5(0x268)],_0x487fe5(0x1f0)),a156_0x588d64[_0x487fe5(0x1bb)](_0x36d4da[_0x487fe5(0x210)],![]),a156_0x588d64['ok'](Number(_0x36d4da[_0x487fe5(0x345)])>=0x0),a156_0x588d64[_0x487fe5(0x1bb)](_0x36d4da[_0x487fe5(0x21d)]?.[0x0]?.[_0x487fe5(0x1b6)],_0x487fe5(0x1f0)),a156_0x588d64[_0x487fe5(0x1bb)](_0x36d4da[_0x487fe5(0x398)],0x0),a156_0x588d64[_0x487fe5(0x1bb)](_0x36d4da[_0x487fe5(0x3d4)],'');}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20APIMart\x20错误结果会结束加载并标记失败',async()=>{const _0x10508a=a156_0x263711,_0x239e3d=_0x10508a(0x37d),{proto:_0x242224,ctx:_0x47e6e3,state:_0x1d1e60}=createTestContext({'targetId':_0x239e3d,'nodeData':{'id':_0x239e3d,'model':_0x10508a(0x266),'provider':_0x10508a(0x321),'aspectRatio':_0x10508a(0x232),'imageSize':'2K','batchSize':0x1},'apiImpl':{'generateImage':async()=>[{'error':_0x10508a(0x31e),'imageUrl':'','thumbUrl':''}]}});await _0x242224[_0x10508a(0x2c5)][_0x10508a(0x2c7)](_0x47e6e3);const _0x5d7e51=_0x1d1e60[_0x10508a(0x1ef)][_0x239e3d];a156_0x588d64['equal'](_0x5d7e51['isGenerating'],![]),a156_0x588d64[_0x10508a(0x1bb)](_0x5d7e51[_0x10508a(0x1be)],_0x10508a(0x1b6)),a156_0x588d64[_0x10508a(0x1bb)](_0x5d7e51[_0x10508a(0x268)],_0x10508a(0x31e)),a156_0x588d64[_0x10508a(0x1bb)](_0x5d7e51[_0x10508a(0x3e0)],_0x10508a(0x3b3)),a156_0x588d64[_0x10508a(0x1bb)](_0x5d7e51[_0x10508a(0x21d)]?.[0x0]?.[_0x10508a(0x1b6)],_0x10508a(0x31e));}),a156_0x4dda2b(a156_0x263711(0x1ca),async()=>{const _0x305309=a156_0x263711,_0x684cad='node-ai-image-mixed-batch',{proto:_0x30b743,ctx:_0x16c730,state:_0x2343b7}=createTestContext({'targetId':_0x684cad,'nodeData':{'id':_0x684cad,'model':_0x305309(0x3aa),'provider':_0x305309(0x397),'aspectRatio':_0x305309(0x232),'imageSize':'2K','batchSize':0x4},'apiImpl':{'generateImage':async()=>({'isBatch':!![],'images':[{'error':_0x305309(0x1f0),'imageUrl':'','thumbUrl':''},{'imageUrl':'/output/a.png','localPath':_0x305309(0x3c5)},{'imageUrl':_0x305309(0x1c8),'localPath':_0x305309(0x241)},{'imageUrl':_0x305309(0x2d5),'localPath':_0x305309(0x35d)}]})}});await _0x30b743[_0x305309(0x2c5)][_0x305309(0x2c7)](_0x16c730);const _0xdc473=_0x2343b7['nodes'][_0x684cad];a156_0x588d64['equal'](_0xdc473[_0x305309(0x38e)],![]),a156_0x588d64[_0x305309(0x1bb)](_0xdc473['jobStatus'],_0x305309(0x34f)),a156_0x588d64['equal'](_0xdc473[_0x305309(0x268)],null),a156_0x588d64[_0x305309(0x1bb)](_0xdc473[_0x305309(0x21d)]?.[_0x305309(0x2b2)],0x4),a156_0x588d64[_0x305309(0x1bb)](_0xdc473[_0x305309(0x21d)]?.[0x0]?.[_0x305309(0x1b6)],_0x305309(0x1f0)),a156_0x588d64[_0x305309(0x1bb)](_0xdc473[_0x305309(0x398)],0x1),a156_0x588d64['equal'](_0xdc473['imageUrl'],_0x305309(0x340)),a156_0x588d64[_0x305309(0x1bb)](_0xdc473[_0x305309(0x313)],_0x305309(0x3c5));}),a156_0x4dda2b(a156_0x263711(0x2ba),async()=>{const _0x439a99=a156_0x263711,_0x4b9163='node-ai-image-volcengine-loading',_0xe3d8f0={};let _0x2ace1e=0x0;const {proto:_0x3cc5b6,ctx:_0x4834f9,state:_0x473a35}=createTestContext({'targetId':_0x4b9163,'nodeData':{'id':_0x4b9163,'model':'volcengine/seedream-4.0','provider':_0x439a99(0x3da),'aspectRatio':_0x439a99(0x232),'imageSize':'2K','batchSize':0x1},'apiImpl':{'generateImage':async(_0x414828,_0x145102={})=>{const _0x2a25ff=_0x439a99;a156_0x588d64[_0x2a25ff(0x1bb)](Boolean(_0x145102[_0x2a25ff(0x3d9)]),![]);const _0x1a77fb=_0x473a35['nodes'][_0x4b9163];return a156_0x588d64['equal'](_0x1a77fb[_0x2a25ff(0x38e)],!![]),a156_0x588d64['equal'](_0x1a77fb[_0x2a25ff(0x1be)],_0x2a25ff(0x355)),a156_0x588d64[_0x2a25ff(0x1bb)](_0x1a77fb[_0x2a25ff(0x1b9)],''),a156_0x588d64['equal'](_0x1a77fb['asyncTaskStatus'],_0x2a25ff(0x1ec)),_0x145102[_0x2a25ff(0x300)]?.({'taskId':_0x2a25ff(0x3b7),'provider':'volcengine','kind':_0x2a25ff(0x280)}),{'imageUrl':'/output/volcengine.png','sourceUrl':_0x2a25ff(0x1e5),'thumbUrl':_0x2a25ff(0x37f)};}},'startLoadingImpl':_0x3b9854=>{const _0x1d4b67=_0x439a99;a156_0x588d64[_0x1d4b67(0x1bb)](_0x3b9854,_0xe3d8f0),_0x2ace1e+=0x1;}});_0x4834f9[_0x439a99(0x2d0)]=_0xe3d8f0,_0x4834f9[_0x439a99(0x3c0)]=createButtonStub(),_0x4834f9[_0x439a99(0x33a)]=()=>{},await _0x3cc5b6['_onGenerate'][_0x439a99(0x2c7)](_0x4834f9);const _0x10fe79=_0x473a35[_0x439a99(0x1ef)][_0x4b9163];a156_0x588d64[_0x439a99(0x1bb)](_0x2ace1e,0x1),a156_0x588d64[_0x439a99(0x1bb)](_0x10fe79[_0x439a99(0x38e)],![]),a156_0x588d64['equal'](_0x10fe79[_0x439a99(0x1be)],_0x439a99(0x34f)),a156_0x588d64[_0x439a99(0x1bb)](_0x10fe79[_0x439a99(0x1b9)],''),a156_0x588d64['equal'](_0x10fe79['asyncTaskKind'],_0x439a99(0x280)),a156_0x588d64['equal'](_0x10fe79['asyncTaskStatus'],_0x439a99(0x1ec)),a156_0x588d64[_0x439a99(0x1bb)](_0x10fe79[_0x439a99(0x3d4)],_0x439a99(0x37f));}),a156_0x4dda2b(a156_0x263711(0x3ce),async()=>{const _0x274cd1=a156_0x263711,_0x2ff6b0='node-ai-image-volcengine-missing-key',_0x322893={},_0xbf0d70=globalThis[_0x274cd1(0x3c4)]['showToast'],_0x407488=[];let _0x2e687f=0x0,_0x21513a=0x0;try{globalThis[_0x274cd1(0x3c4)][_0x274cd1(0x1e2)]=(_0x34e4a6,_0x21dba0)=>{const _0x4ef192=_0x274cd1;_0x407488[_0x4ef192(0x354)]({'message':_0x34e4a6,'type':_0x21dba0});};const {proto:_0xbd18c2,ctx:_0x5dc427,state:_0x2f68c1}=createTestContext({'targetId':_0x2ff6b0,'nodeData':{'id':_0x2ff6b0,'model':'volcengine/seedream-4.0','provider':_0x274cd1(0x3da),'aspectRatio':'1:1','imageSize':'2K','batchSize':0x1},'promptText':_0x274cd1(0x2fb),'getProviderConfigImpl':()=>({'apiKey':''}),'apiImpl':{'generateImage':async()=>{return _0x2e687f+=0x1,{'imageUrl':'/output/should-not-run.png'};}},'startLoadingImpl':_0x14970e=>{a156_0x588d64['equal'](_0x14970e,_0x322893),_0x21513a+=0x1;}});_0x5dc427['previewEl']=_0x322893,_0x5dc427['btnEl']=createButtonStub(),await _0xbd18c2[_0x274cd1(0x2c5)]['call'](_0x5dc427);const _0x297aeb=_0x2f68c1[_0x274cd1(0x1ef)][_0x2ff6b0];a156_0x588d64['equal'](_0x2e687f,0x0),a156_0x588d64[_0x274cd1(0x1bb)](_0x21513a,0x0),a156_0x588d64['equal'](_0x297aeb[_0x274cd1(0x38e)],undefined),a156_0x588d64[_0x274cd1(0x1fd)](_0x407488,[{'message':_0x274cd1(0x383),'type':_0x274cd1(0x21b)}]);}finally{globalThis[_0x274cd1(0x3c4)]['showToast']=_0xbf0d70;}}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20manifest\x20modelApi\x20reads\x20ordinary\x20params\x20from\x20generationParams',async()=>{const _0x1bd3c7=a156_0x263711,_0x104b79=_0x1bd3c7(0x215),{proto:_0x10ef12,ctx:_0x347fcd}=createTestContext({'targetId':_0x104b79,'nodeData':{'id':_0x104b79,'model':_0x1bd3c7(0x266),'provider':'apimart','aspectRatio':_0x1bd3c7(0x25f),'imageSize':'2K','generationParams':{'mode':_0x1bd3c7(0x388),'aspectRatio':_0x1bd3c7(0x220),'imageSize':'4K','google_search':![],'google_image_search':!![],'batchSize':0x2},'batchSize':0x4},'promptText':'manifest\x20params'}),_0x18f307=await _0x10ef12[_0x1bd3c7(0x200)]['call'](_0x347fcd);a156_0x588d64[_0x1bd3c7(0x1bb)](_0x18f307[_0x1bd3c7(0x363)],_0x1bd3c7(0x266)),a156_0x588d64[_0x1bd3c7(0x1bb)](_0x18f307['provider'],_0x1bd3c7(0x321)),a156_0x588d64['equal'](_0x18f307[_0x1bd3c7(0x2a4)],_0x1bd3c7(0x388)),a156_0x588d64[_0x1bd3c7(0x1bb)](_0x18f307[_0x1bd3c7(0x1a7)],'4K'),a156_0x588d64['equal'](_0x18f307[_0x1bd3c7(0x2dd)],'1:8'),a156_0x588d64[_0x1bd3c7(0x1bb)](_0x18f307[_0x1bd3c7(0x2e0)],!![]),a156_0x588d64[_0x1bd3c7(0x1bb)](_0x18f307[_0x1bd3c7(0x31a)],!![]),a156_0x588d64[_0x1bd3c7(0x1bb)](_0x18f307['batchSize'],0x2);}),a156_0x4dda2b(a156_0x263711(0x1df),async()=>{const _0x48f6bc=a156_0x263711,_0x241058='node-ai-image-agnes-image-input',_0x4ecebe='node-ai-image-agnes-source',_0x1685c0={};let _0x57b933=0x0,_0x36d550=0x0,_0x21a20e=null;const {proto:_0x411e3e,ctx:_0x13a17a,state:_0x43899d}=createTestContext({'targetId':_0x241058,'nodes':{[_0x4ecebe]:{'id':_0x4ecebe,'type':_0x48f6bc(0x24b),'imageUrl':_0x48f6bc(0x293)}},'incomingEdges':[{'id':_0x48f6bc(0x2ff),'sourceId':_0x4ecebe,'targetId':_0x241058}],'nodeData':{'id':_0x241058,'model':'agnes/agnes-image-2.0-flash','provider':'agnes','generationParams':{'aspectRatio':_0x48f6bc(0x25f),'imageSize':'1K','batchSize':0x1}},'promptText':'','getProviderConfigImpl':()=>({'apiKey':_0x48f6bc(0x366)}),'apiImpl':{'generateImage':async _0x116a3e=>{const _0x4be26d=_0x48f6bc;return _0x21a20e=_0x116a3e,{'imageUrl':_0x4be26d(0x1ea)};}},'startLoadingImpl':_0x242c58=>{a156_0x588d64['equal'](_0x242c58,_0x1685c0),_0x57b933+=0x1;},'stopLoadingImpl':_0x4c73df=>{const _0x4b6b5b=_0x48f6bc;a156_0x588d64[_0x4b6b5b(0x1bb)](_0x4c73df,_0x1685c0),_0x36d550+=0x1;}});_0x13a17a[_0x48f6bc(0x2d0)]=_0x1685c0,_0x13a17a[_0x48f6bc(0x3c0)]=createButtonStub(),await _0x411e3e[_0x48f6bc(0x2c5)]['call'](_0x13a17a),a156_0x588d64[_0x48f6bc(0x1bb)](_0x57b933,0x1),a156_0x588d64['equal'](_0x36d550,0x1),a156_0x588d64[_0x48f6bc(0x1bb)](_0x21a20e?.[_0x48f6bc(0x2eb)],'agnes'),a156_0x588d64[_0x48f6bc(0x1bb)](_0x21a20e?.[_0x48f6bc(0x363)],'agnes/agnes-image-2.0-flash'),a156_0x588d64[_0x48f6bc(0x1fd)](_0x21a20e?.[_0x48f6bc(0x2ad)],[_0x48f6bc(0x293)]),a156_0x588d64[_0x48f6bc(0x1bb)](_0x43899d[_0x48f6bc(0x1ef)][_0x241058][_0x48f6bc(0x1be)],_0x48f6bc(0x34f));}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20generation\x20start\x20keeps\x20existing\x20preview\x20under\x20loading\x20overlay',async()=>{const _0x56fa19=a156_0x263711,_0x5a0fc9='node-ai-image-stale-error-start';let _0x412c20=null,_0x3d9641=0x0;const {proto:_0x459447,ctx:_0x3832a3,state:_0x129c42}=createTestContext({'targetId':_0x5a0fc9,'nodeData':{'id':_0x5a0fc9,'model':_0x56fa19(0x1b1),'provider':_0x56fa19(0x3cf),'generationParams':{'aspectRatio':_0x56fa19(0x25f),'imageSize':'1K','batchSize':0x1},'images':[{'error':_0x56fa19(0x371),'imageUrl':'','thumbUrl':''}],'imageUrl':'','thumbUrl':'','jobStatus':_0x56fa19(0x1b6),'isGenerating':![]},'promptText':_0x56fa19(0x263),'getProviderConfigImpl':()=>({'apiKey':_0x56fa19(0x366)}),'apiImpl':{'generateImage':async()=>{const _0x106a7=_0x56fa19;return _0x412c20=_0x129c42[_0x106a7(0x1ef)][_0x5a0fc9],{'imageUrl':_0x106a7(0x331)};}},'startLoadingImpl':()=>{_0x3d9641+=0x1;}});_0x3832a3[_0x56fa19(0x3c0)]=createButtonStub(),await _0x459447[_0x56fa19(0x2c5)]['call'](_0x3832a3),a156_0x588d64[_0x56fa19(0x1bb)](_0x3d9641,0x1),a156_0x588d64[_0x56fa19(0x1fd)](_0x412c20?.['images'],[{'error':_0x56fa19(0x371),'imageUrl':'','thumbUrl':''}]),a156_0x588d64[_0x56fa19(0x1bb)](_0x412c20?.[_0x56fa19(0x3d4)],''),a156_0x588d64[_0x56fa19(0x1bb)](_0x412c20?.[_0x56fa19(0x1be)],_0x56fa19(0x355)),a156_0x588d64['equal'](_0x129c42[_0x56fa19(0x1ef)][_0x5a0fc9][_0x56fa19(0x1be)],_0x56fa19(0x34f)),a156_0x588d64[_0x56fa19(0x1bb)](_0x129c42[_0x56fa19(0x1ef)][_0x5a0fc9]['imageUrl'],_0x56fa19(0x331));}),a156_0x4dda2b(a156_0x263711(0x292),async()=>{const _0x34e8a6=a156_0x263711,_0x186e42='node-ai-image-agnes-stale-task-family-start',_0x4a836a={};let _0x2114cf=null,_0x1b4937=0x0;const {proto:_0x55dcb3,ctx:_0x30d2bb,state:_0x1add25}=createTestContext({'targetId':_0x186e42,'nodeData':{'id':_0x186e42,'model':'agnes/agnes-image-2.1-flash','provider':'agnes','generationParams':{'aspectRatio':_0x34e8a6(0x25f),'imageSize':'1K','batchSize':0x1},'rhTaskId':_0x34e8a6(0x38f),'rhTaskStatus':'failed','dreaminaSubmitId':'old-dreamina-task','dreaminaTaskStatus':_0x34e8a6(0x3b3),'dreaminaTaskPhase':_0x34e8a6(0x3b3),'asyncTaskId':_0x34e8a6(0x240),'asyncTaskStatus':'success','jobStatus':_0x34e8a6(0x1b6),'isGenerating':![]},'promptText':_0x34e8a6(0x2f2),'getProviderConfigImpl':()=>({'apiKey':_0x34e8a6(0x366)}),'apiImpl':{'generateImage':async()=>{const _0x15dfaa=_0x34e8a6;return _0x2114cf=_0x1add25[_0x15dfaa(0x1ef)][_0x186e42],{'imageUrl':_0x15dfaa(0x302)};}},'startLoadingImpl':_0x32a658=>{const _0x3d3b02=_0x34e8a6;a156_0x588d64[_0x3d3b02(0x1bb)](_0x32a658,_0x4a836a),_0x1b4937+=0x1;}});_0x30d2bb[_0x34e8a6(0x2d0)]=_0x4a836a,_0x30d2bb[_0x34e8a6(0x3c0)]=createButtonStub(),await _0x55dcb3['_onGenerate'][_0x34e8a6(0x2c7)](_0x30d2bb),a156_0x588d64[_0x34e8a6(0x1bb)](_0x1b4937,0x1),a156_0x588d64['equal'](_0x2114cf?.['isGenerating'],!![]),a156_0x588d64[_0x34e8a6(0x1bb)](_0x2114cf?.[_0x34e8a6(0x1be)],'running'),a156_0x588d64[_0x34e8a6(0x1bb)](_0x2114cf?.[_0x34e8a6(0x291)],''),a156_0x588d64['equal'](_0x2114cf?.['rhTaskStatus'],'idle'),a156_0x588d64[_0x34e8a6(0x1bb)](_0x2114cf?.['dreaminaSubmitId'],''),a156_0x588d64[_0x34e8a6(0x1bb)](_0x2114cf?.[_0x34e8a6(0x243)],_0x34e8a6(0x1ec)),a156_0x588d64[_0x34e8a6(0x1bb)](_0x2114cf?.['dreaminaTaskPhase'],'idle'),a156_0x588d64[_0x34e8a6(0x1bb)](_0x2114cf?.[_0x34e8a6(0x2b1)],''),a156_0x588d64['equal'](_0x2114cf?.[_0x34e8a6(0x3e0)],'idle'),a156_0x588d64[_0x34e8a6(0x1bb)](shouldShowGenerationBusyUi(_0x2114cf),!![]),a156_0x588d64['equal'](_0x1add25[_0x34e8a6(0x1ef)][_0x186e42][_0x34e8a6(0x1be)],'success'),a156_0x588d64[_0x34e8a6(0x1bb)](_0x1add25[_0x34e8a6(0x1ef)][_0x186e42][_0x34e8a6(0x3d4)],_0x34e8a6(0x302));}),a156_0x4dda2b(a156_0x263711(0x2a1),async()=>{const _0x413a25=a156_0x263711,_0x59533d=_0x413a25(0x281),{proto:_0x5b46be,ctx:_0x5af32e,state:_0x3e4549}=createTestContext({'targetId':_0x59533d,'nodeData':{'id':_0x59533d,'model':_0x413a25(0x2d4),'provider':_0x413a25(0x343),'aspectRatio':_0x413a25(0x232),'imageSize':'2K','batchSize':0x1},'apiImpl':{'generateImage':async()=>{const _0x597661=_0x413a25;throw new Error(_0x597661(0x230));}}});await _0x5b46be[_0x413a25(0x2c5)][_0x413a25(0x2c7)](_0x5af32e);const _0x377fa7=_0x3e4549[_0x413a25(0x1ef)][_0x59533d];a156_0x588d64['equal'](_0x377fa7['isGenerating'],![]),a156_0x588d64[_0x413a25(0x1bb)](_0x377fa7[_0x413a25(0x1be)],'error'),a156_0x588d64['equal'](_0x377fa7[_0x413a25(0x268)],_0x413a25(0x230)),a156_0x588d64['equal'](_0x377fa7['asyncTaskStatus'],_0x413a25(0x3b3)),a156_0x588d64[_0x413a25(0x1bb)](_0x377fa7[_0x413a25(0x21d)]?.[0x0]?.[_0x413a25(0x1b6)],_0x413a25(0x230)),a156_0x588d64[_0x413a25(0x1bb)](_0x377fa7[_0x413a25(0x398)],0x0),a156_0x588d64[_0x413a25(0x1bb)](_0x377fa7[_0x413a25(0x3d4)],'');}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20API\x20返回单个错误对象会结束加载并标记失败',async()=>{const _0x3f2dcd=a156_0x263711,_0x25751b=_0x3f2dcd(0x327),{proto:_0x2f9a60,ctx:_0x3eec46,state:_0x4a3177}=createTestContext({'targetId':_0x25751b,'nodeData':{'id':_0x25751b,'model':_0x3f2dcd(0x33e),'provider':_0x3f2dcd(0x397),'aspectRatio':_0x3f2dcd(0x232),'imageSize':'2K','batchSize':0x1},'apiImpl':{'generateImage':async()=>({'error':_0x3f2dcd(0x2cc),'imageUrl':'','thumbUrl':''})}});await _0x2f9a60[_0x3f2dcd(0x2c5)][_0x3f2dcd(0x2c7)](_0x3eec46);const _0x13543a=_0x4a3177[_0x3f2dcd(0x1ef)][_0x25751b];a156_0x588d64[_0x3f2dcd(0x1bb)](_0x13543a[_0x3f2dcd(0x38e)],![]),a156_0x588d64[_0x3f2dcd(0x1bb)](_0x13543a[_0x3f2dcd(0x1be)],_0x3f2dcd(0x1b6)),a156_0x588d64[_0x3f2dcd(0x1bb)](_0x13543a[_0x3f2dcd(0x268)],_0x3f2dcd(0x2cc)),a156_0x588d64[_0x3f2dcd(0x1bb)](_0x13543a[_0x3f2dcd(0x3e0)],_0x3f2dcd(0x3b3));}),a156_0x4dda2b(a156_0x263711(0x3df),async()=>{const _0x11703d=a156_0x263711,_0x4a6e14=_0x11703d(0x2bd),{proto:_0x55aae1,ctx:_0x206390,state:_0x30cf2f}=createTestContext({'targetId':_0x4a6e14,'nodeData':{'id':_0x4a6e14,'model':_0x11703d(0x266),'provider':_0x11703d(0x321),'aspectRatio':_0x11703d(0x232),'imageSize':'2K','batchSize':0x1},'apiImpl':{'generateImage':async()=>{throw new Error('缺少异步图片任务ID，无法恢复');}}});await _0x55aae1['_onGenerate'][_0x11703d(0x2c7)](_0x206390);const _0x475194=_0x30cf2f[_0x11703d(0x1ef)][_0x4a6e14];a156_0x588d64[_0x11703d(0x1bb)](_0x475194['isGenerating'],![]),a156_0x588d64[_0x11703d(0x1bb)](_0x475194[_0x11703d(0x1be)],'error'),a156_0x588d64[_0x11703d(0x1bb)](_0x475194[_0x11703d(0x268)],_0x11703d(0x1b8)),a156_0x588d64['equal'](_0x475194[_0x11703d(0x3e0)],_0x11703d(0x3b3));}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20成功结果会结束加载并标记成功',async()=>{const _0x92655c=a156_0x263711,_0x34cabd=_0x92655c(0x378),{proto:_0x5b0eb4,ctx:_0x280873,state:_0x37fa26}=createTestContext({'targetId':_0x34cabd,'nodeData':{'id':_0x34cabd,'model':_0x92655c(0x229),'provider':'grsai','aspectRatio':_0x92655c(0x232),'imageSize':'2K','batchSize':0x1},'apiImpl':{'generateImage':async()=>({'imageUrl':_0x92655c(0x25b),'sourceUrl':_0x92655c(0x348),'thumbUrl':'/output/success.png'})}});await _0x5b0eb4[_0x92655c(0x2c5)][_0x92655c(0x2c7)](_0x280873);const _0x4f380c=_0x37fa26[_0x92655c(0x1ef)][_0x34cabd];a156_0x588d64[_0x92655c(0x1bb)](_0x4f380c[_0x92655c(0x38e)],![]),a156_0x588d64[_0x92655c(0x1bb)](_0x4f380c['jobStatus'],'success'),a156_0x588d64[_0x92655c(0x1bb)](_0x4f380c[_0x92655c(0x268)],null),a156_0x588d64['equal'](_0x4f380c[_0x92655c(0x3e0)],_0x92655c(0x34f)),a156_0x588d64[_0x92655c(0x1bb)](_0x4f380c['imageUrl'],_0x92655c(0x25b));}),a156_0x4dda2b(a156_0x263711(0x24d),async()=>{const _0x4b3eff=a156_0x263711,_0x25398f=_0x4b3eff(0x22c),_0x2a6671={};let _0x42d09e=0x0,_0x4f91a3=0x0,_0x2961b3=0x0;const {proto:_0x1e9e4c,ctx:_0x57ffe5,state:_0x186988}=createTestContext({'targetId':_0x25398f,'nodeData':{'id':_0x25398f,'model':_0x4b3eff(0x272),'provider':'grsai','aspectRatio':_0x4b3eff(0x232),'imageSize':'2K','batchSize':0x1},'promptText':_0x4b3eff(0x298),'apiImpl':{'generateImage':async(_0xcc9f96,_0x30a7c5={})=>{const _0x4318a9=_0x4b3eff;return _0x42d09e+=0x1,_0x30a7c5[_0x4318a9(0x300)]?.({'taskId':_0x4318a9(0x308)+_0x42d09e,'provider':'grsai'}),{'imageUrl':_0x4318a9(0x1dc)+_0x42d09e+_0x4318a9(0x342),'sourceUrl':'https://img.example.com/grsai-direct-'+_0x42d09e+_0x4318a9(0x342),'thumbUrl':_0x4318a9(0x1dc)+_0x42d09e+_0x4318a9(0x342)};}},'startLoadingImpl':_0x106e8c=>{const _0xa7202=_0x4b3eff;a156_0x588d64[_0xa7202(0x1bb)](_0x106e8c,_0x2a6671),_0x4f91a3+=0x1;},'stopLoadingImpl':_0x4a33bd=>{a156_0x588d64['equal'](_0x4a33bd,_0x2a6671),_0x2961b3+=0x1;}});_0x57ffe5[_0x4b3eff(0x2d0)]=_0x2a6671,_0x57ffe5[_0x4b3eff(0x3c0)]=createButtonStub(),await _0x1e9e4c[_0x4b3eff(0x2c5)][_0x4b3eff(0x2c7)](_0x57ffe5),a156_0x588d64[_0x4b3eff(0x1bb)](_0x57ffe5[_0x4b3eff(0x3a0)],![]),a156_0x588d64['equal'](_0x57ffe5[_0x4b3eff(0x3c0)][_0x4b3eff(0x3bd)],![]),a156_0x588d64[_0x4b3eff(0x33c)](_0x57ffe5[_0x4b3eff(0x3c0)][_0x4b3eff(0x285)],/animation:spin/),await _0x1e9e4c[_0x4b3eff(0x2c5)][_0x4b3eff(0x2c7)](_0x57ffe5);const _0x47d34f=_0x186988[_0x4b3eff(0x1ef)][_0x25398f];a156_0x588d64[_0x4b3eff(0x1bb)](_0x42d09e,0x2),a156_0x588d64[_0x4b3eff(0x1bb)](_0x4f91a3,0x2),a156_0x588d64[_0x4b3eff(0x1bb)](_0x2961b3,0x2),a156_0x588d64['equal'](_0x57ffe5[_0x4b3eff(0x3a0)],![]),a156_0x588d64[_0x4b3eff(0x1bb)](_0x57ffe5['btnEl'][_0x4b3eff(0x3bd)],![]),a156_0x588d64[_0x4b3eff(0x1bb)](_0x47d34f[_0x4b3eff(0x38e)],![]),a156_0x588d64['equal'](_0x47d34f[_0x4b3eff(0x1be)],'success'),a156_0x588d64[_0x4b3eff(0x1bb)](_0x47d34f[_0x4b3eff(0x2b1)],_0x4b3eff(0x1e7)),a156_0x588d64['equal'](_0x47d34f[_0x4b3eff(0x3e0)],_0x4b3eff(0x34f)),a156_0x588d64[_0x4b3eff(0x1bb)](_0x47d34f[_0x4b3eff(0x3d4)],_0x4b3eff(0x3be));}),a156_0x4dda2b(a156_0x263711(0x3b2),async()=>{const _0x219fc6=a156_0x263711,_0x3c98fb=_0x219fc6(0x32e);let _0x55cdc2=0x0;const _0x28ab06={'signal':{'aborted':![]},'abort'(){const _0x1bd871=_0x219fc6;this['signal'][_0x1bd871(0x344)]=!![];}},{proto:_0x49822a,ctx:_0x1bfb51,state:_0xf24a59}=createTestContext({'targetId':_0x3c98fb,'nodeData':{'id':_0x3c98fb,'model':_0x219fc6(0x1eb),'provider':'runninghubwf','generationStartTime':0x3e8,'rhTaskStartedAt':0x3e8,'rhTaskId':_0x219fc6(0x246),'rhTaskStatus':_0x219fc6(0x355),'rhTaskUseOpenapiQuery':!![],'isGenerating':!![],'jobStatus':_0x219fc6(0x355)},'apiImpl':{'cancelRunningHubWorkflowTask':async({apiKey:_0x4cd715,taskId:_0x40a0f7})=>{const _0x1edd1f=_0x219fc6;return a156_0x588d64[_0x1edd1f(0x1bb)](_0x4cd715,'k_rh'),a156_0x588d64['equal'](_0x40a0f7,_0x1edd1f(0x246)),{'code':0x0,'msg':_0x1edd1f(0x3a5)};}},'stopLoadingImpl':()=>{_0x55cdc2+=0x1;}});_0x1bfb51['_isGenerating']=!![],_0x1bfb51[_0x219fc6(0x1bc)]=_0x219fc6(0x248),_0x1bfb51['_rhTaskId']=_0x219fc6(0x246),_0x1bfb51[_0x219fc6(0x24c)]=_0x28ab06,_0x1bfb51[_0x219fc6(0x3c0)]=createButtonStub(),_0x1bfb51[_0x219fc6(0x33a)]=()=>{},await _0x49822a[_0x219fc6(0x26b)][_0x219fc6(0x2c7)](_0x1bfb51);const _0x124d17=_0xf24a59['nodes'][_0x3c98fb];a156_0x588d64['equal'](_0x124d17[_0x219fc6(0x38e)],![]),a156_0x588d64[_0x219fc6(0x1bb)](_0x124d17['jobStatus'],_0x219fc6(0x34c)),a156_0x588d64[_0x219fc6(0x1bb)](_0x124d17[_0x219fc6(0x386)],_0x219fc6(0x34c)),a156_0x588d64[_0x219fc6(0x1bb)](_0x124d17[_0x219fc6(0x28c)],'cancelled\x20by\x20user'),a156_0x588d64[_0x219fc6(0x1bb)](_0x124d17[_0x219fc6(0x304)],0x0),a156_0x588d64[_0x219fc6(0x1bb)](_0x124d17[_0x219fc6(0x2ce)],![]),a156_0x588d64[_0x219fc6(0x1bb)](_0x28ab06[_0x219fc6(0x3d9)][_0x219fc6(0x344)],!![]),a156_0x588d64[_0x219fc6(0x1bb)](_0x55cdc2,0x1),a156_0x588d64[_0x219fc6(0x1bb)](_0x1bfb51[_0x219fc6(0x3a0)],![]),a156_0x588d64[_0x219fc6(0x33c)](_0x1bfb51['btnEl'][_0x219fc6(0x285)],/animation:spin/);}),a156_0x4dda2b(a156_0x263711(0x3d2),()=>{const _0x1d417b=a156_0x263711,_0x4f6bc4=_0x1d417b(0x34b),_0x1119cf={'signal':{'aborted':![]},'abort'(){const _0x5a96fe=_0x1d417b;this[_0x5a96fe(0x3d9)][_0x5a96fe(0x344)]=!![];}},{proto:_0x23e759,ctx:_0x21ef59}=createTestContext({'targetId':_0x4f6bc4,'nodeData':{'id':_0x4f6bc4,'model':_0x1d417b(0x1eb),'provider':_0x1d417b(0x287),'isGenerating':!![],'jobStatus':'running'}});_0x21ef59[_0x1d417b(0x24c)]=_0x1119cf,_0x23e759[_0x1d417b(0x24e)]['call'](_0x21ef59),a156_0x588d64[_0x1d417b(0x1bb)](_0x1119cf[_0x1d417b(0x3d9)][_0x1d417b(0x344)],!![]),a156_0x588d64['equal'](_0x21ef59[_0x1d417b(0x24c)],null);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20RunningHub\x20NanoBanana\x20自适应无参考图时按显示区\x201600x900\x20映射\x2016:9',async()=>{const _0x57fcb4=a156_0x263711,_0x26bdd8=_0x57fcb4(0x2c9),{proto:_0x1e0b88,ctx:_0x4bd3a0}=createTestContext({'targetId':_0x26bdd8,'nodeData':{'id':_0x26bdd8,'model':_0x57fcb4(0x2ee),'provider':_0x57fcb4(0x2a2),'aspectRatio':'自适应','imageSize':'2K','batchSize':0x1,'width':0x640,'height':0x384},'nodes':{},'incomingEdges':[]}),_0x1f7361=await _0x1e0b88[_0x57fcb4(0x200)]['call'](_0x4bd3a0);a156_0x588d64[_0x57fcb4(0x1bb)](_0x1f7361[_0x57fcb4(0x2eb)],'runninghub'),a156_0x588d64['equal'](_0x1f7361['aspectRatio'],_0x57fcb4(0x25f));}),a156_0x4dda2b(a156_0x263711(0x1ff),async()=>{const _0x551481=a156_0x263711,_0xbc0e97=_0x551481(0x2d2),{proto:_0x4ae185,ctx:_0x221fc0}=createTestContext({'targetId':_0xbc0e97,'nodeData':{'id':_0xbc0e97,'model':_0x551481(0x1ad),'provider':_0x551481(0x2a2),'aspectRatio':_0x551481(0x22b),'imageSize':'2K','batchSize':0x1,'width':0x6a4,'height':0x384},'nodes':{},'incomingEdges':[]}),_0x4e5780=await _0x4ae185['_buildPayload'][_0x551481(0x2c7)](_0x221fc0);a156_0x588d64[_0x551481(0x1bb)](_0x4e5780[_0x551481(0x2eb)],_0x551481(0x2a2)),a156_0x588d64[_0x551481(0x1bb)](_0x4e5780[_0x551481(0x2dd)],_0x551481(0x25f));}),a156_0x4dda2b(a156_0x263711(0x3ba),async()=>{const _0x488b9d=a156_0x263711,_0x5d32a6=_0x488b9d(0x31f),{proto:_0x457c17,ctx:_0x30979c}=createTestContext({'targetId':_0x5d32a6,'nodeData':{'id':_0x5d32a6,'model':'runninghub-model/rhart-image-g-2-official','provider':'runninghub','aspectRatio':_0x488b9d(0x220),'imageSize':'4K','batchSize':0x1,'width':0x384,'height':0x6a4},'nodes':{},'incomingEdges':[]}),_0x3aa28d=await _0x457c17[_0x488b9d(0x200)]['call'](_0x30979c);a156_0x588d64['equal'](_0x3aa28d[_0x488b9d(0x2eb)],'runninghub'),a156_0x588d64['equal'](_0x3aa28d[_0x488b9d(0x363)],_0x488b9d(0x27d)),a156_0x588d64[_0x488b9d(0x1bb)](_0x3aa28d[_0x488b9d(0x2dd)],_0x488b9d(0x369));}),a156_0x4dda2b(a156_0x263711(0x2b0),async()=>{const _0x378ce9=a156_0x263711,_0x5bc4b2=_0x378ce9(0x380),{proto:_0x223737,ctx:_0x132dc5}=createTestContext({'targetId':_0x5bc4b2,'nodeData':{'id':_0x5bc4b2,'model':'runninghub-model/rhart-image-g-2-official','provider':_0x378ce9(0x2a2),'aspectRatio':_0x378ce9(0x232),'imageSize':'1K','batchSize':0x1,'width':0x384,'height':0x384},'nodes':{},'incomingEdges':[]}),_0x1079b6=await _0x223737[_0x378ce9(0x200)][_0x378ce9(0x2c7)](_0x132dc5);a156_0x588d64[_0x378ce9(0x1bb)](_0x1079b6[_0x378ce9(0x2eb)],'runninghub'),a156_0x588d64['equal'](_0x1079b6['model'],_0x378ce9(0x27d)),a156_0x588d64['equal'](_0x1079b6[_0x378ce9(0x1a7)],'1K'),a156_0x588d64[_0x378ce9(0x1bb)](_0x1079b6[_0x378ce9(0x2dd)],_0x378ce9(0x232));}),a156_0x4dda2b(a156_0x263711(0x1fa),async()=>{const _0x3b5246=a156_0x263711,_0xc675c4=_0x3b5246(0x202),{proto:_0x1e4d69,ctx:_0x45a1c1}=createTestContext({'targetId':_0xc675c4,'nodeData':{'id':_0xc675c4,'model':'ppio/seedream-5.0-lite','provider':'ppio','aspectRatio':_0x3b5246(0x3a3),'imageSize':'2K','batchSize':0x1,'width':0x6a4,'height':0x384},'nodes':{},'incomingEdges':[]}),_0x4a3b18=await _0x1e4d69[_0x3b5246(0x200)][_0x3b5246(0x2c7)](_0x45a1c1);a156_0x588d64[_0x3b5246(0x1bb)](_0x4a3b18['provider'],_0x3b5246(0x343)),a156_0x588d64[_0x3b5246(0x1bb)](_0x4a3b18[_0x3b5246(0x2dd)],_0x3b5246(0x25f));}),a156_0x4dda2b(a156_0x263711(0x2f3),async()=>{const _0x41d6ca=a156_0x263711,_0x6a4127={'runninghub':{'apiKey':_0x41d6ca(0x2f1),'modelApiKey':_0x41d6ca(0x30a)},'runninghubwf':{'apiKey':'k_runninghub_wf'},'dreamina':{'apiKey':_0x41d6ca(0x3a9)},'ppio':{'apiKey':_0x41d6ca(0x1bd)},'apimart':{'apiKey':_0x41d6ca(0x1de)},'grsai':{'apiKey':_0x41d6ca(0x222)}},_0x3c0c54=[{'name':_0x41d6ca(0x29e),'model':_0x41d6ca(0x2ee),'expectedProvider':_0x41d6ca(0x2a2),'expectedApiKey':_0x41d6ca(0x30a)},{'name':'runninghub\x20工作流使用\x20workflow\x20apiKey','model':_0x41d6ca(0x1eb),'expectedProvider':_0x41d6ca(0x287),'expectedApiKey':_0x41d6ca(0x22f),'isWorkflow':!![]},{'name':_0x41d6ca(0x231),'model':'dreamina/4.5','expectedProvider':_0x41d6ca(0x2f7),'expectedApiKey':_0x41d6ca(0x3a9)},{'name':_0x41d6ca(0x31b),'model':_0x41d6ca(0x2d4),'expectedProvider':_0x41d6ca(0x343),'expectedApiKey':_0x41d6ca(0x1bd)},{'name':'APImart\x20模型推断为\x20apimart','model':_0x41d6ca(0x266),'expectedProvider':'apimart','expectedApiKey':_0x41d6ca(0x1de)},{'name':_0x41d6ca(0x29a),'model':_0x41d6ca(0x229),'expectedProvider':_0x41d6ca(0x397),'expectedApiKey':_0x41d6ca(0x222)}];for(const _0x125cb5 of _0x3c0c54){const {proto:_0x1c1948,ctx:_0x21ae6d}=createTestContext({'targetId':_0x41d6ca(0x274)+_0x125cb5['expectedProvider'],'nodeData':{'id':_0x41d6ca(0x274)+_0x125cb5[_0x41d6ca(0x323)],'model':_0x125cb5[_0x41d6ca(0x363)],'provider':'','imageSize':'2K','batchSize':0x1},'getProviderConfigImpl':_0x551dd1=>_0x6a4127[_0x551dd1]||{},'isRunninghubWorkflowModelImpl':()=>_0x125cb5['isWorkflow']===!![]}),_0x3cb07a=await _0x1c1948[_0x41d6ca(0x38b)][_0x41d6ca(0x2c7)](_0x21ae6d,_0x21ae6d[_0x41d6ca(0x3cd)]);a156_0x588d64[_0x41d6ca(0x1bb)](_0x3cb07a[_0x41d6ca(0x2eb)],_0x125cb5['expectedProvider'],_0x125cb5[_0x41d6ca(0x2c2)]),a156_0x588d64['equal'](_0x3cb07a[_0x41d6ca(0x1d8)],_0x125cb5[_0x41d6ca(0x1d1)],_0x125cb5['name']),a156_0x588d64['equal'](_0x3cb07a[_0x41d6ca(0x363)],_0x125cb5[_0x41d6ca(0x37e)]||_0x125cb5[_0x41d6ca(0x363)],_0x125cb5[_0x41d6ca(0x2c2)]);}}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20RunningHub\x20model\x20API\x20payload\x20does\x20not\x20use\x20workflow\x20key',async()=>{const _0x3c134a=a156_0x263711,{proto:_0xbc7bf0,ctx:_0x497cf1}=createTestContext({'targetId':_0x3c134a(0x396),'nodeData':{'id':_0x3c134a(0x396),'model':_0x3c134a(0x2ee),'provider':'runninghub','aspectRatio':'1:1','imageSize':'2K','batchSize':0x1},'promptText':'prompt','getProviderConfigImpl':_0x59f15b=>_0x59f15b===_0x3c134a(0x2a2)?{'apiKey':_0x3c134a(0x390)}:{}}),_0x2967ea=await _0xbc7bf0[_0x3c134a(0x200)]['call'](_0x497cf1);a156_0x588d64[_0x3c134a(0x1bb)](_0x2967ea[_0x3c134a(0x2eb)],_0x3c134a(0x2a2)),a156_0x588d64[_0x3c134a(0x1bb)](_0x2967ea[_0x3c134a(0x1d8)],'');}),a156_0x4dda2b(a156_0x263711(0x2a3),()=>{const _0x3a8fe8=a156_0x263711,{proto:_0x1038f6,ctx:_0x405c13}=createTestContext({'targetId':_0x3a8fe8(0x34a),'nodeData':{'id':'node-ai-image-recovery-matrix','model':_0x3a8fe8(0x2ee),'provider':'runninghub','imageSize':'2K','batchSize':0x1},'isRunninghubWorkflowModelImpl':_0x395f4e=>String(_0x395f4e||'')[_0x3a8fe8(0x338)](_0x3a8fe8(0x1b0))});a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6[_0x3a8fe8(0x254)][_0x3a8fe8(0x2c7)](_0x405c13,{'model':_0x3a8fe8(0x2ee),'provider':_0x3a8fe8(0x2a2),'rhTaskId':_0x3a8fe8(0x2a7),'rhTaskStatus':_0x3a8fe8(0x1ee)}),!![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6['_isRunningHubRecoverableRunningTask'][_0x3a8fe8(0x2c7)](_0x405c13,{'model':_0x3a8fe8(0x1eb),'provider':'','rhTaskId':_0x3a8fe8(0x1fc),'rhTaskStatus':_0x3a8fe8(0x314)}),!![]),a156_0x588d64['equal'](_0x1038f6['_isRunningHubRecoverableRunningTask'][_0x3a8fe8(0x2c7)](_0x405c13,{'model':'runninghub-model/rhart-image-v1','provider':_0x3a8fe8(0x2a2),'rhTaskId':'rh-task-3','rhTaskStatus':_0x3a8fe8(0x34f)}),![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6[_0x3a8fe8(0x237)][_0x3a8fe8(0x2c7)](_0x405c13,{'model':_0x3a8fe8(0x3e1),'provider':_0x3a8fe8(0x2f7),'dreaminaSubmitId':_0x3a8fe8(0x2c6),'dreaminaTaskStatus':'pending','dreaminaTaskPhase':_0x3a8fe8(0x28d)}),!![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6[_0x3a8fe8(0x237)]['call'](_0x405c13,{'model':_0x3a8fe8(0x3e1),'provider':_0x3a8fe8(0x2f7),'dreaminaSubmitId':'dm-task-2','dreaminaTaskStatus':_0x3a8fe8(0x34f),'dreaminaTaskPhase':_0x3a8fe8(0x259)}),![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6[_0x3a8fe8(0x237)][_0x3a8fe8(0x2c7)](_0x405c13,{'model':_0x3a8fe8(0x3e1),'provider':_0x3a8fe8(0x2f7),'dreaminaSubmitId':_0x3a8fe8(0x21a),'jobStatus':_0x3a8fe8(0x1b6),'dreaminaTaskStatus':_0x3a8fe8(0x1ee),'dreaminaTaskPhase':_0x3a8fe8(0x28d)}),![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6[_0x3a8fe8(0x237)][_0x3a8fe8(0x2c7)](_0x405c13,{'model':_0x3a8fe8(0x3e1),'provider':_0x3a8fe8(0x2f7),'dreaminaSubmitId':_0x3a8fe8(0x2d7),'dreaminaTaskStatus':_0x3a8fe8(0x1b6),'dreaminaTaskPhase':_0x3a8fe8(0x28d)}),![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6[_0x3a8fe8(0x30c)][_0x3a8fe8(0x2c7)](_0x405c13,{'model':_0x3a8fe8(0x2d4),'asyncTaskProvider':_0x3a8fe8(0x343),'asyncTaskKind':_0x3a8fe8(0x280),'asyncTaskId':_0x3a8fe8(0x33b),'asyncTaskStatus':'running'}),!![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6['_isAsyncRecoverableRunningTask'][_0x3a8fe8(0x2c7)](_0x405c13,{'model':'apimart/flux-kontext-pro','asyncTaskProvider':'apimart','asyncTaskKind':_0x3a8fe8(0x280),'asyncTaskId':_0x3a8fe8(0x1af),'asyncTaskStatus':_0x3a8fe8(0x265)}),!![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6[_0x3a8fe8(0x30c)][_0x3a8fe8(0x2c7)](_0x405c13,{'model':_0x3a8fe8(0x2ee),'asyncTaskProvider':_0x3a8fe8(0x2a2),'asyncTaskKind':_0x3a8fe8(0x280),'asyncTaskId':_0x3a8fe8(0x276),'asyncTaskStatus':_0x3a8fe8(0x355)}),![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6[_0x3a8fe8(0x30c)][_0x3a8fe8(0x2c7)](_0x405c13,{'model':_0x3a8fe8(0x3b1),'asyncTaskProvider':'grsai','asyncTaskKind':_0x3a8fe8(0x280),'asyncTaskId':_0x3a8fe8(0x2b4),'asyncTaskStatus':_0x3a8fe8(0x355)}),!![]),a156_0x588d64[_0x3a8fe8(0x1bb)](_0x1038f6[_0x3a8fe8(0x30c)][_0x3a8fe8(0x2c7)](_0x405c13,{'model':_0x3a8fe8(0x2d4),'asyncTaskProvider':'ppio','asyncTaskKind':_0x3a8fe8(0x1f5),'asyncTaskId':_0x3a8fe8(0x3dd),'asyncTaskStatus':_0x3a8fe8(0x355)}),![]);}),a156_0x4dda2b(a156_0x263711(0x347),async()=>{const _0x2ceddd=a156_0x263711,_0x45e9e0=_0x2ceddd(0x23e),_0x2e46d2={'runninghubwf':{'apiKey':'k_runninghub_wf'}},{proto:_0x27725d,ctx:_0x33f0fc}=createTestContext({'targetId':_0x45e9e0,'nodeData':{'id':_0x45e9e0,'model':'runninghub/2050306122774532097','provider':'','aspectRatio':_0x2ceddd(0x232),'imageSize':'2K','batchSize':0x1},'nodes':{'node-rh-workflow-ref':{'id':_0x2ceddd(0x310),'type':_0x2ceddd(0x24b),'originalLocalPath':_0x2ceddd(0x29b)}},'incomingEdges':[{'id':_0x2ceddd(0x2c8),'sourceId':'node-rh-workflow-ref','targetId':_0x45e9e0,'refSlot':''}],'promptText':'','getProviderConfigImpl':_0x2a9fc5=>_0x2e46d2[_0x2a9fc5]||{},'isRunninghubWorkflowModelImpl':_0x48ca45=>_0x48ca45===_0x2ceddd(0x21f)}),_0x9a5ad3=await _0x27725d[_0x2ceddd(0x200)]['call'](_0x33f0fc);a156_0x588d64['ok'](_0x9a5ad3),a156_0x588d64[_0x2ceddd(0x1bb)](_0x9a5ad3['provider'],_0x2ceddd(0x287)),a156_0x588d64[_0x2ceddd(0x1bb)](_0x9a5ad3[_0x2ceddd(0x1d8)],_0x2ceddd(0x22f)),a156_0x588d64[_0x2ceddd(0x1bb)](_0x9a5ad3['prompt'],'');}),a156_0x4dda2b(a156_0x263711(0x2c1),async()=>{const _0x1af75f=a156_0x263711,_0x4887fc=_0x1af75f(0x2da),_0x43c593=globalThis[_0x1af75f(0x3c4)][_0x1af75f(0x1e2)],_0x563283=[];globalThis[_0x1af75f(0x3c4)][_0x1af75f(0x1e2)]=(_0x8e52ee,_0x408d04)=>{_0x563283['push']({'message':_0x8e52ee,'type':_0x408d04});};try{const {proto:_0x74c9f4,ctx:_0x4ff723}=createTestContext({'targetId':_0x4887fc,'nodeData':{'id':_0x4887fc,'model':_0x1af75f(0x21f),'provider':_0x1af75f(0x287),'aspectRatio':'16:9','imageSize':'2K','batchSize':0x1},'promptText':_0x1af75f(0x3c6),'incomingEdges':[],'isRunninghubWorkflowModelImpl':_0x28ebbe=>String(_0x28ebbe||'')[_0x1af75f(0x338)]('runninghub/')}),_0x58d18c=await _0x74c9f4[_0x1af75f(0x200)][_0x1af75f(0x2c7)](_0x4ff723);a156_0x588d64[_0x1af75f(0x1bb)](_0x58d18c,null),a156_0x588d64[_0x1af75f(0x1fd)](_0x563283,[{'message':_0x1af75f(0x1ae),'type':_0x1af75f(0x21b)}]);}finally{globalThis[_0x1af75f(0x3c4)][_0x1af75f(0x1e2)]=_0x43c593;}}),a156_0x4dda2b(a156_0x263711(0x20e),async()=>{const _0x8869a=a156_0x263711,_0x5edc50=_0x8869a(0x252),_0x3f9024=[_0x8869a(0x22e),_0x8869a(0x2f6),'qwen-ref-3',_0x8869a(0x35f)],_0x309950=Object[_0x8869a(0x2cf)](_0x3f9024[_0x8869a(0x1ed)]((_0x4edbf5,_0x26e516)=>[_0x4edbf5,{'id':_0x4edbf5,'type':_0x8869a(0x24b),'originalLocalPath':'data/uploads/qwen-'+(_0x26e516+0x1)+_0x8869a(0x342),'width':0x640,'height':0x384}])),_0x3448a6={'runninghubwf':{'apiKey':_0x8869a(0x22f)}},{proto:_0x47acbf,ctx:_0x2d0bd6}=createTestContext({'targetId':_0x5edc50,'nodeData':{'id':_0x5edc50,'model':_0x8869a(0x21f),'provider':_0x8869a(0x287),'aspectRatio':'16:9','batchSize':0x4,'generationParams':{'batchSize':0x4,'imageSize':'4K','rhInstanceType':_0x8869a(0x1d2),'rhQwenEditMode':'qwen2509','rhQwenFirstImageMode':'depth'}},'nodes':_0x309950,'incomingEdges':_0x3f9024[_0x8869a(0x1ed)]((_0x5302d8,_0x37b587)=>({'id':_0x8869a(0x34d)+(_0x37b587+0x1),'sourceId':_0x5302d8,'targetId':_0x5edc50})),'promptText':_0x8869a(0x296),'getProviderConfigImpl':_0x3cc751=>_0x3448a6[_0x3cc751]||{},'isRunninghubWorkflowModelImpl':_0x283887=>String(_0x283887||'')[_0x8869a(0x338)](_0x8869a(0x1b0))}),_0x9e9dd2=await _0x47acbf[_0x8869a(0x200)]['call'](_0x2d0bd6);a156_0x588d64['ok'](_0x9e9dd2),a156_0x588d64[_0x8869a(0x1bb)](_0x9e9dd2[_0x8869a(0x2eb)],_0x8869a(0x287)),a156_0x588d64['equal'](_0x9e9dd2[_0x8869a(0x363)],'runninghub/2050306122774532097'),a156_0x588d64[_0x8869a(0x1bb)](_0x9e9dd2[_0x8869a(0x1d8)],'k_runninghub_wf'),a156_0x588d64[_0x8869a(0x1bb)](_0x9e9dd2['prompt'],'keep\x20identity'),a156_0x588d64[_0x8869a(0x1bb)](_0x9e9dd2[_0x8869a(0x1a7)],'2K'),a156_0x588d64['equal'](_0x9e9dd2[_0x8869a(0x2dd)],_0x8869a(0x25f)),a156_0x588d64[_0x8869a(0x1bb)](_0x9e9dd2[_0x8869a(0x1ba)],0x1),a156_0x588d64[_0x8869a(0x1bb)](_0x9e9dd2[_0x8869a(0x3b4)],_0x8869a(0x3d8)),a156_0x588d64[_0x8869a(0x1bb)](_0x9e9dd2[_0x8869a(0x20a)],'plus'),a156_0x588d64['equal'](_0x9e9dd2[_0x8869a(0x2ed)],_0x8869a(0x3ae)),a156_0x588d64['equal'](_0x9e9dd2[_0x8869a(0x384)],_0x8869a(0x2f4)),a156_0x588d64[_0x8869a(0x1fd)](_0x9e9dd2['inputUrls'],[_0x8869a(0x399),_0x8869a(0x329),'/data/uploads/qwen-3.png']);}),a156_0x4dda2b(a156_0x263711(0x382),async()=>{const _0x4f3b16=a156_0x263711,_0x381263=async({imageSize:_0x58f16b,model:_0x4ccf1,expectedModel:expectedModel=_0x4ccf1,expectedMode:expectedMode=_0x4f3b16(0x391),expectedImageSize:expectedImageSize='2K'})=>{const _0x2062f5=_0x4f3b16,_0x23866b=_0x2062f5(0x2af)+_0x58f16b+'-'+_0x4ccf1,{proto:_0x144511,ctx:_0x38e6ad}=createTestContext({'targetId':_0x23866b,'nodeData':{'id':_0x23866b,'model':_0x4ccf1,'provider':_0x2062f5(0x397),'aspectRatio':_0x2062f5(0x232),'imageSize':_0x58f16b,'batchSize':0x1}}),_0x31a6e1=await _0x144511[_0x2062f5(0x200)][_0x2062f5(0x2c7)](_0x38e6ad),_0x5a5879=await _0x144511[_0x2062f5(0x38b)]['call'](_0x38e6ad,_0x38e6ad[_0x2062f5(0x3cd)]);a156_0x588d64[_0x2062f5(0x1bb)](_0x31a6e1[_0x2062f5(0x363)],expectedModel),a156_0x588d64[_0x2062f5(0x1bb)](_0x5a5879['model'],expectedModel),a156_0x588d64[_0x2062f5(0x1bb)](_0x31a6e1[_0x2062f5(0x2eb)],_0x2062f5(0x397)),a156_0x588d64['equal'](_0x5a5879[_0x2062f5(0x2eb)],_0x2062f5(0x397)),a156_0x588d64[_0x2062f5(0x1bb)](_0x31a6e1[_0x2062f5(0x2a4)],expectedMode),a156_0x588d64[_0x2062f5(0x1bb)](_0x31a6e1[_0x2062f5(0x1a7)],expectedImageSize),a156_0x588d64[_0x2062f5(0x1bb)](Object[_0x2062f5(0x2e6)]['hasOwnProperty'][_0x2062f5(0x2c7)](_0x5a5879,_0x2062f5(0x2a4)),![]);};await _0x381263({'imageSize':'2K','model':_0x4f3b16(0x219)}),await _0x381263({'imageSize':'4K','model':_0x4f3b16(0x219)}),await _0x381263({'imageSize':'2K','model':'nano-banana-pro-4k-vip','expectedImageSize':'4K'});}),a156_0x4dda2b(a156_0x263711(0x2aa),async()=>{const _0x33718c=a156_0x263711,_0x447da4=async({imageSize:_0x2c1e12,model:_0x4405a6,expectedModel:expectedModel=_0x4405a6,expectedMode:expectedMode='cl',expectedImageSize:expectedImageSize='2K'})=>{const _0x479a9a=a156_0x33f2,_0x40aa68=_0x479a9a(0x393)+_0x2c1e12+'-'+_0x4405a6,{proto:_0x424647,ctx:_0x173b9c}=createTestContext({'targetId':_0x40aa68,'nodeData':{'id':_0x40aa68,'model':_0x4405a6,'provider':_0x479a9a(0x397),'aspectRatio':_0x479a9a(0x232),'imageSize':_0x2c1e12,'batchSize':0x1}}),_0x2f0f9a=await _0x424647['_buildPayload']['call'](_0x173b9c),_0x4c84c0=await _0x424647[_0x479a9a(0x38b)][_0x479a9a(0x2c7)](_0x173b9c,_0x173b9c['_data']);a156_0x588d64['equal'](_0x2f0f9a['model'],expectedModel),a156_0x588d64[_0x479a9a(0x1bb)](_0x4c84c0[_0x479a9a(0x363)],expectedModel),a156_0x588d64[_0x479a9a(0x1bb)](_0x2f0f9a[_0x479a9a(0x2eb)],_0x479a9a(0x397)),a156_0x588d64['equal'](_0x4c84c0[_0x479a9a(0x2eb)],_0x479a9a(0x397)),a156_0x588d64[_0x479a9a(0x1bb)](_0x2f0f9a[_0x479a9a(0x2a4)],expectedMode),a156_0x588d64[_0x479a9a(0x1bb)](_0x2f0f9a[_0x479a9a(0x1a7)],expectedImageSize),a156_0x588d64[_0x479a9a(0x1bb)](Object[_0x479a9a(0x2e6)]['hasOwnProperty'][_0x479a9a(0x2c7)](_0x4c84c0,_0x479a9a(0x2a4)),![]);};await _0x447da4({'imageSize':'2K','model':_0x33718c(0x236)}),await _0x447da4({'imageSize':'4K','model':_0x33718c(0x236)}),await _0x447da4({'imageSize':'2K','model':'nano-banana-2-4k-cl','expectedImageSize':'4K'});}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20manifest\x20GRSAI\x20nano-banana-2\x20passes\x20mode\x20selector\x20and\x20normalizes\x204K',async()=>{const _0x149ca9=a156_0x263711,_0x9c78d2=async({imageSize:_0x3229c8,mode:_0x353154,expectedMode:expectedMode=_0x353154,expectedImageSize:expectedImageSize=_0x3229c8})=>{const _0x546e73=a156_0x33f2,_0x108d44=_0x546e73(0x341)+_0x3229c8+'-'+_0x353154,{proto:_0x13a1d0,ctx:_0x59b236}=createTestContext({'targetId':_0x108d44,'nodeData':{'id':_0x108d44,'model':_0x546e73(0x272),'provider':_0x546e73(0x397),'generationParams':{'imageSize':_0x3229c8,'aspectRatio':_0x546e73(0x232),'mode':_0x353154},'batchSize':0x1}}),_0x278ce3=await _0x13a1d0['_buildPayload']['call'](_0x59b236),_0x21c5df=await _0x13a1d0['_buildResumePayload']['call'](_0x59b236,_0x59b236[_0x546e73(0x3cd)]);a156_0x588d64[_0x546e73(0x1bb)](_0x278ce3['model'],_0x546e73(0x272)),a156_0x588d64[_0x546e73(0x1bb)](_0x21c5df[_0x546e73(0x363)],_0x546e73(0x272)),a156_0x588d64['equal'](_0x278ce3[_0x546e73(0x2eb)],'grsai'),a156_0x588d64['equal'](_0x21c5df[_0x546e73(0x2eb)],_0x546e73(0x397)),a156_0x588d64[_0x546e73(0x1bb)](_0x278ce3['mode'],expectedMode),a156_0x588d64[_0x546e73(0x1bb)](_0x278ce3[_0x546e73(0x1a7)],expectedImageSize),a156_0x588d64[_0x546e73(0x1bb)](Object[_0x546e73(0x2e6)][_0x546e73(0x38c)][_0x546e73(0x2c7)](_0x21c5df,_0x546e73(0x2a4)),![]);};await _0x9c78d2({'imageSize':'2K','mode':_0x149ca9(0x2e9)}),await _0x9c78d2({'imageSize':'2K','mode':'cl'}),await _0x9c78d2({'imageSize':'4K','mode':'cl'}),await _0x9c78d2({'imageSize':'4K','mode':_0x149ca9(0x2e9),'expectedImageSize':'2K'});}),a156_0x4dda2b(a156_0x263711(0x25e),async()=>{const _0x2f6658=a156_0x263711,_0xbbc9df=async({imageSize:_0x274013,mode:_0x32fc18,expectedMode:expectedMode=_0x32fc18,expectedImageSize:expectedImageSize=_0x274013})=>{const _0x100fff=a156_0x33f2,_0x44710f=_0x100fff(0x3c9)+_0x274013+'-'+_0x32fc18,{proto:_0x480fbd,ctx:_0x52d467}=createTestContext({'targetId':_0x44710f,'nodeData':{'id':_0x44710f,'model':_0x100fff(0x28a),'provider':_0x100fff(0x397),'generationParams':{'imageSize':_0x274013,'aspectRatio':_0x100fff(0x232),'mode':_0x32fc18},'batchSize':0x1}}),_0x4eeb64=await _0x480fbd[_0x100fff(0x200)]['call'](_0x52d467),_0x46806f=await _0x480fbd['_buildResumePayload']['call'](_0x52d467,_0x52d467[_0x100fff(0x3cd)]);a156_0x588d64[_0x100fff(0x1bb)](_0x4eeb64[_0x100fff(0x363)],_0x100fff(0x28a)),a156_0x588d64[_0x100fff(0x1bb)](_0x46806f[_0x100fff(0x363)],_0x100fff(0x28a)),a156_0x588d64[_0x100fff(0x1bb)](_0x4eeb64[_0x100fff(0x2eb)],'grsai'),a156_0x588d64[_0x100fff(0x1bb)](_0x46806f[_0x100fff(0x2eb)],_0x100fff(0x397)),a156_0x588d64[_0x100fff(0x1bb)](_0x4eeb64['mode'],expectedMode),a156_0x588d64[_0x100fff(0x1bb)](_0x4eeb64['imageSize'],expectedImageSize),a156_0x588d64[_0x100fff(0x1bb)](Object[_0x100fff(0x2e6)][_0x100fff(0x38c)]['call'](_0x46806f,_0x100fff(0x2a4)),![]);};await _0xbbc9df({'imageSize':'2K','mode':_0x2f6658(0x2e9)}),await _0xbbc9df({'imageSize':'2K','mode':'vt'}),await _0xbbc9df({'imageSize':'2K','mode':'cl'}),await _0xbbc9df({'imageSize':'2K','mode':_0x2f6658(0x391)}),await _0xbbc9df({'imageSize':'4K','mode':'vip'}),await _0xbbc9df({'imageSize':'4K','mode':_0x2f6658(0x2e9),'expectedImageSize':'2K'}),await _0xbbc9df({'imageSize':'4K','mode':'vt','expectedImageSize':'2K'}),await _0xbbc9df({'imageSize':'4K','mode':'cl','expectedImageSize':'2K'});}),a156_0x4dda2b(a156_0x263711(0x357),async()=>{const _0x29bec4=a156_0x263711,_0x52a2df=_0x29bec4(0x1f3),{proto:_0x47c405,ctx:_0x1bd3ea}=createTestContext({'targetId':_0x52a2df,'nodeData':{'id':_0x52a2df,'model':'nano-banana','provider':_0x29bec4(0x397),'width':0x640,'height':0x384,'generationParams':{'imageSize':'3K','aspectRatio':'自适应','mode':_0x29bec4(0x2e9),'batchSize':0x1}}}),_0x24f806=await _0x47c405[_0x29bec4(0x200)]['call'](_0x1bd3ea);a156_0x588d64['equal'](_0x24f806[_0x29bec4(0x1a7)],'2K'),a156_0x588d64[_0x29bec4(0x1bb)](_0x24f806[_0x29bec4(0x2dd)],'auto'),a156_0x588d64[_0x29bec4(0x1bb)](_0x24f806['resolvedRatioLabel'],_0x29bec4(0x22b));}),a156_0x4dda2b(a156_0x263711(0x284),async()=>{const _0x24e8df=a156_0x263711;for(const {storedModel:_0x552adc,imageSize:_0x194715}of[{'storedModel':_0x24e8df(0x3aa),'imageSize':'1K'},{'storedModel':_0x24e8df(0x3aa),'imageSize':'2K'},{'storedModel':_0x24e8df(0x3aa),'imageSize':'4K'},{'storedModel':_0x24e8df(0x3aa),'imageSize':undefined}]){const _0x3957b0=_0x24e8df(0x2d8)+_0x552adc+'-'+(_0x194715||_0x24e8df(0x1d9)),{proto:_0x273cbd,ctx:_0x103b3e}=createTestContext({'targetId':_0x3957b0,'nodeData':{'id':_0x3957b0,'model':_0x552adc,'provider':_0x24e8df(0x397),'generationParams':{'mode':_0x24e8df(0x2e9),'aspectRatio':_0x24e8df(0x369),..._0x194715?{'imageSize':_0x194715}:{},'batchSize':0x1}}}),_0x103af5=await _0x273cbd['_buildPayload'][_0x24e8df(0x2c7)](_0x103b3e),_0x484d0d=await _0x273cbd[_0x24e8df(0x38b)][_0x24e8df(0x2c7)](_0x103b3e,_0x103b3e[_0x24e8df(0x3cd)]);a156_0x588d64['equal'](_0x103af5[_0x24e8df(0x363)],_0x552adc),a156_0x588d64[_0x24e8df(0x1bb)](_0x484d0d[_0x24e8df(0x363)],_0x552adc),a156_0x588d64[_0x24e8df(0x1bb)](_0x103af5[_0x24e8df(0x2eb)],_0x24e8df(0x397)),a156_0x588d64['equal'](_0x484d0d['provider'],_0x24e8df(0x397)),a156_0x588d64[_0x24e8df(0x1bb)](_0x103af5['mode'],'normal'),a156_0x588d64[_0x24e8df(0x1bb)](_0x103af5[_0x24e8df(0x1a7)],'1K'),a156_0x588d64[_0x24e8df(0x1bb)](_0x103af5[_0x24e8df(0x2dd)],_0x24e8df(0x369)),a156_0x588d64[_0x24e8df(0x1bb)](_0x103af5['resolvedRatioLabel'],_0x24e8df(0x369));}}),a156_0x4dda2b(a156_0x263711(0x30b),async()=>{const _0x34a6a6=a156_0x263711,_0x465a87=async({imageSize:_0x462d7c,storedModel:_0x35ca38,aspectRatio:_0x371004})=>{const _0x178595=a156_0x33f2,_0x1f0da1=_0x178595(0x2bc)+_0x462d7c+'-'+_0x35ca38,{proto:_0x2df8d1,ctx:_0x267110}=createTestContext({'targetId':_0x1f0da1,'nodeData':{'id':_0x1f0da1,'model':_0x35ca38,'provider':_0x178595(0x397),'generationParams':{'mode':_0x178595(0x391),'aspectRatio':_0x371004,'imageSize':_0x462d7c,'batchSize':0x1}}}),_0x535fa6=await _0x2df8d1[_0x178595(0x200)][_0x178595(0x2c7)](_0x267110),_0x4ad36b=await _0x2df8d1[_0x178595(0x38b)]['call'](_0x267110,_0x267110['_data']);a156_0x588d64['equal'](_0x535fa6[_0x178595(0x363)],_0x35ca38),a156_0x588d64['equal'](_0x4ad36b['model'],_0x35ca38),a156_0x588d64[_0x178595(0x1bb)](_0x535fa6[_0x178595(0x2eb)],'grsai'),a156_0x588d64[_0x178595(0x1bb)](_0x535fa6['mode'],'vip'),a156_0x588d64[_0x178595(0x1bb)](_0x535fa6['imageSize'],_0x462d7c),a156_0x588d64[_0x178595(0x1bb)](_0x535fa6['aspectRatio'],_0x371004),a156_0x588d64[_0x178595(0x1bb)](_0x535fa6[_0x178595(0x270)],_0x371004);};await _0x465a87({'imageSize':'1K','storedModel':_0x34a6a6(0x3aa),'aspectRatio':_0x34a6a6(0x3a6)}),await _0x465a87({'imageSize':'2K','storedModel':_0x34a6a6(0x3aa),'aspectRatio':_0x34a6a6(0x369)}),await _0x465a87({'imageSize':'4K','storedModel':_0x34a6a6(0x3aa),'aspectRatio':_0x34a6a6(0x216)}),await _0x465a87({'imageSize':'4K','storedModel':'gpt-image-2-vip','aspectRatio':_0x34a6a6(0x369)});}),a156_0x4dda2b(a156_0x263711(0x2d1),async()=>{const _0x31e95f=a156_0x263711,_0x189f20=_0x31e95f(0x257),{proto:_0x209859,ctx:_0x22e895}=createTestContext({'targetId':_0x189f20,'nodeData':{'id':_0x189f20,'model':'gpt-image-2','provider':_0x31e95f(0x397),'generationParams':{'mode':_0x31e95f(0x391),'aspectRatio':'1:1','imageSize':'4K','batchSize':0x1},'width':0x1f4,'height':0x1f4}}),_0x365977=await _0x209859['_buildPayload']['call'](_0x22e895);a156_0x588d64[_0x31e95f(0x1bb)](_0x365977[_0x31e95f(0x363)],_0x31e95f(0x3aa)),a156_0x588d64[_0x31e95f(0x1bb)](_0x365977[_0x31e95f(0x2eb)],_0x31e95f(0x397)),a156_0x588d64[_0x31e95f(0x1bb)](_0x365977['mode'],'vip'),a156_0x588d64['equal'](_0x365977[_0x31e95f(0x1a7)],'4K'),a156_0x588d64['equal'](_0x365977[_0x31e95f(0x2dd)],_0x31e95f(0x232)),a156_0x588d64[_0x31e95f(0x1bb)](_0x365977[_0x31e95f(0x270)],_0x31e95f(0x232));}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20APIMart\x20Seedream\x205\x20lite\x20保留\x203K\x20和支持比例',async()=>{const _0x242b25=a156_0x263711,_0x52d39=_0x242b25(0x1bf),{proto:_0x43e415,ctx:_0x1bc0e9}=createTestContext({'targetId':_0x52d39,'nodeData':{'id':_0x52d39,'model':_0x242b25(0x1e3),'provider':_0x242b25(0x321),'aspectRatio':_0x242b25(0x2fc),'imageSize':'3K','generationParams':{'aspectRatio':_0x242b25(0x2fc),'imageSize':'3K'},'batchSize':0x4}}),_0x3e5d37=await _0x43e415['_buildPayload']['call'](_0x1bc0e9);a156_0x588d64['equal'](_0x3e5d37['provider'],_0x242b25(0x321)),a156_0x588d64['equal'](_0x3e5d37[_0x242b25(0x363)],_0x242b25(0x1e3)),a156_0x588d64[_0x242b25(0x1bb)](_0x3e5d37[_0x242b25(0x1a7)],'3K'),a156_0x588d64[_0x242b25(0x1bb)](_0x3e5d37[_0x242b25(0x2dd)],'21:9'),a156_0x588d64[_0x242b25(0x1bb)](_0x3e5d37[_0x242b25(0x270)],'21:9'),a156_0x588d64[_0x242b25(0x1bb)](_0x3e5d37['batchSize'],0x4);}),a156_0x4dda2b(a156_0x263711(0x2f5),async()=>{const _0x3046d0=a156_0x263711,_0x50f3ed=_0x3046d0(0x258),{proto:_0x1f3ee7,ctx:_0x2f1fb4}=createTestContext({'targetId':_0x50f3ed,'nodeData':{'id':_0x50f3ed,'model':_0x3046d0(0x297),'provider':_0x3046d0(0x321),'aspectRatio':_0x3046d0(0x3a3),'imageSize':'3K','generationParams':{'mode':_0x3046d0(0x1c5),'aspectRatio':_0x3046d0(0x3a3),'imageSize':'3K','batchSize':0x6},'width':0x640,'height':0x384,'batchSize':0x1}}),_0x3e98df=await _0x1f3ee7[_0x3046d0(0x200)][_0x3046d0(0x2c7)](_0x2f1fb4);a156_0x588d64[_0x3046d0(0x1bb)](_0x3e98df['provider'],'apimart'),a156_0x588d64[_0x3046d0(0x1bb)](_0x3e98df[_0x3046d0(0x363)],_0x3046d0(0x297)),a156_0x588d64['equal'](_0x3e98df[_0x3046d0(0x2a4)],_0x3046d0(0x1c5)),a156_0x588d64[_0x3046d0(0x1bb)](_0x3e98df['imageSize'],'1K'),a156_0x588d64[_0x3046d0(0x1bb)](_0x3e98df['aspectRatio'],_0x3046d0(0x25f)),a156_0x588d64[_0x3046d0(0x1bb)](_0x3e98df[_0x3046d0(0x270)],'16:9'),a156_0x588d64[_0x3046d0(0x1bb)](_0x3e98df['batchSize'],0x6);}),a156_0x4dda2b(a156_0x263711(0x25d),async()=>{const _0x4e43=a156_0x263711,_0x390b6c='node-ai-image-apimart-z-image-turbo',{proto:_0x57043a,ctx:_0x3a1e2e}=createTestContext({'targetId':_0x390b6c,'nodeData':{'id':_0x390b6c,'model':_0x4e43(0x1d4),'provider':_0x4e43(0x321),'aspectRatio':_0x4e43(0x3a3),'imageSize':'3K','generationParams':{'aspectRatio':_0x4e43(0x3a3),'imageSize':'3K','prompt_extend':!![],'batchSize':0x4},'width':0x640,'height':0x384,'batchSize':0x1}}),_0x166865=await _0x57043a[_0x4e43(0x200)][_0x4e43(0x2c7)](_0x3a1e2e);a156_0x588d64['equal'](_0x166865[_0x4e43(0x2eb)],_0x4e43(0x321)),a156_0x588d64[_0x4e43(0x1bb)](_0x166865['model'],_0x4e43(0x1d4)),a156_0x588d64[_0x4e43(0x1bb)](_0x166865[_0x4e43(0x1a7)],'1K'),a156_0x588d64[_0x4e43(0x1bb)](_0x166865['aspectRatio'],_0x4e43(0x25f)),a156_0x588d64['equal'](_0x166865[_0x4e43(0x270)],_0x4e43(0x25f)),a156_0x588d64[_0x4e43(0x1bb)](_0x166865[_0x4e43(0x2ac)],!![]),a156_0x588d64[_0x4e43(0x1bb)](_0x166865[_0x4e43(0x1ba)],0x4);}),a156_0x4dda2b(a156_0x263711(0x2b8),async()=>{const _0x4c8795=a156_0x263711,_0x4f5ca3=_0x4c8795(0x36e),_0x1575d7=_0x4c8795(0x3de),{proto:_0x556c23,ctx:_0x411306}=createTestContext({'targetId':_0x4f5ca3,'nodeData':{'id':_0x4f5ca3,'model':'apimart/wan2.7-image','provider':_0x4c8795(0x321),'aspectRatio':_0x4c8795(0x3a3),'imageSize':'4K','generationParams':{'mode':_0x4c8795(0x1c5),'aspectRatio':_0x4c8795(0x3a3),'imageSize':'4K','thinking_mode':![],'batchSize':0x4},'width':0x640,'height':0x384,'batchSize':0x1},'nodes':{[_0x1575d7]:{'id':_0x1575d7,'type':_0x4c8795(0x24b),'imageUrl':_0x4c8795(0x335),'width':0x384,'height':0x640}},'incomingEdges':[{'id':_0x4c8795(0x228),'sourceId':_0x1575d7,'targetId':_0x4f5ca3,'refSlot':''}]}),_0x32c556=await _0x556c23[_0x4c8795(0x200)][_0x4c8795(0x2c7)](_0x411306);a156_0x588d64[_0x4c8795(0x1bb)](_0x32c556[_0x4c8795(0x2eb)],_0x4c8795(0x321)),a156_0x588d64[_0x4c8795(0x1bb)](_0x32c556[_0x4c8795(0x363)],_0x4c8795(0x330)),a156_0x588d64[_0x4c8795(0x1bb)](_0x32c556[_0x4c8795(0x2a4)],_0x4c8795(0x1c5)),a156_0x588d64[_0x4c8795(0x1bb)](_0x32c556[_0x4c8795(0x1a7)],'4K'),a156_0x588d64[_0x4c8795(0x1bb)](_0x32c556['aspectRatio'],_0x4c8795(0x3a6)),a156_0x588d64['equal'](_0x32c556['resolvedRatioLabel'],_0x4c8795(0x3a6)),a156_0x588d64[_0x4c8795(0x1bb)](_0x32c556['thinking_mode'],![]),a156_0x588d64['equal'](_0x32c556[_0x4c8795(0x1ba)],0x4),a156_0x588d64[_0x4c8795(0x1fd)](_0x32c556[_0x4c8795(0x2ad)],[_0x4c8795(0x335)]);}),a156_0x4dda2b('aigenImage\x20task\x20orchestration:\x20APIMart\x20Seedream\x20有参考图时自适应透传\x20API\x20auto',async()=>{const _0x13bc16=a156_0x263711,_0xb36093=_0x13bc16(0x319),_0x447dc4=_0x13bc16(0x2db),{proto:_0xd4f48b,ctx:_0x12a060}=createTestContext({'targetId':_0xb36093,'nodeData':{'id':_0xb36093,'model':_0x13bc16(0x2fa),'provider':'apimart','aspectRatio':_0x13bc16(0x22b),'imageSize':'2K','generationParams':{'aspectRatio':_0x13bc16(0x22b),'imageSize':'2K'},'batchSize':0x1},'nodes':{[_0x447dc4]:{'id':_0x447dc4,'type':'source-image','imageUrl':'https://img.example.com/seedream-ref.png','width':0x640,'height':0x384}},'incomingEdges':[{'id':_0x13bc16(0x21e),'sourceId':_0x447dc4,'targetId':_0xb36093,'refSlot':''}]}),_0x26ecf3=await _0xd4f48b[_0x13bc16(0x200)][_0x13bc16(0x2c7)](_0x12a060);a156_0x588d64[_0x13bc16(0x1bb)](_0x26ecf3[_0x13bc16(0x2eb)],'apimart'),a156_0x588d64[_0x13bc16(0x1bb)](_0x26ecf3[_0x13bc16(0x363)],'apimart/seedream-4.0'),a156_0x588d64[_0x13bc16(0x1bb)](_0x26ecf3[_0x13bc16(0x2dd)],_0x13bc16(0x22b)),a156_0x588d64[_0x13bc16(0x1bb)](_0x26ecf3[_0x13bc16(0x270)],_0x13bc16(0x22b)),a156_0x588d64[_0x13bc16(0x1bb)](_0x26ecf3[_0x13bc16(0x3b4)],_0x13bc16(0x36a)),a156_0x588d64[_0x13bc16(0x1fd)](_0x26ecf3[_0x13bc16(0x2ad)],[_0x13bc16(0x299)]);}),a156_0x4dda2b(a156_0x263711(0x2d6),async()=>{const _0x2dd212=a156_0x263711,_0x436807=_0x2dd212(0x213),{proto:_0x36d173,ctx:_0x33e193}=createTestContext({'targetId':_0x436807,'nodeData':{'id':_0x436807,'model':_0x2dd212(0x3cc),'provider':_0x2dd212(0x321),'aspectRatio':'2:1','imageSize':'2K','generationParams':{'mode':_0x2dd212(0x388),'aspectRatio':_0x2dd212(0x216),'imageSize':'2K','quality':_0x2dd212(0x289)},'batchSize':0x1}}),_0x464a67=await _0x36d173['_buildPayload'][_0x2dd212(0x2c7)](_0x33e193);a156_0x588d64[_0x2dd212(0x1bb)](_0x464a67['provider'],'apimart'),a156_0x588d64[_0x2dd212(0x1bb)](_0x464a67['model'],_0x2dd212(0x3cc)),a156_0x588d64[_0x2dd212(0x1bb)](_0x464a67[_0x2dd212(0x2a4)],'official'),a156_0x588d64[_0x2dd212(0x1bb)](_0x464a67[_0x2dd212(0x1a7)],'2K'),a156_0x588d64[_0x2dd212(0x1bb)](_0x464a67['quality'],'high'),a156_0x588d64[_0x2dd212(0x1bb)](_0x464a67['aspectRatio'],_0x2dd212(0x216)),a156_0x588d64[_0x2dd212(0x1bb)](_0x464a67[_0x2dd212(0x270)],_0x2dd212(0x216));}),a156_0x4dda2b(a156_0x263711(0x28b),async()=>{const _0x2de7ba=a156_0x263711,_0x124e03=_0x2de7ba(0x1e6),{proto:_0xacb716,ctx:_0x216672}=createTestContext({'targetId':_0x124e03,'nodeData':{'id':_0x124e03,'model':_0x2de7ba(0x3cc),'provider':_0x2de7ba(0x321),'aspectRatio':_0x2de7ba(0x232),'imageSize':'4K','generationParams':{'aspectRatio':_0x2de7ba(0x232),'imageSize':'4K'},'width':0x1f4,'height':0x1f4,'batchSize':0x1}}),_0x4ba784=await _0xacb716[_0x2de7ba(0x200)]['call'](_0x216672);a156_0x588d64['equal'](_0x4ba784[_0x2de7ba(0x1a7)],'4K'),a156_0x588d64[_0x2de7ba(0x1bb)](_0x4ba784['aspectRatio'],'16:9'),a156_0x588d64['equal'](_0x4ba784[_0x2de7ba(0x270)],_0x2de7ba(0x25f));}),a156_0x4dda2b(a156_0x263711(0x239),async()=>{const _0x105553=a156_0x263711,_0x4b9843=_0x105553(0x1e9),{proto:_0x1d3aa0,ctx:_0x24b85e}=createTestContext({'targetId':_0x4b9843,'nodeData':{'id':_0x4b9843,'model':_0x105553(0x3cc),'provider':_0x105553(0x321),'aspectRatio':_0x105553(0x3a3),'imageSize':'4K','generationParams':{'aspectRatio':_0x105553(0x3a3),'imageSize':'4K'},'width':0x1f4,'height':0x1f4,'batchSize':0x1}}),_0x4e116d=await _0x1d3aa0[_0x105553(0x200)]['call'](_0x24b85e);a156_0x588d64[_0x105553(0x1bb)](_0x4e116d[_0x105553(0x1a7)],'4K'),a156_0x588d64['equal'](_0x4e116d[_0x105553(0x2dd)],_0x105553(0x25f)),a156_0x588d64[_0x105553(0x1bb)](_0x4e116d['resolvedRatioLabel'],_0x105553(0x25f));});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createAIGenerateNodeTaskOrchestrationModule } from './taskOrchestrationModule.js';
+import {
+  _resetPreviewRuntimeForTests,
+  isPreviewNodeLoading,
+  stopPreviewNodeLoading,
+} from '../../modules/previewMode.js';
+import { createFakePreviewContainer, installPreviewDomStubs } from '../../../tests/testPreviewDom.js';
+import {
+  _resetAssetMentionRegistryForTests,
+  setAssetMentionAssets,
+} from '../../modules/assetMentionRegistry.js';
+import { getModelManifest } from '../../manifests/index.js';
+import { shouldShowGenerationBusyUi } from '../../core/generationTaskUiState.js';
+import { DEFAULT_LOCALE, setLocale } from '../../i18n/index.js';
+const originalWindow = globalThis.window,
+  originalDocument = globalThis.document,
+  originalNodeCtor = globalThis.Node,
+  restorePreviewDom = installPreviewDomStubs();
+if (!globalThis.window) globalThis.window = {};
+typeof globalThis.window.showToast !== 'function' && (globalThis.window.showToast = () => {});
+!globalThis.Node && (globalThis.Node = { TEXT_NODE: 3, ELEMENT_NODE: 1 });
+!globalThis.document && (globalThis.document = { getElementById: () => null });
+(test.after(() => {
+  (_resetPreviewRuntimeForTests(),
+    typeof originalWindow === 'undefined' ? delete globalThis.window : (globalThis.window = originalWindow),
+    typeof originalDocument === 'undefined'
+      ? delete globalThis.document
+      : (globalThis.document = originalDocument),
+    typeof originalNodeCtor === 'undefined' ? delete globalThis.Node : (globalThis.Node = originalNodeCtor),
+    restorePreviewDom());
+}),
+  test.afterEach(() => {
+    (_resetPreviewRuntimeForTests(), _resetAssetMentionRegistryForTests());
+  }));
+function createStore(_0x23e6ce, _0x22775f = []) {
+  return {
+    getState() {
+      return _0x23e6ce;
+    },
+    getIncomingEdges(_0x280853) {
+      return _0x22775f.filter((_0x19d0db) => _0x19d0db.targetId === _0x280853);
+    },
+    updateNodeData(_0x4a6565, _0x13e050) {
+      const _0x283b6e = _0x23e6ce.nodes?.[_0x4a6565] || {};
+      _0x23e6ce.nodes[_0x4a6565] = { ..._0x283b6e, ..._0x13e050 };
+    },
+  };
+}
+function createPromptTextNode(_0x349bef = '') {
+  return { nodeType: Node.TEXT_NODE, textContent: String(_0x349bef || '') };
+}
+function createPromptElementNode({
+  tagName: tagName = 'SPAN',
+  className: className = '',
+  dataset: dataset = {},
+  textContent: textContent = '',
+  childNodes: childNodes = [],
+} = {}) {
+  const _0x5c839b = String(className || '')
+    .split(/\s+/)
+    .filter(Boolean);
+  return {
+    nodeType: Node.ELEMENT_NODE,
+    tagName: tagName,
+    className: className,
+    classList: {
+      contains(_0x1f1df4) {
+        return _0x5c839b.includes(String(_0x1f1df4 || ''));
+      },
+    },
+    dataset: { ...dataset },
+    textContent: String(textContent || ''),
+    childNodes: Array.isArray(childNodes) ? childNodes : [],
+  };
+}
+function createAssetPromptPillNode(_0x76067a, _0x2b1490, _0x4facf5, _0xf532c3) {
+  return createPromptElementNode({
+    className: 'ref-pill',
+    dataset: {
+      label: String(_0x76067a || ''),
+      refOrigin: 'asset',
+      assetId: String(_0x2b1490 || ''),
+      assetIndex: String(_0x4facf5),
+      refType: String(_0xf532c3 || ''),
+    },
+    textContent: String(_0x76067a || ''),
+  });
+}
+function createNodePromptPillNode(_0x10841b, _0x8a9efc, _0x104338 = 'image') {
+  return createPromptElementNode({
+    className: 'ref-pill',
+    dataset: {
+      label: String(_0x10841b || ''),
+      nodeId: String(_0x8a9efc || ''),
+      refType: String(_0x104338 || ''),
+    },
+    textContent: String(_0x10841b || ''),
+  });
+}
+function collectPromptInnerText(_0xf1dcd3) {
+  return (Array.isArray(_0xf1dcd3) ? _0xf1dcd3 : [])
+    .map((_0x1a16d6) => {
+      const _0x8d2ec = Number(_0x1a16d6?.nodeType);
+      if (_0x8d2ec === Node.TEXT_NODE) return String(_0x1a16d6?.textContent || '');
+      if (_0x8d2ec !== Node.ELEMENT_NODE) return '';
+      if (String(_0x1a16d6?.tagName || '').toUpperCase() === 'BR') return '\n';
+      const _0x236c68 = Array.isArray(_0x1a16d6?.childNodes) ? _0x1a16d6.childNodes : [];
+      if (_0x236c68.length > 0) return collectPromptInnerText(_0x236c68);
+      return String(_0x1a16d6?.textContent || '');
+    })
+    .join('');
+}
+function createPromptEl(_0x66b7e6 = 'test prompt') {
+  if (Array.isArray(_0x66b7e6)) {
+    const _0x315e06 = collectPromptInnerText(_0x66b7e6);
+    return { innerText: _0x315e06, textContent: _0x315e06, childNodes: _0x66b7e6 };
+  }
+  return { innerText: _0x66b7e6, textContent: _0x66b7e6, childNodes: [createPromptTextNode(_0x66b7e6)] };
+}
+function createButtonStub() {
+  const _0x2a6594 = new Set();
+  return {
+    disabled: false,
+    title: '',
+    innerHTML: '',
+    style: { color: '', cursor: '' },
+    _attrs: new Map(),
+    classList: {
+      add(_0xd0c089) {
+        _0x2a6594.add(String(_0xd0c089 || ''));
+      },
+      remove(_0x4d024d) {
+        _0x2a6594.delete(String(_0x4d024d || ''));
+      },
+      contains(_0x25cd51) {
+        return _0x2a6594.has(String(_0x25cd51 || ''));
+      },
+    },
+    setAttribute(_0x35f30c, _0x50b156) {
+      this._attrs.set(String(_0x35f30c || ''), String(_0x50b156 || ''));
+    },
+    removeAttribute(_0x4894c0) {
+      this._attrs.delete(String(_0x4894c0 || ''));
+    },
+  };
+}
+function createTestContext({
+  targetId: _0x463842,
+  nodeData: _0x235d21,
+  nodes: nodes = {},
+  incomingEdges: incomingEdges = [],
+  promptText: promptText = 'mountain',
+  promptEl: promptEl = null,
+  ensureConfigImpl: ensureConfigImpl = async () => {},
+  getProviderConfigImpl: getProviderConfigImpl = () => ({ apiKey: 'k_test' }),
+  isRunninghubWorkflowModelImpl: isRunninghubWorkflowModelImpl = null,
+  apiImpl: apiImpl = { generateImage: async () => ({ imageUrl: '/output/test.png' }) },
+  startLoadingImpl: startLoadingImpl = () => {},
+  stopLoadingImpl: stopLoadingImpl = () => {},
+  storeImpl: storeImpl = null,
+  stateOverride: stateOverride = null,
+}) {
+  const _0x15b2e7 = (_0x1a69ba) => {
+      const _0x392ac2 = getModelManifest(_0x1a69ba?.model),
+        _0x49c3e5 = Array.isArray(_0x392ac2?.uiSchema?.fields) ? _0x392ac2.uiSchema.fields : [];
+      if (!_0x49c3e5.length) return { ..._0x1a69ba };
+      const _0x45e693 =
+        _0x1a69ba?.generationParams &&
+        typeof _0x1a69ba.generationParams === 'object' &&
+        !Array.isArray(_0x1a69ba.generationParams)
+          ? { ..._0x1a69ba.generationParams }
+          : {};
+      return (
+        _0x49c3e5.forEach((_0x2c5b89) => {
+          const _0x53c510 = String(_0x2c5b89?.id || '').trim();
+          _0x53c510 &&
+            _0x45e693[_0x53c510] === undefined &&
+            Object.prototype.hasOwnProperty.call(_0x1a69ba, _0x53c510) &&
+            (_0x45e693[_0x53c510] = _0x1a69ba[_0x53c510]);
+        }),
+        { ..._0x1a69ba, generationParams: _0x45e693 }
+      );
+    },
+    _0x2ea73b = stateOverride || { nodes: { ...nodes, [_0x463842]: _0x15b2e7(_0x235d21) } };
+  if (!_0x2ea73b.nodes || typeof _0x2ea73b.nodes !== 'object') _0x2ea73b.nodes = {};
+  !_0x2ea73b.nodes?.[_0x463842] && (_0x2ea73b.nodes[_0x463842] = _0x15b2e7(_0x235d21));
+  const _0x27e9a9 = storeImpl || createStore(_0x2ea73b, incomingEdges),
+    _0x143726 = createAIGenerateNodeTaskOrchestrationModule({
+      store: _0x27e9a9,
+      getRefKindByNodeType: (_0x19d98d) =>
+        _0x19d98d === 'source-image' || _0x19d98d === 'image' || _0x19d98d === 'ai-image'
+          ? 'image'
+          : _0x19d98d === 'source-text' || _0x19d98d === 'ai-text'
+            ? 'text'
+            : null,
+      getImage: async () => null,
+      ensureConfig: ensureConfigImpl,
+      getProviderConfig: getProviderConfigImpl,
+      api: apiImpl,
+      startLoading: startLoadingImpl,
+      stopLoading: stopLoadingImpl,
+    }),
+    _0x54d314 = Object.assign(Object.create(_0x143726), {
+      nodeId: _0x463842,
+      _data: _0x2ea73b.nodes[_0x463842],
+      promptEl: promptEl || createPromptEl(promptText),
+      _isRunninghubWorkflowModel(_0xd384da, _0x220fbc) {
+        if (typeof isRunninghubWorkflowModelImpl === 'function')
+          return isRunninghubWorkflowModelImpl(_0xd384da, _0x220fbc);
+        return false;
+      },
+    });
+  return { ctx: _0x54d314, proto: _0x143726, state: _0x2ea73b, store: _0x27e9a9 };
+}
+(test('aigenImage task orchestration: running RH store state cancels even when local flag is stale', async () => {
+  const _0x33c700 = 'node-image-running-store-cancels',
+    {
+      proto: _0x407f65,
+      ctx: _0x2893e5,
+      state: _0x1e5801,
+    } = createTestContext({
+      targetId: _0x33c700,
+      nodeData: {
+        id: _0x33c700,
+        model: 'runninghub/2044874075721441281',
+        provider: 'runninghubwf',
+        rhTaskId: 'rh-running',
+        rhTaskStatus: 'running',
+        jobStatus: 'running',
+        isGenerating: true,
+      },
+      isRunninghubWorkflowModelImpl: () => true,
+    });
+  let _0x5926a8 = 0,
+    _0x21c3b6 = 0;
+  ((_0x2893e5._isGenerating = false),
+    (_0x2893e5._cancelRunningHubWorkflowTask = async () => {
+      _0x5926a8 += 1;
+    }),
+    (_0x2893e5._onGenerate = async () => {
+      _0x21c3b6 += 1;
+    }),
+    (_0x1e5801.nodes[_0x33c700] = {
+      ..._0x1e5801.nodes[_0x33c700],
+      rhTaskId: 'rh-running',
+      rhTaskStatus: 'running',
+      jobStatus: 'running',
+      isGenerating: true,
+    }),
+    await _0x407f65._handleGenerateOrCancel.call(_0x2893e5),
+    assert.equal(_0x5926a8, 1),
+    assert.equal(_0x21c3b6, 0));
+}),
+  test('aigenImage task orchestration: /预设模板在空输入时回退默认值且不残留占位符', async () => {
+    const _0x2c3ffc = 'node-ai-image-template-default-fallback',
+      { proto: _0x350dc2, ctx: _0x334ba3 } = createTestContext({
+        targetId: _0x2c3ffc,
+        nodeData: {
+          id: _0x2c3ffc,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        promptText: '',
+      }),
+      _0x291ae3 = await _0x350dc2._buildPayload.call(_0x334ba3, '故事/描述：{用户输入 || 一段简短剧情}');
+    (assert.ok(_0x291ae3),
+      assert.equal(_0x291ae3.prompt, '故事/描述：一段简短剧情'),
+      assert.equal(_0x291ae3.prompt.includes('{{'), false));
+  }),
+  test('aigenImage task orchestration: 图像内置对象预设无输入时不生成', async () => {
+    const _0x771e1 = globalThis.window.showToast,
+      _0x4b6d43 = [];
+    globalThis.window.showToast = (_0x31ea5a, _0x15cd91) => {
+      _0x4b6d43.push({ message: _0x31ea5a, type: _0x15cd91 });
+    };
+    try {
+      const _0x1ad5f4 = 'node-ai-image-static-template-empty',
+        { proto: _0x265777, ctx: _0x45cecb } = createTestContext({
+          targetId: _0x1ad5f4,
+          nodeData: {
+            id: _0x1ad5f4,
+            model: 'nano-banana-pro-vt',
+            provider: 'grsai',
+            aspectRatio: '1:1',
+            imageSize: '2K',
+            batchSize: 1,
+          },
+          promptText: '',
+        }),
+        _0x5257c8 = await _0x265777._buildPayload.call(_0x45cecb, {
+          type: 'static',
+          text: '故事/描述：{用户输入 || 一段简短剧情}',
+          requireInput: true,
+          emptyInputMessage: '请输入提示词或添加参考图片',
+        });
+      (assert.equal(_0x5257c8, null),
+        assert.deepEqual(_0x4b6d43, [{ message: '请输入提示词或添加参考图片', type: 'warn' }]));
+    } finally {
+      globalThis.window.showToast = _0x771e1;
+    }
+  }),
+  test('aigenImage task orchestration: 图像内置对象预设使用连线文本入参', async () => {
+    const _0x278721 = 'node-ai-image-static-template-linked-text',
+      _0x57177c = 'source-text-for-static-template',
+      { proto: _0x1b6fe, ctx: _0x6f1c54 } = createTestContext({
+        targetId: _0x278721,
+        nodeData: {
+          id: _0x278721,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: { [_0x57177c]: { id: _0x57177c, type: 'ai-text', outputText: '雨夜赛博街区' } },
+        incomingEdges: [{ id: 'edge-linked-text-static-template', sourceId: _0x57177c, targetId: _0x278721 }],
+        promptText: '',
+      }),
+      _0x39c64f = await _0x1b6fe._buildPayload.call(_0x6f1c54, {
+        type: 'static',
+        text: '故事/描述：{用户输入 || 一段简短剧情}',
+        requireInput: true,
+        emptyInputMessage: '请输入提示词或添加参考图片',
+      });
+    (assert.ok(_0x39c64f), assert.equal(_0x39c64f.prompt, '故事/描述：雨夜赛博街区'));
+  }),
+  test('aigenImage task orchestration: /预设模板在有输入时注入用户输入且不残留占位符', async () => {
+    const _0xa502de = 'node-ai-image-template-use-user-input',
+      { proto: _0x186bcb, ctx: _0x50f0e4 } = createTestContext({
+        targetId: _0xa502de,
+        nodeData: {
+          id: _0xa502de,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        promptText: '夜雨中的街道追逐',
+      }),
+      _0x2e3217 = await _0x186bcb._buildPayload.call(_0x50f0e4, '故事/描述：{用户输入 || 一段简短剧情}');
+    (assert.ok(_0x2e3217),
+      assert.equal(_0x2e3217.prompt, '故事/描述：夜雨中的街道追逐'),
+      assert.equal(_0x2e3217.prompt.includes('{{'), false));
+  }),
+  test('aigenImage task orchestration: 开发者模式下 /预设 仅回填最终提示词不直接生成', async () => {
+    const _0x397cc1 = globalThis.window.DEV_MODE;
+    globalThis.window.DEV_MODE = true;
+    try {
+      const _0x2d305a = 'node-ai-image-template-dev-preview';
+      let _0x439887 = false;
+      const {
+        proto: _0x5110b3,
+        ctx: _0x5679c1,
+        state: _0x386929,
+      } = createTestContext({
+        targetId: _0x2d305a,
+        nodeData: {
+          id: _0x2d305a,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        promptText: '夜雨中的街道追逐',
+        apiImpl: {
+          generateImage: async () => {
+            return ((_0x439887 = true), { imageUrl: '/output/test.png' });
+          },
+        },
+      });
+      (await _0x5110b3._onGenerate.call(_0x5679c1, '故事/描述：{用户输入 || 一段简短剧情}'),
+        assert.equal(_0x439887, false),
+        assert.equal(_0x386929.nodes[_0x2d305a].prompt, '故事/描述：夜雨中的街道追逐'),
+        assert.equal(_0x5679c1.promptEl.innerHTML, '故事/描述：夜雨中的街道追逐'));
+    } finally {
+      globalThis.window.DEV_MODE = _0x397cc1;
+    }
+  }),
+  test('aigenImage task orchestration: 预览模式下点击生成只启动假加载不发请求', async () => {
+    const _0x266bad = globalThis.window.PREVIEW_MODE;
+    globalThis.window.PREVIEW_MODE = true;
+    try {
+      const _0x454a99 = 'node-ai-image-preview-loading';
+      let _0x284389 = false;
+      const { proto: _0x53d376, ctx: _0x382ff5 } = createTestContext({
+        targetId: _0x454a99,
+        nodeData: {
+          id: _0x454a99,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        apiImpl: {
+          generateImage: async () => {
+            return ((_0x284389 = true), { imageUrl: '/output/test.png' });
+          },
+        },
+      });
+      ((_0x382ff5.previewEl = createFakePreviewContainer()),
+        (_0x382ff5.btnEl = createButtonStub()),
+        await _0x53d376._onGenerate.call(_0x382ff5),
+        assert.equal(_0x284389, false),
+        assert.equal(isPreviewNodeLoading(_0x454a99), true),
+        assert.equal(_0x382ff5.btnEl.disabled, true),
+        assert.match(_0x382ff5.btnEl.innerHTML, /animation:spin/),
+        stopPreviewNodeLoading(_0x454a99),
+        assert.equal(_0x382ff5.btnEl.disabled, false),
+        assert.doesNotMatch(_0x382ff5.btnEl.innerHTML, /animation:spin/));
+    } finally {
+      globalThis.window.PREVIEW_MODE = _0x266bad;
+    }
+  }),
+  test('aigenImage task orchestration: asset image mentions send type placeholders in prompt order', async () => {
+    const _0x2937d3 = 'node-ai-image-asset-mentions';
+    setAssetMentionAssets([
+      {
+        id: 'asset-people',
+        items: [
+          {
+            name: 'person1',
+            type: 'source-image',
+            nodeData: { type: 'source-image', originalLocalPath: 'data/assets/person1.png' },
+          },
+          {
+            name: 'person2',
+            type: 'source-image',
+            nodeData: { type: 'source-image', originalLocalPath: 'data/assets/person2.png' },
+          },
+        ],
+      },
+    ]);
+    const { proto: _0x31b53d, ctx: _0x468b11 } = createTestContext({
+        targetId: _0x2937d3,
+        nodeData: {
+          id: _0x2937d3,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        promptEl: createPromptEl([
+          createAssetPromptPillNode('person1', 'asset-people', 0, 'image'),
+          createPromptTextNode(' and '),
+          createAssetPromptPillNode('person2', 'asset-people', 1, 'image'),
+        ]),
+      }),
+      _0x32cfcb = await _0x31b53d._buildPayload.call(_0x468b11);
+    (assert.equal(_0x32cfcb.prompt, '@图片1 and @图片2'),
+      assert.deepEqual(_0x32cfcb.inputUrls, ['/data/assets/person1.png', '/data/assets/person2.png']));
+  }),
+  test('aigenImage task orchestration: thumbnail reorder keeps inputUrls aligned with image labels', async () => {
+    const _0xf1d53f = 'node-ai-image-reordered-thumb-labels',
+      _0x5f5720 = 'node-ref-scene-image',
+      _0x55c55a = 'node-ref-woman-image',
+      { proto: _0x5cd927, ctx: _0x4b9473 } = createTestContext({
+        targetId: _0xf1d53f,
+        nodeData: {
+          id: _0xf1d53f,
+          model: 'apimart/gpt-image-2',
+          provider: 'apimart',
+          aspectRatio: '1:1',
+          imageSize: '1K',
+          batchSize: 1,
+          generationParams: { mode: 'official', aspectRatio: '1:1', imageSize: '1K' },
+        },
+        nodes: {
+          [_0x5f5720]: {
+            id: _0x5f5720,
+            type: 'source-image',
+            originalLocalPath: 'data/uploads/scene.png',
+            width: 0x640,
+            height: 0x384,
+          },
+          [_0x55c55a]: {
+            id: _0x55c55a,
+            type: 'source-image',
+            originalLocalPath: 'data/uploads/woman.png',
+            width: 0x384,
+            height: 0x640,
+          },
+        },
+        incomingEdges: [
+          { id: 'edge-scene-first-after-drag', sourceId: _0x5f5720, targetId: _0xf1d53f },
+          { id: 'edge-woman-second-after-drag', sourceId: _0x55c55a, targetId: _0xf1d53f },
+        ],
+        promptEl: createPromptEl([
+          createNodePromptPillNode('@图片2', _0x55c55a, 'image'),
+          createPromptTextNode(' 的女人替换到 '),
+          createNodePromptPillNode('@图片1', _0x5f5720, 'image'),
+          createPromptTextNode(' 的场景里面'),
+        ]),
+      }),
+      _0x2a4e44 = await _0x5cd927._buildPayload.call(_0x4b9473);
+    (assert.equal(_0x2a4e44.prompt, '@图片2 的女人替换到 @图片1 的场景里面'),
+      assert.deepEqual(_0x2a4e44.inputUrls, ['/data/uploads/scene.png', '/data/uploads/woman.png']));
+  }),
+  test('aigenImage task orchestration: RunningHub workflow payload reads hidden image asset refs', async () => {
+    const _0x291f30 = 'node-ai-image-hidden-asset';
+    setAssetMentionAssets([
+      {
+        id: 'asset-hidden-image',
+        items: [
+          {
+            name: 'person',
+            type: 'source-image',
+            nodeData: { type: 'source-image', originalLocalPath: 'data/assets/hidden-person.png' },
+          },
+        ],
+      },
+    ]);
+    const { proto: _0x54a1bf, ctx: _0x1dbb70 } = createTestContext({
+        targetId: _0x291f30,
+        nodeData: {
+          id: _0x291f30,
+          model: 'runninghub/1994718111704158209',
+          provider: 'runninghubwf',
+          aspectRatio: '1:1',
+          batchSize: 1,
+          generationParams: { rhAnimeRealResolution: 0x6e0, rhInstanceType: 'plus' },
+          promptAssetInputRefs: [{ assetId: 'asset-hidden-image', itemIndex: 0, type: 'image' }],
+        },
+        promptText: 'portrait',
+      }),
+      _0x301cf5 = await _0x54a1bf._buildPayload.call(_0x1dbb70);
+    (assert.equal(_0x301cf5.prompt, 'portrait'),
+      assert.equal(_0x301cf5.rhAnimeRealResolution, 0x6e0),
+      assert.equal(_0x301cf5.rhResolution, 0x6e0),
+      assert.equal(_0x301cf5.rhInstanceType, 'plus'),
+      assert.deepEqual(_0x301cf5.inputUrls, ['/data/assets/hidden-person.png']));
+  }),
+  test('aigenImage task orchestration: person replace payload uses refSlot order for manifest model ids', async () => {
+    const _0x131b97 = ['runninghub/2041177685895946242', 'runninghub/2050313968069165058'];
+    for (const _0x412792 of _0x131b97) {
+      const _0xddcd13 = 'node-person-replace-' + _0x412792.slice(-4),
+        _0xc51146 = _0xddcd13 + '-target',
+        _0x1c362b = _0xddcd13 + '-source',
+        { proto: _0x80facd, ctx: _0x3aaecf } = createTestContext({
+          targetId: _0xddcd13,
+          nodeData: {
+            id: _0xddcd13,
+            model: _0x412792,
+            provider: 'runninghubwf',
+            aspectRatio: '1:1',
+            batchSize: 1,
+            generationParams: {
+              rhResolution: _0x412792.endsWith('5058') ? 0x500 : 0x640,
+              rhInstanceType: 'plus',
+            },
+          },
+          nodes: {
+            [_0xc51146]: {
+              id: _0xc51146,
+              type: 'source-image',
+              originalLocalPath: 'data/uploads/target.png',
+            },
+            [_0x1c362b]: {
+              id: _0x1c362b,
+              type: 'source-image',
+              originalLocalPath: 'data/uploads/source.png',
+            },
+          },
+          incomingEdges: [
+            {
+              id: _0xddcd13 + '-edge-source',
+              sourceId: _0x1c362b,
+              targetId: _0xddcd13,
+              refSlot: 'replacedImage',
+            },
+            {
+              id: _0xddcd13 + '-edge-target',
+              sourceId: _0xc51146,
+              targetId: _0xddcd13,
+              refSlot: 'replaceTarget',
+            },
+          ],
+          promptText: 'replace',
+        }),
+        _0x582435 = await _0x80facd._buildPayload.call(_0x3aaecf);
+      (assert.deepEqual(
+        _0x582435.inputUrls,
+        ['/data/uploads/target.png', '/data/uploads/source.png'],
+        _0x412792,
+      ),
+        assert.equal(_0x582435.rhResolution, _0x412792.endsWith('5058') ? 0x500 : 0x640),
+        assert.equal(_0x582435.rhInstanceType, 'plus'));
+    }
+  }),
+  test('aigenImage task orchestration: modelApi fixed image slots produce inputUrlsBySlot', async () => {
+    const _0x21f6a6 = 'node-youchuan-v6-slots',
+      _0x8f3a1e = 'node-youchuan-main',
+      _0xdbae4e = 'node-youchuan-cref',
+      _0x8792bb = 'node-youchuan-sref',
+      { proto: _0x1b0a07, ctx: _0x362172 } = createTestContext({
+        targetId: _0x21f6a6,
+        nodeData: {
+          id: _0x21f6a6,
+          type: 'ai-image',
+          model: 'runninghub-model/youchuan-v6',
+          provider: 'runninghub',
+          generationParams: { aspectRatio: '1:1', quality: '1' },
+        },
+        nodes: {
+          [_0x8f3a1e]: { id: _0x8f3a1e, type: 'source-image', originalLocalPath: 'data/uploads/main.png' },
+          [_0xdbae4e]: { id: _0xdbae4e, type: 'source-image', originalLocalPath: 'data/uploads/cref.png' },
+          [_0x8792bb]: { id: _0x8792bb, type: 'source-image', originalLocalPath: 'data/uploads/sref.png' },
+        },
+        incomingEdges: [
+          { id: 'edge-sref', sourceId: _0x8792bb, targetId: _0x21f6a6, refSlot: 'sref' },
+          { id: 'edge-main', sourceId: _0x8f3a1e, targetId: _0x21f6a6, refSlot: 'imageUrl' },
+          { id: 'edge-cref', sourceId: _0xdbae4e, targetId: _0x21f6a6, refSlot: 'cref' },
+        ],
+        promptText: 'portrait',
+        getProviderConfigImpl: () => ({ modelApiKey: 'mk' }),
+      }),
+      _0x2465f1 = await _0x1b0a07._buildPayload.call(_0x362172);
+    (assert.deepEqual(_0x2465f1.inputUrlsBySlot, {
+      imageUrl: '/data/uploads/main.png',
+      cref: '/data/uploads/cref.png',
+      sref: '/data/uploads/sref.png',
+    }),
+      assert.deepEqual(_0x2465f1.inputUrls, [
+        '/data/uploads/sref.png',
+        '/data/uploads/main.png',
+        '/data/uploads/cref.png',
+      ]));
+  }),
+  test('aigenImage task orchestration: Midjourney V7 fixed image slots omit missing role slot', async () => {
+    const _0x4d242a = 'node-youchuan-v7-slots',
+      _0x33fc28 = 'node-youchuan-v7-main',
+      _0x4a4ecb = 'node-youchuan-v7-sref',
+      { proto: _0x3bd89f, ctx: _0x46098b } = createTestContext({
+        targetId: _0x4d242a,
+        nodeData: {
+          id: _0x4d242a,
+          type: 'ai-image',
+          model: 'runninghub-model/youchuan-v7',
+          provider: 'runninghub',
+          generationParams: { aspectRatio: '1:1', quality: '1' },
+        },
+        nodes: {
+          [_0x33fc28]: { id: _0x33fc28, type: 'source-image', originalLocalPath: 'data/uploads/v7-main.png' },
+          [_0x4a4ecb]: { id: _0x4a4ecb, type: 'source-image', originalLocalPath: 'data/uploads/v7-sref.png' },
+        },
+        incomingEdges: [
+          { id: 'edge-v7-sref', sourceId: _0x4a4ecb, targetId: _0x4d242a, refSlot: 'sref' },
+          { id: 'edge-v7-main', sourceId: _0x33fc28, targetId: _0x4d242a, refSlot: 'imageUrl' },
+        ],
+        promptText: 'portrait',
+        getProviderConfigImpl: () => ({ modelApiKey: 'mk' }),
+      }),
+      _0x164941 = await _0x3bd89f._buildPayload.call(_0x46098b);
+    (assert.deepEqual(_0x164941.inputUrlsBySlot, {
+      imageUrl: '/data/uploads/v7-main.png',
+      sref: '/data/uploads/v7-sref.png',
+    }),
+      assert.equal(_0x164941.inputUrlsBySlot.cref, undefined),
+      assert.deepEqual(_0x164941.inputUrls, ['/data/uploads/v7-sref.png', '/data/uploads/v7-main.png']));
+  }),
+  test('aigenImage task orchestration: RunningHub image X single fixed slot produces imageUrl input', async () => {
+    const _0x379b1d = 'node-rh-image-x-slot',
+      _0x1a0d54 = 'node-rh-image-x-ref',
+      { proto: _0x1082b7, ctx: _0xa1ca95 } = createTestContext({
+        targetId: _0x379b1d,
+        nodeData: {
+          id: _0x379b1d,
+          type: 'ai-image',
+          model: 'runninghub-model/rhart-image-g',
+          provider: 'runninghub',
+        },
+        nodes: {
+          [_0x1a0d54]: {
+            id: _0x1a0d54,
+            type: 'source-image',
+            originalLocalPath: 'data/uploads/image-x-ref.png',
+          },
+        },
+        incomingEdges: [
+          { id: 'edge-image-x-main', sourceId: _0x1a0d54, targetId: _0x379b1d, refSlot: 'imageUrl' },
+        ],
+        promptText: 'polish the reference',
+        getProviderConfigImpl: () => ({ modelApiKey: 'mk' }),
+      }),
+      _0x1518e6 = await _0x1082b7._buildPayload.call(_0xa1ca95);
+    (assert.deepEqual(_0x1518e6.inputUrlsBySlot, { imageUrl: '/data/uploads/image-x-ref.png' }),
+      assert.deepEqual(_0x1518e6.inputUrls, ['/data/uploads/image-x-ref.png']),
+      assert.equal(_0x1518e6.provider, 'runninghub'),
+      assert.equal(_0x1518e6.rhModelRoute, 'low'),
+      assert.equal(_0x1518e6.imageSize, '1K'),
+      assert.equal(_0x1518e6.aspectRatio, '1:1'),
+      assert.equal(_0x1518e6.batchSize, 1),
+      assert.equal(_0x1518e6.numImages, undefined),
+      assert.equal(_0x1518e6.outputFormat, undefined),
+      assert.equal(_0x1518e6.suppressAspectRatio, undefined));
+  }),
+  test('aigenImage task orchestration: person replace adaptive ratio uses manifest source slot', async () => {
+    const _0x2ee65c = ['runninghub/2041177685895946242', 'runninghub/2050313968069165058'];
+    for (const _0x58b38c of _0x2ee65c) {
+      const _0x1cc149 = 'node-person-replace-ratio-' + _0x58b38c.slice(-4),
+        _0x3cd286 = _0x1cc149 + '-target',
+        _0x1b5325 = _0x1cc149 + '-source',
+        { proto: _0x20ffb8, ctx: _0x1fdf3b } = createTestContext({
+          targetId: _0x1cc149,
+          nodeData: {
+            id: _0x1cc149,
+            model: _0x58b38c,
+            provider: 'runninghubwf',
+            batchSize: 1,
+            generationParams: { rhResolution: _0x58b38c.endsWith('5058') ? 0x500 : 0x640 },
+          },
+          nodes: {
+            [_0x3cd286]: {
+              id: _0x3cd286,
+              type: 'source-image',
+              originalLocalPath: 'data/uploads/target.png',
+              width: 0x640,
+              height: 0x384,
+            },
+            [_0x1b5325]: {
+              id: _0x1b5325,
+              type: 'source-image',
+              originalLocalPath: 'data/uploads/source.png',
+              width: 0x384,
+              height: 0x640,
+            },
+          },
+          incomingEdges: [
+            {
+              id: _0x1cc149 + '-edge-target',
+              sourceId: _0x3cd286,
+              targetId: _0x1cc149,
+              refSlot: 'replaceTarget',
+            },
+            {
+              id: _0x1cc149 + '-edge-source',
+              sourceId: _0x1b5325,
+              targetId: _0x1cc149,
+              refSlot: 'replacedImage',
+            },
+          ],
+          promptText: 'replace',
+        }),
+        _0x5e89c4 = await _0x20ffb8._buildPayload.call(_0x1fdf3b);
+      (assert.deepEqual(
+        _0x5e89c4.inputUrls,
+        ['/data/uploads/target.png', '/data/uploads/source.png'],
+        _0x58b38c,
+      ),
+        assert.equal(_0x5e89c4.resolvedRatioLabel, '9:16', _0x58b38c),
+        assert.equal(_0x5e89c4.adaptiveSource, 'input-media', _0x58b38c));
+    }
+  }),
+  test('aigenImage task orchestration: GRSAI 有参考图+自适应时透传 API auto', async () => {
+    const _0x25f5f2 = 'node-ai-image-1',
+      _0x5eff4c = 'node-ref-image-1',
+      { proto: _0x57cbb0, ctx: _0x476626 } = createTestContext({
+        targetId: _0x25f5f2,
+        nodeData: {
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: {
+          [_0x5eff4c]: {
+            id: _0x5eff4c,
+            type: 'source-image',
+            imageUrl: 'https://img.example.com/ref.png',
+            width: 0x640,
+            height: 0x384,
+          },
+        },
+        incomingEdges: [{ id: 'edge-1', sourceId: _0x5eff4c, targetId: _0x25f5f2, refSlot: '' }],
+      }),
+      _0x3be02d = await _0x57cbb0._buildPayload.call(_0x476626);
+    (assert.equal(_0x3be02d.aspectRatio, 'auto'),
+      assert.equal(_0x3be02d.suppressAspectRatio, undefined),
+      assert.equal(_0x3be02d.resolvedRatioLabel, 'auto'),
+      assert.equal(_0x3be02d.adaptiveSource, 'input-media'),
+      assert.equal(_0x3be02d.ratioCapability, 'aspectRatio'),
+      assert.deepEqual(_0x3be02d.inputUrls, ['https://img.example.com/ref.png']));
+  }),
+  test('aigenImage task orchestration: source-image 生成入参优先使用原图本地路径', async () => {
+    const _0x4bcd3d = 'node-ai-image-source-original-first',
+      _0x269c23 = 'node-ref-image-source-original-first',
+      { proto: _0x4f27f0, ctx: _0x27125a } = createTestContext({
+        targetId: _0x4bcd3d,
+        nodeData: {
+          id: _0x4bcd3d,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: {
+          [_0x269c23]: {
+            id: _0x269c23,
+            type: 'source-image',
+            originalLocalPath: 'data/uploads/original.png',
+            displayLocalPath: 'data/uploads/display.webp',
+            thumbLocalPath: 'data/uploads/thumb.webp',
+            thumbUrl: 'https://img.example.com/thumb.png',
+            width: 0x640,
+            height: 0x384,
+          },
+        },
+        incomingEdges: [
+          { id: 'edge-source-original-first', sourceId: _0x269c23, targetId: _0x4bcd3d, refSlot: '' },
+        ],
+      }),
+      _0x379f0c = await _0x4f27f0._buildPayload.call(_0x27125a);
+    assert.deepEqual(_0x379f0c.inputUrls, ['/data/uploads/original.png']);
+  }),
+  test('aigenImage task orchestration: localized reference parser keeps Chinese aliases in English locale', async () => {
+    setLocale('en-US', { persist: false, notify: false });
+    try {
+      const _0x20dc39 = 'node-ai-image-source-alias-en',
+        _0xca6d65 = 'node-ref-image-source-alias-en',
+        { proto: _0x57b892, ctx: _0x5f3115 } = createTestContext({
+          targetId: _0x20dc39,
+          nodeData: {
+            id: _0x20dc39,
+            model: 'nano-banana-pro-vt',
+            provider: 'grsai',
+            aspectRatio: '1:1',
+            imageSize: '2K',
+            batchSize: 1,
+          },
+          nodes: {
+            [_0xca6d65]: {
+              id: _0xca6d65,
+              type: 'source-image',
+              originalLocalPath: 'data/uploads/alias-original.png',
+            },
+          },
+          incomingEdges: [
+            { id: 'edge-source-alias-en', sourceId: _0xca6d65, targetId: _0x20dc39, refSlot: '' },
+          ],
+          promptText: 'edit @图片1',
+        }),
+        _0x2eac15 = await _0x57b892._buildPayload.call(_0x5f3115);
+      assert.deepEqual(_0x2eac15.inputUrls, ['/data/uploads/alias-original.png']);
+    } finally {
+      setLocale(DEFAULT_LOCALE, { persist: false, notify: false });
+    }
+  }),
+  test('aigenImage task orchestration: ai-image 生成入参优先使用主图原图本地路径', async () => {
+    const _0x2705d9 = 'node-ai-image-ai-original-first',
+      _0xcb078c = 'node-ref-ai-image-original-first',
+      { proto: _0x5a7690, ctx: _0x3a9bd9 } = createTestContext({
+        targetId: _0x2705d9,
+        nodeData: {
+          id: _0x2705d9,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: {
+          [_0xcb078c]: {
+            id: _0xcb078c,
+            type: 'ai-image',
+            mainImageIndex: 1,
+            localPath: 'data/uploads/node-local.png',
+            sourceUrl: 'https://img.example.com/node-source.png',
+            thumbUrl: 'https://img.example.com/node-thumb.png',
+            images: [
+              { originalLocalPath: 'data/uploads/other-original.png' },
+              {
+                originalLocalPath: 'data/uploads/main-original.png',
+                localPath: 'data/uploads/main-local.png',
+                sourceUrl: 'https://img.example.com/main-source.png',
+                thumbUrl: 'https://img.example.com/main-thumb.png',
+              },
+            ],
+            width: 0x4b0,
+            height: 0x4b0,
+          },
+        },
+        incomingEdges: [
+          { id: 'edge-ai-original-first', sourceId: _0xcb078c, targetId: _0x2705d9, refSlot: '' },
+        ],
+      }),
+      _0x19ae8a = await _0x5a7690._buildPayload.call(_0x3a9bd9);
+    assert.deepEqual(_0x19ae8a.inputUrls, ['/data/uploads/main-original.png']);
+  }),
+  test('aigenImage task orchestration: PPIO 有参考图+自适应时不设置 suppressAspectRatio', async () => {
+    const _0x327749 = 'node-ai-image-2',
+      _0x5d8ef6 = 'node-ref-image-2',
+      { proto: _0x3cf21c, ctx: _0x56b05b } = createTestContext({
+        targetId: _0x327749,
+        nodeData: { model: 'ppio/seedream-5.0-lite', aspectRatio: '自适应', imageSize: '2K', batchSize: 1 },
+        nodes: {
+          [_0x5d8ef6]: {
+            id: _0x5d8ef6,
+            type: 'source-image',
+            imageUrl: 'https://img.example.com/ref-ppio.png',
+            width: 0x438,
+            height: 0x546,
+          },
+        },
+        incomingEdges: [{ id: 'edge-2', sourceId: _0x5d8ef6, targetId: _0x327749, refSlot: '' }],
+      }),
+      _0x25eafa = await _0x3cf21c._buildPayload.call(_0x56b05b),
+      _0x44b20f = await _0x3cf21c._buildResumePayload.call(_0x56b05b, _0x56b05b._data);
+    (assert.equal(_0x25eafa.aspectRatio, '4:5'),
+      assert.equal(_0x25eafa.suppressAspectRatio, undefined),
+      assert.equal(_0x25eafa.provider, 'ppio'),
+      assert.equal(_0x44b20f.provider, 'ppio'),
+      assert.deepEqual(_0x25eafa.inputUrls, ['https://img.example.com/ref-ppio.png']));
+  }),
+  test('aigenImage task orchestration: grsai 有入参时自适应保持 API auto', async () => {
+    const _0x37097d = 'node-ai-image-grsai-input-first',
+      _0x423912 = 'node-ref-image-grsai-input-first',
+      { proto: _0x477314, ctx: _0x209a3e } = createTestContext({
+        targetId: _0x37097d,
+        nodeData: {
+          id: _0x37097d,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+          width: 0x384,
+          height: 0x384,
+        },
+        nodes: {
+          [_0x423912]: {
+            id: _0x423912,
+            type: 'source-image',
+            imageUrl: 'https://img.example.com/ref-grsai-169.png',
+            width: 0x640,
+            height: 0x384,
+          },
+        },
+        incomingEdges: [
+          { id: 'edge-grsai-input-first', sourceId: _0x423912, targetId: _0x37097d, refSlot: '' },
+        ],
+      }),
+      _0x2543f4 = await _0x477314._buildPayload.call(_0x209a3e);
+    (assert.equal(_0x2543f4.provider, 'grsai'),
+      assert.equal(_0x2543f4.aspectRatio, 'auto'),
+      assert.equal(_0x2543f4.resolvedRatioLabel, 'auto'),
+      assert.equal(_0x2543f4.adaptiveSource, 'input-media'));
+  }),
+  test('aigenImage task orchestration: GRSAI 未设置 aspectRatio 时默认 API auto', async () => {
+    const _0x44ccfb = 'node-ai-image-default-adaptive',
+      { proto: _0x41c34e, ctx: _0x56db7b } = createTestContext({
+        targetId: _0x44ccfb,
+        nodeData: {
+          id: _0x44ccfb,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          imageSize: '2K',
+          batchSize: 1,
+          width: 0x640,
+          height: 0x384,
+        },
+        incomingEdges: [],
+      }),
+      _0x49813a = await _0x41c34e._buildPayload.call(_0x56db7b);
+    (assert.equal(_0x49813a.aspectRatio, 'auto'),
+      assert.equal(_0x49813a.resolvedRatioLabel, 'auto'),
+      assert.equal(_0x49813a.adaptiveSource, 'display'));
+  }),
+  test('aigenImage task orchestration: 自适应无图像入参时使用显示区域比例映射', async () => {
+    const _0x308128 = 'node-ai-image-3',
+      _0x328f0c = 'node-ref-text-3',
+      { proto: _0x1e086a, ctx: _0x5e4a91 } = createTestContext({
+        targetId: _0x308128,
+        nodeData: {
+          id: _0x308128,
+          model: 'ppio/seedream-5.0-lite',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+          width: 0x6a4,
+          height: 0x384,
+        },
+        nodes: {
+          [_0x328f0c]: { id: _0x328f0c, type: 'source-text', text: 'hello', width: 0x834, height: 0x12c },
+        },
+        incomingEdges: [{ id: 'edge-3', sourceId: _0x328f0c, targetId: _0x308128, refSlot: '' }],
+      }),
+      _0x31d026 = await _0x1e086a._buildPayload.call(_0x5e4a91);
+    (assert.equal(_0x31d026.aspectRatio, '16:9'),
+      assert.equal(_0x31d026.adaptiveSource, 'display'),
+      assert.equal(_0x31d026.resolvedRatioLabel, '16:9'));
+  }),
+  test('aigenImage task orchestration: ai-text 入参无输出时使用 prompt 作为文本内容', async () => {
+    const _0x37c429 = 'node-ai-image-text-prompt-ref',
+      _0x3ca58e = 'node-ai-text-prompt-ref',
+      { proto: _0x32d555, ctx: _0x9549a4 } = createTestContext({
+        targetId: _0x37c429,
+        nodeData: {
+          id: _0x37c429,
+          model: 'ppio/seedream-5.0-lite',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: { [_0x3ca58e]: { id: _0x3ca58e, type: 'ai-text', prompt: '来自生成文本节点的提示词' } },
+        incomingEdges: [
+          { id: 'edge-ai-image-text-prompt', sourceId: _0x3ca58e, targetId: _0x37c429, refSlot: '' },
+        ],
+        promptText: '主体画面',
+      }),
+      _0x1ddc07 = await _0x32d555._buildPayload.call(_0x9549a4);
+    (assert.equal(_0x1ddc07.prompt, '来自生成文本节点的提示词\n主体画面'),
+      assert.deepEqual(_0x1ddc07.inputUrls, []));
+  }),
+  test('aigenImage task orchestration: Dreamina 自适应 + 16:9 入参图透传 16:9', async () => {
+    const _0x50c2fb = 'node-ai-image-dreamina-1',
+      _0x257d0c = 'node-ref-image-dreamina-1',
+      { proto: _0x5045b7, ctx: _0x486c73 } = createTestContext({
+        targetId: _0x50c2fb,
+        nodeData: {
+          model: 'dreamina/5.0',
+          provider: 'dreamina',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: {
+          [_0x257d0c]: {
+            id: _0x257d0c,
+            type: 'source-image',
+            imageUrl: 'https://img.example.com/dreamina-169.png',
+            width: 0x640,
+            height: 0x384,
+          },
+        },
+        incomingEdges: [{ id: 'edge-dreamina-1', sourceId: _0x257d0c, targetId: _0x50c2fb, refSlot: '' }],
+      }),
+      _0x5974e5 = await _0x5045b7._buildPayload.call(_0x486c73);
+    (assert.equal(_0x5974e5.provider, 'dreamina'), assert.equal(_0x5974e5.aspectRatio, '16:9'));
+  }),
+  test('aigenImage task orchestration: 自适应入参优先使用真实媒体尺寸', async () => {
+    const _0x5f2a98 = 'node-ai-image-real-media-size',
+      _0x63e467 = 'node-ref-image-real-media-size',
+      { proto: _0x37969c, ctx: _0x15c760 } = createTestContext({
+        targetId: _0x5f2a98,
+        nodeData: {
+          model: 'dreamina/5.0',
+          provider: 'dreamina',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+          width: 0x640,
+          height: 0x384,
+        },
+        nodes: {
+          [_0x63e467]: {
+            id: _0x63e467,
+            type: 'source-image',
+            imageUrl: 'https://img.example.com/portrait-real.png',
+            width: 0x640,
+            height: 0x384,
+            imageWidth: 0x384,
+            imageHeight: 0x640,
+          },
+        },
+        incomingEdges: [
+          { id: 'edge-real-media-size', sourceId: _0x63e467, targetId: _0x5f2a98, refSlot: '' },
+        ],
+      }),
+      _0x39c41f = await _0x37969c._buildPayload.call(_0x15c760);
+    (assert.equal(_0x39c41f.provider, 'dreamina'),
+      assert.equal(_0x39c41f.aspectRatio, '9:16'),
+      assert.equal(_0x39c41f.resolvedRatioLabel, '9:16'),
+      assert.equal(_0x39c41f.adaptiveSource, 'input-media'));
+  }),
+  test('aigenImage task orchestration: Dreamina 生成入参保留原图本地路径', async () => {
+    const _0x3d382a = 'node-ai-image-dreamina-original-first',
+      _0xd3ccee = 'node-ref-image-dreamina-original-first',
+      { proto: _0x1b8680, ctx: _0x8d2670 } = createTestContext({
+        targetId: _0x3d382a,
+        nodeData: {
+          id: _0x3d382a,
+          model: 'dreamina/5.0',
+          provider: 'dreamina',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: {
+          [_0xd3ccee]: {
+            id: _0xd3ccee,
+            type: 'source-image',
+            originalLocalPath: 'data/uploads/dreamina-original.png',
+            displayLocalPath: 'data/uploads/dreamina-display.webp',
+            thumbLocalPath: 'data/uploads/dreamina-thumb.webp',
+            thumbUrl: 'https://img.example.com/dreamina-thumb.png',
+            width: 0x640,
+            height: 0x384,
+          },
+        },
+        incomingEdges: [
+          { id: 'edge-dreamina-original-first', sourceId: _0xd3ccee, targetId: _0x3d382a, refSlot: '' },
+        ],
+      }),
+      _0x4f210c = await _0x1b8680._buildPayload.call(_0x8d2670);
+    (assert.equal(_0x4f210c.provider, 'dreamina'),
+      assert.deepEqual(_0x4f210c.inputUrls, ['/data/uploads/dreamina-original.png']));
+  }),
+  test('aigenImage task orchestration: Dreamina 自适应 + 非标准比例映射最近支持比例', async () => {
+    const _0x23eb46 = 'node-ai-image-dreamina-2',
+      _0x2847e9 = 'node-ref-image-dreamina-2',
+      { proto: _0x17b0ad, ctx: _0x3337d7 } = createTestContext({
+        targetId: _0x23eb46,
+        nodeData: {
+          model: 'dreamina/4.5',
+          provider: 'dreamina',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: {
+          [_0x2847e9]: {
+            id: _0x2847e9,
+            type: 'source-image',
+            imageUrl: 'https://img.example.com/dreamina-non-standard.png',
+            width: 0x4e2,
+            height: 0x3e8,
+          },
+        },
+        incomingEdges: [{ id: 'edge-dreamina-2', sourceId: _0x2847e9, targetId: _0x23eb46, refSlot: '' }],
+      }),
+      _0x17182a = await _0x17b0ad._buildPayload.call(_0x3337d7);
+    (assert.equal(_0x17182a.provider, 'dreamina'), assert.equal(_0x17182a.aspectRatio, '4:3'));
+  }),
+  test('aigenImage task orchestration: Dreamina 自适应 + 无图像入参时 fallback 为 1:1', async () => {
+    const _0x3c1adf = 'node-ai-image-dreamina-3',
+      { proto: _0x2a690b, ctx: _0x14879e } = createTestContext({
+        targetId: _0x3c1adf,
+        nodeData: {
+          model: 'dreamina/4.1',
+          provider: 'dreamina',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: {},
+        incomingEdges: [],
+      }),
+      _0x59bce7 = await _0x2a690b._buildPayload.call(_0x14879e);
+    (assert.equal(_0x59bce7.provider, 'dreamina'), assert.equal(_0x59bce7.aspectRatio, '1:1'));
+  }),
+  test('aigenImage task orchestration: 无入参时自适应优先使用显示区域比例', async () => {
+    const _0x58542c = 'node-ai-image-display-ratio',
+      { proto: _0x7889db, ctx: _0xb8b8f0 } = createTestContext({
+        targetId: _0x58542c,
+        nodeData: {
+          id: _0x58542c,
+          model: 'dreamina/5.0',
+          provider: 'dreamina',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+          width: 0x5dc,
+          height: 0x384,
+        },
+        incomingEdges: [],
+      }),
+      _0xd0d818 = await _0x7889db._buildPayload.call(_0xb8b8f0);
+    (assert.equal(_0xd0d818.aspectRatio, '16:9'),
+      assert.equal(_0xd0d818.adaptiveSource, 'display'),
+      assert.equal(_0xd0d818.resolvedRatioLabel, '16:9'));
+  }),
+  test('aigenImage task orchestration: async pending 且无 taskId 时触发兜底重提', async () => {
+    const _0x297ef7 = 'node-ai-image-fallback-1',
+      { proto: _0x1f98a3, ctx: _0x383997 } = createTestContext({
+        targetId: _0x297ef7,
+        nodeData: {
+          model: 'ppio/seedream-4.0',
+          provider: 'ppio',
+          asyncTaskProvider: 'ppio',
+          asyncTaskKind: 'image',
+          asyncTaskStatus: 'pending',
+          asyncTaskId: '',
+          generationStartTime: Date.now() - 0x320,
+          generationDuration: null,
+          images: [],
+        },
+      });
+    let _0x32f30a = 0;
+    ((_0x383997._onGenerate = async () => {
+      _0x32f30a += 1;
+    }),
+      (_0x383997._stopAsyncRecovery = () => {}),
+      (_0x383997._isGenerating = false),
+      await _0x1f98a3._maybeResumeAsyncTaskImpl.call(_0x383997),
+      assert.equal(_0x32f30a, 1));
+  }),
+  test('aigenImage task orchestration: async pending 且无 taskId 但已有结果时不触发重提', async () => {
+    const _0x44d452 = 'node-ai-image-fallback-2',
+      { proto: _0x1ed43c, ctx: _0x4b7e86 } = createTestContext({
+        targetId: _0x44d452,
+        nodeData: {
+          model: 'ppio/seedream-4.0',
+          provider: 'ppio',
+          asyncTaskProvider: 'ppio',
+          asyncTaskKind: 'image',
+          asyncTaskStatus: 'pending',
+          asyncTaskId: '',
+          generationStartTime: Date.now() - 0x320,
+          generationDuration: null,
+          imageUrl: '/output/ok.png',
+          images: [{ imageUrl: '/output/ok.png' }],
+        },
+      });
+    let _0x597a2e = 0,
+      _0x2b1454 = 0;
+    ((_0x4b7e86._onGenerate = async () => {
+      _0x597a2e += 1;
+    }),
+      (_0x4b7e86._stopAsyncRecovery = () => {
+        _0x2b1454 += 1;
+      }),
+      (_0x4b7e86._isGenerating = false),
+      await _0x1ed43c._maybeResumeAsyncTaskImpl.call(_0x4b7e86),
+      assert.equal(_0x597a2e, 0),
+      assert.equal(_0x2b1454, 1));
+  }),
+  test('aigenImage task orchestration: RunningHub recovery writes terminal state through runtime', async () => {
+    const _0xbaee84 = 'node-ai-image-rh-runtime-recovery',
+      _0x3d1244 = Date.now() - 0xea60,
+      {
+        proto: _0x567ff6,
+        ctx: _0x5e179d,
+        state: _0x55f681,
+      } = createTestContext({
+        targetId: _0xbaee84,
+        nodeData: {
+          id: _0xbaee84,
+          model: 'runninghub/1994718111704158209',
+          provider: 'runninghubwf',
+          rhTaskId: 'rh-image-resume-success',
+          rhTaskStatus: 'running',
+          rhTaskStartedAt: _0x3d1244,
+          rhTaskUseOpenapiQuery: true,
+          generationStartTime: _0x3d1244,
+          generationDuration: null,
+          isGenerating: true,
+          images: [],
+        },
+        isRunninghubWorkflowModelImpl: () => true,
+        apiImpl: {
+          resumeRunningHubImageTask: async (_0x3b44b3, _0x5093a9, _0x425f0d) => {
+            return (
+              assert.equal(_0x3b44b3, 'rh-image-resume-success'),
+              assert.equal(_0x5093a9.provider, 'runninghubwf'),
+              assert.equal(_0x425f0d.useOpenapiQuery, true),
+              {
+                images: [
+                  {
+                    imageUrl: '/output/resumed.png',
+                    thumbUrl: '/output/resumed-thumb.png',
+                    localPath: 'output/resumed.png',
+                  },
+                ],
+              }
+            );
+          },
+        },
+      });
+    ((_0x5e179d._isGenerating = false),
+      (_0x5e179d._buildResumePayload = async () => ({
+        model: 'runninghub/1994718111704158209',
+        provider: 'runninghubwf',
+        apiKey: 'k_rh',
+      })),
+      (_0x5e179d._persistRunningHubResumeCache = () => {}),
+      (_0x5e179d._updateSubmitButtonState = () => {}),
+      await _0x567ff6._maybeResumeRunningHubTaskImpl.call(_0x5e179d));
+    _0x5e179d._rhResumePromise && (await _0x5e179d._rhResumePromise);
+    const _0x205ad0 = _0x55f681.nodes[_0xbaee84];
+    (assert.equal(_0x205ad0.isGenerating, false),
+      assert.equal(_0x205ad0.jobStatus, 'success'),
+      assert.equal(_0x205ad0.rhTaskId, 'rh-image-resume-success'),
+      assert.equal(_0x205ad0.rhTaskStatus, 'success'),
+      assert.equal(_0x205ad0.rhTaskRecovering, false),
+      assert.equal(_0x205ad0.imageUrl, '/output/resumed.png'),
+      assert.equal(_0x205ad0.thumbUrl, '/output/resumed-thumb.png'),
+      assert.equal(_0x205ad0.localPath, 'output/resumed.png'));
+  }),
+  test('aigenImage task orchestration: async recovery writes terminal state through runtime', async () => {
+    const _0x5a8497 = 'node-ai-image-async-runtime-recovery',
+      _0x396722 = Date.now() - 0xea60;
+    let _0x2ee9c5 = 0;
+    const {
+      proto: _0x1131ed,
+      ctx: _0x25edac,
+      state: _0x26f0ac,
+    } = createTestContext({
+      targetId: _0x5a8497,
+      nodeData: {
+        id: _0x5a8497,
+        model: 'ppio/seedream-4.0',
+        provider: 'ppio',
+        asyncTaskProvider: 'ppio',
+        asyncTaskKind: 'image',
+        asyncTaskId: 'async-image-resume-success',
+        asyncTaskStatus: 'running',
+        asyncTaskStartedAt: _0x396722,
+        generationStartTime: _0x396722,
+        generationDuration: null,
+        isGenerating: true,
+        images: [],
+      },
+      apiImpl: {
+        resumeAsyncImageTask: async (_0x20aefb, _0x9d0401, _0x193c15) => {
+          return (
+            (_0x2ee9c5 += 1),
+            assert.equal(_0x20aefb, 'async-image-resume-success'),
+            assert.equal(_0x9d0401.provider, 'ppio'),
+            assert.ok(_0x193c15?.signal),
+            {
+              images: [
+                {
+                  imageUrl: '/output/async-resumed.png',
+                  thumbUrl: '/output/async-resumed-thumb.png',
+                  localPath: 'output/async-resumed.png',
+                },
+              ],
+            }
+          );
+        },
+      },
+    });
+    ((_0x25edac._isGenerating = false),
+      (_0x25edac._buildResumePayload = async () => ({
+        model: 'ppio/seedream-4.0',
+        provider: 'ppio',
+        apiKey: 'k_ppio',
+      })),
+      (_0x25edac._persistAsyncResumeCache = () => {}),
+      (_0x25edac._updateSubmitButtonState = () => {}),
+      await _0x1131ed._maybeResumeAsyncTaskImpl.call(_0x25edac));
+    _0x25edac._asyncResumePromise && (await _0x25edac._asyncResumePromise);
+    const _0x32686c = _0x26f0ac.nodes[_0x5a8497];
+    (assert.equal(_0x2ee9c5, 1),
+      assert.equal(_0x32686c.isGenerating, false),
+      assert.equal(_0x32686c.jobStatus, 'success'),
+      assert.equal(_0x32686c.asyncTaskId, 'async-image-resume-success'),
+      assert.equal(_0x32686c.asyncTaskStatus, 'success'),
+      assert.equal(_0x32686c.asyncTaskProvider, 'ppio'),
+      assert.equal(_0x32686c.asyncTaskKind, 'image'),
+      assert.equal(_0x32686c.asyncTaskRecovering, false),
+      assert.equal(_0x32686c.imageUrl, '/output/async-resumed.png'),
+      assert.equal(_0x32686c.thumbUrl, '/output/async-resumed-thumb.png'),
+      assert.equal(_0x32686c.localPath, 'output/async-resumed.png'));
+  }),
+  test('aigenImage task orchestration: async recovery local abort keeps timer running', async () => {
+    const _0x3b227f = 'node-ai-image-async-runtime-pause',
+      _0x1f8a8b = Date.now() - 0xea60;
+    let _0xdc5bdd = null;
+    const {
+      proto: _0x572912,
+      ctx: _0x1d9881,
+      state: _0x39acb1,
+    } = createTestContext({
+      targetId: _0x3b227f,
+      nodeData: {
+        id: _0x3b227f,
+        model: 'ppio/seedream-4.0',
+        provider: 'ppio',
+        asyncTaskProvider: 'ppio',
+        asyncTaskKind: 'image',
+        asyncTaskId: 'async-image-resume-pause',
+        asyncTaskStatus: 'running',
+        asyncTaskStartedAt: _0x1f8a8b,
+        generationStartTime: _0x1f8a8b,
+        generationDuration: null,
+        isGenerating: true,
+        images: [],
+      },
+      apiImpl: {
+        resumeAsyncImageTask: async (_0x36f6ba, _0x4c36cb, _0x3e1751) =>
+          new Promise((_0x414ed3, _0x174ee7) => {
+            ((_0xdc5bdd = _0x3e1751?.signal || null),
+              _0xdc5bdd?.addEventListener?.('abort', () => {
+                const _0x3892f8 = new Error('CANCELLED');
+                ((_0x3892f8.name = 'AbortError'), _0x174ee7(_0x3892f8));
+              }));
+          }),
+      },
+    });
+    ((_0x1d9881._isGenerating = false),
+      (_0x1d9881._buildResumePayload = async () => ({
+        model: 'ppio/seedream-4.0',
+        provider: 'ppio',
+        apiKey: 'k_ppio',
+      })),
+      (_0x1d9881._persistAsyncResumeCache = () => {}),
+      (_0x1d9881._updateSubmitButtonState = () => {}),
+      await _0x572912._maybeResumeAsyncTaskImpl.call(_0x1d9881));
+    for (let _0x482d25 = 0; _0x482d25 < 5 && !_0xdc5bdd; _0x482d25 += 1) {
+      await new Promise((_0x291881) => setImmediate(_0x291881));
+    }
+    assert.ok(_0xdc5bdd);
+    const _0x755cd3 = _0x1d9881._asyncResumePromise;
+    _0x1d9881._stopAsyncRecovery(false);
+    if (_0x755cd3) await _0x755cd3;
+    const _0x2005e2 = _0x39acb1.nodes[_0x3b227f];
+    (assert.equal(_0x2005e2.isGenerating, true),
+      assert.equal(_0x2005e2.jobStatus, 'running'),
+      assert.equal(_0x2005e2.generationStartTime, _0x1f8a8b),
+      assert.equal(_0x2005e2.generationDuration, null),
+      assert.equal(_0x2005e2.asyncTaskId, 'async-image-resume-pause'),
+      assert.equal(_0x2005e2.asyncTaskStatus, 'running'),
+      assert.equal(_0x2005e2.asyncTaskRecovering, false));
+  }),
+  test('aigenImage task orchestration: Dreamina recovery writes terminal state through runtime', async () => {
+    const _0x8e60bd = 'node-ai-image-dreamina-runtime-recovery',
+      _0x132abc = Date.now() - 0xea60;
+    let _0x5d18f6 = 0;
+    const {
+      proto: _0x1be6f3,
+      ctx: _0x2ad89c,
+      state: _0x2d4450,
+    } = createTestContext({
+      targetId: _0x8e60bd,
+      nodeData: {
+        id: _0x8e60bd,
+        model: 'dreamina/4.1',
+        provider: 'dreamina',
+        dreaminaSubmitId: 'sid-dreamina-success',
+        dreaminaTaskStatus: 'pending',
+        dreaminaTaskPhase: 'generating',
+        dreaminaTaskLabel: '生成中',
+        dreaminaTaskStartedAt: _0x132abc,
+        dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
+        dreaminaTaskRecovering: false,
+        generationStartTime: _0x132abc,
+        generationDuration: null,
+        isGenerating: true,
+        images: [],
+      },
+      apiImpl: {
+        resumeDreaminaImageTask: async (_0x2bc526, _0x19d122, _0x23a2e0) => {
+          return (
+            (_0x5d18f6 += 1),
+            assert.equal(_0x2bc526, 'sid-dreamina-success'),
+            assert.equal(_0x19d122.provider, 'dreamina'),
+            assert.ok(_0x23a2e0?.signal),
+            {
+              imageUrl: '/output/dreamina-resumed.png',
+              thumbUrl: '/output/dreamina-resumed-thumb.png',
+              localPath: 'output/dreamina-resumed.png',
+            }
+          );
+        },
+      },
+    });
+    ((_0x2ad89c._isGenerating = false),
+      (_0x2ad89c._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
+      (_0x2ad89c._persistDreaminaResumeCache = () => {}),
+      (_0x2ad89c._updateSubmitButtonState = () => {}),
+      await _0x1be6f3._maybeResumeDreaminaTaskImpl.call(_0x2ad89c));
+    _0x2ad89c._dreaminaResumePromise && (await _0x2ad89c._dreaminaResumePromise);
+    const _0x642bc1 = _0x2d4450.nodes[_0x8e60bd];
+    (assert.equal(_0x5d18f6, 1),
+      assert.equal(_0x642bc1.isGenerating, false),
+      assert.equal(_0x642bc1.jobStatus, 'success'),
+      assert.equal(_0x642bc1.dreaminaSubmitId, 'sid-dreamina-success'),
+      assert.equal(_0x642bc1.dreaminaTaskStatus, 'success'),
+      assert.equal(_0x642bc1.dreaminaTaskPhase, 'done'),
+      assert.equal(_0x642bc1.dreaminaTaskLabel, '已完成'),
+      assert.equal(_0x642bc1.dreaminaTaskRecovering, false),
+      assert.equal(_0x642bc1.imageUrl, '/output/dreamina-resumed.png'),
+      assert.equal(_0x642bc1.thumbUrl, '/output/dreamina-resumed-thumb.png'),
+      assert.equal(_0x642bc1.localPath, 'output/dreamina-resumed.png'));
+  }),
+  test('aigenImage task orchestration: stale Dreamina running task resumes and surfaces fail reason', async () => {
+    const _0x7475c4 = 'node-ai-image-dreamina-stale-recovery',
+      _0x4fae83 = Date.now() - 0xea60,
+      {
+        proto: _0x2c3bc0,
+        ctx: _0x1d1fb2,
+        state: _0x3a846a,
+      } = createTestContext({
+        targetId: _0x7475c4,
+        nodeData: {
+          id: _0x7475c4,
+          model: 'dreamina/4.1',
+          provider: 'dreamina',
+          dreaminaSubmitId: 'sid-dreamina-fail',
+          dreaminaTaskStatus: 'pending',
+          dreaminaTaskPhase: 'generating',
+          dreaminaTaskLabel: '生成中',
+          dreaminaTaskStartedAt: _0x4fae83,
+          dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
+          dreaminaTaskRecovering: false,
+          generationStartTime: _0x4fae83,
+          generationDuration: null,
+          isGenerating: true,
+          images: [],
+        },
+        apiImpl: {
+          resumeDreaminaImageTask: async (_0x270264) => {
+            assert.equal(_0x270264, 'sid-dreamina-fail');
+            throw new Error('generation failed: final generation failed');
+          },
+        },
+      });
+    ((_0x1d1fb2._isGenerating = true),
+      (_0x1d1fb2._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
+      (_0x1d1fb2._persistDreaminaResumeCache = () => {}),
+      (_0x1d1fb2._updateSubmitButtonState = () => {}),
+      await _0x2c3bc0._maybeResumeDreaminaTaskImpl.call(_0x1d1fb2),
+      assert.ok(_0x1d1fb2._dreaminaResumePromise),
+      await _0x1d1fb2._dreaminaResumePromise);
+    const _0x1b14eb = _0x3a846a.nodes[_0x7475c4];
+    (assert.equal(_0x1b14eb.isGenerating, false),
+      assert.equal(_0x1b14eb.jobStatus, 'error'),
+      assert.equal(_0x1b14eb.jobError, 'generation failed: final generation failed'),
+      assert.equal(_0x1b14eb.dreaminaTaskStatus, 'failed'),
+      assert.equal(_0x1b14eb.dreaminaTaskPhase, 'failed'),
+      assert.equal(_0x1b14eb.dreaminaTaskLabel, 'generation failed: final generation failed'),
+      assert.equal(_0x1b14eb.dreaminaTaskRecovering, false));
+  }),
+  test('aigenImage task orchestration: persisted Dreamina running task resumes even with fresh lastChecked', async () => {
+    const _0x5d171f = 'node-ai-image-dreamina-persisted-recovery',
+      _0x59e59b = Date.now() - 0xea60,
+      {
+        proto: _0x2a15e8,
+        ctx: _0x2a5c1a,
+        state: _0x4e0ce3,
+      } = createTestContext({
+        targetId: _0x5d171f,
+        nodeData: {
+          id: _0x5d171f,
+          model: 'dreamina/4.1',
+          provider: 'dreamina',
+          dreaminaSubmitId: 'sid-dreamina-persisted-fail',
+          dreaminaTaskStatus: 'pending',
+          dreaminaTaskPhase: 'syncing',
+          dreaminaTaskLabel: '正在同步结果',
+          dreaminaTaskStartedAt: _0x59e59b,
+          dreaminaTaskLastCheckedAt: Date.now(),
+          dreaminaTaskRecovering: false,
+          generationStartTime: _0x59e59b,
+          generationDuration: null,
+          isGenerating: true,
+          images: [],
+        },
+        apiImpl: {
+          resumeDreaminaImageTask: async (_0x4efc45) => {
+            assert.equal(_0x4efc45, 'sid-dreamina-persisted-fail');
+            throw new Error('generation failed: final generation failed');
+          },
+        },
+      });
+    ((_0x2a5c1a._isGenerating = true),
+      (_0x2a5c1a._dreaminaActiveSubmitId = ''),
+      (_0x2a5c1a._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
+      (_0x2a5c1a._persistDreaminaResumeCache = () => {}),
+      (_0x2a5c1a._updateSubmitButtonState = () => {}),
+      await _0x2a15e8._maybeResumeDreaminaTaskImpl.call(_0x2a5c1a),
+      assert.ok(_0x2a5c1a._dreaminaResumePromise),
+      await _0x2a5c1a._dreaminaResumePromise);
+    const _0x50629b = _0x4e0ce3.nodes[_0x5d171f];
+    (assert.equal(_0x50629b.isGenerating, false),
+      assert.equal(_0x50629b.jobStatus, 'error'),
+      assert.equal(_0x50629b.dreaminaTaskStatus, 'failed'),
+      assert.equal(_0x50629b.dreaminaTaskPhase, 'failed'));
+  }),
+  test('aigenImage task orchestration: Dreamina recovery does not abort itself on reentrant state update', async () => {
+    const _0x187ab1 = 'node-ai-image-dreamina-reentrant-recovery',
+      _0x275580 = Date.now() - 0xea60,
+      {
+        proto: _0x3ec7d6,
+        ctx: _0x6e037e,
+        state: _0x17c723,
+        store: _0x347420,
+      } = createTestContext({
+        targetId: _0x187ab1,
+        nodeData: {
+          id: _0x187ab1,
+          model: 'dreamina/4.1',
+          provider: 'dreamina',
+          dreaminaSubmitId: 'sid-dreamina-reentrant-fail',
+          dreaminaTaskStatus: 'pending',
+          dreaminaTaskPhase: 'generating',
+          dreaminaTaskLabel: '生成中',
+          dreaminaTaskStartedAt: _0x275580,
+          dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
+          dreaminaTaskRecovering: false,
+          generationStartTime: _0x275580,
+          generationDuration: null,
+          isGenerating: true,
+          images: [],
+        },
+        apiImpl: {
+          resumeDreaminaImageTask: async (_0x5c3777) => {
+            (assert.equal(_0x5c3777, 'sid-dreamina-reentrant-fail'), await Promise.resolve());
+            throw new Error('generation failed: final generation failed');
+          },
+        },
+      });
+    ((_0x6e037e._isGenerating = true),
+      (_0x6e037e._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
+      (_0x6e037e._persistDreaminaResumeCache = () => {}),
+      (_0x6e037e._updateSubmitButtonState = () => {}));
+    const _0x14ddbf = _0x347420.updateNodeData.bind(_0x347420);
+    let _0xe7fd4a = false;
+    ((_0x347420.updateNodeData = (_0x3e0428, _0x2fbee6) => {
+      (_0x14ddbf(_0x3e0428, _0x2fbee6),
+        !_0xe7fd4a &&
+          _0x2fbee6?.dreaminaTaskRecovering === true &&
+          ((_0xe7fd4a = true), void _0x3ec7d6._maybeResumeDreaminaTaskImpl.call(_0x6e037e)));
+    }),
+      await _0x3ec7d6._maybeResumeDreaminaTaskImpl.call(_0x6e037e),
+      await _0x6e037e._dreaminaResumePromise);
+    const _0x49c049 = _0x17c723.nodes[_0x187ab1];
+    (assert.equal(_0xe7fd4a, true),
+      assert.equal(_0x49c049.isGenerating, false),
+      assert.equal(_0x49c049.jobStatus, 'error'),
+      assert.equal(_0x49c049.dreaminaTaskStatus, 'failed'),
+      assert.equal(_0x49c049.dreaminaTaskRecovering, false));
+  }),
+  test('aigenImage task orchestration: Dreamina failed progress finalizes and stops loading', async () => {
+    const _0x575287 = 'node-ai-image-dreamina-progress-fail',
+      _0x4fb274 = {};
+    let _0x1f2c82 = 0,
+      _0x4d6034 = 0;
+    const {
+      proto: _0x58db53,
+      ctx: _0x4b0a18,
+      state: _0x2429ec,
+    } = createTestContext({
+      targetId: _0x575287,
+      nodeData: {
+        id: _0x575287,
+        model: 'dreamina/4.1',
+        provider: 'dreamina',
+        aspectRatio: '1:1',
+        imageSize: '2K',
+        batchSize: 1,
+      },
+      apiImpl: {
+        generateImage: async (_0x2c856c, _0x49f881 = {}) => {
+          (_0x49f881.onTaskMeta?.({ taskId: 'sid-dreamina-progress-fail' }),
+            _0x49f881.onProgress?.({
+              submitId: 'sid-dreamina-progress-fail',
+              status: 'failed',
+              phase: 'failed',
+              label: 'policy rejected',
+              failReason: 'policy rejected',
+              raw: { status: 'failed' },
+            }));
+          const _0x171aa3 = _0x2429ec.nodes[_0x575287];
+          (assert.equal(_0x171aa3.isGenerating, false),
+            assert.equal(_0x171aa3.jobStatus, 'error'),
+            assert.equal(_0x171aa3.jobError, 'policy rejected'),
+            assert.equal(_0x171aa3.dreaminaTaskStatus, 'failed'),
+            assert.equal(_0x171aa3.dreaminaTaskPhase, 'failed'),
+            assert.equal(_0x4d6034, 1));
+          throw new Error('policy rejected');
+        },
+      },
+      startLoadingImpl: (_0x54dcd9) => {
+        (assert.equal(_0x54dcd9, _0x4fb274), (_0x1f2c82 += 1));
+      },
+      stopLoadingImpl: (_0x93455b) => {
+        (assert.equal(_0x93455b, _0x4fb274), (_0x4d6034 += 1));
+      },
+    });
+    ((_0x4b0a18.previewEl = _0x4fb274),
+      (_0x4b0a18.btnEl = createButtonStub()),
+      (_0x4b0a18._updateSubmitButtonState = () => {}),
+      await _0x58db53._onGenerate.call(_0x4b0a18));
+    const _0x36d4da = _0x2429ec.nodes[_0x575287];
+    (assert.equal(_0x1f2c82, 1),
+      assert.ok(_0x4d6034 >= 1),
+      assert.equal(_0x4b0a18._isGenerating, false),
+      assert.equal(_0x4b0a18.btnEl.classList.contains('is-rh-busy'), false),
+      assert.doesNotMatch(_0x4b0a18.btnEl.innerHTML, /animation:spin/),
+      assert.equal(_0x36d4da.isGenerating, false),
+      assert.equal(_0x36d4da.jobStatus, 'error'),
+      assert.equal(_0x36d4da.jobError, 'policy rejected'),
+      assert.equal(_0x36d4da.dreaminaTaskRecovering, false),
+      assert.ok(Number(_0x36d4da.generationDuration) >= 0),
+      assert.equal(_0x36d4da.images?.[0]?.error, 'policy rejected'),
+      assert.equal(_0x36d4da.mainImageIndex, 0),
+      assert.equal(_0x36d4da.imageUrl, ''));
+  }),
+  test('aigenImage task orchestration: APIMart 错误结果会结束加载并标记失败', async () => {
+    const _0x239e3d = 'node-ai-image-apimart-error',
+      {
+        proto: _0x242224,
+        ctx: _0x47e6e3,
+        state: _0x1d1e60,
+      } = createTestContext({
+        targetId: _0x239e3d,
+        nodeData: {
+          id: _0x239e3d,
+          model: 'apimart/nano-banana-2',
+          provider: 'apimart',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        apiImpl: {
+          generateImage: async () => [
+            { error: 'APIMart 任务报错：找不到任务 id', imageUrl: '', thumbUrl: '' },
+          ],
+        },
+      });
+    await _0x242224._onGenerate.call(_0x47e6e3);
+    const _0x5d7e51 = _0x1d1e60.nodes[_0x239e3d];
+    (assert.equal(_0x5d7e51.isGenerating, false),
+      assert.equal(_0x5d7e51.jobStatus, 'error'),
+      assert.equal(_0x5d7e51.jobError, 'APIMart 任务报错：找不到任务 id'),
+      assert.equal(_0x5d7e51.asyncTaskStatus, 'failed'),
+      assert.equal(_0x5d7e51.images?.[0]?.error, 'APIMart 任务报错：找不到任务 id'));
+  }),
+  test('aigenImage task orchestration: mixed batch failure keeps successful images', async () => {
+    const _0x684cad = 'node-ai-image-mixed-batch',
+      {
+        proto: _0x30b743,
+        ctx: _0x16c730,
+        state: _0x2343b7,
+      } = createTestContext({
+        targetId: _0x684cad,
+        nodeData: {
+          id: _0x684cad,
+          model: 'gpt-image-2',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 4,
+        },
+        apiImpl: {
+          generateImage: async () => ({
+            isBatch: true,
+            images: [
+              { error: 'policy rejected', imageUrl: '', thumbUrl: '' },
+              { imageUrl: '/output/a.png', localPath: 'output/a.png' },
+              { imageUrl: '/output/b.png', localPath: 'output/b.png' },
+              { imageUrl: '/output/c.png', localPath: 'output/c.png' },
+            ],
+          }),
+        },
+      });
+    await _0x30b743._onGenerate.call(_0x16c730);
+    const _0xdc473 = _0x2343b7.nodes[_0x684cad];
+    (assert.equal(_0xdc473.isGenerating, false),
+      assert.equal(_0xdc473.jobStatus, 'success'),
+      assert.equal(_0xdc473.jobError, null),
+      assert.equal(_0xdc473.images?.length, 4),
+      assert.equal(_0xdc473.images?.[0]?.error, 'policy rejected'),
+      assert.equal(_0xdc473.mainImageIndex, 1),
+      assert.equal(_0xdc473.imageUrl, '/output/a.png'),
+      assert.equal(_0xdc473.localPath, 'output/a.png'));
+  }),
+  test('aigenImage task orchestration: Volcengine 直连生成不伪装成异步任务', async () => {
+    const _0x4b9163 = 'node-ai-image-volcengine-loading',
+      _0xe3d8f0 = {};
+    let _0x2ace1e = 0;
+    const {
+      proto: _0x3cc5b6,
+      ctx: _0x4834f9,
+      state: _0x473a35,
+    } = createTestContext({
+      targetId: _0x4b9163,
+      nodeData: {
+        id: _0x4b9163,
+        model: 'volcengine/seedream-4.0',
+        provider: 'volcengine',
+        aspectRatio: '1:1',
+        imageSize: '2K',
+        batchSize: 1,
+      },
+      apiImpl: {
+        generateImage: async (_0x414828, _0x145102 = {}) => {
+          assert.equal(Boolean(_0x145102.signal), false);
+          const _0x1a77fb = _0x473a35.nodes[_0x4b9163];
+          return (
+            assert.equal(_0x1a77fb.isGenerating, true),
+            assert.equal(_0x1a77fb.jobStatus, 'running'),
+            assert.equal(_0x1a77fb.asyncTaskProvider, ''),
+            assert.equal(_0x1a77fb.asyncTaskStatus, 'idle'),
+            _0x145102.onTaskMeta?.({
+              taskId: 'ark-direct-response-1',
+              provider: 'volcengine',
+              kind: 'image',
+            }),
+            {
+              imageUrl: '/output/volcengine.png',
+              sourceUrl: 'https://ark.example.com/volcengine.png',
+              thumbUrl: '/output/volcengine.png',
+            }
+          );
+        },
+      },
+      startLoadingImpl: (_0x3b9854) => {
+        (assert.equal(_0x3b9854, _0xe3d8f0), (_0x2ace1e += 1));
+      },
+    });
+    ((_0x4834f9.previewEl = _0xe3d8f0),
+      (_0x4834f9.btnEl = createButtonStub()),
+      (_0x4834f9._updateSubmitButtonState = () => {}),
+      await _0x3cc5b6._onGenerate.call(_0x4834f9));
+    const _0x10fe79 = _0x473a35.nodes[_0x4b9163];
+    (assert.equal(_0x2ace1e, 1),
+      assert.equal(_0x10fe79.isGenerating, false),
+      assert.equal(_0x10fe79.jobStatus, 'success'),
+      assert.equal(_0x10fe79.asyncTaskProvider, ''),
+      assert.equal(_0x10fe79.asyncTaskKind, 'image'),
+      assert.equal(_0x10fe79.asyncTaskStatus, 'idle'),
+      assert.equal(_0x10fe79.imageUrl, '/output/volcengine.png'));
+  }),
+  test('aigenImage task orchestration: Volcengine 缺少 API Key 时生成前拦截', async () => {
+    const _0x2ff6b0 = 'node-ai-image-volcengine-missing-key',
+      _0x322893 = {},
+      _0xbf0d70 = globalThis.window.showToast,
+      _0x407488 = [];
+    let _0x2e687f = 0,
+      _0x21513a = 0;
+    try {
+      globalThis.window.showToast = (_0x34e4a6, _0x21dba0) => {
+        _0x407488.push({ message: _0x34e4a6, type: _0x21dba0 });
+      };
+      const {
+        proto: _0xbd18c2,
+        ctx: _0x5dc427,
+        state: _0x2f68c1,
+      } = createTestContext({
+        targetId: _0x2ff6b0,
+        nodeData: {
+          id: _0x2ff6b0,
+          model: 'volcengine/seedream-4.0',
+          provider: 'volcengine',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        promptText: 'cat',
+        getProviderConfigImpl: () => ({ apiKey: '' }),
+        apiImpl: {
+          generateImage: async () => {
+            return ((_0x2e687f += 1), { imageUrl: '/output/should-not-run.png' });
+          },
+        },
+        startLoadingImpl: (_0x14970e) => {
+          (assert.equal(_0x14970e, _0x322893), (_0x21513a += 1));
+        },
+      });
+      ((_0x5dc427.previewEl = _0x322893),
+        (_0x5dc427.btnEl = createButtonStub()),
+        await _0xbd18c2._onGenerate.call(_0x5dc427));
+      const _0x297aeb = _0x2f68c1.nodes[_0x2ff6b0];
+      (assert.equal(_0x2e687f, 0),
+        assert.equal(_0x21513a, 0),
+        assert.equal(_0x297aeb.isGenerating, undefined),
+        assert.deepEqual(_0x407488, [{ message: '请先在设置里填写火山方舟 API Key', type: 'warn' }]));
+    } finally {
+      globalThis.window.showToast = _0xbf0d70;
+    }
+  }),
+  test('aigenImage task orchestration: manifest modelApi reads ordinary params from generationParams', async () => {
+    const _0x104b79 = 'node-ai-image-apimart-manifest-params',
+      { proto: _0x10ef12, ctx: _0x347fcd } = createTestContext({
+        targetId: _0x104b79,
+        nodeData: {
+          id: _0x104b79,
+          model: 'apimart/nano-banana-2',
+          provider: 'apimart',
+          aspectRatio: '16:9',
+          imageSize: '2K',
+          generationParams: {
+            mode: 'official',
+            aspectRatio: '1:8',
+            imageSize: '4K',
+            google_search: false,
+            google_image_search: true,
+            batchSize: 2,
+          },
+          batchSize: 4,
+        },
+        promptText: 'manifest params',
+      }),
+      _0x18f307 = await _0x10ef12._buildPayload.call(_0x347fcd);
+    (assert.equal(_0x18f307.model, 'apimart/nano-banana-2'),
+      assert.equal(_0x18f307.provider, 'apimart'),
+      assert.equal(_0x18f307.mode, 'official'),
+      assert.equal(_0x18f307.imageSize, '4K'),
+      assert.equal(_0x18f307.aspectRatio, '1:8'),
+      assert.equal(_0x18f307.google_search, true),
+      assert.equal(_0x18f307.google_image_search, true),
+      assert.equal(_0x18f307.batchSize, 2));
+  }),
+  test('aigenImage task orchestration: Agnes image input starts loading without prompt', async () => {
+    const _0x241058 = 'node-ai-image-agnes-image-input',
+      _0x4ecebe = 'node-ai-image-agnes-source',
+      _0x1685c0 = {};
+    let _0x57b933 = 0,
+      _0x36d550 = 0,
+      _0x21a20e = null;
+    const {
+      proto: _0x411e3e,
+      ctx: _0x13a17a,
+      state: _0x43899d,
+    } = createTestContext({
+      targetId: _0x241058,
+      nodes: {
+        [_0x4ecebe]: { id: _0x4ecebe, type: 'source-image', imageUrl: 'https://cdn.example.com/input.png' },
+      },
+      incomingEdges: [{ id: 'edge-agnes-image', sourceId: _0x4ecebe, targetId: _0x241058 }],
+      nodeData: {
+        id: _0x241058,
+        model: 'agnes/agnes-image-2.0-flash',
+        provider: 'agnes',
+        generationParams: { aspectRatio: '16:9', imageSize: '1K', batchSize: 1 },
+      },
+      promptText: '',
+      getProviderConfigImpl: () => ({ apiKey: 'k_agnes' }),
+      apiImpl: {
+        generateImage: async (_0x116a3e) => {
+          return ((_0x21a20e = _0x116a3e), { imageUrl: '/output/agnes.png' });
+        },
+      },
+      startLoadingImpl: (_0x242c58) => {
+        (assert.equal(_0x242c58, _0x1685c0), (_0x57b933 += 1));
+      },
+      stopLoadingImpl: (_0x4c73df) => {
+        (assert.equal(_0x4c73df, _0x1685c0), (_0x36d550 += 1));
+      },
+    });
+    ((_0x13a17a.previewEl = _0x1685c0),
+      (_0x13a17a.btnEl = createButtonStub()),
+      await _0x411e3e._onGenerate.call(_0x13a17a),
+      assert.equal(_0x57b933, 1),
+      assert.equal(_0x36d550, 1),
+      assert.equal(_0x21a20e?.provider, 'agnes'),
+      assert.equal(_0x21a20e?.model, 'agnes/agnes-image-2.0-flash'),
+      assert.deepEqual(_0x21a20e?.inputUrls, ['https://cdn.example.com/input.png']),
+      assert.equal(_0x43899d.nodes[_0x241058].jobStatus, 'success'));
+  }),
+  test('aigenImage task orchestration: generation start keeps existing preview under loading overlay', async () => {
+    const _0x5a0fc9 = 'node-ai-image-stale-error-start';
+    let _0x412c20 = null,
+      _0x3d9641 = 0;
+    const {
+      proto: _0x459447,
+      ctx: _0x3832a3,
+      state: _0x129c42,
+    } = createTestContext({
+      targetId: _0x5a0fc9,
+      nodeData: {
+        id: _0x5a0fc9,
+        model: 'agnes/agnes-image-2.1-flash',
+        provider: 'agnes',
+        generationParams: { aspectRatio: '16:9', imageSize: '1K', batchSize: 1 },
+        images: [{ error: 'previous failure', imageUrl: '', thumbUrl: '' }],
+        imageUrl: '',
+        thumbUrl: '',
+        jobStatus: 'error',
+        isGenerating: false,
+      },
+      promptText: 'retry this image',
+      getProviderConfigImpl: () => ({ apiKey: 'k_agnes' }),
+      apiImpl: {
+        generateImage: async () => {
+          return ((_0x412c20 = _0x129c42.nodes[_0x5a0fc9]), { imageUrl: '/output/retry.png' });
+        },
+      },
+      startLoadingImpl: () => {
+        _0x3d9641 += 1;
+      },
+    });
+    ((_0x3832a3.btnEl = createButtonStub()),
+      await _0x459447._onGenerate.call(_0x3832a3),
+      assert.equal(_0x3d9641, 1),
+      assert.deepEqual(_0x412c20?.images, [{ error: 'previous failure', imageUrl: '', thumbUrl: '' }]),
+      assert.equal(_0x412c20?.imageUrl, ''),
+      assert.equal(_0x412c20?.jobStatus, 'running'),
+      assert.equal(_0x129c42.nodes[_0x5a0fc9].jobStatus, 'success'),
+      assert.equal(_0x129c42.nodes[_0x5a0fc9].imageUrl, '/output/retry.png'));
+  }),
+  test('aigenImage task orchestration: Agnes image start clears stale task family terminal states', async () => {
+    const _0x186e42 = 'node-ai-image-agnes-stale-task-family-start',
+      _0x4a836a = {};
+    let _0x2114cf = null,
+      _0x1b4937 = 0;
+    const {
+      proto: _0x55dcb3,
+      ctx: _0x30d2bb,
+      state: _0x1add25,
+    } = createTestContext({
+      targetId: _0x186e42,
+      nodeData: {
+        id: _0x186e42,
+        model: 'agnes/agnes-image-2.1-flash',
+        provider: 'agnes',
+        generationParams: { aspectRatio: '16:9', imageSize: '1K', batchSize: 1 },
+        rhTaskId: 'old-rh-task',
+        rhTaskStatus: 'failed',
+        dreaminaSubmitId: 'old-dreamina-task',
+        dreaminaTaskStatus: 'failed',
+        dreaminaTaskPhase: 'failed',
+        asyncTaskId: 'old-async-task',
+        asyncTaskStatus: 'success',
+        jobStatus: 'error',
+        isGenerating: false,
+      },
+      promptText: 'retry with Agnes',
+      getProviderConfigImpl: () => ({ apiKey: 'k_agnes' }),
+      apiImpl: {
+        generateImage: async () => {
+          return ((_0x2114cf = _0x1add25.nodes[_0x186e42]), { imageUrl: '/output/agnes-retry.png' });
+        },
+      },
+      startLoadingImpl: (_0x32a658) => {
+        (assert.equal(_0x32a658, _0x4a836a), (_0x1b4937 += 1));
+      },
+    });
+    ((_0x30d2bb.previewEl = _0x4a836a),
+      (_0x30d2bb.btnEl = createButtonStub()),
+      await _0x55dcb3._onGenerate.call(_0x30d2bb),
+      assert.equal(_0x1b4937, 1),
+      assert.equal(_0x2114cf?.isGenerating, true),
+      assert.equal(_0x2114cf?.jobStatus, 'running'),
+      assert.equal(_0x2114cf?.rhTaskId, ''),
+      assert.equal(_0x2114cf?.rhTaskStatus, 'idle'),
+      assert.equal(_0x2114cf?.dreaminaSubmitId, ''),
+      assert.equal(_0x2114cf?.dreaminaTaskStatus, 'idle'),
+      assert.equal(_0x2114cf?.dreaminaTaskPhase, 'idle'),
+      assert.equal(_0x2114cf?.asyncTaskId, ''),
+      assert.equal(_0x2114cf?.asyncTaskStatus, 'idle'),
+      assert.equal(shouldShowGenerationBusyUi(_0x2114cf), true),
+      assert.equal(_0x1add25.nodes[_0x186e42].jobStatus, 'success'),
+      assert.equal(_0x1add25.nodes[_0x186e42].imageUrl, '/output/agnes-retry.png'));
+  }),
+  test('aigenImage task orchestration: API throw 会结束加载并标记失败', async () => {
+    const _0x59533d = 'node-ai-image-throw-error',
+      {
+        proto: _0x5b46be,
+        ctx: _0x5af32e,
+        state: _0x3e4549,
+      } = createTestContext({
+        targetId: _0x59533d,
+        nodeData: {
+          id: _0x59533d,
+          model: 'ppio/seedream-5.0-lite',
+          provider: 'ppio',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        apiImpl: {
+          generateImage: async () => {
+            throw new Error('PPIO 创建任务失败');
+          },
+        },
+      });
+    await _0x5b46be._onGenerate.call(_0x5af32e);
+    const _0x377fa7 = _0x3e4549.nodes[_0x59533d];
+    (assert.equal(_0x377fa7.isGenerating, false),
+      assert.equal(_0x377fa7.jobStatus, 'error'),
+      assert.equal(_0x377fa7.jobError, 'PPIO 创建任务失败'),
+      assert.equal(_0x377fa7.asyncTaskStatus, 'failed'),
+      assert.equal(_0x377fa7.images?.[0]?.error, 'PPIO 创建任务失败'),
+      assert.equal(_0x377fa7.mainImageIndex, 0),
+      assert.equal(_0x377fa7.imageUrl, ''));
+  }),
+  test('aigenImage task orchestration: API 返回单个错误对象会结束加载并标记失败', async () => {
+    const _0x25751b = 'node-ai-image-object-error',
+      {
+        proto: _0x2f9a60,
+        ctx: _0x3eec46,
+        state: _0x4a3177,
+      } = createTestContext({
+        targetId: _0x25751b,
+        nodeData: {
+          id: _0x25751b,
+          model: 'nano-banana',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        apiImpl: {
+          generateImage: async () => ({ error: 'GRSAI 无法解析图片地址', imageUrl: '', thumbUrl: '' }),
+        },
+      });
+    await _0x2f9a60._onGenerate.call(_0x3eec46);
+    const _0x13543a = _0x4a3177.nodes[_0x25751b];
+    (assert.equal(_0x13543a.isGenerating, false),
+      assert.equal(_0x13543a.jobStatus, 'error'),
+      assert.equal(_0x13543a.jobError, 'GRSAI 无法解析图片地址'),
+      assert.equal(_0x13543a.asyncTaskStatus, 'failed'));
+  }),
+  test('aigenImage task orchestration: 缺少 taskId 错误会结束加载并标记失败', async () => {
+    const _0x4a6e14 = 'node-ai-image-missing-task-id',
+      {
+        proto: _0x55aae1,
+        ctx: _0x206390,
+        state: _0x30cf2f,
+      } = createTestContext({
+        targetId: _0x4a6e14,
+        nodeData: {
+          id: _0x4a6e14,
+          model: 'apimart/nano-banana-2',
+          provider: 'apimart',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        apiImpl: {
+          generateImage: async () => {
+            throw new Error('缺少异步图片任务ID，无法恢复');
+          },
+        },
+      });
+    await _0x55aae1._onGenerate.call(_0x206390);
+    const _0x475194 = _0x30cf2f.nodes[_0x4a6e14];
+    (assert.equal(_0x475194.isGenerating, false),
+      assert.equal(_0x475194.jobStatus, 'error'),
+      assert.equal(_0x475194.jobError, '缺少异步图片任务ID，无法恢复'),
+      assert.equal(_0x475194.asyncTaskStatus, 'failed'));
+  }),
+  test('aigenImage task orchestration: 成功结果会结束加载并标记成功', async () => {
+    const _0x34cabd = 'node-ai-image-success',
+      {
+        proto: _0x5b0eb4,
+        ctx: _0x280873,
+        state: _0x37fa26,
+      } = createTestContext({
+        targetId: _0x34cabd,
+        nodeData: {
+          id: _0x34cabd,
+          model: 'nano-banana-pro-vt',
+          provider: 'grsai',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        apiImpl: {
+          generateImage: async () => ({
+            imageUrl: '/output/success.png',
+            sourceUrl: 'https://img.example.com/success.png',
+            thumbUrl: '/output/success.png',
+          }),
+        },
+      });
+    await _0x5b0eb4._onGenerate.call(_0x280873);
+    const _0x4f380c = _0x37fa26.nodes[_0x34cabd];
+    (assert.equal(_0x4f380c.isGenerating, false),
+      assert.equal(_0x4f380c.jobStatus, 'success'),
+      assert.equal(_0x4f380c.jobError, null),
+      assert.equal(_0x4f380c.asyncTaskStatus, 'success'),
+      assert.equal(_0x4f380c.imageUrl, '/output/success.png'));
+  }),
+  test('aigenImage task orchestration: GRSAI direct success unlocks repeated generation', async () => {
+    const _0x25398f = 'node-ai-image-grsai-repeat-success',
+      _0x2a6671 = {};
+    let _0x42d09e = 0,
+      _0x4f91a3 = 0,
+      _0x2961b3 = 0;
+    const {
+      proto: _0x1e9e4c,
+      ctx: _0x57ffe5,
+      state: _0x186988,
+    } = createTestContext({
+      targetId: _0x25398f,
+      nodeData: {
+        id: _0x25398f,
+        model: 'nano-banana-2',
+        provider: 'grsai',
+        aspectRatio: '1:1',
+        imageSize: '2K',
+        batchSize: 1,
+      },
+      promptText: 'repeatable prompt',
+      apiImpl: {
+        generateImage: async (_0xcc9f96, _0x30a7c5 = {}) => {
+          return (
+            (_0x42d09e += 1),
+            _0x30a7c5.onTaskMeta?.({ taskId: 'grsai-direct-' + _0x42d09e, provider: 'grsai' }),
+            {
+              imageUrl: '/output/grsai-direct-' + _0x42d09e + '.png',
+              sourceUrl: 'https://img.example.com/grsai-direct-' + _0x42d09e + '.png',
+              thumbUrl: '/output/grsai-direct-' + _0x42d09e + '.png',
+            }
+          );
+        },
+      },
+      startLoadingImpl: (_0x106e8c) => {
+        (assert.equal(_0x106e8c, _0x2a6671), (_0x4f91a3 += 1));
+      },
+      stopLoadingImpl: (_0x4a33bd) => {
+        (assert.equal(_0x4a33bd, _0x2a6671), (_0x2961b3 += 1));
+      },
+    });
+    ((_0x57ffe5.previewEl = _0x2a6671),
+      (_0x57ffe5.btnEl = createButtonStub()),
+      await _0x1e9e4c._onGenerate.call(_0x57ffe5),
+      assert.equal(_0x57ffe5._isGenerating, false),
+      assert.equal(_0x57ffe5.btnEl.disabled, false),
+      assert.doesNotMatch(_0x57ffe5.btnEl.innerHTML, /animation:spin/),
+      await _0x1e9e4c._onGenerate.call(_0x57ffe5));
+    const _0x47d34f = _0x186988.nodes[_0x25398f];
+    (assert.equal(_0x42d09e, 2),
+      assert.equal(_0x4f91a3, 2),
+      assert.equal(_0x2961b3, 2),
+      assert.equal(_0x57ffe5._isGenerating, false),
+      assert.equal(_0x57ffe5.btnEl.disabled, false),
+      assert.equal(_0x47d34f.isGenerating, false),
+      assert.equal(_0x47d34f.jobStatus, 'success'),
+      assert.equal(_0x47d34f.asyncTaskId, 'grsai-direct-2'),
+      assert.equal(_0x47d34f.asyncTaskStatus, 'success'),
+      assert.equal(_0x47d34f.imageUrl, '/output/grsai-direct-2.png'));
+  }),
+  test('aigenImage task orchestration: RunningHub cancel writes visible interruption message', async () => {
+    const _0x3c98fb = 'node-ai-image-rh-cancel-visible';
+    let _0x55cdc2 = 0;
+    const _0x28ab06 = {
+        signal: { aborted: false },
+        abort() {
+          this.signal.aborted = true;
+        },
+      },
+      {
+        proto: _0x49822a,
+        ctx: _0x1bfb51,
+        state: _0xf24a59,
+      } = createTestContext({
+        targetId: _0x3c98fb,
+        nodeData: {
+          id: _0x3c98fb,
+          model: 'runninghub/2041177685895946242',
+          provider: 'runninghubwf',
+          generationStartTime: 0x3e8,
+          rhTaskStartedAt: 0x3e8,
+          rhTaskId: 'rh-cancel-visible',
+          rhTaskStatus: 'running',
+          rhTaskUseOpenapiQuery: true,
+          isGenerating: true,
+          jobStatus: 'running',
+        },
+        apiImpl: {
+          cancelRunningHubWorkflowTask: async ({ apiKey: _0x4cd715, taskId: _0x40a0f7 }) => {
+            return (
+              assert.equal(_0x4cd715, 'k_rh'),
+              assert.equal(_0x40a0f7, 'rh-cancel-visible'),
+              { code: 0, msg: 'cancelled by user' }
+            );
+          },
+        },
+        stopLoadingImpl: () => {
+          _0x55cdc2 += 1;
+        },
+      });
+    ((_0x1bfb51._isGenerating = true),
+      (_0x1bfb51._rhApiKey = 'k_rh'),
+      (_0x1bfb51._rhTaskId = 'rh-cancel-visible'),
+      (_0x1bfb51._rhAbortController = _0x28ab06),
+      (_0x1bfb51.btnEl = createButtonStub()),
+      (_0x1bfb51._updateSubmitButtonState = () => {}),
+      await _0x49822a._cancelRunningHubWorkflowTask.call(_0x1bfb51));
+    const _0x124d17 = _0xf24a59.nodes[_0x3c98fb];
+    (assert.equal(_0x124d17.isGenerating, false),
+      assert.equal(_0x124d17.jobStatus, 'cancelled'),
+      assert.equal(_0x124d17.rhTaskStatus, 'cancelled'),
+      assert.equal(_0x124d17.rhStatusMessage, 'cancelled by user'),
+      assert.equal(_0x124d17.rhStatusCode, 0),
+      assert.equal(_0x124d17.rhTaskRecovering, false),
+      assert.equal(_0x28ab06.signal.aborted, true),
+      assert.equal(_0x55cdc2, 1),
+      assert.equal(_0x1bfb51._isGenerating, false),
+      assert.doesNotMatch(_0x1bfb51.btnEl.innerHTML, /animation:spin/));
+  }),
+  test('aigenImage task orchestration: unmount aborts local generation polling', () => {
+    const _0x4f6bc4 = 'node-ai-image-unmount-preserves-task',
+      _0x1119cf = {
+        signal: { aborted: false },
+        abort() {
+          this.signal.aborted = true;
+        },
+      },
+      { proto: _0x23e759, ctx: _0x21ef59 } = createTestContext({
+        targetId: _0x4f6bc4,
+        nodeData: {
+          id: _0x4f6bc4,
+          model: 'runninghub/2041177685895946242',
+          provider: 'runninghubwf',
+          isGenerating: true,
+          jobStatus: 'running',
+        },
+      });
+    ((_0x21ef59._rhAbortController = _0x1119cf),
+      _0x23e759.unmount.call(_0x21ef59),
+      assert.equal(_0x1119cf.signal.aborted, true),
+      assert.equal(_0x21ef59._rhAbortController, null));
+  }),
+  test('aigenImage task orchestration: RunningHub NanoBanana 自适应无参考图时按显示区 1600x900 映射 16:9', async () => {
+    const _0x26bdd8 = 'node-ai-image-rh-nano-1',
+      { proto: _0x1e0b88, ctx: _0x4bd3a0 } = createTestContext({
+        targetId: _0x26bdd8,
+        nodeData: {
+          id: _0x26bdd8,
+          model: 'runninghub-model/rhart-image-v1',
+          provider: 'runninghub',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+          width: 0x640,
+          height: 0x384,
+        },
+        nodes: {},
+        incomingEdges: [],
+      }),
+      _0x1f7361 = await _0x1e0b88._buildPayload.call(_0x4bd3a0);
+    (assert.equal(_0x1f7361.provider, 'runninghub'), assert.equal(_0x1f7361.aspectRatio, '16:9'));
+  }),
+  test('aigenImage task orchestration: RunningHub NanoBanana 自适应无参考图时非标准 1700x900 就近映射 16:9', async () => {
+    const _0xbc0e97 = 'node-ai-image-rh-nano-2',
+      { proto: _0x4ae185, ctx: _0x221fc0 } = createTestContext({
+        targetId: _0xbc0e97,
+        nodeData: {
+          id: _0xbc0e97,
+          model: 'runninghub-model/rhart-image-v1-official',
+          provider: 'runninghub',
+          aspectRatio: 'auto',
+          imageSize: '2K',
+          batchSize: 1,
+          width: 0x6a4,
+          height: 0x384,
+        },
+        nodes: {},
+        incomingEdges: [],
+      }),
+      _0x4e5780 = await _0x4ae185._buildPayload.call(_0x221fc0);
+    (assert.equal(_0x4e5780.provider, 'runninghub'), assert.equal(_0x4e5780.aspectRatio, '16:9'));
+  }),
+  test('aigenImage task orchestration: RunningHub GPT image 2 official 使用扩展比例', async () => {
+    const _0x5d32a6 = 'node-ai-image-rh-gpt2-official',
+      { proto: _0x457c17, ctx: _0x30979c } = createTestContext({
+        targetId: _0x5d32a6,
+        nodeData: {
+          id: _0x5d32a6,
+          model: 'runninghub-model/rhart-image-g-2-official',
+          provider: 'runninghub',
+          aspectRatio: '1:8',
+          imageSize: '4K',
+          batchSize: 1,
+          width: 0x384,
+          height: 0x6a4,
+        },
+        nodes: {},
+        incomingEdges: [],
+      }),
+      _0x3aa28d = await _0x457c17._buildPayload.call(_0x30979c);
+    (assert.equal(_0x3aa28d.provider, 'runninghub'),
+      assert.equal(_0x3aa28d.model, 'runninghub-model/rhart-image-g-2-official'),
+      assert.equal(_0x3aa28d.aspectRatio, '9:21'));
+  }),
+  test('aigenImage task orchestration: RunningHub GPT image 2 official 保留 1K', async () => {
+    const _0x5bc4b2 = 'node-ai-image-rh-gpt2-official-1k',
+      { proto: _0x223737, ctx: _0x132dc5 } = createTestContext({
+        targetId: _0x5bc4b2,
+        nodeData: {
+          id: _0x5bc4b2,
+          model: 'runninghub-model/rhart-image-g-2-official',
+          provider: 'runninghub',
+          aspectRatio: '1:1',
+          imageSize: '1K',
+          batchSize: 1,
+          width: 0x384,
+          height: 0x384,
+        },
+        nodes: {},
+        incomingEdges: [],
+      }),
+      _0x1079b6 = await _0x223737._buildPayload.call(_0x132dc5);
+    (assert.equal(_0x1079b6.provider, 'runninghub'),
+      assert.equal(_0x1079b6.model, 'runninghub-model/rhart-image-g-2-official'),
+      assert.equal(_0x1079b6.imageSize, '1K'),
+      assert.equal(_0x1079b6.aspectRatio, '1:1'));
+  }),
+  test('aigenImage task orchestration: 非 NanoBanana 模型自适应无参考图按显示区域映射', async () => {
+    const _0xc675c4 = 'node-ai-image-non-nano-1',
+      { proto: _0x1e4d69, ctx: _0x45a1c1 } = createTestContext({
+        targetId: _0xc675c4,
+        nodeData: {
+          id: _0xc675c4,
+          model: 'ppio/seedream-5.0-lite',
+          provider: 'ppio',
+          aspectRatio: '自适应',
+          imageSize: '2K',
+          batchSize: 1,
+          width: 0x6a4,
+          height: 0x384,
+        },
+        nodes: {},
+        incomingEdges: [],
+      }),
+      _0x4a3b18 = await _0x1e4d69._buildPayload.call(_0x45a1c1);
+    (assert.equal(_0x4a3b18.provider, 'ppio'), assert.equal(_0x4a3b18.aspectRatio, '16:9'));
+  }),
+  test('aigenImage task orchestration: _buildResumePayload 按模型前缀推断 provider 与 key', async () => {
+    const _0x6a4127 = {
+        runninghub: { apiKey: 'k_runninghub', modelApiKey: 'k_runninghub_model' },
+        runninghubwf: { apiKey: 'k_runninghub_wf' },
+        dreamina: { apiKey: 'k_dreamina' },
+        ppio: { apiKey: 'k_ppio' },
+        apimart: { apiKey: 'k_apimart' },
+        grsai: { apiKey: 'k_grsai' },
+      },
+      _0x3c0c54 = [
+        {
+          name: 'runninghub-model 使用 modelApiKey',
+          model: 'runninghub-model/rhart-image-v1',
+          expectedProvider: 'runninghub',
+          expectedApiKey: 'k_runninghub_model',
+        },
+        {
+          name: 'runninghub 工作流使用 workflow apiKey',
+          model: 'runninghub/2041177685895946242',
+          expectedProvider: 'runninghubwf',
+          expectedApiKey: 'k_runninghub_wf',
+          isWorkflow: true,
+        },
+        {
+          name: 'Dreamina manifest 模型按 provider 执行',
+          model: 'dreamina/4.5',
+          expectedProvider: 'dreamina',
+          expectedApiKey: 'k_dreamina',
+        },
+        {
+          name: 'PPIO 模型推断为 ppio',
+          model: 'ppio/seedream-5.0-lite',
+          expectedProvider: 'ppio',
+          expectedApiKey: 'k_ppio',
+        },
+        {
+          name: 'APImart 模型推断为 apimart',
+          model: 'apimart/nano-banana-2',
+          expectedProvider: 'apimart',
+          expectedApiKey: 'k_apimart',
+        },
+        {
+          name: '裸模型默认走 grsai',
+          model: 'nano-banana-pro-vt',
+          expectedProvider: 'grsai',
+          expectedApiKey: 'k_grsai',
+        },
+      ];
+    for (const _0x125cb5 of _0x3c0c54) {
+      const { proto: _0x1c1948, ctx: _0x21ae6d } = createTestContext({
+          targetId: 'node-ai-image-model-resume-' + _0x125cb5.expectedProvider,
+          nodeData: {
+            id: 'node-ai-image-model-resume-' + _0x125cb5.expectedProvider,
+            model: _0x125cb5.model,
+            provider: '',
+            imageSize: '2K',
+            batchSize: 1,
+          },
+          getProviderConfigImpl: (_0x551dd1) => _0x6a4127[_0x551dd1] || {},
+          isRunninghubWorkflowModelImpl: () => _0x125cb5.isWorkflow === true,
+        }),
+        _0x3cb07a = await _0x1c1948._buildResumePayload.call(_0x21ae6d, _0x21ae6d._data);
+      (assert.equal(_0x3cb07a.provider, _0x125cb5.expectedProvider, _0x125cb5.name),
+        assert.equal(_0x3cb07a.apiKey, _0x125cb5.expectedApiKey, _0x125cb5.name),
+        assert.equal(_0x3cb07a.model, _0x125cb5.expectedModel || _0x125cb5.model, _0x125cb5.name));
+    }
+  }),
+  test('aigenImage task orchestration: RunningHub model API payload does not use workflow key', async () => {
+    const { proto: _0xbc7bf0, ctx: _0x497cf1 } = createTestContext({
+        targetId: 'node-ai-image-runninghub-model-no-key-fallback',
+        nodeData: {
+          id: 'node-ai-image-runninghub-model-no-key-fallback',
+          model: 'runninghub-model/rhart-image-v1',
+          provider: 'runninghub',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        promptText: 'prompt',
+        getProviderConfigImpl: (_0x59f15b) =>
+          _0x59f15b === 'runninghub' ? { apiKey: 'k_runninghub_workflow_only' } : {},
+      }),
+      _0x2967ea = await _0xbc7bf0._buildPayload.call(_0x497cf1);
+    (assert.equal(_0x2967ea.provider, 'runninghub'), assert.equal(_0x2967ea.apiKey, ''));
+  }),
+  test('aigenImage task orchestration: 模型族恢复分类稳定', () => {
+    const { proto: _0x1038f6, ctx: _0x405c13 } = createTestContext({
+      targetId: 'node-ai-image-recovery-matrix',
+      nodeData: {
+        id: 'node-ai-image-recovery-matrix',
+        model: 'runninghub-model/rhart-image-v1',
+        provider: 'runninghub',
+        imageSize: '2K',
+        batchSize: 1,
+      },
+      isRunninghubWorkflowModelImpl: (_0x395f4e) => String(_0x395f4e || '').startsWith('runninghub/'),
+    });
+    (assert.equal(
+      _0x1038f6._isRunningHubRecoverableRunningTask.call(_0x405c13, {
+        model: 'runninghub-model/rhart-image-v1',
+        provider: 'runninghub',
+        rhTaskId: 'rh-task-1',
+        rhTaskStatus: 'pending',
+      }),
+      true,
+    ),
+      assert.equal(
+        _0x1038f6._isRunningHubRecoverableRunningTask.call(_0x405c13, {
+          model: 'runninghub/2041177685895946242',
+          provider: '',
+          rhTaskId: 'rh-task-2',
+          rhTaskStatus: 'RUNNING',
+        }),
+        true,
+      ),
+      assert.equal(
+        _0x1038f6._isRunningHubRecoverableRunningTask.call(_0x405c13, {
+          model: 'runninghub-model/rhart-image-v1',
+          provider: 'runninghub',
+          rhTaskId: 'rh-task-3',
+          rhTaskStatus: 'success',
+        }),
+        false,
+      ),
+      assert.equal(
+        _0x1038f6._isDreaminaRecoverableRunningTask.call(_0x405c13, {
+          model: 'dreamina/4.5',
+          provider: 'dreamina',
+          dreaminaSubmitId: 'dm-task-1',
+          dreaminaTaskStatus: 'pending',
+          dreaminaTaskPhase: 'generating',
+        }),
+        true,
+      ),
+      assert.equal(
+        _0x1038f6._isDreaminaRecoverableRunningTask.call(_0x405c13, {
+          model: 'dreamina/4.5',
+          provider: 'dreamina',
+          dreaminaSubmitId: 'dm-task-2',
+          dreaminaTaskStatus: 'success',
+          dreaminaTaskPhase: 'done',
+        }),
+        false,
+      ),
+      assert.equal(
+        _0x1038f6._isDreaminaRecoverableRunningTask.call(_0x405c13, {
+          model: 'dreamina/4.5',
+          provider: 'dreamina',
+          dreaminaSubmitId: 'dm-task-error',
+          jobStatus: 'error',
+          dreaminaTaskStatus: 'pending',
+          dreaminaTaskPhase: 'generating',
+        }),
+        false,
+      ),
+      assert.equal(
+        _0x1038f6._isDreaminaRecoverableRunningTask.call(_0x405c13, {
+          model: 'dreamina/4.5',
+          provider: 'dreamina',
+          dreaminaSubmitId: 'dm-task-status-error',
+          dreaminaTaskStatus: 'error',
+          dreaminaTaskPhase: 'generating',
+        }),
+        false,
+      ),
+      assert.equal(
+        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+          model: 'ppio/seedream-5.0-lite',
+          asyncTaskProvider: 'ppio',
+          asyncTaskKind: 'image',
+          asyncTaskId: 'async-task-1',
+          asyncTaskStatus: 'running',
+        }),
+        true,
+      ),
+      assert.equal(
+        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+          model: 'apimart/flux-kontext-pro',
+          asyncTaskProvider: 'apimart',
+          asyncTaskKind: 'image',
+          asyncTaskId: 'async-task-2',
+          asyncTaskStatus: 'submitted',
+        }),
+        true,
+      ),
+      assert.equal(
+        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+          model: 'runninghub-model/rhart-image-v1',
+          asyncTaskProvider: 'runninghub',
+          asyncTaskKind: 'image',
+          asyncTaskId: 'async-task-3',
+          asyncTaskStatus: 'running',
+        }),
+        false,
+      ),
+      assert.equal(
+        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+          model: 'grsai/seedream-4.0',
+          asyncTaskProvider: 'grsai',
+          asyncTaskKind: 'image',
+          asyncTaskId: 'async-task-4',
+          asyncTaskStatus: 'running',
+        }),
+        true,
+      ),
+      assert.equal(
+        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+          model: 'ppio/seedream-5.0-lite',
+          asyncTaskProvider: 'ppio',
+          asyncTaskKind: 'video',
+          asyncTaskId: 'async-task-5',
+          asyncTaskStatus: 'running',
+        }),
+        false,
+      ));
+  }),
+  test('aigenImage task orchestration: RunningHub 工作流模型可空提示词生成', async () => {
+    const _0x45e9e0 = 'node-ai-image-rh-workflow-empty-prompt',
+      _0x2e46d2 = { runninghubwf: { apiKey: 'k_runninghub_wf' } },
+      { proto: _0x27725d, ctx: _0x33f0fc } = createTestContext({
+        targetId: _0x45e9e0,
+        nodeData: {
+          id: _0x45e9e0,
+          model: 'runninghub/2050306122774532097',
+          provider: '',
+          aspectRatio: '1:1',
+          imageSize: '2K',
+          batchSize: 1,
+        },
+        nodes: {
+          'node-rh-workflow-ref': {
+            id: 'node-rh-workflow-ref',
+            type: 'source-image',
+            originalLocalPath: 'data/uploads/ref.png',
+          },
+        },
+        incomingEdges: [
+          { id: 'edge-rh-workflow-ref', sourceId: 'node-rh-workflow-ref', targetId: _0x45e9e0, refSlot: '' },
+        ],
+        promptText: '',
+        getProviderConfigImpl: (_0x2a9fc5) => _0x2e46d2[_0x2a9fc5] || {},
+        isRunninghubWorkflowModelImpl: (_0x48ca45) => _0x48ca45 === 'runninghub/2050306122774532097',
+      }),
+      _0x9a5ad3 = await _0x27725d._buildPayload.call(_0x33f0fc);
+    (assert.ok(_0x9a5ad3),
+      assert.equal(_0x9a5ad3.provider, 'runninghubwf'),
+      assert.equal(_0x9a5ad3.apiKey, 'k_runninghub_wf'),
+      assert.equal(_0x9a5ad3.prompt, ''));
+  }),
+  test('aigenImage task orchestration: Qwen image edit requires at least one reference image', async () => {
+    const _0x4887fc = 'node-ai-image-qwen-edit-no-ref',
+      _0x43c593 = globalThis.window.showToast,
+      _0x563283 = [];
+    globalThis.window.showToast = (_0x8e52ee, _0x408d04) => {
+      _0x563283.push({ message: _0x8e52ee, type: _0x408d04 });
+    };
+    try {
+      const { proto: _0x74c9f4, ctx: _0x4ff723 } = createTestContext({
+          targetId: _0x4887fc,
+          nodeData: {
+            id: _0x4887fc,
+            model: 'runninghub/2050306122774532097',
+            provider: 'runninghubwf',
+            aspectRatio: '16:9',
+            imageSize: '2K',
+            batchSize: 1,
+          },
+          promptText: 'edit',
+          incomingEdges: [],
+          isRunninghubWorkflowModelImpl: (_0x28ebbe) => String(_0x28ebbe || '').startsWith('runninghub/'),
+        }),
+        _0x58d18c = await _0x74c9f4._buildPayload.call(_0x4ff723);
+      (assert.equal(_0x58d18c, null),
+        assert.deepEqual(_0x563283, [{ message: '请先添加至少一张参考图再生成', type: 'warn' }]));
+    } finally {
+      globalThis.window.showToast = _0x43c593;
+    }
+  }),
+  test('aigenImage task orchestration: Qwen image edit reads schema params and normalizes unsupported 4K size', async () => {
+    const _0x5edc50 = 'node-ai-image-qwen-edit-defaults',
+      _0x3f9024 = ['qwen-ref-1', 'qwen-ref-2', 'qwen-ref-3', 'qwen-ref-4'],
+      _0x309950 = Object.fromEntries(
+        _0x3f9024.map((_0x4edbf5, _0x26e516) => [
+          _0x4edbf5,
+          {
+            id: _0x4edbf5,
+            type: 'source-image',
+            originalLocalPath: 'data/uploads/qwen-' + (_0x26e516 + 1) + '.png',
+            width: 0x640,
+            height: 0x384,
+          },
+        ]),
+      ),
+      _0x3448a6 = { runninghubwf: { apiKey: 'k_runninghub_wf' } },
+      { proto: _0x47acbf, ctx: _0x2d0bd6 } = createTestContext({
+        targetId: _0x5edc50,
+        nodeData: {
+          id: _0x5edc50,
+          model: 'runninghub/2050306122774532097',
+          provider: 'runninghubwf',
+          aspectRatio: '16:9',
+          batchSize: 4,
+          generationParams: {
+            batchSize: 4,
+            imageSize: '4K',
+            rhInstanceType: 'plus',
+            rhQwenEditMode: 'qwen2509',
+            rhQwenFirstImageMode: 'depth',
+          },
+        },
+        nodes: _0x309950,
+        incomingEdges: _0x3f9024.map((_0x5302d8, _0x37b587) => ({
+          id: 'edge-qwen-' + (_0x37b587 + 1),
+          sourceId: _0x5302d8,
+          targetId: _0x5edc50,
+        })),
+        promptText: 'keep identity',
+        getProviderConfigImpl: (_0x3cc751) => _0x3448a6[_0x3cc751] || {},
+        isRunninghubWorkflowModelImpl: (_0x283887) => String(_0x283887 || '').startsWith('runninghub/'),
+      }),
+      _0x9e9dd2 = await _0x47acbf._buildPayload.call(_0x2d0bd6);
+    (assert.ok(_0x9e9dd2),
+      assert.equal(_0x9e9dd2.provider, 'runninghubwf'),
+      assert.equal(_0x9e9dd2.model, 'runninghub/2050306122774532097'),
+      assert.equal(_0x9e9dd2.apiKey, 'k_runninghub_wf'),
+      assert.equal(_0x9e9dd2.prompt, 'keep identity'),
+      assert.equal(_0x9e9dd2.imageSize, '2K'),
+      assert.equal(_0x9e9dd2.aspectRatio, '16:9'),
+      assert.equal(_0x9e9dd2.batchSize, 1),
+      assert.equal(_0x9e9dd2.ratioCapability, 'dimensions'),
+      assert.equal(_0x9e9dd2.rhInstanceType, 'plus'),
+      assert.equal(_0x9e9dd2.rhQwenEditMode, 'qwen2509'),
+      assert.equal(_0x9e9dd2.rhQwenFirstImageMode, 'depth'),
+      assert.deepEqual(_0x9e9dd2.inputUrls, [
+        '/data/uploads/qwen-1.png',
+        '/data/uploads/qwen-2.png',
+        '/data/uploads/qwen-3.png',
+      ]));
+  }),
+  test('aigenImage task orchestration: GRSAI NanobananaPRO legacy VIP/4K uses supported payload', async () => {
+    const _0x381263 = async ({
+      imageSize: _0x58f16b,
+      model: _0x4ccf1,
+      expectedModel: expectedModel = _0x4ccf1,
+      expectedMode: expectedMode = 'vip',
+      expectedImageSize: expectedImageSize = '2K',
+    }) => {
+      const _0x23866b = 'node-ai-image-nb-pro-vip-' + _0x58f16b + '-' + _0x4ccf1,
+        { proto: _0x144511, ctx: _0x38e6ad } = createTestContext({
+          targetId: _0x23866b,
+          nodeData: {
+            id: _0x23866b,
+            model: _0x4ccf1,
+            provider: 'grsai',
+            aspectRatio: '1:1',
+            imageSize: _0x58f16b,
+            batchSize: 1,
+          },
+        }),
+        _0x31a6e1 = await _0x144511._buildPayload.call(_0x38e6ad),
+        _0x5a5879 = await _0x144511._buildResumePayload.call(_0x38e6ad, _0x38e6ad._data);
+      (assert.equal(_0x31a6e1.model, expectedModel),
+        assert.equal(_0x5a5879.model, expectedModel),
+        assert.equal(_0x31a6e1.provider, 'grsai'),
+        assert.equal(_0x5a5879.provider, 'grsai'),
+        assert.equal(_0x31a6e1.mode, expectedMode),
+        assert.equal(_0x31a6e1.imageSize, expectedImageSize),
+        assert.equal(Object.prototype.hasOwnProperty.call(_0x5a5879, 'mode'), false));
+    };
+    (await _0x381263({ imageSize: '2K', model: 'nano-banana-pro-vip' }),
+      await _0x381263({ imageSize: '4K', model: 'nano-banana-pro-vip' }),
+      await _0x381263({ imageSize: '2K', model: 'nano-banana-pro-4k-vip', expectedImageSize: '4K' }));
+  }),
+  test('aigenImage task orchestration: GRSAI Nanobanana2 CL keeps CL and disables 4K payload', async () => {
+    const _0x447da4 = async ({
+      imageSize: _0x2c1e12,
+      model: _0x4405a6,
+      expectedModel: expectedModel = _0x4405a6,
+      expectedMode: expectedMode = 'cl',
+      expectedImageSize: expectedImageSize = '2K',
+    }) => {
+      const _0x40aa68 = 'node-ai-image-nb2-cl-' + _0x2c1e12 + '-' + _0x4405a6,
+        { proto: _0x424647, ctx: _0x173b9c } = createTestContext({
+          targetId: _0x40aa68,
+          nodeData: {
+            id: _0x40aa68,
+            model: _0x4405a6,
+            provider: 'grsai',
+            aspectRatio: '1:1',
+            imageSize: _0x2c1e12,
+            batchSize: 1,
+          },
+        }),
+        _0x2f0f9a = await _0x424647._buildPayload.call(_0x173b9c),
+        _0x4c84c0 = await _0x424647._buildResumePayload.call(_0x173b9c, _0x173b9c._data);
+      (assert.equal(_0x2f0f9a.model, expectedModel),
+        assert.equal(_0x4c84c0.model, expectedModel),
+        assert.equal(_0x2f0f9a.provider, 'grsai'),
+        assert.equal(_0x4c84c0.provider, 'grsai'),
+        assert.equal(_0x2f0f9a.mode, expectedMode),
+        assert.equal(_0x2f0f9a.imageSize, expectedImageSize),
+        assert.equal(Object.prototype.hasOwnProperty.call(_0x4c84c0, 'mode'), false));
+    };
+    (await _0x447da4({ imageSize: '2K', model: 'nano-banana-2-cl' }),
+      await _0x447da4({ imageSize: '4K', model: 'nano-banana-2-cl' }),
+      await _0x447da4({ imageSize: '2K', model: 'nano-banana-2-4k-cl', expectedImageSize: '4K' }));
+  }),
+  test('aigenImage task orchestration: manifest GRSAI nano-banana-2 passes mode selector and normalizes 4K', async () => {
+    const _0x9c78d2 = async ({
+      imageSize: _0x3229c8,
+      mode: _0x353154,
+      expectedMode: expectedMode = _0x353154,
+      expectedImageSize: expectedImageSize = _0x3229c8,
+    }) => {
+      const _0x108d44 = 'node-ai-image-grsai-manifest-mode-' + _0x3229c8 + '-' + _0x353154,
+        { proto: _0x13a1d0, ctx: _0x59b236 } = createTestContext({
+          targetId: _0x108d44,
+          nodeData: {
+            id: _0x108d44,
+            model: 'nano-banana-2',
+            provider: 'grsai',
+            generationParams: { imageSize: _0x3229c8, aspectRatio: '1:1', mode: _0x353154 },
+            batchSize: 1,
+          },
+        }),
+        _0x278ce3 = await _0x13a1d0._buildPayload.call(_0x59b236),
+        _0x21c5df = await _0x13a1d0._buildResumePayload.call(_0x59b236, _0x59b236._data);
+      (assert.equal(_0x278ce3.model, 'nano-banana-2'),
+        assert.equal(_0x21c5df.model, 'nano-banana-2'),
+        assert.equal(_0x278ce3.provider, 'grsai'),
+        assert.equal(_0x21c5df.provider, 'grsai'),
+        assert.equal(_0x278ce3.mode, expectedMode),
+        assert.equal(_0x278ce3.imageSize, expectedImageSize),
+        assert.equal(Object.prototype.hasOwnProperty.call(_0x21c5df, 'mode'), false));
+    };
+    (await _0x9c78d2({ imageSize: '2K', mode: 'normal' }),
+      await _0x9c78d2({ imageSize: '2K', mode: 'cl' }),
+      await _0x9c78d2({ imageSize: '4K', mode: 'cl' }),
+      await _0x9c78d2({ imageSize: '4K', mode: 'normal', expectedImageSize: '2K' }));
+  }),
+  test('aigenImage task orchestration: manifest GRSAI pro modes keep VT/CL/VIP and normalize 4K', async () => {
+    const _0xbbc9df = async ({
+      imageSize: _0x274013,
+      mode: _0x32fc18,
+      expectedMode: expectedMode = _0x32fc18,
+      expectedImageSize: expectedImageSize = _0x274013,
+    }) => {
+      const _0x44710f = 'node-ai-image-grsai-pro-manifest-mode-' + _0x274013 + '-' + _0x32fc18,
+        { proto: _0x480fbd, ctx: _0x52d467 } = createTestContext({
+          targetId: _0x44710f,
+          nodeData: {
+            id: _0x44710f,
+            model: 'nano-banana-pro',
+            provider: 'grsai',
+            generationParams: { imageSize: _0x274013, aspectRatio: '1:1', mode: _0x32fc18 },
+            batchSize: 1,
+          },
+        }),
+        _0x4eeb64 = await _0x480fbd._buildPayload.call(_0x52d467),
+        _0x46806f = await _0x480fbd._buildResumePayload.call(_0x52d467, _0x52d467._data);
+      (assert.equal(_0x4eeb64.model, 'nano-banana-pro'),
+        assert.equal(_0x46806f.model, 'nano-banana-pro'),
+        assert.equal(_0x4eeb64.provider, 'grsai'),
+        assert.equal(_0x46806f.provider, 'grsai'),
+        assert.equal(_0x4eeb64.mode, expectedMode),
+        assert.equal(_0x4eeb64.imageSize, expectedImageSize),
+        assert.equal(Object.prototype.hasOwnProperty.call(_0x46806f, 'mode'), false));
+    };
+    (await _0xbbc9df({ imageSize: '2K', mode: 'normal' }),
+      await _0xbbc9df({ imageSize: '2K', mode: 'vt' }),
+      await _0xbbc9df({ imageSize: '2K', mode: 'cl' }),
+      await _0xbbc9df({ imageSize: '2K', mode: 'vip' }),
+      await _0xbbc9df({ imageSize: '4K', mode: 'vip' }),
+      await _0xbbc9df({ imageSize: '4K', mode: 'normal', expectedImageSize: '2K' }),
+      await _0xbbc9df({ imageSize: '4K', mode: 'vt', expectedImageSize: '2K' }),
+      await _0xbbc9df({ imageSize: '4K', mode: 'cl', expectedImageSize: '2K' }));
+  }),
+  test('aigenImage task orchestration: GRSAI nanobanana cleans legacy UI params', async () => {
+    const _0x52a2df = 'node-ai-image-grsai-nano-clean-legacy-params',
+      { proto: _0x47c405, ctx: _0x1bd3ea } = createTestContext({
+        targetId: _0x52a2df,
+        nodeData: {
+          id: _0x52a2df,
+          model: 'nano-banana',
+          provider: 'grsai',
+          width: 0x640,
+          height: 0x384,
+          generationParams: { imageSize: '3K', aspectRatio: '自适应', mode: 'normal', batchSize: 1 },
+        },
+      }),
+      _0x24f806 = await _0x47c405._buildPayload.call(_0x1bd3ea);
+    (assert.equal(_0x24f806.imageSize, '2K'),
+      assert.equal(_0x24f806.aspectRatio, 'auto'),
+      assert.equal(_0x24f806.resolvedRatioLabel, 'auto'));
+  }),
+  test('aigenImage task orchestration: GRSAI GPT image 2 常规模式只保留 1K', async () => {
+    for (const { storedModel: _0x552adc, imageSize: _0x194715 } of [
+      { storedModel: 'gpt-image-2', imageSize: '1K' },
+      { storedModel: 'gpt-image-2', imageSize: '2K' },
+      { storedModel: 'gpt-image-2', imageSize: '4K' },
+      { storedModel: 'gpt-image-2', imageSize: undefined },
+    ]) {
+      const _0x3957b0 = 'node-ai-image-gpt-image-2-1k-' + _0x552adc + '-' + (_0x194715 || 'default'),
+        { proto: _0x273cbd, ctx: _0x103b3e } = createTestContext({
+          targetId: _0x3957b0,
+          nodeData: {
+            id: _0x3957b0,
+            model: _0x552adc,
+            provider: 'grsai',
+            generationParams: {
+              mode: 'normal',
+              aspectRatio: '9:21',
+              ...(_0x194715 ? { imageSize: _0x194715 } : {}),
+              batchSize: 1,
+            },
+          },
+        }),
+        _0x103af5 = await _0x273cbd._buildPayload.call(_0x103b3e),
+        _0x484d0d = await _0x273cbd._buildResumePayload.call(_0x103b3e, _0x103b3e._data);
+      (assert.equal(_0x103af5.model, _0x552adc),
+        assert.equal(_0x484d0d.model, _0x552adc),
+        assert.equal(_0x103af5.provider, 'grsai'),
+        assert.equal(_0x484d0d.provider, 'grsai'),
+        assert.equal(_0x103af5.mode, 'normal'),
+        assert.equal(_0x103af5.imageSize, '1K'),
+        assert.equal(_0x103af5.aspectRatio, '9:21'),
+        assert.equal(_0x103af5.resolvedRatioLabel, '9:21'));
+    }
+  }),
+  test('aigenImage task orchestration: GRSAI GPT image 2 VIP 模式保留全部画质', async () => {
+    const _0x465a87 = async ({ imageSize: _0x462d7c, storedModel: _0x35ca38, aspectRatio: _0x371004 }) => {
+      const _0x1f0da1 = 'node-ai-image-gpt-image-2-vip-mode-' + _0x462d7c + '-' + _0x35ca38,
+        { proto: _0x2df8d1, ctx: _0x267110 } = createTestContext({
+          targetId: _0x1f0da1,
+          nodeData: {
+            id: _0x1f0da1,
+            model: _0x35ca38,
+            provider: 'grsai',
+            generationParams: { mode: 'vip', aspectRatio: _0x371004, imageSize: _0x462d7c, batchSize: 1 },
+          },
+        }),
+        _0x535fa6 = await _0x2df8d1._buildPayload.call(_0x267110),
+        _0x4ad36b = await _0x2df8d1._buildResumePayload.call(_0x267110, _0x267110._data);
+      (assert.equal(_0x535fa6.model, _0x35ca38),
+        assert.equal(_0x4ad36b.model, _0x35ca38),
+        assert.equal(_0x535fa6.provider, 'grsai'),
+        assert.equal(_0x535fa6.mode, 'vip'),
+        assert.equal(_0x535fa6.imageSize, _0x462d7c),
+        assert.equal(_0x535fa6.aspectRatio, _0x371004),
+        assert.equal(_0x535fa6.resolvedRatioLabel, _0x371004));
+    };
+    (await _0x465a87({ imageSize: '1K', storedModel: 'gpt-image-2', aspectRatio: '9:16' }),
+      await _0x465a87({ imageSize: '2K', storedModel: 'gpt-image-2', aspectRatio: '9:21' }),
+      await _0x465a87({ imageSize: '4K', storedModel: 'gpt-image-2', aspectRatio: '2:1' }),
+      await _0x465a87({ imageSize: '4K', storedModel: 'gpt-image-2-vip', aspectRatio: '9:21' }));
+  }),
+  test('aigenImage task orchestration: GRSAI GPT image 2 4K 保留官方支持比例', async () => {
+    const _0x189f20 = 'node-ai-image-gpt-image-2-4k-fallback',
+      { proto: _0x209859, ctx: _0x22e895 } = createTestContext({
+        targetId: _0x189f20,
+        nodeData: {
+          id: _0x189f20,
+          model: 'gpt-image-2',
+          provider: 'grsai',
+          generationParams: { mode: 'vip', aspectRatio: '1:1', imageSize: '4K', batchSize: 1 },
+          width: 0x1f4,
+          height: 0x1f4,
+        },
+      }),
+      _0x365977 = await _0x209859._buildPayload.call(_0x22e895);
+    (assert.equal(_0x365977.model, 'gpt-image-2'),
+      assert.equal(_0x365977.provider, 'grsai'),
+      assert.equal(_0x365977.mode, 'vip'),
+      assert.equal(_0x365977.imageSize, '4K'),
+      assert.equal(_0x365977.aspectRatio, '1:1'),
+      assert.equal(_0x365977.resolvedRatioLabel, '1:1'));
+  }),
+  test('aigenImage task orchestration: APIMart Seedream 5 lite 保留 3K 和支持比例', async () => {
+    const _0x52d39 = 'node-ai-image-apimart-seedream-5-lite',
+      { proto: _0x43e415, ctx: _0x1bc0e9 } = createTestContext({
+        targetId: _0x52d39,
+        nodeData: {
+          id: _0x52d39,
+          model: 'apimart/seedream-5.0-lite',
+          provider: 'apimart',
+          aspectRatio: '21:9',
+          imageSize: '3K',
+          generationParams: { aspectRatio: '21:9', imageSize: '3K' },
+          batchSize: 4,
+        },
+      }),
+      _0x3e5d37 = await _0x43e415._buildPayload.call(_0x1bc0e9);
+    (assert.equal(_0x3e5d37.provider, 'apimart'),
+      assert.equal(_0x3e5d37.model, 'apimart/seedream-5.0-lite'),
+      assert.equal(_0x3e5d37.imageSize, '3K'),
+      assert.equal(_0x3e5d37.aspectRatio, '21:9'),
+      assert.equal(_0x3e5d37.resolvedRatioLabel, '21:9'),
+      assert.equal(_0x3e5d37.batchSize, 4));
+  }),
+  test('aigenImage task orchestration: APIMart Qwen image 2.0 使用文档比例和生成数量', async () => {
+    const _0x50f3ed = 'node-ai-image-apimart-qwen-image',
+      { proto: _0x1f3ee7, ctx: _0x2f1fb4 } = createTestContext({
+        targetId: _0x50f3ed,
+        nodeData: {
+          id: _0x50f3ed,
+          model: 'apimart/qwen-image-2.0',
+          provider: 'apimart',
+          aspectRatio: '自适应',
+          imageSize: '3K',
+          generationParams: { mode: 'pro', aspectRatio: '自适应', imageSize: '3K', batchSize: 6 },
+          width: 0x640,
+          height: 0x384,
+          batchSize: 1,
+        },
+      }),
+      _0x3e98df = await _0x1f3ee7._buildPayload.call(_0x2f1fb4);
+    (assert.equal(_0x3e98df.provider, 'apimart'),
+      assert.equal(_0x3e98df.model, 'apimart/qwen-image-2.0'),
+      assert.equal(_0x3e98df.mode, 'pro'),
+      assert.equal(_0x3e98df.imageSize, '1K'),
+      assert.equal(_0x3e98df.aspectRatio, '16:9'),
+      assert.equal(_0x3e98df.resolvedRatioLabel, '16:9'),
+      assert.equal(_0x3e98df.batchSize, 6));
+  }),
+  test('aigenImage task orchestration: APIMart Z-Image-Turbo 自适应转为真实比例并透传智能改写', async () => {
+    const _0x390b6c = 'node-ai-image-apimart-z-image-turbo',
+      { proto: _0x57043a, ctx: _0x3a1e2e } = createTestContext({
+        targetId: _0x390b6c,
+        nodeData: {
+          id: _0x390b6c,
+          model: 'apimart/z-image-turbo',
+          provider: 'apimart',
+          aspectRatio: '自适应',
+          imageSize: '3K',
+          generationParams: { aspectRatio: '自适应', imageSize: '3K', prompt_extend: true, batchSize: 4 },
+          width: 0x640,
+          height: 0x384,
+          batchSize: 1,
+        },
+      }),
+      _0x166865 = await _0x57043a._buildPayload.call(_0x3a1e2e);
+    (assert.equal(_0x166865.provider, 'apimart'),
+      assert.equal(_0x166865.model, 'apimart/z-image-turbo'),
+      assert.equal(_0x166865.imageSize, '1K'),
+      assert.equal(_0x166865.aspectRatio, '16:9'),
+      assert.equal(_0x166865.resolvedRatioLabel, '16:9'),
+      assert.equal(_0x166865.prompt_extend, true),
+      assert.equal(_0x166865.batchSize, 4));
+  }),
+  test('aigenImage task orchestration: APIMart Wan 2.7 收集图片入参并按入参比例自适应', async () => {
+    const _0x4f5ca3 = 'node-ai-image-apimart-wan',
+      _0x1575d7 = 'node-ref-apimart-wan',
+      { proto: _0x556c23, ctx: _0x411306 } = createTestContext({
+        targetId: _0x4f5ca3,
+        nodeData: {
+          id: _0x4f5ca3,
+          model: 'apimart/wan2.7-image',
+          provider: 'apimart',
+          aspectRatio: '自适应',
+          imageSize: '4K',
+          generationParams: {
+            mode: 'pro',
+            aspectRatio: '自适应',
+            imageSize: '4K',
+            thinking_mode: false,
+            batchSize: 4,
+          },
+          width: 0x640,
+          height: 0x384,
+          batchSize: 1,
+        },
+        nodes: {
+          [_0x1575d7]: {
+            id: _0x1575d7,
+            type: 'source-image',
+            imageUrl: 'https://cdn.apimart.ai/ref-wan.png',
+            width: 0x384,
+            height: 0x640,
+          },
+        },
+        incomingEdges: [{ id: 'edge-apimart-wan', sourceId: _0x1575d7, targetId: _0x4f5ca3, refSlot: '' }],
+      }),
+      _0x32c556 = await _0x556c23._buildPayload.call(_0x411306);
+    (assert.equal(_0x32c556.provider, 'apimart'),
+      assert.equal(_0x32c556.model, 'apimart/wan2.7-image'),
+      assert.equal(_0x32c556.mode, 'pro'),
+      assert.equal(_0x32c556.imageSize, '4K'),
+      assert.equal(_0x32c556.aspectRatio, '9:16'),
+      assert.equal(_0x32c556.resolvedRatioLabel, '9:16'),
+      assert.equal(_0x32c556.thinking_mode, false),
+      assert.equal(_0x32c556.batchSize, 4),
+      assert.deepEqual(_0x32c556.inputUrls, ['https://cdn.apimart.ai/ref-wan.png']));
+  }),
+  test('aigenImage task orchestration: APIMart Seedream 有参考图时自适应透传 API auto', async () => {
+    const _0xb36093 = 'node-ai-image-apimart-seedream-auto',
+      _0x447dc4 = 'node-ref-apimart-seedream-auto',
+      { proto: _0xd4f48b, ctx: _0x12a060 } = createTestContext({
+        targetId: _0xb36093,
+        nodeData: {
+          id: _0xb36093,
+          model: 'apimart/seedream-4.0',
+          provider: 'apimart',
+          aspectRatio: 'auto',
+          imageSize: '2K',
+          generationParams: { aspectRatio: 'auto', imageSize: '2K' },
+          batchSize: 1,
+        },
+        nodes: {
+          [_0x447dc4]: {
+            id: _0x447dc4,
+            type: 'source-image',
+            imageUrl: 'https://img.example.com/seedream-ref.png',
+            width: 0x640,
+            height: 0x384,
+          },
+        },
+        incomingEdges: [
+          { id: 'edge-apimart-seedream-auto', sourceId: _0x447dc4, targetId: _0xb36093, refSlot: '' },
+        ],
+      }),
+      _0x26ecf3 = await _0xd4f48b._buildPayload.call(_0x12a060);
+    (assert.equal(_0x26ecf3.provider, 'apimart'),
+      assert.equal(_0x26ecf3.model, 'apimart/seedream-4.0'),
+      assert.equal(_0x26ecf3.aspectRatio, 'auto'),
+      assert.equal(_0x26ecf3.resolvedRatioLabel, 'auto'),
+      assert.equal(_0x26ecf3.ratioCapability, 'size'),
+      assert.deepEqual(_0x26ecf3.inputUrls, ['https://img.example.com/seedream-ref.png']));
+  }),
+  test('aigenImage task orchestration: APIMart GPT image 2 透传新增比例', async () => {
+    const _0x436807 = 'node-ai-image-apimart-gpt-image-2-ratio',
+      { proto: _0x36d173, ctx: _0x33e193 } = createTestContext({
+        targetId: _0x436807,
+        nodeData: {
+          id: _0x436807,
+          model: 'apimart/gpt-image-2',
+          provider: 'apimart',
+          aspectRatio: '2:1',
+          imageSize: '2K',
+          generationParams: { mode: 'official', aspectRatio: '2:1', imageSize: '2K', quality: 'high' },
+          batchSize: 1,
+        },
+      }),
+      _0x464a67 = await _0x36d173._buildPayload.call(_0x33e193);
+    (assert.equal(_0x464a67.provider, 'apimart'),
+      assert.equal(_0x464a67.model, 'apimart/gpt-image-2'),
+      assert.equal(_0x464a67.mode, 'official'),
+      assert.equal(_0x464a67.imageSize, '2K'),
+      assert.equal(_0x464a67.quality, 'high'),
+      assert.equal(_0x464a67.aspectRatio, '2:1'),
+      assert.equal(_0x464a67.resolvedRatioLabel, '2:1'));
+  }),
+  test('aigenImage task orchestration: APIMart GPT image 2 4K 不生成非法比例', async () => {
+    const _0x124e03 = 'node-ai-image-apimart-gpt-image-2-4k',
+      { proto: _0xacb716, ctx: _0x216672 } = createTestContext({
+        targetId: _0x124e03,
+        nodeData: {
+          id: _0x124e03,
+          model: 'apimart/gpt-image-2',
+          provider: 'apimart',
+          aspectRatio: '1:1',
+          imageSize: '4K',
+          generationParams: { aspectRatio: '1:1', imageSize: '4K' },
+          width: 0x1f4,
+          height: 0x1f4,
+          batchSize: 1,
+        },
+      }),
+      _0x4ba784 = await _0xacb716._buildPayload.call(_0x216672);
+    (assert.equal(_0x4ba784.imageSize, '4K'),
+      assert.equal(_0x4ba784.aspectRatio, '16:9'),
+      assert.equal(_0x4ba784.resolvedRatioLabel, '16:9'));
+  }),
+  test('aigenImage task orchestration: APIMart GPT image 2 4K 自适应只解析到可用比例', async () => {
+    const _0x4b9843 = 'node-ai-image-apimart-gpt-image-2-4k-auto',
+      { proto: _0x1d3aa0, ctx: _0x24b85e } = createTestContext({
+        targetId: _0x4b9843,
+        nodeData: {
+          id: _0x4b9843,
+          model: 'apimart/gpt-image-2',
+          provider: 'apimart',
+          aspectRatio: '自适应',
+          imageSize: '4K',
+          generationParams: { aspectRatio: '自适应', imageSize: '4K' },
+          width: 0x1f4,
+          height: 0x1f4,
+          batchSize: 1,
+        },
+      }),
+      _0x4e116d = await _0x1d3aa0._buildPayload.call(_0x24b85e);
+    (assert.equal(_0x4e116d.imageSize, '4K'),
+      assert.equal(_0x4e116d.aspectRatio, '16:9'),
+      assert.equal(_0x4e116d.resolvedRatioLabel, '16:9'));
+  }));

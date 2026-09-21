@@ -1,1 +1,244 @@
-const a424_0xaa4937=a424_0x1e3c;(function(_0x2916e6,_0x25fb42){const _0x4fb731=a424_0x1e3c,_0x29b160=_0x2916e6();while(!![]){try{const _0x5be740=-parseInt(_0x4fb731(0xd6))/0x1+parseInt(_0x4fb731(0x8d))/0x2+parseInt(_0x4fb731(0xbf))/0x3+parseInt(_0x4fb731(0xcd))/0x4*(-parseInt(_0x4fb731(0xbc))/0x5)+parseInt(_0x4fb731(0xad))/0x6*(parseInt(_0x4fb731(0xe4))/0x7)+-parseInt(_0x4fb731(0xc4))/0x8+parseInt(_0x4fb731(0xc8))/0x9;if(_0x5be740===_0x25fb42)break;else _0x29b160['push'](_0x29b160['shift']());}catch(_0x3d0d1d){_0x29b160['push'](_0x29b160['shift']());}}}(a424_0x591b,0x99b98));import{RH_INSTANCE_FIELD,createRunningHubVideoExecutionManifest,createRunningHubVideoModelManifest}from'../../shared/runningHubVideoManifestShared.js';export const RH_VIDEO_BERNINI_V1_MODEL_ID=a424_0xaa4937(0xce);export const RH_VIDEO_BERNINI_V1_EXECUTION_ID=a424_0xaa4937(0x89);const RH_BERNINI_FUNCTION_BY_INPUT_MODE=Object[a424_0xaa4937(0x8e)]({'image':Object[a424_0xaa4937(0x8e)]([a424_0xaa4937(0xb0),a424_0xaa4937(0xc9)]),'video':Object[a424_0xaa4937(0x8e)]([a424_0xaa4937(0xd2),'mv2v']),'videoImage':Object[a424_0xaa4937(0x8e)]([a424_0xaa4937(0xb6),a424_0xaa4937(0xbd),a424_0xaa4937(0xb1)]),'videoVideo':Object[a424_0xaa4937(0x8e)]([a424_0xaa4937(0xb7)])}),RH_BERNINI_FUNCTION_LABELS=Object[a424_0xaa4937(0x8e)]({'i2v':a424_0xaa4937(0xda),'r2v':'r2v参考主体到视频','v2v':a424_0xaa4937(0xa8),'mv2v':a424_0xaa4937(0xa7),'vi2v':a424_0xaa4937(0xa4),'rv2v':a424_0xaa4937(0xe6),'vrc2v':'vrc2v视频区域控制到视频','ads2v':'ads2v广告插入到视频'}),RH_BERNINI_FUNCTION_HELP=Object[a424_0xaa4937(0x8e)]({'t2v':'t2v文本到视频：只输入提示词，适合从文字直接生成完整视频。','i2v':a424_0xaa4937(0xc0),'r2v':a424_0xaa4937(0xb8),'v2v':'v2v视频到视频：基于源视频改风格、改内容或重绘整体画面。','mv2v':a424_0xaa4937(0x98),'vi2v':a424_0xaa4937(0xd3),'rv2v':a424_0xaa4937(0xc3),'vrc2v':a424_0xaa4937(0xe3),'ads2v':a424_0xaa4937(0x95)});function buildFunctionHelp(..._0x5282fa){const _0x4ce6bd=a424_0xaa4937;return _0x5282fa['map'](_0x4ecae4=>RH_BERNINI_FUNCTION_HELP[_0x4ecae4])[_0x4ce6bd(0x93)]('\x0a');}const RH_BERNINI_USAGE_TABLE=Object[a424_0xaa4937(0x8e)]([a424_0xaa4937(0xa0),'|---|---|---|',a424_0xaa4937(0x8b),a424_0xaa4937(0xac),a424_0xaa4937(0xe2),'|\x20`r2v参考主体到视频`\x20|\x20图像，适用于参考主体、服装、物体或场景生成视频。\x20|\x20让参考图中的主体坐在海边长椅上，随着音乐轻轻摇摆，保持主体外观一致。\x20|',a424_0xaa4937(0xe1),'|\x20`rv2v参考视频到视频`\x20|\x20源视频+图像，适用于主体替换、服装替换、物体替换、风格参考。\x20|\x20把视频中人物的外套替换成参考图片里的衣服，保持人物动作、脸部、背景和光照不变。\x20|',a424_0xaa4937(0xbe),a424_0xaa4937(0xb3),'|\x20`mv2v多维编辑到视频`\x20|\x20源视频，适用于动作、姿势、风格、光照、颜色、纹理编辑。\x20|\x20改变人物动作，让人物自然蹲下，保持同一个人物、服装、场景、光照和镜头一致。\x20|']);export const RH_VIDEO_BERNINI_V1_HELP_TOOLTIP=[a424_0xaa4937(0xea),'',...RH_BERNINI_USAGE_TABLE][a424_0xaa4937(0x93)]('\x0a');function a424_0x1e3c(_0x319a9a,_0x1065ea){const _0x591b70=a424_0x591b();return a424_0x1e3c=function(_0x1e3cda,_0x451b92){_0x1e3cda=_0x1e3cda-0x88;let _0x4804ab=_0x591b70[_0x1e3cda];return _0x4804ab;},a424_0x1e3c(_0x319a9a,_0x1065ea);}const RH_BERNINI_FUNCTION_OPTIONS=Object[a424_0xaa4937(0x8e)]([Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xb0),'label':RH_BERNINI_FUNCTION_LABELS[a424_0xaa4937(0xb0)]}),Object['freeze']({'value':a424_0xaa4937(0xc9),'label':RH_BERNINI_FUNCTION_LABELS[a424_0xaa4937(0xc9)]}),Object['freeze']({'value':a424_0xaa4937(0xd2),'label':RH_BERNINI_FUNCTION_LABELS[a424_0xaa4937(0xd2)]}),Object['freeze']({'value':a424_0xaa4937(0xa6),'label':RH_BERNINI_FUNCTION_LABELS[a424_0xaa4937(0xa6)]}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xb6),'label':RH_BERNINI_FUNCTION_LABELS[a424_0xaa4937(0xb6)]}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xbd),'label':RH_BERNINI_FUNCTION_LABELS[a424_0xaa4937(0xbd)]}),Object['freeze']({'value':a424_0xaa4937(0xb1),'label':RH_BERNINI_FUNCTION_LABELS[a424_0xaa4937(0xb1)]}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xb7),'label':RH_BERNINI_FUNCTION_LABELS[a424_0xaa4937(0xb7)]})]),RH_BERNINI_INPUT_MODES=Object[a424_0xaa4937(0x8e)]([a424_0xaa4937(0x9b),'image',a424_0xaa4937(0xa9),'videoImage',a424_0xaa4937(0xd4)]),RH_BERNINI_RATIO_OPTIONS=Object[a424_0xaa4937(0x8e)]([Object['freeze']({'value':a424_0xaa4937(0x9c),'label':a424_0xaa4937(0x9c)}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xd9),'label':a424_0xaa4937(0xd9)}),Object['freeze']({'value':'16:9','label':a424_0xaa4937(0x92)}),Object['freeze']({'value':a424_0xaa4937(0xc5),'label':a424_0xaa4937(0xc5)}),Object['freeze']({'value':a424_0xaa4937(0xd0),'label':a424_0xaa4937(0xd0)}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0x9f),'label':a424_0xaa4937(0x9f)}),Object[a424_0xaa4937(0x8e)]({'value':'3:2','label':a424_0xaa4937(0x99)}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xd8),'label':a424_0xaa4937(0xd8)}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xba),'label':a424_0xaa4937(0xba)}),Object[a424_0xaa4937(0x8e)]({'value':'9:21','label':a424_0xaa4937(0xae)}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xde),'label':a424_0xaa4937(0xde)}),Object['freeze']({'value':a424_0xaa4937(0xb2),'label':a424_0xaa4937(0xb2)}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xe5),'label':a424_0xaa4937(0xe5)}),Object[a424_0xaa4937(0x8e)]({'value':a424_0xaa4937(0xdc),'label':a424_0xaa4937(0xdc)})]);export const rhVideoBerniniV1ModelManifest=createRunningHubVideoModelManifest({'modelId':RH_VIDEO_BERNINI_V1_MODEL_ID,'executionId':RH_VIDEO_BERNINI_V1_EXECUTION_ID,'displayName':a424_0xaa4937(0x9d),'description':'支持文本、图片、源视频、参考视频组合的全能视频替换工作流','vip':!![],'subscriptionAliases':['video_edit_v54','video_edit.pro'],'help':Object[a424_0xaa4937(0x8e)]({'tooltip':RH_VIDEO_BERNINI_V1_HELP_TOOLTIP,'variants':Object[a424_0xaa4937(0x8e)]([Object[a424_0xaa4937(0x8e)]({'when':Object[a424_0xaa4937(0x8e)]({'field':a424_0xaa4937(0xd5),'value':a424_0xaa4937(0x9b)}),'tooltip':RH_VIDEO_BERNINI_V1_HELP_TOOLTIP}),Object[a424_0xaa4937(0x8e)]({'when':Object[a424_0xaa4937(0x8e)]({'field':a424_0xaa4937(0xd5),'value':'image'}),'tooltip':RH_VIDEO_BERNINI_V1_HELP_TOOLTIP}),Object['freeze']({'when':Object[a424_0xaa4937(0x8e)]({'field':a424_0xaa4937(0xd5),'value':a424_0xaa4937(0xa9)}),'tooltip':RH_VIDEO_BERNINI_V1_HELP_TOOLTIP}),Object[a424_0xaa4937(0x8e)]({'when':Object[a424_0xaa4937(0x8e)]({'field':'rhBerniniInputMode','value':a424_0xaa4937(0xe7)}),'tooltip':RH_VIDEO_BERNINI_V1_HELP_TOOLTIP}),Object[a424_0xaa4937(0x8e)]({'when':Object['freeze']({'field':a424_0xaa4937(0xd5),'value':'videoVideo'}),'tooltip':RH_VIDEO_BERNINI_V1_HELP_TOOLTIP})])}),'extensions':Object[a424_0xaa4937(0x8e)]({'vipAliases':Object['freeze']([a424_0xaa4937(0xa1),a424_0xaa4937(0xe0)]),'videoParameterPanel':Object[a424_0xaa4937(0x8e)]({'fixedSlotSummary':Object[a424_0xaa4937(0x8e)]({'resolver':a424_0xaa4937(0xaa),'field':a424_0xaa4937(0xd5)})})}),'fixedAssetSlots':[a424_0xaa4937(0xc1),a424_0xaa4937(0xa3),a424_0xaa4937(0xcc)],'inputSlots':{'allowedKinds':['text',a424_0xaa4937(0xcf),'video'],'minByKind':{'image':0x0,'video':0x0},'maxByKind':{'text':0x1,'image':0x1,'video':0x2,'audio':0x0},'fixedSlots':Object[a424_0xaa4937(0x8e)]([Object['freeze']({'id':'sourceVideo','kind':a424_0xaa4937(0xa9),'label':'源视频','required':![],'displayOrder':0x0}),Object[a424_0xaa4937(0x8e)]({'id':'refImage','kind':a424_0xaa4937(0xcf),'label':a424_0xaa4937(0xc7),'required':![],'displayOrder':0x1}),Object[a424_0xaa4937(0x8e)]({'id':a424_0xaa4937(0xcc),'kind':a424_0xaa4937(0xa9),'label':a424_0xaa4937(0xa2),'required':![],'displayOrder':0x2})])},'uiFields':[Object[a424_0xaa4937(0x8e)]({'id':'rhBerniniFunction','type':a424_0xaa4937(0xca),'placement':a424_0xaa4937(0xcb),'variant':'pillMenu','label':a424_0xaa4937(0xe9),'menuTitle':a424_0xaa4937(0xe9),'menuTooltipField':a424_0xaa4937(0xd5),'menuTooltipByValue':Object[a424_0xaa4937(0x8e)]({'image':['各种功能的用法说明',buildFunctionHelp(a424_0xaa4937(0xb0),a424_0xaa4937(0xc9))][a424_0xaa4937(0x93)]('\x0a'),'video':[a424_0xaa4937(0xea),buildFunctionHelp(a424_0xaa4937(0xd2),a424_0xaa4937(0xa6))]['join']('\x0a'),'videoImage':[a424_0xaa4937(0xea),buildFunctionHelp('vi2v',a424_0xaa4937(0xbd),a424_0xaa4937(0xb1))]['join']('\x0a'),'videoVideo':[a424_0xaa4937(0xea),buildFunctionHelp('ads2v')][a424_0xaa4937(0x93)]('\x0a')}),'defaultValue':a424_0xaa4937(0xb0),'showWhen':Object[a424_0xaa4937(0x8e)]({'field':'rhBerniniInputMode','values':Object[a424_0xaa4937(0x8e)]([a424_0xaa4937(0xcf),a424_0xaa4937(0xa9),a424_0xaa4937(0xe7)])}),'options':RH_BERNINI_FUNCTION_OPTIONS[a424_0xaa4937(0xab)](_0x395bb6=>{const _0x259a9b=a424_0xaa4937,_0xb2b052=Object['entries'](RH_BERNINI_FUNCTION_BY_INPUT_MODE)['filter'](([,_0x2a2898])=>_0x2a2898[_0x259a9b(0xb9)](_0x395bb6[_0x259a9b(0xb4)]))[_0x259a9b(0xab)](([_0x47f045])=>_0x47f045);return Object['freeze']({..._0x395bb6,'hideWhen':Object['freeze']({'field':'rhBerniniInputMode','values':Object[_0x259a9b(0x8e)](RH_BERNINI_INPUT_MODES['filter'](_0x646a1c=>!_0xb2b052[_0x259a9b(0xb9)](_0x646a1c)))})});})}),Object[a424_0xaa4937(0x8e)]({'id':a424_0xaa4937(0x8a),'type':a424_0xaa4937(0xca),'placement':'videoParams','displayRole':a424_0xaa4937(0xd1),'label':a424_0xaa4937(0xdb),'defaultValue':0x340,'options':Object[a424_0xaa4937(0x8e)]([Object[a424_0xaa4937(0x8e)]({'value':0x340,'label':a424_0xaa4937(0xaf)}),Object[a424_0xaa4937(0x8e)]({'value':0x400,'label':a424_0xaa4937(0x94)}),Object[a424_0xaa4937(0x8e)]({'value':0x500,'label':a424_0xaa4937(0xdf)}),Object[a424_0xaa4937(0x8e)]({'value':0x5a0,'label':a424_0xaa4937(0x9a)})])}),Object[a424_0xaa4937(0x8e)]({'id':a424_0xaa4937(0xe8),'type':a424_0xaa4937(0xca),'placement':'videoParams','label':'帧率','defaultValue':0x18,'options':Object[a424_0xaa4937(0x8e)]([Object[a424_0xaa4937(0x8e)]({'value':0x10,'label':a424_0xaa4937(0x9e)}),Object[a424_0xaa4937(0x8e)]({'value':0x18,'label':a424_0xaa4937(0xc6)}),Object[a424_0xaa4937(0x8e)]({'value':0x1e,'label':a424_0xaa4937(0x91)})])}),Object[a424_0xaa4937(0x8e)]({'id':a424_0xaa4937(0x8c),'type':a424_0xaa4937(0xa5),'placement':'videoParams','label':'帧数','defaultValue':0x79,'min':0x0,'max':0xf423f,'step':0x1}),Object[a424_0xaa4937(0x8e)]({'id':'rhBerniniAspectRatio','type':'segmented','placement':a424_0xaa4937(0xcb),'displayRole':a424_0xaa4937(0xb5),'label':'比例','defaultValue':'自适应','options':RH_BERNINI_RATIO_OPTIONS}),RH_INSTANCE_FIELD]});export const rhVideoBerniniV1ExecutionManifest=createRunningHubVideoExecutionManifest({'id':RH_VIDEO_BERNINI_V1_EXECUTION_ID,'label':a424_0xaa4937(0x9d),'workflowId':a424_0xaa4937(0xdd),'submitMode':'openapi-v2-ai-app','queryMode':a424_0xaa4937(0x97),'extensions':Object[a424_0xaa4937(0x8e)]({'payloadResolver':a424_0xaa4937(0xd7)}),'mapping':{'sourceVideoNode':Object[a424_0xaa4937(0x8e)]({'nodeId':'31','fieldName':a424_0xaa4937(0xa9),'description':'上传源视频'}),'refImageNode':Object[a424_0xaa4937(0x8e)]({'nodeId':'32','fieldName':a424_0xaa4937(0xcf),'description':'参考图'}),'modeNode':Object['freeze']({'nodeId':'34','fieldName':a424_0xaa4937(0xb4),'description':a424_0xaa4937(0x88)}),'fpsNode':Object[a424_0xaa4937(0x8e)]({'nodeId':'31','fieldName':a424_0xaa4937(0x96),'value':'24','description':'帧率'}),'framesNode':Object[a424_0xaa4937(0x8e)]({'nodeId':'19','fieldName':a424_0xaa4937(0xb4),'value':a424_0xaa4937(0x90),'description':'帧数'}),'widthNode':Object[a424_0xaa4937(0x8e)]({'nodeId':'17','fieldName':a424_0xaa4937(0xb4),'description':'宽度'}),'heightNode':Object[a424_0xaa4937(0x8e)]({'nodeId':'18','fieldName':a424_0xaa4937(0xb4),'description':'高度'}),'promptNode':Object[a424_0xaa4937(0x8e)]({'nodeId':'53','fieldName':a424_0xaa4937(0xb4),'description':a424_0xaa4937(0xc2)}),'referenceVideoNode':Object['freeze']({'nodeId':a424_0xaa4937(0xbb),'fieldName':'video','description':a424_0xaa4937(0x8f)})}});function a424_0x591b(){const _0x5d9b5a=['|\x20`vrc2v视频区域控制到视频`\x20|\x20源视频+区域控制，适用于主体位置、动作或局部区域控制。\x20|\x20将视频主体移动到指定区域，保持主体身份、服装、背景、镜头构图和光照不变。\x20|','value','aspectRatio','vi2v','ads2v','r2v参考主体到视频：用参考图像锁定主体外观，更适合主体一致性要求高的生成。','includes','21:9','100','30eQxNZR','rv2v','|\x20`ads2v广告插入到视频`\x20|\x20源视频+参考视频，适用于屏幕、广告牌、电视、手机等视频内容插入。\x20|\x20把参考视频添加到源视频里的电脑屏幕上，匹配屏幕透视、亮度、反光和运动效果。\x20|','1959513DVirxi','i2v图片生视频：用参考图像作为画面主体或首帧，按提示词生成动态视频。','sourceVideo','提示词','rv2v参考视频到视频：源视频加参考图像，适合用参考主体或风格约束视频编辑。','5884472rxOuxl','9:16','24帧','参考图像','15917382VaZoQI','r2v','segmented','videoParams','referenceVideo','529328HxZnsz','runninghub/2062515720147259393','image','4:3','resolution','v2v','vi2v视频指令到视频：源视频加参考图像，按提示词做指令式视频编辑。','videoVideo','rhBerniniInputMode','1213833IkKpLh','runninghubBerniniVideoReplaceV1','2:3','1:1','i2v图片生视频','分辨率','1:2','2062515720147259393','5:4','1280','video_edit.pro','|\x20`vi2v视频指令到视频`\x20|\x20源视频+图像，适用于内容传播、参考插入、参考替换。\x20|\x20将参考图片中的人物自然融合到源视频中，保持原视频的镜头运动、光照、透视和背景不变。\x20|','|\x20`v2v视频到视频`\x20|\x20源视频，适用于普通视频编辑、局部增删改。\x20|\x20在源视频中添加一个雪人，保持原视频其他内容、镜头、光照和动作不变。\x20|','vrc2v视频区域控制到视频：源视频加参考图像，适合带区域控制诉求的视频编辑。','278425odeuCT','2:1','rv2v参考视频到视频','videoImage','rhVideoFps','功能选择','各种功能的用法说明','模式选择','runninghub.workflow.video-bernini-v1.v1','rhVideoResolution','|\x20`t2v文本到视频`\x20|\x20无入参，适用于纯文本生成视频。\x20|\x20一只白色北极熊坐在雪地上弹吉他，雪花飘落，镜头稳定，动作自然。\x20|','rhVideoFrames','1504792uVnWzT','freeze','参考视频（仅仅ads2v才需要）','121','30帧','16:9','join','1024','ads2v广告插入到视频：源视频加参考视频，适合把广告或参考视频内容插入到源视频。','force_rate','openapi-v2-query','mv2v多维编辑到视频：基于源视频做更复杂的多维度编辑和画面调整。','3:2','1440','none','自适应','新全能视频替换BERNINI\x20V1','16帧','3:4','|\x20任务类型\x20|\x20使用方法\x20|\x20提示词示例\x20|','video_edit_v54','参考视频','refImage','vi2v视频指令到视频','stepper','mv2v','mv2v多维编辑到视频','v2v视频到视频','video','berniniVideoReplaceInputMode','map','|\x20`i2v图片到视频`\x20|\x20图像，适用于图片动态化、首帧生视频。\x20|\x20根据输入图片生成视频，保持主体外观不变，让主体产生自然轻微动作。\x20|','30VMnBwm','9:21','832','i2v','vrc2v','4:5'];a424_0x591b=function(){return _0x5d9b5a;};return a424_0x591b();}
+import {
+  RH_INSTANCE_FIELD,
+  createRunningHubVideoExecutionManifest,
+  createRunningHubVideoModelManifest,
+} from '../../shared/runningHubVideoManifestShared.js';
+export const RH_VIDEO_BERNINI_V1_MODEL_ID = 'runninghub/2062515720147259393';
+export const RH_VIDEO_BERNINI_V1_EXECUTION_ID = 'runninghub.workflow.video-bernini-v1.v1';
+const RH_BERNINI_FUNCTION_BY_INPUT_MODE = Object.freeze({
+    image: Object.freeze(['i2v', 'r2v']),
+    video: Object.freeze(['v2v', 'mv2v']),
+    videoImage: Object.freeze(['vi2v', 'rv2v', 'vrc2v']),
+    videoVideo: Object.freeze(['ads2v']),
+  }),
+  RH_BERNINI_FUNCTION_LABELS = Object.freeze({
+    i2v: 'i2v图片生视频',
+    r2v: 'r2v参考主体到视频',
+    v2v: 'v2v视频到视频',
+    mv2v: 'mv2v多维编辑到视频',
+    vi2v: 'vi2v视频指令到视频',
+    rv2v: 'rv2v参考视频到视频',
+    vrc2v: 'vrc2v视频区域控制到视频',
+    ads2v: 'ads2v广告插入到视频',
+  }),
+  RH_BERNINI_FUNCTION_HELP = Object.freeze({
+    t2v: 't2v文本到视频：只输入提示词，适合从文字直接生成完整视频。',
+    i2v: 'i2v图片生视频：用参考图像作为画面主体或首帧，按提示词生成动态视频。',
+    r2v: 'r2v参考主体到视频：用参考图像锁定主体外观，更适合主体一致性要求高的生成。',
+    v2v: 'v2v视频到视频：基于源视频改风格、改内容或重绘整体画面。',
+    mv2v: 'mv2v多维编辑到视频：基于源视频做更复杂的多维度编辑和画面调整。',
+    vi2v: 'vi2v视频指令到视频：源视频加参考图像，按提示词做指令式视频编辑。',
+    rv2v: 'rv2v参考视频到视频：源视频加参考图像，适合用参考主体或风格约束视频编辑。',
+    vrc2v: 'vrc2v视频区域控制到视频：源视频加参考图像，适合带区域控制诉求的视频编辑。',
+    ads2v: 'ads2v广告插入到视频：源视频加参考视频，适合把广告或参考视频内容插入到源视频。',
+  });
+function buildFunctionHelp(..._0x5282fa) {
+  return _0x5282fa.map((_0x4ecae4) => RH_BERNINI_FUNCTION_HELP[_0x4ecae4]).join('\n');
+}
+const RH_BERNINI_USAGE_TABLE = Object.freeze([
+  '| 任务类型 | 使用方法 | 提示词示例 |',
+  '|---|---|---|',
+  '| `t2v文本到视频` | 无入参，适用于纯文本生成视频。 | 一只白色北极熊坐在雪地上弹吉他，雪花飘落，镜头稳定，动作自然。 |',
+  '| `i2v图片到视频` | 图像，适用于图片动态化、首帧生视频。 | 根据输入图片生成视频，保持主体外观不变，让主体产生自然轻微动作。 |',
+  '| `v2v视频到视频` | 源视频，适用于普通视频编辑、局部增删改。 | 在源视频中添加一个雪人，保持原视频其他内容、镜头、光照和动作不变。 |',
+  '| `r2v参考主体到视频` | 图像，适用于参考主体、服装、物体或场景生成视频。 | 让参考图中的主体坐在海边长椅上，随着音乐轻轻摇摆，保持主体外观一致。 |',
+  '| `vi2v视频指令到视频` | 源视频+图像，适用于内容传播、参考插入、参考替换。 | 将参考图片中的人物自然融合到源视频中，保持原视频的镜头运动、光照、透视和背景不变。 |',
+  '| `rv2v参考视频到视频` | 源视频+图像，适用于主体替换、服装替换、物体替换、风格参考。 | 把视频中人物的外套替换成参考图片里的衣服，保持人物动作、脸部、背景和光照不变。 |',
+  '| `ads2v广告插入到视频` | 源视频+参考视频，适用于屏幕、广告牌、电视、手机等视频内容插入。 | 把参考视频添加到源视频里的电脑屏幕上，匹配屏幕透视、亮度、反光和运动效果。 |',
+  '| `vrc2v视频区域控制到视频` | 源视频+区域控制，适用于主体位置、动作或局部区域控制。 | 将视频主体移动到指定区域，保持主体身份、服装、背景、镜头构图和光照不变。 |',
+  '| `mv2v多维编辑到视频` | 源视频，适用于动作、姿势、风格、光照、颜色、纹理编辑。 | 改变人物动作，让人物自然蹲下，保持同一个人物、服装、场景、光照和镜头一致。 |',
+]);
+export const RH_VIDEO_BERNINI_V1_HELP_TOOLTIP = ['各种功能的用法说明', '', ...RH_BERNINI_USAGE_TABLE].join(
+  '\n',
+);
+const RH_BERNINI_FUNCTION_OPTIONS = Object.freeze([
+    Object.freeze({ value: 'i2v', label: RH_BERNINI_FUNCTION_LABELS.i2v }),
+    Object.freeze({ value: 'r2v', label: RH_BERNINI_FUNCTION_LABELS.r2v }),
+    Object.freeze({ value: 'v2v', label: RH_BERNINI_FUNCTION_LABELS.v2v }),
+    Object.freeze({ value: 'mv2v', label: RH_BERNINI_FUNCTION_LABELS.mv2v }),
+    Object.freeze({ value: 'vi2v', label: RH_BERNINI_FUNCTION_LABELS.vi2v }),
+    Object.freeze({ value: 'rv2v', label: RH_BERNINI_FUNCTION_LABELS.rv2v }),
+    Object.freeze({ value: 'vrc2v', label: RH_BERNINI_FUNCTION_LABELS.vrc2v }),
+    Object.freeze({ value: 'ads2v', label: RH_BERNINI_FUNCTION_LABELS.ads2v }),
+  ]),
+  RH_BERNINI_INPUT_MODES = Object.freeze(['none', 'image', 'video', 'videoImage', 'videoVideo']),
+  RH_BERNINI_RATIO_OPTIONS = Object.freeze([
+    Object.freeze({ value: '自适应', label: '自适应' }),
+    Object.freeze({ value: '1:1', label: '1:1' }),
+    Object.freeze({ value: '16:9', label: '16:9' }),
+    Object.freeze({ value: '9:16', label: '9:16' }),
+    Object.freeze({ value: '4:3', label: '4:3' }),
+    Object.freeze({ value: '3:4', label: '3:4' }),
+    Object.freeze({ value: '3:2', label: '3:2' }),
+    Object.freeze({ value: '2:3', label: '2:3' }),
+    Object.freeze({ value: '21:9', label: '21:9' }),
+    Object.freeze({ value: '9:21', label: '9:21' }),
+    Object.freeze({ value: '5:4', label: '5:4' }),
+    Object.freeze({ value: '4:5', label: '4:5' }),
+    Object.freeze({ value: '2:1', label: '2:1' }),
+    Object.freeze({ value: '1:2', label: '1:2' }),
+  ]);
+export const rhVideoBerniniV1ModelManifest = createRunningHubVideoModelManifest({
+  modelId: RH_VIDEO_BERNINI_V1_MODEL_ID,
+  executionId: RH_VIDEO_BERNINI_V1_EXECUTION_ID,
+  displayName: '新全能视频替换BERNINI V1',
+  description: '支持文本、图片、源视频、参考视频组合的全能视频替换工作流',
+  vip: true,
+  subscriptionAliases: ['video_edit_v54', 'video_edit.pro'],
+  help: Object.freeze({
+    tooltip: RH_VIDEO_BERNINI_V1_HELP_TOOLTIP,
+    variants: Object.freeze([
+      Object.freeze({
+        when: Object.freeze({ field: 'rhBerniniInputMode', value: 'none' }),
+        tooltip: RH_VIDEO_BERNINI_V1_HELP_TOOLTIP,
+      }),
+      Object.freeze({
+        when: Object.freeze({ field: 'rhBerniniInputMode', value: 'image' }),
+        tooltip: RH_VIDEO_BERNINI_V1_HELP_TOOLTIP,
+      }),
+      Object.freeze({
+        when: Object.freeze({ field: 'rhBerniniInputMode', value: 'video' }),
+        tooltip: RH_VIDEO_BERNINI_V1_HELP_TOOLTIP,
+      }),
+      Object.freeze({
+        when: Object.freeze({ field: 'rhBerniniInputMode', value: 'videoImage' }),
+        tooltip: RH_VIDEO_BERNINI_V1_HELP_TOOLTIP,
+      }),
+      Object.freeze({
+        when: Object.freeze({ field: 'rhBerniniInputMode', value: 'videoVideo' }),
+        tooltip: RH_VIDEO_BERNINI_V1_HELP_TOOLTIP,
+      }),
+    ]),
+  }),
+  extensions: Object.freeze({
+    vipAliases: Object.freeze(['video_edit_v54', 'video_edit.pro']),
+    videoParameterPanel: Object.freeze({
+      fixedSlotSummary: Object.freeze({
+        resolver: 'berniniVideoReplaceInputMode',
+        field: 'rhBerniniInputMode',
+      }),
+    }),
+  }),
+  fixedAssetSlots: ['sourceVideo', 'refImage', 'referenceVideo'],
+  inputSlots: {
+    allowedKinds: ['text', 'image', 'video'],
+    minByKind: { image: 0, video: 0 },
+    maxByKind: { text: 1, image: 1, video: 2, audio: 0 },
+    fixedSlots: Object.freeze([
+      Object.freeze({ id: 'sourceVideo', kind: 'video', label: '源视频', required: false, displayOrder: 0 }),
+      Object.freeze({ id: 'refImage', kind: 'image', label: '参考图像', required: false, displayOrder: 1 }),
+      Object.freeze({
+        id: 'referenceVideo',
+        kind: 'video',
+        label: '参考视频',
+        required: false,
+        displayOrder: 2,
+      }),
+    ]),
+  },
+  uiFields: [
+    Object.freeze({
+      id: 'rhBerniniFunction',
+      type: 'segmented',
+      placement: 'videoParams',
+      variant: 'pillMenu',
+      label: '功能选择',
+      menuTitle: '功能选择',
+      menuTooltipField: 'rhBerniniInputMode',
+      menuTooltipByValue: Object.freeze({
+        image: ['各种功能的用法说明', buildFunctionHelp('i2v', 'r2v')].join('\n'),
+        video: ['各种功能的用法说明', buildFunctionHelp('v2v', 'mv2v')].join('\n'),
+        videoImage: ['各种功能的用法说明', buildFunctionHelp('vi2v', 'rv2v', 'vrc2v')].join('\n'),
+        videoVideo: ['各种功能的用法说明', buildFunctionHelp('ads2v')].join('\n'),
+      }),
+      defaultValue: 'i2v',
+      showWhen: Object.freeze({
+        field: 'rhBerniniInputMode',
+        values: Object.freeze(['image', 'video', 'videoImage']),
+      }),
+      options: RH_BERNINI_FUNCTION_OPTIONS.map((_0x395bb6) => {
+        const _0xb2b052 = Object.entries(RH_BERNINI_FUNCTION_BY_INPUT_MODE)
+          .filter(([, _0x2a2898]) => _0x2a2898.includes(_0x395bb6.value))
+          .map(([_0x47f045]) => _0x47f045);
+        return Object.freeze({
+          ..._0x395bb6,
+          hideWhen: Object.freeze({
+            field: 'rhBerniniInputMode',
+            values: Object.freeze(
+              RH_BERNINI_INPUT_MODES.filter((_0x646a1c) => !_0xb2b052.includes(_0x646a1c)),
+            ),
+          }),
+        });
+      }),
+    }),
+    Object.freeze({
+      id: 'rhVideoResolution',
+      type: 'segmented',
+      placement: 'videoParams',
+      displayRole: 'resolution',
+      label: '分辨率',
+      defaultValue: 0x340,
+      options: Object.freeze([
+        Object.freeze({ value: 0x340, label: '832' }),
+        Object.freeze({ value: 0x400, label: '1024' }),
+        Object.freeze({ value: 0x500, label: '1280' }),
+        Object.freeze({ value: 0x5a0, label: '1440' }),
+      ]),
+    }),
+    Object.freeze({
+      id: 'rhVideoFps',
+      type: 'segmented',
+      placement: 'videoParams',
+      label: '帧率',
+      defaultValue: 24,
+      options: Object.freeze([
+        Object.freeze({ value: 16, label: '16帧' }),
+        Object.freeze({ value: 24, label: '24帧' }),
+        Object.freeze({ value: 30, label: '30帧' }),
+      ]),
+    }),
+    Object.freeze({
+      id: 'rhVideoFrames',
+      type: 'stepper',
+      placement: 'videoParams',
+      label: '帧数',
+      defaultValue: 121,
+      min: 0,
+      max: 0xf423f,
+      step: 1,
+    }),
+    Object.freeze({
+      id: 'rhBerniniAspectRatio',
+      type: 'segmented',
+      placement: 'videoParams',
+      displayRole: 'aspectRatio',
+      label: '比例',
+      defaultValue: '自适应',
+      options: RH_BERNINI_RATIO_OPTIONS,
+    }),
+    RH_INSTANCE_FIELD,
+  ],
+});
+export const rhVideoBerniniV1ExecutionManifest = createRunningHubVideoExecutionManifest({
+  id: RH_VIDEO_BERNINI_V1_EXECUTION_ID,
+  label: '新全能视频替换BERNINI V1',
+  workflowId: '2062515720147259393',
+  submitMode: 'openapi-v2-ai-app',
+  queryMode: 'openapi-v2-query',
+  extensions: Object.freeze({ payloadResolver: 'runninghubBerniniVideoReplaceV1' }),
+  mapping: {
+    sourceVideoNode: Object.freeze({ nodeId: '31', fieldName: 'video', description: '上传源视频' }),
+    refImageNode: Object.freeze({ nodeId: '32', fieldName: 'image', description: '参考图' }),
+    modeNode: Object.freeze({ nodeId: '34', fieldName: 'value', description: '模式选择' }),
+    fpsNode: Object.freeze({ nodeId: '31', fieldName: 'force_rate', value: '24', description: '帧率' }),
+    framesNode: Object.freeze({ nodeId: '19', fieldName: 'value', value: '121', description: '帧数' }),
+    widthNode: Object.freeze({ nodeId: '17', fieldName: 'value', description: '宽度' }),
+    heightNode: Object.freeze({ nodeId: '18', fieldName: 'value', description: '高度' }),
+    promptNode: Object.freeze({ nodeId: '53', fieldName: 'value', description: '提示词' }),
+    referenceVideoNode: Object.freeze({
+      nodeId: '100',
+      fieldName: 'video',
+      description: '参考视频（仅仅ads2v才需要）',
+    }),
+  },
+});

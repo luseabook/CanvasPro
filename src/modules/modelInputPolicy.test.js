@@ -1,1 +1,416 @@
-const a559_0x1a8c02=a559_0x453a;(function(_0x2c380a,_0x5dffc9){const _0xfadf27=a559_0x453a,_0x5d8fd2=_0x2c380a();while(!![]){try{const _0x1242a2=-parseInt(_0xfadf27(0x139))/0x1+parseInt(_0xfadf27(0x151))/0x2*(parseInt(_0xfadf27(0x164))/0x3)+parseInt(_0xfadf27(0x168))/0x4*(parseInt(_0xfadf27(0x178))/0x5)+-parseInt(_0xfadf27(0x181))/0x6+parseInt(_0xfadf27(0x17a))/0x7*(parseInt(_0xfadf27(0x180))/0x8)+-parseInt(_0xfadf27(0x12b))/0x9+parseInt(_0xfadf27(0x152))/0xa;if(_0x1242a2===_0x5dffc9)break;else _0x5d8fd2['push'](_0x5d8fd2['shift']());}catch(_0x4a3b85){_0x5d8fd2['push'](_0x5d8fd2['shift']());}}}(a559_0x7b49,0x56e01));function a559_0x453a(_0x9f72ef,_0x1508b9){const _0x7b49fe=a559_0x7b49();return a559_0x453a=function(_0x453a15,_0x57c799){_0x453a15=_0x453a15-0x126;let _0x4c4e96=_0x7b49fe[_0x453a15];return _0x4c4e96;},a559_0x453a(_0x9f72ef,_0x1508b9);}import a559_0x48a6f8 from'node:test';import a559_0x304c22 from'node:assert/strict';import{PERSON_REPLACE_V21_MODEL_ID,PERSON_REPLACE_V3_MODEL_ID,registerManifestBundle}from'../manifests/index.js';import{getTargetInputPolicy,hasUsableInputNodeSource,isInputKindAllowed,isRhPersonReplaceWorkflowModel}from'./modelInputPolicy.js';function createTwoSlotWorkflowExecution(_0x419e76={}){const _0x2f66f1=a559_0x453a;return{'schemaVersion':_0x2f66f1(0x127),'id':_0x2f66f1(0x12e),'provider':_0x2f66f1(0x12a),'kind':_0x2f66f1(0x126),'adapterType':_0x2f66f1(0x145),'workflowId':_0x2f66f1(0x13a),'submitMode':_0x2f66f1(0x131),'queryMode':_0x2f66f1(0x17f),'mapping':{'imageNodes':['1','2']},'result':{'imagePaths':[_0x2f66f1(0x16e)]},..._0x419e76};}function a559_0x7b49(){const _0x229f0d=['grok-imagine','apimart/kling-v3-omni','-input-target','apimart/happyhorse-1.0','video','647806jxWESZ','plugin-two-slot-image-workflow','kling-o1','model\x20input\x20policy:\x20person\x20replace\x20capability\x20requires\x20matching\x20image\x20input\x20slots','plugin/test-two-slot-image-workflow','maxByKind','model-input-policy-test-two-slot-image','wan27','veo3-reference','storyboard-script','model\x20input\x20policy:\x20video\x20sources\x20with\x20display\x20local\x20paths\x20are\x20usable\x20inputs','seedance-2','workflow','vidu-q3','Style\x20image','reference','display-video','model\x20input\x20policy:\x20VEO3\x20reference\x20mode\x20keeps\x20generic\x203\x20image\x20inputs','model\x20input\x20policy:\x20source\x20video\x20result\x20collections\x20fall\x20back\x20to\x20top-level\x20media','model\x20input\x20policy:\x20RunningHub\x20Seedance\x202.0\x20media\x20inputs\x20follow\x20mode','model\x20input\x20policy:\x20storyboard\x20nodes\x20accept\x20text\x20image\x20and\x20video\x20inputs','apimart/omni-flash-ext','text','ai-video','562294bpPyLe','10498690nMzssh','equal','replacedImage','ai-text','audio','model\x20input\x20policy:\x20Grok\x20Imagine\x20uses\x20manifest\x20image-only\x20limit','plugin-bad-person-replace-workflow','wan2.7','modelId','model\x20input\x20policy:\x20generic\x20two\x20image\x20fixed-slot\x20workflows\x20are\x20not\x20person\x20replace','model\x20input\x20policy:\x20Wan2.7\x20media\x20inputs\x20follow\x20image/video\x20mode','video-keying','runninghub-model/seedance-2.0','apimartr','replaceTarget','model\x20input\x20policy:\x20Volcengine\x20Seedance\x202.0\x20media\x20inputs\x20follow\x20mode','model\x20input\x20policy:\x20person\x20replace\x20manifests\x20keep\x20dedicated\x20fixed\x20slot\x20behavior','apimart-text','6KZFTsC','data/assets/display.mp4','runninghub-model/happyhorse-1.0','runninghub/video_matting','1316aXhUyh','image2video','plugin.test.bad-person-replace.workflow.v1','viduq3','Test\x20Two\x20Slot\x20Image\x20Workflow','fast','results[].url','apimart/kling-video-o1','apimart/gemini-3.1-pro-preview','model\x20input\x20policy:\x20Kling\x20O1\x20uses\x20manifest\x20image\x20and\x20video\x20limits','success','apimart/veo3-fast','happyhorse','model\x20input\x20policy:\x20Kling\x20V3\x20Omni\x20media\x20inputs\x20follow\x20selected\x20mode','model\x20input\x20policy:\x20HappyHorse\x20media\x20inputs\x20follow\x20the\x20selected\x20mode','sourceImage','5165MIsgCb','volcengine','7otqOSM','kling-omni','model\x20input\x20policy:\x20Gemini\x20Omni\x20Flash\x20uses\x20manifest\x20image\x20and\x20video\x20limits','storyboard','frames2video','openapi-v2-query','224504RNSjBQ','3654108YjXUQJ','image','1.0','apimart','runninghub','runninghubwf','3306762auQLuU','volcengine/seedance-2.0-fast','source-video','plugin.test.two-slot-image.workflow.v1','edit','plugin/test-bad-person-replace-slots','openapi-v2-ai-app','apimart/wan2.7','styleImage'];a559_0x7b49=function(){return _0x229f0d;};return a559_0x7b49();}function createTwoSlotWorkflowModel(_0x3e89ec={}){const _0xe4c173=a559_0x453a;return{'schemaVersion':_0xe4c173(0x127),'modelId':_0xe4c173(0x13d),'provider':_0xe4c173(0x12a),'kind':'image','adapterType':_0xe4c173(0x145),'executionId':_0xe4c173(0x12e),'displayName':_0xe4c173(0x16c),'uiSchema':{'fields':[]},'inputSlots':{'allowedKinds':[_0xe4c173(0x14f),'image'],'minByKind':{'image':0x2},'maxByKind':{'image':0x2,'video':0x0,'audio':0x0},'fixedSlots':[{'id':_0xe4c173(0x177),'kind':_0xe4c173(0x126),'label':'Source\x20image','required':!![]},{'id':_0xe4c173(0x133),'kind':_0xe4c173(0x126),'label':_0xe4c173(0x147),'required':!![]}]},'outputType':_0xe4c173(0x126),..._0x3e89ec};}a559_0x48a6f8(a559_0x1a8c02(0x162),()=>{a559_0x304c22['equal'](isRhPersonReplaceWorkflowModel(PERSON_REPLACE_V21_MODEL_ID),!![]),a559_0x304c22['equal'](isRhPersonReplaceWorkflowModel(PERSON_REPLACE_V3_MODEL_ID),!![]);}),a559_0x48a6f8(a559_0x1a8c02(0x15b),()=>{const _0x2331d7=a559_0x1a8c02,_0x4f6d44=createTwoSlotWorkflowExecution(),_0x5b2135=createTwoSlotWorkflowModel();registerManifestBundle({'sourceId':_0x2331d7(0x13f),'executions':[_0x4f6d44],'models':[_0x5b2135]}),a559_0x304c22['equal'](isRhPersonReplaceWorkflowModel(_0x5b2135['modelId']),![]);}),a559_0x48a6f8(a559_0x1a8c02(0x13c),()=>{const _0x504cdf=a559_0x1a8c02,_0x32f819=createTwoSlotWorkflowExecution({'id':_0x504cdf(0x16a),'workflowId':_0x504cdf(0x158)}),_0x1e8144=createTwoSlotWorkflowModel({'modelId':_0x504cdf(0x130),'executionId':_0x32f819['id'],'capabilities':{'fixedImageSlots':[_0x504cdf(0x160),_0x504cdf(0x154)]},'inputSlots':{'allowedKinds':[_0x504cdf(0x14f),'image'],'minByKind':{'image':0x1},'maxByKind':{'image':0x2,'video':0x0,'audio':0x0},'fixedSlots':[{'id':_0x504cdf(0x160),'kind':_0x504cdf(0x126),'required':!![]},{'id':_0x504cdf(0x154),'kind':_0x504cdf(0x138),'required':![]}]}});registerManifestBundle({'sourceId':'model-input-policy-test-bad-person-replace-slots','executions':[_0x32f819],'models':[_0x1e8144]}),a559_0x304c22[_0x504cdf(0x153)](isRhPersonReplaceWorkflowModel(_0x1e8144[_0x504cdf(0x15a)]),![]);}),a559_0x48a6f8(a559_0x1a8c02(0x143),()=>{const _0x5cc41b=a559_0x1a8c02;a559_0x304c22[_0x5cc41b(0x153)](hasUsableInputNodeSource({'id':_0x5cc41b(0x149),'type':_0x5cc41b(0x12d),'displayLocalPath':'data/assets/display.mp4'}),!![]),a559_0x304c22[_0x5cc41b(0x153)](hasUsableInputNodeSource({'id':'display-video-missing','type':_0x5cc41b(0x12d),'displayLocalPath':_0x5cc41b(0x165),'mediaUnavailable':!![],'mediaUnavailableSource':_0x5cc41b(0x165)}),![]);}),a559_0x48a6f8(a559_0x1a8c02(0x14b),()=>{const _0x3f8c5c=a559_0x1a8c02;a559_0x304c22[_0x3f8c5c(0x153)](hasUsableInputNodeSource({'id':'keyed-video','type':'source-video','localPath':'output/keyed.mp4','videoUrl':'/output/keyed.mp4','videos':[{'thumbUrl':''}],'model':_0x3f8c5c(0x167),'rhToolbarTaskType':_0x3f8c5c(0x15d),'jobStatus':_0x3f8c5c(0x172),'isGenerating':![]}),!![]);}),a559_0x48a6f8('model\x20input\x20policy:\x20APIMart\x20text\x20models\x20use\x20GPT\x20image-only\x20media\x20inputs',()=>{const _0x19f5ee=a559_0x1a8c02,_0x2fe8b6=getTargetInputPolicy({'id':_0x19f5ee(0x163),'type':_0x19f5ee(0x155),'model':_0x19f5ee(0x170),'provider':'apimart'});a559_0x304c22[_0x19f5ee(0x153)](isInputKindAllowed(_0x2fe8b6,_0x19f5ee(0x14f)),!![]),a559_0x304c22[_0x19f5ee(0x153)](isInputKindAllowed(_0x2fe8b6,'image'),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x2fe8b6,_0x19f5ee(0x138)),![]),a559_0x304c22['equal'](isInputKindAllowed(_0x2fe8b6,_0x19f5ee(0x156)),![]),a559_0x304c22['equal'](_0x2fe8b6[_0x19f5ee(0x13e)][_0x19f5ee(0x138)],0x0),a559_0x304c22[_0x19f5ee(0x153)](_0x2fe8b6[_0x19f5ee(0x13e)][_0x19f5ee(0x156)],0x0);}),a559_0x48a6f8(a559_0x1a8c02(0x14d),()=>{const _0x3f85a5=a559_0x1a8c02;for(const _0x51da2a of[_0x3f85a5(0x17d),_0x3f85a5(0x142)]){const _0x34a414=getTargetInputPolicy({'id':_0x51da2a+_0x3f85a5(0x136),'type':_0x51da2a});a559_0x304c22[_0x3f85a5(0x153)](isInputKindAllowed(_0x34a414,_0x3f85a5(0x14f)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x34a414,'image'),!![]),a559_0x304c22[_0x3f85a5(0x153)](isInputKindAllowed(_0x34a414,_0x3f85a5(0x138)),!![]),a559_0x304c22[_0x3f85a5(0x153)](isInputKindAllowed(_0x34a414,'audio'),![]),a559_0x304c22[_0x3f85a5(0x153)](_0x34a414[_0x3f85a5(0x13e)][_0x3f85a5(0x156)],0x0);}}),a559_0x48a6f8(a559_0x1a8c02(0x176),()=>{const _0x4521f9=a559_0x1a8c02,_0x482ffa={'id':_0x4521f9(0x174),'type':_0x4521f9(0x150),'model':_0x4521f9(0x137),'provider':_0x4521f9(0x128)},_0x4915e1=getTargetInputPolicy(_0x482ffa);a559_0x304c22[_0x4521f9(0x153)](isInputKindAllowed(_0x4915e1,'image'),![]),a559_0x304c22[_0x4521f9(0x153)](isInputKindAllowed(_0x4915e1,'video'),![]);const _0x31d7d7=getTargetInputPolicy({..._0x482ffa,'generationParams':{'happyhorse_mode':_0x4521f9(0x126)}});a559_0x304c22['equal'](isInputKindAllowed(_0x31d7d7,_0x4521f9(0x126)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x31d7d7,_0x4521f9(0x138)),![]),a559_0x304c22[_0x4521f9(0x153)](_0x31d7d7[_0x4521f9(0x13e)]['image'],0x1);const _0x408fcc=getTargetInputPolicy({..._0x482ffa,'generationParams':{'happyhorse_mode':_0x4521f9(0x148)}});a559_0x304c22[_0x4521f9(0x153)](isInputKindAllowed(_0x408fcc,_0x4521f9(0x126)),!![]),a559_0x304c22[_0x4521f9(0x153)](isInputKindAllowed(_0x408fcc,_0x4521f9(0x138)),![]),a559_0x304c22['equal'](_0x408fcc['maxByKind']['image'],0x9);const _0x43b5da=getTargetInputPolicy({..._0x482ffa,'generationParams':{'happyhorse_mode':_0x4521f9(0x12f)}});a559_0x304c22[_0x4521f9(0x153)](isInputKindAllowed(_0x43b5da,'image'),!![]),a559_0x304c22[_0x4521f9(0x153)](isInputKindAllowed(_0x43b5da,_0x4521f9(0x138)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x43b5da,'audio'),![]),a559_0x304c22[_0x4521f9(0x153)](_0x43b5da['maxByKind'][_0x4521f9(0x126)],0x5),a559_0x304c22[_0x4521f9(0x153)](_0x43b5da[_0x4521f9(0x13e)]['video'],0x1);const _0xadb094=getTargetInputPolicy({..._0x482ffa,'model':_0x4521f9(0x166),'provider':_0x4521f9(0x129),'generationParams':{'happyhorse_mode':'reference'}});a559_0x304c22[_0x4521f9(0x153)](isInputKindAllowed(_0xadb094,_0x4521f9(0x126)),!![]),a559_0x304c22[_0x4521f9(0x153)](isInputKindAllowed(_0xadb094,'video'),![]),a559_0x304c22[_0x4521f9(0x153)](_0xadb094['maxByKind'][_0x4521f9(0x126)],0x9);}),a559_0x48a6f8(a559_0x1a8c02(0x14c),()=>{const _0x49d7ae=a559_0x1a8c02,_0x2d730a={'id':_0x49d7ae(0x144),'type':_0x49d7ae(0x150),'model':_0x49d7ae(0x15e),'provider':_0x49d7ae(0x129)},_0x3bf1e7=getTargetInputPolicy(_0x2d730a);a559_0x304c22[_0x49d7ae(0x153)](isInputKindAllowed(_0x3bf1e7,'text'),!![]),a559_0x304c22[_0x49d7ae(0x153)](isInputKindAllowed(_0x3bf1e7,_0x49d7ae(0x126)),![]),a559_0x304c22[_0x49d7ae(0x153)](isInputKindAllowed(_0x3bf1e7,_0x49d7ae(0x138)),![]),a559_0x304c22['equal'](isInputKindAllowed(_0x3bf1e7,_0x49d7ae(0x156)),![]),a559_0x304c22[_0x49d7ae(0x153)](_0x3bf1e7[_0x49d7ae(0x13e)][_0x49d7ae(0x126)],0x0),a559_0x304c22[_0x49d7ae(0x153)](_0x3bf1e7[_0x49d7ae(0x13e)]['video'],0x0),a559_0x304c22[_0x49d7ae(0x153)](_0x3bf1e7[_0x49d7ae(0x13e)][_0x49d7ae(0x156)],0x0);const _0x47f6c9=getTargetInputPolicy({..._0x2d730a,'generationParams':{'rh_seedance_2_mode':_0x49d7ae(0x169)}});a559_0x304c22[_0x49d7ae(0x153)](isInputKindAllowed(_0x47f6c9,_0x49d7ae(0x14f)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x47f6c9,_0x49d7ae(0x126)),!![]),a559_0x304c22[_0x49d7ae(0x153)](isInputKindAllowed(_0x47f6c9,_0x49d7ae(0x138)),![]),a559_0x304c22[_0x49d7ae(0x153)](isInputKindAllowed(_0x47f6c9,_0x49d7ae(0x156)),![]),a559_0x304c22[_0x49d7ae(0x153)](_0x47f6c9['maxByKind'][_0x49d7ae(0x126)],0x1),a559_0x304c22[_0x49d7ae(0x153)](_0x47f6c9['maxByKind']['video'],0x0),a559_0x304c22[_0x49d7ae(0x153)](_0x47f6c9[_0x49d7ae(0x13e)][_0x49d7ae(0x156)],0x0);const _0x113388=getTargetInputPolicy({..._0x2d730a,'generationParams':{'rh_seedance_2_mode':_0x49d7ae(0x17e)}});a559_0x304c22['equal'](isInputKindAllowed(_0x113388,_0x49d7ae(0x14f)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x113388,_0x49d7ae(0x126)),!![]),a559_0x304c22[_0x49d7ae(0x153)](isInputKindAllowed(_0x113388,_0x49d7ae(0x138)),![]),a559_0x304c22['equal'](isInputKindAllowed(_0x113388,'audio'),![]),a559_0x304c22[_0x49d7ae(0x153)](_0x113388['maxByKind']['image'],0x2),a559_0x304c22[_0x49d7ae(0x153)](_0x113388[_0x49d7ae(0x13e)][_0x49d7ae(0x138)],0x0),a559_0x304c22['equal'](_0x113388[_0x49d7ae(0x13e)]['audio'],0x0);const _0xf2be0b=getTargetInputPolicy({..._0x2d730a,'generationParams':{'rh_seedance_2_mode':'multimodal2video'}});a559_0x304c22['equal'](isInputKindAllowed(_0xf2be0b,_0x49d7ae(0x14f)),!![]),a559_0x304c22[_0x49d7ae(0x153)](isInputKindAllowed(_0xf2be0b,_0x49d7ae(0x126)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0xf2be0b,_0x49d7ae(0x138)),!![]),a559_0x304c22[_0x49d7ae(0x153)](isInputKindAllowed(_0xf2be0b,_0x49d7ae(0x156)),!![]),a559_0x304c22[_0x49d7ae(0x153)](_0xf2be0b[_0x49d7ae(0x13e)][_0x49d7ae(0x126)],0x9),a559_0x304c22['equal'](_0xf2be0b[_0x49d7ae(0x13e)][_0x49d7ae(0x138)],0x3),a559_0x304c22[_0x49d7ae(0x153)](_0xf2be0b['maxByKind'][_0x49d7ae(0x156)],0x3);}),a559_0x48a6f8(a559_0x1a8c02(0x161),()=>{const _0x2c42ae=a559_0x1a8c02,_0x1c47ef={'id':'volcengine-seedance-2','type':_0x2c42ae(0x150),'model':_0x2c42ae(0x12c),'provider':_0x2c42ae(0x179)},_0x8ef30b=getTargetInputPolicy(_0x1c47ef);a559_0x304c22['equal'](isInputKindAllowed(_0x8ef30b,'text'),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x8ef30b,_0x2c42ae(0x126)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x8ef30b,_0x2c42ae(0x138)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x8ef30b,_0x2c42ae(0x156)),!![]),a559_0x304c22['equal'](_0x8ef30b['maxByKind'][_0x2c42ae(0x126)],0x9),a559_0x304c22[_0x2c42ae(0x153)](_0x8ef30b[_0x2c42ae(0x13e)][_0x2c42ae(0x138)],0x3),a559_0x304c22[_0x2c42ae(0x153)](_0x8ef30b['maxByKind']['audio'],0x3);const _0x4f30d7=getTargetInputPolicy({..._0x1c47ef,'generationParams':{'dreaminaRouteMode':_0x2c42ae(0x17e)}});a559_0x304c22[_0x2c42ae(0x153)](isInputKindAllowed(_0x4f30d7,_0x2c42ae(0x126)),!![]),a559_0x304c22[_0x2c42ae(0x153)](isInputKindAllowed(_0x4f30d7,'video'),![]),a559_0x304c22['equal'](_0x4f30d7['maxByKind'][_0x2c42ae(0x126)],0x2);const _0x2218e2=getTargetInputPolicy({..._0x1c47ef,'generationParams':{'dreaminaRouteMode':'multimodal2video'}});a559_0x304c22[_0x2c42ae(0x153)](isInputKindAllowed(_0x2218e2,_0x2c42ae(0x126)),!![]),a559_0x304c22[_0x2c42ae(0x153)](isInputKindAllowed(_0x2218e2,_0x2c42ae(0x138)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x2218e2,'audio'),!![]),a559_0x304c22[_0x2c42ae(0x153)](_0x2218e2[_0x2c42ae(0x13e)][_0x2c42ae(0x126)],0x9),a559_0x304c22[_0x2c42ae(0x153)](_0x2218e2[_0x2c42ae(0x13e)][_0x2c42ae(0x138)],0x3),a559_0x304c22[_0x2c42ae(0x153)](_0x2218e2[_0x2c42ae(0x13e)][_0x2c42ae(0x156)],0x3),a559_0x304c22[_0x2c42ae(0x153)](isInputKindAllowed(_0x8ef30b,_0x2c42ae(0x14f)),!![]);}),a559_0x48a6f8(a559_0x1a8c02(0x14a),()=>{const _0x15237f=a559_0x1a8c02,_0x20cbff=getTargetInputPolicy({'id':_0x15237f(0x141),'type':_0x15237f(0x150),'model':_0x15237f(0x173),'provider':_0x15237f(0x128),'generationParams':{'mode':_0x15237f(0x16d),'generation_type':_0x15237f(0x148)}});a559_0x304c22[_0x15237f(0x153)](isInputKindAllowed(_0x20cbff,'text'),!![]),a559_0x304c22[_0x15237f(0x153)](isInputKindAllowed(_0x20cbff,'image'),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x20cbff,_0x15237f(0x138)),![]),a559_0x304c22[_0x15237f(0x153)](isInputKindAllowed(_0x20cbff,_0x15237f(0x156)),![]),a559_0x304c22[_0x15237f(0x153)](_0x20cbff['maxByKind'][_0x15237f(0x126)],0x3);}),a559_0x48a6f8('model\x20input\x20policy:\x20Vidu\x20Q3\x20media\x20inputs\x20follow\x20generation\x20mode',()=>{const _0x91e662=a559_0x1a8c02,_0x147d5e={'id':_0x91e662(0x146),'type':_0x91e662(0x150),'model':'apimart/viduq3','provider':_0x91e662(0x128)},_0x5844b2=getTargetInputPolicy(_0x147d5e);a559_0x304c22[_0x91e662(0x153)](isInputKindAllowed(_0x5844b2,_0x91e662(0x14f)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x5844b2,_0x91e662(0x126)),!![]),a559_0x304c22[_0x91e662(0x153)](isInputKindAllowed(_0x5844b2,_0x91e662(0x138)),![]),a559_0x304c22[_0x91e662(0x153)](isInputKindAllowed(_0x5844b2,_0x91e662(0x156)),![]),a559_0x304c22[_0x91e662(0x153)](_0x5844b2['maxByKind'][_0x91e662(0x126)],0x2);const _0x2d4754=getTargetInputPolicy({..._0x147d5e,'generationParams':{'vidu_q3_generation_mode':_0x91e662(0x148),'mode':_0x91e662(0x16b)}});a559_0x304c22[_0x91e662(0x153)](isInputKindAllowed(_0x2d4754,'text'),!![]),a559_0x304c22[_0x91e662(0x153)](isInputKindAllowed(_0x2d4754,_0x91e662(0x126)),!![]),a559_0x304c22[_0x91e662(0x153)](isInputKindAllowed(_0x2d4754,'video'),![]),a559_0x304c22[_0x91e662(0x153)](isInputKindAllowed(_0x2d4754,_0x91e662(0x156)),![]),a559_0x304c22[_0x91e662(0x153)](_0x2d4754[_0x91e662(0x13e)][_0x91e662(0x126)],0x7);}),a559_0x48a6f8(a559_0x1a8c02(0x157),()=>{const _0x1a6a7f=a559_0x1a8c02,_0x235790=getTargetInputPolicy({'id':_0x1a6a7f(0x134),'type':_0x1a6a7f(0x150),'model':'apimart/grok-imagine-1.0','provider':_0x1a6a7f(0x128)});a559_0x304c22[_0x1a6a7f(0x153)](isInputKindAllowed(_0x235790,'text'),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x235790,'image'),!![]),a559_0x304c22[_0x1a6a7f(0x153)](isInputKindAllowed(_0x235790,_0x1a6a7f(0x138)),![]),a559_0x304c22[_0x1a6a7f(0x153)](isInputKindAllowed(_0x235790,'audio'),![]),a559_0x304c22['equal'](_0x235790['maxByKind'][_0x1a6a7f(0x126)],0x7);}),a559_0x48a6f8(a559_0x1a8c02(0x17c),()=>{const _0x18b530=a559_0x1a8c02,_0x14aea6=getTargetInputPolicy({'id':'omni-flash','type':'ai-video','model':_0x18b530(0x14e),'provider':_0x18b530(0x128)});a559_0x304c22[_0x18b530(0x153)](isInputKindAllowed(_0x14aea6,_0x18b530(0x14f)),!![]),a559_0x304c22[_0x18b530(0x153)](isInputKindAllowed(_0x14aea6,'image'),!![]),a559_0x304c22[_0x18b530(0x153)](isInputKindAllowed(_0x14aea6,'video'),!![]),a559_0x304c22[_0x18b530(0x153)](isInputKindAllowed(_0x14aea6,_0x18b530(0x156)),![]),a559_0x304c22[_0x18b530(0x153)](_0x14aea6[_0x18b530(0x13e)]['image'],0x3),a559_0x304c22[_0x18b530(0x153)](_0x14aea6[_0x18b530(0x13e)][_0x18b530(0x138)],0x1);}),a559_0x48a6f8(a559_0x1a8c02(0x15c),()=>{const _0x1d6609=a559_0x1a8c02,_0x4fe100={'id':_0x1d6609(0x140),'type':_0x1d6609(0x150),'model':_0x1d6609(0x132),'provider':_0x1d6609(0x128)},_0xba1254=getTargetInputPolicy(_0x4fe100);a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0xba1254,_0x1d6609(0x14f)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0xba1254,_0x1d6609(0x126)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0xba1254,_0x1d6609(0x156)),!![]),a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0xba1254,'video'),![]),a559_0x304c22['equal'](_0xba1254[_0x1d6609(0x13e)]['image'],0x2),a559_0x304c22[_0x1d6609(0x153)](_0xba1254[_0x1d6609(0x13e)][_0x1d6609(0x156)],0x1);const _0x3045ac=getTargetInputPolicy({..._0x4fe100,'generationParams':{'wan27_mode':_0x1d6609(0x138)}});a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x3045ac,_0x1d6609(0x14f)),!![]),a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x3045ac,'video'),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x3045ac,_0x1d6609(0x126)),![]),a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x3045ac,_0x1d6609(0x156)),![]),a559_0x304c22[_0x1d6609(0x153)](_0x3045ac[_0x1d6609(0x13e)][_0x1d6609(0x138)],0x1);const _0x174150=getTargetInputPolicy({..._0x4fe100,'model':_0x1d6609(0x159),'generationParams':{'wan27_mode':'video'}});a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x174150,_0x1d6609(0x138)),!![]),a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x174150,_0x1d6609(0x126)),![]),a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x174150,_0x1d6609(0x156)),![]);const _0x2049de=getTargetInputPolicy({..._0x4fe100,'generationParams':{'wan27_mode':_0x1d6609(0x148)}});a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x2049de,_0x1d6609(0x126)),!![]),a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x2049de,_0x1d6609(0x138)),!![]),a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x2049de,_0x1d6609(0x156)),!![]),a559_0x304c22[_0x1d6609(0x153)](_0x2049de[_0x1d6609(0x13e)][_0x1d6609(0x126)],0x1),a559_0x304c22[_0x1d6609(0x153)](_0x2049de['maxByKind'][_0x1d6609(0x138)],0x1),a559_0x304c22[_0x1d6609(0x153)](_0x2049de[_0x1d6609(0x13e)][_0x1d6609(0x156)],0x1);const _0x460229=getTargetInputPolicy({..._0x4fe100,'generationParams':{'wan27_mode':_0x1d6609(0x12f)}});a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x460229,'image'),![]),a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x460229,_0x1d6609(0x138)),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x460229,_0x1d6609(0x156)),![]),a559_0x304c22['equal'](_0x460229[_0x1d6609(0x13e)][_0x1d6609(0x126)],0x0),a559_0x304c22[_0x1d6609(0x153)](_0x460229['maxByKind'][_0x1d6609(0x138)],0x2);const _0x103919=getTargetInputPolicy({..._0x4fe100,'provider':_0x1d6609(0x15f),'generationParams':{'wan27_mode':_0x1d6609(0x138)}});a559_0x304c22['equal'](isInputKindAllowed(_0x103919,_0x1d6609(0x138)),!![]),a559_0x304c22[_0x1d6609(0x153)](isInputKindAllowed(_0x103919,_0x1d6609(0x126)),![]);}),a559_0x48a6f8(a559_0x1a8c02(0x175),()=>{const _0x265e06=a559_0x1a8c02,_0x42cf46={'id':_0x265e06(0x17b),'type':_0x265e06(0x150),'model':_0x265e06(0x135),'provider':'apimart'},_0x43c714=getTargetInputPolicy(_0x42cf46);a559_0x304c22['equal'](isInputKindAllowed(_0x43c714,_0x265e06(0x14f)),!![]),a559_0x304c22[_0x265e06(0x153)](isInputKindAllowed(_0x43c714,'image'),!![]),a559_0x304c22[_0x265e06(0x153)](isInputKindAllowed(_0x43c714,_0x265e06(0x138)),![]),a559_0x304c22[_0x265e06(0x153)](isInputKindAllowed(_0x43c714,_0x265e06(0x156)),![]),a559_0x304c22[_0x265e06(0x153)](_0x43c714[_0x265e06(0x13e)]['image'],0x2);const _0x12f47d=getTargetInputPolicy({..._0x42cf46,'generationParams':{'kling_v3_omni_mode':'reference'}});a559_0x304c22['equal'](isInputKindAllowed(_0x12f47d,'image'),!![]),a559_0x304c22[_0x265e06(0x153)](isInputKindAllowed(_0x12f47d,_0x265e06(0x138)),!![]),a559_0x304c22[_0x265e06(0x153)](isInputKindAllowed(_0x12f47d,_0x265e06(0x156)),![]),a559_0x304c22[_0x265e06(0x153)](_0x12f47d['maxByKind'][_0x265e06(0x126)],0x1),a559_0x304c22[_0x265e06(0x153)](_0x12f47d['maxByKind'][_0x265e06(0x138)],0x1);const _0x9ac64=getTargetInputPolicy({..._0x42cf46,'generationParams':{'kling_v3_omni_mode':_0x265e06(0x12f)}});a559_0x304c22[_0x265e06(0x153)](isInputKindAllowed(_0x9ac64,_0x265e06(0x126)),![]),a559_0x304c22[_0x265e06(0x153)](isInputKindAllowed(_0x9ac64,_0x265e06(0x138)),!![]),a559_0x304c22[_0x265e06(0x153)](isInputKindAllowed(_0x9ac64,'audio'),![]),a559_0x304c22[_0x265e06(0x153)](_0x9ac64[_0x265e06(0x13e)][_0x265e06(0x138)],0x1);}),a559_0x48a6f8(a559_0x1a8c02(0x171),()=>{const _0x13dc7d=a559_0x1a8c02,_0x1f1824=getTargetInputPolicy({'id':_0x13dc7d(0x13b),'type':_0x13dc7d(0x150),'model':_0x13dc7d(0x16f),'provider':'apimart'});a559_0x304c22[_0x13dc7d(0x153)](isInputKindAllowed(_0x1f1824,'text'),!![]),a559_0x304c22['equal'](isInputKindAllowed(_0x1f1824,'image'),!![]),a559_0x304c22[_0x13dc7d(0x153)](isInputKindAllowed(_0x1f1824,_0x13dc7d(0x138)),!![]),a559_0x304c22[_0x13dc7d(0x153)](isInputKindAllowed(_0x1f1824,'audio'),![]),a559_0x304c22['equal'](_0x1f1824['maxByKind'][_0x13dc7d(0x126)],0x2),a559_0x304c22[_0x13dc7d(0x153)](_0x1f1824[_0x13dc7d(0x13e)][_0x13dc7d(0x138)],0x1);});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  PERSON_REPLACE_V21_MODEL_ID,
+  PERSON_REPLACE_V3_MODEL_ID,
+  registerManifestBundle,
+} from '../manifests/index.js';
+import {
+  getTargetInputPolicy,
+  hasUsableInputNodeSource,
+  isInputKindAllowed,
+  isRhPersonReplaceWorkflowModel,
+} from './modelInputPolicy.js';
+function createTwoSlotWorkflowExecution(_0x419e76 = {}) {
+  return {
+    schemaVersion: '1.0',
+    id: 'plugin.test.two-slot-image.workflow.v1',
+    provider: 'runninghubwf',
+    kind: 'image',
+    adapterType: 'workflow',
+    workflowId: 'plugin-two-slot-image-workflow',
+    submitMode: 'openapi-v2-ai-app',
+    queryMode: 'openapi-v2-query',
+    mapping: { imageNodes: ['1', '2'] },
+    result: { imagePaths: ['results[].url'] },
+    ..._0x419e76,
+  };
+}
+function createTwoSlotWorkflowModel(_0x3e89ec = {}) {
+  return {
+    schemaVersion: '1.0',
+    modelId: 'plugin/test-two-slot-image-workflow',
+    provider: 'runninghubwf',
+    kind: 'image',
+    adapterType: 'workflow',
+    executionId: 'plugin.test.two-slot-image.workflow.v1',
+    displayName: 'Test Two Slot Image Workflow',
+    uiSchema: { fields: [] },
+    inputSlots: {
+      allowedKinds: ['text', 'image'],
+      minByKind: { image: 2 },
+      maxByKind: { image: 2, video: 0, audio: 0 },
+      fixedSlots: [
+        { id: 'sourceImage', kind: 'image', label: 'Source image', required: true },
+        { id: 'styleImage', kind: 'image', label: 'Style image', required: true },
+      ],
+    },
+    outputType: 'image',
+    ..._0x3e89ec,
+  };
+}
+(test('model input policy: person replace manifests keep dedicated fixed slot behavior', () => {
+  (assert.equal(isRhPersonReplaceWorkflowModel(PERSON_REPLACE_V21_MODEL_ID), true),
+    assert.equal(isRhPersonReplaceWorkflowModel(PERSON_REPLACE_V3_MODEL_ID), true));
+}),
+  test('model input policy: generic two image fixed-slot workflows are not person replace', () => {
+    const _0x4f6d44 = createTwoSlotWorkflowExecution(),
+      _0x5b2135 = createTwoSlotWorkflowModel();
+    (registerManifestBundle({
+      sourceId: 'model-input-policy-test-two-slot-image',
+      executions: [_0x4f6d44],
+      models: [_0x5b2135],
+    }),
+      assert.equal(isRhPersonReplaceWorkflowModel(_0x5b2135.modelId), false));
+  }),
+  test('model input policy: person replace capability requires matching image input slots', () => {
+    const _0x32f819 = createTwoSlotWorkflowExecution({
+        id: 'plugin.test.bad-person-replace.workflow.v1',
+        workflowId: 'plugin-bad-person-replace-workflow',
+      }),
+      _0x1e8144 = createTwoSlotWorkflowModel({
+        modelId: 'plugin/test-bad-person-replace-slots',
+        executionId: _0x32f819.id,
+        capabilities: { fixedImageSlots: ['replaceTarget', 'replacedImage'] },
+        inputSlots: {
+          allowedKinds: ['text', 'image'],
+          minByKind: { image: 1 },
+          maxByKind: { image: 2, video: 0, audio: 0 },
+          fixedSlots: [
+            { id: 'replaceTarget', kind: 'image', required: true },
+            { id: 'replacedImage', kind: 'video', required: false },
+          ],
+        },
+      });
+    (registerManifestBundle({
+      sourceId: 'model-input-policy-test-bad-person-replace-slots',
+      executions: [_0x32f819],
+      models: [_0x1e8144],
+    }),
+      assert.equal(isRhPersonReplaceWorkflowModel(_0x1e8144.modelId), false));
+  }),
+  test('model input policy: video sources with display local paths are usable inputs', () => {
+    (assert.equal(
+      hasUsableInputNodeSource({
+        id: 'display-video',
+        type: 'source-video',
+        displayLocalPath: 'data/assets/display.mp4',
+      }),
+      true,
+    ),
+      assert.equal(
+        hasUsableInputNodeSource({
+          id: 'display-video-missing',
+          type: 'source-video',
+          displayLocalPath: 'data/assets/display.mp4',
+          mediaUnavailable: true,
+          mediaUnavailableSource: 'data/assets/display.mp4',
+        }),
+        false,
+      ));
+  }),
+  test('model input policy: source video result collections fall back to top-level media', () => {
+    assert.equal(
+      hasUsableInputNodeSource({
+        id: 'keyed-video',
+        type: 'source-video',
+        localPath: 'output/keyed.mp4',
+        videoUrl: '/output/keyed.mp4',
+        videos: [{ thumbUrl: '' }],
+        model: 'runninghub/video_matting',
+        rhToolbarTaskType: 'video-keying',
+        jobStatus: 'success',
+        isGenerating: false,
+      }),
+      true,
+    );
+  }),
+  test('model input policy: APIMart text models use GPT image-only media inputs', () => {
+    const _0x2fe8b6 = getTargetInputPolicy({
+      id: 'apimart-text',
+      type: 'ai-text',
+      model: 'apimart/gemini-3.1-pro-preview',
+      provider: 'apimart',
+    });
+    (assert.equal(isInputKindAllowed(_0x2fe8b6, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x2fe8b6, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x2fe8b6, 'video'), false),
+      assert.equal(isInputKindAllowed(_0x2fe8b6, 'audio'), false),
+      assert.equal(_0x2fe8b6.maxByKind.video, 0),
+      assert.equal(_0x2fe8b6.maxByKind.audio, 0));
+  }),
+  test('model input policy: storyboard nodes accept text image and video inputs', () => {
+    for (const _0x51da2a of ['storyboard', 'storyboard-script']) {
+      const _0x34a414 = getTargetInputPolicy({ id: _0x51da2a + '-input-target', type: _0x51da2a });
+      (assert.equal(isInputKindAllowed(_0x34a414, 'text'), true),
+        assert.equal(isInputKindAllowed(_0x34a414, 'image'), true),
+        assert.equal(isInputKindAllowed(_0x34a414, 'video'), true),
+        assert.equal(isInputKindAllowed(_0x34a414, 'audio'), false),
+        assert.equal(_0x34a414.maxByKind.audio, 0));
+    }
+  }),
+  test('model input policy: HappyHorse media inputs follow the selected mode', () => {
+    const _0x482ffa = {
+        id: 'happyhorse',
+        type: 'ai-video',
+        model: 'apimart/happyhorse-1.0',
+        provider: 'apimart',
+      },
+      _0x4915e1 = getTargetInputPolicy(_0x482ffa);
+    (assert.equal(isInputKindAllowed(_0x4915e1, 'image'), false),
+      assert.equal(isInputKindAllowed(_0x4915e1, 'video'), false));
+    const _0x31d7d7 = getTargetInputPolicy({ ..._0x482ffa, generationParams: { happyhorse_mode: 'image' } });
+    (assert.equal(isInputKindAllowed(_0x31d7d7, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x31d7d7, 'video'), false),
+      assert.equal(_0x31d7d7.maxByKind.image, 1));
+    const _0x408fcc = getTargetInputPolicy({
+      ..._0x482ffa,
+      generationParams: { happyhorse_mode: 'reference' },
+    });
+    (assert.equal(isInputKindAllowed(_0x408fcc, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x408fcc, 'video'), false),
+      assert.equal(_0x408fcc.maxByKind.image, 9));
+    const _0x43b5da = getTargetInputPolicy({ ..._0x482ffa, generationParams: { happyhorse_mode: 'edit' } });
+    (assert.equal(isInputKindAllowed(_0x43b5da, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x43b5da, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x43b5da, 'audio'), false),
+      assert.equal(_0x43b5da.maxByKind.image, 5),
+      assert.equal(_0x43b5da.maxByKind.video, 1));
+    const _0xadb094 = getTargetInputPolicy({
+      ..._0x482ffa,
+      model: 'runninghub-model/happyhorse-1.0',
+      provider: 'runninghub',
+      generationParams: { happyhorse_mode: 'reference' },
+    });
+    (assert.equal(isInputKindAllowed(_0xadb094, 'image'), true),
+      assert.equal(isInputKindAllowed(_0xadb094, 'video'), false),
+      assert.equal(_0xadb094.maxByKind.image, 9));
+  }),
+  test('model input policy: RunningHub Seedance 2.0 media inputs follow mode', () => {
+    const _0x2d730a = {
+        id: 'seedance-2',
+        type: 'ai-video',
+        model: 'runninghub-model/seedance-2.0',
+        provider: 'runninghub',
+      },
+      _0x3bf1e7 = getTargetInputPolicy(_0x2d730a);
+    (assert.equal(isInputKindAllowed(_0x3bf1e7, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x3bf1e7, 'image'), false),
+      assert.equal(isInputKindAllowed(_0x3bf1e7, 'video'), false),
+      assert.equal(isInputKindAllowed(_0x3bf1e7, 'audio'), false),
+      assert.equal(_0x3bf1e7.maxByKind.image, 0),
+      assert.equal(_0x3bf1e7.maxByKind.video, 0),
+      assert.equal(_0x3bf1e7.maxByKind.audio, 0));
+    const _0x47f6c9 = getTargetInputPolicy({
+      ..._0x2d730a,
+      generationParams: { rh_seedance_2_mode: 'image2video' },
+    });
+    (assert.equal(isInputKindAllowed(_0x47f6c9, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x47f6c9, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x47f6c9, 'video'), false),
+      assert.equal(isInputKindAllowed(_0x47f6c9, 'audio'), false),
+      assert.equal(_0x47f6c9.maxByKind.image, 1),
+      assert.equal(_0x47f6c9.maxByKind.video, 0),
+      assert.equal(_0x47f6c9.maxByKind.audio, 0));
+    const _0x113388 = getTargetInputPolicy({
+      ..._0x2d730a,
+      generationParams: { rh_seedance_2_mode: 'frames2video' },
+    });
+    (assert.equal(isInputKindAllowed(_0x113388, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x113388, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x113388, 'video'), false),
+      assert.equal(isInputKindAllowed(_0x113388, 'audio'), false),
+      assert.equal(_0x113388.maxByKind.image, 2),
+      assert.equal(_0x113388.maxByKind.video, 0),
+      assert.equal(_0x113388.maxByKind.audio, 0));
+    const _0xf2be0b = getTargetInputPolicy({
+      ..._0x2d730a,
+      generationParams: { rh_seedance_2_mode: 'multimodal2video' },
+    });
+    (assert.equal(isInputKindAllowed(_0xf2be0b, 'text'), true),
+      assert.equal(isInputKindAllowed(_0xf2be0b, 'image'), true),
+      assert.equal(isInputKindAllowed(_0xf2be0b, 'video'), true),
+      assert.equal(isInputKindAllowed(_0xf2be0b, 'audio'), true),
+      assert.equal(_0xf2be0b.maxByKind.image, 9),
+      assert.equal(_0xf2be0b.maxByKind.video, 3),
+      assert.equal(_0xf2be0b.maxByKind.audio, 3));
+  }),
+  test('model input policy: Volcengine Seedance 2.0 media inputs follow mode', () => {
+    const _0x1c47ef = {
+        id: 'volcengine-seedance-2',
+        type: 'ai-video',
+        model: 'volcengine/seedance-2.0-fast',
+        provider: 'volcengine',
+      },
+      _0x8ef30b = getTargetInputPolicy(_0x1c47ef);
+    (assert.equal(isInputKindAllowed(_0x8ef30b, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x8ef30b, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x8ef30b, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x8ef30b, 'audio'), true),
+      assert.equal(_0x8ef30b.maxByKind.image, 9),
+      assert.equal(_0x8ef30b.maxByKind.video, 3),
+      assert.equal(_0x8ef30b.maxByKind.audio, 3));
+    const _0x4f30d7 = getTargetInputPolicy({
+      ..._0x1c47ef,
+      generationParams: { dreaminaRouteMode: 'frames2video' },
+    });
+    (assert.equal(isInputKindAllowed(_0x4f30d7, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x4f30d7, 'video'), false),
+      assert.equal(_0x4f30d7.maxByKind.image, 2));
+    const _0x2218e2 = getTargetInputPolicy({
+      ..._0x1c47ef,
+      generationParams: { dreaminaRouteMode: 'multimodal2video' },
+    });
+    (assert.equal(isInputKindAllowed(_0x2218e2, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x2218e2, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x2218e2, 'audio'), true),
+      assert.equal(_0x2218e2.maxByKind.image, 9),
+      assert.equal(_0x2218e2.maxByKind.video, 3),
+      assert.equal(_0x2218e2.maxByKind.audio, 3),
+      assert.equal(isInputKindAllowed(_0x8ef30b, 'text'), true));
+  }),
+  test('model input policy: VEO3 reference mode keeps generic 3 image inputs', () => {
+    const _0x20cbff = getTargetInputPolicy({
+      id: 'veo3-reference',
+      type: 'ai-video',
+      model: 'apimart/veo3-fast',
+      provider: 'apimart',
+      generationParams: { mode: 'fast', generation_type: 'reference' },
+    });
+    (assert.equal(isInputKindAllowed(_0x20cbff, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x20cbff, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x20cbff, 'video'), false),
+      assert.equal(isInputKindAllowed(_0x20cbff, 'audio'), false),
+      assert.equal(_0x20cbff.maxByKind.image, 3));
+  }),
+  test('model input policy: Vidu Q3 media inputs follow generation mode', () => {
+    const _0x147d5e = { id: 'vidu-q3', type: 'ai-video', model: 'apimart/viduq3', provider: 'apimart' },
+      _0x5844b2 = getTargetInputPolicy(_0x147d5e);
+    (assert.equal(isInputKindAllowed(_0x5844b2, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x5844b2, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x5844b2, 'video'), false),
+      assert.equal(isInputKindAllowed(_0x5844b2, 'audio'), false),
+      assert.equal(_0x5844b2.maxByKind.image, 2));
+    const _0x2d4754 = getTargetInputPolicy({
+      ..._0x147d5e,
+      generationParams: { vidu_q3_generation_mode: 'reference', mode: 'viduq3' },
+    });
+    (assert.equal(isInputKindAllowed(_0x2d4754, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x2d4754, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x2d4754, 'video'), false),
+      assert.equal(isInputKindAllowed(_0x2d4754, 'audio'), false),
+      assert.equal(_0x2d4754.maxByKind.image, 7));
+  }),
+  test('model input policy: Grok Imagine uses manifest image-only limit', () => {
+    const _0x235790 = getTargetInputPolicy({
+      id: 'grok-imagine',
+      type: 'ai-video',
+      model: 'apimart/grok-imagine-1.0',
+      provider: 'apimart',
+    });
+    (assert.equal(isInputKindAllowed(_0x235790, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x235790, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x235790, 'video'), false),
+      assert.equal(isInputKindAllowed(_0x235790, 'audio'), false),
+      assert.equal(_0x235790.maxByKind.image, 7));
+  }),
+  test('model input policy: Gemini Omni Flash uses manifest image and video limits', () => {
+    const _0x14aea6 = getTargetInputPolicy({
+      id: 'omni-flash',
+      type: 'ai-video',
+      model: 'apimart/omni-flash-ext',
+      provider: 'apimart',
+    });
+    (assert.equal(isInputKindAllowed(_0x14aea6, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x14aea6, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x14aea6, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x14aea6, 'audio'), false),
+      assert.equal(_0x14aea6.maxByKind.image, 3),
+      assert.equal(_0x14aea6.maxByKind.video, 1));
+  }),
+  test('model input policy: Wan2.7 media inputs follow image/video mode', () => {
+    const _0x4fe100 = { id: 'wan27', type: 'ai-video', model: 'apimart/wan2.7', provider: 'apimart' },
+      _0xba1254 = getTargetInputPolicy(_0x4fe100);
+    (assert.equal(isInputKindAllowed(_0xba1254, 'text'), true),
+      assert.equal(isInputKindAllowed(_0xba1254, 'image'), true),
+      assert.equal(isInputKindAllowed(_0xba1254, 'audio'), true),
+      assert.equal(isInputKindAllowed(_0xba1254, 'video'), false),
+      assert.equal(_0xba1254.maxByKind.image, 2),
+      assert.equal(_0xba1254.maxByKind.audio, 1));
+    const _0x3045ac = getTargetInputPolicy({ ..._0x4fe100, generationParams: { wan27_mode: 'video' } });
+    (assert.equal(isInputKindAllowed(_0x3045ac, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x3045ac, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x3045ac, 'image'), false),
+      assert.equal(isInputKindAllowed(_0x3045ac, 'audio'), false),
+      assert.equal(_0x3045ac.maxByKind.video, 1));
+    const _0x174150 = getTargetInputPolicy({
+      ..._0x4fe100,
+      model: 'wan2.7',
+      generationParams: { wan27_mode: 'video' },
+    });
+    (assert.equal(isInputKindAllowed(_0x174150, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x174150, 'image'), false),
+      assert.equal(isInputKindAllowed(_0x174150, 'audio'), false));
+    const _0x2049de = getTargetInputPolicy({ ..._0x4fe100, generationParams: { wan27_mode: 'reference' } });
+    (assert.equal(isInputKindAllowed(_0x2049de, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x2049de, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x2049de, 'audio'), true),
+      assert.equal(_0x2049de.maxByKind.image, 1),
+      assert.equal(_0x2049de.maxByKind.video, 1),
+      assert.equal(_0x2049de.maxByKind.audio, 1));
+    const _0x460229 = getTargetInputPolicy({ ..._0x4fe100, generationParams: { wan27_mode: 'edit' } });
+    (assert.equal(isInputKindAllowed(_0x460229, 'image'), false),
+      assert.equal(isInputKindAllowed(_0x460229, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x460229, 'audio'), false),
+      assert.equal(_0x460229.maxByKind.image, 0),
+      assert.equal(_0x460229.maxByKind.video, 2));
+    const _0x103919 = getTargetInputPolicy({
+      ..._0x4fe100,
+      provider: 'apimartr',
+      generationParams: { wan27_mode: 'video' },
+    });
+    (assert.equal(isInputKindAllowed(_0x103919, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x103919, 'image'), false));
+  }),
+  test('model input policy: Kling V3 Omni media inputs follow selected mode', () => {
+    const _0x42cf46 = {
+        id: 'kling-omni',
+        type: 'ai-video',
+        model: 'apimart/kling-v3-omni',
+        provider: 'apimart',
+      },
+      _0x43c714 = getTargetInputPolicy(_0x42cf46);
+    (assert.equal(isInputKindAllowed(_0x43c714, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x43c714, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x43c714, 'video'), false),
+      assert.equal(isInputKindAllowed(_0x43c714, 'audio'), false),
+      assert.equal(_0x43c714.maxByKind.image, 2));
+    const _0x12f47d = getTargetInputPolicy({
+      ..._0x42cf46,
+      generationParams: { kling_v3_omni_mode: 'reference' },
+    });
+    (assert.equal(isInputKindAllowed(_0x12f47d, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x12f47d, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x12f47d, 'audio'), false),
+      assert.equal(_0x12f47d.maxByKind.image, 1),
+      assert.equal(_0x12f47d.maxByKind.video, 1));
+    const _0x9ac64 = getTargetInputPolicy({ ..._0x42cf46, generationParams: { kling_v3_omni_mode: 'edit' } });
+    (assert.equal(isInputKindAllowed(_0x9ac64, 'image'), false),
+      assert.equal(isInputKindAllowed(_0x9ac64, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x9ac64, 'audio'), false),
+      assert.equal(_0x9ac64.maxByKind.video, 1));
+  }),
+  test('model input policy: Kling O1 uses manifest image and video limits', () => {
+    const _0x1f1824 = getTargetInputPolicy({
+      id: 'kling-o1',
+      type: 'ai-video',
+      model: 'apimart/kling-video-o1',
+      provider: 'apimart',
+    });
+    (assert.equal(isInputKindAllowed(_0x1f1824, 'text'), true),
+      assert.equal(isInputKindAllowed(_0x1f1824, 'image'), true),
+      assert.equal(isInputKindAllowed(_0x1f1824, 'video'), true),
+      assert.equal(isInputKindAllowed(_0x1f1824, 'audio'), false),
+      assert.equal(_0x1f1824.maxByKind.image, 2),
+      assert.equal(_0x1f1824.maxByKind.video, 1));
+  }));

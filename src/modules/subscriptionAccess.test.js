@@ -1,1 +1,191 @@
-const a621_0x1e3e20=a621_0x19f2;(function(_0x51bbe2,_0x3918e2){const _0x3912c3=a621_0x19f2,_0x48a4ff=_0x51bbe2();while(!![]){try{const _0x41a775=-parseInt(_0x3912c3(0xd0))/0x1*(-parseInt(_0x3912c3(0xde))/0x2)+-parseInt(_0x3912c3(0xd2))/0x3+parseInt(_0x3912c3(0x100))/0x4+parseInt(_0x3912c3(0xf9))/0x5+parseInt(_0x3912c3(0xcf))/0x6+parseInt(_0x3912c3(0xf8))/0x7+-parseInt(_0x3912c3(0xe2))/0x8;if(_0x41a775===_0x3918e2)break;else _0x48a4ff['push'](_0x48a4ff['shift']());}catch(_0x3c3dd8){_0x48a4ff['push'](_0x48a4ff['shift']());}}}(a621_0x1520,0x9d416));import a621_0x76a715 from'node:test';import a621_0x51f0d3 from'node:assert/strict';import{DEFAULT_VIP_GATE_MODEL_ID,RH_VIDEO_HD_VIP_MODEL_ID,RH_VIDEO_HD_VIP_AI_APP_MODEL_ID,RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID,RH_ADVANCED_VOICE_CLONE_VIP_AI_APP_MODEL_ID,DREAMINA_VIDEO_VIP_MODEL_ID,SUBSCRIPTION_GATE_MANIFESTS,resolveVipGateModelId,isVipModel,isModelAllowed}from'./subscriptionAccess.js';a621_0x76a715(a621_0x1e3e20(0xfd),()=>{const _0x2bbe2a=a621_0x1e3e20;a621_0x51f0d3[_0x2bbe2a(0xda)](SUBSCRIPTION_GATE_MANIFESTS['length'],0x8),a621_0x51f0d3['ok'](SUBSCRIPTION_GATE_MANIFESTS[_0x2bbe2a(0xe9)](_0xe6774c=>_0xe6774c[_0x2bbe2a(0xf5)]==='dreaminaVideoVip'&&_0xe6774c[_0x2bbe2a(0xec)]===DREAMINA_VIDEO_VIP_MODEL_ID&&_0xe6774c[_0x2bbe2a(0xd8)][_0x2bbe2a(0xe6)](_0x2bbe2a(0xe0)))),a621_0x51f0d3['ok'](SUBSCRIPTION_GATE_MANIFESTS[_0x2bbe2a(0xe9)](_0x45dd88=>_0x45dd88[_0x2bbe2a(0xf5)]==='runninghubAdvancedVoiceClone'&&_0x45dd88[_0x2bbe2a(0xec)]===RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID&&_0x45dd88['aliases'][_0x2bbe2a(0xe6)](_0x2bbe2a(0xea)))),a621_0x51f0d3['ok'](SUBSCRIPTION_GATE_MANIFESTS[_0x2bbe2a(0xe9)](_0x240298=>_0x240298[_0x2bbe2a(0xf5)]===_0x2bbe2a(0xe1)&&_0x240298[_0x2bbe2a(0xec)]==='runninghub/2055639633148563458'&&_0x240298[_0x2bbe2a(0xdf)][_0x2bbe2a(0xe6)](_0x2bbe2a(0xfe)))),a621_0x51f0d3['ok'](SUBSCRIPTION_GATE_MANIFESTS['some'](_0x27ef2e=>_0x27ef2e[_0x2bbe2a(0xf5)]===_0x2bbe2a(0xd1)&&_0x27ef2e[_0x2bbe2a(0xec)]===_0x2bbe2a(0xd4)&&_0x27ef2e['aliases'][_0x2bbe2a(0xe6)](_0x2bbe2a(0xf1))&&_0x27ef2e['aliases'][_0x2bbe2a(0xe6)](_0x2bbe2a(0xfb)))),a621_0x51f0d3['ok'](SUBSCRIPTION_GATE_MANIFESTS[_0x2bbe2a(0xe9)](_0x1f1c02=>_0x1f1c02[_0x2bbe2a(0xf5)]===_0x2bbe2a(0xfa)&&_0x1f1c02['modelId']===_0x2bbe2a(0xd5)&&_0x1f1c02[_0x2bbe2a(0xdf)]['includes'](_0x2bbe2a(0xf1))&&_0x1f1c02[_0x2bbe2a(0xdf)]['includes'](_0x2bbe2a(0xd6)))),a621_0x51f0d3['ok'](SUBSCRIPTION_GATE_MANIFESTS[_0x2bbe2a(0xcb)](_0x81e874=>_0x81e874[_0x2bbe2a(0xef)]['every'](_0x1b3828=>_0x1b3828[_0x2bbe2a(0x102)]&&_0x1b3828[_0x2bbe2a(0xdc)])));}),a621_0x76a715(a621_0x1e3e20(0xf6),()=>{const _0x152806=a621_0x1e3e20;a621_0x51f0d3['equal'](resolveVipGateModelId(_0x152806(0xf4)),DREAMINA_VIDEO_VIP_MODEL_ID),a621_0x51f0d3[_0x152806(0xda)](resolveVipGateModelId(_0x152806(0xf7),_0x152806(0xe0)),DREAMINA_VIDEO_VIP_MODEL_ID);}),a621_0x76a715(a621_0x1e3e20(0xd3),()=>{const _0x9c8e9f=a621_0x1e3e20,_0x1015e1='runninghub/2062515720147259393';a621_0x51f0d3[_0x9c8e9f(0xda)](resolveVipGateModelId(_0x1015e1),_0x1015e1),a621_0x51f0d3[_0x9c8e9f(0xda)](resolveVipGateModelId(_0x9c8e9f(0xeb)),_0x9c8e9f(0xeb)),a621_0x51f0d3[_0x9c8e9f(0xda)](resolveVipGateModelId(_0x9c8e9f(0xce)),_0x1015e1),a621_0x51f0d3[_0x9c8e9f(0xda)](isVipModel(_0x1015e1),!![]),a621_0x51f0d3['equal'](isModelAllowed(_0x1015e1,{'status':_0x9c8e9f(0xfc),'entitledModelKeys':[_0x9c8e9f(0xf1)]}),![]),a621_0x51f0d3[_0x9c8e9f(0xda)](isModelAllowed(_0x1015e1,{'status':'active','entitledModelKeys':[_0x9c8e9f(0xf1)]}),!![]);}),a621_0x76a715(a621_0x1e3e20(0xf3),()=>{const _0x3a2b97=a621_0x1e3e20,_0x5b2420=_0x3a2b97(0xd4);a621_0x51f0d3[_0x3a2b97(0xda)](resolveVipGateModelId(_0x5b2420),_0x5b2420),a621_0x51f0d3[_0x3a2b97(0xda)](resolveVipGateModelId(_0x3a2b97(0xf0)),_0x3a2b97(0xf0)),a621_0x51f0d3[_0x3a2b97(0xda)](resolveVipGateModelId(_0x3a2b97(0xfb)),_0x5b2420),a621_0x51f0d3[_0x3a2b97(0xda)](isVipModel(_0x5b2420),!![]),a621_0x51f0d3[_0x3a2b97(0xda)](isModelAllowed(_0x5b2420,{'status':'none','entitledModelKeys':['video_edit_v54']}),![]),a621_0x51f0d3[_0x3a2b97(0xda)](isModelAllowed(_0x5b2420,{'status':_0x3a2b97(0xe3),'entitledModelKeys':[_0x3a2b97(0xf1)]}),!![]);}),a621_0x76a715(a621_0x1e3e20(0xcd),()=>{const _0x56d41d=a621_0x1e3e20,_0x41f2a2=_0x56d41d(0xd5);a621_0x51f0d3[_0x56d41d(0xda)](resolveVipGateModelId(_0x41f2a2),_0x41f2a2),a621_0x51f0d3[_0x56d41d(0xda)](resolveVipGateModelId(_0x56d41d(0xe7)),_0x56d41d(0xe7)),a621_0x51f0d3[_0x56d41d(0xda)](resolveVipGateModelId(_0x56d41d(0xd6)),_0x41f2a2),a621_0x51f0d3[_0x56d41d(0xda)](isVipModel(_0x41f2a2),!![]),a621_0x51f0d3[_0x56d41d(0xda)](isModelAllowed(_0x41f2a2,{'status':_0x56d41d(0xfc),'entitledModelKeys':[_0x56d41d(0xf1)]}),![]),a621_0x51f0d3[_0x56d41d(0xda)](isModelAllowed(_0x41f2a2,{'status':_0x56d41d(0xe3),'entitledModelKeys':[_0x56d41d(0xf1)]}),!![]);}),a621_0x76a715(a621_0x1e3e20(0xee),()=>{const _0x16160c=a621_0x1e3e20;a621_0x51f0d3[_0x16160c(0xda)](resolveVipGateModelId(DEFAULT_VIP_GATE_MODEL_ID),DEFAULT_VIP_GATE_MODEL_ID),a621_0x51f0d3[_0x16160c(0xda)](resolveVipGateModelId('2041741496667348994'),DEFAULT_VIP_GATE_MODEL_ID),a621_0x51f0d3[_0x16160c(0xda)](isVipModel(DEFAULT_VIP_GATE_MODEL_ID),!![]),a621_0x51f0d3['equal'](isVipModel('2041741496667348994'),!![]);}),a621_0x76a715(a621_0x1e3e20(0xd9),()=>{const _0x63389a=a621_0x1e3e20;a621_0x51f0d3[_0x63389a(0xda)](isVipModel(RH_VIDEO_HD_VIP_MODEL_ID),!![]),a621_0x51f0d3[_0x63389a(0xda)](isVipModel(RH_VIDEO_HD_VIP_AI_APP_MODEL_ID),!![]),a621_0x51f0d3[_0x63389a(0xda)](isModelAllowed(RH_VIDEO_HD_VIP_MODEL_ID,{'status':'none','entitledModelIds':[RH_VIDEO_HD_VIP_MODEL_ID]}),![]),a621_0x51f0d3[_0x63389a(0xda)](isModelAllowed(RH_VIDEO_HD_VIP_MODEL_ID,{'status':_0x63389a(0xe3),'entitledModelIds':[RH_VIDEO_HD_VIP_AI_APP_MODEL_ID]}),!![]);}),a621_0x76a715(a621_0x1e3e20(0xdd),()=>{const _0x1c6db4=a621_0x1e3e20;a621_0x51f0d3[_0x1c6db4(0xda)](isVipModel(RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID),!![]),a621_0x51f0d3['equal'](isVipModel(RH_ADVANCED_VOICE_CLONE_VIP_AI_APP_MODEL_ID),!![]),a621_0x51f0d3[_0x1c6db4(0xda)](isVipModel('advanced_voice_clone'),!![]),a621_0x51f0d3[_0x1c6db4(0xda)](isModelAllowed(RH_ADVANCED_VOICE_CLONE_VIP_AI_APP_MODEL_ID,{'status':'active','entitledModelIds':[RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID]}),!![]),a621_0x51f0d3['equal'](isModelAllowed('advanced_voice_clone',{'status':_0x1c6db4(0xe3),'entitledModelKeys':[_0x1c6db4(0xea)]}),!![]);}),a621_0x76a715(a621_0x1e3e20(0xcc),()=>{const _0x38c6ef=a621_0x1e3e20,_0x4b69da=_0x38c6ef(0xed),_0x59bf7f=_0x38c6ef(0xf2),_0x2d3ecb=_0x38c6ef(0xff);a621_0x51f0d3[_0x38c6ef(0xda)](SUBSCRIPTION_GATE_MANIFESTS[_0x38c6ef(0xe9)](_0x3e3808=>_0x3e3808[_0x38c6ef(0xf5)]===_0x38c6ef(0xe5)),![]),a621_0x51f0d3['equal'](resolveVipGateModelId(_0x4b69da),_0x4b69da),a621_0x51f0d3[_0x38c6ef(0xda)](resolveVipGateModelId(_0x59bf7f),_0x59bf7f),a621_0x51f0d3[_0x38c6ef(0xda)](resolveVipGateModelId(_0x2d3ecb),_0x2d3ecb),a621_0x51f0d3['equal'](isVipModel(_0x4b69da),![]),a621_0x51f0d3[_0x38c6ef(0xda)](isVipModel(_0x59bf7f),![]),a621_0x51f0d3[_0x38c6ef(0xda)](isVipModel(_0x2d3ecb),![]),a621_0x51f0d3[_0x38c6ef(0xda)](isModelAllowed(_0x4b69da,{'status':_0x38c6ef(0xfc),'entitledModelIds':[]}),!![]);}),a621_0x76a715(a621_0x1e3e20(0xd7),()=>{const _0x4bd251=a621_0x1e3e20,_0x185e71={'status':_0x4bd251(0xe3),'entitledModelIds':[DREAMINA_VIDEO_VIP_MODEL_ID],'entitledModelKeys':[]};a621_0x51f0d3['equal'](isModelAllowed(_0x4bd251(0x101),_0x185e71,'dreamina'),!![]),a621_0x51f0d3[_0x4bd251(0xda)](isModelAllowed('dreamina/seedance2.0fast',_0x185e71,_0x4bd251(0xe0)),!![]);const _0x446782={'status':_0x4bd251(0xe3),'entitledModelIds':[DEFAULT_VIP_GATE_MODEL_ID],'entitledModelKeys':[]};a621_0x51f0d3[_0x4bd251(0xda)](isModelAllowed('dreamina/seedance2.0fast',_0x446782,'dreamina'),![]);}),a621_0x76a715(a621_0x1e3e20(0xdb),()=>{const _0x311d4c=a621_0x1e3e20,_0x258162={'status':_0x311d4c(0xe3),'entitledModelIds':[],'entitledModelKeys':[_0x311d4c(0xe8)]};a621_0x51f0d3[_0x311d4c(0xda)](isModelAllowed(_0x311d4c(0xe4),_0x258162),!![]);});function a621_0x19f2(_0x4b5c61,_0x5237e6){const _0x1520d4=a621_0x1520();return a621_0x19f2=function(_0x19f246,_0x5ccca1){_0x19f246=_0x19f246-0xcb;let _0xb76f56=_0x1520d4[_0x19f246];return _0xb76f56;},a621_0x19f2(_0x4b5c61,_0x5237e6);}function a621_0x1520(){const _0x1ad7fb=['runninghubVideoScailV2','ai-app/2064961300823896065','none','subscription\x20access:\x20VIP\x20gate\x20清单来自共享\x20manifest','commercial_digital_human','runninghub/1994711386552999938','4952700SrpREQ','dreamina/seedance2.0_vip','value','every','subscription\x20access:\x20漫画转真人不再进入\x20VIP\x20gate','subscription\x20access:\x20Scail\x20V2\x20reuses\x20V5.4\x20aliases\x20with\x20independent\x20gate\x20model','ai-app/2062515720147259393','5997312NxUTfs','1nvdbuy','runninghubVideoScail2V1','3751632LZeWgI','subscription\x20access:\x20BERNINI\x20V1\x20复用\x20V5.4\x20授权别名但保持独立\x20gate\x20model','runninghub/2064961300823896065','runninghub/2065463417577762818','ai-app/2065463417577762818','subscription\x20access:\x20即梦模型授权判定读取\x20dreamina/video_vip','providers','subscription\x20access:\x20视频高清\x20ai-app\x20算作\x20VIP\x20模型','equal','subscription\x20access:\x20即梦模型授权支持\x20key\x20alias','deleteWhen','subscription\x20access:\x20进阶声音克隆\x20ai-app\x20和\x20workflow\x20key\x20算作\x20VIP\x20模型','851038IrtRDx','aliases','dreamina','runninghubCommercialDigitalHuman','8212808NzvgeR','active','dreamina/3.5pro','runninghubAnimeReal','includes','2065463417577762818','dreamina_video_vip','some','advanced_voice_clone','2062515720147259393','modelId','runninghub/1994718111704158209','subscription\x20access:\x20runninghub\x20模型维持原有\x20gate\x20model','legacyAliases','2064961300823896065','video_edit_v54','ai-app/1994718111704158209','subscription\x20access:\x20Scail\x20V1\x20reuses\x20V5.4\x20aliases\x20with\x20independent\x20gate\x20model','dreamina/seedance2.0fast','key','subscription\x20access:\x20dreamina\x20模型统一映射到即梦视频\x20VIP\x20gate\x20model','whatever','1305423cdYcHh','357640XKIFIM'];a621_0x1520=function(){return _0x1ad7fb;};return a621_0x1520();}
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  DEFAULT_VIP_GATE_MODEL_ID,
+  RH_VIDEO_HD_VIP_MODEL_ID,
+  RH_VIDEO_HD_VIP_AI_APP_MODEL_ID,
+  RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID,
+  RH_ADVANCED_VOICE_CLONE_VIP_AI_APP_MODEL_ID,
+  DREAMINA_VIDEO_VIP_MODEL_ID,
+  SUBSCRIPTION_GATE_MANIFESTS,
+  resolveVipGateModelId,
+  isVipModel,
+  isModelAllowed,
+} from './subscriptionAccess.js';
+(test('subscription access: VIP gate 清单来自共享 manifest', () => {
+  (assert.equal(SUBSCRIPTION_GATE_MANIFESTS.length, 8),
+    assert.ok(
+      SUBSCRIPTION_GATE_MANIFESTS.some(
+        (_0xe6774c) =>
+          _0xe6774c.key === 'dreaminaVideoVip' &&
+          _0xe6774c.modelId === DREAMINA_VIDEO_VIP_MODEL_ID &&
+          _0xe6774c.providers.includes('dreamina'),
+      ),
+    ),
+    assert.ok(
+      SUBSCRIPTION_GATE_MANIFESTS.some(
+        (_0x45dd88) =>
+          _0x45dd88.key === 'runninghubAdvancedVoiceClone' &&
+          _0x45dd88.modelId === RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID &&
+          _0x45dd88.aliases.includes('advanced_voice_clone'),
+      ),
+    ),
+    assert.ok(
+      SUBSCRIPTION_GATE_MANIFESTS.some(
+        (_0x240298) =>
+          _0x240298.key === 'runninghubCommercialDigitalHuman' &&
+          _0x240298.modelId === 'runninghub/2055639633148563458' &&
+          _0x240298.aliases.includes('commercial_digital_human'),
+      ),
+    ),
+    assert.ok(
+      SUBSCRIPTION_GATE_MANIFESTS.some(
+        (_0x27ef2e) =>
+          _0x27ef2e.key === 'runninghubVideoScail2V1' &&
+          _0x27ef2e.modelId === 'runninghub/2064961300823896065' &&
+          _0x27ef2e.aliases.includes('video_edit_v54') &&
+          _0x27ef2e.aliases.includes('ai-app/2064961300823896065'),
+      ),
+    ),
+    assert.ok(
+      SUBSCRIPTION_GATE_MANIFESTS.some(
+        (_0x1f1c02) =>
+          _0x1f1c02.key === 'runninghubVideoScailV2' &&
+          _0x1f1c02.modelId === 'runninghub/2065463417577762818' &&
+          _0x1f1c02.aliases.includes('video_edit_v54') &&
+          _0x1f1c02.aliases.includes('ai-app/2065463417577762818'),
+      ),
+    ),
+    assert.ok(
+      SUBSCRIPTION_GATE_MANIFESTS.every((_0x81e874) =>
+        _0x81e874.legacyAliases.every((_0x1b3828) => _0x1b3828.value && _0x1b3828.deleteWhen),
+      ),
+    ));
+}),
+  test('subscription access: dreamina 模型统一映射到即梦视频 VIP gate model', () => {
+    (assert.equal(resolveVipGateModelId('dreamina/seedance2.0fast'), DREAMINA_VIDEO_VIP_MODEL_ID),
+      assert.equal(resolveVipGateModelId('whatever', 'dreamina'), DREAMINA_VIDEO_VIP_MODEL_ID));
+  }),
+  test('subscription access: BERNINI V1 复用 V5.4 授权别名但保持独立 gate model', () => {
+    const _0x1015e1 = 'runninghub/2062515720147259393';
+    (assert.equal(resolveVipGateModelId(_0x1015e1), _0x1015e1),
+      assert.equal(resolveVipGateModelId('2062515720147259393'), '2062515720147259393'),
+      assert.equal(resolveVipGateModelId('ai-app/2062515720147259393'), _0x1015e1),
+      assert.equal(isVipModel(_0x1015e1), true),
+      assert.equal(
+        isModelAllowed(_0x1015e1, { status: 'none', entitledModelKeys: ['video_edit_v54'] }),
+        false,
+      ),
+      assert.equal(
+        isModelAllowed(_0x1015e1, { status: 'active', entitledModelKeys: ['video_edit_v54'] }),
+        true,
+      ));
+  }),
+  test('subscription access: Scail V1 reuses V5.4 aliases with independent gate model', () => {
+    const _0x5b2420 = 'runninghub/2064961300823896065';
+    (assert.equal(resolveVipGateModelId(_0x5b2420), _0x5b2420),
+      assert.equal(resolveVipGateModelId('2064961300823896065'), '2064961300823896065'),
+      assert.equal(resolveVipGateModelId('ai-app/2064961300823896065'), _0x5b2420),
+      assert.equal(isVipModel(_0x5b2420), true),
+      assert.equal(
+        isModelAllowed(_0x5b2420, { status: 'none', entitledModelKeys: ['video_edit_v54'] }),
+        false,
+      ),
+      assert.equal(
+        isModelAllowed(_0x5b2420, { status: 'active', entitledModelKeys: ['video_edit_v54'] }),
+        true,
+      ));
+  }),
+  test('subscription access: Scail V2 reuses V5.4 aliases with independent gate model', () => {
+    const _0x41f2a2 = 'runninghub/2065463417577762818';
+    (assert.equal(resolveVipGateModelId(_0x41f2a2), _0x41f2a2),
+      assert.equal(resolveVipGateModelId('2065463417577762818'), '2065463417577762818'),
+      assert.equal(resolveVipGateModelId('ai-app/2065463417577762818'), _0x41f2a2),
+      assert.equal(isVipModel(_0x41f2a2), true),
+      assert.equal(
+        isModelAllowed(_0x41f2a2, { status: 'none', entitledModelKeys: ['video_edit_v54'] }),
+        false,
+      ),
+      assert.equal(
+        isModelAllowed(_0x41f2a2, { status: 'active', entitledModelKeys: ['video_edit_v54'] }),
+        true,
+      ));
+  }),
+  test('subscription access: runninghub 模型维持原有 gate model', () => {
+    (assert.equal(resolveVipGateModelId(DEFAULT_VIP_GATE_MODEL_ID), DEFAULT_VIP_GATE_MODEL_ID),
+      assert.equal(resolveVipGateModelId('2041741496667348994'), DEFAULT_VIP_GATE_MODEL_ID),
+      assert.equal(isVipModel(DEFAULT_VIP_GATE_MODEL_ID), true),
+      assert.equal(isVipModel('2041741496667348994'), true));
+  }),
+  test('subscription access: 视频高清 ai-app 算作 VIP 模型', () => {
+    (assert.equal(isVipModel(RH_VIDEO_HD_VIP_MODEL_ID), true),
+      assert.equal(isVipModel(RH_VIDEO_HD_VIP_AI_APP_MODEL_ID), true),
+      assert.equal(
+        isModelAllowed(RH_VIDEO_HD_VIP_MODEL_ID, {
+          status: 'none',
+          entitledModelIds: [RH_VIDEO_HD_VIP_MODEL_ID],
+        }),
+        false,
+      ),
+      assert.equal(
+        isModelAllowed(RH_VIDEO_HD_VIP_MODEL_ID, {
+          status: 'active',
+          entitledModelIds: [RH_VIDEO_HD_VIP_AI_APP_MODEL_ID],
+        }),
+        true,
+      ));
+  }),
+  test('subscription access: 进阶声音克隆 ai-app 和 workflow key 算作 VIP 模型', () => {
+    (assert.equal(isVipModel(RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID), true),
+      assert.equal(isVipModel(RH_ADVANCED_VOICE_CLONE_VIP_AI_APP_MODEL_ID), true),
+      assert.equal(isVipModel('advanced_voice_clone'), true),
+      assert.equal(
+        isModelAllowed(RH_ADVANCED_VOICE_CLONE_VIP_AI_APP_MODEL_ID, {
+          status: 'active',
+          entitledModelIds: [RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID],
+        }),
+        true,
+      ),
+      assert.equal(
+        isModelAllowed('advanced_voice_clone', {
+          status: 'active',
+          entitledModelKeys: ['advanced_voice_clone'],
+        }),
+        true,
+      ));
+  }),
+  test('subscription access: 漫画转真人不再进入 VIP gate', () => {
+    const _0x4b69da = 'runninghub/1994718111704158209',
+      _0x59bf7f = 'ai-app/1994718111704158209',
+      _0x2d3ecb = 'runninghub/1994711386552999938';
+    (assert.equal(
+      SUBSCRIPTION_GATE_MANIFESTS.some((_0x3e3808) => _0x3e3808.key === 'runninghubAnimeReal'),
+      false,
+    ),
+      assert.equal(resolveVipGateModelId(_0x4b69da), _0x4b69da),
+      assert.equal(resolveVipGateModelId(_0x59bf7f), _0x59bf7f),
+      assert.equal(resolveVipGateModelId(_0x2d3ecb), _0x2d3ecb),
+      assert.equal(isVipModel(_0x4b69da), false),
+      assert.equal(isVipModel(_0x59bf7f), false),
+      assert.equal(isVipModel(_0x2d3ecb), false),
+      assert.equal(isModelAllowed(_0x4b69da, { status: 'none', entitledModelIds: [] }), true));
+  }),
+  test('subscription access: 即梦模型授权判定读取 dreamina/video_vip', () => {
+    const _0x185e71 = {
+      status: 'active',
+      entitledModelIds: [DREAMINA_VIDEO_VIP_MODEL_ID],
+      entitledModelKeys: [],
+    };
+    (assert.equal(isModelAllowed('dreamina/seedance2.0_vip', _0x185e71, 'dreamina'), true),
+      assert.equal(isModelAllowed('dreamina/seedance2.0fast', _0x185e71, 'dreamina'), true));
+    const _0x446782 = {
+      status: 'active',
+      entitledModelIds: [DEFAULT_VIP_GATE_MODEL_ID],
+      entitledModelKeys: [],
+    };
+    assert.equal(isModelAllowed('dreamina/seedance2.0fast', _0x446782, 'dreamina'), false);
+  }),
+  test('subscription access: 即梦模型授权支持 key alias', () => {
+    const _0x258162 = { status: 'active', entitledModelIds: [], entitledModelKeys: ['dreamina_video_vip'] };
+    assert.equal(isModelAllowed('dreamina/3.5pro', _0x258162), true);
+  }));

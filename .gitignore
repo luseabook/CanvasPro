@@ -70,7 +70,6 @@ dreamina-login-qr.png
 !electron/diagnostics.js
 !electron/externalLinks.js
 !electron/updaterController.js
-!electron-builder.obfuscated.cjs
 
 # Ignore electron build outputs
 electron-build/

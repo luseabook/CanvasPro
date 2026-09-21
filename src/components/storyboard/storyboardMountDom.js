@@ -1,1 +1,125 @@
-(function(_0x599355,_0x39dc06){const _0x21e21f=a297_0x5389,_0x49145a=_0x599355();while(!![]){try{const _0x3891c8=-parseInt(_0x21e21f(0x1f9))/0x1+-parseInt(_0x21e21f(0x1ca))/0x2*(-parseInt(_0x21e21f(0x1f8))/0x3)+parseInt(_0x21e21f(0x1c6))/0x4+parseInt(_0x21e21f(0x1d3))/0x5+-parseInt(_0x21e21f(0x1c2))/0x6+-parseInt(_0x21e21f(0x1d4))/0x7*(-parseInt(_0x21e21f(0x1e2))/0x8)+parseInt(_0x21e21f(0x1fb))/0x9*(parseInt(_0x21e21f(0x1e9))/0xa);if(_0x3891c8===_0x39dc06)break;else _0x49145a['push'](_0x49145a['shift']());}catch(_0x425573){_0x49145a['push'](_0x49145a['shift']());}}}(a297_0x549c,0x44d0c));import{buildStoryboardGridTemplate}from'../../core/storyboardCellUtils.js';const SVG_NS='http://www.w3.org/2000/svg';export function createStoryboardScaleWrap(){const _0x4fd946=a297_0x5389,_0x18de1d=document[_0x4fd946(0x1e1)]('div');return _0x18de1d[_0x4fd946(0x1dd)]=_0x4fd946(0x1d8),Object[_0x4fd946(0x1f2)](_0x18de1d[_0x4fd946(0x1c8)],{'width':_0x4fd946(0x1db),'height':_0x4fd946(0x1db),'position':'relative','transformOrigin':_0x4fd946(0x1df),'transition':'transform\x200.35s\x20cubic-bezier(0.34,\x201.56,\x200.64,\x201)'}),_0x18de1d;}export function createStoryboardContainer(){const _0x4c60af=a297_0x5389,_0x30d226=document[_0x4c60af(0x1e1)](_0x4c60af(0x1c3));return _0x30d226[_0x4c60af(0x1dd)]=_0x4c60af(0x1c5),Object['assign'](_0x30d226['style'],{'width':_0x4c60af(0x1db),'height':_0x4c60af(0x1db),'position':'relative','overflow':'hidden','borderRadius':_0x4c60af(0x1dc),'border':_0x4c60af(0x1ce),'background':_0x4c60af(0x1eb),'boxShadow':'var(--shadow-surface)'}),_0x30d226;}function a297_0x549c(){const _0x333c59=['fill','var(--bg-node)','forEach','background\x200.2s','center','gridTemplateColumns','currentColor','100','assign','15px','cells-grid','columns','600','flex','1977qvngMH','307032OacMxh','width','531Tiuarc','textContent','height','8px','3256752NkYNQx','div','0\x200\x2024\x2024','storyboard-container','698052HjjGGX','appendChild','style','stroke','994puMtNN','rect','var(--text-primary)','absolute','1.5px\x20solid\x20var(--stroke-10)','transparent','translateX(-50%)\x20scale(var(--zoom-inv,\x201))','grid','color','1660250MwIsLz','525htomzc','cols','10px','setAttribute','storyboard-scale-wrap','500','viewBox','100%','16px','className','pointer','top\x20left','0\x202px\x204px\x20var(--black-50)','createElement','21304YfAWUE','createElementNS','none','sb-collapsed-badge','svg','var(--black-60)','span','16590sFbbRx'];a297_0x549c=function(){return _0x333c59;};return a297_0x549c();}export function createStoryboardGridElement(_0x1083a3){const _0x34653f=a297_0x5389,_0x469899=document[_0x34653f(0x1e1)]('div');return _0x469899[_0x34653f(0x1dd)]=_0x34653f(0x1f4),Object[_0x34653f(0x1f2)](_0x469899[_0x34653f(0x1c8)],{'position':_0x34653f(0x1cd),'inset':'0','display':_0x34653f(0x1d1),'gap':'0px','background':_0x34653f(0x1cf),'zIndex':'1'}),_0x469899[_0x34653f(0x1c8)][_0x34653f(0x1ef)]=buildStoryboardGridTemplate(_0x1083a3[_0x34653f(0x1f5)],_0x1083a3[_0x34653f(0x1d5)]),_0x469899['style']['gridTemplateRows']=buildStoryboardGridTemplate(_0x1083a3['rowTracks'],_0x1083a3['rows']),_0x469899;}function createCollapsedGridIcon(){const _0x5591f3=a297_0x5389,_0x119a53=document[_0x5591f3(0x1e3)](SVG_NS,_0x5591f3(0x1e6));return _0x119a53[_0x5591f3(0x1d7)](_0x5591f3(0x1fa),'20'),_0x119a53['setAttribute'](_0x5591f3(0x1c0),'20'),_0x119a53['setAttribute'](_0x5591f3(0x1da),_0x5591f3(0x1c4)),_0x119a53[_0x5591f3(0x1d7)](_0x5591f3(0x1ea),_0x5591f3(0x1e4)),_0x119a53[_0x5591f3(0x1d7)](_0x5591f3(0x1c9),_0x5591f3(0x1f0)),_0x119a53[_0x5591f3(0x1d7)]('stroke-width','2'),_0x119a53[_0x5591f3(0x1c8)][_0x5591f3(0x1d2)]='var(--text-secondary)',[['3','3'],['14','3'],['14','14'],['3','14']][_0x5591f3(0x1ec)](([_0x77b587,_0x2c3183])=>{const _0x3bfaa5=_0x5591f3,_0x33a716=document[_0x3bfaa5(0x1e3)](SVG_NS,_0x3bfaa5(0x1cb));_0x33a716[_0x3bfaa5(0x1d7)]('x',_0x77b587),_0x33a716['setAttribute']('y',_0x2c3183),_0x33a716[_0x3bfaa5(0x1d7)](_0x3bfaa5(0x1fa),'7'),_0x33a716['setAttribute'](_0x3bfaa5(0x1c0),'7'),_0x119a53[_0x3bfaa5(0x1c7)](_0x33a716);}),_0x119a53;}function a297_0x5389(_0xf8f1db,_0x1b6879){const _0x549c4d=a297_0x549c();return a297_0x5389=function(_0x53897f,_0x4526d0){_0x53897f=_0x53897f-0x1bf;let _0x3a6f9d=_0x549c4d[_0x53897f];return _0x3a6f9d;},a297_0x5389(_0xf8f1db,_0x1b6879);}export function createStoryboardCollapsedBadge(_0x1b17d0){const _0x5c6379=a297_0x5389,_0x5452ca=document[_0x5c6379(0x1e1)](_0x5c6379(0x1c3));_0x5452ca['className']=_0x5c6379(0x1e5),Object[_0x5c6379(0x1f2)](_0x5452ca['style'],{'position':_0x5c6379(0x1cd),'top':'8px','right':_0x5c6379(0x1c1),'background':_0x5c6379(0x1e7),'backdropFilter':'blur(4px)','borderRadius':_0x5c6379(0x1d6),'padding':'8px\x2012px','display':_0x5c6379(0x1f7),'alignItems':_0x5c6379(0x1ee),'gap':_0x5c6379(0x1c1),'cursor':_0x5c6379(0x1de),'zIndex':'10','transition':_0x5c6379(0x1ed)});const _0xdd214=document[_0x5c6379(0x1e1)](_0x5c6379(0x1e8));return Object[_0x5c6379(0x1f2)](_0xdd214['style'],{'color':_0x5c6379(0x1cc),'fontSize':_0x5c6379(0x1f3),'fontWeight':_0x5c6379(0x1f6)}),_0xdd214[_0x5c6379(0x1bf)]=String(_0x1b17d0),_0x5452ca[_0x5c6379(0x1c7)](createCollapsedGridIcon()),_0x5452ca[_0x5c6379(0x1c7)](_0xdd214),_0x5452ca;}export function createStoryboardHint(_0xda1632){const _0x4949a7=a297_0x5389,_0x517c20=document[_0x4949a7(0x1e1)](_0x4949a7(0x1c3));return _0x517c20['className']='v2-storyboard-hint',Object[_0x4949a7(0x1f2)](_0x517c20['style'],{'position':_0x4949a7(0x1cd),'top':'calc(100%\x20+\x2018px)','left':'50%','transform':_0x4949a7(0x1d0),'color':'var(--text-primary)','fontSize':_0x4949a7(0x1dc),'fontWeight':_0x4949a7(0x1d9),'whiteSpace':'nowrap','pointerEvents':'none','transition':'all\x200.2s','zIndex':_0x4949a7(0x1f1),'textShadow':_0x4949a7(0x1e0)}),_0x517c20['textContent']=_0xda1632?'拖拽单元格进行互换，或拖出生成新图':'双击进入分镜编辑',_0x517c20;}
+import { buildStoryboardGridTemplate } from '../../core/storyboardCellUtils.js';
+const SVG_NS = 'http://www.w3.org/2000/svg';
+export function createStoryboardScaleWrap() {
+  const _0x18de1d = document.createElement('div');
+  return (
+    (_0x18de1d.className = 'storyboard-scale-wrap'),
+    Object.assign(_0x18de1d.style, {
+      width: '100%',
+      height: '100%',
+      position: 'relative',
+      transformOrigin: 'top left',
+      transition: 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    }),
+    _0x18de1d
+  );
+}
+export function createStoryboardContainer() {
+  const _0x30d226 = document.createElement('div');
+  return (
+    (_0x30d226.className = 'storyboard-container'),
+    Object.assign(_0x30d226.style, {
+      width: '100%',
+      height: '100%',
+      position: 'relative',
+      overflow: 'hidden',
+      borderRadius: '16px',
+      border: '1.5px solid var(--stroke-10)',
+      background: 'var(--bg-node)',
+      boxShadow: 'var(--shadow-surface)',
+    }),
+    _0x30d226
+  );
+}
+export function createStoryboardGridElement(_0x1083a3) {
+  const _0x469899 = document.createElement('div');
+  return (
+    (_0x469899.className = 'cells-grid'),
+    Object.assign(_0x469899.style, {
+      position: 'absolute',
+      inset: '0',
+      display: 'grid',
+      gap: '0px',
+      background: 'transparent',
+      zIndex: '1',
+    }),
+    (_0x469899.style.gridTemplateColumns = buildStoryboardGridTemplate(_0x1083a3.columns, _0x1083a3.cols)),
+    (_0x469899.style.gridTemplateRows = buildStoryboardGridTemplate(_0x1083a3.rowTracks, _0x1083a3.rows)),
+    _0x469899
+  );
+}
+function createCollapsedGridIcon() {
+  const _0x119a53 = document.createElementNS(SVG_NS, 'svg');
+  return (
+    _0x119a53.setAttribute('width', '20'),
+    _0x119a53.setAttribute('height', '20'),
+    _0x119a53.setAttribute('viewBox', '0 0 24 24'),
+    _0x119a53.setAttribute('fill', 'none'),
+    _0x119a53.setAttribute('stroke', 'currentColor'),
+    _0x119a53.setAttribute('stroke-width', '2'),
+    (_0x119a53.style.color = 'var(--text-secondary)'),
+    [
+      ['3', '3'],
+      ['14', '3'],
+      ['14', '14'],
+      ['3', '14'],
+    ].forEach(([_0x77b587, _0x2c3183]) => {
+      const _0x33a716 = document.createElementNS(SVG_NS, 'rect');
+      (_0x33a716.setAttribute('x', _0x77b587),
+        _0x33a716.setAttribute('y', _0x2c3183),
+        _0x33a716.setAttribute('width', '7'),
+        _0x33a716.setAttribute('height', '7'),
+        _0x119a53.appendChild(_0x33a716));
+    }),
+    _0x119a53
+  );
+}
+export function createStoryboardCollapsedBadge(_0x1b17d0) {
+  const _0x5452ca = document.createElement('div');
+  ((_0x5452ca.className = 'sb-collapsed-badge'),
+    Object.assign(_0x5452ca.style, {
+      position: 'absolute',
+      top: '8px',
+      right: '8px',
+      background: 'var(--black-60)',
+      backdropFilter: 'blur(4px)',
+      borderRadius: '10px',
+      padding: '8px 12px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      cursor: 'pointer',
+      zIndex: '10',
+      transition: 'background 0.2s',
+    }));
+  const _0xdd214 = document.createElement('span');
+  return (
+    Object.assign(_0xdd214.style, { color: 'var(--text-primary)', fontSize: '15px', fontWeight: '600' }),
+    (_0xdd214.textContent = String(_0x1b17d0)),
+    _0x5452ca.appendChild(createCollapsedGridIcon()),
+    _0x5452ca.appendChild(_0xdd214),
+    _0x5452ca
+  );
+}
+export function createStoryboardHint(_0xda1632) {
+  const _0x517c20 = document.createElement('div');
+  return (
+    (_0x517c20.className = 'v2-storyboard-hint'),
+    Object.assign(_0x517c20.style, {
+      position: 'absolute',
+      top: 'calc(100% + 18px)',
+      left: '50%',
+      transform: 'translateX(-50%) scale(var(--zoom-inv, 1))',
+      color: 'var(--text-primary)',
+      fontSize: '16px',
+      fontWeight: '500',
+      whiteSpace: 'nowrap',
+      pointerEvents: 'none',
+      transition: 'all 0.2s',
+      zIndex: '100',
+      textShadow: '0 2px 4px var(--black-50)',
+    }),
+    (_0x517c20.textContent = _0xda1632 ? '拖拽单元格进行互换，或拖出生成新图' : '双击进入分镜编辑'),
+    _0x517c20
+  );
+}

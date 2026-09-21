@@ -1,1 +1,38 @@
-const a239_0x532a34=a239_0x3436;(function(_0x30a10d,_0x3a436f){const _0x2a3d7f=a239_0x3436,_0x51d75b=_0x30a10d();while(!![]){try{const _0x25f81c=parseInt(_0x2a3d7f(0x1e3))/0x1+parseInt(_0x2a3d7f(0x1d9))/0x2*(-parseInt(_0x2a3d7f(0x1df))/0x3)+parseInt(_0x2a3d7f(0x1de))/0x4+parseInt(_0x2a3d7f(0x1da))/0x5*(parseInt(_0x2a3d7f(0x1dc))/0x6)+-parseInt(_0x2a3d7f(0x1e1))/0x7+-parseInt(_0x2a3d7f(0x1d5))/0x8+-parseInt(_0x2a3d7f(0x1e2))/0x9*(-parseInt(_0x2a3d7f(0x1d8))/0xa);if(_0x25f81c===_0x3a436f)break;else _0x51d75b['push'](_0x51d75b['shift']());}catch(_0x3c5fc7){_0x51d75b['push'](_0x51d75b['shift']());}}}(a239_0x402f,0xa1a99));import{createToolbarHtml,createToolbarIconButton}from'./buttonFactory.js';import{STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG}from'./storyboardScriptToolbarIcon.js';import{t}from'../../i18n/index.js';function a239_0x3436(_0x6d6763,_0x44f131){const _0x402f76=a239_0x402f();return a239_0x3436=function(_0x3436e4,_0x5cfba0){_0x3436e4=_0x3436e4-0x1d4;let _0x2cbc47=_0x402f76[_0x3436e4];return _0x2cbc47;},a239_0x3436(_0x6d6763,_0x44f131);}function a239_0x402f(){const _0x1d9b91=['<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2216\x22\x20height=\x2216\x22><rect\x20x=\x229\x22\x20y=\x229\x22\x20width=\x2213\x22\x20height=\x2213\x22\x20rx=\x222\x22\x20ry=\x222\x22/><path\x20d=\x22M5\x2015H4a2\x202\x200\x200\x201-2-2V4a2\x202\x200\x200\x201\x202-2h9a2\x202\x200\x200\x201\x202\x202v1\x22/></svg>','7682472VFKFzq','11291877mmrmPG','1045025JClnHb','clear-empty-lines','nodeToolbar.text.','storyboardScript','2474000WygXCh','copy','<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2216\x22\x20height=\x2216\x22><path\x20d=\x22M8\x203H5a2\x202\x200\x200\x200-2\x202v3m18\x200V5a2\x202\x200\x200\x200-2-2h-3m0\x2018h3a2\x202\x200\x200\x200\x202-2v-3M3\x2016v3a2\x202\x200\x200\x200\x202\x202h3\x22/></svg>','10ABneBF','154106YmhyoC','12905skXfXL','v2-text-toolbar','294nzMoaa','clearEmptyLines','2269616fklARr','36OTUIay'];a239_0x402f=function(){return _0x1d9b91;};return a239_0x402f();}function textToolbarText(_0xc0e0bc){const _0x2cc5fc=a239_0x3436;return t(_0x2cc5fc(0x1e5)+_0xc0e0bc);}export const TEXT_TOOLBAR_HTML=createToolbarHtml({'toolbarClass':a239_0x532a34(0x1db),'items':[createToolbarIconButton({'action':'copy','tooltip':textToolbarText(a239_0x532a34(0x1d6)),'label':textToolbarText(a239_0x532a34(0x1d6)),'iconSvg':a239_0x532a34(0x1e0)}),createToolbarIconButton({'action':a239_0x532a34(0x1e4),'tooltip':textToolbarText('clearEmptyLines'),'label':textToolbarText(a239_0x532a34(0x1dd)),'iconSvg':'<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2216\x22\x20height=\x2216\x22><path\x20d=\x22M4\x206h16\x22/><path\x20d=\x22M4\x2012h16\x22/><path\x20d=\x22M4\x2018h8\x22/><path\x20d=\x22M18\x2015l3\x203\x22/><path\x20d=\x22M21\x2015l-3\x203\x22/></svg>'}),createToolbarIconButton({'action':'storyboard-script','tooltip':textToolbarText(a239_0x532a34(0x1d4)),'label':textToolbarText('storyboardScript'),'iconSvg':STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG}),createToolbarIconButton({'action':'fullscreen','tooltip':textToolbarText('fullscreen'),'label':textToolbarText('fullscreen'),'iconSvg':a239_0x532a34(0x1d7)})]});
+import { createToolbarHtml, createToolbarIconButton } from './buttonFactory.js';
+import { STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG } from './storyboardScriptToolbarIcon.js';
+import { t } from '../../i18n/index.js';
+function textToolbarText(_0xc0e0bc) {
+  return t('nodeToolbar.text.' + _0xc0e0bc);
+}
+export const TEXT_TOOLBAR_HTML = createToolbarHtml({
+  toolbarClass: 'v2-text-toolbar',
+  items: [
+    createToolbarIconButton({
+      action: 'copy',
+      tooltip: textToolbarText('copy'),
+      label: textToolbarText('copy'),
+      iconSvg:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+    }),
+    createToolbarIconButton({
+      action: 'clear-empty-lines',
+      tooltip: textToolbarText('clearEmptyLines'),
+      label: textToolbarText('clearEmptyLines'),
+      iconSvg:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h8"/><path d="M18 15l3 3"/><path d="M21 15l-3 3"/></svg>',
+    }),
+    createToolbarIconButton({
+      action: 'storyboard-script',
+      tooltip: textToolbarText('storyboardScript'),
+      label: textToolbarText('storyboardScript'),
+      iconSvg: STORYBOARD_SCRIPT_TOOLBAR_ICON_SVG,
+    }),
+    createToolbarIconButton({
+      action: 'fullscreen',
+      tooltip: textToolbarText('fullscreen'),
+      label: textToolbarText('fullscreen'),
+      iconSvg:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>',
+    }),
+  ],
+});

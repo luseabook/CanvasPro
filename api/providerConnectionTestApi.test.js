@@ -1,1 +1,490 @@
-const a63_0x1283b3=a63_0x4692;function a63_0x1a2b(){const _0x3f7e66=['providerConnectionTestApi:\x20missing\x20provider\x20key\x20fails\x20before\x20fetch','CNY','https://upload.apimart.ai/aic-test.png','888.5','skipped','/api/v2/proxy/task?apiUrl=https://api.ppio.com/openai/v1/models','grsai','积分\x208,765','providerConnectionTestApi:\x20normalizes\x20APIMart\x20unlimited\x20balance\x20payloads','category','gemini-3.1-pro','https://cdn.qiniu.example.com','/client/resource/newUploadTokenZH','2503926uPvXue','/uc/openapi/accountStatus','agnes-image-2.1-flash','https://grsaiapi.com','https://www.runninghub.cn/aic-test.png','3836oQxAqi','/v1/user/balance','unlimited','apimart','/api/v2/proxy/task?apiUrl=https://apihub.agnes-ai.com/v1/models','积分\x2099,999\x20·\x20钱包\x20999\x20人民币','rh-model-key','https://upload.qiniu.example.com','runninghub','apikey','积分\x2012,345','auth_failed','used','https://grsai.dakka.com.cn/v1','providerConnectionTestApi:\x20APIMart\x20默认使用国内1线路','error','am-key','doesNotMatch','providerConnectionTestApi:\x20runninghub\x20treats\x20invalid\x20task\x20response\x20as\x20credential\x20pass','https://api.apib.ai','积分\x204,321.25','3621360bIhvYm','length','deepseek/deepseek-v3-0324','54321','3011604VQWvUO','rh-workflow-key','Bearer\x20ppio-key','remaining','12.75','endsWith','fetch','agnes-2.0-flash','https://apihub.agnes-ai.com/v1','invalid\x20api\x20key','https://apihub.agnes-ai.com','providerConnectionTestApi:\x20probes\x20APIMart\x20with\x20models\x20endpoint','https://api.apimart.ai','upload','parse','积分\x209,876','messages','4321.25','suggestion','agnes-key','Bearer\x20rh-model-key','headers','after','余额\x20100.5\x20美元','余额\x20不限','https://ark.cn-beijing.volces.com/api/v3','fromEntries','Bearer\x20ark-key','/api/v2/proxy/task?apiUrl=https://api.aishuch.com/v1/models','demo','aic-test.png','9876','积分\x2054,321\x20·\x20钱包\x20888.5\x20人民币','./providerConnectionTestApi.js','https://upload.apib.ai/aic-test.png','aic-connection-test','task\x20not\x20found','Authorization','人民币','filter','success','/client/openapi/getCredits','deepEqual','https://grsai.dakka.com.cn/client/openapi/getCredits','displayText','https://api.openai.com','999','includes','url','Bearer\x20agnes-key','/api/v2/proxy/task?apiUrl=https://api.apimart.ai/v1/models','providerConnectionTestApi:\x20probes\x20Agnes\x20with\x20models\x20then\x20chat\x20fallback','steps','config','/openapi/v2/query','providerConnectionTestApi:\x20normalizes\x20RunningHUB\x20account\x20status\x20balances','486YysiZH','grsai-key','account','message','qiniu-token','/api/v2/proxy/image','method','detailText','find','apiKey','providerConnectionTestApi:\x20explains\x20auth\x20failures\x20in\x20human\x20language','3178rbgUth','/client/common/getCredits?','source','volcengine','startsWith','https://api.aishuch.com','7318712ckZfHg','ark-key','currencyLabel','ppio','https://upload.aishuch.com/aic-test.png','body','push','258HcihzT','map','/proxy/task?','equal','upload_failed','bad-key','/client/common/getCredits?apikey=grsai-key','GET','/api/v2/proxy/upload?','partial','openai','workflowCredits','max_tokens','options','user','agnes','1237870nkDJLV','/api/v2/proxy/task?apiUrl=https://api.apimart.ai/v1/user/balance','auth','balance','/api/v2/proxy/completions','stringify','Bearer\x20am-key','providerConnectionTestApi:\x20reports\x20upload\x20chain\x20separately','credits','model','match','apiUrl','/api/v2/proxy/apimart-upload','/api/v2/proxy/task?apiUrl=https://ark.cn-beijing.volces.com/ping'];a63_0x1a2b=function(){return _0x3f7e66;};return a63_0x1a2b();}(function(_0x348bc4,_0x201d61){const _0x547085=a63_0x4692,_0x26b7cc=_0x348bc4();while(!![]){try{const _0x167b3f=parseInt(_0x547085(0xbe))/0x1+-parseInt(_0x547085(0xde))/0x2*(parseInt(_0x547085(0x12f))/0x3)+-parseInt(_0x547085(0xf7))/0x4+-parseInt(_0x547085(0xf3))/0x5+parseInt(_0x547085(0xae))/0x6*(parseInt(_0x547085(0x13a))/0x7)+parseInt(_0x547085(0xa7))/0x8+parseInt(_0x547085(0xd9))/0x9;if(_0x167b3f===_0x201d61)break;else _0x26b7cc['push'](_0x26b7cc['shift']());}catch(_0x5f0278){_0x26b7cc['push'](_0x26b7cc['shift']());}}}(a63_0x1a2b,0xa1c1c));import a63_0x5b4ad0 from'node:test';import a63_0xb58cfe from'node:assert/strict';function a63_0x4692(_0x240157,_0x507505){const _0x1a2bb6=a63_0x1a2b();return a63_0x4692=function(_0x469210,_0x58d099){_0x469210=_0x469210-0xa2;let _0x578c55=_0x1a2bb6[_0x469210];return _0x578c55;},a63_0x4692(_0x240157,_0x507505);}function jsonResponse(_0x76b925,_0x58bfbc=0xc8){const _0x49403=a63_0x4692;return{'ok':_0x58bfbc>=0xc8&&_0x58bfbc<0x12c,'status':_0x58bfbc,'headers':{'get':()=>'application/json'},'json':async()=>_0x76b925,'text':async()=>JSON[_0x49403(0xc3)](_0x76b925)};}a63_0x5b4ad0(a63_0x1283b3(0x102),async _0x32f735=>{const _0x17da98=a63_0x1283b3,_0x2d48ea=globalThis[_0x17da98(0xfd)],_0x28f665=[];globalThis[_0x17da98(0xfd)]=async(_0x31632f,_0x19a5d6={})=>{const _0x11714c=_0x17da98;_0x28f665[_0x11714c(0xad)]({'url':String(_0x31632f),'options':_0x19a5d6});if(decodeURIComponent(String(_0x31632f))[_0x11714c(0x126)](_0x11714c(0xdf)))return jsonResponse({'success':!![],'remain_balance':100.5,'used_balance':0x19,'unlimited_quota':![]});if(String(_0x31632f)[_0x11714c(0xfc)](_0x11714c(0xca))){const _0x4878e6=Object[_0x11714c(0x111)](_0x19a5d6['body']['entries']());return a63_0xb58cfe[_0x11714c(0xb1)](_0x4878e6[_0x11714c(0x138)],_0x11714c(0xee)),a63_0xb58cfe[_0x11714c(0xb1)](_0x4878e6[_0x11714c(0xc9)],'https://api.apimart.ai'),jsonResponse({'cdnUrl':_0x11714c(0xce)});}return jsonResponse({'data':[{'id':_0x11714c(0x114)}]});},_0x32f735[_0x17da98(0x10d)](()=>{globalThis['fetch']=_0x2d48ea;});const {testProviderConnection:_0x137d99}=await import(_0x17da98(0x118)),_0xb7cb7b=await _0x137d99('apimart',{'apiUrl':_0x17da98(0x103),'apiKey':_0x17da98(0xee)});a63_0xb58cfe[_0x17da98(0xb1)](_0xb7cb7b['ok'],!![]),a63_0xb58cfe[_0x17da98(0xb1)](_0x28f665[_0x17da98(0xf4)],0x3),a63_0xb58cfe['equal'](_0xb7cb7b[_0x17da98(0xc1)]?.[_0x17da98(0x123)],_0x17da98(0x10e)),a63_0xb58cfe[_0x17da98(0xb1)](_0xb7cb7b[_0x17da98(0xc1)]?.[_0x17da98(0xfa)],100.5),a63_0xb58cfe[_0x17da98(0x121)](_0xb7cb7b['steps'][_0x17da98(0xaf)](_0x2f4159=>_0x2f4159['id']),[_0x17da98(0x12c),_0x17da98(0xc0),_0x17da98(0xc7),_0x17da98(0xc1),_0x17da98(0x104)]),a63_0xb58cfe[_0x17da98(0xb1)](_0x28f665[0x0][_0x17da98(0xbb)][_0x17da98(0x135)],_0x17da98(0xb5)),a63_0xb58cfe[_0x17da98(0xb1)](_0x28f665[0x0][_0x17da98(0xbb)][_0x17da98(0x10c)][_0x17da98(0x11c)],_0x17da98(0xc4)),a63_0xb58cfe['ok'](decodeURIComponent(_0x28f665[0x0][_0x17da98(0x127)])[_0x17da98(0x126)](_0x17da98(0x129))),a63_0xb58cfe[_0x17da98(0xb1)](_0xb7cb7b[_0x17da98(0x12b)][_0x17da98(0x137)](_0x20c9f9=>_0x20c9f9['id']==='model')?.[_0x17da98(0x132)],'模型列表可访问，未执行额外模型调用'),a63_0xb58cfe['ok'](decodeURIComponent(_0x28f665[0x1][_0x17da98(0x127)])['includes'](_0x17da98(0xbf)));}),a63_0x5b4ad0('providerConnectionTestApi:\x20strips\x20APIMart\x20/v1\x20before\x20upload\x20probe',async _0x4b9be6=>{const _0x12c9b2=a63_0x1283b3,_0xed8035=globalThis[_0x12c9b2(0xfd)];globalThis['fetch']=async(_0x4b50bb,_0x3064b0={})=>{const _0x8a2810=_0x12c9b2,_0x1758e8=String(_0x4b50bb);if(_0x1758e8['endsWith'](_0x8a2810(0xca))){const _0x2ae146=Object[_0x8a2810(0x111)](_0x3064b0[_0x8a2810(0xac)]['entries']());return a63_0xb58cfe[_0x8a2810(0xb1)](_0x2ae146['apiUrl'],_0x8a2810(0x103)),jsonResponse({'url':_0x8a2810(0xce)});}if(decodeURIComponent(_0x1758e8)['includes']('/v1/user/balance'))return jsonResponse({'success':!![],'remain_balance':0x1});return jsonResponse({'data':[{'id':_0x8a2810(0x114)}]});},_0x4b9be6[_0x12c9b2(0x10d)](()=>{const _0x405573=_0x12c9b2;globalThis[_0x405573(0xfd)]=_0xed8035;});const {testProviderConnection:_0x503494}=await import(_0x12c9b2(0x118)),_0x1c1711=await _0x503494(_0x12c9b2(0xe1),{'apiUrl':'https://api.apimart.ai/v1','apiKey':'am-key'});a63_0xb58cfe[_0x12c9b2(0xb1)](_0x1c1711['ok'],!![]);}),a63_0x5b4ad0(a63_0x1283b3(0xec),async _0xd8976d=>{const _0x427ed9=a63_0x1283b3,_0x2fedcd=globalThis[_0x427ed9(0xfd)],_0x2fa5af=[];globalThis['fetch']=async(_0x123eb1,_0x1f64f4={})=>{const _0x35923c=_0x427ed9;_0x2fa5af[_0x35923c(0xad)]({'url':String(_0x123eb1),'options':_0x1f64f4});const _0xa8d4a7=decodeURIComponent(String(_0x123eb1));if(_0xa8d4a7[_0x35923c(0x126)](_0x35923c(0xdf)))return jsonResponse({'success':!![],'remain_balance':0x1});if(String(_0x123eb1)[_0x35923c(0xfc)]('/api/v2/proxy/apimart-upload')){const _0x5390d5=Object[_0x35923c(0x111)](_0x1f64f4[_0x35923c(0xac)]['entries']());return a63_0xb58cfe[_0x35923c(0xb1)](_0x5390d5['apiUrl'],_0x35923c(0xf1)),jsonResponse({'cdnUrl':_0x35923c(0x119)});}return jsonResponse({'data':[{'id':_0x35923c(0x114)}]});},_0xd8976d[_0x427ed9(0x10d)](()=>{const _0x26f4e1=_0x427ed9;globalThis[_0x26f4e1(0xfd)]=_0x2fedcd;});const {testProviderConnection:_0x99c470}=await import('./providerConnectionTestApi.js'),_0x22fd62=await _0x99c470(_0x427ed9(0xe1),{'apiKey':_0x427ed9(0xee)});a63_0xb58cfe[_0x427ed9(0xb1)](_0x22fd62['ok'],!![]),a63_0xb58cfe['ok'](decodeURIComponent(_0x2fa5af[0x0]['url'])[_0x427ed9(0x126)]('/api/v2/proxy/task?apiUrl=https://api.apib.ai/v1/models')),a63_0xb58cfe['ok'](decodeURIComponent(_0x2fa5af[0x1][_0x427ed9(0x127)])[_0x427ed9(0x126)]('/api/v2/proxy/task?apiUrl=https://api.apib.ai/v1/user/balance'));}),a63_0x5b4ad0('providerConnectionTestApi:\x20APIMart\x20routeId\x20domestic2\x20uses\x20aishuch\x20endpoints',async _0x31d19c=>{const _0x115941=a63_0x1283b3,_0x221433=globalThis[_0x115941(0xfd)],_0x1fe9e4=[];globalThis[_0x115941(0xfd)]=async(_0x2008c2,_0x15c860={})=>{const _0x52aa69=_0x115941;_0x1fe9e4[_0x52aa69(0xad)]({'url':String(_0x2008c2),'options':_0x15c860});const _0x2e5a61=decodeURIComponent(String(_0x2008c2));if(_0x2e5a61[_0x52aa69(0x126)]('/v1/user/balance'))return jsonResponse({'success':!![],'remain_balance':0x1});if(String(_0x2008c2)[_0x52aa69(0xfc)]('/api/v2/proxy/apimart-upload')){const _0x230e4b=Object['fromEntries'](_0x15c860[_0x52aa69(0xac)]['entries']());return a63_0xb58cfe[_0x52aa69(0xb1)](_0x230e4b[_0x52aa69(0xc9)],_0x52aa69(0xa6)),jsonResponse({'cdnUrl':_0x52aa69(0xab)});}return jsonResponse({'data':[{'id':_0x52aa69(0x114)}]});},_0x31d19c[_0x115941(0x10d)](()=>{const _0x58bdd2=_0x115941;globalThis[_0x58bdd2(0xfd)]=_0x221433;});const {testProviderConnection:_0x4dfd8d}=await import(_0x115941(0x118)),_0x3715ed=await _0x4dfd8d(_0x115941(0xe1),{'routeId':'domestic2','apiKey':_0x115941(0xee)});a63_0xb58cfe[_0x115941(0xb1)](_0x3715ed['ok'],!![]),a63_0xb58cfe['ok'](decodeURIComponent(_0x1fe9e4[0x0][_0x115941(0x127)])['includes'](_0x115941(0x113))),a63_0xb58cfe['ok'](decodeURIComponent(_0x1fe9e4[0x1][_0x115941(0x127)])[_0x115941(0x126)]('/api/v2/proxy/task?apiUrl=https://api.aishuch.com/v1/user/balance'));}),a63_0x5b4ad0(a63_0x1283b3(0x12a),async _0x211872=>{const _0x5e294b=a63_0x1283b3,_0x2a5c67=globalThis[_0x5e294b(0xfd)],_0x5e1dab=[];globalThis[_0x5e294b(0xfd)]=async(_0x171c7f,_0x4937f5={})=>{const _0x6652db=_0x5e294b;_0x5e1dab[_0x6652db(0xad)]({'url':String(_0x171c7f),'options':_0x4937f5});if(String(_0x171c7f)['endsWith'](_0x6652db(0xc2))){const _0x473385=JSON[_0x6652db(0x105)](_0x4937f5[_0x6652db(0xac)]);return a63_0xb58cfe[_0x6652db(0xb1)](_0x473385[_0x6652db(0xc9)],_0x6652db(0xff)),a63_0xb58cfe[_0x6652db(0xb1)](_0x473385[_0x6652db(0x138)],_0x6652db(0x10a)),a63_0xb58cfe['equal'](_0x473385['model'],_0x6652db(0xfe)),a63_0xb58cfe[_0x6652db(0xb1)](_0x473385[_0x6652db(0xba)],0x1),jsonResponse({'choices':[{'message':{'content':'ok'}}]});}return jsonResponse({'data':[{'id':_0x6652db(0xfe)},{'id':_0x6652db(0xdb)}]});},_0x211872['after'](()=>{const _0x5cc5=_0x5e294b;globalThis[_0x5cc5(0xfd)]=_0x2a5c67;});const {testProviderConnection:_0x2b9d48}=await import(_0x5e294b(0x118)),_0x3d0aeb=await _0x2b9d48(_0x5e294b(0xbd),{'apiUrl':_0x5e294b(0x101),'apiKey':_0x5e294b(0x128)});a63_0xb58cfe['equal'](_0x3d0aeb['ok'],!![]),a63_0xb58cfe[_0x5e294b(0xb1)](_0x5e1dab['length'],0x2),a63_0xb58cfe[_0x5e294b(0x121)](_0x3d0aeb[_0x5e294b(0x12b)][_0x5e294b(0xaf)](_0x48e5c4=>_0x48e5c4['id']),['config',_0x5e294b(0xc0),_0x5e294b(0xc7),_0x5e294b(0x104)]),a63_0xb58cfe[_0x5e294b(0xb1)](_0x5e1dab[0x0][_0x5e294b(0xbb)][_0x5e294b(0x135)],_0x5e294b(0xb5)),a63_0xb58cfe[_0x5e294b(0xb1)](_0x5e1dab[0x0]['options'][_0x5e294b(0x10c)][_0x5e294b(0x11c)],'Bearer\x20agnes-key'),a63_0xb58cfe['ok'](decodeURIComponent(_0x5e1dab[0x0]['url'])[_0x5e294b(0x126)](_0x5e294b(0xe2))),a63_0xb58cfe[_0x5e294b(0xb1)](_0x3d0aeb['steps'][_0x5e294b(0x137)](_0xed5772=>_0xed5772['id']==='upload')?.[_0x5e294b(0xd0)],!![]);}),a63_0x5b4ad0(a63_0x1283b3(0xd4),async()=>{const _0x429a11=a63_0x1283b3,{normalizeApimartBalancePayload:_0x34d673}=await import(_0x429a11(0x118)),_0x2cfe2f=_0x34d673({'data':{'success':!![],'unlimited_quota':!![],'remain_balance':-0x1,'used_balance':_0x429a11(0xfb)}});a63_0xb58cfe[_0x429a11(0xb1)](_0x2cfe2f[_0x429a11(0x123)],_0x429a11(0x10f)),a63_0xb58cfe[_0x429a11(0xb1)](_0x2cfe2f[_0x429a11(0xe0)],!![]),a63_0xb58cfe[_0x429a11(0xb1)](_0x2cfe2f[_0x429a11(0xfa)],null),a63_0xb58cfe[_0x429a11(0xb1)](_0x2cfe2f[_0x429a11(0xea)],12.75),a63_0xb58cfe[_0x429a11(0xc8)](_0x2cfe2f[_0x429a11(0x136)],/额度不限/),a63_0xb58cfe[_0x429a11(0xef)](_0x2cfe2f[_0x429a11(0x136)],/-1/),a63_0xb58cfe['doesNotMatch'](_0x2cfe2f[_0x429a11(0x136)],/已用余额/);}),a63_0x5b4ad0(a63_0x1283b3(0x12e),async()=>{const _0x5740e7=a63_0x1283b3,{normalizeRunningHubBalancePayload:_0x54a608}=await import('./providerConnectionTestApi.js'),_0x3f2354=_0x54a608({'workflow':{'code':0x0,'msg':'success','data':{'remainCoins':'99999','remainMoney':'5','currency':'CNY'}},'model':{'code':0x0,'msg':_0x5740e7(0x11f),'data':{'remainCoins':'12','remainMoney':_0x5740e7(0x125),'currency':'CNY'}}});a63_0xb58cfe[_0x5740e7(0xb1)](_0x3f2354[_0x5740e7(0x123)],_0x5740e7(0xe3)),a63_0xb58cfe[_0x5740e7(0xb1)](_0x3f2354[_0x5740e7(0xb9)],0x1869f),a63_0xb58cfe[_0x5740e7(0xb1)](_0x3f2354['modelWallet'],0x3e7),a63_0xb58cfe[_0x5740e7(0xb1)](_0x3f2354[_0x5740e7(0xa9)],_0x5740e7(0x11d)),a63_0xb58cfe[_0x5740e7(0xc8)](_0x3f2354[_0x5740e7(0x136)],/工作流积分：99,999/),a63_0xb58cfe[_0x5740e7(0xc8)](_0x3f2354[_0x5740e7(0x136)],/模型钱包：999 人民币/);}),a63_0x5b4ad0('providerConnectionTestApi:\x20normalizes\x20GRSAI\x20API\x20key\x20credits\x20payloads',async()=>{const _0x5e8b1d=a63_0x1283b3,{normalizeGrsaiBalancePayload:_0xe02fb4}=await import(_0x5e8b1d(0x118)),_0x5a92e9=_0xe02fb4({'code':0x0,'data':{'credits':'4321.25'}});a63_0xb58cfe[_0x5e8b1d(0xb1)](_0x5a92e9['displayText'],_0x5e8b1d(0xf2)),a63_0xb58cfe['equal'](_0x5a92e9[_0x5e8b1d(0xc6)],4321.25),a63_0xb58cfe[_0x5e8b1d(0xb1)](_0x5a92e9[_0x5e8b1d(0xa3)],_0x5e8b1d(0x131)),a63_0xb58cfe[_0x5e8b1d(0xc8)](_0x5a92e9[_0x5e8b1d(0x136)],/账户积分：4,321.25/);const _0x32ae2b=_0xe02fb4({'code':0xc8,'data':'8765'},{'source':_0x5e8b1d(0x138)});a63_0xb58cfe[_0x5e8b1d(0xb1)](_0x32ae2b['displayText'],_0x5e8b1d(0xd3)),a63_0xb58cfe[_0x5e8b1d(0xb1)](_0x32ae2b['source'],_0x5e8b1d(0x138));}),a63_0x5b4ad0('providerConnectionTestApi:\x20probes\x20GRSAI\x20with\x20domestic\x20chat\x20completions\x20directly',async _0x12d7cc=>{const _0x234f50=a63_0x1283b3,_0x462095=globalThis[_0x234f50(0xfd)],_0x943062=[];globalThis['fetch']=async(_0x157bd3,_0x37dc5d={})=>{const _0x2e753b=_0x234f50;_0x943062[_0x2e753b(0xad)]({'url':String(_0x157bd3),'options':_0x37dc5d});if(String(_0x157bd3)[_0x2e753b(0xfc)](_0x2e753b(0xc2)))return jsonResponse({'choices':[{'message':{'content':'ok'}}]});if(String(_0x157bd3)[_0x2e753b(0xfc)]('/client/openapi/getCredits'))return jsonResponse({'code':0x0,'data':{'credits':_0x2e753b(0x108)}});if(String(_0x157bd3)[_0x2e753b(0xfc)](_0x2e753b(0xd8)))return jsonResponse({'data':{'token':_0x2e753b(0x133),'key':_0x2e753b(0x115),'url':_0x2e753b(0xe5),'domain':'https://cdn.qiniu.example.com'}});return jsonResponse({'ok':!![]});},_0x12d7cc[_0x234f50(0x10d)](()=>{globalThis['fetch']=_0x462095;});const {testProviderConnection:_0x54ce49}=await import('./providerConnectionTestApi.js'),_0x4d0b53=await _0x54ce49(_0x234f50(0xd2),{'apiUrl':_0x234f50(0xdc),'apiKey':'grsai-key'});a63_0xb58cfe[_0x234f50(0xb1)](_0x4d0b53['ok'],!![]),a63_0xb58cfe[_0x234f50(0xb1)](_0x943062[_0x234f50(0xf4)],0x4),a63_0xb58cfe[_0x234f50(0x121)](_0x4d0b53[_0x234f50(0x12b)][_0x234f50(0xaf)](_0x4f0549=>_0x4f0549['id']),[_0x234f50(0x12c),_0x234f50(0xc7),_0x234f50(0xc1),'upload']),a63_0xb58cfe[_0x234f50(0xb1)](_0x4d0b53['balance']?.[_0x234f50(0x123)],_0x234f50(0xf2)),a63_0xb58cfe[_0x234f50(0xb1)](_0x4d0b53[_0x234f50(0xc1)]?.[_0x234f50(0xc6)],4321.25),a63_0xb58cfe[_0x234f50(0xb1)](_0x4d0b53[_0x234f50(0xc1)]?.[_0x234f50(0xa3)],'account'),a63_0xb58cfe[_0x234f50(0xb1)](_0x943062[0x0]['url'],_0x234f50(0xc2));const _0x468ed3=JSON['parse'](_0x943062[0x0][_0x234f50(0xbb)][_0x234f50(0xac)]);a63_0xb58cfe['equal'](_0x468ed3[_0x234f50(0xc9)],_0x234f50(0xeb)),a63_0xb58cfe['equal'](_0x468ed3['apiKey'],_0x234f50(0x130)),a63_0xb58cfe[_0x234f50(0xb1)](_0x468ed3[_0x234f50(0xc7)],_0x234f50(0xd6)),a63_0xb58cfe[_0x234f50(0xb1)](_0x468ed3['max_tokens'],undefined),a63_0xb58cfe['deepEqual'](_0x468ed3[_0x234f50(0x107)],[{'role':_0x234f50(0xbc),'content':'你好'}]),a63_0xb58cfe[_0x234f50(0xb1)](_0x943062[0x1][_0x234f50(0x127)],_0x234f50(0x122)),a63_0xb58cfe[_0x234f50(0xb1)](_0x943062[0x1][_0x234f50(0xbb)][_0x234f50(0x135)],'POST'),a63_0xb58cfe['equal'](_0x943062[0x1][_0x234f50(0xbb)][_0x234f50(0x10c)][_0x234f50(0x11c)],undefined),a63_0xb58cfe['deepEqual'](JSON[_0x234f50(0x105)](_0x943062[0x1][_0x234f50(0xbb)]['body']),{'token':'grsai-key'});}),a63_0x5b4ad0('providerConnectionTestApi:\x20GRSAI\x20falls\x20back\x20when\x20API\x20key\x20credits\x20are\x20zero',async _0x3172d6=>{const _0x2dd812=a63_0x1283b3,_0x555781=globalThis[_0x2dd812(0xfd)],_0x565570=[];globalThis['fetch']=async(_0x4fd034,_0x4484ff={})=>{const _0x7605ee=_0x2dd812;_0x565570['push']({'url':String(_0x4fd034),'options':_0x4484ff});if(String(_0x4fd034)[_0x7605ee(0xfc)]('/api/v2/proxy/completions'))return jsonResponse({'choices':[{'message':{'content':'ok'}}]});if(String(_0x4fd034)[_0x7605ee(0xfc)](_0x7605ee(0x120)))return jsonResponse({'code':0x0,'data':{'credits':'0'}});if(String(_0x4fd034)['includes'](_0x7605ee(0xa2)))return jsonResponse({'code':0x0,'data':{'credits':_0x7605ee(0x116)}});if(String(_0x4fd034)['endsWith'](_0x7605ee(0xd8)))return jsonResponse({'data':{'token':_0x7605ee(0x133),'key':_0x7605ee(0x115),'url':_0x7605ee(0xe5),'domain':_0x7605ee(0xd7)}});return jsonResponse({'ok':!![]});},_0x3172d6['after'](()=>{globalThis['fetch']=_0x555781;});const {testProviderConnection:_0x2aca62}=await import(_0x2dd812(0x118)),_0x4c0cfa=await _0x2aca62(_0x2dd812(0xd2),{'apiUrl':_0x2dd812(0xdc),'apiKey':'grsai-key'});a63_0xb58cfe[_0x2dd812(0xb1)](_0x4c0cfa['ok'],!![]),a63_0xb58cfe['equal'](_0x4c0cfa[_0x2dd812(0xc1)]?.[_0x2dd812(0x123)],_0x2dd812(0x106)),a63_0xb58cfe['equal'](_0x4c0cfa[_0x2dd812(0xc1)]?.[_0x2dd812(0xa3)],'account'),a63_0xb58cfe['ok'](_0x565570[0x2][_0x2dd812(0x127)]['includes'](_0x2dd812(0xb4)));}),a63_0x5b4ad0('providerConnectionTestApi:\x20PPIO\x20uses\x20official\x20models\x20endpoint\x20without\x20model-specific\x20fallback',async _0x1edc68=>{const _0x2b1fc7=a63_0x1283b3,_0x41e36a=globalThis[_0x2b1fc7(0xfd)],_0x109d26=[];globalThis[_0x2b1fc7(0xfd)]=async(_0x353556,_0x366903={})=>{const _0x4a6d83=_0x2b1fc7;return _0x109d26[_0x4a6d83(0xad)]({'url':String(_0x353556),'options':_0x366903}),jsonResponse({'data':[{'id':_0x4a6d83(0xf5)}]});},_0x1edc68[_0x2b1fc7(0x10d)](()=>{globalThis['fetch']=_0x41e36a;});const {testProviderConnection:_0x1eccf7}=await import(_0x2b1fc7(0x118)),_0x5eaf9c=await _0x1eccf7(_0x2b1fc7(0xaa),{'apiUrl':'https://api.ppio.com','apiKey':'Bearer\x20ppio-key'});a63_0xb58cfe[_0x2b1fc7(0xb1)](_0x5eaf9c['ok'],!![]),a63_0xb58cfe['equal'](_0x109d26[_0x2b1fc7(0xf4)],0x1),a63_0xb58cfe[_0x2b1fc7(0xb1)](_0x5eaf9c[_0x2b1fc7(0x12b)][_0x2b1fc7(0x137)](_0xdfaab=>_0xdfaab['id']===_0x2b1fc7(0xc7))?.['skipped'],!![]),a63_0xb58cfe['equal'](_0x5eaf9c[_0x2b1fc7(0x12b)][_0x2b1fc7(0x137)](_0x29147=>_0x29147['id']===_0x2b1fc7(0x104))?.[_0x2b1fc7(0xd0)],!![]),a63_0xb58cfe[_0x2b1fc7(0xb1)](_0x109d26[0x0][_0x2b1fc7(0xbb)][_0x2b1fc7(0x10c)][_0x2b1fc7(0x11c)],_0x2b1fc7(0xf9)),a63_0xb58cfe['ok'](decodeURIComponent(_0x109d26[0x0]['url'])[_0x2b1fc7(0x126)](_0x2b1fc7(0xd1)));}),a63_0x5b4ad0('providerConnectionTestApi:\x20volcengine\x20uses\x20Ark\x20ping\x20endpoint',async _0x2593ef=>{const _0x374a32=a63_0x1283b3,_0x8c5a3d=globalThis[_0x374a32(0xfd)],_0x4803a9=[];globalThis[_0x374a32(0xfd)]=async(_0x396f72,_0x58dc5e={})=>{const _0x4bf4ab=_0x374a32;return _0x4803a9[_0x4bf4ab(0xad)]({'url':String(_0x396f72),'options':_0x58dc5e}),jsonResponse('pong');},_0x2593ef[_0x374a32(0x10d)](()=>{const _0x5dec30=_0x374a32;globalThis[_0x5dec30(0xfd)]=_0x8c5a3d;});const {testProviderConnection:_0x433e1b}=await import(_0x374a32(0x118)),_0x26841d=await _0x433e1b(_0x374a32(0xa4),{'apiUrl':_0x374a32(0x110),'apiKey':_0x374a32(0xa8)});a63_0xb58cfe[_0x374a32(0xb1)](_0x26841d['ok'],!![]),a63_0xb58cfe['equal'](_0x4803a9[_0x374a32(0xf4)],0x1),a63_0xb58cfe[_0x374a32(0x121)](_0x26841d[_0x374a32(0x12b)][_0x374a32(0xaf)](_0x24e789=>_0x24e789['id']),['config',_0x374a32(0xc0),'upload']),a63_0xb58cfe[_0x374a32(0xb1)](_0x4803a9[0x0][_0x374a32(0xbb)][_0x374a32(0x135)],_0x374a32(0xb5)),a63_0xb58cfe[_0x374a32(0xb1)](_0x4803a9[0x0][_0x374a32(0xbb)][_0x374a32(0x10c)][_0x374a32(0x11c)],_0x374a32(0x112)),a63_0xb58cfe['ok'](decodeURIComponent(_0x4803a9[0x0][_0x374a32(0x127)])[_0x374a32(0x126)](_0x374a32(0xcb)));}),a63_0x5b4ad0(a63_0x1283b3(0xf0),async _0x25fc24=>{const _0x4d59c5=a63_0x1283b3,_0x16306c=globalThis['fetch'],_0x55c5c9=[];globalThis[_0x4d59c5(0xfd)]=async(_0xee73c2,_0x58cd1e={})=>{const _0x29096b=_0x4d59c5;_0x55c5c9['push']({'url':String(_0xee73c2),'options':_0x58cd1e});if(String(_0xee73c2)===_0x29096b(0x134)){const _0x428d47=JSON[_0x29096b(0x105)](String(_0x58cd1e['body']||'{}'));if(String(_0x428d47[_0x29096b(0xc9)]||'')[_0x29096b(0xfc)](_0x29096b(0xda)))return jsonResponse({'code':0x0,'msg':_0x29096b(0x11f),'data':{'remainCoins':'12345','remainMoney':'0','currency':_0x29096b(0xcd)}});}if(String(_0xee73c2)[_0x29096b(0xa5)]('/api/v2/proxy/upload?'))return jsonResponse({'code':0x0,'data':{'download_url':_0x29096b(0xdd)}});return jsonResponse({'code':0x324,'message':_0x29096b(0x11b)});},_0x25fc24[_0x4d59c5(0x10d)](()=>{const _0x1aff57=_0x4d59c5;globalThis[_0x1aff57(0xfd)]=_0x16306c;});const {testProviderConnection:_0x3415c4}=await import(_0x4d59c5(0x118)),_0x81e9a2=await _0x3415c4(_0x4d59c5(0xe6),{'apiKey':_0x4d59c5(0xf8)});a63_0xb58cfe[_0x4d59c5(0xb1)](_0x81e9a2['ok'],!![]),a63_0xb58cfe[_0x4d59c5(0xb1)](_0x55c5c9[_0x4d59c5(0xf4)],0x2),a63_0xb58cfe['equal'](_0x81e9a2['balance']?.['displayText'],_0x4d59c5(0xe8)),a63_0xb58cfe[_0x4d59c5(0xb1)](_0x81e9a2[_0x4d59c5(0xc1)]?.['workflowCredits'],0x3039),a63_0xb58cfe['equal'](_0x55c5c9[0x0][_0x4d59c5(0x127)],'/api/v2/runninghubwf/query'),a63_0xb58cfe['deepEqual'](JSON[_0x4d59c5(0x105)](_0x55c5c9[0x0][_0x4d59c5(0xbb)][_0x4d59c5(0xac)]),{'apiKey':_0x4d59c5(0xf8),'taskId':'aic-connection-test'}),a63_0xb58cfe[_0x4d59c5(0xb1)](_0x81e9a2[_0x4d59c5(0x12b)][_0x4d59c5(0x137)](_0x31fbd4=>_0x31fbd4['id']===_0x4d59c5(0x104))?.[_0x4d59c5(0xd0)],!![]);}),a63_0x5b4ad0('providerConnectionTestApi:\x20runninghub\x20upload\x20probe\x20uses\x20modelApiKey',async _0xd39398=>{const _0x1c8087=a63_0x1283b3,_0x95d37f=globalThis['fetch'],_0x4d0a15=[];globalThis[_0x1c8087(0xfd)]=async(_0x498066,_0x48951d={})=>{const _0x55f17f=_0x1c8087;_0x4d0a15[_0x55f17f(0xad)]({'url':String(_0x498066),'options':_0x48951d});if(String(_0x498066)===_0x55f17f(0x134)){const _0x14e36b=JSON[_0x55f17f(0x105)](String(_0x48951d[_0x55f17f(0xac)]||'{}'));if(String(_0x14e36b[_0x55f17f(0xc9)]||'')[_0x55f17f(0xfc)]('/uc/openapi/accountStatus'))return jsonResponse({'code':0x0,'msg':_0x55f17f(0x11f),'data':{'remainCoins':_0x14e36b[_0x55f17f(0xe7)]===_0x55f17f(0xf8)?_0x55f17f(0xf6):'0','remainMoney':_0x14e36b[_0x55f17f(0xe7)]==='rh-model-key'?_0x55f17f(0xcf):'0','currency':_0x55f17f(0xcd)}});}if(String(_0x498066)['startsWith']('/api/v2/proxy/upload?'))return jsonResponse({'code':0x0,'data':{'download_url':'https://www.runninghub.cn/aic-test.png'}});return jsonResponse({'code':0x324,'message':_0x55f17f(0x11b)});},_0xd39398['after'](()=>{const _0x1984cb=_0x1c8087;globalThis[_0x1984cb(0xfd)]=_0x95d37f;});const {testProviderConnection:_0x49389c}=await import('./providerConnectionTestApi.js'),_0x183394=await _0x49389c(_0x1c8087(0xe6),{'apiKey':_0x1c8087(0xf8),'modelApiKey':_0x1c8087(0xe4)});a63_0xb58cfe[_0x1c8087(0xb1)](_0x183394['ok'],!![]),a63_0xb58cfe[_0x1c8087(0xb1)](_0x4d0a15[_0x1c8087(0xf4)],0x5),a63_0xb58cfe[_0x1c8087(0xb1)](_0x183394[_0x1c8087(0xc1)]?.[_0x1c8087(0x123)],_0x1c8087(0x117));const _0x29511a=_0x4d0a15[_0x1c8087(0x137)](_0x5025ff=>_0x5025ff[_0x1c8087(0x127)]==='/api/v2/runninghubwf/query'),_0x24bca6=_0x4d0a15['find'](_0x1b2b4b=>{const _0x572384=_0x1c8087;if(_0x1b2b4b[_0x572384(0x127)]!==_0x572384(0x134))return![];const _0x59c6f9=JSON[_0x572384(0x105)](String(_0x1b2b4b['options'][_0x572384(0xac)]||'{}'));return String(_0x59c6f9[_0x572384(0xc9)]||'')['endsWith'](_0x572384(0x12d));}),_0x58e14e=_0x4d0a15[_0x1c8087(0x11e)](_0x5d7f6f=>{const _0x57f3ae=_0x1c8087;if(_0x5d7f6f['url']!==_0x57f3ae(0x134))return![];const _0x2f160c=JSON[_0x57f3ae(0x105)](String(_0x5d7f6f[_0x57f3ae(0xbb)][_0x57f3ae(0xac)]||'{}'));return String(_0x2f160c[_0x57f3ae(0xc9)]||'')[_0x57f3ae(0xfc)](_0x57f3ae(0xda));}),_0xfb63a5=_0x4d0a15['find'](_0x49a26d=>_0x49a26d[_0x1c8087(0x127)]['startsWith'](_0x1c8087(0xb6)));a63_0xb58cfe[_0x1c8087(0x121)](JSON['parse'](_0x29511a['options'][_0x1c8087(0xac)]),{'apiKey':_0x1c8087(0xf8),'taskId':_0x1c8087(0x11a)}),a63_0xb58cfe['equal'](JSON[_0x1c8087(0x105)](_0x24bca6[_0x1c8087(0xbb)][_0x1c8087(0xac)])[_0x1c8087(0x138)],_0x1c8087(0xe4)),a63_0xb58cfe[_0x1c8087(0x121)](_0x58e14e['map'](_0x4ca647=>JSON[_0x1c8087(0x105)](String(_0x4ca647['options']['body']||'{}'))[_0x1c8087(0xe7)]),[_0x1c8087(0xf8),_0x1c8087(0xe4)]),a63_0xb58cfe[_0x1c8087(0xb1)](_0xfb63a5[_0x1c8087(0xbb)][_0x1c8087(0x10c)][_0x1c8087(0x11c)],_0x1c8087(0x10b));}),a63_0x5b4ad0(a63_0x1283b3(0xcc),async _0x353283=>{const _0x2819e1=a63_0x1283b3,_0x211135=globalThis['fetch'];globalThis['fetch']=async()=>{throw new Error('fetch\x20should\x20not\x20be\x20called');},_0x353283[_0x2819e1(0x10d)](()=>{const _0x2d0ade=_0x2819e1;globalThis[_0x2d0ade(0xfd)]=_0x211135;});const {testProviderConnection:_0x5ab773}=await import(_0x2819e1(0x118)),_0x457080=await _0x5ab773(_0x2819e1(0xb8),{'apiUrl':_0x2819e1(0x124),'apiKey':''});a63_0xb58cfe[_0x2819e1(0xb1)](_0x457080['ok'],![]),a63_0xb58cfe[_0x2819e1(0xc8)](_0x457080[_0x2819e1(0xed)],/API Key/);}),a63_0x5b4ad0(a63_0x1283b3(0x139),async _0x3125ee=>{const _0x1f1b74=a63_0x1283b3,_0x249381=globalThis[_0x1f1b74(0xfd)];globalThis['fetch']=async()=>jsonResponse({'error':_0x1f1b74(0x100)},0x191),_0x3125ee[_0x1f1b74(0x10d)](()=>{globalThis['fetch']=_0x249381;});const {testProviderConnection:_0x10fd9d}=await import(_0x1f1b74(0x118)),_0x2e6c40=await _0x10fd9d(_0x1f1b74(0xb8),{'apiUrl':_0x1f1b74(0x124),'apiKey':_0x1f1b74(0xb3)});a63_0xb58cfe[_0x1f1b74(0xb1)](_0x2e6c40['ok'],![]),a63_0xb58cfe[_0x1f1b74(0xb1)](_0x2e6c40['category'],_0x1f1b74(0xe9)),a63_0xb58cfe[_0x1f1b74(0xc8)](_0x2e6c40[_0x1f1b74(0x109)],/API Key/);}),a63_0x5b4ad0(a63_0x1283b3(0xc5),async _0xdd08e9=>{const _0x4e5df0=a63_0x1283b3,_0x39551f=globalThis['fetch'],_0x107a2d=[];globalThis['fetch']=async(_0x126f5a,_0x440cd9={})=>{const _0x105aa4=a63_0x4692;_0x107a2d[_0x105aa4(0xad)]({'url':String(_0x126f5a),'options':_0x440cd9});if(String(_0x126f5a)['includes'](_0x105aa4(0xb0)))return jsonResponse({'data':[{'id':_0x105aa4(0x114)}]});if(String(_0x126f5a)[_0x105aa4(0xfc)]('/api/v2/proxy/completions'))return jsonResponse({'choices':[{'message':{'content':'ok'}}]});return jsonResponse({'error':'upload\x20service\x20unavailable'},0x1f4);},_0xdd08e9[_0x4e5df0(0x10d)](()=>{const _0x4e2acd=_0x4e5df0;globalThis[_0x4e2acd(0xfd)]=_0x39551f;});const {testProviderConnection:_0x217a7a}=await import(_0x4e5df0(0x118)),_0x2ff35d=await _0x217a7a('apimart',{'apiUrl':_0x4e5df0(0x103),'apiKey':_0x4e5df0(0xee)});a63_0xb58cfe[_0x4e5df0(0xb1)](_0x2ff35d['ok'],![]),a63_0xb58cfe[_0x4e5df0(0xb1)](_0x2ff35d[_0x4e5df0(0xb7)],!![]),a63_0xb58cfe[_0x4e5df0(0xb1)](_0x2ff35d[_0x4e5df0(0xd5)],_0x4e5df0(0xb2)),a63_0xb58cfe[_0x4e5df0(0xb1)](_0x2ff35d[_0x4e5df0(0x12b)][_0x4e5df0(0x137)](_0x9b7bb6=>_0x9b7bb6['id']==='upload')?.['ok'],![]),a63_0xb58cfe['match'](_0x2ff35d[_0x4e5df0(0x109)],/上传链路/),a63_0xb58cfe[_0x4e5df0(0xb1)](_0x107a2d[_0x4e5df0(0xf4)],0x4);});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+function jsonResponse(_0x76b925, _0x58bfbc = 200) {
+  return {
+    ok: _0x58bfbc >= 200 && _0x58bfbc < 0x12c,
+    status: _0x58bfbc,
+    headers: { get: () => 'application/json' },
+    json: async () => _0x76b925,
+    text: async () => JSON.stringify(_0x76b925),
+  };
+}
+(test('providerConnectionTestApi: probes APIMart with models endpoint', async (_0x32f735) => {
+  const _0x2d48ea = globalThis.fetch,
+    _0x28f665 = [];
+  ((globalThis.fetch = async (_0x31632f, _0x19a5d6 = {}) => {
+    _0x28f665.push({ url: String(_0x31632f), options: _0x19a5d6 });
+    if (decodeURIComponent(String(_0x31632f)).includes('/v1/user/balance'))
+      return jsonResponse({ success: true, remain_balance: 100.5, used_balance: 25, unlimited_quota: false });
+    if (String(_0x31632f).endsWith('/api/v2/proxy/apimart-upload')) {
+      const _0x4878e6 = Object.fromEntries(_0x19a5d6.body.entries());
+      return (
+        assert.equal(_0x4878e6.apiKey, 'am-key'),
+        assert.equal(_0x4878e6.apiUrl, 'https://api.apimart.ai'),
+        jsonResponse({ cdnUrl: 'https://upload.apimart.ai/aic-test.png' })
+      );
+    }
+    return jsonResponse({ data: [{ id: 'demo' }] });
+  }),
+    _0x32f735.after(() => {
+      globalThis.fetch = _0x2d48ea;
+    }));
+  const { testProviderConnection: _0x137d99 } = await import('./providerConnectionTestApi.js'),
+    _0xb7cb7b = await _0x137d99('apimart', { apiUrl: 'https://api.apimart.ai', apiKey: 'am-key' });
+  (assert.equal(_0xb7cb7b.ok, true),
+    assert.equal(_0x28f665.length, 3),
+    assert.equal(_0xb7cb7b.balance?.displayText, '余额 100.5 美元'),
+    assert.equal(_0xb7cb7b.balance?.remaining, 100.5),
+    assert.deepEqual(
+      _0xb7cb7b.steps.map((_0x2f4159) => _0x2f4159.id),
+      ['config', 'auth', 'model', 'balance', 'upload'],
+    ),
+    assert.equal(_0x28f665[0].options.method, 'GET'),
+    assert.equal(_0x28f665[0].options.headers.Authorization, 'Bearer am-key'),
+    assert.ok(
+      decodeURIComponent(_0x28f665[0].url).includes(
+        '/api/v2/proxy/task?apiUrl=https://api.apimart.ai/v1/models',
+      ),
+    ),
+    assert.equal(
+      _0xb7cb7b.steps.find((_0x20c9f9) => _0x20c9f9.id === 'model')?.message,
+      '模型列表可访问，未执行额外模型调用',
+    ),
+    assert.ok(
+      decodeURIComponent(_0x28f665[1].url).includes(
+        '/api/v2/proxy/task?apiUrl=https://api.apimart.ai/v1/user/balance',
+      ),
+    ));
+}),
+  test('providerConnectionTestApi: strips APIMart /v1 before upload probe', async (_0x4b9be6) => {
+    const _0xed8035 = globalThis.fetch;
+    ((globalThis.fetch = async (_0x4b50bb, _0x3064b0 = {}) => {
+      const _0x1758e8 = String(_0x4b50bb);
+      if (_0x1758e8.endsWith('/api/v2/proxy/apimart-upload')) {
+        const _0x2ae146 = Object.fromEntries(_0x3064b0.body.entries());
+        return (
+          assert.equal(_0x2ae146.apiUrl, 'https://api.apimart.ai'),
+          jsonResponse({ url: 'https://upload.apimart.ai/aic-test.png' })
+        );
+      }
+      if (decodeURIComponent(_0x1758e8).includes('/v1/user/balance'))
+        return jsonResponse({ success: true, remain_balance: 1 });
+      return jsonResponse({ data: [{ id: 'demo' }] });
+    }),
+      _0x4b9be6.after(() => {
+        globalThis.fetch = _0xed8035;
+      }));
+    const { testProviderConnection: _0x503494 } = await import('./providerConnectionTestApi.js'),
+      _0x1c1711 = await _0x503494('apimart', { apiUrl: 'https://api.apimart.ai/v1', apiKey: 'am-key' });
+    assert.equal(_0x1c1711.ok, true);
+  }),
+  test('providerConnectionTestApi: APIMart 默认使用国内1线路', async (_0xd8976d) => {
+    const _0x2fedcd = globalThis.fetch,
+      _0x2fa5af = [];
+    ((globalThis.fetch = async (_0x123eb1, _0x1f64f4 = {}) => {
+      _0x2fa5af.push({ url: String(_0x123eb1), options: _0x1f64f4 });
+      const _0xa8d4a7 = decodeURIComponent(String(_0x123eb1));
+      if (_0xa8d4a7.includes('/v1/user/balance')) return jsonResponse({ success: true, remain_balance: 1 });
+      if (String(_0x123eb1).endsWith('/api/v2/proxy/apimart-upload')) {
+        const _0x5390d5 = Object.fromEntries(_0x1f64f4.body.entries());
+        return (
+          assert.equal(_0x5390d5.apiUrl, 'https://api.apib.ai'),
+          jsonResponse({ cdnUrl: 'https://upload.apib.ai/aic-test.png' })
+        );
+      }
+      return jsonResponse({ data: [{ id: 'demo' }] });
+    }),
+      _0xd8976d.after(() => {
+        globalThis.fetch = _0x2fedcd;
+      }));
+    const { testProviderConnection: _0x99c470 } = await import('./providerConnectionTestApi.js'),
+      _0x22fd62 = await _0x99c470('apimart', { apiKey: 'am-key' });
+    (assert.equal(_0x22fd62.ok, true),
+      assert.ok(
+        decodeURIComponent(_0x2fa5af[0].url).includes(
+          '/api/v2/proxy/task?apiUrl=https://api.apib.ai/v1/models',
+        ),
+      ),
+      assert.ok(
+        decodeURIComponent(_0x2fa5af[1].url).includes(
+          '/api/v2/proxy/task?apiUrl=https://api.apib.ai/v1/user/balance',
+        ),
+      ));
+  }),
+  test('providerConnectionTestApi: APIMart routeId domestic2 uses aishuch endpoints', async (_0x31d19c) => {
+    const _0x221433 = globalThis.fetch,
+      _0x1fe9e4 = [];
+    ((globalThis.fetch = async (_0x2008c2, _0x15c860 = {}) => {
+      _0x1fe9e4.push({ url: String(_0x2008c2), options: _0x15c860 });
+      const _0x2e5a61 = decodeURIComponent(String(_0x2008c2));
+      if (_0x2e5a61.includes('/v1/user/balance')) return jsonResponse({ success: true, remain_balance: 1 });
+      if (String(_0x2008c2).endsWith('/api/v2/proxy/apimart-upload')) {
+        const _0x230e4b = Object.fromEntries(_0x15c860.body.entries());
+        return (
+          assert.equal(_0x230e4b.apiUrl, 'https://api.aishuch.com'),
+          jsonResponse({ cdnUrl: 'https://upload.aishuch.com/aic-test.png' })
+        );
+      }
+      return jsonResponse({ data: [{ id: 'demo' }] });
+    }),
+      _0x31d19c.after(() => {
+        globalThis.fetch = _0x221433;
+      }));
+    const { testProviderConnection: _0x4dfd8d } = await import('./providerConnectionTestApi.js'),
+      _0x3715ed = await _0x4dfd8d('apimart', { routeId: 'domestic2', apiKey: 'am-key' });
+    (assert.equal(_0x3715ed.ok, true),
+      assert.ok(
+        decodeURIComponent(_0x1fe9e4[0].url).includes(
+          '/api/v2/proxy/task?apiUrl=https://api.aishuch.com/v1/models',
+        ),
+      ),
+      assert.ok(
+        decodeURIComponent(_0x1fe9e4[1].url).includes(
+          '/api/v2/proxy/task?apiUrl=https://api.aishuch.com/v1/user/balance',
+        ),
+      ));
+  }),
+  test('providerConnectionTestApi: probes Agnes with models then chat fallback', async (_0x211872) => {
+    const _0x2a5c67 = globalThis.fetch,
+      _0x5e1dab = [];
+    ((globalThis.fetch = async (_0x171c7f, _0x4937f5 = {}) => {
+      _0x5e1dab.push({ url: String(_0x171c7f), options: _0x4937f5 });
+      if (String(_0x171c7f).endsWith('/api/v2/proxy/completions')) {
+        const _0x473385 = JSON.parse(_0x4937f5.body);
+        return (
+          assert.equal(_0x473385.apiUrl, 'https://apihub.agnes-ai.com/v1'),
+          assert.equal(_0x473385.apiKey, 'agnes-key'),
+          assert.equal(_0x473385.model, 'agnes-2.0-flash'),
+          assert.equal(_0x473385.max_tokens, 1),
+          jsonResponse({ choices: [{ message: { content: 'ok' } }] })
+        );
+      }
+      return jsonResponse({ data: [{ id: 'agnes-2.0-flash' }, { id: 'agnes-image-2.1-flash' }] });
+    }),
+      _0x211872.after(() => {
+        globalThis.fetch = _0x2a5c67;
+      }));
+    const { testProviderConnection: _0x2b9d48 } = await import('./providerConnectionTestApi.js'),
+      _0x3d0aeb = await _0x2b9d48('agnes', {
+        apiUrl: 'https://apihub.agnes-ai.com',
+        apiKey: 'Bearer agnes-key',
+      });
+    (assert.equal(_0x3d0aeb.ok, true),
+      assert.equal(_0x5e1dab.length, 2),
+      assert.deepEqual(
+        _0x3d0aeb.steps.map((_0x48e5c4) => _0x48e5c4.id),
+        ['config', 'auth', 'model', 'upload'],
+      ),
+      assert.equal(_0x5e1dab[0].options.method, 'GET'),
+      assert.equal(_0x5e1dab[0].options.headers.Authorization, 'Bearer agnes-key'),
+      assert.ok(
+        decodeURIComponent(_0x5e1dab[0].url).includes(
+          '/api/v2/proxy/task?apiUrl=https://apihub.agnes-ai.com/v1/models',
+        ),
+      ),
+      assert.equal(_0x3d0aeb.steps.find((_0xed5772) => _0xed5772.id === 'upload')?.skipped, true));
+  }),
+  test('providerConnectionTestApi: normalizes APIMart unlimited balance payloads', async () => {
+    const { normalizeApimartBalancePayload: _0x34d673 } = await import('./providerConnectionTestApi.js'),
+      _0x2cfe2f = _0x34d673({
+        data: { success: true, unlimited_quota: true, remain_balance: -1, used_balance: '12.75' },
+      });
+    (assert.equal(_0x2cfe2f.displayText, '余额 不限'),
+      assert.equal(_0x2cfe2f.unlimited, true),
+      assert.equal(_0x2cfe2f.remaining, null),
+      assert.equal(_0x2cfe2f.used, 12.75),
+      assert.match(_0x2cfe2f.detailText, /额度不限/),
+      assert.doesNotMatch(_0x2cfe2f.detailText, /-1/),
+      assert.doesNotMatch(_0x2cfe2f.detailText, /已用余额/));
+  }),
+  test('providerConnectionTestApi: normalizes RunningHUB account status balances', async () => {
+    const { normalizeRunningHubBalancePayload: _0x54a608 } = await import('./providerConnectionTestApi.js'),
+      _0x3f2354 = _0x54a608({
+        workflow: {
+          code: 0,
+          msg: 'success',
+          data: { remainCoins: '99999', remainMoney: '5', currency: 'CNY' },
+        },
+        model: { code: 0, msg: 'success', data: { remainCoins: '12', remainMoney: '999', currency: 'CNY' } },
+      });
+    (assert.equal(_0x3f2354.displayText, '积分 99,999 · 钱包 999 人民币'),
+      assert.equal(_0x3f2354.workflowCredits, 0x1869f),
+      assert.equal(_0x3f2354.modelWallet, 0x3e7),
+      assert.equal(_0x3f2354.currencyLabel, '人民币'),
+      assert.match(_0x3f2354.detailText, /工作流积分：99,999/),
+      assert.match(_0x3f2354.detailText, /模型钱包：999 人民币/));
+  }),
+  test('providerConnectionTestApi: normalizes GRSAI API key credits payloads', async () => {
+    const { normalizeGrsaiBalancePayload: _0xe02fb4 } = await import('./providerConnectionTestApi.js'),
+      _0x5a92e9 = _0xe02fb4({ code: 0, data: { credits: '4321.25' } });
+    (assert.equal(_0x5a92e9.displayText, '积分 4,321.25'),
+      assert.equal(_0x5a92e9.credits, 4321.25),
+      assert.equal(_0x5a92e9.source, 'account'),
+      assert.match(_0x5a92e9.detailText, /账户积分：4,321.25/));
+    const _0x32ae2b = _0xe02fb4({ code: 200, data: '8765' }, { source: 'apiKey' });
+    (assert.equal(_0x32ae2b.displayText, '积分 8,765'), assert.equal(_0x32ae2b.source, 'apiKey'));
+  }),
+  test('providerConnectionTestApi: probes GRSAI with domestic chat completions directly', async (_0x12d7cc) => {
+    const _0x462095 = globalThis.fetch,
+      _0x943062 = [];
+    ((globalThis.fetch = async (_0x157bd3, _0x37dc5d = {}) => {
+      _0x943062.push({ url: String(_0x157bd3), options: _0x37dc5d });
+      if (String(_0x157bd3).endsWith('/api/v2/proxy/completions'))
+        return jsonResponse({ choices: [{ message: { content: 'ok' } }] });
+      if (String(_0x157bd3).endsWith('/client/openapi/getCredits'))
+        return jsonResponse({ code: 0, data: { credits: '4321.25' } });
+      if (String(_0x157bd3).endsWith('/client/resource/newUploadTokenZH'))
+        return jsonResponse({
+          data: {
+            token: 'qiniu-token',
+            key: 'aic-test.png',
+            url: 'https://upload.qiniu.example.com',
+            domain: 'https://cdn.qiniu.example.com',
+          },
+        });
+      return jsonResponse({ ok: true });
+    }),
+      _0x12d7cc.after(() => {
+        globalThis.fetch = _0x462095;
+      }));
+    const { testProviderConnection: _0x54ce49 } = await import('./providerConnectionTestApi.js'),
+      _0x4d0b53 = await _0x54ce49('grsai', { apiUrl: 'https://grsaiapi.com', apiKey: 'grsai-key' });
+    (assert.equal(_0x4d0b53.ok, true),
+      assert.equal(_0x943062.length, 4),
+      assert.deepEqual(
+        _0x4d0b53.steps.map((_0x4f0549) => _0x4f0549.id),
+        ['config', 'model', 'balance', 'upload'],
+      ),
+      assert.equal(_0x4d0b53.balance?.displayText, '积分 4,321.25'),
+      assert.equal(_0x4d0b53.balance?.credits, 4321.25),
+      assert.equal(_0x4d0b53.balance?.source, 'account'),
+      assert.equal(_0x943062[0].url, '/api/v2/proxy/completions'));
+    const _0x468ed3 = JSON.parse(_0x943062[0].options.body);
+    (assert.equal(_0x468ed3.apiUrl, 'https://grsai.dakka.com.cn/v1'),
+      assert.equal(_0x468ed3.apiKey, 'grsai-key'),
+      assert.equal(_0x468ed3.model, 'gemini-3.1-pro'),
+      assert.equal(_0x468ed3.max_tokens, undefined),
+      assert.deepEqual(_0x468ed3.messages, [{ role: 'user', content: '你好' }]),
+      assert.equal(_0x943062[1].url, 'https://grsai.dakka.com.cn/client/openapi/getCredits'),
+      assert.equal(_0x943062[1].options.method, 'POST'),
+      assert.equal(_0x943062[1].options.headers.Authorization, undefined),
+      assert.deepEqual(JSON.parse(_0x943062[1].options.body), { token: 'grsai-key' }));
+  }),
+  test('providerConnectionTestApi: GRSAI falls back when API key credits are zero', async (_0x3172d6) => {
+    const _0x555781 = globalThis.fetch,
+      _0x565570 = [];
+    ((globalThis.fetch = async (_0x4fd034, _0x4484ff = {}) => {
+      _0x565570.push({ url: String(_0x4fd034), options: _0x4484ff });
+      if (String(_0x4fd034).endsWith('/api/v2/proxy/completions'))
+        return jsonResponse({ choices: [{ message: { content: 'ok' } }] });
+      if (String(_0x4fd034).endsWith('/client/openapi/getCredits'))
+        return jsonResponse({ code: 0, data: { credits: '0' } });
+      if (String(_0x4fd034).includes('/client/common/getCredits?'))
+        return jsonResponse({ code: 0, data: { credits: '9876' } });
+      if (String(_0x4fd034).endsWith('/client/resource/newUploadTokenZH'))
+        return jsonResponse({
+          data: {
+            token: 'qiniu-token',
+            key: 'aic-test.png',
+            url: 'https://upload.qiniu.example.com',
+            domain: 'https://cdn.qiniu.example.com',
+          },
+        });
+      return jsonResponse({ ok: true });
+    }),
+      _0x3172d6.after(() => {
+        globalThis.fetch = _0x555781;
+      }));
+    const { testProviderConnection: _0x2aca62 } = await import('./providerConnectionTestApi.js'),
+      _0x4c0cfa = await _0x2aca62('grsai', { apiUrl: 'https://grsaiapi.com', apiKey: 'grsai-key' });
+    (assert.equal(_0x4c0cfa.ok, true),
+      assert.equal(_0x4c0cfa.balance?.displayText, '积分 9,876'),
+      assert.equal(_0x4c0cfa.balance?.source, 'account'),
+      assert.ok(_0x565570[2].url.includes('/client/common/getCredits?apikey=grsai-key')));
+  }),
+  test('providerConnectionTestApi: PPIO uses official models endpoint without model-specific fallback', async (_0x1edc68) => {
+    const _0x41e36a = globalThis.fetch,
+      _0x109d26 = [];
+    ((globalThis.fetch = async (_0x353556, _0x366903 = {}) => {
+      return (
+        _0x109d26.push({ url: String(_0x353556), options: _0x366903 }),
+        jsonResponse({ data: [{ id: 'deepseek/deepseek-v3-0324' }] })
+      );
+    }),
+      _0x1edc68.after(() => {
+        globalThis.fetch = _0x41e36a;
+      }));
+    const { testProviderConnection: _0x1eccf7 } = await import('./providerConnectionTestApi.js'),
+      _0x5eaf9c = await _0x1eccf7('ppio', { apiUrl: 'https://api.ppio.com', apiKey: 'Bearer ppio-key' });
+    (assert.equal(_0x5eaf9c.ok, true),
+      assert.equal(_0x109d26.length, 1),
+      assert.equal(_0x5eaf9c.steps.find((_0xdfaab) => _0xdfaab.id === 'model')?.skipped, true),
+      assert.equal(_0x5eaf9c.steps.find((_0x29147) => _0x29147.id === 'upload')?.skipped, true),
+      assert.equal(_0x109d26[0].options.headers.Authorization, 'Bearer ppio-key'),
+      assert.ok(
+        decodeURIComponent(_0x109d26[0].url).includes(
+          '/api/v2/proxy/task?apiUrl=https://api.ppio.com/openai/v1/models',
+        ),
+      ));
+  }),
+  test('providerConnectionTestApi: volcengine uses Ark ping endpoint', async (_0x2593ef) => {
+    const _0x8c5a3d = globalThis.fetch,
+      _0x4803a9 = [];
+    ((globalThis.fetch = async (_0x396f72, _0x58dc5e = {}) => {
+      return (_0x4803a9.push({ url: String(_0x396f72), options: _0x58dc5e }), jsonResponse('pong'));
+    }),
+      _0x2593ef.after(() => {
+        globalThis.fetch = _0x8c5a3d;
+      }));
+    const { testProviderConnection: _0x433e1b } = await import('./providerConnectionTestApi.js'),
+      _0x26841d = await _0x433e1b('volcengine', {
+        apiUrl: 'https://ark.cn-beijing.volces.com/api/v3',
+        apiKey: 'ark-key',
+      });
+    (assert.equal(_0x26841d.ok, true),
+      assert.equal(_0x4803a9.length, 1),
+      assert.deepEqual(
+        _0x26841d.steps.map((_0x24e789) => _0x24e789.id),
+        ['config', 'auth', 'upload'],
+      ),
+      assert.equal(_0x4803a9[0].options.method, 'GET'),
+      assert.equal(_0x4803a9[0].options.headers.Authorization, 'Bearer ark-key'),
+      assert.ok(
+        decodeURIComponent(_0x4803a9[0].url).includes(
+          '/api/v2/proxy/task?apiUrl=https://ark.cn-beijing.volces.com/ping',
+        ),
+      ));
+  }),
+  test('providerConnectionTestApi: runninghub treats invalid task response as credential pass', async (_0x25fc24) => {
+    const _0x16306c = globalThis.fetch,
+      _0x55c5c9 = [];
+    ((globalThis.fetch = async (_0xee73c2, _0x58cd1e = {}) => {
+      _0x55c5c9.push({ url: String(_0xee73c2), options: _0x58cd1e });
+      if (String(_0xee73c2) === '/api/v2/proxy/image') {
+        const _0x428d47 = JSON.parse(String(_0x58cd1e.body || '{}'));
+        if (String(_0x428d47.apiUrl || '').endsWith('/uc/openapi/accountStatus'))
+          return jsonResponse({
+            code: 0,
+            msg: 'success',
+            data: { remainCoins: '12345', remainMoney: '0', currency: 'CNY' },
+          });
+      }
+      if (String(_0xee73c2).startsWith('/api/v2/proxy/upload?'))
+        return jsonResponse({ code: 0, data: { download_url: 'https://www.runninghub.cn/aic-test.png' } });
+      return jsonResponse({ code: 0x324, message: 'task not found' });
+    }),
+      _0x25fc24.after(() => {
+        globalThis.fetch = _0x16306c;
+      }));
+    const { testProviderConnection: _0x3415c4 } = await import('./providerConnectionTestApi.js'),
+      _0x81e9a2 = await _0x3415c4('runninghub', { apiKey: 'rh-workflow-key' });
+    (assert.equal(_0x81e9a2.ok, true),
+      assert.equal(_0x55c5c9.length, 2),
+      assert.equal(_0x81e9a2.balance?.displayText, '积分 12,345'),
+      assert.equal(_0x81e9a2.balance?.workflowCredits, 0x3039),
+      assert.equal(_0x55c5c9[0].url, '/api/v2/runninghubwf/query'),
+      assert.deepEqual(JSON.parse(_0x55c5c9[0].options.body), {
+        apiKey: 'rh-workflow-key',
+        taskId: 'aic-connection-test',
+      }),
+      assert.equal(_0x81e9a2.steps.find((_0x31fbd4) => _0x31fbd4.id === 'upload')?.skipped, true));
+  }),
+  test('providerConnectionTestApi: runninghub upload probe uses modelApiKey', async (_0xd39398) => {
+    const _0x95d37f = globalThis.fetch,
+      _0x4d0a15 = [];
+    ((globalThis.fetch = async (_0x498066, _0x48951d = {}) => {
+      _0x4d0a15.push({ url: String(_0x498066), options: _0x48951d });
+      if (String(_0x498066) === '/api/v2/proxy/image') {
+        const _0x14e36b = JSON.parse(String(_0x48951d.body || '{}'));
+        if (String(_0x14e36b.apiUrl || '').endsWith('/uc/openapi/accountStatus'))
+          return jsonResponse({
+            code: 0,
+            msg: 'success',
+            data: {
+              remainCoins: _0x14e36b.apikey === 'rh-workflow-key' ? '54321' : '0',
+              remainMoney: _0x14e36b.apikey === 'rh-model-key' ? '888.5' : '0',
+              currency: 'CNY',
+            },
+          });
+      }
+      if (String(_0x498066).startsWith('/api/v2/proxy/upload?'))
+        return jsonResponse({ code: 0, data: { download_url: 'https://www.runninghub.cn/aic-test.png' } });
+      return jsonResponse({ code: 0x324, message: 'task not found' });
+    }),
+      _0xd39398.after(() => {
+        globalThis.fetch = _0x95d37f;
+      }));
+    const { testProviderConnection: _0x49389c } = await import('./providerConnectionTestApi.js'),
+      _0x183394 = await _0x49389c('runninghub', { apiKey: 'rh-workflow-key', modelApiKey: 'rh-model-key' });
+    (assert.equal(_0x183394.ok, true),
+      assert.equal(_0x4d0a15.length, 5),
+      assert.equal(_0x183394.balance?.displayText, '积分 54,321 · 钱包 888.5 人民币'));
+    const _0x29511a = _0x4d0a15.find((_0x5025ff) => _0x5025ff.url === '/api/v2/runninghubwf/query'),
+      _0x24bca6 = _0x4d0a15.find((_0x1b2b4b) => {
+        if (_0x1b2b4b.url !== '/api/v2/proxy/image') return false;
+        const _0x59c6f9 = JSON.parse(String(_0x1b2b4b.options.body || '{}'));
+        return String(_0x59c6f9.apiUrl || '').endsWith('/openapi/v2/query');
+      }),
+      _0x58e14e = _0x4d0a15.filter((_0x5d7f6f) => {
+        if (_0x5d7f6f.url !== '/api/v2/proxy/image') return false;
+        const _0x2f160c = JSON.parse(String(_0x5d7f6f.options.body || '{}'));
+        return String(_0x2f160c.apiUrl || '').endsWith('/uc/openapi/accountStatus');
+      }),
+      _0xfb63a5 = _0x4d0a15.find((_0x49a26d) => _0x49a26d.url.startsWith('/api/v2/proxy/upload?'));
+    (assert.deepEqual(JSON.parse(_0x29511a.options.body), {
+      apiKey: 'rh-workflow-key',
+      taskId: 'aic-connection-test',
+    }),
+      assert.equal(JSON.parse(_0x24bca6.options.body).apiKey, 'rh-model-key'),
+      assert.deepEqual(
+        _0x58e14e.map((_0x4ca647) => JSON.parse(String(_0x4ca647.options.body || '{}')).apikey),
+        ['rh-workflow-key', 'rh-model-key'],
+      ),
+      assert.equal(_0xfb63a5.options.headers.Authorization, 'Bearer rh-model-key'));
+  }),
+  test('providerConnectionTestApi: missing provider key fails before fetch', async (_0x353283) => {
+    const _0x211135 = globalThis.fetch;
+    ((globalThis.fetch = async () => {
+      throw new Error('fetch should not be called');
+    }),
+      _0x353283.after(() => {
+        globalThis.fetch = _0x211135;
+      }));
+    const { testProviderConnection: _0x5ab773 } = await import('./providerConnectionTestApi.js'),
+      _0x457080 = await _0x5ab773('openai', { apiUrl: 'https://api.openai.com', apiKey: '' });
+    (assert.equal(_0x457080.ok, false), assert.match(_0x457080.error, /API Key/));
+  }),
+  test('providerConnectionTestApi: explains auth failures in human language', async (_0x3125ee) => {
+    const _0x249381 = globalThis.fetch;
+    ((globalThis.fetch = async () => jsonResponse({ error: 'invalid api key' }, 0x191)),
+      _0x3125ee.after(() => {
+        globalThis.fetch = _0x249381;
+      }));
+    const { testProviderConnection: _0x10fd9d } = await import('./providerConnectionTestApi.js'),
+      _0x2e6c40 = await _0x10fd9d('openai', { apiUrl: 'https://api.openai.com', apiKey: 'bad-key' });
+    (assert.equal(_0x2e6c40.ok, false),
+      assert.equal(_0x2e6c40.category, 'auth_failed'),
+      assert.match(_0x2e6c40.suggestion, /API Key/));
+  }),
+  test('providerConnectionTestApi: reports upload chain separately', async (_0xdd08e9) => {
+    const _0x39551f = globalThis.fetch,
+      _0x107a2d = [];
+    ((globalThis.fetch = async (_0x126f5a, _0x440cd9 = {}) => {
+      _0x107a2d.push({ url: String(_0x126f5a), options: _0x440cd9 });
+      if (String(_0x126f5a).includes('/proxy/task?')) return jsonResponse({ data: [{ id: 'demo' }] });
+      if (String(_0x126f5a).endsWith('/api/v2/proxy/completions'))
+        return jsonResponse({ choices: [{ message: { content: 'ok' } }] });
+      return jsonResponse({ error: 'upload service unavailable' }, 0x1f4);
+    }),
+      _0xdd08e9.after(() => {
+        globalThis.fetch = _0x39551f;
+      }));
+    const { testProviderConnection: _0x217a7a } = await import('./providerConnectionTestApi.js'),
+      _0x2ff35d = await _0x217a7a('apimart', { apiUrl: 'https://api.apimart.ai', apiKey: 'am-key' });
+    (assert.equal(_0x2ff35d.ok, false),
+      assert.equal(_0x2ff35d.partial, true),
+      assert.equal(_0x2ff35d.category, 'upload_failed'),
+      assert.equal(_0x2ff35d.steps.find((_0x9b7bb6) => _0x9b7bb6.id === 'upload')?.ok, false),
+      assert.match(_0x2ff35d.suggestion, /上传链路/),
+      assert.equal(_0x107a2d.length, 4));
+  }));

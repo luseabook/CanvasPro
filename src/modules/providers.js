@@ -1,1 +1,105 @@
-const a591_0x41ec91=a591_0x558a;(function(_0x3191d7,_0x48262e){const _0x3ac450=a591_0x558a,_0xb7906f=_0x3191d7();while(!![]){try{const _0x2ea048=parseInt(_0x3ac450(0x1c6))/0x1+-parseInt(_0x3ac450(0x1db))/0x2*(-parseInt(_0x3ac450(0x1dc))/0x3)+parseInt(_0x3ac450(0x1ff))/0x4*(parseInt(_0x3ac450(0x1cd))/0x5)+-parseInt(_0x3ac450(0x1d0))/0x6+-parseInt(_0x3ac450(0x1f0))/0x7*(-parseInt(_0x3ac450(0x1f1))/0x8)+parseInt(_0x3ac450(0x1cc))/0x9+-parseInt(_0x3ac450(0x1c8))/0xa;if(_0x2ea048===_0x48262e)break;else _0xb7906f['push'](_0xb7906f['shift']());}catch(_0x3449b5){_0xb7906f['push'](_0xb7906f['shift']());}}}(a591_0x1a43,0x40cfe));import{getModelManifest}from'../manifests/index.js';import{translateManifestText}from'../i18n/manifestText.js';export const APIMART_ROUTE_IDS=Object[a591_0x41ec91(0x1ef)]({'DOMESTIC_1':'domestic1','DOMESTIC_2':'domestic2','OVERSEAS':a591_0x41ec91(0x1f4)});export const APIMART_API_ROUTES=Object['freeze']([Object[a591_0x41ec91(0x1ef)]({'id':APIMART_ROUTE_IDS[a591_0x41ec91(0x1c5)],'label':a591_0x41ec91(0x204),'apiUrl':a591_0x41ec91(0x1d1)}),Object[a591_0x41ec91(0x1ef)]({'id':APIMART_ROUTE_IDS[a591_0x41ec91(0x1f6)],'label':a591_0x41ec91(0x1ea),'apiUrl':a591_0x41ec91(0x1d8)}),Object[a591_0x41ec91(0x1ef)]({'id':APIMART_ROUTE_IDS[a591_0x41ec91(0x1f5)],'label':a591_0x41ec91(0x1ed),'apiUrl':a591_0x41ec91(0x1e1)})]);export const DEFAULT_APIMART_ROUTE_ID=APIMART_ROUTE_IDS[a591_0x41ec91(0x1c5)];export const DEFAULT_APIMART_API_URL=APIMART_API_ROUTES[a591_0x41ec91(0x1f7)](_0x4fb2c9=>_0x4fb2c9['id']===DEFAULT_APIMART_ROUTE_ID)?.[a591_0x41ec91(0x1e4)]||a591_0x41ec91(0x1d1);function normalizeRouteApiUrl(_0x305fa2){const _0x19295b=a591_0x41ec91;return String(_0x305fa2||'')[_0x19295b(0x1e5)]()['replace'](/\/+$/,'')[_0x19295b(0x1fd)](/\/v1$/i,'');}export function getApimartRouteById(_0x420ad4){const _0x25e068=a591_0x41ec91,_0x2c0d85=String(_0x420ad4||'')[_0x25e068(0x1e5)]();return APIMART_API_ROUTES[_0x25e068(0x1f7)](_0x4b862c=>_0x4b862c['id']===_0x2c0d85)||APIMART_API_ROUTES['find'](_0x760ceb=>_0x760ceb['id']===DEFAULT_APIMART_ROUTE_ID);}function a591_0x558a(_0x4c32ef,_0x3eb17f){const _0x1a432b=a591_0x1a43();return a591_0x558a=function(_0x558a4b,_0x226860){_0x558a4b=_0x558a4b-0x1c5;let _0xc86a7b=_0x1a432b[_0x558a4b];return _0xc86a7b;},a591_0x558a(_0x4c32ef,_0x3eb17f);}export function getApimartApiUrlForRoute(_0x2fcf74){return getApimartRouteById(_0x2fcf74)?.['apiUrl']||DEFAULT_APIMART_API_URL;}export function resolveApimartRouteByApiUrl(_0xa46d3a){const _0x3a3c8f=a591_0x41ec91,_0x308cf8=normalizeRouteApiUrl(_0xa46d3a);if(!_0x308cf8)return null;return APIMART_API_ROUTES[_0x3a3c8f(0x1f7)](_0xdb2ef7=>normalizeRouteApiUrl(_0xdb2ef7[_0x3a3c8f(0x1e4)])===_0x308cf8)||null;}export const getDisplayModelName=_0x13cafe=>{const _0x4ee9a7=a591_0x41ec91;if(!_0x13cafe)return'';const _0x1ac447=getModelManifest(_0x13cafe);if(_0x1ac447?.[_0x4ee9a7(0x1cf)])return translateManifestText(_0x1ac447[_0x4ee9a7(0x1cf)]);const _0x464a99={'minimax/minimax-m2.5-highspeed':_0x4ee9a7(0x1ee),'qwen/qwen3.5-397b-a17b':_0x4ee9a7(0x1dd),'deepseek/deepseek-v3.2':_0x4ee9a7(0x1de),'moonshotai/kimi-k2.5':_0x4ee9a7(0x1d5),'apimart/gemini-3.1-pro-preview':_0x4ee9a7(0x1fc),'apimart/gemini-3-flash-preview-nothinking':_0x4ee9a7(0x201),'gpt-image-2':_0x4ee9a7(0x1e6),'gpt-image-2-vip':_0x4ee9a7(0x1e6),'nano-banana':_0x4ee9a7(0x1ce),'nano-banana-fast':'Nanobanana','nano-banana-pro':_0x4ee9a7(0x1f2),'nano-banana-pro-vt':_0x4ee9a7(0x1f2),'nano-banana-pro-cl':_0x4ee9a7(0x1f2),'nano-banana-pro-vip':_0x4ee9a7(0x1f2),'nano-banana-pro-4k-vip':'NanobananaPRO','nano-banana-2':_0x4ee9a7(0x1fa),'nano-banana-2-cl':_0x4ee9a7(0x1fa),'nano-banana-2-4k-cl':_0x4ee9a7(0x1fa),'apimart/gpt-5.4':_0x4ee9a7(0x1d9),'seedance-2.0-fast':_0x4ee9a7(0x1d2),'seedance-2.0':_0x4ee9a7(0x1c7),'aicanvas/text-lite':'AICanvas\x20Text\x20Lite','aicanvas/text-pro':'AICanvas\x20Text\x20Pro','aicanvas/image-lite':_0x4ee9a7(0x1ec),'aicanvas/image-pro':_0x4ee9a7(0x203)};return translateManifestText(_0x464a99[_0x13cafe]||_0x13cafe);};function a591_0x1a43(){const _0x5d83c1=['GPT\x20image\x202','https://apihub.agnes-ai.com','GRSAI','images/grsai.png','国内线路2','AICanvas','AICanvas\x20Image\x20Lite','海外线路','MiniMax\x20M2.5-highspeed','freeze','224980TvnWwi','104fNUzsx','NanobananaPRO','agnes','overseas','OVERSEAS','DOMESTIC_2','find','images/favicon.svg','RunningHUB','Nanobanana2','keys','Gemini\x203.1\x20Pro\x20Preview','replace','runninghubwf','20JVAuKD','APIMart','Gemini\x203\x20Flash\x20(No\x20Thinking)','images/RH.png','AICanvas\x20Image\x20Pro','国内线路1','DOMESTIC_1','217032VAQnmU','Seedance\x202.0','4976170tMtNmH','https://www.runninghub.cn','火山方舟','apimart','4195332RvkOtT','85900TJwrMx','Nanobanana','displayName','2902758oLKTaz','https://api.apib.ai','Seedance\x202.0\x20Fast','https://ark.cn-beijing.volces.com/api/v3','runninghub','Kimi\x20K2.5','https://api.openai.com','images/volcengine.svg','https://api.aishuch.com','GPT-5.4','Agnes\x20AI','59980SKwVVR','6fpRZKS','Qwen3.5-397B-A17B','DeepSeek-V3.2','dreamina','RunningHUB工作流','https://api.apimart.ai','https://grsai.dakka.com.cn','volcengine','apiUrl','trim'];a591_0x1a43=function(){return _0x5d83c1;};return a591_0x1a43();}export const PROVIDERS_META={'grsai':{'id':'grsai','label':a591_0x41ec91(0x1e8),'defaultUrl':a591_0x41ec91(0x1e2),'logoPath':a591_0x41ec91(0x1e9)},'openai':{'id':'openai','label':'OpenAI','defaultUrl':a591_0x41ec91(0x1d6),'logoPath':null},'ppio':{'id':'ppio','label':'派欧云','defaultUrl':'https://api.ppio.com','logoPath':'images/ppio.png'},'apimart':{'id':a591_0x41ec91(0x1cb),'label':a591_0x41ec91(0x200),'defaultUrl':DEFAULT_APIMART_API_URL,'logoPath':null},'agnes':{'id':a591_0x41ec91(0x1f3),'label':a591_0x41ec91(0x1da),'defaultUrl':a591_0x41ec91(0x1e7),'logoPath':null},'volcengine':{'id':a591_0x41ec91(0x1e3),'label':a591_0x41ec91(0x1ca),'defaultUrl':a591_0x41ec91(0x1d3),'logoPath':a591_0x41ec91(0x1d7)},'runninghub':{'id':a591_0x41ec91(0x1d4),'label':a591_0x41ec91(0x1f9),'defaultUrl':a591_0x41ec91(0x1c9),'logoPath':a591_0x41ec91(0x202)},'runninghubwf':{'id':a591_0x41ec91(0x1fe),'label':a591_0x41ec91(0x1e0),'defaultUrl':'https://www.runninghub.cn','logoPath':a591_0x41ec91(0x202)},'dreamina':{'id':a591_0x41ec91(0x1df),'label':'即梦','defaultUrl':'','logoPath':null},'aicanvas':{'id':'aicanvas','label':a591_0x41ec91(0x1eb),'defaultUrl':'','logoPath':a591_0x41ec91(0x1f8)}};export function getAllProviderIds(){const _0x4dd762=a591_0x41ec91;return Object[_0x4dd762(0x1fb)](PROVIDERS_META);}
+import { getModelManifest } from '../manifests/index.js';
+import { translateManifestText } from '../i18n/manifestText.js';
+export const APIMART_ROUTE_IDS = Object.freeze({
+  DOMESTIC_1: 'domestic1',
+  DOMESTIC_2: 'domestic2',
+  OVERSEAS: 'overseas',
+});
+export const APIMART_API_ROUTES = Object.freeze([
+  Object.freeze({ id: APIMART_ROUTE_IDS.DOMESTIC_1, label: '国内线路1', apiUrl: 'https://api.apib.ai' }),
+  Object.freeze({ id: APIMART_ROUTE_IDS.DOMESTIC_2, label: '国内线路2', apiUrl: 'https://api.aishuch.com' }),
+  Object.freeze({ id: APIMART_ROUTE_IDS.OVERSEAS, label: '海外线路', apiUrl: 'https://api.apimart.ai' }),
+]);
+export const DEFAULT_APIMART_ROUTE_ID = APIMART_ROUTE_IDS.DOMESTIC_1;
+export const DEFAULT_APIMART_API_URL =
+  APIMART_API_ROUTES.find((_0x4fb2c9) => _0x4fb2c9.id === DEFAULT_APIMART_ROUTE_ID)?.apiUrl ||
+  'https://api.apib.ai';
+function normalizeRouteApiUrl(_0x305fa2) {
+  return String(_0x305fa2 || '')
+    .trim()
+    .replace(/\/+$/, '')
+    .replace(/\/v1$/i, '');
+}
+export function getApimartRouteById(_0x420ad4) {
+  const _0x2c0d85 = String(_0x420ad4 || '').trim();
+  return (
+    APIMART_API_ROUTES.find((_0x4b862c) => _0x4b862c.id === _0x2c0d85) ||
+    APIMART_API_ROUTES.find((_0x760ceb) => _0x760ceb.id === DEFAULT_APIMART_ROUTE_ID)
+  );
+}
+export function getApimartApiUrlForRoute(_0x2fcf74) {
+  return getApimartRouteById(_0x2fcf74)?.apiUrl || DEFAULT_APIMART_API_URL;
+}
+export function resolveApimartRouteByApiUrl(_0xa46d3a) {
+  const _0x308cf8 = normalizeRouteApiUrl(_0xa46d3a);
+  if (!_0x308cf8) return null;
+  return APIMART_API_ROUTES.find((_0xdb2ef7) => normalizeRouteApiUrl(_0xdb2ef7.apiUrl) === _0x308cf8) || null;
+}
+export const getDisplayModelName = (_0x13cafe) => {
+  if (!_0x13cafe) return '';
+  const _0x1ac447 = getModelManifest(_0x13cafe);
+  if (_0x1ac447?.displayName) return translateManifestText(_0x1ac447.displayName);
+  const _0x464a99 = {
+    'minimax/minimax-m2.5-highspeed': 'MiniMax M2.5-highspeed',
+    'qwen/qwen3.5-397b-a17b': 'Qwen3.5-397B-A17B',
+    'deepseek/deepseek-v3.2': 'DeepSeek-V3.2',
+    'moonshotai/kimi-k2.5': 'Kimi K2.5',
+    'apimart/gemini-3.1-pro-preview': 'Gemini 3.1 Pro Preview',
+    'apimart/gemini-3-flash-preview-nothinking': 'Gemini 3 Flash (No Thinking)',
+    'gpt-image-2': 'GPT image 2',
+    'gpt-image-2-vip': 'GPT image 2',
+    'nano-banana': 'Nanobanana',
+    'nano-banana-fast': 'Nanobanana',
+    'nano-banana-pro': 'NanobananaPRO',
+    'nano-banana-pro-vt': 'NanobananaPRO',
+    'nano-banana-pro-cl': 'NanobananaPRO',
+    'nano-banana-pro-vip': 'NanobananaPRO',
+    'nano-banana-pro-4k-vip': 'NanobananaPRO',
+    'nano-banana-2': 'Nanobanana2',
+    'nano-banana-2-cl': 'Nanobanana2',
+    'nano-banana-2-4k-cl': 'Nanobanana2',
+    'apimart/gpt-5.4': 'GPT-5.4',
+    'seedance-2.0-fast': 'Seedance 2.0 Fast',
+    'seedance-2.0': 'Seedance 2.0',
+    'aicanvas/text-lite': 'AICanvas Text Lite',
+    'aicanvas/text-pro': 'AICanvas Text Pro',
+    'aicanvas/image-lite': 'AICanvas Image Lite',
+    'aicanvas/image-pro': 'AICanvas Image Pro',
+  };
+  return translateManifestText(_0x464a99[_0x13cafe] || _0x13cafe);
+};
+export const PROVIDERS_META = {
+  grsai: {
+    id: 'grsai',
+    label: 'GRSAI',
+    defaultUrl: 'https://grsai.dakka.com.cn',
+    logoPath: 'images/grsai.png',
+  },
+  openai: { id: 'openai', label: 'OpenAI', defaultUrl: 'https://api.openai.com', logoPath: null },
+  ppio: { id: 'ppio', label: '派欧云', defaultUrl: 'https://api.ppio.com', logoPath: 'images/ppio.png' },
+  apimart: { id: 'apimart', label: 'APIMart', defaultUrl: DEFAULT_APIMART_API_URL, logoPath: null },
+  agnes: { id: 'agnes', label: 'Agnes AI', defaultUrl: 'https://apihub.agnes-ai.com', logoPath: null },
+  volcengine: {
+    id: 'volcengine',
+    label: '火山方舟',
+    defaultUrl: 'https://ark.cn-beijing.volces.com/api/v3',
+    logoPath: 'images/volcengine.svg',
+  },
+  runninghub: {
+    id: 'runninghub',
+    label: 'RunningHUB',
+    defaultUrl: 'https://www.runninghub.cn',
+    logoPath: 'images/RH.png',
+  },
+  runninghubwf: {
+    id: 'runninghubwf',
+    label: 'RunningHUB工作流',
+    defaultUrl: 'https://www.runninghub.cn',
+    logoPath: 'images/RH.png',
+  },
+  dreamina: { id: 'dreamina', label: '即梦', defaultUrl: '', logoPath: null },
+  aicanvas: { id: 'aicanvas', label: 'AICanvas', defaultUrl: '', logoPath: 'images/favicon.svg' },
+};
+export function getAllProviderIds() {
+  return Object.keys(PROVIDERS_META);
+}

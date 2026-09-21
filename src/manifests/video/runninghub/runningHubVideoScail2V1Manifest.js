@@ -1,1 +1,275 @@
-const a431_0x2d230a=a431_0x2325;(function(_0x46867a,_0x29de18){const _0x33faac=a431_0x2325,_0x5a3bd5=_0x46867a();while(!![]){try{const _0x39e9e3=-parseInt(_0x33faac(0xbf))/0x1*(parseInt(_0x33faac(0xef))/0x2)+parseInt(_0x33faac(0xd5))/0x3+parseInt(_0x33faac(0xa5))/0x4*(parseInt(_0x33faac(0xa2))/0x5)+parseInt(_0x33faac(0xb5))/0x6*(-parseInt(_0x33faac(0xdb))/0x7)+parseInt(_0x33faac(0xb3))/0x8*(-parseInt(_0x33faac(0xaa))/0x9)+parseInt(_0x33faac(0xcf))/0xa*(parseInt(_0x33faac(0xf1))/0xb)+parseInt(_0x33faac(0xe3))/0xc;if(_0x39e9e3===_0x29de18)break;else _0x5a3bd5['push'](_0x5a3bd5['shift']());}catch(_0x4b1498){_0x5a3bd5['push'](_0x5a3bd5['shift']());}}}(a431_0x6d0d,0x927e0));function a431_0x2325(_0x3c5d84,_0x495416){const _0x6d0d23=a431_0x6d0d();return a431_0x2325=function(_0x2325a6,_0x4ac2c4){_0x2325a6=_0x2325a6-0x9f;let _0x49c0f1=_0x6d0d23[_0x2325a6];return _0x49c0f1;},a431_0x2325(_0x3c5d84,_0x495416);}import{RH_INSTANCE_FIELD,RH_VIDEO_FPS_30_FIELD,RH_VIDEO_RESOLUTION_FIELD,createRunningHubVideoExecutionManifest,createRunningHubVideoModelManifest}from'../../shared/runningHubVideoManifestShared.js';export const RH_VIDEO_SCAIL2_V1_MODEL_ID=a431_0x2d230a(0xb6);export const RH_VIDEO_SCAIL2_V1_EXECUTION_ID=a431_0x2d230a(0xea);export const RH_VIDEO_SCAIL_V2_MODEL_ID=a431_0x2d230a(0xe7);export const RH_VIDEO_SCAIL_V2_EXECUTION_ID=a431_0x2d230a(0xae);const RH_VIDEO_SCAIL_VIP_ALIASES=Object['freeze']([a431_0x2d230a(0xe0),a431_0x2d230a(0xc5)]),RH_VIDEO_SCAIL_RESOLUTION_FIELD=Object['freeze']({...RH_VIDEO_RESOLUTION_FIELD,'defaultValue':0x400});export const RH_VIDEO_SCAIL2_V1_HELP_TOOLTIP=[a431_0x2d230a(0xe8),a431_0x2d230a(0xa6),a431_0x2d230a(0xf0)][a431_0x2d230a(0xad)]('\x0a');export const RH_VIDEO_SCAIL_V2_HELP_TOOLTIP=[a431_0x2d230a(0xa7),a431_0x2d230a(0xa6),a431_0x2d230a(0xf0)]['join']('\x0a');const RH_VIDEO_SCAIL_PANEL_EXTENSION=Object[a431_0x2d230a(0xde)]({'sourceFrameCountFps':a431_0x2d230a(0x9f),'submitScopeTargetEdges':!![],'frameStateDefaults':Object[a431_0x2d230a(0xde)]({'frameRate':0x18,'frameCount':0x12c}),'adaptiveRatio':Object['freeze']({'scopeTargetEdges':!![],'preferSlot':a431_0x2d230a(0xce),'preferVideoKind':!![]})}),RH_VIDEO_SCAIL_FIXED_ASSET_SLOTS=Object['freeze']([a431_0x2d230a(0xce),a431_0x2d230a(0xcc)]),RH_VIDEO_SCAIL_FIXED_INPUT_SLOTS=Object[a431_0x2d230a(0xde)]([Object['freeze']({'id':a431_0x2d230a(0xce),'kind':a431_0x2d230a(0xd1),'label':'源视频','required':!![]}),Object[a431_0x2d230a(0xde)]({'id':a431_0x2d230a(0xcc),'kind':a431_0x2d230a(0xe2),'label':a431_0x2d230a(0xe9),'required':!![]})]),RH_VIDEO_SCAIL_UI_FIELDS=Object[a431_0x2d230a(0xde)]([RH_VIDEO_SCAIL_RESOLUTION_FIELD,RH_VIDEO_FPS_30_FIELD,Object[a431_0x2d230a(0xde)]({'id':a431_0x2d230a(0xc2),'type':a431_0x2d230a(0xa9),'placement':'videoParams','label':'帧数','defaultValue':0x12c,'min':0x0,'max':0xf423f,'step':0x1}),Object[a431_0x2d230a(0xde)]({'id':a431_0x2d230a(0xac),'type':a431_0x2d230a(0xa9),'placement':a431_0x2d230a(0xd6),'variant':a431_0x2d230a(0xcb),'label':a431_0x2d230a(0xcd),'ariaLabel':a431_0x2d230a(0xcd),'defaultValue':0x2,'min':0x1,'max':0xf423f,'step':0x1,'description':a431_0x2d230a(0xb8)}),Object[a431_0x2d230a(0xde)]({'id':a431_0x2d230a(0xb4),'type':a431_0x2d230a(0xbc),'placement':a431_0x2d230a(0xd6),'variant':a431_0x2d230a(0xcb),'label':'检测识别提示词','defaultValue':a431_0x2d230a(0xeb),'allowEmpty':!![],'description':a431_0x2d230a(0xb0)}),Object['freeze']({'id':a431_0x2d230a(0xd8),'type':'segmented','placement':a431_0x2d230a(0xd6),'variant':'advancedRow','label':a431_0x2d230a(0xc7),'defaultValue':![],'description':a431_0x2d230a(0xe1),'options':Object[a431_0x2d230a(0xde)]([Object[a431_0x2d230a(0xde)]({'value':!![],'label':'是'}),Object[a431_0x2d230a(0xde)]({'value':![],'label':'否'})])}),RH_INSTANCE_FIELD]),RH_VIDEO_SCAIL_V2_ENHANCED_MOTION_CONTROL_FIELD=Object[a431_0x2d230a(0xde)]({'id':a431_0x2d230a(0xda),'type':a431_0x2d230a(0xd9),'placement':a431_0x2d230a(0xd6),'variant':'advancedRow','label':a431_0x2d230a(0xa3),'defaultValue':![],'description':a431_0x2d230a(0xa0),'options':Object[a431_0x2d230a(0xde)]([Object[a431_0x2d230a(0xde)]({'value':!![],'label':'是'}),Object[a431_0x2d230a(0xde)]({'value':![],'label':'否'})])}),RH_VIDEO_SCAIL_NODE_INFO_LIST=Object['freeze']([Object[a431_0x2d230a(0xde)]({'nodeId':a431_0x2d230a(0xe5),'fieldName':a431_0x2d230a(0xd1),'source':a431_0x2d230a(0xca),'required':!![],'description':'上传视频'}),Object['freeze']({'nodeId':a431_0x2d230a(0xb9),'fieldName':'image','source':a431_0x2d230a(0xe4),'field':a431_0x2d230a(0xc6),'required':!![],'description':a431_0x2d230a(0xc8)}),Object[a431_0x2d230a(0xde)]({'nodeId':a431_0x2d230a(0xc3),'fieldName':a431_0x2d230a(0xe6),'source':a431_0x2d230a(0xdf),'fields':Object[a431_0x2d230a(0xde)]([a431_0x2d230a(0xab),a431_0x2d230a(0xd8)]),'defaultValue':![],'transform':'booleanString','description':'替换人物/动作参考'}),Object[a431_0x2d230a(0xde)]({'nodeId':a431_0x2d230a(0xd0),'fieldName':'value','source':a431_0x2d230a(0xdf),'fields':Object[a431_0x2d230a(0xde)](['generationParams.rhVideoResolution',a431_0x2d230a(0xb1)]),'defaultValue':0x400,'transform':Object[a431_0x2d230a(0xde)]({'name':a431_0x2d230a(0xee),'min':0x340}),'description':a431_0x2d230a(0xa1)}),Object[a431_0x2d230a(0xde)]({'nodeId':a431_0x2d230a(0xc1),'fieldName':'value','source':a431_0x2d230a(0xdf),'fields':Object[a431_0x2d230a(0xde)](['generationParams.rhScail2PersonCount',a431_0x2d230a(0xac)]),'defaultValue':0x2,'transform':Object[a431_0x2d230a(0xde)]({'name':a431_0x2d230a(0xee),'min':0x1}),'description':a431_0x2d230a(0xd4)}),Object[a431_0x2d230a(0xde)]({'nodeId':a431_0x2d230a(0xed),'fieldName':'value','source':'param','fields':Object[a431_0x2d230a(0xde)]([a431_0x2d230a(0xd2),a431_0x2d230a(0xb4)]),'defaultValue':'person','allowEmpty':!![],'description':'检测识别提示词'}),Object['freeze']({'nodeId':a431_0x2d230a(0xd7),'fieldName':a431_0x2d230a(0xe6),'source':a431_0x2d230a(0xdc),'defaultValue':'','includeEmpty':!![],'description':a431_0x2d230a(0xa4)}),Object[a431_0x2d230a(0xde)]({'nodeId':a431_0x2d230a(0xe5),'fieldName':a431_0x2d230a(0xbb),'source':a431_0x2d230a(0xdf),'fields':Object[a431_0x2d230a(0xde)](['generationParams.rhVideoFps',a431_0x2d230a(0xbe),'frameRate']),'defaultValue':0x18,'transform':'normalizeRhVideoFps','description':'帧率'}),Object['freeze']({'nodeId':a431_0x2d230a(0xe5),'fieldName':a431_0x2d230a(0xbd),'source':a431_0x2d230a(0xdf),'fields':Object[a431_0x2d230a(0xde)]([a431_0x2d230a(0xba),a431_0x2d230a(0xc2),a431_0x2d230a(0xec)]),'defaultValue':0x12c,'transform':Object['freeze']({'name':a431_0x2d230a(0xee),'min':0x0}),'description':a431_0x2d230a(0xb2)})]),RH_VIDEO_SCAIL_V2_NODE_INFO_LIST=Object[a431_0x2d230a(0xde)]([...RH_VIDEO_SCAIL_NODE_INFO_LIST,Object['freeze']({'nodeId':a431_0x2d230a(0xb7),'fieldName':'value','source':a431_0x2d230a(0xdf),'fields':Object['freeze']([a431_0x2d230a(0xa8),'rhScailV2EnhancedMotionControl']),'defaultValue':![],'transform':a431_0x2d230a(0xdd),'description':'强化动作控制'})]);function createScailVideoModelManifest({modelId:_0x406a60,executionId:_0x589f4d,displayName:_0x3b0d31,description:_0x1068ae,helpTooltip:_0x1976ae,vip:vip=![],subscriptionAliases:subscriptionAliases=[],extraUiFields:extraUiFields=[]}){const _0x291188=a431_0x2d230a,_0x1abe86=Object[_0x291188(0xde)]([...subscriptionAliases]),_0x34aba6=Object['freeze']({..._0x1abe86[_0x291188(0xaf)]>0x0?{'vipAliases':_0x1abe86}:{},'videoParameterPanel':RH_VIDEO_SCAIL_PANEL_EXTENSION});return createRunningHubVideoModelManifest({'modelId':_0x406a60,'executionId':_0x589f4d,'displayName':_0x3b0d31,'description':_0x1068ae,'vip':vip,'subscriptionAliases':_0x1abe86,'help':Object['freeze']({'tooltip':_0x1976ae}),'extensions':_0x34aba6,'fixedAssetSlots':RH_VIDEO_SCAIL_FIXED_ASSET_SLOTS,'inputSlots':{'allowedKinds':[_0x291188(0xc0),_0x291188(0xe2),_0x291188(0xd1)],'minByKind':{'image':0x1,'video':0x1},'maxByKind':{'image':0x1,'video':0x1,'audio':0x0},'fixedSlots':RH_VIDEO_SCAIL_FIXED_INPUT_SLOTS},'uiFields':Object[_0x291188(0xde)]([...RH_VIDEO_SCAIL_UI_FIELDS,...extraUiFields])});}function createScailVideoExecutionManifest({id:_0x1f7e87,label:_0x4e54a5,workflowId:_0x44f79a,nodeInfoList:nodeInfoList=RH_VIDEO_SCAIL_NODE_INFO_LIST}){return createRunningHubVideoExecutionManifest({'id':_0x1f7e87,'label':_0x4e54a5,'workflowId':_0x44f79a,'submitMode':'openapi-v2-ai-app','queryMode':'openapi-v2-query','mapping':{'nodeInfoList':nodeInfoList}});}export const rhVideoScail2V1ModelManifest=createScailVideoModelManifest({'modelId':RH_VIDEO_SCAIL2_V1_MODEL_ID,'executionId':RH_VIDEO_SCAIL2_V1_EXECUTION_ID,'displayName':a431_0x2d230a(0xc4),'description':'源视频\x20+\x20参考图的\x20Scail\x20视频编辑工作流','helpTooltip':RH_VIDEO_SCAIL2_V1_HELP_TOOLTIP,'vip':!![],'subscriptionAliases':RH_VIDEO_SCAIL_VIP_ALIASES});function a431_0x6d0d(){const _0x50d4fb=['5tmyUAh','强化动作控制','提示词','601852uZyGdV','接入\x20[[red:源视频]]\x20+\x20[[red:参考图]]，按提示词和高级参数做视频编辑','视频编辑Scail\x20V2用法','generationParams.rhScailV2EnhancedMotionControl','stepper','6593193AracTh','generationParams.rhScail2ReplaceSubject','rhScail2PersonCount','join','runninghub.workflow.video-scail-v2.v1','length','用于指定检测识别目标。默认是\x20person，如无特殊要求请别进行修改。','rhVideoResolution','生成时长（帧数）','8wqYSEV','rhScailDetectPrompt','444leIbGn','runninghub/2064961300823896065','458','用于告诉工作流需要检测/识别的主体人数。识别人数不准时再调整。','338','generationParams.rhVideoFrames','force_rate','textarea','frame_load_cap','rhVideoFps','9gGhSfq','text','383','rhVideoFrames','444','视频编辑Scail\x20V1','video_edit.pro','inputUrls','替换主体','上传图片','视频编辑Scail\x20V2','videoInput','advancedRow','refImage','识别人数','sourceVideo','19390ZpqXUU','324','video','generationParams.rhScailDetectPrompt','2065463417577762818','识别多少人','683025FNrLyW','videoAdvanced','317','rhScail2ReplaceSubject','segmented','rhScailV2EnhancedMotionControl','65709JlAGDm','prompt','booleanString','freeze','param','video_edit_v54','控制是否用参考图替换源视频中的主体。默认否，不需要换主体时保持否。','image','18378852AtseaO','imageInput','336','value','runninghub/2065463417577762818','视频编辑Scail\x20V1用法','参考图','runninghub.workflow.video-scail2-v1.v1','person','frameCount','318','integer','33774tzMtSc','识别人数用于控制需要识别的主体数量；替换主体用于控制是否替换人物/动作参考','1529QyvMoH','v54','加强源视频动作控制约束。默认否，动作不稳定或跟随不足时再开启。','分辨率'];a431_0x6d0d=function(){return _0x50d4fb;};return a431_0x6d0d();}export const rhVideoScail2V1ExecutionManifest=createScailVideoExecutionManifest({'id':RH_VIDEO_SCAIL2_V1_EXECUTION_ID,'label':a431_0x2d230a(0xc4),'workflowId':'2064961300823896065'});export const rhVideoScailV2ModelManifest=createScailVideoModelManifest({'modelId':RH_VIDEO_SCAIL_V2_MODEL_ID,'executionId':RH_VIDEO_SCAIL_V2_EXECUTION_ID,'displayName':a431_0x2d230a(0xc9),'description':'源视频\x20+\x20参考图的\x20Scail\x20V2\x20视频编辑工作流','helpTooltip':RH_VIDEO_SCAIL_V2_HELP_TOOLTIP,'vip':!![],'subscriptionAliases':RH_VIDEO_SCAIL_VIP_ALIASES,'extraUiFields':Object[a431_0x2d230a(0xde)]([RH_VIDEO_SCAIL_V2_ENHANCED_MOTION_CONTROL_FIELD])});export const rhVideoScailV2ExecutionManifest=createScailVideoExecutionManifest({'id':RH_VIDEO_SCAIL_V2_EXECUTION_ID,'label':a431_0x2d230a(0xc9),'workflowId':a431_0x2d230a(0xd3),'nodeInfoList':RH_VIDEO_SCAIL_V2_NODE_INFO_LIST});
+import {
+  RH_INSTANCE_FIELD,
+  RH_VIDEO_FPS_30_FIELD,
+  RH_VIDEO_RESOLUTION_FIELD,
+  createRunningHubVideoExecutionManifest,
+  createRunningHubVideoModelManifest,
+} from '../../shared/runningHubVideoManifestShared.js';
+export const RH_VIDEO_SCAIL2_V1_MODEL_ID = 'runninghub/2064961300823896065';
+export const RH_VIDEO_SCAIL2_V1_EXECUTION_ID = 'runninghub.workflow.video-scail2-v1.v1';
+export const RH_VIDEO_SCAIL_V2_MODEL_ID = 'runninghub/2065463417577762818';
+export const RH_VIDEO_SCAIL_V2_EXECUTION_ID = 'runninghub.workflow.video-scail-v2.v1';
+const RH_VIDEO_SCAIL_VIP_ALIASES = Object.freeze(['video_edit_v54', 'video_edit.pro']),
+  RH_VIDEO_SCAIL_RESOLUTION_FIELD = Object.freeze({ ...RH_VIDEO_RESOLUTION_FIELD, defaultValue: 0x400 });
+export const RH_VIDEO_SCAIL2_V1_HELP_TOOLTIP = [
+  '视频编辑Scail V1用法',
+  '接入 [[red:源视频]] + [[red:参考图]]，按提示词和高级参数做视频编辑',
+  '识别人数用于控制需要识别的主体数量；替换主体用于控制是否替换人物/动作参考',
+].join('\n');
+export const RH_VIDEO_SCAIL_V2_HELP_TOOLTIP = [
+  '视频编辑Scail V2用法',
+  '接入 [[red:源视频]] + [[red:参考图]]，按提示词和高级参数做视频编辑',
+  '识别人数用于控制需要识别的主体数量；替换主体用于控制是否替换人物/动作参考',
+].join('\n');
+const RH_VIDEO_SCAIL_PANEL_EXTENSION = Object.freeze({
+    sourceFrameCountFps: 'v54',
+    submitScopeTargetEdges: true,
+    frameStateDefaults: Object.freeze({ frameRate: 24, frameCount: 0x12c }),
+    adaptiveRatio: Object.freeze({
+      scopeTargetEdges: true,
+      preferSlot: 'sourceVideo',
+      preferVideoKind: true,
+    }),
+  }),
+  RH_VIDEO_SCAIL_FIXED_ASSET_SLOTS = Object.freeze(['sourceVideo', 'refImage']),
+  RH_VIDEO_SCAIL_FIXED_INPUT_SLOTS = Object.freeze([
+    Object.freeze({ id: 'sourceVideo', kind: 'video', label: '源视频', required: true }),
+    Object.freeze({ id: 'refImage', kind: 'image', label: '参考图', required: true }),
+  ]),
+  RH_VIDEO_SCAIL_UI_FIELDS = Object.freeze([
+    RH_VIDEO_SCAIL_RESOLUTION_FIELD,
+    RH_VIDEO_FPS_30_FIELD,
+    Object.freeze({
+      id: 'rhVideoFrames',
+      type: 'stepper',
+      placement: 'videoParams',
+      label: '帧数',
+      defaultValue: 0x12c,
+      min: 0,
+      max: 0xf423f,
+      step: 1,
+    }),
+    Object.freeze({
+      id: 'rhScail2PersonCount',
+      type: 'stepper',
+      placement: 'videoAdvanced',
+      variant: 'advancedRow',
+      label: '识别人数',
+      ariaLabel: '识别人数',
+      defaultValue: 2,
+      min: 1,
+      max: 0xf423f,
+      step: 1,
+      description: '用于告诉工作流需要检测/识别的主体人数。识别人数不准时再调整。',
+    }),
+    Object.freeze({
+      id: 'rhScailDetectPrompt',
+      type: 'textarea',
+      placement: 'videoAdvanced',
+      variant: 'advancedRow',
+      label: '检测识别提示词',
+      defaultValue: 'person',
+      allowEmpty: true,
+      description: '用于指定检测识别目标。默认是 person，如无特殊要求请别进行修改。',
+    }),
+    Object.freeze({
+      id: 'rhScail2ReplaceSubject',
+      type: 'segmented',
+      placement: 'videoAdvanced',
+      variant: 'advancedRow',
+      label: '替换主体',
+      defaultValue: false,
+      description: '控制是否用参考图替换源视频中的主体。默认否，不需要换主体时保持否。',
+      options: Object.freeze([
+        Object.freeze({ value: true, label: '是' }),
+        Object.freeze({ value: false, label: '否' }),
+      ]),
+    }),
+    RH_INSTANCE_FIELD,
+  ]),
+  RH_VIDEO_SCAIL_V2_ENHANCED_MOTION_CONTROL_FIELD = Object.freeze({
+    id: 'rhScailV2EnhancedMotionControl',
+    type: 'segmented',
+    placement: 'videoAdvanced',
+    variant: 'advancedRow',
+    label: '强化动作控制',
+    defaultValue: false,
+    description: '加强源视频动作控制约束。默认否，动作不稳定或跟随不足时再开启。',
+    options: Object.freeze([
+      Object.freeze({ value: true, label: '是' }),
+      Object.freeze({ value: false, label: '否' }),
+    ]),
+  }),
+  RH_VIDEO_SCAIL_NODE_INFO_LIST = Object.freeze([
+    Object.freeze({
+      nodeId: '336',
+      fieldName: 'video',
+      source: 'videoInput',
+      required: true,
+      description: '上传视频',
+    }),
+    Object.freeze({
+      nodeId: '338',
+      fieldName: 'image',
+      source: 'imageInput',
+      field: 'inputUrls',
+      required: true,
+      description: '上传图片',
+    }),
+    Object.freeze({
+      nodeId: '444',
+      fieldName: 'value',
+      source: 'param',
+      fields: Object.freeze(['generationParams.rhScail2ReplaceSubject', 'rhScail2ReplaceSubject']),
+      defaultValue: false,
+      transform: 'booleanString',
+      description: '替换人物/动作参考',
+    }),
+    Object.freeze({
+      nodeId: '324',
+      fieldName: 'value',
+      source: 'param',
+      fields: Object.freeze(['generationParams.rhVideoResolution', 'rhVideoResolution']),
+      defaultValue: 0x400,
+      transform: Object.freeze({ name: 'integer', min: 0x340 }),
+      description: '分辨率',
+    }),
+    Object.freeze({
+      nodeId: '383',
+      fieldName: 'value',
+      source: 'param',
+      fields: Object.freeze(['generationParams.rhScail2PersonCount', 'rhScail2PersonCount']),
+      defaultValue: 2,
+      transform: Object.freeze({ name: 'integer', min: 1 }),
+      description: '识别多少人',
+    }),
+    Object.freeze({
+      nodeId: '318',
+      fieldName: 'value',
+      source: 'param',
+      fields: Object.freeze(['generationParams.rhScailDetectPrompt', 'rhScailDetectPrompt']),
+      defaultValue: 'person',
+      allowEmpty: true,
+      description: '检测识别提示词',
+    }),
+    Object.freeze({
+      nodeId: '317',
+      fieldName: 'value',
+      source: 'prompt',
+      defaultValue: '',
+      includeEmpty: true,
+      description: '提示词',
+    }),
+    Object.freeze({
+      nodeId: '336',
+      fieldName: 'force_rate',
+      source: 'param',
+      fields: Object.freeze(['generationParams.rhVideoFps', 'rhVideoFps', 'frameRate']),
+      defaultValue: 24,
+      transform: 'normalizeRhVideoFps',
+      description: '帧率',
+    }),
+    Object.freeze({
+      nodeId: '336',
+      fieldName: 'frame_load_cap',
+      source: 'param',
+      fields: Object.freeze(['generationParams.rhVideoFrames', 'rhVideoFrames', 'frameCount']),
+      defaultValue: 0x12c,
+      transform: Object.freeze({ name: 'integer', min: 0 }),
+      description: '生成时长（帧数）',
+    }),
+  ]),
+  RH_VIDEO_SCAIL_V2_NODE_INFO_LIST = Object.freeze([
+    ...RH_VIDEO_SCAIL_NODE_INFO_LIST,
+    Object.freeze({
+      nodeId: '458',
+      fieldName: 'value',
+      source: 'param',
+      fields: Object.freeze([
+        'generationParams.rhScailV2EnhancedMotionControl',
+        'rhScailV2EnhancedMotionControl',
+      ]),
+      defaultValue: false,
+      transform: 'booleanString',
+      description: '强化动作控制',
+    }),
+  ]);
+function createScailVideoModelManifest({
+  modelId: _0x406a60,
+  executionId: _0x589f4d,
+  displayName: _0x3b0d31,
+  description: _0x1068ae,
+  helpTooltip: _0x1976ae,
+  vip: vip = false,
+  subscriptionAliases: subscriptionAliases = [],
+  extraUiFields: extraUiFields = [],
+}) {
+  const _0x1abe86 = Object.freeze([...subscriptionAliases]),
+    _0x34aba6 = Object.freeze({
+      ...(_0x1abe86.length > 0 ? { vipAliases: _0x1abe86 } : {}),
+      videoParameterPanel: RH_VIDEO_SCAIL_PANEL_EXTENSION,
+    });
+  return createRunningHubVideoModelManifest({
+    modelId: _0x406a60,
+    executionId: _0x589f4d,
+    displayName: _0x3b0d31,
+    description: _0x1068ae,
+    vip: vip,
+    subscriptionAliases: _0x1abe86,
+    help: Object.freeze({ tooltip: _0x1976ae }),
+    extensions: _0x34aba6,
+    fixedAssetSlots: RH_VIDEO_SCAIL_FIXED_ASSET_SLOTS,
+    inputSlots: {
+      allowedKinds: ['text', 'image', 'video'],
+      minByKind: { image: 1, video: 1 },
+      maxByKind: { image: 1, video: 1, audio: 0 },
+      fixedSlots: RH_VIDEO_SCAIL_FIXED_INPUT_SLOTS,
+    },
+    uiFields: Object.freeze([...RH_VIDEO_SCAIL_UI_FIELDS, ...extraUiFields]),
+  });
+}
+function createScailVideoExecutionManifest({
+  id: _0x1f7e87,
+  label: _0x4e54a5,
+  workflowId: _0x44f79a,
+  nodeInfoList: nodeInfoList = RH_VIDEO_SCAIL_NODE_INFO_LIST,
+}) {
+  return createRunningHubVideoExecutionManifest({
+    id: _0x1f7e87,
+    label: _0x4e54a5,
+    workflowId: _0x44f79a,
+    submitMode: 'openapi-v2-ai-app',
+    queryMode: 'openapi-v2-query',
+    mapping: { nodeInfoList: nodeInfoList },
+  });
+}
+export const rhVideoScail2V1ModelManifest = createScailVideoModelManifest({
+  modelId: RH_VIDEO_SCAIL2_V1_MODEL_ID,
+  executionId: RH_VIDEO_SCAIL2_V1_EXECUTION_ID,
+  displayName: '视频编辑Scail V1',
+  description: '源视频 + 参考图的 Scail 视频编辑工作流',
+  helpTooltip: RH_VIDEO_SCAIL2_V1_HELP_TOOLTIP,
+  vip: true,
+  subscriptionAliases: RH_VIDEO_SCAIL_VIP_ALIASES,
+});
+export const rhVideoScail2V1ExecutionManifest = createScailVideoExecutionManifest({
+  id: RH_VIDEO_SCAIL2_V1_EXECUTION_ID,
+  label: '视频编辑Scail V1',
+  workflowId: '2064961300823896065',
+});
+export const rhVideoScailV2ModelManifest = createScailVideoModelManifest({
+  modelId: RH_VIDEO_SCAIL_V2_MODEL_ID,
+  executionId: RH_VIDEO_SCAIL_V2_EXECUTION_ID,
+  displayName: '视频编辑Scail V2',
+  description: '源视频 + 参考图的 Scail V2 视频编辑工作流',
+  helpTooltip: RH_VIDEO_SCAIL_V2_HELP_TOOLTIP,
+  vip: true,
+  subscriptionAliases: RH_VIDEO_SCAIL_VIP_ALIASES,
+  extraUiFields: Object.freeze([RH_VIDEO_SCAIL_V2_ENHANCED_MOTION_CONTROL_FIELD]),
+});
+export const rhVideoScailV2ExecutionManifest = createScailVideoExecutionManifest({
+  id: RH_VIDEO_SCAIL_V2_EXECUTION_ID,
+  label: '视频编辑Scail V2',
+  workflowId: '2065463417577762818',
+  nodeInfoList: RH_VIDEO_SCAIL_V2_NODE_INFO_LIST,
+});

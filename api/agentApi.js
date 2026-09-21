@@ -1,1 +1,496 @@
-const a13_0x4d5ce7=a13_0x9b60;(function(_0x585bdf,_0x1cb0cb){const _0x19348c=a13_0x9b60,_0x3adfa1=_0x585bdf();while(!![]){try{const _0x4533c2=-parseInt(_0x19348c(0xe6))/0x1*(-parseInt(_0x19348c(0x12b))/0x2)+parseInt(_0x19348c(0x133))/0x3*(parseInt(_0x19348c(0x110))/0x4)+-parseInt(_0x19348c(0x13e))/0x5+parseInt(_0x19348c(0x145))/0x6*(-parseInt(_0x19348c(0x10e))/0x7)+parseInt(_0x19348c(0x16e))/0x8*(-parseInt(_0x19348c(0x15d))/0x9)+-parseInt(_0x19348c(0x163))/0xa*(parseInt(_0x19348c(0xec))/0xb)+parseInt(_0x19348c(0x117))/0xc;if(_0x4533c2===_0x1cb0cb)break;else _0x3adfa1['push'](_0x3adfa1['shift']());}catch(_0x40cc59){_0x3adfa1['push'](_0x3adfa1['shift']());}}}(a13_0x41a2,0xd1d5d));import{generateText}from'./aiTextApi.js';export const AGENT_PLANNER_PROMPT_MAX_CHARS=0xb3b0;const AGENT_PLANNER_HISTORY_LIMIT=0x6,AGENT_PLANNER_HISTORY_TEXT_LIMIT=0x1e0;export const AGENT_SYSTEM_PROMPT=['You\x20are\x20the\x20AI\x20Canvas\x20action\x20planner.',a13_0x4d5ce7(0xf9),a13_0x4d5ce7(0x161),'Do\x20not\x20use\x20Markdown,\x20code\x20fences,\x20lead-in\x20prose,\x20comments,\x20or\x20trailing\x20commas.',a13_0x4d5ce7(0xfb),a13_0x4d5ce7(0xeb),'Use\x20only\x20actions\x20listed\x20in\x20context.commands.',a13_0x4d5ce7(0x157),a13_0x4d5ce7(0x108),'Default\x20to\x20status\x20chat\x20with\x20actions\x20[]\x20for\x20greetings,\x20capability\x20questions,\x20brainstorming,\x20critique,\x20explanation,\x20or\x20any\x20message\x20that\x20does\x20not\x20clearly\x20ask\x20to\x20create,\x20generate,\x20edit,\x20connect,\x20arrange,\x20select,\x20delete,\x20or\x20otherwise\x20modify\x20the\x20canvas.',a13_0x4d5ce7(0x12d),a13_0x4d5ce7(0x178),a13_0x4d5ce7(0xfe),a13_0x4d5ce7(0x115),a13_0x4d5ce7(0x14a),a13_0x4d5ce7(0xe4),a13_0x4d5ce7(0xe5),a13_0x4d5ce7(0x167),'When\x20creating\x20an\x20AI\x20node,\x20include\x20model\x20and\x20provider\x20from\x20context.canvas.availableModels\x20if\x20a\x20listed\x20model\x20better\x20matches\x20the\x20user\x27s\x20selected\x20inputs.',a13_0x4d5ce7(0xf2),'When\x20context.canvas.inputRefs\x20is\x20non-empty,\x20prefer\x20those\x20node\x20IDs\x20over\x20guessing\x20from\x20selectedNodes\x20or\x20the\x20wider\x20canvas.','For\x20image-to-video,\x20first\x20use\x20an\x20image\x20input\x20from\x20context.canvas.inputRefs/referenceContext\x20before\x20falling\x20back\x20to\x20selected\x20image\x20nodes.',a13_0x4d5ce7(0x134),'If\x20multiple\x20inputRefs\x20could\x20match\x20and\x20the\x20user\x27s\x20intent\x20does\x20not\x20identify\x20which\x20one\x20to\x20use,\x20ask\x20a\x20clarification\x20question\x20instead\x20of\x20guessing.','Use\x20node.setParams\x20only\x20with\x20field\x20IDs\x20present\x20in\x20the\x20chosen\x20model\x27s\x20uiSchema.fields;\x20omit\x20unsupported\x20requested\x20params\x20instead\x20of\x20inventing\x20fields.','When\x20no\x20explicit\x20image\x20inputRef\x20is\x20available,\x20image-to-video\x20using\x20the\x20current\x20or\x20selected\x20image\x20must\x20use\x20the\x20exact\x20selected\x20image\x20node\x20id\x20from\x20context.canvas.selectedNodes\x20or\x20context.canvas.selectedNodeIds.',a13_0x4d5ce7(0x109),a13_0x4d5ce7(0x124),a13_0x4d5ce7(0x14c)][a13_0x4d5ce7(0x12a)]('\x0a');const BASE_AGENT_PLAN_EXAMPLES=Object[a13_0x4d5ce7(0x100)]([{'user':'What\x20can\x20you\x20help\x20me\x20do\x20on\x20this\x20canvas?','plan':{'status':a13_0x4d5ce7(0x15f),'reply':a13_0x4d5ce7(0x16f),'actions':[]}},{'user':a13_0x4d5ce7(0x177),'plan':{'status':a13_0x4d5ce7(0x146),'reply':'I\x20will\x20create\x20the\x20image\x20node\x20first,\x20then\x20ask\x20before\x20generation.','actions':[{'type':a13_0x4d5ce7(0x13c),'as':a13_0x4d5ce7(0x13d),'args':{'type':a13_0x4d5ce7(0xff),'prompt':a13_0x4d5ce7(0x112)}},{'type':'generation.run','args':{'nodeId':a13_0x4d5ce7(0x11a)}}]}},{'user':a13_0x4d5ce7(0x155),'plan':{'status':a13_0x4d5ce7(0x146),'reply':a13_0x4d5ce7(0x10d),'actions':[{'type':a13_0x4d5ce7(0x16d),'args':{'gap':0x50}},{'type':a13_0x4d5ce7(0x147),'args':{'mode':'top'}}]}},{'user':a13_0x4d5ce7(0x143),'plan':{'status':'ready','reply':a13_0x4d5ce7(0x135),'actions':[{'type':a13_0x4d5ce7(0x13c),'as':a13_0x4d5ce7(0xe9),'args':{'type':a13_0x4d5ce7(0x126),'prompt':a13_0x4d5ce7(0x15b)}},{'type':a13_0x4d5ce7(0xe7),'args':{'nodeId':a13_0x4d5ce7(0x101),'params':{'duration':0x5}}},{'type':a13_0x4d5ce7(0x116),'args':{'nodeId':'$videoNode.nodeId'}}]}},{'user':'Generate\x20a\x20video.','plan':{'status':a13_0x4d5ce7(0xef),'reply':'I\x20need\x20one\x20detail\x20before\x20creating\x20the\x20video.','question':a13_0x4d5ce7(0x13f),'options':[{'id':'text-to-video','label':a13_0x4d5ce7(0x175)},{'id':a13_0x4d5ce7(0x144),'label':a13_0x4d5ce7(0x120)}],'actions':[]}}]);function isImageNodeType(_0x36f222=''){const _0x4dfe87=a13_0x4d5ce7;return String(_0x36f222||'')===_0x4dfe87(0xff)||String(_0x36f222||'')===_0x4dfe87(0x15a);}function findImageInputRefNodeId(_0x577cc0={}){const _0x3c08cf=a13_0x4d5ce7,_0x32d1f8=_0x577cc0?.['canvas']||{},_0x5026b1=_0x32d1f8[_0x3c08cf(0x16c)]||{},_0x43a0ac=[...Array[_0x3c08cf(0x16a)](_0x32d1f8['inputRefs'])?_0x32d1f8[_0x3c08cf(0xf6)]:[],...Array[_0x3c08cf(0x16a)](_0x5026b1[_0x3c08cf(0xf6)])?_0x5026b1[_0x3c08cf(0xf6)]:[]],_0x502b01=_0x43a0ac[_0x3c08cf(0x140)](_0x2249a4=>isImageNodeType(_0x2249a4?.['type'])||String(_0x2249a4?.['kind']||'')===_0x3c08cf(0x114));if(_0x502b01?.[_0x3c08cf(0x113)]||_0x502b01?.['id'])return String(_0x502b01['nodeId']||_0x502b01['id']);const _0x2205e6=Array[_0x3c08cf(0x16a)](_0x5026b1[_0x3c08cf(0x10f)])?_0x5026b1[_0x3c08cf(0x10f)]:[],_0x36d18f=_0x2205e6[_0x3c08cf(0x140)](_0x470eef=>isImageNodeType(_0x470eef?.[_0x3c08cf(0x12e)])||String(_0x470eef?.[_0x3c08cf(0xed)]||'')==='image');return _0x36d18f?.['nodeId']||_0x36d18f?.['id']?String(_0x36d18f['nodeId']||_0x36d18f['id']):'';}function a13_0x9b60(_0x53c3e7,_0x262ddc){const _0x41a2ec=a13_0x41a2();return a13_0x9b60=function(_0x9b601c,_0x4714b7){_0x9b601c=_0x9b601c-0xe3;let _0x80a5cd=_0x41a2ec[_0x9b601c];return _0x80a5cd;},a13_0x9b60(_0x53c3e7,_0x262ddc);}function findSelectedImageNodeId(_0x45b1f4={}){const _0x528cce=a13_0x4d5ce7,_0x28c17b=findImageInputRefNodeId(_0x45b1f4);if(_0x28c17b)return _0x28c17b;const _0x1ad17c=_0x45b1f4?.[_0x528cce(0x102)]||{},_0x359b75=Array[_0x528cce(0x16a)](_0x1ad17c['selectedNodes'])?_0x1ad17c[_0x528cce(0x107)]:[],_0x4438db=_0x359b75[_0x528cce(0x140)](_0x1b01f0=>isImageNodeType(_0x1b01f0?.['type']));if(_0x4438db?.['id'])return String(_0x4438db['id']);const _0x2b44cf=Array[_0x528cce(0x16a)](_0x1ad17c[_0x528cce(0x165)])?_0x1ad17c[_0x528cce(0x165)][_0x528cce(0x121)](_0x43205c=>String(_0x43205c||''))[_0x528cce(0x138)](Boolean):[];if(_0x2b44cf['length']===0x0)return'';const _0x1e95ef=Array['isArray'](_0x1ad17c[_0x528cce(0x130)])?_0x1ad17c['nodes']:[],_0x4dc59a=new Set(_0x2b44cf),_0x2e328=_0x1e95ef[_0x528cce(0x140)](_0x4319de=>_0x4dc59a[_0x528cce(0x154)](String(_0x4319de?.['id']||''))&&isImageNodeType(_0x4319de?.[_0x528cce(0x12e)]));return _0x2e328?.['id']?String(_0x2e328['id']):'';}function modelAllowsImageInput(_0xa8b15f={}){const _0x371cda=a13_0x4d5ce7,_0x2e39aa=_0xa8b15f?.[_0x371cda(0x176)]&&typeof _0xa8b15f[_0x371cda(0x176)]===_0x371cda(0x136)?_0xa8b15f[_0x371cda(0x176)]:{},_0x1e7e57=Array['isArray'](_0x2e39aa[_0x371cda(0x148)])?_0x2e39aa['allowedKinds']:[];if(_0x1e7e57['includes'](_0x371cda(0x114)))return!![];const _0x49f99d=Number(_0x2e39aa[_0x371cda(0x131)]?.[_0x371cda(0x114)]);return Number[_0x371cda(0x160)](_0x49f99d)&&_0x49f99d>0x0;}function modelRequiresMissingMedia(_0x5c12cd={}){const _0x32700b=a13_0x4d5ce7,_0x4af7ef=_0x5c12cd?.[_0x32700b(0x176)]&&typeof _0x5c12cd[_0x32700b(0x176)]===_0x32700b(0x136)?_0x5c12cd['inputSlots']:{},_0x495d4e=_0x4af7ef[_0x32700b(0xe3)]||{};if(Number(_0x495d4e[_0x32700b(0x11f)])>0x0)return!![];if(Number(_0x495d4e[_0x32700b(0x14b)])>0x0)return!![];const _0x3c9435=Array[_0x32700b(0x16a)](_0x4af7ef[_0x32700b(0x125)])?_0x4af7ef['fixedSlots']:[];return _0x3c9435[_0x32700b(0xfc)](_0x1f15aa=>_0x1f15aa?.[_0x32700b(0x13a)]===!![]&&(String(_0x1f15aa?.[_0x32700b(0xed)]||'')==='video'||String(_0x1f15aa?.[_0x32700b(0xed)]||'')===_0x32700b(0x14b)));}function getModelFieldIds(_0x36a86e={}){const _0x3463d7=a13_0x4d5ce7;return new Set((Array['isArray'](_0x36a86e?.[_0x3463d7(0x118)]?.[_0x3463d7(0x158)])?_0x36a86e['uiSchema'][_0x3463d7(0x158)]:[])['map'](_0x3ec35d=>String(_0x3ec35d?.['id']||'')['trim']())['filter'](Boolean));}function findImageToVideoModel(_0x1e3d12={}){const _0x15c037=a13_0x4d5ce7,_0x54a923=Array[_0x15c037(0x16a)](_0x1e3d12?.[_0x15c037(0x102)]?.[_0x15c037(0x168)])?_0x1e3d12[_0x15c037(0x102)][_0x15c037(0x168)]:[];return _0x54a923[_0x15c037(0x140)](_0x23a134=>_0x23a134?.['kind']===_0x15c037(0x11f)&&_0x23a134?.['modelId']&&modelAllowsImageInput(_0x23a134)&&!modelRequiresMissingMedia(_0x23a134))||null;}function buildImageToVideoExample(_0x47a370,_0x22a200=null,{fromInputRefs:fromInputRefs=![]}={}){const _0x1fa4e0=a13_0x4d5ce7,_0x12ca4f={'type':_0x1fa4e0(0x126),'prompt':_0x1fa4e0(0x159)};_0x22a200?.['modelId']&&(_0x12ca4f[_0x1fa4e0(0x104)]=_0x22a200['modelId'],_0x12ca4f['provider']=_0x22a200[_0x1fa4e0(0x142)]||'');const _0x14df98=[{'type':_0x1fa4e0(0x13c),'as':_0x1fa4e0(0xe9),'args':_0x12ca4f}],_0x54f0e2=getModelFieldIds(_0x22a200);return(!_0x22a200||_0x54f0e2[_0x1fa4e0(0x154)](_0x1fa4e0(0x127)))&&_0x14df98[_0x1fa4e0(0x149)]({'type':_0x1fa4e0(0xe7),'args':{'nodeId':_0x1fa4e0(0x101),'params':{'duration':0x5}}}),_0x14df98[_0x1fa4e0(0x149)]({'type':'graph.connect','args':{'sourceId':_0x47a370,'targetId':_0x1fa4e0(0x101)}},{'type':_0x1fa4e0(0x16d),'args':{'ids':[_0x47a370,_0x1fa4e0(0x101)],'gap':0x50}},{'type':_0x1fa4e0(0x116),'args':{'nodeId':_0x1fa4e0(0x101)}}),{'user':fromInputRefs?'Use\x20the\x20explicit\x20image\x20inputRef\x20to\x20create\x20a\x205\x20second\x20video\x20with\x20a\x20slow\x20push\x20in,\x20then\x20generate.':_0x1fa4e0(0xf8),'plan':{'status':'ready','reply':fromInputRefs?_0x1fa4e0(0xe8):_0x1fa4e0(0x13b),'actions':_0x14df98}};}function a13_0x41a2(){const _0x3d56fc=['142wuRswY','node.setParams','I\x20will\x20create\x20a\x20video\x20node,\x20connect\x20the\x20referenced\x20image\x20to\x20it,\x20arrange\x20the\x20nodes,\x20then\x20ask\x20before\x20generation.','videoNode','All\x20user-facing\x20reply,\x20question,\x20and\x20option\x20labels\x20must\x20be\x20in\x20English.','Do\x20not\x20request\x20unregistered\x20tools.','11atoyAz','kind','selectionFallback','need_clarification','toLowerCase','contextBudget','context.canvas.inputRefs\x20and\x20context.canvas.referenceContext\x20are\x20explicit\x20material\x20inputs\x20supplied\x20by\x20the\x20user\x20from\x20the\x20Agent\x20panel.','Agent\x20planner\x20returned\x20invalid\x20JSON.','capabilitySchema','English','inputRefs','Agent\x20planner\x20returned\x20empty\x20text.','Use\x20the\x20currently\x20selected\x20image\x20to\x20create\x20a\x205\x20second\x20video\x20with\x20a\x20slow\x20push\x20in,\x20then\x20generate.','Return\x20only\x20one\x20strict\x20JSON\x20object.','invalid\x20JSON','Do\x20not\x20return\x20JavaScript.','some','status','If\x20intent\x20is\x20ambiguous,\x20return\x20status\x20need_clarification.','ai-image','freeze','$videoNode.nodeId','canvas','recentCommands','model','replace','string\x20when\x20clarification\x20is\x20needed','selectedNodes','Use\x20context.skills\x20only\x20as\x20planning\x20guidance;\x20skills\x20must\x20produce\x20action\x20plans\x20and\x20must\x20not\x20execute\x20directly.','For\x20image-to-video,\x20always\x20create\x20an\x20ai-video\x20node,\x20graph.connect\x20the\x20selected\x20image\x20node\x20to\x20the\x20new\x20video\x20node,\x20optionally\x20arrange\x20them,\x20then\x20generation.run\x20the\x20video\x20node.','parse','availableWorkflows','contentPreview','I\x20will\x20arrange\x20and\x20align\x20the\x20selected\x20nodes.','631197ktyFQU','referencedNodes','8TdEhiv','comments','cyberpunk\x20city\x20night','nodeId','image','If\x20an\x20action\x20is\x20risky,\x20return\x20status\x20need_confirmation.','generation.run','161148NjPGET','uiSchema','temperature','$imageNode.nodeId','locale','requiresMountedRuntime','text','markdown','video','Image-to-video','map','argsSchema','reply','If\x20the\x20user\x20asks\x20for\x20text-to-video\x20or\x20provides\x20a\x20clear\x20text-only\x20video\x20idea\x20and\x20no\x20usable\x20image\x20is\x20selected,\x20create\x20an\x20ai-video\x20node,\x20set\x20text-to-video\x20params\x20supported\x20by\x20its\x20model,\x20then\x20generation.run\x20it.','fixedSlots','ai-video','duration','agentModelSettings','object\x20matching\x20context.commands[].argsSchema;\x20may\x20reference\x20earlier\x20aliases\x20with\x20$alias.path\x20from\x20returnAliasFields.\x20node.create\x20may\x20include\x20model/provider\x20from\x20context.canvas.availableModels.','join','22810eeexVG','planner_json_retry','Only\x20return\x20canvas\x20actions\x20when\x20the\x20user\x20has\x20explicit\x20canvas\x20action\x20intent.\x20Mere\x20discussion\x20of\x20an\x20image,\x20video,\x20material,\x20or\x20idea\x20is\x20not\x20enough.','type','en-US','nodes','maxByKind','content','1779213ZREAvP','If\x20the\x20user\x20says\x20this,\x20these,\x20the\x20attached\x20material,\x20or\x20the\x20just-added\x20material,\x20resolve\x20that\x20wording\x20to\x20context.canvas.inputRefs.','I\x20will\x20create\x20a\x20text-to-video\x20node,\x20set\x20supported\x20parameters,\x20then\x20ask\x20before\x20generation.','object','max','filter','commands','required','I\x20will\x20create\x20a\x20video\x20node,\x20connect\x20the\x20selected\x20image\x20to\x20it,\x20arrange\x20the\x20nodes,\x20then\x20ask\x20before\x20generation.','node.create','imageNode','993315IGmXpj','Should\x20this\x20be\x20text-to-video\x20or\x20image-to-video?\x20If\x20image-to-video,\x20select\x20or\x20provide\x20a\x20reference\x20image.','find','defaults','provider','Create\x20a\x205\x20second\x20video\x20from\x20text:\x20a\x20paper\x20boat\x20floating\x20through\x20a\x20neon\x20canal.','image-to-video','42gUwIWt','ready','layout.align','allowedKinds','push','Prefer\x20model\x20and\x20workflow\x20capabilities\x20from\x20manifest\x20data\x20in\x20context.','audio','If\x20the\x20user\x20asks\x20for\x20video\x20but\x20the\x20source\x20or\x20content\x20is\x20ambiguous,\x20ask\x20a\x20clarification\x20question\x20instead\x20of\x20guessing.','returnAliasFields','message','failed','edges','strict-json-object','includedModels','简体中文','has','Arrange\x20selected\x20nodes\x20horizontally\x20with\x20gap\x2080\x20and\x20align\x20top.','trim','Use\x20context.commands[].argsSchema,\x20capabilitySchema,\x20and\x20returnAliasFields\x20as\x20the\x20source\x20of\x20truth\x20for\x20action\x20args,\x20selection\x20fallback,\x20runtime\x20requirements,\x20and\x20$alias\x20fields.','fields','slow\x20camera\x20push\x20in','source-image','a\x20paper\x20boat\x20floating\x20through\x20a\x20neon\x20canal','modelCatalog','9omxQMW','...','chat','isFinite','The\x20first\x20non-whitespace\x20character\x20must\x20be\x20{\x20and\x20the\x20last\x20non-whitespace\x20character\x20must\x20be\x20}.','stringify','3120470QmuCew','slice','selectedNodeIds','string','Use\x20generation.run\x20only\x20after\x20the\x20target\x20node\x20exists;\x20generation.run\x20will\x20require\x20confirmation.','availableModels','trailing\x20commas','isArray','planner_json_retry_failed','referenceContext','layout.arrangeRow','6541512dpNNot','I\x20can\x20help\x20discuss\x20ideas\x20first.\x20When\x20you\x20want\x20me\x20to\x20act,\x20tell\x20me\x20to\x20create,\x20generate,\x20connect,\x20arrange,\x20or\x20edit\x20something\x20on\x20the\x20canvas.','length','startsWith','code\x20fences','planner_model_selected','assistant','Text-to-video','inputSlots','Create\x20an\x20image\x20node\x20with\x20prompt\x20cyberpunk\x20city\x20night,\x20then\x20generate.','For\x20status\x20chat,\x20include\x20a\x20helpful\x20reply\x20and\x20keep\x20actions\x20empty.','truncated','minByKind','Use\x20the\x20languagePolicy\x20in\x20the\x20JSON\x20prompt\x20for\x20all\x20user-facing\x20reply,\x20question,\x20and\x20option\x20labels.','When\x20a\x20later\x20action\x20needs\x20an\x20earlier\x20result,\x20set\x20as\x20on\x20the\x20earlier\x20action\x20and\x20reference\x20it\x20as\x20$alias.nodeId.'];a13_0x41a2=function(){return _0x3d56fc;};return a13_0x41a2();}function buildAgentPlanExamples(_0x56d10d={}){const _0x2aa5d6=findImageInputRefNodeId(_0x56d10d),_0x2d9205=_0x2aa5d6||findSelectedImageNodeId(_0x56d10d);if(!_0x2d9205)return BASE_AGENT_PLAN_EXAMPLES;const _0x38fe9a=findImageToVideoModel(_0x56d10d);return[BASE_AGENT_PLAN_EXAMPLES[0x0],buildImageToVideoExample(_0x2d9205,_0x38fe9a,{'fromInputRefs':Boolean(_0x2aa5d6)}),BASE_AGENT_PLAN_EXAMPLES[0x1],BASE_AGENT_PLAN_EXAMPLES[0x2],BASE_AGENT_PLAN_EXAMPLES[0x3],BASE_AGENT_PLAN_EXAMPLES[0x4]];}const AGENT_RESPONSE_CONTRACT=Object['freeze']({'format':a13_0x4d5ce7(0x151),'firstNonWhitespaceChar':'{','lastNonWhitespaceChar':'}','forbidden':[a13_0x4d5ce7(0x11e),a13_0x4d5ce7(0x172),'lead-in\x20prose',a13_0x4d5ce7(0x111),a13_0x4d5ce7(0x169)],'noExecutionOutsidePlan':!![]});function truncatePlannerText(_0x10353d,_0x19dc03=AGENT_PLANNER_HISTORY_TEXT_LIMIT){const _0x18c849=a13_0x4d5ce7,_0x44a79c=String(_0x10353d||'');if(_0x44a79c[_0x18c849(0x170)]<=_0x19dc03)return _0x44a79c;return _0x44a79c[_0x18c849(0x164)](0x0,Math[_0x18c849(0x137)](0x0,_0x19dc03-0x3))+_0x18c849(0x15e);}function normalizeAgentLocale(_0x21dcaa=''){const _0x49a697=a13_0x4d5ce7,_0x4194e7=String(_0x21dcaa||'')['trim']()[_0x49a697(0xf0)]()[_0x49a697(0x105)]('_','-');if(_0x4194e7[_0x49a697(0x171)]('en'))return'en-US';return'zh-CN';}function getPlannerLanguagePolicy(_0x4dcd8b){const _0x3d6318=a13_0x4d5ce7,_0x571f16=normalizeAgentLocale(_0x4dcd8b);if(_0x571f16===_0x3d6318(0x12f))return{'locale':_0x3d6318(0x12f),'responseLanguage':_0x3d6318(0xf5),'instruction':_0x3d6318(0xea)};return{'locale':'zh-CN','responseLanguage':_0x3d6318(0x153),'instruction':'所有面向用户的\x20reply、question、options.label\x20必须使用简体中文。'};}function normalizePlannerHistory(_0x23c5a1=[],{limit:limit=AGENT_PLANNER_HISTORY_LIMIT,textLimit:textLimit=AGENT_PLANNER_HISTORY_TEXT_LIMIT}={}){const _0x306e9f=a13_0x4d5ce7;if(!Array[_0x306e9f(0x16a)](_0x23c5a1))return[];return _0x23c5a1['slice'](-limit)[_0x306e9f(0x121)]((_0x87ff9e={})=>({'role':String(_0x87ff9e['role']||_0x306e9f(0x174)),'status':String(_0x87ff9e[_0x306e9f(0xfd)]||''),'content':truncatePlannerText(_0x87ff9e[_0x306e9f(0x132)]||_0x87ff9e[_0x306e9f(0x123)]||_0x87ff9e[_0x306e9f(0x14e)]||_0x87ff9e['question']||'',textLimit)}))[_0x306e9f(0x138)](_0x155234=>_0x155234['content']||_0x155234[_0x306e9f(0xfd)]);}function cloneJson(_0x28c848){const _0x284b4b=a13_0x4d5ce7;try{return JSON[_0x284b4b(0x10a)](JSON[_0x284b4b(0x162)](_0x28c848||{}));}catch{return{};}}function truncateList(_0xb417af,_0x362986){const _0x42e683=a13_0x4d5ce7;return Array[_0x42e683(0x16a)](_0xb417af)?_0xb417af[_0x42e683(0x164)](0x0,_0x362986):[];}function compactCommand(_0x13c78b={}){const _0x42ee03=a13_0x4d5ce7,_0x547d91=_0x13c78b['argsSchema']&&typeof _0x13c78b['argsSchema']===_0x42ee03(0x136)?_0x13c78b[_0x42ee03(0x122)]:{},_0x1bd038=_0x13c78b[_0x42ee03(0xf4)]&&typeof _0x13c78b[_0x42ee03(0xf4)]===_0x42ee03(0x136)?_0x13c78b[_0x42ee03(0xf4)]:{};return{'id':_0x13c78b['id'],'riskLevel':_0x13c78b['riskLevel'],'argsSchema':{'required':Array[_0x42ee03(0x16a)](_0x547d91[_0x42ee03(0x13a)])?_0x547d91[_0x42ee03(0x13a)]:[],'defaults':_0x547d91[_0x42ee03(0x141)]&&typeof _0x547d91[_0x42ee03(0x141)]==='object'?_0x547d91[_0x42ee03(0x141)]:{},'selectionFallback':_0x547d91[_0x42ee03(0xee)]===!![]},'capabilitySchema':{'selectionFallback':_0x1bd038[_0x42ee03(0xee)]===!![],'requiresMountedRuntime':_0x1bd038[_0x42ee03(0x11c)]===!![]},'returnAliasFields':Array[_0x42ee03(0x16a)](_0x13c78b[_0x42ee03(0x14d)])?_0x13c78b[_0x42ee03(0x14d)]:[]};}function compactPlannerContext(_0x1c56ad,_0x26286d=0x0){const _0x292091=a13_0x4d5ce7,_0x44fe16=cloneJson(_0x1c56ad),_0x45c8bd=_0x44fe16[_0x292091(0x102)]||{};Array['isArray'](_0x44fe16[_0x292091(0x139)])&&_0x26286d>=0x1&&(_0x44fe16['commands']=_0x44fe16[_0x292091(0x139)]['map'](compactCommand));Array[_0x292091(0x16a)](_0x45c8bd[_0x292091(0x103)])&&_0x26286d>=0x1&&(_0x45c8bd[_0x292091(0x103)]=_0x45c8bd[_0x292091(0x103)][_0x292091(0x164)](-0x5));if(Array[_0x292091(0x16a)](_0x45c8bd[_0x292091(0x168)])){const _0x8a9221=[0x16,0xe,0xa,0x6,0x3,0x0],_0x5b705e=_0x8a9221[Math['min'](_0x26286d,_0x8a9221[_0x292091(0x170)]-0x1)];_0x45c8bd['availableModels']=truncateList(_0x45c8bd['availableModels'],_0x5b705e),_0x45c8bd[_0x292091(0x15c)]&&(_0x45c8bd['modelCatalog'][_0x292091(0x179)]=!![],_0x45c8bd[_0x292091(0x15c)][_0x292091(0x152)]=_0x45c8bd[_0x292091(0x168)][_0x292091(0x170)]);}Array[_0x292091(0x16a)](_0x45c8bd[_0x292091(0x10b)])&&_0x26286d>=0x2&&(_0x45c8bd[_0x292091(0x10b)]=[]);if(Array[_0x292091(0x16a)](_0x45c8bd[_0x292091(0x130)])&&_0x26286d>=0x2){const _0x31a362=_0x26286d>=0x4?0x3c:0xa0,_0x5521a6=_0x26286d>=0x5?0xa:0x1e;_0x45c8bd[_0x292091(0x130)]=_0x45c8bd[_0x292091(0x130)][_0x292091(0x164)](0x0,_0x5521a6)['map'](_0x71dc69=>({..._0x71dc69,'promptPreview':truncatePlannerText(_0x71dc69['promptPreview'],_0x31a362),'contentPreview':truncatePlannerText(_0x71dc69[_0x292091(0x10c)],_0x31a362)}));}return Array[_0x292091(0x16a)](_0x45c8bd[_0x292091(0x150)])&&_0x26286d>=0x3&&(_0x45c8bd[_0x292091(0x150)]=_0x45c8bd[_0x292091(0x150)]['slice'](0x0,0x14)),_0x26286d>=0x5&&(_0x45c8bd['edges']=[],_0x45c8bd[_0x292091(0x103)]=[]),_0x44fe16[_0x292091(0x102)]=_0x45c8bd,_0x44fe16[_0x292091(0xf1)]&&(_0x44fe16[_0x292091(0xf1)]={..._0x44fe16[_0x292091(0xf1)],'plannerCompacted':_0x26286d>0x0}),_0x44fe16;}function buildPlannerPayload({message:_0x253242,context:_0x2c76b4,history:history=[],locale:locale=''}={}){const _0x5eb19f=a13_0x4d5ce7;return{'system':AGENT_SYSTEM_PROMPT,'responseContract':AGENT_RESPONSE_CONTRACT,'languagePolicy':getPlannerLanguagePolicy(locale),'userMessage':String(_0x253242||''),'history':normalizePlannerHistory(history),'context':_0x2c76b4,'examples':buildAgentPlanExamples(_0x2c76b4),'outputSchema':{'reply':'string','status':'chat|ready|need_clarification|need_confirmation|failed','requiresConfirmation':'boolean','question':_0x5eb19f(0x106),'options':[{'id':'string','label':_0x5eb19f(0x166)}],'actions':[{'type':'canvas\x20command\x20id','as':'optional\x20action\x20result\x20alias','args':_0x5eb19f(0x129)}]}};}function buildPlannerPrompt({message:_0x488ae1,context:_0x2c6cef,history:history=[],locale:locale=''}={}){const _0x419fbb=a13_0x4d5ce7;let _0x54d936=buildPlannerPayload({'message':_0x488ae1,'context':_0x2c6cef,'history':history,'locale':locale}),_0x5e17a6=JSON[_0x419fbb(0x162)](_0x54d936);if(_0x5e17a6[_0x419fbb(0x170)]<=AGENT_PLANNER_PROMPT_MAX_CHARS)return _0x5e17a6;_0x54d936['history']=normalizePlannerHistory(history,{'limit':0x4,'textLimit':0xb4}),_0x5e17a6=JSON[_0x419fbb(0x162)](_0x54d936);if(_0x5e17a6[_0x419fbb(0x170)]<=AGENT_PLANNER_PROMPT_MAX_CHARS)return _0x5e17a6;for(let _0x108841=0x1;_0x108841<=0x5;_0x108841+=0x1){_0x54d936={..._0x54d936,'context':compactPlannerContext(_0x2c6cef,_0x108841)},_0x5e17a6=JSON[_0x419fbb(0x162)](_0x54d936);if(_0x5e17a6[_0x419fbb(0x170)]<=AGENT_PLANNER_PROMPT_MAX_CHARS)return _0x5e17a6;}return JSON[_0x419fbb(0x162)]({'system':AGENT_SYSTEM_PROMPT,'userMessage':String(_0x488ae1||''),'history':[],'context':compactPlannerContext(_0x2c6cef,0x5),'responseContract':AGENT_RESPONSE_CONTRACT,'examples':buildAgentPlanExamples(_0x2c6cef)[_0x419fbb(0x164)](0x0,0x2),'outputSchema':buildPlannerPayload({'locale':locale})['outputSchema']});}function buildPlannerRetryPrompt(_0x48ce4f,_0xc63f8=''){const _0x480e4a=a13_0x4d5ce7;let _0x1888c6=null;try{_0x1888c6=JSON['parse'](String(_0x48ce4f||''));}catch{return _0x48ce4f;}const _0x1f6a43=JSON[_0x480e4a(0x162)]({..._0x1888c6,'retry':{'previousAttemptRejectedBeforeExecution':!![],'reason':String(_0xc63f8||_0x480e4a(0xfa)),'instruction':'Return\x20the\x20corrected\x20strict\x20JSON\x20object\x20only.\x20Do\x20not\x20include\x20Markdown,\x20prose,\x20comments,\x20or\x20code\x20fences.'}});return _0x1f6a43[_0x480e4a(0x170)]<=AGENT_PLANNER_PROMPT_MAX_CHARS?_0x1f6a43:_0x48ce4f;}function extractJsonObject(_0x160b7e){const _0x516363=a13_0x4d5ce7;if(_0x160b7e&&typeof _0x160b7e===_0x516363(0x136))return _0x160b7e;const _0x22e074=String(_0x160b7e||'')['trim']();if(!_0x22e074)throw new Error(_0x516363(0xf7));try{return JSON[_0x516363(0x10a)](_0x22e074);}catch{throw new Error(_0x516363(0xf3));}}function getPlannerText(_0x1253e5){const _0x523ef7=a13_0x4d5ce7;return typeof _0x1253e5===_0x523ef7(0x166)?_0x1253e5:_0x1253e5?.[_0x523ef7(0x11d)]||_0x1253e5?.['outputText']||_0x1253e5?.[_0x523ef7(0x132)]||'';}export async function requestAgentActionPlan({message:_0x3a2ea7,context:_0x50f067,history:history=[],settings:settings={},request:request=generateText,onTrace:onTrace=null}={}){const _0x5848eb=a13_0x4d5ce7,_0x137bac=String(settings[_0x5848eb(0x104)]||'')[_0x5848eb(0x156)](),_0x2873d4=String(settings[_0x5848eb(0x142)]||'')[_0x5848eb(0x156)]();if(!_0x137bac||!_0x2873d4)return{'status':_0x5848eb(0x14f),'reply':'Agent\x20model\x20is\x20not\x20configured.','actions':[]};const _0x54e380=buildPlannerPrompt({'message':_0x3a2ea7,'context':_0x50f067,'history':history,'locale':settings[_0x5848eb(0x11b)]});onTrace?.({'type':_0x5848eb(0x173),'provider':_0x2873d4,'model':_0x137bac,'reason':_0x5848eb(0x128)});const _0x539267={'model':_0x137bac,'provider':_0x2873d4,'prompt':_0x54e380,'systemPrompt':AGENT_SYSTEM_PROMPT,'temperature':Number[_0x5848eb(0x160)](Number(settings[_0x5848eb(0x119)]))?Number(settings[_0x5848eb(0x119)]):0x0},_0x35d0fe=await request(_0x539267);try{return extractJsonObject(getPlannerText(_0x35d0fe));}catch(_0x22d7bd){onTrace?.({'type':_0x5848eb(0x12c),'reason':_0x22d7bd?.[_0x5848eb(0x14e)]||'invalid\x20JSON','rawPreview':truncatePlannerText(getPlannerText(_0x35d0fe),0xa0)});const _0x2eea07=buildPlannerRetryPrompt(_0x54e380,_0x22d7bd?.[_0x5848eb(0x14e)]),_0x4b05ed=await request({..._0x539267,'prompt':_0x2eea07});try{return extractJsonObject(getPlannerText(_0x4b05ed));}catch(_0x34cbbd){onTrace?.({'type':_0x5848eb(0x16b),'reason':_0x34cbbd?.[_0x5848eb(0x14e)]||'invalid\x20JSON','rawPreview':truncatePlannerText(getPlannerText(_0x4b05ed),0xa0)});throw _0x34cbbd;}}}
+import { generateText } from './aiTextApi.js';
+export const AGENT_PLANNER_PROMPT_MAX_CHARS = 0xb3b0;
+const AGENT_PLANNER_HISTORY_LIMIT = 6,
+  AGENT_PLANNER_HISTORY_TEXT_LIMIT = 0x1e0;
+export const AGENT_SYSTEM_PROMPT = [
+  'You are the AI Canvas action planner.',
+  'Return only one strict JSON object.',
+  'The first non-whitespace character must be { and the last non-whitespace character must be }.',
+  'Do not use Markdown, code fences, lead-in prose, comments, or trailing commas.',
+  'Do not return JavaScript.',
+  'Do not request unregistered tools.',
+  'Use only actions listed in context.commands.',
+  'Use context.commands[].argsSchema, capabilitySchema, and returnAliasFields as the source of truth for action args, selection fallback, runtime requirements, and $alias fields.',
+  'Use context.skills only as planning guidance; skills must produce action plans and must not execute directly.',
+  'Default to status chat with actions [] for greetings, capability questions, brainstorming, critique, explanation, or any message that does not clearly ask to create, generate, edit, connect, arrange, select, delete, or otherwise modify the canvas.',
+  'Only return canvas actions when the user has explicit canvas action intent. Mere discussion of an image, video, material, or idea is not enough.',
+  'For status chat, include a helpful reply and keep actions empty.',
+  'If intent is ambiguous, return status need_clarification.',
+  'If an action is risky, return status need_confirmation.',
+  'Prefer model and workflow capabilities from manifest data in context.',
+  'Use the languagePolicy in the JSON prompt for all user-facing reply, question, and option labels.',
+  'When a later action needs an earlier result, set as on the earlier action and reference it as $alias.nodeId.',
+  'Use generation.run only after the target node exists; generation.run will require confirmation.',
+  "When creating an AI node, include model and provider from context.canvas.availableModels if a listed model better matches the user's selected inputs.",
+  'context.canvas.inputRefs and context.canvas.referenceContext are explicit material inputs supplied by the user from the Agent panel.',
+  'When context.canvas.inputRefs is non-empty, prefer those node IDs over guessing from selectedNodes or the wider canvas.',
+  'For image-to-video, first use an image input from context.canvas.inputRefs/referenceContext before falling back to selected image nodes.',
+  'If the user says this, these, the attached material, or the just-added material, resolve that wording to context.canvas.inputRefs.',
+  "If multiple inputRefs could match and the user's intent does not identify which one to use, ask a clarification question instead of guessing.",
+  "Use node.setParams only with field IDs present in the chosen model's uiSchema.fields; omit unsupported requested params instead of inventing fields.",
+  'When no explicit image inputRef is available, image-to-video using the current or selected image must use the exact selected image node id from context.canvas.selectedNodes or context.canvas.selectedNodeIds.',
+  'For image-to-video, always create an ai-video node, graph.connect the selected image node to the new video node, optionally arrange them, then generation.run the video node.',
+  'If the user asks for text-to-video or provides a clear text-only video idea and no usable image is selected, create an ai-video node, set text-to-video params supported by its model, then generation.run it.',
+  'If the user asks for video but the source or content is ambiguous, ask a clarification question instead of guessing.',
+].join('\n');
+const BASE_AGENT_PLAN_EXAMPLES = Object.freeze([
+  {
+    user: 'What can you help me do on this canvas?',
+    plan: {
+      status: 'chat',
+      reply:
+        'I can help discuss ideas first. When you want me to act, tell me to create, generate, connect, arrange, or edit something on the canvas.',
+      actions: [],
+    },
+  },
+  {
+    user: 'Create an image node with prompt cyberpunk city night, then generate.',
+    plan: {
+      status: 'ready',
+      reply: 'I will create the image node first, then ask before generation.',
+      actions: [
+        { type: 'node.create', as: 'imageNode', args: { type: 'ai-image', prompt: 'cyberpunk city night' } },
+        { type: 'generation.run', args: { nodeId: '$imageNode.nodeId' } },
+      ],
+    },
+  },
+  {
+    user: 'Arrange selected nodes horizontally with gap 80 and align top.',
+    plan: {
+      status: 'ready',
+      reply: 'I will arrange and align the selected nodes.',
+      actions: [
+        { type: 'layout.arrangeRow', args: { gap: 80 } },
+        { type: 'layout.align', args: { mode: 'top' } },
+      ],
+    },
+  },
+  {
+    user: 'Create a 5 second video from text: a paper boat floating through a neon canal.',
+    plan: {
+      status: 'ready',
+      reply: 'I will create a text-to-video node, set supported parameters, then ask before generation.',
+      actions: [
+        {
+          type: 'node.create',
+          as: 'videoNode',
+          args: { type: 'ai-video', prompt: 'a paper boat floating through a neon canal' },
+        },
+        { type: 'node.setParams', args: { nodeId: '$videoNode.nodeId', params: { duration: 5 } } },
+        { type: 'generation.run', args: { nodeId: '$videoNode.nodeId' } },
+      ],
+    },
+  },
+  {
+    user: 'Generate a video.',
+    plan: {
+      status: 'need_clarification',
+      reply: 'I need one detail before creating the video.',
+      question:
+        'Should this be text-to-video or image-to-video? If image-to-video, select or provide a reference image.',
+      options: [
+        { id: 'text-to-video', label: 'Text-to-video' },
+        { id: 'image-to-video', label: 'Image-to-video' },
+      ],
+      actions: [],
+    },
+  },
+]);
+function isImageNodeType(_0x36f222 = '') {
+  return String(_0x36f222 || '') === 'ai-image' || String(_0x36f222 || '') === 'source-image';
+}
+function findImageInputRefNodeId(_0x577cc0 = {}) {
+  const _0x32d1f8 = _0x577cc0?.canvas || {},
+    _0x5026b1 = _0x32d1f8.referenceContext || {},
+    _0x43a0ac = [
+      ...(Array.isArray(_0x32d1f8.inputRefs) ? _0x32d1f8.inputRefs : []),
+      ...(Array.isArray(_0x5026b1.inputRefs) ? _0x5026b1.inputRefs : []),
+    ],
+    _0x502b01 = _0x43a0ac.find(
+      (_0x2249a4) => isImageNodeType(_0x2249a4?.type) || String(_0x2249a4?.kind || '') === 'image',
+    );
+  if (_0x502b01?.nodeId || _0x502b01?.id) return String(_0x502b01.nodeId || _0x502b01.id);
+  const _0x2205e6 = Array.isArray(_0x5026b1.referencedNodes) ? _0x5026b1.referencedNodes : [],
+    _0x36d18f = _0x2205e6.find(
+      (_0x470eef) => isImageNodeType(_0x470eef?.type) || String(_0x470eef?.kind || '') === 'image',
+    );
+  return _0x36d18f?.nodeId || _0x36d18f?.id ? String(_0x36d18f.nodeId || _0x36d18f.id) : '';
+}
+function findSelectedImageNodeId(_0x45b1f4 = {}) {
+  const _0x28c17b = findImageInputRefNodeId(_0x45b1f4);
+  if (_0x28c17b) return _0x28c17b;
+  const _0x1ad17c = _0x45b1f4?.canvas || {},
+    _0x359b75 = Array.isArray(_0x1ad17c.selectedNodes) ? _0x1ad17c.selectedNodes : [],
+    _0x4438db = _0x359b75.find((_0x1b01f0) => isImageNodeType(_0x1b01f0?.type));
+  if (_0x4438db?.id) return String(_0x4438db.id);
+  const _0x2b44cf = Array.isArray(_0x1ad17c.selectedNodeIds)
+    ? _0x1ad17c.selectedNodeIds.map((_0x43205c) => String(_0x43205c || '')).filter(Boolean)
+    : [];
+  if (_0x2b44cf.length === 0) return '';
+  const _0x1e95ef = Array.isArray(_0x1ad17c.nodes) ? _0x1ad17c.nodes : [],
+    _0x4dc59a = new Set(_0x2b44cf),
+    _0x2e328 = _0x1e95ef.find(
+      (_0x4319de) => _0x4dc59a.has(String(_0x4319de?.id || '')) && isImageNodeType(_0x4319de?.type),
+    );
+  return _0x2e328?.id ? String(_0x2e328.id) : '';
+}
+function modelAllowsImageInput(_0xa8b15f = {}) {
+  const _0x2e39aa =
+      _0xa8b15f?.inputSlots && typeof _0xa8b15f.inputSlots === 'object' ? _0xa8b15f.inputSlots : {},
+    _0x1e7e57 = Array.isArray(_0x2e39aa.allowedKinds) ? _0x2e39aa.allowedKinds : [];
+  if (_0x1e7e57.includes('image')) return true;
+  const _0x49f99d = Number(_0x2e39aa.maxByKind?.image);
+  return Number.isFinite(_0x49f99d) && _0x49f99d > 0;
+}
+function modelRequiresMissingMedia(_0x5c12cd = {}) {
+  const _0x4af7ef =
+      _0x5c12cd?.inputSlots && typeof _0x5c12cd.inputSlots === 'object' ? _0x5c12cd.inputSlots : {},
+    _0x495d4e = _0x4af7ef.minByKind || {};
+  if (Number(_0x495d4e.video) > 0) return true;
+  if (Number(_0x495d4e.audio) > 0) return true;
+  const _0x3c9435 = Array.isArray(_0x4af7ef.fixedSlots) ? _0x4af7ef.fixedSlots : [];
+  return _0x3c9435.some(
+    (_0x1f15aa) =>
+      _0x1f15aa?.required === true &&
+      (String(_0x1f15aa?.kind || '') === 'video' || String(_0x1f15aa?.kind || '') === 'audio'),
+  );
+}
+function getModelFieldIds(_0x36a86e = {}) {
+  return new Set(
+    (Array.isArray(_0x36a86e?.uiSchema?.fields) ? _0x36a86e.uiSchema.fields : [])
+      .map((_0x3ec35d) => String(_0x3ec35d?.id || '').trim())
+      .filter(Boolean),
+  );
+}
+function findImageToVideoModel(_0x1e3d12 = {}) {
+  const _0x54a923 = Array.isArray(_0x1e3d12?.canvas?.availableModels) ? _0x1e3d12.canvas.availableModels : [];
+  return (
+    _0x54a923.find(
+      (_0x23a134) =>
+        _0x23a134?.kind === 'video' &&
+        _0x23a134?.modelId &&
+        modelAllowsImageInput(_0x23a134) &&
+        !modelRequiresMissingMedia(_0x23a134),
+    ) || null
+  );
+}
+function buildImageToVideoExample(
+  _0x47a370,
+  _0x22a200 = null,
+  { fromInputRefs: fromInputRefs = false } = {},
+) {
+  const _0x12ca4f = { type: 'ai-video', prompt: 'slow camera push in' };
+  _0x22a200?.modelId &&
+    ((_0x12ca4f.model = _0x22a200.modelId), (_0x12ca4f.provider = _0x22a200.provider || ''));
+  const _0x14df98 = [{ type: 'node.create', as: 'videoNode', args: _0x12ca4f }],
+    _0x54f0e2 = getModelFieldIds(_0x22a200);
+  return (
+    (!_0x22a200 || _0x54f0e2.has('duration')) &&
+      _0x14df98.push({
+        type: 'node.setParams',
+        args: { nodeId: '$videoNode.nodeId', params: { duration: 5 } },
+      }),
+    _0x14df98.push(
+      { type: 'graph.connect', args: { sourceId: _0x47a370, targetId: '$videoNode.nodeId' } },
+      { type: 'layout.arrangeRow', args: { ids: [_0x47a370, '$videoNode.nodeId'], gap: 80 } },
+      { type: 'generation.run', args: { nodeId: '$videoNode.nodeId' } },
+    ),
+    {
+      user: fromInputRefs
+        ? 'Use the explicit image inputRef to create a 5 second video with a slow push in, then generate.'
+        : 'Use the currently selected image to create a 5 second video with a slow push in, then generate.',
+      plan: {
+        status: 'ready',
+        reply: fromInputRefs
+          ? 'I will create a video node, connect the referenced image to it, arrange the nodes, then ask before generation.'
+          : 'I will create a video node, connect the selected image to it, arrange the nodes, then ask before generation.',
+        actions: _0x14df98,
+      },
+    }
+  );
+}
+function buildAgentPlanExamples(_0x56d10d = {}) {
+  const _0x2aa5d6 = findImageInputRefNodeId(_0x56d10d),
+    _0x2d9205 = _0x2aa5d6 || findSelectedImageNodeId(_0x56d10d);
+  if (!_0x2d9205) return BASE_AGENT_PLAN_EXAMPLES;
+  const _0x38fe9a = findImageToVideoModel(_0x56d10d);
+  return [
+    BASE_AGENT_PLAN_EXAMPLES[0],
+    buildImageToVideoExample(_0x2d9205, _0x38fe9a, { fromInputRefs: Boolean(_0x2aa5d6) }),
+    BASE_AGENT_PLAN_EXAMPLES[1],
+    BASE_AGENT_PLAN_EXAMPLES[2],
+    BASE_AGENT_PLAN_EXAMPLES[3],
+    BASE_AGENT_PLAN_EXAMPLES[4],
+  ];
+}
+const AGENT_RESPONSE_CONTRACT = Object.freeze({
+  format: 'strict-json-object',
+  firstNonWhitespaceChar: '{',
+  lastNonWhitespaceChar: '}',
+  forbidden: ['markdown', 'code fences', 'lead-in prose', 'comments', 'trailing commas'],
+  noExecutionOutsidePlan: true,
+});
+function truncatePlannerText(_0x10353d, _0x19dc03 = AGENT_PLANNER_HISTORY_TEXT_LIMIT) {
+  const _0x44a79c = String(_0x10353d || '');
+  if (_0x44a79c.length <= _0x19dc03) return _0x44a79c;
+  return _0x44a79c.slice(0, Math.max(0, _0x19dc03 - 3)) + '...';
+}
+function normalizeAgentLocale(_0x21dcaa = '') {
+  const _0x4194e7 = String(_0x21dcaa || '')
+    .trim()
+    .toLowerCase()
+    .replace('_', '-');
+  if (_0x4194e7.startsWith('en')) return 'en-US';
+  return 'zh-CN';
+}
+function getPlannerLanguagePolicy(_0x4dcd8b) {
+  const _0x571f16 = normalizeAgentLocale(_0x4dcd8b);
+  if (_0x571f16 === 'en-US')
+    return {
+      locale: 'en-US',
+      responseLanguage: 'English',
+      instruction: 'All user-facing reply, question, and option labels must be in English.',
+    };
+  return {
+    locale: 'zh-CN',
+    responseLanguage: '简体中文',
+    instruction: '所有面向用户的 reply、question、options.label 必须使用简体中文。',
+  };
+}
+function normalizePlannerHistory(
+  _0x23c5a1 = [],
+  {
+    limit: limit = AGENT_PLANNER_HISTORY_LIMIT,
+    textLimit: textLimit = AGENT_PLANNER_HISTORY_TEXT_LIMIT,
+  } = {},
+) {
+  if (!Array.isArray(_0x23c5a1)) return [];
+  return _0x23c5a1
+    .slice(-limit)
+    .map((_0x87ff9e = {}) => ({
+      role: String(_0x87ff9e.role || 'assistant'),
+      status: String(_0x87ff9e.status || ''),
+      content: truncatePlannerText(
+        _0x87ff9e.content || _0x87ff9e.reply || _0x87ff9e.message || _0x87ff9e.question || '',
+        textLimit,
+      ),
+    }))
+    .filter((_0x155234) => _0x155234.content || _0x155234.status);
+}
+function cloneJson(_0x28c848) {
+  try {
+    return JSON.parse(JSON.stringify(_0x28c848 || {}));
+  } catch {
+    return {};
+  }
+}
+function truncateList(_0xb417af, _0x362986) {
+  return Array.isArray(_0xb417af) ? _0xb417af.slice(0, _0x362986) : [];
+}
+function compactCommand(_0x13c78b = {}) {
+  const _0x547d91 =
+      _0x13c78b.argsSchema && typeof _0x13c78b.argsSchema === 'object' ? _0x13c78b.argsSchema : {},
+    _0x1bd038 =
+      _0x13c78b.capabilitySchema && typeof _0x13c78b.capabilitySchema === 'object'
+        ? _0x13c78b.capabilitySchema
+        : {};
+  return {
+    id: _0x13c78b.id,
+    riskLevel: _0x13c78b.riskLevel,
+    argsSchema: {
+      required: Array.isArray(_0x547d91.required) ? _0x547d91.required : [],
+      defaults: _0x547d91.defaults && typeof _0x547d91.defaults === 'object' ? _0x547d91.defaults : {},
+      selectionFallback: _0x547d91.selectionFallback === true,
+    },
+    capabilitySchema: {
+      selectionFallback: _0x1bd038.selectionFallback === true,
+      requiresMountedRuntime: _0x1bd038.requiresMountedRuntime === true,
+    },
+    returnAliasFields: Array.isArray(_0x13c78b.returnAliasFields) ? _0x13c78b.returnAliasFields : [],
+  };
+}
+function compactPlannerContext(_0x1c56ad, _0x26286d = 0) {
+  const _0x44fe16 = cloneJson(_0x1c56ad),
+    _0x45c8bd = _0x44fe16.canvas || {};
+  Array.isArray(_0x44fe16.commands) &&
+    _0x26286d >= 1 &&
+    (_0x44fe16.commands = _0x44fe16.commands.map(compactCommand));
+  Array.isArray(_0x45c8bd.recentCommands) &&
+    _0x26286d >= 1 &&
+    (_0x45c8bd.recentCommands = _0x45c8bd.recentCommands.slice(-5));
+  if (Array.isArray(_0x45c8bd.availableModels)) {
+    const _0x8a9221 = [22, 14, 10, 6, 3, 0],
+      _0x5b705e = _0x8a9221[Math.min(_0x26286d, _0x8a9221.length - 1)];
+    ((_0x45c8bd.availableModels = truncateList(_0x45c8bd.availableModels, _0x5b705e)),
+      _0x45c8bd.modelCatalog &&
+        ((_0x45c8bd.modelCatalog.truncated = true),
+        (_0x45c8bd.modelCatalog.includedModels = _0x45c8bd.availableModels.length)));
+  }
+  Array.isArray(_0x45c8bd.availableWorkflows) && _0x26286d >= 2 && (_0x45c8bd.availableWorkflows = []);
+  if (Array.isArray(_0x45c8bd.nodes) && _0x26286d >= 2) {
+    const _0x31a362 = _0x26286d >= 4 ? 60 : 160,
+      _0x5521a6 = _0x26286d >= 5 ? 10 : 30;
+    _0x45c8bd.nodes = _0x45c8bd.nodes.slice(0, _0x5521a6).map((_0x71dc69) => ({
+      ..._0x71dc69,
+      promptPreview: truncatePlannerText(_0x71dc69.promptPreview, _0x31a362),
+      contentPreview: truncatePlannerText(_0x71dc69.contentPreview, _0x31a362),
+    }));
+  }
+  return (
+    Array.isArray(_0x45c8bd.edges) && _0x26286d >= 3 && (_0x45c8bd.edges = _0x45c8bd.edges.slice(0, 20)),
+    _0x26286d >= 5 && ((_0x45c8bd.edges = []), (_0x45c8bd.recentCommands = [])),
+    (_0x44fe16.canvas = _0x45c8bd),
+    _0x44fe16.contextBudget &&
+      (_0x44fe16.contextBudget = { ..._0x44fe16.contextBudget, plannerCompacted: _0x26286d > 0 }),
+    _0x44fe16
+  );
+}
+function buildPlannerPayload({
+  message: _0x253242,
+  context: _0x2c76b4,
+  history: history = [],
+  locale: locale = '',
+} = {}) {
+  return {
+    system: AGENT_SYSTEM_PROMPT,
+    responseContract: AGENT_RESPONSE_CONTRACT,
+    languagePolicy: getPlannerLanguagePolicy(locale),
+    userMessage: String(_0x253242 || ''),
+    history: normalizePlannerHistory(history),
+    context: _0x2c76b4,
+    examples: buildAgentPlanExamples(_0x2c76b4),
+    outputSchema: {
+      reply: 'string',
+      status: 'chat|ready|need_clarification|need_confirmation|failed',
+      requiresConfirmation: 'boolean',
+      question: 'string when clarification is needed',
+      options: [{ id: 'string', label: 'string' }],
+      actions: [
+        {
+          type: 'canvas command id',
+          as: 'optional action result alias',
+          args: 'object matching context.commands[].argsSchema; may reference earlier aliases with $alias.path from returnAliasFields. node.create may include model/provider from context.canvas.availableModels.',
+        },
+      ],
+    },
+  };
+}
+function buildPlannerPrompt({
+  message: _0x488ae1,
+  context: _0x2c6cef,
+  history: history = [],
+  locale: locale = '',
+} = {}) {
+  let _0x54d936 = buildPlannerPayload({
+      message: _0x488ae1,
+      context: _0x2c6cef,
+      history: history,
+      locale: locale,
+    }),
+    _0x5e17a6 = JSON.stringify(_0x54d936);
+  if (_0x5e17a6.length <= AGENT_PLANNER_PROMPT_MAX_CHARS) return _0x5e17a6;
+  ((_0x54d936.history = normalizePlannerHistory(history, { limit: 4, textLimit: 180 })),
+    (_0x5e17a6 = JSON.stringify(_0x54d936)));
+  if (_0x5e17a6.length <= AGENT_PLANNER_PROMPT_MAX_CHARS) return _0x5e17a6;
+  for (let _0x108841 = 1; _0x108841 <= 5; _0x108841 += 1) {
+    ((_0x54d936 = { ..._0x54d936, context: compactPlannerContext(_0x2c6cef, _0x108841) }),
+      (_0x5e17a6 = JSON.stringify(_0x54d936)));
+    if (_0x5e17a6.length <= AGENT_PLANNER_PROMPT_MAX_CHARS) return _0x5e17a6;
+  }
+  return JSON.stringify({
+    system: AGENT_SYSTEM_PROMPT,
+    userMessage: String(_0x488ae1 || ''),
+    history: [],
+    context: compactPlannerContext(_0x2c6cef, 5),
+    responseContract: AGENT_RESPONSE_CONTRACT,
+    examples: buildAgentPlanExamples(_0x2c6cef).slice(0, 2),
+    outputSchema: buildPlannerPayload({ locale: locale }).outputSchema,
+  });
+}
+function buildPlannerRetryPrompt(_0x48ce4f, _0xc63f8 = '') {
+  let _0x1888c6 = null;
+  try {
+    _0x1888c6 = JSON.parse(String(_0x48ce4f || ''));
+  } catch {
+    return _0x48ce4f;
+  }
+  const _0x1f6a43 = JSON.stringify({
+    ..._0x1888c6,
+    retry: {
+      previousAttemptRejectedBeforeExecution: true,
+      reason: String(_0xc63f8 || 'invalid JSON'),
+      instruction:
+        'Return the corrected strict JSON object only. Do not include Markdown, prose, comments, or code fences.',
+    },
+  });
+  return _0x1f6a43.length <= AGENT_PLANNER_PROMPT_MAX_CHARS ? _0x1f6a43 : _0x48ce4f;
+}
+function extractJsonObject(_0x160b7e) {
+  if (_0x160b7e && typeof _0x160b7e === 'object') return _0x160b7e;
+  const _0x22e074 = String(_0x160b7e || '').trim();
+  if (!_0x22e074) throw new Error('Agent planner returned empty text.');
+  try {
+    return JSON.parse(_0x22e074);
+  } catch {
+    throw new Error('Agent planner returned invalid JSON.');
+  }
+}
+function getPlannerText(_0x1253e5) {
+  return typeof _0x1253e5 === 'string'
+    ? _0x1253e5
+    : _0x1253e5?.text || _0x1253e5?.outputText || _0x1253e5?.content || '';
+}
+export async function requestAgentActionPlan({
+  message: _0x3a2ea7,
+  context: _0x50f067,
+  history: history = [],
+  settings: settings = {},
+  request: request = generateText,
+  onTrace: onTrace = null,
+} = {}) {
+  const _0x137bac = String(settings.model || '').trim(),
+    _0x2873d4 = String(settings.provider || '').trim();
+  if (!_0x137bac || !_0x2873d4)
+    return { status: 'failed', reply: 'Agent model is not configured.', actions: [] };
+  const _0x54e380 = buildPlannerPrompt({
+    message: _0x3a2ea7,
+    context: _0x50f067,
+    history: history,
+    locale: settings.locale,
+  });
+  onTrace?.({
+    type: 'planner_model_selected',
+    provider: _0x2873d4,
+    model: _0x137bac,
+    reason: 'agentModelSettings',
+  });
+  const _0x539267 = {
+      model: _0x137bac,
+      provider: _0x2873d4,
+      prompt: _0x54e380,
+      systemPrompt: AGENT_SYSTEM_PROMPT,
+      temperature: Number.isFinite(Number(settings.temperature)) ? Number(settings.temperature) : 0,
+    },
+    _0x35d0fe = await request(_0x539267);
+  try {
+    return extractJsonObject(getPlannerText(_0x35d0fe));
+  } catch (_0x22d7bd) {
+    onTrace?.({
+      type: 'planner_json_retry',
+      reason: _0x22d7bd?.message || 'invalid JSON',
+      rawPreview: truncatePlannerText(getPlannerText(_0x35d0fe), 160),
+    });
+    const _0x2eea07 = buildPlannerRetryPrompt(_0x54e380, _0x22d7bd?.message),
+      _0x4b05ed = await request({ ..._0x539267, prompt: _0x2eea07 });
+    try {
+      return extractJsonObject(getPlannerText(_0x4b05ed));
+    } catch (_0x34cbbd) {
+      onTrace?.({
+        type: 'planner_json_retry_failed',
+        reason: _0x34cbbd?.message || 'invalid JSON',
+        rawPreview: truncatePlannerText(getPlannerText(_0x4b05ed), 160),
+      });
+      throw _0x34cbbd;
+    }
+  }
+}

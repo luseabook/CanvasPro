@@ -1,1 +1,579 @@
-const a176_0x33798c=a176_0xe5b1;(function(_0x55d3d4,_0xa132be){const _0x18b0be=a176_0xe5b1,_0xfec8a9=_0x55d3d4();while(!![]){try{const _0x14228e=parseInt(_0x18b0be(0x139))/0x1+-parseInt(_0x18b0be(0x14c))/0x2*(parseInt(_0x18b0be(0x10d))/0x3)+-parseInt(_0x18b0be(0x12c))/0x4+-parseInt(_0x18b0be(0x166))/0x5+-parseInt(_0x18b0be(0x15c))/0x6*(parseInt(_0x18b0be(0x11f))/0x7)+parseInt(_0x18b0be(0x163))/0x8*(-parseInt(_0x18b0be(0xe4))/0x9)+parseInt(_0x18b0be(0x119))/0xa*(parseInt(_0x18b0be(0xe5))/0xb);if(_0x14228e===_0xa132be)break;else _0xfec8a9['push'](_0xfec8a9['shift']());}catch(_0x40c515){_0xfec8a9['push'](_0xfec8a9['shift']());}}}(a176_0x5440,0x85d9b));import a176_0x5daa3f from'node:test';import a176_0x3cd86e from'node:assert/strict';import{readFileSync}from'node:fs';import{dirname,join}from'node:path';import{fileURLToPath}from'node:url';import{createAIGenTextNodeUiModule}from'./uiModule.js';function a176_0xe5b1(_0x4852e3,_0x3307ff){const _0x5440b3=a176_0x5440();return a176_0xe5b1=function(_0xe5b15,_0x39f757){_0xe5b15=_0xe5b15-0xdd;let _0x5b0a16=_0x5440b3[_0xe5b15];return _0x5b0a16;},a176_0xe5b1(_0x4852e3,_0x3307ff);}import{createAIGenTextNodeStateSyncModule}from'./stateSyncModule.js';import{APIMART_TEXT_MODEL_MENU_ITEMS,buildApimartTextModelMenuHTML,buildRunningHubTextModelMenuHTML,buildTextModelMenuHTML,buildTextProviderMenuGroupsHTML,TEXT_MODEL_MENU_ITEMS_BY_PROVIDER}from'./apimartTextModelMenu.js';import{getDisplayModelName}from'../../modules/providers.js';import{_resetPreviewRuntimeForTests,isPreviewNodeLoading,setPreviewMode,startPreviewNodeLoading}from'../../modules/previewMode.js';import{createFakePreviewContainer,installPreviewDomStubs}from'../../../tests/testPreviewDom.js';const restorePreviewDom=installPreviewDomStubs(),originalRequestAnimationFrame=globalThis[a176_0x33798c(0x156)],__dirname=dirname(fileURLToPath(import.meta['url'])),uiModuleSource=readFileSync(join(__dirname,'uiModule.js'),'utf8');function escapeRegExp(_0x5106d9){const _0x55ee1d=a176_0x33798c;return String(_0x5106d9)['replace'](/[.*+?^${}()|[\]\\]/g,_0x55ee1d(0x154));}typeof globalThis[a176_0x33798c(0x156)]!=='function'&&(globalThis['requestAnimationFrame']=_0x21258e=>{return _0x21258e(),0x0;});a176_0x5daa3f[a176_0x33798c(0xf6)](()=>{_resetPreviewRuntimeForTests();}),a176_0x5daa3f[a176_0x33798c(0x10e)](()=>{const _0x74763e=a176_0x33798c;_resetPreviewRuntimeForTests(),typeof originalRequestAnimationFrame===_0x74763e(0x112)?delete globalThis['requestAnimationFrame']:globalThis[_0x74763e(0x156)]=originalRequestAnimationFrame,restorePreviewDom();}),a176_0x5daa3f(a176_0x33798c(0xde),()=>{const _0x2c04bf=a176_0x33798c,_0x825065=buildApimartTextModelMenuHTML(_0x2c04bf(0x165)),_0xd808b=buildTextModelMenuHTML(_0x2c04bf(0x12b),_0x2c04bf(0x101)),_0x12e51f=buildTextModelMenuHTML(_0x2c04bf(0xe0),'ppio'),_0xf8376e=buildRunningHubTextModelMenuHTML('runninghub-model/rhart-text-g-3-flash-preview-cv/image-to-text'),_0x392e89=buildTextModelMenuHTML(_0x2c04bf(0x157),_0x2c04bf(0x137)),_0x254974=buildTextProviderMenuGroupsHTML(_0x2c04bf(0x12b)),_0x1641a3=APIMART_TEXT_MODEL_MENU_ITEMS[_0x2c04bf(0x134)](_0xa02e12=>[_0xa02e12[_0x2c04bf(0x15a)],_0xa02e12[_0x2c04bf(0x136)]]),_0x2329f6=[[_0xd808b,_0x2c04bf(0x15f)],[_0x12e51f,_0x2c04bf(0x104)],[_0x12e51f,_0x2c04bf(0x130)],[_0x12e51f,_0x2c04bf(0x14a)],[_0x12e51f,_0x2c04bf(0x14d)],[_0x825065,_0x2c04bf(0x12d)],[_0x825065,_0x2c04bf(0x141)],[_0x825065,_0x2c04bf(0x160)],[_0x825065,_0x2c04bf(0xff)],[_0x825065,_0x2c04bf(0x10a)],[_0xf8376e,_0x2c04bf(0x10a)],[_0xf8376e,_0x2c04bf(0xff)],[_0x254974,_0x2c04bf(0x148)]];a176_0x3cd86e['match'](uiModuleSource,/buildTextProviderMenuGroupsHTML\(_activeModel\)/),a176_0x3cd86e[_0x2c04bf(0xef)](uiModuleSource,/buildApimartTextModelMenuHTML\(_activeModel\)/),a176_0x3cd86e[_0x2c04bf(0xef)](uiModuleSource,/return buildTextModelMenuHTML\(_activeModel/),a176_0x3cd86e[_0x2c04bf(0xef)](uiModuleSource,/data-lazy-text-provider=/),a176_0x3cd86e[_0x2c04bf(0xef)](uiModuleSource,/ensureTextProviderSubmenu/),a176_0x3cd86e[_0x2c04bf(0x15b)](_0x254974,/grsai-submenu/),a176_0x3cd86e[_0x2c04bf(0x15b)](_0x254974,/ppio-submenu/),a176_0x3cd86e[_0x2c04bf(0x15b)](_0x254974,/apimart-submenu/),a176_0x3cd86e[_0x2c04bf(0x15b)](_0x254974,/runninghub-submenu/),a176_0x3cd86e[_0x2c04bf(0x15b)](_0x254974,/volcengine-submenu/),a176_0x3cd86e[_0x2c04bf(0x15b)](_0x254974,/images\/volcengine\.svg/),a176_0x3cd86e[_0x2c04bf(0xef)](uiModuleSource,/data-value="deepseek-v3\.2"/),a176_0x3cd86e[_0x2c04bf(0xef)](uiModuleSource,/data-value="apimart\/deepseek-v3\.2"/),a176_0x3cd86e[_0x2c04bf(0xef)](uiModuleSource,/data-value="(?:minimax\/|qwen\/|deepseek\/|moonshotai\/|runninghub-model\/rhart-text|gemini-3\.1-pro-preview|gemini-3-flash-preview-nothinking|apimart\/gpt-5\.4)/),a176_0x3cd86e[_0x2c04bf(0xef)](uiModuleSource,/data-aicanvas-toggle/),a176_0x3cd86e['doesNotMatch'](uiModuleSource,/aicanvas\/text-/),a176_0x3cd86e[_0x2c04bf(0xef)](uiModuleSource,/AICanvas Text/),a176_0x3cd86e[_0x2c04bf(0xef)](_0x825065,/data-value="deepseek-v3\.2"/),a176_0x3cd86e[_0x2c04bf(0xef)](_0x825065,/data-value="apimart\/deepseek-v3\.2"/);for(const [_0x22c47f,_0x422ddd]of _0x1641a3){a176_0x3cd86e['match'](_0x825065,new RegExp(_0x2c04bf(0x14b)+escapeRegExp(_0x22c47f)+'\x22')),a176_0x3cd86e['ok'](_0x825065['includes'](_0x2c04bf(0x117)+_0x422ddd+'</div>'));}a176_0x3cd86e['ok'](_0x825065[_0x2c04bf(0x15e)](_0x2c04bf(0x10b))),a176_0x3cd86e['ok'](_0x825065[_0x2c04bf(0x15e)]('<div\x20class=\x22fmi-title\x22>gemini-3.1-pro-preview</div>')),a176_0x3cd86e['ok'](_0x825065[_0x2c04bf(0x15e)](_0x2c04bf(0xfd)));for(const [_0x208625,_0x3f582a]of _0x2329f6){a176_0x3cd86e['ok'](_0x208625[_0x2c04bf(0x15e)](_0x2c04bf(0x123)+_0x3f582a+'</div>'),_0x2c04bf(0xe7)+_0x3f582a);}for(const [_0x53d7d0,_0x4043f5]of Object['entries']({'grsai':_0xd808b,'ppio':_0x12e51f,'runninghub':_0xf8376e,'volcengine':_0x392e89})){for(const _0x412ce7 of TEXT_MODEL_MENU_ITEMS_BY_PROVIDER[_0x53d7d0]){a176_0x3cd86e['match'](_0x4043f5,new RegExp(_0x2c04bf(0x14b)+escapeRegExp(_0x412ce7['modelId'])+'\x22')),a176_0x3cd86e['ok'](_0x4043f5['includes'](_0x2c04bf(0xf3)+_0x412ce7[_0x2c04bf(0xfa)]+'\x22')),a176_0x3cd86e['ok'](_0x4043f5[_0x2c04bf(0x15e)]('<div\x20class=\x22fmi-title\x22>'+_0x412ce7['title']+_0x2c04bf(0x133)));}}}),a176_0x5daa3f(a176_0x33798c(0x152),()=>{const _0x1d68eb=a176_0x33798c,_0x42ac84=buildTextProviderMenuGroupsHTML(_0x1d68eb(0x157),{'providers':[_0x1d68eb(0x137)]});a176_0x3cd86e[_0x1d68eb(0x15b)](_0x42ac84,/volcengine-submenu/),a176_0x3cd86e['match'](_0x42ac84,/volcengine\/doubao-seed-2-0-pro-260215/),a176_0x3cd86e[_0x1d68eb(0xef)](_0x42ac84,/apimart-submenu/),a176_0x3cd86e['doesNotMatch'](_0x42ac84,/runninghub-submenu/),a176_0x3cd86e[_0x1d68eb(0xef)](_0x42ac84,/grsai-submenu/),a176_0x3cd86e['doesNotMatch'](_0x42ac84,/ppio-submenu/);}),a176_0x5daa3f('aigenText\x20ui:\x20default\x20APIMart\x20text\x20model\x20displays\x20Kimi\x20K2\x20Instruct',()=>{const _0x233358=a176_0x33798c;a176_0x3cd86e[_0x233358(0x15b)](uiModuleSource,/this\._data\.model \|\| "apimart\/kimi-k2-instruct"/),a176_0x3cd86e['match'](uiModuleSource,/<span class="img-model-label">\$\{getDisplayModelName\(_activeModel\)\}<\/span>/),a176_0x3cd86e['equal'](getDisplayModelName(_0x233358(0x165)),'Kimi\x20K2\x20Instruct');});function a176_0x5440(){const _0x542def=['div','node-image-plain','data:image/png;base64,b','add','disabled','parentElement','gemini-3.1-pro','3598084LOYdMZ','APIMart\x20text\x20model','_handlePreviewDblclick','false','阿里最强开源模型Qwen2.5','push','document','</div>','map','parentNode','title','volcengine','contains','133898MhgxDh','_renderRefBar','prompt-attachment-btn','node-text-ui-preview-dblclick','ref-thumb-container','aigenText\x20state\x20sync:\x20running\x20state\x20shows\x20unified\x20loading\x20instead\x20of\x20prompt\x20validation','edge-text-input','edge-image','OpenAI-compatible\x20text\x20model','btnEl','childNodes','update','indexOf','classList','fromEntries','一个\x20API\x20搞定一切——节省\x2030-70%','来自文本入参的提示词','面向未来的新一代大模型','data-value=\x22','131814FZAIYj','月之暗面最新版，超长上下文','querySelector','_innerHTML','split','appendChild','aigenText\x20model\x20menu:\x20provider\x20filter\x20can\x20expose\x20only\x20Volcengine','notEqual','\x5c$&','node-text-scroll-dirty','requestAnimationFrame','volcengine/doubao-seed-2-0-pro-260215','_attrs','aigenText\x20state\x20sync:\x20ref\x20bar\x20reuses\x20thumbnails\x20when\x20source\x20signature\x20changes','modelId','match','356154VUPAKC','data:image/png;base64,masked','includes','谷歌最新模型gemini3.1','极致逻辑与推理性能，OpenAI\x20巅峰之作','true','aigenText\x20ui:\x20普通滚动也会节流保存\x20outputScrollTop','42104dhPUAG','node-text-scroll-active','apimart/kimi-k2-instruct','3177805nynZyF','node-image-masked','aigenText\x20ui:\x20APIMart\x20menu\x20uses\x20new\x20text\x20model\x20set','_outputScrollTop','minimax/minimax-m2.5-highspeed','assign','aigenText\x20state\x20sync:\x20复制模式下不使用旧\x20outputScrollTop\x20还原滚动位置','slice','1629KfqTIK','55LnpuEU','node-text-ui-preview','text\x20model\x20menu\x20should\x20preserve\x20subtitle:\x20','next','source-text','innerHTML','.ref-thumb-container','node-text-refbar','has','className','doesNotMatch','cursor','output/mask/manual-mask.png','contenteditable','data-provider=\x22','nodeId','style','afterEach','aigenText\x20state\x20sync:\x20普通滚动待保存时不使用旧\x20outputScrollTop\x20还原滚动位置','_innerHTMLSetCount','_outputScrollTopDirty','provider','attributes','var(--unavailable-cursor)','<div\x20class=\x22fmi-title\x22>gemini-3-flash-preview-nothinking</div>','equal','旗舰级多模态模型，支持超长文本与深度分析','querySelectorAll','grsai','source-image','toUpperCase','更低延迟、更高性价比的领先模型','node-text-target','nodes','running','edge-masked','join','闪电级响应速度，适用于高频率对话与实时任务','<div\x20class=\x22fmi-title\x22>gpt-5.4</div>','scrollTop','42FpReJZ','after','edge-plain','node-image-ref','aigenText\x20submit\x20button:\x20empty\x20editor\x20can\x20generate\x20from\x20non-empty\x20text\x20input','undefined','refBarEl','create','dataset','.ref-thumb-wrap','<div\x20class=\x22fmi-title\x22>','node-text-source','7768190eohJej','filter','node-text-scroll-save','is-text-selection-active','call','forEach','7Mizezh','deepEqual','ai-text','startsWith','<div\x20class=\x22fmi-sub\x22>','data:image/png;base64,plain'];a176_0x5440=function(){return _0x542def;};return a176_0x5440();}function createSubmitButtonStub(){const _0x4ce6ea=new Set();return{'disabled':![],'title':'','innerHTML':'','style':{'color':'','cursor':''},'dataset':{},'classList':{'add'(..._0x475b66){const _0x117852=a176_0xe5b1;_0x475b66[_0x117852(0x11e)](_0x247012=>_0x4ce6ea['add'](String(_0x247012||'')));},'remove'(..._0x3ca820){const _0x36ceb2=a176_0xe5b1;_0x3ca820[_0x36ceb2(0x11e)](_0x57a367=>_0x4ce6ea['delete'](String(_0x57a367||'')));},'contains'(_0x31a7d3){const _0x21493d=a176_0xe5b1;return _0x4ce6ea[_0x21493d(0xed)](String(_0x31a7d3||''));}},'setAttribute'(_0x29fa4a,_0x20f69f){const _0x26de29=a176_0xe5b1;this[_0x26de29(0x115)][String(_0x29fa4a||'')]=String(_0x20f69f||'');}};}a176_0x5daa3f('aigenText\x20ui:\x20输出区保持只读，不再进入编辑态',()=>{const _0xcf6fc2=a176_0x33798c;let _0x5a50b8=[];const _0x4107bc=[],_0x3386c9=createAIGenTextNodeUiModule({'store':{'getState':()=>({'selectedNodeIds':_0x5a50b8,'nodes':{'node-text-ui-preview':{'outputScrollTop':0x0}}}),'getStateRaw':()=>({'nodes':{'node-text-ui-preview':{'outputScrollTop':0x0}}}),'setSelectedNodes':_0x229739=>{const _0x47e2e9=a176_0xe5b1;_0x5a50b8=_0x229739[_0x47e2e9(0xe3)]();},'updateNodeData':(_0x17b1ce,_0x294f95)=>{const _0x4b72ce=a176_0xe5b1;_0x4107bc[_0x4b72ce(0x131)]([_0x17b1ce,_0x294f95]);}}}),_0x2c7b56={'_attrs':{},'style':{},'scrollTop':0x2a,'setAttribute'(_0x4eb694,_0x5cc7bf){const _0x36dd8=a176_0xe5b1;this[_0x36dd8(0x158)][String(_0x4eb694||'')]=String(_0x5cc7bf||'');},'focus'(){}},_0x3c4a4b=Object[_0xcf6fc2(0xe1)](Object[_0xcf6fc2(0x114)](_0x3386c9),{'nodeId':_0xcf6fc2(0xe6),'outputEl':_0x2c7b56,'_outputScrollTop':0x18});_0x3386c9['_enterOutputEditMode']['call'](_0x3c4a4b),a176_0x3cd86e[_0xcf6fc2(0xfe)](_0x2c7b56[_0xcf6fc2(0x158)][_0xcf6fc2(0xf2)],'false'),a176_0x3cd86e[_0xcf6fc2(0x120)](_0x5a50b8,[_0x3c4a4b[_0xcf6fc2(0xf4)]]),a176_0x3cd86e[_0xcf6fc2(0x120)](_0x4107bc,[[_0x3c4a4b[_0xcf6fc2(0xf4)],{'outputScrollTop':0x2a}]]),a176_0x3cd86e[_0xcf6fc2(0x15b)](uiModuleSource,/bindReadonlyTextSelection\(this\.outputEl,\s*\{/),a176_0x3cd86e[_0xcf6fc2(0x15b)](uiModuleSource,/onActivate: \(\) => this\._enterOutputEditMode\(\)/),a176_0x3cd86e['match'](uiModuleSource,/onDeactivate: \(\) => this\._commitOutputScrollTop\(\)/),a176_0x3cd86e[_0xcf6fc2(0xef)](uiModuleSource,/outputEl\.style\.userSelect = "none"/);}),a176_0x5daa3f(a176_0x33798c(0x162),async()=>{const _0x38b109=a176_0x33798c;let _0x6f4389={'outputScrollTop':0x0};const _0x50f4d7=[],_0x5b3c08=createAIGenTextNodeUiModule({'store':{'getStateRaw':()=>({'nodes':{'node-text-scroll-save':_0x6f4389}}),'updateNodeData':(_0x5b48fa,_0x30a0e9)=>{const _0xddfbac=a176_0xe5b1;_0x50f4d7[_0xddfbac(0x131)]([_0x5b48fa,_0x30a0e9]),_0x6f4389={..._0x6f4389,..._0x30a0e9};}}}),_0x504058={'scrollTop':0x3f},_0x35ae24=Object[_0x38b109(0xe1)](Object[_0x38b109(0x114)](_0x5b3c08),{'nodeId':_0x38b109(0x11b),'outputEl':_0x504058,'_outputScrollTop':0x0});_0x5b3c08['_markOutputScrollTopDirty'][_0x38b109(0x11d)](_0x35ae24),a176_0x3cd86e['equal'](_0x35ae24[_0x38b109(0xf9)],!![]),a176_0x3cd86e['equal'](_0x35ae24[_0x38b109(0xdf)],0x3f),await new Promise(_0x245d9d=>setTimeout(_0x245d9d,0xa0)),a176_0x3cd86e[_0x38b109(0xfe)](_0x35ae24[_0x38b109(0xf9)],![]),a176_0x3cd86e['deepEqual'](_0x50f4d7,[[_0x35ae24[_0x38b109(0xf4)],{'outputScrollTop':0x3f}]]),a176_0x3cd86e['match'](uiModuleSource,/this\._markOutputScrollTopDirty\(\)/);}),a176_0x5daa3f('aigenText\x20ui:\x20预览模式双击输出区也不会进入编辑态',()=>{const _0x193368=a176_0x33798c;let _0x228965=[];const _0x23c2ac=createAIGenTextNodeUiModule({'store':{'getState':()=>({'selectedNodeIds':_0x228965}),'setSelectedNodes':_0x31595b=>{const _0x314e4d=a176_0xe5b1;_0x228965=_0x31595b[_0x314e4d(0xe3)]();}}}),_0x2cadc9={'_attrs':{},'style':{},'innerText':'','scrollTop':0x0,'setAttribute'(_0x378f9f,_0x4c5356){const _0x350854=a176_0xe5b1;this[_0x350854(0x158)][String(_0x378f9f||'')]=String(_0x4c5356||'');},'getAttribute'(_0x571202){const _0x189927=a176_0xe5b1;return this[_0x189927(0x158)][String(_0x571202||'')]||null;},'focus'(){}},_0x2cc3d7=Object['assign'](Object[_0x193368(0x114)](_0x23c2ac),{'nodeId':_0x193368(0x13c),'outputEl':_0x2cadc9,'_outputScrollTop':0x8});let _0x109b5a=![],_0x22ff9d=![];startPreviewNodeLoading(_0x2cc3d7[_0x193368(0xf4)],createFakePreviewContainer()),setPreviewMode(!![]),a176_0x3cd86e[_0x193368(0xfe)](isPreviewNodeLoading(_0x2cc3d7[_0x193368(0xf4)]),!![]),_0x23c2ac[_0x193368(0x12e)][_0x193368(0x11d)](_0x2cc3d7,{'preventDefault'(){_0x109b5a=!![];},'stopPropagation'(){_0x22ff9d=!![];}}),a176_0x3cd86e[_0x193368(0xfe)](_0x109b5a,![]),a176_0x3cd86e['equal'](_0x22ff9d,!![]),a176_0x3cd86e[_0x193368(0x153)](_0x2cadc9['_attrs'][_0x193368(0xf2)],_0x193368(0x161)),a176_0x3cd86e[_0x193368(0xfe)](isPreviewNodeLoading(_0x2cc3d7[_0x193368(0xf4)]),!![]),a176_0x3cd86e[_0x193368(0x120)](_0x228965,[]);}),a176_0x5daa3f(a176_0x33798c(0x13e),()=>{const _0x518945=a176_0x33798c,_0x510375=createAIGenTextNodeStateSyncModule({'store':{}}),_0x2be29a=Object[_0x518945(0xe1)](Object[_0x518945(0x114)](_0x510375),{'_data':{'isGenerating':!![],'jobStatus':_0x518945(0x107)},'promptEl':{'innerText':''},'btnEl':{'disabled':![],'style':{'cursor':''}}});_0x510375['_updateSubmitButtonState'][_0x518945(0x11d)](_0x2be29a),a176_0x3cd86e['equal'](_0x2be29a[_0x518945(0x142)][_0x518945(0x129)],!![]),a176_0x3cd86e[_0x518945(0xfe)](_0x2be29a[_0x518945(0x142)][_0x518945(0xf5)][_0x518945(0xf0)],_0x518945(0xfc)),a176_0x3cd86e['match'](_0x2be29a['btnEl'][_0x518945(0xea)],/animation:spin/);}),a176_0x5daa3f(a176_0x33798c(0xe2),()=>{const _0x5b7ec6=a176_0x33798c,_0x1fe58a=createAIGenTextNodeStateSyncModule({'store':{'getState':()=>({'pickConnectMode':{},'nodes':{}}),'getIncomingEdges':()=>[]},'getDisplayModelName':_0x2db9d4=>_0x2db9d4}),_0x4c216c={'scrollTop':0x58,'classList':{'contains'(_0x3e1bd2){const _0x1c7de5=a176_0xe5b1;return _0x3e1bd2===_0x1c7de5(0x11c);}},'getAttribute'(){const _0xe68b79=a176_0xe5b1;return _0xe68b79(0x12f);}};let _0x242c4b=0x0;const _0xf6939=Object[_0x5b7ec6(0xe1)](Object[_0x5b7ec6(0x114)](_0x1fe58a),{'nodeId':_0x5b7ec6(0x164),'_data':{},'_outputScrollTop':0x58,'outputEl':_0x4c216c,'_renderOutputText':()=>{_0x242c4b+=0x1;},'_renderRefBar':()=>{},'_syncPromptBoxSizeFromData':()=>{},'_updateSubmitButtonState':()=>{}});_0x1fe58a[_0x5b7ec6(0x144)]['call'](_0xf6939,{'id':_0xf6939['nodeId'],'type':_0x5b7ec6(0x121),'outputText':_0x5b7ec6(0xe8),'outputScrollTop':0x5}),a176_0x3cd86e['equal'](_0x4c216c['scrollTop'],0x58),a176_0x3cd86e[_0x5b7ec6(0xfe)](_0xf6939[_0x5b7ec6(0xdf)],0x58),a176_0x3cd86e['equal'](_0x242c4b,0x0);}),a176_0x5daa3f(a176_0x33798c(0xf7),()=>{const _0x3a9616=a176_0x33798c,_0x1d7564=createAIGenTextNodeStateSyncModule({'store':{'getState':()=>({'pickConnectMode':{},'nodes':{}}),'getIncomingEdges':()=>[]},'getDisplayModelName':_0x40845e=>_0x40845e}),_0x34848a={'scrollTop':0x58,'classList':{'contains'(){return![];}},'getAttribute'(){const _0x351462=a176_0xe5b1;return _0x351462(0x12f);}};let _0x19efd5=0x0;const _0x1305de=Object[_0x3a9616(0xe1)](Object['create'](_0x1d7564),{'nodeId':_0x3a9616(0x155),'_data':{},'_lastRenderedOutputText':_0x3a9616(0xe8),'_outputScrollTop':0x58,'_outputScrollTopDirty':!![],'outputEl':_0x34848a,'_renderOutputText':()=>{_0x19efd5+=0x1;},'_renderRefBar':()=>{},'_syncPromptBoxSizeFromData':()=>{},'_updateSubmitButtonState':()=>{}});_0x1d7564['update'][_0x3a9616(0x11d)](_0x1305de,{'id':_0x1305de[_0x3a9616(0xf4)],'type':_0x3a9616(0x121),'outputText':_0x3a9616(0xe8),'outputScrollTop':0x5}),a176_0x3cd86e[_0x3a9616(0xfe)](_0x34848a[_0x3a9616(0x10c)],0x58),a176_0x3cd86e[_0x3a9616(0xfe)](_0x1305de['_outputScrollTop'],0x58),a176_0x3cd86e[_0x3a9616(0xfe)](_0x1305de[_0x3a9616(0xf9)],!![]),a176_0x3cd86e['equal'](_0x19efd5,0x0);}),a176_0x5daa3f(a176_0x33798c(0x111),()=>{const _0x378e7e=a176_0x33798c,_0x6ff54=_0x378e7e(0x105),_0x73ef6=_0x378e7e(0x118),_0x4f6efd={'nodes':{[_0x6ff54]:{'id':_0x6ff54,'type':_0x378e7e(0x121)},[_0x73ef6]:{'id':_0x73ef6,'type':_0x378e7e(0xe9),'content':_0x378e7e(0x149)}}},_0x38c091=[{'id':_0x378e7e(0x13f),'sourceId':_0x73ef6,'targetId':_0x6ff54}],_0x3300ab=createAIGenTextNodeStateSyncModule({'store':{'getState':()=>_0x4f6efd,'getIncomingEdges':()=>_0x38c091}}),_0x5ce6c4=Object[_0x378e7e(0xe1)](Object['create'](_0x3300ab),{'nodeId':_0x6ff54,'_data':_0x4f6efd[_0x378e7e(0x106)][_0x6ff54],'promptEl':{'innerText':'','childNodes':[]},'btnEl':createSubmitButtonStub()});_0x5ce6c4['_updateSubmitButtonState'](),a176_0x3cd86e['equal'](_0x5ce6c4[_0x378e7e(0x142)][_0x378e7e(0x129)],![]),a176_0x3cd86e[_0x378e7e(0xfe)](_0x5ce6c4['btnEl'][_0x378e7e(0xf5)][_0x378e7e(0xf0)],'');});function makeTextRefClassList(_0xafed15){return{'contains'(_0x2c2078){const _0x87e05b=a176_0xe5b1;return String(_0xafed15[_0x87e05b(0xee)]||'')[_0x87e05b(0x150)](/\s+/)[_0x87e05b(0x15e)](_0x2c2078);},'add'(..._0x336f9d){const _0x4ca8d2=a176_0xe5b1,_0x4c17b4=new Set(String(_0xafed15[_0x4ca8d2(0xee)]||'')[_0x4ca8d2(0x150)](/\s+/)[_0x4ca8d2(0x11a)](Boolean));_0x336f9d[_0x4ca8d2(0x11e)](_0x2ad122=>_0x4c17b4[_0x4ca8d2(0x128)](String(_0x2ad122||''))),_0xafed15[_0x4ca8d2(0xee)]=Array['from'](_0x4c17b4)[_0x4ca8d2(0x109)]('\x20');},'remove'(..._0x19417c){const _0xe41e7f=a176_0xe5b1,_0x30c1bd=new Set(_0x19417c[_0xe41e7f(0x134)](_0x52087b=>String(_0x52087b||'')));_0xafed15[_0xe41e7f(0xee)]=String(_0xafed15[_0xe41e7f(0xee)]||'')[_0xe41e7f(0x150)](/\s+/)[_0xe41e7f(0x11a)](_0x43c55b=>_0x43c55b&&!_0x30c1bd['has'](_0x43c55b))['join']('\x20');}};}function createTextRefFakeElement(_0x587583='div'){const _0x15b3b4=a176_0x33798c,_0x4b17a0={'tagName':String(_0x587583||_0x15b3b4(0x125))[_0x15b3b4(0x103)](),'className':'','dataset':{},'attributes':{},'childNodes':[],'parentElement':null,'style':{},'_innerHTML':'','_innerHTMLSetCount':0x0,'classList':null,set 'innerHTML'(_0x40c4ab){const _0x3a966e=_0x15b3b4;_0x4b17a0[_0x3a966e(0xf8)]+=0x1,_0x4b17a0['_innerHTML']=String(_0x40c4ab||''),_0x4b17a0['childNodes']=[];if(_0x4b17a0[_0x3a966e(0x14f)][_0x3a966e(0x15e)]('prompt-attachment-btn')){const _0x39c9dd=createTextRefFakeElement(_0x3a966e(0x125));_0x39c9dd[_0x3a966e(0xee)]=_0x3a966e(0x13b),_0x4b17a0[_0x3a966e(0x151)](_0x39c9dd);}if(_0x4b17a0['_innerHTML'][_0x3a966e(0x15e)](_0x3a966e(0x13d))){const _0x146ba3=createTextRefFakeElement(_0x3a966e(0x125));_0x146ba3[_0x3a966e(0xee)]=_0x3a966e(0x13d),_0x4b17a0['appendChild'](_0x146ba3);}},get 'innerHTML'(){return _0x4b17a0['_innerHTML'];},'appendChild'(_0x41fe3d){const _0x5ec9cf=_0x15b3b4;if(_0x41fe3d['parentElement']){const _0x1377d5=_0x41fe3d[_0x5ec9cf(0x12a)][_0x5ec9cf(0x143)][_0x5ec9cf(0x145)](_0x41fe3d);if(_0x1377d5>=0x0)_0x41fe3d[_0x5ec9cf(0x12a)]['childNodes']['splice'](_0x1377d5,0x1);}return _0x41fe3d[_0x5ec9cf(0x12a)]=_0x4b17a0,_0x41fe3d[_0x5ec9cf(0x135)]=_0x4b17a0,_0x4b17a0[_0x5ec9cf(0x143)][_0x5ec9cf(0x131)](_0x41fe3d),_0x41fe3d;},'remove'(){const _0x214d86=_0x15b3b4,_0x11baa8=_0x4b17a0[_0x214d86(0x12a)];if(!_0x11baa8)return;const _0x335d95=_0x11baa8['childNodes'][_0x214d86(0x145)](_0x4b17a0);if(_0x335d95>=0x0)_0x11baa8['childNodes']['splice'](_0x335d95,0x1);_0x4b17a0[_0x214d86(0x12a)]=null,_0x4b17a0[_0x214d86(0x135)]=null;},'setAttribute'(_0xa775bc,_0x4577ef){const _0x8e0f91=_0x15b3b4;_0x4b17a0[_0x8e0f91(0xfb)][String(_0xa775bc||'')]=String(_0x4577ef||'');},'addEventListener'(){},'matches'(_0x27c15c){const _0x130157=_0x15b3b4;if(_0x27c15c[_0x130157(0x122)]('.'))return _0x4b17a0[_0x130157(0x146)][_0x130157(0x138)](_0x27c15c[_0x130157(0xe3)](0x1));return![];},'querySelector'(_0xc9a621){const _0x36142e=_0x15b3b4;return _0x4b17a0[_0x36142e(0x100)](_0xc9a621)[0x0]||null;},'querySelectorAll'(_0x51dc52){const _0x1e028e=[],_0x529eb1=_0x4adc44=>{const _0x39639c=a176_0xe5b1;if(_0x51dc52['startsWith']('.'))return _0x4adc44[_0x39639c(0x146)]?.['contains'](_0x51dc52[_0x39639c(0xe3)](0x1));return![];},_0x24989c=_0x25a390=>{const _0x3f1d7a=a176_0xe5b1;_0x25a390[_0x3f1d7a(0x143)][_0x3f1d7a(0x11e)](_0x57fa9a=>{const _0x1f06be=_0x3f1d7a;if(_0x529eb1(_0x57fa9a))_0x1e028e[_0x1f06be(0x131)](_0x57fa9a);_0x24989c(_0x57fa9a);});};return _0x24989c(_0x4b17a0),_0x1e028e;}};return _0x4b17a0['classList']=makeTextRefClassList(_0x4b17a0),_0x4b17a0;}a176_0x5daa3f(a176_0x33798c(0x159),()=>{const _0x46c7f8=a176_0x33798c,_0x2146b8=globalThis[_0x46c7f8(0x132)];globalThis[_0x46c7f8(0x132)]={'createElement':createTextRefFakeElement};try{const _0x44cbb5=_0x46c7f8(0xec),_0x8811c0=_0x46c7f8(0x110),_0x559279={'id':_0x46c7f8(0x140),'sourceId':_0x8811c0,'targetId':_0x44cbb5},_0x3f90c2={'pickConnectMode':{},'nodes':{[_0x44cbb5]:{'id':_0x44cbb5,'type':_0x46c7f8(0x121)},[_0x8811c0]:{'id':_0x8811c0,'type':_0x46c7f8(0x102),'src':'data:image/png;base64,a'}},'edges':{[_0x559279['id']]:_0x559279}},_0x36ed22=createAIGenTextNodeStateSyncModule({'store':{'getState':()=>_0x3f90c2,'getIncomingEdges':()=>[_0x559279]},'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}}),_0x1d1652=Object['assign'](Object[_0x46c7f8(0x114)](_0x36ed22),{'nodeId':_0x44cbb5,'refBarEl':createTextRefFakeElement(_0x46c7f8(0x125)),'_bindDragSort':()=>{},'_syncBtnIconState':()=>{}});_0x36ed22['_renderRefBar']['call'](_0x1d1652);const _0x3f3628=_0x1d1652[_0x46c7f8(0x113)][_0x46c7f8(0x14e)]('.ref-thumb-container'),_0x14f12d=_0x3f3628['querySelector']('.ref-thumb-wrap'),_0x8f1ea4=_0x1d1652['refBarEl'][_0x46c7f8(0xf8)];a176_0x3cd86e['ok'](_0x8f1ea4>=0x1),_0x3f90c2['nodes'][_0x8811c0]={..._0x3f90c2[_0x46c7f8(0x106)][_0x8811c0],'src':_0x46c7f8(0x127)},_0x36ed22[_0x46c7f8(0x13a)][_0x46c7f8(0x11d)](_0x1d1652),a176_0x3cd86e[_0x46c7f8(0xfe)](_0x1d1652['refBarEl'][_0x46c7f8(0xf8)],_0x8f1ea4),a176_0x3cd86e[_0x46c7f8(0xfe)](_0x3f3628[_0x46c7f8(0x14e)](_0x46c7f8(0x116)),_0x14f12d),a176_0x3cd86e[_0x46c7f8(0x15b)](_0x14f12d[_0x46c7f8(0xea)],/base64,b/);}finally{globalThis[_0x46c7f8(0x132)]=_0x2146b8;}}),a176_0x5daa3f('aigenText\x20state\x20sync:\x20image\x20ref\x20thumbnails\x20show\x20mask\x20badge\x20only\x20for\x20masked\x20sources',()=>{const _0x71456f=a176_0x33798c,_0x252f95=globalThis[_0x71456f(0x132)];globalThis['document']={'createElement':createTextRefFakeElement};try{const _0x85dae8='node-text-mask-refbar',_0x1315f0=_0x71456f(0xdd),_0x29b107=_0x71456f(0x126),_0x542d6f=[{'id':_0x71456f(0x108),'sourceId':_0x1315f0,'targetId':_0x85dae8},{'id':_0x71456f(0x10f),'sourceId':_0x29b107,'targetId':_0x85dae8}],_0x1deaf1={'pickConnectMode':{},'nodes':{[_0x85dae8]:{'id':_0x85dae8,'type':_0x71456f(0x121)},[_0x1315f0]:{'id':_0x1315f0,'type':_0x71456f(0x102),'src':_0x71456f(0x15d),'maskImageUrl':_0x71456f(0xf1)},[_0x29b107]:{'id':_0x29b107,'type':_0x71456f(0x102),'src':_0x71456f(0x124)}},'edges':Object[_0x71456f(0x147)](_0x542d6f[_0x71456f(0x134)](_0x19244c=>[_0x19244c['id'],_0x19244c]))},_0x15ac17=createAIGenTextNodeStateSyncModule({'store':{'getState':()=>_0x1deaf1,'getIncomingEdges':()=>_0x542d6f},'ensureThumbDecoded':()=>{},'revealRefThumbMedia':()=>{},'_syncPillLabels':()=>{}}),_0x4081a2=Object[_0x71456f(0xe1)](Object[_0x71456f(0x114)](_0x15ac17),{'nodeId':_0x85dae8,'refBarEl':createTextRefFakeElement('div'),'_bindDragSort':()=>{},'_syncBtnIconState':()=>{}});_0x15ac17['_renderRefBar'][_0x71456f(0x11d)](_0x4081a2);const _0x5ab59f=_0x4081a2[_0x71456f(0x113)][_0x71456f(0x14e)](_0x71456f(0xeb))[_0x71456f(0x100)]('.ref-thumb-wrap');a176_0x3cd86e['equal'](_0x5ab59f['length'],0x2),a176_0x3cd86e[_0x71456f(0x15b)](_0x5ab59f[0x0][_0x71456f(0xea)],/ref-thumb-mask-badge/),a176_0x3cd86e[_0x71456f(0x15b)](_0x5ab59f[0x0][_0x71456f(0xea)],/>遮罩<\/span>/),a176_0x3cd86e['doesNotMatch'](_0x5ab59f[0x1]['innerHTML'],/ref-thumb-mask-badge/);}finally{globalThis[_0x71456f(0x132)]=_0x252f95;}});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createAIGenTextNodeUiModule } from './uiModule.js';
+import { createAIGenTextNodeStateSyncModule } from './stateSyncModule.js';
+import {
+  APIMART_TEXT_MODEL_MENU_ITEMS,
+  buildApimartTextModelMenuHTML,
+  buildRunningHubTextModelMenuHTML,
+  buildTextModelMenuHTML,
+  buildTextProviderMenuGroupsHTML,
+  TEXT_MODEL_MENU_ITEMS_BY_PROVIDER,
+} from './apimartTextModelMenu.js';
+import { getDisplayModelName } from '../../modules/providers.js';
+import {
+  _resetPreviewRuntimeForTests,
+  isPreviewNodeLoading,
+  setPreviewMode,
+  startPreviewNodeLoading,
+} from '../../modules/previewMode.js';
+import { createFakePreviewContainer, installPreviewDomStubs } from '../../../tests/testPreviewDom.js';
+const restorePreviewDom = installPreviewDomStubs(),
+  originalRequestAnimationFrame = globalThis.requestAnimationFrame,
+  __dirname = dirname(fileURLToPath(import.meta.url)),
+  uiModuleSource = readFileSync(join(__dirname, 'uiModule.js'), 'utf8');
+function escapeRegExp(_0x5106d9) {
+  return String(_0x5106d9).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+typeof globalThis.requestAnimationFrame !== 'function' &&
+  (globalThis.requestAnimationFrame = (_0x21258e) => {
+    return (_0x21258e(), 0);
+  });
+(test.afterEach(() => {
+  _resetPreviewRuntimeForTests();
+}),
+  test.after(() => {
+    (_resetPreviewRuntimeForTests(),
+      typeof originalRequestAnimationFrame === 'undefined'
+        ? delete globalThis.requestAnimationFrame
+        : (globalThis.requestAnimationFrame = originalRequestAnimationFrame),
+      restorePreviewDom());
+  }),
+  test('aigenText ui: APIMart menu uses new text model set', () => {
+    const _0x825065 = buildApimartTextModelMenuHTML('apimart/kimi-k2-instruct'),
+      _0xd808b = buildTextModelMenuHTML('gemini-3.1-pro', 'grsai'),
+      _0x12e51f = buildTextModelMenuHTML('minimax/minimax-m2.5-highspeed', 'ppio'),
+      _0xf8376e = buildRunningHubTextModelMenuHTML(
+        'runninghub-model/rhart-text-g-3-flash-preview-cv/image-to-text',
+      ),
+      _0x392e89 = buildTextModelMenuHTML('volcengine/doubao-seed-2-0-pro-260215', 'volcengine'),
+      _0x254974 = buildTextProviderMenuGroupsHTML('gemini-3.1-pro'),
+      _0x1641a3 = APIMART_TEXT_MODEL_MENU_ITEMS.map((_0xa02e12) => [_0xa02e12.modelId, _0xa02e12.title]),
+      _0x2329f6 = [
+        [_0xd808b, '谷歌最新模型gemini3.1'],
+        [_0x12e51f, '更低延迟、更高性价比的领先模型'],
+        [_0x12e51f, '阿里最强开源模型Qwen2.5'],
+        [_0x12e51f, '面向未来的新一代大模型'],
+        [_0x12e51f, '月之暗面最新版，超长上下文'],
+        [_0x825065, 'APIMart text model'],
+        [_0x825065, 'OpenAI-compatible text model'],
+        [_0x825065, '极致逻辑与推理性能，OpenAI 巅峰之作'],
+        [_0x825065, '旗舰级多模态模型，支持超长文本与深度分析'],
+        [_0x825065, '闪电级响应速度，适用于高频率对话与实时任务'],
+        [_0xf8376e, '闪电级响应速度，适用于高频率对话与实时任务'],
+        [_0xf8376e, '旗舰级多模态模型，支持超长文本与深度分析'],
+        [_0x254974, '一个 API 搞定一切——节省 30-70%'],
+      ];
+    (assert.match(uiModuleSource, /buildTextProviderMenuGroupsHTML\(_activeModel\)/),
+      assert.doesNotMatch(uiModuleSource, /buildApimartTextModelMenuHTML\(_activeModel\)/),
+      assert.doesNotMatch(uiModuleSource, /return buildTextModelMenuHTML\(_activeModel/),
+      assert.doesNotMatch(uiModuleSource, /data-lazy-text-provider=/),
+      assert.doesNotMatch(uiModuleSource, /ensureTextProviderSubmenu/),
+      assert.match(_0x254974, /grsai-submenu/),
+      assert.match(_0x254974, /ppio-submenu/),
+      assert.match(_0x254974, /apimart-submenu/),
+      assert.match(_0x254974, /runninghub-submenu/),
+      assert.match(_0x254974, /volcengine-submenu/),
+      assert.match(_0x254974, /images\/volcengine\.svg/),
+      assert.doesNotMatch(uiModuleSource, /data-value="deepseek-v3\.2"/),
+      assert.doesNotMatch(uiModuleSource, /data-value="apimart\/deepseek-v3\.2"/),
+      assert.doesNotMatch(
+        uiModuleSource,
+        /data-value="(?:minimax\/|qwen\/|deepseek\/|moonshotai\/|runninghub-model\/rhart-text|gemini-3\.1-pro-preview|gemini-3-flash-preview-nothinking|apimart\/gpt-5\.4)/,
+      ),
+      assert.doesNotMatch(uiModuleSource, /data-aicanvas-toggle/),
+      assert.doesNotMatch(uiModuleSource, /aicanvas\/text-/),
+      assert.doesNotMatch(uiModuleSource, /AICanvas Text/),
+      assert.doesNotMatch(_0x825065, /data-value="deepseek-v3\.2"/),
+      assert.doesNotMatch(_0x825065, /data-value="apimart\/deepseek-v3\.2"/));
+    for (const [_0x22c47f, _0x422ddd] of _0x1641a3) {
+      (assert.match(_0x825065, new RegExp('data-value="' + escapeRegExp(_0x22c47f) + '"')),
+        assert.ok(_0x825065.includes('<div class="fmi-title">' + _0x422ddd + '</div>')));
+    }
+    (assert.ok(_0x825065.includes('<div class="fmi-title">gpt-5.4</div>')),
+      assert.ok(_0x825065.includes('<div class="fmi-title">gemini-3.1-pro-preview</div>')),
+      assert.ok(_0x825065.includes('<div class="fmi-title">gemini-3-flash-preview-nothinking</div>')));
+    for (const [_0x208625, _0x3f582a] of _0x2329f6) {
+      assert.ok(
+        _0x208625.includes('<div class="fmi-sub">' + _0x3f582a + '</div>'),
+        'text model menu should preserve subtitle: ' + _0x3f582a,
+      );
+    }
+    for (const [_0x53d7d0, _0x4043f5] of Object.entries({
+      grsai: _0xd808b,
+      ppio: _0x12e51f,
+      runninghub: _0xf8376e,
+      volcengine: _0x392e89,
+    })) {
+      for (const _0x412ce7 of TEXT_MODEL_MENU_ITEMS_BY_PROVIDER[_0x53d7d0]) {
+        (assert.match(_0x4043f5, new RegExp('data-value="' + escapeRegExp(_0x412ce7.modelId) + '"')),
+          assert.ok(_0x4043f5.includes('data-provider="' + _0x412ce7.provider + '"')),
+          assert.ok(_0x4043f5.includes('<div class="fmi-title">' + _0x412ce7.title + '</div>')));
+      }
+    }
+  }),
+  test('aigenText model menu: provider filter can expose only Volcengine', () => {
+    const _0x42ac84 = buildTextProviderMenuGroupsHTML('volcengine/doubao-seed-2-0-pro-260215', {
+      providers: ['volcengine'],
+    });
+    (assert.match(_0x42ac84, /volcengine-submenu/),
+      assert.match(_0x42ac84, /volcengine\/doubao-seed-2-0-pro-260215/),
+      assert.doesNotMatch(_0x42ac84, /apimart-submenu/),
+      assert.doesNotMatch(_0x42ac84, /runninghub-submenu/),
+      assert.doesNotMatch(_0x42ac84, /grsai-submenu/),
+      assert.doesNotMatch(_0x42ac84, /ppio-submenu/));
+  }),
+  test('aigenText ui: default APIMart text model displays Kimi K2 Instruct', () => {
+    (assert.match(uiModuleSource, /this\._data\.model \|\| "apimart\/kimi-k2-instruct"/),
+      assert.match(
+        uiModuleSource,
+        /<span class="img-model-label">\$\{getDisplayModelName\(_activeModel\)\}<\/span>/,
+      ),
+      assert.equal(getDisplayModelName('apimart/kimi-k2-instruct'), 'Kimi K2 Instruct'));
+  }));
+function createSubmitButtonStub() {
+  const _0x4ce6ea = new Set();
+  return {
+    disabled: false,
+    title: '',
+    innerHTML: '',
+    style: { color: '', cursor: '' },
+    dataset: {},
+    classList: {
+      add(..._0x475b66) {
+        _0x475b66.forEach((_0x247012) => _0x4ce6ea.add(String(_0x247012 || '')));
+      },
+      remove(..._0x3ca820) {
+        _0x3ca820.forEach((_0x57a367) => _0x4ce6ea.delete(String(_0x57a367 || '')));
+      },
+      contains(_0x31a7d3) {
+        return _0x4ce6ea.has(String(_0x31a7d3 || ''));
+      },
+    },
+    setAttribute(_0x29fa4a, _0x20f69f) {
+      this.dataset[String(_0x29fa4a || '')] = String(_0x20f69f || '');
+    },
+  };
+}
+(test('aigenText ui: 输出区保持只读，不再进入编辑态', () => {
+  let _0x5a50b8 = [];
+  const _0x4107bc = [],
+    _0x3386c9 = createAIGenTextNodeUiModule({
+      store: {
+        getState: () => ({
+          selectedNodeIds: _0x5a50b8,
+          nodes: { 'node-text-ui-preview': { outputScrollTop: 0 } },
+        }),
+        getStateRaw: () => ({ nodes: { 'node-text-ui-preview': { outputScrollTop: 0 } } }),
+        setSelectedNodes: (_0x229739) => {
+          _0x5a50b8 = _0x229739.slice();
+        },
+        updateNodeData: (_0x17b1ce, _0x294f95) => {
+          _0x4107bc.push([_0x17b1ce, _0x294f95]);
+        },
+      },
+    }),
+    _0x2c7b56 = {
+      _attrs: {},
+      style: {},
+      scrollTop: 42,
+      setAttribute(_0x4eb694, _0x5cc7bf) {
+        this._attrs[String(_0x4eb694 || '')] = String(_0x5cc7bf || '');
+      },
+      focus() {},
+    },
+    _0x3c4a4b = Object.assign(Object.create(_0x3386c9), {
+      nodeId: 'node-text-ui-preview',
+      outputEl: _0x2c7b56,
+      _outputScrollTop: 24,
+    });
+  (_0x3386c9._enterOutputEditMode.call(_0x3c4a4b),
+    assert.equal(_0x2c7b56._attrs.contenteditable, 'false'),
+    assert.deepEqual(_0x5a50b8, [_0x3c4a4b.nodeId]),
+    assert.deepEqual(_0x4107bc, [[_0x3c4a4b.nodeId, { outputScrollTop: 42 }]]),
+    assert.match(uiModuleSource, /bindReadonlyTextSelection\(this\.outputEl,\s*\{/),
+    assert.match(uiModuleSource, /onActivate: \(\) => this\._enterOutputEditMode\(\)/),
+    assert.match(uiModuleSource, /onDeactivate: \(\) => this\._commitOutputScrollTop\(\)/),
+    assert.doesNotMatch(uiModuleSource, /outputEl\.style\.userSelect = "none"/));
+}),
+  test('aigenText ui: 普通滚动也会节流保存 outputScrollTop', async () => {
+    let _0x6f4389 = { outputScrollTop: 0 };
+    const _0x50f4d7 = [],
+      _0x5b3c08 = createAIGenTextNodeUiModule({
+        store: {
+          getStateRaw: () => ({ nodes: { 'node-text-scroll-save': _0x6f4389 } }),
+          updateNodeData: (_0x5b48fa, _0x30a0e9) => {
+            (_0x50f4d7.push([_0x5b48fa, _0x30a0e9]), (_0x6f4389 = { ..._0x6f4389, ..._0x30a0e9 }));
+          },
+        },
+      }),
+      _0x504058 = { scrollTop: 63 },
+      _0x35ae24 = Object.assign(Object.create(_0x5b3c08), {
+        nodeId: 'node-text-scroll-save',
+        outputEl: _0x504058,
+        _outputScrollTop: 0,
+      });
+    (_0x5b3c08._markOutputScrollTopDirty.call(_0x35ae24),
+      assert.equal(_0x35ae24._outputScrollTopDirty, true),
+      assert.equal(_0x35ae24._outputScrollTop, 63),
+      await new Promise((_0x245d9d) => setTimeout(_0x245d9d, 160)),
+      assert.equal(_0x35ae24._outputScrollTopDirty, false),
+      assert.deepEqual(_0x50f4d7, [[_0x35ae24.nodeId, { outputScrollTop: 63 }]]),
+      assert.match(uiModuleSource, /this\._markOutputScrollTopDirty\(\)/));
+  }),
+  test('aigenText ui: 预览模式双击输出区也不会进入编辑态', () => {
+    let _0x228965 = [];
+    const _0x23c2ac = createAIGenTextNodeUiModule({
+        store: {
+          getState: () => ({ selectedNodeIds: _0x228965 }),
+          setSelectedNodes: (_0x31595b) => {
+            _0x228965 = _0x31595b.slice();
+          },
+        },
+      }),
+      _0x2cadc9 = {
+        _attrs: {},
+        style: {},
+        innerText: '',
+        scrollTop: 0,
+        setAttribute(_0x378f9f, _0x4c5356) {
+          this._attrs[String(_0x378f9f || '')] = String(_0x4c5356 || '');
+        },
+        getAttribute(_0x571202) {
+          return this._attrs[String(_0x571202 || '')] || null;
+        },
+        focus() {},
+      },
+      _0x2cc3d7 = Object.assign(Object.create(_0x23c2ac), {
+        nodeId: 'node-text-ui-preview-dblclick',
+        outputEl: _0x2cadc9,
+        _outputScrollTop: 8,
+      });
+    let _0x109b5a = false,
+      _0x22ff9d = false;
+    (startPreviewNodeLoading(_0x2cc3d7.nodeId, createFakePreviewContainer()),
+      setPreviewMode(true),
+      assert.equal(isPreviewNodeLoading(_0x2cc3d7.nodeId), true),
+      _0x23c2ac._handlePreviewDblclick.call(_0x2cc3d7, {
+        preventDefault() {
+          _0x109b5a = true;
+        },
+        stopPropagation() {
+          _0x22ff9d = true;
+        },
+      }),
+      assert.equal(_0x109b5a, false),
+      assert.equal(_0x22ff9d, true),
+      assert.notEqual(_0x2cadc9._attrs.contenteditable, 'true'),
+      assert.equal(isPreviewNodeLoading(_0x2cc3d7.nodeId), true),
+      assert.deepEqual(_0x228965, []));
+  }),
+  test('aigenText state sync: running state shows unified loading instead of prompt validation', () => {
+    const _0x510375 = createAIGenTextNodeStateSyncModule({ store: {} }),
+      _0x2be29a = Object.assign(Object.create(_0x510375), {
+        _data: { isGenerating: true, jobStatus: 'running' },
+        promptEl: { innerText: '' },
+        btnEl: { disabled: false, style: { cursor: '' } },
+      });
+    (_0x510375._updateSubmitButtonState.call(_0x2be29a),
+      assert.equal(_0x2be29a.btnEl.disabled, true),
+      assert.equal(_0x2be29a.btnEl.style.cursor, 'var(--unavailable-cursor)'),
+      assert.match(_0x2be29a.btnEl.innerHTML, /animation:spin/));
+  }),
+  test('aigenText state sync: 复制模式下不使用旧 outputScrollTop 还原滚动位置', () => {
+    const _0x1fe58a = createAIGenTextNodeStateSyncModule({
+        store: { getState: () => ({ pickConnectMode: {}, nodes: {} }), getIncomingEdges: () => [] },
+        getDisplayModelName: (_0x2db9d4) => _0x2db9d4,
+      }),
+      _0x4c216c = {
+        scrollTop: 88,
+        classList: {
+          contains(_0x3e1bd2) {
+            return _0x3e1bd2 === 'is-text-selection-active';
+          },
+        },
+        getAttribute() {
+          return 'false';
+        },
+      };
+    let _0x242c4b = 0;
+    const _0xf6939 = Object.assign(Object.create(_0x1fe58a), {
+      nodeId: 'node-text-scroll-active',
+      _data: {},
+      _outputScrollTop: 88,
+      outputEl: _0x4c216c,
+      _renderOutputText: () => {
+        _0x242c4b += 1;
+      },
+      _renderRefBar: () => {},
+      _syncPromptBoxSizeFromData: () => {},
+      _updateSubmitButtonState: () => {},
+    });
+    (_0x1fe58a.update.call(_0xf6939, {
+      id: _0xf6939.nodeId,
+      type: 'ai-text',
+      outputText: 'next',
+      outputScrollTop: 5,
+    }),
+      assert.equal(_0x4c216c.scrollTop, 88),
+      assert.equal(_0xf6939._outputScrollTop, 88),
+      assert.equal(_0x242c4b, 0));
+  }),
+  test('aigenText state sync: 普通滚动待保存时不使用旧 outputScrollTop 还原滚动位置', () => {
+    const _0x1d7564 = createAIGenTextNodeStateSyncModule({
+        store: { getState: () => ({ pickConnectMode: {}, nodes: {} }), getIncomingEdges: () => [] },
+        getDisplayModelName: (_0x40845e) => _0x40845e,
+      }),
+      _0x34848a = {
+        scrollTop: 88,
+        classList: {
+          contains() {
+            return false;
+          },
+        },
+        getAttribute() {
+          return 'false';
+        },
+      };
+    let _0x19efd5 = 0;
+    const _0x1305de = Object.assign(Object.create(_0x1d7564), {
+      nodeId: 'node-text-scroll-dirty',
+      _data: {},
+      _lastRenderedOutputText: 'next',
+      _outputScrollTop: 88,
+      _outputScrollTopDirty: true,
+      outputEl: _0x34848a,
+      _renderOutputText: () => {
+        _0x19efd5 += 1;
+      },
+      _renderRefBar: () => {},
+      _syncPromptBoxSizeFromData: () => {},
+      _updateSubmitButtonState: () => {},
+    });
+    (_0x1d7564.update.call(_0x1305de, {
+      id: _0x1305de.nodeId,
+      type: 'ai-text',
+      outputText: 'next',
+      outputScrollTop: 5,
+    }),
+      assert.equal(_0x34848a.scrollTop, 88),
+      assert.equal(_0x1305de._outputScrollTop, 88),
+      assert.equal(_0x1305de._outputScrollTopDirty, true),
+      assert.equal(_0x19efd5, 0));
+  }),
+  test('aigenText submit button: empty editor can generate from non-empty text input', () => {
+    const _0x6ff54 = 'node-text-target',
+      _0x73ef6 = 'node-text-source',
+      _0x4f6efd = {
+        nodes: {
+          [_0x6ff54]: { id: _0x6ff54, type: 'ai-text' },
+          [_0x73ef6]: { id: _0x73ef6, type: 'source-text', content: '来自文本入参的提示词' },
+        },
+      },
+      _0x38c091 = [{ id: 'edge-text-input', sourceId: _0x73ef6, targetId: _0x6ff54 }],
+      _0x3300ab = createAIGenTextNodeStateSyncModule({
+        store: { getState: () => _0x4f6efd, getIncomingEdges: () => _0x38c091 },
+      }),
+      _0x5ce6c4 = Object.assign(Object.create(_0x3300ab), {
+        nodeId: _0x6ff54,
+        _data: _0x4f6efd.nodes[_0x6ff54],
+        promptEl: { innerText: '', childNodes: [] },
+        btnEl: createSubmitButtonStub(),
+      });
+    (_0x5ce6c4._updateSubmitButtonState(),
+      assert.equal(_0x5ce6c4.btnEl.disabled, false),
+      assert.equal(_0x5ce6c4.btnEl.style.cursor, ''));
+  }));
+function makeTextRefClassList(_0xafed15) {
+  return {
+    contains(_0x2c2078) {
+      return String(_0xafed15.className || '')
+        .split(/\s+/)
+        .includes(_0x2c2078);
+    },
+    add(..._0x336f9d) {
+      const _0x4c17b4 = new Set(
+        String(_0xafed15.className || '')
+          .split(/\s+/)
+          .filter(Boolean),
+      );
+      (_0x336f9d.forEach((_0x2ad122) => _0x4c17b4.add(String(_0x2ad122 || ''))),
+        (_0xafed15.className = Array.from(_0x4c17b4).join(' ')));
+    },
+    remove(..._0x19417c) {
+      const _0x30c1bd = new Set(_0x19417c.map((_0x52087b) => String(_0x52087b || '')));
+      _0xafed15.className = String(_0xafed15.className || '')
+        .split(/\s+/)
+        .filter((_0x43c55b) => _0x43c55b && !_0x30c1bd.has(_0x43c55b))
+        .join(' ');
+    },
+  };
+}
+function createTextRefFakeElement(_0x587583 = 'div') {
+  const _0x4b17a0 = {
+    tagName: String(_0x587583 || 'div').toUpperCase(),
+    className: '',
+    dataset: {},
+    attributes: {},
+    childNodes: [],
+    parentElement: null,
+    style: {},
+    _innerHTML: '',
+    _innerHTMLSetCount: 0,
+    classList: null,
+    set innerHTML(_0x40c4ab) {
+      ((_0x4b17a0._innerHTMLSetCount += 1),
+        (_0x4b17a0._innerHTML = String(_0x40c4ab || '')),
+        (_0x4b17a0.childNodes = []));
+      if (_0x4b17a0._innerHTML.includes('prompt-attachment-btn')) {
+        const _0x39c9dd = createTextRefFakeElement('div');
+        ((_0x39c9dd.className = 'prompt-attachment-btn'), _0x4b17a0.appendChild(_0x39c9dd));
+      }
+      if (_0x4b17a0._innerHTML.includes('ref-thumb-container')) {
+        const _0x146ba3 = createTextRefFakeElement('div');
+        ((_0x146ba3.className = 'ref-thumb-container'), _0x4b17a0.appendChild(_0x146ba3));
+      }
+    },
+    get innerHTML() {
+      return _0x4b17a0._innerHTML;
+    },
+    appendChild(_0x41fe3d) {
+      if (_0x41fe3d.parentElement) {
+        const _0x1377d5 = _0x41fe3d.parentElement.childNodes.indexOf(_0x41fe3d);
+        if (_0x1377d5 >= 0) _0x41fe3d.parentElement.childNodes.splice(_0x1377d5, 1);
+      }
+      return (
+        (_0x41fe3d.parentElement = _0x4b17a0),
+        (_0x41fe3d.parentNode = _0x4b17a0),
+        _0x4b17a0.childNodes.push(_0x41fe3d),
+        _0x41fe3d
+      );
+    },
+    remove() {
+      const _0x11baa8 = _0x4b17a0.parentElement;
+      if (!_0x11baa8) return;
+      const _0x335d95 = _0x11baa8.childNodes.indexOf(_0x4b17a0);
+      if (_0x335d95 >= 0) _0x11baa8.childNodes.splice(_0x335d95, 1);
+      ((_0x4b17a0.parentElement = null), (_0x4b17a0.parentNode = null));
+    },
+    setAttribute(_0xa775bc, _0x4577ef) {
+      _0x4b17a0.attributes[String(_0xa775bc || '')] = String(_0x4577ef || '');
+    },
+    addEventListener() {},
+    matches(_0x27c15c) {
+      if (_0x27c15c.startsWith('.')) return _0x4b17a0.classList.contains(_0x27c15c.slice(1));
+      return false;
+    },
+    querySelector(_0xc9a621) {
+      return _0x4b17a0.querySelectorAll(_0xc9a621)[0] || null;
+    },
+    querySelectorAll(_0x51dc52) {
+      const _0x1e028e = [],
+        _0x529eb1 = (_0x4adc44) => {
+          if (_0x51dc52.startsWith('.')) return _0x4adc44.classList?.contains(_0x51dc52.slice(1));
+          return false;
+        },
+        _0x24989c = (_0x25a390) => {
+          _0x25a390.childNodes.forEach((_0x57fa9a) => {
+            if (_0x529eb1(_0x57fa9a)) _0x1e028e.push(_0x57fa9a);
+            _0x24989c(_0x57fa9a);
+          });
+        };
+      return (_0x24989c(_0x4b17a0), _0x1e028e);
+    },
+  };
+  return ((_0x4b17a0.classList = makeTextRefClassList(_0x4b17a0)), _0x4b17a0);
+}
+(test('aigenText state sync: ref bar reuses thumbnails when source signature changes', () => {
+  const _0x2146b8 = globalThis.document;
+  globalThis.document = { createElement: createTextRefFakeElement };
+  try {
+    const _0x44cbb5 = 'node-text-refbar',
+      _0x8811c0 = 'node-image-ref',
+      _0x559279 = { id: 'edge-image', sourceId: _0x8811c0, targetId: _0x44cbb5 },
+      _0x3f90c2 = {
+        pickConnectMode: {},
+        nodes: {
+          [_0x44cbb5]: { id: _0x44cbb5, type: 'ai-text' },
+          [_0x8811c0]: { id: _0x8811c0, type: 'source-image', src: 'data:image/png;base64,a' },
+        },
+        edges: { [_0x559279.id]: _0x559279 },
+      },
+      _0x36ed22 = createAIGenTextNodeStateSyncModule({
+        store: { getState: () => _0x3f90c2, getIncomingEdges: () => [_0x559279] },
+        ensureThumbDecoded: () => {},
+        revealRefThumbMedia: () => {},
+        _syncPillLabels: () => {},
+      }),
+      _0x1d1652 = Object.assign(Object.create(_0x36ed22), {
+        nodeId: _0x44cbb5,
+        refBarEl: createTextRefFakeElement('div'),
+        _bindDragSort: () => {},
+        _syncBtnIconState: () => {},
+      });
+    _0x36ed22._renderRefBar.call(_0x1d1652);
+    const _0x3f3628 = _0x1d1652.refBarEl.querySelector('.ref-thumb-container'),
+      _0x14f12d = _0x3f3628.querySelector('.ref-thumb-wrap'),
+      _0x8f1ea4 = _0x1d1652.refBarEl._innerHTMLSetCount;
+    (assert.ok(_0x8f1ea4 >= 1),
+      (_0x3f90c2.nodes[_0x8811c0] = { ..._0x3f90c2.nodes[_0x8811c0], src: 'data:image/png;base64,b' }),
+      _0x36ed22._renderRefBar.call(_0x1d1652),
+      assert.equal(_0x1d1652.refBarEl._innerHTMLSetCount, _0x8f1ea4),
+      assert.equal(_0x3f3628.querySelector('.ref-thumb-wrap'), _0x14f12d),
+      assert.match(_0x14f12d.innerHTML, /base64,b/));
+  } finally {
+    globalThis.document = _0x2146b8;
+  }
+}),
+  test('aigenText state sync: image ref thumbnails show mask badge only for masked sources', () => {
+    const _0x252f95 = globalThis.document;
+    globalThis.document = { createElement: createTextRefFakeElement };
+    try {
+      const _0x85dae8 = 'node-text-mask-refbar',
+        _0x1315f0 = 'node-image-masked',
+        _0x29b107 = 'node-image-plain',
+        _0x542d6f = [
+          { id: 'edge-masked', sourceId: _0x1315f0, targetId: _0x85dae8 },
+          { id: 'edge-plain', sourceId: _0x29b107, targetId: _0x85dae8 },
+        ],
+        _0x1deaf1 = {
+          pickConnectMode: {},
+          nodes: {
+            [_0x85dae8]: { id: _0x85dae8, type: 'ai-text' },
+            [_0x1315f0]: {
+              id: _0x1315f0,
+              type: 'source-image',
+              src: 'data:image/png;base64,masked',
+              maskImageUrl: 'output/mask/manual-mask.png',
+            },
+            [_0x29b107]: { id: _0x29b107, type: 'source-image', src: 'data:image/png;base64,plain' },
+          },
+          edges: Object.fromEntries(_0x542d6f.map((_0x19244c) => [_0x19244c.id, _0x19244c])),
+        },
+        _0x15ac17 = createAIGenTextNodeStateSyncModule({
+          store: { getState: () => _0x1deaf1, getIncomingEdges: () => _0x542d6f },
+          ensureThumbDecoded: () => {},
+          revealRefThumbMedia: () => {},
+          _syncPillLabels: () => {},
+        }),
+        _0x4081a2 = Object.assign(Object.create(_0x15ac17), {
+          nodeId: _0x85dae8,
+          refBarEl: createTextRefFakeElement('div'),
+          _bindDragSort: () => {},
+          _syncBtnIconState: () => {},
+        });
+      _0x15ac17._renderRefBar.call(_0x4081a2);
+      const _0x5ab59f = _0x4081a2.refBarEl
+        .querySelector('.ref-thumb-container')
+        .querySelectorAll('.ref-thumb-wrap');
+      (assert.equal(_0x5ab59f.length, 2),
+        assert.match(_0x5ab59f[0].innerHTML, /ref-thumb-mask-badge/),
+        assert.match(_0x5ab59f[0].innerHTML, />遮罩<\/span>/),
+        assert.doesNotMatch(_0x5ab59f[1].innerHTML, /ref-thumb-mask-badge/));
+    } finally {
+      globalThis.document = _0x252f95;
+    }
+  }));
