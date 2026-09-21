@@ -49,6 +49,16 @@ class RemoteProxyRouteService:
         }
 
     @staticmethod
+    def _format_exception_for_message(exc):
+        message = str(exc or "").strip()
+        if message:
+            return message
+        detail = repr(exc).strip()
+        if detail:
+            return detail
+        return type(exc).__name__
+
+    @staticmethod
     def _parse_json_object(body):
         try:
             data = json.loads(body)
@@ -190,7 +200,10 @@ class RemoteProxyRouteService:
         except urllib.error.HTTPError as exc:
             return self._proxy_response(exc.code, exc.read())
         except Exception as exc:
-            return self._json_err(500, f"Upload proxy error: {str(exc)}")
+            return self._json_err(
+                500,
+                f"Upload proxy error: {self._format_exception_for_message(exc)}",
+            )
 
     def _handle_runninghub_workflow_run(self, handler):
         data, error = self._read_json_request(handler)

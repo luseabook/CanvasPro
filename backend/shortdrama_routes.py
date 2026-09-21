@@ -6,8 +6,10 @@ import os
 import subprocess
 try:
     from backend import shortdrama_db as db
+    from backend import shortdrama_llm as llm
 except ImportError:
     import shortdrama_db as db
+    import shortdrama_llm as llm
 
 FFMPEG = os.environ.get("AIC_FFMPEG_EXE", "ffmpeg")
 

@@ -1,1 +1,167 @@
-const a49_0x9c3421=a49_0x522b;(function(_0x28eb70,_0x83fde7){const _0x4c828f=a49_0x522b,_0xdd0279=_0x28eb70();while(!![]){try{const _0xc3c278=parseInt(_0x4c828f(0xa6))/0x1*(parseInt(_0x4c828f(0xaa))/0x2)+-parseInt(_0x4c828f(0x94))/0x3*(parseInt(_0x4c828f(0x9f))/0x4)+-parseInt(_0x4c828f(0xa5))/0x5+-parseInt(_0x4c828f(0x99))/0x6+-parseInt(_0x4c828f(0xa9))/0x7+-parseInt(_0x4c828f(0xa4))/0x8*(parseInt(_0x4c828f(0xa7))/0x9)+parseInt(_0x4c828f(0x8e))/0xa*(parseInt(_0x4c828f(0x90))/0xb);if(_0xc3c278===_0x83fde7)break;else _0xdd0279['push'](_0xdd0279['shift']());}catch(_0x11aa2d){_0xdd0279['push'](_0xdd0279['shift']());}}}(a49_0x4f23,0x2afcd));import{post as a49_0x1dac2f}from'./requester.js';const DEFAULT_FREE_IMAGE_HOST_UPLOAD_URL=a49_0x9c3421(0x8f),DEFAULT_FILE_NAME=a49_0x9c3421(0x97);function buildUploadProxyUrl(_0x49606d){const _0x474673=a49_0x9c3421;return _0x474673(0x96)+encodeURIComponent(_0x49606d);}function isPlainObject(_0x33020c){const _0x373e3f=a49_0x9c3421;return!!_0x33020c&&typeof _0x33020c==='object'&&!Array[_0x373e3f(0x9c)](_0x33020c);}function normalizeUrl(_0x1fb763){const _0x3f9870=String(_0x1fb763||'')['trim']();if(!/^https?:\/\//i['test'](_0x3f9870))return'';return _0x3f9870;}function pickUrlFromRecord(_0x2cbb59){const _0xcdd40a=a49_0x9c3421;if(!isPlainObject(_0x2cbb59))return'';return normalizeUrl(_0x2cbb59['url']||_0x2cbb59[_0xcdd40a(0xa0)]||_0x2cbb59['download_url']||_0x2cbb59[_0xcdd40a(0x98)]||_0x2cbb59[_0xcdd40a(0x9e)]||_0x2cbb59[_0xcdd40a(0xa3)]);}function a49_0x4f23(){const _0x298088=['免费图床上传失败：文件不能为空','免费图床上传失败：未返回可用\x20URL','476979TwBLpd','files[]','/api/v2/proxy/upload?apiUrl=','image.png','fileUrl','220770isOsCY','fileName','append','isArray','auto','file_url','8bedyiH','downloadUrl','name','files','src','16XriZOA','400295iatQyH','8026aSClAD','1121454hWALyT','free-image-host','913766gkrHuA','2cllxhD','timeout','893310BjSwym','https://uguu.se/upload','121xhJorz','useProxy'];a49_0x4f23=function(){return _0x298088;};return a49_0x4f23();}export function pickFreeImageHostUrl(_0x23c0fe){const _0x1f247=a49_0x9c3421;if(typeof _0x23c0fe==='string')return normalizeUrl(_0x23c0fe);if(Array[_0x1f247(0x9c)](_0x23c0fe)){for(const _0xc13e6d of _0x23c0fe){const _0xf010e2=typeof _0xc13e6d==='string'?normalizeUrl(_0xc13e6d):pickUrlFromRecord(_0xc13e6d);if(_0xf010e2)return _0xf010e2;}return'';}if(!isPlainObject(_0x23c0fe))return'';const _0x3c1001=pickUrlFromRecord(_0x23c0fe);if(_0x3c1001)return _0x3c1001;const _0x403fe8=Array[_0x1f247(0x9c)](_0x23c0fe[_0x1f247(0xa2)])?_0x23c0fe[_0x1f247(0xa2)]:[];for(const _0x28f6f5 of _0x403fe8){const _0x510f60=typeof _0x28f6f5==='string'?normalizeUrl(_0x28f6f5):pickUrlFromRecord(_0x28f6f5);if(_0x510f60)return _0x510f60;}return'';}async function uploadToUguuImageHost(_0x347acc,_0x4d1b7b={}){const _0x11eec0=a49_0x9c3421,_0x4ab680=new FormData(),_0x1ef179=String(_0x4d1b7b[_0x11eec0(0x9a)]||_0x347acc[_0x11eec0(0xa1)]||DEFAULT_FILE_NAME)['trim']()||DEFAULT_FILE_NAME;_0x4ab680[_0x11eec0(0x9b)](_0x11eec0(0x95),_0x347acc,_0x1ef179);const _0xf57830=_0x4d1b7b['uploadUrl']||DEFAULT_FREE_IMAGE_HOST_UPLOAD_URL,_0x3f763d=_0x4d1b7b[_0x11eec0(0x91)]===![]?_0xf57830:buildUploadProxyUrl(_0xf57830),_0x5f475b=await a49_0x1dac2f(_0x3f763d,_0x4ab680,{'provider':_0x11eec0(0xa8),'buildUrl':_0x4d1b7b['useProxy']===![]?![]:!![],'timeout':Number(_0x4d1b7b[_0x11eec0(0x8d)]||0xea60),'responseType':_0x11eec0(0x9d)}),_0x494b26=pickFreeImageHostUrl(_0x5f475b);if(!_0x494b26)throw new Error(_0x11eec0(0x93));return _0x494b26;}function a49_0x522b(_0xdf0c64,_0x55776e){const _0x4f23bd=a49_0x4f23();return a49_0x522b=function(_0x522b87,_0x247f38){_0x522b87=_0x522b87-0x8d;let _0x4f580c=_0x4f23bd[_0x522b87];return _0x4f580c;},a49_0x522b(_0xdf0c64,_0x55776e);}export async function uploadToFreeImageHost(_0x1022af,_0x8bf9d0={}){const _0x16c2bb=a49_0x9c3421;if(!_0x1022af)throw new Error(_0x16c2bb(0x92));return await uploadToUguuImageHost(_0x1022af,_0x8bf9d0);}export const 免费图床=uploadToFreeImageHost;
+import { post } from './requester.js';
+
+const DEFAULT_FREE_IMAGE_HOST_UPLOAD_URL = 'https://uguu.se/upload';
+const FALLBACK_FREE_IMAGE_HOST_UPLOAD_URL = 'https://telegra.ph/upload';
+const TELEGRAPH_BASE_URL = 'https://telegra.ph';
+const DEFAULT_FILE_NAME = 'image.png';
+const DEFAULT_TIMEOUT = 60000;
+
+function buildUploadProxyUrl(uploadUrl) {
+  return `/api/v2/proxy/upload?apiUrl=${encodeURIComponent(uploadUrl)}`;
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function normalizeUrl(value) {
+  const url = String(value || '').trim();
+  if (!/^https?:\/\//i.test(url)) return '';
+  return url;
+}
+
+function normalizeUrlWithBase(value, baseUrl = '') {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const absoluteUrl = normalizeUrl(raw);
+  if (absoluteUrl) return absoluteUrl;
+  if (!baseUrl) return '';
+  try {
+    return normalizeUrl(new URL(raw, baseUrl).toString());
+  } catch {
+    return '';
+  }
+}
+
+function pickUrlFromRecord(record) {
+  if (!isPlainObject(record)) return '';
+  return normalizeUrl(
+    record.url ||
+      record.downloadUrl ||
+      record.download_url ||
+      record.fileUrl ||
+      record.file_url ||
+      record.src,
+  );
+}
+
+function pickUrlFromRecordWithBase(record, baseUrl = '') {
+  if (!isPlainObject(record)) return '';
+  return normalizeUrlWithBase(
+    record.url ||
+      record.downloadUrl ||
+      record.download_url ||
+      record.fileUrl ||
+      record.file_url ||
+      record.src,
+    baseUrl,
+  );
+}
+
+export function pickFreeImageHostUrl(payload) {
+  if (typeof payload === 'string') return normalizeUrl(payload);
+  if (Array.isArray(payload)) {
+    for (const item of payload) {
+      const url = typeof item === 'string' ? normalizeUrl(item) : pickUrlFromRecord(item);
+      if (url) return url;
+    }
+    return '';
+  }
+  if (!isPlainObject(payload)) return '';
+
+  const directUrl = pickUrlFromRecord(payload);
+  if (directUrl) return directUrl;
+
+  const files = Array.isArray(payload.files) ? payload.files : [];
+  for (const item of files) {
+    const url = typeof item === 'string' ? normalizeUrl(item) : pickUrlFromRecord(item);
+    if (url) return url;
+  }
+  return '';
+}
+
+function pickTelegraphUrl(payload) {
+  if (typeof payload === 'string') return normalizeUrlWithBase(payload, TELEGRAPH_BASE_URL);
+  if (Array.isArray(payload)) {
+    for (const item of payload) {
+      const url =
+        typeof item === 'string'
+          ? normalizeUrlWithBase(item, TELEGRAPH_BASE_URL)
+          : pickUrlFromRecordWithBase(item, TELEGRAPH_BASE_URL);
+      if (url) return url;
+    }
+    return '';
+  }
+  if (!isPlainObject(payload)) return '';
+
+  const directUrl = pickUrlFromRecordWithBase(payload, TELEGRAPH_BASE_URL);
+  if (directUrl) return directUrl;
+
+  const files = Array.isArray(payload.files) ? payload.files : [];
+  for (const item of files) {
+    const url =
+      typeof item === 'string'
+        ? normalizeUrlWithBase(item, TELEGRAPH_BASE_URL)
+        : pickUrlFromRecordWithBase(item, TELEGRAPH_BASE_URL);
+    if (url) return url;
+  }
+  return '';
+}
+
+function makeImageFormData(file, options = {}, fieldName = 'files[]') {
+  const formData = new FormData();
+  const fileName = String(options.fileName || file.name || DEFAULT_FILE_NAME).trim() || DEFAULT_FILE_NAME;
+  formData.append(fieldName, file, fileName);
+  return formData;
+}
+
+async function uploadToImageHost(file, options = {}, host = {}) {
+  const uploadUrl = host.uploadUrl || DEFAULT_FREE_IMAGE_HOST_UPLOAD_URL;
+  const fieldName = host.fieldName || 'files[]';
+  const picker = host.pickUrl || pickFreeImageHostUrl;
+  const formData = makeImageFormData(file, options, fieldName);
+  const targetUrl = options.useProxy === false ? uploadUrl : buildUploadProxyUrl(uploadUrl);
+  const response = await post(targetUrl, formData, {
+    provider: 'free-image-host',
+    buildUrl: options.useProxy === false ? false : true,
+    timeout: Number(options.timeout || DEFAULT_TIMEOUT),
+    responseType: 'auto',
+  });
+  const url = picker(response);
+  if (!url) throw new Error('免费图床上传失败：未返回可用 URL');
+  return url;
+}
+
+async function uploadToUguuImageHost(file, options = {}) {
+  return uploadToImageHost(file, options, {
+    uploadUrl: options.uploadUrl || DEFAULT_FREE_IMAGE_HOST_UPLOAD_URL,
+    fieldName: 'files[]',
+    pickUrl: pickFreeImageHostUrl,
+  });
+}
+
+async function uploadToTelegraphImageHost(file, options = {}) {
+  return uploadToImageHost(file, options, {
+    uploadUrl: FALLBACK_FREE_IMAGE_HOST_UPLOAD_URL,
+    fieldName: 'file',
+    pickUrl: pickTelegraphUrl,
+  });
+}
+
+export async function uploadToFreeImageHost(file, options = {}) {
+  if (!file) throw new Error('免费图床上传失败：文件不能为空');
+
+  try {
+    return await uploadToUguuImageHost(file, options);
+  } catch (primaryError) {
+    if (options.uploadUrl) throw primaryError;
+    try {
+      return await uploadToTelegraphImageHost(file, options);
+    } catch (fallbackError) {
+      const message = fallbackError?.message || primaryError?.message || '未知错误';
+      throw new Error(`免费图床上传失败：${message}`);
+    }
+  }
+}
+
+export const 免费图床 = uploadToFreeImageHost;
