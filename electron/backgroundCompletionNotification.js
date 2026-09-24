@@ -1,49 +1,204 @@
-function normalizeText(_0x593808, _0xf07d40 = '', _0x2ce502 = 160) {
-  const _0x1204de = String(_0x593808 || _0xf07d40 || '')
+import { createCompletionNotificationNavigation } from './completionNotificationNavigation.js';
+import { createNotificationShortcutController } from './notificationShortcutController.js';
+
+function normalizeText(value, fallback = '', maxLength = 160) {
+  const normalized = String(value || fallback || '')
     .replace(/\s+/g, ' ')
     .trim();
-  return _0x1204de.slice(0, _0x2ce502);
+  return normalized.slice(0, maxLength);
 }
-function isWindowFocused(_0x1f6c6b) {
+const IMAGE_ICON_EXTENSION_RE = /\.(?:png|jpe?g|webp|gif|bmp|avif)$/i;
+function normalizeThumbnailLocalPath(value) {
+  const raw = String(value || '')
+      .trim()
+      .slice(0, 512),
+    withoutQuery = raw.split(/[?#]/, 1)[0];
+  return IMAGE_ICON_EXTENSION_RE.test(withoutQuery) ? withoutQuery : '';
+}
+function resolveNotificationIcon(payload, resolvePath) {
+  if (typeof resolvePath !== 'function') return '';
+  const localPath = normalizeThumbnailLocalPath(payload?.thumbnailLocalPath);
+  if (!localPath) return '';
   try {
-    return !!_0x1f6c6b && !_0x1f6c6b.isDestroyed?.() && _0x1f6c6b.isFocused?.() === true;
+    const resolved = String(resolvePath(localPath) || '').trim();
+    return IMAGE_ICON_EXTENSION_RE.test(resolved) ? resolved : '';
+  } catch {
+    return '';
+  }
+}
+function isWindowFocused(win) {
+  try {
+    return !!win && !win.isDestroyed?.() && win.isFocused?.() === true;
   } catch {
     return false;
   }
 }
-export function createBackgroundCompletionNotifier({
-  Notification: _0x2d127,
-  getMainWindow: _0x1c881,
-  focusMainWindow: _0xde445c,
-  appName: appName = 'AI CanvasPro',
-} = {}) {
+function normalizeNavigation(value = {}) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const source = normalizeText(value.source, '', 40),
+    projectId = normalizeText(value.projectId, '', 120);
+  if (source === 'canvas') {
+    const nodeId = normalizeText(value.nodeId, '', 120);
+    return nodeId
+      ? {
+          source: source,
+          projectId: projectId,
+          nodeId: nodeId,
+          canvasId: normalizeText(value.canvasId, '', 120),
+        }
+      : null;
+  }
+  if (!source || !projectId) return null;
+  const step = Math.max(
+    1,
+    Math.min(source === 'replacement-studio' ? 5 : 3, Math.trunc(Number(value.step) || 1)),
+  );
   return {
-    showGenerationComplete(_0x484f62 = {}) {
-      const _0x5ca78c = typeof _0x1c881 === 'function' ? _0x1c881() : null;
-      if (isWindowFocused(_0x5ca78c)) return { success: true, shown: false, reason: 'window-focused' };
-      if (typeof _0x2d127?.isSupported === 'function' && !_0x2d127.isSupported())
+    source: source,
+    projectId: projectId,
+    step: step,
+    outlineSectionId: normalizeText(value.outlineSectionId, '', 120),
+    assetId: normalizeText(value.assetId, '', 120),
+    episodeId: normalizeText(value.episodeId, '', 120),
+    clipId: normalizeText(value.clipId, '', 120),
+  };
+}
+function escapeToastXml(value) {
+  return String(value).replace(
+    /[&<>"']/g,
+    (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char],
+  );
+}
+function createWindowsToastXml({ title: title, body: body, icon: icon }) {
+  const iconXml = icon ? '<image placement="appLogoOverride" src="' + escapeToastXml(icon) + '"/>' : '';
+  return (
+    '<toast duration="long"><visual><binding template="ToastGeneric"><text>' +
+    escapeToastXml(title) +
+    '</text><text>' +
+    escapeToastXml(body) +
+    '</text>' +
+    iconXml +
+    '</binding></visual><audio silent="true"/></toast>'
+  );
+}
+export function createBackgroundCompletionNotifier({
+  Notification: Notification,
+  getMainWindow: getMainWindow,
+  focusMainWindow: focusMainWindow,
+  onClick: onClick,
+  globalShortcutApi: globalShortcutApi,
+  logEvent: logEvent,
+  resolveNotificationIconPath: resolveNotificationIconPath,
+  appName: appName = 'AI CanvasPro',
+  platform: platform = process.platform,
+  setTimeoutFn: setTimeoutFn = setTimeout,
+  clearTimeoutFn: clearTimeoutFn = clearTimeout,
+} = {}) {
+  const navigation = createCompletionNotificationNavigation({
+      focusMainWindow: focusMainWindow,
+      onClick: onClick,
+      logEvent: logEvent,
+    }),
+    shortcutController = createNotificationShortcutController({
+      globalShortcutApi: globalShortcutApi,
+      activate: navigation.activateLatest,
+    }),
+    activeNotifications = new Set();
+  return {
+    updateGlobalShortcut: shortcutController.updateGlobalShortcut,
+    acknowledge: navigation.acknowledge,
+    activateLatest: navigation.activateLatest,
+    dispose() {
+      shortcutController.dispose();
+      navigation.dispose();
+      for (const notification of activeNotifications) notification.close?.();
+      activeNotifications.clear();
+    },
+    showGenerationComplete(payload = {}) {
+      const normalizedNavigation = normalizeNavigation(payload?.navigation),
+        receipt = navigation.remember(normalizedNavigation, normalizeText(payload?.notificationId)),
+        mainWindow = typeof getMainWindow === 'function' ? getMainWindow() : null;
+      if (isWindowFocused(mainWindow)) return { success: true, shown: false, reason: 'window-focused' };
+      if (typeof Notification?.isSupported === 'function' && !Notification.isSupported())
         return { success: true, shown: false, reason: 'unsupported' };
-      const _0x1bf6b3 = normalizeText(_0x484f62?.title, appName, 80),
-        _0x4d29c5 = normalizeText(_0x484f62?.body, '生成任务已完成。', 180);
+      const title = normalizeText(payload?.title, appName, 80),
+        body = normalizeText(payload?.body, '生成任务已完成。', 180),
+        icon = resolveNotificationIcon(payload, resolveNotificationIconPath);
+      let release = () => {};
       try {
-        const _0x18b5b6 = new _0x2d127({ title: _0x1bf6b3, body: _0x4d29c5, silent: true });
-        return (
-          _0x18b5b6.on?.('click', () => {
-            if (typeof _0xde445c === 'function') _0xde445c();
-          }),
-          _0x18b5b6.show?.(),
-          { success: true, shown: true }
-        );
-      } catch (_0x441803) {
-        return (
-          console.warn('[electron] failed to show completion notification:', _0x441803),
-          { success: false, shown: false, error: String(_0x441803?.message || _0x441803) }
-        );
+        const notification = new Notification({
+          title: title,
+          body: body,
+          silent: true,
+          timeoutType: 'default',
+          ...(icon ? { icon: icon } : {}),
+          ...(platform === 'win32'
+            ? { toastXml: createWindowsToastXml({ title: title, body: body, icon: icon }) }
+            : {}),
+        });
+        activeNotifications.add(notification);
+        let autoCloseTimer = null,
+          settled = false;
+        release = (closeWindow = false) => {
+          if (settled) return;
+          settled = true;
+          clearTimeoutFn(autoCloseTimer);
+          activeNotifications.delete(notification);
+          receipt.release = null;
+          if (closeWindow) notification.close?.();
+        };
+        receipt.release = release;
+        const scheduleAutoClose = () => {
+          if (settled) return;
+          clearTimeoutFn(autoCloseTimer);
+          autoCloseTimer = setTimeoutFn(() => release(true), 10000);
+          autoCloseTimer?.unref?.();
+        };
+        notification.on?.('show', scheduleAutoClose);
+        notification.on?.('close', (event) => {
+          if (event?.reason !== 'timedOut') release();
+        });
+        notification.on?.('failed', (_event, error) => {
+          release();
+          const message = String(error?.message || error || 'Unknown notification error');
+          console.warn('[electron] completion notification failed:', message);
+          logEvent?.({
+            type: 'notification.generation_complete_failed',
+            level: 'warn',
+            source: 'main',
+            message: 'Generation completion notification failed',
+            error: message,
+            context: { title: title },
+          });
+        });
+        notification.on?.('click', () => {
+          if (settled) return;
+          navigation.activate(receipt);
+        });
+        scheduleAutoClose();
+        notification.show?.();
+        return { success: true, shown: true };
+      } catch (error) {
+        release();
+        console.warn('[electron] failed to show completion notification:', error);
+        logEvent?.({
+          type: 'notification.generation_complete_failed',
+          level: 'warn',
+          source: 'main',
+          message: 'Generation completion notification failed',
+          error: String(error?.message || error),
+          context: { title: title },
+        });
+        return { success: false, shown: false, error: String(error?.message || error) };
       }
     },
+    consumeClickEvents: navigation.consumeClickEvents,
   };
 }
 export const __backgroundCompletionNotificationForTest = {
   isWindowFocused: isWindowFocused,
+  normalizeNavigation: normalizeNavigation,
+  normalizeThumbnailLocalPath: normalizeThumbnailLocalPath,
+  resolveNotificationIcon: resolveNotificationIcon,
   normalizeText: normalizeText,
 };
