@@ -1,6 +1,7 @@
 import { buildApiUrl } from './apiBase.js';
 import { get, post, del, requester } from './requester.js';
 import { normalizeLocalPath } from '../src/utils/localMediaPath.js';
+import { unwrapProjectReadResponse } from '../src/services/projectDocumentGuard.js';
 const WORKFLOWS_FALLBACK_USER_FILE = '/api/v2/user/workflows.json',
   ASSET_CATEGORIES_USER_FILE = '/api/v2/user/asset-categories.json',
   _saveOutputFromUrlInflight = new Map(),
@@ -45,8 +46,8 @@ function _upsertWorkflowItems(_0x36d3ec, _0x2760c9) {
 export async function fetchV2ProjectFromServer(_0xd9f3df) {
   const _0x45e96c = _normalizeProjectFilename(_0xd9f3df),
     _0x4ff162 = '/api/v2/projects/' + encodeURIComponent(_0x45e96c),
-    _0x5682bc = await get(_0x4ff162, { allow404Null: true, provider: 'local' });
-  return _0x5682bc;
+    _0x5682bc = await get(_0x4ff162, { allow404Null: true, provider: 'local', returnMeta: true });
+  return unwrapProjectReadResponse(_0x5682bc);
 }
 export async function saveV2ProjectToServer(_0x28bc8f) {
   const _0x349c86 = await post('/api/v2/projects/save', _0x28bc8f || {}, { provider: 'local' });

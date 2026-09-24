@@ -7,6 +7,23 @@ export async function fetchPromptPresetsFromServer() {
     return {};
   }
 }
+export async function fetchPromptPresetSettingsFromServer() {
+  try {
+    const settings = await get('/api/v2/user/presets/settings', { provider: 'local' });
+    return settings && typeof settings === 'object' ? settings : {};
+  } catch {
+    return {};
+  }
+}
+export async function savePromptPresetSettingsToServer({
+  defaultQuickCaptureNodeType: defaultQuickCaptureNodeType = '',
+} = {}) {
+  return await post(
+    '/api/v2/user/presets/settings',
+    { defaultQuickCaptureNodeType: defaultQuickCaptureNodeType },
+    { provider: 'local' },
+  );
+}
 export async function savePromptPresetToServer({
   nodeType: _0x8f146b,
   title: _0x2ad7ff,
