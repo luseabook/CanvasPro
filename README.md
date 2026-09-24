@@ -1,3 +1,5 @@
+> **给 AI 助手和开发者**：在本仓库做任何分析或修改之前，先读 [`AGENTS.md`](AGENTS.md)（强制规则）。入口文档是 [`docs/TRACKING.md`](docs/TRACKING.md)，所有文件改动都会自动记录到 [`docs/tracking/changes/`](docs/tracking/changes/)。
+
 <div align="center">
 
 <img src="images\favicon.svg" width="64" height="64" alt="AI Canvas Logo"/>
