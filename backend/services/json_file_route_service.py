@@ -19,6 +19,8 @@ class JsonFileRouteService:
         atomic_write_json,
         start_file_save_migration=None,
         get_file_save_migration_status=None,
+        list_legacy_file_save_candidates=None,
+        start_legacy_file_save_copy=None,
         output_dir_getter=None,
         uploads_dir_getter=None,
     ):
@@ -30,6 +32,8 @@ class JsonFileRouteService:
         self._write_user_settings = write_user_settings
         self._start_file_save_migration = start_file_save_migration
         self._get_file_save_migration_status = get_file_save_migration_status
+        self._list_legacy_file_save_candidates = list_legacy_file_save_candidates
+        self._start_legacy_file_save_copy = start_legacy_file_save_copy
         self._atomic_write_json = atomic_write_json
         self._get_output_dir = output_dir_getter
         self._get_uploads_dir = uploads_dir_getter
@@ -376,6 +380,29 @@ class JsonFileRouteService:
         except Exception as exc:
             return self._json_err(500, str(exc))
 
+    def _load_legacy_file_save_candidates(self):
+        if not self._list_legacy_file_save_candidates:
+            return self._json_err(404, "Legacy file copy is unavailable")
+        try:
+            return self._json_ok(self._list_legacy_file_save_candidates())
+        except Exception as exc:
+            return self._json_err(500, str(exc))
+
+    def _start_legacy_file_save_copy_job(self, body):
+        if not self._start_legacy_file_save_copy:
+            return self._json_err(404, "Legacy file copy is unavailable")
+        data, error = self._parse_json_object(body)
+        if error is not None:
+            return error
+        try:
+            return self._json_ok(self._start_legacy_file_save_copy(data))
+        except ValueError as exc:
+            return self._json_err(400, str(exc))
+        except RuntimeError as exc:
+            return self._json_err(409, str(exc))
+        except Exception as exc:
+            return self._json_err(500, str(exc))
+
     def _load_file_save_migration_status(self, handler):
         if not self._get_file_save_migration_status:
             return self._json_err(404, "File save migration is unavailable")
@@ -433,6 +460,9 @@ class JsonFileRouteService:
                 self._list_json_objects(self._get_workflows_dir(), id_from_filename=True)
             )
 
+        if path == "/api/v2/user/file-save-paths/legacy/candidates":
+            return self._load_legacy_file_save_candidates()
+
         if path == "/api/v2/user/file-save-paths/migration/status":
             return self._load_file_save_migration_status(handler)
 
@@ -450,6 +480,9 @@ class JsonFileRouteService:
 
         if path == "/api/v2/workflows/save":
             return self._save_workflow(body)
+
+        if path == "/api/v2/user/file-save-paths/legacy/start":
+            return self._start_legacy_file_save_copy_job(body)
 
         if path == "/api/v2/user/file-save-paths/migration/start":
             return self._start_file_save_migration_job(body)

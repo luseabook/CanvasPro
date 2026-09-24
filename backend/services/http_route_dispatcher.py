@@ -409,6 +409,7 @@ class HttpRouteDispatcher:
             "/api/v2/workflows/thumb/save",
             "/api/v2/user/presets/save",
             "/api/v2/user/presets/delete",
+            "/api/v2/user/presets/settings",
         )
         library_file_post_response = self._get_library_file_route_service().handle_post(
             handler,

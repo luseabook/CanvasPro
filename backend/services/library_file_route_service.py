@@ -9,6 +9,7 @@ class LibraryFileRouteService:
     _PRESET_THUMB_USER_PREFIX = "user/prompt/_thumbs/presets/"
     _PRESET_TRIGGER_MODE_DIRECT = "direct"
     _PRESET_TRIGGER_MODE_INSERT_PROMPT = "insertPrompt"
+    _PRESET_SETTINGS_FILENAME = "settings.json"
 
     def __init__(
         self,
@@ -96,6 +97,45 @@ class LibraryFileRouteService:
         if not safe_title:
             return ""
         return os.path.join(self._preset_dir(preset_type), f"{safe_title}.json")
+
+    def _preset_settings_path(self):
+        return os.path.join(self._get_user_dir(), "prompt", self._PRESET_SETTINGS_FILENAME)
+
+    @staticmethod
+    def _normalize_quick_capture_node_type(value):
+        node_type = str(value or "").strip()
+        if node_type not in LibraryFileRouteService._DEFAULT_PRESET_TYPES:
+            return ""
+        return node_type
+
+    def _read_preset_settings(self):
+        path = self._preset_settings_path()
+        if not os.path.exists(path):
+            return {"defaultQuickCaptureNodeType": ""}
+        try:
+            with open(path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+        except Exception as exc:
+            print(f"Error reading preset settings {path}: {exc}")
+            return {"defaultQuickCaptureNodeType": ""}
+        if not isinstance(data, dict):
+            return {"defaultQuickCaptureNodeType": ""}
+        return {
+            "defaultQuickCaptureNodeType": self._normalize_quick_capture_node_type(
+                data.get("defaultQuickCaptureNodeType")
+            )
+        }
+
+    def _save_preset_settings(self, data):
+        node_type = self._normalize_quick_capture_node_type(data.get("defaultQuickCaptureNodeType"))
+        path = self._preset_settings_path()
+        try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w", encoding="utf-8") as file:
+                json.dump({"defaultQuickCaptureNodeType": node_type}, file, ensure_ascii=False)
+        except Exception as exc:
+            return self._json_err(500, f"Failed to save preset settings: {exc}")
+        return self._json_ok({"defaultQuickCaptureNodeType": node_type})
 
     @staticmethod
     def _normalize_preset_thumb_local_path(value):
@@ -424,6 +464,8 @@ class LibraryFileRouteService:
     def handle_get(self, handler, path):
         if path == "/api/v2/user/presets":
             return self._json_ok(self._read_presets())
+        if path == "/api/v2/user/presets/settings":
+            return self._json_ok(self._read_preset_settings())
         return None
 
     def handle_post(self, handler, path, body):
@@ -438,6 +480,12 @@ class LibraryFileRouteService:
             if error is not None:
                 return error
             return self._delete_preset(data)
+
+        if path == "/api/v2/user/presets/settings":
+            data, error = self._parse_json_object(body)
+            if error is not None:
+                return error
+            return self._save_preset_settings(data)
 
         if path == "/api/v2/assets/thumb/save":
             data, error = self._parse_json_object(body)

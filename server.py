@@ -36,7 +36,6 @@ import hashlib
 import datetime
 import hmac
 import ipaddress
-import shutil
 import tempfile
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -47,7 +46,15 @@ from backend.services.hot_update_service import HotUpdateService
 from backend import shortdrama_routes as SHORTDRAMA_ROUTES
 from backend.services.http_route_dispatcher import HttpRouteDispatcher
 from backend.services.config_route_service import ConfigRouteService
+from backend.services.comfyui_route_service import ComfyUiRouteService
+from backend.services.story_document_route_service import StoryDocumentRouteService
 from backend.services.json_file_route_service import JsonFileRouteService
+from backend.services.file_save_migration import (
+    copy_tree, inspect_source, validate_copy_steps, verify_copies,
+)
+from backend.services.legacy_storage_import import (
+    inspect_legacy_roots, public_legacy_candidates, resolve_legacy_candidate,
+)
 from backend.services.library_file_route_service import LibraryFileRouteService
 from backend.services.media_file_route_service import MediaFileRouteService
 from backend.services.local_media_processing_route_service import LocalMediaProcessingRouteService
@@ -256,6 +263,7 @@ _smart_clip_jobs = {}
 _smart_clip_lock = threading.Lock()
 _file_save_migration_jobs = {}
 _file_save_migration_lock = threading.Lock()
+_file_save_settings_lock = threading.RLock()
 
 def _normalize_smart_clip_max_segments(value):
     try:
@@ -388,6 +396,21 @@ def _write_json_file(path, data):
         os.makedirs(parent, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def _write_user_settings_atomic(path, data):
+    parent = os.path.dirname(path)
+    os.makedirs(parent, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=".aic-settings-", suffix=".tmp", dir=parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as file:
+            json.dump(data, file, ensure_ascii=False, indent=2)
+            file.flush()
+            os.fsync(file.fileno())
+        os.replace(temporary, path)
+    finally:
+        if os.path.lexists(temporary):
+            os.unlink(temporary)
 
 
 def _normalize_storage_dir(raw, fallback):
@@ -529,7 +552,7 @@ def _persist_local_file_save_paths_if_needed(local_settings, paths):
         next_settings = dict(local_settings) if isinstance(local_settings, dict) else {}
         next_settings["fileSavePaths"] = _normalize_file_save_paths_for_policy(
             paths,
-            migrate_legacy_defaults=not _is_user_managed_file_save_paths(local_settings),
+            migrate_legacy_defaults=False,
         )
         _write_json_file(SETTINGS_FILE, next_settings)
     except Exception:
@@ -546,7 +569,7 @@ def _infer_data_dir_from_temp_dir(temp_dir):
     return normalized
 
 
-def _file_save_paths_from_settings(settings, migrate_legacy_defaults=True):
+def _file_save_paths_from_settings(settings, migrate_legacy_defaults=False):
     src = settings.get("fileSavePaths") if isinstance(settings, dict) else {}
     if not isinstance(src, dict):
         src = {}
@@ -573,7 +596,7 @@ def _file_save_paths_from_settings(settings, migrate_legacy_defaults=True):
     }
 
 
-def _normalize_file_save_paths_for_policy(paths, migrate_legacy_defaults=True):
+def _normalize_file_save_paths_for_policy(paths, migrate_legacy_defaults=False):
     normalized = _file_save_paths_from_settings(
         {"fileSavePaths": paths},
         migrate_legacy_defaults=migrate_legacy_defaults,
@@ -607,7 +630,7 @@ def _is_same_or_nested_path(a, b):
     return aa == bb or _is_path_inside(aa, bb) or _is_path_inside(bb, aa)
 
 
-def _validate_file_save_paths(paths, migrate_legacy_defaults=True):
+def _validate_file_save_paths(paths, migrate_legacy_defaults=False):
     normalized = _normalize_file_save_paths_for_policy(
         paths,
         migrate_legacy_defaults=migrate_legacy_defaults,
@@ -633,44 +656,6 @@ def _validate_file_save_paths(paths, migrate_legacy_defaults=True):
         if _is_same_or_nested_path(left, right):
             raise ValueError(f"{left_label}和{right_label}不能相同或互相包含")
     return normalized
-
-
-def _remove_empty_dirs(root_dir):
-    root_dir = os.path.abspath(root_dir)
-    if not os.path.isdir(root_dir):
-        return
-    for current_root, _, files in os.walk(root_dir, topdown=False):
-        if files:
-            continue
-        try:
-            if not os.listdir(current_root):
-                os.rmdir(current_root)
-        except Exception:
-            pass
-
-
-def _move_missing_tree(src, dst):
-    src = os.path.abspath(src)
-    dst = os.path.abspath(dst)
-    if not os.path.isdir(src):
-        return
-    os.makedirs(dst, exist_ok=True)
-    for root, dirs, files in os.walk(src):
-        rel_root = os.path.relpath(root, src)
-        target_root = dst if rel_root == "." else os.path.join(dst, rel_root)
-        os.makedirs(target_root, exist_ok=True)
-        for dirname in dirs:
-            os.makedirs(os.path.join(target_root, dirname), exist_ok=True)
-        for filename in files:
-            src_file = os.path.join(root, filename)
-            dst_file = os.path.join(target_root, filename)
-            if os.path.exists(dst_file):
-                continue
-            try:
-                shutil.move(src_file, dst_file)
-            except Exception:
-                pass
-    _remove_empty_dirs(src)
 
 
 def _is_using_default_file_save_paths(paths):
@@ -710,34 +695,6 @@ def _legacy_default_file_save_path_sets():
     return legacy_sets
 
 
-def _move_legacy_default_tree(src, dst):
-    if not src or not dst:
-        return False
-    if _same_storage_path(src, dst) or _is_same_or_nested_path(src, dst):
-        return False
-    if not os.path.isdir(src):
-        return False
-    _move_missing_tree(src, dst)
-    return True
-
-
-def _migrate_legacy_default_files_to_current(paths=None):
-    if not SYSTEM_FILE_SAVE_PATHS_ENABLED:
-        return False
-    current = paths if isinstance(paths, dict) else _current_file_save_paths()
-    if not _is_using_default_file_save_paths(current):
-        return False
-    moved = False
-    for legacy_paths in _legacy_default_file_save_path_sets():
-        moved = _move_legacy_default_tree(legacy_paths.get("canvasDir"), current.get("canvasDir")) or moved
-        moved = _move_legacy_default_tree(legacy_paths.get("outputDir"), current.get("outputDir")) or moved
-        moved_data = _move_legacy_default_tree(legacy_paths.get("dataDir"), current.get("dataDir"))
-        moved = moved_data or moved
-        if not moved_data:
-            moved = _move_legacy_default_tree(legacy_paths.get("tempDir"), current.get("tempDir")) or moved
-    return moved
-
-
 def _new_file_save_migration_job_id():
     ts = int(time.time() * 1000)
     return f"file-save-migration-{ts}-{random.randint(1000, 9999)}"
@@ -768,204 +725,136 @@ def _file_save_migration_public_job(job):
     return public
 
 
-def _count_file_save_migration_files(src):
-    src = os.path.abspath(src)
-    if not os.path.isdir(src):
-        return 0
-    total = 0
-    for _, _, files in os.walk(src):
-        total += len(files)
-    return total
-
-
 def _build_file_save_migration_steps(previous, normalized):
+    # The data tree includes uploads, assets, workflows and unknown user files.
+    # Separately copying only its known subdirectories could silently lose data.
+    if not _is_path_inside(previous["tempDir"], previous["dataDir"]):
+        raise ValueError("旧上传目录不在数据目录内；请先人工核对旧目录")
+    if not _is_path_inside(normalized["tempDir"], normalized["dataDir"]):
+        raise ValueError("新上传目录不在数据目录内")
     return [
         {
-            "key": "canvasDir",
-            "label": "画布项目保存路径",
-            "src": os.path.abspath(previous["canvasDir"]),
-            "dst": os.path.abspath(normalized["canvasDir"]),
-        },
-        {
-            "key": "outputDir",
-            "label": "输出文件保存路径",
-            "src": os.path.abspath(previous["outputDir"]),
-            "dst": os.path.abspath(normalized["outputDir"]),
-        },
-        {
-            "key": "tempDir",
-            "label": "上传文件保存路径",
-            "src": os.path.abspath(previous["tempDir"]),
-            "dst": os.path.abspath(normalized["tempDir"]),
-        },
-        {
-            "key": "assetsDir",
-            "label": "资产库保存路径",
-            "src": os.path.abspath(os.path.join(previous["dataDir"], "assets")),
-            "dst": os.path.abspath(os.path.join(normalized["dataDir"], "assets")),
-        },
-        {
-            "key": "workflowsDir",
-            "label": "工作流保存路径",
-            "src": os.path.abspath(os.path.join(previous["dataDir"], "workflows")),
-            "dst": os.path.abspath(os.path.join(normalized["dataDir"], "workflows")),
-        },
+            "key": key,
+            "label": label,
+            "src": os.path.abspath(previous[key]),
+            "dst": os.path.abspath(normalized[key]),
+        }
+        for key, label in (
+            ("canvasDir", "画布项目保存路径"),
+            ("outputDir", "输出文件保存路径"),
+            ("dataDir", "数据文件保存路径"),
+        )
     ]
 
 
-def _move_missing_tree_with_file_save_progress(job_id, step):
-    src = os.path.abspath(step["src"])
-    dst = os.path.abspath(step["dst"])
-    label = str(step.get("label") or "")
-    if _same_storage_path(src, dst) or not os.path.isdir(src):
-        return
+def _copy_file_save_tree_with_progress(job_id, step):
+    def report(relative, outcome, byte_count, error):
+        with _file_save_migration_lock:
+            job = _file_save_migration_jobs.get(job_id)
+            if not job:
+                raise RuntimeError("迁移任务丢失，保存路径未切换")
+            job["stage"] = "正在复制文件（保留旧目录）"
+            job["currentBucket"] = step["key"]
+            job["currentFile"] = relative.replace("\\", "/")
+            if outcome == "failed":
+                job["failedCount"] = int(job.get("failedCount") or 0) + 1
+                errors = job.setdefault("errors", [])
+                if len(errors) < 20:
+                    errors.append({"bucket": step["key"], "path": job["currentFile"], "error": str(error)})
+            else:
+                count_key = "copiedCount" if outcome == "copied" else "skippedCount"
+                job[count_key] = int(job.get(count_key) or 0) + 1
+                job["copiedBytes"] = int(job.get("copiedBytes") or 0) + byte_count
+                job["processedFiles"] = int(job.get("processedFiles") or 0) + 1
+                total = max(1, int(job.get("totalFiles") or 0))
+                job["progress"] = min(94, 6 + int((job["processedFiles"] / total) * 88))
+            job["updatedAt"] = time.time()
 
-    os.makedirs(dst, exist_ok=True)
-    for root, dirs, files in os.walk(src):
-        rel_root = os.path.relpath(root, src)
-        target_root = dst if rel_root == "." else os.path.join(dst, rel_root)
-        os.makedirs(target_root, exist_ok=True)
-        for dirname in dirs:
-            os.makedirs(os.path.join(target_root, dirname), exist_ok=True)
-        for filename in files:
-            src_file = os.path.join(root, filename)
-            dst_file = os.path.join(target_root, filename)
-            rel_file = filename if rel_root == "." else os.path.join(rel_root, filename)
-            current_file = rel_file.replace("\\", "/")
-            with _file_save_migration_lock:
-                job = _file_save_migration_jobs.get(job_id)
-                if not job:
-                    return
-                job["stage"] = f"正在迁移{label}"
-                job["currentBucket"] = step.get("key") or ""
-                job["currentFile"] = current_file
-                job["updatedAt"] = time.time()
-
-            if os.path.exists(dst_file):
-                with _file_save_migration_lock:
-                    job = _file_save_migration_jobs.get(job_id)
-                    if not job:
-                        return
-                    job["skippedCount"] = int(job.get("skippedCount") or 0) + 1
-                    job["processedFiles"] = int(job.get("processedFiles") or 0) + 1
-                    total_files = max(1, int(job.get("totalFiles") or 0))
-                    job["progress"] = min(94, 6 + int((job["processedFiles"] / total_files) * 88))
-                    job["updatedAt"] = time.time()
-                continue
-
-            try:
-                shutil.move(src_file, dst_file)
-                with _file_save_migration_lock:
-                    job = _file_save_migration_jobs.get(job_id)
-                    if not job:
-                        return
-                    job["copiedCount"] = int(job.get("copiedCount") or 0) + 1
-                    job["copiedBytes"] = int(job.get("copiedBytes") or 0) + int(os.path.getsize(dst_file) or 0)
-            except Exception as exc:
-                with _file_save_migration_lock:
-                    job = _file_save_migration_jobs.get(job_id)
-                    if not job:
-                        return
-                    job["failedCount"] = int(job.get("failedCount") or 0) + 1
-                    errors = job.get("errors")
-                    if not isinstance(errors, list):
-                        errors = []
-                        job["errors"] = errors
-                    if len(errors) < 20:
-                        errors.append(
-                            {
-                                "bucket": step.get("key") or "",
-                                "path": current_file,
-                                "error": str(exc),
-                            }
-                        )
-            finally:
-                with _file_save_migration_lock:
-                    job = _file_save_migration_jobs.get(job_id)
-                    if not job:
-                        return
-                    job["processedFiles"] = int(job.get("processedFiles") or 0) + 1
-                    total_files = max(1, int(job.get("totalFiles") or 0))
-                    job["progress"] = min(94, 6 + int((job["processedFiles"] / total_files) * 88))
-                    job["updatedAt"] = time.time()
-    _remove_empty_dirs(src)
+    copy_tree(step["src"], step["dst"], on_file=report)
 
 
-def _run_file_save_migration_job(job_id, settings_payload, normalized, previous):
+def _run_file_save_migration_job(
+    job_id, settings_payload, normalized, previous,
+    *, steps_override=None, expected_snapshots=None, apply_settings=True,
+):
     try:
-        steps = _build_file_save_migration_steps(previous, normalized)
+        planned_steps = steps_override if steps_override is not None else _build_file_save_migration_steps(previous, normalized)
+        steps = validate_copy_steps(planned_steps)
         _update_file_save_migration_job(
-            job_id,
-            status="planning",
-            stage="正在检查旧目录",
-            progress=2,
+            job_id, status="planning", stage="正在检查旧目录", progress=2,
         )
-        for p in normalized.values():
-            os.makedirs(p, exist_ok=True)
-
         total_files = 0
+        snapshots = []
         step_summaries = []
         for step in steps:
-            count = 0
-            if not _same_storage_path(step["src"], step["dst"]):
-                count = _count_file_save_migration_files(step["src"])
+            snapshot = inspect_source(step["src"])
+            snapshots.append(snapshot)
+            count = snapshot[0]
             total_files += count
-            step_summaries.append(
-                {
-                    "key": step["key"],
-                    "label": step["label"],
-                    "source": step["src"],
-                    "target": step["dst"],
-                    "fileCount": count,
-                }
-            )
-
+            step_summaries.append({
+                "key": step["key"], "label": step["label"],
+                "source": step["src"], "target": step["dst"], "fileCount": count,
+            })
+        if expected_snapshots is not None and snapshots != expected_snapshots:
+            raise RuntimeError("旧版目录在确认后发生变化；请重新扫描并确认")
         _update_file_save_migration_job(
-            job_id,
-            status="moving",
-            stage="正在迁移文件",
-            progress=6 if total_files else 88,
-            totalFiles=total_files,
+            job_id, status="copying", stage="正在复制文件（保留旧目录）",
+            progress=6 if total_files else 88, totalFiles=total_files,
             steps=step_summaries,
         )
-
         for step in steps:
-            _move_missing_tree_with_file_save_progress(job_id, step)
+            _copy_file_save_tree_with_progress(job_id, step)
 
+        verify_copies(steps, snapshots)
+        if any(not _same_storage_path(_current_file_save_paths()[key], previous[key])
+               for key in ("canvasDir", "outputDir", "dataDir", "tempDir")):
+            raise RuntimeError("迁移期间原保存位置发生变化，未切换目录")
+        if not apply_settings:
+            _update_file_save_migration_job(
+                job_id, status="done", stage="旧版文件复制完成（旧目录仍保留）", progress=100,
+                settings=_read_user_settings(), targetPaths=_current_file_save_paths(),
+                currentFile="", currentBucket="", completedAt=time.time(),
+            )
+            return
         _update_file_save_migration_job(
-            job_id,
-            status="applying",
-            stage="正在应用新的保存位置",
-            progress=96,
-            currentFile="",
-            currentBucket="",
+            job_id, status="applying", stage="正在应用新的保存位置",
+            progress=96, currentFile="", currentBucket="",
         )
-        payload = dict(settings_payload) if isinstance(settings_payload, dict) else {}
-        payload["fileSavePaths"] = normalized
-        _write_user_settings(payload, migrate=False)
-        applied_paths = _current_file_save_paths()
+        # Merge only the confirmed path metadata into the newest server settings;
+        # unrelated preferences may have changed while copying many files.
+        with _file_save_settings_lock:
+            payload = _read_user_settings()
+            meta = settings_payload.get("fileSavePathsMeta") if isinstance(settings_payload, dict) else None
+            if isinstance(meta, dict):
+                payload["fileSavePathsMeta"] = meta
+            payload["fileSavePaths"] = normalized
+            _write_user_settings(payload, allow_migration_commit=True)
         _update_file_save_migration_job(
-            job_id,
-            status="done",
-            stage="迁移完成",
-            progress=100,
-            settings=_read_user_settings(),
-            targetPaths=applied_paths,
+            job_id, status="done", stage="迁移完成", progress=100,
+            settings=_read_user_settings(), targetPaths=_current_file_save_paths(),
             completedAt=time.time(),
         )
     except Exception as exc:
         _update_file_save_migration_job(
-            job_id,
-            status="error",
-            stage="迁移失败",
-            error=str(exc),
-            progress=100,
-            completedAt=time.time(),
+            job_id, status="error", stage="迁移失败；旧目录仍保留，请核对当前保存路径",
+            error=str(exc), completedAt=time.time(),
         )
+
+
+def _register_file_save_migration_job(job):
+    with _file_save_migration_lock:
+        if job["jobId"] in _file_save_migration_jobs:
+            raise RuntimeError("迁移任务编号冲突，请重试")
+        for active_job in _file_save_migration_jobs.values():
+            if str(active_job.get("status") or "") in ("pending", "planning", "moving", "copying", "applying"):
+                raise RuntimeError("文件迁移正在进行中，请等待当前迁移完成")
+        _file_save_migration_jobs[job["jobId"]] = job
 
 
 def _start_file_save_migration(data):
     payload = dict(data) if isinstance(data, dict) else {}
+    if payload.get("confirmed") is not True:
+        raise ValueError("必须明确确认复制旧目录并切换保存路径")
     settings_payload = payload.get("settings")
     if not isinstance(settings_payload, dict):
         settings_payload = dict(payload)
@@ -999,11 +888,7 @@ def _start_file_save_migration(data):
         "startedAt": time.time(),
         "updatedAt": time.time(),
     }
-    with _file_save_migration_lock:
-        for active_job in _file_save_migration_jobs.values():
-            if str(active_job.get("status") or "") in ("pending", "planning", "moving", "copying", "applying"):
-                raise RuntimeError("文件迁移正在进行中，请等待当前迁移完成")
-        _file_save_migration_jobs[job_id] = job
+    _register_file_save_migration_job(job)
 
     thread = threading.Thread(
         target=_run_file_save_migration_job,
@@ -1011,7 +896,60 @@ def _start_file_save_migration(data):
         daemon=True,
         name=f"FileSaveMigration-{job_id}",
     )
-    thread.start()
+    try:
+        thread.start()
+    except Exception:
+        with _file_save_migration_lock:
+            _file_save_migration_jobs.pop(job_id, None)
+        raise
+    return _file_save_migration_public_job(job)
+
+
+def _inspect_legacy_file_save_candidates():
+    if not SYSTEM_FILE_SAVE_PATHS_ENABLED:
+        return []
+    return inspect_legacy_roots(_legacy_default_file_save_path_sets(), _current_file_save_paths())
+
+
+def _list_legacy_file_save_candidates():
+    return {"success": True, "candidates": public_legacy_candidates(_inspect_legacy_file_save_candidates())}
+
+
+def _start_legacy_file_save_copy(data):
+    payload = dict(data) if isinstance(data, dict) else {}
+    if payload.get("confirmed") is not True:
+        raise ValueError("必须明确确认复制旧版目录")
+    candidate = resolve_legacy_candidate(
+        _inspect_legacy_file_save_candidates(),
+        str(payload.get("candidateId") or ""),
+        str(payload.get("fingerprint") or ""),
+    )
+    current = _current_file_save_paths()
+    job_id = _new_file_save_migration_job_id()
+    job = {
+        "success": True, "jobId": job_id, "status": "pending", "mode": "legacy",
+        "stage": "准备复制旧版目录", "progress": 0,
+        "previousPaths": current, "targetPaths": current,
+        "legacySourcePaths": candidate["sourcePaths"], "candidateId": candidate["id"],
+        "totalFiles": 0, "processedFiles": 0, "copiedCount": 0,
+        "skippedCount": 0, "failedCount": 0, "copiedBytes": 0,
+        "currentBucket": "", "currentFile": "", "errors": [],
+        "startedAt": time.time(), "updatedAt": time.time(),
+    }
+    _register_file_save_migration_job(job)
+    thread = threading.Thread(
+        target=_run_file_save_migration_job,
+        args=(job_id, {}, current, current),
+        kwargs={"steps_override": candidate["steps"],
+                "expected_snapshots": candidate["snapshots"], "apply_settings": False},
+        daemon=True, name=f"LegacyFileCopy-{job_id}",
+    )
+    try:
+        thread.start()
+    except Exception:
+        with _file_save_migration_lock:
+            _file_save_migration_jobs.pop(job_id, None)
+        raise
     return _file_save_migration_public_job(job)
 
 
@@ -1070,17 +1008,14 @@ def _ensure_storage_dirs():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-def _apply_file_save_paths(paths, migrate=False, migrate_legacy_defaults=True):
+def _apply_file_save_paths(paths, migrate=False, migrate_legacy_defaults=False):
+    if migrate:
+        raise ValueError("不能直接移动用户文件；请使用已确认的迁移任务")
     normalized = _validate_file_save_paths(
-        paths,
-        migrate_legacy_defaults=migrate_legacy_defaults,
+        paths, migrate_legacy_defaults=migrate_legacy_defaults,
     )
-    previous = _current_file_save_paths()
     for p in normalized.values():
         os.makedirs(p, exist_ok=True)
-    if migrate:
-        for step in _build_file_save_migration_steps(previous, normalized):
-            _move_missing_tree(step["src"], step["dst"])
     _refresh_storage_globals(normalized)
     _ensure_storage_dirs()
     return _current_file_save_paths()
@@ -1141,12 +1076,11 @@ try:
     _startup_applied_file_save_paths = _apply_file_save_paths(
         _normalize_file_save_paths_for_policy(
             _startup_settings.get("fileSavePaths"),
-            migrate_legacy_defaults=not _is_user_managed_file_save_paths(_startup_settings),
+            migrate_legacy_defaults=False,
         ),
         migrate=False,
         migrate_legacy_defaults=False,
     )
-    _migrate_legacy_default_files_to_current(_startup_applied_file_save_paths)
     _persist_local_file_save_paths_if_needed(
         _startup_local_settings,
         _startup_applied_file_save_paths,
@@ -1213,7 +1147,7 @@ def _read_user_settings():
     if local_file_save_paths:
         merged["fileSavePaths"] = _normalize_file_save_paths_for_policy(
             local_file_save_paths,
-            migrate_legacy_defaults=not _is_user_managed_file_save_paths(local_settings),
+            migrate_legacy_defaults=False,
         )
     elif system_file_save_paths:
         normalized_paths = _normalize_file_save_paths_for_policy(system_file_save_paths)
@@ -1224,32 +1158,64 @@ def _read_user_settings():
     return merged
 
 
-def _write_user_settings(data, migrate=True):
-    payload = dict(data) if isinstance(data, dict) else {}
-    if isinstance(payload.get("fileSavePaths"), dict):
-        applied_paths = _apply_file_save_paths(
-            payload["fileSavePaths"],
-            migrate=bool(migrate),
-            migrate_legacy_defaults=False,
-        )
-        payload["fileSavePaths"] = applied_paths
-        meta = payload.get("fileSavePathsMeta") if isinstance(payload.get("fileSavePathsMeta"), dict) else {}
-        payload["fileSavePathsMeta"] = {
-            **meta,
-            "source": "user",
-            "updatedAt": meta.get("updatedAt") or time.time(),
-        }
-    elif "fileSavePaths" not in payload:
-        payload["fileSavePaths"] = _current_file_save_paths()
-    _write_json_file(SETTINGS_FILE, payload)
+def _write_user_settings(data, allow_migration_commit=False):
+    with _file_save_settings_lock:
+        payload = dict(data) if isinstance(data, dict) else {}
+        applied_paths = None
+        previous = _current_file_save_paths()
+        changed = False
+        if isinstance(payload.get("fileSavePaths"), dict):
+            normalized = _validate_file_save_paths(
+                payload["fileSavePaths"], migrate_legacy_defaults=False,
+            )
+            changed = any(not _same_storage_path(normalized[key], previous[key])
+                          for key in ("canvasDir", "outputDir", "dataDir", "tempDir"))
+            if changed and not allow_migration_commit:
+                raise ValueError("保存目录变更必须先通过确认迁移；原设置与旧文件未改动")
+            for path_value in normalized.values():
+                os.makedirs(path_value, exist_ok=True)
+            applied_paths = normalized
+            payload["fileSavePaths"] = normalized
+            meta = payload.get("fileSavePathsMeta") if isinstance(payload.get("fileSavePathsMeta"), dict) else {}
+            payload["fileSavePathsMeta"] = {
+                **meta, "source": "user", "updatedAt": meta.get("updatedAt") or time.time(),
+            }
+        elif "fileSavePaths" not in payload:
+            payload["fileSavePaths"] = previous
 
-    install_id = str(payload.get("installId") or "").strip()
-    system_settings = _read_json_file(SYSTEM_SETTINGS_FILE, {})
-    next_system_settings = dict(system_settings)
-    if install_id:
-        next_system_settings["installId"] = install_id
-    next_system_settings.pop("fileSavePaths", None)
-    _write_json_file(SYSTEM_SETTINGS_FILE, next_system_settings)
+        # Prepare live services and derived directories before the atomic file
+        # replacement. If preparation or persistence fails, restore old globals;
+        # the old settings file has not been overwritten on failure.
+        if changed:
+            try:
+                _refresh_storage_globals(applied_paths)
+                _ensure_storage_dirs()
+            except Exception:
+                _refresh_storage_globals(previous)
+                _ensure_storage_dirs()
+                raise
+        try:
+            _write_user_settings_atomic(SETTINGS_FILE, payload)
+        except Exception:
+            if changed:
+                try:
+                    _refresh_storage_globals(previous)
+                    _ensure_storage_dirs()
+                except Exception as rollback_exc:
+                    raise RuntimeError("设置写入失败且恢复原目录失败，请检查当前保存路径") from rollback_exc
+            raise
+
+        install_id = str(payload.get("installId") or "").strip()
+        system_settings = _read_json_file(SYSTEM_SETTINGS_FILE, {})
+        next_system_settings = dict(system_settings)
+        if install_id:
+            next_system_settings["installId"] = install_id
+        next_system_settings.pop("fileSavePaths", None)
+        try:
+            _write_user_settings_atomic(SYSTEM_SETTINGS_FILE, next_system_settings)
+        except Exception as exc:
+            # Local settings already committed; avoid falsely reporting a rollback.
+            print(f"[settings] auxiliary system settings were not saved: {exc}", file=sys.stderr)
 
 
 def _subscription_user_data_root():
@@ -1400,6 +1366,8 @@ JSON_FILE_ROUTE_SERVICE = JsonFileRouteService(
     write_user_settings=_write_user_settings,
     start_file_save_migration=_start_file_save_migration,
     get_file_save_migration_status=_get_file_save_migration_status,
+    list_legacy_file_save_candidates=_list_legacy_file_save_candidates,
+    start_legacy_file_save_copy=_start_legacy_file_save_copy,
     atomic_write_json=lambda path, data: _atomic_write_json(path, data),
     output_dir_getter=lambda: OUTPUT_DIR,
     uploads_dir_getter=lambda: UPLOADS_DIR,
@@ -1484,6 +1452,8 @@ _SENSITIVE_API_PREFIXES = (
     "/api/v2/assets",
     "/api/v2/chat",
     "/api/v2/config",
+    "/api/v2/comfyui",
+    "/api/v2/story-workspace",
     "/api/v2/dreamina",
     "/api/v2/grid_tiles",
     "/api/v2/images/derivatives",
@@ -1809,6 +1779,9 @@ def _smart_clip_update(job_id, **kwargs):
         for k, v in kwargs.items():
             job[k] = v
 
+
+COMFYUI_ROUTE_SERVICE = ComfyUiRouteService(read_body=_read_body)
+STORY_DOCUMENT_ROUTE_SERVICE = StoryDocumentRouteService()
 
 HTTP_ROUTE_DISPATCHER = HttpRouteDispatcher(
     local_version=LOCAL_VERSION,
@@ -2606,6 +2579,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not _enforce_local_api_access(self, path):
             return
 
+        comfy_response = COMFYUI_ROUTE_SERVICE.handle_get(self, path)
+        if comfy_response is not None:
+            _send_route_response(self, comfy_response)
+            return
+
         if HTTP_ROUTE_DISPATCHER.handle_get(self, path):
             return
 
@@ -2638,6 +2616,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         path = self.path.split("?")[0]
         if not _enforce_local_api_access(self, path):
+            return
+
+        comfy_response = COMFYUI_ROUTE_SERVICE.handle_post(self, path)
+        if comfy_response is not None:
+            _send_route_response(self, comfy_response)
+            return
+
+        document_response = STORY_DOCUMENT_ROUTE_SERVICE.handle_post(self, path)
+        if document_response is not None:
+            _send_route_response(self, document_response)
             return
 
         if HTTP_ROUTE_DISPATCHER.handle_post(self, path):
