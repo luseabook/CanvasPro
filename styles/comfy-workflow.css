@@ -1,0 +1,19 @@
+.cw-node { display: flex; flex-direction: column; overflow: hidden; position: relative; height: 100%; box-sizing: border-box; min-height: 0; padding: 10px; gap: 8px; border: 1px solid var(--border, #454550); border-radius: 10px; background: var(--bg-2, #202027); color: var(--text-primary, #eee); font: 12px/1.4 sans-serif; }
+.cw-node .cw-row { display: flex; flex-wrap: wrap; flex-shrink: 0; gap: 6px; align-items: center; }
+.cw-node input,.cw-node textarea,.cw-node select { border: 1px solid var(--border, #454550); background: var(--bg-dropdown, #303038); color: inherit; border-radius: 4px; padding: 5px; min-width: 0; box-sizing: border-box; font: inherit; }
+.cw-node .cw-row>select,.cw-node .cw-row>input { flex: 1 1 170px; max-width: 100%; }
+.cw-node .cw-button { position: static; width: auto; height: auto; min-height: 27px; padding: 4px 8px; border: 1px solid var(--border, #555561); background: var(--bg-dropdown, #303038); color: inherit; border-radius: 5px; cursor: pointer; font: inherit; white-space: nowrap; }
+.cw-node .cw-button:disabled,.cw-node input:disabled,.cw-node textarea:disabled,.cw-node select:disabled { opacity: .5; cursor: default; }
+.cw-node .cw-button:hover:not(:disabled) { border-color: #818cf8; }
+.cw-note { opacity: .7; font-size: 11px; flex-shrink: 0; }
+.cw-inputs { flex: 1 1 0; min-height: 90px; overflow-y: auto; overscroll-behavior: contain; padding: 4px; border: 1px solid var(--border, #454550); border-radius: 5px; }
+.cw-field { display: grid; grid-template-columns: minmax(90px, 35%) minmax(100px, 1fr); gap: 6px; margin-bottom: 8px; align-items: start; }
+.cw-field-label { overflow-wrap: anywhere; opacity: .8; }
+.cw-field>textarea { resize: vertical; min-height: 28px; max-height: 180px; width: 100%; }
+.cw-field>input { width: 100%; }
+.cw-field>input[type=checkbox] { width: 16px; }
+.cw-field>button { grid-column: 2; justify-self: start; }
+.cw-status { flex-shrink: 0; min-height: 18px; max-height: 70px; overflow-y: auto; overflow-wrap: anywhere; }
+.cw-results { flex: 0 0 auto; max-height: 95px; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11px; opacity: .8; }
+.cw-workflow-title { overflow-wrap: anywhere; }
+.cw-resizer { position: absolute; bottom: 1px; right: 1px; width: 14px; height: 14px; border-right: 3px solid #818cf8; border-bottom: 3px solid #818cf8; cursor: nwse-resize; touch-action: none; }
