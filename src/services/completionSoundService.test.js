@@ -89,4 +89,51 @@ const originalWindow = globalThis.window,
     (assert.equal(_0xb1ea9a.ok, false),
       assert.equal(_0xb1ea9a.error.message, 'blocked'),
       assert.deepEqual(_0x2a8ae2, [['提示音播放失败，请检查文件', 'warn']]));
+  }),
+  test('completionSoundService: native playback rescues a blocked browser play', async () => {
+    const _0x4c1f0b = [];
+    ((console.warn = () => {}),
+      (globalThis.window = {
+        electronAPI: {
+          notificationSound: {
+            play: async (_0x5f9a3c) => {
+              return (_0x4c1f0b.push(_0x5f9a3c), { success: true, played: true });
+            },
+          },
+        },
+      }),
+      __completionSoundServiceForTest.setAudioFactory(() => ({
+        set volume(_0x3d0f9a) {},
+        play: async () => {
+          throw new Error('autoplay-blocked');
+        },
+      })));
+    const _0x1b6c52 = await previewCompletionSound({
+      enabled: true,
+      volume: 0.8,
+      selectedFilePath: 'D:/sounds/custom.mp3',
+    });
+    (assert.equal(_0x1b6c52.ok, true),
+      assert.equal(_0x1b6c52.native, true),
+      assert.deepEqual(_0x4c1f0b, [
+        { filePath: 'D:/sounds/custom.mp3', volume: 0.8, reason: 'generation-success' },
+      ]));
+  }),
+  test('completionSoundService: native playback failure keeps the original error', async () => {
+    const _0x2951e8 = [];
+    ((console.warn = () => {}),
+      (globalThis.window = {
+        electronAPI: { notificationSound: { play: async () => ({ success: false, reason: 'player-exit' }) } },
+        showToast: (_0x2f6f80, _0x591d31) => _0x2951e8.push([_0x2f6f80, _0x591d31]),
+      }),
+      __completionSoundServiceForTest.setAudioFactory(() => ({
+        set volume(_0x3f0d29) {},
+        play: async () => {
+          throw new Error('blocked');
+        },
+      })));
+    const _0x2e06fd = await previewCompletionSound({ enabled: true, selectedFilePath: 'D:/sounds/custom.mp3' });
+    (assert.equal(_0x2e06fd.ok, false),
+      assert.equal(_0x2e06fd.error.message, 'blocked'),
+      assert.deepEqual(_0x2951e8, [['提示音播放失败，请检查文件', 'warn']]));
   }));

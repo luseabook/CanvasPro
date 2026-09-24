@@ -1,17 +1,11 @@
 import { loadProject, resolveCanvasData, saveProject } from './projectService.js';
 import { sanitizeMultiCanvasDataForPersistence } from '../utils/thumbnailPersistence.js';
+import { requireOpenedProjectDocument } from './projectDocumentGuard.js';
+import { captureRecoverySnapshotBeforeSave, clearRecoverySnapshotAfterSave } from './recoverySnapshotSaveGuard.js';
 function getDesktopProjectApi() {
   const _0x257dc7 = globalThis.window?.electronAPI?.project;
   if (!_0x257dc7 || typeof _0x257dc7 !== 'object') return null;
   return _0x257dc7;
-}
-async function clearRecoverySnapshotAfterSave(_0x315ba7) {
-  if (!_0x315ba7 || typeof _0x315ba7.clearRecoverySnapshot !== 'function') return;
-  try {
-    await _0x315ba7.clearRecoverySnapshot();
-  } catch (_0x402f43) {
-    console.warn('[desktopProjectService] 清理恢复快照失败:', _0x402f43);
-  }
 }
 function isAutoDefaultRecentProject(_0x55a42a) {
   const _0x5f800 = String(_0x55a42a?.filename || '')
@@ -38,7 +32,7 @@ export function canUseDesktopProjectApi() {
 }
 export function normalizeDesktopProjectOpenResult(_0x4b1d99) {
   if (!_0x4b1d99 || _0x4b1d99.canceled) return _0x4b1d99 || { canceled: true };
-  return { ..._0x4b1d99, multiData: resolveCanvasData(_0x4b1d99.data || {}) };
+  return { ..._0x4b1d99, multiData: resolveCanvasData(requireOpenedProjectDocument(_0x4b1d99)) };
 }
 export async function openDesktopProject(_0x2d7c36 = {}) {
   const _0x2370f7 = getDesktopProjectApi();
@@ -51,6 +45,7 @@ export async function saveDesktopProject(_0x377ffa, _0x264b61, _0x3f258b = {}) {
   const _0x12fc53 = sanitizeMultiCanvasDataForPersistence(_0x264b61 || {}),
     _0x247655 = getDesktopProjectApi();
   if (_0x247655 && typeof _0x247655.save === 'function') {
+    const recoveryBeforeSave = await captureRecoverySnapshotBeforeSave(_0x247655);
     const _0x34b37f = await _0x247655.save({
       projectName: _0x377ffa,
       projectId: _0x3f258b.projectId || globalThis.window?.currentProjectId || '',
@@ -58,7 +53,8 @@ export async function saveDesktopProject(_0x377ffa, _0x264b61, _0x3f258b = {}) {
       mode: _0x3f258b.mode || 'save',
       multiData: _0x12fc53,
     });
-    return (_0x34b37f?.success && (await clearRecoverySnapshotAfterSave(_0x247655)), _0x34b37f);
+    if (_0x34b37f?.success) await clearRecoverySnapshotAfterSave(_0x247655, recoveryBeforeSave, _0x34b37f);
+    return _0x34b37f;
   }
   return await saveProject(_0x377ffa, _0x12fc53);
 }

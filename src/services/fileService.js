@@ -1,4 +1,7 @@
 import { generateThumbnail } from '../modules/imageUtils.js';
+import { WHITEBOARD_SIZE } from '../modules/whiteboard/whiteboardModel.js';
+import { COMFY_NODE_SIZE } from '../modules/comfyui/comfyWorkflowModel.js';
+import { STORY_WORKSPACE_SIZE } from '../modules/storyWorkspace/storyWorkspaceModel.js';
 import { ensureLocalImageDerivatives, uploadFile } from './projectService.js';
 import { buildImageNodeStorageFields } from './imageDerivativeService.js';
 import appStore from '../core/stores/appStore.js';
@@ -118,6 +121,9 @@ export function getNodeDefaultSize(_0x347af4) {
     'source-audio': { width: 0x140, height: 140 },
     'media-clip': { ...MEDIA_CLIP_COMPACT_SIZE },
     collage: { width: 0x240, height: 0x240 },
+    whiteboard: { ...WHITEBOARD_SIZE },
+    'comfyui-workflow': { ...COMFY_NODE_SIZE },
+    'story-workspace': { ...STORY_WORKSPACE_SIZE },
     'source-text': { width: 0x200, height: 0x120 },
     'comment-note': { width: 0x104, height: 120 },
     'storyboard-script': { width: 0x400, height: 0x240 },

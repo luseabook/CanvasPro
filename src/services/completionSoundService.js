@@ -64,6 +64,21 @@ async function resolvePlaybackUrl(_0x2d3ec3) {
   const _0x3eee9e = await _0x4ff496({ path: _0x195465, type: 'audio/mpeg' });
   return normalizeText(_0x3eee9e?.url || _0x3eee9e);
 }
+async function playNativeCompletionSound(_0x62a4c4) {
+  const _0x2f0d16 = globalThis.window?.electronAPI?.notificationSound?.play;
+  if (typeof _0x2f0d16 !== 'function') return { ok: false, skipped: 'unavailable' };
+  const _0x37d6a2 = normalizeCompletionSoundSettings(_0x62a4c4),
+    _0x1c44be = normalizeText(_0x37d6a2.selectedFilePath) || _0x37d6a2.builtInPath;
+  if (!_0x1c44be) return { ok: false, skipped: 'missing-file' };
+  const _0x1a4d6a = await _0x2f0d16({
+    filePath: _0x1c44be,
+    volume: _0x37d6a2.volume,
+    reason: 'generation-success',
+  });
+  if (_0x1a4d6a?.success === false)
+    return { ok: false, skipped: _0x1a4d6a.reason || 'native-failed', result: _0x1a4d6a };
+  return { ok: true, native: true, result: _0x1a4d6a };
+}
 async function playResolvedSound(_0x32ac12) {
   const _0x1ae0e2 = normalizeCompletionSoundSettings(_0x32ac12);
   if (_0x1ae0e2.enabled === false) return { ok: false, skipped: 'disabled' };
@@ -73,8 +88,16 @@ async function playResolvedSound(_0x32ac12) {
   const _0x32cfd4 = audioFactory(_0x399737);
   if (!_0x32cfd4) return { ok: false, skipped: 'missing-audio' };
   _0x32cfd4.volume = _0x1ae0e2.volume;
-  const _0x946aed = _0x32cfd4.play?.();
-  if (_0x946aed && typeof _0x946aed.then === 'function') await _0x946aed;
+  try {
+    const _0x946aed = _0x32cfd4.play?.();
+    if (_0x946aed && typeof _0x946aed.then === 'function') await _0x946aed;
+  } catch (_0x1e3b7d) {
+    try {
+      const _0x4f0f36 = await playNativeCompletionSound(_0x1ae0e2);
+      if (_0x4f0f36.ok) return _0x4f0f36;
+    } catch {}
+    throw _0x1e3b7d;
+  }
   return { ok: true, url: _0x399737 };
 }
 function reportPlaybackFailure(_0x7871cc) {

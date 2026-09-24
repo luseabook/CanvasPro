@@ -1,3 +1,5 @@
+import { mediaTaskOwnsGuardedWriteback } from '../modules/mediaTaskRecoveryModel.js';
+import { mayApplyMediaTaskUpdate, releaseMediaTaskCanvasScope } from '../modules/mediaTaskCanvasScope.js';
 import appStore from '../core/stores/appStore.js';
 import { buildCanvasLocalAudioFields, buildCanvasLocalVideoFields } from './canvasMediaLocalService.js';
 import { logDiagnosticEvent } from './diagnosticsService.js';
@@ -102,12 +104,18 @@ function schedulePendingUpdateFlush() {
   pendingUpdateTimer = setTimeout(flushPendingUpdates, _0x1647c9);
 }
 function handleMediaTaskUpdate(_0x594b42 = {}) {
+  // Story export has its own canvas/source guard; never mutate a same-ID node here.
+  if (mediaTaskOwnsGuardedWriteback(_0x594b42)) {
+    if (TERMINAL_STATUSES.has(normalizeStatus(_0x594b42.status))) releaseMediaTaskCanvasScope(_0x594b42.taskId);
+    return;
+  }
   const _0x40cb6b = normalizeStatus(_0x594b42.status),
     _0x324897 = getUpdateKey(_0x594b42);
   if (TERMINAL_STATUSES.has(_0x40cb6b)) {
     const _0x3ce307 = pendingUpdates.get(_0x324897);
     if (_0x3ce307) pendingUpdates.delete(_0x324897);
-    applyMediaTaskUpdate({ ...(_0x3ce307 || {}), ..._0x594b42 });
+    try { applyMediaTaskUpdate({ ...(_0x3ce307 || {}), ..._0x594b42 }); }
+    finally { releaseMediaTaskCanvasScope(_0x594b42.taskId); }
     return;
   }
   if (COALESCED_STATUSES.has(_0x40cb6b)) {
@@ -129,6 +137,8 @@ function getMatchingNodeIds(_0x14c00b = {}) {
     .filter(Boolean);
 }
 function applyMediaTaskUpdate(_0x394a51 = {}) {
+  // Also recheck after coalescing: a canvas may switch during the 250 ms delay.
+  if (!mayApplyMediaTaskUpdate(_0x394a51.taskId, appStore, globalThis.window)) return;
   const _0x2e7fe6 = getMatchingNodeIds(_0x394a51);
   if (!_0x2e7fe6.length) return;
   const _0x5c6917 = {

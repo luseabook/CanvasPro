@@ -146,6 +146,13 @@ function buildShortcutContext(_0xf0e9d8, { audioClipModeActive: audioClipModeAct
 }
 function handleKeyDown(_0x3ccf81) {
   if (isCommentNoteShortcutRecording()) return;
+  // A modal story editor owns all keys, including Save and Space.
+  if (_0x3ccf81.target?.closest?.('.sw-studio, .node-media-export-dialog, .timeline-export-dialog')) return;
+  // Capture-phase canvas shortcuts must not delete an embedded editor while typing.
+  // Let editors handle their own keys, while keeping Save and canvas-pan shortcuts.
+  const whiteboardTarget = _0x3ccf81.target?.closest?.('.wb-node, .cw-node, .sw-node');
+  const whiteboardSave = (_0x3ccf81.ctrlKey || _0x3ccf81.metaKey) && String(_0x3ccf81.key).toLowerCase() === 's';
+  if (whiteboardTarget && !whiteboardSave && _0x3ccf81.key !== ' ') return;
   const _0x3b6a5a = appStore.getStateRaw();
   if (_0x3ccf81.code === 'Escape' && isEscFeatureModeActive(_0x3b6a5a)) {
     (_0x3ccf81.preventDefault(), _0x3ccf81.stopImmediatePropagation(), dispatchShortcutAction('escape-all'));

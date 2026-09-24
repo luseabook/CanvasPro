@@ -10,6 +10,7 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import { t } from '../i18n/index.js';
+import { requireProjectDocument } from './projectDocumentGuard.js';
 export const PROJECT_RECENTS_VERSION = 1;
 export const PROJECT_RECENTS_LIMIT = 20;
 export const RECOVERY_SNAPSHOT_VERSION = 1;
@@ -89,8 +90,7 @@ export function findFirstSupportedProjectPathFromArgs(_0x1b813f, { mustExist: mu
 export function readProjectJson(_0x39ad2c) {
   const _0x235c75 = assertJsonProjectPath(_0x39ad2c, { mustExist: true }),
     _0x1aaf17 = JSON.parse(stripUtf8Bom(readFileSync(_0x235c75, 'utf8')));
-  if (!isPlainObject(_0x1aaf17)) throw new Error('Project JSON must be an object');
-  return _0x1aaf17;
+  return requireProjectDocument(_0x1aaf17);
 }
 export function buildProjectFilePayload(_0x44912e) {
   if (!isPlainObject(_0x44912e)) throw new Error('Project data must be an object');
@@ -118,7 +118,10 @@ export function writeProjectJson(_0x103bb7, _0x2d137b) {
 }
 export function buildRecoverySnapshotPayload(_0x229470 = {}, { now: now = Date.now() } = {}) {
   const _0x1e4e0b = isPlainObject(_0x229470?.data) ? _0x229470.data : _0x229470?.multiData,
-    _0x35e586 = buildProjectFilePayload(_0x1e4e0b || {}),
+    verifiedData = requireProjectDocument(_0x1e4e0b || {});
+  if (Array.isArray(verifiedData.canvases) && verifiedData.canvases.length === 0)
+    throw new Error('Recovery snapshot must include a canvas');
+  const _0x35e586 = buildProjectFilePayload(verifiedData),
     _0x3f226e = normalizeTimestamp(_0x229470?.savedAt, normalizeTimestamp(now, Date.now())),
     _0x478366 = String(_0x229470?.filename || '').trim();
   return {
@@ -144,6 +147,14 @@ export function writeRecoverySnapshot(_0x15deb4, _0x23747d, _0x1d7a36 = {}) {
   if (!_0x152f21) throw new Error('Recovery path is required');
   const _0x381f99 = path.resolve(_0x152f21),
     _0x515d28 = buildRecoverySnapshotPayload(_0x23747d, _0x1d7a36);
+  const existing = getRecoverySnapshotInfo(_0x381f99);
+  if (existing.exists && (existing.invalid || existing.projectId !== _0x515d28.projectId ||
+      existing.filename !== _0x515d28.filename || existing.recentId !== _0x515d28.recentId ||
+      existing.displayPath !== _0x515d28.displayPath)) {
+    throw Object.assign(new Error('已有其他工程或无效恢复快照；原文件已保留，请先备份核对'), {
+      code: 'RECOVERY_SNAPSHOT_PROTECTED',
+    });
+  }
   mkdirSync(path.dirname(_0x381f99), { recursive: true });
   const _0x46c67a = _0x381f99 + '.tmp-' + process.pid + '-' + Date.now();
   return (
@@ -157,16 +168,21 @@ export function readRecoverySnapshot(_0x26addd) {
     const _0x21d2c7 = String(_0x26addd || '').trim();
     if (!_0x21d2c7) return null;
     const _0x4a7e91 = path.resolve(_0x21d2c7),
-      _0x20d427 = JSON.parse(stripUtf8Bom(readFileSync(_0x4a7e91, 'utf8')));
+      raw = readFileSync(_0x4a7e91, 'utf8'),
+      _0x20d427 = JSON.parse(stripUtf8Bom(raw));
     if (!isPlainObject(_0x20d427)) return null;
     if (Number(_0x20d427.version) !== RECOVERY_SNAPSHOT_VERSION) return null;
     if (!isPlainObject(_0x20d427.data)) return null;
+    if (typeof _0x20d427.projectId !== 'string' || !_0x20d427.projectId.trim()) return null;
+    const verifiedData = requireProjectDocument(_0x20d427.data);
+    if (Array.isArray(verifiedData.canvases) && verifiedData.canvases.length === 0) return null;
     const _0x973593 = normalizeTimestamp(_0x20d427.savedAt, 0);
     if (!_0x973593) return null;
     return {
       ..._0x20d427,
       savedAt: _0x973593,
-      projectId: String(_0x20d427.projectId || '').trim() || 'default_v2_project',
+      revision: createHash('sha256').update(raw, 'utf8').digest('hex'),
+      projectId: _0x20d427.projectId.trim(),
       projectName: sanitizeProjectName(
         _0x20d427.projectName || _0x20d427.projectId || t('coreServices.projectFile.unnamedCanvas'),
       ),
@@ -188,18 +204,36 @@ export function removeRecoverySnapshot(_0x1dc46a) {
     if (_0x405646?.code !== 'ENOENT') throw _0x405646;
   }
 }
+export function clearRecoverySnapshotIfMatches(filename, expected = {}) {
+  const projectId = String(expected?.projectId || '').trim(),
+    revision = String(expected?.revision || '').trim();
+  if (!projectId || !/^[a-f0-9]{64}$/.test(revision))
+    return { success: false, cleared: false, reason: 'guard-required' };
+  const snapshot = readRecoverySnapshot(filename);
+  if (!snapshot) return { success: false, cleared: false,
+    reason: filename && existsSync(filename) ? 'invalid' : 'missing' };
+  if (snapshot.projectId !== projectId || snapshot.revision !== revision)
+    return { success: false, cleared: false, reason: 'changed' };
+  removeRecoverySnapshot(filename);
+  return { success: true, cleared: true };
+}
 export function getRecoverySnapshotInfo(_0x9b8d5e, { currentLastModified: currentLastModified = 0 } = {}) {
   const _0x384e0a = readRecoverySnapshot(_0x9b8d5e);
-  if (!_0x384e0a)
+  if (!_0x384e0a) {
+    const filename = String(_0x9b8d5e || '').trim();
+    const invalid = !!filename && existsSync(filename);
     return {
-      exists: false,
+      exists: invalid,
+      invalid,
       isNewerThanProject: false,
       savedAt: 0,
       currentLastModified: normalizeTimestamp(currentLastModified, 0),
     };
+  }
   const _0x1e6b2c = normalizeTimestamp(currentLastModified, _0x384e0a.lastKnownProjectLastModified);
   return {
     exists: true,
+    revision: _0x384e0a.revision,
     isNewerThanProject: _0x384e0a.savedAt > _0x1e6b2c,
     savedAt: _0x384e0a.savedAt,
     currentLastModified: _0x1e6b2c,

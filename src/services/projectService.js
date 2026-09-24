@@ -12,6 +12,8 @@ import {
   uploadFileToServer,
 } from '../../api/projectsV2Api.js';
 import { sanitizeMultiCanvasDataForPersistence } from '../utils/thumbnailPersistence.js';
+import { readProjectDocument } from './projectDocumentGuard.js';
+import { captureRecoverySnapshotBeforeSave, clearRecoverySnapshotAfterSave } from './recoverySnapshotSaveGuard.js';
 import { localPathToUrl, normalizeLocalPath, pickResultLocalPath } from '../utils/localMediaPath.js';
 import {
   buildImageNodeStorageFields,
@@ -149,13 +151,16 @@ export function resolveCanvasData(_0x5e88f2) {
   };
   return _migrateCanvasDataInPlace({ canvases: [_0x5d414a], activeCanvasId: 'canvas_1' });
 }
-export async function loadProject(_0x4e7d52) {
+export async function loadProject(_0x4e7d52, { allowMissing: allowMissing = false, onMissing } = {}) {
+  const projectId = String(_0x4e7d52 || '').trim();
+  if (!projectId) throw new Error('项目ID为空；未以空画布替代');
   try {
-    const _0x4eec6e = _0x4e7d52.endsWith('.json') ? _0x4e7d52 : _0x4e7d52 + '.json',
-      _0x130c4b = await fetchV2ProjectFromServer(_0x4e7d52);
-    if (!_0x130c4b)
+    const _0x4eec6e = projectId.endsWith('.json') ? projectId : projectId + '.json',
+      _0x130c4b = await readProjectDocument(fetchV2ProjectFromServer, projectId, { allowMissing });
+    if (_0x130c4b === null)
       return (
-        console.warn('[projectService] 项目文件 ' + _0x4eec6e + ' 不存在，以空数据初始化...'),
+        console.warn('[projectService] 未找到工程文件，按明确允许缺失的流程新建空画布：' + _0x4eec6e),
+        onMissing?.(),
         resolveCanvasData({})
       );
     const _0x673f3b = resolveCanvasData(_0x130c4b);
@@ -166,29 +171,30 @@ export async function loadProject(_0x4e7d52) {
       _0x673f3b
     );
   } catch (_0xfc51ac) {
-    return (console.error('[projectService] 加载项目异常:', _0xfc51ac), resolveCanvasData({}));
+    console.error('[projectService] 加载项目异常，未替换为空画布:', _0xfc51ac);
+    throw _0xfc51ac;
   }
 }
 export async function saveProject(_0x3a2cbb, _0x30e137) {
   try {
-    const _0x166098 = sanitizeMultiCanvasDataForPersistence(_0x30e137 || {}),
+    const recoveryApi = globalThis.window?.electronAPI?.project,
+      recoveryBeforeSave = await captureRecoverySnapshotBeforeSave(recoveryApi),
+      _0x166098 = sanitizeMultiCanvasDataForPersistence(_0x30e137 || {}),
       _0x59d4fd = {
         projectName: _0x3a2cbb || DEFAULT_PROJECT_NAME,
         activeCanvasId: _0x166098?.activeCanvasId || 'canvas_1',
         canvases: _0x166098?.canvases || [],
       },
       _0x395f9f = await saveV2ProjectToServer(_0x59d4fd);
-    return (
-      _0x395f9f &&
-        _0x395f9f.success &&
-        ((window._v2CurrentFile = _0x395f9f.filename),
-        (window.currentProjectId = _0x395f9f.filename.replace('.json', '')),
-        _clearElectronRecoverySnapshotAfterSave()),
-      console.log(
-        '[projectService] 项目 ' + _0x3a2cbb + ' 已持久化（' + _0x59d4fd.canvases.length + ' 个画布）',
-      ),
-      _0x395f9f
-    );
+    if (_0x395f9f?.success) {
+      window._v2CurrentFile = _0x395f9f.filename;
+      window.currentProjectId = _0x395f9f.filename.replace('.json', '');
+      await clearRecoverySnapshotAfterSave(recoveryApi, recoveryBeforeSave, {
+        ..._0x395f9f, projectId: window.currentProjectId,
+      });
+    }
+    console.log('[projectService] 项目 ' + _0x3a2cbb + ' 已持久化（' + _0x59d4fd.canvases.length + ' 个画布）');
+    return _0x395f9f;
   } catch (_0x23e8c7) {
     console.error('[projectService] 存档异常:', _0x23e8c7);
     throw _0x23e8c7;
@@ -211,13 +217,6 @@ export async function deleteProject(_0x51bac5) {
 function _getElectronImportAsset() {
   const _0x35ea38 = globalThis.window?.electronAPI?.importAsset;
   return typeof _0x35ea38 === 'function' ? _0x35ea38 : null;
-}
-function _clearElectronRecoverySnapshotAfterSave() {
-  const _0x5ed114 = globalThis.window?.electronAPI?.project?.clearRecoverySnapshot;
-  if (typeof _0x5ed114 !== 'function') return;
-  void _0x5ed114().catch((_0x5a0468) => {
-    console.warn('[projectService] 清理恢复快照失败:', _0x5a0468);
-  });
 }
 function _getElectronPathForFile(_0x18658d) {
   if (!globalThis.window?.electronAPI) return '';
