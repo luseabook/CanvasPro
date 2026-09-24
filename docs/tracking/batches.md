@@ -1,4 +1,4 @@
-# 批次索引（第 1–121 批）
+# 批次索引（第 1–122 批）
 
 > 由 `docs/TRACKING.md` 维护。每交付一批，在表尾追加一行；细节写专题文档（都在 `docs/` 下）。
 > 来源：冻结台账 `docs/implementation-handoff.md` 的 §2 表格与各批标题，加上各专题文档的标题。生成于 2026-09-25。
@@ -127,4 +127,5 @@
 | 119 | R06/R12 | api/ 请求响应工具区 7 个零 import 纯叶落地不接线（新建 api/utils/），57 项离线测试首跑全绿 | `api-request-response-utils.md` |
 | 120 | R06 | api/story-generation/ 首批 10 件（8 纯叶 + 2 件依赖 api/utils/）落地不接线，96 项离线测试首跑全绿 | `api-story-generation-leaves.md` |
 | 121 | R06 | 分三段。121a：api/story-generation/ 再落 8 件（审片协议、复刻补片、调用证据、原片帧、摘要蓝图、资产提取结果与引用合同）落地不接线，82 项离线测试全绿；121b：再落 3 件（资产需求证据、混合输出预算、分集剧本审时），47 项离线测试全绿；121c：再落 2 件（分集大纲规划、三路并行资产提取，均为依赖注入工厂），34 项离线测试全绿。第 121 批完成 | `api-story-generation-batch121.md` |
+| 122 | R06 | 分三段。122a：src/modules/storyWorkspace/ 11 个 0 import 小纯叶（素材提取续跑、首页改写与拖放、复刻角色身份与参考素材、工作区表面等）落地不接线，37 项离线测试首跑全绿；122b、122c 未开始，见 `docs/TRACKING.md` §7.2 | `src-storyworkspace-batch122.md` |
 

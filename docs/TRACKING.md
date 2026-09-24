@@ -2,7 +2,7 @@
 
 > **新对话只读这一份就能接手，不要通读项目。** 本文件体积 ≤45 KB、单行 ≤400 字，一次 `read_files` 就能读完。
 > 入口链：用户只需说「读一下项目文档」→ `README.md` 顶部或 `AGENTS.md` → 本文件。所有文件改动都会自动记录（§12）。
-> 最后更新：2026-09-25 · 状态：第 121 批已完成（121a / 121b / 121c）；**第 122 批未开始（§7.2）** · 维护规则见 §9。
+> 最后更新：2026-09-25 · 状态：第 122 批分三段，122a 已交付；**122b 未开始（§7.2）** · 维护规则见 §9。
 
 ## 0. 现状速览
 
@@ -10,11 +10,11 @@
 - **总目标**（用户原话要点）：对照已安装的 0.7.16（`D:\shuocancas\SHUO Canvas\resources\webapp`），把缺失功能的**可维护源码加进来，并实际接入工程**。
   - R01–R26 全范围不缩减；单批交付只是检查点。
   - 直接实施，不要只分析，也不要每批再问是否开发。
-- **进度**：已交付 121 批，逐批索引见 `docs/tracking/batches.md`。R01–R26 **都没有完成**（§6）。
-- **必须清楚的偏差**：第 84–121 批几乎都是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
-  - 静态分析显示，985 个非测试 JS 模块里有 **223 个从任何入口都不可达**（含第 121c 批新增的 2 个），清单见 `docs/tracking/orphans.md`。
+- **进度**：已交付 121 批，第 122 批已交付 122a 段，逐批索引见 `docs/tracking/batches.md`。R01–R26 **都没有完成**（§6）。
+- **必须清楚的偏差**：第 84–122a 批几乎都是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
+  - 静态分析显示，996 个非测试 JS 模块里有 **234 个从任何入口都不可达**（含第 122a 批新增的 11 个），清单见 `docs/tracking/orphans.md`。
   - 总目标要求「实际接入」，所以接线欠账（§7.4）迟早要还。
-- **下一步**：第 122 批，§7.2 第 1 项，先做 `src/modules/storyWorkspace` 的纯叶（R06）。每件先过导出闸门。
+- **下一步**：122b（`storyEpisodeSplitBatchExecution`、`storyWorkspacePersistence`、`storySummaryRun`、`storyScriptImport`、`storyStyleCatalog`、`storyWorkspaceData`），再做 122c。分段见 `docs/src-storyworkspace-batch122.md` §1。
 - **变更记录**：全自动。任何人改了任何项目文件，都会被记到 `docs/tracking/changes/`，机制见 §12。
 
 ## 1. 开工流程（新对话照做）
@@ -119,7 +119,7 @@
 以下是以往批次 bash 命令的 PowerShell 改写，首次使用前先确认能跑通。
 
 ```powershell
-# src 回归 sweep（基线 3587 / 3544 / 43）
+# src 回归 sweep（基线 3624 / 3581 / 43）
 node --test --test-timeout=25000 (Get-ChildItem src -Recurse -Filter *.test.js).FullName
 # api 回归（基线 791 / 791 / 0）
 node --test (Get-ChildItem api -Recurse -Filter *.test.js).FullName
@@ -169,13 +169,13 @@ node tools/tracking/track.mjs --status
 | 项 | 值 |
 | --- | --- |
 | 分支 | master，与上游无领先或落后 |
-| git_status | 0 staged / 68 unstaged / 888 untracked / 0 冲突（第 121c 批新增 2 件源码、2 件测试后；此前为 0/68/884/0）。`git status --porcelain` 会把未跟踪目录折叠成一条，数字不同（第 118 批后记为 701） |
-| 提交情况 | 第 1–121 批的全部改动**从未提交** |
-| src sweep | 3587 / 3544 / 43。43 项失败都是因为缺夹具 `tests/testPreviewDom.js` |
+| git_status | 用户已开始按目录分组提交（`A.0:` 系列，截至 2026-09-25 07:19 共 10 个），数字还在变。写入本行时为 0 staged / 39 unstaged / 551 untracked / 0 冲突（含第 122a 批新增 22 件）。`git status --porcelain` 会把未跟踪目录折叠成一条，数字不同（第 118 批后记为 701） |
+| 提交情况 | 用户正在分组提交；写入本行时 `api/story-generation/`、`src/modules/storyWorkspace/` 等仍未提交。agent 不提交 |
+| src sweep | 3624 / 3581 / 43（第 122a 批 +37）。43 项失败都是因为缺夹具 `tests/testPreviewDom.js` |
 | api sweep | 791 / 791 / 0（第 121c 批 +34） |
 | electron sweep | 1649 / 1648 / 1。那 1 项是 R14 第 17 批的遗留 |
-| 静态检查 | 1390 个 JS 文件 `node --check` 全部通过；所有 Python 文件都能 `ast.parse`。这是 2026-09-25 在本地镜像上做的离线检查；第 119、120、121 批新增的 14、20、26 个 JS 文件也都通过 |
-| 孤立模块 | 223 / 985，见 `docs/tracking/orphans.md` |
+| 静态检查 | 1390 个 JS 文件 `node --check` 全部通过；所有 Python 文件都能 `ast.parse`。这是 2026-09-25 在本地镜像上做的离线检查；第 119、120、121、122a 批新增的 14、20、26、22 个 JS 文件也都通过 |
+| 孤立模块 | 234 / 996，见 `docs/tracking/orphans.md` |
 | 变更记录 | `docs/tracking/changes/2026-09.md`，基线 #0001 纳入 1824 个文件；最新编号用 `node tools/tracking/track.mjs --status` 查看 |
 | 台账 | `docs/implementation-handoff.md`，1 325 173 B / 1773 行，**已冻结**（§8 第 3 条） |
 
@@ -188,7 +188,7 @@ node tools/tracking/track.mjs --status
 | R03 | P1 部分待验收 | 媒体任务中心、后台与跨画布调度、历史、恢复 | 第 16/20/24/25/54 批。缺：完整的持久队列、厂商查询与可靠取消、真正的后台跨画布调度 |
 | R04 | P1 部分待验收 | 分镜图片和视频生成、人物场景批量、镜头媒体关联 | 第 12–14/19 批。缺：其余模型、多图和首尾帧、参考输入批次、多外观和变体、远程落地、后台任务 |
 | R05 | P1 部分待验收 | 成片、时间线、剪映和 PR 导出 | 第 11/15/18/37 批。缺：剪映草稿 `draft_content.json`、Premiere 工程目录、多轨和字幕 |
-| R06 | P2 待补全 | 工作室的其余差异：外观、变体、本地提取、批量、视频复刻 | 要按 0.7.16 的 `storyWorkspace`、`storyGeneration` 重新核对。§7.1 的 `api/story-generation/` 和 §7.2 的 `src/modules/storyWorkspace` 纯叶属于这一项。第 119 批落了 `api/utils/` 剧本生成工具 4 件，第 120、121 批落了 `api/story-generation/` 32 件中的 23 件（均未接线） |
+| R06 | P2 待补全 | 工作室的其余差异：外观、变体、本地提取、批量、视频复刻 | 要按 0.7.16 的 `storyWorkspace`、`storyGeneration` 重新核对。§7.1 的 `api/story-generation/` 和 §7.2 的 `src/modules/storyWorkspace` 纯叶属于这一项。第 119 批落了 `api/utils/` 剧本生成工具 4 件，第 120、121 批落了 `api/story-generation/` 32 件中的 23 件，第 122a 批落了 `storyWorkspace` 纯叶 24 件中的 11 件（均未接线） |
 | R07 | P2 待补全 | 扫描 PDF、OCR、更多文档格式 | 还没有批次 |
 | R08 | P2 待实现 | 人物检测、识别、替换、素材库 | 第 85 批落了替换工作室核心 9 件（未接线）；`personReplacement` 还有 12 个纯叶没落；后端接口缺失 |
 | R09 | P2 待实现 | 分镜 3D、导演相机、模型包、全景 | 第 86–93 批落了约 45/97 件（未接线）；主装配（依赖 three.js 的 `workspaceController`、`sceneRuntime` 等）没落 |
@@ -220,7 +220,7 @@ node tools/tracking/track.mjs --status
 
 ### 7.2 之后的纯新增队列
 
-1. **`src/modules` 的 136 个纯叶**，按能力区成组落地：`storyWorkspace` 24、`collaboration` 13、`app` 13、`personReplacement` 12、`runninghubAiApp` 6、`panoramaSceneNode` 5 等。完整清单在 `deobf-tools\b119\screen.txt`。
+1. **`src/modules` 的 136 个纯叶**，按能力区成组落地：`storyWorkspace` 24（第 122 批进行中：122a 已落 11 件，122b 6 件、122c 7 件待做）、`collaboration` 13、`app` 13、`personReplacement` 12、`runninghubAiApp` 6、`panoramaSceneNode` 5 等。完整清单在 `deobf-tools\b119\screen.txt`。
 2. **`api/` 的其余纯叶**：34 件（原 41 件，第 119 批已落 7 件）。
 3. **`src/services`**：零依赖纯叶已经清零，剩下的都带相对 import，必须先过导出闸门。
 
@@ -241,7 +241,7 @@ node tools/tracking/track.mjs --status
 
 ### 7.4 接线欠账（总目标要求「实际接入」）
 
-- 共 223 个孤立模块。大块有：
+- 共 234 个孤立模块。大块有：
   - R15 chrome-shell 运行时：`chromeShellRuntime` 没装配。
   - R12 Agent 扩展层：`src/modules/agent` 的 80 个模块只有 13 个接进了运行时。
   - R09 分镜 3D：约 43 件。
@@ -268,7 +268,7 @@ node tools/tracking/track.mjs --status
    - 触发方式是点更新横幅：`src/modules/AutoUpdate.js` 的 `_doApply` → `POST /api/v2/update/apply`，没有二次确认。
    - 现在因为缺 `双击运行.bat` 而不会生效。
    - 建议加上「工作区不干净就拒绝」的保护，但要先经用户同意再改。
-2. **第 1–121 批改动从未提交**：68 个修改、888 个未跟踪（含跟踪机制自身的文件）。建议用户自己提交一次检查点，agent 不得自动提交。
+2. **提交进行中**：用户已开始按目录分组提交（`A.0:` 系列）。agent 新落的文件都是纯新增，不和提交冲突；agent 不得自动提交。
 3. **台账已冻结。**
    - `docs/implementation-handoff.md` 超过 1 MiB，`read_files` 和 `search_files` 都拒读，`apply_patch` 也改不了它。
    - 它保留为历史档案：R01–R26 原表在第 1499–1527 行，第 119 批预筛在第 1755 行。只能用 `run_command` 加 `Select-String` 只读查询。
@@ -330,6 +330,10 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上，只保留 10 条）
 
+- 2026-09-25（第八次）：交付第 122a 批，`src/modules/storyWorkspace/` 落 11 个 0 import 纯叶，落地不接线。24 件纯叶已全部暂存格式化，按 122a / 122b / 122c 分段。
+  - 11 件与暂存逐字节一致，`node --check` 11/11，prettier 22/22；自研 37 例测试沙箱和本机首跑全绿。
+  - src sweep 3587→3624 / 3544→3581 / 43（失败名集合一致）；api 791 未变；受保护文件 MD5 不变；消费方 0 命中。
+  - 期间用户开始按目录分组提交（`A.0:` 系列），git 计数随之变化；专题文档 `docs/src-storyworkspace-batch122.md`；orphans 223→234；变更 #0019、#0020。
 - 2026-09-25（第七次）：交付第 121c 批，`api/story-generation/` 再落 2 件（`storyEpisodeOutlinePlanning`、`storyAssetParallelExtraction`，均为依赖注入工厂），落地不接线；第 121 批至此完成。
   - 2 件过导出闸门，与暂存逐字节一致；`src/domain` 缺失的依赖只在测试里用替身注入，没有落 shim。
   - 自研 34 例测试落地后首跑全绿（沙箱预跑 4 例期望写错，改测试不改实现）；api sweep 757→791（+34）/ 失败 0；src sweep 3587/3544/43 未变，失败名集合一致；受保护文件 MD5 不变。
