@@ -1,0 +1,113 @@
+function createBackendStartupError(message, code, { cause: cause = null, details: details = null } = {}) {
+  const error = new Error(message);
+  error['code'] = code;
+  if (cause) error['cause'] = cause;
+  if (details) error['details'] = details;
+  return error;
+}
+function safeNotify(notify, ...args) {
+  try {
+    notify?.(...args);
+  } catch {}
+}
+export function createBackendStartupMonitor({
+  child: child,
+  onError: onError = null,
+  onExit: onExit = null,
+  onClose: onClose = null,
+} = {}) {
+  if (!child || typeof child['once'] !== 'function')
+    throw new TypeError('Backend\x20child\x20process\x20is\x20required');
+  let ready = ![],
+    failureSettled = ![],
+    rejectFailure;
+  const failure = new Promise((_resolve, reject) => {
+      rejectFailure = reject;
+    }),
+    settleFailure = (error) => {
+      if (ready || failureSettled) return ![];
+      return ((failureSettled = !![]), rejectFailure(error), !![]);
+    };
+  return (
+    child['once']('error', (error) => {
+      const spawnError = createBackendStartupError(
+        'Failed\x20to\x20spawn\x20local\x20backend:\x20' + (error?.['message'] || error),
+        'BACKEND_SPAWN_ERROR',
+        { cause: error },
+      );
+      if (settleFailure(spawnError)) safeNotify(onError, error);
+    }),
+    child['once']('exit', (exitCode, signal) => {
+      (safeNotify(onExit, exitCode, signal),
+        settleFailure(
+          createBackendStartupError(
+            'Local backend exited before readiness (code=' +
+              (exitCode ?? '') +
+              ', signal=' +
+              (signal ?? '') +
+              ')',
+            'BACKEND_EXITED_BEFORE_READY',
+            { details: { exitCode: exitCode, signal: signal } },
+          ),
+        ));
+    }),
+    child['once']('close', (closeCode, closeSignal) => {
+      safeNotify(onClose, closeCode, closeSignal);
+    }),
+    {
+      failure: failure,
+      markReady() {
+        ready = !![];
+      },
+    }
+  );
+}
+export function launchMonitoredBackendProcess({
+  spawnProcess: spawnProcess,
+  command: command,
+  args: args = [],
+  options: options = {},
+  logStream: logStream = null,
+  onSpawnError: onSpawnError = null,
+  onExit: onExit = null,
+} = {}) {
+  if (typeof spawnProcess !== 'function')
+    throw new TypeError('Backend\x20process\x20launcher\x20is\x20required');
+  let logClosed = ![],
+    spawnFailed = ![];
+  const closeLog = () => {
+      if (logClosed) return;
+      ((logClosed = !![]), logStream?.['end']?.());
+    },
+    handleSpawnError = (error) => {
+      ((spawnFailed = !![]), safeNotify(onSpawnError, error), closeLog());
+    };
+  let child;
+  try {
+    child = spawnProcess(command, args, options);
+  } catch (error) {
+    handleSpawnError(error);
+    throw createBackendStartupError(
+      'Failed to spawn local backend: ' + (error?.['message'] || error),
+      'BACKEND_SPAWN_ERROR',
+      { cause: error },
+    );
+  }
+  logStream &&
+    (child['stdout']?.['pipe']?.(logStream, { end: ![] }),
+    child['stderr']?.['pipe']?.(logStream, { end: ![] }));
+  const monitor = createBackendStartupMonitor({
+    child: child,
+    onError: handleSpawnError,
+    onExit: (code, signal) => {
+      if (!spawnFailed) safeNotify(onExit, code, signal);
+    },
+    onClose: closeLog,
+  });
+  return {
+    child: child,
+    closeLog: closeLog,
+    failure: monitor['failure'],
+    markReady: monitor['markReady'],
+  };
+}

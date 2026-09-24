@@ -23,6 +23,9 @@ contextBridge.exposeInMainWorld('aiCanvasDesktop', {
 contextBridge.exposeInMainWorld('electronAPI', {
   getPathForFile: (file) => webUtils.getPathForFile(file),
   project: {
+    fullPackageCapabilities: () => ipcRenderer.invoke('project:fullPackageCapabilities'),
+    exportFullPackage: (payload) => ipcRenderer.invoke('project:exportFullPackage', payload),
+    restoreFullPackage: (payload) => ipcRenderer.invoke('project:restoreFullPackage', payload),
     open: (payload) => ipcRenderer.invoke('project:open', payload),
     save: (payload) => ipcRenderer.invoke('project:save', payload),
     exportPackage: (payload) => ipcRenderer.invoke('project:exportPackage', payload),
@@ -31,9 +34,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     removeRecent: (payload) => ipcRenderer.invoke('project:removeRecent', payload),
     setUnsavedState: (payload) => ipcRenderer.send('project:setUnsavedState', payload),
     writeRecoverySnapshot: (payload) => ipcRenderer.invoke('project:writeRecoverySnapshot', payload),
+    writeRecoverySnapshotIfCompatible: (payload) => ipcRenderer.invoke('project:writeRecoverySnapshot', payload),
     getRecoverySnapshotInfo: (payload) => ipcRenderer.invoke('project:getRecoverySnapshotInfo', payload),
     readRecoverySnapshot: () => ipcRenderer.invoke('project:readRecoverySnapshot'),
-    clearRecoverySnapshot: () => ipcRenderer.invoke('project:clearRecoverySnapshot'),
+    clearRecoverySnapshot: (expected) => ipcRenderer.invoke('project:clearRecoverySnapshot', expected),
+    clearRecoverySnapshotIfMatch: (expected) => ipcRenderer.invoke('project:clearRecoverySnapshot', expected),
     consumeExternalOpenRequests: () => ipcRenderer.invoke('project:consumeExternalOpenRequests'),
     onExternalOpen: (callback) => {
       if (typeof callback !== 'function') return () => {};
@@ -81,6 +86,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   screenshot: {
     captureDisplay: () => ipcRenderer.invoke('screenshot:captureDisplay'),
+    updateGlobalShortcut: (payload) => ipcRenderer.invoke('screenshot:updateGlobalShortcut', payload),
     onGlobalCapture: (callback) => {
       if (typeof callback !== 'function') return () => {};
       const listener = (_event, payload) => {
@@ -102,14 +108,91 @@ contextBridge.exposeInMainWorld('electronAPI', {
       };
     },
   },
+  textPreset: {
+    claimEvent: (payload) => ipcRenderer.invoke('textPreset:claimEvent', payload),
+    acknowledgeEvent: (payload) => ipcRenderer.invoke('textPreset:acknowledgeEvent', payload),
+    updateGlobalShortcut: (payload) => ipcRenderer.invoke('textPreset:updateGlobalShortcut', payload),
+    onSelectedText: (callback) => {
+      if (typeof callback !== 'function') return () => {};
+      let stopped = false;
+      let timer;
+      const listener = (_event, payload) => {
+        callback(payload);
+      };
+      ipcRenderer.on('textPreset:selectedTextReady', listener);
+      const poll = async () => {
+        try {
+          const events = await ipcRenderer.invoke('textPreset:consumeEvents');
+          if (!stopped && Array.isArray(events)) events.forEach(callback);
+        } catch {}
+        if (!stopped) {
+          timer = setTimeout(poll, 150);
+          timer?.unref?.();
+        }
+      };
+      timer = setTimeout(poll, 0);
+      timer?.unref?.();
+      return () => {
+        stopped = true;
+        clearTimeout(timer);
+        ipcRenderer.removeListener('textPreset:selectedTextReady', listener);
+      };
+    },
+    onGlobalShortcutStatus: (callback) => {
+      if (typeof callback !== 'function') return () => {};
+      const listener = (_event, payload) => {
+        callback(payload);
+      };
+      ipcRenderer.on('textPreset:globalShortcutStatus', listener);
+      return () => {
+        ipcRenderer.removeListener('textPreset:globalShortcutStatus', listener);
+      };
+    },
+  },
   secureSettings: {
     get: (payload) => ipcRenderer.invoke('secureSettings:get', payload),
     set: (payload) => ipcRenderer.invoke('secureSettings:set', payload),
     delete: (payload) => ipcRenderer.invoke('secureSettings:delete', payload),
   },
+  customAiApps: {
+    read: () => ipcRenderer.invoke('customAiApps:read'),
+    write: (payload) => ipcRenderer.invoke('customAiApps:write', payload),
+  },
+  agentInformation: {
+    readUrl: (payload) => ipcRenderer.invoke('agentInformation:readUrl', payload),
+  },
+  agentSkills: {
+    list: () => ipcRenderer.invoke('agentSkills:list'),
+    openRoot: () => ipcRenderer.invoke('agentSkills:openRoot'),
+    installFromFolder: () => ipcRenderer.invoke('agentSkills:installFromFolder'),
+    saveManaged: (payload) => ipcRenderer.invoke('agentSkills:saveManaged', payload),
+    deleteInstalled: (payload) => ipcRenderer.invoke('agentSkills:deleteInstalled', payload),
+  },
   importAsset: (payload) => ipcRenderer.invoke('asset:import', payload),
   importRemoteAsset: (payload) => ipcRenderer.invoke('asset:importRemote', payload),
+  timelineExport: {
+    capabilities: () => ipcRenderer.invoke('timelineExport:capabilities'),
+    export: (payload) => ipcRenderer.invoke('timelineExport:export', payload),
+  },
+  nodeMediaExport: {
+    capabilities: () => ipcRenderer.invoke('nodeMediaExport:capabilities'),
+    exportSelected: (payload) => ipcRenderer.invoke('nodeMediaExport:exportSelected', payload),
+  },
+  nodeExport: {
+    exportSelected: (payload) => ipcRenderer.invoke('nodeExport:exportSelected', payload),
+    saveMedia: (payload) => ipcRenderer.invoke('nodeExport:saveMedia', payload),
+    saveText: (payload) => ipcRenderer.invoke('nodeExport:saveText', payload),
+    saveMediaFiles: (payload) => ipcRenderer.invoke('nodeExport:saveMediaFiles', payload),
+    saveTimeline: (payload) => ipcRenderer.invoke('nodeExport:saveTimeline', payload),
+    openJianying: () => ipcRenderer.invoke('nodeExport:openJianying'),
+  },
   mediaTask: {
+    history: {
+      status: () => ipcRenderer.invoke('mediaTaskHistory:status'),
+      read: (payload) => ipcRenderer.invoke('mediaTaskHistory:read', payload),
+      configure: (payload) => ipcRenderer.invoke('mediaTaskHistory:configure', payload),
+      flush: () => ipcRenderer.invoke('mediaTaskHistory:flush'),
+    },
     enqueue: (payload) => ipcRenderer.invoke('mediaTask:enqueue', payload),
     cancel: (payload) => ipcRenderer.invoke('mediaTask:cancel', payload),
     list: (payload) => ipcRenderer.invoke('mediaTask:list', payload),
@@ -131,6 +214,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     listMp3Files: (payload) => ipcRenderer.invoke('notificationSound:listMp3Files', payload),
     listSystemSounds: () => ipcRenderer.invoke('notificationSound:listSystemSounds'),
     openSystemSoundFolder: () => ipcRenderer.invoke('notificationSound:openSystemSoundFolder'),
+    play: (payload) => ipcRenderer.invoke('notificationSound:play', payload),
   },
   showItemInFolder: (payload) => ipcRenderer.invoke('shell:showItemInFolder', payload),
   openKnownFolder: (payload) => ipcRenderer.invoke('shell:openKnownFolder', payload),
@@ -163,6 +247,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   notification: {
     showGenerationComplete: (payload) => ipcRenderer.invoke('notification:showGenerationComplete', payload),
+    updateGlobalShortcut: (payload) => ipcRenderer.invoke('notification:updateGlobalShortcut', payload),
+    acknowledge: (payload) => ipcRenderer.invoke('notification:acknowledge', payload),
+    onGenerationCompleteClick: (callback) => {
+      if (typeof callback !== 'function') return () => {};
+      const listener = (_event, payload) => {
+        callback(payload);
+      };
+      ipcRenderer.on('notification:generationCompleteClicked', listener);
+      return () => {
+        ipcRenderer.removeListener('notification:generationCompleteClicked', listener);
+      };
+    },
   },
   localAssetCleanup: {
     scan: (payload) => ipcRenderer.invoke('localAssetCleanup:scan', payload),

@@ -1,92 +1,135 @@
-import { BrowserWindow, desktopCapturer, globalShortcut, screen } from 'electron';
+import { BrowserWindow, clipboard, desktopCapturer, globalShortcut, nativeImage, screen } from 'electron';
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import {
+  parseScreenshotShortcutPayload,
+} from './screenshotShortcutAccelerators.js';
+import { createBoundedCaptureEventQueue } from './screenshotCaptureEventQueue.js';
+
+const DEFAULT_SCREENSHOT_ACCELERATOR = 'Alt+Q',
+  CAPTURE_EVENT_LIMIT = 8;
+
+function clampNumber(value, minimum, maximum) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return minimum;
+  return Math.min(maximum, Math.max(minimum, numeric));
+}
+
 export function createScreenshotOverlayController({
-  appRoot: _0x4957f9,
-  dirname: _0x460c18,
-  accelerator: _0x2ad8dd,
-  getMainWindow: _0x31301d,
-  logDiagnosticEvent: _0x6d568c,
+  appRoot: appRoot,
+  dirname: dirname,
+  accelerator: accelerator,
+  getMainWindow: getMainWindow,
+  focusCanvas: focusCanvas = () => {},
+  logDiagnosticEvent: logDiagnosticEvent,
+  globalShortcutApi: globalShortcutApi = globalShortcut,
 }) {
-  let _0x34de2b = null,
-    _0x3e6910 = null,
-    _0x2fcf8e = null,
-    _0x2b05fa = '',
-    _0x25300f = false,
-    _0x2e6c76 = { ok: false, registered: false, accelerator: _0x2ad8dd, reason: 'not-registered' };
-  async function _0x146a4b() {
-    const _0x76225 = screen.getCursorScreenPoint(),
-      _0x8c4f0c = screen.getDisplayNearestPoint(_0x76225),
-      _0x41c748 = Number(_0x8c4f0c?.scaleFactor || 1) || 1,
-      _0x493532 = _0x8c4f0c?.bounds || { x: 0, y: 0, width: 0, height: 0 },
-      _0x323e7d = {
-        width: Math.max(1, Math.round(Number(_0x493532.width || 1) * _0x41c748)),
-        height: Math.max(1, Math.round(Number(_0x493532.height || 1) * _0x41c748)),
+  const initialShortcut = parseScreenshotShortcutPayload({
+      accelerator: accelerator || DEFAULT_SCREENSHOT_ACCELERATOR,
+    }),
+    initialAccelerator = initialShortcut.ok ? initialShortcut.accelerator : DEFAULT_SCREENSHOT_ACCELERATOR;
+  let overlayWindow = null,
+    overlayLoadPromise = null,
+    nativeHelper = null,
+    nativeHelperBuffer = '',
+    shortcutRegistered = false,
+    registeredAccelerator = '',
+    prewarmPromise = null,
+    currentAccelerator = initialAccelerator,
+    shortcutStatus = {
+      ok: false,
+      registered: false,
+      accelerator: currentAccelerator,
+      reason: 'not-registered',
+    };
+  const captureEvents = createBoundedCaptureEventQueue(CAPTURE_EVENT_LIMIT);
+
+  async function captureDesktopDisplay() {
+    const cursorPoint = screen.getCursorScreenPoint(),
+      display = screen.getDisplayNearestPoint(cursorPoint),
+      scaleFactor = Number(display?.scaleFactor || 1) || 1,
+      bounds = display?.bounds || { x: 0, y: 0, width: 0, height: 0 },
+      thumbnailSize = {
+        width: Math.max(1, Math.round(Number(bounds.width || 1) * scaleFactor)),
+        height: Math.max(1, Math.round(Number(bounds.height || 1) * scaleFactor)),
       },
-      _0x1f922e = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: _0x323e7d }),
-      _0x124ab4 =
-        _0x1f922e.find((_0x235e45) => String(_0x235e45.display_id || '') === String(_0x8c4f0c.id)) ||
-        _0x1f922e[0],
-      _0x39d3d5 = _0x124ab4?.thumbnail;
-    if (!_0x39d3d5 || _0x39d3d5.isEmpty()) return { ok: false, reason: 'no-image' };
+      sources = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: thumbnailSize }),
+      source = sources.find((entry) => String(entry.display_id || '') === String(display.id)) || sources[0],
+      thumbnail = source?.thumbnail;
+    if (!thumbnail || thumbnail.isEmpty()) return { ok: false, reason: 'no-image' };
     return {
       ok: true,
       mimeType: 'image/png',
-      dataUrl: _0x39d3d5.toDataURL(),
+      dataUrl: thumbnail.toDataURL(),
       display: {
-        id: String(_0x8c4f0c.id),
-        scaleFactor: _0x41c748,
-        bounds: { x: _0x493532.x, y: _0x493532.y, width: _0x493532.width, height: _0x493532.height },
-        imageSize: _0x39d3d5.getSize(),
+        id: String(display.id),
+        scaleFactor: scaleFactor,
+        bounds: { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },
+        imageSize: thumbnail.getSize(),
+      },
+      cursor: {
+        screenX: Math.round(cursorPoint.x),
+        screenY: Math.round(cursorPoint.y),
+        x: Math.round(clampNumber(cursorPoint.x - bounds.x, 0, Math.max(0, bounds.width))),
+        y: Math.round(clampNumber(cursorPoint.y - bounds.y, 0, Math.max(0, bounds.height))),
       },
     };
   }
-  function _0x290bb7(_0x5664c6 = _0x2e6c76) {
-    const _0x1bf994 = _0x31301d();
-    if (!_0x1bf994 || _0x1bf994.isDestroyed()) return;
-    if (_0x1bf994.webContents.isDestroyed()) return;
-    _0x1bf994.webContents.send('screenshot:globalShortcutStatus', { accelerator: _0x2ad8dd, ..._0x5664c6 });
+  function sendGlobalScreenshotShortcutStatus(status = shortcutStatus) {
+    const mainWindow = getMainWindow();
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    if (mainWindow.webContents.isDestroyed()) return;
+    mainWindow.webContents.send('screenshot:globalShortcutStatus', {
+      accelerator: currentAccelerator,
+      ...status,
+    });
   }
-  function _0x39a3a0(_0xce8eab = {}) {
-    ((_0x2e6c76 = { accelerator: _0x2ad8dd, ..._0x2e6c76, ..._0xce8eab }), _0x290bb7());
+  function setShortcutStatus(patch = {}) {
+    shortcutStatus = {
+      accelerator: currentAccelerator,
+      ...shortcutStatus,
+      ...patch,
+      accelerator: currentAccelerator,
+    };
+    sendGlobalScreenshotShortcutStatus();
   }
-  function _0x2d4a78() {
-    if (!_0x34de2b || _0x34de2b.isDestroyed()) return;
-    (void _0x34de2b.webContents.executeJavaScript('window.__resetScreenshotOverlay?.()'),
-      _0x34de2b.setOpacity(1),
-      _0x34de2b.setAlwaysOnTop(false),
-      _0x34de2b.hide());
+  function resetOverlayWindow() {
+    if (!overlayWindow || overlayWindow.isDestroyed()) return;
+    (void overlayWindow.webContents.executeJavaScript('window.__resetScreenshotOverlay?.()'),
+      overlayWindow.setOpacity(1),
+      overlayWindow.setAlwaysOnTop(false),
+      overlayWindow.hide());
   }
-  function _0x3ce84d() {
-    _0x3e6910 = null;
-    if (!_0x34de2b || _0x34de2b.isDestroyed()) return;
-    _0x34de2b.destroy();
+  function destroyScreenshotOverlayWindow() {
+    overlayLoadPromise = null;
+    if (!overlayWindow || overlayWindow.isDestroyed()) return;
+    overlayWindow.destroy();
   }
-  function _0x88fc17(_0x5cb615 = {}) {
-    const _0x12b877 = _0x5cb615?.display?.bounds;
-    if (_0x12b877 && _0x12b877.width > 0 && _0x12b877.height > 0)
+  function resolveOverlayBounds(payload = {}) {
+    const bounds = payload?.display?.bounds;
+    if (bounds && bounds.width > 0 && bounds.height > 0)
       return {
-        x: Math.round(_0x12b877.x),
-        y: Math.round(_0x12b877.y),
-        width: Math.round(_0x12b877.width),
-        height: Math.round(_0x12b877.height),
+        x: Math.round(bounds.x),
+        y: Math.round(bounds.y),
+        width: Math.round(bounds.width),
+        height: Math.round(bounds.height),
       };
-    const _0x3becc9 = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())?.bounds;
-    return _0x3becc9 || { x: 0, y: 0, width: 0x500, height: 0x2d0 };
+    const fallback = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())?.bounds;
+    return fallback || { x: 0, y: 0, width: 0x500, height: 0x2d0 };
   }
-  function _0x44e592() {
+  function offscreenBounds() {
     return { x: -0x7d00, y: -0x7d00, width: 1, height: 1 };
   }
-  async function _0xac72c(_0x1701ed = null) {
-    if (_0x34de2b && !_0x34de2b.isDestroyed()) {
-      if (_0x3e6910) await _0x3e6910;
-      return _0x34de2b;
+  async function ensureOverlayWindow(payload = null) {
+    if (overlayWindow && !overlayWindow.isDestroyed()) {
+      if (overlayLoadPromise) await overlayLoadPromise;
+      return overlayWindow;
     }
-    const _0x165651 = _0x1701ed ? _0x88fc17(_0x1701ed) : _0x44e592();
+    const bounds = payload ? resolveOverlayBounds(payload) : offscreenBounds();
     return (
-      (_0x34de2b = new BrowserWindow({
-        ..._0x165651,
+      (overlayWindow = new BrowserWindow({
+        ...bounds,
         title: 'Screenshot Overlay',
         show: false,
         frame: false,
@@ -102,294 +145,415 @@ export function createScreenshotOverlayController({
         maximizable: false,
         backgroundColor: '#00000000',
         webPreferences: {
-          preload: path.join(_0x460c18, 'screenshotOverlayPreload.cjs'),
+          preload: path.join(dirname, 'screenshotOverlayPreload.cjs'),
           contextIsolation: true,
           nodeIntegration: false,
           sandbox: true,
         },
       })),
-      _0x34de2b.on('closed', () => {
-        ((_0x34de2b = null), (_0x3e6910 = null));
+      overlayWindow.on('closed', () => {
+        ((overlayWindow = null), (overlayLoadPromise = null));
       }),
-      (_0x3e6910 = _0x34de2b.loadFile(path.join(_0x460c18, 'screenshotOverlay.html')).catch((_0xfc9c0b) => {
-        _0x3e6910 = null;
-        throw _0xfc9c0b;
+      (overlayLoadPromise = overlayWindow.loadFile(path.join(dirname, 'screenshotOverlay.html')).catch((error) => {
+        overlayLoadPromise = null;
+        throw error;
       })),
-      await _0x3e6910,
-      _0x34de2b
+      await overlayLoadPromise,
+      overlayWindow
     );
   }
-  async function _0x120210(_0xf6f469) {
-    const _0x556fae = await _0xac72c();
-    if (!_0x556fae || _0x556fae.isDestroyed()) return;
-    (_0x556fae.setOpacity(1),
-      _0x556fae.setBounds(_0xf6f469 || _0x88fc17()),
-      await _0x556fae.webContents.executeJavaScript('window.__resetScreenshotOverlay?.()'),
-      _0x556fae.setAlwaysOnTop(true, 'screen-saver'),
-      _0x556fae.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true }),
-      _0x556fae.show(),
-      _0x556fae.focus());
-  }
-  async function _0x492c99(_0x3f2bde) {
-    if (!_0x34de2b || _0x34de2b.isDestroyed()) return;
-    await _0x34de2b.webContents.executeJavaScript(
-      'window.__startScreenshotOverlay(' + JSON.stringify(_0x3f2bde) + ')',
+  function prewarmOverlayWindow() {
+    if (prewarmPromise) return prewarmPromise;
+    return (
+      (prewarmPromise = ensureOverlayWindow()
+        .catch((error) => {
+          logDiagnosticEvent({
+            type: 'screenshot.global_overlay_prewarm_failed',
+            level: 'warn',
+            source: 'main',
+            message: 'Global screenshot overlay prewarm failed',
+            error: error,
+          });
+        })
+        .finally(() => {
+          prewarmPromise = null;
+        })),
+      prewarmPromise
     );
   }
-  async function _0x35d2f8() {
-    if (_0x34de2b && !_0x34de2b.isDestroyed() && _0x34de2b.isVisible()) {
-      (_0x34de2b.show(), _0x34de2b.focus());
+  async function prepareOverlayWindow(targetBounds) {
+    const window = await ensureOverlayWindow();
+    if (!window || window.isDestroyed()) return false;
+    return (
+      window.setOpacity(1),
+      window.setBounds(targetBounds || resolveOverlayBounds()),
+      await window.webContents.executeJavaScript(
+        'window.__prepareScreenshotOverlay ? window.__prepareScreenshotOverlay() : window.__resetScreenshotOverlay?.()',
+      ),
+      window.setAlwaysOnTop(true, 'screen-saver'),
+      window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true }),
+      window.show(),
+      window.focus(),
+      true
+    );
+  }
+  async function startOverlaySelection(capture) {
+    if (!overlayWindow || overlayWindow.isDestroyed()) return false;
+    const started = await overlayWindow.webContents.executeJavaScript(
+      'window.__startScreenshotOverlay(' + JSON.stringify(capture) + ')',
+    );
+    return started ? true : false;
+  }
+  async function startGlobalCapture() {
+    if (overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.isVisible()) {
+      (overlayWindow.show(), overlayWindow.focus());
       return;
     }
     try {
-      const _0x425a92 = _0x88fc17();
-      await _0x120210(_0x425a92);
-      const _0x33e86d = await _0x146a4b();
-      if (!_0x33e86d?.ok) {
-        (_0x2d4a78(),
-          _0x39a3a0({ ok: false, registered: _0x25300f, reason: _0x33e86d?.reason || 'capture-failed' }),
-          _0x6d568c({
+      const targetBounds = resolveOverlayBounds(),
+        prepared = await prepareOverlayWindow(targetBounds);
+      if (!prepared) {
+        setShortcutStatus({ ok: false, registered: shortcutStatus.registered === true, reason: 'overlay-start-failed' });
+        return;
+      }
+      const capture = await captureDesktopDisplay();
+      if (!capture?.ok) {
+        (resetOverlayWindow(),
+          setShortcutStatus({
+            ok: false,
+            registered: shortcutStatus.registered === true,
+            reason: capture?.reason || 'capture-failed',
+          }),
+          logDiagnosticEvent({
             type: 'screenshot.global_capture_failed',
             level: 'warn',
             source: 'main',
             message: 'Global screenshot capture failed',
-            context: _0x33e86d || {},
+            context: capture || {},
           }));
         return;
       }
-      await _0x492c99(_0x33e86d);
-    } catch (_0x3be666) {
-      (_0x2d4a78(),
-        _0x39a3a0({
+      const started = await startOverlaySelection(capture);
+      !started &&
+        (resetOverlayWindow(),
+        setShortcutStatus({ ok: false, registered: shortcutStatus.registered === true, reason: 'overlay-start-failed' }),
+        logDiagnosticEvent({
+          type: 'screenshot.global_overlay_start_failed',
+          level: 'warn',
+          source: 'main',
+          message: 'Global screenshot overlay failed to start',
+          context: { display: capture.display, cursor: capture.cursor },
+        }));
+    } catch (error) {
+      (resetOverlayWindow(),
+        setShortcutStatus({
           ok: false,
-          registered: _0x25300f,
+          registered: shortcutStatus.registered === true,
           reason: 'capture-failed',
-          error: String(_0x3be666?.message || _0x3be666),
+          error: String(error?.message || error),
         }),
-        _0x6d568c({
+        logDiagnosticEvent({
           type: 'screenshot.global_overlay_failed',
           level: 'error',
           source: 'main',
           message: 'Global screenshot overlay failed',
-          error: _0x3be666,
+          error: error,
         }));
     }
   }
-  function _0x303865() {
-    if (_0x25300f) return;
-    let _0x3bf6cd = false;
+  function unregisterGlobalShortcut() {
+    if (!shortcutRegistered && !registeredAccelerator) return;
     try {
-      _0x3bf6cd = globalShortcut.register(_0x2ad8dd, () => {
-        void _0x35d2f8();
+      globalShortcutApi.unregister(registeredAccelerator || currentAccelerator);
+    } catch {}
+    ((shortcutRegistered = false), (registeredAccelerator = ''));
+  }
+  function registerGlobalShortcut() {
+    if (shortcutRegistered && registeredAccelerator === currentAccelerator) return;
+    unregisterGlobalShortcut();
+    let registered = false;
+    try {
+      registered = globalShortcutApi.register(currentAccelerator, () => {
+        void startGlobalCapture();
       });
-    } catch (_0x553ce8) {
-      _0x6d568c({
+    } catch (error) {
+      logDiagnosticEvent({
         type: 'screenshot.global_shortcut_register_failed',
         level: 'error',
         source: 'main',
         message: 'Global screenshot shortcut registration threw',
-        error: _0x553ce8,
+        error: error,
       });
     }
-    ((_0x25300f = _0x3bf6cd),
-      _0x39a3a0({
-        ok: _0x3bf6cd,
-        registered: _0x3bf6cd,
-        reason: _0x3bf6cd ? 'registered' : 'registration-failed',
-      }),
-      _0x6d568c({
-        type: _0x3bf6cd
-          ? 'screenshot.global_shortcut_registered'
-          : 'screenshot.global_shortcut_register_failed',
-        level: _0x3bf6cd ? 'info' : 'warn',
-        source: 'main',
-        message: _0x3bf6cd
-          ? 'Global screenshot shortcut registered'
-          : 'Global screenshot shortcut registration failed',
-        context: { accelerator: _0x2ad8dd },
+    ((shortcutRegistered = registered),
+      (registeredAccelerator = registered ? currentAccelerator : ''),
+      setShortcutStatus({
+        ok: registered,
+        registered: registered,
+        reason: registered ? 'registered' : 'registration-failed',
       }));
+    if (registered) void prewarmOverlayWindow();
+    logDiagnosticEvent({
+      type: registered
+        ? 'screenshot.global_shortcut_registered'
+        : 'screenshot.global_shortcut_register_failed',
+      level: registered ? 'info' : 'warn',
+      source: 'main',
+      message: registered
+        ? 'Global screenshot shortcut registered'
+        : 'Global screenshot shortcut registration failed',
+      context: { accelerator: currentAccelerator },
+    });
   }
-  function _0x57fec6() {
-    if (_0x10747a()) {
-      _0x39a3a0({ ok: false, registered: false, reason: 'native-helper-starting' });
+  function installGlobalScreenshotShortcut() {
+    if (startNativeHelper()) {
+      setShortcutStatus({ ok: false, registered: false, reason: 'native-helper-starting' });
       return;
     }
-    _0x303865();
+    registerGlobalShortcut();
   }
-  function _0x4357bf() {
-    (_0x272eb7(), _0x25300f && (globalShortcut.unregister(_0x2ad8dd), (_0x25300f = false)));
+  function uninstallGlobalScreenshotShortcut() {
+    (stopNativeHelper(), unregisterGlobalShortcut());
   }
-  async function _0x2f266b(_0x1b6429 = {}) {
-    const _0xaad54f = String(_0x1b6429?.pngBase64 || '').trim();
-    if (!_0xaad54f) return { ok: false, reason: 'empty-payload' };
+  function configureGlobalScreenshotShortcut(payload = {}) {
+    const parsed = parseScreenshotShortcutPayload(payload);
+    if (!parsed.ok)
+      return (
+        setShortcutStatus({
+          ok: false,
+          registered: shortcutStatus.registered === true,
+          reason: parsed.reason || 'invalid-shortcut',
+        }),
+        {
+          ok: false,
+          registered: shortcutStatus.registered === true,
+          accelerator: currentAccelerator,
+          reason: parsed.reason || 'invalid-shortcut',
+        }
+      );
+    if (parsed.accelerator === currentAccelerator) {
+      sendGlobalScreenshotShortcutStatus();
+      return { ...shortcutStatus, ok: shortcutStatus.ok === true, accelerator: currentAccelerator };
+    }
     return (
-      _0x2d4a78(),
-      _0xe926b4({
-        pngBase64: _0xaad54f,
-        mimeType: String(_0x1b6429?.mimeType || 'image/png') || 'image/png',
+      uninstallGlobalScreenshotShortcut(),
+      (currentAccelerator = parsed.accelerator),
+      (shortcutStatus = { ok: false, registered: false, accelerator: currentAccelerator, reason: 'not-registered' }),
+      installGlobalScreenshotShortcut(),
+      { ...shortcutStatus, accelerator: currentAccelerator }
+    );
+  }
+  function getGlobalScreenshotShortcutStatus() {
+    return { ...shortcutStatus, accelerator: currentAccelerator };
+  }
+  function consumeGlobalScreenshotCaptureEvents() {
+    return captureEvents.consume();
+  }
+  async function handleScreenshotOverlayConfirm(payload = {}) {
+    const pngBase64 = String(payload?.pngBase64 || '').trim();
+    if (!pngBase64) return { ok: false, reason: 'empty-payload' };
+    return (
+      resetOverlayWindow(),
+      deliverCaptureResult({
+        pngBase64: pngBase64,
+        mimeType: String(payload?.mimeType || 'image/png') || 'image/png',
         source: 'globalShortcut',
+        actionId: payload?.actionId,
+        runImmediately: payload?.runImmediately,
       }),
       { ok: true }
     );
   }
-  async function _0x19d4bf() {
-    return (_0x2d4a78(), { ok: true });
+  async function handleScreenshotOverlayCancel() {
+    return (resetOverlayWindow(), { ok: true });
   }
-  function _0x2ef3b3() {
-    return path.join(_0x4957f9, 'native', 'screenshot-helper', 'bin', 'screenshot-helper.exe');
+  function resolveNativeHelperPath() {
+    return path.join(appRoot, 'native', 'screenshot-helper', 'bin', 'screenshot-helper.exe');
   }
-  function _0x335ffb() {
-    return path.join(_0x4957f9, 'images', 'cursors', 'windows11-concept-v2', 'light');
+  function resolveCursorDir() {
+    return path.join(appRoot, 'images', 'cursors', 'windows11-concept-v2', 'light');
   }
-  function _0xe926b4(_0x4fd594 = {}) {
-    const _0x216905 = String(_0x4fd594?.pngBase64 || '').trim();
-    if (!_0x216905) return false;
-    const _0x48e704 = _0x31301d();
+  function deliverCaptureResult(payload = {}) {
+    const pngBase64 = String(payload?.pngBase64 || '').trim();
+    if (!pngBase64) return false;
+    if (payload?.actionId !== 'reverse-prompt')
+      try {
+        const image = nativeImage.createFromDataURL('data:image/png;base64,' + pngBase64);
+        if (image.isEmpty()) throw new Error('empty-screenshot-image');
+        clipboard.writeImage(image);
+      } catch (error) {
+        logDiagnosticEvent({
+          type: 'screenshot.clipboard_write_failed',
+          level: 'warn',
+          source: 'main',
+          message: 'Failed to copy screenshot to clipboard',
+          error: error,
+        });
+      }
+    const event = {
+      pngBase64: pngBase64,
+      mimeType: String(payload?.mimeType || 'image/png') || 'image/png',
+      source: payload?.source || 'nativeHelper',
+      createdAt: Date.now(),
+    };
+    payload?.actionId === 'reverse-prompt' &&
+      ((event.actionId = 'reverse-prompt'),
+      (event.runImmediately = payload?.runImmediately === true),
+      Promise.resolve()
+        .then(() => focusCanvas())
+        .catch(() => {}));
+    captureEvents.push(event);
+    const mainWindow = getMainWindow();
     return (
-      _0x48e704 &&
-        !_0x48e704.isDestroyed() &&
-        !_0x48e704.webContents.isDestroyed() &&
-        _0x48e704.webContents.send('screenshot:globalCaptureReady', {
-          pngBase64: _0x216905,
-          mimeType: String(_0x4fd594?.mimeType || 'image/png') || 'image/png',
-          source: _0x4fd594?.source || 'nativeHelper',
-          createdAt: Date.now(),
-        }),
+      mainWindow &&
+        !mainWindow.isDestroyed() &&
+        !mainWindow.webContents.isDestroyed() &&
+        mainWindow.webContents.send('screenshot:globalCaptureReady', event),
       true
     );
   }
-  function _0x48384b(_0xd75b70) {
-    const _0x44d05b = String(_0xd75b70 || '').trim();
-    if (!_0x44d05b) return;
-    let _0x5bee01 = null;
+  function handleNativeHelperMessage(message) {
+    const raw = String(message || '').trim();
+    if (!raw) return;
+    let payload = null;
     try {
-      _0x5bee01 = JSON.parse(_0x44d05b);
-    } catch (_0x3caf26) {
-      _0x6d568c({
+      payload = JSON.parse(raw);
+    } catch (error) {
+      logDiagnosticEvent({
         type: 'screenshot.native_helper_bad_message',
         level: 'warn',
         source: 'main',
         message: 'Native screenshot helper sent an invalid message',
-        context: { raw: _0x44d05b.slice(0, 160) },
-        error: _0x3caf26,
+        context: { raw: raw.slice(0, 160) },
+        error: error,
       });
       return;
     }
-    if (_0x5bee01?.type === 'status') {
-      const _0xcc4539 = _0x5bee01.registered === true;
-      _0x39a3a0({
-        ok: _0xcc4539,
-        registered: _0xcc4539,
-        reason: _0xcc4539 ? 'registered-native' : 'native-registration-failed',
+    if (payload?.type === 'status') {
+      const registered = payload.registered === true;
+      setShortcutStatus({
+        ok: registered,
+        registered: registered,
+        reason: registered ? 'registered-native' : 'native-registration-failed',
       });
-      !_0xcc4539 && (_0x272eb7(), _0x303865());
+      !registered && (stopNativeHelper(), registerGlobalShortcut());
       return;
     }
-    _0x5bee01?.type === 'capture' &&
-      _0xe926b4({
-        pngBase64: _0x5bee01.pngBase64,
-        mimeType: _0x5bee01.mimeType || 'image/png',
+    payload?.type === 'capture' &&
+      deliverCaptureResult({
+        pngBase64: payload.pngBase64,
+        mimeType: payload.mimeType || 'image/png',
         source: 'nativeHelper',
+        actionId: payload.actionId,
+        runImmediately: payload.runImmediately,
       });
   }
-  function _0x10747a() {
+  function startNativeHelper() {
     if (process.platform !== 'win32') return false;
-    if (_0x2fcf8e && !_0x2fcf8e.killed) return true;
-    const _0x1b6e4d = _0x2ef3b3();
-    if (!existsSync(_0x1b6e4d))
+    if (nativeHelper && !nativeHelper.killed) return true;
+    const helperPath = resolveNativeHelperPath();
+    if (!existsSync(helperPath))
       return (
-        _0x6d568c({
+        logDiagnosticEvent({
           type: 'screenshot.native_helper_missing',
           level: 'warn',
           source: 'main',
           message: 'Native screenshot helper executable is missing',
-          context: { helperPath: _0x1b6e4d },
+          context: { helperPath: helperPath },
         }),
         false
       );
     try {
-      ((_0x2b05fa = ''),
-        (_0x2fcf8e = spawn(_0x1b6e4d, [], {
-          env: { ...process.env, AICANVAS_CURSOR_DIR: _0x335ffb() },
+      ((nativeHelperBuffer = ''),
+        (nativeHelper = spawn(helperPath, [], {
+          env: {
+            ...process.env,
+            AICANVAS_CURSOR_DIR: resolveCursorDir(),
+            AICANVAS_THEME_TOKENS_PATH: path.join(appRoot, 'styles', 'variables.css'),
+            AICANVAS_SCREENSHOT_ACCELERATOR: currentAccelerator,
+          },
           stdio: ['ignore', 'pipe', 'pipe'],
           windowsHide: true,
         })));
-    } catch (_0x447d3d) {
+    } catch (error) {
       return (
-        _0x6d568c({
+        logDiagnosticEvent({
           type: 'screenshot.native_helper_start_failed',
           level: 'error',
           source: 'main',
           message: 'Native screenshot helper failed to start',
-          error: _0x447d3d,
-          context: { helperPath: _0x1b6e4d },
+          error: error,
+          context: { helperPath: helperPath },
         }),
-        (_0x2fcf8e = null),
+        (nativeHelper = null),
         false
       );
     }
     return (
-      _0x2fcf8e.stdout?.setEncoding('utf8'),
-      _0x2fcf8e.stdout?.on('data', (_0x11f892) => {
-        _0x2b05fa += String(_0x11f892 || '');
-        let _0x3bb5fa = _0x2b05fa.indexOf('\n');
-        while (_0x3bb5fa >= 0) {
-          const _0x43de21 = _0x2b05fa.slice(0, _0x3bb5fa);
-          ((_0x2b05fa = _0x2b05fa.slice(_0x3bb5fa + 1)),
-            _0x48384b(_0x43de21),
-            (_0x3bb5fa = _0x2b05fa.indexOf('\n')));
+      nativeHelper.stdout?.setEncoding('utf8'),
+      nativeHelper.stdout?.on('data', (chunk) => {
+        nativeHelperBuffer += String(chunk || '');
+        let newlineIndex = nativeHelperBuffer.indexOf('\n');
+        while (newlineIndex >= 0) {
+          const line = nativeHelperBuffer.slice(0, newlineIndex);
+          ((nativeHelperBuffer = nativeHelperBuffer.slice(newlineIndex + 1)),
+            handleNativeHelperMessage(line),
+            (newlineIndex = nativeHelperBuffer.indexOf('\n')));
         }
       }),
-      _0x2fcf8e.stderr?.setEncoding('utf8'),
-      _0x2fcf8e.stderr?.on('data', (_0x105423) => {
-        _0x6d568c({
+      nativeHelper.stderr?.setEncoding('utf8'),
+      nativeHelper.stderr?.on('data', (chunk) => {
+        logDiagnosticEvent({
           type: 'screenshot.native_helper_stderr',
           level: 'warn',
           source: 'main',
           message: 'Native screenshot helper stderr',
-          context: { text: String(_0x105423 || '').slice(0, 0x3e8) },
+          context: { text: String(chunk || '').slice(0, 0x3e8) },
         });
       }),
-      _0x2fcf8e.on('exit', (_0x4dfed9, _0x2b8cbd) => {
-        ((_0x2fcf8e = null),
-          (_0x2b05fa = ''),
-          _0x39a3a0({ ok: false, registered: false, reason: 'native-helper-exited' }),
-          _0x6d568c({
+      nativeHelper.on('exit', (code, signal) => {
+        ((nativeHelper = null),
+          (nativeHelperBuffer = ''),
+          setShortcutStatus({ ok: false, registered: false, reason: 'native-helper-exited' }),
+          logDiagnosticEvent({
             type: 'screenshot.native_helper_exited',
-            level: _0x4dfed9 === 0 ? 'info' : 'warn',
+            level: code === 0 ? 'info' : 'warn',
             source: 'main',
             message: 'Native screenshot helper exited',
-            context: { code: _0x4dfed9, signal: _0x2b8cbd },
+            context: { code: code, signal: signal },
           }));
       }),
-      _0x2fcf8e.on('error', (_0x24632b) => {
-        ((_0x2fcf8e = null),
-          _0x39a3a0({
+      nativeHelper.on('error', (error) => {
+        ((nativeHelper = null),
+          setShortcutStatus({
             ok: false,
             registered: false,
             reason: 'native-helper-error',
-            error: String(_0x24632b?.message || _0x24632b),
+            error: String(error?.message || error),
           }));
       }),
       true
     );
   }
-  function _0x272eb7() {
-    if (!_0x2fcf8e || _0x2fcf8e.killed) return;
+  function stopNativeHelper() {
+    if (!nativeHelper || nativeHelper.killed) return;
     try {
-      _0x2fcf8e.kill();
+      nativeHelper.kill();
     } catch {
     } finally {
-      ((_0x2fcf8e = null), (_0x2b05fa = ''));
+      ((nativeHelper = null), (nativeHelperBuffer = ''));
     }
   }
   return {
-    captureDesktopDisplay: _0x146a4b,
-    destroyScreenshotOverlayWindow: _0x3ce84d,
-    handleScreenshotOverlayCancel: _0x19d4bf,
-    handleScreenshotOverlayConfirm: _0x2f266b,
-    installGlobalScreenshotShortcut: _0x57fec6,
-    sendGlobalScreenshotShortcutStatus: _0x290bb7,
-    uninstallGlobalScreenshotShortcut: _0x4357bf,
+    captureDesktopDisplay: captureDesktopDisplay,
+    configureGlobalScreenshotShortcut: configureGlobalScreenshotShortcut,
+    consumeGlobalScreenshotCaptureEvents: consumeGlobalScreenshotCaptureEvents,
+    destroyScreenshotOverlayWindow: destroyScreenshotOverlayWindow,
+    getGlobalScreenshotShortcutStatus: getGlobalScreenshotShortcutStatus,
+    handleScreenshotOverlayCancel: handleScreenshotOverlayCancel,
+    handleScreenshotOverlayConfirm: handleScreenshotOverlayConfirm,
+    installGlobalScreenshotShortcut: installGlobalScreenshotShortcut,
+    sendGlobalScreenshotShortcutStatus: sendGlobalScreenshotShortcutStatus,
+    uninstallGlobalScreenshotShortcut: uninstallGlobalScreenshotShortcut,
   };
 }
