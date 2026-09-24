@@ -35,6 +35,7 @@ import {
   setGenerateButtonCancellableUi,
   setGenerateButtonLoadingUi,
 } from '../../modules/previewGenerateButtonUi.js';
+import { createStoryReferenceVideoGuard } from '../../modules/storyWorkspace/storyReferenceVideo.js';
 import { resolveGenerationInputImageUrl } from '../../services/imageReferenceUrlService.js';
 import { logDiagnosticEvent } from '../../services/diagnosticsService.js';
 import { buildGenerationStartPatch } from '../../core/generationTaskLifecycle.js';
@@ -2245,6 +2246,15 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
       if (shouldShowGenerationBusyUi(_0x33f6f3) || _0x30885d) return;
       this._videoSubmitInFlight = true;
       try {
+        let storyReferenceGuard;
+        try {
+          storyReferenceGuard = createStoryReferenceVideoGuard({ store: _0x4cc8fc, nodeId: this.nodeId,
+            resolveExecution: resolveModelExecution, getPromptHtml: () => this.promptEl?.innerHTML });
+          if (storyReferenceGuard && _0x133f9f != null) throw new Error('首帧任务不接受预设覆盖，请使用原节点普通生成按钮');
+          if (storyReferenceGuard && !window.confirm(storyReferenceGuard.confirmation)) return;
+        } catch (error) {
+          window.showToast?.(error.message, 'error'); return;
+        }
         const _0x457103 = String(this._data?.model || '').trim(),
           _0x51db0b = String(this._data?.provider || '').trim();
         await _0x9f6bfe(_0x457103, _0x51db0b);
@@ -2255,6 +2265,8 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
           } catch {}
         const _0x5bd3a7 = await this._buildPayload(_0x133f9f, { randomizeSubmitParams: true });
         if (!_0x5bd3a7) return;
+        try { storyReferenceGuard?.assertCurrent(_0x5bd3a7); }
+        catch (error) { window.showToast?.(error.message, 'error'); return; }
         const _0x4fdef3 = String(_0x5bd3a7.model || '').trim();
         if (_0x212b55(_0x4fdef3, _0x5bd3a7.provider) && !String(_0x5bd3a7.installId || '').trim()) {
           window.showToast?.(videoTaskText('toasts.missingInstallId'), 'error');
@@ -2397,7 +2409,7 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
                 if (_0x4b3bb6) this._persistAsyncResumeCache();
               },
               submit: async (_0x13d984, _0x2cdbc0 = {}) =>
-                _0x285cdc.generateVideo(_0x5bd3a7, {
+                _0x285cdc.generateVideo((storyReferenceGuard?.beforeSend(_0x5bd3a7), _0x5bd3a7), {
                   ...(_0x30ee23 ? { signal: this._rhAbortController.signal } : {}),
                   ...(_0x223447 ? { maxWaitMs: _0x4fb3f5 } : {}),
                   onTaskMeta: ({ taskId: _0x5ebf88, useOpenapiQuery: _0x17b67a, provider: _0x272d83 }) => {

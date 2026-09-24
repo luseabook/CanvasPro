@@ -208,12 +208,17 @@ export function clampMediaClipRange(_0x2f8aa1 = {}, _0x3b3438 = 0) {
     }
   );
 }
+function readStoryImageHoldDuration(track, sourceKey, kind) {
+  const value = track?.storyImageDurationSec;
+  return kind === 'image' && normalizeText(track?.sourceKey) === sourceKey &&
+    Number.isFinite(value) && value >= 0.1 && value <= 3600 ? value : 0;
+}
 function normalizeTrack(_0x18efdb = {}, _0x52f77c = null, _0x357823 = '') {
   if (!_0x52f77c) return null;
   const _0x1c21e6 = _0x18efdb && typeof _0x18efdb === 'object' ? _0x18efdb : {},
     _0x3505b0 = resolveMediaClipSourceKey(_0x52f77c);
   if (!_0x3505b0) return null;
-  const _0x1abaf4 = resolveMediaClipDurationSec(_0x52f77c, _0x357823),
+  const _0x1abaf4 = readStoryImageHoldDuration(_0x1c21e6, _0x3505b0, _0x357823) || resolveMediaClipDurationSec(_0x52f77c, _0x357823),
     _0x55dd42 = normalizeText(_0x1c21e6.sourceKey) !== _0x3505b0,
     _0x14935e = _0x55dd42
       ? { startSec: 0, endSec: _0x1abaf4 || _0x1c21e6.endSec || MIN_RANGE_SEC }
@@ -362,6 +367,7 @@ function normalizeVideoClips(_0x5d42db = {}, _0xbbf7b9 = []) {
           startSec: _0x532520.startSec,
           endSec: _0x532520.endSec,
           durationSec: _0x532520.durationSec,
+          ...(readStoryImageHoldDuration(_0x2051e1, _0x325434, _0x5b1645) ? { storyImageDurationSec: _0x2051e1.storyImageDurationSec } : {}),
           timelineStartSec: _0x2051e1?.timelineStartSec,
           timelineEndSec: _0x2051e1?.timelineEndSec,
         });
@@ -464,6 +470,7 @@ function normalizeAudioClips(_0x49306a = {}, _0x3be2b1 = []) {
           laneIndex: _0x2c962c?.laneIndex,
           muted: _0x2c962c?.muted === true,
           disabled: _0x2c962c?.disabled === true,
+          ...(_0x2c962c?.volume !== undefined ? { volume: _0x2c962c.volume } : {}),
         }),
           (_0x3cdaa5 = Math.max(_0x3cdaa5, _0x4f7575)));
       });
@@ -1001,6 +1008,7 @@ function normalizeMediaClipExportAudioClips(_0x4e2ae1 = []) {
         timelineStartSec: _0x51ee39,
         timelineEndSec: _0x505614,
         laneIndex: normalizeMediaClipAudioLaneIndex(_0xc0223e.laneIndex),
+        ...(_0xc0223e.volume !== undefined && _0xc0223e.volume !== 1 ? { volume: Math.max(0, Math.min(1, toNumber(_0xc0223e.volume, 1))) } : {}),
       };
     })
     .filter(Boolean);
@@ -1049,7 +1057,7 @@ export function buildMediaClipExportSignature({
           ':' +
           roundSec(_0x6e0c7e.timelineStartSec) +
           ':' +
-          roundSec(_0x6e0c7e.timelineEndSec),
+          roundSec(_0x6e0c7e.timelineEndSec) + (_0x6e0c7e.volume !== undefined ? ':volume=' + _0x6e0c7e.volume : ''),
       );
     });
   else
@@ -1098,6 +1106,7 @@ export function buildMediaClipExportPayload({
       timelineStart: roundSec(_0x4113d2.timelineStartSec),
       timelineEnd: roundSec(_0x4113d2.timelineEndSec),
       laneIndex: normalizeMediaClipAudioLaneIndex(_0x4113d2.laneIndex),
+      ...(_0x4113d2.volume !== undefined && _0x4113d2.volume !== 1 ? { volume: _0x4113d2.volume } : {}),
     })),
     _0x2a0f78 = _0x22c255.length > 1 || _0x22c255.some((_0x48c9d7) => _0x48c9d7.kind === 'image'),
     _0x3c6f86 = _0x22c255.find((_0x3417e) => _0x3417e.kind === 'video') || _0x22c255[0] || null,

@@ -3,6 +3,9 @@ import { t } from '../i18n/index.js';
 import { shouldShowGenerationBusyUi } from './generationTaskUiState.js';
 export function getRendererDefaultNodeLabel(_0x100f1c) {
   const _0x5cd38d = String(_0x100f1c?.type || '');
+  if (_0x5cd38d === 'whiteboard') return t('nodeCreation.items.whiteboard.defaultName');
+  if (_0x5cd38d === 'comfyui-workflow') return t('nodeCreation.items.comfyWorkflow.defaultName');
+  if (_0x5cd38d === 'story-workspace') return t('nodeCreation.items.storyWorkspace.defaultName');
   let _0x3b7873 = t('coreUi.renderer.defaultNodeNames.node');
   if (_0x5cd38d.includes('image')) _0x3b7873 = t('coreUi.renderer.defaultNodeNames.image');
   else {

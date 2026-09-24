@@ -10,8 +10,27 @@ function hasGenerationRuntimeMethod(_0x2fbfab = {}) {
   );
 }
 export function createNodeRuntimeRegistry() {
-  const _0x5f51a2 = new Map();
+  const _0x5f51a2 = new Map(),
+    runtimeResolvers = new Map();
   return {
+    registerResolver(nodeType, resolver) {
+      if (typeof resolver !== 'function') throw new TypeError('Node runtime resolver must be a function');
+      return (
+        runtimeResolvers.set(nodeType, resolver),
+        () => {
+          if (runtimeResolvers.get(nodeType) === resolver) runtimeResolvers.delete(nodeType);
+        }
+      );
+    },
+    resolve(nodeId, options = {}) {
+      const normalizedId = normalizeNodeId(nodeId),
+        nodeRecord =
+          options.store?.getStateRaw?.()?.nodes?.[normalizedId] ||
+          options.store?.getState?.()?.nodes?.[normalizedId];
+      if (nodeRecord && runtimeResolvers.has(nodeRecord.type))
+        return runtimeResolvers.get(nodeRecord.type)(normalizedId, options);
+      return normalizedId ? _0x5f51a2.get(normalizedId) || null : null;
+    },
     register(_0x16f264, _0x23f763 = {}) {
       const _0x2a3162 = normalizeNodeId(_0x16f264);
       if (!_0x2a3162 || !_0x23f763 || typeof _0x23f763 !== 'object') return null;

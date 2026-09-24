@@ -53,6 +53,9 @@ import {
   createEmptyCollageNodeData,
   isCollageImageNode,
 } from '../modules/collage/collageFactory.js';
+import { createWhiteboardNodeData } from '../modules/whiteboard/whiteboardModel.js';
+import { createComfyWorkflowNodeData } from '../modules/comfyui/comfyWorkflowModel.js';
+import { createStoryWorkspaceNodeData } from '../modules/storyWorkspace/storyWorkspaceModel.js';
 import { createDragController } from '../modules/interaction/DragController.js';
 import {
   beginDragFpsSession,
@@ -986,6 +989,16 @@ function showNodesContextMenu(_0x361e2e, _0x4f4904, _0x5912c5) {
         new CustomEvent('v2:canvas-paste-request', { detail: { screenX: _0x361e2e, screenY: _0x4f4904 } }),
       );
     }));
+  _0xfa722a('导出选中节点本地媒体…', '', () => {
+    import('../modules/nodeExport/NodeMediaExportDialog.js')
+      .then(({ openNodeMediaExportDialog }) => openNodeMediaExportDialog(_0x25f1fe, [..._0x592d17]))
+      .catch(() => window.showToast?.('媒体导出窗口加载失败', 'error'));
+  });
+  _0xfa722a('导出视频时间线工程（Premiere XML）…', '', () => {
+    import('../modules/timelineExport/TimelineExportDialog.js')
+      .then(({ openTimelineExportDialog }) => openTimelineExportDialog(_0x25f1fe, [..._0x592d17]))
+      .catch(() => window.showToast?.('时间线导出窗口加载失败', 'error'));
+  });
   const _0x3b68b0 = _0x592d17.filter((_0x3b4150) => isCollageImageNode(_0x25f1fe[_0x3b4150]));
   _0x3b68b0.length >= 2 &&
     _0xfa722a(t('canvasInteraction.contextMenu.createCollage'), '', () => {
@@ -1552,6 +1565,24 @@ export function initCanvasContextMenu(_0x1d7319) {
         height: _0x4587eb,
         name: _0x301c37,
       });
+    if (_0x39c6b7 === 'story-workspace')
+      return createStoryWorkspaceNodeData({
+        id: _0x10760e, x: _0x557619, y: _0x11182e,
+        width: _0x7ecc36, height: _0x4587eb,
+        name: _0x301c37 || t('nodeCreation.items.storyWorkspace.defaultName'),
+      });
+    if (_0x39c6b7 === 'comfyui-workflow')
+      return createComfyWorkflowNodeData({
+        id: _0x10760e, x: _0x557619, y: _0x11182e,
+        width: _0x7ecc36, height: _0x4587eb,
+        name: _0x301c37 || t('nodeCreation.items.comfyWorkflow.defaultName'),
+      });
+    if (_0x39c6b7 === 'whiteboard')
+      return createWhiteboardNodeData({
+        id: _0x10760e, x: _0x557619, y: _0x11182e,
+        width: _0x7ecc36, height: _0x4587eb,
+        name: _0x301c37 || t('nodeCreation.items.whiteboard.defaultName'),
+      });
     if (_0x39c6b7 === 'collage')
       return createEmptyCollageNodeData({
         id: _0x10760e,
@@ -1915,6 +1946,9 @@ export function initCanvasContextMenu(_0x1d7319) {
         'panorama-360': () => _0x3fa974(_0x8aa9ee),
         'storyboard-script': () => _0x1c7de0(_0x8aa9ee),
         collage: () => _0x5ae89d(_0x8aa9ee),
+        whiteboard: () => _0x5ae89d(_0x8aa9ee),
+        'comfyui-workflow': () => _0x5ae89d(_0x8aa9ee),
+        'story-workspace': () => _0x1c7de0(_0x8aa9ee),
         'web-preview': () => _0x213904(_0x8aa9ee),
         'media-clip': () => _0x3c2b58(_0x8aa9ee),
         debug: () => _0x48c687(),

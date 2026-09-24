@@ -535,6 +535,9 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
       ).trim();
     }
     ['_shouldFallbackRegenerateAsyncTask'](_0x26fe5d = this._data) {
+      // Workroom batches require a new explicit decision, never fallback paid resubmission.
+      if (_0x26fe5d?.storyMediaBatch?.version === 1 ||
+          _0xff470c.getState?.()?.nodes?.[this.nodeId]?.storyMediaBatch?.version === 1) return false;
       const _0x4efc83 = String(_0x26fe5d?.asyncTaskId || '').trim();
       if (_0x4efc83) return false;
       const _0x2f0a18 = this._inferProviderFromModel(

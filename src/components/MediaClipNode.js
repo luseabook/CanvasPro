@@ -150,6 +150,7 @@ export class MediaClipNode {
   constructor(_0x298e4e) {
     ((this.nodeData = _0x298e4e || {}),
       (this.id = this.nodeData.id),
+      (this._storyClipNodesContext = this.nodeData.storySequence ? appStore.getStateRaw().nodes : null),
       (this.el = document.createElement('div')),
       (this.el.className = 'media-clip-node-shell'),
       (this._sources = { video: null, videos: [], audio: null, audios: [] }),
@@ -771,11 +772,12 @@ export class MediaClipNode {
   ['_syncAudioPreviewSourceForTimelineSec'](_0x541c4b = this._playheadSec) {
     const _0x2a07dc = this._audioPreview;
     if (!_0x2a07dc) return false;
-    this._videoPreview && this._mediaClip.tracks?.audio && (this._videoPreview.muted = true);
+    this._videoPreview && this._mediaClip.tracks?.audio && (this._videoPreview.muted = this.nodeData?.storySequence?.version !== 2);
     const _0x314a0d = this._getAudioClipContextAtTimelineSec(_0x541c4b, {
       audibleOnly: true,
       nearest: false,
     });
+    _0x2a07dc.volume = Math.max(0, Math.min(1, toNumber(_0x314a0d.clip?.volume, 1)));
     if (!_0x314a0d.url) return (setMediaElementSource(_0x2a07dc, ''), (this._previewAudioSrc = ''), false);
     const _0x38276c = setMediaElementSource(_0x2a07dc, _0x314a0d.url);
     if (_0x38276c) this._resetPreviewSeekState('audio');
@@ -2221,7 +2223,8 @@ export class MediaClipNode {
       if (_0x1661d4) {
         const _0x3641ac = this._ensurePreviewAudioElement();
         if (setMediaElementSource(_0x3641ac, _0x3efd22)) this._resetPreviewSeekState('audio');
-        ((this._previewAudioSrc = _0x3efd22), (_0x5d8c6b.muted = true), _0x150eba.appendChild(_0x3641ac));
+        _0x3641ac.volume = Math.max(0, Math.min(1, toNumber(_0x1046af?.clip?.volume, 1)));
+        ((this._previewAudioSrc = _0x3efd22), (_0x5d8c6b.muted = this.nodeData?.storySequence?.version !== 2), _0x150eba.appendChild(_0x3641ac));
       } else ((_0x5d8c6b.muted = false), this._disposePreviewMedia('audio'));
       (_0x150eba.appendChild(_0x58060f),
         _0x150eba.appendChild(_0x5d8c6b),

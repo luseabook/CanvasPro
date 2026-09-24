@@ -19,7 +19,29 @@ const zhCN = Object.freeze({
       shortcutRegistrationFailed: '全局 Alt+Q 注册失败，仍可在应用内使用 Alt+Q',
       captureFailed: '全局截图失败，请检查屏幕录制权限或稍后重试',
     }),
+    globalTextPreset: Object.freeze({
+      noSelectedText: '没有读取到选中文本，请先选中文字后再使用快捷键',
+      defaultMissing: '尚未设置默认预设栏，已暂时打开文本预设；右键顶部预设栏可设置星标',
+      shortcutRegistrationFailed: '全局 {accelerator} 注册失败，请在快捷键设置中更换按键',
+    }),
+    globalCapture: Object.freeze({
+      unsupportedAction: '暂不支持这种加入方式',
+      preparingGeneration: '正在创建节点并准备生成',
+      nodeAdded: '已加入当前画布',
+      actionFailed: '加入画布失败：{reason}',
+      generationFailed: '节点已创建，但启动生成失败：{reason}',
+      generationStarted: '节点已创建并开始生成',
+      nodeNames: Object.freeze({
+        sourceText: '全局选中文本',
+        aiText: '选中文本 · AI 文本',
+        aiImage: '选中文本\x20·\x20AI\x20图像',
+        aiVideo: '选中文本 · AI 视频',
+      }),
+    }),
     nodeLabel: Object.freeze({ renameTooltip: '点击重命名' }),
+    completionNavigation: Object.freeze({
+      nodeMissing: '对应的画布节点已删除或项目已关闭。',
+    }),
   }),
   appShell: Object.freeze({ currentVersionBadge: '当前版本：V {version}' }),
   appBusinessEvents: Object.freeze({
@@ -80,7 +102,7 @@ const zhCN = Object.freeze({
   projectManager: Object.freeze({
     defaultProjectName: '画板 {date}',
     newProjectFallback: '新项目',
-    loadFailed: '读取项目失败',
+    loadFailed: '读取项目失败；当前画布未替换。请核对保存位置，不要用空画布覆盖原项目。',
     loading: '加载中...',
     newProject: '新建项目',
     delete: '删除',
@@ -140,7 +162,7 @@ const zhCN = Object.freeze({
     deleteFailed: '删除失败',
     listLoadFailed: '加载失败，请确认服务器运行中',
     loaded: '已加载：{name}',
-    loadFailed: '加载失败',
+    loadFailed: '项目未加载，当前画布未替换；请核对项目文件与保存目录。',
     saveSucceeded: '保存成功：{name}',
     saveFailed: '保存失败',
     newCanvasCreated: '已新建画布',
@@ -459,6 +481,11 @@ const zhCN = Object.freeze({
         label: '迁移保存位置',
         preparing: '准备迁移文件',
         migrating: '正在迁移文件',
+        inspecting: '正在检查旧目录',
+        copying: '正在复制文件（保留旧目录）',
+        applying: '正在应用新的保存位置',
+        legacyDone: '旧版文件复制完成（旧目录仍保留）',
+        failedStage: '复制失败；旧目录仍保留，请核对当前保存路径',
         creatingTask: '正在创建迁移任务',
         migrateOutput: '正在迁移输出文件保存路径',
         done: '迁移完成',
@@ -470,7 +497,43 @@ const zhCN = Object.freeze({
         itemFailed: '迁移失败',
         noJobId: '迁移任务未返回 jobId',
         failedMessage: '文件迁移失败',
-        summary: '迁移完成：复制 {copied} 个，跳过 {skipped} 个，失败 {failed} 个',
+        summary: '迁移完成：复制 {copied} 个，已有同内容 {skipped} 个，失败 {failed} 个（旧文件保留）',
+        confirmCopy:
+          '确定复制下列旧目录中的全部文件并切换保存位置？\n\n{paths}\n\n旧目录和原文件不会删除；同名但内容不同、源文件变动或校验失败时不切换路径。请先备份并暂停项目保存和生成任务。',
+        confirmUnavailable: '当前窗口无法显示迁移确认，保存位置未更改',
+        pathLabels: Object.freeze({
+          canvasDir: '项目目录',
+          dataDir: '数据与素材目录',
+          outputDir: '输出目录',
+          tempDir: '上传目录',
+        }),
+      }),
+      legacyImport: Object.freeze({
+        label: '从旧版默认目录导入',
+        desc: '仅扫描桌面宿主提供的旧版默认项目、数据与输出目录。复制到当前保存位置，不删除旧文件；不会改写绝对素材路径。确认旧工程和素材保存重开前勿清理旧目录。',
+        scan: '扫描旧目录',
+        select: '选择旧版存储目录',
+        copy: '确认复制',
+        files: '个文件',
+        scanning: '正在只读扫描旧版目录…',
+        noCandidates: '未找到可复制的旧版默认目录；自定义旧路径需用原生“打开工程”单独核对。',
+        blocked: '该旧目录不能安全导入：{error}',
+        preview: '旧目录：{root}；待核对 {count} 个文件。不会在确认前复制。',
+        scanFailed: '扫描旧目录失败：{error}',
+        confirmUnavailable: '当前窗口无法显示导入确认，未复制文件',
+        confirm:
+          '确认仅复制这 {count} 个旧版文件到当前保存位置？\n\n{paths}\n\n同名内容不同会失败而不覆盖；源文件与旧目录始终保留。请先备份并暂停保存/生成。复制不会改写工程中的绝对素材引用；核对旧工程与素材重开前切勿清理旧目录。',
+        pathLabels: Object.freeze({
+          canvasDir: '项目目录',
+          dataDir: '数据与素材目录',
+          outputDir: '输出目录',
+        }),
+        missingJob: '旧目录复制任务没有返回 jobId',
+        copyFailed: '旧目录复制失败',
+        copyFailedWithReason: '旧目录复制失败：{error}。旧文件保留，可能已有部分副本，请核对后重试。',
+        statusUnknown: '任务 {jobId} 尚未确认完成：{error}。后台可能仍在复制；请勿清理旧目录。',
+        done: '旧版文件已复制 {copied} 个，已有同内容 {identical} 个；旧目录仍保留。请手动打开工程并验证素材。',
+        unknownError: '未知错误',
       }),
       validation: Object.freeze({
         chooseRoot: '请选择保存根目录',
@@ -486,6 +549,7 @@ const zhCN = Object.freeze({
         pickTitle: '选择保存根目录',
         pickFailed: '选择目录失败：{error}',
         loadFailed: '加载文件与保存路径失败',
+        savedWithoutMigration: '保存路径未改变，设置已保存',
         partialMigrationFailed: '保存位置已更新，但部分文件迁移失败。{summary}',
         saveFailed: '保存文件路径失败：{error}',
         unknownError: '未知错误',
@@ -509,7 +573,7 @@ const zhCN = Object.freeze({
       }),
       legacyCleanup: Object.freeze({
         label: '清理旧 C 盘资源',
-        desc: '路径迁移后，扫描旧默认保存位置里的项目素材、输出和缓存文件，确认后移到系统回收站',
+        desc: '仅在确认旧项目及全部素材已正确保存重开后，再扫描旧位置；删除前需另行确认，旧文件不由迁移自动清理',
         scan: '扫描旧位置',
         trash: '移到回收站',
         count: '可清理文件',
@@ -1467,6 +1531,10 @@ const zhCN = Object.freeze({
       activate: '去激活授权',
       subscriptionRequired: '请先激活授权后继续添加预设',
       deleteAria: '删除 {title}',
+      quickCaptureDefaultSet: '已将「{preset}」设为全局复制文本默认预设栏',
+      quickCaptureDefaultFailed: '保存默认预设栏失败',
+      quickCaptureDefaultAria: '「{preset}」，全局复制文本默认预设栏',
+      quickCaptureSetAria: '「{preset}」，右键设为全局复制文本默认预设栏',
     }),
     editor: Object.freeze({
       name: '名字',
@@ -2119,6 +2187,7 @@ const zhCN = Object.freeze({
   coreServices: Object.freeze({
     completion: Object.freeze({
       notificationBody: '生成任务已完成。',
+      notificationNodeBody: '“{name}”生成完成。',
       soundPlaybackFailed: '提示音播放失败，请检查文件',
     }),
     projectFile: Object.freeze({ unnamedCanvas: '未命名画布' }),
@@ -2229,7 +2298,19 @@ const zhCN = Object.freeze({
     packageUnsupported: '当前环境不支持加载项目包',
     packagePathMissing: '无法读取项目包路径',
     localArchiveLoaded: '成功加载本地存档: {name}',
-    jsonArchiveParseFailed: '解析 JSON 存档失败',
+    jsonArchiveParseFailed: 'JSON 存档读取失败或工程结构不受支持，当前画布未替换。',
+    projectLoadFailedNoSave:
+      '项目读取失败，已停用当前工程自动保存；请核对原文件与保存位置，不要用空画布覆盖。',
+    recoveryReadFailedNoSave:
+      '恢复快照或本地缓存无法安全读取，已停用当前工程自动保存；原始数据保留。请先备份核对，勿用空画布覆盖。',
+    recoverySnapshotProtected:
+      '检测到其他工程或无法读取的恢复快照，原文件已保留；本次恢复备份未写入。请先备份核对。',
+    recoverySnapshotUpgradeRequired:
+      '当前桌面端不支持受保护的恢复快照写入，本次未写恢复备份。请手动保存工程并更新重启桌面端；关闭前未保存修改可能丢失。',
+    recoverySnapshotRetainedAfterSave:
+      '工程已保存，但原恢复快照未自动清理（可能属于其他工程、已损坏或保存期间更新）。请先备份核对原文件。',
+    defaultProjectMissing:
+      '未找到默认工程，已打开新空画布。若以前保存过工程，请先核对旧保存位置，不要用空画布覆盖。',
   }),
   imageFunctionMenu: Object.freeze({
     providers: Object.freeze({
@@ -3531,6 +3612,17 @@ const zhCN = Object.freeze({
         subtitle: '镜头表、提示词、节奏',
       }),
       collage: Object.freeze({ label: '拼图', defaultName: '拼图', subtitle: '图片排版与导出' }),
+      whiteboard: Object.freeze({ label: '白板', defaultName: '白板', subtitle: '自由绘制、图文排版与导出' }),
+      comfyWorkflow: Object.freeze({
+        label: 'ComfyUI 工作流',
+        defaultName: 'ComfyUI 工作流',
+        subtitle: '本地/云端 API 工作流与生成结果',
+      }),
+      storyWorkspace: Object.freeze({
+        label: '剧本工作室',
+        defaultName: '剧本工作室',
+        subtitle: '多集剧本、人物场景与分镜编辑',
+      }),
       mediaClip: Object.freeze({ label: '剪辑', defaultName: '剪辑', subtitle: '音视频剪切整理' }),
       debug: Object.freeze({
         label: '调试节点',

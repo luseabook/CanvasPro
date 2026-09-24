@@ -19,7 +19,31 @@ const enUS = Object.freeze({
       shortcutRegistrationFailed: 'Global Alt+Q registration failed. You can still use Alt+Q inside the app.',
       captureFailed: 'Global screenshot failed. Check screen recording permission or try again later.',
     }),
+    globalTextPreset: Object.freeze({
+      noSelectedText: 'No selected text was found. Select text, then use the shortcut again.',
+      defaultMissing:
+        'No default preset tab is set. Text presets opened temporarily; right-click a tab to star it.',
+      shortcutRegistrationFailed:
+        'Global {accelerator} registration failed. Choose another shortcut in settings.',
+    }),
+    globalCapture: Object.freeze({
+      unsupportedAction: 'This canvas action is not supported yet.',
+      preparingGeneration: 'Creating\x20the\x20node\x20and\x20preparing\x20generation',
+      nodeAdded: 'Added to the current canvas',
+      actionFailed: 'Failed to add to canvas: {reason}',
+      generationFailed: 'The node was created, but generation could not start: {reason}',
+      generationStarted: 'Node\x20created\x20and\x20generation\x20started',
+      nodeNames: Object.freeze({
+        sourceText: 'Globally\x20selected\x20text',
+        aiText: 'Selected text · AI text',
+        aiImage: 'Selected text · AI image',
+        aiVideo: 'Selected text · AI video',
+      }),
+    }),
     nodeLabel: Object.freeze({ renameTooltip: 'Click to rename' }),
+    completionNavigation: Object.freeze({
+      nodeMissing: 'The corresponding canvas node was deleted or the project was closed.',
+    }),
   }),
   appShell: Object.freeze({ currentVersionBadge: 'Current version: V{version}' }),
   appBusinessEvents: Object.freeze({
@@ -95,7 +119,8 @@ const enUS = Object.freeze({
   projectManager: Object.freeze({
     defaultProjectName: 'Canvas {date}',
     newProjectFallback: 'New project',
-    loadFailed: 'Failed to read project',
+    loadFailed:
+      'Failed to read project; the current canvas was not replaced. Check the save location; do not overwrite the original with an empty canvas.',
     loading: 'Loading...',
     newProject: 'New project',
     delete: 'Delete',
@@ -159,7 +184,7 @@ const enUS = Object.freeze({
     deleteFailed: 'Delete failed',
     listLoadFailed: 'Loading failed. Confirm the server is running.',
     loaded: 'Loaded: {name}',
-    loadFailed: 'Loading failed',
+    loadFailed: 'Project not loaded; the current canvas was not replaced. Check the file and save location.',
     saveSucceeded: 'Saved: {name}',
     saveFailed: 'Save failed',
     newCanvasCreated: 'New canvas created',
@@ -509,6 +534,11 @@ const enUS = Object.freeze({
         label: 'Migrate save location',
         preparing: 'Preparing files for migration',
         migrating: 'Migrating files',
+        inspecting: 'Checking old folders',
+        copying: 'Copying files (keeping the old folders)',
+        applying: 'Applying new save paths',
+        legacyDone: 'Legacy files copied; original folders remain',
+        failedStage: 'Copy failed. Original folders remain; check active save paths',
         creatingTask: 'Creating migration task',
         migrateOutput: 'Migrating output save path',
         done: 'Migration complete',
@@ -520,7 +550,47 @@ const enUS = Object.freeze({
         itemFailed: 'Migration failed',
         noJobId: 'Migration task did not return a jobId',
         failedMessage: 'File migration failed',
-        summary: 'Migration complete: copied {copied}, skipped {skipped}, failed {failed}',
+        summary:
+          'Migration complete: copied {copied}, already identical {skipped}, failed {failed} (old files retained)',
+        confirmCopy:
+          'Copy all files from these old locations and switch the save paths?\n\n{paths}\n\nOriginal files are kept. Name conflicts, changed source files, or verification errors prevent the switch. Back up first, and pause project saves and generation jobs.',
+        confirmUnavailable: 'This window cannot show a migration confirmation; save paths were not changed',
+        pathLabels: Object.freeze({
+          canvasDir: 'Projects',
+          dataDir: 'Data and assets',
+          outputDir: 'Outputs',
+          tempDir: 'Uploads',
+        }),
+      }),
+      legacyImport: Object.freeze({
+        label: 'Import from older default folders',
+        desc: 'Scan only legacy defaults provided by the desktop host. Copy projects, data and outputs to current save paths without deleting the originals. Absolute media references are not rewritten. Keep old folders until reopening and verifying projects and media.',
+        scan: 'Scan old folders',
+        select: 'Choose legacy folder',
+        copy: 'Confirm copy',
+        files: 'files',
+        scanning: 'Scanning legacy folders (read-only)…',
+        noCandidates:
+          'No importable legacy default folders found. Check custom old paths by opening the project explicitly.',
+        blocked: 'This legacy location cannot be imported safely: {error}',
+        preview: 'Old location: {root}; {count} files. No copying until you confirm.',
+        scanFailed: 'Failed to scan old folders: {error}',
+        confirmUnavailable: 'This window cannot display the import confirmation; no files copied',
+        confirm:
+          'Copy these {count} legacy files to the current save paths?\n\n{paths}\n\nDifferent-content name conflicts abort without overwriting. Original files and folders remain. Back up first, and pause saves and generation. This does not rewrite absolute media references; do not clean old folders until projects and media reopen correctly.',
+        pathLabels: Object.freeze({
+          canvasDir: 'Projects',
+          dataDir: 'Data and assets',
+          outputDir: 'Outputs',
+        }),
+        missingJob: 'Legacy copy task did not return a jobId',
+        copyFailed: 'Legacy folder copy failed',
+        copyFailedWithReason:
+          'Legacy copy failed: {error}. Originals remain; some copies may exist. Check before retrying.',
+        statusUnknown:
+          'Task {jobId} is not confirmed complete: {error}. Copying may still be in progress; keep the original folders.',
+        done: 'Copied {copied} legacy files; {identical} already identical. Old folders remain. Open the project and verify its media.',
+        unknownError: 'Unknown error',
       }),
       validation: Object.freeze({
         chooseRoot: 'Choose a save root folder',
@@ -536,6 +606,7 @@ const enUS = Object.freeze({
         pickTitle: 'Choose save root folder',
         pickFailed: 'Failed to choose folder: {error}',
         loadFailed: 'Failed to load file and save paths',
+        savedWithoutMigration: 'Save paths unchanged; settings saved',
         partialMigrationFailed: 'Save location was updated, but some files failed to migrate. {summary}',
         saveFailed: 'Failed to save file paths: {error}',
         unknownError: 'Unknown error',
@@ -559,7 +630,7 @@ const enUS = Object.freeze({
       }),
       legacyCleanup: Object.freeze({
         label: 'Clean old C drive assets',
-        desc: 'After path migration, scan the old default save location for project assets, outputs, and cache files, then move confirmed files to the system Recycle Bin',
+        desc: 'Only scan old locations after confirming old projects and all media reopen correctly. Deleting requires separate confirmation; migration never cleans the originals',
         scan: 'Scan old location',
         trash: 'Move to Recycle Bin',
         count: 'Cleanable files',
@@ -1664,6 +1735,10 @@ const enUS = Object.freeze({
       activate: 'Activate',
       subscriptionRequired: 'Activate access before adding more presets',
       deleteAria: 'Delete {title}',
+      quickCaptureDefaultSet: '{preset} is now the default tab for global text capture',
+      quickCaptureDefaultFailed: 'Failed to save the default preset tab',
+      quickCaptureDefaultAria: '{preset}, default tab for global text capture',
+      quickCaptureSetAria: '{preset}, right-click to set as the global text capture default',
     }),
     editor: Object.freeze({
       name: 'Name',
@@ -2483,6 +2558,7 @@ const enUS = Object.freeze({
   coreServices: Object.freeze({
     completion: Object.freeze({
       notificationBody: 'Generation task completed.',
+      notificationNodeBody: '“{name}” finished generating.',
       soundPlaybackFailed: 'Completion sound playback failed. Check the file.',
     }),
     projectFile: Object.freeze({ unnamedCanvas: 'Untitled canvas' }),
@@ -2599,7 +2675,20 @@ const enUS = Object.freeze({
     packageUnsupported: 'Project package loading is not supported in this environment',
     packagePathMissing: 'Unable to read project package path',
     localArchiveLoaded: 'Loaded local archive: {name}',
-    jsonArchiveParseFailed: 'Failed to parse JSON archive',
+    jsonArchiveParseFailed:
+      'JSON archive read failed or its project structure is unsupported; the current canvas was not replaced.',
+    projectLoadFailedNoSave:
+      'Project read failed. Autosave for this project is disabled; check the original file and save location. Do not overwrite it with an empty canvas.',
+    recoveryReadFailedNoSave:
+      'Recovery snapshot or local cache could not be safely read. Autosave for this project is disabled; the original data remains. Back it up before retrying; do not overwrite it with a blank canvas.',
+    recoverySnapshotProtected:
+      'A recovery snapshot from another project or an unreadable snapshot was preserved; this recovery backup was not written. Back up and inspect the original file.',
+    recoverySnapshotUpgradeRequired:
+      'This desktop host cannot write a guarded recovery snapshot, so no recovery backup was written. Save the project manually, then update and restart the desktop app; unsaved changes may be lost on close.',
+    recoverySnapshotRetainedAfterSave:
+      'Project saved, but the existing recovery snapshot was not automatically cleared (it may belong to another project, be damaged, or have changed during saving). Back up and inspect the original file.',
+    defaultProjectMissing:
+      'Default project not found; a new blank canvas is open. If you have saved work, check the old save location before saving anything over it.',
   }),
   imageFunctionMenu: Object.freeze({
     providers: Object.freeze({
@@ -4045,6 +4134,21 @@ const enUS = Object.freeze({
         label: 'Storyboard',
         defaultName: 'Storyboard',
         subtitle: 'Shot lists, prompts, pacing',
+      }),
+      whiteboard: Object.freeze({
+        label: 'Whiteboard',
+        defaultName: 'Whiteboard',
+        subtitle: 'Draw, arrange images and text, export',
+      }),
+      comfyWorkflow: Object.freeze({
+        label: 'ComfyUI Workflow',
+        defaultName: 'ComfyUI Workflow',
+        subtitle: 'Local/cloud API workflows and results',
+      }),
+      storyWorkspace: Object.freeze({
+        label: 'Story Workspace',
+        defaultName: 'Story Workspace',
+        subtitle: 'Episodes, character and scene notes, and shot editing',
       }),
       collage: Object.freeze({
         label: 'Collage',

@@ -1,4 +1,6 @@
-import { runLocalMediaClipExport } from '../../../api/localMediaTaskApi.js';
+import { showStoryClipRecovery } from '../../modules/storyWorkspace/StoryClipPreview.js';
+import { createStoryClipExportGuard, validateStoryClipOutput } from '../../modules/storyWorkspace/storyClipModel.js';
+import { runLocalMediaClipExport, canUseElectronMediaTask } from '../../../api/localMediaTaskApi.js';
 import appStore from '../../core/stores/appStore.js';
 import { generateId } from '../../core/math.js';
 import { commit } from '../../modules/history.js';
@@ -96,6 +98,7 @@ export function exportAudioClips(_0x16be59, _0x4090be = _0x16be59._mediaClip.tra
         laneIndex: _0x19efc3.laneIndex,
         muted: _0x19efc3.muted === true,
         disabled: _0x19efc3.disabled === true,
+        ...(_0x19efc3.volume !== undefined ? { volume: _0x19efc3.volume } : {}),
       };
     })
     .filter(Boolean);
@@ -160,6 +163,7 @@ export function waitForExportLoadingFrame() {
   });
 }
 export async function exportMaterialToCanvas(_0x49a06d, _0x4de78d = 'video', _0x40dbd5 = 0) {
+  if (_0x49a06d.nodeData?.storySequence || _0x49a06d._storyClipNodesContext) { window.showToast?.('本批初剪请使用整段导出；单素材请定位原已采纳媒体。'); return; }
   if (_0x49a06d._exporting) return;
   const _0x18a61d = _0x4de78d === 'audio' ? 'audio' : 'video';
   let _0x28c425 = null,
@@ -271,19 +275,28 @@ export async function exportAndUse(_0x2b04ab, _0x5c25c5) {
     window.showToast?.(mediaClipText('export.noClips'));
     return;
   }
+  let storyClipGuard, storyClipResult = null;
+  try {
+    storyClipGuard = createStoryClipExportGuard({ store: appStore, nodeId: _0x2b04ab.id, payload: _0x2bde47,
+      expectedNodes: _0x2b04ab._storyClipNodesContext, requireMarked: !!(_0x2b04ab._storyClipNodesContext || _0x2b04ab.nodeData?.storySequence) });
+    if (storyClipGuard && !canUseElectronMediaTask()) throw new Error('镜头初剪渲染需更新后的桌面端，不调用浏览器后端');
+    if (storyClipGuard && !window.confirm(storyClipGuard.confirmation)) return;
+  } catch (error) { window.showToast?.(error.message); return; }
   ((_0x2b04ab._exporting = true),
     _0x2b04ab.el.classList.add('is-exporting'),
     _0x2b04ab._startExportLoading());
   try {
     await _0x2b04ab._waitForExportLoadingFrame();
+    storyClipGuard?.assertCurrent();
     let _0x3b7acd = null;
     if (
-      _0x2b04ab._mediaClip.lastOutput?.signature === _0x2bde47.signature &&
+      !storyClipGuard && _0x2b04ab._mediaClip.lastOutput?.signature === _0x2bde47.signature &&
       _0x2b04ab._mediaClip.lastOutput?.localPath
     )
       _0x3b7acd = { ..._0x2b04ab._mediaClip.lastOutput };
     else {
-      _0x3b7acd = await runLocalMediaClipExport(_0x2bde47, { timeout: 0x927c0 });
+      _0x3b7acd = await runLocalMediaClipExport(storyClipGuard?.request || _0x2bde47, { timeout: 0x927c0 });
+      if (storyClipGuard) { storyClipResult = { ..._0x3b7acd, localPath: validateStoryClipOutput(_0x3b7acd) }; storyClipGuard.assertCurrent(); }
       const _0x297095 = pickResultLocalPath(_0x3b7acd) || _0x3b7acd?.localPath || _0x3b7acd?.path || '',
         _0x229d3f = {
           ..._0x3b7acd,
@@ -294,15 +307,18 @@ export async function exportAndUse(_0x2b04ab, _0x5c25c5) {
       (_0x2b04ab._setMediaClip({ ..._0x2b04ab._mediaClip, lastOutput: _0x229d3f }, true, { render: false }),
         (_0x3b7acd = _0x229d3f));
     }
+    storyClipGuard?.assertCurrent();
     (_0x5c25c5 === 'download'
       ? downloadLocalPath(_0x3b7acd.localPath, _0x3b7acd.filename)
       : _0x2b04ab._addOutputNode(_0x2bde47.outputType, _0x3b7acd, {
           source: _0xf2e234,
+          ...(storyClipGuard ? { storySequenceOutput: storyClipGuard.outputSource } : {}),
           durationSec:
             _0x3e51e4 || Math.max(0, toNumber(_0xa40bf5?.endSec, 0) - toNumber(_0xa40bf5?.startSec, 0)),
         }),
       window.showToast?.(mediaClipText('export.clipExported')));
   } catch (_0x36ab6d) {
+    if (storyClipGuard && storyClipResult?.localPath) showStoryClipRecovery(storyClipResult.localPath, _0x36ab6d?.message);
     window.showToast?.(_0x36ab6d?.message || mediaClipText('export.clipFailed'));
   } finally {
     ((_0x2b04ab._exporting = false),
@@ -380,6 +396,7 @@ export function addOutputNode(_0x26f004, _0x565558, _0x3a1029 = {}, _0xd33e66 = 
     _0x4b6e7b = resolveMediaClipPosterImageFields(_0x4a95df, _0x3a1029, _0xd33e66),
     _0x3bf1e2 = _0x4b6e7b.isOutputPoster === true,
     _0x4c599c = {
+      ...(_0xd33e66.storySequenceOutput ? { storySequenceOutput: _0xd33e66.storySequenceOutput } : {}),
       ...buildSourceMediaNodePayload({
         id: _0xd38ad0,
         type: 'source-video',
