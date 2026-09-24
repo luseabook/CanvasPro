@@ -23,6 +23,7 @@ export function createVideoReverseMediaTaskHandler({
   ffprobeVideoMeta: _0x50c186,
   getOutputDir: _0x4d42a4,
   getRuntimeToolOrFallback: _0x371415,
+  runFfmpegTask: runFfmpegTask,
   resolveMediaTaskSource: _0x14127a,
   toOutputLocalPath: _0xec399,
 }) {
@@ -40,9 +41,14 @@ export function createVideoReverseMediaTaskHandler({
         sourceAbs: _0x17dd4f,
         outAbs: _0x43eace,
         hasAudio: _0x331cc9,
-      });
+      }),
+      runFfmpeg =
+        typeof runFfmpegTask === 'function'
+          ? runFfmpegTask
+          : (task, queue, args, options) =>
+              queue.runProcess(task, _0x371415('ffmpeg'), args, options);
     return (
-      await _0x507084.runProcess(_0x50ded9, _0x371415('ffmpeg'), _0x9f09d5, {
+      await runFfmpeg(_0x50ded9, _0x507084, _0x9f09d5, {
         durationSec: _0x3d7819.duration || 0,
         progressMessage: 'Reversing video',
       }),

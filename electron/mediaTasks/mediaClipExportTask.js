@@ -83,6 +83,7 @@ function normalizeMediaClipExportAudioClips(_0x3bc851 = []) {
         duration: _0x22f658.duration,
         timelineStart: _0x182789,
         timelineEnd: Math.max(_0x182789, _0x579c9a),
+        ...(_0x14c374.volume !== undefined && _0x14c374.volume !== 1 ? { volume: Math.max(0, Math.min(1, toNumber(_0x14c374.volume, 1))) } : {}),
       };
     })
     .filter(Boolean);
@@ -99,7 +100,9 @@ function buildMediaClipAudioMixFilterParts(_0x137a96 = [], _0x18b18d = 0, _0x1e0
       return (
         '[' +
         _0x488760 +
-        ':a]aformat=sample_rates=44100:channel_layouts=stereo,asetpts=PTS-STARTPTS,adelay=' +
+        ':a]aformat=sample_rates=44100:channel_layouts=stereo,asetpts=PTS-STARTPTS,' +
+        (_0x377464.volume !== undefined ? 'volume=' + _0x377464.volume + ',' : '') +
+        'adelay=' +
         _0x4aa2a6 +
         '|' +
         _0x4aa2a6 +
@@ -424,6 +427,7 @@ export function createMediaClipExportTaskHandler({
   ffprobeVideoMeta: _0x5f0b26,
   getOutputDir: _0x1baefd,
   getRuntimeToolOrFallback: _0x2060b4,
+  runFfmpegTask: runFfmpegTask,
   resolveMediaTaskSource: _0xce446c,
   toOutputLocalPath: _0x597446,
 }) {
@@ -485,9 +489,13 @@ export function createMediaClipExportTaskHandler({
       }),
       _0x473683 = _0x495301.length
         ? _0x495301.reduce((_0x383a12, _0x22e8d5) => _0x383a12 + _0x22e8d5.duration, 0)
-        : _0x52fc1d.duration;
+        : _0x52fc1d.duration,
+      runFfmpeg =
+        typeof runFfmpegTask === 'function'
+          ? runFfmpegTask
+          : (task, queue, args, options) => queue.runProcess(task, _0x2060b4('ffmpeg'), args, options);
     return (
-      await _0x5bc472.runProcess(_0x103cac, _0x2060b4('ffmpeg'), _0x3544fd, {
+      await runFfmpeg(_0x103cac, _0x5bc472, _0x3544fd, {
         durationSec: _0x473683,
         progressMessage: 'Exporting clip',
       }),

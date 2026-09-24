@@ -26,6 +26,7 @@ import {
   normalizeVirtualLocalPath,
   resolveVirtualPathToAbsolute,
 } from './localAssetCleanup.js';
+import { getVideoPlaybackProxyFilename } from './videoPlaybackProxy.js';
 export const PROJECT_PACKAGE_SCHEMA_VERSION = 1;
 export const PROJECT_PACKAGE_KIND = 'aiCanvas.projectPackage';
 export const PROJECT_PACKAGE_FILE_EXTENSION = '.aicpkg';
@@ -172,10 +173,18 @@ function writeZip(_0x289ea3, _0x87627f, _0x48b23a = {}) {
   return new Promise((_0x252927, _0x5107e8) => {
     const _0x275f8d = createWriteStream(_0x87627f),
       _0x5d2565 = Math.max(1, Number(_0x48b23a.estimatedBytes || 0) || 1);
-    let _0x461bdb = 0;
-    (_0x275f8d.once('close', _0x252927),
-      _0x275f8d.once('error', _0x5107e8),
-      _0x289ea3.outputStream.once('error', _0x5107e8),
+    let _0x461bdb = 0, settled = false;
+    const fail = error => {
+      if (settled) return;
+      settled = true;
+      _0x275f8d.once('close', () => _0x5107e8(error));
+      _0x289ea3.outputStream.destroy();
+      _0x275f8d.destroy();
+    };
+    (_0x275f8d.once('close', () => { if (!settled) { settled = true; _0x252927(); } }),
+      _0x275f8d.once('error', fail),
+      _0x289ea3.once('error', fail),
+      _0x289ea3.outputStream.once('error', fail),
       _0x289ea3.outputStream.on('data', (_0x4a1ac4) => {
         _0x461bdb += Number(_0x4a1ac4?.length || 0) || 0;
         const _0x556867 = Math.min(1, _0x461bdb / _0x5d2565);
@@ -221,6 +230,7 @@ function getRecoverableOriginalVideoFallback(_0x5ab478, _0x13d24e) {
   if (!_0x4023db || !VIDEO_EXTENSIONS.has(_0x1f92cb.ext.toLowerCase())) return null;
   const _0x227102 = 'data/assets/derived/video',
     _0x5c842a = [
+      _0x227102 + '/' + getVideoPlaybackProxyFilename(_0x4023db),
       _0x227102 + '/' + _0x4023db + '.proxy.mp4',
       _0x227102 + '/' + _0x4023db + '.mp4',
       _0x227102 + '/' + _0x4023db + '.webm',

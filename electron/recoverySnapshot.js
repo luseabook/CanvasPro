@@ -30,7 +30,8 @@ export function installRecoverySnapshotBeforeClose(_0x212f51, _0x5ef38e = {}) {
       typeof _0x5ef38e.requestSnapshot === 'function'
         ? _0x5ef38e.requestSnapshot
         : requestRendererRecoverySnapshot,
-    _0x16f3cd = typeof _0x5ef38e.logEvent === 'function' ? _0x5ef38e.logEvent : () => {};
+    _0x16f3cd = typeof _0x5ef38e.logEvent === 'function' ? _0x5ef38e.logEvent : () => {},
+    confirmCloseWithoutSnapshot = _0x5ef38e.confirmCloseWithoutSnapshot;
   let _0xa642a8 = false,
     _0x434767 = false;
   _0x212f51.on('close', (_0x2400e4) => {
@@ -45,8 +46,10 @@ export function installRecoverySnapshotBeforeClose(_0x212f51, _0x5ef38e = {}) {
     if (_0x434767) return;
     ((_0x434767 = true),
       void (async () => {
+        let shouldClose = true;
         try {
           const _0x5d2506 = await _0x38a9a0(_0x212f51, 'window-close');
+          if (_0x5d2506?.code === 'RECOVERY_SNAPSHOT_PROTECTED') shouldClose = false;
           _0x5d2506?.success === false &&
             _0x16f3cd({
               type: 'project.recovery_snapshot_before_close_failed',
@@ -55,6 +58,16 @@ export function installRecoverySnapshotBeforeClose(_0x212f51, _0x5ef38e = {}) {
               message: 'Recovery snapshot before close failed',
               context: { reason: _0x5d2506.reason || '', error: _0x5d2506.error || '' },
             });
+          if (_0x5d2506?.code === 'RECOVERY_SNAPSHOT_PROTECTED') {
+            // The old snapshot is intact, but this session has no new backup.
+            try {
+              if (typeof confirmCloseWithoutSnapshot === 'function')
+                shouldClose = (await confirmCloseWithoutSnapshot(_0x5d2506)) === true;
+            } catch (_0x12432f) {
+              _0x16f3cd({ type: 'project.recovery_snapshot_close_confirm_failed',
+                level: 'warn', source: 'main', error: _0x12432f });
+            }
+          }
         } catch (_0x373eb8) {
           _0x16f3cd({
             type: 'project.recovery_snapshot_before_close_failed',
@@ -64,8 +77,11 @@ export function installRecoverySnapshotBeforeClose(_0x212f51, _0x5ef38e = {}) {
             error: _0x373eb8,
           });
         } finally {
-          ((_0x434767 = false), (_0xa642a8 = true));
-          if (!_0x212f51.isDestroyed()) _0x212f51.close();
+          _0x434767 = false;
+          if (shouldClose && !_0x212f51.isDestroyed()) {
+            _0xa642a8 = true;
+            _0x212f51.close();
+          }
         }
       })());
   });

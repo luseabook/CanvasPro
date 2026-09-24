@@ -1,3 +1,4 @@
+import { createFullProjectPackageController } from './fullProjectPackageController.js';
 import path from 'node:path';
 import {
   PROJECT_PACKAGE_FILE_EXTENSION,
@@ -73,6 +74,7 @@ export function createProjectPackageController({
   app: _0x154eee,
   dialog: _0x3d08af,
   getMainWindow: getMainWindow = () => null,
+  consumeExternalPackageTicket,
   getCanvasProjectDir: _0x2fc1f5,
   getOutputDir: _0x5e3fb1,
   getUploadsDir: _0x518e0d,
@@ -159,5 +161,16 @@ export function createProjectPackageController({
         }
       );
     };
-  return { exportDesktopProjectPackage: _0x4c38c2, importDesktopProjectPackage: _0x262930 };
+  return { exportDesktopProjectPackage: _0x4c38c2, importDesktopProjectPackage: _0x262930,
+    ...createFullProjectPackageController({ dialog: _0x3d08af, getMainWindow, getRoots: _0x339ace,
+      consumeExternalPackageTicket,
+      getProjectRoot: _0x2fc1f5, getTempRoot: () => _0x154eee.getPath('temp'),
+      getDownloadsRoot: () => { try { return _0x154eee.getPath('downloads'); } catch { return _0x2fc1f5(); } },
+      readAppVersion: _0x59478a, emitProgress: emitPackageProgress,
+      registerResult: result => {
+        const recent = _0xded5d2(_0x5ef5b0(), result.projectPath, { name: result.projectName });
+        _0x5601cb(); return _0x187714(result.projectPath, result.data, recent);
+      },
+    }),
+  };
 }
