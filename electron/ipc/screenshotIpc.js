@@ -1,6 +1,7 @@
 export function registerScreenshotIpcHandlers({
   ipcMain: _0x339e20,
   captureDesktopDisplay: _0x1778a2,
+  configureGlobalScreenshotShortcut: _0x413dc7,
   handleScreenshotOverlayConfirm: _0x1136e3,
   handleScreenshotOverlayCancel: _0x5366b3,
 }) {
@@ -19,5 +20,9 @@ export function registerScreenshotIpcHandlers({
     _0x339e20.handle('screenshot:overlayCancel', async () => {
       if (typeof _0x5366b3 !== 'function') return { ok: false, reason: 'not-supported' };
       return await _0x5366b3();
+    }),
+    _0x339e20.handle('screenshot:updateGlobalShortcut', async (_0x102349, _0x59f713) => {
+      if (typeof _0x413dc7 !== 'function') return { ok: false, reason: 'not-supported' };
+      return _0x413dc7(_0x59f713);
     }));
 }

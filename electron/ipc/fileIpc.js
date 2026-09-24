@@ -27,6 +27,7 @@ export function registerFileIpcHandlers({
   listNotificationSoundMp3Files,
   listSystemNotificationSoundFiles,
   openSystemNotificationSoundFolder,
+  playNotificationSound,
 }) {
   ipcMain.handle('asset:import', async (_event, payload) => {
     return await importAssetToLibrary(payload || {});
@@ -80,6 +81,13 @@ export function registerFileIpcHandlers({
       throw new Error('当前环境不支持打开系统提示音目录');
     }
     return await openSystemNotificationSoundFolder();
+  });
+
+  ipcMain.handle('notificationSound:play', async (_event, payload) => {
+    if (typeof playNotificationSound !== 'function') {
+      throw new Error('当前环境不支持播放提示音');
+    }
+    return await playNotificationSound(payload || {});
   });
 
   ipcMain.handle('shell:showItemInFolder', (_event, payload) => {

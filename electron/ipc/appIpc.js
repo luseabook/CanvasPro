@@ -28,5 +28,11 @@ export function registerAppIpcHandlers({
       if (!_0x2c022e || typeof _0x2c022e.showGenerationComplete !== 'function')
         return { success: true, shown: false, reason: 'unavailable' };
       return _0x2c022e.showGenerationComplete(_0x4f2a07 || {});
-    }));
+    }),
+    _0x91da6a.handle('notification:updateGlobalShortcut', (_0x3f51a9, _0x2d8be4 = {}) =>
+      _0x3087e5?.()?.updateGlobalShortcut(_0x2d8be4 || {}),
+    ),
+    _0x91da6a.handle('notification:acknowledge', (_0x1c7d3a, _0x4ae690 = {}) =>
+      _0x3087e5?.()?.acknowledge(_0x4ae690 || {}),
+    ));
 }

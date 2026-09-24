@@ -1,5 +1,8 @@
+import { assertNodeExportSender } from '../nodeMediaExportService.js';
+import { FULL_PACKAGE_LIMITS } from '../../src/modules/projectPackage/fullProjectPackageModel.js';
 export function registerProjectIpcHandlers({
   ipcMain: _0x480888,
+  exportFullProjectPackage, restoreFullProjectPackage, getNodeExportWindow, isNodeExportAppUrl,
   openDesktopProject: _0x538252,
   saveDesktopProject: _0x511050,
   exportDesktopProjectPackage: _0x274f5a,
@@ -13,6 +16,19 @@ export function registerProjectIpcHandlers({
   readDesktopRecoverySnapshot: _0x339450,
   clearDesktopRecoverySnapshot: _0x43364d,
 }) {
+  const assertFullSender = event => assertNodeExportSender(event, getNodeExportWindow(), isNodeExportAppUrl);
+  _0x480888.handle('project:fullPackageCapabilities', event => {
+    assertFullSender(event);
+    if (typeof exportFullProjectPackage !== 'function' || typeof restoreFullProjectPackage !== 'function') throw new Error('完整工程包宿主未就绪，请更新并重启');
+    return { version: 1, externalPackageTickets: 1, limits: FULL_PACKAGE_LIMITS };
+  });
+  for (const [channel, action] of [['project:exportFullPackage', exportFullProjectPackage], ['project:restoreFullPackage', restoreFullProjectPackage]]) {
+    _0x480888.handle(channel, (event, payload) => {
+      assertFullSender(event);
+      if (typeof action !== 'function') throw new Error('完整工程包宿主未就绪，请更新并重启');
+      return action(payload || {}, { sender: event.sender, assertActive: () => assertFullSender(event) });
+    });
+  }
   (_0x480888.handle('project:open', (_0x33730f, _0x175e0d) => {
     return _0x538252(_0x175e0d || {});
   }),
@@ -34,14 +50,16 @@ export function registerProjectIpcHandlers({
     _0x480888.handle('project:removeRecent', (_0x17c3ba, _0x561997) => {
       return _0x1b8d96(_0x561997?.recentId || '');
     }),
-    _0x480888.handle('project:consumeExternalOpenRequests', () => {
+    _0x480888.handle('project:consumeExternalOpenRequests', event => {
+      // Consuming removes queued requests and can expose parsed project contents.
+      assertFullSender(event);
       return _0xaccd9f();
     }),
     _0x480888.handle('project:writeRecoverySnapshot', (_0x4a846f, _0xce5c48 = {}) => {
       try {
         return _0x132fcc(_0xce5c48 || {});
       } catch (_0x83d580) {
-        return { success: false, error: String(_0x83d580?.message || _0x83d580) };
+        return { success: false, code: _0x83d580?.code || '', error: String(_0x83d580?.message || _0x83d580) };
       }
     }),
     _0x480888.handle('project:getRecoverySnapshotInfo', (_0x22ba6f, _0x3d526c = {}) => {
@@ -64,11 +82,12 @@ export function registerProjectIpcHandlers({
         return { success: false, exists: false, error: String(_0xb6ebca?.message || _0xb6ebca) };
       }
     }),
-    _0x480888.handle('project:clearRecoverySnapshot', () => {
+    _0x480888.handle('project:clearRecoverySnapshot', (event, expected = {}) => {
+      assertFullSender(event);
       try {
-        return _0x43364d();
+        return _0x43364d(expected || {});
       } catch (_0x5906b3) {
-        return { success: false, error: String(_0x5906b3?.message || _0x5906b3) };
+        return { success: false, cleared: false, error: String(_0x5906b3?.message || _0x5906b3) };
       }
     }));
 }
