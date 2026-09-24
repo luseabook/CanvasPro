@@ -21,10 +21,10 @@ const projectGallery = document.getElementById('projectGallery'),
       const _0x559689 = generateId('proj');
       return await createProject(_0x559689, _0x393e15);
     },
-    async loadProject(_0x437d73) {
+    async loadProject(_0x437d73, { allowMissing: allowMissing = false } = {}) {
       try {
+        const _0x10491e = await project.loadProject(_0x437d73, { allowMissing });
         clearRendererCache();
-        const _0x10491e = await project.loadProject(_0x437d73);
         ((window.currentProjectId = _0x437d73),
           (window._v2CurrentRecentProjectId = ''),
           (window._v2CurrentProjectDisplayPath = ''),
@@ -41,8 +41,10 @@ const projectGallery = document.getElementById('projectGallery'),
           if (_0x1b37a6) _0x1f06d5 = _0x1b37a6.name;
           _0xdcd9f6.textContent = _0x1f06d5;
         }
+        return true;
       } catch (_0x386ad2) {
         (console.error('Failed to load project:', _0x386ad2), alert(projectManagerText('loadFailed')));
+        return false;
       }
     },
     async saveCurrentProject() {
@@ -252,10 +254,8 @@ const projectGallery = document.getElementById('projectGallery'),
         }),
         (_0x5f0d10.onclick = async () => {
           const _0x2ba172 = await this.createProject();
-          if (_0x2ba172) {
-            if (window.store) window.store.hydrate({});
-            (await this.loadProject(_0x2ba172), commit());
-          }
+          // init() hydrates on success; never clear the current canvas before the read.
+          if (_0x2ba172 && (await this.loadProject(_0x2ba172, { allowMissing: true }))) commit();
         }),
         projectGrid.appendChild(_0x5f0d10),
         _0x38d66e

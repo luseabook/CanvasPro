@@ -2,6 +2,9 @@ import { screenToWorld, generateId } from '../../core/math.js';
 import { createPanorama360NodeData, createPanoramaSceneNodeData } from '../panoramaSceneNode/sceneNode.js';
 import { createStoryboardScriptNodeData } from '../../core/storyboardScriptFactory.js';
 import { createEmptyCollageNodeData } from '../collage/collageFactory.js';
+import { createWhiteboardNodeData } from '../whiteboard/whiteboardModel.js';
+import { createComfyWorkflowNodeData } from '../comfyui/comfyWorkflowModel.js';
+import { createStoryWorkspaceNodeData } from '../storyWorkspace/storyWorkspaceModel.js';
 import { t } from '../../i18n/index.js';
 const DEV_ONLY_NODE_TYPES = new Set(['media-clip', 'web-preview']);
 export function createSpecialNodeDataByType({
@@ -48,6 +51,24 @@ export function createSpecialNodeDataByType({
       width: _0x2e16e5,
       height: _0x1a3e21,
       name: _0x3f20a9 || t('nodeCreation.items.collage.defaultName'),
+    });
+  if (_0x5a6b3f === 'story-workspace')
+    return createStoryWorkspaceNodeData({
+      id: _0x4a81e1, x: _0x294dbb, y: _0x39dc89,
+      width: _0x2e16e5, height: _0x1a3e21,
+      name: _0x3f20a9 || t('nodeCreation.items.storyWorkspace.defaultName'),
+    });
+  if (_0x5a6b3f === 'comfyui-workflow')
+    return createComfyWorkflowNodeData({
+      id: _0x4a81e1, x: _0x294dbb, y: _0x39dc89,
+      width: _0x2e16e5, height: _0x1a3e21,
+      name: _0x3f20a9 || t('nodeCreation.items.comfyWorkflow.defaultName'),
+    });
+  if (_0x5a6b3f === 'whiteboard')
+    return createWhiteboardNodeData({
+      id: _0x4a81e1, x: _0x294dbb, y: _0x39dc89,
+      width: _0x2e16e5, height: _0x1a3e21,
+      name: _0x3f20a9 || t('nodeCreation.items.whiteboard.defaultName'),
     });
   if (_0x5a6b3f === 'web-preview')
     return {

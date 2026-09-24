@@ -484,6 +484,23 @@ async function _saveToServer() {
     console.warn('[shortcuts] save failed:', _0x23a4f5);
   }
 }
+function _syncCanvasScreenshotShortcutToElectron() {
+  if (typeof window === 'undefined') return;
+  const _0x216a4c = globalThis.window?.electronAPI?.screenshot;
+  if (typeof _0x216a4c?.updateGlobalShortcut !== 'function') return;
+  const _0x363bbb = Array.isArray(_shortcuts?.['canvas-screenshot']?.keys)
+    ? _shortcuts['canvas-screenshot'].keys
+    : DEFAULT_SHORTCUTS['canvas-screenshot'].keys;
+  try {
+    const _0x2424ad = _0x216a4c.updateGlobalShortcut({ keys: _0x363bbb });
+    if (_0x2424ad && typeof _0x2424ad.catch === 'function')
+      _0x2424ad.catch((_0x570fb2) => {
+        console.warn('[shortcuts] failed to sync global screenshot shortcut:', _0x570fb2);
+      });
+  } catch (_0x18ad86) {
+    console.warn('[shortcuts] failed to sync global screenshot shortcut:', _0x18ad86);
+  }
+}
 function _syncShortcutsToGlobal() {
   const _0x512415 = {},
     _0x528ab9 = ['editor-tool-brush', 'editor-tool-eraser', 'editor-tool-bucket', 'editor-clear'];
@@ -493,7 +510,8 @@ function _syncShortcutsToGlobal() {
       _0x512415[_0x4868bc] = _0x5e8e0f.toUpperCase();
     }
   }),
-    (window._mattingShortcuts = _0x512415));
+    (window._mattingShortcuts = _0x512415),
+    _syncCanvasScreenshotShortcutToElectron());
 }
 function _applyPreset(_0xec91c, _0x2f9af8 = true) {
   const _0x992453 = _normalizePresetName(_0xec91c);

@@ -1,8 +1,12 @@
+import appStore from '../core/stores/appStore.js';
+import { captureExternalProjectTarget, createSerialExternalProjectOpener, runGuardedExternalProjectOpen } from './externalProjectOpen.js';
+import { runFullProjectPackage, showRetainedProjectPackage } from './projectPackage/fullProjectPackageSession.js';
 import * as project from './project.js';
 import { commit } from './history.js';
 import { clearRendererCache } from '../core/renderer.js';
 import { clearElement, setStaticInnerHTML, setText } from '../utils/dom.js';
 import { sanitizeMultiCanvasDataForPersistence } from '../utils/thumbnailPersistence.js';
+import { requireOpenedProjectDocument } from '../services/projectDocumentGuard.js';
 import {
   canUseDesktopProjectApi,
   exportDesktopProjectPackage,
@@ -444,8 +448,9 @@ const CanvasProjectDropdownManager = {
     }
     function _0x478d29(_0xdb0f05) {
       if (!_0xdb0f05 || _0xdb0f05.canceled) return false;
+      const validData = requireOpenedProjectDocument(_0xdb0f05);
       const _0x140f80 = sanitizeMultiCanvasDataForPersistence(
-        _0xdb0f05.multiData || project.resolveCanvasData(_0xdb0f05.data || {}),
+        _0xdb0f05.multiData || project.resolveCanvasData(validData),
       );
       (clearRendererCache(),
         window.CanvasTabManager?.init?.(_0x140f80),
@@ -605,11 +610,34 @@ const CanvasProjectDropdownManager = {
         (_0x3fbab4(), _0x59aff4());
       }
     }
+    let fullPackageUiBusy = false;
+    async function runFullPackage(mode, externalPackageTicket) {
+      if (fullPackageUiBusy) { _0x3d7fc6('已有完整工程包操作正在执行', 'error'); return; }
+      fullPackageUiBusy = true;
+      const operationId = _0x22de91('full-package-' + mode);
+      const release = _0x1220c2(operationId, { title: mode === 'export' ? '收集全部画布' : '恢复独立工程' });
+      try {
+        const result = await runFullProjectPackage({ mode, api: window.electronAPI?.project,
+          projectName: _0x230ab7(), projectId: window.currentProjectId || '', operationId, externalPackageTicket,
+          readContext: () => ({ nodes: appStore.getStateRaw().nodes, canvases: window.CanvasTabManager?._canvases,
+            identity: JSON.stringify([window.currentProjectId, window._v2CurrentRecentProjectId, window._v2CurrentProjectDisplayPath]),
+            data: window.CanvasTabManager?.getMultiDataSnapshot?.({ sanitizeForPersistence: true, captureVisualSnapshot: false }) }),
+          confirmSwitch: result => window.confirm(`已恢复 ${result.canvasCount} 张画布到独立工程文件。现在切换打开？\n${result.projectPath}\n\n未应用工作室草稿和当前工程的未保存修改不会写入该文件；请先导出草稿/保存当前工程，必要时取消切换。取消切换也保留恢复文件。不是任务恢复，不自动重发生成。`),
+          openProject: result => _0x478d29({ ...result, multiData: result.data }),
+          onRetained: showRetainedProjectPackage,
+        });
+        if (result?.cleanupWarnings?.length) _0x3d7fc6(result.cleanupWarnings.join('\n'), 'error');
+        if (result?.success && mode === 'export') _0x3d7fc6(`完整工程包已写入：${result.filename}（${result.canvasCount} 张画布）。原工程未另行保存。`);
+      } catch (error) { _0x3d7fc6(error?.message || '完整工程包操作失败', 'error'); }
+      finally { release(); _0x59aff4(); fullPackageUiBusy = false; }
+    }
     async function _0x188164(_0x316ed3 = '') {
       const _0x10b348 = _0x22de91('import-package'),
         _0x5f2050 = _0x1220c2(_0x10b348, { title: projectDropdownText('loadingProjectTitle') });
       try {
+        const assertCurrent = captureExternalProjectTarget(readExternalProjectTarget);
         _0x316ed3 && (await _0x176981(projectDropdownText('readingProjectPackage')));
+        assertCurrent();
         const _0x4922cb = await importDesktopProjectPackage({ path: _0x316ed3, operationId: _0x10b348 });
         if (!_0x4922cb || _0x4922cb.canceled) return _0x4922cb;
         return (
@@ -620,6 +648,7 @@ const CanvasProjectDropdownManager = {
                 message: projectDropdownText('renderingProjectPackage'),
               }),
               await _0x566243()),
+          assertCurrent(),
           _0x30ef2b(_0x4922cb) &&
             (closeSidebarSubmenu('canvas-project'),
             _0x3d7fc6(
@@ -642,6 +671,12 @@ const CanvasProjectDropdownManager = {
     function _0x6635d4() {
       return window.CanvasTabManager?.hasDirtyCanvases?.() === true;
     }
+    function readExternalProjectTarget() {
+      const manager = window.CanvasTabManager;
+      return { manager, nodes: appStore.getStateRaw()?.nodes, canvases: manager?._canvases,
+        key: JSON.stringify([window.currentProjectId, window._v2CurrentFile, window._v2CurrentRecentProjectId,
+          window._v2CurrentProjectDisplayPath, manager?.getActiveCanvasId?.()]) };
+    }
     function _0x1bf52a(_0x89c72c) {
       if (!_0x6635d4()) return true;
       const _0x75a42e = _0x89c72c?.filename || projectDropdownText('externalProject');
@@ -653,16 +688,28 @@ const CanvasProjectDropdownManager = {
         _0x3d7fc6(_0x41291a.error || projectDropdownText('externalOpenFailed'), 'error');
         return;
       }
-      if (_0x41291a.kind === 'projectPackage') {
-        await _0x188164(_0x41291a.path || _0x41291a.filePath || '');
+      if (_0x41291a.kind === 'fullProjectPackage') {
+        if (typeof _0x41291a.externalPackageTicket !== 'string') {
+          _0x3d7fc6('系统工程包请求缺少可信凭据，请重新从系统打开文件', 'error');
+          return;
+        }
+        await runFullPackage('restore', _0x41291a.externalPackageTicket);
         return;
       }
-      if (!_0x1bf52a(_0x41291a)) return;
+      if (_0x41291a.kind === 'projectPackage') {
+        _0x3d7fc6('旧桌面端的系统打开只会导入活动画布。为保留全部画布，请从“恢复完整工程包（独立工程）”菜单重新选包；系统直达需更新并重启桌面端', 'error');
+        return;
+      }
       try {
-        (await _0x176981(projectDropdownText('renderingCanvas')),
-          _0x478d29(_0x41291a) &&
-            (closeSidebarSubmenu('canvas-project'),
-            _0x3d7fc6(projectDropdownText('opened', { name: _0x41291a.projectName || _0x41291a.filename }))));
+        requireOpenedProjectDocument(_0x41291a); // Reject old-host malformed files before the dirty-canvas confirmation.
+        const opened = await runGuardedExternalProjectOpen({ response: _0x41291a,
+          readTarget: readExternalProjectTarget,
+          prepare: () => _0x176981(projectDropdownText('renderingCanvas')),
+          confirmReplace: _0x1bf52a, apply: _0x478d29 });
+        if (opened) {
+          closeSidebarSubmenu('canvas-project');
+          _0x3d7fc6(projectDropdownText('opened', { name: _0x41291a.projectName || _0x41291a.filename }));
+        }
       } catch (_0x2f5938) {
         (console.error('[desktopProject] external open failed:', _0x2f5938),
           _0x3d7fc6(_0x2f5938?.message || projectDropdownText('externalOpenFailed'), 'error'));
@@ -670,12 +717,10 @@ const CanvasProjectDropdownManager = {
         _0x59aff4();
       }
     }
-    async function _0x1aee75(_0x17c5a6) {
-      const _0x3d28f6 = Array.isArray(_0x17c5a6) ? _0x17c5a6 : [];
-      for (const _0x45e5c7 of _0x3d28f6) {
-        await _0x1f3bd4(_0x45e5c7);
-      }
-    }
+    const _0x1aee75 = createSerialExternalProjectOpener(_0x1f3bd4, error => {
+      console.error('[desktopProject] external open request failed:', error);
+      _0x3d7fc6(error?.message || projectDropdownText('externalOpenFailed'), 'error');
+    });
     async function _0x3411b9() {
       const _0x1ba815 = window.electronAPI?.project?.consumeExternalOpenRequests;
       if (typeof _0x1ba815 !== 'function') return;
@@ -692,7 +737,10 @@ const CanvasProjectDropdownManager = {
       if (window.__aiCanvasExternalProjectOpenInstalled) return;
       ((window.__aiCanvasExternalProjectOpenInstalled = true),
         _0x3ae995((_0x48905e) => {
-          void _0x1aee75(_0x48905e);
+          void _0x1aee75(_0x48905e).catch(error => {
+            console.error('[desktopProject] external open batch failed:', error);
+            _0x3d7fc6(error?.message || projectDropdownText('externalOpenFailed'), 'error');
+          });
         }),
         void _0x3411b9());
     }
@@ -744,6 +792,8 @@ const CanvasProjectDropdownManager = {
             onClick: () => _0x188164(),
           }),
         ));
+      _0xfdc064.appendChild(_0x303d87({ iconId: 'iconPackageExport18', title: '收集完整工程（全部画布）', onClick: () => runFullPackage('export') }));
+      _0xfdc064.appendChild(_0x303d87({ iconId: 'iconPackageImport18', title: '恢复完整工程包（独立工程）', onClick: () => runFullPackage('restore') }));
       const _0x4ee9fc = _0x5447f2.querySelector('.cpd-close');
       _0x5447f2.insertBefore(_0xfdc064, _0x4ee9fc || null);
     }

@@ -5,6 +5,8 @@ import {
   startFileSavePathMigration,
 } from '../../../api/userSettingsApi.js';
 import { t } from '../../i18n/index.js';
+import { fileSavePathChanges } from './fileSaveMigrationGuard.js';
+import { initLegacyFileSaveImport } from './legacyFileSaveImport.js';
 import { showError, showSuccess } from '../../services/toastService.js';
 const MIGRATION_POLL_INTERVAL_MS = 0x15e,
   ROOT_FIELD_ID = 'fileSaveRootDir',
@@ -16,6 +18,11 @@ const MIGRATION_POLL_INTERVAL_MS = 0x15e,
     正在创建迁移任务: 'migration.creatingTask',
     正在迁移文件: 'migration.migrating',
     正在迁移输出文件保存路径: 'migration.migrateOutput',
+    正在检查旧目录: 'migration.inspecting',
+    '正在复制文件（保留旧目录）': 'migration.copying',
+    正在应用新的保存位置: 'migration.applying',
+    '旧版文件复制完成（旧目录仍保留）': 'migration.legacyDone',
+    '迁移失败；旧目录仍保留，请核对当前保存路径': 'migration.failedStage',
     迁移完成: 'migration.done',
   });
 function fileSaveText(_0x51aec3, _0x9409d1 = {}) {
@@ -305,37 +312,41 @@ function buildMigrationSummary(_0x4ce30b) {
     _0x255898 = Number(_0x4ce30b?.failedCount || 0);
   return fileSaveText('migration.summary', { copied: _0x14951c, skipped: _0x3aceb0, failed: _0x255898 });
 }
-async function saveSettingsWithMigration(_0x58a724) {
-  try {
-    renderMigrationStatus({ status: 'pending', stage: fileSaveText('migration.creatingTask'), progress: 0 });
-    const _0x383464 = await startFileSavePathMigration(_0x58a724);
-    renderMigrationStatus(_0x383464);
-    const _0x2883a2 = normalizeText(_0x383464?.jobId);
-    if (!_0x2883a2) throw new Error(fileSaveText('migration.noJobId'));
-    const _0x52daba = await pollMigrationUntilFinished(_0x2883a2);
-    if (normalizeText(_0x52daba?.status) !== 'done')
-      throw new Error(_0x52daba?.error || fileSaveText('migration.failedMessage'));
-    return _0x52daba;
-  } catch (_0x405bae) {
-    if (Number(_0x405bae?.status || _0x405bae?.statusCode || 0) === 0x194) {
-      const _0x332372 = await saveUserSettingsToServer(_0x58a724),
-        _0x4bdf51 = {
-          status: 'done',
-          progress: 100,
-          copiedCount: 0,
-          skippedCount: 0,
-          failedCount: 0,
-          settings: _0x332372?.settings,
-        };
-      return (renderMigrationStatus(_0x4bdf51), _0x4bdf51);
-    }
-    throw _0x405bae;
-  }
+function confirmSavePathChanges(changes) {
+  const confirm = globalThis.window?.confirm;
+  if (typeof confirm !== 'function') throw new Error(fileSaveText('migration.confirmUnavailable'));
+  const paths = changes.map(({ key, from, to }) =>
+    `${fileSaveText('migration.pathLabels.' + key)}:\n${from || '—'}\n→ ${to || '—'}`,
+  ).join('\n\n');
+  return confirm.call(globalThis.window, fileSaveText('migration.confirmCopy', { paths }));
+}
+async function saveSettingsWithMigration(settings) {
+  renderMigrationStatus({ status: 'pending', stage: fileSaveText('migration.creatingTask'), progress: 0 });
+  // Never downgrade a missing migration endpoint to a plain settings write.
+  const job = await startFileSavePathMigration(settings, { confirmed: true });
+  renderMigrationStatus(job);
+  const jobId = normalizeText(job?.jobId);
+  if (!jobId) throw new Error(fileSaveText('migration.noJobId'));
+  const result = await pollMigrationUntilFinished(jobId);
+  if (normalizeText(result?.status) !== 'done')
+    throw new Error(result?.error || fileSaveText('migration.failedMessage'));
+  return result;
 }
 export function initFileSaveSettings() {
   const _0x6b9f54 = document.getElementById('btnFileSavePathsSave');
-  if (!_0x6b9f54) return;
+  if (!_0x6b9f54 || _0x6b9f54.__fileSaveSettingsBound) return;
+  _0x6b9f54.__fileSaveSettingsBound = true;
   (bindDirectoryPickers(),
+    initLegacyFileSaveImport({
+      pollMigrationUntilFinished,
+      renderMigrationStatus,
+      resetMigrationStatus,
+      saveButton: _0x6b9f54,
+      setSaveControlsBusy: (busy) => {
+        setSaving(_0x6b9f54, busy);
+        setInputsDisabled(busy);
+      },
+    }),
     fetchUserSettingsFromServer()
       .then((_0x2d0353) => {
         applyPathsToInputs(_0x2d0353?.fileSavePaths || {});
@@ -354,25 +365,35 @@ export function initFileSaveSettings() {
       }
       (setSaving(_0x6b9f54, true), setInputsDisabled(true), resetMigrationStatus());
       try {
-        const _0xa0eaa5 = await fetchUserSettingsFromServer().catch(() => ({})),
-          _0x258190 = await saveSettingsWithMigration({
-            ...(_0xa0eaa5 || {}),
-            fileSavePaths: _0x3cc6b6,
-            fileSavePathsMeta: {
-              ...(_0xa0eaa5?.fileSavePathsMeta || {}),
-              source: 'user',
-              mode: normalizeText(getRootInput()?.value) ? 'root' : 'custom',
-              rootDir: normalizeText(getRootInput()?.value),
-              updatedAt: Date.now(),
-            },
-          }),
-          _0x3a07ff = _0x258190?.settings || (await fetchUserSettingsFromServer());
-        (applyPathsToInputs(_0x3a07ff?.fileSavePaths || _0x3cc6b6),
-          Number(_0x258190?.failedCount || 0) > 0
-            ? showError(
-                fileSaveText('runtime.partialMigrationFailed', { summary: buildMigrationSummary(_0x258190) }),
-              )
-            : showSuccess(buildMigrationSummary(_0x258190)));
+        const current = await fetchUserSettingsFromServer();
+        const proposed = {
+          ...(current || {}),
+          fileSavePaths: _0x3cc6b6,
+          fileSavePathsMeta: {
+            ...(current?.fileSavePathsMeta || {}),
+            source: 'user',
+            mode: normalizeText(getRootInput()?.value) ? 'root' : 'custom',
+            rootDir: normalizeText(getRootInput()?.value),
+            updatedAt: Date.now(),
+          },
+        };
+        const changes = fileSavePathChanges(current?.fileSavePaths, _0x3cc6b6);
+        if (changes.length && !confirmSavePathChanges(changes)) return;
+        let result;
+        if (changes.length) {
+          result = await saveSettingsWithMigration(proposed);
+        } else {
+          const saved = await saveUserSettingsToServer(proposed);
+          result = { status: 'done', copiedCount: 0, skippedCount: 0,
+            failedCount: 0, settings: saved?.settings };
+        }
+        const applied = result?.settings || (await fetchUserSettingsFromServer());
+        applyPathsToInputs(applied?.fileSavePaths || _0x3cc6b6);
+        if (Number(result?.failedCount || 0) > 0) {
+          showError(fileSaveText('runtime.partialMigrationFailed', { summary: buildMigrationSummary(result) }));
+        } else {
+          showSuccess(changes.length ? buildMigrationSummary(result) : fileSaveText('runtime.savedWithoutMigration'));
+        }
       } catch (_0x2a5bcb) {
         (console.error('[Settings] 保存文件与保存路径失败:', _0x2a5bcb),
           showError(fileSaveText('runtime.saveFailed', { error: errorMessage(_0x2a5bcb) })));

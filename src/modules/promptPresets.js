@@ -1,6 +1,8 @@
 import {
   deletePromptPresetFromServer,
+  fetchPromptPresetSettingsFromServer,
   fetchPromptPresetsFromServer,
+  savePromptPresetSettingsToServer,
   savePromptPresetToServer,
 } from '../../api/promptPresetsApi.js';
 import {
@@ -327,7 +329,12 @@ export const PROMPT_PRESETS = {
   ],
   'ai-video': [],
 };
-let customPresets = {};
+let customPresets = {},
+  promptPresetSettings = { defaultQuickCaptureNodeType: '' },
+  promptPresetSettingsLoaded = false,
+  promptPresetSettingsLoadPromise = null,
+  activePresetManagerOverlay = null,
+  closeActivePresetManager = null;
 const FREE_CUSTOM_PRESET_LIMIT = 2,
   SUPPORTED_PRESET_NODE_TYPES = new Set(['ai-image', 'ai-text', 'ai-video', 'ai-audio']),
   PRESET_MANAGER_TABS = [
@@ -386,9 +393,12 @@ function getPresetNodeTypeLabel(_0x4e365f) {
   const _0x154308 = NODE_TYPE_I18N_KEYS[_0x4e365f];
   return _0x154308 ? promptPresetsText('nodeTypes.' + _0x154308) : promptPresetsText('nodeTypes.node');
 }
+export function getPromptPresetCollectionLabel(_0x64bb1b) {
+  const _0x154308 = NODE_TYPE_I18N_KEYS[_0x64bb1b];
+  return _0x154308 ? promptPresetsText('tabs.' + _0x154308 + '.label') : '';
+}
 function getPresetManagerTabLabel(_0x33e558) {
-  const _0x497cf4 = NODE_TYPE_I18N_KEYS[_0x33e558?.nodeType];
-  return _0x497cf4 ? promptPresetsText('tabs.' + _0x497cf4 + '.label') : String(_0x33e558?.label || '');
+  return getPromptPresetCollectionLabel(_0x33e558?.nodeType) || String(_0x33e558?.label || '');
 }
 function getPresetManagerDesc(_0x1d0362) {
   return promptPresetsText('manager.desc', { nodeType: getPresetNodeTypeLabel(_0x1d0362) });
@@ -423,6 +433,9 @@ export function shouldInsertPromptForPreset(_0x185096 = {}) {
     normalizePromptPresetTriggerMode(_0x185096?.triggerMode) === PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT
   );
 }
+export function isPromptPresetNodeTypeSupported(_0x212b41) {
+  return SUPPORTED_PRESET_NODE_TYPES.has(String(_0x212b41 || '').trim());
+}
 function getPromptPresetTriggerModeLabel(_0x5e10f8 = {}) {
   return shouldInsertPromptForPreset(_0x5e10f8)
     ? promptPresetsText('triggerModes.insertPrompt')
@@ -430,7 +443,8 @@ function getPromptPresetTriggerModeLabel(_0x5e10f8 = {}) {
 }
 export async function loadCustomPresets() {
   try {
-    customPresets = await fetchPromptPresetsFromServer();
+    const [_0x2e5b0e] = await Promise.all([fetchPromptPresetsFromServer(), loadPromptPresetSettings()]);
+    customPresets = _0x2e5b0e;
   } catch (_0x3eb349) {
     console.warn('[promptPresets] No custom presets found or load failed.', _0x3eb349);
   }
@@ -447,6 +461,57 @@ function normalizePresetNodeType(_0x1c816e) {
 function normalizePresetManagerNodeType(_0x302940) {
   const _0x1f97a1 = String(_0x302940 || '').trim();
   return PRESET_MANAGER_TABS.some((_0x1415aa) => _0x1415aa.nodeType === _0x1f97a1) ? _0x1f97a1 : 'ai-text';
+}
+function normalizePromptPresetSettings(_0x5e0a4d = {}) {
+  const _0x2b8c17 = String(_0x5e0a4d?.defaultQuickCaptureNodeType || '').trim();
+  return {
+    defaultQuickCaptureNodeType: PRESET_MANAGER_TABS.some((_0x4f0d92) => _0x4f0d92.nodeType === _0x2b8c17)
+      ? _0x2b8c17
+      : '',
+  };
+}
+export async function loadPromptPresetSettings({ force: force = false } = {}) {
+  if (promptPresetSettingsLoaded && !force) return { ...promptPresetSettings };
+  if (promptPresetSettingsLoadPromise && !force) return promptPresetSettingsLoadPromise;
+  const _0x4c1e60 = (async () => {
+    const _0x3ad7f1 = await fetchPromptPresetSettingsFromServer();
+    return (
+      (promptPresetSettings = normalizePromptPresetSettings(_0x3ad7f1)),
+      (promptPresetSettingsLoaded = true),
+      { ...promptPresetSettings }
+    );
+  })().catch((_0x1b9d4e) => {
+    return (
+      console.warn('[promptPresets] Failed to load preset settings.', _0x1b9d4e),
+      (promptPresetSettingsLoaded = true),
+      { ...promptPresetSettings }
+    );
+  });
+  promptPresetSettingsLoadPromise = _0x4c1e60;
+  try {
+    return await _0x4c1e60;
+  } finally {
+    promptPresetSettingsLoadPromise === _0x4c1e60 && (promptPresetSettingsLoadPromise = null);
+  }
+}
+export function getDefaultQuickCapturePresetNodeType() {
+  return promptPresetSettings.defaultQuickCaptureNodeType || '';
+}
+export async function setDefaultQuickCapturePresetNodeType(_0x4c4b6c) {
+  const _0x49452f = String(_0x4c4b6c || '').trim();
+  if (!PRESET_MANAGER_TABS.some((_0x371e2a) => _0x371e2a.nodeType === _0x49452f))
+    throw new Error('Invalid quick capture preset node type');
+  return (
+    await savePromptPresetSettingsToServer({ defaultQuickCaptureNodeType: _0x49452f }),
+    (promptPresetSettings = { ...promptPresetSettings, defaultQuickCaptureNodeType: _0x49452f }),
+    (promptPresetSettingsLoaded = true),
+    { ...promptPresetSettings }
+  );
+}
+export function __setPromptPresetSettingsForTest(_0x30f0a7 = {}) {
+  ((promptPresetSettings = normalizePromptPresetSettings(_0x30f0a7)),
+    (promptPresetSettingsLoaded = true),
+    (promptPresetSettingsLoadPromise = null));
 }
 export function getCustomPromptPresets(_0x4a2c20) {
   const _0x312496 = normalizePresetNodeType(_0x4a2c20);
@@ -849,10 +914,20 @@ function createPresetEditor({
     { element: _0x3b17e2, triggerModeControl: _0x4d4f3d.element, saveButton: _0x434a1d }
   );
 }
-export function openCustomPresetsManager({ nodeType: _0x3b61cf } = {}) {
-  let _0x15d6d4 = normalizePresetManagerNodeType(_0x3b61cf);
+export function openCustomPresetsManager({
+  nodeType: _0x3b61cf,
+  initialDraftTemplate: initialDraftTemplate = '',
+} = {}) {
+  const _0x2f8e15 = String(initialDraftTemplate || '').trim();
+  let _0x15d6d4 = normalizePresetManagerNodeType(_0x3b61cf || getDefaultQuickCapturePresetNodeType());
+  closeActivePresetManager?.();
   const _0x3446a8 = document.createElement('div');
   _0x3446a8.className = 'preset-modal-overlay';
+  const _0x1763c1 = () => {
+    (_0x3446a8.remove(),
+      activePresetManagerOverlay === _0x3446a8 &&
+        ((activePresetManagerOverlay = null), (closeActivePresetManager = null)));
+  };
   const _0x431cfe = document.createElement('div');
   ((_0x431cfe.className = 'preset-modal preset-modal--manager'),
     _0x431cfe.addEventListener('click', (_0x1c3832) => _0x1c3832.stopPropagation()));
@@ -870,22 +945,60 @@ export function openCustomPresetsManager({ nodeType: _0x3b61cf } = {}) {
     _0x29214d.appendChild(_0x3f48ef));
   const _0x51ec90 = buildPresetModalButton('×', 'preset-manager-close-btn');
   (_0x51ec90.setAttribute('aria-label', promptPresetsText('manager.close')),
-    _0x51ec90.addEventListener('click', () => _0x3446a8.remove()),
+    _0x51ec90.addEventListener('click', () => _0x1763c1()),
     _0x15fddf.appendChild(_0x29214d),
     _0x15fddf.appendChild(_0x51ec90));
   const _0xdb2f87 = document.createElement('div');
   ((_0xdb2f87.className = 'preset-manager-tabs'), _0xdb2f87.setAttribute('role', 'tablist'));
   const _0x474ba5 = new Map();
+  let _0x3ee4c4 = false;
   PRESET_MANAGER_TABS.forEach((_0xd63ffe) => {
     const _0x3d71d0 = buildPresetModalButton('', 'preset-manager-tab');
-    (_0x3d71d0.setAttribute('role', 'tab'), _0x3d71d0.appendChild(buildPresetManagerTabIcon(_0xd63ffe.icon)));
+    (_0x3d71d0.setAttribute('role', 'tab'),
+      (_0x3d71d0.dataset.nodeType = _0xd63ffe.nodeType),
+      _0x3d71d0.appendChild(buildPresetManagerTabIcon(_0xd63ffe.icon)));
     const _0x2eb9eb = document.createElement('span');
-    ((_0x2eb9eb.textContent = getPresetManagerTabLabel(_0xd63ffe)),
-      _0x3d71d0.appendChild(_0x2eb9eb),
+    ((_0x2eb9eb.textContent = getPresetManagerTabLabel(_0xd63ffe)), _0x3d71d0.appendChild(_0x2eb9eb));
+    const _0x5f3a90 = document.createElement('span');
+    ((_0x5f3a90.className = 'preset-manager-tab-star'),
+      (_0x5f3a90.textContent = '★'),
+      _0x5f3a90.setAttribute('aria-hidden', 'true'),
+      _0x3d71d0.appendChild(_0x5f3a90),
       _0x3d71d0.addEventListener('click', () => {
+        if (_0x15d6d4 === _0xd63ffe.nodeType) return;
         ((_0x15d6d4 = _0xd63ffe.nodeType), _0x5e7679());
       }),
-      _0x474ba5.set(_0xd63ffe.nodeType, _0x3d71d0),
+      _0x3d71d0.addEventListener('contextmenu', async (_0x457218) => {
+        (_0x457218.preventDefault(), _0x457218.stopPropagation());
+        if (_0x3ee4c4) return;
+        const _0x3a7e2b = getDefaultQuickCapturePresetNodeType();
+        if (_0x3a7e2b === _0xd63ffe.nodeType) return;
+        ((_0x3ee4c4 = true),
+          (promptPresetSettings = {
+            ...promptPresetSettings,
+            defaultQuickCaptureNodeType: _0xd63ffe.nodeType,
+          }),
+          _0x5e7679());
+        try {
+          (await setDefaultQuickCapturePresetNodeType(_0xd63ffe.nodeType),
+            showPresetManagerToast(
+              promptPresetsText('manager.quickCaptureDefaultSet', {
+                preset: getPresetManagerTabLabel(_0xd63ffe),
+              }),
+              'success',
+            ));
+        } catch (_0x46fd67) {
+          ((promptPresetSettings = { ...promptPresetSettings, defaultQuickCaptureNodeType: _0x3a7e2b }),
+            _0x5e7679(),
+            showPresetManagerToast(
+              _0x46fd67?.message || promptPresetsText('manager.quickCaptureDefaultFailed'),
+              'error',
+            ));
+        } finally {
+          _0x3ee4c4 = false;
+        }
+      }),
+      _0x474ba5.set(_0xd63ffe.nodeType, { button: _0x3d71d0, star: _0x5f3a90 }),
       _0xdb2f87.appendChild(_0x3d71d0));
   });
   const _0x23e661 = document.createElement('div');
@@ -918,10 +1031,23 @@ export function openCustomPresetsManager({ nodeType: _0x3b61cf } = {}) {
         _0x4e44b4.replaceChildren(),
         _0x206d8c.replaceChildren(),
         (_0x3f48ef.textContent = getPresetManagerDesc(_0x15d6d4)),
-        _0x474ba5.forEach((_0x2b8395, _0x1a3f6c) => {
-          const _0x215b2b = _0x1a3f6c === _0x15d6d4;
+        _0x474ba5.forEach(({ button: _0x2b8395, star: _0x2981b7 }, _0x1a3f6c) => {
+          const _0x215b2b = _0x1a3f6c === _0x15d6d4,
+            _0x4c0c5f = _0x1a3f6c === getDefaultQuickCapturePresetNodeType(),
+            _0x2d7f2a = PRESET_MANAGER_TABS.find((_0x5c2cbe) => _0x5c2cbe.nodeType === _0x1a3f6c),
+            _0x4e7ab6 = _0x4c0c5f
+              ? promptPresetsText('manager.quickCaptureDefaultAria', {
+                  preset: getPresetManagerTabLabel(_0x2d7f2a),
+                })
+              : promptPresetsText('manager.quickCaptureSetAria', {
+                  preset: getPresetManagerTabLabel(_0x2d7f2a),
+                });
           (_0x2b8395.classList.toggle('is-active', _0x215b2b),
-            _0x2b8395.setAttribute('aria-selected', _0x215b2b ? 'true' : 'false'));
+            _0x2b8395.classList.toggle('is-quick-capture-default', _0x4c0c5f),
+            _0x2b8395.setAttribute('aria-selected', _0x215b2b ? 'true' : 'false'),
+            _0x2b8395.setAttribute('aria-label', _0x4e7ab6),
+            (_0x2b8395.title = _0x4e7ab6),
+            (_0x2981b7.hidden = !_0x4c0c5f));
         }));
       const _0x149432 = _0x2dd8f0(_0x15d6d4),
         _0x4c86c9 = appStore.getStateRaw().subscription || {},
@@ -1069,28 +1195,41 @@ export function openCustomPresetsManager({ nodeType: _0x3b61cf } = {}) {
           _0x4e44b4.appendChild(_0x3d0372));
       }
     };
-  (_0x5a65ee.addEventListener('click', () => {
-    const _0x4862fe = _0x2dd8f0(_0x15d6d4),
-      _0x1d9a2b = appStore.getStateRaw().subscription || {};
-    if (!canCreateCustomPromptPreset(_0x15d6d4, _0x1d9a2b)) {
-      (showPresetManagerToast(
-        promptPresetsText('manager.freeLimitToast', { limit: FREE_CUSTOM_PRESET_LIMIT }),
-        'warn',
-      ),
-        requestSubscriptionFromPresetManager(_0x3446a8));
-      return;
-    }
-    ((_0x4862fe.draftCounter += 1),
-      (_0x4862fe.draftPreset = {
-        id: _0x4862fe.draftCounter,
+  if (_0x2f8e15) {
+    const _0x2a6a1f = _0x347663.get(_0x15d6d4);
+    ((_0x2a6a1f.draftCounter = 1),
+      (_0x2a6a1f.draftPreset = {
+        id: _0x2a6a1f.draftCounter,
         title: getUniqueDraftTitle(getCustomPromptPresets(_0x15d6d4)),
         desc: '',
-        template: '',
-        triggerMode: PROMPT_PRESET_TRIGGER_MODE_DIRECT,
+        template: _0x2f8e15,
+        triggerMode: PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT,
       }),
-      (_0x4862fe.selectedKey = 'draft:' + _0x4862fe.draftPreset.id),
-      _0x5e7679());
-  }),
+      (_0x2a6a1f.selectedKey = 'draft:' + _0x2a6a1f.draftPreset.id));
+  }
+  return (
+    _0x5a65ee.addEventListener('click', () => {
+      const _0x4862fe = _0x2dd8f0(_0x15d6d4),
+        _0x1d9a2b = appStore.getStateRaw().subscription || {};
+      if (!canCreateCustomPromptPreset(_0x15d6d4, _0x1d9a2b)) {
+        (showPresetManagerToast(
+          promptPresetsText('manager.freeLimitToast', { limit: FREE_CUSTOM_PRESET_LIMIT }),
+          'warn',
+        ),
+          requestSubscriptionFromPresetManager(_0x3446a8));
+        return;
+      }
+      ((_0x4862fe.draftCounter += 1),
+        (_0x4862fe.draftPreset = {
+          id: _0x4862fe.draftCounter,
+          title: getUniqueDraftTitle(getCustomPromptPresets(_0x15d6d4)),
+          desc: '',
+          template: '',
+          triggerMode: PROMPT_PRESET_TRIGGER_MODE_DIRECT,
+        }),
+        (_0x4862fe.selectedKey = 'draft:' + _0x4862fe.draftPreset.id),
+        _0x5e7679());
+    }),
     _0x431cfe.appendChild(_0x15fddf),
     _0x431cfe.appendChild(_0xdb2f87),
     _0x431cfe.appendChild(_0x23e661),
@@ -1098,7 +1237,21 @@ export function openCustomPresetsManager({ nodeType: _0x3b61cf } = {}) {
     _0x3446a8.appendChild(_0x431cfe),
     _0x5e7679(),
     _0x3446a8.addEventListener('mousedown', (_0x455733) => {
-      _0x455733.target === _0x3446a8 && _0x3446a8.remove();
+      _0x455733.target === _0x3446a8 && _0x1763c1();
     }),
-    document.body.appendChild(_0x3446a8));
+    document.body.appendChild(_0x3446a8),
+    (activePresetManagerOverlay = _0x3446a8),
+    (closeActivePresetManager = _0x1763c1),
+    _0x3446a8
+  );
+}
+export async function openQuickCapturePromptPresetDraft(_0x4b7f2a) {
+  await loadPromptPresetSettings();
+  const _0x32af41 = getDefaultQuickCapturePresetNodeType(),
+    _0x1b0a3e = _0x32af41 || 'ai-text',
+    _0x4a5e8c = openCustomPresetsManager({
+      nodeType: _0x1b0a3e,
+      initialDraftTemplate: _0x4b7f2a,
+    });
+  return { overlay: _0x4a5e8c, nodeType: _0x1b0a3e, hasConfiguredDefault: Boolean(_0x32af41) };
 }

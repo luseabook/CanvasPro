@@ -3,6 +3,7 @@ import { buildImageNodeStorageFields } from '../../services/imageDerivativeServi
 import { buildCanvasLocalImageFields } from '../../services/canvasMediaLocalService.js';
 import { createStableSignature } from '../../utils/stableSignature.js';
 import { normalizeLocalPath, pickResultLocalPath } from '../../utils/localMediaPath.js';
+import { requireProjectDocument } from '../../services/projectDocumentGuard.js';
 import { isModelApiModel, isWorkflowModel, resolveModelProvider } from '../../manifests/index.js';
 import { t } from '../../i18n/index.js';
 export { createStableSignature } from '../../utils/stableSignature.js';
@@ -33,6 +34,11 @@ const BOOT_PERF_MEASURE_NAMES = [
     'dreaminaTaskLastCheckedAt',
     'dreaminaTaskRecovering',
   ];
+function unsafeRecoveryError() {
+  return Object.assign(new Error('恢复快照或本地缓存无法安全读取；保留原始数据，未加载空画布'), {
+    code: 'UNSAFE_PROJECT_RECOVERY',
+  });
+}
 function getUntitledProjectName() {
   return t('projectLifecycle.untitledProject');
 }
@@ -519,37 +525,37 @@ export function buildWorkspaceShardRecords(_0x3d05ec) {
   };
 }
 export function restoreWorkspacePayloadFromShardRecords(_0x3a0951, _0x443dc9) {
-  if (!_0x3a0951 || !Array.isArray(_0x3a0951.canvasOrder)) return null;
-  const _0x1a61ce = new Map();
-  for (const _0x10352f of _0x443dc9 || []) {
-    if (!_0x10352f || !_0x10352f.id) continue;
-    _0x1a61ce.set(_0x10352f.id, {
-      id: _0x10352f.id,
-      name: _0x10352f.name || getUntitledCanvasName(),
-      _persistRevHint: Number.isFinite(_0x10352f?._persistRevHint) ? _0x10352f._persistRevHint : undefined,
-      nodes: Array.isArray(_0x10352f.nodes) ? _0x10352f.nodes : [],
-      edges: Array.isArray(_0x10352f.edges) ? _0x10352f.edges : [],
-      viewport:
-        _0x10352f.viewport && typeof _0x10352f.viewport === 'object'
-          ? _0x10352f.viewport
-          : { x: 0, y: 0, zoom: 1.1 },
-      assets: Array.isArray(_0x10352f.assets) ? _0x10352f.assets : [],
-      visualSnapshot:
-        _0x10352f.visualSnapshot && typeof _0x10352f.visualSnapshot === 'object'
-          ? _0x10352f.visualSnapshot
-          : null,
+  if (!Array.isArray(_0x3a0951?.canvasOrder) || !_0x3a0951.canvasOrder.length || !Array.isArray(_0x443dc9) ||
+      _0x443dc9.length !== _0x3a0951.canvasOrder.length ||
+      typeof _0x3a0951.projectId !== 'string' || !_0x3a0951.projectId.trim()) return null;
+  const seen = new Set();
+  const _0x546dd9 = [];
+  for (let index = 0; index < _0x3a0951.canvasOrder.length; index++) {
+    const _0x434e61 = _0x3a0951.canvasOrder[index];
+    const _0x7b049f = _0x434e61?.id;
+    const _0x10352f = _0x443dc9[index];
+    if (typeof _0x7b049f !== 'string' || !_0x7b049f.trim() || seen.has(_0x7b049f) ||
+        !_0x10352f || typeof _0x10352f !== 'object' || Array.isArray(_0x10352f) ||
+        _0x10352f.id !== _0x7b049f || !Array.isArray(_0x10352f.nodes) ||
+        !Array.isArray(_0x10352f.edges) ||
+        (_0x10352f.assets != null && !Array.isArray(_0x10352f.assets))) return null;
+    seen.add(_0x7b049f);
+    _0x546dd9.push({
+      id: _0x7b049f,
+      name: _0x434e61.name || _0x10352f.name || getUntitledCanvasName(),
+      _persistRevHint: Number.isFinite(_0x10352f._persistRevHint) ? _0x10352f._persistRevHint : undefined,
+      nodes: _0x10352f.nodes,
+      edges: _0x10352f.edges,
+      viewport: _0x10352f.viewport && typeof _0x10352f.viewport === 'object' && !Array.isArray(_0x10352f.viewport)
+        ? _0x10352f.viewport : { x: 0, y: 0, zoom: 1.1 },
+      assets: _0x10352f.assets || [],
+      visualSnapshot: _0x10352f.visualSnapshot && typeof _0x10352f.visualSnapshot === 'object'
+        ? _0x10352f.visualSnapshot : null,
     });
   }
-  const _0x546dd9 = [];
-  for (const _0x434e61 of _0x3a0951.canvasOrder) {
-    const _0x7b049f = _0x434e61?.id;
-    if (!_0x7b049f) return null;
-    const _0x5f5c57 = _0x1a61ce.get(_0x7b049f);
-    if (!_0x5f5c57) return null;
-    _0x546dd9.push({ ..._0x5f5c57, name: _0x434e61?.name || _0x5f5c57.name || getUntitledCanvasName() });
-  }
+  if (_0x3a0951.activeCanvasId && !seen.has(_0x3a0951.activeCanvasId)) return null;
   return {
-    projectId: _0x3a0951.projectId || 'default_v2_project',
+    projectId: _0x3a0951.projectId,
     projectName: _0x3a0951.projectName || getUntitledProjectName(),
     multiData: { canvases: _0x546dd9, activeCanvasId: _0x3a0951.activeCanvasId || _0x546dd9[0]?.id || null },
   };
@@ -580,6 +586,7 @@ export function createProjectLifecycle({
     _0x4dc4bb = '',
     _0x26f7e7 = 0,
     _0x11676e = false;
+  let recoveryWriteWarningShown = false;
   function _0x1c0741() {
     ((_0x366e9f = ''), (_0x494215 = ''), _0x2de4e9.clear(), (_0x5c4fdb = new Set()), (_0x3bb602 = false));
   }
@@ -743,17 +750,30 @@ export function createProjectLifecycle({
     async load() {
       try {
         const _0x131856 = await this.getRecord(WORKSPACE_META_KEY);
-        if (_0x131856?.cacheVersion === 2 && Array.isArray(_0x131856.canvasOrder)) {
+        if (_0x131856 != null) {
+          if (_0x131856.cacheVersion !== 2 || !Array.isArray(_0x131856.canvasOrder) ||
+              !_0x131856.canvasOrder.length) throw unsafeRecoveryError();
           const _0x1ba857 = _0x131856.canvasOrder.map((_0xbd4788) => buildWorkspaceCanvasKey(_0xbd4788?.id)),
             _0x4ed259 = await this.getRecords(_0x1ba857),
             _0x2c1008 = restoreWorkspacePayloadFromShardRecords(_0x131856, _0x4ed259);
-          if (_0x2c1008?.multiData?.canvases?.length) return (_0x5a04ac(_0x2c1008), _0x2c1008);
+          if (!_0x2c1008?.multiData?.canvases?.length) throw unsafeRecoveryError();
+          return (_0x5a04ac(_0x2c1008), _0x2c1008);
         }
         const _0x1c9f0c = await this.getRecord(LEGACY_WORKSPACE_KEY);
-        if (_0x1c9f0c?.multiData?.canvases?.length) return (_0x1c0741(), _0x1c9f0c);
+        if (_0x1c9f0c != null) {
+          if (typeof _0x1c9f0c.projectId !== 'string' || !_0x1c9f0c.projectId.trim() ||
+              !Array.isArray(_0x1c9f0c.multiData?.canvases) || !_0x1c9f0c.multiData.canvases.length ||
+              _0x1c9f0c.multiData.canvases.some(canvas => canvas.nodes == null || canvas.edges == null))
+            throw unsafeRecoveryError();
+          requireProjectDocument(_0x1c9f0c.multiData);
+          return (_0x1c0741(), _0x1c9f0c);
+        }
         return (_0x1c0741(), null);
       } catch (_0x39aabd) {
-        return (console.warn('[V2LocalCache] Load failed:', _0x39aabd), _0x1c0741(), null);
+        console.warn('[V2LocalCache] Load failed:', _0x39aabd);
+        _0x1c0741();
+        // A rejected IndexedDB read cannot prove the cache is absent; fail closed.
+        throw unsafeRecoveryError();
       }
     },
     async clear() {
@@ -846,6 +866,13 @@ export function createProjectLifecycle({
     const _0x264f2c = _0x459735();
     if (typeof _0x264f2c?.writeRecoverySnapshot !== 'function')
       return { success: false, reason: 'api-unavailable' };
+    if (typeof _0x264f2c.writeRecoverySnapshotIfCompatible !== 'function') {
+      if (!recoveryWriteWarningShown) {
+        recoveryWriteWarningShown = true;
+        window.showToast?.(t('projectLifecycle.recoverySnapshotUpgradeRequired'), 'warning');
+      }
+      return { success: false, code: 'RECOVERY_SNAPSHOT_PROTECTED', reason: 'guard-unavailable' };
+    }
     if (!_0x4ea40c()) return { success: false, reason: 'clean' };
     const _0x124465 = _0x50b40f(_0x27ea37, { sanitizeForPersistence: true });
     if (!_0x124465?.canvases?.length) return { success: false, reason: 'empty-canvas' };
@@ -858,8 +885,12 @@ export function createProjectLifecycle({
     if (_0x81e81a) return _0x81e81a.catch(() => null).then(() => _0x3096d3(_0x313b21));
     return (
       (_0x81e81a = _0x264f2c
-        .writeRecoverySnapshot({ ..._0x2cda12, reason: _0x313b21, multiData: _0x124465 })
+        .writeRecoverySnapshotIfCompatible({ ..._0x2cda12, reason: _0x313b21, multiData: _0x124465 })
         .then((_0x37cbb8) => {
+          if (_0x37cbb8?.code === 'RECOVERY_SNAPSHOT_PROTECTED' && !recoveryWriteWarningShown) {
+            recoveryWriteWarningShown = true;
+            window.showToast?.(t('projectLifecycle.recoverySnapshotProtected'), 'warning');
+          }
           return (
             _0x37cbb8?.success !== false && ((_0x4dc4bb = _0xd7e948), (_0x26f7e7 = Date.now())),
             _0x37cbb8
@@ -907,14 +938,18 @@ export function createProjectLifecycle({
       return null;
     try {
       const _0x4d2a90 = await _0x2fabd1.getRecoverySnapshotInfo(_0x13f488());
+      if (_0x4d2a90?.invalid || _0x4d2a90?.error ||
+          typeof _0x4d2a90?.exists !== 'boolean') throw unsafeRecoveryError();
       if (!_0x4d2a90?.exists) return null;
-      if (_0x4d2a90.isNewerThanProject !== true) return (await _0x2fabd1.clearRecoverySnapshot?.(), null);
+      if (_0x4d2a90.isNewerThanProject !== true) return null; // Never auto-delete an older recovery file.
       const _0x5b9568 = await _0x2fabd1.readRecoverySnapshot();
-      if (!_0x5b9568?.success || !_0x5b9568.data) return null;
+      if (!_0x5b9568?.success) throw unsafeRecoveryError();
+      const verifiedData = requireProjectDocument(_0x5b9568.data);
+      if (Array.isArray(verifiedData.canvases) && verifiedData.canvases.length === 0) throw unsafeRecoveryError();
       return {
         projectId: _0x5b9568.projectId || window.currentProjectId || 'default_v2_project',
         projectName: _0x5b9568.projectName || getUntitledProjectName(),
-        multiData: _0x3e2003.resolveCanvasData(_0x5b9568.data),
+        multiData: _0x3e2003.resolveCanvasData(verifiedData),
         recovery: true,
         filename: _0x5b9568.filename || '',
         recentId: _0x5b9568.recentId || '',
@@ -922,7 +957,8 @@ export function createProjectLifecycle({
         lastModified: Number(_0x5b9568.lastModified || 0) || 0,
       };
     } catch (_0x3de964) {
-      return (console.warn('[projectLifecycle] 读取恢复快照失败:', _0x3de964), null);
+      console.warn('[projectLifecycle] 读取恢复快照失败:', _0x3de964);
+      throw unsafeRecoveryError();
     }
   }
   function _0x129e15(_0x41cf4e) {
@@ -1383,7 +1419,9 @@ export function createProjectLifecycle({
       (_0x163715('initApp:start'), _0x4a3b4f());
       const _0x474ce5 = readDreaminaResumeBackupSync(),
         _0x59ab35 = await _0x178e0c(),
-        _0x498899 = _0x59ab35 || (await _0x5da0cd.load());
+        // Validate both persisted sources before a good snapshot can overwrite a damaged cache.
+        _0x3bd8c5 = await _0x5da0cd.load(),
+        _0x498899 = _0x59ab35 || _0x3bd8c5;
       if (
         _0x498899 &&
         _0x498899.multiData &&
@@ -1436,9 +1474,15 @@ export function createProjectLifecycle({
       _0x3be267 && ((_0x3be267.style.transition = 'none'), void _0x3be267.offsetHeight);
       _0x41c41b.updateViewport(0, 0, 1);
       window.showGlobalLoading && window.showGlobalLoading(t('projectLifecycle.loadingWorkspaceFiles'));
-      const _0x2e6f8c = window.currentProjectId || 'default_v2_project';
+      const _0x2e6f8c = window.currentProjectId || 'default_v2_project',
+        _0x19bb36 = _0x2e6f8c === 'default_v2_project' &&
+          !new URLSearchParams(window.location.search).get('id');
+      let missingDefaultProject = false;
       ((window.currentProjectId = _0x2e6f8c), _0x163715('project.loadProject:start'));
-      const _0xe76454 = await _0x3e2003.loadProject(_0x2e6f8c),
+      const _0xe76454 = await _0x3e2003.loadProject(_0x2e6f8c, {
+          allowMissing: _0x19bb36,
+          onMissing: () => { missingDefaultProject = true; },
+        }),
         _0x5c7ab1 = mergeDreaminaResumeBackupIntoMultiData(_0xe76454, _0x474ce5, _0x2e6f8c);
       (_0x163715('project.loadProject:end'),
         _0x1fade4('project.loadProject', 'project.loadProject:start', 'project.loadProject:end'),
@@ -1471,10 +1515,20 @@ export function createProjectLifecycle({
           animate: true,
           afterHidden: () => {
             (_0x3a5a22(_0x2e6f8c), _0x568118(_0x2e6f8c));
+            if (missingDefaultProject) window.showToast?.(t('projectLifecycle.defaultProjectMissing'), 'warning');
           },
         }));
     } catch (_0x2c4c94) {
+      // An unsuccessful read must not leave an old project ID attached to an empty store.
       (console.error('Failed to init app:', _0x2c4c94),
+        (window._isAppLoaded = false),
+        (window.currentProjectId = ''),
+        (window._v2CurrentFile = ''),
+        (window._v2CurrentRecentProjectId = ''),
+        (window._v2CurrentProjectDisplayPath = ''),
+        (window._v2CurrentProjectLastModified = 0),
+        window.showToast?.(t(_0x2c4c94?.code === 'UNSAFE_PROJECT_RECOVERY'
+          ? 'projectLifecycle.recoveryReadFailedNoSave' : 'projectLifecycle.projectLoadFailedNoSave'), 'error'),
         _0xa6188c({ wrapEl: _0x53b260, canvasEl: _0x3be267, animate: true }));
     }
   }
@@ -1522,8 +1576,9 @@ export function createProjectLifecycle({
     const _0x257d6f = new FileReader();
     ((_0x257d6f.onload = (_0x389586) => {
       try {
-        const _0x5c8d7f = JSON.parse(_0x389586.target.result),
-          _0x4602ef = _0x3e2003.resolveCanvasData(_0x5c8d7f),
+        const _0x5c8d7f = requireProjectDocument(JSON.parse(_0x389586.target.result));
+        if (Array.isArray(_0x5c8d7f.canvases) && !_0x5c8d7f.canvases.length) throw new Error('空画布存档不能覆盖当前工程');
+        const _0x4602ef = _0x3e2003.resolveCanvasData(_0x5c8d7f),
           _0x281fdf = _0x2a60e5(_0x4602ef),
           _0x14ba42 =
             _0x281fdf.canvases.find((_0x316e8f) => _0x316e8f.id === _0x281fdf.activeCanvasId) ||
@@ -1550,6 +1605,7 @@ export function createProjectLifecycle({
           window.showToast?.(t('projectLifecycle.jsonArchiveParseFailed'), 'error'));
       }
     }),
+      (_0x257d6f.onerror = () => window.showToast?.(t('projectLifecycle.jsonArchiveParseFailed'), 'error')),
       _0x257d6f.readAsText(_0x25fcbf));
   }
   function _0x396a6a() {

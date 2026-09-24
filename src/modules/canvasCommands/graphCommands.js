@@ -162,6 +162,9 @@ function findEdgesByEndpoints(
     return true;
   });
 }
+function hasExplicitCreatePosition(_0x272665 = {}) {
+  return Number['isFinite'](Number(_0x272665['x'])) && Number['isFinite'](Number(_0x272665['y']));
+}
 function resolveCreateSize(_0x106fdf, _0x43b010 = {}, _0x46ac6f = {}) {
   const _0x45e1e1 = DEFAULT_NODE_SIZES[_0x106fdf] || { width: 0x12c, height: 0x12c };
   let _0x889012 = null;
@@ -402,8 +405,12 @@ export function registerGraphCommands(_0x3030e3) {
         params: { type: 'object' },
         width: { type: 'number' },
         height: { type: 'number' },
+        x: { type: 'number' },
+        y: { type: 'number' },
+        placement: { type: 'string' },
+        sequenceKey: { type: 'string' },
       },
-      defaults: { width: 'node default', height: 'node default' },
+      defaults: { width: 'node default', height: 'node default', placement: 'viewport-center-sequence' },
     },
     capabilitySchema: { reads: ['cursor', 'selection', 'modelRegistry'], writes: ['nodes', 'selection'] },
     returnSchema: { aliasFields: ['nodeId', 'node'] },
@@ -415,7 +422,9 @@ export function registerGraphCommands(_0x3030e3) {
           errorCode: 'UNSUPPORTED_NODE_TYPE',
           message: 'Unsupported node.create type: ' + (_0x2b16b3 || '(empty)'),
         };
-      if (typeof _0x3441a2.createNodeAtCursor !== 'function')
+      const _0x264310 =
+        hasExplicitCreatePosition(_0xe54d94) && typeof _0x3441a2['buildNodeData'] === 'function';
+      if (!_0x264310 && typeof _0x3441a2['createNodeAtCursor'] !== 'function')
         return {
           ok: false,
           errorCode: 'NODE_CREATE_UNAVAILABLE',
@@ -425,13 +434,77 @@ export function registerGraphCommands(_0x3030e3) {
       if (_0x5ed415.ok === false) return _0x5ed415;
       return { args: { ..._0xe54d94, ..._0x5ed415.args, type: _0x2b16b3 } };
     },
-    execute(_0x26e700, _0xfc5428) {
-      const { width: _0xa8eb04, height: _0x5d05bb } = resolveCreateSize(_0x26e700.type, _0x26e700, _0xfc5428),
-        _0x1e71d4 = String(_0x26e700.name || _0x26e700.label || ''),
-        _0x97264e = _0xfc5428.createNodeAtCursor(_0x26e700.type, _0xa8eb04, _0x5d05bb, _0x1e71d4),
-        _0x4dd8f7 = applyInitialNodeModel(_0x97264e, _0x26e700, _0xfc5428),
-        _0x4bb15e = applyInitialNodeText(_0x4dd8f7, _0x26e700, _0xfc5428);
-      return { nodeId: _0x4bb15e?.id || _0x97264e?.id || '', node: _0x4bb15e || _0x97264e };
+    execute(_0x1c25e4, _0x3e312a) {
+      const { width: _0x54e37d, height: _0x5930a6 } = resolveCreateSize(
+          _0x1c25e4['type'],
+          _0x1c25e4,
+          _0x3e312a,
+        ),
+        _0xaff048 = String(_0x1c25e4['name'] || _0x1c25e4['label'] || ''),
+        _0x3ff79f = _0x1c25e4['agentReservation'] === !![],
+        _0xd98c54 = _0x3ff79f
+          ? [
+              ...(Array['isArray'](getState(_0x3e312a)['selectedNodeIds'])
+                ? getState(_0x3e312a)['selectedNodeIds']
+                : []),
+            ]
+          : [],
+        _0x2baee0 = String(_0x1c25e4['reuseNodeId'] || '')['trim'](),
+        _0x4cea57 = _0x2baee0 ? getNode(_0x3e312a, _0x2baee0) : null;
+      if (_0x4cea57 && String(_0x4cea57['type'] || '')['trim']() === _0x1c25e4['type']) {
+        const _0x1d0908 = getStore(_0x3e312a),
+          _0x5cb9c2 = { ..._0x3e312a, commit: null };
+        (Object['prototype']['hasOwnProperty']['call'](_0x1c25e4, 'name') || _0x1c25e4['label'] != null) &&
+          _0x1d0908?.['updateNodeData']?.(_0x2baee0, { name: _0xaff048 });
+        const _0x2ce34a = applyInitialNodeModel(
+            getNode(_0x3e312a, _0x2baee0) || _0x4cea57,
+            _0x1c25e4,
+            _0x5cb9c2,
+          ),
+          _0xfd4956 = applyInitialNodeText(_0x2ce34a, _0x1c25e4, _0x5cb9c2);
+        return (
+          _0x1d0908?.['setSelectedNodes']?.([_0x2baee0]),
+          _0x3e312a['commit']?.(),
+          { nodeId: _0x2baee0, node: getNode(_0x3e312a, _0x2baee0) || _0xfd4956 || _0x4cea57, reused: !![] }
+        );
+      }
+      if (hasExplicitCreatePosition(_0x1c25e4) && typeof _0x3e312a['buildNodeData'] === 'function') {
+        const _0x47d206 = generateId(_0x1c25e4['type']),
+          _0x429d97 = _0x3e312a['buildNodeData']({
+            ..._0x1c25e4,
+            id: _0x47d206,
+            type: _0x1c25e4['type'],
+            name: _0xaff048,
+            width: _0x54e37d,
+            height: _0x5930a6,
+            x: Number(_0x1c25e4['x']),
+            y: Number(_0x1c25e4['y']),
+          });
+        if (!_0x429d97 || typeof _0x429d97 !== 'object')
+          throw createCanvasCommandError(
+            'NODE_CREATE_FAILED',
+            'Canvas node factory did not return data for type: ' + _0x1c25e4['type'],
+          );
+        (getStore(_0x3e312a)?.['addNode']?.(_0x429d97),
+          getStore(_0x3e312a)?.['setSelectedNodes']?.(_0x3ff79f ? _0xd98c54 : [_0x47d206]));
+        const _0x4c7f17 = { ..._0x3e312a, commit: null },
+          _0x1cc2d8 = applyInitialNodeModel(_0x429d97, _0x1c25e4, _0x4c7f17),
+          _0x26f868 = applyInitialNodeText(_0x1cc2d8, _0x1c25e4, _0x4c7f17);
+        return (
+          _0x3e312a['commit']?.(),
+          { nodeId: _0x26f868?.['id'] || _0x47d206, node: _0x26f868 || _0x429d97 }
+        );
+      }
+      const _0x537841 = String(_0x1c25e4['placement'] || 'viewport-center-sequence')['trim'](),
+        _0x513c09 = String(_0x1c25e4['sequenceKey'] || _0x3e312a['createNodeSequenceKey'] || '')['trim'](),
+        _0x48e365 = _0x3e312a['createNodeAtCursor'](_0x1c25e4['type'], _0x54e37d, _0x5930a6, _0xaff048, {
+          placement: _0x537841,
+          sequenceKey: _0x513c09,
+        });
+      if (_0x3ff79f) getStore(_0x3e312a)?.['setSelectedNodes']?.(_0xd98c54);
+      const _0x332660 = applyInitialNodeModel(_0x48e365, _0x1c25e4, _0x3e312a),
+        _0x218b1a = applyInitialNodeText(_0x332660, _0x1c25e4, _0x3e312a);
+      return { nodeId: _0x218b1a?.['id'] || _0x48e365?.['id'] || '', node: _0x218b1a || _0x48e365 };
     },
   }),
     _0x3030e3.register({

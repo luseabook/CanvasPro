@@ -48,6 +48,9 @@ const _NODE_META = {
     'ai-audio': { aliases: [], wrapperClasses: ['audio-node'], refKind: 'audio' },
     debug: { aliases: [], wrapperClasses: [], refKind: '' },
     collage: { aliases: [], wrapperClasses: ['collage-node-wrapper'], refKind: '' },
+    whiteboard: { aliases: [], wrapperClasses: ['whiteboard-node-wrapper'], refKind: '' },
+    'comfyui-workflow': { aliases: [], wrapperClasses: ['comfy-workflow-node-wrapper'], refKind: '' },
+    'story-workspace': { aliases: [], wrapperClasses: ['story-workspace-node-wrapper'], refKind: '' },
     storyboard: { aliases: [], wrapperClasses: [], refKind: '' },
     'storyboard-script': {
       aliases: ['storyboard_script'],

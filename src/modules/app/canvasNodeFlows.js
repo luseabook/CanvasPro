@@ -205,8 +205,8 @@ export function createAppCanvasNodeFlows({
       { viewport: _0x42ca43 } = _0x549398();
     return screenToWorld(_0x16fc90, _0x56a241, _0x42ca43);
   }
-  function _0x3e727b(_0x3a1b7d, _0x10cb97, _0x51a427, _0x52e76c) {
-    const { x: _0x544551, y: _0xdfeb98 } = _0x3af476(),
+  function _0x3e727b(_0x3a1b7d, _0x10cb97, _0x51a427, _0x52e76c, _0x1b2c0e = {}) {
+    const { x: _0x544551, y: _0xdfeb98 } = _0x3af476(_0x1b2c0e),
       _0x56d588 = generateId(_0x3a1b7d),
       _0x33043b =
         _0x3a1b7d === 'ai-text'
@@ -233,14 +233,32 @@ export function createAppCanvasNodeFlows({
         height: _0x2c2c61,
         name: _0x52e76c,
       };
+    _0x3a1b7d === 'comment-note' &&
+      ((_0x53c86e.name = ''), (_0x53c86e.content = ''), (_0x53c86e.style = createDefaultCommentNoteStyle()));
+    if (_0x1b2c0e.placement === 'viewport-center-sequence') {
+      const { spacing: _0x56fab1, direction: _0x3c1251, avoidOverlap: _0x5bf912 } = getNodeSpawnPrefs(),
+        _0x395738 = normalizeSpawnDirection(_0x3c1251),
+        _0x6b9b7a = _0x544551 - _0x1f1cb1 / 2,
+        _0x53166c = _0xdfeb98 - _0x2c2c61 / 2,
+        _0x2cc25e = _0x549398().nodes || {},
+        _0x5c6424 = String(_0x1b2c0e.sequenceKey || '').trim(),
+        _0x2d01f4 = _0x5bf912 ? _0x2cc25e : getSequenceNodes(_0x2cc25e, _0x5c6424),
+        _0x4cc574 = findAvailablePosition(
+          _0x2d01f4,
+          _0x6b9b7a,
+          _0x53166c,
+          _0x1f1cb1,
+          _0x2c2c61,
+          _0x56fab1,
+          _0x395738,
+        );
+      ((_0x53c86e.x = _0x4cc574.x), (_0x53c86e.y = _0x4cc574.y));
+      if (_0x5c6424) _0x53c86e.spawnSequenceKey = _0x5c6424;
+    }
     return (
-      _0x3a1b7d === 'comment-note' &&
-        ((_0x53c86e.name = ''),
-        (_0x53c86e.content = ''),
-        (_0x53c86e.style = createDefaultCommentNoteStyle())),
       _0x232205.addNode(_0x53c86e),
       _0x232205.setSelectedNodes([_0x56d588]),
-      _0x121662(),
+      _0x1b2c0e.skipCommit !== !![] && _0x121662(),
       _0x53c86e
     );
   }

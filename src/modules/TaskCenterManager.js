@@ -1,3 +1,6 @@
+import { MediaTaskHistoryPanel } from './MediaTaskHistoryPanel.js';
+import { createMediaTaskRecoveryPanel } from './mediaTaskRecoveryCanvas.js';
+import { createMediaTaskListRefresh } from './mediaTaskRecoveryModel.js';
 import { registerSidebarSubmenu } from './sidebarSubmenuController.js';
 import { pickResultLocalPath } from '../utils/localMediaPath.js';
 import { GENERATION_TASK_CENTER_EVENT } from './generationTaskCenterEvents.js';
@@ -37,6 +40,7 @@ function normalizeTask(_0x48bd03 = {}) {
   };
 }
 function getTaskLabel(_0x256aed) {
+  if (_0x256aed === 'storySequenceExport') return '镜头顺序渲染（本地）';
   const _0x2bb7a2 = String(_0x256aed || '').trim();
   if (!_0x2bb7a2) return taskCenterText('taskKinds.mediaTask');
   const _0x55b220 = 'taskCenter.taskKinds.' + _0x2bb7a2,
@@ -101,6 +105,7 @@ export class TaskCenterManager {
       (this.unsubscribeGenerationTasks = null),
       (this.unsubscribeLocale = null),
       this.initPanel(),
+      this.initRecoveryPanel(),
       this.bindLocaleChange(),
       this.bindMediaTasks(),
       this.bindGenerationTasks());
@@ -133,6 +138,19 @@ export class TaskCenterManager {
       this.panel.addEventListener('click', (_0x1fb1ed) => this.handleClick(_0x1fb1ed)),
       this.render());
   }
+  initRecoveryPanel() {
+    this.mediaTaskReader = createMediaTaskListRefresh({
+      api: getElectronMediaTaskApi(),
+      onTask: task => this.upsertTask(task, { silent: true }),
+      onComplete: () => this.scheduleRender(),
+    });
+    this.recoveryPanel = createMediaTaskRecoveryPanel({
+      api: getElectronMediaTaskApi(), refresh: () => this.mediaTaskReader.refresh(),
+    });
+    this.panel.insertBefore(this.recoveryPanel.el, this.listEl);
+    this.historyPanel = new MediaTaskHistoryPanel({ api: getElectronMediaTaskApi()?.history, createRecoveryPanel: createMediaTaskRecoveryPanel });
+    this.panel.insertBefore(this.historyPanel.el, this.listEl);
+  }
   ['bindLocaleChange']() {
     this.unsubscribeLocale = onLocaleChange(() => {
       this.render();
@@ -144,19 +162,18 @@ export class TaskCenterManager {
       this.render();
       return;
     }
+    const initialLookupSequence = this.recoveryPanel.sequence;
     (typeof _0x33984f.onUpdate === 'function' &&
       (this.unsubscribe = _0x33984f.onUpdate((_0x113203) => {
+        this.mediaTaskReader.noteEvent(_0x113203 || {});
         this.upsertTask(_0x113203 || {});
       })),
       typeof _0x33984f.list === 'function' &&
-        _0x33984f
-          .list({ limit: MAX_TASKS })
-          .then((_0x4e111e) => {
-            if (!Array.isArray(_0x4e111e)) return;
-            (_0x4e111e.forEach((_0x46e27e) => this.upsertTask(_0x46e27e, { silent: true })),
-              this.scheduleRender());
-          })
-          .catch(() => {}));
+        this.mediaTaskReader.refresh().catch(() => {
+          if (this.recoveryPanel.sequence === initialLookupSequence) {
+            this.recoveryPanel.message.textContent = '初次宿主列表读取失败，状态待核对；可手动刷新。不自动重发任务。';
+          }
+        }));
   }
   ['bindGenerationTasks']() {
     if (!globalThis.window?.addEventListener) return;
@@ -175,6 +192,9 @@ export class TaskCenterManager {
       this.startClock());
   }
   ['hide']() {
+    this.recoveryPanel?.suspend();
+    this.historyPanel?.suspend();
+    this.mediaTaskReader?.invalidate();
     (this.panel?.classList.remove('show'),
       document.getElementById('btnTasks')?.classList.remove('active'),
       this.stopClock());
@@ -350,6 +370,11 @@ export class TaskCenterManager {
         (_0x25b7f2.dataset.taskId = _0x32b8cf.taskId),
         _0x22e902.appendChild(_0x25b7f2));
     }
+    if (_0x32b8cf.source === 'mediaTask') {
+      const lookup = el('button', 'v2-task-card-action', '查找 / 取回');
+      lookup.type = 'button'; lookup.dataset.taskAction = 'lookup-local';
+      lookup.dataset.taskId = _0x32b8cf.taskId; _0x22e902.appendChild(lookup);
+    }
     const _0x574de5 = getResultLocalPath(_0x32b8cf.result);
     if (_0x574de5) {
       const _0x18f768 = el('button', 'v2-task-card-action', taskCenterText('actions.reveal'));
@@ -372,7 +397,12 @@ export class TaskCenterManager {
     if (!_0x8322b0) return;
     (_0x2e6e28.preventDefault(), _0x2e6e28.stopPropagation());
     const _0x2211d7 = _0x8322b0.dataset.taskAction || '';
+    if (_0x2211d7 === 'lookup-local') {
+      void this.recoveryPanel.lookup(_0x8322b0.dataset.taskId || '');
+      return;
+    }
     if (_0x2211d7 === 'clear-terminal') {
+      this.mediaTaskReader?.invalidate();
       for (const [_0x49f2d1, _0x238485] of this.tasks.entries()) {
         if (TERMINAL_STATUSES.has(_0x238485.status)) this.tasks.delete(_0x49f2d1);
       }
