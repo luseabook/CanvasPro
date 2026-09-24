@@ -2135,6 +2135,27 @@
                 ></div>
                 <div class="settings-file-migration-errors" id="fileSaveMigrationErrors" hidden></div>
               </div>
+              <div class="settings-section settings-card settings-file-save-legacy-card" id="fileSaveLegacyImportCard">
+                <div class="settings-row settings-local-cleanup-row">
+                  <div>
+                    <div class="settings-label" data-i18n="settings.fileSave.legacyImport.label">从旧版默认目录导入</div>
+                    <div class="settings-desc" data-i18n="settings.fileSave.legacyImport.desc">
+                      扫描旧版项目、素材和输出目录，仅复制到当前保存位置，不删除旧文件；确认旧工程和素材重开前勿清理旧目录。
+                    </div>
+                    <div class="settings-desc settings-local-cleanup-status" id="fileSaveLegacyStatus" aria-live="polite"></div>
+                  </div>
+                  <div class="settings-local-cleanup-actions">
+                    <button type="button" class="settings-save-btn settings-btn-ghost" id="btnFileSaveLegacyScan"
+                      data-i18n="settings.fileSave.legacyImport.scan">扫描旧目录</button>
+                    <label class="settings-desc" for="fileSaveLegacyCandidate"
+                      data-i18n="settings.fileSave.legacyImport.select">选择旧目录</label>
+                    <select id="fileSaveLegacyCandidate" class="settings-input settings-path-input" disabled="disabled"
+                      aria-label="选择旧版存储目录" data-i18n-aria-label="settings.fileSave.legacyImport.select"></select>
+                    <button type="button" class="settings-save-btn" id="btnFileSaveLegacyCopy" disabled="disabled"
+                      data-i18n="settings.fileSave.legacyImport.copy">确认复制</button>
+                  </div>
+                </div>
+              </div>
               <div
                 class="settings-section settings-card settings-local-cleanup-card"
                 id="localAssetCleanupCard"
@@ -2200,7 +2221,7 @@
                       清理旧 C 盘资源
                     </div>
                     <div class="settings-desc" data-i18n="settings.fileSave.legacyCleanup.desc">
-                      路径迁移后，扫描旧默认保存位置里的项目素材、输出和缓存文件，确认后移到系统回收站
+                      仅在确认旧项目及全部素材已正确保存重开后，再扫描旧位置；删除前需另行确认，迁移不会自动清理旧文件
                     </div>
                     <div
                       class="settings-desc settings-local-cleanup-status"

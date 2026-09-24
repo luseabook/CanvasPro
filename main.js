@@ -35,6 +35,9 @@ import { setTextWithLineBreaks } from './src/utils/dom.js';
 import { StoryboardNode } from './src/components/StoryboardNode.js';
 import { StoryboardScriptNode } from './src/components/StoryboardScriptNode.js';
 import { CollageNode } from './src/components/CollageNode.js';
+import { WhiteboardNode } from './src/components/WhiteboardNode.js';
+import { ComfyWorkflowNode } from './src/components/ComfyWorkflowNode.js';
+import { StoryWorkspaceNode } from './src/components/StoryWorkspaceNode.js';
 import { PanoramaSceneNode } from './src/components/PanoramaSceneNode.js';
 import { undo, redo, commit, onCommit } from './src/modules/history.js';
 import * as project from './src/modules/project.js';
@@ -55,6 +58,9 @@ import {
   initDesktopMediaWakeService,
   initStoreRuntimeEffects,
 } from './src/services/index.js';
+import { subscribeGenerationCompleteNotificationClicks } from './src/services/completionNotificationService.js';
+import { desktopBridge, installDesktopBridgeCompat } from './src/services/desktopBridge.js';
+import { scheduleChromeShellStartupReady } from './src/services/chromeShellStartupReadiness.js';
 import { uploadFile } from './src/services/projectService.js';
 import { migrateLegacyThumbnailsInMultiData } from './src/services/thumbnailCacheService.js';
 import { initWebPreviewViewSyncService } from './src/services/webPreviewViewSyncService.js';
@@ -113,6 +119,7 @@ import { createAppTopbarAndConfig } from './src/modules/app/appTopbarAndConfig.j
 import { createAppPanels } from './src/modules/app/appPanels.js';
 import { createAppViewport } from './src/modules/app/appViewport.js';
 import { installAppCanvasPointerBindings } from './src/modules/app/appCanvasPointerBindings.js';
+import { installGlobalTextPresetBridge } from './src/modules/app/globalTextPresetBridge.js';
 import { initAppShellUi } from './src/modules/app/appShellUi.js';
 import {
   createCanvasCommandContext,
@@ -132,6 +139,7 @@ import { getLocale, initI18nDomBindings, t } from './src/i18n/index.js';
 ((window._isSessionActive = true),
   initI18nDomBindings(),
   initToastService(),
+  installDesktopBridgeCompat(),
   initDiagnosticsService(),
   initExternalLinkHandlers(),
   initKeyboardService(),
@@ -173,6 +181,9 @@ const NODE_COMPONENTS = {
   group: GroupNode,
   debug: DebugNode,
   collage: CollageNode,
+  whiteboard: WhiteboardNode,
+  'comfyui-workflow': ComfyWorkflowNode,
+  'story-workspace': StoryWorkspaceNode,
   storyboard: StoryboardNode,
   'storyboard-script': StoryboardScriptNode,
   'panorama-scene': PanoramaSceneNode,
@@ -473,6 +484,42 @@ function installGlobalScreenshotBridge() {
     }));
 }
 installGlobalScreenshotBridge();
+installGlobalTextPresetBridge({
+  getCanvasIdentity: () =>
+    (window.currentProjectId || 'default_v2_project') + ':' + CanvasTabManager.getActiveCanvasId(),
+  textPresetApi: desktopBridge['textPreset']['isAvailable']() ? desktopBridge['textPreset'] : null,
+  showToast: (..._0x38ffef) => window.showToast?.(..._0x38ffef),
+  translate: mainText,
+  executeCanvasCommand: (_0x16b448, _0x3de349) =>
+    executeCanvasCommand(_0x16b448, _0x3de349, canvasCommandContext),
+  isNodeMounted: (_0x234f2b) => window['v2Renderer']?.['isNodeMounted']?.(_0x234f2b) === true,
+  scheduleFrame: (_0x20bb16) => window['requestAnimationFrame'](_0x20bb16),
+});
+function installCompletionNotificationBridge() {
+  subscribeGenerationCompleteNotificationClicks(async (_0x39a4f2 = {}) => {
+    const _0x1a2f6e = String(_0x39a4f2?.nodeId || '').trim();
+    if (!_0x1a2f6e) return;
+    const _0x3f5f8c = String(_0x39a4f2?.canvasId || '').trim(),
+      _0x1c2bfb = CanvasTabManager.getMultiDataSnapshot({ captureVisualSnapshot: false }),
+      _0x5a6f5d = (_0x1c2bfb?.canvases || []).filter((_0x4e0d17) => {
+        if (_0x3f5f8c && _0x4e0d17?.id !== _0x3f5f8c) return false;
+        const _0x2e1a3f = _0x4e0d17?.nodes || [];
+        return Array.isArray(_0x2e1a3f)
+          ? _0x2e1a3f.some((_0x1d0b6e) => _0x1d0b6e?.id === _0x1a2f6e)
+          : Boolean(_0x2e1a3f[_0x1a2f6e]);
+      });
+    if (_0x5a6f5d.length !== 1) {
+      window.showToast?.(mainText('completionNavigation.nodeMissing'), 'warn');
+      return;
+    }
+    const _0x4c4aaf = _0x5a6f5d[0].id;
+    if (_0x4c4aaf !== CanvasTabManager.getActiveCanvasId()) await CanvasTabManager.switchTo(_0x4c4aaf);
+    if (CanvasTabManager.getActiveCanvasId() !== _0x4c4aaf) return;
+    if (!graphStore.getState()?.nodes?.[_0x1a2f6e]) return;
+    (graphStore.setSelectedNodes([_0x1a2f6e]), appViewport.focusNodes([_0x1a2f6e]));
+  });
+}
+installCompletionNotificationBridge();
 const appBusinessEvents = createAppBusinessEvents({
   store: appStore,
   wrap: wrap,
@@ -534,3 +581,4 @@ const appPanels = createAppPanels({
   SettingsManager.init({ graphStore: graphStore, uiStore: uiStore }),
   MascotManager.init({ bindFabButton: false }),
   initAutoUpdate());
+scheduleChromeShellStartupReady({ windowObject: window, diagnostics: desktopBridge['diagnostics'] });
