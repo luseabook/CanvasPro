@@ -2,7 +2,7 @@
 
 > **新对话只读这一份就能接手，不要通读项目。** 本文件体积 ≤45 KB、单行 ≤400 字，一次 `read_files` 就能读完。
 > 入口链：用户只需说「读一下项目文档」→ `README.md` 顶部或 `AGENTS.md` → 本文件。所有文件改动都会自动记录（§12）。
-> 最后更新：2026-09-25 · 状态：第 123 批（123a、123b）已完成，**下一批是第 124 批（§7.2，转 `collaboration`）**；第 1–122c 批已分 25 条 `A.0:` 提交入库（最后一条是记账提交 `95f09b5`），`master` 与 `port/batches-1-122a` 两个远端都在 `95f09b5`；第 123 批的 21 个新文件和本次文档改动未提交 · 维护规则见 §9。
+> 最后更新：2026-09-25 · 状态：第 123 批（123a、123b）已完成，**下一批是第 124 批（§7.2，转 `collaboration`）**；第 1–123b 批已分 28 条 `A.0:` 提交入库，`master` 与 `port/batches-1-122a` 两个远端都推到本次记账提交（用户选定推 master，mac-arm64 构建覆盖 v0.4.12 资产的风险已知悉）；工作树干净 · 维护规则见 §9。
 
 ## 0. 现状速览
 
@@ -170,9 +170,9 @@ node tools/tracking/track.mjs --status
 
 | 项 | 值 |
 | --- | --- |
-| 分支 | `master`、`origin/master`、`origin/port/batches-1-122a` 三者同为 `95f09b5`（记账提交）；之后只有第 123 批的新增文件和文档改动，都未提交 |
-| git_status | 0 staged / 6 unstaged / 21 untracked / 0 冲突（第 123b 批收工后）。unstaged：本文件、`docs/src-storyworkspace-batch122.md`，以及 `docs/tracking/` 下的 batches、orphans、log-archive 和变更记录；untracked：第 123 批的 10 件源码、10 个测试和专题文档 `docs/src-storyworkspace-batch123.md` |
-| 提交情况 | 共 25 条 `A.0:` 提交：前 20 条见 §11 第九次；第十二次新增第 122b 批（`74270ca`）、第 122c 批（`dd8cdde`）、台账与专题文档（`cf431d9`）、README 删原作者联系方式一节（`0231658`，用户手改），随后是记账提交 `95f09b5`。`api/freeImageHostApi.js` 未被任何提交触及，MD5 不变。推送经用户选定：`master` 与 `port/batches-1-122a` 都在 `95f09b5`；推 master 会触发 mac-arm64 构建并 `--clobber` 覆盖 v0.4.12 资产 |
+| 分支 | 本次推送后 `master`、`origin/master`、`origin/port/batches-1-122a` 三者同为记账提交（`7c02833` 之后那一条）；工作树干净 |
+| git_status | 0 staged / 0 unstaged / 0 untracked / 0 冲突（第 123 批分 3 条提交之后）。第 123 批的 10 件源码、10 个测试和专题文档 `docs/src-storyworkspace-batch123.md` 都已入库 |
+| 提交情况 | 共 28 条 `A.0:` 提交：前 25 条见 §11 第九次与第十二次；本次加第 123a 批 14 件（`15f780b`）、第 123b 批 6 件（`3622094`）、台账与专题文档 7 件（`7c02833`），随后是记账提交。`api/freeImageHostApi.js` 未被任何提交触及，MD5 不变。推送目标由用户再次选定：`master` 与 `port/batches-1-122a` 都推，再推 master 会再次触发 mac-arm64 构建并 `--clobber` 覆盖 v0.4.12 资产 |
 | src sweep | 3857 / 3814 / 43（第 123a 批 +69、123b 批 +45）。43 项失败都是因为缺夹具 `tests/testPreviewDom.js` |
 | api sweep | 791 / 791 / 0（第 121c 批 +34） |
 | electron sweep | 1649 / 1648 / 1。那 1 项是 R14 第 17 批的遗留 |
@@ -271,9 +271,9 @@ node tools/tracking/track.mjs --status
    - 触发方式是点更新横幅：`src/modules/AutoUpdate.js` 的 `_doApply` → `POST /api/v2/update/apply`，没有二次确认。
    - 现在因为缺 `双击运行.bat` 而不会生效。
    - 建议加上「工作区不干净就拒绝」的保护，但要先经用户同意再改。
-2. **提交与推送已完成（2026-09-25）**：第 1–122c 批的内容全部入库，共 24 条 `A.0:` 提交，`master` 与 `port/batches-1-122a` 都已推到 `0231658`。
-   - 推 master 是用户在「只推分支」与「同时推 master」之间明确选定的，后果已当面说明：`.github/workflows/mac-arm64-build.yml` 会因此构建，并在 tag `v0.4.12` 已存在时执行 `gh release upload --clobber`，覆盖现有 macOS 资产。
-   - 构建是否真的触发、是否成功，本机 `gh` 不可用，**未核实**。
+2. **提交与推送已完成（2026-09-25）**：第 1–123b 批的内容全部入库，共 28 条 `A.0:` 提交，`master` 与 `port/batches-1-122a` 都已推送。
+   - 推 master 是用户在「只推分支」与「同时推 master」之间选定的；两轮都选了推 master，后果两次都当面说明过：`.github/workflows/mac-arm64-build.yml` 会因此构建，并在 tag `v0.4.12` 已存在时执行 `gh release upload --clobber`，覆盖现有 macOS 资产。
+   - 构建是否真的触发、是否成功，本机 `gh` 不可用，**两轮都未核实**。这个后果可能已经发生，不要假设 v0.4.12 的资产还是原样。
    - 后续 agent 仍不得自行提交或推送，每次都要先问；工作树现为干净状态，本条第 1 项的热更新风险暂时清零。
 3. **台账已冻结。**
    - `docs/implementation-handoff.md` 超过 1 MiB，`read_files` 和 `search_files` 都拒读，`apply_patch` 也改不了它。
@@ -337,6 +337,11 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上，只保留 10 条）
 
+- 2026-09-25（第十五次）：按用户「提交推送」指示把第 123 批入库并推送。
+  - 3 条提交：`15f780b` 第 123a 批 7 件源码 + 7 个测试、`3622094` 第 123b 批 3 + 3、`7c02833` 台账与专题文档 7 件，随后一条记账提交（本条所在）。`api/freeImageHostApi.js` 未被任何提交触及，MD5 仍为 `1e0458013f5341c99f21faefc1d34d3f`。
+  - 推送前复核：10 个新测试文件离线全绿（114 例、0 失败，与 123a 的 69 加 123b 的 45 吻合）；10 件新源码 `node --check` 全通过；新文件里没有绝对开发路径、MCP 地址或密钥。
+  - 推送目标由用户再次选定：`master` 与 `port/batches-1-122a` 都推，与上一轮处置一致；后果已当面说明（mac-arm64 构建后 `--clobber` 覆盖 v0.4.12 资产）。本机 `gh` 不可用，构建是否触发与结果**未核实**。
+  - 本次未跑完整 sweep、未启动应用、未做真机验收；只做入库和文档，没有改业务代码。§11 最旧一条移到 `docs/tracking/log-archive.md`。
 - 2026-09-25（第十四次）：交付第 123b 批，`src/modules/storyWorkspace/` 再落 3 件（片段帧数据、片段制作页渲染、工作区工具栏与页脚渲染），落地不接线；第 123 批完成。
   - 3 件在 123a 阶段已暂存、已过闸门；与暂存逐字节一致，`node --check`、prettier 各 6/6。渲染件的测试只断言 HTML 字符串，不引入 DOM。
   - 自研 45 例沙箱和本机首跑全绿（首跑前自查改掉 1 处写错的类名断言），变异抽查 21/21。src sweep 3812→3857 / 3769→3814 / 43（失败名集合一致）；api 791 未变；MD5 不变；消费方 0 命中。
@@ -380,10 +385,6 @@ node tools/tracking/track.mjs --status
   - 3 件过导出闸门（HybridBudget 在同段前置件落地后复跑）；27 个导出，与暂存逐字节一致。
   - 自研 47 例测试落地后首跑全绿（沙箱预跑 1 例期望算错，改测试不改实现）；api sweep 710→757（+47）/ 失败 0；src sweep 3587/3544/43 未变，失败名集合一致；受保护文件 MD5 不变。
   - 专题文档 `docs/api-story-generation-batch121.md` 增 §6–§8；orphans 218→221；git 0/68/878/0 → 0/68/884/0；变更 #0013、#0014。
-- 2026-09-25（第五次）：交付第 121a 批，`api/story-generation/` 再落 8 件（第 120 批解阻的 7 件 + 链式解阻的 `storyAssetReferenceContract`），落地不接线。
-  - 8 件全部过导出闸门；源码 30 个导出，与暂存逐字节一致；`node --check` 18/18。
-  - 自研 82 例测试落地后首跑全绿（沙箱预跑时 2 例测试数据写错，改测试不改实现）；api sweep 628→710（+82）/ 失败 0；src sweep 3587/3544/43 未变，失败名集合一致；受保护文件 MD5 不变。
-  - 专题文档 `docs/api-story-generation-batch121.md`；orphans 210→218；git 0/68/861/0 → 0/68/878/0；变更 #0010、#0011。
 
 ## 12. 变更记录机制（全自动）
 
