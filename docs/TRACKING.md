@@ -2,7 +2,7 @@
 
 > **新对话只读这一份就能接手，不要通读项目。** 本文件体积 ≤45 KB、单行 ≤400 字，一次 `read_files` 就能读完。
 > 入口链：用户只需说「读一下项目文档」→ `README.md` 顶部或 `AGENTS.md` → 本文件。所有文件改动都会自动记录（§12）。
-> 最后更新：2026-09-25 · 状态：第 122 批（122a、122b、122c）已完成，**下一批是第 123 批（§7.2）**；第 1–122a 批已分 20 条 `A.0:` 提交入库并推到分支 `port/batches-1-122a`，master 未动；第 122b、122c 批的新文件未提交 · 维护规则见 §9。
+> 最后更新：2026-09-25 · 状态：第 122 批（122a、122b、122c）已完成，**下一批是第 123 批（§7.2）**；第 1–122c 批已分 24 条 `A.0:` 提交入库，`master` 与 `port/batches-1-122a` 两个远端都已推到 `0231658`（master 推送由用户确认，已触发 mac-arm64 构建的风险已知悉），工作树干净 · 维护规则见 §9。
 
 ## 0. 现状速览
 
@@ -169,9 +169,9 @@ node tools/tracking/track.mjs --status
 
 | 项 | 值 |
 | --- | --- |
-| 分支 | master，本地领先 `origin/master` 20 个提交（`A.0:` 系列），**未推 master**；20 条都已在远端分支 `origin/port/batches-1-122a`（`842782e`），`origin/master` 仍为 `e12ecd1` |
-| git_status | 0 staged / 5 unstaged / 27 untracked / 0 冲突（第 122c 批收工时）。未跟踪的是 122b、122c 的 13 件源码、13 个测试和新建的 `docs/tracking/log-archive.md`；修改的是变更记录和 4 份文档。第 122a 批及以前的内容都已入库 |
-| 提交情况 | 经用户授权的分组提交已完成：第 1–121 批的 956 件按功能目录切成 17 条（逐批归属试过但不可靠，覆盖率仅 49.9%、91.6% 的文件被多批互相认领，故降级按目录分组），第 122a 批 27 件单独 1 条，台账 2 条（`6377e58` 记分组，`842782e` 记推送；后一条是写完本节后补的，所以旧版这里写 19 条）。`api/freeImageHostApi.js` 未被任何提交触及，MD5 不变。推送同样需用户授权：本次按用户指示只推了 `port/batches-1-122a`，master 未推。第 122b、122c 批的文件和文档改动都未提交 |
+| 分支 | `master`、`origin/master`、`origin/port/batches-1-122a` 三者同为 `0231658`；工作树干净，无未提交改动 |
+| git_status | 0 staged / 0 unstaged / 0 untracked / 0 冲突（本次分组提交 4 条之后）。第 122b、122c 的 13 件源码、13 个测试和新建的 `docs/tracking/log-archive.md` 都已入库；README 的手改也随本次提交 |
+| 提交情况 | 共 24 条 `A.0:` 提交：前 20 条见 §11 第九次；本次新增第 122b 批（`74270ca`）、第 122c 批（`dd8cdde`）、台账与专题文档（`cf431d9`）、README 删原作者联系方式一节（`0231658`，用户手改）。`api/freeImageHostApi.js` 未被任何提交触及，MD5 不变。推送经用户选定：`master` 与 `port/batches-1-122a` 都推到 `0231658`，推 master 会触发 mac-arm64 构建并 `--clobber` 覆盖 v0.4.12 资产 |
 | src sweep | 3743 / 3700 / 43（第 122c 批 +73）。43 项失败都是因为缺夹具 `tests/testPreviewDom.js` |
 | api sweep | 791 / 791 / 0（第 121c 批 +34） |
 | electron sweep | 1649 / 1648 / 1。那 1 项是 R14 第 17 批的遗留 |
@@ -269,7 +269,10 @@ node tools/tracking/track.mjs --status
    - 触发方式是点更新横幅：`src/modules/AutoUpdate.js` 的 `_doApply` → `POST /api/v2/update/apply`，没有二次确认。
    - 现在因为缺 `双击运行.bat` 而不会生效。
    - 建议加上「工作区不干净就拒绝」的保护，但要先经用户同意再改。
-2. **分组提交已完成（2026-09-25 07:30）**：第 1–122a 批的内容已全部入库（20 条 `A.0:` 提交，含 2 条台账），都在远端分支 `port/batches-1-122a` 上，**master 仍未推**（`origin/master` 一旦被推，`.github/workflows/mac-arm64-build.yml` 会立即构建并在 tag `v0.4.12` 已存在时执行 `gh release upload --clobber`，覆盖现有 macOS 资产）。后续 agent 仍不得自行提交或推送；第 122b 批起新落的文件又处于未提交状态（见 §5），本条第 1 项的热更新风险也随之重新积累。
+2. **提交与推送已完成（2026-09-25）**：第 1–122c 批的内容全部入库，共 24 条 `A.0:` 提交，`master` 与 `port/batches-1-122a` 都已推到 `0231658`。
+   - 推 master 是用户在「只推分支」与「同时推 master」之间明确选定的，后果已当面说明：`.github/workflows/mac-arm64-build.yml` 会因此构建，并在 tag `v0.4.12` 已存在时执行 `gh release upload --clobber`，覆盖现有 macOS 资产。
+   - 构建是否真的触发、是否成功，本机 `gh` 不可用，**未核实**。
+   - 后续 agent 仍不得自行提交或推送，每次都要先问；工作树现为干净状态，本条第 1 项的热更新风险暂时清零。
 3. **台账已冻结。**
    - `docs/implementation-handoff.md` 超过 1 MiB，`read_files` 和 `search_files` 都拒读，`apply_patch` 也改不了它。
    - 它保留为历史档案：R01–R26 原表在第 1499–1527 行，第 119 批预筛在第 1755 行。只能用 `run_command` 加 `Select-String` 只读查询。
@@ -332,6 +335,11 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上，只保留 10 条）
 
+- 2026-09-25（第十二次）：按用户「git更新推送」指示做分组提交与推送，第 122 批全部入库。
+  - 4 条提交：`74270ca` 第 122b 批 6 件源码 + 6 个测试、`dd8cdde` 第 122c 批 7 + 7、`cf431d9` 台账与专题文档 6 件、`0231658` README 删原作者联系方式一节（用户手改，本次一并提交）。`api/freeImageHostApi.js` 未被任何提交触及，MD5 仍为 `1e0458013f5341c99f21faefc1d34d3f`。
+  - 推送前复核：13 个新测试文件离线全绿（119 例通过、0 失败，与 122b 的 46 加 122c 的 73 吻合）；该目录全部 JS `node --check` 通过；新文件里没有绝对开发路径、MCP 地址或密钥，命中的 `apiKey` 都在早先已提交的测试里且值是假串。
+  - 推送目标由用户在两个后果之间选定：`master` 与 `port/batches-1-122a` 都推到 `0231658`。推 master 会触发 `.github/workflows/mac-arm64-build.yml`（构建后 `gh release upload v0.4.12 --clobber` 覆盖既有 macOS 资产），后果已当面说明；本机 `gh` 不可用，构建是否被触发**未核实**。
+  - 本次未跑 sweep、未启动应用、未做真机验收；改动只涉及入库和文档，没有改业务代码。§11 最旧一条移到 `docs/tracking/log-archive.md`。
 - 2026-09-25（第十一次）：交付第 122c 批，`src/modules/storyWorkspace/` 再落 7 个 0 import 件（素材提取草稿的阻断与付费重跑确认闸门、悬停预览、片段视频结果、听不清标记、素材库菜单浮层、大纲导航、提示词引用胶囊），落地不接线；第 122 批完成。
   - 7 件 prettier(镜像)==暂存，与暂存逐字节一致；`node --check` 14/14，prettier 14/14。DOM 件的测试各自内联最小假 DOM，不引入 jsdom。
   - 自研 73 例沙箱和本机首跑全绿；变异抽查 18/18（首轮 17/18，补强 1 例）。src sweep 3670→3743 / 3627→3700 / 43（失败名集合一致）；api 791 未变；受保护文件 MD5 不变；消费方 0 命中。
@@ -372,11 +380,6 @@ node tools/tracking/track.mjs --status
   - 新建 `api/utils/`，落了 strictJson、storyGenerationValues、storySceneIdentity、storyAssetPublicText，另有 `api/` 下 mediaUploadErrors、runningHubWorkflowPollingPolicy、runningHubUploadResponse；共 25 个导出，与暂存逐字节一致。
   - 自研 57 例测试首跑全绿；api sweep 475→532（+57）/ 失败 0；src sweep 3587/3544/43 未变，失败名集合与 `b85-fails.txt` 一致；受保护文件 MD5 不变。
   - 专题文档 `docs/api-request-response-utils.md`；orphans 193→200；git 0/68/825/0 → 0/68/840/0。
-- 2026-09-25（第二次）：上线全自动跟踪机制。
-  - 新增 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md`；`README.md` 顶部加入口提示。（试过在 `.agents/skills/` 放项目技能，MCP 桥不会扫描，已删除。）
-  - 新增 `tools/tracking/track.mjs`（零依赖的变更记录脚本）和 `.vscode/tasks.json`（打开文件夹时自动启动监视）；已建立基线并启动监视。
-  - 本文件新增 §1.1 常设授权和 §12 变更记录机制；§1、§2、§3.3、§9 相应调整。
-  - git：改动前 0/67/820/0，改动后 0/68/825/0。监视进程已自动记下 #0002（入口文件和本文件的改动），端到端验证通过。
 
 ## 12. 变更记录机制（全自动）
 
