@@ -2,7 +2,7 @@
 
 > **新对话只读这一份就能接手，不要通读项目。** 本文件体积 ≤45 KB、单行 ≤400 字，一次 `read_files` 就能读完。
 > 入口链：用户只需说「读一下项目文档」→ `README.md` 顶部或 `AGENTS.md` → 本文件。所有文件改动都会自动记录（§12）。
-> 最后更新：2026-09-25 · 状态：第 122 批分三段，122a 已交付（**122b 未开始，§7.2**）；第 1–122a 批的未提交工作已分 19 条提交入库，并推到分支 `port/batches-1-122a`，master 未动 · 维护规则见 §9。
+> 最后更新：2026-09-25 · 状态：第 122 批（122a、122b、122c）已完成，**下一批是第 123 批（§7.2）**；第 1–122a 批已分 20 条 `A.0:` 提交入库并推到分支 `port/batches-1-122a`，master 未动；第 122b、122c 批的新文件未提交 · 维护规则见 §9。
 
 ## 0. 现状速览
 
@@ -10,11 +10,11 @@
 - **总目标**（用户原话要点）：对照已安装的 0.7.16（`D:\shuocancas\SHUO Canvas\resources\webapp`），把缺失功能的**可维护源码加进来，并实际接入工程**。
   - R01–R26 全范围不缩减；单批交付只是检查点。
   - 直接实施，不要只分析，也不要每批再问是否开发。
-- **进度**：已交付 121 批，第 122 批已交付 122a 段，逐批索引见 `docs/tracking/batches.md`。R01–R26 **都没有完成**（§6）。
-- **必须清楚的偏差**：第 84–122a 批几乎都是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
-  - 静态分析显示，996 个非测试 JS 模块里有 **234 个从任何入口都不可达**（含第 122a 批新增的 11 个），清单见 `docs/tracking/orphans.md`。
+- **进度**：已交付 122 批（第 122 批分 122a、122b、122c 三段），逐批索引见 `docs/tracking/batches.md`。R01–R26 **都没有完成**（§6）。
+- **必须清楚的偏差**：第 84–122 批几乎都是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
+  - 静态分析显示，1009 个非测试 JS 模块里有 **247 个从任何入口都不可达**（含第 122 批新增的 24 个），清单见 `docs/tracking/orphans.md`。
   - 总目标要求「实际接入」，所以接线欠账（§7.4）迟早要还。
-- **下一步**：122b（`storyEpisodeSplitBatchExecution`、`storyWorkspacePersistence`、`storySummaryRun`、`storyScriptImport`、`storyStyleCatalog`、`storyWorkspaceData`），再做 122c。分段见 `docs/src-storyworkspace-batch122.md` §1。
+- **下一步**：第 123 批。先重跑 `deps-ast` 给 `storyWorkspace` 重新分级，再把 8 件依赖已齐的 OK 件和新解阻的件过导出闸门后落地；不够一批就转 `collaboration`。口径见 `docs/src-storyworkspace-batch122.md` §13。
 - **变更记录**：全自动。任何人改了任何项目文件，都会被记到 `docs/tracking/changes/`，机制见 §12。
 
 ## 1. 开工流程（新对话照做）
@@ -119,8 +119,9 @@
 以下是以往批次 bash 命令的 PowerShell 改写，首次使用前先确认能跑通。
 
 ```powershell
-# src 回归 sweep（基线 3624 / 3581 / 43）
+# src 回归 sweep（基线 3743 / 3700 / 43）
 node --test --test-timeout=25000 (Get-ChildItem src -Recurse -Filter *.test.js).FullName
+# 用 FullName 跑时 10 个文件级失败名带 F:\\CanvasPro\\ 前缀，去掉后再和 b85-fails.txt 比；TAP 约 8 MB，先 Out-File 到 deobf-tools 再统计
 # api 回归（基线 791 / 791 / 0）
 node --test (Get-ChildItem api -Recurse -Filter *.test.js).FullName
 # 本机 Node 24 默认 spec 输出，没有 "# pass" 行；要数用例时在 --test 后加 --test-reporter=tap
@@ -168,14 +169,14 @@ node tools/tracking/track.mjs --status
 
 | 项 | 值 |
 | --- | --- |
-| 分支 | master，本地领先 `origin/master` 19 个提交（`A.0:` 系列），**未推 master**；这 19 条已推到远端分支 `origin/port/batches-1-122a`，`origin/master` 仍为 `e12ecd1` |
-| git_status | 0 staged / 0 unstaged / 0 untracked / 0 冲突（2026-09-25 07:30 收工核对，工作区干净）。此前未提交的 956 个文件已全部入库 |
-| 提交情况 | 经用户授权的分组提交已完成：第 1–121 批的 956 件按功能目录切成 17 条（逐批归属试过但不可靠，覆盖率仅 49.9%、91.6% 的文件被多批互相认领，故降级按目录分组），第 122a 批 27 件单独 1 条，台账 1 条。`api/freeImageHostApi.js` 未被任何提交触及，MD5 不变。推送同样需用户授权：本次按用户指示只推了 `port/batches-1-122a`，master 未推 |
-| src sweep | 3624 / 3581 / 43（第 122a 批 +37）。43 项失败都是因为缺夹具 `tests/testPreviewDom.js` |
+| 分支 | master，本地领先 `origin/master` 20 个提交（`A.0:` 系列），**未推 master**；20 条都已在远端分支 `origin/port/batches-1-122a`（`842782e`），`origin/master` 仍为 `e12ecd1` |
+| git_status | 0 staged / 5 unstaged / 27 untracked / 0 冲突（第 122c 批收工时）。未跟踪的是 122b、122c 的 13 件源码、13 个测试和新建的 `docs/tracking/log-archive.md`；修改的是变更记录和 4 份文档。第 122a 批及以前的内容都已入库 |
+| 提交情况 | 经用户授权的分组提交已完成：第 1–121 批的 956 件按功能目录切成 17 条（逐批归属试过但不可靠，覆盖率仅 49.9%、91.6% 的文件被多批互相认领，故降级按目录分组），第 122a 批 27 件单独 1 条，台账 2 条（`6377e58` 记分组，`842782e` 记推送；后一条是写完本节后补的，所以旧版这里写 19 条）。`api/freeImageHostApi.js` 未被任何提交触及，MD5 不变。推送同样需用户授权：本次按用户指示只推了 `port/batches-1-122a`，master 未推。第 122b、122c 批的文件和文档改动都未提交 |
+| src sweep | 3743 / 3700 / 43（第 122c 批 +73）。43 项失败都是因为缺夹具 `tests/testPreviewDom.js` |
 | api sweep | 791 / 791 / 0（第 121c 批 +34） |
 | electron sweep | 1649 / 1648 / 1。那 1 项是 R14 第 17 批的遗留 |
-| 静态检查 | 1390 个 JS 文件 `node --check` 全部通过；所有 Python 文件都能 `ast.parse`。这是 2026-09-25 在本地镜像上做的离线检查；第 119、120、121、122a 批新增的 14、20、26、22 个 JS 文件也都通过 |
-| 孤立模块 | 234 / 996，见 `docs/tracking/orphans.md` |
+| 静态检查 | 1390 个 JS 文件 `node --check` 全部通过；所有 Python 文件都能 `ast.parse`。这是 2026-09-25 在本地镜像上做的离线检查；第 119、120、121、122a、122b、122c 批新增的 14、20、26、22、12、14 个 JS 文件也都通过 |
+| 孤立模块 | 247 / 1009，见 `docs/tracking/orphans.md` |
 | 变更记录 | `docs/tracking/changes/2026-09.md`，基线 #0001 纳入 1824 个文件；最新编号用 `node tools/tracking/track.mjs --status` 查看 |
 | 台账 | `docs/implementation-handoff.md`，1 325 173 B / 1773 行，**已冻结**（§8 第 3 条） |
 
@@ -188,7 +189,7 @@ node tools/tracking/track.mjs --status
 | R03 | P1 部分待验收 | 媒体任务中心、后台与跨画布调度、历史、恢复 | 第 16/20/24/25/54 批。缺：完整的持久队列、厂商查询与可靠取消、真正的后台跨画布调度 |
 | R04 | P1 部分待验收 | 分镜图片和视频生成、人物场景批量、镜头媒体关联 | 第 12–14/19 批。缺：其余模型、多图和首尾帧、参考输入批次、多外观和变体、远程落地、后台任务 |
 | R05 | P1 部分待验收 | 成片、时间线、剪映和 PR 导出 | 第 11/15/18/37 批。缺：剪映草稿 `draft_content.json`、Premiere 工程目录、多轨和字幕 |
-| R06 | P2 待补全 | 工作室的其余差异：外观、变体、本地提取、批量、视频复刻 | 要按 0.7.16 的 `storyWorkspace`、`storyGeneration` 重新核对。§7.1 的 `api/story-generation/` 和 §7.2 的 `src/modules/storyWorkspace` 纯叶属于这一项。第 119 批落了 `api/utils/` 剧本生成工具 4 件，第 120、121 批落了 `api/story-generation/` 32 件中的 23 件，第 122a 批落了 `storyWorkspace` 纯叶 24 件中的 11 件（均未接线） |
+| R06 | P2 待补全 | 工作室的其余差异：外观、变体、本地提取、批量、视频复刻 | 要按 0.7.16 的 `storyWorkspace`、`storyGeneration` 重新核对。§7.1 的 `api/story-generation/` 和 §7.2 的 `src/modules/storyWorkspace` 纯叶属于这一项。第 119 批落了 `api/utils/` 剧本生成工具 4 件，第 120、121 批落了 `api/story-generation/` 32 件中的 23 件，第 122 批落齐了 `storyWorkspace` 的 24 件纯叶（均未接线） |
 | R07 | P2 待补全 | 扫描 PDF、OCR、更多文档格式 | 还没有批次 |
 | R08 | P2 待实现 | 人物检测、识别、替换、素材库 | 第 85 批落了替换工作室核心 9 件（未接线）；`personReplacement` 还有 12 个纯叶没落；后端接口缺失 |
 | R09 | P2 待实现 | 分镜 3D、导演相机、模型包、全景 | 第 86–93 批落了约 45/97 件（未接线）；主装配（依赖 three.js 的 `workspaceController`、`sceneRuntime` 等）没落 |
@@ -220,7 +221,7 @@ node tools/tracking/track.mjs --status
 
 ### 7.2 之后的纯新增队列
 
-1. **`src/modules` 的 136 个纯叶**，按能力区成组落地：`storyWorkspace` 24（第 122 批进行中：122a 已落 11 件，122b 6 件、122c 7 件待做）、`collaboration` 13、`app` 13、`personReplacement` 12、`runninghubAiApp` 6、`panoramaSceneNode` 5 等。完整清单在 `deobf-tools\b119\screen.txt`。
+1. **`src/modules` 的 136 个纯叶**，按能力区成组落地：`storyWorkspace` 24（第 122 批已全部落地；另有 8 件 OK 件待第 123 批评估）、`collaboration` 13、`app` 13、`personReplacement` 12、`runninghubAiApp` 6、`panoramaSceneNode` 5 等。完整清单在 `deobf-tools\b119\screen.txt`。
 2. **`api/` 的其余纯叶**：34 件（原 41 件，第 119 批已落 7 件）。
 3. **`src/services`**：零依赖纯叶已经清零，剩下的都带相对 import，必须先过导出闸门。
 
@@ -241,7 +242,7 @@ node tools/tracking/track.mjs --status
 
 ### 7.4 接线欠账（总目标要求「实际接入」）
 
-- 共 234 个孤立模块。大块有：
+- 共 247 个孤立模块。大块有：
   - R15 chrome-shell 运行时：`chromeShellRuntime` 没装配。
   - R12 Agent 扩展层：`src/modules/agent` 的 80 个模块只有 13 个接进了运行时。
   - R09 分镜 3D：约 43 件。
@@ -268,7 +269,7 @@ node tools/tracking/track.mjs --status
    - 触发方式是点更新横幅：`src/modules/AutoUpdate.js` 的 `_doApply` → `POST /api/v2/update/apply`，没有二次确认。
    - 现在因为缺 `双击运行.bat` 而不会生效。
    - 建议加上「工作区不干净就拒绝」的保护，但要先经用户同意再改。
-2. **分组提交已完成（2026-09-25 07:30）**：第 1–122a 批的未提交内容已全部入库（19 条 `A.0:` 提交），工作区干净；这 19 条已推到远端分支 `port/batches-1-122a`，**master 仍未推**（`origin/master` 一旦被推，`.github/workflows/mac-arm64-build.yml` 会立即构建并在 tag `v0.4.12` 已存在时执行 `gh release upload --clobber`，覆盖现有 macOS 资产）。后续 agent 仍不得自行提交或推送；新落的文件会重新造成未跟踪状态，本条第 1 项的热更新风险也随之重新积累。
+2. **分组提交已完成（2026-09-25 07:30）**：第 1–122a 批的内容已全部入库（20 条 `A.0:` 提交，含 2 条台账），都在远端分支 `port/batches-1-122a` 上，**master 仍未推**（`origin/master` 一旦被推，`.github/workflows/mac-arm64-build.yml` 会立即构建并在 tag `v0.4.12` 已存在时执行 `gh release upload --clobber`，覆盖现有 macOS 资产）。后续 agent 仍不得自行提交或推送；第 122b 批起新落的文件又处于未提交状态（见 §5），本条第 1 项的热更新风险也随之重新积累。
 3. **台账已冻结。**
    - `docs/implementation-handoff.md` 超过 1 MiB，`read_files` 和 `search_files` 都拒读，`apply_patch` 也改不了它。
    - 它保留为历史档案：R01–R26 原表在第 1499–1527 行，第 119 批预筛在第 1755 行。只能用 `run_command` 加 `Select-String` 只读查询。
@@ -287,6 +288,7 @@ node tools/tracking/track.mjs --status
    - 桌面模式下 Python 带 token，用浏览器直接打开桌面端口会返回 403，这是正常的。
    - `playwright.config.js` 指向不存在的 `e2e/` 和 `tools/`。
    - `package.json` 里没有 test 脚本。
+   - 用 `run_command` 给 `track.mjs --note` 传说明时，文字里不能再嵌套英文双引号：PowerShell 会把参数截断，脚本报「未知参数」且不记录。要引用就用「」。
 10. **许可**：CanvasPro 采用非商业源码许可加商业授权。从 0.7.16 移植来的代码只适合个人非商业使用，商业用途要先核对作者的条款。
 
 ## 9. 收工协议（每批做完，或对话要结束时）
@@ -330,6 +332,16 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上，只保留 10 条）
 
+- 2026-09-25（第十一次）：交付第 122c 批，`src/modules/storyWorkspace/` 再落 7 个 0 import 件（素材提取草稿的阻断与付费重跑确认闸门、悬停预览、片段视频结果、听不清标记、素材库菜单浮层、大纲导航、提示词引用胶囊），落地不接线；第 122 批完成。
+  - 7 件 prettier(镜像)==暂存，与暂存逐字节一致；`node --check` 14/14，prettier 14/14。DOM 件的测试各自内联最小假 DOM，不引入 jsdom。
+  - 自研 73 例沙箱和本机首跑全绿；变异抽查 18/18（首轮 17/18，补强 1 例）。src sweep 3670→3743 / 3627→3700 / 43（失败名集合一致）；api 791 未变；受保护文件 MD5 不变；消费方 0 命中。
+  - 记下的小坑：引用胶囊占位符两端是私用区字符；切换到另一个 wrap 的目标菜单不会收回前一个；视频结果序号必须传数字。0.7.16 的引用方（主装配 `storyWorkspace` 等）都还没进仓库。
+  - 专题文档 `docs/src-storyworkspace-batch122.md` 增 §10–§13；orphans 240→247 / 1009；变更 #0027、#0028；§11 最旧一条移到新建的 `docs/tracking/log-archive.md`。
+- 2026-09-25（第十次）：交付第 122b 批，`src/modules/storyWorkspace/` 再落 6 个 0 import 数据 / 逻辑件（分集批量拆分执行、工作区存档快照、摘要运行记录、上传剧本解析、视频风格目录、演示数据），落地不接线。
+  - 开工核对：session-start 无变化；本地领先 20 条，比旧 §5 多出的是 `842782e` 台账提交，已在远端分支上。暂存区有前一会话 07:48 留下的 3 个测试草稿（无交接记录），核对后作为底稿采用，原稿备份在 `b122\tests-prev-0748\`。
+  - 6 件 prettier(镜像)==暂存，与暂存逐字节一致；`node --check` 12/12，prettier 12/12；自研 46 例沙箱和本机首跑全绿，变异抽查 13/13（首轮 12/13，补 1 例）。
+  - src sweep 3624→3670 / 3581→3627 / 43（失败名集合一致）；api 791 未变；受保护文件 MD5 不变；消费方 0 命中。0.7.16 里的 11 个引用方都还没进仓库；`images/story-styles/` 的 94 张缩略图仓库里没有。
+  - 专题文档 `docs/src-storyworkspace-batch122.md` 增 §6–§9；orphans 234→240 / 1002；变更 #0024、#0025。
 - 2026-09-25（第九次）：经用户授权做分组提交——第 1–121 批遗留的 956 个未提交文件按功能目录切成 17 条 `A.0:` 提交，第 122a 批 27 件和第 122a 收工后的台账各成 1 条，共 19 条；随后按用户指示**只推到新分支 `port/batches-1-122a`**，`origin/master` 仍为 `e12ecd1`，故未触发 mac-arm64 构建（该工作流只监听 master 和手动触发）。
   - 逐批归属先做过测算，结论是不可靠：专题文档互相引用导致命中仅 477/956（49.9%），且 91.6% 的命中文件被多批同时认领，最早认领法把绝大部分文件吸进 2 个批次。按计划预先约定的降级方案改为按功能目录分组，分桶规则与清单可复现。
   - 核对：17 桶逐条 `committed=list` 全等；`git diff --name-only e12ecd1..HEAD` 去重后 956 件全覆盖、无残差；`git status` 为 0/0/0。
@@ -365,11 +377,6 @@ node tools/tracking/track.mjs --status
   - 新增 `tools/tracking/track.mjs`（零依赖的变更记录脚本）和 `.vscode/tasks.json`（打开文件夹时自动启动监视）；已建立基线并启动监视。
   - 本文件新增 §1.1 常设授权和 §12 变更记录机制；§1、§2、§3.3、§9 相应调整。
   - git：改动前 0/67/820/0，改动后 0/68/825/0。监视进程已自动记下 #0002（入口文件和本文件的改动），端到端验证通过。
-- 2026-09-25：通读全项目（1674 个文件）后建立本跟踪体系。
-  - 新增 `docs/TRACKING.md`，以及 `docs/tracking/` 下的 project-map、batches、orphans 三份文档。
-  - 在 `docs/next-session-prompt.md` 顶部加了一段说明，指向本文件。
-  - 没有改业务代码，没有跑测试。
-  - git：改动前 0/67/816/0，改动后 0/67/820/0。
 
 ## 12. 变更记录机制（全自动）
 

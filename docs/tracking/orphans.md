@@ -1,7 +1,7 @@
 # 孤立模块清单（已落地但从入口不可达）
 
 > 由 `docs/TRACKING.md` 维护。依据是 2026-09-25 对本地镜像做的静态依赖分析：从 `index.html`、`main.js`、`renderer.js`、`electron/main.js`、preload 和 worker 等入口出发，沿相对 import 遍历，走不到的非测试 JS 模块都列在这里。
-> 共 **234** 个，非测试 JS 模块总数 996（第 122a 批新增 11 个后）。大部分是第 56–122a 批「落地不接线」的移植件；少数是 0.4.12 原有的遗留文件，如 `src/hooks/*`、`src/core/store.js`、`ProjectManager.js`。
+> 共 **247** 个，非测试 JS 模块总数 1009（第 122c 批新增 7 个后）。大部分是第 56–122 批「落地不接线」的移植件；少数是 0.4.12 原有的遗留文件，如 `src/hooks/*`、`src/core/store.js`、`ProjectManager.js`。
 > 某个模块接线后，从本表删掉它，并同步 `docs/TRACKING.md` §5 的计数。重算方法：从上述入口做 import 可达性遍历，排除 `*.test.js`、`vendor/`、`deobfuscated/`。
 
 | 目录 | 数量 |
@@ -11,7 +11,7 @@
 | `src/services/` | 19 |
 | `electron/` | 16 |
 | `api/story-generation/` | 23 |
-| `src/modules/storyWorkspace/` | 11 |
+| `src/modules/storyWorkspace/` | 24 |
 | `src/core/` | 9 |
 | `src/modules/` | 8 |
 | `src/modules/personReplacement/` | 8 |
@@ -63,10 +63,11 @@ storyAssetExtractionRequest.js、storyAssetExtractionResult.js、storyAssetHybri
 storyEpisodeScriptResponseRecovery.js、storyEpisodeScriptTiming.js、storyEpisodeSpokenTiming.js、storyInvocationEvidence.js、storyReplicationAssetFrames.js、storyReplicationFlowPrompts.js、storyReplicationMissingClips.js、storyRequestPolicy.js、storyReviewOutputContract.js、storyReviewRequestJournal.js、
 storySummaryBlueprint.js、storySummaryGeneration.js、storyTextRequest.js
 
-## `src/modules/storyWorkspace/`（11）
+## `src/modules/storyWorkspace/`（24）
 
-storyAssetExtractionRunner.js、storyAsyncButtonPresentation.js、storyCanvasBinding.js、storyCollaborationPolicy.js、storyEpisodeSplitPresentationPolicy.js、storyHomeRewrite.js、storyProjectNavigation.js、storyReplicationAssetIdentity.js、storyReplicationDefinitions.js、storyTaskBatchCancellation.js、
-storyWorkspaceSurface.js
+storyAssetExtractionDraft.js、storyAssetExtractionRunner.js、storyAssetHoverPreviewController.js、storyAsyncButtonPresentation.js、storyCanvasBinding.js、storyClipPromptReferences.js、storyClipVideoResultDom.js、storyCollaborationPolicy.js、storyEpisodeSplitBatchExecution.js、
+storyEpisodeSplitPresentationPolicy.js、storyHomeRewrite.js、storyLibraryAppearanceMenuPortal.js、storyOutlineNavigation.js、storyProjectNavigation.js、storyReplicationAssetIdentity.js、storyReplicationDefinitions.js、storyScriptImport.js、storySpeechGapEditor.js、storyStyleCatalog.js、storySummaryRun.js、
+storyTaskBatchCancellation.js、storyWorkspaceData.js、storyWorkspacePersistence.js、storyWorkspaceSurface.js
 
 ## `src/core/`（9）
 
