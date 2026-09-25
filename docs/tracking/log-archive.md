@@ -3,6 +3,14 @@
 > 由 `docs/TRACKING.md` §9 第 4 条维护：TRACKING.md §11 只保留最新 10 条，挤出来的旧日志移到这里，最新的在上。
 > 只追加，不改写已有内容。
 
+- 2026-09-25（第四次）：交付第 120 批，`api/story-generation/` 首批 10 件（8 纯叶 + 2 件依赖 `api/utils/`），落地不接线。
+  - 镜像目录实有 32 件（LEAF 10 / OK 2 / BLK 20）；2 个 OK 件过了导出闸门；两个大纯叶留给第 121 批。源码 29 个导出，与暂存逐字节一致。
+  - 自研 96 例测试首跑全绿；api sweep 532→628（+96）/ 失败 0；src sweep 3587/3544/43 未变，失败名集合与 `b85-fails.txt` 一致；受保护文件 MD5 不变。
+  - 专题文档 `docs/api-story-generation-leaves.md`；orphans 200→210；git 0/68/840/0 → 0/68/861/0；变更 #0007、#0008。
+- 2026-09-25（第三次）：交付第 119 批，`api/` 请求响应工具区 7 个零 import 纯叶，落地不接线。
+  - 新建 `api/utils/`，落了 strictJson、storyGenerationValues、storySceneIdentity、storyAssetPublicText，另有 `api/` 下 mediaUploadErrors、runningHubWorkflowPollingPolicy、runningHubUploadResponse；共 25 个导出，与暂存逐字节一致。
+  - 自研 57 例测试首跑全绿；api sweep 475→532（+57）/ 失败 0；src sweep 3587/3544/43 未变，失败名集合与 `b85-fails.txt` 一致；受保护文件 MD5 不变。
+  - 专题文档 `docs/api-request-response-utils.md`；orphans 193→200；git 0/68/825/0 → 0/68/840/0。
 - 2026-09-25（第二次）：上线全自动跟踪机制。
   - 新增 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md`；`README.md` 顶部加入口提示。（试过在 `.agents/skills/` 放项目技能，MCP 桥不会扫描，已删除。）
   - 新增 `tools/tracking/track.mjs`（零依赖的变更记录脚本）和 `.vscode/tasks.json`（打开文件夹时自动启动监视）；已建立基线并启动监视。

@@ -2,7 +2,7 @@
 
 > **新对话只读这一份就能接手，不要通读项目。** 本文件体积 ≤45 KB、单行 ≤400 字，一次 `read_files` 就能读完。
 > 入口链：用户只需说「读一下项目文档」→ `README.md` 顶部或 `AGENTS.md` → 本文件。所有文件改动都会自动记录（§12）。
-> 最后更新：2026-09-25 · 状态：第 122 批（122a、122b、122c）已完成，**下一批是第 123 批（§7.2）**；第 1–122c 批已分 24 条 `A.0:` 提交入库，`master` 与 `port/batches-1-122a` 两个远端都已推到 `0231658`（master 推送由用户确认，已触发 mac-arm64 构建的风险已知悉），工作树干净 · 维护规则见 §9。
+> 最后更新：2026-09-25 · 状态：第 123 批（123a、123b）已完成，**下一批是第 124 批（§7.2，转 `collaboration`）**；第 1–122c 批已分 25 条 `A.0:` 提交入库（最后一条是记账提交 `95f09b5`），`master` 与 `port/batches-1-122a` 两个远端都在 `95f09b5`；第 123 批的 21 个新文件和本次文档改动未提交 · 维护规则见 §9。
 
 ## 0. 现状速览
 
@@ -10,11 +10,11 @@
 - **总目标**（用户原话要点）：对照已安装的 0.7.16（`D:\shuocancas\SHUO Canvas\resources\webapp`），把缺失功能的**可维护源码加进来，并实际接入工程**。
   - R01–R26 全范围不缩减；单批交付只是检查点。
   - 直接实施，不要只分析，也不要每批再问是否开发。
-- **进度**：已交付 122 批（第 122 批分 122a、122b、122c 三段），逐批索引见 `docs/tracking/batches.md`。R01–R26 **都没有完成**（§6）。
-- **必须清楚的偏差**：第 84–122 批几乎都是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
-  - 静态分析显示，1009 个非测试 JS 模块里有 **247 个从任何入口都不可达**（含第 122 批新增的 24 个），清单见 `docs/tracking/orphans.md`。
+- **进度**：已交付 123 批（第 123 批分 123a、123b 两段），逐批索引见 `docs/tracking/batches.md`。R01–R26 **都没有完成**（§6）。
+- **必须清楚的偏差**：第 84–123 批几乎都是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
+  - 静态分析显示，1019 个非测试 JS 模块里有 **257 个从任何入口都不可达**（含第 122 批的 24 个和第 123 批的 10 个），清单见 `docs/tracking/orphans.md`。
   - 总目标要求「实际接入」，所以接线欠账（§7.4）迟早要还。
-- **下一步**：第 123 批。先重跑 `deps-ast` 给 `storyWorkspace` 重新分级，再把 8 件依赖已齐的 OK 件和新解阻的件过导出闸门后落地；不够一批就转 `collaboration`。口径见 `docs/src-storyworkspace-batch122.md` §13。
+- **下一步**：第 124 批，转 `collaboration`：先落 13 个纯叶，4 件 OK 件过导出闸门后再定；`storyWorkspace` 因第 123 批落地而新转 OK 的 3 件，也要过闸门并核对依赖世代。口径见 `docs/src-storyworkspace-batch123.md` §11。
 - **变更记录**：全自动。任何人改了任何项目文件，都会被记到 `docs/tracking/changes/`，机制见 §12。
 
 ## 1. 开工流程（新对话照做）
@@ -119,7 +119,7 @@
 以下是以往批次 bash 命令的 PowerShell 改写，首次使用前先确认能跑通。
 
 ```powershell
-# src 回归 sweep（基线 3743 / 3700 / 43）
+# src 回归 sweep（基线 3857 / 3814 / 43）
 node --test --test-timeout=25000 (Get-ChildItem src -Recurse -Filter *.test.js).FullName
 # 用 FullName 跑时 10 个文件级失败名带 F:\\CanvasPro\\ 前缀，去掉后再和 b85-fails.txt 比；TAP 约 8 MB，先 Out-File 到 deobf-tools 再统计
 # api 回归（基线 791 / 791 / 0）
@@ -144,6 +144,7 @@ node tools/tracking/track.mjs --status
 1. **选件**：取 §7 队列的第一项。
    - 纯叶（0 条相对 import）可以直接排期。
    - 带相对 import 的，先用 `verify-exports.mjs` 核验每个具名导入在本仓真实存在。原因是 `deps-ast` 的 OK 只看依赖文件在不在，第 116 批因此出现过 25% 的假阳性。
+   - `verify-exports.mjs` 只认 `import {…}`，会漏掉 `export {…} from` 再导出；第 123 批起改用 `b123\b123-gate.mjs`（AST 版）。闸门只核对名字，被 import 的在用文件还要和镜像对照世代差异（§8 第 6 条）。
 2. **暂存**：把镜像文件复制到 `deobf-tools\b<批号>\port\`，用 `prettierrc.json` 格式化。
 3. **落地**：
    - 用 `apply_patch` 的 Add File 写到仓库的同一相对路径，新目录会自动创建；内容和暂存产物一致。
@@ -157,7 +158,7 @@ node tools/tracking/track.mjs --status
 5. **回归**（需要授权）：跑 src 和 api 的 sweep，改了 electron 再加跑 electron。
    - 通过数应该恰好增加新增用例数，失败数不变。
    - src 的 43 项失败名单必须和 `b85-fails.txt` 完全一致。
-6. **反查消费方**：在 `api`、`src`、`electron`、`main.js`、`renderer.js` 里 grep 模块名。
+6. **反查消费方**：在 `api`、`src`、`electron`、`main.js`、`renderer.js` 里 grep 模块名（仓库根目录其实没有 `renderer.js`；要区分大小写，否则 `createStoryClipExportGuard` 这类名字会误报）。
    - 0 命中就记为「落地不接线」。
    - 如果本仓有真实消费方且依赖闭合，可以接线（参考第 75–78 批），但要写清行为差异，并注明「需真机验收」。
 7. **收尾核对**：受保护文件 MD5 不变；记下 git_status 前后的数字。
@@ -169,14 +170,14 @@ node tools/tracking/track.mjs --status
 
 | 项 | 值 |
 | --- | --- |
-| 分支 | `master`、`origin/master`、`origin/port/batches-1-122a` 三者同为 `0231658`；工作树干净，无未提交改动 |
-| git_status | 0 staged / 0 unstaged / 0 untracked / 0 冲突（本次分组提交 4 条之后）。第 122b、122c 的 13 件源码、13 个测试和新建的 `docs/tracking/log-archive.md` 都已入库；README 的手改也随本次提交 |
-| 提交情况 | 共 24 条 `A.0:` 提交：前 20 条见 §11 第九次；本次新增第 122b 批（`74270ca`）、第 122c 批（`dd8cdde`）、台账与专题文档（`cf431d9`）、README 删原作者联系方式一节（`0231658`，用户手改）。`api/freeImageHostApi.js` 未被任何提交触及，MD5 不变。推送经用户选定：`master` 与 `port/batches-1-122a` 都推到 `0231658`，推 master 会触发 mac-arm64 构建并 `--clobber` 覆盖 v0.4.12 资产 |
-| src sweep | 3743 / 3700 / 43（第 122c 批 +73）。43 项失败都是因为缺夹具 `tests/testPreviewDom.js` |
+| 分支 | `master`、`origin/master`、`origin/port/batches-1-122a` 三者同为 `95f09b5`（记账提交）；之后只有第 123 批的新增文件和文档改动，都未提交 |
+| git_status | 0 staged / 6 unstaged / 21 untracked / 0 冲突（第 123b 批收工后）。unstaged：本文件、`docs/src-storyworkspace-batch122.md`，以及 `docs/tracking/` 下的 batches、orphans、log-archive 和变更记录；untracked：第 123 批的 10 件源码、10 个测试和专题文档 `docs/src-storyworkspace-batch123.md` |
+| 提交情况 | 共 25 条 `A.0:` 提交：前 20 条见 §11 第九次；第十二次新增第 122b 批（`74270ca`）、第 122c 批（`dd8cdde`）、台账与专题文档（`cf431d9`）、README 删原作者联系方式一节（`0231658`，用户手改），随后是记账提交 `95f09b5`。`api/freeImageHostApi.js` 未被任何提交触及，MD5 不变。推送经用户选定：`master` 与 `port/batches-1-122a` 都在 `95f09b5`；推 master 会触发 mac-arm64 构建并 `--clobber` 覆盖 v0.4.12 资产 |
+| src sweep | 3857 / 3814 / 43（第 123a 批 +69、123b 批 +45）。43 项失败都是因为缺夹具 `tests/testPreviewDom.js` |
 | api sweep | 791 / 791 / 0（第 121c 批 +34） |
 | electron sweep | 1649 / 1648 / 1。那 1 项是 R14 第 17 批的遗留 |
-| 静态检查 | 1390 个 JS 文件 `node --check` 全部通过；所有 Python 文件都能 `ast.parse`。这是 2026-09-25 在本地镜像上做的离线检查；第 119、120、121、122a、122b、122c 批新增的 14、20、26、22、12、14 个 JS 文件也都通过 |
-| 孤立模块 | 247 / 1009，见 `docs/tracking/orphans.md` |
+| 静态检查 | 1390 个 JS 文件 `node --check` 全部通过；所有 Python 文件都能 `ast.parse`。这是 2026-09-25 在本地镜像上做的离线检查；第 119、120、121、122a、122b、122c、123a、123b 批新增的 14、20、26、22、12、14、14、6 个 JS 文件也都通过 |
+| 孤立模块 | 257 / 1019，见 `docs/tracking/orphans.md` |
 | 变更记录 | `docs/tracking/changes/2026-09.md`，基线 #0001 纳入 1824 个文件；最新编号用 `node tools/tracking/track.mjs --status` 查看 |
 | 台账 | `docs/implementation-handoff.md`，1 325 173 B / 1773 行，**已冻结**（§8 第 3 条） |
 
@@ -189,7 +190,7 @@ node tools/tracking/track.mjs --status
 | R03 | P1 部分待验收 | 媒体任务中心、后台与跨画布调度、历史、恢复 | 第 16/20/24/25/54 批。缺：完整的持久队列、厂商查询与可靠取消、真正的后台跨画布调度 |
 | R04 | P1 部分待验收 | 分镜图片和视频生成、人物场景批量、镜头媒体关联 | 第 12–14/19 批。缺：其余模型、多图和首尾帧、参考输入批次、多外观和变体、远程落地、后台任务 |
 | R05 | P1 部分待验收 | 成片、时间线、剪映和 PR 导出 | 第 11/15/18/37 批。缺：剪映草稿 `draft_content.json`、Premiere 工程目录、多轨和字幕 |
-| R06 | P2 待补全 | 工作室的其余差异：外观、变体、本地提取、批量、视频复刻 | 要按 0.7.16 的 `storyWorkspace`、`storyGeneration` 重新核对。§7.1 的 `api/story-generation/` 和 §7.2 的 `src/modules/storyWorkspace` 纯叶属于这一项。第 119 批落了 `api/utils/` 剧本生成工具 4 件，第 120、121 批落了 `api/story-generation/` 32 件中的 23 件，第 122 批落齐了 `storyWorkspace` 的 24 件纯叶（均未接线） |
+| R06 | P2 待补全 | 工作室的其余差异：外观、变体、本地提取、批量、视频复刻 | 要按 0.7.16 的 `storyWorkspace`、`storyGeneration` 重新核对。§7.1 的 `api/story-generation/` 和 §7.2 的 `src/modules/storyWorkspace` 纯叶属于这一项。第 119 批落了 `api/utils/` 剧本生成工具 4 件，第 120、121 批落了 `api/story-generation/` 32 件中的 23 件，第 122 批落齐了 `storyWorkspace` 的 24 件纯叶，第 123 批再落 10 件依赖已齐的件（均未接线） |
 | R07 | P2 待补全 | 扫描 PDF、OCR、更多文档格式 | 还没有批次 |
 | R08 | P2 待实现 | 人物检测、识别、替换、素材库 | 第 85 批落了替换工作室核心 9 件（未接线）；`personReplacement` 还有 12 个纯叶没落；后端接口缺失 |
 | R09 | P2 待实现 | 分镜 3D、导演相机、模型包、全景 | 第 86–93 批落了约 45/97 件（未接线）；主装配（依赖 three.js 的 `workspaceController`、`sceneRuntime` 等）没落 |
@@ -221,7 +222,7 @@ node tools/tracking/track.mjs --status
 
 ### 7.2 之后的纯新增队列
 
-1. **`src/modules` 的 136 个纯叶**，按能力区成组落地：`storyWorkspace` 24（第 122 批已全部落地；另有 8 件 OK 件待第 123 批评估）、`collaboration` 13、`app` 13、`personReplacement` 12、`runninghubAiApp` 6、`panoramaSceneNode` 5 等。完整清单在 `deobf-tools\b119\screen.txt`。
+1. **`src/modules` 的 136 个纯叶**，按能力区成组落地：`storyWorkspace` 24（第 122 批已全部落地；第 123 批重新分级后落了 10 件 OK 件，4 件受阻见 §7.3；收工后复跑又有 3 件新转 OK，待过闸门）、`collaboration` 13、`app` 13、`personReplacement` 12、`runninghubAiApp` 6、`panoramaSceneNode` 5 等。完整清单在 `deobf-tools\b119\screen.txt`。
 2. **`api/` 的其余纯叶**：34 件（原 41 件，第 119 批已落 7 件）。
 3. **`src/services`**：零依赖纯叶已经清零，剩下的都带相对 import，必须先过导出闸门。
 
@@ -239,6 +240,7 @@ node tools/tracking/track.mjs --status
 | `src/core/rendererPanPreviewReconcile.js` | 在用的 `rendererVirtualization.js` 缺 `resolveRendererVirtualizationTier` 和 `resolveRendererLowZoomMountLimit` |
 | 节点管理面板装配 | `canvasMediaLocalService.js` 的 28 个消费方世代分叉 |
 | `directorMultiView` / `directorViewportRuntime` | 导出面受阻（第 91 批记录） |
+| `storyWorkspace` 的 `storyEpisodeCanvas`、`storyReplicationCardMotion`、`storyReplicationPortraitController`、`storyWorkspaceDeveloperDiagnostics` | 在用的 `core/generationResultRenderer.js`、`core/math.js`、`services/diagnosticsService.js` 缺对应导出（第 123 批闸门，见 `docs/src-storyworkspace-batch123.md` §1） |
 
 ### 7.4 接线欠账（总目标要求「实际接入」）
 
@@ -282,7 +284,7 @@ node tools/tracking/track.mjs --status
    - src 的 43 项来自缺失的夹具 `tests/testPreviewDom.js`，整个 `tests/` 目录都不存在。
    - electron 的 1 项是 R14 第 17 批的遗留。
    - 不要伪造夹具去「修」它们。
-6. **导出闸门**：`deps-ast` 的 OK 只看依赖文件在不在，不看具名导出；第 116 批就因此撤回过一件。
+6. **导出闸门**：`deps-ast` 的 OK 只看依赖文件在不在，不看具名导出；第 116 批就因此撤回过一件。闸门也只核对名字：第 123 批发现本仓 `videoFrameCapture`（不认 crop）和 `modelRegistry`（id 解析方式）与 0.7.16 有世代差异，接线前要先处理。
 7. **git 条目折叠**：新建目录里的多个未跟踪文件，在 porcelain 输出里只算 1 条（第 114 批发现），不能靠条目增量判断文件有没有落地。
 8. **反混淆残留**：
    - 局部变量名仍是 `_0x…`，读代码时别被误导。
@@ -335,6 +337,16 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上，只保留 10 条）
 
+- 2026-09-25（第十四次）：交付第 123b 批，`src/modules/storyWorkspace/` 再落 3 件（片段帧数据、片段制作页渲染、工作区工具栏与页脚渲染），落地不接线；第 123 批完成。
+  - 3 件在 123a 阶段已暂存、已过闸门；与暂存逐字节一致，`node --check`、prettier 各 6/6。渲染件的测试只断言 HTML 字符串，不引入 DOM。
+  - 自研 45 例沙箱和本机首跑全绿（首跑前自查改掉 1 处写错的类名断言），变异抽查 21/21。src sweep 3812→3857 / 3769→3814 / 43（失败名集合一致）；api 791 未变；MD5 不变；消费方 0 命中。
+  - 收工后复跑 deps-ast：`storyWorkspace` 又有 3 件新转 OK（待过闸门）；`collaboration` 为 LEAF 13 / OK 4 / BLK 21，是第 124 批的起点。
+  - 专题文档 `docs/src-storyworkspace-batch123.md` 增 §8–§11；orphans 254→257 / 1019；变更 #0035、#0036；§11 最旧一条移到 `docs/tracking/log-archive.md`。
+- 2026-09-25（第十三次）：交付第 123a 批，`src/modules/storyWorkspace/` 落 7 件依赖已齐的件（片段导出、截帧、输入槽位、分集剧本批量队列、复刻视频上限、剧本改动守卫、缩略图回填），落地不接线。
+  - 重跑 deps-ast：OK 8→14、BLK 109→103。14 件过扩展闸门 `b123-gate`（AST 版，补上 verify-exports 漏看的再导出）：10 件通过，4 件缺在用文件的导出，记为受阻；123b 的 3 件已暂存。
+  - 依赖世代核对：desktopBridge、videoResultThumbnailApi 与镜像逐字节相同；localMediaPath 等差分 427 次 0 不同；videoFrameCapture 不认 crop、modelRegistry 解析方式不同，测试按本仓行为写并标注。
+  - 7 件与暂存逐字节一致，`node --check`、prettier 各 14/14；自研 69 例沙箱和本机首跑全绿，变异抽查 22/22。src sweep 3743→3812 / 3700→3769 / 43（失败名集合一致）；api 791 未变；MD5 不变；消费方 0 命中。
+  - 专题文档 `docs/src-storyworkspace-batch123.md`；orphans 247→254 / 1016；变更 #0032、#0033；§11 最旧一条移到 `docs/tracking/log-archive.md`。
 - 2026-09-25（第十二次）：按用户「git更新推送」指示做分组提交与推送，第 122 批全部入库。
   - 4 条提交：`74270ca` 第 122b 批 6 件源码 + 6 个测试、`dd8cdde` 第 122c 批 7 + 7、`cf431d9` 台账与专题文档 6 件、`0231658` README 删原作者联系方式一节（用户手改，本次一并提交）。`api/freeImageHostApi.js` 未被任何提交触及，MD5 仍为 `1e0458013f5341c99f21faefc1d34d3f`。
   - 推送前复核：13 个新测试文件离线全绿（119 例通过、0 失败，与 122b 的 46 加 122c 的 73 吻合）；该目录全部 JS `node --check` 通过；新文件里没有绝对开发路径、MCP 地址或密钥，命中的 `apiKey` 都在早先已提交的测试里且值是假串。
@@ -372,14 +384,6 @@ node tools/tracking/track.mjs --status
   - 8 件全部过导出闸门；源码 30 个导出，与暂存逐字节一致；`node --check` 18/18。
   - 自研 82 例测试落地后首跑全绿（沙箱预跑时 2 例测试数据写错，改测试不改实现）；api sweep 628→710（+82）/ 失败 0；src sweep 3587/3544/43 未变，失败名集合一致；受保护文件 MD5 不变。
   - 专题文档 `docs/api-story-generation-batch121.md`；orphans 210→218；git 0/68/861/0 → 0/68/878/0；变更 #0010、#0011。
-- 2026-09-25（第四次）：交付第 120 批，`api/story-generation/` 首批 10 件（8 纯叶 + 2 件依赖 `api/utils/`），落地不接线。
-  - 镜像目录实有 32 件（LEAF 10 / OK 2 / BLK 20）；2 个 OK 件过了导出闸门；两个大纯叶留给第 121 批。源码 29 个导出，与暂存逐字节一致。
-  - 自研 96 例测试首跑全绿；api sweep 532→628（+96）/ 失败 0；src sweep 3587/3544/43 未变，失败名集合与 `b85-fails.txt` 一致；受保护文件 MD5 不变。
-  - 专题文档 `docs/api-story-generation-leaves.md`；orphans 200→210；git 0/68/840/0 → 0/68/861/0；变更 #0007、#0008。
-- 2026-09-25（第三次）：交付第 119 批，`api/` 请求响应工具区 7 个零 import 纯叶，落地不接线。
-  - 新建 `api/utils/`，落了 strictJson、storyGenerationValues、storySceneIdentity、storyAssetPublicText，另有 `api/` 下 mediaUploadErrors、runningHubWorkflowPollingPolicy、runningHubUploadResponse；共 25 个导出，与暂存逐字节一致。
-  - 自研 57 例测试首跑全绿；api sweep 475→532（+57）/ 失败 0；src sweep 3587/3544/43 未变，失败名集合与 `b85-fails.txt` 一致；受保护文件 MD5 不变。
-  - 专题文档 `docs/api-request-response-utils.md`；orphans 193→200；git 0/68/825/0 → 0/68/840/0。
 
 ## 12. 变更记录机制（全自动）
 

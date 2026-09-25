@@ -257,4 +257,4 @@
    - `storyAssetExtractionDraft` 另被 `storyAssetExtractionWorkspaceController` 引用；`storyClipVideoResultDom` 被 `storyClipResultSelectionController` 引用。
    - `storyClipPromptReferences` 被 `storyClipMentions`、`storyPlanningData`、`storyReplicationPromptReferences` 引用。
 3. **第 122 批完成**：`storyWorkspace` 的 24 件纯叶全部落地，均未接线。
-4. **第 123 批口径**：先重跑 `b95/deps-ast.mjs src/modules/storyWorkspace` 重新分级，因为 24 件落地后部分 BLK 件可能已转 OK。然后对 §1 的 8 件 OK 件和新解阻的件逐件过导出闸门再落地。不够一批时，按 TRACKING §7.2 转 `collaboration` 的 13 个纯叶。
+4. **第 123 批口径**：先重跑 `b95/deps-ast.mjs src/modules/storyWorkspace` 重新分级，因为 24 件落地后部分 BLK 件可能已转 OK。然后对 §1 的 8 件 OK 件和新解阻的件逐件过导出闸门再落地。不够一批时，按 TRACKING §7.2 转 `collaboration` 的 13 个纯叶。（已执行：第 123 批见 `docs/src-storyworkspace-batch123.md`。）
