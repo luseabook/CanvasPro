@@ -1,7 +1,7 @@
 # 孤立模块清单（已落地但从入口不可达）
 
 > 由 `docs/TRACKING.md` 维护。依据是 2026-09-25 对本地镜像做的静态依赖分析：从 `index.html`、`main.js`、`renderer.js`、`electron/main.js`、preload 和 worker 等入口出发，沿相对 import 遍历，走不到的非测试 JS 模块都列在这里。
-> 共 **257** 个，非测试 JS 模块总数 1019（第 123b 批新增 3 个后）。大部分是第 56–123 批「落地不接线」的移植件；少数是 0.4.12 原有的遗留文件，如 `src/hooks/*`、`src/core/store.js`、`ProjectManager.js`。
+> 增量台账共 **274** 个，非测试 JS 模块总数 1036（第 123b 基线 257/1019 加 124a–124e 的 17 件；2026-09-28 反查消费方 0 命中，本次未重跑全图遍历）。大部分是第 56–124e 批「落地不接线」的移植件；少数是 0.4.12 原有的遗留文件，如 `src/hooks/*`、`src/core/store.js`、`ProjectManager.js`。
 > 某个模块接线后，从本表删掉它，并同步 `docs/TRACKING.md` §5 的计数。重算方法：从上述入口做 import 可达性遍历，排除 `*.test.js`、`vendor/`、`deobfuscated/`。
 
 | 目录 | 数量 |
@@ -12,6 +12,7 @@
 | `electron/` | 16 |
 | `api/story-generation/` | 23 |
 | `src/modules/storyWorkspace/` | 34 |
+| `src/modules/collaboration/` | 17 |
 | `src/core/` | 9 |
 | `src/modules/` | 8 |
 | `src/modules/personReplacement/` | 8 |
@@ -142,3 +143,6 @@ rhAiAppRunningHubProfile.js
 
 runningHubDefaultSiteSettings.js
 
+## `src/modules/collaboration/`（17）
+
+collaborationCanvasBinding.js、collaborationChangeFeed.js、collaborationChatInput.js、collaborationChatPosition.js、collaborationChatState.js、collaborationConflicts.js、collaborationConnectionIndicator.js、collaborationDocument.js、collaborationEditing.js、collaborationFieldMerge.js、collaborationJournal.js、collaborationMemberColor.js、collaborationPreferences.js、collaborationPresenceChannel.js、collaborationPreviews.js、collaborationReviewDom.js、collaborationReviewState.js
