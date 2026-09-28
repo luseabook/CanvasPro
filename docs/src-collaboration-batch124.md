@@ -8,7 +8,7 @@
 - 124c：2026-09-28 新增 `collaborationCanvasBinding` 与 50 例测试，已完成离线验证，唯一依赖为本批 Journal；落地不接线，细节见 §7。
 - 124d：2026-09-28 新增 `collaborationChatInput` 与 40 例测试，实际模态依赖组合测试通过；落地不接线，细节见 §8。
 - 124e：2026-09-28 新增 `collaborationReviewDom` 与 37 例测试，图标依赖受限差分一致；落地不接线，NodeReference 另有导出阻塞，见 §9。
-- 124f：用户授权本地提交 124a–124e 后，新增 CommentThreads 与 35 例测试；本段未提交、未接线，详见 §10。
+- 124f：用户授权本地提交 124a–124e 后，新增 CommentThreads 与35例；后续已提交推送移植分支，仍未接线。实现见§10，提交推送见§11。
 - 源：只读的 `C:/Users/luobote/.qoder/tmp/shuo-deobf/src/modules/collaboration/`。
 - 暂存与检查证据：`C:/Users/luobote/.qoder/tmp/deobf-tools/b124/`，源码位于 `port/src/modules/collaboration/`，测试副本位于 `tests/src/modules/collaboration/`。
 
@@ -72,7 +72,7 @@
 - 124a 全部未接线；增量孤立模块台账从 257/1019 更新为 270/1032，非重新运行全图遍历所得。
 - 开工 Git：master，0 staged / 1 unstaged / 26 untracked / 0 冲突；源码和测试继承前一会话，不是本次新增实现。
 - 124a 阶段只补文档和检查；124b 新增一件源码及测试。不自动提交、推送、安装依赖、升级受保护装配件。
-- 124b–124f 已落冲突、画布绑定、聊天输入、评审 DOM 与评论线程；124a–124e 已本地提交，124f 未提交。下一段 124g 优先 Activity；NodeReference 继续保留媒体导出阻塞，详见 §10。
+- 124b–124f 已落冲突、画布绑定、聊天输入、评审DOM与评论线程；124a–f现已提交推送移植分支，远端master未更新。下一段124g优先Activity，NodeReference仍有媒体导出阻塞；见§11。
 
 
 ## 6. 124b：冲突管理与冲突分区（2026-09-28）
@@ -288,7 +288,7 @@ MCP 泛搜触及文件扫描上限，空结果仍带 truncated=true，因此改�
 - 按用户“提交后继续”授权，在 master 创建 **8fafc80**（完整 SHA `8fafc8036c0a5f40f81d21dc099185713c1c8d10`），父提交为 `1a42e297186ca8cbcd4d377eed34f46a512e438b`。提交说明：`A.0: batch 124a-e - 17 collaboration modules with 284 tests (unwired)`。
 - 精确提交 40 件：17 个源码、17 个测试、6 个专题/交接/记录文档。提交前核对 34 件既有代码哈希及语法，重跑协作 284/284；暂存清单和实际提交清单完全一致，未混入其他改动。提交后工作区曾为 0/0/0/0。
 - 证据在外部 b124/：`b124ae-commit-manifest.json`、`b124ae-precommit.tap`、`b124ae-commit-receipt.json`。没有 push、fetch 或发布；ahead 1 是相对本地 upstream 引用的结果，不是联网核验。
-- 提交结果由 #0052 追加说明；下面继续开发的 **124f 不在该提交中，仍未提交**。没有把一次提交授权扩展为持续自动提交或推送。
+- 提交结果由 #0052 追加说明；当时继续开发的 **124f 不在8fafc80中，开发收尾时尚未提交**。之后用户另行授权提交推送，结果见§11；没有持续自动提交或推送授权。
 
 ### 新增与依赖
 
@@ -336,3 +336,15 @@ src/api 使用 Node 原始字节 TAP 捕获，未经 PowerShell 管道转码。�
 - **下一段 124g 优先 Activity**，随后 Lobby/NicknameEditor/Select 继续各自依赖核验。NodeReference 仍缺 canvasMediaLocalService 的 resolveCanvasVideoPosterUrl；不能用文件存在性 OK 绕过此导出阻塞。
 - Git：用户授权提交前 0/5/35/0，提交后 0/0/0/0，124f 收尾 **0/6/2/0**；master 比本地 upstream ahead 1，未推送。#0053 记录新增源码/测试，收尾文档由跟踪脚本追加。
 - R10 服务端/API、Session/Application 装配及真实协作验收均未完成；R01–R26 状态不因提交或离线模块落地而变成完成。
+
+## 11. 124f 提交及仅移植分支推送（2026-09-28）
+
+- 用户要求“提交推送”，在目标选择被跳过后要求“继续”。已先告知采用不触发master发布的保守方案：只更新origin/port/batches-1-122a。没有收到master发布副作用的明确选择，故不沿用9月25日双分支推送授权。
+- 提交 **ba8e9b4**（完整SHA `ba8e9b4db713b53e689cea5db3bf6aecff5e3746`）：`A.0: batch 124f - collaboration comment threads with 35 tests (unwired)`。父提交8fafc80；只含本次两件源码/测试与六件交接/变更文档，共8件，暂存和实际提交清单全等。
+- 提交前复跑协作目录 **319/319**，代码哈希及语法 **36/36**；freeImageHostApi.js MD5仍为 `1e0458013f5341c99f21faefc1d34d3f`。本次不修改业务代码，也没有再次执行src/api全量；§10的全量结果是124f开发阶段的既有证据。
+- 首轮远端核对：master与port/batches-1-122a均为1a42e29。非强制push后，移植分支到ba8e9b4（包含前一条8fafc80），远端master仍为完整SHA `1a42e297186ca8cbcd4d377eed34f46a512e438b`。工作区曾恢复0/0/0/0。
+- 本节及主跟踪文档等后续记账另成提交，并按同一范围推移植分支；最终记账SHA以git log -1和远端核对为准。本地继续停留master，不改变upstream；因origin/master故意不更新，本地显示ahead是预期，不应据此擅自再推master。
+- 持久Git代理 `http://127.0.0.1:7890` 连接失败。仅对本次Git命令加 `-c http.proxy=` 临时直连；没有修改配置或关闭TLS证书校验。显式单分支refspec、不强推、不跟随标签。
+- 已核对本仓mac-arm64-build.yml：push仅监听master，另有workflow_dispatch。本次没有推master或手工触发工作流；未查询GitHub Actions/发布资产状态，不能称为构建或发布验收。
+- 外部证据目录：`deobf-tools/b124/commit124f/`，含manifest.json、precommit319.tap、remote-before.json、commit-receipt.json、first-push-receipt.json；最终记账推送结果写final-push-receipt.json。#0055记录首次提交推送说明，收尾变更由脚本追加。
+- 总体仍为18模块/319例、落地不接线；下一段124g Activity。NodeReference缺失媒体导出和R10服务端/主装配/多人验收欠账不因Git提交而消失。
