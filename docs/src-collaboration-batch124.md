@@ -343,8 +343,14 @@ src/api 使用 Node 原始字节 TAP 捕获，未经 PowerShell 管道转码。�
 - 提交 **ba8e9b4**（完整SHA `ba8e9b4db713b53e689cea5db3bf6aecff5e3746`）：`A.0: batch 124f - collaboration comment threads with 35 tests (unwired)`。父提交8fafc80；只含本次两件源码/测试与六件交接/变更文档，共8件，暂存和实际提交清单全等。
 - 提交前复跑协作目录 **319/319**，代码哈希及语法 **36/36**；freeImageHostApi.js MD5仍为 `1e0458013f5341c99f21faefc1d34d3f`。本次不修改业务代码，也没有再次执行src/api全量；§10的全量结果是124f开发阶段的既有证据。
 - 首轮远端核对：master与port/batches-1-122a均为1a42e29。非强制push后，移植分支到ba8e9b4（包含前一条8fafc80），远端master仍为完整SHA `1a42e297186ca8cbcd4d377eed34f46a512e438b`。工作区曾恢复0/0/0/0。
-- 本节及主跟踪文档等后续记账另成提交，并按同一范围推移植分支；最终记账SHA以git log -1和远端核对为准。本地继续停留master，不改变upstream；因origin/master故意不更新，本地显示ahead是预期，不应据此擅自再推master。
+- 本节及主跟踪文档等已另成记账提交 **3b8fc6e**，但追加推送受网络阻塞，尚未执行；本次网络状态记录也仅本地入库，均待同步。本地继续停留master，不改变upstream，不应据ahead提示擅自推master。
 - 持久Git代理 `http://127.0.0.1:7890` 连接失败。仅对本次Git命令加 `-c http.proxy=` 临时直连；没有修改配置或关闭TLS证书校验。显式单分支refspec、不强推、不跟随标签。
 - 已核对本仓mac-arm64-build.yml：push仅监听master，另有workflow_dispatch。本次没有推master或手工触发工作流；未查询GitHub Actions/发布资产状态，不能称为构建或发布验收。
-- 外部证据目录：`deobf-tools/b124/commit124f/`，含manifest.json、precommit319.tap、remote-before.json、commit-receipt.json、first-push-receipt.json；最终记账推送结果写final-push-receipt.json。#0055记录首次提交推送说明，收尾变更由脚本追加。
+- 外部证据目录：`deobf-tools/b124/commit124f/`，含manifest.json、precommit319.tap、remote-before.json、commit-receipt.json、first-push-receipt.json；成功的最终记账推送才会写final-push-receipt.json；本次未成功，改以pending-sync.json记录待同步状态。#0055记录首次提交推送说明，收尾变更由脚本追加。
 - 总体仍为18模块/319例、落地不接线；下一段124g Activity。NodeReference缺失媒体导出和R10服务端/主装配/多人验收欠账不因Git提交而消失。
+
+### 追加同步受阻：如实交接
+
+- 3b8fc6e完整SHA为 `3b8fc6ed13b6daccb3f10e0a3a5aedb7087b2c4e`，含5件记账文档。提交成功后，在push前的远端核对遭遇Empty reply from server；改用本次命令级HTTP/1.1后连接超时，再按原成功参数有限重试仍Connection was reset。
+- 三次都停止在前置ls-remote，**没有执行记账push**，没有重复提交、强推或改目标。最后一次成功核对仍是移植分支ba8e9b4、master 1a42e29；业务代码的首轮推送已确认成功，不能把末尾记账失败说成全部代码未推，也不能说所有提交都已推。
+- 本次网络状态另作本地记录提交，不继续无限重试。恢复既有代理或GitHub连通性后，先读取HEAD与远端引用，再只快进推送 `HEAD:refs/heads/port/batches-1-122a`，包含3b8fc6e和本次状态记录。不要重新创建业务提交，也不要更新远端master。

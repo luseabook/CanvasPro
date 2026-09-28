@@ -2,7 +2,7 @@
 
 > **新对话只读这一份就能接手，不要通读项目。** 本文件体积 ≤45 KB、单行 ≤400 字，一次 `read_files` 就能读完。
 > 入口链：用户只需说「读一下项目文档」→ `README.md` 顶部或 `AGENTS.md` → 本文件。所有文件改动都会自动记录（§12）。
-> 最后更新：2026-09-28 · 状态：124a–124f 已提交，8fafc80 与 ba8e9b4 已推至 origin/port/batches-1-122a，末尾附本次记账提交；远端 master 保留 1a42e29，未触发其 push 发布路径。本地仍在 master。协作累计 18 件/319 例，均未接线；下一段 124g Activity。维护规则见 §9。
+> 最后更新：2026-09-28 · 状态：124a–f业务提交8fafc80、ba8e9b4已推origin/port/batches-1-122a；记账3b8fc6e及本次网络状态记录仅在本地，追加推送因GitHub连接失败而暂停。本次未推远端master，最后成功核对为1a42e29。本地仍master；18件/319例均未接线。先恢复网络补同步，再做124g Activity。
 
 ## 0. 现状速览
 
@@ -10,11 +10,11 @@
 - **总目标**（用户原话要点）：对照已安装的 0.7.16（`D:\shuocancas\SHUO Canvas\resources\webapp`），把缺失功能的**可维护源码加进来，并实际接入工程**。
   - R01–R26 全范围不缩减；单批交付只是检查点。
   - 直接实施，不要只分析，也不要每批再问是否开发。
-- **进度**：第 1–123 批已提交推送；124a–124f 已提交并推送移植分支，未更新远端 master，索引见 `docs/tracking/batches.md`。R01–R26 **都没有完成**（§6）。
+- **进度**：第1–123批已提交推送；124a–f业务代码已推移植分支，末尾记账尚未同步，未更新远端master。R01–R26 **都没有完成**（§6）；不把业务推送成功误写为全部记账已推。
 - **必须清楚的偏差**：第 84–124f 批几乎都是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
   - 沿用第 123b 批静态分析基线，本批累计新增 18 件并反查消费方，增量台账为 1037 个非测试 JS 模块、**275 个入口不可达模块**（本次未重跑全图遍历），清单见 `docs/tracking/orphans.md`。
   - 总目标要求「实际接入」，所以接线欠账（§7.4）迟早要还。
-- **下一步**：124g 先 `collaborationActivity`；NodeReference 缺 `resolveCanvasVideoPosterUrl`，继续阻塞。文件存在性 LEAF 0 / OK 5 / BLK 15，另有 Lobby、NicknameEditor、Select 待核验；Comments 仍缺 textareaMentions/NodeReference。见 `docs/src-collaboration-batch124.md` §10。
+- **下一步**：先恢复网络，核对并快进同步本地HEAD至origin/port/batches-1-122a，不重复提交、不推master。然后124g先Activity；NodeReference仍缺resolveCanvasVideoPosterUrl。文件存在性LEAF 0 / OK 5 / BLK 15，Comments仍缺textareaMentions/NodeReference；见专题§11。
 - **变更记录**：全自动。任何人改了任何项目文件，都会被记到 `docs/tracking/changes/`，机制见 §12。
 
 ## 1. 开工流程（新对话照做）
@@ -171,9 +171,9 @@ node tools/tracking/track.mjs --status
 
 | 项 | 值 |
 | --- | --- |
-| 分支 | 本地仍为 `master`，业务提交 `8fafc80`、`ba8e9b4` 已推 `origin/port/batches-1-122a`，记账提交同步同一分支；远端 `master` 保留 `1a42e29`。upstream 仍为 origin/master，ahead 不表示移植分支没推 |
-| git_status | 开工 0 staged / 6 unstaged / 2 untracked / 0 冲突；124f 业务提交及首轮 push 后为 0/0/0/0。随后仅补提交/推送记账，最终须核对工作树干净与移植分支等于 HEAD；不切换工作分支或更改 upstream |
-| 提交情况 | `8fafc80`：124a–e 共40件；`ba8e9b4`：124f 共8件。两者均已快进推送移植分支，末尾记账另成提交。目标选项被跳过后用户要求继续，按已告知的保守范围不推 master、不强推、不推标签；详细证据见专题 §11 |
+| 分支 | 本地仍master；业务提交8fafc80、ba8e9b4已推移植分支。记账3b8fc6e及后附网络状态记录待推；最后成功核对远端port为ba8e9b4、master为1a42e29。upstream未改，勿据ahead提示推master |
+| git_status | 开工0/6/2/0，业务提交推送后0/0/0/0；后续记账与网络状态记录均在本地入库，最终工作树需核对干净。工作树干净不代表追加同步完成；远端最新状态须恢复网络后重新查询 |
+| 提交情况 | 8fafc80（40件）与ba8e9b4（8件）已快进推送移植分支；3b8fc6e（5件记账）及本次网络状态记录待同步。追加网络核对连续失败，尚未执行记账push；不强推、不推标签或master；证据见专题§11 |
 | src sweep | 4176 / 4133 / 43（124f 新增 35），9 月 28 日实跑。43 项失败名与 b85 完全一致，无新增或消失；证据 b124f-src-raw.tap、b124f-failure-comparison.json |
 | api sweep | 791 / 791 / 0（9 月 28 日实跑，未变） |
 | electron sweep | 1649 / 1648 / 1。那 1 项是 R14 第 17 批的遗留 |
@@ -342,7 +342,8 @@ node tools/tracking/track.mjs --status
 - 2026-09-28（第二十一次）：按用户“提交推送”及“继续”完成124f本地提交 ba8e9b4（8件）。目标选项被跳过，按已告知保守方案仅推 origin/port/batches-1-122a；8fafc80一并快进，远端master仍1a42e29。
   - 提交前协作319/319、代码哈希与语法36/36，受保护MD5不变；未改实现或运行应用。本次未重跑src/api全量，沿用124f的4176/4133/43与791全绿证据，不冒充新测试结果。
   - 原代理127.0.0.1:7890不可用，git -c http.proxy=临时直连成功；没有改持久配置、禁用证书校验、强推或推标签。已用ls-remote核对两分支；mac工作流push仅监听master，未查询远端CI结果。
-  - 业务提交后工作树0/0/0/0；收尾记账提交继续推同一移植分支，最终HEAD以git核对。记录#0055为提交推送说明；下一段仍124g Activity，18件/319例均未接线，R01–R26未完成。
+  - 业务提交后工作树0/0/0/0；记账3b8fc6e已入库，追加ls-remote连续出现空响应、连接失败和重置，尚未执行记账push；该提交及本次状态记录待网络恢复后同步。#0055为业务推送说明，#0056为记账文档，后续失败状态由脚本记录。
+  - 不重复提交已入库内容，不恢复旧的master发布授权。先修复网络并核对移植分支，再做124g Activity；18件/319例均未接线，R01–R26未完成。
 - 2026-09-28（第二十次）：按用户“提交后继续”先提交 124a–124e，40 件精确入库为 8fafc80，提交前 284/284、语法/哈希 34/34；提交后工作区干净，未推送。随后交付 124f CommentThreads/35 例，仍未提交、未接线。
   - 依赖 ReviewDom 五个导出存在，ReviewDom/MemberColor 与镜像一致，传递图标依赖哈希沿用 124e 未变。沙箱/主机首跑 35/35，变异 19/19；新件语法 2/2，暂存哈希和格式 36/36。
   - src 4176/4133/43 与 b85 名单一致，api 791 全绿；MD5 不变，现有诊断 0 错误/警告。固定孤儿回复空白、重复成员身份差异、渲染时权限和非原子渲染边界，见专题 §10。
