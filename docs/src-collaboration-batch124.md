@@ -354,3 +354,11 @@ src/api 使用 Node 原始字节 TAP 捕获，未经 PowerShell 管道转码。�
 - 3b8fc6e完整SHA为 `3b8fc6ed13b6daccb3f10e0a3a5aedb7087b2c4e`，含5件记账文档。提交成功后，在push前的远端核对遭遇Empty reply from server；改用本次命令级HTTP/1.1后连接超时，再按原成功参数有限重试仍Connection was reset。
 - 三次都停止在前置ls-remote，**没有执行记账push**，没有重复提交、强推或改目标。最后一次成功核对仍是移植分支ba8e9b4、master 1a42e29；业务代码的首轮推送已确认成功，不能把末尾记账失败说成全部代码未推，也不能说所有提交都已推。
 - 本次网络状态另作本地记录提交，不继续无限重试。恢复既有代理或GitHub连通性后，先读取HEAD与远端引用，再只快进推送 `HEAD:refs/heads/port/batches-1-122a`，包含3b8fc6e和本次状态记录。不要重新创建业务提交，也不要更新远端master。
+
+### 补同步完成（2026-09-28）
+
+- 用户说「处理分支」。先核对：`origin/port/batches-1-122a`（ba8e9b4）是 master 的祖先（`git merge-base --is-ancestor` 为真），**不存在待合并的分叉**，把它合入 master 只是 `Already up to date`；缺口仅是远端 port 落后两条记账提交。
+- 按上节既定方案执行：推送前先 live `ls-remote` 复核（远端 master `1a42e29`、port `ba8e9b4`、tag `v0.4.12` 为 `41dcfd3c`），确认 `ba8e9b4..3c3b3ae` 是快进后，只推 `HEAD:refs/heads/port/batches-1-122a`（`--no-follow-tags`、无强推）。结果 `ba8e9b4..3c3b3ae` 成功，本地分支对齐到 3c3b3ae 并绑定 upstream；远端 master 未动、未触发 mac-arm64 发布路径。
+- 本次代理 `127.0.0.1:7890` 仍不可用，Git 直连成功；未改持久配置、未禁用证书校验。`pending-sync.json` 记载的待同步状态由此解除，该文件本身未改写，后续判断以远端引用为准。
+- 遗留工作树 `.kilo/worktrees/childish-animal`（detached `1a42e29`、工作区干净）已 `git worktree remove` + `prune`，只剩主工作树；未删除任何受跟踪文件。
+- 未改业务代码、未跑测试、未启动应用、未查远端 CI；18 件/319 例仍全部未接线，R01–R26 均未完成。

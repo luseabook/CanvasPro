@@ -2,7 +2,7 @@
 
 > **新对话只读这一份就能接手，不要通读项目。** 本文件体积 ≤45 KB、单行 ≤400 字，一次 `read_files` 就能读完。
 > 入口链：用户只需说「读一下项目文档」→ `README.md` 顶部或 `AGENTS.md` → 本文件。所有文件改动都会自动记录（§12）。
-> 最后更新：2026-09-28 · 状态：124a–f业务提交8fafc80、ba8e9b4已推origin/port/batches-1-122a；记账3b8fc6e及本次网络状态记录仅在本地，追加推送因GitHub连接失败而暂停。本次未推远端master，最后成功核对为1a42e29。本地仍master；18件/319例均未接线。先恢复网络补同步，再做124g Activity。
+> 最后更新：2026-09-28 · 状态：124a–f 业务提交 8fafc80、ba8e9b4 连同记账 3b8fc6e、3c3b3ae 已快进推送 origin/port/batches-1-122a（远端 port=3c3b3ae），本地两分支同点；遗留工作树 .kilo/worktrees/childish-animal 已清理。远端 master 仍 1a42e29，未推、未触发 mac-arm64 发布路径。18 件/319 例均未接线。下一段 124g Activity。
 
 ## 0. 现状速览
 
@@ -10,11 +10,11 @@
 - **总目标**（用户原话要点）：对照已安装的 0.7.16（`D:\shuocancas\SHUO Canvas\resources\webapp`），把缺失功能的**可维护源码加进来，并实际接入工程**。
   - R01–R26 全范围不缩减；单批交付只是检查点。
   - 直接实施，不要只分析，也不要每批再问是否开发。
-- **进度**：第1–123批已提交推送；124a–f业务代码已推移植分支，末尾记账尚未同步，未更新远端master。R01–R26 **都没有完成**（§6）；不把业务推送成功误写为全部记账已推。
+- **进度**：第1–123批已提交推送；124a–f 业务代码与末尾记账（8fafc80、ba8e9b4、3b8fc6e、3c3b3ae）均已推远端移植分支，远端 master 未更新。R01–R26 **都没有完成**（§6）；不把推送成功误写为功能已完成。
 - **必须清楚的偏差**：第 84–124f 批几乎都是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
   - 沿用第 123b 批静态分析基线，本批累计新增 18 件并反查消费方，增量台账为 1037 个非测试 JS 模块、**275 个入口不可达模块**（本次未重跑全图遍历），清单见 `docs/tracking/orphans.md`。
   - 总目标要求「实际接入」，所以接线欠账（§7.4）迟早要还。
-- **下一步**：先恢复网络，核对并快进同步本地HEAD至origin/port/batches-1-122a，不重复提交、不推master。然后124g先Activity；NodeReference仍缺resolveCanvasVideoPosterUrl。文件存在性LEAF 0 / OK 5 / BLK 15，Comments仍缺textareaMentions/NodeReference；见专题§11。
+- **下一步**：124g 先 Activity；NodeReference 仍缺 resolveCanvasVideoPosterUrl。文件存在性 LEAF 0 / OK 5 / BLK 15，Comments 仍缺 textareaMentions/NodeReference；见专题 §11。远端 master 是否推送须用户另行选择（会触发发布路径），不自行推。
 - **变更记录**：全自动。任何人改了任何项目文件，都会被记到 `docs/tracking/changes/`，机制见 §12。
 
 ## 1. 开工流程（新对话照做）
@@ -167,13 +167,13 @@ node tools/tracking/track.mjs --status
    - 写专题文档 `docs/<主题>.md`，结构参照 `docs/services-image-preview-and-video-frame.md`：落地清单、冻结的端口行为、检查结果表、未执行项与边界、下一批口径。
    - 然后按 §9 更新本文件和 `docs/tracking/batches.md`。
 
-## 5. 仓库快照（2026-09-28，124f 提交推送收尾）
+## 5. 仓库快照（2026-09-28，124f 记账补同步完成）
 
 | 项 | 值 |
 | --- | --- |
-| 分支 | 本地仍master；业务提交8fafc80、ba8e9b4已推移植分支。记账3b8fc6e及后附网络状态记录待推；最后成功核对远端port为ba8e9b4、master为1a42e29。upstream未改，勿据ahead提示推master |
-| git_status | 开工0/6/2/0，业务提交推送后0/0/0/0；后续记账与网络状态记录均在本地入库，最终工作树需核对干净。工作树干净不代表追加同步完成；远端最新状态须恢复网络后重新查询 |
-| 提交情况 | 8fafc80（40件）与ba8e9b4（8件）已快进推送移植分支；3b8fc6e（5件记账）及本次网络状态记录待同步。追加网络核对连续失败，尚未执行记账push；不强推、不推标签或master；证据见专题§11 |
+| 分支 | 本地 `master`（3c3b3ae）与 `port/batches-1-122a`（同点，已绑 upstream）；业务与记账提交 8fafc80、ba8e9b4、3b8fc6e、3c3b3ae 均已推远端 port（`ba8e9b4..3c3b3ae` 快进），远端 master 仍 1a42e29。勿据 ahead 提示推 master |
+| git_status | 补同步前 0/1/0/0（仅变更记录），本次记账文档改完 0/5/0/0；记账提交后应回到 0/0/0/0。工作树干净不代表远端 master 已同步 |
+| 提交情况 | 8fafc80（40件）、ba8e9b4（8件）已在早先推送；3b8fc6e（5件记账）与 3c3b3ae（网络状态记录）本次直连快进补推成功，远端 port=3c3b3ae。全程不强推、不跟随标签、未推 master；证据见专题 §11 |
 | src sweep | 4176 / 4133 / 43（124f 新增 35），9 月 28 日实跑。43 项失败名与 b85 完全一致，无新增或消失；证据 b124f-src-raw.tap、b124f-failure-comparison.json |
 | api sweep | 791 / 791 / 0（9 月 28 日实跑，未变） |
 | electron sweep | 1649 / 1648 / 1。那 1 项是 R14 第 17 批的遗留 |
@@ -339,6 +339,12 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上，只保留 10 条）
 
+- 2026-09-28（第二十二次）：按用户「处理分支」核对：`origin/port/batches-1-122a`（ba8e9b4）是 master 的祖先，不存在待合并的分叉，把它合入 master 只是空操作；真正欠的是补同步。
+  - 授权后按已告知的保守方案只快进推送移植分支：`ba8e9b4..3c3b3ae`（含 `3b8fc6e`、`3c3b3ae` 两条记账提交），本地 port 分支对齐到同一点并绑定 upstream；远端 master 保持 `1a42e29`，不强推、不跟随标签，未触发 mac-arm64 发布路径。
+  - 推送前用 live `ls-remote` 复核两分支才执行；持久代理仍不可用，本次 Git 直连成功，未改持久配置、未禁用证书校验。#0057 记下的「待同步」状态由此解除。
+  - 清理遗留工作树 `.kilo/worktrees/childish-animal`（detached `1a42e29`、工作区干净）：`worktree remove` + `prune` 后只剩主工作树，没有删除任何受跟踪文件。
+  - 本次不改业务代码、未跑测试、未启动应用；18 件/319 例仍全部未接线，R01–R26 都没有完成。§11 最旧一条移到 `docs/tracking/log-archive.md`。
+
 - 2026-09-28（第二十一次）：按用户“提交推送”及“继续”完成124f本地提交 ba8e9b4（8件）。目标选项被跳过，按已告知保守方案仅推 origin/port/batches-1-122a；8fafc80一并快进，远端master仍1a42e29。
   - 提交前协作319/319、代码哈希与语法36/36，受保护MD5不变；未改实现或运行应用。本次未重跑src/api全量，沿用124f的4176/4133/43与791全绿证据，不冒充新测试结果。
   - 原代理127.0.0.1:7890不可用，git -c http.proxy=临时直连成功；没有改持久配置、禁用证书校验、强推或推标签。已用ls-remote核对两分支；mac工作流push仅监听master，未查询远端CI结果。
@@ -379,12 +385,6 @@ node tools/tracking/track.mjs --status
   - 依赖世代核对：desktopBridge、videoResultThumbnailApi 与镜像逐字节相同；localMediaPath 等差分 427 次 0 不同；videoFrameCapture 不认 crop、modelRegistry 解析方式不同，测试按本仓行为写并标注。
   - 7 件与暂存逐字节一致，`node --check`、prettier 各 14/14；自研 69 例沙箱和本机首跑全绿，变异抽查 22/22。src sweep 3743→3812 / 3700→3769 / 43（失败名集合一致）；api 791 未变；MD5 不变；消费方 0 命中。
   - 专题文档 `docs/src-storyworkspace-batch123.md`；orphans 247→254 / 1016；变更 #0032、#0033；§11 最旧一条移到 `docs/tracking/log-archive.md`。
-- 2026-09-25（第十二次）：按用户「git更新推送」指示做分组提交与推送，第 122 批全部入库。
-  - 4 条提交：`74270ca` 第 122b 批 6 件源码 + 6 个测试、`dd8cdde` 第 122c 批 7 + 7、`cf431d9` 台账与专题文档 6 件、`0231658` README 删原作者联系方式一节（用户手改，本次一并提交）。`api/freeImageHostApi.js` 未被任何提交触及，MD5 仍为 `1e0458013f5341c99f21faefc1d34d3f`。
-  - 推送前复核：13 个新测试文件离线全绿（119 例通过、0 失败，与 122b 的 46 加 122c 的 73 吻合）；该目录全部 JS `node --check` 通过；新文件里没有绝对开发路径、MCP 地址或密钥，命中的 `apiKey` 都在早先已提交的测试里且值是假串。
-  - 推送目标由用户在两个后果之间选定：`master` 与 `port/batches-1-122a` 都推到 `0231658`。推 master 会触发 `.github/workflows/mac-arm64-build.yml`（构建后 `gh release upload v0.4.12 --clobber` 覆盖既有 macOS 资产），后果已当面说明；本机 `gh` 不可用，构建是否被触发**未核实**。
-  - 本次未跑 sweep、未启动应用、未做真机验收；改动只涉及入库和文档，没有改业务代码。§11 最旧一条移到 `docs/tracking/log-archive.md`。
-
 ## 12. 变更记录机制（全自动）
 
 - **记录什么**：git 会跟踪的所有文件，即已跟踪文件加上未被 `.gitignore` 忽略的新文件；排除 `user/`、`data/`、`output/`、`venv/`、`deobfuscated/` 等运行数据。代码和文档的增、删、改都会被记下来。
