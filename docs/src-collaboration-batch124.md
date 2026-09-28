@@ -8,6 +8,7 @@
 - 124c：2026-09-28 新增 `collaborationCanvasBinding` 与 50 例测试，已完成离线验证，唯一依赖为本批 Journal；落地不接线，细节见 §7。
 - 124d：2026-09-28 新增 `collaborationChatInput` 与 40 例测试，实际模态依赖组合测试通过；落地不接线，细节见 §8。
 - 124e：2026-09-28 新增 `collaborationReviewDom` 与 37 例测试，图标依赖受限差分一致；落地不接线，NodeReference 另有导出阻塞，见 §9。
+- 124f：用户授权本地提交 124a–124e 后，新增 CommentThreads 与 35 例测试；本段未提交、未接线，详见 §10。
 - 源：只读的 `C:/Users/luobote/.qoder/tmp/shuo-deobf/src/modules/collaboration/`。
 - 暂存与检查证据：`C:/Users/luobote/.qoder/tmp/deobf-tools/b124/`，源码位于 `port/src/modules/collaboration/`，测试副本位于 `tests/src/modules/collaboration/`。
 
@@ -71,7 +72,7 @@
 - 124a 全部未接线；增量孤立模块台账从 257/1019 更新为 270/1032，非重新运行全图遍历所得。
 - 开工 Git：master，0 staged / 1 unstaged / 26 untracked / 0 冲突；源码和测试继承前一会话，不是本次新增实现。
 - 124a 阶段只补文档和检查；124b 新增一件源码及测试。不自动提交、推送、安装依赖、升级受保护装配件。
-- 124b–124e 已完成冲突、画布绑定、聊天输入和评审 DOM 的落地与测试；当前 124f 优先 CommentThreads，随后 Activity；NodeReference 缺媒体导出仍阻塞，不自动升代在用依赖，详见 §9。
+- 124b–124f 已落冲突、画布绑定、聊天输入、评审 DOM 与评论线程；124a–124e 已本地提交，124f 未提交。下一段 124g 优先 Activity；NodeReference 继续保留媒体导出阻塞，详见 §10。
 
 
 ## 6. 124b：冲突管理与冲突分区（2026-09-28）
@@ -276,6 +277,62 @@ MCP 泛搜触及文件扫描上限，空结果仍带 truncated=true，因此改�
 - 镜像 38 件中已落 **17 件 / 284 例**。按依赖文件存在性重分级为 **LEAF 0 / OK 6 / BLK 15**；OK 中仍可能有导出级阻塞。
 - 新转为文件存在性 OK 的 Activity、CommentThreads 已过真实导出检查，均只从 ReviewDom 导入；仍需各自审读源代码、编写离线组合测试，不代表运行可用。
 - **NodeReference 仍阻塞**：它虽然进入文件存在性 OK，但现有 `src/services/canvasMediaLocalService.js` 缺少 `resolveCanvasVideoPosterUrl`。另外三个导入已存在；证据 `b124e-gates.json`。未加 shim，未为它静默升级媒体服务，也未落其源码。
-- **124f 优先 CommentThreads**（镜像约 2854 B），随后 Activity（4193 B）；Lobby、NicknameEditor、Select 继续按各自依赖和行为边界核验。NodeReference 单独保留依赖设计/授权闸门。
+- 124e 收尾排定 **124f 优先 CommentThreads**（现已完成，见 §10；镜像约 2854 B），随后 Activity（4193 B）；Lobby、NicknameEditor、Select 继续按各自依赖和行为边界核验。NodeReference 单独保留依赖设计/授权闸门。
 - 增量孤立台账 **274/1036**，由上段 273/1035 加本模块所得，非全图重算。Git **0/5/33/0 → 0/5/35/0**；记录 #0049 新增源码/测试，#0050 补充测试边界，文档收尾由脚本追加。
 - R10 仍未完成：API/服务端、Session/Application 接线和真实多人运行验收均未交付；R01–R26 也不因本次模块落地变成完成。
+
+## 10. 本地提交 124a–124e，继续 124f CommentThreads（2026-09-28）
+
+### 已完成的提交与边界
+
+- 按用户“提交后继续”授权，在 master 创建 **8fafc80**（完整 SHA `8fafc8036c0a5f40f81d21dc099185713c1c8d10`），父提交为 `1a42e297186ca8cbcd4d377eed34f46a512e438b`。提交说明：`A.0: batch 124a-e - 17 collaboration modules with 284 tests (unwired)`。
+- 精确提交 40 件：17 个源码、17 个测试、6 个专题/交接/记录文档。提交前核对 34 件既有代码哈希及语法，重跑协作 284/284；暂存清单和实际提交清单完全一致，未混入其他改动。提交后工作区曾为 0/0/0/0。
+- 证据在外部 b124/：`b124ae-commit-manifest.json`、`b124ae-precommit.tap`、`b124ae-commit-receipt.json`。没有 push、fetch 或发布；ahead 1 是相对本地 upstream 引用的结果，不是联网核验。
+- 提交结果由 #0052 追加说明；下面继续开发的 **124f 不在该提交中，仍未提交**。没有把一次提交授权扩展为持续自动提交或推送。
+
+### 新增与依赖
+
+- 新增 `src/modules/collaboration/collaborationCommentThreads.js`：85 行 / 3559 B，唯一导出 `renderCommentThreads`，与格式化镜像及暂存逐字节一致。
+- 同名测试 606 行 / 22863 B，共 35 例。源码 SHA256：`e147f8188c7e59f6418c56850fe5fc798e36abb8c2702c74a88dd6c30cfa6224`；测试 SHA256：`c3c57d103ec1a6200ffe632db8950bd902fcc2db2fe3b37968a75f9afcd74315`。
+- 唯一直接依赖为 ReviewDom，五个具名导入真实核验 5/5：reviewElement、reviewTime、reviewAvatar、colorMemberName、appendMentionText。
+- ReviewDom、MemberColor 与格式化镜像一致；其传递图标依赖与镜像仍字节不同，但四件依赖哈希均与 124e 相同，沿用 §9 已限定范围的图标差分证据，没有覆盖或升代在用依赖。核对结果为 `b124f-dependency-check.json`，落地前后均复核。
+
+### 冻结行为与接入契约
+
+1. 先保存 list.scrollTop，再清空列表；只将 id===thread 的记录作为根，按输入数组顺序渲染。每根先显示自身，再显示 thread 严格匹配根 ID 且 ID 不等于根 ID 的回复；不按时间排序、不去重，同 ID 的重复根各自产生一个分区。
+2. actions 位于根消息之后、首个回复之前；没有回复时在根后追加。空数组显示“还没有评论，写下你的建议吧”；**非空但只有孤儿回复时列表为空，不显示空态文案**。调用方须提供根记录。
+3. 根 resolved 的真值控制分区样式和“已解决”状态；回复自身的 resolved 不控制整个分区。is-reply 按消息 ID 判断，is-mentioned 仅看 mentions.includes(当前 actorId)，不要求正文真的出现该人的 @名字。
+4. 正文通过真实 appendMentionText 写文本/提及 span，继承 §9 的允许列表和单 UTF-16 码元右边界；不是完整 Unicode 词边界。正文、昵称中的 HTML 字样不作为 HTML 解析。
+5. 作者头部优先当前成员名，假值时退回评论保存的名字；头像和颜色优先当前完整成员记录，离开成员才回退 actor ID/历史名字。若当前成员名为空，头部可显示历史名字，但头像显示“成”。
+6. **成员 ID 应唯一**：名称 Map 取重复 ID 的最后一个名字，头像/颜色的 find 却取第一个成员。保留且测试了这一区别，没有擅自去重或统一身份策略。
+7. 未解决的根显示回复按钮；根作者，或角色严格为 owner/admin，才显示解决/重开按钮。作者即使角色为 viewer 也满足此 UI 条件，拥有某个回复不等于拥有根。**这是渲染时的显示规则，不是服务端授权检查**；已注册回调不会在点击时复核角色或 resolved。
+8. 回复回调拿到原根对象；解决/重开回调拿到原根对象和对应按钮。不会克隆数据、回查替换后的数组、自行写 resolved、禁用按钮或添加加载状态。注册的监听闭包直接调用回调，不包裹错误或等待 Promise；原生事件派发如何报告异常/忽略返回值未用本测试模拟。
+9. 正常完成后回写保存的 scrollTop，空态和孤儿路径也如此；只验证属性读写次序，不保证浏览器布局收缩时实际滚动位置不被钳制。每次重建新 DOM 和按钮监听，不是增量更新或完整生命周期管理器。
+10. 数据契约由调用方保证：members、comments、mentions 应是相应数组，body 应可供文本函数读取。渲染不作统一校验或事务回滚；坏记录可能在旧列表已清空、前面分区已追加后抛错，末尾滚动回写也不会执行。
+
+测试只调用公开 renderCommentThreads，使用真实 ReviewDom/MemberColor 及其传递模块，DOM 仅为局部树与监听注册适配器，每例恢复全局 document；日期格式化只在对应测试内 mock。没有新增运行时 shim、虚假消费方或外部测试依赖。
+
+### 验证结果
+
+| 检查 | 结果 | 证据（外部 b124/ 下） |
+| --- | --- | --- |
+| 沙箱与主机首跑 | 各 35/35，0 失败、0 跳过，无首跑修正 | b124f-tests.tap 保存主机显式 TAP 首跑 |
+| 语法 | 新增源码与测试 2/2 | b124f-host-check.mjs |
+| 字节/格式 | 协作暂存与仓库 36/36 哈希一致，prettier 3.9.8 格式 36/36；新源码等于格式化镜像 | b124f-hashes.json、b124-stage.mjs --check、b124-prettier-check.mjs |
+| 有限变异 | 沙箱和主机均 19/19 有效语法变异检出；每次 35 例、无取消，不代表完整覆盖率 | mutate124f.mjs、mutation124f/results.json；仅外部副本，finally 恢复 |
+| src 全量 | 4176 总 / 4133 通过 / 43 失败，退出码 1 | b124f-src-raw.tap |
+| 失败名基线 | 与 b85 的 43 项完全一致，新增 0、消失 0 | b124f-failure-comparison.json、b124f-src-fails-raw.txt |
+| api 全量 | 791/791/0，退出码 0 | b124f-api-raw.tap |
+| 现有编辑器诊断 | 协作目录错误 0、警告 0；非构建结果 | get_diagnostics |
+| 受保护文件 | freeImageHostApi.js MD5 不变 | 1e0458013f5341c99f21faefc1d34d3f |
+| 消费方 | src/api/electron 非测试 JS 与 main.js，排除自身后 1030 件中完整模块名/导出名 0 命中 | b124f-consumers.json；未接线 |
+
+src/api 使用 Node 原始字节 TAP 捕获，未经 PowerShell 管道转码。未改 Electron，未跑其全套；未启动应用、构建、安装依赖、调用真实服务或做浏览器/多人运行验收。
+
+### 收尾与下一段
+
+- 镜像 38 件中已落 **18 件 / 319 例**，全部仍未接线。增量孤立台账 **275/1037**，不是重新运行全图遍历。
+- 文件存在性重分级 **LEAF 0 / OK 5 / BLK 15**。Comments 不再缺 CommentThreads，但仍缺 textareaMentions 和 NodeReference，不能直接移植装配。
+- **下一段 124g 优先 Activity**，随后 Lobby/NicknameEditor/Select 继续各自依赖核验。NodeReference 仍缺 canvasMediaLocalService 的 resolveCanvasVideoPosterUrl；不能用文件存在性 OK 绕过此导出阻塞。
+- Git：用户授权提交前 0/5/35/0，提交后 0/0/0/0，124f 收尾 **0/6/2/0**；master 比本地 upstream ahead 1，未推送。#0053 记录新增源码/测试，收尾文档由跟踪脚本追加。
+- R10 服务端/API、Session/Application 装配及真实协作验收均未完成；R01–R26 状态不因提交或离线模块落地而变成完成。
