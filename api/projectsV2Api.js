@@ -362,3 +362,190 @@ export async function checkLocalMediaExistsOnServer(_0x40e715) {
     return false;
   }
 }
+const PROJECT_FILE_EXTENSION_RE = /\.(?:aicanvas|json)$/i;
+
+export const SAVE_OUTPUT_FROM_URL_TIMEOUT_MS = 0x5 * 0x3c * 0x3e8;
+
+const _localMediaStatInflight = new Map(),
+  _localMediaStatCache = new Map(),
+  LOCAL_MEDIA_EXISTS_CACHE_LIMIT = 0x3e8,
+  LOCAL_MEDIA_EXISTS_TRUE_CACHE_TTL_MS = 0x1e * 0x3e8,
+  LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS = 0x3 * 0x3e8;
+
+function isLocalRelativeUrl(_0x33bf0b) {
+  const _0x1c5ce9 = String(_0x33bf0b || '')['trim']();
+  return _0x1c5ce9['startsWith']('/') && !_0x1c5ce9['startsWith']('//');
+}
+
+function normalizePositiveTimeoutMs(_0x4e6db4, _0x123f3c) {
+  const _0x3ca3f4 = Number(_0x4e6db4);
+  return Number['isFinite'](_0x3ca3f4) && _0x3ca3f4 > 0x0 ? _0x3ca3f4 : _0x123f3c;
+}
+
+function _collectNormalizedLocalPaths(_0xd502e9) {
+  const _0x1c1446 = new Set();
+  for (const _0x8b2a66 of Array['isArray'](_0xd502e9) ? _0xd502e9 : []) {
+    const _0x4c8f33 = normalizeLocalPath(_0x8b2a66);
+    if (_0x4c8f33) _0x1c1446['add'](_0x4c8f33);
+  }
+  return _0x1c1446;
+}
+
+function _evictSavedOutputCacheByLocalPaths(_0x329a3a) {
+  const _0xe48b45 = _collectNormalizedLocalPaths(_0x329a3a);
+  if (_0xe48b45['size'] === 0x0) return;
+  for (const [_0x4d5049, _0x5a0845] of _saveOutputFromUrlCache['entries']()) {
+    const _0x45d52c = normalizeLocalPath(
+      _0x5a0845?.['localPath'] || _0x5a0845?.['path'] || _0x5a0845?.['url'],
+    );
+    _0x45d52c && _0xe48b45['has'](_0x45d52c) && _saveOutputFromUrlCache['delete'](_0x4d5049);
+  }
+}
+
+function _evictLocalMediaExistsCacheByLocalPaths(_0x35fe3f) {
+  const _0x3eae5a = _collectNormalizedLocalPaths(_0x35fe3f);
+  for (const _0x2225b7 of _0x3eae5a) {
+    const _0x556a93 = _localPathToStaticRequestPath(_0x2225b7);
+    if (_0x556a93) _localMediaStatCache['delete'](_0x556a93);
+  }
+}
+
+function _readLocalMediaStatCache(_0x1724bc) {
+  const _0x3d20b8 = _localMediaStatCache['get'](_0x1724bc);
+  if (!_0x3d20b8) return undefined;
+  if (Number(_0x3d20b8['expiresAt'] || 0x0) <= Date['now']())
+    return (_localMediaStatCache['delete'](_0x1724bc), undefined);
+  return _0x3d20b8['stat'];
+}
+
+function _rememberLocalMediaStat(_0x43c91c, _0x4e295d) {
+  if (!_0x43c91c) return;
+  const _0x51b3eb = {
+      exists: _0x4e295d?.['exists'] === !![],
+      sizeBytes:
+        Number['isSafeInteger'](Number(_0x4e295d?.['sizeBytes'])) && Number(_0x4e295d['sizeBytes']) >= 0x0
+          ? Number(_0x4e295d['sizeBytes'])
+          : 0x0,
+      contentType: String(_0x4e295d?.['contentType'] || '')['trim'](),
+      lastModified: String(_0x4e295d?.['lastModified'] || '')['trim'](),
+    },
+    _0x52ce82 = _0x51b3eb['exists']
+      ? LOCAL_MEDIA_EXISTS_TRUE_CACHE_TTL_MS
+      : LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS;
+  _localMediaStatCache['set'](_0x43c91c, { stat: _0x51b3eb, expiresAt: Date['now']() + _0x52ce82 });
+  if (_localMediaStatCache['size'] > LOCAL_MEDIA_EXISTS_CACHE_LIMIT) {
+    const _0x40b677 = _localMediaStatCache['keys']()['next']()['value'];
+    if (_0x40b677) _localMediaStatCache['delete'](_0x40b677);
+  }
+  return _0x51b3eb;
+}
+
+function _normalizeLegacyProjectFilename(_0x3be800) {
+  const _0x5815ec = String(_0x3be800 || '')['trim']();
+  if (!_0x5815ec) return 'default_v2_project.json';
+  return PROJECT_FILE_EXTENSION_RE['test'](_0x5815ec) ? _0x5815ec : _0x5815ec + '.json';
+}
+
+export async function renameV2ProjectOnServer(_0x535b01, _0x1cc162) {
+  const _0x153bcc = String(_0x1cc162 || '')['trim']();
+  if (!_0x153bcc) return { success: ![] };
+  const _0x18102f = _normalizeProjectFilename(_0x535b01);
+  return await requester({
+    url: '/api/v2/projects/' + encodeURIComponent(_0x18102f),
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON['stringify']({ name: _0x153bcc }),
+    provider: 'local',
+  });
+}
+
+export async function saveOutputVideoThumbnailToServer(_0x30690f = {}) {
+  return await post('/api/v2/output-files/video-thumbnail', _0x30690f || {}, { provider: 'local' });
+}
+
+export async function fetchAssetCategorySettingsFromServer() {
+  try {
+    const _0x256dee = await get(ASSET_CATEGORIES_USER_FILE, { provider: 'local' });
+    if (Array['isArray'](_0x256dee)) return { categories: _0x256dee, displayNames: {}, parents: {} };
+    if (_0x256dee && typeof _0x256dee === 'object') {
+      const _0x3d7357 = Array['isArray'](_0x256dee['categories'])
+          ? _0x256dee['categories']
+          : Array['isArray'](_0x256dee['items'])
+            ? _0x256dee['items']
+            : [],
+        _0x51c54b =
+          _0x256dee['displayNames'] && typeof _0x256dee['displayNames'] === 'object'
+            ? _0x256dee['displayNames']
+            : {},
+        _0x12be99 =
+          _0x256dee['parents'] && typeof _0x256dee['parents'] === 'object' ? _0x256dee['parents'] : {};
+      return { categories: _0x3d7357, displayNames: _0x51c54b, parents: _0x12be99 };
+    }
+    return { categories: [], displayNames: {}, parents: {} };
+  } catch {
+    return { categories: [], displayNames: {}, parents: {} };
+  }
+}
+
+export async function discardStagedAssetUploadToServer(_0x406340) {
+  const _0x1dadd2 = String(_0x406340 || '')
+    ['trim']()
+    ['toLowerCase']();
+  if (!/^[a-f0-9]{32}$/['test'](_0x1dadd2)) return { success: ![], removed: ![] };
+  return await post(
+    '/api/v2/assets/stage/discard',
+    { stageId: _0x1dadd2 },
+    { provider: 'local', timeout: 0x1e * 0x3e8, retries: 0x0 },
+  );
+}
+
+export async function statLocalMediaOnServer(_0x45abbc) {
+  const _0x2e96d7 =
+      typeof _0x45abbc === 'string'
+        ? _0x45abbc
+        : String(_0x45abbc?.['localPath'] || _0x45abbc?.['path'] || '')['trim'](),
+    _0xcdf4fd = _localPathToStaticRequestPath(_0x2e96d7);
+  if (!_0xcdf4fd) return { exists: ![], sizeBytes: 0x0, contentType: '', lastModified: '' };
+  const _0x562dcb = _readLocalMediaStatCache(_0xcdf4fd);
+  if (_0x562dcb !== undefined) return _0x562dcb;
+  if (_localMediaStatInflight['has'](_0xcdf4fd)) return await _localMediaStatInflight['get'](_0xcdf4fd);
+  const _0x44b53c = requester({
+    url: _0xcdf4fd,
+    method: 'HEAD',
+    provider: 'local',
+    responseType: 'text',
+    allow404Null: !![],
+    returnMeta: !![],
+    timeout: 0x2710,
+  })
+    ['then']((_0x5847df) => {
+      const _0xaf6a10 = Number(_0x5847df?.['status'] || 0x0),
+        _0x19b172 = _0xaf6a10 >= 0xc8 && _0xaf6a10 < 0x190,
+        _0x344ebe = Number(_0x5847df?.['headers']?.['get']?.('content-length') || 0x0);
+      return _rememberLocalMediaStat(_0xcdf4fd, {
+        exists: _0x19b172,
+        sizeBytes: _0x19b172 && Number['isSafeInteger'](_0x344ebe) && _0x344ebe >= 0x0 ? _0x344ebe : 0x0,
+        contentType: _0x19b172
+          ? String(_0x5847df?.['headers']?.['get']?.('content-type') || '')['trim']()
+          : '',
+        lastModified: _0x19b172
+          ? String(_0x5847df?.['headers']?.['get']?.('last-modified') || '')['trim']()
+          : '',
+      });
+    })
+    ['catch'](() => {
+      return _rememberLocalMediaStat(_0xcdf4fd, {
+        exists: ![],
+        sizeBytes: 0x0,
+        contentType: '',
+        lastModified: '',
+      });
+    });
+  return (
+    _localMediaStatInflight['set'](_0xcdf4fd, _0x44b53c),
+    _0x44b53c['finally'](() => {
+      _localMediaStatInflight['get'](_0xcdf4fd) === _0x44b53c && _localMediaStatInflight['delete'](_0xcdf4fd);
+    })['catch'](() => {}),
+    await _0x44b53c
+  );
+}

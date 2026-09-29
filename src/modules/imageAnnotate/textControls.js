@@ -278,3 +278,17 @@ export const buildCopiedTextCommand = (_0x2a3886, _0x4d979c) => {
     _0x5f0ba3 = TEXT_COPY_OFFSET_WORLD / _0x5b28cd;
   return { ..._0x2a3886, x: Number(_0x2a3886.x || 0) + _0x5f0ba3, y: Number(_0x2a3886.y || 0) + _0x5f0ba3 };
 };
+
+export const TEXT_LINE_HEIGHT_RATIO=1.2;
+
+export const TEXT_ROTATE_HANDLE_OFFSET=0x18;
+
+export const TEXT_ROTATE_HIT_RADIUS=0xd;
+
+const getViewportZoom=_0x15166e=>{const _0x56d280=Number(_0x15166e?.['zoom']);return Number["isFinite"](_0x56d280)&&_0x56d280>0x0?_0x56d280:0x1;},getScreenX=(_0x5529b2,_0x33c5db)=>((Number(_0x5529b2)||0x0)-(Number(_0x33c5db?.['x'])||0x0))*getViewportZoom(_0x33c5db),getScreenY=(_0x5c68fb,_0x22dfb4)=>((Number(_0x5c68fb)||0x0)-(Number(_0x22dfb4?.['y'])||0x0))*getViewportZoom(_0x22dfb4);
+
+export const getTextRotationHandles=_0x41358a=>{const _0x166738=Array["isArray"](_0x41358a?.['corners'])?_0x41358a["corners"]:[];if(_0x166738['length']<0x2)return[];const [_0x2c1a7f,_0x1c3286]=_0x166738,_0x30da6b=_0x1c3286['x']-_0x2c1a7f['x'],_0x1ff2d1=_0x1c3286['y']-_0x2c1a7f['y'],_0x367cbd=Math["hypot"](_0x30da6b,_0x1ff2d1)||0x1,_0x5cf120={'x':(_0x2c1a7f['x']+_0x1c3286['x'])/0x2,'y':(_0x2c1a7f['y']+_0x1c3286['y'])/0x2};return[{'point':{'x':_0x5cf120['x']+_0x1ff2d1/_0x367cbd*TEXT_ROTATE_HANDLE_OFFSET,'y':_0x5cf120['y']-_0x30da6b/_0x367cbd*TEXT_ROTATE_HANDLE_OFFSET},'handle':"rotate"}];};
+
+export const getTextRotationHandle=_0x2433dc=>getTextRotationHandles(_0x2433dc)[0x0]?.["point"]||null;
+
+export const getTextAnchorForCenter=({centerPx:_0x447458,layoutWidth:_0x569e99,layoutHeight:_0x27b788,scaleX:_0x280340,scaleY:_0x2df2d9,rotation:_0x47c2a8}={})=>{const _0x2539dd=rotateTextLocalPoint({'x':(Number(_0x569e99)||0x0)*(Number(_0x280340)||0x0)/0x2,'y':(Number(_0x27b788)||0x0)*(Number(_0x2df2d9)||0x0)/0x2},_0x47c2a8);return{'x':Number(_0x447458?.['x']||0x0)-_0x2539dd['x'],'y':Number(_0x447458?.['y']||0x0)-_0x2539dd['y']};};

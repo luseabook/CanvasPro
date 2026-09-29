@@ -338,3 +338,7 @@ export async function runLocalMediaClipExport(_0x40fc43 = {}, _0x3ed4de = {}) {
   if (!_0x406465?.data) throw new Error('Local media clip export API unavailable');
   return _0x406465.data;
 }
+
+const TERMINAL_STATUSES = new Set(['complete',"failed","cancelled"]);
+
+export async function listElectronMediaTasks(_0x4da2c2={}){const _0x2a87e0=getMediaTaskBridge();if(!_0x2a87e0)return{'tasks':[]};return await _0x2a87e0['list'](_0x4da2c2);}

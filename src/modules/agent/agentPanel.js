@@ -1415,3 +1415,6 @@ export function initAgentPanel({
     }
   );
 }
+export {
+  formatAgentAssistantMarkdown,
+} from './agentConversationPresentation.js';

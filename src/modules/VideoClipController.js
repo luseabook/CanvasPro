@@ -2249,4 +2249,29 @@ const VideoClipController = {
     if (!silent) window.showToast?.(videoClipText('cut.cancelled'), 'info');
   },
 };
+const VIDEO_CLIP_CONTROLLER_METHOD_KEYS = new Set(
+    Object.entries(VideoClipController)
+      .filter(([, _0x422a0a]) => typeof _0x422a0a === 'function')
+      .map(([_0x591c70]) => _0x591c70),
+  ),
+  VIDEO_CLIP_CONTROLLER_INITIAL_STATE = Object.freeze(
+    Object.fromEntries(
+      Object.entries(VideoClipController).filter(([_0x359388]) => !VIDEO_CLIP_CONTROLLER_METHOD_KEYS.has(_0x359388)),
+    ),
+  );
 export default VideoClipController;
+export function createVideoClipController() {
+  const _0x34f032 = Object.create(VideoClipController);
+  for (const _0x37bb9c of Object.keys(VideoClipController)) {
+    if (VIDEO_CLIP_CONTROLLER_METHOD_KEYS.has(_0x37bb9c)) continue;
+    const _0x13287f = Object.hasOwn(VIDEO_CLIP_CONTROLLER_INITIAL_STATE, _0x37bb9c)
+      ? VIDEO_CLIP_CONTROLLER_INITIAL_STATE[_0x37bb9c]
+      : undefined;
+    _0x34f032[_0x37bb9c] = Array.isArray(_0x13287f)
+      ? [..._0x13287f]
+      : _0x13287f && typeof _0x13287f === 'object'
+        ? { ..._0x13287f }
+        : _0x13287f;
+  }
+  return _0x34f032;
+}

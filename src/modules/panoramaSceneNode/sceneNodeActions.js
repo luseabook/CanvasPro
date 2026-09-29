@@ -31,6 +31,20 @@ import {
   normalizePanoramaSceneState,
   normalizeSceneOnlyPanoramaSceneState,
 } from './sceneNode.js';
+import {
+  DEFAULT_MANNEQUIN_POSE_ID,
+  createCustomMannequinPose,
+  normalizeBonePose,
+  normalizeCustomMannequinPose,
+  resolveMannequinPose,
+} from './poseCatalog.js';
+import {
+  normalizeCameraTimeline,
+  removeCameraKeyframe,
+  updateCameraTimelineSettings,
+  upsertCameraKeyframe,
+} from './cameraTimeline.js';
+import { resolveSceneAsset } from './sceneAssetCatalog.js';
 function panoramaSceneText(_0x2a5123, _0x1c2d45 = {}) {
   return t('panoramaSceneNode.' + _0x2a5123, _0x1c2d45);
 }
@@ -1937,5 +1951,291 @@ export function focusPanoramaSceneSelection({ nodeId: _0x3b16c0, storeInstance: 
       storeInstance: storeInstance,
     }),
     true
+  );
+}
+function resolvePanoramaThumbnailUrl(_0x35c39a) {
+  if (!_0x35c39a || typeof _0x35c39a !== 'object') return '';
+  return pickFirstNonEmptyString(
+    localPathToUrl(_0x35c39a['thumbLocalPath']),
+    localPathToUrl(_0x35c39a['thumbnailLocalPath']),
+    _0x35c39a['thumbUrl'],
+    _0x35c39a['thumbnailUrl'],
+  );
+}
+
+export function setPanoramaSceneInteractionOptions({
+  nodeId: _0x47b73f,
+  patch: patch = {},
+  storeInstance: storeInstance = appStore,
+}) {
+  writeSceneState(storeInstance, _0x47b73f, (_0x434f2d) => {
+    const _0x5858f6 = cloneSceneState(_0x434f2d);
+    return (
+      Object['prototype']['hasOwnProperty']['call'](patch, 'transformSpace') &&
+        (_0x5858f6['ui']['transformSpace'] = patch['transformSpace'] === 'local' ? 'local' : 'world'),
+      Object['prototype']['hasOwnProperty']['call'](patch, 'snapEnabled') &&
+        (_0x5858f6['ui']['snapEnabled'] = patch['snapEnabled'] === !![]),
+      Number['isFinite'](Number(patch['translationSnap'])) &&
+        (_0x5858f6['ui']['translationSnap'] = Number(patch['translationSnap'])),
+      Number['isFinite'](Number(patch['rotationSnap'])) &&
+        (_0x5858f6['ui']['rotationSnap'] = Number(patch['rotationSnap'])),
+      Number['isFinite'](Number(patch['scaleSnap'])) &&
+        (_0x5858f6['ui']['scaleSnap'] = Number(patch['scaleSnap'])),
+      Object['prototype']['hasOwnProperty']['call'](patch, 'groundLock') &&
+        (_0x5858f6['ui']['groundLock'] = patch['groundLock'] === !![]),
+      Object['prototype']['hasOwnProperty']['call'](patch, 'uniformScale') &&
+        (_0x5858f6['ui']['uniformScale'] = patch['uniformScale'] === !![]),
+      Object['prototype']['hasOwnProperty']['call'](patch, 'navigationMode') &&
+        (_0x5858f6['ui']['navigationMode'] = patch['navigationMode'] === 'fly' ? 'fly' : 'orbit'),
+      Number['isFinite'](Number(patch['flySpeed'])) &&
+        (_0x5858f6['ui']['flySpeed'] = Math['max'](0.25, Math['min'](0x28, Number(patch['flySpeed'])))),
+      Object['prototype']['hasOwnProperty']['call'](patch, 'showTimeline') &&
+        (_0x5858f6['ui']['showTimeline'] = patch['showTimeline'] === !![]),
+      _0x5858f6
+    );
+  });
+}
+
+export function upsertPanoramaSceneCustomPose({
+  nodeId: _0x4d6333,
+  pose: _0x27663c,
+  storeInstance: storeInstance = appStore,
+}) {
+  const _0x12f316 = normalizeCustomMannequinPose(_0x27663c),
+    _0x54b11b =
+      _0x12f316['id'] && _0x12f316['id'] !== 'custom' ? _0x12f316['id'] : generateId('mannequin-pose'),
+    _0x2544e0 = { ..._0x12f316, id: _0x54b11b };
+  return (
+    writeSceneState(storeInstance, _0x4d6333, (_0x22fa2e) => {
+      const _0x1a6dfa = cloneSceneState(_0x22fa2e),
+        _0x34332a = Array['isArray'](_0x1a6dfa['customPoses']) ? _0x1a6dfa['customPoses'] : [];
+      return (
+        (_0x1a6dfa['customPoses'] = [
+          ..._0x34332a['filter']((_0x318909) => _0x318909['id'] !== _0x54b11b),
+          _0x2544e0,
+        ]),
+        _0x1a6dfa
+      );
+    }),
+    commit(),
+    _0x2544e0
+  );
+}
+
+export function applyPanoramaSceneMannequinPose({
+  nodeId: _0x3ae607,
+  mannequinId: _0x2deac4,
+  poseId: poseId = DEFAULT_MANNEQUIN_POSE_ID,
+  bonePose: bonePose = null,
+  customPose: customPose = null,
+  storeInstance: storeInstance = appStore,
+}) {
+  const _0x1a84f8 = String(_0x2deac4 || '')['trim']();
+  if (!_0x1a84f8) return null;
+  let _0xa25357 = null;
+  return (
+    writeSceneState(storeInstance, _0x3ae607, (_0x1ab2ec) => {
+      const _0x1f1c67 = cloneSceneState(_0x1ab2ec),
+        _0x32f54a = customPose
+          ? {
+              ...normalizeCustomMannequinPose(customPose),
+              id: String(customPose['id'] || '')['trim']() || generateId('mannequin-pose'),
+            }
+          : null;
+      _0x32f54a &&
+        (_0x1f1c67['customPoses'] = [
+          ...(_0x1f1c67['customPoses'] || [])['filter']((_0x4a7811) => _0x4a7811['id'] !== _0x32f54a['id']),
+          _0x32f54a,
+        ]);
+      const _0x4d81e3 = _0x32f54a?.['id'] || (poseId !== 'custom' ? String(poseId || '')['trim']() : ''),
+        _0x11b843 = (_0x1f1c67['customPoses'] || [])['find']((_0x114723) => _0x114723['id'] === _0x4d81e3),
+        _0x51ce64 = bonePose
+          ? createCustomMannequinPose({
+              id: _0x11b843?.['id'] || _0x32f54a?.['id'] || 'custom',
+              name: _0x11b843?.['name'] || _0x32f54a?.['name'] || 'Custom pose',
+              bones: bonePose,
+            })
+          : _0x11b843 || resolveMannequinPose(poseId, _0x32f54a);
+      return (
+        (_0xa25357 = _0x51ce64),
+        (_0x1f1c67['mannequins'] = _0x1f1c67['mannequins']['map']((_0x26a313) =>
+          _0x26a313['id'] === _0x1a84f8
+            ? {
+                ..._0x26a313,
+                poseId:
+                  _0x51ce64?.['category'] === 'custom'
+                    ? 'custom'
+                    : _0x51ce64?.['id'] || DEFAULT_MANNEQUIN_POSE_ID,
+                customPoseId: _0x51ce64?.['category'] === 'custom' ? _0x51ce64['id'] : null,
+                bonePose: normalizeBonePose(_0x51ce64?.['bones']),
+              }
+            : _0x26a313,
+        )),
+        setSingleSelection(_0x1f1c67, 'mannequin', _0x1a84f8),
+        _0x1f1c67
+      );
+    }),
+    commit(),
+    _0xa25357
+  );
+}
+
+export function addPanoramaSceneCameraKeyframe({
+  nodeId: _0x19d60a,
+  keyframe: keyframe = {},
+  viewPose: viewPose = null,
+  storeInstance: storeInstance = appStore,
+}) {
+  const _0x409145 = getSceneState(storeInstance, _0x19d60a),
+    _0x30dd98 = normalizeCameraTimeline(_0x409145['cameraTimeline']),
+    _0x48ee4f = normalizeCompositionPoint(viewPose?.['position'], { x: 0x0, y: 1.6, z: 0x6 }),
+    _0x3aba2d = normalizeCompositionPoint(keyframe?.['position'], _0x48ee4f),
+    _0x53ce1b = normalizeCompositionPoint(viewPose?.['forward'], { x: 0x0, y: 0x0, z: -0x1 }),
+    _0x590525 = {
+      x: _0x3aba2d['x'] + _0x53ce1b['x'] * 0x5,
+      y: _0x3aba2d['y'] + _0x53ce1b['y'] * 0x5,
+      z: _0x3aba2d['z'] + _0x53ce1b['z'] * 0x5,
+    },
+    _0x160848 = normalizeCompositionPoint(keyframe?.['target'], _0x590525),
+    _0x214222 = Number(keyframe['fov'] ?? viewPose?.['fov']),
+    _0x2f6170 = {
+      id: String(keyframe['id'] || '')['trim']() || generateId('camera-keyframe'),
+      time: Number['isFinite'](Number(keyframe['time']))
+        ? Number(keyframe['time'])
+        : _0x30dd98['currentTime'],
+      position: _0x3aba2d,
+      target: _0x160848,
+      fov: Number['isFinite'](_0x214222) ? _0x214222 : 0x37,
+      easing: keyframe['easing'] || 'ease-in-out',
+    };
+  return (
+    writeSceneState(storeInstance, _0x19d60a, (_0x499221) => {
+      const _0x103a33 = cloneSceneState(_0x499221);
+      return (
+        (_0x103a33['cameraTimeline'] = upsertCameraKeyframe(_0x103a33['cameraTimeline'], _0x2f6170)),
+        _0x103a33
+      );
+    }),
+    commit(),
+    _0x2f6170['id']
+  );
+}
+
+export function updatePanoramaSceneCameraTimeline({
+  nodeId: _0x51130f,
+  timeline: timeline = null,
+  patch: patch = null,
+  storeInstance: storeInstance = appStore,
+}) {
+  (writeSceneState(storeInstance, _0x51130f, (_0x3bce32) => {
+    const _0x49ca90 = cloneSceneState(_0x3bce32);
+    return (
+      (_0x49ca90['cameraTimeline'] = timeline
+        ? normalizeCameraTimeline(timeline)
+        : updateCameraTimelineSettings(_0x49ca90['cameraTimeline'], patch || {})),
+      _0x49ca90
+    );
+  }),
+    commit());
+}
+
+export function deletePanoramaSceneCameraKeyframe({
+  nodeId: _0xe6b95e,
+  keyframeId: _0x4427f5,
+  storeInstance: storeInstance = appStore,
+}) {
+  (writeSceneState(storeInstance, _0xe6b95e, (_0x313ccd) => {
+    const _0x22f46e = cloneSceneState(_0x313ccd);
+    return (
+      (_0x22f46e['cameraTimeline'] = removeCameraKeyframe(_0x22f46e['cameraTimeline'], _0x4427f5)),
+      _0x22f46e
+    );
+  }),
+    commit());
+}
+
+function normalizeCompositionPoint(_0x273238, _0x1e360f) {
+  return {
+    x: Number['isFinite'](Number(_0x273238?.['x'])) ? Number(_0x273238['x']) : _0x1e360f['x'],
+    y: Number['isFinite'](Number(_0x273238?.['y'])) ? Number(_0x273238['y']) : _0x1e360f['y'],
+    z: Number['isFinite'](Number(_0x273238?.['z'])) ? Number(_0x273238['z']) : _0x1e360f['z'],
+  };
+}
+
+export function composePanoramaScene({
+  nodeId: _0x444971,
+  assets: assets = [],
+  mannequins: mannequins = [],
+  cameraTimeline: cameraTimeline = null,
+  environmentMode: environmentMode = null,
+  replaceExisting: replaceExisting = ![],
+  storeInstance: storeInstance = appStore,
+}) {
+  const _0x10d2aa = getStoreNode(storeInstance, _0x444971);
+  if (!_0x10d2aa || isPanorama360NodeType(_0x10d2aa['type'])) return null;
+  const _0xa07b7c = [],
+    _0x19dfed = [];
+  return (
+    writeSceneState(storeInstance, _0x444971, (_0x3aa1ff) => {
+      const _0x55cf38 = cloneSceneState(_0x3aa1ff);
+      replaceExisting &&
+        ((_0x55cf38['cubes'] = []),
+        (_0x55cf38['mannequins'] = []),
+        (_0x55cf38['groups'] = []),
+        clearSelection(_0x55cf38));
+      environmentMode && (_0x55cf38['environmentMode'] = environmentMode === 'day' ? 'day' : 'night');
+      const _0x4e2138 = Array['isArray'](assets) ? assets : [];
+      _0x4e2138['forEach']((_0x208955, _0x2ac7ad) => {
+        const _0x5d22f0 = resolveSceneAsset(_0x208955?.['assetId'] || _0x208955?.['id']);
+        if (!_0x5d22f0) return;
+        const _0x237509 = generateId('scene-asset');
+        _0xa07b7c['push'](_0x237509);
+        const _0x547e17 = {
+          x: ((_0x2ac7ad % 0x4) - Math['min'](1.5, (_0x4e2138['length'] - 0x1) / 0x2)) * 2.2,
+          y: 0x0,
+          z: Math['floor'](_0x2ac7ad / 0x4) * 2.2,
+        };
+        _0x55cf38['cubes']['push']({
+          id: _0x237509,
+          assetId: _0x5d22f0['id'],
+          colorKey: _0x208955?.['colorKey'] || _0x5d22f0['colorKey'] || 'blue',
+          position: normalizeCompositionPoint(_0x208955?.['position'], _0x547e17),
+          rotation: normalizeCompositionPoint(_0x208955?.['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
+          scale: _0x208955?.['scale'] ?? 0x1,
+        });
+      });
+      const _0x4c5cdf = Array['isArray'](mannequins) ? mannequins : [];
+      _0x4c5cdf['forEach']((_0x1f96d5, _0x65a997) => {
+        const _0x311a49 = generateId('mannequin');
+        _0x19dfed['push'](_0x311a49);
+        const _0x280685 = _0x1f96d5?.['bonePose']
+          ? createCustomMannequinPose({ bones: _0x1f96d5['bonePose'] })
+          : resolveMannequinPose(_0x1f96d5?.['poseId']);
+        _0x55cf38['mannequins']['push']({
+          id: _0x311a49,
+          gender: _0x1f96d5?.['gender'] === 'female' ? 'female' : 'male',
+          colorKey: _0x1f96d5?.['colorKey'] || 'blue',
+          poseId:
+            _0x280685?.['category'] === 'custom' ? 'custom' : _0x280685?.['id'] || DEFAULT_MANNEQUIN_POSE_ID,
+          customPoseId: null,
+          bonePose: normalizeBonePose(_0x280685?.['bones']),
+          position: normalizeCompositionPoint(_0x1f96d5?.['position'], {
+            x: (_0x65a997 - (_0x4c5cdf['length'] - 0x1) / 0x2) * 1.5,
+            y: 0x0,
+            z: 0x0,
+          }),
+          rotation: normalizeCompositionPoint(_0x1f96d5?.['rotation'], { x: 0x0, y: Math['PI'], z: 0x0 }),
+          scale: _0x1f96d5?.['scale'] ?? 0x1,
+        });
+      });
+      cameraTimeline && (_0x55cf38['cameraTimeline'] = normalizeCameraTimeline(cameraTimeline));
+      const _0x44f3d6 = _0x19dfed['at'](-0x1),
+        _0x3b3463 = _0xa07b7c['at'](-0x1);
+      if (_0x44f3d6) setSingleSelection(_0x55cf38, 'mannequin', _0x44f3d6);
+      else _0x3b3463 && setSingleSelection(_0x55cf38, 'cube', _0x3b3463);
+      return _0x55cf38;
+    }),
+    commit(),
+    { nodeId: _0x444971, assetIds: _0xa07b7c, mannequinIds: _0x19dfed }
   );
 }

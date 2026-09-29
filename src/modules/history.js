@@ -89,3 +89,9 @@ export function redo() {
 export function getHistoryInfo() {
   return _defaultHistory.getHistoryInfo();
 }
+
+export function resetHistory(){return _defaultHistory["reset"]();}
+
+export function createHistoryCheckpoint(){return _defaultHistory['createCheckpoint']();}
+
+export function undoToHistoryCheckpoint(_0x2f3a02,_0xec749d={}){return _defaultHistory['undoToCheckpoint'](_0x2f3a02,_0xec749d);}

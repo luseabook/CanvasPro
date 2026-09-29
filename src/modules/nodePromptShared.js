@@ -1,3 +1,5 @@
+import { normalizePromptMentionType } from './promptAssetInputRefs.js';
+import { rememberVirtualizedPromptCommit, serializeVirtualizedPromptHtml } from './promptPasteVirtualization.js';
 import appStore from '../core/stores/appStore.js';
 import {
   getInputLimitReason,
@@ -21,6 +23,7 @@ const AT_TYPE_MAP = { text: '文本', image: '图片', video: '视频', audio: '
   ASSET_TYPE_MENU_LABELS = { text: 'text', image: 'image', video: 'video', audio: 'audio' };
 export const PROMPT_ASSET_INPUT_REFS_FIELD = 'promptAssetInputRefs';
 const PROMPT_INPUT_REF_UNRESOLVED_ATTR = 'data-ref-unresolved',
+  PROMPT_INPUT_REF_LABEL_ATTR = 'data-ref-label',
   PROMPT_HTML_COMMIT_DELAY_MS = 0x140,
   ADVANCED_VOICE_CLONE_WORKFLOW_KEY = 'advanced_voice_clone',
   _pendingPromptHtmlCommitTargets = new Set(),
@@ -51,6 +54,10 @@ function _stripMentionDisplayMarker(_0xdab4d7) {
     .trim()
     .replace(/^@+/, '')
     .trim();
+}
+function _formatMentionSubmitLabel(_0x14f0c1) {
+  const _0x423c36 = _stripMentionDisplayMarker(_0x14f0c1);
+  return _0x423c36 ? '@' + _0x423c36 : '';
 }
 function _normalizePromptWhitespace(_0x4891bd) {
   return String(_0x4891bd || '')
@@ -167,15 +174,38 @@ function _getPillMentionType(_0x1e8707) {
     )
   );
 }
+function _getPromptInputDisplayLabel(_0x4d0540) {
+  return _stripMentionDisplayMarker(
+    _getDatasetValue(_0x4d0540, 'label', 'data-label') || _0x4d0540?.textContent || '',
+  );
+}
+function _getPromptInputRefLabel(_0x9e6d9a, _0x274d1e = '') {
+  return _stripMentionDisplayMarker(
+    _getDatasetValue(_0x9e6d9a, 'refLabel', PROMPT_INPUT_REF_LABEL_ATTR) || _0x274d1e,
+  );
+}
+export function getPromptInputSubmitLabelFromPillNode(_0x2c4722, _0x174f70 = '') {
+  if (_isAssetMentionPill(_0x2c4722))
+    return String(
+      _getDatasetValue(_0x2c4722, 'label', 'data-label') || _0x2c4722?.textContent || _0x174f70 || '',
+    ).trim();
+  return _formatMentionSubmitLabel(
+    _getPromptInputRefLabel(_0x2c4722, _0x174f70) ||
+      _getPromptInputDisplayLabel(_0x2c4722) ||
+      _0x174f70,
+  );
+}
 function _setInputMentionPillUnresolved(_0x3597cc, { label: label = '', type: type = '' } = {}) {
   if (!_isRefPillNode(_0x3597cc) || _isAssetMentionPill(_0x3597cc)) return false;
   const _0x176297 = _stripMentionDisplayMarker(
       label || _0x3597cc?.dataset?.label || _0x3597cc?.textContent || '',
     ),
+    _0x247c53 = _getPromptInputRefLabel(_0x3597cc, _0x176297),
     _0x2db370 = _getMentionType(type) || _getPillMentionType(_0x3597cc);
   ((_0x3597cc.dataset.label = _0x176297),
     (_0x3597cc.dataset.refOrigin = 'node'),
     (_0x3597cc.dataset.refUnresolved = 'true'));
+  if (_0x247c53) _0x3597cc.dataset.refLabel = _0x247c53;
   if (_0x2db370) _0x3597cc.dataset.refType = _0x2db370;
   return (
     delete _0x3597cc.dataset.nodeId,
@@ -505,6 +535,31 @@ export function appendAssetMentionToPrompt({
     Array.isArray(inputRefs) && inputRefs.push({ ..._0xd7869b, type: _0x4c7a97, placeholder: _0x503341 }),
     true
   );
+}
+export function appendMentionPillToPrompt(_0x14cef7, _0x336af3, { focus: focus = true } = {}) {
+  const _0x2a1c97 = _0x14cef7?.promptEl;
+  if (!_0x2a1c97 || !_0x336af3) return null;
+  const _0x506d9e = _createMentionPillForCandidate(_0x336af3, _0x14cef7);
+  _bindPromptPill(_0x14cef7, _0x506d9e);
+  const _0x2b3fa6 = Boolean(String(_0x2a1c97.textContent || '').trim() || _0x2a1c97.childNodes?.length);
+  if (_0x2b3fa6) _0x2a1c97.appendChild(document.createTextNode(' '));
+  _0x2a1c97.appendChild(_0x506d9e);
+  const _0x47cc7b = document.createTextNode('\u00a0');
+  _0x2a1c97.appendChild(_0x47cc7b);
+  _updatePromptHtml(_0x14cef7);
+  if (focus) {
+    const _0x249d24 = globalThis.window?.getSelection?.(),
+      _0x5bc204 =
+        typeof globalThis.document?.createRange === 'function' ? globalThis.document.createRange() : null;
+    _0x249d24 &&
+      _0x5bc204 &&
+      (_0x5bc204.setStart(_0x47cc7b, _0x47cc7b.textContent.length),
+      _0x5bc204.collapse(true),
+      _0x249d24.removeAllRanges(),
+      _0x249d24.addRange(_0x5bc204),
+      _0x2a1c97.focus?.());
+  }
+  return _0x506d9e;
 }
 export function getAssetInputRefsFromPrompt(_0x5d76c8 = null, { allowedTypes: allowedTypes = null } = {}) {
   if (!_0x5d76c8 || typeof _0x5d76c8.querySelectorAll !== 'function') return [];
@@ -2466,3 +2521,31 @@ export function _syncPillLabels(_0x1940e6, _0x3fa739) {
   }),
     _0x53054e && _updatePromptHtml(_0x1940e6, { renderRefBar: false }));
 }
+
+function _findLastMentionTriggerIndex(_0x4b38b7,_0x54dbdb){const _0x164049=Number["isFinite"](_0x54dbdb)?_0x54dbdb-0x1:undefined;return Math['max'](String(_0x4b38b7||'')["lastIndexOf"]('@',_0x164049),String(_0x4b38b7||'')["lastIndexOf"]('＠',_0x164049));}
+
+function _getNodeMentionDisplayLabel(_0x18d6cc={},_0x467a03=''){const _0x446ce3=[_0x18d6cc?.["name"],_0x18d6cc?.["title"],_0x18d6cc?.["label"],_0x18d6cc?.["displayName"]]["map"](_0x535c06=>_stripMentionDisplayMarker(_0x535c06))["find"](Boolean);return _0x446ce3||_stripMentionDisplayMarker(_0x467a03);}
+
+export function resolveTextReferenceContent(_0x1b77c7){const _0x274200=String(_0x1b77c7?.["type"]||'')["trim"]()["toLowerCase"]();if(_0x274200==="source-text"||_0x274200==="text"){const _0x9fd16c=typeof _0x1b77c7?.["content"]==="string"?_0x1b77c7['content']:_0x1b77c7?.["text"]||_0x1b77c7?.["outputText"]||_0x1b77c7?.["prompt"]||_0x1b77c7?.['label']||'';return String(_0x9fd16c)["trim"]();}return String(_0x1b77c7?.["outputText"]||_0x1b77c7?.["text"]||_0x1b77c7?.["content"]||_0x1b77c7?.['prompt']||_0x1b77c7?.["label"]||'')["trim"]();}
+
+function _decorateMentionPill(_0x2a53fb,_0x10e2d9,_0x462b2a=null){if(typeof _0x2a53fb?.["decorateMentionPill"]!=='function')return;_0x2a53fb['decorateMentionPill']({'pill':_0x10e2d9,'mention':_0x462b2a});}
+
+export function createPromptMediaReferenceState(_0x2be96e=[]){const _0x2d0164={'image':0x0,'video':0x0,'audio':0x0},_0x76a9b6=new Map();for(const _0x47fe09 of _0x2be96e){const _0x37b3cc=normalizePromptMentionType(_0x47fe09["type"]),_0x5ac7a3=String(_0x47fe09['url']||'')['trim']();if(!(_0x37b3cc in _0x2d0164)||!_0x5ac7a3||_0x76a9b6["has"](_0x37b3cc+':'+_0x5ac7a3))continue;_0x2d0164[_0x37b3cc]+=0x1,_0x76a9b6["set"](_0x37b3cc+':'+_0x5ac7a3,getMentionPlaceholderLabel(_0x37b3cc,_0x2d0164[_0x37b3cc]));}return{'mediaCounts':_0x2d0164,'dedupeState':_0x76a9b6};}
+
+function _readPromptHtmlForCommit(_0x5897db){const _0x4db631=serializeVirtualizedPromptHtml(_0x5897db?.['promptEl']),_0x7778bc=_0x4db631===null?sanitizePromptHtml(_0x5897db?.["promptEl"]?.["innerHTML"]||''):_0x4db631,_0x24398f=_isEmptyPromptHtml(_0x7778bc)?'':_0x7778bc;return rememberVirtualizedPromptCommit(_0x5897db,_0x24398f),_0x24398f;}
+
+export function bindPromptMentionHost(_0x529e94,{enablePaste:enablePaste=!![],enableSelectAll:enableSelectAll=!![],ignoreInlineEditor:ignoreInlineEditor=!![],inlineEditorSelector:inlineEditorSelector="[data-prompt-pill-inline-editor=\"true\"]",rehydrate:rehydrate=!![],commitHydratedPrompt:commitHydratedPrompt=!![],closeMenuOnDestroy:closeMenuOnDestroy=!![]}={}){const _0x38d655=_0x529e94?.["promptEl"];if(!_0x38d655?.['addEventListener'])return null;const _0xadb0d1=_0x23d20d=>ignoreInlineEditor&&Boolean(_0x23d20d?.["target"]?.["closest"]?.(inlineEditorSelector)),_0x34232c=_0x1720c8=>{if(_0xadb0d1(_0x1720c8))return;schedulePromptHtmlCommit(_0x529e94),_checkAtTrigger(_0x529e94,_0x1720c8);},_0xeb8a74=()=>{flushPromptHtmlCommit(_0x529e94);},_0x272fda=_0x425c1b=>{if(_0xadb0d1(_0x425c1b))return;if(_handleMentionMenuKeyboard(_0x425c1b))return;if(enableSelectAll&&handlePromptSelectAll(_0x529e94,_0x425c1b))return;_handlePillKeyboard(_0x529e94,_0x425c1b);},_0x5e2d4b=_0x46ab8b=>{if(_0xadb0d1(_0x46ab8b))return;handlePromptPaste(_0x529e94,_0x46ab8b);};_0x38d655["addEventListener"]("input",_0x34232c),_0x38d655["addEventListener"]("blur",_0xeb8a74),_0x38d655['addEventListener']('keydown',_0x272fda);if(enablePaste)_0x38d655["addEventListener"]("paste",_0x5e2d4b);if(rehydrate)_rehydratePromptPills(_0x529e94);if(commitHydratedPrompt&&typeof _0x529e94['getPromptHtml']==="function"&&typeof _0x529e94["commitPromptHtml"]==="function"){const _0x252927=_readPromptHtmlForCommit(_0x529e94);_0x252927!==_0x529e94["getPromptHtml"]()&&_0x529e94["commitPromptHtml"](_0x252927);}let _0x211083=![];return{'destroy'(){if(_0x211083)return;_0x211083=!![];if(closeMenuOnDestroy)_closeMentionMenu();flushPromptHtmlCommit(_0x529e94),_0x38d655["removeEventListener"]?.("input",_0x34232c),_0x38d655["removeEventListener"]?.("blur",_0xeb8a74),_0x38d655["removeEventListener"]?.('keydown',_0x272fda);if(enablePaste)_0x38d655['removeEventListener']?.("paste",_0x5e2d4b);}};}
+
+function _appendMentionSectionLabel(_0x18e38d,_0x496bbb){const _0x4a9323=document["createElement"]("div");return _0x4a9323["className"]="at-mention-section-label",_0x4a9323["textContent"]=String(_0x496bbb||''),_0x18e38d["appendChild"](_0x4a9323),_0x4a9323;}
+
+function _appendMentionGroupLabel(_0x4a2bf1,_0x440d05){const _0x57da0c=document["createElement"]('div');return _0x57da0c["className"]="at-mention-group-label",_0x57da0c["textContent"]=String(_0x440d05||''),_0x4a2bf1['appendChild'](_0x57da0c),_0x57da0c;}
+
+function _applyMentionPillPresentation(_0xe04b1d,_0x2ba3b9={}){if(!_0xe04b1d)return;const _0x5c0c62=String(_0x2ba3b9?.['pillKind']||'')["trim"]();if(_0x5c0c62)_0xe04b1d["dataset"]["promptPillKind"]=_0x5c0c62;else delete _0xe04b1d["dataset"]["promptPillKind"];_0xe04b1d['classList']?.["toggle"]?.("story-time-pill",_0x5c0c62==="time");const _0x2fc685=_0x2ba3b9?.['missingAsset']===!![];_0xe04b1d["classList"]?.["toggle"]?.('ref-pill--unresolved',_0x2fc685);if(_0x2fc685)_0xe04b1d["dataset"]['refUnresolved']="true",_0xe04b1d["title"]="缺少图片素材";else{_0xe04b1d['dataset']?.["refUnresolved"]==="true"&&_0x2ba3b9?.["origin"]==="asset"&&delete _0xe04b1d['dataset']['refUnresolved'];if(_0xe04b1d["title"]==="缺少图片素材")_0xe04b1d["removeAttribute"]?.('title');}}
+
+function _populateMentionMenuTree(_0x46ca79,_0x421ade,_0x5bbad6,{triggerRange:triggerRange=null,atIndex:atIndex=-0x1,pillToEdit:pillToEdit=null}={}){let _0x5cbd74='',_0x3f7689='',_0x546041=0x0;_0x5bbad6["nodeItems"]['forEach'](_0x3e7822=>{const _0x118a3e=String(_0x3e7822["menuGroup"]||'')["trim"](),_0x5cbb45=String(_0x3e7822["menuSection"]||'')["trim"]();if(_0x118a3e&&_0x118a3e!==_0x5cbd74){if(_0x546041>0x0)_appendMentionDivider(_0x46ca79);_appendMentionGroupLabel(_0x46ca79,_0x118a3e),_0x3f7689='';}_0x5cbd74=_0x118a3e,_0x5cbb45&&_0x5cbb45!==_0x3f7689&&_appendMentionSectionLabel(_0x46ca79,_0x5cbb45),_0x3f7689=_0x5cbb45,_appendMentionCandidateItem(_0x46ca79,_0x421ade,_0x3e7822,{'triggerRange':triggerRange,'atIndex':atIndex,'pillToEdit':pillToEdit}),_0x546041+=0x1;}),_0x5bbad6["nodeItems"]["length"]&&_0x5bbad6["assetItems"]["length"]&&_appendMentionDivider(_0x46ca79),_0x5bbad6["assetItems"]["forEach"](_0x3f99bc=>{const _0x114b7b=_createMentionMenuItem({'label':_0x3f99bc["label"],'subtitle':_0x3f99bc["subtitle"],'hasSubmenu':!![]}),_0x158915=_createMentionSubmenu();if(!_0x3f99bc["suppressBulkMention"]){const _0x2b5755=_getBulkAssetLimitReason(_0x421ade,_0x3f99bc["items"],pillToEdit),_0x402ff9=_createMentionMenuItem({'label':nodePromptSharedText('useEntireAsset'),'title':_0x2b5755,'disabled':!!_0x2b5755,'onSelect':()=>{if(_0x2b5755){globalThis["window"]?.["showToast"]?.(_0x2b5755,"warn");return;}_insertMentionPills(_0x421ade,_0x3f99bc["items"],{'triggerRange':triggerRange,'atIndex':atIndex,'pillToEdit':pillToEdit}),_closeMentionMenu();}});_0x158915["appendChild"](_0x402ff9),_appendMentionDivider(_0x158915);}_0x3f99bc["items"]["forEach"](_0x31482d=>{_appendMentionCandidateItem(_0x158915,_0x421ade,_0x31482d,{'triggerRange':triggerRange,'atIndex':atIndex,'pillToEdit':pillToEdit});}),_0x114b7b["appendChild"](_0x158915),_0x46ca79["appendChild"](_0x114b7b);});}
+
+function _getMentionMenuPages(_0x3eb0ce,_0xb7b368=[]){const _0x82e70a=typeof _0x3eb0ce?.["getMentionMenuPages"]==='function'?_0x3eb0ce["getMentionMenuPages"]({'candidates':_0xb7b368}):[];if(!Array['isArray'](_0x82e70a)||_0x82e70a['length']<0x2)return[];const _0x1daefe=new Set();return _0x82e70a['map'](_0x5013d3=>({'id':String(_0x5013d3?.['id']||'')["trim"](),'label':String(_0x5013d3?.["label"]||'')["trim"](),'icon':["assets","tools"]["includes"](String(_0x5013d3?.["icon"]||'')["trim"]())?String(_0x5013d3["icon"])["trim"]():''}))["filter"](_0x4a601c=>{if(!_0x4a601c['id']||!_0x4a601c["label"]||_0x1daefe["has"](_0x4a601c['id']))return![];return _0x1daefe["add"](_0x4a601c['id']),!![];});}
+
+function _createMentionMenuPageIcon(_0x3c9701){const _0x557064=String(_0x3c9701||'')["trim"]();if(!_0x557064)return null;const _0x42b7e5=document['createElement']("span");return _0x42b7e5["className"]="at-mention-tab-icon",_0x42b7e5["dataset"]["icon"]=_0x557064,_0x42b7e5["setAttribute"]("aria-hidden","true"),_0x42b7e5["innerHTML"]=_0x557064==="tools"?"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M14.7 6.3a4 4 0 0 0-5-5L12 3.6 9.6 6 7.3 3.7a4 4 0 0 0 5 5l-7.7 7.7a2 2 0 1 0 2.8 2.8z\"/><path d=\"m16 15 4.5 4.5\"/></svg>":'<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22><path\x20d=\x22M4\x206.5h6l1.7\x202H20v9.5a2\x202\x200\x200\x201-2\x202H6a2\x202\x200\x200\x201-2-2z\x22/><path\x20d=\x22M4\x209h16\x22/></svg>',_0x42b7e5;}
+
+function _appendMentionMenuPages(_0x4ad620,_0x4cb8c9,_0x398323,_0x5081c5){const _0x410cf3=_getMentionMenuPages(_0x4cb8c9,_0x398323);if(_0x410cf3["length"]<0x2)return null;const _0x177fa2=document["createElement"]("div");_0x177fa2["className"]="at-mention-tabs",_0x177fa2["setAttribute"]('role',"tablist"),_0x177fa2["setAttribute"]("aria-label","@ 功能分类"),_0x4ad620["appendChild"](_0x177fa2);const _0x42cb45=document['createElement']("div");_0x42cb45["className"]='at-mention-pages';const _0x200756=document['createElement']("div");_0x200756["className"]="at-mention-pages-track",_0x200756["style"]['width']=_0x410cf3["length"]*0x64+'%',_0x200756["style"]["gridTemplateColumns"]="repeat("+_0x410cf3["length"]+", minmax(0, 1fr))",_0x42cb45["appendChild"](_0x200756),_0x4ad620["appendChild"](_0x42cb45);const _0xe329bb=String(_0x4cb8c9?.["getMentionMenuDefaultPage"]?.({'candidates':_0x398323})||_0x410cf3[0x0]['id'])["trim"](),_0x29d811=_0x410cf3["map"](_0x4c4d81=>{const _0xeb7e37=_0x398323["filter"](_0x32fbba=>String(_0x32fbba?.['menuPage']||_0x410cf3[0x0]['id'])["trim"]()===_0x4c4d81['id']),_0x44476c=document["createElement"]("button");_0x44476c['type']="button",_0x44476c["className"]="at-mention-tab";const _0x10ed9c=_createMentionMenuPageIcon(_0x4c4d81["icon"]);if(_0x10ed9c)_0x44476c['appendChild'](_0x10ed9c);const _0x17cafb=document['createElement']('span');_0x17cafb['className']="at-mention-tab-label",_0x17cafb["textContent"]=_0x4c4d81["label"],_0x44476c['appendChild'](_0x17cafb),_0x44476c["dataset"]["mentionPage"]=_0x4c4d81['id'],_0x44476c["setAttribute"]("role","tab");const _0x172fee=document['createElement']('div');_0x172fee["className"]="at-mention-page",_0x172fee["dataset"]["mentionPagePanel"]=_0x4c4d81['id'],_0x172fee['setAttribute']("role",'tabpanel');if(_0xeb7e37['length'])_populateMentionMenuTree(_0x172fee,_0x4cb8c9,_buildMentionMenuTree(_0xeb7e37),_0x5081c5);else{const _0x43ac94=document["createElement"]("div");_0x43ac94["className"]='at-mention-empty',_0x43ac94["textContent"]='没有匹配的内容',_0x172fee['appendChild'](_0x43ac94);}return _0x177fa2["appendChild"](_0x44476c),_0x200756["appendChild"](_0x172fee),{..._0x4c4d81,'button':_0x44476c,'panel':_0x172fee,'hasCandidates':_0xeb7e37["length"]>0x0};}),_0x3266b0=_0x29d811["find"](_0x420209=>_0x420209['id']===_0xe329bb);let _0x54d57b=_0x3266b0?.["hasCandidates"]?_0x3266b0:null;if(!_0x54d57b)_0x54d57b=_0x29d811["find"](_0x2670f7=>_0x2670f7["hasCandidates"]);if(!_0x54d57b)_0x54d57b=_0x3266b0||_0x29d811[0x0];const _0x29d1f9=(_0x399cf3,{keyboard:keyboard=![]}={})=>{if(!_0x399cf3)return;const _0x5988cc=_0x29d811["indexOf"](_0x399cf3);_0x29d811["forEach"](_0x35da96=>{const _0x303953=_0x35da96===_0x399cf3;_0x35da96['button']['classList']["toggle"]("is-active",_0x303953),_0x35da96["button"]['setAttribute']("aria-selected",String(_0x303953)),_0x35da96['button']["tabIndex"]=_0x303953?0x0:-0x1,_0x35da96['panel']["classList"]["toggle"]("is-active",_0x303953),_0x35da96["panel"]["setAttribute"]("aria-hidden",String(!_0x303953)),_0x35da96['panel']["inert"]=!_0x303953;}),_0x200756["style"]["transform"]="translateX("+-_0x5988cc*(0x64/_0x29d811["length"])+'%)',_mentionMenuState["activeMenu"]=_0x399cf3['panel'],_setInitialMentionActiveItem(_0x399cf3['panel'],{'keyboard':keyboard}),_positionMentionMenu();};return _0x29d811["forEach"](_0x1e4b35=>{_0x1e4b35["button"]["addEventListener"]("mousedown",_0x1e8c08=>{_0x1e8c08["preventDefault"](),_0x1e8c08['stopPropagation'](),_0x29d1f9(_0x1e4b35);});}),_0x29d1f9(_0x54d57b),_0x54d57b?.["panel"]||null;}

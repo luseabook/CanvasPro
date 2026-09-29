@@ -291,13 +291,64 @@ function makePolicy(_0x3f68c5, _0x54605a = {}) {
     maxByKind: { ..._0x54605a },
   };
 }
-function makeManifestInputPolicy(_0x3c9671) {
+function normalizePolicyCompareValue(_0x44ca62) {
+  return String(_0x44ca62 ?? '')
+    .trim()
+    .toLowerCase();
+}
+function manifestPolicyConditionMatches(_0x147704, _0x2a5a5c = {}) {
+  if (Array.isArray(_0x147704))
+    return _0x147704.some((_0x54d8f7) => manifestPolicyConditionMatches(_0x54d8f7, _0x2a5a5c));
+  if (!_0x147704 || typeof _0x147704 !== 'object') return false;
+  if (Array.isArray(_0x147704.any))
+    return _0x147704.any.some((_0x30b5a4) => manifestPolicyConditionMatches(_0x30b5a4, _0x2a5a5c));
+  if (Array.isArray(_0x147704.all))
+    return _0x147704.all.every((_0x149cec) => manifestPolicyConditionMatches(_0x149cec, _0x2a5a5c));
+  const _0x2f269f = normalizeText(_0x147704.field ?? _0x147704.param);
+  if (!_0x2f269f) return false;
+  const _0x12e9b8 = _0x147704.values !== undefined ? _0x147704.values : _0x147704.value,
+    _0x5435d4 = (Array.isArray(_0x12e9b8) ? _0x12e9b8 : [_0x12e9b8]).map(normalizePolicyCompareValue),
+    _0x5cd3e8 = _0x5435d4.includes(normalizePolicyCompareValue(_0x2a5a5c?.[_0x2f269f]));
+  return _0x147704.not === true ? !_0x5cd3e8 : _0x5cd3e8;
+}
+export function getActiveManifestInputPolicyVariant(_0x50aaa8, _0x57ef12 = {}) {
+  const _0x110494 = Array.isArray(_0x50aaa8?.policyVariants) ? _0x50aaa8.policyVariants : [];
+  if (_0x110494.length === 0) return null;
+  const _0x10e812 =
+      _0x57ef12?.generationParams &&
+      typeof _0x57ef12.generationParams === 'object' &&
+      !Array.isArray(_0x57ef12.generationParams)
+        ? _0x57ef12.generationParams
+        : {},
+    _0x222265 = { ..._0x57ef12, ..._0x10e812 };
+  return _0x110494.find((_0x1fbd54) => manifestPolicyConditionMatches(_0x1fbd54?.when, _0x222265)) || null;
+}
+function makeManifestInputPolicy(_0x3c9671, _0x10c6a8 = {}) {
   if (!_0x3c9671 || typeof _0x3c9671 !== 'object') return null;
-  const _0xab5035 = Array.isArray(_0x3c9671.allowedKinds) ? _0x3c9671.allowedKinds : [];
+  const _0x507ccf = getActiveManifestInputPolicyVariant(_0x3c9671, _0x10c6a8),
+    _0xab5035 = Array.isArray(_0x507ccf?.allowedKinds)
+      ? _0x507ccf.allowedKinds
+      : Array.isArray(_0x3c9671.allowedKinds)
+        ? _0x3c9671.allowedKinds
+        : [];
   return {
     allowedKinds: INPUT_KIND_ORDER.filter((_0x240ba6) => _0xab5035.includes(_0x240ba6)),
-    maxByKind: { ...(_0x3c9671.maxByKind || {}) },
+    maxByKind: { ...(_0x3c9671.maxByKind || {}), ...(_0x507ccf?.maxByKind || {}) },
   };
+}
+export function manifestInputPolicyReferencesField(_0x287764, _0x1c853e) {
+  const _0x598dd7 = normalizeText(_0x1c853e);
+  if (!_0x598dd7) return false;
+  const _0x27b5a3 = (_0x33389a) => {
+    if (Array.isArray(_0x33389a)) return _0x33389a.some(_0x27b5a3);
+    if (!_0x33389a || typeof _0x33389a !== 'object') return false;
+    if (Array.isArray(_0x33389a.any) && _0x33389a.any.some(_0x27b5a3)) return true;
+    if (Array.isArray(_0x33389a.all) && _0x33389a.all.some(_0x27b5a3)) return true;
+    return normalizeText(_0x33389a.field ?? _0x33389a.param) === _0x598dd7;
+  };
+  return (Array.isArray(_0x287764?.policyVariants) ? _0x287764.policyVariants : []).some((_0x1f3292) =>
+    _0x27b5a3(_0x1f3292?.when),
+  );
 }
 function makeDreaminaStyleVideoPolicy(_0x150ca4) {
   const _0x46af14 =
@@ -357,8 +408,19 @@ function getSeedance2VideoMode(_0x26b282 = {}) {
 }
 function makeSeedance2VideoPolicy(_0x4aebab) {
   const _0x2ecea9 = getSeedance2VideoMode(_0x4aebab);
-  if (_0x2ecea9 === 'multimodal2video')
-    return makePolicy(['text', 'image', 'video', 'audio'], { image: 9, video: 3, audio: 3 });
+  if (_0x2ecea9 === 'multimodal2video') {
+    const _0x5b06da = _0x4aebab?.model,
+      _0x355127 = _0x4aebab?.provider,
+      _0xa1f974 =
+        resolveModelExecution(_0x5b06da, { providerHint: _0x355127 }) || resolveModelExecution(_0x5b06da),
+      _0x3dabea = _0xa1f974?.modelManifest || getModelManifest(_0x5b06da),
+      _0x35c6af = makeManifestInputPolicy(_0x3dabea?.inputSlots, _0x4aebab);
+    return makePolicy(['text', 'image', 'video', 'audio'], {
+      image: _0x35c6af?.maxByKind?.image ?? 9,
+      video: _0x35c6af?.maxByKind?.video ?? 3,
+      audio: _0x35c6af?.maxByKind?.audio ?? 3,
+    });
+  }
   if (_0x2ecea9 === 'frames2video') return makePolicy(['text', 'image'], { image: 2, video: 0, audio: 0 });
   if (_0x2ecea9 === 'image2video') return makePolicy(['text', 'image'], { image: 1, video: 0, audio: 0 });
   return makePolicy(['text'], { image: 0, video: 0, audio: 0 });
@@ -423,7 +485,7 @@ export function getTargetInputPolicy(_0x1526f0 = {}) {
     _0x49a58a = normalizeText(_0x1526f0?.provider).toLowerCase(),
     _0x379dc6 = normalizeText(_0x1526f0?.audioWorkflowKey);
   if (_0x32f7fc === 'ai-image') {
-    const _0x172ecb = makeManifestInputPolicy(getModelManifest(_0x506028)?.inputSlots);
+    const _0x172ecb = makeManifestInputPolicy(getModelManifest(_0x506028)?.inputSlots, _0x1526f0);
     if (_0x172ecb) return _0x172ecb;
     const _0x24ebc9 = isRhPersonReplaceWorkflowModel(_0x506028)
       ? 2
@@ -439,12 +501,15 @@ export function getTargetInputPolicy(_0x1526f0 = {}) {
     if (isApimartWan27VideoModel(_0x506028, _0x49a58a)) return makeWan27VideoPolicy(_0x1526f0);
     if (isApimartKlingV3OmniVideoModel(_0x506028, _0x49a58a)) return makeKlingV3OmniVideoPolicy(_0x1526f0);
     if (isApimartViduQ3VideoModel(_0x506028, _0x49a58a)) return makeViduQ3VideoPolicy(_0x1526f0);
-    const _0x39bbef = makeManifestInputPolicy(getModelManifest(_0x506028)?.inputSlots);
+    const _0x39bbef = makeManifestInputPolicy(getModelManifest(_0x506028)?.inputSlots, _0x1526f0);
     if (_0x39bbef) return _0x39bbef;
     return makePolicy(['text', 'image', 'video'], { audio: 0 });
   }
   if (_0x32f7fc === 'ai-audio') {
-    const _0x1e80a9 = makeManifestInputPolicy(getModelManifest(_0x379dc6 || _0x506028)?.inputSlots);
+    const _0x1e80a9 = makeManifestInputPolicy(
+      getModelManifest(_0x379dc6 || _0x506028)?.inputSlots,
+      _0x1526f0,
+    );
     if (_0x1e80a9) return _0x1e80a9;
     return makePolicy(['text', 'audio'], {
       image: 0,
@@ -454,12 +519,24 @@ export function getTargetInputPolicy(_0x1526f0 = {}) {
   }
   if (_0x32f7fc === 'ai-text') {
     const _0xad477d = getModelManifest(_0x506028),
-      _0x37bae8 = resolveTargetProvider(_0x506028, _0x49a58a) || normalizeProviderId(_0xad477d?.provider);
+      _0x15f8c0 = makeManifestInputPolicy(_0xad477d?.inputSlots, _0x1526f0);
+    if (_0x15f8c0) return _0x15f8c0;
+    const _0x37bae8 = resolveTargetProvider(_0x506028, _0x49a58a) || normalizeProviderId(_0xad477d?.provider);
     if (_0x37bae8 === 'apimart') return makePolicy(['text', 'image'], { video: 0, audio: 0 });
     return makePolicy(['text', 'image', 'video', 'audio'], {});
   }
   if (_0x32f7fc === 'media-clip')
     return { allowedKinds: ['image', 'video', 'audio'], maxByKind: { text: 0 } };
+  if (_0x32f7fc === 'whiteboard')
+    return {
+      allowedKinds: ['image'],
+      maxByKind: { text: 0, image: 1, video: 0, audio: 0 },
+    };
+  if (_0x32f7fc === 'storyboard-script') {
+    const _0x1e367d = normalizeText(_0x1526f0.storyboardScript?.model) || _0x506028,
+      _0x1fc807 = makeManifestInputPolicy(getModelManifest(_0x1e367d)?.inputSlots, _0x1526f0);
+    if (_0x1fc807) return _0x1fc807;
+  }
   if (_0x32f7fc === 'storyboard' || _0x32f7fc === 'storyboard-script')
     return makePolicy(['text', 'image', 'video'], { audio: 0 });
   return makePolicy(['text', 'image', 'video', 'audio'], {});
@@ -467,7 +544,7 @@ export function getTargetInputPolicy(_0x1526f0 = {}) {
 export function canTargetReceiveInputs(_0x193845 = {}) {
   return INPUT_TARGET_NODE_TYPES.has(normalizeText(_0x193845?.type));
 }
-function getVideoSourceKey(_0x52c3ce) {
+export function getVideoSourceKey(_0x52c3ce) {
   if (!_0x52c3ce || typeof _0x52c3ce !== 'object') return '';
   return (
     normalizeText(_0x52c3ce.localPath) ||

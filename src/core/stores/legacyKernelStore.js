@@ -27,6 +27,11 @@ import {
   normalizeEmptyStoryboardCell,
   resolveStoryboardCellSourceIndex,
 } from '../storyboardCellUtils.js';
+import {
+  cloneStoryboard3DProjects,
+  createStoryboard3DProjectActions,
+} from './storyboard3dProjectState.js';
+import { createNodeFieldSubscriptions } from './nodeFieldSubscriptions.js';
 import { sanitizeCanvasNodeMediaPatchForStore } from '../../services/canvasMediaLocalService.js';
 import {
   canAppendInputKindWithinLimit,
@@ -472,7 +477,8 @@ function shouldPreserveRunningGenerationOnHydrate(
 }
 function createStore() {
   let _0x36929b = createInitialState();
-  const _0x137896 = [],
+  const _0x3602fe = createNodeFieldSubscriptions(() => _0x36929b.nodes),
+    _0x137896 = [],
     _0x5f4349 = [],
     _0x488878 = [];
   let _0x135c8c = 0,
@@ -619,6 +625,7 @@ function createStore() {
       _0x3d0976 = true;
       return;
     }
+    _0x3602fe.flush();
     for (const _0x119742 of _0x5f4349) {
       _0x119742(_0x36929b);
     }
@@ -741,6 +748,7 @@ function createStore() {
       _0xcc58 = { parentId: null, name: _0xd0ff0b, _bizRev: 1, ..._0x3e4f45 };
     (captureFeatureSelectionsFromNodePatch(_0xcc58, _0xcc58, _0x36929b.ui?.featureSelections || {}),
       (_0x36929b.nodes[_0xcc58.id] = _0xcc58),
+      _0x3602fe.touch(_0xcc58.id),
       (_0x36929b._nodeCount = (_0x36929b._nodeCount || 0) + 1),
       _0x1bb4d0(),
       _0xcc58.parentId && _0x152cda(_0xcc58.id, _0xcc58.parentId),
@@ -1025,6 +1033,7 @@ function createStore() {
     }
     for (const _0x8f2e43 of _0x3f3141) {
       delete _0x36929b.nodes[_0x8f2e43];
+      _0x3602fe.touch(_0x8f2e43);
     }
     _0x36929b._nodeCount = Object.keys(_0x36929b.nodes).length;
     for (const { id: _0x668cad, parentId: _0x1c7014 } of _0x55c383) {
@@ -1094,6 +1103,7 @@ function createStore() {
     captureFeatureSelectionsFromNodePatch(_0x24c000, _0x37806e, _0x36929b.ui?.featureSelections || {});
     const _0x190b7d = (typeof _0x24c000._bizRev === 'number' ? _0x24c000._bizRev : 0) + 1;
     ((_0x36929b.nodes[_0x3d2ecd] = { ..._0x24c000, ..._0x37806e, _bizRev: _0x190b7d }),
+      _0x3602fe.touch(_0x3d2ecd),
       _0x277f11 !== _0x24c000.parentId && _0x152cda(_0x3d2ecd, _0x277f11, _0x24c000.parentId),
       _0x1bb4d0(),
       _0x3fbc44());
@@ -1117,6 +1127,7 @@ function createStore() {
         captureFeatureSelectionsFromNodePatch(_0x9a6312, _0x45fb8c, _0x36929b.ui?.featureSelections || {});
         const _0x2acb86 = (typeof _0x9a6312._bizRev === 'number' ? _0x9a6312._bizRev : 0) + 1;
         ((_0x36929b.nodes[_0x48902a] = { ..._0x9a6312, ..._0x45fb8c, _bizRev: _0x2acb86 }),
+          _0x3602fe.touch(_0x48902a),
           _0x492d36 !== _0x9a6312.parentId && _0x152cda(_0x48902a, _0x492d36, _0x9a6312.parentId),
           (_0xf44421 = true));
       }
@@ -1184,7 +1195,7 @@ function createStore() {
           _bizRev: (typeof _0x10ec40._bizRev === 'number' ? _0x10ec40._bizRev : 0) + 1,
         }));
     }
-    return (_0x1bb4d0(), _0x3fbc44(), true);
+    return (_0x3602fe.touch(_0x1dea6e), _0x3602fe.touch(_0x3da132), _0x1bb4d0(), _0x3fbc44(), true);
   }
   function _0x483c6d(_0x198e89, _0x404b90) {
     const _0xa75780 = _0x36929b.nodes[_0x198e89];
@@ -1192,6 +1203,7 @@ function createStore() {
     if (_0xa75780.name === _0x404b90) return;
     const _0x2db21c = (typeof _0xa75780._bizRev === 'number' ? _0xa75780._bizRev : 0) + 1;
     ((_0x36929b.nodes[_0x198e89] = { ..._0xa75780, name: _0x404b90, _bizRev: _0x2db21c }),
+      _0x3602fe.touch(_0x198e89),
       _0x1bb4d0(),
       _0x3fbc44());
   }
@@ -1239,7 +1251,7 @@ function createStore() {
     for (const [_0x1a3570, _0x1eca11] of Object.entries(_0x36929b.nodes)) {
       _0x1eca11.parentId && _0x152cda(_0x1a3570, _0x1eca11.parentId);
     }
-    (_0x35099c(), _0x1bb4d0(), _0x3fbc44());
+    (_0x3602fe.reload(), _0x35099c(), _0x1bb4d0(), _0x3fbc44());
   }
   function _0x561e04() {
     const _0x393f59 = {};
@@ -1387,6 +1399,7 @@ function createStore() {
         assets: Array.isArray(_0x36929b.assets)
           ? _0x36929b.assets.map((_0x490f26) => cloneAssetSnapshot(_0x490f26))
           : [],
+        storyboard3dProjects: cloneStoryboard3DProjects(_0x36929b.storyboard3dProjects, deepClone),
       };
     return sanitizeSerializedCanvasData(_0x5c00bb);
   }
@@ -1444,6 +1457,11 @@ function createStore() {
       (_0x36929b.assets = Array.isArray(_0x55fb49.assets)
         ? _0x55fb49.assets.map((_0x2a6fc5) => cloneAssetSnapshot(_0x2a6fc5))
         : []),
+      (_0x36929b.storyboard3dProjects = cloneStoryboard3DProjects(
+        _0x55fb49.storyboard3dProjects,
+        deepClone,
+      )),
+      _0x3602fe.reload(),
       _0x1bb4d0(),
       _0x3fbc44());
   }
@@ -1714,6 +1732,22 @@ function createStore() {
     const _0x14be86 = _0x36929b.subscription || {};
     ((_0x36929b.subscription = { ..._0x14be86, ...(_0x4ad1f7 || {}) }), _0x3fbc44());
   }
+  function _0x586d8c(_0x37f186) {
+    const _0x29c783 = _0x36929b.modelCatalog || {};
+    ((_0x36929b.modelCatalog = { ..._0x29c783, ...(_0x37f186 || {}) }), _0x3fbc44());
+  }
+  const {
+    upsertStoryboard3DProject: _0x4c2d9f,
+    deleteStoryboard3DProject: _0x426d0a,
+  } = createStoryboard3DProjectActions({
+    readProjects: () => _0x36929b.storyboard3dProjects,
+    writeProjects: (_0x336bed) => {
+      _0x36929b.storyboard3dProjects = _0x336bed;
+      _0x1bb4d0();
+      _0x3fbc44();
+    },
+    clone: deepClone,
+  });
   function _0x4bcc62(_0x357f3f) {
     if (!_0x357f3f || !_0x357f3f.id) throw new Error('[store] addAsset() 需要提供含有 id 字段的资产数据');
     const _0x25e041 = JSON.parse(JSON.stringify(_0x357f3f));
@@ -1867,6 +1901,7 @@ function createStore() {
     subscribe: _0x4b9dbb,
     subscribeRaw: _0x2817d4,
     subscribeSelector: _0x45783d,
+    subscribeNodeField: _0x3602fe.subscribe,
     batch: _0x55ed64,
     requestRender: _0x626269,
     invalidateUi: _0x1769b9,
@@ -1934,10 +1969,13 @@ function createStore() {
     setSelectionRelatedHighlightColor: _0x6e2d82,
     setConnectionLinesVisible: _0x1f5c63,
     setSubscriptionState: _0x2bc64d,
+    setModelCatalogState: _0x586d8c,
     initUiPrefs: _0x5bf9f6,
     addAsset: _0x4bcc62,
     deleteAsset: _0x4d7d29,
     updateAsset: _0x19b1f6,
+    upsertStoryboard3DProject: _0x4c2d9f,
+    deleteStoryboard3DProject: _0x426d0a,
     setWorkflowsLoading: _0x111094,
     setWorkflows: _0x741bec,
     upsertWorkflow: _0x49c444,

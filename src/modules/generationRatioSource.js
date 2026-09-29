@@ -150,3 +150,70 @@ export function getGenerationRatioSizeWithDom({
     getGenerationRatioMediaSize(nodeData, edge, { includeNodeFrame: includeNodeFrame })
   );
 }
+export function getGenerationMediaItemSize(_0x4449b7 = {}) {
+  const _0x2dce85 = _0x4449b7 && typeof _0x4449b7 === 'object' ? _0x4449b7 : {},
+    _0x5ecc47 =
+      _0x2dce85['metadata'] && typeof _0x2dce85['metadata'] === 'object' ? _0x2dce85['metadata'] : {},
+    _0x11de13 = pickPositiveDimension(
+      _0x2dce85['originalWidth'],
+      _0x2dce85['imageWidth'],
+      _0x2dce85['videoWidth'],
+      _0x2dce85['naturalWidth'],
+      _0x2dce85['mediaWidth'],
+      _0x2dce85['width'],
+      _0x5ecc47['originalWidth'],
+      _0x5ecc47['imageWidth'],
+      _0x5ecc47['videoWidth'],
+      _0x5ecc47['width'],
+    ),
+    _0x2f22eb = pickPositiveDimension(
+      _0x2dce85['originalHeight'],
+      _0x2dce85['imageHeight'],
+      _0x2dce85['videoHeight'],
+      _0x2dce85['naturalHeight'],
+      _0x2dce85['mediaHeight'],
+      _0x2dce85['height'],
+      _0x5ecc47['originalHeight'],
+      _0x5ecc47['imageHeight'],
+      _0x5ecc47['videoHeight'],
+      _0x5ecc47['height'],
+    );
+  return _0x11de13 > 0x0 && _0x2f22eb > 0x0 ? { width: _0x11de13, height: _0x2f22eb } : null;
+}
+
+export function pickGenerationRatioSourceInput(_0x462fdb = {}, _0x17e7a3 = {}) {
+  const _0x3c1f71 =
+      _0x462fdb && typeof _0x462fdb === 'object' && !Array['isArray'](_0x462fdb) ? _0x462fdb : {},
+    _0xea45a6 = ['image', 'video']['flatMap']((_0x634d1a) => {
+      const _0x277d5a = _0x3c1f71[_0x634d1a] ?? _0x3c1f71[_0x634d1a + 's'] ?? [],
+        _0x32fc1d = Array['isArray'](_0x277d5a) ? _0x277d5a : _0x277d5a ? [_0x277d5a] : [];
+      return _0x32fc1d['filter'](Boolean)['map']((_0x4340fd) => ({ item: _0x4340fd, kind: _0x634d1a }));
+    });
+  if (_0xea45a6['length'] === 0x0) return null;
+  const _0x107fd6 = getGenerationDisplayRatioSourceConfig(_0x17e7a3),
+    _0x3fba16 = _0x107fd6?.['kind']
+      ? _0xea45a6['filter'](({ kind: _0xd6da6d }) => _0xd6da6d === _0x107fd6['kind'])
+      : _0xea45a6,
+    _0x1ece67 = _0x3fba16['length'] > 0x0 ? _0x3fba16 : _0xea45a6,
+    _0x4b76fd = Array['isArray'](_0x107fd6?.['slots'])
+      ? _0x107fd6['slots']
+      : _0x107fd6?.['slot']
+        ? [_0x107fd6['slot']]
+        : [];
+  for (const _0x69f2e4 of _0x4b76fd) {
+    const _0xd908e1 = _0x1ece67['find'](
+      ({ item: _0x4027d0 }) =>
+        String(_0x4027d0?.['slotId'] || _0x4027d0?.['refSlot'] || '')['trim']() === _0x69f2e4,
+    );
+    if (_0xd908e1) return _0xd908e1['item'];
+  }
+  const _0x3052e6 =
+    _0x107fd6?.['inputIndex'] !== undefined ? _0x107fd6['inputIndex'] : _0x107fd6?.['fallbackIndex'];
+  if (Number['isInteger'](_0x3052e6) && _0x3052e6 >= 0x0 && _0x3052e6 < _0x1ece67['length'])
+    return _0x1ece67[_0x3052e6]?.['item'] || null;
+  return _0x1ece67[0x0]?.['item'] || null;
+}
+
+export function getGenerationInputRatioMediaSize(_0x281ec3 = {}, _0x529fed = {}) {
+  return getGenerationMediaItemSize(pickGenerationRatioSourceInput(_0x281ec3, _0x529fed));
+}

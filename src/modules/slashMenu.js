@@ -119,9 +119,11 @@ function _clearSlashOutsideDocClick() {
     (_slashOutsideDocClick = null));
 }
 function _cleanupSlashMenuLifecycle() {
+  const _0x486302 = _slashPositionState?.onOpenChange;
   (_clearSlashOutsideDocClick(),
     _slashViewportUnsubscribe && (_slashViewportUnsubscribe(), (_slashViewportUnsubscribe = null)),
-    (_slashPositionState = null));
+    (_slashPositionState = null),
+    _0x486302?.(false));
 }
 function _getSlashAnchorRect(_0xec9d3f) {
   if (
@@ -238,11 +240,8 @@ function _selectPromptPreset({
       _0x291aa5?.(_0x2a2fdb?.template, { insertPrompt: shouldInsertPromptForPreset(_0x2a2fdb) });
     }, 50));
 }
-export function checkSlashTrigger(
-  _0x4dd9ad,
-  { promptEl: _0xae49a1, nodeType: _0x3db939, nodeId: _0x7337d5, onGenerate: _0x53a9d9 },
-) {
-  if (_0x4dd9ad.inputType === 'insertCompositionText') return;
+export function checkSlashTrigger(_0x4dd9ad, _0x24d0f5 = {}) {
+  if (_0x4dd9ad?.inputType === 'insertCompositionText') return;
   const _0x5f0c7b = window.getSelection();
   if (!_0x5f0c7b.rangeCount) return;
   const _0x5f3c86 = _0x5f0c7b.getRangeAt(0);
@@ -256,6 +255,23 @@ export function checkSlashTrigger(
     closeSlashMenu();
     return;
   }
+  return _renderSlashMenu({ ..._0x24d0f5, range: _0x5f3c86, selection: _0x5f0c7b });
+}
+export function openPromptPresetMenu(_0x4d90c4 = {}) {
+  return _renderSlashMenu(_0x4d90c4);
+}
+function _renderSlashMenu({
+  promptEl: _0xae49a1,
+  nodeType: _0x3db939,
+  nodeId: _0x7337d5,
+  onGenerate: _0x53a9d9,
+  range: _0x5f3c86 = null,
+  selection: _0x5f0c7b = null,
+  anchorEl: _0x3ad420 = null,
+  placement: _0x2f34bc = 'auto-start',
+  onOpenChange: _0x234ee7 = null,
+  onPromptCommit: _0x2ae0ff = null,
+}) {
   const _0x1da878 = getSlashPromptPresetEntries(_0x3db939),
     _0x51008c = getSlashMenu();
   (_cleanupSlashMenuLifecycle(),
@@ -306,6 +322,7 @@ export function checkSlashTrigger(
               range: _0x5f3c86,
               selection: _0x5f0c7b,
               onGenerate: _0x53a9d9,
+              onPromptCommit: _0x2ae0ff,
             }),
           );
         }),
@@ -351,6 +368,7 @@ export function checkSlashTrigger(
               range: _0x5f3c86,
               selection: _0x5f0c7b,
               onGenerate: _0x53a9d9,
+              onPromptCommit: _0x2ae0ff,
             }));
         }));
     _0x51008c.appendChild(_0x45e778);
@@ -388,12 +406,15 @@ export function checkSlashTrigger(
     (_0x51008c.style.visibility = 'hidden'),
     (_slashPositionState = {
       menu: _0x51008c,
-      anchorEl: _0xae49a1.parentNode || _0xae49a1,
+      anchorEl: _0x3ad420 || _0xae49a1.parentNode || _0xae49a1,
+      placement: ['above-end', 'expanded-panel'].includes(_0x2f34bc) ? _0x2f34bc : 'auto-start',
       menuHeight: _0x51008c.offsetHeight || 0x118,
+      onOpenChange: _0x234ee7,
     }),
     _positionSlashMenu(),
     _watchSlashViewport(),
-    _bindSlashOutsideDocClick(_0x51008c));
+    _bindSlashOutsideDocClick(_0x51008c),
+    _0x234ee7?.(true));
 }
 function activateSubMenu(_0x48a4b2, _0x443e34) {
   const _0x2555ab = document.querySelectorAll('.preset-slash-submenu');

@@ -57,6 +57,17 @@ export function logDiagnosticEvent(_0x45f280 = {}) {
     return Promise.resolve({ ok: false });
   }
 }
+export function logDeveloperDiagnosticEvent(
+  _0x4cc3fc = {},
+  { windowObject: windowObject = globalThis.window, logEvent: logEvent = logDiagnosticEvent } = {},
+) {
+  if (windowObject?.AI_CANVAS_IS_DEV_BUILD !== true) return Promise.resolve({ ok: false, skipped: true });
+  try {
+    return Promise.resolve(logEvent(_0x4cc3fc)).catch(() => ({ ok: false }));
+  } catch {
+    return Promise.resolve({ ok: false });
+  }
+}
 export function logPerformanceSnapshot(_0x4bf383 = 'manual') {
   const _0x54b6c4 = String(_0x4bf383 || 'manual').trim() || 'manual';
   return logDiagnosticEvent({

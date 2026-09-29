@@ -1,3 +1,4 @@
+import { createPromptPresetTriggerController } from './promptPresetTrigger.js';
 import {
   RH_AUDIO_ADVANCED_VOICE_CLONE_MODEL_ID,
   RH_AUDIO_ADVANCED_VOICE_CLONE_RUNNINGHUB_MODEL_ID,
@@ -371,3 +372,7 @@ export function attachGenerationNodeHelpTip(
     _0xd8032e._generationNodeHelpTip
   );
 }
+
+const GENERATION_NODE_HELP_ICON_HTML = "<span class=\"generation-node-help-tip-icon\" aria-hidden=\"true\"></span>";
+
+export function attachGenerationNodePromptTools(_0x28b3cf,_0x1b25c1={}){if(!_0x28b3cf||!_0x1b25c1?.["panel"])return null;return _0x28b3cf["_promptPresetTrigger"]?.['remove']?.(),_0x28b3cf["_promptPresetTrigger"]=createPromptPresetTriggerController({'panel':_0x1b25c1["panel"],'getPromptEl':()=>_0x28b3cf["promptEl"],'getNodeType':()=>_0x28b3cf["_data"]?.["type"],'getNodeId':()=>_0x28b3cf["nodeId"],'onGenerate':(_0x418f9c,_0x123812)=>_0x28b3cf['_onGenerate']?.(_0x418f9c,_0x123812)}),attachGenerationNodeHelpTip(_0x28b3cf,_0x1b25c1);}

@@ -709,3 +709,11 @@ export function createModelApiExecutionManifest({
     result: Object.freeze({ taskIdPath: 'taskId', urlFields: Object.freeze(['url', 'imageUrl']) }),
   });
 }
+
+export const APIMART_SEEDREAM_5_PRO_IMAGE_SIZE_FIELD=Object["freeze"]({...IMAGE_SIZE_FIELD,'defaultValue':'2K','options':Object["freeze"]([Object["freeze"]({'value':'1K','label':'1K'}),Object["freeze"]({'value':'2K','label':'2K'})])});
+
+const APIMART_GPT_IMAGE_2_QUALITY_DESCRIPTION='quality\x0a图片质量\x0alow\x20-\x20快速省钱，轮廓够用\x0amedium\x20-\x20平衡\x0ahigh\x20-\x20最高精度（4K\x20+\x20high\x20耗时\x20>120s）';
+
+export const GRSAI_NANO_BANANA_1K_IMAGE_SIZE_FIELD=Object["freeze"]({...IMAGE_SIZE_FIELD,'defaultValue':'1K','options':Object["freeze"]([Object['freeze']({'value':'1K','label':'1K'}),Object["freeze"]({'value':'2K','label':'2K','disabled':!![],'tooltip':"1K only"}),Object["freeze"]({'value':'4K','label':'4K','disabled':!![],'tooltip':'1K\x20only'})])});
+
+export const GRSAI_NANO_BANANA_2K_IMAGE_SIZE_FIELD=Object['freeze']({...IMAGE_SIZE_FIELD,'defaultValue':'2K','options':Object["freeze"]([Object["freeze"]({'value':'1K','label':'1K','disabled':!![],'tooltip':'2K\x20only'}),Object['freeze']({'value':'2K','label':'2K'}),Object["freeze"]({'value':'4K','label':'4K','disabled':!![],'tooltip':"2K only"})])});

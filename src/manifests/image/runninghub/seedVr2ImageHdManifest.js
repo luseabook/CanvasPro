@@ -1,0 +1,83 @@
+import {
+  RH_IMAGE_INSTANCE_FIELD,
+  RUNNINGHUB_INSTANCE_TYPE_ALLOWED_VALUES,
+} from '../../shared/runningHubImageManifestShared.js';
+export const SEED_VR2_IMAGE_HD_MODEL_ID = 'runninghub/2098332624828846082';
+export const SEED_VR2_IMAGE_HD_EXECUTION_ID = 'runninghub.workflow.seedvr2-image-hd.v1';
+export const seedVr2ImageHdModelManifest = Object['freeze']({
+  schemaVersion: '1.0',
+  modelId: SEED_VR2_IMAGE_HD_MODEL_ID,
+  executionId: SEED_VR2_IMAGE_HD_EXECUTION_ID,
+  provider: 'runninghubwf',
+  kind: 'image',
+  adapterType: 'workflow',
+  uiPlacement: ['toolbar'],
+  displayName: 'SeedVR2 高清放大',
+  icon: 'images/RH.png',
+  description: '使用 SeedVR2 将图片高清放大至 2048 或 4096 分辨率',
+  extensions: {
+    providerProfiles: ['runninghub', 'runninghub-international'],
+    imageMenu: { group: 'runninghubWorkflow' },
+    imageHdMenu: { enabled: !![] },
+  },
+  capabilities: { inputKinds: ['image'], outputType: 'image', maxImages: 0x1 },
+  inputSlots: {
+    allowedKinds: ['image'],
+    minByKind: { image: 0x1 },
+    maxByKind: { text: 0x0, image: 0x1, video: 0x0, audio: 0x0 },
+  },
+  uiSchema: {
+    fields: [
+      {
+        id: 'rhResolution',
+        type: 'segmented',
+        variant: 'pillMenu',
+        placement: 'resolution',
+        label: '分辨率',
+        menuTitle: '分辨率',
+        defaultValue: 0x1000,
+        options: [0x800, 0x1000]['map']((_0xa4af2f) => ({
+          value: _0xa4af2f,
+          label: String(_0xa4af2f),
+          selectedLabel: '分辨率' + _0xa4af2f,
+        })),
+      },
+      RH_IMAGE_INSTANCE_FIELD,
+    ],
+  },
+  async: !![],
+  cancellable: !![],
+  outputType: 'image',
+});
+export const seedVr2ImageHdExecutionManifest = Object['freeze']({
+  schemaVersion: '1.0',
+  id: SEED_VR2_IMAGE_HD_EXECUTION_ID,
+  provider: 'runninghubwf',
+  kind: 'image',
+  adapterType: 'workflow',
+  workflowId: '2098332624828846082',
+  appId: '2098332624828846082',
+  extensions: { providerProfileBindings: { 'runninghub-international': { appId: '2098332722527039489' } } },
+  submitMode: 'openapi-v2-ai-app',
+  queryMode: 'openapi-v2-query',
+  instanceType: {
+    field: 'rhInstanceType',
+    defaultValue: 'default',
+    allowedValues: RUNNINGHUB_INSTANCE_TYPE_ALLOWED_VALUES,
+  },
+  mapping: {
+    nodeInfoList: [
+      { nodeId: '52', fieldName: 'image', source: 'imageInput', required: !![], description: '上传图片' },
+      {
+        nodeId: '54',
+        fieldName: 'value',
+        field: 'generationParams.rhResolution',
+        defaultValue: 0x1000,
+        transform: 'integer',
+        description: '放大分辨率',
+      },
+    ],
+  },
+  result: { taskIdPath: 'taskId', urlFields: ['url', 'imageUrl'] },
+  validation: { minInputImages: 0x1, missingInputMessage: '请提供待高清的源图片' },
+});

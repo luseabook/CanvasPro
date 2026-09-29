@@ -88,12 +88,48 @@ const subscriptionGateManifest = {
       modelPrefixes: ['dreamina/'],
     },
     {
+      key: 'audioVoiceStudio',
+      modelId: 'feature/audio_voice_studio',
+      workflowId: '',
+      displayName: '语音工作室',
+      aliases: ['audio_voice_studio', 'voice_studio.pro'],
+      providers: ['aicanvas'],
+      allowAnyActiveSubscription: true,
+    },
+    {
       key: 'replacementStudio',
       modelId: 'feature/replacement_studio',
       workflowId: '',
       displayName: '\u66ff\u6362\u5de5\u4f5c\u5ba4',
       aliases: ['replacement_studio', 'replacement_studio.pro'],
       providers: ['aicanvas'],
+      allowAnyActiveSubscription: true,
+    },
+    {
+      key: 'runninghubAiApp',
+      modelId: 'feature/rh_ai_app',
+      workflowId: '',
+      displayName: 'RH AI应用',
+      aliases: ['rh_ai_app', 'runninghub_ai_app.pro'],
+      modelPrefixes: ['runninghub/ai-app-'],
+      allowAnyActiveSubscription: true,
+    },
+    {
+      key: 'binghuoVideo',
+      modelId: 'feature/binghuo_video',
+      workflowId: '',
+      displayName: '便宜渠道视频',
+      aliases: ['binghuo_video', 'binghuo_video.pro'],
+      providers: ['binghuo'],
+      modelPrefixes: ['binghuo/'],
+      allowAnyActiveSubscription: true,
+    },
+    {
+      key: 'customProvider',
+      modelId: 'feature/custom_provider',
+      workflowId: '',
+      displayName: '自定义中转站',
+      aliases: ['custom_provider', 'custom_provider.pro'],
       allowAnyActiveSubscription: true,
     },
   ],
@@ -113,6 +149,11 @@ function freezeSubscriptionGateEntry(_0x22fe38) {
     key: _0x545bef,
     modelId: String(_0x374a73.modelId || '').trim(),
     workflowId: String(_0x374a73.workflowId || '').trim(),
+    additionalWorkflowIds: Object.freeze(
+      Array.isArray(_0x374a73.additionalWorkflowIds)
+        ? _0x374a73.additionalWorkflowIds.map((_0x3d6c5a) => String(_0x3d6c5a || '').trim()).filter(Boolean)
+        : [],
+    ),
     displayName: String(_0x374a73.displayName || '').trim(),
     aliases: Object.freeze(
       Array.isArray(_0x374a73.aliases)
@@ -203,8 +244,11 @@ export const RH_ADVANCED_VOICE_CLONE_VIP_AI_APP_MODEL_ID = getSubscriptionGateAl
   'ai-app/',
 );
 export const DREAMINA_VIDEO_VIP_MODEL_ID = requireSubscriptionGateModelId('dreaminaVideoVip');
+export const AUDIO_VOICE_STUDIO_VIP_MODEL_ID = requireSubscriptionGateModelId('audioVoiceStudio');
 export const REPLACEMENT_STUDIO_VIP_MODEL_ID =
   requireSubscriptionGateModelId('replacementStudio');
+export const RH_AI_APP_VIP_MODEL_ID = requireSubscriptionGateModelId('runninghubAiApp');
+export const CUSTOM_PROVIDER_VIP_MODEL_ID = requireSubscriptionGateModelId('customProvider');
 export const VIDEO_VIP_MODEL_IDS = Array.from(
   new Set(SUBSCRIPTION_GATE_MANIFESTS.map((_0x5066df) => _0x5066df.modelId)),
 );

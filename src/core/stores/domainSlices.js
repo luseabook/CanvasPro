@@ -23,7 +23,14 @@ const GRAPH_STATE_KEYS = Object.freeze([
     'theme',
     'ui',
   ]),
-  WORKSPACE_STATE_KEYS = Object.freeze(['subscription', 'assets', 'workflows', 'workflowUi']);
+  WORKSPACE_STATE_KEYS = Object.freeze([
+    'subscription',
+    'modelCatalog',
+    'assets',
+    'storyboard3dProjects',
+    'workflows',
+    'workflowUi',
+  ]);
 function pickStateKeys(_0x2d9ef3, _0x24d01a) {
   if (!_0x2d9ef3 || typeof _0x2d9ef3 !== 'object') return {};
   const _0x260614 = {};

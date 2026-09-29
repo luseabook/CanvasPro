@@ -818,3 +818,194 @@ export function getModelsByKind(_0x34ada7) {
 export function listModelManifests() {
   return Array.from(new Set(_models.values()));
 }
+
+const ALLOWED_PROMPT_EMPTY_POLICIES = new Set(['block', 'allowWithInput', 'allow']);
+
+function isAspectRatioUiSchemaField(_0x253d88) {
+  const _0x355260 = normalizeRegistryKey(_0x253d88?.['id'])['toLowerCase'](),
+    _0x29b1bc = normalizeRegistryKey(_0x253d88?.['displayRole'])['toLowerCase'](),
+    _0x28cc1e = normalizeRegistryKey(_0x253d88?.['variant'])['toLowerCase']();
+  return _0x355260 === 'aspectratio' || _0x29b1bc === 'aspectratio' || _0x28cc1e === 'ratiopill';
+}
+
+function getUiSchemaFieldOptions(_0x5ea862) {
+  const _0x10830b = Array['isArray'](_0x5ea862?.['options']) ? _0x5ea862['options'] : [],
+    _0x1bc95b = Array['isArray'](_0x5ea862?.['developerOptions']) ? _0x5ea862['developerOptions'] : [];
+  return [..._0x10830b, ..._0x1bc95b];
+}
+
+function assertPromptConfig(_0x757c93) {
+  if (_0x757c93['prompt'] === undefined || _0x757c93['prompt'] === null) return;
+  assertPlainObject(_0x757c93['prompt'], 'model manifest prompt');
+  if (
+    _0x757c93['prompt']['emptyPolicy'] !== undefined &&
+    _0x757c93['prompt']['emptyPolicy'] !== null &&
+    !ALLOWED_PROMPT_EMPTY_POLICIES['has'](String(_0x757c93['prompt']['emptyPolicy'] || ''))
+  )
+    throw new Error(
+      '[manifest]\x20model\x20manifest\x20' +
+        _0x757c93['modelId'] +
+        ' prompt.emptyPolicy must be one of: ' +
+        Array['from'](ALLOWED_PROMPT_EMPTY_POLICIES)['join'](',\x20'),
+    );
+  if (_0x757c93['prompt']['minLength'] !== undefined && _0x757c93['prompt']['minLength'] !== null) {
+    const _0x3ee75e = Number(_0x757c93['prompt']['minLength']);
+    if (!Number['isInteger'](_0x3ee75e) || _0x3ee75e < 0x0)
+      throw new Error(
+        '[manifest]\x20model\x20manifest\x20' +
+          _0x757c93['modelId'] +
+          ' prompt.minLength must be a non-negative integer',
+      );
+  }
+}
+
+function assertInputPolicyCondition(_0x5c1a5e, _0x590bc9) {
+  if (Array['isArray'](_0x5c1a5e)) {
+    if (_0x5c1a5e['length'] === 0x0)
+      throw new Error('[manifest] ' + _0x590bc9 + '\x20must\x20not\x20be\x20empty');
+    _0x5c1a5e['forEach']((_0x56ccbc, _0x473f40) =>
+      assertInputPolicyCondition(_0x56ccbc, _0x590bc9 + '[' + _0x473f40 + ']'),
+    );
+    return;
+  }
+  assertPlainObject(_0x5c1a5e, _0x590bc9);
+  if (Array['isArray'](_0x5c1a5e['any']) || Array['isArray'](_0x5c1a5e['all'])) {
+    const _0x447dbb = Array['isArray'](_0x5c1a5e['any']) ? 'any' : 'all';
+    assertInputPolicyCondition(_0x5c1a5e[_0x447dbb], _0x590bc9 + '.' + _0x447dbb);
+    return;
+  }
+  if (!normalizeRegistryKey(_0x5c1a5e['field'] ?? _0x5c1a5e['param']))
+    throw new Error('[manifest] ' + _0x590bc9 + '\x20must\x20declare\x20field\x20or\x20param');
+  if (_0x5c1a5e['value'] === undefined && _0x5c1a5e['values'] === undefined)
+    throw new Error('[manifest]\x20' + _0x590bc9 + ' must declare value or values');
+}
+
+function assertInputPolicyExtensions(_0x184ec4) {
+  const _0x3a47f7 = _0x184ec4['inputSlots'];
+  if (
+    _0x3a47f7['preserveHiddenInputsByKind'] !== undefined &&
+    typeof _0x3a47f7['preserveHiddenInputsByKind'] !== 'boolean'
+  )
+    throw new Error('[manifest] model manifest inputSlots.preserveHiddenInputsByKind must be a boolean');
+  const _0x3e1317 = _0x3a47f7['preserveHiddenInputsByKindFields'];
+  if (
+    _0x3e1317 !== undefined &&
+    (!Array['isArray'](_0x3e1317) ||
+      _0x3e1317['length'] === 0x0 ||
+      _0x3e1317['some']((_0x26e8d9) => !String(_0x26e8d9 || '')['trim']()))
+  )
+    throw new Error(
+      '[manifest]\x20model\x20manifest\x20inputSlots.preserveHiddenInputsByKindFields\x20must\x20be\x20a\x20non-empty\x20string\x20array',
+    );
+  if (Array['isArray'](_0x3e1317) && _0x3a47f7['preserveHiddenInputsByKind'] !== !![])
+    throw new Error(
+      '[manifest] model manifest inputSlots.preserveHiddenInputsByKindFields requires preserveHiddenInputsByKind',
+    );
+  const _0x59a309 = _0x3a47f7['policyVariants'] || [];
+  if (_0x59a309 && !Array['isArray'](_0x59a309))
+    throw new Error('[manifest] model manifest inputSlots.policyVariants must be an array');
+  (_0x59a309 || [])['forEach']((_0x5966f6, _0xc28623) => {
+    const _0x91cb01 = 'model manifest inputSlots.policyVariants[' + _0xc28623 + ']';
+    (assertPlainObject(_0x5966f6, _0x91cb01),
+      assertInputPolicyCondition(_0x5966f6['when'], _0x91cb01 + '.when'));
+    if (_0x5966f6['allowedKinds'] !== undefined && !Array['isArray'](_0x5966f6['allowedKinds']))
+      throw new Error('[manifest] ' + _0x91cb01 + '.allowedKinds must be an array');
+    if (_0x5966f6['maxByKind'] !== undefined && !isPlainObject(_0x5966f6['maxByKind']))
+      throw new Error('[manifest] ' + _0x91cb01 + '.maxByKind must be an object');
+    Object['entries'](_0x5966f6['maxByKind'] || {})['forEach'](([_0x1a287d, _0x17c907]) => {
+      const _0x1b6e19 = Number(_0x17c907);
+      if (!Number['isFinite'](_0x1b6e19) || _0x1b6e19 < 0x0)
+        throw new Error(
+          '[manifest]\x20' + _0x91cb01 + '.maxByKind.' + _0x1a287d + ' must be a non-negative number',
+        );
+    });
+  });
+  const _0x229592 = _0x3a47f7['mediaConstraintsByKind'] || {};
+  if (_0x229592 && !isPlainObject(_0x229592))
+    throw new Error('[manifest] model manifest inputSlots.mediaConstraintsByKind must be an object');
+  Object['entries'](_0x229592 || {})['forEach'](([_0x584ebc, _0x17f505]) => {
+    const _0x543c18 = 'model manifest inputSlots.mediaConstraintsByKind.' + _0x584ebc;
+    (assertPlainObject(_0x17f505, _0x543c18),
+      ['minDurationSeconds', 'maxDurationSeconds', 'maxBytes']['forEach']((_0x3fccc1) => {
+        if (_0x17f505[_0x3fccc1] === undefined) return;
+        const _0x175c6f = Number(_0x17f505[_0x3fccc1]);
+        if (!Number['isFinite'](_0x175c6f) || _0x175c6f <= 0x0)
+          throw new Error('[manifest] ' + _0x543c18 + '.' + _0x3fccc1 + ' must be positive');
+      }));
+    if (
+      _0x17f505['minDurationSeconds'] !== undefined &&
+      _0x17f505['maxDurationSeconds'] !== undefined &&
+      Number(_0x17f505['minDurationSeconds']) > Number(_0x17f505['maxDurationSeconds'])
+    )
+      throw new Error(
+        '[manifest] ' + _0x543c18 + '.minDurationSeconds\x20cannot\x20exceed\x20maxDurationSeconds',
+      );
+    if (
+      _0x17f505['allowedExtensions'] !== undefined &&
+      (!Array['isArray'](_0x17f505['allowedExtensions']) ||
+        _0x17f505['allowedExtensions']['some']((_0x4f6303) => !String(_0x4f6303 || '')['trim']()))
+    )
+      throw new Error('[manifest] ' + _0x543c18 + '.allowedExtensions must be an array of non-empty strings');
+  });
+}
+
+function assertManifestBundle(_0x3bd194) {
+  (assertPlainObject(_0x3bd194, 'manifest bundle'),
+    assertPlainData(_0x3bd194, 'manifest bundle'),
+    assertRequiredFields(_0x3bd194, ['sourceId'], 'manifest bundle'));
+  if (!normalizeRegistryKey(_0x3bd194['sourceId']))
+    throw new Error('[manifest] manifest bundle sourceId must be non-empty');
+  if (!Array['isArray'](_0x3bd194['models']))
+    throw new TypeError('[manifest] manifest bundle.models must be an array');
+  if (!Array['isArray'](_0x3bd194['executions']))
+    throw new TypeError('[manifest] manifest bundle.executions must be an array');
+  const _0x1d7c59 = _0x3bd194['executions'],
+    _0x47741a = _0x3bd194['models'];
+  (_0x1d7c59['forEach'](validateExecutionManifest),
+    _0x47741a['forEach'](validateModelManifest),
+    assertRegistryKeysAvailable(_0x1d7c59, _executions, 'id', 'execution\x20manifest'));
+  const _0x557610 = buildManifestKeyMap(_0x1d7c59, 'id', 'execution manifest');
+  return (
+    assertRegistryKeysAvailable(_0x47741a, _models, 'modelId', 'model manifest'),
+    assertBundleModelExecutionLinks(_0x47741a, _0x557610),
+    { executions: _0x1d7c59, models: _0x47741a }
+  );
+}
+
+export function validateManifestBundle(_0x4842b2) {
+  return (assertManifestBundle(_0x4842b2), !![]);
+}
+
+function removeManifestFromRegistry(_0x489574, _0x4b614c, _0x331eaf, _0x341783) {
+  const _0x392bfa = String(_0x489574?.[_0x331eaf] || '')['trim']();
+  if (!_0x392bfa) return;
+  getManifestRegistryKeys(_0x489574, _0x331eaf, _0x341783)['forEach']((_0x134a7f) => {
+    const _0xbea582 = _0x4b614c['get'](_0x134a7f);
+    String(_0xbea582?.[_0x331eaf] || '')['trim']() === _0x392bfa && _0x4b614c['delete'](_0x134a7f);
+  });
+}
+
+export function unregisterManifestBundle(_0x218062) {
+  const _0x5be94d = Array['isArray'](_0x218062?.['executions']) ? _0x218062['executions'] : [],
+    _0x171d6c = Array['isArray'](_0x218062?.['models']) ? _0x218062['models'] : [];
+  return (
+    _0x5be94d['forEach']((_0x24d39b) =>
+      removeManifestFromRegistry(_0x24d39b, _executions, 'id', 'execution\x20manifest'),
+    ),
+    _0x171d6c['forEach']((_0x558e34) =>
+      removeManifestFromRegistry(_0x558e34, _models, 'modelId', 'model manifest'),
+    ),
+    !![]
+  );
+}
+
+function resolveUniqueModelDisplayName(_0x1f7c87, _0x3d2c10 = '') {
+  const _0x2fadaf = normalizeRegistryKey(_0x1f7c87)['toLowerCase'](),
+    _0x88270e = normalizeProviderId(_0x3d2c10);
+  if (!_0x2fadaf) return null;
+  const _0x1805b4 = Array['from'](new Set(_models['values']()))['filter']((_0x351cf6) => {
+    if (normalizeRegistryKey(_0x351cf6?.['displayName'])['toLowerCase']() !== _0x2fadaf) return ![];
+    return !_0x88270e || normalizeProviderId(_0x351cf6?.['provider']) === _0x88270e;
+  });
+  return _0x1805b4['length'] === 0x1 ? _0x1805b4[0x0] : null;
+}

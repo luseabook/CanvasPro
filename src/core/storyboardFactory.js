@@ -177,3 +177,31 @@ export function buildStoryboardNodePayload({
     ..._0x50d94d,
   };
 }
+export const STORYBOARD_EMPTY_GRID_DEFAULTS = Object.freeze({ cols: 3, rows: 3, aspectRatio: '1:1' });
+
+export function createEmptyStoryboardNodeData({
+  id: _0x1fd928,
+  name: name = '宫格图',
+  x: x = 0,
+  y: y = 0,
+  width: width = 900,
+  height: height = 900,
+  cols: cols = STORYBOARD_EMPTY_GRID_DEFAULTS.cols,
+  rows: rows = STORYBOARD_EMPTY_GRID_DEFAULTS.rows,
+  aspectRatio: aspectRatio = STORYBOARD_EMPTY_GRID_DEFAULTS.aspectRatio,
+  isEditing: isEditing = false,
+} = {}) {
+  return buildStoryboardNodePayload({
+    id: _0x1fd928,
+    name: name,
+    x: x,
+    y: y,
+    width: width,
+    height: height,
+    cols: cols,
+    rows: rows,
+    aspectRatio: aspectRatio,
+    isEditing: isEditing,
+    cells: buildQuickCreateStoryboardCells({ cols: cols, rows: rows, imageRef: '' }),
+  });
+}

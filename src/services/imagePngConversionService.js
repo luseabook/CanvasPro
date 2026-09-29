@@ -28,6 +28,23 @@ function inferImageMimeTypeFromUrl(_0x4bd419) {
 function resolveImageMimeType(_0x4228f0, _0x52257a) {
   return normalizeImageMimeType(_0x4228f0?.type) || inferImageMimeTypeFromUrl(_0x52257a);
 }
+function bytesToBase64(_0x1ecbf1) {
+  if (typeof Buffer !== 'undefined') return Buffer.from(_0x1ecbf1).toString('base64');
+  let _0x1f95bb = '';
+  const _0x13f5f2 = 0x8000;
+  for (let _0x1ede5b = 0; _0x1ede5b < _0x1ecbf1.length; _0x1ede5b += _0x13f5f2) {
+    _0x1f95bb += String.fromCharCode(..._0x1ecbf1.subarray(_0x1ede5b, _0x1ede5b + _0x13f5f2));
+  }
+  return typeof btoa === 'function' ? btoa(_0x1f95bb) : '';
+}
+async function convertImageBlobToDataUrl(_0x2431f6, _0x5abb86 = '') {
+  if (!isBlobLike(_0x2431f6)) return '';
+  const _0x4435d0 = new Uint8Array(await _0x2431f6.arrayBuffer()),
+    _0x125668 = bytesToBase64(_0x4435d0);
+  if (!_0x125668) return '';
+  const _0x564139 = resolveImageMimeType(_0x2431f6, _0x5abb86) || 'image/png';
+  return 'data:' + _0x564139 + ';base64,' + _0x125668;
+}
 function hasDomCanvasRuntime() {
   return (
     typeof document !== 'undefined' &&
@@ -114,6 +131,8 @@ async function convertImageUrlToPngBlob(_0x46c01e) {
   }
 }
 export {
+  bytesToBase64,
+  convertImageBlobToDataUrl,
   convertImageBlobToPngBlob,
   convertImageUrlToPngBlob,
   inferImageMimeTypeFromUrl,

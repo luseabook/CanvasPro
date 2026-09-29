@@ -1,3 +1,5 @@
+import { hasImageDerivativeFields } from '../src/services/imageDerivativeService.js';
+import { buildCanvasLocalImageFields } from '../src/services/canvasMediaLocalService.js';
 import { requester } from './requester.js';
 import { runTaskSingleFlight } from './taskSingleFlight.js';
 import {
@@ -875,3 +877,15 @@ export async function runDreaminaVideoGeneration(_0x8eea56, _0x4d389d = {}) {
     localPath: _0x57aad8[0]?.localPath || '',
   };
 }
+
+function normalizeDreaminaGenerateNum(_0xe33ec9={}){const _0xa2c08f=_0xe33ec9?.['generateNum']??_0xe33ec9?.["generate_num"]??_0xe33ec9?.['batchSize']??0x1,_0x2dc4d2=Number["parseInt"](_0xa2c08f,0xa);if(!Number['isFinite'](_0x2dc4d2))return 0x1;return Math["max"](0x1,Math["min"](0xa,_0x2dc4d2));}
+
+export async function submitDreaminaImageUpscale(_0x32d50d){return postJson('/api/v2/dreamina/image_upscale',_0x32d50d);}
+
+function getDreaminaImageUpscaleInputImage(_0x67383a={}){const _0x480220=String(_0x67383a?.["inputUrlsBySlot"]?.["image"]||'')["trim"]();if(_0x480220)return _0x480220;const _0x31868e=String(_0x67383a?.["image"]||_0x67383a?.["imageUrl"]||_0x67383a?.["inputImage"]||'')["trim"]();if(_0x31868e)return _0x31868e;const _0x4e4b5f=Array["isArray"](_0x67383a?.["inputUrls"])?_0x67383a["inputUrls"]:[];return String(_0x4e4b5f["find"](_0x1f0800=>String(_0x1f0800||'')["trim"]())||'')["trim"]();}
+
+function normalizeDreaminaImageUpscaleResolution(_0x1cb1ac={}){const _0x39cc60=normalizeResolutionType(_0x1cb1ac?.["resolutionType"]??_0x1cb1ac?.["resolution_type"]??_0x1cb1ac?.["imageSize"]);if(_0x39cc60==='4k'||_0x39cc60==='8k')return _0x39cc60;return'2k';}
+
+export function buildDreaminaImageUpscaleSubmitPayload(_0x4f3a8c={}){const _0x4b3d04=getDreaminaImageUpscaleInputImage(_0x4f3a8c);if(!_0x4b3d04)throw new Error("即梦图片超清/放大需要 1 张输入图片");return{'image':_0x4b3d04,'resolutionType':normalizeDreaminaImageUpscaleResolution(_0x4f3a8c)};}
+
+export async function runDreaminaImageUpscaleGeneration(_0x345db4,_0x299d10={}){const _0x2ec188=await submitDreaminaImageUpscale(buildDreaminaImageUpscaleSubmitPayload(_0x345db4));if(_0x2ec188?.["success"]===![])throw new Error(normalizeDreaminaErrorMessage(_0x2ec188?.["message"])||"即梦图片超清/放大任务提交失败");const _0x3875bf=String(_0x2ec188?.["submitId"]||'')["trim"]();if(!_0x3875bf)throw new Error("即梦图片超清/放大任务提交失败：未返回 submitId");_0x299d10?.["onTaskMeta"]?.({'taskId':_0x3875bf,'submitId':_0x3875bf,'provider':"dreamina",'kind':"image"}),_0x299d10?.["onTaskId"]?.(_0x3875bf);const _0x5aa8ba=await pollDreaminaUntilDone(_0x3875bf,{..._0x299d10,'taskKind':'image'}),_0x541e60=normalizeDreaminaTaskSnapshot(_0x5aa8ba,{'submitId':_0x3875bf});if(_0x541e60?.["phase"]==="failed")throw new Error(normalizeDreaminaErrorMessage(_0x541e60?.["failReason"])||"即梦图片超清/放大失败");const _0x2ff480=Array["isArray"](_0x541e60?.["outputs"])?_0x541e60["outputs"]:[];if(!_0x2ff480["length"])throw new Error('即梦图片超清/放大完成，但没有可用输出');return _0x2ff480["map"](_0x494da0=>{const _0x394730=_0x494da0["localUrl"]||_0x494da0["url"];return{'sourceId':null,'thumbId':null,'sourceUrl':_0x494da0["url"]||_0x394730,'thumbUrl':_0x394730,'imageUrl':_0x394730,'localPath':_0x494da0["localPath"]||'',...hasImageDerivativeFields(_0x494da0)?buildCanvasLocalImageFields(_0x494da0):{}};});}

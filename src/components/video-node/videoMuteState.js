@@ -6,3 +6,12 @@ export function buildVideoMutedPatch(_0x5b8e73 = {}, _0x23225f) {
   const _0x131dc9 = !!_0x23225f;
   return _0x5b8e73?.[VIDEO_MUTED_FIELD] === _0x131dc9 ? null : { [VIDEO_MUTED_FIELD]: _0x131dc9 };
 }
+export function readVideoAudioDefaultEnabledFromStore(_0x27d6ec) {
+  try {
+    const _0x7b58b1 =
+      typeof _0x27d6ec?.getStateRaw === 'function' ? _0x27d6ec.getStateRaw() : _0x27d6ec?.getState?.();
+    return _0x7b58b1?.ui?.videoAudioDefaultEnabled === true;
+  } catch {
+    return false;
+  }
+}

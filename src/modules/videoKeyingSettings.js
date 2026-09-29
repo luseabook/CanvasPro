@@ -1,3 +1,4 @@
+import { resolveRunningHubWorkflowAccess } from '../../api/configApi.js';
 import appStore from '../core/stores/appStore.js';
 import { ensureConfig, getProviderConfig } from '../../api/configApi.js';
 const RH_KEYING_FPS_OPTIONS = Object.freeze([16, 24, 30]);
@@ -37,3 +38,5 @@ export async function getRunningHubWorkflowApiKey() {
   const _0x11b52e = getProviderConfig('runninghubwf');
   return String(_0x11b52e?.apiKey || '').trim();
 }
+
+export async function getRunningHubWorkflowAccess(_0x3a9eb1=''){return resolveRunningHubWorkflowAccess(_0x3a9eb1);}

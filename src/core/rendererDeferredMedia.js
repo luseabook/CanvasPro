@@ -1,10 +1,42 @@
+import { resolveRendererLowZoomMountLimit } from './rendererVirtualization.js';
+import { isNodeType } from '../modules/registry.js';
 export const RENDERER_DEFER_MEDIA_ON_MOUNT_FLAG = '__rendererDeferMediaOnMount';
+export const RENDERER_DEFER_DETAILS_ON_MOUNT_FLAG = '__rendererDeferDetailsOnMount';
+export const RENDERER_EAGER_VIDEO_PREVIEW_ON_MOUNT_FLAG = '__rendererEagerVideoPreviewOnMount';
+export const RENDERER_PREBUILD_OFFSCREEN_FLAG = '__rendererPrebuildOffscreen';
 export function shouldDeferRendererMediaOnMount(_0x59bda8 = {}) {
   return _0x59bda8?.[RENDERER_DEFER_MEDIA_ON_MOUNT_FLAG] === true;
 }
 export function withRendererDeferredMediaHint(_0x560257 = {}, _0x5d968b = false) {
   if (!_0x5d968b) return _0x560257;
   return { ...(_0x560257 || {}), [RENDERER_DEFER_MEDIA_ON_MOUNT_FLAG]: true };
+}
+export function shouldDeferRendererDetailsOnMount(_0x44c2b1 = {}) {
+  return _0x44c2b1?.[RENDERER_DEFER_DETAILS_ON_MOUNT_FLAG] === true;
+}
+export function shouldUseRendererEagerVideoPreviewOnMount(_0x323a80 = {}) {
+  return _0x323a80?.[RENDERER_EAGER_VIDEO_PREVIEW_ON_MOUNT_FLAG] === true;
+}
+export function shouldPrebuildRendererRuntimeOffscreen(_0x947d1b = {}) {
+  return _0x947d1b?.[RENDERER_PREBUILD_OFFSCREEN_FLAG] === true;
+}
+export function withRendererDeferredMountHints(
+  _0x4d6f46 = {},
+  {
+    deferMedia: deferMedia = false,
+    deferDetails: deferDetails = false,
+    eagerVideoPreview: eagerVideoPreview = false,
+    prebuildOffscreen: prebuildOffscreen = false,
+  } = {},
+) {
+  if (!deferMedia && !deferDetails && !eagerVideoPreview && !prebuildOffscreen) return _0x4d6f46;
+  return {
+    ...(_0x4d6f46 || {}),
+    ...(deferMedia ? { [RENDERER_DEFER_MEDIA_ON_MOUNT_FLAG]: true } : {}),
+    ...(deferDetails ? { [RENDERER_DEFER_DETAILS_ON_MOUNT_FLAG]: true } : {}),
+    ...(eagerVideoPreview ? { [RENDERER_EAGER_VIDEO_PREVIEW_ON_MOUNT_FLAG]: true } : {}),
+    ...(prebuildOffscreen ? { [RENDERER_PREBUILD_OFFSCREEN_FLAG]: true } : {}),
+  };
 }
 const DEFAULT_MEDIA_HYDRATION_BATCH_SIZE = 6,
   DEFAULT_MEDIA_HYDRATION_RETRY_MS = 120,
@@ -95,3 +127,18 @@ export function createRendererDeferredMediaController({
     getQueuedCount: () => _0x33b600.size,
   };
 }
+
+const MAX_VISIBLE_AUDIO_WARMUP_COUNT=0x4;
+
+export function shouldActivateRendererMediaHoverPlayback({viewport:_0x26178e,nodeCount:nodeCount=0x0,isSelected:isSelected=![]}={}){if(isSelected===!![])return!![];return resolveRendererLowZoomMountLimit({'viewport':_0x26178e,'nodeCount':nodeCount})<=0x0;}
+
+export function scheduleRendererVisibleAudioSurfaceHydration({node:_0x317480,nodeId:_0x47bd07,isVisible:_0x4dff28,isSelected:_0x1728e8,viewport:_0x4bd8fb,nodeCount:_0x49bfa,visibleAudioRank:visibleAudioRank=0x1,component:_0x415c0a,deferredMedia:_0x138f42}={}){if(!_0x47bd07)return![];if(!isNodeType(_0x317480,["source-audio","ai-audio",'audio']))return![];_0x415c0a?.['setRendererAudioSurfaceVisible']?.(_0x4dff28===!![]);if(_0x4dff28!==!![])return![];if(_0x1728e8!==!![]&&(resolveRendererLowZoomMountLimit({'viewport':_0x4bd8fb,'nodeCount':_0x49bfa})>0x0||Number(visibleAudioRank)>MAX_VISIBLE_AUDIO_WARMUP_COUNT))return![];if(_0x415c0a?.["prepareRendererVisibleAudioSurface"]?.()!==!![])return![];if(_0x1728e8)_0x138f42?.["hydrateNow"]?.(_0x47bd07);else _0x138f42?.['enqueue']?.(_0x47bd07,{'urgent':!![]});return!![];}
+
+export function createRendererVisibleAudioSurfaceHydrationPass({viewport:_0x59b5be,nodeCount:_0x191476,deferredMedia:_0x2b28bb}={}){let _0x3f18f5=0x0;return({node:_0x547ebb,nodeId:_0x41aa33,isVisible:_0x51797c,isSelected:_0x577997,component:_0x3baf01}={})=>{const _0x571b7b=_0x577997!==!![]&&_0x51797c===!![]&&isNodeType(_0x547ebb,["source-audio","ai-audio","audio"])?_0x3f18f5+=0x1:0x1;return scheduleRendererVisibleAudioSurfaceHydration({'node':_0x547ebb,'nodeId':_0x41aa33,'isVisible':_0x51797c,'isSelected':_0x577997,'viewport':_0x59b5be,'nodeCount':_0x191476,'visibleAudioRank':_0x571b7b,'component':_0x3baf01,'deferredMedia':_0x2b28bb});};}
+
+const DEFAULT_VIDEO_HYDRATION_BATCH_SIZE = 0x1;
+const VIDEO_MEDIA_NODE_TYPES = new Set(["source-video",'ai-video',"video"]);
+
+function getDeferredMediaComponentType(_0xd4883){return String(_0xd4883?.["_data"]?.["type"]||_0xd4883?.["nodeData"]?.["type"]||_0xd4883?.["data"]?.["type"]||'')["trim"]()['toLowerCase']();}
+
+function isDeferredVideoMediaComponent(_0x4b5ea1){return VIDEO_MEDIA_NODE_TYPES["has"](getDeferredMediaComponentType(_0x4b5ea1));}

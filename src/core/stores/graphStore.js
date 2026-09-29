@@ -1,6 +1,7 @@
 import { selectGraphState } from './domainSlices.js';
 const GRAPH_ACTION_NAMES = Object.freeze([
   'batch',
+  'subscribeNodeField',
   'requestRender',
   'invalidateUi',
   'addNode',

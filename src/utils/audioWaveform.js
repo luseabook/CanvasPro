@@ -223,3 +223,21 @@ export async function getWaveformBarsPathFromUrl(
   if (_0x4a2e06) _cache.set(_0x24fa58, _0x4a2e06);
   return _0x4a2e06;
 }
+
+const _decodeQueue = [];
+
+let _activeDecodes=0x0;
+
+const MAX_CONCURRENT_AUDIO_DECODES=0x2,MAX_WAVEFORM_PATHS=0x100;
+
+function _cachePath(_0x344f86,_0x5bd645,_0x604d2b=0x0){if(!_0x5bd645)return;_cache["delete"](_0x344f86),_cache['set'](_0x344f86,{'path':_0x5bd645,'duration':Number["isFinite"](_0x604d2b)&&_0x604d2b>0x0?_0x604d2b:0x0});while(_cache["size"]>MAX_WAVEFORM_PATHS)_cache["delete"](_cache["keys"]()["next"]()['value']);}
+
+function _readWaveformResult(_0x19e66d,_0x542670){const _0x25ada0=Number(_0x19e66d?.["duration"]);if(Number['isFinite'](_0x25ada0)&&_0x25ada0>0x0)_0x542670?.(_0x25ada0);return _0x19e66d?.['path']||'';}
+
+function _queueAudioDecode(_0xd3d906,_0x3bce7e){return new Promise(_0x5c1029=>{const _0x1a520e=()=>{const _0x322b42=_decodeQueue["indexOf"](_0x4f84f2);_0x322b42>=0x0&&(_decodeQueue['splice'](_0x322b42,0x1),_0x5c1029(null));},_0x4f84f2=async()=>{_0x3bce7e?.["removeEventListener"]("abort",_0x1a520e),_activeDecodes+=0x1;try{_0x5c1029(_0x3bce7e?.['aborted']?null:await _0xd3d906());}catch{_0x5c1029(null);}finally{_activeDecodes-=0x1;while(_activeDecodes<MAX_CONCURRENT_AUDIO_DECODES&&_decodeQueue['length']){void _decodeQueue['shift']()();}}};if(_0x3bce7e?.["aborted"])return _0x5c1029(null);if(_activeDecodes<MAX_CONCURRENT_AUDIO_DECODES)void _0x4f84f2();else _decodeQueue["push"](_0x4f84f2),_0x3bce7e?.["addEventListener"]("abort",_0x1a520e,{'once':!![]});});}
+
+function _createDecodedAudioBufferJob(_0x5e28fd,_0xebc4b2){const _0x47bfc4=typeof AbortController==="function"?new AbortController():null,_0x4e349c={'consumers':0x0,'controller':_0x47bfc4,'settled':![],'promise':null};return _0x4e349c["promise"]=_queueAudioDecode(async()=>{let _0x37d8de;try{const _0x3600e8=await fetchRemoteBlob(_0x5e28fd,{'signal':_0x47bfc4?.["signal"]});_0x37d8de=await _0x3600e8['arrayBuffer']();}catch{return null;}if(!_0x37d8de||_0x47bfc4?.['signal']?.["aborted"])return null;try{const _0x13a3c7=await _decodeAudioData(_0xebc4b2,_0x37d8de);return _0x47bfc4?.["signal"]?.["aborted"]?null:_0x13a3c7||null;}catch{return null;}},_0x47bfc4?.["signal"])['finally'](()=>{_0x4e349c['settled']=!![];if(_bufferInflight['get'](_0x5e28fd)===_0x4e349c)_bufferInflight['delete'](_0x5e28fd);}),_bufferInflight["set"](_0x5e28fd,_0x4e349c),_0x4e349c;}
+
+async function _waitForDecodedAudioBufferJob(_0x204d39,_0x2ea34e){if(!_0x204d39||_0x2ea34e?.["aborted"])return null;_0x204d39["consumers"]+=0x1;let _0x208543=![],_0x357c4d=null;const _0x4463ff=_0x2ea34e?new Promise(_0x1877d4=>{_0x357c4d=()=>{_0x208543=!![],_0x1877d4(null);},_0x2ea34e["addEventListener"]('abort',_0x357c4d,{'once':!![]});}):null;try{return await(_0x4463ff?Promise['race']([_0x204d39["promise"],_0x4463ff]):_0x204d39["promise"]);}finally{if(_0x2ea34e&&_0x357c4d)_0x2ea34e["removeEventListener"]("abort",_0x357c4d);_0x204d39["consumers"]=Math["max"](0x0,_0x204d39["consumers"]-0x1),_0x208543&&!_0x204d39['settled']&&_0x204d39['consumers']===0x0&&_0x204d39["controller"]?.["abort"]();}}
+
+export async function getAudioNodeWaveformPath(_0x70e66f,_0x599619,_0x9fc9d={}){if(_0x9fc9d["signal"]?.["aborted"])return'';const _0x3db722=JSON["stringify"](['audio-node',_0x70e66f,_0x599619,_0x9fc9d["width"],_0x9fc9d["height"],_0x9fc9d["samples"]]),_0x19a0e0=_cache["get"](_0x3db722);if(_0x19a0e0&&(_0x19a0e0['duration']>0x0||!_0x9fc9d["onDuration"]))return _readWaveformResult(_0x19a0e0,_0x9fc9d["onDuration"]);const _0x486963=_0x599619?await getWaveformBarsPathFromPersistedUrl(_0x599619,_0x9fc9d):'';if(_0x9fc9d["signal"]?.['aborted'])return'';let _0x9be4bb=0x0;if(_0x486963){_0x9fc9d['onDuration']&&(_0x9be4bb=await getAudioDurationFromUrl(_0x70e66f,{'signal':_0x9fc9d['signal'],'cacheBuffer':![]}));if(_0x9fc9d["signal"]?.["aborted"])return'';return _cachePath(_0x3db722,_0x486963,_0x9be4bb),_readWaveformResult({'path':_0x486963,'duration':_0x9be4bb},_0x9fc9d["onDuration"]);}const _0x3a1074=await getWaveformBarsPathFromUrl(_0x70e66f,{..._0x9fc9d,'cacheBuffer':![],'onDuration':_0x4d839d=>{_0x9be4bb=_0x4d839d;}});if(_0x9fc9d['signal']?.["aborted"])return'';return _cachePath(_0x3db722,_0x3a1074,_0x9be4bb),_readWaveformResult({'path':_0x3a1074,'duration':_0x9be4bb},_0x9fc9d["onDuration"]);}

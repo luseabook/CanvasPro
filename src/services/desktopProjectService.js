@@ -2,6 +2,7 @@ import { loadProject, resolveCanvasData, saveProject } from './projectService.js
 import { sanitizeMultiCanvasDataForPersistence } from '../utils/thumbnailPersistence.js';
 import { requireOpenedProjectDocument } from './projectDocumentGuard.js';
 import { captureRecoverySnapshotBeforeSave, clearRecoverySnapshotAfterSave } from './recoverySnapshotSaveGuard.js';
+import { discardStagedProjectPackage, stageProjectPackageFile } from '../../api/projectPackageApi.js';
 function getDesktopProjectApi() {
   const _0x257dc7 = globalThis.window?.electronAPI?.project;
   if (!_0x257dc7 || typeof _0x257dc7 !== 'object') return null;
@@ -98,4 +99,48 @@ export async function removeDesktopRecentProject(_0x36f495) {
 }
 export async function loadProjectWithFallback(_0x22938c) {
   return await loadProject(_0x22938c);
+}
+export async function exportDesktopWorkspaceProjectPackage({
+  projectType: _0x1ea9c8,
+  projectId: projectId = '',
+  projectName: projectName = '',
+  projectData: _0xc59d78,
+  operationId: operationId = '',
+} = {}) {
+  const _0x24d844 = getDesktopProjectApi();
+  if (!_0x24d844 || typeof _0x24d844['exportPackage'] !== 'function')
+    throw new Error('Electron project package export API is unavailable');
+  return await _0x24d844['exportPackage']({
+    projectType: _0x1ea9c8,
+    projectId: projectId,
+    projectName: projectName,
+    projectData: _0xc59d78,
+    operationId: operationId,
+  });
+}
+
+export async function importDesktopWorkspaceProjectPackage(_0x1be661 = {}) {
+  const _0x41e391 = getDesktopProjectApi();
+  if (!_0x41e391 || typeof _0x41e391['importPackage'] !== 'function')
+    throw new Error('Electron project package import API is unavailable');
+  let _0x40470d = null;
+  try {
+    let _0x5cafe1 = String(_0x1be661['path'] || '')['trim']();
+    !_0x5cafe1 &&
+      _0x1be661['file'] &&
+      ((_0x40470d = await stageProjectPackageFile(_0x1be661['file'], { signal: _0x1be661['signal'] })),
+      (_0x5cafe1 = _0x40470d['path']));
+    const _0x45f061 = await _0x41e391['importPackage']({
+      path: _0x5cafe1,
+      operationId: _0x1be661['operationId'] || '',
+    });
+    return _0x45f061;
+  } finally {
+    if (_0x40470d?.['stageId'])
+      try {
+        await discardStagedProjectPackage(_0x40470d['stageId']);
+      } catch (_0x5bc729) {
+        console['warn']('[desktopProjectService] 清理暂存项目包失败:', _0x5bc729);
+      }
+  }
 }

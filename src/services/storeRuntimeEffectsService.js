@@ -10,16 +10,28 @@ import {
   normalizeVideoToolbarLayout,
   serializeVideoToolbarLayout,
 } from '../modules/videoToolbarLayoutMemory.js';
+import { normalizeCanvasToolbarPlacement } from '../modules/canvasToolbarPlacement.js';
+import { normalizeNodeManagerPlacement } from '../modules/nodeManager/nodeManagerPlacement.js';
+import { readViewportInteractionState } from '../core/viewportInteractionState.js';
+import { normalizeConnectionLineStyle } from '../core/edgePathGeometry.js';
 const THEME_STORAGE_KEY = 'ai-canvas-theme',
   SHOW_VIDEO_META_STORAGE_KEY = 'v2-show-video-meta',
+  SHOW_SELECTION_MEDIA_PROPERTIES_STORAGE_KEY = 'v2-show-selection-media-properties',
   TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY = 'v2-title-follows-canvas-zoom',
   PROMPT_BOX_RESIZE_ENABLED_STORAGE_KEY = 'v2-prompt-box-resize-enabled',
   PROMPT_ENTER_BEHAVIOR_STORAGE_KEY = 'v2-prompt-enter-behavior',
   PROMPT_ATTACHMENT_BUTTON_HIDDEN_STORAGE_KEY = 'v2-prompt-attachment-button-hidden',
+  PROMPT_PRESET_BUTTON_HIDDEN_STORAGE_KEY = 'v2-prompt-preset-button-hidden',
+  VIDEO_AUDIO_DEFAULT_ENABLED_STORAGE_KEY = 'v2-video-audio-default-enabled',
+  CANVAS_TOOLBAR_PLACEMENT_STORAGE_KEY = 'v2-canvas-toolbar-placement',
+  NODE_MANAGER_PLACEMENT_STORAGE_KEY = 'v2-node-manager-placement',
+  LEFT_SIDEBAR_AUTO_HIDE_STORAGE_KEY = 'v2-left-sidebar-auto-hide',
+  BOTTOM_LEFT_BAR_AUTO_HIDE_STORAGE_KEY = 'v2-bottom-left-bar-auto-hide',
   IMAGE_VIDEO_NODE_RESIZE_ENABLED_STORAGE_KEY = 'v2-image-video-node-resize-enabled',
   SELECTION_RELATED_HIGHLIGHT_ENABLED_STORAGE_KEY = 'v2-selection-related-highlight-enabled',
   SELECTION_RELATED_HIGHLIGHT_COLOR_STORAGE_KEY = 'v2-selection-related-highlight-color',
   CONNECTION_LINES_VISIBLE_STORAGE_KEY = 'v2-connection-lines-visible',
+  CONNECTION_LINE_STYLE_STORAGE_KEY = 'v2-connection-line-style',
   IMAGE_TOOLBAR_LAYOUT_STORAGE_KEY = 'v2-image-toolbar-layout',
   VIDEO_TOOLBAR_LAYOUT_STORAGE_KEY = 'v2-video-toolbar-layout',
   ALIGN_FEATURE_ENABLED_STORAGE_KEY = 'v2-align-enabled',
@@ -32,324 +44,399 @@ function getStorage() {
   } catch {}
   return null;
 }
-function safeStorageGet(_0x3992eb, _0x5b22e9 = '') {
-  const _0x49cceb = getStorage();
-  if (!_0x49cceb) return _0x5b22e9;
+function safeStorageGet(_0x2b18d3, _0x4db7dc = '') {
+  const _0x4e017c = getStorage();
+  if (!_0x4e017c) return _0x4db7dc;
   try {
-    const _0x32629c = _0x49cceb.getItem(_0x3992eb);
-    return _0x32629c == null ? _0x5b22e9 : _0x32629c;
+    const _0x109307 = _0x4e017c['getItem'](_0x2b18d3);
+    return _0x109307 == null ? _0x4db7dc : _0x109307;
   } catch {
-    return _0x5b22e9;
+    return _0x4db7dc;
   }
 }
-function safeStorageSet(_0x19b155, _0x3b9f81) {
-  const _0x7c26e6 = getStorage();
-  if (!_0x7c26e6) return;
+function safeStorageSet(_0x568c73, _0x1e5d89) {
+  const _0x17ef30 = getStorage();
+  if (!_0x17ef30) return;
   try {
-    _0x7c26e6.setItem(_0x19b155, String(_0x3b9f81));
+    _0x17ef30['setItem'](_0x568c73, String(_0x1e5d89));
   } catch {}
 }
-function parseJsonObject(_0x4eb018) {
-  if (!_0x4eb018) return {};
+function parseJsonObject(_0x38707d) {
+  if (!_0x38707d) return {};
   try {
-    const _0x26441f = JSON.parse(_0x4eb018);
-    return _0x26441f && typeof _0x26441f === 'object' && !Array.isArray(_0x26441f) ? _0x26441f : {};
+    const _0x30f350 = JSON['parse'](_0x38707d);
+    return _0x30f350 && typeof _0x30f350 === 'object' && !Array['isArray'](_0x30f350) ? _0x30f350 : {};
   } catch {
     return {};
   }
 }
-function normalizeSelectionRelatedHighlightColor(_0x37b1ca) {
-  const _0x13e935 = String(_0x37b1ca || '').trim();
-  return ['white', 'blue', 'green', 'cyan', 'purple', 'red', 'yellow'].includes(_0x13e935)
-    ? _0x13e935
+function normalizeSelectionRelatedHighlightColor(_0x1d1b14) {
+  const _0xc5e33 = String(_0x1d1b14 || '')['trim']();
+  return ['white', 'blue', 'green', 'cyan', 'purple', 'red', 'yellow']['includes'](_0xc5e33)
+    ? _0xc5e33
     : 'white';
 }
-function normalizePromptEnterBehavior(_0xafa1f0) {
-  return _0xafa1f0 === 'newline' ? 'newline' : 'submit';
+function normalizePromptEnterBehavior(_0x1b6b43) {
+  return _0x1b6b43 === 'newline' ? 'newline' : 'submit';
 }
-export function normalizeThemeName(_0x3f806c) {
-  return _0x3f806c === 'light' ? 'light' : 'dark';
+export function normalizeThemeName(_0x16f2e7) {
+  return _0x16f2e7 === 'light' ? 'light' : 'dark';
 }
 export function readThemeFromStorage() {
   return normalizeThemeName(safeStorageGet(THEME_STORAGE_KEY, 'dark'));
 }
-export function applyThemeToDom(_0x17dca7) {
-  const _0x19b830 = normalizeThemeName(_0x17dca7);
+export function applyThemeToDom(_0x25ab87) {
+  const _0x13594a = normalizeThemeName(_0x25ab87);
   try {
-    const _0x34d670 = typeof document !== 'undefined' ? document?.documentElement : null;
-    _0x34d670 &&
-      typeof _0x34d670.setAttribute === 'function' &&
-      _0x34d670.setAttribute('data-theme', _0x19b830);
+    const _0x10cdb7 = typeof document !== 'undefined' ? document?.['documentElement'] : null;
+    _0x10cdb7 &&
+      typeof _0x10cdb7['setAttribute'] === 'function' &&
+      _0x10cdb7['setAttribute']('data-theme', _0x13594a);
   } catch {}
 }
-export function applyStoredThemeToDom() {
-  const theme = readThemeFromStorage();
-  applyThemeToDom(theme);
-  return theme;
+export function persistThemeToStorage(_0x457e9c) {
+  safeStorageSet(THEME_STORAGE_KEY, normalizeThemeName(_0x457e9c));
 }
-export function persistThemeToStorage(_0x488ab5) {
-  safeStorageSet(THEME_STORAGE_KEY, normalizeThemeName(_0x488ab5));
+export function applyStoredThemeToDom() {
+  const _0x4dee3d = readThemeFromStorage();
+  return (applyThemeToDom(_0x4dee3d), _0x4dee3d);
 }
 export function readUiPrefsFromStorage() {
-  const _0x3e75d5 = safeStorageGet(SHOW_VIDEO_META_STORAGE_KEY, '0'),
-    _0x54c3ff = safeStorageGet(TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY, '0'),
-    _0x3f6ea9 = safeStorageGet(PROMPT_BOX_RESIZE_ENABLED_STORAGE_KEY, '1'),
-    _0x4485db = safeStorageGet(PROMPT_ENTER_BEHAVIOR_STORAGE_KEY, 'submit'),
-    _0x17f17e = safeStorageGet(PROMPT_ATTACHMENT_BUTTON_HIDDEN_STORAGE_KEY, '0'),
-    _0xbba216 = safeStorageGet(IMAGE_VIDEO_NODE_RESIZE_ENABLED_STORAGE_KEY, '0'),
-    _0x501205 = safeStorageGet(SELECTION_RELATED_HIGHLIGHT_ENABLED_STORAGE_KEY, '1'),
-    _0x2d05fe = safeStorageGet(SELECTION_RELATED_HIGHLIGHT_COLOR_STORAGE_KEY, 'white'),
-    _0x152864 = safeStorageGet(CONNECTION_LINES_VISIBLE_STORAGE_KEY, '1'),
-    _0x108df8 = safeStorageGet(IMAGE_TOOLBAR_LAYOUT_STORAGE_KEY, ''),
-    _0x5baeb4 = safeStorageGet(VIDEO_TOOLBAR_LAYOUT_STORAGE_KEY, ''),
-    _0x2c113b = safeStorageGet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, '1'),
-    _0x4fa50b = safeStorageGet(ALIGN_TRIGGER_MODE_STORAGE_KEY, ''),
-    _0x5e6293 = safeStorageGet(ALIGN_DISTRIBUTE_GAP_STORAGE_KEY, '40'),
-    _0x282016 = safeStorageGet(SNAP_GUIDES_ENABLED_STORAGE_KEY, '1'),
-    _0x1a8297 = safeStorageGet(FEATURE_SELECTIONS_STORAGE_KEY, '{}'),
-    _0x2691e9 =
-      _0x4fa50b === 'hold' || _0x4fa50b === 'click' || _0x4fa50b === 'off'
-        ? _0x4fa50b
-        : String(_0x2c113b) === '0'
+  const _0x37e053 = safeStorageGet(SHOW_SELECTION_MEDIA_PROPERTIES_STORAGE_KEY, '1'),
+    _0x3c41c6 = safeStorageGet(TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY, '0'),
+    _0xbbb4f1 = safeStorageGet(PROMPT_BOX_RESIZE_ENABLED_STORAGE_KEY, '1'),
+    _0x59fa66 = safeStorageGet(PROMPT_ENTER_BEHAVIOR_STORAGE_KEY, 'submit'),
+    _0x16eeb3 = safeStorageGet(PROMPT_ATTACHMENT_BUTTON_HIDDEN_STORAGE_KEY, '1'),
+    _0x64aba3 = safeStorageGet(PROMPT_PRESET_BUTTON_HIDDEN_STORAGE_KEY, '0'),
+    _0x5278c3 = safeStorageGet(VIDEO_AUDIO_DEFAULT_ENABLED_STORAGE_KEY, '0'),
+    _0x3358da = safeStorageGet(CANVAS_TOOLBAR_PLACEMENT_STORAGE_KEY, 'left'),
+    _0x277b4b = safeStorageGet(NODE_MANAGER_PLACEMENT_STORAGE_KEY, 'left'),
+    _0x419091 = safeStorageGet(LEFT_SIDEBAR_AUTO_HIDE_STORAGE_KEY, '0'),
+    _0x7c3239 = safeStorageGet(BOTTOM_LEFT_BAR_AUTO_HIDE_STORAGE_KEY, '0'),
+    _0x32694e = safeStorageGet(IMAGE_VIDEO_NODE_RESIZE_ENABLED_STORAGE_KEY, '0'),
+    _0xf79b0d = safeStorageGet(SELECTION_RELATED_HIGHLIGHT_ENABLED_STORAGE_KEY, '1'),
+    _0x27907d = safeStorageGet(SELECTION_RELATED_HIGHLIGHT_COLOR_STORAGE_KEY, 'white'),
+    _0x3fc5cb = safeStorageGet(CONNECTION_LINES_VISIBLE_STORAGE_KEY, '1'),
+    _0x5ed4d1 = safeStorageGet(CONNECTION_LINE_STYLE_STORAGE_KEY, 'curve'),
+    _0x19a76f = safeStorageGet(IMAGE_TOOLBAR_LAYOUT_STORAGE_KEY, ''),
+    _0x5a714e = safeStorageGet(VIDEO_TOOLBAR_LAYOUT_STORAGE_KEY, ''),
+    _0x50e66a = safeStorageGet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, '1'),
+    _0x38be75 = safeStorageGet(ALIGN_TRIGGER_MODE_STORAGE_KEY, ''),
+    _0x23accb = safeStorageGet(ALIGN_DISTRIBUTE_GAP_STORAGE_KEY, '40'),
+    _0x234b06 = safeStorageGet(SNAP_GUIDES_ENABLED_STORAGE_KEY, '1'),
+    _0x6282a3 = safeStorageGet(FEATURE_SELECTIONS_STORAGE_KEY, '{}'),
+    _0x11bf04 =
+      _0x38be75 === 'hold' || _0x38be75 === 'click' || _0x38be75 === 'off'
+        ? _0x38be75
+        : String(_0x50e66a) === '0'
           ? 'off'
           : 'click',
-    _0x308861 = Number(_0x5e6293),
-    _0x33cfc0 = Number.isFinite(_0x308861) ? Math.max(0, Math.min(200, Math.round(_0x308861))) : 40;
+    _0x353a8d = Number(_0x23accb),
+    _0x3e4c1c = Number['isFinite'](_0x353a8d)
+      ? Math['max'](0x0, Math['min'](0xc8, Math['round'](_0x353a8d)))
+      : 0x28;
   return {
-    showVideoMeta: String(_0x3e75d5) === '1',
-    titleFollowsCanvasZoom: String(_0x54c3ff) === '1',
-    promptBoxResizeEnabled: String(_0x3f6ea9) !== '0',
-    promptEnterBehavior: normalizePromptEnterBehavior(_0x4485db),
-    promptAttachmentButtonHidden: String(_0x17f17e) === '1',
-    imageVideoNodeResizeEnabled: String(_0xbba216) === '1',
-    selectionRelatedHighlightEnabled: String(_0x501205) !== '0',
-    selectionRelatedHighlightColor: normalizeSelectionRelatedHighlightColor(_0x2d05fe),
-    connectionLinesVisible: String(_0x152864) !== '0',
-    imageToolbarLayout: normalizeImageToolbarLayout(parseJsonObject(_0x108df8)),
-    videoToolbarLayout: normalizeVideoToolbarLayout(parseJsonObject(_0x5baeb4)),
-    alignFeatureEnabled: _0x2691e9 !== 'off',
-    alignFeatureTriggerMode: _0x2691e9,
-    alignDistributeGap: _0x33cfc0,
-    snapGuidesEnabled: String(_0x282016) !== '0',
-    featureSelections: sanitizeFeatureSelectionsRecord(parseJsonObject(_0x1a8297)),
+    showVideoMeta: ![],
+    showSelectionMediaProperties: String(_0x37e053) !== '0',
+    titleFollowsCanvasZoom: String(_0x3c41c6) === '1',
+    promptBoxResizeEnabled: String(_0xbbb4f1) !== '0',
+    promptEnterBehavior: normalizePromptEnterBehavior(_0x59fa66),
+    promptAttachmentButtonHidden: String(_0x16eeb3) === '1',
+    promptPresetButtonHidden: String(_0x64aba3) === '1',
+    videoAudioDefaultEnabled: String(_0x5278c3) === '1',
+    canvasToolbarPlacement: normalizeCanvasToolbarPlacement(_0x3358da),
+    nodeManagerPlacement: normalizeNodeManagerPlacement(_0x277b4b),
+    leftSidebarAutoHideEnabled: String(_0x419091) === '1',
+    bottomLeftBarAutoHideEnabled: String(_0x7c3239) === '1',
+    imageVideoNodeResizeEnabled: String(_0x32694e) === '1',
+    selectionRelatedHighlightEnabled: String(_0xf79b0d) !== '0',
+    selectionRelatedHighlightColor: normalizeSelectionRelatedHighlightColor(_0x27907d),
+    connectionLinesVisible: String(_0x3fc5cb) !== '0',
+    connectionLineStyle: normalizeConnectionLineStyle(_0x5ed4d1),
+    imageToolbarLayout: normalizeImageToolbarLayout(parseJsonObject(_0x19a76f)),
+    videoToolbarLayout: normalizeVideoToolbarLayout(parseJsonObject(_0x5a714e)),
+    alignFeatureEnabled: _0x11bf04 !== 'off',
+    alignFeatureTriggerMode: _0x11bf04,
+    alignDistributeGap: _0x3e4c1c,
+    snapGuidesEnabled: String(_0x234b06) !== '0',
+    featureSelections: sanitizeFeatureSelectionsRecord(parseJsonObject(_0x6282a3)),
   };
 }
-export function persistUiPrefsToStorage(_0x2c17dd) {
-  const _0xbf965c = _0x2c17dd?.showVideoMeta === true,
-    _0x41e556 = _0x2c17dd?.titleFollowsCanvasZoom === true,
-    _0xe87bbe = _0x2c17dd?.promptBoxResizeEnabled !== false,
-    _0x371531 = normalizePromptEnterBehavior(_0x2c17dd?.promptEnterBehavior),
-    _0x22e35e = _0x2c17dd?.promptAttachmentButtonHidden === true,
-    _0x4b1df0 = _0x2c17dd?.imageVideoNodeResizeEnabled === true,
-    _0x293565 = _0x2c17dd?.selectionRelatedHighlightEnabled !== false,
-    _0x1881f2 = normalizeSelectionRelatedHighlightColor(_0x2c17dd?.selectionRelatedHighlightColor),
-    _0x198a9a = _0x2c17dd?.connectionLinesVisible !== false,
-    _0x53362a = normalizeImageToolbarLayout(_0x2c17dd?.imageToolbarLayout),
-    _0x1cdaba = normalizeVideoToolbarLayout(_0x2c17dd?.videoToolbarLayout),
-    _0x474474 =
-      _0x2c17dd?.alignFeatureTriggerMode === 'hold' ||
-      _0x2c17dd?.alignFeatureTriggerMode === 'click' ||
-      _0x2c17dd?.alignFeatureTriggerMode === 'off'
-        ? _0x2c17dd.alignFeatureTriggerMode
-        : _0x2c17dd?.alignFeatureEnabled === false
+export function persistUiPrefsToStorage(_0x1981b8) {
+  const _0x5bc241 = _0x1981b8?.['showSelectionMediaProperties'] !== ![],
+    _0x47712b = _0x1981b8?.['titleFollowsCanvasZoom'] === !![],
+    _0x1b668c = _0x1981b8?.['promptBoxResizeEnabled'] !== ![],
+    _0x1e7094 = normalizePromptEnterBehavior(_0x1981b8?.['promptEnterBehavior']),
+    _0x517092 = _0x1981b8?.['promptAttachmentButtonHidden'] === !![],
+    _0x4b4660 = _0x1981b8?.['promptPresetButtonHidden'] === !![],
+    _0x4a217b = _0x1981b8?.['videoAudioDefaultEnabled'] === !![],
+    _0x3e60f2 = normalizeCanvasToolbarPlacement(_0x1981b8?.['canvasToolbarPlacement']),
+    _0x24cbbf = normalizeNodeManagerPlacement(_0x1981b8?.['nodeManagerPlacement']),
+    _0x337339 = _0x1981b8?.['leftSidebarAutoHideEnabled'] === !![],
+    _0x13f789 = _0x1981b8?.['bottomLeftBarAutoHideEnabled'] === !![],
+    _0x14ccf4 = _0x1981b8?.['imageVideoNodeResizeEnabled'] === !![],
+    _0x383cac = _0x1981b8?.['selectionRelatedHighlightEnabled'] !== ![],
+    _0x3765cb = normalizeSelectionRelatedHighlightColor(_0x1981b8?.['selectionRelatedHighlightColor']),
+    _0x36b437 = _0x1981b8?.['connectionLinesVisible'] !== ![],
+    _0x24996e = normalizeConnectionLineStyle(_0x1981b8?.['connectionLineStyle']),
+    _0x1007c3 = normalizeImageToolbarLayout(_0x1981b8?.['imageToolbarLayout']),
+    _0x213457 = normalizeVideoToolbarLayout(_0x1981b8?.['videoToolbarLayout']),
+    _0x12af39 =
+      _0x1981b8?.['alignFeatureTriggerMode'] === 'hold' ||
+      _0x1981b8?.['alignFeatureTriggerMode'] === 'click' ||
+      _0x1981b8?.['alignFeatureTriggerMode'] === 'off'
+        ? _0x1981b8['alignFeatureTriggerMode']
+        : _0x1981b8?.['alignFeatureEnabled'] === ![]
           ? 'off'
           : 'click',
-    _0x5bf100 = _0x474474 !== 'off',
-    _0x3af60d = Number(_0x2c17dd?.alignDistributeGap),
-    _0x607a4f = Number.isFinite(_0x3af60d) ? Math.max(0, Math.min(200, Math.round(_0x3af60d))) : 40,
-    _0x50be6c = _0x2c17dd?.snapGuidesEnabled !== false,
-    _0x5f094f = sanitizeFeatureSelectionsRecord(_0x2c17dd?.featureSelections || {});
-  (safeStorageSet(SHOW_VIDEO_META_STORAGE_KEY, _0xbf965c ? '1' : '0'),
-    safeStorageSet(TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY, _0x41e556 ? '1' : '0'),
-    safeStorageSet(PROMPT_BOX_RESIZE_ENABLED_STORAGE_KEY, _0xe87bbe ? '1' : '0'),
-    safeStorageSet(PROMPT_ENTER_BEHAVIOR_STORAGE_KEY, _0x371531),
-    safeStorageSet(PROMPT_ATTACHMENT_BUTTON_HIDDEN_STORAGE_KEY, _0x22e35e ? '1' : '0'),
-    safeStorageSet(IMAGE_VIDEO_NODE_RESIZE_ENABLED_STORAGE_KEY, _0x4b1df0 ? '1' : '0'),
-    safeStorageSet(SELECTION_RELATED_HIGHLIGHT_ENABLED_STORAGE_KEY, _0x293565 ? '1' : '0'),
-    safeStorageSet(SELECTION_RELATED_HIGHLIGHT_COLOR_STORAGE_KEY, _0x1881f2),
-    safeStorageSet(CONNECTION_LINES_VISIBLE_STORAGE_KEY, _0x198a9a ? '1' : '0'),
-    safeStorageSet(IMAGE_TOOLBAR_LAYOUT_STORAGE_KEY, serializeImageToolbarLayout(_0x53362a)),
-    safeStorageSet(VIDEO_TOOLBAR_LAYOUT_STORAGE_KEY, serializeVideoToolbarLayout(_0x1cdaba)),
-    safeStorageSet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, _0x5bf100 ? '1' : '0'),
-    safeStorageSet(ALIGN_TRIGGER_MODE_STORAGE_KEY, _0x474474),
-    safeStorageSet(ALIGN_DISTRIBUTE_GAP_STORAGE_KEY, String(_0x607a4f)),
-    safeStorageSet(SNAP_GUIDES_ENABLED_STORAGE_KEY, _0x50be6c ? '1' : '0'),
-    safeStorageSet(FEATURE_SELECTIONS_STORAGE_KEY, JSON.stringify(_0x5f094f)));
+    _0x3c01f5 = _0x12af39 !== 'off',
+    _0x36a4e8 = Number(_0x1981b8?.['alignDistributeGap']),
+    _0x4e2112 = Number['isFinite'](_0x36a4e8)
+      ? Math['max'](0x0, Math['min'](0xc8, Math['round'](_0x36a4e8)))
+      : 0x28,
+    _0x3f6ffe = _0x1981b8?.['snapGuidesEnabled'] !== ![],
+    _0x1fefb1 = sanitizeFeatureSelectionsRecord(_0x1981b8?.['featureSelections'] || {});
+  (safeStorageSet(SHOW_VIDEO_META_STORAGE_KEY, '0'),
+    safeStorageSet(SHOW_SELECTION_MEDIA_PROPERTIES_STORAGE_KEY, _0x5bc241 ? '1' : '0'),
+    safeStorageSet(TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY, _0x47712b ? '1' : '0'),
+    safeStorageSet(PROMPT_BOX_RESIZE_ENABLED_STORAGE_KEY, _0x1b668c ? '1' : '0'),
+    safeStorageSet(PROMPT_ENTER_BEHAVIOR_STORAGE_KEY, _0x1e7094),
+    safeStorageSet(PROMPT_ATTACHMENT_BUTTON_HIDDEN_STORAGE_KEY, _0x517092 ? '1' : '0'),
+    safeStorageSet(PROMPT_PRESET_BUTTON_HIDDEN_STORAGE_KEY, _0x4b4660 ? '1' : '0'),
+    safeStorageSet(VIDEO_AUDIO_DEFAULT_ENABLED_STORAGE_KEY, _0x4a217b ? '1' : '0'),
+    safeStorageSet(CANVAS_TOOLBAR_PLACEMENT_STORAGE_KEY, _0x3e60f2),
+    safeStorageSet(NODE_MANAGER_PLACEMENT_STORAGE_KEY, _0x24cbbf),
+    safeStorageSet(LEFT_SIDEBAR_AUTO_HIDE_STORAGE_KEY, _0x337339 ? '1' : '0'),
+    safeStorageSet(BOTTOM_LEFT_BAR_AUTO_HIDE_STORAGE_KEY, _0x13f789 ? '1' : '0'),
+    safeStorageSet(IMAGE_VIDEO_NODE_RESIZE_ENABLED_STORAGE_KEY, _0x14ccf4 ? '1' : '0'),
+    safeStorageSet(SELECTION_RELATED_HIGHLIGHT_ENABLED_STORAGE_KEY, _0x383cac ? '1' : '0'),
+    safeStorageSet(SELECTION_RELATED_HIGHLIGHT_COLOR_STORAGE_KEY, _0x3765cb),
+    safeStorageSet(CONNECTION_LINES_VISIBLE_STORAGE_KEY, _0x36b437 ? '1' : '0'),
+    safeStorageSet(CONNECTION_LINE_STYLE_STORAGE_KEY, _0x24996e),
+    safeStorageSet(IMAGE_TOOLBAR_LAYOUT_STORAGE_KEY, serializeImageToolbarLayout(_0x1007c3)),
+    safeStorageSet(VIDEO_TOOLBAR_LAYOUT_STORAGE_KEY, serializeVideoToolbarLayout(_0x213457)),
+    safeStorageSet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, _0x3c01f5 ? '1' : '0'),
+    safeStorageSet(ALIGN_TRIGGER_MODE_STORAGE_KEY, _0x12af39),
+    safeStorageSet(ALIGN_DISTRIBUTE_GAP_STORAGE_KEY, String(_0x4e2112)),
+    safeStorageSet(SNAP_GUIDES_ENABLED_STORAGE_KEY, _0x3f6ffe ? '1' : '0'),
+    safeStorageSet(FEATURE_SELECTIONS_STORAGE_KEY, JSON['stringify'](_0x1fefb1)));
 }
 function isViewportAnimating() {
-  try {
-    const _0x3826ba = typeof document !== 'undefined' ? document?.body : null;
-    if (!_0x3826ba?.classList) return false;
-    return (
-      _0x3826ba.classList.contains('is-panning') ||
-      _0x3826ba.classList.contains('is-viewport-animating') ||
-      _0x3826ba.classList.contains('is-zooming')
-    );
-  } catch {
-    return false;
-  }
+  return readViewportInteractionState()['isViewportBusy'];
 }
 export function shouldBumpViewportPersistOnZoom() {
   return !isViewportAnimating();
 }
-function resolveStoreBundle(_0xb0e2fa) {
-  if (!_0xb0e2fa || typeof _0xb0e2fa !== 'object') return { uiStore: null, graphStore: null };
-  if (_0xb0e2fa.uiStore && _0xb0e2fa.graphStore)
-    return { uiStore: _0xb0e2fa.uiStore, graphStore: _0xb0e2fa.graphStore };
-  if (typeof _0xb0e2fa.getDomainStores === 'function') {
-    const _0x1e407d = _0xb0e2fa.getDomainStores() || {};
-    if (_0x1e407d.uiStore && _0x1e407d.graphStore)
-      return { uiStore: _0x1e407d.uiStore, graphStore: _0x1e407d.graphStore };
+function resolveStoreBundle(_0x1ddf72) {
+  if (!_0x1ddf72 || typeof _0x1ddf72 !== 'object') return { uiStore: null, graphStore: null };
+  if (_0x1ddf72['uiStore'] && _0x1ddf72['graphStore'])
+    return { uiStore: _0x1ddf72['uiStore'], graphStore: _0x1ddf72['graphStore'] };
+  if (typeof _0x1ddf72['getDomainStores'] === 'function') {
+    const _0x3d3dc4 = _0x1ddf72['getDomainStores']() || {};
+    if (_0x3d3dc4['uiStore'] && _0x3d3dc4['graphStore'])
+      return { uiStore: _0x3d3dc4['uiStore'], graphStore: _0x3d3dc4['graphStore'] };
   }
-  return { uiStore: _0xb0e2fa, graphStore: _0xb0e2fa };
+  return { uiStore: _0x1ddf72, graphStore: _0x1ddf72 };
 }
-export function initStoreRuntimeEffects(_0x11649d) {
-  const { uiStore: _0x2c424d, graphStore: _0x31e291 } = resolveStoreBundle(_0x11649d);
-  if (!_0x2c424d || !_0x31e291) return () => {};
-  const _0x2b6cfb = readThemeFromStorage(),
-    _0x4eff59 = readUiPrefsFromStorage();
-  (_0x2c424d.initTheme(_0x2b6cfb),
-    _0x2c424d.initUiPrefs(_0x4eff59),
-    applyThemeToDom(_0x2b6cfb),
-    _0x31e291.setViewportPersistPolicy(shouldBumpViewportPersistOnZoom));
-  const _0x45dab1 = _0x2c424d.subscribeSelector(
-      (_0x14d5ba) => _0x14d5ba.theme,
-      (_0x4ccabe) => {
-        const _0x147082 = normalizeThemeName(_0x4ccabe);
-        (applyThemeToDom(_0x147082), persistThemeToStorage(_0x147082));
+export function initStoreRuntimeEffects(_0x3d9912) {
+  const { uiStore: _0x503c83, graphStore: _0x9d262e } = resolveStoreBundle(_0x3d9912);
+  if (!_0x503c83 || !_0x9d262e) return () => {};
+  const _0x495614 = applyStoredThemeToDom(),
+    _0x439732 = readUiPrefsFromStorage();
+  (_0x503c83['initTheme'](_0x495614),
+    _0x503c83['initUiPrefs'](_0x439732),
+    _0x9d262e['setViewportPersistPolicy'](shouldBumpViewportPersistOnZoom));
+  const _0x3cae09 = _0x503c83['subscribeSelector'](
+    (_0x3625e9) => _0x3625e9['theme'],
+    (_0x920186) => {
+      const _0x464abc = normalizeThemeName(_0x920186);
+      (applyThemeToDom(_0x464abc), persistThemeToStorage(_0x464abc));
+    },
+  );
+  safeStorageSet(SHOW_VIDEO_META_STORAGE_KEY, '0');
+  const _0x10e2f3 = _0x503c83['subscribeSelector'](
+      (_0x2c82c8) => _0x2c82c8['ui']?.['showSelectionMediaProperties'] !== ![],
+      (_0x2f467e) => {
+        safeStorageSet(SHOW_SELECTION_MEDIA_PROPERTIES_STORAGE_KEY, _0x2f467e ? '1' : '0');
       },
     ),
-    _0x2029b5 = _0x2c424d.subscribeSelector(
-      (_0x3fb8ca) => _0x3fb8ca.ui?.showVideoMeta === true,
-      (_0x22d96b) => {
-        safeStorageSet(SHOW_VIDEO_META_STORAGE_KEY, _0x22d96b ? '1' : '0');
+    _0x16a774 = _0x503c83['subscribeSelector'](
+      (_0x52cd02) => _0x52cd02['ui']?.['titleFollowsCanvasZoom'] === !![],
+      (_0x401ed6) => {
+        safeStorageSet(TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY, _0x401ed6 ? '1' : '0');
       },
     ),
-    _0x5b3c37 = _0x2c424d.subscribeSelector(
-      (_0xc98617) => _0xc98617.ui?.titleFollowsCanvasZoom === true,
-      (_0x4a6be4) => {
-        safeStorageSet(TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY, _0x4a6be4 ? '1' : '0');
+    _0x5ca8b9 = _0x503c83['subscribeSelector'](
+      (_0x58d0e5) => _0x58d0e5['ui']?.['promptBoxResizeEnabled'] !== ![],
+      (_0x4f53be) => {
+        safeStorageSet(PROMPT_BOX_RESIZE_ENABLED_STORAGE_KEY, _0x4f53be ? '1' : '0');
       },
     ),
-    _0x2a58f3 = _0x2c424d.subscribeSelector(
-      (_0x104c19) => _0x104c19.ui?.promptBoxResizeEnabled !== false,
-      (_0x100d5d) => {
-        safeStorageSet(PROMPT_BOX_RESIZE_ENABLED_STORAGE_KEY, _0x100d5d ? '1' : '0');
+    _0x28064a = _0x503c83['subscribeSelector'](
+      (_0x14e684) => normalizePromptEnterBehavior(_0x14e684['ui']?.['promptEnterBehavior']),
+      (_0x32392e) => {
+        safeStorageSet(PROMPT_ENTER_BEHAVIOR_STORAGE_KEY, _0x32392e);
       },
     ),
-    _0x10a8cc = _0x2c424d.subscribeSelector(
-      (_0x5d2093) => normalizePromptEnterBehavior(_0x5d2093.ui?.promptEnterBehavior),
-      (_0x1e147a) => {
-        safeStorageSet(PROMPT_ENTER_BEHAVIOR_STORAGE_KEY, _0x1e147a);
+    _0x408791 = _0x503c83['subscribeSelector'](
+      (_0x5b6789) => _0x5b6789['ui']?.['promptAttachmentButtonHidden'] === !![],
+      (_0x598402) => {
+        safeStorageSet(PROMPT_ATTACHMENT_BUTTON_HIDDEN_STORAGE_KEY, _0x598402 ? '1' : '0');
       },
     ),
-    _0x2f8cd5 = _0x2c424d.subscribeSelector(
-      (_0x4d5d86) => _0x4d5d86.ui?.promptAttachmentButtonHidden === true,
-      (_0x4766f5) => {
-        safeStorageSet(PROMPT_ATTACHMENT_BUTTON_HIDDEN_STORAGE_KEY, _0x4766f5 ? '1' : '0');
+    _0xba3352 = _0x503c83['subscribeSelector'](
+      (_0x112034) => _0x112034['ui']?.['promptPresetButtonHidden'] === !![],
+      (_0x298dcb) => {
+        safeStorageSet(PROMPT_PRESET_BUTTON_HIDDEN_STORAGE_KEY, _0x298dcb ? '1' : '0');
       },
     ),
-    _0x44d033 = _0x2c424d.subscribeSelector(
-      (_0xae7c9f) => _0xae7c9f.ui?.imageVideoNodeResizeEnabled === true,
-      (_0x192262) => {
-        safeStorageSet(IMAGE_VIDEO_NODE_RESIZE_ENABLED_STORAGE_KEY, _0x192262 ? '1' : '0');
+    _0x4b4b48 = _0x503c83['subscribeSelector'](
+      (_0x50a819) => _0x50a819['ui']?.['videoAudioDefaultEnabled'] === !![],
+      (_0x476ce5) => {
+        safeStorageSet(VIDEO_AUDIO_DEFAULT_ENABLED_STORAGE_KEY, _0x476ce5 ? '1' : '0');
       },
     ),
-    _0x3f7868 = _0x2c424d.subscribeSelector(
-      (_0x4a5892) => _0x4a5892.ui?.selectionRelatedHighlightEnabled !== false,
-      (_0x39f4e9) => {
-        safeStorageSet(SELECTION_RELATED_HIGHLIGHT_ENABLED_STORAGE_KEY, _0x39f4e9 ? '1' : '0');
+    _0x19c068 = _0x503c83['subscribeSelector'](
+      (_0x39b4ce) => normalizeCanvasToolbarPlacement(_0x39b4ce['ui']?.['canvasToolbarPlacement']),
+      (_0x2a3c04) => {
+        safeStorageSet(CANVAS_TOOLBAR_PLACEMENT_STORAGE_KEY, _0x2a3c04);
       },
     ),
-    _0xdb46 = _0x2c424d.subscribeSelector(
-      (_0x1dacbf) => normalizeSelectionRelatedHighlightColor(_0x1dacbf.ui?.selectionRelatedHighlightColor),
-      (_0x39b84e) => {
-        safeStorageSet(SELECTION_RELATED_HIGHLIGHT_COLOR_STORAGE_KEY, _0x39b84e);
+    _0x205a36 = _0x503c83['subscribeSelector'](
+      (_0x516a4d) => normalizeNodeManagerPlacement(_0x516a4d['ui']?.['nodeManagerPlacement']),
+      (_0x596756) => {
+        safeStorageSet(NODE_MANAGER_PLACEMENT_STORAGE_KEY, _0x596756);
       },
     ),
-    _0x2fb96a = _0x2c424d.subscribeSelector(
-      (_0x1f1080) => _0x1f1080.ui?.connectionLinesVisible !== false,
-      (_0x5904e2) => {
-        safeStorageSet(CONNECTION_LINES_VISIBLE_STORAGE_KEY, _0x5904e2 ? '1' : '0');
+    _0x40443f = _0x503c83['subscribeSelector'](
+      (_0x5c35b8) => _0x5c35b8['ui']?.['leftSidebarAutoHideEnabled'] === !![],
+      (_0xb8550b) => {
+        safeStorageSet(LEFT_SIDEBAR_AUTO_HIDE_STORAGE_KEY, _0xb8550b ? '1' : '0');
       },
     ),
-    _0x54e9eb = _0x2c424d.subscribeSelector(
-      (_0x4eecd6) => serializeImageToolbarLayout(_0x4eecd6.ui?.imageToolbarLayout),
-      (_0x228b2e) => {
-        safeStorageSet(IMAGE_TOOLBAR_LAYOUT_STORAGE_KEY, _0x228b2e);
+    _0x79636d = _0x503c83['subscribeSelector'](
+      (_0x1e3efa) => _0x1e3efa['ui']?.['bottomLeftBarAutoHideEnabled'] === !![],
+      (_0x287d13) => {
+        safeStorageSet(BOTTOM_LEFT_BAR_AUTO_HIDE_STORAGE_KEY, _0x287d13 ? '1' : '0');
       },
     ),
-    _0x48e663 = _0x2c424d.subscribeSelector(
-      (_0x3aae2b) => serializeVideoToolbarLayout(_0x3aae2b.ui?.videoToolbarLayout),
-      (_0x54d3de) => {
-        safeStorageSet(VIDEO_TOOLBAR_LAYOUT_STORAGE_KEY, _0x54d3de);
+    _0x40faf1 = _0x503c83['subscribeSelector'](
+      (_0x8f9e6d) => _0x8f9e6d['ui']?.['imageVideoNodeResizeEnabled'] === !![],
+      (_0x211681) => {
+        safeStorageSet(IMAGE_VIDEO_NODE_RESIZE_ENABLED_STORAGE_KEY, _0x211681 ? '1' : '0');
       },
     ),
-    _0x3052fb = _0x2c424d.subscribeSelector(
-      (_0x1bca86) => _0x1bca86.ui?.alignFeatureEnabled !== false,
-      (_0x79cf0a) => {
-        safeStorageSet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, _0x79cf0a ? '1' : '0');
+    _0x3e7a7b = _0x503c83['subscribeSelector'](
+      (_0x4dc803) => _0x4dc803['ui']?.['selectionRelatedHighlightEnabled'] !== ![],
+      (_0x1e83f0) => {
+        safeStorageSet(SELECTION_RELATED_HIGHLIGHT_ENABLED_STORAGE_KEY, _0x1e83f0 ? '1' : '0');
       },
     ),
-    _0x35fce7 = _0x2c424d.subscribeSelector(
-      (_0x3007c8) => {
-        const _0x49c541 = _0x3007c8.ui?.alignFeatureTriggerMode;
-        return _0x49c541 === 'hold' || _0x49c541 === 'click' || _0x49c541 === 'off' ? _0x49c541 : 'click';
-      },
-      (_0x279eea) => {
-        (safeStorageSet(ALIGN_TRIGGER_MODE_STORAGE_KEY, _0x279eea),
-          safeStorageSet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, _0x279eea === 'off' ? '0' : '1'));
+    _0x2e4558 = _0x503c83['subscribeSelector'](
+      (_0x362ec4) =>
+        normalizeSelectionRelatedHighlightColor(_0x362ec4['ui']?.['selectionRelatedHighlightColor']),
+      (_0x3cf452) => {
+        safeStorageSet(SELECTION_RELATED_HIGHLIGHT_COLOR_STORAGE_KEY, _0x3cf452);
       },
     ),
-    _0x1eb07b = _0x2c424d.subscribeSelector(
-      (_0x4ab4c2) => {
-        const _0xda83fa = Number(_0x4ab4c2.ui?.alignDistributeGap);
-        return Number.isFinite(_0xda83fa) ? Math.max(0, Math.min(200, Math.round(_0xda83fa))) : 40;
-      },
-      (_0x1633d0) => {
-        safeStorageSet(ALIGN_DISTRIBUTE_GAP_STORAGE_KEY, String(_0x1633d0));
+    _0x5b8b1c = _0x503c83['subscribeSelector'](
+      (_0x47ba82) => _0x47ba82['ui']?.['connectionLinesVisible'] !== ![],
+      (_0x20e586) => {
+        safeStorageSet(CONNECTION_LINES_VISIBLE_STORAGE_KEY, _0x20e586 ? '1' : '0');
       },
     ),
-    _0x432457 = _0x2c424d.subscribeSelector(
-      (_0x22377d) => _0x22377d.ui?.snapGuidesEnabled !== false,
-      (_0x50e6bd) => {
-        safeStorageSet(SNAP_GUIDES_ENABLED_STORAGE_KEY, _0x50e6bd ? '1' : '0');
+    _0x327e8a = _0x503c83['subscribeSelector'](
+      (_0x1ed259) => normalizeConnectionLineStyle(_0x1ed259['ui']?.['connectionLineStyle']),
+      (_0x1f6f90) => {
+        safeStorageSet(CONNECTION_LINE_STYLE_STORAGE_KEY, _0x1f6f90);
       },
     ),
-    _0x5408ce = _0x2c424d.subscribeSelector(
-      (_0x970958) => {
+    _0x199197 = _0x503c83['subscribeSelector'](
+      (_0x4fb732) => serializeImageToolbarLayout(_0x4fb732['ui']?.['imageToolbarLayout']),
+      (_0x3b4e2e) => {
+        safeStorageSet(IMAGE_TOOLBAR_LAYOUT_STORAGE_KEY, _0x3b4e2e);
+      },
+    ),
+    _0x331161 = _0x503c83['subscribeSelector'](
+      (_0xa1e5d9) => serializeVideoToolbarLayout(_0xa1e5d9['ui']?.['videoToolbarLayout']),
+      (_0x46709b) => {
+        safeStorageSet(VIDEO_TOOLBAR_LAYOUT_STORAGE_KEY, _0x46709b);
+      },
+    ),
+    _0x2a1cea = _0x503c83['subscribeSelector'](
+      (_0x15b3c0) => _0x15b3c0['ui']?.['alignFeatureEnabled'] !== ![],
+      (_0x49ab9a) => {
+        safeStorageSet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, _0x49ab9a ? '1' : '0');
+      },
+    ),
+    _0x29f4e5 = _0x503c83['subscribeSelector'](
+      (_0x1879f6) => {
+        const _0x2ac817 = _0x1879f6['ui']?.['alignFeatureTriggerMode'];
+        return _0x2ac817 === 'hold' || _0x2ac817 === 'click' || _0x2ac817 === 'off' ? _0x2ac817 : 'click';
+      },
+      (_0x23635e) => {
+        (safeStorageSet(ALIGN_TRIGGER_MODE_STORAGE_KEY, _0x23635e),
+          safeStorageSet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, _0x23635e === 'off' ? '0' : '1'));
+      },
+    ),
+    _0x72bd3d = _0x503c83['subscribeSelector'](
+      (_0x151580) => {
+        const _0x1f30c5 = Number(_0x151580['ui']?.['alignDistributeGap']);
+        return Number['isFinite'](_0x1f30c5)
+          ? Math['max'](0x0, Math['min'](0xc8, Math['round'](_0x1f30c5)))
+          : 0x28;
+      },
+      (_0x444218) => {
+        safeStorageSet(ALIGN_DISTRIBUTE_GAP_STORAGE_KEY, String(_0x444218));
+      },
+    ),
+    _0x4a89d5 = _0x503c83['subscribeSelector'](
+      (_0x50f048) => _0x50f048['ui']?.['snapGuidesEnabled'] !== ![],
+      (_0x370906) => {
+        safeStorageSet(SNAP_GUIDES_ENABLED_STORAGE_KEY, _0x370906 ? '1' : '0');
+      },
+    ),
+    _0x5d0bba = _0x503c83['subscribeSelector'](
+      (_0x1b966a) => {
         try {
-          return JSON.stringify(_0x970958.ui?.featureSelections || {});
+          return JSON['stringify'](_0x1b966a['ui']?.['featureSelections'] || {});
         } catch {
           return '{}';
         }
       },
-      (_0xaf4f85) => {
-        const _0x4524e9 = parseJsonObject(_0xaf4f85);
+      (_0x1a4237) => {
+        const _0x744b70 = parseJsonObject(_0x1a4237);
         safeStorageSet(
           FEATURE_SELECTIONS_STORAGE_KEY,
-          JSON.stringify(sanitizeFeatureSelectionsRecord(_0x4524e9)),
+          JSON['stringify'](sanitizeFeatureSelectionsRecord(_0x744b70)),
         );
       },
     );
   return () => {
-    (_0x45dab1?.(),
-      _0x2029b5?.(),
-      _0x5b3c37?.(),
-      _0x2a58f3?.(),
-      _0x10a8cc?.(),
-      _0x2f8cd5?.(),
-      _0x44d033?.(),
-      _0x3f7868?.(),
-      _0xdb46?.(),
-      _0x2fb96a?.(),
-      _0x54e9eb?.(),
-      _0x48e663?.(),
-      _0x3052fb?.(),
-      _0x35fce7?.(),
-      _0x1eb07b?.(),
-      _0x432457?.(),
-      _0x5408ce?.(),
-      _0x31e291.setViewportPersistPolicy(() => true));
+    (_0x3cae09?.(),
+      _0x10e2f3?.(),
+      _0x16a774?.(),
+      _0x5ca8b9?.(),
+      _0x28064a?.(),
+      _0x408791?.(),
+      _0xba3352?.(),
+      _0x4b4b48?.(),
+      _0x19c068?.(),
+      _0x205a36?.(),
+      _0x40443f?.(),
+      _0x79636d?.(),
+      _0x40faf1?.(),
+      _0x3e7a7b?.(),
+      _0x2e4558?.(),
+      _0x5b8b1c?.(),
+      _0x327e8a?.(),
+      _0x199197?.(),
+      _0x331161?.(),
+      _0x2a1cea?.(),
+      _0x29f4e5?.(),
+      _0x72bd3d?.(),
+      _0x4a89d5?.(),
+      _0x5d0bba?.(),
+      _0x9d262e['setViewportPersistPolicy'](() => !![]));
   };
 }

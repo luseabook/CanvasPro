@@ -2,6 +2,14 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
 import { normalizeRatioLabelText } from '../imageRatioPolicy.js';
 import { buildImageRequestFromManifest } from './ModelApiManifestNormalizer.js';
 import { getRunningHubWorkflowPayloadResolver } from './runninghubWorkflowResolvers/index.js';
+import {
+  getRunningHubProviderProfileId,
+  normalizeRunningHubModelApiProfileId,
+  resolveRunningHubModelApiBaseUrl,
+} from '../../src/modules/runningHubProviderProfiles.js';
+import { normalizeRunningHubInstanceType } from '../../src/modules/runningHubInstanceTypes.js';
+import { uploadModelApiMediaInputs } from '../mediaInputUploadRouter.js';
+import { createMediaUploadError } from '../mediaUploadErrorDetails.js';
 const RH_V54_SOURCE_VIDEO_MISSING_MESSAGE = '未获取到源视频 URL，请重新连接或重新上传源视频后再生成。',
   RH_V54_SOURCE_VIDEO_UPLOAD_FAILED_MESSAGE =
     '源视频上传失败，可能是网络延迟或视频文件暂时无法访问，请稍后重试，或重新上传源视频。',
@@ -802,4 +810,194 @@ export async function buildModelRequest(_0x2a4514, _0x1bdf33, _0x40ebd7) {
   });
   if (_0x29afad) return _0x29afad;
   throw new Error('RunningHub model API manifest missing: ' + _0x2a4514.model);
+}
+const CUSTOM_AI_APP_MEDIA_NODE_SOURCES = new Set(['imageInput', 'videoInput', 'audioInput']);
+
+function getRunningHubWorkflowProfileId(_0x514d28 = {}) {
+  const _0x5ea456 = getRunningHubProviderProfileId(_0x514d28);
+  return _0x5ea456 ? normalizeRunningHubModelApiProfileId(_0x5ea456) : '';
+}
+
+function getRunningHubWorkflowBaseUrl(_0x3de2ac = {}) {
+  const _0x3ef228 = String(_0x3de2ac?.['runningHubApiUrl'] || '')['trim']();
+  if (_0x3ef228) return _0x3ef228['replace'](/\/+$/, '');
+  return resolveRunningHubModelApiBaseUrl(getRunningHubWorkflowProfileId(_0x3de2ac));
+}
+
+export function resolveRunningHubWorkflowResourceId(_0x4c0d2e, _0x4819ac = {}) {
+  const _0x2bfe98 = getRunningHubWorkflowProfileId(_0x4819ac) || 'runninghub',
+    _0x21e58a = _0x4c0d2e?.['extensions']?.['providerProfileBindings']?.[_0x2bfe98],
+    _0x164a39 = _0x4c0d2e?.['submitMode'] === 'runninghub-task-create',
+    _0x49627a = _0x164a39
+      ? _0x21e58a?.['workflowId'] || _0x21e58a?.['appId']
+      : _0x21e58a?.['appId'] || _0x21e58a?.['workflowId'],
+    _0x9ea9f0 = _0x164a39
+      ? _0x4c0d2e?.['workflowId'] || _0x4c0d2e?.['appId']
+      : _0x4c0d2e?.['appId'] || _0x4c0d2e?.['workflowId'];
+  return String(_0x49627a || _0x9ea9f0 || '')['trim']();
+}
+
+function isImportedRunningHubAiAppManifest(_0x5a4a20) {
+  return (
+    Boolean(_0x5a4a20?.['extensions']?.['rhAiApp']) &&
+    _0x5a4a20['extensions']['rhAiApp']['sourceType'] !== 'runninghub-workflow'
+  );
+}
+
+function relaxCustomAiAppMediaNodeMappings(_0x4f48fb = null, { enabled: enabled = ![] } = {}) {
+  if (!enabled || !_0x4f48fb || typeof _0x4f48fb !== 'object' || Array['isArray'](_0x4f48fb))
+    return _0x4f48fb;
+  const _0xd9123a = Array['isArray'](_0x4f48fb['nodeInfoList'])
+    ? _0x4f48fb['nodeInfoList']['map']((_0x4dab6f) =>
+        CUSTOM_AI_APP_MEDIA_NODE_SOURCES['has'](String(_0x4dab6f?.['source'] || '')['trim']())
+          ? { ..._0x4dab6f, required: ![] }
+          : _0x4dab6f,
+      )
+    : _0x4f48fb['nodeInfoList'];
+  return { ..._0x4f48fb, nodeInfoList: _0xd9123a };
+}
+
+function getImageWorkflowLongSideMap(_0x521b53 = {}) {
+  const _0x4e8d18 =
+    _0x521b53?.['longSideByImageSize'] && typeof _0x521b53['longSideByImageSize'] === 'object'
+      ? _0x521b53['longSideByImageSize']
+      : null;
+  return _0x4e8d18 || Object['freeze']({ '1K': 0x400, '1.5K': 0x600, '2K': 0x780 });
+}
+
+function resolveImageWorkflowQualityKey(_0x4541b5, _0x189981 = {}) {
+  const _0x2a1d21 = getImageWorkflowLongSideMap(_0x189981),
+    _0x19e26b = String(_0x189981?.['defaultImageSize'] || '2K')
+      ['trim']()
+      ['toUpperCase'](),
+    _0x3b7213 = String(_0x4541b5 || _0x19e26b)
+      ['trim']()
+      ['toUpperCase'](),
+    _0x597eaf = Object['keys'](_0x2a1d21);
+  return (
+    _0x597eaf['find']((_0x560a37) => String(_0x560a37)['trim']()['toUpperCase']() === _0x3b7213) ||
+    _0x597eaf['find']((_0x4bd2b2) => String(_0x4bd2b2)['trim']()['toUpperCase']() === _0x19e26b) ||
+    _0x597eaf[0x0] ||
+    '2K'
+  );
+}
+
+function resolveImageWorkflowDimensions(_0x26c569, _0xe8b55c, _0x4ff4d1 = {}) {
+  const _0x37e6ce = resolveImageWorkflowQualityKey(_0x26c569, _0x4ff4d1),
+    _0x22535c = Number(getImageWorkflowLongSideMap(_0x4ff4d1)[_0x37e6ce]) || 0x780,
+    _0x4f92d1 = String(_0x4ff4d1?.['defaultAspectRatio'] || RUNNINGHUB_WORKFLOW_DEFAULT_RATIO)['trim'](),
+    _0x2520e1 = normalizeRunningHubWorkflowRatio(_0xe8b55c, _0x4f92d1),
+    [_0x1585a2, _0xcd4634] = _0x2520e1['split'](':'),
+    _0x37b5a3 = Number['parseFloat'](_0x1585a2) || 0x1,
+    _0x4aaf64 = Number['parseFloat'](_0xcd4634) || 0x1,
+    _0x41b04e = _0x37b5a3 >= _0x4aaf64,
+    _0x2158e0 = _0x41b04e ? _0x22535c : (_0x22535c * _0x37b5a3) / _0x4aaf64,
+    _0xdee1d5 = _0x41b04e ? (_0x22535c * _0x4aaf64) / _0x37b5a3 : _0x22535c,
+    _0x58b425 = Math['max'](0x1, Number(_0x4ff4d1?.['align']) || 0x40),
+    _0x4394c2 = Math['max'](0x1, Number(_0x4ff4d1?.['minDimension']) || 0x200),
+    _0x2645b0 = (_0x528680) =>
+      Math['max'](_0x4394c2, Math['round'](Number(_0x528680 || 0x0) / _0x58b425) * _0x58b425);
+  return { width: _0x2645b0(_0x2158e0), height: _0x2645b0(_0xdee1d5) };
+}
+
+function resolveManifestDimensionsValue(_0x1c717c, _0x4b96a0, _0x2e0d7b, _0x4d86fe) {
+  const _0x215ab6 = [
+    ...(Array['isArray'](_0x4b96a0?.[_0x2e0d7b + 'Fields']) ? _0x4b96a0[_0x2e0d7b + 'Fields'] : []),
+    _0x4b96a0?.[_0x2e0d7b + 'Field'],
+    _0x2e0d7b === 'imageSize' ? 'imageSize' : 'resolvedRatioLabel',
+    _0x2e0d7b === 'imageSize' ? 'generationParams.imageSize' : 'aspectRatio',
+    _0x2e0d7b === 'aspectRatio' ? 'generationParams.aspectRatio' : '',
+  ]['filter'](Boolean);
+  return resolveManifestPayloadValue(_0x1c717c, _0x215ab6, _0x4d86fe);
+}
+
+function normalizeManifestDimensionNode(_0x5f1059, _0x38ced4, _0x204387) {
+  if (_0x5f1059 && typeof _0x5f1059 === 'object' && !Array['isArray'](_0x5f1059))
+    return {
+      nodeId: String(_0x5f1059['nodeId'] || '')['trim'](),
+      fieldName: String(_0x5f1059['fieldName'] || _0x204387)['trim']() || _0x204387,
+      description: _0x5f1059['description'] || _0x204387,
+    };
+  return {
+    nodeId: String(_0x38ced4?.['nodeId'] || '')['trim'](),
+    fieldName: String(
+      _0x204387 === 'width'
+        ? _0x38ced4?.['widthFieldName'] || 'width'
+        : _0x38ced4?.['heightFieldName'] || 'height',
+    )['trim'](),
+    description: _0x204387,
+  };
+}
+
+function pushManifestDimensionsNodes(_0x1148df, _0x221c2e, _0x1a63d5) {
+  const _0x579a3f = normalizeManifestDimensionNode(_0x221c2e?.['widthNode'], _0x221c2e, 'width'),
+    _0x22f348 = normalizeManifestDimensionNode(_0x221c2e?.['heightNode'], _0x221c2e, 'height');
+  [
+    [_0x579a3f, _0x1a63d5['width']],
+    [_0x22f348, _0x1a63d5['height']],
+  ]['forEach'](([_0x477d88, _0x1c0a6]) => {
+    if (!_0x477d88['nodeId'] || !_0x477d88['fieldName']) return;
+    _0x1148df['push']({
+      nodeId: _0x477d88['nodeId'],
+      fieldName: _0x477d88['fieldName'],
+      fieldValue: String(_0x1c0a6),
+      description: _0x477d88['description'],
+    });
+  });
+}
+
+function buildRunningHubImageResultExtractor() {
+  return (_0x4b79c7) => {
+    if (_0x4b79c7['status'] === 'COMPLETED' && Array['isArray'](_0x4b79c7['results']))
+      return _0x4b79c7['results']
+        ['map']((_0x1d8936) => _0x1d8936['url'] || _0x1d8936['imageUrl'])
+        ['filter'](Boolean);
+    return [];
+  };
+}
+
+function buildOpenApiImageWorkflowRequest({
+  executionManifest: _0x31329c,
+  payload: _0x1d2424,
+  apiKey: _0x51248e,
+  nodeInfoList: _0x5c0721,
+}) {
+  const _0x29d7f7 = normalizeRunningHubInstanceType(_0x1d2424[_0x31329c['instanceType']?.['field']]),
+    _0x3bd41d = resolveRunningHubWorkflowResourceId(_0x31329c, _0x1d2424);
+  return {
+    url: '/api/v2/proxy/image',
+    headers: { 'Content-Type': 'application/json' },
+    body: {
+      apiUrl: getRunningHubWorkflowBaseUrl(_0x1d2424) + '/openapi/v2/run/ai-app/' + _0x3bd41d,
+      apiKey: _0x51248e,
+      nodeInfoList: _0x5c0721,
+      instanceType: _0x29d7f7,
+      usePersonalQueue: 'false',
+    },
+    isAsync: !![],
+    taskIdPath: _0x31329c['result']?.['taskIdPath'] || 'taskId',
+    adapterTrace: { source: 'manifest', executionId: _0x31329c['id'], modelId: _0x1d2424['model'] },
+    pollUrlBuilder: () => getRunningHubWorkflowBaseUrl(_0x1d2424) + '/openapi/v2/query',
+    resultExtractor: buildRunningHubImageResultExtractor(),
+  };
+}
+
+async function uploadRunningHubMediaInputs(
+  _0x542a1a,
+  _0xf980a0,
+  _0xc0626f,
+  _0x591ac5,
+  _0x41f068,
+  { uploadFailedMessage: uploadFailedMessage = 'RunningHUB\x20素材上传失败' } = {},
+) {
+  try {
+    return await uploadModelApiMediaInputs(_0x542a1a, _0xf980a0, _0x41f068, {
+      apiKey: _0x591ac5,
+      apiUrl: getRunningHubWorkflowBaseUrl(_0xc0626f),
+      fallbackProvider: 'runninghub',
+      strictUpload: !![],
+    });
+  } catch (_0x5321a9) {
+    throw createMediaUploadError(_0x5321a9, { kind: _0x542a1a, label: uploadFailedMessage });
+  }
 }

@@ -140,6 +140,24 @@ let _edgeIndexRev = -1,
   _currentSnapshot = null,
   _runningTimers = new Set(),
   _lastTimerSyncRev = -1;
+const MANIFEST_MODEL_NODE_TYPES = new Set(['ai-image', 'ai-text', 'ai-video', 'ai-audio']);
+export function refreshManifestModelNodeUis() {
+  const _0x410294 = [],
+    _0x4637a5 = [];
+  for (const [_0x3a9604, _0x47a3bc] of [..._componentMap.entries()]) {
+    const _0x397700 = _currentSnapshot?.nodes?.[_0x3a9604];
+    if (!_0x397700 || !MANIFEST_MODEL_NODE_TYPES.has(normalizeNodeType(_0x397700.type))) continue;
+    if (typeof _0x47a3bc?.refreshModelRegistryUi === 'function')
+      try {
+        (_0x47a3bc.refreshModelRegistryUi(), _0x410294.push(_0x3a9604));
+        continue;
+      } catch (_0x25873e) {
+        console.warn('[Renderer] refresh model registry UI failed:', _0x25873e);
+      }
+    (_destroyNode(_0x3a9604), _0x4637a5.push(_0x3a9604));
+  }
+  return { refreshedNodeIds: _0x410294, remountedNodeIds: _0x4637a5 };
+}
 function _hideTimer(_0x276321) {
   const _0x33432 = _wrapperMap.get(_0x276321),
     _0x2c2c18 = _0x33432?.__v2_timer_el;
@@ -916,6 +934,8 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
   (_0x290e05.appendChild(_0xa653f4), _syncRendererBridge());
   let _0x2fcab6 = null,
     _0x34921d = null,
+    _presentationActive = true,
+    _latestPresentationSnapshot = null,
     _0x4d6a84 = -1,
     _0x749f98 = -1,
     _0x50eeb5 = 0,
@@ -926,6 +946,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
       _0xaaf6b3 !== null && (cancelAnimationFrame(_0xaaf6b3), (_0xaaf6b3 = null)));
   }
   function _0x58868c(_0x5c3ff2 = RENDERER_VIRTUALIZATION_CONFIG.settleDelayMs) {
+    if (!_presentationActive) return;
     (_0x4e7d6e(),
       (_0x2db68f = setTimeout(
         () => {
@@ -1111,7 +1132,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
     else deferredParkCount > 0 && _0x2685db > 0 && _0x58868c(_0x2685db + 16);
   }
   function _0x19f4ce(_0x4ddc65) {
-    if (!_0x4ddc65) return;
+    if (!_presentationActive || !_0x4ddc65) return;
     const _0x4af397 = isPerfProbeEnabled(),
       _0x510a2c =
         _0x4af397 && typeof performance !== 'undefined' && typeof performance.now === 'function'
@@ -1230,7 +1251,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
   typeof window !== 'undefined' &&
     ((window.v2Renderer = window.v2Renderer || {}),
     Object.assign(window.v2Renderer, { flushNode: _0x40c520, flushNodes: _0x6ea2e9 }));
-  const _0x886477 = _0x1df4a5.subscribeRaw((_0x58bb73) => {
+  const _schedulePresentationSnapshot = (_0x58bb73) => {
       ((_currentSnapshot = _0x58bb73), (_0x34921d = _0x58bb73));
       if (_0x2fcab6 !== null) return;
       _0x2fcab6 = requestAnimationFrame(() => {
@@ -1238,8 +1259,14 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
         const _0x337ce4 = _0x34921d;
         ((_0x34921d = null), _syncRunningTimers(_0x337ce4), _0x19f4ce(_0x337ce4));
       });
+    },
+    _0x886477 = _0x1df4a5.subscribeRaw((_0x58bb73) => {
+      _latestPresentationSnapshot = _0x58bb73;
+      if (!_presentationActive) return;
+      _schedulePresentationSnapshot(_0x58bb73);
     }),
     _0x4830cf = () => {
+      _presentationActive = false;
       (_0x886477(),
         _0x4e7d6e(),
         _containerResizeObserver &&
@@ -1258,6 +1285,17 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
         _0x22f85d?.remove?.(),
         _0xa653f4?.remove?.());
     };
+  _0x4830cf.setPresentationActive = (active) => {
+    const nextActive = active === true;
+    if (_presentationActive === nextActive) return;
+    _presentationActive = nextActive;
+    if (!_presentationActive) {
+      _0x2fcab6 !== null && (cancelAnimationFrame(_0x2fcab6), (_0x2fcab6 = null));
+      _0x34921d = null;
+      return;
+    }
+    if (_latestPresentationSnapshot) _schedulePresentationSnapshot(_latestPresentationSnapshot);
+  };
   return _0x4830cf;
 }
 function _renderViewport(_0x594e4d, _0x4ddaf8, _0x5d47c5 = false) {

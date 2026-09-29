@@ -9,6 +9,14 @@ export function firstNonEmptyString(..._0x32158a) {
   }
   return '';
 }
+export function resolveGenerationResultSelection(_0x43a687 = [], _0xaf63d1 = 0) {
+  const _0xe0b48c = Number(_0xaf63d1),
+    _0x21147c = Number.isFinite(_0xe0b48c) ? Math.trunc(_0xe0b48c) : 0;
+  return {
+    items: _0x43a687,
+    activeIndex: Math.max(0, Math.min(_0x43a687.length - 1, _0x21147c)),
+  };
+}
 export function normalizeGenerationResultItems(
   _0x5253d2,
   { collectionField: collectionField = '', singleItemFields: singleItemFields = [] } = {},

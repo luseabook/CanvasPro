@@ -8,6 +8,10 @@ import {
 } from '../services/desktopMediaBlobSource.js';
 import { localPathToUrl } from '../utils/localMediaPath.js';
 import { t } from '../i18n/index.js';
+import {
+  claimExternalVideoPlayback,
+  releaseExternalVideoPlayback,
+} from '../components/shared/hoverVideoPlaybackLifecycle.js';
 const PLAYABLE_VIDEO_TYPES = new Set(['source-video', 'video', 'ai-video']),
   GROUP_NODE_TYPE = 'group',
   SYNC_PLAYBACK_CLASS = 'is-sync-video-playing';
@@ -401,4 +405,200 @@ export function syncPlayGroupVideos({
     showToast: showToast,
     ..._0x5c7533,
   });
+}
+let activeSyncVideoPlaybackSession = null,
+  syncVideoPlaybackSessionSequence = 0x0;
+
+const syncVideoPlaybackStateListeners = new Set();
+
+export function getSyncVideoPlaybackState() {
+  const _0x88c83a = activeSyncVideoPlaybackSession?.['isCurrent']?.() === !![] ;
+  return { active: _0x88c83a, loop: _0x88c83a && activeSyncVideoPlaybackSession?.['loop'] === !![] };
+}
+
+function notifySyncVideoPlaybackState() {
+  const _0x4b3226 = getSyncVideoPlaybackState();
+  for (const _0x3f59ff of syncVideoPlaybackStateListeners) {
+    try {
+      _0x3f59ff(_0x4b3226);
+    } catch {}
+  }
+}
+
+export function subscribeSyncVideoPlaybackState(_0x4cb2cc) {
+  if (typeof _0x4cb2cc !== 'function') return () => {};
+  syncVideoPlaybackStateListeners['add'](_0x4cb2cc);
+  try {
+    _0x4cb2cc(getSyncVideoPlaybackState());
+  } catch {}
+  return () => syncVideoPlaybackStateListeners['delete'](_0x4cb2cc);
+}
+
+export function resolveCanvasNodePlayableVideoEntry(_0x1f34c2) {
+  if (!PLAYABLE_VIDEO_TYPES['has'](normalizeText(_0x1f34c2?.['type']))) return null;
+  if (isUnavailableVideoRecord(_0x1f34c2)) return null;
+  if (normalizeText(_0x1f34c2?.['type']) === 'ai-video') {
+    const _0x4325ef = getMainVideoRecord(_0x1f34c2);
+    if (_0x4325ef?.['record']) {
+      if (isUnavailableVideoRecord(_0x4325ef['record'])) return null;
+      const _0x1cda71 = resolveVideoSource(_0x4325ef['record']) || resolveVideoSource(_0x1f34c2);
+      return _0x1cda71
+        ? {
+            nodeId: normalizeText(_0x1f34c2['id']),
+            videoIndex: _0x4325ef['index'],
+            source: _0x1cda71,
+            node: _0x1f34c2,
+            record: _0x4325ef['record'],
+          }
+        : null;
+    }
+  }
+  const _0x465d71 = resolveVideoSource(_0x1f34c2);
+  return _0x465d71
+    ? {
+        nodeId: normalizeText(_0x1f34c2['id']),
+        videoIndex: 0x0,
+        source: _0x465d71,
+        node: _0x1f34c2,
+        record: _0x1f34c2,
+      }
+    : null;
+}
+
+export function findCanvasVideoElementForEntry(_0x4d2ef1, _0x1d3e50) {
+  const _0x2a9a09 = _0x4d2ef1 || globalThis['document'];
+  if (!_0x2a9a09 || typeof _0x2a9a09['getElementById'] !== 'function') return null;
+  const _0x1faf86 = _0x2a9a09['getElementById'](normalizeText(_0x1d3e50?.['nodeId']));
+  if (!_0x1faf86 || typeof _0x1faf86['querySelector'] !== 'function') return null;
+  const _0x45701c = Math['max'](0x0, Math['trunc'](Number(_0x1d3e50?.['videoIndex']) || 0x0));
+  return (
+    _0x1faf86['querySelector']('video[data-idx="' + _0x45701c + '\x22]') ||
+    _0x1faf86['querySelector']('.video-player') ||
+    _0x1faf86['querySelector']('video')
+  );
+}
+
+function isSpaceInteraction(_0x53e5c7) {
+  return _0x53e5c7?.['code'] === 'Space' || _0x53e5c7?.['key'] === '\x20' || _0x53e5c7?.['key'] === 'Space';
+}
+
+function beginSyncVideoPlaybackSession({
+  targets: _0x1a583d,
+  loop: loop = ![],
+  documentObject: _0x49be61,
+  windowObject: _0x3ce1f3,
+  shouldStopOnPointerEvent: _0x3858fc,
+}) {
+  const _0x33d5f6 = loop === !![],
+    _0x2eae9f = Object['freeze']({ kind: 'sync-video-playback', id: ++syncVideoPlaybackSessionSequence });
+  let _0x14b0f6 = 'preparing',
+    _0x1cf430 = ![],
+    _0x112cda = _0x1a583d['filter']((_0x1e4556) => _0x1e4556['videoEl']);
+  const _0x1bafeb = new Map(),
+    _0x289aeb = (_0x1bbff8) => {
+      const _0x440767 = _0x1bafeb['get'](_0x1bbff8) || [];
+      _0x1bafeb['delete'](_0x1bbff8);
+      while (_0x440767['length'] > 0x0) _0x440767['pop']()?.();
+    },
+    _0x22c78a = (_0x3a4785, { pause: pause = ![] } = {}) => {
+      (_0x289aeb(_0x3a4785),
+        releaseExternalVideoPlayback(_0x3a4785['videoEl'], _0x2eae9f),
+        _0x3a4785['cleanupChrome']?.(),
+        (_0x3a4785['videoEl']['loop'] = ![]));
+      if (pause) safePause(_0x3a4785['videoEl']);
+      _0x112cda = _0x112cda['filter']((_0x22cd76) => _0x22cd76 !== _0x3a4785);
+    },
+    _0x1cda29 = ({ pauseTargets: pauseTargets = !![] } = {}) => {
+      if (_0x1cf430) return ![];
+      ((_0x1cf430 = !![]), (_0x14b0f6 = 'stopped'));
+      const _0x3b856f = activeSyncVideoPlaybackSession === _0x5acc7c;
+      if (_0x3b856f) activeSyncVideoPlaybackSession = null;
+      (_0x49be61?.['removeEventListener']?.('pointerdown', _0x26dab2, !![]),
+        _0x3ce1f3?.['removeEventListener']?.('keydown', _0x3cb1cc, !![]));
+      for (const _0x178504 of [..._0x112cda]) {
+        _0x22c78a(_0x178504, { pause: pauseTargets });
+      }
+      if (_0x3b856f) notifySyncVideoPlaybackState();
+      return !![];
+    },
+    _0x45d152 = (_0x38bab8, _0x3701ae, _0xaa25ca) => {
+      _0x38bab8['videoEl']['addEventListener']?.(_0x3701ae, _0xaa25ca);
+      const _0x5a5ea4 = _0x1bafeb['get'](_0x38bab8) || [];
+      (_0x5a5ea4['push'](() => _0x38bab8['videoEl']['removeEventListener']?.(_0x3701ae, _0xaa25ca)),
+        _0x1bafeb['set'](_0x38bab8, _0x5a5ea4));
+    },
+    _0x5acc7c = {
+      owner: _0x2eae9f,
+      loop: _0x33d5f6,
+      isCurrent() {
+        return !_0x1cf430 && activeSyncVideoPlaybackSession === _0x5acc7c;
+      },
+      activate(_0x51f115) {
+        if (!_0x5acc7c['isCurrent']()) return ![];
+        const _0x2d44f7 = new Set(_0x51f115);
+        for (const _0x20431d of [..._0x112cda]) {
+          if (_0x2d44f7['has'](_0x20431d)) continue;
+          _0x22c78a(_0x20431d, { pause: !![] });
+        }
+        const _0x5e7a90 = _0x33d5f6 ? 0x2 : 0x1;
+        if (_0x112cda['length'] < _0x5e7a90) return ![];
+        _0x14b0f6 = 'active';
+        for (const _0x570d80 of _0x112cda) {
+          const _0x431fd = () => {
+              if (_0x14b0f6 !== 'active' || !_0x5acc7c['isCurrent']()) return;
+              if (_0x33d5f6) {
+                _0x5acc7c['stop']();
+                return;
+              }
+              _0x22c78a(_0x570d80);
+              if (_0x112cda['length'] === 0x0) _0x1cda29({ pauseTargets: ![] });
+            },
+            _0x555e9c = _0x33d5f6 ? ['pause', 'error'] : ['pause', 'ended', 'error'];
+          for (const _0x360435 of _0x555e9c) {
+            _0x45d152(_0x570d80, _0x360435, _0x431fd);
+          }
+        }
+        const _0x14159c = _0x112cda['filter'](
+          (_0x28716d) =>
+            _0x28716d['videoEl']?.['paused'] === !![] || _0x28716d['videoEl']?.['isConnected'] === ![],
+        );
+        if (_0x33d5f6 && _0x14159c['length'] > 0x0) return (_0x5acc7c['stop'](), ![]);
+        for (const _0x41f9b3 of _0x14159c) _0x22c78a(_0x41f9b3);
+        if (_0x112cda['length'] === 0x0) return (_0x1cda29({ pauseTargets: ![] }), ![]);
+        return _0x5acc7c['isCurrent']();
+      },
+      stop() {
+        return _0x1cda29({ pauseTargets: !![] });
+      },
+    },
+    _0x26dab2 = (_0x4e5cdc) => {
+      if (typeof _0x3858fc === 'function')
+        try {
+          if (_0x3858fc(_0x4e5cdc) === ![]) return;
+        } catch {}
+      _0x5acc7c['stop']();
+    },
+    _0x3cb1cc = (_0x58f252) => {
+      if (isSpaceInteraction(_0x58f252)) _0x5acc7c['stop']();
+    };
+  activeSyncVideoPlaybackSession = _0x5acc7c;
+  for (const _0x18760a of _0x112cda) {
+    claimExternalVideoPlayback(_0x18760a['videoEl'], _0x2eae9f);
+  }
+  return (
+    _0x33d5f6 &&
+      (_0x49be61?.['addEventListener']?.('pointerdown', _0x26dab2, !![]),
+      _0x3ce1f3?.['addEventListener']?.('keydown', _0x3cb1cc, !![])),
+    notifySyncVideoPlaybackState(),
+    _0x5acc7c
+  );
+}
+
+export function stopActiveSyncVideoPlayback() {
+  return activeSyncVideoPlaybackSession?.['stop']?.() === !![] ;
+}
+
+export function stopActiveSyncVideoLoopPlayback() {
+  if (activeSyncVideoPlaybackSession?.['loop'] !== !![]) return ![];
+  return stopActiveSyncVideoPlayback();
 }

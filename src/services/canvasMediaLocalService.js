@@ -458,3 +458,43 @@ export function sanitizeCanvasNodeMediaPatchForStore(_0x21e4a2 = {}, _0x39b8b9 =
     _0x112d1f
   );
 }
+export const VIDEO_PROXY_VERSION_V2_1280 = 'v2-1280';
+
+export function resolveCanvasVideoDisplayUrl(_0x236eff = {}) {
+  return resolveCanvasVideoUrl(_0x236eff);
+}
+
+export function buildCanvasVideoProxyPromotionPatch(_0x4ebf43 = {}) {
+  const _0xdf9da9 = pickLocalPath(_0x4ebf43, ['pendingVideoProxyLocalPath']),
+    _0x5c6f7b = normalizeText(_0x4ebf43?.['pendingVideoProxyVersion']);
+  if (!_0xdf9da9 || _0x5c6f7b !== VIDEO_PROXY_VERSION_V2_1280) return null;
+  return {
+    ...buildCanvasLocalVideoFields({
+      displayLocalPath: _0xdf9da9,
+      videoProxyStatus: 'generated',
+      videoProxyVersion: _0x5c6f7b,
+    }),
+    pendingVideoProxyLocalPath: '',
+    pendingVideoProxyVersion: '',
+    videoProxyMigrationStatus: 'promoted',
+    videoProxyMigrationError: '',
+  };
+}
+
+function normalizeRemoteMediaFallback() {
+  return '';
+}
+
+function normalizeAudioCollection(_0x1b2644) {
+  if (!Array['isArray'](_0x1b2644)) return _0x1b2644;
+  return _0x1b2644['map']((_0x56750b) => {
+    if (!_0x56750b || typeof _0x56750b !== 'object') return _0x56750b;
+    return {
+      ..._0x56750b,
+      ...buildCanvasLocalAudioFields(_0x56750b, {
+        includeCanonicalUrl: hasOwn(_0x56750b, 'url'),
+        includeResultUrl: hasOwn(_0x56750b, 'resultUrl'),
+      }),
+    };
+  });
+}

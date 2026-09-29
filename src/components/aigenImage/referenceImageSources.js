@@ -50,3 +50,15 @@ export function resolveRefImageCandidateUrls(_0x48888b) {
     _0x1a1de7 = [_0x353847, _0x4801c2].filter(Boolean);
   return Array.from(new Set(_0x1a1de7));
 }
+
+function normalizeIdentityPart(_0x2f418f){return String(_0x2f418f??'')["trim"]();}
+
+function appendImageIdentityFields(_0x508c71,_0x52026c,_0x15a677={}){['assetId',"sourceId","thumbId","imageUrl","sourceUrl","thumbUrl","url","resultUrl","localPath","originalLocalPath",'displayLocalPath','thumbLocalPath',"fileName","derivativeStatus"]["forEach"](_0x5ed6f6=>{const _0xcfae96=normalizeIdentityPart(_0x15a677?.[_0x5ed6f6]);if(_0xcfae96)_0x508c71["push"](_0x52026c+'.'+_0x5ed6f6+'='+_0xcfae96);});}
+
+function hashRefImageVersionKey(_0xdc5414=''){const _0x53e45f=normalizeIdentityPart(_0xdc5414);let _0x173ac1=0x1505;for(let _0x57966e=0x0;_0x57966e<_0x53e45f["length"];_0x57966e+=0x1){_0x173ac1=(_0x173ac1<<0x5)+_0x173ac1^_0x53e45f['charCodeAt'](_0x57966e),_0x173ac1>>>=0x0;}return _0x173ac1['toString'](0x24);}
+
+export function resolveRefImageMediaIdentityKey(_0x4e43e6,_0x198866={}){const _0x2b10bb=resolveAiImagePrimaryItem(_0x4e43e6),_0x37a1ba=["node="+normalizeIdentityPart(_0x4e43e6?.['id']),"type="+normalizeIdentityPart(_0x4e43e6?.["type"]),"_bizRev="+normalizeIdentityPart(_0x4e43e6?.['_bizRev']),"main="+normalizeIdentityPart(_0x4e43e6?.["mainImageIndex"]),'edgeSourceMediaKey='+normalizeIdentityPart(_0x198866?.["sourceMediaKey"])];return appendImageIdentityFields(_0x37a1ba,'node',_0x4e43e6),appendImageIdentityFields(_0x37a1ba,'primary',_0x2b10bb),_0x37a1ba['join']('|');}
+
+export function versionRefImageUrl(_0x94b67e='',_0x4cffc3=''){const _0x5af576=String(_0x94b67e||'')["trim"](),_0x203a13=normalizeIdentityPart(_0x4cffc3);if(!_0x5af576||!_0x203a13)return _0x5af576;if(/^(?:blob:|data:)/i["test"](_0x5af576))return _0x5af576;if(!_0x5af576['startsWith']('/'))return _0x5af576;const [_0x1bbdfb,_0x52dcc5='']=_0x5af576["split"]('#',0x2),_0xcd8cc6=_0x1bbdfb["includes"]('?')?'&':'?',_0x5ccd7c=hashRefImageVersionKey(_0x203a13);return''+_0x1bbdfb+_0xcd8cc6+"aicv="+_0x5ccd7c+(_0x52dcc5?'#'+_0x52dcc5:'');}
+
+export function resolveVersionedRefImageRenderSources(_0x1a4c47,_0x5652bf={},_0x41ca0b={}){const _0x51f3ba=resolveRefImageMediaIdentityKey(_0x1a4c47,_0x5652bf),{thumbSrc:_0x418865,previewSrc:_0x39b970}=resolveRefImageRenderSources(_0x1a4c47,_0x41ca0b),_0x8a1ac1=versionRefImageUrl(_0x418865,_0x51f3ba);return{'thumbSrc':_0x8a1ac1,'previewSrc':versionRefImageUrl(_0x39b970||_0x8a1ac1,_0x51f3ba),'mediaIdentityKey':_0x51f3ba};}

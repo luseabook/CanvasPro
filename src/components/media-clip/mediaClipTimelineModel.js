@@ -177,3 +177,64 @@ export function buildMediaClipTimelineTicks(_0x3d69fb, _0x2fd666 = 0) {
   }
   return _0x52d742;
 }
+export const MEDIA_CLIP_TIMELINE_RULER_MARK_MIN_SPACING_PX = 0x2c;
+
+export const MEDIA_CLIP_TIMELINE_RULER_MARK_MAX_COUNT = 0x7d0;
+
+export const MEDIA_CLIP_TIMELINE_FRAME_MARK_MIN_SPACING_PX = 0xc;
+
+export const MEDIA_CLIP_TIMELINE_FRAME_MARK_MAX_COUNT = 0x2ee0;
+
+const MEDIA_CLIP_TIMELINE_RULER_MARK_STEPS_ASC = Object['freeze']([0.1, 0.2, 0.5, 0x1, 0x2, 0x5, 0xa, 0xf]);
+
+export function buildMediaClipTimelineRulerMarks(_0x3286cf, _0x32cfd9 = 0x0, _0x198149 = {}) {
+  const _0x272a65 = getMediaClipTimelineDisplayDuration(_0x3286cf),
+    _0x24442c = Math['max'](MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, toNumber(_0x32cfd9, 0x0)),
+    _0x89c8ff = _0x24442c / Math['max'](0x1, _0x272a65),
+    _0x393edb = Math['max'](0x0, Math['round'](toNumber(_0x198149['frameRate'], 0x0))),
+    _0x4ca16b = _0x393edb > 0x0 ? Math['floor'](_0x272a65 * _0x393edb + 0.0001) : 0x0,
+    _0x344628 =
+      _0x393edb > 0x0 &&
+      _0x89c8ff / _0x393edb >= MEDIA_CLIP_TIMELINE_FRAME_MARK_MIN_SPACING_PX &&
+      _0x4ca16b + 0x1 <= MEDIA_CLIP_TIMELINE_FRAME_MARK_MAX_COUNT;
+  if (_0x344628) {
+    const _0x109030 = _0x393edb % 0x2 === 0x0 ? _0x393edb / 0x2 : 0x0;
+    return Array['from']({ length: _0x4ca16b + 0x1 }, (_0x33078e, _0x3386f4) => ({
+      sec: _0x3386f4 / _0x393edb,
+      frameIndex: _0x3386f4,
+      isFrame: !![],
+      isMajor: _0x3386f4 % _0x393edb === 0x0,
+      isMid:
+        _0x3386f4 > 0x0 && _0x109030 > 0x0 && _0x3386f4 % _0x109030 === 0x0 && _0x3386f4 % _0x393edb !== 0x0,
+    }));
+  }
+  const _0x42eba4 = buildMediaClipTimelineTicks(_0x272a65, _0x24442c),
+    _0x358a70 = Math['max'](0.1, Number(_0x42eba4[0x1]) - Number(_0x42eba4[0x0]) || 0x1),
+    _0x551afb =
+      MEDIA_CLIP_TIMELINE_RULER_MARK_STEPS_ASC['find']((_0xbfd14a) => {
+        const _0x10034d = _0x358a70 / _0xbfd14a;
+        return (
+          _0xbfd14a <= _0x358a70 &&
+          Math['abs'](_0x10034d - Math['round'](_0x10034d)) < 0.0001 &&
+          _0xbfd14a * _0x89c8ff >= MEDIA_CLIP_TIMELINE_RULER_MARK_MIN_SPACING_PX &&
+          Math['ceil'](_0x272a65 / _0xbfd14a) + 0x1 <= MEDIA_CLIP_TIMELINE_RULER_MARK_MAX_COUNT
+        );
+      }) || _0x358a70,
+    _0xd26c9a = new Set(_0x42eba4['map']((_0x316834) => _0x316834['toFixed'](0x3))),
+    _0x10c087 = _0x358a70 / 0x2,
+    _0x3b2659 = [];
+  for (let _0x1f81fa = 0x0; _0x1f81fa <= _0x272a65 + 0.001; _0x1f81fa += _0x551afb) {
+    const _0x18a14a = roundMs(_0x1f81fa),
+      _0x311df9 = _0xd26c9a['has'](_0x18a14a['toFixed'](0x3)),
+      _0x25588b = _0x10c087 > 0x0 ? _0x18a14a / _0x10c087 : 0x0;
+    _0x3b2659['push']({
+      sec: _0x18a14a,
+      frameIndex: -0x1,
+      isFrame: ![],
+      isMajor: _0x311df9,
+      isMid:
+        !_0x311df9 && _0x10c087 >= _0x551afb && Math['abs'](_0x25588b - Math['round'](_0x25588b)) < 0.0001,
+    });
+  }
+  return _0x3b2659;
+}

@@ -2367,3 +2367,16 @@ export function createAIGenerateNodeUiModule(_0x42221e) {
   }
   return _0x10d534.prototype;
 }
+
+const AIGEN_IMAGE_MULTI_STACK_MOTION_DURATION_MS = 0x1f4;
+const AIGEN_IMAGE_BACKPLATE_MEDIA_HIDE_CLEAR_DELAY_MS = 0xb4;
+
+export function shouldShowImagePromptInput(_0x1d9fde){if(!_0x1d9fde||typeof _0x1d9fde!=='object')return!![];if(_0x1d9fde?.["prompt"]?.['visible']===![])return![];if(_0x1d9fde?.["prompt"]?.['hidden']===!![])return![];return!![];}
+
+function getRhAiAppImageResultMediaKey(_0x19d34e={}){const _0x30e820=Array['isArray'](_0x19d34e?.["images"])?_0x19d34e["images"]:[],_0x56b516=Number(_0x19d34e?.["mainImageIndex"]),_0x416691=Number["isFinite"](_0x56b516)?Math["max"](0x0,Math["trunc"](_0x56b516)):0x0,_0x52be7a=_0x30e820[Math["min"](_0x416691,Math['max'](0x0,_0x30e820["length"]-0x1))]||{};return[_0x52be7a["displayLocalPath"],_0x52be7a["localPath"],_0x52be7a["originalLocalPath"],_0x52be7a["imageUrl"],_0x52be7a['sourceUrl'],_0x52be7a["thumbUrl"],_0x52be7a['thumbId'],_0x19d34e?.["imageUrl"],_0x19d34e?.["sourceUrl"],_0x19d34e?.['thumbUrl']]["map"](_0x253925=>String(_0x253925||'')["trim"]())["find"](Boolean)||'';}
+
+export function resolveUploadedImageReferenceUrl(_0x1b5363={}){const _0x3f01ab=buildImageNodeStorageFields(_0x1b5363);return String(_0x1b5363?.["displayUrl"]||'')["trim"]()||String(_0x1b5363?.["originalUrl"]||'')["trim"]()||String(_0x1b5363?.["url"]||'')["trim"]()||toLocalPathUrl(_0x3f01ab['displayLocalPath']||_0x3f01ab["originalLocalPath"]||_0x3f01ab["localPath"]);}
+
+function flushAIGenImageReferenceUploadNodes(_0x272de6=[]){const _0x1027f9=Array["from"](new Set(_0x272de6["map"](_0x464285=>String(_0x464285||'')["trim"]())["filter"](Boolean)));if(_0x1027f9["length"]===0x0)return![];const _0x187ffc=globalThis["window"]?.["v2Renderer"];if(typeof _0x187ffc?.["flushNodes"]==="function")try{if(_0x187ffc["flushNodes"](_0x1027f9)===!![])return!![];}catch{}if(typeof _0x187ffc?.["flushNode"]!=="function")return![];let _0x342131=![];for(const _0x54b96f of _0x1027f9){try{_0x342131=_0x187ffc['flushNode'](_0x54b96f)===!![]||_0x342131;}catch{}}return _0x342131;}
+
+function collectSubmitButtonInputRecords({latestNode:latestNode={},nodes:nodes={},inEdges:inEdges=[],imageInputGate:imageInputGate={}}={}){const _0x80e50f=getTargetInputPolicy({...latestNode,'type':latestNode?.["type"]||'ai-image'}),_0x47942f=String(imageInputGate?.["kind"]||'')["trim"](),_0x36f223=[];return _0x47942f==='image'&&getImageInputGateUploadedUrl(latestNode,imageInputGate)&&_0x36f223["push"]({'kind':'image','refSlot':''}),(Array["isArray"](inEdges)?inEdges:[])["forEach"](_0x5ef24a=>{const _0xa77721=nodes?.[_0x5ef24a?.['sourceId']];if(!_0xa77721)return;const _0x527879=resolveEffectiveInputKind(_0xa77721,_0x5ef24a);if(!_0x527879||!isInputKindAllowed(_0x80e50f,_0x527879))return;if(_0x47942f&&_0x527879!==_0x47942f)return;if(_0x527879==="text"){const _0x524f84=String(_0xa77721["outputText"]||_0xa77721['text']||_0xa77721["content"]||_0xa77721["prompt"]||_0xa77721['label']||'')['trim']();if(!_0x524f84)return;}_0x36f223["push"]({'kind':_0x527879,'refSlot':_0x5ef24a?.["refSlot"]||''});}),_0x36f223;}

@@ -515,3 +515,11 @@ export async function buildRunningHubVideoWorkflowSubmitPatch(_0x5cf279 = {}) {
   if (!_0x3e5687) return null;
   return { payloadPatch: _0xeca4b1, updateData: _0x195149?.updateData || {} };
 }
+
+const RH_LTX23_RESOLUTION_OPTIONS = Object["freeze"]([0x400,0x500,0x5a0,0x640,0x780]);
+
+function normalizeRhLtx23Resolution(_0x482628){const _0x4ff241=Number(_0x482628);return RH_LTX23_RESOLUTION_OPTIONS["includes"](_0x4ff241)?_0x4ff241:0x500;}
+
+export function buildRunningHubVideoFixedSlotPayloadPatch({model:model='',nodeData:nodeData={},slotEntries:slotEntries={}}={}){const _0x38afbd=String(model||nodeData?.['model']||'')["trim"](),_0x98a911=getFixedInputSlotConfigFromManifest({...nodeData,'model':_0x38afbd},{'includeHiddenSlots':!![]});if(!_0x98a911)return{};const _0x518ee1=getRunningHubVideoParameterPanelPolicy(_0x38afbd)?.["fixedSlotSummary"]?.["resolver"]==="berniniVideoReplaceInputMode",_0x444e44=_0x518ee1?buildBerniniFixedSlotPayloadPatch(slotEntries):buildGenericFixedSlotPayloadPatchFromEntries(slotEntries,_0x98a911),_0x352745=Object["fromEntries"](Object['entries'](slotEntries)["map"](([_0x564638,_0x2ce301])=>[String(_0x564638||'')["trim"](),String(_0x2ce301?.["url"]||'')["trim"]()])['filter'](([_0x520ae1,_0x395468])=>_0x520ae1&&_0x395468));return Object["keys"](_0x352745)["length"]&&(_0x444e44["inputUrlsBySlot"]=_0x352745),{..._0x444e44,...buildRunningHubVideoFixedSlotSummaryPatch({'model':_0x38afbd,'nodeData':nodeData,'slotEntries':slotEntries})};}
+
+function buildCollectedMediaPayloadPatch(_0x5c1e11,_0xe6aa09={}){if(_0x5c1e11?.["extensions"]?.["collectMediaInputs"]!==!![])return{};const _0x4239ca=_0x1b2041=>(Array["isArray"](_0x1b2041)?_0x1b2041:[])["map"](_0x39139b=>String(_0x39139b||'')["trim"]())["filter"](Boolean);return{'inputImages':_0x4239ca(_0xe6aa09['images']),'inputVideos':_0x4239ca(_0xe6aa09["videos"]),'inputAudios':_0x4239ca(_0xe6aa09['audios'])};}

@@ -1,3 +1,5 @@
+import { syncNotificationShortcut } from './settings/notificationShortcutSettings.js';
+import { desktopBridge } from '../services/desktopBridge.js';
 import { fetchUserShortcutsFromServer, saveUserShortcutsToServer } from '../../api/shortcutsApi.js';
 import { onLocaleChange, t } from '../i18n/index.js';
 const DEFAULT_PRESET_NAME = '默认预设',
@@ -793,6 +795,18 @@ export function closeShortcuts() {
 export function getShortcuts() {
   return _shortcuts;
 }
+export function getShortcutLabel(_0x3e0c2d, _0x2bb5f6 = '') {
+  const _0x3e1b41 = String(_0x3e0c2d || '').trim();
+  if (!_0x3e1b41) return _0x2bb5f6;
+  const _0x3e7d90 = getShortcutKeys(_0x3e1b41);
+  return _0x3e7d90.length > 0 ? _0x3e7d90.join(' ') : '';
+}
+export function getShortcutKeys(_0x3e0c2d) {
+  const _0x3e1b41 = String(_0x3e0c2d || '').trim();
+  if (!_0x3e1b41) return [];
+  const _0x4bf264 = _shortcuts[_0x3e1b41] || DEFAULT_SHORTCUTS[_0x3e1b41];
+  return Array.isArray(_0x4bf264?.keys) ? _0x4bf264.keys.filter(Boolean) : [];
+}
 export function getCurrentPreset() {
   return _currentPreset;
 }
@@ -844,3 +858,32 @@ typeof document !== 'undefined' &&
       }),
       _initPresetSelect());
   }));
+
+const MODIFIER_ONLY_SHORTCUT_ACTIONS = new Set(["cut-edge","duplicate-with-edges",'multi-select']);
+const FIXED_GLOBAL_SHORTCUT_BINDINGS = Object["freeze"]({'delete':Object["freeze"]([Object["freeze"](["Delete"])])});
+
+let _shortcutSearchQuery = '';
+let _saveRevision = 0x0;
+let _saveLoopPromise = null;
+
+function _setRecordingAction(_0x973268){_recordingAction=_0x973268||null,typeof window!=="undefined"&&(window["__aicShortcutRecording"]=!!_recordingAction,void syncNotificationShortcut(_recordingAction?[]:_shortcuts['jump-latest-notification']['keys']));}
+
+const DEFAULT_PRESET_SHORTCUT_MIGRATIONS = {'fit-all':{'from':['Ctrl','0'],'to':[]}};
+
+function _resolveSavedAlternateKeys(_0x37eed3,_0x1073c9,_0xee52d1){const _0xd12ec8=Array["isArray"](_0x37eed3?.["alternateKeys"])?_0x37eed3["alternateKeys"]:_0xee52d1===CUSTOM_PRESET_NAME?[]:_0x1073c9;if(!Array["isArray"](_0xd12ec8))return[];return _0xd12ec8['map'](_0x5a6e9f=>_normalizeShortcutKeys(_0x5a6e9f))["filter"](_0x5625cb=>_0x5625cb["length"]>0x0);}
+
+function _createShortcutSavePayload(){return{'preset':_currentPreset,'shortcuts':Object["fromEntries"](Object['entries'](_shortcuts)['map'](([_0x535d67,_0xfe268c])=>[_0x535d67,{'keys':_0xfe268c["keys"],...Array["isArray"](_0xfe268c["alternateKeys"])?{'alternateKeys':_0xfe268c['alternateKeys']}:{}}]))};}
+
+function _syncGlobalTextCaptureShortcutsToElectron(){if(typeof window==="undefined")return;if(!desktopBridge["textPreset"]["isAvailable"]())return;["global-capture-launcher","global-text-preset"]["forEach"](_0x3a1d92=>{const _0x220b40=Array['isArray'](_shortcuts?.[_0x3a1d92]?.['keys'])?_shortcuts[_0x3a1d92]['keys']:DEFAULT_SHORTCUTS[_0x3a1d92]["keys"];try{const _0x49c1ab=desktopBridge["textPreset"]["updateGlobalShortcut"]({'actionId':_0x3a1d92,'keys':_0x220b40});_0x49c1ab&&typeof _0x49c1ab["catch"]==="function"&&_0x49c1ab["catch"](_0xfb467=>{console["warn"]("[shortcuts] failed to sync "+_0x3a1d92+" global shortcut:",_0xfb467);});}catch(_0x1cde41){console["warn"]("[shortcuts] failed to sync "+_0x3a1d92+" global shortcut:",_0x1cde41);}});}
+
+function _normalizeShortcutSearchText(_0x2d5223){return String(_0x2d5223||'')["trim"]()['toLocaleLowerCase']();}
+
+function _matchesShortcutSearch(_0x114437,_0x377e49,_0x4b5b6a,_0x4dff5c){const _0x126225=_normalizeShortcutSearchText(_0x4dff5c);if(!_0x126225)return!![];const _0x3442cd=_getShortcutBindingStrings(_0x114437,_0x377e49),_0x47bbf2=_0x3442cd["length"]>0x0?_0x3442cd["flatMap"](_0x2bc4af=>[_0x2bc4af,_0x2bc4af['replaceAll']('+','\x20')]):[_tShortcut('unset',"未设置")],_0x5b0c0d=_normalizeShortcutSearchText([_0x114437,_0x377e49['label'],_translateShortcutAction(_0x114437,_0x377e49["label"]),_0x4b5b6a,_translateShortcutGroup(_0x4b5b6a),..._0x47bbf2]["join"]('\x20'));return _0x126225["split"](/\s+/)["filter"](Boolean)["every"](_0x33e5e2=>_0x5b0c0d["includes"](_0x33e5e2));}
+
+function _initShortcutSearch(){const _0x4ae3a4=document["getElementById"]('shortcutsSearchInput');if(!_0x4ae3a4)return;_shortcutSearchQuery=_0x4ae3a4["value"]||'';if(_0x4ae3a4["dataset"]["shortcutSearchBound"]){_render();return;}_0x4ae3a4["dataset"]["shortcutSearchBound"]="true",_0x4ae3a4["addEventListener"]('input',_0x3f84ce=>{_shortcutSearchQuery=_0x3f84ce['target']?.['value']||'',_render();}),_0x4ae3a4["addEventListener"]("keydown",_0x4825eb=>{if(_0x4825eb["key"]!=="Escape"||!_0x4ae3a4["value"])return;_0x4825eb["preventDefault"](),_0x4825eb["stopPropagation"](),_0x4ae3a4["value"]='',_shortcutSearchQuery='',_render();});}
+
+export function resolveShortcutActionForEvent(_0x568bae,_0x59949f=[]){const _0x2288c3=_toShortcutBindingString(_buildShortcutKeysFromEvent(_0x568bae));if(!_0x2288c3)return null;for(const _0xd2764b of _0x59949f){const _0x680fef=String(_0xd2764b||'')["trim"]();if(!_0x680fef)continue;const _0x47cb36=_shortcuts[_0x680fef]||DEFAULT_SHORTCUTS[_0x680fef];if(_getShortcutBindingStrings(_0x680fef,_0x47cb36)["includes"](_0x2288c3))return _0x680fef;}return null;}
+
+export function getInitialShortcuts(){return _buildPresetShortcuts(ASHUO_PRESET_NAME);}
+
+function _handleRecordingKeydown(_0x851700){if(!_recordingAction)return;_0x851700['preventDefault'](),_0x851700['stopImmediatePropagation']();if(_0x851700["key"]==="Escape"){_stopRecording(null);return;}const _0x3e51d7=_buildShortcutKeysFromEvent(_0x851700),_0x52087b=_normalizeShortcutMainKey(_0x851700),_0x37ba48=MODIFIER_ONLY_SHORTCUT_ACTIONS["has"](_recordingAction);if(_0x3e51d7['length']>0x0&&(_0x37ba48||_0x3e51d7["includes"]("AltRight")||!["Ctrl","Shift","Alt",'']["includes"](_0x52087b))){if(_shortcuts[_recordingAction]?.["inputType"]==='pointer')return;_stopRecording(_0x3e51d7);}}

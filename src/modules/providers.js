@@ -68,16 +68,29 @@ export const getDisplayModelName = (_0x13cafe) => {
   };
   return translateManifestText(_0x464a99[_0x13cafe] || _0x13cafe);
 };
+export const GRSAI_API_ROUTES = Object.freeze([
+  Object.freeze({ id: 'domestic', apiUrl: 'https://grsai.dakka.com.cn' }),
+  Object.freeze({ id: 'global', apiUrl: 'https://grsaiapi.com' }),
+]);
 export const PROVIDERS_META = {
   grsai: {
     id: 'grsai',
     label: 'GRSAI',
-    defaultUrl: 'https://grsai.dakka.com.cn',
+    defaultUrl: GRSAI_API_ROUTES[0].apiUrl,
+    apiRoutes: GRSAI_API_ROUTES,
+    defaultRouteId: 'domestic',
     logoPath: 'images/grsai.png',
   },
   openai: { id: 'openai', label: 'OpenAI', defaultUrl: 'https://api.openai.com', logoPath: null },
   ppio: { id: 'ppio', label: '派欧云', defaultUrl: 'https://api.ppio.com', logoPath: 'images/ppio.png' },
-  apimart: { id: 'apimart', label: 'APIMart', defaultUrl: DEFAULT_APIMART_API_URL, logoPath: null },
+  apimart: {
+    id: 'apimart',
+    label: 'APIMart',
+    defaultUrl: DEFAULT_APIMART_API_URL,
+    apiRoutes: APIMART_API_ROUTES,
+    defaultRouteId: DEFAULT_APIMART_ROUTE_ID,
+    logoPath: null,
+  },
   agnes: { id: 'agnes', label: 'Agnes AI', defaultUrl: 'https://apihub.agnes-ai.com', logoPath: null },
   volcengine: {
     id: 'volcengine',
@@ -109,3 +122,5 @@ export const PROVIDERS_META = {
 export function getAllProviderIds() {
   return Object.keys(PROVIDERS_META);
 }
+
+export function resolveProviderApiRoute(_0x1b844f,_0x359a44={}){const _0x5332e6=PROVIDERS_META[_0x1b844f],_0x1d7d54=_0x5332e6?.["apiRoutes"];if(!_0x1d7d54)return null;const _0x154435=String(_0x359a44["apiUrl"]||'')['trim']()["replace"](/\/+$/,''),_0x1e09ea=_0x1d7d54["find"](_0xaada00=>normalizeRouteApiUrl(_0xaada00['apiUrl'])===normalizeRouteApiUrl(_0x154435));if(_0x154435)return{'apiUrl':_0x154435,'routeId':_0x1e09ea?.['id']||''};const _0x1220f5=_0x1d7d54["find"](_0x73a473=>_0x73a473['id']===_0x359a44["routeId"])||_0x1d7d54["find"](_0x83a27e=>_0x83a27e['id']===_0x5332e6['defaultRouteId']);return{'apiUrl':_0x1220f5['apiUrl'],'routeId':_0x1220f5['id']};}

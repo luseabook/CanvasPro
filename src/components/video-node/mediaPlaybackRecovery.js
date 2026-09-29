@@ -6,6 +6,8 @@ const DEBUG_STORAGE_KEY = 'aic.videoPlaybackDebug',
   DEFAULT_RECOVERY_COOLDOWN_MS = 0x384,
   DEFAULT_STARTUP_RECOVERY_GRACE_MS = 0x4b0,
   DEFAULT_STARTUP_RECOVERY_MIN_PLAYED_SECONDS = 0.08,
+  HOVER_PLAYBACK_INTENT = 'hover',
+  EXCLUSIVE_PLAYBACK_INTENT = 'exclusive',
   videoRecoveryStates = new WeakMap(),
   activePlaybackVideos = new Set();
 export function isVideoPlaybackDebugEnabled() {
@@ -95,6 +97,7 @@ export function attachVideoPlaybackRecovery(_0x29b5c3, _0x3ae755 = {}) {
   return (
     !_0x2a7d8a &&
       ((_0x2a7d8a = {
+        disposed: false,
         label: 'video',
         ensureSrc: null,
         shouldRecover: null,
@@ -108,12 +111,26 @@ export function attachVideoPlaybackRecovery(_0x29b5c3, _0x3ae755 = {}) {
         lastRecoveryAt: 0,
         lastPlayRequestAt: 0,
         lastPlayingAt: 0,
+        playbackIntent: EXCLUSIVE_PLAYBACK_INTENT,
       }),
       videoRecoveryStates.set(_0x29b5c3, _0x2a7d8a),
       installMediaEventListeners(_0x29b5c3, _0x2a7d8a)),
+    (_0x2a7d8a.disposed = false),
     updateRecoveryState(_0x2a7d8a, _0x3ae755),
     _0x2a7d8a
   );
+}
+export function detachVideoPlaybackRecovery(_0x56b767) {
+  if (!_0x56b767) return false;
+  const _0x30241b = videoRecoveryStates.get(_0x56b767),
+    _0x3e7e1d = activePlaybackVideos.delete(_0x56b767);
+  if (!_0x30241b) return _0x3e7e1d;
+  _0x30241b.disposed = true;
+  if (_0x30241b.recoveryTimer !== null) clearTimeout(_0x30241b.recoveryTimer);
+  _0x30241b.recoveryTimer = null;
+  _0x30241b.ensureSrc = null;
+  _0x30241b.shouldRecover = null;
+  return true;
 }
 export async function prepareVideoForPlayback(_0x387af9, _0x4f2c2d = {}) {
   if (!_0x387af9) return false;
@@ -122,13 +139,28 @@ export async function prepareVideoForPlayback(_0x387af9, _0x4f2c2d = {}) {
   if (_0x387af9.preload !== 'auto') _0x387af9.preload = 'auto';
   return (logVideoPlaybackEvent(_0x387af9, 'prepare', { label: _0x3a1df4.label }), true);
 }
+export function claimVideoPlaybackOwnership(_0x31ed78, _0x27389f = {}) {
+  if (!_0x31ed78) return false;
+  const _0x573cae = attachVideoPlaybackRecovery(_0x31ed78, _0x27389f),
+    _0xb6e723 = resolvePlaybackIntent(_0x31ed78, _0x573cae, _0x27389f.playbackIntent);
+  if (_0x27389f.allowConcurrent !== true && !prepareActiveVideosForPlayback(_0x31ed78, _0xb6e723))
+    return (
+      logVideoPlaybackEvent(_0x31ed78, 'play-blocked', {
+        label: _0x573cae.label,
+        extra: { playbackIntent: _0xb6e723 },
+      }),
+      false
+    );
+  _0x573cae.playbackIntent = _0xb6e723;
+  return true;
+}
 export async function playVideoWithRecovery(_0x30e920, _0x26e3ad = {}) {
   if (!_0x30e920) return false;
   const _0x118120 = attachVideoPlaybackRecovery(_0x30e920, _0x26e3ad),
     _0x1f1132 = await prepareVideoForPlayback(_0x30e920, _0x26e3ad);
   if (!_0x1f1132) return false;
   if (!shouldContinuePlayback(_0x26e3ad)) return (safePause(_0x30e920), false);
-  _0x26e3ad.allowConcurrent !== true && pauseOtherActiveVideos(_0x30e920);
+  if (!claimVideoPlaybackOwnership(_0x30e920, _0x26e3ad)) return false;
   try {
     _0x118120.lastPlayRequestAt = Date.now();
     const _0x24b538 = _0x30e920.play?.();
@@ -329,15 +361,34 @@ function safePause(_0x271aa1) {
     _0x271aa1?.pause?.();
   } catch {}
 }
-function pauseOtherActiveVideos(_0x2adc2a) {
+function resolvePlaybackIntent(_0x21482f, _0x18305e, _0x1795c9) {
+  const _0x4151fc = _0x1795c9 === HOVER_PLAYBACK_INTENT ? HOVER_PLAYBACK_INTENT : EXCLUSIVE_PLAYBACK_INTENT;
+  if (
+    _0x4151fc === HOVER_PLAYBACK_INTENT &&
+    activePlaybackVideos.has(_0x21482f) &&
+    _0x21482f?.paused === false &&
+    _0x18305e?.playbackIntent !== HOVER_PLAYBACK_INTENT
+  )
+    return EXCLUSIVE_PLAYBACK_INTENT;
+  return _0x4151fc;
+}
+function prepareActiveVideosForPlayback(_0x2adc2a, _0x6bbb00) {
+  let _0x1061e2 = false;
   for (const _0x1846c2 of Array.from(activePlaybackVideos)) {
     if (!_0x1846c2 || _0x1846c2 === _0x2adc2a) continue;
     if (_0x1846c2.isConnected === false) {
       activePlaybackVideos.delete(_0x1846c2);
       continue;
     }
+    const _0x373c9d =
+      videoRecoveryStates.get(_0x1846c2)?.playbackIntent || EXCLUSIVE_PLAYBACK_INTENT;
+    if (_0x6bbb00 === HOVER_PLAYBACK_INTENT && _0x373c9d !== HOVER_PLAYBACK_INTENT) {
+      _0x1061e2 = true;
+      continue;
+    }
     (safePause(_0x1846c2), activePlaybackVideos.delete(_0x1846c2));
   }
+  return !_0x1061e2;
 }
 export function __resetVideoPlaybackRecoveryForTest() {
   activePlaybackVideos.clear();

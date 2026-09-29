@@ -295,3 +295,9 @@ export function resolveVideoWorkflowSchemaParam(_0x225d75, _0x3ae853, _0x3f4f97)
     throw new Error('RunningHub video node ' + _0x3ae853 + ' missing generationParams.' + _0x35c80a);
   return _0x5989e4;
 }
+
+export function resolveBerniniVideoReplaceInputMode({hasSourceVideo:hasSourceVideo=![],hasRefImage:hasRefImage=![],hasReferenceVideo:hasReferenceVideo=![]}={}){if(hasSourceVideo&&hasReferenceVideo)return'videoVideo';if(hasSourceVideo&&hasRefImage)return "videoImage";if(hasSourceVideo)return'video';if(hasRefImage)return "image";return "none";}
+
+export function resolveBerniniFunctionForInputMode(_0x109010,_0x470616=''){const _0x35ddaf={'image':["i2v","r2v"],'video':["v2v","mv2v"],'videoImage':["vi2v","rv2v","vrc2v"],'videoVideo':["ads2v"]},_0x368f26=_0x35ddaf[_0x109010]||[],_0x4943c1=String(_0x470616||'')["trim"]();return _0x368f26["includes"](_0x4943c1)?_0x4943c1:_0x368f26[0x0]||'';}
+
+export function buildVideoWorkflowReferenceSummaryParamsPatch(_0x1bab3d={},_0x197284='',_0x24ade3={}){const _0x303190=getRunningHubVideoParameterPanelPolicy(_0x197284),_0x58071a=_0x303190?.["fixedSlotSummary"],_0x3ad13f=String(_0x58071a?.["field"]||'')['trim']();if(!_0x3ad13f||_0x58071a?.["resolver"]!=='berniniVideoReplaceInputMode')return{};const _0xae313f=Math["max"](0x0,Number(_0x24ade3?.["imageCount"])||0x0),_0xab4abd=Math["max"](0x0,Number(_0x24ade3?.["videoCount"])||0x0),_0x5a9de8=resolveBerniniVideoReplaceInputMode({'hasSourceVideo':_0xab4abd>0x0,'hasRefImage':_0xae313f>0x0,'hasReferenceVideo':_0xab4abd>0x1}),_0x3fb10d={[_0x3ad13f]:_0x5a9de8},_0x3b3fe2=resolveBerniniFunctionForInputMode(_0x5a9de8,_0x1bab3d?.["generationParams"]?.["rhBerniniFunction"]??_0x1bab3d?.["rhBerniniFunction"]);if(_0x3b3fe2)_0x3fb10d['rhBerniniFunction']=_0x3b3fe2;return _0x3fb10d;}

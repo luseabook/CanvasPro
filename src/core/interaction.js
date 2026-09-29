@@ -74,7 +74,11 @@ import {
 } from '../modules/interaction/EdgeController.js';
 import { createSelectionController } from '../modules/interaction/SelectionController.js';
 import { createZoomController } from '../modules/interaction/ZoomController.js';
+import { createWheelPanController } from '../modules/interaction/WheelPanController.js';
+import { createInteractionCommandAdapter } from '../modules/interaction/interactionCommandAdapter.js';
+import { createViewportPreviewCoordinator } from '../modules/interaction/viewportPreviewCoordinator.js';
 import { removeContextMenus, showContextMenu } from '../modules/interaction/contextMenuPresenter.js';
+import { buildAppCanvasNodeData } from '../modules/app/canvasNodeDataFactory.js';
 import {
   CONTEXT_NODE_CREATION_SECTION_IDS,
   NODE_CREATION_UPLOAD_ITEM,
@@ -85,6 +89,8 @@ import {
   beginViewportPanPreview,
   cancelViewportPanPreview,
   flushViewportPanPreview,
+  getViewportPanPreview,
+  isViewportPanPreviewActive,
   updateViewportPanPreview,
 } from './viewportPanPreview.js';
 import {
@@ -463,7 +469,41 @@ const dragController = createDragController({
     isNodeType: isNodeType,
     isValidConnection: isValidConnection_2,
   }),
-  zoomController = createZoomController({ store: appStore });
+  wheelViewportPreview = createViewportPreviewCoordinator({
+    beginPreview: beginViewportPanPreview,
+    updatePreview: (_0x2f61a4) => {
+      updateViewportPanPreview(_0x2f61a4.x, _0x2f61a4.y, _0x2f61a4.zoom);
+    },
+    flushPreview: flushViewportPanPreview,
+    getPreview: getViewportPanPreview,
+    isPreviewActive: isViewportPanPreviewActive,
+  }),
+  zoomController = createZoomController({ store: appStore }),
+  wheelPanController = createWheelPanController({
+    store: appStore,
+    viewportPreview: wheelViewportPreview,
+  }),
+  interactionCommandAdapter = createInteractionCommandAdapter({
+    store: appStore,
+    graphStore: graphStore,
+    uiStore: uiStore,
+    commit: commit,
+    buildNodeData: buildAppCanvasNodeData,
+    getNodeDefaultSize: getNodeDefaultSize,
+    getAIGenerationDefaultSizeByType: getAIGenerationDefaultSizeByType,
+    getAIGenerationNodeSize: getAIGenerationNodeSize,
+    connectNodes: addEdgeWithPolicies,
+    clipboard: {
+      getClipboard: getClipboard,
+      getClipboardGraph: getClipboardGraph,
+      setClipboard: setClipboard,
+    },
+    focusNodes: (_0x4faaf2) => window.v2FocusOnNodes?.(_0x4faaf2),
+    translate: t,
+    showToast: (..._0x18ec7c) => window.showToast?.(..._0x18ec7c),
+    scheduleFrame: (_0x4da98c) => requestAnimationFrame(_0x4da98c),
+    windowObject: typeof window !== 'undefined' ? window : null,
+  });
 setDragContextGetter(() => dragContext);
 let viewportRafId = null,
   pendingViewportUpdate = null,
@@ -904,8 +944,34 @@ export function handlePointerUp(_0x4bd087 = 0, _0x16cc0f = 0) {
 export function handleWheel(_0x35cc98, _0x1f9727, _0x1a360a) {
   zoomController.handleWheel(_0x35cc98, _0x1f9727, _0x1a360a);
 }
+export function handleWheelPan(_0x340ba0, _0x4847ca, _0x29e9eb) {
+  return wheelPanController.handleWheelPan(_0x340ba0, _0x4847ca, _0x29e9eb);
+}
+export function settleWheelZoom() {
+  return flushViewportUpdate();
+}
+export function settleWheelPan() {
+  return wheelPanController.settleWheelPan();
+}
+export function executeCanvasCommand(_0x119242, _0x2e6b49 = {}) {
+  return interactionCommandAdapter.executeCanvasCommand(_0x119242, _0x2e6b49);
+}
 export function getDragContext() {
   return { ...dragContext };
+}
+export function getInteractionRenderState() {
+  return {
+    isDragging: !!dragContext.isDragging,
+    isDraggingCell: !!dragContext.isDraggingCell,
+    isCommittingDrag: dragContext.isCommittingDrag === true,
+    isPanning: !!dragContext.isPanning,
+    assistPanActive: !!dragContext.assistPanActive,
+    targetNodeId: dragContext.targetNodeId || null,
+    pendingDx: Number.isFinite(dragContext.pendingDx) ? dragContext.pendingDx : 0,
+    pendingDy: Number.isFinite(dragContext.pendingDy) ? dragContext.pendingDy : 0,
+    hasMoved: !!dragContext.hasMoved,
+    wasSelectedOnDown: !!dragContext.wasSelectedOnDown,
+  };
 }
 export function handleDoubleClick(_0x14a175, _0x56e5fb) {
   const { viewport: _0x390385, nodes: _0xea3627 } = getStateRaw(),

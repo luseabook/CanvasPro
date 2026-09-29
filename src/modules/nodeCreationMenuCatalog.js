@@ -204,3 +204,5 @@ export function getNodeCreationMenuSections(_0x19e09f, { includeDevOnly: include
     })
     .filter(Boolean);
 }
+
+export function isNodeCreationTypeEnabled(_0x245f43){const _0x13386a=NODE_CREATION_ITEMS[String(_0x245f43||'')];return _0x13386a?.["creationDisabled"]!==!![];}

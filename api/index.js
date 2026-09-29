@@ -130,3 +130,122 @@ export {
   pollApimartPrivateAvatarTask,
 } from './apimartPrivateAvatarApi.js';
 export { uploadVideoToRunningHub, uploadVideoToApimartCdn, processInputVideos } from './videoUploadApi.js';
+export { requestAgentAssistantReply } from './agentAssistantApi.js';
+export { requestAgentContextDigest } from './agentContextDigestApi.js';
+export { requestAgentSkillDraft } from './agentSkillAuthoringApi.js';
+export { requestPersonReplacementPromptEnhancement } from './personReplacementPromptEnhancementApi.js';
+export {
+  adjustStoryClipPrompt,
+  extractStoryAssets,
+  extractStoryAssetsParallel,
+  generateStoryEpisodeScript,
+  generateStorySummary,
+  planStoryEpisodeOutlines,
+  recoverStoryEpisodeSplitDraftLocally,
+  splitStoryEpisodeChecked,
+  splitStoryEpisodeExperimental,
+  splitStoryEpisodesBatch,
+} from './storyGenerationApi.js';
+export { extractStoryAssetsHybridExperimental } from './storyAssetHybridExtractionApi.js';
+export { reviewStoryEpisodeSplitQuality } from './story-generation/storyEpisodeSplitQualityApi.js';
+export { extractStoryDocumentText, validateStoryDocumentFile } from './storyDocumentApi.js';
+export { fetchStoryWorkspaceFromServer, saveStoryWorkspaceToServer } from './storyWorkspaceApi.js';
+export {
+  fetchReplacementStudioWorkspaceFromServer,
+  saveReplacementStudioWorkspaceToServer,
+} from './personReplacementWorkspaceApi.js';
+export { analyzeVideoReplicationClip } from './storyVideoReplicationPromptApi.js';
+export {
+  getPersonReplacementModelPackStatus,
+  installPersonReplacementModelPack,
+} from './personReplacementModelPackApi.js';
+export {
+  analyzeCustomProviderDocumentation,
+  buildCustomProviderManifestDraft,
+  deleteCustomProviderManifestBundle,
+  discoverCustomProvider,
+  listCustomProviderManifestBundles,
+  saveCustomProviderManifestBundle,
+  validateCustomProviderManifestDraft,
+} from './customProviderDiscoveryApi.js';
+export { getApiConfigSnapshot } from './configApi.js';
+export {
+  resumeApimartMidjourneyUpscaleTask,
+  submitApimartMidjourneyUpscaleRequest,
+  submitApimartMidjourneyVariationRequest,
+} from './aiImageApi.js';
+export {
+  buildStoryGenerationPrompt,
+  buildStoryClipAdjustmentPrompt,
+  buildStoryEpisodeOutlineBatchPrompt,
+  buildStoryEpisodeOutlinePrompt,
+  buildStoryEpisodeScriptPrompt,
+  buildStorySummaryPrompt,
+  generateStoryDraft,
+  parseStoryGenerationResult,
+  parseStoryClipAdjustmentResult,
+  parseStoryEpisodeOutlineBatchResult,
+  parseStoryEpisodeOutlineResult,
+  parseStoryEpisodeOutlineSkeletonResult,
+  parseStoryEpisodeScriptResult,
+  parseStorySummaryResult,
+  planStoryEpisodes,
+  createStoryEpisodeOutlineBatches,
+  splitStorySourceText,
+  splitStoryEpisode,
+} from './storyGenerationApi.js';
+export {
+  STORY_ASSET_EXPERIMENTAL_KINDS,
+  buildStoryAssetDetailBatchPrompt,
+  buildStoryAssetKindExtractionPrompt,
+  buildStoryAssetInventoryPrompt,
+  buildStoryAssetInventoryRepairPrompt,
+  createStoryAssetExtractionBatches,
+  extractStoryAssetsEvidenceBatched,
+  extractStoryAssetsExperimental,
+  inspectStoryAssetInventoryCoverage,
+  normalizeStoryAssetExtractionSources,
+  parseStoryAssetKindExtractionResult,
+  parseStoryAssetInventoryResult,
+} from './storyAssetExperimentalApi.js';
+export {
+  STORY_ASSET_LOCAL_BATCH_SIZE,
+  STORY_ASSET_LOCAL_CHUNK_CHARACTERS,
+  STORY_ASSET_LOCAL_EXTRACTION_PATH,
+  STORY_ASSET_LOCAL_MODEL,
+  createStoryAssetLocalEvidenceScenes,
+  createStoryAssetLocalExtractionBatches,
+  createStoryAssetLocalExtractionChunks,
+  extractStoryAssetMentionsLocal,
+} from './storyAssetLocalExtractionApi.js';
+export {
+  fetchPersonReplacementWorkspaceFromServer,
+  savePersonReplacementWorkspaceToServer,
+} from './personReplacementWorkspaceApi.js';
+export {
+  detectPersonReplacementPeople,
+} from './personReplacementModelPackApi.js';
+export {
+  getObjectStorageConfig,
+} from './configApi.js';
+export {
+  isConfiguredObjectStorageEnabled,
+  OBJECT_STORAGE_UPLOAD_PROVIDER,
+  testObjectStorageConnection,
+  uploadPublicMediaToConfiguredObjectStorage,
+  uploadToConfiguredObjectStorage,
+} from './objectStorageApi.js';
+export {
+  submitDreaminaImageUpscale,
+  runDreaminaImageUpscaleGeneration,
+} from './dreaminaGenApi.js';
+export {
+  fetchLocalMediaPlaybackBlob,
+} from './localMediaPlaybackApi.js';
+export {
+  listElectronMediaTasks,
+} from './localMediaTaskApi.js';
+export {
+  renameV2ProjectOnServer,
+  fetchAssetCategorySettingsFromServer,
+} from './projectsV2Api.js';

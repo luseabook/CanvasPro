@@ -1,3 +1,4 @@
+import { resolveCanvasImageDisplayUrl, resolveCanvasImageSourceUrl } from '../services/canvasMediaLocalService.js';
 import { getImage } from './storage.js';
 import { firstNonEmpty } from '../utils/validators.js';
 import {
@@ -252,3 +253,15 @@ export async function openNodeImagePreview(_0xde6749) {
   if (!_0x145251) return () => {};
   return openImagePreview(_0x145251.url, { revokeUrlOnClose: _0x145251.revokeUrlOnClose });
 }
+
+export async function resolveNodeImageOriginalSource(_0x21481f){if(!_0x21481f)return null;const _0xeb974b=Array["isArray"](_0x21481f["images"])?_0x21481f["images"]:[],_0x256cb0=_0x21481f["mainImageIndex"]||0x0,_0x56b447=_0xeb974b[_0x256cb0]||null,_0xa05e56=firstNonEmpty(_0x56b447?.["sourceId"],_0x21481f["sourceId"]);if(_0xa05e56)try{const _0x59de22=await getImage(_0xa05e56);if(_0x59de22)return{'url':URL['createObjectURL'](_0x59de22),'revokeUrlOnClose':!![]};}catch(_0x1aa003){}const _0x4b974b=firstNonEmpty(resolveCanvasImageSourceUrl(_0x56b447),resolveCanvasImageSourceUrl(_0x21481f));if(_0x4b974b)return{'url':_0x4b974b,'revokeUrlOnClose':![]};return null;}
+
+function collectUniquePreviewUrls(_0x4a5544=[]){const _0xc98c05=[],_0x589497=new Set();for(const _0x5d39c4 of _0x4a5544){const _0x40ac91=String(_0x5d39c4||'')["trim"]();if(!_0x40ac91||_0x589497['has'](_0x40ac91))continue;_0x589497["add"](_0x40ac91),_0xc98c05['push'](_0x40ac91);}return _0xc98c05;}
+
+function resolveImmediateNodeImagePreviewUrls(_0x1efe50,_0x2b3596=''){const _0xd98cba=Array["isArray"](_0x1efe50?.["images"])?_0x1efe50['images']:[],_0x23cfa2=Math["max"](0x0,Number(_0x1efe50?.["mainImageIndex"])||0x0),_0x17487b=_0xd98cba[_0x23cfa2]||_0xd98cba[0x0]||null;return collectUniquePreviewUrls([_0x2b3596,resolveCanvasImageDisplayUrl(_0x17487b),resolveCanvasImageDisplayUrl(_0x1efe50),resolveCanvasImagePreviewUrl(_0x17487b),resolveCanvasImagePreviewUrl(_0x1efe50),resolveCanvasImageThumbUrl(_0x17487b),resolveCanvasImageThumbUrl(_0x1efe50)]);}
+
+let activeImagePreviewClose=null,activeVideoPreviewClose=null,videoPreviewOwnerSequence=0x0;
+
+export function closeActiveImagePreview(){if(typeof activeImagePreviewClose!=="function")return![];const _0x33aa0c=activeImagePreviewClose;return _0x33aa0c(),!![];}
+
+export function closeActiveVideoPreview(){if(typeof activeVideoPreviewClose!=="function")return![];const _0x186d44=activeVideoPreviewClose;return _0x186d44(),!![];}

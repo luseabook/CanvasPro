@@ -15,4 +15,12 @@ export {
   saveRemoteImageLocallyDetailed,
   exportProject,
   importProject,
+  importLocalStagedAsset,
+  discardLocalStagedAsset,
+} from '../services/projectService.js';
+export {
+  loadProjectStrict,
+  setProjectPersistenceBlocked,
+  clearProjectPersistenceBlock,
+  isProjectPersistenceBlocked,
 } from '../services/projectService.js';

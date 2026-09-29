@@ -1,3 +1,6 @@
+import { renderOpenAiLogoHtml } from '../shared/openAiLogo.js';
+import { renderComfyUiCloudWorkflowLogoHtml, renderComfyUiLocalWorkflowLogoHtml, renderComfyUiWorkflowLogoHtmlFromIconKind } from '../shared/customAiAppLogo.js';
+import { isModelManifestPubliclyListed } from '../../manifests/modelCatalogVisibility.js';
 import {
   NANO_BANANA_FAMILIES,
   getDefaultModeForNanoBananaFamily,
@@ -1151,3 +1154,59 @@ export function buildQwenFirstImageModeControlsHTML(_0x2851f4) {
     })
     .join('');
 }
+
+export const VOLCENGINE_SEEDREAM_5_PRO_MODEL='volcengine/seedream-5.0-pro';
+
+const OPENAI_CLI_LOGO_ICON_HTML = renderOpenAiLogoHtml("node-menu-icon");
+const COMFYUI_CLOUD_WORKFLOW_ICON_HTML = renderComfyUiCloudWorkflowLogoHtml({'className':"node-menu-icon"});
+const COMFYUI_LOCAL_WORKFLOW_ICON_HTML = renderComfyUiLocalWorkflowLogoHtml({'className':"node-menu-icon"});
+
+const IMAGE_SIZE_ORDER=Object["freeze"](['1K','2K','3K','4K']);
+
+function normalizeImageSizeToken(_0x3a87e7){return String(_0x3a87e7||'')["trim"]()["toUpperCase"]();}
+
+function pickSupportedImageSize(_0x13d3ca,_0x50c7bd){const _0x583da9=(Array["isArray"](_0x50c7bd?.['options'])?_0x50c7bd["options"]:[])["map"](_0x4b42eb=>normalizeImageSizeToken(_0x4b42eb?.["value"]??_0x4b42eb))["filter"](Boolean),_0x476bc2=normalizeImageSizeToken(_0x13d3ca);if(!_0x583da9['length']||!_0x476bc2||_0x583da9['includes'](_0x476bc2))return'';const _0x217c60=IMAGE_SIZE_ORDER['indexOf'](_0x476bc2),_0x3d2c32=_0x583da9["map"](_0x4a7ad2=>({'value':_0x4a7ad2,'rank':IMAGE_SIZE_ORDER["indexOf"](_0x4a7ad2)}))["filter"](_0x51749f=>_0x51749f["rank"]>=0x0)["sort"]((_0x5bd771,_0x2c6128)=>_0x5bd771["rank"]-_0x2c6128["rank"]);if(_0x217c60>=0x0&&_0x3d2c32["length"]>0x0){const _0x36f0a7=_0x3d2c32["filter"](_0x332d8b=>_0x332d8b["rank"]<=_0x217c60)['at'](-0x1);return _0x36f0a7?.['value']||_0x3d2c32[0x0]['value'];}const _0x34cc51=normalizeImageSizeToken(_0x50c7bd?.["defaultValue"]);return _0x583da9["includes"](_0x34cc51)?_0x34cc51:_0x583da9[0x0];}
+
+const BINGHUO_BADGE_ICON_HTML = "<div class=\"node-menu-icon node-menu-icon-badge\">BH</div>";
+
+function isSavedRhAiAppManifest(_0xb19cfe){return Boolean(String(_0xb19cfe?.["extensions"]?.['rhAiApp']?.["appKey"]||'')["trim"]());}
+
+function isSavedComfyUiWorkflowManifest(_0x4c652c){return Boolean(String(_0x4c652c?.["extensions"]?.["comfyUiWorkflow"]?.['appKey']||'')["trim"]());}
+
+function getCustomProviderMeta(_0x3201fd){const _0x1875e1=_0x3201fd?.["extensions"]?.['customProvider'];return _0x1875e1&&typeof _0x1875e1==="object"?_0x1875e1:null;}
+
+function getCustomProviderBadgeText(_0x46377a,_0x4d6771={}){return String(getCustomProviderMeta(_0x46377a)?.["badge"]||_0x4d6771["badge"]||'CP')['trim']()["slice"](0x0,0x2)||'CP';}
+
+function getCustomProviderImageGroups(_0x338c4b=''){const _0x59855b=new Map();return getModelsByKind('image')['filter'](isModelManifestPubliclyListed)["forEach"](_0x1840a1=>{const _0x1d3f1a=getImageMenuMeta(_0x1840a1),_0x1bd09c=getCustomProviderMeta(_0x1840a1),_0x28bd60=String(_0x1d3f1a?.["group"]||_0x1840a1?.["provider"]||'')["trim"]();if(!_0x1d3f1a||!_0x1bd09c||!_0x28bd60)return;!_0x59855b["has"](_0x28bd60)&&_0x59855b["set"](_0x28bd60,{'providerId':_0x28bd60,'displayName':_0x1bd09c["displayName"]||_0x28bd60,'subtitle':_0x1d3f1a["subtitle"]||"自定义中转站",'badge':_0x1bd09c["badge"]||_0x1d3f1a["badge"]||'CP','items':[]}),_0x59855b["get"](_0x28bd60)["items"]['push'](_0x1840a1);}),Array["from"](_0x59855b["values"]())["map"](_0x4638cf=>{const _0x464ea7=_0x4638cf["providerId"]["replace"](/[^A-Za-z0-9_-]/g,'-');return renderImageMenuGroupHTML({'headerClass':"custom-provider-image-group-header custom-provider-image-group-"+_0x464ea7,'toggleAttr':"data-custom-provider-image-toggle",'submenuClass':"custom-provider-image-submenu-"+_0x464ea7,'iconHtml':"<div class=\"node-menu-icon node-menu-icon-badge\">"+escapeHtmlAttr(_0x4638cf["badge"])+"</div>",'title':_0x4638cf['displayName'],'subtitle':_0x4638cf['subtitle'],'attrs':{'data-custom-provider-image-group':_0x4638cf["providerId"]},'itemsHtml':_0x4638cf['items']["sort"]((_0x4e2ce4,_0x5bfbb3)=>Number(getImageMenuMeta(_0x4e2ce4)?.['order']||0x0)-Number(getImageMenuMeta(_0x5bfbb3)?.["order"]||0x0))['map'](_0x285746=>renderImageManifestMenuItemHTML(_0x285746,_0x338c4b))["join"]('')});});}
+
+export function buildBinghuoImageMenuGroupHTML(_0x5d198f){const _0xced180=getImageModelMenuManifests('binghuo')["map"](_0x38a80d=>renderImageManifestMenuItemHTML(_0x38a80d,_0x5d198f))["join"]('');if(!_0xced180)return'';return renderImageMenuGroupHTML({'headerClass':"binghuo-image-group-header",'toggleAttr':"data-binghuo-image-toggle",'submenuClass':'binghuo-image-submenu','iconHtml':BINGHUO_BADGE_ICON_HTML,'title':"便宜渠道bh",'subtitle':'炳火图片生成\x20API','itemsHtml':_0xced180});}
+
+function buildOfficialImageMenuGroupHTML(_0x30944e,_0x14fe94,_0xecb9ae,_0x2cd50c,_0x37d947){const _0x524885=getImageModelMenuManifests(_0x14fe94)["map"](_0xc44faf=>renderImageManifestMenuItemHTML(_0xc44faf,_0x30944e))['join']('');return renderImageMenuGroupHTML({'headerClass':_0x14fe94+"-group-header",'toggleAttr':"data-"+_0x14fe94+"-toggle",'submenuClass':_0x14fe94+"-submenu",'iconHtml':"<img src=\""+_0x2cd50c+'\x22\x20class=\x22node-menu-icon\x22\x20alt=\x22'+_0x14fe94+'\x22>','title':_0xecb9ae,'subtitle':_0x37d947,'itemsHtml':_0x524885});}
+
+export function buildOpenAiCliImageMenuGroupHTML(_0x5d86e3){const _0x5b4681=getImageModelMenuManifests('openai-cli')["map"](_0x2cc9de=>renderImageManifestMenuItemHTML(_0x2cc9de,_0x5d86e3))['join']('');if(!_0x5b4681)return'';return renderImageMenuGroupHTML({'headerClass':"openai-cli-image-group-header",'toggleAttr':"data-openai-cli-image-toggle",'submenuClass':"openai-cli-image-submenu",'iconHtml':OPENAI_CLI_LOGO_ICON_HTML,'title':"OpenAI CLI",'subtitle':"使用本机已登录的 OpenAI CLI 账号",'itemsHtml':_0x5b4681});}
+
+export function buildRhAiAppImageMenuGroupHTML(_0x5314ab){const _0x4e0240=getImageModelMenuManifests("rhAiApp")["map"](_0x4d1990=>renderImageManifestMenuItemHTML(_0x4d1990,_0x5314ab))['join']('');if(!_0x4e0240)return'';return renderImageMenuGroupHTML({'headerClass':'rh-ai-app-image-group-header','toggleAttr':"data-rh-ai-app-toggle",'submenuClass':"rh-ai-app-image-submenu",'iconHtml':"<img src=\"images/RH.png\" class=\"node-menu-icon\" alt=\"runninghub\">",'title':"RH AI应用",'subtitle':"自定义 RunningHub AI App",'itemsHtml':_0x4e0240});}
+
+function buildComfyUiWorkflowImageMenuGroupHTML({activeModel:_0x13deba,group:_0x43b15e,headerClass:_0x15d520,toggleAttr:_0x347778,submenuClass:_0x5b2461,iconHtml:_0x5ddba9,title:_0x46cebd,subtitle:_0x5d3930}={}){const _0x593928=getImageModelMenuManifests(_0x43b15e)["map"](_0x3f5be1=>renderImageManifestMenuItemHTML(_0x3f5be1,_0x13deba))["join"]('');if(!_0x593928)return'';return renderImageMenuGroupHTML({'headerClass':_0x15d520,'toggleAttr':_0x347778,'submenuClass':_0x5b2461,'iconHtml':_0x5ddba9,'title':_0x46cebd,'subtitle':_0x5d3930,'itemsHtml':_0x593928});}
+
+export function buildComfyUiCloudWorkflowImageMenuGroupHTML(_0x31a9f9){return buildComfyUiWorkflowImageMenuGroupHTML({'activeModel':_0x31a9f9,'group':"comfyUiCloudWorkflow",'headerClass':"comfyui-cloud-workflow-group-header",'toggleAttr':"data-comfyui-cloud-workflow-toggle",'submenuClass':'comfyui-cloud-workflow-submenu','iconHtml':COMFYUI_CLOUD_WORKFLOW_ICON_HTML,'title':"云端工作流",'subtitle':"保存的 ComfyUI 云端工作流"});}
+
+export function buildComfyUiLocalWorkflowImageMenuGroupHTML(_0x98f744){return buildComfyUiWorkflowImageMenuGroupHTML({'activeModel':_0x98f744,'group':'comfyUiLocalWorkflow','headerClass':"comfyui-local-workflow-group-header",'toggleAttr':"data-comfyui-local-workflow-toggle",'submenuClass':'comfyui-local-workflow-submenu','iconHtml':COMFYUI_LOCAL_WORKFLOW_ICON_HTML,'title':"本地工作流",'subtitle':'保存的\x20ComfyUI\x20本地工作流'});}
+
+function createImageTriggerIconFromHTML(_0x435d18,_0x13aaec){const _0x595a42=_0x435d18?.["ownerDocument"]||(typeof document!=="undefined"?document:null),_0xb60fd4=_0x595a42?.['createElement']?.("template");if(!_0xb60fd4)return null;return _0xb60fd4["innerHTML"]=String(_0x13aaec||'')['trim'](),_0xb60fd4["content"]?.["firstElementChild"]||null;}
+
+function setOpenAiCliImageModelTriggerIcon(_0x163add){const _0x3f3954=createImageTriggerIconFromHTML(_0x163add,renderOpenAiLogoHtml("image-model-trigger-icon"));if(!_0x3f3954)return;replaceImageModelTriggerFirstIcon(_0x163add,_0x3f3954);}
+
+function getComfyUiWorkflowIconKind(_0x158576='',_0x19d488=null){const _0x144eee=_0x19d488?.["querySelector"]?.(".custom-ai-app-logo");if(_0x144eee?.['classList']?.["contains"]('custom-ai-app-logo--comfyui-cloud'))return "comfyUiCloudWorkflowBadge";if(_0x144eee?.["classList"]?.["contains"]("custom-ai-app-logo--comfyui-local"))return "comfyUiLocalWorkflowBadge";const _0x5c41d7=String(_0x158576||'')["trim"]()||String(_0x19d488?.["dataset"]?.["value"]||_0x19d488?.["getAttribute"]?.('data-value')||'')['trim'](),_0x33ffb7=String(getModelManifest(_0x5c41d7)?.["extensions"]?.["imageMenu"]?.["iconKind"]||'')["trim"]();return _0x33ffb7;}
+
+function renderComfyUiWorkflowTriggerIconHTML(_0x554b35=''){return renderComfyUiWorkflowLogoHtmlFromIconKind(getComfyUiWorkflowIconKind(_0x554b35),{'className':"image-model-trigger-icon"});}
+
+function setComfyUiWorkflowTriggerIcon(_0x2e7428,_0x3b76d2=null){const _0x1f02dd=createImageTriggerIconFromHTML(_0x2e7428,renderComfyUiWorkflowLogoHtmlFromIconKind(getComfyUiWorkflowIconKind('',_0x3b76d2),{'className':"image-model-trigger-icon"}));if(!_0x1f02dd)return;replaceImageModelTriggerFirstIcon(_0x2e7428,_0x1f02dd);}
+
+function resolveImageTriggerManifest(_0x10a88c='',_0x1007f5=''){const _0x7efdf7=String(_0x10a88c||'')['trim']();if(_0x7efdf7){const _0x591da8=getModelManifest(_0x7efdf7);if(_0x591da8)return _0x591da8;}const _0x2a2308=String(_0x1007f5||'')['trim']();if(!_0x7efdf7&&!_0x2a2308)return null;try{return resolveModelExecution(_0x7efdf7,{'providerHint':_0x2a2308})?.["modelManifest"]||resolveModelExecution(_0x7efdf7)?.['modelManifest']||null;}catch{return null;}}
+
+function renderCustomProviderTriggerBadgeHTML(_0xbbadfe,_0x3bf6ae={}){const _0x3b4b90=getCustomProviderBadgeText(_0xbbadfe,_0x3bf6ae);return "<div class=\"image-model-trigger-icon image-model-trigger-badge\">"+escapeHtmlAttr(_0x3b4b90)+"</div>";}
+
+function setCustomProviderImageModelTriggerIcon(_0x1cea6d,_0xa51346,_0x2376bf={}){const _0x2a2ec9=createImageTriggerIcon(_0x1cea6d,"div");if(!_0x2a2ec9)return;_0x2a2ec9['className']="image-model-trigger-icon image-model-trigger-badge",_0x2a2ec9["innerText"]=getCustomProviderBadgeText(_0xa51346,_0x2376bf),replaceImageModelTriggerFirstIcon(_0x1cea6d,_0x2a2ec9);}
+
+export function syncImageModelTriggerIcon(_0x59910f,_0x4bf2e3={}){if(!_0x59910f||!_0x4bf2e3?.['model'])return;const _0x179af3=createImageTriggerIconFromHTML(_0x59910f,renderImageModelTriggerIconHTML({'model':_0x4bf2e3['model'],'provider':_0x4bf2e3["provider"]})),_0x53096f=_0x59910f["firstElementChild"];_0x179af3&&_0x53096f?.['outerHTML']!==_0x179af3['outerHTML']&&_0x53096f?.["replaceWith"]?.(_0x179af3);}

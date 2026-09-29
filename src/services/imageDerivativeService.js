@@ -41,6 +41,14 @@ export function hasImageDerivativeFields(_0x3c9ad4 = {}) {
     toPositiveInt(_0x3c9ad4?.originalHeight),
   );
 }
+export function needsImageDerivatives(_0x1862bf = {}) {
+  const _0x56f760 = normalizeImageDerivativeFields(_0x1862bf),
+    _0x55be8b = _0x56f760.originalLocalPath || _0x56f760.localPath;
+  if (!_0x55be8b || /\.svg$/i.test(_0x55be8b)) return false;
+  return [_0x56f760.displayLocalPath, _0x56f760.thumbLocalPath].some(
+    (_0xed7eae) => !_0xed7eae || _0xed7eae === _0x55be8b,
+  );
+}
 export function buildImageNodeStorageFields(_0x541646 = {}) {
   const _0x1c8e63 = normalizeImageDerivativeFields(_0x541646),
     _0x44090a = {

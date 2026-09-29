@@ -569,3 +569,133 @@ export function computeUniformScaleFactor({
     _0x4598d5 = Math.max(0.0001, safeLength(subtract(_0x4de008, _0x59b8ad)));
   return clamp(_0x4598d5 / _0x83b91d, 0.01, 8);
 }
+const SCENE_ORBIT_POLE_MARGIN = 0.01;
+
+export const SCENE_NAVIGATION_REFERENCE_FOCAL_LENGTH_MM = 0x23;
+
+const SCENE_PAN_SCREEN_GAIN = 0.9,
+  SCENE_CLOSE_PAN_SCREEN_GAIN = 0.82,
+  WHEEL_LINE_HEIGHT_PX = 0x10,
+  WHEEL_DELTA_LIMIT_PX = 0xf0;
+
+export function computePerspectiveFrameDistance({
+  radius: _0x821b21,
+  fov: fov = 0x3a,
+  aspect: aspect = 0x1,
+  padding: padding = 1.18,
+  minDistance: minDistance = SCENE_ORBIT_DISTANCE_MIN,
+  maxDistance: maxDistance = SCENE_ORBIT_DISTANCE_MAX,
+} = {}) {
+  const _0x30bedc = Math.max(0.01, Number(_0x821b21) || 0.5),
+    _0x538bae = (clamp(Number(fov) || 0x3a, 0x1, 0xb3) * Math.PI) / 0x168,
+    _0x178f7b = Math.max(0.1, Number(aspect) || 0x1),
+    _0x426fb1 = Math.atan(Math.tan(_0x538bae) * _0x178f7b),
+    _0x26941e = Math.max(0.01, Math.min(_0x538bae, _0x426fb1)),
+    _0x102718 = (_0x30bedc / Math.sin(_0x26941e)) * Math.max(0x1, Number(padding) || 0x1);
+  return clamp(_0x102718, minDistance, maxDistance);
+}
+
+export function resolveAdaptiveCameraClipPlanes({
+  focusDistance: _0x45785c,
+  sceneExtent: sceneExtent = 0x0,
+  sceneDistance: sceneDistance = 0x0,
+} = {}) {
+  const _0x180c3c = Math.max(SCENE_ORBIT_DISTANCE_MIN, Number(_0x45785c) || 0x8),
+    _0x3fe396 = Math.max(0x0, Number(sceneExtent) || 0x0),
+    _0x177acc = Math.max(0x0, Number(sceneDistance) || 0x0),
+    _0x31daac = clamp(Math.max(0xfa, _0x180c3c * 0x20, _0x3fe396 * 0x4, _0x177acc * 1.25), 0xfa, 0x1388);
+  return { near: clamp(Math.max(_0x180c3c * 0.01, _0x31daac / 0xc350), 0.015, 0.25), far: _0x31daac };
+}
+
+function resolveSceneOrbitProjectionGain(_0x25217b) {
+  const _0x4c281b = focalLengthToFov(SCENE_NAVIGATION_REFERENCE_FOCAL_LENGTH_MM),
+    _0x47230b = clamp(Number(_0x25217b) || _0x4c281b, 0x1, 0xb3);
+  return Math.tan((_0x47230b * Math.PI) / 0x168) / Math.tan((_0x4c281b * Math.PI) / 0x168);
+}
+
+export function applySceneFlyLookDelta(_0x4f8d46, _0x1413ff, _0xc16778, _0x4dbc19, _0x1d03e8 = {}) {
+  const _0xbef3fe = resolveSceneCameraPose(_0x4f8d46),
+    _0x3f4188 = applyOrbitDelta(_0x4f8d46, _0x1413ff, _0xc16778, _0x4dbc19, _0x1d03e8),
+    _0x30bfd6 = Math.max(
+      SCENE_ORBIT_DISTANCE_MIN,
+      Number(_0x4f8d46?.['orbitDistance']) || _0xbef3fe['distance'] || 0x8,
+    ),
+    _0x19d805 = Math.cos(_0x3f4188['orbitPitch']),
+    _0x465079 = {
+      x: _0x30bfd6 * Math.sin(_0x3f4188['orbitYaw']) * _0x19d805,
+      y: _0x30bfd6 * Math.sin(_0x3f4188['orbitPitch']),
+      z: _0x30bfd6 * Math.cos(_0x3f4188['orbitYaw']) * _0x19d805,
+    };
+  return {
+    ..._0x3f4188,
+    target: {
+      x: _0xbef3fe['position']['x'] - _0x465079['x'],
+      y: _0xbef3fe['position']['y'] - _0x465079['y'],
+      z: _0xbef3fe['position']['z'] - _0x465079['z'],
+    },
+  };
+}
+
+export function applySceneFlyMovement(
+  _0x734ae8,
+  _0x3572e5 = {},
+  _0x44097c = 0x0,
+  { speed: speed = 0x4, boostMultiplier: boostMultiplier = 0x4, minimumCameraY: minimumCameraY = 0.2 } = {},
+) {
+  const _0x345ca6 = resolveSceneCameraPose(_0x734ae8),
+    _0x45290d = normalizeVector3(_0x734ae8?.['target'], { x: 0x0, y: 1.2, z: 0x0 }),
+    _0x1f71c9 = normalize3(subtract(_0x45290d, _0x345ca6['position']), { x: 0x0, y: 0x0, z: -0x1 }),
+    _0x2bd614 = { x: 0x0, y: 0x1, z: 0x0 },
+    _0x4ea4c9 = normalize3(cross(_0x1f71c9, _0x2bd614), { x: 0x1, y: 0x0, z: 0x0 }),
+    _0x1f51cc = {
+      x:
+        _0x1f71c9['x'] * (Number(_0x3572e5['forward']) || 0x0) +
+        _0x4ea4c9['x'] * (Number(_0x3572e5['right']) || 0x0),
+      y:
+        _0x1f71c9['y'] * (Number(_0x3572e5['forward']) || 0x0) +
+        _0x4ea4c9['y'] * (Number(_0x3572e5['right']) || 0x0) +
+        (Number(_0x3572e5['vertical']) || 0x0),
+      z:
+        _0x1f71c9['z'] * (Number(_0x3572e5['forward']) || 0x0) +
+        _0x4ea4c9['z'] * (Number(_0x3572e5['right']) || 0x0),
+    },
+    _0x1498ba = length3(_0x1f51cc),
+    _0x18fd02 = _0x1498ba > 0x1 ? normalize3(_0x1f51cc) : _0x1f51cc,
+    _0x376fa1 = _0x3572e5['boost'] === !![] ? Math.max(0x1, Number(boostMultiplier) || 0x1) : 0x1,
+    _0x2a3580 =
+      Math.max(0x0, Math.min(0.1, Number(_0x44097c) || 0x0)) *
+      Math.max(0.01, Number(speed) || 0x4) *
+      _0x376fa1,
+    _0x5453b7 = scale(_0x18fd02, _0x2a3580),
+    _0x339d94 = _0x345ca6['position']['y'] + _0x5453b7['y'];
+  return (
+    _0x339d94 < minimumCameraY && (_0x5453b7['y'] += minimumCameraY - _0x339d94),
+    {
+      target: {
+        x: _0x45290d['x'] + _0x5453b7['x'],
+        y: _0x45290d['y'] + _0x5453b7['y'],
+        z: _0x45290d['z'] + _0x5453b7['z'],
+      },
+    }
+  );
+}
+
+function hasFiniteVector3(_0x12275c) {
+  return (
+    Number.isFinite(Number(_0x12275c?.['x'])) &&
+    Number.isFinite(Number(_0x12275c?.['y'])) &&
+    Number.isFinite(Number(_0x12275c?.['z']))
+  );
+}
+
+export function normalizeWheelDelta(_0xdbd59a, _0x5090af = 0x0, _0x19575b = 0x320) {
+  const _0x2ad826 = Number(_0xdbd59a) || 0x0,
+    _0x108f24 = Number(_0x5090af) || 0x0,
+    _0xe122b0 =
+      _0x108f24 === 0x1
+        ? WHEEL_LINE_HEIGHT_PX
+        : _0x108f24 === 0x2
+          ? Math.max(0x78, Number(_0x19575b) || 0x320)
+          : 0x1;
+  return clamp(_0x2ad826 * _0xe122b0, -WHEEL_DELTA_LIMIT_PX, WHEEL_DELTA_LIMIT_PX);
+}

@@ -1,3 +1,10 @@
+import { positionAnchoredSubmenu } from '../../utils/submenuPosition.js';
+function resolveCanvasViewportTop(_0x3fcba7, _0x1dd732 = globalThis.document) {
+  const _0x549beb = Number(_0x3fcba7);
+  if (Number.isFinite(_0x549beb)) return Math.max(0, _0x549beb);
+  const _0x3d6ac1 = _0x1dd732?.querySelector?.('.v2-canvas-stage')?.getBoundingClientRect?.();
+  return Number.isFinite(Number(_0x3d6ac1?.top)) ? Math.max(0, Number(_0x3d6ac1.top)) : 0;
+}
 export function appendToolbarActionMenuTitle(_0x39d049, _0x4f819c) {
   const _0x136b37 = document.createElement('div');
   return (
@@ -89,4 +96,64 @@ export function createToolbarActionPopupAnchorPositionGetter(_0x176133, _0x2c7f2
       };
     };
   return ((_0x459fed.hasVisibleAnchor = () => _0x5331e7(_0x4da827())), _0x459fed);
+}
+export function positionToolbarActionSubmenu(
+  _0x474476,
+  _0x25190e,
+  {
+    gap: gap = 12,
+    viewportInset: viewportInset = 8,
+    viewportTop: _0x12c5e5,
+    windowObject: windowObject = globalThis.window,
+  } = {},
+) {
+  const _0x303b2c = _0x474476?.getBoundingClientRect?.();
+  if (!_0x303b2c || _0x303b2c.width <= 0 || _0x303b2c.height <= 0) return null;
+  return (
+    (_0x25190e.style.transform = 'translate(0, 0)'),
+    positionAnchoredSubmenu({
+      submenu: _0x25190e,
+      anchorRect: _0x303b2c,
+      preferredSide: 'right',
+      position: 'fixed',
+      gap,
+      viewportMargin: viewportInset,
+      viewportWidth: windowObject?.innerWidth,
+      viewportHeight: windowObject?.innerHeight,
+      viewportTop: resolveCanvasViewportTop(_0x12c5e5),
+    })
+  );
+}
+export function positionToolbarActionSubmenuAbove(
+  _0x4ee4f0,
+  _0x3d45a7,
+  {
+    viewportInset: viewportInset = 8,
+    viewportTop: _0x55c2b1,
+    windowObject: windowObject = globalThis.window,
+  } = {},
+) {
+  const _0x447a3d = Number(_0x4ee4f0?.left) || 0,
+    _0x5585b4 = Number(_0x4ee4f0?.top) || 0;
+  return (
+    (_0x3d45a7.style.transform = 'translate(0, 0)'),
+    positionAnchoredSubmenu({
+      submenu: _0x3d45a7,
+      anchorRect: {
+        left: _0x447a3d,
+        right: _0x447a3d,
+        top: _0x5585b4,
+        bottom: _0x5585b4,
+        width: 0,
+        height: 0,
+      },
+      horizontalPlacement: 'center',
+      verticalPlacement: 'above',
+      position: 'fixed',
+      viewportMargin: viewportInset,
+      viewportWidth: windowObject?.innerWidth,
+      viewportHeight: windowObject?.innerHeight,
+      viewportTop: resolveCanvasViewportTop(_0x55c2b1),
+    })
+  );
 }

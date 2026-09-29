@@ -168,3 +168,23 @@ export function executeSelectedGenerateButtons({
     skippedGenerating: _0xe2f2b1,
   };
 }
+
+const DEFAULT_SELECTED_GENERATE_STAGGER_MS = 0x12c;
+
+let activeSelectedGenerateBatch=null;
+
+export function hasRunningGroupGenerateNodes(_0x40b22d,_0x40bb92){return collectGroupExecutableNodeIds(_0x40b22d,_0x40bb92)['some'](_0x405e9d=>_0x40b22d?.[_0x405e9d]?.["isGenerating"]===!![]);}
+
+export function hasRunningSelectedGenerateNodes(_0x46eb8c,_0x25b9db=[]){return collectSelectedExecutableNodeIds(_0x46eb8c,_0x25b9db)['some'](_0x17b036=>_0x46eb8c?.[_0x17b036]?.["isGenerating"]===!![]);}
+
+export function cancelGroupGenerateButtons({groupId:_0x2accde,state:state=appStore["getState"](),root:root=globalThis['document'],showToast:showToast=globalThis["window"]?.['showToast']}={}){const _0x11a03d=state?.["nodes"]||{},_0x41dec7=collectGroupExecutableNodeIds(_0x11a03d,_0x2accde)["filter"](_0x5affc5=>_0x11a03d?.[_0x5affc5]?.["isGenerating"]===!![]);let _0x2a6c7b=0x0;for(const _0x13263e of _0x41dec7){const _0x100f37=findGenerateButtonForNode(root,_0x13263e);if(!_0x100f37||_0x100f37["disabled"])continue;_0x100f37['click'](),_0x2a6c7b+=0x1;}return _0x2a6c7b>0x0&&showToast?.(groupExecutionText("groupCancelTriggered",{'count':_0x2a6c7b}),"info"),{'clicked':_0x2a6c7b,'total':_0x41dec7["length"]};}
+
+function normalizeStaggerMs(_0x33622f,_0x15a972=DEFAULT_SELECTED_GENERATE_STAGGER_MS){const _0x415119=Number(_0x33622f);if(!Number["isFinite"](_0x415119)||_0x415119<0x0)return _0x15a972;return Math["floor"](_0x415119);}
+
+function scheduleGenerateButtonClick(_0x5f512d,_0x56f8e6,_0x316d14,_0xc326a8=()=>{}){const _0x73d244=()=>{if(!_0x5f512d["disabled"])_0x5f512d["click"]();_0xc326a8();};if(_0x56f8e6>0x0&&typeof _0x316d14==="function")return _0x316d14(_0x73d244,_0x56f8e6);return _0x73d244(),null;}
+
+export function hasActiveSelectedGenerateBatch(){return Boolean(activeSelectedGenerateBatch);}
+
+function cancelActiveSelectedGenerateQueue(){const _0x1d52b2=activeSelectedGenerateBatch;if(!_0x1d52b2)return![];return activeSelectedGenerateBatch=null,_0x1d52b2["cancelled"]=!![],_0x1d52b2["timeoutIds"]["forEach"](_0xf78e1e=>_0x1d52b2["clearScheduledTimeout"]?.(_0xf78e1e)),_0x1d52b2['timeoutIds']["clear"](),_0x1d52b2["onStateChange"]?.(![]),!![];}
+
+export function cancelSelectedGenerateButtons({selectedIds:selectedIds=[],state:state=appStore["getState"](),root:root=globalThis['document'],showToast:showToast=globalThis["window"]?.["showToast"]}={}){const _0xe1d3bb=cancelActiveSelectedGenerateQueue(),_0x1263a5=state?.['nodes']||{},_0x359bb4=collectSelectedExecutableNodeIds(_0x1263a5,selectedIds)['filter'](_0x461514=>_0x1263a5?.[_0x461514]?.['isGenerating']===!![]);let _0x23383d=0x0;for(const _0x2e70f6 of _0x359bb4){const _0x479965=findGenerateButtonForNode(root,_0x2e70f6);if(!_0x479965||_0x479965["disabled"])continue;_0x479965["click"](),_0x23383d+=0x1;}return _0x23383d>0x0&&showToast?.(groupExecutionText("selectedCancelTriggered",{'count':_0x23383d}),'info'),_0xe1d3bb||_0x23383d>0x0;}

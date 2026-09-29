@@ -1,0 +1,141 @@
+import {
+  createResolutionField,
+  createAspectRatioField,
+  createFooterDurationSliderOptionsField,
+  createVideoInputSlots,
+  createVideoMenuExtension,
+  VIDEO_SIZE_RATIO_POLICY,
+  VIDEO_AUDIO_FIELD,
+  VIDEO_PROMPT_EXTEND_FIELD,
+  VIDEO_WATERMARK_FIELD,
+  VIDEO_SEED_FIELDS,
+} from './vendorVideoModelApiShared.js';
+const frameMode = { field: 'generation_type', value: 'frame' },
+  referenceMode = { field: 'generation_type', value: 'reference' };
+export const BAILIAN_VIDEO_MODELS = Object['freeze']([
+  {
+    modelId: 'bailian/wan3.0-video',
+    executionId: 'bailian.model-api.video.wan3-0.v1',
+    provider: 'bailian',
+    displayName: 'Wan 3.0 Video',
+    model: 'wan3.0-video',
+    icon: 'images/qwen.svg',
+    endpoint: '/api/v1/services/aigc/video-generation/video-synthesis',
+    fields: [
+      {
+        id: 'generation_type',
+        type: 'segmented',
+        placement: 'mode',
+        variant: 'sectionMenu',
+        label: '生成模式',
+        defaultValue: 'reference',
+        options: [
+          { value: 'frame', label: '首尾帧' },
+          { value: 'reference', label: '多模态参考' },
+        ],
+        description: '无素材时生成文生视频；首尾帧模式仅接受图片，多模态参考模式支持图片、视频和音频。',
+      },
+      createResolutionField({ defaultValue: '1080P', options: ['480P', '720P', '1080P'] }),
+      createAspectRatioField({ options: ['16:9', '4:3', '1:1', '3:4', '9:16'] }),
+      createFooterDurationSliderOptionsField({
+        values: [-0x1, ...Array['from']({ length: 0x1d }, (_0x457023, _0x13377f) => _0x13377f + 0x2)],
+        defaultValue: 0x5,
+        optionOverridesByValue: { '-1': { label: '自动', displayLabel: '自动' } },
+      }),
+      { ...VIDEO_AUDIO_FIELD, defaultValue: !![] },
+      VIDEO_PROMPT_EXTEND_FIELD,
+      VIDEO_WATERMARK_FIELD,
+      ...VIDEO_SEED_FIELDS,
+    ],
+    inputSlots: {
+      ...createVideoInputSlots({
+        image: 0xa,
+        video: 0x5,
+        audio: 0x5,
+        fixedSlots: [
+          { id: 'firstFrame', kind: 'image', label: '首帧', displayOrder: 0xa, showWhen: frameMode },
+          { id: 'lastFrame', kind: 'image', label: '尾帧', displayOrder: 0x14, showWhen: frameMode },
+          {
+            id: 'referenceImage',
+            kind: 'image',
+            label: '参考图',
+            displayOrder: 0x1e,
+            showWhen: referenceMode,
+          },
+          {
+            id: 'referenceVideo',
+            kind: 'video',
+            label: '参考视频',
+            displayOrder: 0x28,
+            showWhen: referenceMode,
+          },
+          {
+            id: 'referenceAudio',
+            kind: 'audio',
+            label: '参考音频',
+            displayOrder: 0x32,
+            showWhen: referenceMode,
+          },
+        ],
+        cycleFixedInputWhenFull: !![],
+        policyVariants: [
+          {
+            when: frameMode,
+            allowedKinds: ['text', 'image'],
+            maxByKind: { image: 0x2, video: 0x0, audio: 0x0 },
+          },
+        ],
+        maxTotalDurationSecondsByKind: { video: 0xf, audio: 0xf },
+        mediaConstraintsByKind: {
+          image: { allowedExtensions: ['jpg', 'jpeg', 'png', 'bmp', 'webp'], maxBytes: 0x14 * 0x400 * 0x400 },
+          video: {
+            allowedExtensions: ['mp4', 'mov'],
+            minDurationSeconds: 0x1,
+            maxDurationSeconds: 0xf,
+            maxBytes: 0x64 * 0x400 * 0x400,
+          },
+          audio: {
+            allowedExtensions: ['wav', 'mp3'],
+            minDurationSeconds: 0x1,
+            maxDurationSeconds: 0xf,
+            maxBytes: 0xf * 0x400 * 0x400,
+          },
+        },
+      }),
+      maxVideoInputAndOutputDurationSeconds: 0x1e,
+    },
+    ratioPolicy: { ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: !![] },
+    prompt: { placeholder: '描述画面、动作和声音；参考模式可用图1、视频1、音频1引用素材。' },
+    help: {
+      tooltip:
+        '首尾帧模式仅支持图片；参考模式最多\x2010\x20图、5\x20视频、5\x20音频。视频与音频各不超过\x2015\x20秒，输入视频与输出总时长不超过\x2030\x20秒。',
+    },
+    extensions: {
+      ...createVideoMenuExtension(0xa, '百炼官方 · 文生 / 首尾帧 / 多模态参考'),
+      storyWorkspace: { promptMode: 'wan-3.0' },
+      videoInputSurface: { hideFixedInputSlots: !![] },
+    },
+    bodyMapping: [
+      { path: 'model', from: 'model' },
+      { path: 'input.prompt', from: 'prompt' },
+    ],
+    executionExtensions: { bodyResolver: 'bailianVideo', strictInputCounts: !![] },
+    responseMapping: {
+      taskIdPath: 'output.task_id',
+      statusPath: 'output.task_status',
+      resultPaths: ['output.video_url'],
+      errorPaths: ['output.message', 'message'],
+    },
+    resultTaskIdPath: 'output.task_id',
+    taskPolling: {
+      method: 'GET',
+      mode: 'task-proxy',
+      headersMode: 'bearer',
+      urlTemplate: '{baseUrl}/api/v1/tasks/{taskId}',
+      pollIntervalMs: 0x1388,
+      maxWaitMs: 0x124f80,
+      successStatuses: ['succeeded'],
+      failedStatuses: ['failed', 'canceled', 'unknown'],
+    },
+  },
+]);

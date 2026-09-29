@@ -6,6 +6,7 @@ import { normalizeLocalPath, pickResultLocalPath } from '../../utils/localMediaP
 import { requireProjectDocument } from '../../services/projectDocumentGuard.js';
 import { isModelApiModel, isWorkflowModel, resolveModelProvider } from '../../manifests/index.js';
 import { t } from '../../i18n/index.js';
+import { rendererStartupState } from '../../services/rendererStartupState.js';
 export { createStableSignature } from '../../utils/stableSignature.js';
 const BOOT_PERF_MEASURE_NAMES = [
     'project.loadProject',
@@ -1460,15 +1461,17 @@ export function createProjectLifecycle({
           (window._isAppLoaded = true),
           _0x30069b({ writeRecovery: _0x498899.recovery === true, reason: 'startup' }),
           window._checkEmptyHint?.(),
-          _0x396c67(),
-          _0xa6188c({
-            wrapEl: _0x53b260,
-            canvasEl: _0x3be267,
-            animate: false,
-            afterHidden: () => {
-              (_0x3a5a22(window.currentProjectId), _0x568118(window.currentProjectId));
-            },
-          }));
+          _0x396c67());
+        rendererStartupState.complete('project');
+        if (!(await rendererStartupState.settled).ready) return;
+        _0xa6188c({
+          wrapEl: _0x53b260,
+          canvasEl: _0x3be267,
+          animate: false,
+          afterHidden: () => {
+            (_0x3a5a22(window.currentProjectId), _0x568118(window.currentProjectId));
+          },
+        });
         return;
       }
       _0x3be267 && ((_0x3be267.style.transition = 'none'), void _0x3be267.offsetHeight);
@@ -1508,17 +1511,20 @@ export function createProjectLifecycle({
         _0x30069b({ writeRecovery: false, reason: 'startup' }),
         window._checkEmptyHint?.());
       const _0x761d86 = document.getElementById('projectNameText');
-      (_0x761d86 && (_0x761d86.textContent = getDefaultCanvasName()),
-        _0xa6188c({
-          wrapEl: _0x53b260,
-          canvasEl: _0x3be267,
-          animate: true,
-          afterHidden: () => {
-            (_0x3a5a22(_0x2e6f8c), _0x568118(_0x2e6f8c));
-            if (missingDefaultProject) window.showToast?.(t('projectLifecycle.defaultProjectMissing'), 'warning');
-          },
-        }));
+      _0x761d86 && (_0x761d86.textContent = getDefaultCanvasName());
+      rendererStartupState.complete('project');
+      if (!(await rendererStartupState.settled).ready) return;
+      _0xa6188c({
+        wrapEl: _0x53b260,
+        canvasEl: _0x3be267,
+        animate: true,
+        afterHidden: () => {
+          (_0x3a5a22(_0x2e6f8c), _0x568118(_0x2e6f8c));
+          if (missingDefaultProject) window.showToast?.(t('projectLifecycle.defaultProjectMissing'), 'warning');
+        },
+      });
     } catch (_0x2c4c94) {
+      rendererStartupState.fail('project-hydration');
       // An unsuccessful read must not leave an old project ID attached to an empty store.
       (console.error('Failed to init app:', _0x2c4c94),
         (window._isAppLoaded = false),

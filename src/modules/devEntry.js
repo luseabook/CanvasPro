@@ -173,3 +173,5 @@ export function initDevEntries({ isDevBuild: _0x33c655 } = {}) {
     document.body.appendChild(_0x2aa185),
     bindLocaleSync());
 }
+
+export function toggleDevMode(){if(window["LOCAL_DEV_BUILD"]!==!![])return null;const _0xfbba1a=!Boolean(window['DEV_MODE']);return setDevMode(_0xfbba1a,document["getElementById"]('devEntryModeBtn')),window["showToast"]?.(_0xfbba1a?devEntryText("toasts.devOn"):devEntryText("toasts.devOff")),_0xfbba1a;}

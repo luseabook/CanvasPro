@@ -6,6 +6,7 @@ import commandRegistry, {
 } from './commandRegistry.js';
 import {
   executeCanvasCommand,
+  executeCanvasCommandSync,
   executeCanvasCommandPlan,
   hasCanvasCommandPlanVariableReference,
 } from './commandExecutor.js';
@@ -38,6 +39,7 @@ export {
   createCanvasCommandRegistry,
   commandRegistry as canvasCommandRegistry,
   executeCanvasCommand,
+  executeCanvasCommandSync,
   executeCanvasCommandPlan,
   hasCanvasCommandPlanVariableReference,
 };

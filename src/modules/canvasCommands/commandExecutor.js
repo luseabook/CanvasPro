@@ -282,3 +282,61 @@ export async function executeCanvasCommandPlan(_0xa72015 = [], _0x105788 = {}, _
     message: 'Canvas command plan executed.',
   };
 }
+export function executeCanvasCommandSync(_0x5c7b0b, _0x379df3 = {}, _0x57cc49 = {}) {
+  const _0x22c92c = normalizeCommandId(_0x5c7b0b);
+  if (!_0x22c92c) return buildFailure('', 'MISSING_COMMAND_ID', 'Canvas command id is required.');
+  const _0x581ef1 = getRegistry(_0x57cc49),
+    _0x1d8bb0 = _0x581ef1?.['get']?.(_0x22c92c) || null;
+  if (!_0x1d8bb0) return buildFailure(_0x22c92c, 'UNKNOWN_COMMAND', 'Unknown canvas command: ' + _0x22c92c);
+  try {
+    const _0xf532ab = normalizeValidation(
+      _0x22c92c,
+      _0x1d8bb0['validate']?.(_0x379df3, _0x57cc49),
+      _0x379df3,
+    );
+    if (!_0xf532ab['ok']) return _0xf532ab;
+    if (_0x1d8bb0['execute']?.['constructor']?.['name'] === 'AsyncFunction')
+      return buildFailure(
+        _0x22c92c,
+        'ASYNC_COMMAND_UNSUPPORTED',
+        _0x22c92c + ' cannot run through a synchronous command entry.',
+      );
+    const _0x31f49a = _0x1d8bb0['execute'](_0xf532ab['args'], _0x57cc49);
+    if (_0x31f49a && typeof _0x31f49a['then'] === 'function')
+      return (
+        Promise['resolve'](_0x31f49a)['catch'](() => {}),
+        buildFailure(
+          _0x22c92c,
+          'ASYNC_COMMAND_UNSUPPORTED',
+          _0x22c92c + ' cannot run through a synchronous command entry.',
+        )
+      );
+    const _0x1b5b25 = createCanvasCommandSuccess({
+      commandId: _0x22c92c,
+      result: _0x31f49a,
+      message: _0x1d8bb0['description'] || _0x22c92c,
+      riskLevel: _0x1d8bb0['riskLevel'] || 'safe',
+    });
+    return (
+      _0x57cc49['recordCommand']?.({
+        commandId: _0x22c92c,
+        args: _0xf532ab['args'],
+        result: _0x1b5b25,
+        riskLevel: _0x1d8bb0['riskLevel'] || 'safe',
+        ts: Date['now'](),
+      }),
+      _0x1b5b25
+    );
+  } catch (_0x56883e) {
+    const _0x547202 = normalizeThrownError(_0x22c92c, _0x56883e);
+    return (
+      _0x57cc49['recordCommand']?.({
+        commandId: _0x22c92c,
+        args: _0x379df3,
+        result: _0x547202,
+        ts: Date['now'](),
+      }),
+      _0x547202
+    );
+  }
+}

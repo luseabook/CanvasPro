@@ -526,3 +526,5 @@ export function buildDreaminaVideoNodeNormalizationPatch(_0x59e717) {
     Object.keys(_0x5c85de).length > 0 ? _0x5c85de : null
   );
 }
+
+export function getDreaminaStyleVideoInputLimits(_0x44ba72,_0x5a793f=''){const _0x21ee1e=resolveDreaminaStyleVideoManifest(_0x44ba72,_0x5a793f),_0x11cd91=(_0x49aaec,_0x1e0b8e)=>{const _0x3067bb=Number(_0x49aaec);return Number["isFinite"](_0x3067bb)&&_0x3067bb>=0x0?Math["trunc"](_0x3067bb):_0x1e0b8e;};return Object["freeze"]({'image':_0x11cd91(_0x21ee1e?.["inputSlots"]?.['maxByKind']?.["image"],0x9),'video':_0x11cd91(_0x21ee1e?.["inputSlots"]?.['maxByKind']?.["video"],0x3),'audio':_0x11cd91(_0x21ee1e?.["inputSlots"]?.['maxByKind']?.['audio'],0x3)});}

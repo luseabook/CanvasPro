@@ -1,3 +1,4 @@
+import { PANORAMA_CHARACTER_BONES, normalizeBonePose } from './poseCatalog.js';
 import * as threeRuntime from './threeRuntime.js';
 import { GLTFLoader } from '../../../vendor/three/examples/jsm/loaders/GLTFLoader.js';
 import { clone } from '../../../vendor/three/examples/jsm/utils/SkeletonUtils.js';
@@ -101,3 +102,7 @@ export async function createPanoramaCharacterModelInstance(_0x1e1883) {
   const _0x2aa706 = await loadCharacterTemplate(_0x1e1883);
   return cloneCharacterTemplate(_0x2aa706);
 }
+
+export function capturePanoramaCharacterBoneBase(_0x12857a){const _0x4b11b2={};for(const _0x1e97ed of PANORAMA_CHARACTER_BONES){const _0x8ce9d=_0x12857a?.['getObjectByName']?.(_0x1e97ed);if(!_0x8ce9d?.["quaternion"])continue;_0x4b11b2[_0x1e97ed]={'x':_0x8ce9d["quaternion"]['x'],'y':_0x8ce9d["quaternion"]['y'],'z':_0x8ce9d['quaternion']['z'],'w':_0x8ce9d["quaternion"]['w']};}return _0x4b11b2;}
+
+export function applyPanoramaCharacterBonePose(_0x4f5e3e,_0x43eeef,_0x23f96b={}){const _0x1f1b0d=normalizeBonePose(_0x43eeef);for(const _0x393845 of PANORAMA_CHARACTER_BONES){const _0x52e33f=_0x4f5e3e?.["getObjectByName"]?.(_0x393845);if(!_0x52e33f?.["quaternion"])continue;const _0x258c19=_0x23f96b?.[_0x393845];if(_0x258c19)_0x52e33f["quaternion"]['set'](_0x258c19['x'],_0x258c19['y'],_0x258c19['z'],_0x258c19['w']);const _0x4c90af=_0x1f1b0d[_0x393845];if(!_0x4c90af)continue;const _0x27f85d=new threeRuntime[("Quaternion")]()["setFromEuler"](new threeRuntime[("Euler")](_0x4c90af['x'],_0x4c90af['y'],_0x4c90af['z'],"XYZ"));_0x52e33f['quaternion']["multiply"](_0x27f85d);}return _0x4f5e3e?.["updateMatrixWorld"]?.(!![]),_0x4f5e3e;}

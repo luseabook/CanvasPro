@@ -460,3 +460,49 @@ export function buildRhLipSyncAssetSlotMap(_0x2fb567 = null, _0x2b1f17 = {}) {
     nodeData: _0x2b1f17.nodeData,
   });
 }
+function getConditionFieldIds(_0xe3c7ac, _0x5a6415 = new Set()) {
+  if (Array['isArray'](_0xe3c7ac))
+    return (_0xe3c7ac['forEach']((_0x354e46) => getConditionFieldIds(_0x354e46, _0x5a6415)), _0x5a6415);
+  if (!_0xe3c7ac || typeof _0xe3c7ac !== 'object') return _0x5a6415;
+  Array['isArray'](_0xe3c7ac['any']) &&
+    _0xe3c7ac['any']['forEach']((_0x5afc29) => getConditionFieldIds(_0x5afc29, _0x5a6415));
+  Array['isArray'](_0xe3c7ac['all']) &&
+    _0xe3c7ac['all']['forEach']((_0x47ada0) => getConditionFieldIds(_0x47ada0, _0x5a6415));
+  const _0x2551d3 = String(_0xe3c7ac['field'] || '')['trim']();
+  if (_0x2551d3) _0x5a6415['add'](_0x2551d3);
+  return _0x5a6415;
+}
+
+function getHiddenFixedSlotReasonFields(
+  _0x13c8e0,
+  _0x419702 = {},
+  _0x83aa03 = null,
+  { useRhVisibilityFlags: useRhVisibilityFlags = ![] } = {},
+) {
+  const _0x269630 = new Set();
+  return (
+    useRhVisibilityFlags &&
+      _0x419702?.['rhSpecialMode'] === 'cameraMove' &&
+      (_0x13c8e0 === 'firstFrame' || _0x13c8e0 === 'videoMask') &&
+      _0x269630['add']('rhSpecialMode'),
+    useRhVisibilityFlags &&
+      _0x419702?.['rhSubtractSubject'] === !![] &&
+      (_0x13c8e0 === 'firstFrame' || _0x13c8e0 === 'videoMask') &&
+      _0x269630['add']('rhSubtractSubject'),
+    _0x83aa03?.['showWhen'] &&
+      !fixedSlotConditionMatches(_0x83aa03['showWhen'], _0x419702) &&
+      getConditionFieldIds(_0x83aa03['showWhen'], _0x269630),
+    _0x83aa03?.['hideWhen'] &&
+      fixedSlotConditionMatches(_0x83aa03['hideWhen'], _0x419702) &&
+      getConditionFieldIds(_0x83aa03['hideWhen'], _0x269630),
+    Array['from'](_0x269630)
+  );
+}
+
+export function shouldHideFixedInputSlots(_0x25c29b = null, _0x57d5b3 = {}) {
+  if (_0x25c29b?.['inputSurfaceHidden'] === !![]) return !![];
+  const _0x478c84 = _0x25c29b?.['manifest'] || _0x25c29b,
+    _0x589b3a = _0x478c84?.['extensions']?.['videoInputSurface'];
+  if (_0x589b3a?.['hideFixedInputSlots'] === !![]) return !![];
+  return fixedSlotConditionMatches(_0x589b3a?.['hideFixedInputSlotsWhen'], _0x57d5b3);
+}

@@ -30,6 +30,9 @@ function _hide() {
   if (_previewEl) _previewEl.classList.remove('is-visible');
   if (_previewImgEl) _previewImgEl.classList.remove('is-pending');
 }
+export function hideRefThumbHoverPreview(_0x18e0f5) {
+  if (_activeWrapEl && (_0x18e0f5 === _activeWrapEl || _0x18e0f5?.contains?.(_activeWrapEl))) _hide();
+}
 function _scheduleHide(_0x687a03 = 80) {
   if (_hideTimerId) clearTimeout(_hideTimerId);
   _hideTimerId = window.setTimeout(() => {

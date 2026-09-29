@@ -99,6 +99,13 @@ export function createRendererSpatialIndex(_0x113bba, { cellSize: cellSize = DEF
     nodeCount: _0x18b5aa.size,
   };
 }
+export function getRendererSpatialIndexNode(_0x454912, _0x309e6c) {
+  const _0x1960f9 = _0x454912?.nodeSource;
+  if (_0x1960f9 instanceof Map) return _0x1960f9.get(_0x309e6c);
+  if (_0x1960f9 && typeof _0x1960f9 === 'object' && !Array.isArray(_0x1960f9))
+    return _0x1960f9[_0x309e6c];
+  return _0x454912?.nodesById?.get?.(_0x309e6c)?.node;
+}
 export function queryRendererSpatialIndex(_0x252b1f, _0x57b541) {
   if (!_0x252b1f || !_0x57b541) return [];
   const _0x2853c7 = cellRangeForBounds(_0x57b541, _0x252b1f.cellSize || DEFAULT_CELL_SIZE),

@@ -36,6 +36,10 @@ import {
   resumeDreaminaImageTask,
   resumeRunningHubImageTask,
 } from '../../api/aiImageApi.js';
+import {
+  fetchDreaminaCliStatusFromServer,
+  getCachedDreaminaCliStatus,
+} from '../../api/dreaminaCliApi.js';
 import { generateId } from '../core/math.js';
 import { checkSlashTrigger, handleSlashKeyboardNavigation, closeSlashMenu } from '../modules/slashMenu.js';
 import { activateMenuKeyboard } from '../modules/floatingMenuKeyboard.js';
@@ -43,11 +47,15 @@ import ImageFreeAngleController from '../modules/ImageFreeAngleController.js';
 import { createAIGenerateNodeUiModule } from './aigenImage/uiModule.js';
 import { hasAIGenMaskPreviewBaseImage } from './aigenImage/maskPreviewPolicy.js';
 import { createAIGenerateNodeStateSyncModule } from './aigenImage/stateSyncModule.js';
+import { createAIGenerateNodeSelectionStateModule } from './aigenImage/selectionStateModule.js';
 import { createAIGenerateNodeTaskOrchestrationModule } from './aigenImage/taskOrchestrationModule.js';
+import { createImageGenerationPresentationModule } from './aigenImage/imageGenerationPresentation.js';
 import { shouldDeferRendererMediaOnMount } from '../core/rendererDeferredMedia.js';
 const api = {
     buildGenerateImageRequest: buildGenerateImageRequest,
     cancelRunningHubWorkflowTask: cancelRunningHubImageTask,
+    fetchDreaminaCliStatusFromServer: fetchDreaminaCliStatusFromServer,
+    getCachedDreaminaCliStatus: getCachedDreaminaCliStatus,
     generateImage: generateImage,
     resumeAsyncImageTask: resumeAsyncImageTask,
     resumeDreaminaImageTask: resumeDreaminaImageTask,
@@ -277,6 +285,8 @@ export class AIGenerateNode {
 }
 const aiGenerateNodeUiModule = createAIGenerateNodeUiModule(AI_GENERATE_NODE_MODULE_DEPS),
   aiGenerateNodeStateSyncModule = createAIGenerateNodeStateSyncModule(AI_GENERATE_NODE_MODULE_DEPS),
+  aiGenerateNodeSelectionStateModule =
+    createAIGenerateNodeSelectionStateModule(AI_GENERATE_NODE_MODULE_DEPS),
   aiGenerateNodeTaskOrchestrationModule = createAIGenerateNodeTaskOrchestrationModule(
     AI_GENERATE_NODE_MODULE_DEPS,
   );
@@ -287,4 +297,11 @@ function applyClassPrototypeMethods(_0x562abf, _0x5c26fd) {
 }
 (applyClassPrototypeMethods(AIGenerateNode.prototype, aiGenerateNodeUiModule),
   applyClassPrototypeMethods(AIGenerateNode.prototype, aiGenerateNodeStateSyncModule),
-  applyClassPrototypeMethods(AIGenerateNode.prototype, aiGenerateNodeTaskOrchestrationModule));
+  applyClassPrototypeMethods(AIGenerateNode.prototype, aiGenerateNodeSelectionStateModule),
+  applyClassPrototypeMethods(
+    AIGenerateNode.prototype,
+    createImageGenerationPresentationModule(
+      AI_GENERATE_NODE_MODULE_DEPS,
+      aiGenerateNodeTaskOrchestrationModule,
+    ),
+  ));
