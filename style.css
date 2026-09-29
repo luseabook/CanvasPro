@@ -2516,6 +2516,19 @@ textarea.collaboration-input {
 .workspace-mode-switcher {
   position: relative;
 }
+.workspace-mode-switcher::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: min(520px, calc(100vw - 24px));
+  height: 10px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.workspace-mode-switcher.is-open::after {
+  pointer-events: auto;
+}
 .workspace-mode-current {
   appearance: none;
   -webkit-appearance: none;
