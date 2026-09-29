@@ -44,12 +44,24 @@ import {
   renderContextMenu,
   renderPickConnectBanner,
 } from './rendererOverlays.js';
-import { createNodeDetailHydrationController } from './rendererNodeDetailHydration.js';
 import { createRendererInteractionGraceController } from './rendererInteractionGrace.js';
 import { createRendererPresentationSubscription } from './rendererPresentationSubscription.js';
-import { createRendererDeferredMediaController } from './rendererDeferredMedia.js';
-import { createRendererFastPreviewLayer } from './rendererFastPreviewLayer.js';
+import { createRendererFramePlan } from './rendererFramePlan.js';
+import {
+  cancelRendererFastPreviewMediaPreloads,
+  createRendererFastPreviewLayer,
+} from './rendererFastPreviewLayer.js';
+import { createRendererRasterPreviewCoordinator } from './rendererRasterPreviewCoordinator.js';
+import {
+  createRendererFastPreviewContinuationController,
+  createRendererFastPreviewLifecycleTracker,
+  syncRendererFastPreviewAfterNodeRender,
+} from './rendererFastPreviewContinuation.js';
 import { createFastPreviewReleaseScheduler } from './rendererFastPreviewRelease.js';
+import { createRendererMediaPresentationCoordinator } from './rendererMediaPresentationCoordinator.js';
+import { createRendererSourceVideoSlotLifecycle } from './rendererSourceVideoSlotLifecycle.js';
+import { resolveRendererVideoMediaLeaseKey } from './rendererVideoMediaResidency.js';
+import { syncRendererBridge } from './rendererBridge.js';
 import { resolveModelProvider } from '../manifests/index.js';
 import { syncNodeMediaLodMode } from './rendererNodeMediaLod.js';
 import { buildRendererNodeSignature } from './rendererNodeSignature.js';
@@ -75,6 +87,7 @@ import {
   getRendererDefaultNodeLabel,
   getRendererNodeZIndex,
   shouldSkipInitialMediaNodeUpdate,
+  syncRendererFastPreviewPresentationOwner,
 } from './rendererNodePresentation.js';
 import { t } from '../i18n/index.js';
 import { setCanvasMediaSchedulerPaused } from '../modules/canvasMediaScheduler.js';
@@ -105,31 +118,79 @@ const _multiSelectRenderCache = {
     getDragContext: getDragContext,
     onBusyStateChange: setCanvasMediaSchedulerPaused,
   }),
+  _fastPreviewLifecycle = createRendererFastPreviewLifecycleTracker(),
+  _sourceVideoSlotLifecycle = createRendererSourceVideoSlotLifecycle({
+    getNode: (_0x2de466) => _currentSnapshot?.nodes?.[_0x2de466],
+    getWrapper: (_0x308bea) => _wrapperMap.get(_0x308bea),
+    releasePreview: (_0x3ba9d2) => _fastPreviewLayer.releaseNode(_0x3ba9d2),
+    forgetScheduledRelease: (_0x53cf86) => _fastPreviewRelease.forget(_0x53cf86),
+  }),
   _fastPreviewLayer = createRendererFastPreviewLayer({
     getWrapper: (_0x3c5282) => _wrapperMap.get(_0x3c5282),
     isMounted: (_0x2bcb8b) => _mountedNodeIds.has(_0x2bcb8b),
+    resolveMediaPresentationReady: _sourceVideoSlotLifecycle.resolveMediaPresentationReady,
+    onPresentationOwnerChanged: ({ active: _0x5f21bd, wrapper: _0x427cee }) => {
+      syncRendererFastPreviewPresentationOwner(_0x427cee, _0x5f21bd);
+    },
+    onMediaPresented: () => {
+      if (_rendererInteractionGrace.isBusy()) return;
+      _schedulePreparedMediaRuntimeCommit?.();
+    },
+  }),
+  _fastPreviewContinuation = createRendererFastPreviewContinuationController({
+    sync: (..._0x28ccde) => _fastPreviewLayer.sync(..._0x28ccde),
   }),
   _fastPreviewRelease = createFastPreviewReleaseScheduler({
     getWrapper: (_0x5897de) => _wrapperMap.get(_0x5897de),
+    hasPreview: (_0x298c9b) => _fastPreviewLayer.hasNodePreview(_0x298c9b),
+    isMounted: (_0x3889c3) => _mountedNodeIds.has(_0x3889c3),
     isInteractionBusy: _rendererInteractionGrace.isBusy,
+    resolveMediaPresentationReady: _sourceVideoSlotLifecycle.resolveMediaPresentationReady,
     releasePreview: (_0x2546bc) => _fastPreviewLayer.releaseNode(_0x2546bc),
   }),
-  _rendererDeferredMedia = createRendererDeferredMediaController({
-    getComponent: (_0x53f5fc) => _componentMap.get(_0x53f5fc),
-    isInteractionBusy: _rendererInteractionGrace.isBusy,
-    onHydrateMedia: _fastPreviewRelease.schedule,
-  }),
-  _nodeDetailHydration = createNodeDetailHydrationController({
-    getWrapper: (_0x5e3125) => _wrapperMap.get(_0x5e3125),
-    getParkedWrapper: (_0x4c8cbf) => _parkedWrapperMap.get(_0x4c8cbf),
-    getWrappers: () => _wrapperMap.values(),
-    getParkedWrappers: () => _parkedWrapperMap.values(),
-    isMounted: (_0x273e74) => _mountedNodeIds.has(_0x273e74),
-    isInteractionBusy: _rendererInteractionGrace.isBusy,
-    onHydrateNodeDetails: (_0x32277d) => {
-      (_fastPreviewLayer.retainNode(_0x32277d), _rendererDeferredMedia.enqueue(_0x32277d));
+  _rasterPreviewCoordinator = createRendererRasterPreviewCoordinator({
+    isDomMediaPresented: (_0x546764, _0x2859a7) =>
+      _fastPreviewLayer.isNodePresentationReady(_0x546764, _0x2859a7),
+    onRasterHandoffFrame: _fastPreviewLayer.stageRasterHandoffFrame,
+    onRasterMediaClaimed: (_0xdfac54) => {
+      _fastPreviewContinuation.excludeNodes(_0xdfac54);
+      for (const _0x26b331 of _0xdfac54)
+        _fastPreviewLayer.removeNode(_0x26b331, { collect: false });
+    },
+    onMediaPresented: () => {
+      if (_rendererInteractionGrace.isBusy()) return;
+      _schedulePreparedMediaRuntimeCommit?.();
     },
   }),
+  _mediaPresentation = createRendererMediaPresentationCoordinator({
+    getNode: (_0x4ce09f) => _currentSnapshot?.nodes?.[_0x4ce09f],
+    getComponent: (_0x2afcd6) => _componentMap.get(_0x2afcd6),
+    getWrapper: (_0x2d945a) => _wrapperMap.get(_0x2d945a),
+    getParkedWrapper: (_0x79fbb2) => _parkedWrapperMap.get(_0x79fbb2),
+    getWrappers: () => _wrapperMap.values(),
+    getParkedWrappers: () => _parkedWrapperMap.values(),
+    isMounted: (_0x3b21d2) => _mountedNodeIds.has(_0x3b21d2),
+    isInteractionBusy: _rendererInteractionGrace.isBusy,
+    isPinned: (_0x995bc1) => _getNodePinSet(_0x995bc1, false)?.size > 0,
+    isSelected: (_0x2854b3) => {
+      const _0x9c1d6 = _currentSnapshot?.selectedNodeIds;
+      return Array.isArray(_0x9c1d6)
+        ? _0x9c1d6.includes(_0x2854b3)
+        : _0x9c1d6?.has?.(_0x2854b3) === true;
+    },
+    preview: _fastPreviewLayer,
+    previewRelease: _fastPreviewRelease,
+    videoSlots: _sourceVideoSlotLifecycle,
+    batchSize: 2,
+    presentedMediaLeaseMs: 600,
+    maxRetainedPresentedMedia: 3,
+  }),
+  {
+    media: _rendererDeferredMedia,
+    details: _nodeDetailHydration,
+    residency: _videoMediaResidency,
+    videoBackpressure: _videoHydrationBackpressure,
+  } = _mediaPresentation,
   _edgeLayer = createRendererEdgeLayer({
     getContainerSize: _getEdgeContainerSize,
     nowMs: _nowMs,
@@ -352,18 +413,37 @@ function _clearAnchoredUiForNode(_0x5f47d9) {
   const _0x38cd19 = _componentMap.get(_0x5f47d9);
   _0x38cd19 && typeof _0x38cd19.highlightCell === 'function' && _0x38cd19.highlightCell(-1);
 }
+function _resolveVideoMediaLeaseKey(_0x5ca464, _0x53070e) {
+  const _0xf2fe03 = _sourceVideoSlotLifecycle.isManagedNode(_0x5ca464)
+    ? _sourceVideoSlotLifecycle.read(_0x5ca464)
+    : null;
+  return resolveRendererVideoMediaLeaseKey(_0x53070e, _0xf2fe03);
+}
 function _parkNode(_0x2883a2) {
   const _0x3d51fd = _wrapperMap.get(_0x2883a2);
   if (!_0x3d51fd) return null;
+  _sourceVideoSlotLifecycle.isManagedNode(_0x2883a2) &&
+    (_sourceVideoSlotLifecycle.syncVisibility(_0x2883a2, 'far'),
+    _sourceVideoSlotLifecycle.setResidency(_0x2883a2, 'parked'));
   return (
-    _nodeDetailHydration.forgetNodeDetailHydration(_0x2883a2),
-    _rendererDeferredMedia.forget(_0x2883a2),
-    _fastPreviewRelease.forget(_0x2883a2),
+    _mediaPresentation.forgetHydration(_0x2883a2),
     _syncRunningTimerForNode(_0x2883a2, null, { hide: true }),
     _0x3d51fd.isConnected && _0x3d51fd.remove(),
+    _videoMediaResidency.park(_0x2883a2, {
+      retainPresentedMedia: (() => {
+        const _0x8ae6f = _componentMap.get(_0x2883a2);
+        try {
+          return _0x8ae6f?.hasPresentedRendererMedia?.() === true;
+        } catch {
+          return false;
+        }
+      })(),
+      leaseKey: _resolveVideoMediaLeaseKey(_0x2883a2, _currentSnapshot?.nodes?.[_0x2883a2]),
+    }),
     _mountedNodeIds.delete(_0x2883a2),
     _parkedNodeIds.add(_0x2883a2),
     _parkedWrapperMap.set(_0x2883a2, _0x3d51fd),
+    _fastPreviewLifecycle.record(_nodeTypeSnapshotMap.get(_0x2883a2)),
     _clearAnchoredUiForNode(_0x2883a2),
     _nodeRuntimeBridge.unregister(_0x2883a2),
     _0x3d51fd
@@ -373,10 +453,13 @@ function _mountNode(_0x65fed0, _0x450728) {
   const _0x118cc9 = _wrapperMap.get(_0x65fed0);
   if (!_0x118cc9) return null;
   return (
+    _videoMediaResidency.unpark(_0x65fed0),
     !_0x118cc9.isConnected && _0x450728.appendChild(_0x118cc9),
     _parkedWrapperMap.delete(_0x65fed0),
     _parkedNodeIds.delete(_0x65fed0),
     _mountedNodeIds.add(_0x65fed0),
+    _sourceVideoSlotLifecycle.setResidency(_0x65fed0, 'mounted'),
+    _fastPreviewLifecycle.record(_nodeTypeSnapshotMap.get(_0x65fed0)),
     _nodeRuntimeBridge.register(_0x65fed0),
     _0x118cc9
   );
@@ -388,9 +471,7 @@ function _flushMountBatch(_0x2ff5b6, _0x1af636) {
 }
 function _destroyNode(_0x17af1e) {
   (_rendererMediaRuntimePreparer.forget(_0x17af1e),
-    _nodeDetailHydration.forgetNodeDetailHydration(_0x17af1e),
-    _rendererDeferredMedia.forget(_0x17af1e),
-    _fastPreviewRelease.forget(_0x17af1e),
+    _mediaPresentation.forget(_0x17af1e),
     _syncRunningTimerForNode(_0x17af1e, null, { hide: true }));
   const _0x17a345 = _componentMap.get(_0x17af1e);
   try {
@@ -407,49 +488,64 @@ function _destroyNode(_0x17af1e) {
     _pendingNodeDataMap.delete(_0x17af1e),
     _nodeTypeSnapshotMap.delete(_0x17af1e),
     _nodeRuntimeBridge.unregister(_0x17af1e),
+    _sourceVideoSlotLifecycle.isManagedNode(_0x17af1e) &&
+      _sourceVideoSlotLifecycle.forget(_0x17af1e),
     _clearNodePin(_0x17af1e),
-    _fastPreviewLayer.removeNode(_0x17af1e));
+    _fastPreviewLayer.discardNode(_0x17af1e),
+    _fastPreviewContinuation.excludeNodes([_0x17af1e]));
 }
 function _syncRendererBridge() {
-  if (typeof window === 'undefined') return;
-  ((window.v2Renderer = window.v2Renderer || {}),
-    Object.assign(window.v2Renderer, {
-      nodeInstances: _componentMap,
-      wrapperMap: _wrapperMap,
-      isNodeMounted(_0x93e64b) {
-        return !!(_0x93e64b && _mountedNodeIds.has(_0x93e64b) && _wrapperMap.get(_0x93e64b)?.isConnected);
-      },
-      getMountedWrapper(_0x3cba34) {
-        if (!_0x3cba34 || !_mountedNodeIds.has(_0x3cba34)) return null;
-        const _0xdc4ffd = _wrapperMap.get(_0x3cba34);
-        return _0xdc4ffd?.isConnected ? _0xdc4ffd : null;
-      },
-      getEdgeIdsForNode(_0x15e2c6) {
-        if (!_0x15e2c6) return [];
-        const _0x582c60 = _nodeToEdgeIds.get(_0x15e2c6);
-        return _0x582c60 ? Array.from(_0x582c60) : [];
-      },
-      getEdgeLayerStats: () => _edgeLayer.getStats(),
-      hitTestEdgeAtScreenPoint: (_0x29a701, _0x3bfe37, _0x4a8e2d) =>
-        _edgeLayer.hitTestEdgeAtScreenPoint(_0x29a701, _0x3bfe37, _0x4a8e2d),
-      prepareDynamicEdges: (_0x3c9278) => _edgeLayer.prepareDynamicEdges(_0x3c9278),
-      setEdgeInteractionHighlight: (_0x4d6bb4, _0x4bdf3a) =>
-        _edgeLayer.setActiveEdge(_0x4d6bb4, _0x4bdf3a),
-      setHoveredEdge: (_0x3c5836, _0x1ce979) => _edgeLayer.setHoveredEdge(_0x3c5836, _0x1ce979),
-      markViewportInteractionBusy: _rendererInteractionGrace.markBusy,
-      pinNode(_0x2043d9, _0x37f8e4 = 'src/ui/') {
-        if (!_0x2043d9) return;
-        const _0x3d3b9d = _getNodePinSet(_0x2043d9, true);
-        _0x3d3b9d.add(String(_0x37f8e4 || 'src/ui/'));
-      },
-      unpinNode(_0x44dc77, _0x442b64 = 'src/ui/') {
-        if (!_0x44dc77) return;
-        const _0x18dc87 = _getNodePinSet(_0x44dc77, false);
-        if (!_0x18dc87) return;
-        (_0x18dc87.delete(String(_0x442b64 || 'src/ui/')),
-          _0x18dc87.size === 0 && _nodePinReasons.delete(_0x44dc77));
-      },
-    }));
+  syncRendererBridge(typeof window === 'undefined' ? null : window, {
+    componentMap: _componentMap,
+    wrapperMap: _wrapperMap,
+    mountedNodeIds: _mountedNodeIds,
+    nodeToEdgeIds: _nodeToEdgeIds,
+    getEdgeLayerStats: _edgeLayer.getStats,
+    hitTestEdgeAtScreenPoint: _edgeLayer.hitTestEdgeAtScreenPoint,
+    prepareDynamicEdges: _edgeLayer.prepareDynamicEdges,
+    setEdgeInteractionHighlight: _edgeLayer.setActiveEdge,
+    setHoveredEdge: _edgeLayer.setHoveredEdge,
+    markViewportInteractionBusy: _markRasterMediaInteractionBusy,
+    releaseViewportInteractionBusy: _releaseRasterMediaInteractionBusy,
+    captureRasterPreviewNode: _rasterPreviewCoordinator.captureNodeFrame,
+    excludeRasterPreviewNode: _rasterPreviewCoordinator.excludeNode,
+    syncFastPreviewDragProxy: _fastPreviewLayer.syncNodeDragPreview,
+    releaseFastPreviewForPlayback(_0x399529) {
+      if (!_0x399529) return false;
+      if (_sourceVideoSlotLifecycle.isManagedNode(_0x399529)) return false;
+      const _0x3ba665 = _fastPreviewLayer.releaseNode(_0x399529) === true;
+      if (!_0x3ba665) return false;
+      const _0x19a0e5 = _wrapperMap.get(_0x399529);
+      return (
+        _0x19a0e5?.dataset &&
+          (_0x19a0e5.dataset.fastPreviewReleasedForPlayback = '1'),
+        _fastPreviewRelease.forget(_0x399529),
+        true
+      );
+    },
+    prepareMediaSlotSource(_0x6d7867, _0x38eb06, _0x395b49 = {}) {
+      return _sourceVideoSlotLifecycle.prepareSource(_0x6d7867, _0x38eb06, _0x395b49);
+    },
+    reportMediaSlotFrame: _sourceVideoSlotLifecycle.reportFrame,
+    pinNode(_0x2043d9, _0x37f8e4 = 'src/ui/') {
+      if (!_0x2043d9) return;
+      const _0x3d3b9d = _getNodePinSet(_0x2043d9, true);
+      _0x3d3b9d.add(String(_0x37f8e4 || 'src/ui/'));
+    },
+    unpinNode(_0x44dc77, _0x442b64 = 'src/ui/') {
+      if (!_0x44dc77) return;
+      const _0x18dc87 = _getNodePinSet(_0x44dc77, false);
+      if (!_0x18dc87) return;
+      (_0x18dc87.delete(String(_0x442b64 || 'src/ui/')),
+        _0x18dc87.size === 0 && _nodePinReasons.delete(_0x44dc77));
+    },
+  });
+}
+function _markRasterMediaInteractionBusy() {
+  (_rendererInteractionGrace.markBusy(), _rasterPreviewCoordinator.setMediaLoadingBusy(true));
+}
+function _releaseRasterMediaInteractionBusy() {
+  (_rasterPreviewCoordinator.setMediaLoadingBusy(false), _schedulePreparedMediaRuntimeCommit?.());
 }
 function _rebuildEdgeIndex(_0x2c906e) {
   (_nodeToEdgeIds.clear(), _incomingEdgeIdsByTarget.clear());
@@ -832,10 +928,13 @@ export function clearRendererCache() {
     _nodePinReasons.clear(),
     _pendingNodeDataMap.clear(),
     _nodeTypeSnapshotMap.clear(),
-    _nodeDetailHydration.clearNodeDetailHydrationState(),
-    _rendererDeferredMedia.clear(),
-    _fastPreviewRelease.clear(),
+    _mediaPresentation.clear(),
+    _sourceVideoSlotLifecycle.reset(),
+    _fastPreviewContinuation.reset(),
+    _fastPreviewLifecycle.reset(),
     _fastPreviewLayer.clear(),
+    _rasterPreviewCoordinator.reset(),
+    cancelRendererFastPreviewMediaPreloads({ includeActive: true, reason: 'renderer-cache-clear' }),
     _clearRunningTimerState());
 }
 ((window._edgeDomCache = _edgeDomCache), _syncRendererBridge());
@@ -895,10 +994,10 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
       (_syncRunningTimers(_0x58bb73), _0x19f4ce(_0x58bb73));
     },
     onSuspend: () => {
-      (_0x4e7d6e(), _rendererMediaRuntimePreparer.pause());
+      (_0x4e7d6e(), _rendererMediaRuntimePreparer.pause(), _mediaPresentation.pause());
     },
     onResume: () => {
-      _rendererMediaRuntimePreparer.resume();
+      (_mediaPresentation.resume(), _rendererMediaRuntimePreparer.resume());
     },
   });
   let _0x4d6a84 = -1,
@@ -1196,7 +1295,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
         : (_0x4e7d6e(), _rendererInteractionGrace.markIdle());
       if (_0x2e6a9c.style.display === 'none') _0x2e6a9c.style.display = '';
       (_0xf2ac69(_0x4ddc65),
-        !_0x1a12df && (_nodeDetailHydration.resumeNodeDetailHydration(), _rendererDeferredMedia.resume()));
+        !_0x1a12df && _mediaPresentation.resume());
     } finally {
       if (_0x4af397 && typeof performance !== 'undefined' && typeof performance.now === 'function') {
         const _0x2c6c2a =
@@ -1269,7 +1368,9 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
           (_containerResizeObserver.disconnect(), (_containerResizeObserver = null)),
         (_containerResizeHandler = null),
         (_containerSizeSourceEl = null),
-        _nodeDetailHydration.clearNodeDetailHydrationState(),
+        _mediaPresentation.clear(),
+        _sourceVideoSlotLifecycle.reset(),
+        _rasterPreviewCoordinator.reset(),
         _clearRunningTimerState(),
         _0x2e6a9c?.remove?.(),
         _0x496ecf?.remove?.(),
@@ -1695,6 +1796,7 @@ function _renderNodes(
       selectedNodeSet: _0x44e39b,
       parentToChildren: _0x17c51c,
     }),
+    interactionBusy = _rendererInteractionGrace.isBusy(),
     { width: _0x460fc9, height: _0x379dc0 } = _getCachedContainerSize(_0x757360.parentElement || _0x757360),
     _0x3ed32d = Number.isFinite(_0x3716f9?._nodeCount)
       ? _0x3716f9._nodeCount
@@ -1737,6 +1839,55 @@ function _renderNodes(
     })),
     (_lastVirtualCandidateSignature = _0x3a852d),
     (_lastVirtualCandidateResult = _0x47b692));
+  const _0x7b5205 = createRendererFramePlan({
+      snapshot: _0x3716f9,
+      nodes: _0x4b355d,
+      viewport: _0x676f3a,
+      containerRect: { width: _0x460fc9, height: _0x379dc0 },
+      nodeCount: _0x3ed32d,
+      geometryRev: _0x2f4dd1,
+    }),
+    _0x2c9a17 = _0x7b5205.buildScenePlan({
+      mountCandidateIds: _0x47b692.mountCandidateIds,
+      previewCandidateIds: _0x47b692.previewCandidateIds,
+      parkCandidateIds: _0x47b692.parkCandidateIds,
+      selectedNodeIds: _0x44e39b,
+      activeNodeIds: _0x5987f3,
+      keepAliveNodeIds: _0x47b692.keepAliveNodeIds,
+      mountedNodeIds: _mountedNodeIds,
+      includeParkIds: false,
+      deferInitialPlanning: _0x4730fc?.deferInitialRasterPlanning === true,
+    });
+  _0x47b692 = {
+    ..._0x47b692,
+    mountCandidateIds: _0x2c9a17.fullSurfaceIds,
+    previewCandidateIds: _0x2c9a17.presentationSurfaceIds,
+    parkCandidateIds: _0x2c9a17.fullSurfaceReleaseIds,
+    scenePlan: _0x2c9a17,
+  };
+  const _0x38c987 = _rasterPreviewCoordinator.sync({
+    canvasEl: _0x757360,
+    nodes: _0x4b355d,
+    scenePlan: _0x2c9a17,
+    selectedNodeIds: _0x44e39b,
+    dragNodeIds: _0x5987f3,
+    connOverlay: _0x54d2e1,
+    pickConnectMode: _0x18682e,
+    viewport: _0x676f3a,
+    viewportBusy: interactionBusy,
+    containerWidth: _0x460fc9,
+    containerHeight: _0x379dc0,
+    mediaLoadingBusy: interactionBusy,
+    freezeRasterSurface: interactionBusy,
+    lockRasterParticipation: _0x4730fc?.lockRasterParticipation === true,
+    deferInitialPlanning: _0x4730fc?.deferInitialRasterPlanning === true,
+    releaseFullSurface(_0x16bce6) {
+      const _0x47e2c1 = _wrapperMap.get(_0x16bce6);
+      if (!_0x47e2c1?.style || _0x47e2c1.classList?.contains?.('is-dragging')) return;
+      _0x47e2c1.style.display = 'none';
+      _syncRunningTimerForNode(_0x16bce6, null, { hide: true });
+    },
+  });
   _notifyVirtualizationProbe({
     signature: _0x3a852d,
     cacheHit: _0x2e247e,
@@ -1746,10 +1897,20 @@ function _renderNodes(
     spatialIndex: !!_0x4c23a,
     nodeCount: _0x3ed32d,
     mountCandidateCount: _0x47b692.mountCandidateIds?.size || 0,
+    previewCandidateCount: _0x47b692.previewCandidateIds?.size || 0,
     parkCandidateCount: _0x47b692.parkCandidateIds?.size || 0,
     keepAliveCount: _0x47b692.keepAliveNodeIds?.size || 0,
   });
-  const { mountCandidateIds: _0x186ec4, parkCandidateIds: _0x41faeb } = _0x47b692,
+  const { mountCandidateIds: _0x186ec4 } = _0x47b692,
+    _0x67f5f0 = _0x38c987.domPreviewCandidateIds || _0x47b692.previewCandidateIds,
+    _0x50ef9a = _0x38c987.domPreviewMediaSourceOwnerIds || new Set(),
+    _0x20fdd9 = new Set([
+      ..._0x50ef9a,
+      ...[..._0x2c9a17.exactVisibleGenerationBusyIds].filter(
+        (_0x162b6a) => !_0x2c9a17.fullSurfaceIds.has(_0x162b6a) || !_mountedNodeIds.has(_0x162b6a),
+      ),
+    ]),
+    _0x41faeb = _0x38c987.releasableFullSurfaceIds || _0x47b692.parkCandidateIds,
     _0x50e3ad = collectVirtualizedRenderNodes({
       nodes: _0x4b355d,
       virtualizationResult: _0x47b692,
@@ -1762,7 +1923,6 @@ function _renderNodes(
     _0x129f6f = createRendererStructuralBudget(),
     exactVisiblePreviewNodeIds = _collectExactVisiblePreviewNodeIds(_0x757360);
   _rendererMediaRuntimePreparer.prune(_0x186ec4);
-  const interactionBusy = _rendererInteractionGrace.isBusy();
   let _0x38ea0f = false,
     _0x21ef5e = 0,
     _0x2cc9b8 = null;
@@ -1779,8 +1939,17 @@ function _renderNodes(
       _0x1d267c &&
       _0x1d267c !== _0x16f7d5 &&
       (_destroyNode(_0x563f60), (_0x540ac2 = null), (_0x2e4456 = null));
-    const _0x9714e9 = _mountedNodeIds.has(_0x563f60) && !!_0x540ac2?.isConnected,
-      _0x1aa0a5 = _0x186ec4.has(_0x563f60) || (_0x9714e9 && !_0x41faeb.has(_0x563f60));
+    const _0x457bb9 = _0x44e39b.has(_0x563f60),
+      _0x4a3aea = !_0x457bb9 && _0x1677db?.has?.(_0x563f60),
+      _0x9714e9 = _mountedNodeIds.has(_0x563f60) && !!_0x540ac2?.isConnected;
+    _sourceVideoSlotLifecycle.isManagedNode(_0x563f60) &&
+      _sourceVideoSlotLifecycle.syncViewportVisibility(_0x563f60, {
+        isSelected: _0x457bb9,
+        isPreviewCandidate: _0x67f5f0.has(_0x563f60),
+        isVisible: _isNodeVisible(_0x360a17, _0x676f3a, _0x460fc9, _0x379dc0),
+      });
+    const _0x5227a7 = _sourceVideoSlotLifecycle.shouldRetainPresentedSurface(_0x563f60),
+      _0x1aa0a5 = _0x186ec4.has(_0x563f60) || _0x5227a7 || (_0x9714e9 && !_0x41faeb.has(_0x563f60));
     let _0x4664c2 = false;
     if (!_0x1aa0a5) {
       if (_0x540ac2 && _0x2e4456) {
@@ -1797,8 +1966,6 @@ function _renderNodes(
       }
       continue;
     }
-    const _0x457bb9 = _0x44e39b.has(_0x563f60),
-      _0x4a3aea = !_0x457bb9 && _0x1677db?.has?.(_0x563f60);
     if (!_0x2e4456 || !_0x540ac2) {
       if (!_0x129f6f.hasBudget()) {
         _0x38ea0f = true;
@@ -1966,7 +2133,29 @@ function _renderNodes(
   }
   return (
     _flushMountBatch(_0x757360, _0x2cc9b8),
-    _fastPreviewLayer.sync(_0x757360, _0x4b355d, _0x186ec4, _0x44e39b),
+    syncRendererFastPreviewAfterNodeRender({
+      continuation: _fastPreviewContinuation,
+      layer: _fastPreviewLayer,
+      canvasEl: _0x757360,
+      nodes: _0x4b355d,
+      previewCandidateIds: _0x67f5f0,
+      selectedNodeSet: _0x44e39b,
+      candidateSignature: _0x3a852d,
+      hasPendingStructuralOps: _0x38ea0f,
+      connOverlay: _0x54d2e1,
+      pickConnectMode: _0x18682e,
+      nodeCount: _0x3ed32d,
+      viewport: _0x676f3a,
+      containerWidth: _0x460fc9,
+      containerHeight: _0x379dc0,
+      dragContext: _0x4adfff,
+      dragTargets: _0x5987f3,
+      freezeRasterSurface: _0x38c987.freezeActive === true,
+      mediaSourceOwnerIds: _0x50ef9a,
+      requiredImmediateMediaSourceOwnerIds: _0x20fdd9,
+      viewportBusy: interactionBusy,
+      ..._fastPreviewLifecycle.getContinuationOptions(),
+    }),
     { hasPendingStructuralOps: _0x38ea0f, deferredParkCount: _0x21ef5e }
   );
 }
