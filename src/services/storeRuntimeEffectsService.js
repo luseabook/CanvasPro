@@ -82,6 +82,11 @@ export function applyThemeToDom(_0x17dca7) {
       _0x34d670.setAttribute('data-theme', _0x19b830);
   } catch {}
 }
+export function applyStoredThemeToDom() {
+  const theme = readThemeFromStorage();
+  applyThemeToDom(theme);
+  return theme;
+}
 export function persistThemeToStorage(_0x488ab5) {
   safeStorageSet(THEME_STORAGE_KEY, normalizeThemeName(_0x488ab5));
 }

@@ -168,6 +168,45 @@ export function resolveCanvasVideoLocalPath(_0x3a1870 = {}) {
 export function resolveCanvasVideoUrl(_0x465994 = {}) {
   return toCanvasLocalUrl(resolveCanvasVideoLocalPath(_0x465994));
 }
+function normalizeCanvasVideoPosterUrl(value, { localOnly = false } = {}) {
+  const normalized = normalizeText(value);
+  if (!normalized) return '';
+  if (/^data:image\//i.test(normalized) || /^blob:/i.test(normalized) || /^aic-local-preview:/i.test(normalized)) {
+    return normalized;
+  }
+  if (/^(?:https?:|file:)/i.test(normalized)) return '';
+  const localUrl = localPathToUrl(normalized);
+  if (localUrl) return localUrl;
+  return localOnly ? '' : normalized;
+}
+export function resolveCanvasVideoPosterUrl(_0x3ed78b = {}) {
+  const videos = Array.isArray(_0x3ed78b?.videos) ? _0x3ed78b.videos : [],
+    mainIndex = Math.max(0, Number(_0x3ed78b?.mainVideoIndex) || 0),
+    mainVideo = videos[mainIndex] || videos[0] || null,
+    candidates = [
+      [mainVideo?.posterLocalPath, true],
+      [mainVideo?.previewLocalPath, true],
+      [mainVideo?.thumbLocalPath, true],
+      [mainVideo?.thumbnailLocalPath, true],
+      [mainVideo?.posterUrl, false],
+      [mainVideo?.previewUrl, false],
+      [mainVideo?.thumbUrl, false],
+      [mainVideo?.thumbnailUrl, false],
+      [_0x3ed78b?.posterLocalPath, true],
+      [_0x3ed78b?.previewLocalPath, true],
+      [_0x3ed78b?.thumbLocalPath, true],
+      [_0x3ed78b?.thumbnailLocalPath, true],
+      [_0x3ed78b?.posterUrl, false],
+      [_0x3ed78b?.previewUrl, false],
+      [_0x3ed78b?.thumbUrl, false],
+      [_0x3ed78b?.thumbnailUrl, false],
+    ];
+  for (const [value, localOnly] of candidates) {
+    const resolved = normalizeCanvasVideoPosterUrl(value, { localOnly });
+    if (resolved) return resolved;
+  }
+  return '';
+}
 export function resolveCanvasAudioLocalPath(_0x20103f = {}) {
   return pickLocalPath(_0x20103f, ['localPath', 'audioUrl', 'src', 'url', 'resultUrl']);
 }

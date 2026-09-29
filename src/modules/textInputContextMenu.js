@@ -1,6 +1,8 @@
 import { t } from '../i18n/index.js';
-const MENU_SELECTOR = '.v2-text-input-context-menu',
-  TEXT_INPUT_TYPES = new Set(['', 'text', 'search', 'url', 'tel', 'email', 'password', 'number']);
+const MENU_SELECTOR = '.v2-text-input-context-menu';
+export const TEXT_CONTEXT_MENU_TARGET_SELECTOR =
+  "input, textarea, [contenteditable]:not([contenteditable='false'])";
+const TEXT_INPUT_TYPES = new Set(['', 'text', 'search', 'url', 'tel', 'email', 'password', 'number']);
 function getWindow() {
   return globalThis.window || null;
 }

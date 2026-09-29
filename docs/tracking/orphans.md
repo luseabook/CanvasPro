@@ -1,107 +1,115 @@
 # 孤立模块清单（已落地但从入口不可达）
 
-> 由 `docs/TRACKING.md` 维护。依据是 2026-09-25 对本地镜像做的静态依赖分析：从 `index.html`、`main.js`、`renderer.js`、`electron/main.js`、preload 和 worker 等入口出发，沿相对 import 遍历，走不到的非测试 JS 模块都列在这里。
-> 增量台账共 **275** 个，非测试 JS 模块总数 1037（第 123b 基线 257/1019 加 124a–124f 的 18 件；2026-09-28 反查消费方，本次未重跑全图遍历）。大部分是第 56–124f 批「落地不接线」的移植件；少数是 0.4.12 原有的遗留文件，如 `src/hooks/*`、`src/core/store.js`、`ProjectManager.js`。
-> 某个模块接线后，从本表删掉它，并同步 `docs/TRACKING.md` §5 的计数。重算方法：从上述入口做 import 可达性遍历，排除 `*.test.js`、`vendor/`、`deobfuscated/`。
+> 由 `docs/TRACKING.md` 维护。**本表是 2026-09-28 第 126 批的实测结果**，不再是按批次累加的估算：
+> 从 `index.html` 的 `<script type="module">`、`package.json` 的 `main`（`electron/main.js`）、以及按运行期加载约定补的入口（`electron/*preload*.cjs`、`db/migrations/*.cjs`、`knexfile.cjs`、`main.js`）出发，
+> 沿相对 `import` / `export … from` / 动态 `import()` / `new URL("…js", import.meta.url)` 做全图遍历，走不到的非测试 JS 模块都列在这里。
+> 脚本与证据：`deobf-tools/b126/reach.mjs`、`reach-report.txt`、`reach-orphans.json`；方法说明见 `docs/b126-reachability.md`。
+
+> scope：**1238** 个非测试 JS 模块（`src/`、`api/`、`electron/`、`db/` 加根级 `*.js`/`*.cjs`；排除 `*.test.js` / `*_test.js` / `*.spec.js`、`node_modules/`、`deobfuscated/`、`vendor/`、`user/`、`data/`、`output/`、`build/`、`dist/`、`tools/`、`backend/`）。
+> 可达 **755** / 孤立 **483** / 断链 **0** / 解析失败 **0**（断链为 0 说明整个仓库的相对 import 都能解析到实际文件）。
+> 另有 5 个 `vendor/three/**` 文件可达，不计入 scope。
+
+> 某个模块接线后，从本表删掉它，并同步 `docs/TRACKING.md` §5 的计数。重算：`node deobf-tools/b126/reach.mjs`。
 
 | 目录 | 数量 |
 | --- | --- |
+| `src/modules/` | 90 |
 | `src/modules/agent/` | 67 |
-| `src/modules/storyboard3d/` | 43 |
-| `src/services/` | 19 |
-| `electron/` | 16 |
+| `src/modules/storyWorkspace/` | 48 |
+| `src/modules/storyboard3d/` | 46 |
+| `src/modules/personReplacement/` | 37 |
+| `src/modules/collaboration/` | 24 |
 | `api/story-generation/` | 23 |
-| `src/modules/storyWorkspace/` | 34 |
-| `src/modules/collaboration/` | 18 |
+| `src/services/` | 19 |
+| `electron/` | 18 |
+| `src/modules/app/` | 18 |
+| `src/modules/panoramaSceneNode/` | 10 |
 | `src/core/` | 9 |
-| `src/modules/` | 8 |
-| `src/modules/personReplacement/` | 8 |
-| `src/hooks/` | 4 |
-| `src/modules/nodeManager/` | 4 |
-| `src/utils/` | 3 |
-| `api/adapters/` | 2 |
-| `./` | 1 |
+| `src/modules/settings/` | 8 |
+| `src/modules/runninghubAiApp/` | 7 |
+| `src/modules/interaction/` | 6 |
 | `api/` | 4 |
 | `api/utils/` | 4 |
-| `db/migrations/` | 1 |
-| `src/components/` | 1 |
+| `src/hooks/` | 4 |
+| `src/modules/canvasCommands/` | 4 |
+| `src/modules/nodeManager/` | 4 |
+| `src/modules/videoRetake/` | 4 |
+| `src/utils/` | 4 |
+| `src/modules/canvasMcp/` | 3 |
+| `src/modules/canvasShortcuts/` | 3 |
+| `src/modules/tutorials/` | 3 |
+| `src/modules/whiteboard/` | 3 |
+| `api/adapters/` | 2 |
+| `src/components/` | 2 |
+| `src/modules/imageAnnotate/` | 2 |
+| `./` | 1 |
 | `src/components/aigenImage/` | 1 |
 | `src/components/nodeToolbar/` | 1 |
 | `src/config/` | 1 |
 | `src/core/stores/` | 1 |
-| `src/modules/runninghubAiApp/` | 1 |
-| `src/modules/settings/` | 1 |
+| `src/modules/characterAssets/` | 1 |
+| `src/modules/promptPresetCatalog/` | 1 |
+| **合计** | **483** |
+
+## `src/modules/`（90）
+
+ImageExpandController_lf.js、ProjectManager.js、agnesProviderProfiles.js、assetCreateFly.js、assetPackageMedia.js、audioVoiceAnalysisSegments.js、audioVoiceAnalysisSession.js、audioVoiceConfirmDialog.js、audioVoiceLocalAsrRuntime.js、audioVoicePanelEvents.js、audioVoicePanelGenerationFeedback.js、audioVoicePanelPickSession.js、audioVoicePanelSegmentState.js、audioVoicePlaybackSession.js、audioVoiceRuntimeRepairFlow.js、audioVoiceSegmentEditSession.js、audioVoiceTranslation.js、autoUpdatePolicy.js、backgroundTaskCanvasSnapshot.js、canvasImageDisplayHandoff.js、canvasProjectSaveTransaction.js、canvasToolbarPlacement.js、clipboardMediaSignature.js、generationHistoryVideoThumbnails.js、generationPromptPolicy.js、groupNodeLayout.js、imageCropSourceUrl.js、imageFreeAngleAspectRatio.js、imageHdModelMenu.js、imageNodeImageUrl.js、imageOverlayReadiness.js、imageOverlayViewportPreview.js、materialComparisonImageCache.js、materialComparisonViewport.js、materialLibraryPolicy.js、minimaxProviderProfiles.js、modelApiVideoResolverPolicy.js、modelGenerationParamMemory.js、modelMediaInputLimits.js、modelProviderProfileSelection.js、modelProviderProfiles.js、nodeBatchExport.js、nodeCreationMenuIcons.js、nodeVideoElement.js、promptAssetInputRefs.js、promptMentionMatcher.js、promptPasteVirtualization.js、promptReferenceSignature.js、promptTriggerComposition.js、referenceInputThumbnail.js、runningHubInstanceTypes.js、runningHubProviderProfiles.js、taskCenterListView.js、taskCenterModel.js、taskCenterThumbnail.js、taskStatusFeedback.js、toolbarPendingResultNodes.js、videoAspectRatioExecution.js、videoKeyingProjection.js、videoKeyingSourceVideoLimit.js、videoTimelineThumbnails.js、workspaceActionIcons.js、workspaceAssetAppearance.js、workspaceAssetDragPreview.js、workspaceAssetHover.js、workspaceAssetLibraryContextMenu.js、workspaceAssetPromptPresets.js、workspaceAssetSelection.js、workspaceAssetSettingsShell.js、workspaceBetaNotice.js、workspaceCanvasMaterialization.js、workspaceContextMenuGuard.js、workspaceEpisodeRailPresentation.js、workspaceHorizontalWheel.js、workspaceImageDownload.js、workspaceMarqueeSelection.js、workspaceMediaDownload.js、workspaceMediaHistory.js、workspaceMenuController.js、workspacePageTransition.js、workspacePersistenceCoordinator.js、workspacePersistencePresentation.js、workspacePresentationLifecycle.js、workspaceProjectHome.js、workspaceResizeSession.js、workspaceStepShortcut.js、workspaceStudioModes.js、workspaceVideoDownload.js、workspaceVideoPlaybackControls.js、workspaceWheelNavigation.js
 
 ## `src/modules/agent/`（67）
 
-agentActionPostconditions.js、agentAssistantConversation.js、agentAssistantConversationRuntime.js、agentAssistantMarkdown.js、agentCapabilityDiscovery.js、agentCapabilityRouter.js、agentClarificationPolicy.js、agentCompletionEvidence.js、agentComposerAttachmentController.js、agentContextDigest.js、agentContex
-tDigestRuntime.js、agentConversationActionText.js、agentConversationActions.js、agentConversationCanvasTransfer.js、agentConversationCanvasTransferRuntime.js、agentConversationCapabilityRuntime.js、agentConversationChoices.js、agentConversationIntent.js、agentConversationPresentation.js、agentConversationScr
-oll.js、agentConversationStreamingPresentation.js、agentConversationText.js、agentDiscoveryCommands.js、agentDocumentInput.js、agentDurableRunState.js、agentExternalInformation.js、agentExternalInformationRuntime.js、agentExternalToolRegistry.js、agentFailureDiagnostic.js、agentLoopPlanSelection.js、agentLoopR
-ecovery.js、agentMessageTime.js、agentModelRequestRuntime.js、agentPanelContinuity.js、agentPanelElements.js、agentPanelText.js、agentParameterHints.js、agentPlanLifecycle.js、agentPrecreatedNode.js、agentProjectMemory.js、agentProjectMemoryConversationRuntime.js、agentProjectMemoryStore.js、agentReferenceConte
-xt.js、agentReplyVersions.js、agentRunEventLog.js、agentRunStatusPresentation.js、agentRunSteps.js、agentScrollableWheel.js、agentSessionEventLog.js、agentSkillAuthoring.js、agentSkillAuthoringRuntime.js、agentSkillConversationRuntime.js、agentSkillEditor.js、agentSkillLifecycle.js、agentSkillLifecycleRuntime.j
-s、agentSkillLoader.js、agentSkillPanel.js、agentSkillPanelText.js、agentSkillPicker.js、agentSkillPreferences.js、agentSkillRegistry.js、agentSkillUsage.js、agentStreamingProse.js、agentTaskBindingRuntime.js、agentTextConversationRuntime.js、agentToolResult.js、agentTurnRouter.js
+agentActionPostconditions.js、agentAssistantConversation.js、agentAssistantConversationRuntime.js、agentAssistantMarkdown.js、agentCapabilityDiscovery.js、agentCapabilityRouter.js、agentClarificationPolicy.js、agentCompletionEvidence.js、agentComposerAttachmentController.js、agentContextDigest.js、agentContextDigestRuntime.js、agentConversationActionText.js、agentConversationActions.js、agentConversationCanvasTransfer.js、agentConversationCanvasTransferRuntime.js、agentConversationCapabilityRuntime.js、agentConversationChoices.js、agentConversationIntent.js、agentConversationPresentation.js、agentConversationScroll.js、agentConversationStreamingPresentation.js、agentConversationText.js、agentDiscoveryCommands.js、agentDocumentInput.js、agentDurableRunState.js、agentExternalInformation.js、agentExternalInformationRuntime.js、agentExternalToolRegistry.js、agentFailureDiagnostic.js、agentLoopPlanSelection.js、agentLoopRecovery.js、agentMessageTime.js、agentModelRequestRuntime.js、agentPanelContinuity.js、agentPanelElements.js、agentPanelText.js、agentParameterHints.js、agentPlanLifecycle.js、agentPrecreatedNode.js、agentProjectMemory.js、agentProjectMemoryConversationRuntime.js、agentProjectMemoryStore.js、agentReferenceContext.js、agentReplyVersions.js、agentRunEventLog.js、agentRunStatusPresentation.js、agentRunSteps.js、agentScrollableWheel.js、agentSessionEventLog.js、agentSkillAuthoring.js、agentSkillAuthoringRuntime.js、agentSkillConversationRuntime.js、agentSkillEditor.js、agentSkillLifecycle.js、agentSkillLifecycleRuntime.js、agentSkillLoader.js、agentSkillPanel.js、agentSkillPanelText.js、agentSkillPicker.js、agentSkillPreferences.js、agentSkillRegistry.js、agentSkillUsage.js、agentStreamingProse.js、agentTaskBindingRuntime.js、agentTextConversationRuntime.js、agentToolResult.js、agentTurnRouter.js
 
-## `src/modules/storyboard3d/`（43）
+## `src/modules/storyWorkspace/`（48）
 
-assetCatalogSelection.js、assetRecord.js、backgroundCalibration.js、backgroundCalibrationInteraction.js、backgroundImageController.js、backgroundPerspectiveEstimator.js、binaryAssetRepository.js、characterImagePoseController.js、directorCameraKeyEditor.js、directorCameraPath.js、directorCameraPathPanel.js、dir
-ectorClipTimeline.js、directorClips.js、directorCurveEditor.js、directorCurves.js、directorFollowPanel.js、directorGeneratedLayers.js、directorNumericDrag.js、directorRecovery.js、directorSceneAuthoring.js、directorSceneRuntime.js、directorSceneSettings.js、directorTimelineOperations.js、editorStore.js、exportCa
-nvasBridge.js、exportController.js、gltfImportAdapter.js、imagePoseEstimator.js、imagePoseRetargeter.js、imagePoseRuntimeManifest.js、instanceBatching.js、miniMapMath.js、modelImport.js、modelImportJob.js、objectTransformCapabilities.js、selectionBox.js、storyboardExport.js、texturePolicy.js、timelinePresentation
-.js、transformSession.js、viewportNavigationProtocol.js、viewportNavigationSettings.js、voiceInputService.js
+replicationWorkspaceBetaNotice.js、storyAssetExtractionDraft.js、storyAssetExtractionRunner.js、storyAssetHoverPreviewController.js、storyAssetPromptPresets.js、storyAssetSettingsShell.js、storyAsyncButtonPresentation.js、storyCanvasBinding.js、storyCanvasMediaSync.js、storyCanvasNodeSubscription.js、storyCanvasSyncWorkspaceController.js、storyClipExport.js、storyClipFrameCapture.js、storyClipFrames.js、storyClipInputSlots.js、storyClipProductionPresentation.js、storyClipPromptReferences.js、storyClipVideoResultDom.js、storyCollaborationPolicy.js、storyEpisodeScriptBatchQueue.js、storyEpisodeSplitBatchExecution.js、storyEpisodeSplitPresentationPolicy.js、storyHomeRewrite.js、storyLibraryAppearanceMenuPortal.js、storyMarqueeSelection.js、storyMediaHistory.js、storyOutlineNavigation.js、storyProjectNavigation.js、storyReplicationAssetFrames.js、storyReplicationAssetIdentity.js、storyReplicationDefinitions.js、storyReplicationRepresentativeFrames.js、storyReplicationReviewLayout.js、storyReplicationReviewThumbnails.js、storyReplicationVideoLimits.js、storyScriptImport.js、storyScriptRevision.js、storySpeechGapEditor.js、storyStyleCatalog.js、storySummaryRun.js、storyTaskBatchCancellation.js、storyVideoThumbnailBackfill.js、storyWorkspaceBetaNotice.js、storyWorkspaceChromePresentation.js、storyWorkspaceData.js、storyWorkspaceIcons.js、storyWorkspacePersistence.js、storyWorkspaceSurface.js
 
-## `src/services/`（19）
+## `src/modules/storyboard3d/`（46）
 
-binghuoCatalogPricing.js、canvasPanShortcutState.js、canvasProjectAccess.js、downloadNamingService.js、downloadSaveService.js、escapeScope.js、fastImagePreviewService.js、legacyStorageMigrationDeadline.js、mediaObjectUrlRegistry.js、modalInteractionScope.js、packagedBrowserShortcutGuard.js、physicalShortcutSta
-te.js、projectSaveQueue.js、providerConnectionVerification.js、rendererStartupEvidence.js、rendererStartupState.js、startupVisualReadiness.js、videoFramePresentation.js、webPreviewRemoteInputQueue.js
+assetCatalogSelection.js、assetRecord.js、backgroundCalibration.js、backgroundCalibrationInteraction.js、backgroundImageController.js、backgroundPerspectiveEstimator.js、binaryAssetRepository.js、characterActionSampling.js、characterImagePoseController.js、directorCameraKeyEditor.js、directorCameraPath.js、directorCameraPathPanel.js、directorClipTimeline.js、directorClips.js、directorCurveEditor.js、directorCurves.js、directorFollowPanel.js、directorGeneratedLayers.js、directorNumericDrag.js、directorRecovery.js、directorSceneAuthoring.js、directorSceneRuntime.js、directorSceneSettings.js、directorTimelineOperations.js、editorStore.js、exportCanvasBridge.js、exportController.js、geometryImportWorkerCore.js、gltfImportAdapter.js、imagePoseEstimator.js、imagePoseRetargeter.js、imagePoseRuntimeManifest.js、instanceBatching.js、miniMapMath.js、modelGeometryImport.worker.js、modelImport.js、modelImportJob.js、objectTransformCapabilities.js、selectionBox.js、storyboardExport.js、texturePolicy.js、timelinePresentation.js、transformSession.js、viewportNavigationProtocol.js、viewportNavigationSettings.js、voiceInputService.js
 
-## `electron/`（16）
+## `src/modules/personReplacement/`（37）
 
-appWindowSizePolicy.js、backendStartupMonitor.js、canvasRuntimeMode.js、chromeCdpPipeClient.js、chromeShellBrowserVersion.js、chromeShellLauncher.js、chromeShellProfileRecovery.js、chromeShellRuntime.js、chromeShellStartupDiagnostics.js、chromeShellStartupFallback.js、chromeShellStartupHealth.js、chromeShellWe
-bPreviewManager.js、desktopStartupLifecycle.js、nativeContextMenuIcons.js、sortformerModelRoot.js、windowsTaskbarIdentity.js
+personReplacementAssetPackage.js、personReplacementBoxDragPreview.js、personReplacementCapabilities.js、personReplacementCharacterAppearanceLocalization.js、personReplacementCompletionNavigation.js、personReplacementCompositeMediaResidency.js、personReplacementDetectionFeedback.js、personReplacementExport.js、personReplacementExportSubmenuController.js、personReplacementGenerationTaskIdentity.js、personReplacementLocationGuideSvg.js、personReplacementManualBox.js、personReplacementModelGate.js、personReplacementOutputLineage.js、personReplacementProjectLibrary.js、personReplacementPromptEnhancement.js、personReplacementPromptEnhancementIntegration.js、personReplacementPromptIdentity.js、personReplacementPromptMode.js、personReplacementResultHistoryLayout.js、personReplacementShotCutModel.js、personReplacementShotReverse.js、personReplacementSlideTransition.js、personReplacementSmartDetectPresentation.js、personReplacementSourceDescriptions.js、personReplacementSourcePlayback.js、personReplacementStableDom.js、personReplacementTimelineExport.js、personReplacementTimelineExportPrompt.js、personReplacementVideoGeneration.js、personReplacementVideoSyncPlayback.js、personReplacementVoiceLibrary.js、personReplacementVoiceSeparationState.js、personReplacementWorkspaceInput.js、personReplacementWorkspaceIntentPort.js、replacementStudioBetaNotice.js、replacementStudioTerminology.js
+
+## `src/modules/collaboration/`（24）
+
+collaborationActivity.js、collaborationCanvasBinding.js、collaborationChangeFeed.js、collaborationChatInput.js、collaborationChatPosition.js、collaborationChatState.js、collaborationCommentThreads.js、collaborationConflicts.js、collaborationConnectionIndicator.js、collaborationDocument.js、collaborationEditing.js、collaborationFieldMerge.js、collaborationInvitation.js、collaborationJournal.js、collaborationLobby.js、collaborationMemberColor.js、collaborationMembers.js、collaborationNicknameEditor.js、collaborationPreferences.js、collaborationPresenceChannel.js、collaborationPreviews.js、collaborationReviewDom.js、collaborationReviewState.js、collaborationSelect.js
 
 ## `api/story-generation/`（23）
 
-storyAssetExtractionRequest.js、storyAssetExtractionResult.js、storyAssetHybridBudget.js、storyAssetParallelExtraction.js、storyAssetReferenceContract.js、storyAssetRequiredContracts.js、storyAssetRequirementEvidence.js、storyAssetVoicePolicy.js、storyEpisodeOutlinePlanning.js、storyEpisodeScriptPrompt.js、
-storyEpisodeScriptResponseRecovery.js、storyEpisodeScriptTiming.js、storyEpisodeSpokenTiming.js、storyInvocationEvidence.js、storyReplicationAssetFrames.js、storyReplicationFlowPrompts.js、storyReplicationMissingClips.js、storyRequestPolicy.js、storyReviewOutputContract.js、storyReviewRequestJournal.js、
-storySummaryBlueprint.js、storySummaryGeneration.js、storyTextRequest.js
+storyAssetExtractionRequest.js、storyAssetExtractionResult.js、storyAssetHybridBudget.js、storyAssetParallelExtraction.js、storyAssetReferenceContract.js、storyAssetRequiredContracts.js、storyAssetRequirementEvidence.js、storyAssetVoicePolicy.js、storyEpisodeOutlinePlanning.js、storyEpisodeScriptPrompt.js、storyEpisodeScriptResponseRecovery.js、storyEpisodeScriptTiming.js、storyEpisodeSpokenTiming.js、storyInvocationEvidence.js、storyReplicationAssetFrames.js、storyReplicationFlowPrompts.js、storyReplicationMissingClips.js、storyRequestPolicy.js、storyReviewOutputContract.js、storyReviewRequestJournal.js、storySummaryBlueprint.js、storySummaryGeneration.js、storyTextRequest.js
 
-## `src/modules/storyWorkspace/`（34）
+## `src/services/`（19）
 
-storyAssetExtractionDraft.js、storyAssetExtractionRunner.js、storyAssetHoverPreviewController.js、storyAsyncButtonPresentation.js、storyCanvasBinding.js、storyClipExport.js、storyClipFrameCapture.js、storyClipFrames.js、storyClipInputSlots.js、storyClipProductionPresentation.js、storyClipPromptReferences.js、
-storyClipVideoResultDom.js、storyCollaborationPolicy.js、storyEpisodeScriptBatchQueue.js、storyEpisodeSplitBatchExecution.js、storyEpisodeSplitPresentationPolicy.js、storyHomeRewrite.js、storyLibraryAppearanceMenuPortal.js、storyOutlineNavigation.js、storyProjectNavigation.js、
-storyReplicationAssetIdentity.js、storyReplicationDefinitions.js、storyReplicationVideoLimits.js、storyScriptImport.js、storyScriptRevision.js、storySpeechGapEditor.js、storyStyleCatalog.js、storySummaryRun.js、storyTaskBatchCancellation.js、storyVideoThumbnailBackfill.js、storyWorkspaceChromePresentation.js、
-storyWorkspaceData.js、storyWorkspacePersistence.js、storyWorkspaceSurface.js
+binghuoCatalogPricing.js、canvasPanShortcutState.js、canvasProjectAccess.js、downloadNamingService.js、downloadSaveService.js、escapeScope.js、fastImagePreviewService.js、legacyStorageMigrationDeadline.js、mediaObjectUrlRegistry.js、modalInteractionScope.js、packagedBrowserShortcutGuard.js、physicalShortcutState.js、projectSaveQueue.js、providerConnectionVerification.js、rendererStartupEvidence.js、rendererStartupState.js、startupVisualReadiness.js、videoFramePresentation.js、webPreviewRemoteInputQueue.js
+
+## `electron/`（18）
+
+appWindowSizePolicy.js、backendStartupMonitor.js、canvasRuntimeMode.js、chromeBrowserWorker.js、chromeCdpPipeClient.js、chromeShellBrowserVersion.js、chromeShellLauncher.js、chromeShellProfileRecovery.js、chromeShellRuntime.js、chromeShellStartupDiagnostics.js、chromeShellStartupFallback.js、chromeShellStartupHealth.js、chromeShellWebPreviewManager.js、desktopStartupLifecycle.js、globalCaptureWindow.js、nativeContextMenuIcons.js、sortformerModelRoot.js、windowsTaskbarIdentity.js
+
+## `src/modules/app/`（18）
+
+agentMaterialUpload.js、apiConfigAutoSave.js、appActivityTracking.js、appCanvasDropImport.js、appDebugApis.js、appTopbarCustomProviderPresentation.js、canvasWorkspacePresentation.js、comfyUiConnectionSettings.js、completionNavigation.js、globalScreenshotBridge.js、iconButtonMotion.js、modelCatalogProviderCard.js、nativeContextMenuGuard.js、projectContext.js、providerStatusTooltipController.js、sourceNodeNameBackfill.js、subscriptionStateWatcher.js、workspaceCacheIdleScheduler.js
+
+## `src/modules/panoramaSceneNode/`（10）
+
+articulatedCharacterModel.js、cameraTimeline.js、characterBodyProfile.js、poseCatalog.js、scene3dGizmoVisual.js、scene3dPanoramaBridgeTexture.js、scene3dPanoramaTexture.js、scene3dProceduralAssetVisual.js、sceneAssetCatalog.js、transformInteractionAdapter.js
 
 ## `src/core/`（9）
 
 rendererEdgeHitIndex.js、rendererEdgeVisibilityIndex.js、rendererFastPreviewAdmission.js、rendererFastPreviewContinuation.js、rendererMediaRuntimePreparer.js、rendererRasterProxyPolicy.js、rendererRuntimeDiagnostics.js、store.js、viewportInteractionState.js
 
-## `src/modules/`（8）
+## `src/modules/settings/`（8）
 
-ImageExpandController_lf.js、ImageExpandController_test.js、ProjectManager.js、modelGenerationParamMemory.js、modelProviderProfileSelection.js、nodeBatchExport.js、runningHubProviderProfiles.js、workspaceStudioModes.js
+apiConfigSavePresentation.js、apiRouteSelection.js、canvasControlSettings.js、downloadNamingSettings.js、localAssetCleanupList.js、nodeManagerSettings.js、notificationShortcutSettings.js、runningHubDefaultSiteSettings.js
 
-## `src/modules/personReplacement/`（8）
+## `src/modules/runninghubAiApp/`（7）
 
-personReplacementCapabilities.js、personReplacementGenerationTaskIdentity.js、personReplacementOutputLineage.js、personReplacementProjectLibrary.js、personReplacementPromptIdentity.js、personReplacementVoiceLibrary.js、personReplacementWorkspaceInput.js、replacementStudioTerminology.js
+rhAiAppFieldMetadata.js、rhAiAppMotion.js、rhAiAppPersistence.js、rhAiAppPreviewPresentation.js、rhAiAppRunningHubProfile.js、rhAiAppSaveAction.js、rhAiAppSources.js
 
-## `src/hooks/`（4）
+## `src/modules/interaction/`（6）
 
-index.js、useHistory.js、useSelection.js、useViewport.js
-
-## `src/modules/nodeManager/`（4）
-
-nodeManagerDragContract.js、nodeManagerDragController.js、nodeManagerModel.js、nodeManagerPlacement.js
-
-## `src/utils/`（3）
-
-contextMenuShortcutCatalog.js、focusTrap.js、format.js
-
-## `api/adapters/`（2）
-
-ApimartAdapter.js、GeminiAdapter.js
-
-## `./`（1）
-
-playwright.config.js
+WheelPanController.js、contextMenuIcons.js、dropTargetSpatialQuery.js、previewCommitSession.js、viewportAutoPan.js、viewportPreviewCoordinator.js
 
 ## `api/`（4）
 
@@ -111,13 +119,57 @@ agentModelRequestParams.js、mediaUploadErrors.js、runningHubUploadResponse.js�
 
 storyAssetPublicText.js、storyGenerationValues.js、storySceneIdentity.js、strictJson.js
 
-## `db/migrations/`（1）
+## `src/hooks/`（4）
 
-001_short_drama_core.cjs
+index.js、useHistory.js、useSelection.js、useViewport.js
 
-## `src/components/`（1）
+## `src/modules/canvasCommands/`（4）
 
-sharedIconMarkup.js
+mediaToolCommands.js、nodeExportCommands.js、storyboardCommands.js、taskCommands.js
+
+## `src/modules/nodeManager/`（4）
+
+nodeManagerDragContract.js、nodeManagerDragController.js、nodeManagerModel.js、nodeManagerPlacement.js
+
+## `src/modules/videoRetake/`（4）
+
+segmentRetakeInputBinding.js、segmentRetakeModelPolicy.js、segmentRetakeModelPreference.js、segmentRetakeSession.js
+
+## `src/utils/`（4）
+
+contextMenuIconCatalog.js、contextMenuShortcutCatalog.js、focusTrap.js、format.js
+
+## `src/modules/canvasMcp/`（3）
+
+canvasMcpAutoConnection.js、canvasMcpSession.js、canvasMcpTools.js
+
+## `src/modules/canvasShortcuts/`（3）
+
+shortcutCatalog.js、shortcutGraph.js、shortcutPresentation.js
+
+## `src/modules/tutorials/`（3）
+
+tutorialCatalog.js、tutorialContentCache.js、tutorialTabs.js
+
+## `src/modules/whiteboard/`（3）
+
+whiteboardBackgroundPreview.js、whiteboardInteractionGeometry.js、whiteboardNodeData.js
+
+## `api/adapters/`（2）
+
+ApimartAdapter.js、GeminiAdapter.js
+
+## `src/components/`（2）
+
+contextMenuIcon.js、sharedIconMarkup.js
+
+## `src/modules/imageAnnotate/`（2）
+
+arrowGeometry.js、whiteboardShapes.js
+
+## `./`（1）
+
+playwright.config.js
 
 ## `src/components/aigenImage/`（1）
 
@@ -135,14 +187,10 @@ productFeatures.js
 
 index.js
 
-## `src/modules/runninghubAiApp/`（1）
+## `src/modules/characterAssets/`（1）
 
-rhAiAppRunningHubProfile.js
+characterAssetImageGeneration.js
 
-## `src/modules/settings/`（1）
+## `src/modules/promptPresetCatalog/`（1）
 
-runningHubDefaultSiteSettings.js
-
-## `src/modules/collaboration/`（18）
-
-collaborationCanvasBinding.js、collaborationChangeFeed.js、collaborationChatInput.js、collaborationChatPosition.js、collaborationChatState.js、collaborationCommentThreads.js、collaborationConflicts.js、collaborationConnectionIndicator.js、collaborationDocument.js、collaborationEditing.js、collaborationFieldMerge.js、collaborationJournal.js、collaborationMemberColor.js、collaborationPreferences.js、collaborationPresenceChannel.js、collaborationPreviews.js、collaborationReviewDom.js、collaborationReviewState.js
+doubaoAudio1PromptPresets.js

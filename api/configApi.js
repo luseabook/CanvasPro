@@ -261,3 +261,7 @@ export function getProviderConfig(_0xe44d70) {
     return { apiUrl: _0x2d8ddf, apiKey: '', modelApiKey: '', routeId: DEFAULT_APIMART_ROUTE_ID };
   return { apiUrl: _0x2d8ddf, apiKey: '', modelApiKey: '' };
 }
+
+export function getObjectStorageConfig() {
+  return cloneConfig(isPlainObject(apiConfig?.objectStorage) ? apiConfig.objectStorage : {});
+}

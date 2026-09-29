@@ -2,8 +2,13 @@ import { buildApiUrl } from './apiBase.js';
 import { get, post, del, requester } from './requester.js';
 import { normalizeLocalPath } from '../src/utils/localMediaPath.js';
 import { unwrapProjectReadResponse } from '../src/services/projectDocumentGuard.js';
+import {
+  assertLocalAssetUploadSize,
+  parseLocalAssetUploadError,
+} from './localAssetUploadPolicy.js';
 const WORKFLOWS_FALLBACK_USER_FILE = '/api/v2/user/workflows.json',
   ASSET_CATEGORIES_USER_FILE = '/api/v2/user/asset-categories.json',
+  ASSET_STAGE_UPLOAD_TIMEOUT_MS = 30 * 60 * 1000,
   _saveOutputFromUrlInflight = new Map(),
   _saveOutputFromUrlCache = new Map(),
   SAVE_OUTPUT_FROM_URL_CACHE_LIMIT = 0x1f4;
@@ -230,6 +235,18 @@ export async function uploadFileToServer(_0x8efb47) {
     provider: 'local',
   });
   return _0x1c53eb;
+}
+
+export async function stageAssetUploadToServer(_0x31c5c0) {
+  assertLocalAssetUploadSize(_0x31c5c0);
+  const _0x30d9d4 = _0x31c5c0?.name ? String(_0x31c5c0.name) : 'file';
+  return await post('/api/v2/assets/stage?filename=' + encodeURIComponent(_0x30d9d4), _0x31c5c0, {
+    provider: 'local',
+    timeout: ASSET_STAGE_UPLOAD_TIMEOUT_MS,
+    retries: 0,
+    headers: { 'Content-Type': 'application/octet-stream' },
+    errorParser: parseLocalAssetUploadError,
+  });
 }
 export async function fetchRemoteBlob(_0x525ea0, _0x1ecb1c = {}) {
   const _0x58ff8a = await get(_0x525ea0, {

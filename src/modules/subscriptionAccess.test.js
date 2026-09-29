@@ -13,7 +13,7 @@ import {
   isModelAllowed,
 } from './subscriptionAccess.js';
 (test('subscription access: VIP gate 清单来自共享 manifest', () => {
-  (assert.equal(SUBSCRIPTION_GATE_MANIFESTS.length, 8),
+  (assert.equal(SUBSCRIPTION_GATE_MANIFESTS.length, 9),
     assert.ok(
       SUBSCRIPTION_GATE_MANIFESTS.some(
         (_0xe6774c) =>

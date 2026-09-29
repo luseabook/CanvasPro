@@ -87,7 +87,7 @@ function resolveMappedModelValue(_0x2d7635, _0x143a46) {
     _0x2c8b59 = _0x2d7635.byImageSize || {};
   return (_0x4f0ff7 && _0x2c8b59[_0x4f0ff7]) || _0x2d7635.default || _0x2d7635.model || '';
 }
-function resolveExecutionModelToken(_0x477d4c, _0x10b049) {
+export function resolveExecutionModelToken(_0x477d4c, _0x10b049) {
   let _0x5cc91c = _0x477d4c.model || _0x10b049.model || '';
   const _0x24a8bc = normalizeManifestOptionKey(_0x10b049.mode ?? _0x10b049.generationParams?.mode);
   let _0x19c698 = false;
@@ -1228,7 +1228,7 @@ function resolveRequestManifest(_0x3cbe51, _0x576778, _0x1cedfe) {
     effectivePayload: _0x1f3f72,
   };
 }
-async function buildManifestMappedBody(_0x37aaf4) {
+export async function buildManifestMappedBody(_0x37aaf4) {
   const _0x587337 = await buildBodyFromMapping({
       bodyMapping: _0x37aaf4.executionManifest.bodyMapping,
       context: _0x37aaf4,
@@ -1269,7 +1269,7 @@ export function resolveManifestTaskPolling(_0x9fe3c9, _0x2c18de, _0xf82a49, _0x1
     modelId: _0x19c472?.modelManifest?.modelId || '',
   };
 }
-function resolveManifestApiUrl(_0x3f06cb, _0x153412, _0x4f5af3, _0x4efce8) {
+export function resolveManifestApiUrl(_0x3f06cb, _0x153412, _0x4f5af3, _0x4efce8) {
   const _0x1285be = _0x4f5af3.extensions?.endpointResolver;
   if (!_0x1285be) return resolveDefaultApiUrl(_0x3f06cb, _0x153412, _0x4f5af3);
   const _0x44297d = getModelApiEndpointResolver(_0x1285be);

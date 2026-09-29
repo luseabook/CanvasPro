@@ -362,3 +362,110 @@ src/api 使用 Node 原始字节 TAP 捕获，未经 PowerShell 管道转码。�
 - 本次代理 `127.0.0.1:7890` 仍不可用，Git 直连成功；未改持久配置、未禁用证书校验。`pending-sync.json` 记载的待同步状态由此解除，该文件本身未改写，后续判断以远端引用为准。
 - 遗留工作树 `.kilo/worktrees/childish-animal`（detached `1a42e29`、工作区干净）已 `git worktree remove` + `prune`，只剩主工作树；未删除任何受跟踪文件。
 - 未改业务代码、未跑测试、未启动应用、未查远端 CI；18 件/319 例仍全部未接线，R01–R26 均未完成。
+
+## 12. 124g `collaborationActivity` 及 45 例测试（2026-09-28）
+
+### 落地清单
+
+- 新增 `src/modules/collaboration/collaborationActivity.js`：117 行 / 5369 B，唯一导出 `createCollaborationActivity`。与 prettier 3.9.8 格式化后的镜像逐字节一致，SHA256 `3134c574ebb8b78a0062bb18f060185ad7223ba04d896b96b1e58fdd4e4b59ac`。
+- 新增同名测试 `collaborationActivity.test.js`：674 行 / 23726 B，45 例，SHA256 `4f8434945969b25c7266faf773ca4e3b003891cacd7298cd25a582de12c6d7e7`。
+- 协作目录累计 **19 件 / 364 例**；镜像 38 件中已落 19 件，全部未接线。
+
+### 依赖与闸门
+
+- 唯一静态依赖是 `./collaborationReviewDom.js` 的 `reviewElement`、`reviewTime`；`b123-gate.mjs`（AST 版）核对 2/2 存在，`MISSING_TOTAL=0`。
+- 世代核对（`b124g-depcheck.mjs`，用 prettierrc.json 格式化镜像后逐字节比对）：`collaborationReviewDom.js` 与 `collaborationMemberColor.js` 都与镜像一致；`components/contextMenuIcon.js`、`utils/contextMenuIconCatalog.js` 仍字节不同，沿用 124e/124f 已限定范围的图标差分证据。这两个图标件本模块不经（Activity 只用 ReviewDom 的 `reviewElement`/`reviewTime`），未覆盖或升代在用依赖。
+- 未加 shim，未改任何在用文件。
+
+### 冻结行为与接入契约
+
+1. **首次打开会被房间重置吞掉**：`lastRoomId` 初值为 `''`，首帧必然与真实 `roomId` 不同，于是走重置分支——清空签名、`details.open=false`、清缓存、清列表——并立即 `return`，什么都不渲染。第二次打开才会真正渲染。真实浏览器里把 `details.open` 置 false 会再派发一次 `toggle`，处理器因 `open` 为假立刻返回，所以不会死循环；本测试的适配器不模拟该事件重入，只固定直接语义。
+2. **渲染签名**：以 `JSON.stringify(review.activities)` 为签名，与上次相同则整段重建与滚动写入都跳过，仅保留尾部的按钮禁用态重同步；`activities` 缺失时按空数组处理。
+3. **元素复用**：列表项按 `seq` 缓存在一个 Map 里复用，顺序完全跟随输入数组；`insertBefore` 负责调序，尾部循环删除不在新列表里的子节点，缓存里已消失的 `seq` 一并删除。
+4. **节点按钮禁用不可观测的默认值**：创建分支写成 `hasReviewNode ? !hasReviewNode(id) : true`，但每帧尾部的重同步循环都用 `!hasReviewNode?.(id)` 覆盖它。`hasReviewNode` 缺失时两者结果相同，因此创建分支的默认值是死分支——变异抽查里唯一存活的变异即此因。
+5. **滚动锚点**：仅当渲染前 `scrollTop > 0` 时，取第一个 `bottom` 大于列表顶部的子元素作为锚点；渲染后若锚点仍 `isConnected`，按 `当前 scrollTop + 锚点 top − 记录 top` 回写，否则恢复渲染前的 `scrollTop`。`scrollTop` 为 0 时完全不读子元素矩形。
+6. **空态**：列表没有元素子节点时追加 `p.collaboration-subtle`「还没有协作动态」；从空态转非空时，该段落在尾部的移除循环里被删掉。
+7. **文案优先级**：`error` 优先；否则 `loading && revision < 0` 时显示「正在加载动态…」并给 feedback 加 `is-pending`；否则「最近 100 条操作」。`loading` 但 `revision >= 0` 不算 pending。文本相同则不写，避免无谓的 DOM 写入。
+8. **重试按钮**：`hidden = !error`，`disabled = !!loading`；点击调用 `actions.refreshReview?.()`，缺失时不抛错。
+9. **节点按钮**：`dataset.nodeId` 存节点 id，`click` 传 `(id, kind 属于 comment/resolve/reopen)`；`is-mentioned` 只看 `activity.mentions.includes(actorId)`。
+10. **未知 kind 回退**「操作了」；文案是 `name + ' ' + 标签`（空格用 `\x20`）。
+11. 模块**不做任何服务端授权判断**：按钮禁用只反映调用方 `hasReviewNode` 的即时结果，是否为本人/权限在渲染之外。
+
+### 验证结果
+
+| 检查 | 结果 | 证据（外部 `b124/` 下） |
+| --- | --- | --- |
+| 定向首跑 | 45/45，0 失败、0 跳过，无首跑修正 | 主机实跑显式 TAP；格式化后又复跑 45/45 |
+| 语法 | 源码与测试 `node --check` 2/2 | 主机实跑 |
+| 字节一致 | 源码等于 prettier 3.9.8 格式化镜像，SHA256 `3134c574…` | `b124-stage.mjs` 暂存产物与仓库逐字节 `cmp` 相同 |
+| 格式 | 新测试经 prettier 3.9.8 重排（674 行），源码本已合规 | `b124g-format.mjs` |
+| 依存世代 | ReviewDom、MemberColor 与格式化镜像一致；图标链差分沿用旧证据 | `b124g-depcheck.mjs` |
+| 变异抽查 | 16 个语法有效变异，15 检出；1 存活且为语义等价的死分支 | `mutate124g.mjs`、`mutation124g/results.json`；仅改外部副本，`restored=true` |
+| src 全量 | 4221 总 / 4178 通过 / 43 失败，退出码 1 | `b124g-src-raw.tap` |
+| 失败名基线 | 与 b85 的 43 项完全一致，新增 0、消失 0 | `b124g-failure-comparison.json`、`b124g-src-fails-raw.txt` |
+| api 全量 | 791/791/0，退出码 0 | `b124g-api-raw.tap` |
+| 受保护文件 | `freeImageHostApi.js` MD5 不变 | `1E0458013F5341C99F21FAEFC1D34D3F` |
+| 消费方反查 | src/api/electron 非测试 JS 与 main.js 排除自身后 1031 件中模块名与导出名 0 命中 | 未接线 |
+
+src/api 用 Node 原始字节 TAP 捕获（不经 PowerShell 管道转码）。变异脚本先因外部副本缺 `package.json` 的 `type: module` 跑出假基线（45 例全部未执行），补上后基线为 45/0，此前那次结果已作废。未启动应用、构建、安装依赖、调用真实服务或做浏览器/多人运行验收；没有自动提交推送。
+
+### 收尾与下一段
+
+- 增量孤立台账 **276 / 1038**（上段 275/1037 加本模块），非全图重算。Git 落地后 **0/0/2/0**。
+- 文件存在性重分级仍为 LEAF 0 / OK 5 / BLK 15 减去 Activity 后的 OK 4；**下一段 124g 余量**：Lobby（8499 B）、NicknameEditor（2752 B）、Select（5136 B）按各自依赖与行为边界逐件核验；NodeReference 仍缺 `canvasMediaLocalService` 的 `resolveCanvasVideoPosterUrl`，不能用文件存在性 OK 绕过该导出阻塞。
+- R10 的 API/服务端、Session/Application 装配与真实多人运行验收均未完成；R01–R26 不因本次落地或后续提交变成完成。
+
+## 13. 124h `collaborationLobby` / `collaborationNicknameEditor` / `collaborationSelect` 及 119 例测试（2026-09-28）
+
+### 落地清单
+
+- 新增 `src/modules/collaboration/collaborationLobby.js`：225 行 / 10468 B，唯一导出 `createCollaborationLobby`，返回 `{resetHostChoice, mountSession, mountSessionControls, render}`。与 prettier 3.9.8 格式化后的镜像逐字节一致，SHA256 `b39a5c4cf2c4cb61157374302c25b098635e6640cde493e50e3d0ad5d7aba736`；同名测试 759 行 / 27729 B / 44 例，SHA256 `1c7c1e65…`。
+- 新增 `src/modules/collaboration/collaborationNicknameEditor.js`：111 行 / 3704 B，唯一导出 `createCollaborationNicknameEditor`，返回 `{update, close, destroy}`。SHA256 `73063fa7a5c1643753a3d679fd994dfc99c4c3ff3f04173245510416df635257`；同名测试 498 行 / 16130 B / 29 例，SHA256 `9d8804e0…`。
+- 新增 `src/modules/collaboration/collaborationSelect.js`：139 行 / 6407 B，唯一导出 `createCollaborationSelect`，返回 `{sync, open, close, trigger, destroy}`。SHA256 `421edcbb0ab732888b0087ef1e50cdd2b5002f7ab561649b62deac38718c56da`；同名测试 732 行 / 25101 B / 46 例，SHA256 `8e118b25…`。
+- 协作目录累计 **22 件 / 483 例**；镜像 38 件中已落 22 件，全部未接线。
+
+### 依赖与闸门
+
+- Lobby 静态依赖 `./collaborationSelect` 之外的图标：`../../components/contextMenuIcon.js` 的 `createContextMenuIcon`；NicknameEditor 依赖 `contextMenuIcon` 与 `../collaboration/collaborationMemberColor` 之外的构造入参，无新增静态依赖；Select 依赖 `../../components/sharedIconMarkup.js` 的 `MATERIAL_TREE_CHEVRON_ICON_SVG`。三件分别过 `b123-gate.mjs`（AST 版），逐件 `MISSING_TOTAL=0`。
+- 世代核对：Lobby / NicknameEditor / Select 三件源码与 prettierrc.json 格式化后的镜像逐字节相同；所依赖的 `contextMenuIcon.js`、`sharedIconMarkup.js` 仍字节不同，沿用 124e/124f 已限定范围的图标差分证据——本批三件只取 `createContextMenuIcon` 与单个 SVG 常量导出，未覆盖或升代在用图标件。
+- 未加 shim，未改任何在用文件；三件在仓库内均为孤立件（消费方反查 0 命中）。
+
+### 冻结行为与接入契约
+
+1. **Lobby 锁定态**：`view.hidden = !!locked || key !== current`——有会话（`locked` 非空）时两个面板**都**隐藏，不是只隐藏非当前页签；`tab.disabled = !!locked && key !== locked`。切页签前若已有选中项则先 `resetHostChoice()`。
+2. **Lobby 开房选择**：点「立即开房」在无 `resumeKey` 时直接 `run(button, () => actions.create())`；有 `resumeKey` 时先展开隐藏的「恢复上次 / 新建协作」二选一并移焦，`Escape` 且无 `aria-busy="true"` 才收起。`render` 里若 `resumeKey` 变化会收起已展开的选择。
+3. **Lobby 昵称输入**：`maxLength=32`，`change` 调 `actions.setDisplayName`；`render` 只在输入框**未获焦**时写 `displayName || '成员'`；有会话时 `readOnly` 且隐藏编辑按钮。
+4. **Lobby 尾部复位**：`render` 末尾 `if (!joinButton.hasAttribute('aria-busy')) joinButton.disabled = !inviteInput.value.trim()`——运行中按钮由 `run` 的 busy 态接管，渲染不覆盖。节点数文案 `(nodeCount||0) + ' 个节点'`。
+5. **NicknameEditor 会话守卫**：构造时快照 `session`，`isCurrentSession` = 未销毁 && `getState().session?.roomId` 等于快照 `roomId` && `getState().actorId === person.id`；**无会话构造时访问 `roomId` 直接抛 TypeError**（测试据此断言，不视为「惰性」）。提交、更新、关闭都以该守卫为前提。
+6. **NicknameEditor 提交**：守卫失败或 `busy` 直接返回；值为空 → `setCustomValidity('请输入昵称')` + `reportValidity()`；与原值相同 → 直接 `close(true)`；否则 `run(saveButton, …)` 期间禁用保存/取消，成功后在 `finally` 恢复，并 `close(!form.hidden)` 带上焦点语义。IME：`keyCode === 0xe5` 时不当作 Enter 提交。
+7. **Select 包装顺序**：`select.before(wrapper)` 后 `wrapper.append(select, trigger, menu)`——原生 select 被**收养**进包装器，所以 `destroy()` 只 `wrapper.remove()` 即连带移除原生控件。
+8. **Select 定位**：rAF 自调度 `position()`，宽度 `min(max(rect.width, 130), innerWidth - 24)`，左边界 `max(12, min(rect.right - width, innerWidth - width - 12))`；下方空间 `< 120` 且上方更大时翻转到上方；`maxHeight = max(40, min(280, space))`。
+9. **Select 选项复用**：以 `[value, textContent, disabled, hidden]` 的 JSON 为签名，签名不变不重建；`hidden` 选项跳过渲染；`aria-selected` 与 roving `tabIndex` 每次同步。
+10. **Select 交互**：菜单 `popover=manual`，`pointerdown` 捕获阶段在包装器外点击即关；键盘支持 `Escape`/`Tab`（关闭）、`Arrow`/`Home`/`End`（在未禁用项间移动）；选项点击 → 写 `select.value` + `sync()` + `close(true)` + `dispatchEvent(new Event('change', {bubbles:true}))`。
+11. 三件均**不做服务端授权判断**：Locked/`disabled`/会话守卫只反映调用方传入的即时状态。
+
+### 验证结果
+
+| 检查 | 结果 | 证据（外部 `b124/` 下） |
+| --- | --- | --- |
+| 导出闸门 | 三件逐件 `MISSING_TOTAL=0` | `b123/b123-gate.mjs`（AST 版） |
+| 定向首跑 | Lobby 44/44、NicknameEditor 29/29、Select 46/46，0 失败 0 跳过 | 主机实跑显式 TAP；格式化后复跑仍全绿 |
+| 语法 | 三件源码 + 三件测试 `node --check` 6/6 | 主机实跑 |
+| 字节一致 | 三件源码等于 prettier 3.9.8 格式化镜像（SHA256 见落地清单） | `b124-stage.mjs` 暂存产物与仓库逐字节 `cmp` 相同 |
+| 变异抽查 | 65 个语法有效变异全部检出（Lobby 24、NicknameEditor 18、Select 23），基线 29/0、46/0、44/0，`restored=true` | `mutate124h.mjs`、`mutation124h/results.json`；仅改外部副本 |
+| src 全量 | 4340 总 / 4297 通过 / 43 失败，退出码 1 | `b124h-src-raw.tap` |
+| 失败名基线 | 与 b85 的 43 项完全一致，新增 0、消失 0 | `b124h-failure-comparison.json`、`b124h-src-fails-raw.txt` |
+| api 全量 | 791/791/0，退出码 0 | `b124h-api-raw.tap` |
+| 受保护文件 | `freeImageHostApi.js` MD5 不变 | `1E0458013F5341C99F21FAEFC1D34D3F` |
+| 消费方反查 | 1041 个非测试 JS 模块中三件模块名与导出名 0 命中 | 未接线 |
+
+src/api 用 Node 原始字节 TAP 捕获（不经 PowerShell 管道转码）。
+
+**一处需说明的变异过程**：Select 的 23 个变异里有一个（`close` 焦点实参）在首轮**存活**。核查后判定它不是死分支——`close(!hidden)` 与 `close(true)` 在隐藏态下可观测地不同——而是测试没有断言收尾焦点，属真实覆盖缺口；随即在成功重命名的用例里补上 `edit.hidden === false` 与 `edit.focusCount === 1`，该变异转为检出。未用「语义等价」把缺口解释掉。
+
+### 收尾与下一段
+
+- 增量孤立台账 **279 / 1041**（上段 276/1038 加本批 3 件），非全图重算。Git 落地后新增 3 件源码 + 3 件测试（`??` 6 项），文档 6 项 `M`。
+- 协作镜像里文件存在性 **OK 的件至此全部落完**（124g Activity + 124h Lobby / NicknameEditor / Select）。余 15 件都卡在缺失导出（如 NodeReference 需 `canvasMediaLocalService.resolveCanvasVideoPosterUrl`）或受保护装配，须另行授权的世代升级批次才能推进。
+- 因此**协作阶段收束**，下一段转入 `src/modules` 纯叶队列：先重跑 `deps-ast`（`b119/screen.txt` 与 §7.2 计数自 122 批起已过期）重算分组，再按 app 13、personReplacement 12、runninghubAiApp 6、panoramaSceneNode 5 等分组逐批落地。
+- R10 的 API/服务端、Session/Application 装配与真实多人运行验收均未完成；R01–R26 不因本次落地或后续提交变成完成。

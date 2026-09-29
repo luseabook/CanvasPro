@@ -87,12 +87,18 @@ export const PROVIDERS_META = {
   },
   runninghub: {
     id: 'runninghub',
+    taskHistoryUrls: {
+      workflow: 'https://www.runninghub.cn/call-api/bill-task',
+    },
     label: 'RunningHUB',
     defaultUrl: 'https://www.runninghub.cn',
     logoPath: 'images/RH.png',
   },
   runninghubwf: {
     id: 'runninghubwf',
+    taskHistoryUrls: {
+      workflow: 'https://www.runninghub.cn/call-api/bill-task',
+    },
     label: 'RunningHUB工作流',
     defaultUrl: 'https://www.runninghub.cn',
     logoPath: 'images/RH.png',

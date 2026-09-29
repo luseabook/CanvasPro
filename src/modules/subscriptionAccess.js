@@ -87,6 +87,15 @@ const subscriptionGateManifest = {
       providers: ['dreamina'],
       modelPrefixes: ['dreamina/'],
     },
+    {
+      key: 'replacementStudio',
+      modelId: 'feature/replacement_studio',
+      workflowId: '',
+      displayName: '\u66ff\u6362\u5de5\u4f5c\u5ba4',
+      aliases: ['replacement_studio', 'replacement_studio.pro'],
+      providers: ['aicanvas'],
+      allowAnyActiveSubscription: true,
+    },
   ],
 };
 function freezeSubscriptionGateLegacyAlias(_0x536189, _0x1c8328) {
@@ -131,6 +140,7 @@ function freezeSubscriptionGateEntry(_0x22fe38) {
         ? _0x374a73.modelPrefixes.map((_0x4b6e24) => String(_0x4b6e24 || '').trim()).filter(Boolean)
         : [],
     ),
+    allowAnyActiveSubscription: _0x374a73.allowAnyActiveSubscription === true,
   });
 }
 function requireSubscriptionGateEntries() {
@@ -193,10 +203,15 @@ export const RH_ADVANCED_VOICE_CLONE_VIP_AI_APP_MODEL_ID = getSubscriptionGateAl
   'ai-app/',
 );
 export const DREAMINA_VIDEO_VIP_MODEL_ID = requireSubscriptionGateModelId('dreaminaVideoVip');
+export const REPLACEMENT_STUDIO_VIP_MODEL_ID =
+  requireSubscriptionGateModelId('replacementStudio');
 export const VIDEO_VIP_MODEL_IDS = Array.from(
   new Set(SUBSCRIPTION_GATE_MANIFESTS.map((_0x5066df) => _0x5066df.modelId)),
 );
 const VIDEO_VIP_MODEL_ID_SET = new Set(VIDEO_VIP_MODEL_IDS),
+  SUBSCRIPTION_GATE_BY_MODEL_ID = Object.freeze(
+    Object.fromEntries(SUBSCRIPTION_GATE_MANIFESTS.map((_0x5066df) => [_0x5066df.modelId, _0x5066df])),
+  ),
   VIP_MODEL_ID_CANONICAL_ALIASES = Object.freeze(
     Object.fromEntries(
       SUBSCRIPTION_GATE_MANIFESTS.flatMap((_0x3545df) => [
@@ -370,6 +385,7 @@ export function isModelAllowed(_0x9ad14f, _0xe80c8f, _0x3f5439 = '') {
     _0xa93a85 = resolveVipGateModelId(_0x285e73, _0x3f5439);
   if (!isVipModel(_0xa93a85)) return true;
   if (!isSubscriptionActive(_0xe80c8f || {})) return false;
+  if (SUBSCRIPTION_GATE_BY_MODEL_ID[_0xa93a85]?.allowAnyActiveSubscription) return true;
   const _0x48c026 = _0xe80c8f && typeof _0xe80c8f === 'object' ? _0xe80c8f : {},
     _0x2fcf3c = Array.isArray(_0x48c026.entitledModelIds)
       ? _0x48c026.entitledModelIds.map((_0x19e907) => normalizeVipModelId(_0x19e907)).filter(Boolean)

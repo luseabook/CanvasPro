@@ -185,6 +185,47 @@ export function resolveMappedResponseValues(_0x301424, _0x4f735a = []) {
   }
   return Array.from(new Set(_0xef30af.filter(Boolean)));
 }
+function normalizeImageMimeType(_0x5ac923, _0x3acb65 = 'image/png') {
+  const _0x49b9ab = String(_0x5ac923 || '')
+    .trim()
+    .toLowerCase();
+  if (/^image\/[a-z0-9.+-]{1,64}$/.test(_0x49b9ab)) return _0x49b9ab;
+  const _0x46a30f = String(_0x3acb65 || '')
+    .trim()
+    .toLowerCase();
+  return /^image\/[a-z0-9.+-]{1,64}$/.test(_0x46a30f) ? _0x46a30f : 'image/png';
+}
+function normalizeImageBase64DataUrl(_0x16c274, _0x2e9ca3) {
+  const _0x149151 = String(_0x16c274 || '').trim();
+  if (/^data:image\/[a-z0-9.+-]{1,64};base64,[a-z0-9+/=_-]+$/i.test(_0x149151)) return _0x149151;
+  const _0x269a65 = _0x149151.replace(/\s+/g, '');
+  if (!_0x269a65 || !/^[a-z0-9+/=_-]+$/i.test(_0x269a65)) return '';
+  try {
+    const _0xc5c351 = atob(_0x269a65.slice(0, 0x18).replace(/-/g, '+').replace(/_/g, '/'));
+    if (_0xc5c351.startsWith('ÿØÿ')) _0x2e9ca3 = 'image/jpeg';
+    else if (_0xc5c351.startsWith('PNG\r\n\u001a\n')) _0x2e9ca3 = 'image/png';
+    else if (/^GIF8[79]a/.test(_0xc5c351)) _0x2e9ca3 = 'image/gif';
+    else if (_0xc5c351.startsWith('RIFF') && _0xc5c351.slice(8, 12) === 'WEBP') _0x2e9ca3 = 'image/webp';
+  } catch {}
+  return 'data:' + _0x2e9ca3 + ';base64,' + _0x269a65;
+}
+export function resolveMappedImageResponseValues(_0x3fa6e7, _0x5e85e9 = {}) {
+  const _0x3f1f0a = resolveMappedResponseValues(
+      _0x3fa6e7,
+      _0x5e85e9?.['resultPaths'] || _0x5e85e9?.['paths'],
+    ),
+    _0x3d1464 = Array.isArray(_0x5e85e9?.['base64Paths']) ? _0x5e85e9['base64Paths'] : [],
+    _0xc1c619 = Array.isArray(_0x5e85e9?.['base64MimeTypePaths']) ? _0x5e85e9['base64MimeTypePaths'] : [],
+    _0x59ff62 = _0xc1c619.flatMap((_0x58d7bf) => collectValuesByPath(_0x3fa6e7, _0x58d7bf)),
+    _0x4d66a7 = normalizeImageMimeType(_0x5e85e9?.['base64DefaultMimeType']),
+    _0x392059 = _0x3d1464.flatMap((_0x196021) => collectValuesByPath(_0x3fa6e7, _0x196021)),
+    _0x274d4f = _0x392059
+      .map((_0x2249bd, _0x4f3317) =>
+        normalizeImageBase64DataUrl(_0x2249bd, normalizeImageMimeType(_0x59ff62[_0x4f3317], _0x4d66a7)),
+      )
+      .filter(Boolean);
+  return Array.from(new Set([..._0x3f1f0a, ..._0x274d4f]));
+}
 export function resolveMappedResponseValue(_0x432c0f, _0x210702 = []) {
   return resolveMappedResponseValues(_0x432c0f, _0x210702)[0] || '';
 }
