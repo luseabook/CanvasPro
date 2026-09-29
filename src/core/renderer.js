@@ -1,7 +1,6 @@
-import { getNodeClass, isNodeType } from '../modules/registry.js';
+import { isNodeType } from '../modules/registry.js';
 import {
   getRefKindByNodeType,
-  getNodeWrapperExtraClasses,
   hasNodeTypeBetaBadge,
   normalizeNodeType,
 } from '../modules/nodeMeta.js';
@@ -38,10 +37,8 @@ import {
 } from './rendererOverlays.js';
 import { createNodeDetailHydrationController } from './rendererNodeDetailHydration.js';
 import { createRendererInteractionGraceController } from './rendererInteractionGrace.js';
-import {
-  createRendererDeferredMediaController,
-  withRendererDeferredMediaHint,
-} from './rendererDeferredMedia.js';
+import { createRendererPresentationSubscription } from './rendererPresentationSubscription.js';
+import { createRendererDeferredMediaController } from './rendererDeferredMedia.js';
 import { createRendererFastPreviewLayer } from './rendererFastPreviewLayer.js';
 import { createFastPreviewReleaseScheduler } from './rendererFastPreviewRelease.js';
 import { resolveModelProvider } from '../manifests/index.js';
@@ -51,6 +48,19 @@ import { syncNodeResultClass } from './rendererNodeResultState.js';
 import { syncNodeMediaMetricsDataset } from '../modules/nodeMediaMetrics.js';
 import { createRendererNodeRuntimeBridge } from './rendererNodeRuntimeBridge.js';
 import {
+  disposePreparedRendererNodeRuntime,
+  prepareRendererNodeRuntime,
+} from './rendererNodeRuntimeFactory.js';
+import {
+  createRendererMediaRuntimePreparer,
+  shouldPrebuildRendererMediaRuntime,
+} from './rendererMediaRuntimePreparer.js';
+import { shouldDeferInitialVideoMediaOnMount } from './rendererPriorityMediaWork.js';
+import {
+  isRendererRuntimeDiagnosticsEnabled,
+  recordRendererRuntimeDiagnostic,
+} from './rendererRuntimeDiagnostics.js';
+import {
   buildRendererDragTargetSet,
   buildSelectedNodeRankMap,
   getRendererDefaultNodeLabel,
@@ -59,6 +69,7 @@ import {
 } from './rendererNodePresentation.js';
 import { t } from '../i18n/index.js';
 import { setCanvasMediaSchedulerPaused } from '../modules/canvasMediaScheduler.js';
+let _schedulePreparedMediaRuntimeCommit = null;
 const _componentMap = new Map(),
   _nodeRuntimeBridge = createRendererNodeRuntimeBridge({
     getInstance: (_0xecbd03) => _componentMap.get(_0xecbd03),
@@ -123,6 +134,21 @@ const _multiSelectRenderCache = {
     'red',
     'yellow',
   ]);
+const _rendererMediaRuntimePreparer = createRendererMediaRuntimePreparer({
+  isInteractionBusy: _rendererInteractionGrace.isBusy,
+  onPrepared: ({ nodeId, durationMs }) => {
+    (isRendererRuntimeDiagnosticsEnabled() &&
+      recordRendererRuntimeDiagnostic({
+        kind: 'renderer-media-runtime-prepared',
+        nodeId,
+        durationMs,
+      }),
+      _schedulePreparedMediaRuntimeCommit?.());
+  },
+  onPrepareError: ({ nodeId, error }) => {
+    console.error('[Renderer] media runtime prepare failed:', nodeId, error);
+  },
+});
 let _edgeIndexRev = -1,
   _edgeEntriesRev = -1,
   _edgeEntriesSource = null,
@@ -348,7 +374,8 @@ function _flushMountBatch(_0x2ff5b6, _0x1af636) {
   _0x2ff5b6.appendChild(_0x1af636);
 }
 function _destroyNode(_0x17af1e) {
-  (_nodeDetailHydration.forgetNodeDetailHydration(_0x17af1e),
+  (_rendererMediaRuntimePreparer.forget(_0x17af1e),
+    _nodeDetailHydration.forgetNodeDetailHydration(_0x17af1e),
     _rendererDeferredMedia.forget(_0x17af1e),
     _fastPreviewRelease.forget(_0x17af1e),
     _syncRunningTimerForNode(_0x17af1e, null, { hide: true }));
@@ -837,6 +864,7 @@ function _getGroupColorWithOpacity(_0x2750f8, _0x1081c8) {
   return 'var(--' + _0x56c2d2 + '-' + _0x1081c8 + ')';
 }
 export function clearRendererCache() {
+  _rendererMediaRuntimePreparer.clear();
   console.log('[Renderer] 执行全盘物理清盘...');
   const _0x86851f = new Set([
     ..._componentMap.keys(),
@@ -932,11 +960,21 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
   _0x290e05.appendChild(_0x22f85d);
   const _0xa653f4 = createContextMenuEl();
   (_0x290e05.appendChild(_0xa653f4), _syncRendererBridge());
-  let _0x2fcab6 = null,
-    _0x34921d = null,
-    _presentationActive = true,
-    _latestPresentationSnapshot = null,
-    _0x4d6a84 = -1,
+  const _presentationSubscription = createRendererPresentationSubscription({
+    onSnapshot: (_0x58bb73) => {
+      _currentSnapshot = _0x58bb73;
+    },
+    render: (_0x58bb73) => {
+      (_syncRunningTimers(_0x58bb73), _0x19f4ce(_0x58bb73));
+    },
+    onSuspend: () => {
+      (_0x4e7d6e(), _rendererMediaRuntimePreparer.pause());
+    },
+    onResume: () => {
+      _rendererMediaRuntimePreparer.resume();
+    },
+  });
+  let _0x4d6a84 = -1,
     _0x749f98 = -1,
     _0x50eeb5 = 0,
     _0x2db68f = null,
@@ -946,7 +984,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
       _0xaaf6b3 !== null && (cancelAnimationFrame(_0xaaf6b3), (_0xaaf6b3 = null)));
   }
   function _0x58868c(_0x5c3ff2 = RENDERER_VIRTUALIZATION_CONFIG.settleDelayMs) {
-    if (!_presentationActive) return;
+    if (!_presentationSubscription.isActive()) return;
     (_0x4e7d6e(),
       (_0x2db68f = setTimeout(
         () => {
@@ -954,7 +992,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
           if (_0xaaf6b3 !== null) return;
           _0xaaf6b3 = requestAnimationFrame(() => {
             _0xaaf6b3 = null;
-            if (_0x2fcab6 !== null) return;
+            if (_presentationSubscription.hasPendingFrame()) return;
             if (!_currentSnapshot) return;
             if (_rendererInteractionGrace.isBusy()) {
               _0x58868c(_0x5c3ff2);
@@ -966,6 +1004,8 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
         Math.max(0, _0x5c3ff2),
       )));
   }
+  const _schedulePreparedMediaRuntimeCommitForRenderer = () => _0x58868c(0);
+  _schedulePreparedMediaRuntimeCommit = _schedulePreparedMediaRuntimeCommitForRenderer;
   installNodeResizeGeometryPreviewer(
     typeof window === 'undefined' ? null : window,
     () => _currentSnapshot,
@@ -1132,7 +1172,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
     else deferredParkCount > 0 && _0x2685db > 0 && _0x58868c(_0x2685db + 16);
   }
   function _0x19f4ce(_0x4ddc65) {
-    if (!_presentationActive || !_0x4ddc65) return;
+    if (!_presentationSubscription.isActive() || !_0x4ddc65) return;
     const _0x4af397 = isPerfProbeEnabled(),
       _0x510a2c =
         _0x4af397 && typeof performance !== 'undefined' && typeof performance.now === 'function'
@@ -1156,6 +1196,15 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
           _0x6b61ce.isPanning || _0x6b61ce.assistPanActive
             ? getViewportPanPreview() || _0x4ddc65.viewport
             : _0x4ddc65.viewport;
+      _0x5bd547 ||
+      _0x6b61ce.isPanning ||
+      _0x6b61ce.assistPanActive ||
+      _0xf6e30e ||
+      _0x41e773 ||
+      _0x1f9623 ||
+      _0x1a12df
+        ? _rendererMediaRuntimePreparer.pause()
+        : _rendererMediaRuntimePreparer.resume();
       _renderViewport(_0x50065c, _0x22fb80, _0x4ddc65.ui?.titleFollowsCanvasZoom === true);
       if (_0x5bd547) {
         (_rendererInteractionGrace.markBusy(), (_0xe4fe0d = 'viewport-animating'));
@@ -1251,23 +1300,12 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
   typeof window !== 'undefined' &&
     ((window.v2Renderer = window.v2Renderer || {}),
     Object.assign(window.v2Renderer, { flushNode: _0x40c520, flushNodes: _0x6ea2e9 }));
-  const _schedulePresentationSnapshot = (_0x58bb73) => {
-      ((_currentSnapshot = _0x58bb73), (_0x34921d = _0x58bb73));
-      if (_0x2fcab6 !== null) return;
-      _0x2fcab6 = requestAnimationFrame(() => {
-        _0x2fcab6 = null;
-        const _0x337ce4 = _0x34921d;
-        ((_0x34921d = null), _syncRunningTimers(_0x337ce4), _0x19f4ce(_0x337ce4));
-      });
-    },
-    _0x886477 = _0x1df4a5.subscribeRaw((_0x58bb73) => {
-      _latestPresentationSnapshot = _0x58bb73;
-      if (!_presentationActive) return;
-      _schedulePresentationSnapshot(_0x58bb73);
-    }),
-    _0x4830cf = () => {
-      _presentationActive = false;
-      (_0x886477(),
+  _presentationSubscription.connect(_0x1df4a5);
+  const _0x4830cf = () => {
+      (_presentationSubscription.dispose(),
+        _rendererMediaRuntimePreparer.clear(),
+        _schedulePreparedMediaRuntimeCommit === _schedulePreparedMediaRuntimeCommitForRenderer &&
+          (_schedulePreparedMediaRuntimeCommit = null),
         _0x4e7d6e(),
         _containerResizeObserver &&
           (_containerResizeObserver.disconnect(), (_containerResizeObserver = null)),
@@ -1275,8 +1313,6 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
         (_containerSizeSourceEl = null),
         _nodeDetailHydration.clearNodeDetailHydrationState(),
         _clearRunningTimerState(),
-        _0x2fcab6 !== null && (cancelAnimationFrame(_0x2fcab6), (_0x2fcab6 = null)),
-        (_0x34921d = null),
         _0x2e6a9c?.remove?.(),
         _0x496ecf?.remove?.(),
         _0x8cf9be?.remove?.(),
@@ -1285,17 +1321,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
         _0x22f85d?.remove?.(),
         _0xa653f4?.remove?.());
     };
-  _0x4830cf.setPresentationActive = (active) => {
-    const nextActive = active === true;
-    if (_presentationActive === nextActive) return;
-    _presentationActive = nextActive;
-    if (!_presentationActive) {
-      _0x2fcab6 !== null && (cancelAnimationFrame(_0x2fcab6), (_0x2fcab6 = null));
-      _0x34921d = null;
-      return;
-    }
-    if (_latestPresentationSnapshot) _schedulePresentationSnapshot(_latestPresentationSnapshot);
-  };
+  _0x4830cf.setPresentationActive = _presentationSubscription.setActive;
   return _0x4830cf;
 }
 function _renderViewport(_0x594e4d, _0x4ddaf8, _0x5d47c5 = false) {
@@ -1390,124 +1416,59 @@ function _getIncomingEdgeSignature(_0x191098, _0x482106, _0x4f85db) {
   }
   return _0x225564.join(',');
 }
-function _createNodeRuntime(_0x5ab9e4, _0x517b31, _0x1764c9, _0x1e0288, _0x143163, _0x30241c = {}) {
-  const _0x55124f = _0x5ab9e4.id,
-    _0x3402fc = document.getElementById(_0x55124f);
-  _0x3402fc && !_wrapperMap.has(_0x55124f) && _0x3402fc.remove();
-  const _0x19dd06 = document.createElement('div');
-  ((_0x19dd06.id = _0x55124f),
-    (_0x19dd06.dataset.nodeId = _0x55124f),
-    syncNodeMediaMetricsDataset(_0x19dd06, _0x5ab9e4));
-  let _0x5894ad = 'v2-node node';
-  const _0x2b262d = normalizeNodeType(_0x5ab9e4.type),
-    _0x494e81 = getNodeWrapperExtraClasses(_0x2b262d);
-  if (_0x494e81) _0x5894ad += ' ' + _0x494e81;
-  _0x19dd06.className = _0x5894ad;
-  const _0x443c29 = _0x517b31.has(_0x55124f);
-  _0x443c29 && _0x19dd06.classList.add('selected', 'v2-selected');
-  (Object.assign(_0x19dd06.style, {
-    position: 'absolute',
-    top: '0',
-    left: '0',
-    width: _0x5ab9e4.width + 'px',
-    height: _0x5ab9e4.height + 'px',
-    transform: 'translate(' + _0x5ab9e4.x + 'px, ' + _0x5ab9e4.y + 'px)',
-    zIndex: getRendererNodeZIndex(_0x5ab9e4, _0x443c29, _0x1764c9?.get?.(_0x55124f) ?? -1),
-    display: 'flex',
-    flexDirection: 'column',
-  }),
-    (_0x19dd06._posKey = _0x5ab9e4.x + ',' + _0x5ab9e4.y + ',' + _0x5ab9e4.width + ',' + _0x5ab9e4.height));
-  _0x1e0288.isDragging &&
-    _0x143163 &&
-    _0x143163.has(_0x55124f) &&
-    (_0x1e0288.hasMoved || !_0x1e0288.wasSelectedOnDown) &&
-    _0x19dd06.classList.add('is-ui-hidden');
-  if (isNodeType(_0x5ab9e4, 'group')) {
-    const _0x2f412a = _0x5ab9e4.color || 'var(--indigo)';
-    ((_0x19dd06.style.borderColor = _getGroupColorWithOpacity(_0x2f412a, '60')),
-      (_0x19dd06.style.backgroundColor = _getGroupColorWithOpacity(_0x2f412a, '05')),
-      _0x19dd06.style.setProperty('--current-group-color', _0x2f412a));
+function isRendererMediaRuntimeInteractionPriority({
+  nodeId: _0x2ac779,
+  isSelected: _0x1304fc,
+  isSelectionRelated: _0x518052,
+  dragTargets: _0x20474f,
+  connOverlay: _0x1d5f76,
+  pickMode: _0x11ee59,
+} = {}) {
+  if (!_0x2ac779) return false;
+  return !!(
+    _0x1304fc ||
+    _0x518052 ||
+    _0x20474f?.has?.(_0x2ac779) ||
+    _0x1d5f76?.srcId === _0x2ac779 ||
+    _0x1d5f76?.hoverId === _0x2ac779 ||
+    _0x11ee59?.sourceNodeId === _0x2ac779 ||
+    _0x11ee59?.hoverNodeId === _0x2ac779
+  );
+}
+function _collectExactVisiblePreviewNodeIds(_0x757360) {
+  const _0x2f95be = _0x757360?.querySelector?.('.v2-fast-preview-layer');
+  if (!_0x2f95be) return new Set();
+  const _0x5a6e6a = new Set();
+  for (const _0x2896ea of _0x2f95be.children || []) {
+    const _0x4d10f5 = String(_0x2896ea?.dataset?.nodeId || '').trim();
+    if (_0x4d10f5 && _0x2896ea?.dataset?.hasMedia === '1') _0x5a6e6a.add(_0x4d10f5);
   }
-  if (!isNodeType(_0x5ab9e4, ['group', 'comment-note'])) {
-    const _0x254fb8 = document.createElement('div');
-    ((_0x254fb8.className = 'node-label'), (_0x254fb8.dataset.nodeId = _0x55124f));
-    const _0xfad9cb = _v2GetNodeLabelKind(_0x2b262d);
-    if (_0xfad9cb) _0x254fb8.dataset.labelKind = _0xfad9cb;
-    const _0x5de1ec = getRendererDefaultNodeLabel(_0x5ab9e4),
-      _0x231d13 = hasNodeTypeBetaBadge(_0x2b262d),
-      _0x5173d0 = _0x5ab9e4.name || _0x5de1ec,
-      _0x29e793 = _v2FormatNodeLabelText(_0x5173d0);
-    ((_0x254fb8.dataset.fullName = _0x5173d0),
-      (_0x254fb8.dataset.defaultName = _0x5de1ec),
-      (_0x254fb8.dataset.isBeta = _0x231d13 ? '1' : '0'),
-      _v2SetNodeLabelContent(_0x254fb8, {
-        labelKind: _0xfad9cb,
-        displayLabelText: _0x29e793,
-        defaultName: _0x5de1ec,
-        isBeta: _0x231d13,
-        fullLabelText: _0x5173d0,
-      }),
-      _0x19dd06.appendChild(_0x254fb8),
-      (_0x19dd06.__v2_name_el = _0x254fb8));
-    const _0x1ec362 = document.createElement('div');
-    ((_0x1ec362.className = 'node-timer'),
-      (_0x1ec362.dataset.nodeId = _0x55124f),
-      (_0x1ec362.style.position = 'absolute'),
-      (_0x1ec362.style.bottom = 'calc(100% + 8px)'),
-      (_0x1ec362.style.right = '0'),
-      (_0x1ec362.style.fontSize = '13px'),
-      (_0x1ec362.style.fontWeight = '600'),
-      (_0x1ec362.style.color = 'var(--text-primary)'),
-      (_0x1ec362.style.padding = '2px 8px'),
-      (_0x1ec362.style.whiteSpace = 'nowrap'),
-      (_0x1ec362.style.userSelect = 'none'),
-      (_0x1ec362.style.pointerEvents = 'none'),
-      (_0x1ec362.style.zIndex = '10'),
-      (_0x1ec362.style.maxWidth = '100%'),
-      (_0x1ec362.style.borderRadius = '6px'),
-      (_0x1ec362.style.transition = 'all 0.2s'),
-      (_0x1ec362.style.background = 'transparent'),
-      (_0x1ec362.style.border = '1px solid transparent'),
-      (_0x1ec362.style.display = 'none'),
-      (_0x1ec362.textContent = ''),
-      _0x19dd06.appendChild(_0x1ec362),
-      (_0x19dd06.__v2_timer_el = _0x1ec362));
-    if (isNodeType(_0x5ab9e4, ['source-video', 'ai-video'])) {
-      const _0x4ad340 = document.createElement('div');
-      ((_0x4ad340.className = 'node-video-meta'),
-        (_0x4ad340.dataset.nodeId = _0x55124f),
-        (_0x4ad340.dataset.visible = '0'),
-        (_0x4ad340.textContent = ''),
-        _0x19dd06.appendChild(_0x4ad340),
-        (_0x19dd06.__v2_video_meta_el = _0x4ad340));
-    }
-  }
-  const _0xd4c89d = getNodeClass(_0x5ab9e4.type),
-    _0x4727c1 = new _0xd4c89d(withRendererDeferredMediaHint(_0x5ab9e4, _0x30241c.deferMediaOnMount === true)),
-    _0x14fd55 = _0x4727c1.mount();
+  return _0x5a6e6a;
+}
+function _registerNodeRuntime(_0x16d9df) {
+  if (!_0x16d9df?.nodeId || !_0x16d9df.wrapperEl || !_0x16d9df.instance) return null;
+  const _0x47bac9 = document.getElementById(_0x16d9df.nodeId);
   return (
-    _0x14fd55 &&
-      (_0x14fd55.classList.add('v2-node-component'),
-      (_0x14fd55.style.flex = '1'),
-      (_0x14fd55.style.width = '100%'),
-      (_0x14fd55.style.minHeight = '0'),
-      (_0x14fd55.style.minWidth = '0'),
-      (_0x14fd55.style.display = 'flex'),
-      (_0x14fd55.style.flexDirection = 'column'),
-      (_0x14fd55.style.overflow =
-        _0x2b262d === 'storyboard' ||
-        _0x2b262d === 'storyboard-script' ||
-        _0x2b262d === 'collage' ||
-        _0x2b262d === 'media-clip' ||
-        _0x2b262d === 'panorama-scene' ||
-        _0x2b262d === 'panorama-360'
-          ? 'visible'
-          : 'hidden'),
-      _0x19dd06.appendChild(_0x14fd55)),
-    _componentMap.set(_0x55124f, _0x4727c1),
-    _wrapperMap.set(_0x55124f, _0x19dd06),
-    _nodeTypeSnapshotMap.set(_0x55124f, _0x2b262d),
-    { wrapperEl: _0x19dd06, instance: _0x4727c1 }
+    _0x47bac9 &&
+      _0x47bac9 !== _0x16d9df.wrapperEl &&
+      !_wrapperMap.has(_0x16d9df.nodeId) &&
+      _0x47bac9.remove(),
+    _componentMap.set(_0x16d9df.nodeId, _0x16d9df.instance),
+    _wrapperMap.set(_0x16d9df.nodeId, _0x16d9df.wrapperEl),
+    _nodeTypeSnapshotMap.set(_0x16d9df.nodeId, _0x16d9df.canonicalType),
+    _0x16d9df
+  );
+}
+function _createNodeRuntime(_0x5ab9e4, _0x517b31, _0x1764c9, _0x1e0288, _0x143163, _0x30241c = {}) {
+  return _registerNodeRuntime(
+    prepareRendererNodeRuntime({
+      node: _0x5ab9e4,
+      selectedNodeSet: _0x517b31,
+      selectedNodeRankMap: _0x1764c9,
+      dragContext: _0x1e0288,
+      dragTargets: _0x143163,
+      options: _0x30241c,
+    }),
   );
 }
 function _ensureVideoMetaEl(_0x2109a3, _0x38759a) {
@@ -1840,7 +1801,10 @@ function _renderNodes(
       containerWidth: _0x460fc9,
       containerHeight: _0x379dc0,
     }),
-    _0x129f6f = createRendererStructuralBudget();
+    _0x129f6f = createRendererStructuralBudget(),
+    exactVisiblePreviewNodeIds = _collectExactVisiblePreviewNodeIds(_0x757360);
+  _rendererMediaRuntimePreparer.prune(_0x186ec4);
+  const interactionBusy = _rendererInteractionGrace.isBusy();
   let _0x38ea0f = false,
     _0x21ef5e = 0,
     _0x2cc9b8 = null;
@@ -1882,7 +1846,7 @@ function _renderNodes(
         _0x38ea0f = true;
         continue;
       }
-      ((_0x52b5ea = _nodeDetailHydration.shouldDeferNodeDetails({
+      _0x52b5ea = _nodeDetailHydration.shouldDeferNodeDetails({
         node: _0x360a17,
         nodeId: _0x563f60,
         isSelected: _0x457bb9,
@@ -1891,16 +1855,93 @@ function _renderNodes(
         relatedNodeIds: _0x1677db,
         viewport: _0x676f3a,
         mountCandidateCount: _0x186ec4.size,
-      })),
-        ({ wrapperEl: _0x540ac2, instance: _0x2e4456 } = _createNodeRuntime(
+      });
+      const deferMediaOnMount =
+          _0x52b5ea ||
+          shouldDeferInitialVideoMediaOnMount({
+            node: _0x360a17,
+            nodeId: _0x563f60,
+            isSelected: _0x457bb9,
+            isSelectionRelated: _0x4a3aea,
+            dragTargets: _0x5987f3,
+            nodeCount: _0x3ed32d,
+            mountCandidateCount: _0x186ec4.size,
+          }),
+        runtimeOptions = {
+          deferDetailsOnMount: _0x52b5ea,
+          deferMediaOnMount,
+          eagerVideoPreviewOnMount: false,
+        },
+        runtimeVariant = [
+          _0x52b5ea ? 'details-deferred' : 'details-live',
+          deferMediaOnMount ? 'media-deferred' : 'media-live',
+          'eager-live',
+        ].join('|'),
+        hasPreparedRuntime = _rendererMediaRuntimePreparer.hasPrepared(
+          _0x563f60,
           _0x360a17,
-          _0x44e39b,
-          _0x4037dc,
-          _0x4adfff,
-          _0x5987f3,
-          { deferMediaOnMount: _0x52b5ea },
-        )),
-        !_0x2cc9b8 && (_0x2cc9b8 = document.createDocumentFragment()),
+          runtimeVariant,
+        ),
+        interactionPriority = isRendererMediaRuntimeInteractionPriority({
+          nodeId: _0x563f60,
+          isSelected: _0x457bb9,
+          isSelectionRelated: _0x4a3aea,
+          dragTargets: _0x5987f3,
+          connOverlay: _0x54d2e1,
+          pickMode: _0x18682e,
+        }),
+        shouldPrebuildRuntime = shouldPrebuildRendererMediaRuntime({
+          node: _0x360a17,
+          nodeCount: _0x3ed32d,
+          veryDenseNodeCount: RENDERER_VIRTUALIZATION_CONFIG.veryDenseNodeCount,
+          hasExactVisiblePreview: exactVisiblePreviewNodeIds.has(_0x563f60),
+          interactionBusy,
+          interactionPriority,
+          deferMediaOnMount,
+          viewportPriorityMediaOnly: false,
+          idlePreparationSupported: typeof requestIdleCallback === 'function',
+        });
+      if (!hasPreparedRuntime && shouldPrebuildRuntime) {
+        _rendererMediaRuntimePreparer.enqueue({
+          nodeId: _0x563f60,
+          version: _0x360a17,
+          variant: runtimeVariant,
+          isValid: () =>
+            _currentSnapshot?.nodes?.[_0x563f60] === _0x360a17 && !_componentMap.has(_0x563f60),
+          prepare: () =>
+            prepareRendererNodeRuntime({
+              node: _0x360a17,
+              selectedNodeSet: _0x44e39b,
+              selectedNodeRankMap: _0x4037dc,
+              dragContext: _0x4adfff,
+              dragTargets: _0x5987f3,
+              options: { ...runtimeOptions, prebuildOffscreen: true },
+            }),
+          dispose: disposePreparedRendererNodeRuntime,
+        });
+        continue;
+      }
+      !hasPreparedRuntime && !shouldPrebuildRuntime && _rendererMediaRuntimePreparer.forget(_0x563f60);
+      const preparedRuntime = hasPreparedRuntime
+          ? _rendererMediaRuntimePreparer.take(_0x563f60, _0x360a17, runtimeVariant)
+          : null,
+        registeredRuntime = preparedRuntime
+          ? _registerNodeRuntime(preparedRuntime)
+          : _createNodeRuntime(
+              _0x360a17,
+              _0x44e39b,
+              _0x4037dc,
+              _0x4adfff,
+              _0x5987f3,
+              runtimeOptions,
+            );
+      if (!registeredRuntime) {
+        preparedRuntime && disposePreparedRendererNodeRuntime(preparedRuntime);
+        _0x38ea0f = true;
+        continue;
+      }
+      ({ wrapperEl: _0x540ac2, instance: _0x2e4456 } = registeredRuntime);
+      (!_0x2cc9b8 && (_0x2cc9b8 = document.createDocumentFragment()),
         _mountNode(_0x563f60, _0x2cc9b8),
         (_0x4664c2 = true),
         _0x129f6f.consume());
