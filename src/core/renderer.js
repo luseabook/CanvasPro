@@ -24,6 +24,15 @@ import {
   collectVirtualizedRenderNodes,
   getCachedRendererSpatialIndex,
 } from './rendererSpatialIndex.js';
+import {
+  buildFullEdgeRenderSignature,
+  clearCachedEdgeVisibilityIndex,
+  getCachedEdgeGeometrySignature,
+  getCachedEdgeVisibilityIndex,
+  MANY_EDGES_THRESHOLD,
+} from './rendererEdgeVisibilityIndex.js';
+import { createRendererEdgeLayer } from './rendererEdgeLayer.js';
+import { normalizeConnectionLineStyle } from './edgePathGeometry.js';
 import { installNodeResizeGeometryPreviewer } from './rendererResizePreview.js';
 import { getAIGenerationDefaultSizeByType } from '../services/fileService.js';
 import { buildGroupOutputMembershipSignature } from '../modules/groupDynamicOutput.js';
@@ -121,8 +130,12 @@ const _multiSelectRenderCache = {
       (_fastPreviewLayer.retainNode(_0x32277d), _rendererDeferredMedia.enqueue(_0x32277d));
     },
   }),
-  _edgeDomCache = new Map(),
-  _edgeEndpointSignatureCache = new Map(),
+  _edgeLayer = createRendererEdgeLayer({
+    getContainerSize: _getEdgeContainerSize,
+    nowMs: _nowMs,
+    recordRedrawSample: recordEdgeRedrawSample,
+  }),
+  _edgeDomCache = _edgeLayer.getDomCache(),
   _nodeToEdgeIds = new Map(),
   _incomingEdgeIdsByTarget = new Map(),
   SELECTION_RELATED_HIGHLIGHT_COLORS = Object.freeze([
@@ -416,6 +429,13 @@ function _syncRendererBridge() {
         const _0x582c60 = _nodeToEdgeIds.get(_0x15e2c6);
         return _0x582c60 ? Array.from(_0x582c60) : [];
       },
+      getEdgeLayerStats: () => _edgeLayer.getStats(),
+      hitTestEdgeAtScreenPoint: (_0x29a701, _0x3bfe37, _0x4a8e2d) =>
+        _edgeLayer.hitTestEdgeAtScreenPoint(_0x29a701, _0x3bfe37, _0x4a8e2d),
+      prepareDynamicEdges: (_0x3c9278) => _edgeLayer.prepareDynamicEdges(_0x3c9278),
+      setEdgeInteractionHighlight: (_0x4d6bb4, _0x4bdf3a) =>
+        _edgeLayer.setActiveEdge(_0x4d6bb4, _0x4bdf3a),
+      setHoveredEdge: (_0x3c5836, _0x1ce979) => _edgeLayer.setHoveredEdge(_0x3c5836, _0x1ce979),
       markViewportInteractionBusy: _rendererInteractionGrace.markBusy,
       pinNode(_0x2043d9, _0x37f8e4 = 'src/ui/') {
         if (!_0x2043d9) return;
@@ -540,99 +560,6 @@ function _getEdgeContainerSize(_0x5d4fe6) {
 }
 function _invalidateFullEdgeRenderSignature({ clearedDom: clearedDom = false } = {}) {
   ((_lastFullEdgeRenderSignature = ''), clearedDom && (_edgeDomClearedSinceLastFull = true));
-}
-function _syncEdgeHighlightClass(_0x175534, _0x5c019f, _0xfd0e66) {
-  if (!_0x175534?.groupEl?.classList || !_0x5c019f) return;
-  const _0x3eaa0d = !!_0xfd0e66?.has?.(_0x5c019f);
-  if (_0x175534.highlighted === _0x3eaa0d) return;
-  (_0x3eaa0d
-    ? _0x175534.groupEl.classList.add('connection-highlighted')
-    : _0x175534.groupEl.classList.remove('connection-highlighted'),
-    (_0x175534.highlighted = _0x3eaa0d));
-}
-function _formatEdgeSignatureNumber(_0xdb7d50) {
-  const _0xef4fd = Number(_0xdb7d50);
-  return Number.isFinite(_0xef4fd) ? _0xef4fd.toFixed(1) : '0.0';
-}
-function _appendSortedSetSignature(_0x18a181, _0x3c2a66, _0x328939) {
-  if (!(_0x328939 instanceof Set) || _0x328939.size === 0) {
-    _0x18a181.push(_0x3c2a66 + ':');
-    return;
-  }
-  _0x18a181.push(_0x3c2a66 + ':' + Array.from(_0x328939).sort().join(','));
-}
-function _buildFullEdgeRenderSignature({
-  edgeEntries: _0x415d62,
-  nodes: _0xc97fb,
-  viewport: _0xb8dad7,
-  dragOffsetCtx: _0x4d73d0,
-  relatedEdgeIds: _0x2ae469,
-  containerW: _0x383076,
-  containerH: _0xb0d914,
-}) {
-  const _0xb8fcaa = _0xb8dad7 || { x: 0, y: 0, zoom: 1 },
-    _0x59935a = _0x4d73d0?.movedNodeIds instanceof Set ? _0x4d73d0.movedNodeIds : null,
-    _0x363433 = Number.isFinite(_0x4d73d0?.dx) ? _0x4d73d0.dx : 0,
-    _0x565776 = Number.isFinite(_0x4d73d0?.dy) ? _0x4d73d0.dy : 0,
-    _0x573401 = [
-      'edge-full',
-      'vp:' +
-        _formatEdgeSignatureNumber(_0xb8fcaa.x) +
-        ':' +
-        _formatEdgeSignatureNumber(_0xb8fcaa.y) +
-        ':' +
-        _formatEdgeSignatureNumber(_0xb8fcaa.zoom || 1),
-      'box:' + _formatEdgeSignatureNumber(_0x383076) + ':' + _formatEdgeSignatureNumber(_0xb0d914),
-      'drag:' + _formatEdgeSignatureNumber(_0x363433) + ':' + _formatEdgeSignatureNumber(_0x565776),
-    ];
-  (_appendSortedSetSignature(_0x573401, 'dragIds', _0x59935a),
-    _appendSortedSetSignature(_0x573401, 'highlight', _0x2ae469));
-  for (const _0x5de1f8 of _0x415d62 || []) {
-    if (!_0x5de1f8?.id) continue;
-    const _0x4d7e22 = _0xc97fb?.[_0x5de1f8.sourceId],
-      _0x837d80 = _0xc97fb?.[_0x5de1f8.targetId];
-    if (!_0x4d7e22 || !_0x837d80) {
-      _0x573401.push(
-        'e:' +
-          _0x5de1f8.id +
-          ':' +
-          (_0x5de1f8.sourceId || '') +
-          ':' +
-          (_0x5de1f8.targetId || '') +
-          ':missing',
-      );
-      continue;
-    }
-    const _0x354b5c = _0x59935a && _0x59935a.has(_0x5de1f8.sourceId) ? _0x363433 : 0,
-      _0x303f37 = _0x59935a && _0x59935a.has(_0x5de1f8.sourceId) ? _0x565776 : 0,
-      _0x2dbad1 = _0x59935a && _0x59935a.has(_0x5de1f8.targetId) ? _0x363433 : 0,
-      _0x4c7e41 = _0x59935a && _0x59935a.has(_0x5de1f8.targetId) ? _0x565776 : 0,
-      _0x13140 = Number(_0x4d7e22.x || 0) + _0x354b5c,
-      _0x518ffc = Number(_0x4d7e22.y || 0) + _0x303f37,
-      _0x23ce64 = Number(_0x837d80.x || 0) + _0x2dbad1,
-      _0x575e78 = Number(_0x837d80.y || 0) + _0x4c7e41,
-      _0x3e6121 = _0x13140 + Number(_0x4d7e22.width ?? 0),
-      _0x461787 = _0x518ffc + Number(_0x4d7e22.height ?? 0) / 2,
-      _0x549c34 = _0x23ce64,
-      _0x4cea0e = _0x575e78 + Number(_0x837d80.height ?? 0) / 2;
-    _0x573401.push(
-      'e:' +
-        _0x5de1f8.id +
-        ':' +
-        (_0x5de1f8.sourceId || '') +
-        ':' +
-        (_0x5de1f8.targetId || '') +
-        ':' +
-        _formatEdgeSignatureNumber(_0x3e6121) +
-        ':' +
-        _formatEdgeSignatureNumber(_0x461787) +
-        ':' +
-        _formatEdgeSignatureNumber(_0x549c34) +
-        ':' +
-        _formatEdgeSignatureNumber(_0x4cea0e),
-    );
-  }
-  return _0x573401.join('|');
 }
 function _normalizeSignaturePart(_0xb9ad11) {
   if (_0xb9ad11 === null || _0xb9ad11 === undefined) return null;
@@ -885,8 +812,8 @@ export function clearRendererCache() {
     (_multiSelectRenderCache.composeBtnKind = ''),
     (_alignPanelRenderCache.centerSig = ''),
     (_alignPanelRenderCache.buttonStateSig = ''),
-    _edgeDomCache.clear(),
-    _edgeEndpointSignatureCache.clear(),
+    _edgeLayer.reset(),
+    clearCachedEdgeVisibilityIndex(),
     _nodeToEdgeIds.clear(),
     _incomingEdgeIdsByTarget.clear(),
     (_edgeIndexRev = -1),
@@ -1059,17 +986,39 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
       _0x1ba630 = _getEdgeEntries(_0x59e95d, _0x3dddde),
       _0x4e5a6f = _0x1ba630.length,
       _0x25b848 = document.documentElement,
-      _0x16131c = _0x4e5a6f >= 0x190;
+      _0x16131c = _0x4e5a6f >= MANY_EDGES_THRESHOLD;
     if (_0x16131c)
       !_0x25b848.classList.contains('has-many-edges') && _0x25b848.classList.add('has-many-edges');
     else _0x25b848.classList.contains('has-many-edges') && _0x25b848.classList.remove('has-many-edges');
     const _0x5e2ea0 = getDragContext(),
       _0x48ab70 = _resolveDragRenderOffset(_0x2c0ce5, _0x5e2ea0),
-      _0x5a8d94 = _0x2c0ce5.ui?.connectionLinesVisible !== false;
-    let _0x520f4c = null;
+      _0x5a8d94 = _0x2c0ce5.ui?.connectionLinesVisible !== false,
+      _0x3d603d = normalizeConnectionLineStyle(_0x2c0ce5.ui?.connectionLineStyle);
+    let _0x520f4c = null,
+      _0x10ffa1 = '',
+      _0x482a3d = null;
+    function _0x441927() {
+      if (!_0x16131c) return '';
+      if (!_0x10ffa1)
+        _0x10ffa1 = getCachedEdgeGeometrySignature(_0x1ba630, _0x2c0ce5.nodes, {
+          edgesRev: _0x3dddde,
+          geometryRev: 0,
+        });
+      return _0x10ffa1;
+    }
+    function _0x3def62() {
+      if (!_0x5a8d94 || !_0x16131c) return null;
+      if (!_0x482a3d)
+        _0x482a3d = getCachedEdgeVisibilityIndex(_0x1ba630, _0x2c0ce5.nodes, {
+          edgesRev: _0x3dddde,
+          geometryRev: 0,
+          geometrySignature: _0x441927(),
+        });
+      return _0x482a3d;
+    }
     function _0x24c487(_0x3c8bf7 = false) {
       !_0x520f4c && (_0x520f4c = _getEdgeContainerSize(_0x290e05));
-      const _0x36b56a = _buildFullEdgeRenderSignature({
+      const _0x36b56a = buildFullEdgeRenderSignature({
         edgeEntries: _0x1ba630,
         nodes: _0x2c0ce5.nodes,
         viewport: _0x2c0ce5.viewport,
@@ -1077,9 +1026,18 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
         relatedEdgeIds: _0x13c2e0.relatedEdgeIds,
         containerW: _0x520f4c.containerW,
         containerH: _0x520f4c.containerH,
+        edgesRev: _0x3dddde,
+        geometryRev: 0,
+        geometrySignature: _0x441927(),
+        edgePathStyle: _0x3d603d,
       });
       if (!_0x3c8bf7 && _0x36b56a === _lastFullEdgeRenderSignature) return null;
-      return { containerSize: _0x520f4c, renderSignature: _0x36b56a };
+      return {
+        containerSize: _0x520f4c,
+        renderSignature: _0x36b56a,
+        geometryRevisionKey: 'edges:' + _0x3dddde + ':geometry:0',
+        pathStyle: _0x3d603d,
+      };
     }
     if (!_0x5a8d94) _clearRenderedEdges(_0x1f858c);
     else {
@@ -1096,7 +1054,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
           _0x13c2e0.relatedEdgeIds,
           _0x1ba630,
           'edges-rev-changed',
-          _0x333363,
+          { ..._0x333363, edgeVisibilityIndex: _0x3def62() },
         );
       } else {
         if (_0x5e2ea0.isDragging) {
@@ -1118,7 +1076,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
               _0x290e05,
               _0x48ab70,
               _0x13c2e0.relatedEdgeIds,
-              { containerSize: _0x520f4c || null },
+              { containerSize: _0x520f4c || null, pathStyle: _0x3d603d },
             );
           else {
             if (!_0x2e7dff || _0x2e7dff.size === 0) {
@@ -1134,7 +1092,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
                   _0x13c2e0.relatedEdgeIds,
                   _0x1ba630,
                   'drag-related-edges-unavailable',
-                  _0x34ea0c,
+                  { ..._0x34ea0c, edgeVisibilityIndex: _0x3def62() },
                 );
             }
           }
@@ -1151,7 +1109,7 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
               _0x13c2e0.relatedEdgeIds,
               _0x1ba630,
               'steady',
-              _0x3b376f,
+              { ..._0x3b376f, edgeVisibilityIndex: _0x3def62() },
             );
         }
       }
@@ -2064,144 +2022,18 @@ function _renderEdgesByIds(
   _0x4d8540 = null,
   _0x44b1fb = {},
 ) {
-  const _0x592d68 = _nowMs(),
-    _0x6f7082 = _0x3df112 || { x: 0, y: 0, zoom: 1 },
-    _0x3506bc = _0x44b1fb?.containerSize || _getEdgeContainerSize(_0xc99a03),
-    _0x585199 = _0x3506bc.containerW,
-    _0x3dd2b5 = _0x3506bc.containerH,
-    _0x40011e = _nowMs(),
-    _0x4268bb = 200,
-    _0x57620d = _0x5cb7c4?.movedNodeIds instanceof Set ? _0x5cb7c4.movedNodeIds : null,
-    _0x49b04e = Number.isFinite(_0x5cb7c4?.dx) ? _0x5cb7c4.dx : 0,
-    _0xaf30f4 = Number.isFinite(_0x5cb7c4?.dy) ? _0x5cb7c4.dy : 0;
-  function _0x14692f(_0x59d2b3, _0x32209c, _0x151ec7, _0x1f2ea4) {
-    const { x: _0x454435, y: _0x3da06c, zoom: _0x13ff95 } = _0x6f7082,
-      _0x48fe7a = _0x59d2b3 * _0x13ff95 + _0x454435,
-      _0x2c1046 = _0x32209c * _0x13ff95 + _0x3da06c,
-      _0x43e9d5 = _0x151ec7 * _0x13ff95 + _0x454435,
-      _0x15be8d = _0x1f2ea4 * _0x13ff95 + _0x3da06c,
-      _0x2b3799 = Math.min(_0x48fe7a, _0x43e9d5),
-      _0x512433 = Math.min(_0x2c1046, _0x15be8d),
-      _0x55054e = Math.max(_0x48fe7a, _0x43e9d5),
-      _0x41830e = Math.max(_0x2c1046, _0x15be8d);
-    return (
-      _0x55054e > -_0x4268bb &&
-      _0x2b3799 < _0x585199 + _0x4268bb &&
-      _0x41830e > -_0x4268bb &&
-      _0x512433 < _0x3dd2b5 + _0x4268bb
-    );
-  }
-  const _0x2d7f17 = [];
-  let _0x7546be = 0,
-    _0x22e80c = 0,
-    _0x38d6e7 = 0,
-    _0x39aecb = 0,
-    _0x357e02 = 0;
-  for (const _0x1e02a6 of _0x28b02b) {
-    const _0x49ed52 = _0x202f86[_0x1e02a6];
-    if (!_0x49ed52) continue;
-    const _0x2dd423 = _0x40956d[_0x49ed52.sourceId],
-      _0x46a386 = _0x40956d[_0x49ed52.targetId];
-    if (!_0x2dd423 || !_0x46a386) continue;
-    const _0x36f0d3 = _0x57620d && _0x57620d.has(_0x49ed52.sourceId) ? _0x49b04e : 0,
-      _0x54b026 = _0x57620d && _0x57620d.has(_0x49ed52.sourceId) ? _0xaf30f4 : 0,
-      _0x56b9de = _0x57620d && _0x57620d.has(_0x49ed52.targetId) ? _0x49b04e : 0,
-      _0x2489b0 = _0x57620d && _0x57620d.has(_0x49ed52.targetId) ? _0xaf30f4 : 0,
-      _0x4a7a99 = _0x2dd423.x + _0x36f0d3,
-      _0x328040 = _0x2dd423.y + _0x54b026,
-      _0x4fdda6 = _0x46a386.x + _0x56b9de,
-      _0x41f48c = _0x46a386.y + _0x2489b0,
-      _0x139eaf = _0x4a7a99 + (_0x2dd423.width ?? 0),
-      _0x20e46f = _0x328040 + (_0x2dd423.height ?? 0) / 2,
-      _0x229c2b = _0x4fdda6,
-      _0x5b1192 = _0x41f48c + (_0x46a386.height ?? 0) / 2,
-      _0x128ee0 = _0x14692f(_0x139eaf, _0x20e46f, _0x229c2b, _0x5b1192),
-      _0x424e5c =
-        _0x139eaf.toFixed(1) +
-        ',' +
-        _0x20e46f.toFixed(1) +
-        ',' +
-        _0x229c2b.toFixed(1) +
-        ',' +
-        _0x5b1192.toFixed(1),
-      _0x416452 = _edgeEndpointSignatureCache.get(_0x49ed52.id);
-    let _0xedb41d = _edgeDomCache.get(_0x49ed52.id);
-    const _0x3f4688 = !_0xedb41d || _0x416452 !== _0x424e5c;
-    if (!_0x128ee0) {
-      _0x357e02 += 1;
-      _0xedb41d?.groupEl?.isConnected && (_0xedb41d.groupEl.remove(), (_0x38d6e7 += 1));
-      (_edgeDomCache.delete(_0x49ed52.id), _edgeEndpointSignatureCache.delete(_0x49ed52.id));
-      continue;
-    }
-    _0x7546be += 1;
-    if (!_0xedb41d) {
-      const _0x2b1abf = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      ((_0x2b1abf.id = 'edge-group-' + _0x49ed52.id),
-        _0x2b1abf.setAttribute('class', 'connection-group'),
-        _0x2b1abf.setAttribute('data-conn-id', _0x49ed52.id),
-        _0x312e87.appendChild(_0x2b1abf));
-      const _0x5ee162 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      (_0x5ee162.setAttribute('class', 'connection-bg'), _0x2b1abf.appendChild(_0x5ee162));
-      const _0x561616 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      (_0x561616.setAttribute('class', 'connection-main'),
-        _0x2b1abf.appendChild(_0x561616),
-        (_0xedb41d = { groupEl: _0x2b1abf, hoverPath: _0x5ee162, pathEl: _0x561616, highlighted: null }),
-        _edgeDomCache.set(_0x49ed52.id, _0xedb41d),
-        (_0x22e80c += 1));
-    } else _0x39aecb += 1;
-    _syncEdgeHighlightClass(_0xedb41d, _0x49ed52.id, _0x4d8540);
-    if (_0x3f4688) {
-      const _0x7a357a = Math.max(Math.abs(_0x229c2b - _0x139eaf) * 0.5, 60),
-        _0x430d2a =
-          'M ' +
-          _0x139eaf +
-          ' ' +
-          _0x20e46f +
-          ' C ' +
-          (_0x139eaf + _0x7a357a) +
-          ' ' +
-          _0x20e46f +
-          ', ' +
-          (_0x229c2b - _0x7a357a) +
-          ' ' +
-          _0x5b1192 +
-          ', ' +
-          _0x229c2b +
-          ' ' +
-          _0x5b1192;
-      _0x2d7f17.push({
-        domCache: _0xedb41d,
-        d: _0x430d2a,
-        endpointSignature: _0x424e5c,
-        edgeId: _0x49ed52.id,
-      });
-    }
-  }
-  const _0x5b1227 = _nowMs();
-  for (const _0x263562 of _0x2d7f17) {
-    (_0x263562.domCache.hoverPath.setAttribute('d', _0x263562.d),
-      _0x263562.domCache.pathEl.setAttribute('d', _0x263562.d),
-      _edgeEndpointSignatureCache.set(_0x263562.edgeId, _0x263562.endpointSignature));
-  }
-  const _0x21eba6 = _nowMs();
-  (_0x2d7f17.length > 0 || _0x22e80c > 0 || _0x38d6e7 > 0) && _invalidateFullEdgeRenderSignature();
-  const _0x4cc9bc = _nowMs(),
-    _0x11a3d1 = _0x28b02b instanceof Set ? _0x28b02b.size : _0x2d7f17.length;
-  recordEdgeRedrawSample('partial', _0x4cc9bc - _0x592d68, {
-    reason: 'drag-related-edges',
-    edgeCount: _0x11a3d1,
-    visibleEdgeCount: _0x7546be,
-    updatedCount: _0x2d7f17.length,
-    createdCount: _0x22e80c,
-    removedCount: _0x38d6e7,
-    reusedCount: _0x39aecb,
-    skippedInvisibleCount: _0x357e02,
-    cacheSize: _edgeDomCache.size,
-    layoutReadMs: _0x3506bc.layoutReadMs,
-    pathBuildMs: Math.max(0, _0x5b1227 - _0x40011e),
-    domWriteMs: Math.max(0, _0x21eba6 - _0x5b1227),
-    clearedDom: false,
+  const _0x394a92 = _edgeLayer.renderPartial({
+    svgEl: _0x312e87,
+    edgeIds: _0x28b02b,
+    edges: _0x202f86,
+    nodes: _0x40956d,
+    viewport: _0x3df112,
+    containerEl: _0xc99a03,
+    dragOffsetCtx: _0x5cb7c4,
+    relatedEdgeIds: _0x4d8540,
+    options: _0x44b1fb,
   });
+  if (_0x394a92.mutated) _invalidateFullEdgeRenderSignature();
 }
 function _renderEdges(
   _0x860ab4,
@@ -2215,167 +2047,33 @@ function _renderEdges(
   _0x1b3c6a = 'steady',
   _0x4f77a1 = {},
 ) {
-  const _0x57de3f = _nowMs(),
-    _0x5988aa = _0x1889f6 || { x: 0, y: 0, zoom: 1 },
-    _0x58c911 = _0x4f77a1?.containerSize || _getEdgeContainerSize(_0x248971),
-    _0x6a1f5b = _0x58c911.containerW,
-    _0x76168e = _0x58c911.containerH,
-    _0x23cbbc = _edgeDomClearedSinceLastFull === true,
-    _0x4b6650 = _nowMs(),
-    _0x49fe4d = 200,
-    _0x5d4939 = _0x5513f2?.movedNodeIds instanceof Set ? _0x5513f2.movedNodeIds : null,
-    _0x231cf7 = Number.isFinite(_0x5513f2?.dx) ? _0x5513f2.dx : 0,
-    _0x15c093 = Number.isFinite(_0x5513f2?.dy) ? _0x5513f2.dy : 0;
-  function _0x5232ac(_0xfa5410, _0x37bae6, _0x177033, _0x4ceaf5) {
-    const { x: _0x476a2e, y: _0x517a89, zoom: _0x8c2d15 } = _0x5988aa,
-      _0x10d3eb = _0xfa5410 * _0x8c2d15 + _0x476a2e,
-      _0x2ff0fa = _0x37bae6 * _0x8c2d15 + _0x517a89,
-      _0x2da173 = _0x177033 * _0x8c2d15 + _0x476a2e,
-      _0x3f4df0 = _0x4ceaf5 * _0x8c2d15 + _0x517a89,
-      _0x1de674 = Math.min(_0x10d3eb, _0x2da173),
-      _0x166d7b = Math.min(_0x2ff0fa, _0x3f4df0),
-      _0x42dcdb = Math.max(_0x10d3eb, _0x2da173),
-      _0x3fe5d7 = Math.max(_0x2ff0fa, _0x3f4df0);
-    return (
-      _0x42dcdb > -_0x49fe4d &&
-      _0x1de674 < _0x6a1f5b + _0x49fe4d &&
-      _0x3fe5d7 > -_0x49fe4d &&
-      _0x166d7b < _0x76168e + _0x49fe4d
-    );
-  }
-  const _0x3f0dba = [];
-  let _0x2b1be5 = 0,
-    _0x1849e6 = 0,
-    _0x34bf01 = 0,
-    _0x1fbf51 = 0,
-    _0x469a95 = 0;
-  const _0x3ec10a = Array.isArray(_0x57c361) ? _0x57c361 : Object.values(_0x2826c1 || {});
-  for (const _0x53967f of _0x3ec10a) {
-    const _0x3565b5 = _0x57c703[_0x53967f.sourceId],
-      _0x3f1f4b = _0x57c703[_0x53967f.targetId];
-    if (!_0x3565b5 || !_0x3f1f4b) continue;
-    const _0x30a4ef = _0x5d4939 && _0x5d4939.has(_0x53967f.sourceId) ? _0x231cf7 : 0,
-      _0x4428e6 = _0x5d4939 && _0x5d4939.has(_0x53967f.sourceId) ? _0x15c093 : 0,
-      _0x25fd19 = _0x5d4939 && _0x5d4939.has(_0x53967f.targetId) ? _0x231cf7 : 0,
-      _0x18bc21 = _0x5d4939 && _0x5d4939.has(_0x53967f.targetId) ? _0x15c093 : 0,
-      _0x1ed2bf = _0x3565b5.x + _0x30a4ef,
-      _0x425b75 = _0x3565b5.y + _0x4428e6,
-      _0x2db3a9 = _0x3f1f4b.x + _0x25fd19,
-      _0xae445a = _0x3f1f4b.y + _0x18bc21,
-      _0x12d111 = _0x1ed2bf + (_0x3565b5.width ?? 0),
-      _0x14cab3 = _0x425b75 + (_0x3565b5.height ?? 0) / 2,
-      _0xa67b1b = _0x2db3a9,
-      _0x1080d0 = _0xae445a + (_0x3f1f4b.height ?? 0) / 2,
-      _0xb831d8 = _0x5232ac(_0x12d111, _0x14cab3, _0xa67b1b, _0x1080d0),
-      _0xc9a5c0 =
-        _0x12d111.toFixed(1) +
-        ',' +
-        _0x14cab3.toFixed(1) +
-        ',' +
-        _0xa67b1b.toFixed(1) +
-        ',' +
-        _0x1080d0.toFixed(1),
-      _0x2c3435 = _edgeEndpointSignatureCache.get(_0x53967f.id);
-    let _0x7d2ab = _edgeDomCache.get(_0x53967f.id);
-    const _0x52b574 = !_0x7d2ab || _0x2c3435 !== _0xc9a5c0;
-    if (!_0xb831d8) {
-      _0x469a95 += 1;
-      _0x7d2ab?.groupEl?.isConnected && (_0x7d2ab.groupEl.remove(), (_0x34bf01 += 1));
-      (_edgeDomCache.delete(_0x53967f.id), _edgeEndpointSignatureCache.delete(_0x53967f.id));
-      continue;
-    }
-    _0x2b1be5 += 1;
-    if (!_0x7d2ab) {
-      const _0x45895e = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      ((_0x45895e.id = 'edge-group-' + _0x53967f.id),
-        _0x45895e.setAttribute('class', 'connection-group'),
-        _0x45895e.setAttribute('data-conn-id', _0x53967f.id),
-        _0x860ab4.appendChild(_0x45895e));
-      const _0x3721eb = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      (_0x3721eb.setAttribute('class', 'connection-bg'), _0x45895e.appendChild(_0x3721eb));
-      const _0x256453 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      (_0x256453.setAttribute('class', 'connection-main'),
-        _0x45895e.appendChild(_0x256453),
-        (_0x7d2ab = { groupEl: _0x45895e, hoverPath: _0x3721eb, pathEl: _0x256453, highlighted: null }),
-        _edgeDomCache.set(_0x53967f.id, _0x7d2ab),
-        (_0x1849e6 += 1));
-    } else _0x1fbf51 += 1;
-    _syncEdgeHighlightClass(_0x7d2ab, _0x53967f.id, _0x11154a);
-    if (_0x52b574) {
-      const _0x4551d1 = Math.max(Math.abs(_0xa67b1b - _0x12d111) * 0.5, 60),
-        _0xa24ef3 =
-          'M ' +
-          _0x12d111 +
-          ' ' +
-          _0x14cab3 +
-          ' C ' +
-          (_0x12d111 + _0x4551d1) +
-          ' ' +
-          _0x14cab3 +
-          ', ' +
-          (_0xa67b1b - _0x4551d1) +
-          ' ' +
-          _0x1080d0 +
-          ', ' +
-          _0xa67b1b +
-          ' ' +
-          _0x1080d0;
-      _0x3f0dba.push({
-        domCache: _0x7d2ab,
-        d: _0xa24ef3,
-        endpointSignature: _0xc9a5c0,
-        edgeId: _0x53967f.id,
-      });
-    }
-  }
-  const _0x22e2dc = _nowMs();
-  for (const _0x54efbe of _0x3f0dba) {
-    (_0x54efbe.domCache.hoverPath.setAttribute('d', _0x54efbe.d),
-      _0x54efbe.domCache.pathEl.setAttribute('d', _0x54efbe.d),
-      _edgeEndpointSignatureCache.set(_0x54efbe.edgeId, _0x54efbe.endpointSignature));
-  }
-  const _0x3c61a8 = _nowMs();
+  _edgeLayer.renderFull({
+    svgEl: _0x860ab4,
+    edges: _0x2826c1,
+    nodes: _0x57c703,
+    viewport: _0x1889f6,
+    containerEl: _0x248971,
+    dragOffsetCtx: _0x5513f2,
+    relatedEdgeIds: _0x11154a,
+    edgeEntries: _0x57c361,
+    reason: _0x1b3c6a,
+    options: {
+      ..._0x4f77a1,
+      clearedDom: _edgeDomClearedSinceLastFull === true,
+    },
+  });
   _0x4f77a1?.renderSignature && (_lastFullEdgeRenderSignature = _0x4f77a1.renderSignature);
   _edgeDomClearedSinceLastFull = false;
-  const _0x2b5084 = _nowMs();
-  recordEdgeRedrawSample('full', _0x2b5084 - _0x57de3f, {
-    reason: _0x1b3c6a,
-    edgeCount: _0x3ec10a.length,
-    visibleEdgeCount: _0x2b1be5,
-    updatedCount: _0x3f0dba.length,
-    createdCount: _0x1849e6,
-    removedCount: _0x34bf01,
-    reusedCount: _0x1fbf51,
-    skippedInvisibleCount: _0x469a95,
-    cacheSize: _edgeDomCache.size,
-    layoutReadMs: _0x58c911.layoutReadMs,
-    pathBuildMs: Math.max(0, _0x22e2dc - _0x4b6650),
-    domWriteMs: Math.max(0, _0x3c61a8 - _0x22e2dc),
-    clearedDom: _0x23cbbc,
-  });
 }
 function _clearRenderedEdges(_0x3d7480) {
-  if (!_0x3d7480) return;
-  let _0x40a2c2 = 0;
-  (_0x3d7480.querySelectorAll('.connection-group').forEach((_0x12e267) => {
-    const _0x28bcbf = _0x12e267.getAttribute('data-conn-id');
-    (_0x28bcbf && (_edgeDomCache.delete(_0x28bcbf), _edgeEndpointSignatureCache.delete(_0x28bcbf)),
-      _0x12e267.remove(),
-      (_0x40a2c2 += 1));
-  }),
-    _0x3d7480.querySelectorAll('path').forEach((_0x6b28dd) => {
-      if (_0x6b28dd.id === 'v2-draft-edge') return;
-      if (!_0x6b28dd.id.startsWith('edge-') && !_0x6b28dd.id.startsWith('hover-edge-')) return;
-      const _0x42f128 = _0x6b28dd.id.replace('hover-edge-', '').replace('edge-', '');
-      (_edgeDomCache.delete(_0x42f128),
-        _edgeEndpointSignatureCache.delete(_0x42f128),
-        _0x6b28dd.remove(),
-        (_0x40a2c2 += 1));
-    }),
-    _0x40a2c2 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true }));
+  const _0x40a2c2 = _edgeLayer.clearRenderedEdges(_0x3d7480);
+  _0x40a2c2 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true });
 }
 function _clearRenderedEdgesFromDocument() {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') {
+    _edgeLayer.reset();
+    return;
+  }
   const _0x3be291 = document.getElementById?.('v2-edges');
   (_0x3be291 && _clearRenderedEdges(_0x3be291),
     document.getElementById?.('v2-draft-edge')?.remove?.(),
@@ -2383,28 +2081,7 @@ function _clearRenderedEdgesFromDocument() {
     document.querySelectorAll?.('[id^="v2-thumb-"]').forEach((_0xc6b343) => _0xc6b343.remove()));
 }
 function _cleanupEdges(_0xf153b8, _0x38acd6) {
-  let _0x43cb9c = 0;
-  const _0x5cfe2b = _0xf153b8.querySelectorAll('g.connection-group');
-  for (const _0x5dbe76 of _0x5cfe2b) {
-    const _0x5d1dd9 = _0x5dbe76.getAttribute('data-conn-id');
-    !_0x38acd6[_0x5d1dd9] &&
-      (_0x5dbe76.remove(),
-      (_0x43cb9c += 1),
-      _edgeDomCache.delete(_0x5d1dd9),
-      _edgeEndpointSignatureCache.delete(_0x5d1dd9));
-  }
-  const _0x40610e = _0xf153b8.querySelectorAll('path');
-  for (const _0x35c5ab of _0x40610e) {
-    if (_0x35c5ab.id === 'v2-draft-edge') continue;
-    if (_0x35c5ab.id.startsWith('edge-') || _0x35c5ab.id.startsWith('hover-edge-')) {
-      const _0x43fbd1 = _0x35c5ab.id.replace('hover-edge-', '').replace('edge-', '');
-      !_0x38acd6[_0x43fbd1] &&
-        (_0x35c5ab.remove(),
-        (_0x43cb9c += 1),
-        _edgeDomCache.delete(_0x43fbd1),
-        _edgeEndpointSignatureCache.delete(_0x43fbd1));
-    }
-  }
+  const _0x43cb9c = _edgeLayer.cleanupEdges(_0xf153b8, _0x38acd6);
   (document.querySelectorAll('.v2-edge-thumbnail').forEach((_0x2fa06a) => _0x2fa06a.remove()),
     document.querySelectorAll('[id^="v2-thumb-"]').forEach((_0x250aad) => _0x250aad.remove()),
     _0x43cb9c > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true }));
