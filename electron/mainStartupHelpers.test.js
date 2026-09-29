@@ -16,7 +16,7 @@ function makeDeps(overrides = {}) {
     },
   };
   const helpers = createStartupHelpers({
-    appDisplayName: 'AI CanvasPro',
+    appDisplayName: 'updream canvas',
     appOrigin: 'http://127.0.0.1:8777',
     getMainWindow: () => (overrides.window === null ? null : window),
     logDiagnosticEvent: (event) => events.push(event),
@@ -57,7 +57,7 @@ test('loadStartupStatus defaults the title to the app display name', () => {
   const { helpers, window } = makeDeps();
   helpers.loadStartupStatus();
   const html = decodeURIComponent(window.urls[0].slice('data:text/html;charset=utf-8,'.length));
-  assert.ok(html.includes('AI CanvasPro 正在启动'));
+  assert.ok(html.includes('updream canvas 正在启动'));
   assert.ok(html.includes('AccentColor'));
   assert.ok(html.includes('spin 0.9s linear infinite'));
 });

@@ -462,7 +462,7 @@ test('prepareChromeShellTaskbarIdentity forwards the resolved browser and profil
       appId: 'com.example.aicanvaspro',
       iconPath: 'C:\\App\\icon.ico',
       executablePath: 'C:\\App\\ai-canvaspro.exe',
-      displayName: 'AI CanvasPro',
+      displayName: 'updream canvas',
       sizeGuardDllPath: 'C:\\App\\size-guard.dll',
       minWidth: 1400,
     },
@@ -624,8 +624,8 @@ test('activateChromeShellWindowSoon spawns the windows activator with the decode
   const script = spawn.calls[0].args[0x5];
   assert.ok(script.startsWith('$targetPid = 4660\n$deadline = [DateTime]::UtcNow.AddMilliseconds(6000)'));
   assert.ok(script.includes('AicChromeShellWindowActivator'));
+  assert.ok(script.includes("-like '*updream canvas*'"));
   assert.ok(script.includes("-like '*AI CanvasPro*'"));
-  assert.ok(script.includes("-like '*AI Canvas*'"));
   assert.ok(!script.includes('SHUO'));
   assert.ok(script.endsWith('exit 0'));
   assert.equal(helper.state.unrefed, 0x1);
@@ -755,8 +755,11 @@ test('controlChromeShellLaunchWindow spawns an encoded focus helper carrying the
   const script = decodeUtf16Base64(spawn.calls[0].args[0x6]);
   assert.ok(script.includes('GetEnvironmentVariable("AIC_CHROME_SHELL_FOCUS_MODE")'));
   assert.ok(script.includes('AicChromeShellFocus'));
-  assert.ok(script.includes('-notlike "*AI CanvasPro*"'));
-  assert.ok(script.includes('-notlike "*AI Canvas*"'));
+  assert.ok(
+    script.includes(
+      '$title -notlike "*updream canvas*" -and $title -notlike "*AI CanvasPro*" -and $title -notlike "*AI Canvas*"',
+    ),
+  );
   assert.ok(!script.includes('SHUO'));
   assert.equal(spawn.calls[0].options.env.AIC_CHROME_SHELL_FOCUS_MODE, 'tracked');
   assert.equal(spawn.calls[0].options.env.AIC_CHROME_SHELL_WINDOW_ACTION, 'focus');

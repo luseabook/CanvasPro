@@ -28,7 +28,7 @@ export function createFullProjectPackageController({ dialog, getMainWindow, getR
         context.assertActive();
         const chosen = await dialog.showSaveDialog(getMainWindow(), {
           title: '保存完整工程包（请使用新文件名）', defaultPath: path.join(getDownloadsRoot(), sanitizeProjectName(payload.projectName || '完整工程') + '.aicpkg'),
-          filters: [{ name: 'AI CanvasPro Project Package', extensions: ['aicpkg'] }],
+          filters: [{ name: 'updream canvas Project Package', extensions: ['aicpkg'] }],
         });
         if (chosen.canceled || !chosen.filePath) return { success: false, canceled: true };
         context.assertActive();
@@ -48,7 +48,7 @@ export function createFullProjectPackageController({ dialog, getMainWindow, getR
           packagePath = consumeExternalPackageTicket(payload.externalPackageTicket);
           if (typeof packagePath !== 'string' || !path.isAbsolute(packagePath) || path.extname(packagePath).toLowerCase() !== '.aicpkg') throw new Error('系统工程包路径无效');
         } else {
-          const chosen = await dialog.showOpenDialog(getMainWindow(), { title: '恢复完整工程包为独立工程', properties: ['openFile'], filters: [{ name: 'AI CanvasPro Project Package', extensions: ['aicpkg'] }] });
+          const chosen = await dialog.showOpenDialog(getMainWindow(), { title: '恢复完整工程包为独立工程', properties: ['openFile'], filters: [{ name: 'updream canvas Project Package', extensions: ['aicpkg'] }] });
           if (chosen.canceled || !chosen.filePaths?.[0]) return { success: false, canceled: true };
           packagePath = chosen.filePaths[0];
         }

@@ -1,9 +1,9 @@
 {
-  "name": "ai-canvaspro",
+  "name": "updream-canvas",
   "private": true,
   "version": "0.4.12",
-  "description": "AI CanvasPro desktop editor",
-  "author": "AI CanvasPro",
+  "description": "updream canvas desktop editor",
+  "author": "updream canvas",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {

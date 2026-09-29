@@ -151,7 +151,7 @@ export function createGlobalCaptureWindowController({
     ((captureWindow = new BrowserWindowClass({
       width: windowSize['width'],
       height: windowSize['height'],
-      title: '发送到 AI CanvasPro 无限画布',
+      title: '发送到 updream canvas 无限画布',
       show: ![],
       frame: ![],
       thickFrame: ![],

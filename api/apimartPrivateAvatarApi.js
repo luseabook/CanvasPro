@@ -238,7 +238,7 @@ export async function submitApimartSeedance2PrivateAvatar({
     ? (_0x135350.group_id = _0x4a30cf)
     : (_0x135350.group = {
         name: String(_0x3c2a76?.name || DEFAULT_GROUP_NAME).trim() || DEFAULT_GROUP_NAME,
-        description: String(_0x3c2a76?.description || 'AI Canvas Seedance 2.0 private avatar assets').trim(),
+        description: String(_0x3c2a76?.description || 'updream canvas Seedance 2.0 private avatar assets').trim(),
       });
   const _0x2df3c9 = await post(
     '/api/v2/proxy/image',

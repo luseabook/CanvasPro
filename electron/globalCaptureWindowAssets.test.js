@@ -40,7 +40,7 @@ test('the panel document declares the module entry, the theme hooks and the styl
 });
 
 test('the panel document is rebranded and carries no legacy brand string', () => {
-  assert.match(html, /<title>发送到 AI CanvasPro 无限画布<\/title>/);
+  assert.match(html, /<title>发送到 updream canvas 无限画布<\/title>/);
   for (const [label, text] of [
     ['html', html],
     ['renderer', renderer],

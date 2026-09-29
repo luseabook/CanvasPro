@@ -2,9 +2,9 @@
 
 <div align="center">
 
-<img src="images\favicon.svg" width="64" height="64" alt="AI Canvas Logo"/>
+<img src="images\favicon.svg" width="64" height="64" alt="updream canvas Logo"/>
 
-# AI Canvas
+# updream canvas
 
 **基于节点的 AI 多模态画布编辑器**
 
@@ -97,9 +97,9 @@
 1. **下载整合包**
    [点击下载](https://github.com/ashuoAI/AI-CanvasPro/releases)
 2. **解压文件**
-   将下载的压缩包解压到不带中文的路径，例如 `D:\AI-CanvasPro`
+   将下载的压缩包解压到不带中文的路径，例如 `D:\updream-canvas`
 3. **一键启动**
-   直接双击 **`AI CanvasPro.exe`** 文件即可
+   直接双击 **`updream canvas.exe`** 文件即可
 
 ***
 

@@ -190,7 +190,7 @@ class OverlayWindow {
     hwnd_ = CreateWindowEx(
         WS_EX_TOPMOST | WS_EX_TOOLWINDOW,
         wc.lpszClassName,
-        L"AI Canvas Screenshot",
+        L"updream canvas Screenshot",
         WS_POPUP,
         0,
         0,

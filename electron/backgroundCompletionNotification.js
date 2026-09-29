@@ -89,7 +89,7 @@ export function createBackgroundCompletionNotifier({
   globalShortcutApi: globalShortcutApi,
   logEvent: logEvent,
   resolveNotificationIconPath: resolveNotificationIconPath,
-  appName: appName = 'AI CanvasPro',
+  appName: appName = 'updream canvas',
   platform: platform = process.platform,
   setTimeoutFn: setTimeoutFn = setTimeout,
   clearTimeoutFn: clearTimeoutFn = clearTimeout,

@@ -62,6 +62,7 @@ dreamina-login-qr.png
 
 # Ignore electron related files
 **/electron*
+!electron-builder.win.cjs
 *.electron*
 **/electron*/
 !electron/    

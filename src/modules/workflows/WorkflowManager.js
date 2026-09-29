@@ -82,7 +82,7 @@ function formatWorkflowMetaLine(_0xd3eb62) {
 function showToast(_0xf641dd, _0x2fbebf = 'info') {
   window.showToast?.(_0xf641dd, _0x2fbebf);
 }
-function appendCoverPlaceholder(_0x488cdc, _0x28434a = 'AI Canvas') {
+function appendCoverPlaceholder(_0x488cdc, _0x28434a = 'updream canvas') {
   if (!_0x488cdc) return;
   _0x488cdc.replaceChildren(el('div', 'v2-workflow-cover-placeholder', _0x28434a));
 }
@@ -336,7 +336,7 @@ export class WorkflowManager {
       _0x40b607 = el('div', 'v2-workflow-empty-text', _0x3886fb);
     return (_0x5ccd5a.appendChild(_0x40b607), _0x5ccd5a);
   }
-  ['renderCover'](_0x4a1c0c, _0x4c42b9 = 'v2-workflow-cover', _0x4d9686 = 'AI Canvas') {
+  ['renderCover'](_0x4a1c0c, _0x4c42b9 = 'v2-workflow-cover', _0x4d9686 = 'updream canvas') {
     const _0x40f737 = el('div', _0x4c42b9),
       _0x188ffd = cleanText(_0x4a1c0c);
     appendCoverPlaceholder(_0x40f737, _0x4d9686);

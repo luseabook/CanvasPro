@@ -143,7 +143,7 @@ export async function buildGenerationCompleteNotificationRequest(
       ? t('coreServices.completion.notificationNodeBody', { name: _0x579d1d })
       : t('coreServices.completion.notificationBody');
   return {
-    title: normalizeText(_0x2ec05c?.['title']) || 'AI CanvasPro',
+    title: normalizeText(_0x2ec05c?.['title']) || 'updream canvas',
     body: normalizeText(_0x2ec05c?.['body']) || _0x405e86,
     ...(_0x511305 ? { thumbnailLocalPath: _0x511305 } : {}),
     ...(_0x2ec05c?.['navigation'] && typeof _0x2ec05c['navigation'] === 'object'
@@ -224,7 +224,7 @@ export async function showTaskStatusNotification({
   if (_0x1997fe['notificationEnabled'] !== ![] && _0x1f0ab8?.['isAvailable']?.() !== ![]) {
     const _0x197a81 = Promise['resolve']()['then'](() =>
       _0x1f0ab8?.['showGenerationComplete']?.({
-        title: 'AI CanvasPro',
+        title: 'updream canvas',
         body: _0x4c49ca,
         ...(_0x394f11 ? { navigation: _0x394f11, notificationId: _0x4365f8['notificationId'] } : {}),
       }),

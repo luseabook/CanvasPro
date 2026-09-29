@@ -161,7 +161,7 @@ function _isReleaseFooterLine(_0x4e58bc) {
   const _0x312cfe = String(_0x4e58bc || '').trim();
   if (!_0x312cfe) return false;
   return (
-    /^AI-CanvasPro[！!]/u.test(_0x312cfe) ||
+    /^(?:AI-CanvasPro|updream-canvas)[！!]/u.test(_0x312cfe) ||
     /^注[：:]/u.test(_0x312cfe) ||
     /^BUG问题/u.test(_0x312cfe) ||
     /^https?:\/\//i.test(_0x312cfe) ||

@@ -335,7 +335,7 @@ def diarize_with_sortformer(args: argparse.Namespace) -> int:
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="AI CanvasPro Sortformer speaker diarization helper")
+    parser = argparse.ArgumentParser(description="updream canvas Sortformer speaker diarization helper")
     parser.add_argument("--audio", default="", help="Path to a 16 kHz mono wav audio file")
     parser.add_argument("--model-root", required=True, help="Writable Sortformer model/cache root")
     parser.add_argument("--duration-ms", type=int, default=0, help="Source media duration in milliseconds")

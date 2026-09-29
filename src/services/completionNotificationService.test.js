@@ -36,7 +36,7 @@ const originalWindow = globalThis.window;
       }));
     const _0x56e1fa = await showGenerationCompleteNotification();
     (assert.deepEqual(_0x56e1fa, { success: true, shown: true }),
-      assert.deepEqual(_0xfbd86a, [{ title: 'AI CanvasPro', body: '生成任务已完成。' }]));
+      assert.deepEqual(_0xfbd86a, [{ title: 'updream canvas', body: '生成任务已完成。' }]));
   }),
   test('completionNotificationService: skips when disabled in settings', async () => {
     const _0x53e795 = [];
@@ -62,7 +62,7 @@ test('completionNotificationService: builds a node-aware request with the local 
     navigation: { source: 'canvas', nodeId: 'n1' },
   });
   assert.deepEqual(request, {
-    title: 'AI CanvasPro',
+    title: 'updream canvas',
     body: '“图片 1”生成完成。',
     thumbnailLocalPath: 'data/assets/a.png',
     navigation: { source: 'canvas', nodeId: 'n1' },
@@ -86,7 +86,7 @@ test('completionNotificationService: video requests use the injected first-frame
   assert.equal(seen.length, 1);
   assert.equal(seen[0].localPath, 'data/assets/a.mp4');
   assert.deepEqual(request, {
-    title: 'AI CanvasPro',
+    title: 'updream canvas',
     body: '“视频 1”生成完成。',
     thumbnailLocalPath: 'data/assets/a.thumb.jpg',
   });
@@ -101,7 +101,7 @@ test('completionNotificationService: a failing first-frame enhancer still yields
       },
     },
   );
-  assert.deepEqual(request, { title: 'AI CanvasPro', body: '“视频 2”生成完成。' });
+  assert.deepEqual(request, { title: 'updream canvas', body: '“视频 2”生成完成。' });
 });
 
 test('completionNotificationService: navigation payload drives the toast and the native delivery', async () => {
@@ -189,7 +189,7 @@ test('completionNotificationService: task status notifications reuse the toast a
     assert.equal(toasts[0][3].ariaLabel, '生成失败，点击查看任务'),
     assert.deepEqual(played, [{ system: true }]),
     assert.equal(delivered.length, 1),
-    assert.equal(delivered[0].title, 'AI CanvasPro'),
+    assert.equal(delivered[0].title, 'updream canvas'),
     assert.equal(delivered[0].body, '生成失败'),
     assert.deepEqual(delivered[0].navigation, { source: 'canvas', nodeId: 'n1' }));
 });

@@ -119,8 +119,8 @@ jobs:
           cat > electron-builder.mac-arm64.cjs <<'EOF'
           module.exports = {
             appId: "com.aicanvaspro.editor",
-            productName: "AI CanvasPro",
-            copyright: "Copyright (c) 2026 AI CanvasPro",
+            productName: "updream canvas",
+            copyright: "Copyright (c) 2026 updream canvas",
             asar: false,
             directories: {
               output: "dist-mac",
@@ -167,16 +167,16 @@ jobs:
                 { target: "dmg", arch: ["arm64"] },
                 { target: "zip", arch: ["arm64"] }
               ],
-              artifactName: "AI-CanvasPro-Mac-${arch}-${version}.${ext}"
+              artifactName: "updream-canvas-Mac-${arch}-${version}.${ext}"
             },
             dmg: {
-              artifactName: "AI-CanvasPro-Mac-${arch}-${version}.${ext}"
+              artifactName: "updream-canvas-Mac-${arch}-${version}.${ext}"
             },
             fileAssociations: [
               {
                 ext: ["aicanvas", "aicproj"],
-                name: "AI CanvasPro Project",
-                description: "AI CanvasPro Project"
+                name: "updream canvas Project",
+                description: "updream canvas Project"
               }
             ]
           };
@@ -221,6 +221,6 @@ jobs:
             gh release upload "$TAG" "${ASSETS[@]}" --clobber
           else
             gh release create "$TAG" "${ASSETS[@]}" \
-              --title "AI CanvasPro v$VERSION" \
-              --notes "macOS Apple Silicon build for AI CanvasPro v$VERSION"
+              --title "updream canvas v$VERSION" \
+              --notes "macOS Apple Silicon build for updream canvas v$VERSION"
           fi

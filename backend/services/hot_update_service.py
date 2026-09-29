@@ -162,7 +162,7 @@ class HotUpdateService:
 
     def fetch_update_manifest(self):
         headers = {
-            "User-Agent": "AI-CanvasPro-AutoUpdate/2.0",
+            "User-Agent": "updream-canvas-AutoUpdate/2.0",
             "Accept": "application/json, application/octet-stream;q=0.9, */*;q=0.8",
         }
         req = urllib.request.Request(self.update_manifest_url, headers=headers)

@@ -110,8 +110,9 @@ import {
   writeRecoverySnapshot,
 } from '../src/services/desktopProjectFileStore.js';
 import { registerIpcHandlers } from './ipc/registerIpcHandlers.js';
-const APP_DISPLAY_NAME = 'AI CanvasPro',
-  APP_USER_DATA_ROOT = path.join(app.getPath('appData'), APP_DISPLAY_NAME),
+const APP_DISPLAY_NAME = 'updream canvas',
+  APP_DATA_DIRECTORY_NAME = 'AI CanvasPro',
+  APP_USER_DATA_ROOT = path.join(app.getPath('appData'), APP_DATA_DIRECTORY_NAME),
   __filename = fileURLToPath(import.meta.url),
   __dirname = path.dirname(__filename),
   APP_ROOT = app.isPackaged ? app.getAppPath() : path.resolve(__dirname, '..'),
@@ -138,7 +139,7 @@ const APP_DISPLAY_NAME = 'AI CanvasPro',
   SERVER_READY_INTERVAL_MS = 0x190,
   LOCAL_ACCESS_TOKEN = randomBytes(32).toString('hex'),
   SERVER_ID_HEADER = 'x-aicanvas-server',
-  SERVER_ID_VALUE = 'AI CanvasPro',
+  SERVER_ID_VALUE = APP_DISPLAY_NAME,
   LOCAL_PREVIEW_SCHEME = 'aic-local-preview',
   LOCAL_PREVIEW_TTL_MS = 12 * 60 * 60 * 0x3e8,
   CLIPBOARD_FILE_REFERENCES_FORMAT = 'application/x-ai-canvas-file-references',
@@ -1460,7 +1461,7 @@ function getLocalAssetCleanupManager() {
 function getProjectDialogFilters() {
   return [
     {
-      name: 'AI CanvasPro Project',
+      name: 'updream canvas Project',
       extensions: SUPPORTED_PROJECT_FILE_EXTENSIONS.map((_0x51baab) => _0x51baab.replace(/^\./, '')),
     },
   ];

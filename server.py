@@ -1,5 +1,5 @@
 r"""
-./server.py - AI Canvas V2 本地服务
+./server.py - updream canvas V2 本地服务
 
 用法:
   cd v2
@@ -2600,7 +2600,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         has_cors = any(b"Access-Control-Allow-Origin:" in h for h in header_buf)
         has_server_id = any(b"X-AICanvas-Server:" in h for h in header_buf)
         if not has_server_id:
-            self.send_header("X-AICanvas-Server", "AI CanvasPro")
+            self.send_header("X-AICanvas-Server", "updream canvas")
         if not has_cache_control:
             self.send_header(
                 "Cache-Control",
@@ -3620,7 +3620,7 @@ if __name__ == "__main__":
             print("[security] 0.0.0.0 需要显式局域网模式，已回退到 127.0.0.1")
         if lan_mode:
             print("[security] 局域网模式已开启，请通过 AIC_ALLOWED_ORIGINS 配置可信 Origin")
-        print("AI Canvas 服务已启动")
+        print("updream canvas 服务已启动")
         for url in _display_urls(bind_host, port):
             print(url)
         print("按 Ctrl+C 停止服务")

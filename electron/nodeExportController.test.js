@@ -79,7 +79,7 @@ test('exportSelectedNodesPackage falls back to the native save dialog and honour
     assert.equal(seen[0].title, '批量下载节点');
     assert.equal(seen[0].filters[0].extensions[0], 'zip');
     assert.equal(path.dirname(seen[0].defaultPath), root);
-    assert.match(path.basename(seen[0].defaultPath), /^AI-CanvasPro-Export-\d{8}-\d{6}\.zip$/);
+    assert.match(path.basename(seen[0].defaultPath), /^updream-canvas-Export-\d{8}-\d{6}\.zip$/);
 
     const chosen = buildController(root, {
       showSaveDialog: async () => ({ canceled: false, filePath: path.join(root, 'picked') }),

@@ -120,7 +120,7 @@ function createManager(logDir, overrides = {}) {
     launchSessionId: 'sid-manager',
     serverLogPath: path.join(logDir, 'server.log'),
     app: null,
-    getMetadata: async () => ({ app: { name: 'AI CanvasPro' } }),
+    getMetadata: async () => ({ app: { name: 'updream canvas' } }),
     ...overrides,
   });
 }
@@ -502,7 +502,7 @@ test('getSuggestedPackagePath prefers the downloads folder and falls back to the
   const logDir = createTempDir('aic-diag-suggest-');
   const downloads = createTempDir('aic-diag-downloads-');
   const date = new Date(2026, 8, 24, 12, 34, 56);
-  const expected = 'AI-CanvasPro-Diagnostics-20260924-123456.zip';
+  const expected = 'updream-canvas-Diagnostics-20260924-123456.zip';
   try {
     const fromDownloads = createManager(logDir, { app: { getPath: () => downloads } });
     assert.equal(fromDownloads.getSuggestedPackagePath(date), path.join(downloads, expected));
@@ -545,7 +545,7 @@ test('createPackage writes a redacted diagnostics archive with a manifest and su
     seedLogDir(logDir);
     const manager = createManager(logDir, {
       getMetadata: async () => ({
-        app: { name: 'AI CanvasPro' },
+        app: { name: 'updream canvas' },
         extra: { apiKey: 'SECRETVALUE' },
         secrets: { apiKey: 'SECRETVALUE' },
       }),
@@ -566,7 +566,7 @@ test('createPackage writes a redacted diagnostics archive with a manifest and su
     ]);
 
     const metadata = readZipJson(entries, 'metadata.json');
-    assert.equal(metadata.app.name, 'AI CanvasPro');
+    assert.equal(metadata.app.name, 'updream canvas');
     assert.equal(metadata.extra.apiKey, REDACTED);
     assert.equal(metadata.secrets, REDACTED);
     assert.equal(metadata.host.platform, process.platform);
@@ -688,7 +688,7 @@ test('createPackage defaults to the suggested path and includes an AI analysis r
     const result = await manager.createPackage({
       aiAnalysisReport: { summary: 'ok', apiKey: 'SECRETVALUE' },
     });
-    assert.match(path.basename(result.path), /^AI-CanvasPro-Diagnostics-\d{8}-\d{6}\.zip$/);
+    assert.match(path.basename(result.path), /^updream-canvas-Diagnostics-\d{8}-\d{6}\.zip$/);
     assert.equal(result.filename, path.basename(result.path));
     assert.equal(path.dirname(result.path), manager.diagnosticsDir);
     const entries = readZipEntries(result.path);

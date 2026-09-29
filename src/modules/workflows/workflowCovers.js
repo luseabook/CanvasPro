@@ -617,7 +617,7 @@ export function extractWorkflowCoverCandidates(_0x4072d4) {
     .map(({ priority: _0x26c83f, order: _0x198c28, ..._0x3c12fb }) => _0x3c12fb);
 }
 export function getDefaultWorkflowCoverCandidate() {
-  return { id: DEFAULT_WORKFLOW_COVER_ID, src: '', nodeId: '', label: 'AI Canvas' };
+  return { id: DEFAULT_WORKFLOW_COVER_ID, src: '', nodeId: '', label: 'updream canvas' };
 }
 export function isDataImageCover(_0x6ce797) {
   return cleanText(_0x6ce797).startsWith('data:image/');

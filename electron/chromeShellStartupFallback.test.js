@@ -58,7 +58,7 @@ test('the missing-browser prompt offers download, compat mode and quit in that o
   assert.equal(dialog.calls.length, 1);
   const payload = dialog.calls[0];
   assert.equal(payload.type, 'warning');
-  assert.equal(payload.title, 'AI CanvasPro 启动提示');
+  assert.equal(payload.title, 'updream canvas 启动提示');
   assert.equal(payload.message, '未检测到 Chrome 浏览器内核');
   assert.deepEqual(payload.buttons, ['重新下载 Chrome', '进入兼容模式', '退出']);
   assert.equal(payload.defaultId, 0);
@@ -66,7 +66,7 @@ test('the missing-browser prompt offers download, compat mode and quit in that o
   assert.equal(payload.noLink, true);
   assert.ok(payload.detail.includes('缺少 Chrome 浏览器内核，部分功能将无法正常使用。'));
   assert.ok(
-    payload.detail.includes('请重新下载安装最新版 Google Chrome 浏览器，然后重新启动 AI CanvasPro。'),
+    payload.detail.includes('请重新下载安装最新版 Google Chrome 浏览器，然后重新启动 updream canvas。'),
   );
   assert.ok(payload.detail.includes('兼容模式下部分功能不可用，包括部分视频截帧和关键帧功能。'));
 });
@@ -149,7 +149,7 @@ test('a locked profile reported through EPERM is named in the timeout detail', a
   const error = readyTimeoutError({ causeCode: 'EPERM', profileRecovery: true });
   assert.equal(await promptForChromeShellStartupFailure({ dialogApi: dialog.api, error: error }), 'electron');
   const payload = dialog.calls[0];
-  assert.equal(payload.title, 'AI CanvasPro 启动超时');
+  assert.equal(payload.title, 'updream canvas 启动超时');
   assert.equal(payload.message, '画布页面未能就绪');
   assert.deepEqual(payload.buttons, ['进入兼容模式', '退出']);
   assert.equal(payload.defaultId, 0);
@@ -191,7 +191,7 @@ test('a storage-migration startup failure is described as an incomplete data upg
   const error = Object.assign(new Error('migration failed'), { details: { stage: 'storage-migration' } });
   assert.equal(await promptForChromeShellStartupFailure({ dialogApi: dialog.api, error: error }), 'electron');
   const payload = dialog.calls[0];
-  assert.equal(payload.title, 'AI CanvasPro 启动失败');
+  assert.equal(payload.title, 'updream canvas 启动失败');
   assert.equal(payload.message, '画布未能完成加载');
   assert.ok(payload.detail.includes('升级数据恢复未完成，已停止进入画布，原迁移数据仍保留。'));
   assert.ok(payload.detail.includes('migration failed'));

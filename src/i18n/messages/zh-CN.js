@@ -1,6 +1,6 @@
 const zhCN = Object.freeze({
   app: Object.freeze({
-    documentTitle: 'AI Canvas - AI 画布',
+    documentTitle: 'updream canvas',
     serverDisconnected:
       '⚠️ 警告：与本地服务器断开连接，功能将受限。请检查后台终端（黑框）是否被意外关闭，若关闭请重新「双击运行。bat」。',
     quickGenerate: 'AiCanvas Agent',
@@ -95,7 +95,7 @@ const zhCN = Object.freeze({
     addCanvasPage: '新建画布页面',
     currentVersion: '当前版本',
     canvasProject: '画布项目',
-    canvasTitle: 'AI 画布',
+    canvasTitle: 'updream canvas',
     loading: '加载中...',
     newCanvas: '新建画布',
   }),
@@ -473,7 +473,7 @@ const zhCN = Object.freeze({
       rootDir: Object.freeze({
         label: '保存根目录',
         desc: '项目、数据和输出会统一保存在该目录下',
-        placeholder: '例如 D:\\AI CanvasPro Files',
+        placeholder: '例如 D:\\updream canvas Files',
         pickAria: '选择保存根目录',
         choose: '选择',
       }),
@@ -859,7 +859,7 @@ const zhCN = Object.freeze({
   about: Object.freeze({
     author: '作者：',
     bilibili: '访问 Bilibili 主页',
-    footer: '© 2026 AI Canvas. All rights reserved...',
+    footer: '© 2026 updream canvas. All rights reserved...',
   }),
   appPanels: Object.freeze({
     tutorial: Object.freeze({
