@@ -4,6 +4,7 @@ import re
 from urllib.parse import parse_qs, unquote, urlparse
 
 from backend.services.media_file_route_service import MediaFileRouteService
+from backend.services.path_security import safe_json_filename, confined_json_path
 
 
 class JsonFileRouteService:
@@ -69,13 +70,18 @@ class JsonFileRouteService:
 
     @staticmethod
     def _safe_json_filename(filename):
-        name = str(filename or "")
-        return bool(name and name.endswith(".json") and "/" not in name and ".." not in name)
+        return bool(safe_json_filename(filename))
 
     @staticmethod
     def _valid_json_path_fragment(filename):
-        name = str(filename or "")
-        return bool(name and name.endswith(".json") and ".." not in name)
+        return bool(safe_json_filename(filename))
+
+    @staticmethod
+    def _json_path(directory, filename):
+        try:
+            return confined_json_path(directory, filename)
+        except ValueError:
+            return None
 
     @staticmethod
     def _safe_name(value):
@@ -89,11 +95,8 @@ class JsonFileRouteService:
         except Exception:
             return default
 
-    @staticmethod
-    def _write_json_file(path, data):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w", encoding="utf-8") as file:
-            json.dump(data, file, ensure_ascii=False, indent=2)
+    def _write_json_file(self, path, data):
+        self._atomic_write_json(path, data)
 
     def _list_projects(self):
         canvas_dir = self._get_canvas_dir()
@@ -101,7 +104,9 @@ class JsonFileRouteService:
         for filename in os.listdir(canvas_dir):
             if not filename.endswith(".json"):
                 continue
-            path = os.path.join(canvas_dir, filename)
+            path = self._json_path(canvas_dir, filename)
+            if not path or not os.path.isfile(path):
+                continue
             files.append(
                 {
                     "filename": filename,
@@ -114,9 +119,9 @@ class JsonFileRouteService:
 
     def _load_project(self, path):
         filename = unquote(path[len("/api/v2/projects/") :])
-        if not filename or ".." in filename:
-            return None
-        project_path = os.path.join(self._get_canvas_dir(), filename)
+        project_path = self._json_path(self._get_canvas_dir(), filename)
+        if not project_path:
+            return self._json_err(400, "Invalid filename")
         if not os.path.exists(project_path):
             return self._json_err(404, "Project not found")
         with open(project_path, "r", encoding="utf-8-sig") as file:
@@ -128,7 +133,9 @@ class JsonFileRouteService:
             for filename in os.listdir(directory):
                 if not filename.endswith(".json"):
                     continue
-                path = os.path.join(directory, filename)
+                path = self._json_path(directory, filename)
+                if not path or not os.path.isfile(path):
+                    continue
                 data = self._load_json_file(path)
                 if isinstance(data, dict):
                     if id_from_filename and not data.get("id"):
@@ -288,12 +295,14 @@ class JsonFileRouteService:
         }
 
     def _load_user_json(self, path):
-        filename = path[len("/api/v2/user/") :]
+        filename = unquote(path[len("/api/v2/user/") :])
         if not self._safe_json_filename(filename):
             return None
         if filename == "settings.json":
             return self._json_ok(self._read_user_settings())
-        file_path = os.path.join(self._get_user_dir(), filename)
+        file_path = self._json_path(self._get_user_dir(), filename)
+        if not file_path:
+            return self._json_err(400, "Invalid filename")
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8-sig") as file:
                 return self._json_ok(json.load(file))
@@ -305,7 +314,9 @@ class JsonFileRouteService:
             return error
         name = str(data.get("projectName", "未命名画布")).strip() or "未命名画布"
         filename = self._safe_name(name) + ".json"
-        path = os.path.join(self._get_canvas_dir(), filename)
+        path = self._json_path(self._get_canvas_dir(), filename)
+        if not path:
+            return self._json_err(400, "Invalid filename")
         if "canvases" in data:
             payload = {
                 "canvases": data["canvases"],
@@ -328,7 +339,10 @@ class JsonFileRouteService:
         if not asset_id:
             return self._json_err(400, "Asset ID required")
         filename = self._safe_name(asset_id) + ".json"
-        self._write_json_file(os.path.join(self._get_assets_dir(), filename), data)
+        file_path = self._json_path(self._get_assets_dir(), filename)
+        if not file_path:
+            return self._json_err(400, "Invalid filename")
+        self._write_json_file(file_path, data)
         return self._json_ok({"success": True, "id": asset_id})
 
     def _save_workflow(self, body):
@@ -341,11 +355,14 @@ class JsonFileRouteService:
         filename = self._safe_name(workflow_id) + ".json"
         if not data.get("scope"):
             data["scope"] = "private"
-        self._write_json_file(os.path.join(self._get_workflows_dir(), filename), data)
+        file_path = self._json_path(self._get_workflows_dir(), filename)
+        if not file_path:
+            return self._json_err(400, "Invalid filename")
+        self._write_json_file(file_path, data)
         return self._json_ok({"success": True, "id": workflow_id})
 
     def _save_user_json(self, path, body):
-        filename = path[len("/api/v2/user/") :]
+        filename = unquote(path[len("/api/v2/user/") :])
         if not self._safe_json_filename(filename):
             return self._json_err(400, "Invalid filename")
         data, error = self._parse_json_value(body)
@@ -362,7 +379,10 @@ class JsonFileRouteService:
                     "settings": self._read_user_settings(),
                 }
             )
-        self._write_json_file(os.path.join(self._get_user_dir(), filename), data)
+        file_path = self._json_path(self._get_user_dir(), filename)
+        if not file_path:
+            return self._json_err(400, "Invalid filename")
+        self._write_json_file(file_path, data)
         return self._json_ok({"success": True})
 
     def _start_file_save_migration_job(self, body):
@@ -422,7 +442,9 @@ class JsonFileRouteService:
         filename = unquote(path[len(prefix) :])
         if not self._valid_json_path_fragment(filename):
             return self._json_err(400, "Invalid request")
-        file_path = os.path.join(directory, filename)
+        file_path = self._json_path(directory, filename)
+        if not file_path:
+            return self._json_err(400, "Invalid filename")
         if not os.path.exists(file_path):
             return self._json_err(404, not_found_message)
         os.remove(file_path)
@@ -432,7 +454,9 @@ class JsonFileRouteService:
         filename = unquote(path[len("/api/v2/projects/") :])
         if not self._valid_json_path_fragment(filename):
             return self._json_err(400, "Invalid request")
-        file_path = os.path.join(self._get_canvas_dir(), filename)
+        file_path = self._json_path(self._get_canvas_dir(), filename)
+        if not file_path:
+            return self._json_err(400, "Invalid filename")
         if not os.path.exists(file_path):
             return self._json_err(404, "Project not found")
         data, error = self._parse_json_object(body)
@@ -442,7 +466,12 @@ class JsonFileRouteService:
         if not new_name:
             return self._json_err(400, "Name required")
         new_filename = self._safe_name(new_name) + ".json"
-        os.rename(file_path, os.path.join(self._get_canvas_dir(), new_filename))
+        new_path = self._json_path(self._get_canvas_dir(), new_filename)
+        if not new_path:
+            return self._json_err(400, "Invalid filename")
+        if os.path.exists(new_path) and os.path.normcase(new_path) != os.path.normcase(file_path):
+            return self._json_err(409, "A project with that name already exists")
+        os.rename(file_path, new_path)
         return self._json_ok({"success": True, "filename": new_filename})
 
     def handle_get(self, handler, path):

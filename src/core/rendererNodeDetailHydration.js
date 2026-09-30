@@ -21,6 +21,7 @@ export function createNodeDetailHydrationController({
     _0x15dc6f = new Set(),
     _0x3414de = null,
     _0x463457 = '';
+  let paused = false;
   function _0x305474() {
     if (_0x3414de === null) return;
     if (_0x463457 === 'idle' && typeof cancelIdleCallback === 'function') cancelIdleCallback(_0x3414de);
@@ -38,7 +39,7 @@ export function createNodeDetailHydrationController({
     _0x31f84d?.(_0x271034, _0x2b1d3a);
   }
   function _0x1d96f7() {
-    if (_0x3414de !== null) return;
+    if (paused || _0x3414de !== null) return;
     if (_0x32804f?.()) {
       ((_0x463457 = 'timeout'),
         (_0x3414de = setTimeout(() => _0x160f0a(), NODE_DETAIL_HYDRATION_BUSY_RETRY_MS)));
@@ -58,6 +59,7 @@ export function createNodeDetailHydrationController({
   }
   function _0x160f0a(_0x5d3dde = null) {
     ((_0x3414de = null), (_0x463457 = ''));
+    if (paused) return;
     if (_0x32804f?.()) {
       _0x1d96f7();
       return;
@@ -82,6 +84,7 @@ export function createNodeDetailHydrationController({
     (_0x15dc6f.add(_0x937cb), _0x332a4d.push(_0x937cb), _0x1d96f7());
   }
   function _0x1f55a3() {
+    paused = false;
     if (_0x332a4d.length === 0) return;
     _0x1d96f7();
   }
@@ -185,6 +188,7 @@ export function createNodeDetailHydrationController({
     forgetNodeDetailHydration: _0x4a54c4,
     hydrateNodeDetails: _0x16e45a,
     isNodeDetailActive: _0x21fd84,
+    pause() { paused = true; _0x305474(); },
     resumeNodeDetailHydration: _0x1f55a3,
     shouldDeferNodeDetails: _0x4ca8df,
     syncNodeDetailMountStage: _0x5182db,

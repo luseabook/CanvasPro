@@ -23,7 +23,8 @@ export function showToast(_0x20ad90, _0x1d5988 = 'ok', _0x5a8d6c) {
       _0x55fffc.appendChild(_0x124f90));
   }
   const _0x31ec96 = document.createElement('span');
-  ((_0x31ec96.textContent = _0x20ad90),
+  const message = String(_0x20ad90 ?? '').replace(/\s+/g, ' ').trim();
+  ((_0x31ec96.textContent = message.length > 320 ? message.slice(0, 319) + '…' : message),
     _0x55fffc.appendChild(_0x31ec96),
     _0x9863da.appendChild(_0x55fffc),
     setTimeout(() => {

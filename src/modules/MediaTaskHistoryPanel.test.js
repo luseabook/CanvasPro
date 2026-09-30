@@ -60,7 +60,7 @@ test('reading is passive; a selected row is bound to its recordId before recover
   assert.deepEqual(recovery.lookups, ['task-1']);
   const selected = await recovery.api.list({ taskId: 'task-1' });
   assert.equal(selected[0].history.recordId, RECORD);
-  assert.deepEqual(queries[1], { recordId: RECORD, limit: 1 });
+  assert.deepEqual(queries[1], { offset: 0, recordId: RECORD, limit: 1 });
 });
 test('opt-in requires explicit confirmation and a fresh session/revision token', async t => {
   let approved = false, calls = 0, request;

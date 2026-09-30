@@ -7,7 +7,20 @@ import {
 } from './refThumbMediaReveal.js';
 const ORIGINAL_IMAGE = globalThis.Image,
   ORIGINAL_REQUEST_ANIMATION_FRAME = globalThis.requestAnimationFrame,
-  ORIGINAL_SET_TIMEOUT = globalThis.setTimeout;
+  ORIGINAL_SET_TIMEOUT = globalThis.setTimeout,
+  ORIGINAL_CLEAR_TIMEOUT = globalThis.clearTimeout;
+// Match real timer cancellation: the shared scheduler cancels its timeout after decode.
+function installTimerQueue(queue) {
+  let sequence = 0;
+  globalThis.setTimeout = callback => {
+    const entry = () => callback(); entry.timerId = ++sequence;
+    queue.push(entry); return entry.timerId;
+  };
+  globalThis.clearTimeout = id => {
+    const index = queue.findIndex(entry => entry.timerId === id);
+    if (index >= 0) queue.splice(index, 1);
+  };
+}
 function flushMicrotasks() {
   let _0x5723a6 = Promise.resolve();
   for (let _0xc18070 = 0; _0xc18070 < 8; _0xc18070 += 1) {
@@ -88,7 +101,8 @@ function installFakeImage(_0x4cabde) {
   (typeof ORIGINAL_REQUEST_ANIMATION_FRAME === 'undefined'
     ? delete globalThis.requestAnimationFrame
     : (globalThis.requestAnimationFrame = ORIGINAL_REQUEST_ANIMATION_FRAME),
-    (globalThis.setTimeout = ORIGINAL_SET_TIMEOUT));
+    (globalThis.setTimeout = ORIGINAL_SET_TIMEOUT),
+    (globalThis.clearTimeout = ORIGINAL_CLEAR_TIMEOUT));
 }),
   test('ensureThumbDecoded retries the same src after a failed decode', async () => {
     const _0x288184 = installFakeImage([false, true]);
@@ -103,9 +117,7 @@ function installFakeImage(_0x4cabde) {
     ((globalThis.requestAnimationFrame = (_0x5791c7) => {
       return (_0x5791c7(), 1);
     }),
-      (globalThis.setTimeout = (_0x4da928) => {
-        return (_0x553053.push(_0x4da928), _0x553053.length);
-      }));
+      (installTimerQueue(_0x553053)));
     const _0x30a2c8 = createImg(),
       _0x3e4125 = createWrap(_0x30a2c8);
     (revealRefThumbMedia(_0x3e4125, 'sig-1'),
@@ -127,9 +139,7 @@ function installFakeImage(_0x4cabde) {
     ((globalThis.requestAnimationFrame = (_0x484b85) => {
       return (_0x484b85(), 1);
     }),
-      (globalThis.setTimeout = (_0x34427e) => {
-        return (_0x19de00.push(_0x34427e), _0x19de00.length);
-      }));
+      (installTimerQueue(_0x19de00)));
     const _0x4c8ff5 = createImg(),
       _0x42e601 = createWrap(_0x4c8ff5);
     (revealRefThumbMedia(_0x42e601, 'sig-1'),
@@ -149,9 +159,7 @@ function installFakeImage(_0x4cabde) {
     ((globalThis.requestAnimationFrame = (_0x317f71) => {
       return (_0x317f71(), 1);
     }),
-      (globalThis.setTimeout = (_0xf5f8c3) => {
-        return (_0x328a72.push(_0xf5f8c3), _0x328a72.length);
-      }));
+      (installTimerQueue(_0x328a72)));
     const _0x122bc5 = createImg();
     _0x122bc5.isConnected = false;
     const _0x31d79f = createWrap(_0x122bc5);
@@ -173,9 +181,7 @@ function installFakeImage(_0x4cabde) {
     ((globalThis.requestAnimationFrame = (_0x39c633) => {
       return (_0x39c633(), 1);
     }),
-      (globalThis.setTimeout = (_0x3c84b8) => {
-        return (_0x175308.push(_0x3c84b8), _0x175308.length);
-      }));
+      (installTimerQueue(_0x175308)));
     const _0x5585b8 = createImg(),
       _0x193910 = createWrap(_0x5585b8);
     (revealRefThumbMedia(_0x193910, 'sig-1'),
@@ -193,9 +199,7 @@ function installFakeImage(_0x4cabde) {
     ((globalThis.requestAnimationFrame = (_0x4261cc) => {
       return (_0x4261cc(), 1);
     }),
-      (globalThis.setTimeout = (_0x12e69d) => {
-        return (_0x38c21b.push(_0x12e69d), _0x38c21b.length);
-      }));
+      (installTimerQueue(_0x38c21b)));
     const _0x3cd63b = createImg(),
       _0x9c2857 = createWrap(_0x3cd63b);
     (revealRefThumbMedia(_0x9c2857, 'sig-1'),

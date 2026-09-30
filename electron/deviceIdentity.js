@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
+import { writeJsonAtomicallySync } from './atomicJsonStore.js';
 import path from 'node:path';
 const DEVICE_IDENTITY_FILENAME = 'device-identity.json';
 function readJsonFileSyncSafe(_0x4e81ae) {
@@ -10,9 +11,7 @@ function readJsonFileSyncSafe(_0x4e81ae) {
   }
 }
 function writeJsonFileSyncSafe(_0x27f88b, _0x46179c) {
-  const _0x2f8bf0 = path.dirname(_0x27f88b);
-  if (_0x2f8bf0) mkdirSync(_0x2f8bf0, { recursive: true });
-  writeFileSync(_0x27f88b, JSON.stringify(_0x46179c || {}, null, 2), 'utf8');
+  writeJsonAtomicallySync(_0x27f88b, _0x46179c || {});
 }
 function normalizeDeviceIdentityValue(_0x22b0fa) {
   const _0x155885 = String(_0x22b0fa || '').trim();
@@ -31,6 +30,7 @@ export function createDeviceIdentityManager({
   app: _0x2cfe96,
   appRoot: _0x27e5d8,
   getUserRoot: _0x1ada4c,
+  isolatedProfile = false,
   logEvent: logEvent = () => {},
 }) {
   function _0x46dd2f() {
@@ -44,12 +44,14 @@ export function createDeviceIdentityManager({
     return path.join(_0x520bcf, _0x1573b8);
   }
   function _0x4cdea1() {
+    if (isolatedProfile) return [path.join(_0x2cfe96.getPath('userData'), DEVICE_IDENTITY_FILENAME)];
     return [
       path.join(_0x2cfe96.getPath('userData'), DEVICE_IDENTITY_FILENAME),
       path.join(_0x46dd2f(), DEVICE_IDENTITY_FILENAME),
     ];
   }
   function _0x54fa5d() {
+    if (isolatedProfile) return [path.join(_0x1ada4c(), 'settings.json')];
     return [
       path.join(_0x1ada4c(), 'settings.json'),
       path.join(_0x46dd2f(), 'settings.json'),

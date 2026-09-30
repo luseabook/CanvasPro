@@ -74,7 +74,7 @@ test('绑定状态变化时把 allowGeneration 合并进通知', async () => {
   const { scheduler, log } = makeHarness();
   scheduler.take().callback();
   await settle();
-  assert.deepEqual(log.changes, [{ enabled: true, binding: 'b', allowGeneration: true }]);
+  assert.deepEqual(log.changes, [{ enabled: true, binding: 'b', allowGeneration: false }]);
 });
 
 test('未就绪时不做启用并重排一秒', async () => {
@@ -89,7 +89,7 @@ test('就绪且拿到绑定后启用一次，随后相同状态不再重复启�
   const { scheduler, log } = makeHarness();
   scheduler.take().callback();
   await settle();
-  assert.deepEqual(log.enable, [{ allowGeneration: true }]);
+  assert.deepEqual(log.enable, [{ allowGeneration: false }]);
   const next = scheduler.take();
   assert.equal(next.delay, 1000);
   next.callback();
@@ -155,7 +155,7 @@ test('启用后绑定消失会调用 disable 并重排', async () => {
   const { connection, scheduler, log } = makeHarness(over);
   scheduler.take().callback();
   await settle();
-  assert.deepEqual(log.enable, [{ allowGeneration: true }]);
+  assert.deepEqual(log.enable, [{ allowGeneration: false }]);
   scheduler.take();
   over.ready = false;
   connection.refresh();
@@ -172,7 +172,7 @@ test('启用失败时记录原因并按五秒退避', async () => {
   assert.deepEqual(log.changes.at(-1), {
     enabled: false,
     reason: 'boom',
-    allowGeneration: true,
+    allowGeneration: false,
   });
   assert.equal(scheduler.take().delay, 5000);
 });
@@ -243,4 +243,30 @@ test('上一轮启用未结算时跳过本轮并重排', async () => {
   resolveEnable(true);
   await settle();
   assert.equal(scheduler.take().delay, 1000);
+});
+
+
+for (const status of [401, 403, 404, 405, 501]) {
+  test(`unsupported/unauthorized backend ${status} stops automatic retry`, async () => {
+    const scheduler = makeScheduler(); let requests = 0;
+    const connection = createCanvasMcpAutoConnection({
+      isReady: () => true, getBinding: () => 'canvas',
+      schedule: scheduler.schedule, cancel: scheduler.cancel,
+      createSession: () => ({ checkBinding() {}, disable: async () => {}, destroy: async () => {},
+        enable: async () => { requests++; throw Object.assign(new Error('unavailable'), { status }); } }),
+    });
+    scheduler.take().callback(); await settle();
+    assert.equal(requests, 1); assert.equal(scheduler.jobs.size, 0);
+    connection.refresh(); assert.equal(scheduler.jobs.size, 0);
+    await connection.destroy();
+  });
+}
+test('generation permission must be explicitly enabled', async () => {
+  const { connection, scheduler, log } = makeHarness();
+  scheduler.take().callback(); await settle();
+  assert.equal(log.enable[0].allowGeneration, false);
+  connection.setAllowGeneration(true);
+  scheduler.take().callback(); await settle();
+  assert.equal(log.enable.at(-1).allowGeneration, true);
+  await connection.destroy();
 });

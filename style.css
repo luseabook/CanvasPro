@@ -18492,6 +18492,8 @@ body.dev-mode .settings-card.dev-mode-only {
 }
 #v2-toast-wrap {
   position: fixed;
+  width: min(560px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
   bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
@@ -18512,7 +18514,11 @@ body.dev-mode .settings-card.dev-mode-only {
   font-weight: 500;
   letter-spacing: 0.01em;
   box-shadow: var(--toast-shadow);
-  white-space: nowrap;
+  box-sizing: border-box;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
   display: flex;
   align-items: center;
   gap: 8px;

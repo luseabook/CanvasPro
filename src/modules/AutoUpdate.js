@@ -15,6 +15,8 @@ let _dismissedSignature = '',
   _desktopUpdateUnsubscribe = null,
   _desktopUpdaterActive = false,
   _desktopInstallAfterDownload = false;
+let desktopErrorEventSequence = 0;
+let lastDesktopErrorEventId = null;
 function autoUpdateText(_0x5eb5c6, _0x3fd1a6 = {}) {
   return t('autoUpdate.' + _0x5eb5c6, _0x3fd1a6);
 }
@@ -918,8 +920,13 @@ function _handleDesktopUpdaterEvent(_0x17f006) {
   }
   if (_0x17f006.type === 'error') {
     if (_0x17f006.skipped) return;
-    ((_desktopInstallAfterDownload = false),
-      window.showToast?.(_0x17f006.message || autoUpdateText('toasts.updateFailed')));
+    if (_0x17f006.eventId != null && _0x17f006.eventId === lastDesktopErrorEventId) return;
+    lastDesktopErrorEventId = _0x17f006.eventId ?? null;
+    desktopErrorEventSequence += 1;
+    _desktopInstallAfterDownload = false;
+    // Background checks must never cover the workspace with technical errors.
+    if (_0x17f006.manual !== false)
+      window.showToast?.(_0x17f006.message || autoUpdateText('toasts.updateFailed'), 'warning');
   }
 }
 function _bindDesktopUpdaterEvents() {
@@ -942,11 +949,13 @@ export function initAutoUpdate() {
 }
 export async function showManualUpdateCheck() {
   if (window.aiCanvasDesktop?.isElectron) {
+    const errorsBeforeCheck = desktopErrorEventSequence;
     try {
       (window.showToast?.(autoUpdateText('toasts.checkingDesktop')),
         await window.aiCanvasDesktop.checkForUpdates?.());
     } catch (_0x386dc0) {
-      window.showToast?.(autoUpdateText('toasts.desktopCheckFailed'));
+      if (desktopErrorEventSequence === errorsBeforeCheck)
+        window.showToast?.(autoUpdateText('toasts.desktopCheckFailed'), 'warning');
     }
     return;
   }

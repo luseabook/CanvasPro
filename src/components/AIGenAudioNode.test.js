@@ -6,7 +6,7 @@ import {
   isPreviewNodeLoading,
   stopPreviewNodeLoading,
 } from '../modules/previewMode.js';
-import { createFakePreviewContainer, installPreviewDomStubs } from '../../tests/testPreviewDom.js';
+import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../tools/dom-test-environment.mjs';
 import {
   _resetAssetMentionRegistryForTests,
   setAssetMentionAssets,
@@ -212,11 +212,11 @@ function createTestContext({
   const _0x5b1abd = readFileSync(new URL('./AIGenAudioNode.js', import.meta.url), 'utf8');
   (assert.match(
     _0x5b1abd,
-    /from "\.\.\/modules\/nodePromptShared\.js";[\s\S]*this\.promptEl\.addEventListener\("input",[\s\S]*_checkAtTrigger\(this,\s*e\)/,
+    /from ['"]\.\.\/modules\/nodePromptShared\.js['"];[\s\S]*this\.promptEl\.addEventListener\(['"]input['"],[\s\S]*_checkAtTrigger\(this,\s*[\w$]+\)/,
   ),
     assert.match(
       _0x5b1abd,
-      /this\.promptEl\.addEventListener\("keydown",[\s\S]*_handleMentionMenuKeyboard\(e\)[\s\S]*_handlePillKeyboard\(this,\s*e\)/,
+      /this\.promptEl\.addEventListener\(['"]keydown['"],[\s\S]*_handleMentionMenuKeyboard\([\w$]+\)[\s\S]*_handlePillKeyboard\(this,\s*[\w$]+\)/,
     ));
 }),
   test('aigenAudio payload: ref-pill 文本引用会替换为真实文本', () => {

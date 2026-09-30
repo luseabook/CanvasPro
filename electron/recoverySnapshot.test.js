@@ -50,3 +50,43 @@ test('a successful dirty-state snapshot closes normally without a discard prompt
   assert.equal(win.closed, 1);
   assert.equal(prompted, false);
 });
+
+for (const [name, requestSnapshot] of [
+  ['ordinary failure', async () => ({ success: false, reason: 'disk-full' })],
+  ['timeout', async () => ({ success: false, reason: 'timeout' })],
+  ['exception', async () => { throw new Error('renderer gone'); }],
+  ['missing acknowledgement', async () => undefined],
+]) {
+  test(`close remains cancelable after ${name}`, async () => {
+    const win = fakeWindow(); let cancelled = 0;
+    installRecoverySnapshotBeforeClose(win, {
+      getRendererProjectState: () => ({ hasUnsavedChanges: true }), requestSnapshot,
+      onCloseCancelled: () => cancelled++,
+    });
+    win.emit('close', { preventDefault() {} }); await flush();
+    assert.equal(win.closed, 0); assert.equal(cancelled, 1);
+  });
+}
+test('workspace preparation is requested even when the canvas is clean', async () => {
+  const win = fakeWindow(); let asked = false;
+  installRecoverySnapshotBeforeClose(win, {
+    getRendererProjectState: () => ({ hasUnsavedChanges: false }),
+    shouldPrepareRenderer: () => true,
+    requestSnapshot: async () => { asked = true; return { success: true }; },
+  });
+  win.emit('close', { preventDefault() {} }); await flush();
+  assert.equal(asked, true); assert.equal(win.closed, 1);
+});
+
+
+test('explicit discard closes even when renderer beforeunload would veto, without weakening the default', async () => {
+  const win = fakeWindow(); let destroyed = 0;
+  win.destroy = () => { destroyed++; };
+  installRecoverySnapshotBeforeClose(win, {
+    shouldPrepareRenderer: () => true,
+    requestSnapshot: async () => ({ success: false, reason: 'fixture-save-failure' }),
+    confirmCloseWithoutSnapshot: async () => true,
+  });
+  win.emit('close', { preventDefault() {} }); await flush();
+  assert.equal(destroyed, 1); assert.equal(win.closed, 0);
+});

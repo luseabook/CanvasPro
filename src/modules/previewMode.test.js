@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { createFakePreviewContainer, installPreviewDomStubs } from '../../tests/testPreviewDom.js';
+import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../tools/dom-test-environment.mjs';
 const restoreDom = installPreviewDomStubs(),
   previewModeModule = await import('./previewMode.js'),
   {

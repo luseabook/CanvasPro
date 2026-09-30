@@ -55,6 +55,7 @@ export function createRendererDeferredMediaController({
     _0x33b600 = new Set(),
     _0x1f37aa = null,
     _0x5be506 = '';
+  let paused = false;
   const _0x157fff = Math.max(1, Math.trunc(Number(batchSize) || 1));
   function _0x2317bc() {
     if (_0x1f37aa === null) return;
@@ -65,7 +66,7 @@ export function createRendererDeferredMediaController({
     ((_0x1f37aa = null), (_0x5be506 = ''));
   }
   function _0x2b0a9a(_0x1d8ccc = DEFAULT_MEDIA_HYDRATION_FALLBACK_MS) {
-    if (_0x1f37aa !== null || _0x13e325.length === 0) return;
+    if (paused || _0x1f37aa !== null || _0x13e325.length === 0) return;
     const _0x423ed2 = getWindowLike();
     if (_0x1da791?.()) {
       ((_0x5be506 = 'timeout'), (_0x1f37aa = setTimeout(_0xff8e07, DEFAULT_MEDIA_HYDRATION_RETRY_MS)));
@@ -89,7 +90,7 @@ export function createRendererDeferredMediaController({
   }
   function _0xff8e07(_0xfb2d2b = null) {
     ((_0x1f37aa = null), (_0x5be506 = ''));
-    if (_0x13e325.length === 0) return;
+    if (paused || _0x13e325.length === 0) return;
     if (_0x1da791?.()) {
       _0x2b0a9a(DEFAULT_MEDIA_HYDRATION_RETRY_MS);
       return;
@@ -123,7 +124,8 @@ export function createRendererDeferredMediaController({
     enqueue: _0x50fa38,
     flush: _0xff8e07,
     forget: _0x305dbd,
-    resume: _0x2b0a9a,
+    pause() { paused = true; _0x2317bc(); },
+    resume() { paused = false; _0x2b0a9a(); },
     getQueuedCount: () => _0x33b600.size,
   };
 }

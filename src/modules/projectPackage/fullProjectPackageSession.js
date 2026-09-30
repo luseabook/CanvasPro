@@ -3,13 +3,15 @@ let busy = false;
 export function createFullProjectContextGuard(readContext) {
   const initial = readContext();
   if (!initial?.data || !initial.nodes || !initial.canvases) throw new Error('当前工程快照尚未就绪');
+  // The reader may return a mutable context object; retain the original references, not that object.
+  const { nodes, canvases, identity } = initial;
   const signature = JSON.stringify(initial.data);
   if (new TextEncoder().encode(signature).byteLength > FULL_PACKAGE_LIMITS.jsonBytes) throw new Error('完整工程JSON超过64MiB');
   return {
     snapshot: JSON.parse(signature),
     assertCurrent() {
       const current = readContext();
-      if (current.nodes !== initial.nodes || current.canvases !== initial.canvases || current.identity !== initial.identity || JSON.stringify(current.data) !== signature) throw new Error('等待期间工程/画布或内容已改变，不自动切换；落盘结果请从独立文件打开');
+      if (current.nodes !== nodes || current.canvases !== canvases || current.identity !== identity || JSON.stringify(current.data) !== signature) throw new Error('等待期间工程/画布或内容已改变，不自动切换；落盘结果请从独立文件打开');
     },
   };
 }

@@ -11,7 +11,16 @@
     "desktop": "set \"AICANVAS_PORT=8778\" && electron .",
     "desktop:solo": "electron .",
     "migrate": "node node_modules/knex/bin/cli.js migrate:latest --knexfile knexfile.cjs",
-    "migrate:rollback": "node node_modules/knex/bin/cli.js migrate:rollback --knexfile knexfile.cjs"
+    "migrate:rollback": "node node_modules/knex/bin/cli.js migrate:rollback --knexfile knexfile.cjs",
+    "test:stability": "node tools/run-stability-tests.mjs",
+    "test:backend": "node tools/run-backend-tests.mjs",
+    "test:e2e": "playwright test",
+    "verify:startup": "node tools/verify-startup.mjs",
+    "build:win": "electron-builder --win --config electron-builder.win.cjs --publish never",
+    "test:desktop": "playwright test --config playwright.desktop.config.js",
+    "test:migrations": "node tools/check-migrations.mjs",
+    "check:package": "node tools/check-package.mjs",
+    "test:all:unit": "node tools/run-full-tests.mjs"
   },
   "dependencies": {
     "electron-updater": "^6.8.3",
@@ -20,7 +29,10 @@
   },
   "devDependencies": {
     "better-sqlite3": "^12.11.1",
-    "electron": "^42.4.1",
-    "knex": "^3.3.0"
+    "electron": "42.4.1",
+    "knex": "^3.3.0",
+    "@playwright/test": "1.63.0",
+    "electron-builder": "26.15.3",
+    "jsdom": "29.1.1"
   }
 }

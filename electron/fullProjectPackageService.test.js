@@ -42,7 +42,7 @@ test('same-size corrupted asset fails before persistent writes and before confir
   assert.equal(existsSync(path.join(f.roots.outputRoot, 'ProjectImports')), false); assert.deepEqual(readdirSync(f.projectRoot), []);
 });
 test('missing manifest coverage cannot bind to an existing unrelated local file', async t => {
-  const f = fixture(t); f.data.canvases[0].nodes.push({ id: 'missing', localPath: 'output/unlisted.mp4' }); await makePackage(f);
+  const f = fixture(t); f.data.canvases[0].nodes.push({ id: 'missing', type: 'source-video', localPath: 'output/unlisted.mp4' }); await makePackage(f);
   await assert.rejects(restore(f), /未包含/); assert.equal(existsSync(path.join(f.roots.outputRoot, 'ProjectImports')), false);
 });
 test('extra archive files rejected even if listed graph is otherwise valid', async t => {

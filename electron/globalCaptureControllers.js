@@ -1,4 +1,5 @@
 import { createGlobalCaptureWindowController } from './globalCaptureWindowController.js';
+import { runCleanupSteps } from '../src/utils/cleanupSteps.js';
 import { createGlobalTextPresetShortcutController } from './globalTextPresetShortcutController.js';
 import { createSelectedTextCaptureController } from './selectedTextCapture.js';
 export function createGlobalCaptureControllers({
@@ -38,11 +39,11 @@ export function createGlobalCaptureControllers({
   const managedCaptureWindowController = {
     ...captureWindowController,
     prewarm: () => Promise['all']([captureWindowController['prewarm'](), selectedTextCapture['prewarm']()]),
-    destroy: () => {
-      (shortcutController['destroy'](),
-        selectedTextCapture['destroy'](),
-        captureWindowController['destroy']());
-    },
+    destroy: () => runCleanupSteps([
+      () => shortcutController.destroy(),
+      () => selectedTextCapture.destroy(),
+      () => captureWindowController.destroy(),
+    ], { onError: error => logDiagnosticEvent?.({ type: 'global_capture.cleanup_failed', level: 'warn', source: 'main', error }) }),
   };
   return {
     globalCaptureWindowController: managedCaptureWindowController,

@@ -288,7 +288,7 @@ test('captureStoryClipFrameFromSource：画面加载失败、定位失败都会�
   assert.equal(throwSeek.body.children.length, 0);
 });
 
-test('captureStoryClipFrameFromSource：crop 在本仓 videoFrameCapture 下不生效，仍截整帧（世代差异）', async (t) => {
+test('captureStoryClipFrameFromSource：crop 使用归一化选区而非整帧', async (t) => {
   const doc = createFakeDocument();
   useGlobalDocument(t, doc);
   const snapshot = await captureStoryClipFrameFromSource({
@@ -296,9 +296,9 @@ test('captureStoryClipFrameFromSource：crop 在本仓 videoFrameCapture 下不�
     documentObject: doc,
     crop: { x: 0.25, y: 0.25, width: 0.5, height: 0.5 },
   });
-  assert.equal(snapshot.width, 640);
-  assert.equal(snapshot.height, 360);
-  assert.deepEqual(doc.created.canvases[0].draws[0].slice(1), [0, 0, 640, 360]);
+  assert.equal(snapshot.width, 320);
+  assert.equal(snapshot.height, 180);
+  assert.deepEqual(doc.created.canvases[0].draws[0].slice(1), [160, 90, 320, 180, 0, 0, 320, 180]);
 });
 
 test('captureStoryClipFrameSnapshot：缺视频元素或画面未就绪时报错', async () => {

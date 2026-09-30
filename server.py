@@ -49,6 +49,8 @@ from backend.services.config_route_service import ConfigRouteService
 from backend.services.comfyui_route_service import ComfyUiRouteService
 from backend.services.story_document_route_service import StoryDocumentRouteService
 from backend.services.json_file_route_service import JsonFileRouteService
+from backend.services.json_storage import atomic_write_json
+from backend.services.static_file_access import resolve_static_file
 from backend.services.file_save_migration import (
     copy_tree, inspect_source, validate_copy_steps, verify_copies,
 )
@@ -391,26 +393,11 @@ def _read_json_file(path, default=None):
 
 
 def _write_json_file(path, data):
-    parent = os.path.dirname(path)
-    if parent:
-        os.makedirs(parent, exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    atomic_write_json(path, data)
 
 
 def _write_user_settings_atomic(path, data):
-    parent = os.path.dirname(path)
-    os.makedirs(parent, exist_ok=True)
-    fd, temporary = tempfile.mkstemp(prefix=".aic-settings-", suffix=".tmp", dir=parent)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as file:
-            json.dump(data, file, ensure_ascii=False, indent=2)
-            file.flush()
-            os.fsync(file.fileno())
-        os.replace(temporary, path)
-    finally:
-        if os.path.lexists(temporary):
-            os.unlink(temporary)
+    atomic_write_json(path, data)
 
 
 def _normalize_storage_dir(raw, fallback):
@@ -1474,11 +1461,9 @@ _SENSITIVE_API_PREFIXES = (
 
 
 def _is_sensitive_api_path(path):
-    clean_path = str(path or "").split("?", 1)[0].rstrip("/") or "/"
-    return any(
-        clean_path == prefix or clean_path.startswith(prefix + "/")
-        for prefix in _SENSITIVE_API_PREFIXES
-    )
+    # Default protected: new APIs (including shortdrama) cannot miss a prefix list.
+    clean_path = urllib.parse.unquote(str(path or "").split("?", 1)[0]).rstrip("/")
+    return clean_path == "/api" or clean_path.startswith("/api/")
 
 
 def _request_passes_local_security(handler, path):
@@ -2326,20 +2311,7 @@ def _load_json_file(p):
         return {}
 
 def _atomic_write_json(p, data):
-    tmp = p + ".tmp"
-    try:
-        with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-            f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp, p)
-    except Exception:
-        try:
-            if os.path.exists(tmp):
-                os.remove(tmp)
-        except Exception:
-            pass
-        raise
+    atomic_write_json(p, data)
 
 def _scan_max_gen_seq_for_date(date_str):
     try:
@@ -2417,50 +2389,34 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
+    def _resolve_static_file(self, path):
+        return resolve_static_file(path, DIRECTORY, (
+            ("output/", OUTPUT_DIR),
+            ("data/uploads/", UPLOADS_DIR),
+            ("data/assets/", ASSETS_DIR),
+            ("data/workflows/", WORKFLOWS_DIR),
+            ("user/prompt/_thumbs/", os.path.join(USER_DIR, "prompt", "_thumbs")),
+        ))
+
     def translate_path(self, path):
-        raw_path = urllib.parse.urlsplit(path).path
-        decoded_path = urllib.parse.unquote(raw_path).replace("\\", "/")
-        virtual_roots = (
-            ("/user/prompt/_thumbs/", os.path.join(USER_DIR, "prompt", "_thumbs")),
-            ("/data/workflows/", WORKFLOWS_DIR),
-        )
-        media_path = _resolve_local_virtual_path(decoded_path)
-        if media_path:
-            return media_path
-        for prefix, root_dir in virtual_roots:
-            if decoded_path == prefix[:-1] or decoded_path.startswith(prefix):
-                rel = decoded_path[len(prefix):].lstrip("/")
-                rel = os.path.normpath(rel)
-                if rel in ("", "."):
-                    return os.path.abspath(root_dir)
-                if rel.startswith(".."):
-                    return os.path.abspath(root_dir)
-                return os.path.abspath(os.path.join(root_dir, rel))
-        return super().translate_path(path)
+        resolved = self._resolve_static_file(path)
+        return resolved[0] if resolved else ""
 
     # 屏蔽日志噪音（按霢注释掉）
     def log_message(self, fmt, *args):
         pass
 
     def send_head(self):
-        path = self.translate_path(self.path)
-        f = None
-        if os.path.isdir(path):
-            parts = urllib.parse.urlsplit(self.path)
-            if not parts.path.endswith('/'):
-                self.send_response(301)
-                new_parts = (parts[0], parts[1], parts[2] + '/', parts[3], parts[4])
-                new_url = urllib.parse.urlunsplit(new_parts)
-                self.send_header("Location", new_url)
-                self.end_headers()
-                return None
-            for index in ("index.html", "index.htm"):
-                index_path = os.path.join(path, index)
-                if os.path.exists(index_path):
-                    path = index_path
-                    break
-            else:
-                return self.list_directory(path)
+        resolved = self._resolve_static_file(self.path)
+        if not resolved:
+            self.send_error(404, "File not found")
+            return None
+        path, private = resolved
+        if private and not _enforce_local_api_access(self, "/api/private-media"):
+            return None
+        if not os.path.isfile(path):
+            self.send_error(404, "File not found")
+            return None
         ctype = self.guess_type(path)
         try:
             f = open(path, 'rb')

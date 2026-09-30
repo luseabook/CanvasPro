@@ -15,9 +15,9 @@ permissions:
   contents: write
 
 env:
-  NODE_VERSION: "20"
-  ELECTRON_VERSION: "41.3.0"
-  ELECTRON_BUILDER_VERSION: "26.8.1"
+  NODE_VERSION: "24"
+  ELECTRON_VERSION: "42.4.1"
+  ELECTRON_BUILDER_VERSION: "26.15.3"
   PYTHON_STANDALONE_URL: "https://github.com/astral-sh/python-build-standalone/releases/download/20240224/cpython-3.11.8+20240224-aarch64-apple-darwin-install_only.tar.gz"
 
 jobs:
@@ -57,11 +57,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install package dependencies
-        run: npm install --omit=dev --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Install build-only tooling
         run: |
-          npm install --no-save --no-audit --no-fund \
+          npm install --no-save --package-lock=false --no-audit --no-fund \
             electron-builder@${ELECTRON_BUILDER_VERSION} \
             electron@${ELECTRON_VERSION} \
             @ffmpeg-installer/ffmpeg@1.1.0 \
@@ -114,6 +114,17 @@ jobs:
           rm -rf .electron-runtime/staging
           du -sh .electron-runtime/runtime/python .electron-runtime/runtime/ffmpeg
 
+      - name: Gate packaging on isolated regression and browser acceptance
+        env:
+          AIC_TEST_PYTHON: .electron-runtime/runtime/python/bin/python3
+        run: |
+          npm run test:stability
+          npm run test:backend
+          npm run test:migrations
+          npx playwright install chromium
+          npm run test:e2e
+          npm run test:desktop
+
       - name: Write macOS electron-builder config
         run: |
           cat > electron-builder.mac-arm64.cjs <<'EOF'
@@ -129,6 +140,7 @@ jobs:
               "api/**/*",
               "assets/**/*",
               "backend/**/*",
+              "db/**/*",
               "electron/**/*",
               "images/**/*",
               "src/**/*",
@@ -146,6 +158,7 @@ jobs:
               "!**/*.spec.js",
               "!**/*.map",
               "!**/*.pyc",
+              "!**/test_*.py",
               "!**/__pycache__/**",
               "!**/tests/**",
               "!**/test-results/**",

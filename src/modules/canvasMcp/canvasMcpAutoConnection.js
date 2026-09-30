@@ -5,27 +5,29 @@ export function createCanvasMcpAutoConnection({
   onChange: onChange = () => {},
   schedule: schedule = setTimeout,
   cancel: cancel = clearTimeout,
+  allowGeneration = false,
 }) {
   let _0x446ca4 = ![],
     _0x12734b = ![],
-    _0xcf4594 = !![],
+    _0xcf4594 = allowGeneration === true,
     _0x1f629f = '',
     _0x2a455b = ![],
     _0x573597 = { enabled: ![] },
     _0x56c5ab;
+  let backendUnavailable = false;
   const _0x34400a = () => onChange({ ..._0x573597, allowGeneration: _0xcf4594 }),
     _0x347949 = _0x5e161e((_0x4bf0e5) => {
       ((_0x573597 = _0x4bf0e5), _0x34400a());
     });
   function _0x30d28b(_0x143dc5) {
     cancel(_0x56c5ab);
-    if (!_0x446ca4)
+    if (!_0x446ca4 && !backendUnavailable)
       _0x56c5ab = schedule(() => {
         void _0x589a4f();
       }, _0x143dc5);
   }
   async function _0x589a4f() {
-    if (_0x446ca4) return;
+    if (_0x446ca4 || backendUnavailable) return;
     _0x347949['checkBinding']();
     if (_0x12734b) {
       _0x30d28b(0x3e8);
@@ -48,6 +50,8 @@ export function createCanvasMcpAutoConnection({
       const _0x49d58a = await _0x347949['enable']({ allowGeneration: _0x49ebf7 });
       _0x49d58a && ((_0x1f629f = _0x18ef07), (_0x2a455b = _0x49ebf7));
     } catch (_0x18ccb3) {
+      const status = Number(_0x18ccb3?.status || _0x18ccb3?.statusCode);
+      backendUnavailable = [401, 403, 404, 405, 501].includes(status) || _0x18ccb3?.code === 'UNSUPPORTED';
       ((_0x573597 = { enabled: ![], reason: _0x18ccb3['message'] }), _0x34400a(), (_0x203038 = 0x1388));
     } finally {
       ((_0x12734b = ![]), _0x30d28b(_0x203038));

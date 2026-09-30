@@ -13,7 +13,7 @@ import {
   isPreviewNodeLoading,
   stopPreviewNodeLoading,
 } from '../../modules/previewMode.js';
-import { createFakePreviewContainer, installPreviewDomStubs } from '../../../tests/testPreviewDom.js';
+import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../../tools/dom-test-environment.mjs';
 import {
   _resetAssetMentionRegistryForTests,
   setAssetMentionAssets,
@@ -531,6 +531,7 @@ function createLipSyncPayloadContext({
   }));
 function createStore(_0x5ba33d, _0x4b093f = []) {
   return {
+    getStateRaw() { return _0x5ba33d; },
     getState() {
       return _0x5ba33d;
     },
@@ -3167,7 +3168,7 @@ function createTestContext({
       _0x3b0140.push(String(_0x53dc23 || ''));
     };
     const _0x18c08e = createVideoNodeTaskOrchestrationModule({
-        store: { getState: () => ({ nodes: {} }), updateNodeData: () => {} },
+        store: { getStateRaw: () => ({ nodes: {} }), getState: () => ({ nodes: {} }), updateNodeData: () => {} },
         api: {},
         getImage: async () => null,
         startLoading: () => {},
@@ -3198,7 +3199,7 @@ function createTestContext({
   }),
   test('task orchestration: dreamina VIP 有 installId 时会继续执行后续逻辑', async () => {
     const _0x47558b = createVideoNodeTaskOrchestrationModule({
-        store: { getState: () => ({ nodes: {} }), updateNodeData: () => {} },
+        store: { getStateRaw: () => ({ nodes: {} }), getState: () => ({ nodes: {} }), updateNodeData: () => {} },
         api: {},
         getImage: async () => null,
         startLoading: () => {},

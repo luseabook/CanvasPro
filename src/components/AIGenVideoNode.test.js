@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createFakePreviewContainer, installPreviewDomStubs } from '../../tests/testPreviewDom.js';
+import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../tools/dom-test-environment.mjs';
 const restoreDom = installPreviewDomStubs();
 ((globalThis.window.addEventListener ||= () => {}), (globalThis.window.removeEventListener ||= () => {}));
 const { default: store } = await import('../core/stores/appStore.js'),

@@ -122,6 +122,16 @@ class HotUpdateService:
                 return name
         return remotes[0] if remotes else None
 
+    def _worktree_is_clean(self):
+        try:
+            result = subprocess.run(
+                ["git", "status", "--porcelain", "--untracked-files=all"],
+                cwd=self.directory, capture_output=True, timeout=10,
+            )
+            return result.returncode == 0 and not result.stdout.strip()
+        except Exception:
+            return False
+
     def hot_update_status(self):
         if not os.path.isdir(os.path.join(self.directory, ".git")):
             return {
@@ -153,6 +163,9 @@ class HotUpdateService:
                 "restartScript": restart_script,
                 "reason": f"未找到当前平台启动脚本: {restart_script}",
             }
+        if not self._worktree_is_clean():
+            return {"canHotApply": False, "remote": remote, "restartScript": restart_script,
+                    "reason": "工作区有未提交修改或无法检查状态，已禁用热更新。请先自行备份处理。"}
         return {
             "canHotApply": True,
             "remote": remote,
@@ -340,8 +353,11 @@ class HotUpdateService:
             err = self.decode_proc_output(fetch.stderr).strip() or self.decode_proc_output(fetch.stdout).strip()
             return {"success": False, "error": err}
 
+        # Re-check after the network wait; user edits may have happened meanwhile.
+        if not self._worktree_is_clean():
+            return {"success": False, "error": "工作区在下载期间发生变化，已取消更新，文件未被覆盖。"}
         reset = subprocess.run(
-            ["git", "reset", "--hard", "FETCH_HEAD"],
+            ["git", "merge", "--ff-only", "FETCH_HEAD"],
             cwd=self.directory,
             capture_output=True,
             timeout=60,

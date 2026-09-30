@@ -1,4 +1,5 @@
 import { openDebugRequestWindow, renderRequestDebugButton } from '../debugRequestWindow.js';
+import { handleStoryStyleThumbnailError } from './storyStylePreview.js';
 import { RECORDING_ASR_MODELS } from '../../../api/recordingAsrModels.js';
 import { updateStoryEpisodeScriptText } from './storyScriptRevision.js';
 import { renderStoryPlanningTextModelPicker } from './storyPlanningModelPicker.js';
@@ -1995,6 +1996,9 @@ export function initStoryWorkspace({
       models: { text: _0x55ddb6, image: _0x3cea9e, video: _0x15c009 },
     },
     _0x2e97b0 = documentObject['createElement']('section');
+  const handleStoryWorkspaceImageError = event => {
+    if (!handleStoryStyleThumbnailError(event)) handleWorkspaceAssetLibraryImageError(event);
+  };
   ((_0x2e97b0['id'] = 'storyWorkspaceRoot'),
     (_0x2e97b0['className'] = 'story-workspace-root'),
     (_0x2e97b0['dataset']['uiStop'] = '1'),
@@ -6258,7 +6262,7 @@ export function initStoryWorkspace({
       },
       !![],
     ),
-    _0x2e97b0['addEventListener']('error', handleWorkspaceAssetLibraryImageError, !![]),
+    _0x2e97b0['addEventListener']('error', handleStoryWorkspaceImageError, !![]),
     _0x2e97b0['addEventListener']('click', (_0x25006a) => {
       if (_0xd0330d['consumeClick'](_0x25006a)) return;
       if (_0xf33372(_0x25006a)) return;
@@ -9947,6 +9951,13 @@ export function initStoryWorkspace({
     activate: _0x5062b4,
     deactivate: _0x15fd10,
     isActive: () => _0x57f246,
+    hasUnsavedChanges: () => _0x167ce5.isDirty(),
+    async prepareForClose() {
+      if (!_0x167ce5.isDirty()) return { success: true };
+      if (!_0x167ce5.isReady()) return { success: false, reason: 'story-workspace-not-ready' };
+      await _0x167ce5.flush();
+      return { success: !_0x167ce5.isDirty(), reason: 'story-workspace-save' };
+    },
     getProjectWorkspaceMode: () => getStoryProjectWorkspaceMode(_0x109ee4['data']?.['project']),
     openHome() {
       _0x109ee4['view'] = 'home';
@@ -9979,7 +9990,7 @@ export function initStoryWorkspace({
         (_0x27857a = null),
         _0x132152(),
         _0x3478a1['destroy'](),
-        void _0x167ce5['destroy']({ flush: !![], force: !![] })['catch'](() => {}),
+        void _0x167ce5['destroy']({ flush: false })['catch'](() => {}),
         _0x51b855['destroy'](),
         _0x177bdc?.(),
         _0x2e8331?.(),
@@ -9987,7 +9998,7 @@ export function initStoryWorkspace({
         _0x3f7dbf?.(),
         _0x44835e['querySelectorAll'](':scope\x20>\x20.story-page')['forEach'](_0x1206b1),
         _0x89ceea(),
-        _0x2e97b0['removeEventListener']('error', handleWorkspaceAssetLibraryImageError, !![]),
+        _0x2e97b0['removeEventListener']('error', handleStoryWorkspaceImageError, !![]),
         windowObject?.['removeEventListener']?.('pointermove', _0xa05991, !![]),
         windowObject?.['removeEventListener']?.('pointerup', _0x4a7636, !![]),
         windowObject?.['removeEventListener']?.('pointercancel', _0x26aeab, !![]),

@@ -13,7 +13,7 @@ import {
   isModelAllowed,
 } from './subscriptionAccess.js';
 (test('subscription access: VIP gate 清单来自共享 manifest', () => {
-  (assert.equal(SUBSCRIPTION_GATE_MANIFESTS.length, 9),
+  (assert.deepEqual(SUBSCRIPTION_GATE_MANIFESTS.map(gate => gate.key).sort(), ['runninghubVideoV54','runninghubVideoBerniniV1','runninghubVideoScail2V1','runninghubVideoScailV2','runninghubVideoHd','runninghubCommercialDigitalHuman','runninghubAdvancedVoiceClone','dreaminaVideoVip','audioVoiceStudio','replacementStudio','runninghubAiApp','binghuoVideo','customProvider'].sort()),
     assert.ok(
       SUBSCRIPTION_GATE_MANIFESTS.some(
         (_0xe6774c) =>

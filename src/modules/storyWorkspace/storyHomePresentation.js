@@ -421,7 +421,7 @@ function renderStoryStylePicker(
     _0x55773c +
     '">\n    <button type="button" class="story-home-param-trigger story-menu-trigger story-style-trigger" data-story-home-param-trigger="style" aria-haspopup="dialog" aria-expanded="false">\n      ' +
     (_0x252997['thumbnail']
-      ? '<img src="' + escapeHtml(_0x252997['thumbnail']) + '" alt="" draggable="false">'
+      ? '<img data-story-style-thumbnail src="' + escapeHtml(_0x252997['thumbnail']) + '" alt="" draggable="false">'
       : '<span\x20class=\x22story-home-param-icon\x20story-style-custom-icon\x22\x20aria-hidden=\x22true\x22>✦</span>') +
     '\n      <span class="story-style-trigger-label">' +
     escapeHtml(_0x252997['label']) +
@@ -453,7 +453,7 @@ function renderStoryStylePicker(
         escapeHtml(_0x66b6d9['label']['toLowerCase']()) +
         '" data-story-style-card-category="' +
         escapeHtml(_0x66b6d9['category']) +
-        '">\n            <img src="' +
+        '">\n            <img data-story-style-thumbnail src="' +
         escapeHtml(_0x66b6d9['thumbnail']) +
         '" alt="" loading="lazy" decoding="async" draggable="false">\n            <span>' +
         escapeHtml(_0x66b6d9['label']) +

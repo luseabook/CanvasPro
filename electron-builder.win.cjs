@@ -5,6 +5,7 @@ module.exports = {
   productName: 'updream canvas',
   copyright: 'Copyright (c) 2026 updream canvas',
   asar: false,
+  afterSign: path.join(__dirname, 'build', 'write-install-manifest.cjs'),
   directories: {
     output: 'dist-win',
   },
@@ -31,6 +32,7 @@ module.exports = {
     '!**/*.spec.js',
     '!**/*.map',
     '!**/*.pyc',
+    '!**/test_*.py',
     '!**/__pycache__/**',
     '!**/tests/**',
     '!**/test-results/**',
