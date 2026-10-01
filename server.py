@@ -1,5 +1,5 @@
 r"""
-./server.py - updream canvas V2 本地服务
+./server.py - Canvas V2 本地服务
 
 用法:
   cd v2
@@ -345,15 +345,17 @@ DEFAULT_SUB_CONTACT_WECHAT = os.environ.get(
     "AIC_SUB_CONTACT_WECHAT",
     "yumengashuo",
 ).strip() or "yumengashuo"
-DEFAULT_SUB_CONTACT_IMAGE_URL = "https://api.ashuoai.com/static/contact/wechat.png"
+DEFAULT_SUB_CONTACT_IMAGE_URL = ""
 DEFAULT_SUB_CONTACT_URL = os.environ.get(
     "AIC_SUB_CONTACT_URL",
     DEFAULT_SUB_CONTACT_IMAGE_URL,
 ).strip()
-OFFICIAL_SUBSCRIPTION_API_BASE = "https://api.ashuoai.com"
+OFFICIAL_SUBSCRIPTION_API_BASE = "https://api.1e1e.cn"
 
 
 def _get_system_state_dir():
+    # Keep the historic state path so rebranding does not rotate install IDs
+    # or strand cached authorization on existing Windows/macOS installations.
     app_folder = "AI-CanvasPro"
     if sys.platform.startswith("win"):
         base_dir = (
@@ -1022,20 +1024,20 @@ def _apply_file_save_paths(paths, migrate=False, migrate_legacy_defaults=False):
 
 
 def _is_enabled_env(name):
-    try:
-        value = str(os.environ.get(name, "") or "").strip().lower()
-    except Exception:
-        return False
-    return value in ("1", "true", "yes", "on")
+    return str(os.environ.get(name, "") or "").strip().lower() in ("1", "true", "yes", "on")
+
 
 def _resolve_subscription_api_base():
-    allow_override = (
-        _is_enabled_env("AIC_ALLOW_SUBSCRIPTION_API_OVERRIDE")
-        or _is_enabled_env("AIC_DEV_MODE")
-    )
     raw_override = (os.environ.get("AIC_SUBSCRIPTION_API_BASE", "") or "").strip()
-    if allow_override and raw_override:
-        return raw_override.rstrip("/"), True
+    if raw_override and _is_enabled_env("AIC_ALLOW_SUBSCRIPTION_API_OVERRIDE"):
+        try:
+            parsed = urllib.parse.urlsplit(raw_override)
+            if (parsed.scheme.lower() == "https" and parsed.hostname and not parsed.username
+                    and not parsed.password and parsed.path in ("", "/")
+                    and not parsed.query and not parsed.fragment):
+                return f"https://{parsed.netloc}", True
+        except Exception:
+            pass
     return OFFICIAL_SUBSCRIPTION_API_BASE, False
 
 SUBSCRIPTION_API_BASE, SUBSCRIPTION_API_BASE_OVERRIDDEN = _resolve_subscription_api_base()
@@ -1055,6 +1057,9 @@ SUBSCRIPTION_CLIENT = SubscriptionRemoteClient(
     contact_text=DEFAULT_SUB_CONTACT_TEXT,
     contact_url=DEFAULT_SUB_CONTACT_URL,
     contact_wechat=DEFAULT_SUB_CONTACT_WECHAT,
+    client_config_path=(os.environ.get("AIC_CLIENT_CONFIG_PATH") or os.path.join(SYSTEM_STATE_DIR, "client-config.json")),
+    local_override_path=(os.environ.get("AIC_CLIENT_CONFIG_OVERRIDE_PATH") or os.path.join(SYSTEM_STATE_DIR, "client-config.local.json")),
+    status_cache_path=(os.environ.get("AIC_SUBSCRIPTION_STATUS_PATH") or os.path.join(SYSTEM_STATE_DIR, "subscription-status.json")),
 )
 SUBSCRIPTION_GATE_SERVICE = SubscriptionGateService(
     client=SUBSCRIPTION_CLIENT,
@@ -1354,6 +1359,7 @@ UPDATE_SERVICE = HotUpdateService(
     directory=DIRECTORY,
     local_version=LOCAL_VERSION,
     is_dev_build=_is_dev_build,
+    update_config_provider=lambda: SUBSCRIPTION_CLIENT.get_client_config(),
 )
 
 CONFIG_ROUTE_SERVICE = ConfigRouteService(config_file_getter=lambda: CONFIG_FILE)
@@ -2579,6 +2585,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not _enforce_local_api_access(self, path):
             return
 
+        if path == "/api/client-config":
+            query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
+            refresh = (query.get("refresh") or [""])[0].strip().lower() in ("1", "true", "yes")
+            _json_ok(self, SUBSCRIPTION_CLIENT.get_client_config(refresh=refresh))
+            return
+
         comfy_response = COMFYUI_ROUTE_SERVICE.handle_get(self, path)
         if comfy_response is not None:
             _send_route_response(self, comfy_response)
@@ -2600,7 +2612,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         has_cors = any(b"Access-Control-Allow-Origin:" in h for h in header_buf)
         has_server_id = any(b"X-AICanvas-Server:" in h for h in header_buf)
         if not has_server_id:
-            self.send_header("X-AICanvas-Server", "updream canvas")
+            self.send_header("X-AICanvas-Server", "Canvas")
         if not has_cache_control:
             self.send_header(
                 "Cache-Control",
@@ -3620,7 +3632,7 @@ if __name__ == "__main__":
             print("[security] 0.0.0.0 需要显式局域网模式，已回退到 127.0.0.1")
         if lan_mode:
             print("[security] 局域网模式已开启，请通过 AIC_ALLOWED_ORIGINS 配置可信 Origin")
-        print("updream canvas 服务已启动")
+        print("Canvas 服务已启动")
         for url in _display_urls(bind_host, port):
             print(url)
         print("按 Ctrl+C 停止服务")

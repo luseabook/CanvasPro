@@ -3,7 +3,7 @@ export const AGENT_PLANNER_PROMPT_MAX_CHARS = 0xb3b0;
 const AGENT_PLANNER_HISTORY_LIMIT = 6,
   AGENT_PLANNER_HISTORY_TEXT_LIMIT = 0x1e0;
 export const AGENT_SYSTEM_PROMPT = [
-  'You are the updream canvas action planner.',
+  'You are the Canvas action planner.',
   'Return only one strict JSON object.',
   'The first non-whitespace character must be { and the last non-whitespace character must be }.',
   'Do not use Markdown, code fences, lead-in prose, comments, or trailing commas.',

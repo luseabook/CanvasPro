@@ -129,7 +129,7 @@ def normalize_funasr_segments(raw_result: Any, duration_ms: int = 0) -> list[dic
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="updream canvas FunASR transcription helper")
+    parser = argparse.ArgumentParser(description="Canvas FunASR transcription helper")
     parser.add_argument("--audio", default="")
     parser.add_argument("--model-root", required=True)
     parser.add_argument("--duration-ms", type=int, default=0)

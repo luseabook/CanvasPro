@@ -12,7 +12,7 @@ function trimText(_0x5e4a49) {
 }
 function getProjectPackageDialogFilters() {
   return [
-    { name: 'updream canvas Project Package', extensions: [PROJECT_PACKAGE_FILE_EXTENSION.replace(/^\./, '')] },
+    { name: 'Canvas Project Package', extensions: [PROJECT_PACKAGE_FILE_EXTENSION.replace(/^\./, '')] },
   ];
 }
 function resolveProjectPackageImportPath(_0x17318a = {}) {

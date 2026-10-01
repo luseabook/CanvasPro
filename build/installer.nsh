@@ -129,6 +129,7 @@
   !insertmacro preserveInstallDirectory "Canvas Project"
   !insertmacro preserveInstallDirectory "output"
   !insertmacro preserveInstallDirectory "data"
+  !insertmacro preserveInstallDirectory "Canvas Files"
   !insertmacro preserveInstallDirectory "AI CanvasPro Files"
 
   SetOutPath $TEMP
@@ -143,5 +144,6 @@
   !insertmacro restoreInstallDirectory "Canvas Project"
   !insertmacro restoreInstallDirectory "output"
   !insertmacro restoreInstallDirectory "data"
+  !insertmacro restoreInstallDirectory "Canvas Files"
   !insertmacro restoreInstallDirectory "AI CanvasPro Files"
 !macroend

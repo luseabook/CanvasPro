@@ -36,7 +36,7 @@ function pad2(value) {
 export function defaultNodeExportZipName(date = new Date()) {
   const at = date instanceof Date ? date : new Date(date);
   return (
-    'updream-canvas-Export-' +
+    'Canvas-Export-' +
     [
       at.getFullYear(),
       pad2(at.getMonth() + 1),

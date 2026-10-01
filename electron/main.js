@@ -110,8 +110,8 @@ import {
   writeRecoverySnapshot,
 } from '../src/services/desktopProjectFileStore.js';
 import { registerIpcHandlers } from './ipc/registerIpcHandlers.js';
-const APP_DISPLAY_NAME = 'updream canvas',
-  APP_DATA_DIRECTORY_NAME = 'AI CanvasPro',
+let APP_DISPLAY_NAME = 'Canvas';
+const APP_DATA_DIRECTORY_NAME = 'AI CanvasPro',
   APP_USER_DATA_ROOT = path.join(app.getPath('appData'), APP_DATA_DIRECTORY_NAME),
   __filename = fileURLToPath(import.meta.url),
   __dirname = path.dirname(__filename),
@@ -378,7 +378,7 @@ function installWindowStatePersistence(_0x1bfc6b) {
     }));
 }
 const { delay, loadStartupStatus, isLocalAppUrl, openExternalUrl } = createStartupHelpers({
-  appDisplayName: APP_DISPLAY_NAME,
+  appDisplayName: () => APP_DISPLAY_NAME,
   appOrigin: APP_ORIGIN,
   getMainWindow: () => mainWindow,
   logDiagnosticEvent: logDiagnosticEvent,
@@ -434,6 +434,26 @@ function requestLocalJson(_0x52adc2, _0x3c3cdb = 0x640) {
       _0x2869fe.on('error', _0x19bd8c),
       _0x2869fe.end());
   });
+}
+async function refreshProductDisplayName() {
+  try {
+    const response = await requestLocalJson('/api/client-config?refresh=1', 8000);
+    const config = response?.data && typeof response.data === 'object' ? response.data : response;
+    const displayName = String(config?.product_display_name || config?.productDisplayName || '')
+      .replace(/[\u0000-\u001f\u007f]/g, '')
+      .trim()
+      .slice(0, 80);
+    if (!displayName) return;
+    APP_DISPLAY_NAME = displayName;
+    app.setName(APP_DISPLAY_NAME);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      updateMainWindowUnsavedState(mainWindow);
+      const payload = JSON.stringify({ displayName: APP_DISPLAY_NAME });
+      void mainWindow.webContents
+        .executeJavaScript(`window.dispatchEvent(new CustomEvent('canvas:product-display-name', { detail: ${payload} }));`)
+        .catch(() => {});
+    }
+  } catch {}
 }
 async function clearPortBeforeStart(_0x2f1d77 = null) {
   const _0x1a93c4 = resolveBackendLaunch();
@@ -534,6 +554,9 @@ function buildPackagedServerEnv() {
   const _0x438439 = app.getPath('userData'),
     _0x20ca3d = getStorageRoot();
   return {
+    AIC_CLIENT_CONFIG_PATH: path.join(_0x438439, 'client-config.json'),
+    AIC_CLIENT_CONFIG_OVERRIDE_PATH: path.join(_0x438439, 'client-config.local.json'),
+    AIC_SUBSCRIPTION_STATUS_PATH: path.join(_0x438439, 'subscription-status.json'),
     AIC_USER_DIR: path.join(_0x438439, 'user'),
     AIC_CANVAS_DIR: path.join(_0x20ca3d, 'projects'),
     AIC_DATA_DIR: path.join(_0x20ca3d, 'data'),
@@ -604,7 +627,7 @@ const { getStableDeviceId } = createDeviceIdentityManager({
       mainWindow.webContents?.send?.('notification:generationCompleteClicked', event),
     logEvent: logDiagnosticEvent,
     resolveNotificationIconPath: resolveLocalVirtualPath,
-    appName: APP_DISPLAY_NAME,
+    appName: () => APP_DISPLAY_NAME,
   }),
   nodeExportController = createNodeExportController({
     app: app,
@@ -1151,6 +1174,13 @@ async function ensureServerRunning(_0x4c8dab = null) {
       AICANVAS_PORT: String(PORT),
       AIC_LOCAL_TOKEN: LOCAL_ACCESS_TOKEN,
       ...buildPackagedServerEnv(),
+      ...(app.isPackaged
+        ? {
+            AIC_SUBSCRIPTION_API_BASE: '',
+            AIC_ALLOW_SUBSCRIPTION_API_OVERRIDE: '',
+            AIC_DEV_MODE: '',
+          }
+        : {}),
     },
     stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true,
@@ -1461,7 +1491,7 @@ function getLocalAssetCleanupManager() {
 function getProjectDialogFilters() {
   return [
     {
-      name: 'updream canvas Project',
+      name: 'Canvas Project',
       extensions: SUPPORTED_PROJECT_FILE_EXTENSIONS.map((_0x51baab) => _0x51baab.replace(/^\./, '')),
     },
   ];
@@ -1841,6 +1871,7 @@ async function restartBackendAndReload() {
       stopSpawnedServer(),
       await clearPortBeforeStart(loadStartupStatus),
       await ensureServerRunning(loadStartupStatus),
+      void refreshProductDisplayName(),
       void localRuntimeKeepAlive.start('backend-restart'),
       loadCanvasWindow());
   } catch (_0x19ab58) {
@@ -1987,6 +2018,7 @@ async function startApp() {
     queueExternalProjectOpenFromArgs(process.argv, 'startup'),
     await clearPortBeforeStart(),
     await ensureServerRunning(),
+    void refreshProductDisplayName(),
     void localRuntimeKeepAlive.start('server-ready'),
     loadCanvasWindow());
 }

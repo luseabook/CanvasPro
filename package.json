@@ -1,9 +1,9 @@
 {
-  "name": "updream-canvas",
+  "name": "canvas",
   "private": true,
   "version": "0.4.12",
-  "description": "updream canvas desktop editor",
-  "author": "updream canvas",
+  "description": "Canvas desktop editor",
+  "author": "Canvas",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {

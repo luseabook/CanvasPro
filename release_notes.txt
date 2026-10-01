@@ -13,7 +13,7 @@
 - 
 
 
-AI-CanvasPro！ windows/mac 应用版本已发布 欢迎体验！ 
+Canvas！ Windows/macOS 应用版本已发布，欢迎体验！
 BUG问题或要新增功能反馈文档：https://i1etb6xynr.feishu.cn/wiki/N2C3wD6SgisOpek11mfcfJCinkr?from=from_copylink
 
 

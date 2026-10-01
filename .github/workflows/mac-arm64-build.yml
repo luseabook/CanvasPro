@@ -1,4 +1,4 @@
-name: Mac ARM64 package
+name: Canvas macOS ARM64 package
 
 on:
   workflow_dispatch:
@@ -7,12 +7,8 @@ on:
         description: Optional version override. Leave empty to read index.html.
         required: false
         type: string
-  push:
-    branches:
-      - master
-
 permissions:
-  contents: write
+  contents: read
 
 env:
   NODE_VERSION: "20"
@@ -48,7 +44,6 @@ jobs:
             throw new Error(`Invalid release version: ${version || "<missing>"}`);
           }
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `version=${version}\n`);
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, `tag=v${version}\n`);
           NODE
 
       - name: Setup Node
@@ -119,8 +114,8 @@ jobs:
           cat > electron-builder.mac-arm64.cjs <<'EOF'
           module.exports = {
             appId: "com.aicanvaspro.editor",
-            productName: "updream canvas",
-            copyright: "Copyright (c) 2026 updream canvas",
+            productName: "Canvas",
+            copyright: "Copyright (c) 2026 Canvas",
             asar: false,
             directories: {
               output: "dist-mac",
@@ -167,16 +162,16 @@ jobs:
                 { target: "dmg", arch: ["arm64"] },
                 { target: "zip", arch: ["arm64"] }
               ],
-              artifactName: "updream-canvas-Mac-${arch}-${version}.${ext}"
+              artifactName: "Canvas-Mac-${arch}-${version}.${ext}"
             },
             dmg: {
-              artifactName: "updream-canvas-Mac-${arch}-${version}.${ext}"
+              artifactName: "Canvas-Mac-${arch}-${version}.${ext}"
             },
             fileAssociations: [
               {
                 ext: ["aicanvas", "aicproj"],
-                name: "updream canvas Project",
-                description: "updream canvas Project"
+                name: "Canvas Project",
+                description: "Canvas Project"
               }
             ]
           };
@@ -190,37 +185,9 @@ jobs:
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mac-arm64-${{ steps.version.outputs.version }}
+          name: Canvas-mac-arm64-${{ steps.version.outputs.version }}
           if-no-files-found: error
           path: |
             dist-mac/*.dmg
             dist-mac/*.zip
             dist-mac/latest-mac.yml
-
-      - name: Upload GitHub Release assets
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.version.outputs.tag }}
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          set -euo pipefail
-          ASSETS=()
-          while IFS= read -r asset; do
-            ASSETS+=("$asset")
-          done < <(find dist-mac -type f \( \
-            -name "*.dmg" -o \
-            -name "*.zip" -o \
-            -name "latest-mac.yml" \
-          \) | sort)
-          if [ "${#ASSETS[@]}" -eq 0 ]; then
-            echo "No macOS release assets found."
-            exit 1
-          fi
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "${ASSETS[@]}" --clobber
-          else
-            gh release create "$TAG" "${ASSETS[@]}" \
-              --title "updream canvas v$VERSION" \
-              --notes "macOS Apple Silicon build for updream canvas v$VERSION"
-          fi

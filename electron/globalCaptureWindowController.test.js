@@ -343,7 +343,7 @@ test('show builds a frameless transparent always-on-top window and loads its htm
     phase: 'ready',
   });
   const options = first().record.constructorOptions;
-  assert.equal(options.title, '发送到 updream canvas 无限画布');
+  assert.equal(options.title, '发送到 Canvas 无限画布');
   assert.equal(options.show, false);
   assert.equal(options.frame, false);
   assert.equal(options.thickFrame, false);

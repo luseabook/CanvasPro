@@ -89,7 +89,7 @@ export function createBackgroundCompletionNotifier({
   globalShortcutApi: globalShortcutApi,
   logEvent: logEvent,
   resolveNotificationIconPath: resolveNotificationIconPath,
-  appName: appName = 'updream canvas',
+  appName: appName = 'Canvas',
   platform: platform = process.platform,
   setTimeoutFn: setTimeoutFn = setTimeout,
   clearTimeoutFn: clearTimeoutFn = clearTimeout,
@@ -121,7 +121,8 @@ export function createBackgroundCompletionNotifier({
       if (isWindowFocused(mainWindow)) return { success: true, shown: false, reason: 'window-focused' };
       if (typeof Notification?.isSupported === 'function' && !Notification.isSupported())
         return { success: true, shown: false, reason: 'unsupported' };
-      const title = normalizeText(payload?.title, appName, 80),
+      const configuredAppName = typeof appName === 'function' ? appName() : appName,
+        title = normalizeText(payload?.title, configuredAppName || 'Canvas', 80),
         body = normalizeText(payload?.body, '生成任务已完成。', 180),
         icon = resolveNotificationIcon(payload, resolveNotificationIconPath);
       let release = () => {};

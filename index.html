@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title data-i18n="app.documentTitle">updream canvas</title>
+    <title data-i18n="app.documentTitle" data-product-name="document-title">Canvas</title>
     <meta name="app-version" content="0.4.12" />
     <link rel="icon" type="image/svg+xml" href="images/favicon.svg" />
     <link rel="stylesheet" href="./styles/preset-menu.css" />
@@ -59,7 +59,7 @@
                 </linearGradient>
               </defs>
             </svg>
-            <span class="logo-title">updream canvas</span>
+            <span class="logo-title" data-product-name="wordmark">Canvas</span>
           </div>
           <div class="project-name" id="projectNameEl">
             <span id="projectNameText" contenteditable="true" spellcheck="false">新项目</span>
@@ -317,7 +317,7 @@
               type="button"
               class="avatar-menu-item"
               id="btnGithubOfficial"
-              data-external-url="https://github.com/ashuoAI/AI-CanvasPro"
+              data-external-url="https://github.com/luseaer-ship-it/CanvasPro"
               aria-label="打开 GitHub 官方仓库"
               data-i18n-aria-label="settings.menu.openGithub"
             >
@@ -798,6 +798,7 @@
       </button>
     </div>
     <div id="v2-debug" data-i18n="app.debugSandbox">V2 架构验证沙盒 · 拖拽节点进行测试</div>
+    <script type="module" src="./src/services/productBranding.js?v=20261001"></script>
     <script type="module" src="./main.js?v=2026041901"></script>
     <div id="settingsOverlay" class="settings-overlay">
       <div class="settings-modal">
@@ -2058,8 +2059,9 @@
                       type="text"
                       id="fileSaveRootDir"
                       class="settings-input settings-path-input"
-                      placeholder="例如 D:\updream canvas Files"
+                      placeholder="例如 D:\Canvas Files"
                       data-i18n-placeholder="settings.fileSave.rootDir.placeholder"
+                      data-product-name-placeholder="true"
                     />
                     <button
                       type="button"
@@ -3334,9 +3336,9 @@
     <div class="about-dialog">
       <button type="button" class="about-close" id="aboutClose">&times;</button>
       <div class="about-logo">
-        <img src="images/favicon.svg" width="48" height="48" alt="updream canvas Logo" />
+        <img src="images/favicon.svg" width="48" height="48" alt="Canvas Logo" data-product-name-alt="true" />
       </div>
-      <h2 class="about-title">updream canvas</h2>
+      <h2 class="about-title" data-product-name="about">Canvas</h2>
       <div class="about-version" id="aboutVersion"></div>
       <div class="about-author"><span data-i18n="about.author">作者：</span><strong>阿硕</strong></div>
       <button
@@ -3352,7 +3354,7 @@
         </svg>
         <span data-i18n="about.bilibili">访问 Bilibili 主页</span>
       </button>
-      <div class="about-footer" data-i18n="about.footer">© 2026 updream canvas. All rights reserved...</div>
+      <div class="about-footer" data-i18n="about.footer" data-product-name-footer="true">© 2026 Canvas. All rights reserved...</div>
     </div>
   </div>
 </html>

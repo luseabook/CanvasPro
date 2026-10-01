@@ -2,9 +2,9 @@
 
 <div align="center">
 
-<img src="images\favicon.svg" width="64" height="64" alt="updream canvas Logo"/>
+<img src="images\favicon.svg" width="64" height="64" alt="Canvas Logo"/>
 
-# updream canvas
+# Canvas
 
 **基于节点的 AI 多模态画布编辑器**
 
@@ -30,9 +30,9 @@
 
 ***
 
-## &#x20;视频演示 
+## 📖 使用说明
 
-\[[人物场景固定 seedance2.0生成](https://ashuoai.github.io/AI-CanvasPro/)]
+[查看 Canvas 使用说明](./使用说明.md)
 
 ## ✨ 功能特性
 
@@ -74,9 +74,9 @@
    ```bash
    任意一个不带中文路径的目录 上面的地址栏 输入 CMD
    # 克隆项目
-   git clone https://github.com/ashuoAI/AI-CanvasPro.git
+   git clone https://github.com/luseaer-ship-it/CanvasPro.git
    # 进入项目
-   cd AI-CanvasPro
+   cd CanvasPro
    ```
 3. **安装依赖并启动**
    ```bash
@@ -95,11 +95,11 @@
 ### 方法 2：Windows系统 一键整合包（推荐普通用户）
 
 1. **下载整合包**
-   [点击下载](https://github.com/ashuoAI/AI-CanvasPro/releases)
+   [点击下载](https://github.com/luseaer-ship-it/CanvasPro/releases)
 2. **解压文件**
-   将下载的压缩包解压到不带中文的路径，例如 `D:\updream-canvas`
+   将下载的压缩包解压到不带中文的路径，例如 `D:\CanvasPro`
 3. **一键启动**
-   直接双击 **`updream canvas.exe`** 文件即可
+   直接双击 **`Canvas.exe`** 文件即可
 
 ***
 

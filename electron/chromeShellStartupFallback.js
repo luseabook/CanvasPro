@@ -7,7 +7,7 @@ async function openChromeDownload(shellApi) {
 export async function promptForMissingChromeShellBrowser({
   dialogApi: dialogApi,
   shellApi: shellApi,
-  appName: appName = 'updream canvas',
+  appName: appName = 'Canvas',
 } = {}) {
   if (typeof dialogApi?.['showMessageBox'] !== 'function') return 'quit';
   try {
@@ -36,7 +36,7 @@ export async function promptForMissingChromeShellBrowser({
 export async function promptForChromeShellStartupFailure({
   dialogApi: dialogApi,
   shellApi: shellApi,
-  appName: appName = 'updream canvas',
+  appName: appName = 'Canvas',
   error: error,
 } = {}) {
   if (error?.['code'] === 'CHROME_SHELL_STARTUP_CANCELLED') return 'quit';

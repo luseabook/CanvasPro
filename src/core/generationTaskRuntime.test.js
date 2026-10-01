@@ -118,7 +118,7 @@ function baseSpec(_0x29ad51 = {}) {
         ['volume', 0.4],
         ['play', 'assets/sounds/notify.mp3'],
       ]),
-      assert.deepEqual(_0x38aa52, [{ title: 'updream canvas', body: '生成任务已完成。' }]));
+      assert.deepEqual(_0x38aa52, [{ title: 'Canvas', body: '生成任务已完成。' }]));
   }),
   test('generationTaskRuntime: resume skips duplicate recovery while foreground task is active', async () => {
     const _0x2c4df9 = createMockStore({ 'target-1': { id: 'target-1', type: 'source-image' } }),

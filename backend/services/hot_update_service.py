@@ -23,18 +23,20 @@ class HotUpdateService:
         directory,
         local_version,
         is_dev_build,
-        update_manifest_url="https://github.com/ashuoAI/AI-CanvasPro/releases/latest/download/latest.json",
-        update_release_url="https://github.com/ashuoAI/AI-CanvasPro/releases/latest",
+        update_manifest_url="https://github.com/luseaer-ship-it/CanvasPro/releases/latest/download/latest.json",
+        update_release_url="https://github.com/luseaer-ship-it/CanvasPro/releases/latest",
         update_branch="master",
         remote_priority=("origin", "github", "gitee"),
         update_interval_sec=30 * 60,
         initial_delay_sec=10,
+        update_config_provider=None,
     ):
         self.directory = os.path.abspath(directory)
         self.local_version = str(local_version or "").strip()
         self._is_dev_build = is_dev_build if callable(is_dev_build) else (lambda: bool(is_dev_build))
         self.update_manifest_url = str(update_manifest_url or "").strip()
         self.update_release_url = str(update_release_url or "").strip()
+        self.update_config_provider = update_config_provider if callable(update_config_provider) else None
         self.update_branch = str(update_branch or "master").strip() or "master"
         self.remote_priority = tuple(remote_priority or ("origin", "github", "gitee"))
         self.update_interval_sec = max(1.0, float(update_interval_sec or 30 * 60))
@@ -161,11 +163,24 @@ class HotUpdateService:
         }
 
     def fetch_update_manifest(self):
+        manifest_url = self.update_manifest_url
+        if self.update_config_provider:
+            try:
+                config = self.update_config_provider()
+                candidate = str(
+                    (config or {}).get("update_manifest_url")
+                    or (config or {}).get("updateManifestUrl")
+                    or ""
+                ).strip()
+                if candidate:
+                    manifest_url = candidate
+            except Exception:
+                pass
         headers = {
-            "User-Agent": "updream-canvas-AutoUpdate/2.0",
+            "User-Agent": "Canvas-AutoUpdate/2.0",
             "Accept": "application/json, application/octet-stream;q=0.9, */*;q=0.8",
         }
-        req = urllib.request.Request(self.update_manifest_url, headers=headers)
+        req = urllib.request.Request(manifest_url, headers=headers)
         with urllib.request.urlopen(req, timeout=10) as resp:
             return json.loads(resp.read().decode("utf-8"))
 

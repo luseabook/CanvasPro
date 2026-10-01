@@ -157,7 +157,7 @@ function requestPinnedUrl(url, { address, family, signal, timeoutMs, maxBytes } 
           Accept:
             'text/html,application/xhtml+xml,text/plain,application/json,application/xml;q=0.9,*/*;q=0.1',
           'Accept-Encoding': 'identity',
-          'User-Agent': 'SHUO-Canvas-Agent-URL-Reader/1.0',
+          'User-Agent': 'Canvas-Agent-URL-Reader/1.0',
         },
       },
       (response) => {

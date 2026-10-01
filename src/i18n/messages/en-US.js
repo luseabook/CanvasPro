@@ -1,6 +1,6 @@
 const enUS = Object.freeze({
   app: Object.freeze({
-    documentTitle: 'updream canvas',
+    documentTitle: 'Canvas',
     serverDisconnected:
       '⚠️ Warning: the local server is disconnected. Some features are limited. Check whether the background terminal was closed, then restart the app if needed.',
     quickGenerate: 'AiCanvas Agent',
@@ -112,7 +112,7 @@ const enUS = Object.freeze({
     addCanvasPage: 'New canvas page',
     currentVersion: 'Current version',
     canvasProject: 'Canvas projects',
-    canvasTitle: 'updream canvas',
+    canvasTitle: 'Canvas',
     loading: 'Loading...',
     newCanvas: 'New canvas',
   }),
@@ -526,7 +526,7 @@ const enUS = Object.freeze({
       rootDir: Object.freeze({
         label: 'Save root folder',
         desc: 'Projects, data, and outputs are saved together under this folder',
-        placeholder: 'For example D:\\updream canvas Files',
+        placeholder: 'For example D:\\Canvas Files',
         pickAria: 'Choose save root folder',
         choose: 'Choose',
       }),
@@ -1042,7 +1042,7 @@ const enUS = Object.freeze({
   about: Object.freeze({
     author: 'Author:',
     bilibili: 'Visit Bilibili profile',
-    footer: '© 2026 updream canvas. All rights reserved...',
+    footer: '© 2026 Canvas. All rights reserved...',
   }),
   appPanels: Object.freeze({
     tutorial: Object.freeze({

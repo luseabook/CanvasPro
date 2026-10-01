@@ -502,7 +502,7 @@ test('getSuggestedPackagePath prefers the downloads folder and falls back to the
   const logDir = createTempDir('aic-diag-suggest-');
   const downloads = createTempDir('aic-diag-downloads-');
   const date = new Date(2026, 8, 24, 12, 34, 56);
-  const expected = 'updream-canvas-Diagnostics-20260924-123456.zip';
+  const expected = 'Canvas-Diagnostics-20260924-123456.zip';
   try {
     const fromDownloads = createManager(logDir, { app: { getPath: () => downloads } });
     assert.equal(fromDownloads.getSuggestedPackagePath(date), path.join(downloads, expected));
@@ -688,7 +688,7 @@ test('createPackage defaults to the suggested path and includes an AI analysis r
     const result = await manager.createPackage({
       aiAnalysisReport: { summary: 'ok', apiKey: 'SECRETVALUE' },
     });
-    assert.match(path.basename(result.path), /^updream-canvas-Diagnostics-\d{8}-\d{6}\.zip$/);
+    assert.match(path.basename(result.path), /^Canvas-Diagnostics-\d{8}-\d{6}\.zip$/);
     assert.equal(result.filename, path.basename(result.path));
     assert.equal(path.dirname(result.path), manager.diagnosticsDir);
     const entries = readZipEntries(result.path);
