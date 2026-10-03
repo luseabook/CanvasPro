@@ -195,7 +195,7 @@ test('main.js exposes the capture window controller and owns its lifecycle', () 
   assert.equal(MAIN_SOURCE.includes('selectedTextCaptureController'), false);
 });
 
-test('main.js registers the Alt+C global shortcut on start and unregisters it on quit', () => {
+test('main.js registers the Control+Alt+Shift+C global shortcut on start and unregisters it on quit', () => {
   assert.match(
     MAIN_SOURCE,
     /screenshotOverlayController\.installGlobalScreenshotShortcut\(\),\n\s+globalTextPresetShortcutController\.installGlobalShortcut\(\),/,
@@ -205,6 +205,7 @@ test('main.js registers the Alt+C global shortcut on start and unregisters it on
     /screenshotOverlayController\.uninstallGlobalScreenshotShortcut\(\),\n\s+globalTextPresetShortcutController\?\.uninstallGlobalShortcut\?\.\(\),/,
   );
   assert.equal(MAIN_SOURCE.includes('accelerator: GLOBAL_CAPTURE_LAUNCHER_ACCELERATOR'), true);
+  assert.match(MAIN_SOURCE, /GLOBAL_CAPTURE_LAUNCHER_ACCELERATOR = 'Control\+Alt\+Shift\+C'/);
 });
 
 test('mainIpcSetup reads the four overlay deps off the capture window controller', () => {

@@ -343,7 +343,7 @@ test('show builds a frameless transparent always-on-top window and loads its htm
     phase: 'ready',
   });
   const options = first().record.constructorOptions;
-  assert.equal(options.title, '发送到 updream canvas 无限画布');
+  assert.equal(options.title, '发送到 Canvas 无限画布');
   assert.equal(options.show, false);
   assert.equal(options.frame, false);
   assert.equal(options.thickFrame, false);
@@ -477,7 +477,7 @@ test('show sends the presentation payload on the window channel', async () => {
         text: 'hello',
         phase: 'ready',
         errorReason: '',
-        shortcutLabel: 'Alt+C',
+        shortcutLabel: 'Control+Alt+Shift+C',
         theme: 'light',
         runImmediately: false,
         activeActionId: 'source-text',
@@ -499,7 +499,7 @@ test('show numbers each presentation in sequence', async () => {
 test('show defaults the shortcut label when the payload label is blank', async () => {
   const { controller, first } = createController();
   await controller.show({ captureId: 'cap-1', text: 'hi', shortcutLabel: '   ' }, null);
-  assert.equal(first().record.sent[0x0].payload.shortcutLabel, 'Alt+C');
+  assert.equal(first().record.sent[0x0].payload.shortcutLabel, 'Control+Alt+Shift+C');
 });
 
 test('show trims a supplied shortcut label and error reason', async () => {

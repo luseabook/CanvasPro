@@ -23,18 +23,20 @@ class HotUpdateService:
         directory,
         local_version,
         is_dev_build,
-        update_manifest_url="https://github.com/ashuoAI/AI-CanvasPro/releases/latest/download/latest.json",
-        update_release_url="https://github.com/ashuoAI/AI-CanvasPro/releases/latest",
+        update_manifest_url="https://github.com/luseaer-ship-it/CanvasPro/releases/latest/download/latest.json",
+        update_release_url="https://github.com/luseaer-ship-it/CanvasPro/releases/latest",
         update_branch="master",
         remote_priority=("origin", "github", "gitee"),
         update_interval_sec=30 * 60,
         initial_delay_sec=10,
+        update_config_provider=None,
     ):
         self.directory = os.path.abspath(directory)
         self.local_version = str(local_version or "").strip()
         self._is_dev_build = is_dev_build if callable(is_dev_build) else (lambda: bool(is_dev_build))
         self.update_manifest_url = str(update_manifest_url or "").strip()
         self.update_release_url = str(update_release_url or "").strip()
+        self.update_config_provider = update_config_provider if callable(update_config_provider) else None
         self.update_branch = str(update_branch or "master").strip() or "master"
         self.remote_priority = tuple(remote_priority or ("origin", "github", "gitee"))
         self.update_interval_sec = max(1.0, float(update_interval_sec or 30 * 60))
@@ -115,6 +117,31 @@ class HotUpdateService:
         except Exception:
             return []
 
+    def _git_worktree_snapshot(self):
+        try:
+            status = subprocess.run(
+                ["git", "status", "--porcelain=v1", "--untracked-files=all"],
+                cwd=self.directory,
+                capture_output=True,
+                timeout=10,
+            )
+            if status.returncode != 0:
+                return None
+            head = subprocess.run(
+                ["git", "rev-parse", "--verify", "HEAD"],
+                cwd=self.directory,
+                capture_output=True,
+                timeout=10,
+            )
+            if head.returncode != 0:
+                return None
+            return {
+                "dirty": bool(self.decode_proc_output(status.stdout).strip()),
+                "head": self.decode_proc_output(head.stdout).strip(),
+            }
+        except Exception:
+            return None
+
     def select_git_remote(self, remotes=None):
         remotes = remotes if remotes is not None else self.get_git_remotes()
         for name in self.remote_priority:
@@ -129,6 +156,21 @@ class HotUpdateService:
                 "remote": None,
                 "restartScript": None,
                 "reason": "当前不是可热更新包，缺少 .git 目录",
+            }
+        worktree = self._git_worktree_snapshot()
+        if worktree is None:
+            return {
+                "canHotApply": False,
+                "remote": None,
+                "restartScript": None,
+                "reason": "无法确认 Git 工作树状态，已禁用热更新",
+            }
+        if worktree["dirty"]:
+            return {
+                "canHotApply": False,
+                "remote": None,
+                "restartScript": None,
+                "reason": "工作树有未提交或未跟踪文件，请先保存/提交后再热更新",
             }
         remote = self.select_git_remote()
         if not remote:
@@ -161,11 +203,24 @@ class HotUpdateService:
         }
 
     def fetch_update_manifest(self):
+        manifest_url = self.update_manifest_url
+        if self.update_config_provider:
+            try:
+                config = self.update_config_provider()
+                candidate = str(
+                    (config or {}).get("update_manifest_url")
+                    or (config or {}).get("updateManifestUrl")
+                    or ""
+                ).strip()
+                if candidate:
+                    manifest_url = candidate
+            except Exception:
+                pass
         headers = {
-            "User-Agent": "updream-canvas-AutoUpdate/2.0",
+            "User-Agent": "Canvas-AutoUpdate/2.0",
             "Accept": "application/json, application/octet-stream;q=0.9, */*;q=0.8",
         }
-        req = urllib.request.Request(self.update_manifest_url, headers=headers)
+        req = urllib.request.Request(manifest_url, headers=headers)
         with urllib.request.urlopen(req, timeout=10) as resp:
             return json.loads(resp.read().decode("utf-8"))
 
@@ -330,6 +385,10 @@ class HotUpdateService:
         remote = hot.get("remote")
         restart_script = hot.get("restartScript")
 
+        initial_state = self._git_worktree_snapshot()
+        if initial_state is None or initial_state["dirty"]:
+            return {"success": False, "error": "工作树状态已变化或不干净，已取消热更新"}
+
         fetch = subprocess.run(
             ["git", "fetch", remote, self.update_branch],
             cwd=self.directory,
@@ -340,15 +399,35 @@ class HotUpdateService:
             err = self.decode_proc_output(fetch.stderr).strip() or self.decode_proc_output(fetch.stdout).strip()
             return {"success": False, "error": err}
 
-        reset = subprocess.run(
-            ["git", "reset", "--hard", "FETCH_HEAD"],
+        current_state = self._git_worktree_snapshot()
+        if current_state is None or current_state["dirty"] or current_state["head"] != initial_state["head"]:
+            return {"success": False, "error": "更新期间工作树发生变化，未覆盖本地改动"}
+        target = subprocess.run(
+            ["git", "rev-parse", "--verify", "FETCH_HEAD"],
+            cwd=self.directory,
+            capture_output=True,
+            timeout=10,
+        )
+        if target.returncode != 0:
+            err = self.decode_proc_output(target.stderr).strip() or self.decode_proc_output(target.stdout).strip()
+            return {"success": False, "error": err or "无法解析更新提交"}
+        ancestry = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", initial_state["head"], "FETCH_HEAD"],
+            cwd=self.directory,
+            capture_output=True,
+            timeout=10,
+        )
+        if ancestry.returncode != 0:
+            return {"success": False, "error": "远端更新不是当前提交的快进后代，拒绝覆盖本地提交"}
+        merge = subprocess.run(
+            ["git", "merge", "--ff-only", "FETCH_HEAD"],
             cwd=self.directory,
             capture_output=True,
             timeout=60,
         )
-        if reset.returncode != 0:
-            err = self.decode_proc_output(reset.stderr).strip() or self.decode_proc_output(reset.stdout).strip()
-            return {"success": False, "error": err}
+        if merge.returncode != 0:
+            err = self.decode_proc_output(merge.stderr).strip() or self.decode_proc_output(merge.stdout).strip()
+            return {"success": False, "error": err or "快进更新失败"}
 
         if not restart_script or not os.path.isfile(restart_script):
             return {"success": False, "error": f"未找到当前平台启动脚本: {restart_script}"}

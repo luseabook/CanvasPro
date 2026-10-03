@@ -196,14 +196,17 @@ export function createWorkspaceModeCoordinator({
     _0x510317 = () => {
       canvasWorkspace?.['setPresentationActive']?.(_0x10437f['mode'] === CANVAS_MODE_ID);
       const _0x54349b = new Set(MODE_BODY_CLASSES[_0x10437f['mode']] || []);
+      const hiddenCanvas = _0x10437f['mode'] !== CANVAS_MODE_ID;
       (new Set(Object['values'](MODE_BODY_CLASSES)['flat']())['forEach']((_0x15ea37) => {
         documentObject['body']['classList']['toggle'](_0x15ea37, _0x54349b['has'](_0x15ea37));
-      }),
-        documentObject['getElementById']('v2-canvas')?.['setAttribute'](
-          'aria-hidden',
-          String(_0x10437f['mode'] !== CANVAS_MODE_ID),
-        ),
-        _0x3ec2b6());
+      }));
+      for (const element of [documentObject['getElementById']('v2-canvas'), documentObject['querySelector']?.('.sidebar-floating')]) {
+        if (!element) continue;
+        element['setAttribute']('aria-hidden', String(hiddenCanvas));
+        if (hiddenCanvas) element['setAttribute']('inert', '');
+        else element['removeAttribute']?.('inert');
+      }
+      _0x3ec2b6();
     },
     _0x2f912c = ({ focus: focus = '' } = {}) => {
       const _0x3a753c = _0x2e0402 || _0x34892a;
@@ -379,11 +382,13 @@ export function createWorkspaceModeCoordinator({
       const _0x17bc21 = _0x572647['dataset']['storyWorkspaceMode'];
       if (_0x17bc21 === _0x10437f['mode'] && _0x17bc21 !== STORYBOARD_3D_MODE_ID) {
         ((_0x2e0402 = ![]), (_0x34892a = ![]), _0x2f912c(), _0x428779(_0x17bc21));
+        _0xff80ed.querySelector('.workspace-mode-current')?.focus?.({ preventScroll: !![] });
         return;
       }
       const _0x4ce0b2 = _0xff80ed['querySelector']('.workspace-mode-current'),
         _0x161370 = () => {
           ((_0x2e0402 = ![]), (_0x34892a = ![]), _0x2f912c(), _0x428779(_0x17bc21));
+          _0xff80ed.querySelector('.workspace-mode-current')?.focus?.({ preventScroll: !![] });
         };
       let _0x5a5030 = null;
       try {

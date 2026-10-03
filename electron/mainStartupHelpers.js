@@ -21,7 +21,9 @@ export function createStartupHelpers({
   }
   function createStartupHtml(options = {}) {
     const kind = String(options['kind'] || 'loading'),
-      title = escapeHtml(options['title'] || appDisplayName + '\x20正在启动'),
+      title = escapeHtml(
+        options['title'] || (typeof appDisplayName === 'function' ? appDisplayName() : appDisplayName) + '\x20正在启动',
+      ),
       detail = escapeHtml(options['detail'] || ''),
       hint = escapeHtml(options['hint'] || ''),
       isError = kind === 'error';

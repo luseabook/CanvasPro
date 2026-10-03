@@ -91,7 +91,20 @@ export const PROVIDERS_META = {
     defaultRouteId: DEFAULT_APIMART_ROUTE_ID,
     logoPath: null,
   },
-  agnes: { id: 'agnes', label: 'Agnes AI', defaultUrl: 'https://apihub.agnes-ai.com', logoPath: null },
+  // 国内 / 国际是两条互不相通的线路：域名不同，而且 API Key 不能互换（跨线路会 401）。
+  // 因此把它们定义为两个独立厂商，各自拥有独立的密钥输入框与配置项。
+  'agnes-domestic': {
+    id: 'agnes-domestic',
+    label: 'Agnes AI（国内）',
+    defaultUrl: 'https://api.agnes-ai.cn',
+    logoPath: null,
+  },
+  agnes: {
+    id: 'agnes',
+    label: 'Agnes AI（国际）',
+    defaultUrl: 'https://apihub.agnes-ai.com',
+    logoPath: null,
+  },
   volcengine: {
     id: 'volcengine',
     label: '火山方舟',

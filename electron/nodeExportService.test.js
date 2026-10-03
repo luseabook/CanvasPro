@@ -21,9 +21,9 @@ test('zip name helpers keep a single extension', () => {
   assert.equal(withNodeExportZipExtension('   '), '');
   assert.equal(
     defaultNodeExportZipName(new Date(2026, 8, 24, 5, 6, 7)),
-    'updream-canvas-Export-20260924-050607.zip',
+    'Canvas-Export-20260924-050607.zip',
   );
-  assert.match(defaultNodeExportZipName(), /^updream-canvas-Export-\d{8}-\d{6}\.zip$/);
+  assert.match(defaultNodeExportZipName(), /^Canvas-Export-\d{8}-\d{6}\.zip$/);
 });
 
 test('exportNodeItemsToZip writes media, text and a manifest', async () => {

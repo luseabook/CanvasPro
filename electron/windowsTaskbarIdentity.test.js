@@ -10,10 +10,10 @@ import { APP_WINDOW_MIN_HEIGHT, APP_WINDOW_MIN_WIDTH } from './appWindowSizePoli
 
 const IDENTITY_TIMEOUT_MS = 0x1770;
 const IDENTITY = {
-  appId: 'com.example.canvas',
+  appId: 'cn.1e1e.canvas',
   iconPath: 'C:\\app\\icon.ico',
   executablePath: 'C:\\app\\canvas.exe',
-  displayName: 'updream canvas',
+  displayName: 'Canvas',
 };
 const SCRIPT_INPUT = {
   browserPath: 'C:\\Chrome\\chrome.exe',
@@ -285,11 +285,12 @@ test('the script builds the relaunch command, the profile switch and the size gu
   assert.ok(script.includes('exit 3'));
 });
 
-test('the taskbar brand matcher accepts the ported product name and the short legacy title', () => {
+test('the taskbar brand matcher accepts Canvas and legacy titles', () => {
   const script = buildWindowsChromeShellTaskbarIdentityScript(SCRIPT_INPUT);
   assert.ok(script.includes('title.IndexOf("updream canvas", StringComparison.OrdinalIgnoreCase) >= 0'));
   assert.ok(script.includes('title.IndexOf("AI CanvasPro", StringComparison.OrdinalIgnoreCase) >= 0'));
   assert.ok(script.includes('title.IndexOf("AI Canvas", StringComparison.OrdinalIgnoreCase) >= 0'));
+  assert.ok(script.includes('title.IndexOf("Canvas", StringComparison.OrdinalIgnoreCase) >= 0'));
   assert.ok(!script.includes('SHUO Canvas'));
 });
 

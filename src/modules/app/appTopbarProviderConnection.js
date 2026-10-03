@@ -25,6 +25,21 @@ import {
   normalizeComfyUiConnectionTarget,
   normalizeComfyUiFormUrl,
 } from './comfyUiConnectionSettings.js';
+import { fetchProviderModelList } from '../../../api/providerModelListApi.js';
+import {
+  PROVIDER_MODEL_CATALOG_PROVIDER_IDS,
+  applyProviderModelCatalog,
+  collectEnabledVendorModels,
+  inferProviderModelKind,
+  isProviderModelCatalogProvider,
+  mergeProviderModelCatalog,
+  readProviderModelCatalog,
+} from '../settings/providerModelCatalog.js';
+import {
+  readProviderModelCatalogSelection,
+  renderProviderModelCatalogPanel,
+} from '../settings/providerModelCatalogPanel.js';
+import { createProviderModelCatalogBundleRegistry } from './providerModelCatalogRegistration.js';
 import { createCustomProviderOnboardingController } from './appTopbarCustomProviderOnboarding.js';
 import { createDreaminaLoginSessionController } from './appTopbarDreaminaSession.js';
 const RUNNINGHUB_SETTINGS_PROVIDER_IDS = ['runninghub', 'runninghub-international'],
@@ -118,6 +133,124 @@ export function createProviderSettingsController({
     _0x287e45 = null;
   const _0x134865 = createProviderStatusTooltipController();
   let _0x1bab9a = null;
+  // ── 厂商模型清单：从接口拉取、勾选、动态登记 ─────────────────────────────
+  // 内置清单只能覆盖已适配的模型；厂商新增模型时，用户在这里拉一次真实列表即可选用。
+  const _0x4a71c9 = createProviderModelCatalogBundleRegistry();
+  function _0x2f9d13(_0x11e0a5 = _0x4fcbd4) {
+    try {
+      return _0x4a71c9['sync'](collectEnabledVendorModels(_0x11e0a5));
+    } catch (_0x1c3d5e) {
+      console['warn']('[Provider Model Catalog] sync failed:', _0x1c3d5e);
+      return { changed: false, registered: 0x0 };
+    }
+  }
+  function _0x5a7c9e(_0x2b1e0c, _0x3f5c1d = {}) {
+    const _0x3d0f2a = readProviderModelCatalog(_0x4fcbd4?.['providers']?.[_0x2b1e0c] || {}),
+      _0x1a2f7f = _0x3f5c1d['statusText'] ?? '';
+    return renderProviderModelCatalogPanel({
+      documentObject: _0x50ad60,
+      providerId: _0x2b1e0c,
+      catalog: _0x3d0f2a,
+      statusText:
+        _0x1a2f7f ||
+        (_0x3d0f2a['models']['length']
+          ? trApiInput('models.count', { count: _0x3d0f2a['models']['length'] })
+          : ''),
+      message: _0x3f5c1d['message'] || '',
+      messageKind: _0x3f5c1d['messageKind'] || 'info',
+    });
+  }
+  function _0x5c1f8b(_0x2f0e57) {
+    const _0x3c9a1b = readProviderModelCatalogSelection(_0x50ad60, _0x2f0e57);
+    if (_0x3c9a1b['length'] === 0) return false;
+    const _0x4f0d69 = String(_0x2f0e57 || '')['trim']();
+    _0x4fcbd4['providers'] = _0x4fcbd4['providers'] || {};
+    _0x4fcbd4['providers'][_0x4f0d69] = applyProviderModelCatalog(_0x4fcbd4['providers'][_0x4f0d69], {
+      fetchedAt: new Date()['toISOString'](),
+      models: _0x3c9a1b['map']((_0x4d2f1a) => ({
+        id: _0x4d2f1a['id'],
+        kind: _0x4d2f1a['kind'] || inferProviderModelKind(_0x4f0d69, _0x4d2f1a['id']),
+        enabled: _0x4d2f1a['enabled'],
+      })),
+    });
+    return true;
+  }
+  async function _0x1e5a76(_0x2f0e57, _0x5d3a91 = null) {
+    const _0x1a2cbe = String(_0x2f0e57 || '')['trim']();
+    if (!isProviderModelCatalogProvider(_0x1a2cbe)) return false;
+    const _0x3b1d0e = _0x50ad60['getElementById']('providerKey-' + _0x1a2cbe),
+      _0x2210af = String(_0x3b1d0e?.['value'] || '')
+        ['trim']()
+        ['replace'](/^Bearer\s+/i, '');
+    if (!_0x2210af) {
+      (_0xd96ce0['showToast']?.(trApiInput('models.needKey'), 'error'), _0x3b1d0e?.['focus']?.());
+      return false;
+    }
+    if (_0x5d3a91) _0x5d3a91['disabled'] = true;
+    _0x5a7c9e(_0x1a2cbe, {
+      statusText: trApiInput('models.fetching'),
+      message: trApiInput('models.fetching'),
+    });
+    try {
+      const _0x4f7a1c = _0x4fcbd4?.['providers']?.[_0x1a2cbe] || {},
+        _0x5fb8a5 = await fetchProviderModelList({
+          providerId: _0x1a2cbe,
+          apiUrl: _0x4f7a1c['apiUrl'],
+          apiKey: _0x2210af,
+        });
+      if (!_0x5fb8a5['success']) {
+        _0x5a7c9e(_0x1a2cbe, {
+          statusText: '',
+          message: trApiInput('models.failed') + '：' + _0x5fb8a5['error'],
+          messageKind: 'error',
+        });
+        return false;
+      }
+      if (_0x5fb8a5['models']['length'] === 0) {
+        _0x5a7c9e(_0x1a2cbe, {
+          statusText: '',
+          message: trApiInput('models.empty'),
+          messageKind: 'error',
+        });
+        return false;
+      }
+      // 拉取只刷新候选清单，不改动已勾选状态；写入配置由“保存选择”完成。
+      const _0x1f9d5f = mergeProviderModelCatalog(
+        _0x1a2cbe,
+        readProviderModelCatalog(_0x4f7a1c)['models'],
+        _0x5fb8a5['models'],
+      );
+      renderProviderModelCatalogPanel({
+        documentObject: _0x50ad60,
+        providerId: _0x1a2cbe,
+        catalog: { fetchedAt: new Date()['toISOString'](), models: _0x1f9d5f },
+        statusText: trApiInput('models.count', { count: _0x1f9d5f['length'] }),
+      });
+      return true;
+    } finally {
+      if (_0x5d3a91) _0x5d3a91['disabled'] = false;
+    }
+  }
+  async function _0x4b8e2c(_0x2f0e57) {
+    const _0x1a2cbe = String(_0x2f0e57 || '')['trim']();
+    if (!isProviderModelCatalogProvider(_0x1a2cbe)) return false;
+    if (!_0x5c1f8b(_0x1a2cbe)) return false;
+    await _0x3acf88?.['persist']();
+    const _0x2c1c9a = _0x2f9d13(_0x4fcbd4);
+    _0x48dc00?.();
+    const _0x3d0f2a = readProviderModelCatalog(_0x4fcbd4?.['providers']?.[_0x1a2cbe] || {}),
+      _0x5a3f1c = _0x2c1c9a?.['skipped']?.['length'] || 0;
+    _0x5a7c9e(_0x1a2cbe, {
+      statusText: trApiInput('models.count', { count: _0x3d0f2a['models']['length'] }),
+      message:
+        trApiInput('models.saved') +
+        (_0x2c1c9a?.['registered'] ? '（新增 ' + _0x2c1c9a['registered'] + ' 个）' : '') +
+        (_0x5a3f1c ? '（' + _0x5a3f1c + ' 个需手动接入）' : ''),
+      messageKind: 'success',
+    });
+    return true;
+  }
+
   const _0x5ef025 = new Set();
   function _0x4b4d05(_0x3a4849) {
     const _0xa89355 = typeof _0x3a4849 === 'string' ? _0x3a4849 : _0x3a4849?.['id'];
@@ -710,7 +843,9 @@ export function createProviderSettingsController({
             const _0x72255a = _0x50ad60['getElementById']('providerKey-grsai');
             if (_0x5ba888(_0x72255a) && !_0x72255a['value']) _0x72255a['value'] = _0x201a29['apiKey'];
           }
-          (_0x1bab9a['syncEditorCredentials'](_0x84ebce),
+          (_0x2f9d13(_0x4fcbd4),
+            PROVIDER_MODEL_CATALOG_PROVIDER_IDS['forEach']((_0x6f31a2) => _0x5a7c9e(_0x6f31a2)),
+            _0x1bab9a['syncEditorCredentials'](_0x84ebce),
             _0x1bab9a['syncDefaults'](_0x84ebce),
             _0x5ef025['size'] && _0x2b288c(_0x167079(_0x201a29)),
             _0xadece6(_0x4fcbd4),
@@ -751,6 +886,22 @@ export function createProviderSettingsController({
           })['catch'](() => {});
         });
       }),
+      _0x50ad60['querySelectorAll']('[data-provider-models]')['forEach']((_0x3e1a2b) => {
+        const _0x1d6f0e = String(_0x3e1a2b['dataset']['providerModels'] || '')['trim']();
+        if (!_0x1d6f0e) return;
+        _0x3e1a2b['addEventListener']('click', () => {
+          _0x1e5a76(_0x1d6f0e, _0x3e1a2b)['catch'](() => {});
+        });
+      }),
+      (_0x50ad60['getElementById']('pane-api-input') || _0x50ad60)['addEventListener'](
+        'click',
+        (_0x4bb3c2) => {
+          const _0x2ab1d2 = _0x4bb3c2?.['target']?.['closest']?.('[data-provider-model-save]');
+          if (!_0x2ab1d2) return;
+          _0x4bb3c2['preventDefault']?.();
+          _0x4b8e2c(String(_0x2ab1d2['dataset']['providerModelSave'] || '')['trim']())['catch'](() => {});
+        },
+      ),
       _0x1ba785(),
       bindProviderApiKeyGuideTriggers(_0x50ad60),
       bindVolcengineSpeechApiKeyGuideTriggers(_0x50ad60),

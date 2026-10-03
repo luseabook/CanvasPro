@@ -16731,6 +16731,105 @@ body.dev-mode .settings-card.dev-mode-only {
   color: var(--text-muted);
   pointer-events: none;
 }
+/* ── 厂商模型清单（设置 → API Key → 获取模型列表） ───────────────────── */
+.settings-provider-models-btn {
+  margin-left: 0;
+}
+.settings-provider-models {
+  margin-top: var(--space-10);
+  padding: var(--space-10);
+  border: 1px solid var(--stroke-10);
+  border-radius: var(--radius-8);
+  background: var(--white-03);
+}
+.settings-provider-models[hidden] {
+  display: none;
+}
+.settings-provider-models-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+.settings-provider-models-title {
+  font-size: var(--font-11);
+  color: var(--text-muted);
+}
+.settings-provider-models-status {
+  margin-left: auto;
+  font-size: var(--font-11);
+  color: var(--text-muted);
+}
+.settings-provider-models-save {
+  padding: var(--space-3) var(--space-10);
+  border: 1px solid var(--green-30);
+  border-radius: var(--radius-6);
+  background: var(--green-10);
+  color: var(--green);
+  font-size: var(--font-11);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.settings-provider-models-save:hover {
+  background: var(--green-30);
+}
+.settings-provider-models-message {
+  margin-bottom: var(--space-8);
+  font-size: var(--font-11);
+  color: var(--text-muted);
+  word-break: break-word;
+}
+.settings-provider-models-message.is-error {
+  color: var(--error-text-light);
+}
+.settings-provider-models-message.is-success {
+  color: var(--green);
+}
+.settings-provider-models-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-height: 260px;
+  overflow: auto;
+}
+.settings-provider-model-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: var(--font-12);
+  color: var(--text-primary);
+}
+.settings-provider-model-name {
+  font-family: var(--font-mono);
+  word-break: break-all;
+}
+.settings-provider-model-tag {
+  padding: 1px var(--space-6);
+  border: 1px solid var(--stroke-10);
+  border-radius: var(--radius-4);
+  color: var(--text-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+.settings-provider-model-tag.is-integrated {
+  border-color: var(--green-30);
+  background: var(--green-10);
+  color: var(--green);
+}
+.settings-provider-model-kind {
+  margin-left: auto;
+  padding: 2px var(--space-6);
+  border: 1px solid var(--stroke-10);
+  border-radius: var(--radius-4);
+  background: var(--white-05);
+  color: var(--text-primary);
+  font-size: var(--font-11);
+}
+.settings-provider-model-row.is-integrated .settings-provider-model-name {
+  color: var(--text-muted);
+}
+
 .settings-provider-test-btn {
   margin-left: auto;
   display: inline-flex;

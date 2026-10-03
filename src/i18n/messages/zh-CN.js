@@ -1,7 +1,9 @@
 const zhCN = Object.freeze({
   app: Object.freeze({
-    documentTitle: 'updream canvas',
+    documentTitle: 'Canvas',
     serverDisconnected:
+      '⚠️ 警告：与本地服务断开连接，正在尝试自动恢复…若长时间无法恢复，请重启应用。',
+    serverDisconnectedDev:
       '⚠️ 警告：与本地服务器断开连接，功能将受限。请检查后台终端（黑框）是否被意外关闭，若关闭请重新「双击运行。bat」。',
     quickGenerate: 'AiCanvas Agent',
     debugSandbox: 'V2 架构验证沙盒 · 拖拽节点进行测试',
@@ -95,7 +97,7 @@ const zhCN = Object.freeze({
     addCanvasPage: '新建画布页面',
     currentVersion: '当前版本',
     canvasProject: '画布项目',
-    canvasTitle: 'updream canvas',
+    canvasTitle: 'Canvas',
     loading: '加载中...',
     newCanvas: '新建画布',
   }),
@@ -473,7 +475,7 @@ const zhCN = Object.freeze({
       rootDir: Object.freeze({
         label: '保存根目录',
         desc: '项目、数据和输出会统一保存在该目录下',
-        placeholder: '例如 D:\\updream canvas Files',
+        placeholder: '例如 D:\\Canvas Files',
         pickAria: '选择保存根目录',
         choose: '选择',
       }),
@@ -635,6 +637,13 @@ const zhCN = Object.freeze({
         overseas: '海外线路',
         custom: '自定义线路：{value}',
       }),
+      readiness: Object.freeze({
+        ready: '已就绪 {count} 个服务',
+        empty: '尚未配置任何服务',
+        readyShort: '已就绪 {count}',
+        emptyShort: '未配置',
+        requiredShort: '需配置',
+      }),
       diagnostics: Object.freeze({
         skipped: '跳过',
         passed: '通过',
@@ -665,13 +674,36 @@ const zhCN = Object.freeze({
         frontendPlaceholder: '前端占位',
         oauthLogin: 'OAuth 登录',
       }),
+      models: Object.freeze({
+        fetch: '获取模型列表',
+        fetchTitle: '从厂商接口读取模型列表（GET /v1/models）',
+        fetching: '正在获取…',
+        empty: '接口没有返回任何模型',
+        failed: '获取模型列表失败',
+        needKey: '请先填写该线路的 API 密钥',
+        matched: '已接入',
+        unmatched: '未接入',
+        count: '接口返回 {count} 个模型',
+        selectHint: '勾选要在软件里使用的模型',
+        save: '保存选择',
+        saved: '已保存模型选择',
+        text: '文本',
+        image: '图片',
+        video: '视频',
+      }),
       providers: Object.freeze({
         apimart: Object.freeze({
           testTitle: '测试 APIMart 连接',
           getTitle: '前往 APIMart 获取 API Key',
         }),
         agnes: Object.freeze({
-          testTitle: '测试 Agnes AI 连接',
+          title: 'Agnes AI（国际）',
+          testTitle: '测试 Agnes AI（国际）连接',
+          getTitle: '前往 Agnes AI 获取 API Key',
+        }),
+        agnesDomestic: Object.freeze({
+          title: 'Agnes AI（国内）',
+          testTitle: '测试 Agnes AI（国内）连接',
           getTitle: '前往 Agnes AI 获取 API Key',
         }),
         volcengine: Object.freeze({
@@ -859,7 +891,7 @@ const zhCN = Object.freeze({
   about: Object.freeze({
     author: '作者：',
     bilibili: '访问 Bilibili 主页',
-    footer: '© 2026 updream canvas. All rights reserved...',
+    footer: '© 2026 Canvas. All rights reserved...',
   }),
   appPanels: Object.freeze({
     tutorial: Object.freeze({

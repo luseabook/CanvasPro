@@ -1,13 +1,21 @@
 const path = require('node:path');
 
 module.exports = {
+  // Preserve the existing bundle identity so installs upgrade in place.
   appId: 'com.aicanvaspro.editor',
-  productName: 'updream canvas',
-  copyright: 'Copyright (c) 2026 updream canvas',
+  productName: 'Canvas',
+  copyright: 'Copyright (c) 2026 Canvas',
   asar: false,
   directories: {
     output: 'dist-win',
   },
+  publish: [
+    {
+      provider: 'github',
+      owner: 'luseaer-ship-it',
+      repo: 'CanvasPro',
+    },
+  ],
   files: [
     'api/**/*',
     'assets/**/*',
@@ -31,6 +39,7 @@ module.exports = {
     '!**/*.spec.js',
     '!**/*.map',
     '!**/*.pyc',
+    '!**/test_*.py',
     '!**/__pycache__/**',
     '!**/tests/**',
     '!**/test-results/**',
@@ -49,7 +58,7 @@ module.exports = {
     ],
     icon: path.join(__dirname, 'build', 'app-icon.ico'),
     requestedExecutionLevel: 'asInvoker',
-    artifactName: 'updream-canvas-${version}-win-${arch}.${ext}',
+    artifactName: 'Canvas-${version}-win-${arch}.${ext}',
   },
   nsis: {
     oneClick: false,
@@ -57,8 +66,8 @@ module.exports = {
     allowToChangeInstallationDirectory: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    shortcutName: 'updream canvas',
+    shortcutName: 'Canvas',
     include: path.join(__dirname, 'build', 'installer.nsh'),
-    artifactName: 'updream-canvas-Setup-${version}-${arch}.${ext}',
+    artifactName: 'Canvas-Setup-${version}-${arch}.${ext}',
   },
 };

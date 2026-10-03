@@ -168,7 +168,7 @@ function present(presentation = {}) {
     (document['documentElement']['dataset']['theme'] = presentation['theme'] === 'light' ? 'light' : 'dark'),
     updateRunImmediately(presentation['runImmediately'] === !![]),
     syncControls());
-  const shortcutLabel = String(presentation['shortcutLabel'] || 'Alt+C');
+  const shortcutLabel = String(presentation['shortcutLabel'] || 'Control+Alt+Shift+C');
   if (state['phase'] === 'capturing') showFeedback('正在读取选中文字…');
   else
     state['phase'] === 'error'

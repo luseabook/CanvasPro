@@ -2,7 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSecureSettingsCapabilityOperations } from './secureSettingsCapabilityOperations.js';
 
-const normalizeKeys = (payload) => (payload?.key ? [payload.key] : []);
+const API_KEY = 'apiConfig.providers.openai.apiKey';
+const normalizeKeys = (payload) =>
+  Array.isArray(payload?.keys) ? payload.keys : payload?.key ? [payload.key] : [];
 
 function createStore({ available = true, values = {} } = {}) {
   const writes = [];
@@ -16,22 +18,22 @@ function createStore({ available = true, values = {} } = {}) {
 }
 
 test('get returns stored values only when the store is available', () => {
-  const store = createStore({ values: { apiKey: 'secret' } });
+  const store = createStore({ values: { [API_KEY]: 'secret' } });
   const operations = createSecureSettingsCapabilityOperations({
     getSecureSettingsStore: () => store,
     normalizeSecureSettingsKeys: normalizeKeys,
   });
-  assert.deepEqual(operations.get({ key: 'apiKey' }), {
+  assert.deepEqual(operations.get({ key: 'apiConfig.providers.openai.apiKey' }), {
     ok: true,
     available: true,
-    values: { apiKey: 'secret' },
+    values: { [API_KEY]: 'secret' },
   });
 
   const offline = createSecureSettingsCapabilityOperations({
-    getSecureSettingsStore: () => createStore({ available: false, values: { apiKey: 'secret' } }),
+    getSecureSettingsStore: () => createStore({ available: false, values: { [API_KEY]: 'secret' } }),
     normalizeSecureSettingsKeys: normalizeKeys,
   });
-  assert.deepEqual(offline.get({ key: 'apiKey' }), { ok: true, available: false, values: {} });
+  assert.deepEqual(offline.get({ key: 'apiConfig.providers.openai.apiKey' }), { ok: true, available: false, values: {} });
 });
 
 test('get degrades to an error result when the store throws', () => {
@@ -41,7 +43,7 @@ test('get degrades to an error result when the store throws', () => {
     },
     normalizeSecureSettingsKeys: normalizeKeys,
   });
-  assert.deepEqual(operations.get({ key: 'apiKey' }), {
+  assert.deepEqual(operations.get({ key: 'apiConfig.providers.openai.apiKey' }), {
     ok: false,
     available: false,
     values: {},
@@ -54,12 +56,12 @@ test('set and delete refuse to run without a working store', () => {
     getSecureSettingsStore: () => createStore({ available: false }),
     normalizeSecureSettingsKeys: normalizeKeys,
   });
-  assert.deepEqual(operations.set({ key: 'apiKey', value: 'v' }), {
+  assert.deepEqual(operations.set({ key: 'apiConfig.providers.openai.apiKey', value: 'v' }), {
     ok: false,
     available: false,
     error: '安全存储不可用',
   });
-  assert.deepEqual(operations.delete({ key: 'apiKey' }), {
+  assert.deepEqual(operations.delete({ key: 'apiConfig.providers.openai.apiKey' }), {
     ok: false,
     available: false,
     error: '安全存储不可用',
@@ -85,16 +87,28 @@ test('set and delete reject keys the normalizer drops', () => {
   assert.deepEqual(store.writes, []);
 });
 
+test('get/set/delete reject keys outside the secret configuration namespaces', () => {
+  const store = createStore({ values: { 'system.token': 'must stay hidden' } });
+  const operations = createSecureSettingsCapabilityOperations({
+    getSecureSettingsStore: () => store,
+    normalizeSecureSettingsKeys: normalizeKeys,
+  });
+  assert.deepEqual(operations.get({ key: 'system.token' }), { ok: true, available: true, values: {} });
+  assert.equal(operations.set({ key: 'system.token', value: 'overwrite' }).ok, false);
+  assert.equal(operations.delete({ key: 'system.token' }).ok, false);
+  assert.deepEqual(store.writes, []);
+});
+
 test('set and delete forward normalized keys to the store', () => {
   const store = createStore();
   const operations = createSecureSettingsCapabilityOperations({
     getSecureSettingsStore: () => store,
     normalizeSecureSettingsKeys: normalizeKeys,
   });
-  assert.deepEqual(operations.set({ key: 'apiKey', value: 'v1' }), { ok: true, available: true });
-  assert.deepEqual(operations.delete({ key: 'apiKey' }), { ok: true, available: true });
+  assert.deepEqual(operations.set({ key: 'apiConfig.providers.openai.apiKey', value: 'v1' }), { ok: true, available: true });
+  assert.deepEqual(operations.delete({ key: 'apiConfig.providers.openai.apiKey' }), { ok: true, available: true });
   assert.deepEqual(store.writes, [
-    ['set', 'apiKey', 'v1'],
-    ['delete', 'apiKey'],
+    ['set', 'apiConfig.providers.openai.apiKey', 'v1'],
+    ['delete', 'apiConfig.providers.openai.apiKey'],
   ]);
 });

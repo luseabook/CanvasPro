@@ -25,6 +25,28 @@ export function clearStoryHomeReferenceScript(_0x30e2da = {}) {
   if (_0x30e2da['hasCreatedProject'] !== !![] && _0x30e2da['data']?.['project'])
     _0x30e2da['data']['project']['sourceDocument'] = null;
 }
+// Attaching a file on the 快速创作 tab already runs the rewrite pipeline, so uploading a
+// novel only needs to land the text there with a usable instruction pre-filled. Without this
+// the user had to write the adaptation prompt themselves.
+export function buildNovelAdaptationInstruction({ episodeCount: episodeCount, sceneMaxSeconds: sceneMaxSeconds } = {}) {
+  const _0x3ad1e8 = Number(episodeCount),
+    _0x4f3c25 = Number(sceneMaxSeconds),
+    _0x2c8e91 =
+      Number['isFinite'](_0x3ad1e8) && _0x3ad1e8 > 0x0
+        ? '改编为 ' + Math['trunc'](_0x3ad1e8) + ' 集'
+        : '改编为分集',
+    _0x5540b1 =
+      Number['isFinite'](_0x4f3c25) && _0x4f3c25 > 0x0
+        ? '，单个场景不超过 ' + Math['trunc'](_0x4f3c25) + ' 秒'
+        : '';
+  return (
+    '把这部小说' +
+    _0x2c8e91 +
+    '竖屏短剧剧本' +
+    _0x5540b1 +
+    '。保留主线与关键人物，按场景拆分，每场标注地点、出场人物和时长；删除与主线无关的支线，补齐可直接拍摄的对白。'
+  );
+}
 export function getStoryHomeSummaryTaskCopy(_0x5af706 = 'generate') {
   if (_0x5af706 === 'rewrite')
     return {

@@ -1,7 +1,9 @@
 const enUS = Object.freeze({
   app: Object.freeze({
-    documentTitle: 'updream canvas',
+    documentTitle: 'Canvas',
     serverDisconnected:
+      '⚠️ Warning: the local service is disconnected. Trying to recover automatically — restart the app if it does not come back.',
+    serverDisconnectedDev:
       '⚠️ Warning: the local server is disconnected. Some features are limited. Check whether the background terminal was closed, then restart the app if needed.',
     quickGenerate: 'AiCanvas Agent',
     debugSandbox: 'V2 architecture sandbox · Drag nodes to test',
@@ -112,7 +114,7 @@ const enUS = Object.freeze({
     addCanvasPage: 'New canvas page',
     currentVersion: 'Current version',
     canvasProject: 'Canvas projects',
-    canvasTitle: 'updream canvas',
+    canvasTitle: 'Canvas',
     loading: 'Loading...',
     newCanvas: 'New canvas',
   }),
@@ -526,7 +528,7 @@ const enUS = Object.freeze({
       rootDir: Object.freeze({
         label: 'Save root folder',
         desc: 'Projects, data, and outputs are saved together under this folder',
-        placeholder: 'For example D:\\updream canvas Files',
+        placeholder: 'For example D:\\Canvas Files',
         pickAria: 'Choose save root folder',
         choose: 'Choose',
       }),
@@ -692,6 +694,13 @@ const enUS = Object.freeze({
         overseas: 'Overseas route',
         custom: 'Custom route: {value}',
       }),
+      readiness: Object.freeze({
+        ready: '{count} service(s) ready',
+        empty: 'No service configured yet',
+        readyShort: 'Ready {count}',
+        emptyShort: 'Not configured',
+        requiredShort: 'Setup needed',
+      }),
       diagnostics: Object.freeze({
         skipped: 'Skipped',
         passed: 'Passed',
@@ -722,13 +731,36 @@ const enUS = Object.freeze({
         frontendPlaceholder: 'Frontend placeholder',
         oauthLogin: 'OAuth login',
       }),
+      models: Object.freeze({
+        fetch: 'Fetch model list',
+        fetchTitle: 'Read the model list from the vendor API (GET /v1/models)',
+        fetching: 'Fetching…',
+        empty: 'The API returned no models',
+        failed: 'Failed to fetch the model list',
+        needKey: 'Enter this line\u2019s API key first',
+        matched: 'Integrated',
+        unmatched: 'Not integrated',
+        count: 'The API returned {count} models',
+        selectHint: 'Tick the models you want to use',
+        save: 'Save selection',
+        saved: 'Model selection saved',
+        text: 'Text',
+        image: 'Image',
+        video: 'Video',
+      }),
       providers: Object.freeze({
         apimart: Object.freeze({
           testTitle: 'Test APIMart connection',
           getTitle: 'Go to APIMart to get an API key',
         }),
         agnes: Object.freeze({
-          testTitle: 'Test Agnes AI connection',
+          title: 'Agnes AI (International)',
+          testTitle: 'Test Agnes AI (International) connection',
+          getTitle: 'Go to Agnes AI to get an API key',
+        }),
+        agnesDomestic: Object.freeze({
+          title: 'Agnes AI (Domestic)',
+          testTitle: 'Test Agnes AI (Domestic) connection',
           getTitle: 'Go to Agnes AI to get an API key',
         }),
         volcengine: Object.freeze({
@@ -1042,7 +1074,7 @@ const enUS = Object.freeze({
   about: Object.freeze({
     author: 'Author:',
     bilibili: 'Visit Bilibili profile',
-    footer: '© 2026 updream canvas. All rights reserved...',
+    footer: '© 2026 Canvas. All rights reserved...',
   }),
   appPanels: Object.freeze({
     tutorial: Object.freeze({

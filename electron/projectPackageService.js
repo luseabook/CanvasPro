@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import {
+  constants,
   copyFileSync,
   createReadStream,
   createWriteStream,
@@ -7,12 +8,13 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  renameSync,
+  rmdirSync,
   rmSync,
   statSync,
 } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import extract_zip from 'extract-zip';
 import yazl from 'yazl';
 import {
   buildProjectFilePayload,
@@ -403,37 +405,42 @@ export async function exportProjectPackageToPath({
   for (const _0xdb462e of _0x112b3f) {
     _0x414156.addFile(_0xdb462e.absPath, _0xdb462e.archivePath);
   }
-  return (
+  const temporaryDirectory = mkdtempSync(path.join(path.dirname(_0x46d258), '.aicpkg-export-'));
+  const temporaryPath = path.join(temporaryDirectory, path.basename(_0x46d258));
+  try {
     emitProgress(_0x4c8ce8, {
       phase: 'zipping',
       message: '正在写入项目包...',
       progress: 0.85,
       current: 0,
       total: _0x112b3f.length,
-    }),
-    await writeZip(_0x414156, _0x46d258, {
+    });
+    await writeZip(_0x414156, temporaryPath, {
       onProgress: _0x4c8ce8,
       estimatedBytes:
         _0x28c5a3.length +
         _0x581083.length +
         _0x112b3f.reduce((_0x50dde7, _0x357c96) => _0x50dde7 + Number(_0x357c96.size || 0), 0),
-    }),
-    emitProgress(_0x4c8ce8, {
-      phase: 'done',
-      message: '项目包收集完成',
-      progress: 1,
-      current: _0x112b3f.length,
-      total: _0x112b3f.length,
-    }),
-    {
-      success: true,
-      canceled: false,
-      path: _0x46d258,
-      filename: path.basename(_0x46d258),
-      assetsCount: _0x112b3f.length,
-      warnings: _0x4ab3e4.warnings,
-    }
-  );
+    });
+    renameSync(temporaryPath, _0x46d258);
+  } finally {
+    rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
+  emitProgress(_0x4c8ce8, {
+    phase: 'done',
+    message: '项目包收集完成',
+    progress: 1,
+    current: _0x112b3f.length,
+    total: _0x112b3f.length,
+  });
+  return {
+    success: true,
+    canceled: false,
+    path: _0x46d258,
+    filename: path.basename(_0x46d258),
+    assetsCount: _0x112b3f.length,
+    warnings: _0x4ab3e4.warnings,
+  };
 }
 function assertImportPackageSize(_0x2cc1bc, _0x3f906f) {
   const _0x24ebc2 = statSync(_0x2cc1bc);
@@ -524,7 +531,7 @@ function allocateUniqueProjectPath(_0x9b7161, _0x27d89f) {
 function importDirNameForProject(_0xf21862, _0x2bec9c = new Date()) {
   return safePathSegment((_0xf21862 || 'Project') + '-' + timestampForFilename(_0x2bec9c), 'Project');
 }
-function validateImportAssets(_0x348cbb, _0x3f55bc, _0x5f272e, _0x98363b = {}) {
+async function validateImportAssets(_0x348cbb, _0x3f55bc, _0x5f272e, _0x98363b = {}) {
   const _0x5312ec = Number(_0x98363b.maxAssetBytes || DEFAULT_MAX_IMPORT_ASSET_BYTES),
     _0x5ca4b1 = [],
     _0x2be2db = new Set();
@@ -552,6 +559,11 @@ function validateImportAssets(_0x348cbb, _0x3f55bc, _0x5f272e, _0x98363b = {}) {
     const _0x44778d = Number(_0xe644b3.size || 0) || 0;
     if (_0x44778d > 0 && _0x44778d !== _0x33bce7)
       throw new Error('Project package asset size mismatch: ' + _0xf78b36);
+    const expectedHash = String(_0xe644b3.sha256 || '').trim().toLowerCase();
+    if (expectedHash && !/^[a-f0-9]{64}$/.test(expectedHash))
+      throw new Error('Project package asset SHA-256 is invalid: ' + _0xf78b36);
+    if (expectedHash && (await hashFileSha256(_0x39cce8)).toLowerCase() !== expectedHash)
+      throw new Error('Project package asset SHA-256 mismatch: ' + _0xf78b36);
     if (!findRootDefinition(_0xf78b36, _0x5f272e))
       throw new Error('Unsupported project package asset localPath: ' + _0xf78b36);
     _0x5ca4b1.push({ localPath: _0xf78b36, archivePath: _0x1ed70e, absPath: _0x39cce8, size: _0x33bce7 });
@@ -573,11 +585,22 @@ export async function importProjectPackageFromPath({
   mkdirSync(_0x14d74e, { recursive: true });
   const _0x425e26 = mkdtempSync(path.join(_0x14d74e, 'aicpkg-'));
   try {
-    await extract_zip(_0x6a6b14, { dir: _0x425e26 });
+    // Reuse the bounded streaming extractor used by full-package restore.
+    const { extractFullPackage } = await import('./fullProjectPackageService.js');
+    const extractedEntries = await extractFullPackage(_0x6a6b14, _0x425e26);
     const _0x2a513b = path.join(_0x425e26, PROJECT_PACKAGE_MANIFEST_NAME);
     if (!existsSync(_0x2a513b)) throw new Error('Project package manifest is missing');
     const _0x41ecdb = readJsonFile(_0x2a513b, 'project package manifest');
     assertPackageManifest(_0x41ecdb);
+    const expectedEntries = new Set([
+      PROJECT_PACKAGE_MANIFEST_NAME,
+      PROJECT_PACKAGE_PROJECT_FILE,
+      ..._0x41ecdb.assets.map(asset => normalizeArchivePath(asset?.archivePath)).filter(Boolean),
+    ]);
+    if (
+      expectedEntries.size !== extractedEntries.size ||
+      [...extractedEntries.keys()].some(name => !expectedEntries.has(name))
+    ) throw new Error('Project package contains unlisted archive entries');
     const _0xc4f0dd = assertArchivePathInsideTemp(_0x425e26, _0x41ecdb.projectFile);
     if (!_0xc4f0dd || !existsSync(_0xc4f0dd)) throw new Error('Project package project file is missing');
     const _0x11ac65 = readJsonFile(_0xc4f0dd, 'project package project file'),
@@ -588,7 +611,7 @@ export async function importProjectPackageFromPath({
         'Imported Project',
       ),
       _0x1c6ddb = importDirNameForProject(_0x14766c, now),
-      _0x5a3642 = validateImportAssets(_0x41ecdb, _0x425e26, _0x749e3e || {}, {
+      _0x5a3642 = await validateImportAssets(_0x41ecdb, _0x425e26, _0x749e3e || {}, {
         maxAssetBytes: maxAssetBytes,
       }),
       _0x5dcf41 = new Map(),
@@ -599,25 +622,44 @@ export async function importProjectPackageFromPath({
           { from: _0x5d6733.absPath, to: _0xb3adfb.absPath }
         );
       });
-    for (const _0x2aa793 of _0x132d5d) {
-      (mkdirSync(path.dirname(_0x2aa793.to), { recursive: true }),
-        copyFileSync(_0x2aa793.from, _0x2aa793.to));
-    }
-    const _0x13bcfc = rewriteProjectLocalReferences(_0x11ac65, _0x5dcf41),
-      _0x2ea271 = allocateUniqueProjectPath(_0x5e4d4f, _0x14766c);
-    return (
-      writeProjectJson(_0x2ea271, _0x13bcfc),
-      {
+    const createdAssets = [], createdDirectories = new Set();
+    let importedProjectPath = '';
+    try {
+      for (const item of _0x132d5d) {
+        let directory = path.dirname(item.to);
+        const missingDirectories = [];
+        while (directory && !existsSync(directory)) {
+          missingDirectories.push(directory);
+          const parent = path.dirname(directory);
+          if (parent === directory) break;
+          directory = parent;
+        }
+        missingDirectories.forEach(directoryPath => createdDirectories.add(directoryPath));
+        mkdirSync(path.dirname(item.to), { recursive: true });
+        copyFileSync(item.from, item.to, constants.COPYFILE_EXCL);
+        createdAssets.push(item.to);
+      }
+      const importedData = rewriteProjectLocalReferences(_0x11ac65, _0x5dcf41);
+      importedProjectPath = allocateUniqueProjectPath(_0x5e4d4f, _0x14766c);
+      writeProjectJson(importedProjectPath, importedData);
+      return {
         success: true,
         canceled: false,
-        projectPath: _0x2ea271,
+        projectPath: importedProjectPath,
         projectName: _0x14766c + ' - 导入',
-        filename: path.basename(_0x2ea271),
-        data: _0x13bcfc,
+        filename: path.basename(importedProjectPath),
+        data: importedData,
         assetsCount: _0x5a3642.length,
         sourcePackagePath: _0x6a6b14,
+      };
+    } catch (error) {
+      if (importedProjectPath) rmSync(importedProjectPath, { force: true });
+      for (const filePath of createdAssets.reverse()) rmSync(filePath, { force: true });
+      for (const directory of [...createdDirectories].sort((a, b) => b.length - a.length)) {
+        try { rmdirSync(directory); } catch {}
       }
-    );
+      throw error;
+    }
   } finally {
     rmSync(_0x425e26, { recursive: true, force: true });
   }

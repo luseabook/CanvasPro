@@ -151,7 +151,7 @@ export function createGlobalCaptureWindowController({
     ((captureWindow = new BrowserWindowClass({
       width: windowSize['width'],
       height: windowSize['height'],
-      title: '发送到 updream canvas 无限画布',
+      title: '发送到 Canvas 无限画布',
       show: ![],
       frame: ![],
       thickFrame: ![],
@@ -294,7 +294,7 @@ export function createGlobalCaptureWindowController({
           text: text,
           phase: phase,
           errorReason: String(payload?.['errorReason'] || '')['trim'](),
-          shortcutLabel: String(payload?.['shortcutLabel'] || 'Alt+C')['trim']() || 'Alt+C',
+          shortcutLabel: String(payload?.['shortcutLabel'] || 'Control+Alt+Shift+C')['trim']() || 'Control+Alt+Shift+C',
           theme: nativeThemeApi?.['shouldUseDarkColors'] === ![] ? 'light' : 'dark',
           runImmediately: runImmediately,
           activeActionId: activeActionId,

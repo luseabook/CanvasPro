@@ -65,7 +65,7 @@ import { MediaTaskQueue } from './mediaTaskQueue.js';
 import { resolvePreferredRuntimePythonCommand } from './pythonRuntimeResolver.js';
 import { syncRecentProjectsToSystemRecentDocuments } from './recentDocuments.js';
 import { installRecoverySnapshotBeforeClose, requestRendererRecoverySnapshot } from './recoverySnapshot.js';
-import { createSecureSettingsStore } from './secureSettingsStore.js';
+import { createSecureSettingsStore, isAllowedSecureSettingKey } from './secureSettingsStore.js';
 import { createScreenshotOverlayController } from './screenshotOverlayController.js';
 import { createGlobalCaptureControllers } from './globalCaptureControllers.js';
 import { createImageDerivativeWorker } from './imageDerivativeWorker.js';
@@ -110,8 +110,14 @@ import {
   writeRecoverySnapshot,
 } from '../src/services/desktopProjectFileStore.js';
 import { registerIpcHandlers } from './ipc/registerIpcHandlers.js';
-const APP_DISPLAY_NAME = 'updream canvas',
-  APP_DATA_DIRECTORY_NAME = 'AI CanvasPro',
+let APP_DISPLAY_NAME = 'Canvas';
+const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
+  ? // Production keeps its historical folder, so an existing install keeps its projects and
+    // settings. Note the packaged name is 'canvas' from package.json, not the product name.
+    'AI CanvasPro'
+  : // A side-by-side test build carries its own productName in package.json (see
+    // electron-builder.win.dev.cjs), so it gets its own folder instead of sharing data.
+    app.getName() || 'AI CanvasPro',
   APP_USER_DATA_ROOT = path.join(app.getPath('appData'), APP_DATA_DIRECTORY_NAME),
   __filename = fileURLToPath(import.meta.url),
   __dirname = path.dirname(__filename),
@@ -145,9 +151,15 @@ const APP_DISPLAY_NAME = 'updream canvas',
   CLIPBOARD_FILE_REFERENCES_FORMAT = 'application/x-ai-canvas-file-references',
   RECOVERY_SNAPSHOT_FILENAME = 'recovery-snapshot.json',
   GLOBAL_SCREENSHOT_ACCELERATOR = 'Alt+Q',
-  GLOBAL_CAPTURE_LAUNCHER_ACCELERATOR = 'Alt+C';
+  GLOBAL_CAPTURE_LAUNCHER_ACCELERATOR = 'Control+Alt+Shift+C',
+  SERVER_RESTART_BASE_DELAY_MS = 0x3e8,
+  SERVER_RESTART_MAX_DELAY_MS = 0x7530,
+  SERVER_RESTART_MAX_ATTEMPTS = 0x5;
 let mainWindow = null,
   spawnedServer = null,
+  serverRestartTimer = null,
+  serverRestartAttempts = 0,
+  serverShutdownRequested = false,
   updaterHandlersInstalled = false,
   updateCheckStarted = false,
   autoUpdaterInstance = null,
@@ -237,6 +249,7 @@ const DEFAULT_WINDOW_STATE = { width: 0x5a0, height: 0x3c0, isMaximized: false }
 const { globalCaptureWindowController, globalTextPresetShortcutController } = createGlobalCaptureControllers({
   dirname: __dirname,
   accelerator: GLOBAL_CAPTURE_LAUNCHER_ACCELERATOR,
+  globalShortcutApi: globalShortcut,
   focusCanvas: () => focusMainWindow(),
   getMainWindow: () => mainWindow,
   logDiagnosticEvent: logDiagnosticEvent,
@@ -378,7 +391,7 @@ function installWindowStatePersistence(_0x1bfc6b) {
     }));
 }
 const { delay, loadStartupStatus, isLocalAppUrl, openExternalUrl } = createStartupHelpers({
-  appDisplayName: APP_DISPLAY_NAME,
+  appDisplayName: () => APP_DISPLAY_NAME,
   appOrigin: APP_ORIGIN,
   getMainWindow: () => mainWindow,
   logDiagnosticEvent: logDiagnosticEvent,
@@ -434,6 +447,26 @@ function requestLocalJson(_0x52adc2, _0x3c3cdb = 0x640) {
       _0x2869fe.on('error', _0x19bd8c),
       _0x2869fe.end());
   });
+}
+async function refreshProductDisplayName() {
+  try {
+    const response = await requestLocalJson('/api/client-config?refresh=1', 8000);
+    const config = response?.data && typeof response.data === 'object' ? response.data : response;
+    const displayName = String(config?.product_display_name || config?.productDisplayName || '')
+      .replace(/[\u0000-\u001f\u007f]/g, '')
+      .trim()
+      .slice(0, 80);
+    if (!displayName) return;
+    APP_DISPLAY_NAME = displayName;
+    app.setName(APP_DISPLAY_NAME);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      updateMainWindowUnsavedState(mainWindow);
+      const payload = JSON.stringify({ displayName: APP_DISPLAY_NAME });
+      void mainWindow.webContents
+        .executeJavaScript(`window.dispatchEvent(new CustomEvent('canvas:product-display-name', { detail: ${payload} }));`)
+        .catch(() => {});
+    }
+  } catch {}
 }
 async function clearPortBeforeStart(_0x2f1d77 = null) {
   const _0x1a93c4 = resolveBackendLaunch();
@@ -534,6 +567,9 @@ function buildPackagedServerEnv() {
   const _0x438439 = app.getPath('userData'),
     _0x20ca3d = getStorageRoot();
   return {
+    AIC_CLIENT_CONFIG_PATH: path.join(_0x438439, 'client-config.json'),
+    AIC_CLIENT_CONFIG_OVERRIDE_PATH: path.join(_0x438439, 'client-config.local.json'),
+    AIC_SUBSCRIPTION_STATUS_PATH: path.join(_0x438439, 'subscription-status.json'),
     AIC_USER_DIR: path.join(_0x438439, 'user'),
     AIC_CANVAS_DIR: path.join(_0x20ca3d, 'projects'),
     AIC_DATA_DIR: path.join(_0x20ca3d, 'data'),
@@ -604,7 +640,7 @@ const { getStableDeviceId } = createDeviceIdentityManager({
       mainWindow.webContents?.send?.('notification:generationCompleteClicked', event),
     logEvent: logDiagnosticEvent,
     resolveNotificationIconPath: resolveLocalVirtualPath,
-    appName: APP_DISPLAY_NAME,
+    appName: () => APP_DISPLAY_NAME,
   }),
   nodeExportController = createNodeExportController({
     app: app,
@@ -1079,7 +1115,7 @@ function installLocalApiTokenHeader() {
   if (localApiTokenHeaderInstalled) return;
   ((localApiTokenHeaderInstalled = true),
     session.defaultSession.webRequest.onBeforeSendHeaders(
-      { urls: [APP_ORIGIN + '/api/*', 'http://localhost:' + PORT + '/api/*'] },
+      { urls: [APP_ORIGIN + '/*', 'http://localhost:' + PORT + '/*'] },
       (_0x329894, _0x8bf78f) => {
         _0x8bf78f({
           requestHeaders: { ..._0x329894.requestHeaders, 'X-AIC-Local-Token': LOCAL_ACCESS_TOKEN },
@@ -1106,6 +1142,59 @@ async function waitForServerReady(_0x1ca88f = null) {
       await delay(SERVER_READY_INTERVAL_MS));
   }
   return false;
+}
+// The local backend can die on its own (crash, killed from Task Manager, port stolen).
+// Nothing used to bring it back, so the renderer stayed on the disconnect banner until the
+// app was restarted by hand. Re-spawn with capped exponential backoff instead.
+function scheduleServerRestart() {
+  if (serverShutdownRequested || serverRestartTimer) return;
+  if (serverRestartAttempts >= SERVER_RESTART_MAX_ATTEMPTS) {
+    logDiagnosticEvent({
+      type: 'backend.restart_exhausted',
+      level: 'error',
+      source: 'main',
+      message: 'Local Python service restart attempts exhausted',
+      context: { attempts: serverRestartAttempts, port: PORT },
+    });
+    return;
+  }
+  const attempt = serverRestartAttempts + 0x1,
+    delayMs = Math['min'](SERVER_RESTART_BASE_DELAY_MS * Math['pow'](0x2, serverRestartAttempts), SERVER_RESTART_MAX_DELAY_MS);
+  serverRestartAttempts = attempt;
+  logDiagnosticEvent({
+    type: 'backend.restart_scheduled',
+    level: 'warn',
+    source: 'main',
+    message: 'Local Python service exited; scheduling restart',
+    context: { attempt: attempt, delayMs: delayMs, port: PORT },
+  });
+  serverRestartTimer = setTimeout(() => {
+    serverRestartTimer = null;
+    if (serverShutdownRequested || spawnedServer) return;
+    void ensureServerRunning()
+      .then(() => {
+        serverRestartAttempts = 0;
+        logDiagnosticEvent({
+          type: 'backend.restart_succeeded',
+          level: 'info',
+          source: 'main',
+          message: 'Local Python service restarted',
+          context: { attempt: attempt, port: PORT },
+        });
+      })
+      .catch((_0x5c2f18) => {
+        logDiagnosticEvent({
+          type: 'backend.restart_failed',
+          level: 'error',
+          source: 'main',
+          message: 'Local Python service restart failed',
+          error: _0x5c2f18,
+          context: { attempt: attempt, port: PORT },
+        });
+        scheduleServerRestart();
+      });
+  }, delayMs);
+  if (typeof serverRestartTimer['unref'] === 'function') serverRestartTimer['unref']();
 }
 async function ensureServerRunning(_0x4c8dab = null) {
   _0x4c8dab?.({
@@ -1151,6 +1240,13 @@ async function ensureServerRunning(_0x4c8dab = null) {
       AICANVAS_PORT: String(PORT),
       AIC_LOCAL_TOKEN: LOCAL_ACCESS_TOKEN,
       ...buildPackagedServerEnv(),
+      ...(app.isPackaged
+        ? {
+            AIC_SUBSCRIPTION_API_BASE: '',
+            AIC_ALLOW_SUBSCRIPTION_API_OVERRIDE: '',
+            AIC_DEV_MODE: '',
+          }
+        : {}),
     },
     stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true,
@@ -1200,7 +1296,8 @@ async function ensureServerRunning(_0x4c8dab = null) {
             message: 'Local Python service exited',
             context: { code: _0x4daa93, signal: _0x2ae6fd, port: PORT },
           }),
-        (spawnedServer = null));
+        (spawnedServer = null),
+        serverShutdownRequested || scheduleServerRestart());
     }));
   const _0x69f021 = await waitForServerReady(_0x4c8dab);
   if (!_0x69f021) {
@@ -1217,6 +1314,8 @@ async function ensureServerRunning(_0x4c8dab = null) {
     throw new Error(APP_DISPLAY_NAME + ' server did not become ready at ' + APP_URL);
   }
   return (
+    // A ready backend clears the backoff so a later crash gets a full retry budget again.
+    (serverRestartAttempts = 0),
     _0x4c8dab?.({
       kind: 'loading',
       title: APP_DISPLAY_NAME + ' 正在启动',
@@ -1227,7 +1326,9 @@ async function ensureServerRunning(_0x4c8dab = null) {
   );
 }
 function stopSpawnedServer() {
-  if (!spawnedServer || spawnedServer.killed) return;
+  serverShutdownRequested = true;
+  if (serverRestartTimer) (clearTimeout(serverRestartTimer), (serverRestartTimer = null));
+  if (serverRestartAttempts === 0 && (!spawnedServer || spawnedServer.killed)) return;
   try {
     spawnedServer.kill();
   } catch {
@@ -1310,7 +1411,7 @@ const resolveDoubaoAsrConfig = createDoubaoAsrConfigResolver({
   });
 function normalizeSecureSettingsKeys(_0x1dd1d4 = {}) {
   const _0x1ce6f4 = Array.isArray(_0x1dd1d4?.keys) ? _0x1dd1d4.keys : [_0x1dd1d4?.key];
-  return _0x1ce6f4.map((_0x2f6168) => String(_0x2f6168 || '').trim()).filter(Boolean);
+  return _0x1ce6f4.map((_0x2f6168) => String(_0x2f6168 || '').trim()).filter(isAllowedSecureSettingKey);
 }
 function syncSystemRecentDocumentsBestEffort() {
   try {
@@ -1461,7 +1562,7 @@ function getLocalAssetCleanupManager() {
 function getProjectDialogFilters() {
   return [
     {
-      name: 'updream canvas Project',
+      name: 'Canvas Project',
       extensions: SUPPORTED_PROJECT_FILE_EXTENSIONS.map((_0x51baab) => _0x51baab.replace(/^\./, '')),
     },
   ];
@@ -1841,6 +1942,7 @@ async function restartBackendAndReload() {
       stopSpawnedServer(),
       await clearPortBeforeStart(loadStartupStatus),
       await ensureServerRunning(loadStartupStatus),
+      void refreshProductDisplayName(),
       void localRuntimeKeepAlive.start('backend-restart'),
       loadCanvasWindow());
   } catch (_0x19ab58) {
@@ -1967,6 +2069,11 @@ function createMainWindow() {
     mainWindow.on('minimize', () => void localRuntimeKeepAlive.refresh('minimize')),
     mainWindow.on('closed', () => {
       (webPreviewViewManager.disposeViews(), localRuntimeKeepAlive.stop(), (mainWindow = null));
+      // The prewarmed global capture window is a hidden BrowserWindow that stays
+      // alive for the session, so 'window-all-closed' never fires while it exists.
+      // Without this, closing the main window leaves the app, its helper processes
+      // and the spawned Python backend running forever.
+      process.platform !== 'darwin' && app.quit();
     }),
     mainWindow.on('unresponsive', () => {
       logDiagnosticEvent({
@@ -1987,6 +2094,7 @@ async function startApp() {
     queueExternalProjectOpenFromArgs(process.argv, 'startup'),
     await clearPortBeforeStart(),
     await ensureServerRunning(),
+    void refreshProductDisplayName(),
     void localRuntimeKeepAlive.start('server-ready'),
     loadCanvasWindow());
 }

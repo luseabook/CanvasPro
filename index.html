@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title data-i18n="app.documentTitle">updream canvas</title>
+    <title data-i18n="app.documentTitle" data-product-name="document-title">Canvas</title>
     <meta name="app-version" content="0.4.12" />
     <link rel="icon" type="image/svg+xml" href="images/favicon.svg" />
     <link rel="stylesheet" href="./styles/preset-menu.css" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="./styles/story-home.css" />
     <link rel="stylesheet" href="./styles/agent.css" />
   </head>
   <body>
@@ -59,7 +60,7 @@
                 </linearGradient>
               </defs>
             </svg>
-            <span class="logo-title">updream canvas</span>
+            <span class="logo-title" data-product-name="wordmark">Canvas</span>
           </div>
           <div class="project-name" id="projectNameEl">
             <span id="projectNameText" contenteditable="true" spellcheck="false">新项目</span>
@@ -317,7 +318,7 @@
               type="button"
               class="avatar-menu-item"
               id="btnGithubOfficial"
-              data-external-url="https://github.com/ashuoAI/AI-CanvasPro"
+              data-external-url="https://github.com/luseaer-ship-it/CanvasPro"
               aria-label="打开 GitHub 官方仓库"
               data-i18n-aria-label="settings.menu.openGithub"
             >
@@ -798,6 +799,7 @@
       </button>
     </div>
     <div id="v2-debug" data-i18n="app.debugSandbox">V2 架构验证沙盒 · 拖拽节点进行测试</div>
+    <script type="module" src="./src/services/productBranding.js?v=20261001"></script>
     <script type="module" src="./main.js?v=2026041901"></script>
     <div id="settingsOverlay" class="settings-overlay">
       <div class="settings-modal">
@@ -2058,8 +2060,9 @@
                       type="text"
                       id="fileSaveRootDir"
                       class="settings-input settings-path-input"
-                      placeholder="例如 D:\updream canvas Files"
+                      placeholder="例如 D:\Canvas Files"
                       data-i18n-placeholder="settings.fileSave.rootDir.placeholder"
+                      data-product-name-placeholder="true"
                     />
                     <button
                       type="button"
@@ -2425,7 +2428,97 @@
               <div class="settings-section settings-card">
                 <div class="settings-card-head">
                   <div class="settings-card-badge">AG</div>
-                  <span class="settings-card-title">Agnes AI</span>
+                  <span class="settings-card-title" data-i18n="settings.apiInput.providers.agnesDomestic.title"
+                    >Agnes AI（国内）</span
+                  >
+                  <span
+                    class="settings-provider-status settings-provider-status--test"
+                    id="providerTestStatus-agnes-domestic"
+                    hidden
+                  ></span>
+                  <button
+                    type="button"
+                    class="settings-provider-test-btn"
+                    data-provider-test="agnes-domestic"
+                    title="测试 Agnes AI（国内）连接"
+                    aria-label="测试 Agnes AI（国内）连接"
+                    data-i18n-title="settings.apiInput.providers.agnesDomestic.testTitle"
+                    data-i18n-aria-label="settings.apiInput.providers.agnesDomestic.testTitle"
+                  >
+                    <svg
+                      class="settings-btn-icon"
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg>
+                    <span class="settings-btn-label" data-i18n="settings.apiInput.testConnection"
+                      >测试连接</span
+                    >
+                  </button>
+                  <button
+                    type="button"
+                    class="settings-getkey settings-provider-models-btn"
+                    data-provider-models="agnes-domestic"
+                    title="获取模型列表"
+                    data-i18n-title="settings.apiInput.models.fetchTitle"
+                  >
+                    <svg
+                      class="settings-btn-icon"
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                      <polyline points="21 3 21 9 15 9" />
+                    </svg>
+                    <span data-i18n="settings.apiInput.models.fetch">获取模型列表</span>
+                  </button>
+                  <button
+                    type="button"
+                    data-external-url="https://agnes-ai.com"
+                    title="前往 Agnes AI 获取 API Key"
+                    data-i18n-title="settings.apiInput.providers.agnesDomestic.getTitle"
+                    class="settings-getkey"
+                  >
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    <span data-i18n="settings.apiInput.getKey">获取 Key</span>
+                  </button>
+                </div>
+                <div class="settings-label" data-i18n="settings.apiInput.apiKey">API 密钥</div>
+                <input
+                  type="password"
+                  id="providerKey-agnes-domestic"
+                  class="settings-input"
+                  placeholder="sk-..."
+                />
+                <div class="settings-provider-models" id="providerModels-agnes-domestic" hidden></div>
+              </div>
+              <div class="settings-section settings-card">
+                <div class="settings-card-head">
+                  <div class="settings-card-badge">AG</div>
+                  <span class="settings-card-title" data-i18n="settings.apiInput.providers.agnes.title"
+                    >Agnes AI（国际）</span
+                  >
                   <span
                     class="settings-provider-status settings-provider-status--test"
                     id="providerTestStatus-agnes"
@@ -2458,7 +2551,28 @@
                   </button>
                   <button
                     type="button"
-                    data-external-url="https://agnes-ai.com/doc/agnes-20-flash"
+                    class="settings-getkey settings-provider-models-btn"
+                    data-provider-models="agnes"
+                    title="获取模型列表"
+                    data-i18n-title="settings.apiInput.models.fetchTitle"
+                  >
+                    <svg
+                      class="settings-btn-icon"
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                      <polyline points="21 3 21 9 15 9" />
+                    </svg>
+                    <span data-i18n="settings.apiInput.models.fetch">获取模型列表</span>
+                  </button>
+                  <button
+                    type="button"
+                    data-external-url="https://agnes-ai.com"
                     title="前往 Agnes AI 获取 API Key"
                     data-i18n-title="settings.apiInput.providers.agnes.getTitle"
                     class="settings-getkey"
@@ -2480,6 +2594,7 @@
                 </div>
                 <div class="settings-label" data-i18n="settings.apiInput.apiKey">API 密钥</div>
                 <input type="password" id="providerKey-agnes" class="settings-input" placeholder="sk-..." />
+                <div class="settings-provider-models" id="providerModels-agnes" hidden></div>
               </div>
               <div class="settings-section settings-card">
                 <div class="settings-card-head">
@@ -3334,9 +3449,9 @@
     <div class="about-dialog">
       <button type="button" class="about-close" id="aboutClose">&times;</button>
       <div class="about-logo">
-        <img src="images/favicon.svg" width="48" height="48" alt="updream canvas Logo" />
+        <img src="images/favicon.svg" width="48" height="48" alt="Canvas Logo" data-product-name-alt="true" />
       </div>
-      <h2 class="about-title">updream canvas</h2>
+      <h2 class="about-title" data-product-name="about">Canvas</h2>
       <div class="about-version" id="aboutVersion"></div>
       <div class="about-author"><span data-i18n="about.author">作者：</span><strong>阿硕</strong></div>
       <button
@@ -3352,7 +3467,7 @@
         </svg>
         <span data-i18n="about.bilibili">访问 Bilibili 主页</span>
       </button>
-      <div class="about-footer" data-i18n="about.footer">© 2026 updream canvas. All rights reserved...</div>
+      <div class="about-footer" data-i18n="about.footer" data-product-name-footer="true">© 2026 Canvas. All rights reserved...</div>
     </div>
   </div>
 </html>

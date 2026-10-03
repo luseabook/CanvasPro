@@ -455,7 +455,7 @@ export function createDiagnosticsManager(_0x5b58a7 = {}) {
     }
   }
   function _0x46662c(_0x5d97c1 = new Date()) {
-    const _0x36b9c9 = 'updream-canvas-Diagnostics-' + timestampForFilename(_0x5d97c1) + '.zip';
+    const _0x36b9c9 = 'Canvas-Diagnostics-' + timestampForFilename(_0x5d97c1) + '.zip';
     return path['join'](resolveDownloadsDir(_0x16f636, _0x524fc1), _0x36b9c9);
   }
   async function _0x1e85ba(_0x23200d = {}) {

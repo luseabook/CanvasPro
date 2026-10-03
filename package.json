@@ -1,12 +1,14 @@
 {
-  "name": "updream-canvas",
+  "name": "canvas",
   "private": true,
   "version": "0.4.12",
-  "description": "updream canvas desktop editor",
-  "author": "updream canvas",
+  "description": "Canvas desktop editor",
+  "author": "Canvas",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
+    "test": "node --test \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\"",
+    "test:e2e": "playwright test",
     "web": "venv\\Scripts\\python.exe server.py",
     "desktop": "set \"AICANVAS_PORT=8778\" && electron .",
     "desktop:solo": "electron .",
@@ -19,6 +21,7 @@
     "yazl": "^3.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "better-sqlite3": "^12.11.1",
     "electron": "^42.4.1",
     "knex": "^3.3.0"

@@ -1,11 +1,18 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 export const SECURE_SETTINGS_VERSION = 1;
+export function isAllowedSecureSettingKey(value) {
+  const key = String(value || '').trim();
+  if (!key || key.length > 160 || !/^[A-Za-z0-9._:-]+$/.test(key)) return false;
+  return (
+    /^apiConfig\.providers\.[A-Za-z0-9_-]{1,120}\.(?:apiKey|modelApiKey)$/.test(key) ||
+    /^apiConfig\.objectStorage\.(?:accessKeyId|secretAccessKey|sessionToken)$/.test(key) ||
+    /^apiConfig\.objectStorage\.profiles\.[A-Za-z0-9_-]{1,120}\.(?:accessKeyId|secretAccessKey|sessionToken)$/.test(key)
+  );
+}
 function normalizeSecureSettingKey(_0x3644a8) {
   const _0x74658b = String(_0x3644a8 || '').trim();
-  if (!_0x74658b || _0x74658b.length > 160) return '';
-  if (!/^[A-Za-z0-9._:-]+$/.test(_0x74658b)) return '';
-  return _0x74658b;
+  return isAllowedSecureSettingKey(_0x74658b) ? _0x74658b : '';
 }
 function readStoreFile(_0x32122e) {
   try {

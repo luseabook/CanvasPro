@@ -7,6 +7,7 @@ const TEST_TIMEOUT_MS = 0x7530,
     'apimart',
     'volcengine',
     'agnes',
+    'agnes-domestic',
     'grsai',
     'ppio',
     'runninghub',
@@ -14,7 +15,10 @@ const TEST_TIMEOUT_MS = 0x7530,
   ]),
   COMPLETION_FALLBACKS = Object.freeze({
     apimart: { model: 'deepseek-v4-flash', basePath: 'v1', label: 'DeepSeek V4 Flash' },
-    agnes: { model: 'agnes-2.0-flash', basePath: 'v1', label: 'Agnes 2.0 Flash' },
+    // Agnes 2.0 Flash is deprecated by the vendor and returns empty content, so the probe uses
+    // the current flash model instead.
+    agnes: { model: 'agnes-3.0-flash', basePath: 'v1', label: 'Agnes 3.0 Flash' },
+    'agnes-domestic': { model: 'agnes-3.0-flash', basePath: 'v1', label: 'Agnes 3.0 Flash' },
     grsai: { model: 'gemini-3.1-pro', basePath: 'v1', label: 'Gemini 3.1 Pro' },
     ppio: { basePath: 'openai/v1' },
   }),
@@ -31,6 +35,7 @@ const TEST_TIMEOUT_MS = 0x7530,
     ppio: '派欧云当前链路不需要独立厂商上传，本轮只检测密钥和模型列表',
     volcengine: '火山方舟当前先检测 API Key 和服务连通性，模型素材上传待模型接入时验证',
     agnes: 'Agnes AI 兼容接口当前先检测 API Key 和服务连通性，素材沿模型链路上传',
+    'agnes-domestic': 'Agnes AI 国内线路当前先检测 API Key 和服务连通性，素材沿模型链路上传',
   }),
   ONE_PIXEL_PNG_BASE64 =
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';

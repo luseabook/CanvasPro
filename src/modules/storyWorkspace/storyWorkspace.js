@@ -4160,6 +4160,30 @@ export function initStoryWorkspace({
         ));
     });
   }
+  // Keeps a param popover inside the viewport: shrink to the space below, or
+  // flip above when the trigger sits too low for the popover to fit.
+  function fitStoryParamPopoverToViewport(_0x7b21c4) {
+    const _0x2f81a6 = _0x7b21c4?.['querySelector']?.('.story-home-param-popover');
+    if (!_0x2f81a6) return;
+    (_0x2f81a6['classList']?.['remove']?.('story-home-param-popover--above'),
+      (_0x2f81a6['style']['maxHeight'] = ''));
+    if (globalThis['getComputedStyle']?.(_0x2f81a6)?.['position'] === 'fixed') return;
+    const _0x3d9c11 = Number(globalThis['innerHeight'] || 0);
+    if (!_0x3d9c11) return;
+    const _0x4b7e28 = _0x7b21c4?.['querySelector']?.('[data-story-home-param-trigger]'),
+      _0x1c93ad = _0x4b7e28?.['getBoundingClientRect']?.();
+    if (!_0x1c93ad) return;
+    const _0x2c6f47 = 16,
+      _0x1f0a4a = _0x3d9c11 - _0x1c93ad['bottom'] - _0x2c6f47,
+      _0x5a7d1e = _0x1c93ad['top'] - _0x2c6f47,
+      _0x1a8f2c = 420;
+    if (_0x1f0a4a < _0x1a8f2c && _0x5a7d1e > _0x1f0a4a) {
+      (_0x2f81a6['classList']?.['add']?.('story-home-param-popover--above'),
+        (_0x2f81a6['style']['maxHeight'] = Math['max'](160, Math['floor'](_0x5a7d1e)) + 'px'));
+      return;
+    }
+    _0x2f81a6['style']['maxHeight'] = Math['max'](160, Math['floor'](_0x1f0a4a)) + 'px';
+  }
   function _0x1ac9be(_0x8f417 = '') {
     const _0x4258d9 = normalizeText(_0x8f417);
     ((_0x109ee4['openProjectMenuId'] = _0x4258d9),
@@ -6308,7 +6332,8 @@ export function initStoryWorkspace({
         (_0x345d08(),
           _0x76c71e(_0x3951e6),
           _0x3951e6['classList']['toggle']('is-open', _0x5a97bc),
-          _0x16e455['setAttribute']('aria-expanded', String(_0x5a97bc)));
+          _0x16e455['setAttribute']('aria-expanded', String(_0x5a97bc)),
+          _0x5a97bc && fitStoryParamPopoverToViewport(_0x3951e6));
         return;
       }
       const _0x34d3dc = _0x25006a['target']['closest']('[data-story-asset-preset-option]');
@@ -6344,7 +6369,7 @@ export function initStoryWorkspace({
         (_0x1ef2c4?.['querySelectorAll']('[data-story-style-category]')['forEach']((_0x1ba69d) => {
           const _0x40418b = _0x1ba69d === _0x4541d4;
           (_0x1ba69d['classList']['toggle']('is-active', _0x40418b),
-            _0x1ba69d['setAttribute']('aria-selected', String(_0x40418b)));
+            _0x1ba69d['setAttribute']('aria-pressed', String(_0x40418b)));
         }),
           _0x4bd181(_0x1ef2c4));
         return;
@@ -6712,6 +6737,56 @@ export function initStoryWorkspace({
         'confirm-delete-asset-appearance',
         'cancel-delete-asset-appearance',
       ]['includes'](_0x4078b4) && (_0x25006a['preventDefault'](), _0x25006a['stopPropagation']());
+      if (
+        _0x4078b4 === 'select-all-novel-chapters' ||
+        _0x4078b4 === 'clear-novel-chapters' ||
+        _0x4078b4 === 'set-novel-episode-count' ||
+        _0x4078b4 === 'toggle-novel-chapter' ||
+        _0x4078b4 === 'start-novel-conversion'
+      ) {
+        const _0x4c0a1e = Array['isArray'](_0x109ee4['novelChapters'])
+            ? _0x109ee4['novelChapters']
+            : [],
+          _0x2b7d90 = _0x4c0a1e['filter']((_0x3d8f2a) => _0x3d8f2a['adaptation'] !== 'done'),
+          _0x1e0e5c = Array['isArray'](_0x109ee4['novelSelectedChapterIds'])
+            ? _0x109ee4['novelSelectedChapterIds']['slice']()
+            : [];
+        if (_0x4078b4 === 'select-all-novel-chapters')
+          _0x109ee4['novelSelectedChapterIds'] = _0x2b7d90['map']((_0x3d8f2a) => _0x3d8f2a['id']);
+        else if (_0x4078b4 === 'clear-novel-chapters')
+          _0x109ee4['novelSelectedChapterIds'] = [];
+        else if (_0x4078b4 === 'toggle-novel-chapter') {
+          const _0x19c2b3 = normalizeText(_0x145f02['dataset']['storyNovelChapter']),
+            _0x50e0a6 = _0x1e0e5c['indexOf'](_0x19c2b3);
+          (_0x50e0a6 >= 0x0 ? _0x1e0e5c['splice'](_0x50e0a6, 0x1) : _0x1e0e5c['push'](_0x19c2b3),
+            (_0x109ee4['novelSelectedChapterIds'] = _0x1e0e5c));
+        } else if (_0x4078b4 === 'set-novel-episode-count')
+          _0x109ee4['novelEpisodeCount'] = Math['max'](
+            0x1,
+            Math['trunc'](
+              Number(
+                _0x2e97b0['querySelector']('[data-story-novel-episode-count]')?.['value'],
+              ) || 0x1,
+            ),
+          );
+        else {
+          const _0x32d1f5 = Number(
+            _0x2e97b0['querySelector']('[data-story-novel-episode-count]')?.['value'],
+          );
+          (Number['isFinite'](_0x32d1f5) &&
+            _0x32d1f5 > 0x0 &&
+            (_0x109ee4['novelEpisodeCount'] = Math['trunc'](_0x32d1f5)),
+            _0x50d1ac(
+              '批次转换尚未接通（下一步实现逐集生成）。本次已选 ' +
+                _0x1e0e5c['length'] +
+                ' 章、计划 ' +
+                _0x109ee4['novelEpisodeCount'] +
+                ' 集。',
+              'info',
+            ));
+        }
+        _0xb8a26b();
+      }
       if (_0x4078b4 === 'toggle-clip-adjustment') {
         ((_0x109ee4['clipAdjustmentOpen'] = !_0x109ee4['clipAdjustmentOpen']),
           (_0x109ee4['clipAdjustmentPromptModeOpen'] = ![]),
@@ -6775,8 +6850,15 @@ export function initStoryWorkspace({
                     else {
                       if (_0x4078b4 === 'keep-current-clip-prompt') _0x1052be();
                       else {
-                        if (_0x4078b4 === 'choose-script' || _0x4078b4 === 'choose-rewrite-script')
-                          _0x52dd70?.['click']();
+                        if (
+                          _0x4078b4 === 'choose-script' ||
+                          _0x4078b4 === 'choose-rewrite-script' ||
+                          _0x4078b4 === 'choose-novel'
+                        )
+                          ((_0x109ee4['scriptIntent'] =
+                            _0x4078b4 === 'choose-novel' ? 'novel' : 'script'),
+                            _0xb8a26b(),
+                            _0x52dd70?.['click']());
                         else {
                           if (_0x4078b4 === 'remove-rewrite-script')
                             (clearStoryHomeReferenceScript(_0x109ee4),
@@ -9947,6 +10029,12 @@ export function initStoryWorkspace({
     activate: _0x5062b4,
     deactivate: _0x15fd10,
     isActive: () => _0x57f246,
+    flushPersistence() {
+      return _0x167ce5['destroy']({ flush: !![], force: !![] })['then'](
+        () => !![],
+        () => ![],
+      );
+    },
     getProjectWorkspaceMode: () => getStoryProjectWorkspaceMode(_0x109ee4['data']?.['project']),
     openHome() {
       _0x109ee4['view'] = 'home';
@@ -9979,7 +10067,7 @@ export function initStoryWorkspace({
         (_0x27857a = null),
         _0x132152(),
         _0x3478a1['destroy'](),
-        void _0x167ce5['destroy']({ flush: !![], force: !![] })['catch'](() => {}),
+        void _0x352fe1['flushPersistence'](),
         _0x51b855['destroy'](),
         _0x177bdc?.(),
         _0x2e8331?.(),

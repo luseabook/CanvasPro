@@ -4,6 +4,7 @@ import {
   createImageModelApiManifest,
   createModelApiExecutionManifest,
 } from './sharedImageModelApiFields.js';
+import { AGNES_MODEL_API_PROFILE_IDS } from '../../../modules/agnesProviderProfiles.js';
 const AGNES_IMAGE_INPUT_SLOTS = Object.freeze({
     allowedKinds: Object.freeze(['text', 'image']),
     minByKind: Object.freeze({ text: 0, image: 0 }),
@@ -47,6 +48,16 @@ const AGNES_IMAGE_INPUT_SLOTS = Object.freeze({
       bodyMapping: AGNES_IMAGE_BODY_MAPPING,
       order: 20,
     }),
+    Object.freeze({
+      modelId: 'agnes/agnes-image-2.5-flash',
+      executionId: 'agnes.model-api.image.agnes-image-2-5-flash.v1',
+      displayName: 'Agnes Image 2.5 Flash',
+      model: 'agnes-image-2.5-flash',
+      description: 'Agnes AI text-to-image and image-to-image model API',
+      inputSlots: AGNES_IMAGE_INPUT_SLOTS,
+      bodyMapping: AGNES_IMAGE_BODY_MAPPING,
+      order: 30,
+    }),
   ]);
 export const agnesImageModelApiModelManifests = Object.freeze(
   AGNES_IMAGE_MODELS.map((_0x2a7bd5) =>
@@ -60,6 +71,9 @@ export const agnesImageModelApiModelManifests = Object.freeze(
       fields: Object.freeze([APIMART_NANO_BANANA_IMAGE_SIZE_FIELD, APIMART_QWEN_IMAGE_RATIO_FIELD]),
       inputSlots: _0x2a7bd5.inputSlots,
       extensions: Object.freeze({
+        // Declares the domestic and international lines so the key panel can offer the route
+        // switch, the same way the video manifests already do.
+        providerProfiles: AGNES_MODEL_API_PROFILE_IDS,
         imageMenu: Object.freeze({
           group: 'agnes',
           order: _0x2a7bd5.order,

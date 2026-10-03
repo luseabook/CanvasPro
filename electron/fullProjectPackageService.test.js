@@ -6,7 +6,7 @@ import { createWriteStream, existsSync, mkdirSync, mkdtempSync, readFileSync, re
 import os from 'node:os';
 import path from 'node:path';
 import yazl from 'yazl';
-import { exportProjectPackageToPath } from './projectPackageService.js';
+import { exportProjectPackageToPath, importProjectPackageFromPath } from './projectPackageService.js';
 import { exportFullProjectPackage, restoreFullProjectPackage, inspectFullProjectPackage } from './fullProjectPackageService.js';
 function fixture(t) {
   const base = mkdtempSync(path.join(os.tmpdir(), 'full-package-test-'));
@@ -25,6 +25,23 @@ async function makePackage(f, manifest = f.manifest, data = f.data, extras = [])
   await new Promise((resolve, reject) => { const stream = createWriteStream(f.outputPath); zip.once('error', reject); stream.once('error', reject); stream.once('close', resolve); zip.outputStream.pipe(stream); zip.end(); });
 }
 function restore(f, extra = {}) { return restoreFullProjectPackage({ packagePath: f.outputPath, roots: f.roots, projectRoot: f.projectRoot, tempRoot: f.tempRoot, confirm: async () => true, ...extra }); }
+test('legacy project package import verifies same-size asset hashes before persistent writes', async t => {
+  const f = fixture(t);
+  const original = f.bytes;
+  f.bytes = Buffer.from(original);
+  f.bytes[0] ^= 0xff;
+  await makePackage(f);
+  await assert.rejects(importProjectPackageFromPath({
+    packagePath: f.outputPath,
+    roots: f.roots,
+    projectRoot: f.projectRoot,
+    tempRoot: f.tempRoot,
+  }), /SHA-256 mismatch/);
+  assert.deepEqual(readdirSync(f.projectRoot), []);
+  assert.equal(existsSync(path.join(f.roots.outputRoot, 'ProjectImports')), false);
+  assert.deepEqual(readdirSync(f.tempRoot), []);
+});
+
 test('original v1 writer to strict full restore preserves every canvas, IDs and local bytes', async t => {
   const f = fixture(t);
   const exported = await exportFullProjectPackage({ outputPath: f.outputPath, multiData: f.data, roots: f.roots, projectName: 'Full' });
@@ -42,7 +59,7 @@ test('same-size corrupted asset fails before persistent writes and before confir
   assert.equal(existsSync(path.join(f.roots.outputRoot, 'ProjectImports')), false); assert.deepEqual(readdirSync(f.projectRoot), []);
 });
 test('missing manifest coverage cannot bind to an existing unrelated local file', async t => {
-  const f = fixture(t); f.data.canvases[0].nodes.push({ id: 'missing', localPath: 'output/unlisted.mp4' }); await makePackage(f);
+  const f = fixture(t); f.data.canvases[0].nodes.push({ id: 'missing', type: 'source-video', localPath: 'output/unlisted.mp4' }); await makePackage(f);
   await assert.rejects(restore(f), /未包含/); assert.equal(existsSync(path.join(f.roots.outputRoot, 'ProjectImports')), false);
 });
 test('extra archive files rejected even if listed graph is otherwise valid', async t => {
@@ -76,4 +93,5 @@ test('original ZIP file errors reject the export promise instead of an unhandled
   const f = fixture(t); const source = path.join(f.roots.outputRoot, 'a.mp4');
   await assert.rejects(exportProjectPackageToPath({ outputPath: f.outputPath, multiData: f.data, roots: f.roots,
     onProgress: event => { if (event.phase === 'zipping' && existsSync(source)) unlinkSync(source); } }));
+  assert.equal(existsSync(f.outputPath), false);
 });

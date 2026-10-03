@@ -1,5 +1,5 @@
-export const TUTORIAL_RELEASES_URL = 'https://github.com/ashuoAI/SHUO-Canvas/releases';
-const API_URL = 'https://api.github.com/repos/ashuoAI/SHUO-Canvas/releases?per_page=100';
+export const TUTORIAL_RELEASES_URL = 'https://github.com/luseaer-ship-it/CanvasPro/releases';
+const API_URL = 'https://api.github.com/repos/luseaer-ship-it/CanvasPro/releases?per_page=100';
 export function normalizeTutorialReleases(_0x166634) {
   if (!Array['isArray'](_0x166634)) throw new Error('更新说明格式无效');
   return _0x166634['filter'](

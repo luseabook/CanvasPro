@@ -135,7 +135,7 @@ test('the default accelerator reaches the real shortcut controller', () => {
     ok: false,
     actionId: GLOBAL_CAPTURE_LAUNCHER_SHORTCUT_ID,
     registered: false,
-    accelerator: 'Alt+C',
+    accelerator: 'CommandOrControl+Shift+Alt+C',
     reason: 'not-registered',
   });
 });
