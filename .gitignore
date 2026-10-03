@@ -24,6 +24,8 @@ npm-desktop.std*.log
 npm-web.std*.log
 dist/
 dist-obfuscated/
+dist-win/
+dist-win-*/
 deobfuscated/
 .electron-runtime/
 playwright-report/
