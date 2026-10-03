@@ -7,6 +7,21 @@ import {
   getApimartRouteById,
   resolveApimartRouteByApiUrl,
 } from '../providers.js';
+import { fetchProviderModelList } from '../../../api/providerModelListApi.js';
+import {
+  PROVIDER_MODEL_CATALOG_PROVIDER_IDS,
+  applyProviderModelCatalog,
+  collectEnabledVendorModels,
+  inferProviderModelKind,
+  isProviderModelCatalogProvider,
+  mergeProviderModelCatalog,
+  readProviderModelCatalog,
+} from '../settings/providerModelCatalog.js';
+import {
+  readProviderModelCatalogSelection,
+  renderProviderModelCatalogPanel,
+} from '../settings/providerModelCatalogPanel.js';
+import { createProviderModelCatalogBundleRegistry } from './providerModelCatalogRegistration.js';
 const DREAMINA_LOGIN_PAGE_URL = 'https://jimeng.jianying.com/',
   DREAMINA_I18N_PREFIX = 'settings.apiInput.providers.dreamina';
 function trTemplate(_0x57eba7, _0x344c47 = {}) {
@@ -118,6 +133,7 @@ export function createAppTopbarAndConfig({
   importDreaminaLoginResponseFromServer: _0x57c009,
   logoutDreaminaFromServer: _0x36ac1f,
   buildDreaminaQrImageUrl: _0x14cf38,
+  refreshManifestModelNodeUis: _0x5f0a11,
   showError: _0xf820b9,
 } = {}) {
   const _0x2bdde1 = 85 * 0x3e8,
@@ -140,7 +156,18 @@ export function createAppTopbarAndConfig({
       autoOpenedManualAuthUrl: '',
     };
   let _0x43d0f1 = {};
-  const _0x1e2cbf = ['grsai', 'openai', 'ppio', 'apimart', 'agnes', 'volcengine', 'runninghub'],
+  // 'agnes-domestic' 是独立厂商（域名与密钥都与国际版不同），必须在这里登记，
+  // 否则它的密钥输入框既不会回填也不会被保存。
+  const _0x1e2cbf = [
+      'grsai',
+      'openai',
+      'ppio',
+      'apimart',
+      'agnes-domestic',
+      'agnes',
+      'volcengine',
+      'runninghub',
+    ],
     _0x5d49f2 = [
       'settings-provider-status--testing',
       'settings-provider-status--success',
@@ -149,6 +176,134 @@ export function createAppTopbarAndConfig({
     ];
   let _0x41e853 = null,
     _0x273e6c = null;
+  // ── 厂商模型清单：从接口拉取、勾选、动态登记 ─────────────────────────────
+  // 内置清单只覆盖已适配的模型；厂商新增模型时，在这里拉一次真实列表即可选用。
+  const _0x4c7a19 = createProviderModelCatalogBundleRegistry();
+  function _0x2f9d13(_0x11e0a5 = _0x43d0f1) {
+    try {
+      return _0x4c7a19.sync(collectEnabledVendorModels(_0x11e0a5));
+    } catch (_0x1c3d5e) {
+      console.warn('[Provider Model Catalog] sync failed:', _0x1c3d5e);
+      return { changed: false, registered: 0 };
+    }
+  }
+  function _0x5a7c9e(_0x2b1e0c, _0x3f5c1d = {}) {
+    const _0x3d0f2a = readProviderModelCatalog(_0x43d0f1?.providers?.[_0x2b1e0c] || {}),
+      _0x1a2f7f = _0x3f5c1d.statusText ?? '';
+    return renderProviderModelCatalogPanel({
+      documentObject: document,
+      providerId: _0x2b1e0c,
+      catalog: _0x3d0f2a,
+      statusText:
+        _0x1a2f7f ||
+        (_0x3d0f2a.models.length ? trApiInput('models.count', { count: _0x3d0f2a.models.length }) : ''),
+      message: _0x3f5c1d.message || '',
+      messageKind: _0x3f5c1d.messageKind || 'info',
+    });
+  }
+  function _0x5c1f8b(_0x2f0e57) {
+    const _0x3c9a1b = readProviderModelCatalogSelection(document, _0x2f0e57);
+    if (_0x3c9a1b.length === 0) return false;
+    const _0x4f0d69 = String(_0x2f0e57 || '').trim();
+    _0x43d0f1.providers = _0x43d0f1.providers || {};
+    _0x43d0f1.providers[_0x4f0d69] = applyProviderModelCatalog(_0x43d0f1.providers[_0x4f0d69], {
+      fetchedAt: new Date().toISOString(),
+      models: _0x3c9a1b.map((_0x4d2f1a) => ({
+        id: _0x4d2f1a.id,
+        kind: _0x4d2f1a.kind || inferProviderModelKind(_0x4f0d69, _0x4d2f1a.id),
+        enabled: _0x4d2f1a.enabled,
+      })),
+    });
+    return true;
+  }
+  async function _0x1e5a76(_0x2f0e57, _0x5d3a91 = null) {
+    const _0x1a2cbe = String(_0x2f0e57 || '').trim();
+    if (!isProviderModelCatalogProvider(_0x1a2cbe)) return false;
+    const _0x3b1d0e = document.getElementById('providerKey-' + _0x1a2cbe),
+      _0x2210af = String(_0x3b1d0e?.value || '')
+        .trim()
+        .replace(/^Bearer\s+/i, '');
+    if (!_0x2210af) {
+      (window.showToast?.(trApiInput('models.needKey'), 'warn'), _0x3b1d0e?.focus?.());
+      return false;
+    }
+    if (_0x5d3a91) _0x5d3a91.disabled = true;
+    _0x5a7c9e(_0x1a2cbe, {
+      statusText: trApiInput('models.fetching'),
+      message: trApiInput('models.fetching'),
+    });
+    try {
+      const _0x4f7a1c = _0x43d0f1?.providers?.[_0x1a2cbe] || {},
+        _0x5fb8a5 = await fetchProviderModelList({
+          providerId: _0x1a2cbe,
+          apiUrl: _0x4f7a1c.apiUrl,
+          apiKey: _0x2210af,
+        });
+      if (!_0x5fb8a5.success) {
+        _0x5a7c9e(_0x1a2cbe, {
+          statusText: '',
+          message: trApiInput('models.failed') + '：' + _0x5fb8a5.error,
+          messageKind: 'error',
+        });
+        return false;
+      }
+      if (_0x5fb8a5.models.length === 0) {
+        _0x5a7c9e(_0x1a2cbe, {
+          statusText: '',
+          message: trApiInput('models.empty'),
+          messageKind: 'error',
+        });
+        return false;
+      }
+      // 拉取只刷新候选清单，不改动已勾选状态；写入配置由“保存选择”完成。
+      const _0x1f9d5f = mergeProviderModelCatalog(
+        _0x1a2cbe,
+        readProviderModelCatalog(_0x4f7a1c).models,
+        _0x5fb8a5.models,
+      );
+      renderProviderModelCatalogPanel({
+        documentObject: document,
+        providerId: _0x1a2cbe,
+        catalog: { fetchedAt: new Date().toISOString(), models: _0x1f9d5f },
+        statusText: trApiInput('models.count', { count: _0x1f9d5f.length }),
+      });
+      return true;
+    } finally {
+      if (_0x5d3a91) _0x5d3a91.disabled = false;
+    }
+  }
+  async function _0x4b8e2c(_0x2f0e57) {
+    const _0x1a2cbe = String(_0x2f0e57 || '').trim();
+    if (!isProviderModelCatalogProvider(_0x1a2cbe)) return false;
+    if (!_0x5c1f8b(_0x1a2cbe)) return false;
+    const _0x70211a = _0x5b6f5b(),
+      _0x211510 = await _0x5bc7d1(_0x70211a);
+    if (!_0x211510?.success && _0x211510?.error) {
+      window.showToast?.(
+        trApiInput('diagnostics.saveFailed', { error: _0x211510.error }),
+        'error',
+      );
+      return false;
+    }
+    _0x43d0f1 = _0x70211a;
+    const _0x2c1c9a = _0x2f9d13(_0x43d0f1);
+    _0x5f0a11?.();
+    const _0x3d0f2a = readProviderModelCatalog(_0x43d0f1?.providers?.[_0x1a2cbe] || {}),
+      // 只有“该模态还没适配”才算需要手动接入；已内置的模型被跳过是正常的。
+      _0x5a3f1c = (_0x2c1c9a?.skipped || []).filter((_0x5b0f1e) =>
+        String(_0x5b0f1e?.reason || '').startsWith('no-template'),
+      ).length;
+    _0x5a7c9e(_0x1a2cbe, {
+      statusText: trApiInput('models.count', { count: _0x3d0f2a.models.length }),
+      message:
+        trApiInput('models.saved') +
+        (_0x2c1c9a?.registered ? '（新增 ' + _0x2c1c9a.registered + ' 个）' : '') +
+        (_0x5a3f1c ? '（' + _0x5a3f1c + ' 个该模态暂未适配）' : ''),
+      messageKind: 'success',
+    });
+    _0x3751c3({ force: true, silent: true }).catch(() => {});
+    return true;
+  }
   function _0x5ef8ff() {
     return Array.from(document.querySelectorAll('[data-apimart-route]'));
   }
@@ -1201,7 +1356,9 @@ export function createAppTopbarAndConfig({
           if (_0x2c62ea && _0x2bfeb3.apiUrl) _0x2c62ea.value = _0x2bfeb3.apiUrl;
           if (_0x4a4414 && _0x2bfeb3.apiKey) _0x4a4414.value = _0x2bfeb3.apiKey;
         }),
-          _0x4edacd(_0xff95e5.apimart || {}));
+          _0x4edacd(_0xff95e5.apimart || {}),
+          _0x2f9d13(_0x43d0f1),
+          PROVIDER_MODEL_CATALOG_PROVIDER_IDS.forEach((_0x6f31a2) => _0x5a7c9e(_0x6f31a2)));
         const _0xbb0eef = document.getElementById('providerKey-runninghub-model');
         _0xbb0eef &&
           _0xff95e5.runninghub?.modelApiKey &&
@@ -1257,6 +1414,22 @@ export function createAppTopbarAndConfig({
           _0x2d6980(_0x21c197, { providerId: _0x13ba2a }).catch(() => {});
         });
       }),
+      document.querySelectorAll('[data-provider-models]').forEach((_0x3e1a2b) => {
+        const _0x1d6f0e = String(_0x3e1a2b.dataset.providerModels || '').trim();
+        if (!_0x1d6f0e) return;
+        _0x3e1a2b.addEventListener('click', () => {
+          _0x1e5a76(_0x1d6f0e, _0x3e1a2b).catch(() => {});
+        });
+      }),
+      (document.getElementById('pane-api-input') || document).addEventListener(
+        'click',
+        (_0x4bb3c2) => {
+          const _0x2ab1d2 = _0x4bb3c2?.target?.closest?.('[data-provider-model-save]');
+          if (!_0x2ab1d2) return;
+          (_0x4bb3c2.preventDefault?.(),
+            _0x4b8e2c(String(_0x2ab1d2.dataset.providerModelSave || '').trim()).catch(() => {}));
+        },
+      ),
       _0x138603(),
       _0x2fb6bc());
   }

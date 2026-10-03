@@ -19,6 +19,7 @@ r"""
 import http.server
 import socketserver
 import os
+import ntpath
 import json
 import threading
 import subprocess
@@ -318,6 +319,8 @@ CONFIG_FILE    = os.path.join(USER_DIR, "config.json")
 SETTINGS_FILE  = os.path.join(USER_DIR, "settings.json")
 GEN_SEQ_STATE_FILE = os.path.join(OUTPUT_DIR, ".gen_seq_state.json")
 MAX_UPLOAD_BYTES = _get_int_env("AIC_UPLOAD_MAX_BYTES", 100 * 1024 * 1024, 1)
+MAX_REQUEST_BODY_BYTES = 128 * 1024 * 1024
+MAX_CHUNK_HEADER_BYTES = 128
 IMAGE_DERIVATIVE_DISPLAY_MAX_EDGE = 1280
 IMAGE_DERIVATIVE_THUMB_MAX_EDGE = 320
 IMAGE_DERIVATIVE_DISPLAY_QUALITY = 78
@@ -1492,10 +1495,12 @@ def _request_passes_local_security(handler, path):
         return True
     if LOCAL_ACCESS_TOKEN:
         return _request_has_valid_local_token(handler)
+    # Origin is a browser CSRF signal, not client authentication. Never let a
+    # non-loopback peer gain API access merely by forging a loopback Origin.
+    if not _client_is_loopback(handler):
+        return False
     origin = handler.headers.get("Origin", "")
-    if origin:
-        return _is_allowed_origin(handler, origin) or _request_has_valid_local_token(handler)
-    return _client_is_loopback(handler) or _request_has_valid_local_token(handler)
+    return not origin or _is_allowed_origin(handler, origin)
 
 
 def _enforce_local_api_access(handler, path):
@@ -1586,33 +1591,65 @@ def _send_route_response(handler, response):
     raise ValueError(f"Unknown route response kind: {kind}")
 
 def _read_body(handler, max_bytes=None):
+    try:
+        requested_limit = MAX_REQUEST_BODY_BYTES if max_bytes is None else max(0, int(max_bytes))
+    except (TypeError, ValueError, OverflowError):
+        raise ValueError("INVALID_REQUEST_BODY_LIMIT")
+    limit = min(MAX_REQUEST_BODY_BYTES, requested_limit)
     te = (handler.headers.get("Transfer-Encoding", "") or "").lower()
     if "chunked" in te:
         chunks = []
         total = 0
         while True:
-            line = handler.rfile.readline()
-            if not line:
-                break
+            line = handler.rfile.readline(MAX_CHUNK_HEADER_BYTES + 1)
+            if not line or len(line) > MAX_CHUNK_HEADER_BYTES or not line.endswith(b"\n"):
+                handler.close_connection = True
+                raise ValueError("INVALID_CHUNKED_REQUEST")
             size_hex = line.split(b";", 1)[0].strip()
             try:
                 size = int(size_hex, 16)
-            except Exception:
-                break
+            except (TypeError, ValueError):
+                handler.close_connection = True
+                raise ValueError("INVALID_CHUNKED_REQUEST")
+            if size < 0:
+                handler.close_connection = True
+                raise ValueError("INVALID_CHUNKED_REQUEST")
             if size == 0:
-                handler.rfile.readline()
-                break
-            chunk = handler.rfile.read(size)
-            total += len(chunk)
-            if max_bytes is not None and total > max_bytes:
+                trailer_bytes = 0
+                while True:
+                    trailer = handler.rfile.readline(MAX_CHUNK_HEADER_BYTES + 1)
+                    trailer_bytes += len(trailer)
+                    if not trailer or len(trailer) > MAX_CHUNK_HEADER_BYTES or trailer_bytes > 64 * 1024:
+                        handler.close_connection = True
+                        raise ValueError("INVALID_CHUNKED_REQUEST")
+                    if trailer in (b"\r\n", b"\n"):
+                        break
+                return b"".join(chunks)
+            if size > limit - total:
+                handler.close_connection = True
                 raise ValueError("REQUEST_BODY_TOO_LARGE")
+            chunk = handler.rfile.read(size)
+            if len(chunk) != size or handler.rfile.read(2) != b"\r\n":
+                handler.close_connection = True
+                raise ValueError("INVALID_CHUNKED_REQUEST")
+            total += size
             chunks.append(chunk)
-            handler.rfile.read(2)
-        return b"".join(chunks)
-    length = int(handler.headers.get("Content-Length", 0))
-    if max_bytes is not None and length > max_bytes:
+    try:
+        length = int(handler.headers.get("Content-Length", 0) or 0)
+    except (TypeError, ValueError, OverflowError):
+        handler.close_connection = True
+        raise ValueError("INVALID_CONTENT_LENGTH")
+    if length < 0:
+        handler.close_connection = True
+        raise ValueError("INVALID_CONTENT_LENGTH")
+    if length > limit:
+        handler.close_connection = True
         raise ValueError("REQUEST_BODY_TOO_LARGE")
-    return handler.rfile.read(length) if length > 0 else b""
+    body = handler.rfile.read(length) if length > 0 else b""
+    if len(body) != length:
+        handler.close_connection = True
+        raise ValueError("INCOMPLETE_REQUEST_BODY")
+    return body
 
 
 def _iter_sse_data_lines(response):
@@ -2418,38 +2455,84 @@ def _resolve_local_virtual_path(src_path):
     return MEDIA_FILE_ROUTE_SERVICE.resolve_local_virtual_path(src_path)
 
 
+def _is_path_within_root(path, root):
+    try:
+        target = os.path.normcase(os.path.realpath(path))
+        base = os.path.normcase(os.path.realpath(root))
+        return os.path.commonpath([target, base]) == base
+    except (OSError, ValueError):
+        return False
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=DIRECTORY, **kwargs)
-
     def translate_path(self, path):
+        self._aic_static_path_invalid = False
+        self._aic_media_path = False
         raw_path = urllib.parse.urlsplit(path).path
-        decoded_path = urllib.parse.unquote(raw_path).replace("\\", "/")
+        decoded_path = urllib.parse.unquote(raw_path).replace(chr(92), "/")
         virtual_roots = (
             ("/user/prompt/_thumbs/", os.path.join(USER_DIR, "prompt", "_thumbs")),
             ("/data/workflows/", WORKFLOWS_DIR),
         )
         media_path = _resolve_local_virtual_path(decoded_path)
         if media_path:
-            return media_path
+            media_roots = (OUTPUT_DIR, UPLOADS_DIR, ASSETS_DIR)
+            if not any(_is_path_within_root(media_path, root) for root in media_roots):
+                self._aic_static_path_invalid = True
+                return os.path.join(DIRECTORY, "__blocked_static_path__")
+            self._aic_media_path = True
+            return os.path.realpath(media_path)
         for prefix, root_dir in virtual_roots:
             if decoded_path == prefix[:-1] or decoded_path.startswith(prefix):
                 rel = decoded_path[len(prefix):].lstrip("/")
-                rel = os.path.normpath(rel)
-                if rel in ("", "."):
-                    return os.path.abspath(root_dir)
-                if rel.startswith(".."):
-                    return os.path.abspath(root_dir)
-                return os.path.abspath(os.path.join(root_dir, rel))
-        return super().translate_path(path)
+                drive, _ = ntpath.splitdrive(rel)
+                parts = [part for part in rel.split("/") if part]
+                if (
+                    os.path.isabs(rel)
+                    or ntpath.isabs(rel)
+                    or drive
+                    or any(part in (".", "..") or ":" in part for part in parts)
+                ):
+                    self._aic_static_path_invalid = True
+                    return os.path.join(DIRECTORY, "__blocked_static_path__")
+                root = os.path.realpath(root_dir)
+                target = os.path.realpath(os.path.join(root, *parts))
+                if not _is_path_within_root(target, root):
+                    self._aic_static_path_invalid = True
+                    return os.path.join(DIRECTORY, "__blocked_static_path__")
+                return target
+        translated = super().translate_path(path)
+        root = os.path.realpath(DIRECTORY)
+        target = os.path.realpath(translated)
+        if not _is_path_within_root(target, root):
+            self._aic_static_path_invalid = True
+            return os.path.join(DIRECTORY, "__blocked_static_path__")
+        return target
+
 
     # 屏蔽日志噪音（按霢注释掉）
     def log_message(self, fmt, *args):
         pass
 
+    def list_directory(self, path):
+        self.send_error(404, "Directory listing is disabled")
+        return None
+
     def send_head(self):
+        decoded_path = urllib.parse.unquote(urllib.parse.urlsplit(self.path).path).replace(chr(92), "/")
+        segments = [part.lower() for part in decoded_path.split("/") if part]
+        if any(part in {".git", ".env", ".vscode", ".kilo", ".workbuddy", "venv", "node_modules", "release", "dist", "deobfuscated", "test-artifacts", "test-results", "playwright-report", "logs"} for part in segments):
+            self.send_error(404, "File not found")
+            return None
+        if segments and segments[0] in {"user", "data", "output"}:
+            if not _request_passes_local_security(self, "/api/v2/user"):
+                self.send_error(403, "Private files require local authorization")
+                return None
         path = self.translate_path(self.path)
+        if getattr(self, "_aic_static_path_invalid", False):
+            self.send_error(404, "File not found")
+            return None
         f = None
         if os.path.isdir(path):
             parts = urllib.parse.urlsplit(self.path)
@@ -3608,6 +3691,11 @@ def _is_benign_client_disconnect_error(error):
 
 class QuietThreadingTCPServer(socketserver.ThreadingTCPServer):
     allow_reuse_address = True
+    # The renderer loads hundreds of ES modules in parallel from this server.
+    # socketserver defaults to a backlog of 5, which rejects those bursts with
+    # ERR_CONNECTION_REFUSED and leaves the app stuck on its loading screen.
+    request_queue_size = 512
+    daemon_threads = True
 
     def handle_error(self, request, client_address):
         error = sys.exc_info()[1]
@@ -3631,7 +3719,7 @@ if __name__ == "__main__":
         if bind_host_was_restricted:
             print("[security] 0.0.0.0 需要显式局域网模式，已回退到 127.0.0.1")
         if lan_mode:
-            print("[security] 局域网模式已开启，请通过 AIC_ALLOWED_ORIGINS 配置可信 Origin")
+            print("[security] 局域网模式已开启；远程敏感 API 和私有文件需配置 AIC_LOCAL_TOKEN，Origin 仅用于 CORS")
         print("Canvas 服务已启动")
         for url in _display_urls(bind_host, port):
             print(url)

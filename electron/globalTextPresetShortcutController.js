@@ -98,7 +98,7 @@ function createInitialBinding(actionId, accelerator) {
 }
 
 export function createGlobalTextPresetShortcutController({
-  accelerator = 'Alt+C',
+  accelerator = 'Control+Alt+Shift+C',
   accelerators = {},
   clipboardApi = {},
   globalShortcutApi = {},
@@ -264,7 +264,7 @@ export function createGlobalTextPresetShortcutController({
   async function runShortcutCapture(actionId) {
     const isLauncher = actionId === GLOBAL_CAPTURE_LAUNCHER_SHORTCUT_ID;
     const captureId = isLauncher ? Date.now() + '-' + ++launcherSequence : '';
-    const shortcutLabel = boundAccelerators.get(actionId)?.accelerator || 'Alt+C';
+    const shortcutLabel = boundAccelerators.get(actionId)?.accelerator || 'Control+Alt+Shift+C';
     const registered = () => boundAccelerators.get(actionId)?.registered === true;
     try {
       if (isLauncher) {

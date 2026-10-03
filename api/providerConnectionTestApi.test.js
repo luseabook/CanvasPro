@@ -154,12 +154,12 @@ function jsonResponse(_0x76b925, _0x58bfbc = 200) {
         return (
           assert.equal(_0x473385.apiUrl, 'https://apihub.agnes-ai.com/v1'),
           assert.equal(_0x473385.apiKey, 'agnes-key'),
-          assert.equal(_0x473385.model, 'agnes-2.0-flash'),
+          assert.equal(_0x473385.model, 'agnes-3.0-flash'),
           assert.equal(_0x473385.max_tokens, 1),
           jsonResponse({ choices: [{ message: { content: 'ok' } }] })
         );
       }
-      return jsonResponse({ data: [{ id: 'agnes-2.0-flash' }, { id: 'agnes-image-2.1-flash' }] });
+      return jsonResponse({ data: [{ id: 'agnes-3.0-flash' }, { id: 'agnes-image-2.1-flash' }] });
     }),
       _0x211872.after(() => {
         globalThis.fetch = _0x2a5c67;

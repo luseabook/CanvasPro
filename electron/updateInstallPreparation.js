@@ -81,19 +81,17 @@ export function createUpdateInstallPreparation(_0x44fe64 = {}) {
     return (_0x5268c2(_0x5cedb1), _0x1a673f);
   }
   async function _0xf0905d() {
-    const _0x4c8236 = _0x1abdd3(),
-      _0x5a96ce = _0x381303();
-    if (_0x4c8236?.hasUnsavedChanges !== true || !_0x5a96ce || _0x5a96ce.isDestroyed() || !_0x353527) return;
+    const _0x4c8236 = _0x1abdd3();
+    if (_0x4c8236?.hasUnsavedChanges !== true) return true;
+    const _0x5a96ce = _0x381303();
+    if (!_0x5a96ce || _0x5a96ce.isDestroyed?.() || !_0x353527) {
+      throw new Error('未保存工程无法生成更新前恢复快照，已取消安装');
+    }
     try {
       const _0x408ed6 = await _0x353527(_0x5a96ce, 'update-install');
-      _0x408ed6?.success === false &&
-        _0x347c25({
-          type: 'updater.recovery_snapshot_before_install_failed',
-          level: 'warn',
-          source: 'main',
-          message: 'Recovery snapshot before update install failed',
-          context: { reason: _0x408ed6.reason || '', error: _0x408ed6.error || '' },
-        });
+      if (_0x408ed6?.success !== true)
+        throw new Error(_0x408ed6?.reason || _0x408ed6?.error || '未保存工程恢复快照失败，已取消安装');
+      return true;
     } catch (_0x142a2e) {
       _0x347c25({
         type: 'updater.recovery_snapshot_before_install_failed',
@@ -102,17 +100,18 @@ export function createUpdateInstallPreparation(_0x44fe64 = {}) {
         message: 'Recovery snapshot before update install failed',
         error: _0x142a2e,
       });
+      throw new Error('未保存工程恢复快照失败，已取消安装: ' + String(_0x142a2e?.message || _0x142a2e));
     }
   }
   async function _0x253f26() {
-    (_0x330ada(),
-      _0x347c25({
-        type: 'updater.prepare_install',
-        level: 'info',
-        source: 'main',
-        message: 'Preparing application for update install',
-      }),
-      await _0xf0905d());
+    await _0xf0905d();
+    _0x330ada();
+    _0x347c25({
+      type: 'updater.prepare_install',
+      level: 'info',
+      source: 'main',
+      message: 'Preparing application for update install',
+    });
     try {
       _0x16cb56();
     } catch (_0x48d330) {

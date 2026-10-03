@@ -917,9 +917,12 @@ function _handleDesktopUpdaterEvent(_0x17f006) {
     return;
   }
   if (_0x17f006.type === 'error') {
+    _desktopInstallAfterDownload = false;
     if (_0x17f006.skipped) return;
-    ((_desktopInstallAfterDownload = false),
-      window.showToast?.(_0x17f006.message || autoUpdateText('toasts.updateFailed')));
+    // Background update checks fail routinely (offline, missing release feed) and the raw
+    // error message embeds the whole HTTP response header dump, which used to be toasted
+    // across the bottom of the canvas. Only surface manual checks, with localized copy.
+    if (_0x17f006.manual) window.showToast?.(autoUpdateText('toasts.desktopCheckFailed'), 'warn');
   }
 }
 function _bindDesktopUpdaterEvents() {

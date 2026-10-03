@@ -38,11 +38,15 @@ class StoryDocumentRouteService:
                 return self._error(411, "文档上传需要 Content-Length。")
             length = int(length_header)
             if not 0 < length <= FILE_LIMIT:
+                self._drain_request(handler, length)
                 return self._error(413, "文档必须非空且不超过 8MB。")
             mime = handler.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
             extension = {"application/pdf": ".pdf",
                          "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx"}.get(mime)
             if not extension:
+                # Consume the body before answering: closing the socket while the client is
+                # still sending makes browsers surface a network error instead of this message.
+                self._drain_request(handler, length)
                 return self._error(415, "仅支持 DOCX 和 PDF。")
             try:
                 data = self._read_upload(handler, length)
@@ -76,6 +80,23 @@ class StoryDocumentRouteService:
             chunks.append(chunk)
             remaining -= len(chunk)
         return b"".join(chunks)
+
+    @staticmethod
+    def _drain_request(handler, length):
+        """Read and discard a rejected upload so the client can finish sending its body."""
+        remaining, deadline = min(int(length or 0), FILE_LIMIT), time.monotonic() + 10
+        try:
+            while remaining > 0:
+                timeout = deadline - time.monotonic()
+                if timeout <= 0:
+                    return
+                handler.connection.settimeout(timeout)
+                chunk = handler.rfile.read1(min(65536, remaining))
+                if not chunk:
+                    return
+                remaining -= len(chunk)
+        except OSError:
+            return
 
     def _run_worker(self, data, extension):
         worker_path = Path(__file__).with_name("story_document_worker.py")

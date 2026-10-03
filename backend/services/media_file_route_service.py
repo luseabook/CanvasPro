@@ -20,6 +20,23 @@ VIDEO_EXTENSIONS = frozenset((".mp4", ".webm", ".mov", ".m4v", ".avi", ".mkv"))
 AUDIO_EXTENSIONS = frozenset((".mp3", ".wav", ".m4a", ".aac", ".ogg", ".flac", ".webm"))
 OUTPUT_INDEX_FILENAME = ".output_index.json"
 OUTPUT_INDEX_VERSION = 1
+MAX_REMOTE_OUTPUT_DOWNLOAD_BYTES = 1024 * 1024 * 1024
+
+
+class _ValidatedDownloadRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def __init__(self, validate_host):
+        super().__init__()
+        self._validate_host = validate_host
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        target_url = urllib.parse.urljoin(req.full_url, newurl)
+        try:
+            parsed = urllib.parse.urlparse(target_url)
+        except Exception:
+            return None
+        if parsed.scheme.lower() not in ("http", "https") or self._validate_host(parsed) is not None:
+            return None
+        return super().redirect_request(req, fp, code, msg, headers, target_url)
 
 
 class MediaFileRouteService:
@@ -777,15 +794,23 @@ class MediaFileRouteService:
 
         try:
             max_bytes = int(data.get("maxBytes") or 1024 * 1024 * 300)
-        except Exception:
-            max_bytes = 1024 * 1024 * 300
+        except (TypeError, ValueError, OverflowError):
+            return self._json_err(400, "Invalid maxBytes")
+        if max_bytes <= 0:
+            return self._json_err(400, "Invalid maxBytes")
+        max_bytes = min(max_bytes, MAX_REMOTE_OUTPUT_DOWNLOAD_BYTES)
 
         request_url = self._quote_download_url_for_request(url)
+        fpath = ""
         try:
             request = urllib.request.Request(request_url, method="GET")
+            opener = urllib.request.build_opener(_ValidatedDownloadRedirectHandler(self._validate_download_host))
             request.add_header("User-Agent", "AI-Canvas/1.0")
             try:
-                with urllib.request.urlopen(request, timeout=120) as resp:
+                with opener.open(request, timeout=120) as resp:
+                    declared_size = int(resp.headers.get("Content-Length") or 0)
+                    if declared_size > max_bytes:
+                        return self._json_err(413, "File too large")
                     content_type = resp.headers.get("Content-Type") or ""
                     ext = (data.get("ext") or "").strip().lower()
                     if not re.match(r"^[a-z0-9]{1,5}$", ext):
@@ -810,8 +835,18 @@ class MediaFileRouteService:
                                 return self._json_err(413, "File too large")
                             file.write(chunk)
             except urllib.error.HTTPError as exc:
+                if fpath:
+                    try:
+                        os.remove(fpath)
+                    except OSError:
+                        pass
                 return self._json_err(502, f"Download HTTPError: {exc.code}")
             except Exception as exc:
+                if fpath:
+                    try:
+                        os.remove(fpath)
+                    except OSError:
+                        pass
                 return self._json_err(502, f"Download failed: {str(exc)}")
 
             rel_path = f"output/{filename}"

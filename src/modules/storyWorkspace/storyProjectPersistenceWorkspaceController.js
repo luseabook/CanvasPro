@@ -22,6 +22,7 @@ const TRANSIENT_ACTIONS = new Set([
     'select-clip-adjustment-mode',
     'choose-script',
     'choose-rewrite-script',
+    'choose-novel',
     'choose-replication-videos',
     'reupload-replication-video',
     'preview-replication-video',

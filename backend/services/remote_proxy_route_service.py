@@ -8,6 +8,7 @@ PUBLIC_UPLOAD_API_URLS = {
     "https://uguu.se/upload",
     "https://telegra.ph/upload",
 }
+MAX_REMOTE_PROXY_UPLOAD_BYTES = 128 * 1024 * 1024
 
 
 class RemoteProxyRouteService:
@@ -185,8 +186,9 @@ class RemoteProxyRouteService:
             return self._json_err(400, "Missing apiUrl or apiKey")
 
         try:
-            content_length = int(handler.headers.get("Content-Length", 0))
-            body = handler.rfile.read(content_length)
+            if "chunked" in str(handler.headers.get("Transfer-Encoding", "") or "").lower():
+                return self._json_err(400, "Chunked upload is not supported")
+            body = self._read_body(handler, max_bytes=MAX_REMOTE_PROXY_UPLOAD_BYTES)
             content_type = handler.headers.get("Content-Type", "")
 
             req = urllib.request.Request(api_url, data=body, method="POST")
@@ -199,6 +201,9 @@ class RemoteProxyRouteService:
                 return self._proxy_response(resp.status, resp.read())
         except urllib.error.HTTPError as exc:
             return self._proxy_response(exc.code, exc.read())
+        except ValueError as exc:
+            code = 413 if str(exc) == "REQUEST_BODY_TOO_LARGE" else 400
+            return self._json_err(code, "Request body too large" if code == 413 else str(exc))
         except Exception as exc:
             return self._json_err(
                 500,

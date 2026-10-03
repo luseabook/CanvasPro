@@ -294,7 +294,7 @@ export function createGlobalCaptureWindowController({
           text: text,
           phase: phase,
           errorReason: String(payload?.['errorReason'] || '')['trim'](),
-          shortcutLabel: String(payload?.['shortcutLabel'] || 'Alt+C')['trim']() || 'Alt+C',
+          shortcutLabel: String(payload?.['shortcutLabel'] || 'Control+Alt+Shift+C')['trim']() || 'Control+Alt+Shift+C',
           theme: nativeThemeApi?.['shouldUseDarkColors'] === ![] ? 'light' : 'dark',
           runImmediately: runImmediately,
           activeActionId: activeActionId,

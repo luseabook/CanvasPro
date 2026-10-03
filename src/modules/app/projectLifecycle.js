@@ -864,6 +864,17 @@ export function createProjectLifecycle({
     return _0x27ea37?.hasDirtyCanvases?.() === true;
   }
   async function _0x3096d3(_0x313b21 = 'auto') {
+    // Flush the story workspace auto-save before the close/update handshake
+    // resolves, so a pending write is not lost when the renderer goes away.
+    const storyRoot = window.document?.['getElementById']?.('storyWorkspaceRoot');
+    const storyApi = storyRoot?.['_storyWorkspaceApi'];
+    if (typeof storyApi?.['flushPersistence'] === 'function') {
+      try {
+        await storyApi['flushPersistence']();
+      } catch (_0x1a2b1f) {
+        console.warn('[projectLifecycle] 关闭前刷新剧本保存失败:', _0x1a2b1f);
+      }
+    }
     const _0x264f2c = _0x459735();
     if (typeof _0x264f2c?.writeRecoverySnapshot !== 'function')
       return { success: false, reason: 'api-unavailable' };

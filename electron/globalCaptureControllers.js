@@ -3,11 +3,12 @@ import { createGlobalTextPresetShortcutController } from './globalTextPresetShor
 import { createSelectedTextCaptureController } from './selectedTextCapture.js';
 export function createGlobalCaptureControllers({
   dirname: dirname,
-  accelerator: accelerator = 'Alt+C',
+  accelerator: accelerator = 'Control+Alt+Shift+C',
   focusCanvas: focusCanvas,
   getMainWindow: getMainWindow,
   logDiagnosticEvent: logDiagnosticEvent,
   selectedTextCaptureController: selectedTextCaptureController = null,
+  globalShortcutApi: globalShortcutApi = null,
 } = {}) {
   let shortcutController = null;
   const selectedTextCapture =
@@ -26,6 +27,7 @@ export function createGlobalCaptureControllers({
     });
   shortcutController = createGlobalTextPresetShortcutController({
     accelerator: accelerator,
+    ...(globalShortcutApi ? { globalShortcutApi: globalShortcutApi } : {}),
     copySelectedText: selectedTextCapture['capture'],
     hasKeyReleaseTracking: () => selectedTextCapture['isKeyReleaseTrackingAvailable']?.() === !![],
     focusCanvas: focusCanvas,

@@ -47,7 +47,7 @@ function createHarness(overrides = {}) {
       : overrides.window;
   const shortcutApi = overrides.globalShortcutApi || createStubShortcutApi();
   const controller = createGlobalTextPresetShortcutController({
-    accelerator: overrides.accelerator,
+    accelerator: overrides.accelerator === undefined ? 'Alt+C' : overrides.accelerator,
     accelerators: overrides.accelerators,
     globalShortcutApi: shortcutApi,
     getMainWindow: () => window,
@@ -142,7 +142,12 @@ test('normalizeGlobalTextPresetShortcutPayload: requires exactly one primary key
   assert.equal(normalizeGlobalTextPresetShortcutPayload({ keys: ['shift', 'a'] }).accelerator, 'Shift+A');
 });
 
-test('default shortcut status reports the launcher binding as unregistered and the preset as unbound', () => {
+test('controller factory defaults to the non-conflicting global capture accelerator', () => {
+  const controller = createGlobalTextPresetShortcutController({ globalShortcutApi: createStubShortcutApi() });
+  assert.equal(controller.getShortcutStatus().accelerator, 'CommandOrControl+Shift+Alt+C');
+});
+
+test('fixture shortcut status reports the launcher binding as unregistered and the preset as unbound', () => {
   const h = createHarness();
   assert.deepEqual(h.controller.getShortcutStatus(), {
     ok: false,

@@ -417,22 +417,22 @@ test('present maps every capture error reason to its own copy', async (t) => {
     {
       reason: 'shortcut-keys-still-held',
       status: '请先松开快捷键',
-      hint: '松开后再按 Alt+C',
+      hint: '松开后再按 Control+Alt+Shift+C',
     },
     {
       reason: 'copy-command-timeout',
       status: '读取选区超时',
-      hint: '保持文字选中，再按 Alt+C',
+      hint: '保持文字选中，再按 Control+Alt+Shift+C',
     },
     {
       reason: 'copy-worker-startup-timeout',
       status: '读取选区超时',
-      hint: '保持文字选中，再按 Alt+C',
+      hint: '保持文字选中，再按 Control+Alt+Shift+C',
     },
     {
       reason: 'something-else',
       status: '未能读取选中文字',
-      hint: '重新选中文字，再按 Alt+C',
+      hint: '重新选中文字，再按 Control+Alt+Shift+C',
     },
     {
       reason: 'something-else',

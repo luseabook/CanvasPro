@@ -11,7 +11,7 @@ function createStoryStylePreset(_0x486d71, _0x320b0d, _0x395f4a) {
     label: _0x320b0d,
     category: _0x395f4a,
     prompt: _0x320b0d,
-    thumbnail: 'images/story-styles/' + _0x486d71 + '.webp',
+    thumbnail: 'images/story-styles/' + _0x395f4a + '.svg',
   });
 }
 export const STORY_STYLE_PRESETS = Object['freeze']([

@@ -1,4 +1,5 @@
 import { createViewportFocusController } from '../../core/viewportFocus.js';
+import { t } from '../../i18n/index.js';
 import { CANVAS_LOW_ZOOM_LOD_THRESHOLD } from '../canvasImageLod.js';
 import { installProviderIconLodController } from '../providerIconLod.js';
 const TEXT_LOD_ZOOM = CANVAS_LOW_ZOOM_LOD_THRESHOLD,
@@ -20,6 +21,16 @@ export function createAppViewport({
     _0x296a38 = 0,
     _0x5e7e46 = null;
   const _0x14eac7 = installProviderIconLodController({ rootEl: _0x159534 || document, store: _0x285f5e });
+  // The offline banner used to send every user looking for a backend console, which only
+  // exists when the server was started by hand from source. Pick the wording per environment.
+  const serverAlertEl = document.getElementById('v2-server-disconnect-alert');
+  if (serverAlertEl) {
+    const alertKey = globalThis.window?.aiCanvasDesktop?.isElectron
+      ? 'app.serverDisconnected'
+      : 'app.serverDisconnectedDev';
+    (serverAlertEl.setAttribute('data-i18n', alertKey),
+      (serverAlertEl.textContent = t(alertKey)));
+  }
   function _0xc712a9(_0x5452c8) {
     (document.body.classList.toggle('is-zoom-low', _0x5452c8), _0x14eac7?.scheduleSync?.());
   }

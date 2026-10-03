@@ -31,13 +31,13 @@ test('categories and presets form a frozen catalog', () => {
   assert.equal(STORY_STYLE_PRESETS.at(-1).id, 'pixel-art');
 });
 
-test('each preset uses its label as prompt and a webp thumbnail named after its id', () => {
+test('each preset uses its label as prompt and an available category preview', () => {
   for (const preset of STORY_STYLE_PRESETS) {
     assert.equal(Object.isFrozen(preset), true);
     assert.deepEqual(Object.keys(preset), ['id', 'label', 'category', 'prompt', 'thumbnail']);
     assert.match(preset.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
     assert.equal(preset.prompt, preset.label);
-    assert.equal(preset.thumbnail, `images/story-styles/${preset.id}.webp`);
+    assert.equal(preset.thumbnail, `images/story-styles/${preset.category}.svg`);
     assert.notEqual(preset.category, 'all');
   }
 });
@@ -50,7 +50,7 @@ test('presets are looked up by trimmed id', () => {
     label: '像素风',
     category: '2d',
     prompt: '像素风',
-    thumbnail: 'images/story-styles/pixel-art.webp',
+    thumbnail: 'images/story-styles/2d.svg',
   });
   assert.equal(getStoryStylePreset('ue5-realistic-render').category, '3d');
   assert.equal(getStoryStylePreset('custom'), null);
@@ -70,7 +70,7 @@ test('a preset id resolves to that preset and ignores free-text prompts', () => 
     styleId: 'horror-film',
     stylePrompt: '恐怖电影风格',
     label: '恐怖电影风格',
-    thumbnail: 'images/story-styles/horror-film.webp',
+    thumbnail: 'images/story-styles/live.svg',
     isCustom: false,
   });
 });

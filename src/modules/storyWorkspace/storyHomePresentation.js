@@ -1,6 +1,7 @@
 import { renderRequestDebugButton } from '../debugRequestWindow.js';
 import { RECORDING_ASR_MODELS } from '../../../api/recordingAsrModels.js';
 import { renderAIGenTextModelSelectorMarkup } from '../../components/aigenText/modelSelector.js';
+import { renderStoryNovelBatchPanel } from './storyNovelBatchPresentation.js';
 import { getDisplayModelName } from '../providers.js';
 import { getStorySurfaceProjects } from './storyWorkspaceSurface.js';
 import { renderWorkspaceProjectCard, renderWorkspaceProjectSortControl } from '../workspaceProjectHome.js';
@@ -53,7 +54,8 @@ function escapeHtml(_0xf6fd44) {
 function normalizeText(_0x4b2282) {
   return String(_0x4b2282 ?? '')['trim']();
 }
-export function getStoryHomeModeDescription(_0x40025a) {
+export function getStoryHomeModeDescription(_0x40025a, _0x30af2c = '') {
+  if (_0x40025a === 'upload' && _0x30af2c === 'novel') return '上传小说，AI 改编为分集剧本后制作';
   return (
     {
       upload: '导入已有剧本，按原稿进入制作',
@@ -117,6 +119,14 @@ function renderHomeTabs(_0x2f8070) {
   );
 }
 export function renderStoryHomeComposerBody(_0x1ef196) {
+  // A parsed novel turns the upload tab into the chapter batch picker.
+  if (
+    _0x1ef196['homeTab'] === 'upload' &&
+    _0x1ef196['scriptIntent'] === 'novel' &&
+    Array['isArray'](_0x1ef196['novelChapters']) &&
+    _0x1ef196['novelChapters']['length']
+  )
+    return renderStoryNovelBatchPanel(_0x1ef196);
   if (_0x1ef196['homeTab'] === 'collaborate')
     return (
       '<div class="story-home-composer-panel story-home-input-wrap story-home-story-input">\n      <label for="storyIdeaInput">输入故事想法</label>\n      <textarea id="storyIdeaInput" data-story-idea-input maxlength="' +
@@ -226,6 +236,7 @@ export function renderStoryHomeComposerBody(_0x1ef196) {
       '</span>\n        </div>\n      </div>\n    </div>'
     );
   }
+  const isNovelIntent = _0x1ef196['scriptIntent'] === 'novel';
   if (_0x1ef196['uploadInputMode'] === 'paste')
     return (
       '<div class="story-home-composer-panel story-home-input-wrap story-home-story-input story-home-paste-input" data-story-script-drop>\n      <label for="storyPasteInput">粘贴剧本文本</label>\n      <textarea id="storyPasteInput" data-story-paste-input maxlength="' +
@@ -234,7 +245,9 @@ export function renderStoryHomeComposerBody(_0x1ef196) {
       escapeHtml(_0x1ef196['scriptText']) +
       '</textarea>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-home-input-meta\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<p>支持最多\x20' +
       STORY_SCRIPT_MAX_CHARACTERS +
-      ' 字，将按原稿导入，不扩写、不重新分集。</p>\n        <span data-story-paste-count>' +
+      ' 字，' +
+      (isNovelIntent ? '将改编为分集剧本，拆分场景后生成正文。' : '将按原稿导入，不扩写、不重新分集。') +
+      '</p>\n        <span data-story-paste-count>' +
       _0x1ef196['scriptText']['length'] +
       '\x20/\x20' +
       STORY_SCRIPT_MAX_CHARACTERS +
@@ -246,12 +259,18 @@ export function renderStoryHomeComposerBody(_0x1ef196) {
       ? '正在解析文档…'
       : _0x1ef196['scriptFileName']
         ? escapeHtml(_0x1ef196['scriptFileName'])
-        : '上传剧本文件') +
+        : isNovelIntent
+          ? '上传小说'
+          : '上传剧本文件') +
     '</strong>\n    <p>' +
     (_0x1ef196['scriptFileName']
-      ? '剧本已就绪，将按原稿结构导入并直接提取素材。'
+      ? isNovelIntent
+        ? '小说已就绪，将改编为分集剧本并拆分场景。'
+        : '剧本已就绪，将按原稿结构导入并直接提取素材。'
       : '支持 TXT、DOCX、文本型 PDF，文本内容不超过 ' + STORY_SCRIPT_MAX_CHARACTERS + ' 字。') +
-    '</p>\x0a\x20\x20\x20\x20<div\x20class=\x22story-upload-actions\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20button-press-feedback\x22\x20data-story-action=\x22choose-script\x22\x20' +
+    '</p>\x0a\x20\x20\x20\x20<div\x20class=\x22story-upload-actions\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20button-press-feedback' +
+    (isNovelIntent ? '' : ' is-active') +
+    '\x22\x20data-story-action=\x22choose-script\x22\x20' +
     (_0x1ef196['isParsingDocument'] ? 'disabled' : '') +
     ' aria-busy="' +
     Boolean(_0x1ef196['isParsingDocument']) +
@@ -259,7 +278,9 @@ export function renderStoryHomeComposerBody(_0x1ef196) {
     (_0x1ef196['isParsingDocument'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
     '<span>' +
     (_0x1ef196['isParsingDocument'] ? '解析中' : '上传剧本') +
-    '</span></button>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20button-press-feedback\x22\x20data-story-action=\x22paste-script\x22\x20aria-pressed=\x22false\x22><span>粘贴文本</span></button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>'
+    '</span></button>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20button-press-feedback' +
+    (isNovelIntent ? ' is-active' : '') +
+    '\x22\x20data-story-action=\x22choose-novel\x22\x20aria-pressed=\x22false\x22><span>上传小说</span></button>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20button-press-feedback\x22\x20data-story-action=\x22paste-script\x22\x20aria-pressed=\x22false\x22><span>粘贴文本</span></button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>'
   );
 }
 export function renderStoryScriptModeControl(_0x5ed5ca = 'plot', { hidden: hidden = ![] } = {}) {
@@ -348,7 +369,11 @@ function renderStoryPlanningPicker({
     escapeHtml(_0x1e8641) +
     '" aria-haspopup="listbox" aria-expanded="false">\n      <span class="story-home-param-icon" aria-hidden="true">' +
     escapeHtml(_0x529993) +
-    '</span>\n      <span data-story-planning-trigger-label>' +
+    '</span>' +
+    (_0x1e8641 === 'promptMode'
+      ? '<span class="story-home-param-kind-label">提示词</span>'
+      : '') +
+    '\n      <span data-story-planning-trigger-label>' +
     escapeHtml(_0x3bf9dd(_0xdd8106)) +
     '</span>\n      ' +
     renderStoryHomeParamChevron() +
@@ -419,22 +444,22 @@ function renderStoryStylePicker(
     '<div class="story-home-param-picker story-style-picker' +
     _0x4f6c91 +
     _0x55773c +
-    '">\n    <button type="button" class="story-home-param-trigger story-menu-trigger story-style-trigger" data-story-home-param-trigger="style" aria-haspopup="dialog" aria-expanded="false">\n      ' +
+    '">\n    <button type="button" class="story-home-param-trigger story-menu-trigger story-style-trigger" data-story-home-param-trigger="style" aria-haspopup="dialog" aria-expanded="false" title="选择提示词风格">\n      ' +
     (_0x252997['thumbnail']
       ? '<img src="' + escapeHtml(_0x252997['thumbnail']) + '" alt="" draggable="false">'
       : '<span\x20class=\x22story-home-param-icon\x20story-style-custom-icon\x22\x20aria-hidden=\x22true\x22>✦</span>') +
-    '\n      <span class="story-style-trigger-label">' +
+    '\n      <span class="story-home-param-kind-label">风格</span>\n      <span class="story-style-trigger-label">' +
     escapeHtml(_0x252997['label']) +
     '</span>\x0a\x20\x20\x20\x20\x20\x20' +
     renderStoryHomeParamChevron() +
-    '\n    </button>\n    <section class="story-home-param-popover story-style-popover" role="dialog" aria-label="风格库">\n      <div class="story-style-library" data-story-style-library>\n        <div class="story-style-header">\n          <div>\n            <strong>风格库</strong>\n            <small>为后续角色、场景、道具和分集画面统一视觉方向</small>\n          </div>\n          <label class="story-style-search">\n            <span aria-hidden="true">⌕</span>\n            <input type="search" data-story-style-search-input placeholder="搜索风格" autocomplete="off">\n          </label>\n        </div>\n        <div class="story-style-tabs" role="tablist">\n          ' +
+    '\n    </button>\n    <section class="story-home-param-popover story-style-popover" role="dialog" aria-label="风格库">\n      <div class="story-style-library" data-story-style-library>\n        <div class="story-style-header">\n          <div>\n            <strong>风格库</strong>\n            <small>为后续角色、场景、道具和分集画面统一视觉方向</small>\n          </div>\n          <label class="story-style-search">\n            <span aria-hidden="true">⌕</span>\n            <input type="search" data-story-style-search-input placeholder="搜索风格" autocomplete="off">\n          </label>\n        </div>\n        <div class="story-style-tabs" role="group" aria-label="风格分类">\n          ' +
     STORY_STYLE_CATEGORIES['map'](
       (_0x15bb20) =>
         '<button type="button" class="story-style-tab ' +
         (_0x15bb20['id'] === 'all' ? 'is-active' : '') +
         '" data-story-style-category="' +
         _0x15bb20['id'] +
-        '" role="tab" aria-selected="' +
+        '" role="button" aria-pressed="' +
         (_0x15bb20['id'] === 'all') +
         '\x22>' +
         _0x15bb20['label'] +
@@ -650,7 +675,7 @@ export function renderStoryHome(_0x3d80d7) {
     (_0x3d80d7['workspaceSurface'] === 'replication'
       ? ''
       : '<p class="story-home-mode-description" data-story-home-mode-description aria-live="polite">' +
-        escapeHtml(getStoryHomeModeDescription(_0x1693af['homeTab'])) +
+        escapeHtml(getStoryHomeModeDescription(_0x1693af['homeTab'], _0x1693af['scriptIntent'])) +
         '</p>') +
     '\n      <div class="story-home-composer ' +
     (_0x3d80d7['isGeneratingStory'] ? 'is-generating' : '') +

@@ -1,3 +1,4 @@
+import { AGNES_MODEL_API_PROFILE_IDS } from '../../../modules/agnesProviderProfiles.js';
 function createTextModelApiManifest({
   modelId: _0xa5dac3,
   executionId: _0x2e01ec,
@@ -221,16 +222,28 @@ const RUNNINGHUB_IMAGE_TO_TEXT_MODELS = Object.freeze([
       order: 30,
     }),
   ]),
+  // Agnes 2.0 Flash is deprecated by the vendor and no longer returns content, so it is not
+  // offered any more. Verified against both lines with live keys.
   AGNES_TEXT_MODELS = Object.freeze([
     Object.freeze({
-      modelId: 'agnes/agnes-2.0-flash',
-      executionId: 'agnes.model-api.text.agnes-2-flash.v1',
-      displayName: 'Agnes 2.0 Flash',
-      model: 'agnes-2.0-flash',
-      title: 'Agnes 2.0 Flash',
+      modelId: 'agnes/agnes-2.5-flash',
+      executionId: 'agnes.model-api.text.agnes-2-5-flash.v1',
+      displayName: 'Agnes 2.5 Flash',
+      model: 'agnes-2.5-flash',
+      title: 'Agnes 2.5 Flash',
       subtitle: 'Agnes AI fast text generation model',
       icon: 'agnes',
-      order: 10,
+      order: 20,
+    }),
+    Object.freeze({
+      modelId: 'agnes/agnes-3.0-flash',
+      executionId: 'agnes.model-api.text.agnes-3-0-flash.v1',
+      displayName: 'Agnes 3.0 Flash',
+      model: 'agnes-3.0-flash',
+      title: 'Agnes 3.0 Flash',
+      subtitle: 'Agnes AI fast text generation model',
+      icon: 'agnes',
+      order: 30,
     }),
   ]),
   CHAT_COMPLETION_TEXT_RESPONSE_MAPPING = Object.freeze({
@@ -570,6 +583,9 @@ export const vendorTextModelApiModelManifests = Object.freeze([
       description: 'Agnes AI chat completion model API',
       inputSlots: CHAT_COMPLETION_TEXT_INPUT_SLOTS,
       extensions: Object.freeze({
+        // Declares the domestic and international lines so the key panel can offer the route
+        // switch. Without it Agnes showed no route selector at all.
+        providerProfiles: AGNES_MODEL_API_PROFILE_IDS,
         textMenu: Object.freeze({
           group: 'agnes',
           order: _0x2572a5.order,

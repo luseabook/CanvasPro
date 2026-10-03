@@ -26,6 +26,11 @@ import {
   resolveStoryVideoInputTextModelId,
 } from './storyWorkspaceModelCatalog.js';
 import { resolveStoryVideoReplicationHomeTab } from './storyVideoReplication.js';
+import { splitNovelChapters } from './storyNovelChapterSplit.js';
+import {
+  defaultChapterSelection,
+  normalizeChapterRecords,
+} from './storyChapterSelection.js';
 function normalizeText(_0x310167) {
   return String(_0x310167 ?? '')['trim']();
 }
@@ -261,7 +266,11 @@ export function createStoryHomeWorkspaceController({
     }
     _0x7f47ce['dataset']['activeTab'] = _0x29ce16;
     const _0x473d5a = _0xee0140['querySelector']('[data-story-home-mode-description]');
-    if (_0x473d5a) _0x473d5a['textContent'] = getStoryHomeModeDescription(_0x29ce16);
+    if (_0x473d5a)
+      _0x473d5a['textContent'] = getStoryHomeModeDescription(
+        _0x29ce16,
+        _0x57d133['scriptIntent'],
+      );
     _0x7f47ce['querySelectorAll']('[data-story-home-tab]')['forEach']((_0x2c43ea) => {
       const _0x126c7c = _0x2c43ea['dataset']['storyHomeTab'] === _0x29ce16;
       (_0x2c43ea['classList']['toggle']('is-active', _0x126c7c),
@@ -297,6 +306,18 @@ export function createStoryHomeWorkspaceController({
     if (_0x57d133['scriptMode'] === _0x5c6c78) return ![];
     return ((_0x57d133['scriptMode'] = _0x5c6c78), _0x73d6cc(), _0x31b651(), !![]);
   }
+  // A novel is adapted in batches, so parse it into chapters and pick the first batch instead
+  // of handing the whole book to the rewrite pipeline.
+  function _0x6c2f10(_0x4f8a3b) {
+    const _0x3f0e1c = normalizeChapterRecords(splitNovelChapters(_0x4f8a3b)),
+      _0x5a1d2b = defaultChapterSelection(_0x3f0e1c);
+    return (
+      (_0x57d133['novelChapters'] = _0x3f0e1c),
+      (_0x57d133['novelSelectedChapterIds'] = _0x5a1d2b.chapterIds),
+      (_0x57d133['novelEpisodeCount'] = _0x5a1d2b.episodeSuggestion.recommended),
+      _0x3f0e1c['length']
+    );
+  }
   async function _0x303d33(_0x235894) {
     if (!_0x235894) return ![];
     if (typeof _0xfe5af4 !== 'function') return (_0x17e886('剧本文档解析服务尚未初始化。', 'error'), ![]);
@@ -305,7 +326,11 @@ export function createStoryHomeWorkspaceController({
     try {
       const _0x2df689 = await _0xfe5af4(_0x235894);
       if (_0x57d133['data'] !== _0x21352f) return ![];
-      const _0x44db80 = String(_0x2df689?.['text'] || '')['slice'](0x0, STORY_SCRIPT_MAX_CHARACTERS);
+      // The parser used to slice the document to the limit without saying anything, so an
+      // oversized novel silently lost everything past the cut. Report the loss explicitly.
+      const _0x3f8a1c = String(_0x2df689?.['text'] || ''),
+        _0x44db80 = _0x3f8a1c['slice'](0x0, STORY_SCRIPT_MAX_CHARACTERS),
+        _0x1c0e77 = _0x3f8a1c['length'] - _0x44db80['length'];
       if (!normalizeText(_0x44db80)) throw new Error('文档解析结果没有可用文本。');
       return (
         (_0x57d133['scriptCharacterCount'] = Number['isFinite'](_0x2df689?.['characterCount'])
@@ -321,7 +346,33 @@ export function createStoryHomeWorkspaceController({
             characterCount: _0x57d133['scriptCharacterCount'],
           }),
         _0x31b651({ immediate: !![] }),
-        _0x372c60('剧本文档解析完成。', 'success'),
+        _0x1c0e77 > 0x0 &&
+          _0x372c60(
+            '文档共 ' +
+              _0x3f8a1c['length'] +
+              ' 字，超出单次处理上限 ' +
+              STORY_SCRIPT_MAX_CHARACTERS +
+              ' 字，本次只保留前 ' +
+              _0x44db80['length'] +
+              ' 字，其余 ' +
+              _0x1c0e77 +
+              ' 字未进入项目。请拆分后分批处理。',
+            'warn',
+          ),
+        (_0x57d133['scriptTruncatedCharacters'] = _0x1c0e77),
+        _0x57d133['scriptIntent'] === 'novel'
+          ? (function () {
+              const _0x2c6a1f = _0x6c2f10(_0x44db80);
+              (_0x31b651({ immediate: !![] }),
+                _0x3e53a1(),
+                _0x372c60(
+                  _0x2c6a1f > 0x1
+                    ? '已解析 ' + _0x2c6a1f + ' 章，请勾选本次要改编的章节。'
+                    : '未能识别章节标题，全文作为一章，请确认是否继续。',
+                  _0x2c6a1f > 0x1 ? 'success' : 'warn',
+                ));
+            })()
+          : _0x372c60('剧本文档解析完成。', 'success'),
         !![]
       );
     } catch (_0x5591f2) {
