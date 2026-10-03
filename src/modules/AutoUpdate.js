@@ -15,6 +15,8 @@ let _dismissedSignature = '',
   _desktopUpdateUnsubscribe = null,
   _desktopUpdaterActive = false,
   _desktopInstallAfterDownload = false;
+let desktopErrorEventSequence = 0;
+let lastDesktopErrorEventId = null;
 function autoUpdateText(_0x5eb5c6, _0x3fd1a6 = {}) {
   return t('autoUpdate.' + _0x5eb5c6, _0x3fd1a6);
 }
@@ -919,6 +921,9 @@ function _handleDesktopUpdaterEvent(_0x17f006) {
   if (_0x17f006.type === 'error') {
     _desktopInstallAfterDownload = false;
     if (_0x17f006.skipped) return;
+    if (_0x17f006.eventId != null && _0x17f006.eventId === lastDesktopErrorEventId) return;
+    lastDesktopErrorEventId = _0x17f006.eventId ?? null;
+    desktopErrorEventSequence += 1;
     // Background update checks fail routinely (offline, missing release feed) and the raw
     // error message embeds the whole HTTP response header dump, which used to be toasted
     // across the bottom of the canvas. Only surface manual checks, with localized copy.
@@ -945,11 +950,13 @@ export function initAutoUpdate() {
 }
 export async function showManualUpdateCheck() {
   if (window.aiCanvasDesktop?.isElectron) {
+    const errorsBeforeCheck = desktopErrorEventSequence;
     try {
       (window.showToast?.(autoUpdateText('toasts.checkingDesktop')),
         await window.aiCanvasDesktop.checkForUpdates?.());
     } catch (_0x386dc0) {
-      window.showToast?.(autoUpdateText('toasts.desktopCheckFailed'));
+      if (desktopErrorEventSequence === errorsBeforeCheck)
+        window.showToast?.(autoUpdateText('toasts.desktopCheckFailed'), 'warning');
     }
     return;
   }

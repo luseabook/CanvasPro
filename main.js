@@ -1,5 +1,7 @@
+import { registerPageTeardown, runCleanupSteps } from './src/utils/cleanupSteps.js';
 import './src/services/startupLoaderBootstrap.js';
 import { createStoryAgentComposition } from './src/modules/app/storyAgentComposition.js';
+import { installWorkspaceCloseGuard } from './src/modules/app/workspaceCloseGuard.js';
 import appStore, { graphStore, uiStore, workspaceStore } from './src/core/stores/appStore.js';
 import { subscribeNodeDeletions } from './src/core/nodeDeletionEvents.js';
 import { pauseActiveWorkspaceTasks } from './src/core/generationTaskRuntime.js';
@@ -363,14 +365,10 @@ const canvasStageResizeObserver =
     : null;
 (canvasStageResizeObserver?.observe(canvasStage),
   window.addEventListener('resize', syncCanvasViewportScreenOrigin),
-  window.addEventListener(
-    'beforeunload',
-    () => {
-      (canvasStageResizeObserver?.disconnect(),
-        window.removeEventListener('resize', syncCanvasViewportScreenOrigin));
-    },
-    { once: true },
-  ),
+  registerPageTeardown(window, () => runCleanupSteps([
+    () => canvasStageResizeObserver?.disconnect(),
+    () => window.removeEventListener('resize', syncCanvasViewportScreenOrigin),
+  ])),
   installRendererEventBindingGuard(),
   installImageGenerationExecution({
     store: appStore,
@@ -386,7 +384,7 @@ const canvasRenderer = initRenderer(wrap, canvas, appStore),
     renderer: canvasRenderer,
     warmup: disposeCanvasViewportVideoWarmup,
   });
-(window.addEventListener('beforeunload', disposeCanvasViewportVideoWarmup, { once: true }),
+(registerPageTeardown(window, disposeCanvasViewportVideoWarmup),
   initRendererUiEvents({ wrap: wrap, store: appStore }),
   initWebPreviewViewSyncService({ graphStore: graphStore, root: document }),
   initStoreRuntimeEffects(appStore),
@@ -435,13 +433,13 @@ const disposeIconButtonMotion = bindIconButtonMotion(
     '.sidebar-floating .sidebar-btn-v3, .sidebar-floating .user-gear-plain, .canvas-controls-floating .cc-btn',
   ),
 );
-window.addEventListener('beforeunload', disposeIconButtonMotion, { once: true });
+registerPageTeardown(window, disposeIconButtonMotion);
 const disposeSelectionMediaProperties = initSelectionMediaProperties({
   graphStore: graphStore,
   uiStore: uiStore,
   element: document.getElementById('selectionMediaProperties'),
 });
-window.addEventListener('beforeunload', disposeSelectionMediaProperties, { once: true });
+registerPageTeardown(window, disposeSelectionMediaProperties);
 let createStoryEpisodeCanvasFromWorkspace = async () => {
     throw new Error('分集画布服务尚未初始化。');
   },
@@ -616,19 +614,21 @@ const completionNavigation = createCompletionNavigation({
   requestWorkspaceMode: (..._0x140606) => workspaceModeCoordinator?.setMode?.(..._0x140606),
   showToast: (..._0x277820) => window.showToast?.(..._0x277820),
 });
-window.addEventListener(
-  'beforeunload',
-  () => {
-    (workspaceModeCoordinator?.destroy?.(),
-      completionNavigation?.destroy?.(),
-      canvasWorkspacePresentation?.destroy?.(),
-      storyWorkspaceApi?.destroy?.(),
-      storyboard3DWorkspaceController?.dispose?.(),
-      replacementStudioModelGate?.destroy?.(),
-      replacementStudioApplication?.destroy?.());
-  },
-  { once: true },
-);
+const workspaceCloseGuard = installWorkspaceCloseGuard({
+  windowObject: window,
+  getWorkspaces: () => [storyWorkspaceApi],
+});
+registerPageTeardown(window, () => runCleanupSteps([
+  () => workspaceCloseGuard.destroy(),
+  () => workspaceModeCoordinator?.destroy?.(),
+  () => completionNavigation?.destroy?.(),
+  () => canvasWorkspacePresentation?.destroy?.(),
+  () => storyWorkspaceApi?.destroy?.(),
+  () => storyboard3DWorkspaceController?.dispose?.(),
+  () => replacementStudioModelGate?.destroy?.(),
+  () => replacementStudioApplication?.destroy?.(),
+]));
+
 const appViewport = createAppViewport({
   graphStore: graphStore,
   uiStore: uiStore,
@@ -1107,7 +1107,7 @@ const nodeManagerPanel = createNodeManagerPanel({
   canvasStage: canvasStage,
   button: document.getElementById('btnNodeManager'),
 });
-(window.addEventListener('beforeunload', () => nodeManagerPanel?.destroy?.(), { once: true }),
+(registerPageTeardown(window, () => nodeManagerPanel?.destroy?.()),
   MascotManager.init({ bindFabButton: false }),
   initAutoUpdate(),
   rendererStartupState.complete('entry'),

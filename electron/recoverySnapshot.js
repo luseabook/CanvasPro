@@ -1,88 +1,87 @@
-const DEFAULT_CLOSE_RECOVERY_TIMEOUT_MS = 0x9c4;
-function delay(_0x3f3fab) {
-  return new Promise((_0x2f8570) => {
-    setTimeout(_0x2f8570, _0x3f3fab);
-  });
-}
+const DEFAULT_CLOSE_RECOVERY_TIMEOUT_MS = 10000;
+
 export async function requestRendererRecoverySnapshot(
-  _0x589313,
-  _0x4bbf5e = 'window-close',
-  { timeoutMs: timeoutMs = DEFAULT_CLOSE_RECOVERY_TIMEOUT_MS } = {},
+  window,
+  reason = 'window-close',
+  { timeoutMs = DEFAULT_CLOSE_RECOVERY_TIMEOUT_MS } = {},
 ) {
-  if (!_0x589313 || _0x589313.isDestroyed()) return { success: false, reason: 'window-unavailable' };
-  const _0x401782 =
-    '(() => {\n    const writer = window.__aiCanvasWriteRecoverySnapshotForClose;\n    if (typeof writer !== "function") {\n      return { success: false, reason: "writer-unavailable" };\n    }\n    return Promise.resolve(writer(' +
-    JSON.stringify(_0x4bbf5e) +
-    ')).catch((error) => ({\n      success: false,\n      error: String(error && error.message ? error.message : error),\n    }));\n  })()';
-  return await Promise.race([
-    _0x589313.webContents.executeJavaScript(_0x401782, true),
-    delay(timeoutMs).then(() => ({ success: false, reason: 'timeout' })),
-  ]);
+  if (!window || window.isDestroyed()) return { success: false, reason: 'window-unavailable' };
+  const script = `(() => {
+    const writer = window.__aiCanvasPrepareForClose || window.__aiCanvasWriteRecoverySnapshotForClose;
+    if (typeof writer !== 'function') return { success: false, reason: 'writer-unavailable' };
+    return Promise.resolve(writer(${JSON.stringify(reason)}));
+  })()`;
+  let timer;
+  try {
+    return await Promise.race([
+      window.webContents.executeJavaScript(script, true),
+      new Promise(resolve => {
+        timer = setTimeout(() => resolve({ success: false, reason: 'timeout' }), timeoutMs);
+      }),
+    ]);
+  } catch (error) {
+    return { success: false, reason: 'snapshot-error', error: String(error?.message || error) };
+  } finally {
+    clearTimeout(timer);
+  }
 }
-export function installRecoverySnapshotBeforeClose(_0x212f51, _0x5ef38e = {}) {
-  if (!_0x212f51) return;
-  const _0x1bb744 =
-      typeof _0x5ef38e.getRendererProjectState === 'function'
-        ? _0x5ef38e.getRendererProjectState
-        : () => ({}),
-    _0x29fbc3 = typeof _0x5ef38e.shouldBypassClose === 'function' ? _0x5ef38e.shouldBypassClose : () => false,
-    _0x38a9a0 =
-      typeof _0x5ef38e.requestSnapshot === 'function'
-        ? _0x5ef38e.requestSnapshot
-        : requestRendererRecoverySnapshot,
-    _0x16f3cd = typeof _0x5ef38e.logEvent === 'function' ? _0x5ef38e.logEvent : () => {},
-    confirmCloseWithoutSnapshot = _0x5ef38e.confirmCloseWithoutSnapshot;
-  let _0xa642a8 = false,
-    _0x434767 = false;
-  _0x212f51.on('close', (_0x2400e4) => {
-    if (_0x29fbc3()) return;
-    if (_0xa642a8) {
-      _0xa642a8 = false;
-      return;
-    }
-    const _0x1a8233 = _0x1bb744();
-    if (_0x1a8233?.hasUnsavedChanges !== true) return;
-    _0x2400e4.preventDefault();
-    if (_0x434767) return;
-    ((_0x434767 = true),
-      void (async () => {
-        let shouldClose = true;
-        try {
-          const _0x5d2506 = await _0x38a9a0(_0x212f51, 'window-close');
-          if (_0x5d2506?.code === 'RECOVERY_SNAPSHOT_PROTECTED') shouldClose = false;
-          _0x5d2506?.success === false &&
-            _0x16f3cd({
-              type: 'project.recovery_snapshot_before_close_failed',
-              level: 'warn',
-              source: 'main',
-              message: 'Recovery snapshot before close failed',
-              context: { reason: _0x5d2506.reason || '', error: _0x5d2506.error || '' },
-            });
-          if (_0x5d2506?.code === 'RECOVERY_SNAPSHOT_PROTECTED') {
-            // The old snapshot is intact, but this session has no new backup.
-            try {
-              if (typeof confirmCloseWithoutSnapshot === 'function')
-                shouldClose = (await confirmCloseWithoutSnapshot(_0x5d2506)) === true;
-            } catch (_0x12432f) {
-              _0x16f3cd({ type: 'project.recovery_snapshot_close_confirm_failed',
-                level: 'warn', source: 'main', error: _0x12432f });
-            }
-          }
-        } catch (_0x373eb8) {
-          _0x16f3cd({
-            type: 'project.recovery_snapshot_before_close_failed',
-            level: 'warn',
-            source: 'main',
-            message: 'Recovery snapshot before close failed',
-            error: _0x373eb8,
+
+export function installRecoverySnapshotBeforeClose(window, options = {}) {
+  if (!window) return;
+  const {
+    getRendererProjectState = () => ({}),
+    shouldBypassClose = () => false,
+    shouldPrepareRenderer = () => false,
+    requestSnapshot = requestRendererRecoverySnapshot,
+    confirmCloseWithoutSnapshot,
+    onCloseCancelled = () => {},
+    logEvent = () => {},
+  } = options;
+  let approved = false;
+  let pending = false;
+  window.on('close', event => {
+    if (shouldBypassClose()) return;
+    if (approved) { approved = false; return; }
+    if (getRendererProjectState()?.hasUnsavedChanges !== true && !shouldPrepareRenderer()) return;
+    event.preventDefault();
+    if (pending) return;
+    pending = true;
+    void (async () => {
+      let result;
+      let mayClose = false;
+      let discardConfirmed = false;
+      try {
+        result = await requestSnapshot(window, 'window-close');
+        mayClose = result?.success === true || result?.reason === 'clean';
+      } catch (error) {
+        result = { success: false, reason: 'snapshot-error', error: String(error?.message || error) };
+      }
+      try {
+        if (!mayClose) {
+          logEvent({
+            type: 'project.recovery_snapshot_before_close_failed', level: 'warn', source: 'main',
+            message: 'Persistence before close did not complete',
+            context: { reason: result?.reason || 'unknown', error: result?.error || '' },
           });
-        } finally {
-          _0x434767 = false;
-          if (shouldClose && !_0x212f51.isDestroyed()) {
-            _0xa642a8 = true;
-            _0x212f51.close();
-          }
+          // Every failure is fail-closed, not only a protected recovery snapshot.
+          mayClose = typeof confirmCloseWithoutSnapshot === 'function' &&
+            (await confirmCloseWithoutSnapshot(result)) === true;
+          discardConfirmed = mayClose;
         }
-      })());
+      } catch (error) {
+        mayClose = false;
+        logEvent({ type: 'project.recovery_snapshot_close_confirm_failed', level: 'warn', source: 'main', error });
+      } finally {
+        pending = false;
+        if (mayClose && !window.isDestroyed()) {
+          // Only an explicit discard may bypass a renderer beforeunload veto.
+          // Normal successful saves still use close(), so newly-dirty work can cancel it.
+          if (discardConfirmed && typeof window.destroy === 'function') window.destroy();
+          else { approved = true; window.close(); }
+        } else {
+          onCloseCancelled();
+        }
+      }
+    })();
   });
 }

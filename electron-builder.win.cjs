@@ -6,6 +6,7 @@ module.exports = {
   productName: 'Canvas',
   copyright: 'Copyright (c) 2026 Canvas',
   asar: false,
+  afterSign: path.join(__dirname, 'build', 'write-install-manifest.cjs'),
   directories: {
     output: 'dist-win',
   },

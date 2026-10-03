@@ -40,18 +40,29 @@ class ServerSecurityTest(unittest.TestCase):
             self.assertFalse(server._request_passes_local_security(invalid, "/api/v2/projects"))
 
     def test_remote_client_cannot_fetch_private_static_user_files_without_token(self):
-        errors = []
-        handler = SimpleNamespace(
-            path="/user/config.json",
-            headers={"Origin": f"http://127.0.0.1:{server.PORT}"},
-            client_address=("192.168.1.44", 45678),
-            server=SimpleNamespace(server_address=("0.0.0.0", server.PORT)),
-            send_error=lambda code, message: errors.append((code, message)),
-        )
+        # Runtime data lives under private roots; a non-loopback peer must never read it.
+        handler = object.__new__(server.Handler)
+        resolved = server.Handler._resolve_static_file(handler, "/output/render.png")
+        self.assertIsNotNone(resolved)
+        self.assertTrue(resolved[1], "output/ must be classified as private")
+        sent = []
+        handler.path = "/output/render.png"
+        handler.headers = {}
+        handler.client_address = ("192.168.1.44", 45678)
+        handler.server = SimpleNamespace(server_address=("0.0.0.0", server.PORT))
+        handler.send_response = lambda code, message=None: sent.append(code)
+        handler.send_header = lambda *args, **kwargs: None
+        handler.end_headers = lambda: None
+        handler.wfile = SimpleNamespace(write=lambda body: None)
         with patch.object(server, "LOCAL_ACCESS_TOKEN", ""):
             result = server.Handler.send_head(handler)
         self.assertIsNone(result)
-        self.assertEqual(errors[0][0], 403)
+        self.assertEqual(sent[0], 403)
+
+    def test_legacy_user_static_files_are_not_served_at_all(self):
+        handler = object.__new__(server.Handler)
+        self.assertIsNone(server.Handler._resolve_static_file(handler, "/user/config.json"))
+        self.assertIsNone(server.Handler._resolve_static_file(handler, "/data/workflows/../../secret.json"))
 
     def test_oversized_content_length_is_rejected_before_body_read(self):
         stream = __import__("io").BytesIO(b"body-not-consumed")
@@ -90,13 +101,18 @@ class ServerSecurityTest(unittest.TestCase):
     def test_windows_drive_path_cannot_escape_virtual_workflow_root(self):
         handler = object.__new__(server.Handler)
         handler.directory = server.DIRECTORY
-        translated = server.Handler.translate_path(
-            handler,
-            "/data/workflows/C:/Users/example/private.json",
+        # A drive-qualified name is refused outright rather than resolved outside the root.
+        self.assertIsNone(
+            server.Handler._resolve_static_file(
+                handler,
+                "/data/workflows/C:/Users/example/private.json",
+            )
         )
-        self.assertTrue(handler._aic_static_path_invalid)
-        self.assertTrue(server._is_path_within_root(translated, server.DIRECTORY))
-        self.assertFalse(os.path.normcase(translated).startswith(os.path.normcase("C:\\Users")))
+        # A legitimate workflow name still resolves, and resolves inside the workflow root.
+        resolved = server.Handler._resolve_static_file(handler, "/data/workflows/demo.json")
+        self.assertIsNotNone(resolved)
+        self.assertTrue(server._is_path_within_root(resolved[0], server.WORKFLOWS_DIR))
+        self.assertTrue(resolved[1])
 
 
 if __name__ == "__main__":

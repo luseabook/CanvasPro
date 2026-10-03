@@ -4,10 +4,15 @@ import { listModelManifests } from '../../manifests/index.js';
 import { createCanvasMcpSession } from '../canvasMcp/canvasMcpSession.js';
 import { createCanvasMcpAutoConnection } from '../canvasMcp/canvasMcpAutoConnection.js';
 export function initCanvasMcp({
+  enabled = false,
+  allowGeneration = false,
   commandContext: _0x77446a,
   getCanvasIdentity: _0x4aafa2,
   windowObject: windowObject = window,
 }) {
+  // This source backend does not advertise canvas MCP. Opt in only after a
+  // supporting backend is selected; creating a timer is itself an activation.
+  if (enabled !== true) return Object.freeze({ destroy: () => false });
   let _0x19fa3a;
   try {
     ((_0x19fa3a =
@@ -17,6 +22,7 @@ export function initCanvasMcp({
     _0x19fa3a = crypto['randomUUID']();
   }
   const _0x1aba94 = createCanvasMcpAutoConnection({
+    allowGeneration,
     getBinding: _0x4aafa2,
     isReady: () => windowObject['_isAppLoaded'] === !![],
     createSession: (_0x11baf2) =>

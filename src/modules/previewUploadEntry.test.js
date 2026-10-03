@@ -10,7 +10,7 @@ import { IMAGE_TOOLBAR_HTML } from '../components/nodeToolbar/imageToolbarHtml.j
 import { VIDEO_TOOLBAR_HTML } from '../components/nodeToolbar/videoToolbarHtml.js';
 import { AUDIO_TOOLBAR_HTML } from '../components/nodeToolbar/audioToolbar.js';
 import { DEFAULT_LOCALE, setLocale } from '../i18n/index.js';
-import { installPreviewDomStubs } from '../../tests/testPreviewDom.js';
+import { installDomEnvironment as installPreviewDomStubs } from '../../tools/dom-test-environment.mjs';
 const restoreDom = installPreviewDomStubs();
 (test.afterEach(() => {
   (setLocale(DEFAULT_LOCALE, { persist: false, notify: false }), _resetPreviewRuntimeForTests());

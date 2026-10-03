@@ -32,6 +32,7 @@ export function createStorageRoots({
   processExecPath: _0x1f669e,
   userDataRoot: _0x14cbb5,
   localAppData: _0x210e09,
+  storageRootOverride = '',
   platform: platform = process.platform,
 } = {}) {
   const _0x5964a1 = path.resolve(_0x8b0a27 || '.'),
@@ -41,6 +42,10 @@ export function createStorageRoots({
       ? resolvePackagedFilesRoot({ localAppData: _0x210e09, userDataRoot: _0x14cbb5, platform: platform })
       : path.join(_0x5964a1, 'user-data'),
     _0x1f84e4 = [];
+  if (trimText(storageRootOverride)) {
+    return { installRoot: _0x2cafec, installDataRoot: _0x4a59f4,
+      storageRoot: path.resolve(storageRootOverride), legacyFilesRoots: [] };
+  }
   return (
     _0x476d07
       ? (pushUniquePath(_0x1f84e4, _0x4a59f4, platform),

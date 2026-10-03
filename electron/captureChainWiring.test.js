@@ -190,7 +190,7 @@ test('main.js assembles the capture chain through the single assembly factory', 
 test('main.js exposes the capture window controller and owns its lifecycle', () => {
   assert.match(MAIN_SOURCE, /\n\s+globalCaptureWindowController: globalCaptureWindowController,/);
   assert.match(MAIN_SOURCE, /void globalCaptureWindowController\.prewarm\(\),/);
-  assert.match(MAIN_SOURCE, /globalCaptureWindowController\?\.destroy\?\.\(\)\);/);
+  assert.match(MAIN_SOURCE, /cleanup:\s*\(\)\s*=>\s*runCleanupSteps\([\s\S]*?\(\)\s*=>\s*globalCaptureWindowController\.destroy\(\)/);
   assert.match(MAIN_SOURCE, /globalTextPresetShortcutController\?\.sendShortcutStatus\?\.\(\),/);
   assert.equal(MAIN_SOURCE.includes('selectedTextCaptureController'), false);
 });
@@ -198,11 +198,11 @@ test('main.js exposes the capture window controller and owns its lifecycle', () 
 test('main.js registers the Control+Alt+Shift+C global shortcut on start and unregisters it on quit', () => {
   assert.match(
     MAIN_SOURCE,
-    /screenshotOverlayController\.installGlobalScreenshotShortcut\(\),\n\s+globalTextPresetShortcutController\.installGlobalShortcut\(\),/,
+    /AIC_DISABLE_GLOBAL_CAPTURE[\s\S]*?screenshotOverlayController\.installGlobalScreenshotShortcut\(\),[\s\S]*?AIC_DISABLE_GLOBAL_CAPTURE[\s\S]*?globalTextPresetShortcutController\.installGlobalShortcut\(\),/,
   );
   assert.match(
     MAIN_SOURCE,
-    /screenshotOverlayController\.uninstallGlobalScreenshotShortcut\(\),\n\s+globalTextPresetShortcutController\?\.uninstallGlobalShortcut\?\.\(\),/,
+    /screenshotOverlayController\.uninstallGlobalScreenshotShortcut\(\),[\s\S]*?globalShortcut\.unregisterAll\(\),[\s\S]*?globalCaptureWindowController\.destroy\(\)/,
   );
   assert.equal(MAIN_SOURCE.includes('accelerator: GLOBAL_CAPTURE_LAUNCHER_ACCELERATOR'), true);
   assert.match(MAIN_SOURCE, /GLOBAL_CAPTURE_LAUNCHER_ACCELERATOR = 'Control\+Alt\+Shift\+C'/);

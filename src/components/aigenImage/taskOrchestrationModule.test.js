@@ -6,7 +6,7 @@ import {
   isPreviewNodeLoading,
   stopPreviewNodeLoading,
 } from '../../modules/previewMode.js';
-import { createFakePreviewContainer, installPreviewDomStubs } from '../../../tests/testPreviewDom.js';
+import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../../tools/dom-test-environment.mjs';
 import {
   _resetAssetMentionRegistryForTests,
   setAssetMentionAssets,

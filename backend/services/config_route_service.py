@@ -1,5 +1,6 @@
 import json
 import os
+from backend.services.json_storage import atomic_write_json, json_file_lock, CorruptJSONError
 
 
 class ConfigRouteService:
@@ -38,15 +39,15 @@ class ConfigRouteService:
         with open(path, "r", encoding="utf-8-sig") as file:
             try:
                 data = json.load(file)
-            except json.JSONDecodeError:
-                return {}
-        return data if isinstance(data, dict) else {}
+            except json.JSONDecodeError as exc:
+                raise CorruptJSONError("Configuration JSON is damaged; the original file was preserved") from exc
+        if not isinstance(data, dict):
+            raise CorruptJSONError("Configuration must be a JSON object; the original file was preserved")
+        return data
 
     def _write_config(self, data):
         path = self._config_file()
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w", encoding="utf-8") as file:
-            json.dump(data, file, ensure_ascii=False, indent=2)
+        atomic_write_json(path, data)
 
     def get_custom_ai_config(self):
         env_url = os.environ.get("CUSTOM_AI_URL", "").strip()
@@ -118,6 +119,12 @@ class ConfigRouteService:
         }
 
     def handle_get(self, handler, path):
+        try:
+            return self._handle_get(handler, path)
+        except CorruptJSONError as exc:
+            return self._json_err(409, str(exc))
+
+    def _handle_get(self, handler, path):
         if path == "/api/config":
             return self._json_ok(self._read_public_config())
 
@@ -127,6 +134,15 @@ class ConfigRouteService:
         return None
 
     def handle_post(self, handler, path, body):
+        try:
+            with json_file_lock(self._config_file()):
+                return self._handle_post(handler, path, body)
+        except CorruptJSONError as exc:
+            return self._json_err(409, str(exc))
+        except OSError:
+            return self._json_err(500, "Configuration could not be saved; the previous file was preserved")
+
+    def _handle_post(self, handler, path, body):
         if path == "/api/config":
             data, error = self._parse_json_object(body)
             if error is not None:

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULT_LOCALE, setLocale } from '../i18n/index.js';
-import { createFakePreviewContainer, installPreviewDomStubs } from '../../tests/testPreviewDom.js';
+import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../tools/dom-test-environment.mjs';
 const restoreDom = installPreviewDomStubs();
 let store,
   previewMode,

@@ -14,7 +14,9 @@ function normalizeRetryDelays(_0x5dfc3d) {
     .filter((_0x4632f2) => Number.isFinite(_0x4632f2) && _0x4632f2 >= 0);
 }
 function getErrorMessage(_0x53d0f6, _0x20ce65) {
-  return _0x53d0f6?.message ? String(_0x53d0f6.message) : _0x20ce65;
+  // Raw updater exceptions may contain entire HTTP responses and request URLs.
+  // Keep technical details in diagnostics, not in renderer notifications.
+  return _0x20ce65 || '应用更新失败，请稍后重试。';
 }
 function waitForRetry(_0x1bb0a9, _0x16ce19) {
   return new Promise((_0x16f97a) => {
@@ -50,6 +52,9 @@ export function createUpdaterController(_0xfc6c5e = {}) {
     _0x37cc95 = null,
     _0x4a1cb0 = 0,
     _0x348df0 = false;
+  let checkPromise = null;
+  let checkErrorReported = false;
+  let updaterEventSequence = 0;
   function _0x72ba3c() {
     return {
       state: _0x283bb9,
@@ -66,7 +71,7 @@ export function createUpdaterController(_0xfc6c5e = {}) {
     _0x283bb9 = _0x5f3e34;
   }
   function _0x5042cb(_0x32f792, _0x509cdf = {}) {
-    const _0x3bee79 = { type: _0x32f792, state: _0x283bb9, ..._0x509cdf };
+    const _0x3bee79 = { type: _0x32f792, state: _0x283bb9, eventId: ++updaterEventSequence, ..._0x509cdf };
     _0x2ee29f = _0x3bee79;
     if (_0x3bee79.info) _0x3adb5b = _0x3bee79.info;
     return (_0x59037f(_0x3bee79), _0x3bee79);
@@ -86,6 +91,12 @@ export function createUpdaterController(_0xfc6c5e = {}) {
       _0x25fdd2(-1),
       _0x273cb5(_0x80ed80, 'error', _0x14ad70, _0x3179cf, _0x54deb9));
   }
+  function reportCheckError(error, manual) {
+    if (checkErrorReported) return;
+    checkErrorReported = true;
+    _0x2581ff('updater.check_failed', 'Application update check failed', error, { manual });
+    _0x5042cb('error', { info: _0x3adb5b, message: getErrorMessage(error, '暂时无法检查更新，请稍后重试。'), manual });
+  }
   function _0x5000be() {
     if (_0x509440) return;
     ((_0x509440 = true),
@@ -102,13 +113,7 @@ export function createUpdaterController(_0xfc6c5e = {}) {
           );
           return;
         }
-        (_0x2581ff('updater.error', 'Application updater failed', _0x572908),
-          _0x5042cb('error', {
-            info: _0x3adb5b,
-            message: getErrorMessage(_0x572908, '应用更新检查失败'),
-            manual: _0x348df0,
-          }),
-          (_0x348df0 = false));
+        reportCheckError(_0x572908, _0x348df0);
       }),
       _0x5775d8.on('checking-for-update', () => {
         (_0x52daf2(UPDATER_STATES.CHECKING),
@@ -161,24 +166,23 @@ export function createUpdaterController(_0xfc6c5e = {}) {
           _0x5042cb('downloaded', { info: _0x3adb5b }));
       }));
   }
-  async function _0x4b95e7(_0xff094b = {}) {
+  function _0x4b95e7(options = {}) {
     _0x5000be();
-    if (!_0x283e82()) return { ok: false, skipped: true, reason: 'not-packaged', state: _0x283bb9 };
-    (_0x52daf2(UPDATER_STATES.CHECKING), (_0x348df0 = Boolean(_0xff094b.manual)));
-    try {
-      return (await _0x5775d8.checkForUpdates(), { ok: true, state: _0x283bb9 });
-    } catch (_0x1af229) {
-      (_0x2581ff('updater.check_failed', 'Application update check failed', _0x1af229, {
-        manual: Boolean(_0xff094b.manual),
-      }),
-        _0x5042cb('error', {
-          info: _0x3adb5b,
-          message: getErrorMessage(_0x1af229, '应用更新检查失败，请稍后再试'),
-          manual: _0x348df0,
-        }),
-        (_0x348df0 = false));
-      throw _0x1af229;
+    if (!_0x283e82()) return Promise.resolve({ ok: false, skipped: true, reason: 'not-packaged', state: _0x283bb9 });
+    if (checkPromise) {
+      _0x348df0 = _0x348df0 || options.manual === true;
+      return checkPromise;
     }
+    checkErrorReported = false;
+    _0x348df0 = options.manual === true;
+    _0x52daf2(UPDATER_STATES.CHECKING);
+    checkPromise = Promise.resolve().then(() => _0x5775d8.checkForUpdates())
+      .then(() => ({ ok: !checkErrorReported, state: _0x283bb9 }))
+      .catch(error => {
+        reportCheckError(error, _0x348df0);
+        throw error;
+      }).finally(() => { checkPromise = null; _0x348df0 = false; });
+    return checkPromise;
   }
   async function _0x3c9917(_0x4f3a95) {
     ((_0x4a1cb0 = _0x4f3a95),
@@ -253,7 +257,8 @@ export function createUpdaterController(_0xfc6c5e = {}) {
       }),
         _0x5042cb('error', {
           info: _0x3adb5b,
-          message: getErrorMessage(_0x3760a7, '重启安装失败，请稍后再试'),
+          message: getErrorMessage(_0x3760a7, '保存或重启安装未完成，请保存工程后重试。'),
+          manual: true,
         }));
       throw _0x3760a7;
     }

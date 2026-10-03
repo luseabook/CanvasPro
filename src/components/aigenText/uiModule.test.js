@@ -20,7 +20,7 @@ import {
   setPreviewMode,
   startPreviewNodeLoading,
 } from '../../modules/previewMode.js';
-import { createFakePreviewContainer, installPreviewDomStubs } from '../../../tests/testPreviewDom.js';
+import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../../tools/dom-test-environment.mjs';
 const restorePreviewDom = installPreviewDomStubs(),
   originalRequestAnimationFrame = globalThis.requestAnimationFrame,
   __dirname = dirname(fileURLToPath(import.meta.url)),
@@ -67,7 +67,7 @@ typeof globalThis.requestAnimationFrame !== 'function' &&
         [_0xf8376e, '旗舰级多模态模型，支持超长文本与深度分析'],
         [_0x254974, '一个 API 搞定一切——节省 30-70%'],
       ];
-    (assert.match(uiModuleSource, /buildTextProviderMenuGroupsHTML\(_activeModel\)/),
+    (assert.match(uiModuleSource, /buildTextProviderMenuGroupsHTML\([\w$]+\)/),
       assert.doesNotMatch(uiModuleSource, /buildApimartTextModelMenuHTML\(_activeModel\)/),
       assert.doesNotMatch(uiModuleSource, /return buildTextModelMenuHTML\(_activeModel/),
       assert.doesNotMatch(uiModuleSource, /data-lazy-text-provider=/),
@@ -127,10 +127,10 @@ typeof globalThis.requestAnimationFrame !== 'function' &&
       assert.doesNotMatch(_0x42ac84, /ppio-submenu/));
   }),
   test('aigenText ui: default APIMart text model displays Kimi K2 Instruct', () => {
-    (assert.match(uiModuleSource, /this\._data\.model \|\| "apimart\/kimi-k2-instruct"/),
+    (assert.match(uiModuleSource, /this\._data\.model\s*\|\|\s*['"]apimart\/kimi-k2-instruct['"]/),
       assert.match(
         uiModuleSource,
-        /<span class="img-model-label">\$\{getDisplayModelName\(_activeModel\)\}<\/span>/,
+        new RegExp('img-model-label[\\s\\S]{0,160}' + uiModuleSource.match(/getDisplayModelName:\s*([\w$]+)/)[1] + '\\([\\w$]+\\)'),
       ),
       assert.equal(getDisplayModelName('apimart/kimi-k2-instruct'), 'Kimi K2 Instruct'));
   }));

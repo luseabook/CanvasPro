@@ -20,6 +20,11 @@ import electron_updater from 'electron-updater';
 import { openShellFolder } from './shellItemRevealer.js';
 import { resolveBackendLaunchSpec } from './backendLaunchResolver.js';
 import { findVerifiedBackendProcessPids } from './backendProcessIdentity.js';
+import { stopSpawnedServerProcess } from './backendProcessTermination.js';
+import { createDesktopStartupLifecycle } from './desktopStartupLifecycle.js';
+import { createDesktopQuitCoordinator } from './desktopQuitCoordinator.js';
+import { createRendererNavigationGuard } from './rendererNavigationGuard.js';
+import { runCleanupSteps } from '../src/utils/cleanupSteps.js';
 import { reclaimStartupPort } from './startupPortRecovery.js';
 import { collectListeningPortPids, probeTcpPortAvailable } from './startupPortInspector.js';
 import { resolveWindowsSystemToolPath } from './windowsSystemTools.js';
@@ -118,7 +123,9 @@ const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
   : // A side-by-side test build carries its own productName in package.json (see
     // electron-builder.win.dev.cjs), so it gets its own folder instead of sharing data.
     app.getName() || 'AI CanvasPro',
-  APP_USER_DATA_ROOT = path.join(app.getPath('appData'), APP_DATA_DIRECTORY_NAME),
+  APP_USER_DATA_ROOT = process.env.AIC_USER_DATA_ROOT
+    ? path.resolve(process.env.AIC_USER_DATA_ROOT)
+    : path.join(app.getPath('appData'), APP_DATA_DIRECTORY_NAME),
   __filename = fileURLToPath(import.meta.url),
   __dirname = path.dirname(__filename),
   APP_ROOT = app.isPackaged ? app.getAppPath() : path.resolve(__dirname, '..'),
@@ -131,12 +138,13 @@ const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
     processExecPath: process.execPath,
     userDataRoot: APP_USER_DATA_ROOT,
     localAppData: process.env.LOCALAPPDATA,
+    storageRootOverride: process.env.AIC_STORAGE_ROOT,
   }),
   PACKAGED_INSTALL_ROOT = STORAGE_ROOTS.installRoot,
   PACKAGED_INSTALL_DATA_ROOT = STORAGE_ROOTS.installDataRoot,
   PACKAGED_FILES_ROOT = STORAGE_ROOTS.storageRoot,
   LEGACY_PACKAGED_FILES_ROOTS = STORAGE_ROOTS.legacyFilesRoots,
-  LEGACY_PACKAGED_FILES_ROOT = LEGACY_PACKAGED_FILES_ROOTS[0] || APP_ROOT,
+  LEGACY_PACKAGED_FILES_ROOT = LEGACY_PACKAGED_FILES_ROOTS[0] || (process.env.AIC_STORAGE_ROOT ? PACKAGED_FILES_ROOT : APP_ROOT),
   HOST = '127.0.0.1',
   PORT = Number.parseInt(process.env.AICANVAS_PORT || '8777', 10) || 0x2249,
   APP_ORIGIN = 'http://' + HOST + ':' + PORT,
@@ -173,6 +181,26 @@ let mainWindow = null,
   assetUpdateEvents = createAssetUpdateEventBuffer(),
   secureSettingsStore = null,
   updateInstallPreparation = null;
+const desktopStartupLifecycle = createDesktopStartupLifecycle({
+  app, getSpawnedServer: () => spawnedServer, probeServer: () => probeServer(),
+  clearPortBeforeStart: () => clearPortBeforeStart(), ensureServerRunning: () => ensureServerRunning(),
+});
+const desktopQuitCoordinator = createDesktopQuitCoordinator({
+  app, getMainWindow: () => mainWindow,
+  shouldBypassClose: () => isQuittingForUpdate,
+  beginShutdown: () => desktopStartupLifecycle.beginQuit(),
+  onError: error => logDiagnosticEvent({ type: 'app.shutdown_cleanup_failed', level: 'warn', source: 'main', error }),
+  cleanup: () => runCleanupSteps([
+    () => localRuntimeKeepAlive.stop(),
+    () => backgroundCompletionNotifier.dispose(),
+    () => screenshotOverlayController.uninstallGlobalScreenshotShortcut(),
+    () => screenshotOverlayController.destroyScreenshotOverlayWindow(),
+    () => globalShortcut.unregisterAll(),
+    () => globalCaptureWindowController.destroy(),
+    () => stopSpawnedServer(),
+    () => stopAllPowerSaveBlockers(),
+  ], { onError: error => logDiagnosticEvent({ type: 'app.shutdown_cleanup_failed', level: 'warn', source: 'main', error }) }),
+});
 function isDragImportProfilingEnabled() {
   return /^(1|true|yes|on)$/i.test(String(process.env.AIC_DRAG_IMPORT_PROFILING || '').trim());
 }
@@ -197,10 +225,10 @@ const pendingExternalProjectOpenRequests = [],
     },
   ]),
   app.setName(APP_DISPLAY_NAME));
-const GOT_SINGLE_INSTANCE_LOCK = app.requestSingleInstanceLock();
-!GOT_SINGLE_INSTANCE_LOCK && (app.exit(0), process.exit(0));
 const USER_DATA_DIR = APP_USER_DATA_ROOT;
 (mkdirSync(USER_DATA_DIR, { recursive: true }), app.setPath('userData', USER_DATA_DIR));
+const GOT_SINGLE_INSTANCE_LOCK = app.requestSingleInstanceLock();
+!GOT_SINGLE_INSTANCE_LOCK && (app.exit(0), process.exit(0));
 const LOG_DIR = path.join(USER_DATA_DIR, 'logs'),
   SERVER_LOG_PATH = path.join(LOG_DIR, 'server.log'),
   WINDOW_STATE_PATH = path.join(USER_DATA_DIR, 'window-state.json');
@@ -401,7 +429,7 @@ const { delay, loadStartupStatus, isLocalAppUrl, openExternalUrl } = createStart
 });
 function probeServer(_0x1837ce = 0x4b0) {
   return new Promise((_0x5164e0) => {
-    const _0x35c039 = http.get(APP_ORIGIN + '/api/v2/runtime/info', { timeout: _0x1837ce }, (_0x2aa121) => {
+    const _0x35c039 = http.get(APP_ORIGIN + '/api/v2/runtime/info', { timeout: _0x1837ce, headers: { 'X-AIC-Local-Token': LOCAL_ACCESS_TOKEN } }, (_0x2aa121) => {
       const _0xc711b1 = String(_0x2aa121.headers[SERVER_ID_HEADER] || '');
       (_0x2aa121.resume(), _0x5164e0(_0x2aa121.statusCode === 200 && _0xc711b1 === SERVER_ID_VALUE));
     });
@@ -469,6 +497,10 @@ async function refreshProductDisplayName() {
   } catch {}
 }
 async function clearPortBeforeStart(_0x2f1d77 = null) {
+  if (process.env.AIC_DISABLE_PORT_RECLAIM === '1') {
+    if (!await probeTcpPortAvailable({ host: HOST, port: PORT })) throw new Error('Independent test port is occupied; no existing process was stopped');
+    return;
+  }
   const _0x1a93c4 = resolveBackendLaunch();
   return reclaimStartupPort({
     port: PORT,
@@ -517,6 +549,7 @@ async function clearPortBeforeStart(_0x2f1d77 = null) {
   });
 }
 function resolvePythonCommand() {
+  if (!app.isPackaged && process.env.AIC_TEST_PYTHON) return process.env.AIC_TEST_PYTHON;
   if (app.isPackaged) {
     const _0x495dd7 =
       process.platform === 'win32'
@@ -592,6 +625,7 @@ const { getStableDeviceId } = createDeviceIdentityManager({
     app: app,
     appRoot: APP_ROOT,
     getUserRoot: getUserRoot,
+    isolatedProfile: Boolean(process.env.AIC_USER_DATA_ROOT),
     logEvent: logDiagnosticEvent,
   }),
   webPreviewViewManager = createWebPreviewViewManager({
@@ -745,6 +779,7 @@ const { getStableDeviceId } = createDeviceIdentityManager({
     },
   });
 function readConfiguredUserSettingsSync() {
+  if (process.env.AIC_USER_DATA_ROOT) return readUserSettingsFromFilesSync([path.join(getUserRoot(), 'settings.json')]);
   const _0x313bd1 = process.env.LOCALAPPDATA || app.getPath('userData');
   return readUserSettingsFromFilesSync([
     path.join(getUserRoot(), 'settings.json'),
@@ -1126,7 +1161,8 @@ function installLocalApiTokenHeader() {
 async function waitForServerReady(_0x1ca88f = null) {
   const _0x15991e = Date.now();
   while (Date.now() - _0x15991e < SERVER_READY_TIMEOUT_MS) {
-    if (await probeServer()) return true;
+    desktopStartupLifecycle.assertStarting();
+    if (await probeServer()) { desktopStartupLifecycle.assertStarting(); return true; }
     const _0x53bc8d = Date.now() - _0x15991e;
     (_0x1ca88f?.({
       kind: 'loading',
@@ -1197,6 +1233,7 @@ function scheduleServerRestart() {
   if (typeof serverRestartTimer['unref'] === 'function') serverRestartTimer['unref']();
 }
 async function ensureServerRunning(_0x4c8dab = null) {
+  desktopStartupLifecycle.assertStarting();
   _0x4c8dab?.({
     kind: 'loading',
     title: APP_DISPLAY_NAME + ' 正在启动',
@@ -1213,6 +1250,7 @@ async function ensureServerRunning(_0x4c8dab = null) {
       }),
       'reused'
     );
+  desktopStartupLifecycle.assertStarting();
   const _0x247828 = resolvePythonCommand();
   _0x4c8dab?.({
     kind: 'loading',
@@ -1233,7 +1271,8 @@ async function ensureServerRunning(_0x4c8dab = null) {
       '\n',
   );
   let _0x52dc35 = null;
-  ((spawnedServer = spawn(_0x247828, ['server.py', '--host=' + HOST, '--port=' + PORT], {
+  let launchedServer = null;
+  ((launchedServer = spawnedServer = spawn(_0x247828, ['server.py', '--host=' + HOST, '--port=' + PORT], {
     cwd: APP_ROOT,
     env: {
       ...process.env,
@@ -1251,9 +1290,12 @@ async function ensureServerRunning(_0x4c8dab = null) {
     stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true,
   })),
-    spawnedServer.stdout?.pipe(_0x4ca931, { end: false }),
-    spawnedServer.stderr?.pipe(_0x4ca931, { end: false }),
-    spawnedServer.once('error', (_0x4f5417) => {
+    launchedServer.stdout?.pipe(_0x4ca931, { end: false }),
+    launchedServer.stderr?.pipe(_0x4ca931, { end: false }),
+    launchedServer.once('spawn', () => {
+      if (desktopQuitCoordinator.isQuitting()) stopSpawnedServerProcess(launchedServer);
+    }),
+    launchedServer.once('error', (_0x4f5417) => {
       ((_0x52dc35 = _0x4f5417),
         _0x4ca931.write(
           '[' +
@@ -1277,7 +1319,7 @@ async function ensureServerRunning(_0x4c8dab = null) {
           hint: '请重启应用，若仍失败请导出诊断日志。',
         }));
     }),
-    spawnedServer.once('exit', (_0x4daa93, _0x2ae6fd) => {
+    launchedServer.once('close', (_0x4daa93, _0x2ae6fd) => {
       (_0x4ca931.write(
         '[' +
           new Date().toISOString() +
@@ -1296,7 +1338,7 @@ async function ensureServerRunning(_0x4c8dab = null) {
             message: 'Local Python service exited',
             context: { code: _0x4daa93, signal: _0x2ae6fd, port: PORT },
           }),
-        (spawnedServer = null),
+        (spawnedServer === launchedServer && (spawnedServer = null)),
         serverShutdownRequested || scheduleServerRestart());
     }));
   const _0x69f021 = await waitForServerReady(_0x4c8dab);
@@ -1328,9 +1370,12 @@ async function ensureServerRunning(_0x4c8dab = null) {
 function stopSpawnedServer() {
   serverShutdownRequested = true;
   if (serverRestartTimer) (clearTimeout(serverRestartTimer), (serverRestartTimer = null));
-  if (serverRestartAttempts === 0 && (!spawnedServer || spawnedServer.killed)) return;
+  if (!spawnedServer || (serverRestartAttempts === 0 && spawnedServer.killed)) return;
   try {
-    spawnedServer.kill();
+    stopSpawnedServerProcess(spawnedServer, {
+      platform: process.platform,
+      env: process.env,
+    });
   } catch {
   } finally {
     spawnedServer = null;
@@ -1400,7 +1445,7 @@ function getSecureSettingsStore() {
   );
 }
 const resolveDoubaoAsrConfig = createDoubaoAsrConfigResolver({
-    appRoot: APP_ROOT,
+    appRoot: process.env.AIC_USER_DATA_ROOT ? APP_USER_DATA_ROOT : APP_ROOT,
     getSecureSettingsStore: getSecureSettingsStore,
     getUserRoot: getUserRoot,
     processEnv: process.env,
@@ -1414,6 +1459,7 @@ function normalizeSecureSettingsKeys(_0x1dd1d4 = {}) {
   return _0x1ce6f4.map((_0x2f6168) => String(_0x2f6168 || '').trim()).filter(isAllowedSecureSettingKey);
 }
 function syncSystemRecentDocumentsBestEffort() {
+  if (process.env.AIC_USER_DATA_ROOT) return { ok: true, count: 0, paths: [], skipped: 'independent-profile' };
   try {
     return syncRecentProjectsToSystemRecentDocuments({
       app: app,
@@ -1928,41 +1974,55 @@ function loadCanvasWindow(_0x386651 = mainWindow) {
   if (!_0x386651 || _0x386651.isDestroyed()) return;
   void _0x386651.loadURL(APP_URL);
 }
+const rendererNavigationGuard = createRendererNavigationGuard({
+  getMainWindow: () => mainWindow,
+  requestSnapshot: requestRendererRecoverySnapshot,
+  shouldPrepare: window => window.webContents.getURL().startsWith(APP_ORIGIN),
+  onFailure: async () => {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    await dialog.showMessageBox(mainWindow, {
+      type: 'warning', buttons: ['返回并保存'], defaultId: 0, cancelId: 0,
+      message: '保存未完成，已取消重载。', detail: '后台服务和当前窗口保持运行。请保存后重试。',
+    });
+  },
+});
 async function restartBackendAndReload() {
   if (app.isPackaged || backendRestartInProgress) return;
-  backendRestartInProgress = true;
-  try {
-    (loadStartupStatus({
-      kind: 'loading',
-      title: APP_DISPLAY_NAME + ' 正在重新启动',
-      detail: '正在重新加载画布环境。',
-      hint: '完成后会自动回到画布。',
-    }),
-      localRuntimeKeepAlive.stop(),
-      stopSpawnedServer(),
-      await clearPortBeforeStart(loadStartupStatus),
-      await ensureServerRunning(loadStartupStatus),
-      void refreshProductDisplayName(),
-      void localRuntimeKeepAlive.start('backend-restart'),
-      loadCanvasWindow());
-  } catch (_0x19ab58) {
-    (console.error('[electron] backend restart failed:', _0x19ab58),
-      logDiagnosticEvent({
-        type: 'backend.restart_failed',
-        level: 'error',
-        source: 'main',
-        message: 'Backend restart failed',
-        error: _0x19ab58,
+  return rendererNavigationGuard.run('backend-restart', async () => {
+    backendRestartInProgress = true;
+    try {
+      (loadStartupStatus({
+        kind: 'loading',
+        title: APP_DISPLAY_NAME + ' 正在重新启动',
+        detail: '正在重新加载画布环境。',
+        hint: '完成后会自动回到画布。',
       }),
-      loadStartupStatus({
-        kind: 'error',
-        title: APP_DISPLAY_NAME + ' 重新启动失败',
-        detail: '画布环境重新加载失败。',
-        hint: '请重启应用，若仍失败请导出诊断日志。',
-      }));
-  } finally {
-    backendRestartInProgress = false;
-  }
+        localRuntimeKeepAlive.stop(),
+        stopSpawnedServer(),
+        await clearPortBeforeStart(loadStartupStatus),
+        await ensureServerRunning(loadStartupStatus),
+        void refreshProductDisplayName(),
+        void localRuntimeKeepAlive.start('backend-restart'),
+        loadCanvasWindow());
+    } catch (_0x19ab58) {
+      (console.error('[electron] backend restart failed:', _0x19ab58),
+        logDiagnosticEvent({
+          type: 'backend.restart_failed',
+          level: 'error',
+          source: 'main',
+          message: 'Backend restart failed',
+          error: _0x19ab58,
+        }),
+        loadStartupStatus({
+          kind: 'error',
+          title: APP_DISPLAY_NAME + ' 重新启动失败',
+          detail: '画布环境重新加载失败。',
+          hint: '请重启应用，若仍失败请导出诊断日志。',
+        }));
+    } finally {
+      backendRestartInProgress = false;
+    }
+  });
 }
 function createMainWindow() {
   (installAppMenu({
@@ -1972,7 +2032,11 @@ function createMainWindow() {
     getMainWindow: () => mainWindow,
     logDir: LOG_DIR,
     restartBackendAndReload: restartBackendAndReload,
-    stopSpawnedServer: stopSpawnedServer,
+    reloadCanvas: ignoreCache => rendererNavigationGuard.run('renderer-reload', window => {
+      if (ignoreCache) window.webContents.reloadIgnoringCache();
+      else window.webContents.reload();
+    }),
+    relaunchElectron: () => desktopQuitCoordinator.requestRelaunch(),
   }),
     installLocalApiTokenHeader());
   const { isMaximized: _0x5cd38b, ..._0x7e79c } = readWindowState();
@@ -1997,8 +2061,10 @@ function createMainWindow() {
     installRecoverySnapshotBeforeClose(mainWindow, {
       getRendererProjectState: () => rendererProjectState,
       shouldBypassClose: () => isQuittingForUpdate,
+      shouldPrepareRenderer: () => mainWindow?.webContents.getURL().startsWith(APP_ORIGIN) === true,
+      onCloseCancelled: () => desktopQuitCoordinator.cancelQuit(),
       logEvent: logDiagnosticEvent,
-      confirmCloseWithoutSnapshot: async () => {
+      confirmCloseWithoutSnapshot: async (result) => {
         if (!mainWindow || mainWindow.isDestroyed()) return false;
         const zh = String(app.getLocale() || '')
           .toLowerCase()
@@ -2008,13 +2074,13 @@ function createMainWindow() {
           defaultId: 0,
           cancelId: 0,
           noLink: true,
-          title: zh ? '恢复快照已受保护' : 'Recovery snapshot protected',
+          title: zh ? '保存未完成' : 'Saving did not complete',
           message: zh
-            ? '无法写入当前工程的恢复快照，未保存修改可能丢失。'
-            : 'A recovery snapshot could not be written for this project. Unsaved changes may be lost.',
+            ? '工作区保存或恢复快照未完成，关闭将可能丢失未保存修改。'
+            : 'Workspace saving or recovery did not complete. Closing may lose unsaved changes.',
           detail: zh
-            ? '其他工程或无法读取的原恢复文件已保留。建议返回并保存当前工程，先备份核对原文件。'
-            : 'The existing snapshot from another project or an unreadable snapshot was preserved. Return to save this project and back up the original file.',
+            ? '建议返回并保存后重试。已有恢复文件会继续保留；超时或保存错误不会自动放弃修改。'
+            : 'Return and save, then retry. Existing recovery files are preserved; errors never silently discard changes.',
           buttons: zh
             ? ['返回并保存', '放弃未保存修改并关闭']
             : ['Return and save', 'Discard unsaved changes and close'],
@@ -2067,13 +2133,14 @@ function createMainWindow() {
     mainWindow.on('restore', () => void localRuntimeKeepAlive.start('restore')),
     mainWindow.on('hide', () => void localRuntimeKeepAlive.refresh('hide')),
     mainWindow.on('minimize', () => void localRuntimeKeepAlive.refresh('minimize')),
+    mainWindow.webContents.on('will-prevent-unload', () => desktopQuitCoordinator.cancelQuit()),
     mainWindow.on('closed', () => {
-      (webPreviewViewManager.disposeViews(), localRuntimeKeepAlive.stop(), (mainWindow = null));
-      // The prewarmed global capture window is a hidden BrowserWindow that stays
-      // alive for the session, so 'window-all-closed' never fires while it exists.
-      // Without this, closing the main window leaves the app, its helper processes
-      // and the spawned Python backend running forever.
-      process.platform !== 'darwin' && app.quit();
+      mainWindow = null;
+      runCleanupSteps([
+        () => webPreviewViewManager.disposeViews(),
+        () => localRuntimeKeepAlive.stop(),
+        () => desktopQuitCoordinator.mainWindowClosed(),
+      ], { onError: error => logDiagnosticEvent({ type: 'app.window_cleanup_failed', level: 'warn', source: 'main', error }) });
     }),
     mainWindow.on('unresponsive', () => {
       logDiagnosticEvent({
@@ -2085,20 +2152,22 @@ function createMainWindow() {
     }));
 }
 async function startApp() {
+  if (!desktopStartupLifecycle.requestStart()) return;
   (installLocalPreviewProtocol(),
     installIpcHandlers(),
-    void globalCaptureWindowController.prewarm(),
+    process.env.AIC_DISABLE_GLOBAL_CAPTURE !== '1' && void globalCaptureWindowController.prewarm(),
     createMainWindow(),
-    screenshotOverlayController.installGlobalScreenshotShortcut(),
-    globalTextPresetShortcutController.installGlobalShortcut(),
+    process.env.AIC_DISABLE_GLOBAL_CAPTURE !== '1' && screenshotOverlayController.installGlobalScreenshotShortcut(),
+    process.env.AIC_DISABLE_GLOBAL_CAPTURE !== '1' && globalTextPresetShortcutController.installGlobalShortcut(),
     queueExternalProjectOpenFromArgs(process.argv, 'startup'),
-    await clearPortBeforeStart(),
-    await ensureServerRunning(),
+    await desktopStartupLifecycle.prepareBackend(),
+    desktopStartupLifecycle.assertStarting(),
     void refreshProductDisplayName(),
     void localRuntimeKeepAlive.start('server-ready'),
     loadCanvasWindow());
 }
 function handleStartupFailure(_0xf40367) {
+  if (_0xf40367?.code === 'AIC_DESKTOP_STARTUP_CANCELLED') return;
   (console.error('[electron] startup failed:', _0xf40367),
     logDiagnosticEvent({
       type: 'app.startup_failed',
@@ -2126,7 +2195,7 @@ function installAppLifecycleHandlers() {
       (focusMainWindow(), queueExternalProjectOpenFromArgs(_0x34cc3e, 'second-instance'));
     }),
     app.on('activate', () => {
-      BrowserWindow.getAllWindows().length === 0 &&
+      (!mainWindow || mainWindow.isDestroyed()) &&
         void startApp().catch((_0x109634) => {
           (console.error('[electron] activate failed:', _0x109634),
             logDiagnosticEvent({
@@ -2141,18 +2210,8 @@ function installAppLifecycleHandlers() {
     app.on('window-all-closed', () => {
       process.platform !== 'darwin' && app.quit();
     }),
-    app.on('before-quit', () => {
-      (screenshotOverlayController.destroyScreenshotOverlayWindow(),
-        localRuntimeKeepAlive.stop(),
-        stopSpawnedServer(),
-        stopAllPowerSaveBlockers());
-    }),
-    app.on('will-quit', () => {
-      (backgroundCompletionNotifier.dispose(),
-        screenshotOverlayController.uninstallGlobalScreenshotShortcut(),
-        globalTextPresetShortcutController?.uninstallGlobalShortcut?.(),
-        globalCaptureWindowController?.destroy?.());
-    }));
+    app.on('before-quit', event => desktopQuitCoordinator.beforeQuit(event)),
+    app.on('will-quit', () => desktopQuitCoordinator.willQuit()));
 }
 GOT_SINGLE_INSTANCE_LOCK && installAppLifecycleHandlers();
 (process.on('uncaughtException', (_0x48adb1) => {

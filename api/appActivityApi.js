@@ -3,6 +3,9 @@ const APP_STARTUP_ACTIVITY_PATH = '/api/v2/app-activity/startup';
 export async function reportAppStartupActivity(_0xb7fde9 = {}) {
   const _0x41445a = String(_0xb7fde9?.['deviceId'] || '')['trim']();
   if (!_0x41445a) return { success: ![], recorded: ![], reason: 'missing_device_id' };
+  if (_0xb7fde9?.['enabled'] !== true) {
+    return { success: ![], recorded: ![], reason: 'disabled' };
+  }
   return await requester({
     url: APP_STARTUP_ACTIVITY_PATH,
     method: 'POST',

@@ -8,34 +8,31 @@
   ${endif}
 !macroend
 
-!macro closeExistingAppProcesses
-  DetailPrint "Closing existing ${PRODUCT_NAME} processes before install or uninstall."
-  nsExec::ExecToLog `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command "Get-CimInstance -ClassName Win32_Process | ? {$$_.Name -eq '${APP_EXECUTABLE_FILENAME}' -or ($$_.Path -and $$_.Path.StartsWith('$INSTDIR', 'CurrentCultureIgnoreCase'))} | % { $$p = Get-Process -Id $$_.ProcessId -ErrorAction SilentlyContinue; if ($$p) { $$null = $$p.CloseMainWindow() } }"`
-  Sleep 3500
-  nsExec::ExecToLog `"$SYSDIR\cmd.exe" /C taskkill /F /T /IM "${APP_EXECUTABLE_FILENAME}"`
-  nsExec::ExecToLog `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command "Get-CimInstance -ClassName Win32_Process | ? {$$_.Path -and $$_.Path.StartsWith('$INSTDIR', 'CurrentCultureIgnoreCase')} | % { Stop-Process -Id $$_.ProcessId -Force -ErrorAction SilentlyContinue }"`
-  Sleep 1500
-!macroend
-
-!macro abortIfExistingAppProcessesRemain
-  nsExec::ExecToStack `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command "if ((Get-CimInstance -ClassName Win32_Process | ? {$$_.Name -eq '${APP_EXECUTABLE_FILENAME}' -or ($$_.Path -and $$_.Path.StartsWith('$INSTDIR', 'CurrentCultureIgnoreCase'))}).Count -gt 0) { exit 0 } else { exit 1 }"`
-  Pop $0
-  Pop $1
-  ${if} $0 == 0
-    MessageBox MB_OK|MB_ICONEXCLAMATION "${PRODUCT_NAME} is still running or protected by Windows permissions. Please close it or run this installer as administrator, then try again."
-    SetErrorLevel 2
-    Quit
+; Never force-kill an editor that might still be saving or displaying a cancelable close dialog.
+!macro ensureExistingAppClosed
+  ${if} $INSTDIR != ""
+    InitPluginsDir
+    File /oname=$PLUGINSDIR\aic-process-check.ps1 "${BUILD_RESOURCES_DIR}\installer-process-check.ps1"
+    DetailPrint "Waiting for the selected installation to close. Save work and exit the editor first."
+    nsExec::ExecToStack `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\aic-process-check.ps1" -InstallDir "$INSTDIR" -ExecutableName "${APP_EXECUTABLE_FILENAME}"`
+    Pop $0
+    Pop $1
+    ${if} $0 != 0
+      ${ifNot} ${Silent}
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Installation or removal was cancelled. Please save your work, close the editor, and retry. No application process was force-terminated."
+      ${endif}
+      SetErrorLevel 2
+      Quit
+    ${endif}
   ${endif}
 !macroend
 
 !macro customInit
-  !insertmacro closeExistingAppProcesses
-  !insertmacro abortIfExistingAppProcessesRemain
+  !insertmacro ensureExistingAppClosed
 !macroend
 
 !macro customCheckAppRunning
-  !insertmacro closeExistingAppProcesses
-  !insertmacro abortIfExistingAppProcessesRemain
+  !insertmacro ensureExistingAppClosed
 !macroend
 
 !macro customInstall
@@ -47,103 +44,48 @@
   ${endif}
 !macroend
 
-!macro handleOldUninstallResultForUpdate
-  IfErrors 0 +3
-    DetailPrint "Old uninstaller could not be launched; continuing with installer cleanup."
-    Return
-
-  ${if} $R0 == 0
-    Return
+!macro verifyOldUninstallerResult
+  ${if} ${Errors}
+    ${ifNot} ${Silent}
+      MessageBox MB_OK|MB_ICONEXCLAMATION "The previous uninstaller could not be started. Installation was cancelled; existing files were retained."
+    ${endif}
+    SetErrorLevel 2
+    Quit
   ${endif}
-
-  ${if} $R0 == 2
-    DetailPrint "Old uninstaller returned 2; verifying that app processes are closed before continuing."
-    !insertmacro closeExistingAppProcesses
-    !insertmacro abortIfExistingAppProcessesRemain
-    ClearErrors
-    Return
+  ${if} $R0 != 0
+    ${ifNot} ${Silent}
+      MessageBox MB_OK|MB_ICONEXCLAMATION "The previous uninstaller did not complete ($R0). Installation was cancelled instead of assuming cleanup succeeded."
+    ${endif}
+    SetErrorLevel 2
+    Quit
   ${endif}
-
-  MessageBox MB_OK|MB_ICONEXCLAMATION "$(uninstallFailed): $R0"
-  DetailPrint "Uninstall was not successful. Uninstaller error code: $R0."
-  SetErrorLevel 2
-  Quit
 !macroend
 
 !macro customUnInstallCheck
-  !insertmacro handleOldUninstallResultForUpdate
+  !insertmacro verifyOldUninstallerResult
 !macroend
 
 !macro customUnInstallCheckCurrentUser
-  !insertmacro handleOldUninstallResultForUpdate
-!macroend
-
-!macro preserveInstallDirectory RELATIVE_DIR
-  ${if} ${FileExists} "$INSTDIR\${RELATIVE_DIR}\*.*"
-  ${orIf} ${FileExists} "$INSTDIR\${RELATIVE_DIR}"
-    CreateDirectory "$PLUGINSDIR\aic-preserved"
-    ClearErrors
-    Rename "$INSTDIR\${RELATIVE_DIR}" "$PLUGINSDIR\aic-preserved\${RELATIVE_DIR}"
-    ${if} ${errors}
-      DetailPrint "Unable to move $INSTDIR\${RELATIVE_DIR}; leaving it in place and using targeted cleanup."
-      StrCpy $R9 "0"
-      ClearErrors
-    ${endif}
-  ${endif}
-!macroend
-
-!macro restoreInstallDirectory RELATIVE_DIR
-  ${if} ${FileExists} "$PLUGINSDIR\aic-preserved\${RELATIVE_DIR}\*.*"
-  ${orIf} ${FileExists} "$PLUGINSDIR\aic-preserved\${RELATIVE_DIR}"
-    CreateDirectory "$INSTDIR"
-    ClearErrors
-    Rename "$PLUGINSDIR\aic-preserved\${RELATIVE_DIR}" "$INSTDIR\${RELATIVE_DIR}"
-    ${if} ${errors}
-      DetailPrint "Unable to restore $INSTDIR\${RELATIVE_DIR}; leaving preserved copy in installer temp."
-      CreateDirectory "$INSTDIR\${RELATIVE_DIR}"
-      CopyFiles /SILENT "$PLUGINSDIR\aic-preserved\${RELATIVE_DIR}\*.*" "$INSTDIR\${RELATIVE_DIR}"
-      RMDir /r "$PLUGINSDIR\aic-preserved\${RELATIVE_DIR}"
-      ClearErrors
-    ${endif}
-  ${endif}
-!macroend
-
-!macro removeApplicationFilesOnly
-  Delete "$INSTDIR\${APP_EXECUTABLE_FILENAME}"
-  Delete "$INSTDIR\${UNINSTALL_FILENAME}"
-  Delete "$INSTDIR\*.dll"
-  Delete "$INSTDIR\*.pak"
-  Delete "$INSTDIR\*.bin"
-  Delete "$INSTDIR\*.dat"
-  Delete "$INSTDIR\*.json"
-  Delete "$INSTDIR\*.txt"
-  RMDir /r "$INSTDIR\resources"
-  RMDir /r "$INSTDIR\locales"
-  RMDir /r "$INSTDIR\swiftshader"
+  !insertmacro verifyOldUninstallerResult
 !macroend
 
 !macro customRemoveFiles
-  StrCpy $R9 "1"
-
-  !insertmacro preserveInstallDirectory "Data"
-  !insertmacro preserveInstallDirectory "Canvas Project"
-  !insertmacro preserveInstallDirectory "output"
-  !insertmacro preserveInstallDirectory "data"
-  !insertmacro preserveInstallDirectory "Canvas Files"
-  !insertmacro preserveInstallDirectory "AI CanvasPro Files"
-
+  !insertmacro ensureExistingAppClosed
+  InitPluginsDir
+  File /oname=$PLUGINSDIR\aic-remove-program-files.ps1 "${BUILD_RESOURCES_DIR}\uninstall-program-files.ps1"
   SetOutPath $TEMP
-
-  ${if} $R9 == "1"
-    RMDir /r "$INSTDIR"
-  ${else}
-    !insertmacro removeApplicationFilesOnly
+  nsExec::ExecToStack `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\aic-remove-program-files.ps1" -InstallDir "$INSTDIR"`
+  Pop $0
+  Pop $1
+  ${if} $0 != 0
+    ${ifNot} ${Silent}
+      MessageBox MB_OK|MB_ICONEXCLAMATION "Program cleanup could not be verified. Removal was stopped. Data folders, unknown files, and modified files are retained in place."
+    ${endif}
+    SetErrorLevel 2
+    Quit
   ${endif}
-
-  !insertmacro restoreInstallDirectory "Data"
-  !insertmacro restoreInstallDirectory "Canvas Project"
-  !insertmacro restoreInstallDirectory "output"
-  !insertmacro restoreInstallDirectory "data"
-  !insertmacro restoreInstallDirectory "Canvas Files"
-  !insertmacro restoreInstallDirectory "AI CanvasPro Files"
+  ; The generated uninstaller is not part of the packed application manifest.
+  Delete "$INSTDIR\${UNINSTALL_FILENAME}"
+  ; Deliberately non-recursive. Unknown/legacy content is never removed implicitly.
+  RMDir "$INSTDIR"
 !macroend

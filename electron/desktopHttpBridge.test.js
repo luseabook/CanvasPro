@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createDesktopHttpBridgeHandlers, startDesktopHttpBridge } from './desktopHttpBridge.js';
 import { MediaTaskQueue } from './mediaTaskQueue.js';
+import { mkdtempSync, rmSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 const TOKEN = 'a'.repeat(64);
 
@@ -173,11 +176,13 @@ test('staged local file imports reject raw paths and bytes, then enforce the vir
   );
 });
 
-test('shell helpers refuse unallowlisted folders and resolve allowed ones', async () => {
+test('shell helpers refuse unallowlisted folders and resolve allowed ones', async t => {
   const opened = [];
+  const logs = mkdtempSync(path.join(os.tmpdir(), 'bridge-logs-test-'));
+  t.after(() => rmSync(logs, { recursive: true, force: true }));
   await withBridge(
     {
-      resolveKnownFolder: (kind) => (kind === 'logs' ? 'C:/logs' : ''),
+      resolveKnownFolder: (kind) => (kind === 'logs' ? logs : ''),
       openFolder: (folder) => {
         opened.push(folder);
         return { foregroundRequested: true };
@@ -188,7 +193,7 @@ test('shell helpers refuse unallowlisted folders and resolve allowed ones', asyn
       assert.match((await denied.json()).error, /Folder is not allowed/);
       const allowed = await post(bridge, '/api/v2/desktop/shell/open-known-folder', { kind: 'logs' });
       assert.deepEqual(await allowed.json(), { success: true, data: { ok: true } });
-      assert.deepEqual(opened, ['C:/logs']);
+      assert.deepEqual(opened, [logs]);
     },
   );
 });

@@ -33,7 +33,7 @@ function makeTempDir(t, prefix) {
 
 function createAnalyzeRig({
   outputDir,
-  modelRoot = 'F:/models/funasr',
+  modelRoot = path.join(outputDir, 'models', 'funasr'),
   videoMeta = { width: 0, height: 0, duration: 12, fps: 0 },
   hasAudio = true,
   asrResult = null,
@@ -104,6 +104,7 @@ function createAnalyzeRig({
     toOutputLocalPath: (folder, name) => 'output/' + folder + '/' + name,
   });
   return {
+    modelRoot,
     handler,
     processes,
     toolCalls,
@@ -439,14 +440,14 @@ test('a funasr payload transcribes, cuts each sentence and stays diarization-fre
       args: { asrProvider: 'funasr', engine: 'gpu', diarizationProvider: 'none' },
     });
   assert.equal(result.asr.provider, 'funasr');
-  assert.equal(result.asr.modelRoot, 'F:/models/funasr');
+  assert.equal(result.asr.modelRoot, rig.modelRoot);
   assert.equal(result.asr.diarizationProvider, 'none');
   assert.equal(result.asr.fallbackReason, '');
   assert.equal(rig.funasrCalls.length, 1);
   assert.equal(rig.funasrCalls[0].engine, 'gpu');
   assert.equal(rig.funasrCalls[0].pythonCommand, 'F:/runtime/python/python.exe');
   assert.deepEqual(rig.funasrCalls[0].certificateEnv, { SSL_CERT_FILE: 'F:/certs/cacert.pem' });
-  assert.equal(rig.funasrCalls[0].modelRoot, 'F:/models/funasr');
+  assert.equal(rig.funasrCalls[0].modelRoot, rig.modelRoot);
   assert.ok(!rig.diarizationCalls.length);
   assert.equal(result.segments.length, 2);
   assert.equal(result.segments[0].sourceText, '你好');
@@ -477,7 +478,7 @@ test('a funasr payload with sortformer assigns speakers from the overlap', async
       args: { asrProvider: 'funasr' },
     });
   assert.equal(result.asr.diarizationProvider, 'sortformer');
-  assert.equal(result.asr.diarizationModelRoot, path.join('F:/models/funasr', '..', 'sortformer-fixed'));
+  assert.equal(result.asr.diarizationModelRoot, path.join(rig.modelRoot, '..', 'sortformer-fixed'));
   assert.equal(rig.diarizationCalls.length, 1);
   assert.equal(rig.diarizationCalls[0].modelRoot, result.asr.diarizationModelRoot);
   assert.deepEqual(

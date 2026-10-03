@@ -1,5 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+
+// Check wiring independently of decompiler-local variable names and equivalent string/member notation.
+// Public method/property names and the operation sequence remain required by each pattern.
+function assertSourceWiring(text, pattern, absent = false) {
+  const canonical = text.replace(/\\x([0-9a-f]{2})/gi, (_, hex) => String.fromCharCode(parseInt(hex,16)))
+    .replace(/\[['"]([A-Za-z_$][\w$]*)['"]\]/g, '.$1').replace(/'/g, '"').replace(/!!\[\]/g, 'true').replace(/!\[\]/g, 'false');
+  const locals = /\b(?:store|refreshInitialMultiResultStack|imageIndex|plate|plateImg|plateDisplayLod|selectedIds|id|showMainImageImmediately|targetIdx|safeTargetIdx|applyMultiStackCardLayout|expanded|showExpandedCard|mediaEl|multiStackMotionDurationMs|layerImg|layerDisplayLod|frame|stackThrowTransition|playStackPlateTransition)\b/g;
+  const portable = new RegExp(pattern.source.replace(locals, '[\\w$]+').replace(/;/g, '(?:;|,)'), pattern.flags);
+  if (absent) assert.doesNotMatch(canonical, portable); else assert.match(canonical, portable);
+}
+
 import { readFileSync } from 'node:fs';
 import {
   MULTI_RESULT_BACKPLATES_CLASS,
@@ -190,50 +201,48 @@ function createClassListHost() {
   }),
   test('multi result stack backplates: UI refreshes after renderer wrapper overflow is applied', () => {
     const _0x244e7f = readFileSync(new URL('./uiModule.impl.js', import.meta.url), 'utf8');
-    (assert.match(_0x244e7f, /requestAnimationFrame\(refreshInitialMultiResultStack\)/),
-      assert.match(_0x244e7f, /_loadAndDisplayImage\(\{\s*force:\s*true\s*\}\)/),
-      assert.match(_0x244e7f, /this\._root\?\.style\.setProperty\("overflow",\s*"visible"\)/));
+    (assertSourceWiring(_0x244e7f, /requestAnimationFrame\(refreshInitialMultiResultStack\)/),
+      assertSourceWiring(_0x244e7f, /_loadAndDisplayImage\(\{\s*force:\s*true\s*\}\)/),
+      assertSourceWiring(_0x244e7f, /this\._root\?\.style\.setProperty\("overflow",\s*"visible"\)/));
   }),
   test('multi result stack backplates: expanded cards reuse backdrop elements', () => {
     const _0xb0ea94 = readFileSync(new URL('./uiModule.impl.js', import.meta.url), 'utf8');
-    (assert.match(_0xb0ea94, /_multiBackplateEls\[imageIndex\] = plate/),
-      assert.match(_0xb0ea94, /plateImg\.className = "multi-stack-backplate-media"/),
-      assert.match(_0xb0ea94, /_setLazyImageDisplaySource\(plateImg,\s*plateDisplayLod\)/),
-      assert.doesNotMatch(_0xb0ea94, /plateImg\.src\s*=\s*plateDisplayLod\.url/),
-      assert.match(_0xb0ea94, /_bindResultImageDragOut\(plate,/),
-      assert.match(_0xb0ea94, /_removeCurrentNodeFromSelection\(\)/),
-      assert.match(_0xb0ea94, /selectedIds\.filter\(\(id\) => id !== this\.nodeId\)/),
-      assert.match(
-        _0xb0ea94,
+    (assertSourceWiring(_0xb0ea94, /_multiBackplateEls\[imageIndex\] = plate/),
+      assertSourceWiring(_0xb0ea94, /plateImg\.className = "multi-stack-backplate-media"/),
+      assertSourceWiring(_0xb0ea94, /_setLazyImageDisplaySource\(plateImg,\s*plateDisplayLod\)/),
+      assertSourceWiring(_0xb0ea94, /plateImg\.src\s*=\s*plateDisplayLod\.url/, true),
+      assertSourceWiring(_0xb0ea94, /_bindResultImageDragOut\(plate,/),
+      assertSourceWiring(_0xb0ea94, /_removeCurrentNodeFromSelection\(\)/),
+      assertSourceWiring(_0xb0ea94, /selectedIds\.filter\(\(id\) => id !== this\.nodeId\)/),
+      assertSourceWiring(_0xb0ea94,
         /this\._removeCurrentNodeFromSelection\(\);\s*store\.updateNodeData\(this\.nodeId,\s*\{\s*isImagesExpanded:\s*true\s*\}\)/,
       ),
-      assert.match(_0xb0ea94, /const showMainImageImmediately = \(targetIdx\) =>/),
-      assert.match(_0xb0ea94, /showMainImageImmediately\(safeTargetIdx\);[\s\S]*setTimeout\(\(\) => \{/),
-      assert.match(_0xb0ea94, /let applyMultiStackCardLayout = \(\) => \{\}/),
-      assert.match(_0xb0ea94, /applyMultiStackCardLayout = \(expanded\) =>/),
-      assert.match(_0xb0ea94, /plate\.classList\.toggle\("is-expanded-card", showExpandedCard\)/),
-      assert.match(_0xb0ea94, /mediaEl\.style\.opacity = showExpandedCard \? "1" : "0"/),
-      assert.match(_0xb0ea94, /this\._loadLazyImageDisplaySource\(mediaEl\)/),
-      assert.match(
-        _0xb0ea94,
+      assertSourceWiring(_0xb0ea94, /const showMainImageImmediately = \(targetIdx\) =>/),
+      assertSourceWiring(_0xb0ea94, /showMainImageImmediately\(safeTargetIdx\);[\s\S]*setTimeout\(\(\) => \{/),
+      assertSourceWiring(_0xb0ea94, /let applyMultiStackCardLayout = \(\) => \{\}/),
+      assertSourceWiring(_0xb0ea94, /applyMultiStackCardLayout = \(expanded\) =>/),
+      assertSourceWiring(_0xb0ea94, /plate\.classList\.toggle\("is-expanded-card", showExpandedCard\)/),
+      assertSourceWiring(_0xb0ea94, /mediaEl\.style\.opacity = showExpandedCard \? "1" : "0"/),
+      assertSourceWiring(_0xb0ea94, /this\._loadLazyImageDisplaySource\(mediaEl\)/),
+      assertSourceWiring(_0xb0ea94,
         /this\._scheduleClearLazyImageDisplaySource\(\s*mediaEl,\s*multiStackMotionDurationMs,\s*\)/,
       ),
-      assert.match(_0xb0ea94, /this\._clearLazyImageDisplaySource\(mediaEl\)/),
-      assert.match(_0xb0ea94, /this\._setLazyImageDisplaySource\(layerImg,\s*layerDisplayLod\)/),
-      assert.doesNotMatch(_0xb0ea94, /layerImg\.src\s*=\s*layerDisplayLod\.url/),
-      assert.match(_0xb0ea94, /top:\s*frame\.top \+ "px"/),
-      assert.match(_0xb0ea94, /const stackThrowTransition =/),
-      assert.match(_0xb0ea94, /cubic-bezier\(0\.175,\s*0\.885,\s*0\.32,\s*1\.27\)/),
-      assert.match(_0xb0ea94, /const playStackPlateTransition =/),
-      assert.match(_0xb0ea94, /plate\.style\.transition = "none"/),
-      assert.match(_0xb0ea94, /requestAnimationFrame\(\(\) => \{/),
-      assert.doesNotMatch(_0xb0ea94, /filter:\s*"brightness\([^"]*blur\(/),
-      assert.doesNotMatch(_0xb0ea94, /plate\.animate\(/),
-      assert.doesNotMatch(_0xb0ea94, /buildThrowKeyframes/),
-      assert.doesNotMatch(_0xb0ea94, /animateStackCardPath/),
-      assert.doesNotMatch(_0xb0ea94, /buildStackCardTransform/),
-      assert.doesNotMatch(_0xb0ea94, /buildStackCardOvershootTransform/),
-      assert.doesNotMatch(_0xb0ea94, /is-transitioning-out/),
-      assert.doesNotMatch(_0xb0ea94, /is-stack-consumed/),
-      assert.doesNotMatch(_0xb0ea94, /this\._multiStackWrap\.appendChild\(this\._expandPanel\)/));
+      assertSourceWiring(_0xb0ea94, /this\._clearLazyImageDisplaySource\(mediaEl\)/),
+      assertSourceWiring(_0xb0ea94, /this\._setLazyImageDisplaySource\(layerImg,\s*layerDisplayLod\)/),
+      assertSourceWiring(_0xb0ea94, /layerImg\.src\s*=\s*layerDisplayLod\.url/, true),
+      assertSourceWiring(_0xb0ea94, /top:\s*frame\.top \+ "px"/),
+      assertSourceWiring(_0xb0ea94, /const stackThrowTransition =/),
+      assertSourceWiring(_0xb0ea94, /cubic-bezier\(0\.175,\s*0\.885,\s*0\.32,\s*1\.27\)/),
+      assertSourceWiring(_0xb0ea94, /const playStackPlateTransition =/),
+      assertSourceWiring(_0xb0ea94, /plate\.style\.transition = "none"/),
+      assertSourceWiring(_0xb0ea94, /requestAnimationFrame\(\(\) => \{/),
+      assertSourceWiring(_0xb0ea94, /filter:\s*"brightness\([^"]*blur\(/, true),
+      assertSourceWiring(_0xb0ea94, /plate\.animate\(/, true),
+      assertSourceWiring(_0xb0ea94, /buildThrowKeyframes/, true),
+      assertSourceWiring(_0xb0ea94, /animateStackCardPath/, true),
+      assertSourceWiring(_0xb0ea94, /buildStackCardTransform/, true),
+      assertSourceWiring(_0xb0ea94, /buildStackCardOvershootTransform/, true),
+      assertSourceWiring(_0xb0ea94, /is-transitioning-out/, true),
+      assertSourceWiring(_0xb0ea94, /is-stack-consumed/, true),
+      assertSourceWiring(_0xb0ea94, /this\._multiStackWrap\.appendChild\(this\._expandPanel\)/, true));
   }));

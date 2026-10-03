@@ -23,7 +23,34 @@ test('appActivityApi: skips the request when the device id is missing', async ()
   }
 });
 
-test('appActivityApi: posts normalized startup activity', async () => {
+test('appActivityApi: does not call an unavailable backend unless explicitly enabled', async () => {
+  const originalFetch = globalThis.fetch;
+  let called = false;
+  try {
+    globalThis.fetch = async () => {
+      called = true;
+      throw new Error('fetch should not be called');
+    };
+
+    assert.deepEqual(
+      await reportAppStartupActivity({
+        deviceId: 'device-1',
+        appVersion: '0.4.12',
+        os: 'win32',
+      }),
+      {
+        success: false,
+        recorded: false,
+        reason: 'disabled',
+      },
+    );
+    assert.equal(called, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('appActivityApi: posts normalized startup activity when explicitly enabled', async () => {
   const originalFetch = globalThis.fetch;
   const calls = [];
   try {
@@ -36,6 +63,7 @@ test('appActivityApi: posts normalized startup activity', async () => {
     };
 
     const result = await reportAppStartupActivity({
+      enabled: true,
       deviceId: ' device-1 ',
       appVersion: ' 0.4.12 ',
       os: ' win32 ',

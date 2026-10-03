@@ -44,7 +44,7 @@ export function ensureThumbDecoded(_0x126aa9) {
   if (_0x2acbb0) return _0x2acbb0;
   if (typeof Image !== 'function') return Promise.resolve(false);
   let _0xbb87f7 = null;
-  const _0x1ba2f4 = preloadCanvasImage(_0x31013d, { priority: 40, fetchPriority: 'auto' }).then(
+  const _0x1ba2f4 = preloadCanvasImage(_0x31013d, { priority: 40, fetchPriority: 'auto', decode: true, rejectTtlMs: 0 }).then(
     () => true,
     () => false,
   );

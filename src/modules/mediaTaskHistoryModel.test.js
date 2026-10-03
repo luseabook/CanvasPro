@@ -98,7 +98,7 @@ test('history reader refuses missing/reused record; does not fall back to first 
   const api = apiFor(query => { calls.push(query); return { version: 1, ok: true, rows: [view], total: 1 }; });
   const reader = createMediaTaskHistoryReader(api, FIRST);
   assert.equal((await reader.list({ taskId: 'task-1' }))[0].history.recordId, FIRST);
-  assert.deepEqual(calls, [{ recordId: FIRST, limit: 1 }]);
+  assert.deepEqual(calls, [{ offset: 0, recordId: FIRST, limit: 1 }]);
   await assert.rejects(reader.list({ taskId: 'another-task' }), /任务ID不符/);
   const wrong = apiFor(() => ({ version: 1, ok: true, rows: [{ ...view, history: { ...view.history, recordId: SECOND } }], total: 1 }));
   await assert.rejects(createMediaTaskHistoryReader(wrong, FIRST).list({ taskId: 'task-1' }));

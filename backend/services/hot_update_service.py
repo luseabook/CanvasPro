@@ -149,6 +149,16 @@ class HotUpdateService:
                 return name
         return remotes[0] if remotes else None
 
+    def _worktree_is_clean(self):
+        try:
+            result = subprocess.run(
+                ["git", "status", "--porcelain", "--untracked-files=all"],
+                cwd=self.directory, capture_output=True, timeout=10,
+            )
+            return result.returncode == 0 and not result.stdout.strip()
+        except Exception:
+            return False
+
     def hot_update_status(self):
         if not os.path.isdir(os.path.join(self.directory, ".git")):
             return {
@@ -195,6 +205,9 @@ class HotUpdateService:
                 "restartScript": restart_script,
                 "reason": f"未找到当前平台启动脚本: {restart_script}",
             }
+        if not self._worktree_is_clean():
+            return {"canHotApply": False, "remote": remote, "restartScript": restart_script,
+                    "reason": "工作区有未提交修改或无法检查状态，已禁用热更新。请先自行备份处理。"}
         return {
             "canHotApply": True,
             "remote": remote,

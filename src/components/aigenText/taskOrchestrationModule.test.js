@@ -6,7 +6,7 @@ import {
   isPreviewNodeLoading,
   stopPreviewNodeLoading,
 } from '../../modules/previewMode.js';
-import { createFakePreviewContainer, installPreviewDomStubs } from '../../../tests/testPreviewDom.js';
+import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../../tools/dom-test-environment.mjs';
 import { DEFAULT_LOCALE, setLocale } from '../../i18n/index.js';
 const originalWindow = globalThis.window,
   originalNodeCtor = globalThis.Node,

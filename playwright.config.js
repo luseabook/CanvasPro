@@ -1,43 +1,38 @@
 import fs from 'node:fs';
-import { chromium, defineConfig, devices } from '@playwright/test';
-const PORT = 0x104d,
-  BASE_URL = 'http://127.0.0.1:' + PORT,
-  SYSTEM_CHROME_PATHS = [
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-  ],
-  PLAYWRIGHT_CHROMIUM_READY = fs.existsSync(chromium.executablePath()),
-  SYSTEM_CHROME_READY = SYSTEM_CHROME_PATHS.some((_0x5192ff) => fs.existsSync(_0x5192ff)),
-  USE_SYSTEM_CHROME =
-    process.env.PLAYWRIGHT_USE_SYSTEM_CHROME === '1' || (!PLAYWRIGHT_CHROMIUM_READY && SYSTEM_CHROME_READY);
+import { chromium, defineConfig } from '@playwright/test';
+import { E2E_TOKEN, registerTestServerCleanup } from './tools/test-runtime.mjs';
+const port = Number(process.env.AIC_E2E_PORT || 18779);
+if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Invalid AIC_E2E_PORT');
+registerTestServerCleanup(port);
+let channel = process.env.PLAYWRIGHT_CHANNEL || undefined;
+if (!channel && !fs.existsSync(chromium.executablePath()) && process.platform === 'win32') {
+  if (fs.existsSync('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')) channel = 'msedge';
+  else if (fs.existsSync('C:/Program Files/Google/Chrome/Application/chrome.exe')) channel = 'chrome';
+}
 export default defineConfig({
   testDir: './e2e',
-  timeout: 0xea60,
-  expect: { timeout: 0x2710 },
+  outputDir: 'test-results/browser',
+  testIgnore: '**/desktop-lifecycle.spec.js',
+  timeout: 60000,
+  expect: { timeout: 15000 },
   fullyParallel: false,
   workers: 1,
-  retries: process.env.CI ? 2 : 0,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  retries: 0,
+  reporter: [['list'], ['html', { outputFolder: 'playwright-report/browser', open: 'never' }]],
   use: {
-    baseURL: BASE_URL,
-    trace: 'on-first-retry',
+    baseURL: `http://127.0.0.1:${port}`,
+    channel,
+    extraHTTPHeaders: { 'X-AIC-Local-Token': E2E_TOKEN },
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
-    viewport: { width: 0x5a0, height: 0x384 },
+    viewport: { width: 1440, height: 960 },
   },
-  projects: [
-    {
-      name: 'chromium-smoke',
-      use: { ...devices['Desktop Chrome'], ...(USE_SYSTEM_CHROME ? { channel: 'chrome' } : {}) },
-    },
-  ],
   webServer: {
-    command: 'node tools/e2e-static-server.mjs --port ' + PORT,
-    url: BASE_URL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 0x1d4c0,
+    command: `node tools/e2e-static-server.mjs --port ${port}`,
+    url: `http://127.0.0.1:${port}/`,
+    // Never attach acceptance tests to an existing service or the user's files.
+    reuseExistingServer: false,
+    timeout: 90000,
+    gracefulShutdown: { signal: 'SIGTERM', timeout: 10000 },
   },
 });
