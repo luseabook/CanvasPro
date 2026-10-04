@@ -1,55 +1,54 @@
 import { collectSelectedNodeExportItems } from '../nodeBatchExport.js';
 import { createCanvasCommandError } from './commandRegistry.js';
 import { normalizeNodeIds } from './graphCommands.js';
-function getState(_0x493ca0) {
-  return _0x493ca0['store']?.['getStateRaw']?.() || _0x493ca0['store']?.['getState']?.() || {};
+function getState(context) {
+  return context['store']?.['getStateRaw']?.() || context['store']?.['getState']?.() || {};
 }
-function trimText(_0x1d6b1f) {
-  return String(_0x1d6b1f || '')['trim']();
+function trimText(value) {
+  return String(value || '')['trim']();
 }
-function firstNonEmpty(..._0x28fd42) {
-  for (const _0x3703f6 of _0x28fd42) {
-    const _0x345c7d = trimText(_0x3703f6);
-    if (_0x345c7d) return _0x345c7d;
+function firstNonEmpty(...candidates) {
+  for (const candidate of candidates) {
+    const normalized = trimText(candidate);
+    if (normalized) return normalized;
   }
   return '';
 }
-function getNodeExportApi(_0x1608ca = {}) {
-  const _0x403000 =
-    _0x1608ca['nodeExport'] || _0x1608ca['windowObject']?.['electronAPI']?.['nodeExport'] || null;
-  return typeof _0x403000?.['exportSelected'] === 'function' ? _0x403000 : null;
+function getNodeExportApi(context = {}) {
+  const api = context['nodeExport'] || context['windowObject']?.['electronAPI']?.['nodeExport'] || null;
+  return typeof api?.['exportSelected'] === 'function' ? api : null;
 }
-function normalizeDestinationArgs(_0x4d52e1 = {}) {
+function normalizeDestinationArgs(args = {}) {
   return {
     directory: firstNonEmpty(
-      _0x4d52e1['directory'],
-      _0x4d52e1['downloadDir'],
-      _0x4d52e1['targetDir'],
-      _0x4d52e1['destinationDirectory'],
+      args['directory'],
+      args['downloadDir'],
+      args['targetDir'],
+      args['destinationDirectory'],
     ),
-    outputPath: firstNonEmpty(_0x4d52e1['outputPath'], _0x4d52e1['filePath'], _0x4d52e1['path']),
-    filename: firstNonEmpty(_0x4d52e1['filename'], _0x4d52e1['fileName']),
+    outputPath: firstNonEmpty(args['outputPath'], args['filePath'], args['path']),
+    filename: firstNonEmpty(args['filename'], args['fileName']),
   };
 }
-function normalizeExportItems(_0x4c866e = {}, _0x70b649 = {}) {
-  const _0x496af0 = normalizeNodeIds(_0x4c866e, _0x70b649, { min: 0x1, allowSelection: !![] }),
-    { items: _0x3239f7, skipped: _0x5b98f1 } = collectSelectedNodeExportItems({
-      nodes: getState(_0x70b649)['nodes'] || {},
-      selectedNodeIds: _0x496af0,
+function normalizeExportItems(args = {}, context = {}) {
+  const ids = normalizeNodeIds(args, context, { min: 0x1, allowSelection: !![] }),
+    { items: items, skipped: skipped } = collectSelectedNodeExportItems({
+      nodes: getState(context)['nodes'] || {},
+      selectedNodeIds: ids,
     });
-  if (_0x3239f7['length'] <= 0x0)
+  if (items['length'] <= 0x0)
     throw createCanvasCommandError(
       'NO_EXPORTABLE_ITEMS',
       'Selected canvas nodes do not contain exportable text or media.',
-      { ids: _0x496af0, skipped: _0x5b98f1 },
+      { ids: ids, skipped: skipped },
     );
-  return { ids: _0x496af0, items: _0x3239f7, skipped: _0x5b98f1 };
+  return { ids: ids, items: items, skipped: skipped };
 }
-function mergeSkipped(..._0x541b46) {
-  return _0x541b46['flatMap']((_0x23c7ed) => (Array['isArray'](_0x23c7ed) ? _0x23c7ed : []));
+function mergeSkipped(...lists) {
+  return lists['flatMap']((list) => (Array['isArray'](list) ? list : []));
 }
-export function registerNodeExportCommands(_0x3183d5) {
-  _0x3183d5['register']({
+export function registerNodeExportCommands(registry) {
+  registry['register']({
     id: 'node.exportSelected',
     description: 'Export selected canvas node outputs to a ZIP package.',
     riskLevel: 'confirm',
@@ -70,50 +69,50 @@ export function registerNodeExportCommands(_0x3183d5) {
       requiresSystemAccess: !![],
     },
     returnSchema: { aliasFields: ['path', 'filename', 'exportedCount', 'counts'] },
-    validate(_0x1634f1 = {}, _0x41f132 = {}) {
+    validate(args = {}, context = {}) {
       try {
-        if (!getNodeExportApi(_0x41f132))
+        if (!getNodeExportApi(context))
           return {
             ok: ![],
             errorCode: 'NODE_EXPORT_UNAVAILABLE',
             message: 'Node\x20export\x20is\x20unavailable\x20in\x20this\x20environment.',
           };
-        const _0x5f55cd = normalizeExportItems(_0x1634f1, _0x41f132);
-        return { args: { ...normalizeDestinationArgs(_0x1634f1), ..._0x5f55cd } };
-      } catch (_0x18be04) {
+        const selection = normalizeExportItems(args, context);
+        return { args: { ...normalizeDestinationArgs(args), ...selection } };
+      } catch (error) {
         return {
           ok: ![],
-          errorCode: _0x18be04['errorCode'] || 'INVALID_NODE_EXPORT_SELECTION',
-          message: _0x18be04['message'],
-          details: _0x18be04['details'],
+          errorCode: error['errorCode'] || 'INVALID_NODE_EXPORT_SELECTION',
+          message: error['message'],
+          details: error['details'],
         };
       }
     },
-    async execute(_0x51e9ac, _0x27ce6e) {
-      const _0x3a32eb = getNodeExportApi(_0x27ce6e);
-      if (!_0x3a32eb)
+    async execute(args, context) {
+      const api = getNodeExportApi(context);
+      if (!api)
         throw createCanvasCommandError(
           'NODE_EXPORT_UNAVAILABLE',
           'Node\x20export\x20is\x20unavailable\x20in\x20this\x20environment.',
         );
-      const _0x2fde54 = await _0x3a32eb['exportSelected']({
-        items: _0x51e9ac['items'] || [],
-        directory: _0x51e9ac['directory'] || '',
-        outputPath: _0x51e9ac['outputPath'] || '',
-        filename: _0x51e9ac['filename'] || '',
+      const result = await api['exportSelected']({
+        items: args['items'] || [],
+        directory: args['directory'] || '',
+        outputPath: args['outputPath'] || '',
+        filename: args['filename'] || '',
       });
-      if (_0x2fde54?.['canceled'])
+      if (result?.['canceled'])
         throw createCanvasCommandError('NODE_EXPORT_CANCELED', 'Node export was canceled.');
-      if (_0x2fde54?.['success'] !== !![])
+      if (result?.['success'] !== !![])
         throw createCanvasCommandError(
-          _0x2fde54?.['code'] || 'NODE_EXPORT_FAILED',
-          _0x2fde54?.['message'] || _0x2fde54?.['error'] || 'Node export failed.',
-          _0x2fde54,
+          result?.['code'] || 'NODE_EXPORT_FAILED',
+          result?.['message'] || result?.['error'] || 'Node export failed.',
+          result,
         );
       return {
-        ..._0x2fde54,
-        ids: _0x51e9ac['ids'] || [],
-        skipped: mergeSkipped(_0x51e9ac['skipped'], _0x2fde54['skipped']),
+        ...result,
+        ids: args['ids'] || [],
+        skipped: mergeSkipped(args['skipped'], result['skipped']),
       };
     },
   });

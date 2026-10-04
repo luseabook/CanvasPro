@@ -1,11 +1,11 @@
 import { showTaskStatusNotification } from '../services/completionNotificationService.js';
 import { ACTIVE_TASK_STATUSES } from './taskCenterModel.js';
 const WAIT_NOTICE_MS = 0xa * 0x3c * 0x3e8,
-  clean = (_0x42e7f7, _0x337bd2) =>
-    String(_0x42e7f7 || '')
+  clean = (text, limit) =>
+    String(text || '')
       ['replace'](/\s+/g, '\x20')
       ['trim']()
-      ['slice'](0x0, _0x337bd2);
+      ['slice'](0x0, limit);
 export function createTaskStatusFeedback({
   notify: notify = showTaskStatusNotification,
   setTimer: setTimer = setTimeout,
@@ -14,95 +14,93 @@ export function createTaskStatusFeedback({
   mergeMs: mergeMs = 0x258,
   now: now = Date['now'],
 } = {}) {
-  const _0x4aa706 = now(),
-    _0x219ef9 = new Map(),
-    _0x3dacbf = new Map();
-  let _0x1e6d58 = ![];
-  function _0x3100ab(_0x4852d9) {
-    if (_0x1e6d58) return;
+  const createdAt = now(),
+    waitingTasks = new Map(),
+    pendingFailures = new Map();
+  let destroyed = ![];
+  function emitNotification(payload) {
+    if (destroyed) return;
     try {
-      Promise['resolve'](notify(_0x4852d9))['catch'](console['warn']);
-    } catch (_0x1c5bf6) {
-      console['warn'](_0x1c5bf6);
+      Promise['resolve'](notify(payload))['catch'](console['warn']);
+    } catch (error) {
+      console['warn'](error);
     }
   }
-  function _0x412150(_0x20f2c8) {
-    return _0x20f2c8['navigation'] ? { ..._0x20f2c8['navigation'] } : null;
+  function pickNavigation(task) {
+    return task['navigation'] ? { ...task['navigation'] } : null;
   }
-  function _0x380a6d(_0x425b96) {
-    const _0x26c426 = JSON['stringify']([_0x425b96['source'], _0x425b96['projectId'], _0x425b96['canvasId']]);
-    let _0x5b1508 = _0x3dacbf['get'](_0x26c426);
-    (!_0x5b1508 &&
-      ((_0x5b1508 = {
+  function queueFailureNotice(task) {
+    const groupKey = JSON['stringify']([task['source'], task['projectId'], task['canvasId']]);
+    let group = pendingFailures['get'](groupKey);
+    (!group &&
+      ((group = {
         tasks: [],
         timer: setTimer(() => {
-          _0x3dacbf['delete'](_0x26c426);
-          const _0x1cd755 = _0x5b1508['tasks']['filter']((_0x53f6b2) => _0x53f6b2['status'] === 'failed');
-          if (!_0x1cd755['length']) return;
-          const _0x1f39fe = _0x1cd755[0x0],
-            _0x56b674 = clean(_0x1f39fe['title'], 0x3c) || '生成任务',
-            _0x25df22 = clean(_0x1f39fe['error'], 0x78) || '请点击查看任务详情',
-            _0x1ca444 = _0x5b1508['tasks']['filter']((_0x8b0f0d) => _0x8b0f0d['status'] === 'complete')[
-              'length'
-            ];
-          _0x3100ab({
+          pendingFailures['delete'](groupKey);
+          const failed = group['tasks']['filter']((entry) => entry['status'] === 'failed');
+          if (!failed['length']) return;
+          const first = failed[0x0],
+            title = clean(first['title'], 0x3c) || '生成任务',
+            detail = clean(first['error'], 0x78) || '请点击查看任务详情',
+            completedCount = group['tasks']['filter']((entry) => entry['status'] === 'complete')['length'];
+          emitNotification({
             type: 'error',
-            navigation: _0x412150(_0x1f39fe),
+            navigation: pickNavigation(first),
             body:
-              _0x5b1508['tasks']['length'] === 0x1
-                ? _0x56b674 + '失败：' + _0x25df22
+              group['tasks']['length'] === 0x1
+                ? title + '失败：' + detail
                 : '多项任务已结束：成功\x20' +
-                  _0x1ca444 +
+                  completedCount +
                   ' 个，失败 ' +
-                  _0x1cd755['length'] +
+                  failed['length'] +
                   ' 个。' +
-                  _0x56b674 +
+                  title +
                   '：' +
-                  _0x25df22,
+                  detail,
           });
         }, mergeMs),
       }),
-      _0x5b1508['timer']?.['unref']?.(),
-      _0x3dacbf['set'](_0x26c426, _0x5b1508)),
-      _0x5b1508['tasks']['push']({ ..._0x425b96, navigation: _0x412150(_0x425b96) }));
+      group['timer']?.['unref']?.(),
+      pendingFailures['set'](groupKey, group)),
+      group['tasks']['push']({ ...task, navigation: pickNavigation(task) }));
   }
   return {
-    observe(_0x2f822e, _0x498c00, { silent: silent = ![] } = {}) {
-      if (_0x1e6d58) return;
-      const _0x28161b = _0x219ef9['get'](_0x2f822e['taskId']);
-      if (ACTIVE_TASK_STATUSES['has'](_0x2f822e['status'])) {
-        if (_0x28161b) {
-          _0x28161b['task'] = { ..._0x2f822e, navigation: _0x412150(_0x2f822e) };
+    observe(task, previous, { silent: silent = ![] } = {}) {
+      if (destroyed) return;
+      const waitingEntry = waitingTasks['get'](task['taskId']);
+      if (ACTIVE_TASK_STATUSES['has'](task['status'])) {
+        if (waitingEntry) {
+          waitingEntry['task'] = { ...task, navigation: pickNavigation(task) };
           return;
         }
-        const _0x1a263d = { task: { ..._0x2f822e, navigation: _0x412150(_0x2f822e) }, timer: null };
-        ((_0x1a263d['timer'] = setTimer(() => {
-          ((_0x1a263d['timer'] = null),
-            _0x3100ab({
+        const entry = { task: { ...task, navigation: pickNavigation(task) }, timer: null };
+        ((entry['timer'] = setTimer(() => {
+          ((entry['timer'] = null),
+            emitNotification({
               type: 'warn',
-              navigation: _0x412150(_0x1a263d['task']),
+              navigation: pickNavigation(entry['task']),
               body:
-                (clean(_0x1a263d['task']['title'], 0x3c) || '生成任务') +
+                (clean(entry['task']['title'], 0x3c) || '生成任务') +
                 '等待较久，尚未确认完成。点击查看进度，请勿重复提交。',
             }));
         }, waitMs)),
-          _0x1a263d['timer']?.['unref']?.(),
-          _0x219ef9['set'](_0x2f822e['taskId'], _0x1a263d));
+          entry['timer']?.['unref']?.(),
+          waitingTasks['set'](task['taskId'], entry));
         return;
       }
-      _0x28161b && (clearTimer(_0x28161b['timer']), _0x219ef9['delete'](_0x2f822e['taskId']));
-      const _0x3a4b06 =
-        !_0x498c00 &&
-        _0x2f822e['status'] === 'failed' &&
-        Number(_0x2f822e['startedAt'] || _0x2f822e['createdAt']) >= _0x4aa706;
-      if (silent || (!_0x3a4b06 && !ACTIVE_TASK_STATUSES['has'](_0x498c00?.['status']))) return;
-      if (['failed', 'complete']['includes'](_0x2f822e['status'])) _0x380a6d(_0x2f822e);
+      waitingEntry && (clearTimer(waitingEntry['timer']), waitingTasks['delete'](task['taskId']));
+      const isFreshFailure =
+        !previous &&
+        task['status'] === 'failed' &&
+        Number(task['startedAt'] || task['createdAt']) >= createdAt;
+      if (silent || (!isFreshFailure && !ACTIVE_TASK_STATUSES['has'](previous?.['status']))) return;
+      if (['failed', 'complete']['includes'](task['status'])) queueFailureNotice(task);
     },
     destroy() {
-      _0x1e6d58 = !![];
-      for (const _0x1749b8 of _0x219ef9['values']()) clearTimer(_0x1749b8['timer']);
-      for (const _0xe358c1 of _0x3dacbf['values']()) clearTimer(_0xe358c1['timer']);
-      (_0x219ef9['clear'](), _0x3dacbf['clear']());
+      destroyed = !![];
+      for (const entry of waitingTasks['values']()) clearTimer(entry['timer']);
+      for (const entry of pendingFailures['values']()) clearTimer(entry['timer']);
+      (waitingTasks['clear'](), pendingFailures['clear']());
     },
   };
 }

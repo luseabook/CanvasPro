@@ -51,10 +51,14 @@
 
    配置：`singleQuote=true, printWidth=110, tabWidth=2, semi=true, arrowParens=always, endOfLine=lf`。
 
-7. **复验**。格式化会产生非语义差异（主要是多行列表的尾逗号），校验器已对尾逗号做归一化，
-   复验仍须 `PASS`。
+   > **注意：prettier 不是 token 保等的，所以格式化这一步无法用等价闸门证明。**
+   > 实测：`startupVisualReadiness.js` 里 `return (……);` 在原名较长时 prettier 保留外层括号，
+   > 改名后表达式能收进一行，prettier 就把这对外层括号去掉了（token 少 2 个）。
+   > 把"格式化后的原件"当基线再比也不行（同样 FAIL），因为换行/括号决策**依赖内容长度**。
+   > 因此闸门只对第 4 步的**纯改名**做等价证明；格式化交给 prettier 自身的语义保持保证，
+   > 并用第 7 步的测试兜底。
 
-8. **验收**：`node --check <file>` → 该模块测试 → 全量回归（失败集合必须与上一批次一致）→
+7. **验收**：`node --check <file>` → 该模块测试 → 全量回归（失败集合必须与上一批次一致）→
    `--explain` 输出改名映射存档。
 
 ## 2. 校验器原理与边界
@@ -77,9 +81,25 @@
 
 ## 3. 已完成的批次
 
-| 批次 | 件数 | 文件 | 改名数 | 校验 |
-|------|------|------|--------|------|
-| 试点 | 1 | `src/modules/assetPackageMedia.js` | 74 | PASS ×2（改名前/格式化后），测试 8/8 |
+| 批次 | 件数 | 改名数 | 结果 |
+|------|------|--------|------|
+| 试点 | 1 | 74 | `src/modules/assetPackageMedia.js`；纯改名闸门 PASS，模块测试 8/8，全量回归失败集合不变 |
+| 批量 1 | 8 | 233 | 纯改名闸门 8/8 PASS；模块测试合计 78/78；全量回归失败集合不变 |
+
+批量 1 的 8 件（均为零消费方叶子模块）：
+
+```
+src/modules/settings/nodeManagerSettings.js                       25 个名字
+src/modules/taskStatusFeedback.js                                 29
+src/modules/generationPromptPolicy.js                             24
+src/services/startupVisualReadiness.js                            24
+src/modules/canvasCommands/nodeExportCommands.js                  24
+src/modules/agent/agentPrecreatedNode.js                          23
+src/components/video-node/sourceVideoFramePresentationBatch.js    33
+src/modules/promptMentionSelection.js                             51
+```
+
+累计 9 件 / 307 个名字。零消费方候选池还剩 68 件（`tools/deobf-scan.mjs` 实测）。
 
 ## 4. 与移植工序的关系（重要）
 

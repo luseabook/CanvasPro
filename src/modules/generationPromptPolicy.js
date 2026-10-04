@@ -6,26 +6,30 @@ export const PROMPT_EMPTY_POLICIES = Object['freeze']({
 });
 export const PROMPT_EMPTY_POLICY_VALUES = Object['freeze'](Object['values'](PROMPT_EMPTY_POLICIES));
 const DEFAULT_PROMPT_MIN_LENGTH = 0x1;
-function isPlainObject(_0x87c78b) {
-  return !!_0x87c78b && typeof _0x87c78b === 'object' && !Array['isArray'](_0x87c78b);
+function isPlainObject(value) {
+  return !!value && typeof value === 'object' && !Array['isArray'](value);
 }
-function normalizePromptEmptyPolicy(_0x3d4349) {
-  const _0xb4e683 = String(_0x3d4349 || '')['trim']();
-  return PROMPT_EMPTY_POLICY_VALUES['includes'](_0xb4e683) ? _0xb4e683 : '';
+function normalizePromptEmptyPolicy(value) {
+  const normalized = String(value || '')['trim']();
+  return PROMPT_EMPTY_POLICY_VALUES['includes'](normalized) ? normalized : '';
 }
-function normalizePromptMinLength(_0x12c282) {
-  if (_0x12c282 === undefined || _0x12c282 === null || _0x12c282 === '') return DEFAULT_PROMPT_MIN_LENGTH;
-  const _0x41901a = Number(_0x12c282);
-  return Number['isInteger'](_0x41901a) && _0x41901a >= 0x0 ? _0x41901a : DEFAULT_PROMPT_MIN_LENGTH;
+function normalizePromptMinLength(value) {
+  if (value === undefined || value === null || value === '') return DEFAULT_PROMPT_MIN_LENGTH;
+  const numeric = Number(value);
+  return Number['isInteger'](numeric) && numeric >= 0x0 ? numeric : DEFAULT_PROMPT_MIN_LENGTH;
 }
 function resolveDefaultEmptyPolicy({
-  modelManifest: _0x4f2ba1,
-  executionManifest: _0x1460df,
-  provider: _0x584ab2,
+  modelManifest: modelManifest,
+  executionManifest: executionManifest,
+  provider: provider,
 }) {
-  const _0x3cb56c = String(_0x4f2ba1?.['adapterType'] || _0x1460df?.['adapterType'] || '')['trim'](),
-    _0x12b8e7 = [_0x584ab2, _0x4f2ba1?.['provider'], _0x1460df?.['provider']]['map'](normalizeProviderId);
-  if (_0x3cb56c === 'workflow' && _0x12b8e7['includes']('runninghubwf'))
+  const adapterType = String(modelManifest?.['adapterType'] || executionManifest?.['adapterType'] || '')[
+      'trim'
+    ](),
+    providers = [provider, modelManifest?.['provider'], executionManifest?.['provider']]['map'](
+      normalizeProviderId,
+    );
+  if (adapterType === 'workflow' && providers['includes']('runninghubwf'))
     return PROMPT_EMPTY_POLICIES['ALLOW'];
   return PROMPT_EMPTY_POLICIES['BLOCK'];
 }
@@ -35,40 +39,40 @@ export function resolveGenerationPromptPolicy({
   modelManifest: modelManifest = null,
   executionManifest: executionManifest = null,
 } = {}) {
-  const _0x35a58e =
+  const resolved =
       modelManifest && executionManifest
         ? { modelManifest: modelManifest, executionManifest: executionManifest }
         : resolveModelExecution(model, { providerHint: provider }) || resolveModelExecution(model),
-    _0x5bd23b = modelManifest || _0x35a58e?.['modelManifest'] || null,
-    _0x511de6 = executionManifest || _0x35a58e?.['executionManifest'] || null,
-    _0x451a79 = isPlainObject(_0x5bd23b?.['prompt']) ? _0x5bd23b['prompt'] : {},
-    _0x2ec647 = normalizePromptEmptyPolicy(_0x451a79['emptyPolicy']),
-    _0x113adb =
-      _0x2ec647 ||
+    manifest = modelManifest || resolved?.['modelManifest'] || null,
+    execution = executionManifest || resolved?.['executionManifest'] || null,
+    promptConfig = isPlainObject(manifest?.['prompt']) ? manifest['prompt'] : {},
+    manifestPolicy = normalizePromptEmptyPolicy(promptConfig['emptyPolicy']),
+    emptyPolicy =
+      manifestPolicy ||
       resolveDefaultEmptyPolicy({
-        modelManifest: _0x5bd23b,
-        executionManifest: _0x511de6,
+        modelManifest: manifest,
+        executionManifest: execution,
         provider: provider,
       });
   return {
-    emptyPolicy: _0x113adb,
-    minLength: normalizePromptMinLength(_0x451a79['minLength']),
-    modelManifest: _0x5bd23b,
-    executionManifest: _0x511de6,
-    source: _0x2ec647 ? 'manifest' : 'default',
+    emptyPolicy: emptyPolicy,
+    minLength: normalizePromptMinLength(promptConfig['minLength']),
+    modelManifest: manifest,
+    executionManifest: execution,
+    source: manifestPolicy ? 'manifest' : 'default',
   };
 }
-export function countPromptCharacters(_0x2de23a = '') {
-  const _0x12a57b = String(_0x2de23a || '')['trim']();
-  let _0x1cd4b0 = _0x12a57b['length'];
-  for (let _0x2fcf5c = 0x0; _0x2fcf5c < _0x12a57b['length'] - 0x1; _0x2fcf5c += 0x1) {
-    const _0x3a583c = _0x12a57b['charCodeAt'](_0x2fcf5c);
-    if (_0x3a583c < 0xd800 || _0x3a583c > 0xdbff) continue;
-    const _0x54c5bc = _0x12a57b['charCodeAt'](_0x2fcf5c + 0x1);
-    if (_0x54c5bc < 0xdc00 || _0x54c5bc > 0xdfff) continue;
-    ((_0x1cd4b0 -= 0x1), (_0x2fcf5c += 0x1));
+export function countPromptCharacters(text = '') {
+  const normalized = String(text || '')['trim']();
+  let count = normalized['length'];
+  for (let index = 0x0; index < normalized['length'] - 0x1; index += 0x1) {
+    const high = normalized['charCodeAt'](index);
+    if (high < 0xd800 || high > 0xdbff) continue;
+    const low = normalized['charCodeAt'](index + 0x1);
+    if (low < 0xdc00 || low > 0xdfff) continue;
+    ((count -= 0x1), (index += 0x1));
   }
-  return _0x1cd4b0;
+  return count;
 }
 export function evaluateGenerationPromptBoundary({
   model: model = '',
@@ -78,27 +82,27 @@ export function evaluateGenerationPromptBoundary({
   modelManifest: modelManifest = null,
   executionManifest: executionManifest = null,
 } = {}) {
-  const _0x21e713 = resolveGenerationPromptPolicy({
+  const policy = resolveGenerationPromptPolicy({
       model: model,
       provider: provider,
       modelManifest: modelManifest,
       executionManifest: executionManifest,
     }),
-    _0x476541 = countPromptCharacters(promptText);
-  if (_0x476541 >= _0x21e713['minLength'])
-    return { ok: !![], reason: '', promptLength: _0x476541, ..._0x21e713 };
-  if (_0x476541 > 0x0) return { ok: ![], reason: 'promptTooShort', promptLength: _0x476541, ..._0x21e713 };
-  if (_0x21e713['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW'])
-    return { ok: !![], reason: '', promptLength: _0x476541, ..._0x21e713 };
-  if (_0x21e713['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT'] && hasInput === !![])
-    return { ok: !![], reason: '', promptLength: _0x476541, ..._0x21e713 };
+    promptLength = countPromptCharacters(promptText);
+  if (promptLength >= policy['minLength'])
+    return { ok: !![], reason: '', promptLength: promptLength, ...policy };
+  if (promptLength > 0x0) return { ok: ![], reason: 'promptTooShort', promptLength: promptLength, ...policy };
+  if (policy['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW'])
+    return { ok: !![], reason: '', promptLength: promptLength, ...policy };
+  if (policy['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT'] && hasInput === !![])
+    return { ok: !![], reason: '', promptLength: promptLength, ...policy };
   return {
     ok: ![],
     reason:
-      _0x21e713['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT']
+      policy['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT']
         ? 'promptOrInputRequired'
         : 'promptRequired',
-    promptLength: _0x476541,
-    ..._0x21e713,
+    promptLength: promptLength,
+    ...policy,
   };
 }
