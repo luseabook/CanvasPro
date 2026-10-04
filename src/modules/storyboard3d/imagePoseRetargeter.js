@@ -55,363 +55,353 @@ const EPSILON = 1e-8,
     foot_l: 1.25,
     foot_r: 1.25,
   });
-function clamp(_0x2486dd, _0x3679b1, _0x21a53b) {
-  return Math['max'](_0x3679b1, Math['min'](_0x21a53b, Number(_0x2486dd) || 0x0));
+function clamp(value, item, key) {
+  return Math['max'](item, Math['min'](key, Number(value) || 0x0));
 }
-function finiteNumber(_0x42d66f) {
-  const _0x2c0ff3 = Number(_0x42d66f);
-  return Number['isFinite'](_0x2c0ff3) ? _0x2c0ff3 : null;
+function finiteNumber(index) {
+  const result = Number(index);
+  return Number['isFinite'](result) ? result : null;
 }
-function add(_0x1e78d6, _0x3eb97d) {
+function add(x2, box) {
   return {
-    x: _0x1e78d6['x'] + _0x3eb97d['x'],
-    y: _0x1e78d6['y'] + _0x3eb97d['y'],
-    z: _0x1e78d6['z'] + _0x3eb97d['z'],
+    x: x2['x'] + box['x'],
+    y: x2['y'] + box['y'],
+    z: x2['z'] + box['z'],
   };
 }
-function subtract(_0x36946f, _0x3d6d82) {
+function subtract(x3, box2) {
   return {
-    x: _0x36946f['x'] - _0x3d6d82['x'],
-    y: _0x36946f['y'] - _0x3d6d82['y'],
-    z: _0x36946f['z'] - _0x3d6d82['z'],
+    x: x3['x'] - box2['x'],
+    y: x3['y'] - box2['y'],
+    z: x3['z'] - box2['z'],
   };
 }
-function scaleVector(_0x22d4f2, _0x216343) {
-  return { x: _0x22d4f2['x'] * _0x216343, y: _0x22d4f2['y'] * _0x216343, z: _0x22d4f2['z'] * _0x216343 };
+function scaleVector(x4, data) {
+  return { x: x4['x'] * data, y: x4['y'] * data, z: x4['z'] * data };
 }
-function dot(_0x6df149, _0x988fea) {
-  return _0x6df149['x'] * _0x988fea['x'] + _0x6df149['y'] * _0x988fea['y'] + _0x6df149['z'] * _0x988fea['z'];
+function dot(box3, box4) {
+  return box3['x'] * box4['x'] + box3['y'] * box4['y'] + box3['z'] * box4['z'];
 }
-function cross(_0x43295e, _0x27f86c) {
+function cross(x5, box5) {
   return {
-    x: _0x43295e['y'] * _0x27f86c['z'] - _0x43295e['z'] * _0x27f86c['y'],
-    y: _0x43295e['z'] * _0x27f86c['x'] - _0x43295e['x'] * _0x27f86c['z'],
-    z: _0x43295e['x'] * _0x27f86c['y'] - _0x43295e['y'] * _0x27f86c['x'],
+    x: x5['y'] * box5['z'] - x5['z'] * box5['y'],
+    y: x5['z'] * box5['x'] - x5['x'] * box5['z'],
+    z: x5['x'] * box5['y'] - x5['y'] * box5['x'],
   };
 }
-function vectorLength(_0x5bd7b6) {
-  return Math['hypot'](_0x5bd7b6['x'], _0x5bd7b6['y'], _0x5bd7b6['z']);
+function vectorLength(box6) {
+  return Math['hypot'](box6['x'], box6['y'], box6['z']);
 }
-function normalizeVector(_0x34c73d) {
-  const _0x3d6468 = vectorLength(_0x34c73d);
-  return _0x3d6468 > EPSILON ? scaleVector(_0x34c73d, 0x1 / _0x3d6468) : null;
+function normalizeVector(options) {
+  const vectorLength2 = vectorLength(options);
+  return vectorLength2 > EPSILON ? scaleVector(options, 0x1 / vectorLength2) : null;
 }
-function midpoint(_0x55f910, _0x1eac1e) {
-  return scaleVector(add(_0x55f910, _0x1eac1e), 0.5);
+function midpoint(target, source) {
+  return scaleVector(add(target, source), 0.5);
 }
-function segmentDirection(_0x340a29, _0x59aed8) {
-  return _0x340a29 && _0x59aed8 ? normalizeVector(subtract(_0x59aed8, _0x340a29)) : null;
+function segmentDirection(next, current) {
+  return next && current ? normalizeVector(subtract(current, next)) : null;
 }
-function normalizeQuaternion(_0x2f8acc) {
-  if (!Array['isArray'](_0x2f8acc) || _0x2f8acc['length'] !== 0x4) return null;
-  const _0x58fd03 = _0x2f8acc['map'](finiteNumber);
-  if (_0x58fd03['some']((_0x181d42) => _0x181d42 === null)) return null;
-  const _0x45dd6c = Math['hypot'](..._0x58fd03);
-  if (_0x45dd6c <= EPSILON) return null;
-  const _0x82a3f3 = _0x58fd03['map']((_0x5e5c30) => _0x5e5c30 / _0x45dd6c);
-  return _0x82a3f3[0x3] < 0x0 ? _0x82a3f3['map']((_0x305a86) => -_0x305a86) : _0x82a3f3;
+function normalizeQuaternion(list) {
+  if (!Array['isArray'](list) || list['length'] !== 0x4) return null;
+  const list2 = list['map'](finiteNumber);
+  if (list2['some']((entry) => entry === null)) return null;
+  const record = Math['hypot'](...list2);
+  if (record <= EPSILON) return null;
+  const list3 = list2['map']((payload) => payload / record);
+  return list3[0x3] < 0x0 ? list3['map']((handle) => -handle) : list3;
 }
-function multiplyQuaternions(_0x15492e, _0x2a05e9) {
-  const [_0x533865, _0x2cba1f, _0x5ce7c3, _0x13453b] = _0x15492e,
-    [_0x274170, _0x4c3715, _0x4909d6, _0x1ddb96] = _0x2a05e9;
+function multiplyQuaternions(state, config) {
+  const [scope, input, output, value2] = state,
+    [value3, value4, value5, value6] = config;
   return normalizeQuaternion([
-    _0x13453b * _0x274170 + _0x533865 * _0x1ddb96 + _0x2cba1f * _0x4909d6 - _0x5ce7c3 * _0x4c3715,
-    _0x13453b * _0x4c3715 - _0x533865 * _0x4909d6 + _0x2cba1f * _0x1ddb96 + _0x5ce7c3 * _0x274170,
-    _0x13453b * _0x4909d6 + _0x533865 * _0x4c3715 - _0x2cba1f * _0x274170 + _0x5ce7c3 * _0x1ddb96,
-    _0x13453b * _0x1ddb96 - _0x533865 * _0x274170 - _0x2cba1f * _0x4c3715 - _0x5ce7c3 * _0x4909d6,
+    value2 * value3 + scope * value6 + input * value5 - output * value4,
+    value2 * value4 - scope * value5 + input * value6 + output * value3,
+    value2 * value5 + scope * value4 - input * value3 + output * value6,
+    value2 * value6 - scope * value3 - input * value4 - output * value5,
   ]);
 }
-function invertQuaternion(_0x100b36) {
-  return [-_0x100b36[0x0], -_0x100b36[0x1], -_0x100b36[0x2], _0x100b36[0x3]];
+function invertQuaternion(value7) {
+  return [-value7[0x0], -value7[0x1], -value7[0x2], value7[0x3]];
 }
-function rotateVectorByQuaternion(_0xd7baa8, _0x58cb61) {
-  const [_0x583be7, _0x2e76c2, _0x3772b2, _0x6bff19] = _0x58cb61,
-    _0x47eded = { x: _0x583be7, y: _0x2e76c2, z: _0x3772b2 },
-    _0x10a3de = cross(_0x47eded, _0xd7baa8),
-    _0x182163 = cross(_0x47eded, _0x10a3de);
-  return add(_0xd7baa8, add(scaleVector(_0x10a3de, 0x2 * _0x6bff19), scaleVector(_0x182163, 0x2)));
+function rotateVectorByQuaternion(value8, value9) {
+  const [x6, y2, z2, value10] = value9,
+    value11 = { x: x6, y: y2, z: z2 },
+    cross2 = cross(value11, value8),
+    cross3 = cross(value11, cross2);
+  return add(value8, add(scaleVector(cross2, 0x2 * value10), scaleVector(cross3, 0x2)));
 }
-function quaternionFromTo(_0x16e991, _0x57c2a8) {
-  const _0x31f5c7 = normalizeVector(_0x16e991),
-    _0x188ad2 = normalizeVector(_0x57c2a8);
-  if (!_0x31f5c7 || !_0x188ad2) return null;
-  const _0x4b0b8a = clamp(dot(_0x31f5c7, _0x188ad2), -0x1, 0x1);
-  if (_0x4b0b8a > 0x1 - EPSILON) return [...IDENTITY_QUATERNION];
-  if (_0x4b0b8a < -0x1 + EPSILON) {
-    const _0x511dcb = cross(_0x31f5c7, { x: 0x1, y: 0x0, z: 0x0 }),
-      _0x2e133f = cross(_0x31f5c7, { x: 0x0, y: 0x0, z: 0x1 }),
-      _0x22795e = normalizeVector(vectorLength(_0x511dcb) > vectorLength(_0x2e133f) ? _0x511dcb : _0x2e133f);
-    return _0x22795e ? [_0x22795e['x'], _0x22795e['y'], _0x22795e['z'], 0x0] : null;
+function quaternionFromTo(value12, value13) {
+  const vector = normalizeVector(value12),
+    vector2 = normalizeVector(value13);
+  if (!vector || !vector2) return null;
+  const clamp2 = clamp(dot(vector, vector2), -0x1, 0x1);
+  if (clamp2 > 0x1 - EPSILON) return [...IDENTITY_QUATERNION];
+  if (clamp2 < -0x1 + EPSILON) {
+    const cross4 = cross(vector, { x: 0x1, y: 0x0, z: 0x0 }),
+      cross5 = cross(vector, { x: 0x0, y: 0x0, z: 0x1 }),
+      box7 = normalizeVector(vectorLength(cross4) > vectorLength(cross5) ? cross4 : cross5);
+    return box7 ? [box7['x'], box7['y'], box7['z'], 0x0] : null;
   }
-  const _0x5b3c75 = cross(_0x31f5c7, _0x188ad2),
-    _0x5dc174 = Math['sqrt']((0x1 + _0x4b0b8a) * 0x2);
-  return normalizeQuaternion([
-    _0x5b3c75['x'] / _0x5dc174,
-    _0x5b3c75['y'] / _0x5dc174,
-    _0x5b3c75['z'] / _0x5dc174,
-    _0x5dc174 / 0x2,
-  ]);
+  const box8 = cross(vector, vector2),
+    value14 = Math['sqrt']((0x1 + clamp2) * 0x2);
+  return normalizeQuaternion([box8['x'] / value14, box8['y'] / value14, box8['z'] / value14, value14 / 0x2]);
 }
-function quaternionFromBasis(_0x1b4ac2, _0x5264e1, _0x12f476) {
-  const _0x3f73c5 = _0x1b4ac2['x'],
-    _0x4665a3 = _0x5264e1['x'],
-    _0x330491 = _0x12f476['x'],
-    _0x12e733 = _0x1b4ac2['y'],
-    _0x7ef007 = _0x5264e1['y'],
-    _0x1c2cea = _0x12f476['y'],
-    _0x354e4d = _0x1b4ac2['z'],
-    _0x5aa79d = _0x5264e1['z'],
-    _0x47db70 = _0x12f476['z'],
-    _0x22d880 = _0x3f73c5 + _0x7ef007 + _0x47db70;
-  let _0x2482fc;
-  if (_0x22d880 > 0x0) {
-    const _0x25e70a = 0.5 / Math['sqrt'](_0x22d880 + 0x1);
-    _0x2482fc = [
-      (_0x5aa79d - _0x1c2cea) * _0x25e70a,
-      (_0x330491 - _0x354e4d) * _0x25e70a,
-      (_0x12e733 - _0x4665a3) * _0x25e70a,
-      0.25 / _0x25e70a,
+function quaternionFromBasis(box9, box10, box11) {
+  const value15 = box9['x'],
+    value16 = box10['x'],
+    value17 = box11['x'],
+    value18 = box9['y'],
+    value19 = box10['y'],
+    value20 = box11['y'],
+    value21 = box9['z'],
+    value22 = box10['z'],
+    value23 = box11['z'],
+    count = value15 + value19 + value23;
+  let value24;
+  if (count > 0x0) {
+    const value25 = 0.5 / Math['sqrt'](count + 0x1);
+    value24 = [
+      (value22 - value20) * value25,
+      (value17 - value21) * value25,
+      (value18 - value16) * value25,
+      0.25 / value25,
     ];
   } else {
-    if (_0x3f73c5 > _0x7ef007 && _0x3f73c5 > _0x47db70) {
-      const _0x15de00 = 0x2 * Math['sqrt'](0x1 + _0x3f73c5 - _0x7ef007 - _0x47db70);
-      _0x2482fc = [
-        0.25 * _0x15de00,
-        (_0x4665a3 + _0x12e733) / _0x15de00,
-        (_0x330491 + _0x354e4d) / _0x15de00,
-        (_0x5aa79d - _0x1c2cea) / _0x15de00,
+    if (value15 > value19 && value15 > value23) {
+      const value26 = 0x2 * Math['sqrt'](0x1 + value15 - value19 - value23);
+      value24 = [
+        0.25 * value26,
+        (value16 + value18) / value26,
+        (value17 + value21) / value26,
+        (value22 - value20) / value26,
       ];
     } else {
-      if (_0x7ef007 > _0x47db70) {
-        const _0x11d423 = 0x2 * Math['sqrt'](0x1 + _0x7ef007 - _0x3f73c5 - _0x47db70);
-        _0x2482fc = [
-          (_0x4665a3 + _0x12e733) / _0x11d423,
-          0.25 * _0x11d423,
-          (_0x1c2cea + _0x5aa79d) / _0x11d423,
-          (_0x330491 - _0x354e4d) / _0x11d423,
+      if (value19 > value23) {
+        const value27 = 0x2 * Math['sqrt'](0x1 + value19 - value15 - value23);
+        value24 = [
+          (value16 + value18) / value27,
+          0.25 * value27,
+          (value20 + value22) / value27,
+          (value17 - value21) / value27,
         ];
       } else {
-        const _0xe29c0a = 0x2 * Math['sqrt'](0x1 + _0x47db70 - _0x3f73c5 - _0x7ef007);
-        _0x2482fc = [
-          (_0x330491 + _0x354e4d) / _0xe29c0a,
-          (_0x1c2cea + _0x5aa79d) / _0xe29c0a,
-          0.25 * _0xe29c0a,
-          (_0x12e733 - _0x4665a3) / _0xe29c0a,
+        const value28 = 0x2 * Math['sqrt'](0x1 + value23 - value15 - value19);
+        value24 = [
+          (value17 + value21) / value28,
+          (value20 + value22) / value28,
+          0.25 * value28,
+          (value18 - value16) / value28,
         ];
       }
     }
   }
-  return normalizeQuaternion(_0x2482fc);
+  return normalizeQuaternion(value24);
 }
-function frameQuaternion(_0x1ea61c, _0xee16a5) {
-  const _0x1bab1b = normalizeVector(_0xee16a5);
-  if (!_0x1bab1b) return null;
-  const _0x4b7612 = subtract(_0x1ea61c, scaleVector(_0x1bab1b, dot(_0x1ea61c, _0x1bab1b))),
-    _0x4decbf = normalizeVector(_0x4b7612);
-  if (!_0x4decbf) return null;
-  const _0x448ffd = normalizeVector(cross(_0x4decbf, _0x1bab1b));
-  if (!_0x448ffd) return null;
-  const _0x20ccf9 = normalizeVector(cross(_0x1bab1b, _0x448ffd));
-  return _0x20ccf9 ? quaternionFromBasis(_0x20ccf9, _0x1bab1b, _0x448ffd) : null;
+function frameQuaternion(value29, value30) {
+  const vector3 = normalizeVector(value30);
+  if (!vector3) return null;
+  const subtract2 = subtract(value29, scaleVector(vector3, dot(value29, vector3))),
+    vector4 = normalizeVector(subtract2);
+  if (!vector4) return null;
+  const vector5 = normalizeVector(cross(vector4, vector3));
+  if (!vector5) return null;
+  const vector6 = normalizeVector(cross(vector3, vector5));
+  return vector6 ? quaternionFromBasis(vector6, vector3, vector5) : null;
 }
-function quaternionFraction(_0xc208ed, _0x1ca7d7) {
-  const _0x227c5d = normalizeQuaternion(_0xc208ed);
-  if (!_0x227c5d) return null;
-  const _0x5853ee = clamp(_0x227c5d[0x3], -0x1, 0x1),
-    _0x5f1634 = 0x2 * Math['acos'](_0x5853ee);
-  if (_0x5f1634 <= EPSILON) return [...IDENTITY_QUATERNION];
-  const _0x295afa = Math['sin'](_0x5f1634 / 0x2);
-  if (Math['abs'](_0x295afa) <= EPSILON) return [...IDENTITY_QUATERNION];
-  const _0x32a645 = _0x227c5d['slice'](0x0, 0x3)['map']((_0x20199d) => _0x20199d / _0x295afa),
-    _0x3197a2 = (_0x5f1634 * clamp(_0x1ca7d7, 0x0, 0x1)) / 0x2,
-    _0x2bc2bf = Math['sin'](_0x3197a2);
+function quaternionFraction(value31, value32) {
+  const list4 = normalizeQuaternion(value31);
+  if (!list4) return null;
+  const clamp3 = clamp(list4[0x3], -0x1, 0x1),
+    value33 = 0x2 * Math['acos'](clamp3);
+  if (value33 <= EPSILON) return [...IDENTITY_QUATERNION];
+  const value34 = Math['sin'](value33 / 0x2);
+  if (Math['abs'](value34) <= EPSILON) return [...IDENTITY_QUATERNION];
+  const value35 = list4['slice'](0x0, 0x3)['map']((value36) => value36 / value34),
+    value37 = (value33 * clamp(value32, 0x0, 0x1)) / 0x2,
+    value38 = Math['sin'](value37);
   return normalizeQuaternion([
-    _0x32a645[0x0] * _0x2bc2bf,
-    _0x32a645[0x1] * _0x2bc2bf,
-    _0x32a645[0x2] * _0x2bc2bf,
-    Math['cos'](_0x3197a2),
+    value35[0x0] * value38,
+    value35[0x1] * value38,
+    value35[0x2] * value38,
+    Math['cos'](value37),
   ]);
 }
-function clampQuaternionAngle(_0x2084bc, _0xd00ab2) {
-  const _0x691476 = normalizeQuaternion(_0x2084bc);
-  if (!_0x691476) return null;
-  const _0x342520 = 0x2 * Math['acos'](clamp(_0x691476[0x3], -0x1, 0x1));
-  if (!Number['isFinite'](_0xd00ab2) || _0x342520 <= _0xd00ab2) return _0x691476;
-  return quaternionFraction(_0x691476, _0xd00ab2 / Math['max'](EPSILON, _0x342520));
+function clampQuaternionAngle(value39, value40) {
+  const quaternion = normalizeQuaternion(value39);
+  if (!quaternion) return null;
+  const value41 = 0x2 * Math['acos'](clamp(quaternion[0x3], -0x1, 0x1));
+  if (!Number['isFinite'](value40) || value41 <= value40) return quaternion;
+  return quaternionFraction(quaternion, value40 / Math['max'](EPSILON, value41));
 }
-function toStoryboard3DRigQuaternion(_0x59fd6a) {
-  const _0x2709b0 = normalizeQuaternion(_0x59fd6a);
-  if (!_0x2709b0) return null;
-  return normalizeQuaternion([_0x2709b0[0x0], -_0x2709b0[0x1], -_0x2709b0[0x2], _0x2709b0[0x3]]);
+function toStoryboard3DRigQuaternion(value42) {
+  const quaternion2 = normalizeQuaternion(value42);
+  if (!quaternion2) return null;
+  return normalizeQuaternion([quaternion2[0x0], -quaternion2[0x1], -quaternion2[0x2], quaternion2[0x3]]);
 }
-function unwrapLandmarks(_0x373313) {
-  let _0x22d791 =
-    _0x373313?.['worldLandmarks'] ??
-    _0x373313?.['poseWorldLandmarks'] ??
-    _0x373313?.['landmarks'] ??
-    _0x373313;
-  if (Array['isArray'](_0x22d791?.[0x0])) _0x22d791 = _0x22d791[0x0];
-  return Array['isArray'](_0x22d791) && _0x22d791['length'] >= 0x21 ? _0x22d791 : null;
+function unwrapLandmarks(value43) {
+  let list5 =
+    value43?.['worldLandmarks'] ?? value43?.['poseWorldLandmarks'] ?? value43?.['landmarks'] ?? value43;
+  if (Array['isArray'](list5?.[0x0])) list5 = list5[0x0];
+  return Array['isArray'](list5) && list5['length'] >= 0x21 ? list5 : null;
 }
-function landmarkVisibility(_0x56eae5) {
-  if (!_0x56eae5 || typeof _0x56eae5 !== 'object') return 0x0;
-  const _0x235a4c = finiteNumber(_0x56eae5['visibility']),
-    _0x249acd = finiteNumber(_0x56eae5['presence']);
-  if (_0x235a4c !== null && _0x249acd !== null) return clamp(Math['min'](_0x235a4c, _0x249acd), 0x0, 0x1);
-  if (_0x235a4c !== null) return clamp(_0x235a4c, 0x0, 0x1);
-  if (_0x249acd !== null) return clamp(_0x249acd, 0x0, 0x1);
+function landmarkVisibility(enabled) {
+  if (!enabled || typeof enabled !== 'object') return 0x0;
+  const finiteNumber2 = finiteNumber(enabled['visibility']),
+    finiteNumber3 = finiteNumber(enabled['presence']);
+  if (finiteNumber2 !== null && finiteNumber3 !== null)
+    return clamp(Math['min'](finiteNumber2, finiteNumber3), 0x0, 0x1);
+  if (finiteNumber2 !== null) return clamp(finiteNumber2, 0x0, 0x1);
+  if (finiteNumber3 !== null) return clamp(finiteNumber3, 0x0, 0x1);
   return 0x1;
 }
-function convertLandmark(_0xefa999, { mirrorX: _0x40071e, invertY: _0x519774, invertZ: _0x20c5d2 }) {
-  const _0x48b457 = finiteNumber(_0xefa999?.['x']),
-    _0x58ff6 = finiteNumber(_0xefa999?.['y']),
-    _0x1134d5 = finiteNumber(_0xefa999?.['z']);
-  if (_0x48b457 === null || _0x58ff6 === null || _0x1134d5 === null) return null;
+function convertLandmark(box12, { mirrorX: mirrorX2, invertY: invertY2, invertZ: invertZ2 }) {
+  const finiteNumber4 = finiteNumber(box12?.['x']),
+    finiteNumber5 = finiteNumber(box12?.['y']),
+    finiteNumber6 = finiteNumber(box12?.['z']);
+  if (finiteNumber4 === null || finiteNumber5 === null || finiteNumber6 === null) return null;
   return {
-    x: _0x40071e ? -_0x48b457 : _0x48b457,
-    y: _0x519774 ? -_0x58ff6 : _0x58ff6,
-    z: _0x20c5d2 ? -_0x1134d5 : _0x1134d5,
-    visibility: landmarkVisibility(_0xefa999),
+    x: mirrorX2 ? -finiteNumber4 : finiteNumber4,
+    y: invertY2 ? -finiteNumber5 : finiteNumber5,
+    z: invertZ2 ? -finiteNumber6 : finiteNumber6,
+    visibility: landmarkVisibility(box12),
   };
 }
-function normalizationScale(_0x5e1895) {
+function normalizationScale(value44) {
   const {
-      leftShoulder: _0x3cc81f,
-      rightShoulder: _0x219846,
-      leftHip: _0x3f10dd,
-      rightHip: _0x3ef5d4,
+      leftShoulder: leftShoulder,
+      rightShoulder: rightShoulder,
+      leftHip: leftHip,
+      rightHip: rightHip,
     } = MEDIAPIPE_POSE_LANDMARK_INDEX,
-    _0x1772a6 =
-      _0x5e1895[_0x3cc81f] && _0x5e1895[_0x219846]
-        ? midpoint(_0x5e1895[_0x3cc81f], _0x5e1895[_0x219846])
+    value45 =
+      value44[leftShoulder] && value44[rightShoulder]
+        ? midpoint(value44[leftShoulder], value44[rightShoulder])
         : null,
-    _0x149529 =
-      _0x5e1895[_0x3f10dd] && _0x5e1895[_0x3ef5d4]
-        ? midpoint(_0x5e1895[_0x3f10dd], _0x5e1895[_0x3ef5d4])
-        : null,
-    _0x4f4f59 = _0x1772a6 && _0x149529 ? vectorLength(subtract(_0x1772a6, _0x149529)) : 0x0;
-  if (_0x4f4f59 > EPSILON) return { origin: _0x149529, scale: _0x4f4f59 };
-  const _0xe2261e = [
-      _0x5e1895[_0x3cc81f] && _0x5e1895[_0x219846]
-        ? vectorLength(subtract(_0x5e1895[_0x3cc81f], _0x5e1895[_0x219846]))
+    origin = value44[leftHip] && value44[rightHip] ? midpoint(value44[leftHip], value44[rightHip]) : null,
+    scale = value45 && origin ? vectorLength(subtract(value45, origin)) : 0x0;
+  if (scale > EPSILON) return { origin: origin, scale: scale };
+  const list6 = [
+      value44[leftShoulder] && value44[rightShoulder]
+        ? vectorLength(subtract(value44[leftShoulder], value44[rightShoulder]))
         : 0x0,
-      _0x5e1895[_0x3f10dd] && _0x5e1895[_0x3ef5d4]
-        ? vectorLength(subtract(_0x5e1895[_0x3f10dd], _0x5e1895[_0x3ef5d4]))
+      value44[leftHip] && value44[rightHip]
+        ? vectorLength(subtract(value44[leftHip], value44[rightHip]))
         : 0x0,
-    ]['filter']((_0x4fe1c8) => _0x4fe1c8 > EPSILON),
-    _0x2ed29c =
-      _0xe2261e['length'] > 0x0
-        ? _0xe2261e['reduce']((_0x91a321, _0x1ee55f) => _0x91a321 + _0x1ee55f, 0x0) / _0xe2261e['length']
+    ]['filter']((value46) => value46 > EPSILON),
+    scale2 =
+      list6['length'] > 0x0
+        ? list6['reduce']((value47, value48) => value47 + value48, 0x0) / list6['length']
         : 0x0;
-  return _0x2ed29c > EPSILON ? { origin: _0x149529 || { x: 0x0, y: 0x0, z: 0x0 }, scale: _0x2ed29c } : null;
+  return scale2 > EPSILON ? { origin: origin || { x: 0x0, y: 0x0, z: 0x0 }, scale: scale2 } : null;
 }
-function normalizeLandmarks(_0x3b76a4, _0x1d3d01) {
-  const _0x61472a = _0x3b76a4['map']((_0x3b1eb7) => convertLandmark(_0x3b1eb7, _0x1d3d01)),
-    _0xf6f06a = normalizationScale(_0x61472a);
-  if (!_0xf6f06a) return null;
-  return _0x61472a['map'](
-    (_0x552afc) =>
-      _0x552afc && {
-        ...scaleVector(subtract(_0x552afc, _0xf6f06a['origin']), 0x1 / _0xf6f06a['scale']),
-        visibility: _0x552afc['visibility'],
+function normalizeLandmarks(list7, value49) {
+  const list8 = list7['map']((value50) => convertLandmark(value50, value49)),
+    box13 = normalizationScale(list8);
+  if (!box13) return null;
+  return list8['map'](
+    (visibility2) =>
+      visibility2 && {
+        ...scaleVector(subtract(visibility2, box13['origin']), 0x1 / box13['scale']),
+        visibility: visibility2['visibility'],
       },
   );
 }
-function confidenceFor(_0x40fec0, _0x4b4fdc) {
-  const _0x18c83c = [...new Set(_0x4b4fdc)]['map'](
-    (_0x41cdf8) => _0x40fec0[_0x41cdf8]?.['visibility'] ?? 0x0,
-  );
-  return _0x18c83c['length'] > 0x0 ? Math['min'](..._0x18c83c) : 0x0;
+function confidenceFor(value51, value52) {
+  const list9 = [...new Set(value52)]['map']((value53) => value51[value53]?.['visibility'] ?? 0x0);
+  return list9['length'] > 0x0 ? Math['min'](...list9) : 0x0;
 }
-function average(_0x3989d6) {
-  return _0x3989d6['length'] > 0x0
-    ? _0x3989d6['reduce']((_0x53ca63, _0xc92366) => _0x53ca63 + _0xc92366, 0x0) / _0x3989d6['length']
+function average(list10) {
+  return list10['length'] > 0x0
+    ? list10['reduce']((value54, value55) => value54 + value55, 0x0) / list10['length']
     : 0x0;
 }
-function handTarget(_0x25e183, _0x267d95) {
-  const _0x463dca = MEDIAPIPE_POSE_LANDMARK_INDEX,
-    _0x37a28d = _0x25e183[_0x463dca[_0x267d95 + 'Wrist']],
-    _0x3255a9 = _0x25e183[_0x463dca[_0x267d95 + 'Pinky']],
-    _0xa47ff = _0x25e183[_0x463dca[_0x267d95 + 'Index']];
-  return _0x37a28d && _0x3255a9 && _0xa47ff
-    ? segmentDirection(_0x37a28d, midpoint(_0x3255a9, _0xa47ff))
-    : null;
+function handTarget(value56, value57) {
+  const value58 = MEDIAPIPE_POSE_LANDMARK_INDEX,
+    value59 = value56[value58[value57 + 'Wrist']],
+    value60 = value56[value58[value57 + 'Pinky']],
+    value61 = value56[value58[value57 + 'Index']];
+  return value59 && value60 && value61 ? segmentDirection(value59, midpoint(value60, value61)) : null;
 }
-function retargetArm(_0x3389a9, _0x520857, _0x2fbc23) {
-  const _0x4b9dd9 = MEDIAPIPE_POSE_LANDMARK_INDEX,
-    _0x3f6040 = _0x3389a9[_0x4b9dd9[_0x520857 + 'Shoulder']],
-    _0x1cbeac = _0x3389a9[_0x4b9dd9[_0x520857 + 'Elbow']],
-    _0x48a682 = _0x3389a9[_0x4b9dd9[_0x520857 + 'Wrist']],
-    _0x1425f6 = invertQuaternion(_0x2fbc23),
-    _0x29265e = segmentDirection(_0x3f6040, _0x1cbeac),
-    _0x4615de = segmentDirection(_0x1cbeac, _0x48a682),
-    _0x43e6a4 = handTarget(_0x3389a9, _0x520857);
-  if (!_0x29265e || !_0x4615de) return null;
-  const _0x49ee61 = ARM_REST_DIRECTION[_0x520857],
-    _0x4e35ba = rotateVectorByQuaternion(_0x29265e, _0x1425f6),
-    _0x3fe71d = rotateVectorByQuaternion(_0x4615de, _0x1425f6),
-    _0x3b8705 = quaternionFromTo(_0x49ee61, _0x4e35ba),
-    _0x355b8b = quaternionFromTo(_0x49ee61, _0x3fe71d);
-  if (!_0x3b8705 || !_0x355b8b) return null;
-  const _0x1b3b7f = multiplyQuaternions(invertQuaternion(_0x3b8705), _0x355b8b);
-  let _0x571790 = null;
-  if (_0x43e6a4) {
-    const _0x28aef8 = rotateVectorByQuaternion(_0x43e6a4, _0x1425f6),
-      _0x2014de = quaternionFromTo(_0x49ee61, _0x28aef8);
-    _0x571790 = _0x2014de ? multiplyQuaternions(invertQuaternion(_0x355b8b), _0x2014de) : null;
+function retargetArm(value62, value63, value64) {
+  const value65 = MEDIAPIPE_POSE_LANDMARK_INDEX,
+    value66 = value62[value65[value63 + 'Shoulder']],
+    value67 = value62[value65[value63 + 'Elbow']],
+    value68 = value62[value65[value63 + 'Wrist']],
+    invertQuaternion2 = invertQuaternion(value64),
+    segmentDirection2 = segmentDirection(value66, value67),
+    segmentDirection3 = segmentDirection(value67, value68),
+    handTarget2 = handTarget(value62, value63);
+  if (!segmentDirection2 || !segmentDirection3) return null;
+  const value69 = ARM_REST_DIRECTION[value63],
+    rotateVectorByQuaternion2 = rotateVectorByQuaternion(segmentDirection2, invertQuaternion2),
+    rotateVectorByQuaternion3 = rotateVectorByQuaternion(segmentDirection3, invertQuaternion2),
+    upper = quaternionFromTo(value69, rotateVectorByQuaternion2),
+    quaternionFromTo2 = quaternionFromTo(value69, rotateVectorByQuaternion3);
+  if (!upper || !quaternionFromTo2) return null;
+  const lower = multiplyQuaternions(invertQuaternion(upper), quaternionFromTo2);
+  let hand = null;
+  if (handTarget2) {
+    const rotateVectorByQuaternion4 = rotateVectorByQuaternion(handTarget2, invertQuaternion2),
+      quaternionFromTo3 = quaternionFromTo(value69, rotateVectorByQuaternion4);
+    hand = quaternionFromTo3
+      ? multiplyQuaternions(invertQuaternion(quaternionFromTo2), quaternionFromTo3)
+      : null;
   }
-  return { upper: _0x3b8705, lower: _0x1b3b7f, hand: _0x571790 };
+  return { upper: upper, lower: lower, hand: hand };
 }
-function retargetLeg(_0x2576bc, _0x362004, _0x1021a1) {
-  const _0x21043d = MEDIAPIPE_POSE_LANDMARK_INDEX,
-    _0x563d2f = _0x2576bc[_0x21043d[_0x362004 + 'Hip']],
-    _0x240a8e = _0x2576bc[_0x21043d[_0x362004 + 'Knee']],
-    _0x25ba8f = _0x2576bc[_0x21043d[_0x362004 + 'Ankle']],
-    _0x34612d = _0x2576bc[_0x21043d[_0x362004 + 'FootIndex']],
-    _0x4db7e5 = invertQuaternion(_0x1021a1),
-    _0x4c7822 = segmentDirection(_0x563d2f, _0x240a8e),
-    _0xb49b6e = segmentDirection(_0x240a8e, _0x25ba8f);
-  if (!_0x4c7822 || !_0xb49b6e) return null;
-  const _0x59e9d4 = rotateVectorByQuaternion(_0x4c7822, _0x4db7e5),
-    _0x8e963f = rotateVectorByQuaternion(_0xb49b6e, _0x4db7e5),
-    _0x39d91e = quaternionFromTo(LEG_REST_DIRECTION, _0x59e9d4),
-    _0x55b2d0 = quaternionFromTo(LEG_REST_DIRECTION, _0x8e963f);
-  if (!_0x39d91e || !_0x55b2d0) return null;
-  const _0x3a3cc1 = multiplyQuaternions(invertQuaternion(_0x39d91e), _0x55b2d0);
-  let _0x459e5f = null;
-  const _0x389e2c = segmentDirection(_0x25ba8f, _0x34612d);
-  if (_0x389e2c) {
-    const _0x1cc798 = rotateVectorByQuaternion(_0x389e2c, _0x4db7e5),
-      _0x1eecac = quaternionFromTo(WORLD_FORWARD, _0x1cc798);
-    _0x459e5f = _0x1eecac ? multiplyQuaternions(invertQuaternion(_0x55b2d0), _0x1eecac) : null;
+function retargetLeg(value70, value71, value72) {
+  const value73 = MEDIAPIPE_POSE_LANDMARK_INDEX,
+    value74 = value70[value73[value71 + 'Hip']],
+    value75 = value70[value73[value71 + 'Knee']],
+    value76 = value70[value73[value71 + 'Ankle']],
+    value77 = value70[value73[value71 + 'FootIndex']],
+    invertQuaternion3 = invertQuaternion(value72),
+    segmentDirection4 = segmentDirection(value74, value75),
+    segmentDirection5 = segmentDirection(value75, value76);
+  if (!segmentDirection4 || !segmentDirection5) return null;
+  const rotateVectorByQuaternion5 = rotateVectorByQuaternion(segmentDirection4, invertQuaternion3),
+    rotateVectorByQuaternion6 = rotateVectorByQuaternion(segmentDirection5, invertQuaternion3),
+    thigh = quaternionFromTo(LEG_REST_DIRECTION, rotateVectorByQuaternion5),
+    quaternionFromTo4 = quaternionFromTo(LEG_REST_DIRECTION, rotateVectorByQuaternion6);
+  if (!thigh || !quaternionFromTo4) return null;
+  const calf = multiplyQuaternions(invertQuaternion(thigh), quaternionFromTo4);
+  let foot = null;
+  const segmentDirection6 = segmentDirection(value76, value77);
+  if (segmentDirection6) {
+    const rotateVectorByQuaternion7 = rotateVectorByQuaternion(segmentDirection6, invertQuaternion3),
+      quaternionFromTo5 = quaternionFromTo(WORLD_FORWARD, rotateVectorByQuaternion7);
+    foot = quaternionFromTo5
+      ? multiplyQuaternions(invertQuaternion(quaternionFromTo4), quaternionFromTo5)
+      : null;
   }
-  return { thigh: _0x39d91e, calf: _0x3a3cc1, foot: _0x459e5f };
+  return { thigh: thigh, calf: calf, foot: foot };
 }
-function buildBodyFrames(_0x202d1e) {
-  const _0x5dccdb = MEDIAPIPE_POSE_LANDMARK_INDEX,
-    _0x87120a = _0x202d1e[_0x5dccdb['leftShoulder']],
-    _0xfada08 = _0x202d1e[_0x5dccdb['rightShoulder']],
-    _0x581167 = _0x202d1e[_0x5dccdb['leftHip']],
-    _0x2ac143 = _0x202d1e[_0x5dccdb['rightHip']];
-  if (!_0x87120a || !_0xfada08 || !_0x581167 || !_0x2ac143) return null;
-  const _0x204ab5 = midpoint(_0x87120a, _0xfada08),
-    _0x5b3b6b = midpoint(_0x581167, _0x2ac143),
-    _0x318082 = subtract(_0x204ab5, _0x5b3b6b),
-    _0x2c5e5b = frameQuaternion(subtract(_0x2ac143, _0x581167), WORLD_UP),
-    _0x1d841d = frameQuaternion(subtract(_0xfada08, _0x87120a), _0x318082);
-  if (!_0x2c5e5b || !_0x1d841d) return null;
+function buildBodyFrames(value78) {
+  const value79 = MEDIAPIPE_POSE_LANDMARK_INDEX,
+    enabled2 = value78[value79['leftShoulder']],
+    enabled3 = value78[value79['rightShoulder']],
+    enabled4 = value78[value79['leftHip']],
+    enabled5 = value78[value79['rightHip']];
+  if (!enabled2 || !enabled3 || !enabled4 || !enabled5) return null;
+  const shoulderMid = midpoint(enabled2, enabled3),
+    midpoint2 = midpoint(enabled4, enabled5),
+    subtract3 = subtract(shoulderMid, midpoint2),
+    pelvisQuaternion = frameQuaternion(subtract(enabled5, enabled4), WORLD_UP),
+    torsoQuaternion = frameQuaternion(subtract(enabled3, enabled2), subtract3);
+  if (!pelvisQuaternion || !torsoQuaternion) return null;
   return {
-    shoulderMid: _0x204ab5,
-    pelvisQuaternion: _0x2c5e5b,
-    torsoQuaternion: _0x1d841d,
-    spineQuaternion: multiplyQuaternions(invertQuaternion(_0x2c5e5b), _0x1d841d),
+    shoulderMid: shoulderMid,
+    pelvisQuaternion: pelvisQuaternion,
+    torsoQuaternion: torsoQuaternion,
+    spineQuaternion: multiplyQuaternions(invertQuaternion(pelvisQuaternion), torsoQuaternion),
   };
 }
-function warning(_0x5d354f, _0x28aaa4, _0x41eb5c = {}) {
-  return { code: _0x5d354f, message: _0x28aaa4, ..._0x41eb5c };
+function warning(code, message, args = {}) {
+  return { code: code, message: message, ...args };
 }
 export function retargetMediaPipePoseToStoryboard3D(
-  _0x40ca40,
+  value80,
   {
     minVisibility: minVisibility = DEFAULT_IMAGE_POSE_MIN_VISIBILITY,
     mirrorX: mirrorX = !![],
@@ -419,8 +409,8 @@ export function retargetMediaPipePoseToStoryboard3D(
     invertZ: invertZ = !![],
   } = {},
 ) {
-  const _0x5820ac = unwrapLandmarks(_0x40ca40);
-  if (!_0x5820ac)
+  const unwrapLandmarks2 = unwrapLandmarks(value80);
+  if (!unwrapLandmarks2)
     return {
       boneOverrides: {},
       confidence: 0x0,
@@ -429,12 +419,12 @@ export function retargetMediaPipePoseToStoryboard3D(
         warning('POSE_LANDMARKS_INVALID', 'MediaPipe pose retargeting requires at least 33 world landmarks.'),
       ],
     };
-  const _0x1253f7 = normalizeLandmarks(_0x5820ac, {
+  const landmarks = normalizeLandmarks(unwrapLandmarks2, {
     mirrorX: mirrorX !== ![],
     invertY: invertY !== ![],
     invertZ: invertZ !== ![],
   });
-  if (!_0x1253f7)
+  if (!landmarks)
     return {
       boneOverrides: {},
       confidence: 0x0,
@@ -443,127 +433,122 @@ export function retargetMediaPipePoseToStoryboard3D(
         warning('POSE_SCALE_UNAVAILABLE', 'Pose landmarks do not contain a usable torso or body scale.'),
       ],
     };
-  const _0x5863ac = clamp(minVisibility, 0x0, 0x1),
-    _0x51d1ef = MEDIAPIPE_POSE_LANDMARK_INDEX,
-    _0x13a1bd = {},
-    _0x4841a5 = {},
-    _0x36e3f8 = [],
-    _0x1bddf0 = [],
-    _0x4f762d = (_0x3c71e3, _0x25e0c3, _0x4f3ae8) => {
-      const _0x35e96f = confidenceFor(_0x1253f7, _0x25e0c3);
-      _0x4841a5[_0x3c71e3] = _0x35e96f;
-      if (_0x35e96f < _0x5863ac) {
-        _0x36e3f8['push'](_0x3c71e3);
+  const threshold = clamp(minVisibility, 0x0, 0x1),
+    value81 = MEDIAPIPE_POSE_LANDMARK_INDEX,
+    boneOverrides = {},
+    boneConfidence = {},
+    bones = [],
+    bones2 = [],
+    handler = (value82, value83, handler2) => {
+      const confidenceFor2 = confidenceFor(landmarks, value83);
+      boneConfidence[value82] = confidenceFor2;
+      if (confidenceFor2 < threshold) {
+        bones['push'](value82);
         return;
       }
-      const _0x30c228 = _0x4f3ae8(),
-        _0x16855e = clampQuaternionAngle(_0x30c228, BONE_ANGLE_LIMITS[_0x3c71e3]);
-      if (!_0x16855e) {
-        _0x1bddf0['push'](_0x3c71e3);
+      const value84 = handler2(),
+        clampQuaternionAngle2 = clampQuaternionAngle(value84, BONE_ANGLE_LIMITS[value82]);
+      if (!clampQuaternionAngle2) {
+        bones2['push'](value82);
         return;
       }
-      _0x13a1bd[_0x3c71e3] = toStoryboard3DRigQuaternion(_0x16855e);
+      boneOverrides[value82] = toStoryboard3DRigQuaternion(clampQuaternionAngle2);
     },
-    _0x45ae32 = [
-      _0x51d1ef['leftShoulder'],
-      _0x51d1ef['rightShoulder'],
-      _0x51d1ef['leftHip'],
-      _0x51d1ef['rightHip'],
-    ],
-    _0x24eee7 = buildBodyFrames(_0x1253f7);
-  _0x4f762d('pelvis', [_0x51d1ef['leftHip'], _0x51d1ef['rightHip']], () => _0x24eee7?.['pelvisQuaternion']);
-  const _0x233339 = _0x24eee7?.['spineQuaternion']
-    ? quaternionFraction(_0x24eee7['spineQuaternion'], 0x1 / 0x3)
+    args2 = [value81['leftShoulder'], value81['rightShoulder'], value81['leftHip'], value81['rightHip']],
+    bodyFrames = buildBodyFrames(landmarks);
+  handler('pelvis', [value81['leftHip'], value81['rightHip']], () => bodyFrames?.['pelvisQuaternion']);
+  const value85 = bodyFrames?.['spineQuaternion']
+    ? quaternionFraction(bodyFrames['spineQuaternion'], 0x1 / 0x3)
     : null;
-  for (const _0x18d306 of ['spine_01', 'spine_02', 'spine_03']) {
-    _0x4f762d(_0x18d306, _0x45ae32, () => _0x233339);
+  for (const value86 of ['spine_01', 'spine_02', 'spine_03']) {
+    handler(value86, args2, () => value85);
   }
-  const _0x3facbd = [..._0x45ae32, _0x51d1ef['leftEar'], _0x51d1ef['rightEar']];
-  let _0x4d7ec4 = null;
-  (_0x4f762d('neck_01', _0x3facbd, () => {
-    if (!_0x24eee7) return null;
-    const _0x479959 = midpoint(_0x1253f7[_0x51d1ef['leftEar']], _0x1253f7[_0x51d1ef['rightEar']]),
-      _0x8c6703 = segmentDirection(_0x24eee7['shoulderMid'], _0x479959);
-    if (!_0x8c6703) return null;
-    const _0x53f728 = rotateVectorByQuaternion(_0x8c6703, invertQuaternion(_0x24eee7['torsoQuaternion']));
-    return ((_0x4d7ec4 = quaternionFromTo(WORLD_UP, _0x53f728)), _0x4d7ec4);
+  const args3 = [...args2, value81['leftEar'], value81['rightEar']];
+  let quaternionFromTo6 = null;
+  (handler('neck_01', args3, () => {
+    if (!bodyFrames) return null;
+    const midpoint3 = midpoint(landmarks[value81['leftEar']], landmarks[value81['rightEar']]),
+      segmentDirection7 = segmentDirection(bodyFrames['shoulderMid'], midpoint3);
+    if (!segmentDirection7) return null;
+    const rotateVectorByQuaternion8 = rotateVectorByQuaternion(
+      segmentDirection7,
+      invertQuaternion(bodyFrames['torsoQuaternion']),
+    );
+    return ((quaternionFromTo6 = quaternionFromTo(WORLD_UP, rotateVectorByQuaternion8)), quaternionFromTo6);
   }),
-    _0x4f762d('Head', [..._0x3facbd, _0x51d1ef['nose']], () => {
-      if (!_0x24eee7 || !_0x4d7ec4) return null;
-      const _0x150d66 = midpoint(_0x1253f7[_0x51d1ef['leftEar']], _0x1253f7[_0x51d1ef['rightEar']]),
-        _0x3dc5a3 = segmentDirection(_0x150d66, _0x1253f7[_0x51d1ef['nose']]);
-      if (!_0x3dc5a3) return null;
-      const _0x49f238 = rotateVectorByQuaternion(_0x3dc5a3, invertQuaternion(_0x24eee7['torsoQuaternion'])),
-        _0x4df932 = quaternionFromTo(WORLD_FORWARD, _0x49f238);
-      return _0x4df932 ? multiplyQuaternions(invertQuaternion(_0x4d7ec4), _0x4df932) : null;
+    handler('Head', [...args3, value81['nose']], () => {
+      if (!bodyFrames || !quaternionFromTo6) return null;
+      const midpoint4 = midpoint(landmarks[value81['leftEar']], landmarks[value81['rightEar']]),
+        segmentDirection8 = segmentDirection(midpoint4, landmarks[value81['nose']]);
+      if (!segmentDirection8) return null;
+      const rotateVectorByQuaternion9 = rotateVectorByQuaternion(
+          segmentDirection8,
+          invertQuaternion(bodyFrames['torsoQuaternion']),
+        ),
+        quaternionFromTo7 = quaternionFromTo(WORLD_FORWARD, rotateVectorByQuaternion9);
+      return quaternionFromTo7
+        ? multiplyQuaternions(invertQuaternion(quaternionFromTo6), quaternionFromTo7)
+        : null;
     }));
-  for (const _0x558512 of ['left', 'right']) {
-    const _0x54ce86 = _0x558512 === 'left' ? 'l' : 'r',
-      _0x3c62ee = [..._0x45ae32, _0x51d1ef[_0x558512 + 'Elbow'], _0x51d1ef[_0x558512 + 'Wrist']];
-    let _0x5b46c9 = null;
-    const _0x12f85c = () => {
-      if (!_0x5b46c9 && _0x24eee7)
-        _0x5b46c9 = retargetArm(_0x1253f7, _0x558512, _0x24eee7['torsoQuaternion']);
-      return _0x5b46c9;
+  for (const value87 of ['left', 'right']) {
+    const value88 = value87 === 'left' ? 'l' : 'r',
+      args4 = [...args2, value81[value87 + 'Elbow'], value81[value87 + 'Wrist']];
+    let retargetArm2 = null;
+    const run = () => {
+      if (!retargetArm2 && bodyFrames)
+        retargetArm2 = retargetArm(landmarks, value87, bodyFrames['torsoQuaternion']);
+      return retargetArm2;
     };
-    (_0x4f762d(
-      'upperarm_' + _0x54ce86,
-      [..._0x45ae32, _0x51d1ef[_0x558512 + 'Elbow']],
-      () => _0x12f85c()?.['upper'],
-    ),
-      _0x4f762d('lowerarm_' + _0x54ce86, _0x3c62ee, () => _0x12f85c()?.['lower']),
-      _0x4f762d(
-        'hand_' + _0x54ce86,
-        [..._0x3c62ee, _0x51d1ef[_0x558512 + 'Pinky'], _0x51d1ef[_0x558512 + 'Index']],
-        () => _0x12f85c()?.['hand'],
+    (handler('upperarm_' + value88, [...args2, value81[value87 + 'Elbow']], () => run()?.['upper']),
+      handler('lowerarm_' + value88, args4, () => run()?.['lower']),
+      handler(
+        'hand_' + value88,
+        [...args4, value81[value87 + 'Pinky'], value81[value87 + 'Index']],
+        () => run()?.['hand'],
       ));
-    const _0x4e28f3 = [
-      _0x51d1ef['leftHip'],
-      _0x51d1ef['rightHip'],
-      _0x51d1ef[_0x558512 + 'Knee'],
-      _0x51d1ef[_0x558512 + 'Ankle'],
+    const args5 = [
+      value81['leftHip'],
+      value81['rightHip'],
+      value81[value87 + 'Knee'],
+      value81[value87 + 'Ankle'],
     ];
-    let _0x115289 = null;
-    const _0x10f262 = () => {
-      if (!_0x115289 && _0x24eee7)
-        _0x115289 = retargetLeg(_0x1253f7, _0x558512, _0x24eee7['pelvisQuaternion']);
-      return _0x115289;
+    let retargetLeg2 = null;
+    const run2 = () => {
+      if (!retargetLeg2 && bodyFrames)
+        retargetLeg2 = retargetLeg(landmarks, value87, bodyFrames['pelvisQuaternion']);
+      return retargetLeg2;
     };
-    (_0x4f762d(
-      'thigh_' + _0x54ce86,
-      [_0x51d1ef['leftHip'], _0x51d1ef['rightHip'], _0x51d1ef[_0x558512 + 'Knee']],
-      () => _0x10f262()?.['thigh'],
+    (handler(
+      'thigh_' + value88,
+      [value81['leftHip'], value81['rightHip'], value81[value87 + 'Knee']],
+      () => run2()?.['thigh'],
     ),
-      _0x4f762d('calf_' + _0x54ce86, _0x4e28f3, () => _0x10f262()?.['calf']),
-      _0x4f762d(
-        'foot_' + _0x54ce86,
-        [..._0x4e28f3, _0x51d1ef[_0x558512 + 'FootIndex']],
-        () => _0x10f262()?.['foot'],
-      ));
+      handler('calf_' + value88, args5, () => run2()?.['calf']),
+      handler('foot_' + value88, [...args5, value81[value87 + 'FootIndex']], () => run2()?.['foot']));
   }
-  const _0x2f44f2 = [];
+  const warnings = [];
   return (
-    _0x36e3f8['length'] > 0x0 &&
-      _0x2f44f2['push'](
+    bones['length'] > 0x0 &&
+      warnings['push'](
         warning(
           'LOW_CONFIDENCE_BONES_SKIPPED',
           'Low-visibility\x20landmarks\x20were\x20not\x20applied\x20to\x20the\x20affected\x20character\x20bones.',
-          { bones: _0x36e3f8, threshold: _0x5863ac },
+          { bones: bones, threshold: threshold },
         ),
       ),
-    _0x1bddf0['length'] > 0x0 &&
-      _0x2f44f2['push'](
+    bones2['length'] > 0x0 &&
+      warnings['push'](
         warning(
           'DEGENERATE_POSE_SEGMENTS_SKIPPED',
           'Zero-length\x20or\x20ambiguous\x20pose\x20segments\x20were\x20not\x20applied.',
-          { bones: _0x1bddf0 },
+          { bones: bones2 },
         ),
       ),
     {
-      boneOverrides: _0x13a1bd,
-      confidence: average(Object['values'](_0x4841a5)),
-      boneConfidence: _0x4841a5,
-      warnings: _0x2f44f2,
+      boneOverrides: boneOverrides,
+      confidence: average(Object['values'](boneConfidence)),
+      boneConfidence: boneConfidence,
+      warnings: warnings,
     }
   );
 }

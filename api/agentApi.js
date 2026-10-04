@@ -96,103 +96,90 @@ const BASE_AGENT_PLAN_EXAMPLES = Object.freeze([
     },
   },
 ]);
-function isImageNodeType(_0x36f222 = '') {
-  return String(_0x36f222 || '') === 'ai-image' || String(_0x36f222 || '') === 'source-image';
+function isImageNodeType(value = '') {
+  return String(value || '') === 'ai-image' || String(value || '') === 'source-image';
 }
-function findImageInputRefNodeId(_0x577cc0 = {}) {
-  const _0x32d1f8 = _0x577cc0?.canvas || {},
-    _0x5026b1 = _0x32d1f8.referenceContext || {},
-    _0x43a0ac = [
-      ...(Array.isArray(_0x32d1f8.inputRefs) ? _0x32d1f8.inputRefs : []),
-      ...(Array.isArray(_0x5026b1.inputRefs) ? _0x5026b1.inputRefs : []),
+function findImageInputRefNodeId(canvas = {}) {
+  const item = canvas?.canvas || {},
+    key = item.referenceContext || {},
+    list = [
+      ...(Array.isArray(item.inputRefs) ? item.inputRefs : []),
+      ...(Array.isArray(key.inputRefs) ? key.inputRefs : []),
     ],
-    _0x502b01 = _0x43a0ac.find(
-      (_0x2249a4) => isImageNodeType(_0x2249a4?.type) || String(_0x2249a4?.kind || '') === 'image',
-    );
-  if (_0x502b01?.nodeId || _0x502b01?.id) return String(_0x502b01.nodeId || _0x502b01.id);
-  const _0x2205e6 = Array.isArray(_0x5026b1.referencedNodes) ? _0x5026b1.referencedNodes : [],
-    _0x36d18f = _0x2205e6.find(
-      (_0x470eef) => isImageNodeType(_0x470eef?.type) || String(_0x470eef?.kind || '') === 'image',
-    );
-  return _0x36d18f?.nodeId || _0x36d18f?.id ? String(_0x36d18f.nodeId || _0x36d18f.id) : '';
+    index = list.find((item2) => isImageNodeType(item2?.type) || String(item2?.kind || '') === 'image');
+  if (index?.nodeId || index?.id) return String(index.nodeId || index.id);
+  const list2 = Array.isArray(key.referencedNodes) ? key.referencedNodes : [],
+    result = list2.find((item3) => isImageNodeType(item3?.type) || String(item3?.kind || '') === 'image');
+  return result?.nodeId || result?.id ? String(result.nodeId || result.id) : '';
 }
-function findSelectedImageNodeId(_0x45b1f4 = {}) {
-  const _0x28c17b = findImageInputRefNodeId(_0x45b1f4);
-  if (_0x28c17b) return _0x28c17b;
-  const _0x1ad17c = _0x45b1f4?.canvas || {},
-    _0x359b75 = Array.isArray(_0x1ad17c.selectedNodes) ? _0x1ad17c.selectedNodes : [],
-    _0x4438db = _0x359b75.find((_0x1b01f0) => isImageNodeType(_0x1b01f0?.type));
-  if (_0x4438db?.id) return String(_0x4438db.id);
-  const _0x2b44cf = Array.isArray(_0x1ad17c.selectedNodeIds)
-    ? _0x1ad17c.selectedNodeIds.map((_0x43205c) => String(_0x43205c || '')).filter(Boolean)
+function findSelectedImageNodeId(canvas2 = {}) {
+  const imageInputRefNodeId = findImageInputRefNodeId(canvas2);
+  if (imageInputRefNodeId) return imageInputRefNodeId;
+  const data = canvas2?.canvas || {},
+    list3 = Array.isArray(data.selectedNodes) ? data.selectedNodes : [],
+    options = list3.find((item4) => isImageNodeType(item4?.type));
+  if (options?.id) return String(options.id);
+  const list4 = Array.isArray(data.selectedNodeIds)
+    ? data.selectedNodeIds.map((item5) => String(item5 || '')).filter(Boolean)
     : [];
-  if (_0x2b44cf.length === 0) return '';
-  const _0x1e95ef = Array.isArray(_0x1ad17c.nodes) ? _0x1ad17c.nodes : [],
-    _0x4dc59a = new Set(_0x2b44cf),
-    _0x2e328 = _0x1e95ef.find(
-      (_0x4319de) => _0x4dc59a.has(String(_0x4319de?.id || '')) && isImageNodeType(_0x4319de?.type),
-    );
-  return _0x2e328?.id ? String(_0x2e328.id) : '';
+  if (list4.length === 0) return '';
+  const list5 = Array.isArray(data.nodes) ? data.nodes : [],
+    map = new Set(list4),
+    target = list5.find((item6) => map.has(String(item6?.id || '')) && isImageNodeType(item6?.type));
+  return target?.id ? String(target.id) : '';
 }
-function modelAllowsImageInput(_0xa8b15f = {}) {
-  const _0x2e39aa =
-      _0xa8b15f?.inputSlots && typeof _0xa8b15f.inputSlots === 'object' ? _0xa8b15f.inputSlots : {},
-    _0x1e7e57 = Array.isArray(_0x2e39aa.allowedKinds) ? _0x2e39aa.allowedKinds : [];
-  if (_0x1e7e57.includes('image')) return true;
-  const _0x49f99d = Number(_0x2e39aa.maxByKind?.image);
-  return Number.isFinite(_0x49f99d) && _0x49f99d > 0;
+function modelAllowsImageInput(options2 = {}) {
+  const source = options2?.inputSlots && typeof options2.inputSlots === 'object' ? options2.inputSlots : {},
+    list6 = Array.isArray(source.allowedKinds) ? source.allowedKinds : [];
+  if (list6.includes('image')) return true;
+  const count = Number(source.maxByKind?.image);
+  return Number.isFinite(count) && count > 0;
 }
-function modelRequiresMissingMedia(_0x5c12cd = {}) {
-  const _0x4af7ef =
-      _0x5c12cd?.inputSlots && typeof _0x5c12cd.inputSlots === 'object' ? _0x5c12cd.inputSlots : {},
-    _0x495d4e = _0x4af7ef.minByKind || {};
-  if (Number(_0x495d4e.video) > 0) return true;
-  if (Number(_0x495d4e.audio) > 0) return true;
-  const _0x3c9435 = Array.isArray(_0x4af7ef.fixedSlots) ? _0x4af7ef.fixedSlots : [];
-  return _0x3c9435.some(
-    (_0x1f15aa) =>
-      _0x1f15aa?.required === true &&
-      (String(_0x1f15aa?.kind || '') === 'video' || String(_0x1f15aa?.kind || '') === 'audio'),
+function modelRequiresMissingMedia(options3 = {}) {
+  const next = options3?.inputSlots && typeof options3.inputSlots === 'object' ? options3.inputSlots : {},
+    current = next.minByKind || {};
+  if (Number(current.video) > 0) return true;
+  if (Number(current.audio) > 0) return true;
+  const list7 = Array.isArray(next.fixedSlots) ? next.fixedSlots : [];
+  return list7.some(
+    (item7) =>
+      item7?.required === true &&
+      (String(item7?.kind || '') === 'video' || String(item7?.kind || '') === 'audio'),
   );
 }
-function getModelFieldIds(_0x36a86e = {}) {
+function getModelFieldIds(options4 = {}) {
   return new Set(
-    (Array.isArray(_0x36a86e?.uiSchema?.fields) ? _0x36a86e.uiSchema.fields : [])
-      .map((_0x3ec35d) => String(_0x3ec35d?.id || '').trim())
+    (Array.isArray(options4?.uiSchema?.fields) ? options4.uiSchema.fields : [])
+      .map((item8) => String(item8?.id || '').trim())
       .filter(Boolean),
   );
 }
-function findImageToVideoModel(_0x1e3d12 = {}) {
-  const _0x54a923 = Array.isArray(_0x1e3d12?.canvas?.availableModels) ? _0x1e3d12.canvas.availableModels : [];
+function findImageToVideoModel(canvas3 = {}) {
+  const list8 = Array.isArray(canvas3?.canvas?.availableModels) ? canvas3.canvas.availableModels : [];
   return (
-    _0x54a923.find(
-      (_0x23a134) =>
-        _0x23a134?.kind === 'video' &&
-        _0x23a134?.modelId &&
-        modelAllowsImageInput(_0x23a134) &&
-        !modelRequiresMissingMedia(_0x23a134),
+    list8.find(
+      (item9) =>
+        item9?.kind === 'video' &&
+        item9?.modelId &&
+        modelAllowsImageInput(item9) &&
+        !modelRequiresMissingMedia(item9),
     ) || null
   );
 }
-function buildImageToVideoExample(
-  _0x47a370,
-  _0x22a200 = null,
-  { fromInputRefs: fromInputRefs = false } = {},
-) {
-  const _0x12ca4f = { type: 'ai-video', prompt: 'slow camera push in' };
-  _0x22a200?.modelId &&
-    ((_0x12ca4f.model = _0x22a200.modelId), (_0x12ca4f.provider = _0x22a200.provider || ''));
-  const _0x14df98 = [{ type: 'node.create', as: 'videoNode', args: _0x12ca4f }],
-    _0x54f0e2 = getModelFieldIds(_0x22a200);
+function buildImageToVideoExample(sourceId, enabled = null, { fromInputRefs: fromInputRefs = false } = {}) {
+  const args = { type: 'ai-video', prompt: 'slow camera push in' };
+  enabled?.modelId && ((args.model = enabled.modelId), (args.provider = enabled.provider || ''));
+  const actions = [{ type: 'node.create', as: 'videoNode', args: args }],
+    map2 = getModelFieldIds(enabled);
   return (
-    (!_0x22a200 || _0x54f0e2.has('duration')) &&
-      _0x14df98.push({
+    (!enabled || map2.has('duration')) &&
+      actions.push({
         type: 'node.setParams',
         args: { nodeId: '$videoNode.nodeId', params: { duration: 5 } },
       }),
-    _0x14df98.push(
-      { type: 'graph.connect', args: { sourceId: _0x47a370, targetId: '$videoNode.nodeId' } },
-      { type: 'layout.arrangeRow', args: { ids: [_0x47a370, '$videoNode.nodeId'], gap: 80 } },
+    actions.push(
+      { type: 'graph.connect', args: { sourceId: sourceId, targetId: '$videoNode.nodeId' } },
+      { type: 'layout.arrangeRow', args: { ids: [sourceId, '$videoNode.nodeId'], gap: 80 } },
       { type: 'generation.run', args: { nodeId: '$videoNode.nodeId' } },
     ),
     {
@@ -204,19 +191,19 @@ function buildImageToVideoExample(
         reply: fromInputRefs
           ? 'I will create a video node, connect the referenced image to it, arrange the nodes, then ask before generation.'
           : 'I will create a video node, connect the selected image to it, arrange the nodes, then ask before generation.',
-        actions: _0x14df98,
+        actions: actions,
       },
     }
   );
 }
-function buildAgentPlanExamples(_0x56d10d = {}) {
-  const _0x2aa5d6 = findImageInputRefNodeId(_0x56d10d),
-    _0x2d9205 = _0x2aa5d6 || findSelectedImageNodeId(_0x56d10d);
-  if (!_0x2d9205) return BASE_AGENT_PLAN_EXAMPLES;
-  const _0x38fe9a = findImageToVideoModel(_0x56d10d);
+function buildAgentPlanExamples(options5 = {}) {
+  const imageInputRefNodeId2 = findImageInputRefNodeId(options5),
+    enabled2 = imageInputRefNodeId2 || findSelectedImageNodeId(options5);
+  if (!enabled2) return BASE_AGENT_PLAN_EXAMPLES;
+  const videoModel = findImageToVideoModel(options5);
   return [
     BASE_AGENT_PLAN_EXAMPLES[0],
-    buildImageToVideoExample(_0x2d9205, _0x38fe9a, { fromInputRefs: Boolean(_0x2aa5d6) }),
+    buildImageToVideoExample(enabled2, videoModel, { fromInputRefs: Boolean(imageInputRefNodeId2) }),
     BASE_AGENT_PLAN_EXAMPLES[1],
     BASE_AGENT_PLAN_EXAMPLES[2],
     BASE_AGENT_PLAN_EXAMPLES[3],
@@ -230,22 +217,22 @@ const AGENT_RESPONSE_CONTRACT = Object.freeze({
   forbidden: ['markdown', 'code fences', 'lead-in prose', 'comments', 'trailing commas'],
   noExecutionOutsidePlan: true,
 });
-function truncatePlannerText(_0x10353d, _0x19dc03 = AGENT_PLANNER_HISTORY_TEXT_LIMIT) {
-  const _0x44a79c = String(_0x10353d || '');
-  if (_0x44a79c.length <= _0x19dc03) return _0x44a79c;
-  return _0x44a79c.slice(0, Math.max(0, _0x19dc03 - 3)) + '...';
+function truncatePlannerText(entry, record = AGENT_PLANNER_HISTORY_TEXT_LIMIT) {
+  const list9 = String(entry || '');
+  if (list9.length <= record) return list9;
+  return list9.slice(0, Math.max(0, record - 3)) + '...';
 }
-function normalizeAgentLocale(_0x21dcaa = '') {
-  const _0x4194e7 = String(_0x21dcaa || '')
+function normalizeAgentLocale(payload = '') {
+  const handle = String(payload || '')
     .trim()
     .toLowerCase()
     .replace('_', '-');
-  if (_0x4194e7.startsWith('en')) return 'en-US';
+  if (handle.startsWith('en')) return 'en-US';
   return 'zh-CN';
 }
-function getPlannerLanguagePolicy(_0x4dcd8b) {
-  const _0x571f16 = normalizeAgentLocale(_0x4dcd8b);
-  if (_0x571f16 === 'en-US')
+function getPlannerLanguagePolicy(state) {
+  const agentLocale = normalizeAgentLocale(state);
+  if (agentLocale === 'en-US')
     return {
       locale: 'en-US',
       responseLanguage: 'English',
@@ -258,96 +245,93 @@ function getPlannerLanguagePolicy(_0x4dcd8b) {
   };
 }
 function normalizePlannerHistory(
-  _0x23c5a1 = [],
+  list10 = [],
   {
     limit: limit = AGENT_PLANNER_HISTORY_LIMIT,
     textLimit: textLimit = AGENT_PLANNER_HISTORY_TEXT_LIMIT,
   } = {},
 ) {
-  if (!Array.isArray(_0x23c5a1)) return [];
-  return _0x23c5a1
+  if (!Array.isArray(list10)) return [];
+  return list10
     .slice(-limit)
-    .map((_0x87ff9e = {}) => ({
-      role: String(_0x87ff9e.role || 'assistant'),
-      status: String(_0x87ff9e.status || ''),
+    .map((error = {}) => ({
+      role: String(error.role || 'assistant'),
+      status: String(error.status || ''),
       content: truncatePlannerText(
-        _0x87ff9e.content || _0x87ff9e.reply || _0x87ff9e.message || _0x87ff9e.question || '',
+        error.content || error.reply || error.message || error.question || '',
         textLimit,
       ),
     }))
-    .filter((_0x155234) => _0x155234.content || _0x155234.status);
+    .filter((response) => response.content || response.status);
 }
-function cloneJson(_0x28c848) {
+function cloneJson(config) {
   try {
-    return JSON.parse(JSON.stringify(_0x28c848 || {}));
+    return JSON.parse(JSON.stringify(config || {}));
   } catch {
     return {};
   }
 }
-function truncateList(_0xb417af, _0x362986) {
-  return Array.isArray(_0xb417af) ? _0xb417af.slice(0, _0x362986) : [];
+function truncateList(list11, scope) {
+  return Array.isArray(list11) ? list11.slice(0, scope) : [];
 }
-function compactCommand(_0x13c78b = {}) {
-  const _0x547d91 =
-      _0x13c78b.argsSchema && typeof _0x13c78b.argsSchema === 'object' ? _0x13c78b.argsSchema : {},
-    _0x1bd038 =
-      _0x13c78b.capabilitySchema && typeof _0x13c78b.capabilitySchema === 'object'
-        ? _0x13c78b.capabilitySchema
-        : {};
+function compactCommand(id = {}) {
+  const defaults = id.argsSchema && typeof id.argsSchema === 'object' ? id.argsSchema : {},
+    selectionFallback =
+      id.capabilitySchema && typeof id.capabilitySchema === 'object' ? id.capabilitySchema : {};
   return {
-    id: _0x13c78b.id,
-    riskLevel: _0x13c78b.riskLevel,
+    id: id.id,
+    riskLevel: id.riskLevel,
     argsSchema: {
-      required: Array.isArray(_0x547d91.required) ? _0x547d91.required : [],
-      defaults: _0x547d91.defaults && typeof _0x547d91.defaults === 'object' ? _0x547d91.defaults : {},
-      selectionFallback: _0x547d91.selectionFallback === true,
+      required: Array.isArray(defaults.required) ? defaults.required : [],
+      defaults: defaults.defaults && typeof defaults.defaults === 'object' ? defaults.defaults : {},
+      selectionFallback: defaults.selectionFallback === true,
     },
     capabilitySchema: {
-      selectionFallback: _0x1bd038.selectionFallback === true,
-      requiresMountedRuntime: _0x1bd038.requiresMountedRuntime === true,
+      selectionFallback: selectionFallback.selectionFallback === true,
+      requiresMountedRuntime: selectionFallback.requiresMountedRuntime === true,
     },
-    returnAliasFields: Array.isArray(_0x13c78b.returnAliasFields) ? _0x13c78b.returnAliasFields : [],
+    returnAliasFields: Array.isArray(id.returnAliasFields) ? id.returnAliasFields : [],
   };
 }
-function compactPlannerContext(_0x1c56ad, _0x26286d = 0) {
-  const _0x44fe16 = cloneJson(_0x1c56ad),
-    _0x45c8bd = _0x44fe16.canvas || {};
-  Array.isArray(_0x44fe16.commands) &&
-    _0x26286d >= 1 &&
-    (_0x44fe16.commands = _0x44fe16.commands.map(compactCommand));
-  Array.isArray(_0x45c8bd.recentCommands) &&
-    _0x26286d >= 1 &&
-    (_0x45c8bd.recentCommands = _0x45c8bd.recentCommands.slice(-5));
-  if (Array.isArray(_0x45c8bd.availableModels)) {
-    const _0x8a9221 = [22, 14, 10, 6, 3, 0],
-      _0x5b705e = _0x8a9221[Math.min(_0x26286d, _0x8a9221.length - 1)];
-    ((_0x45c8bd.availableModels = truncateList(_0x45c8bd.availableModels, _0x5b705e)),
-      _0x45c8bd.modelCatalog &&
-        ((_0x45c8bd.modelCatalog.truncated = true),
-        (_0x45c8bd.modelCatalog.includedModels = _0x45c8bd.availableModels.length)));
+function compactPlannerContext(input, plannerCompacted = 0) {
+  const canvas4 = cloneJson(input),
+    output = canvas4.canvas || {};
+  Array.isArray(canvas4.commands) &&
+    plannerCompacted >= 1 &&
+    (canvas4.commands = canvas4.commands.map(compactCommand));
+  Array.isArray(output.recentCommands) &&
+    plannerCompacted >= 1 &&
+    (output.recentCommands = output.recentCommands.slice(-5));
+  if (Array.isArray(output.availableModels)) {
+    const list12 = [22, 14, 10, 6, 3, 0],
+      value2 = list12[Math.min(plannerCompacted, list12.length - 1)];
+    ((output.availableModels = truncateList(output.availableModels, value2)),
+      output.modelCatalog &&
+        ((output.modelCatalog.truncated = true),
+        (output.modelCatalog.includedModels = output.availableModels.length)));
   }
-  Array.isArray(_0x45c8bd.availableWorkflows) && _0x26286d >= 2 && (_0x45c8bd.availableWorkflows = []);
-  if (Array.isArray(_0x45c8bd.nodes) && _0x26286d >= 2) {
-    const _0x31a362 = _0x26286d >= 4 ? 60 : 160,
-      _0x5521a6 = _0x26286d >= 5 ? 10 : 30;
-    _0x45c8bd.nodes = _0x45c8bd.nodes.slice(0, _0x5521a6).map((_0x71dc69) => ({
-      ..._0x71dc69,
-      promptPreview: truncatePlannerText(_0x71dc69.promptPreview, _0x31a362),
-      contentPreview: truncatePlannerText(_0x71dc69.contentPreview, _0x31a362),
+  Array.isArray(output.availableWorkflows) && plannerCompacted >= 2 && (output.availableWorkflows = []);
+  if (Array.isArray(output.nodes) && plannerCompacted >= 2) {
+    const value3 = plannerCompacted >= 4 ? 60 : 160,
+      value4 = plannerCompacted >= 5 ? 10 : 30;
+    output.nodes = output.nodes.slice(0, value4).map((args2) => ({
+      ...args2,
+      promptPreview: truncatePlannerText(args2.promptPreview, value3),
+      contentPreview: truncatePlannerText(args2.contentPreview, value3),
     }));
   }
   return (
-    Array.isArray(_0x45c8bd.edges) && _0x26286d >= 3 && (_0x45c8bd.edges = _0x45c8bd.edges.slice(0, 20)),
-    _0x26286d >= 5 && ((_0x45c8bd.edges = []), (_0x45c8bd.recentCommands = [])),
-    (_0x44fe16.canvas = _0x45c8bd),
-    _0x44fe16.contextBudget &&
-      (_0x44fe16.contextBudget = { ..._0x44fe16.contextBudget, plannerCompacted: _0x26286d > 0 }),
-    _0x44fe16
+    Array.isArray(output.edges) && plannerCompacted >= 3 && (output.edges = output.edges.slice(0, 20)),
+    plannerCompacted >= 5 && ((output.edges = []), (output.recentCommands = [])),
+    (canvas4.canvas = output),
+    canvas4.contextBudget &&
+      (canvas4.contextBudget = { ...canvas4.contextBudget, plannerCompacted: plannerCompacted > 0 }),
+    canvas4
   );
 }
 function buildPlannerPayload({
-  message: _0x253242,
-  context: _0x2c76b4,
+  message: message,
+  context: context,
   history: history = [],
   locale: locale = '',
 } = {}) {
@@ -355,10 +339,10 @@ function buildPlannerPayload({
     system: AGENT_SYSTEM_PROMPT,
     responseContract: AGENT_RESPONSE_CONTRACT,
     languagePolicy: getPlannerLanguagePolicy(locale),
-    userMessage: String(_0x253242 || ''),
+    userMessage: String(message || ''),
     history: normalizePlannerHistory(history),
-    context: _0x2c76b4,
-    examples: buildAgentPlanExamples(_0x2c76b4),
+    context: context,
+    examples: buildAgentPlanExamples(context),
     outputSchema: {
       reply: 'string',
       status: 'chat|ready|need_clarification|need_confirmation|failed',
@@ -376,121 +360,120 @@ function buildPlannerPayload({
   };
 }
 function buildPlannerPrompt({
-  message: _0x488ae1,
-  context: _0x2c6cef,
+  message: message2,
+  context: context2,
   history: history = [],
   locale: locale = '',
 } = {}) {
-  let _0x54d936 = buildPlannerPayload({
-      message: _0x488ae1,
-      context: _0x2c6cef,
+  let args3 = buildPlannerPayload({
+      message: message2,
+      context: context2,
       history: history,
       locale: locale,
     }),
-    _0x5e17a6 = JSON.stringify(_0x54d936);
-  if (_0x5e17a6.length <= AGENT_PLANNER_PROMPT_MAX_CHARS) return _0x5e17a6;
-  ((_0x54d936.history = normalizePlannerHistory(history, { limit: 4, textLimit: 180 })),
-    (_0x5e17a6 = JSON.stringify(_0x54d936)));
-  if (_0x5e17a6.length <= AGENT_PLANNER_PROMPT_MAX_CHARS) return _0x5e17a6;
-  for (let _0x108841 = 1; _0x108841 <= 5; _0x108841 += 1) {
-    ((_0x54d936 = { ..._0x54d936, context: compactPlannerContext(_0x2c6cef, _0x108841) }),
-      (_0x5e17a6 = JSON.stringify(_0x54d936)));
-    if (_0x5e17a6.length <= AGENT_PLANNER_PROMPT_MAX_CHARS) return _0x5e17a6;
+    list13 = JSON.stringify(args3);
+  if (list13.length <= AGENT_PLANNER_PROMPT_MAX_CHARS) return list13;
+  ((args3.history = normalizePlannerHistory(history, { limit: 4, textLimit: 180 })),
+    (list13 = JSON.stringify(args3)));
+  if (list13.length <= AGENT_PLANNER_PROMPT_MAX_CHARS) return list13;
+  for (let count2 = 1; count2 <= 5; count2 += 1) {
+    ((args3 = { ...args3, context: compactPlannerContext(context2, count2) }),
+      (list13 = JSON.stringify(args3)));
+    if (list13.length <= AGENT_PLANNER_PROMPT_MAX_CHARS) return list13;
   }
   return JSON.stringify({
     system: AGENT_SYSTEM_PROMPT,
-    userMessage: String(_0x488ae1 || ''),
+    userMessage: String(message2 || ''),
     history: [],
-    context: compactPlannerContext(_0x2c6cef, 5),
+    context: compactPlannerContext(context2, 5),
     responseContract: AGENT_RESPONSE_CONTRACT,
-    examples: buildAgentPlanExamples(_0x2c6cef).slice(0, 2),
+    examples: buildAgentPlanExamples(context2).slice(0, 2),
     outputSchema: buildPlannerPayload({ locale: locale }).outputSchema,
   });
 }
-function buildPlannerRetryPrompt(_0x48ce4f, _0xc63f8 = '') {
-  let _0x1888c6 = null;
+function buildPlannerRetryPrompt(value5, value6 = '') {
+  let args4 = null;
   try {
-    _0x1888c6 = JSON.parse(String(_0x48ce4f || ''));
+    args4 = JSON.parse(String(value5 || ''));
   } catch {
-    return _0x48ce4f;
+    return value5;
   }
-  const _0x1f6a43 = JSON.stringify({
-    ..._0x1888c6,
+  const list14 = JSON.stringify({
+    ...args4,
     retry: {
       previousAttemptRejectedBeforeExecution: true,
-      reason: String(_0xc63f8 || 'invalid JSON'),
+      reason: String(value6 || 'invalid JSON'),
       instruction:
         'Return the corrected strict JSON object only. Do not include Markdown, prose, comments, or code fences.',
     },
   });
-  return _0x1f6a43.length <= AGENT_PLANNER_PROMPT_MAX_CHARS ? _0x1f6a43 : _0x48ce4f;
+  return list14.length <= AGENT_PLANNER_PROMPT_MAX_CHARS ? list14 : value5;
 }
-function extractJsonObject(_0x160b7e) {
-  if (_0x160b7e && typeof _0x160b7e === 'object') return _0x160b7e;
-  const _0x22e074 = String(_0x160b7e || '').trim();
-  if (!_0x22e074) throw new Error('Agent planner returned empty text.');
+function extractJsonObject(value7) {
+  if (value7 && typeof value7 === 'object') return value7;
+  const enabled3 = String(value7 || '').trim();
+  if (!enabled3) throw new Error('Agent planner returned empty text.');
   try {
-    return JSON.parse(_0x22e074);
+    return JSON.parse(enabled3);
   } catch {
     throw new Error('Agent planner returned invalid JSON.');
   }
 }
-function getPlannerText(_0x1253e5) {
-  return typeof _0x1253e5 === 'string'
-    ? _0x1253e5
-    : _0x1253e5?.text || _0x1253e5?.outputText || _0x1253e5?.content || '';
+function getPlannerText(response2) {
+  return typeof response2 === 'string'
+    ? response2
+    : response2?.text || response2?.outputText || response2?.content || '';
 }
 export async function requestAgentActionPlan({
-  message: _0x3a2ea7,
-  context: _0x50f067,
+  message: message3,
+  context: context3,
   history: history = [],
   settings: settings = {},
   request: request = generateText,
   onTrace: onTrace = null,
 } = {}) {
-  const _0x137bac = String(settings.model || '').trim(),
-    _0x2873d4 = String(settings.provider || '').trim();
-  if (!_0x137bac || !_0x2873d4)
-    return { status: 'failed', reply: 'Agent model is not configured.', actions: [] };
-  const _0x54e380 = buildPlannerPrompt({
-    message: _0x3a2ea7,
-    context: _0x50f067,
+  const model = String(settings.model || '').trim(),
+    provider = String(settings.provider || '').trim();
+  if (!model || !provider) return { status: 'failed', reply: 'Agent model is not configured.', actions: [] };
+  const prompt = buildPlannerPrompt({
+    message: message3,
+    context: context3,
     history: history,
     locale: settings.locale,
   });
   onTrace?.({
     type: 'planner_model_selected',
-    provider: _0x2873d4,
-    model: _0x137bac,
+    provider: provider,
+    model: model,
     reason: 'agentModelSettings',
   });
-  const _0x539267 = {
-      model: _0x137bac,
-      provider: _0x2873d4,
-      prompt: _0x54e380,
+  const args5 = {
+      model: model,
+      provider: provider,
+      prompt: prompt,
       systemPrompt: AGENT_SYSTEM_PROMPT,
       temperature: Number.isFinite(Number(settings.temperature)) ? Number(settings.temperature) : 0,
     },
-    _0x35d0fe = await request(_0x539267);
+    request2 = await request(args5);
   try {
-    return extractJsonObject(getPlannerText(_0x35d0fe));
-  } catch (_0x22d7bd) {
+    return extractJsonObject(getPlannerText(request2));
+  } catch (reason) {
     onTrace?.({
       type: 'planner_json_retry',
-      reason: _0x22d7bd?.message || 'invalid JSON',
-      rawPreview: truncatePlannerText(getPlannerText(_0x35d0fe), 160),
+      reason: reason?.message || 'invalid JSON',
+      rawPreview: truncatePlannerText(getPlannerText(request2), 160),
     });
-    const _0x2eea07 = buildPlannerRetryPrompt(_0x54e380, _0x22d7bd?.message),
-      _0x4b05ed = await request({ ..._0x539267, prompt: _0x2eea07 });
+    const prompt2 = buildPlannerRetryPrompt(prompt, reason?.message),
+      request3 = await request({ ...args5, prompt: prompt2 });
     try {
-      return extractJsonObject(getPlannerText(_0x4b05ed));
-    } catch (_0x34cbbd) {
+      return extractJsonObject(getPlannerText(request3));
+    } catch (reason2) {
       onTrace?.({
         type: 'planner_json_retry_failed',
-        reason: _0x34cbbd?.message || 'invalid JSON',
-        rawPreview: truncatePlannerText(getPlannerText(_0x4b05ed), 160),
+        reason: reason2?.message || 'invalid JSON',
+        rawPreview: truncatePlannerText(getPlannerText(request3), 160),
       });
-      throw _0x34cbbd;
+      throw reason2;
     }
   }
 }

@@ -61,10 +61,10 @@ const APIMART_IMAGE_FUNCTION_FAMILIES = Object.freeze({
   NANOBANANA_PRO: 'nanobanana-pro',
   GPT_IMAGE_2: 'gpt-image-2',
 });
-function createImageMenuExtension(_0x198d9a, _0xa32c9 = null) {
+function createImageMenuExtension(value, item = null) {
   return Object.freeze({
-    imageMenu: Object.freeze(_0x198d9a),
-    ...(_0xa32c9 ? { imageFunctionMenu: Object.freeze(_0xa32c9) } : {}),
+    imageMenu: Object.freeze(value),
+    ...(item ? { imageFunctionMenu: Object.freeze(item) } : {}),
   });
 }
 const GPT_IMAGE_2_PROMPT = Object.freeze({
@@ -232,10 +232,10 @@ const GPT_IMAGE_2_PROMPT = Object.freeze({
     }),
   ]),
   APIMART_NANO_BANANA_2_BODY_MAPPING = Object.freeze([
-    ...APIMART_IMAGE_BODY_MAPPING.map((_0x307053) =>
-      _0x307053.path === 'resolution'
-        ? Object.freeze({ ..._0x307053, transform: 'apimartNanoBanana2Resolution' })
-        : _0x307053,
+    ...APIMART_IMAGE_BODY_MAPPING.map((args) =>
+      args.path === 'resolution'
+        ? Object.freeze({ ...args, transform: 'apimartNanoBanana2Resolution' })
+        : args,
     ),
     Object.freeze({
       path: 'google_search',
@@ -253,17 +253,17 @@ const GPT_IMAGE_2_PROMPT = Object.freeze({
     }),
   ]),
   APIMART_NANO_BANANA_PRO_BODY_MAPPING = Object.freeze([
-    ...APIMART_IMAGE_BODY_MAPPING.map((_0x1fa38e) =>
-      _0x1fa38e.path === 'resolution'
-        ? Object.freeze({ ..._0x1fa38e, transform: 'apimartNanoBanana2Resolution' })
-        : _0x1fa38e,
+    ...APIMART_IMAGE_BODY_MAPPING.map((args2) =>
+      args2.path === 'resolution'
+        ? Object.freeze({ ...args2, transform: 'apimartNanoBanana2Resolution' })
+        : args2,
     ),
   ]),
   APIMART_NANO_BANANA_BODY_MAPPING = Object.freeze([
-    ...APIMART_IMAGE_BODY_MAPPING.map((_0x2121d3) =>
-      _0x2121d3.path === 'resolution'
+    ...APIMART_IMAGE_BODY_MAPPING.map((item2) =>
+      item2.path === 'resolution'
         ? Object.freeze({ path: 'resolution', from: 'constant', value: '1K' })
-        : _0x2121d3,
+        : item2,
     ),
   ]),
   APIMART_SEEDREAM_BODY_MAPPING = Object.freeze([

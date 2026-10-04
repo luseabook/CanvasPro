@@ -3,228 +3,218 @@ export const STORYBOARD_3D_BINARY_ASSET_DB_NAME = 'AICanvasStoryboard3DAssets';
 export const STORYBOARD_3D_BINARY_ASSET_STORE_NAME = 'assets';
 const DEFAULT_DESCRIPTOR_MAX_BYTES = 0x200 * 0x400,
   DEFAULT_GET_MANY_LIMIT = 0x1f4;
-function text(_0xdba5fe) {
-  return String(_0xdba5fe ?? '')['trim']();
+function text(value) {
+  return String(value ?? '')['trim']();
 }
-function requiredText(_0x3a7a84, _0x33d30f) {
-  const _0x501283 = text(_0x3a7a84);
-  if (!_0x501283)
-    throw new Storyboard3DBinaryAssetRepositoryError(_0x33d30f + ' is required', {
+function requiredText(item, key) {
+  const text2 = text(item);
+  if (!text2)
+    throw new Storyboard3DBinaryAssetRepositoryError(key + ' is required', {
       code: 'BINARY_ASSET_INVALID_RECORD',
     });
-  return _0x501283;
+  return text2;
 }
-function isBlobLike(_0x56fd91) {
+function isBlobLike(index) {
   return Boolean(
-    _0x56fd91 &&
-    typeof _0x56fd91 === 'object' &&
-    typeof _0x56fd91['arrayBuffer'] === 'function' &&
-    Number['isFinite'](Number(_0x56fd91['size'])),
+    index &&
+    typeof index === 'object' &&
+    typeof index['arrayBuffer'] === 'function' &&
+    Number['isFinite'](Number(index['size'])),
   );
 }
-function isBinaryValue(_0x81b2f) {
-  return isBlobLike(_0x81b2f) || _0x81b2f instanceof ArrayBuffer || ArrayBuffer['isView'](_0x81b2f);
+function isBinaryValue(result) {
+  return isBlobLike(result) || result instanceof ArrayBuffer || ArrayBuffer['isView'](result);
 }
-function normalizePath(_0x10c236, _0x4774e5) {
-  const _0x227c6b = text(_0x10c236 || _0x4774e5)
+function normalizePath(data, options) {
+  const text3 = text(data || options)
     ['replaceAll']('\x5c', '/')
     ['split']('/')
-    ['filter']((_0x1cedb4) => _0x1cedb4 && _0x1cedb4 !== '.' && _0x1cedb4 !== '..')
+    ['filter']((target) => target && target !== '.' && target !== '..')
     ['join']('/');
-  return _0x227c6b || _0x4774e5;
+  return text3 || options;
 }
-function jsonDescriptor(_0x26112c, _0x3b08ba) {
-  const _0xb501ad =
-    _0x26112c && typeof _0x26112c === 'object' && !Array['isArray'](_0x26112c) ? _0x26112c : {};
-  let _0x54aa54;
+function jsonDescriptor(source, next) {
+  const current = source && typeof source === 'object' && !Array['isArray'](source) ? source : {};
+  let entry;
   try {
-    _0x54aa54 = JSON['stringify'](_0xb501ad, (_0x10c3ad, _0x5d664c) => {
-      if (isBinaryValue(_0x5d664c)) throw new TypeError('descriptor must not contain binary data');
-      if (['function', 'symbol', 'bigint']['includes'](typeof _0x5d664c))
+    entry = JSON['stringify'](current, (record, payload) => {
+      if (isBinaryValue(payload)) throw new TypeError('descriptor must not contain binary data');
+      if (['function', 'symbol', 'bigint']['includes'](typeof payload))
         throw new TypeError('descriptor\x20must\x20contain\x20JSON-safe\x20values\x20only');
-      return _0x5d664c;
+      return payload;
     });
-  } catch (_0x31cb75) {
+  } catch (cause) {
     throw new Storyboard3DBinaryAssetRepositoryError(
-      'Invalid\x20binary\x20asset\x20descriptor:\x20' + (_0x31cb75?.['message'] || String(_0x31cb75)),
-      { code: 'BINARY_ASSET_INVALID_DESCRIPTOR', cause: _0x31cb75 },
+      'Invalid\x20binary\x20asset\x20descriptor:\x20' + (cause?.['message'] || String(cause)),
+      { code: 'BINARY_ASSET_INVALID_DESCRIPTOR', cause: cause },
     );
   }
-  const _0x44cec5 = new TextEncoder()['encode'](_0x54aa54)['byteLength'];
-  if (_0x44cec5 > _0x3b08ba)
-    throw new Storyboard3DBinaryAssetRepositoryError(
-      'Binary asset descriptor exceeds ' + _0x3b08ba + ' bytes',
-      { code: 'BINARY_ASSET_DESCRIPTOR_TOO_LARGE' },
-    );
-  return JSON['parse'](_0x54aa54);
+  const textEncoder = new TextEncoder()['encode'](entry)['byteLength'];
+  if (textEncoder > next)
+    throw new Storyboard3DBinaryAssetRepositoryError('Binary asset descriptor exceeds ' + next + ' bytes', {
+      code: 'BINARY_ASSET_DESCRIPTOR_TOO_LARGE',
+    });
+  return JSON['parse'](entry);
 }
-function toBlob(_0x3d885a, _0x2fb2da = 'application/octet-stream') {
-  if (isBlobLike(_0x3d885a)) return _0x3d885a;
-  if (_0x3d885a instanceof ArrayBuffer || ArrayBuffer['isView'](_0x3d885a))
-    return new Blob([_0x3d885a], { type: _0x2fb2da });
+function toBlob(handle, type = 'application/octet-stream') {
+  if (isBlobLike(handle)) return handle;
+  if (handle instanceof ArrayBuffer || ArrayBuffer['isView'](handle))
+    return new Blob([handle], { type: type });
   return null;
 }
-function normalizeBinaryFile(_0x3af1f4, _0x154617, _0x452ab5 = null) {
-  const _0x5cf329 = _0x3af1f4 && typeof _0x3af1f4 === 'object' && 'blob' in _0x3af1f4 ? _0x3af1f4 : {},
-    _0x505846 = _0x5cf329['blob'] ?? _0x3af1f4,
-    _0x447ef8 = toBlob(
-      _0x505846,
-      text(_0x5cf329['type'] || _0x3af1f4?.['type']) || 'application/octet-stream',
-    );
-  if (!_0x447ef8)
+function normalizeBinaryFile(error, state, config = null) {
+  const error2 = error && typeof error === 'object' && 'blob' in error ? error : {},
+    scope = error2['blob'] ?? error,
+    blob = toBlob(scope, text(error2['type'] || error?.['type']) || 'application/octet-stream');
+  if (!blob)
     throw new Storyboard3DBinaryAssetRepositoryError(
-      _0x154617 + '\x20must\x20contain\x20a\x20Blob\x20or\x20ArrayBuffer',
+      state + '\x20must\x20contain\x20a\x20Blob\x20or\x20ArrayBuffer',
       { code: 'BINARY_ASSET_INVALID_BINARY' },
     );
-  const _0x572958 = _0x452ab5 == null ? 'asset.bin' : 'related-' + (_0x452ab5 + 0x1) + '.bin',
-    _0x16e3bd = normalizePath(_0x5cf329['name'] || _0x3af1f4?.['name'], _0x572958)
+  const input = config == null ? 'asset.bin' : 'related-' + (config + 0x1) + '.bin',
+    name = normalizePath(error2['name'] || error?.['name'], input)
       ['split']('/')
       ['at'](-0x1),
-    _0xe4ca8e = normalizePath(
-      _0x5cf329['relativePath'] || _0x5cf329['path'] || _0x3af1f4?.['webkitRelativePath'],
-      _0x16e3bd,
+    relativePath = normalizePath(
+      error2['relativePath'] || error2['path'] || error?.['webkitRelativePath'],
+      name,
     );
   return {
-    name: _0x16e3bd,
-    relativePath: _0xe4ca8e,
-    type: text(_0x5cf329['type'] || _0x3af1f4?.['type'] || _0x447ef8['type']) || 'application/octet-stream',
-    size: Math['max'](0x0, Number(_0x447ef8['size']) || 0x0),
-    lastModified: Math['max'](0x0, Number(_0x5cf329['lastModified'] || _0x3af1f4?.['lastModified']) || 0x0),
-    blob: _0x447ef8,
+    name: name,
+    relativePath: relativePath,
+    type: text(error2['type'] || error?.['type'] || blob['type']) || 'application/octet-stream',
+    size: Math['max'](0x0, Number(blob['size']) || 0x0),
+    lastModified: Math['max'](0x0, Number(error2['lastModified'] || error?.['lastModified']) || 0x0),
+    blob: blob,
   };
 }
-function cloneRecord(_0x285206) {
-  if (_0x285206 == null) return null;
-  if (typeof structuredClone === 'function') return structuredClone(_0x285206);
+function cloneRecord(relatedFiles) {
+  if (relatedFiles == null) return null;
+  if (typeof structuredClone === 'function') return structuredClone(relatedFiles);
   return {
-    ..._0x285206,
-    descriptor: JSON['parse'](JSON['stringify'](_0x285206['descriptor'])),
-    primaryFile: { ..._0x285206['primaryFile'] },
-    relatedFiles: _0x285206['relatedFiles']['map']((_0xabaa17) => ({ ..._0xabaa17 })),
+    ...relatedFiles,
+    descriptor: JSON['parse'](JSON['stringify'](relatedFiles['descriptor'])),
+    primaryFile: { ...relatedFiles['primaryFile'] },
+    relatedFiles: relatedFiles['relatedFiles']['map']((args) => ({ ...args })),
   };
 }
-function validateRetrievedRecord(_0x29dc9e, _0xbc210d) {
-  if (_0x29dc9e == null) return null;
-  if (Number(_0x29dc9e['schemaVersion']) !== STORYBOARD_3D_BINARY_ASSET_SCHEMA_VERSION)
+function validateRetrievedRecord(now2, descriptorMaxBytes2) {
+  if (now2 == null) return null;
+  if (Number(now2['schemaVersion']) !== STORYBOARD_3D_BINARY_ASSET_SCHEMA_VERSION)
     throw new Storyboard3DBinaryAssetRepositoryError(
-      'Unsupported\x20stored\x203D\x20binary\x20asset\x20schema\x20version:\x20' + _0x29dc9e['schemaVersion'],
+      'Unsupported\x20stored\x203D\x20binary\x20asset\x20schema\x20version:\x20' + now2['schemaVersion'],
       { code: 'BINARY_ASSET_UNSUPPORTED_SCHEMA' },
     );
-  return normalizeStoryboard3DBinaryAssetRecord(_0x29dc9e, {
-    now: _0x29dc9e['updatedAt'],
-    descriptorMaxBytes: _0xbc210d,
+  return normalizeStoryboard3DBinaryAssetRecord(now2, {
+    now: now2['updatedAt'],
+    descriptorMaxBytes: descriptorMaxBytes2,
   });
 }
 export function normalizeStoryboard3DBinaryAssetRecord(
-  _0x4fc170,
+  enabled,
   { now: now = Date['now'](), descriptorMaxBytes: descriptorMaxBytes = DEFAULT_DESCRIPTOR_MAX_BYTES } = {},
 ) {
-  if (!_0x4fc170 || typeof _0x4fc170 !== 'object' || Array['isArray'](_0x4fc170))
+  if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled))
     throw new Storyboard3DBinaryAssetRepositoryError(
       'Binary\x20asset\x20record\x20must\x20be\x20an\x20object',
       { code: 'BINARY_ASSET_INVALID_RECORD' },
     );
-  const _0x98bd44 = requiredText(_0x4fc170['assetId'], 'assetId'),
-    _0x51f87b = requiredText(_0x4fc170['kind'], 'kind'),
-    _0x332cc9 = normalizeBinaryFile(_0x4fc170['primaryFile'], 'primaryFile'),
-    _0x356bb0 = (Array['isArray'](_0x4fc170['relatedFiles']) ? _0x4fc170['relatedFiles'] : [])['map'](
-      (_0x35e3d3, _0x351180) => normalizeBinaryFile(_0x35e3d3, 'relatedFiles[' + _0x351180 + ']', _0x351180),
+  const assetId2 = requiredText(enabled['assetId'], 'assetId'),
+    kind = requiredText(enabled['kind'], 'kind'),
+    primaryFile = normalizeBinaryFile(enabled['primaryFile'], 'primaryFile'),
+    relatedFiles2 = (Array['isArray'](enabled['relatedFiles']) ? enabled['relatedFiles'] : [])['map'](
+      (output, value2) => normalizeBinaryFile(output, 'relatedFiles[' + value2 + ']', value2),
     ),
-    _0x42f274 = new Set();
-  for (const _0x4c5e4f of [_0x332cc9, ..._0x356bb0]) {
-    const _0x2fe7f9 = _0x4c5e4f['relativePath']['toLocaleLowerCase']();
-    if (_0x42f274['has'](_0x2fe7f9))
+    map = new Set();
+  for (const value3 of [primaryFile, ...relatedFiles2]) {
+    const value4 = value3['relativePath']['toLocaleLowerCase']();
+    if (map['has'](value4))
       throw new Storyboard3DBinaryAssetRepositoryError(
-        'Duplicate binary asset file path: ' + _0x4c5e4f['relativePath'],
+        'Duplicate binary asset file path: ' + value3['relativePath'],
         { code: 'BINARY_ASSET_DUPLICATE_FILE' },
       );
-    _0x42f274['add'](_0x2fe7f9);
+    map['add'](value4);
   }
-  const _0x38d522 = Math['max'](0x0, Number(now) || Date['now']());
+  const updatedAt = Math['max'](0x0, Number(now) || Date['now']());
   return {
     schemaVersion: STORYBOARD_3D_BINARY_ASSET_SCHEMA_VERSION,
-    assetId: _0x98bd44,
-    kind: _0x51f87b,
+    assetId: assetId2,
+    kind: kind,
     descriptor: jsonDescriptor(
-      _0x4fc170['descriptor'],
+      enabled['descriptor'],
       Math['max'](0x400, Number(descriptorMaxBytes) || DEFAULT_DESCRIPTOR_MAX_BYTES),
     ),
-    primaryFile: _0x332cc9,
-    relatedFiles: _0x356bb0,
-    byteLength: [_0x332cc9, ..._0x356bb0]['reduce'](
-      (_0x251bfc, _0x1f3adf) => _0x251bfc + _0x1f3adf['size'],
-      0x0,
-    ),
-    createdAt: Math['max'](0x0, Number(_0x4fc170['createdAt']) || _0x38d522),
-    updatedAt: _0x38d522,
+    primaryFile: primaryFile,
+    relatedFiles: relatedFiles2,
+    byteLength: [primaryFile, ...relatedFiles2]['reduce']((value5, value6) => value5 + value6['size'], 0x0),
+    createdAt: Math['max'](0x0, Number(enabled['createdAt']) || updatedAt),
+    updatedAt: updatedAt,
   };
 }
-function fileReference(_0x14c15d) {
+function fileReference(name2) {
   return {
-    name: _0x14c15d['name'],
-    relativePath: _0x14c15d['relativePath'],
-    type: _0x14c15d['type'],
-    size: _0x14c15d['size'],
-    lastModified: _0x14c15d['lastModified'],
+    name: name2['name'],
+    relativePath: name2['relativePath'],
+    type: name2['type'],
+    size: name2['size'],
+    lastModified: name2['lastModified'],
   };
 }
-export function createStoryboard3DBinaryAssetReference(_0x464b76) {
-  const _0x5e82a3 = requiredText(_0x464b76?.['assetId'], 'assetId'),
-    _0xda42aa = requiredText(_0x464b76?.['kind'], 'kind');
-  if (!_0x464b76?.['primaryFile'])
+export function createStoryboard3DBinaryAssetReference(enabled2) {
+  const assetId3 = requiredText(enabled2?.['assetId'], 'assetId'),
+    kind2 = requiredText(enabled2?.['kind'], 'kind');
+  if (!enabled2?.['primaryFile'])
     throw new Storyboard3DBinaryAssetRepositoryError('primaryFile\x20is\x20required', {
       code: 'BINARY_ASSET_INVALID_RECORD',
     });
   return {
     schemaVersion: STORYBOARD_3D_BINARY_ASSET_SCHEMA_VERSION,
-    assetId: _0x5e82a3,
-    kind: _0xda42aa,
-    descriptor: jsonDescriptor(_0x464b76['descriptor'], DEFAULT_DESCRIPTOR_MAX_BYTES),
+    assetId: assetId3,
+    kind: kind2,
+    descriptor: jsonDescriptor(enabled2['descriptor'], DEFAULT_DESCRIPTOR_MAX_BYTES),
     storage: {
       driver: 'indexeddb',
       database: STORYBOARD_3D_BINARY_ASSET_DB_NAME,
-      primaryFile: fileReference(_0x464b76['primaryFile']),
-      relatedFiles: (_0x464b76['relatedFiles'] || [])['map'](fileReference),
-      byteLength: Math['max'](0x0, Number(_0x464b76['byteLength']) || 0x0),
+      primaryFile: fileReference(enabled2['primaryFile']),
+      relatedFiles: (enabled2['relatedFiles'] || [])['map'](fileReference),
+      byteLength: Math['max'](0x0, Number(enabled2['byteLength']) || 0x0),
     },
   };
 }
 export class Storyboard3DBinaryAssetRepositoryError extends Error {
   constructor(
-    _0xb31a04,
+    value7,
     {
       code: code = 'BINARY_ASSET_STORAGE_ERROR',
       operation: operation = '',
       assetId: assetId = '',
-      cause: _0x3d8b8d,
+      cause: cause2,
     } = {},
   ) {
-    (super(_0xb31a04, { cause: _0x3d8b8d }),
+    (super(value7, { cause: cause2 }),
       (this['name'] = 'Storyboard3DBinaryAssetRepositoryError'),
       (this['code'] = code),
       (this['operation'] = operation),
       (this['assetId'] = assetId));
   }
 }
-function storageError(_0x566ea8, _0x3b3043, _0x497a2d = '') {
-  if (_0x3b3043 instanceof Storyboard3DBinaryAssetRepositoryError) return _0x3b3043;
-  const _0x19b28a = _0x3b3043?.['name'] === 'QuotaExceededError';
+function storageError(operation2, cause3, assetId4 = '') {
+  if (cause3 instanceof Storyboard3DBinaryAssetRepositoryError) return cause3;
+  const code2 = cause3?.['name'] === 'QuotaExceededError';
   return new Storyboard3DBinaryAssetRepositoryError(
-    _0x19b28a
-      ? 'Insufficient browser storage for 3D asset ' + (_0x497a2d || 'data')
+    code2
+      ? 'Insufficient browser storage for 3D asset ' + (assetId4 || 'data')
       : 'Failed to ' +
-          _0x566ea8 +
+          operation2 +
           ' 3D binary asset' +
-          (_0x497a2d ? '\x20' + _0x497a2d : '') +
+          (assetId4 ? '\x20' + assetId4 : '') +
           ':\x20' +
-          (_0x3b3043?.['message'] || String(_0x3b3043)),
+          (cause3?.['message'] || String(cause3)),
     {
-      code: _0x19b28a
-        ? 'BINARY_ASSET_QUOTA_EXCEEDED'
-        : 'BINARY_ASSET_' + _0x566ea8['toUpperCase']() + '_FAILED',
-      operation: _0x566ea8,
-      assetId: _0x497a2d,
-      cause: _0x3b3043,
+      code: code2 ? 'BINARY_ASSET_QUOTA_EXCEEDED' : 'BINARY_ASSET_' + operation2['toUpperCase']() + '_FAILED',
+      operation: operation2,
+      assetId: assetId4,
+      cause: cause3,
     },
   );
 }
@@ -232,42 +222,39 @@ export class Storyboard3DMemoryAssetDriver {
   constructor({ records: records = new Map() } = {}) {
     this['records'] = records;
   }
-  async ['put'](_0x1bb91c) {
-    return (this['records']['set'](_0x1bb91c['assetId'], cloneRecord(_0x1bb91c)), cloneRecord(_0x1bb91c));
+  async ['put'](value8) {
+    return (this['records']['set'](value8['assetId'], cloneRecord(value8)), cloneRecord(value8));
   }
-  async ['get'](_0x3e555e) {
-    return cloneRecord(this['records']['get'](_0x3e555e) || null);
+  async ['get'](value9) {
+    return cloneRecord(this['records']['get'](value9) || null);
   }
-  async ['getMany'](_0x159dae) {
-    return _0x159dae['map']((_0x20a233) => cloneRecord(this['records']['get'](_0x20a233) || null));
+  async ['getMany'](list) {
+    return list['map']((value10) => cloneRecord(this['records']['get'](value10) || null));
   }
-  async ['remove'](_0x3fe864) {
-    return this['records']['delete'](_0x3fe864);
+  async ['remove'](value11) {
+    return this['records']['delete'](value11);
   }
   async ['close']() {}
 }
-function requestResult(_0x2fe3f7) {
-  return new Promise((_0xd84e5, _0x3207b9) => {
-    ((_0x2fe3f7['onsuccess'] = (_0x1ac1cc) =>
-      _0xd84e5(_0x1ac1cc?.['target']?.['result'] ?? _0x2fe3f7['result'] ?? null)),
-      (_0x2fe3f7['onerror'] = (_0x2d95e4) =>
-        _0x3207b9(
-          _0x2d95e4?.['target']?.['error'] || _0x2fe3f7['error'] || new Error('IndexedDB request failed'),
+function requestResult(value12) {
+  return new Promise((handler, handler2) => {
+    ((value12['onsuccess'] = (event) => handler(event?.['target']?.['result'] ?? value12['result'] ?? null)),
+      (value12['onerror'] = (event2) =>
+        handler2(
+          event2?.['target']?.['error'] || value12['error'] || new Error('IndexedDB request failed'),
         )));
   });
 }
-function transactionDone(_0x21a110) {
-  return new Promise((_0x91f0d5, _0x2b5d98) => {
-    ((_0x21a110['oncomplete'] = () => _0x91f0d5()),
-      (_0x21a110['onerror'] = (_0xccb0c8) =>
-        _0x2b5d98(
-          _0xccb0c8?.['target']?.['error'] || _0x21a110['error'] || new Error('IndexedDB transaction failed'),
+function transactionDone(value13) {
+  return new Promise((handler3, handler4) => {
+    ((value13['oncomplete'] = () => handler3()),
+      (value13['onerror'] = (event3) =>
+        handler4(
+          event3?.['target']?.['error'] || value13['error'] || new Error('IndexedDB transaction failed'),
         )),
-      (_0x21a110['onabort'] = (_0x5dbbd0) =>
-        _0x2b5d98(
-          _0x5dbbd0?.['target']?.['error'] ||
-            _0x21a110['error'] ||
-            new Error('IndexedDB transaction aborted'),
+      (value13['onabort'] = (event4) =>
+        handler4(
+          event4?.['target']?.['error'] || value13['error'] || new Error('IndexedDB transaction aborted'),
         )));
   });
 }
@@ -294,32 +281,32 @@ export class Storyboard3DIndexedDBAssetDriver {
         }),
       );
     return (
-      (this['dbPromise'] = new Promise((_0x3e7865, _0x40b724) => {
-        let _0x146981;
+      (this['dbPromise'] = new Promise((handler5, handler6) => {
+        let value14;
         try {
-          _0x146981 = this['indexedDB']['open'](this['dbName'], this['version']);
-        } catch (_0x15dfbb) {
-          _0x40b724(storageError('open', _0x15dfbb));
+          value14 = this['indexedDB']['open'](this['dbName'], this['version']);
+        } catch (value15) {
+          handler6(storageError('open', value15));
           return;
         }
-        ((_0x146981['onupgradeneeded'] = (_0x48e010) => {
-          const _0x4c86c0 = _0x48e010['target']['result'];
-          !_0x4c86c0['objectStoreNames']['contains'](this['storeName']) &&
-            _0x4c86c0['createObjectStore'](this['storeName'], { keyPath: 'assetId' });
+        ((value14['onupgradeneeded'] = (event5) => {
+          const enabled3 = event5['target']['result'];
+          !enabled3['objectStoreNames']['contains'](this['storeName']) &&
+            enabled3['createObjectStore'](this['storeName'], { keyPath: 'assetId' });
         }),
-          (_0x146981['onsuccess'] = (_0x3a1237) => {
-            const _0x42f6e6 = _0x3a1237['target']['result'];
-            ((_0x42f6e6['onversionchange'] = () => {
-              (_0x42f6e6['close'](), (this['dbPromise'] = null));
+          (value14['onsuccess'] = (event6) => {
+            const value16 = event6['target']['result'];
+            ((value16['onversionchange'] = () => {
+              (value16['close'](), (this['dbPromise'] = null));
             }),
-              _0x3e7865(_0x42f6e6));
+              handler5(value16));
           }),
-          (_0x146981['onerror'] = (_0x40ef63) => {
-            ((this['dbPromise'] = null), _0x40b724(storageError('open', _0x40ef63['target']['error'])));
+          (value14['onerror'] = (event7) => {
+            ((this['dbPromise'] = null), handler6(storageError('open', event7['target']['error'])));
           }),
-          (_0x146981['onblocked'] = () => {
+          (value14['onblocked'] = () => {
             ((this['dbPromise'] = null),
-              _0x40b724(
+              handler6(
                 new Storyboard3DBinaryAssetRepositoryError(
                   '3D binary asset database upgrade is blocked by another open window',
                   { code: 'BINARY_ASSET_STORAGE_BLOCKED', operation: 'open' },
@@ -330,44 +317,42 @@ export class Storyboard3DIndexedDBAssetDriver {
       this['dbPromise']
     );
   }
-  async ['put'](_0x414b6a) {
-    const _0x4433c7 = await this['_open'](),
-      _0x4c2ad7 = _0x4433c7['transaction'](this['storeName'], 'readwrite'),
-      _0x5499e2 = transactionDone(_0x4c2ad7),
-      _0xf9e9d6 = requestResult(_0x4c2ad7['objectStore'](this['storeName'])['put'](_0x414b6a));
-    return (await Promise['all']([_0xf9e9d6, _0x5499e2]), cloneRecord(_0x414b6a));
+  async ['put'](value17) {
+    const value18 = await this['_open'](),
+      value19 = value18['transaction'](this['storeName'], 'readwrite'),
+      transactionDone2 = transactionDone(value19),
+      requestResult2 = requestResult(value19['objectStore'](this['storeName'])['put'](value17));
+    return (await Promise['all']([requestResult2, transactionDone2]), cloneRecord(value17));
   }
-  async ['get'](_0x50bdba) {
-    const _0xbeca26 = await this['_open'](),
-      _0x37b714 = _0xbeca26['transaction'](this['storeName'], 'readonly'),
-      _0x5a6619 = transactionDone(_0x37b714),
-      _0x5f46b3 = await requestResult(_0x37b714['objectStore'](this['storeName'])['get'](_0x50bdba));
-    return (await _0x5a6619, _0x5f46b3 || null);
+  async ['get'](value20) {
+    const value21 = await this['_open'](),
+      value22 = value21['transaction'](this['storeName'], 'readonly'),
+      transactionDone3 = transactionDone(value22),
+      requestResult3 = await requestResult(value22['objectStore'](this['storeName'])['get'](value20));
+    return (await transactionDone3, requestResult3 || null);
   }
-  async ['getMany'](_0x362eae) {
-    const _0x509188 = await this['_open'](),
-      _0x41f677 = _0x509188['transaction'](this['storeName'], 'readonly'),
-      _0x8d2289 = transactionDone(_0x41f677),
-      _0x2b8304 = _0x41f677['objectStore'](this['storeName']),
-      _0x4bf3aa = await Promise['all'](
-        _0x362eae['map']((_0xa8cdf9) => requestResult(_0x2b8304['get'](_0xa8cdf9))),
-      );
-    return (await _0x8d2289, _0x4bf3aa['map']((_0x3e1841) => _0x3e1841 || null));
+  async ['getMany'](list2) {
+    const value23 = await this['_open'](),
+      value24 = value23['transaction'](this['storeName'], 'readonly'),
+      transactionDone4 = transactionDone(value24),
+      map2 = value24['objectStore'](this['storeName']),
+      list3 = await Promise['all'](list2['map']((value25) => requestResult(map2['get'](value25))));
+    return (await transactionDone4, list3['map']((value26) => value26 || null));
   }
-  async ['remove'](_0x1b972b) {
-    const _0x486ad2 = await this['_open'](),
-      _0x48b651 = _0x486ad2['transaction'](this['storeName'], 'readwrite'),
-      _0x40c5fe = transactionDone(_0x48b651),
-      _0x133755 = _0x48b651['objectStore'](this['storeName']),
-      _0x19512a = requestResult(_0x133755['count'](_0x1b972b)),
-      _0x28d215 = requestResult(_0x133755['delete'](_0x1b972b)),
-      [_0x31d41c] = await Promise['all']([_0x19512a, _0x28d215, _0x40c5fe]);
-    return Number(_0x31d41c) > 0x0;
+  async ['remove'](value27) {
+    const value28 = await this['_open'](),
+      value29 = value28['transaction'](this['storeName'], 'readwrite'),
+      transactionDone5 = transactionDone(value29),
+      map3 = value29['objectStore'](this['storeName']),
+      requestResult4 = requestResult(map3['count'](value27)),
+      requestResult5 = requestResult(map3['delete'](value27)),
+      [value30] = await Promise['all']([requestResult4, requestResult5, transactionDone5]);
+    return Number(value30) > 0x0;
   }
   async ['close']() {
     if (!this['dbPromise']) return;
-    const _0xa74cfd = await this['dbPromise']['catch'](() => null);
-    (_0xa74cfd?.['close']?.(), (this['dbPromise'] = null));
+    const value31 = await this['dbPromise']['catch'](() => null);
+    (value31?.['close']?.(), (this['dbPromise'] = null));
   }
 }
 export class Storyboard3DBinaryAssetRepository {
@@ -377,9 +362,9 @@ export class Storyboard3DBinaryAssetRepository {
     descriptorMaxBytes: descriptorMaxBytes = DEFAULT_DESCRIPTOR_MAX_BYTES,
     getManyLimit: getManyLimit = DEFAULT_GET_MANY_LIMIT,
   } = {}) {
-    for (const _0x56cb30 of ['put', 'get', 'getMany', 'remove']) {
-      if (typeof driver?.[_0x56cb30] !== 'function')
-        throw new TypeError('Binary asset driver must implement ' + _0x56cb30 + '()');
+    for (const value32 of ['put', 'get', 'getMany', 'remove']) {
+      if (typeof driver?.[value32] !== 'function')
+        throw new TypeError('Binary asset driver must implement ' + value32 + '()');
     }
     ((this['driver'] = driver),
       (this['now'] = now),
@@ -389,69 +374,69 @@ export class Storyboard3DBinaryAssetRepository {
       )),
       (this['getManyLimit'] = Math['max'](0x1, Number(getManyLimit) || DEFAULT_GET_MANY_LIMIT)));
   }
-  async ['put'](_0x4368cd) {
-    let _0x25f121;
+  async ['put'](value33) {
+    let storyboard3DBinaryAssetRecord;
     try {
       return (
-        (_0x25f121 = normalizeStoryboard3DBinaryAssetRecord(_0x4368cd, {
+        (storyboard3DBinaryAssetRecord = normalizeStoryboard3DBinaryAssetRecord(value33, {
           now: this['now'](),
           descriptorMaxBytes: this['descriptorMaxBytes'],
         })),
-        await this['driver']['put'](_0x25f121),
-        cloneRecord(_0x25f121)
+        await this['driver']['put'](storyboard3DBinaryAssetRecord),
+        cloneRecord(storyboard3DBinaryAssetRecord)
       );
-    } catch (_0x482340) {
-      throw storageError('put', _0x482340, _0x25f121?.['assetId'] || _0x4368cd?.['assetId']);
+    } catch (value34) {
+      throw storageError('put', value34, storyboard3DBinaryAssetRecord?.['assetId'] || value33?.['assetId']);
     }
   }
-  async ['get'](_0x1cac7a) {
-    const _0x2ba549 = requiredText(_0x1cac7a, 'assetId');
+  async ['get'](value35) {
+    const requiredText2 = requiredText(value35, 'assetId');
     try {
       return cloneRecord(
-        validateRetrievedRecord(await this['driver']['get'](_0x2ba549), this['descriptorMaxBytes']),
+        validateRetrievedRecord(await this['driver']['get'](requiredText2), this['descriptorMaxBytes']),
       );
-    } catch (_0x504873) {
-      throw storageError('get', _0x504873, _0x2ba549);
+    } catch (value36) {
+      throw storageError('get', value36, requiredText2);
     }
   }
-  async ['getMany'](_0x1ab421) {
-    if (!Array['isArray'](_0x1ab421))
+  async ['getMany'](list4) {
+    if (!Array['isArray'](list4))
       throw new Storyboard3DBinaryAssetRepositoryError('assetIds\x20must\x20be\x20an\x20array', {
         code: 'BINARY_ASSET_INVALID_QUERY',
         operation: 'getMany',
       });
-    if (_0x1ab421['length'] > this['getManyLimit'])
+    if (list4['length'] > this['getManyLimit'])
       throw new Storyboard3DBinaryAssetRepositoryError(
         'getMany supports at most ' + this['getManyLimit'] + ' asset ids',
         { code: 'BINARY_ASSET_QUERY_TOO_LARGE', operation: 'getMany' },
       );
-    const _0x57d9bc = _0x1ab421['map']((_0x306b06) => requiredText(_0x306b06, 'assetId'));
+    const value37 = list4['map']((value38) => requiredText(value38, 'assetId'));
     try {
-      return (await this['driver']['getMany'](_0x57d9bc))['map']((_0x3117a8) =>
-        cloneRecord(validateRetrievedRecord(_0x3117a8, this['descriptorMaxBytes'])),
+      return (await this['driver']['getMany'](value37))['map']((value39) =>
+        cloneRecord(validateRetrievedRecord(value39, this['descriptorMaxBytes'])),
       );
-    } catch (_0x2bc5a5) {
-      throw storageError('getMany', _0x2bc5a5);
+    } catch (value40) {
+      throw storageError('getMany', value40);
     }
   }
-  async ['remove'](_0x2f8fb6) {
-    const _0x1907b8 = requiredText(_0x2f8fb6, 'assetId');
+  async ['remove'](value41) {
+    const requiredText3 = requiredText(value41, 'assetId');
     try {
-      return await this['driver']['remove'](_0x1907b8);
-    } catch (_0x3e23b1) {
-      throw storageError('remove', _0x3e23b1, _0x1907b8);
+      return await this['driver']['remove'](requiredText3);
+    } catch (value42) {
+      throw storageError('remove', value42, requiredText3);
     }
   }
   async ['close']() {
     await this['driver']['close']?.();
   }
 }
-export function createStoryboard3DBinaryAssetRepository(_0x51fa06) {
-  return new Storyboard3DBinaryAssetRepository(_0x51fa06);
+export function createStoryboard3DBinaryAssetRepository(value43) {
+  return new Storyboard3DBinaryAssetRepository(value43);
 }
-export function createStoryboard3DMemoryAssetDriver(_0x35496f) {
-  return new Storyboard3DMemoryAssetDriver(_0x35496f);
+export function createStoryboard3DMemoryAssetDriver(value44) {
+  return new Storyboard3DMemoryAssetDriver(value44);
 }
-export function createStoryboard3DIndexedDBAssetDriver(_0x438763) {
-  return new Storyboard3DIndexedDBAssetDriver(_0x438763);
+export function createStoryboard3DIndexedDBAssetDriver(value45) {
+  return new Storyboard3DIndexedDBAssetDriver(value45);
 }

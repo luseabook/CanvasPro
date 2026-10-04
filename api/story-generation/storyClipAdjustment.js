@@ -1,1 +1,432 @@
-import{buildVideoReplicationAudioLanguageRule}from'../../src/domain/storyGeneration/videoReplicationLanguage.js';import{buildStoryPromptLanguageRule,normalizeStoryPromptLanguage}from'../../src/domain/storyGeneration/promptLanguage.js';import{withReplicationRequestPolicy}from'./storyRequestPolicy.js';import{getStoryPromptModeLabel,isStoryMinimaxH3PromptMode,isStorySeedance25PromptMode,isStoryWan30PromptMode,normalizeStoryMinimaxH3OfficialTags,normalizeStoryPromptMode}from'../../src/domain/storyGeneration/promptModes.js';import{getStoryClipPromptModeRewriteRequirements}from'../../src/domain/storyGeneration/promptModeRules.js';export const STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION=0x3;export const STORY_CLIP_ADJUSTMENT_SYSTEM_PROMPT=["你是一名专业的短剧分镜提示词编辑。","你的任务是按照用户说明，只调整指定的视频提示词内容，不扩写整集、不创建新片段，也不生成视频。","保持当前卡片中的人物、场景、道具、剧情事件、对白、画外音和上下文连续；按照用户说明调整镜头组织、节奏与时间，并细化当前情境能够自然呈现的表演。","候选提示词采用可直接交给视频生成模型执行的画面描述。根据当前镜头选择有表达价值的环境层次、人物位置与朝向、动作过程、姿态或手势、面部表情与视线、道具互动、光影变化和动作落点。","镜头语言根据剧情、动作和情绪选择观众的观察方式，可写对当前镜头有意义的景别、机位与角度、构图、运镜、焦点和落点。静止或运动都可以；中景、平视、固定镜头在适合当前叙事时也是有效选择。","用户要求保持的资产引用必须逐字保留；不得为了缩短单镜时长而删除、概括或新增当前卡片的剧情内容。","如请求包含 targetPromptMode，必须严格执行其中对应的目标提示词结构；不同模式的镜头时间语法不可混用。","scope 为 selection 时，只返回选中文字的替换文本；scope 为 prompt 或 clip 时，返回完整的候选视频提示词。","不要输出 HTML、Markdown、代码块、解释、修改说明或多个方案。MiniMax H3 官方格式要求的 <Subject N>、<Picture N>、<Video N>、<Audio N>、<d>、<scenetrans>、<cutoff> 是提示词文本标签，不是 HTML。","除目标提示词模式必要的英文字段名和官方结构标签外，candidateText 的叙述、对白、画外音、歌词和画面文字全部直接输出简体中文。返回 JSON 前先自行检查并把草稿中的英文正文改写为中文，不要把英文正文交给客户端处理。只返回严格 JSON 对象，且只能包含 candidateText、candidateDurationSeconds 两个字段；无需调整总时长时 candidateDurationSeconds 可以省略。"]["join"]('\x0a');export function createStoryClipAdjustmentApi({generateText:_0x21b7e7,parseStrictJson:_0x2b1b9b,normalizeText:_0x227904,normalizePositiveNumber:_0x38079d,getResultText:_0x22a3d3,assertPlanningModel:_0x50d178,buildStoryTextProviderProfilePayload:_0x561b87,requestStrictResult:_0x291b3b,requestTimeoutMs:_0x5a2a4c}={}){function _0x19f4df(_0x47275d){return["selection","prompt","clip"]["includes"](_0x47275d)?_0x47275d:'prompt';}function _0x65006b(_0x3791c5){return[...new Set((Array["isArray"](_0x3791c5)?_0x3791c5:[])['map'](_0x227904)["filter"](Boolean))]["slice"](0x0,0x32);}function _0x408504(_0x65c34a={}){const _0x3db4dd=_0x65c34a&&typeof _0x65c34a==="object"&&!Array["isArray"](_0x65c34a)?_0x65c34a:{};return{'projectTitle':_0x227904(_0x3db4dd["projectTitle"]),..._0x3db4dd["sourceMode"]==="video-replication"?{'audioLanguage':buildVideoReplicationAudioLanguageRule({'targetLocale':_0x227904(_0x3db4dd['targetLocale'])||"source",'sourceLanguage':_0x227904(_0x3db4dd["sourceLanguage"])})}:{},'storySummary':_0x227904(_0x3db4dd['storySummary']),'episodeNumber':Math["max"](0x1,Math["trunc"](Number(_0x3db4dd["episodeNumber"])||0x1)),'episodeTitle':_0x227904(_0x3db4dd["episodeTitle"]),'episodeSynopsis':_0x227904(_0x3db4dd["episodeSynopsis"]),'clipTitle':_0x227904(_0x3db4dd["clipTitle"]),'clipScript':_0x227904(_0x3db4dd["clipScript"]),'creativeIntent':_0x227904(_0x3db4dd["creativeIntent"]),'transition':_0x227904(_0x3db4dd["transition"])};}function _0x546cdd({scope:scope="prompt",instruction:instruction='',currentPrompt:currentPrompt='',selectedText:selectedText='',preserveAssetRefs:preserveAssetRefs=!![],preserveDuration:preserveDuration=!![],lockedAssetTokens:lockedAssetTokens=[],lockedDurationTokens:lockedDurationTokens=[],duration:duration='',maxDurationSeconds:maxDurationSeconds=0x0,context:context={},sourcePromptMode:sourcePromptMode='',targetPromptMode:targetPromptMode='',targetLanguage:targetLanguage=''}={}){const _0x255991=_0x19f4df(scope),_0x10f127=_0x38079d(maxDurationSeconds),_0x16c9c7=preserveDuration!==!![]&&_0x255991!=="selection"&&_0x10f127>0x0,_0x3b4f01=Boolean(_0x227904(targetPromptMode)),_0x1bb920=normalizeStoryPromptMode(sourcePromptMode,{'allowDeveloperModes':!![]}),_0x42f6f1=normalizeStoryPromptMode(targetPromptMode,{'allowDeveloperModes':!![]}),_0x3e9324=_0x3b4f01?getStoryClipPromptModeRewriteRequirements(_0x42f6f1,{'hasAssetRefs':_0x65006b(lockedAssetTokens)["length"]>0x0}):[];return JSON["stringify"]({'task':"adjust_story_clip_prompt",'schemaVersion':STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION,'scope':_0x255991,'instruction':_0x227904(instruction),'targetLanguage':normalizeStoryPromptLanguage(targetLanguage),'currentPrompt':_0x227904(currentPrompt),..._0x255991==='selection'?{'selectedText':_0x227904(selectedText)}:{},'locked':{'preserveAssetRefs':preserveAssetRefs===!![],'preserveDuration':preserveDuration===!![],'assetTokens':preserveAssetRefs===!![]?_0x65006b(lockedAssetTokens):[],'durationTokens':preserveDuration===!![]?_0x65006b(lockedDurationTokens):[],'clipDuration':preserveDuration===!![]?_0x227904(duration):''},'timing':{'sourceDuration':_0x227904(duration),'maxDurationSeconds':_0x10f127,'allowReallocation':_0x16c9c7,'minimumShotDurationSeconds':0.5,'durationStepSeconds':0.5},..._0x3b4f01?{'promptMode':{'source':_0x1bb920,'sourceLabel':getStoryPromptModeLabel(_0x1bb920),'target':_0x42f6f1,'targetLabel':getStoryPromptModeLabel(_0x42f6f1),'converting':_0x1bb920!==_0x42f6f1}}:{},'context':_0x408504(context),'requirements':[buildStoryPromptLanguageRule(targetLanguage,{'translateOnly':!_0x227904(instruction)&&(!targetPromptMode||_0x42f6f1===_0x1bb920)}),_0x255991==="selection"?"candidateText 只返回选中文字的替换内容，不要返回完整提示词。":"candidateText 返回调整后的完整视频提示词。",'严格执行\x20instruction，不改变未要求修改的剧情事实。',_0x255991==="selection"?"在 selectedText 范围内补充 instruction 要求的可观察表演，选区外内容保持原样。":"当 instruction 要求增强画面、电影感或情绪表现时，把原叙述转译成摄像机实际拍到的连续画面，并根据当前镜头选择有表达价值的环境、人物位置、动作过程、表情视线、道具、光影以及镜头观察方式。",_0x255991==="selection"?'替换内容的信息密度与原镜头时长自然匹配。':"镜头语言与动作节拍、情绪落点和对应时长自然匹配；静止或运动镜头都按当前表达需要选择。",preserveAssetRefs===!![]?_0x16c9c7?"assetTokens 中的每个引用必须在最终候选中逐字保留，不能改名或删除；因重新拆分镜头，可以在不同镜头中按需要重复引用同一资产。":"assetTokens 中的每个引用必须在最终候选中逐字保留，不能改名、删除或重复添加。":'可以按用户说明调整资产引用。',..._0x3e9324,preserveDuration===!![]?'保持\x20clipDuration\x20和\x20durationTokens，不增加超过当前时长的动作、对白或镜头节拍。':_0x16c9c7?_0x3b4f01?"根据 targetPromptMode 的时间语法重新组织完整提示词；候选总时长不得超过 "+_0x10f127+" 秒，candidateDurationSeconds 必须与目标模式的时间结构一致。完整保留 currentPrompt 的人物、场景、道具、剧情事件、动作、对白与声音内容。":'根据\x20instruction\x20决定是否重新拆分镜头和分配时间；instruction\x20未要求改变节奏时，候选总时长应尽量接近\x20sourceDuration。完整保留\x20currentPrompt\x20的人物、场景、道具、剧情事件、动作、对白与声音内容。每个镜头使用“⏱\x20数字s”标记，单镜至少\x200.5\x20秒并按\x200.5\x20秒递增；总时长不得超过\x20'+_0x10f127+" 秒。candidateDurationSeconds 必须等于所有镜头时间标记之和。":'可以按用户说明调整时间表达，但不得删减当前卡片内容。',_0x16c9c7?"只返回 JSON：{\"candidateText\":\"...\",\"candidateDurationSeconds\":15}。":'只返回\x20JSON：{\x22candidateText\x22:\x22...\x22}。']});}function _0xf9452f(_0x481a24){const _0xf02168=String(_0x481a24??'')['match'](/\d+(?:\.\d+)?/),_0x30a19f=Number(_0xf02168?.[0x0]);return Number["isFinite"](_0x30a19f)&&_0x30a19f>0x0?Number(_0x30a19f["toFixed"](0x1)):0x0;}function _0x2ac90c(_0x2d710a){const _0x2be73a=[],_0x57b3fb=/⏱\s*(\d+(?:\.\d+)?)\s*(?:s|秒)/gi;let _0x1989b5=null;while(_0x1989b5=_0x57b3fb["exec"](String(_0x2d710a||''))){const _0x2f31bc=Number(_0x1989b5[0x1]);if(Number["isFinite"](_0x2f31bc)&&_0x2f31bc>0x0)_0x2be73a["push"](_0x2f31bc);}return _0x2be73a;}function _0x30623c(_0x28e8e8,{allowMinimaxH3Tags:allowMinimaxH3Tags=![]}={}){const _0x58170a=[],_0x506a75=_0x3669e4=>{const _0x38f98f="story-h3-tag-"+_0x58170a["length"]+'';return _0x58170a["push"]({'token':_0x38f98f,'tag':_0x3669e4}),_0x38f98f;};let _0x58d95b=String(_0x28e8e8||'');return allowMinimaxH3Tags&&(_0x58d95b=_0x58d95b['replace'](/<\/?d>|<(?:scenetrans|cutoff)>|<(?:Subject|Picture|Video|Audio)\s+\d+>/giu,_0x506a75)),_0x58d95b=_0x58d95b["replace"](/<!--[\s\S]*?-->/gu,'')['replace'](/<\s*(script|style|iframe|object|embed|svg|math|template|noscript)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/giu,'')["replace"](/<\s*\/?\s*(?:script|style|iframe|object|embed|svg|math|template|noscript)\b[^>]*>/giu,'')["replace"](/<\s*\/?\s*[a-z][^>]*>/giu,''),_0x58170a["reduce"]((_0x1d8e71,{token:_0x5766c2,tag:_0xa03d69})=>_0x1d8e71["split"](_0x5766c2)["join"](_0xa03d69),_0x58d95b)["trim"]();}function _0x143b61(_0x3058bf,_0x138711,_0x47d3d0,_0xed0438=''){const _0x4a70c1=_0x38079d(_0x47d3d0);if(!_0x138711)throw new Error("AI 没有返回候选片段总时长。");if(_0x4a70c1>0x0&&_0x138711>_0x4a70c1+0.001)throw new Error("候选片段总时长不能超过 "+_0x4a70c1+" 秒。");const _0x2616d8=normalizeStoryPromptMode(_0xed0438,{'allowDeveloperModes':!![]});if(isStorySeedance25PromptMode(_0x2616d8)||isStoryWan30PromptMode(_0x2616d8)){const _0x1ede6b=[...String(_0x3058bf||'')["matchAll"](/(?:\[)?(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)秒(?:\])?/gu)]["map"](_0x500662=>({'start':Number(_0x500662[0x1]),'end':Number(_0x500662[0x2])}));if(!_0x1ede6b["length"])throw new Error('候选提示词没有连续时间区间。');let _0x668b9f=0x0;_0x1ede6b["forEach"](({start:_0xaa64bc,end:_0x1e4380})=>{if(_0xaa64bc!==_0x668b9f||_0x1e4380<=_0xaa64bc)throw new Error("候选提示词的时间区间不连续。");_0x668b9f=_0x1e4380;});if(Math["abs"](_0x668b9f-_0x138711)>0.001)throw new Error("candidateDurationSeconds 必须等于最后一个时间区间的终点。");return;}if(isStoryMinimaxH3PromptMode(_0x2616d8)){if(!Number["isInteger"](_0x138711)||_0x138711<0x4||_0x138711>0xf)throw new Error("MiniMax H3 候选片段总时长必须为 4 至 15 秒的整数。");if(!/(?:integrated_multimodal_description|detailed_description):/u["test"](_0x3058bf))throw new Error('MiniMax\x20H3\x20候选提示词缺少官方镜头描述段落。');if(/⏱/u["test"](_0x3058bf))throw new Error("MiniMax H3 候选提示词不能包含 ⏱ 时长标签。");const _0x273063=[...String(_0x3058bf||'')["matchAll"](/\[Shot\s+\d+\]\s+At\s+(\d{2}):(\d{2}(?:\.\d{3})?)/gu)]["map"](_0x24a1d7=>Number(_0x24a1d7[0x1])*0x3c+Number(_0x24a1d7[0x2]));if(_0x273063["some"]((_0x2b0c17,_0x9f0803)=>_0x2b0c17<=0x0||_0x2b0c17>=_0x138711||_0x9f0803>0x0&&_0x2b0c17<=_0x273063[_0x9f0803-0x1]))throw new Error("MiniMax H3 候选提示词的切镜时间无效。");return;}const _0x421d28=_0x2ac90c(_0x3058bf);if(!_0x421d28['length'])throw new Error("候选提示词没有为每个镜头分配时间标记。");const _0x242bc7=_0x421d28["find"](_0x51e31c=>_0x51e31c<0.5||Math["abs"](_0x51e31c*0x2-Math["round"](_0x51e31c*0x2))>0.001);if(_0x242bc7!==undefined)throw new Error("候选镜头时长必须至少为 0.5 秒，并按 0.5 秒递增。");const _0x278e05=Number(_0x421d28["reduce"]((_0x2e311b,_0x480bf8)=>_0x2e311b+_0x480bf8,0x0)["toFixed"](0x1));if(Math["abs"](_0x278e05-_0x138711)>0.001)throw new Error("candidateDurationSeconds 必须等于所有镜头时间标记之和。");}function _0x4aa3e3(_0x5a2f94,{requireDuration:requireDuration=![],maxDurationSeconds:maxDurationSeconds=0x0,promptMode:promptMode=''}={}){const _0x2f1526=_0x2b1b9b(_0x22a3d3(_0x5a2f94),"AI 没有返回候选提示词。");let _0x5ab76d=_0x227904(_0x2f1526["candidateText"]);if(!_0x5ab76d)throw new Error("AI 返回的候选提示词为空。");const _0x2aea2b=normalizeStoryPromptMode(promptMode,{'allowDeveloperModes':!![]}),_0x3b7745=isStoryMinimaxH3PromptMode(_0x2aea2b);_0x3b7745&&(_0x5ab76d=normalizeStoryMinimaxH3OfficialTags(_0x5ab76d));_0x5ab76d=_0x30623c(_0x5ab76d,{'allowMinimaxH3Tags':_0x3b7745});if(!_0x5ab76d)throw new Error('AI\x20返回的候选提示词为空。');const _0x2327e5=_0xf9452f(_0x2f1526['candidateDurationSeconds']);return requireDuration&&_0x143b61(_0x5ab76d,_0x2327e5,maxDurationSeconds,promptMode),{'candidateText':_0x5ab76d,'candidateDurationSeconds':_0x2327e5};}function _0x32a7fa(_0x1f1486,_0x19406c){return String(_0x1f1486||'')['split'](_0x19406c)['length']-0x1;}function _0x1cb6b5(_0x224987,_0x49d25a,_0x28c2b2,_0x443cd7,{allowCountChange:allowCountChange=![]}={}){const _0x3acb31=_0x65006b(_0x28c2b2)["filter"](_0x1e2068=>allowCountChange?_0x32a7fa(_0x224987,_0x1e2068)<0x1:_0x32a7fa(_0x224987,_0x1e2068)!==_0x32a7fa(_0x49d25a,_0x1e2068));if(_0x3acb31['length'])throw new Error(allowCountChange?"候选内容缺少"+_0x443cd7+'：'+_0x3acb31["join"]('、'):"候选内容没有原样保留"+_0x443cd7+'：'+_0x3acb31['join']('、'));}async function _0x49a83e({project:project={},scope:scope="prompt",instruction:instruction='',currentPrompt:currentPrompt='',selection:selection=null,preserveAssetRefs:preserveAssetRefs=!![],preserveDuration:preserveDuration=!![],lockedAssetTokens:lockedAssetTokens=[],lockedDurationTokens:lockedDurationTokens=[],duration:duration='',maxDurationSeconds:maxDurationSeconds=0x0,context:context={},sourcePromptMode:sourcePromptMode='',targetPromptMode:targetPromptMode='',targetLanguage:targetLanguage='',model:model='',provider:provider='',providerProfileId:providerProfileId='',request:request=_0x21b7e7,onProgress:onProgress=null}={}){request=withReplicationRequestPolicy(request,project),_0x50d178(model,provider);const _0xe21999=_0x19f4df(scope),_0x3c5046=_0x227904(instruction),_0x58ff27=normalizeStoryPromptMode(sourcePromptMode,{'allowDeveloperModes':!![]}),_0x3575d9=Boolean(_0x227904(targetPromptMode)),_0x5165c2=normalizeStoryPromptMode(targetPromptMode,{'allowDeveloperModes':!![]}),_0x119390=_0x227904(currentPrompt),_0xaa528a=_0x38079d(maxDurationSeconds),_0x1968a7=preserveDuration!==!![]&&_0xe21999!=="selection"&&_0xaa528a>0x0,_0x812cb8=_0xf9452f(duration),_0x5bd467=normalizeStoryPromptLanguage(targetLanguage);if(targetLanguage&&!_0x5bd467)throw new Error("请选择支持的转换语言。");if(!_0x3c5046&&!_0x3575d9&&!_0x5bd467)throw new Error("请先填写希望 AI 如何调整，或选择提示词模式。");if(!_0x119390)throw new Error("当前片段还没有可调整的视频提示词。");let _0xd8af1c='',_0x4ed7c6=0x0,_0x569d4e=0x0;if(_0xe21999==="selection"){_0x4ed7c6=Math["max"](0x0,Math['trunc'](Number(selection?.["start"])||0x0)),_0x569d4e=Math["max"](_0x4ed7c6,Math["trunc"](Number(selection?.["end"])||0x0)),_0xd8af1c=_0x227904(selection?.["text"]||_0x119390['slice'](_0x4ed7c6,_0x569d4e));if(!_0xd8af1c||_0x119390['slice'](_0x4ed7c6,_0x569d4e)!==_0xd8af1c)throw new Error("选中文字已经变化，请重新选择后再调整。");}const _0x4ae3e5=_0x546cdd({'scope':_0xe21999,'instruction':_0x3c5046,'currentPrompt':_0x119390,'selectedText':_0xd8af1c,'preserveAssetRefs':preserveAssetRefs,'preserveDuration':preserveDuration,'lockedAssetTokens':lockedAssetTokens,'lockedDurationTokens':lockedDurationTokens,'duration':duration,'maxDurationSeconds':_0xaa528a,'context':context,'sourcePromptMode':_0x58ff27,'targetPromptMode':_0x3575d9?_0x5165c2:'','targetLanguage':_0x5bd467});return onProgress?.({'stage':'adjusting-story-clip','current':0x1,'total':0x1,'message':"正在生成候选版本"}),await _0x291b3b({'request':request,'requestPayload':{'model':_0x227904(model),'provider':_0x227904(provider),..._0x561b87(providerProfileId),'prompt':_0x4ae3e5,'systemPrompt':[STORY_CLIP_ADJUSTMENT_SYSTEM_PROMPT,buildStoryPromptLanguageRule(_0x5bd467,{'translateOnly':!_0x3c5046&&(!_0x3575d9||_0x5165c2===_0x58ff27)})||_0x408504(context)['audioLanguage']]["filter"](Boolean)["join"]('\x0a'),'temperature':0.45,'timeoutMs':_0x5a2a4c},'parse':_0x18bc1b=>{const _0x5e4386=_0x4aa3e3(_0x18bc1b,{'requireDuration':_0x1968a7,'maxDurationSeconds':_0xaa528a,'promptMode':_0x3575d9?_0x5165c2:''}),_0x1f4864=_0xe21999==="selection"?_0x227904(''+_0x119390["slice"](0x0,_0x4ed7c6)+_0x5e4386['candidateText']+_0x119390['slice'](_0x569d4e)):_0x5e4386["candidateText"];return preserveAssetRefs===!![]&&_0x1cb6b5(_0x1f4864,_0x119390,lockedAssetTokens,"资产引用",{'allowCountChange':_0x1968a7}),preserveDuration===!![]&&_0x1cb6b5(_0x1f4864,_0x119390,lockedDurationTokens,"时间标记"),{'schemaVersion':STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION,'scope':_0xe21999,'candidateText':_0x1f4864,'targetLanguage':_0x5bd467,'candidateDurationSeconds':_0x1968a7?_0x5e4386['candidateDurationSeconds']:_0x812cb8||_0x5e4386["candidateDurationSeconds"],'replacementText':_0xe21999==="selection"?_0x5e4386["candidateText"]:'','sourcePromptMode':_0x58ff27,'targetPromptMode':_0x3575d9?_0x5165c2:_0x58ff27};},'outputContract':_0x1968a7?_0x3575d9?"candidateText and candidateDurationSeconds; strictly use "+_0x5165c2+'\x20prompt\x20structure;\x20keep\x20all\x20source\x20content\x20and\x20asset\x20tokens;\x20timing\x20is\x20within\x20maxDurationSeconds':"candidateText and candidateDurationSeconds; keep all source content and asset tokens; each shot uses a 0.5-second-step timing token; timing sum is within maxDurationSeconds":'candidateText\x20string;\x20preserve\x20every\x20locked\x20asset\x20and\x20duration\x20token','repairInstruction':_0x1968a7?_0x3575d9?"只修复候选提示词，使其严格符合 "+_0x5165c2+" 的目标结构、资产引用与时间语法；完整保留当前卡片剧情信息，candidateDurationSeconds 不超过上限；不要解释。":"只修复候选提示词的格式、资产引用与镜头时间分配；完整保留当前卡片内容，确保每镜至少 0.5 秒、按 0.5 秒递增，时间标记总和等于 candidateDurationSeconds 且不超过上限；不要解释。":"只修复候选提示词的格式与锁定内容；不要解释。",'retryTemperature':0.2});}return{'adjustStoryClipPrompt':_0x49a83e,'buildStoryClipAdjustmentPrompt':_0x546cdd,'parseStoryClipAdjustmentResult':_0x4aa3e3};}
+import { buildVideoReplicationAudioLanguageRule } from '../../src/domain/storyGeneration/videoReplicationLanguage.js';
+import {
+  buildStoryPromptLanguageRule,
+  normalizeStoryPromptLanguage,
+} from '../../src/domain/storyGeneration/promptLanguage.js';
+import { withReplicationRequestPolicy } from './storyRequestPolicy.js';
+import {
+  getStoryPromptModeLabel,
+  isStoryMinimaxH3PromptMode,
+  isStorySeedance25PromptMode,
+  isStoryWan30PromptMode,
+  normalizeStoryMinimaxH3OfficialTags,
+  normalizeStoryPromptMode,
+} from '../../src/domain/storyGeneration/promptModes.js';
+import { getStoryClipPromptModeRewriteRequirements } from '../../src/domain/storyGeneration/promptModeRules.js';
+export const STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION = 0x3;
+export const STORY_CLIP_ADJUSTMENT_SYSTEM_PROMPT = [
+  '你是一名专业的短剧分镜提示词编辑。',
+  '你的任务是按照用户说明，只调整指定的视频提示词内容，不扩写整集、不创建新片段，也不生成视频。',
+  '保持当前卡片中的人物、场景、道具、剧情事件、对白、画外音和上下文连续；按照用户说明调整镜头组织、节奏与时间，并细化当前情境能够自然呈现的表演。',
+  '候选提示词采用可直接交给视频生成模型执行的画面描述。根据当前镜头选择有表达价值的环境层次、人物位置与朝向、动作过程、姿态或手势、面部表情与视线、道具互动、光影变化和动作落点。',
+  '镜头语言根据剧情、动作和情绪选择观众的观察方式，可写对当前镜头有意义的景别、机位与角度、构图、运镜、焦点和落点。静止或运动都可以；中景、平视、固定镜头在适合当前叙事时也是有效选择。',
+  '用户要求保持的资产引用必须逐字保留；不得为了缩短单镜时长而删除、概括或新增当前卡片的剧情内容。',
+  '如请求包含 targetPromptMode，必须严格执行其中对应的目标提示词结构；不同模式的镜头时间语法不可混用。',
+  'scope 为 selection 时，只返回选中文字的替换文本；scope 为 prompt 或 clip 时，返回完整的候选视频提示词。',
+  '不要输出 HTML、Markdown、代码块、解释、修改说明或多个方案。MiniMax H3 官方格式要求的 <Subject N>、<Picture N>、<Video N>、<Audio N>、<d>、<scenetrans>、<cutoff> 是提示词文本标签，不是 HTML。',
+  '除目标提示词模式必要的英文字段名和官方结构标签外，candidateText 的叙述、对白、画外音、歌词和画面文字全部直接输出简体中文。返回 JSON 前先自行检查并把草稿中的英文正文改写为中文，不要把英文正文交给客户端处理。只返回严格 JSON 对象，且只能包含 candidateText、candidateDurationSeconds 两个字段；无需调整总时长时 candidateDurationSeconds 可以省略。',
+]['join']('\x0a');
+export function createStoryClipAdjustmentApi({
+  generateText: generateText,
+  parseStrictJson: parseStrictJson,
+  normalizeText: normalizeText,
+  normalizePositiveNumber: normalizePositiveNumber,
+  getResultText: getResultText,
+  assertPlanningModel: assertPlanningModel,
+  buildStoryTextProviderProfilePayload: buildStoryTextProviderProfilePayload,
+  requestStrictResult: requestStrictResult,
+  requestTimeoutMs: requestTimeoutMs,
+} = {}) {
+  function run(value) {
+    return ['selection', 'prompt', 'clip']['includes'](value) ? value : 'prompt';
+  }
+  function run2(item) {
+    return [...new Set((Array['isArray'](item) ? item : [])['map'](normalizeText)['filter'](Boolean))][
+      'slice'
+    ](0x0, 0x32);
+  }
+  function run3(options = {}) {
+    const args = options && typeof options === 'object' && !Array['isArray'](options) ? options : {};
+    return {
+      projectTitle: normalizeText(args['projectTitle']),
+      ...(args['sourceMode'] === 'video-replication'
+        ? {
+            audioLanguage: buildVideoReplicationAudioLanguageRule({
+              targetLocale: normalizeText(args['targetLocale']) || 'source',
+              sourceLanguage: normalizeText(args['sourceLanguage']),
+            }),
+          }
+        : {}),
+      storySummary: normalizeText(args['storySummary']),
+      episodeNumber: Math['max'](0x1, Math['trunc'](Number(args['episodeNumber']) || 0x1)),
+      episodeTitle: normalizeText(args['episodeTitle']),
+      episodeSynopsis: normalizeText(args['episodeSynopsis']),
+      clipTitle: normalizeText(args['clipTitle']),
+      clipScript: normalizeText(args['clipScript']),
+      creativeIntent: normalizeText(args['creativeIntent']),
+      transition: normalizeText(args['transition']),
+    };
+  }
+  function run4({
+    scope: scope = 'prompt',
+    instruction: instruction = '',
+    currentPrompt: currentPrompt = '',
+    selectedText: selectedText = '',
+    preserveAssetRefs: preserveAssetRefs = !![],
+    preserveDuration: preserveDuration = !![],
+    lockedAssetTokens: lockedAssetTokens = [],
+    lockedDurationTokens: lockedDurationTokens = [],
+    duration: duration = '',
+    maxDurationSeconds: maxDurationSeconds = 0x0,
+    context: context = {},
+    sourcePromptMode: sourcePromptMode = '',
+    targetPromptMode: targetPromptMode = '',
+    targetLanguage: targetLanguage = '',
+  } = {}) {
+    const args2 = run(scope),
+      count = normalizePositiveNumber(maxDurationSeconds),
+      key = preserveDuration !== !![] && args2 !== 'selection' && count > 0x0,
+      args3 = Boolean(normalizeText(targetPromptMode)),
+      storyPromptMode = normalizeStoryPromptMode(sourcePromptMode, { allowDeveloperModes: !![] }),
+      storyPromptMode2 = normalizeStoryPromptMode(targetPromptMode, { allowDeveloperModes: !![] }),
+      args4 = args3
+        ? getStoryClipPromptModeRewriteRequirements(storyPromptMode2, {
+            hasAssetRefs: run2(lockedAssetTokens)['length'] > 0x0,
+          })
+        : [];
+    return JSON['stringify']({
+      task: 'adjust_story_clip_prompt',
+      schemaVersion: STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION,
+      scope: args2,
+      instruction: normalizeText(instruction),
+      targetLanguage: normalizeStoryPromptLanguage(targetLanguage),
+      currentPrompt: normalizeText(currentPrompt),
+      ...(args2 === 'selection' ? { selectedText: normalizeText(selectedText) } : {}),
+      locked: {
+        preserveAssetRefs: preserveAssetRefs === !![],
+        preserveDuration: preserveDuration === !![],
+        assetTokens: preserveAssetRefs === !![] ? run2(lockedAssetTokens) : [],
+        durationTokens: preserveDuration === !![] ? run2(lockedDurationTokens) : [],
+        clipDuration: preserveDuration === !![] ? normalizeText(duration) : '',
+      },
+      timing: {
+        sourceDuration: normalizeText(duration),
+        maxDurationSeconds: count,
+        allowReallocation: key,
+        minimumShotDurationSeconds: 0.5,
+        durationStepSeconds: 0.5,
+      },
+      ...(args3
+        ? {
+            promptMode: {
+              source: storyPromptMode,
+              sourceLabel: getStoryPromptModeLabel(storyPromptMode),
+              target: storyPromptMode2,
+              targetLabel: getStoryPromptModeLabel(storyPromptMode2),
+              converting: storyPromptMode !== storyPromptMode2,
+            },
+          }
+        : {}),
+      context: run3(context),
+      requirements: [
+        buildStoryPromptLanguageRule(targetLanguage, {
+          translateOnly:
+            !normalizeText(instruction) && (!targetPromptMode || storyPromptMode2 === storyPromptMode),
+        }),
+        args2 === 'selection'
+          ? 'candidateText 只返回选中文字的替换内容，不要返回完整提示词。'
+          : 'candidateText 返回调整后的完整视频提示词。',
+        '严格执行\x20instruction，不改变未要求修改的剧情事实。',
+        args2 === 'selection'
+          ? '在 selectedText 范围内补充 instruction 要求的可观察表演，选区外内容保持原样。'
+          : '当 instruction 要求增强画面、电影感或情绪表现时，把原叙述转译成摄像机实际拍到的连续画面，并根据当前镜头选择有表达价值的环境、人物位置、动作过程、表情视线、道具、光影以及镜头观察方式。',
+        args2 === 'selection'
+          ? '替换内容的信息密度与原镜头时长自然匹配。'
+          : '镜头语言与动作节拍、情绪落点和对应时长自然匹配；静止或运动镜头都按当前表达需要选择。',
+        preserveAssetRefs === !![]
+          ? key
+            ? 'assetTokens 中的每个引用必须在最终候选中逐字保留，不能改名或删除；因重新拆分镜头，可以在不同镜头中按需要重复引用同一资产。'
+            : 'assetTokens 中的每个引用必须在最终候选中逐字保留，不能改名、删除或重复添加。'
+          : '可以按用户说明调整资产引用。',
+        ...args4,
+        preserveDuration === !![]
+          ? '保持\x20clipDuration\x20和\x20durationTokens，不增加超过当前时长的动作、对白或镜头节拍。'
+          : key
+            ? args3
+              ? '根据 targetPromptMode 的时间语法重新组织完整提示词；候选总时长不得超过 ' +
+                count +
+                ' 秒，candidateDurationSeconds 必须与目标模式的时间结构一致。完整保留 currentPrompt 的人物、场景、道具、剧情事件、动作、对白与声音内容。'
+              : '根据\x20instruction\x20决定是否重新拆分镜头和分配时间；instruction\x20未要求改变节奏时，候选总时长应尽量接近\x20sourceDuration。完整保留\x20currentPrompt\x20的人物、场景、道具、剧情事件、动作、对白与声音内容。每个镜头使用“⏱\x20数字s”标记，单镜至少\x200.5\x20秒并按\x200.5\x20秒递增；总时长不得超过\x20' +
+                count +
+                ' 秒。candidateDurationSeconds 必须等于所有镜头时间标记之和。'
+            : '可以按用户说明调整时间表达，但不得删减当前卡片内容。',
+        key
+          ? '只返回 JSON：{"candidateText":"...","candidateDurationSeconds":15}。'
+          : '只返回\x20JSON：{\x22candidateText\x22:\x22...\x22}。',
+      ],
+    });
+  }
+  function run5(index) {
+    const result = String(index ?? '')['match'](/\d+(?:\.\d+)?/),
+      count2 = Number(result?.[0x0]);
+    return Number['isFinite'](count2) && count2 > 0x0 ? Number(count2['toFixed'](0x1)) : 0x0;
+  }
+  function run6(data) {
+    const target = [],
+      source = /⏱\s*(\d+(?:\.\d+)?)\s*(?:s|秒)/gi;
+    let next = null;
+    while ((next = source['exec'](String(data || '')))) {
+      const count3 = Number(next[0x1]);
+      if (Number['isFinite'](count3) && count3 > 0x0) target['push'](count3);
+    }
+    return target;
+  }
+  function run7(current, { allowMinimaxH3Tags: allowMinimaxH3Tags = ![] } = {}) {
+    const entry = [],
+      record = (payload) => {
+        const handle = 'story-h3-tag-' + entry['length'] + '';
+        return (entry['push']({ token: handle, tag: payload }), handle);
+      };
+    let state = String(current || '');
+    return (
+      allowMinimaxH3Tags &&
+        (state = state['replace'](
+          /<\/?d>|<(?:scenetrans|cutoff)>|<(?:Subject|Picture|Video|Audio)\s+\d+>/giu,
+          record,
+        )),
+      (state = state['replace'](/<!--[\s\S]*?-->/gu, '')
+        ['replace'](
+          /<\s*(script|style|iframe|object|embed|svg|math|template|noscript)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/giu,
+          '',
+        )
+        ['replace'](
+          /<\s*\/?\s*(?:script|style|iframe|object|embed|svg|math|template|noscript)\b[^>]*>/giu,
+          '',
+        )
+        ['replace'](/<\s*\/?\s*[a-z][^>]*>/giu, '')),
+      entry['reduce']((config, { token: token, tag: tag }) => config['split'](token)['join'](tag), state)[
+        'trim'
+      ]()
+    );
+  }
+  function run8(input, enabled, output, value2 = '') {
+    const count4 = normalizePositiveNumber(output);
+    if (!enabled) throw new Error('AI 没有返回候选片段总时长。');
+    if (count4 > 0x0 && enabled > count4 + 0.001)
+      throw new Error('候选片段总时长不能超过 ' + count4 + ' 秒。');
+    const storyPromptMode3 = normalizeStoryPromptMode(value2, { allowDeveloperModes: !![] });
+    if (isStorySeedance25PromptMode(storyPromptMode3) || isStoryWan30PromptMode(storyPromptMode3)) {
+      const enabled2 = [
+        ...String(input || '')['matchAll'](/(?:\[)?(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)秒(?:\])?/gu),
+      ]['map']((value3) => ({ start: Number(value3[0x1]), end: Number(value3[0x2]) }));
+      if (!enabled2['length']) throw new Error('候选提示词没有连续时间区间。');
+      let value4 = 0x0;
+      enabled2['forEach'](({ start: start, end: end }) => {
+        if (start !== value4 || end <= start) throw new Error('候选提示词的时间区间不连续。');
+        value4 = end;
+      });
+      if (Math['abs'](value4 - enabled) > 0.001)
+        throw new Error('candidateDurationSeconds 必须等于最后一个时间区间的终点。');
+      return;
+    }
+    if (isStoryMinimaxH3PromptMode(storyPromptMode3)) {
+      if (!Number['isInteger'](enabled) || enabled < 0x4 || enabled > 0xf)
+        throw new Error('MiniMax H3 候选片段总时长必须为 4 至 15 秒的整数。');
+      if (!/(?:integrated_multimodal_description|detailed_description):/u['test'](input))
+        throw new Error('MiniMax\x20H3\x20候选提示词缺少官方镜头描述段落。');
+      if (/⏱/u['test'](input)) throw new Error('MiniMax H3 候选提示词不能包含 ⏱ 时长标签。');
+      const value5 = [
+        ...String(input || '')['matchAll'](/\[Shot\s+\d+\]\s+At\s+(\d{2}):(\d{2}(?:\.\d{3})?)/gu),
+      ]['map']((value6) => Number(value6[0x1]) * 0x3c + Number(value6[0x2]));
+      if (
+        value5['some'](
+          (count5, count6) =>
+            count5 <= 0x0 || count5 >= enabled || (count6 > 0x0 && count5 <= value5[count6 - 0x1]),
+        )
+      )
+        throw new Error('MiniMax H3 候选提示词的切镜时间无效。');
+      return;
+    }
+    const list = run6(input);
+    if (!list['length']) throw new Error('候选提示词没有为每个镜头分配时间标记。');
+    const value7 = list['find'](
+      (count7) => count7 < 0.5 || Math['abs'](count7 * 0x2 - Math['round'](count7 * 0x2)) > 0.001,
+    );
+    if (value7 !== undefined) throw new Error('候选镜头时长必须至少为 0.5 秒，并按 0.5 秒递增。');
+    const value8 = Number(list['reduce']((value9, value10) => value9 + value10, 0x0)['toFixed'](0x1));
+    if (Math['abs'](value8 - enabled) > 0.001)
+      throw new Error('candidateDurationSeconds 必须等于所有镜头时间标记之和。');
+  }
+  function run9(
+    value11,
+    {
+      requireDuration: requireDuration = ![],
+      maxDurationSeconds: maxDurationSeconds = 0x0,
+      promptMode: promptMode = '',
+    } = {},
+  ) {
+    const value12 = parseStrictJson(getResultText(value11), 'AI 没有返回候选提示词。');
+    let enabled3 = normalizeText(value12['candidateText']);
+    if (!enabled3) throw new Error('AI 返回的候选提示词为空。');
+    const storyPromptMode4 = normalizeStoryPromptMode(promptMode, { allowDeveloperModes: !![] }),
+      isStoryMinimaxH3PromptMode2 = isStoryMinimaxH3PromptMode(storyPromptMode4);
+    isStoryMinimaxH3PromptMode2 && (enabled3 = normalizeStoryMinimaxH3OfficialTags(enabled3));
+    enabled3 = run7(enabled3, { allowMinimaxH3Tags: isStoryMinimaxH3PromptMode2 });
+    if (!enabled3) throw new Error('AI\x20返回的候选提示词为空。');
+    const value13 = run5(value12['candidateDurationSeconds']);
+    return (
+      requireDuration && run8(enabled3, value13, maxDurationSeconds, promptMode),
+      { candidateText: enabled3, candidateDurationSeconds: value13 }
+    );
+  }
+  function run10(value14, value15) {
+    return String(value14 || '')['split'](value15)['length'] - 0x1;
+  }
+  function run11(value16, value17, value18, value19, { allowCountChange: allowCountChange = ![] } = {}) {
+    const list2 = run2(value18)['filter']((value20) =>
+      allowCountChange ? run10(value16, value20) < 0x1 : run10(value16, value20) !== run10(value17, value20),
+    );
+    if (list2['length'])
+      throw new Error(
+        allowCountChange
+          ? '候选内容缺少' + value19 + '：' + list2['join']('、')
+          : '候选内容没有原样保留' + value19 + '：' + list2['join']('、'),
+      );
+  }
+  async function run12({
+    project: project = {},
+    scope: scope = 'prompt',
+    instruction: instruction = '',
+    currentPrompt: currentPrompt = '',
+    selection: selection = null,
+    preserveAssetRefs: preserveAssetRefs = !![],
+    preserveDuration: preserveDuration = !![],
+    lockedAssetTokens: lockedAssetTokens = [],
+    lockedDurationTokens: lockedDurationTokens = [],
+    duration: duration = '',
+    maxDurationSeconds: maxDurationSeconds = 0x0,
+    context: context = {},
+    sourcePromptMode: sourcePromptMode = '',
+    targetPromptMode: targetPromptMode = '',
+    targetLanguage: targetLanguage = '',
+    model: model = '',
+    provider: provider = '',
+    providerProfileId: providerProfileId = '',
+    request: request = generateText,
+    onProgress: onProgress = null,
+  } = {}) {
+    ((request = withReplicationRequestPolicy(request, project)), assertPlanningModel(model, provider));
+    const value21 = run(scope),
+      enabled4 = normalizeText(instruction),
+      storyPromptMode5 = normalizeStoryPromptMode(sourcePromptMode, { allowDeveloperModes: !![] }),
+      enabled5 = Boolean(normalizeText(targetPromptMode)),
+      storyPromptMode6 = normalizeStoryPromptMode(targetPromptMode, { allowDeveloperModes: !![] }),
+      list3 = normalizeText(currentPrompt),
+      count8 = normalizePositiveNumber(maxDurationSeconds),
+      value22 = preserveDuration !== !![] && value21 !== 'selection' && count8 > 0x0,
+      value23 = run5(duration),
+      storyPromptLanguage = normalizeStoryPromptLanguage(targetLanguage);
+    if (targetLanguage && !storyPromptLanguage) throw new Error('请选择支持的转换语言。');
+    if (!enabled4 && !enabled5 && !storyPromptLanguage)
+      throw new Error('请先填写希望 AI 如何调整，或选择提示词模式。');
+    if (!list3) throw new Error('当前片段还没有可调整的视频提示词。');
+    let enabled6 = '',
+      value24 = 0x0,
+      value25 = 0x0;
+    if (value21 === 'selection') {
+      ((value24 = Math['max'](0x0, Math['trunc'](Number(selection?.['start']) || 0x0))),
+        (value25 = Math['max'](value24, Math['trunc'](Number(selection?.['end']) || 0x0))),
+        (enabled6 = normalizeText(selection?.['text'] || list3['slice'](value24, value25))));
+      if (!enabled6 || list3['slice'](value24, value25) !== enabled6)
+        throw new Error('选中文字已经变化，请重新选择后再调整。');
+    }
+    const value26 = run4({
+      scope: value21,
+      instruction: enabled4,
+      currentPrompt: list3,
+      selectedText: enabled6,
+      preserveAssetRefs: preserveAssetRefs,
+      preserveDuration: preserveDuration,
+      lockedAssetTokens: lockedAssetTokens,
+      lockedDurationTokens: lockedDurationTokens,
+      duration: duration,
+      maxDurationSeconds: count8,
+      context: context,
+      sourcePromptMode: storyPromptMode5,
+      targetPromptMode: enabled5 ? storyPromptMode6 : '',
+      targetLanguage: storyPromptLanguage,
+    });
+    return (
+      onProgress?.({ stage: 'adjusting-story-clip', current: 0x1, total: 0x1, message: '正在生成候选版本' }),
+      await requestStrictResult({
+        request: request,
+        requestPayload: {
+          model: normalizeText(model),
+          provider: normalizeText(provider),
+          ...buildStoryTextProviderProfilePayload(providerProfileId),
+          prompt: value26,
+          systemPrompt: [
+            STORY_CLIP_ADJUSTMENT_SYSTEM_PROMPT,
+            buildStoryPromptLanguageRule(storyPromptLanguage, {
+              translateOnly: !enabled4 && (!enabled5 || storyPromptMode6 === storyPromptMode5),
+            }) || run3(context)['audioLanguage'],
+          ]
+            ['filter'](Boolean)
+            ['join']('\x0a'),
+          temperature: 0.45,
+          timeoutMs: requestTimeoutMs,
+        },
+        parse: (value27) => {
+          const value28 = run9(value27, {
+              requireDuration: value22,
+              maxDurationSeconds: count8,
+              promptMode: enabled5 ? storyPromptMode6 : '',
+            }),
+            value29 =
+              value21 === 'selection'
+                ? normalizeText(
+                    '' + list3['slice'](0x0, value24) + value28['candidateText'] + list3['slice'](value25),
+                  )
+                : value28['candidateText'];
+          return (
+            preserveAssetRefs === !![] &&
+              run11(value29, list3, lockedAssetTokens, '资产引用', { allowCountChange: value22 }),
+            preserveDuration === !![] && run11(value29, list3, lockedDurationTokens, '时间标记'),
+            {
+              schemaVersion: STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION,
+              scope: value21,
+              candidateText: value29,
+              targetLanguage: storyPromptLanguage,
+              candidateDurationSeconds: value22
+                ? value28['candidateDurationSeconds']
+                : value23 || value28['candidateDurationSeconds'],
+              replacementText: value21 === 'selection' ? value28['candidateText'] : '',
+              sourcePromptMode: storyPromptMode5,
+              targetPromptMode: enabled5 ? storyPromptMode6 : storyPromptMode5,
+            }
+          );
+        },
+        outputContract: value22
+          ? enabled5
+            ? 'candidateText and candidateDurationSeconds; strictly use ' +
+              storyPromptMode6 +
+              '\x20prompt\x20structure;\x20keep\x20all\x20source\x20content\x20and\x20asset\x20tokens;\x20timing\x20is\x20within\x20maxDurationSeconds'
+            : 'candidateText and candidateDurationSeconds; keep all source content and asset tokens; each shot uses a 0.5-second-step timing token; timing sum is within maxDurationSeconds'
+          : 'candidateText\x20string;\x20preserve\x20every\x20locked\x20asset\x20and\x20duration\x20token',
+        repairInstruction: value22
+          ? enabled5
+            ? '只修复候选提示词，使其严格符合 ' +
+              storyPromptMode6 +
+              ' 的目标结构、资产引用与时间语法；完整保留当前卡片剧情信息，candidateDurationSeconds 不超过上限；不要解释。'
+            : '只修复候选提示词的格式、资产引用与镜头时间分配；完整保留当前卡片内容，确保每镜至少 0.5 秒、按 0.5 秒递增，时间标记总和等于 candidateDurationSeconds 且不超过上限；不要解释。'
+          : '只修复候选提示词的格式与锁定内容；不要解释。',
+        retryTemperature: 0.2,
+      })
+    );
+  }
+  return {
+    adjustStoryClipPrompt: run12,
+    buildStoryClipAdjustmentPrompt: run4,
+    parseStoryClipAdjustmentResult: run9,
+  };
+}

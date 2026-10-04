@@ -69,321 +69,326 @@ const IMPORT_DIR_ROOT = 'ProjectImports',
   ]),
   VIDEO_EXTENSIONS = new Set(['.mp4', '.webm', '.mov', '.m4v', '.avi', '.mkv']),
   RECOVERABLE_DERIVED_VIDEO_EXTENSIONS = new Set(['.mp4', '.webm', '.mov', '.m4v']);
-function isPlainObject(_0x5ea462) {
-  return !!_0x5ea462 && typeof _0x5ea462 === 'object' && !Array.isArray(_0x5ea462);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array.isArray(enabled);
 }
-function trimText(_0x4b6c29) {
-  return String(_0x4b6c29 || '').trim();
+function trimText(value) {
+  return String(value || '').trim();
 }
-function normalizePackagePath(_0x276b31) {
-  const _0x576e18 = trimText(_0x276b31);
-  if (!_0x576e18) throw new Error('Project package path is required');
-  if (!path.isAbsolute(_0x576e18)) throw new Error('Project package path must be absolute');
-  if (path.extname(_0x576e18).toLowerCase() !== PROJECT_PACKAGE_FILE_EXTENSION)
+function normalizePackagePath(key) {
+  const trimText2 = trimText(key);
+  if (!trimText2) throw new Error('Project package path is required');
+  if (!path.isAbsolute(trimText2)) throw new Error('Project package path must be absolute');
+  if (path.extname(trimText2).toLowerCase() !== PROJECT_PACKAGE_FILE_EXTENSION)
     throw new Error('Only .aicpkg project packages are supported');
-  return path.resolve(_0x576e18);
+  return path.resolve(trimText2);
 }
-export function withProjectPackageExtension(_0x5bd350) {
-  const _0x1b53b7 = trimText(_0x5bd350);
-  if (!_0x1b53b7) return _0x1b53b7;
-  return path.extname(_0x1b53b7) ? _0x1b53b7 : '' + _0x1b53b7 + PROJECT_PACKAGE_FILE_EXTENSION;
+export function withProjectPackageExtension(index) {
+  const trimText3 = trimText(index);
+  if (!trimText3) return trimText3;
+  return path.extname(trimText3) ? trimText3 : '' + trimText3 + PROJECT_PACKAGE_FILE_EXTENSION;
 }
-function stripUtf8Bom(_0x37cd0b) {
-  return String(_0x37cd0b || '').replace(/^\uFEFF/, '');
+function stripUtf8Bom(result) {
+  return String(result || '').replace(/^\uFEFF/, '');
 }
-function readJsonFile(_0x2c08d6, _0x1c54da) {
-  let _0x7871bc = null;
+function readJsonFile(data, options) {
+  let target = null;
   try {
-    _0x7871bc = JSON.parse(stripUtf8Bom(readFileSync(_0x2c08d6, 'utf8')));
-  } catch (_0x56929d) {
-    throw new Error('Invalid ' + (_0x1c54da || 'JSON') + ': ' + String(_0x56929d?.message || _0x56929d));
+    target = JSON.parse(stripUtf8Bom(readFileSync(data, 'utf8')));
+  } catch (error2) {
+    throw new Error('Invalid ' + (options || 'JSON') + ': ' + String(error2?.message || error2));
   }
-  if (!isPlainObject(_0x7871bc)) throw new Error((_0x1c54da || 'JSON') + ' must be an object');
-  return _0x7871bc;
+  if (!isPlainObject(target)) throw new Error((options || 'JSON') + ' must be an object');
+  return target;
 }
-function timestampForFilename(_0x4e9252 = new Date()) {
-  const _0x27f7f0 = (_0x38165a) => String(_0x38165a).padStart(2, '0');
+function timestampForFilename(source = new Date()) {
+  const run = (next) => String(next).padStart(2, '0');
   return [
-    _0x4e9252.getFullYear(),
-    _0x27f7f0(_0x4e9252.getMonth() + 1),
-    _0x27f7f0(_0x4e9252.getDate()),
+    source.getFullYear(),
+    run(source.getMonth() + 1),
+    run(source.getDate()),
     '-',
-    _0x27f7f0(_0x4e9252.getHours()),
-    _0x27f7f0(_0x4e9252.getMinutes()),
-    _0x27f7f0(_0x4e9252.getSeconds()),
+    run(source.getHours()),
+    run(source.getMinutes()),
+    run(source.getSeconds()),
   ].join('');
 }
-function safePathSegment(_0x29b42c, _0x368f77 = 'project') {
-  const _0x3a99db = sanitizeProjectName(_0x29b42c || _0x368f77)
+function safePathSegment(current, entry = 'project') {
+  const sanitizeProjectName2 = sanitizeProjectName(current || entry)
     .replace(/[.]+$/g, '')
     .replace(/\s+/g, ' ')
     .trim();
-  return _0x3a99db || _0x368f77;
+  return sanitizeProjectName2 || entry;
 }
-function normalizeArchivePath(_0x83123) {
-  const _0x1240ab = trimText(_0x83123).replace(/\\/g, '/').replace(/^\/+/, '');
-  if (!_0x1240ab || _0x1240ab.includes('\0')) return '';
-  if (/^[a-z][a-z0-9+.-]*:/i.test(_0x1240ab) || /^[a-zA-Z]:\//.test(_0x1240ab) || _0x1240ab.startsWith('//'))
-    return '';
-  const _0x3bf4cb = [];
-  for (const _0x217e4e of _0x1240ab.split('/')) {
-    const _0x549fb4 = _0x217e4e.trim();
-    if (!_0x549fb4 || _0x549fb4 === '.') continue;
-    if (_0x549fb4 === '..') return '';
-    _0x3bf4cb.push(_0x549fb4);
+function normalizeArchivePath(record) {
+  const list = trimText(record).replace(/\\/g, '/').replace(/^\/+/, '');
+  if (!list || list.includes('\0')) return '';
+  if (/^[a-z][a-z0-9+.-]*:/i.test(list) || /^[a-zA-Z]:\//.test(list) || list.startsWith('//')) return '';
+  const list2 = [];
+  for (const payload of list.split('/')) {
+    const enabled2 = payload.trim();
+    if (!enabled2 || enabled2 === '.') continue;
+    if (enabled2 === '..') return '';
+    list2.push(enabled2);
   }
-  return _0x3bf4cb.length > 0 ? _0x3bf4cb.join('/') : '';
+  return list2.length > 0 ? list2.join('/') : '';
 }
-function buildAssetArchivePath(_0x5229b3) {
-  const _0x14a619 = normalizeVirtualLocalPath(_0x5229b3);
-  if (!_0x14a619) return '';
-  return 'assets/' + _0x14a619;
+function buildAssetArchivePath(handle) {
+  const virtualLocalPath = normalizeVirtualLocalPath(handle);
+  if (!virtualLocalPath) return '';
+  return 'assets/' + virtualLocalPath;
 }
-function findRootDefinition(_0x2c128d, _0x581937) {
-  const _0x1251fe = normalizeVirtualLocalPath(_0x2c128d);
-  if (!_0x1251fe) return null;
-  for (const _0x37a589 of ROOT_DEFINITIONS) {
-    if (!_0x1251fe.startsWith(_0x37a589.virtualPrefix)) continue;
-    const _0x5b3df1 = trimText(_0x581937?.[_0x37a589.rootKey]);
-    if (!_0x5b3df1) return null;
+function findRootDefinition(state, config) {
+  const localPath = normalizeVirtualLocalPath(state);
+  if (!localPath) return null;
+  for (const args of ROOT_DEFINITIONS) {
+    if (!localPath.startsWith(args.virtualPrefix)) continue;
+    const trimText4 = trimText(config?.[args.rootKey]);
+    if (!trimText4) return null;
     return {
-      ..._0x37a589,
-      absRoot: path.resolve(_0x5b3df1),
-      localPath: _0x1251fe,
-      relPath: _0x1251fe.slice(_0x37a589.virtualPrefix.length),
+      ...args,
+      absRoot: path.resolve(trimText4),
+      localPath: localPath,
+      relPath: localPath.slice(args.virtualPrefix.length),
     };
   }
   return null;
 }
-function clampProgress(_0x28e71a) {
-  const _0xe0d21 = Number(_0x28e71a);
-  if (!Number.isFinite(_0xe0d21)) return null;
-  return Math.max(0, Math.min(1, _0xe0d21));
+function clampProgress(scope) {
+  const input = Number(scope);
+  if (!Number.isFinite(input)) return null;
+  return Math.max(0, Math.min(1, input));
 }
-function emitProgress(_0x36a33a, _0x5cfec3 = {}) {
-  if (typeof _0x36a33a !== 'function') return;
-  const _0x453472 = clampProgress(_0x5cfec3.progress);
-  _0x36a33a({
-    phase: trimText(_0x5cfec3.phase) || 'working',
-    message: trimText(_0x5cfec3.message),
-    progress: _0x453472,
-    current: Number.isFinite(Number(_0x5cfec3.current)) ? Number(_0x5cfec3.current) : null,
-    total: Number.isFinite(Number(_0x5cfec3.total)) ? Number(_0x5cfec3.total) : null,
+function emitProgress(handler, error3 = {}) {
+  if (typeof handler !== 'function') return;
+  const progress = clampProgress(error3.progress);
+  handler({
+    phase: trimText(error3.phase) || 'working',
+    message: trimText(error3.message),
+    progress: progress,
+    current: Number.isFinite(Number(error3.current)) ? Number(error3.current) : null,
+    total: Number.isFinite(Number(error3.total)) ? Number(error3.total) : null,
   });
 }
-function writeZip(_0x289ea3, _0x87627f, _0x48b23a = {}) {
-  return new Promise((_0x252927, _0x5107e8) => {
-    const _0x275f8d = createWriteStream(_0x87627f),
-      _0x5d2565 = Math.max(1, Number(_0x48b23a.estimatedBytes || 0) || 1);
-    let _0x461bdb = 0, settled = false;
-    const fail = error => {
+function writeZip(output, value2, value3 = {}) {
+  return new Promise((handler2, handler3) => {
+    const writeStream = createWriteStream(value2),
+      total = Math.max(1, Number(value3.estimatedBytes || 0) || 1);
+    let current2 = 0,
+      settled = false;
+    const fail = (error) => {
       if (settled) return;
       settled = true;
-      _0x275f8d.once('close', () => _0x5107e8(error));
-      _0x289ea3.outputStream.destroy();
-      _0x275f8d.destroy();
+      writeStream.once('close', () => handler3(error));
+      output.outputStream.destroy();
+      writeStream.destroy();
     };
-    (_0x275f8d.once('close', () => { if (!settled) { settled = true; _0x252927(); } }),
-      _0x275f8d.once('error', fail),
-      _0x289ea3.once('error', fail),
-      _0x289ea3.outputStream.once('error', fail),
-      _0x289ea3.outputStream.on('data', (_0x4a1ac4) => {
-        _0x461bdb += Number(_0x4a1ac4?.length || 0) || 0;
-        const _0x556867 = Math.min(1, _0x461bdb / _0x5d2565);
-        emitProgress(_0x48b23a.onProgress, {
+    (writeStream.once('close', () => {
+      if (!settled) {
+        settled = true;
+        handler2();
+      }
+    }),
+      writeStream.once('error', fail),
+      output.once('error', fail),
+      output.outputStream.once('error', fail),
+      output.outputStream.on('data', (list3) => {
+        current2 += Number(list3?.length || 0) || 0;
+        const value4 = Math.min(1, current2 / total);
+        emitProgress(value3.onProgress, {
           phase: 'zipping',
           message: '正在写入项目包...',
-          progress: 0.85 + _0x556867 * 0.13,
-          current: _0x461bdb,
-          total: _0x5d2565,
+          progress: 0.85 + value4 * 0.13,
+          current: current2,
+          total: total,
         });
       }),
-      _0x289ea3.outputStream.pipe(_0x275f8d),
-      _0x289ea3.end());
+      output.outputStream.pipe(writeStream),
+      output.end());
   });
 }
-function hashFileSha256(_0x17cda0, _0x4b1fda = {}) {
-  return new Promise((_0x1a7836, _0x2407eb) => {
-    const _0x372aca = createHash('sha256'),
-      _0x69c651 = createReadStream(_0x17cda0);
-    (_0x69c651.once('error', _0x2407eb),
-      _0x69c651.on('data', (_0x183ad6) => {
-        (_0x372aca.update(_0x183ad6),
-          typeof _0x4b1fda.onChunk === 'function' && _0x4b1fda.onChunk(Number(_0x183ad6?.length || 0) || 0));
+function hashFileSha256(value5, value6 = {}) {
+  return new Promise((handler4, value7) => {
+    const hash = createHash('sha256'),
+      readStream = createReadStream(value5);
+    (readStream.once('error', value7),
+      readStream.on('data', (list4) => {
+        (hash.update(list4),
+          typeof value6.onChunk === 'function' && value6.onChunk(Number(list4?.length || 0) || 0));
       }),
-      _0x69c651.once('end', () => _0x1a7836(_0x372aca.digest('hex'))));
+      readStream.once('end', () => handler4(hash.digest('hex'))));
   });
 }
-function findExistingAssetPath(_0x35cda1, _0x4d0360) {
-  const _0x1d8b65 = normalizeVirtualLocalPath(_0x35cda1);
-  if (!_0x1d8b65) return null;
-  const _0x45d9b1 = resolveVirtualPathToAbsolute(_0x1d8b65, _0x4d0360);
-  if (!_0x45d9b1 || !existsSync(_0x45d9b1)) return null;
-  const _0x3bc23f = statSync(_0x45d9b1);
-  if (!_0x3bc23f.isFile()) return null;
-  return { localPath: _0x1d8b65, absPath: _0x45d9b1, size: Number(_0x3bc23f.size || 0) };
+function findExistingAssetPath(value8, value9) {
+  const localPath2 = normalizeVirtualLocalPath(value8);
+  if (!localPath2) return null;
+  const absPath = resolveVirtualPathToAbsolute(localPath2, value9);
+  if (!absPath || !existsSync(absPath)) return null;
+  const statSync2 = statSync(absPath);
+  if (!statSync2.isFile()) return null;
+  return { localPath: localPath2, absPath: absPath, size: Number(statSync2.size || 0) };
 }
-function getRecoverableOriginalVideoFallback(_0x5ab478, _0x13d24e) {
-  const _0x207d41 = normalizeVirtualLocalPath(_0x5ab478),
-    _0x3d6268 = 'data/assets/original/';
-  if (!_0x207d41.startsWith(_0x3d6268)) return null;
-  const _0x1f92cb = path.posix.parse(_0x207d41.slice(_0x3d6268.length)),
-    _0x4023db = _0x1f92cb.name;
-  if (!_0x4023db || !VIDEO_EXTENSIONS.has(_0x1f92cb.ext.toLowerCase())) return null;
-  const _0x227102 = 'data/assets/derived/video',
-    _0x5c842a = [
-      _0x227102 + '/' + getVideoPlaybackProxyFilename(_0x4023db),
-      _0x227102 + '/' + _0x4023db + '.proxy.mp4',
-      _0x227102 + '/' + _0x4023db + '.mp4',
-      _0x227102 + '/' + _0x4023db + '.webm',
-      _0x227102 + '/' + _0x4023db + '.mov',
-      _0x227102 + '/' + _0x4023db + '.m4v',
-      _0x227102 + '/' + _0x4023db + '.poster.jpg',
+function getRecoverableOriginalVideoFallback(value10, value11) {
+  const list5 = normalizeVirtualLocalPath(value10),
+    list6 = 'data/assets/original/';
+  if (!list5.startsWith(list6)) return null;
+  const error4 = path.posix.parse(list5.slice(list6.length)),
+    enabled3 = error4.name;
+  if (!enabled3 || !VIDEO_EXTENSIONS.has(error4.ext.toLowerCase())) return null;
+  const value12 = 'data/assets/derived/video',
+    value13 = [
+      value12 + '/' + getVideoPlaybackProxyFilename(enabled3),
+      value12 + '/' + enabled3 + '.proxy.mp4',
+      value12 + '/' + enabled3 + '.mp4',
+      value12 + '/' + enabled3 + '.webm',
+      value12 + '/' + enabled3 + '.mov',
+      value12 + '/' + enabled3 + '.m4v',
+      value12 + '/' + enabled3 + '.poster.jpg',
     ];
-  for (const _0x4dd9ad of _0x5c842a) {
-    const _0x36249a = findExistingAssetPath(_0x4dd9ad, _0x13d24e);
-    if (!_0x36249a) continue;
-    const _0x53c753 = path.extname(_0x36249a.localPath).toLowerCase();
-    return { ..._0x36249a, canReplaceOriginal: RECOVERABLE_DERIVED_VIDEO_EXTENSIONS.has(_0x53c753) };
+  for (const value14 of value13) {
+    const args2 = findExistingAssetPath(value14, value11);
+    if (!args2) continue;
+    const value15 = path.extname(args2.localPath).toLowerCase();
+    return { ...args2, canReplaceOriginal: RECOVERABLE_DERIVED_VIDEO_EXTENSIONS.has(value15) };
   }
   return null;
 }
-function collectRemoteMediaReferences(_0x4bf51f, _0x2a9e3d = [], _0x1fad2a = new Set()) {
-  if (_0x4bf51f == null || typeof _0x4bf51f !== 'object') return _0x2a9e3d;
-  if (_0x1fad2a.has(_0x4bf51f)) return _0x2a9e3d;
-  _0x1fad2a.add(_0x4bf51f);
-  if (Array.isArray(_0x4bf51f)) {
-    for (const _0xbc43cb of _0x4bf51f) collectRemoteMediaReferences(_0xbc43cb, _0x2a9e3d, _0x1fad2a);
-    return _0x2a9e3d;
+function collectRemoteMediaReferences(value16, list7 = [], map = new Set()) {
+  if (value16 == null || typeof value16 !== 'object') return list7;
+  if (map.has(value16)) return list7;
+  map.add(value16);
+  if (Array.isArray(value16)) {
+    for (const value17 of value16) collectRemoteMediaReferences(value17, list7, map);
+    return list7;
   }
-  const _0x19908a = Object.entries(_0x4bf51f),
-    _0x25b16f = _0x19908a.some(([_0x2c7c94, _0x18e652]) => {
-      if (!LOCAL_PATH_KEYS.has(_0x2c7c94)) return false;
-      return collectVirtualLocalPathsFromString(_0x18e652).length > 0;
+  const list8 = Object.entries(value16),
+    enabled4 = list8.some(([value18, value19]) => {
+      if (!LOCAL_PATH_KEYS.has(value18)) return false;
+      return collectVirtualLocalPathsFromString(value19).length > 0;
     });
-  for (const [_0x104806, _0x3e6d44] of _0x19908a) {
+  for (const [key2, url] of list8) {
     if (
-      URL_KEYS.has(_0x104806) &&
-      typeof _0x3e6d44 === 'string' &&
-      /^https?:\/\//i.test(_0x3e6d44) &&
-      collectVirtualLocalPathsFromString(_0x3e6d44).length === 0 &&
-      !_0x25b16f
+      URL_KEYS.has(key2) &&
+      typeof url === 'string' &&
+      /^https?:\/\//i.test(url) &&
+      collectVirtualLocalPathsFromString(url).length === 0 &&
+      !enabled4
     ) {
-      _0x2a9e3d.push({ key: _0x104806, url: _0x3e6d44 });
+      list7.push({ key: key2, url: url });
       continue;
     }
-    collectRemoteMediaReferences(_0x3e6d44, _0x2a9e3d, _0x1fad2a);
+    collectRemoteMediaReferences(url, list7, map);
   }
-  return _0x2a9e3d;
+  return list7;
 }
-async function buildExportAssets(_0x3b6810, _0x1a0c35, _0x53b827 = {}) {
-  const _0x4cdd64 = [...collectReferencedLocalPaths(_0x3b6810)].sort(),
-    _0x57d1d3 = [],
-    _0x10b277 = [],
-    _0x5f4e55 = [],
-    _0x233cb2 = [],
-    _0x4aa817 = new Set(_0x4cdd64);
-  let _0x4d69e4 = 0;
-  emitProgress(_0x53b827.onProgress, {
+async function buildExportAssets(value20, value21, value22 = {}) {
+  const message = [...collectReferencedLocalPaths(value20)].sort(),
+    list9 = [],
+    assets = [],
+    missing = [],
+    warnings = [],
+    map2 = new Set(message);
+  let current3 = 0;
+  emitProgress(value22.onProgress, {
     phase: 'collecting',
-    message: _0x4cdd64.length ? '正在收集本地素材 0/' + _0x4cdd64.length : '正在检查项目素材...',
+    message: message.length ? '正在收集本地素材 0/' + message.length : '正在检查项目素材...',
     progress: 0.05,
     current: 0,
-    total: _0x4cdd64.length,
+    total: message.length,
   });
-  for (let _0x4ebe06 = 0; _0x4ebe06 < _0x4cdd64.length; _0x4ebe06 += 1) {
-    const _0x3b817c = _0x4cdd64[_0x4ebe06],
-      _0x2fcb5a = buildAssetArchivePath(_0x3b817c),
-      _0x12c317 = resolveVirtualPathToAbsolute(_0x3b817c, _0x1a0c35);
-    if (!_0x2fcb5a || !_0x12c317 || !existsSync(_0x12c317)) {
-      const _0x46c08f = getRecoverableOriginalVideoFallback(_0x3b817c, _0x1a0c35);
-      if (_0x46c08f) {
-        _0x233cb2.push({
+  for (let current4 = 0; current4 < message.length; current4 += 1) {
+    const localPath3 = message[current4],
+      archivePath = buildAssetArchivePath(localPath3),
+      absPath2 = resolveVirtualPathToAbsolute(localPath3, value21);
+    if (!archivePath || !absPath2 || !existsSync(absPath2)) {
+      const fallbackLocalPath = getRecoverableOriginalVideoFallback(localPath3, value21);
+      if (fallbackLocalPath) {
+        warnings.push({
           type: 'missing-original-video-fallback',
-          localPath: _0x3b817c,
-          fallbackLocalPath: _0x46c08f.localPath,
-          canReplaceOriginal: _0x46c08f.canReplaceOriginal,
+          localPath: localPath3,
+          fallbackLocalPath: fallbackLocalPath.localPath,
+          canReplaceOriginal: fallbackLocalPath.canReplaceOriginal,
         });
-        !_0x4aa817.has(_0x46c08f.localPath) &&
-          (_0x4aa817.add(_0x46c08f.localPath), _0x4cdd64.push(_0x46c08f.localPath));
+        !map2.has(fallbackLocalPath.localPath) &&
+          (map2.add(fallbackLocalPath.localPath), message.push(fallbackLocalPath.localPath));
         continue;
       }
-      _0x5f4e55.push(_0x3b817c);
+      missing.push(localPath3);
       continue;
     }
-    const _0xc1171c = statSync(_0x12c317);
-    if (!_0xc1171c.isFile()) {
-      _0x5f4e55.push(_0x3b817c);
+    const statSync3 = statSync(absPath2);
+    if (!statSync3.isFile()) {
+      missing.push(localPath3);
       continue;
     }
-    (_0x57d1d3.push({
-      localPath: _0x3b817c,
-      archivePath: _0x2fcb5a,
-      absPath: _0x12c317,
-      size: Number(_0xc1171c.size || 0),
+    (list9.push({
+      localPath: localPath3,
+      archivePath: archivePath,
+      absPath: absPath2,
+      size: Number(statSync3.size || 0),
     }),
-      emitProgress(_0x53b827.onProgress, {
+      emitProgress(value22.onProgress, {
         phase: 'collecting',
-        message: '正在收集本地素材 ' + (_0x4ebe06 + 1) + '/' + _0x4cdd64.length,
-        progress: 0.05 + ((_0x4ebe06 + 1) / Math.max(1, _0x4cdd64.length)) * 0.2,
-        current: _0x4ebe06 + 1,
-        total: _0x4cdd64.length,
+        message: '正在收集本地素材 ' + (current4 + 1) + '/' + message.length,
+        progress: 0.05 + ((current4 + 1) / Math.max(1, message.length)) * 0.2,
+        current: current4 + 1,
+        total: message.length,
       }));
   }
-  const _0x1e6208 = _0x57d1d3.reduce((_0x35714, _0x11f722) => _0x35714 + Number(_0x11f722.size || 0), 0);
-  for (let _0x339518 = 0; _0x339518 < _0x57d1d3.length; _0x339518 += 1) {
-    const _0x26f2b = _0x57d1d3[_0x339518];
-    _0x10b277.push({
-      ..._0x26f2b,
-      sha256: await hashFileSha256(_0x26f2b.absPath, {
-        onChunk: (_0x215ae0) => {
-          ((_0x4d69e4 += _0x215ae0),
-            emitProgress(_0x53b827.onProgress, {
+  const total2 = list9.reduce((item2, value23) => item2 + Number(value23.size || 0), 0);
+  for (let value24 = 0; value24 < list9.length; value24 += 1) {
+    const args3 = list9[value24];
+    assets.push({
+      ...args3,
+      sha256: await hashFileSha256(args3.absPath, {
+        onChunk: (value25) => {
+          ((current3 += value25),
+            emitProgress(value22.onProgress, {
               phase: 'hashing',
-              message: '正在校验素材 ' + (_0x339518 + 1) + '/' + _0x57d1d3.length,
-              progress: 0.25 + (_0x4d69e4 / Math.max(1, _0x1e6208)) * 0.5,
-              current: _0x4d69e4,
-              total: _0x1e6208,
+              message: '正在校验素材 ' + (value24 + 1) + '/' + list9.length,
+              progress: 0.25 + (current3 / Math.max(1, total2)) * 0.5,
+              current: current3,
+              total: total2,
             }));
         },
       }),
     });
   }
-  return { assets: _0x10b277, missing: _0x5f4e55, warnings: _0x233cb2 };
+  return { assets: assets, missing: missing, warnings: warnings };
 }
 export async function exportProjectPackageToPath({
-  outputPath: _0x42d841,
-  multiData: _0x193624,
+  outputPath: outputPath,
+  multiData: multiData,
   projectId: projectId = '',
   projectName: projectName = '',
   appVersion: appVersion = '',
-  roots: _0x155965,
+  roots: roots,
   now: now = new Date(),
-  onProgress: _0x4c8ce8,
+  onProgress: onProgress,
 } = {}) {
-  const _0x46d258 = path.resolve(withProjectPackageExtension(_0x42d841));
-  if (path.extname(_0x46d258).toLowerCase() !== PROJECT_PACKAGE_FILE_EXTENSION)
+  const path2 = path.resolve(withProjectPackageExtension(outputPath));
+  if (path.extname(path2).toLowerCase() !== PROJECT_PACKAGE_FILE_EXTENSION)
     throw new Error('Project package output path must end with .aicpkg');
-  emitProgress(_0x4c8ce8, { phase: 'preparing', message: '正在准备项目包...', progress: 0.02 });
-  const _0xa8700b = buildProjectFilePayload(_0x193624 || {}),
-    _0x135028 = collectRemoteMediaReferences(_0xa8700b);
-  if (_0x135028.length > 0) {
-    const _0xac0fd7 = new Error('Project package export blocked: remote media must be saved locally first');
-    ((_0xac0fd7.code = 'REMOTE_MEDIA_NOT_LOCALIZED'), (_0xac0fd7.remoteMedia = _0x135028.slice(0, 20)));
-    throw _0xac0fd7;
+  emitProgress(onProgress, { phase: 'preparing', message: '正在准备项目包...', progress: 0.02 });
+  const projectFilePayload = buildProjectFilePayload(multiData || {}),
+    list10 = collectRemoteMediaReferences(projectFilePayload);
+  if (list10.length > 0) {
+    const error5 = new Error('Project package export blocked: remote media must be saved locally first');
+    ((error5.code = 'REMOTE_MEDIA_NOT_LOCALIZED'), (error5.remoteMedia = list10.slice(0, 20)));
+    throw error5;
   }
   const {
-    assets: _0x112b3f,
-    missing: _0x560893,
-    warnings: _0x220daf,
-  } = await buildExportAssets(_0xa8700b, _0x155965 || {}, { onProgress: _0x4c8ce8 });
-  if (_0x560893.length > 0) {
-    const _0x2e0b5f = new Error('Project package export blocked: missing local assets');
-    ((_0x2e0b5f.code = 'MISSING_LOCAL_ASSETS'), (_0x2e0b5f.missing = _0x560893));
-    throw _0x2e0b5f;
+    assets: assets2,
+    missing: missing2,
+    warnings: warnings2,
+  } = await buildExportAssets(projectFilePayload, roots || {}, { onProgress: onProgress });
+  if (missing2.length > 0) {
+    const error6 = new Error('Project package export blocked: missing local assets');
+    ((error6.code = 'MISSING_LOCAL_ASSETS'), (error6.missing = missing2));
+    throw error6;
   }
-  const _0x35fd5b = _0x112b3f.map(({ absPath: _0x371df1, ..._0x1b08fe }) => _0x1b08fe),
-    _0x4ab3e4 = {
+  const assets3 = assets2.map(({ absPath: absPath3, ...args4 }) => args4),
+    warnings3 = {
       schemaVersion: PROJECT_PACKAGE_SCHEMA_VERSION,
       packageKind: PROJECT_PACKAGE_KIND,
       exportedAt: now.toISOString(),
@@ -393,239 +398,241 @@ export async function exportProjectPackageToPath({
         projectName: safePathSegment(projectName || projectId || '未命名画布', '未命名画布'),
       },
       projectFile: PROJECT_PACKAGE_PROJECT_FILE,
-      assets: _0x35fd5b,
-      warnings: _0x220daf,
+      assets: assets3,
+      warnings: warnings2,
     };
-  mkdirSync(path.dirname(_0x46d258), { recursive: true });
-  const _0x414156 = new yazl['ZipFile'](),
-    _0x28c5a3 = Buffer.from(JSON.stringify(_0x4ab3e4, null, 2) + '\n', 'utf8'),
-    _0x581083 = Buffer.from(JSON.stringify(_0xa8700b, null, 2) + '\n', 'utf8');
-  (_0x414156.addBuffer(_0x28c5a3, PROJECT_PACKAGE_MANIFEST_NAME),
-    _0x414156.addBuffer(_0x581083, PROJECT_PACKAGE_PROJECT_FILE));
-  for (const _0xdb462e of _0x112b3f) {
-    _0x414156.addFile(_0xdb462e.absPath, _0xdb462e.archivePath);
+  mkdirSync(path.dirname(path2), { recursive: true });
+  const value26 = new yazl['ZipFile'](),
+    estimatedBytes = Buffer.from(JSON.stringify(warnings3, null, 2) + '\n', 'utf8'),
+    list11 = Buffer.from(JSON.stringify(projectFilePayload, null, 2) + '\n', 'utf8');
+  (value26.addBuffer(estimatedBytes, PROJECT_PACKAGE_MANIFEST_NAME),
+    value26.addBuffer(list11, PROJECT_PACKAGE_PROJECT_FILE));
+  for (const value27 of assets2) {
+    value26.addFile(value27.absPath, value27.archivePath);
   }
-  const temporaryDirectory = mkdtempSync(path.join(path.dirname(_0x46d258), '.aicpkg-export-'));
-  const temporaryPath = path.join(temporaryDirectory, path.basename(_0x46d258));
+  const temporaryDirectory = mkdtempSync(path.join(path.dirname(path2), '.aicpkg-export-'));
+  const temporaryPath = path.join(temporaryDirectory, path.basename(path2));
   try {
-    emitProgress(_0x4c8ce8, {
+    emitProgress(onProgress, {
       phase: 'zipping',
       message: '正在写入项目包...',
       progress: 0.85,
       current: 0,
-      total: _0x112b3f.length,
+      total: assets2.length,
     });
-    await writeZip(_0x414156, temporaryPath, {
-      onProgress: _0x4c8ce8,
+    await writeZip(value26, temporaryPath, {
+      onProgress: onProgress,
       estimatedBytes:
-        _0x28c5a3.length +
-        _0x581083.length +
-        _0x112b3f.reduce((_0x50dde7, _0x357c96) => _0x50dde7 + Number(_0x357c96.size || 0), 0),
+        estimatedBytes.length +
+        list11.length +
+        assets2.reduce((item3, value28) => item3 + Number(value28.size || 0), 0),
     });
-    renameSync(temporaryPath, _0x46d258);
+    renameSync(temporaryPath, path2);
   } finally {
     rmSync(temporaryDirectory, { recursive: true, force: true });
   }
-  emitProgress(_0x4c8ce8, {
+  emitProgress(onProgress, {
     phase: 'done',
     message: '项目包收集完成',
     progress: 1,
-    current: _0x112b3f.length,
-    total: _0x112b3f.length,
+    current: assets2.length,
+    total: assets2.length,
   });
   return {
     success: true,
     canceled: false,
-    path: _0x46d258,
-    filename: path.basename(_0x46d258),
-    assetsCount: _0x112b3f.length,
-    warnings: _0x4ab3e4.warnings,
+    path: path2,
+    filename: path.basename(path2),
+    assetsCount: assets2.length,
+    warnings: warnings3.warnings,
   };
 }
-function assertImportPackageSize(_0x2cc1bc, _0x3f906f) {
-  const _0x24ebc2 = statSync(_0x2cc1bc);
-  if (!_0x24ebc2.isFile()) throw new Error('Project package path is not a file');
-  const _0x2b42c6 = Number(_0x3f906f || DEFAULT_MAX_IMPORT_PACKAGE_BYTES);
-  if (Number(_0x24ebc2.size || 0) > _0x2b42c6) throw new Error('Project package is too large');
+function assertImportPackageSize(value29, value30) {
+  const statSync4 = statSync(value29);
+  if (!statSync4.isFile()) throw new Error('Project package path is not a file');
+  const value31 = Number(value30 || DEFAULT_MAX_IMPORT_PACKAGE_BYTES);
+  if (Number(statSync4.size || 0) > value31) throw new Error('Project package is too large');
 }
-function assertPackageManifest(_0x4c72dc) {
-  if (!isPlainObject(_0x4c72dc)) throw new Error('Invalid project package manifest');
-  if (Number(_0x4c72dc.schemaVersion) !== PROJECT_PACKAGE_SCHEMA_VERSION)
+function assertPackageManifest(value32) {
+  if (!isPlainObject(value32)) throw new Error('Invalid project package manifest');
+  if (Number(value32.schemaVersion) !== PROJECT_PACKAGE_SCHEMA_VERSION)
     throw new Error('Unsupported project package schemaVersion');
-  if (_0x4c72dc.packageKind !== PROJECT_PACKAGE_KIND) throw new Error('Invalid project package kind');
-  const _0x41df95 = normalizeArchivePath(_0x4c72dc.projectFile);
-  if (_0x41df95 !== PROJECT_PACKAGE_PROJECT_FILE) throw new Error('Invalid project package projectFile');
-  if (!Array.isArray(_0x4c72dc.assets)) throw new Error('Invalid project package assets');
+  if (value32.packageKind !== PROJECT_PACKAGE_KIND) throw new Error('Invalid project package kind');
+  const archivePath2 = normalizeArchivePath(value32.projectFile);
+  if (archivePath2 !== PROJECT_PACKAGE_PROJECT_FILE) throw new Error('Invalid project package projectFile');
+  if (!Array.isArray(value32.assets)) throw new Error('Invalid project package assets');
 }
-function assertArchivePathInsideTemp(_0x417249, _0x1508cc) {
-  const _0x1fbf11 = normalizeArchivePath(_0x1508cc);
-  if (!_0x1fbf11) return '';
-  const _0x23f99a = path.resolve(_0x417249, ..._0x1fbf11.split('/'));
-  return isPathInside(_0x23f99a, _0x417249) ? _0x23f99a : '';
+function assertArchivePathInsideTemp(value33, value34) {
+  const args5 = normalizeArchivePath(value34);
+  if (!args5) return '';
+  const value35 = path.resolve(value33, ...args5.split('/'));
+  return isPathInside(value35, value33) ? value35 : '';
 }
-function allocateUniqueFilePath(_0x3118ee) {
-  if (!existsSync(_0x3118ee)) return _0x3118ee;
-  const _0x27803d = path.dirname(_0x3118ee),
-    _0x518c27 = path.parse(_0x3118ee);
-  for (let _0x386a82 = 2; _0x386a82 < 0x3e8; _0x386a82 += 1) {
-    const _0x567eca = path.join(_0x27803d, _0x518c27.name + ' (' + _0x386a82 + ')' + _0x518c27.ext);
-    if (!existsSync(_0x567eca)) return _0x567eca;
+function allocateUniqueFilePath(value36) {
+  if (!existsSync(value36)) return value36;
+  const value37 = path.dirname(value36),
+    error7 = path.parse(value36);
+  for (let count = 2; count < 0x3e8; count += 1) {
+    const value38 = path.join(value37, error7.name + ' (' + count + ')' + error7.ext);
+    if (!existsSync(value38)) return value38;
   }
   throw new Error('Unable to allocate unique import file path');
 }
-function allocateImportedAssetTarget(_0x345add, _0x9ff8bf, _0x29f564) {
-  const _0x2ec650 = findRootDefinition(_0x345add, _0x9ff8bf);
-  if (!_0x2ec650) throw new Error('Unsupported local asset path: ' + _0x345add);
-  const _0x3682ff = _0x2ec650.relPath.split('/').filter(Boolean),
-    _0x566fff = [IMPORT_DIR_ROOT, _0x29f564, ..._0x3682ff].join('/'),
-    _0x4a7670 = allocateUniqueFilePath(path.resolve(_0x2ec650.absRoot, ..._0x566fff.split('/')));
-  if (!isPathInside(_0x4a7670, _0x2ec650.absRoot))
-    throw new Error('Invalid imported asset target: ' + _0x345add);
-  const _0x4e1d2c = path.relative(_0x2ec650.absRoot, _0x4a7670).replace(/\\/g, '/');
-  return { absPath: _0x4a7670, localPath: '' + _0x2ec650.virtualPrefix + _0x4e1d2c };
+function allocateImportedAssetTarget(value39, value40, value41) {
+  const rootDefinition = findRootDefinition(value39, value40);
+  if (!rootDefinition) throw new Error('Unsupported local asset path: ' + value39);
+  const args6 = rootDefinition.relPath.split('/').filter(Boolean),
+    args7 = [IMPORT_DIR_ROOT, value41, ...args6].join('/'),
+    absPath4 = allocateUniqueFilePath(path.resolve(rootDefinition.absRoot, ...args7.split('/')));
+  if (!isPathInside(absPath4, rootDefinition.absRoot))
+    throw new Error('Invalid imported asset target: ' + value39);
+  const value42 = path.relative(rootDefinition.absRoot, absPath4).replace(/\\/g, '/');
+  return { absPath: absPath4, localPath: '' + rootDefinition.virtualPrefix + value42 };
 }
-function isUrlLikeKey(_0x42c00c) {
-  return URL_KEYS.has(String(_0x42c00c || ''));
+function isUrlLikeKey(value43) {
+  return URL_KEYS.has(String(value43 || ''));
 }
-function rewriteStringLocalReferences(_0x44f793, _0x37f02a, _0x4a4fb7 = '') {
-  const _0x3cf012 = String(_0x44f793 || '').split('|'),
-    _0x2e19ba = _0x3cf012.map((_0x532d7e) => {
-      const _0x34025f = normalizeVirtualLocalPath(_0x532d7e),
-        _0x4ab375 = _0x34025f ? _0x37f02a.get(_0x34025f) : '';
-      if (!_0x4ab375) return _0x532d7e;
-      const _0x1f8b1e = _0x532d7e.trim();
-      if (LOCAL_PATH_KEYS.has(_0x4a4fb7)) return _0x4ab375;
-      if (isUrlLikeKey(_0x4a4fb7) || /^https?:\/\//i.test(_0x1f8b1e) || _0x1f8b1e.startsWith('/'))
-        return '/' + _0x4ab375;
-      return _0x4ab375;
+function rewriteStringLocalReferences(value44, map3, value45 = '') {
+  const list12 = String(value44 || '').split('|'),
+    list13 = list12.map((item4) => {
+      const virtualLocalPath2 = normalizeVirtualLocalPath(item4),
+        enabled5 = virtualLocalPath2 ? map3.get(virtualLocalPath2) : '';
+      if (!enabled5) return item4;
+      const value46 = item4.trim();
+      if (LOCAL_PATH_KEYS.has(value45)) return enabled5;
+      if (isUrlLikeKey(value45) || /^https?:\/\//i.test(value46) || value46.startsWith('/'))
+        return '/' + enabled5;
+      return enabled5;
     });
-  return _0x2e19ba.join('|');
+  return list13.join('|');
 }
-function rewriteProjectLocalReferences(_0x569459, _0x2810ff, _0x50bc3a = '') {
-  if (typeof _0x569459 === 'string') {
-    const _0x5ac026 = collectVirtualLocalPathsFromString(_0x569459);
-    if (!_0x5ac026.some((_0x5a25cd) => _0x2810ff.has(_0x5a25cd))) return _0x569459;
-    return rewriteStringLocalReferences(_0x569459, _0x2810ff, _0x50bc3a);
+function rewriteProjectLocalReferences(list14, map4, value47 = '') {
+  if (typeof list14 === 'string') {
+    const list15 = collectVirtualLocalPathsFromString(list14);
+    if (!list15.some((item5) => map4.has(item5))) return list14;
+    return rewriteStringLocalReferences(list14, map4, value47);
   }
-  if (Array.isArray(_0x569459))
-    return _0x569459.map((_0x2561dd) => rewriteProjectLocalReferences(_0x2561dd, _0x2810ff, _0x50bc3a));
-  if (!isPlainObject(_0x569459)) return _0x569459;
-  const _0x127c6d = {};
-  for (const [_0x212dd7, _0x39f2d2] of Object.entries(_0x569459)) {
-    _0x127c6d[_0x212dd7] = rewriteProjectLocalReferences(_0x39f2d2, _0x2810ff, _0x212dd7);
+  if (Array.isArray(list14))
+    return list14.map((item6) => rewriteProjectLocalReferences(item6, map4, value47));
+  if (!isPlainObject(list14)) return list14;
+  const value48 = {};
+  for (const [value49, value50] of Object.entries(list14)) {
+    value48[value49] = rewriteProjectLocalReferences(value50, map4, value49);
   }
-  return _0x127c6d;
+  return value48;
 }
-function allocateUniqueProjectPath(_0x9b7161, _0x27d89f) {
-  const _0x1918d5 = path.resolve(trimText(_0x9b7161));
-  mkdirSync(_0x1918d5, { recursive: true });
-  const _0x4459ca = safePathSegment((_0x27d89f || '未命名画布') + ' - 导入', 'imported-project'),
-    _0x3168fe = path.join(_0x1918d5, _0x4459ca + '.aicanvas');
-  if (!existsSync(_0x3168fe)) return _0x3168fe;
-  for (let _0x5dbbe1 = 2; _0x5dbbe1 < 0x3e8; _0x5dbbe1 += 1) {
-    const _0x36d9bb = path.join(_0x1918d5, _0x4459ca + ' (' + _0x5dbbe1 + ').aicanvas');
-    if (!existsSync(_0x36d9bb)) return _0x36d9bb;
+function allocateUniqueProjectPath(value51, value52) {
+  const value53 = path.resolve(trimText(value51));
+  mkdirSync(value53, { recursive: true });
+  const safePathSegment2 = safePathSegment((value52 || '未命名画布') + ' - 导入', 'imported-project'),
+    value54 = path.join(value53, safePathSegment2 + '.aicanvas');
+  if (!existsSync(value54)) return value54;
+  for (let count2 = 2; count2 < 0x3e8; count2 += 1) {
+    const value55 = path.join(value53, safePathSegment2 + ' (' + count2 + ').aicanvas');
+    if (!existsSync(value55)) return value55;
   }
   throw new Error('Unable to allocate imported project file path');
 }
-function importDirNameForProject(_0xf21862, _0x2bec9c = new Date()) {
-  return safePathSegment((_0xf21862 || 'Project') + '-' + timestampForFilename(_0x2bec9c), 'Project');
+function importDirNameForProject(value56, value57 = new Date()) {
+  return safePathSegment((value56 || 'Project') + '-' + timestampForFilename(value57), 'Project');
 }
-async function validateImportAssets(_0x348cbb, _0x3f55bc, _0x5f272e, _0x98363b = {}) {
-  const _0x5312ec = Number(_0x98363b.maxAssetBytes || DEFAULT_MAX_IMPORT_ASSET_BYTES),
-    _0x5ca4b1 = [],
-    _0x2be2db = new Set();
-  for (const _0xe644b3 of _0x348cbb.assets) {
-    if (!isPlainObject(_0xe644b3)) throw new Error('Invalid project package asset');
-    const _0xf78b36 = normalizeVirtualLocalPath(_0xe644b3.localPath),
-      _0x1ed70e = normalizeArchivePath(_0xe644b3.archivePath);
+async function validateImportAssets(value58, value59, value60, value61 = {}) {
+  const value62 = Number(value61.maxAssetBytes || DEFAULT_MAX_IMPORT_ASSET_BYTES),
+    list16 = [],
+    map5 = new Set();
+  for (const value63 of value58.assets) {
+    if (!isPlainObject(value63)) throw new Error('Invalid project package asset');
+    const localPath4 = normalizeVirtualLocalPath(value63.localPath),
+      archivePath3 = normalizeArchivePath(value63.archivePath);
     if (
-      !_0xf78b36 ||
-      String(_0xe644b3.localPath || '')
+      !localPath4 ||
+      String(value63.localPath || '')
         .replace(/\\/g, '/')
-        .replace(/^\/+/, '') !== _0xf78b36
+        .replace(/^\/+/, '') !== localPath4
     )
       throw new Error('Invalid project package asset localPath');
-    if (!_0x1ed70e || !_0x1ed70e.startsWith('assets/')) throw new Error('Invalid project package asset path');
-    if (_0x2be2db.has(_0xf78b36)) continue;
-    _0x2be2db.add(_0xf78b36);
-    const _0x39cce8 = assertArchivePathInsideTemp(_0x3f55bc, _0x1ed70e);
-    if (!_0x39cce8 || !existsSync(_0x39cce8))
-      throw new Error('Project package asset is missing: ' + _0xf78b36);
-    const _0x573624 = statSync(_0x39cce8);
-    if (!_0x573624.isFile()) throw new Error('Project package asset is not a file: ' + _0xf78b36);
-    const _0x33bce7 = Number(_0x573624.size || 0);
-    if (_0x33bce7 > _0x5312ec) throw new Error('Project package asset is too large');
-    const _0x44778d = Number(_0xe644b3.size || 0) || 0;
-    if (_0x44778d > 0 && _0x44778d !== _0x33bce7)
-      throw new Error('Project package asset size mismatch: ' + _0xf78b36);
-    const expectedHash = String(_0xe644b3.sha256 || '').trim().toLowerCase();
+    if (!archivePath3 || !archivePath3.startsWith('assets/'))
+      throw new Error('Invalid project package asset path');
+    if (map5.has(localPath4)) continue;
+    map5.add(localPath4);
+    const absPath5 = assertArchivePathInsideTemp(value59, archivePath3);
+    if (!absPath5 || !existsSync(absPath5))
+      throw new Error('Project package asset is missing: ' + localPath4);
+    const statSync5 = statSync(absPath5);
+    if (!statSync5.isFile()) throw new Error('Project package asset is not a file: ' + localPath4);
+    const size = Number(statSync5.size || 0);
+    if (size > value62) throw new Error('Project package asset is too large');
+    const count3 = Number(value63.size || 0) || 0;
+    if (count3 > 0 && count3 !== size) throw new Error('Project package asset size mismatch: ' + localPath4);
+    const expectedHash = String(value63.sha256 || '')
+      .trim()
+      .toLowerCase();
     if (expectedHash && !/^[a-f0-9]{64}$/.test(expectedHash))
-      throw new Error('Project package asset SHA-256 is invalid: ' + _0xf78b36);
-    if (expectedHash && (await hashFileSha256(_0x39cce8)).toLowerCase() !== expectedHash)
-      throw new Error('Project package asset SHA-256 mismatch: ' + _0xf78b36);
-    if (!findRootDefinition(_0xf78b36, _0x5f272e))
-      throw new Error('Unsupported project package asset localPath: ' + _0xf78b36);
-    _0x5ca4b1.push({ localPath: _0xf78b36, archivePath: _0x1ed70e, absPath: _0x39cce8, size: _0x33bce7 });
+      throw new Error('Project package asset SHA-256 is invalid: ' + localPath4);
+    if (expectedHash && (await hashFileSha256(absPath5)).toLowerCase() !== expectedHash)
+      throw new Error('Project package asset SHA-256 mismatch: ' + localPath4);
+    if (!findRootDefinition(localPath4, value60))
+      throw new Error('Unsupported project package asset localPath: ' + localPath4);
+    list16.push({ localPath: localPath4, archivePath: archivePath3, absPath: absPath5, size: size });
   }
-  return _0x5ca4b1;
+  return list16;
 }
 export async function importProjectPackageFromPath({
-  packagePath: _0x17e1b5,
-  roots: _0x749e3e,
-  projectRoot: _0x5e4d4f,
+  packagePath: packagePath,
+  roots: roots2,
+  projectRoot: projectRoot,
   tempRoot: tempRoot = os.tmpdir(),
   now: now = new Date(),
   maxPackageBytes: maxPackageBytes = DEFAULT_MAX_IMPORT_PACKAGE_BYTES,
   maxAssetBytes: maxAssetBytes = DEFAULT_MAX_IMPORT_ASSET_BYTES,
 } = {}) {
-  const _0x6a6b14 = normalizePackagePath(_0x17e1b5);
-  assertImportPackageSize(_0x6a6b14, maxPackageBytes);
-  const _0x14d74e = path.resolve(tempRoot || os.tmpdir());
-  mkdirSync(_0x14d74e, { recursive: true });
-  const _0x425e26 = mkdtempSync(path.join(_0x14d74e, 'aicpkg-'));
+  const sourcePackagePath = normalizePackagePath(packagePath);
+  assertImportPackageSize(sourcePackagePath, maxPackageBytes);
+  const value64 = path.resolve(tempRoot || os.tmpdir());
+  mkdirSync(value64, { recursive: true });
+  const mkdtempSync2 = mkdtempSync(path.join(value64, 'aicpkg-'));
   try {
     // Reuse the bounded streaming extractor used by full-package restore.
     const { extractFullPackage } = await import('./fullProjectPackageService.js');
-    const extractedEntries = await extractFullPackage(_0x6a6b14, _0x425e26);
-    const _0x2a513b = path.join(_0x425e26, PROJECT_PACKAGE_MANIFEST_NAME);
-    if (!existsSync(_0x2a513b)) throw new Error('Project package manifest is missing');
-    const _0x41ecdb = readJsonFile(_0x2a513b, 'project package manifest');
-    assertPackageManifest(_0x41ecdb);
+    const extractedEntries = await extractFullPackage(sourcePackagePath, mkdtempSync2);
+    const value65 = path.join(mkdtempSync2, PROJECT_PACKAGE_MANIFEST_NAME);
+    if (!existsSync(value65)) throw new Error('Project package manifest is missing');
+    const args8 = readJsonFile(value65, 'project package manifest');
+    assertPackageManifest(args8);
     const expectedEntries = new Set([
       PROJECT_PACKAGE_MANIFEST_NAME,
       PROJECT_PACKAGE_PROJECT_FILE,
-      ..._0x41ecdb.assets.map(asset => normalizeArchivePath(asset?.archivePath)).filter(Boolean),
+      ...args8.assets.map((asset) => normalizeArchivePath(asset?.archivePath)).filter(Boolean),
     ]);
     if (
       expectedEntries.size !== extractedEntries.size ||
-      [...extractedEntries.keys()].some(name => !expectedEntries.has(name))
-    ) throw new Error('Project package contains unlisted archive entries');
-    const _0xc4f0dd = assertArchivePathInsideTemp(_0x425e26, _0x41ecdb.projectFile);
-    if (!_0xc4f0dd || !existsSync(_0xc4f0dd)) throw new Error('Project package project file is missing');
-    const _0x11ac65 = readJsonFile(_0xc4f0dd, 'project package project file'),
-      _0x14766c = safePathSegment(
-        _0x41ecdb.project?.projectName ||
-          _0x41ecdb.project?.projectId ||
-          path.basename(_0x6a6b14, PROJECT_PACKAGE_FILE_EXTENSION),
+      [...extractedEntries.keys()].some((name) => !expectedEntries.has(name))
+    )
+      throw new Error('Project package contains unlisted archive entries');
+    const assertArchivePathInsideTemp2 = assertArchivePathInsideTemp(mkdtempSync2, args8.projectFile);
+    if (!assertArchivePathInsideTemp2 || !existsSync(assertArchivePathInsideTemp2))
+      throw new Error('Project package project file is missing');
+    const jsonFile = readJsonFile(assertArchivePathInsideTemp2, 'project package project file'),
+      projectName2 = safePathSegment(
+        args8.project?.projectName ||
+          args8.project?.projectId ||
+          path.basename(sourcePackagePath, PROJECT_PACKAGE_FILE_EXTENSION),
         'Imported Project',
       ),
-      _0x1c6ddb = importDirNameForProject(_0x14766c, now),
-      _0x5a3642 = await validateImportAssets(_0x41ecdb, _0x425e26, _0x749e3e || {}, {
+      importDirNameForProject2 = importDirNameForProject(projectName2, now),
+      assetsCount = await validateImportAssets(args8, mkdtempSync2, roots2 || {}, {
         maxAssetBytes: maxAssetBytes,
       }),
-      _0x5dcf41 = new Map(),
-      _0x132d5d = _0x5a3642.map((_0x5d6733) => {
-        const _0xb3adfb = allocateImportedAssetTarget(_0x5d6733.localPath, _0x749e3e || {}, _0x1c6ddb);
-        return (
-          _0x5dcf41.set(_0x5d6733.localPath, _0xb3adfb.localPath),
-          { from: _0x5d6733.absPath, to: _0xb3adfb.absPath }
-        );
+      map6 = new Map(),
+      value66 = assetsCount.map((from2) => {
+        const to = allocateImportedAssetTarget(from2.localPath, roots2 || {}, importDirNameForProject2);
+        return (map6.set(from2.localPath, to.localPath), { from: from2.absPath, to: to.absPath });
       });
-    const createdAssets = [], createdDirectories = new Set();
+    const createdAssets = [],
+      createdDirectories = new Set();
     let importedProjectPath = '';
     try {
-      for (const item of _0x132d5d) {
+      for (const item of value66) {
         let directory = path.dirname(item.to);
         const missingDirectories = [];
         while (directory && !existsSync(directory)) {
@@ -634,34 +641,36 @@ export async function importProjectPackageFromPath({
           if (parent === directory) break;
           directory = parent;
         }
-        missingDirectories.forEach(directoryPath => createdDirectories.add(directoryPath));
+        missingDirectories.forEach((directoryPath) => createdDirectories.add(directoryPath));
         mkdirSync(path.dirname(item.to), { recursive: true });
         copyFileSync(item.from, item.to, constants.COPYFILE_EXCL);
         createdAssets.push(item.to);
       }
-      const importedData = rewriteProjectLocalReferences(_0x11ac65, _0x5dcf41);
-      importedProjectPath = allocateUniqueProjectPath(_0x5e4d4f, _0x14766c);
+      const importedData = rewriteProjectLocalReferences(jsonFile, map6);
+      importedProjectPath = allocateUniqueProjectPath(projectRoot, projectName2);
       writeProjectJson(importedProjectPath, importedData);
       return {
         success: true,
         canceled: false,
         projectPath: importedProjectPath,
-        projectName: _0x14766c + ' - 导入',
+        projectName: projectName2 + ' - 导入',
         filename: path.basename(importedProjectPath),
         data: importedData,
-        assetsCount: _0x5a3642.length,
-        sourcePackagePath: _0x6a6b14,
+        assetsCount: assetsCount.length,
+        sourcePackagePath: sourcePackagePath,
       };
     } catch (error) {
       if (importedProjectPath) rmSync(importedProjectPath, { force: true });
       for (const filePath of createdAssets.reverse()) rmSync(filePath, { force: true });
       for (const directory of [...createdDirectories].sort((a, b) => b.length - a.length)) {
-        try { rmdirSync(directory); } catch {}
+        try {
+          rmdirSync(directory);
+        } catch {}
       }
       throw error;
     }
   } finally {
-    rmSync(_0x425e26, { recursive: true, force: true });
+    rmSync(mkdtempSync2, { recursive: true, force: true });
   }
 }
 export const projectPackageInternals = {

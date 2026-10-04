@@ -1,8 +1,8 @@
 import { PANORAMA_CHARACTER_BONES, normalizeBonePose } from '../panoramaSceneNode/poseCatalog.js';
 import { sampleCharacterActionPose } from './characterActionSampling.js';
 function bodyPreset(
-  _0x4c2047,
-  _0x398eb3,
+  id,
+  name,
   {
     gender: gender = 'male',
     ageGroup: ageGroup = 'adult',
@@ -16,8 +16,8 @@ function bodyPreset(
   } = {},
 ) {
   return Object['freeze']({
-    id: _0x4c2047,
-    name: _0x398eb3,
+    id: id,
+    name: name,
     gender: gender,
     ageGroup: ageGroup,
     height: height,
@@ -223,8 +223,8 @@ export const STORYBOARD_3D_ACTIONS = Object['freeze']([
     ['dance-ballet', '芭蕾姿势'],
     ['lean-left', '左侧倾身'],
     ['lean-right', '右侧倾身'],
-  ]['map'](([_0x23e7b6, _0x2a38e3]) =>
-    Object['freeze']({ id: _0x23e7b6, name: _0x2a38e3, poseId: _0x23e7b6, loop: ![], duration: 0x1 }),
+  ]['map'](([id2, name2]) =>
+    Object['freeze']({ id: id2, name: name2, poseId: id2, loop: ![], duration: 0x1 }),
   ),
 ]);
 export const STORYBOARD_3D_HAND_POSES = Object['freeze']([
@@ -240,9 +240,9 @@ export const STORYBOARD_3D_HAND_POSES = Object['freeze']([
     thumbCurl: 0.75,
   }),
 ]);
-const BODY_BY_ID = new Map(STORYBOARD_3D_BODY_PRESETS['map']((_0x3fa3eb) => [_0x3fa3eb['id'], _0x3fa3eb])),
-  ACTION_BY_ID = new Map(STORYBOARD_3D_ACTIONS['map']((_0x54b563) => [_0x54b563['id'], _0x54b563])),
-  HAND_BY_ID = new Map(STORYBOARD_3D_HAND_POSES['map']((_0x34243b) => [_0x34243b['id'], _0x34243b])),
+const BODY_BY_ID = new Map(STORYBOARD_3D_BODY_PRESETS['map']((value) => [value['id'], value])),
+  ACTION_BY_ID = new Map(STORYBOARD_3D_ACTIONS['map']((item) => [item['id'], item])),
+  HAND_BY_ID = new Map(STORYBOARD_3D_HAND_POSES['map']((key) => [key['id'], key])),
   BONE_SET = new Set(PANORAMA_CHARACTER_BONES),
   PI = Math['PI'],
   DEFAULT_LIMIT = Object['freeze']({ x: [-PI, PI], y: [-PI, PI], z: [-PI, PI] });
@@ -254,246 +254,248 @@ export const STORYBOARD_3D_BONE_LIMITS = Object['freeze']({
   calf_l: Object['freeze']({ x: [0x0, 2.65], y: [-0.25, 0.25], z: [-0.25, 0.25] }),
   calf_r: Object['freeze']({ x: [0x0, 2.65], y: [-0.25, 0.25], z: [-0.25, 0.25] }),
 });
-function clamp(_0x2c7775, _0x1a6c13, _0x39d290) {
-  return Math['max'](_0x1a6c13, Math['min'](_0x39d290, Number(_0x2c7775) || 0x0));
+function clamp(index, result, data) {
+  return Math['max'](result, Math['min'](data, Number(index) || 0x0));
 }
-function mergeBonePoses(..._0x51b050) {
-  const _0xe7336e = {};
+function mergeBonePoses(...list) {
+  const options = {};
   return (
-    _0x51b050['forEach']((_0x230b44) => {
-      Object['entries'](normalizeBonePose(_0x230b44))['forEach'](([_0x3d46fc, _0x3ed93d]) => {
-        const _0x1a7bd7 = _0xe7336e[_0x3d46fc] || { x: 0x0, y: 0x0, z: 0x0 };
-        _0xe7336e[_0x3d46fc] = {
-          x: _0x1a7bd7['x'] + _0x3ed93d['x'],
-          y: _0x1a7bd7['y'] + _0x3ed93d['y'],
-          z: _0x1a7bd7['z'] + _0x3ed93d['z'],
+    list['forEach']((target) => {
+      Object['entries'](normalizeBonePose(target))['forEach'](([source, box]) => {
+        const x2 = options[source] || { x: 0x0, y: 0x0, z: 0x0 };
+        options[source] = {
+          x: x2['x'] + box['x'],
+          y: x2['y'] + box['y'],
+          z: x2['z'] + box['z'],
         };
       });
     }),
-    normalizeBonePose(_0xe7336e)
+    normalizeBonePose(options)
   );
 }
-export function clampStoryboard3DBoneEuler(_0x595eb3, _0x46b1b0 = {}) {
-  if (!BONE_SET['has'](String(_0x595eb3 || ''))) return null;
-  const _0x3f50c1 = STORYBOARD_3D_BONE_LIMITS[_0x595eb3] || DEFAULT_LIMIT;
+export function clampStoryboard3DBoneEuler(next, box2 = {}) {
+  if (!BONE_SET['has'](String(next || ''))) return null;
+  const box3 = STORYBOARD_3D_BONE_LIMITS[next] || DEFAULT_LIMIT;
   return {
-    x: clamp(_0x46b1b0['x'], _0x3f50c1['x'][0x0], _0x3f50c1['x'][0x1]),
-    y: clamp(_0x46b1b0['y'], _0x3f50c1['y'][0x0], _0x3f50c1['y'][0x1]),
-    z: clamp(_0x46b1b0['z'], _0x3f50c1['z'][0x0], _0x3f50c1['z'][0x1]),
+    x: clamp(box2['x'], box3['x'][0x0], box3['x'][0x1]),
+    y: clamp(box2['y'], box3['y'][0x0], box3['y'][0x1]),
+    z: clamp(box2['z'], box3['z'][0x0], box3['z'][0x1]),
   };
 }
-export function eulerToStoryboard3DQuaternion(_0xd3734 = {}) {
-  const _0x384799 = Number(_0xd3734['x']) || 0x0,
-    _0x25f3ea = Number(_0xd3734['y']) || 0x0,
-    _0x247803 = Number(_0xd3734['z']) || 0x0,
-    _0x546656 = Math['cos'](_0x384799 / 0x2),
-    _0x471ac6 = Math['cos'](_0x25f3ea / 0x2),
-    _0xd70f74 = Math['cos'](_0x247803 / 0x2),
-    _0xc6fb9d = Math['sin'](_0x384799 / 0x2),
-    _0x27d12e = Math['sin'](_0x25f3ea / 0x2),
-    _0x3f42c6 = Math['sin'](_0x247803 / 0x2);
+export function eulerToStoryboard3DQuaternion(box4 = {}) {
+  const current = Number(box4['x']) || 0x0,
+    entry = Number(box4['y']) || 0x0,
+    record = Number(box4['z']) || 0x0,
+    payload = Math['cos'](current / 0x2),
+    handle = Math['cos'](entry / 0x2),
+    state = Math['cos'](record / 0x2),
+    config = Math['sin'](current / 0x2),
+    scope = Math['sin'](entry / 0x2),
+    input = Math['sin'](record / 0x2);
   return [
-    _0xc6fb9d * _0x471ac6 * _0xd70f74 + _0x546656 * _0x27d12e * _0x3f42c6,
-    _0x546656 * _0x27d12e * _0xd70f74 - _0xc6fb9d * _0x471ac6 * _0x3f42c6,
-    _0x546656 * _0x471ac6 * _0x3f42c6 + _0xc6fb9d * _0x27d12e * _0xd70f74,
-    _0x546656 * _0x471ac6 * _0xd70f74 - _0xc6fb9d * _0x27d12e * _0x3f42c6,
+    config * handle * state + payload * scope * input,
+    payload * scope * state - config * handle * input,
+    payload * handle * input + config * scope * state,
+    payload * handle * state - config * scope * input,
   ];
 }
-export function normalizeStoryboard3DBoneOverrides(_0x658c6 = {}) {
-  const _0x42fbbe = {};
-  for (const [_0x17c5db, _0x1bd890] of Object['entries'](_0x658c6 || {})) {
-    if (!BONE_SET['has'](_0x17c5db) || !Array['isArray'](_0x1bd890) || _0x1bd890['length'] !== 0x4) continue;
-    const _0x499c43 = _0x1bd890['map'](Number);
-    if (!_0x499c43['every'](Number['isFinite'])) continue;
-    const _0x1a265b = Math['hypot'](..._0x499c43);
-    if (_0x1a265b <= 1e-8) continue;
-    _0x42fbbe[_0x17c5db] = _0x499c43['map']((_0xe69167) => _0xe69167 / _0x1a265b);
+export function normalizeStoryboard3DBoneOverrides(options2 = {}) {
+  const output = {};
+  for (const [value2, list2] of Object['entries'](options2 || {})) {
+    if (!BONE_SET['has'](value2) || !Array['isArray'](list2) || list2['length'] !== 0x4) continue;
+    const list3 = list2['map'](Number);
+    if (!list3['every'](Number['isFinite'])) continue;
+    const count = Math['hypot'](...list3);
+    if (count <= 1e-8) continue;
+    output[value2] = list3['map']((value3) => value3 / count);
   }
-  return _0x42fbbe;
+  return output;
 }
-export function setStoryboard3DBoneOverride(_0x18f428, _0x3f6599, _0xb85fd8) {
-  const _0x22cf2f = clampStoryboard3DBoneEuler(_0x3f6599, _0xb85fd8);
-  if (!_0x22cf2f) throw new Error('Unknown character bone: ' + _0x3f6599);
+export function setStoryboard3DBoneOverride(value4, value5, value6) {
+  const clampStoryboard3DBoneEuler2 = clampStoryboard3DBoneEuler(value5, value6);
+  if (!clampStoryboard3DBoneEuler2) throw new Error('Unknown character bone: ' + value5);
   return {
-    ...normalizeStoryboard3DBoneOverrides(_0x18f428),
-    [_0x3f6599]: eulerToStoryboard3DQuaternion(_0x22cf2f),
+    ...normalizeStoryboard3DBoneOverrides(value4),
+    [value5]: eulerToStoryboard3DQuaternion(clampStoryboard3DBoneEuler2),
   };
 }
-export function normalizeStoryboard3DCharacterState(_0x370722 = {}) {
-  const _0x28f22c = BODY_BY_ID['has'](_0x370722['bodyPresetId']) ? _0x370722['bodyPresetId'] : 'adult-male',
-    _0x1b241b = ACTION_BY_ID['has'](_0x370722['actionId'])
-      ? _0x370722['actionId']
+export function normalizeStoryboard3DCharacterState(actionPlaying = {}) {
+  const bodyPresetId = BODY_BY_ID['has'](actionPlaying['bodyPresetId'])
+      ? actionPlaying['bodyPresetId']
+      : 'adult-male',
+    actionId = ACTION_BY_ID['has'](actionPlaying['actionId'])
+      ? actionPlaying['actionId']
       : STORYBOARD_3D_ACTIONS[0x0]['id'],
-    _0x15acc3 = HAND_BY_ID['has'](_0x370722['leftHandPoseId']) ? _0x370722['leftHandPoseId'] : 'relaxed',
-    _0x2965a3 = HAND_BY_ID['has'](_0x370722['rightHandPoseId']) ? _0x370722['rightHandPoseId'] : 'relaxed';
+    leftHandPoseId = HAND_BY_ID['has'](actionPlaying['leftHandPoseId'])
+      ? actionPlaying['leftHandPoseId']
+      : 'relaxed',
+    rightHandPoseId = HAND_BY_ID['has'](actionPlaying['rightHandPoseId'])
+      ? actionPlaying['rightHandPoseId']
+      : 'relaxed';
   return {
-    bodyPresetId: _0x28f22c,
-    actionId: _0x1b241b,
-    actionTime: Math['max'](0x0, Number(_0x370722['actionTime']) || 0x0),
-    actionPlaying: _0x370722['actionPlaying'] === !![],
-    leftHandPoseId: _0x15acc3,
-    rightHandPoseId: _0x2965a3,
-    boneOverrides: normalizeStoryboard3DBoneOverrides(_0x370722['boneOverrides']),
+    bodyPresetId: bodyPresetId,
+    actionId: actionId,
+    actionTime: Math['max'](0x0, Number(actionPlaying['actionTime']) || 0x0),
+    actionPlaying: actionPlaying['actionPlaying'] === !![],
+    leftHandPoseId: leftHandPoseId,
+    rightHandPoseId: rightHandPoseId,
+    boneOverrides: normalizeStoryboard3DBoneOverrides(actionPlaying['boneOverrides']),
   };
 }
-export function resolveStoryboard3DCharacterPose(_0x32e226 = {}) {
-  const _0x1f452f = normalizeStoryboard3DCharacterState(_0x32e226),
-    _0x9556f1 = BODY_BY_ID['get'](_0x1f452f['bodyPresetId']),
-    _0x4de542 = ACTION_BY_ID['get'](_0x1f452f['actionId']),
-    _0x30296f = sampleCharacterActionPose(_0x4de542, _0x1f452f['actionTime']),
-    _0xd542e2 = HAND_BY_ID['get'](_0x1f452f['leftHandPoseId']),
-    _0x1f2b46 = HAND_BY_ID['get'](_0x1f452f['rightHandPoseId']),
-    _0xccd9cc = {
-      state: _0x1f452f,
+export function resolveStoryboard3DCharacterPose(options3 = {}) {
+  const state2 = normalizeStoryboard3DCharacterState(options3),
+    value7 = BODY_BY_ID['get'](state2['bodyPresetId']),
+    value8 = ACTION_BY_ID['get'](state2['actionId']),
+    sampleCharacterActionPose2 = sampleCharacterActionPose(value8, state2['actionTime']),
+    args = HAND_BY_ID['get'](state2['leftHandPoseId']),
+    args2 = HAND_BY_ID['get'](state2['rightHandPoseId']),
+    value9 = {
+      state: state2,
       body: {
-        ...structuredClone(_0x9556f1),
-        ...(Number['isFinite'](_0x32e226['heightCm'])
-          ? { height: Math['max'](0x37, Math['min'](0xe6, _0x32e226['heightCm'])) / 0x64 }
+        ...structuredClone(value7),
+        ...(Number['isFinite'](options3['heightCm'])
+          ? { height: Math['max'](0x37, Math['min'](0xe6, options3['heightCm'])) / 0x64 }
           : {}),
       },
-      action: structuredClone(_0x4de542),
-      baseBones: mergeBonePoses(_0x9556f1?.['posture'], _0x30296f?.['bones']),
-      handRotations: { hand_l: { ..._0xd542e2['rotation'] }, hand_r: { ..._0x1f2b46['rotation'] } },
-      handPoses: { left: structuredClone(_0xd542e2), right: structuredClone(_0x1f2b46) },
-      boneOverrides: structuredClone(_0x1f452f['boneOverrides']),
+      action: structuredClone(value8),
+      baseBones: mergeBonePoses(value7?.['posture'], sampleCharacterActionPose2?.['bones']),
+      handRotations: { hand_l: { ...args['rotation'] }, hand_r: { ...args2['rotation'] } },
+      handPoses: { left: structuredClone(args), right: structuredClone(args2) },
+      boneOverrides: structuredClone(state2['boneOverrides']),
     };
-  return (
-    (_0xccd9cc['resolvedBoneQuaternions'] = composeStoryboard3DCharacterBoneQuaternions(_0xccd9cc)),
-    _0xccd9cc
-  );
+  return ((value9['resolvedBoneQuaternions'] = composeStoryboard3DCharacterBoneQuaternions(value9)), value9);
 }
-export function composeStoryboard3DCharacterBoneQuaternions(_0x3ef0a2 = {}) {
-  const _0x47933b =
-      _0x3ef0a2?.['baseBones'] && _0x3ef0a2?.['handRotations'] && _0x3ef0a2?.['boneOverrides']
-        ? _0x3ef0a2
-        : { ...resolveStoryboard3DCharacterPoseParts(_0x3ef0a2) },
-    _0x4cdf6a = {
-      ...normalizeBonePose(_0x47933b['baseBones']),
-      ...normalizeBonePose(_0x47933b['handRotations']),
+export function composeStoryboard3DCharacterBoneQuaternions(options4 = {}) {
+  const value10 =
+      options4?.['baseBones'] && options4?.['handRotations'] && options4?.['boneOverrides']
+        ? options4
+        : { ...resolveStoryboard3DCharacterPoseParts(options4) },
+    value11 = {
+      ...normalizeBonePose(value10['baseBones']),
+      ...normalizeBonePose(value10['handRotations']),
     },
-    _0x305adb = {};
-  for (const [_0x1ab56c, _0x12aea1] of Object['entries'](_0x4cdf6a)) {
-    _0x305adb[_0x1ab56c] = eulerToStoryboard3DQuaternion(_0x12aea1);
+    args3 = {};
+  for (const [value12, value13] of Object['entries'](value11)) {
+    args3[value12] = eulerToStoryboard3DQuaternion(value13);
   }
-  return { ..._0x305adb, ...normalizeStoryboard3DBoneOverrides(_0x47933b['boneOverrides']) };
+  return { ...args3, ...normalizeStoryboard3DBoneOverrides(value10['boneOverrides']) };
 }
 export function applyStoryboard3DCharacterPoseToModel(
-  _0xf0e2b9,
-  _0x109207 = {},
+  value14,
+  value15 = {},
   { baseBoneQuaternions: baseBoneQuaternions = {} } = {},
 ) {
-  const _0xac7ef8 = composeStoryboard3DCharacterBoneQuaternions(_0x109207);
-  for (const _0x560fab of PANORAMA_CHARACTER_BONES) {
-    const _0x26a87e = _0xf0e2b9?.['getObjectByName']?.(_0x560fab);
-    if (!_0x26a87e?.['quaternion']) continue;
-    const _0x586dd4 = baseBoneQuaternions[_0x560fab];
-    _0x586dd4 &&
-      typeof _0x26a87e['quaternion']['set'] === 'function' &&
-      _0x26a87e['quaternion']['set'](_0x586dd4['x'], _0x586dd4['y'], _0x586dd4['z'], _0x586dd4['w']);
-    const _0x45872f = _0xac7ef8[_0x560fab];
-    if (!_0x45872f) continue;
-    if (typeof _0x26a87e['quaternion']['multiply'] === 'function')
-      _0x26a87e['quaternion']['multiply']({
-        x: _0x45872f[0x0],
-        y: _0x45872f[0x1],
-        z: _0x45872f[0x2],
-        w: _0x45872f[0x3],
+  const composeStoryboard3DCharacterBoneQuaternions2 = composeStoryboard3DCharacterBoneQuaternions(value15);
+  for (const value16 of PANORAMA_CHARACTER_BONES) {
+    const enabled = value14?.['getObjectByName']?.(value16);
+    if (!enabled?.['quaternion']) continue;
+    const box5 = baseBoneQuaternions[value16];
+    box5 &&
+      typeof enabled['quaternion']['set'] === 'function' &&
+      enabled['quaternion']['set'](box5['x'], box5['y'], box5['z'], box5['w']);
+    const x3 = composeStoryboard3DCharacterBoneQuaternions2[value16];
+    if (!x3) continue;
+    if (typeof enabled['quaternion']['multiply'] === 'function')
+      enabled['quaternion']['multiply']({
+        x: x3[0x0],
+        y: x3[0x1],
+        z: x3[0x2],
+        w: x3[0x3],
       });
     else
-      typeof _0x26a87e['quaternion']['set'] === 'function' &&
-        _0x26a87e['quaternion']['set'](_0x45872f[0x0], _0x45872f[0x1], _0x45872f[0x2], _0x45872f[0x3]);
+      typeof enabled['quaternion']['set'] === 'function' &&
+        enabled['quaternion']['set'](x3[0x0], x3[0x1], x3[0x2], x3[0x3]);
   }
-  return (_0xf0e2b9?.['updateMatrixWorld']?.(!![]), _0xf0e2b9);
+  return (value14?.['updateMatrixWorld']?.(!![]), value14);
 }
-export function setStoryboard3DCharacterActionPlayback(_0x46f669, _0xb04e99) {
-  const _0x4db45c = normalizeStoryboard3DCharacterState(_0x46f669);
-  return { ..._0x4db45c, actionPlaying: _0xb04e99 === !![] };
+export function setStoryboard3DCharacterActionPlayback(value17, actionPlaying2) {
+  const args4 = normalizeStoryboard3DCharacterState(value17);
+  return { ...args4, actionPlaying: actionPlaying2 === !![] };
 }
-export function seekStoryboard3DCharacterAction(_0xc75c5e, _0x56ac96) {
-  const _0x38245d = normalizeStoryboard3DCharacterState(_0xc75c5e),
-    _0x117960 = ACTION_BY_ID['get'](_0x38245d['actionId']),
-    _0x1c3048 = Math['max'](0.001, Number(_0x117960['duration']) || 0x1),
-    _0xdf2b1a = Math['max'](0x0, Number(_0x56ac96) || 0x0);
+export function seekStoryboard3DCharacterAction(value18, value19) {
+  const args5 = normalizeStoryboard3DCharacterState(value18),
+    actionTime = ACTION_BY_ID['get'](args5['actionId']),
+    value20 = Math['max'](0.001, Number(actionTime['duration']) || 0x1),
+    value21 = Math['max'](0x0, Number(value19) || 0x0);
   return {
-    ..._0x38245d,
-    actionTime: _0x117960['loop'] ? _0xdf2b1a % _0x1c3048 : Math['min'](_0xdf2b1a, _0x1c3048),
+    ...args5,
+    actionTime: actionTime['loop'] ? value21 % value20 : Math['min'](value21, value20),
   };
 }
-export function advanceStoryboard3DCharacterAction(_0x107f97, _0x501b5e) {
-  const _0x53f1a2 = normalizeStoryboard3DCharacterState(_0x107f97);
-  if (!_0x53f1a2['actionPlaying']) return _0x53f1a2;
-  const _0x4f7bed = ACTION_BY_ID['get'](_0x53f1a2['actionId']),
-    _0x362775 = Math['max'](0.001, Number(_0x4f7bed['duration']) || 0x1),
-    _0x79e395 = _0x53f1a2['actionTime'] + Math['max'](0x0, Number(_0x501b5e) || 0x0);
-  if (_0x4f7bed['loop']) return { ..._0x53f1a2, actionTime: _0x79e395 % _0x362775 };
-  if (_0x79e395 >= _0x362775) return { ..._0x53f1a2, actionTime: _0x362775, actionPlaying: ![] };
-  return { ..._0x53f1a2, actionTime: _0x79e395 };
+export function advanceStoryboard3DCharacterAction(value22, value23) {
+  const args6 = normalizeStoryboard3DCharacterState(value22);
+  if (!args6['actionPlaying']) return args6;
+  const value24 = ACTION_BY_ID['get'](args6['actionId']),
+    actionTime2 = Math['max'](0.001, Number(value24['duration']) || 0x1),
+    actionTime3 = args6['actionTime'] + Math['max'](0x0, Number(value23) || 0x0);
+  if (value24['loop']) return { ...args6, actionTime: actionTime3 % actionTime2 };
+  if (actionTime3 >= actionTime2) return { ...args6, actionTime: actionTime2, actionPlaying: ![] };
+  return { ...args6, actionTime: actionTime3 };
 }
-export function quaternionToStoryboard3DEuler(_0x3b30c6 = []) {
-  const _0x35531b = Array['isArray'](_0x3b30c6) ? _0x3b30c6['map'](Number) : [],
-    _0x476ae8 =
-      _0x35531b['length'] === 0x4 && _0x35531b['every'](Number['isFinite'])
-        ? Math['hypot'](..._0x35531b)
-        : 0x0,
-    _0x416d34 =
-      _0x476ae8 > 1e-8 ? _0x35531b['map']((_0x1edd9c) => _0x1edd9c / _0x476ae8) : [0x0, 0x0, 0x0, 0x1],
-    [_0x544378, _0x39c8a9, _0x4d8bf6, _0x311721] = _0x416d34,
-    _0xd81df5 = 0x1 - 0x2 * (_0x39c8a9 * _0x39c8a9 + _0x4d8bf6 * _0x4d8bf6),
-    _0x1a5474 = 0x2 * (_0x544378 * _0x39c8a9 - _0x4d8bf6 * _0x311721),
-    _0x197f4f = 0x2 * (_0x544378 * _0x4d8bf6 + _0x39c8a9 * _0x311721),
-    _0x246b44 = 0x1 - 0x2 * (_0x544378 * _0x544378 + _0x4d8bf6 * _0x4d8bf6),
-    _0x3f82c0 = 0x2 * (_0x39c8a9 * _0x4d8bf6 - _0x544378 * _0x311721),
-    _0x3b2f8f = 0x2 * (_0x39c8a9 * _0x4d8bf6 + _0x544378 * _0x311721),
-    _0x35100f = 0x1 - 0x2 * (_0x544378 * _0x544378 + _0x39c8a9 * _0x39c8a9),
-    _0x3fc87a = { x: 0x0, y: Math['asin'](clamp(_0x197f4f, -0x1, 0x1)), z: 0x0 };
+export function quaternionToStoryboard3DEuler(list4 = []) {
+  const list5 = Array['isArray'](list4) ? list4['map'](Number) : [],
+    count2 = list5['length'] === 0x4 && list5['every'](Number['isFinite']) ? Math['hypot'](...list5) : 0x0,
+    value25 = count2 > 1e-8 ? list5['map']((value26) => value26 / count2) : [0x0, 0x0, 0x0, 0x1],
+    [value27, value28, value29, value30] = value25,
+    value31 = 0x1 - 0x2 * (value28 * value28 + value29 * value29),
+    value32 = 0x2 * (value27 * value28 - value29 * value30),
+    value33 = 0x2 * (value27 * value29 + value28 * value30),
+    value34 = 0x1 - 0x2 * (value27 * value27 + value29 * value29),
+    value35 = 0x2 * (value28 * value29 - value27 * value30),
+    value36 = 0x2 * (value28 * value29 + value27 * value30),
+    value37 = 0x1 - 0x2 * (value27 * value27 + value28 * value28),
+    box6 = { x: 0x0, y: Math['asin'](clamp(value33, -0x1, 0x1)), z: 0x0 };
   return (
-    Math['abs'](_0x197f4f) < 0.9999999
-      ? ((_0x3fc87a['x'] = Math['atan2'](-_0x3f82c0, _0x35100f)),
-        (_0x3fc87a['z'] = Math['atan2'](-_0x1a5474, _0xd81df5)))
-      : (_0x3fc87a['x'] = Math['atan2'](_0x3b2f8f, _0x246b44)),
-    _0x3fc87a
+    Math['abs'](value33) < 0.9999999
+      ? ((box6['x'] = Math['atan2'](-value35, value37)), (box6['z'] = Math['atan2'](-value32, value31)))
+      : (box6['x'] = Math['atan2'](value36, value34)),
+    box6
   );
 }
 export function createStoryboard3DBoneEditState(
-  _0x813c79 = {},
+  options5 = {},
   { selectedBoneName: selectedBoneName = 'pelvis', showControls: showControls = !![] } = {},
 ) {
-  const _0x2fe7b5 = normalizeStoryboard3DCharacterState(_0x813c79),
-    _0x1e73f2 = {};
-  for (const [_0xdfc3ac, _0x3ba641] of Object['entries'](_0x2fe7b5['boneOverrides'])) {
-    _0x1e73f2[_0xdfc3ac] = quaternionToStoryboard3DEuler(_0x3ba641);
+  const boneOverrides = normalizeStoryboard3DCharacterState(options5),
+    localEulerByBone = {};
+  for (const [value38, value39] of Object['entries'](boneOverrides['boneOverrides'])) {
+    localEulerByBone[value38] = quaternionToStoryboard3DEuler(value39);
   }
   return {
     selectedBoneName: BONE_SET['has'](selectedBoneName) ? selectedBoneName : 'pelvis',
     showControls: showControls !== ![],
-    localEulerByBone: _0x1e73f2,
-    boneOverrides: _0x2fe7b5['boneOverrides'],
+    localEulerByBone: localEulerByBone,
+    boneOverrides: boneOverrides['boneOverrides'],
   };
 }
-export function updateStoryboard3DBoneEditState(_0x37f59b, _0x372ce7, _0x7002b8) {
-  const _0x5ac722 = clampStoryboard3DBoneEuler(_0x372ce7, _0x7002b8);
-  if (!_0x5ac722) throw new Error('Unknown character bone: ' + _0x372ce7);
+export function updateStoryboard3DBoneEditState(args7, selectedBoneName2, value40) {
+  const clampStoryboard3DBoneEuler3 = clampStoryboard3DBoneEuler(selectedBoneName2, value40);
+  if (!clampStoryboard3DBoneEuler3) throw new Error('Unknown character bone: ' + selectedBoneName2);
   return {
-    ..._0x37f59b,
-    selectedBoneName: _0x372ce7,
-    localEulerByBone: { ..._0x37f59b?.['localEulerByBone'], [_0x372ce7]: _0x5ac722 },
-    boneOverrides: setStoryboard3DBoneOverride(_0x37f59b?.['boneOverrides'], _0x372ce7, _0x5ac722),
+    ...args7,
+    selectedBoneName: selectedBoneName2,
+    localEulerByBone: { ...args7?.['localEulerByBone'], [selectedBoneName2]: clampStoryboard3DBoneEuler3 },
+    boneOverrides: setStoryboard3DBoneOverride(
+      args7?.['boneOverrides'],
+      selectedBoneName2,
+      clampStoryboard3DBoneEuler3,
+    ),
   };
 }
-export function commitStoryboard3DBoneEditState(_0xc21f1a, _0x32c240) {
-  return normalizeStoryboard3DCharacterState({ ..._0xc21f1a, boneOverrides: _0x32c240?.['boneOverrides'] });
+export function commitStoryboard3DBoneEditState(args8, boneOverrides2) {
+  return normalizeStoryboard3DCharacterState({ ...args8, boneOverrides: boneOverrides2?.['boneOverrides'] });
 }
-function resolveStoryboard3DCharacterPoseParts(_0x48645a = {}) {
-  const _0x15f96d = normalizeStoryboard3DCharacterState(_0x48645a),
-    _0x2c6099 = BODY_BY_ID['get'](_0x15f96d['bodyPresetId']),
-    _0x5b3c23 = ACTION_BY_ID['get'](_0x15f96d['actionId']),
-    _0x9751d3 = sampleCharacterActionPose(_0x5b3c23, _0x15f96d['actionTime']);
+function resolveStoryboard3DCharacterPoseParts(options6 = {}) {
+  const boneOverrides3 = normalizeStoryboard3DCharacterState(options6),
+    value41 = BODY_BY_ID['get'](boneOverrides3['bodyPresetId']),
+    value42 = ACTION_BY_ID['get'](boneOverrides3['actionId']),
+    sampleCharacterActionPose3 = sampleCharacterActionPose(value42, boneOverrides3['actionTime']);
   return {
-    baseBones: mergeBonePoses(_0x2c6099?.['posture'], _0x9751d3?.['bones']),
+    baseBones: mergeBonePoses(value41?.['posture'], sampleCharacterActionPose3?.['bones']),
     handRotations: {
-      hand_l: { ...HAND_BY_ID['get'](_0x15f96d['leftHandPoseId'])['rotation'] },
-      hand_r: { ...HAND_BY_ID['get'](_0x15f96d['rightHandPoseId'])['rotation'] },
+      hand_l: { ...HAND_BY_ID['get'](boneOverrides3['leftHandPoseId'])['rotation'] },
+      hand_r: { ...HAND_BY_ID['get'](boneOverrides3['rightHandPoseId'])['rotation'] },
     },
-    boneOverrides: _0x15f96d['boneOverrides'],
+    boneOverrides: boneOverrides3['boneOverrides'],
   };
 }

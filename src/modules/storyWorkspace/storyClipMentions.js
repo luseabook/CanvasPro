@@ -1,1 +1,733 @@
-import{normalizeStoryCharacterVoiceReference}from'./storyCharacterVoice.js';import{buildStoryClipFrameMentionCandidates,resolveStoryClipFrameMentionRef,STORY_CLIP_FRAME_MENTION_PREFIX}from'./storyClipFrames.js';import{deriveStoryEpisodeAssetSummary}from'./storyPlanningData.js';import{protectStoryPromptPills}from'./storyClipPromptReferences.js';import{getStoryReplicationCharacterDisplayLabel}from'./storyReplicationPromptReferences.js';const STORY_ASSET_NODE_PREFIX='story-asset:',STORY_CHARACTER_VOICE_NODE_PREFIX="story-character-voice:",STORY_TIME_MENTION_ASSET_ID='story-meta:time',STORY_TIME_ICON_SVG="<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"13\" r=\"8\"></circle><path d=\"M12 9v4l2.5 1.5\"></path><path d=\"M9 2h6\"></path><path d=\"M12 2v3\"></path></svg>";function normalizeText(_0x4b3ab1){return String(_0x4b3ab1||'')["trim"]();}function escapeHtml(_0x3e059b){return String(_0x3e059b??'')["replace"](/&/g,"&amp;")["replace"](/</g,"&lt;")['replace'](/>/g,"&gt;")['replace'](/"/g,"&quot;")["replace"](/'/g,"&#39;");}function escapeRegExp(_0x118357){return String(_0x118357||'')["replace"](/[.*+?^${}()|[\]\\]/g,"\\$&");}const STORY_H3_LITERAL_TAG_PATTERN=/(?:<|&(?:amp;)*(?:lt;|#0*60;|#x0*3c;)|＜)\s*((?:\/\s*)?d|scenetrans|cutoff|(?:Subject|Picture|Video|Audio)\s+\d+)\s*(?:>|&(?:amp;)*(?:gt;|#0*62;|#x0*3e;)|＞)/giu;function normalizeStoryH3LiteralTag(_0x186c2f=''){const _0x431e01=normalizeText(_0x186c2f)["replace"](/\s+/gu,'\x20');if(/^\/\s*d$/iu["test"](_0x431e01))return "</d>";if(/^d$/iu['test'](_0x431e01))return "<d>";if(/^(scenetrans|cutoff)$/iu['test'](_0x431e01))return'<'+_0x431e01["toLowerCase"]()+'>';const _0x3a1a74=_0x431e01['match'](/^(Subject|Picture|Video|Audio)\s+(\d+)$/iu);if(!_0x3a1a74)return'';const _0x2f34bb=''+_0x3a1a74[0x1][0x0]["toUpperCase"]()+_0x3a1a74[0x1]["slice"](0x1)['toLowerCase']();return'<'+_0x2f34bb+'\x20'+_0x3a1a74[0x2]+'>';}function protectStoryH3LiteralTags(_0x592d32=''){const _0x4c88fa=[],_0x47cb90=String(_0x592d32||'')["replace"](STORY_H3_LITERAL_TAG_PATTERN,(_0x179a96,_0x2dd852)=>{const _0xc1d1be=normalizeStoryH3LiteralTag(_0x2dd852);if(!_0xc1d1be)return _0x179a96;const _0x29d46b='story-h3-tag-'+_0x4c88fa["length"]+'';return _0x4c88fa["push"]({'token':_0x29d46b,'tag':_0xc1d1be}),_0x29d46b;});return{'source':_0x47cb90,'restore':(_0x14f55f='')=>_0x4c88fa["reduce"]((_0x286cf7,{token:_0x453ea8,tag:_0x33d803})=>_0x286cf7['split'](_0x453ea8)['join'](escapeHtml(_0x33d803)),String(_0x14f55f||''))};}export function normalizeStoryClipTimeLabel(_0x460a5a,_0x4e6870='3.0s'){const _0x402ebd=String(_0x460a5a??'')["match"](/-?\d+(?:\.\d+)?/),_0x2fd903=Number(_0x402ebd?.[0x0]);if(!Number["isFinite"](_0x2fd903)||_0x2fd903<=0x0)return _0x4e6870;const _0x4daea8=Math["min"](0x3e7,Math["max"](0.1,_0x2fd903));return _0x4daea8['toFixed'](0x1)+'s';}function getStoryAssetMentionAppearance(_0x4bb11f={}){const _0x1eeb8b=Array['isArray'](_0x4bb11f["appearances"])?_0x4bb11f['appearances']:[],_0x3a2d28=normalizeText(_0x4bb11f["baseAppearanceId"]);return _0x1eeb8b["find"](_0x1a6506=>_0x3a2d28&&normalizeText(_0x1a6506?.['id'])===_0x3a2d28)||_0x1eeb8b["find"](_0x83ec80=>normalizeText(_0x83ec80?.["name"])==='基础形象')||_0x1eeb8b[0x0]||null;}function buildStoryAssetMentionId(_0x188494='',_0x21eb3a=''){return''+STORY_ASSET_NODE_PREFIX+encodeURIComponent(normalizeText(_0x188494))+':'+encodeURIComponent(normalizeText(_0x21eb3a)||"__asset__");}function parseStoryAssetMentionId(_0x179224=''){const _0x5c3f0f=normalizeText(_0x179224);if(!_0x5c3f0f["startsWith"](STORY_ASSET_NODE_PREFIX))return null;const [_0xdd030b='',_0x554875='']=_0x5c3f0f['slice'](STORY_ASSET_NODE_PREFIX["length"])["split"](':');try{const _0x3ddb62=decodeURIComponent(_0xdd030b),_0xa43e5c=decodeURIComponent(_0x554875);return _0x3ddb62?{'assetId':_0x3ddb62,'appearanceId':_0xa43e5c}:null;}catch{return null;}}function matchesQuery(_0x27befd={},_0x4260d1=''){const _0x58872d=normalizeText(_0x4260d1)["replace"](/^@+/,'')["toLowerCase"]();if(!_0x58872d)return!![];const _0x5f0e04=Array["isArray"](_0x27befd["mentionVariants"])?_0x27befd["mentionVariants"]:[];return[_0x27befd["label"],_0x27befd["subtitle"],_0x27befd["pillLabel"],_0x27befd["assetName"],_0x27befd["type"],..._0x5f0e04['flatMap'](_0x2afccf=>[_0x2afccf?.["label"],_0x2afccf?.["subtitle"],_0x2afccf?.["pillLabel"]])]['map'](_0x2a2441=>normalizeText(_0x2a2441)['toLowerCase']())["some"](_0x23abc5=>_0x23abc5["includes"](_0x58872d));}function getStoryAssetMentionSection(_0x1ded70){if(_0x1ded70==="scene")return'场景';if(_0x1ded70==="prop")return'道具';return'角色';}function getStoryAssetMentionAppearances(_0x5e2670={}){const _0x180885=Array["isArray"](_0x5e2670["appearances"])?_0x5e2670["appearances"]["filter"](Boolean):[],_0x3ffd08=getStoryAssetMentionAppearance(_0x5e2670);if(_0x5e2670["kind"]!=="character")return _0x3ffd08?[_0x3ffd08]:[];if(!_0x180885["length"])return _0x3ffd08?[_0x3ffd08]:[];return[..._0x180885]['sort']((_0x396ce6,_0xaf8504)=>Number(_0xaf8504===_0x3ffd08)-Number(_0x396ce6===_0x3ffd08));}export function getStoryEpisodeMentionAssets(_0x5cbadb=[],_0x26ca90=null){const _0x13cf4b=(Array["isArray"](_0x5cbadb)?_0x5cbadb:[])["filter"](_0x942d92=>_0x942d92&&["character",'scene','prop']["includes"](_0x942d92["kind"])),_0x54cbe1=deriveStoryEpisodeAssetSummary(_0x26ca90,_0x13cf4b);return _0x54cbe1["assetIds"]['length']?_0x54cbe1["assets"]:_0x13cf4b;}function buildStoryClipAssetMentionCandidate({asset:_0x3516d0,appearance:appearance=null,allowAssetImageFallback:allowAssetImageFallback=![],displayAssets:displayAssets=[]}={}){const _0x1246a4=normalizeText(_0x3516d0?.["name"])||'本集素材',_0x2bbc5d=normalizeText(appearance?.['id']),_0x5f3307=normalizeText(appearance?.['name'])||"基础形象",_0x30043f=normalizeText(appearance?.['imageUrl']||(allowAssetImageFallback?_0x3516d0?.["imageUrl"]:''));return{'origin':"asset",'menuDirect':!![],'suppressTooltip':!![],'assetId':buildStoryAssetMentionId(_0x3516d0?.['id'],_0x2bbc5d),'assetIndex':0x0,'type':"image",'label':_0x1246a4,'subtitle':_0x5f3307,'pillLabel':getStoryReplicationCharacterDisplayLabel(_0x3516d0,appearance,displayAssets)||_0x1246a4+" · "+_0x5f3307,'sourcePillLabel':_0x1246a4+" · "+_0x5f3307,'thumbUrl':_0x30043f,'iconType':'image','storyAssetId':normalizeText(_0x3516d0?.['id']),'storyAppearanceId':_0x2bbc5d,'storyAssetKind':normalizeText(_0x3516d0?.["kind"]),'menuPage':"assets",'menuGroup':"本集素材",'menuSection':getStoryAssetMentionSection(_0x3516d0?.["kind"]),'assetName':"本集素材",'missingAsset':!_0x30043f};}export function buildStoryClipMentionCandidates({assets:assets=[],episode:episode=null,libraryCandidates:libraryCandidates=[],clipFrames:clipFrames=[],query:query='',includeTime:includeTime=![],includeClipFrames:includeClipFrames=![],defaultDuration:defaultDuration="3.0s"}={}){const _0x324a23=new Map([["character",0x0],["scene",0x1],["prop",0x2]]),_0x516eb0=[...getStoryEpisodeMentionAssets(assets,episode)]["sort"]((_0xf583c9,_0x141699)=>(_0x324a23["get"](_0xf583c9?.["kind"])??0x9)-(_0x324a23["get"](_0x141699?.["kind"])??0x9))['map'](_0x3adbec=>{const _0x437cae=getStoryAssetMentionAppearances(_0x3adbec),_0x50e628=_0x437cae["length"]?_0x437cae["map"](_0x16cbf0=>buildStoryClipAssetMentionCandidate({'asset':_0x3adbec,'appearance':_0x16cbf0,'displayAssets':episode?.["replication"]?assets:[]})):[buildStoryClipAssetMentionCandidate({'asset':_0x3adbec,'appearance':null,'allowAssetImageFallback':!![],'displayAssets':episode?.["replication"]?assets:[]})],_0x272aa2=normalizeText(query)["replace"](/^@+/,'')["toLowerCase"](),_0x2bbd05=_0x272aa2?_0x50e628['findIndex'](_0x5b10fa=>[_0x5b10fa['subtitle'],_0x5b10fa["pillLabel"]]["some"](_0x32a3f5=>normalizeText(_0x32a3f5)["toLowerCase"]()["includes"](_0x272aa2))):-0x1,_0x587437=_0x2bbd05>=0x0?_0x2bbd05:0x0,_0xe88aea=_0x50e628[_0x587437]||_0x50e628[0x0];return{..._0xe88aea,'mentionVariants':_0x50e628,'mentionVariantIndex':_0x587437};}),_0xf36afb=(Array["isArray"](libraryCandidates)?libraryCandidates:[])["map"](_0x2e2181=>({..._0x2e2181,'origin':'asset','menuDirect':!![],'menuPage':"assets",'menuGroup':'全部素材','menuSection':'','suppressTooltip':!![],'assetIndex':Number(_0x2e2181?.["itemIndex"]||0x0),'label':normalizeText(_0x2e2181?.["insertLabel"]||_0x2e2181?.["label"]||_0x2e2181?.["name"])||"素材库内容",'assetName':normalizeText(_0x2e2181?.["assetName"])||"素材库",'iconType':normalizeText(_0x2e2181?.['type'])})),_0xbfc7a6=includeTime?[{'origin':"asset",'menuDirect':!![],'suppressTooltip':!![],'assetId':STORY_TIME_MENTION_ASSET_ID,'assetIndex':0x0,'type':'','label':'添加时间','subtitle':"设置当前片段在提示词中的生成时长",'pillLabel':normalizeStoryClipTimeLabel(defaultDuration),'pillKind':'time','iconType':'','assetName':"片段设置",'menuPage':"tools",'menuSection':'','compactVisual':!![]}]:[],_0x387991=includeClipFrames||clipFrames['length']?buildStoryClipFrameMentionCandidates(clipFrames,{'query':query,'clips':episode?.["clips"],'episodeId':episode?.['id']}):[];return[..._0x516eb0,..._0xf36afb,..._0xbfc7a6,..._0x387991]["filter"](_0x1447b0=>matchesQuery(_0x1447b0,query));}function renderStoryAssetMentionPill(_0x5841aa,_0xd34356=[]){const _0x5484f2=normalizeText(_0x5841aa?.['pillLabel']||_0x5841aa?.["label"])||"本集素材",_0x405a4f=_0x5841aa?.["missingAsset"]===!![],_0x5dcd19=normalizeText(_0x5841aa?.["storyAssetId"]),_0x476e7a=normalizeText(_0x5841aa?.["storyAppearanceId"]),_0x2d9db5=_0xd34356['find'](_0x5d27d4=>_0x5d27d4['id']===_0x5dcd19),_0x3fadc5=_0x2d9db5?.['appearances']?.['find'](_0x380cd3=>_0x380cd3['id']===_0x476e7a),_0x2b3b88=getStoryReplicationCharacterDisplayLabel(_0x2d9db5,_0x3fadc5,_0xd34356)||_0x5484f2,_0x117a90=_0x5841aa?.["thumbUrl"]?"<img class=\"ref-pill-thumb\" src=\""+escapeHtml(_0x5841aa["thumbUrl"])+'\x22\x20alt=\x22\x22\x20draggable=\x22false\x22>':'';return'<span\x20class=\x22ref-pill'+(_0x405a4f?" ref-pill--unresolved":'')+'\x22\x20contenteditable=\x22false\x22\x20data-label=\x22'+escapeHtml(_0x2b3b88)+"\" data-ref-origin=\"asset\" data-asset-id=\""+escapeHtml(_0x5841aa["assetId"])+"\" data-asset-index=\"0\" data-ref-type=\"image\""+(_0x5dcd19?" data-story-asset-hover-id=\""+escapeHtml(_0x5dcd19)+'\x22':'')+(_0x476e7a?" data-story-asset-hover-appearance-id=\""+escapeHtml(_0x476e7a)+'\x22':'')+(_0x405a4f?" data-ref-unresolved=\"true\" data-tooltip=\"缺少图片素材\"":'')+'>'+_0x117a90+"<span class=\"ref-pill-label\">"+escapeHtml(_0x2b3b88)+"</span></span>";}function renderStoryTimeMentionPill(_0x547ed9){const _0x2b25dc=normalizeStoryClipTimeLabel(_0x547ed9);return "<span class=\"ref-pill story-time-pill\" contenteditable=\"false\" data-label=\""+escapeHtml(_0x2b25dc)+"\" data-ref-origin=\"asset\" data-asset-id=\""+STORY_TIME_MENTION_ASSET_ID+"\" data-asset-index=\"0\" data-prompt-pill-kind=\"time\"><span class=\"story-time-pill-icon\" aria-hidden=\"true\">"+STORY_TIME_ICON_SVG+'</span><span\x20class=\x22ref-pill-label\x22>'+escapeHtml(_0x2b25dc)+"</span></span>";}export function createStoryClipTimeMentionIcon(_0x126e43=globalThis['document']){const _0x24d00a=_0x126e43?.["createElement"]?.("span");if(!_0x24d00a)return null;return _0x24d00a['className']='story-time-pill-icon',_0x24d00a['setAttribute']?.("aria-hidden",'true'),_0x24d00a["innerHTML"]=STORY_TIME_ICON_SVG,_0x24d00a;}export function beginStoryClipTimePillEdit({pill:_0xc18c7f,documentObject:documentObject=globalThis["document"],onCommit:onCommit=null}={}){if(!_0xc18c7f||!documentObject?.["createElement"])return null;const _0x4fca5b=_0xc18c7f["querySelector"]?.(".story-time-pill-input");if(_0x4fca5b)return _0x4fca5b["focus"]?.(),_0x4fca5b['select']?.(),_0x4fca5b;const _0x17dafa=_0xc18c7f["querySelector"]?.(".ref-pill-label");if(!_0x17dafa||typeof _0xc18c7f["replaceChild"]!=="function")return null;const _0x172188=normalizeStoryClipTimeLabel(_0xc18c7f["dataset"]?.["label"]||_0x17dafa["textContent"]),_0x12eafc=documentObject["createElement"]("input");_0x12eafc["className"]="story-time-pill-input",_0x12eafc['type']="text",_0x12eafc["inputMode"]="decimal",_0x12eafc["value"]=_0x172188["replace"](/s$/i,''),_0x12eafc["autocomplete"]="off",_0x12eafc["spellcheck"]=![],_0x12eafc['dataset']['promptPillInlineEditor']="true",_0x12eafc["setAttribute"]?.("aria-label","片段时间（秒）");let _0x46889f=![];const _0x9a6246=_0x4f3cfb=>{if(_0x46889f)return;_0x46889f=!![];const _0x2653e7=_0x4f3cfb?normalizeStoryClipTimeLabel(_0x12eafc['value'],_0x172188):_0x172188,_0x1e37c6=documentObject['createElement']("span");_0x1e37c6["className"]="ref-pill-label",_0x1e37c6["textContent"]=_0x2653e7;if(_0x12eafc["parentNode"]===_0xc18c7f)_0xc18c7f["replaceChild"](_0x1e37c6,_0x12eafc);_0xc18c7f["dataset"]["label"]=_0x2653e7,_0xc18c7f["classList"]?.['remove']?.("is-editing"),_0x4f3cfb&&_0x2653e7!==_0x172188&&typeof onCommit==="function"&&onCommit(_0x2653e7);};return _0x12eafc['addEventListener']?.("keydown",_0xd70868=>{if(_0xd70868["key"]==='Enter'){_0xd70868['preventDefault']?.(),_0x9a6246(!![]);return;}_0xd70868['key']==="Escape"&&(_0xd70868["preventDefault"]?.(),_0x9a6246(![]));}),_0x12eafc["addEventListener"]?.("blur",()=>_0x9a6246(!![])),_0xc18c7f["replaceChild"](_0x12eafc,_0x17dafa),_0xc18c7f["classList"]?.["add"]?.('is-editing'),_0x12eafc["focus"]?.(),_0x12eafc["select"]?.(),_0x12eafc;}export function resolveStoryClipPromptPillPresentation(_0x74a7eb,_0x26ab23=[],_0x44be29=[]){const _0x3ce2a5=normalizeText(_0x74a7eb?.["dataset"]?.["assetId"]||_0x74a7eb?.['getAttribute']?.('data-asset-id')),_0x3ff5cf=normalizeText(_0x74a7eb?.["dataset"]?.["promptPillKind"]||_0x74a7eb?.["getAttribute"]?.('data-prompt-pill-kind'));if(_0x3ff5cf==="time"||_0x3ce2a5===STORY_TIME_MENTION_ASSET_ID)return{'pillKind':'time','missingAsset':![]};if(_0x3ce2a5["startsWith"](STORY_CLIP_FRAME_MENTION_PREFIX))return{'pillKind':"frame",'missingAsset':!resolveStoryClipFrameMentionRef(_0x74a7eb,_0x44be29)};if(!_0x3ce2a5['startsWith'](STORY_ASSET_NODE_PREFIX))return{'pillKind':'','missingAsset':![]};return{'pillKind':'','missingAsset':!resolveStoryClipAssetMentionRef(_0x74a7eb,_0x26ab23)};}export function syncStoryClipPromptPillPresentation(_0x14f242,_0x5a6f53=[],_0x3ccec5=[]){_0x14f242?.['querySelectorAll']?.(".ref-pill")?.["forEach"]?.(_0x417bbc=>{syncStoryClipPromptPillHoverTarget(_0x417bbc);const _0x128b4d=resolveStoryClipPromptPillPresentation(_0x417bbc,_0x5a6f53,_0x3ccec5);_0x128b4d["pillKind"]==='time'&&(_0x417bbc['dataset']["promptPillKind"]="time",_0x417bbc["classList"]?.["add"]?.("story-time-pill"));if(_0x128b4d["missingAsset"]){_0x417bbc["dataset"]["refUnresolved"]="true",_0x417bbc["classList"]?.["add"]?.("ref-pill--unresolved"),_0x417bbc["setAttribute"]?.("data-tooltip",'缺少图片素材'),_0x417bbc["removeAttribute"]?.("title");return;}const _0x25f536=normalizeText(_0x417bbc?.["dataset"]?.["assetId"]);(_0x25f536['startsWith'](STORY_ASSET_NODE_PREFIX)||_0x25f536["startsWith"](STORY_CLIP_FRAME_MENTION_PREFIX))&&(delete _0x417bbc["dataset"]["refUnresolved"],_0x417bbc["classList"]?.['remove']?.('ref-pill--unresolved'),_0x417bbc['removeAttribute']?.("data-tooltip"),_0x417bbc["removeAttribute"]?.("data-native-title"),_0x417bbc["removeAttribute"]?.("data-tooltip-source"),_0x417bbc["removeAttribute"]?.("title"));});}export function renderStoryClipPromptMentions(_0x3fe8b9,{assets:assets=[],episode:episode=null,clipFrames:clipFrames=[]}={}){const _0x46d5ad=protectStoryH3LiteralTags(_0x3fe8b9),_0x466fbd=protectStoryPromptPills(_0x46d5ad["source"]),_0x5c0457=episode?.["replication"]?assets:[];for(const _0x247615 of _0x466fbd["pills"]){const _0x486ac6=parseStoryAssetMentionId(_0x247615["html"]["match"](/\bdata-asset-id="([^"]+)"/u)?.[0x1]),_0x185a60=_0x486ac6&&assets["find"](_0x36f8a9=>_0x36f8a9['id']===_0x486ac6["assetId"]),_0x36c52a=_0x185a60?.['appearances']?.["find"](_0x57a72e=>_0x57a72e['id']===_0x486ac6["appearanceId"]);if(_0x36c52a){const _0x44ba47=normalizeText(_0x36c52a["imageUrl"]);_0x247615["html"]=_0x247615["html"]["replace"](/<img\b[^>]*class="ref-pill-thumb"[^>]*>/gu,''),_0x247615["html"]=_0x247615["html"]["replace"](/^<span\b[^>]*>/u,_0x257745=>{let _0x15564b=_0x257745["replace"](/\sdata-ref-unresolved="[^"]*"/u,'')['replace'](/\sdata-tooltip="缺少图片素材"/u,'')["replace"](/\bclass="([^"]*)"/u,(_0x426c77,_0x3369d8)=>"class=\""+_0x3369d8['split'](/\s+/u)["filter"](_0x1a3500=>_0x1a3500!=='ref-pill--unresolved')['join']('\x20')+(_0x44ba47?'':'\x20ref-pill--unresolved')+'\x22');if(!_0x44ba47)_0x15564b=_0x15564b["replace"](/>$/u," data-ref-unresolved=\"true\" data-tooltip=\"缺少图片素材\">");return _0x15564b+(_0x44ba47?"<img class=\"ref-pill-thumb\" src=\""+escapeHtml(_0x44ba47)+"\" alt=\"\" draggable=\"false\">":'');});}const _0x51918b=_0x5c0457["length"]&&getStoryReplicationCharacterDisplayLabel(_0x185a60,_0x36c52a,assets);_0x51918b&&(_0x247615["html"]=_0x247615["html"]["replace"](/\bdata-label="[^"]*"/u,"data-label=\""+escapeHtml(_0x51918b)+'\x22'),_0x247615["html"]=/class="ref-pill-label"/u['test'](_0x247615["html"])?_0x247615["html"]["replace"](/(<span\b[^>]*class="ref-pill-label"[^>]*>)[\s\S]*?(<\/span>)/u,(_0x378438,_0x41e141,_0x5a1201)=>''+_0x41e141+escapeHtml(_0x51918b)+_0x5a1201):_0x247615["html"]["replace"](/>[^<>]*<\/span>$/u,'>'+escapeHtml(_0x51918b)+"</span>"));}const _0x5a2e44=_0x466fbd['source'];if(!_0x5a2e44)return _0x5a2e44;const _0x35f509=buildStoryClipMentionCandidates({'assets':assets,'episode':episode,'clipFrames':clipFrames}),_0x1d338e=new Map();_0x35f509["forEach"](_0x1df188=>{const _0x4434dc=normalizeText(_0x1df188['label']);_0x4434dc&&!_0x1d338e["has"](_0x4434dc)&&_0x1d338e["set"](_0x4434dc,_0x1df188);const _0x4c6b52=Array["isArray"](_0x1df188["mentionVariants"])?_0x1df188['mentionVariants']:[];_0x4c6b52["forEach"](_0x2f163a=>{const _0x3d386c=normalizeText(_0x2f163a?.["pillLabel"]||_0x2f163a?.["label"]);if(_0x3d386c)_0x1d338e["set"](_0x3d386c,_0x2f163a);if(_0x2f163a?.["sourcePillLabel"])_0x1d338e["set"](_0x2f163a['sourcePillLabel'],_0x2f163a);});});const _0x1d537c=[..._0x1d338e["keys"]()]['filter'](Boolean)['sort']((_0x5dfc94,_0x5812a0)=>_0x5812a0["length"]-_0x5dfc94["length"]),_0x36c30c=_0x1d537c["length"]?"@(?:"+_0x1d537c['map'](escapeRegExp)["join"]('|')+')':"(?!)",_0x19a161=new RegExp('('+_0x36c30c+")|(⏱\\s*-?\\d+(?:\\.\\d+)?\\s*(?:s|秒))",'gi'),_0x285783=(_0x519ab2,{escapeText:escapeText=!![]}={})=>{_0x19a161["lastIndex"]=0x0;let _0x288761=0x0,_0x463fb4='',_0x50f35d=null;const _0x3a015d=_0x5e1448=>escapeText?escapeHtml(_0x5e1448):_0x5e1448;while(_0x50f35d=_0x19a161["exec"](_0x519ab2)){_0x463fb4+=_0x3a015d(_0x519ab2['slice'](_0x288761,_0x50f35d["index"]));if(_0x50f35d[0x1]){const _0x139f45=_0x50f35d[0x1]["slice"](0x1),_0x59e1ba=_0x1d338e["get"](_0x139f45);_0x463fb4+=_0x59e1ba?renderStoryAssetMentionPill(_0x59e1ba,_0x5c0457):_0x3a015d(_0x50f35d[0x0]);}else _0x463fb4+=renderStoryTimeMentionPill(_0x50f35d[0x2]);_0x288761=_0x50f35d["index"]+_0x50f35d[0x0]['length'];}return _0x463fb4+=_0x3a015d(_0x519ab2['slice'](_0x288761)),_0x463fb4;};if(_0x466fbd["pills"]["length"]||/<[a-z][\s\S]*>/i["test"](_0x5a2e44))return _0x46d5ad["restore"](_0x466fbd['restore'](_0x5a2e44["split"](/(<[^>]+>)/gu)["map"](_0xb80720=>_0xb80720["startsWith"]('<')?_0xb80720:_0x285783(_0xb80720,{'escapeText':![]}))["join"]('')));return _0x46d5ad['restore'](_0x466fbd['restore'](_0x285783(_0x5a2e44)));}export function resolveStoryClipPromptAssetRefs(_0x259b11,{assets:assets=[],episode:episode=null,clipFrames:clipFrames=[],resolveExternalAssetRef:resolveExternalAssetRef=null,voiceAssetIds:voiceAssetIds=null}={}){const _0x49bfbb=renderStoryClipPromptMentions(_0x259b11,{'assets':assets,'episode':episode,'clipFrames':clipFrames}),_0x4f98b5=/<span\b[^>]*\bclass\s*=\s*(["'])[^"']*\bref-pill\b[^"']*\1[^>]*>/gi,_0x6b93d5=(_0x4efaf7,_0x4a6515)=>{const _0x1625e3=_0x4efaf7["match"](new RegExp('\x5cb'+_0x4a6515+'\x5cs*=\x5cs*([\x22\x27])(.*?)\x5c1','i'));return normalizeText(_0x1625e3?.[0x2])["replace"](/&quot;/gi,'\x22')['replace'](/&#39;|&apos;/gi,'\x27')['replace'](/&lt;/gi,'<')['replace'](/&gt;/gi,'>')["replace"](/&amp;/gi,'&');},_0x4c97b5=[],_0x3a8675=new Set(),_0x4fd18a=voiceAssetIds==null?null:new Set([...voiceAssetIds]["map"](normalizeText)["filter"](Boolean));let _0x49798c=null;while(_0x49798c=_0x4f98b5['exec'](_0x49bfbb)){const _0x510388=_0x49798c[0x0],_0x30051a=_0x6b93d5(_0x510388,"data-asset-id");if(!_0x30051a)continue;const _0x404c36=getStoryAssetIdFromMentionNodeId(_0x30051a),_0x43a665=_0x30051a["startsWith"](STORY_ASSET_NODE_PREFIX)?resolveStoryClipAssetMentionRefs({'dataset':{'assetId':_0x30051a}},assets,{'voiceEnabled':_0x4fd18a&&!_0x4fd18a["has"](_0x404c36)?![]:getStoryEpisodeCharacterVoiceEnabled(episode,_0x404c36)}):_0x30051a["startsWith"](STORY_CLIP_FRAME_MENTION_PREFIX)?resolveStoryClipFrameMentionRef({'dataset':{'assetId':_0x30051a}},clipFrames):typeof resolveExternalAssetRef==="function"?resolveExternalAssetRef({'assetId':_0x30051a,'itemIndex':Number(_0x6b93d5(_0x510388,'data-asset-index'))}):null;(Array['isArray'](_0x43a665)?_0x43a665:[_0x43a665])["filter"](Boolean)["forEach"](_0x2de033=>{const _0x2dfb94=normalizeText(_0x2de033?.['type']||_0x2de033?.["kind"]),_0xa3c71e=normalizeText(_0x2de033?.["url"]);if(!_0x2dfb94||!_0xa3c71e)return;const _0x25b74e=_0x2dfb94+':'+_0xa3c71e;if(_0x3a8675["has"](_0x25b74e))return;_0x3a8675["add"](_0x25b74e),_0x4c97b5['push'](_0x2de033);});}return _0x4c97b5;}export function getStoryAssetIdFromMentionNodeId(_0x33de51=''){return parseStoryAssetMentionId(_0x33de51)?.["assetId"]||'';}export function getStoryEpisodeCharacterVoiceEnabled(_0xaf18={},_0x3ec3f7=''){const _0x3cd0ad=normalizeText(_0x3ec3f7),_0x2841ac=_0xaf18?.["characterVoiceEnabledByAssetId"];if(!_0x3cd0ad||!_0x2841ac||typeof _0x2841ac!=="object"||Array["isArray"](_0x2841ac)||typeof _0x2841ac[_0x3cd0ad]!=="boolean")return undefined;return _0x2841ac[_0x3cd0ad];}export function setStoryEpisodeCharacterVoiceEnabled(_0x278243={},_0xf86249='',_0x6c7a74=![]){if(!_0x278243||typeof _0x278243!=="object"||Array["isArray"](_0x278243))return![];const _0x3beac7=normalizeText(_0xf86249);if(!_0x3beac7)return![];const _0x5ac7b8=_0x278243["characterVoiceEnabledByAssetId"];return _0x278243["characterVoiceEnabledByAssetId"]={..._0x5ac7b8&&typeof _0x5ac7b8==="object"&&!Array["isArray"](_0x5ac7b8)?_0x5ac7b8:{},[_0x3beac7]:_0x6c7a74===!![]},!![];}export function syncStoryClipPromptPillHoverTarget(_0x267b7c){if(!_0x267b7c?.["dataset"])return'';const _0x358d61=parseStoryAssetMentionId(_0x267b7c["dataset"]["assetId"]),_0x55a951=_0x358d61?.['assetId']||'',_0x10b0ba=_0x358d61?.["appearanceId"]==="__asset__"?'':_0x358d61?.["appearanceId"]||'';if(_0x55a951)_0x267b7c['dataset']["storyAssetHoverId"]=_0x55a951;else delete _0x267b7c["dataset"]["storyAssetHoverId"];return _0x10b0ba?_0x267b7c["dataset"]["storyAssetHoverAppearanceId"]=_0x10b0ba:delete _0x267b7c["dataset"]["storyAssetHoverAppearanceId"],_0x55a951;}export function resolveStoryClipAssetMentionRef(_0x4c113c,_0x14b7c1=[]){const _0x4ac8bf=parseStoryAssetMentionId(_0x4c113c?.["dataset"]?.["assetId"]);if(!_0x4ac8bf)return null;const _0x2cd30b=(Array["isArray"](_0x14b7c1)?_0x14b7c1:[])["find"](_0x8b71a5=>normalizeText(_0x8b71a5?.['id'])===_0x4ac8bf["assetId"]);if(!_0x2cd30b)return null;const _0x3bee96=_0x4ac8bf['appearanceId']==="__asset__"?null:(Array["isArray"](_0x2cd30b["appearances"])?_0x2cd30b['appearances']:[])["find"](_0x47c50f=>normalizeText(_0x47c50f?.['id'])===_0x4ac8bf["appearanceId"]);if(_0x4ac8bf["appearanceId"]!=="__asset__"&&!_0x3bee96)return null;const _0xe53bc9=_0x4ac8bf["appearanceId"]==='__asset__'?normalizeText(_0x2cd30b['imageUrl']):normalizeText(_0x3bee96?.['imageUrl']);if(!_0xe53bc9)return null;return{'origin':"asset",'assetId':normalizeText(_0x4c113c?.["dataset"]?.['assetId']),'storyAssetId':_0x4ac8bf["assetId"],'appearanceId':_0x4ac8bf["appearanceId"],'itemIndex':0x0,'type':"image",'name':normalizeText(_0x2cd30b["name"])||"本集素材",'label':normalizeText(_0x2cd30b['name'])||"本集素材",'url':_0xe53bc9,'thumbUrl':_0xe53bc9,'nodeData':{'type':"source-image",'imageUrl':_0xe53bc9}};}export function getStoryClipMentionVoiceState(_0x19b343,_0x5d1067=[],{voiceEnabled:_0x3dd2dc}={}){const _0x7c4e91=parseStoryAssetMentionId(_0x19b343?.["dataset"]?.["assetId"]),_0x223746=_0x7c4e91?(Array["isArray"](_0x5d1067)?_0x5d1067:[])["find"](_0x153d22=>normalizeText(_0x153d22?.['id'])===_0x7c4e91['assetId']):null,_0x4e0ce7=_0x223746?.["kind"]==='character'?normalizeStoryCharacterVoiceReference(_0x223746?.["voiceReference"]):null,_0x4b61f2=normalizeText(_0x4e0ce7?.['audioUrl']||_0x4e0ce7?.["localPath"]),_0x4619f6=Boolean(_0x223746&&_0x4b61f2),_0x3659ee=normalizeText(_0x19b343?.["dataset"]?.['storyVoiceEnabled']),_0x32c1e5=typeof _0x3dd2dc==="boolean"?_0x3dd2dc:_0x3659ee!=="false";return{'available':_0x4619f6,'enabled':_0x4619f6&&_0x32c1e5,'asset':_0x223746,'voiceReference':_0x4e0ce7,'url':_0x4b61f2};}export function setStoryClipMentionVoiceEnabled(_0x5b27df,_0x385527=[],_0x1e0313=![]){if(!_0x5b27df?.["dataset"])return getStoryClipMentionVoiceState(_0x5b27df,_0x385527);const _0x3ee8ec=getStoryClipMentionVoiceState(_0x5b27df,_0x385527);if(_0x3ee8ec["available"]&&_0x1e0313===!![])_0x5b27df['dataset']["storyVoiceEnabled"]="true";else _0x3ee8ec["available"]?_0x5b27df['dataset']["storyVoiceEnabled"]="false":(delete _0x5b27df['dataset']["storyVoiceEnabled"],_0x5b27df["removeAttribute"]?.('data-story-voice-enabled'));return getStoryClipMentionVoiceState(_0x5b27df,_0x385527);}export function resolveStoryClipAssetMentionRefs(_0x18f03a,_0x805ffc=[],{voiceEnabled:_0x221a48,clipFrames:clipFrames=[],resolveExternalAssetRef:resolveExternalAssetRef=null}={}){const _0x4c7588=resolveStoryClipFrameMentionRef(_0x18f03a,clipFrames);if(_0x4c7588)return _0x4c7588;const _0x199e96=normalizeText(_0x18f03a?.["dataset"]?.["assetId"]);if(!_0x199e96["startsWith"](STORY_ASSET_NODE_PREFIX)&&typeof resolveExternalAssetRef==="function")return resolveExternalAssetRef({'assetId':_0x199e96,'itemIndex':Number(_0x18f03a?.["dataset"]?.["assetIndex"]||0x0)});const _0x565c59=[],_0x4edb8e=resolveStoryClipAssetMentionRef(_0x18f03a,_0x805ffc);if(_0x4edb8e)_0x565c59["push"](_0x4edb8e);const _0x5f0445=getStoryClipMentionVoiceState(_0x18f03a,_0x805ffc,{'voiceEnabled':_0x221a48});if(_0x5f0445["enabled"]){const _0x437204=normalizeText(_0x5f0445["asset"]?.['id']);_0x565c59['push']({'origin':"asset",'assetId':''+STORY_CHARACTER_VOICE_NODE_PREFIX+encodeURIComponent(_0x437204),'storyAssetId':_0x437204,'itemIndex':0x0,'type':"audio",'name':(normalizeText(_0x5f0445['asset']?.['name'])||'角色')+'\x20·\x20声音参考','label':normalizeText(_0x5f0445['asset']?.['name'])||"角色声音",'url':_0x5f0445['url'],'audioUrl':_0x5f0445["url"],'localPath':normalizeText(_0x5f0445["voiceReference"]?.['localPath']),'placeholderTypeLabel':'声音','nodeData':{'type':"source-audio",'audioUrl':_0x5f0445["url"],'localPath':normalizeText(_0x5f0445['voiceReference']?.['localPath'])}});}if(_0x565c59["length"]===0x0)return null;return _0x565c59["length"]===0x1?_0x565c59[0x0]:_0x565c59;}
+import { normalizeStoryCharacterVoiceReference } from './storyCharacterVoice.js';
+import {
+  buildStoryClipFrameMentionCandidates,
+  resolveStoryClipFrameMentionRef,
+  STORY_CLIP_FRAME_MENTION_PREFIX,
+} from './storyClipFrames.js';
+import { deriveStoryEpisodeAssetSummary } from './storyPlanningData.js';
+import { protectStoryPromptPills } from './storyClipPromptReferences.js';
+import { getStoryReplicationCharacterDisplayLabel } from './storyReplicationPromptReferences.js';
+const STORY_ASSET_NODE_PREFIX = 'story-asset:',
+  STORY_CHARACTER_VOICE_NODE_PREFIX = 'story-character-voice:',
+  STORY_TIME_MENTION_ASSET_ID = 'story-meta:time',
+  STORY_TIME_ICON_SVG =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 1.5"></path><path d="M9 2h6"></path><path d="M12 2v3"></path></svg>';
+function normalizeText(value) {
+  return String(value || '')['trim']();
+}
+function escapeHtml(item) {
+  return String(item ?? '')
+    ['replace'](/&/g, '&amp;')
+    ['replace'](/</g, '&lt;')
+    ['replace'](/>/g, '&gt;')
+    ['replace'](/"/g, '&quot;')
+    ['replace'](/'/g, '&#39;');
+}
+function escapeRegExp(key) {
+  return String(key || '')['replace'](/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+const STORY_H3_LITERAL_TAG_PATTERN =
+  /(?:<|&(?:amp;)*(?:lt;|#0*60;|#x0*3c;)|＜)\s*((?:\/\s*)?d|scenetrans|cutoff|(?:Subject|Picture|Video|Audio)\s+\d+)\s*(?:>|&(?:amp;)*(?:gt;|#0*62;|#x0*3e;)|＞)/giu;
+function normalizeStoryH3LiteralTag(index = '') {
+  const text = normalizeText(index)['replace'](/\s+/gu, '\x20');
+  if (/^\/\s*d$/iu['test'](text)) return '</d>';
+  if (/^d$/iu['test'](text)) return '<d>';
+  if (/^(scenetrans|cutoff)$/iu['test'](text)) return '<' + text['toLowerCase']() + '>';
+  const enabled = text['match'](/^(Subject|Picture|Video|Audio)\s+(\d+)$/iu);
+  if (!enabled) return '';
+  const result = '' + enabled[0x1][0x0]['toUpperCase']() + enabled[0x1]['slice'](0x1)['toLowerCase']();
+  return '<' + result + '\x20' + enabled[0x2] + '>';
+}
+function protectStoryH3LiteralTags(data = '') {
+  const options = [],
+    target = String(data || '')['replace'](STORY_H3_LITERAL_TAG_PATTERN, (source, next) => {
+      const storyH3LiteralTag = normalizeStoryH3LiteralTag(next);
+      if (!storyH3LiteralTag) return source;
+      const current = 'story-h3-tag-' + options['length'] + '';
+      return (options['push']({ token: current, tag: storyH3LiteralTag }), current);
+    });
+  return {
+    source: target,
+    restore: (entry = '') =>
+      options['reduce'](
+        (record, { token: token, tag: tag }) => record['split'](token)['join'](escapeHtml(tag)),
+        String(entry || ''),
+      ),
+  };
+}
+export function normalizeStoryClipTimeLabel(payload, handle = '3.0s') {
+  const state = String(payload ?? '')['match'](/-?\d+(?:\.\d+)?/),
+    count = Number(state?.[0x0]);
+  if (!Number['isFinite'](count) || count <= 0x0) return handle;
+  const config = Math['min'](0x3e7, Math['max'](0.1, count));
+  return config['toFixed'](0x1) + 's';
+}
+function getStoryAssetMentionAppearance(options2 = {}) {
+  const scope = Array['isArray'](options2['appearances']) ? options2['appearances'] : [],
+    text2 = normalizeText(options2['baseAppearanceId']);
+  return (
+    scope['find']((input) => text2 && normalizeText(input?.['id']) === text2) ||
+    scope['find']((output) => normalizeText(output?.['name']) === '基础形象') ||
+    scope[0x0] ||
+    null
+  );
+}
+function buildStoryAssetMentionId(value2 = '', value3 = '') {
+  return (
+    '' +
+    STORY_ASSET_NODE_PREFIX +
+    encodeURIComponent(normalizeText(value2)) +
+    ':' +
+    encodeURIComponent(normalizeText(value3) || '__asset__')
+  );
+}
+function parseStoryAssetMentionId(value4 = '') {
+  const list = normalizeText(value4);
+  if (!list['startsWith'](STORY_ASSET_NODE_PREFIX)) return null;
+  const [value5 = '', value6 = ''] = list['slice'](STORY_ASSET_NODE_PREFIX['length'])['split'](':');
+  try {
+    const decodeURIComponent2 = decodeURIComponent(value5),
+      decodeURIComponent3 = decodeURIComponent(value6);
+    return decodeURIComponent2 ? { assetId: decodeURIComponent2, appearanceId: decodeURIComponent3 } : null;
+  } catch {
+    return null;
+  }
+}
+function matchesQuery(options3 = {}, value7 = '') {
+  const text3 = normalizeText(value7)['replace'](/^@+/, '')['toLowerCase']();
+  if (!text3) return !![];
+  const list2 = Array['isArray'](options3['mentionVariants']) ? options3['mentionVariants'] : [];
+  return [
+    options3['label'],
+    options3['subtitle'],
+    options3['pillLabel'],
+    options3['assetName'],
+    options3['type'],
+    ...list2['flatMap']((value8) => [value8?.['label'], value8?.['subtitle'], value8?.['pillLabel']]),
+  ]
+    ['map']((value9) => normalizeText(value9)['toLowerCase']())
+    ['some']((value10) => value10['includes'](text3));
+}
+function getStoryAssetMentionSection(value11) {
+  if (value11 === 'scene') return '场景';
+  if (value11 === 'prop') return '道具';
+  return '角色';
+}
+function getStoryAssetMentionAppearances(options4 = {}) {
+  const args = Array['isArray'](options4['appearances']) ? options4['appearances']['filter'](Boolean) : [],
+    storyAssetMentionAppearance = getStoryAssetMentionAppearance(options4);
+  if (options4['kind'] !== 'character')
+    return storyAssetMentionAppearance ? [storyAssetMentionAppearance] : [];
+  if (!args['length']) return storyAssetMentionAppearance ? [storyAssetMentionAppearance] : [];
+  return [...args]['sort'](
+    (value12, value13) =>
+      Number(value13 === storyAssetMentionAppearance) - Number(value12 === storyAssetMentionAppearance),
+  );
+}
+export function getStoryEpisodeMentionAssets(list3 = [], value14 = null) {
+  const value15 = (Array['isArray'](list3) ? list3 : [])['filter'](
+      (value16) => value16 && ['character', 'scene', 'prop']['includes'](value16['kind']),
+    ),
+    storyEpisodeAssetSummary = deriveStoryEpisodeAssetSummary(value14, value15);
+  return storyEpisodeAssetSummary['assetIds']['length'] ? storyEpisodeAssetSummary['assets'] : value15;
+}
+function buildStoryClipAssetMentionCandidate({
+  asset: asset,
+  appearance: appearance = null,
+  allowAssetImageFallback: allowAssetImageFallback = ![],
+  displayAssets: displayAssets = [],
+} = {}) {
+  const text4 = normalizeText(asset?.['name']) || '本集素材',
+    text5 = normalizeText(appearance?.['id']),
+    text6 = normalizeText(appearance?.['name']) || '基础形象',
+    text7 = normalizeText(appearance?.['imageUrl'] || (allowAssetImageFallback ? asset?.['imageUrl'] : ''));
+  return {
+    origin: 'asset',
+    menuDirect: !![],
+    suppressTooltip: !![],
+    assetId: buildStoryAssetMentionId(asset?.['id'], text5),
+    assetIndex: 0x0,
+    type: 'image',
+    label: text4,
+    subtitle: text6,
+    pillLabel:
+      getStoryReplicationCharacterDisplayLabel(asset, appearance, displayAssets) || text4 + ' · ' + text6,
+    sourcePillLabel: text4 + ' · ' + text6,
+    thumbUrl: text7,
+    iconType: 'image',
+    storyAssetId: normalizeText(asset?.['id']),
+    storyAppearanceId: text5,
+    storyAssetKind: normalizeText(asset?.['kind']),
+    menuPage: 'assets',
+    menuGroup: '本集素材',
+    menuSection: getStoryAssetMentionSection(asset?.['kind']),
+    assetName: '本集素材',
+    missingAsset: !text7,
+  };
+}
+export function buildStoryClipMentionCandidates({
+  assets: assets = [],
+  episode: episode = null,
+  libraryCandidates: libraryCandidates = [],
+  clipFrames: clipFrames = [],
+  query: query = '',
+  includeTime: includeTime = ![],
+  includeClipFrames: includeClipFrames = ![],
+  defaultDuration: defaultDuration = '3.0s',
+} = {}) {
+  const value17 = new Map([
+      ['character', 0x0],
+      ['scene', 0x1],
+      ['prop', 0x2],
+    ]),
+    args2 = [...getStoryEpisodeMentionAssets(assets, episode)]
+      ['sort'](
+        (value18, value19) =>
+          (value17['get'](value18?.['kind']) ?? 0x9) - (value17['get'](value19?.['kind']) ?? 0x9),
+      )
+      ['map']((value20) => {
+        const storyAssetMentionAppearances = getStoryAssetMentionAppearances(value20),
+          list4 = storyAssetMentionAppearances['length']
+            ? storyAssetMentionAppearances['map']((value21) =>
+                buildStoryClipAssetMentionCandidate({
+                  asset: value20,
+                  appearance: value21,
+                  displayAssets: episode?.['replication'] ? assets : [],
+                }),
+              )
+            : [
+                buildStoryClipAssetMentionCandidate({
+                  asset: value20,
+                  appearance: null,
+                  allowAssetImageFallback: !![],
+                  displayAssets: episode?.['replication'] ? assets : [],
+                }),
+              ],
+          text8 = normalizeText(query)['replace'](/^@+/, '')['toLowerCase'](),
+          count2 = text8
+            ? list4['findIndex']((value22) =>
+                [value22['subtitle'], value22['pillLabel']]['some']((value23) =>
+                  normalizeText(value23)['toLowerCase']()['includes'](text8),
+                ),
+              )
+            : -0x1,
+          value24 = count2 >= 0x0 ? count2 : 0x0,
+          args3 = list4[value24] || list4[0x0];
+        return { ...args3, mentionVariants: list4, mentionVariantIndex: value24 };
+      }),
+    args4 = (Array['isArray'](libraryCandidates) ? libraryCandidates : [])['map']((args5) => ({
+      ...args5,
+      origin: 'asset',
+      menuDirect: !![],
+      menuPage: 'assets',
+      menuGroup: '全部素材',
+      menuSection: '',
+      suppressTooltip: !![],
+      assetIndex: Number(args5?.['itemIndex'] || 0x0),
+      label: normalizeText(args5?.['insertLabel'] || args5?.['label'] || args5?.['name']) || '素材库内容',
+      assetName: normalizeText(args5?.['assetName']) || '素材库',
+      iconType: normalizeText(args5?.['type']),
+    })),
+    args6 = includeTime
+      ? [
+          {
+            origin: 'asset',
+            menuDirect: !![],
+            suppressTooltip: !![],
+            assetId: STORY_TIME_MENTION_ASSET_ID,
+            assetIndex: 0x0,
+            type: '',
+            label: '添加时间',
+            subtitle: '设置当前片段在提示词中的生成时长',
+            pillLabel: normalizeStoryClipTimeLabel(defaultDuration),
+            pillKind: 'time',
+            iconType: '',
+            assetName: '片段设置',
+            menuPage: 'tools',
+            menuSection: '',
+            compactVisual: !![],
+          },
+        ]
+      : [],
+    args7 =
+      includeClipFrames || clipFrames['length']
+        ? buildStoryClipFrameMentionCandidates(clipFrames, {
+            query: query,
+            clips: episode?.['clips'],
+            episodeId: episode?.['id'],
+          })
+        : [];
+  return [...args2, ...args4, ...args6, ...args7]['filter']((value25) => matchesQuery(value25, query));
+}
+function renderStoryAssetMentionPill(value26, list5 = []) {
+  const text9 = normalizeText(value26?.['pillLabel'] || value26?.['label']) || '本集素材',
+    value27 = value26?.['missingAsset'] === !![],
+    text10 = normalizeText(value26?.['storyAssetId']),
+    text11 = normalizeText(value26?.['storyAppearanceId']),
+    value28 = list5['find']((value29) => value29['id'] === text10),
+    value30 = value28?.['appearances']?.['find']((value31) => value31['id'] === text11),
+    storyReplicationCharacterDisplayLabel =
+      getStoryReplicationCharacterDisplayLabel(value28, value30, list5) || text9,
+    value32 = value26?.['thumbUrl']
+      ? '<img class="ref-pill-thumb" src="' +
+        escapeHtml(value26['thumbUrl']) +
+        '\x22\x20alt=\x22\x22\x20draggable=\x22false\x22>'
+      : '';
+  return (
+    '<span\x20class=\x22ref-pill' +
+    (value27 ? ' ref-pill--unresolved' : '') +
+    '\x22\x20contenteditable=\x22false\x22\x20data-label=\x22' +
+    escapeHtml(storyReplicationCharacterDisplayLabel) +
+    '" data-ref-origin="asset" data-asset-id="' +
+    escapeHtml(value26['assetId']) +
+    '" data-asset-index="0" data-ref-type="image"' +
+    (text10 ? ' data-story-asset-hover-id="' + escapeHtml(text10) + '\x22' : '') +
+    (text11 ? ' data-story-asset-hover-appearance-id="' + escapeHtml(text11) + '\x22' : '') +
+    (value27 ? ' data-ref-unresolved="true" data-tooltip="缺少图片素材"' : '') +
+    '>' +
+    value32 +
+    '<span class="ref-pill-label">' +
+    escapeHtml(storyReplicationCharacterDisplayLabel) +
+    '</span></span>'
+  );
+}
+function renderStoryTimeMentionPill(value33) {
+  const storyClipTimeLabel = normalizeStoryClipTimeLabel(value33);
+  return (
+    '<span class="ref-pill story-time-pill" contenteditable="false" data-label="' +
+    escapeHtml(storyClipTimeLabel) +
+    '" data-ref-origin="asset" data-asset-id="' +
+    STORY_TIME_MENTION_ASSET_ID +
+    '" data-asset-index="0" data-prompt-pill-kind="time"><span class="story-time-pill-icon" aria-hidden="true">' +
+    STORY_TIME_ICON_SVG +
+    '</span><span\x20class=\x22ref-pill-label\x22>' +
+    escapeHtml(storyClipTimeLabel) +
+    '</span></span>'
+  );
+}
+export function createStoryClipTimeMentionIcon(value34 = globalThis['document']) {
+  const el = value34?.['createElement']?.('span');
+  if (!el) return null;
+  return (
+    (el['className'] = 'story-time-pill-icon'),
+    el['setAttribute']?.('aria-hidden', 'true'),
+    (el['innerHTML'] = STORY_TIME_ICON_SVG),
+    el
+  );
+}
+export function beginStoryClipTimePillEdit({
+  pill: pill,
+  documentObject: documentObject = globalThis['document'],
+  onCommit: onCommit = null,
+} = {}) {
+  if (!pill || !documentObject?.['createElement']) return null;
+  const value35 = pill['querySelector']?.('.story-time-pill-input');
+  if (value35) return (value35['focus']?.(), value35['select']?.(), value35);
+  const enabled2 = pill['querySelector']?.('.ref-pill-label');
+  if (!enabled2 || typeof pill['replaceChild'] !== 'function') return null;
+  const storyClipTimeLabel2 = normalizeStoryClipTimeLabel(
+      pill['dataset']?.['label'] || enabled2['textContent'],
+    ),
+    el2 = documentObject['createElement']('input');
+  ((el2['className'] = 'story-time-pill-input'),
+    (el2['type'] = 'text'),
+    (el2['inputMode'] = 'decimal'),
+    (el2['value'] = storyClipTimeLabel2['replace'](/s$/i, '')),
+    (el2['autocomplete'] = 'off'),
+    (el2['spellcheck'] = ![]),
+    (el2['dataset']['promptPillInlineEditor'] = 'true'),
+    el2['setAttribute']?.('aria-label', '片段时间（秒）'));
+  let value36 = ![];
+  const run = (value37) => {
+    if (value36) return;
+    value36 = !![];
+    const value38 = value37
+        ? normalizeStoryClipTimeLabel(el2['value'], storyClipTimeLabel2)
+        : storyClipTimeLabel2,
+      value39 = documentObject['createElement']('span');
+    ((value39['className'] = 'ref-pill-label'), (value39['textContent'] = value38));
+    if (el2['parentNode'] === pill) pill['replaceChild'](value39, el2);
+    ((pill['dataset']['label'] = value38),
+      pill['classList']?.['remove']?.('is-editing'),
+      value37 && value38 !== storyClipTimeLabel2 && typeof onCommit === 'function' && onCommit(value38));
+  };
+  return (
+    el2['addEventListener']?.('keydown', (event) => {
+      if (event['key'] === 'Enter') {
+        (event['preventDefault']?.(), run(!![]));
+        return;
+      }
+      event['key'] === 'Escape' && (event['preventDefault']?.(), run(![]));
+    }),
+    el2['addEventListener']?.('blur', () => run(!![])),
+    pill['replaceChild'](el2, enabled2),
+    pill['classList']?.['add']?.('is-editing'),
+    el2['focus']?.(),
+    el2['select']?.(),
+    el2
+  );
+}
+export function resolveStoryClipPromptPillPresentation(value40, value41 = [], value42 = []) {
+  const text12 = normalizeText(
+      value40?.['dataset']?.['assetId'] || value40?.['getAttribute']?.('data-asset-id'),
+    ),
+    text13 = normalizeText(
+      value40?.['dataset']?.['promptPillKind'] || value40?.['getAttribute']?.('data-prompt-pill-kind'),
+    );
+  if (text13 === 'time' || text12 === STORY_TIME_MENTION_ASSET_ID)
+    return { pillKind: 'time', missingAsset: ![] };
+  if (text12['startsWith'](STORY_CLIP_FRAME_MENTION_PREFIX))
+    return { pillKind: 'frame', missingAsset: !resolveStoryClipFrameMentionRef(value40, value42) };
+  if (!text12['startsWith'](STORY_ASSET_NODE_PREFIX)) return { pillKind: '', missingAsset: ![] };
+  return { pillKind: '', missingAsset: !resolveStoryClipAssetMentionRef(value40, value41) };
+}
+export function syncStoryClipPromptPillPresentation(el3, value43 = [], value44 = []) {
+  el3?.['querySelectorAll']?.('.ref-pill')?.['forEach']?.((el4) => {
+    syncStoryClipPromptPillHoverTarget(el4);
+    const storyClipPromptPillPresentation = resolveStoryClipPromptPillPresentation(el4, value43, value44);
+    storyClipPromptPillPresentation['pillKind'] === 'time' &&
+      ((el4['dataset']['promptPillKind'] = 'time'), el4['classList']?.['add']?.('story-time-pill'));
+    if (storyClipPromptPillPresentation['missingAsset']) {
+      ((el4['dataset']['refUnresolved'] = 'true'),
+        el4['classList']?.['add']?.('ref-pill--unresolved'),
+        el4['setAttribute']?.('data-tooltip', '缺少图片素材'),
+        el4['removeAttribute']?.('title'));
+      return;
+    }
+    const text14 = normalizeText(el4?.['dataset']?.['assetId']);
+    (text14['startsWith'](STORY_ASSET_NODE_PREFIX) ||
+      text14['startsWith'](STORY_CLIP_FRAME_MENTION_PREFIX)) &&
+      (delete el4['dataset']['refUnresolved'],
+      el4['classList']?.['remove']?.('ref-pill--unresolved'),
+      el4['removeAttribute']?.('data-tooltip'),
+      el4['removeAttribute']?.('data-native-title'),
+      el4['removeAttribute']?.('data-tooltip-source'),
+      el4['removeAttribute']?.('title'));
+  });
+}
+export function renderStoryClipPromptMentions(
+  value45,
+  { assets: assets = [], episode: episode = null, clipFrames: clipFrames = [] } = {},
+) {
+  const ctx = protectStoryH3LiteralTags(value45),
+    ctx2 = protectStoryPromptPills(ctx['source']),
+    value46 = episode?.['replication'] ? assets : [];
+  for (const value47 of ctx2['pills']) {
+    const storyAssetMentionId = parseStoryAssetMentionId(
+        value47['html']['match'](/\bdata-asset-id="([^"]+)"/u)?.[0x1],
+      ),
+      value48 =
+        storyAssetMentionId && assets['find']((value49) => value49['id'] === storyAssetMentionId['assetId']),
+      value50 = value48?.['appearances']?.['find'](
+        (value51) => value51['id'] === storyAssetMentionId['appearanceId'],
+      );
+    if (value50) {
+      const text15 = normalizeText(value50['imageUrl']);
+      ((value47['html'] = value47['html']['replace'](/<img\b[^>]*class="ref-pill-thumb"[^>]*>/gu, '')),
+        (value47['html'] = value47['html']['replace'](/^<span\b[^>]*>/u, (value52) => {
+          let value53 = value52['replace'](/\sdata-ref-unresolved="[^"]*"/u, '')
+            ['replace'](/\sdata-tooltip="缺少图片素材"/u, '')
+            ['replace'](
+              /\bclass="([^"]*)"/u,
+              (value54, value55) =>
+                'class="' +
+                value55['split'](/\s+/u)
+                  ['filter']((value56) => value56 !== 'ref-pill--unresolved')
+                  ['join']('\x20') +
+                (text15 ? '' : '\x20ref-pill--unresolved') +
+                '\x22',
+            );
+          if (!text15)
+            value53 = value53['replace'](/>$/u, ' data-ref-unresolved="true" data-tooltip="缺少图片素材">');
+          return (
+            value53 +
+            (text15
+              ? '<img class="ref-pill-thumb" src="' + escapeHtml(text15) + '" alt="" draggable="false">'
+              : '')
+          );
+        })));
+    }
+    const value57 = value46['length'] && getStoryReplicationCharacterDisplayLabel(value48, value50, assets);
+    value57 &&
+      ((value47['html'] = value47['html']['replace'](
+        /\bdata-label="[^"]*"/u,
+        'data-label="' + escapeHtml(value57) + '\x22',
+      )),
+      (value47['html'] = /class="ref-pill-label"/u['test'](value47['html'])
+        ? value47['html']['replace'](
+            /(<span\b[^>]*class="ref-pill-label"[^>]*>)[\s\S]*?(<\/span>)/u,
+            (value58, value59, value60) => '' + value59 + escapeHtml(value57) + value60,
+          )
+        : value47['html']['replace'](/>[^<>]*<\/span>$/u, '>' + escapeHtml(value57) + '</span>')));
+  }
+  const enabled3 = ctx2['source'];
+  if (!enabled3) return enabled3;
+  const storyClipMentionCandidates = buildStoryClipMentionCandidates({
+      assets: assets,
+      episode: episode,
+      clipFrames: clipFrames,
+    }),
+    args8 = new Map();
+  storyClipMentionCandidates['forEach']((value61) => {
+    const text16 = normalizeText(value61['label']);
+    text16 && !args8['has'](text16) && args8['set'](text16, value61);
+    const value62 = Array['isArray'](value61['mentionVariants']) ? value61['mentionVariants'] : [];
+    value62['forEach']((value63) => {
+      const text17 = normalizeText(value63?.['pillLabel'] || value63?.['label']);
+      if (text17) args8['set'](text17, value63);
+      if (value63?.['sourcePillLabel']) args8['set'](value63['sourcePillLabel'], value63);
+    });
+  });
+  const list6 = [...args8['keys']()]
+      ['filter'](Boolean)
+      ['sort']((value64, value65) => value65['length'] - value64['length']),
+    value66 = list6['length'] ? '@(?:' + list6['map'](escapeRegExp)['join']('|') + ')' : '(?!)',
+    regExp = new RegExp('(' + value66 + ')|(⏱\\s*-?\\d+(?:\\.\\d+)?\\s*(?:s|秒))', 'gi'),
+    handler = (list7, { escapeText: escapeText = !![] } = {}) => {
+      regExp['lastIndex'] = 0x0;
+      let value67 = 0x0,
+        value68 = '',
+        value69 = null;
+      const run2 = (value70) => (escapeText ? escapeHtml(value70) : value70);
+      while ((value69 = regExp['exec'](list7))) {
+        value68 += run2(list7['slice'](value67, value69['index']));
+        if (value69[0x1]) {
+          const value71 = value69[0x1]['slice'](0x1),
+            value72 = args8['get'](value71);
+          value68 += value72 ? renderStoryAssetMentionPill(value72, value46) : run2(value69[0x0]);
+        } else value68 += renderStoryTimeMentionPill(value69[0x2]);
+        value67 = value69['index'] + value69[0x0]['length'];
+      }
+      return ((value68 += run2(list7['slice'](value67))), value68);
+    };
+  if (ctx2['pills']['length'] || /<[a-z][\s\S]*>/i['test'](enabled3))
+    return ctx['restore'](
+      ctx2['restore'](
+        enabled3['split'](/(<[^>]+>)/gu)
+          ['map']((value73) => (value73['startsWith']('<') ? value73 : handler(value73, { escapeText: ![] })))
+          ['join'](''),
+      ),
+    );
+  return ctx['restore'](ctx2['restore'](handler(enabled3)));
+}
+export function resolveStoryClipPromptAssetRefs(
+  value74,
+  {
+    assets: assets = [],
+    episode: episode = null,
+    clipFrames: clipFrames = [],
+    resolveExternalAssetRef: resolveExternalAssetRef = null,
+    voiceAssetIds: voiceAssetIds = null,
+  } = {},
+) {
+  const renderStoryClipPromptMentions2 = renderStoryClipPromptMentions(value74, {
+      assets: assets,
+      episode: episode,
+      clipFrames: clipFrames,
+    }),
+    value75 = /<span\b[^>]*\bclass\s*=\s*(["'])[^"']*\bref-pill\b[^"']*\1[^>]*>/gi,
+    handler2 = (value76, value77) => {
+      const value78 = value76['match'](
+        new RegExp('\x5cb' + value77 + '\x5cs*=\x5cs*([\x22\x27])(.*?)\x5c1', 'i'),
+      );
+      return normalizeText(value78?.[0x2])
+        ['replace'](/&quot;/gi, '\x22')
+        ['replace'](/&#39;|&apos;/gi, '\x27')
+        ['replace'](/&lt;/gi, '<')
+        ['replace'](/&gt;/gi, '>')
+        ['replace'](/&amp;/gi, '&');
+    },
+    list8 = [],
+    value79 = new Set(),
+    enabled4 =
+      voiceAssetIds == null ? null : new Set([...voiceAssetIds]['map'](normalizeText)['filter'](Boolean));
+  let value80 = null;
+  while ((value80 = value75['exec'](renderStoryClipPromptMentions2))) {
+    const value81 = value80[0x0],
+      enabled5 = handler2(value81, 'data-asset-id');
+    if (!enabled5) continue;
+    const storyAssetIdFromMentionNodeId = getStoryAssetIdFromMentionNodeId(enabled5),
+      value82 = enabled5['startsWith'](STORY_ASSET_NODE_PREFIX)
+        ? resolveStoryClipAssetMentionRefs({ dataset: { assetId: enabled5 } }, assets, {
+            voiceEnabled:
+              enabled4 && !enabled4['has'](storyAssetIdFromMentionNodeId)
+                ? ![]
+                : getStoryEpisodeCharacterVoiceEnabled(episode, storyAssetIdFromMentionNodeId),
+          })
+        : enabled5['startsWith'](STORY_CLIP_FRAME_MENTION_PREFIX)
+          ? resolveStoryClipFrameMentionRef({ dataset: { assetId: enabled5 } }, clipFrames)
+          : typeof resolveExternalAssetRef === 'function'
+            ? resolveExternalAssetRef({
+                assetId: enabled5,
+                itemIndex: Number(handler2(value81, 'data-asset-index')),
+              })
+            : null;
+    (Array['isArray'](value82) ? value82 : [value82])['filter'](Boolean)['forEach']((value83) => {
+      const text18 = normalizeText(value83?.['type'] || value83?.['kind']),
+        text19 = normalizeText(value83?.['url']);
+      if (!text18 || !text19) return;
+      const value84 = text18 + ':' + text19;
+      if (value79['has'](value84)) return;
+      (value79['add'](value84), list8['push'](value83));
+    });
+  }
+  return list8;
+}
+export function getStoryAssetIdFromMentionNodeId(value85 = '') {
+  return parseStoryAssetMentionId(value85)?.['assetId'] || '';
+}
+export function getStoryEpisodeCharacterVoiceEnabled(options5 = {}, value86 = '') {
+  const text20 = normalizeText(value86),
+    enabled6 = options5?.['characterVoiceEnabledByAssetId'];
+  if (
+    !text20 ||
+    !enabled6 ||
+    typeof enabled6 !== 'object' ||
+    Array['isArray'](enabled6) ||
+    typeof enabled6[text20] !== 'boolean'
+  )
+    return undefined;
+  return enabled6[text20];
+}
+export function setStoryEpisodeCharacterVoiceEnabled(enabled7 = {}, value87 = '', value88 = ![]) {
+  if (!enabled7 || typeof enabled7 !== 'object' || Array['isArray'](enabled7)) return ![];
+  const text21 = normalizeText(value87);
+  if (!text21) return ![];
+  const args9 = enabled7['characterVoiceEnabledByAssetId'];
+  return (
+    (enabled7['characterVoiceEnabledByAssetId'] = {
+      ...(args9 && typeof args9 === 'object' && !Array['isArray'](args9) ? args9 : {}),
+      [text21]: value88 === !![],
+    }),
+    !![]
+  );
+}
+export function syncStoryClipPromptPillHoverTarget(el5) {
+  if (!el5?.['dataset']) return '';
+  const storyAssetMentionId2 = parseStoryAssetMentionId(el5['dataset']['assetId']),
+    value89 = storyAssetMentionId2?.['assetId'] || '',
+    value90 =
+      storyAssetMentionId2?.['appearanceId'] === '__asset__'
+        ? ''
+        : storyAssetMentionId2?.['appearanceId'] || '';
+  if (value89) el5['dataset']['storyAssetHoverId'] = value89;
+  else delete el5['dataset']['storyAssetHoverId'];
+  return (
+    value90
+      ? (el5['dataset']['storyAssetHoverAppearanceId'] = value90)
+      : delete el5['dataset']['storyAssetHoverAppearanceId'],
+    value89
+  );
+}
+export function resolveStoryClipAssetMentionRef(value91, value92 = []) {
+  const storyAssetMentionId3 = parseStoryAssetMentionId(value91?.['dataset']?.['assetId']);
+  if (!storyAssetMentionId3) return null;
+  const error = (Array['isArray'](value92) ? value92 : [])['find'](
+    (value93) => normalizeText(value93?.['id']) === storyAssetMentionId3['assetId'],
+  );
+  if (!error) return null;
+  const enabled8 =
+    storyAssetMentionId3['appearanceId'] === '__asset__'
+      ? null
+      : (Array['isArray'](error['appearances']) ? error['appearances'] : [])['find'](
+          (value94) => normalizeText(value94?.['id']) === storyAssetMentionId3['appearanceId'],
+        );
+  if (storyAssetMentionId3['appearanceId'] !== '__asset__' && !enabled8) return null;
+  const enabled9 =
+    storyAssetMentionId3['appearanceId'] === '__asset__'
+      ? normalizeText(error['imageUrl'])
+      : normalizeText(enabled8?.['imageUrl']);
+  if (!enabled9) return null;
+  return {
+    origin: 'asset',
+    assetId: normalizeText(value91?.['dataset']?.['assetId']),
+    storyAssetId: storyAssetMentionId3['assetId'],
+    appearanceId: storyAssetMentionId3['appearanceId'],
+    itemIndex: 0x0,
+    type: 'image',
+    name: normalizeText(error['name']) || '本集素材',
+    label: normalizeText(error['name']) || '本集素材',
+    url: enabled9,
+    thumbUrl: enabled9,
+    nodeData: { type: 'source-image', imageUrl: enabled9 },
+  };
+}
+export function getStoryClipMentionVoiceState(value95, value96 = [], { voiceEnabled: voiceEnabled } = {}) {
+  const storyAssetMentionId4 = parseStoryAssetMentionId(value95?.['dataset']?.['assetId']),
+    value97 = storyAssetMentionId4
+      ? (Array['isArray'](value96) ? value96 : [])['find'](
+          (value98) => normalizeText(value98?.['id']) === storyAssetMentionId4['assetId'],
+        )
+      : null,
+    value99 =
+      value97?.['kind'] === 'character'
+        ? normalizeStoryCharacterVoiceReference(value97?.['voiceReference'])
+        : null,
+    text22 = normalizeText(value99?.['audioUrl'] || value99?.['localPath']),
+    value100 = Boolean(value97 && text22),
+    text23 = normalizeText(value95?.['dataset']?.['storyVoiceEnabled']),
+    value101 = typeof voiceEnabled === 'boolean' ? voiceEnabled : text23 !== 'false';
+  return {
+    available: value100,
+    enabled: value100 && value101,
+    asset: value97,
+    voiceReference: value99,
+    url: text22,
+  };
+}
+export function setStoryClipMentionVoiceEnabled(el6, value102 = [], value103 = ![]) {
+  if (!el6?.['dataset']) return getStoryClipMentionVoiceState(el6, value102);
+  const storyClipMentionVoiceState = getStoryClipMentionVoiceState(el6, value102);
+  if (storyClipMentionVoiceState['available'] && value103 === !![])
+    el6['dataset']['storyVoiceEnabled'] = 'true';
+  else
+    storyClipMentionVoiceState['available']
+      ? (el6['dataset']['storyVoiceEnabled'] = 'false')
+      : (delete el6['dataset']['storyVoiceEnabled'], el6['removeAttribute']?.('data-story-voice-enabled'));
+  return getStoryClipMentionVoiceState(el6, value102);
+}
+export function resolveStoryClipAssetMentionRefs(
+  value104,
+  value105 = [],
+  {
+    voiceEnabled: voiceEnabled2,
+    clipFrames: clipFrames = [],
+    resolveExternalAssetRef: resolveExternalAssetRef = null,
+  } = {},
+) {
+  const storyClipFrameMentionRef = resolveStoryClipFrameMentionRef(value104, clipFrames);
+  if (storyClipFrameMentionRef) return storyClipFrameMentionRef;
+  const text24 = normalizeText(value104?.['dataset']?.['assetId']);
+  if (!text24['startsWith'](STORY_ASSET_NODE_PREFIX) && typeof resolveExternalAssetRef === 'function')
+    return resolveExternalAssetRef({
+      assetId: text24,
+      itemIndex: Number(value104?.['dataset']?.['assetIndex'] || 0x0),
+    });
+  const list9 = [],
+    storyClipAssetMentionRef = resolveStoryClipAssetMentionRef(value104, value105);
+  if (storyClipAssetMentionRef) list9['push'](storyClipAssetMentionRef);
+  const response = getStoryClipMentionVoiceState(value104, value105, { voiceEnabled: voiceEnabled2 });
+  if (response['enabled']) {
+    const text25 = normalizeText(response['asset']?.['id']);
+    list9['push']({
+      origin: 'asset',
+      assetId: '' + STORY_CHARACTER_VOICE_NODE_PREFIX + encodeURIComponent(text25),
+      storyAssetId: text25,
+      itemIndex: 0x0,
+      type: 'audio',
+      name: (normalizeText(response['asset']?.['name']) || '角色') + '\x20·\x20声音参考',
+      label: normalizeText(response['asset']?.['name']) || '角色声音',
+      url: response['url'],
+      audioUrl: response['url'],
+      localPath: normalizeText(response['voiceReference']?.['localPath']),
+      placeholderTypeLabel: '声音',
+      nodeData: {
+        type: 'source-audio',
+        audioUrl: response['url'],
+        localPath: normalizeText(response['voiceReference']?.['localPath']),
+      },
+    });
+  }
+  if (list9['length'] === 0x0) return null;
+  return list9['length'] === 0x1 ? list9[0x0] : list9;
+}

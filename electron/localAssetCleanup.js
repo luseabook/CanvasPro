@@ -12,216 +12,216 @@ const PROJECT_EXTENSIONS = new Set(['.aicanvas', '.aicproj', '.json']),
     { key: 'assets', rootKey: 'assetsRoot', virtualPrefix: 'data/assets/' },
     { key: 'workflowThumbs', rootKey: 'workflowThumbsRoot', virtualPrefix: 'data/workflows/thumbs/' },
   ]);
-function isPlainObject(_0x140a84) {
-  return !!_0x140a84 && typeof _0x140a84 === 'object' && !Array.isArray(_0x140a84);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array.isArray(enabled);
 }
-function trimText(_0x1ee0af) {
-  return String(_0x1ee0af || '').trim();
+function trimText(value) {
+  return String(value || '').trim();
 }
-function decodePathPart(_0x2f0bea) {
+function decodePathPart(item) {
   try {
-    return decodeURIComponent(_0x2f0bea);
+    return decodeURIComponent(item);
   } catch {
-    return _0x2f0bea;
+    return item;
   }
 }
-function splitCompositeVirtualPathValue(_0xa67eb2) {
-  const _0x170f87 = trimText(_0xa67eb2);
-  if (!_0x170f87) return [];
-  return _0x170f87
+function splitCompositeVirtualPathValue(key) {
+  const trimText2 = trimText(key);
+  if (!trimText2) return [];
+  return trimText2
     .split('|')
-    .map((_0x471f78) => _0x471f78.trim())
+    .map((item2) => item2.trim())
     .filter(Boolean);
 }
-function normalizeComparablePath(_0x2b56cb, _0x28e1be = process.platform) {
-  const _0x13fde3 = path.resolve(String(_0x2b56cb || ''));
-  return _0x28e1be === 'win32' || _0x28e1be === 'darwin' ? _0x13fde3.toLowerCase() : _0x13fde3;
+function normalizeComparablePath(index, result = process.platform) {
+  const data = path.resolve(String(index || ''));
+  return result === 'win32' || result === 'darwin' ? data.toLowerCase() : data;
 }
-export function isPathInside(_0x306632, _0x24cd3a, _0x482dfb = process.platform) {
+export function isPathInside(options, target, source = process.platform) {
   try {
-    const _0x2cc809 = normalizeComparablePath(_0x306632, _0x482dfb),
-      _0x2166f2 = normalizeComparablePath(_0x24cd3a, _0x482dfb);
-    return _0x2cc809 === _0x2166f2 || _0x2cc809.startsWith('' + _0x2166f2 + path.sep);
+    const comparablePath = normalizeComparablePath(options, source),
+      comparablePath2 = normalizeComparablePath(target, source);
+    return comparablePath === comparablePath2 || comparablePath.startsWith('' + comparablePath2 + path.sep);
   } catch {
     return false;
   }
 }
-export function normalizeVirtualLocalPath(_0x3bb29e) {
-  let _0x29f88e = trimText(_0x3bb29e);
-  if (!_0x29f88e) return '';
-  if (_0x29f88e.includes('|')) return '';
-  if (/^(?:file|javascript|data|blob):/i.test(_0x29f88e)) return '';
-  if (/^https?:\/\//i.test(_0x29f88e))
+export function normalizeVirtualLocalPath(next) {
+  let list = trimText(next);
+  if (!list) return '';
+  if (list.includes('|')) return '';
+  if (/^(?:file|javascript|data|blob):/i.test(list)) return '';
+  if (/^https?:\/\//i.test(list))
     try {
-      _0x29f88e = new URL(_0x29f88e).pathname || '';
+      list = new URL(list).pathname || '';
     } catch {
       return '';
     }
   else {
-    if (/^[a-z][a-z0-9+.-]*:/i.test(_0x29f88e) && !_0x29f88e.startsWith('/')) return '';
+    if (/^[a-z][a-z0-9+.-]*:/i.test(list) && !list.startsWith('/')) return '';
   }
-  const _0x30a083 = _0x29f88e.split(/[?#]/, 1)[0],
-    _0x22f7d9 = decodePathPart(_0x30a083).replace(/\\/g, '/').replace(/^\/+/, '');
-  if (_0x22f7d9.includes('|')) return '';
-  if (/^[a-zA-Z]:\//.test(_0x22f7d9) || _0x22f7d9.startsWith('//')) return '';
-  if (_0x22f7d9.split('/').some((_0x404230) => _0x404230 === '..')) return '';
-  const _0xe2d0d4 = path.posix.normalize(_0x22f7d9);
-  if (!_0xe2d0d4 || _0xe2d0d4 === '.' || _0xe2d0d4 === '..' || _0xe2d0d4.startsWith('../')) return '';
-  return CLEANABLE_PREFIXES.some((_0x3c2f1e) => _0xe2d0d4.startsWith(_0x3c2f1e)) ? _0xe2d0d4 : '';
+  const current = list.split(/[?#]/, 1)[0],
+    list2 = decodePathPart(current).replace(/\\/g, '/').replace(/^\/+/, '');
+  if (list2.includes('|')) return '';
+  if (/^[a-zA-Z]:\//.test(list2) || list2.startsWith('//')) return '';
+  if (list2.split('/').some((item3) => item3 === '..')) return '';
+  const enabled2 = path.posix.normalize(list2);
+  if (!enabled2 || enabled2 === '.' || enabled2 === '..' || enabled2.startsWith('../')) return '';
+  return CLEANABLE_PREFIXES.some((item4) => enabled2.startsWith(item4)) ? enabled2 : '';
 }
-export function collectVirtualLocalPathsFromString(_0x3c9316) {
-  const _0x3ead1a = [],
-    _0x29d4e6 = new Set();
-  for (const _0x1dedb2 of splitCompositeVirtualPathValue(_0x3c9316)) {
-    const _0x1e4704 = normalizeVirtualLocalPath(_0x1dedb2);
-    if (!_0x1e4704 || _0x29d4e6.has(_0x1e4704)) continue;
-    (_0x29d4e6.add(_0x1e4704), _0x3ead1a.push(_0x1e4704));
+export function collectVirtualLocalPathsFromString(entry) {
+  const list3 = [],
+    map = new Set();
+  for (const record of splitCompositeVirtualPathValue(entry)) {
+    const virtualLocalPath = normalizeVirtualLocalPath(record);
+    if (!virtualLocalPath || map.has(virtualLocalPath)) continue;
+    (map.add(virtualLocalPath), list3.push(virtualLocalPath));
   }
-  return _0x3ead1a;
+  return list3;
 }
-export function collectReferencedLocalPaths(_0x399094, _0x15dfd4 = new Set(), _0x64e677 = new Set()) {
-  if (_0x399094 == null) return _0x15dfd4;
-  if (typeof _0x399094 === 'string') {
-    for (const _0x1a97c3 of collectVirtualLocalPathsFromString(_0x399094)) {
-      _0x15dfd4.add(_0x1a97c3);
+export function collectReferencedLocalPaths(payload, handle = new Set(), map2 = new Set()) {
+  if (payload == null) return handle;
+  if (typeof payload === 'string') {
+    for (const state of collectVirtualLocalPathsFromString(payload)) {
+      handle.add(state);
     }
-    return _0x15dfd4;
+    return handle;
   }
-  if (typeof _0x399094 !== 'object') return _0x15dfd4;
-  if (_0x64e677.has(_0x399094)) return _0x15dfd4;
-  _0x64e677.add(_0x399094);
-  if (Array.isArray(_0x399094)) {
-    for (const _0x37c682 of _0x399094) collectReferencedLocalPaths(_0x37c682, _0x15dfd4, _0x64e677);
-    return _0x15dfd4;
+  if (typeof payload !== 'object') return handle;
+  if (map2.has(payload)) return handle;
+  map2.add(payload);
+  if (Array.isArray(payload)) {
+    for (const config of payload) collectReferencedLocalPaths(config, handle, map2);
+    return handle;
   }
-  for (const _0x4b3766 of Object.values(_0x399094)) {
-    collectReferencedLocalPaths(_0x4b3766, _0x15dfd4, _0x64e677);
+  for (const input of Object.values(payload)) {
+    collectReferencedLocalPaths(input, handle, map2);
   }
-  return _0x15dfd4;
+  return handle;
 }
-function stripUtf8Bom(_0x5d7585) {
-  return String(_0x5d7585 || '').replace(/^\uFEFF/, '');
+function stripUtf8Bom(output) {
+  return String(output || '').replace(/^\uFEFF/, '');
 }
-function readJsonIfPossible(_0x17f57, _0x3d9bd7, _0x4a6459) {
+function readJsonIfPossible(value2, list4, source2) {
   try {
-    return JSON.parse(stripUtf8Bom(readFileSync(_0x17f57, 'utf8')));
-  } catch (_0x274cbf) {
+    return JSON.parse(stripUtf8Bom(readFileSync(value2, 'utf8')));
+  } catch (error) {
     return (
-      _0x3d9bd7?.push({
+      list4?.push({
         type: 'json-read-failed',
-        source: _0x4a6459 || _0x17f57,
-        message: String(_0x274cbf?.message || _0x274cbf),
+        source: source2 || value2,
+        message: String(error?.message || error),
       }),
       null
     );
   }
 }
-function listFilesRecursive(_0x2e1050, _0x466378, _0x53ce75 = {}) {
-  const _0x30e0fa = trimText(_0x2e1050);
-  if (!_0x30e0fa || !existsSync(_0x30e0fa)) return [];
-  const _0xf06103 = [],
-    _0x14eadb = [path.resolve(_0x30e0fa)],
-    _0x1a4f96 = path.resolve(_0x30e0fa);
-  while (_0x14eadb.length > 0) {
-    const _0x11f9ab = _0x14eadb.pop();
-    let _0x4414ca = [];
+function listFilesRecursive(value3, list5, list6 = {}) {
+  const trimText3 = trimText(value3);
+  if (!trimText3 || !existsSync(trimText3)) return [];
+  const list7 = [],
+    list8 = [path.resolve(trimText3)],
+    value4 = path.resolve(trimText3);
+  while (list8.length > 0) {
+    const source3 = list8.pop();
+    let dirSync = [];
     try {
-      _0x4414ca = readdirSync(_0x11f9ab, { withFileTypes: true });
-    } catch (_0x39840b) {
-      _0x466378?.push({
+      dirSync = readdirSync(source3, { withFileTypes: true });
+    } catch (error2) {
+      list5?.push({
         type: 'directory-read-failed',
-        source: _0x11f9ab,
-        message: String(_0x39840b?.message || _0x39840b),
+        source: source3,
+        message: String(error2?.message || error2),
       });
       continue;
     }
-    for (const _0x480266 of _0x4414ca) {
-      const _0x273e04 = path.join(_0x11f9ab, _0x480266.name);
-      if (!isPathInside(_0x273e04, _0x1a4f96)) continue;
-      if (_0x480266.isSymbolicLink()) continue;
-      if (_0x480266.isDirectory()) {
-        _0x14eadb.push(_0x273e04);
+    for (const error3 of dirSync) {
+      const item5 = path.join(source3, error3.name);
+      if (!isPathInside(item5, value4)) continue;
+      if (error3.isSymbolicLink()) continue;
+      if (error3.isDirectory()) {
+        list8.push(item5);
         continue;
       }
-      if (!_0x480266.isFile()) continue;
-      if (typeof _0x53ce75.filter === 'function' && !_0x53ce75.filter(_0x273e04)) continue;
-      _0xf06103.push(_0x273e04);
+      if (!error3.isFile()) continue;
+      if (typeof list6.filter === 'function' && !list6.filter(item5)) continue;
+      list7.push(item5);
     }
   }
-  return _0xf06103;
+  return list7;
 }
-function isSupportedProjectFile(_0x27b838) {
-  return PROJECT_EXTENSIONS.has(path.extname(String(_0x27b838 || '')).toLowerCase());
+function isSupportedProjectFile(value5) {
+  return PROJECT_EXTENSIONS.has(path.extname(String(value5 || '')).toLowerCase());
 }
-function readRecentProjectPaths(_0x59f8b2, _0x2e6cdd) {
-  if (!_0x59f8b2 || !existsSync(_0x59f8b2)) return [];
-  const _0xb00ba6 = readJsonIfPossible(_0x59f8b2, _0x2e6cdd, 'recent-projects'),
-    _0x15909f = Array.isArray(_0xb00ba6?.items) ? _0xb00ba6.items : [];
-  return _0x15909f
-    .map((_0x6c2684) => trimText(_0x6c2684?.path || _0x6c2684?.displayPath))
-    .filter((_0x49af4a) => _0x49af4a && path.isAbsolute(_0x49af4a) && isSupportedProjectFile(_0x49af4a));
+function readRecentProjectPaths(enabled3, value6) {
+  if (!enabled3 || !existsSync(enabled3)) return [];
+  const jsonIfPossible = readJsonIfPossible(enabled3, value6, 'recent-projects'),
+    list9 = Array.isArray(jsonIfPossible?.items) ? jsonIfPossible.items : [];
+  return list9
+    .map((item6) => trimText(item6?.path || item6?.displayPath))
+    .filter((item7) => item7 && path.isAbsolute(item7) && isSupportedProjectFile(item7));
 }
-function addJsonReferencesFromFiles(_0x50b12d, _0x326302, _0x4019a9, _0x441c6c) {
-  const _0x40b5d6 = new Set();
-  for (const _0x202cc1 of _0x50b12d) {
-    const _0x58cd09 = path.resolve(_0x202cc1),
-      _0x5116b4 = normalizeComparablePath(_0x58cd09);
-    if (_0x40b5d6.has(_0x5116b4) || !existsSync(_0x58cd09)) continue;
-    _0x40b5d6.add(_0x5116b4);
-    const _0x16d0f5 = readJsonIfPossible(_0x58cd09, _0x4019a9, _0x441c6c || _0x58cd09);
-    if (_0x16d0f5 != null) collectReferencedLocalPaths(_0x16d0f5, _0x326302);
+function addJsonReferencesFromFiles(value7, value8, value9, value10) {
+  const map3 = new Set();
+  for (const value11 of value7) {
+    const value12 = path.resolve(value11),
+      comparablePath3 = normalizeComparablePath(value12);
+    if (map3.has(comparablePath3) || !existsSync(value12)) continue;
+    map3.add(comparablePath3);
+    const jsonIfPossible2 = readJsonIfPossible(value12, value9, value10 || value12);
+    if (jsonIfPossible2 != null) collectReferencedLocalPaths(jsonIfPossible2, value8);
   }
 }
-function listJsonFiles(_0x57d093, _0x1dc0b4) {
-  return listFilesRecursive(_0x57d093, _0x1dc0b4, {
-    filter: (_0x14794f) => path.extname(_0x14794f).toLowerCase() === '.json',
+function listJsonFiles(value13, value14) {
+  return listFilesRecursive(value13, value14, {
+    filter: (value15) => path.extname(value15).toLowerCase() === '.json',
   });
 }
-function listProjectFiles(_0xb622fe, _0x4bc19d) {
-  return listFilesRecursive(_0xb622fe, _0x4bc19d, { filter: isSupportedProjectFile });
+function listProjectFiles(value16, value17) {
+  return listFilesRecursive(value16, value17, { filter: isSupportedProjectFile });
 }
-function getWorkflowThumbRoot(_0x201b5b) {
-  const _0x203897 = trimText(_0x201b5b);
-  return _0x203897 ? path.join(_0x203897, 'thumbs') : '';
+function getWorkflowThumbRoot(value18) {
+  const trimText4 = trimText(value18);
+  return trimText4 ? path.join(trimText4, 'thumbs') : '';
 }
 export function buildLocalAssetCleanupRoots({
   fileSavePaths: fileSavePaths = {},
   defaults: defaults = {},
 } = {}) {
-  const _0x35d819 = isPlainObject(fileSavePaths) ? fileSavePaths : {},
-    _0x1978ef = (_0x244f59) => {
-      const _0x3dcbff = trimText(_0x244f59);
-      return _0x3dcbff ? path.resolve(_0x3dcbff) : '';
+  const isPlainObject2 = isPlainObject(fileSavePaths) ? fileSavePaths : {},
+    canvasRoot = (value19) => {
+      const trimText5 = trimText(value19);
+      return trimText5 ? path.resolve(trimText5) : '';
     },
-    _0x332fb1 = _0x1978ef(trimText(_0x35d819.dataDir) || trimText(defaults.dataDir)),
-    _0x3b1437 = _0x332fb1
-      ? path.join(_0x332fb1, 'uploads')
-      : _0x1978ef(trimText(_0x35d819.tempDir) || trimText(defaults.uploadsDir));
+    assetsRoot = canvasRoot(trimText(isPlainObject2.dataDir) || trimText(defaults.dataDir)),
+    uploadsRoot = assetsRoot
+      ? path.join(assetsRoot, 'uploads')
+      : canvasRoot(trimText(isPlainObject2.tempDir) || trimText(defaults.uploadsDir));
   return {
-    canvasRoot: _0x1978ef(trimText(_0x35d819.canvasDir) || trimText(defaults.canvasDir)),
-    outputRoot: _0x1978ef(trimText(_0x35d819.outputDir) || trimText(defaults.outputDir)),
-    uploadsRoot: _0x3b1437,
-    assetsRoot: _0x332fb1 ? path.join(_0x332fb1, 'assets') : _0x1978ef(defaults.assetsDir),
-    workflowsRoot: _0x332fb1 ? path.join(_0x332fb1, 'workflows') : _0x1978ef(defaults.workflowsDir),
-    workflowThumbsRoot: _0x1978ef(
+    canvasRoot: canvasRoot(trimText(isPlainObject2.canvasDir) || trimText(defaults.canvasDir)),
+    outputRoot: canvasRoot(trimText(isPlainObject2.outputDir) || trimText(defaults.outputDir)),
+    uploadsRoot: uploadsRoot,
+    assetsRoot: assetsRoot ? path.join(assetsRoot, 'assets') : canvasRoot(defaults.assetsDir),
+    workflowsRoot: assetsRoot ? path.join(assetsRoot, 'workflows') : canvasRoot(defaults.workflowsDir),
+    workflowThumbsRoot: canvasRoot(
       trimText(defaults.workflowThumbsDir) || getWorkflowThumbRoot(defaults.workflowsDir),
     ),
-    recentProjectsStorePath: _0x1978ef(defaults.recentProjectsStorePath),
-    recoverySnapshotPath: _0x1978ef(defaults.recoverySnapshotPath),
+    recentProjectsStorePath: canvasRoot(defaults.recentProjectsStorePath),
+    recoverySnapshotPath: canvasRoot(defaults.recoverySnapshotPath),
   };
 }
-function rootsSignature(_0x1556c8) {
+function rootsSignature(value20) {
   return [
-    _0x1556c8.canvasRoot,
-    _0x1556c8.outputRoot,
-    _0x1556c8.uploadsRoot,
-    _0x1556c8.assetsRoot,
-    _0x1556c8.workflowsRoot,
-    _0x1556c8.workflowThumbsRoot,
-    _0x1556c8.recentProjectsStorePath,
-    _0x1556c8.recoverySnapshotPath,
+    value20.canvasRoot,
+    value20.outputRoot,
+    value20.uploadsRoot,
+    value20.assetsRoot,
+    value20.workflowsRoot,
+    value20.workflowThumbsRoot,
+    value20.recentProjectsStorePath,
+    value20.recoverySnapshotPath,
   ]
-    .map((_0x411e05) => normalizeComparablePath(_0x411e05 || ''))
+    .map((item8) => normalizeComparablePath(item8 || ''))
     .join('|');
 }
 function publicRoots() {
@@ -232,255 +232,248 @@ function publicRoots() {
     workflowThumbs: 'data/workflows/thumbs/',
   };
 }
-function buildRootConfigs(_0x3b488b) {
-  return ROOT_DEFINITIONS.map((_0x2ba940) => ({
-    ..._0x2ba940,
-    absRoot: trimText(_0x3b488b?.[_0x2ba940.rootKey]),
-  })).filter((_0x1c4f25) => _0x1c4f25.absRoot);
+function buildRootConfigs(value21) {
+  return ROOT_DEFINITIONS.map((args) => ({
+    ...args,
+    absRoot: trimText(value21?.[args.rootKey]),
+  })).filter((item9) => item9.absRoot);
 }
-export function resolveVirtualPathToAbsolute(_0x2c0630, _0x2098c9) {
-  const _0x43f81d = normalizeVirtualLocalPath(_0x2c0630);
-  if (!_0x43f81d) return '';
-  for (const _0x3fdbff of buildRootConfigs(_0x2098c9)) {
-    if (!_0x43f81d.startsWith(_0x3fdbff.virtualPrefix)) continue;
-    const _0x1828fa = _0x43f81d.slice(_0x3fdbff.virtualPrefix.length),
-      _0x515e99 = path.resolve(_0x3fdbff.absRoot, ..._0x1828fa.split('/').filter(Boolean));
-    return isPathInside(_0x515e99, _0x3fdbff.absRoot) ? _0x515e99 : '';
+export function resolveVirtualPathToAbsolute(value22, value23) {
+  const list10 = normalizeVirtualLocalPath(value22);
+  if (!list10) return '';
+  for (const value24 of buildRootConfigs(value23)) {
+    if (!list10.startsWith(value24.virtualPrefix)) continue;
+    const args2 = list10.slice(value24.virtualPrefix.length),
+      value25 = path.resolve(value24.absRoot, ...args2.split('/').filter(Boolean));
+    return isPathInside(value25, value24.absRoot) ? value25 : '';
   }
   return '';
 }
-function toVirtualPath(_0x4601d1, _0x5874c9) {
-  const _0x59739d = path.relative(_0x5874c9.absRoot, _0x4601d1);
-  if (!_0x59739d || _0x59739d.startsWith('..') || path.isAbsolute(_0x59739d)) return '';
-  return '' + _0x5874c9.virtualPrefix + _0x59739d.replace(/\\/g, '/');
+function toVirtualPath(value26, value27) {
+  const enabled4 = path.relative(value27.absRoot, value26);
+  if (!enabled4 || enabled4.startsWith('..') || path.isAbsolute(enabled4)) return '';
+  return '' + value27.virtualPrefix + enabled4.replace(/\\/g, '/');
 }
-function isCleanableJsonCandidate(_0x28ccde) {
-  return /\.waveform\.json$/i.test(path.basename(_0x28ccde));
+function isCleanableJsonCandidate(value28) {
+  return /\.waveform\.json$/i.test(path.basename(value28));
 }
-function isCleanableCandidate(_0x1acc6f, _0x5d7037) {
-  const _0x3aa531 = path.basename(_0x1acc6f),
-    _0x5eb3d = path.extname(_0x3aa531).toLowerCase();
-  if (_0x3aa531 === 'assets.index.json') return false;
-  if (_0x5eb3d === '.json') return isCleanableJsonCandidate(_0x1acc6f);
-  if (!MEDIA_EXTENSIONS.has(_0x5eb3d)) return false;
-  if (_0x5d7037 === 'workflowThumbs') return IMAGE_EXTENSIONS.has(_0x5eb3d);
+function isCleanableCandidate(value29, value30) {
+  const value31 = path.basename(value29),
+    value32 = path.extname(value31).toLowerCase();
+  if (value31 === 'assets.index.json') return false;
+  if (value32 === '.json') return isCleanableJsonCandidate(value29);
+  if (!MEDIA_EXTENSIONS.has(value32)) return false;
+  if (value30 === 'workflowThumbs') return IMAGE_EXTENSIONS.has(value32);
   return true;
 }
-function classifyCandidateKind(_0x50ce78) {
-  if (isCleanableJsonCandidate(_0x50ce78)) return 'waveform';
-  const _0x20fba7 = path.extname(_0x50ce78).toLowerCase();
-  if (IMAGE_EXTENSIONS.has(_0x20fba7)) return 'image';
-  if (VIDEO_EXTENSIONS.has(_0x20fba7)) return 'video';
-  if (AUDIO_EXTENSIONS.has(_0x20fba7)) return 'audio';
+function classifyCandidateKind(value33) {
+  if (isCleanableJsonCandidate(value33)) return 'waveform';
+  const value34 = path.extname(value33).toLowerCase();
+  if (IMAGE_EXTENSIONS.has(value34)) return 'image';
+  if (VIDEO_EXTENSIONS.has(value34)) return 'video';
+  if (AUDIO_EXTENSIONS.has(value34)) return 'audio';
   return 'media';
 }
-function collectCandidateFiles(_0x264648, _0xfd431a) {
-  const _0x4a1efa = [],
-    _0x190269 = new Set();
-  for (const _0x2142b9 of buildRootConfigs(_0x264648)) {
-    const _0x49b645 = listFilesRecursive(_0x2142b9.absRoot, _0xfd431a, {
-      filter: (_0x190a0d) => isCleanableCandidate(_0x190a0d, _0x2142b9.key),
+function collectCandidateFiles(value35, value36) {
+  const list11 = [],
+    map4 = new Set();
+  for (const sourceRoot of buildRootConfigs(value35)) {
+    const listFilesRecursive2 = listFilesRecursive(sourceRoot.absRoot, value36, {
+      filter: (value37) => isCleanableCandidate(value37, sourceRoot.key),
     });
-    for (const _0x205814 of _0x49b645) {
-      const _0x97c6d6 = path.resolve(_0x205814),
-        _0x576d42 = normalizeComparablePath(_0x97c6d6);
-      if (_0x190269.has(_0x576d42)) continue;
-      _0x190269.add(_0x576d42);
-      const _0x3b3c35 = toVirtualPath(_0x97c6d6, _0x2142b9);
-      if (!_0x3b3c35) continue;
-      let _0x4a06e2 = null;
+    for (const value38 of listFilesRecursive2) {
+      const absPath = path.resolve(value38),
+        comparablePath4 = normalizeComparablePath(absPath);
+      if (map4.has(comparablePath4)) continue;
+      map4.add(comparablePath4);
+      const localPath = toVirtualPath(absPath, sourceRoot);
+      if (!localPath) continue;
+      let statSync2 = null;
       try {
-        _0x4a06e2 = statSync(_0x97c6d6);
+        statSync2 = statSync(absPath);
       } catch {
         continue;
       }
-      if (!_0x4a06e2?.isFile?.()) continue;
-      _0x4a1efa.push({
-        absPath: _0x97c6d6,
-        localPath: _0x3b3c35,
-        size: Number(_0x4a06e2.size || 0),
-        kind: classifyCandidateKind(_0x97c6d6),
-        modifiedAt: Math.round(Number(_0x4a06e2.mtimeMs || 0)),
-        sourceRoot: _0x2142b9.key,
+      if (!statSync2?.isFile?.()) continue;
+      list11.push({
+        absPath: absPath,
+        localPath: localPath,
+        size: Number(statSync2.size || 0),
+        kind: classifyCandidateKind(absPath),
+        modifiedAt: Math.round(Number(statSync2.mtimeMs || 0)),
+        sourceRoot: sourceRoot.key,
       });
     }
   }
-  return _0x4a1efa;
+  return list11;
 }
-function collectAllReferences({ roots: _0x369d4f, currentProjectSnapshot: _0x5ceeb1, warnings: _0x3ed890 }) {
-  const _0xc80b14 = new Set();
-  collectReferencedLocalPaths(_0x5ceeb1, _0xc80b14);
-  const _0x3ffab7 = listProjectFiles(_0x369d4f.canvasRoot, _0x3ed890);
-  addJsonReferencesFromFiles(_0x3ffab7, _0xc80b14, _0x3ed890, 'project');
-  const _0x5e9f41 = readRecentProjectPaths(_0x369d4f.recentProjectsStorePath, _0x3ed890);
+function collectAllReferences({
+  roots: roots,
+  currentProjectSnapshot: currentProjectSnapshot,
+  warnings: warnings,
+}) {
+  const value39 = new Set();
+  collectReferencedLocalPaths(currentProjectSnapshot, value39);
+  const listProjectFiles2 = listProjectFiles(roots.canvasRoot, warnings);
+  addJsonReferencesFromFiles(listProjectFiles2, value39, warnings, 'project');
+  const recentProjectPaths = readRecentProjectPaths(roots.recentProjectsStorePath, warnings);
   return (
-    addJsonReferencesFromFiles(_0x5e9f41, _0xc80b14, _0x3ed890, 'recent-project'),
-    existsSync(_0x369d4f.recoverySnapshotPath) &&
-      addJsonReferencesFromFiles([_0x369d4f.recoverySnapshotPath], _0xc80b14, _0x3ed890, 'recovery-snapshot'),
-    addJsonReferencesFromFiles(
-      listJsonFiles(_0x369d4f.assetsRoot, _0x3ed890),
-      _0xc80b14,
-      _0x3ed890,
-      'assets',
-    ),
-    addJsonReferencesFromFiles(
-      listJsonFiles(_0x369d4f.workflowsRoot, _0x3ed890),
-      _0xc80b14,
-      _0x3ed890,
-      'workflows',
-    ),
-    _0xc80b14
+    addJsonReferencesFromFiles(recentProjectPaths, value39, warnings, 'recent-project'),
+    existsSync(roots.recoverySnapshotPath) &&
+      addJsonReferencesFromFiles([roots.recoverySnapshotPath], value39, warnings, 'recovery-snapshot'),
+    addJsonReferencesFromFiles(listJsonFiles(roots.assetsRoot, warnings), value39, warnings, 'assets'),
+    addJsonReferencesFromFiles(listJsonFiles(roots.workflowsRoot, warnings), value39, warnings, 'workflows'),
+    value39
   );
 }
-function createScanId(_0x29d54d = Date.now()) {
-  return 'asset-cleanup-' + _0x29d54d + '-' + Math.random().toString(36).slice(2, 10);
+function createScanId(value40 = Date.now()) {
+  return 'asset-cleanup-' + value40 + '-' + Math.random().toString(36).slice(2, 10);
 }
 function runScan({
-  roots: _0x5ea791,
-  currentProjectSnapshot: _0x214322,
+  roots: roots2,
+  currentProjectSnapshot: currentProjectSnapshot2,
   scanId: scanId = createScanId(),
   scannedAt: scannedAt = Date.now(),
   scope: scope = 'current',
 }) {
-  const _0x55177f = [],
-    _0x17772b = collectAllReferences({
-      roots: _0x5ea791,
-      currentProjectSnapshot: _0x214322,
-      warnings: _0x55177f,
+  const warnings2 = [],
+    references = collectAllReferences({
+      roots: roots2,
+      currentProjectSnapshot: currentProjectSnapshot2,
+      warnings: warnings2,
     }),
-    _0x24baf9 = collectCandidateFiles(_0x5ea791, _0x55177f),
-    _0x1be440 = _0x24baf9
-      .filter((_0x2a90c2) => !_0x17772b.has(_0x2a90c2.localPath))
-      .map(({ absPath: _0x4f065b, ..._0x4f52aa }) => _0x4f52aa)
+    candidateCount = collectCandidateFiles(roots2, warnings2),
+    orphanCount = candidateCount
+      .filter((item10) => !references.has(item10.localPath))
+      .map(({ absPath: absPath2, ...args3 }) => args3)
       .sort(
-        (_0x3c25b, _0x34ed7d) =>
-          Number(_0x34ed7d.size || 0) - Number(_0x3c25b.size || 0) ||
-          _0x3c25b.localPath.localeCompare(_0x34ed7d.localPath),
+        (item11, value41) =>
+          Number(value41.size || 0) - Number(item11.size || 0) ||
+          item11.localPath.localeCompare(value41.localPath),
       ),
-    _0x2e7402 = _0x1be440.reduce((_0x477a94, _0x1d7789) => _0x477a94 + Number(_0x1d7789.size || 0), 0);
+    orphanBytes = orphanCount.reduce((item12, value42) => item12 + Number(value42.size || 0), 0);
   return {
     ok: true,
     scanId: scanId,
     scope: scope,
     scannedAt: scannedAt,
     roots: publicRoots(),
-    candidateCount: _0x24baf9.length,
-    orphanCount: _0x1be440.length,
-    orphanBytes: _0x2e7402,
-    items: _0x1be440,
-    warnings: _0x55177f,
+    candidateCount: candidateCount.length,
+    orphanCount: orphanCount.length,
+    orphanBytes: orphanBytes,
+    items: orphanCount,
+    warnings: warnings2,
     _private: {
-      roots: _0x5ea791,
-      rootsSignature: rootsSignature(_0x5ea791),
-      currentProjectSnapshot: _0x214322,
-      references: _0x17772b,
+      roots: roots2,
+      rootsSignature: rootsSignature(roots2),
+      currentProjectSnapshot: currentProjectSnapshot2,
+      references: references,
     },
   };
 }
-function publicScanResult(_0x171df6) {
-  const { _private: _0x38a9f8, ..._0x2c715e } = _0x171df6;
-  return _0x2c715e;
+function publicScanResult(value43) {
+  const { _private: _private, ...args4 } = value43;
+  return args4;
 }
-function cloneJsonLike(_0x511dde) {
-  if (_0x511dde == null) return _0x511dde;
+function cloneJsonLike(value44) {
+  if (value44 == null) return value44;
   if (typeof structuredClone === 'function')
     try {
-      return structuredClone(_0x511dde);
+      return structuredClone(value44);
     } catch {}
   try {
-    return JSON.parse(JSON.stringify(_0x511dde));
+    return JSON.parse(JSON.stringify(value44));
   } catch {
     return null;
   }
 }
 export function createLocalAssetCleanupManager({
-  getRoots: _0x3cca10,
-  trashItem: _0x234ec3,
+  getRoots: getRoots,
+  trashItem: trashItem,
   now: now = () => Date.now(),
 } = {}) {
-  const _0xd76fb2 = new Map();
-  async function _0x383dba(_0x3ecff5 = {}) {
-    if (typeof _0x3cca10 !== 'function') throw new Error('缺少清理目录配置');
-    const _0xb7ecf1 = await _0x3cca10(_0x3ecff5);
-    return _0xb7ecf1 && typeof _0xb7ecf1 === 'object' ? _0xb7ecf1 : {};
+  const map5 = new Map();
+  async function run(options2 = {}) {
+    if (typeof getRoots !== 'function') throw new Error('缺少清理目录配置');
+    const value45 = await getRoots(options2);
+    return value45 && typeof value45 === 'object' ? value45 : {};
   }
   return {
-    async scan(_0x2ade92 = {}) {
-      const _0x2c4803 = await _0x383dba(_0x2ade92 || {}),
-        _0x2622b1 = runScan({
-          roots: _0x2c4803,
-          currentProjectSnapshot: cloneJsonLike(_0x2ade92?.currentProjectSnapshot),
+    async scan(options3 = {}) {
+      const roots3 = await run(options3 || {}),
+        runScan2 = runScan({
+          roots: roots3,
+          currentProjectSnapshot: cloneJsonLike(options3?.currentProjectSnapshot),
           scanId: createScanId(now()),
           scannedAt: now(),
-          scope: trimText(_0x2ade92?.scope) || 'current',
+          scope: trimText(options3?.scope) || 'current',
         });
-      _0xd76fb2.set(_0x2622b1.scanId, _0x2622b1);
-      if (_0xd76fb2.size > 6) {
-        const _0x370075 = _0xd76fb2.keys().next().value;
-        if (_0x370075) _0xd76fb2.delete(_0x370075);
+      map5.set(runScan2.scanId, runScan2);
+      if (map5.size > 6) {
+        const value46 = map5.keys().next().value;
+        if (value46) map5.delete(value46);
       }
-      return publicScanResult(_0x2622b1);
+      return publicScanResult(runScan2);
     },
-    async trash(_0x22576e = {}) {
-      if (typeof _0x234ec3 !== 'function') throw new Error('当前环境不支持移到回收站');
-      const _0x55e4da = trimText(_0x22576e?.scanId),
-        _0xa81d51 = _0xd76fb2.get(_0x55e4da);
-      if (!_0xa81d51) throw new Error('扫描结果已过期，请重新扫描');
-      const _0x56f3b6 = await _0x383dba(_0x22576e || {});
-      if (rootsSignature(_0x56f3b6) !== _0xa81d51._private.rootsSignature) {
-        _0xd76fb2.delete(_0x55e4da);
+    async trash(options4 = {}) {
+      if (typeof trashItem !== 'function') throw new Error('当前环境不支持移到回收站');
+      const scanId2 = trimText(options4?.scanId),
+        roots4 = map5.get(scanId2);
+      if (!roots4) throw new Error('扫描结果已过期，请重新扫描');
+      const value47 = await run(options4 || {});
+      if (rootsSignature(value47) !== roots4._private.rootsSignature) {
+        map5.delete(scanId2);
         throw new Error('文件保存路径已变化，请重新扫描');
       }
-      const _0x525ea4 = Array.isArray(_0x22576e?.localPaths)
-          ? _0x22576e.localPaths.map(normalizeVirtualLocalPath).filter(Boolean)
+      const value48 = Array.isArray(options4?.localPaths)
+          ? options4.localPaths.map(normalizeVirtualLocalPath).filter(Boolean)
           : [],
-        _0x721881 = new Set(_0x525ea4);
-      if (_0x721881.size === 0)
-        return { ok: true, trashedCount: 0, trashedBytes: 0, skipped: [], errors: [] };
-      const _0x6adacc = runScan({
-          roots: _0xa81d51._private.roots,
+        value49 = new Set(value48);
+      if (value49.size === 0) return { ok: true, trashedCount: 0, trashedBytes: 0, skipped: [], errors: [] };
+      const runScan3 = runScan({
+          roots: roots4._private.roots,
           currentProjectSnapshot: cloneJsonLike(
-            _0x22576e?.currentProjectSnapshot || _0xa81d51._private.currentProjectSnapshot,
+            options4?.currentProjectSnapshot || roots4._private.currentProjectSnapshot,
           ),
-          scanId: _0x55e4da,
+          scanId: scanId2,
           scannedAt: now(),
-          scope: _0xa81d51.scope || 'current',
+          scope: roots4.scope || 'current',
         }),
-        _0x4aba5c = new Map(_0x6adacc.items.map((_0x8c0154) => [_0x8c0154.localPath, _0x8c0154])),
-        _0x4e876a = [],
-        _0x1c56ac = [];
-      let _0x2768f9 = 0,
-        _0x345ea9 = 0;
-      for (const _0x2e5441 of _0x721881) {
-        const _0x4f2c9f = _0x4aba5c.get(_0x2e5441);
-        if (!_0x4f2c9f) {
-          _0x4e876a.push({ localPath: _0x2e5441, reason: 'referenced-or-missing' });
+        map6 = new Map(runScan3.items.map((item13) => [item13.localPath, item13])),
+        skipped = [],
+        ok = [];
+      let trashedCount = 0,
+        trashedBytes = 0;
+      for (const localPath2 of value49) {
+        const enabled5 = map6.get(localPath2);
+        if (!enabled5) {
+          skipped.push({ localPath: localPath2, reason: 'referenced-or-missing' });
           continue;
         }
-        const _0x494cdc = resolveVirtualPathToAbsolute(_0x2e5441, _0xa81d51._private.roots);
-        if (!_0x494cdc || !existsSync(_0x494cdc)) {
-          _0x4e876a.push({ localPath: _0x2e5441, reason: 'missing' });
+        const absolute = resolveVirtualPathToAbsolute(localPath2, roots4._private.roots);
+        if (!absolute || !existsSync(absolute)) {
+          skipped.push({ localPath: localPath2, reason: 'missing' });
           continue;
         }
         try {
-          (await _0x234ec3(_0x494cdc), (_0x2768f9 += 1), (_0x345ea9 += Number(_0x4f2c9f.size || 0)));
-        } catch (_0x4a2a68) {
-          _0x1c56ac.push({ localPath: _0x2e5441, message: String(_0x4a2a68?.message || _0x4a2a68) });
+          (await trashItem(absolute), (trashedCount += 1), (trashedBytes += Number(enabled5.size || 0)));
+        } catch (error4) {
+          ok.push({ localPath: localPath2, message: String(error4?.message || error4) });
         }
       }
       return (
-        _0xd76fb2.delete(_0x55e4da),
+        map5.delete(scanId2),
         {
-          ok: _0x1c56ac.length === 0,
-          trashedCount: _0x2768f9,
-          trashedBytes: _0x345ea9,
-          skipped: _0x4e876a,
-          errors: _0x1c56ac,
+          ok: ok.length === 0,
+          trashedCount: trashedCount,
+          trashedBytes: trashedBytes,
+          skipped: skipped,
+          errors: ok,
         }
       );
     },
-    _scanForTests(_0x58357e = {}) {
-      return runScan(_0x58357e);
+    _scanForTests(options5 = {}) {
+      return runScan(options5);
     },
   };
 }

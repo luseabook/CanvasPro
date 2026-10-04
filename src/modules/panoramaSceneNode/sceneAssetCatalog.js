@@ -10,41 +10,41 @@ const COLOR_VARIANTS = Object['freeze']([
     Object['freeze']({ id: 'medium', label: 'Medium', scale: 0x1 }),
     Object['freeze']({ id: 'large', label: 'Large', scale: 1.35 }),
   ]),
-  vector3 = (_0x2034d7 = 0x0, _0x3f06f7 = 0x0, _0xa2b9ca = 0x0) => ({
-    x: _0x2034d7,
-    y: _0x3f06f7,
-    z: _0xa2b9ca,
+  vector3 = (x = 0x0, y = 0x0, z = 0x0) => ({
+    x: x,
+    y: y,
+    z: z,
   }),
-  box = (_0x5841ac, _0x45a6fe, _0x55b01d = {}) => ({
+  box = (args, args2, colorKey = {}) => ({
     primitive: 'box',
-    size: { ..._0x5841ac },
-    position: { ..._0x45a6fe },
-    rotation: { ...vector3(), ...(_0x55b01d['rotation'] || {}) },
-    colorKey: _0x55b01d['colorKey'] || null,
+    size: { ...args },
+    position: { ...args2 },
+    rotation: { ...vector3(), ...(colorKey['rotation'] || {}) },
+    colorKey: colorKey['colorKey'] || null,
   }),
-  cylinder = (_0x149888, _0x50050a, _0x5c21c2, _0x25d6eb = {}) => ({
+  cylinder = (value, height, args3, radiusTop = {}) => ({
     primitive: 'cylinder',
-    radiusTop: _0x25d6eb['radiusTop'] ?? _0x149888,
-    radiusBottom: _0x25d6eb['radiusBottom'] ?? _0x149888,
-    height: _0x50050a,
-    position: { ..._0x5c21c2 },
-    rotation: { ...vector3(), ...(_0x25d6eb['rotation'] || {}) },
-    colorKey: _0x25d6eb['colorKey'] || null,
+    radiusTop: radiusTop['radiusTop'] ?? value,
+    radiusBottom: radiusTop['radiusBottom'] ?? value,
+    height: height,
+    position: { ...args3 },
+    rotation: { ...vector3(), ...(radiusTop['rotation'] || {}) },
+    colorKey: radiusTop['colorKey'] || null,
   }),
-  sphere = (_0x2455e4, _0x3e5ce0, _0x32ad1c = {}) => ({
+  sphere = (radius, args4, colorKey2 = {}) => ({
     primitive: 'sphere',
-    radius: _0x2455e4,
-    position: { ..._0x3e5ce0 },
-    rotation: { ...vector3(), ...(_0x32ad1c['rotation'] || {}) },
-    colorKey: _0x32ad1c['colorKey'] || null,
+    radius: radius,
+    position: { ...args4 },
+    rotation: { ...vector3(), ...(colorKey2['rotation'] || {}) },
+    colorKey: colorKey2['colorKey'] || null,
   }),
-  torus = (_0x13ec81, _0x193dbb, _0x33815a, _0x34692b = {}) => ({
+  torus = (radius2, tube, args5, colorKey3 = {}) => ({
     primitive: 'torus',
-    radius: _0x13ec81,
-    tube: _0x193dbb,
-    position: { ..._0x33815a },
-    rotation: { ...vector3(), ...(_0x34692b['rotation'] || {}) },
-    colorKey: _0x34692b['colorKey'] || null,
+    radius: radius2,
+    tube: tube,
+    position: { ...args5 },
+    rotation: { ...vector3(), ...(colorKey3['rotation'] || {}) },
+    colorKey: colorKey3['colorKey'] || null,
   }),
   FAMILY_TEMPLATES = Object['freeze']([
     {
@@ -91,8 +91,8 @@ const COLOR_VARIANTS = Object['freeze']([
       name: 'Stairs',
       category: 'architecture',
       tags: ['steps', 'platform'],
-      parts: Array['from']({ length: 0x5 }, (_0x1ba89b, _0x2d0ff4) =>
-        box(vector3(2.5, 0.28, 0.65), vector3(0x0, 0.14 + _0x2d0ff4 * 0.28, _0x2d0ff4 * 0.55)),
+      parts: Array['from']({ length: 0x5 }, (item, key) =>
+        box(vector3(2.5, 0.28, 0.65), vector3(0x0, 0.14 + key * 0.28, key * 0.55)),
       ),
     },
     {
@@ -113,10 +113,8 @@ const COLOR_VARIANTS = Object['freeze']([
       tags: ['desk', 'dining'],
       parts: [
         box(vector3(2.2, 0.16, 1.1), vector3(0x0, 1.05, 0x0)),
-        ...[-0.9, 0.9]['flatMap']((_0x4d4018) =>
-          [-0.38, 0.38]['map']((_0x16682b) =>
-            box(vector3(0.14, 0x1, 0.14), vector3(_0x4d4018, 0.5, _0x16682b)),
-          ),
+        ...[-0.9, 0.9]['flatMap']((index) =>
+          [-0.38, 0.38]['map']((result) => box(vector3(0.14, 0x1, 0.14), vector3(index, 0.5, result))),
         ),
       ],
     },
@@ -128,10 +126,8 @@ const COLOR_VARIANTS = Object['freeze']([
       parts: [
         box(vector3(0.85, 0.14, 0.85), vector3(0x0, 0.72, 0x0)),
         box(vector3(0.85, 1.05, 0.14), vector3(0x0, 1.3, 0.36)),
-        ...[-0.32, 0.32]['flatMap']((_0xa629a1) =>
-          [-0.32, 0.32]['map']((_0x46b370) =>
-            box(vector3(0.1, 0.7, 0.1), vector3(_0xa629a1, 0.35, _0x46b370)),
-          ),
+        ...[-0.32, 0.32]['flatMap']((data) =>
+          [-0.32, 0.32]['map']((options) => box(vector3(0.1, 0.7, 0.1), vector3(data, 0.35, options))),
         ),
       ],
     },
@@ -155,8 +151,8 @@ const COLOR_VARIANTS = Object['freeze']([
       parts: [
         box(vector3(0.16, 2.8, 0.65), vector3(-1.05, 1.4, 0x0)),
         box(vector3(0.16, 2.8, 0.65), vector3(1.05, 1.4, 0x0)),
-        ...[0.12, 0.95, 1.78, 2.62]['map']((_0x51a44d) =>
-          box(vector3(2.25, 0.12, 0.65), vector3(0x0, _0x51a44d, 0x0)),
+        ...[0.12, 0.95, 1.78, 2.62]['map']((target) =>
+          box(vector3(2.25, 0.12, 0.65), vector3(0x0, target, 0x0)),
         ),
       ],
     },
@@ -195,11 +191,11 @@ const COLOR_VARIANTS = Object['freeze']([
       name: 'Dance\x20Floor',
       category: 'stage',
       tags: ['dance', 'club', 'floor'],
-      parts: Array['from']({ length: 0x10 }, (_0x435666, _0xc8e2ff) => {
-        const _0x4aec25 = ((_0xc8e2ff % 0x4) - 1.5) * 0.82,
-          _0x472dd5 = (Math['floor'](_0xc8e2ff / 0x4) - 1.5) * 0.82;
-        return box(vector3(0.78, 0.12, 0.78), vector3(_0x4aec25, 0.06, _0x472dd5), {
-          colorKey: ['blue', 'purple', 'cyan', 'yellow'][_0xc8e2ff % 0x4],
+      parts: Array['from']({ length: 0x10 }, (source, next) => {
+        const current = ((next % 0x4) - 1.5) * 0.82,
+          entry = (Math['floor'](next / 0x4) - 1.5) * 0.82;
+        return box(vector3(0.78, 0.12, 0.78), vector3(current, 0.06, entry), {
+          colorKey: ['blue', 'purple', 'cyan', 'yellow'][next % 0x4],
         });
       }),
     },
@@ -241,10 +237,10 @@ const COLOR_VARIANTS = Object['freeze']([
       category: 'stage',
       tags: ['rig', 'concert', 'frame'],
       parts: [
-        ...[-1.7, 1.7]['flatMap']((_0x2b0c0e) =>
-          [-0.22, 0.22]['map']((_0x11f19c) => cylinder(0.06, 0x3, vector3(_0x2b0c0e, 1.5, _0x11f19c))),
+        ...[-1.7, 1.7]['flatMap']((record) =>
+          [-0.22, 0.22]['map']((payload) => cylinder(0.06, 0x3, vector3(record, 1.5, payload))),
         ),
-        ...[-0.22, 0.22]['map']((_0x36b170) => box(vector3(3.5, 0.1, 0.1), vector3(0x0, 2.95, _0x36b170))),
+        ...[-0.22, 0.22]['map']((handle) => box(vector3(3.5, 0.1, 0.1), vector3(0x0, 2.95, handle))),
       ],
     },
     {
@@ -323,138 +319,111 @@ const COLOR_VARIANTS = Object['freeze']([
       parts: [sphere(0.75, vector3(0x0, 0.45, 0x0)), sphere(0.48, vector3(0.52, 0.3, 0.15))],
     },
   ]);
-function scalePart(_0x1dbda6, _0x2aa307) {
-  const _0x29836a = {
-    ..._0x1dbda6,
+function scalePart(x2, state) {
+  const config = {
+    ...x2,
     position: {
-      x: _0x1dbda6['position']['x'] * _0x2aa307,
-      y: _0x1dbda6['position']['y'] * _0x2aa307,
-      z: _0x1dbda6['position']['z'] * _0x2aa307,
+      x: x2['position']['x'] * state,
+      y: x2['position']['y'] * state,
+      z: x2['position']['z'] * state,
     },
-    rotation: { ..._0x1dbda6['rotation'] },
+    rotation: { ...x2['rotation'] },
   };
-  _0x1dbda6['size'] &&
-    (_0x29836a['size'] = {
-      x: _0x1dbda6['size']['x'] * _0x2aa307,
-      y: _0x1dbda6['size']['y'] * _0x2aa307,
-      z: _0x1dbda6['size']['z'] * _0x2aa307,
+  x2['size'] &&
+    (config['size'] = {
+      x: x2['size']['x'] * state,
+      y: x2['size']['y'] * state,
+      z: x2['size']['z'] * state,
     });
-  for (const _0x17b637 of ['radius', 'radiusTop', 'radiusBottom', 'height', 'tube']) {
-    if (Number['isFinite'](_0x1dbda6[_0x17b637])) _0x29836a[_0x17b637] = _0x1dbda6[_0x17b637] * _0x2aa307;
+  for (const scope of ['radius', 'radiusTop', 'radiusBottom', 'height', 'tube']) {
+    if (Number['isFinite'](x2[scope])) config[scope] = x2[scope] * state;
   }
-  return _0x29836a;
+  return config;
 }
 const ASSETS = Object['freeze'](
-    FAMILY_TEMPLATES['flatMap']((_0x39c2c4) =>
-      SIZE_VARIANTS['flatMap']((_0x180c6e) =>
-        COLOR_VARIANTS['map']((_0x15ba33) =>
+    FAMILY_TEMPLATES['flatMap']((id) =>
+      SIZE_VARIANTS['flatMap']((size) =>
+        COLOR_VARIANTS['map']((colorKey4) =>
           Object['freeze']({
-            id: _0x39c2c4['category'] + '-' + _0x39c2c4['id'] + '-' + _0x180c6e['id'] + '-' + _0x15ba33['id'],
-            familyId: _0x39c2c4['id'],
-            name: _0x39c2c4['name'] + '\x20' + _0x180c6e['label'] + '\x20' + _0x15ba33['label'],
-            category: _0x39c2c4['category'],
-            tags: Object['freeze']([..._0x39c2c4['tags'], _0x180c6e['id'], _0x15ba33['id']]),
+            id: id['category'] + '-' + id['id'] + '-' + size['id'] + '-' + colorKey4['id'],
+            familyId: id['id'],
+            name: id['name'] + '\x20' + size['label'] + '\x20' + colorKey4['label'],
+            category: id['category'],
+            tags: Object['freeze']([...id['tags'], size['id'], colorKey4['id']]),
             kind: 'procedural',
-            colorKey: _0x15ba33['id'],
-            size: _0x180c6e['id'],
+            colorKey: colorKey4['id'],
+            size: size['id'],
             parts: Object['freeze'](
-              _0x39c2c4['parts']['map']((_0x30a817) =>
-                Object['freeze'](scalePart(_0x30a817, _0x180c6e['scale'])),
-              ),
+              id['parts']['map']((input) => Object['freeze'](scalePart(input, size['scale']))),
             ),
           }),
         ),
       ),
     ),
   ),
-  ASSET_BY_ID = new Map(ASSETS['map']((_0x2442e4) => [_0x2442e4['id'], _0x2442e4]));
+  ASSET_BY_ID = new Map(ASSETS['map']((output) => [output['id'], output]));
 export const DEFAULT_SCENE_ASSET_ID = 'props-cube-medium-blue';
 export const SCENE_ASSET_COUNT = ASSETS['length'];
 export function listSceneAssets() {
   return [...ASSETS];
 }
 export function getSceneAssetCategories() {
-  return [...new Set(ASSETS['map']((_0x473853) => _0x473853['category']))];
+  return [...new Set(ASSETS['map']((value2) => value2['category']))];
 }
-export function findSceneAsset(_0x198548) {
-  return ASSET_BY_ID['get'](String(_0x198548 || '')['trim']()) || null;
+export function findSceneAsset(value3) {
+  return ASSET_BY_ID['get'](String(value3 || '')['trim']()) || null;
 }
-function getPartHalfExtents(_0x341f87 = {}) {
-  if (_0x341f87['primitive'] === 'sphere') {
-    const _0x498510 = Math['max'](0x0, Number(_0x341f87['radius']) || 0x0);
-    return vector3(_0x498510, _0x498510, _0x498510);
+function getPartHalfExtents(box2 = {}) {
+  if (box2['primitive'] === 'sphere') {
+    const value4 = Math['max'](0x0, Number(box2['radius']) || 0x0);
+    return vector3(value4, value4, value4);
   }
-  if (_0x341f87['primitive'] === 'torus') {
-    const _0x332552 = Math['max'](
-      0x0,
-      (Number(_0x341f87['radius']) || 0x0) + (Number(_0x341f87['tube']) || 0x0),
-    );
-    return vector3(_0x332552, _0x332552, _0x332552);
+  if (box2['primitive'] === 'torus') {
+    const value5 = Math['max'](0x0, (Number(box2['radius']) || 0x0) + (Number(box2['tube']) || 0x0));
+    return vector3(value5, value5, value5);
   }
-  if (_0x341f87['primitive'] === 'cylinder') {
-    const _0x4b1656 = Math['max'](
-        0x0,
-        Number(_0x341f87['radiusTop']) || 0x0,
-        Number(_0x341f87['radiusBottom']) || 0x0,
-      ),
-      _0x5a3c0e = Math['max'](0x0, (Number(_0x341f87['height']) || 0x0) / 0x2),
-      _0x2b6b68 = Math['max'](_0x4b1656, _0x5a3c0e);
-    return vector3(_0x2b6b68, _0x2b6b68, _0x2b6b68);
+  if (box2['primitive'] === 'cylinder') {
+    const value6 = Math['max'](0x0, Number(box2['radiusTop']) || 0x0, Number(box2['radiusBottom']) || 0x0),
+      value7 = Math['max'](0x0, (Number(box2['height']) || 0x0) / 0x2),
+      value8 = Math['max'](value6, value7);
+    return vector3(value8, value8, value8);
   }
   return vector3(
-    Math['max'](0x0, (Number(_0x341f87?.['size']?.['x']) || 0x0) / 0x2),
-    Math['max'](0x0, (Number(_0x341f87?.['size']?.['y']) || 0x0) / 0x2),
-    Math['max'](0x0, (Number(_0x341f87?.['size']?.['z']) || 0x0) / 0x2),
+    Math['max'](0x0, (Number(box2?.['size']?.['x']) || 0x0) / 0x2),
+    Math['max'](0x0, (Number(box2?.['size']?.['y']) || 0x0) / 0x2),
+    Math['max'](0x0, (Number(box2?.['size']?.['z']) || 0x0) / 0x2),
   );
 }
-export function estimateSceneAssetBoundingRadius(_0xfdf9e6) {
-  const _0x50c384 = typeof _0xfdf9e6 === 'string' ? findSceneAsset(_0xfdf9e6) : _0xfdf9e6,
-    _0x4b8c75 = Array['isArray'](_0x50c384?.['parts']) ? _0x50c384['parts'] : [];
-  if (_0x4b8c75['length'] === 0x0) return 0.5;
-  const _0x3a8a13 = _0x4b8c75['reduce'](
-      (_0x2ac0e6, _0x23255c) => {
-        const _0x5ea493 = _0x23255c?.['position'] || vector3(),
-          _0x595fb0 = getPartHalfExtents(_0x23255c);
+export function estimateSceneAssetBoundingRadius(value9) {
+  const value10 = typeof value9 === 'string' ? findSceneAsset(value9) : value9,
+    list = Array['isArray'](value10?.['parts']) ? value10['parts'] : [];
+  if (list['length'] === 0x0) return 0.5;
+  const value11 = list['reduce'](
+      (value12, value13) => {
+        const box3 = value13?.['position'] || vector3(),
+          box4 = getPartHalfExtents(value13);
         return (
-          (_0x2ac0e6['min']['x'] = Math['min'](
-            _0x2ac0e6['min']['x'],
-            (Number(_0x5ea493['x']) || 0x0) - _0x595fb0['x'],
-          )),
-          (_0x2ac0e6['min']['y'] = Math['min'](
-            _0x2ac0e6['min']['y'],
-            (Number(_0x5ea493['y']) || 0x0) - _0x595fb0['y'],
-          )),
-          (_0x2ac0e6['min']['z'] = Math['min'](
-            _0x2ac0e6['min']['z'],
-            (Number(_0x5ea493['z']) || 0x0) - _0x595fb0['z'],
-          )),
-          (_0x2ac0e6['max']['x'] = Math['max'](
-            _0x2ac0e6['max']['x'],
-            (Number(_0x5ea493['x']) || 0x0) + _0x595fb0['x'],
-          )),
-          (_0x2ac0e6['max']['y'] = Math['max'](
-            _0x2ac0e6['max']['y'],
-            (Number(_0x5ea493['y']) || 0x0) + _0x595fb0['y'],
-          )),
-          (_0x2ac0e6['max']['z'] = Math['max'](
-            _0x2ac0e6['max']['z'],
-            (Number(_0x5ea493['z']) || 0x0) + _0x595fb0['z'],
-          )),
-          _0x2ac0e6
+          (value12['min']['x'] = Math['min'](value12['min']['x'], (Number(box3['x']) || 0x0) - box4['x'])),
+          (value12['min']['y'] = Math['min'](value12['min']['y'], (Number(box3['y']) || 0x0) - box4['y'])),
+          (value12['min']['z'] = Math['min'](value12['min']['z'], (Number(box3['z']) || 0x0) - box4['z'])),
+          (value12['max']['x'] = Math['max'](value12['max']['x'], (Number(box3['x']) || 0x0) + box4['x'])),
+          (value12['max']['y'] = Math['max'](value12['max']['y'], (Number(box3['y']) || 0x0) + box4['y'])),
+          (value12['max']['z'] = Math['max'](value12['max']['z'], (Number(box3['z']) || 0x0) + box4['z'])),
+          value12
         );
       },
       { min: vector3(Infinity, Infinity, Infinity), max: vector3(-Infinity, -Infinity, -Infinity) },
     ),
-    _0x2a07ea = vector3(
-      Math['max'](0.01, (_0x3a8a13['max']['x'] - _0x3a8a13['min']['x']) / 0x2),
-      Math['max'](0.01, (_0x3a8a13['max']['y'] - _0x3a8a13['min']['y']) / 0x2),
-      Math['max'](0.01, (_0x3a8a13['max']['z'] - _0x3a8a13['min']['z']) / 0x2),
+    box5 = vector3(
+      Math['max'](0.01, (value11['max']['x'] - value11['min']['x']) / 0x2),
+      Math['max'](0.01, (value11['max']['y'] - value11['min']['y']) / 0x2),
+      Math['max'](0.01, (value11['max']['z'] - value11['min']['z']) / 0x2),
     );
-  return Math['max'](0.5, Math['hypot'](_0x2a07ea['x'], _0x2a07ea['y'], _0x2a07ea['z']));
+  return Math['max'](0.5, Math['hypot'](box5['x'], box5['y'], box5['z']));
 }
-export function resolveSceneAsset(_0x11b132, _0x3cf378 = DEFAULT_SCENE_ASSET_ID) {
-  const _0x5d0fd4 = String(_0x11b132 || '')['trim']();
-  return ASSET_BY_ID['get'](_0x5d0fd4) || ASSET_BY_ID['get'](_0x3cf378) || ASSETS[0x0] || null;
+export function resolveSceneAsset(value14, value15 = DEFAULT_SCENE_ASSET_ID) {
+  const value16 = String(value14 || '')['trim']();
+  return ASSET_BY_ID['get'](value16) || ASSET_BY_ID['get'](value15) || ASSETS[0x0] || null;
 }
 export function searchSceneAssets({
   query: query = '',
@@ -462,26 +431,20 @@ export function searchSceneAssets({
   limit: limit = 0x50,
   offset: offset = 0x0,
 } = {}) {
-  const _0x57e09f = String(query || '')
+  const enabled = String(query || '')
       ['trim']()
       ['toLowerCase'](),
-    _0x21a16b = String(category || 'all')
+    value17 = String(category || 'all')
       ['trim']()
       ['toLowerCase'](),
-    _0x5ab792 = Math['max'](0x0, Math['floor'](Number(offset) || 0x0)),
-    _0x22fa92 = Math['max'](0x1, Math['min'](0x168, Math['floor'](Number(limit) || 0x50)));
-  return ASSETS['filter']((_0x1d1fd5) => {
-    if (_0x21a16b !== 'all' && _0x1d1fd5['category'] !== _0x21a16b) return ![];
-    if (!_0x57e09f) return !![];
-    const _0x2e6866 = [
-      _0x1d1fd5['id'],
-      _0x1d1fd5['familyId'],
-      _0x1d1fd5['name'],
-      _0x1d1fd5['category'],
-      ..._0x1d1fd5['tags'],
-    ]
+    value18 = Math['max'](0x0, Math['floor'](Number(offset) || 0x0)),
+    value19 = Math['max'](0x1, Math['min'](0x168, Math['floor'](Number(limit) || 0x50)));
+  return ASSETS['filter']((error) => {
+    if (value17 !== 'all' && error['category'] !== value17) return ![];
+    if (!enabled) return !![];
+    const list2 = [error['id'], error['familyId'], error['name'], error['category'], ...error['tags']]
       ['join']('\x20')
       ['toLowerCase']();
-    return _0x2e6866['includes'](_0x57e09f);
-  })['slice'](_0x5ab792, _0x5ab792 + _0x22fa92);
+    return list2['includes'](enabled);
+  })['slice'](value18, value18 + value19);
 }

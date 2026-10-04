@@ -24,17 +24,17 @@ export const RENDERER_VIRTUALIZATION_CONFIG = Object['freeze']({
   dragCommitReconcileDelayMs: 0x1e0,
   recentPinMs: 0x7d0,
 });
-export function resolveRendererVirtualizationTier({ viewport: _0x2862ad, nodeCount: nodeCount = 0x0 } = {}) {
-  const _0x241c97 = Number['isFinite'](Number(_0x2862ad?.['zoom'])) ? Number(_0x2862ad['zoom']) : 0x1,
-    _0x58b17e = Number['isFinite'](Number(nodeCount)) ? Number(nodeCount) : 0x0;
+export function resolveRendererVirtualizationTier({ viewport: viewport, nodeCount: nodeCount = 0x0 } = {}) {
+  const value = Number['isFinite'](Number(viewport?.['zoom'])) ? Number(viewport['zoom']) : 0x1,
+    item = Number['isFinite'](Number(nodeCount)) ? Number(nodeCount) : 0x0;
   if (
-    _0x241c97 <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
-    _0x58b17e >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
+    value <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
+    item >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
   )
     return 'very-dense-low-zoom';
   if (
-    _0x241c97 <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
-    _0x58b17e >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']
+    value <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
+    item >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']
   )
     return 'dense-low-zoom';
   return 'default';
@@ -47,204 +47,205 @@ export function createRendererStructuralBudget({
       ? performance['now']()
       : 0x0,
 } = {}) {
-  let _0x337675 = batchSize,
-    _0x3f5ba9 = 0x0;
-  const _0x59b50f = now();
+  let count = batchSize,
+    count2 = 0x0;
+  const now2 = now();
   return {
     hasBudget() {
-      return _0x337675 > 0x0 && (_0x3f5ba9 <= 0x0 || !_0x59b50f || now() - _0x59b50f < frameBudgetMs);
+      return count > 0x0 && (count2 <= 0x0 || !now2 || now() - now2 < frameBudgetMs);
     },
     consume() {
-      ((_0x337675 -= 0x1), (_0x3f5ba9 += 0x1));
+      ((count -= 0x1), (count2 += 0x1));
     },
   };
 }
-export function getRendererStructuralReconcileDelayMs(_0xabbd12) {
-  const _0x110910 = Number(_0xabbd12);
-  if (!Number['isFinite'](_0x110910)) return 0x0;
-  if (_0x110910 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'])
+export function getRendererStructuralReconcileDelayMs(key) {
+  const index = Number(key);
+  if (!Number['isFinite'](index)) return 0x0;
+  if (index >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'])
     return RENDERER_VIRTUALIZATION_CONFIG['veryDenseStructuralReconcileDelayMs'];
-  if (_0x110910 >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'])
+  if (index >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'])
     return RENDERER_VIRTUALIZATION_CONFIG['denseStructuralReconcileDelayMs'];
   return 0x0;
 }
-function addNodeAndChildren(_0x647c5, _0x1afa16, _0x23cf7e) {
-  if (!_0x1afa16 || _0x647c5['has'](_0x1afa16)) return;
-  const _0x112a8f = [_0x1afa16];
-  for (let _0x55d321 = 0x0; _0x55d321 < _0x112a8f['length']; _0x55d321 += 0x1) {
-    const _0x1b49b3 = _0x112a8f[_0x55d321];
-    if (!_0x1b49b3 || _0x647c5['has'](_0x1b49b3)) continue;
-    _0x647c5['add'](_0x1b49b3);
-    const _0x37af70 = _0x23cf7e?.[_0x1b49b3];
-    if (!_0x37af70) continue;
-    const _0x35e124 =
-      _0x37af70 instanceof Set
-        ? _0x37af70
-        : Array['isArray'](_0x37af70)
-          ? _0x37af70
-          : typeof _0x37af70[Symbol['iterator']] === 'function'
-            ? _0x37af70
+function addNodeAndChildren(map, enabled, result) {
+  if (!enabled || map['has'](enabled)) return;
+  const list = [enabled];
+  for (let data = 0x0; data < list['length']; data += 0x1) {
+    const enabled2 = list[data];
+    if (!enabled2 || map['has'](enabled2)) continue;
+    map['add'](enabled2);
+    const enabled3 = result?.[enabled2];
+    if (!enabled3) continue;
+    const options =
+      enabled3 instanceof Set
+        ? enabled3
+        : Array['isArray'](enabled3)
+          ? enabled3
+          : typeof enabled3[Symbol['iterator']] === 'function'
+            ? enabled3
             : [];
-    for (const _0x3370ae of _0x35e124) {
-      if (!_0x647c5['has'](_0x3370ae)) _0x112a8f['push'](_0x3370ae);
+    for (const target of options) {
+      if (!map['has'](target)) list['push'](target);
     }
   }
 }
-function isWebPreviewNode(_0x3cb68c = {}) {
+function isWebPreviewNode(options2 = {}) {
   return (
-    String(_0x3cb68c?.['type'] || '')
+    String(options2?.['type'] || '')
       ['trim']()
       ['toLowerCase']() === 'web-preview'
   );
 }
-function isPreferredLowZoomMountNode(_0x425af8 = {}) {
-  const _0x5c0c87 = String(_0x425af8?.['type'] || '')
+function isPreferredLowZoomMountNode(options3 = {}) {
+  const source = String(options3?.['type'] || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x5c0c87 === 'comment-note' || _0x5c0c87 === 'group' || _0x5c0c87 === 'web-preview';
+  return source === 'comment-note' || source === 'group' || source === 'web-preview';
 }
-function isHeavyMediaNode(_0x6e8d0 = {}) {
-  const _0x3d3feb = String(_0x6e8d0?.['type'] || '')
+function isHeavyMediaNode(options4 = {}) {
+  const next = String(options4?.['type'] || '')
     ['trim']()
     ['toLowerCase']();
   return (
-    _0x3d3feb === 'source-image' ||
-    _0x3d3feb === 'ai-image' ||
-    _0x3d3feb === 'source-video' ||
-    _0x3d3feb === 'video' ||
-    _0x3d3feb === 'ai-video' ||
-    _0x3d3feb === 'source-audio' ||
-    _0x3d3feb === 'audio' ||
-    _0x3d3feb === 'ai-audio'
+    next === 'source-image' ||
+    next === 'ai-image' ||
+    next === 'source-video' ||
+    next === 'video' ||
+    next === 'ai-video' ||
+    next === 'source-audio' ||
+    next === 'audio' ||
+    next === 'ai-audio'
   );
 }
-function getViewportWorldCenter(_0x45f0f1, _0x39cde2, _0xe5f6d1) {
-  const _0x91e900 = screenViewportToWorldBounds({
-    viewport: _0x45f0f1,
-    containerWidth: _0x39cde2,
-    containerHeight: _0xe5f6d1,
+function getViewportWorldCenter(viewport2, containerWidth, containerHeight) {
+  const worldBounds = screenViewportToWorldBounds({
+    viewport: viewport2,
+    containerWidth: containerWidth,
+    containerHeight: containerHeight,
     padding: 0x0,
   });
   return {
-    x: (_0x91e900['minX'] + _0x91e900['maxX']) / 0x2,
-    y: (_0x91e900['minY'] + _0x91e900['maxY']) / 0x2,
+    x: (worldBounds['minX'] + worldBounds['maxX']) / 0x2,
+    y: (worldBounds['minY'] + worldBounds['maxY']) / 0x2,
   };
 }
-function getNodeCenterDistanceSq(_0x32b4d3 = {}, _0x750ae = {}) {
-  const _0x1a7292 = Number['isFinite'](Number(_0x32b4d3['x'])) ? Number(_0x32b4d3['x']) : 0x0,
-    _0x25ac72 = Number['isFinite'](Number(_0x32b4d3['y'])) ? Number(_0x32b4d3['y']) : 0x0,
-    _0x1d6b11 = Math['max'](0x1, Number(_0x32b4d3['width']) || 0xa0),
-    _0x37db9c = Math['max'](0x1, Number(_0x32b4d3['height']) || 0x78),
-    _0x20e23a = _0x1a7292 + _0x1d6b11 / 0x2 - _0x750ae['x'],
-    _0x32cdfa = _0x25ac72 + _0x37db9c / 0x2 - _0x750ae['y'];
-  return _0x20e23a * _0x20e23a + _0x32cdfa * _0x32cdfa;
+function getNodeCenterDistanceSq(box = {}, box2 = {}) {
+  const current = Number['isFinite'](Number(box['x'])) ? Number(box['x']) : 0x0,
+    entry = Number['isFinite'](Number(box['y'])) ? Number(box['y']) : 0x0,
+    record = Math['max'](0x1, Number(box['width']) || 0xa0),
+    payload = Math['max'](0x1, Number(box['height']) || 0x78),
+    handle = current + record / 0x2 - box2['x'],
+    state = entry + payload / 0x2 - box2['y'];
+  return handle * handle + state * state;
 }
 function collectViewportWebPreviewNodeIds({
-  nodes: _0x2c76b4,
-  spatialIndex: _0x477d88,
-  viewport: _0x231197,
-  containerWidth: _0x21296a,
-  containerHeight: _0x2ebfb4,
-  padding: _0x4055a9,
+  nodes: nodes,
+  spatialIndex: spatialIndex2,
+  viewport: viewport3,
+  containerWidth: containerWidth2,
+  containerHeight: containerHeight2,
+  padding: padding,
 } = {}) {
-  const _0x5bdbc7 = new Set();
-  if (!_0x2c76b4 || !_0x231197) return _0x5bdbc7;
-  if (_0x477d88) {
-    const _0x106f64 = screenViewportToWorldBounds({
-      viewport: _0x231197,
-      containerWidth: _0x21296a,
-      containerHeight: _0x2ebfb4,
-      padding: _0x4055a9,
+  const config = new Set();
+  if (!nodes || !viewport3) return config;
+  if (spatialIndex2) {
+    const worldBounds2 = screenViewportToWorldBounds({
+      viewport: viewport3,
+      containerWidth: containerWidth2,
+      containerHeight: containerHeight2,
+      padding: padding,
     });
-    for (const _0x376225 of queryRendererSpatialIndexIds(_0x477d88, _0x106f64)) {
-      if (isWebPreviewNode(_0x2c76b4?.[_0x376225])) _0x5bdbc7['add'](_0x376225);
+    for (const scope of queryRendererSpatialIndexIds(spatialIndex2, worldBounds2)) {
+      if (isWebPreviewNode(nodes?.[scope])) config['add'](scope);
     }
-    return _0x5bdbc7;
+    return config;
   }
-  for (const _0x1f6491 of Object['values'](_0x2c76b4 || {})) {
-    if (!_0x1f6491?.['id'] || !isWebPreviewNode(_0x1f6491)) continue;
-    isNodeInsideViewportPadding(_0x1f6491, _0x231197, _0x21296a, _0x2ebfb4, _0x4055a9) &&
-      _0x5bdbc7['add'](_0x1f6491['id']);
+  for (const enabled4 of Object['values'](nodes || {})) {
+    if (!enabled4?.['id'] || !isWebPreviewNode(enabled4)) continue;
+    isNodeInsideViewportPadding(enabled4, viewport3, containerWidth2, containerHeight2, padding) &&
+      config['add'](enabled4['id']);
   }
-  return _0x5bdbc7;
+  return config;
 }
 export function isNodeInsideViewportPadding(
-  _0xc97000,
-  _0x3732a7,
-  _0x39e46b,
-  _0xcb3138,
-  _0x3153e6 = 0x0,
-  _0x663fd7 = 0x0,
-  _0x19c5a7 = 0x0,
+  box3,
+  box4,
+  input,
+  output,
+  value2 = 0x0,
+  value3 = 0x0,
+  value4 = 0x0,
 ) {
-  if (!_0xc97000 || !_0x3732a7) return ![];
-  const _0x29f3db = Number['isFinite'](_0x3732a7['zoom']) ? _0x3732a7['zoom'] : 0x1,
-    _0x3252ac = Number['isFinite'](_0xc97000['x']) ? _0xc97000['x'] : 0x0,
-    _0x23c720 = Number['isFinite'](_0xc97000['y']) ? _0xc97000['y'] : 0x0,
-    _0x47335e = Number['isFinite'](_0xc97000['width']) ? _0xc97000['width'] : 0x0,
-    _0x2beb6b = Number['isFinite'](_0xc97000['height']) ? _0xc97000['height'] : 0x0,
-    _0x5b8e2a = Number['isFinite'](_0x663fd7) ? _0x663fd7 : 0x0,
-    _0xae1ec5 = Number['isFinite'](_0x19c5a7) ? _0x19c5a7 : 0x0,
-    _0x434172 =
-      (_0x3252ac + _0x5b8e2a) * _0x29f3db + (Number['isFinite'](_0x3732a7['x']) ? _0x3732a7['x'] : 0x0),
-    _0x2b8774 =
-      (_0x23c720 + _0xae1ec5) * _0x29f3db + (Number['isFinite'](_0x3732a7['y']) ? _0x3732a7['y'] : 0x0),
-    _0xf2db23 = _0x47335e * _0x29f3db,
-    _0x19e651 = _0x2beb6b * _0x29f3db;
+  if (!box3 || !box4) return ![];
+  const value5 = Number['isFinite'](box4['zoom']) ? box4['zoom'] : 0x1,
+    value6 = Number['isFinite'](box3['x']) ? box3['x'] : 0x0,
+    value7 = Number['isFinite'](box3['y']) ? box3['y'] : 0x0,
+    value8 = Number['isFinite'](box3['width']) ? box3['width'] : 0x0,
+    value9 = Number['isFinite'](box3['height']) ? box3['height'] : 0x0,
+    value10 = Number['isFinite'](value3) ? value3 : 0x0,
+    value11 = Number['isFinite'](value4) ? value4 : 0x0,
+    value12 = (value6 + value10) * value5 + (Number['isFinite'](box4['x']) ? box4['x'] : 0x0),
+    value13 = (value7 + value11) * value5 + (Number['isFinite'](box4['y']) ? box4['y'] : 0x0),
+    value14 = value8 * value5,
+    value15 = value9 * value5;
   return (
-    _0x434172 + _0xf2db23 > -_0x3153e6 &&
-    _0x434172 < _0x39e46b + _0x3153e6 &&
-    _0x2b8774 + _0x19e651 > -_0x3153e6 &&
-    _0x2b8774 < _0xcb3138 + _0x3153e6
+    value12 + value14 > -value2 &&
+    value12 < input + value2 &&
+    value13 + value15 > -value2 &&
+    value13 < output + value2
   );
 }
 export function collectVirtualKeepAliveNodeIds({
-  selectedNodeIds: _0x330d32,
-  connOverlay: _0x5c58d4,
-  pickConnectMode: _0x2eb694,
-  dragContext: _0x452299,
-  parentToChildren: _0x558b51,
-  pinnedNodeIds: _0x1b7454,
+  selectedNodeIds: selectedNodeIds,
+  connOverlay: connOverlay,
+  pickConnectMode: pickConnectMode,
+  dragContext: dragContext,
+  parentToChildren: parentToChildren,
+  pinnedNodeIds: pinnedNodeIds,
 } = {}) {
-  const _0xd61e76 = new Set(),
-    _0x22515c =
-      _0x330d32 instanceof Set ? Array['from'](_0x330d32) : Array['isArray'](_0x330d32) ? _0x330d32 : [];
-  _0x22515c['forEach']((_0x3caf6b) => addNodeAndChildren(_0xd61e76, _0x3caf6b, _0x558b51));
-  if (_0x452299?.['isDragging'] && _0x452299?.['targetNodeId']) {
-    const _0x5d093b = _0x22515c['includes'](_0x452299['targetNodeId'])
-      ? _0x22515c
-      : [_0x452299['targetNodeId']];
-    _0x5d093b['forEach']((_0x5a7e75) => addNodeAndChildren(_0xd61e76, _0x5a7e75, _0x558b51));
+  const value16 = new Set(),
+    list2 =
+      selectedNodeIds instanceof Set
+        ? Array['from'](selectedNodeIds)
+        : Array['isArray'](selectedNodeIds)
+          ? selectedNodeIds
+          : [];
+  list2['forEach']((value17) => addNodeAndChildren(value16, value17, parentToChildren));
+  if (dragContext?.['isDragging'] && dragContext?.['targetNodeId']) {
+    const list3 = list2['includes'](dragContext['targetNodeId']) ? list2 : [dragContext['targetNodeId']];
+    list3['forEach']((value18) => addNodeAndChildren(value16, value18, parentToChildren));
   }
-  _0x5c58d4?.['srcId'] && _0xd61e76['add'](_0x5c58d4['srcId']);
-  _0x5c58d4?.['hoverId'] && _0xd61e76['add'](_0x5c58d4['hoverId']);
-  _0x2eb694?.['sourceNodeId'] && _0xd61e76['add'](_0x2eb694['sourceNodeId']);
-  _0x2eb694?.['hoverNodeId'] && _0xd61e76['add'](_0x2eb694['hoverNodeId']);
-  const _0x4c31db = _0x1b7454 instanceof Set ? _0x1b7454 : Array['isArray'](_0x1b7454) ? _0x1b7454 : [];
-  for (const _0x1cc524 of _0x4c31db) {
-    _0xd61e76['add'](_0x1cc524);
+  connOverlay?.['srcId'] && value16['add'](connOverlay['srcId']);
+  connOverlay?.['hoverId'] && value16['add'](connOverlay['hoverId']);
+  pickConnectMode?.['sourceNodeId'] && value16['add'](pickConnectMode['sourceNodeId']);
+  pickConnectMode?.['hoverNodeId'] && value16['add'](pickConnectMode['hoverNodeId']);
+  const value19 =
+    pinnedNodeIds instanceof Set ? pinnedNodeIds : Array['isArray'](pinnedNodeIds) ? pinnedNodeIds : [];
+  for (const value20 of value19) {
+    value16['add'](value20);
   }
-  return _0xd61e76;
+  return value16;
 }
 export function resolveRendererVirtualizationPadding({
-  viewport: _0x1d771a,
+  viewport: viewport4,
   nodeCount: nodeCount = 0x0,
   mountPadding: mountPadding = RENDERER_VIRTUALIZATION_CONFIG['mountPadding'],
   parkPadding: parkPadding = RENDERER_VIRTUALIZATION_CONFIG['parkPadding'],
 } = {}) {
-  const _0x573394 = Number['isFinite'](_0x1d771a?.['zoom']) ? _0x1d771a['zoom'] : 0x1,
-    _0x234a9b = Number['isFinite'](nodeCount) ? nodeCount : 0x0;
+  const value21 = Number['isFinite'](viewport4?.['zoom']) ? viewport4['zoom'] : 0x1,
+    value22 = Number['isFinite'](nodeCount) ? nodeCount : 0x0;
   if (
-    _0x573394 <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
-    _0x234a9b >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
+    value21 <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
+    value22 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
   )
     return {
       mountPadding: RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomMountPadding'],
       parkPadding: RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomParkPadding'],
     };
   if (
-    _0x573394 <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
-    _0x234a9b >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']
+    value21 <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
+    value22 >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']
   )
     return {
       mountPadding: RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomMountPadding'],
@@ -253,322 +254,338 @@ export function resolveRendererVirtualizationPadding({
   return { mountPadding: mountPadding, parkPadding: parkPadding };
 }
 export function resolveRendererPreviewPadding({
-  viewport: _0xffb435,
+  viewport: viewport5,
   nodeCount: nodeCount = 0x0,
   mountPadding: mountPadding = RENDERER_VIRTUALIZATION_CONFIG['mountPadding'],
   previewPadding: previewPadding = mountPadding,
 } = {}) {
-  const _0x44e107 = Number['isFinite'](_0xffb435?.['zoom']) ? _0xffb435['zoom'] : 0x1,
-    _0x720122 = Number['isFinite'](nodeCount) ? nodeCount : 0x0,
-    _0x1fc44f = Number['isFinite'](Number(previewPadding)) ? Number(previewPadding) : mountPadding;
+  const value23 = Number['isFinite'](viewport5?.['zoom']) ? viewport5['zoom'] : 0x1,
+    value24 = Number['isFinite'](nodeCount) ? nodeCount : 0x0,
+    value25 = Number['isFinite'](Number(previewPadding)) ? Number(previewPadding) : mountPadding;
   if (
-    _0x44e107 <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
-    _0x720122 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
+    value23 <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
+    value24 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
   )
     return Math['max'](mountPadding, RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomPreviewPadding']);
   if (
-    _0x44e107 <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
-    _0x720122 >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']
+    value23 <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
+    value24 >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']
   )
     return Math['max'](mountPadding, RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomPreviewPadding']);
-  return Math['max'](mountPadding, _0x1fc44f);
+  return Math['max'](mountPadding, value25);
 }
-export function resolveRendererLowZoomMountLimit({ viewport: _0x421f1b, nodeCount: nodeCount = 0x0 } = {}) {
-  const _0x40d8db = Number['isFinite'](_0x421f1b?.['zoom']) ? _0x421f1b['zoom'] : 0x1,
-    _0x5d3001 = Number['isFinite'](nodeCount) ? nodeCount : 0x0;
+export function resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount = 0x0 } = {}) {
+  const value26 = Number['isFinite'](viewport6?.['zoom']) ? viewport6['zoom'] : 0x1,
+    value27 = Number['isFinite'](nodeCount) ? nodeCount : 0x0;
   if (
-    _0x40d8db <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
-    _0x5d3001 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
+    value26 <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
+    value27 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
   )
     return RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomMaxMountCandidates'];
   if (
-    _0x40d8db <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
-    _0x5d3001 >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']
+    value26 <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
+    value27 >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']
   )
     return RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomMaxMountCandidates'];
   return 0x0;
 }
 function limitLowZoomMountCandidates({
-  nodes: _0x5c4f4c,
-  mountCandidateIds: _0xfac674,
-  keepAliveNodeIds: _0x164702,
-  viewport: _0x449fe3,
-  containerWidth: _0x284b17,
-  containerHeight: _0x565804,
-  limit: _0x60a4a8,
+  nodes: nodes2,
+  mountCandidateIds: mountCandidateIds,
+  keepAliveNodeIds: keepAliveNodeIds,
+  viewport: viewport7,
+  containerWidth: containerWidth3,
+  containerHeight: containerHeight3,
+  limit: limit,
 } = {}) {
-  if (!(_0xfac674 instanceof Set) || !(_0x60a4a8 > 0x0)) return _0xfac674;
-  const _0xf97819 = new Set(_0x164702 || []);
-  for (const _0x2867c6 of _0xfac674) {
-    const _0x5b6b18 = _0x5c4f4c?.[_0x2867c6];
-    isPreferredLowZoomMountNode(_0x5b6b18) && _0xf97819['add'](_0x2867c6);
+  if (!(mountCandidateIds instanceof Set) || !(limit > 0x0)) return mountCandidateIds;
+  const value28 = new Set(keepAliveNodeIds || []);
+  for (const value29 of mountCandidateIds) {
+    const value30 = nodes2?.[value29];
+    isPreferredLowZoomMountNode(value30) && value28['add'](value29);
   }
-  const _0xb55dde = new Set();
-  for (const _0xc1e490 of _0xf97819) {
-    if (_0xfac674['has'](_0xc1e490)) _0xb55dde['add'](_0xc1e490);
+  const map2 = new Set();
+  for (const value31 of value28) {
+    if (mountCandidateIds['has'](value31)) map2['add'](value31);
   }
-  const _0x25c5ec = Math['max'](0x0, Math['floor'](_0x60a4a8) - _0xb55dde['size']);
-  if (_0x25c5ec <= 0x0) return _0xb55dde;
-  const _0x17e539 = getViewportWorldCenter(_0x449fe3, _0x284b17, _0x565804),
-    _0x5ca60f = [];
-  let _0x1632e6 = 0x0;
-  for (const _0x54f636 of _0xfac674) {
-    if (_0xb55dde['has'](_0x54f636)) continue;
-    const _0x112470 = _0x5c4f4c?.[_0x54f636];
-    if (!_0x112470?.['id']) continue;
-    if (isHeavyMediaNode(_0x112470)) continue;
-    (_0x5ca60f['push']({
-      nodeId: _0x54f636,
-      distanceSq: getNodeCenterDistanceSq(_0x112470, _0x17e539),
-      order: _0x1632e6,
+  const count3 = Math['max'](0x0, Math['floor'](limit) - map2['size']);
+  if (count3 <= 0x0) return map2;
+  const viewportWorldCenter = getViewportWorldCenter(viewport7, containerWidth3, containerHeight3),
+    list4 = [];
+  let order = 0x0;
+  for (const nodeId of mountCandidateIds) {
+    if (map2['has'](nodeId)) continue;
+    const enabled5 = nodes2?.[nodeId];
+    if (!enabled5?.['id']) continue;
+    if (isHeavyMediaNode(enabled5)) continue;
+    (list4['push']({
+      nodeId: nodeId,
+      distanceSq: getNodeCenterDistanceSq(enabled5, viewportWorldCenter),
+      order: order,
     }),
-      (_0x1632e6 += 0x1));
+      (order += 0x1));
   }
-  _0x5ca60f['sort'](
-    (_0x194234, _0x6ef39f) =>
-      _0x194234['distanceSq'] - _0x6ef39f['distanceSq'] || _0x194234['order'] - _0x6ef39f['order'],
+  list4['sort'](
+    (value32, value33) =>
+      value32['distanceSq'] - value33['distanceSq'] || value32['order'] - value33['order'],
   );
-  for (const _0x48441a of _0x5ca60f['slice'](0x0, _0x25c5ec)) {
-    _0xb55dde['add'](_0x48441a['nodeId']);
+  for (const value34 of list4['slice'](0x0, count3)) {
+    map2['add'](value34['nodeId']);
   }
-  return _0xb55dde;
+  return map2;
 }
 function finalizeVirtualizationCandidateSets({
-  nodes: _0x5dc0f2,
-  nodeCount: _0x4cf876,
-  mountCandidateIds: _0x26762b,
-  previewCandidateIds: previewCandidateIds = _0x26762b,
-  parkCandidateIds: _0xb3d060,
-  keepAliveNodeIds: _0x49fbb9,
-  mountedNodeIds: _0x171534,
-  viewport: _0x556ef2,
-  containerWidth: _0x84c61a,
-  containerHeight: _0x45ae1d,
+  nodes: nodes3,
+  nodeCount: nodeCount2,
+  mountCandidateIds: mountCandidateIds2,
+  previewCandidateIds: previewCandidateIds = mountCandidateIds2,
+  parkCandidateIds: parkCandidateIds,
+  keepAliveNodeIds: keepAliveNodeIds2,
+  mountedNodeIds: mountedNodeIds,
+  viewport: viewport8,
+  containerWidth: containerWidth4,
+  containerHeight: containerHeight4,
 } = {}) {
-  const _0x5d3e36 = resolveRendererLowZoomMountLimit({ viewport: _0x556ef2, nodeCount: _0x4cf876 });
-  if (!(_0x5d3e36 > 0x0))
+  const limit2 = resolveRendererLowZoomMountLimit({ viewport: viewport8, nodeCount: nodeCount2 });
+  if (!(limit2 > 0x0))
     return {
-      keepAliveNodeIds: _0x49fbb9,
-      mountCandidateIds: _0x26762b,
+      keepAliveNodeIds: keepAliveNodeIds2,
+      mountCandidateIds: mountCandidateIds2,
       previewCandidateIds: previewCandidateIds,
-      parkCandidateIds: _0xb3d060,
+      parkCandidateIds: parkCandidateIds,
     };
-  const _0x2246df = limitLowZoomMountCandidates({
-      nodes: _0x5dc0f2,
-      mountCandidateIds: _0x26762b,
-      keepAliveNodeIds: _0x49fbb9,
-      viewport: _0x556ef2,
-      containerWidth: _0x84c61a,
-      containerHeight: _0x45ae1d,
-      limit: _0x5d3e36,
+  const mountCandidateIds3 = limitLowZoomMountCandidates({
+      nodes: nodes3,
+      mountCandidateIds: mountCandidateIds2,
+      keepAliveNodeIds: keepAliveNodeIds2,
+      viewport: viewport8,
+      containerWidth: containerWidth4,
+      containerHeight: containerHeight4,
+      limit: limit2,
     }),
-    _0x3c8dd3 =
-      _0x171534 instanceof Set ? _0x171534 : Array['isArray'](_0x171534) ? new Set(_0x171534) : new Set();
-  for (const _0x104f45 of _0x3c8dd3) {
-    if (!_0x104f45 || _0x49fbb9['has'](_0x104f45)) continue;
-    if (!_0x2246df['has'](_0x104f45)) _0xb3d060['add'](_0x104f45);
+    value35 =
+      mountedNodeIds instanceof Set
+        ? mountedNodeIds
+        : Array['isArray'](mountedNodeIds)
+          ? new Set(mountedNodeIds)
+          : new Set();
+  for (const enabled6 of value35) {
+    if (!enabled6 || keepAliveNodeIds2['has'](enabled6)) continue;
+    if (!mountCandidateIds3['has'](enabled6)) parkCandidateIds['add'](enabled6);
   }
-  for (const _0x15efc8 of _0x49fbb9) {
-    _0xb3d060['delete'](_0x15efc8);
+  for (const value36 of keepAliveNodeIds2) {
+    parkCandidateIds['delete'](value36);
   }
   return {
-    keepAliveNodeIds: _0x49fbb9,
-    mountCandidateIds: _0x2246df,
+    keepAliveNodeIds: keepAliveNodeIds2,
+    mountCandidateIds: mountCandidateIds3,
     previewCandidateIds: previewCandidateIds,
-    parkCandidateIds: _0xb3d060,
+    parkCandidateIds: parkCandidateIds,
   };
 }
 export function buildVirtualizationCandidateSets({
-  nodes: _0x1d5a65,
+  nodes: nodes4,
   spatialIndex: spatialIndex = null,
-  viewport: _0x471042,
-  containerWidth: _0x56b083,
-  containerHeight: _0x223540,
-  selectedNodeIds: _0x56f893,
-  connOverlay: _0x5dd954,
-  pickConnectMode: _0x344a8b,
-  dragContext: _0x275bf8,
-  parentToChildren: _0x5a52d8,
-  pinnedNodeIds: _0x48db8c,
-  mountedNodeIds: _0xec78ce,
+  viewport: viewport9,
+  containerWidth: containerWidth5,
+  containerHeight: containerHeight5,
+  selectedNodeIds: selectedNodeIds2,
+  connOverlay: connOverlay2,
+  pickConnectMode: pickConnectMode2,
+  dragContext: dragContext2,
+  parentToChildren: parentToChildren2,
+  pinnedNodeIds: pinnedNodeIds2,
+  mountedNodeIds: mountedNodeIds2,
   mountPadding: mountPadding = RENDERER_VIRTUALIZATION_CONFIG['mountPadding'],
   parkPadding: parkPadding = RENDERER_VIRTUALIZATION_CONFIG['parkPadding'],
 } = {}) {
-  const _0x536802 = spatialIndex ? null : Object['values'](_0x1d5a65 || {}),
-    _0x147e2e = spatialIndex?.['nodeCount'] ?? _0x536802['length'],
-    _0x1470f7 = resolveRendererVirtualizationPadding({
-      viewport: _0x471042,
-      nodeCount: _0x147e2e,
+  const list5 = spatialIndex ? null : Object['values'](nodes4 || {}),
+    nodeCount3 = spatialIndex?.['nodeCount'] ?? list5['length'],
+    mountPadding2 = resolveRendererVirtualizationPadding({
+      viewport: viewport9,
+      nodeCount: nodeCount3,
       mountPadding: mountPadding,
       parkPadding: parkPadding,
     }),
-    _0x250639 = resolveRendererPreviewPadding({
-      viewport: _0x471042,
-      nodeCount: _0x147e2e,
-      mountPadding: _0x1470f7['mountPadding'],
+    padding2 = resolveRendererPreviewPadding({
+      viewport: viewport9,
+      nodeCount: nodeCount3,
+      mountPadding: mountPadding2['mountPadding'],
     }),
-    _0x48a897 = collectVirtualKeepAliveNodeIds({
-      selectedNodeIds: _0x56f893,
-      connOverlay: _0x5dd954,
-      pickConnectMode: _0x344a8b,
-      dragContext: _0x275bf8,
-      parentToChildren: _0x5a52d8,
-      pinnedNodeIds: _0x48db8c,
+    keepAliveNodeIds3 = collectVirtualKeepAliveNodeIds({
+      selectedNodeIds: selectedNodeIds2,
+      connOverlay: connOverlay2,
+      pickConnectMode: pickConnectMode2,
+      dragContext: dragContext2,
+      parentToChildren: parentToChildren2,
+      pinnedNodeIds: pinnedNodeIds2,
     });
-  for (const _0x9d3add of collectViewportWebPreviewNodeIds({
-    nodes: _0x1d5a65,
+  for (const value37 of collectViewportWebPreviewNodeIds({
+    nodes: nodes4,
     spatialIndex: spatialIndex,
-    viewport: _0x471042,
-    containerWidth: _0x56b083,
-    containerHeight: _0x223540,
-    padding: _0x1470f7['parkPadding'],
+    viewport: viewport9,
+    containerWidth: containerWidth5,
+    containerHeight: containerHeight5,
+    padding: mountPadding2['parkPadding'],
   })) {
-    _0x48a897['add'](_0x9d3add);
+    keepAliveNodeIds3['add'](value37);
   }
-  const _0x1bc7c7 = new Set(),
-    _0x2cd7ee = new Set(),
-    _0x554f51 = new Set();
+  const mountCandidateIds4 = new Set(),
+    previewCandidateIds2 = new Set(),
+    parkCandidateIds2 = new Set();
   if (spatialIndex) {
-    const _0x566440 = screenViewportToWorldBounds({
-        viewport: _0x471042,
-        containerWidth: _0x56b083,
-        containerHeight: _0x223540,
-        padding: _0x1470f7['mountPadding'],
+    const worldBounds3 = screenViewportToWorldBounds({
+        viewport: viewport9,
+        containerWidth: containerWidth5,
+        containerHeight: containerHeight5,
+        padding: mountPadding2['mountPadding'],
       }),
-      _0x1c9cbb = screenViewportToWorldBounds({
-        viewport: _0x471042,
-        containerWidth: _0x56b083,
-        containerHeight: _0x223540,
-        padding: _0x1470f7['parkPadding'],
+      worldBounds4 = screenViewportToWorldBounds({
+        viewport: viewport9,
+        containerWidth: containerWidth5,
+        containerHeight: containerHeight5,
+        padding: mountPadding2['parkPadding'],
       }),
-      _0x269726 =
-        _0x250639 > _0x1470f7['mountPadding']
+      value38 =
+        padding2 > mountPadding2['mountPadding']
           ? screenViewportToWorldBounds({
-              viewport: _0x471042,
-              containerWidth: _0x56b083,
-              containerHeight: _0x223540,
-              padding: _0x250639,
+              viewport: viewport9,
+              containerWidth: containerWidth5,
+              containerHeight: containerHeight5,
+              padding: padding2,
             })
-          : _0x566440,
-      _0x120e3c = queryRendererSpatialIndexIds(spatialIndex, _0x566440),
-      _0xf55a13 = _0x269726 === _0x566440 ? _0x120e3c : queryRendererSpatialIndexIds(spatialIndex, _0x269726),
-      _0x1cf7a8 = queryRendererSpatialIndexIds(spatialIndex, _0x1c9cbb);
-    for (const _0x4941b9 of _0x48a897) {
-      (_0x1bc7c7['add'](_0x4941b9), _0x2cd7ee['add'](_0x4941b9));
+          : worldBounds3,
+      queryRendererSpatialIndexIds2 = queryRendererSpatialIndexIds(spatialIndex, worldBounds3),
+      value39 =
+        value38 === worldBounds3
+          ? queryRendererSpatialIndexIds2
+          : queryRendererSpatialIndexIds(spatialIndex, value38),
+      map3 = queryRendererSpatialIndexIds(spatialIndex, worldBounds4);
+    for (const value40 of keepAliveNodeIds3) {
+      (mountCandidateIds4['add'](value40), previewCandidateIds2['add'](value40));
     }
-    for (const _0x5c458d of _0x120e3c) {
-      (_0x1bc7c7['add'](_0x5c458d), _0x2cd7ee['add'](_0x5c458d));
+    for (const value41 of queryRendererSpatialIndexIds2) {
+      (mountCandidateIds4['add'](value41), previewCandidateIds2['add'](value41));
     }
-    for (const _0x1b9e32 of _0xf55a13) {
-      _0x2cd7ee['add'](_0x1b9e32);
+    for (const value42 of value39) {
+      previewCandidateIds2['add'](value42);
     }
-    const _0x57aff2 =
-      _0xec78ce instanceof Set
-        ? _0xec78ce
-        : Array['isArray'](_0xec78ce)
-          ? _0xec78ce
+    const value43 =
+      mountedNodeIds2 instanceof Set
+        ? mountedNodeIds2
+        : Array['isArray'](mountedNodeIds2)
+          ? mountedNodeIds2
           : spatialIndex['nodeIds'] || [];
-    for (const _0x291fea of _0x57aff2) {
-      if (!_0x291fea || _0x48a897['has'](_0x291fea)) continue;
-      if (!_0x1cf7a8['has'](_0x291fea)) _0x554f51['add'](_0x291fea);
+    for (const enabled7 of value43) {
+      if (!enabled7 || keepAliveNodeIds3['has'](enabled7)) continue;
+      if (!map3['has'](enabled7)) parkCandidateIds2['add'](enabled7);
     }
     return finalizeVirtualizationCandidateSets({
-      nodes: _0x1d5a65,
-      nodeCount: _0x147e2e,
-      keepAliveNodeIds: _0x48a897,
-      mountCandidateIds: _0x1bc7c7,
-      previewCandidateIds: _0x2cd7ee,
-      parkCandidateIds: _0x554f51,
-      mountedNodeIds: _0xec78ce,
-      viewport: _0x471042,
-      containerWidth: _0x56b083,
-      containerHeight: _0x223540,
+      nodes: nodes4,
+      nodeCount: nodeCount3,
+      keepAliveNodeIds: keepAliveNodeIds3,
+      mountCandidateIds: mountCandidateIds4,
+      previewCandidateIds: previewCandidateIds2,
+      parkCandidateIds: parkCandidateIds2,
+      mountedNodeIds: mountedNodeIds2,
+      viewport: viewport9,
+      containerWidth: containerWidth5,
+      containerHeight: containerHeight5,
     });
   }
-  for (const _0x47f2a6 of _0x536802) {
-    if (!_0x47f2a6?.['id']) continue;
-    const _0x4b8102 = _0x47f2a6['id'];
-    if (_0x48a897['has'](_0x4b8102)) {
-      (_0x1bc7c7['add'](_0x4b8102), _0x2cd7ee['add'](_0x4b8102));
+  for (const enabled8 of list5) {
+    if (!enabled8?.['id']) continue;
+    const value44 = enabled8['id'];
+    if (keepAliveNodeIds3['has'](value44)) {
+      (mountCandidateIds4['add'](value44), previewCandidateIds2['add'](value44));
       continue;
     }
-    const _0x24c130 = isNodeInsideViewportPadding(
-      _0x47f2a6,
-      _0x471042,
-      _0x56b083,
-      _0x223540,
-      _0x1470f7['mountPadding'],
+    const isNodeInsideViewportPadding2 = isNodeInsideViewportPadding(
+      enabled8,
+      viewport9,
+      containerWidth5,
+      containerHeight5,
+      mountPadding2['mountPadding'],
     );
-    if (_0x24c130) {
-      (_0x1bc7c7['add'](_0x4b8102), _0x2cd7ee['add'](_0x4b8102));
+    if (isNodeInsideViewportPadding2) {
+      (mountCandidateIds4['add'](value44), previewCandidateIds2['add'](value44));
       continue;
     }
-    if (_0x250639 > _0x1470f7['mountPadding']) {
-      const _0x5bd892 = isNodeInsideViewportPadding(_0x47f2a6, _0x471042, _0x56b083, _0x223540, _0x250639);
-      _0x5bd892 && _0x2cd7ee['add'](_0x4b8102);
+    if (padding2 > mountPadding2['mountPadding']) {
+      const isNodeInsideViewportPadding3 = isNodeInsideViewportPadding(
+        enabled8,
+        viewport9,
+        containerWidth5,
+        containerHeight5,
+        padding2,
+      );
+      isNodeInsideViewportPadding3 && previewCandidateIds2['add'](value44);
     }
-    const _0x2fb9cc = isNodeInsideViewportPadding(
-      _0x47f2a6,
-      _0x471042,
-      _0x56b083,
-      _0x223540,
-      _0x1470f7['parkPadding'],
+    const isNodeInsideViewportPadding4 = isNodeInsideViewportPadding(
+      enabled8,
+      viewport9,
+      containerWidth5,
+      containerHeight5,
+      mountPadding2['parkPadding'],
     );
-    !_0x2fb9cc && _0x554f51['add'](_0x4b8102);
+    !isNodeInsideViewportPadding4 && parkCandidateIds2['add'](value44);
   }
   return finalizeVirtualizationCandidateSets({
-    nodes: _0x1d5a65,
-    nodeCount: _0x147e2e,
-    keepAliveNodeIds: _0x48a897,
-    mountCandidateIds: _0x1bc7c7,
-    previewCandidateIds: _0x2cd7ee,
-    parkCandidateIds: _0x554f51,
-    mountedNodeIds: _0xec78ce,
-    viewport: _0x471042,
-    containerWidth: _0x56b083,
-    containerHeight: _0x223540,
+    nodes: nodes4,
+    nodeCount: nodeCount3,
+    keepAliveNodeIds: keepAliveNodeIds3,
+    mountCandidateIds: mountCandidateIds4,
+    previewCandidateIds: previewCandidateIds2,
+    parkCandidateIds: parkCandidateIds2,
+    mountedNodeIds: mountedNodeIds2,
+    viewport: viewport9,
+    containerWidth: containerWidth5,
+    containerHeight: containerHeight5,
   });
 }
 export function ensureRendererExactVisiblePreviewCandidates({
-  virtualizationResult: _0x272042,
-  nodes: _0x3414c3,
+  virtualizationResult: virtualizationResult,
+  nodes: nodes5,
   spatialIndex: spatialIndex = null,
-  viewport: _0x16918d,
-  containerWidth: _0x46c308,
-  containerHeight: _0x13191e,
-  nodeCount: _0x5dd0a4,
+  viewport: viewport10,
+  containerWidth: containerWidth6,
+  containerHeight: containerHeight6,
+  nodeCount: nodeCount4,
 } = {}) {
-  const _0x54ccac = Number['isFinite'](Number(_0x5dd0a4))
-      ? Number(_0x5dd0a4)
-      : Object['keys'](_0x3414c3 || {})['length'],
-    _0x181040 = Number(_0x16918d?.['zoom']);
+  const value45 = Number['isFinite'](Number(nodeCount4))
+      ? Number(nodeCount4)
+      : Object['keys'](nodes5 || {})['length'],
+    value46 = Number(viewport10?.['zoom']);
   if (
-    _0x54ccac < RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'] ||
-    !Number['isFinite'](_0x181040) ||
-    _0x181040 > RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold']
+    value45 < RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'] ||
+    !Number['isFinite'](value46) ||
+    value46 > RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold']
   )
-    return _0x272042;
-  const _0x379f94 = spatialIndex
+    return virtualizationResult;
+  const value47 = spatialIndex
       ? queryRendererSpatialIndexIds(
           spatialIndex,
           screenViewportToWorldBounds({
-            viewport: _0x16918d,
-            containerWidth: _0x46c308,
-            containerHeight: _0x13191e,
+            viewport: viewport10,
+            containerWidth: containerWidth6,
+            containerHeight: containerHeight6,
             padding: 0x0,
           }),
         )
       : new Set(
-          Object['values'](_0x3414c3 || {})
+          Object['values'](nodes5 || {})
             ['filter'](
-              (_0x49a741) =>
-                _0x49a741?.['id'] &&
-                isNodeInsideViewportPadding(_0x49a741, _0x16918d, _0x46c308, _0x13191e, 0x0),
+              (value48) =>
+                value48?.['id'] &&
+                isNodeInsideViewportPadding(value48, viewport10, containerWidth6, containerHeight6, 0x0),
             )
-            ['map']((_0x503758) => _0x503758['id']),
+            ['map']((value49) => value49['id']),
         ),
-    _0x5193d4 = _0x272042?.['previewCandidateIds'] || _0x272042?.['mountCandidateIds'] || new Set(),
-    _0x40aad3 = Array['from'](_0x379f94)['filter']((_0x5b1aed) => !_0x5193d4['has'](_0x5b1aed));
-  if (_0x40aad3['length'] === 0x0) return _0x272042;
-  return { ..._0x272042, previewCandidateIds: new Set([..._0x5193d4, ..._0x40aad3]) };
+    map4 =
+      virtualizationResult?.['previewCandidateIds'] ||
+      virtualizationResult?.['mountCandidateIds'] ||
+      new Set(),
+    list6 = Array['from'](value47)['filter']((value50) => !map4['has'](value50));
+  if (list6['length'] === 0x0) return virtualizationResult;
+  return { ...virtualizationResult, previewCandidateIds: new Set([...map4, ...list6]) };
 }

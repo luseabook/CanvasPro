@@ -1,1 +1,452 @@
-import{normalizeFlowSource}from'./videoReplicationFlowNormalization.js';export function requireFlow(_0x159d35,_0x30aca3){if(!_0x159d35)throw new Error(_0x30aca3);}const text=_0x1184b2=>typeof _0x1184b2==="string",wording=_0x154ca9=>_0x154ca9["replace"](/[^\p{L}\p{N}]/gu,''),partsText=_0x424f0a=>_0x424f0a["parts"]["map"](_0x2846ae=>_0x2846ae["text"])["join"](''),exactFields=(_0x12f1e4,_0xb19f13)=>requireFlow(_0x12f1e4&&Object["keys"](_0x12f1e4)['sort']()["join"](',')===[..._0xb19f13]["sort"]()["join"](','),"补丁包含未授权或缺失字段");export function inspectFlowSpeech(_0x156e13){return _0x156e13["shots"]['filter'](_0x49f13c=>{const _0x374d66=_0x49f13c["sound"]['replace'](/无(?:人声|旁白|对白|对话)|没有(?:人声|旁白|对白|对话)/gu,'');return/旁白|画外音|对白|对话|说话/u["test"](_0x374d66)&&!_0x156e13["speech"]['some'](_0x380eb3=>_0x380eb3["startSec"]<_0x49f13c["endSec"]&&_0x380eb3["endSec"]>_0x49f13c['startSec']);})['map'](_0x284fcd=>_0x284fcd['id']);}export function applyFlowSpeechRecovery(_0x56eb0b,_0x529a45,_0x2a0da8){exactFields(_0x529a45,['videoObserved',"speech"]),requireFlow(_0x529a45["videoObserved"]===!![]&&Array["isArray"](_0x529a45['speech'])&&_0x529a45["speech"]["length"],'人声补录未确认原片或仍为空');const _0x1556fb=[],_0x140b4a=validateFlowSource({..._0x56eb0b,'speech':_0x529a45["speech"]},_0x2a0da8,_0x1556fb),_0x4877bf=[];for(const _0x386506 of _0x140b4a['shots']){_0x386506["visual"]=_0x386506["visual"]['replace'](/字幕(?:显示|为)?[：:]?\s*“[^”]*”[。]?/gu,_0x244481=>{return _0x4877bf['push']({'shotId':_0x386506['id'],'exactText':_0x244481}),'';});}return{'source':validateFlowSource(_0x140b4a,_0x2a0da8),'removals':_0x4877bf,'notes':_0x1556fb};}export function validateFlowSource(_0x3c3bdd,_0x311ef4,_0x4b92e0=[]){requireFlow(_0x3c3bdd,'未获得可用的原片识别结果，请查看前序步骤的具体错误'),requireFlow(_0x3c3bdd?.["videoObserved"]===!![],'模型未确认读取原片'),requireFlow(Array["isArray"](_0x3c3bdd["characters"])&&Array["isArray"](_0x3c3bdd["shots"])&&_0x3c3bdd['shots']['length']&&Array["isArray"](_0x3c3bdd['speech']),"识别结果缺少人物、镜头或人声数组");const _0x28a5ce=normalizeFlowSource(_0x3c3bdd,_0x311ef4),_0x3b4b0d=_0x28a5ce['source'],_0x15af98=[..._0x3b4b0d["characters"],..._0x3b4b0d["shots"],..._0x3b4b0d["speech"]]["map"](_0xee23c4=>_0xee23c4['id']);requireFlow(_0x15af98["every"](_0xc74b3=>text(_0xc74b3)&&_0xc74b3["trim"]())&&new Set(_0x15af98)["size"]===_0x15af98["length"],'原片记录编号缺失或重复');const _0x56aa10=new Set(_0x3b4b0d["characters"]["map"](_0x4cd260=>_0x4cd260['id']));requireFlow(_0x3b4b0d["characters"]["every"](_0x94db1e=>text(_0x94db1e['name'])&&_0x94db1e["name"]["trim"]()&&text(_0x94db1e["appearance"])),"人物名称或外观无效");for(const [_0x1c01f5,_0x55d709]of _0x3b4b0d["shots"]["entries"]()){requireFlow(Number['isFinite'](_0x55d709['startSec'])&&Number['isFinite'](_0x55d709["endSec"])&&_0x55d709['endSec']>_0x55d709["startSec"],'镜头时间无效：'+_0x55d709['id']);const _0x12c6cb=_0x1c01f5?_0x3b4b0d['shots'][_0x1c01f5-0x1]["endSec"]:0x0;requireFlow(Math["abs"](_0x55d709['startSec']-_0x12c6cb)<0.02&&_0x55d709["endSec"]<=_0x311ef4+0.02,'镜头时间不连续或越界：'+_0x55d709['id']),requireFlow(Array['isArray'](_0x55d709['characterIds'])&&_0x55d709['characterIds']["every"](_0x443549=>_0x56aa10["has"](_0x443549)),'镜头人物引用无效：'+_0x55d709['id']),requireFlow(text(_0x55d709['visual'])&&_0x55d709["visual"]["trim"]()&&text(_0x55d709["camera"])&&text(_0x55d709["sound"])&&text(_0x55d709["uncertainty"]),'镜头内容无效：'+_0x55d709['id']);}requireFlow(Math['abs'](_0x3b4b0d["shots"]['at'](-0x1)['endSec']-_0x311ef4)<0.02,'镜头未覆盖至原片结尾');for(const [_0x34a495,_0x21fb41]of _0x3b4b0d["speech"]['entries']()){requireFlow(Number["isFinite"](_0x21fb41["startSec"])&&Number['isFinite'](_0x21fb41['endSec'])&&_0x21fb41["startSec"]>=0x0&&_0x21fb41["endSec"]>_0x21fb41["startSec"]&&_0x21fb41['endSec']<=_0x311ef4+0.02,"人声时间无效："+_0x21fb41['id']),requireFlow(!_0x34a495||_0x21fb41["startSec"]>=_0x3b4b0d["speech"][_0x34a495-0x1]["startSec"],"人声记录顺序错误"),requireFlow(Array["isArray"](_0x21fb41["parts"])&&_0x21fb41["parts"]["length"]>0x0&&_0x21fb41['parts']["length"]<=0x10,"人声内容为空："+_0x21fb41['id']);for(const _0x18a214 of _0x21fb41["parts"]){requireFlow((_0x56aa10["has"](_0x18a214["speakerId"])||_0x18a214['speakerId']==='')&&['dialogue',"voiceover"]["includes"](_0x18a214["kind"])&&text(_0x18a214["text"])&&_0x18a214["text"]['trim']()&&text(_0x18a214["uncertainty"]),"人声归属、类型或文本无效："+_0x21fb41['id']);}}return _0x4b92e0["push"](..._0x28a5ce["notes"]),_0x3b4b0d;}export function classifyFlowReview(_0x8f03ac,_0x307b0b,_0x1bf8f1){requireFlow(_0x307b0b?.['videoObserved']===!![]&&Array["isArray"](_0x307b0b['issues']),"审查结果结构无效");const _0x58dbcb=[],_0x997afe=[],_0x40f9aa=new Set();for(const [_0x5da513,_0x26e7f8]of[["checkedSpeechIds",_0x8f03ac['speech']],["checkedShotIds",_0x8f03ac['shots']]]){(!Array["isArray"](_0x307b0b[_0x5da513])||JSON["stringify"]([...new Set(_0x307b0b[_0x5da513])]['sort']())!==JSON["stringify"](_0x26e7f8['map'](_0xf45576=>_0xf45576['id'])["sort"]()))&&_0x997afe["push"]({'code':'review-coverage','blocking':![],'detail':"审查未确认覆盖全部镜头与人声，保留可定位的意见并继续",'field':_0x5da513});}const _0x192ff5=new Set([..._0x8f03ac["characters"],..._0x8f03ac["shots"],..._0x8f03ac['speech']]["map"](_0x5369b0=>_0x5369b0['id'])),_0x27175c=new Set(["speaker","identity","key_action","plot","major_omission"]);for(const _0x3b8c3c of _0x307b0b['issues']['slice'](0x0,0xc)){try{requireFlow(_0x3b8c3c&&typeof _0x3b8c3c==="object","审查问题不是对象"),requireFlow(text(_0x3b8c3c['id'])&&_0x3b8c3c['id']&&!_0x40f9aa["has"](_0x3b8c3c['id'])&&Array["isArray"](_0x3b8c3c['sourceIds'])&&_0x3b8c3c["sourceIds"]["length"]&&_0x3b8c3c['sourceIds']['every'](_0x324abe=>_0x192ff5["has"](_0x324abe)),"审查引用缺失、重复或未知"),_0x40f9aa["add"](_0x3b8c3c['id']),requireFlow(Number["isFinite"](_0x3b8c3c["startSec"])&&Number["isFinite"](_0x3b8c3c["endSec"])&&_0x3b8c3c["startSec"]>=0x0&&_0x3b8c3c["endSec"]>_0x3b8c3c["startSec"]&&_0x3b8c3c["endSec"]<=_0x1bf8f1,"审查证据时间无效"),requireFlow(text(_0x3b8c3c["evidence"])&&_0x3b8c3c["evidence"]["trim"]()&&["high","uncertain"]["includes"](_0x3b8c3c["confidence"]),'审查缺少证据或置信度'),requireFlow(_0x27175c["has"](_0x3b8c3c["category"])||_0x3b8c3c['category']==="minor_wording",'审查问题类别无效');if(_0x27175c["has"](_0x3b8c3c["category"])&&_0x3b8c3c['confidence']==="high")_0x58dbcb["push"](_0x3b8c3c);else _0x997afe["push"]({..._0x3b8c3c,'blocking':![],'code':"review-note"});}catch(_0x4d36f9){_0x997afe["push"]({'code':"review-issue-skipped",'blocking':![],'issue':_0x3b8c3c,'detail':_0x4d36f9["message"]});}}if(_0x307b0b['hasMoreIssues']||_0x307b0b["issues"]['length']>0xc)_0x997afe["push"]({'code':"review-overflow",'blocking':![],'detail':"审查仍有未列出的实质问题"});return{'actionable':_0x58dbcb,'notes':_0x997afe};}export function mapFlowReviewTimes(_0x59be2a,_0x2d2699,_0x73449f=[]){return requireFlow(["reel",'source']["includes"](_0x59be2a?.['timeBasis'])&&Array['isArray'](_0x59be2a["issues"]),'审查缺少明确的窗口时间基准'),{..._0x59be2a,'timeBasis':"source",'issues':_0x59be2a["issues"]["flatMap"](_0x3ec8f7=>{const _0x5e71e2=Number["isFinite"](_0x3ec8f7?.["startSec"])&&Number["isFinite"](_0x3ec8f7?.["endSec"])&&_0x3ec8f7['endSec']>_0x3ec8f7["startSec"],_0x5a03fa=(_0xf61f8f,_0xa08a80,_0x2bc791=0x0)=>_0x5e71e2&&_0x3ec8f7['startSec']>=_0xf61f8f[_0xa08a80+"StartSec"]-_0x2bc791&&_0x3ec8f7["endSec"]<=_0xf61f8f[_0xa08a80+'EndSec']+_0x2bc791;let _0x1a8fbc=_0x59be2a["timeBasis"],_0x552294=_0x2d2699['find'](_0x4b9946=>_0x5a03fa(_0x4b9946,_0x1a8fbc))||_0x2d2699["find"](_0x4e2ff7=>_0x5a03fa(_0x4e2ff7,_0x1a8fbc,0x1));if(!_0x552294&&_0x1a8fbc==='reel'){_0x552294=_0x2d2699["find"](_0x2fc80a=>_0x5a03fa(_0x2fc80a,"source"));if(_0x552294)_0x1a8fbc='source';}if(!_0x552294)return _0x73449f["push"]({'code':'review-issue-skipped','blocking':![],'issue':_0x3ec8f7,'detail':"审查时间无法定位到证据窗口，保留意见但不据此改稿"}),[];const _0x1e10ab=_0x1a8fbc==='reel'?_0x552294["sourceStartSec"]-_0x552294["reelStartSec"]:0x0,_0x51a251=Math["max"](_0x552294["sourceStartSec"],_0x3ec8f7["startSec"]+_0x1e10ab),_0x906c56=Math["min"](_0x552294["sourceEndSec"],_0x3ec8f7['endSec']+_0x1e10ab);if(_0x906c56<=_0x51a251)return _0x73449f['push']({'code':"review-issue-skipped",'blocking':![],'issue':_0x3ec8f7,'detail':'审查时间未与证据窗口相交，保留意见但不据此改稿'}),[];return(_0x1a8fbc!==_0x59be2a['timeBasis']||_0x51a251!==_0x3ec8f7["startSec"]+_0x1e10ab||_0x906c56!==_0x3ec8f7["endSec"]+_0x1e10ab)&&_0x73449f['push']({'code':"review-time-normalized",'blocking':![],'issueId':_0x3ec8f7['id'],'detail':_0x1a8fbc!==_0x59be2a['timeBasis']?"审查时间使用了原片秒数，已按原片窗口定位":"已对齐审查时间边缘不超过 1 秒的偏差"}),[{..._0x3ec8f7,'startSec':_0x51a251,'endSec':_0x906c56}];})};}export function applyFlowRepair(_0x3b3dd1,_0x12ece2,_0x2408f6,_0x50b896){exactFields(_0x2408f6,["speechPatches","shotPatches","characterPatches","addedSpeech","issueResults"]);for(const _0x605abe of Object["keys"](_0x2408f6))requireFlow(Array['isArray'](_0x2408f6[_0x605abe]),"修补结果必须为数组");requireFlow(JSON["stringify"](_0x2408f6['issueResults']["map"](_0x496235=>_0x496235["issueId"])["sort"]())===JSON['stringify'](_0x12ece2["map"](_0x42189d=>_0x42189d['id'])["sort"]()),"修补未逐项回应审查问题");for(const _0x553ca8 of _0x2408f6["issueResults"])requireFlow(["repaired","rejected","uncertain"]["includes"](_0x553ca8['status'])&&text(_0x553ca8["reason"])&&_0x553ca8["reason"]["trim"](),"修补处理状态无效");const _0x511e6f=structuredClone(_0x3b3dd1),_0x5ae7d0=new Set(),_0x41a3f6=_0x4fd667=>_0x12ece2["filter"](_0x1cee9c=>_0x1cee9c["sourceIds"]['includes'](_0x4fd667)),_0x4eaaf5=(_0x18f2df,_0x2ab9d0)=>{requireFlow(_0x41a3f6(_0x18f2df)['length']&&!_0x5ae7d0["has"](_0x18f2df),'补丁越过审查范围或重复修改');const _0x14e0b4=_0x2ab9d0["find"](_0xaafbcc=>_0xaafbcc['id']===_0x18f2df);return requireFlow(_0x14e0b4,'补丁引用未知记录'),_0x5ae7d0["add"](_0x18f2df),_0x14e0b4;};for(const _0x5520c3 of _0x2408f6["speechPatches"]){exactFields(_0x5520c3,['id',"parts"]);const _0x61e515=_0x4eaaf5(_0x5520c3['id'],_0x511e6f['speech']);_0x41a3f6(_0x5520c3['id'])['every'](_0x231545=>_0x231545["category"]==='speaker')&&requireFlow(Array["isArray"](_0x5520c3['parts'])&&wording(partsText(_0x5520c3))===wording(partsText(_0x61e515)),"说话人修补不得改写原话"),_0x61e515['parts']=structuredClone(_0x5520c3['parts']);}for(const _0x244e78 of _0x2408f6["shotPatches"]){exactFields(_0x244e78,['id',"visual","camera",'sound',"characterIds",'uncertainty']),Object["assign"](_0x4eaaf5(_0x244e78['id'],_0x511e6f["shots"]),_0x244e78);}for(const _0x5e0c9e of _0x2408f6["characterPatches"]){exactFields(_0x5e0c9e,['id',"name","appearance"]),requireFlow(_0x41a3f6(_0x5e0c9e['id'])["some"](_0x19e441=>_0x19e441["category"]==='identity'),"人物修改必须由身份问题授权"),Object["assign"](_0x4eaaf5(_0x5e0c9e['id'],_0x511e6f["characters"]),_0x5e0c9e);}for(const [_0x4f6ab4,_0x32ca85]of _0x2408f6['addedSpeech']["entries"]()){exactFields(_0x32ca85,['shotId',"startSec","endSec",'parts']);const _0x13e294=_0x511e6f["shots"]['find'](_0x58d258=>_0x58d258['id']===_0x32ca85["shotId"]);requireFlow(_0x13e294&&_0x41a3f6(_0x13e294['id'])["some"](_0x58e85f=>_0x58e85f['category']==="major_omission"),"补录人声必须引用被报告遗漏的镜头"),requireFlow(_0x32ca85['startSec']>=_0x13e294['startSec']&&_0x32ca85["endSec"]<=_0x13e294["endSec"],"补录人声越过证据范围");const _0x470c02="repair-speech-"+(_0x4f6ab4+0x1);requireFlow(![..._0x511e6f['characters'],..._0x511e6f["shots"],..._0x511e6f['speech']]["some"](_0x1c3aa1=>_0x1c3aa1['id']===_0x470c02),'补录编号冲突'),_0x511e6f["speech"]['push']({'id':_0x470c02,'startSec':_0x32ca85["startSec"],'endSec':_0x32ca85["endSec"],'parts':structuredClone(_0x32ca85["parts"])});}return _0x511e6f["speech"]['sort']((_0x577926,_0x3388ca)=>_0x577926["startSec"]-_0x3388ca["startSec"]),validateFlowSource(_0x511e6f,_0x50b896);}export function applyFlowRepairIndividually(_0x279c25,_0x24affe,_0x4290e3,_0x3a6f4b){exactFields(_0x4290e3,['speechPatches',"shotPatches","characterPatches","addedSpeech","issueResults"]);const _0x3cbca8={'speechPatches':[],'shotPatches':[],'characterPatches':[],'addedSpeech':[],'issueResults':_0x4290e3["issueResults"]};let _0x467387=applyFlowRepair(_0x279c25,_0x24affe,_0x3cbca8,_0x3a6f4b);const _0x6bf161=[],_0x1eb628=new Set();for(const _0x530041 of["speechPatches",'shotPatches',"characterPatches","addedSpeech"]){requireFlow(Array["isArray"](_0x4290e3[_0x530041]),"修补字段不是数组");const _0x153733=_0x530041==='addedSpeech'?[_0x4290e3[_0x530041]]:_0x4290e3[_0x530041]["map"](_0xafb785=>[_0xafb785]);for(const _0x59276f of _0x153733){if(!_0x59276f['length'])continue;try{for(const _0x41eabe of _0x59276f){if(!_0x41eabe['id'])continue;requireFlow(!_0x1eb628["has"](_0x41eabe['id']),'同一记录不能重复修补'),_0x1eb628["add"](_0x41eabe['id']);}_0x467387=applyFlowRepair(_0x467387,_0x24affe,{..._0x3cbca8,[_0x530041]:_0x59276f},_0x3a6f4b);}catch(_0x4feffa){_0x6bf161['push']({'field':_0x530041,'ids':_0x59276f["map"](_0x27f22e=>_0x27f22e['id']||_0x27f22e["shotId"]),'detail':_0x4feffa['message']});}}}return{'candidate':_0x467387,'rejected':_0x6bf161};}export function flowEvidenceWindows(_0xc7636b,_0x5200ac,_0x3d74c2){const _0x1a1353=_0x5200ac["map"](_0x5a96d2=>{const _0x540159=[..._0xc7636b["shots"],..._0xc7636b["speech"]]["filter"](_0x4ef6a5=>_0x5a96d2['sourceIds']["includes"](_0x4ef6a5['id']));for(const _0x4e0720 of _0x5a96d2["sourceIds"]){const _0x42966c=_0xc7636b["speech"]["findIndex"](_0x1cffe6=>_0x1cffe6['id']===_0x4e0720);if(_0x42966c>0x0)_0x540159["push"](_0xc7636b["speech"][_0x42966c-0x1]);if(_0x42966c>=0x0&&_0x42966c+0x1<_0xc7636b["speech"]["length"])_0x540159["push"](_0xc7636b["speech"][_0x42966c+0x1]);}return{'sourceStartSec':Math["max"](0x0,Math["floor"](Math["min"](_0x5a96d2['startSec'],..._0x540159["map"](_0x4df2d3=>_0x4df2d3["startSec"])))-0x1),'sourceEndSec':Math["min"](_0x3d74c2,Math['ceil'](Math["max"](_0x5a96d2["endSec"],..._0x540159['map'](_0xf58cfc=>_0xf58cfc["endSec"])))+0x1)};})['sort']((_0x130061,_0x248ddb)=>_0x130061["sourceStartSec"]-_0x248ddb["sourceStartSec"]),_0x279091=[];for(const _0x3ab852 of _0x1a1353){const _0x2b70c5=_0x279091['at'](-0x1);if(_0x2b70c5&&_0x3ab852["sourceStartSec"]<=_0x2b70c5['sourceEndSec'])_0x2b70c5["sourceEndSec"]=Math["max"](_0x2b70c5["sourceEndSec"],_0x3ab852["sourceEndSec"]);else _0x279091["push"]({..._0x3ab852});}let _0x5a69a8=0x0;return _0x279091["map"](_0x348fc0=>{const _0x523289=_0x5a69a8;return _0x5a69a8+=_0x348fc0["sourceEndSec"]-_0x348fc0['sourceStartSec'],{..._0x348fc0,'reelStartSec':_0x523289,'reelEndSec':_0x5a69a8};});}export function createFlowReviewWindows(_0x31b6ed,_0x18f7b3,_0x575d88=0x23){requireFlow(Number["isFinite"](_0x575d88)&&_0x575d88>=0xa,"审查窗口上限无效");const _0x4de640=Math["ceil"](_0x18f7b3/_0x575d88),_0x3e8191=_0x18f7b3/_0x4de640,_0xd41601=Array["from"]({'length':_0x4de640},()=>({'characters':_0x31b6ed["characters"],'shots':[],'speech':[],'videoObserved':!![],'title':_0x31b6ed["title"]}));for(const _0x4c7f8f of["shots",'speech']){for(const _0x245031 of _0x31b6ed[_0x4c7f8f])_0xd41601[Math["min"](_0x4de640-0x1,Math["floor"]((_0x245031["startSec"]+_0x245031["endSec"])/0x2/_0x3e8191))][_0x4c7f8f]['push'](_0x245031);}return _0xd41601["map"]((_0x31fe3e,_0x4210af)=>{if(!_0x31fe3e["shots"]["length"]&&!_0x31fe3e["speech"]['length'])return null;const _0x57cfa4=[..._0x31fe3e["shots"],..._0x31fe3e["speech"]],_0x3bbacb=Math["max"](0x0,Math["min"](_0x4210af*_0x3e8191,..._0x57cfa4['map'](_0x343560=>_0x343560["startSec"]))-0x2),_0x58abec=Math["min"](_0x18f7b3,Math["max"]((_0x4210af+0x1)*_0x3e8191,..._0x57cfa4["map"](_0x5848cd=>_0x5848cd["endSec"]))+0x2);return{'scope':_0x31fe3e,'windows':[{'sourceStartSec':_0x3bbacb,'sourceEndSec':_0x58abec,'reelStartSec':0x0,'reelEndSec':_0x58abec-_0x3bbacb}]};})["filter"](Boolean);}
+import { normalizeFlowSource } from './videoReplicationFlowNormalization.js';
+export function requireFlow(enabled, value) {
+  if (!enabled) throw new Error(value);
+}
+const text = (item) => typeof item === 'string',
+  wording = (key) => key['replace'](/[^\p{L}\p{N}]/gu, ''),
+  partsText = (index) => index['parts']['map']((result) => result['text'])['join'](''),
+  exactFields = (data, args) =>
+    requireFlow(
+      data && Object['keys'](data)['sort']()['join'](',') === [...args]['sort']()['join'](','),
+      '补丁包含未授权或缺失字段',
+    );
+export function inspectFlowSpeech(enabled2) {
+  return enabled2['shots']
+    ['filter']((options) => {
+      const target = options['sound']['replace'](
+        /无(?:人声|旁白|对白|对话)|没有(?:人声|旁白|对白|对话)/gu,
+        '',
+      );
+      return (
+        /旁白|画外音|对白|对话|说话/u['test'](target) &&
+        !enabled2['speech']['some'](
+          (source) => source['startSec'] < options['endSec'] && source['endSec'] > options['startSec'],
+        )
+      );
+    })
+    ['map']((next) => next['id']);
+}
+export function applyFlowSpeechRecovery(args2, current, entry) {
+  (exactFields(current, ['videoObserved', 'speech']),
+    requireFlow(
+      current['videoObserved'] === !![] && Array['isArray'](current['speech']) && current['speech']['length'],
+      '人声补录未确认原片或仍为空',
+    ));
+  const record = [],
+    validateFlowSource2 = validateFlowSource({ ...args2, speech: current['speech'] }, entry, record),
+    list = [];
+  for (const payload of validateFlowSource2['shots']) {
+    payload['visual'] = payload['visual']['replace'](/字幕(?:显示|为)?[：:]?\s*“[^”]*”[。]?/gu, (handle) => {
+      return (list['push']({ shotId: payload['id'], exactText: handle }), '');
+    });
+  }
+  return { source: validateFlowSource(validateFlowSource2, entry), removals: list, notes: record };
+}
+export function validateFlowSource(state, config, scope = []) {
+  (requireFlow(state, '未获得可用的原片识别结果，请查看前序步骤的具体错误'),
+    requireFlow(state?.['videoObserved'] === !![], '模型未确认读取原片'),
+    requireFlow(
+      Array['isArray'](state['characters']) &&
+        Array['isArray'](state['shots']) &&
+        state['shots']['length'] &&
+        Array['isArray'](state['speech']),
+      '识别结果缺少人物、镜头或人声数组',
+    ));
+  const args3 = normalizeFlowSource(state, config),
+    args4 = args3['source'],
+    input = [...args4['characters'], ...args4['shots'], ...args4['speech']]['map']((output) => output['id']);
+  requireFlow(
+    input['every']((value2) => text(value2) && value2['trim']()) &&
+      new Set(input)['size'] === input['length'],
+    '原片记录编号缺失或重复',
+  );
+  const value3 = new Set(args4['characters']['map']((value4) => value4['id']));
+  requireFlow(
+    args4['characters']['every'](
+      (error) => text(error['name']) && error['name']['trim']() && text(error['appearance']),
+    ),
+    '人物名称或外观无效',
+  );
+  for (const [value5, value6] of args4['shots']['entries']()) {
+    requireFlow(
+      Number['isFinite'](value6['startSec']) &&
+        Number['isFinite'](value6['endSec']) &&
+        value6['endSec'] > value6['startSec'],
+      '镜头时间无效：' + value6['id'],
+    );
+    const value7 = value5 ? args4['shots'][value5 - 0x1]['endSec'] : 0x0;
+    (requireFlow(
+      Math['abs'](value6['startSec'] - value7) < 0.02 && value6['endSec'] <= config + 0.02,
+      '镜头时间不连续或越界：' + value6['id'],
+    ),
+      requireFlow(
+        Array['isArray'](value6['characterIds']) &&
+          value6['characterIds']['every']((value8) => value3['has'](value8)),
+        '镜头人物引用无效：' + value6['id'],
+      ),
+      requireFlow(
+        text(value6['visual']) &&
+          value6['visual']['trim']() &&
+          text(value6['camera']) &&
+          text(value6['sound']) &&
+          text(value6['uncertainty']),
+        '镜头内容无效：' + value6['id'],
+      ));
+  }
+  requireFlow(Math['abs'](args4['shots']['at'](-0x1)['endSec'] - config) < 0.02, '镜头未覆盖至原片结尾');
+  for (const [enabled3, value9] of args4['speech']['entries']()) {
+    (requireFlow(
+      Number['isFinite'](value9['startSec']) &&
+        Number['isFinite'](value9['endSec']) &&
+        value9['startSec'] >= 0x0 &&
+        value9['endSec'] > value9['startSec'] &&
+        value9['endSec'] <= config + 0.02,
+      '人声时间无效：' + value9['id'],
+    ),
+      requireFlow(
+        !enabled3 || value9['startSec'] >= args4['speech'][enabled3 - 0x1]['startSec'],
+        '人声记录顺序错误',
+      ),
+      requireFlow(
+        Array['isArray'](value9['parts']) &&
+          value9['parts']['length'] > 0x0 &&
+          value9['parts']['length'] <= 0x10,
+        '人声内容为空：' + value9['id'],
+      ));
+    for (const value10 of value9['parts']) {
+      requireFlow(
+        (value3['has'](value10['speakerId']) || value10['speakerId'] === '') &&
+          ['dialogue', 'voiceover']['includes'](value10['kind']) &&
+          text(value10['text']) &&
+          value10['text']['trim']() &&
+          text(value10['uncertainty']),
+        '人声归属、类型或文本无效：' + value9['id'],
+      );
+    }
+  }
+  return (scope['push'](...args3['notes']), args4);
+}
+export function classifyFlowReview(args5, value11, value12) {
+  requireFlow(value11?.['videoObserved'] === !![] && Array['isArray'](value11['issues']), '审查结果结构无效');
+  const value13 = [],
+    value14 = [],
+    enabled4 = new Set();
+  for (const [value15, list2] of [
+    ['checkedSpeechIds', args5['speech']],
+    ['checkedShotIds', args5['shots']],
+  ]) {
+    (!Array['isArray'](value11[value15]) ||
+      JSON['stringify']([...new Set(value11[value15])]['sort']()) !==
+        JSON['stringify'](list2['map']((value16) => value16['id'])['sort']())) &&
+      value14['push']({
+        code: 'review-coverage',
+        blocking: ![],
+        detail: '审查未确认覆盖全部镜头与人声，保留可定位的意见并继续',
+        field: value15,
+      });
+  }
+  const value17 = new Set(
+      [...args5['characters'], ...args5['shots'], ...args5['speech']]['map']((value18) => value18['id']),
+    ),
+    value19 = new Set(['speaker', 'identity', 'key_action', 'plot', 'major_omission']);
+  for (const args6 of value11['issues']['slice'](0x0, 0xc)) {
+    try {
+      (requireFlow(args6 && typeof args6 === 'object', '审查问题不是对象'),
+        requireFlow(
+          text(args6['id']) &&
+            args6['id'] &&
+            !enabled4['has'](args6['id']) &&
+            Array['isArray'](args6['sourceIds']) &&
+            args6['sourceIds']['length'] &&
+            args6['sourceIds']['every']((value20) => value17['has'](value20)),
+          '审查引用缺失、重复或未知',
+        ),
+        enabled4['add'](args6['id']),
+        requireFlow(
+          Number['isFinite'](args6['startSec']) &&
+            Number['isFinite'](args6['endSec']) &&
+            args6['startSec'] >= 0x0 &&
+            args6['endSec'] > args6['startSec'] &&
+            args6['endSec'] <= value12,
+          '审查证据时间无效',
+        ),
+        requireFlow(
+          text(args6['evidence']) &&
+            args6['evidence']['trim']() &&
+            ['high', 'uncertain']['includes'](args6['confidence']),
+          '审查缺少证据或置信度',
+        ),
+        requireFlow(
+          value19['has'](args6['category']) || args6['category'] === 'minor_wording',
+          '审查问题类别无效',
+        ));
+      if (value19['has'](args6['category']) && args6['confidence'] === 'high') value13['push'](args6);
+      else value14['push']({ ...args6, blocking: ![], code: 'review-note' });
+    } catch (value21) {
+      value14['push']({
+        code: 'review-issue-skipped',
+        blocking: ![],
+        issue: args6,
+        detail: value21['message'],
+      });
+    }
+  }
+  if (value11['hasMoreIssues'] || value11['issues']['length'] > 0xc)
+    value14['push']({ code: 'review-overflow', blocking: ![], detail: '审查仍有未列出的实质问题' });
+  return { actionable: value13, notes: value14 };
+}
+export function mapFlowReviewTimes(args7, list3, list4 = []) {
+  return (
+    requireFlow(
+      ['reel', 'source']['includes'](args7?.['timeBasis']) && Array['isArray'](args7['issues']),
+      '审查缺少明确的窗口时间基准',
+    ),
+    {
+      ...args7,
+      timeBasis: 'source',
+      issues: args7['issues']['flatMap']((args8) => {
+        const value22 =
+            Number['isFinite'](args8?.['startSec']) &&
+            Number['isFinite'](args8?.['endSec']) &&
+            args8['endSec'] > args8['startSec'],
+          handler = (value23, value24, value25 = 0x0) =>
+            value22 &&
+            args8['startSec'] >= value23[value24 + 'StartSec'] - value25 &&
+            args8['endSec'] <= value23[value24 + 'EndSec'] + value25;
+        let value26 = args7['timeBasis'],
+          enabled5 =
+            list3['find']((value27) => handler(value27, value26)) ||
+            list3['find']((value28) => handler(value28, value26, 0x1));
+        if (!enabled5 && value26 === 'reel') {
+          enabled5 = list3['find']((value29) => handler(value29, 'source'));
+          if (enabled5) value26 = 'source';
+        }
+        if (!enabled5)
+          return (
+            list4['push']({
+              code: 'review-issue-skipped',
+              blocking: ![],
+              issue: args8,
+              detail: '审查时间无法定位到证据窗口，保留意见但不据此改稿',
+            }),
+            []
+          );
+        const value30 = value26 === 'reel' ? enabled5['sourceStartSec'] - enabled5['reelStartSec'] : 0x0,
+          value31 = Math['max'](enabled5['sourceStartSec'], args8['startSec'] + value30),
+          value32 = Math['min'](enabled5['sourceEndSec'], args8['endSec'] + value30);
+        if (value32 <= value31)
+          return (
+            list4['push']({
+              code: 'review-issue-skipped',
+              blocking: ![],
+              issue: args8,
+              detail: '审查时间未与证据窗口相交，保留意见但不据此改稿',
+            }),
+            []
+          );
+        return (
+          (value26 !== args7['timeBasis'] ||
+            value31 !== args8['startSec'] + value30 ||
+            value32 !== args8['endSec'] + value30) &&
+            list4['push']({
+              code: 'review-time-normalized',
+              blocking: ![],
+              issueId: args8['id'],
+              detail:
+                value26 !== args7['timeBasis']
+                  ? '审查时间使用了原片秒数，已按原片窗口定位'
+                  : '已对齐审查时间边缘不超过 1 秒的偏差',
+            }),
+          [{ ...args8, startSec: value31, endSec: value32 }]
+        );
+      }),
+    }
+  );
+}
+export function applyFlowRepair(value33, value34, value35, value36) {
+  exactFields(value35, ['speechPatches', 'shotPatches', 'characterPatches', 'addedSpeech', 'issueResults']);
+  for (const value37 of Object['keys'](value35))
+    requireFlow(Array['isArray'](value35[value37]), '修补结果必须为数组');
+  requireFlow(
+    JSON['stringify'](value35['issueResults']['map']((value38) => value38['issueId'])['sort']()) ===
+      JSON['stringify'](value34['map']((value39) => value39['id'])['sort']()),
+    '修补未逐项回应审查问题',
+  );
+  for (const response of value35['issueResults'])
+    requireFlow(
+      ['repaired', 'rejected', 'uncertain']['includes'](response['status']) &&
+        text(response['reason']) &&
+        response['reason']['trim'](),
+      '修补处理状态无效',
+    );
+  const args9 = structuredClone(value33),
+    enabled6 = new Set(),
+    handler2 = (value40) => value34['filter']((value41) => value41['sourceIds']['includes'](value40)),
+    handler3 = (value42, value43) => {
+      requireFlow(handler2(value42)['length'] && !enabled6['has'](value42), '补丁越过审查范围或重复修改');
+      const value44 = value43['find']((value45) => value45['id'] === value42);
+      return (requireFlow(value44, '补丁引用未知记录'), enabled6['add'](value42), value44);
+    };
+  for (const value46 of value35['speechPatches']) {
+    exactFields(value46, ['id', 'parts']);
+    const value47 = handler3(value46['id'], args9['speech']);
+    (handler2(value46['id'])['every']((value48) => value48['category'] === 'speaker') &&
+      requireFlow(
+        Array['isArray'](value46['parts']) && wording(partsText(value46)) === wording(partsText(value47)),
+        '说话人修补不得改写原话',
+      ),
+      (value47['parts'] = structuredClone(value46['parts'])));
+  }
+  for (const value49 of value35['shotPatches']) {
+    (exactFields(value49, ['id', 'visual', 'camera', 'sound', 'characterIds', 'uncertainty']),
+      Object['assign'](handler3(value49['id'], args9['shots']), value49));
+  }
+  for (const value50 of value35['characterPatches']) {
+    (exactFields(value50, ['id', 'name', 'appearance']),
+      requireFlow(
+        handler2(value50['id'])['some']((value51) => value51['category'] === 'identity'),
+        '人物修改必须由身份问题授权',
+      ),
+      Object['assign'](handler3(value50['id'], args9['characters']), value50));
+  }
+  for (const [value52, value53] of value35['addedSpeech']['entries']()) {
+    exactFields(value53, ['shotId', 'startSec', 'endSec', 'parts']);
+    const value54 = args9['shots']['find']((value55) => value55['id'] === value53['shotId']);
+    (requireFlow(
+      value54 && handler2(value54['id'])['some']((value56) => value56['category'] === 'major_omission'),
+      '补录人声必须引用被报告遗漏的镜头',
+    ),
+      requireFlow(
+        value53['startSec'] >= value54['startSec'] && value53['endSec'] <= value54['endSec'],
+        '补录人声越过证据范围',
+      ));
+    const value57 = 'repair-speech-' + (value52 + 0x1);
+    (requireFlow(
+      ![...args9['characters'], ...args9['shots'], ...args9['speech']]['some'](
+        (value58) => value58['id'] === value57,
+      ),
+      '补录编号冲突',
+    ),
+      args9['speech']['push']({
+        id: value57,
+        startSec: value53['startSec'],
+        endSec: value53['endSec'],
+        parts: structuredClone(value53['parts']),
+      }));
+  }
+  return (
+    args9['speech']['sort']((value59, value60) => value59['startSec'] - value60['startSec']),
+    validateFlowSource(args9, value36)
+  );
+}
+export function applyFlowRepairIndividually(value61, value62, value63, value64) {
+  exactFields(value63, ['speechPatches', 'shotPatches', 'characterPatches', 'addedSpeech', 'issueResults']);
+  const args10 = {
+    speechPatches: [],
+    shotPatches: [],
+    characterPatches: [],
+    addedSpeech: [],
+    issueResults: value63['issueResults'],
+  };
+  let flowRepair = applyFlowRepair(value61, value62, args10, value64);
+  const list5 = [],
+    enabled7 = new Set();
+  for (const value65 of ['speechPatches', 'shotPatches', 'characterPatches', 'addedSpeech']) {
+    requireFlow(Array['isArray'](value63[value65]), '修补字段不是数组');
+    const value66 =
+      value65 === 'addedSpeech' ? [value63[value65]] : value63[value65]['map']((value67) => [value67]);
+    for (const list6 of value66) {
+      if (!list6['length']) continue;
+      try {
+        for (const enabled8 of list6) {
+          if (!enabled8['id']) continue;
+          (requireFlow(!enabled7['has'](enabled8['id']), '同一记录不能重复修补'),
+            enabled7['add'](enabled8['id']));
+        }
+        flowRepair = applyFlowRepair(flowRepair, value62, { ...args10, [value65]: list6 }, value64);
+      } catch (error2) {
+        list5['push']({
+          field: value65,
+          ids: list6['map']((value68) => value68['id'] || value68['shotId']),
+          detail: error2['message'],
+        });
+      }
+    }
+  }
+  return { candidate: flowRepair, rejected: list5 };
+}
+export function flowEvidenceWindows(args11, value69, value70) {
+  const value71 = value69['map']((value72) => {
+      const list7 = [...args11['shots'], ...args11['speech']]['filter']((value73) =>
+        value72['sourceIds']['includes'](value73['id']),
+      );
+      for (const value74 of value72['sourceIds']) {
+        const count = args11['speech']['findIndex']((value75) => value75['id'] === value74);
+        if (count > 0x0) list7['push'](args11['speech'][count - 0x1]);
+        if (count >= 0x0 && count + 0x1 < args11['speech']['length'])
+          list7['push'](args11['speech'][count + 0x1]);
+      }
+      return {
+        sourceStartSec: Math['max'](
+          0x0,
+          Math['floor'](Math['min'](value72['startSec'], ...list7['map']((value76) => value76['startSec']))) -
+            0x1,
+        ),
+        sourceEndSec: Math['min'](
+          value70,
+          Math['ceil'](Math['max'](value72['endSec'], ...list7['map']((value77) => value77['endSec']))) + 0x1,
+        ),
+      };
+    })['sort']((value78, value79) => value78['sourceStartSec'] - value79['sourceStartSec']),
+    value80 = [];
+  for (const args12 of value71) {
+    const value81 = value80['at'](-0x1);
+    if (value81 && args12['sourceStartSec'] <= value81['sourceEndSec'])
+      value81['sourceEndSec'] = Math['max'](value81['sourceEndSec'], args12['sourceEndSec']);
+    else value80['push']({ ...args12 });
+  }
+  let value82 = 0x0;
+  return value80['map']((args13) => {
+    const value83 = value82;
+    return (
+      (value82 += args13['sourceEndSec'] - args13['sourceStartSec']),
+      { ...args13, reelStartSec: value83, reelEndSec: value82 }
+    );
+  });
+}
+export function createFlowReviewWindows(value84, value85, count2 = 0x23) {
+  requireFlow(Number['isFinite'](count2) && count2 >= 0xa, '审查窗口上限无效');
+  const value86 = Math['ceil'](value85 / count2),
+    value87 = value85 / value86,
+    value88 = Array['from']({ length: value86 }, () => ({
+      characters: value84['characters'],
+      shots: [],
+      speech: [],
+      videoObserved: !![],
+      title: value84['title'],
+    }));
+  for (const value89 of ['shots', 'speech']) {
+    for (const value90 of value84[value89])
+      value88[
+        Math['min'](value86 - 0x1, Math['floor']((value90['startSec'] + value90['endSec']) / 0x2 / value87))
+      ][value89]['push'](value90);
+  }
+  return value88['map']((args14, value91) => {
+    if (!args14['shots']['length'] && !args14['speech']['length']) return null;
+    const list8 = [...args14['shots'], ...args14['speech']],
+      value92 = Math['max'](
+        0x0,
+        Math['min'](value91 * value87, ...list8['map']((value93) => value93['startSec'])) - 0x2,
+      ),
+      value94 = Math['min'](
+        value85,
+        Math['max']((value91 + 0x1) * value87, ...list8['map']((value95) => value95['endSec'])) + 0x2,
+      );
+    return {
+      scope: args14,
+      windows: [
+        { sourceStartSec: value92, sourceEndSec: value94, reelStartSec: 0x0, reelEndSec: value94 - value92 },
+      ],
+    };
+  })['filter'](Boolean);
+}

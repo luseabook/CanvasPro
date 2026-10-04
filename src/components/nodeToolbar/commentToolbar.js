@@ -11,8 +11,8 @@ import {
 import { t } from '../../i18n/index.js';
 import { registerStaticInnerHTML } from '../../utils/dom.js';
 import { normalizeCommentNoteStyle } from '../commentNoteStyle.js';
-function commentToolbarText(_0x51341c, _0x3a5503 = {}) {
-  return t('nodeToolbar.comment.' + _0x51341c, _0x3a5503);
+function commentToolbarText(value, item = {}) {
+  return t('nodeToolbar.comment.' + value, item);
 }
 const I18N = {
     fontDec: commentToolbarText('fontDec'),
@@ -109,24 +109,24 @@ const I18N = {
     white: 'var(--canvas-white)',
     transparent: 'transparent',
   };
-function createColorPopupHtml(_0x509496, _0x4f0004, _0x185915, _0x1bc028) {
+function createColorPopupHtml(key, list, index, result) {
   return (
     '\n    <div class="comment-toolbar-color-popup" data-popup="' +
-    _0x509496 +
+    key +
     '" aria-label="' +
-    _0x185915 +
+    index +
     '">\n      ' +
-    _0x4f0004
+    list
       .map(
-        (_0x5e8700) =>
+        (item2) =>
           '<button\n              class="ftb-btn comment-toolbar-color-item"\n              data-action="' +
-          _0x509496 +
+          key +
           '"\n              data-value="' +
-          _0x5e8700 +
+          item2 +
           '"\n              data-tooltip="' +
-          (_0x1bc028[_0x5e8700] || _0x5e8700) +
+          (result[item2] || item2) +
           '"\n              aria-label="' +
-          (_0x1bc028[_0x5e8700] || _0x5e8700) +
+          (result[item2] || item2) +
           '"\n            ></button>',
       )
       .join('') +
@@ -203,274 +203,267 @@ export const COMMENT_NOTE_TOOLBAR_HTML =
   SVG_DELETE +
   '</button>\n</div>\n';
 registerStaticInnerHTML('toolbar:comment-note', COMMENT_NOTE_TOOLBAR_HTML);
-function normalizeArgs(_0xbfc3fb) {
-  if (_0xbfc3fb && typeof _0xbfc3fb === 'object' && !_0xbfc3fb.nodeType && _0xbfc3fb.toolbarEl)
-    return _0xbfc3fb;
+function normalizeArgs(toolbarEl) {
+  if (toolbarEl && typeof toolbarEl === 'object' && !toolbarEl.nodeType && toolbarEl.toolbarEl)
+    return toolbarEl;
   return {
-    toolbarEl: _0xbfc3fb?.[0],
-    nodeId: _0xbfc3fb?.[1],
-    getCurrentStyle: _0xbfc3fb?.[2],
-    getNodeSnapshot: _0xbfc3fb?.[4],
+    toolbarEl: toolbarEl?.[0],
+    nodeId: toolbarEl?.[1],
+    getCurrentStyle: toolbarEl?.[2],
+    getNodeSnapshot: toolbarEl?.[4],
   };
 }
-function setColorDot(_0x4dfed2, _0x53830c) {
-  if (!_0x4dfed2) return;
-  const _0x2b9fc2 = COLOR_SWATCH_TOKEN_MAP[_0x53830c] || 'var(--white-20)';
-  (_0x4dfed2.style.setProperty('--comment-toolbar-dot-color', _0x2b9fc2),
-    _0x4dfed2.classList.toggle('is-transparent', _0x53830c === 'transparent'));
+function setColorDot(el, data) {
+  if (!el) return;
+  const options = COLOR_SWATCH_TOKEN_MAP[data] || 'var(--white-20)';
+  (el.style.setProperty('--comment-toolbar-dot-color', options),
+    el.classList.toggle('is-transparent', data === 'transparent'));
 }
-function getJumpShortcutTooltipText(_0x3c4063) {
-  return commentToolbarText('jumpTooltip', { shortcut: formatJumpShortcutLabel(_0x3c4063, I18N.jumpEmpty) });
+function getJumpShortcutTooltipText(target) {
+  return commentToolbarText('jumpTooltip', { shortcut: formatJumpShortcutLabel(target, I18N.jumpEmpty) });
 }
-export function bindCommentNoteToolbarEvents(..._0x43444e) {
+export function bindCommentNoteToolbarEvents(...list2) {
   const {
-    toolbarEl: _0x4dde22,
-    nodeId: _0x517faf,
-    getCurrentStyle: _0x493f36,
-    getNodeSnapshot: _0x460bc3,
-  } = normalizeArgs(_0x43444e.length === 1 ? _0x43444e[0] : _0x43444e);
-  if (!_0x4dde22 || !_0x517faf || typeof _0x493f36 !== 'function') return null;
-  (_0x4dde22.addEventListener('pointerdown', (_0x5ca1da) => _0x5ca1da.stopPropagation()),
-    _0x4dde22.addEventListener('dblclick', (_0x548232) => {
-      (_0x548232.preventDefault(), _0x548232.stopPropagation());
+    toolbarEl: toolbarEl2,
+    nodeId: nodeId,
+    getCurrentStyle: getCurrentStyle,
+    getNodeSnapshot: getNodeSnapshot,
+  } = normalizeArgs(list2.length === 1 ? list2[0] : list2);
+  if (!toolbarEl2 || !nodeId || typeof getCurrentStyle !== 'function') return null;
+  (toolbarEl2.addEventListener('pointerdown', (event) => event.stopPropagation()),
+    toolbarEl2.addEventListener('dblclick', (event2) => {
+      (event2.preventDefault(), event2.stopPropagation());
     }),
-    (_0x4dde22.tabIndex = -1));
-  const _0xa78453 = 2;
-  let _0x3c4ae8 = null,
-    _0x3c6860 = false,
-    _0xf0ce33 = 0,
-    _0x5595c3 = null;
-  const _0x305970 = _0x4dde22.querySelector('[data-dot="text-color"]'),
-    _0x8e56c7 = _0x4dde22.querySelector('[data-dot="background-color"]'),
-    _0x10a1fd = _0x4dde22.querySelector('.act-convert-markdown'),
-    _0x477f74 = _0x4dde22.querySelector('.comment-toolbar-jump-wrap'),
-    _0x3d6235 = _0x4dde22.querySelector('.act-jump-shortcut'),
-    _0x21d152 = _0x4dde22.querySelector('[data-role="jump-binding"]'),
-    _0x352f7d = _0x4dde22.querySelector('[data-role="jump-zoom-range"]'),
-    _0x40a290 = _0x4dde22.querySelector('[data-role="jump-zoom-value"]'),
-    _0x2ca4cf = () => appStore.getStateRaw().nodes?.[_0x517faf] || null,
-    _0x3c0bc8 = () => normalizeCommentNoteJumpShortcut(_0x2ca4cf()?.jumpShortcut),
-    _0x1c316c = () => _0x2ca4cf()?.contentFormat === 'markdown',
-    _0x1c9c46 = () => {
-      if (!_0x10a1fd) return;
-      const _0x499c7a = _0x1c316c();
-      (_0x10a1fd.classList.toggle('is-active', _0x499c7a),
-        _0x10a1fd.setAttribute('data-tooltip', _0x499c7a ? I18N.convertPlainText : I18N.convertMarkdown),
-        _0x10a1fd.setAttribute('aria-label', _0x499c7a ? I18N.convertPlainText : I18N.convertMarkdown));
+    (toolbarEl2.tabIndex = -1));
+  const source = 2;
+  let value2 = null,
+    enabled = false,
+    enabled2 = 0,
+    value3 = null;
+  const next = toolbarEl2.querySelector('[data-dot="text-color"]'),
+    current = toolbarEl2.querySelector('[data-dot="background-color"]'),
+    el2 = toolbarEl2.querySelector('.act-convert-markdown'),
+    el3 = toolbarEl2.querySelector('.comment-toolbar-jump-wrap'),
+    el4 = toolbarEl2.querySelector('.act-jump-shortcut'),
+    el5 = toolbarEl2.querySelector('[data-role="jump-binding"]'),
+    el6 = toolbarEl2.querySelector('[data-role="jump-zoom-range"]'),
+    el7 = toolbarEl2.querySelector('[data-role="jump-zoom-value"]'),
+    handler = () => appStore.getStateRaw().nodes?.[nodeId] || null,
+    handler2 = () => normalizeCommentNoteJumpShortcut(handler()?.jumpShortcut),
+    handler3 = () => handler()?.contentFormat === 'markdown',
+    handler4 = () => {
+      if (!el2) return;
+      const entry = handler3();
+      (el2.classList.toggle('is-active', entry),
+        el2.setAttribute('data-tooltip', entry ? I18N.convertPlainText : I18N.convertMarkdown),
+        el2.setAttribute('aria-label', entry ? I18N.convertPlainText : I18N.convertMarkdown));
     },
-    _0x156695 = () => {
-      if (!_0xf0ce33) return;
-      (clearTimeout(_0xf0ce33), (_0xf0ce33 = 0));
+    handler5 = () => {
+      if (!enabled2) return;
+      (clearTimeout(enabled2), (enabled2 = 0));
     },
-    _0x21996f = (_0x5ed972) => {
-      if (!_0x3d6235) return;
-      _0x3d6235.setAttribute('data-tooltip', getJumpShortcutTooltipText(_0x5ed972));
+    handler6 = (record) => {
+      if (!el4) return;
+      el4.setAttribute('data-tooltip', getJumpShortcutTooltipText(record));
     },
-    _0xd14bf9 = (_0x10ad98, _0x14f545 = 0x708) => {
-      if (!_0x3d6235) return;
-      (_0x156695(),
-        _0x3d6235.classList.add('is-tooltip-pinned'),
-        _0x3d6235.setAttribute('data-tooltip', _0x10ad98),
-        (_0xf0ce33 = window.setTimeout(() => {
-          (_0x3d6235.classList.remove('is-tooltip-pinned'), _0x21996f(_0x3c0bc8().keys), _0x156695());
-        }, _0x14f545)));
+    handler7 = (payload, handle = 0x708) => {
+      if (!el4) return;
+      (handler5(),
+        el4.classList.add('is-tooltip-pinned'),
+        el4.setAttribute('data-tooltip', payload),
+        (enabled2 = window.setTimeout(() => {
+          (el4.classList.remove('is-tooltip-pinned'), handler6(handler2().keys), handler5());
+        }, handle)));
     },
-    _0x5d22ab = () => {
-      const _0x470641 = _0x3c0bc8(),
-        _0xc8dc05 = formatJumpShortcutLabel(_0x470641.keys, I18N.jumpEmpty);
-      (_0x21d152 &&
-        ((_0x21d152.textContent = _0x3c6860 ? I18N.jumpHintRecording : _0xc8dc05),
-        _0x21d152.classList.toggle('is-recording', _0x3c6860),
-        _0x21d152.setAttribute('aria-label', _0x3c6860 ? I18N.jumpHintRecording : _0xc8dc05)),
-        _0x3d6235 && !_0x3d6235.classList.contains('is-tooltip-pinned') && _0x21996f(_0x470641.keys),
-        _0x352f7d &&
-          document.activeElement !== _0x352f7d &&
-          (_0x352f7d.value = String(_0x470641.zoomPercent)),
-        _0x40a290 && (_0x40a290.textContent = _0x470641.zoomPercent + '%'),
-        _0x477f74 && _0x477f74.classList.toggle('is-recording', _0x3c6860));
+    handler8 = () => {
+      const map = handler2(),
+        formatJumpShortcutLabel2 = formatJumpShortcutLabel(map.keys, I18N.jumpEmpty);
+      (el5 &&
+        ((el5.textContent = enabled ? I18N.jumpHintRecording : formatJumpShortcutLabel2),
+        el5.classList.toggle('is-recording', enabled),
+        el5.setAttribute('aria-label', enabled ? I18N.jumpHintRecording : formatJumpShortcutLabel2)),
+        el4 && !el4.classList.contains('is-tooltip-pinned') && handler6(map.keys),
+        el6 && document.activeElement !== el6 && (el6.value = String(map.zoomPercent)),
+        el7 && (el7.textContent = map.zoomPercent + '%'),
+        el3 && el3.classList.toggle('is-recording', enabled));
     },
-    _0x10a1e9 = (_0x2f9ea0) => {
-      ((_0x3c6860 = _0x2f9ea0 === true), (window.__commentNoteShortcutRecording = _0x3c6860), _0x5d22ab());
+    handler9 = (state) => {
+      ((enabled = state === true), (window.__commentNoteShortcutRecording = enabled), handler8());
     },
-    _0xf708bc = (_0x5bc1ab) => {
-      const _0x2eafde = getShortcuts?.(),
-        _0x40cc7e = detectShortcutConflict(_0x2eafde, '__comment-note-jump__', _0x5bc1ab);
-      if (_0x40cc7e) return commentToolbarText('jumpConflictGlobal', { label: _0x40cc7e.label });
-      const _0x363270 = buildJumpShortcutBinding(_0x5bc1ab);
-      if (!_0x363270) return null;
-      const _0x548437 = appStore.getStateRaw().nodes || {};
-      for (const [_0x1e6447, _0x1d2428] of Object.entries(_0x548437)) {
-        if (!_0x1d2428 || _0x1e6447 === _0x517faf || _0x1d2428.type !== 'comment-note') continue;
-        const _0x51b2a7 = normalizeCommentNoteJumpShortcut(_0x1d2428.jumpShortcut),
-          _0x218281 = buildJumpShortcutBinding(_0x51b2a7.keys);
-        if (_0x218281 && _0x218281 === _0x363270) return commentToolbarText('jumpConflictOther');
+    handler10 = (config) => {
+      const scope = getShortcuts?.(),
+        label = detectShortcutConflict(scope, '__comment-note-jump__', config);
+      if (label) return commentToolbarText('jumpConflictGlobal', { label: label.label });
+      const jumpShortcutBinding = buildJumpShortcutBinding(config);
+      if (!jumpShortcutBinding) return null;
+      const input = appStore.getStateRaw().nodes || {};
+      for (const [output, enabled3] of Object.entries(input)) {
+        if (!enabled3 || output === nodeId || enabled3.type !== 'comment-note') continue;
+        const map2 = normalizeCommentNoteJumpShortcut(enabled3.jumpShortcut),
+          jumpShortcutBinding2 = buildJumpShortcutBinding(map2.keys);
+        if (jumpShortcutBinding2 && jumpShortcutBinding2 === jumpShortcutBinding)
+          return commentToolbarText('jumpConflictOther');
       }
       return null;
     },
-    _0x45a6c6 = (_0x435e14, { commitHistory: commitHistory = true } = {}) => {
-      const _0x53e872 = _0x3c0bc8(),
-        _0x5af5c8 = normalizeCommentNoteJumpShortcut({ ..._0x53e872, ...(_0x435e14 || {}) });
+    handler11 = (value4, { commitHistory: commitHistory = true } = {}) => {
+      const map3 = handler2(),
+        jumpShortcut = normalizeCommentNoteJumpShortcut({ ...map3, ...(value4 || {}) });
       if (
-        buildJumpShortcutBinding(_0x53e872.keys) === buildJumpShortcutBinding(_0x5af5c8.keys) &&
-        _0x53e872.zoomPercent === _0x5af5c8.zoomPercent
+        buildJumpShortcutBinding(map3.keys) === buildJumpShortcutBinding(jumpShortcut.keys) &&
+        map3.zoomPercent === jumpShortcut.zoomPercent
       ) {
-        _0x5d22ab();
+        handler8();
         return;
       }
-      (appStore.updateNodeData(_0x517faf, { jumpShortcut: _0x5af5c8 }),
+      (appStore.updateNodeData(nodeId, { jumpShortcut: jumpShortcut }),
         commitHistory && commit(),
-        _0x5d22ab());
+        handler8());
     },
-    _0x2af8a2 = () => {
-      (_0x5595c3 && (document.removeEventListener('keydown', _0x5595c3, true), (_0x5595c3 = null)),
-        _0x10a1e9(false));
+    handler12 = () => {
+      (value3 && (document.removeEventListener('keydown', value3, true), (value3 = null)), handler9(false));
     },
-    _0x2c6138 = () => {
-      if (_0x3c6860) return;
-      (_0x10a1e9(true),
-        (_0x5595c3 = (_0x476e88) => {
-          if (!_0x3c6860) return;
-          (_0x476e88.preventDefault(), _0x476e88.stopImmediatePropagation());
-          if (_0x476e88.key === 'Escape') {
-            (_0x2af8a2(), _0x5d22ab());
+    handler13 = () => {
+      if (enabled) return;
+      (handler9(true),
+        (value3 = (event3) => {
+          if (!enabled) return;
+          (event3.preventDefault(), event3.stopImmediatePropagation());
+          if (event3.key === 'Escape') {
+            (handler12(), handler8());
             return;
           }
-          const _0x57dc21 = parseJumpShortcutFromKeydown(_0x476e88);
-          if (!_0x57dc21.length) return;
-          const _0x340682 = _0xf708bc(_0x57dc21);
-          if (_0x340682) {
-            (_0xd14bf9(_0x340682), _0x2af8a2());
+          const keys = parseJumpShortcutFromKeydown(event3);
+          if (!keys.length) return;
+          const value5 = handler10(keys);
+          if (value5) {
+            (handler7(value5), handler12());
             return;
           }
-          (_0x45a6c6({ keys: _0x57dc21 }), window.showToast?.(I18N.jumpUpdated, 'success'), _0x2af8a2());
+          (handler11({ keys: keys }), window.showToast?.(I18N.jumpUpdated, 'success'), handler12());
         }),
-        document.addEventListener('keydown', _0x5595c3, true));
+        document.addEventListener('keydown', value3, true));
     },
-    _0x28d99d = () => {
-      _0x4dde22
+    handler14 = () => {
+      toolbarEl2
         .querySelectorAll('.comment-toolbar-color-wrap')
-        .forEach((_0x5d0ec9) => _0x5d0ec9.classList.remove('is-open'));
+        .forEach((el8) => el8.classList.remove('is-open'));
     },
-    _0x2beedb = () => {
-      if (_0x477f74) _0x477f74.classList.remove('is-open');
-      _0x2af8a2();
+    handler15 = () => {
+      if (el3) el3.classList.remove('is-open');
+      handler12();
     },
-    _0x2a4498 = () => {
-      ((_0x3c4ae8 = null),
-        _0x4dde22.classList.remove('comment-toolbar-popup-open'),
-        _0x28d99d(),
-        _0x2beedb());
+    handler16 = () => {
+      ((value2 = null), toolbarEl2.classList.remove('comment-toolbar-popup-open'), handler14(), handler15());
     },
-    _0x120ee2 = (_0xa65414) => {
-      ((_0x3c4ae8 = _0xa65414),
-        _0x4dde22.classList.add('comment-toolbar-popup-open'),
-        _0x4dde22.querySelectorAll('.comment-toolbar-color-wrap').forEach((_0x33f2a7) => {
-          _0x33f2a7.classList.toggle('is-open', _0x33f2a7.dataset.role === _0xa65414);
+    handler17 = (value6) => {
+      ((value2 = value6),
+        toolbarEl2.classList.add('comment-toolbar-popup-open'),
+        toolbarEl2.querySelectorAll('.comment-toolbar-color-wrap').forEach((el9) => {
+          el9.classList.toggle('is-open', el9.dataset.role === value6);
         }),
-        _0x477f74 && _0x477f74.classList.toggle('is-open', _0xa65414 === 'jump-shortcut'),
-        _0xa65414 !== 'jump-shortcut' && _0x2af8a2(),
-        _0xa65414 === 'jump-shortcut' && (_0x21d152?.focus(), _0x5d22ab()));
+        el3 && el3.classList.toggle('is-open', value6 === 'jump-shortcut'),
+        value6 !== 'jump-shortcut' && handler12(),
+        value6 === 'jump-shortcut' && (el5?.focus(), handler8()));
     };
-  _0x4dde22.addEventListener('focusout', (_0x32215e) => {
-    if (!_0x4dde22.contains(_0x32215e.relatedTarget)) _0x2a4498();
+  toolbarEl2.addEventListener('focusout', (value7) => {
+    if (!toolbarEl2.contains(value7.relatedTarget)) handler16();
   });
-  const _0x23411a = (_0x394549) => {
-      const _0xf9f054 = normalizeCommentNoteStyle(_0x394549 || _0x493f36());
-      (_0x4dde22
+  const run = (value8) => {
+      const commentNoteStyle = normalizeCommentNoteStyle(value8 || getCurrentStyle());
+      (toolbarEl2
         .querySelectorAll('[data-action="text-color"]')
-        .forEach((_0x35298e) =>
-          _0x35298e.classList.toggle('is-active', _0x35298e.dataset.value === _0xf9f054.textColor),
+        .forEach((el10) =>
+          el10.classList.toggle('is-active', el10.dataset.value === commentNoteStyle.textColor),
         ),
-        _0x4dde22
+        toolbarEl2
           .querySelectorAll('[data-action="background-color"]')
-          .forEach((_0x781f6c) =>
-            _0x781f6c.classList.toggle('is-active', _0x781f6c.dataset.value === _0xf9f054.backgroundColor),
+          .forEach((el11) =>
+            el11.classList.toggle('is-active', el11.dataset.value === commentNoteStyle.backgroundColor),
           ),
-        setColorDot(_0x305970, _0xf9f054.textColor),
-        setColorDot(_0x8e56c7, _0xf9f054.backgroundColor),
-        _0x5d22ab(),
-        _0x1c9c46());
+        setColorDot(next, commentNoteStyle.textColor),
+        setColorDot(current, commentNoteStyle.backgroundColor),
+        handler8(),
+        handler4());
     },
-    _0x326222 = (_0x10b61f) => {
-      const _0x51985d = normalizeCommentNoteStyle(_0x493f36()),
-        _0x3ee007 = normalizeCommentNoteStyle({ ..._0x51985d, ..._0x10b61f });
-      (appStore.updateNodeData(_0x517faf, { style: _0x3ee007 }), commit());
+    handler18 = (args) => {
+      const args2 = normalizeCommentNoteStyle(getCurrentStyle()),
+        style = normalizeCommentNoteStyle({ ...args2, ...args });
+      (appStore.updateNodeData(nodeId, { style: style }), commit());
     },
-    _0x24c96a = ({ commitHistory: commitHistory = true } = {}) => {
-      if (!_0x352f7d) return;
-      const _0x184200 = normalizeJumpShortcutZoomPercent(_0x352f7d.value);
-      _0x45a6c6({ zoomPercent: _0x184200 }, { commitHistory: commitHistory });
+    handler19 = ({ commitHistory: commitHistory = true } = {}) => {
+      if (!el6) return;
+      const zoomPercent = normalizeJumpShortcutZoomPercent(el6.value);
+      handler11({ zoomPercent: zoomPercent }, { commitHistory: commitHistory });
     };
   return (
-    _0x352f7d?.addEventListener('input', () => _0x24c96a({ commitHistory: false })),
-    _0x352f7d?.addEventListener('change', () => _0x24c96a({ commitHistory: true })),
-    _0x4dde22.addEventListener('click', (_0x2cc3e1) => {
-      const _0x50a3ed = _0x2cc3e1.target.closest('button');
-      if (!_0x50a3ed) return;
-      _0x2cc3e1.stopPropagation();
-      const _0x55c2d0 = _0x50a3ed.dataset.action;
-      if (_0x55c2d0 === 'jump-toggle-record') {
-        _0x3c6860 ? _0x2af8a2() : _0x2c6138();
+    el6?.addEventListener('input', () => handler19({ commitHistory: false })),
+    el6?.addEventListener('change', () => handler19({ commitHistory: true })),
+    toolbarEl2.addEventListener('click', (event4) => {
+      const el12 = event4.target.closest('button');
+      if (!el12) return;
+      event4.stopPropagation();
+      const value9 = el12.dataset.action;
+      if (value9 === 'jump-toggle-record') {
+        enabled ? handler12() : handler13();
         return;
       }
-      if (_0x55c2d0 === 'jump-clear-keys') {
-        (_0x2af8a2(), _0x45a6c6({ keys: [] }), window.showToast?.(I18N.jumpCleared, 'success'));
+      if (value9 === 'jump-clear-keys') {
+        (handler12(), handler11({ keys: [] }), window.showToast?.(I18N.jumpCleared, 'success'));
         return;
       }
-      if (_0x50a3ed.classList.contains('act-jump-shortcut')) {
-        if (_0x3c4ae8 === 'jump-shortcut') _0x2a4498();
-        else _0x120ee2('jump-shortcut');
+      if (el12.classList.contains('act-jump-shortcut')) {
+        if (value2 === 'jump-shortcut') handler16();
+        else handler17('jump-shortcut');
         return;
       }
-      if (_0x50a3ed.classList.contains('act-convert-markdown')) {
-        const _0x31f153 = _0x2ca4cf(),
-          _0xaf490c = (typeof _0x460bc3 === 'function' && _0x460bc3()) || _0x31f153;
-        if (!_0xaf490c) return;
-        const _0x1ed125 = (_0x31f153?.contentFormat || _0xaf490c.contentFormat) !== 'markdown';
-        (appStore.updateNodeData(_0x517faf, {
-          content: typeof _0xaf490c.content === 'string' ? _0xaf490c.content : '',
-          contentFormat: _0x1ed125 ? 'markdown' : 'plain',
+      if (el12.classList.contains('act-convert-markdown')) {
+        const value10 = handler(),
+          enabled4 = (typeof getNodeSnapshot === 'function' && getNodeSnapshot()) || value10;
+        if (!enabled4) return;
+        const contentFormat = (value10?.contentFormat || enabled4.contentFormat) !== 'markdown';
+        (appStore.updateNodeData(nodeId, {
+          content: typeof enabled4.content === 'string' ? enabled4.content : '',
+          contentFormat: contentFormat ? 'markdown' : 'plain',
         }),
           commit(),
-          window.showToast?.(_0x1ed125 ? I18N.markdownConverted : I18N.plainTextConverted, 'success'),
-          _0x1c9c46(),
-          _0x2a4498());
+          window.showToast?.(contentFormat ? I18N.markdownConverted : I18N.plainTextConverted, 'success'),
+          handler4(),
+          handler16());
         return;
       }
-      if (_0x50a3ed.classList.contains('act-font-dec')) {
-        const _0x584879 = normalizeCommentNoteStyle(_0x493f36());
-        (_0x326222({ fontSize: _0x584879.fontSize - _0xa78453 }), _0x2a4498());
+      if (el12.classList.contains('act-font-dec')) {
+        const fontSize = normalizeCommentNoteStyle(getCurrentStyle());
+        (handler18({ fontSize: fontSize.fontSize - source }), handler16());
         return;
       }
-      if (_0x50a3ed.classList.contains('act-font-inc')) {
-        const _0x4a8d65 = normalizeCommentNoteStyle(_0x493f36());
-        (_0x326222({ fontSize: _0x4a8d65.fontSize + _0xa78453 }), _0x2a4498());
+      if (el12.classList.contains('act-font-inc')) {
+        const fontSize2 = normalizeCommentNoteStyle(getCurrentStyle());
+        (handler18({ fontSize: fontSize2.fontSize + source }), handler16());
         return;
       }
-      if (_0x50a3ed.classList.contains('act-delete-node')) {
-        (appStore.deleteNodes([_0x517faf]), commit(), _0x2a4498());
+      if (el12.classList.contains('act-delete-node')) {
+        (appStore.deleteNodes([nodeId]), commit(), handler16());
         return;
       }
-      if (_0x50a3ed.classList.contains('act-text-color')) {
-        if (_0x3c4ae8 === 'text-color') _0x2a4498();
-        else _0x120ee2('text-color');
+      if (el12.classList.contains('act-text-color')) {
+        if (value2 === 'text-color') handler16();
+        else handler17('text-color');
         return;
       }
-      if (_0x50a3ed.classList.contains('act-bg-color')) {
-        if (_0x3c4ae8 === 'background-color') _0x2a4498();
-        else _0x120ee2('background-color');
+      if (el12.classList.contains('act-bg-color')) {
+        if (value2 === 'background-color') handler16();
+        else handler17('background-color');
         return;
       }
-      const _0x545062 = _0x50a3ed.dataset.value;
-      if (_0x55c2d0 === 'text-color' && _0x545062) {
-        (_0x326222({ textColor: _0x545062 }), _0x2a4498());
+      const textColor = el12.dataset.value;
+      if (value9 === 'text-color' && textColor) {
+        (handler18({ textColor: textColor }), handler16());
         return;
       }
-      _0x55c2d0 === 'background-color' &&
-        _0x545062 &&
-        (_0x326222({ backgroundColor: _0x545062 }), _0x2a4498());
+      value9 === 'background-color' && textColor && (handler18({ backgroundColor: textColor }), handler16());
     }),
-    _0x23411a(_0x493f36()),
-    _0x23411a
+    run(getCurrentStyle()),
+    run
   );
 }

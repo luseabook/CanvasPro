@@ -1,5 +1,8 @@
 import { showStoryClipRecovery } from '../../modules/storyWorkspace/StoryClipPreview.js';
-import { createStoryClipExportGuard, validateStoryClipOutput } from '../../modules/storyWorkspace/storyClipModel.js';
+import {
+  createStoryClipExportGuard,
+  validateStoryClipOutput,
+} from '../../modules/storyWorkspace/storyClipModel.js';
 import { runLocalMediaClipExport, canUseElectronMediaTask } from '../../../api/localMediaTaskApi.js';
 import appStore from '../../core/stores/appStore.js';
 import { generateId } from '../../core/math.js';
@@ -27,410 +30,422 @@ import {
 } from './mediaClipSourceResolver.js';
 import { firstNonEmpty, normalizeText, stopPointer, toNumber } from './mediaClipUtils.js';
 import { makeButton } from './mediaClipViewUtils.js';
-function mediaClipText(_0x30cbad, _0x3023a6 = {}) {
-  return t('mediaClip.' + _0x30cbad, _0x3023a6);
+function mediaClipText(value, item = {}) {
+  return t('mediaClip.' + value, item);
 }
-export function singleVisualClipExportTrack(_0x4b56f3 = {}) {
+export function singleVisualClipExportTrack(sourceKey = {}) {
   return {
-    sourceKey: _0x4b56f3.sourceKey,
-    startSec: _0x4b56f3.startSec,
-    endSec: _0x4b56f3.endSec,
-    durationSec: _0x4b56f3.durationSec,
+    sourceKey: sourceKey.sourceKey,
+    startSec: sourceKey.startSec,
+    endSec: sourceKey.endSec,
+    durationSec: sourceKey.durationSec,
   };
 }
-export function exportVisualClips(_0x5eda5d, _0x2cdfda = _0x5eda5d._mediaClip.tracks?.video) {
-  return _0x5eda5d
-    ._videoTimelineClips(_0x2cdfda)
-    .map((_0x36272c, _0x19df7c) => {
-      const _0x297131 = _0x5eda5d._videoClipSource(_0x36272c, _0x19df7c),
-        _0x2263e0 = firstNonEmpty(
-          resolveMediaClipSourceKey(_0x297131),
-          _0x36272c?.sourceKey,
-          resolveMediaClipLocalPath(_0x297131),
+export function exportVisualClips(kind, key = kind._mediaClip.tracks?.video) {
+  return kind
+    ._videoTimelineClips(key)
+    .map((startSec, index) => {
+      const source = kind._videoClipSource(startSec, index),
+        sourceKey2 = firstNonEmpty(
+          resolveMediaClipSourceKey(source),
+          startSec?.sourceKey,
+          resolveMediaClipLocalPath(source),
         );
-      if (!_0x2263e0) return null;
+      if (!sourceKey2) return null;
       return {
-        source: _0x297131,
-        sourceKey: _0x2263e0,
-        kind: _0x5eda5d._visualClipKind(_0x36272c, _0x297131),
-        startSec: _0x36272c.startSec,
-        endSec: _0x36272c.endSec,
-        durationSec: _0x36272c.durationSec,
-        timelineStartSec: _0x36272c.timelineStartSec,
-        timelineEndSec: _0x36272c.timelineEndSec,
+        source: source,
+        sourceKey: sourceKey2,
+        kind: kind._visualClipKind(startSec, source),
+        startSec: startSec.startSec,
+        endSec: startSec.endSec,
+        durationSec: startSec.durationSec,
+        timelineStartSec: startSec.timelineStartSec,
+        timelineEndSec: startSec.timelineEndSec,
       };
     })
     .filter(Boolean);
 }
-export function firstExportVideoSource(_0x43a657, _0x1089fe = []) {
+export function firstExportVideoSource(result, list = []) {
   return (
-    _0x1089fe.find((_0x2f30f5) => _0x2f30f5.kind === 'video')?.source ||
-    _0x1089fe[0]?.source ||
-    _0x43a657._firstVideoSource()
+    list.find((item2) => item2.kind === 'video')?.source || list[0]?.source || result._firstVideoSource()
   );
 }
-export function exportVisualDurationSec(_0x308f7c = []) {
-  return _0x308f7c.reduce((_0x3147a2, _0x4b07f8) => {
-    const _0x563aff = toNumber(_0x4b07f8?.startSec, 0),
-      _0x1345bc = Math.max(_0x563aff, toNumber(_0x4b07f8?.endSec, _0x563aff));
-    return _0x3147a2 + Math.max(0, _0x1345bc - _0x563aff);
+export function exportVisualDurationSec(list2 = []) {
+  return list2.reduce((item3, data) => {
+    const toNumber2 = toNumber(data?.startSec, 0),
+      options = Math.max(toNumber2, toNumber(data?.endSec, toNumber2));
+    return item3 + Math.max(0, options - toNumber2);
   }, 0);
 }
-export function exportAudioClips(_0x16be59, _0x4090be = _0x16be59._mediaClip.tracks?.audio) {
-  return _0x16be59
-    ._audioTimelineClips(_0x4090be)
-    .map((_0x19efc3, _0x45849e) => {
-      const _0x2968dd = _0x16be59._audioClipSource(_0x19efc3, _0x45849e),
-        _0xa4b13 = firstNonEmpty(
-          resolveMediaClipSourceKey(_0x2968dd),
-          _0x19efc3?.sourceKey,
-          resolveMediaClipLocalPath(_0x2968dd),
+export function exportAudioClips(target, next = target._mediaClip.tracks?.audio) {
+  return target
+    ._audioTimelineClips(next)
+    .map((startSec2, current) => {
+      const source2 = target._audioClipSource(startSec2, current),
+        sourceKey3 = firstNonEmpty(
+          resolveMediaClipSourceKey(source2),
+          startSec2?.sourceKey,
+          resolveMediaClipLocalPath(source2),
         );
-      if (!_0xa4b13) return null;
+      if (!sourceKey3) return null;
       return {
-        source: _0x2968dd,
-        sourceKey: _0xa4b13,
-        startSec: _0x19efc3.startSec,
-        endSec: _0x19efc3.endSec,
-        durationSec: _0x19efc3.durationSec,
-        timelineStartSec: _0x19efc3.timelineStartSec,
-        timelineEndSec: _0x19efc3.timelineEndSec,
-        laneIndex: _0x19efc3.laneIndex,
-        muted: _0x19efc3.muted === true,
-        disabled: _0x19efc3.disabled === true,
-        ...(_0x19efc3.volume !== undefined ? { volume: _0x19efc3.volume } : {}),
+        source: source2,
+        sourceKey: sourceKey3,
+        startSec: startSec2.startSec,
+        endSec: startSec2.endSec,
+        durationSec: startSec2.durationSec,
+        timelineStartSec: startSec2.timelineStartSec,
+        timelineEndSec: startSec2.timelineEndSec,
+        laneIndex: startSec2.laneIndex,
+        muted: startSec2.muted === true,
+        disabled: startSec2.disabled === true,
+        ...(startSec2.volume !== undefined ? { volume: startSec2.volume } : {}),
       };
     })
     .filter(Boolean);
 }
-export function exportLoadingTargetElement(_0x3ea77d) {
+export function exportLoadingTargetElement(entry) {
   return (
-    _0x3ea77d.el?.querySelector?.('.media-clip-preview') ||
-    _0x3ea77d.el?.querySelector?.('.media-clip-compact-body') ||
-    _0x3ea77d.el ||
+    entry.el?.querySelector?.('.media-clip-preview') ||
+    entry.el?.querySelector?.('.media-clip-compact-body') ||
+    entry.el ||
     null
   );
 }
-export function startExportLoading(_0xdaaa61, _0x4058a4 = mediaClipText('export.loading')) {
+export function startExportLoading(record, mediaClipText2 = mediaClipText('export.loading')) {
   if (typeof document === 'undefined') return;
-  const _0x2e3d37 = _0xdaaa61._exportLoadingTargetElement();
-  if (!_0x2e3d37) return;
-  _0xdaaa61._exportLoadingTarget &&
-    _0xdaaa61._exportLoadingTarget !== _0x2e3d37 &&
-    _0xdaaa61._stopExportLoading();
-  ((_0xdaaa61._exportLoadingTarget = _0x2e3d37), _0x2e3d37.classList?.add('is-exporting-material'));
-  const _0x2c8598 = _0x2e3d37.querySelector?.('.media-clip-export-loading-overlay');
-  if (_0x2c8598) {
-    const _0x1d3169 = _0x2c8598.querySelector?.('.media-clip-export-loading-label');
-    if (_0x1d3169) _0x1d3169.textContent = _0x4058a4;
+  const el = record._exportLoadingTargetElement();
+  if (!el) return;
+  record._exportLoadingTarget && record._exportLoadingTarget !== el && record._stopExportLoading();
+  ((record._exportLoadingTarget = el), el.classList?.add('is-exporting-material'));
+  const el2 = el.querySelector?.('.media-clip-export-loading-overlay');
+  if (el2) {
+    const el3 = el2.querySelector?.('.media-clip-export-loading-label');
+    if (el3) el3.textContent = mediaClipText2;
     return;
   }
-  const _0x57b0a2 = document.createElement('div');
-  ((_0x57b0a2.className = 'media-clip-export-loading-overlay'),
-    _0x57b0a2.setAttribute('role', 'status'),
-    _0x57b0a2.setAttribute('aria-live', 'polite'));
-  const _0x26a2cd = document.createElement('div');
-  _0x26a2cd.className = 'media-clip-export-loading-spinner';
-  const _0x5e470e = document.createElement('div');
-  ((_0x5e470e.className = 'media-clip-export-loading-label'), (_0x5e470e.textContent = _0x4058a4));
-  const _0x143084 = document.createElement('div');
-  _0x143084.className = 'media-clip-export-loading-bar';
-  const _0x257768 = document.createElement('div');
-  ((_0x257768.className = 'media-clip-export-loading-bar-fill'),
-    _0x143084.appendChild(_0x257768),
-    _0x57b0a2.append(_0x26a2cd, _0x5e470e, _0x143084),
-    _0x2e3d37.appendChild(_0x57b0a2));
+  const el4 = document.createElement('div');
+  ((el4.className = 'media-clip-export-loading-overlay'),
+    el4.setAttribute('role', 'status'),
+    el4.setAttribute('aria-live', 'polite'));
+  const payload = document.createElement('div');
+  payload.className = 'media-clip-export-loading-spinner';
+  const el5 = document.createElement('div');
+  ((el5.className = 'media-clip-export-loading-label'), (el5.textContent = mediaClipText2));
+  const el6 = document.createElement('div');
+  el6.className = 'media-clip-export-loading-bar';
+  const handle = document.createElement('div');
+  ((handle.className = 'media-clip-export-loading-bar-fill'),
+    el6.appendChild(handle),
+    el4.append(payload, el5, el6),
+    el.appendChild(el4));
 }
-export function stopExportLoading(_0x518d8e) {
-  const _0xcbe1b2 = _0x518d8e._exportLoadingTarget;
-  (_0xcbe1b2?.classList?.remove('is-exporting-material'),
-    _0xcbe1b2?.querySelectorAll?.('.media-clip-export-loading-overlay')?.forEach((_0x2d851f) => {
-      if (typeof _0x2d851f.remove === 'function') {
-        _0x2d851f.remove();
+export function stopExportLoading(state) {
+  const el7 = state._exportLoadingTarget;
+  (el7?.classList?.remove('is-exporting-material'),
+    el7?.querySelectorAll?.('.media-clip-export-loading-overlay')?.forEach((el8) => {
+      if (typeof el8.remove === 'function') {
+        el8.remove();
         return;
       }
-      _0x2d851f.parentNode?.removeChild?.(_0x2d851f);
+      el8.parentNode?.removeChild?.(el8);
     }),
-    (_0x518d8e._exportLoadingTarget = null));
+    (state._exportLoadingTarget = null));
 }
 export function waitForExportLoadingFrame() {
-  return new Promise((_0x16c342) => {
+  return new Promise((handler) => {
     if (typeof requestAnimationFrame === 'function') {
-      requestAnimationFrame(() => _0x16c342());
+      requestAnimationFrame(() => handler());
       return;
     }
-    setTimeout(_0x16c342, 0);
+    setTimeout(handler, 0);
   });
 }
-export async function exportMaterialToCanvas(_0x49a06d, _0x4de78d = 'video', _0x40dbd5 = 0) {
-  if (_0x49a06d.nodeData?.storySequence || _0x49a06d._storyClipNodesContext) { window.showToast?.('本批初剪请使用整段导出；单素材请定位原已采纳媒体。'); return; }
-  if (_0x49a06d._exporting) return;
-  const _0x18a61d = _0x4de78d === 'audio' ? 'audio' : 'video';
-  let _0x28c425 = null,
-    _0x447dc5 = null,
-    _0x18ec48 = '',
-    _0x40aba4 = {},
-    _0x39184c = null;
-  if (_0x18a61d === 'audio') {
-    const _0x44d66c = _0x49a06d._mediaClip.tracks?.audio || null,
-      _0x20d35e = _0x49a06d._audioTimelineClips(_0x44d66c),
-      _0x3813f3 = Math.max(0, Math.min(_0x20d35e.length - 1, Math.trunc(toNumber(_0x40dbd5, 0)))),
-      _0x33cfc8 = _0x20d35e[_0x3813f3] || null,
-      _0x1e7b8c = _0x33cfc8
+export async function exportMaterialToCanvas(videoTrack, config = 'video', scope = 0) {
+  if (videoTrack.nodeData?.storySequence || videoTrack._storyClipNodesContext) {
+    window.showToast?.('本批初剪请使用整段导出；单素材请定位原已采纳媒体。');
+    return;
+  }
+  if (videoTrack._exporting) return;
+  const input = config === 'audio' ? 'audio' : 'video';
+  let mediaClipExportPayload = null,
+    audioSource = null,
+    output = '',
+    value2 = {},
+    enabled = null;
+  if (input === 'audio') {
+    const value3 = videoTrack._mediaClip.tracks?.audio || null,
+      list3 = videoTrack._audioTimelineClips(value3),
+      value4 = Math.max(0, Math.min(list3.length - 1, Math.trunc(toNumber(scope, 0)))),
+      sourceKey4 = list3[value4] || null,
+      audioTrack = sourceKey4
         ? {
-            sourceKey: _0x33cfc8.sourceKey,
-            startSec: _0x33cfc8.startSec,
-            endSec: _0x33cfc8.endSec,
-            durationSec: _0x33cfc8.durationSec,
+            sourceKey: sourceKey4.sourceKey,
+            startSec: sourceKey4.startSec,
+            endSec: sourceKey4.endSec,
+            durationSec: sourceKey4.durationSec,
           }
-        : _0x44d66c;
-    ((_0x447dc5 = _0x33cfc8 ? _0x49a06d._audioClipSource(_0x33cfc8, _0x3813f3) : _0x49a06d._sources.audio),
-      (_0x28c425 = buildMediaClipExportPayload({ audioSource: _0x447dc5, audioTrack: _0x1e7b8c })),
-      (_0x18ec48 = 'audio'),
-      (_0x40aba4 = {
-        source: _0x447dc5,
+        : value3;
+    ((audioSource = sourceKey4 ? videoTrack._audioClipSource(sourceKey4, value4) : videoTrack._sources.audio),
+      (mediaClipExportPayload = buildMediaClipExportPayload({
+        audioSource: audioSource,
+        audioTrack: audioTrack,
+      })),
+      (output = 'audio'),
+      (value2 = {
+        source: audioSource,
         name: mediaClipText('outputNames.audio'),
-        durationSec: Math.max(0, toNumber(_0x1e7b8c?.endSec, 0) - toNumber(_0x1e7b8c?.startSec, 0)),
+        durationSec: Math.max(0, toNumber(audioTrack?.endSec, 0) - toNumber(audioTrack?.startSec, 0)),
       }));
   } else {
-    const _0x5062a5 = _0x49a06d._videoTimelineClips(_0x49a06d._mediaClip.tracks?.video),
-      _0x45570c = Math.max(0, Math.min(_0x5062a5.length - 1, Math.trunc(toNumber(_0x40dbd5, 0)))),
-      _0x391215 = _0x5062a5[_0x45570c];
-    if (!_0x391215) return;
-    _0x447dc5 = _0x49a06d._videoClipSource(_0x391215, _0x45570c);
-    const _0x687d45 = _0x49a06d._visualClipKind(_0x391215, _0x447dc5);
-    _0x687d45 === 'image'
-      ? ((_0x39184c = _0x447dc5), (_0x40aba4 = { name: mediaClipText('outputNames.image') }))
-      : ((_0x28c425 = buildMediaClipExportPayload({
-          videoSource: _0x447dc5,
-          videoTrack: _0x49a06d._singleVisualClipExportTrack(_0x391215),
+    const list4 = videoTrack._videoTimelineClips(videoTrack._mediaClip.tracks?.video),
+      value5 = Math.max(0, Math.min(list4.length - 1, Math.trunc(toNumber(scope, 0)))),
+      enabled2 = list4[value5];
+    if (!enabled2) return;
+    audioSource = videoTrack._videoClipSource(enabled2, value5);
+    const value6 = videoTrack._visualClipKind(enabled2, audioSource);
+    value6 === 'image'
+      ? ((enabled = audioSource), (value2 = { name: mediaClipText('outputNames.image') }))
+      : ((mediaClipExportPayload = buildMediaClipExportPayload({
+          videoSource: audioSource,
+          videoTrack: videoTrack._singleVisualClipExportTrack(enabled2),
         })),
-        (_0x18ec48 = 'video'),
-        (_0x40aba4 = {
-          source: _0x447dc5,
+        (output = 'video'),
+        (value2 = {
+          source: audioSource,
           name: mediaClipText('outputNames.video'),
-          durationSec: Math.max(0, toNumber(_0x391215.endSec, 0) - toNumber(_0x391215.startSec, 0)),
+          durationSec: Math.max(0, toNumber(enabled2.endSec, 0) - toNumber(enabled2.startSec, 0)),
         }));
   }
-  if (!_0x28c425 && !_0x39184c) {
+  if (!mediaClipExportPayload && !enabled) {
     window.showToast?.(mediaClipText('export.noMaterial'));
     return;
   }
-  ((_0x49a06d._exporting = true),
-    _0x49a06d.el?.classList?.add('is-exporting'),
-    _0x49a06d._startExportLoading());
+  ((videoTrack._exporting = true),
+    videoTrack.el?.classList?.add('is-exporting'),
+    videoTrack._startExportLoading());
   try {
-    await _0x49a06d._waitForExportLoadingFrame();
-    if (_0x39184c) _0x49a06d._addImageOutputNodeFromSource(_0x39184c, _0x40aba4);
+    await videoTrack._waitForExportLoadingFrame();
+    if (enabled) videoTrack._addImageOutputNodeFromSource(enabled, value2);
     else {
-      const _0x2682f7 = await runLocalMediaClipExport(_0x28c425, { timeout: 0x927c0 });
-      _0x49a06d._addOutputNode(_0x18ec48 || _0x28c425.outputType, _0x2682f7, _0x40aba4);
+      const runLocalMediaClipExport2 = await runLocalMediaClipExport(mediaClipExportPayload, {
+        timeout: 0x927c0,
+      });
+      videoTrack._addOutputNode(
+        output || mediaClipExportPayload.outputType,
+        runLocalMediaClipExport2,
+        value2,
+      );
     }
     window.showToast?.(mediaClipText('export.materialAdded'));
-  } catch (_0x396c91) {
-    window.showToast?.(_0x396c91?.message || mediaClipText('export.materialFailed'));
+  } catch (error2) {
+    window.showToast?.(error2?.message || mediaClipText('export.materialFailed'));
   } finally {
-    ((_0x49a06d._exporting = false),
-      _0x49a06d.el?.classList?.remove('is-exporting'),
-      _0x49a06d._stopExportLoading(),
-      _0x49a06d._render());
+    ((videoTrack._exporting = false),
+      videoTrack.el?.classList?.remove('is-exporting'),
+      videoTrack._stopExportLoading(),
+      videoTrack._render());
   }
 }
-export function renderDownloadMenu(_0x470609) {
-  const _0x3ca330 = document.createElement('div');
-  _0x3ca330.className = 'v2-canvas-ctx-menu media-clip-menu';
-  const _0x33cd2c = mediaClipText('menu.addToCanvas'),
-    _0x334e47 = makeButton('v2-menu-row media-clip-menu-item', _0x33cd2c, _0x33cd2c);
-  _0x334e47.addEventListener('click', async (_0x4ccab1) => {
-    (stopPointer(_0x4ccab1), _0x470609._setDownloadMenuOpen(false), await _0x470609._exportAndUse('canvas'));
+export function renderDownloadMenu(value7) {
+  const value8 = document.createElement('div');
+  value8.className = 'v2-canvas-ctx-menu media-clip-menu';
+  const mediaClipText3 = mediaClipText('menu.addToCanvas'),
+    el9 = makeButton('v2-menu-row media-clip-menu-item', mediaClipText3, mediaClipText3);
+  el9.addEventListener('click', async (value9) => {
+    (stopPointer(value9), value7._setDownloadMenuOpen(false), await value7._exportAndUse('canvas'));
   });
-  const _0x3c61c6 = mediaClipText('menu.export'),
-    _0x424558 = makeButton('v2-menu-row media-clip-menu-item', _0x3c61c6, _0x3c61c6);
+  const mediaClipText4 = mediaClipText('menu.export'),
+    el10 = makeButton('v2-menu-row media-clip-menu-item', mediaClipText4, mediaClipText4);
   return (
-    _0x424558.addEventListener('click', async (_0x1ad03e) => {
-      (stopPointer(_0x1ad03e),
-        _0x470609._setDownloadMenuOpen(false),
-        await _0x470609._exportAndUse('download'));
+    el10.addEventListener('click', async (value10) => {
+      (stopPointer(value10), value7._setDownloadMenuOpen(false), await value7._exportAndUse('download'));
     }),
-    _0x3ca330.append(_0x334e47, _0x424558),
-    _0x3ca330
+    value8.append(el9, el10),
+    value8
   );
 }
-export async function exportAndUse(_0x2b04ab, _0x5c25c5) {
-  if (_0x2b04ab._exporting) return;
-  const _0xa40bf5 = _0x2b04ab._mediaClip.tracks?.video || null,
-    _0xb08d2e = _0x2b04ab._mediaClip.tracks?.audio || null,
-    _0x9fcd7e = _0x2b04ab._exportVisualClips(_0xa40bf5),
-    _0xd28170 = _0x2b04ab._exportAudioClips(_0xb08d2e),
-    _0xf2e234 = _0x2b04ab._firstExportVideoSource(_0x9fcd7e),
-    _0x3e51e4 = _0x2b04ab._exportVisualDurationSec(_0x9fcd7e),
-    _0x2bde47 = buildMediaClipExportPayload({
-      videoSource: _0xf2e234,
-      videoTrack: _0xa40bf5,
-      audioTrack: _0xb08d2e,
-      videoClips: _0x9fcd7e,
-      audioClips: _0xd28170,
+export async function exportAndUse(nodeId, value11) {
+  if (nodeId._exporting) return;
+  const videoTrack2 = nodeId._mediaClip.tracks?.video || null,
+    audioTrack2 = nodeId._mediaClip.tracks?.audio || null,
+    videoClips = nodeId._exportVisualClips(videoTrack2),
+    audioClips = nodeId._exportAudioClips(audioTrack2),
+    videoSource = nodeId._firstExportVideoSource(videoClips),
+    durationSec = nodeId._exportVisualDurationSec(videoClips),
+    payload2 = buildMediaClipExportPayload({
+      videoSource: videoSource,
+      videoTrack: videoTrack2,
+      audioTrack: audioTrack2,
+      videoClips: videoClips,
+      audioClips: audioClips,
     });
-  if (!_0x2bde47) {
+  if (!payload2) {
     window.showToast?.(mediaClipText('export.noClips'));
     return;
   }
-  let storyClipGuard, storyClipResult = null;
+  let storyClipGuard,
+    storyClipResult = null;
   try {
-    storyClipGuard = createStoryClipExportGuard({ store: appStore, nodeId: _0x2b04ab.id, payload: _0x2bde47,
-      expectedNodes: _0x2b04ab._storyClipNodesContext, requireMarked: !!(_0x2b04ab._storyClipNodesContext || _0x2b04ab.nodeData?.storySequence) });
-    if (storyClipGuard && !canUseElectronMediaTask()) throw new Error('镜头初剪渲染需更新后的桌面端，不调用浏览器后端');
-    if (storyClipGuard && !window.confirm(storyClipGuard.confirmation)) return;
-  } catch (error) { window.showToast?.(error.message); return; }
-  ((_0x2b04ab._exporting = true),
-    _0x2b04ab.el.classList.add('is-exporting'),
-    _0x2b04ab._startExportLoading());
-  try {
-    await _0x2b04ab._waitForExportLoadingFrame();
-    storyClipGuard?.assertCurrent();
-    let _0x3b7acd = null;
-    if (
-      !storyClipGuard && _0x2b04ab._mediaClip.lastOutput?.signature === _0x2bde47.signature &&
-      _0x2b04ab._mediaClip.lastOutput?.localPath
-    )
-      _0x3b7acd = { ..._0x2b04ab._mediaClip.lastOutput };
-    else {
-      _0x3b7acd = await runLocalMediaClipExport(storyClipGuard?.request || _0x2bde47, { timeout: 0x927c0 });
-      if (storyClipGuard) { storyClipResult = { ..._0x3b7acd, localPath: validateStoryClipOutput(_0x3b7acd) }; storyClipGuard.assertCurrent(); }
-      const _0x297095 = pickResultLocalPath(_0x3b7acd) || _0x3b7acd?.localPath || _0x3b7acd?.path || '',
-        _0x229d3f = {
-          ..._0x3b7acd,
-          outputType: _0x2bde47.outputType,
-          signature: _0x2bde47.signature,
-          localPath: _0x297095,
-        };
-      (_0x2b04ab._setMediaClip({ ..._0x2b04ab._mediaClip, lastOutput: _0x229d3f }, true, { render: false }),
-        (_0x3b7acd = _0x229d3f));
-    }
-    storyClipGuard?.assertCurrent();
-    (_0x5c25c5 === 'download'
-      ? downloadLocalPath(_0x3b7acd.localPath, _0x3b7acd.filename)
-      : _0x2b04ab._addOutputNode(_0x2bde47.outputType, _0x3b7acd, {
-          source: _0xf2e234,
-          ...(storyClipGuard ? { storySequenceOutput: storyClipGuard.outputSource } : {}),
-          durationSec:
-            _0x3e51e4 || Math.max(0, toNumber(_0xa40bf5?.endSec, 0) - toNumber(_0xa40bf5?.startSec, 0)),
-        }),
-      window.showToast?.(mediaClipText('export.clipExported')));
-  } catch (_0x36ab6d) {
-    if (storyClipGuard && storyClipResult?.localPath) showStoryClipRecovery(storyClipResult.localPath, _0x36ab6d?.message);
-    window.showToast?.(_0x36ab6d?.message || mediaClipText('export.clipFailed'));
-  } finally {
-    ((_0x2b04ab._exporting = false),
-      _0x2b04ab.el.classList.remove('is-exporting'),
-      _0x2b04ab._stopExportLoading());
-  }
-}
-export function resolveOutputNodePosition(_0x460aed, _0x5a85ed, _0x1909a4) {
-  return calcSafeSpawnPosNearNode(
-    appStore.getState()?.nodes || {},
-    _0x460aed.nodeData || {},
-    _0x5a85ed,
-    _0x1909a4,
-  );
-}
-export function addImageOutputNodeFromSource(_0x40a2be, _0x43355b = {}, _0x6a5df4 = {}) {
-  const _0x142932 = resolveMediaClipImageUrl(_0x43355b),
-    _0x2afb61 = resolveMediaClipLocalPath(_0x43355b);
-  if (!_0x142932 && !_0x2afb61) return;
-  const _0x215861 = resolveMediaClipDimensions(_0x43355b),
-    _0x5eda05 = getAutoMediaSizeByShortSide(_0x215861.width, _0x215861.height),
-    _0x24c41f = _0x40a2be._resolveOutputNodePosition(_0x5eda05.width, _0x5eda05.height),
-    _0x3467c1 = generateId('source-image'),
-    _0x2cd904 = buildSourceMediaNodePayload({
-      id: _0x3467c1,
-      type: 'source-image',
-      x: _0x24c41f.x,
-      y: _0x24c41f.y,
-      width: _0x5eda05.width,
-      height: _0x5eda05.height,
-      name: _0x6a5df4.name || mediaClipText('outputNames.image'),
-      src: _0x142932,
-      imageUrl: _0x142932,
-      sourceUrl: normalizeText(_0x43355b?.sourceUrl || _0x142932),
-      thumbUrl: normalizeText(_0x43355b?.thumbUrl || resolveMediaClipThumbUrl(_0x43355b)),
-      localPath: _0x2afb61,
-      originalLocalPath: normalizeText(_0x43355b?.originalLocalPath || _0x2afb61),
-      displayLocalPath: normalizeText(_0x43355b?.displayLocalPath || _0x2afb61),
-      naturalWidth: _0x215861.width,
-      naturalHeight: _0x215861.height,
-      fileName: _0x43355b?.fileName || '',
-      needsAutoResize: false,
+    storyClipGuard = createStoryClipExportGuard({
+      store: appStore,
+      nodeId: nodeId.id,
+      payload: payload2,
+      expectedNodes: nodeId._storyClipNodesContext,
+      requireMarked: !!(nodeId._storyClipNodesContext || nodeId.nodeData?.storySequence),
     });
-  (appStore.addNode(_0x2cd904), appStore.setSelectedNodes([_0x3467c1]), commit());
-}
-export function addOutputNode(_0x26f004, _0x565558, _0x3a1029 = {}, _0xd33e66 = {}) {
-  const _0x175eb8 = pickResultLocalPath(_0x3a1029) || normalizeText(_0x3a1029.localPath || _0x3a1029.path);
-  if (!_0x175eb8) return;
-  const _0x303cbb = localPathToUrl(_0x175eb8);
-  if (_0x565558 === 'audio') {
-    const _0x201d19 = generateId('source-audio'),
-      _0xd29dbd = _0x26f004._resolveOutputNodePosition(0x140, 140),
-      _0x5b99ad = buildSourceAudioNodePayload({
-        id: _0x201d19,
-        type: 'source-audio',
-        x: _0xd29dbd.x,
-        y: _0xd29dbd.y,
-        width: 0x140,
-        height: 140,
-        name: _0xd33e66.name || mediaClipText('outputNames.audio'),
-        src: _0x303cbb,
-        audioUrl: _0x303cbb,
-        localPath: _0x175eb8,
-        audioDuration: toNumber(_0x3a1029.audioDuration, _0xd33e66.durationSec || 0),
-        fileName: _0x3a1029.filename || '',
-      });
-    (appStore.addNode(_0x5b99ad), appStore.setSelectedNodes([_0x201d19]), commit());
+    if (storyClipGuard && !canUseElectronMediaTask())
+      throw new Error('镜头初剪渲染需更新后的桌面端，不调用浏览器后端');
+    if (storyClipGuard && !window.confirm(storyClipGuard.confirmation)) return;
+  } catch (error) {
+    window.showToast?.(error.message);
     return;
   }
-  const _0x4a95df = _0xd33e66.source || _0x26f004._sources.video,
-    _0x52a4b3 = resolveMediaClipOutputVideoDimensions(_0x4a95df, _0x3a1029),
-    _0x333df3 = getAutoMediaSizeByShortSide(_0x52a4b3.width, _0x52a4b3.height),
-    _0x275feb = _0x26f004._resolveOutputNodePosition(_0x333df3.width, _0x333df3.height),
-    _0xd38ad0 = generateId('source-video'),
-    _0x4b6e7b = resolveMediaClipPosterImageFields(_0x4a95df, _0x3a1029, _0xd33e66),
-    _0x3bf1e2 = _0x4b6e7b.isOutputPoster === true,
-    _0x4c599c = {
-      ...(_0xd33e66.storySequenceOutput ? { storySequenceOutput: _0xd33e66.storySequenceOutput } : {}),
+  ((nodeId._exporting = true), nodeId.el.classList.add('is-exporting'), nodeId._startExportLoading());
+  try {
+    await nodeId._waitForExportLoadingFrame();
+    storyClipGuard?.assertCurrent();
+    let args = null;
+    if (
+      !storyClipGuard &&
+      nodeId._mediaClip.lastOutput?.signature === payload2.signature &&
+      nodeId._mediaClip.lastOutput?.localPath
+    )
+      args = { ...nodeId._mediaClip.lastOutput };
+    else {
+      args = await runLocalMediaClipExport(storyClipGuard?.request || payload2, { timeout: 0x927c0 });
+      if (storyClipGuard) {
+        storyClipResult = { ...args, localPath: validateStoryClipOutput(args) };
+        storyClipGuard.assertCurrent();
+      }
+      const localPath = pickResultLocalPath(args) || args?.localPath || args?.path || '',
+        lastOutput = {
+          ...args,
+          outputType: payload2.outputType,
+          signature: payload2.signature,
+          localPath: localPath,
+        };
+      (nodeId._setMediaClip({ ...nodeId._mediaClip, lastOutput: lastOutput }, true, { render: false }),
+        (args = lastOutput));
+    }
+    storyClipGuard?.assertCurrent();
+    (value11 === 'download'
+      ? downloadLocalPath(args.localPath, args.filename)
+      : nodeId._addOutputNode(payload2.outputType, args, {
+          source: videoSource,
+          ...(storyClipGuard ? { storySequenceOutput: storyClipGuard.outputSource } : {}),
+          durationSec:
+            durationSec || Math.max(0, toNumber(videoTrack2?.endSec, 0) - toNumber(videoTrack2?.startSec, 0)),
+        }),
+      window.showToast?.(mediaClipText('export.clipExported')));
+  } catch (error3) {
+    if (storyClipGuard && storyClipResult?.localPath)
+      showStoryClipRecovery(storyClipResult.localPath, error3?.message);
+    window.showToast?.(error3?.message || mediaClipText('export.clipFailed'));
+  } finally {
+    ((nodeId._exporting = false), nodeId.el.classList.remove('is-exporting'), nodeId._stopExportLoading());
+  }
+}
+export function resolveOutputNodePosition(value12, value13, value14) {
+  return calcSafeSpawnPosNearNode(appStore.getState()?.nodes || {}, value12.nodeData || {}, value13, value14);
+}
+export function addImageOutputNodeFromSource(value15, fileName = {}, name = {}) {
+  const src = resolveMediaClipImageUrl(fileName),
+    localPath2 = resolveMediaClipLocalPath(fileName);
+  if (!src && !localPath2) return;
+  const naturalWidth = resolveMediaClipDimensions(fileName),
+    width = getAutoMediaSizeByShortSide(naturalWidth.width, naturalWidth.height),
+    x = value15._resolveOutputNodePosition(width.width, width.height),
+    id = generateId('source-image'),
+    sourceMediaNodePayload = buildSourceMediaNodePayload({
+      id: id,
+      type: 'source-image',
+      x: x.x,
+      y: x.y,
+      width: width.width,
+      height: width.height,
+      name: name.name || mediaClipText('outputNames.image'),
+      src: src,
+      imageUrl: src,
+      sourceUrl: normalizeText(fileName?.sourceUrl || src),
+      thumbUrl: normalizeText(fileName?.thumbUrl || resolveMediaClipThumbUrl(fileName)),
+      localPath: localPath2,
+      originalLocalPath: normalizeText(fileName?.originalLocalPath || localPath2),
+      displayLocalPath: normalizeText(fileName?.displayLocalPath || localPath2),
+      naturalWidth: naturalWidth.width,
+      naturalHeight: naturalWidth.height,
+      fileName: fileName?.fileName || '',
+      needsAutoResize: false,
+    });
+  (appStore.addNode(sourceMediaNodePayload), appStore.setSelectedNodes([id]), commit());
+}
+export function addOutputNode(value16, value17, fileName2 = {}, name2 = {}) {
+  const localPath3 = pickResultLocalPath(fileName2) || normalizeText(fileName2.localPath || fileName2.path);
+  if (!localPath3) return;
+  const src2 = localPathToUrl(localPath3);
+  if (value17 === 'audio') {
+    const id2 = generateId('source-audio'),
+      x2 = value16._resolveOutputNodePosition(0x140, 140),
+      sourceAudioNodePayload = buildSourceAudioNodePayload({
+        id: id2,
+        type: 'source-audio',
+        x: x2.x,
+        y: x2.y,
+        width: 0x140,
+        height: 140,
+        name: name2.name || mediaClipText('outputNames.audio'),
+        src: src2,
+        audioUrl: src2,
+        localPath: localPath3,
+        audioDuration: toNumber(fileName2.audioDuration, name2.durationSec || 0),
+        fileName: fileName2.filename || '',
+      });
+    (appStore.addNode(sourceAudioNodePayload), appStore.setSelectedNodes([id2]), commit());
+    return;
+  }
+  const value18 = name2.source || value16._sources.video,
+    naturalWidth2 = resolveMediaClipOutputVideoDimensions(value18, fileName2),
+    width2 = getAutoMediaSizeByShortSide(naturalWidth2.width, naturalWidth2.height),
+    x3 = value16._resolveOutputNodePosition(width2.width, width2.height),
+    id3 = generateId('source-video'),
+    mediaClipPosterImageFields = resolveMediaClipPosterImageFields(value18, fileName2, name2),
+    thumbUrl = mediaClipPosterImageFields.isOutputPoster === true,
+    value19 = {
+      ...(name2.storySequenceOutput ? { storySequenceOutput: name2.storySequenceOutput } : {}),
       ...buildSourceMediaNodePayload({
-        id: _0xd38ad0,
+        id: id3,
         type: 'source-video',
-        x: _0x275feb.x,
-        y: _0x275feb.y,
-        width: _0x333df3.width,
-        height: _0x333df3.height,
-        name: _0xd33e66.name || mediaClipText('outputNames.video'),
-        src: _0x303cbb,
-        videoUrl: _0x303cbb,
-        localPath: _0x175eb8,
-        originalLocalPath: _0x175eb8,
-        displayLocalPath: _0x175eb8,
-        thumbUrl: _0x3bf1e2 ? _0x4b6e7b.thumbUrl : '',
-        posterUrl: _0x3bf1e2 ? _0x4b6e7b.posterUrl : '',
-        thumbLocalPath: _0x3bf1e2 ? _0x4b6e7b.thumbLocalPath : '',
-        posterLocalPath: _0x3bf1e2 ? _0x4b6e7b.posterLocalPath : '',
-        videoThumbSrc: _0x303cbb,
-        naturalWidth: _0x52a4b3.width,
-        naturalHeight: _0x52a4b3.height,
-        videoWidth: _0x52a4b3.width,
-        videoHeight: _0x52a4b3.height,
+        x: x3.x,
+        y: x3.y,
+        width: width2.width,
+        height: width2.height,
+        name: name2.name || mediaClipText('outputNames.video'),
+        src: src2,
+        videoUrl: src2,
+        localPath: localPath3,
+        originalLocalPath: localPath3,
+        displayLocalPath: localPath3,
+        thumbUrl: thumbUrl ? mediaClipPosterImageFields.thumbUrl : '',
+        posterUrl: thumbUrl ? mediaClipPosterImageFields.posterUrl : '',
+        thumbLocalPath: thumbUrl ? mediaClipPosterImageFields.thumbLocalPath : '',
+        posterLocalPath: thumbUrl ? mediaClipPosterImageFields.posterLocalPath : '',
+        videoThumbSrc: src2,
+        naturalWidth: naturalWidth2.width,
+        naturalHeight: naturalWidth2.height,
+        videoWidth: naturalWidth2.width,
+        videoHeight: naturalWidth2.height,
         videoDuration: toNumber(
-          _0x3a1029.videoDuration,
-          _0xd33e66.durationSec || _0x26f004._mediaClip.tracks?.video?.endSec || 0,
+          fileName2.videoDuration,
+          name2.durationSec || value16._mediaClip.tracks?.video?.endSec || 0,
         ),
-        fileName: _0x3a1029.filename || '',
+        fileName: fileName2.filename || '',
         needsAutoResize: false,
       }),
-      naturalWidth: _0x52a4b3.width,
-      naturalHeight: _0x52a4b3.height,
-      videoWidth: _0x52a4b3.width,
-      videoHeight: _0x52a4b3.height,
+      naturalWidth: naturalWidth2.width,
+      naturalHeight: naturalWidth2.height,
+      videoWidth: naturalWidth2.width,
+      videoHeight: naturalWidth2.height,
       needsAutoResize: false,
     };
-  (appStore.addNode(_0x4c599c), appStore.setSelectedNodes([_0xd38ad0]), commit());
+  (appStore.addNode(value19), appStore.setSelectedNodes([id3]), commit());
 }

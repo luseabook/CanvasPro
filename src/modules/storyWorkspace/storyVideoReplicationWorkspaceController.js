@@ -27,565 +27,560 @@ import {
   syncStoryVideoReplicationCardElement,
   syncStoryReplicationSelection,
 } from './storyVideoReplicationPresentation.js';
-function normalizeText(_0x4846f6) {
-  return String(_0x4846f6 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function finishAnalysisAttempt(_0x26efa7, _0x1631fc, _0x55c799 = null) {
-  if (!_0x1631fc) return;
-  const _0x2935fb = {
-    ..._0x1631fc,
+function finishAnalysisAttempt(item, args, status = null) {
+  if (!args) return;
+  const context = {
+    ...args,
     finishedAt: Date['now'](),
-    status: _0x55c799 ? 'failed' : 'succeeded',
-    ...(_0x55c799
+    status: status ? 'failed' : 'succeeded',
+    ...(status
       ? {
-          error: String(_0x55c799['message'] || '视频分析失败')['slice'](0x0, 0x4b0),
-          code: _0x55c799['code'],
-          httpStatus: _0x55c799['status'],
-          errorType: _0x55c799['type'],
+          error: String(status['message'] || '视频分析失败')['slice'](0x0, 0x4b0),
+          code: status['code'],
+          httpStatus: status['status'],
+          errorType: status['type'],
         }
       : {}),
   };
-  ((_0x26efa7['replication']['analysisAttempts'] = [
-    ...(_0x26efa7['replication']['analysisAttempts'] || []),
-    _0x2935fb,
-  ]['slice'](-0xa)),
+  ((item['replication']['analysisAttempts'] = [...(item['replication']['analysisAttempts'] || []), context][
+    'slice'
+  ](-0xa)),
     void logDiagnosticEvent({
       type: 'story.replication_analysis_finished',
-      level: _0x55c799 ? 'error' : 'info',
-      message: _0x55c799 ? _0x2935fb['error'] : '原视频分析完成',
-      context: _0x2935fb,
+      level: status ? 'error' : 'info',
+      message: status ? context['error'] : '原视频分析完成',
+      context: context,
     }));
 }
 export function createStoryVideoReplicationWorkspaceController({
-  state: _0x3cface,
-  viewport: _0x351474,
+  state: state,
+  viewport: viewport,
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis['window'] || globalThis,
-  analyzeSourceVideo: _0x1bcbdc,
+  analyzeSourceVideo: analyzeSourceVideo,
   transcribeSource: transcribeSource = transcribeReplicationSource,
-  analysisPromises: _0x1535a2,
-  sourceFileByEpisodeKey: _0x2d2bff,
-  createProjectToken: _0x4bba83,
-  beginProjectSession: _0x44fa42,
-  isProjectTaskLive: _0x25aa94,
-  isProjectTaskCurrent: _0x3bd786,
-  startBackgroundTask: _0x258670,
-  updateBackgroundTask: _0x36982a,
-  finishBackgroundTask: _0x3c192c,
-  syncProjectEntry: _0x2ba442,
-  syncCurrentProjectEntry: _0xefa5e1,
-  schedulePersistence: _0xa436c9,
-  openProject: _0xe2504e,
-  renderFooter: _0x49e0b8,
-  showToast: _0xda3d8c,
-  showNavigableTaskResultToast: _0x515b50,
-  notifyTextTaskComplete: _0xb45264,
+  analysisPromises: analysisPromises,
+  sourceFileByEpisodeKey: sourceFileByEpisodeKey,
+  createProjectToken: createProjectToken,
+  beginProjectSession: beginProjectSession,
+  isProjectTaskLive: isProjectTaskLive,
+  isProjectTaskCurrent: isProjectTaskCurrent,
+  startBackgroundTask: startBackgroundTask,
+  updateBackgroundTask: updateBackgroundTask,
+  finishBackgroundTask: finishBackgroundTask,
+  syncProjectEntry: syncProjectEntry,
+  syncCurrentProjectEntry: syncCurrentProjectEntry,
+  schedulePersistence: schedulePersistence,
+  openProject: openProject,
+  renderFooter: renderFooter,
+  showToast: showToast,
+  showNavigableTaskResultToast: showNavigableTaskResultToast,
+  notifyTextTaskComplete: notifyTextTaskComplete,
 } = {}) {
   if (
-    !_0x3cface ||
-    !_0x351474 ||
+    !state ||
+    !viewport ||
     !documentObject ||
-    !(_0x1535a2 instanceof Map) ||
-    !(_0x2d2bff instanceof Map) ||
-    typeof _0x4bba83 !== 'function' ||
-    typeof _0x44fa42 !== 'function' ||
-    typeof _0x25aa94 !== 'function' ||
-    typeof _0x3bd786 !== 'function' ||
-    typeof _0x258670 !== 'function' ||
-    typeof _0x36982a !== 'function' ||
-    typeof _0x3c192c !== 'function' ||
-    typeof _0x2ba442 !== 'function' ||
-    typeof _0xefa5e1 !== 'function' ||
-    typeof _0xa436c9 !== 'function' ||
-    typeof _0xe2504e !== 'function' ||
-    typeof _0x49e0b8 !== 'function' ||
-    typeof _0xda3d8c !== 'function' ||
-    typeof _0x515b50 !== 'function' ||
-    typeof _0xb45264 !== 'function'
+    !(analysisPromises instanceof Map) ||
+    !(sourceFileByEpisodeKey instanceof Map) ||
+    typeof createProjectToken !== 'function' ||
+    typeof beginProjectSession !== 'function' ||
+    typeof isProjectTaskLive !== 'function' ||
+    typeof isProjectTaskCurrent !== 'function' ||
+    typeof startBackgroundTask !== 'function' ||
+    typeof updateBackgroundTask !== 'function' ||
+    typeof finishBackgroundTask !== 'function' ||
+    typeof syncProjectEntry !== 'function' ||
+    typeof syncCurrentProjectEntry !== 'function' ||
+    typeof schedulePersistence !== 'function' ||
+    typeof openProject !== 'function' ||
+    typeof renderFooter !== 'function' ||
+    typeof showToast !== 'function' ||
+    typeof showNavigableTaskResultToast !== 'function' ||
+    typeof notifyTextTaskComplete !== 'function'
   )
     throw new TypeError(
       'Story\x20video\x20replication\x20requires\x20task,\x20persistence,\x20and\x20presentation\x20adapters.',
     );
-  function _0x38a7ff(_0x267159) {
-    const _0x5594b8 = windowObject?.['URL'];
-    if (!_0x267159 || typeof _0x5594b8?.['createObjectURL'] !== 'function') return '';
+  function createSourcePreviewUrl(enabled) {
+    const key = windowObject?.['URL'];
+    if (!enabled || typeof key?.['createObjectURL'] !== 'function') return '';
     try {
-      return _0x5594b8['createObjectURL'](_0x267159);
-    } catch (_0x35cb91) {
-      return (console['warn']('[storyWorkspace] 创建复刻视频本地预览失败', _0x35cb91), '');
+      return key['createObjectURL'](enabled);
+    } catch (index) {
+      return (console['warn']('[storyWorkspace] 创建复刻视频本地预览失败', index), '');
     }
   }
-  function _0x313d26(_0x3f7e21) {
-    const _0x18f4a1 = normalizeText(_0x3f7e21),
-      _0x4a5b5e = windowObject?.['URL'];
-    if (!_0x18f4a1['startsWith']('blob:') || typeof _0x4a5b5e?.['revokeObjectURL'] !== 'function') return;
-    _0x4a5b5e['revokeObjectURL'](_0x18f4a1);
+  function revokeSourcePreviewUrl(result) {
+    const text = normalizeText(result),
+      data = windowObject?.['URL'];
+    if (!text['startsWith']('blob:') || typeof data?.['revokeObjectURL'] !== 'function') return;
+    data['revokeObjectURL'](text);
   }
-  function _0x1c21c8() {
-    (_0x3cface['replicationSourcePreviewUrls']['forEach'](_0x313d26),
-      (_0x3cface['replicationSourcePreviewUrls'] = []));
+  function releaseSourcePreviewUrls() {
+    (state['replicationSourcePreviewUrls']['forEach'](revokeSourcePreviewUrl),
+      (state['replicationSourcePreviewUrls'] = []));
   }
-  function _0x5843c8(_0x2c02cf) {
+  function refreshEpisode(episodeId2) {
     if (
-      _0x3cface['view'] !== 'project' ||
-      _0x3cface['step'] !== 0x1 ||
-      _0x3cface['data']?.['project']?.['sourceMode'] !== 'video-replication'
+      state['view'] !== 'project' ||
+      state['step'] !== 0x1 ||
+      state['data']?.['project']?.['sourceMode'] !== 'video-replication'
     )
       return ![];
-    const _0x296014 = _0x351474['querySelector']('.story-page.is-current'),
-      _0x3f79cd = findStoryReplicationEpisode(_0x3cface['data'], _0x2c02cf),
-      _0x190a93 = [...(_0x296014?.['querySelectorAll']('[data-story-replication-episode-id]') || [])]['find'](
-        (_0x2a4383) =>
-          _0x2a4383['matches']?.('article') &&
-          normalizeText(_0x2a4383['dataset']['storyReplicationEpisodeId']) === normalizeText(_0x2c02cf),
+    const el = viewport['querySelector']('.story-page.is-current'),
+      storyReplicationEpisode = findStoryReplicationEpisode(state['data'], episodeId2),
+      enabled2 = [...(el?.['querySelectorAll']('[data-story-replication-episode-id]') || [])]['find'](
+        (el2) =>
+          el2['matches']?.('article') &&
+          normalizeText(el2['dataset']['storyReplicationEpisodeId']) === normalizeText(episodeId2),
       );
-    if (!_0x296014 || !_0x3f79cd || !_0x190a93) return ![];
-    const _0xa55e57 = _0x3cface['data']['episodes']['indexOf'](_0x3f79cd);
+    if (!el || !storyReplicationEpisode || !enabled2) return ![];
+    const options = state['data']['episodes']['indexOf'](storyReplicationEpisode);
     return (
-      _0x296014['dispatchEvent']?.(
-        new CustomEvent('story-replication-updated', { detail: { episodeId: _0x2c02cf } }),
+      el['dispatchEvent']?.(
+        new CustomEvent('story-replication-updated', { detail: { episodeId: episodeId2 } }),
       ),
-      syncStoryVideoReplicationCardElement(_0x190a93, _0x3f79cd, _0xa55e57)
+      syncStoryVideoReplicationCardElement(enabled2, storyReplicationEpisode, options)
     );
   }
-  function _0x4c582e() {
+  function refreshFooter() {
     if (
-      _0x3cface['view'] !== 'project' ||
-      _0x3cface['step'] !== 0x1 ||
-      _0x3cface['data']?.['project']?.['sourceMode'] !== 'video-replication'
+      state['view'] !== 'project' ||
+      state['step'] !== 0x1 ||
+      state['data']?.['project']?.['sourceMode'] !== 'video-replication'
     )
       return ![];
-    const _0x5ee202 = _0x351474['querySelector']('.story-page.is-current'),
-      _0x29d68a = _0x5ee202?.['querySelector']('.story-page-footer');
-    if (_0x5ee202) syncStoryReplicationSelection(_0x5ee202, _0x3cface);
-    if (!_0x29d68a) return ![];
-    const _0x39c714 = documentObject['createElement']('template');
-    _0x39c714['innerHTML'] = _0x49e0b8(_0x3cface)['trim']();
-    const _0x127034 = _0x39c714['content']['firstElementChild'];
-    if (!_0x127034) return ![];
-    return (_0x29d68a['replaceWith'](_0x127034), !![]);
+    const el3 = viewport['querySelector']('.story-page.is-current'),
+      enabled3 = el3?.['querySelector']('.story-page-footer');
+    if (el3) syncStoryReplicationSelection(el3, state);
+    if (!enabled3) return ![];
+    const el4 = documentObject['createElement']('template');
+    el4['innerHTML'] = renderFooter(state)['trim']();
+    const enabled4 = el4['content']['firstElementChild'];
+    if (!enabled4) return ![];
+    return (enabled3['replaceWith'](enabled4), !![]);
   }
-  function _0x39848d(_0x1ffb09, _0x13ddca) {
+  function run(target, source) {
     if (
-      !_0x3bd786(_0x1ffb09) ||
-      _0x3cface['view'] !== 'project' ||
-      _0x3cface['step'] !== 0x1 ||
-      _0x3cface['data']?.['project']?.['sourceMode'] !== 'video-replication'
+      !isProjectTaskCurrent(target) ||
+      state['view'] !== 'project' ||
+      state['step'] !== 0x1 ||
+      state['data']?.['project']?.['sourceMode'] !== 'video-replication'
     )
       return ![];
-    const _0x2b4d2a = _0x5843c8(_0x13ddca),
-      _0x1b89cd = _0x4c582e();
-    return _0x2b4d2a && _0x1b89cd;
+    const next = refreshEpisode(source),
+      current = refreshFooter();
+    return next && current;
   }
-  async function _0x5bd7c5(
-    _0x2fce5e,
-    _0x6f99b8,
-    _0x59d73d,
+  async function analyzeEpisode(
+    projectId,
+    file,
+    episodeId3,
     { uploadOnly: uploadOnly = ![], force: force = ![] } = {},
   ) {
-    const _0x1b1a7d = findStoryReplicationEpisode(_0x2fce5e['data'], _0x59d73d);
-    if (!_0x1b1a7d || !_0x25aa94(_0x2fce5e)) return ![];
-    const _0x1d5c18 = force
-      ? { replication: { ..._0x1b1a7d['replication'] }, status: _0x1b1a7d['status'] }
-      : null;
-    let _0x30ab46 = null;
-    const _0x36c803 = buildStoryBackgroundTaskId('video-replication-analysis', { episodeId: _0x59d73d });
-    _0x258670(
-      _0x2fce5e,
+    const status2 = findStoryReplicationEpisode(projectId['data'], episodeId3);
+    if (!status2 || !isProjectTaskLive(projectId)) return ![];
+    const response = force ? { replication: { ...status2['replication'] }, status: status2['status'] } : null;
+    let entry = null;
+    const id = buildStoryBackgroundTaskId('video-replication-analysis', { episodeId: episodeId3 });
+    startBackgroundTask(
+      projectId,
       {
-        id: _0x36c803,
+        id: id,
         type: 'video-replication-analysis',
-        scope: { episodeId: _0x59d73d },
-        label: '解析第 ' + _0x1b1a7d['number'] + ' 集视频',
+        scope: { episodeId: episodeId3 },
+        label: '解析第 ' + status2['number'] + ' 集视频',
         message: '正在上传原视频',
       },
       { refreshHome: ![] },
     );
-    if (!force) invalidateStoryVideoReplicationAssetLocalization(_0x2fce5e['data']);
-    ((_0x1b1a7d['replication'] = {
-      ...(_0x1b1a7d['replication'] || {}),
+    if (!force) invalidateStoryVideoReplicationAssetLocalization(projectId['data']);
+    ((status2['replication'] = {
+      ...(status2['replication'] || {}),
       status: 'uploading',
       progress: 0xa,
       error: '',
     }),
-      _0x39848d(_0x2fce5e, _0x59d73d));
+      run(projectId, episodeId3));
     try {
-      const _0x441477 = validateStoryReplicationVideoSize(
-        _0x6f99b8 || _0x1b1a7d['sourceVideo'],
-        _0x2fce5e['modelSettings']['models']?.['text'],
+      const response2 = validateStoryReplicationVideoSize(
+        file || status2['sourceVideo'],
+        projectId['modelSettings']['models']?.['text'],
       );
-      if (!_0x441477['ok']) throw new Error(_0x441477['error']);
-      let _0x5d0e23 = normalizeText(_0x1b1a7d['sourceVideo']?.['videoRef']);
-      if (!_0x5d0e23) {
-        if (!_0x6f99b8) throw new Error('原视频尚未上传，请使用卡片上的“重新上传该视频”。');
-        const _0x9855e0 = readVideoFileNaturalSize(_0x6f99b8)['catch'](() => null),
-          _0x306060 = await uploadFile(_0x6f99b8, _0x2fce5e['projectId']);
-        if (!_0x25aa94(_0x2fce5e)) return ![];
-        const _0x41859a = await _0x9855e0;
-        if (!_0x25aa94(_0x2fce5e)) return ![];
-        const _0x57b86d = resolveStoryReplicationUploadedVideo(_0x306060);
-        _0x5d0e23 = _0x57b86d['videoRef'];
-        let _0x8675c3 = {
-          ..._0x306060,
-          localPath: _0x57b86d['localPath'] || _0x306060?.['localPath'],
-          videoUrl: _0x5d0e23,
+      if (!response2['ok']) throw new Error(response2['error']);
+      let videoUrl = normalizeText(status2['sourceVideo']?.['videoRef']);
+      if (!videoUrl) {
+        if (!file) throw new Error('原视频尚未上传，请使用卡片上的“重新上传该视频”。');
+        const videoFileNaturalSize = readVideoFileNaturalSize(file)['catch'](() => null),
+          args2 = await uploadFile(file, projectId['projectId']);
+        if (!isProjectTaskLive(projectId)) return ![];
+        const durationSec = await videoFileNaturalSize;
+        if (!isProjectTaskLive(projectId)) return ![];
+        const localPath = resolveStoryReplicationUploadedVideo(args2);
+        videoUrl = localPath['videoRef'];
+        let posterUrl = {
+          ...args2,
+          localPath: localPath['localPath'] || args2?.['localPath'],
+          videoUrl: videoUrl,
         };
         try {
-          _0x8675c3 = await ensureVideoResultThumbnail(_0x8675c3);
-        } catch (_0xe853ea) {
+          posterUrl = await ensureVideoResultThumbnail(posterUrl);
+        } catch (record) {
           globalThis['console']?.['warn']?.(
             '[storyWorkspace] 复刻视频首帧提取失败，继续执行视频解析',
-            _0xe853ea,
+            record,
           );
         }
-        if (!_0x25aa94(_0x2fce5e)) return ![];
-        applyStoryVideoReplicationUpload(_0x1b1a7d, {
-          file: _0x6f99b8,
-          videoRef: _0x5d0e23,
-          durationSec: _0x41859a?.['duration'] || _0x306060?.['durationSec'] || _0x306060?.['duration'],
-          posterUrl: _0x8675c3?.['posterUrl'] || _0x8675c3?.['thumbUrl'],
-          posterLocalPath: _0x8675c3?.['posterLocalPath'] || _0x8675c3?.['thumbLocalPath'],
+        if (!isProjectTaskLive(projectId)) return ![];
+        applyStoryVideoReplicationUpload(status2, {
+          file: file,
+          videoRef: videoUrl,
+          durationSec: durationSec?.['duration'] || args2?.['durationSec'] || args2?.['duration'],
+          posterUrl: posterUrl?.['posterUrl'] || posterUrl?.['thumbUrl'],
+          posterLocalPath: posterUrl?.['posterLocalPath'] || posterUrl?.['thumbLocalPath'],
         });
       } else
-        ((_0x1b1a7d['replication'] = {
-          ...(_0x1b1a7d['replication'] || {}),
+        ((status2['replication'] = {
+          ...(status2['replication'] || {}),
           status: 'analyzing',
           progress: 0x2d,
           error: '',
         }),
-          (_0x1b1a7d['status'] = '解析中'));
+          (status2['status'] = '解析中'));
       if (uploadOnly)
         return (
-          (_0x1b1a7d['replication']['status'] = 'pending'),
-          (_0x1b1a7d['replication']['progress'] = 0x0),
-          (_0x1b1a7d['status'] = '待分析'),
-          _0x3c192c(
-            _0x2fce5e,
-            _0x36c803,
+          (status2['replication']['status'] = 'pending'),
+          (status2['replication']['progress'] = 0x0),
+          (status2['status'] = '待分析'),
+          finishBackgroundTask(
+            projectId,
+            id,
             { status: 'succeeded', message: '视频已导入，等待选择分析' },
             { refreshHome: ![] },
           ),
-          syncStoryVideoReplicationProject(_0x2fce5e['data']),
-          _0x2ba442(_0x2fce5e),
-          _0xa436c9({ immediate: !![] }),
-          _0x39848d(_0x2fce5e, _0x59d73d),
+          syncStoryVideoReplicationProject(projectId['data']),
+          syncProjectEntry(projectId),
+          schedulePersistence({ immediate: !![] }),
+          run(projectId, episodeId3),
           !![]
         );
-      (_0x36982a(
-        _0x2fce5e,
-        _0x36c803,
+      (updateBackgroundTask(
+        projectId,
+        id,
         { status: 'running', message: '正在理解剧情、台词与镜头' },
         { refreshHome: ![] },
       ),
-        _0x39848d(_0x2fce5e, _0x59d73d));
-      const _0x365cc0 = normalizeText(_0x2fce5e['modelSettings']['models']?.['text']);
-      if (!_0x365cc0 || resolveStoryVideoInputTextModelId(_0x365cc0) !== _0x365cc0)
+        run(projectId, episodeId3));
+      const modelId = normalizeText(projectId['modelSettings']['models']?.['text']);
+      if (!modelId || resolveStoryVideoInputTextModelId(modelId) !== modelId)
         throw new Error('当前选中的模型不支持视频分析，请从模型菜单重新选择后重试。');
-      const _0x4e7a0e =
-          getStoryWorkspaceModelChoice('text', _0x365cc0)?.['provider'] ||
-          _0x2fce5e['modelSettings']['textProvider'],
-        _0x386f86 = resolveStoryTextProviderProfileId(
-          _0x4e7a0e,
-          _0x2fce5e['modelSettings']['textProviderProfileId'],
+      const provider =
+          getStoryWorkspaceModelChoice('text', modelId)?.['provider'] ||
+          projectId['modelSettings']['textProvider'],
+        providerProfileId = resolveStoryTextProviderProfileId(
+          provider,
+          projectId['modelSettings']['textProviderProfileId'],
         );
-      _0x36982a(
-        _0x2fce5e,
-        _0x36c803,
-        { modelId: _0x365cc0, provider: _0x4e7a0e, providerProfileId: _0x386f86 },
+      updateBackgroundTask(
+        projectId,
+        id,
+        { modelId: modelId, provider: provider, providerProfileId: providerProfileId },
         { refreshHome: ![] },
       );
-      (force || !_0x1b1a7d['replication']['sourceAnalysis']) &&
-        (_0x30ab46 = {
+      (force || !status2['replication']['sourceAnalysis']) &&
+        (entry = {
           startedAt: Date['now'](),
-          projectId: _0x2fce5e['projectId'],
-          episodeId: _0x59d73d,
-          modelId: _0x365cc0,
-          provider: _0x4e7a0e,
-          providerProfileId: _0x386f86,
+          projectId: projectId['projectId'],
+          episodeId: episodeId3,
+          modelId: modelId,
+          provider: provider,
+          providerProfileId: providerProfileId,
         });
-      let _0xaca5ae =
-        _0x1b1a7d['replication']['speechEvidence'] ||
-        _0x1b1a7d['replication']['sourceAnalysis']?.['speechEvidence'];
-      if ((force || !_0x1b1a7d['replication']['sourceAnalysis']) && !_0xaca5ae) {
-        (_0x36982a(
-          _0x2fce5e,
-          _0x36c803,
+      let speechEvidence =
+        status2['replication']['speechEvidence'] ||
+        status2['replication']['sourceAnalysis']?.['speechEvidence'];
+      if ((force || !status2['replication']['sourceAnalysis']) && !speechEvidence) {
+        (updateBackgroundTask(
+          projectId,
+          id,
           { message: '正在识别原片音轨，保留台词与时间' },
           { refreshHome: ![] },
         ),
-          (_0xaca5ae = await transcribeSource({
-            videoRef: _0x5d0e23,
-            provider: _0x2fce5e['data']['project']['replication']?.['asrProvider'] || 'volcengine-speech',
-            isActive: () => _0x25aa94(_0x2fce5e),
+          (speechEvidence = await transcribeSource({
+            videoRef: videoUrl,
+            provider: projectId['data']['project']['replication']?.['asrProvider'] || 'volcengine-speech',
+            isActive: () => isProjectTaskLive(projectId),
           })));
-        if (!_0x25aa94(_0x2fce5e)) return ![];
-        if (_0x1d5c18) _0x1d5c18['replication']['speechEvidence'] = _0xaca5ae;
+        if (!isProjectTaskLive(projectId)) return ![];
+        if (response) response['replication']['speechEvidence'] = speechEvidence;
         !force &&
-          ((_0x1b1a7d['replication']['speechEvidence'] = _0xaca5ae),
-          _0x2ba442(_0x2fce5e),
-          _0xa436c9({ immediate: !![] }));
+          ((status2['replication']['speechEvidence'] = speechEvidence),
+          syncProjectEntry(projectId),
+          schedulePersistence({ immediate: !![] }));
       }
-      const _0x5a7452 = await _0x1bcbdc({
-        videoRef: _0x5d0e23,
-        speechEvidence: _0xaca5ae,
-        durationSec: _0x1b1a7d['sourceVideo']['durationSec'],
-        modelId: _0x365cc0,
-        model: _0x365cc0,
-        provider: _0x4e7a0e,
-        providerProfileId: _0x386f86,
-        sourceAnalysis: force ? null : _0x1b1a7d['replication']['sourceAnalysis'] || null,
-        isActive: () => _0x25aa94(_0x2fce5e),
-        onProgress: (_0x147a8b) => {
-          if (!_0x25aa94(_0x2fce5e)) return;
-          ((_0x1b1a7d['replication']['message'] = _0x147a8b),
-            _0x36982a(_0x2fce5e, _0x36c803, { message: _0x147a8b }, { refreshHome: ![] }),
-            _0x39848d(_0x2fce5e, _0x59d73d));
+      const sourceAnalysis = await analyzeSourceVideo({
+        videoRef: videoUrl,
+        speechEvidence: speechEvidence,
+        durationSec: status2['sourceVideo']['durationSec'],
+        modelId: modelId,
+        model: modelId,
+        provider: provider,
+        providerProfileId: providerProfileId,
+        sourceAnalysis: force ? null : status2['replication']['sourceAnalysis'] || null,
+        isActive: () => isProjectTaskLive(projectId),
+        onProgress: (message) => {
+          if (!isProjectTaskLive(projectId)) return;
+          ((status2['replication']['message'] = message),
+            updateBackgroundTask(projectId, id, { message: message }, { refreshHome: ![] }),
+            run(projectId, episodeId3));
         },
-        onSourceAnalysis: async (_0x8deed5) => {
-          if (!_0x25aa94(_0x2fce5e) || force) return;
-          ((_0x1b1a7d['replication']['sourceAnalysis'] = _0x8deed5),
-            _0x2ba442(_0x2fce5e),
-            _0xa436c9({ immediate: !![] }));
+        onSourceAnalysis: async (payload) => {
+          if (!isProjectTaskLive(projectId) || force) return;
+          ((status2['replication']['sourceAnalysis'] = payload),
+            syncProjectEntry(projectId),
+            schedulePersistence({ immediate: !![] }));
         },
       });
-      if (!_0x25aa94(_0x2fce5e)) return ![];
-      if (_0x5a7452['sourceAnalysis']) {
-        const _0x2146f3 = {
-          ..._0x1b1a7d,
-          replication: { ..._0x1b1a7d['replication'], sourceAnalysis: _0x5a7452['sourceAnalysis'] },
+      if (!isProjectTaskLive(projectId)) return ![];
+      if (sourceAnalysis['sourceAnalysis']) {
+        const episode = {
+          ...status2,
+          replication: { ...status2['replication'], sourceAnalysis: sourceAnalysis['sourceAnalysis'] },
         };
         await collectStoryReplicationRepresentativeFrames({
-          episode: _0x2146f3,
-          projectId: _0x2fce5e['projectId'],
-          isActive: () => _0x25aa94(_0x2fce5e),
-          onProgress: (_0x58025b) => {
-            ((_0x1b1a7d['replication']['message'] = _0x58025b), _0x39848d(_0x2fce5e, _0x59d73d));
+          episode: episode,
+          projectId: projectId['projectId'],
+          isActive: () => isProjectTaskLive(projectId),
+          onProgress: (handle) => {
+            ((status2['replication']['message'] = handle), run(projectId, episodeId3));
           },
         });
       }
-      if (!_0x25aa94(_0x2fce5e)) return ![];
-      if (force && !_0x5a7452['sourceAnalysis']) throw new Error('未返回原片分析，已保留现有内容。');
-      applyStoryVideoReplicationAnalysis(_0x1b1a7d, _0x5a7452);
-      if (_0xaca5ae) _0x1b1a7d['replication']['speechEvidence'] = _0xaca5ae;
-      finishAnalysisAttempt(_0x1b1a7d, _0x30ab46);
+      if (!isProjectTaskLive(projectId)) return ![];
+      if (force && !sourceAnalysis['sourceAnalysis']) throw new Error('未返回原片分析，已保留现有内容。');
+      applyStoryVideoReplicationAnalysis(status2, sourceAnalysis);
+      if (speechEvidence) status2['replication']['speechEvidence'] = speechEvidence;
+      finishAnalysisAttempt(status2, entry);
       if (force) {
-        invalidateStoryVideoReplicationAssetLocalization(_0x2fce5e['data']);
-        if (_0x1b1a7d['clips']?.['length']) _0x1b1a7d['replication']['promptsStale'] = !![];
+        invalidateStoryVideoReplicationAssetLocalization(projectId['data']);
+        if (status2['clips']?.['length']) status2['replication']['promptsStale'] = !![];
         else {
-          const _0x3c8514 = _0x2fce5e['data']['project']['replication']['characterBindings'] || {};
-          for (const _0x2a36ce of Object['keys'](_0x3c8514))
-            if (_0x2a36ce['startsWith'](_0x1b1a7d['id'] + ':')) delete _0x3c8514[_0x2a36ce];
+          const config = projectId['data']['project']['replication']['characterBindings'] || {};
+          for (const scope of Object['keys'](config))
+            if (scope['startsWith'](status2['id'] + ':')) delete config[scope];
         }
       }
       return (
-        (_0x1b1a7d['replication']['message'] = ''),
-        syncStoryVideoReplicationProject(_0x2fce5e['data']),
-        _0x3c192c(
-          _0x2fce5e,
-          _0x36c803,
-          { status: 'succeeded', message: '第\x20' + _0x1b1a7d['number'] + ' 集视频解析完成' },
+        (status2['replication']['message'] = ''),
+        syncStoryVideoReplicationProject(projectId['data']),
+        finishBackgroundTask(
+          projectId,
+          id,
+          { status: 'succeeded', message: '第\x20' + status2['number'] + ' 集视频解析完成' },
           { refreshHome: ![] },
         ),
-        _0x2ba442(_0x2fce5e),
-        _0xa436c9({ immediate: !![] }),
-        _0x39848d(_0x2fce5e, _0x59d73d),
+        syncProjectEntry(projectId),
+        schedulePersistence({ immediate: !![] }),
+        run(projectId, episodeId3),
         !![]
       );
-    } catch (_0x42e1a5) {
-      if (!_0x25aa94(_0x2fce5e)) return ![];
-      if (_0x1d5c18)
-        ((_0x1b1a7d['replication'] = {
-          ..._0x1d5c18['replication'],
-          error: '重新分析失败，已保留原人物记录：' + (_0x42e1a5?.['message'] || '请重试'),
+    } catch (error) {
+      if (!isProjectTaskLive(projectId)) return ![];
+      if (response)
+        ((status2['replication'] = {
+          ...response['replication'],
+          error: '重新分析失败，已保留原人物记录：' + (error?.['message'] || '请重试'),
         }),
-          (_0x1b1a7d['status'] = _0x1d5c18['status']));
-      else failStoryVideoReplicationEpisode(_0x1b1a7d, _0x42e1a5?.['message']);
+          (status2['status'] = response['status']));
+      else failStoryVideoReplicationEpisode(status2, error?.['message']);
       return (
-        finishAnalysisAttempt(_0x1b1a7d, _0x30ab46, _0x42e1a5),
-        syncStoryVideoReplicationProject(_0x2fce5e['data']),
-        _0x3c192c(
-          _0x2fce5e,
-          _0x36c803,
+        finishAnalysisAttempt(status2, entry, error),
+        syncStoryVideoReplicationProject(projectId['data']),
+        finishBackgroundTask(
+          projectId,
+          id,
           {
             status: 'failed',
-            message: '第\x20' + _0x1b1a7d['number'] + '\x20集视频解析失败',
-            error: _0x42e1a5?.['message'] || '视频解析失败。',
+            message: '第\x20' + status2['number'] + '\x20集视频解析失败',
+            error: error?.['message'] || '视频解析失败。',
           },
           { refreshHome: ![] },
         ),
-        _0x2ba442(_0x2fce5e),
-        _0xa436c9({ immediate: !![] }),
-        _0x39848d(_0x2fce5e, _0x59d73d),
+        syncProjectEntry(projectId),
+        schedulePersistence({ immediate: !![] }),
+        run(projectId, episodeId3),
         ![]
       );
     }
   }
-  async function _0x4dea22(_0x38bf4a, _0x561a09 = []) {
-    const _0x5b53ea = normalizeText(_0x38bf4a?.['projectId']),
-      _0x11c782 = _0x1535a2['get'](_0x5b53ea);
-    if (_0x11c782) return _0x11c782;
-    const _0x37ccd5 = Array['isArray'](_0x561a09) ? [..._0x561a09] : [],
-      _0x4ecb15 = (async () => {
-        let _0x4103a9 = 0x0;
-        for (const _0x1938b9 of _0x37ccd5) {
-          if (!_0x25aa94(_0x38bf4a)) break;
-          if (!(await _0x5bd7c5(_0x38bf4a, _0x1938b9['file'], _0x1938b9['episodeId'], _0x1938b9)))
-            _0x4103a9 += 0x1;
+  async function runAnalysis(input, args3 = []) {
+    const text2 = normalizeText(input?.['projectId']),
+      output = analysisPromises['get'](text2);
+    if (output) return output;
+    const list = Array['isArray'](args3) ? [...args3] : [],
+      value2 = (async () => {
+        let enabled5 = 0x0;
+        for (const value3 of list) {
+          if (!isProjectTaskLive(input)) break;
+          if (!(await analyzeEpisode(input, value3['file'], value3['episodeId'], value3))) enabled5 += 0x1;
         }
-        if (!_0x25aa94(_0x38bf4a)) return ![];
-        const _0x571737 = getStoryVideoReplicationSummary(_0x38bf4a['data']);
+        if (!isProjectTaskLive(input)) return ![];
+        const storyVideoReplicationSummary = getStoryVideoReplicationSummary(input['data']);
         if (
-          !_0x4103a9 &&
-          !_0x571737['active'] &&
-          !_0x571737['failed'] &&
-          _0x571737['completed'] === _0x571737['total']
+          !enabled5 &&
+          !storyVideoReplicationSummary['active'] &&
+          !storyVideoReplicationSummary['failed'] &&
+          storyVideoReplicationSummary['completed'] === storyVideoReplicationSummary['total']
         )
-          _0xb45264(
-            '视频解析完成，共\x20' + _0x571737['completed'] + ' 条。',
-            _0x38bf4a,
+          notifyTextTaskComplete(
+            '视频解析完成，共\x20' + storyVideoReplicationSummary['completed'] + ' 条。',
+            input,
             { step: 0x1 },
             { notificationMessage: '复刻视频解析完成。' },
           );
         else
-          (_0x571737['failed'] || _0x4103a9) &&
-            _0x515b50(
+          (storyVideoReplicationSummary['failed'] || enabled5) &&
+            showNavigableTaskResultToast(
               '视频解析已完成 ' +
-                _0x571737['completed'] +
+                storyVideoReplicationSummary['completed'] +
                 '/' +
-                _0x571737['total'] +
+                storyVideoReplicationSummary['total'] +
                 ' 条，' +
-                Math['max'](_0x571737['failed'], _0x4103a9) +
+                Math['max'](storyVideoReplicationSummary['failed'], enabled5) +
                 ' 条请求失败。',
               'warn',
-              _0x38bf4a,
+              input,
               { step: 0x1 },
             );
         return (
-          _0x571737['completed'] > 0x0 ||
-          _0x37ccd5['some'](
-            (_0x3a2231) =>
-              _0x3a2231['uploadOnly'] &&
-              findStoryReplicationEpisode(_0x38bf4a['data'], _0x3a2231['episodeId'])?.['replication']?.[
-                'status'
-              ] === 'pending',
+          storyVideoReplicationSummary['completed'] > 0x0 ||
+          list['some'](
+            (value4) =>
+              value4['uploadOnly'] &&
+              findStoryReplicationEpisode(input['data'], value4['episodeId'])?.['replication']?.['status'] ===
+                'pending',
           )
         );
       })()['finally'](() => {
-        _0x1535a2['get'](_0x5b53ea) === _0x4ecb15 && _0x1535a2['delete'](_0x5b53ea);
-        if (_0x3bd786(_0x38bf4a)) _0x4c582e();
+        analysisPromises['get'](text2) === value2 && analysisPromises['delete'](text2);
+        if (isProjectTaskCurrent(input)) refreshFooter();
       });
-    return (_0x1535a2['set'](_0x5b53ea, _0x4ecb15), _0x4ecb15);
+    return (analysisPromises['set'](text2, value2), value2);
   }
-  async function _0x22c46a() {
-    if (_0x3cface['isGeneratingStory']) return ![];
-    if (resolveStoryVideoReplicationHomeTab(_0x3cface, 'replication') !== 'replication') return ![];
-    if (typeof _0x1bcbdc !== 'function') return (_0xda3d8c('视频理解 Agent 尚未初始化。', 'error'), ![]);
-    const _0x5e80b8 = [..._0x3cface['replicationSourceFiles']];
-    if (!_0x5e80b8['length']) return (_0xda3d8c('请先上传至少一条视频。', 'warn'), ![]);
-    const _0x499a01 = resolveStoryVideoInputTextModelId(_0x3cface['models']['text']);
-    if (!_0x499a01) return (_0xda3d8c('当前没有支持视频输入的文本模型。', 'error'), ![]);
-    const _0x482606 = _0x5e80b8['map']((_0x268c83) =>
-      validateStoryReplicationVideoSize(_0x268c83, _0x499a01),
-    )['find']((_0x55acb0) => !_0x55acb0['ok']);
-    if (_0x482606) return (_0xda3d8c(_0x482606['error'], 'warn'), ![]);
-    (_0xefa5e1(), _0x44fa42(), (_0x3cface['models']['text'] = _0x499a01));
-    const _0x3c66fd = getStoryWorkspaceModelChoice('text', _0x499a01);
-    ((_0x3cface['textProvider'] = _0x3c66fd?.['provider'] || _0x3cface['textProvider']),
-      (_0x3cface['textProviderProfileId'] = resolveStoryTextProviderProfileId(
-        _0x3cface['textProvider'],
-        _0x3cface['textProviderProfileId'],
+  async function startFromHome() {
+    if (state['isGeneratingStory']) return ![];
+    if (resolveStoryVideoReplicationHomeTab(state, 'replication') !== 'replication') return ![];
+    if (typeof analyzeSourceVideo !== 'function')
+      return (showToast('视频理解 Agent 尚未初始化。', 'error'), ![]);
+    const files = [...state['replicationSourceFiles']];
+    if (!files['length']) return (showToast('请先上传至少一条视频。', 'warn'), ![]);
+    const modelId2 = resolveStoryVideoInputTextModelId(state['models']['text']);
+    if (!modelId2) return (showToast('当前没有支持视频输入的文本模型。', 'error'), ![]);
+    const value5 = files['map']((value6) => validateStoryReplicationVideoSize(value6, modelId2))['find'](
+      (response3) => !response3['ok'],
+    );
+    if (value5) return (showToast(value5['error'], 'warn'), ![]);
+    (syncCurrentProjectEntry(), beginProjectSession(), (state['models']['text'] = modelId2));
+    const storyWorkspaceModelChoice = getStoryWorkspaceModelChoice('text', modelId2);
+    ((state['textProvider'] = storyWorkspaceModelChoice?.['provider'] || state['textProvider']),
+      (state['textProviderProfileId'] = resolveStoryTextProviderProfileId(
+        state['textProvider'],
+        state['textProviderProfileId'],
       )));
-    const _0x29f3bc = 'story-' + Date['now']();
-    ((_0x3cface['data'] = createStoryVideoReplicationProjectData({
-      projectId: _0x29f3bc,
-      files: _0x5e80b8,
-      modelId: _0x499a01,
-      provider: _0x3cface['textProvider'],
-      providerProfileId: _0x3cface['textProviderProfileId'],
-      targetLocale: _0x3cface['replicationTargetLocale'],
-      asrProvider: _0x3cface['replicationAsrProvider'] || 'volcengine-speech',
-      promptMode: _0x3cface['data']['project']?.['planning']?.['promptMode'],
-      aspectRatio: _0x3cface['data']['project']?.['aspectRatio'] || '9:16',
+    const projectId2 = 'story-' + Date['now']();
+    ((state['data'] = createStoryVideoReplicationProjectData({
+      projectId: projectId2,
+      files: files,
+      modelId: modelId2,
+      provider: state['textProvider'],
+      providerProfileId: state['textProviderProfileId'],
+      targetLocale: state['replicationTargetLocale'],
+      asrProvider: state['replicationAsrProvider'] || 'volcengine-speech',
+      promptMode: state['data']['project']?.['planning']?.['promptMode'],
+      aspectRatio: state['data']['project']?.['aspectRatio'] || '9:16',
     })),
-      (_0x3cface['projectTitleEdited'] = ![]),
-      (_0x3cface['hasCreatedProject'] = !![]),
-      (_0x3cface['assetSelectionMode'] = ![]),
-      (_0x3cface['selectedAssetIds'] = []),
-      (_0x3cface['selectedEpisodeId'] = _0x3cface['data']['episodes'][0x0]?.['id'] || ''),
-      (_0x3cface['selectedClipId'] = ''),
-      _0x1c21c8(),
-      (_0x3cface['replicationSourceFiles'] = []),
-      _0xe2504e({ resetStep: !![] }),
-      _0xefa5e1(),
-      _0xa436c9({ immediate: !![] }));
-    const _0x2c560f = _0x4bba83(),
-      _0x1f321b = _0x5e80b8['map']((_0x4c8295, _0x11c8bb) => ({
-        file: _0x4c8295,
-        episodeId: _0x3cface['data']['episodes'][_0x11c8bb]?.['id'],
+      (state['projectTitleEdited'] = ![]),
+      (state['hasCreatedProject'] = !![]),
+      (state['assetSelectionMode'] = ![]),
+      (state['selectedAssetIds'] = []),
+      (state['selectedEpisodeId'] = state['data']['episodes'][0x0]?.['id'] || ''),
+      (state['selectedClipId'] = ''),
+      releaseSourcePreviewUrls(),
+      (state['replicationSourceFiles'] = []),
+      openProject({ resetStep: !![] }),
+      syncCurrentProjectEntry(),
+      schedulePersistence({ immediate: !![] }));
+    const value7 = createProjectToken(),
+      list2 = files['map']((file2, value8) => ({
+        file: file2,
+        episodeId: state['data']['episodes'][value8]?.['id'],
         uploadOnly: !![],
-      }))['filter']((_0x3bc3b6) => _0x3bc3b6['file'] && _0x3bc3b6['episodeId']);
+      }))['filter']((value9) => value9['file'] && value9['episodeId']);
     return (
-      _0x1f321b['forEach']((_0x412dab) => {
-        _0x2d2bff['set'](_0x29f3bc + ':' + _0x412dab['episodeId'], _0x412dab['file']);
+      list2['forEach']((value10) => {
+        sourceFileByEpisodeKey['set'](projectId2 + ':' + value10['episodeId'], value10['file']);
       }),
-      _0x4dea22(_0x2c560f, _0x1f321b)
+      runAnalysis(value7, list2)
     );
   }
-  async function _0x411f99() {
-    if (_0x3cface['data']?.['project']?.['sourceMode'] !== 'video-replication') return ![];
-    const _0x4da1fa = _0x4bba83(),
-      _0x1089b0 = normalizeText(_0x4da1fa['projectId']);
-    if (_0x1535a2['has'](_0x1089b0)) return ![];
-    const _0x3c3734 = _0x3cface['data']['episodes']
-      ['filter']((_0x2312a9) => _0x2312a9?.['replication']?.['status'] === 'failed')
-      ['map']((_0x2b6742) => ({
-        episodeId: _0x2b6742['id'],
-        file: _0x2d2bff['get'](_0x1089b0 + ':' + _0x2b6742['id']) || null,
+  async function retryFailedAnalysis() {
+    if (state['data']?.['project']?.['sourceMode'] !== 'video-replication') return ![];
+    const value11 = createProjectToken(),
+      text3 = normalizeText(value11['projectId']);
+    if (analysisPromises['has'](text3)) return ![];
+    const list3 = state['data']['episodes']
+      ['filter']((value12) => value12?.['replication']?.['status'] === 'failed')
+      ['map']((episodeId4) => ({
+        episodeId: episodeId4['id'],
+        file: sourceFileByEpisodeKey['get'](text3 + ':' + episodeId4['id']) || null,
       }));
-    if (!_0x3c3734['length']) return ![];
-    return _0x4dea22(_0x4da1fa, _0x3c3734);
+    if (!list3['length']) return ![];
+    return runAnalysis(value11, list3);
   }
-  async function _0x4bd8bd({ all: all = ![], episodeId: episodeId = '' } = {}) {
-    if (_0x3cface['data']?.['project']?.['sourceMode'] !== 'video-replication') return ![];
-    const _0x22ddd0 = _0x4bba83();
-    if (_0x1535a2['has'](_0x22ddd0['projectId'])) return ![];
-    const _0xb492a4 = _0x22ddd0['data']['episodes']
+  async function analyzeSelected({ all: all = ![], episodeId: episodeId = '' } = {}) {
+    if (state['data']?.['project']?.['sourceMode'] !== 'video-replication') return ![];
+    const value13 = createProjectToken();
+    if (analysisPromises['has'](value13['projectId'])) return ![];
+    const list4 = value13['data']['episodes']
       ['filter'](
-        (_0x12a22d) =>
-          ['pending', 'failed']['includes'](_0x12a22d['replication']?.['status']) &&
-          (episodeId
-            ? _0x12a22d['id'] === episodeId
-            : all || _0x12a22d['replication']['selectedForAnalysis']),
+        (value14) =>
+          ['pending', 'failed']['includes'](value14['replication']?.['status']) &&
+          (episodeId ? value14['id'] === episodeId : all || value14['replication']['selectedForAnalysis']),
       )
-      ['map']((_0x83e2af) => ({
-        episodeId: _0x83e2af['id'],
-        file: _0x2d2bff['get'](_0x22ddd0['projectId'] + ':' + _0x83e2af['id']) || null,
+      ['map']((episodeId5) => ({
+        episodeId: episodeId5['id'],
+        file: sourceFileByEpisodeKey['get'](value13['projectId'] + ':' + episodeId5['id']) || null,
       }));
-    if (!_0xb492a4['length']) return (_0xda3d8c('请先选择待分析的视频。', 'warn'), ![]);
-    for (const _0x310d06 of _0xb492a4) {
-      const _0x4360f7 = findStoryReplicationEpisode(_0x22ddd0['data'], _0x310d06['episodeId']);
-      ((_0x4360f7['replication']['status'] = 'queued'), _0x5843c8(_0x4360f7['id']));
+    if (!list4['length']) return (showToast('请先选择待分析的视频。', 'warn'), ![]);
+    for (const value15 of list4) {
+      const storyReplicationEpisode2 = findStoryReplicationEpisode(value13['data'], value15['episodeId']);
+      ((storyReplicationEpisode2['replication']['status'] = 'queued'),
+        refreshEpisode(storyReplicationEpisode2['id']));
     }
-    return (_0x4c582e(), _0x4dea22(_0x22ddd0, _0xb492a4));
+    return (refreshFooter(), runAnalysis(value13, list4));
   }
   return {
-    reanalyzeEpisode: (_0x345ba5) => {
-      const _0x1e3474 = _0x4bba83(),
-        _0x5e93a2 = findStoryReplicationEpisode(_0x1e3474['data'], _0x345ba5);
-      if (!_0x5e93a2?.['replication']['sourceAnalysis']) return ![];
-      if (_0x1535a2['has'](_0x1e3474['projectId']))
-        return (_0xda3d8c('已有视频正在分析，请等待完成后再重新识别。', 'warn'), ![]);
-      return _0x4dea22(_0x1e3474, [{ episodeId: _0x345ba5, force: !![] }]);
+    reanalyzeEpisode: (episodeId6) => {
+      const value16 = createProjectToken(),
+        storyReplicationEpisode3 = findStoryReplicationEpisode(value16['data'], episodeId6);
+      if (!storyReplicationEpisode3?.['replication']['sourceAnalysis']) return ![];
+      if (analysisPromises['has'](value16['projectId']))
+        return (showToast('已有视频正在分析，请等待完成后再重新识别。', 'warn'), ![]);
+      return runAnalysis(value16, [{ episodeId: episodeId6, force: !![] }]);
     },
-    analyzeEpisode: _0x5bd7c5,
-    analyzeSelected: _0x4bd8bd,
-    createSourcePreviewUrl: _0x38a7ff,
-    refreshEpisode: _0x5843c8,
-    refreshFooter: _0x4c582e,
-    releaseSourcePreviewUrls: _0x1c21c8,
-    retryFailedAnalysis: _0x411f99,
-    revokeSourcePreviewUrl: _0x313d26,
-    runAnalysis: _0x4dea22,
-    startFromHome: _0x22c46a,
+    analyzeEpisode: analyzeEpisode,
+    analyzeSelected: analyzeSelected,
+    createSourcePreviewUrl: createSourcePreviewUrl,
+    refreshEpisode: refreshEpisode,
+    refreshFooter: refreshFooter,
+    releaseSourcePreviewUrls: releaseSourcePreviewUrls,
+    retryFailedAnalysis: retryFailedAnalysis,
+    revokeSourcePreviewUrl: revokeSourcePreviewUrl,
+    runAnalysis: runAnalysis,
+    startFromHome: startFromHome,
   };
 }

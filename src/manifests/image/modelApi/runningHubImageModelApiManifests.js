@@ -10,32 +10,27 @@ import {
   createImageModelApiManifest,
   createModelApiExecutionManifest,
 } from './sharedImageModelApiFields.js';
-function freezeExtensionValue(_0xc7fdb1) {
-  if (Array.isArray(_0xc7fdb1)) return Object.freeze([..._0xc7fdb1]);
-  if (_0xc7fdb1 && typeof _0xc7fdb1 === 'object')
+function freezeExtensionValue(args) {
+  if (Array.isArray(args)) return Object.freeze([...args]);
+  if (args && typeof args === 'object')
     return Object.freeze(
-      Object.fromEntries(
-        Object.entries(_0xc7fdb1).map(([_0x107678, _0x2a8bb4]) => [
-          _0x107678,
-          freezeExtensionValue(_0x2a8bb4),
-        ]),
-      ),
+      Object.fromEntries(Object.entries(args).map(([value, item]) => [value, freezeExtensionValue(item)])),
     );
-  return _0xc7fdb1;
+  return args;
 }
 function createImageModelExtensions({
-  imageMenu: _0x5bd746,
-  imageSizePolicy: _0x2ad002,
-  nanoBanana: _0x639e05,
+  imageMenu: imageMenu,
+  imageSizePolicy: imageSizePolicy,
+  nanoBanana: nanoBanana,
 } = {}) {
-  const _0x55363a = {};
-  if (_0x5bd746) _0x55363a.imageMenu = freezeExtensionValue(_0x5bd746);
-  _0x2ad002 && (_0x55363a.imageSizePolicy = freezeExtensionValue(_0x2ad002));
-  if (_0x639e05) _0x55363a.nanoBanana = freezeExtensionValue(_0x639e05);
-  return Object.freeze(_0x55363a);
+  const key = {};
+  if (imageMenu) key.imageMenu = freezeExtensionValue(imageMenu);
+  imageSizePolicy && (key.imageSizePolicy = freezeExtensionValue(imageSizePolicy));
+  if (nanoBanana) key.nanoBanana = freezeExtensionValue(nanoBanana);
+  return Object.freeze(key);
 }
-function createImageMenuExtension(_0x56ce44) {
-  return createImageModelExtensions({ imageMenu: _0x56ce44 });
+function createImageMenuExtension(imageMenu2) {
+  return createImageModelExtensions({ imageMenu: imageMenu2 });
 }
 const RUNNINGHUB_DIMENSIONS_RATIO_POLICY = Object.freeze({ capability: 'dimensions' }),
   RUNNINGHUB_GPT_IMAGE_2_4K_RATIO_LABELS = Object.freeze(['16:9', '9:16', '2:1', '1:2', '21:9', '9:21']),
@@ -85,65 +80,65 @@ const RUNNINGHUB_DIMENSIONS_RATIO_POLICY = Object.freeze({ capability: 'dimensio
     ]),
   });
 function createYouchuanSegmentedField({
-  id: _0x2fe8c3,
-  label: _0x2a2576,
-  defaultValue: _0x4efb65,
-  description: _0x1800b3,
-  options: _0x41fc8c,
+  id: id,
+  label: label,
+  defaultValue: defaultValue2,
+  description: description,
+  options: options,
   placement: placement = 'advanced',
   variant: variant = 'advancedRow',
   showInfoTip: showInfoTip = false,
 }) {
   return Object.freeze({
-    id: _0x2fe8c3,
+    id: id,
     type: 'segmented',
     placement: placement,
     ...(variant ? { variant: variant } : {}),
-    label: _0x2a2576,
-    defaultValue: _0x4efb65,
-    ...(_0x1800b3 ? { description: _0x1800b3 } : {}),
+    label: label,
+    defaultValue: defaultValue2,
+    ...(description ? { description: description } : {}),
     ...(showInfoTip ? { showInfoTip: true } : {}),
     options: Object.freeze(
-      _0x41fc8c.map((_0x5b6af7) => Object.freeze({ value: _0x5b6af7.value, label: _0x5b6af7.label })),
+      options.map((value2) => Object.freeze({ value: value2.value, label: value2.label })),
     ),
   });
 }
 function createYouchuanNumberField({
-  id: _0x43c5a2,
-  label: _0x4ec0a5,
-  defaultValue: _0x7b7917,
-  min: _0x4d6a1b,
-  max: _0x22190c,
-  step: step = _0x22190c === 0x3e8 ? 50 : _0x22190c === 100 ? 5 : 1,
-  description: _0x3ec6ad,
+  id: id2,
+  label: label2,
+  defaultValue: defaultValue3,
+  min: min,
+  max: max,
+  step: step = max === 0x3e8 ? 50 : max === 100 ? 5 : 1,
+  description: description2,
 }) {
   return Object.freeze({
-    id: _0x43c5a2,
+    id: id2,
     type: 'slider',
     placement: 'advanced',
     variant: 'rhV54BreastJiggle',
-    label: _0x4ec0a5,
-    defaultValue: _0x7b7917,
-    min: _0x4d6a1b,
-    max: _0x22190c,
+    label: label2,
+    defaultValue: defaultValue3,
+    min: min,
+    max: max,
     step: step,
-    ...(_0x3ec6ad ? { description: _0x3ec6ad } : {}),
+    ...(description2 ? { description: description2 } : {}),
   });
 }
 function createYouchuanToggleField({
-  id: _0x165659,
-  label: _0x1b3f9b,
+  id: id3,
+  label: label3,
   defaultValue: defaultValue = false,
-  description: _0x2fdaa5,
+  description: description3,
 }) {
   return Object.freeze({
-    id: _0x165659,
+    id: id3,
     type: 'segmented',
     placement: 'advanced',
     variant: 'rhV54BooleanRow',
-    label: _0x1b3f9b,
+    label: label3,
     defaultValue: defaultValue,
-    ...(_0x2fdaa5 ? { description: _0x2fdaa5 } : {}),
+    ...(description3 ? { description: description3 } : {}),
     options: Object.freeze([
       Object.freeze({ value: true, label: '是' }),
       Object.freeze({ value: false, label: '否' }),
@@ -441,12 +436,10 @@ const YOUCHUAN_CHAOS_FIELD = createYouchuanNumberField({
       Object.freeze({ value: '2:3', label: '2:3' }),
     ]),
   });
-function createRunningHubImageExecutionExtensions(_0x51ad1f) {
+function createRunningHubImageExecutionExtensions(index) {
   return Object.freeze({
     ...RUNNINGHUB_IMAGE_RESOLVERS,
-    ...(_0x51ad1f.runningHubImage
-      ? { runningHubImage: freezeExtensionValue(_0x51ad1f.runningHubImage) }
-      : {}),
+    ...(index.runningHubImage ? { runningHubImage: freezeExtensionValue(index.runningHubImage) } : {}),
   });
 }
 const RUNNINGHUB_MODEL_API_MANIFESTS = Object.freeze([
@@ -804,35 +797,35 @@ const RUNNINGHUB_MODEL_API_MANIFESTS = Object.freeze([
   }),
 ]);
 export const runningHubImageModelApiModelManifests = Object.freeze(
-  RUNNINGHUB_MODEL_API_MANIFESTS.map((_0x3b2d70) =>
+  RUNNINGHUB_MODEL_API_MANIFESTS.map((modelId) =>
     createImageModelApiManifest({
-      modelId: _0x3b2d70.modelId,
-      executionId: _0x3b2d70.executionId,
+      modelId: modelId.modelId,
+      executionId: modelId.executionId,
       provider: 'runninghub',
-      displayName: _0x3b2d70.displayName,
-      icon: _0x3b2d70.icon,
+      displayName: modelId.displayName,
+      icon: modelId.icon,
       description: 'RunningHub image model API',
-      fields: _0x3b2d70.fields,
-      extensions: _0x3b2d70.extensions,
-      ratioPolicy: _0x3b2d70.ratioPolicy,
-      inputSlots: _0x3b2d70.inputSlots,
-      nanoBanana: _0x3b2d70.nanoBanana,
-      prompt: _0x3b2d70.prompt,
+      fields: modelId.fields,
+      extensions: modelId.extensions,
+      ratioPolicy: modelId.ratioPolicy,
+      inputSlots: modelId.inputSlots,
+      nanoBanana: modelId.nanoBanana,
+      prompt: modelId.prompt,
     }),
   ),
 );
 export const runningHubImageModelApiExecutionManifests = Object.freeze(
-  RUNNINGHUB_MODEL_API_MANIFESTS.map((_0x4960f5) =>
+  RUNNINGHUB_MODEL_API_MANIFESTS.map((id4) =>
     createModelApiExecutionManifest({
-      id: _0x4960f5.executionId,
+      id: id4.executionId,
       provider: 'runninghub',
-      model: _0x4960f5.model || _0x4960f5.modelId.replace('runninghub-model/', ''),
+      model: id4.model || id4.modelId.replace('runninghub-model/', ''),
       endpoint: '/openapi/v2',
       endpointMode: 'text-or-image',
-      routeModels: _0x4960f5.routeModels,
+      routeModels: id4.routeModels,
       bodyMapping: RUNNINGHUB_IMAGE_BODY_MAPPING,
       responseMapping: RUNNINGHUB_IMAGE_RESPONSE_MAPPING,
-      extensions: createRunningHubImageExecutionExtensions(_0x4960f5),
+      extensions: createRunningHubImageExecutionExtensions(id4),
     }),
   ),
 );

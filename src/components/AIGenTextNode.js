@@ -66,9 +66,9 @@ const api = { buildGenerateTextRequest: buildGenerateTextRequest, generateText: 
     saveCustomTextModels: saveCustomTextModels,
   };
 export class AIGenTextNode {
-  constructor(_0xc057e7) {
-    ((this._data = _0xc057e7),
-      (this.nodeId = _0xc057e7.id),
+  constructor(value) {
+    ((this._data = value),
+      (this.nodeId = value.id),
       (this.previewEl = null),
       (this.outputEl = null),
       (this.refBarEl = null),
@@ -78,36 +78,29 @@ export class AIGenTextNode {
       (this._dragSrcIdx = null),
       (this._dragBounds = []),
       (this._lastEdgeSig = null),
-      (this._outputScrollTop = Number.isFinite(_0xc057e7?.outputScrollTop)
-        ? Math.max(0, _0xc057e7.outputScrollTop)
+      (this._outputScrollTop = Number.isFinite(value?.outputScrollTop)
+        ? Math.max(0, value.outputScrollTop)
         : 0),
       (this._outputScrollTopDirty = false),
       (this._outputScrollTopCommitTimer = null),
       (this._lastRenderedOutputText = ''),
       (this._footerControllerCleanup = null));
   }
-  ['_checkAtTrigger'](_0x3bc691) {
-    return _checkAtTrigger(this, _0x3bc691);
+  ['_checkAtTrigger'](item) {
+    return _checkAtTrigger(this, item);
   }
-  ['_populateMentionMenu'](
-    _0x5dd532,
-    _0x3ec9eb,
-    _0x3cee25,
-    _0x29c9ea = '',
-    _0x571eec = -1,
-    _0x5ea83f = null,
-  ) {
+  ['_populateMentionMenu'](x, y, triggerRange, query = '', atIndex = -1, pillToEdit = null) {
     return _populateMentionMenu(this, {
-      x: _0x5dd532,
-      y: _0x3ec9eb,
-      triggerRange: _0x3cee25,
-      query: _0x29c9ea,
-      atIndex: _0x571eec,
-      pillToEdit: _0x5ea83f,
+      x: x,
+      y: y,
+      triggerRange: triggerRange,
+      query: query,
+      atIndex: atIndex,
+      pillToEdit: pillToEdit,
     });
   }
-  ['_handlePillKeyboard'](_0x43b734) {
-    return _handlePillKeyboard(this, _0x43b734);
+  ['_handlePillKeyboard'](key) {
+    return _handlePillKeyboard(this, key);
   }
   ['unmount']() {
     (this._commitOutputScrollTop?.(),
@@ -125,152 +118,146 @@ const aiGenTextNodeUiModule = createAIGenTextNodeUiModule(AI_GEN_TEXT_NODE_MODUL
   aiGenTextNodeTaskOrchestrationModule = createAIGenTextNodeTaskOrchestrationModule(
     AI_GEN_TEXT_NODE_MODULE_DEPS,
   );
-function applyClassPrototypeMethods(_0x507846, _0xfba237) {
-  if (!_0xfba237) return;
-  const _0xaf3995 = Object.getOwnPropertyDescriptors(_0xfba237);
-  (delete _0xaf3995.constructor, Object.defineProperties(_0x507846, _0xaf3995));
+function applyClassPrototypeMethods(index, enabled) {
+  if (!enabled) return;
+  const result = Object.getOwnPropertyDescriptors(enabled);
+  (delete result.constructor, Object.defineProperties(index, result));
 }
 (applyClassPrototypeMethods(AIGenTextNode.prototype, aiGenTextNodeUiModule),
   applyClassPrototypeMethods(AIGenTextNode.prototype, aiGenTextNodeStateSyncModule),
   applyClassPrototypeMethods(AIGenTextNode.prototype, aiGenTextNodeTaskOrchestrationModule));
-export function _renderSharedRefBar(_0x5d7e5f) {
-  if (!_0x5d7e5f.refBarEl) return;
-  const _0x313833 = appStore.getState(),
-    _0x478086 = _0x313833.nodes || {},
-    _0x3044a3 = appStore.getIncomingEdges(_0x5d7e5f.nodeId);
-  let _0x11a4eb = { text: 0, image: 0, video: 0, audio: 0 };
-  const _0x44fb0e = {},
-    _0x2d98a1 = createPromptAttachmentButtonHTML();
-  if (_0x5d7e5f._isDraggingSorting) {
-    _syncPillLabels(_0x5d7e5f, _0x44fb0e);
+export function _renderSharedRefBar(enabled2) {
+  if (!enabled2.refBarEl) return;
+  const data = appStore.getState(),
+    options = data.nodes || {},
+    target = appStore.getIncomingEdges(enabled2.nodeId);
+  let response = { text: 0, image: 0, video: 0, audio: 0 };
+  const source = {},
+    promptAttachmentButtonHTML = createPromptAttachmentButtonHTML();
+  if (enabled2._isDraggingSorting) {
+    _syncPillLabels(enabled2, source);
     return;
   }
-  const _0x59d04f = (_0x252c00) => {
-      return localPathToUrl(_0x252c00);
+  const run = (next) => {
+      return localPathToUrl(next);
     },
-    _0x4af7a6 = (_0x17efc0) => {
-      const _0x4e9afe = String(_0x17efc0 || '')
+    handler = (current) => {
+      const enabled3 = String(current || '')
         .trim()
         .toLowerCase();
-      if (!_0x4e9afe) return false;
-      if (_0x4e9afe.startsWith('data:image/')) return true;
-      return /\.(png|jpe?g|webp|gif|bmp|svg|avif)(\?|#|$)/i.test(_0x4e9afe);
+      if (!enabled3) return false;
+      if (enabled3.startsWith('data:image/')) return true;
+      return /\.(png|jpe?g|webp|gif|bmp|svg|avif)(\?|#|$)/i.test(enabled3);
     },
-    _0xd1e6d3 = (_0xf79a46) => {
+    handler2 = (entry) => {
       return (
-        String(_0xf79a46?.src || '').trim() ||
-        _0x59d04f(_0xf79a46?.localPath) ||
-        String(_0xf79a46?.imageUrl || '').trim() ||
-        String(_0xf79a46?.thumbUrl || '').trim()
+        String(entry?.src || '').trim() ||
+        run(entry?.localPath) ||
+        String(entry?.imageUrl || '').trim() ||
+        String(entry?.thumbUrl || '').trim()
       );
     },
-    _0x155883 = (_0xf53948) => {
-      const _0x2f77db = Number.isFinite(Number(_0xf53948?.mainVideoIndex))
-          ? Math.max(0, Math.trunc(Number(_0xf53948.mainVideoIndex)))
+    handler3 = (record) => {
+      const payload = Number.isFinite(Number(record?.mainVideoIndex))
+          ? Math.max(0, Math.trunc(Number(record.mainVideoIndex)))
           : 0,
-        _0x1d4753 = Array.isArray(_0xf53948?.videos)
-          ? _0xf53948.videos[_0x2f77db] || _0xf53948.videos[0]
-          : null,
-        _0x1fa6b0 = [
-          String(_0x1d4753?.thumbUrl || '').trim(),
-          String(_0xf53948?.thumbUrl || '').trim(),
-          String(_0xf53948?.firstFrameUrl || '').trim(),
-          String(_0xf53948?.firstFrameThumbUrl || '').trim(),
-          String(_0xf53948?.imageUrl || '').trim(),
-          String(_0xf53948?.src || '').trim(),
-          _0x59d04f(_0x1d4753?.localPath),
-          _0x59d04f(_0xf53948?.localPath),
-          String(_0x1d4753?.videoUrl || '').trim(),
-          String(_0xf53948?.videoUrl || '').trim(),
+        handle = Array.isArray(record?.videos) ? record.videos[payload] || record.videos[0] : null,
+        list = [
+          String(handle?.thumbUrl || '').trim(),
+          String(record?.thumbUrl || '').trim(),
+          String(record?.firstFrameUrl || '').trim(),
+          String(record?.firstFrameThumbUrl || '').trim(),
+          String(record?.imageUrl || '').trim(),
+          String(record?.src || '').trim(),
+          run(handle?.localPath),
+          run(record?.localPath),
+          String(handle?.videoUrl || '').trim(),
+          String(record?.videoUrl || '').trim(),
         ].filter(Boolean);
-      return _0x1fa6b0.find((_0x521f37) => _0x4af7a6(_0x521f37)) || '';
+      return list.find((item2) => handler(item2)) || '';
     },
-    _0x3e63eb = (_0x4e225f) => {
-      const _0x4f7952 = [
-        String(_0x4e225f?.thumbUrl || '').trim(),
-        String(_0x4e225f?.imageUrl || '').trim(),
-        String(_0x4e225f?.src || '').trim(),
-        _0x59d04f(_0x4e225f?.localPath),
-        String(_0x4e225f?.audioUrl || '').trim(),
+    handler4 = (state) => {
+      const list2 = [
+        String(state?.thumbUrl || '').trim(),
+        String(state?.imageUrl || '').trim(),
+        String(state?.src || '').trim(),
+        run(state?.localPath),
+        String(state?.audioUrl || '').trim(),
       ].filter(Boolean);
-      return _0x4f7952.find((_0x4d3e50) => _0x4af7a6(_0x4d3e50)) || '';
+      return list2.find((item3) => handler(item3)) || '';
     },
-    _0x4c12af = [];
-  for (const _0x4f84e3 of _0x3044a3) {
-    const _0x4740ac = _0x478086[_0x4f84e3.sourceId];
-    if (!_0x4740ac) continue;
-    const _0x3a6037 = _0x4740ac.type || '';
-    let _0x3e2d3b = '';
-    if (_0x3a6037 === 'text' || _0x3a6037 === 'source-text' || _0x3a6037 === 'ai-text')
-      (_0x11a4eb.text++, (_0x3e2d3b = 'text'));
+    list3 = [];
+  for (const edgeId of target) {
+    const response2 = options[edgeId.sourceId];
+    if (!response2) continue;
+    const config = response2.type || '';
+    let scope = '';
+    if (config === 'text' || config === 'source-text' || config === 'ai-text')
+      (response.text++, (scope = 'text'));
     else {
-      if (_0x3a6037 === 'source-image' || _0x3a6037 === 'ai-image')
-        (_0x11a4eb.image++, (_0x3e2d3b = 'image'));
+      if (config === 'source-image' || config === 'ai-image') (response.image++, (scope = 'image'));
       else {
-        if (_0x3a6037 === 'source-video' || _0x3a6037 === 'video' || _0x3a6037 === 'ai-video')
-          (_0x11a4eb.video++, (_0x3e2d3b = 'video'));
+        if (config === 'source-video' || config === 'video' || config === 'ai-video')
+          (response.video++, (scope = 'video'));
         else
-          (_0x3a6037 === 'source-audio' || _0x3a6037 === 'audio' || _0x3a6037 === 'ai-audio') &&
-            (_0x11a4eb.audio++, (_0x3e2d3b = 'audio'));
+          (config === 'source-audio' || config === 'audio' || config === 'ai-audio') &&
+            (response.audio++, (scope = 'audio'));
       }
     }
-    if (_0x3e2d3b) {
-      const _0x50a4d4 = {
+    if (scope) {
+      const input = {
           text: t('aigenText.refs.types.text'),
           image: t('aigenText.refs.types.image'),
           video: t('aigenText.refs.types.video'),
           audio: t('aigenText.refs.types.audio'),
         },
-        _0x2a9622 = '@' + (_0x50a4d4[_0x3e2d3b] || _0x3e2d3b) + _0x11a4eb[_0x3e2d3b];
-      _0x44fb0e[_0x4f84e3.sourceId] = _0x2a9622;
+        output = '@' + (input[scope] || scope) + response[scope];
+      source[edgeId.sourceId] = output;
     }
-    let _0x59bb40 = '';
-    if (_0x3a6037 === 'source-image') {
-      const _0x3c978b = _0xd1e6d3(_0x4740ac);
-      if (_0x3c978b) ensureThumbDecoded(_0x3c978b);
-      const _0x244369 = !!String(_0x4740ac.mask || '').trim();
-      _0x59bb40 = _0x3c978b
+    let thumb = '';
+    if (config === 'source-image') {
+      const value2 = handler2(response2);
+      if (value2) ensureThumbDecoded(value2);
+      const value3 = !!String(response2.mask || '').trim();
+      thumb = value2
         ? '<img src="' +
-          _0x3c978b +
+          value2 +
           '" class="ref-thumb-media is-pending" draggable="false">' +
-          (_0x244369 ? '<span class="ref-thumb-mask-badge">' + t('aigenText.refs.maskBadge') + '</span>' : '')
+          (value3 ? '<span class="ref-thumb-mask-badge">' + t('aigenText.refs.maskBadge') + '</span>' : '')
         : '<div class="ref-thumb-media ref-thumb-text"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /></svg></div>';
     } else {
-      if (_0x3a6037 === 'ai-image') {
-        const _0x887bda = _0xd1e6d3(_0x4740ac),
-          _0xdeeed0 = !!String(_0x4740ac.mask || '').trim();
-        if (_0x887bda) ensureThumbDecoded(_0x887bda);
-        _0x59bb40 = _0x887bda
+      if (config === 'ai-image') {
+        const value4 = handler2(response2),
+          value5 = !!String(response2.mask || '').trim();
+        if (value4) ensureThumbDecoded(value4);
+        thumb = value4
           ? '<img src="' +
-            _0x887bda +
+            value4 +
             '" class="ref-thumb-media is-pending" draggable="false">' +
-            (_0xdeeed0
-              ? '<span class="ref-thumb-mask-badge">' + t('aigenText.refs.maskBadge') + '</span>'
-              : '')
+            (value5 ? '<span class="ref-thumb-mask-badge">' + t('aigenText.refs.maskBadge') + '</span>' : '')
           : '<div class="ref-thumb-media ref-thumb-text"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /></svg></div>';
       } else {
-        if (_0x3a6037 === 'source-text' || _0x3a6037 === 'text')
-          _0x59bb40 = createReferenceFallbackThumbHtml('text');
+        if (config === 'source-text' || config === 'text') thumb = createReferenceFallbackThumbHtml('text');
         else {
-          if (_0x3a6037 === 'ai-text') {
-            const _0x1922af = String(
-              _0x4740ac.outputText || _0x4740ac.text || _0x4740ac.content || _0x4740ac.prompt || '',
+          if (config === 'ai-text') {
+            const enabled4 = String(
+              response2.outputText || response2.text || response2.content || response2.prompt || '',
             ).trim();
-            if (!_0x1922af) continue;
-            _0x59bb40 = createReferenceFallbackThumbHtml('text');
+            if (!enabled4) continue;
+            thumb = createReferenceFallbackThumbHtml('text');
           } else {
-            if (_0x3a6037 === 'source-video' || _0x3a6037 === 'video' || _0x3a6037 === 'ai-video') {
-              const _0xdc4ac1 = _0x155883(_0x4740ac);
-              if (_0xdc4ac1) ensureThumbDecoded(_0xdc4ac1);
-              _0x59bb40 = _0xdc4ac1
-                ? '<img src="' + _0xdc4ac1 + '" class="ref-thumb-media is-pending" draggable="false">'
+            if (config === 'source-video' || config === 'video' || config === 'ai-video') {
+              const value6 = handler3(response2);
+              if (value6) ensureThumbDecoded(value6);
+              thumb = value6
+                ? '<img src="' + value6 + '" class="ref-thumb-media is-pending" draggable="false">'
                 : '<div class="ref-thumb-media ref-thumb-text"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="var(--bg-node-dark)" /><polygon points="8,6 19,12 8,18" fill="var(--text-secondary)" /></svg></div>';
             } else {
-              if (_0x3a6037 === 'source-audio' || _0x3a6037 === 'audio' || _0x3a6037 === 'ai-audio') {
-                const _0x257f89 = _0x3e63eb(_0x4740ac);
-                if (_0x257f89) ensureThumbDecoded(_0x257f89);
-                _0x59bb40 = _0x257f89
-                  ? '<img src="' + _0x257f89 + '" class="ref-thumb-media is-pending" draggable="false">'
+              if (config === 'source-audio' || config === 'audio' || config === 'ai-audio') {
+                const value7 = handler4(response2);
+                if (value7) ensureThumbDecoded(value7);
+                thumb = value7
+                  ? '<img src="' + value7 + '" class="ref-thumb-media is-pending" draggable="false">'
                   : createReferenceFallbackThumbHtml('audio');
               }
             }
@@ -278,79 +265,77 @@ export function _renderSharedRefBar(_0x5d7e5f) {
         }
       }
     }
-    if (!_0x59bb40) continue;
-    const _0x571cd8 = String(_0x4740ac.mask || '').trim() ? 'm1' : 'm0',
-      _0x50ceab = Number.isFinite(Number(_0x4740ac.mainVideoIndex))
-        ? Math.max(0, Math.trunc(Number(_0x4740ac.mainVideoIndex)))
+    if (!thumb) continue;
+    const value8 = String(response2.mask || '').trim() ? 'm1' : 'm0',
+      value9 = Number.isFinite(Number(response2.mainVideoIndex))
+        ? Math.max(0, Math.trunc(Number(response2.mainVideoIndex)))
         : 0,
-      _0x3d1e96 = Array.isArray(_0x4740ac.videos) ? _0x4740ac.videos[_0x50ceab] || _0x4740ac.videos[0] : null,
-      _0x279289 =
-        _0x3a6037 +
+      value10 = Array.isArray(response2.videos) ? response2.videos[value9] || response2.videos[0] : null,
+      sig =
+        config +
         '|' +
-        _0x4f84e3.id +
+        edgeId.id +
         '|' +
-        _0x4f84e3.sourceId +
+        edgeId.sourceId +
         '|' +
-        (_0x4740ac.src ||
-          _0x4740ac.imageUrl ||
-          _0x4740ac.thumbUrl ||
-          _0x4740ac.videoUrl ||
-          _0x4740ac.audioUrl ||
+        (response2.src ||
+          response2.imageUrl ||
+          response2.thumbUrl ||
+          response2.videoUrl ||
+          response2.audioUrl ||
           '') +
         '|' +
-        (_0x4740ac.localPath || '') +
+        (response2.localPath || '') +
         '|' +
-        (_0x4740ac.thumbId || '') +
+        (response2.thumbId || '') +
         '|' +
-        (_0x3d1e96?.thumbUrl || '') +
+        (value10?.thumbUrl || '') +
         '|' +
-        (_0x3d1e96?.localPath || '') +
+        (value10?.localPath || '') +
         '|' +
-        (_0x3d1e96?.videoUrl || '') +
+        (value10?.videoUrl || '') +
         '|' +
-        _0x571cd8;
-    _0x4c12af.push({ edgeId: _0x4f84e3.id, sourceId: _0x4f84e3.sourceId, sig: _0x279289, thumb: _0x59bb40 });
+        value8;
+    list3.push({ edgeId: edgeId.id, sourceId: edgeId.sourceId, sig: sig, thumb: thumb });
   }
-  if (_0x4c12af.length === 0) {
-    const _0x4211c4 = !!_0x5d7e5f.refBarEl.querySelector('.ref-thumb-wrap'),
-      _0x1c5a5d = !!_0x5d7e5f.refBarEl.querySelector('.ref-thumb-container');
-    (_0x5d7e5f._lastRefHTML !== _0x2d98a1 || _0x4211c4 || _0x1c5a5d) &&
-      ((_0x5d7e5f._lastRefHTML = _0x2d98a1),
-      _0x5d7e5f.refBarEl.classList.remove('active'),
-      (_0x5d7e5f.refBarEl.innerHTML = _0x2d98a1));
-    _syncPillLabels(_0x5d7e5f, _0x44fb0e);
+  if (list3.length === 0) {
+    const value11 = !!enabled2.refBarEl.querySelector('.ref-thumb-wrap'),
+      value12 = !!enabled2.refBarEl.querySelector('.ref-thumb-container');
+    (enabled2._lastRefHTML !== promptAttachmentButtonHTML || value11 || value12) &&
+      ((enabled2._lastRefHTML = promptAttachmentButtonHTML),
+      enabled2.refBarEl.classList.remove('active'),
+      (enabled2.refBarEl.innerHTML = promptAttachmentButtonHTML));
+    _syncPillLabels(enabled2, source);
     return;
   }
-  ((_0x5d7e5f._lastRefHTML = '__has-items__'), _0x5d7e5f.refBarEl.classList.add('active'));
-  let _0x3820d2 = _0x5d7e5f.refBarEl.querySelector('.prompt-attachment-btn'),
-    _0x247d33 = _0x5d7e5f.refBarEl.querySelector('.ref-thumb-container');
-  (!_0x3820d2 || !_0x247d33) &&
-    ((_0x5d7e5f.refBarEl.innerHTML = _0x2d98a1 + ' <div class="ref-thumb-container"></div>'),
-    (_0x3820d2 = _0x5d7e5f.refBarEl.querySelector('.prompt-attachment-btn')),
-    (_0x247d33 = _0x5d7e5f.refBarEl.querySelector('.ref-thumb-container')));
-  const _0x2f4ee6 = new Map();
-  _0x247d33
-    .querySelectorAll('.ref-thumb-wrap')
-    .forEach((_0x2638ae) => _0x2f4ee6.set(_0x2638ae.dataset.edgeId, _0x2638ae));
-  const _0x59b607 = new Set();
-  for (const _0x4df95a of _0x4c12af) {
-    let _0xbd8852 = _0x2f4ee6.get(_0x4df95a.edgeId);
-    (!_0xbd8852 && ((_0xbd8852 = document.createElement('div')), (_0xbd8852.className = 'ref-thumb-wrap')),
-      _0xbd8852.dataset.sig !== _0x4df95a.sig &&
-        ((_0xbd8852.innerHTML =
-          _0x4df95a.thumb +
+  ((enabled2._lastRefHTML = '__has-items__'), enabled2.refBarEl.classList.add('active'));
+  let enabled5 = enabled2.refBarEl.querySelector('.prompt-attachment-btn'),
+    el = enabled2.refBarEl.querySelector('.ref-thumb-container');
+  (!enabled5 || !el) &&
+    ((enabled2.refBarEl.innerHTML = promptAttachmentButtonHTML + ' <div class="ref-thumb-container"></div>'),
+    (enabled5 = enabled2.refBarEl.querySelector('.prompt-attachment-btn')),
+    (el = enabled2.refBarEl.querySelector('.ref-thumb-container')));
+  const map = new Map();
+  el.querySelectorAll('.ref-thumb-wrap').forEach((el2) => map.set(el2.dataset.edgeId, el2));
+  const map2 = new Set();
+  for (const value13 of list3) {
+    let el3 = map.get(value13.edgeId);
+    (!el3 && ((el3 = document.createElement('div')), (el3.className = 'ref-thumb-wrap')),
+      el3.dataset.sig !== value13.sig &&
+        ((el3.innerHTML =
+          value13.thumb +
           '<button type="button" class="ref-thumb-delete" title="' +
           t('aigenText.refs.remove') +
           '">×</button>'),
-        (_0xbd8852.dataset.sig = _0x4df95a.sig),
-        revealRefThumbMedia(_0xbd8852, _0x4df95a.sig)),
-      (_0xbd8852.dataset.edgeId = _0x4df95a.edgeId),
-      (_0xbd8852.dataset.sourceId = _0x4df95a.sourceId),
-      _0x247d33.appendChild(_0xbd8852),
-      _0x59b607.add(_0x4df95a.edgeId));
+        (el3.dataset.sig = value13.sig),
+        revealRefThumbMedia(el3, value13.sig)),
+      (el3.dataset.edgeId = value13.edgeId),
+      (el3.dataset.sourceId = value13.sourceId),
+      el.appendChild(el3),
+      map2.add(value13.edgeId));
   }
-  for (const [_0x1e66e6, _0x2d09e3] of _0x2f4ee6.entries()) {
-    if (!_0x59b607.has(_0x1e66e6)) _0x2d09e3.remove();
+  for (const [value14, el4] of map.entries()) {
+    if (!map2.has(value14)) el4.remove();
   }
-  _syncPillLabels(_0x5d7e5f, _0x44fb0e);
+  _syncPillLabels(enabled2, source);
 }

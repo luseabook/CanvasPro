@@ -3,450 +3,436 @@ import { recordMinimapUpdateSample } from './perf/perfProbe.js';
 import { isNodeType } from './registry.js';
 const PAN_PREVIEW_MIN_INTERVAL_MS = 96,
   PAN_NODE_UPDATE_DELAY_MS = 180;
-export function initMinimap(_0xd3bc54, _0x39c75d) {
-  const _0x22b21c = document.getElementById('minimapViewport'),
-    _0x12b139 = document.getElementById('minimapWrapper');
-  if (!_0xd3bc54 || !_0x22b21c || !_0x12b139) return;
-  const _0x24515d = new Map();
-  let _0x8f0841 = null,
-    _0x48b73b = 1,
-    _0x2507fe = 0,
-    _0x51b616 = 0,
-    _0x5ddff2 = 0,
-    _0x4a9bb3 = 0,
-    _0x4325b6 = -1,
-    _0x897e42 = false,
-    _0x2ff2f5 = 0,
-    _0x1e93cc = 0,
-    _0x2feec7 = 1,
-    _0x17d401 = '',
-    _0x37400a = null,
-    _0x32a6a0 = null,
-    _0x2fd5cb = null,
-    _0x52f049 = null,
-    _0x190d77 = null,
-    _0x11b7f8 = null,
-    _0x3c4d31 = 0,
-    _0x277f12 = 0,
-    _0x1f720a = false;
-  function _0x19a50b() {
+export function initMinimap(mapW, store) {
+  const el = document.getElementById('minimapViewport'),
+    el2 = document.getElementById('minimapWrapper');
+  if (!mapW || !el || !el2) return;
+  const dotCount = new Map();
+  let bounds = null,
+    scale = 1,
+    offsetX = 0,
+    offsetY = 0,
+    mapW2 = 0,
+    mapH = 0,
+    value = -1,
+    enabled = false,
+    item = 0,
+    key = 0,
+    index = 1,
+    result = '',
+    enabled2 = null,
+    enabled3 = null,
+    setTimeout2 = null,
+    value2 = null,
+    setTimeout3 = null,
+    enabled4 = null,
+    data = 0,
+    options = 0,
+    delayed = false;
+  function run() {
     return typeof performance !== 'undefined' && performance && typeof performance.now === 'function'
       ? performance.now()
       : Date.now();
   }
-  function _0x231959(_0x1f21a7) {
-    const _0x878f8a = Number(_0x1f21a7?._nodeCount);
-    if (Number.isFinite(_0x878f8a)) return _0x878f8a;
-    return Object.keys(_0x1f21a7?.nodes || {}).length;
+  function nodeCount(target) {
+    const source = Number(target?._nodeCount);
+    if (Number.isFinite(source)) return source;
+    return Object.keys(target?.nodes || {}).length;
   }
-  function _0x57045d() {
+  function run2() {
     return !!document?.body?.classList?.contains?.('is-panning');
   }
-  function _0x16dfcb(_0x4fcbd7) {
-    if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(_0x4fcbd7);
-    return setTimeout(_0x4fcbd7, 16);
+  function run3(next) {
+    if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(next);
+    return setTimeout(next, 16);
   }
-  function _0x1cf8c2(_0x52c4f1) {
-    if (!_0x52c4f1) return;
+  function run4(enabled5) {
+    if (!enabled5) return;
     if (typeof cancelAnimationFrame === 'function') {
-      cancelAnimationFrame(_0x52c4f1);
+      cancelAnimationFrame(enabled5);
       return;
     }
-    clearTimeout(_0x52c4f1);
+    clearTimeout(enabled5);
   }
-  function _0x11d5b4() {
-    return { mapW: _0xd3bc54.clientWidth || 200, mapH: _0xd3bc54.clientHeight || 140 };
+  function run5() {
+    return { mapW: mapW.clientWidth || 200, mapH: mapW.clientHeight || 140 };
   }
-  function _0x2d78a5(_0xa93e7b) {
-    if (_0xa93e7b && _0xa93e7b.width !== 0) return _0xa93e7b;
+  function run6(box) {
+    if (box && box.width !== 0) return box;
     return { minX: -0x3e8, minY: -0x3e8, maxX: 0x3e8, maxY: 0x3e8, width: 0x7d0, height: 0x7d0 };
   }
-  function _0x234dbc(_0x2df14c) {
-    const _0x4b9b69 = Number(_0x2df14c?._nodeCount);
-    if (Number.isFinite(_0x4b9b69)) return _0x4b9b69 <= 0;
-    return !_0x2df14c?.nodes || Object.keys(_0x2df14c.nodes).length === 0;
+  function run7(enabled6) {
+    const count = Number(enabled6?._nodeCount);
+    if (Number.isFinite(count)) return count <= 0;
+    return !enabled6?.nodes || Object.keys(enabled6.nodes).length === 0;
   }
-  function _0x147173(_0x5240db) {
+  function run8(box2) {
     return {
-      x: Number.isFinite(Number(_0x5240db?.x)) ? Number(_0x5240db.x) : 0,
-      y: Number.isFinite(Number(_0x5240db?.y)) ? Number(_0x5240db.y) : 0,
-      zoom: Number.isFinite(Number(_0x5240db?.zoom)) ? Number(_0x5240db.zoom) : 1,
+      x: Number.isFinite(Number(box2?.x)) ? Number(box2.x) : 0,
+      y: Number.isFinite(Number(box2?.y)) ? Number(box2.y) : 0,
+      zoom: Number.isFinite(Number(box2?.zoom)) ? Number(box2.zoom) : 1,
     };
   }
-  function _0x3cef5e(_0x48fd3b) {
-    const _0x465c74 = Number(_0x48fd3b);
-    return Number.isFinite(_0x465c74) ? Math.round(_0x465c74 * 100) / 100 : 0;
+  function run9(current) {
+    const entry = Number(current);
+    return Number.isFinite(entry) ? Math.round(entry * 100) / 100 : 0;
   }
-  function _0x4dda82(_0xbdc7fb = {}) {
-    let _0x2ef3bb = '';
-    for (const _0x475759 of Object.values(_0xbdc7fb || {})) {
-      if (!_0x475759 || isNodeType(_0x475759, 'group')) continue;
-      ((_0x2ef3bb += [
-        _0x475759.id || '',
-        _0x475759.type || '',
-        _0x3cef5e(_0x475759.x),
-        _0x3cef5e(_0x475759.y),
-        _0x3cef5e(_0x475759.width || 200),
-        _0x3cef5e(_0x475759.height || 100),
+  function run10(options2 = {}) {
+    let record = '';
+    for (const box3 of Object.values(options2 || {})) {
+      if (!box3 || isNodeType(box3, 'group')) continue;
+      ((record += [
+        box3.id || '',
+        box3.type || '',
+        run9(box3.x),
+        run9(box3.y),
+        run9(box3.width || 200),
+        run9(box3.height || 100),
       ].join(':')),
-        (_0x2ef3bb += '|'));
+        (record += '|'));
     }
-    return _0x2ef3bb;
+    return record;
   }
-  function _0x3acf4d(_0x3b0287, _0x4d7a8d, _0x206064 = {}) {
-    const _0x48bc20 = _0x2d78a5(_0x3b0287),
-      { mapW: _0x5482cb, mapH: _0x169d00 } = _0x11d5b4(),
-      _0x508e88 = Math.max(_0x48bc20.width, 0x3e8),
-      _0x2bdc4a = Math.max(_0x48bc20.height, 0x3e8),
-      _0x51d05e = Math.min(_0x5482cb / _0x508e88, _0x169d00 / _0x2bdc4a),
-      _0x4c82a0 = (_0x5482cb - _0x508e88 * _0x51d05e) / 2,
-      _0x3c4de9 = (_0x169d00 - _0x2bdc4a * _0x51d05e) / 2;
-    ((_0x8f0841 = _0x48bc20),
-      (_0x48b73b = _0x51d05e),
-      (_0x2507fe = _0x4c82a0),
-      (_0x51b616 = _0x3c4de9),
-      (_0x5ddff2 = _0x5482cb),
-      (_0x4a9bb3 = _0x169d00),
-      (_0x4325b6 = Number.isFinite(_0x4d7a8d) ? _0x4d7a8d : -1),
-      (_0x897e42 = _0x206064.trackViewport === true));
-    const _0x53ff7c = _0x147173(_0x206064.viewport);
+  function run11(payload, handle, state = {}) {
+    const bounds2 = run6(payload),
+      { mapW: mapW3, mapH: mapH2 } = run5(),
+      config = Math.max(bounds2.width, 0x3e8),
+      scope = Math.max(bounds2.height, 0x3e8),
+      scale2 = Math.min(mapW3 / config, mapH2 / scope),
+      offsetX2 = (mapW3 - config * scale2) / 2,
+      offsetY2 = (mapH2 - scope * scale2) / 2;
+    ((bounds = bounds2),
+      (scale = scale2),
+      (offsetX = offsetX2),
+      (offsetY = offsetY2),
+      (mapW2 = mapW3),
+      (mapH = mapH2),
+      (value = Number.isFinite(handle) ? handle : -1),
+      (enabled = state.trackViewport === true));
+    const box4 = run8(state.viewport);
     return (
-      (_0x2ff2f5 = _0x53ff7c.x),
-      (_0x1e93cc = _0x53ff7c.y),
-      (_0x2feec7 = _0x53ff7c.zoom),
-      (window._v2MinimapScale = _0x51d05e),
+      (item = box4.x),
+      (key = box4.y),
+      (index = box4.zoom),
+      (window._v2MinimapScale = scale2),
       {
-        bounds: _0x48bc20,
-        scale: _0x51d05e,
-        offsetX: _0x4c82a0,
-        offsetY: _0x3c4de9,
-        mapW: _0x5482cb,
-        mapH: _0x169d00,
+        bounds: bounds2,
+        scale: scale2,
+        offsetX: offsetX2,
+        offsetY: offsetY2,
+        mapW: mapW3,
+        mapH: mapH2,
       }
     );
   }
-  function _0x25cd81(_0x5b2506) {
-    const _0x44a2a6 = _0x234dbc(_0x5b2506),
-      _0xc9ab05 = calcWorldBounds(_0x5b2506?.nodes || {}, _0x5b2506?.viewport);
-    return _0x3acf4d(_0xc9ab05, _0x5b2506?._persistRev, {
-      trackViewport: _0x44a2a6,
-      viewport: _0x44a2a6 ? _0x5b2506?.viewport : null,
+  function run12(input) {
+    const trackViewport = run7(input),
+      calcWorldBounds2 = calcWorldBounds(input?.nodes || {}, input?.viewport);
+    return run11(calcWorldBounds2, input?._persistRev, {
+      trackViewport: trackViewport,
+      viewport: trackViewport ? input?.viewport : null,
     });
   }
-  function _0x2cd81a(_0x222f77, { allowCached: allowCached = true } = {}) {
-    const _0x4c7401 = Number.isFinite(_0x222f77?._persistRev) ? _0x222f77._persistRev : -1,
-      _0x64d15c = _0x234dbc(_0x222f77),
-      _0x59d1aa = _0x147173(_0x222f77?.viewport),
-      { mapW: _0x781ffc, mapH: _0x5dbc06 } = _0x11d5b4(),
-      _0x4593fc = !!_0x8f0841,
-      _0x200e36 = _0x4593fc && _0x4325b6 === _0x4c7401,
-      _0x392b79 = _0x4593fc && _0x5ddff2 === _0x781ffc && _0x4a9bb3 === _0x5dbc06,
-      _0x28e5b8 =
-        _0x4593fc &&
-        _0x897e42 === true &&
-        _0x64d15c === true &&
-        _0x2ff2f5 === _0x59d1aa.x &&
-        _0x1e93cc === _0x59d1aa.y &&
-        _0x2feec7 === _0x59d1aa.zoom;
-    if (allowCached && _0x200e36 && ((!_0x64d15c && !_0x897e42) || _0x28e5b8)) {
-      if (_0x392b79)
+  function run13(output, { allowCached: allowCached = true } = {}) {
+    const value3 = Number.isFinite(output?._persistRev) ? output._persistRev : -1,
+      trackViewport2 = run7(output),
+      box5 = run8(output?.viewport),
+      { mapW: mapW4, mapH: mapH3 } = run5(),
+      value4 = !!bounds,
+      value5 = value4 && value === value3,
+      value6 = value4 && mapW2 === mapW4 && mapH === mapH3,
+      value7 =
+        value4 &&
+        enabled === true &&
+        trackViewport2 === true &&
+        item === box5.x &&
+        key === box5.y &&
+        index === box5.zoom;
+    if (allowCached && value5 && ((!trackViewport2 && !enabled) || value7)) {
+      if (value6)
         return (
-          (window._v2MinimapScale = _0x48b73b),
+          (window._v2MinimapScale = scale),
           {
-            bounds: _0x8f0841,
-            scale: _0x48b73b,
-            offsetX: _0x2507fe,
-            offsetY: _0x51b616,
-            mapW: _0x781ffc,
-            mapH: _0x5dbc06,
+            bounds: bounds,
+            scale: scale,
+            offsetX: offsetX,
+            offsetY: offsetY,
+            mapW: mapW4,
+            mapH: mapH3,
           }
         );
-      return _0x3acf4d(_0x8f0841, _0x4c7401, {
-        trackViewport: _0x64d15c,
-        viewport: _0x64d15c ? _0x59d1aa : null,
+      return run11(bounds, value3, {
+        trackViewport: trackViewport2,
+        viewport: trackViewport2 ? box5 : null,
       });
     }
-    return _0x25cd81(_0x222f77);
+    return run12(output);
   }
-  function _0x273d44(_0x5570e8) {
-    const _0x17740a = Number.isFinite(_0x5570e8?._persistRev) ? _0x5570e8._persistRev : -1,
-      _0xeec31c = _0x234dbc(_0x5570e8);
-    if (_0x8f0841 && _0x4325b6 === _0x17740a && !_0xeec31c && !_0x897e42)
+  function run14(value8) {
+    const value9 = Number.isFinite(value8?._persistRev) ? value8._persistRev : -1,
+      enabled7 = run7(value8);
+    if (bounds && value === value9 && !enabled7 && !enabled)
       return (
-        (window._v2MinimapScale = _0x48b73b),
+        (window._v2MinimapScale = scale),
         {
-          bounds: _0x8f0841,
-          scale: _0x48b73b,
-          offsetX: _0x2507fe,
-          offsetY: _0x51b616,
-          mapW: _0x5ddff2,
-          mapH: _0x4a9bb3,
+          bounds: bounds,
+          scale: scale,
+          offsetX: offsetX,
+          offsetY: offsetY,
+          mapW: mapW2,
+          mapH: mapH,
         }
       );
-    return _0x2cd81a(_0x5570e8, { allowCached: true });
+    return run13(value8, { allowCached: true });
   }
-  function _0x1bae22() {
-    _0x2fd5cb = null;
-    if (_0x57045d()) {
-      _0x2fd5cb = setTimeout(_0x1bae22, PAN_NODE_UPDATE_DELAY_MS);
+  function run15() {
+    setTimeout2 = null;
+    if (run2()) {
+      setTimeout2 = setTimeout(run15, PAN_NODE_UPDATE_DELAY_MS);
       return;
     }
-    !_0x37400a && (_0x37400a = _0x16dfcb(_0x2b752c));
+    !enabled2 && (enabled2 = run3(run16));
   }
-  function _0x4a42b3(_0x110607) {
-    if (!_0x32a6a0) _0x32a6a0 = _0x110607;
+  function run17(value10) {
+    if (!enabled3) enabled3 = value10;
     else {
-      if (_0x32a6a0 === 'both' || _0x110607 === 'both') _0x32a6a0 = 'both';
-      else _0x32a6a0 !== _0x110607 ? (_0x32a6a0 = 'both') : (_0x32a6a0 = _0x110607);
+      if (enabled3 === 'both' || value10 === 'both') enabled3 = 'both';
+      else enabled3 !== value10 ? (enabled3 = 'both') : (enabled3 = value10);
     }
-    if (_0x57045d() && (_0x32a6a0 === 'nodes' || _0x32a6a0 === 'both')) {
-      !_0x2fd5cb && (_0x2fd5cb = setTimeout(_0x1bae22, PAN_NODE_UPDATE_DELAY_MS));
+    if (run2() && (enabled3 === 'nodes' || enabled3 === 'both')) {
+      !setTimeout2 && (setTimeout2 = setTimeout(run15, PAN_NODE_UPDATE_DELAY_MS));
       return;
     }
-    !_0x37400a && (_0x37400a = _0x16dfcb(_0x2b752c));
+    !enabled2 && (enabled2 = run3(run16));
   }
-  function _0x2b752c() {
-    _0x37400a = null;
-    const _0xd93dec = _0x32a6a0;
-    _0x32a6a0 = null;
-    if (!_0xd93dec) return;
-    const _0x2933ef = _0x39c75d.getStateRaw();
-    _0xd93dec === 'nodes' || _0xd93dec === 'both' ? _0x3912fc(_0x2933ef) : _0x586fda(_0x2933ef);
+  function run16() {
+    enabled2 = null;
+    const enabled8 = enabled3;
+    enabled3 = null;
+    if (!enabled8) return;
+    const value11 = store.getStateRaw();
+    enabled8 === 'nodes' || enabled8 === 'both' ? run18(value11) : run19(value11);
   }
-  function _0x3912fc(_0x4c443c) {
-    const _0x11c677 = _0x19a50b(),
-      _0x26b694 = _0x4c443c?.nodes || {},
-      _0x24bdc0 = _0x4c443c?.viewport || { x: 0, y: 0, zoom: 1 },
-      _0x49cfc5 = _0x4dda82(_0x26b694),
-      _0x364fc4 = Number.isFinite(_0x4c443c?._persistRev) ? _0x4c443c._persistRev : -1;
-    if (_0x8f0841 && _0x17d401 === _0x49cfc5 && !_0x234dbc(_0x4c443c)) {
-      ((_0x4325b6 = _0x364fc4),
-        _0x3c4481(_0x24bdc0, _0x8f0841, _0x48b73b, _0x2507fe, _0x51b616),
-        recordMinimapUpdateSample('viewport', _0x19a50b() - _0x11c677, {
-          nodeCount: _0x231959(_0x4c443c),
-          dotCount: _0x24515d.size,
+  function run18(value12) {
+    const value13 = run(),
+      value14 = value12?.nodes || {},
+      value15 = value12?.viewport || { x: 0, y: 0, zoom: 1 },
+      value16 = run10(value14),
+      value17 = Number.isFinite(value12?._persistRev) ? value12._persistRev : -1;
+    if (bounds && result === value16 && !run7(value12)) {
+      ((value = value17),
+        run20(value15, bounds, scale, offsetX, offsetY),
+        recordMinimapUpdateSample('viewport', run() - value13, {
+          nodeCount: nodeCount(value12),
+          dotCount: dotCount.size,
           viewportOnly: true,
         }));
       return;
     }
-    const {
-        bounds: _0x4d39b6,
-        scale: _0x12934f,
-        offsetX: _0xf1d4a5,
-        offsetY: _0x41ab2c,
-      } = _0x25cd81(_0x4c443c),
-      _0x37ae95 = new Set();
-    let _0x13f8f8 = 0,
-      _0x2bcb31 = 0,
-      _0x323d63 = 0;
-    ((window._v2MinimapDotMap = _0x24515d),
-      Object.values(_0x26b694).forEach((_0x293e3b) => {
-        if (isNodeType(_0x293e3b, 'group')) return;
-        _0x37ae95.add(_0x293e3b.id);
-        let _0x2adf94 = _0x24515d.get(_0x293e3b.id);
-        const _0xb9187d = _0xf1d4a5 + (_0x293e3b.x - _0x4d39b6.minX) * _0x12934f,
-          _0x424ae7 = _0x41ab2c + (_0x293e3b.y - _0x4d39b6.minY) * _0x12934f,
-          _0x53ac68 = Math.max((_0x293e3b.width || 200) * _0x12934f, 2),
-          _0x32b68b = Math.max((_0x293e3b.height || 100) * _0x12934f, 2);
-        !_0x2adf94
-          ? ((_0x2adf94 = document.createElement('div')),
-            (_0x2adf94.id = 'minimap-node-' + _0x293e3b.id),
-            _0x24515d.set(_0x293e3b.id, _0x2adf94),
-            _0xd3bc54.appendChild(_0x2adf94),
-            (_0x13f8f8 += 1))
-          : (_0x2bcb31 += 1);
-        let _0x3b56f0 = 'default';
-        const _0x1bf2dd = _0x293e3b.type || '';
-        if (_0x1bf2dd.includes('text')) _0x3b56f0 = 'text';
+    const { bounds: bounds3, scale: scale3, offsetX: offsetX3, offsetY: offsetY3 } = run12(value12),
+      map = new Set();
+    let createdCount = 0,
+      updatedCount = 0,
+      removedCount = 0;
+    ((window._v2MinimapDotMap = dotCount),
+      Object.values(value14).forEach((box6) => {
+        if (isNodeType(box6, 'group')) return;
+        map.add(box6.id);
+        let el3 = dotCount.get(box6.id);
+        const value18 = offsetX3 + (box6.x - bounds3.minX) * scale3,
+          value19 = offsetY3 + (box6.y - bounds3.minY) * scale3,
+          value20 = Math.max((box6.width || 200) * scale3, 2),
+          value21 = Math.max((box6.height || 100) * scale3, 2);
+        !el3
+          ? ((el3 = document.createElement('div')),
+            (el3.id = 'minimap-node-' + box6.id),
+            dotCount.set(box6.id, el3),
+            mapW.appendChild(el3),
+            (createdCount += 1))
+          : (updatedCount += 1);
+        let value22 = 'default';
+        const list = box6.type || '';
+        if (list.includes('text')) value22 = 'text';
         else {
-          if (_0x1bf2dd.includes('image')) _0x3b56f0 = 'image';
+          if (list.includes('image')) value22 = 'image';
           else {
-            if (_0x1bf2dd.includes('video')) _0x3b56f0 = 'video';
+            if (list.includes('video')) value22 = 'video';
             else {
-              if (_0x1bf2dd.includes('audio')) _0x3b56f0 = 'audio';
+              if (list.includes('audio')) value22 = 'audio';
             }
           }
         }
-        _0x2adf94.className !== 'minimap-node ' + _0x3b56f0 &&
-          (_0x2adf94.className = 'minimap-node ' + _0x3b56f0);
-        if (_0x2adf94.style.left !== _0xb9187d + 'px') _0x2adf94.style.left = _0xb9187d + 'px';
-        if (_0x2adf94.style.top !== _0x424ae7 + 'px') _0x2adf94.style.top = _0x424ae7 + 'px';
-        if (_0x2adf94.style.width !== _0x53ac68 + 'px') _0x2adf94.style.width = _0x53ac68 + 'px';
-        if (_0x2adf94.style.height !== _0x32b68b + 'px') _0x2adf94.style.height = _0x32b68b + 'px';
+        el3.className !== 'minimap-node ' + value22 && (el3.className = 'minimap-node ' + value22);
+        if (el3.style.left !== value18 + 'px') el3.style.left = value18 + 'px';
+        if (el3.style.top !== value19 + 'px') el3.style.top = value19 + 'px';
+        if (el3.style.width !== value20 + 'px') el3.style.width = value20 + 'px';
+        if (el3.style.height !== value21 + 'px') el3.style.height = value21 + 'px';
       }),
-      _0x24515d.forEach((_0x13affd, _0x4ec1c5) => {
-        !_0x37ae95.has(_0x4ec1c5) && (_0x13affd.remove(), _0x24515d.delete(_0x4ec1c5), (_0x323d63 += 1));
+      dotCount.forEach((el4, value23) => {
+        !map.has(value23) && (el4.remove(), dotCount.delete(value23), (removedCount += 1));
       }),
-      _0x3c4481(_0x24bdc0, _0x4d39b6, _0x12934f, _0xf1d4a5, _0x41ab2c),
-      recordMinimapUpdateSample('nodes', _0x19a50b() - _0x11c677, {
-        nodeCount: _0x231959(_0x4c443c),
-        dotCount: _0x24515d.size,
-        createdCount: _0x13f8f8,
-        updatedCount: _0x2bcb31,
-        removedCount: _0x323d63,
+      run20(value15, bounds3, scale3, offsetX3, offsetY3),
+      recordMinimapUpdateSample('nodes', run() - value13, {
+        nodeCount: nodeCount(value12),
+        dotCount: dotCount.size,
+        createdCount: createdCount,
+        updatedCount: updatedCount,
+        removedCount: removedCount,
         viewportOnly: false,
       }),
-      (_0x17d401 = _0x49cfc5));
+      (result = value16));
   }
-  function _0x586fda(_0x504d98) {
-    const _0x48d5c8 = _0x19a50b(),
-      _0x5900f3 = _0x504d98?.viewport || { x: 0, y: 0, zoom: 1 };
-    if (!_0x8f0841) {
-      _0x3912fc(_0x39c75d.getStateRaw());
+  function run19(value24) {
+    const value25 = run(),
+      value26 = value24?.viewport || { x: 0, y: 0, zoom: 1 };
+    if (!bounds) {
+      run18(store.getStateRaw());
       return;
     }
-    const _0x55bbb4 = Number.isFinite(_0x504d98?._persistRev) ? _0x504d98._persistRev : -1;
-    if (_0x4325b6 !== _0x55bbb4) {
-      _0x3912fc(_0x39c75d.getStateRaw());
+    const value27 = Number.isFinite(value24?._persistRev) ? value24._persistRev : -1;
+    if (value !== value27) {
+      run18(store.getStateRaw());
       return;
     }
-    const {
-      bounds: _0x2855da,
-      scale: _0x311527,
-      offsetX: _0x1427e2,
-      offsetY: _0x2acd22,
-    } = _0x273d44(_0x504d98);
-    (_0x3c4481(_0x5900f3, _0x2855da, _0x311527, _0x1427e2, _0x2acd22),
-      recordMinimapUpdateSample('viewport', _0x19a50b() - _0x48d5c8, {
-        nodeCount: _0x231959(_0x504d98),
-        dotCount: _0x24515d.size,
+    const { bounds: bounds4, scale: scale4, offsetX: offsetX4, offsetY: offsetY4 } = run14(value24);
+    (run20(value26, bounds4, scale4, offsetX4, offsetY4),
+      recordMinimapUpdateSample('viewport', run() - value25, {
+        nodeCount: nodeCount(value24),
+        dotCount: dotCount.size,
         viewportOnly: true,
       }));
   }
-  function _0x3c4481(_0x55896, _0x40abac, _0x3330c9, _0x3dd0bd, _0x47a19d) {
-    const _0x3998e0 = window.innerWidth / _0x55896.zoom,
-      _0x2008a0 = window.innerHeight / _0x55896.zoom,
-      _0x5e7a88 = -_0x55896.x / _0x55896.zoom,
-      _0x93f8fd = -_0x55896.y / _0x55896.zoom,
-      _0x3ffa47 = _0x3dd0bd + (_0x5e7a88 - _0x40abac.minX) * _0x3330c9,
-      _0x482b22 = _0x47a19d + (_0x93f8fd - _0x40abac.minY) * _0x3330c9,
-      _0x211548 = _0x3998e0 * _0x3330c9,
-      _0x302427 = _0x2008a0 * _0x3330c9;
-    (_0x22b21c.style.left !== _0x3ffa47 + 'px' && (_0x22b21c.style.left = _0x3ffa47 + 'px'),
-      _0x22b21c.style.top !== _0x482b22 + 'px' && (_0x22b21c.style.top = _0x482b22 + 'px'),
-      _0x22b21c.style.width !== _0x211548 + 'px' && (_0x22b21c.style.width = _0x211548 + 'px'),
-      _0x22b21c.style.height !== _0x302427 + 'px' && (_0x22b21c.style.height = _0x302427 + 'px'));
+  function run20(box7, value28, value29, value30, value31) {
+    const value32 = window.innerWidth / box7.zoom,
+      value33 = window.innerHeight / box7.zoom,
+      value34 = -box7.x / box7.zoom,
+      value35 = -box7.y / box7.zoom,
+      value36 = value30 + (value34 - value28.minX) * value29,
+      value37 = value31 + (value35 - value28.minY) * value29,
+      value38 = value32 * value29,
+      value39 = value33 * value29;
+    (el.style.left !== value36 + 'px' && (el.style.left = value36 + 'px'),
+      el.style.top !== value37 + 'px' && (el.style.top = value37 + 'px'),
+      el.style.width !== value38 + 'px' && (el.style.width = value38 + 'px'),
+      el.style.height !== value39 + 'px' && (el.style.height = value39 + 'px'));
   }
-  function _0x4a5104() {
-    if (_0x52f049) return;
-    _0x52f049 = _0x16dfcb(_0x126248);
+  function run21() {
+    if (value2) return;
+    value2 = run3(run22);
   }
-  function _0x126248() {
-    _0x52f049 = null;
-    if (!_0x11b7f8) return;
-    const _0x326b32 = _0x11b7f8;
-    _0x11b7f8 = null;
-    const _0x2e8afc = _0x39c75d.getStateRaw(),
-      _0x2efc6c = { ..._0x2e8afc, viewport: _0x326b32 },
-      _0x4ae6c9 = _0x19a50b(),
+  function run22() {
+    value2 = null;
+    if (!enabled4) return;
+    const viewport = enabled4;
+    enabled4 = null;
+    const args = store.getStateRaw(),
+      value40 = { ...args, viewport: viewport },
+      value41 = run(),
       {
-        bounds: _0x579910,
-        scale: _0x2ef428,
-        offsetX: _0x191f42,
-        offsetY: _0x169588,
-      } = _0x2cd81a(_0x2efc6c, { allowCached: true });
-    (_0x3c4481(_0x326b32, _0x579910, _0x2ef428, _0x191f42, _0x169588),
-      (_0x3c4d31 = _0x19a50b()),
-      (_0x277f12 += 1),
-      recordMinimapUpdateSample('pan-preview', _0x3c4d31 - _0x4ae6c9, {
-        nodeCount: _0x231959(_0x2e8afc),
-        dotCount: _0x24515d.size,
+        bounds: bounds5,
+        scale: scale5,
+        offsetX: offsetX5,
+        offsetY: offsetY5,
+      } = run13(value40, { allowCached: true });
+    (run20(viewport, bounds5, scale5, offsetX5, offsetY5),
+      (data = run()),
+      (options += 1),
+      recordMinimapUpdateSample('pan-preview', data - value41, {
+        nodeCount: nodeCount(args),
+        dotCount: dotCount.size,
         viewportOnly: true,
-        delayed: _0x1f720a,
+        delayed: delayed,
       }),
-      (_0x1f720a = false));
+      (delayed = false));
   }
-  function _0x3a64af(_0x361f81, _0x1e884e = {}) {
-    _0x11b7f8 = _0x147173(_0x361f81);
-    const _0x33517b = _0x1e884e.force === true,
-      _0xd56b2c = _0x19a50b() - _0x3c4d31,
-      _0x138d81 = _0x33517b ? 0 : Math.max(0, PAN_PREVIEW_MIN_INTERVAL_MS - _0xd56b2c);
-    if (_0x138d81 <= 0) {
-      _0x190d77 && (clearTimeout(_0x190d77), (_0x190d77 = null));
-      ((_0x1f720a = false), _0x4a5104());
+  function run23(value42, value43 = {}) {
+    enabled4 = run8(value42);
+    const value44 = value43.force === true,
+      value45 = run() - data,
+      count2 = value44 ? 0 : Math.max(0, PAN_PREVIEW_MIN_INTERVAL_MS - value45);
+    if (count2 <= 0) {
+      setTimeout3 && (clearTimeout(setTimeout3), (setTimeout3 = null));
+      ((delayed = false), run21());
       return;
     }
-    !_0x190d77 &&
-      ((_0x1f720a = true),
-      (_0x190d77 = setTimeout(() => {
-        ((_0x190d77 = null), _0x4a5104());
-      }, _0x138d81)));
+    !setTimeout3 &&
+      ((delayed = true),
+      (setTimeout3 = setTimeout(() => {
+        ((setTimeout3 = null), run21());
+      }, count2)));
   }
-  function _0x181c18(_0x1cab22 = null) {
-    if (_0x1cab22) _0x11b7f8 = _0x147173(_0x1cab22);
+  function run24(value46 = null) {
+    if (value46) enabled4 = run8(value46);
     return (
-      _0x190d77 && (clearTimeout(_0x190d77), (_0x190d77 = null)),
-      _0x52f049 && (_0x1cf8c2(_0x52f049), (_0x52f049 = null)),
-      _0x126248(),
-      _0x277f12
+      setTimeout3 && (clearTimeout(setTimeout3), (setTimeout3 = null)),
+      value2 && (run4(value2), (value2 = null)),
+      run22(),
+      options
     );
   }
-  const _0x5a937a = (_0x3e2269, _0x1341ba = {}) => _0x3a64af(_0x3e2269, _0x1341ba),
-    _0x247583 = (_0x3995fc = null) => _0x181c18(_0x3995fc),
-    _0x49cd1b = () => _0x277f12;
-  ((window._v2ScheduleMinimapViewportPreview = _0x5a937a),
-    (window._v2FlushMinimapViewportPreview = _0x247583),
-    (window._v2GetMinimapPreviewFlushCount = _0x49cd1b));
-  const _0x444eef = _0x39c75d.subscribeSelector(
-      (_0x548084) => _0x548084._persistRev || 0,
-      () => _0x4a42b3('nodes'),
+  const value47 = (value48, value49 = {}) => run23(value48, value49),
+    value50 = (value51 = null) => run24(value51),
+    value52 = () => options;
+  ((window._v2ScheduleMinimapViewportPreview = value47),
+    (window._v2FlushMinimapViewportPreview = value50),
+    (window._v2GetMinimapPreviewFlushCount = value52));
+  const run25 = store.subscribeSelector(
+      (value53) => value53._persistRev || 0,
+      () => run17('nodes'),
     ),
-    _0x1ff42e = _0x39c75d.subscribeSelector(
-      (_0x40bc4a) => _0x40bc4a.viewport,
-      () => _0x4a42b3('viewport'),
+    handler = store.subscribeSelector(
+      (value54) => value54.viewport,
+      () => run17('viewport'),
     );
-  _0x4a42b3('both');
-  const _0x289a37 = document.getElementById('v2-wrap');
-  _0x289a37 &&
-    (_0x289a37.style.removeProperty('--bg-x'),
-    _0x289a37.style.removeProperty('--bg-y'),
-    _0x289a37.style.removeProperty('--bg-zoom'));
-  let _0x112dcf = false;
-  const _0x493476 = (_0x4d6db5) => {
-    const _0x1e2062 = _0x39c75d.getStateRaw(),
-      { viewport: _0x575c31 } = _0x1e2062,
+  run17('both');
+  const el5 = document.getElementById('v2-wrap');
+  el5 &&
+    (el5.style.removeProperty('--bg-x'),
+    el5.style.removeProperty('--bg-y'),
+    el5.style.removeProperty('--bg-zoom'));
+  let enabled9 = false;
+  const run26 = (event) => {
+    const value55 = store.getStateRaw(),
+      { viewport: viewport2 } = value55,
       {
-        bounds: _0x5c01a9,
-        scale: _0x9c519a,
-        offsetX: _0x48b030,
-        offsetY: _0x2b9ce7,
-      } = _0x2cd81a(_0x1e2062, { allowCached: true }),
-      _0x40546c = _0xd3bc54.getBoundingClientRect(),
-      _0x2f5a7b = _0x4d6db5.clientX - _0x40546c.left - _0x48b030,
-      _0x2f461e = _0x4d6db5.clientY - _0x40546c.top - _0x2b9ce7,
-      _0x27ce9d = _0x5c01a9.minX + _0x2f5a7b / _0x9c519a,
-      _0x57d072 = _0x5c01a9.minY + _0x2f461e / _0x9c519a,
-      _0x31e4e9 = window.innerWidth / 2 - _0x27ce9d * _0x575c31.zoom,
-      _0x43a3f6 = window.innerHeight / 2 - _0x57d072 * _0x575c31.zoom;
-    _0x39c75d.updateViewport(_0x31e4e9, _0x43a3f6, _0x575c31.zoom);
+        bounds: bounds6,
+        scale: scale6,
+        offsetX: offsetX6,
+        offsetY: offsetY6,
+      } = run13(value55, { allowCached: true }),
+      box8 = mapW.getBoundingClientRect(),
+      value56 = event.clientX - box8.left - offsetX6,
+      value57 = event.clientY - box8.top - offsetY6,
+      value58 = bounds6.minX + value56 / scale6,
+      value59 = bounds6.minY + value57 / scale6,
+      value60 = window.innerWidth / 2 - value58 * viewport2.zoom,
+      value61 = window.innerHeight / 2 - value59 * viewport2.zoom;
+    store.updateViewport(value60, value61, viewport2.zoom);
   };
   return (
-    _0x12b139.addEventListener('pointerdown', (_0x9323ff) => {
-      (_0x9323ff.stopPropagation(),
-        (_0x112dcf = true),
-        _0x12b139.setPointerCapture(_0x9323ff.pointerId),
-        _0x493476(_0x9323ff));
+    el2.addEventListener('pointerdown', (event2) => {
+      (event2.stopPropagation(), (enabled9 = true), el2.setPointerCapture(event2.pointerId), run26(event2));
     }),
-    _0x12b139.addEventListener('pointermove', (_0x386432) => {
-      if (!_0x112dcf) return;
-      _0x493476(_0x386432);
+    el2.addEventListener('pointermove', (value62) => {
+      if (!enabled9) return;
+      run26(value62);
     }),
-    _0x12b139.addEventListener('pointerup', (_0x1b93b7) => {
-      ((_0x112dcf = false), _0x12b139.releasePointerCapture(_0x1b93b7.pointerId));
+    el2.addEventListener('pointerup', (event3) => {
+      ((enabled9 = false), el2.releasePointerCapture(event3.pointerId));
     }),
-    function _0x5dd6c3() {
-      (_0x444eef(),
-        _0x1ff42e(),
-        _0x37400a && (_0x1cf8c2(_0x37400a), (_0x37400a = null)),
-        _0x2fd5cb && (clearTimeout(_0x2fd5cb), (_0x2fd5cb = null)),
-        _0x52f049 && (_0x1cf8c2(_0x52f049), (_0x52f049 = null)),
-        _0x190d77 && (clearTimeout(_0x190d77), (_0x190d77 = null)),
-        window._v2ScheduleMinimapViewportPreview === _0x5a937a &&
+    function run27() {
+      (run25(),
+        handler(),
+        enabled2 && (run4(enabled2), (enabled2 = null)),
+        setTimeout2 && (clearTimeout(setTimeout2), (setTimeout2 = null)),
+        value2 && (run4(value2), (value2 = null)),
+        setTimeout3 && (clearTimeout(setTimeout3), (setTimeout3 = null)),
+        window._v2ScheduleMinimapViewportPreview === value47 &&
           delete window._v2ScheduleMinimapViewportPreview,
-        window._v2FlushMinimapViewportPreview === _0x247583 && delete window._v2FlushMinimapViewportPreview,
-        window._v2GetMinimapPreviewFlushCount === _0x49cd1b && delete window._v2GetMinimapPreviewFlushCount,
-        _0x24515d.forEach((_0x5903e3) => _0x5903e3.remove()),
-        _0x24515d.clear());
+        window._v2FlushMinimapViewportPreview === value50 && delete window._v2FlushMinimapViewportPreview,
+        window._v2GetMinimapPreviewFlushCount === value52 && delete window._v2GetMinimapPreviewFlushCount,
+        dotCount.forEach((el6) => el6.remove()),
+        dotCount.clear());
     }
   );
 }

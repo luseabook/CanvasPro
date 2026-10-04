@@ -375,9 +375,7 @@ export const APIMART_SEEDREAM_RATIO_FIELD = Object.freeze({
 export const APIMART_SEEDREAM_5_LITE_RATIO_FIELD = Object.freeze({
   ...APIMART_SEEDREAM_RATIO_FIELD,
   options: Object.freeze(
-    APIMART_SEEDREAM_RATIO_FIELD.options.filter(
-      (_0x2d3c85) => String(_0x2d3c85?.value ?? _0x2d3c85) !== '9:21',
-    ),
+    APIMART_SEEDREAM_RATIO_FIELD.options.filter((el) => String(el?.value ?? el) !== '9:21'),
   ),
 });
 export const NANO_BANANA_2_RATIO_FIELD = Object.freeze({
@@ -531,11 +529,11 @@ export const APIMART_QWEN_IMAGE_BATCH_SIZE_FIELD = Object.freeze({
     Object.freeze({ value: 6, label: '6x', selectedLabel: '6x' }),
   ]),
 });
-export function withDefaultValue(_0x36a1b9, _0x2e060c) {
-  return Object.freeze({ ..._0x36a1b9, defaultValue: _0x2e060c });
+export function withDefaultValue(args, defaultValue) {
+  return Object.freeze({ ...args, defaultValue: defaultValue });
 }
-function freezeFields(_0x2257fc) {
-  return Object.freeze(_0x2257fc.map((_0x1635dd) => Object.freeze(_0x1635dd)));
+function freezeFields(list) {
+  return Object.freeze(list.map((item) => Object.freeze(item)));
 }
 const DEFAULT_IMAGE_MODEL_API_INPUT_SLOTS = Object.freeze({
   allowedKinds: Object.freeze(['text', 'image']),
@@ -565,155 +563,166 @@ const DEFAULT_RATIO_POLICY_BY_PROVIDER = Object.freeze({
   runninghub: Object.freeze({ capability: 'aspectRatio' }),
   volcengine: Object.freeze({ capability: 'dimensions' }),
 });
-function normalizeProviderId(_0x38b898) {
-  return String(_0x38b898 || '')
+function normalizeProviderId(value) {
+  return String(value || '')
     .trim()
     .toLowerCase();
 }
-function freezeRatioPolicyValue(_0x32952d) {
-  if (Array.isArray(_0x32952d)) return Object.freeze([..._0x32952d]);
-  if (_0x32952d && typeof _0x32952d === 'object')
+function freezeRatioPolicyValue(args2) {
+  if (Array.isArray(args2)) return Object.freeze([...args2]);
+  if (args2 && typeof args2 === 'object')
     return Object.freeze(
-      Object.fromEntries(
-        Object.entries(_0x32952d).map(([_0x357324, _0x88358c]) => [
-          _0x357324,
-          freezeRatioPolicyValue(_0x88358c),
-        ]),
-      ),
+      Object.fromEntries(Object.entries(args2).map(([key, index]) => [key, freezeRatioPolicyValue(index)])),
     );
-  return _0x32952d;
+  return args2;
 }
-function freezeRatioPolicy(_0x3635ee) {
-  if (!_0x3635ee || typeof _0x3635ee !== 'object') return null;
+function freezeRatioPolicy(enabled) {
+  if (!enabled || typeof enabled !== 'object') return null;
   return Object.freeze(
     Object.fromEntries(
-      Object.entries(_0x3635ee).map(([_0x3ab36f, _0x306533]) => [
-        _0x3ab36f,
-        freezeRatioPolicyValue(_0x306533),
-      ]),
+      Object.entries(enabled).map(([result, data]) => [result, freezeRatioPolicyValue(data)]),
     ),
   );
 }
-function mergeRatioPolicyExtension(_0x331ea2, _0x4f2ebd, _0x1bdf83) {
-  const _0x2b0709 = _0x331ea2 && typeof _0x331ea2 === 'object' ? { ..._0x331ea2 } : {},
-    _0x1c81d1 =
-      _0x1bdf83 ||
-      _0x2b0709.ratioPolicy ||
-      DEFAULT_RATIO_POLICY_BY_PROVIDER[normalizeProviderId(_0x4f2ebd)] ||
-      null;
-  if (_0x1c81d1) _0x2b0709.ratioPolicy = freezeRatioPolicy(_0x1c81d1);
-  return Object.keys(_0x2b0709).length > 0 ? Object.freeze(_0x2b0709) : null;
+function mergeRatioPolicyExtension(args3, options, target) {
+  const source = args3 && typeof args3 === 'object' ? { ...args3 } : {},
+    next =
+      target || source.ratioPolicy || DEFAULT_RATIO_POLICY_BY_PROVIDER[normalizeProviderId(options)] || null;
+  if (next) source.ratioPolicy = freezeRatioPolicy(next);
+  return Object.keys(source).length > 0 ? Object.freeze(source) : null;
 }
-function freezeInputSlots(_0x55dd84 = DEFAULT_IMAGE_MODEL_API_INPUT_SLOTS) {
-  const _0x9e5c11 = _0x55dd84 || DEFAULT_IMAGE_MODEL_API_INPUT_SLOTS,
-    _0x5c8503 = Array.isArray(_0x9e5c11.fixedSlots)
+function freezeInputSlots(current = DEFAULT_IMAGE_MODEL_API_INPUT_SLOTS) {
+  const entry = current || DEFAULT_IMAGE_MODEL_API_INPUT_SLOTS,
+    args4 = Array.isArray(entry.fixedSlots)
       ? {
-          fixedSlots: Object.freeze(
-            _0x9e5c11.fixedSlots.map((_0x23a36b) => Object.freeze({ ...(_0x23a36b || {}) })),
-          ),
+          fixedSlots: Object.freeze(entry.fixedSlots.map((item2) => Object.freeze({ ...(item2 || {}) }))),
         }
       : {};
   return Object.freeze({
-    allowedKinds: Object.freeze([...(_0x9e5c11.allowedKinds || [])]),
-    minByKind: Object.freeze({ ...(_0x9e5c11.minByKind || {}) }),
-    maxByKind: Object.freeze({ ...(_0x9e5c11.maxByKind || {}) }),
-    ..._0x5c8503,
+    allowedKinds: Object.freeze([...(entry.allowedKinds || [])]),
+    minByKind: Object.freeze({ ...(entry.minByKind || {}) }),
+    maxByKind: Object.freeze({ ...(entry.maxByKind || {}) }),
+    ...args4,
   });
 }
 export function createImageModelApiManifest({
-  modelId: _0x56df33,
-  executionId: _0x2cc1f0,
-  provider: _0x249a85,
-  displayName: _0x2fe752,
-  icon: _0x3b3447,
-  description: _0x5f4568,
-  fields: _0x45251d,
-  extensions: _0x4a6d48,
-  ratioPolicy: _0x44b353,
-  inputSlots: _0x4e25e0,
-  nanoBanana: _0x9df8bb,
-  prompt: _0x3572b1,
+  modelId: modelId,
+  executionId: executionId,
+  provider: provider,
+  displayName: displayName,
+  icon: icon,
+  description: description,
+  fields: fields,
+  extensions: extensions,
+  ratioPolicy: ratioPolicy,
+  inputSlots: inputSlots,
+  nanoBanana: nanoBanana,
+  prompt: prompt,
 }) {
-  const _0x366f50 = _0x9df8bb
-      ? Object.freeze({ ...(_0x4a6d48 || {}), nanoBanana: Object.freeze({ ..._0x9df8bb }) })
-      : _0x4a6d48,
-    _0x425e72 = mergeRatioPolicyExtension(_0x366f50, _0x249a85, _0x44b353);
+  const record = nanoBanana
+      ? Object.freeze({ ...(extensions || {}), nanoBanana: Object.freeze({ ...nanoBanana }) })
+      : extensions,
+    extensions2 = mergeRatioPolicyExtension(record, provider, ratioPolicy);
   return Object.freeze({
     schemaVersion: '1.0',
-    modelId: _0x56df33,
-    provider: _0x249a85,
+    modelId: modelId,
+    provider: provider,
     kind: 'image',
     adapterType: 'modelApi',
-    executionId: _0x2cc1f0,
-    displayName: _0x2fe752,
-    icon: _0x3b3447,
-    description: _0x5f4568,
-    ...(_0x3572b1 ? { prompt: Object.freeze({ ..._0x3572b1 }) } : {}),
-    ...(_0x425e72 ? { extensions: _0x425e72 } : {}),
-    inputSlots: freezeInputSlots(_0x4e25e0),
-    uiSchema: Object.freeze({ fields: freezeFields(_0x45251d) }),
+    executionId: executionId,
+    displayName: displayName,
+    icon: icon,
+    description: description,
+    ...(prompt ? { prompt: Object.freeze({ ...prompt }) } : {}),
+    ...(extensions2 ? { extensions: extensions2 } : {}),
+    inputSlots: freezeInputSlots(inputSlots),
+    uiSchema: Object.freeze({ fields: freezeFields(fields) }),
     async: true,
     cancellable: false,
     outputType: 'image',
   });
 }
 export function createModelApiExecutionManifest({
-  id: _0x320f93,
-  provider: _0x2175e4,
-  model: _0x457ba5,
-  endpoint: _0x3fd839,
-  endpointMode: _0x43d432,
-  bodyMapping: _0x49331d,
-  responseMapping: _0x5cd11e,
-  extensions: _0x201ba8,
-  taskPolling: _0x39fd23,
-  modeModels: _0x2a182a,
-  imageSizeModels: _0x349988,
-  routeModels: _0x1bdbf6,
+  id: id,
+  provider: provider2,
+  model: model,
+  endpoint: endpoint,
+  endpointMode: endpointMode,
+  bodyMapping: bodyMapping,
+  responseMapping: responseMapping,
+  extensions: extensions3,
+  taskPolling: taskPolling,
+  modeModels: modeModels,
+  imageSizeModels: imageSizeModels,
+  routeModels: routeModels,
 }) {
-  const _0x4740ad = Object.freeze([
+  const payload = Object.freeze([
       'data.result.images[].url',
       'result.images[].url',
       'results[].url',
       'results[].imageUrl',
       'url',
     ]),
-    _0x4ea357 = _0x39fd23 && typeof _0x39fd23 === 'object' ? Object.freeze({ ..._0x39fd23 }) : null,
-    _0x4ee225 =
-      _0x201ba8 || _0x4ea357
-        ? Object.freeze({ ...(_0x201ba8 || {}), ...(_0x4ea357 ? { taskPolling: _0x4ea357 } : {}) })
+    taskPolling2 = taskPolling && typeof taskPolling === 'object' ? Object.freeze({ ...taskPolling }) : null,
+    extensions4 =
+      extensions3 || taskPolling2
+        ? Object.freeze({ ...(extensions3 || {}), ...(taskPolling2 ? { taskPolling: taskPolling2 } : {}) })
         : null;
   return Object.freeze({
     schemaVersion: '1.0',
-    id: _0x320f93,
-    provider: _0x2175e4,
+    id: id,
+    provider: provider2,
     kind: 'image',
     adapterType: 'modelApi',
-    endpoint: _0x3fd839,
-    ...(_0x43d432 ? { endpointMode: _0x43d432 } : {}),
+    endpoint: endpoint,
+    ...(endpointMode ? { endpointMode: endpointMode } : {}),
     method: 'POST',
-    model: _0x457ba5,
-    ...(_0x2a182a ? { modeModels: Object.freeze(_0x2a182a) } : {}),
-    ...(_0x349988 ? { imageSizeModels: Object.freeze(_0x349988) } : {}),
-    ...(_0x1bdbf6 ? { routeModels: Object.freeze(_0x1bdbf6) } : {}),
-    ...(_0x4ee225 ? { extensions: _0x4ee225 } : {}),
+    model: model,
+    ...(modeModels ? { modeModels: Object.freeze(modeModels) } : {}),
+    ...(imageSizeModels ? { imageSizeModels: Object.freeze(imageSizeModels) } : {}),
+    ...(routeModels ? { routeModels: Object.freeze(routeModels) } : {}),
+    ...(extensions4 ? { extensions: extensions4 } : {}),
     headers: Object.freeze({ 'Content-Type': 'application/json' }),
-    bodyMapping: Object.freeze(_0x49331d || []),
+    bodyMapping: Object.freeze(bodyMapping || []),
     responseMapping: Object.freeze({
       taskIdPath: 'taskId',
       statusPath: 'status',
       errorPath: 'error',
-      ...(_0x5cd11e || {}),
-      resultPaths: Object.freeze(_0x5cd11e?.resultPaths || _0x4740ad),
+      ...(responseMapping || {}),
+      resultPaths: Object.freeze(responseMapping?.resultPaths || payload),
     }),
     result: Object.freeze({ taskIdPath: 'taskId', urlFields: Object.freeze(['url', 'imageUrl']) }),
   });
 }
 
-export const APIMART_SEEDREAM_5_PRO_IMAGE_SIZE_FIELD=Object["freeze"]({...IMAGE_SIZE_FIELD,'defaultValue':'2K','options':Object["freeze"]([Object["freeze"]({'value':'1K','label':'1K'}),Object["freeze"]({'value':'2K','label':'2K'})])});
+export const APIMART_SEEDREAM_5_PRO_IMAGE_SIZE_FIELD = Object['freeze']({
+  ...IMAGE_SIZE_FIELD,
+  defaultValue: '2K',
+  options: Object['freeze']([
+    Object['freeze']({ value: '1K', label: '1K' }),
+    Object['freeze']({ value: '2K', label: '2K' }),
+  ]),
+});
 
-const APIMART_GPT_IMAGE_2_QUALITY_DESCRIPTION='quality\x0a图片质量\x0alow\x20-\x20快速省钱，轮廓够用\x0amedium\x20-\x20平衡\x0ahigh\x20-\x20最高精度（4K\x20+\x20high\x20耗时\x20>120s）';
+const APIMART_GPT_IMAGE_2_QUALITY_DESCRIPTION =
+  'quality\x0a图片质量\x0alow\x20-\x20快速省钱，轮廓够用\x0amedium\x20-\x20平衡\x0ahigh\x20-\x20最高精度（4K\x20+\x20high\x20耗时\x20>120s）';
 
-export const GRSAI_NANO_BANANA_1K_IMAGE_SIZE_FIELD=Object["freeze"]({...IMAGE_SIZE_FIELD,'defaultValue':'1K','options':Object["freeze"]([Object['freeze']({'value':'1K','label':'1K'}),Object["freeze"]({'value':'2K','label':'2K','disabled':!![],'tooltip':"1K only"}),Object["freeze"]({'value':'4K','label':'4K','disabled':!![],'tooltip':'1K\x20only'})])});
+export const GRSAI_NANO_BANANA_1K_IMAGE_SIZE_FIELD = Object['freeze']({
+  ...IMAGE_SIZE_FIELD,
+  defaultValue: '1K',
+  options: Object['freeze']([
+    Object['freeze']({ value: '1K', label: '1K' }),
+    Object['freeze']({ value: '2K', label: '2K', disabled: !![], tooltip: '1K only' }),
+    Object['freeze']({ value: '4K', label: '4K', disabled: !![], tooltip: '1K\x20only' }),
+  ]),
+});
 
-export const GRSAI_NANO_BANANA_2K_IMAGE_SIZE_FIELD=Object['freeze']({...IMAGE_SIZE_FIELD,'defaultValue':'2K','options':Object["freeze"]([Object["freeze"]({'value':'1K','label':'1K','disabled':!![],'tooltip':'2K\x20only'}),Object['freeze']({'value':'2K','label':'2K'}),Object["freeze"]({'value':'4K','label':'4K','disabled':!![],'tooltip':"2K only"})])});
+export const GRSAI_NANO_BANANA_2K_IMAGE_SIZE_FIELD = Object['freeze']({
+  ...IMAGE_SIZE_FIELD,
+  defaultValue: '2K',
+  options: Object['freeze']([
+    Object['freeze']({ value: '1K', label: '1K', disabled: !![], tooltip: '2K\x20only' }),
+    Object['freeze']({ value: '2K', label: '2K' }),
+    Object['freeze']({ value: '4K', label: '4K', disabled: !![], tooltip: '2K only' }),
+  ]),
+});

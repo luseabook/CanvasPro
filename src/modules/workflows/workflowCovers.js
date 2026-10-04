@@ -78,148 +78,129 @@ const SNAPSHOT_WIDTH = 0x280,
     '--group-slate': [100, 116, 139],
     '--cyan': [6, 182, 212],
   });
-function cleanText(_0x3730db) {
-  return String(_0x3730db ?? '').trim();
+function cleanText(value) {
+  return String(value ?? '').trim();
 }
-function workflowCoverText(_0x1561e7, _0x47bb96 = {}) {
-  return t('workflows.covers.' + _0x1561e7, _0x47bb96);
+function workflowCoverText(item, key = {}) {
+  return t('workflows.covers.' + item, key);
 }
-function rgbToSvgColor(_0x265b18, _0x28efaa, _0x4110df) {
+function rgbToSvgColor(index, result, data) {
   return (
     '#' +
-    [_0x265b18, _0x28efaa, _0x4110df]
-      .map((_0x5539fa) =>
-        Math.max(0, Math.min(255, Number(_0x5539fa) || 0))
+    [index, result, data]
+      .map((item2) =>
+        Math.max(0, Math.min(255, Number(item2) || 0))
           .toString(16)
           .padStart(2, '0'),
       )
       .join('')
   );
 }
-function fallbackSnapshotColor(_0x407681) {
-  return rgbToSvgColor(...(SNAPSHOT_COLOR_FALLBACKS[_0x407681] || SNAPSHOT_COLOR_FALLBACKS.accentDefault));
+function fallbackSnapshotColor(options) {
+  return rgbToSvgColor(...(SNAPSHOT_COLOR_FALLBACKS[options] || SNAPSHOT_COLOR_FALLBACKS.accentDefault));
 }
-function fallbackCssTokenColor(_0x3fa75c) {
-  const _0xfd4ad3 = cleanText(_0x3fa75c),
-    _0x32f398 = CSS_TOKEN_COLOR_FALLBACKS[_0xfd4ad3];
-  if (_0x32f398) return rgbToSvgColor(..._0x32f398);
-  const _0xa3051e = _0xfd4ad3.match(CSS_TOKEN_OPACITY_RE);
-  if (!_0xa3051e) return '';
-  const _0x26940c = CSS_TOKEN_COLOR_FALLBACKS[_0xa3051e[1]];
-  if (!_0x26940c) return '';
-  const _0x4e4284 = Math.max(0, Math.min(100, Number(_0xa3051e[2]) || 0)) / 100;
+function fallbackCssTokenColor(target) {
+  const cleanText2 = cleanText(target),
+    args = CSS_TOKEN_COLOR_FALLBACKS[cleanText2];
+  if (args) return rgbToSvgColor(...args);
+  const enabled = cleanText2.match(CSS_TOKEN_OPACITY_RE);
+  if (!enabled) return '';
+  const enabled2 = CSS_TOKEN_COLOR_FALLBACKS[enabled[1]];
+  if (!enabled2) return '';
+  const source = Math.max(0, Math.min(100, Number(enabled[2]) || 0)) / 100;
   return (
-    CSS_RGBA_FUNCTION +
-    '(' +
-    _0x26940c[0] +
-    ', ' +
-    _0x26940c[1] +
-    ', ' +
-    _0x26940c[2] +
-    ', ' +
-    _0x4e4284 +
-    ')'
+    CSS_RGBA_FUNCTION + '(' + enabled2[0] + ', ' + enabled2[1] + ', ' + enabled2[2] + ', ' + source + ')'
   );
 }
 function getRootComputedStyle() {
   if (typeof document === 'undefined' || typeof getComputedStyle !== 'function') return null;
   return getComputedStyle(document.documentElement);
 }
-function resolveCssCustomProperty(_0xee6d88, _0xa1e9f5, _0x5134cc = new Set()) {
-  const _0x4fae1c = cleanText(_0xee6d88);
-  if (!_0x4fae1c || !_0xa1e9f5 || _0x5134cc.has(_0x4fae1c)) return '';
-  _0x5134cc.add(_0x4fae1c);
-  const _0x184b96 = cleanText(_0xa1e9f5.getPropertyValue(_0x4fae1c));
-  if (!_0x184b96) return '';
-  const _0x28dafd = _0x184b96.match(CSS_CUSTOM_PROPERTY_RE);
-  if (!_0x28dafd) return _0x184b96;
-  return resolveCssCustomProperty(_0x28dafd[1], _0xa1e9f5, _0x5134cc) || cleanText(_0x28dafd[2]);
+function resolveCssCustomProperty(next, enabled3, map = new Set()) {
+  const cleanText3 = cleanText(next);
+  if (!cleanText3 || !enabled3 || map.has(cleanText3)) return '';
+  map.add(cleanText3);
+  const cleanText4 = cleanText(enabled3.getPropertyValue(cleanText3));
+  if (!cleanText4) return '';
+  const enabled4 = cleanText4.match(CSS_CUSTOM_PROPERTY_RE);
+  if (!enabled4) return cleanText4;
+  return resolveCssCustomProperty(enabled4[1], enabled3, map) || cleanText(enabled4[2]);
 }
-function snapshotColor(_0x2b50b7) {
-  const _0x35c349 = fallbackSnapshotColor(_0x2b50b7),
-    _0x2a6ab5 = SNAPSHOT_COLOR_TOKENS[_0x2b50b7],
-    _0x3c4c70 = getRootComputedStyle();
-  return resolveCssCustomProperty(_0x2a6ab5, _0x3c4c70) || _0x35c349;
+function snapshotColor(current) {
+  const fallbackSnapshotColor2 = fallbackSnapshotColor(current),
+    entry = SNAPSHOT_COLOR_TOKENS[current],
+    rootComputedStyle = getRootComputedStyle();
+  return resolveCssCustomProperty(entry, rootComputedStyle) || fallbackSnapshotColor2;
 }
-function resolveSnapshotColorValue(_0x1dd4dc, _0x4b3cac = 'accentDefault', _0x21cdd2 = new Set()) {
-  const _0x2b41bf = cleanText(_0x1dd4dc);
-  if (!_0x2b41bf) return snapshotColor(_0x4b3cac);
-  const _0xbbce22 = _0x2b41bf.match(CSS_CUSTOM_PROPERTY_RE);
-  if (!_0xbbce22) return _0x2b41bf;
-  const _0x2e8b2c = _0xbbce22[1];
-  if (_0x21cdd2.has(_0x2e8b2c)) return fallbackSnapshotColor(_0x4b3cac);
-  _0x21cdd2.add(_0x2e8b2c);
-  const _0x3f49f1 = resolveCssCustomProperty(_0x2e8b2c, getRootComputedStyle());
-  if (_0x3f49f1) return resolveSnapshotColorValue(_0x3f49f1, _0x4b3cac, _0x21cdd2);
-  const _0x54ddd8 = cleanText(_0xbbce22[2]);
-  if (_0x54ddd8) return resolveSnapshotColorValue(_0x54ddd8, _0x4b3cac, _0x21cdd2);
-  return fallbackCssTokenColor(_0x2e8b2c) || fallbackSnapshotColor(_0x4b3cac);
+function resolveSnapshotColorValue(record, payload = 'accentDefault', map2 = new Set()) {
+  const cleanText5 = cleanText(record);
+  if (!cleanText5) return snapshotColor(payload);
+  const enabled5 = cleanText5.match(CSS_CUSTOM_PROPERTY_RE);
+  if (!enabled5) return cleanText5;
+  const handle = enabled5[1];
+  if (map2.has(handle)) return fallbackSnapshotColor(payload);
+  map2.add(handle);
+  const cssCustomProperty = resolveCssCustomProperty(handle, getRootComputedStyle());
+  if (cssCustomProperty) return resolveSnapshotColorValue(cssCustomProperty, payload, map2);
+  const cleanText6 = cleanText(enabled5[2]);
+  if (cleanText6) return resolveSnapshotColorValue(cleanText6, payload, map2);
+  return fallbackCssTokenColor(handle) || fallbackSnapshotColor(payload);
 }
-function withOpacityToken(_0x3edb18, _0x4915c9) {
-  const _0x437faa = cleanText(_0x3edb18).match(/^var\(\s*(--[\w-]+)\s*\)$/);
-  if (!_0x437faa) return _0x3edb18;
-  return 'var(' + _0x437faa[1] + '-' + _0x4915c9 + ')';
+function withOpacityToken(state, config) {
+  const cleanText7 = cleanText(state).match(/^var\(\s*(--[\w-]+)\s*\)$/);
+  if (!cleanText7) return state;
+  return 'var(' + cleanText7[1] + '-' + config + ')';
 }
-function normalizeNodeList(_0x337a92) {
-  return Array.isArray(_0x337a92)
-    ? _0x337a92
-    : _0x337a92 && typeof _0x337a92 === 'object'
-      ? Object.values(_0x337a92)
-      : [];
+function normalizeNodeList(scope) {
+  return Array.isArray(scope) ? scope : scope && typeof scope === 'object' ? Object.values(scope) : [];
 }
-function normalizeEdgeList(_0x1e682d) {
-  return Array.isArray(_0x1e682d)
-    ? _0x1e682d
-    : _0x1e682d && typeof _0x1e682d === 'object'
-      ? Object.values(_0x1e682d)
-      : [];
+function normalizeEdgeList(input) {
+  return Array.isArray(input) ? input : input && typeof input === 'object' ? Object.values(input) : [];
 }
-function escapeSvgText(_0x5ccbb3) {
-  return cleanText(_0x5ccbb3).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function escapeSvgText(output) {
+  return cleanText(output).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-function truncateSvgText(_0x3ece3e, _0x109da5 = 10) {
-  const _0x561d1c = cleanText(_0x3ece3e);
-  if (_0x561d1c.length <= _0x109da5) return _0x561d1c;
-  return _0x561d1c.slice(0, _0x109da5 - 1) + '…';
+function truncateSvgText(value2, value3 = 10) {
+  const list = cleanText(value2);
+  if (list.length <= value3) return list;
+  return list.slice(0, value3 - 1) + '…';
 }
-function edgeSourceId(_0x3f2e09) {
-  return cleanText(_0x3f2e09?.sourceId ?? _0x3f2e09?.source);
+function edgeSourceId(value4) {
+  return cleanText(value4?.sourceId ?? value4?.source);
 }
-function edgeTargetId(_0x278dfc) {
-  return cleanText(_0x278dfc?.targetId ?? _0x278dfc?.target);
+function edgeTargetId(event) {
+  return cleanText(event?.targetId ?? event?.target);
 }
-function nodeTypeKey(_0x17e666) {
-  return cleanText(_0x17e666?.type).toLowerCase();
+function nodeTypeKey(value5) {
+  return cleanText(value5?.type).toLowerCase();
 }
-function isGroupNode(_0x12c636) {
-  return nodeTypeKey(_0x12c636) === 'group';
+function isGroupNode(value6) {
+  return nodeTypeKey(value6) === 'group';
 }
-function nodeSize(_0x514881) {
+function nodeSize(box) {
   return {
-    width: Math.max(24, Number(_0x514881?.width ?? _0x514881?.w) || 100),
-    height: Math.max(24, Number(_0x514881?.height ?? _0x514881?.h) || 100),
+    width: Math.max(24, Number(box?.width ?? box?.w) || 100),
+    height: Math.max(24, Number(box?.height ?? box?.h) || 100),
   };
 }
-function nodePosition(_0x588268) {
-  return { x: Number(_0x588268?.x) || 0, y: Number(_0x588268?.y) || 0 };
+function nodePosition(box2) {
+  return { x: Number(box2?.x) || 0, y: Number(box2?.y) || 0 };
 }
-function pickSnapshotTitle(_0x313a0a, _0x57e1b4 = {}) {
-  const _0x1b16c8 = cleanText(_0x57e1b4.title || _0x57e1b4.name);
-  if (_0x1b16c8) return _0x1b16c8;
-  const _0x332e24 = _0x313a0a.find((_0x4d38b1) => isGroupNode(_0x4d38b1) && !cleanText(_0x4d38b1?.parentId));
-  return (
-    cleanText(_0x332e24?.name || _0x332e24?.title || _0x332e24?.label) || workflowCoverText('titleFallback')
-  );
+function pickSnapshotTitle(list2, error = {}) {
+  const cleanText8 = cleanText(error.title || error.name);
+  if (cleanText8) return cleanText8;
+  const error2 = list2.find((item3) => isGroupNode(item3) && !cleanText(item3?.parentId));
+  return cleanText(error2?.name || error2?.title || error2?.label) || workflowCoverText('titleFallback');
 }
-function pickSnapshotGroupColor(_0x11522e, _0x1b6dd3 = {}) {
-  const _0x4f2da4 = cleanText(_0x1b6dd3.groupColor || _0x1b6dd3.accentColor || _0x1b6dd3.color);
-  if (_0x4f2da4) return _0x4f2da4;
-  const _0x45a1a8 = _0x11522e.find((_0x14d75f) => isGroupNode(_0x14d75f) && !cleanText(_0x14d75f?.parentId));
-  return cleanText(_0x45a1a8?.color);
+function pickSnapshotGroupColor(list3, value7 = {}) {
+  const cleanText9 = cleanText(value7.groupColor || value7.accentColor || value7.color);
+  if (cleanText9) return cleanText9;
+  const value8 = list3.find((item4) => isGroupNode(item4) && !cleanText(item4?.parentId));
+  return cleanText(value8?.color);
 }
-function createSnapshotTheme(_0x331153, _0x3f0e02 = {}) {
-  const _0x4569d6 = pickSnapshotGroupColor(_0x331153, _0x3f0e02);
-  if (!_0x4569d6)
+function createSnapshotTheme(value9, value10 = {}) {
+  const snapshotGroupColor = pickSnapshotGroupColor(value9, value10);
+  if (!snapshotGroupColor)
     return {
       frameGlowStart: snapshotColor('frameGlowStart'),
       frameGlowEnd: snapshotColor('frameGlowEnd'),
@@ -228,166 +209,164 @@ function createSnapshotTheme(_0x331153, _0x3f0e02 = {}) {
       toolbarDotStroke: snapshotColor('toolbarDotStroke'),
       groupAccent: snapshotColor('accentGroup'),
     };
-  const _0x56ae1b = resolveSnapshotColorValue(_0x4569d6, 'accentGroup'),
-    _0x44dec2 = resolveSnapshotColorValue(withOpacityToken(_0x4569d6, '60'), 'frameGlowEnd');
+  const frameGlowStart = resolveSnapshotColorValue(snapshotGroupColor, 'accentGroup'),
+    frameGlowEnd = resolveSnapshotColorValue(withOpacityToken(snapshotGroupColor, '60'), 'frameGlowEnd');
   return {
-    frameGlowStart: _0x56ae1b,
-    frameGlowEnd: _0x44dec2,
-    frameInnerStroke: _0x56ae1b,
-    toolbarDotFill: _0x56ae1b,
-    toolbarDotStroke: _0x44dec2,
-    groupAccent: _0x56ae1b,
+    frameGlowStart: frameGlowStart,
+    frameGlowEnd: frameGlowEnd,
+    frameInnerStroke: frameGlowStart,
+    toolbarDotFill: frameGlowStart,
+    toolbarDotStroke: frameGlowEnd,
+    groupAccent: frameGlowStart,
   };
 }
-function pickNodeLabel(_0xa41d33) {
+function pickNodeLabel(error3) {
   return (
-    cleanText(_0xa41d33?.name || _0xa41d33?.title || _0xa41d33?.label) ||
-    pickNodeTypeLabel(_0xa41d33) ||
+    cleanText(error3?.name || error3?.title || error3?.label) ||
+    pickNodeTypeLabel(error3) ||
     workflowCoverText('nodeTypes.node')
   );
 }
-function pickNodeTypeLabel(_0x10110c) {
-  const _0x2bd603 = nodeTypeKey(_0x10110c);
-  if (_0x2bd603.includes('video')) return workflowCoverText('nodeTypes.video');
-  if (_0x2bd603.includes('audio')) return workflowCoverText('nodeTypes.audio');
-  if (_0x2bd603.includes('image') || _0x2bd603.includes('photo')) return workflowCoverText('nodeTypes.image');
-  if (_0x2bd603.includes('text') || _0x2bd603.includes('prompt')) return workflowCoverText('nodeTypes.text');
-  if (_0x2bd603.includes('mask')) return workflowCoverText('nodeTypes.mask');
-  if (_0x2bd603.includes('group')) return workflowCoverText('nodeTypes.group');
+function pickNodeTypeLabel(value11) {
+  const list4 = nodeTypeKey(value11);
+  if (list4.includes('video')) return workflowCoverText('nodeTypes.video');
+  if (list4.includes('audio')) return workflowCoverText('nodeTypes.audio');
+  if (list4.includes('image') || list4.includes('photo')) return workflowCoverText('nodeTypes.image');
+  if (list4.includes('text') || list4.includes('prompt')) return workflowCoverText('nodeTypes.text');
+  if (list4.includes('mask')) return workflowCoverText('nodeTypes.mask');
+  if (list4.includes('group')) return workflowCoverText('nodeTypes.group');
   return workflowCoverText('nodeTypes.node');
 }
-function pickNodeAccent(_0x51bc6b, _0xc0a069 = null) {
-  const _0x486148 = nodeTypeKey(_0x51bc6b);
-  if (_0x486148.includes('video')) return snapshotColor('accentVideo');
-  if (_0x486148.includes('audio')) return snapshotColor('accentAudio');
-  if (_0x486148.includes('text') || _0x486148.includes('prompt')) return snapshotColor('accentText');
-  if (_0x486148.includes('image') || _0x486148.includes('photo')) return snapshotColor('accentImage');
-  if (_0x486148.includes('mask')) return snapshotColor('accentMask');
-  if (_0x486148.includes('group'))
-    return cleanText(_0x51bc6b?.color)
-      ? resolveSnapshotColorValue(_0x51bc6b.color, 'accentGroup')
-      : _0xc0a069?.groupAccent || snapshotColor('accentGroup');
+function pickNodeAccent(value12, value13 = null) {
+  const list5 = nodeTypeKey(value12);
+  if (list5.includes('video')) return snapshotColor('accentVideo');
+  if (list5.includes('audio')) return snapshotColor('accentAudio');
+  if (list5.includes('text') || list5.includes('prompt')) return snapshotColor('accentText');
+  if (list5.includes('image') || list5.includes('photo')) return snapshotColor('accentImage');
+  if (list5.includes('mask')) return snapshotColor('accentMask');
+  if (list5.includes('group'))
+    return cleanText(value12?.color)
+      ? resolveSnapshotColorValue(value12.color, 'accentGroup')
+      : value13?.groupAccent || snapshotColor('accentGroup');
   return snapshotColor('accentDefault');
 }
-function projectNode(_0x10303f, _0x3c86af, _0x20f2a3, _0x2f7ac4) {
-  const _0xbf6404 = nodePosition(_0x10303f),
-    _0x187baa = nodeSize(_0x10303f),
-    _0x409d9f = _0x2f7ac4.x + (_0xbf6404.x - _0x3c86af.minX) * _0x20f2a3,
-    _0x1f0085 = _0x2f7ac4.y + (_0xbf6404.y - _0x3c86af.minY) * _0x20f2a3,
-    _0x3b22bc = _0x187baa.width * _0x20f2a3,
-    _0x59c0e4 = _0x187baa.height * _0x20f2a3,
-    _0x1f9783 = Math.max(48, _0x3b22bc),
-    _0x290949 = Math.max(34, _0x59c0e4);
+function projectNode(value14, value15, value16, box3) {
+  const box4 = nodePosition(value14),
+    box5 = nodeSize(value14),
+    x = box3.x + (box4.x - value15.minX) * value16,
+    y = box3.y + (box4.y - value15.minY) * value16,
+    value17 = box5.width * value16,
+    value18 = box5.height * value16,
+    width = Math.max(48, value17),
+    height = Math.max(34, value18);
   return {
-    x: _0x409d9f - (_0x1f9783 - _0x3b22bc) / 2,
-    y: _0x1f0085 - (_0x290949 - _0x59c0e4) / 2,
-    width: _0x1f9783,
-    height: _0x290949,
-    cx: _0x409d9f + _0x3b22bc / 2,
-    cy: _0x1f0085 + _0x59c0e4 / 2,
+    x: x - (width - value17) / 2,
+    y: y - (height - value18) / 2,
+    width: width,
+    height: height,
+    cx: x + value17 / 2,
+    cy: y + value18 / 2,
   };
 }
-function renderSnapshotEdges(_0x73a84e, _0x58c083) {
-  const _0x3255bd = [];
-  for (const _0x308540 of _0x73a84e) {
-    const _0x14e1dd = _0x58c083.get(edgeSourceId(_0x308540)),
-      _0xda0e55 = _0x58c083.get(edgeTargetId(_0x308540));
-    if (!_0x14e1dd || !_0xda0e55) continue;
-    const _0x1eb6b7 = _0x14e1dd.x + _0x14e1dd.width,
-      _0x1670b4 = _0x14e1dd.y + _0x14e1dd.height / 2,
-      _0x41bedc = _0xda0e55.x,
-      _0x1f59e5 = _0xda0e55.y + _0xda0e55.height / 2,
-      _0x2cd6be = Math.max(34, Math.abs(_0x41bedc - _0x1eb6b7) * 0.45);
-    _0x3255bd.push(
+function renderSnapshotEdges(value19, map3) {
+  const list6 = [];
+  for (const value20 of value19) {
+    const box6 = map3.get(edgeSourceId(value20)),
+      box7 = map3.get(edgeTargetId(value20));
+    if (!box6 || !box7) continue;
+    const value21 = box6.x + box6.width,
+      value22 = box6.y + box6.height / 2,
+      value23 = box7.x,
+      value24 = box7.y + box7.height / 2,
+      value25 = Math.max(34, Math.abs(value23 - value21) * 0.45);
+    list6.push(
       '<path d="M ' +
-        _0x1eb6b7.toFixed(1) +
+        value21.toFixed(1) +
         ' ' +
-        _0x1670b4.toFixed(1) +
+        value22.toFixed(1) +
         ' C ' +
-        (_0x1eb6b7 + _0x2cd6be).toFixed(1) +
+        (value21 + value25).toFixed(1) +
         ' ' +
-        _0x1670b4.toFixed(1) +
+        value22.toFixed(1) +
         ', ' +
-        (_0x41bedc - _0x2cd6be).toFixed(1) +
+        (value23 - value25).toFixed(1) +
         ' ' +
-        _0x1f59e5.toFixed(1) +
+        value24.toFixed(1) +
         ', ' +
-        _0x41bedc.toFixed(1) +
+        value23.toFixed(1) +
         ' ' +
-        _0x1f59e5.toFixed(1) +
+        value24.toFixed(1) +
         '" fill="none" stroke="' +
         snapshotColor('edge') +
         '" stroke-width="2.2" stroke-linecap="round" opacity="0.72"/>',
     );
   }
-  return _0x3255bd.join('');
+  return list6.join('');
 }
-function renderSnapshotNodes(_0x2df368, _0x205150, _0x15dd47 = null) {
-  return _0x2df368
-    .map((_0x1b458c) => {
-      const _0x2934fe = cleanText(_0x1b458c?.id),
-        _0x30682a = _0x205150.get(_0x2934fe);
-      if (!_0x30682a) return '';
-      const _0x5b6402 = escapeSvgText(
-          truncateSvgText(pickNodeLabel(_0x1b458c), _0x30682a.width > 92 ? 12 : 8),
-        ),
-        _0x30e210 = escapeSvgText(pickNodeTypeLabel(_0x1b458c)),
-        _0x3c0f51 = pickNodeAccent(_0x1b458c, _0x15dd47),
-        _0x26b0fa = _0x30682a.y + 27,
-        _0x1a21d0 = Math.max(8, _0x30682a.height - 37);
+function renderSnapshotNodes(list7, map4, value26 = null) {
+  return list7
+    .map((item5) => {
+      const cleanText10 = cleanText(item5?.id),
+        box8 = map4.get(cleanText10);
+      if (!box8) return '';
+      const escapeSvgText2 = escapeSvgText(truncateSvgText(pickNodeLabel(item5), box8.width > 92 ? 12 : 8)),
+        escapeSvgText3 = escapeSvgText(pickNodeTypeLabel(item5)),
+        nodeAccent = pickNodeAccent(item5, value26),
+        value27 = box8.y + 27,
+        value28 = Math.max(8, box8.height - 37);
       return [
         '<g filter="url(#nodeShadow)">',
         '<rect x="' +
-          _0x30682a.x.toFixed(1) +
+          box8.x.toFixed(1) +
           '" y="' +
-          _0x30682a.y.toFixed(1) +
+          box8.y.toFixed(1) +
           '" width="' +
-          _0x30682a.width.toFixed(1) +
+          box8.width.toFixed(1) +
           '" height="' +
-          _0x30682a.height.toFixed(1) +
+          box8.height.toFixed(1) +
           '" rx="10" fill="' +
           snapshotColor('nodeFill') +
           '" stroke="' +
           snapshotColor('nodeStroke') +
           '" stroke-width="1"/>',
         '<rect x="' +
-          (_0x30682a.x + 1).toFixed(1) +
+          (box8.x + 1).toFixed(1) +
           '" y="' +
-          (_0x30682a.y + 1).toFixed(1) +
+          (box8.y + 1).toFixed(1) +
           '" width="' +
-          (_0x30682a.width - 2).toFixed(1) +
+          (box8.width - 2).toFixed(1) +
           '" height="6" rx="5" fill="' +
-          _0x3c0f51 +
+          nodeAccent +
           '"/>',
         '<text x="' +
-          (_0x30682a.x + 12).toFixed(1) +
+          (box8.x + 12).toFixed(1) +
           '" y="' +
-          (_0x30682a.y + 22).toFixed(1) +
+          (box8.y + 22).toFixed(1) +
           '" fill="' +
           snapshotColor('nodeText') +
           '" font-size="12" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="700">' +
-          _0x5b6402 +
+          escapeSvgText2 +
           '</text>',
         '<rect x="' +
-          (_0x30682a.x + 12).toFixed(1) +
+          (box8.x + 12).toFixed(1) +
           '" y="' +
-          _0x26b0fa.toFixed(1) +
+          value27.toFixed(1) +
           '" width="' +
-          Math.max(10, _0x30682a.width - 24).toFixed(1) +
+          Math.max(10, box8.width - 24).toFixed(1) +
           '" height="' +
-          _0x1a21d0.toFixed(1) +
+          value28.toFixed(1) +
           '" rx="7" fill="' +
           snapshotColor('nodeContentFill') +
           '" opacity="0.76"/>',
-        _0x30682a.width >= 70 && _0x30682a.height >= 54
+        box8.width >= 70 && box8.height >= 54
           ? '<text x="' +
-            (_0x30682a.x + 17).toFixed(1) +
+            (box8.x + 17).toFixed(1) +
             '" y="' +
-            (_0x26b0fa + 19).toFixed(1) +
+            (value27 + 19).toFixed(1) +
             '" fill="' +
             snapshotColor('nodeTypeText') +
             '" font-size="10" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif">' +
-            _0x30e210 +
+            escapeSvgText3 +
             '</text>'
           : '',
         '</g>',
@@ -395,40 +374,37 @@ function renderSnapshotNodes(_0x2df368, _0x205150, _0x15dd47 = null) {
     })
     .join('');
 }
-function createWorkflowSnapshotSvg(_0x364c62, _0x2e4ce3 = {}) {
-  const _0x19809e = normalizeNodeList(_0x364c62?.nodes).filter(Boolean);
-  if (_0x19809e.length === 0) return '';
-  const _0xcc6ff2 = createSnapshotTheme(_0x19809e, _0x2e4ce3),
-    _0x839578 = normalizeEdgeList(_0x364c62?.edges),
-    _0x53dc6c = calcWorkflowBounds(_0x19809e);
-  if (!_0x53dc6c.width && !_0x53dc6c.height) return '';
-  const _0x1bc78c = _0x19809e.filter((_0x2c010a) => !isGroupNode(_0x2c010a)),
-    _0x293651 = (_0x1bc78c.length > 0 ? _0x1bc78c : _0x19809e).slice(0, SNAPSHOT_MAX_NODES),
-    _0x3e61d2 = new Set(_0x293651.map((_0x44a7df) => cleanText(_0x44a7df?.id)).filter(Boolean)),
-    _0xd2f1d8 = _0x839578.filter(
-      (_0x181320) => _0x3e61d2.has(edgeSourceId(_0x181320)) && _0x3e61d2.has(edgeTargetId(_0x181320)),
-    ),
-    _0x475b90 = SNAPSHOT_FRAME.width - SNAPSHOT_FRAME.padding * 2,
-    _0x4d77e9 = SNAPSHOT_FRAME.height - SNAPSHOT_FRAME.padding * 2,
-    _0x2fd046 = Math.min(
-      _0x475b90 / Math.max(_0x53dc6c.width, 1),
-      _0x4d77e9 / Math.max(_0x53dc6c.height, 1),
-      1.45,
-    ),
-    _0x290d5e = _0x53dc6c.width * _0x2fd046,
-    _0x18f102 = _0x53dc6c.height * _0x2fd046,
-    _0x20302e = {
-      x: SNAPSHOT_FRAME.x + SNAPSHOT_FRAME.padding + (_0x475b90 - _0x290d5e) / 2,
-      y: SNAPSHOT_FRAME.y + SNAPSHOT_FRAME.padding + (_0x4d77e9 - _0x18f102) / 2,
+function createWorkflowSnapshotSvg(value29, value30 = {}) {
+  const nodeCount = normalizeNodeList(value29?.nodes).filter(Boolean);
+  if (nodeCount.length === 0) return '';
+  const snapshotTheme = createSnapshotTheme(nodeCount, value30),
+    edgeCount = normalizeEdgeList(value29?.edges),
+    box9 = calcWorkflowBounds(nodeCount);
+  if (!box9.width && !box9.height) return '';
+  const list8 = nodeCount.filter((item6) => !isGroupNode(item6)),
+    list9 = (list8.length > 0 ? list8 : nodeCount).slice(0, SNAPSHOT_MAX_NODES),
+    map5 = new Set(list9.map((item7) => cleanText(item7?.id)).filter(Boolean)),
+    value31 = edgeCount.filter((item8) => map5.has(edgeSourceId(item8)) && map5.has(edgeTargetId(item8))),
+    value32 = SNAPSHOT_FRAME.width - SNAPSHOT_FRAME.padding * 2,
+    value33 = SNAPSHOT_FRAME.height - SNAPSHOT_FRAME.padding * 2,
+    value34 = Math.min(value32 / Math.max(box9.width, 1), value33 / Math.max(box9.height, 1), 1.45),
+    value35 = box9.width * value34,
+    value36 = box9.height * value34,
+    value37 = {
+      x: SNAPSHOT_FRAME.x + SNAPSHOT_FRAME.padding + (value32 - value35) / 2,
+      y: SNAPSHOT_FRAME.y + SNAPSHOT_FRAME.padding + (value33 - value36) / 2,
     },
-    _0x28a3e0 = new Map();
-  for (const _0x39cebb of _0x293651) {
-    const _0x5788f1 = cleanText(_0x39cebb?.id);
-    if (!_0x5788f1) continue;
-    _0x28a3e0.set(_0x5788f1, projectNode(_0x39cebb, _0x53dc6c, _0x2fd046, _0x20302e));
+    map6 = new Map();
+  for (const value38 of list9) {
+    const cleanText11 = cleanText(value38?.id);
+    if (!cleanText11) continue;
+    map6.set(cleanText11, projectNode(value38, box9, value34, value37));
   }
-  const _0x44fe54 = escapeSvgText(truncateSvgText(pickSnapshotTitle(_0x19809e, _0x2e4ce3), 18)),
-    _0x303441 = workflowCoverText('summary', { nodeCount: _0x19809e.length, edgeCount: _0x839578.length });
+  const escapeSvgText4 = escapeSvgText(truncateSvgText(pickSnapshotTitle(nodeCount, value30), 18)),
+    workflowCoverText2 = workflowCoverText('summary', {
+      nodeCount: nodeCount.length,
+      edgeCount: edgeCount.length,
+    });
   return (
     '<svg xmlns="http://www.w3.org/2000/svg" width="' +
     SNAPSHOT_WIDTH +
@@ -443,9 +419,9 @@ function createWorkflowSnapshotSvg(_0x364c62, _0x2e4ce3 = {}) {
     '" opacity="0.72"/>\n  </pattern>\n  <filter id="nodeShadow" x="-16%" y="-20%" width="132%" height="140%">\n    <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="' +
     snapshotColor('shadow') +
     '" flood-opacity="0.25"/>\n  </filter>\n  <linearGradient id="frameGlow" x1="0" x2="1" y1="0" y2="1">\n    <stop offset="0" stop-color="' +
-    _0xcc6ff2.frameGlowStart +
+    snapshotTheme.frameGlowStart +
     '"/>\n    <stop offset="1" stop-color="' +
-    _0xcc6ff2.frameGlowEnd +
+    snapshotTheme.frameGlowEnd +
     '"/>\n  </linearGradient>\n</defs>\n<rect width="' +
     SNAPSHOT_WIDTH +
     '" height="' +
@@ -459,7 +435,7 @@ function createWorkflowSnapshotSvg(_0x364c62, _0x2e4ce3 = {}) {
     '" fill="url(#grid)"/>\n<text x="52" y="48" fill="' +
     snapshotColor('titleText') +
     '" font-size="28" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="800">' +
-    _0x44fe54 +
+    escapeSvgText4 +
     '</text>\n<g opacity="0.92">\n  <rect x="252" y="28" width="136" height="44" rx="14" fill="' +
     snapshotColor('toolbarFill') +
     '" stroke="' +
@@ -467,9 +443,9 @@ function createWorkflowSnapshotSvg(_0x364c62, _0x2e4ce3 = {}) {
     '" stroke-width="1.2"/>\n  <path d="M 280 42 L 280 58 L 294 50 Z" fill="none" stroke="' +
     snapshotColor('toolbarIcon') +
     '" stroke-width="2" stroke-linejoin="round"/>\n  <circle cx="320" cy="50" r="9" fill="' +
-    _0xcc6ff2.toolbarDotFill +
+    snapshotTheme.toolbarDotFill +
     '" stroke="' +
-    _0xcc6ff2.toolbarDotStroke +
+    snapshotTheme.toolbarDotStroke +
     '" stroke-width="2"/>\n  <rect x="352" y="41" width="18" height="18" rx="2" fill="none" stroke="' +
     snapshotColor('toolbarIcon') +
     '" stroke-width="2"/>\n</g>\n<rect x="' +
@@ -491,7 +467,7 @@ function createWorkflowSnapshotSvg(_0x364c62, _0x2e4ce3 = {}) {
     '" height="' +
     (SNAPSHOT_FRAME.height - 12) +
     '" rx="13" fill="none" stroke="' +
-    _0xcc6ff2.frameInnerStroke +
+    snapshotTheme.frameInnerStroke +
     '" stroke-width="1" opacity="0.9"/>\n<text x="' +
     (SNAPSHOT_FRAME.x + 26) +
     '" y="' +
@@ -499,129 +475,121 @@ function createWorkflowSnapshotSvg(_0x364c62, _0x2e4ce3 = {}) {
     '" fill="' +
     snapshotColor('summaryText') +
     '" font-size="15" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="700">' +
-    escapeSvgText(_0x303441) +
+    escapeSvgText(workflowCoverText2) +
     '</text>\n<g>' +
-    renderSnapshotEdges(_0xd2f1d8, _0x28a3e0) +
-    renderSnapshotNodes(_0x293651, _0x28a3e0, _0xcc6ff2) +
+    renderSnapshotEdges(value31, map6) +
+    renderSnapshotNodes(list9, map6, snapshotTheme) +
     '</g>\n</svg>'
   );
 }
-export function createWorkflowSnapshotCoverDataUrl(_0x249052, _0x44eb2c = {}) {
-  const _0x1ec829 = createWorkflowSnapshotSvg(_0x249052, _0x44eb2c);
-  if (!_0x1ec829) return '';
-  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(_0x1ec829);
+export function createWorkflowSnapshotCoverDataUrl(value39, value40 = {}) {
+  const workflowSnapshotSvg = createWorkflowSnapshotSvg(value39, value40);
+  if (!workflowSnapshotSvg) return '';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(workflowSnapshotSvg);
 }
-export function createWorkflowSnapshotCoverCandidate(_0x21b9d9, _0x2e302b = {}) {
-  const _0x4bfbe1 = createWorkflowSnapshotCoverDataUrl(_0x21b9d9, _0x2e302b);
-  if (!_0x4bfbe1) return null;
+export function createWorkflowSnapshotCoverCandidate(value41, value42 = {}) {
+  const src = createWorkflowSnapshotCoverDataUrl(value41, value42);
+  if (!src) return null;
   return {
     id: WORKFLOW_SNAPSHOT_COVER_ID,
-    src: _0x4bfbe1,
+    src: src,
     nodeId: '',
-    label: cleanText(_0x2e302b.label) || workflowCoverText('snapshotLabel'),
+    label: cleanText(value42.label) || workflowCoverText('snapshotLabel'),
   };
 }
-function normalizePath(_0x1b7b18) {
-  const _0x185c51 = cleanText(_0x1b7b18);
-  if (!_0x185c51) return '';
+function normalizePath(value43) {
+  const cleanText12 = cleanText(value43);
+  if (!cleanText12) return '';
   if (
-    _0x185c51.startsWith('/') ||
-    _0x185c51.startsWith('data:') ||
-    _0x185c51.startsWith('blob:') ||
-    /^https?:\/\//i.test(_0x185c51)
+    cleanText12.startsWith('/') ||
+    cleanText12.startsWith('data:') ||
+    cleanText12.startsWith('blob:') ||
+    /^https?:\/\//i.test(cleanText12)
   )
-    return _0x185c51;
-  const _0x5728f2 = localPathToUrl(_0x185c51);
-  return _0x5728f2 || '/' + _0x185c51.replace(/^\/+/, '');
+    return cleanText12;
+  const url = localPathToUrl(cleanText12);
+  return url || '/' + cleanText12.replace(/^\/+/, '');
 }
-function pickMediaSrc(_0x47855a) {
-  if (!_0x47855a || typeof _0x47855a !== 'object') return '';
+function pickMediaSrc(response) {
+  if (!response || typeof response !== 'object') return '';
   return normalizePath(
-    _0x47855a.localPath ||
-      _0x47855a.thumbLocalPath ||
-      _0x47855a.thumbUrl ||
-      _0x47855a.coverUrl ||
-      _0x47855a.poster ||
-      _0x47855a.imageUrl ||
-      _0x47855a.src ||
-      _0x47855a.url,
+    response.localPath ||
+      response.thumbLocalPath ||
+      response.thumbUrl ||
+      response.coverUrl ||
+      response.poster ||
+      response.imageUrl ||
+      response.src ||
+      response.url,
   );
 }
-function pickArrayMediaSrc(_0x48add4, _0x2f99ed, _0x226bd0) {
-  const _0x10bf35 = Array.isArray(_0x48add4?.[_0x2f99ed]) ? _0x48add4[_0x2f99ed] : [];
-  if (_0x10bf35.length === 0) return '';
-  const _0x165bc9 = Number(_0x48add4?.[_0x226bd0]),
-    _0x40eb3e = Number.isInteger(_0x165bc9) && _0x165bc9 >= 0 ? _0x10bf35[_0x165bc9] : null;
-  return pickMediaSrc(_0x40eb3e) || pickMediaSrc(_0x10bf35[0]);
+function pickArrayMediaSrc(value44, value45, value46) {
+  const list10 = Array.isArray(value44?.[value45]) ? value44[value45] : [];
+  if (list10.length === 0) return '';
+  const count = Number(value44?.[value46]),
+    value47 = Number.isInteger(count) && count >= 0 ? list10[count] : null;
+  return pickMediaSrc(value47) || pickMediaSrc(list10[0]);
 }
-function getCoverCandidatePriority(_0x446de4) {
-  const _0x5a33b3 = cleanText(_0x446de4?.type).toLowerCase(),
-    _0x4dc406 = [
-      _0x5a33b3,
-      cleanText(_0x446de4?.name),
-      cleanText(_0x446de4?.title),
-      cleanText(_0x446de4?.label),
-    ]
+function getCoverCandidatePriority(error4) {
+  const list11 = cleanText(error4?.type).toLowerCase(),
+    list12 = [list11, cleanText(error4?.name), cleanText(error4?.title), cleanText(error4?.label)]
       .join(' ')
       .toLowerCase();
   if (
-    _0x5a33b3.startsWith('ai-') ||
-    _0x5a33b3.includes('result') ||
-    _0x4dc406.includes('输出') ||
-    _0x4dc406.includes('生成')
+    list11.startsWith('ai-') ||
+    list11.includes('result') ||
+    list12.includes('输出') ||
+    list12.includes('生成')
   )
     return 0;
-  if (_0x5a33b3.startsWith('source-') || _0x4dc406.includes('输入') || _0x4dc406.includes('参考')) return 1;
+  if (list11.startsWith('source-') || list12.includes('输入') || list12.includes('参考')) return 1;
   return 2;
 }
-export function resolveWorkflowNodeThumbSrc(_0x347aa1) {
-  if (!_0x347aa1 || typeof _0x347aa1 !== 'object') return '';
+export function resolveWorkflowNodeThumbSrc(enabled6) {
+  if (!enabled6 || typeof enabled6 !== 'object') return '';
   return (
     normalizePath(
-      _0x347aa1.localPath ||
-        _0x347aa1.thumbLocalPath ||
-        _0x347aa1.thumbUrl ||
-        _0x347aa1.coverUrl ||
-        _0x347aa1.thumbnailUrl ||
-        _0x347aa1.thumbnail ||
-        _0x347aa1.poster ||
-        _0x347aa1.src ||
-        _0x347aa1.imageUrl,
+      enabled6.localPath ||
+        enabled6.thumbLocalPath ||
+        enabled6.thumbUrl ||
+        enabled6.coverUrl ||
+        enabled6.thumbnailUrl ||
+        enabled6.thumbnail ||
+        enabled6.poster ||
+        enabled6.src ||
+        enabled6.imageUrl,
     ) ||
-    pickArrayMediaSrc(_0x347aa1, 'images', 'mainImageIndex') ||
-    pickArrayMediaSrc(_0x347aa1, 'videos', 'mainVideoIndex')
+    pickArrayMediaSrc(enabled6, 'images', 'mainImageIndex') ||
+    pickArrayMediaSrc(enabled6, 'videos', 'mainVideoIndex')
   );
 }
-export function extractWorkflowCoverCandidates(_0x4072d4) {
-  const _0x5adf60 = normalizeNodeList(_0x4072d4),
-    _0x2e34b5 = new Set(),
-    _0x5c9aa4 = [];
-  for (const _0x56be6b of _0x5adf60) {
-    const _0x111eb3 = resolveWorkflowNodeThumbSrc(_0x56be6b);
-    if (!_0x111eb3 || _0x2e34b5.has(_0x111eb3)) continue;
-    (_0x2e34b5.add(_0x111eb3),
-      _0x5c9aa4.push({
-        id: 'cover-' + (_0x5c9aa4.length + 1),
-        src: _0x111eb3,
-        nodeId: cleanText(_0x56be6b?.id),
-        label:
-          cleanText(_0x56be6b?.name) || workflowCoverText('coverNodeLabel', { index: _0x5c9aa4.length + 1 }),
-        priority: getCoverCandidatePriority(_0x56be6b),
-        order: _0x5c9aa4.length,
+export function extractWorkflowCoverCandidates(value48) {
+  const nodeList = normalizeNodeList(value48),
+    map7 = new Set(),
+    index2 = [];
+  for (const error5 of nodeList) {
+    const src2 = resolveWorkflowNodeThumbSrc(error5);
+    if (!src2 || map7.has(src2)) continue;
+    (map7.add(src2),
+      index2.push({
+        id: 'cover-' + (index2.length + 1),
+        src: src2,
+        nodeId: cleanText(error5?.id),
+        label: cleanText(error5?.name) || workflowCoverText('coverNodeLabel', { index: index2.length + 1 }),
+        priority: getCoverCandidatePriority(error5),
+        order: index2.length,
       }));
   }
-  return _0x5c9aa4
-    .sort(
-      (_0x2b4987, _0x557daf) => _0x2b4987.priority - _0x557daf.priority || _0x2b4987.order - _0x557daf.order,
-    )
-    .map(({ priority: _0x26c83f, order: _0x198c28, ..._0x3c12fb }) => _0x3c12fb);
+  return index2
+    .sort((item9, value49) => item9.priority - value49.priority || item9.order - value49.order)
+    .map(({ priority: priority, order: order, ...args2 }) => args2);
 }
 export function getDefaultWorkflowCoverCandidate() {
   return { id: DEFAULT_WORKFLOW_COVER_ID, src: '', nodeId: '', label: 'updream canvas' };
 }
-export function isDataImageCover(_0x6ce797) {
-  return cleanText(_0x6ce797).startsWith('data:image/');
+export function isDataImageCover(value50) {
+  return cleanText(value50).startsWith('data:image/');
 }
-export function isSvgDataImageCover(_0x528cbd) {
-  return /^data:image\/svg\+xml(?:[;,]|$)/i.test(cleanText(_0x528cbd));
+export function isSvgDataImageCover(value51) {
+  return /^data:image\/svg\+xml(?:[;,]|$)/i.test(cleanText(value51));
 }

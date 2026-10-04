@@ -24,48 +24,48 @@ import {
   getPersonReplacementProjectAudioAssets,
   getPersonReplacementVoiceLibraryBoundCharacters,
 } from './personReplacementVoiceLibrary.js';
-function normalizeText(_0x31c3ef) {
-  return String(_0x31c3ef ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function escapeHtml(_0x223ebf) {
-  return String(_0x223ebf ?? '')
+function escapeHtml(item) {
+  return String(item ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
     ['replaceAll']('\x22', '&quot;')
     ['replaceAll']('\x27', '&apos;');
 }
-function normalizeMediaUrl(_0x3a62f2) {
-  const _0x4d7f10 = normalizeText(_0x3a62f2);
-  if (!_0x4d7f10) return '';
-  return localPathToUrl(_0x4d7f10) || _0x4d7f10;
+function normalizeMediaUrl(key) {
+  const text = normalizeText(key);
+  if (!text) return '';
+  return localPathToUrl(text) || text;
 }
-function normalizeProjectAssetMediaForRender(_0x1c8130 = {}) {
+function normalizeProjectAssetMediaForRender(args = {}) {
   return {
-    ..._0x1c8130,
-    appearances: getWorkspaceAssetAppearances(_0x1c8130)['map']((_0x211ab7) => ({
-      ..._0x211ab7,
-      imageUrl: normalizeMediaUrl(_0x211ab7['imageUrl']),
-      referenceImageUrl: normalizeMediaUrl(_0x211ab7['referenceImageUrl']),
+    ...args,
+    appearances: getWorkspaceAssetAppearances(args)['map']((args2) => ({
+      ...args2,
+      imageUrl: normalizeMediaUrl(args2['imageUrl']),
+      referenceImageUrl: normalizeMediaUrl(args2['referenceImageUrl']),
     })),
   };
 }
-function getCharacterVoiceUrl(_0x19f8d7 = {}) {
+function getCharacterVoiceUrl(options = {}) {
   return normalizeMediaUrl(
-    _0x19f8d7['voiceReference']?.['audioUrl'] ||
-      _0x19f8d7['voiceReference']?.['localPath'] ||
-      _0x19f8d7['voiceRef'],
+    options['voiceReference']?.['audioUrl'] ||
+      options['voiceReference']?.['localPath'] ||
+      options['voiceRef'],
   );
 }
-function renderVoiceReferenceStatus(_0x34f6da = {}, _0x2c4673 = '') {
-  const _0x3ac5a5 = Boolean(getCharacterVoiceUrl(_0x34f6da));
+function renderVoiceReferenceStatus(options2 = {}, index = '') {
+  const result = Boolean(getCharacterVoiceUrl(options2));
   return (
     '<span class="person-replacement-target-voice-status' +
-    (_0x2c4673 ? '\x20' + escapeHtml(_0x2c4673) : '') +
+    (index ? '\x20' + escapeHtml(index) : '') +
     '\x20' +
-    (_0x3ac5a5 ? 'has-reference' : 'is-missing') +
+    (result ? 'has-reference' : 'is-missing') +
     '"><i aria-hidden="true"></i>' +
-    (_0x3ac5a5 ? '有声音参考' : '无声音参考') +
+    (result ? '有声音参考' : '无声音参考') +
     '</span>'
   );
 }
@@ -74,264 +74,273 @@ export const PERSON_REPLACEMENT_LIBRARY_TARGETS = Object['freeze']([
   { kind: 'scene', label: '场景' },
   { kind: 'audio', label: '音频' },
 ]);
-export function getPersonReplacementSelectableAssets(_0x213112, _0x4c227f) {
-  if (_0x4c227f === 'library')
-    return _0x213112['libraryAssets']['filter'](
-      (_0x336231) =>
-        (normalizeText(_0x336231?.['mediaKind'])['toLowerCase']() === 'image' &&
-          normalizeText(_0x336231?.['sourceUrl'] || _0x336231?.['imageUrl'])) ||
-        (normalizeText(_0x336231?.['mediaKind'])['toLowerCase']() === 'audio' &&
-          getPersonReplacementLibraryAudioRef(_0x336231)),
+export function getPersonReplacementSelectableAssets(data, target) {
+  if (target === 'library')
+    return data['libraryAssets']['filter'](
+      (source) =>
+        (normalizeText(source?.['mediaKind'])['toLowerCase']() === 'image' &&
+          normalizeText(source?.['sourceUrl'] || source?.['imageUrl'])) ||
+        (normalizeText(source?.['mediaKind'])['toLowerCase']() === 'audio' &&
+          getPersonReplacementLibraryAudioRef(source)),
     );
-  if (_0x4c227f === 'audio') return getPersonReplacementProjectAudioAssets(_0x213112);
-  return _0x4c227f === 'scene' ? _0x213112['scenes'] : _0x213112['characters'];
+  if (target === 'audio') return getPersonReplacementProjectAudioAssets(data);
+  return target === 'scene' ? data['scenes'] : data['characters'];
 }
-export function renderPersonReplacementAssetSettingsPage(_0x20a201, _0x2253a7 = {}) {
-  const _0x222d44 = ['character', 'scene', 'audio', 'library']['includes'](
-      _0x20a201['workspace']['characterAssetTab'],
+export function renderPersonReplacementAssetSettingsPage(characters, footerHtml = {}) {
+  const activeTab = ['character', 'scene', 'audio', 'library']['includes'](
+      characters['workspace']['characterAssetTab'],
     )
-      ? _0x20a201['workspace']['characterAssetTab']
+      ? characters['workspace']['characterAssetTab']
       : 'character',
-    _0x3d534e = _0x222d44 === 'library',
-    _0xaa214d = _0x222d44 === 'scene',
-    _0x9ac240 = _0x222d44 === 'audio',
-    _0x1ff73c = new Set(
-      Array['isArray'](_0x2253a7['assetUploadPendingKinds']) ? _0x2253a7['assetUploadPendingKinds'] : [],
+    previewAppearance = activeTab === 'library',
+    readOnly = activeTab === 'scene',
+    calloutTitle = activeTab === 'audio',
+    map = new Set(
+      Array['isArray'](footerHtml['assetUploadPendingKinds']) ? footerHtml['assetUploadPendingKinds'] : [],
     ),
-    _0x2c4d9f = getPersonReplacementProjectAudioAssets(_0x20a201),
-    _0x692f55 = normalizeText(_0x2253a7['voiceLibraryTargetCharacterId']),
-    _0x2aac37 = {
-      ..._0x20a201,
-      characters: _0x20a201['characters']['map'](normalizeProjectAssetMediaForRender),
-      scenes: _0x20a201['scenes']['map'](normalizeProjectAssetMediaForRender),
+    list = getPersonReplacementProjectAudioAssets(characters),
+    text2 = normalizeText(footerHtml['voiceLibraryTargetCharacterId']),
+    next = {
+      ...characters,
+      characters: characters['characters']['map'](normalizeProjectAssetMediaForRender),
+      scenes: characters['scenes']['map'](normalizeProjectAssetMediaForRender),
     },
-    _0xfb16a7 = _0x2aac37['characters']['find']((_0x3486af) => _0x3486af['id'] === _0x692f55) || null,
-    _0x89154c = _0x9ac240 && Boolean(_0xfb16a7),
-    _0x425368 = buildPersonReplacementAssetViewState(_0x2aac37);
-  _0x89154c &&
-    ((_0x425368['selectedAssetIds'] = [_0x425368['selectedAssetId']]),
-    (_0x425368['assetSelectionMode'] = ![]));
-  _0x425368['isBatchGenerating'] = _0x2253a7['assetBatchGenerationActive'] === !![];
-  const _0x259122 = _0x425368['assetSelectionMode'] && _0x425368['selectedAssetIds']['length'] > 0x1;
-  ((_0x425368['batchGenerationLabel'] = normalizeText(_0x2253a7['assetBatchGenerationLabel'])),
-    (_0x425368['batchCancelRequested'] = _0x2253a7['assetBatchCancelRequested'] === !![]),
-    (_0x425368['batchGeneratingAssetIds'] = Array['isArray'](_0x2253a7['assetBatchGeneratingCharacterIds'])
-      ? _0x2253a7['assetBatchGeneratingCharacterIds']
+    error = next['characters']['find']((current) => current['id'] === text2) || null,
+    showVoiceLibraryConfirm = calloutTitle && Boolean(error),
+    allowDeleteAssetCard = buildPersonReplacementAssetViewState(next);
+  showVoiceLibraryConfirm &&
+    ((allowDeleteAssetCard['selectedAssetIds'] = [allowDeleteAssetCard['selectedAssetId']]),
+    (allowDeleteAssetCard['assetSelectionMode'] = ![]));
+  allowDeleteAssetCard['isBatchGenerating'] = footerHtml['assetBatchGenerationActive'] === !![];
+  const entry =
+    allowDeleteAssetCard['assetSelectionMode'] && allowDeleteAssetCard['selectedAssetIds']['length'] > 0x1;
+  ((allowDeleteAssetCard['batchGenerationLabel'] = normalizeText(footerHtml['assetBatchGenerationLabel'])),
+    (allowDeleteAssetCard['batchCancelRequested'] = footerHtml['assetBatchCancelRequested'] === !![]),
+    (allowDeleteAssetCard['batchGeneratingAssetIds'] = Array['isArray'](
+      footerHtml['assetBatchGeneratingCharacterIds'],
+    )
+      ? footerHtml['assetBatchGeneratingCharacterIds']
       : []),
-    (_0x425368['batchCancelAction'] = 'cancel-asset-batch-generation'));
-  const _0x4dbe9e = _0x425368['data']['assets'],
-    _0x4cafd3 = _0x4dbe9e['find']((_0x10d911) => _0x10d911['id'] === _0x425368['selectedAssetId']) || null,
-    _0x205d9c = getPersonReplacementSelectableAssets(_0x2aac37, _0x222d44),
-    _0x3fe444 =
-      _0x205d9c['length'] > 0x0 &&
-      _0x205d9c['every']((_0x5a7019) => _0x425368['selectedAssetIds']['includes'](_0x5a7019['id'])),
-    _0x18d4a5 = _0x3d534e
-      ? _0x205d9c['filter']((_0x38dc58) => _0x425368['selectedAssetIds']['includes'](_0x38dc58['id']))
+    (allowDeleteAssetCard['batchCancelAction'] = 'cancel-asset-batch-generation'));
+  const assets = allowDeleteAssetCard['data']['assets'],
+    record = assets['find']((payload) => payload['id'] === allowDeleteAssetCard['selectedAssetId']) || null,
+    list2 = getPersonReplacementSelectableAssets(next, activeTab),
+    allSelected =
+      list2['length'] > 0x0 &&
+      list2['every']((handle) => allowDeleteAssetCard['selectedAssetIds']['includes'](handle['id'])),
+    list3 = previewAppearance
+      ? list2['filter']((state) => allowDeleteAssetCard['selectedAssetIds']['includes'](state['id']))
       : [],
-    _0x344b80 = _0x18d4a5['length'],
-    _0x513d54 = _0x2253a7['assetLibraryDisclosure'] || createWorkspaceAssetLibraryDisclosure(),
-    _0x399dca = (_0xc586ec) => {
-      const _0x3dbde0 = !_0x3d534e && !_0xaa214d && !_0x9ac240,
-        _0x534bdd = _0x3dbde0 ? getWorkspaceAssetAppearanceStats(_0xc586ec) : null,
-        _0x1692fa = getPersonReplacementVoiceLibraryBoundCharacters(_0x20a201, _0xc586ec);
-      if (normalizeText(_0xc586ec?.['mediaKind'])['toLowerCase']() === 'audio')
+    config = list3['length'],
+    scope = footerHtml['assetLibraryDisclosure'] || createWorkspaceAssetLibraryDisclosure(),
+    renderAsset = (imageUrl) => {
+      const statusText = !previewAppearance && !readOnly && !calloutTitle,
+        input = statusText ? getWorkspaceAssetAppearanceStats(imageUrl) : null,
+        boundCharacters = getPersonReplacementVoiceLibraryBoundCharacters(characters, imageUrl);
+      if (normalizeText(imageUrl?.['mediaKind'])['toLowerCase']() === 'audio')
         return renderPersonReplacementAudioAssetCard(
-          { ..._0x425368, allowDeleteAssetCard: _0x425368['allowDeleteAssetCard'] && !_0x89154c },
-          _0xc586ec,
-          { boundCharacters: _0x1692fa, showVoiceLibraryConfirm: _0x89154c },
+          {
+            ...allowDeleteAssetCard,
+            allowDeleteAssetCard: allowDeleteAssetCard['allowDeleteAssetCard'] && !showVoiceLibraryConfirm,
+          },
+          imageUrl,
+          { boundCharacters: boundCharacters, showVoiceLibraryConfirm: showVoiceLibraryConfirm },
         );
-      return renderPersonReplacementAssetCard(_0x425368, _0xc586ec, {
+      return renderPersonReplacementAssetCard(allowDeleteAssetCard, imageUrl, {
         cardAttributes:
-          !_0x3d534e && getWorkspaceAssetAppearances(_0xc586ec)['length'] > 0x1
-            ? 'data-story-card-appearance-wheel="' + escapeHtml(_0xc586ec['id']) + '\x22'
+          !previewAppearance && getWorkspaceAssetAppearances(imageUrl)['length'] > 0x1
+            ? 'data-story-card-appearance-wheel="' + escapeHtml(imageUrl['id']) + '\x22'
             : '',
-        previewAppearance: _0x3d534e
-          ? { ..._0xc586ec, imageUrl: _0xc586ec['thumbnailUrl'] || _0xc586ec['imageUrl'] }
-          : getWorkspaceAssetAppearances(_0xc586ec)[
-              _0x425368['assetAppearanceIndexes']?.[_0xc586ec['id']] || 0x0
+        previewAppearance: previewAppearance
+          ? { ...imageUrl, imageUrl: imageUrl['thumbnailUrl'] || imageUrl['imageUrl'] }
+          : getWorkspaceAssetAppearances(imageUrl)[
+              allowDeleteAssetCard['assetAppearanceIndexes']?.[imageUrl['id']] || 0x0
             ],
         accessoryHtml:
-          !_0x3d534e && getWorkspaceAssetAppearances(_0xc586ec)['length'] > 0x1
+          !previewAppearance && getWorkspaceAssetAppearances(imageUrl)['length'] > 0x1
             ? renderWorkspaceCardAppearanceNavigation({
-                attributes: { 'data-story-card-appearance-wheel': _0xc586ec['id'] },
+                attributes: { 'data-story-card-appearance-wheel': imageUrl['id'] },
                 previousAttributes: {
                   'data-story-action': 'previous-appearance',
-                  'data-story-card-appearance-id': _0xc586ec['id'],
+                  'data-story-card-appearance-id': imageUrl['id'],
                 },
                 nextAttributes: {
                   'data-story-action': 'next-appearance',
-                  'data-story-card-appearance-id': _0xc586ec['id'],
+                  'data-story-card-appearance-id': imageUrl['id'],
                 },
               })
             : '',
-        fallbackImageUrl: _0x3d534e ? _0xc586ec['sourceUrl'] : '',
-        workspaceAssetLibraryImage: _0x3d534e,
-        statusText: _0x3dbde0
-          ? (_0x425368['assetAppearanceIndexes']?.[_0xc586ec['id']] || 0x0) + 0x1 + ' / ' + _0x534bdd['total']
+        fallbackImageUrl: previewAppearance ? imageUrl['sourceUrl'] : '',
+        workspaceAssetLibraryImage: previewAppearance,
+        statusText: statusText
+          ? (allowDeleteAssetCard['assetAppearanceIndexes']?.[imageUrl['id']] || 0x0) +
+            0x1 +
+            ' / ' +
+            input['total']
           : '',
-        cardClassName: _0x3dbde0
+        cardClassName: statusText
           ? 'person-replacement-character-asset-card workspace-portrait-card'
-          : !_0x3d534e && _0xaa214d
+          : !previewAppearance && readOnly
             ? 'workspace-portrait-card'
             : '',
-        headingAccessoryHtml: _0x3dbde0
-          ? renderWorkspaceCardVoiceStatus(Boolean(getCharacterVoiceUrl(_0xc586ec)))
+        headingAccessoryHtml: statusText
+          ? renderWorkspaceCardVoiceStatus(Boolean(getCharacterVoiceUrl(imageUrl)))
           : '',
       });
     },
-    _0x2e315a = _0x3d534e
-      ? _0x513d54['render']({ assets: _0x4dbe9e, renderAsset: _0x399dca })
-      : _0x4dbe9e['map'](_0x399dca)['join'](''),
-    _0x2d2dc2 =
-      _0x18d4a5['length'] && _0x18d4a5['every']((_0x1623c8) => _0x1623c8['mediaKind'] === 'audio')
+    cardsHtml = previewAppearance
+      ? scope['render']({ assets: assets, renderAsset: renderAsset })
+      : assets['map'](renderAsset)['join'](''),
+    output =
+      list3['length'] && list3['every']((value2) => value2['mediaKind'] === 'audio')
         ? '<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x22\x20data-person-replacement-action=\x22add-library-assets-to-project\x22\x20data-person-replacement-library-target-kind=\x22audio\x22>加入到音频项目' +
-          (_0x425368['assetSelectionMode'] ? '\x20(' + _0x344b80 + ')' : '') +
+          (allowDeleteAssetCard['assetSelectionMode'] ? '\x20(' + config + ')' : '') +
           '</button>'
         : '<div\x20class=\x22story-asset-batch-menu-wrap\x20story-library-add-menu-wrap\x20person-replacement-library-add-menu-wrap\x22>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x20story-asset-batch-trigger\x22\x20data-person-replacement-action=\x22toggle-library-add-targets\x22\x20aria-haspopup=\x22menu\x22\x20aria-expanded=\x22false\x22\x20' +
-          (_0x344b80 ? '' : 'disabled') +
+          (config ? '' : 'disabled') +
           '><span class="story-asset-batch-trigger-label">加入到项目' +
-          (_0x425368['assetSelectionMode'] && _0x344b80 ? '\x20(' + _0x344b80 + ')' : '') +
+          (allowDeleteAssetCard['assetSelectionMode'] && config ? '\x20(' + config + ')' : '') +
           '</span></button>\n    <div class="story-asset-batch-menu story-library-add-menu" role="menu" aria-label="选择加入项目的素材分类" aria-hidden="true">\n      ' +
           PERSON_REPLACEMENT_LIBRARY_TARGETS['map'](
-            ({ kind: _0x55c86a, label: _0x242a2d }) =>
+            ({ kind: kind, label: label }) =>
               '<button\x20type=\x22button\x22\x20role=\x22menuitem\x22\x20data-person-replacement-action=\x22add-library-assets-to-project\x22\x20data-person-replacement-library-target-kind=\x22' +
-              _0x55c86a +
+              kind +
               '"><span class="story-asset-batch-mode-icon">' +
-              renderWorkspaceAssetTabIcon(_0x55c86a) +
+              renderWorkspaceAssetTabIcon(kind) +
               '</span><span>' +
-              _0x242a2d +
+              label +
               '</span></button>',
           )['join']('') +
           '\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>',
-    _0x259403 = (_0x145a2c, _0x3c30bf, _0x5919c) => {
-      const _0x535c3c = _0x1ff73c['has'](_0x145a2c);
+    primaryActionHtml = (value3, value4, value5) => {
+      const value6 = map['has'](value3);
       return (
         '<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x22\x20data-person-replacement-action=\x22' +
-        _0x5919c +
+        value5 +
         '\x22' +
-        (_0x535c3c ? ' aria-busy="true" disabled' : '') +
+        (value6 ? ' aria-busy="true" disabled' : '') +
         '>' +
-        (_0x535c3c
+        (value6
           ? '<span class="storyboard-script-loading-spinner" aria-hidden="true"></span><span>上传中…</span>'
-          : '上传' + _0x3c30bf) +
+          : '上传' + value4) +
         '</button>'
       );
     },
-    _0x190c9d = {
-      detailSplitRatio: _0x425368['assetDetailSplitRatio'],
+    args3 = {
+      detailSplitRatio: allowDeleteAssetCard['assetDetailSplitRatio'],
       detailSplitterHtml:
-        typeof _0x2253a7['renderDetailSplitter'] === 'function'
-          ? _0x2253a7['renderDetailSplitter'](_0x425368['assetDetailSplitRatio'])
+        typeof footerHtml['renderDetailSplitter'] === 'function'
+          ? footerHtml['renderDetailSplitter'](allowDeleteAssetCard['assetDetailSplitRatio'])
           : '',
     },
-    _0x1d1702 = _0x9ac240
-      ? _0x89154c
+    calloutActionsHtml = calloutTitle
+      ? showVoiceLibraryConfirm
         ? '<button type="button" class="story-secondary-button" data-person-replacement-action="cancel-character-voice-library">取消</button>'
         : renderWorkspaceAssetSelectionActions({
-            selectedCount: _0x425368['selectedAssetIds']['length'],
-            allSelected: _0x3fe444,
-            primaryActionHtml: _0x259403('audio', '音频', 'choose-new-audio-files'),
+            selectedCount: allowDeleteAssetCard['selectedAssetIds']['length'],
+            allSelected: allSelected,
+            primaryActionHtml: primaryActionHtml('audio', '音频', 'choose-new-audio-files'),
           })
       : renderWorkspaceAssetSelectionActions({
           compactTrigger: ![],
-          selectionMode: _0x425368['assetSelectionMode'],
-          selectedCount: _0x425368['selectedAssetIds']['length'],
-          allSelected: _0x3fe444,
-          primaryActionHtml: _0x3d534e
-            ? _0x2d2dc2
-            : _0xaa214d
-              ? _0x259122
+          selectionMode: allowDeleteAssetCard['assetSelectionMode'],
+          selectedCount: allowDeleteAssetCard['selectedAssetIds']['length'],
+          allSelected: allSelected,
+          primaryActionHtml: previewAppearance
+            ? output
+            : readOnly
+              ? entry
                 ? ''
-                : _0x259403('scene', '场景', 'choose-new-scene-images')
-              : _0x259122 || _0x425368['isBatchGenerating']
-                ? renderPersonReplacementBatchGenerationControl(_0x425368)
-                : _0x259403('character', '人物', 'choose-new-character-images'),
-          selectAllLabel: _0x3d534e ? '全选素材' : '全选',
+                : primaryActionHtml('scene', '场景', 'choose-new-scene-images')
+              : entry || allowDeleteAssetCard['isBatchGenerating']
+                ? renderPersonReplacementBatchGenerationControl(allowDeleteAssetCard)
+                : primaryActionHtml('character', '人物', 'choose-new-character-images'),
+          selectAllLabel: previewAppearance ? '全选素材' : '全选',
           clearSelectionLabel: '取消全选',
         });
   return renderWorkspaceAssetSettingsShell({
     className: 'person-replacement-assets-page',
     calloutInHeading: !![],
     headingInListColumn: !![],
-    calloutStatus: _0x425368['assetSelectionMode']
-      ? '已选择\x20' + _0x425368['selectedAssetIds']['length'] + '\x20项'
+    calloutStatus: allowDeleteAssetCard['assetSelectionMode']
+      ? '已选择\x20' + allowDeleteAssetCard['selectedAssetIds']['length'] + '\x20项'
       : '',
-    activeTab: _0x222d44,
+    activeTab: activeTab,
     tabCount: 0x4,
     tabsHtml: [
-      ['character', '人物', _0x20a201['characters']['length']],
-      ['scene', '场景', _0x20a201['scenes']['length']],
-      ['audio', '音频', _0x2c4d9f['length']],
-      ['library', '总素材', _0x20a201['libraryAssets']['length']],
+      ['character', '人物', characters['characters']['length']],
+      ['scene', '场景', characters['scenes']['length']],
+      ['audio', '音频', list['length']],
+      ['library', '总素材', characters['libraryAssets']['length']],
     ]
       ['map'](
-        ([_0x392b0b, _0x5084cd, _0x446e7d]) =>
+        ([value7, value8, value9]) =>
           '<button type="button" class="' +
-          (_0x222d44 === _0x392b0b ? 'is-active' : '') +
+          (activeTab === value7 ? 'is-active' : '') +
           '\x22\x20data-person-replacement-action=\x22select-character-asset-tab\x22\x20data-asset-tab=\x22' +
-          _0x392b0b +
+          value7 +
           '" role="tab" aria-selected="' +
-          (_0x222d44 === _0x392b0b) +
+          (activeTab === value7) +
           '" tabindex="' +
-          (_0x222d44 === _0x392b0b ? '0' : '-1') +
+          (activeTab === value7 ? '0' : '-1') +
           '\x22>' +
-          renderWorkspaceAssetTabIcon(_0x392b0b) +
+          renderWorkspaceAssetTabIcon(value7) +
           '<span\x20class=\x22story-asset-tab-label\x22>' +
-          _0x5084cd +
+          value8 +
           '</span><span class="story-asset-tab-count">' +
-          _0x446e7d +
+          value9 +
           '</span></button>',
       )
       ['join'](''),
-    calloutTitle: _0x9ac240
-      ? _0x89154c
-        ? '为「' + _0xfb16a7['name'] + '」添加声音'
+    calloutTitle: calloutTitle
+      ? showVoiceLibraryConfirm
+        ? '为「' + error['name'] + '」添加声音'
         : '音频素材'
-      : _0x3d534e
+      : previewAppearance
         ? '从总素材加入项目'
-        : _0xaa214d
+        : readOnly
           ? '项目场景素材'
           : '上传人物基础形象',
-    calloutDescription: _0x9ac240
-      ? _0x89154c
+    calloutDescription: calloutTitle
+      ? showVoiceLibraryConfirm
         ? '请选择音频，再点击「设为角色声音参考」。'
         : '这里只显示已加入当前项目的音频；上传会先保存到总素材再加入项目。'
-      : _0x3d534e
-        ? _0x425368['assetSelectionMode']
-          ? _0x425368['selectedAssetIds']['length']
-            ? '已选择 ' + _0x425368['selectedAssetIds']['length'] + ' 项素材'
+      : previewAppearance
+        ? allowDeleteAssetCard['assetSelectionMode']
+          ? allowDeleteAssetCard['selectedAssetIds']['length']
+            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + ' 项素材'
             : '点击图片或音频进行多选，或拖动鼠标框选。'
           : '单击素材可查看详情；点击加入到项目后，选择人物、场景或音频。'
-        : _0xaa214d
-          ? _0x425368['assetSelectionMode']
-            ? '已选择 ' + _0x425368['selectedAssetIds']['length'] + '\x20项'
+        : readOnly
+          ? allowDeleteAssetCard['assetSelectionMode']
+            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + '\x20项'
             : '从总素材加入的场景可在图像替换中作为画面参考。'
-          : _0x425368['assetSelectionMode']
-            ? '已选择 ' + _0x425368['selectedAssetIds']['length'] + '\x20项'
+          : allowDeleteAssetCard['assetSelectionMode']
+            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + '\x20项'
             : '上传的第一张图片作为基础形象；后续生成会新增形象。',
-    calloutActionsHtml: _0x1d1702,
-    cardsHtml: _0x2e315a,
-    emptyText: _0x9ac240
+    calloutActionsHtml: calloutActionsHtml,
+    cardsHtml: cardsHtml,
+    emptyText: calloutTitle
       ? '当前项目暂无音频，请从总素材加入或上传音频'
-      : _0x3d534e
+      : previewAppearance
         ? '总素材中暂无可用素材'
-        : _0xaa214d
+        : readOnly
           ? '请先从总素材加入场景'
           : '请先上传人物基础形象',
     detailHtml:
-      normalizeText(_0x4cafd3?.['mediaKind'])['toLowerCase']() === 'audio'
-        ? renderPersonReplacementAudioAssetDetail(_0x4cafd3, {
-            characters: _0x20a201['characters'],
-            isLibrary: _0x3d534e,
-            boundCharacters: getPersonReplacementVoiceLibraryBoundCharacters(_0x20a201, _0x4cafd3),
-            selectedCharacterId: _0x89154c ? _0xfb16a7?.['id'] || '' : '',
+      normalizeText(record?.['mediaKind'])['toLowerCase']() === 'audio'
+        ? renderPersonReplacementAudioAssetDetail(record, {
+            characters: characters['characters'],
+            isLibrary: previewAppearance,
+            boundCharacters: getPersonReplacementVoiceLibraryBoundCharacters(characters, record),
+            selectedCharacterId: showVoiceLibraryConfirm ? error?.['id'] || '' : '',
           })
-        : renderPersonReplacementAssetDetail(_0x425368, _0x4cafd3, {
-            showEmptyDescription: _0x3d534e || _0xaa214d,
-            readOnly: _0xaa214d,
-            ..._0x190c9d,
+        : renderPersonReplacementAssetDetail(allowDeleteAssetCard, record, {
+            showEmptyDescription: previewAppearance || readOnly,
+            readOnly: readOnly,
+            ...args3,
           }),
-    footerHtml: _0x2253a7['footerHtml'] || '',
-    splitRatio: _0x425368['assetSplitRatio'],
+    footerHtml: footerHtml['footerHtml'] || '',
+    splitRatio: allowDeleteAssetCard['assetSplitRatio'],
   });
 }

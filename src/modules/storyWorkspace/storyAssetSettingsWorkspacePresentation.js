@@ -27,141 +27,132 @@ import {
   normalizeStoryAssetDetailSplitRatio,
   normalizeStoryAssetSplitRatio,
 } from './storyWorkspaceInteractions.js';
-function normalizeText(_0x500a52) {
-  return String(_0x500a52 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-export function isStoryAddedAssetAppearance(_0x55c3cf = {}) {
-  return ['library', 'upload']['includes'](normalizeText(_0x55c3cf?.['sourceOrigin']));
+export function isStoryAddedAssetAppearance(options = {}) {
+  return ['library', 'upload']['includes'](normalizeText(options?.['sourceOrigin']));
 }
-export function removeStoryAddedAssetAppearance(_0x48b582 = {}, _0x1f522e = '') {
-  const _0xda8c87 = getStoryAssetAppearances(_0x48b582),
-    _0x4502eb = normalizeText(_0x1f522e),
-    _0x336839 = _0xda8c87['findIndex']((_0x403f3f) => normalizeText(_0x403f3f?.['id']) === _0x4502eb),
-    _0x261d71 = _0xda8c87[_0x336839] || null;
-  if (_0xda8c87['length'] <= 0x1 || _0x336839 < 0x0 || !isStoryAddedAssetAppearance(_0x261d71))
+export function removeStoryAddedAssetAppearance(options2 = {}, item = '') {
+  const list = getStoryAssetAppearances(options2),
+    text = normalizeText(item),
+    removedIndex = list['findIndex']((key) => normalizeText(key?.['id']) === text),
+    removedAppearance = list[removedIndex] || null;
+  if (list['length'] <= 0x1 || removedIndex < 0x0 || !isStoryAddedAssetAppearance(removedAppearance))
     return {
       removed: ![],
       removedAppearance: null,
       removedIndex: -0x1,
-      nextIndex: Math['max'](0x0, Math['min'](_0xda8c87['length'] - 0x1, _0x336839)),
+      nextIndex: Math['max'](0x0, Math['min'](list['length'] - 0x1, removedIndex)),
     };
   return (
-    (_0x48b582['appearances'] = _0xda8c87['filter']((_0x2b26fe, _0x50e95d) => _0x50e95d !== _0x336839)),
-    normalizeText(_0x48b582['baseAppearanceId']) === _0x4502eb &&
-      ((_0x48b582['baseAppearanceId'] = ''), ensureStoryAssetBaseAppearance(_0x48b582)),
+    (options2['appearances'] = list['filter']((index, result) => result !== removedIndex)),
+    normalizeText(options2['baseAppearanceId']) === text &&
+      ((options2['baseAppearanceId'] = ''), ensureStoryAssetBaseAppearance(options2)),
     {
       removed: !![],
-      removedAppearance: _0x261d71,
-      removedIndex: _0x336839,
-      nextIndex: Math['max'](0x0, Math['min'](_0x48b582['appearances']['length'] - 0x1, _0x336839)),
+      removedAppearance: removedAppearance,
+      removedIndex: removedIndex,
+      nextIndex: Math['max'](0x0, Math['min'](options2['appearances']['length'] - 0x1, removedIndex)),
     }
   );
 }
 const STORY_VISUAL_ASSET_KINDS = ['character', 'scene', 'prop'];
-export function clearStoryAssetAppearanceImage(_0x4f0aa5 = {}, _0x52399b = '') {
-  const _0x191ffb = getStoryAssetAppearances(_0x4f0aa5),
-    _0xd56c51 = _0x191ffb['findIndex']((_0x5b49a7) => _0x5b49a7['id'] === _0x52399b),
-    _0x10770a = _0x191ffb[_0xd56c51];
-  if (!_0x10770a || !normalizeText(_0x10770a['imageUrl'])) return { removed: ![] };
+export function clearStoryAssetAppearanceImage(options3 = {}, data = '') {
+  const list2 = getStoryAssetAppearances(options3),
+    nextIndex = list2['findIndex']((target) => target['id'] === data),
+    enabled = list2[nextIndex];
+  if (!enabled || !normalizeText(enabled['imageUrl'])) return { removed: ![] };
   return (
-    (_0x10770a['imageUrl'] = ''),
-    (_0x10770a['generatedImage'] = null),
-    (_0x10770a['generatedImages'] = []),
-    (_0x10770a['activeIndex'] = 0x0),
-    (_0x10770a['error'] = ''),
-    { removed: !![], nextIndex: _0xd56c51 }
+    (enabled['imageUrl'] = ''),
+    (enabled['generatedImage'] = null),
+    (enabled['generatedImages'] = []),
+    (enabled['activeIndex'] = 0x0),
+    (enabled['error'] = ''),
+    { removed: !![], nextIndex: nextIndex }
   );
 }
-export function getMissingStoryAssetImages(_0x59a758 = []) {
-  return (Array['isArray'](_0x59a758) ? _0x59a758 : [])['flatMap']((_0x57f317) => {
-    const _0x4752e0 = normalizeText(_0x57f317?.['kind']);
-    if (!STORY_VISUAL_ASSET_KINDS['includes'](_0x4752e0)) return [];
-    const _0x3723cb = getStoryAssetAppearances(_0x57f317),
-      _0x333379 = _0x3723cb['length'] ? _0x3723cb : [_0x57f317];
-    return _0x333379['filter']((_0x3087da) => !normalizeText(_0x3087da?.['imageUrl']))['map'](
-      (_0xe04196) => ({
-        kind: _0x4752e0,
-        assetId: normalizeText(_0x57f317?.['id']),
-        assetName: normalizeText(_0x57f317?.['name']),
-        appearanceId: normalizeText(_0xe04196?.['id']),
-        appearanceName: normalizeText(_0xe04196?.['name']),
-      }),
-    );
+export function getMissingStoryAssetImages(list3 = []) {
+  return (Array['isArray'](list3) ? list3 : [])['flatMap']((error) => {
+    const kind = normalizeText(error?.['kind']);
+    if (!STORY_VISUAL_ASSET_KINDS['includes'](kind)) return [];
+    const list4 = getStoryAssetAppearances(error),
+      list5 = list4['length'] ? list4 : [error];
+    return list5['filter']((source) => !normalizeText(source?.['imageUrl']))['map']((error2) => ({
+      kind: kind,
+      assetId: normalizeText(error?.['id']),
+      assetName: normalizeText(error?.['name']),
+      appearanceId: normalizeText(error2?.['id']),
+      appearanceName: normalizeText(error2?.['name']),
+    }));
   });
 }
-export function buildMissingStoryAssetImageWarning(_0x458dc4 = []) {
-  const _0x5a6db8 = { character: '角色', scene: '场景', prop: '道具' },
-    _0x5d966a = STORY_VISUAL_ASSET_KINDS['map']((_0x1d27d5) => {
-      const _0x24f689 = (Array['isArray'](_0x458dc4) ? _0x458dc4 : [])['filter'](
-        (_0x4a89ae) => _0x4a89ae?.['kind'] === _0x1d27d5,
+export function buildMissingStoryAssetImageWarning(list6 = []) {
+  const next = { character: '角色', scene: '场景', prop: '道具' },
+    list7 = STORY_VISUAL_ASSET_KINDS['map']((current) => {
+      const entry = (Array['isArray'](list6) ? list6 : [])['filter'](
+        (record) => record?.['kind'] === current,
       )['length'];
-      return _0x24f689 ? _0x5a6db8[_0x1d27d5] + '\x20' + _0x24f689 + '\x20张' : '';
+      return entry ? next[current] + '\x20' + entry + '\x20张' : '';
     })['filter'](Boolean);
-  if (!_0x5d966a['length']) return '';
+  if (!list7['length']) return '';
   return (
     '检测到缺少图片：' +
-    _0x5d966a['join']('、') +
+    list7['join']('、') +
     '。跳过后，这些素材不会作为分镜视频的图片参考。是否跳过并继续？'
   );
 }
 export function createStoryAssetSettingsWorkspacePresentation({
-  projection: _0x41a372,
-  presentation: _0x3c3f4e,
-  getTabLabel: getTabLabel = (_0x26ebd9) => _0x26ebd9,
+  projection: projection,
+  presentation: presentation,
+  getTabLabel: getTabLabel = (payload) => payload,
   renderTabIcon: renderTabIcon = () => '',
   renderPageFooter: renderPageFooter = () => '',
 } = {}) {
-  if (!_0x41a372 || !_0x3c3f4e)
+  if (!projection || !presentation)
     throw new TypeError(
       'Story\x20asset\x20settings\x20workspace\x20requires\x20projection\x20and\x20presentation\x20owners.',
     );
-  const _0x445aa7 = (_0x3a9268) => {
-      if (_0x3a9268['assetFilter'] === 'audio') return getStoryProjectAudioAssets(_0x3a9268['data']);
-      if (_0x3a9268['assetFilter'] === 'library')
+  const getVisibleAssets = (handle) => {
+      if (handle['assetFilter'] === 'audio') return getStoryProjectAudioAssets(handle['data']);
+      if (handle['assetFilter'] === 'library')
         return buildWorkspaceAssetLibraryItems({ allowedTypes: ['image', 'audio'] });
-      return _0x3a9268['data']['assets']['filter'](
-        (_0x1c287f) => _0x1c287f['kind'] === _0x3a9268['assetFilter'],
-      );
+      return handle['data']['assets']['filter']((config) => config['kind'] === handle['assetFilter']);
     },
-    _0x2c84b4 = (_0x588512 = {}) =>
-      normalizeText(_0x588512?.['mediaKind'])['toLowerCase']() === 'image' &&
-      Boolean(normalizeText(_0x588512?.['sourceUrl'] || _0x588512?.['imageUrl'])),
-    _0xe086f9 = (_0x28edff = {}, _0x8e3271 = []) => {
-      const _0x37cb76 = new Set(
-        (Array['isArray'](_0x8e3271) ? _0x8e3271 : [])
-          ['filter'](_0x2c84b4)
-          ['map']((_0x1410af) => normalizeText(_0x1410af?.['id']))
+    isLibraryImageAsset = (options4 = {}) =>
+      normalizeText(options4?.['mediaKind'])['toLowerCase']() === 'image' &&
+      Boolean(normalizeText(options4?.['sourceUrl'] || options4?.['imageUrl'])),
+    getLibraryActionAssetIds = (options5 = {}, scope = []) => {
+      const map = new Set(
+        (Array['isArray'](scope) ? scope : [])
+          ['filter'](isLibraryImageAsset)
+          ['map']((input) => normalizeText(input?.['id']))
           ['filter'](Boolean),
       );
-      return (Array['isArray'](_0x28edff['selectedAssetIds']) ? _0x28edff['selectedAssetIds'] : [])
+      return (Array['isArray'](options5['selectedAssetIds']) ? options5['selectedAssetIds'] : [])
         ['map'](normalizeText)
-        ['filter']((_0x119355) => _0x37cb76['has'](_0x119355));
+        ['filter']((output) => map['has'](output));
     },
-    _0x8422e8 = (_0x2510af, _0x464c18) =>
-      _0x464c18['find']((_0x5078a5) => _0x5078a5['id'] === _0x2510af['selectedAssetId']) ||
-      _0x464c18[0x0] ||
-      null,
-    _0x1ad485 = (_0x4ef0bb, _0x2d1ab4) => {
-      const _0x7f57cf = Number(_0x4ef0bb['assetAppearanceIndexes']?.[_0x2d1ab4?.['id']]),
-        _0x31c6c5 = Math['max'](0x0, getStoryAssetAppearances(_0x2d1ab4)['length'] - 0x1);
-      return Math['max'](
-        0x0,
-        Math['min'](_0x31c6c5, Number['isFinite'](_0x7f57cf) ? Math['trunc'](_0x7f57cf) : 0x0),
-      );
+    getSelectedAsset = (value2, list8) =>
+      list8['find']((value3) => value3['id'] === value2['selectedAssetId']) || list8[0x0] || null,
+    getSelectedAppearanceIndex = (value4, value5) => {
+      const value6 = Number(value4['assetAppearanceIndexes']?.[value5?.['id']]),
+        value7 = Math['max'](0x0, getStoryAssetAppearances(value5)['length'] - 0x1);
+      return Math['max'](0x0, Math['min'](value7, Number['isFinite'](value6) ? Math['trunc'](value6) : 0x0));
     },
-    _0x1a3ffe = (_0x5afd6d, _0x45a6f7) =>
-      _0x45a6f7?.['isLibraryAsset']
-        ? _0x45a6f7
-        : getStoryAssetAppearance(_0x45a6f7, _0x1ad485(_0x5afd6d, _0x45a6f7)),
-    _0x4abadf = (_0x1a88c7 = {}, _0x4a9f55 = {}) => {
-      const _0x58821b = normalizeText(_0x1a88c7?.['id']),
-        _0xf5f92c = normalizeText(_0x4a9f55?.['id']);
-      return _0x58821b && _0xf5f92c ? _0x58821b + ':' + _0xf5f92c : '';
+    getSelectedAppearance = (value8, value9) =>
+      value9?.['isLibraryAsset']
+        ? value9
+        : getStoryAssetAppearance(value9, getSelectedAppearanceIndex(value8, value9)),
+    getAppearanceActionKey = (options6 = {}, value10 = {}) => {
+      const text2 = normalizeText(options6?.['id']),
+        text3 = normalizeText(value10?.['id']);
+      return text2 && text3 ? text2 + ':' + text3 : '';
     },
-    _0x4002b7 = isStoryAddedAssetAppearance,
-    _0x2df3e2 = (
-      _0x16093f,
-      _0x23f4e6,
+    isAddedAppearance = isStoryAddedAssetAppearance,
+    renderAssetCard = (
+      value11,
+      value12,
       {
         previewAppearance: previewAppearance = null,
         statusText: statusText = '',
@@ -172,14 +163,14 @@ export function createStoryAssetSettingsWorkspacePresentation({
         shellClassName: shellClassName = '',
         accessoryHtml: accessoryHtml = '',
         cardMetaHtml: cardMetaHtml = '',
-        cardMediaHtml: cardMediaHtml = renderStoryReplicationAssetComparison(_0x16093f, _0x23f4e6),
+        cardMediaHtml: cardMediaHtml = renderStoryReplicationAssetComparison(value11, value12),
         fallbackImageUrl: fallbackImageUrl = '',
         workspaceAssetLibraryImage: workspaceAssetLibraryImage = ![],
       } = {},
     ) =>
-      _0x3c3f4e['renderAssetSurface']({
+      presentation['renderAssetSurface']({
         kind: 'card',
-        card: _0x41a372['projectAssetCard'](_0x16093f, _0x23f4e6, {
+        card: projection['projectAssetCard'](value11, value12, {
           previewAppearance: previewAppearance,
           statusText: statusText,
           cardStatusHtml: cardStatusHtml,
@@ -194,72 +185,75 @@ export function createStoryAssetSettingsWorkspacePresentation({
           workspaceAssetLibraryImage: workspaceAssetLibraryImage,
         }),
       }),
-    _0xca99ad = (_0x2537ce) =>
-      _0x3c3f4e['renderAssetSurface']({ kind: 'appearance-arrow', direction: _0x2537ce }),
-    _0x224528 = (_0x456bdd = {}, { disabled: disabled = ![] } = {}) =>
-      _0x3c3f4e['renderAssetSurface']({
+    renderAppearanceArrow = (direction) =>
+      presentation['renderAssetSurface']({ kind: 'appearance-arrow', direction: direction }),
+    renderAssetReferenceInput = (referenceImageUrl = {}, { disabled: disabled = ![] } = {}) =>
+      presentation['renderAssetSurface']({
         kind: 'reference-input',
-        reference: { referenceImageUrl: _0x456bdd['referenceImageUrl'], disabled: disabled },
+        reference: { referenceImageUrl: referenceImageUrl['referenceImageUrl'], disabled: disabled },
       }),
-    _0xd7e800 = (_0x3fc4f0, { action: action = '', label: label = '', className: className = '' } = {}) =>
-      renderWorkspacePreviewArrow(_0x3fc4f0, {
+    renderPreviewArrow = (
+      value13,
+      { action: action = '', label: label = '', className: className = '' } = {},
+    ) =>
+      renderWorkspacePreviewArrow(value13, {
         action: action,
         label: label,
         className: className,
         actionAttributes: { 'data-story-action': action },
       }),
-    _0x3c1e5c = (_0x1f2fb7) =>
-      _0xd7e800(_0x1f2fb7, {
-        action: _0x1f2fb7 === 'previous' ? 'previous-clip' : 'next-clip',
-        label: _0x1f2fb7 === 'previous' ? '上一幕' : '下一幕',
+    renderClipNavigationArrow = (action2) =>
+      renderPreviewArrow(action2, {
+        action: action2 === 'previous' ? 'previous-clip' : 'next-clip',
+        label: action2 === 'previous' ? '上一幕' : '下一幕',
         className: 'story-clip-navigation-arrow',
       }),
-    _0xc43093 = new Set(['mp3', 'wav', 'm4a']),
-    _0x45e257 = new Set(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a']),
-    _0x686e66 = (_0x5eb44f) => {
-      const _0x19c827 = normalizeText(_0x5eb44f?.['name'])['toLowerCase'](),
-        _0x47fa46 = _0x19c827['includes']('.') ? _0x19c827['split']('.')['pop']() : '',
-        _0x541e99 = normalizeText(_0x5eb44f?.['type'])['toLowerCase']();
-      return _0xc43093['has'](_0x47fa46) || _0x45e257['has'](_0x541e99);
+    map2 = new Set(['mp3', 'wav', 'm4a']),
+    map3 = new Set(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a']),
+    isSupportedCharacterVoiceFile = (error3) => {
+      const list9 = normalizeText(error3?.['name'])['toLowerCase'](),
+        value14 = list9['includes']('.') ? list9['split']('.')['pop']() : '',
+        text4 = normalizeText(error3?.['type'])['toLowerCase']();
+      return map2['has'](value14) || map3['has'](text4);
     },
-    _0x3c7504 = (_0x45e989 = {}) =>
-      _0x3c3f4e['renderAssetControls']({
+    renderAssetBatchGenerationControl = (state2 = {}) =>
+      presentation['renderAssetControls']({
         kind: 'batch-generation',
-        control: _0x41a372['projectAssetControl']('batch-generation', { state: _0x45e989 }),
+        control: projection['projectAssetControl']('batch-generation', { state: state2 }),
       }),
-    _0x424c8f = (_0xd52362 = {}, _0x10a6ac = {}) =>
-      _0x3c3f4e['renderAssetControls']({
+    renderAssetPromptGenerationControl = (state3 = {}, generationControl2 = {}) =>
+      presentation['renderAssetControls']({
         kind: 'prompt-generation',
-        control: _0x41a372['projectAssetControl']('prompt-generation', {
-          state: _0xd52362,
-          generationControl: _0x10a6ac,
+        control: projection['projectAssetControl']('prompt-generation', {
+          state: state3,
+          generationControl: generationControl2,
         }),
       }),
-    _0x15c9dc = ({
+    renderLibraryAddToProjectControl = ({
       selectedCount: selectedCount = 0x0,
       projectAssets: projectAssets = [],
       showCount: showCount = !![],
     } = {}) => {
-      const _0x3ba441 = _0x41a372['projectAssetControl']('library-selection', {
+      const args = projection['projectAssetControl']('library-selection', {
         selectionMode: showCount,
         selectedCount: selectedCount,
         projectAssets: projectAssets,
         getTabLabel: getTabLabel,
       });
-      return _0x3c3f4e['renderAssetControls']({
+      return presentation['renderAssetControls']({
         kind: 'library-add',
-        control: { ..._0x3ba441, showCount: showCount },
+        control: { ...args, showCount: showCount },
       });
     },
-    _0x272bcc = ({
+    renderLibrarySelectionActions = ({
       selectionMode: selectionMode = ![],
       selectedCount: selectedCount = 0x0,
       allSelected: allSelected = ![],
       projectAssets: projectAssets = [],
     } = {}) =>
-      _0x3c3f4e['renderAssetControls']({
+      presentation['renderAssetControls']({
         kind: 'library-selection',
-        control: _0x41a372['projectAssetControl']('library-selection', {
+        control: projection['projectAssetControl']('library-selection', {
           selectionMode: selectionMode,
           selectedCount: selectedCount,
           allSelected: allSelected,
@@ -267,40 +261,40 @@ export function createStoryAssetSettingsWorkspacePresentation({
           getTabLabel: getTabLabel,
         }),
       }),
-    _0x518bab = (_0x2310e5, _0x1d88b0 = {}) => {
-      if (typeof _0x2310e5?.['classList']?.['toggle'] !== 'function') return ![];
-      const _0x146ae7 = hasStoryCharacterVoiceReference(_0x1d88b0);
+    syncCharacterVoiceCapsuleState = (el, value15 = {}) => {
+      if (typeof el?.['classList']?.['toggle'] !== 'function') return ![];
+      const hasStoryCharacterVoiceReference2 = hasStoryCharacterVoiceReference(value15);
       return (
-        _0x2310e5['classList']['toggle']('has-reference', _0x146ae7),
-        _0x2310e5['classList']['toggle']('is-missing', !_0x146ae7),
+        el['classList']['toggle']('has-reference', hasStoryCharacterVoiceReference2),
+        el['classList']['toggle']('is-missing', !hasStoryCharacterVoiceReference2),
         !![]
       );
     },
-    _0x144ac5 = (_0x494007 = ![]) =>
-      _0x3c3f4e['renderAssetSurface']({ kind: 'voice-icon', hasVoice: _0x494007 }),
-    _0x58655c = (_0x129459) =>
-      _0x3c3f4e['renderAssetSurface']({
+    renderVoiceIcon = (hasVoice = ![]) =>
+      presentation['renderAssetSurface']({ kind: 'voice-icon', hasVoice: hasVoice }),
+    handler = (asset2) =>
+      presentation['renderAssetSurface']({
         kind: 'voice-player',
-        voicePlayer: _0x41a372['projectAssetControl']('voice-player', { asset: _0x129459 }),
+        voicePlayer: projection['projectAssetControl']('voice-player', { asset: asset2 }),
       }),
-    _0x3fc801 = (_0x36e080, _0xc78edf = {}) => {
-      const _0x5d0294 = _0x36e080?.['querySelector']?.('.story-asset-caption-title');
-      if (!_0x5d0294) return ![];
-      _0x5d0294['querySelector']?.('[data-story-character-voice-player]')?.['remove']?.();
-      const _0xb581c3 = _0x58655c(_0xc78edf);
-      if (_0xb581c3) _0x5d0294['insertAdjacentHTML']('beforeend', _0xb581c3);
+    syncCharacterVoicePlayerState = (el2, value16 = {}) => {
+      const el3 = el2?.['querySelector']?.('.story-asset-caption-title');
+      if (!el3) return ![];
+      el3['querySelector']?.('[data-story-character-voice-player]')?.['remove']?.();
+      const value17 = handler(value16);
+      if (value17) el3['insertAdjacentHTML']('beforeend', value17);
       return !![];
     },
-    _0x3ba73c = ({
+    renderAssetPreviewActions = ({
       state: state = {},
       asset: asset = {},
       appearance: appearance = {},
       generationControl: generationControl = {},
       readOnly: readOnly = ![],
     } = {}) =>
-      _0x3c3f4e['renderAssetSurface']({
+      presentation['renderAssetSurface']({
         kind: 'preview-actions',
-        actions: _0x41a372['projectAssetControl']('preview-actions', {
+        actions: projection['projectAssetControl']('preview-actions', {
           state: state,
           asset: asset,
           appearance: appearance,
@@ -308,227 +302,235 @@ export function createStoryAssetSettingsWorkspacePresentation({
           readOnly: readOnly,
         }),
       }),
-    _0x5aea27 = (
-      _0x585e97,
-      _0x356775,
+    renderAssetDetail = (
+      value18,
+      value19,
       { showEmptyDescription: showEmptyDescription = !![], readOnly: readOnly = ![] } = {},
     ) =>
-      _0x3c3f4e['renderAssetSurface']({
+      presentation['renderAssetSurface']({
         kind: 'detail',
         detail: {
-          ..._0x41a372['projectAssetDetail'](_0x585e97, _0x356775, {
+          ...projection['projectAssetDetail'](value18, value19, {
             showEmptyDescription: showEmptyDescription,
             readOnly: readOnly,
           }),
-          detailSplitRatio: normalizeStoryAssetDetailSplitRatio(_0x585e97['assetDetailSplitRatio']),
+          detailSplitRatio: normalizeStoryAssetDetailSplitRatio(value18['assetDetailSplitRatio']),
         },
       }),
-    _0x291783 = (_0x11ca30) => {
-      const _0x689a03 = _0x445aa7(_0x11ca30),
-        _0x3eeb0b =
-          _0x11ca30['assetFilter'] === 'library'
-            ? _0x689a03['filter']((_0x320071) => _0x2c84b4(_0x320071) || isStoryAudioAsset(_0x320071))
-            : _0x689a03,
-        _0x91a246 =
-          _0x3eeb0b['length'] > 0x0 &&
-          _0x3eeb0b['every']((_0x40a413) => _0x11ca30['selectedAssetIds']['includes'](_0x40a413['id'])),
-        _0x4396d9 = _0x8422e8(_0x11ca30, _0x689a03);
-      _0x4396d9 &&
-        _0x11ca30['selectedAssetId'] !== _0x4396d9['id'] &&
-        (_0x11ca30['selectedAssetId'] = _0x4396d9['id']);
-      const _0x48811d = _0x11ca30['assetFilter'] === 'library' ? _0xe086f9(_0x11ca30, _0x689a03) : [],
-        _0x51b837 = _0x11ca30['data']['assets']['filter']((_0xa58ced) => _0xa58ced['kind'] === 'character')[
+    renderAssetsPage = (cardMediaHtml2) => {
+      const assets = getVisibleAssets(cardMediaHtml2),
+        list10 =
+          cardMediaHtml2['assetFilter'] === 'library'
+            ? assets['filter']((value20) => isLibraryImageAsset(value20) || isStoryAudioAsset(value20))
+            : assets,
+        allSelected2 =
+          list10['length'] > 0x0 &&
+          list10['every']((value21) => cardMediaHtml2['selectedAssetIds']['includes'](value21['id'])),
+        value22 = getSelectedAsset(cardMediaHtml2, assets);
+      value22 &&
+        cardMediaHtml2['selectedAssetId'] !== value22['id'] &&
+        (cardMediaHtml2['selectedAssetId'] = value22['id']);
+      const selectedCount2 =
+          cardMediaHtml2['assetFilter'] === 'library' ? getLibraryActionAssetIds(cardMediaHtml2, assets) : [],
+        value23 = cardMediaHtml2['data']['assets']['filter']((value24) => value24['kind'] === 'character')[
           'length'
         ],
-        _0x548e64 = _0x11ca30['data']['assets']['filter']((_0x4df6d9) => _0x4df6d9['kind'] === 'scene')[
+        value25 = cardMediaHtml2['data']['assets']['filter']((value26) => value26['kind'] === 'scene')[
           'length'
         ],
-        _0x3603e0 = _0x11ca30['data']['assets']['filter']((_0xfdd287) => _0xfdd287['kind'] === 'prop')[
+        value27 = cardMediaHtml2['data']['assets']['filter']((value28) => value28['kind'] === 'prop')[
           'length'
         ],
-        _0x4b9ddd = buildWorkspaceAssetLibraryItems({ allowedTypes: ['image', 'audio'] })['length'],
-        _0x4a3472 = (_0x4a21c0) =>
-          isStoryAudioAsset(_0x4a21c0)
-            ? _0x2df3e2(
-                _0x11ca30,
-                { ..._0x4a21c0, isLibraryAsset: !![], imageUrl: '', role: '音频素材' },
+        workspaceAssetLibraryItems = buildWorkspaceAssetLibraryItems({ allowedTypes: ['image', 'audio'] })[
+          'length'
+        ],
+        renderAsset = (imageUrl) =>
+          isStoryAudioAsset(imageUrl)
+            ? renderAssetCard(
+                cardMediaHtml2,
+                { ...imageUrl, isLibraryAsset: !![], imageUrl: '', role: '音频素材' },
                 {
                   cardMediaHtml: renderStoryAudioArtwork(),
                   statusText:
                     '已绑定 ' +
-                    getStoryAudioBoundCharacters(_0x11ca30['data'], _0x4a21c0)['length'] +
+                    getStoryAudioBoundCharacters(cardMediaHtml2['data'], imageUrl)['length'] +
                     ' 个角色',
                 },
               )
-            : _0x2df3e2(_0x11ca30, _0x4a21c0, {
+            : renderAssetCard(cardMediaHtml2, imageUrl, {
                 cardMediaHtml:
-                  _0x11ca30['assetFilter'] !== 'library'
-                    ? renderStoryReplicationAssetComparison(_0x11ca30, _0x4a21c0)
+                  cardMediaHtml2['assetFilter'] !== 'library'
+                    ? renderStoryReplicationAssetComparison(cardMediaHtml2, imageUrl)
                     : '',
                 previewAppearance:
-                  _0x11ca30['assetFilter'] === 'library'
-                    ? { ..._0x4a21c0, imageUrl: _0x4a21c0['thumbnailUrl'] || _0x4a21c0['imageUrl'] }
+                  cardMediaHtml2['assetFilter'] === 'library'
+                    ? { ...imageUrl, imageUrl: imageUrl['thumbnailUrl'] || imageUrl['imageUrl'] }
                     : null,
-                fallbackImageUrl: _0x11ca30['assetFilter'] === 'library' ? _0x4a21c0['sourceUrl'] : '',
-                workspaceAssetLibraryImage: _0x11ca30['assetFilter'] === 'library',
+                fallbackImageUrl: cardMediaHtml2['assetFilter'] === 'library' ? imageUrl['sourceUrl'] : '',
+                workspaceAssetLibraryImage: cardMediaHtml2['assetFilter'] === 'library',
               }),
-        _0x33b4ab =
-          _0x11ca30['assetFilter'] === 'library'
-            ? (_0x11ca30['assetLibraryDisclosure'] || createWorkspaceAssetLibraryDisclosure())['render']({
-                assets: _0x689a03,
-                renderAsset: _0x4a3472,
-              })
-            : _0x689a03['map'](_0x4a3472)['join'](''),
-        _0x3907ca = !![],
-        _0x20203c = renderStoryAudioActions(
-          _0x11ca30,
-          _0x689a03,
-          storyAudioUploads['has'](_0x11ca30['data']),
+        cardsHtml =
+          cardMediaHtml2['assetFilter'] === 'library'
+            ? (cardMediaHtml2['assetLibraryDisclosure'] || createWorkspaceAssetLibraryDisclosure())['render'](
+                {
+                  assets: assets,
+                  renderAsset: renderAsset,
+                },
+              )
+            : assets['map'](renderAsset)['join'](''),
+        calloutInHeading = !![],
+        primaryActionHtml = renderStoryAudioActions(
+          cardMediaHtml2,
+          assets,
+          storyAudioUploads['has'](cardMediaHtml2['data']),
         );
       return renderWorkspaceAssetSettingsShell({
         className: 'story-workspace-assets-page',
-        calloutInHeading: _0x3907ca,
-        headingInListColumn: _0x3907ca,
+        calloutInHeading: calloutInHeading,
+        headingInListColumn: calloutInHeading,
         calloutStatus:
-          _0x3907ca && _0x11ca30['assetSelectionMode']
-            ? '已选择\x20' + _0x11ca30['selectedAssetIds']['length'] + '\x20项'
+          calloutInHeading && cardMediaHtml2['assetSelectionMode']
+            ? '已选择\x20' + cardMediaHtml2['selectedAssetIds']['length'] + '\x20项'
             : '',
-        activeTab: _0x11ca30['assetFilter'],
+        activeTab: cardMediaHtml2['assetFilter'],
         tabCount: 0x5,
         tabsHtml: [
-          ['character', _0x51b837],
-          ['scene', _0x548e64],
-          ['prop', _0x3603e0],
-          ['audio', getStoryProjectAudioAssets(_0x11ca30['data'])['length']],
-          ['library', _0x4b9ddd],
+          ['character', value23],
+          ['scene', value25],
+          ['prop', value27],
+          ['audio', getStoryProjectAudioAssets(cardMediaHtml2['data'])['length']],
+          ['library', workspaceAssetLibraryItems],
         ]
           ['map'](
-            ([_0x1226ed, _0x24594d]) =>
+            ([value29, value30]) =>
               '<button type="button" class="' +
-              (_0x11ca30['assetFilter'] === _0x1226ed ? 'is-active' : '') +
+              (cardMediaHtml2['assetFilter'] === value29 ? 'is-active' : '') +
               '" data-story-asset-filter="' +
-              _0x1226ed +
+              value29 +
               '" role="tab" aria-selected="' +
-              (_0x11ca30['assetFilter'] === _0x1226ed) +
+              (cardMediaHtml2['assetFilter'] === value29) +
               '" tabindex="' +
-              (_0x11ca30['assetFilter'] === _0x1226ed ? '0' : '-1') +
+              (cardMediaHtml2['assetFilter'] === value29 ? '0' : '-1') +
               '\x22>' +
-              renderTabIcon(_0x1226ed) +
+              renderTabIcon(value29) +
               '<span class="story-asset-tab-label">' +
-              getTabLabel(_0x1226ed) +
+              getTabLabel(value29) +
               '</span><span class="story-asset-tab-count">' +
-              _0x24594d +
+              value30 +
               '</span></button>',
           )
           ['join'](''),
         calloutTitle:
-          _0x11ca30['assetFilter'] === 'audio'
+          cardMediaHtml2['assetFilter'] === 'audio'
             ? '项目音频素材'
-            : _0x11ca30['assetFilter'] === 'character'
+            : cardMediaHtml2['assetFilter'] === 'character'
               ? '生成或导入角色形象'
-              : _0x11ca30['assetFilter'] === 'scene'
+              : cardMediaHtml2['assetFilter'] === 'scene'
                 ? '生成或导入场景设定'
-                : _0x11ca30['assetFilter'] === 'prop'
+                : cardMediaHtml2['assetFilter'] === 'prop'
                   ? '生成或导入道具设定'
                   : '从总素材加入项目',
         calloutDescription:
-          _0x11ca30['assetFilter'] === 'audio'
+          cardMediaHtml2['assetFilter'] === 'audio'
             ? '显示已加入当前项目的音频；上传会先保存到总素材，再加入项目。'
-            : _0x11ca30['assetFilter'] === 'library'
-              ? _0x11ca30['assetSelectionMode']
-                ? _0x11ca30['selectedAssetIds']['length']
-                  ? '已选择 ' + _0x11ca30['selectedAssetIds']['length'] + ' 张图片'
+            : cardMediaHtml2['assetFilter'] === 'library'
+              ? cardMediaHtml2['assetSelectionMode']
+                ? cardMediaHtml2['selectedAssetIds']['length']
+                  ? '已选择 ' + cardMediaHtml2['selectedAssetIds']['length'] + ' 张图片'
                   : '点击素材进行多选，或拖动鼠标框选。'
                 : '选中素材后加入项目；支持框选多选。'
-              : _0x11ca30['assetSelectionMode']
-                ? '已选择 ' + _0x11ca30['selectedAssetIds']['length'] + '\x20项'
-                : _0x11ca30['assetFilter'] === 'character'
+              : cardMediaHtml2['assetSelectionMode']
+                ? '已选择 ' + cardMediaHtml2['selectedAssetIds']['length'] + '\x20项'
+                : cardMediaHtml2['assetFilter'] === 'character'
                   ? '多形象角色会先确定基础形象，再以其作为参考生成其他形象。'
                   : '每项素材保留一张可复用的设定图。',
         calloutActionsHtml:
-          _0x11ca30['assetFilter'] === 'audio'
+          cardMediaHtml2['assetFilter'] === 'audio'
             ? renderWorkspaceAssetSelectionActions({
-                selectedCount: _0x11ca30['selectedAssetIds']['length'],
-                allSelected: _0x91a246,
-                primaryActionHtml: _0x20203c,
+                selectedCount: cardMediaHtml2['selectedAssetIds']['length'],
+                allSelected: allSelected2,
+                primaryActionHtml: primaryActionHtml,
               })
-            : _0x11ca30['assetFilter'] === 'library'
-              ? _0x20203c
+            : cardMediaHtml2['assetFilter'] === 'library'
+              ? primaryActionHtml
                 ? renderWorkspaceAssetSelectionActions({
-                    selectionMode: _0x11ca30['assetSelectionMode'],
-                    selectedCount: _0x11ca30['selectedAssetIds']['length'],
-                    allSelected: _0x91a246,
+                    selectionMode: cardMediaHtml2['assetSelectionMode'],
+                    selectedCount: cardMediaHtml2['selectedAssetIds']['length'],
+                    allSelected: allSelected2,
                     primaryActionHtml:
-                      _0x20203c +
-                      (_0x48811d['length']
-                        ? _0x15c9dc({
-                            selectedCount: _0x48811d['length'],
-                            projectAssets: _0x11ca30['data']['assets'],
+                      primaryActionHtml +
+                      (selectedCount2['length']
+                        ? renderLibraryAddToProjectControl({
+                            selectedCount: selectedCount2['length'],
+                            projectAssets: cardMediaHtml2['data']['assets'],
                           })
                         : ''),
                     selectAllLabel: '全选素材',
                   })
-                : _0x272bcc({
-                    selectionMode: _0x11ca30['assetSelectionMode'],
-                    selectedCount: _0x48811d['length'],
-                    allSelected: _0x91a246,
-                    projectAssets: _0x11ca30['data']['assets'],
+                : renderLibrarySelectionActions({
+                    selectionMode: cardMediaHtml2['assetSelectionMode'],
+                    selectedCount: selectedCount2['length'],
+                    allSelected: allSelected2,
+                    projectAssets: cardMediaHtml2['data']['assets'],
                   })
-              : (_0x11ca30['assetSelectionMode'] && _0x11ca30['selectedAssetIds']['length'] > 0x1) ||
-                  _0x11ca30['isBatchGenerating']
+              : (cardMediaHtml2['assetSelectionMode'] &&
+                    cardMediaHtml2['selectedAssetIds']['length'] > 0x1) ||
+                  cardMediaHtml2['isBatchGenerating']
                 ? '<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x22\x20data-story-action=\x22toggle-all-assets\x22\x20aria-pressed=\x22' +
-                  _0x91a246 +
+                  allSelected2 +
                   '\x22\x20' +
-                  (_0x689a03['length'] ? '' : 'disabled') +
+                  (assets['length'] ? '' : 'disabled') +
                   '>' +
-                  (_0x91a246 ? '取消全选' : '全选') +
+                  (allSelected2 ? '取消全选' : '全选') +
                   '</button>' +
-                  _0x3c7504(_0x11ca30)
+                  renderAssetBatchGenerationControl(cardMediaHtml2)
                 : renderWorkspaceAssetSelectionActions(),
-        cardsHtml: _0x33b4ab,
+        cardsHtml: cardsHtml,
         emptyText:
-          _0x11ca30['assetFilter'] === 'audio' ? '当前项目暂无音频，请从总素材加入或上传音频' : '暂无素材',
+          cardMediaHtml2['assetFilter'] === 'audio'
+            ? '当前项目暂无音频，请从总素材加入或上传音频'
+            : '暂无素材',
         detailHtml:
-          _0x11ca30['assetFilter'] === 'audio' || isStoryAudioAsset(_0x4396d9)
-            ? renderStoryAudioDetail(_0x11ca30, _0x4396d9)
-            : _0x5aea27(_0x11ca30, _0x4396d9),
-        footerHtml: renderPageFooter(_0x11ca30, {
+          cardMediaHtml2['assetFilter'] === 'audio' || isStoryAudioAsset(value22)
+            ? renderStoryAudioDetail(cardMediaHtml2, value22)
+            : renderAssetDetail(cardMediaHtml2, value22),
+        footerHtml: renderPageFooter(cardMediaHtml2, {
           nextLabel:
-            _0x11ca30['data']?.['project']?.['sourceMode'] === 'video-replication'
-              ? _0x11ca30['data']['episodes']['length'] === 0x1
-                ? _0x11ca30['data']['episodes'][0x0]['clips']?.['length']
+            cardMediaHtml2['data']?.['project']?.['sourceMode'] === 'video-replication'
+              ? cardMediaHtml2['data']['episodes']['length'] === 0x1
+                ? cardMediaHtml2['data']['episodes'][0x0]['clips']?.['length']
                   ? '进入视频制作'
                   : '生成分段提示词'
                 : '下一步：视频列表'
               : '生成分镜视频',
         }),
-        splitRatio: normalizeStoryAssetSplitRatio(_0x11ca30['assetSplitRatio']),
+        splitRatio: normalizeStoryAssetSplitRatio(cardMediaHtml2['assetSplitRatio']),
       });
     };
   return Object['freeze']({
-    getAppearanceActionKey: _0x4abadf,
-    getLibraryActionAssetIds: _0xe086f9,
-    getSelectedAppearance: _0x1a3ffe,
-    getSelectedAppearanceIndex: _0x1ad485,
-    getSelectedAsset: _0x8422e8,
-    getVisibleAssets: _0x445aa7,
-    isAddedAppearance: _0x4002b7,
-    isLibraryImageAsset: _0x2c84b4,
-    isSupportedCharacterVoiceFile: _0x686e66,
-    renderAppearanceArrow: _0xca99ad,
-    renderAssetBatchGenerationControl: _0x3c7504,
-    renderAssetCard: _0x2df3e2,
-    renderAssetDetail: _0x5aea27,
-    renderAssetPreviewActions: _0x3ba73c,
-    renderAssetPromptGenerationControl: _0x424c8f,
-    renderAssetReferenceInput: _0x224528,
-    renderAssetsPage: _0x291783,
-    renderClipNavigationArrow: _0x3c1e5c,
-    renderLibraryAddToProjectControl: _0x15c9dc,
-    renderLibrarySelectionActions: _0x272bcc,
-    renderPreviewArrow: _0xd7e800,
-    renderVoiceIcon: _0x144ac5,
-    syncCharacterVoiceCapsuleState: _0x518bab,
-    syncCharacterVoicePlayerState: _0x3fc801,
+    getAppearanceActionKey: getAppearanceActionKey,
+    getLibraryActionAssetIds: getLibraryActionAssetIds,
+    getSelectedAppearance: getSelectedAppearance,
+    getSelectedAppearanceIndex: getSelectedAppearanceIndex,
+    getSelectedAsset: getSelectedAsset,
+    getVisibleAssets: getVisibleAssets,
+    isAddedAppearance: isAddedAppearance,
+    isLibraryImageAsset: isLibraryImageAsset,
+    isSupportedCharacterVoiceFile: isSupportedCharacterVoiceFile,
+    renderAppearanceArrow: renderAppearanceArrow,
+    renderAssetBatchGenerationControl: renderAssetBatchGenerationControl,
+    renderAssetCard: renderAssetCard,
+    renderAssetDetail: renderAssetDetail,
+    renderAssetPreviewActions: renderAssetPreviewActions,
+    renderAssetPromptGenerationControl: renderAssetPromptGenerationControl,
+    renderAssetReferenceInput: renderAssetReferenceInput,
+    renderAssetsPage: renderAssetsPage,
+    renderClipNavigationArrow: renderClipNavigationArrow,
+    renderLibraryAddToProjectControl: renderLibraryAddToProjectControl,
+    renderLibrarySelectionActions: renderLibrarySelectionActions,
+    renderPreviewArrow: renderPreviewArrow,
+    renderVoiceIcon: renderVoiceIcon,
+    syncCharacterVoiceCapsuleState: syncCharacterVoiceCapsuleState,
+    syncCharacterVoicePlayerState: syncCharacterVoicePlayerState,
   });
 }

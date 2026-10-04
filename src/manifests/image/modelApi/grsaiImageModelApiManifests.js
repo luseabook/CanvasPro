@@ -20,34 +20,29 @@ import {
   createModelApiExecutionManifest,
   withDefaultValue,
 } from './sharedImageModelApiFields.js';
-function freezeExtensionValue(_0x1ddc80) {
-  if (Array.isArray(_0x1ddc80)) return Object.freeze([..._0x1ddc80]);
-  if (_0x1ddc80 && typeof _0x1ddc80 === 'object')
+function freezeExtensionValue(args) {
+  if (Array.isArray(args)) return Object.freeze([...args]);
+  if (args && typeof args === 'object')
     return Object.freeze(
-      Object.fromEntries(
-        Object.entries(_0x1ddc80).map(([_0x57bb63, _0x1a4321]) => [
-          _0x57bb63,
-          freezeExtensionValue(_0x1a4321),
-        ]),
-      ),
+      Object.fromEntries(Object.entries(args).map(([value, item]) => [value, freezeExtensionValue(item)])),
     );
-  return _0x1ddc80;
+  return args;
 }
 function createImageModelExtensions({
-  imageMenu: _0x1ab3e8,
-  imageSizePolicy: _0x2b61bd,
-  gptImage2: _0x4f736d,
-  nanoBanana: _0x397762,
+  imageMenu: imageMenu,
+  imageSizePolicy: imageSizePolicy,
+  gptImage2: gptImage2,
+  nanoBanana: nanoBanana,
 } = {}) {
-  const _0x5d8177 = {};
-  if (_0x1ab3e8) _0x5d8177.imageMenu = freezeExtensionValue(_0x1ab3e8);
-  _0x2b61bd && (_0x5d8177.imageSizePolicy = freezeExtensionValue(_0x2b61bd));
-  if (_0x4f736d) _0x5d8177.gptImage2 = freezeExtensionValue(_0x4f736d);
-  if (_0x397762) _0x5d8177.nanoBanana = freezeExtensionValue(_0x397762);
-  return Object.freeze(_0x5d8177);
+  const key = {};
+  if (imageMenu) key.imageMenu = freezeExtensionValue(imageMenu);
+  imageSizePolicy && (key.imageSizePolicy = freezeExtensionValue(imageSizePolicy));
+  if (gptImage2) key.gptImage2 = freezeExtensionValue(gptImage2);
+  if (nanoBanana) key.nanoBanana = freezeExtensionValue(nanoBanana);
+  return Object.freeze(key);
 }
-function createImageMenuExtension(_0x32a2fb) {
-  return createImageModelExtensions({ imageMenu: _0x32a2fb });
+function createImageMenuExtension(imageMenu2) {
+  return createImageModelExtensions({ imageMenu: imageMenu2 });
 }
 const GRSAI_IMAGE_BODY_MAPPING = Object.freeze([]),
   GRSAI_IMAGE_RESPONSE_MAPPING = Object.freeze({
@@ -104,11 +99,11 @@ const GRSAI_IMAGE_BODY_MAPPING = Object.freeze([]),
     '2:1': Object.freeze({ '1K': '1536x768', '2K': '3072x1536', '4K': '3840x1920' }),
     '1:2': Object.freeze({ '1K': '768x1536', '2K': '1536x3072', '4K': '1920x3840' }),
   });
-function getRatioLabelsForImageSize(_0x44b050, _0x24f8f4) {
+function getRatioLabelsForImageSize(index, result) {
   return Object.freeze(
-    Object.entries(_0x44b050)
-      .filter(([, _0x4dec4f]) => Object.prototype.hasOwnProperty.call(_0x4dec4f || {}, _0x24f8f4))
-      .map(([_0x2e2ab5]) => _0x2e2ab5),
+    Object.entries(index)
+      .filter(([, data]) => Object.prototype.hasOwnProperty.call(data || {}, result))
+      .map(([options]) => options),
   );
 }
 const GRSAI_GPT_IMAGE_2_1K_RATIO_LABELS = getRatioLabelsForImageSize(

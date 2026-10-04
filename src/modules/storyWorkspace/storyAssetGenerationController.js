@@ -29,392 +29,399 @@ import {
 } from './storyAssetPromptPresets.js';
 import { replaceStoryCharacterVoiceReference, resumeStoryCharacterVoice } from './storyCharacterVoice.js';
 import { sanitizeStoryTaskResumePayload } from './storyProjectTaskToken.js';
-function normalizeText(_0x55ed5a) {
-  return String(_0x55ed5a ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
 export function createStoryAssetGenerationController({
-  state: _0x16e813,
-  activeRecoveries: _0xa0dbbf,
-  activeExecutions: _0x2fea6c,
+  state: state,
+  activeRecoveries: activeRecoveries,
+  activeExecutions: activeExecutions,
   isWorkspaceDestroyed: isWorkspaceDestroyed = () => ![],
   hasImageGenerator: hasImageGenerator = () => ![],
-  generateImage: _0x1eeac7,
-  createProjectToken: _0xc0adb9,
-  createProjectTokenForData: _0x4613b8,
-  isProjectTaskLive: _0x537777,
-  isProjectTaskCurrent: _0x54b1cb,
+  generateImage: generateImage,
+  createProjectToken: createProjectToken,
+  createProjectTokenForData: createProjectTokenForData,
+  isProjectTaskLive: isProjectTaskLive,
+  isProjectTaskCurrent: isProjectTaskCurrent,
   registerProjectData: registerProjectData = () => {},
-  waitForRecoveryManifest: _0x5a57e6,
-  startBackgroundTask: _0x32cf33,
-  updateBackgroundTask: _0x46cc2e,
-  finishBackgroundTask: _0x33741f,
+  waitForRecoveryManifest: waitForRecoveryManifest,
+  startBackgroundTask: startBackgroundTask,
+  updateBackgroundTask: updateBackgroundTask,
+  finishBackgroundTask: finishBackgroundTask,
   schedulePersistence: schedulePersistence = () => {},
   render: render = () => {},
-  findAsset: _0x34378d,
-  getSelectedAppearance: _0x508136,
+  findAsset: findAsset,
+  getSelectedAppearance: getSelectedAppearance,
   showToast: showToast = () => {},
   showTaskApiKeyError: showTaskApiKeyError = () => ![],
   showTaskResultToast: showTaskResultToast = () => {},
   notifyTaskResult: notifyTaskResult = () => {},
   showNavigableTaskResultToast: showNavigableTaskResultToast = () => {},
 } = {}) {
-  if (!_0x16e813 || !_0xa0dbbf || !_0x2fea6c)
+  if (!state || !activeRecoveries || !activeExecutions)
     throw new TypeError('Story asset generation requires state and recovery owners.');
   if (
-    typeof _0x1eeac7 !== 'function' ||
-    typeof _0xc0adb9 !== 'function' ||
-    typeof _0x4613b8 !== 'function' ||
-    typeof _0x537777 !== 'function' ||
-    typeof _0x54b1cb !== 'function' ||
-    typeof _0x5a57e6 !== 'function' ||
-    typeof _0x32cf33 !== 'function' ||
-    typeof _0x46cc2e !== 'function' ||
-    typeof _0x33741f !== 'function' ||
-    typeof _0x34378d !== 'function' ||
-    typeof _0x508136 !== 'function'
+    typeof generateImage !== 'function' ||
+    typeof createProjectToken !== 'function' ||
+    typeof createProjectTokenForData !== 'function' ||
+    typeof isProjectTaskLive !== 'function' ||
+    typeof isProjectTaskCurrent !== 'function' ||
+    typeof waitForRecoveryManifest !== 'function' ||
+    typeof startBackgroundTask !== 'function' ||
+    typeof updateBackgroundTask !== 'function' ||
+    typeof finishBackgroundTask !== 'function' ||
+    typeof findAsset !== 'function' ||
+    typeof getSelectedAppearance !== 'function'
   )
     throw new TypeError('Story asset generation requires task and asset adapters.');
-  const _0x215079 = (_0x3c976e, _0x50529c, _0x213070 = {}) => {
-      const _0x2c3cbf = normalizeText(_0x213070['modelId']) || _0x16e813['models']['image'],
-        _0x55cb57 = normalizeText(_0x213070['provider']) || _0x16e813['imageProvider'],
-        _0x41aad7 =
-          _0x213070['generationParams'] && typeof _0x213070['generationParams'] === 'object'
-            ? _0x213070['generationParams']
-            : _0x16e813['imageGenerationParams'],
-        _0x742263 = normalizeText(_0x213070['promptPresetId']) || _0x16e813['assetPromptPresetId'],
-        _0x98e208 = normalizeText(_0x213070['scenePromptPresetId']) || _0x16e813['sceneAssetPromptPresetId'],
-        _0x1b22a4 =
-          _0x3c976e['kind'] === 'character'
-            ? applyStoryCharacterAssetPromptPreset(_0x742263, _0x50529c['prompt'])
-            : _0x3c976e['kind'] === 'scene'
-              ? applyStorySceneAssetPromptPreset(_0x98e208, _0x50529c['prompt'])
-              : _0x50529c['prompt'],
-        _0xb2d30c = Boolean(normalizeText(_0x50529c['referenceImageUrl'])),
-        _0x59822d = buildStoryAssetGenerationPayload({
-          asset: { ..._0x50529c, prompt: _0x1b22a4 },
-          modelId: _0x2c3cbf,
-          provider: _0x55cb57,
-          generationParams: _0x41aad7,
-          referenceImageUrls: getStoryAssetAppearanceReferenceUrls(_0x3c976e, _0x50529c),
-          mapReferenceImageToImage2: _0xb2d30c,
+  const getAppearanceGenerationContext = (item, args, key = {}) => {
+      const modelId = normalizeText(key['modelId']) || state['models']['image'],
+        provider = normalizeText(key['provider']) || state['imageProvider'],
+        generationParams =
+          key['generationParams'] && typeof key['generationParams'] === 'object'
+            ? key['generationParams']
+            : state['imageGenerationParams'],
+        text = normalizeText(key['promptPresetId']) || state['assetPromptPresetId'],
+        text2 = normalizeText(key['scenePromptPresetId']) || state['sceneAssetPromptPresetId'],
+        prompt =
+          item['kind'] === 'character'
+            ? applyStoryCharacterAssetPromptPreset(text, args['prompt'])
+            : item['kind'] === 'scene'
+              ? applyStorySceneAssetPromptPreset(text2, args['prompt'])
+              : args['prompt'],
+        mapReferenceImageToImage2 = Boolean(normalizeText(args['referenceImageUrl'])),
+        payload = buildStoryAssetGenerationPayload({
+          asset: { ...args, prompt: prompt },
+          modelId: modelId,
+          provider: provider,
+          generationParams: generationParams,
+          referenceImageUrls: getStoryAssetAppearanceReferenceUrls(item, args),
+          mapReferenceImageToImage2: mapReferenceImageToImage2,
         });
       return {
-        payload: _0x59822d,
-        execution: resolveModelExecution(_0x59822d['model'], { providerHint: _0x59822d['provider'] }),
+        payload: payload,
+        execution: resolveModelExecution(payload['model'], { providerHint: payload['provider'] }),
       };
     },
-    _0x2736c1 = (_0x410176, _0x45f34e, _0x56c1ea) => {
-      const _0x5aa537 = normalizeImageGenerationResult(_0x56c1ea),
-        _0x315f8e = getSuccessfulImageGenerationItems(_0x5aa537),
-        _0x16471f = _0x315f8e[0x0],
-        _0x854b29 = normalizeText(
-          _0x16471f?.['imageUrl'] ||
-            _0x16471f?.['url'] ||
-            _0x16471f?.['sourceUrl'] ||
-            _0x16471f?.['thumbUrl'],
+    applyResult = (index, result, data) => {
+      const imageGenerationResult = normalizeImageGenerationResult(data),
+        list = getSuccessfulImageGenerationItems(imageGenerationResult),
+        response = list[0x0],
+        text3 = normalizeText(
+          response?.['imageUrl'] || response?.['url'] || response?.['sourceUrl'] || response?.['thumbUrl'],
         );
-      if (!_0x854b29) throw new Error(getImageGenerationResultError(_0x5aa537) || '图像生成结果缺少可用图片');
+      if (!text3)
+        throw new Error(getImageGenerationResultError(imageGenerationResult) || '图像生成结果缺少可用图片');
       return (
-        (_0x45f34e['imageUrl'] = _0x854b29),
-        (_0x45f34e['generatedImage'] = { ..._0x16471f }),
-        (_0x45f34e['generatedImages'] = _0x315f8e['map']((_0x23ff99) => ({ ..._0x23ff99 }))),
-        (_0x45f34e['activeIndex'] = 0x0),
-        (_0x45f34e['error'] = ''),
-        ensureStoryAssetBaseAppearance(_0x410176),
-        _0x16471f
+        (result['imageUrl'] = text3),
+        (result['generatedImage'] = { ...response }),
+        (result['generatedImages'] = list['map']((args2) => ({ ...args2 }))),
+        (result['activeIndex'] = 0x0),
+        (result['error'] = ''),
+        ensureStoryAssetBaseAppearance(index),
+        response
       );
     },
-    _0xcf6a51 = (_0x1a7988 = {}) => {
-      const _0xc37895 = _0x1a7988['execution']?.['modelManifest'],
-        _0x3f936e = _0x1a7988['execution']?.['executionManifest'];
+    resumable = (options = {}) => {
+      const target = options['execution']?.['modelManifest'],
+        source = options['execution']?.['executionManifest'];
       return Boolean(
-        _0x3f936e?.['adapterType'] === 'workflow' ||
-        _0xc37895?.['async'] === !![] ||
-        _0x3f936e?.['extensions']?.['taskPolling'],
+        source?.['adapterType'] === 'workflow' ||
+        target?.['async'] === !![] ||
+        source?.['extensions']?.['taskPolling'],
       );
     },
-    _0x3de53a = async (_0x435dfb, _0x415021, _0x284a8a = {}) => {
-      const _0x52133b = _0x215079(_0x435dfb, _0x415021, _0x284a8a),
-        _0x36e0c4 = _0x284a8a['projectToken'] || _0xc0adb9(),
-        _0x4470b6 = createStoryAssetImageLocalization({
-          asset: _0x435dfb,
-          appearance: _0x415021,
-          projectToken: _0x36e0c4,
-          isLive: _0x537777,
-          applyResult: _0x2736c1,
+    requestAppearanceImage = async (asset, appearance, batch = {}) => {
+      const modelId2 = getAppearanceGenerationContext(asset, appearance, batch),
+        projectToken = batch['projectToken'] || createProjectToken(),
+        args3 = createStoryAssetImageLocalization({
+          asset: asset,
+          appearance: appearance,
+          projectToken: projectToken,
+          isLive: isProjectTaskLive,
+          applyResult: applyResult,
           onLocalized: () => schedulePersistence({ immediate: !![] }),
         }),
-        _0x45e6ed = buildStoryBackgroundTaskId('asset-image', {
-          assetId: _0x435dfb?.['id'],
-          appearanceId: _0x415021?.['id'],
+        id = buildStoryBackgroundTaskId('asset-image', {
+          assetId: asset?.['id'],
+          appearanceId: appearance?.['id'],
         });
-      _0x32cf33(_0x36e0c4, {
-        id: _0x45e6ed,
+      startBackgroundTask(projectToken, {
+        id: id,
         type: 'asset-image',
-        scope: { assetId: _0x435dfb?.['id'], appearanceId: _0x415021?.['id'] },
-        label: '生成' + (normalizeText(_0x435dfb?.['name']) || '素材') + '形象',
+        scope: { assetId: asset?.['id'], appearanceId: appearance?.['id'] },
+        label: '生成' + (normalizeText(asset?.['name']) || '素材') + '形象',
         message: '正在等待图片生成结果',
-        modelId: _0x52133b['payload']?.['model'],
-        provider: _0x52133b['payload']?.['provider'],
+        modelId: modelId2['payload']?.['model'],
+        provider: modelId2['payload']?.['provider'],
         providerProfileId:
-          _0x52133b['payload']?.['providerProfileId'] || _0x52133b['payload']?.['rhProviderProfileId'],
-        executionId: _0x52133b['execution']?.['executionManifest']?.['id'],
-        resumePayload: sanitizeStoryTaskResumePayload(_0x52133b['payload']),
-        batch: _0x284a8a['batch'],
+          modelId2['payload']?.['providerProfileId'] || modelId2['payload']?.['rhProviderProfileId'],
+        executionId: modelId2['execution']?.['executionManifest']?.['id'],
+        resumePayload: sanitizeStoryTaskResumePayload(modelId2['payload']),
+        batch: batch['batch'],
       });
       try {
-        const _0x5c71ec = (_0x4addf3) => {
-            const _0x2a85ca = normalizeText(_0x4addf3);
-            if (!_0x2a85ca || !_0x537777(_0x36e0c4)) return;
-            _0x46cc2e(_0x36e0c4, _0x45e6ed, {
+        const onTaskId = (next) => {
+            const remoteTaskId = normalizeText(next);
+            if (!remoteTaskId || !isProjectTaskLive(projectToken)) return;
+            updateBackgroundTask(projectToken, id, {
               status: 'running',
               message: '图片任务已提交，正在等待结果',
-              resumable: _0xcf6a51(_0x52133b),
-              remoteTaskId: _0x2a85ca,
-              resumePayload: sanitizeStoryTaskResumePayload(_0x52133b['payload']),
+              resumable: resumable(modelId2),
+              remoteTaskId: remoteTaskId,
+              resumePayload: sanitizeStoryTaskResumePayload(modelId2['payload']),
             });
           },
-          _0x4e3aa9 = await _0x1eeac7(_0x52133b['payload'], {
-            ..._0x4470b6['options'],
-            onTaskId: _0x5c71ec,
-            onTaskMeta: ({ taskId: _0x27b031 } = {}) => _0x5c71ec(_0x27b031),
+          current = await generateImage(modelId2['payload'], {
+            ...args3['options'],
+            onTaskId: onTaskId,
+            onTaskMeta: ({ taskId: taskId } = {}) => onTaskId(taskId),
           });
-        if (!_0x537777(_0x36e0c4)) return ![];
+        if (!isProjectTaskLive(projectToken)) return ![];
         return (
-          _0x2736c1(_0x435dfb, _0x415021, _0x4e3aa9),
-          _0x4470b6['commitRemote'](),
-          _0x33741f(_0x36e0c4, _0x45e6ed, { status: 'succeeded', message: '素材图片生成完成' }),
+          applyResult(asset, appearance, current),
+          args3['commitRemote'](),
+          finishBackgroundTask(projectToken, id, { status: 'succeeded', message: '素材图片生成完成' }),
           !![]
         );
-      } catch (_0x1d157f) {
-        _0x537777(_0x36e0c4) &&
-          _0x33741f(_0x36e0c4, _0x45e6ed, {
+      } catch (error) {
+        isProjectTaskLive(projectToken) &&
+          finishBackgroundTask(projectToken, id, {
             status: 'failed',
             message: '素材图片生成失败',
-            error: _0x1d157f?.['getUserMessage']?.() || _0x1d157f?.['message'] || '图像生成失败。',
+            error: error?.['getUserMessage']?.() || error?.['message'] || '图像生成失败。',
           });
-        _0x1d157f['storyAssetGenerationContext'] = _0x52133b;
-        throw _0x1d157f;
+        error['storyAssetGenerationContext'] = modelId2;
+        throw error;
       }
     },
-    _0x5a8cc6 = async (_0x2a6bf6, _0x5a5910 = _0xc0adb9()) => {
-      const _0x1fe0ad = _0x5a5910['projectId'] + ':' + _0x2a6bf6['id'];
-      if (_0xa0dbbf['has'](_0x1fe0ad) || _0x2fea6c['has'](_0x1fe0ad) || isWorkspaceDestroyed()) return ![];
-      (_0xa0dbbf['add'](_0x1fe0ad), _0x2fea6c['add'](_0x1fe0ad), registerProjectData(_0x5a5910));
-      if (_0x54b1cb(_0x5a5910)) {
+    resumeImageTask = async (modelId3, projectToken2 = createProjectToken()) => {
+      const entry = projectToken2['projectId'] + ':' + modelId3['id'];
+      if (activeRecoveries['has'](entry) || activeExecutions['has'](entry) || isWorkspaceDestroyed())
+        return ![];
+      (activeRecoveries['add'](entry), activeExecutions['add'](entry), registerProjectData(projectToken2));
+      if (isProjectTaskCurrent(projectToken2)) {
         setStoryAssetAppearanceGenerating(
-          _0x16e813,
-          _0x2a6bf6['scope']?.['assetId'],
-          _0x2a6bf6['scope']?.['appearanceId'],
+          state,
+          modelId3['scope']?.['assetId'],
+          modelId3['scope']?.['appearanceId'],
           !![],
         );
-        if (_0x16e813['view'] === 'project' && _0x16e813['step'] === 0x2) render();
+        if (state['view'] === 'project' && state['step'] === 0x2) render();
       }
       try {
-        const _0x598a42 = await _0x5a57e6({ modelId: _0x2a6bf6['modelId'], provider: _0x2a6bf6['provider'] });
-        if (!_0x537777(_0x5a5910) || isWorkspaceDestroyed()) return ![];
-        if (!_0x598a42)
-          throw new Error('图片模型缺少\x20manifest\x20或\x20execution\x20manifest：' + _0x2a6bf6['modelId']);
-        const _0x17d12a = _0x5a5910['data']?.['assets']?.['find'](
-            (_0x5aee77) =>
-              normalizeText(_0x5aee77?.['id']) === normalizeText(_0x2a6bf6['scope']?.['assetId']),
+        const enabled = await waitForRecoveryManifest({
+          modelId: modelId3['modelId'],
+          provider: modelId3['provider'],
+        });
+        if (!isProjectTaskLive(projectToken2) || isWorkspaceDestroyed()) return ![];
+        if (!enabled)
+          throw new Error('图片模型缺少\x20manifest\x20或\x20execution\x20manifest：' + modelId3['modelId']);
+        const asset2 = projectToken2['data']?.['assets']?.['find'](
+            (record) => normalizeText(record?.['id']) === normalizeText(modelId3['scope']?.['assetId']),
           ),
-          _0x29a4fc = getStoryAssetAppearances(_0x17d12a)['find'](
-            (_0x5b5904) =>
-              normalizeText(_0x5b5904?.['id']) === normalizeText(_0x2a6bf6['scope']?.['appearanceId']),
+          appearance2 = getStoryAssetAppearances(asset2)['find'](
+            (handle) => normalizeText(handle?.['id']) === normalizeText(modelId3['scope']?.['appearanceId']),
           );
-        if (!_0x17d12a || !_0x29a4fc) throw new Error('素材图片任务对应的角色或形象已不存在。');
-        const _0x274d54 = createStoryAssetImageLocalization({
-            asset: _0x17d12a,
-            appearance: _0x29a4fc,
-            projectToken: _0x5a5910,
-            isLive: _0x537777,
-            applyResult: _0x2736c1,
+        if (!asset2 || !appearance2) throw new Error('素材图片任务对应的角色或形象已不存在。');
+        const storyAssetImageLocalization = createStoryAssetImageLocalization({
+            asset: asset2,
+            appearance: appearance2,
+            projectToken: projectToken2,
+            isLive: isProjectTaskLive,
+            applyResult: applyResult,
             onLocalized: () => schedulePersistence({ immediate: !![] }),
           }),
-          _0x123036 = {
-            ...(_0x2a6bf6['resumePayload'] && typeof _0x2a6bf6['resumePayload'] === 'object'
-              ? _0x2a6bf6['resumePayload']
+          config = {
+            ...(modelId3['resumePayload'] && typeof modelId3['resumePayload'] === 'object'
+              ? modelId3['resumePayload']
               : {}),
-            model: _0x2a6bf6['modelId'],
-            provider: _0x2a6bf6['provider'],
+            model: modelId3['modelId'],
+            provider: modelId3['provider'],
           },
-          _0x4d5471 = resolveModelExecution(_0x2a6bf6['modelId'], { providerHint: _0x2a6bf6['provider'] });
-        let _0x4f1fbc = null;
-        if (_0x2a6bf6['provider'] === 'dreamina')
-          _0x4f1fbc = await resumeDreaminaImageTask(
-            _0x2a6bf6['remoteTaskId'],
-            _0x123036,
-            _0x274d54['options'],
+          modelExecution = resolveModelExecution(modelId3['modelId'], { providerHint: modelId3['provider'] });
+        let resumeDreaminaImageTask2 = null;
+        if (modelId3['provider'] === 'dreamina')
+          resumeDreaminaImageTask2 = await resumeDreaminaImageTask(
+            modelId3['remoteTaskId'],
+            config,
+            storyAssetImageLocalization['options'],
           );
         else
-          _0x4d5471?.['executionManifest']?.['adapterType'] === 'workflow' ||
-          ['runninghub', 'runninghubwf']['includes'](_0x2a6bf6['provider'])
-            ? (_0x4f1fbc = await resumeRunningHubImageTask(
-                _0x2a6bf6['remoteTaskId'],
-                _0x123036,
-                _0x274d54['options'],
+          modelExecution?.['executionManifest']?.['adapterType'] === 'workflow' ||
+          ['runninghub', 'runninghubwf']['includes'](modelId3['provider'])
+            ? (resumeDreaminaImageTask2 = await resumeRunningHubImageTask(
+                modelId3['remoteTaskId'],
+                config,
+                storyAssetImageLocalization['options'],
               ))
-            : (_0x4f1fbc = await resumeAsyncImageTask(
-                _0x2a6bf6['remoteTaskId'],
-                _0x123036,
-                _0x274d54['options'],
+            : (resumeDreaminaImageTask2 = await resumeAsyncImageTask(
+                modelId3['remoteTaskId'],
+                config,
+                storyAssetImageLocalization['options'],
               ));
-        if (!_0x537777(_0x5a5910)) return ![];
+        if (!isProjectTaskLive(projectToken2)) return ![];
         return (
-          _0x2736c1(_0x17d12a, _0x29a4fc, _0x4f1fbc),
-          _0x274d54['commitRemote'](),
-          _0x33741f(_0x5a5910, _0x2a6bf6['id'], {
+          applyResult(asset2, appearance2, resumeDreaminaImageTask2),
+          storyAssetImageLocalization['commitRemote'](),
+          finishBackgroundTask(projectToken2, modelId3['id'], {
             status: 'succeeded',
             message: '素材图片任务已恢复并生成完成',
           }),
           schedulePersistence({ immediate: !![] }),
-          _0x54b1cb(_0x5a5910) && _0x16e813['view'] === 'project' && _0x16e813['step'] === 0x2 && render(),
-          showNavigableTaskResultToast('素材图片任务已恢复并生成完成。', 'success', _0x5a5910, {
+          isProjectTaskCurrent(projectToken2) &&
+            state['view'] === 'project' &&
+            state['step'] === 0x2 &&
+            render(),
+          showNavigableTaskResultToast('素材图片任务已恢复并生成完成。', 'success', projectToken2, {
             step: 0x2,
-            assetId: _0x2a6bf6['scope']?.['assetId'],
+            assetId: modelId3['scope']?.['assetId'],
           }),
           !![]
         );
-      } catch (_0x46549d) {
-        if (!_0x537777(_0x5a5910)) return ![];
+      } catch (error2) {
+        if (!isProjectTaskLive(projectToken2)) return ![];
         return (
-          _0x33741f(_0x5a5910, _0x2a6bf6['id'], {
+          finishBackgroundTask(projectToken2, modelId3['id'], {
             status: 'failed',
             message: '素材图片任务恢复失败',
-            error: _0x46549d?.['message'] || '素材图片任务恢复失败。',
+            error: error2?.['message'] || '素材图片任务恢复失败。',
           }),
-          showTaskResultToast(_0x46549d?.['message'] || '素材图片任务恢复失败。', 'error', _0x46549d),
+          showTaskResultToast(error2?.['message'] || '素材图片任务恢复失败。', 'error', error2),
           ![]
         );
       } finally {
-        (_0xa0dbbf['delete'](_0x1fe0ad), _0x2fea6c['delete'](_0x1fe0ad));
-        if (_0x54b1cb(_0x5a5910)) {
+        (activeRecoveries['delete'](entry), activeExecutions['delete'](entry));
+        if (isProjectTaskCurrent(projectToken2)) {
           setStoryAssetAppearanceGenerating(
-            _0x16e813,
-            _0x2a6bf6['scope']?.['assetId'],
-            _0x2a6bf6['scope']?.['appearanceId'],
+            state,
+            modelId3['scope']?.['assetId'],
+            modelId3['scope']?.['appearanceId'],
             ![],
           );
-          if (_0x16e813['view'] === 'project' && _0x16e813['step'] === 0x2) render();
+          if (state['view'] === 'project' && state['step'] === 0x2) render();
         }
       }
     },
-    _0x16ed6f = async (_0x2ae637, _0x33fa45 = _0xc0adb9()) => {
-      const _0x106710 = _0x33fa45['projectId'] + ':' + _0x2ae637['id'];
-      if (_0xa0dbbf['has'](_0x106710) || _0x2fea6c['has'](_0x106710) || isWorkspaceDestroyed()) return ![];
-      (_0xa0dbbf['add'](_0x106710), _0x2fea6c['add'](_0x106710), registerProjectData(_0x33fa45));
-      if (_0x54b1cb(_0x33fa45)) {
-        setStoryAssetVoiceGenerating(_0x16e813, _0x2ae637['scope']?.['assetId'], !![]);
-        if (_0x16e813['view'] === 'project' && _0x16e813['step'] === 0x2) render();
+    resumeVoiceTask = async (modelId4, scope = createProjectToken()) => {
+      const input = scope['projectId'] + ':' + modelId4['id'];
+      if (activeRecoveries['has'](input) || activeExecutions['has'](input) || isWorkspaceDestroyed())
+        return ![];
+      (activeRecoveries['add'](input), activeExecutions['add'](input), registerProjectData(scope));
+      if (isProjectTaskCurrent(scope)) {
+        setStoryAssetVoiceGenerating(state, modelId4['scope']?.['assetId'], !![]);
+        if (state['view'] === 'project' && state['step'] === 0x2) render();
       }
       try {
-        const _0x52bf37 = await _0x5a57e6({ modelId: _0x2ae637['modelId'], provider: _0x2ae637['provider'] });
-        if (!_0x537777(_0x33fa45) || isWorkspaceDestroyed()) return ![];
-        if (!_0x52bf37)
-          throw new Error('声音模型缺少\x20manifest\x20或\x20execution\x20manifest：' + _0x2ae637['modelId']);
-        const _0x480204 = _0x33fa45['data']?.['assets']?.['find'](
-          (_0x321689) => normalizeText(_0x321689?.['id']) === normalizeText(_0x2ae637['scope']?.['assetId']),
-        );
-        if (!_0x480204) throw new Error('角色声音任务对应的角色已不存在。');
-        const _0x8f444a = await resumeStoryCharacterVoice({
-          asset: _0x480204,
-          taskId: _0x2ae637['remoteTaskId'],
-          payload: _0x2ae637['resumePayload'] || {},
+        const enabled2 = await waitForRecoveryManifest({
+          modelId: modelId4['modelId'],
+          provider: modelId4['provider'],
         });
-        if (!_0x8f444a || !_0x537777(_0x33fa45)) return ![];
+        if (!isProjectTaskLive(scope) || isWorkspaceDestroyed()) return ![];
+        if (!enabled2)
+          throw new Error('声音模型缺少\x20manifest\x20或\x20execution\x20manifest：' + modelId4['modelId']);
+        const asset3 = scope['data']?.['assets']?.['find'](
+          (output) => normalizeText(output?.['id']) === normalizeText(modelId4['scope']?.['assetId']),
+        );
+        if (!asset3) throw new Error('角色声音任务对应的角色已不存在。');
+        const resumeStoryCharacterVoice2 = await resumeStoryCharacterVoice({
+          asset: asset3,
+          taskId: modelId4['remoteTaskId'],
+          payload: modelId4['resumePayload'] || {},
+        });
+        if (!resumeStoryCharacterVoice2 || !isProjectTaskLive(scope)) return ![];
         return (
-          replaceStoryCharacterVoiceReference(_0x480204, _0x8f444a),
-          _0x33741f(_0x33fa45, _0x2ae637['id'], {
+          replaceStoryCharacterVoiceReference(asset3, resumeStoryCharacterVoice2),
+          finishBackgroundTask(scope, modelId4['id'], {
             status: 'succeeded',
             message: '角色声音任务已恢复并生成完成',
           }),
           schedulePersistence({ immediate: !![] }),
-          _0x54b1cb(_0x33fa45) && _0x16e813['view'] === 'project' && _0x16e813['step'] === 0x2 && render(),
-          showNavigableTaskResultToast('角色声音任务已恢复并生成完成。', 'success', _0x33fa45, {
+          isProjectTaskCurrent(scope) && state['view'] === 'project' && state['step'] === 0x2 && render(),
+          showNavigableTaskResultToast('角色声音任务已恢复并生成完成。', 'success', scope, {
             step: 0x2,
-            assetId: _0x2ae637['scope']?.['assetId'],
+            assetId: modelId4['scope']?.['assetId'],
           }),
           !![]
         );
-      } catch (_0x1250e5) {
-        if (!_0x537777(_0x33fa45)) return ![];
+      } catch (error3) {
+        if (!isProjectTaskLive(scope)) return ![];
         return (
-          _0x33741f(_0x33fa45, _0x2ae637['id'], {
+          finishBackgroundTask(scope, modelId4['id'], {
             status: 'failed',
             message: '角色声音任务恢复失败',
-            error: _0x1250e5?.['message'] || '角色声音任务恢复失败。',
+            error: error3?.['message'] || '角色声音任务恢复失败。',
           }),
-          showTaskResultToast(_0x1250e5?.['message'] || '角色声音任务恢复失败。', 'error', _0x1250e5),
+          showTaskResultToast(error3?.['message'] || '角色声音任务恢复失败。', 'error', error3),
           ![]
         );
       } finally {
-        (_0xa0dbbf['delete'](_0x106710), _0x2fea6c['delete'](_0x106710));
-        if (_0x54b1cb(_0x33fa45)) {
-          setStoryAssetVoiceGenerating(_0x16e813, _0x2ae637['scope']?.['assetId'], ![]);
-          normalizeText(_0x16e813['characterVoiceEditor']?.['assetId']) ===
-            normalizeText(_0x2ae637['scope']?.['assetId']) &&
-            (_0x16e813['characterVoiceEditor']['isGenerating'] = ![]);
-          if (_0x16e813['view'] === 'project' && _0x16e813['step'] === 0x2) render();
+        (activeRecoveries['delete'](input), activeExecutions['delete'](input));
+        if (isProjectTaskCurrent(scope)) {
+          setStoryAssetVoiceGenerating(state, modelId4['scope']?.['assetId'], ![]);
+          normalizeText(state['characterVoiceEditor']?.['assetId']) ===
+            normalizeText(modelId4['scope']?.['assetId']) &&
+            (state['characterVoiceEditor']['isGenerating'] = ![]);
+          if (state['view'] === 'project' && state['step'] === 0x2) render();
         }
       }
     },
-    _0x2afc9a = (_0x53bd61 = _0x16e813['data']) => {
-      const _0x183e1b = _0x4613b8(_0x53bd61),
-        _0x3bd484 = getStoryBackgroundTasks(_0x53bd61)['filter'](
-          (_0x1b51df) =>
-            ['asset-image', 'asset-voice']['includes'](_0x1b51df['type']) &&
-            _0x1b51df['resumable'] &&
-            _0x1b51df['remoteTaskId'] &&
-            ['queued', 'submitting', 'pending', 'running', 'recovering']['includes'](_0x1b51df['status']),
+    resumePersistedTasks = (value2 = state['data']) => {
+      const value3 = createProjectTokenForData(value2),
+        list2 = getStoryBackgroundTasks(value2)['filter'](
+          (response2) =>
+            ['asset-image', 'asset-voice']['includes'](response2['type']) &&
+            response2['resumable'] &&
+            response2['remoteTaskId'] &&
+            ['queued', 'submitting', 'pending', 'running', 'recovering']['includes'](response2['status']),
         );
       return (
-        _0x3bd484['forEach']((_0x572ba3) => {
-          _0x572ba3['type'] === 'asset-voice'
-            ? void _0x16ed6f(_0x572ba3, _0x183e1b)
-            : void _0x5a8cc6(_0x572ba3, _0x183e1b);
+        list2['forEach']((value4) => {
+          value4['type'] === 'asset-voice'
+            ? void resumeVoiceTask(value4, value3)
+            : void resumeImageTask(value4, value3);
         }),
-        _0x3bd484['length']
+        list2['length']
       );
     },
-    _0x1a8569 = (_0x517e72, { showFallbackToast: showFallbackToast = !![] } = {}) => {
-      const _0x43bd20 = _0x517e72?.['storyAssetGenerationContext'] || {},
-        _0xe5aea = showTaskApiKeyError(_0x517e72, {
-          providerId: _0x43bd20['payload']?.['provider'] || _0x16e813['imageProvider'],
-          model: _0x43bd20['payload']?.['model'] || _0x16e813['models']['image'],
-          adapterType: _0x43bd20['execution']?.['executionManifest']?.['adapterType'] || '',
+    showGenerationError = (details, { showFallbackToast: showFallbackToast = !![] } = {}) => {
+      const providerId = details?.['storyAssetGenerationContext'] || {},
+        showTaskApiKeyError2 = showTaskApiKeyError(details, {
+          providerId: providerId['payload']?.['provider'] || state['imageProvider'],
+          model: providerId['payload']?.['model'] || state['models']['image'],
+          adapterType: providerId['execution']?.['executionManifest']?.['adapterType'] || '',
         });
-      if (!_0xe5aea && showFallbackToast)
+      if (!showTaskApiKeyError2 && showFallbackToast)
         showTaskResultToast(
-          _0x517e72?.['getUserMessage']?.() || _0x517e72?.['message'] || '图像生成失败，请稍后重试。',
+          details?.['getUserMessage']?.() || details?.['message'] || '图像生成失败，请稍后重试。',
           'error',
-          _0x517e72,
+          details,
         );
       else
-        !_0xe5aea &&
+        !showTaskApiKeyError2 &&
           notifyTaskResult(
             null,
-            _0x517e72?.['getUserMessage']?.() || _0x517e72?.['message'] || '图像生成失败，请稍后重试。',
+            details?.['getUserMessage']?.() || details?.['message'] || '图像生成失败，请稍后重试。',
             'error',
-            { details: _0x517e72 },
+            { details: details },
           );
-      return _0xe5aea;
+      return showTaskApiKeyError2;
     },
-    _0x24682a = async () => {
-      const _0x2a8da6 = _0x34378d(_0x16e813['selectedAssetId']),
-        _0x3dd16b = _0x2a8da6 ? _0x508136(_0x16e813, _0x2a8da6) : null;
+    generateSelected = async () => {
+      const assetId = findAsset(state['selectedAssetId']),
+        enabled3 = assetId ? getSelectedAppearance(state, assetId) : null;
       if (
-        !_0x2a8da6 ||
-        !_0x3dd16b ||
-        _0x2a8da6['isLibraryAsset'] ||
-        isStoryAssetAppearanceLoading(_0x16e813, _0x2a8da6['id'], _0x3dd16b['id'])
+        !assetId ||
+        !enabled3 ||
+        assetId['isLibraryAsset'] ||
+        isStoryAssetAppearanceLoading(state, assetId['id'], enabled3['id'])
       )
         return;
-      if (!normalizeText(_0x3dd16b['prompt'])) {
+      if (!normalizeText(enabled3['prompt'])) {
         showToast('请先填写提示词。', 'warn');
         return;
       }
-      if (shouldGenerateStoryAssetBaseAppearanceFirst(_0x2a8da6, _0x3dd16b)) {
+      if (shouldGenerateStoryAssetBaseAppearanceFirst(assetId, enabled3)) {
         showToast('请先生成基础形象，再生成其他形象。', 'warn');
         return;
       }
@@ -422,48 +429,48 @@ export function createStoryAssetGenerationController({
         showToast('图像生成服务尚未初始化。', 'error');
         return;
       }
-      const _0x47e789 = _0xc0adb9();
-      (setStoryAssetAppearanceGenerating(_0x16e813, _0x2a8da6['id'], _0x3dd16b['id'], !![]),
-        (_0x3dd16b['error'] = ''),
+      const projectToken3 = createProjectToken();
+      (setStoryAssetAppearanceGenerating(state, assetId['id'], enabled3['id'], !![]),
+        (enabled3['error'] = ''),
         render());
       try {
-        await _0x3de53a(_0x2a8da6, _0x3dd16b, { projectToken: _0x47e789 });
-        if (!_0x537777(_0x47e789)) return ![];
+        await requestAppearanceImage(assetId, enabled3, { projectToken: projectToken3 });
+        if (!isProjectTaskLive(projectToken3)) return ![];
         return (
-          showNavigableTaskResultToast('当前形象已生成。', 'success', _0x47e789, {
+          showNavigableTaskResultToast('当前形象已生成。', 'success', projectToken3, {
             step: 0x2,
-            assetId: _0x2a8da6['id'],
+            assetId: assetId['id'],
           }),
           schedulePersistence({ immediate: !![] }),
           !![]
         );
-      } catch (_0x96bacf) {
-        if (!_0x537777(_0x47e789)) return ![];
+      } catch (error4) {
+        if (!isProjectTaskLive(projectToken3)) return ![];
         return (
-          (_0x3dd16b['error'] = _0x96bacf?.['getUserMessage']?.() || _0x96bacf?.['message'] || '生成失败'),
-          _0x1a8569(_0x96bacf),
+          (enabled3['error'] = error4?.['getUserMessage']?.() || error4?.['message'] || '生成失败'),
+          showGenerationError(error4),
           ![]
         );
       } finally {
-        _0x54b1cb(_0x47e789) &&
-          (setStoryAssetAppearanceGenerating(_0x16e813, _0x2a8da6['id'], _0x3dd16b['id'], ![]), render());
+        isProjectTaskCurrent(projectToken3) &&
+          (setStoryAssetAppearanceGenerating(state, assetId['id'], enabled3['id'], ![]), render());
       }
     };
   return Object['freeze']({
     previewSelected: () => {
-      const _0x337e09 = _0x34378d(_0x16e813['selectedAssetId']),
-        _0x4d36c6 = _0x337e09 ? _0x508136(_0x16e813, _0x337e09) : null;
-      if (!_0x337e09 || !_0x4d36c6) throw new Error('请先选择素材形象');
-      return _0x215079(_0x337e09, _0x4d36c6);
+      const enabled4 = findAsset(state['selectedAssetId']),
+        enabled5 = enabled4 ? getSelectedAppearance(state, enabled4) : null;
+      if (!enabled4 || !enabled5) throw new Error('请先选择素材形象');
+      return getAppearanceGenerationContext(enabled4, enabled5);
     },
-    applyImageResult: _0x2736c1,
-    canResumeImageTask: _0xcf6a51,
-    generateSelected: _0x24682a,
-    getAppearanceGenerationContext: _0x215079,
-    requestAppearanceImage: _0x3de53a,
-    resumeImageTask: _0x5a8cc6,
-    resumePersistedTasks: _0x2afc9a,
-    resumeVoiceTask: _0x16ed6f,
-    showGenerationError: _0x1a8569,
+    applyImageResult: applyResult,
+    canResumeImageTask: resumable,
+    generateSelected: generateSelected,
+    getAppearanceGenerationContext: getAppearanceGenerationContext,
+    requestAppearanceImage: requestAppearanceImage,
+    resumeImageTask: resumeImageTask,
+    resumePersistedTasks: resumePersistedTasks,
+    resumeVoiceTask: resumeVoiceTask,
+    showGenerationError: showGenerationError,
   });
 }

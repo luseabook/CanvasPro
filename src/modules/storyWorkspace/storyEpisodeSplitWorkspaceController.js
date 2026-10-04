@@ -45,27 +45,27 @@ export {
   shouldUseStoryEpisodeExperimentalSplit,
   resolveStoryEpisodeExperimentalErrorMessage,
 } from './storyEpisodeSplitPresentationPolicy.js';
-function normalizeText(_0x34fda1) {
-  return String(_0x34fda1 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function cloneData(_0x4bfac4) {
-  return JSON['parse'](JSON['stringify'](_0x4bfac4));
+function cloneData(item) {
+  return JSON['parse'](JSON['stringify'](item));
 }
-function requireFunctions(_0x607790, _0xeceb11) {
-  for (const [_0x550a9e, _0x231ef4] of Object['entries'](_0xeceb11)) {
-    if (typeof _0x231ef4 !== 'function') throw new TypeError(_0x607790 + ' requires ' + _0x550a9e + '.');
+function requireFunctions(key, index) {
+  for (const [result, data] of Object['entries'](index)) {
+    if (typeof data !== 'function') throw new TypeError(key + ' requires ' + result + '.');
   }
 }
 export function createStoryEpisodeSplitWorkspaceController({
-  state: _0x373e5d,
+  state: state,
   windowObject: windowObject = globalThis['window'] || globalThis,
   operations: operations = {},
   projectTasks: projectTasks = {},
   persistence: persistence = {},
   presentation: presentation = {},
-  getPlanningContext: _0x4af71b,
+  getPlanningContext: getPlanningContext,
 } = {}) {
-  if (!_0x373e5d || typeof _0x373e5d !== 'object')
+  if (!state || typeof state !== 'object')
     throw new TypeError('Story episode split requires workspace state.');
   (requireFunctions('Story episode split project tasks', {
     createProjectToken: projectTasks['createProjectToken'],
@@ -94,147 +94,150 @@ export function createStoryEpisodeSplitWorkspaceController({
       showTaskResult: presentation['showTaskResult'],
       showToast: presentation['showToast'],
     }));
-  if (typeof _0x4af71b !== 'function')
+  if (typeof getPlanningContext !== 'function')
     throw new TypeError('Story\x20episode\x20split\x20requires\x20getPlanningContext.');
-  const _0x15b623 = createStoryTaskBatchCancellationRegistry();
-  function _0x911fd7() {
-    return projectTasks['createProjectToken'](_0x373e5d);
+  const isCancellationRequested = createStoryTaskBatchCancellationRegistry();
+  function run() {
+    return projectTasks['createProjectToken'](state);
   }
-  function _0x2bb61d(_0x13df79, _0x2da14b, _0x241cd7, _0x5e956e = {}) {
-    const _0x32abb6 = normalizeStoryPromptMode(
-        _0x5e956e['promptMode'] || _0x241cd7?.['data']?.['project']?.['planning']?.['promptMode'],
+  function run2(options, target, sourceMode, args = {}) {
+    const promptMode = normalizeStoryPromptMode(
+        args['promptMode'] || sourceMode?.['data']?.['project']?.['planning']?.['promptMode'],
         { allowDeveloperModes: !![] },
       ),
-      _0x4c76ae = resolveStoryPromptModeDefaultVideoModelId(_0x32abb6),
-      _0x2a2ca8 = resolveStoryWorkspaceModelId(
+      storyPromptModeDefaultVideoModelId = resolveStoryPromptModeDefaultVideoModelId(promptMode),
+      videoModelId = resolveStoryWorkspaceModelId(
         'video',
-        _0x4c76ae || _0x241cd7?.['modelSettings']?.['models']?.['video'] || _0x373e5d['models']['video'],
+        storyPromptModeDefaultVideoModelId ||
+          sourceMode?.['modelSettings']?.['models']?.['video'] ||
+          state['models']['video'],
       ),
-      _0x3e40dd = mergeStoryEpisodeSplit(_0x13df79, _0x2da14b, {
-        ..._0x5e956e,
-        promptMode: _0x32abb6,
-        videoModelId: _0x2a2ca8,
-        sourceMode: _0x241cd7?.['data']?.['project']?.['sourceMode'],
+      storyEpisodeSplit = mergeStoryEpisodeSplit(options, target, {
+        ...args,
+        promptMode: promptMode,
+        videoModelId: videoModelId,
+        sourceMode: sourceMode?.['data']?.['project']?.['sourceMode'],
         includeDialogueVoiceGuidance:
-          _0x241cd7?.['data']?.['project']?.['sourceMode'] === 'video-replication',
+          sourceMode?.['data']?.['project']?.['sourceMode'] === 'video-replication',
       });
-    return (initializeStoryEpisodeVideoGenerationDurations(_0x3e40dd, _0x2a2ca8), _0x3e40dd);
+    return (
+      initializeStoryEpisodeVideoGenerationDurations(storyEpisodeSplit, videoModelId),
+      storyEpisodeSplit
+    );
   }
-  function _0x40eb98({
-    episode: _0x58e88e,
-    projectToken: _0x1ac36c,
-    backgroundTaskId: _0xf89a5d,
-    context: _0x2abfa1,
-    mode: _0x5af08b,
+  function run3({
+    episode: episode,
+    projectToken: projectToken,
+    backgroundTaskId: backgroundTaskId,
+    context: context,
+    mode: mode,
     promptExperiment: promptExperiment = ![],
   }) {
-    const _0x508493 = getStoryBackgroundTasks(_0x1ac36c['data'])['find'](
-      (_0x52b5fe) => _0x52b5fe['id'] === _0xf89a5d,
+    const resumePayload = getStoryBackgroundTasks(projectToken['data'])['find'](
+      (source) => source['id'] === backgroundTaskId,
     );
     return createStoryEpisodeSplitRunRecorder({
-      project: _0x2abfa1['project'],
-      episode: _0x58e88e,
-      assets: _0x1ac36c['data']['assets'],
-      constraints: _0x2abfa1['project']['planning'],
+      project: context['project'],
+      episode: episode,
+      assets: projectToken['data']['assets'],
+      constraints: context['project']['planning'],
       execution: {
-        modelId: _0x2abfa1['model'],
-        provider: _0x2abfa1['provider'],
-        providerProfileId: _0x2abfa1['providerProfileId'],
+        modelId: context['model'],
+        provider: context['provider'],
+        providerProfileId: context['providerProfileId'],
       },
-      mode: _0x5af08b,
+      mode: mode,
       promptExperiment: promptExperiment,
-      resumePayload: _0x508493?.['resumePayload'],
-      onChange: async (_0x20e43f) => {
-        (projectTasks['updateBackgroundTask'](_0x1ac36c, _0xf89a5d, {
+      resumePayload: resumePayload?.['resumePayload'],
+      onChange: async (modelId) => {
+        (projectTasks['updateBackgroundTask'](projectToken, backgroundTaskId, {
           resumable: !![],
-          modelId: _0x20e43f['input']['execution']['modelId'],
-          provider: _0x20e43f['input']['execution']['provider'],
-          resumePayload: { kind: _0x20e43f['kind'], run: _0x20e43f },
+          modelId: modelId['input']['execution']['modelId'],
+          provider: modelId['input']['execution']['provider'],
+          resumePayload: { kind: modelId['kind'], run: modelId },
         }),
-          projectTasks['syncProjectEntry'](_0x1ac36c));
-        const _0x5da9cb = await persistence['persistNow']();
-        if (persistence['isDurableRequired']() && !_0x5da9cb)
+          projectTasks['syncProjectEntry'](projectToken));
+        const enabled = await persistence['persistNow']();
+        if (persistence['isDurableRequired']() && !enabled)
           throw new Error('分镜运行记录保存失败，已停止模型请求。');
       },
     });
   }
-  async function _0x58e0af(_0xe6a1c8, _0x2b6dac) {
-    if (!_0xe6a1c8['requiresPaidRetry']) return !![];
-    const _0x58cf4e = await presentation['requestChoice'](getStoryEpisodeSplitPaidRetryChoice(_0x2b6dac));
-    if (_0x58cf4e !== 'retry') return ![];
-    return (await _0xe6a1c8['authorizePaidRetry'](), !![]);
+  async function run4(enabled2, next) {
+    if (!enabled2['requiresPaidRetry']) return !![];
+    const current = await presentation['requestChoice'](getStoryEpisodeSplitPaidRetryChoice(next));
+    if (current !== 'retry') return ![];
+    return (await enabled2['authorizePaidRetry'](), !![]);
   }
-  function _0x219614({
-    episode: _0x3ac940,
-    projectToken: _0x253d51,
-    context: _0x35eabd,
-    splitRun: _0x2fe8f3,
-    repairDraft: _0x187e0e,
-    onProgress: _0x206882,
+  function run5({
+    episode: episode2,
+    projectToken: projectToken2,
+    context: context2,
+    splitRun: splitRun,
+    repairDraft: repairDraft2,
+    onProgress: onProgress,
   }) {
     return {
-      project: _0x35eabd['project'],
-      episode: _0x3ac940,
-      assets: buildVideoReplicationGenerationAssets(_0x253d51['data']['assets'], _0x35eabd['project']),
-      constraints: _0x35eabd['project']['planning'],
+      project: context2['project'],
+      episode: episode2,
+      assets: buildVideoReplicationGenerationAssets(projectToken2['data']['assets'], context2['project']),
+      constraints: context2['project']['planning'],
       clipDurationConstraints: resolveStoryVideoClipDurationConstraints(
         resolveStoryWorkspaceModelId(
           'video',
-          _0x253d51['modelSettings']?.['models']?.['video'] || _0x373e5d['models']['video'],
+          projectToken2['modelSettings']?.['models']?.['video'] || state['models']['video'],
         ),
       ),
-      model: _0x2fe8f3['execution']['modelId'],
-      provider: _0x2fe8f3['execution']['provider'],
-      providerProfileId: _0x2fe8f3['execution']['providerProfileId'],
-      repairDraft: _0x187e0e,
-      onInvocation: _0x2fe8f3['onInvocation'],
+      model: splitRun['execution']['modelId'],
+      provider: splitRun['execution']['provider'],
+      providerProfileId: splitRun['execution']['providerProfileId'],
+      repairDraft: repairDraft2,
+      onInvocation: splitRun['onInvocation'],
       diagnostics: createStoryEpisodeSplitDeveloperDiagnostics(windowObject),
-      onProgress: _0x206882,
+      onProgress: onProgress,
     };
   }
-  function _0x4026ae({
-    episode: _0x468227,
-    projectToken: _0x133269,
-    context: _0x4f00e8,
-    splitRun: _0x120c16,
-    promptExperiment: _0x137d9b,
-    onProgress: _0x4a32e8,
+  function run6({
+    episode: episode3,
+    projectToken: projectToken3,
+    context: context3,
+    splitRun: splitRun2,
+    promptExperiment: promptExperiment2,
+    onProgress: onProgress2,
   }) {
-    const _0x38c5d6 = _0x133269['data'],
-      _0x205602 = _0x38c5d6['episodes']['findIndex']((_0x1943d0) => _0x1943d0['id'] === _0x468227['id']),
-      _0x5ee7b8 = _0x120c16['checkpoint'] || _0x468227?.['experimentalSplitDraft'];
+    const args2 = projectToken3['data'],
+      previousEpisode = args2['episodes']['findIndex']((entry) => entry['id'] === episode3['id']),
+      resumeDraft = splitRun2['checkpoint'] || episode3?.['experimentalSplitDraft'];
     return {
-      project: _0x4f00e8['project'],
-      episode: _0x468227,
-      previousEpisode: _0x205602 > 0x0 ? _0x38c5d6['episodes'][_0x205602 - 0x1] : null,
-      nextEpisode: _0x205602 >= 0x0 ? _0x38c5d6['episodes'][_0x205602 + 0x1] || null : null,
-      assets: buildVideoReplicationGenerationAssets(_0x38c5d6['assets'], _0x4f00e8['project']),
-      constraints: _0x4f00e8['project']['planning'],
-      model: _0x120c16['execution']['modelId'],
-      provider: _0x120c16['execution']['provider'],
-      providerProfileId: _0x120c16['execution']['providerProfileId'],
-      promptExperiment: _0x137d9b === !![],
-      resumeDraft: _0x5ee7b8?.['status'] === 'completed' ? null : _0x5ee7b8 || null,
-      onInvocation: _0x120c16['onInvocation'],
+      project: context3['project'],
+      episode: episode3,
+      previousEpisode: previousEpisode > 0x0 ? args2['episodes'][previousEpisode - 0x1] : null,
+      nextEpisode: previousEpisode >= 0x0 ? args2['episodes'][previousEpisode + 0x1] || null : null,
+      assets: buildVideoReplicationGenerationAssets(args2['assets'], context3['project']),
+      constraints: context3['project']['planning'],
+      model: splitRun2['execution']['modelId'],
+      provider: splitRun2['execution']['provider'],
+      providerProfileId: splitRun2['execution']['providerProfileId'],
+      promptExperiment: promptExperiment2 === !![],
+      resumeDraft: resumeDraft?.['status'] === 'completed' ? null : resumeDraft || null,
+      onInvocation: splitRun2['onInvocation'],
       diagnostics: createStoryEpisodeSplitDeveloperDiagnostics(windowObject),
-      onCheckpoint: async (_0x3ee881) => {
-        if (!projectTasks['isLive'](_0x133269)) return;
-        const _0x538c00 = _0x38c5d6['episodes']['findIndex'](
-          (_0x2e8383) => _0x2e8383['id'] === _0x468227['id'],
-        );
-        if (_0x538c00 < 0x0) return;
-        ((_0x38c5d6['episodes'][_0x538c00] = {
-          ..._0x38c5d6['episodes'][_0x538c00],
-          experimentalSplitDraft: cloneData(_0x3ee881),
+      onCheckpoint: async (record) => {
+        if (!projectTasks['isLive'](projectToken3)) return;
+        const count = args2['episodes']['findIndex']((payload) => payload['id'] === episode3['id']);
+        if (count < 0x0) return;
+        ((args2['episodes'][count] = {
+          ...args2['episodes'][count],
+          experimentalSplitDraft: cloneData(record),
         }),
-          await _0x120c16['saveCheckpoint'](_0x3ee881));
+          await splitRun2['saveCheckpoint'](record));
       },
-      onProgress: _0x4a32e8,
+      onProgress: onProgress2,
     };
   }
-  async function _0x43ca56(
-    _0x26e906,
-    _0xf5c9cb,
+  async function run7(
+    episodeId,
+    projectToken4,
     {
       batch: batch = null,
       experimental: experimental = ![],
@@ -243,239 +246,237 @@ export function createStoryEpisodeSplitWorkspaceController({
       repairDraft: repairDraft = null,
     } = {},
   ) {
-    if (!projectTasks['isLive'](_0xf5c9cb)) return null;
-    const _0x219747 = _0xf5c9cb['data'],
-      _0x43ebc1 = _0x4af71b(_0x219747, _0xf5c9cb),
-      _0x34d7af = createStoryEpisodeScriptGuard(() => _0xf5c9cb['data'], _0x26e906);
-    _0x26e906 = _0x34d7af['episode'];
-    const _0x41db9b = experimental ? 'episode-split-experimental' : 'episode-split',
-      _0x523fa1 = buildStoryBackgroundTaskId(_0x41db9b, { episodeId: _0x26e906['id'] }),
-      _0x5b19e6 = _0x40eb98({
-        episode: _0x26e906,
-        projectToken: _0xf5c9cb,
-        backgroundTaskId: _0x523fa1,
-        context: _0x43ebc1,
+    if (!projectTasks['isLive'](projectToken4)) return null;
+    const projectData = projectToken4['data'],
+      context4 = getPlanningContext(projectData, projectToken4),
+      storyEpisodeScriptGuard = createStoryEpisodeScriptGuard(() => projectToken4['data'], episodeId);
+    episodeId = storyEpisodeScriptGuard['episode'];
+    const type = experimental ? 'episode-split-experimental' : 'episode-split',
+      backgroundTaskId2 = buildStoryBackgroundTaskId(type, { episodeId: episodeId['id'] }),
+      modelId2 = run3({
+        episode: episodeId,
+        projectToken: projectToken4,
+        backgroundTaskId: backgroundTaskId2,
+        context: context4,
         mode: experimental ? 'experimental' : 'standard',
         promptExperiment: promptExperiment,
       });
-    if (!(await _0x58e0af(_0x5b19e6, _0x26e906))) return null;
-    projectTasks['startBackgroundTask'](_0xf5c9cb, {
-      id: _0x523fa1,
-      modelId: _0x5b19e6['execution']['modelId'],
-      provider: _0x5b19e6['execution']['provider'],
-      providerProfileId: _0x5b19e6['execution']['providerProfileId'],
-      type: _0x41db9b,
-      scope: { episodeId: _0x26e906['id'] },
+    if (!(await run4(modelId2, episodeId))) return null;
+    projectTasks['startBackgroundTask'](projectToken4, {
+      id: backgroundTaskId2,
+      modelId: modelId2['execution']['modelId'],
+      provider: modelId2['execution']['provider'],
+      providerProfileId: modelId2['execution']['providerProfileId'],
+      type: type,
+      scope: { episodeId: episodeId['id'] },
       label: experimentalLabel
-        ? '实验分批拆分第 ' + (_0x26e906['number'] || '') + '\x20集'
-        : '拆分第 ' + (_0x26e906['number'] || '') + ' 集分镜',
+        ? '实验分批拆分第 ' + (episodeId['number'] || '') + '\x20集'
+        : '拆分第 ' + (episodeId['number'] || '') + ' 集分镜',
       message: experimental ? '正在规划整集分镜蓝图' : '正在生成分镜脚本',
       batch: batch,
       resumable: !![],
-      resumePayload: _0x5b19e6['payload'](),
+      resumePayload: modelId2['payload'](),
     });
-    const _0x580bc9 = ({ message: _0x33bd79 } = {}) => {
-      if (!projectTasks['isLive'](_0xf5c9cb)) return;
-      projectTasks['updateBackgroundTask'](_0xf5c9cb, _0x523fa1, {
+    const onProgress3 = ({ message: message } = {}) => {
+      if (!projectTasks['isLive'](projectToken4)) return;
+      projectTasks['updateBackgroundTask'](projectToken4, backgroundTaskId2, {
         status: 'running',
-        message: normalizeText(_0x33bd79) || '正在生成分镜脚本',
+        message: normalizeText(message) || '正在生成分镜脚本',
       });
     };
-    let _0x47ed02 = null,
-      _0x3455f1;
+    let result2 = null,
+      promptInputKey;
     try {
-      await _0x5b19e6['start']();
-      const _0x13201e = await prepareStoryReplicationGenerationEpisode({
-        episode: _0x26e906,
-        projectData: _0x219747,
-        onProgress: _0x580bc9,
-        isActive: () => projectTasks['isLive'](_0xf5c9cb),
+      await modelId2['start']();
+      const episode4 = await prepareStoryReplicationGenerationEpisode({
+        episode: episodeId,
+        projectData: projectData,
+        onProgress: onProgress3,
+        isActive: () => projectTasks['isLive'](projectToken4),
       });
-      _0x3455f1 = _0x13201e['replication']?.['generationInputKey'];
-      if (_0x5b19e6['candidateArtifact']) _0x47ed02 = _0x5b19e6['candidateArtifact'];
+      promptInputKey = episode4['replication']?.['generationInputKey'];
+      if (modelId2['candidateArtifact']) result2 = modelId2['candidateArtifact'];
       else {
-        if (_0x5b19e6['generatedCandidate']) _0x47ed02 = _0x5b19e6['generatedCandidate'];
+        if (modelId2['generatedCandidate']) result2 = modelId2['generatedCandidate'];
         else
           experimental
-            ? (_0x47ed02 = await operations['splitExperimental'](
-                _0x4026ae({
-                  episode: _0x13201e,
-                  projectToken: _0xf5c9cb,
-                  context: _0x43ebc1,
-                  splitRun: _0x5b19e6,
+            ? (result2 = await operations['splitExperimental'](
+                run6({
+                  episode: episode4,
+                  projectToken: projectToken4,
+                  context: context4,
+                  splitRun: modelId2,
                   promptExperiment: promptExperiment,
-                  onProgress: _0x580bc9,
+                  onProgress: onProgress3,
                 }),
               ))
-            : (_0x47ed02 = await operations['splitStandard'](
-                _0x219614({
-                  episode: _0x13201e,
-                  projectToken: _0xf5c9cb,
-                  context: _0x43ebc1,
-                  splitRun: _0x5b19e6,
+            : (result2 = await operations['splitStandard'](
+                run5({
+                  episode: episode4,
+                  projectToken: projectToken4,
+                  context: context4,
+                  splitRun: modelId2,
                   repairDraft: repairDraft,
-                  onProgress: _0x580bc9,
+                  onProgress: onProgress3,
                 }),
               ));
       }
-      (assertStoryReplicationGenerationCurrent(_0x219747, _0x13201e), _0x34d7af['assertCurrent']());
-      if (!_0x5b19e6['candidateArtifact'] && !_0x5b19e6['generatedCandidate'])
-        await _0x5b19e6['saveGeneratedCandidate'](_0x47ed02);
-      ((_0x47ed02 = applyReplicationSegmentPlan(_0x47ed02, _0x13201e)),
-        (_0x47ed02 = applyReplicationAsrDelivery(
-          _0x47ed02,
-          _0x13201e,
-          _0x219747['project'],
-          _0x219747['assets'],
+      (assertStoryReplicationGenerationCurrent(projectData, episode4),
+        storyEpisodeScriptGuard['assertCurrent']());
+      if (!modelId2['candidateArtifact'] && !modelId2['generatedCandidate'])
+        await modelId2['saveGeneratedCandidate'](result2);
+      ((result2 = applyReplicationSegmentPlan(result2, episode4)),
+        (result2 = applyReplicationAsrDelivery(
+          result2,
+          episode4,
+          projectData['project'],
+          projectData['assets'],
         )),
-        (_0x47ed02 = await runStoryEpisodeSplitQualityReview({
+        (result2 = await runStoryEpisodeSplitQualityReview({
           reviewEpisodeSplit: operations['review'],
-          result: _0x47ed02,
-          episode: _0x13201e,
-          context: _0x43ebc1,
-          projectData: _0x219747,
-          splitRun: _0x5b19e6,
-          onProgress: _0x580bc9,
+          result: result2,
+          episode: episode4,
+          context: context4,
+          projectData: projectData,
+          splitRun: modelId2,
+          onProgress: onProgress3,
         })),
-        (_0x47ed02 = applyReplicationSegmentPlan(_0x47ed02, _0x13201e)),
-        (_0x47ed02 = applyReplicationAsrDelivery(
-          _0x47ed02,
-          _0x13201e,
-          _0x219747['project'],
-          _0x219747['assets'],
+        (result2 = applyReplicationSegmentPlan(result2, episode4)),
+        (result2 = applyReplicationAsrDelivery(
+          result2,
+          episode4,
+          projectData['project'],
+          projectData['assets'],
         )));
-      if (!_0x5b19e6['candidateArtifact']) await _0x5b19e6['ready'](_0x47ed02);
-      (assertStoryReplicationGenerationCurrent(_0x219747, _0x13201e), _0x34d7af['assertCurrent']());
-    } catch (_0x121648) {
-      await _0x5b19e6['failed'](_0x121648)['catch'](() => {});
-      if (projectTasks['isLive'](_0xf5c9cb)) {
-        if (_0x34d7af['isCurrent']() && experimental && _0x121648?.['experimentalDraft']) {
-          const _0x23780c = _0x219747['episodes']['findIndex'](
-            (_0x35431c) => _0x35431c['id'] === _0x26e906['id'],
-          );
-          _0x23780c >= 0x0 &&
-            ((_0x219747['episodes'][_0x23780c] = {
-              ..._0x219747['episodes'][_0x23780c],
-              experimentalSplitDraft: cloneData(_0x121648['experimentalDraft']),
+      if (!modelId2['candidateArtifact']) await modelId2['ready'](result2);
+      (assertStoryReplicationGenerationCurrent(projectData, episode4),
+        storyEpisodeScriptGuard['assertCurrent']());
+    } catch (splitDraft) {
+      await modelId2['failed'](splitDraft)['catch'](() => {});
+      if (projectTasks['isLive'](projectToken4)) {
+        if (storyEpisodeScriptGuard['isCurrent']() && experimental && splitDraft?.['experimentalDraft']) {
+          const count2 = projectData['episodes']['findIndex']((handle) => handle['id'] === episodeId['id']);
+          count2 >= 0x0 &&
+            ((projectData['episodes'][count2] = {
+              ...projectData['episodes'][count2],
+              experimentalSplitDraft: cloneData(splitDraft['experimentalDraft']),
             }),
-            projectTasks['syncProjectEntry'](_0xf5c9cb),
+            projectTasks['syncProjectEntry'](projectToken4),
             persistence['schedule']({ immediate: !![] }));
         } else {
-          if (_0x34d7af['isCurrent']() && !experimental && _0x121648?.['partialResult']) {
-            const _0x58bd51 = _0x219747['episodes']['findIndex'](
-              (_0x55f0fe) => _0x55f0fe['id'] === _0x26e906['id'],
-            );
-            _0x58bd51 >= 0x0 &&
-              ((_0x219747['episodes'][_0x58bd51] = {
-                ..._0x219747['episodes'][_0x58bd51],
-                splitDraft: _0x121648['partialResult'],
+          if (storyEpisodeScriptGuard['isCurrent']() && !experimental && splitDraft?.['partialResult']) {
+            const count3 = projectData['episodes']['findIndex']((config) => config['id'] === episodeId['id']);
+            count3 >= 0x0 &&
+              ((projectData['episodes'][count3] = {
+                ...projectData['episodes'][count3],
+                splitDraft: splitDraft['partialResult'],
               }),
               persistence['schedule']({ immediate: !![] }));
           }
         }
-        const _0x3735b1 = experimental
-          ? resolveStoryEpisodeExperimentalErrorMessage(_0x121648, {
+        const error = experimental
+          ? resolveStoryEpisodeExperimentalErrorMessage(splitDraft, {
               retryActionLabel: experimentalLabel ? '开发测试' : '生成分镜脚本',
             })
-          : _0x121648?.['message'] || '分集拆分失败。';
-        projectTasks['finishBackgroundTask'](_0xf5c9cb, _0x523fa1, {
+          : splitDraft?.['message'] || '分集拆分失败。';
+        projectTasks['finishBackgroundTask'](projectToken4, backgroundTaskId2, {
           status: 'failed',
           message: experimentalLabel
-            ? '第\x20' + (_0x26e906['number'] || '') + ' 集实验分批拆分失败'
-            : _0x121648?.['partialResult']
-              ? '第\x20' + (_0x26e906['number'] || '') + '\x20集本次返回未完全通过，已保存原始结果'
-              : '第\x20' + (_0x26e906['number'] || '') + ' 集分镜拆分失败',
-          error: _0x3735b1,
+            ? '第\x20' + (episodeId['number'] || '') + ' 集实验分批拆分失败'
+            : splitDraft?.['partialResult']
+              ? '第\x20' + (episodeId['number'] || '') + '\x20集本次返回未完全通过，已保存原始结果'
+              : '第\x20' + (episodeId['number'] || '') + ' 集分镜拆分失败',
+          error: error,
           resumable: !![],
-          resumePayload: _0x5b19e6['payload'](),
+          resumePayload: modelId2['payload'](),
         });
       }
-      throw _0x121648;
+      throw splitDraft;
     }
-    if (!projectTasks['isLive'](_0xf5c9cb)) return null;
-    const _0x1ba485 = _0x2bb61d(_0x26e906, _0x47ed02, _0xf5c9cb, {
-      assets: _0x219747['assets'],
+    if (!projectTasks['isLive'](projectToken4)) return null;
+    const args3 = run2(episodeId, result2, projectToken4, {
+      assets: projectData['assets'],
       preserveMedia: !![],
-      visualStyle: _0x43ebc1['visualStyle'],
-      promptMode: _0x43ebc1['project']['planning']?.['promptMode'],
+      visualStyle: context4['visualStyle'],
+      promptMode: context4['project']['planning']?.['promptMode'],
       ...(experimental ? { includeContinuityHandoffs: !![] } : {}),
     });
-    (delete _0x1ba485['splitDraft'],
-      delete _0x1ba485['experimentalSplitDraft'],
-      (_0x1ba485['splitQualityReview'] = _0x47ed02['qualityReview']));
-    if (_0x26e906['replication']?.['sourceAnalysis'])
-      _0x1ba485['replication'] = {
-        ..._0x1ba485['replication'],
-        promptInputKey: _0x3455f1,
+    (delete args3['splitDraft'],
+      delete args3['experimentalSplitDraft'],
+      (args3['splitQualityReview'] = result2['qualityReview']));
+    if (episodeId['replication']?.['sourceAnalysis'])
+      args3['replication'] = {
+        ...args3['replication'],
+        promptInputKey: promptInputKey,
         promptsStale: ![],
       };
-    const _0x560cd8 = _0x219747['episodes']['findIndex']((_0x284592) => _0x284592['id'] === _0x26e906['id']);
-    if (_0x560cd8 >= 0x0) _0x219747['episodes'][_0x560cd8] = _0x1ba485;
+    const count4 = projectData['episodes']['findIndex']((scope) => scope['id'] === episodeId['id']);
+    if (count4 >= 0x0) projectData['episodes'][count4] = args3;
     return (
-      await _0x5b19e6['succeeded'](),
-      projectTasks['finishBackgroundTask'](_0xf5c9cb, _0x523fa1, {
+      await modelId2['succeeded'](),
+      projectTasks['finishBackgroundTask'](projectToken4, backgroundTaskId2, {
         status: 'succeeded',
-        message: getStoryEpisodeSplitDeliveryMessage(_0x1ba485),
+        message: getStoryEpisodeSplitDeliveryMessage(args3),
         resumable: ![],
-        resumePayload: _0x5b19e6['payload'](),
+        resumePayload: modelId2['payload'](),
       }),
-      _0x1ba485
+      args3
     );
   }
-  function _0xf46fd1(_0x31ef7b) {
+  function recoverDraft(input) {
     if (typeof operations['recoverDraft'] !== 'function')
       return (presentation['showToast']('分镜本地恢复能力尚未初始化。', 'error'), ![]);
-    const _0x42d2bd = _0x911fd7(),
-      _0x3d387d = _0x42d2bd['data'],
-      _0x15096e = _0x3d387d['episodes']['findIndex']((_0x4ef36a) => _0x4ef36a['id'] === _0x31ef7b);
-    if (_0x15096e < 0x0) return ![];
-    const _0x121175 = _0x3d387d['episodes'][_0x15096e];
-    if (!_0x121175?.['splitDraft'])
+    const output = run(),
+      assets = output['data'],
+      count5 = assets['episodes']['findIndex']((value2) => value2['id'] === input);
+    if (count5 < 0x0) return ![];
+    const episode5 = assets['episodes'][count5];
+    if (!episode5?.['splitDraft'])
       return (presentation['showToast']('当前分集没有已保存的返回可供恢复。', 'info'), ![]);
     try {
-      const _0x1382ad = _0x4af71b(_0x3d387d, _0x42d2bd),
-        _0x194f07 = operations['recoverDraft']({
-          project: _0x1382ad['project'],
-          episode: _0x121175,
-          assets: _0x3d387d['assets'],
-          constraints: _0x1382ad['project']['planning'],
-          draft: _0x121175['splitDraft'],
+      const project = getPlanningContext(assets, output),
+        value3 = operations['recoverDraft']({
+          project: project['project'],
+          episode: episode5,
+          assets: assets['assets'],
+          constraints: project['project']['planning'],
+          draft: episode5['splitDraft'],
         }),
-        _0x2f5a62 = _0x2bb61d(_0x121175, _0x194f07, _0x42d2bd, {
-          assets: _0x3d387d['assets'],
+        value4 = run2(episode5, value3, output, {
+          assets: assets['assets'],
           preserveMedia: !![],
-          visualStyle: _0x1382ad['visualStyle'],
-          promptMode: _0x1382ad['project']['planning']?.['promptMode'],
+          visualStyle: project['visualStyle'],
+          promptMode: project['project']['planning']?.['promptMode'],
         });
       return (
-        delete _0x2f5a62['splitDraft'],
-        delete _0x2f5a62['experimentalSplitDraft'],
-        (_0x3d387d['episodes'][_0x15096e] = _0x2f5a62),
+        delete value4['splitDraft'],
+        delete value4['experimentalSplitDraft'],
+        (assets['episodes'][count5] = value4),
         persistence['schedule']({ immediate: !![] }),
         presentation['render'](),
         presentation['showToast'](
           '第\x20' +
-            (_0x2f5a62['number'] || '') +
+            (value4['number'] || '') +
             '\x20集已在本地恢复为\x20' +
-            _0x2f5a62['clips']['length'] +
+            value4['clips']['length'] +
             ' 个片段；未调用模型。',
           'success',
         ),
         !![]
       );
-    } catch (_0x4a7320) {
+    } catch (error2) {
       return (
         presentation['showTaskResult'](
-          (normalizeText(_0x4a7320?.['message']) || '已保存结果仍无法在本地恢复。') + '（未调用模型。）',
+          (normalizeText(error2?.['message']) || '已保存结果仍无法在本地恢复。') + '（未调用模型。）',
           'error',
-          _0x4a7320,
+          error2,
         ),
         ![]
       );
     }
   }
-  async function _0x1fece1(
-    _0xc1dab6,
+  async function run8(
+    value5,
     {
       explicitExperimental: explicitExperimental = ![],
       openAfter: openAfter = ![],
@@ -483,11 +484,11 @@ export function createStoryEpisodeSplitWorkspaceController({
     } = {},
   ) {
     if (explicitExperimental && !isStoryEpisodeExperimentalSplitAvailable(windowObject)) return ![];
-    const _0x3474a7 = presentation['getGenerationControl'](_0xc1dab6);
-    if (_0x3474a7['disabled']) return ![];
-    const _0x2e5e63 = explicitExperimental || shouldUseStoryEpisodeExperimentalSplit(_0x373e5d),
-      _0x2c3e7e = _0x2e5e63 ? operations['splitExperimental'] : operations['splitStandard'];
-    if (typeof _0x2c3e7e !== 'function')
+    const el = presentation['getGenerationControl'](value5);
+    if (el['disabled']) return ![];
+    const experimental2 = explicitExperimental || shouldUseStoryEpisodeExperimentalSplit(state),
+      value6 = experimental2 ? operations['splitExperimental'] : operations['splitStandard'];
+    if (typeof value6 !== 'function')
       return (
         presentation['showToast'](
           explicitExperimental ? '实验分批拆分 Agent 尚未初始化。' : '分镜拆分 Agent 尚未初始化。',
@@ -495,197 +496,194 @@ export function createStoryEpisodeSplitWorkspaceController({
         ),
         ![]
       );
-    const _0x100519 = _0x373e5d['data']['episodes']['find']((_0xf25252) => _0xf25252['id'] === _0xc1dab6);
-    if (!_0x100519) return ![];
-    setStoryEpisodeSplitRunning(_0x373e5d, _0x100519['id'], !![]);
-    const _0x505f12 = _0x911fd7();
+    const enabled3 = state['data']['episodes']['find']((value7) => value7['id'] === value5);
+    if (!enabled3) return ![];
+    setStoryEpisodeSplitRunning(state, enabled3['id'], !![]);
+    const value8 = run();
     presentation['render']();
     try {
-      const _0x20fd25 = await _0x43ca56(_0x100519, _0x505f12, {
-        experimental: _0x2e5e63,
+      const episodeId2 = await run7(enabled3, value8, {
+        experimental: experimental2,
         experimentalLabel: explicitExperimental,
         promptExperiment: explicitExperimental,
-        repairDraft: repairDraft === !![] ? _0x100519['splitDraft'] : null,
+        repairDraft: repairDraft === !![] ? enabled3['splitDraft'] : null,
       });
-      if (!_0x20fd25 || !projectTasks['isLive'](_0x505f12)) return ![];
+      if (!episodeId2 || !projectTasks['isLive'](value8)) return ![];
       return (
         persistence['schedule']({ immediate: !![] }),
         explicitExperimental
           ? presentation['notifyComplete'](
               '第\x20' +
-                _0x20fd25['number'] +
+                episodeId2['number'] +
                 ' 集实验分批拆分：' +
-                getStoryEpisodeSplitDeliveryMessage(_0x20fd25),
-              _0x505f12,
-              { episodeId: _0x20fd25['id'], clipId: _0x20fd25['clips'][0x0]?.['id'] },
+                getStoryEpisodeSplitDeliveryMessage(episodeId2),
+              value8,
+              { episodeId: episodeId2['id'], clipId: episodeId2['clips'][0x0]?.['id'] },
               {
                 notificationMessage:
-                  '第\x20' + _0x20fd25['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(_0x20fd25),
+                  '第\x20' + episodeId2['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(episodeId2),
               },
             )
           : presentation['notifyComplete'](
-              '第\x20' + _0x20fd25['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(_0x20fd25),
-              _0x505f12,
-              { episodeId: _0x20fd25['id'], clipId: _0x20fd25['clips'][0x0]?.['id'] },
+              '第\x20' + episodeId2['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(episodeId2),
+              value8,
+              { episodeId: episodeId2['id'], clipId: episodeId2['clips'][0x0]?.['id'] },
               {
                 notificationMessage:
-                  '第\x20' + _0x20fd25['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(_0x20fd25),
+                  '第\x20' + episodeId2['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(episodeId2),
               },
             ),
         openAfter &&
-          projectTasks['isCurrent'](_0x505f12) &&
-          (setStoryEpisodeSplitRunning(_0x373e5d, _0x100519['id'], ![]),
-          await presentation['openEpisode'](_0x20fd25['id'], _0x20fd25['clips'][0x0]?.['id'])),
+          projectTasks['isCurrent'](value8) &&
+          (setStoryEpisodeSplitRunning(state, enabled3['id'], ![]),
+          await presentation['openEpisode'](episodeId2['id'], episodeId2['clips'][0x0]?.['id'])),
         !![]
       );
-    } catch (_0x3bb6f0) {
-      if (!projectTasks['isLive'](_0x505f12)) return ![];
+    } catch (error3) {
+      if (!projectTasks['isLive'](value8)) return ![];
       return (
         presentation['showTaskResult'](
-          _0x2e5e63
-            ? resolveStoryEpisodeExperimentalErrorMessage(_0x3bb6f0, {
+          experimental2
+            ? resolveStoryEpisodeExperimentalErrorMessage(error3, {
                 retryActionLabel: explicitExperimental ? '开发测试' : '生成分镜脚本',
               })
-            : _0x3bb6f0?.['message'] || '分集拆分失败。',
+            : error3?.['message'] || '分集拆分失败。',
           'error',
-          _0x3bb6f0,
+          error3,
         ),
         ![]
       );
     } finally {
-      projectTasks['isCurrent'](_0x505f12) &&
-        (setStoryEpisodeSplitRunning(_0x373e5d, _0x100519['id'], ![]), presentation['render']());
+      projectTasks['isCurrent'](value8) &&
+        (setStoryEpisodeSplitRunning(state, enabled3['id'], ![]), presentation['render']());
     }
   }
-  async function _0x3873af({ selectionMode: selectionMode = ![], experimental: experimental = !![] } = {}) {
-    if (getStoryEpisodeBatchControlState(_0x373e5d)['disabled']) return ![];
+  async function run9({ selectionMode: selectionMode = ![], experimental: experimental = !![] } = {}) {
+    if (getStoryEpisodeBatchControlState(state)['disabled']) return ![];
     if (
       (experimental && typeof operations['splitExperimental'] !== 'function') ||
       (!experimental && typeof operations['splitStandard'] !== 'function')
     )
       return (presentation['showToast']('分镜拆分 Agent 尚未初始化。', 'error'), ![]);
-    const _0x47c87f = new Set(
-        (Array['isArray'](_0x373e5d['splittingEpisodeIds']) ? _0x373e5d['splittingEpisodeIds'] : [])
-          ['map']((_0x53890a) => normalizeText(_0x53890a))
+    const map = new Set(
+        (Array['isArray'](state['splittingEpisodeIds']) ? state['splittingEpisodeIds'] : [])
+          ['map']((value9) => normalizeText(value9))
           ['filter'](Boolean),
       ),
-      _0x3e4676 = getStoryEpisodeBatchTargets(
-        _0x373e5d['data']['episodes'],
-        _0x373e5d['selectedEpisodeIds'],
+      total = getStoryEpisodeBatchTargets(
+        state['data']['episodes'],
+        state['selectedEpisodeIds'],
         selectionMode,
-      )['filter']((_0x62417f) => !_0x47c87f['has'](normalizeText(_0x62417f?.['id'])));
-    if (!_0x3e4676['length']) return (presentation['showToast']('请先选择需要拆分的分集。', 'info'), ![]);
-    const _0x1744da = selectionMode ? 'splitting-selected' : 'splitting-all',
-      _0x44d600 = selectionMode ? '正在拆分选中分集' : '正在批量拆分',
-      _0x1a3343 = _0x3e4676['map']((_0x6d5630) => normalizeText(_0x6d5630['id']))['filter'](Boolean);
-    (_0x1a3343['forEach']((_0x50fb8f) => setStoryEpisodeSplitRunning(_0x373e5d, _0x50fb8f, !![])),
-      (_0x373e5d['episodeBatchSplitOperation'] = _0x1744da),
-      (_0x373e5d['episodeBatchSplitStatus'] = _0x44d600 + ' 1/' + _0x3e4676['length']),
-      (_0x373e5d['episodeBatchSplitCancelRequested'] = ![]));
-    const _0x2c6f39 = _0x911fd7(),
-      _0x2f9056 = _0x2c6f39['data'],
-      _0x55f8fc = projectTasks['createTaskBatch']('episode-splits', {
-        operation: _0x1744da,
-        total: _0x3e4676['length'],
+      )['filter']((value10) => !map['has'](normalizeText(value10?.['id'])));
+    if (!total['length']) return (presentation['showToast']('请先选择需要拆分的分集。', 'info'), ![]);
+    const operation = selectionMode ? 'splitting-selected' : 'splitting-all',
+      value11 = selectionMode ? '正在拆分选中分集' : '正在批量拆分',
+      targetEpisodeIds = total['map']((value12) => normalizeText(value12['id']))['filter'](Boolean);
+    (targetEpisodeIds['forEach']((value13) => setStoryEpisodeSplitRunning(state, value13, !![])),
+      (state['episodeBatchSplitOperation'] = operation),
+      (state['episodeBatchSplitStatus'] = value11 + ' 1/' + total['length']),
+      (state['episodeBatchSplitCancelRequested'] = ![]));
+    const projectToken5 = run(),
+      value14 = projectToken5['data'],
+      batchId = projectTasks['createTaskBatch']('episode-splits', {
+        operation: operation,
+        total: total['length'],
         completed: 0x0,
-        targetEpisodeIds: _0x1a3343,
-        pendingEpisodeIds: _0x1a3343,
+        targetEpisodeIds: targetEpisodeIds,
+        pendingEpisodeIds: targetEpisodeIds,
         cancelRequested: ![],
-        label: _0x373e5d['episodeBatchSplitStatus'],
+        label: state['episodeBatchSplitStatus'],
       });
-    ((_0x373e5d['episodeBatchSplitId'] = _0x55f8fc['id']), presentation['render']());
+    ((state['episodeBatchSplitId'] = batchId['id']), presentation['render']());
     try {
-      const _0x255c7e = await runStoryEpisodeSplitBatchQueue({
-        targets: _0x3e4676,
-        batchId: _0x55f8fc['id'],
-        isLive: () => projectTasks['isLive'](_0x2c6f39),
-        isCancellationRequested: _0x15b623['isRequested'],
-        resolveTarget: (_0x4b323b) =>
-          _0x2f9056['episodes']['find'](
-            (_0x2e85f1) => normalizeText(_0x2e85f1?.['id']) === normalizeText(_0x4b323b?.['id']),
+      const pendingTargets = await runStoryEpisodeSplitBatchQueue({
+        targets: total,
+        batchId: batchId['id'],
+        isLive: () => projectTasks['isLive'](projectToken5),
+        isCancellationRequested: isCancellationRequested['isRequested'],
+        resolveTarget: (value15) =>
+          value14['episodes']['find'](
+            (value16) => normalizeText(value16?.['id']) === normalizeText(value15?.['id']),
           ),
-        createMissingTargetError: (_0x17e111) =>
-          new Error('第\x20' + (_0x17e111?.['number'] || '') + ' 集不存在，无法拆分。'),
-        runTarget: (_0x5d09b2) =>
-          _0x43ca56(_0x5d09b2, _0x2c6f39, { batch: _0x55f8fc, experimental: experimental }),
+        createMissingTargetError: (value17) =>
+          new Error('第\x20' + (value17?.['number'] || '') + ' 集不存在，无法拆分。'),
+        runTarget: (value18) => run7(value18, projectToken5, { batch: batchId, experimental: experimental }),
         onTargetSettled: ({
-          target: _0x375105,
-          index: _0x43db2f,
-          completed: _0x2d9bc1,
-          pendingTargets: _0x34359b,
+          target: target2,
+          index: index2,
+          completed: completed,
+          pendingTargets: pendingTargets2,
         }) => {
-          const _0x39ca62 = normalizeText(_0x375105?.['id']),
-            _0x12f437 = _0x44d600 + '\x20' + (_0x43db2f + 0x1) + '/' + _0x3e4676['length'];
-          projectTasks['syncTaskBatch'](_0x2c6f39, _0x55f8fc, {
-            completed: _0x2d9bc1,
-            pendingEpisodeIds: _0x34359b['map']((_0x5c0d5e) => normalizeText(_0x5c0d5e?.['id']))['filter'](
+          const text = normalizeText(target2?.['id']),
+            label = value11 + '\x20' + (index2 + 0x1) + '/' + total['length'];
+          projectTasks['syncTaskBatch'](projectToken5, batchId, {
+            completed: completed,
+            pendingEpisodeIds: pendingTargets2['map']((value19) => normalizeText(value19?.['id']))['filter'](
               Boolean,
             ),
-            label: _0x12f437,
+            label: label,
           });
-          if (projectTasks['isCurrent'](_0x2c6f39)) {
-            if (_0x39ca62) setStoryEpisodeSplitRunning(_0x373e5d, _0x39ca62, ![]);
-            ((_0x373e5d['episodeBatchSplitStatus'] = _0x12f437), presentation['render']());
+          if (projectTasks['isCurrent'](projectToken5)) {
+            if (text) setStoryEpisodeSplitRunning(state, text, ![]);
+            ((state['episodeBatchSplitStatus'] = label), presentation['render']());
           }
           persistence['schedule']();
         },
       });
-      if (_0x255c7e['status'] === 'interrupted') return ![];
+      if (pendingTargets['status'] === 'interrupted') return ![];
       return finalizeStoryEpisodeSplitBatch({
         result: {
-          ..._0x255c7e,
-          pendingTargets: _0x255c7e['pendingTargets']
-            ['map']((_0x4f4c8d) => normalizeText(_0x4f4c8d?.['id']))
+          ...pendingTargets,
+          pendingTargets: pendingTargets['pendingTargets']
+            ['map']((value20) => normalizeText(value20?.['id']))
             ['filter'](Boolean),
         },
-        batch: _0x55f8fc,
-        projectToken: _0x2c6f39,
+        batch: batchId,
+        projectToken: projectToken5,
         experimental: experimental,
         selectionMode: selectionMode,
-        syncBatch: (_0x2c6f42) => projectTasks['syncTaskBatch'](_0x2c6f39, _0x55f8fc, _0x2c6f42),
+        syncBatch: (value21) => projectTasks['syncTaskBatch'](projectToken5, batchId, value21),
         persist: () => persistence['schedule']({ immediate: !![] }),
         showToast: presentation['showToast'],
-        resolveErrorMessage: (_0x1d003d) =>
+        resolveErrorMessage: (error4) =>
           experimental
-            ? resolveStoryEpisodeExperimentalErrorMessage(_0x1d003d, { retryActionLabel: '批量拆分' })
-            : normalizeText(_0x1d003d?.['message']) || '分镜拆分失败。',
-        notifyFailure: (_0xa66a68, _0x237f85) =>
-          presentation['notifyGenerationResult'](_0xa66a68, _0x2c6f39, { step: 0x3 }, _0x237f85),
-        notifySuccess: (_0xb9a2e5, _0xece79b) =>
-          presentation['notifyComplete'](_0xb9a2e5, _0x2c6f39, { step: 0x3 }, _0xece79b),
+            ? resolveStoryEpisodeExperimentalErrorMessage(error4, { retryActionLabel: '批量拆分' })
+            : normalizeText(error4?.['message']) || '分镜拆分失败。',
+        notifyFailure: (value22, value23) =>
+          presentation['notifyGenerationResult'](value22, projectToken5, { step: 0x3 }, value23),
+        notifySuccess: (value24, value25) =>
+          presentation['notifyComplete'](value24, projectToken5, { step: 0x3 }, value25),
       });
     } finally {
-      (_0x15b623['clear'](_0x55f8fc['id']),
-        projectTasks['isCurrent'](_0x2c6f39) &&
-          (_0x1a3343['forEach']((_0x4cf1a8) => setStoryEpisodeSplitRunning(_0x373e5d, _0x4cf1a8, ![])),
-          resetStoryEpisodeSplitBatchState(_0x373e5d),
+      (isCancellationRequested['clear'](batchId['id']),
+        projectTasks['isCurrent'](projectToken5) &&
+          (targetEpisodeIds['forEach']((value26) => setStoryEpisodeSplitRunning(state, value26, ![])),
+          resetStoryEpisodeSplitBatchState(state),
           presentation['render']()));
     }
   }
-  function _0x86de70() {
-    const _0x320506 = _0x911fd7();
+  function cancelBatch() {
+    const value27 = run();
     return cancelStoryEpisodeSplitBatch({
-      state: _0x373e5d,
-      tasks: getStoryBackgroundTasks(_0x373e5d['data']),
+      state: state,
+      tasks: getStoryBackgroundTasks(state['data']),
       isTaskActive: isStoryBackgroundTaskActive,
-      requestCancellation: _0x15b623['request'],
-      updateBatch: (_0xd10a89, _0x3a4121) =>
-        projectTasks['updateBackgroundTaskBatch'](_0x320506, _0xd10a89, _0x3a4121),
-      setEpisodeRunning: (_0x2b94ce, _0x479ac8) =>
-        setStoryEpisodeSplitRunning(_0x373e5d, _0x2b94ce, _0x479ac8),
+      requestCancellation: isCancellationRequested['request'],
+      updateBatch: (value28, value29) => projectTasks['updateBackgroundTaskBatch'](value27, value28, value29),
+      setEpisodeRunning: (value30, value31) => setStoryEpisodeSplitRunning(state, value30, value31),
       showToast: presentation['showToast'],
       render: presentation['render'],
     });
   }
   return Object['freeze']({
-    cancelBatch: _0x86de70,
-    recoverDraft: _0xf46fd1,
+    cancelBatch: cancelBatch,
+    recoverDraft: recoverDraft,
     splitBatch: ({ selectionMode: selectionMode = ![] } = {}) =>
-      _0x3873af({
+      run9({
         selectionMode: selectionMode,
-        experimental: shouldUseStoryEpisodeExperimentalSplit(_0x373e5d),
+        experimental: shouldUseStoryEpisodeExperimentalSplit(state),
       }),
-    splitEpisode: (_0x54952a, _0x3d2bcb = {}) => _0x1fece1(_0x54952a, _0x3d2bcb),
-    splitEpisodeExperimental: (_0x1ff7d6) => _0x1fece1(_0x1ff7d6, { explicitExperimental: !![] }),
+    splitEpisode: (value32, value33 = {}) => run8(value32, value33),
+    splitEpisodeExperimental: (value34) => run8(value34, { explicitExperimental: !![] }),
   });
 }

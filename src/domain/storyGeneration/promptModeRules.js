@@ -6,8 +6,8 @@ import {
   isStoryWan30PromptMode,
   normalizeStoryPromptMode,
 } from './promptModes.js';
-export function getStoryEpisodeClipGroupingRequirements(_0x1ae314 = '') {
-  if (normalizeStoryPromptMode(_0x1ae314, { allowDeveloperModes: !![] }) !== 'seedance-2.0') return [];
+export function getStoryEpisodeClipGroupingRequirements(value = '') {
+  if (normalizeStoryPromptMode(value, { allowDeveloperModes: !![] }) !== 'seedance-2.0') return [];
   return [
     'Seedance 2.0 的 15 秒是单片上限，不是目标时长；用户设置更短上限时遵从该上限。连续剧情、同一轮对白和对应动作或反应组织在同一个 clip 内，换说话人、换景别或切镜头只增加 shot，不单独新建 clip。仅在继续内容会超过上限，或确有换场、时间跳跃、独立叙事阶段时拆段；自然结束的短片段保留，不拉长表演、不补空镜、不增删台词凑秒数。',
   ];
@@ -38,8 +38,8 @@ const STORY_EPISODE_SEEDANCE_2_5_TIMELINE_GUIDANCE =
     '围绕一个明确的核心故事与关系张力组织分镜；首镜\x20visual\x20必须用简体中文落实项目\x20visualStyle，并写清初始构图，所有\x20visual\x20必须用简体中文写清主体位置、环境与光线、可见动作和状态变化，camera\x20必须用自然、具体的简体中文写清景别、机位、运镜类型、幅度、速度和最终落点。audio\x20只写当前镜头可听见的环境声、物理动作声、非语言人声或用户明确要求的配乐事件本身，不要添加任何字段内前缀；客户端会将非配乐声音统一写为“画面内音效：…”，与\x20dialogue\x20和\x20voiceover\x20明确分离。多镜头只在叙事需要新信息时使用，避免在一个\x205\x20至\x206\x20秒动作内堆叠过度复杂的运镜；在不改变原剧情、不新增事件的前提下，提供足够具体的中文视听细节，不要自动补写输入不存在的对白、旁白、声音或配乐。',
   STORY_EPISODE_MINIMAX_H3_LANGUAGE_GUIDANCE =
     '为满足\x20MiniMax\x20官方\x20h3-prompt-writing\x20输出结构，当前模式的\x20creativeIntent、transition、transitionFromPrevious、visual、camera、dialogue、voiceover\x20与\x20audio\x20必须使用自然、具体的简体中文，并保留唯一说话人姓名；不得输出或保留英文对白、画外音、歌词、画面文字或英文叙述。客户端会把有参考素材的\x20clip\x20组装为\x20subject_definitions、summary、retention_analysis、detailed_description、overall_soundscape、non_diegetic_music\x20六段式\x20Ref2VA\x20提示词；无参考素材时组装为\x20T2VA\x20三段式提示词。除字段名、<Subject\x20N>\x20等引用标签、[Shot\x20N]\x20At\x20MM:SS.mmm、[reference\x20generation]、fully_preserved、<d>[Chinese]\x20等官方结构标签外，所有提示词正文只能使用简体中文。';
-export function getStoryEpisodePromptModePlanningRequirements(_0x568e62 = '') {
-  if (isStorySeedance25PromptMode(_0x568e62))
+export function getStoryEpisodePromptModePlanningRequirements(item = '') {
+  if (isStorySeedance25PromptMode(item))
     return [
       STORY_EPISODE_SEEDANCE_2_5_TIMELINE_GUIDANCE,
       STORY_EPISODE_SEEDANCE_2_5_REFERENCE_GUIDANCE,
@@ -47,14 +47,14 @@ export function getStoryEpisodePromptModePlanningRequirements(_0x568e62 = '') {
       STORY_EPISODE_SEEDANCE_2_5_POSITION_HANDOFF_GUIDANCE,
       STORY_EPISODE_SEEDANCE_2_5_PERFORMANCE_GUIDANCE,
     ];
-  if (isStoryWan30PromptMode(_0x568e62))
+  if (isStoryWan30PromptMode(item))
     return [
       STORY_EPISODE_OPENING_POSITION_GUIDANCE,
       STORY_EPISODE_WAN_3_0_TIMELINE_GUIDANCE,
       STORY_EPISODE_WAN_3_0_REFERENCE_GUIDANCE,
       STORY_EPISODE_WAN_3_0_AUDIO_GUIDANCE,
     ];
-  if (isStoryMinimaxH3PromptMode(_0x568e62))
+  if (isStoryMinimaxH3PromptMode(item))
     return [
       STORY_EPISODE_OPENING_POSITION_GUIDANCE,
       STORY_EPISODE_MINIMAX_H3_DURATION_GUIDANCE,
@@ -62,36 +62,38 @@ export function getStoryEpisodePromptModePlanningRequirements(_0x568e62 = '') {
       STORY_EPISODE_MINIMAX_H3_DIRECTING_GUIDANCE,
       STORY_EPISODE_MINIMAX_H3_LANGUAGE_GUIDANCE,
     ];
-  return [STORY_EPISODE_OPENING_POSITION_GUIDANCE, ...getStoryEpisodeClipGroupingRequirements(_0x568e62)];
+  return [STORY_EPISODE_OPENING_POSITION_GUIDANCE, ...getStoryEpisodeClipGroupingRequirements(item)];
 }
-export function isStoryEpisodeTimelineGuidance(_0x29e2ce = '') {
+export function isStoryEpisodeTimelineGuidance(key = '') {
   return [STORY_EPISODE_SEEDANCE_2_5_TIMELINE_GUIDANCE, STORY_EPISODE_WAN_3_0_TIMELINE_GUIDANCE]['includes'](
-    _0x29e2ce,
+    key,
   );
 }
 export function appendStoryEpisodePromptModeSystemPrompt(
-  _0x30e549 = '',
-  _0x216e7f = '',
+  index = '',
+  result = '',
   { announceTimelineContract: announceTimelineContract = ![] } = {},
 ) {
-  const _0x1bdaa6 = getStoryEpisodePromptModePlanningRequirements(_0x216e7f);
-  if (!_0x1bdaa6['length']) return _0x30e549;
-  const _0x20d259 = isStoryWan30PromptMode(_0x216e7f)
+  const list = getStoryEpisodePromptModePlanningRequirements(result);
+  if (!list['length']) return index;
+  const isStoryWan30PromptMode2 = isStoryWan30PromptMode(result)
       ? 'Wan\x203.0'
-      : isStoryMinimaxH3PromptMode(_0x216e7f)
+      : isStoryMinimaxH3PromptMode(result)
         ? 'MiniMax\x20H3'
         : 'Seedance 2.5',
-    _0x132df3 = isStoryContinuousTimelinePromptMode(_0x216e7f);
+    isStoryContinuousTimelinePromptMode2 = isStoryContinuousTimelinePromptMode(result);
   return [
-    _0x30e549,
-    announceTimelineContract && _0x132df3
-      ? '当前为\x20' + _0x20d259 + ' 提示词模式，以下时间轴契约覆盖上方通用 JSON 示例中的字段限制。'
+    index,
+    announceTimelineContract && isStoryContinuousTimelinePromptMode2
+      ? '当前为\x20' +
+        isStoryWan30PromptMode2 +
+        ' 提示词模式，以下时间轴契约覆盖上方通用 JSON 示例中的字段限制。'
       : '',
-    ..._0x1bdaa6,
+    ...list,
     VIDEO_REPLICATION_AUDIO_LANGUAGE_SYSTEM_RULE,
-    announceTimelineContract && _0x132df3
+    announceTimelineContract && isStoryContinuousTimelinePromptMode2
       ? '每个 shot 除通用字段外必须返回 startSec 与 endSec；只返回用户消息指定的 ' +
-        _0x20d259 +
+        isStoryWan30PromptMode2 +
         '\x20JSON\x20结构。'
       : '',
   ]
@@ -99,26 +101,26 @@ export function appendStoryEpisodePromptModeSystemPrompt(
     ['join']('\x0a');
 }
 export const getStoryEpisodeTimelinePlanningRequirements = getStoryEpisodePromptModePlanningRequirements;
-export function resolveStoryPromptModeClipMaxSeconds(_0x5b77f2 = '', _0x310d3d = 0xf) {
-  return isStoryMinimaxH3PromptMode(_0x5b77f2) ? 0xf : _0x310d3d;
+export function resolveStoryPromptModeClipMaxSeconds(data = '', options = 0xf) {
+  return isStoryMinimaxH3PromptMode(data) ? 0xf : options;
 }
 export function getStorySpatialContinuityPromptLines({ sourceEvidence: sourceEvidence = ![] } = {}) {
-  const _0x4c638f = sourceEvidence ? '原片场景' : '场景参考图',
-    _0x45f22e = sourceEvidence ? '原片人物形象' : '已选参考形象';
+  const target = sourceEvidence ? '原片场景' : '场景参考图',
+    source = sourceEvidence ? '原片人物形象' : '已选参考形象';
   return [
     '场景空间连续性参考锚点：同一连续时空内，除非剧情通过可见事件明确改变，' +
-      _0x4c638f +
+      target +
       '中的建筑、家具、出入口、固定地标和光线方向的相对关系保持连续；镜头变化只改变观察方式，不得整体镜像或重排世界空间布局。',
     '人物空间连续性：人物站位优先用场景固定地标或主体相对关系描述，画面左/右只作当前机位补充；位置、朝向、视线与动作方向、左右手持物和动作落点按时间轴连续变化，换位或持物变化必须通过可观察动作完成，不得瞬移或无动作位置重置；不得在无人移动时对调人物相对场景地标的世界位置，仅由机位变化产生的屏幕左右变化不算换位。除非剧情通过可见事件明确改变，人物面部、发型和服装沿用' +
-      _0x45f22e +
+      source +
       '。',
   ];
 }
 export function getStoryClipPromptModeRewriteRequirements(
-  _0x33b8a2 = '',
+  next = '',
   { hasAssetRefs: hasAssetRefs = ![] } = {},
 ) {
-  if (isStoryMinimaxH3PromptMode(_0x33b8a2))
+  if (isStoryMinimaxH3PromptMode(next))
     return hasAssetRefs
       ? [
           '目标为 MiniMax H3 Ref2VA 提示词。严格按 subject_definitions、summary、retention_analysis、detailed_description、overall_soundscape、non_diegetic_music 六段及该顺序输出。',
@@ -131,13 +133,13 @@ export function getStoryClipPromptModeRewriteRequirements(
           '三段正文直接输出简体中文，仅字段名和官方结构标签保留英文；返回\x20candidateText\x20前自行检查，并把草稿中的英文叙述、对白、歌词或画面文字改写为中文。对白写成\x20<d>[Chinese]\x20中文原文</d>，说话人使用全片稳定的\x20(S1)、(S2)。',
           'integrated_multimodal_description 第一镜写 [Shot 1] 且不带时间；后续镜头写 [Shot N] At MM:SS.mmm。非对白、非画外音的镜内声音统一写为“画面内音效：…”。不得输出其他声音字段前缀或 ⏱ 时长标签。',
         ];
-  if (isStoryWan30PromptMode(_0x33b8a2))
+  if (isStoryWan30PromptMode(next))
     return [
       '目标为 Wan 3.0 多模态提示词。开头只绑定一次每个锁定的 @素材引用；后续镜头使用普通角色、场景和道具名称，不重复绑定素材。',
       '镜头严格使用“镜头1 [0-3秒]：……”格式；首镜从 0 秒开始，后镜起点等于前镜终点，时间连续、无空档、无重叠，最后终点等于 candidateDurationSeconds。不得输出 ⏱ 标签。',
       '使用中文描述可见动作、表情、运镜、对白与原生声音；多人对白使用唯一角色名，不使用他或她替代说话人。',
     ];
-  if (isStorySeedance25PromptMode(_0x33b8a2))
+  if (isStorySeedance25PromptMode(next))
     return [
       '目标为 Seedance 2.5 连续时间轴提示词。开头只绑定一次每个已选定的 @素材引用；后续镜头使用普通角色、场景和道具名称，不重复绑定素材。',
       '镜头严格使用“0-3秒：……”格式；首镜从 0 秒开始，后镜起点等于前镜终点，时间连续、无空档、无重叠，最后终点等于 candidateDurationSeconds。不得输出分镜 ⏱ 时长标签。',

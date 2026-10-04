@@ -25,14 +25,14 @@ const MIGRATION_POLL_INTERVAL_MS = 0x15e,
     '迁移失败；旧目录仍保留，请核对当前保存路径': 'migration.failedStage',
     迁移完成: 'migration.done',
   });
-function fileSaveText(_0x51aec3, _0x9409d1 = {}) {
-  return t('settings.fileSave.' + _0x51aec3, _0x9409d1);
+function fileSaveText(value, item = {}) {
+  return t('settings.fileSave.' + value, item);
 }
-function errorMessage(_0x522af8) {
-  return _0x522af8?.message || fileSaveText('runtime.unknownError');
+function errorMessage(error) {
+  return error?.message || fileSaveText('runtime.unknownError');
 }
-function getInput(_0x30e47d) {
-  return document.getElementById(FIELD_IDS[_0x30e47d]);
+function getInput(index) {
+  return document.getElementById(FIELD_IDS[index]);
 }
 function getRootInput() {
   return document.getElementById(ROOT_FIELD_ID);
@@ -40,189 +40,189 @@ function getRootInput() {
 function getRootPickButton() {
   return document.getElementById(ROOT_BUTTON_ID);
 }
-function normalizeText(_0x207738) {
-  return String(_0x207738 || '').trim();
+function normalizeText(data) {
+  return String(data || '').trim();
 }
-function translateMigrationStage(_0x45679c) {
-  const _0x160179 = normalizeText(_0x45679c);
-  if (!_0x160179) return '';
-  const _0x28fb5a = MIGRATION_STAGE_I18N_KEYS[_0x160179];
-  return _0x28fb5a ? fileSaveText(_0x28fb5a) : _0x160179;
+function translateMigrationStage(options) {
+  const text = normalizeText(options);
+  if (!text) return '';
+  const target = MIGRATION_STAGE_I18N_KEYS[text];
+  return target ? fileSaveText(target) : text;
 }
-function trimTrailingPathSeparators(_0x1e5eee) {
-  const _0x29398b = normalizeText(_0x1e5eee);
-  if (/^[a-zA-Z]:[\\/]*$/.test(_0x29398b)) return _0x29398b.slice(0, 2) + '\\';
-  if (_0x29398b === '/' || _0x29398b === '\\') return _0x29398b;
-  return _0x29398b.replace(/[\\/]+$/g, '');
+function trimTrailingPathSeparators(source) {
+  const list = normalizeText(source);
+  if (/^[a-zA-Z]:[\\/]*$/.test(list)) return list.slice(0, 2) + '\\';
+  if (list === '/' || list === '\\') return list;
+  return list.replace(/[\\/]+$/g, '');
 }
-function getPathSeparator(_0x35d6ea) {
-  const _0x3e01fb = normalizeText(_0x35d6ea);
-  return _0x3e01fb.includes('\\') && !_0x3e01fb.includes('/') ? '\\' : '/';
+function getPathSeparator(next) {
+  const list2 = normalizeText(next);
+  return list2.includes('\\') && !list2.includes('/') ? '\\' : '/';
 }
-function joinPath(_0x370908, _0x2e828d) {
-  const _0x2d5a42 = trimTrailingPathSeparators(_0x370908);
-  if (!_0x2d5a42) return '';
-  if (_0x2d5a42 === '/' || _0x2d5a42 === '\\') return '' + _0x2d5a42 + _0x2e828d;
-  if (/^[a-zA-Z]:\\$/.test(_0x2d5a42)) return '' + _0x2d5a42 + _0x2e828d;
-  return '' + _0x2d5a42 + getPathSeparator(_0x2d5a42) + _0x2e828d;
+function joinPath(entry, record) {
+  const trimTrailingPathSeparators2 = trimTrailingPathSeparators(entry);
+  if (!trimTrailingPathSeparators2) return '';
+  if (trimTrailingPathSeparators2 === '/' || trimTrailingPathSeparators2 === '\\')
+    return '' + trimTrailingPathSeparators2 + record;
+  if (/^[a-zA-Z]:\\$/.test(trimTrailingPathSeparators2)) return '' + trimTrailingPathSeparators2 + record;
+  return '' + trimTrailingPathSeparators2 + getPathSeparator(trimTrailingPathSeparators2) + record;
 }
-function pathKey(_0x311756) {
-  return trimTrailingPathSeparators(_0x311756).replace(/\\/g, '/').toLowerCase();
+function pathKey(payload) {
+  return trimTrailingPathSeparators(payload).replace(/\\/g, '/').toLowerCase();
 }
-function pathBasename(_0x994593) {
-  const _0x2c9518 = trimTrailingPathSeparators(_0x994593).replace(/\\/g, '/'),
-    _0x541536 = _0x2c9518.split('/').filter(Boolean);
-  return _0x541536.at(-1) || '';
+function pathBasename(handle) {
+  const trimTrailingPathSeparators3 = trimTrailingPathSeparators(handle).replace(/\\/g, '/'),
+    state = trimTrailingPathSeparators3.split('/').filter(Boolean);
+  return state.at(-1) || '';
 }
-function normalizeParentPath(_0x14412a) {
-  const _0x18a4a6 = trimTrailingPathSeparators(_0x14412a),
-    _0x596506 = _0x18a4a6.match(/^(.*)[\\/][^\\/]+$/);
-  if (!_0x596506) return '';
-  const _0x1d928b = trimTrailingPathSeparators(_0x596506[1]);
-  return /^[a-zA-Z]:$/.test(_0x1d928b) ? _0x1d928b + '\\' : _0x1d928b;
+function normalizeParentPath(config) {
+  const trimTrailingPathSeparators4 = trimTrailingPathSeparators(config),
+    enabled = trimTrailingPathSeparators4.match(/^(.*)[\\/][^\\/]+$/);
+  if (!enabled) return '';
+  const trimTrailingPathSeparators5 = trimTrailingPathSeparators(enabled[1]);
+  return /^[a-zA-Z]:$/.test(trimTrailingPathSeparators5)
+    ? trimTrailingPathSeparators5 + '\\'
+    : trimTrailingPathSeparators5;
 }
-function buildManagedPaths(_0xa4747c) {
-  const _0x65243a = trimTrailingPathSeparators(_0xa4747c);
+function buildManagedPaths(scope) {
+  const trimTrailingPathSeparators6 = trimTrailingPathSeparators(scope);
   return {
-    canvasDir: joinPath(_0x65243a, MANAGED_DIR_NAMES.canvasDir),
-    dataDir: joinPath(_0x65243a, MANAGED_DIR_NAMES.dataDir),
-    outputDir: joinPath(_0x65243a, MANAGED_DIR_NAMES.outputDir),
+    canvasDir: joinPath(trimTrailingPathSeparators6, MANAGED_DIR_NAMES.canvasDir),
+    dataDir: joinPath(trimTrailingPathSeparators6, MANAGED_DIR_NAMES.dataDir),
+    outputDir: joinPath(trimTrailingPathSeparators6, MANAGED_DIR_NAMES.outputDir),
   };
 }
-function inferManagedRoot(_0xf3e96f) {
-  const _0x2107c5 = normalizeFileSavePaths(_0xf3e96f),
-    _0x2df11f = [];
-  for (const [_0x2083db, _0x564292] of Object.entries(MANAGED_DIR_NAMES)) {
-    const _0x2e9916 = normalizeText(_0x2107c5?.[_0x2083db]);
-    if (!_0x2e9916 || pathBasename(_0x2e9916).toLowerCase() !== _0x564292.toLowerCase()) return '';
-    _0x2df11f.push(normalizeParentPath(_0x2e9916));
+function inferManagedRoot(input) {
+  const fileSavePaths = normalizeFileSavePaths(input),
+    list3 = [];
+  for (const [output, value2] of Object.entries(MANAGED_DIR_NAMES)) {
+    const text2 = normalizeText(fileSavePaths?.[output]);
+    if (!text2 || pathBasename(text2).toLowerCase() !== value2.toLowerCase()) return '';
+    list3.push(normalizeParentPath(text2));
   }
-  const [_0x42739e] = _0x2df11f;
-  if (!_0x42739e) return '';
-  return _0x2df11f.every((_0x3a167d) => pathKey(_0x3a167d) === pathKey(_0x42739e)) ? _0x42739e : '';
+  const [enabled2] = list3;
+  if (!enabled2) return '';
+  return list3.every((item2) => pathKey(item2) === pathKey(enabled2)) ? enabled2 : '';
 }
-function inferDataDirFromTempDir(_0x3f7f1f) {
-  const _0x192125 = normalizeText(_0x3f7f1f).replace(/\\/g, '/');
-  if (!_0x192125) return '';
-  return /\/uploads\/?$/i.test(_0x192125) ? _0x192125.replace(/\/uploads\/?$/i, '') : _0x192125;
+function inferDataDirFromTempDir(value3) {
+  const text3 = normalizeText(value3).replace(/\\/g, '/');
+  if (!text3) return '';
+  return /\/uploads\/?$/i.test(text3) ? text3.replace(/\/uploads\/?$/i, '') : text3;
 }
-function normalizeFileSavePaths(_0x20f79c) {
+function normalizeFileSavePaths(value4) {
   return {
-    ...(_0x20f79c || {}),
-    dataDir: normalizeText(_0x20f79c?.dataDir) || inferDataDirFromTempDir(_0x20f79c?.tempDir),
+    ...(value4 || {}),
+    dataDir: normalizeText(value4?.dataDir) || inferDataDirFromTempDir(value4?.tempDir),
   };
 }
-function applyPathsToInputs(_0x316947) {
-  const _0x536254 = normalizeFileSavePaths(_0x316947),
-    _0x278abd = getRootInput();
-  if (_0x278abd) _0x278abd.value = inferManagedRoot(_0x536254);
-  for (const _0x19e126 of Object.keys(FIELD_IDS)) {
-    const _0x50e17b = getInput(_0x19e126);
-    if (_0x50e17b) _0x50e17b.value = normalizeText(_0x536254?.[_0x19e126]);
+function applyPathsToInputs(value5) {
+  const fileSavePaths2 = normalizeFileSavePaths(value5),
+    el = getRootInput();
+  if (el) el.value = inferManagedRoot(fileSavePaths2);
+  for (const value6 of Object.keys(FIELD_IDS)) {
+    const el2 = getInput(value6);
+    if (el2) el2.value = normalizeText(fileSavePaths2?.[value6]);
   }
 }
-function setInputsDisabled(_0x512053) {
-  const _0x116923 = getRootInput(),
-    _0x34b00e = getRootPickButton();
-  if (_0x116923) _0x116923.disabled = !!_0x512053;
-  if (_0x34b00e) _0x34b00e.disabled = !!_0x512053;
-  for (const _0x172216 of Object.keys(FIELD_IDS)) {
-    const _0x2912dc = getInput(_0x172216);
-    if (_0x2912dc) _0x2912dc.disabled = !!_0x512053;
+function setInputsDisabled(enabled3) {
+  const el3 = getRootInput(),
+    el4 = getRootPickButton();
+  if (el3) el3.disabled = !!enabled3;
+  if (el4) el4.disabled = !!enabled3;
+  for (const value7 of Object.keys(FIELD_IDS)) {
+    const el5 = getInput(value7);
+    if (el5) el5.disabled = !!enabled3;
   }
 }
 function readPathsFromInputs() {
-  const _0x475c69 = normalizeText(getRootInput()?.value);
-  if (_0x475c69) return buildManagedPaths(_0x475c69);
+  const text4 = normalizeText(getRootInput()?.value);
+  if (text4) return buildManagedPaths(text4);
   return {
     canvasDir: normalizeText(getInput('canvasDir')?.value),
     dataDir: normalizeText(getInput('dataDir')?.value),
     outputDir: normalizeText(getInput('outputDir')?.value),
   };
 }
-function validateRequired(_0x49d558) {
+function validateRequired(enabled4) {
   if (
     !normalizeText(getRootInput()?.value) &&
-    !_0x49d558.canvasDir &&
-    !_0x49d558.dataDir &&
-    !_0x49d558.outputDir
+    !enabled4.canvasDir &&
+    !enabled4.dataDir &&
+    !enabled4.outputDir
   )
     return fileSaveText('validation.chooseRoot');
-  if (!_0x49d558.canvasDir) return fileSaveText('validation.projectPath');
-  if (!_0x49d558.dataDir) return fileSaveText('validation.dataPath');
-  if (!_0x49d558.outputDir) return fileSaveText('validation.outputPath');
+  if (!enabled4.canvasDir) return fileSaveText('validation.projectPath');
+  if (!enabled4.dataDir) return fileSaveText('validation.dataPath');
+  if (!enabled4.outputDir) return fileSaveText('validation.outputPath');
   return '';
 }
-function setSaving(_0x48b8eb, _0x2123cc) {
-  if (!_0x48b8eb) return;
-  ((_0x48b8eb.disabled = !!_0x2123cc),
-    (_0x48b8eb.textContent = _0x2123cc ? fileSaveText('runtime.saving') : fileSaveText('save')));
+function setSaving(el6, enabled5) {
+  if (!el6) return;
+  ((el6.disabled = !!enabled5),
+    (el6.textContent = enabled5 ? fileSaveText('runtime.saving') : fileSaveText('save')));
 }
 function getDirectoryPicker() {
   return globalThis.window?.electronAPI?.selectDirectory;
 }
-function readSelectedDirectory(_0x31f057) {
-  if (!_0x31f057 || _0x31f057.canceled) return '';
-  if (_0x31f057.success === false) return '';
-  return normalizeText(_0x31f057.path || _0x31f057.filePath || _0x31f057.filePaths?.[0]);
+function readSelectedDirectory(response) {
+  if (!response || response.canceled) return '';
+  if (response.success === false) return '';
+  return normalizeText(response.path || response.filePath || response.filePaths?.[0]);
 }
-function getPickButtonLabel(_0x44baf0) {
+function getPickButtonLabel(el7) {
   return normalizeText(
-    _0x44baf0?.querySelector?.('span')?.textContent ||
-      _0x44baf0?.textContent ||
-      fileSaveText('runtime.choose'),
+    el7?.querySelector?.('span')?.textContent || el7?.textContent || fileSaveText('runtime.choose'),
   );
 }
-function setPickButtonLabel(_0x572333, _0x26c956) {
-  const _0x2d8566 = _0x572333?.querySelector?.('span');
-  if (_0x2d8566) _0x2d8566.textContent = _0x26c956;
-  else _0x572333 && (_0x572333.textContent = _0x26c956);
+function setPickButtonLabel(el8, value8) {
+  const el9 = el8?.querySelector?.('span');
+  if (el9) el9.textContent = value8;
+  else el8 && (el8.textContent = value8);
 }
 function syncDerivedInputsFromRoot() {
-  const _0x590dd2 = normalizeText(getRootInput()?.value);
-  if (!_0x590dd2) return;
-  applyPathsToInputs(buildManagedPaths(_0x590dd2));
+  const text5 = normalizeText(getRootInput()?.value);
+  if (!text5) return;
+  applyPathsToInputs(buildManagedPaths(text5));
 }
 async function pickRootDirectory() {
-  const _0x13699e = getRootInput(),
-    _0x2856a6 = getDirectoryPicker();
-  if (!_0x13699e || typeof _0x2856a6 !== 'function') {
+  const el10 = getRootInput(),
+    handler = getDirectoryPicker();
+  if (!el10 || typeof handler !== 'function') {
     showError(fileSaveText('runtime.pickerUnsupported'));
     return;
   }
-  const _0xfdf399 = getRootPickButton(),
-    _0x54f641 = getPickButtonLabel(_0xfdf399);
-  _0xfdf399 && ((_0xfdf399.disabled = true), setPickButtonLabel(_0xfdf399, fileSaveText('runtime.choosing')));
+  const el11 = getRootPickButton(),
+    pickButtonLabel = getPickButtonLabel(el11);
+  el11 && ((el11.disabled = true), setPickButtonLabel(el11, fileSaveText('runtime.choosing')));
   try {
-    const _0x118a1a = await _0x2856a6({
+    const value9 = await handler({
         title: fileSaveText('runtime.pickTitle'),
-        defaultPath: normalizeText(_0x13699e.value),
+        defaultPath: normalizeText(el10.value),
       }),
-      _0x15050b = readSelectedDirectory(_0x118a1a);
-    _0x15050b && ((_0x13699e.value = _0x15050b), syncDerivedInputsFromRoot(), _0x13699e.focus?.());
-  } catch (_0x5cc66e) {
-    (console.error('[Settings] 选择保存目录失败:', _0x5cc66e),
-      showError(fileSaveText('runtime.pickFailed', { error: errorMessage(_0x5cc66e) })));
+      selectedDirectory = readSelectedDirectory(value9);
+    selectedDirectory && ((el10.value = selectedDirectory), syncDerivedInputsFromRoot(), el10.focus?.());
+  } catch (value10) {
+    (console.error('[Settings] 选择保存目录失败:', value10),
+      showError(fileSaveText('runtime.pickFailed', { error: errorMessage(value10) })));
   } finally {
-    _0xfdf399 && ((_0xfdf399.disabled = false), setPickButtonLabel(_0xfdf399, _0x54f641));
+    el11 && ((el11.disabled = false), setPickButtonLabel(el11, pickButtonLabel));
   }
 }
 function bindDirectoryPickers() {
-  const _0x3ebceb = getRootInput();
-  _0x3ebceb &&
-    !_0x3ebceb.__fileSaveRootInputBound &&
-    ((_0x3ebceb.__fileSaveRootInputBound = true),
-    _0x3ebceb.addEventListener('input', syncDerivedInputsFromRoot));
-  const _0x4d8278 = getRootPickButton();
-  _0x4d8278 &&
-    !_0x4d8278.__fileSaveDirectoryPickerBound &&
-    ((_0x4d8278.__fileSaveDirectoryPickerBound = true),
-    _0x4d8278.addEventListener('click', () => {
+  const el12 = getRootInput();
+  el12 &&
+    !el12.__fileSaveRootInputBound &&
+    ((el12.__fileSaveRootInputBound = true), el12.addEventListener('input', syncDerivedInputsFromRoot));
+  const el13 = getRootPickButton();
+  el13 &&
+    !el13.__fileSaveDirectoryPickerBound &&
+    ((el13.__fileSaveDirectoryPickerBound = true),
+    el13.addEventListener('click', () => {
       void pickRootDirectory();
     }));
 }
-function sleep(_0x13c640) {
-  return new Promise((_0x3a9bd9) => setTimeout(_0x3a9bd9, _0x13c640));
+function sleep(value11) {
+  return new Promise((value12) => setTimeout(value12, value11));
 }
 function getMigrationElements() {
   return {
@@ -238,86 +238,91 @@ function getMigrationElements() {
     errors: document.getElementById('fileSaveMigrationErrors'),
   };
 }
-function clampPercent(_0x4d76f7) {
-  const _0x1d1f72 = Number(_0x4d76f7);
-  if (!Number.isFinite(_0x1d1f72)) return 0;
-  return Math.max(0, Math.min(100, Math.round(_0x1d1f72)));
+function clampPercent(value13) {
+  const value14 = Number(value13);
+  if (!Number.isFinite(value14)) return 0;
+  return Math.max(0, Math.min(100, Math.round(value14)));
 }
-function renderMigrationErrors(_0x94b24b, _0x546640) {
-  if (!_0x94b24b) return;
-  const _0x326028 = Array.isArray(_0x546640) ? _0x546640 : [];
-  (_0x94b24b.replaceChildren(), (_0x94b24b.hidden = _0x326028.length === 0));
-  for (const _0x5a6965 of _0x326028.slice(0, 20)) {
-    const _0xb1b189 = document.createElement('div');
-    _0xb1b189.className = 'settings-file-migration-error';
-    const _0x21a73c = normalizeText(_0x5a6965?.path || _0x5a6965?.localPath || ''),
-      _0x344c67 = normalizeText(_0x5a6965?.error || fileSaveText('migration.itemFailed'));
-    ((_0xb1b189.textContent = _0x21a73c ? _0x21a73c + ' · ' + _0x344c67 : _0x344c67),
-      _0x94b24b.appendChild(_0xb1b189));
+function renderMigrationErrors(el14, value15) {
+  if (!el14) return;
+  const list4 = Array.isArray(value15) ? value15 : [];
+  (el14.replaceChildren(), (el14.hidden = list4.length === 0));
+  for (const value16 of list4.slice(0, 20)) {
+    const el15 = document.createElement('div');
+    el15.className = 'settings-file-migration-error';
+    const text6 = normalizeText(value16?.path || value16?.localPath || ''),
+      text7 = normalizeText(value16?.error || fileSaveText('migration.itemFailed'));
+    ((el15.textContent = text6 ? text6 + ' · ' + text7 : text7), el14.appendChild(el15));
   }
 }
-function renderMigrationStatus(_0x5374ae) {
-  const _0x29afbd = getMigrationElements();
-  if (!_0x29afbd.card) return;
-  _0x29afbd.card.hidden = false;
-  const _0x8b5b92 = clampPercent(_0x5374ae?.progress);
-  if (_0x29afbd.percent) _0x29afbd.percent.textContent = _0x8b5b92 + '%';
-  if (_0x29afbd.bar) _0x29afbd.bar.style.width = _0x8b5b92 + '%';
-  _0x29afbd.stage &&
-    (_0x29afbd.stage.textContent =
-      translateMigrationStage(_0x5374ae?.stage) || fileSaveText('migration.migrating'));
-  const _0x2c6558 = Number(_0x5374ae?.processedFiles || 0),
-    _0x2d1ab2 = Number(_0x5374ae?.totalFiles || 0);
-  _0x29afbd.processed && (_0x29afbd.processed.textContent = _0x2c6558 + ' / ' + (_0x2d1ab2 || _0x2c6558));
-  if (_0x29afbd.copied) _0x29afbd.copied.textContent = String(Number(_0x5374ae?.copiedCount || 0));
-  if (_0x29afbd.skipped) _0x29afbd.skipped.textContent = String(Number(_0x5374ae?.skippedCount || 0));
-  if (_0x29afbd.failed) _0x29afbd.failed.textContent = String(Number(_0x5374ae?.failedCount || 0));
-  const _0x59410d = normalizeText(_0x5374ae?.currentFile);
-  (_0x29afbd.current &&
-    ((_0x29afbd.current.textContent = _0x59410d
-      ? fileSaveText('migration.current', { file: _0x59410d })
-      : ''),
-    (_0x29afbd.current.title = _0x59410d)),
-    renderMigrationErrors(_0x29afbd.errors, _0x5374ae?.errors));
+function renderMigrationStatus(value17) {
+  const migrationElements = getMigrationElements();
+  if (!migrationElements.card) return;
+  migrationElements.card.hidden = false;
+  const clampPercent2 = clampPercent(value17?.progress);
+  if (migrationElements.percent) migrationElements.percent.textContent = clampPercent2 + '%';
+  if (migrationElements.bar) migrationElements.bar.style.width = clampPercent2 + '%';
+  migrationElements.stage &&
+    (migrationElements.stage.textContent =
+      translateMigrationStage(value17?.stage) || fileSaveText('migration.migrating'));
+  const value18 = Number(value17?.processedFiles || 0),
+    value19 = Number(value17?.totalFiles || 0);
+  migrationElements.processed &&
+    (migrationElements.processed.textContent = value18 + ' / ' + (value19 || value18));
+  if (migrationElements.copied)
+    migrationElements.copied.textContent = String(Number(value17?.copiedCount || 0));
+  if (migrationElements.skipped)
+    migrationElements.skipped.textContent = String(Number(value17?.skippedCount || 0));
+  if (migrationElements.failed)
+    migrationElements.failed.textContent = String(Number(value17?.failedCount || 0));
+  const file = normalizeText(value17?.currentFile);
+  (migrationElements.current &&
+    ((migrationElements.current.textContent = file ? fileSaveText('migration.current', { file: file }) : ''),
+    (migrationElements.current.title = file)),
+    renderMigrationErrors(migrationElements.errors, value17?.errors));
 }
 function resetMigrationStatus() {
-  const _0x4bee79 = getMigrationElements();
-  if (_0x4bee79.card) _0x4bee79.card.hidden = true;
-  if (_0x4bee79.stage) _0x4bee79.stage.textContent = fileSaveText('migration.preparing');
-  if (_0x4bee79.percent) _0x4bee79.percent.textContent = '0%';
-  if (_0x4bee79.bar) _0x4bee79.bar.style.width = '0%';
-  if (_0x4bee79.processed) _0x4bee79.processed.textContent = '0 / 0';
-  if (_0x4bee79.copied) _0x4bee79.copied.textContent = '0';
-  if (_0x4bee79.skipped) _0x4bee79.skipped.textContent = '0';
-  if (_0x4bee79.failed) _0x4bee79.failed.textContent = '0';
-  (_0x4bee79.current && ((_0x4bee79.current.textContent = ''), (_0x4bee79.current.title = '')),
-    renderMigrationErrors(_0x4bee79.errors, []));
+  const migrationElements2 = getMigrationElements();
+  if (migrationElements2.card) migrationElements2.card.hidden = true;
+  if (migrationElements2.stage) migrationElements2.stage.textContent = fileSaveText('migration.preparing');
+  if (migrationElements2.percent) migrationElements2.percent.textContent = '0%';
+  if (migrationElements2.bar) migrationElements2.bar.style.width = '0%';
+  if (migrationElements2.processed) migrationElements2.processed.textContent = '0 / 0';
+  if (migrationElements2.copied) migrationElements2.copied.textContent = '0';
+  if (migrationElements2.skipped) migrationElements2.skipped.textContent = '0';
+  if (migrationElements2.failed) migrationElements2.failed.textContent = '0';
+  (migrationElements2.current &&
+    ((migrationElements2.current.textContent = ''), (migrationElements2.current.title = '')),
+    renderMigrationErrors(migrationElements2.errors, []));
 }
-function isMigrationFinished(_0x32a16c) {
-  const _0x5086c7 = normalizeText(_0x32a16c?.status);
-  return _0x5086c7 === 'done' || _0x5086c7 === 'error';
+function isMigrationFinished(response2) {
+  const text8 = normalizeText(response2?.status);
+  return text8 === 'done' || text8 === 'error';
 }
-async function pollMigrationUntilFinished(_0x3e4ceb) {
-  let _0x456a53 = null;
+async function pollMigrationUntilFinished(value20) {
+  let fetchFileSavePathMigrationStatus2 = null;
   while (true) {
     (await sleep(MIGRATION_POLL_INTERVAL_MS),
-      (_0x456a53 = await fetchFileSavePathMigrationStatus(_0x3e4ceb)),
-      renderMigrationStatus(_0x456a53));
-    if (isMigrationFinished(_0x456a53)) return _0x456a53;
+      (fetchFileSavePathMigrationStatus2 = await fetchFileSavePathMigrationStatus(value20)),
+      renderMigrationStatus(fetchFileSavePathMigrationStatus2));
+    if (isMigrationFinished(fetchFileSavePathMigrationStatus2)) return fetchFileSavePathMigrationStatus2;
   }
 }
-function buildMigrationSummary(_0x4ce30b) {
-  const _0x14951c = Number(_0x4ce30b?.copiedCount || 0),
-    _0x3aceb0 = Number(_0x4ce30b?.skippedCount || 0),
-    _0x255898 = Number(_0x4ce30b?.failedCount || 0);
-  return fileSaveText('migration.summary', { copied: _0x14951c, skipped: _0x3aceb0, failed: _0x255898 });
+function buildMigrationSummary(value21) {
+  const copied = Number(value21?.copiedCount || 0),
+    skipped = Number(value21?.skippedCount || 0),
+    failed = Number(value21?.failedCount || 0);
+  return fileSaveText('migration.summary', { copied: copied, skipped: skipped, failed: failed });
 }
 function confirmSavePathChanges(changes) {
   const confirm = globalThis.window?.confirm;
   if (typeof confirm !== 'function') throw new Error(fileSaveText('migration.confirmUnavailable'));
-  const paths = changes.map(({ key, from, to }) =>
-    `${fileSaveText('migration.pathLabels.' + key)}:\n${from || '—'}\n→ ${to || '—'}`,
-  ).join('\n\n');
+  const paths = changes
+    .map(
+      ({ key, from, to }) =>
+        `${fileSaveText('migration.pathLabels.' + key)}:\n${from || '—'}\n→ ${to || '—'}`,
+    )
+    .join('\n\n');
   return confirm.call(globalThis.window, fileSaveText('migration.confirmCopy', { paths }));
 }
 async function saveSettingsWithMigration(settings) {
@@ -333,42 +338,42 @@ async function saveSettingsWithMigration(settings) {
   return result;
 }
 export function initFileSaveSettings() {
-  const _0x6b9f54 = document.getElementById('btnFileSavePathsSave');
-  if (!_0x6b9f54 || _0x6b9f54.__fileSaveSettingsBound) return;
-  _0x6b9f54.__fileSaveSettingsBound = true;
+  const saveButton = document.getElementById('btnFileSavePathsSave');
+  if (!saveButton || saveButton.__fileSaveSettingsBound) return;
+  saveButton.__fileSaveSettingsBound = true;
   (bindDirectoryPickers(),
     initLegacyFileSaveImport({
       pollMigrationUntilFinished,
       renderMigrationStatus,
       resetMigrationStatus,
-      saveButton: _0x6b9f54,
+      saveButton: saveButton,
       setSaveControlsBusy: (busy) => {
-        setSaving(_0x6b9f54, busy);
+        setSaving(saveButton, busy);
         setInputsDisabled(busy);
       },
     }),
     fetchUserSettingsFromServer()
-      .then((_0x2d0353) => {
-        applyPathsToInputs(_0x2d0353?.fileSavePaths || {});
+      .then((value22) => {
+        applyPathsToInputs(value22?.fileSavePaths || {});
       })
-      .catch((_0x2b9ed7) => {
-        (console.error('[Settings] 加载文件与保存路径失败:', _0x2b9ed7),
+      .catch((value23) => {
+        (console.error('[Settings] 加载文件与保存路径失败:', value23),
           showError(fileSaveText('runtime.loadFailed')));
       }),
     resetMigrationStatus(),
-    _0x6b9f54.addEventListener('click', async () => {
-      const _0x3cc6b6 = readPathsFromInputs(),
-        _0x80a3a6 = validateRequired(_0x3cc6b6);
-      if (_0x80a3a6) {
-        showError(_0x80a3a6);
+    saveButton.addEventListener('click', async () => {
+      const fileSavePaths3 = readPathsFromInputs(),
+        validateRequired2 = validateRequired(fileSavePaths3);
+      if (validateRequired2) {
+        showError(validateRequired2);
         return;
       }
-      (setSaving(_0x6b9f54, true), setInputsDisabled(true), resetMigrationStatus());
+      (setSaving(saveButton, true), setInputsDisabled(true), resetMigrationStatus());
       try {
         const current = await fetchUserSettingsFromServer();
         const proposed = {
           ...(current || {}),
-          fileSavePaths: _0x3cc6b6,
+          fileSavePaths: fileSavePaths3,
           fileSavePathsMeta: {
             ...(current?.fileSavePathsMeta || {}),
             source: 'user',
@@ -377,28 +382,37 @@ export function initFileSaveSettings() {
             updatedAt: Date.now(),
           },
         };
-        const changes = fileSavePathChanges(current?.fileSavePaths, _0x3cc6b6);
+        const changes = fileSavePathChanges(current?.fileSavePaths, fileSavePaths3);
         if (changes.length && !confirmSavePathChanges(changes)) return;
         let result;
         if (changes.length) {
           result = await saveSettingsWithMigration(proposed);
         } else {
           const saved = await saveUserSettingsToServer(proposed);
-          result = { status: 'done', copiedCount: 0, skippedCount: 0,
-            failedCount: 0, settings: saved?.settings };
+          result = {
+            status: 'done',
+            copiedCount: 0,
+            skippedCount: 0,
+            failedCount: 0,
+            settings: saved?.settings,
+          };
         }
         const applied = result?.settings || (await fetchUserSettingsFromServer());
-        applyPathsToInputs(applied?.fileSavePaths || _0x3cc6b6);
+        applyPathsToInputs(applied?.fileSavePaths || fileSavePaths3);
         if (Number(result?.failedCount || 0) > 0) {
-          showError(fileSaveText('runtime.partialMigrationFailed', { summary: buildMigrationSummary(result) }));
+          showError(
+            fileSaveText('runtime.partialMigrationFailed', { summary: buildMigrationSummary(result) }),
+          );
         } else {
-          showSuccess(changes.length ? buildMigrationSummary(result) : fileSaveText('runtime.savedWithoutMigration'));
+          showSuccess(
+            changes.length ? buildMigrationSummary(result) : fileSaveText('runtime.savedWithoutMigration'),
+          );
         }
-      } catch (_0x2a5bcb) {
-        (console.error('[Settings] 保存文件与保存路径失败:', _0x2a5bcb),
-          showError(fileSaveText('runtime.saveFailed', { error: errorMessage(_0x2a5bcb) })));
+      } catch (value24) {
+        (console.error('[Settings] 保存文件与保存路径失败:', value24),
+          showError(fileSaveText('runtime.saveFailed', { error: errorMessage(value24) })));
       } finally {
-        (setSaving(_0x6b9f54, false), setInputsDisabled(false));
+        (setSaving(saveButton, false), setInputsDisabled(false));
       }
     }));
 }

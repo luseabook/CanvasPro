@@ -1,1 +1,448 @@
-import{CUSTOM_APP_FOOTER_LIMIT,clearParameterGroup,getParameterEntries,groupParameters,normalizeParameterGroups,orderParameterEntries}from'../../domain/customAiApp/parameterLayout.js';import{escapeHtmlAttr}from'../../components/aigenImage/uiModuleModelHelpers.js';import{renderUiSchemaFields}from'../../components/aigenImage/uiSchemaRenderer.js';import{positionAnchoredSubmenu}from'../../utils/submenuPosition.js';import{animatePreviewOrder,showGroupPanel}from'./rhAiAppMotion.js';export function renderGroupedPreviewParams(_0x392531,_0x283f08,_0x3047aa){const _0x1be483=_0x283f08?.["models"]?.[0x0]?.['uiSchema']?.["fields"]||[],_0x17e904={'generationParams':Object["fromEntries"](_0x1be483["map"](_0x1d9712=>[_0x1d9712['id'],_0x1d9712["defaultValue"]]))};return getParameterEntries(_0x392531)["map"]((_0x41cc16,_0x5996c9)=>{if(!_0x41cc16['id']||_0x41cc16["members"]['length']<0x2)return _0x3047aa(_0x41cc16['members'][0x0],_0x5996c9);const _0x424356=_0x41cc16['members'][0x0]["index"],_0x4dc133=escapeHtmlAttr(_0x41cc16['id']),_0x550419=_0x41cc16['members']["map"](_0x10bcc2=>{const _0x14b79c=_0x1be483["find"](_0xa5cd58=>_0xa5cd58["customAiAppComponentIndex"]===_0x10bcc2['index']);if(!_0x14b79c)return'';return "<div class=\"rh-ai-app-group-member\" data-group-member=\""+_0x10bcc2["index"]+'\x22>'+renderUiSchemaFields([{..._0x14b79c,'variant':"groupRow"}],_0x17e904,{'unwrap':!![]})+'</div>';})["join"]('');return'<div\x20class=\x22rh-ai-app-preview-component\x20rh-ai-app-preview-draggable\x20rh-ai-app-preview-param-chip\x20rh-ai-app-preview-group\x22\x20data-preview-drag-kind=\x22param\x22\x20data-preview-component-index=\x22'+_0x424356+"\" data-param-group=\""+_0x4dc133+"\" data-preview-order=\""+_0x5996c9+"\">\n      <button type=\"button\" class=\"img-pill-btn\" data-param-group-action=\"open\" aria-expanded=\"false\">"+escapeHtmlAttr(_0x41cc16["label"])+"</button><span class=\"rh-ai-app-preview-drag-pad\" aria-hidden=\"true\"></span>\n      <div class=\"rh-ai-app-group-panel\" hidden role=\"dialog\" aria-label=\"编辑参数组\">\n        <div class=\"rh-ai-app-group-heading\"><input aria-label=\"参数组名称\" data-param-group-name=\""+_0x4dc133+'\x22\x20value=\x22'+escapeHtmlAttr(_0x41cc16["label"])+'\x22\x20maxlength=\x2224\x22><span\x20role=\x22button\x22\x20tabindex=\x220\x22\x20class=\x22rh-tip\x20ui-schema-info-tip\x22\x20data-param-group-action=\x22description\x22\x20data-tooltip=\x22'+escapeHtmlAttr(_0x41cc16['description']||'编辑参数组说明')+"\" aria-label=\"编辑参数组说明\">!</span></div>\n        <textarea class=\"rh-ai-app-group-description\" data-param-group-description=\""+_0x4dc133+"\" aria-label=\"参数组说明\" maxlength=\"1000\" hidden>"+escapeHtmlAttr(_0x41cc16['description'])+'</textarea>'+_0x550419+"\n      </div></div>";})["join"]('');}export function createParameterGroupInteraction(_0x4795e5){let _0x408247=null,_0x5f48fd=null,_0x1b7037=null,_0x587890=null;const _0x4ff8a4=()=>_0x4795e5["componentDrafts"],_0x2c73a0=()=>getParameterEntries(_0x4ff8a4()),_0x4953e8=_0x2ac518=>_0x4ff8a4()["find"](_0x45c9d5=>_0x45c9d5["index"]===_0x2ac518['index']),_0x59bb78=()=>{clearTimeout(_0x5f48fd),_0x408247?.["element"]?.["classList"]['remove']("is-group-drop-pending","is-group-drop-ready"),_0x408247?.["element"]?.["removeAttribute"]("data-group-drop-label"),_0x408247=null,_0x1b7037?.["element"]?.["removeAttribute"]("data-group-insert"),_0x1b7037=null;},_0x3f3b32=_0x15fc15=>{const _0x435fb2=_0x15fc15["querySelector"](".rh-ai-app-group-panel");_0x435fb2["style"]["bottom"]='auto';const _0x3c3013=_0x15fc15['getBoundingClientRect'](),_0xe1760f=_0x4795e5['panel'],_0x5b47e1=_0xe1760f['querySelector'](".rh-ai-app-kind-field")?.["getBoundingClientRect"]()["bottom"]||0x0,_0xb8b0ff=_0xe1760f["querySelector"](".rh-ai-app-footer")?.["getBoundingClientRect"]()['top']||window["innerHeight"];positionAnchoredSubmenu({'submenu':_0x435fb2,'anchorRect':_0x3c3013,'containerRect':_0x3c3013,'horizontalPlacement':"center",'verticalPlacement':'above','verticalGap':0xa,'viewportTop':_0x5b47e1,'viewportHeight':_0xb8b0ff,'viewportWidth':_0xe1760f["getBoundingClientRect"]()["right"]-0x8});},_0x3706dd=(_0x5d0494,_0x2e28d8,_0x4d8a5e)=>{_0x5d0494["forEach"](_0x302df2=>{clearParameterGroup(_0x302df2),_0x302df2["previewPlacement"]=_0x2e28d8;if(_0x2e28d8==="advanced")delete _0x302df2["homeParamOrder"];}),normalizeParameterGroups(_0x4ff8a4());if(_0x2e28d8==="home"){const _0x2e4aeb=_0x2c73a0()["filter"](_0x521602=>!_0x521602["members"]["some"](_0x2eb05a=>_0x5d0494['includes'](_0x2eb05a)));_0x2e4aeb["splice"](_0x4d8a5e,0x0,..._0x5d0494["map"](_0x4f48ad=>({'members':[_0x4f48ad]}))),orderParameterEntries(_0x2e4aeb);}else{const _0x5271cd=_0x4ff8a4()["filter"](_0x55feb6=>_0x55feb6["componentKind"]==='param'&&_0x55feb6['previewPlacement']!=='home'&&!_0x5d0494["includes"](_0x55feb6))['sort']((_0x27af0d,_0x38b815)=>(_0x27af0d["advancedParamOrder"]??_0x27af0d["index"])-(_0x38b815["advancedParamOrder"]??_0x38b815["index"]));_0x5271cd["splice"](_0x4d8a5e,0x0,..._0x5d0494),_0x5271cd["forEach"]((_0x1c7cfe,_0x154962)=>{_0x1c7cfe["advancedParamOrder"]=_0x154962;});}};return{'reset':_0x59bb78,'restorePanel'(){const _0x323e18=_0x587890;_0x587890=null;if(!_0x323e18)return;const _0x4cbfd8=Array["from"](_0x4795e5["panel"]['querySelectorAll']("[data-param-group]"))["find"](_0xa59cc2=>_0xa59cc2["dataset"]["paramGroup"]===_0x323e18['id']);if(!_0x4cbfd8)return;const _0x344206=_0x4cbfd8["querySelector"](".rh-ai-app-group-panel");_0x344206["hidden"]=![],_0x4cbfd8["querySelector"]('[data-param-group-action=\x22open\x22]')["setAttribute"]("aria-expanded","true"),_0x3f3b32(_0x4cbfd8),_0x344206["scrollTop"]=_0x323e18["scrollTop"];},'move'(_0x49b7a1,_0x3d0dcb){if(!["param",'advanced-param','group-param']['includes'](_0x49b7a1["dragKind"]))return![];const _0x43bcb3=_0x4953e8(_0x49b7a1);if(!_0x43bcb3)return![];const _0x19ca81=Array["from"](_0x4795e5["panel"]["querySelectorAll"]('.rh-ai-app-group-panel:not([hidden])'))["find"](_0x472293=>{const _0x184cd=_0x472293['getBoundingClientRect']();return _0x49b7a1["currentClientX"]>=_0x184cd["left"]&&_0x49b7a1["currentClientX"]<=_0x184cd["right"]&&_0x49b7a1["currentClientY"]>=_0x184cd["top"]&&_0x49b7a1["currentClientY"]<=_0x184cd["bottom"];});if(_0x19ca81&&_0x49b7a1["dragKind"]==='group-param'&&_0x19ca81["closest"]('[data-param-group]')["dataset"]["paramGroup"]===_0x43bcb3['footerGroupId']){_0x59bb78(),_0x4795e5["_clearPreviewAdvancedParamDropPlaceholder"](_0x49b7a1,{'animate':!![]}),_0x4795e5["_clearPreviewHomeParamDropPlaceholder"](_0x49b7a1,{'animate':!![]});const _0x4308fc=Array["from"](_0x19ca81['querySelectorAll']("[data-group-member]"))["filter"](_0x23d6a8=>Number(_0x23d6a8["dataset"]["groupMember"])!==_0x43bcb3['index']),_0x40ac78=_0x19ca81["getBoundingClientRect"]()["top"]+_0x19ca81["clientTop"]-_0x19ca81['scrollTop'],_0x2e0bdc=_0x4308fc["filter"](_0x291c5e=>_0x49b7a1["currentClientY"]>_0x40ac78+_0x291c5e["offsetTop"]+_0x291c5e["offsetHeight"]/0x2)['length'],_0x4989f0=_0x4308fc[_0x2e0bdc]||_0x4308fc['at'](-0x1);_0x4989f0?.["setAttribute"]('data-group-insert',_0x2e0bdc<_0x4308fc["length"]?"before":"after"),_0x1b7037={'element':_0x4989f0,'order':_0x2e0bdc,'id':_0x43bcb3["footerGroupId"],'scrollTop':_0x19ca81["scrollTop"]};const _0x394bc2=_0x19ca81["querySelector"]("[data-group-member=\""+_0x43bcb3["index"]+'\x22]'),_0x158f21=Array['from'](_0x19ca81['querySelectorAll']("[data-group-member]"));if(_0x158f21["indexOf"](_0x394bc2)!==_0x2e0bdc){const _0xf7a67f=_0x19ca81["scrollTop"];animatePreviewOrder(_0x158f21,()=>_0x19ca81["insertBefore"](_0x394bc2,_0x4308fc[_0x2e0bdc]||null)),_0x19ca81['scrollTop']=_0xf7a67f;}return _0x49b7a1['groupLayoutHandled']=!![],!![];}_0x1b7037?.["element"]?.["removeAttribute"]('data-group-insert'),_0x1b7037=null;const _0x3fbfd3=Array["from"](_0x4795e5["_getPreviewZoneElement"]("params")?.["children"]||[]),_0x3163c1=_0x3d0dcb==="params"&&_0x3fbfd3["find"](_0x324069=>{const _0x724c4e=_0x4ff8a4()['find'](_0x3f46b7=>_0x3f46b7["index"]===Number(_0x324069['dataset']['previewComponentIndex']));if(!_0x724c4e||_0x724c4e===_0x43bcb3||_0x43bcb3["footerGroupId"]&&_0x724c4e["footerGroupId"]===_0x43bcb3["footerGroupId"])return![];const _0x54830c=_0x324069["getBoundingClientRect"]();return _0x49b7a1["currentClientX"]>_0x54830c["left"]+_0x54830c["width"]*0.25&&_0x49b7a1["currentClientX"]<_0x54830c["right"]-_0x54830c['width']*0.25&&_0x49b7a1['currentClientY']>=_0x54830c["top"]&&_0x49b7a1['currentClientY']<=_0x54830c["bottom"];});_0x3163c1!==_0x408247?.["element"]&&(_0x59bb78(),_0x3163c1&&(_0x408247={'element':_0x3163c1,'index':Number(_0x3163c1["dataset"]["previewComponentIndex"]),'ready':![]},_0x3163c1["classList"]["add"]('is-group-drop-pending'),_0x5f48fd=setTimeout(()=>{if(!_0x408247||_0x408247["element"]!==_0x3163c1)return;_0x408247["ready"]=!![],_0x3163c1["classList"]["add"]('is-group-drop-ready'),_0x3163c1['dataset']["groupDropLabel"]=_0x3163c1["dataset"]["paramGroup"]?"松开加入分组":"松开创建分组";},0x1c2)));const _0x2e5d9c=_0x2c73a0()['some'](_0x1a14d9=>_0x1a14d9['id']);if(!_0x408247&&_0x3d0dcb==="advanced")_0x4795e5["_reorderPreviewAdvancedParamsDuringDrag"](_0x49b7a1);else _0x4795e5["_clearPreviewAdvancedParamDropPlaceholder"](_0x49b7a1,{'animate':!![]});if(!_0x408247&&!_0x2e5d9c&&_0x49b7a1['dragKind']!=="group-param"&&_0x3d0dcb!=='params')return _0x49b7a1["groupLayoutHandled"]=![],![];!_0x408247&&!_0x2e5d9c&&_0x3d0dcb==="params"&&_0x4795e5["_reorderPreviewHomeParamsDuringDrag"](_0x49b7a1);if(!_0x408247&&_0x2e5d9c&&_0x3d0dcb==="params"){const _0x25b28f=_0x2c73a0()['find'](_0x56a6aa=>_0x56a6aa["members"]["includes"](_0x43bcb3)),_0x30e104=_0x49b7a1["dragKind"]==='param'&&_0x25b28f,_0x221b5a=_0x30e104||_0x2c73a0()["length"]<CUSTOM_APP_FOOTER_LIMIT;if(_0x221b5a){const _0x229b26=_0x30e104?_0x3fbfd3["find"](_0x6e729a=>Number(_0x6e729a["dataset"]['previewComponentIndex'])===_0x43bcb3['index']):_0x4795e5["_createPreviewHomeParamDropPlaceholder"](_0x49b7a1),_0x18737b=_0x3fbfd3["filter"](_0x54e7d5=>_0x54e7d5!==_0x229b26),_0x1723d7=_0x18737b["filter"](_0x14d611=>{const _0x2ce1d2=_0x14d611["getBoundingClientRect"]();return _0x49b7a1["currentClientX"]>_0x2ce1d2["left"]+_0x2ce1d2["width"]/0x2;})["length"];_0x229b26&&Array["from"](_0x229b26['parentElement']["children"])["indexOf"](_0x229b26)!==_0x1723d7&&animatePreviewOrder([..._0x18737b,_0x229b26],()=>_0x229b26['parentElement']["insertBefore"](_0x229b26,_0x18737b[_0x1723d7]||null));}}else{if(_0x408247||_0x3d0dcb!=="params")_0x4795e5["_clearPreviewHomeParamDropPlaceholder"](_0x49b7a1,{'animate':!![]});}return _0x4795e5["_getPreviewZoneElement"]('params')?.["classList"]["toggle"]('is-param-drop-target',_0x3d0dcb==="params"),_0x49b7a1["groupLayoutHandled"]=!![],!![];},'end'(_0x300840,_0x3e48b0,_0x23c7e3){if(!_0x300840["groupLayoutHandled"])return _0x59bb78(),![];const _0x5099c3=_0x4795e5["panel"]["querySelector"](".rh-ai-app-group-panel:not([hidden])");_0x587890=_0x5099c3?{'id':_0x5099c3["closest"]("[data-param-group]")["dataset"]["paramGroup"],'scrollTop':_0x5099c3["scrollTop"]}:null;if(_0x3e48b0["type"]!=="pointerup"){if(_0x300840["layoutSnapshot"])_0x4795e5["_restorePreviewLayoutSnapshot"](_0x300840["layoutSnapshot"]);return _0x59bb78(),!![];}const _0x5216dc=_0x4953e8(_0x300840);if(!_0x5216dc)return _0x59bb78(),!![];const _0x1bede0=_0x2c73a0()["find"](_0x11af9d=>_0x11af9d['members']["includes"](_0x5216dc)),_0x4c73f2=_0x300840['dragKind']==="param"&&!!_0x1bede0?.['id'],_0x124e09=_0x4c73f2?_0x1bede0["members"]:[_0x5216dc];if(_0x1b7037&&_0x1bede0?.['id']===_0x1b7037['id']){const _0x2ba7df=_0x2c73a0(),_0x2e429b=_0x2ba7df["find"](_0x123260=>_0x123260['id']===_0x1bede0['id']);_0x2e429b["members"]=_0x2e429b["members"]['filter'](_0x3680e6=>_0x3680e6!==_0x5216dc),_0x2e429b['members']["splice"](_0x1b7037["order"],0x0,_0x5216dc),orderParameterEntries(_0x2ba7df);}else{if(_0x408247?.["ready"]&&_0x23c7e3==="params")groupParameters(_0x4ff8a4(),_0x5216dc['index'],_0x408247['index'],{'wholeGroup':_0x4c73f2});else{if(_0x23c7e3==="params"){const _0x16136e=_0x2c73a0()["filter"](_0x14afb1=>!_0x4c73f2||!_0x14afb1["members"]["includes"](_0x5216dc)),_0x100e22=_0x1bede0&&(_0x4c73f2||_0x1bede0["members"]["length"]===0x1);if(_0x100e22||_0x16136e["length"]<CUSTOM_APP_FOOTER_LIMIT){const _0x39769f=Array['from'](_0x4795e5["_getPreviewZoneElement"]("params")?.['children']||[])["filter"](_0x50efa5=>Number(_0x50efa5["dataset"]["previewComponentIndex"])!==(_0x1bede0?.["members"][0x0]?.["index"]??_0x5216dc['index'])),_0xde0e6b=_0x39769f["filter"](_0x101525=>{const _0x35746b=_0x101525["getBoundingClientRect"]();return _0x300840["currentClientX"]>_0x35746b["left"]+_0x35746b["width"]/0x2;})["length"];if(_0x4c73f2)_0x16136e["splice"](_0xde0e6b,0x0,_0x1bede0),orderParameterEntries(_0x16136e);else _0x3706dd(_0x124e09,'home',_0xde0e6b);}}else{if(_0x23c7e3==='advanced'){const _0x38211e=_0x4795e5['_getPreviewDropOrder']("advanced",_0x300840["currentClientX"],".rh-ai-app-preview-advanced-param",_0x300840["currentClientY"]);_0x3706dd(_0x124e09,"advanced",_0x38211e);}else _0x23c7e3==='prompt'&&!_0x4c73f2&&_0x4795e5["_movePreviewTextParamToPrompt"](_0x300840);}}}return _0x59bb78(),!![];},'bind'(_0x1e9550){const _0xad5c07=_0x16973d=>{const _0x56cadf=_0x16973d["target"]["closest"]?.("[data-param-group-action]");if(!_0x56cadf)return;_0x16973d["stopPropagation"]();const _0x110be5=_0x56cadf["closest"]("[data-param-group]"),_0x288295=_0x2c73a0()['find'](_0x5442fa=>_0x5442fa['id']===_0x110be5?.["dataset"]["paramGroup"]);if(!_0x288295)return;const _0x7fa93c=_0x56cadf["dataset"]["paramGroupAction"];if(_0x7fa93c==='description'){const _0x549fc2=_0x110be5["querySelector"]("[data-param-group-description]");_0x549fc2['hidden']=!_0x549fc2["hidden"];if(!_0x549fc2["hidden"])_0x549fc2["focus"]({'preventScroll':!![]});_0x3f3b32(_0x110be5);return;}if(_0x7fa93c==="open"){const _0x1a1f9e=_0x110be5["querySelector"](".rh-ai-app-group-panel"),_0x42f53a=_0x56cadf['getAttribute']("aria-expanded")!=="true";_0x1e9550["querySelectorAll"](".rh-ai-app-group-panel")['forEach'](_0x1c137c=>{if(_0x1c137c!==_0x1a1f9e&&!_0x1c137c["hidden"])showGroupPanel(_0x1c137c,![]);}),_0x1e9550["querySelectorAll"]('[data-param-group-action=\x22open\x22]')["forEach"](_0x2203f0=>_0x2203f0["setAttribute"]('aria-expanded','false')),showGroupPanel(_0x1a1f9e,_0x42f53a),_0x56cadf["setAttribute"]("aria-expanded",String(_0x42f53a));if(_0x42f53a)_0x3f3b32(_0x110be5);return;}},_0x4fa831=_0x1a64da=>{const _0x55955c=_0x1a64da["target"]["dataset"]?.["paramGroupDescription"];if(_0x55955c){const _0x465592=_0x1a64da["target"]["value"]['trim']();_0x4ff8a4()["filter"](_0x2f0a3c=>_0x2f0a3c['footerGroupId']===_0x55955c)["forEach"](_0x8f23ca=>{_0x8f23ca["footerGroupDescription"]=_0x465592;}),_0x1a64da["target"]['closest']("[data-param-group]")["querySelector"]("[data-param-group-action=\"description\"]")["dataset"]["tooltip"]=_0x465592||"编辑参数组说明",_0x4795e5["_refreshBundleFromComponents"]({'renderPreview':![]});return;}const _0x31b664=_0x1a64da["target"]["dataset"]?.["paramGroupName"];if(!_0x31b664)return;const _0x5f4347=_0x1a64da["target"]["value"]["trim"]()||"参数组";_0x4ff8a4()['filter'](_0x23da34=>_0x23da34["footerGroupId"]===_0x31b664)["forEach"](_0xa5147d=>{_0xa5147d['footerGroupLabel']=_0x5f4347;}),_0x1a64da['target']["value"]=_0x5f4347,_0x1a64da['target']['closest']("[data-param-group]")['querySelector']("[data-param-group-action=\"open\"]")["textContent"]=_0x5f4347,_0x4795e5["_refreshBundleFromComponents"]({'renderPreview':![]});},_0x112596=_0x40a489=>{if(_0x40a489["type"]==="keydown"&&_0x40a489['key']!=="Escape")return;_0x40a489['type']==="keydown"&&_0x1e9550["querySelector"](".rh-ai-app-group-panel:not([hidden])")&&(_0x40a489['preventDefault'](),_0x40a489['stopImmediatePropagation']()),_0x1e9550["querySelectorAll"](".rh-ai-app-group-panel:not([hidden])")["forEach"](_0x542de2=>{const _0x3c469a=_0x542de2["closest"]("[data-param-group]");if(_0x40a489["type"]!=="keydown"&&_0x3c469a["contains"](_0x40a489['target']))return;showGroupPanel(_0x542de2,![]),_0x3c469a["querySelector"]("[data-param-group-action=\"open\"]")['setAttribute']("aria-expanded","false");if(_0x40a489["type"]==="keydown")_0x3c469a["querySelector"]("[data-param-group-action=\"open\"]")["focus"]();});},_0x309cce=_0x18dab0=>{if(_0x18dab0?.['target']?.["closest"]?.(".rh-ai-app-group-panel"))return;_0x1e9550['querySelectorAll'](".rh-ai-app-group-panel:not([hidden])")["forEach"](_0x4540cc=>_0x3f3b32(_0x4540cc["closest"]("[data-param-group]")));},_0x3c582f=_0x195b9c=>{(_0x195b9c['key']==="Enter"||_0x195b9c["key"]==='\x20')&&_0x195b9c['target']["matches"]('[data-param-group-action=\x22description\x22]')&&(_0x195b9c["preventDefault"](),_0x195b9c["target"]["click"]());};return _0x1e9550['addEventListener']("keydown",_0x3c582f),_0x1e9550["addEventListener"]('click',_0xad5c07),_0x1e9550["addEventListener"]("change",_0x4fa831),_0x1e9550["ownerDocument"]['addEventListener']("pointerdown",_0x112596),_0x1e9550["ownerDocument"]["addEventListener"]('keydown',_0x112596,!![]),_0x1e9550["ownerDocument"]["defaultView"]["addEventListener"]("resize",_0x309cce),_0x1e9550["addEventListener"]("scroll",_0x309cce,!![]),()=>{_0x1e9550['removeEventListener']("keydown",_0x3c582f),_0x1e9550["removeEventListener"]("click",_0xad5c07),_0x1e9550['removeEventListener']('change',_0x4fa831),_0x1e9550["ownerDocument"]["removeEventListener"]('pointerdown',_0x112596),_0x1e9550["ownerDocument"]['removeEventListener']("keydown",_0x112596,!![]),_0x1e9550['ownerDocument']['defaultView']["removeEventListener"]('resize',_0x309cce),_0x1e9550['removeEventListener']("scroll",_0x309cce,!![]),_0x59bb78();};}};}
+import {
+  CUSTOM_APP_FOOTER_LIMIT,
+  clearParameterGroup,
+  getParameterEntries,
+  groupParameters,
+  normalizeParameterGroups,
+  orderParameterEntries,
+} from '../../domain/customAiApp/parameterLayout.js';
+import { escapeHtmlAttr } from '../../components/aigenImage/uiModuleModelHelpers.js';
+import { renderUiSchemaFields } from '../../components/aigenImage/uiSchemaRenderer.js';
+import { positionAnchoredSubmenu } from '../../utils/submenuPosition.js';
+import { animatePreviewOrder, showGroupPanel } from './rhAiAppMotion.js';
+export function renderGroupedPreviewParams(value, item, handler) {
+  const key = item?.['models']?.[0x0]?.['uiSchema']?.['fields'] || [],
+    index = {
+      generationParams: Object['fromEntries'](key['map']((result) => [result['id'], result['defaultValue']])),
+    };
+  return getParameterEntries(value)
+    ['map']((enabled, data) => {
+      if (!enabled['id'] || enabled['members']['length'] < 0x2) return handler(enabled['members'][0x0], data);
+      const options = enabled['members'][0x0]['index'],
+        escapeHtmlAttr2 = escapeHtmlAttr(enabled['id']),
+        target = enabled['members']
+          ['map']((source) => {
+            const args = key['find']((next) => next['customAiAppComponentIndex'] === source['index']);
+            if (!args) return '';
+            return (
+              '<div class="rh-ai-app-group-member" data-group-member="' +
+              source['index'] +
+              '\x22>' +
+              renderUiSchemaFields([{ ...args, variant: 'groupRow' }], index, { unwrap: !![] }) +
+              '</div>'
+            );
+          })
+          ['join']('');
+      return (
+        '<div\x20class=\x22rh-ai-app-preview-component\x20rh-ai-app-preview-draggable\x20rh-ai-app-preview-param-chip\x20rh-ai-app-preview-group\x22\x20data-preview-drag-kind=\x22param\x22\x20data-preview-component-index=\x22' +
+        options +
+        '" data-param-group="' +
+        escapeHtmlAttr2 +
+        '" data-preview-order="' +
+        data +
+        '">\n      <button type="button" class="img-pill-btn" data-param-group-action="open" aria-expanded="false">' +
+        escapeHtmlAttr(enabled['label']) +
+        '</button><span class="rh-ai-app-preview-drag-pad" aria-hidden="true"></span>\n      <div class="rh-ai-app-group-panel" hidden role="dialog" aria-label="编辑参数组">\n        <div class="rh-ai-app-group-heading"><input aria-label="参数组名称" data-param-group-name="' +
+        escapeHtmlAttr2 +
+        '\x22\x20value=\x22' +
+        escapeHtmlAttr(enabled['label']) +
+        '\x22\x20maxlength=\x2224\x22><span\x20role=\x22button\x22\x20tabindex=\x220\x22\x20class=\x22rh-tip\x20ui-schema-info-tip\x22\x20data-param-group-action=\x22description\x22\x20data-tooltip=\x22' +
+        escapeHtmlAttr(enabled['description'] || '编辑参数组说明') +
+        '" aria-label="编辑参数组说明">!</span></div>\n        <textarea class="rh-ai-app-group-description" data-param-group-description="' +
+        escapeHtmlAttr2 +
+        '" aria-label="参数组说明" maxlength="1000" hidden>' +
+        escapeHtmlAttr(enabled['description']) +
+        '</textarea>' +
+        target +
+        '\n      </div></div>'
+      );
+    })
+    ['join']('');
+}
+export function createParameterGroupInteraction(current) {
+  let enabled2 = null,
+    setTimeout2 = null,
+    entry = null,
+    record = null;
+  const run = () => current['componentDrafts'],
+    handler2 = () => getParameterEntries(run()),
+    handler3 = (payload) => run()['find']((handle) => handle['index'] === payload['index']),
+    handler4 = () => {
+      (clearTimeout(setTimeout2),
+        enabled2?.['element']?.['classList']['remove']('is-group-drop-pending', 'is-group-drop-ready'),
+        enabled2?.['element']?.['removeAttribute']('data-group-drop-label'),
+        (enabled2 = null),
+        entry?.['element']?.['removeAttribute']('data-group-insert'),
+        (entry = null));
+    },
+    handler5 = (el) => {
+      const state = el['querySelector']('.rh-ai-app-group-panel');
+      state['style']['bottom'] = 'auto';
+      const config = el['getBoundingClientRect'](),
+        el2 = current['panel'],
+        scope = el2['querySelector']('.rh-ai-app-kind-field')?.['getBoundingClientRect']()['bottom'] || 0x0,
+        input =
+          el2['querySelector']('.rh-ai-app-footer')?.['getBoundingClientRect']()['top'] ||
+          window['innerHeight'];
+      positionAnchoredSubmenu({
+        submenu: state,
+        anchorRect: config,
+        containerRect: config,
+        horizontalPlacement: 'center',
+        verticalPlacement: 'above',
+        verticalGap: 0xa,
+        viewportTop: scope,
+        viewportHeight: input,
+        viewportWidth: el2['getBoundingClientRect']()['right'] - 0x8,
+      });
+    },
+    handler6 = (list, output, value2) => {
+      (list['forEach']((value3) => {
+        (clearParameterGroup(value3), (value3['previewPlacement'] = output));
+        if (output === 'advanced') delete value3['homeParamOrder'];
+      }),
+        normalizeParameterGroups(run()));
+      if (output === 'home') {
+        const value4 = handler2()['filter'](
+          (enabled3) => !enabled3['members']['some']((value5) => list['includes'](value5)),
+        );
+        (value4['splice'](value2, 0x0, ...list['map']((value6) => ({ members: [value6] }))),
+          orderParameterEntries(value4));
+      } else {
+        const value7 = run()
+          ['filter'](
+            (value8) =>
+              value8['componentKind'] === 'param' &&
+              value8['previewPlacement'] !== 'home' &&
+              !list['includes'](value8),
+          )
+          ['sort'](
+            (value9, value10) =>
+              (value9['advancedParamOrder'] ?? value9['index']) -
+              (value10['advancedParamOrder'] ?? value10['index']),
+          );
+        (value7['splice'](value2, 0x0, ...list),
+          value7['forEach']((value11, value12) => {
+            value11['advancedParamOrder'] = value12;
+          }));
+      }
+    };
+  return {
+    reset: handler4,
+    restorePanel() {
+      const enabled4 = record;
+      record = null;
+      if (!enabled4) return;
+      const enabled5 = Array['from'](current['panel']['querySelectorAll']('[data-param-group]'))['find'](
+        (value13) => value13['dataset']['paramGroup'] === enabled4['id'],
+      );
+      if (!enabled5) return;
+      const value14 = enabled5['querySelector']('.rh-ai-app-group-panel');
+      ((value14['hidden'] = ![]),
+        enabled5['querySelector']('[data-param-group-action=\x22open\x22]')['setAttribute'](
+          'aria-expanded',
+          'true',
+        ),
+        handler5(enabled5),
+        (value14['scrollTop'] = enabled4['scrollTop']));
+    },
+    move(value15, value16) {
+      if (!['param', 'advanced-param', 'group-param']['includes'](value15['dragKind'])) return ![];
+      const enabled6 = handler3(value15);
+      if (!enabled6) return ![];
+      const el3 = Array['from'](current['panel']['querySelectorAll']('.rh-ai-app-group-panel:not([hidden])'))[
+        'find'
+      ]((el4) => {
+        const value17 = el4['getBoundingClientRect']();
+        return (
+          value15['currentClientX'] >= value17['left'] &&
+          value15['currentClientX'] <= value17['right'] &&
+          value15['currentClientY'] >= value17['top'] &&
+          value15['currentClientY'] <= value17['bottom']
+        );
+      });
+      if (
+        el3 &&
+        value15['dragKind'] === 'group-param' &&
+        el3['closest']('[data-param-group]')['dataset']['paramGroup'] === enabled6['footerGroupId']
+      ) {
+        (handler4(),
+          current['_clearPreviewAdvancedParamDropPlaceholder'](value15, { animate: !![] }),
+          current['_clearPreviewHomeParamDropPlaceholder'](value15, { animate: !![] }));
+        const value18 = Array['from'](el3['querySelectorAll']('[data-group-member]'))['filter'](
+            (value19) => Number(value19['dataset']['groupMember']) !== enabled6['index'],
+          ),
+          value20 = el3['getBoundingClientRect']()['top'] + el3['clientTop'] - el3['scrollTop'],
+          value21 = value18['filter'](
+            (value22) =>
+              value15['currentClientY'] > value20 + value22['offsetTop'] + value22['offsetHeight'] / 0x2,
+          )['length'],
+          value23 = value18[value21] || value18['at'](-0x1);
+        (value23?.['setAttribute']('data-group-insert', value21 < value18['length'] ? 'before' : 'after'),
+          (entry = {
+            element: value23,
+            order: value21,
+            id: enabled6['footerGroupId'],
+            scrollTop: el3['scrollTop'],
+          }));
+        const value24 = el3['querySelector']('[data-group-member="' + enabled6['index'] + '\x22]'),
+          value25 = Array['from'](el3['querySelectorAll']('[data-group-member]'));
+        if (value25['indexOf'](value24) !== value21) {
+          const value26 = el3['scrollTop'];
+          (animatePreviewOrder(value25, () => el3['insertBefore'](value24, value18[value21] || null)),
+            (el3['scrollTop'] = value26));
+        }
+        return ((value15['groupLayoutHandled'] = !![]), !![]);
+      }
+      (entry?.['element']?.['removeAttribute']('data-group-insert'), (entry = null));
+      const value27 = Array['from'](current['_getPreviewZoneElement']('params')?.['children'] || []),
+        el5 =
+          value16 === 'params' &&
+          value27['find']((el6) => {
+            const enabled7 = run()['find'](
+              (value28) => value28['index'] === Number(el6['dataset']['previewComponentIndex']),
+            );
+            if (
+              !enabled7 ||
+              enabled7 === enabled6 ||
+              (enabled6['footerGroupId'] && enabled7['footerGroupId'] === enabled6['footerGroupId'])
+            )
+              return ![];
+            const box = el6['getBoundingClientRect']();
+            return (
+              value15['currentClientX'] > box['left'] + box['width'] * 0.25 &&
+              value15['currentClientX'] < box['right'] - box['width'] * 0.25 &&
+              value15['currentClientY'] >= box['top'] &&
+              value15['currentClientY'] <= box['bottom']
+            );
+          });
+      el5 !== enabled2?.['element'] &&
+        (handler4(),
+        el5 &&
+          ((enabled2 = { element: el5, index: Number(el5['dataset']['previewComponentIndex']), ready: ![] }),
+          el5['classList']['add']('is-group-drop-pending'),
+          (setTimeout2 = setTimeout(() => {
+            if (!enabled2 || enabled2['element'] !== el5) return;
+            ((enabled2['ready'] = !![]),
+              el5['classList']['add']('is-group-drop-ready'),
+              (el5['dataset']['groupDropLabel'] = el5['dataset']['paramGroup']
+                ? '松开加入分组'
+                : '松开创建分组'));
+          }, 0x1c2))));
+      const enabled8 = handler2()['some']((value29) => value29['id']);
+      if (!enabled2 && value16 === 'advanced') current['_reorderPreviewAdvancedParamsDuringDrag'](value15);
+      else current['_clearPreviewAdvancedParamDropPlaceholder'](value15, { animate: !![] });
+      if (!enabled2 && !enabled8 && value15['dragKind'] !== 'group-param' && value16 !== 'params')
+        return ((value15['groupLayoutHandled'] = ![]), ![]);
+      !enabled2 &&
+        !enabled8 &&
+        value16 === 'params' &&
+        current['_reorderPreviewHomeParamsDuringDrag'](value15);
+      if (!enabled2 && enabled8 && value16 === 'params') {
+        const value30 = handler2()['find']((value31) => value31['members']['includes'](enabled6)),
+          value32 = value15['dragKind'] === 'param' && value30,
+          value33 = value32 || handler2()['length'] < CUSTOM_APP_FOOTER_LIMIT;
+        if (value33) {
+          const value34 = value32
+              ? value27['find'](
+                  (value35) => Number(value35['dataset']['previewComponentIndex']) === enabled6['index'],
+                )
+              : current['_createPreviewHomeParamDropPlaceholder'](value15),
+            args2 = value27['filter']((value36) => value36 !== value34),
+            value37 = args2['filter']((value38) => {
+              const value39 = value38['getBoundingClientRect']();
+              return value15['currentClientX'] > value39['left'] + value39['width'] / 0x2;
+            })['length'];
+          value34 &&
+            Array['from'](value34['parentElement']['children'])['indexOf'](value34) !== value37 &&
+            animatePreviewOrder([...args2, value34], () =>
+              value34['parentElement']['insertBefore'](value34, args2[value37] || null),
+            );
+        }
+      } else {
+        if (enabled2 || value16 !== 'params')
+          current['_clearPreviewHomeParamDropPlaceholder'](value15, { animate: !![] });
+      }
+      return (
+        current['_getPreviewZoneElement']('params')?.['classList']['toggle'](
+          'is-param-drop-target',
+          value16 === 'params',
+        ),
+        (value15['groupLayoutHandled'] = !![]),
+        !![]
+      );
+    },
+    end(enabled9, value40, value41) {
+      if (!enabled9['groupLayoutHandled']) return (handler4(), ![]);
+      const value42 = current['panel']['querySelector']('.rh-ai-app-group-panel:not([hidden])');
+      record = value42
+        ? {
+            id: value42['closest']('[data-param-group]')['dataset']['paramGroup'],
+            scrollTop: value42['scrollTop'],
+          }
+        : null;
+      if (value40['type'] !== 'pointerup') {
+        if (enabled9['layoutSnapshot']) current['_restorePreviewLayoutSnapshot'](enabled9['layoutSnapshot']);
+        return (handler4(), !![]);
+      }
+      const enabled10 = handler3(enabled9);
+      if (!enabled10) return (handler4(), !![]);
+      const enabled11 = handler2()['find']((value43) => value43['members']['includes'](enabled10)),
+        enabled12 = enabled9['dragKind'] === 'param' && !!enabled11?.['id'],
+        value44 = enabled12 ? enabled11['members'] : [enabled10];
+      if (entry && enabled11?.['id'] === entry['id']) {
+        const value45 = handler2(),
+          value46 = value45['find']((value47) => value47['id'] === enabled11['id']);
+        ((value46['members'] = value46['members']['filter']((value48) => value48 !== enabled10)),
+          value46['members']['splice'](entry['order'], 0x0, enabled10),
+          orderParameterEntries(value45));
+      } else {
+        if (enabled2?.['ready'] && value41 === 'params')
+          groupParameters(run(), enabled10['index'], enabled2['index'], { wholeGroup: enabled12 });
+        else {
+          if (value41 === 'params') {
+            const value49 = handler2()['filter'](
+                (enabled13) => !enabled12 || !enabled13['members']['includes'](enabled10),
+              ),
+              value50 = enabled11 && (enabled12 || enabled11['members']['length'] === 0x1);
+            if (value50 || value49['length'] < CUSTOM_APP_FOOTER_LIMIT) {
+              const value51 = Array['from'](current['_getPreviewZoneElement']('params')?.['children'] || [])[
+                  'filter'
+                ](
+                  (value52) =>
+                    Number(value52['dataset']['previewComponentIndex']) !==
+                    (enabled11?.['members'][0x0]?.['index'] ?? enabled10['index']),
+                ),
+                value53 = value51['filter']((value54) => {
+                  const value55 = value54['getBoundingClientRect']();
+                  return enabled9['currentClientX'] > value55['left'] + value55['width'] / 0x2;
+                })['length'];
+              if (enabled12) (value49['splice'](value53, 0x0, enabled11), orderParameterEntries(value49));
+              else handler6(value44, 'home', value53);
+            }
+          } else {
+            if (value41 === 'advanced') {
+              const value56 = current['_getPreviewDropOrder'](
+                'advanced',
+                enabled9['currentClientX'],
+                '.rh-ai-app-preview-advanced-param',
+                enabled9['currentClientY'],
+              );
+              handler6(value44, 'advanced', value56);
+            } else value41 === 'prompt' && !enabled12 && current['_movePreviewTextParamToPrompt'](enabled9);
+          }
+        }
+      }
+      return (handler4(), !![]);
+    },
+    bind(el7) {
+      const value57 = (value58) => {
+          const enabled14 = value58['target']['closest']?.('[data-param-group-action]');
+          if (!enabled14) return;
+          value58['stopPropagation']();
+          const value59 = enabled14['closest']('[data-param-group]'),
+            enabled15 = handler2()['find']((value60) => value60['id'] === value59?.['dataset']['paramGroup']);
+          if (!enabled15) return;
+          const value61 = enabled14['dataset']['paramGroupAction'];
+          if (value61 === 'description') {
+            const el8 = value59['querySelector']('[data-param-group-description]');
+            el8['hidden'] = !el8['hidden'];
+            if (!el8['hidden']) el8['focus']({ preventScroll: !![] });
+            handler5(value59);
+            return;
+          }
+          if (value61 === 'open') {
+            const value62 = value59['querySelector']('.rh-ai-app-group-panel'),
+              value63 = enabled14['getAttribute']('aria-expanded') !== 'true';
+            (el7['querySelectorAll']('.rh-ai-app-group-panel')['forEach']((enabled16) => {
+              if (enabled16 !== value62 && !enabled16['hidden']) showGroupPanel(enabled16, ![]);
+            }),
+              el7['querySelectorAll']('[data-param-group-action=\x22open\x22]')['forEach']((value64) =>
+                value64['setAttribute']('aria-expanded', 'false'),
+              ),
+              showGroupPanel(value62, value63),
+              enabled14['setAttribute']('aria-expanded', String(value63)));
+            if (value63) handler5(value59);
+            return;
+          }
+        },
+        value65 = (event) => {
+          const value66 = event['target']['dataset']?.['paramGroupDescription'];
+          if (value66) {
+            const value67 = event['target']['value']['trim']();
+            (run()
+              ['filter']((value68) => value68['footerGroupId'] === value66)
+              ['forEach']((value69) => {
+                value69['footerGroupDescription'] = value67;
+              }),
+              (event['target']
+                ['closest']('[data-param-group]')
+                ['querySelector']('[data-param-group-action="description"]')['dataset']['tooltip'] =
+                value67 || '编辑参数组说明'),
+              current['_refreshBundleFromComponents']({ renderPreview: ![] }));
+            return;
+          }
+          const enabled17 = event['target']['dataset']?.['paramGroupName'];
+          if (!enabled17) return;
+          const value70 = event['target']['value']['trim']() || '参数组';
+          (run()
+            ['filter']((value71) => value71['footerGroupId'] === enabled17)
+            ['forEach']((value72) => {
+              value72['footerGroupLabel'] = value70;
+            }),
+            (event['target']['value'] = value70),
+            (event['target']
+              ['closest']('[data-param-group]')
+              ['querySelector']('[data-param-group-action="open"]')['textContent'] = value70),
+            current['_refreshBundleFromComponents']({ renderPreview: ![] }));
+        },
+        value73 = (event2) => {
+          if (event2['type'] === 'keydown' && event2['key'] !== 'Escape') return;
+          (event2['type'] === 'keydown' &&
+            el7['querySelector']('.rh-ai-app-group-panel:not([hidden])') &&
+            (event2['preventDefault'](), event2['stopImmediatePropagation']()),
+            el7['querySelectorAll']('.rh-ai-app-group-panel:not([hidden])')['forEach']((value74) => {
+              const value75 = value74['closest']('[data-param-group]');
+              if (event2['type'] !== 'keydown' && value75['contains'](event2['target'])) return;
+              (showGroupPanel(value74, ![]),
+                value75['querySelector']('[data-param-group-action="open"]')['setAttribute'](
+                  'aria-expanded',
+                  'false',
+                ));
+              if (event2['type'] === 'keydown')
+                value75['querySelector']('[data-param-group-action="open"]')['focus']();
+            }));
+        },
+        value76 = (event3) => {
+          if (event3?.['target']?.['closest']?.('.rh-ai-app-group-panel')) return;
+          el7['querySelectorAll']('.rh-ai-app-group-panel:not([hidden])')['forEach']((value77) =>
+            handler5(value77['closest']('[data-param-group]')),
+          );
+        },
+        value78 = (event4) => {
+          (event4['key'] === 'Enter' || event4['key'] === '\x20') &&
+            event4['target']['matches']('[data-param-group-action=\x22description\x22]') &&
+            (event4['preventDefault'](), event4['target']['click']());
+        };
+      return (
+        el7['addEventListener']('keydown', value78),
+        el7['addEventListener']('click', value57),
+        el7['addEventListener']('change', value65),
+        el7['ownerDocument']['addEventListener']('pointerdown', value73),
+        el7['ownerDocument']['addEventListener']('keydown', value73, !![]),
+        el7['ownerDocument']['defaultView']['addEventListener']('resize', value76),
+        el7['addEventListener']('scroll', value76, !![]),
+        () => {
+          (el7['removeEventListener']('keydown', value78),
+            el7['removeEventListener']('click', value57),
+            el7['removeEventListener']('change', value65),
+            el7['ownerDocument']['removeEventListener']('pointerdown', value73),
+            el7['ownerDocument']['removeEventListener']('keydown', value73, !![]),
+            el7['ownerDocument']['defaultView']['removeEventListener']('resize', value76),
+            el7['removeEventListener']('scroll', value76, !![]),
+            handler4());
+        }
+      );
+    },
+  };
+}

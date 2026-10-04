@@ -1,246 +1,245 @@
 import { resolveGenerationInputImageUrl } from '../../services/imageReferenceUrlService.js';
 import { appendApimartPrivateAvatarProviderAssetRefs } from '../../modules/apimartPrivateAvatarAssets.js';
 import { localPathToUrl } from '../../utils/localMediaPath.js';
-function normalizePositiveNumber(..._0x5d4b64) {
-  for (const _0x155d4d of _0x5d4b64) {
-    const _0x17ccbb = Number(_0x155d4d);
-    if (Number['isFinite'](_0x17ccbb) && _0x17ccbb > 0x0) return _0x17ccbb;
+function normalizePositiveNumber(...args) {
+  for (const value of args) {
+    const count = Number(value);
+    if (Number['isFinite'](count) && count > 0x0) return count;
   }
   return 0x0;
 }
-function getVideoDurationFromSource(_0x4f96b1 = {}, _0x31c29f = null) {
+function getVideoDurationFromSource(options = {}, item = null) {
   return normalizePositiveNumber(
-    _0x31c29f?.['videoDuration'],
-    _0x31c29f?.['duration'],
-    _0x4f96b1?.['videoDuration'],
-    _0x4f96b1?.['duration'],
+    item?.['videoDuration'],
+    item?.['duration'],
+    options?.['videoDuration'],
+    options?.['duration'],
   );
 }
-function getVideoDurationFromAssetRef(_0x41a3f4 = {}) {
+function getVideoDurationFromAssetRef(options2 = {}) {
   return normalizePositiveNumber(
-    _0x41a3f4?.['videoDuration'],
-    _0x41a3f4?.['duration'],
-    _0x41a3f4?.['nodeData']?.['videoDuration'],
-    _0x41a3f4?.['nodeData']?.['duration'],
+    options2?.['videoDuration'],
+    options2?.['duration'],
+    options2?.['nodeData']?.['videoDuration'],
+    options2?.['nodeData']?.['duration'],
   );
 }
-function getImageSizeBytesFromSource(_0xbeb033 = {}) {
+function getImageSizeBytesFromSource(options3 = {}) {
   return normalizePositiveNumber(
-    _0xbeb033?.['imageSizeBytes'],
-    _0xbeb033?.['imageByteSize'],
-    _0xbeb033?.['fileSize'],
-    _0xbeb033?.['sizeBytes'],
-    _0xbeb033?.['byteSize'],
+    options3?.['imageSizeBytes'],
+    options3?.['imageByteSize'],
+    options3?.['fileSize'],
+    options3?.['sizeBytes'],
+    options3?.['byteSize'],
   );
 }
-function getImageSizeBytesFromAssetRef(_0x4fcf46 = {}) {
+function getImageSizeBytesFromAssetRef(options4 = {}) {
   return normalizePositiveNumber(
-    _0x4fcf46?.['imageSizeBytes'],
-    _0x4fcf46?.['imageByteSize'],
-    _0x4fcf46?.['fileSize'],
-    _0x4fcf46?.['sizeBytes'],
-    _0x4fcf46?.['byteSize'],
-    _0x4fcf46?.['nodeData']?.['imageSizeBytes'],
-    _0x4fcf46?.['nodeData']?.['imageByteSize'],
-    _0x4fcf46?.['nodeData']?.['fileSize'],
-    _0x4fcf46?.['nodeData']?.['sizeBytes'],
-    _0x4fcf46?.['nodeData']?.['byteSize'],
+    options4?.['imageSizeBytes'],
+    options4?.['imageByteSize'],
+    options4?.['fileSize'],
+    options4?.['sizeBytes'],
+    options4?.['byteSize'],
+    options4?.['nodeData']?.['imageSizeBytes'],
+    options4?.['nodeData']?.['imageByteSize'],
+    options4?.['nodeData']?.['fileSize'],
+    options4?.['nodeData']?.['sizeBytes'],
+    options4?.['nodeData']?.['byteSize'],
   );
 }
-function getVideoSizeBytesFromSource(_0x88acee = {}, _0x28203e = null) {
+function getVideoSizeBytesFromSource(options5 = {}, key = null) {
   return normalizePositiveNumber(
-    _0x28203e?.['videoSizeBytes'],
-    _0x28203e?.['videoByteSize'],
-    _0x28203e?.['fileSize'],
-    _0x28203e?.['sizeBytes'],
-    _0x28203e?.['byteSize'],
-    _0x88acee?.['videoSizeBytes'],
-    _0x88acee?.['videoByteSize'],
-    _0x88acee?.['fileSize'],
-    _0x88acee?.['sizeBytes'],
-    _0x88acee?.['byteSize'],
+    key?.['videoSizeBytes'],
+    key?.['videoByteSize'],
+    key?.['fileSize'],
+    key?.['sizeBytes'],
+    key?.['byteSize'],
+    options5?.['videoSizeBytes'],
+    options5?.['videoByteSize'],
+    options5?.['fileSize'],
+    options5?.['sizeBytes'],
+    options5?.['byteSize'],
   );
 }
-function getVideoSizeBytesFromAssetRef(_0x47ab37 = {}) {
+function getVideoSizeBytesFromAssetRef(options6 = {}) {
   return normalizePositiveNumber(
-    _0x47ab37?.['videoSizeBytes'],
-    _0x47ab37?.['videoByteSize'],
-    _0x47ab37?.['fileSize'],
-    _0x47ab37?.['sizeBytes'],
-    _0x47ab37?.['byteSize'],
-    _0x47ab37?.['nodeData']?.['videoSizeBytes'],
-    _0x47ab37?.['nodeData']?.['videoByteSize'],
-    _0x47ab37?.['nodeData']?.['fileSize'],
-    _0x47ab37?.['nodeData']?.['sizeBytes'],
-    _0x47ab37?.['nodeData']?.['byteSize'],
+    options6?.['videoSizeBytes'],
+    options6?.['videoByteSize'],
+    options6?.['fileSize'],
+    options6?.['sizeBytes'],
+    options6?.['byteSize'],
+    options6?.['nodeData']?.['videoSizeBytes'],
+    options6?.['nodeData']?.['videoByteSize'],
+    options6?.['nodeData']?.['fileSize'],
+    options6?.['nodeData']?.['sizeBytes'],
+    options6?.['nodeData']?.['byteSize'],
   );
 }
-function getAudioDurationFromSource(_0x152990 = {}) {
-  return normalizePositiveNumber(_0x152990?.['audioDuration'], _0x152990?.['duration']);
+function getAudioDurationFromSource(options7 = {}) {
+  return normalizePositiveNumber(options7?.['audioDuration'], options7?.['duration']);
 }
-function getAudioDurationFromAssetRef(_0x14f1c0 = {}) {
+function getAudioDurationFromAssetRef(options8 = {}) {
   return normalizePositiveNumber(
-    _0x14f1c0?.['audioDuration'],
-    _0x14f1c0?.['duration'],
-    _0x14f1c0?.['nodeData']?.['audioDuration'],
-    _0x14f1c0?.['nodeData']?.['duration'],
+    options8?.['audioDuration'],
+    options8?.['duration'],
+    options8?.['nodeData']?.['audioDuration'],
+    options8?.['nodeData']?.['duration'],
   );
 }
-function getAudioSizeBytesFromSource(_0x37f4c1 = {}) {
+function getAudioSizeBytesFromSource(options9 = {}) {
   return normalizePositiveNumber(
-    _0x37f4c1?.['audioSizeBytes'],
-    _0x37f4c1?.['audioByteSize'],
-    _0x37f4c1?.['fileSize'],
-    _0x37f4c1?.['sizeBytes'],
-    _0x37f4c1?.['byteSize'],
+    options9?.['audioSizeBytes'],
+    options9?.['audioByteSize'],
+    options9?.['fileSize'],
+    options9?.['sizeBytes'],
+    options9?.['byteSize'],
   );
 }
-function getAudioSizeBytesFromAssetRef(_0x43b8f1 = {}) {
+function getAudioSizeBytesFromAssetRef(options10 = {}) {
   return normalizePositiveNumber(
-    _0x43b8f1?.['audioSizeBytes'],
-    _0x43b8f1?.['audioByteSize'],
-    _0x43b8f1?.['fileSize'],
-    _0x43b8f1?.['sizeBytes'],
-    _0x43b8f1?.['byteSize'],
-    _0x43b8f1?.['nodeData']?.['audioSizeBytes'],
-    _0x43b8f1?.['nodeData']?.['audioByteSize'],
-    _0x43b8f1?.['nodeData']?.['fileSize'],
-    _0x43b8f1?.['nodeData']?.['sizeBytes'],
-    _0x43b8f1?.['nodeData']?.['byteSize'],
+    options10?.['audioSizeBytes'],
+    options10?.['audioByteSize'],
+    options10?.['fileSize'],
+    options10?.['sizeBytes'],
+    options10?.['byteSize'],
+    options10?.['nodeData']?.['audioSizeBytes'],
+    options10?.['nodeData']?.['audioByteSize'],
+    options10?.['nodeData']?.['fileSize'],
+    options10?.['nodeData']?.['sizeBytes'],
+    options10?.['nodeData']?.['byteSize'],
   );
 }
-function createMediaAccess(_0x1ac783) {
-  const _0x5a54b0 = (_0xdfaa5a) => {
-      const _0x1d7170 = String(_0xdfaa5a || '')['trim']();
-      if (!_0x1d7170) return '';
-      return typeof _0x1ac783 === 'function' ? String(_0x1ac783(_0x1d7170) || '')['trim']() : _0x1d7170;
+function createMediaAccess(handler) {
+  const run = (index) => {
+      const enabled = String(index || '')['trim']();
+      if (!enabled) return '';
+      return typeof handler === 'function' ? String(handler(enabled) || '')['trim']() : enabled;
     },
-    _0x1cb11c = (_0x1b9fdd, _0x33b3f8) => {
-      const _0x4f4a01 = Array['isArray'](_0x1b9fdd?.['videos']) ? _0x1b9fdd['videos'] : [];
-      if (_0x4f4a01['length'] <= 0x0) return null;
-      const _0x1d62d4 = String(_0x33b3f8?.['sourceMediaKey'] || '')['trim']();
-      if (_0x1d62d4) {
-        const _0x353c04 = _0x4f4a01['find']((_0x12d1d2) => {
-          const _0x9ebc86 =
-            String(_0x12d1d2?.['localPath'] || '')['trim']() ||
-            String(_0x12d1d2?.['videoUrl'] || '')['trim']();
-          return _0x9ebc86 === _0x1d62d4;
+    pickAiVideoItem = (result, data) => {
+      const list = Array['isArray'](result?.['videos']) ? result['videos'] : [];
+      if (list['length'] <= 0x0) return null;
+      const target = String(data?.['sourceMediaKey'] || '')['trim']();
+      if (target) {
+        const source = list['find']((next) => {
+          const current =
+            String(next?.['localPath'] || '')['trim']() || String(next?.['videoUrl'] || '')['trim']();
+          return current === target;
         });
-        if (_0x353c04) return _0x353c04;
+        if (source) return source;
       }
-      const _0x13f06f = Number(_0x1b9fdd?.['mainVideoIndex']),
-        _0x26f757 = Number['isFinite'](_0x13f06f) ? Math['max'](0x0, Math['trunc'](_0x13f06f)) : 0x0;
-      return _0x4f4a01[Math['min'](_0x26f757, _0x4f4a01['length'] - 0x1)] || null;
+      const entry = Number(result?.['mainVideoIndex']),
+        record = Number['isFinite'](entry) ? Math['max'](0x0, Math['trunc'](entry)) : 0x0;
+      return list[Math['min'](record, list['length'] - 0x1)] || null;
     },
-    _0x33568c = (_0x5d967b, _0x4c7bf1 = null) => {
-      const _0x1813f8 =
-          String(_0x5d967b?.['type'] || '') === 'ai-video' ? _0x1cb11c(_0x5d967b, _0x4c7bf1) : null,
-        _0x1b0792 = [
-          localPathToUrl(String(_0x1813f8?.['localPath'] || '')['trim']()),
-          localPathToUrl(String(_0x1813f8?.['displayLocalPath'] || '')['trim']()),
-          localPathToUrl(String(_0x1813f8?.['originalLocalPath'] || '')['trim']()),
-          _0x1813f8?.['videoUrl'],
-          localPathToUrl(String(_0x5d967b?.['localPath'] || '')['trim']()),
-          localPathToUrl(String(_0x5d967b?.['displayLocalPath'] || '')['trim']()),
-          localPathToUrl(String(_0x5d967b?.['originalLocalPath'] || '')['trim']()),
-          localPathToUrl(String(_0x5d967b?.['videoLocalPath'] || '')['trim']()),
-          _0x5d967b?.['videoUrl'],
-          _0x5d967b?.['src'],
-          _0x5d967b?.['url'],
-          _0x5d967b?.['resultUrl'],
-          _0x5d967b?.['sourceUrl'],
+    getVideoUrl = (response, payload = null) => {
+      const handle =
+          String(response?.['type'] || '') === 'ai-video' ? pickAiVideoItem(response, payload) : null,
+        state = [
+          localPathToUrl(String(handle?.['localPath'] || '')['trim']()),
+          localPathToUrl(String(handle?.['displayLocalPath'] || '')['trim']()),
+          localPathToUrl(String(handle?.['originalLocalPath'] || '')['trim']()),
+          handle?.['videoUrl'],
+          localPathToUrl(String(response?.['localPath'] || '')['trim']()),
+          localPathToUrl(String(response?.['displayLocalPath'] || '')['trim']()),
+          localPathToUrl(String(response?.['originalLocalPath'] || '')['trim']()),
+          localPathToUrl(String(response?.['videoLocalPath'] || '')['trim']()),
+          response?.['videoUrl'],
+          response?.['src'],
+          response?.['url'],
+          response?.['resultUrl'],
+          response?.['sourceUrl'],
         ];
-      for (const _0x3de351 of _0x1b0792) {
-        const _0x5a4ef2 = _0x5a54b0(_0x3de351);
-        if (_0x5a4ef2) return _0x5a4ef2;
+      for (const config of state) {
+        const scope = run(config);
+        if (scope) return scope;
       }
       return '';
     },
-    _0x5e2894 = (_0x1814ba) => _0x5a54b0(resolveGenerationInputImageUrl(_0x1814ba)),
-    _0x499539 = (_0x57e10e) => {
-      const _0x3761f2 = String(
-        _0x57e10e?.['mask'] ||
-          _0x57e10e?.['maskImageDataUrl'] ||
-          _0x57e10e?.['maskImageUrl'] ||
-          _0x57e10e?.['maskUrl'] ||
-          _0x57e10e?.['maskLocalPath'] ||
+    getImageUrl = (input) => run(resolveGenerationInputImageUrl(input)),
+    getMaskImageUrl = (output) => {
+      const value2 = String(
+        output?.['mask'] ||
+          output?.['maskImageDataUrl'] ||
+          output?.['maskImageUrl'] ||
+          output?.['maskUrl'] ||
+          output?.['maskLocalPath'] ||
           '',
       )['trim']();
-      return _0x5a54b0(localPathToUrl(_0x3761f2) || _0x3761f2);
+      return run(localPathToUrl(value2) || value2);
     },
-    _0x2c6992 = (_0x46653f) => {
-      const _0x52daaa = [
-        localPathToUrl(String(_0x46653f?.['localPath'] || '')['trim']()),
-        _0x46653f?.['audioUrl'],
-        _0x46653f?.['src'],
+    getAudioUrl = (value3) => {
+      const value4 = [
+        localPathToUrl(String(value3?.['localPath'] || '')['trim']()),
+        value3?.['audioUrl'],
+        value3?.['src'],
       ];
-      for (const _0x3ba11f of _0x52daaa) {
-        const _0x2a6a37 = _0x5a54b0(_0x3ba11f);
-        if (_0x2a6a37) return _0x2a6a37;
+      for (const value5 of value4) {
+        const value6 = run(value5);
+        if (value6) return value6;
       }
       return '';
     };
   return {
-    getAudioUrl: _0x2c6992,
-    getImageUrl: _0x5e2894,
-    getMaskImageUrl: _0x499539,
-    getVideoUrl: _0x33568c,
-    pickAiVideoItem: _0x1cb11c,
+    getAudioUrl: getAudioUrl,
+    getImageUrl: getImageUrl,
+    getMaskImageUrl: getMaskImageUrl,
+    getVideoUrl: getVideoUrl,
+    pickAiVideoItem: pickAiVideoItem,
   };
 }
-function appendUnique(_0x4ba2c0, _0xaa49ee) {
-  const _0x17935b = String(_0xaa49ee || '')['trim']();
-  if (_0x17935b && !_0x4ba2c0['includes'](_0x17935b)) _0x4ba2c0['push'](_0x17935b);
+function appendUnique(list2, value7) {
+  const value8 = String(value7 || '')['trim']();
+  if (value8 && !list2['includes'](value8)) list2['push'](value8);
 }
-function appendUniqueVideo(_0x26bac3, _0x3569a2, _0x9aab59, _0x4eb70b = {}) {
-  const _0x428891 = String(_0x9aab59 || '')['trim']();
-  if (!_0x428891) return;
-  const _0x3ac53a = _0x26bac3['indexOf'](_0x428891),
-    _0x269b4f = { ..._0x4eb70b, url: _0x428891 };
-  if (_0x3ac53a < 0x0) {
-    (_0x26bac3['push'](_0x428891), _0x3569a2['push'](_0x269b4f));
+function appendUniqueVideo(list3, list4, value9, args2 = {}) {
+  const url = String(value9 || '')['trim']();
+  if (!url) return;
+  const count2 = list3['indexOf'](url),
+    args3 = { ...args2, url: url };
+  if (count2 < 0x0) {
+    (list3['push'](url), list4['push'](args3));
     return;
   }
-  const _0x3c9f43 = _0x3569a2[_0x3ac53a] || {};
-  !(Number(_0x3c9f43['duration']) > 0x0) &&
-    Number(_0x269b4f['duration']) > 0x0 &&
-    (_0x3569a2[_0x3ac53a] = { ..._0x3c9f43, ..._0x269b4f });
+  const args4 = list4[count2] || {};
+  !(Number(args4['duration']) > 0x0) &&
+    Number(args3['duration']) > 0x0 &&
+    (list4[count2] = { ...args4, ...args3 });
 }
-function appendUniqueAudio(_0x163342, _0x22ce1f, _0x266258, _0x59c9e0 = {}) {
-  const _0x5f2422 = String(_0x266258 || '')['trim']();
-  if (!_0x5f2422) return;
-  const _0x48c8b9 = _0x163342['indexOf'](_0x5f2422),
-    _0x57ff73 = { ..._0x59c9e0, url: _0x5f2422 };
-  if (_0x48c8b9 < 0x0) {
-    (_0x163342['push'](_0x5f2422), _0x22ce1f['push'](_0x57ff73));
+function appendUniqueAudio(list5, list6, value10, args5 = {}) {
+  const url2 = String(value10 || '')['trim']();
+  if (!url2) return;
+  const count3 = list5['indexOf'](url2),
+    value11 = { ...args5, url: url2 };
+  if (count3 < 0x0) {
+    (list5['push'](url2), list6['push'](value11));
     return;
   }
-  const _0xbef10b = _0x22ce1f[_0x48c8b9] || {};
-  _0x22ce1f[_0x48c8b9] = {
-    ..._0xbef10b,
+  const args6 = list6[count3] || {};
+  list6[count3] = {
+    ...args6,
     ...Object['fromEntries'](
-      Object['entries'](_0x57ff73)['filter'](([, _0x88d09d]) => {
-        if (_0x88d09d === '' || _0x88d09d == null) return ![];
-        if (Number(_0x88d09d) === 0x0) return ![];
+      Object['entries'](value11)['filter'](([, value12]) => {
+        if (value12 === '' || value12 == null) return ![];
+        if (Number(value12) === 0x0) return ![];
         return !![];
       }),
     ),
   };
 }
-function appendUniqueImage(_0x14b058, _0x4ee502, _0x10071b, _0x5257cc = {}) {
-  appendUniqueAudio(_0x14b058, _0x4ee502, _0x10071b, _0x5257cc);
+function appendUniqueImage(value13, value14, value15, value16 = {}) {
+  appendUniqueAudio(value13, value14, value15, value16);
 }
 export function resolveVideoSubmitInputMaterials({
   inEdges: inEdges = [],
   nodes: nodes = {},
   assetInputRefs: assetInputRefs = [],
   initialImageUrls: initialImageUrls = [],
-  resolveMediaUrl: _0x297cb8,
+  resolveMediaUrl: resolveMediaUrl,
 } = {}) {
-  const _0x15e068 = createMediaAccess(_0x297cb8),
-    _0x2b0f9c = Array['isArray'](assetInputRefs) ? assetInputRefs : [],
-    _0x572c15 = Array['isArray'](inEdges) ? inEdges : [],
-    _0x8c6f2d = {
+  const helpers = createMediaAccess(resolveMediaUrl),
+    images = Array['isArray'](assetInputRefs) ? assetInputRefs : [],
+    value17 = Array['isArray'](inEdges) ? inEdges : [],
+    modelApi = {
       images: [],
       imageRefs: [],
       imageEntries: [],
@@ -251,141 +250,144 @@ export function resolveVideoSubmitInputMaterials({
       audioEntries: [],
       providerAssetRefs: [],
     };
-  ((Array['isArray'](initialImageUrls) ? initialImageUrls : [])['forEach']((_0x547496) =>
-    appendUniqueImage(_0x8c6f2d['images'], _0x8c6f2d['imageEntries'], _0x547496),
+  ((Array['isArray'](initialImageUrls) ? initialImageUrls : [])['forEach']((value18) =>
+    appendUniqueImage(modelApi['images'], modelApi['imageEntries'], value18),
   ),
-    _0x2b0f9c['filter'](
-      (_0x5a0910) =>
-        _0x5a0910?.['type'] === 'image' &&
-        _0x5a0910?.['url'] &&
-        _0x8c6f2d['images']['includes'](String(_0x5a0910['url'])['trim']()),
-    )['forEach']((_0x1618b7) => {
-      const _0x339ab3 = getImageSizeBytesFromAssetRef(_0x1618b7);
-      appendUniqueImage(_0x8c6f2d['images'], _0x8c6f2d['imageEntries'], _0x1618b7['url'], {
-        ...(_0x339ab3 > 0x0 ? { sizeBytes: _0x339ab3 } : {}),
-        assetRefSource: _0x1618b7['assetRefSource'] || '',
+    images['filter'](
+      (response2) =>
+        response2?.['type'] === 'image' &&
+        response2?.['url'] &&
+        modelApi['images']['includes'](String(response2['url'])['trim']()),
+    )['forEach']((assetRefSource) => {
+      const sizeBytes = getImageSizeBytesFromAssetRef(assetRefSource);
+      appendUniqueImage(modelApi['images'], modelApi['imageEntries'], assetRefSource['url'], {
+        ...(sizeBytes > 0x0 ? { sizeBytes: sizeBytes } : {}),
+        assetRefSource: assetRefSource['assetRefSource'] || '',
       });
     }),
-    _0x2b0f9c['filter']((_0x2cdd98) => _0x2cdd98?.['type'] === 'audio' && _0x2cdd98?.['url'])['forEach'](
-      (_0x1fffef) => {
-        appendUniqueAudio(_0x8c6f2d['audios'], _0x8c6f2d['audioEntries'], _0x1fffef['url'], {
-          duration: getAudioDurationFromAssetRef(_0x1fffef),
-          sizeBytes: getAudioSizeBytesFromAssetRef(_0x1fffef),
-          assetRefSource: _0x1fffef['assetRefSource'] || '',
+    images['filter']((response3) => response3?.['type'] === 'audio' && response3?.['url'])['forEach'](
+      (assetRefSource2) => {
+        appendUniqueAudio(modelApi['audios'], modelApi['audioEntries'], assetRefSource2['url'], {
+          duration: getAudioDurationFromAssetRef(assetRefSource2),
+          sizeBytes: getAudioSizeBytesFromAssetRef(assetRefSource2),
+          assetRefSource: assetRefSource2['assetRefSource'] || '',
         });
       },
     ),
-    _0x2b0f9c['filter']((_0x1bcc61) => _0x1bcc61?.['type'] === 'video' && _0x1bcc61?.['url'])['forEach'](
-      (_0x5a74fd) => {
-        const _0x46a346 = getVideoSizeBytesFromAssetRef(_0x5a74fd);
-        (appendUniqueVideo(_0x8c6f2d['videos'], _0x8c6f2d['videoEntries'], _0x5a74fd['url'], {
-          duration: getVideoDurationFromAssetRef(_0x5a74fd),
-          ...(_0x46a346 > 0x0 ? { sizeBytes: _0x46a346 } : {}),
-          assetRefSource: _0x5a74fd['assetRefSource'] || '',
+    images['filter']((response4) => response4?.['type'] === 'video' && response4?.['url'])['forEach'](
+      (assetRefSource3) => {
+        const sizeBytes2 = getVideoSizeBytesFromAssetRef(assetRefSource3);
+        (appendUniqueVideo(modelApi['videos'], modelApi['videoEntries'], assetRefSource3['url'], {
+          duration: getVideoDurationFromAssetRef(assetRefSource3),
+          ...(sizeBytes2 > 0x0 ? { sizeBytes: sizeBytes2 } : {}),
+          assetRefSource: assetRefSource3['assetRefSource'] || '',
         }),
-          _0x8c6f2d['videoRefs']['push']({ refSlot: _0x5a74fd?.['refSlot'] || '', url: _0x5a74fd['url'] }));
+          modelApi['videoRefs']['push']({
+            refSlot: assetRefSource3?.['refSlot'] || '',
+            url: assetRefSource3['url'],
+          }));
       },
     ));
-  const _0x12103f = {
-    images: _0x2b0f9c['filter']((_0x5bfe9d) => _0x5bfe9d?.['type'] === 'image' && _0x5bfe9d?.['url'])['map'](
-      (_0xc13c7a) => _0xc13c7a['url'],
+  const dreamina = {
+    images: images['filter']((response5) => response5?.['type'] === 'image' && response5?.['url'])['map'](
+      (response6) => response6['url'],
     ),
-    videos: _0x2b0f9c['filter']((_0x185943) => _0x185943?.['type'] === 'video' && _0x185943?.['url'])['map'](
-      (_0x1171c6) => _0x1171c6['url'],
+    videos: images['filter']((response7) => response7?.['type'] === 'video' && response7?.['url'])['map'](
+      (response8) => response8['url'],
     ),
-    audios: _0x2b0f9c['filter']((_0x4d9465) => _0x4d9465?.['type'] === 'audio' && _0x4d9465?.['url'])['map'](
-      (_0x10f0a9) => _0x10f0a9['url'],
+    audios: images['filter']((response9) => response9?.['type'] === 'audio' && response9?.['url'])['map'](
+      (response10) => response10['url'],
     ),
-    videoEntries: _0x2b0f9c['filter']((_0x1e56d5) => _0x1e56d5?.['type'] === 'video' && _0x1e56d5?.['url'])[
+    videoEntries: images['filter']((response11) => response11?.['type'] === 'video' && response11?.['url'])[
       'map'
-    ]((_0x418eee) => ({ url: _0x418eee['url'], duration: getVideoDurationFromAssetRef(_0x418eee) })),
-    audioEntries: _0x2b0f9c['filter']((_0x7f44d3) => _0x7f44d3?.['type'] === 'audio' && _0x7f44d3?.['url'])[
+    ]((url3) => ({ url: url3['url'], duration: getVideoDurationFromAssetRef(url3) })),
+    audioEntries: images['filter']((response12) => response12?.['type'] === 'audio' && response12?.['url'])[
       'map'
-    ]((_0x2daa76) => ({ url: _0x2daa76['url'], duration: getAudioDurationFromAssetRef(_0x2daa76) })),
+    ]((url4) => ({ url: url4['url'], duration: getAudioDurationFromAssetRef(url4) })),
     providerAssetRefs: [],
   };
-  for (const _0x1b4468 of _0x572c15) {
-    const _0x1e4dac = nodes?.[_0x1b4468?.['sourceId']];
-    if (!_0x1e4dac) continue;
-    const _0xa0263 = String(_0x1e4dac?.['type'] || '')['toLowerCase']();
-    if (_0xa0263['includes']('image')) {
-      const _0xd5aba9 = _0x15e068['getImageUrl'](_0x1e4dac),
-        _0x309854 = String(
-          _0xd5aba9 || _0x1e4dac?.['imageUrl'] || _0x1e4dac?.['src'] || _0x1e4dac?.['url'] || '',
+  for (const edgeId of value17) {
+    const response13 = nodes?.[edgeId?.['sourceId']];
+    if (!response13) continue;
+    const list7 = String(response13?.['type'] || '')['toLowerCase']();
+    if (list7['includes']('image')) {
+      const sourceUrl = helpers['getImageUrl'](response13),
+        url5 = String(
+          sourceUrl || response13?.['imageUrl'] || response13?.['src'] || response13?.['url'] || '',
         )['trim'](),
-        _0x627e6b = getImageSizeBytesFromSource(_0x1e4dac);
-      appendUniqueImage(_0x8c6f2d['images'], _0x8c6f2d['imageEntries'], _0x309854, {
-        ...(_0x627e6b > 0x0 ? { sizeBytes: _0x627e6b } : {}),
-        edgeId: _0x1b4468?.['id'],
+        sizeBytes3 = getImageSizeBytesFromSource(response13);
+      appendUniqueImage(modelApi['images'], modelApi['imageEntries'], url5, {
+        ...(sizeBytes3 > 0x0 ? { sizeBytes: sizeBytes3 } : {}),
+        edgeId: edgeId?.['id'],
       });
-      _0x309854 &&
-        (_0x8c6f2d['imageRefs']['push']({ refSlot: _0x1b4468?.['refSlot'] || '', url: _0x309854 }),
-        appendApimartPrivateAvatarProviderAssetRefs(_0x8c6f2d['providerAssetRefs'], _0x1e4dac, {
+      url5 &&
+        (modelApi['imageRefs']['push']({ refSlot: edgeId?.['refSlot'] || '', url: url5 }),
+        appendApimartPrivateAvatarProviderAssetRefs(modelApi['providerAssetRefs'], response13, {
           kind: 'image',
-          sourceUrl: _0x309854,
-          refSlot: _0x1b4468?.['refSlot'],
-          edgeId: _0x1b4468?.['id'],
+          sourceUrl: url5,
+          refSlot: edgeId?.['refSlot'],
+          edgeId: edgeId?.['id'],
         }));
-      _0xd5aba9 &&
-        (_0x12103f['images']['push'](_0xd5aba9),
-        appendApimartPrivateAvatarProviderAssetRefs(_0x12103f['providerAssetRefs'], _0x1e4dac, {
+      sourceUrl &&
+        (dreamina['images']['push'](sourceUrl),
+        appendApimartPrivateAvatarProviderAssetRefs(dreamina['providerAssetRefs'], response13, {
           kind: 'image',
-          sourceUrl: _0xd5aba9,
-          refSlot: _0x1b4468?.['refSlot'],
-          edgeId: _0x1b4468?.['id'],
+          sourceUrl: sourceUrl,
+          refSlot: edgeId?.['refSlot'],
+          edgeId: edgeId?.['id'],
         }));
       continue;
     }
-    if (_0xa0263['includes']('video')) {
-      const _0x2c964e =
-          String(_0x1e4dac?.['type'] || '') === 'ai-video'
-            ? _0x15e068['pickAiVideoItem'](_0x1e4dac, _0x1b4468)
+    if (list7['includes']('video')) {
+      const value19 =
+          String(response13?.['type'] || '') === 'ai-video'
+            ? helpers['pickAiVideoItem'](response13, edgeId)
             : null,
-        _0x4556d0 = _0x15e068['getVideoUrl'](_0x1e4dac, _0x1b4468),
-        _0x4825d0 = getVideoSizeBytesFromSource(_0x1e4dac, _0x2c964e),
-        _0x637342 = {
-          duration: getVideoDurationFromSource(_0x1e4dac, _0x2c964e),
-          ...(_0x4825d0 > 0x0 ? { sizeBytes: _0x4825d0 } : {}),
-          edgeId: _0x1b4468?.['id'],
+        url6 = helpers['getVideoUrl'](response13, edgeId),
+        sizeBytes4 = getVideoSizeBytesFromSource(response13, value19),
+        duration = {
+          duration: getVideoDurationFromSource(response13, value19),
+          ...(sizeBytes4 > 0x0 ? { sizeBytes: sizeBytes4 } : {}),
+          edgeId: edgeId?.['id'],
         };
-      appendUniqueVideo(_0x8c6f2d['videos'], _0x8c6f2d['videoEntries'], _0x4556d0, _0x637342);
-      _0x4556d0 &&
-        (_0x8c6f2d['videoRefs']['push']({ refSlot: _0x1b4468?.['refSlot'] || '', url: _0x4556d0 }),
-        _0x12103f['videos']['push'](_0x4556d0),
-        _0x12103f['videoEntries']['push']({ url: _0x4556d0, duration: _0x637342['duration'] }),
-        appendApimartPrivateAvatarProviderAssetRefs(_0x8c6f2d['providerAssetRefs'], _0x1e4dac, {
+      appendUniqueVideo(modelApi['videos'], modelApi['videoEntries'], url6, duration);
+      url6 &&
+        (modelApi['videoRefs']['push']({ refSlot: edgeId?.['refSlot'] || '', url: url6 }),
+        dreamina['videos']['push'](url6),
+        dreamina['videoEntries']['push']({ url: url6, duration: duration['duration'] }),
+        appendApimartPrivateAvatarProviderAssetRefs(modelApi['providerAssetRefs'], response13, {
           kind: 'video',
-          sourceUrl: _0x4556d0,
-          refSlot: _0x1b4468?.['refSlot'],
-          edgeId: _0x1b4468?.['id'],
+          sourceUrl: url6,
+          refSlot: edgeId?.['refSlot'],
+          edgeId: edgeId?.['id'],
         }),
-        appendApimartPrivateAvatarProviderAssetRefs(_0x12103f['providerAssetRefs'], _0x1e4dac, {
+        appendApimartPrivateAvatarProviderAssetRefs(dreamina['providerAssetRefs'], response13, {
           kind: 'video',
-          sourceUrl: _0x4556d0,
-          refSlot: _0x1b4468?.['refSlot'],
-          edgeId: _0x1b4468?.['id'],
+          sourceUrl: url6,
+          refSlot: edgeId?.['refSlot'],
+          edgeId: edgeId?.['id'],
         }));
       continue;
     }
-    if (_0xa0263['includes']('audio')) {
-      const _0x533c32 = _0x15e068['getAudioUrl'](_0x1e4dac),
-        _0x11c5d2 = {
-          duration: getAudioDurationFromSource(_0x1e4dac),
-          sizeBytes: getAudioSizeBytesFromSource(_0x1e4dac),
-          edgeId: _0x1b4468?.['id'],
+    if (list7['includes']('audio')) {
+      const url7 = helpers['getAudioUrl'](response13),
+        duration2 = {
+          duration: getAudioDurationFromSource(response13),
+          sizeBytes: getAudioSizeBytesFromSource(response13),
+          edgeId: edgeId?.['id'],
         };
-      (appendUniqueAudio(_0x8c6f2d['audios'], _0x8c6f2d['audioEntries'], _0x533c32, _0x11c5d2),
-        _0x533c32 &&
-          (_0x12103f['audios']['push'](_0x533c32),
-          _0x12103f['audioEntries']['push']({ url: _0x533c32, duration: _0x11c5d2['duration'] })));
+      (appendUniqueAudio(modelApi['audios'], modelApi['audioEntries'], url7, duration2),
+        url7 &&
+          (dreamina['audios']['push'](url7),
+          dreamina['audioEntries']['push']({ url: url7, duration: duration2['duration'] })));
     }
   }
   return {
-    assetVideoCount: _0x2b0f9c['filter'](
-      (_0x1e5ef0) => _0x1e5ef0?.['type'] === 'video' && _0x1e5ef0?.['url'],
+    assetVideoCount: images['filter'](
+      (response14) => response14?.['type'] === 'video' && response14?.['url'],
     )['length'],
-    dreamina: _0x12103f,
-    helpers: _0x15e068,
-    modelApi: _0x8c6f2d,
+    dreamina: dreamina,
+    helpers: helpers,
+    modelApi: modelApi,
   };
 }

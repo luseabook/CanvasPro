@@ -10,43 +10,41 @@ import {
 } from './storyClipFrames.js';
 const IMAGE_NODE_TYPES = new Set(['source-image', 'ai-image', 'image']),
   VIDEO_NODE_TYPES = new Set(['source-video', 'ai-video', 'video']);
-function asObject(_0x1b948b) {
-  return _0x1b948b && typeof _0x1b948b === 'object' && !Array['isArray'](_0x1b948b) ? _0x1b948b : {};
+function asObject(value) {
+  return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
 }
-function normalizeText(_0x207241) {
-  return String(_0x207241 || '')['trim']();
+function normalizeText(item) {
+  return String(item || '')['trim']();
 }
-function normalizeIndex(_0x500ba0, _0x4efd3e) {
-  const _0x170f54 = Math['trunc'](Number(_0x500ba0));
-  if (!Number['isFinite'](_0x170f54) || _0x4efd3e <= 0x0) return 0x0;
-  return Math['max'](0x0, Math['min'](_0x4efd3e - 0x1, _0x170f54));
+function normalizeIndex(key, count) {
+  const index = Math['trunc'](Number(key));
+  if (!Number['isFinite'](index) || count <= 0x0) return 0x0;
+  return Math['max'](0x0, Math['min'](count - 0x1, index));
 }
-function firstText(..._0x19ee4f) {
-  return _0x19ee4f['map'](normalizeText)['find'](Boolean) || '';
+function firstText(...list) {
+  return list['map'](normalizeText)['find'](Boolean) || '';
 }
-function hashText(_0x350e98) {
-  let _0x4a78be = 0x811c9dc5;
-  for (const _0x11f1a5 of String(_0x350e98 || '')) {
-    ((_0x4a78be ^= _0x11f1a5['charCodeAt'](0x0)), (_0x4a78be = Math['imul'](_0x4a78be, 0x1000193)));
+function hashText(result) {
+  let data = 0x811c9dc5;
+  for (const options of String(result || '')) {
+    ((data ^= options['charCodeAt'](0x0)), (data = Math['imul'](data, 0x1000193)));
   }
-  return (_0x4a78be >>> 0x0)['toString'](0x24);
+  return (data >>> 0x0)['toString'](0x24);
 }
-function withoutNodeType(_0x5ae6c1) {
-  const _0x213b30 = { ...asObject(_0x5ae6c1) };
-  return (delete _0x213b30['type'], _0x213b30);
+function withoutNodeType(target) {
+  const source = { ...asObject(target) };
+  return (delete source['type'], source);
 }
-function getActiveMediaItem(_0x390b47, _0x5c8298, _0xe6be8d) {
-  const _0x597f57 = Array['isArray'](_0x390b47?.[_0x5c8298]) ? _0x390b47[_0x5c8298] : [],
-    _0x3c6313 = _0xe6be8d['map']((_0x12fe7d) => _0x390b47?.[_0x12fe7d])['find'](
-      (_0x39d704) => _0x39d704 !== undefined,
-    );
-  return asObject(_0x597f57[normalizeIndex(_0x3c6313, _0x597f57['length'])]);
+function getActiveMediaItem(next, current, list2) {
+  const list3 = Array['isArray'](next?.[current]) ? next[current] : [],
+    entry = list2['map']((record) => next?.[record])['find']((payload) => payload !== undefined);
+  return asObject(list3[normalizeIndex(entry, list3['length'])]);
 }
-function buildCanvasMediaFrameId(_0x13e39b, _0x145e13) {
-  return 'story-canvas-media-' + hashText(normalizeText(_0x13e39b) + ':' + normalizeText(_0x145e13));
+function buildCanvasMediaFrameId(handle, state) {
+  return 'story-canvas-media-' + hashText(normalizeText(handle) + ':' + normalizeText(state));
 }
 function findEpisodeContext(
-  _0x43cd4b,
+  config,
   {
     binding: binding = {},
     existingFrame: existingFrame = null,
@@ -54,152 +52,113 @@ function findEpisodeContext(
     clipId: clipId = '',
   } = {},
 ) {
-  const _0x4094b7 = Array['isArray'](_0x43cd4b?.['episodes']) ? _0x43cd4b['episodes'] : [],
-    _0x5477ed = firstText(binding['clipFrameClipId'], binding['clipId'], existingFrame?.['clipId'], clipId),
-    _0x289da7 = firstText(
+  const list4 = Array['isArray'](config?.['episodes']) ? config['episodes'] : [],
+    text = firstText(binding['clipFrameClipId'], binding['clipId'], existingFrame?.['clipId'], clipId),
+    text2 = firstText(
       binding['clipFrameEpisodeId'],
       binding['episodeId'],
       existingFrame?.['episodeId'],
       episodeId,
     );
-  let _0x5e1e54 = _0x4094b7['find']((_0x409e5b) => normalizeText(_0x409e5b?.['id']) === _0x289da7);
-  !_0x5e1e54 &&
-    _0x5477ed &&
-    (_0x5e1e54 = _0x4094b7['find'](
-      (_0x791ee1) =>
-        Array['isArray'](_0x791ee1?.['clips']) &&
-        _0x791ee1['clips']['some']((_0x27768a) => normalizeText(_0x27768a?.['id']) === _0x5477ed),
+  let episode = list4['find']((scope) => normalizeText(scope?.['id']) === text2);
+  !episode &&
+    text &&
+    (episode = list4['find'](
+      (input) =>
+        Array['isArray'](input?.['clips']) &&
+        input['clips']['some']((output) => normalizeText(output?.['id']) === text),
     ));
-  _0x5e1e54 ||= _0x4094b7[0x0] || null;
-  const _0x1cf869 = Array['isArray'](_0x5e1e54?.['clips']) ? _0x5e1e54['clips'] : [],
-    _0x2c7313 =
-      _0x1cf869['find']((_0x34b333) => normalizeText(_0x34b333?.['id']) === _0x5477ed) ||
-      _0x1cf869[0x0] ||
-      null;
-  return { episode: _0x5e1e54, clip: _0x2c7313 };
+  episode ||= list4[0x0] || null;
+  const list5 = Array['isArray'](episode?.['clips']) ? episode['clips'] : [],
+    clip = list5['find']((value2) => normalizeText(value2?.['id']) === text) || list5[0x0] || null;
+  return { episode: episode, clip: clip };
 }
-export function isStoryCanvasMediaNode(_0x48d70a = {}) {
-  const _0x3b5518 = normalizeText(_0x48d70a['type']);
-  return IMAGE_NODE_TYPES['has'](_0x3b5518) || VIDEO_NODE_TYPES['has'](_0x3b5518);
+export function isStoryCanvasMediaNode(options2 = {}) {
+  const text3 = normalizeText(options2['type']);
+  return IMAGE_NODE_TYPES['has'](text3) || VIDEO_NODE_TYPES['has'](text3);
 }
-function isStoryWorkspaceClipVideoNode(_0x2f99ef = {}) {
+function isStoryWorkspaceClipVideoNode(options3 = {}) {
   return (
-    VIDEO_NODE_TYPES['has'](normalizeText(_0x2f99ef['type'])) &&
-    normalizeText(_0x2f99ef['storyWorkspaceBinding']?.['kind']) === 'clip-video'
+    VIDEO_NODE_TYPES['has'](normalizeText(options3['type'])) &&
+    normalizeText(options3['storyWorkspaceBinding']?.['kind']) === 'clip-video'
   );
 }
-export function resolveStoryCanvasNodeMedia(_0x4bbc6d = {}) {
-  const _0xda7451 = normalizeText(_0x4bbc6d['type']);
-  if (IMAGE_NODE_TYPES['has'](_0xda7451)) {
-    const _0x52e2d0 = getActiveMediaItem(_0x4bbc6d, 'images', ['mainImageIndex', 'activeImageIndex']),
-      _0x56cabb = firstText(
-        _0x52e2d0['imageUrl'],
-        _0x52e2d0['url'],
-        _0x4bbc6d['imageUrl'],
-        _0x4bbc6d['src'],
-        _0x4bbc6d['url'],
-        _0x52e2d0['sourceUrl'],
-        _0x4bbc6d['sourceUrl'],
-        _0x52e2d0['thumbUrl'],
-        _0x4bbc6d['thumbUrl'],
+export function resolveStoryCanvasNodeMedia(box = {}) {
+  const text4 = normalizeText(box['type']);
+  if (IMAGE_NODE_TYPES['has'](text4)) {
+    const box2 = getActiveMediaItem(box, 'images', ['mainImageIndex', 'activeImageIndex']),
+      imageUrl = firstText(
+        box2['imageUrl'],
+        box2['url'],
+        box['imageUrl'],
+        box['src'],
+        box['url'],
+        box2['sourceUrl'],
+        box['sourceUrl'],
+        box2['thumbUrl'],
+        box['thumbUrl'],
       ),
-      _0x1a0c3f = firstText(_0x52e2d0['localPath'], _0x4bbc6d['localPath']),
-      _0x5cff86 = firstText(_0x52e2d0['originalLocalPath'], _0x4bbc6d['originalLocalPath']),
-      _0xfb083f = firstText(_0x52e2d0['displayLocalPath'], _0x4bbc6d['displayLocalPath']),
-      _0x6c18bd = firstText(_0x52e2d0['thumbLocalPath'], _0x4bbc6d['thumbLocalPath']);
-    if (![_0x56cabb, _0x1a0c3f, _0x5cff86, _0xfb083f, _0x6c18bd]['some'](Boolean)) return null;
+      localPath = firstText(box2['localPath'], box['localPath']),
+      originalLocalPath = firstText(box2['originalLocalPath'], box['originalLocalPath']),
+      displayLocalPath = firstText(box2['displayLocalPath'], box['displayLocalPath']),
+      thumbLocalPath = firstText(box2['thumbLocalPath'], box['thumbLocalPath']);
+    if (![imageUrl, localPath, originalLocalPath, displayLocalPath, thumbLocalPath]['some'](Boolean))
+      return null;
     return {
       mediaType: STORY_CLIP_MEDIA_TYPE_IMAGE,
-      imageUrl: _0x56cabb,
-      sourceUrl: firstText(_0x52e2d0['sourceUrl'], _0x4bbc6d['sourceUrl'], _0x56cabb),
-      localPath: _0x1a0c3f,
-      originalLocalPath: _0x5cff86,
-      displayLocalPath: _0xfb083f,
-      thumbLocalPath: _0x6c18bd,
-      fileName: firstText(
-        _0x52e2d0['fileName'],
-        _0x52e2d0['filename'],
-        _0x4bbc6d['fileName'],
-        _0x4bbc6d['filename'],
-      ),
-      width:
-        Number(
-          _0x52e2d0['width'] ||
-            _0x52e2d0['originalWidth'] ||
-            _0x4bbc6d['originalWidth'] ||
-            _0x4bbc6d['width'],
-        ) || 0x0,
+      imageUrl: imageUrl,
+      sourceUrl: firstText(box2['sourceUrl'], box['sourceUrl'], imageUrl),
+      localPath: localPath,
+      originalLocalPath: originalLocalPath,
+      displayLocalPath: displayLocalPath,
+      thumbLocalPath: thumbLocalPath,
+      fileName: firstText(box2['fileName'], box2['filename'], box['fileName'], box['filename']),
+      width: Number(box2['width'] || box2['originalWidth'] || box['originalWidth'] || box['width']) || 0x0,
       height:
-        Number(
-          _0x52e2d0['height'] ||
-            _0x52e2d0['originalHeight'] ||
-            _0x4bbc6d['originalHeight'] ||
-            _0x4bbc6d['height'],
-        ) || 0x0,
+        Number(box2['height'] || box2['originalHeight'] || box['originalHeight'] || box['height']) || 0x0,
     };
   }
-  if (VIDEO_NODE_TYPES['has'](_0xda7451)) {
-    const _0xb5fa7e = getActiveMediaItem(_0x4bbc6d, 'videos', ['mainVideoIndex', 'activeVideoIndex']),
-      _0x110357 = firstText(
-        _0xb5fa7e['videoUrl'],
-        _0xb5fa7e['url'],
-        _0x4bbc6d['videoUrl'],
-        _0x4bbc6d['src'],
-        _0x4bbc6d['url'],
-        _0xb5fa7e['sourceUrl'],
-        _0x4bbc6d['sourceUrl'],
+  if (VIDEO_NODE_TYPES['has'](text4)) {
+    const box3 = getActiveMediaItem(box, 'videos', ['mainVideoIndex', 'activeVideoIndex']),
+      videoUrl = firstText(
+        box3['videoUrl'],
+        box3['url'],
+        box['videoUrl'],
+        box['src'],
+        box['url'],
+        box3['sourceUrl'],
+        box['sourceUrl'],
       ),
-      _0x26f0b3 = firstText(_0xb5fa7e['localPath'], _0x4bbc6d['localPath']),
-      _0x25f905 = firstText(_0xb5fa7e['originalLocalPath'], _0x4bbc6d['originalLocalPath']),
-      _0x366b83 = firstText(_0xb5fa7e['displayLocalPath'], _0x4bbc6d['displayLocalPath']);
-    if (![_0x110357, _0x26f0b3, _0x25f905, _0x366b83]['some'](Boolean)) return null;
+      localPath2 = firstText(box3['localPath'], box['localPath']),
+      originalLocalPath2 = firstText(box3['originalLocalPath'], box['originalLocalPath']),
+      displayLocalPath2 = firstText(box3['displayLocalPath'], box['displayLocalPath']);
+    if (![videoUrl, localPath2, originalLocalPath2, displayLocalPath2]['some'](Boolean)) return null;
     return {
       mediaType: STORY_CLIP_MEDIA_TYPE_VIDEO,
-      videoUrl: _0x110357,
-      sourceUrl: firstText(_0xb5fa7e['sourceUrl'], _0x4bbc6d['sourceUrl'], _0x110357),
-      localPath: _0x26f0b3,
-      originalLocalPath: _0x25f905,
-      displayLocalPath: _0x366b83,
-      thumbUrl: firstText(
-        _0xb5fa7e['thumbUrl'],
-        _0xb5fa7e['posterUrl'],
-        _0x4bbc6d['thumbUrl'],
-        _0x4bbc6d['posterUrl'],
-      ),
-      posterUrl: firstText(_0xb5fa7e['posterUrl'], _0x4bbc6d['posterUrl']),
+      videoUrl: videoUrl,
+      sourceUrl: firstText(box3['sourceUrl'], box['sourceUrl'], videoUrl),
+      localPath: localPath2,
+      originalLocalPath: originalLocalPath2,
+      displayLocalPath: displayLocalPath2,
+      thumbUrl: firstText(box3['thumbUrl'], box3['posterUrl'], box['thumbUrl'], box['posterUrl']),
+      posterUrl: firstText(box3['posterUrl'], box['posterUrl']),
       thumbLocalPath: firstText(
-        _0xb5fa7e['thumbLocalPath'],
-        _0xb5fa7e['posterLocalPath'],
-        _0x4bbc6d['thumbLocalPath'],
-        _0x4bbc6d['posterLocalPath'],
+        box3['thumbLocalPath'],
+        box3['posterLocalPath'],
+        box['thumbLocalPath'],
+        box['posterLocalPath'],
       ),
-      posterLocalPath: firstText(_0xb5fa7e['posterLocalPath'], _0x4bbc6d['posterLocalPath']),
-      fileName: firstText(
-        _0xb5fa7e['fileName'],
-        _0xb5fa7e['filename'],
-        _0x4bbc6d['fileName'],
-        _0x4bbc6d['filename'],
-      ),
-      width:
-        Number(
-          _0xb5fa7e['videoWidth'] || _0xb5fa7e['width'] || _0x4bbc6d['videoWidth'] || _0x4bbc6d['width'],
-        ) || 0x0,
-      height:
-        Number(
-          _0xb5fa7e['videoHeight'] || _0xb5fa7e['height'] || _0x4bbc6d['videoHeight'] || _0x4bbc6d['height'],
-        ) || 0x0,
+      posterLocalPath: firstText(box3['posterLocalPath'], box['posterLocalPath']),
+      fileName: firstText(box3['fileName'], box3['filename'], box['fileName'], box['filename']),
+      width: Number(box3['videoWidth'] || box3['width'] || box['videoWidth'] || box['width']) || 0x0,
+      height: Number(box3['videoHeight'] || box3['height'] || box['videoHeight'] || box['height']) || 0x0,
       videoDuration: Math['max'](
         0x0,
-        Number(
-          _0xb5fa7e['videoDuration'] ||
-            _0xb5fa7e['duration'] ||
-            _0x4bbc6d['videoDuration'] ||
-            _0x4bbc6d['duration'],
-        ) || 0x0,
+        Number(box3['videoDuration'] || box3['duration'] || box['videoDuration'] || box['duration']) || 0x0,
       ),
       videoFps: Math['max'](
         0x0,
-        Number(_0xb5fa7e['videoFps'] || _0xb5fa7e['fps'] || _0x4bbc6d['videoFps'] || _0x4bbc6d['fps']) || 0x0,
+        Number(box3['videoFps'] || box3['fps'] || box['videoFps'] || box['fps']) || 0x0,
       ),
     };
   }
@@ -216,43 +175,43 @@ export function buildStoryCanvasMediaFrame({
 } = {}) {
   if (!isStoryCanvasMediaNode(node)) return null;
   if (isStoryWorkspaceClipVideoNode(node)) return null;
-  const _0x1288e3 = resolveStoryCanvasNodeMedia(node);
-  if (!_0x1288e3) return null;
-  const _0x4fb120 = asObject(node['storyWorkspaceBinding']),
-    { episode: _0x4e2115, clip: _0x3601bd } = findEpisodeContext(projectData, {
-      binding: _0x4fb120,
+  const endTimeSec = resolveStoryCanvasNodeMedia(node);
+  if (!endTimeSec) return null;
+  const binding2 = asObject(node['storyWorkspaceBinding']),
+    { episode: episode2, clip: clip2 } = findEpisodeContext(projectData, {
+      binding: binding2,
       existingFrame: existingFrame,
       episodeId: episodeId,
       clipId: clipId,
     }),
-    _0x3adec3 = normalizeText(canvasId),
-    _0x386ad8 = normalizeText(node['id']);
-  if (!_0x3adec3 || !_0x386ad8) return null;
-  const _0x6c463c = firstText(
-      _0x4fb120['clipFrameId'],
+    canvasId2 = normalizeText(canvasId),
+    canvasNodeId = normalizeText(node['id']);
+  if (!canvasId2 || !canvasNodeId) return null;
+  const id2 = firstText(
+      binding2['clipFrameId'],
       existingFrame?.['id'],
-      buildCanvasMediaFrameId(_0x3adec3, _0x386ad8),
+      buildCanvasMediaFrameId(canvasId2, canvasNodeId),
     ),
-    _0xda62ea = Math['max'](0x0, Number(existingFrame?.['createdAt']) || Number(now?.()) || Date['now']());
+    createdAt = Math['max'](0x0, Number(existingFrame?.['createdAt']) || Number(now?.()) || Date['now']());
   return normalizeStoryClipFrame({
     ...asObject(existingFrame),
-    ..._0x1288e3,
-    id: _0x6c463c,
-    name: firstText(node['name'], existingFrame?.['name'], _0x3601bd?.['title'], '画布媒体'),
-    episodeId: normalizeText(_0x4e2115?.['id']),
-    episodeTitle: normalizeText(_0x4e2115?.['title']),
-    clipId: normalizeText(_0x3601bd?.['id']),
-    clipTitle: firstText(_0x3601bd?.['title'], existingFrame?.['clipTitle'], '片段'),
+    ...endTimeSec,
+    id: id2,
+    name: firstText(node['name'], existingFrame?.['name'], clip2?.['title'], '画布媒体'),
+    episodeId: normalizeText(episode2?.['id']),
+    episodeTitle: normalizeText(episode2?.['title']),
+    clipId: normalizeText(clip2?.['id']),
+    clipTitle: firstText(clip2?.['title'], existingFrame?.['clipTitle'], '片段'),
     currentTimeSec: 0x0,
-    endTimeSec: _0x1288e3['mediaType'] === STORY_CLIP_MEDIA_TYPE_VIDEO ? _0x1288e3['videoDuration'] : 0x0,
-    sourceKey: 'canvas-node:' + _0x3adec3 + ':' + _0x386ad8,
-    canvasId: _0x3adec3,
-    canvasNodeId: _0x386ad8,
-    createdAt: _0xda62ea,
+    endTimeSec: endTimeSec['mediaType'] === STORY_CLIP_MEDIA_TYPE_VIDEO ? endTimeSec['videoDuration'] : 0x0,
+    sourceKey: 'canvas-node:' + canvasId2 + ':' + canvasNodeId,
+    canvasId: canvasId2,
+    canvasNodeId: canvasNodeId,
+    createdAt: createdAt,
   });
 }
 export function reconcileStoryCanvasMediaNodes(
-  _0x1bbf92 = {},
+  projectData2 = {},
   {
     canvasId: canvasId = '',
     nodes: nodes = [],
@@ -261,204 +220,197 @@ export function reconcileStoryCanvasMediaNodes(
     now: now = Date['now'],
   } = {},
 ) {
-  if (!_0x1bbf92?.['project'] || !Array['isArray'](nodes)) return ![];
-  const _0x18cea7 = normalizeText(canvasId);
-  if (!_0x18cea7 || normalizeText(_0x1bbf92['project']['canvasBinding']?.['canvasId']) !== _0x18cea7)
+  if (!projectData2?.['project'] || !Array['isArray'](nodes)) return ![];
+  const canvasId3 = normalizeText(canvasId);
+  if (!canvasId3 || normalizeText(projectData2['project']['canvasBinding']?.['canvasId']) !== canvasId3)
     return ![];
-  const _0x313e24 = normalizeText(_0x1bbf92['project']['id']),
-    _0x12067f = normalizeStoryClipFrames(_0x1bbf92['clipFrames']);
-  let _0x2b02f2 = _0x12067f;
-  for (const _0x21c0c7 of nodes) {
-    const _0xadfc80 = normalizeText(_0x21c0c7?.['id']);
-    if (!_0xadfc80) continue;
-    const _0x510d35 = asObject(_0x21c0c7?.['storyWorkspaceBinding']),
-      _0x4582bf =
-        _0x2b02f2['find'](
-          (_0x253588) =>
-            normalizeText(_0x253588?.['canvasId']) === _0x18cea7 &&
-            normalizeText(_0x253588?.['canvasNodeId']) === _0xadfc80,
+  const text5 = normalizeText(projectData2['project']['id']),
+    storyClipFrames = normalizeStoryClipFrames(projectData2['clipFrames']);
+  let list6 = storyClipFrames;
+  for (const node2 of nodes) {
+    const text6 = normalizeText(node2?.['id']);
+    if (!text6) continue;
+    const asObject2 = asObject(node2?.['storyWorkspaceBinding']),
+      existingFrame2 =
+        list6['find'](
+          (value3) =>
+            normalizeText(value3?.['canvasId']) === canvasId3 &&
+            normalizeText(value3?.['canvasNodeId']) === text6,
         ) ||
-        _0x2b02f2['find'](
-          (_0x43d12e) => normalizeText(_0x43d12e?.['id']) === normalizeText(_0x510d35['clipFrameId']),
-        ),
-      _0x565879 = normalizeText(_0x510d35['projectId']);
-    if (_0x565879 && _0x313e24 && _0x565879 !== _0x313e24) {
-      if (_0x4582bf) _0x2b02f2 = _0x2b02f2['filter']((_0x5db935) => _0x5db935['id'] !== _0x4582bf['id']);
+        list6['find']((value4) => normalizeText(value4?.['id']) === normalizeText(asObject2['clipFrameId'])),
+      text7 = normalizeText(asObject2['projectId']);
+    if (text7 && text5 && text7 !== text5) {
+      if (existingFrame2) list6 = list6['filter']((value5) => value5['id'] !== existingFrame2['id']);
       continue;
     }
-    const _0x3352d2 = buildStoryCanvasMediaFrame({
-      canvasId: _0x18cea7,
-      node: _0x21c0c7,
-      projectData: _0x1bbf92,
-      existingFrame: _0x4582bf,
+    const storyCanvasMediaFrame = buildStoryCanvasMediaFrame({
+      canvasId: canvasId3,
+      node: node2,
+      projectData: projectData2,
+      existingFrame: existingFrame2,
       episodeId: episodeId,
       clipId: clipId,
       now: now,
     });
-    if (!_0x3352d2) {
-      if (_0x4582bf) _0x2b02f2 = _0x2b02f2['filter']((_0x33b055) => _0x33b055['id'] !== _0x4582bf['id']);
+    if (!storyCanvasMediaFrame) {
+      if (existingFrame2) list6 = list6['filter']((value6) => value6['id'] !== existingFrame2['id']);
       continue;
     }
-    _0x2b02f2 = upsertStoryClipFrame(_0x2b02f2, _0x3352d2);
+    list6 = upsertStoryClipFrame(list6, storyCanvasMediaFrame);
   }
-  if (JSON['stringify'](_0x12067f) === JSON['stringify'](_0x2b02f2)) return ![];
-  return ((_0x1bbf92['clipFrames'] = _0x2b02f2), !![]);
+  if (JSON['stringify'](storyClipFrames) === JSON['stringify'](list6)) return ![];
+  return ((projectData2['clipFrames'] = list6), !![]);
 }
 export function buildStoryClipFrameCanvasNodeData({ project: project = {}, frame: frame = {} } = {}) {
-  const _0x10238a = normalizeStoryClipFrame(frame),
-    _0x1dafa5 = getStoryClipFrameMediaType(_0x10238a),
-    _0x2d0dd8 = {
-      name: normalizeText(_0x10238a['name']) || '片段帧',
-      sourceUrl: normalizeText(_0x10238a['sourceUrl']),
-      localPath: normalizeText(_0x10238a['localPath']),
-      originalLocalPath: normalizeText(_0x10238a['originalLocalPath']),
-      displayLocalPath: normalizeText(_0x10238a['displayLocalPath']),
-      thumbLocalPath: normalizeText(_0x10238a['thumbLocalPath']),
-      fileName: normalizeText(_0x10238a['fileName']),
+  const error = normalizeStoryClipFrame(frame),
+    storyClipFrameMediaType = getStoryClipFrameMediaType(error),
+    args = {
+      name: normalizeText(error['name']) || '片段帧',
+      sourceUrl: normalizeText(error['sourceUrl']),
+      localPath: normalizeText(error['localPath']),
+      originalLocalPath: normalizeText(error['originalLocalPath']),
+      displayLocalPath: normalizeText(error['displayLocalPath']),
+      thumbLocalPath: normalizeText(error['thumbLocalPath']),
+      fileName: normalizeText(error['fileName']),
       storyWorkspaceBinding: {
         projectId: normalizeText(project['id']),
-        episodeId: normalizeText(_0x10238a['episodeId']),
-        clipId: normalizeText(_0x10238a['clipId']),
+        episodeId: normalizeText(error['episodeId']),
+        clipId: normalizeText(error['clipId']),
         kind: 'clip-frame-media',
         canvasScope: 'project',
-        clipFrameId: normalizeText(_0x10238a['id']),
-        clipFrameEpisodeId: normalizeText(_0x10238a['episodeId']),
-        clipFrameClipId: normalizeText(_0x10238a['clipId']),
+        clipFrameId: normalizeText(error['id']),
+        clipFrameEpisodeId: normalizeText(error['episodeId']),
+        clipFrameClipId: normalizeText(error['clipId']),
       },
     };
-  if (_0x1dafa5 === STORY_CLIP_MEDIA_TYPE_VIDEO)
+  if (storyClipFrameMediaType === STORY_CLIP_MEDIA_TYPE_VIDEO)
     return {
-      ..._0x2d0dd8,
+      ...args,
       type: 'source-video',
-      videoUrl: resolveStoryClipFrameMediaUrl(_0x10238a),
-      thumbUrl: resolveStoryClipFrameImageUrl(_0x10238a),
-      posterUrl: firstText(_0x10238a['posterUrl'], _0x10238a['thumbUrl']),
-      posterLocalPath: normalizeText(_0x10238a['posterLocalPath']),
-      videoDuration: Number(_0x10238a['videoDuration']) || 0x0,
-      videoFps: Number(_0x10238a['videoFps']) || 0x0,
+      videoUrl: resolveStoryClipFrameMediaUrl(error),
+      thumbUrl: resolveStoryClipFrameImageUrl(error),
+      posterUrl: firstText(error['posterUrl'], error['thumbUrl']),
+      posterLocalPath: normalizeText(error['posterLocalPath']),
+      videoDuration: Number(error['videoDuration']) || 0x0,
+      videoFps: Number(error['videoFps']) || 0x0,
     };
   return {
-    ..._0x2d0dd8,
+    ...args,
     type: 'source-image',
-    imageUrl: resolveStoryClipFrameImageUrl(_0x10238a),
+    imageUrl: resolveStoryClipFrameImageUrl(error),
     needsAutoResize: !![],
   };
 }
 export function createStoryClipFrameCanvasAdapter({
-  canvasTabManager: _0x24738a,
-  createNodeAtCursor: _0x13e793,
-  getGraphState: _0x54fed2,
-  updateNodeData: _0x1656ce,
-  deleteNodes: _0x43eeb2 = null,
+  canvasTabManager: canvasTabManager,
+  createNodeAtCursor: createNodeAtCursor,
+  getGraphState: getGraphState,
+  updateNodeData: updateNodeData,
+  deleteNodes: deleteNodes2 = null,
   getNodeSize: getNodeSize = () => ({ width: 0x200, height: 0x120 }),
   commit: commit = () => {},
 } = {}) {
   if (
-    typeof _0x24738a?.['getActiveCanvasId'] !== 'function' ||
-    typeof _0x13e793 !== 'function' ||
-    typeof _0x54fed2 !== 'function' ||
-    typeof _0x1656ce !== 'function'
+    typeof canvasTabManager?.['getActiveCanvasId'] !== 'function' ||
+    typeof createNodeAtCursor !== 'function' ||
+    typeof getGraphState !== 'function' ||
+    typeof updateNodeData !== 'function'
   )
     throw new Error('story\x20clip\x20frame\x20canvas\x20adapter\x20dependencies\x20are\x20incomplete');
-  const _0x14f48f = (_0x496f50) => asObject(_0x54fed2()?.['nodes'])[normalizeText(_0x496f50)] || null;
+  const run = (value7) => asObject(getGraphState()?.['nodes'])[normalizeText(value7)] || null;
   return {
-    canvasExists(_0x2a10e5) {
-      const _0x2ff7e0 = normalizeText(_0x2a10e5);
-      if (!_0x2ff7e0) return ![];
-      const _0x5c1776 = _0x24738a['getMultiDataSnapshot']?.({ captureVisualSnapshot: ![] }) || {};
-      return Array['isArray'](_0x5c1776['canvases'])
-        ? _0x5c1776['canvases']['some']((_0x3429b5) => normalizeText(_0x3429b5?.['id']) === _0x2ff7e0)
-        : normalizeText(_0x24738a['getActiveCanvasId']()) === _0x2ff7e0;
+    canvasExists(value8) {
+      const text8 = normalizeText(value8);
+      if (!text8) return ![];
+      const value9 = canvasTabManager['getMultiDataSnapshot']?.({ captureVisualSnapshot: ![] }) || {};
+      return Array['isArray'](value9['canvases'])
+        ? value9['canvases']['some']((value10) => normalizeText(value10?.['id']) === text8)
+        : normalizeText(canvasTabManager['getActiveCanvasId']()) === text8;
     },
-    async switchCanvas(_0x34d3fe) {
-      const _0x221076 = normalizeText(_0x34d3fe);
-      if (normalizeText(_0x24738a['getActiveCanvasId']()) === _0x221076) return !![];
-      if (!_0x221076 || typeof _0x24738a['switchTo'] !== 'function') return ![];
-      return (await _0x24738a['switchTo'](_0x221076)) !== ![];
+    async switchCanvas(value11) {
+      const text9 = normalizeText(value11);
+      if (normalizeText(canvasTabManager['getActiveCanvasId']()) === text9) return !![];
+      if (!text9 || typeof canvasTabManager['switchTo'] !== 'function') return ![];
+      return (await canvasTabManager['switchTo'](text9)) !== ![];
     },
-    nodeExists(_0x495141) {
-      return Boolean(_0x14f48f(_0x495141));
+    nodeExists(value12) {
+      return Boolean(run(value12));
     },
-    async createMediaNode(_0x33ae74, { sequenceKey: _0x4dbfeb } = {}) {
-      const _0x15fd53 = asObject(getNodeSize(_0x33ae74['type'], _0x33ae74)),
-        _0x4f1bcc = _0x13e793(
-          _0x33ae74['type'],
-          Number(_0x15fd53['width']) || 0x200,
-          Number(_0x15fd53['height']) || 0x120,
-          _0x33ae74['name'],
-          { placement: 'viewport-center-sequence', sequenceKey: _0x4dbfeb },
+    async createMediaNode(error2, { sequenceKey: sequenceKey } = {}) {
+      const box4 = asObject(getNodeSize(error2['type'], error2)),
+        args2 = createNodeAtCursor(
+          error2['type'],
+          Number(box4['width']) || 0x200,
+          Number(box4['height']) || 0x120,
+          error2['name'],
+          { placement: 'viewport-center-sequence', sequenceKey: sequenceKey },
         );
-      if (!_0x4f1bcc?.['id']) throw new Error('创建片段帧画布节点失败');
+      if (!args2?.['id']) throw new Error('创建片段帧画布节点失败');
       return (
-        _0x1656ce(_0x4f1bcc['id'], withoutNodeType(_0x33ae74)),
+        updateNodeData(args2['id'], withoutNodeType(error2)),
         commit(),
-        _0x14f48f(_0x4f1bcc['id']) || { ..._0x4f1bcc, ...withoutNodeType(_0x33ae74) }
+        run(args2['id']) || { ...args2, ...withoutNodeType(error2) }
       );
     },
-    async updateMediaNode(_0x33e89b, _0x39901f) {
-      const _0x38a796 = normalizeText(_0x33e89b);
-      if (!_0x38a796) return null;
-      return (
-        _0x1656ce(_0x38a796, withoutNodeType(_0x39901f)),
-        commit(),
-        _0x14f48f(_0x38a796) || { id: _0x38a796, ..._0x39901f }
-      );
+    async updateMediaNode(value13, args3) {
+      const id3 = normalizeText(value13);
+      if (!id3) return null;
+      return (updateNodeData(id3, withoutNodeType(args3)), commit(), run(id3) || { id: id3, ...args3 });
     },
-    deleteNodes(_0x2a9146 = []) {
-      if (typeof _0x43eeb2 !== 'function') return ![];
-      const _0x5daf0d = (Array['isArray'](_0x2a9146) ? _0x2a9146 : [])
+    deleteNodes(list7 = []) {
+      if (typeof deleteNodes2 !== 'function') return ![];
+      const list8 = (Array['isArray'](list7) ? list7 : [])
         ['map'](normalizeText)
-        ['filter']((_0xcded14) => _0xcded14 && _0x14f48f(_0xcded14));
-      if (!_0x5daf0d['length']) return ![];
-      return (_0x43eeb2(_0x5daf0d), commit(), !![]);
+        ['filter']((value14) => value14 && run(value14));
+      if (!list8['length']) return ![];
+      return (deleteNodes2(list8), commit(), !![]);
     },
   };
 }
 export async function deleteStoryCanvasMediaNodes({
   canvasId: canvasId = '',
   nodeIds: nodeIds = [],
-  adapter: _0x2685bc,
+  adapter: adapter,
 } = {}) {
-  const _0xafe791 = ['canvasExists', 'switchCanvas', 'deleteNodes'];
-  if (_0xafe791['some']((_0x3be2d1) => typeof _0x2685bc?.[_0x3be2d1] !== 'function'))
+  const list9 = ['canvasExists', 'switchCanvas', 'deleteNodes'];
+  if (list9['some']((value15) => typeof adapter?.[value15] !== 'function'))
     throw new Error('deleteStoryCanvasMediaNodes requires a complete canvas adapter');
-  const _0x1e8007 = normalizeText(canvasId),
-    _0x2abb3e = (Array['isArray'](nodeIds) ? nodeIds : [])['map'](normalizeText)['filter'](Boolean);
-  if (!_0x1e8007 || !_0x2abb3e['length'] || !(await _0x2685bc['canvasExists'](_0x1e8007))) return ![];
-  if ((await _0x2685bc['switchCanvas'](_0x1e8007)) === ![])
-    throw new Error('无法切换到关联画布：' + _0x1e8007);
-  return _0x2685bc['deleteNodes'](_0x2abb3e, { canvasId: _0x1e8007 }) !== ![];
+  const canvasId4 = normalizeText(canvasId),
+    list10 = (Array['isArray'](nodeIds) ? nodeIds : [])['map'](normalizeText)['filter'](Boolean);
+  if (!canvasId4 || !list10['length'] || !(await adapter['canvasExists'](canvasId4))) return ![];
+  if ((await adapter['switchCanvas'](canvasId4)) === ![]) throw new Error('无法切换到关联画布：' + canvasId4);
+  return adapter['deleteNodes'](list10, { canvasId: canvasId4 }) !== ![];
 }
 export async function syncStoryClipFrameToCanvas({
   project: project = {},
   frame: frame = {},
-  adapter: _0x4529cc,
+  adapter: adapter2,
 } = {}) {
-  const _0x1e327e = ['canvasExists', 'switchCanvas', 'nodeExists', 'createMediaNode', 'updateMediaNode'];
-  if (_0x1e327e['some']((_0x137cd5) => typeof _0x4529cc?.[_0x137cd5] !== 'function'))
+  const list11 = ['canvasExists', 'switchCanvas', 'nodeExists', 'createMediaNode', 'updateMediaNode'];
+  if (list11['some']((value16) => typeof adapter2?.[value16] !== 'function'))
     throw new Error('syncStoryClipFrameToCanvas requires a complete canvas adapter');
-  const _0x2e9092 = normalizeText(project['canvasBinding']?.['canvasId']);
-  if (!_0x2e9092 || !(await _0x4529cc['canvasExists'](_0x2e9092)))
+  const canvasId5 = normalizeText(project['canvasBinding']?.['canvasId']);
+  if (!canvasId5 || !(await adapter2['canvasExists'](canvasId5)))
     return { synced: ![], reason: 'canvas-unavailable' };
-  if ((await _0x4529cc['switchCanvas'](_0x2e9092)) === ![])
-    throw new Error('无法切换到已绑定的项目画布：' + _0x2e9092);
-  const _0x31ebde = buildStoryClipFrameCanvasNodeData({ project: project, frame: frame }),
-    _0x3b04b3 = normalizeText(frame['canvasId']) === _0x2e9092 ? normalizeText(frame['canvasNodeId']) : '',
-    _0x88d882 = Boolean(_0x3b04b3 && (await _0x4529cc['nodeExists'](_0x3b04b3, _0x2e9092))),
-    _0x46d1ee = _0x88d882
-      ? await _0x4529cc['updateMediaNode'](_0x3b04b3, _0x31ebde, { canvasId: _0x2e9092 })
-      : await _0x4529cc['createMediaNode'](_0x31ebde, {
-          canvasId: _0x2e9092,
-          sequenceKey: 'story-project:' + (normalizeText(project['id']) || _0x2e9092) + ':clip-frames',
+  if ((await adapter2['switchCanvas'](canvasId5)) === ![])
+    throw new Error('无法切换到已绑定的项目画布：' + canvasId5);
+  const storyClipFrameCanvasNodeData = buildStoryClipFrameCanvasNodeData({ project: project, frame: frame }),
+    text10 = normalizeText(frame['canvasId']) === canvasId5 ? normalizeText(frame['canvasNodeId']) : '',
+    enabled = Boolean(text10 && (await adapter2['nodeExists'](text10, canvasId5))),
+    node3 = enabled
+      ? await adapter2['updateMediaNode'](text10, storyClipFrameCanvasNodeData, { canvasId: canvasId5 })
+      : await adapter2['createMediaNode'](storyClipFrameCanvasNodeData, {
+          canvasId: canvasId5,
+          sequenceKey: 'story-project:' + (normalizeText(project['id']) || canvasId5) + ':clip-frames',
         }),
-    _0x119a6a = normalizeText(_0x46d1ee?.['id'] || (_0x88d882 ? _0x3b04b3 : ''));
-  if (!_0x119a6a) throw new Error('同步片段帧到项目画布失败');
+    nodeId = normalizeText(node3?.['id'] || (enabled ? text10 : ''));
+  if (!nodeId) throw new Error('同步片段帧到项目画布失败');
   return {
     synced: !![],
-    created: !_0x88d882,
-    canvasId: _0x2e9092,
-    nodeId: _0x119a6a,
-    node: _0x46d1ee,
-    frame: normalizeStoryClipFrame({ ...frame, canvasId: _0x2e9092, canvasNodeId: _0x119a6a }),
+    created: !enabled,
+    canvasId: canvasId5,
+    nodeId: nodeId,
+    node: node3,
+    frame: normalizeStoryClipFrame({ ...frame, canvasId: canvasId5, canvasNodeId: nodeId }),
   };
 }

@@ -1,401 +1,403 @@
 import { t } from '../../i18n/index.js';
-function imageToolbarText(_0x169383) {
-  return t('nodeToolbar.image.' + _0x169383);
+function imageToolbarText(value) {
+  return t('nodeToolbar.image.' + value);
 }
 const IMAGE_TOOLBAR_ZONE_MAP = Object.freeze({
   'outside-primary': 'outsidePrimary',
   'outside-secondary': 'outsideSecondary',
   more: 'more',
 });
-function getToolbarZones(_0x883b78) {
+function getToolbarZones(outsidePrimary) {
   return {
-    outsidePrimary: _0x883b78.querySelector('[data-zone="outside-primary"]'),
-    outsideSecondary: _0x883b78.querySelector('[data-zone="outside-secondary"]'),
-    more: _0x883b78.querySelector('[data-zone="more"]'),
+    outsidePrimary: outsidePrimary.querySelector('[data-zone="outside-primary"]'),
+    outsideSecondary: outsidePrimary.querySelector('[data-zone="outside-secondary"]'),
+    more: outsidePrimary.querySelector('[data-zone="more"]'),
   };
 }
-function collectToolbarActionButtons(_0x42b242, _0x18eb7e) {
-  const _0x372a4b = new Map();
+function collectToolbarActionButtons(el, handler) {
+  const map = new Map();
   return (
-    _0x42b242.querySelectorAll('.ftb-btn').forEach((_0x2382a3) => {
-      if (_0x2382a3.dataset.fixedToolbarButton === '1') return;
-      const _0x1eedcc = _0x18eb7e(_0x2382a3);
-      if (!_0x1eedcc || _0x372a4b.has(_0x1eedcc)) return;
-      _0x372a4b.set(_0x1eedcc, _0x2382a3);
+    el.querySelectorAll('.ftb-btn').forEach((el2) => {
+      if (el2.dataset.fixedToolbarButton === '1') return;
+      const enabled = handler(el2);
+      if (!enabled || map.has(enabled)) return;
+      map.set(enabled, el2);
     }),
-    _0x372a4b
+    map
   );
 }
 function applyToolbarLayoutToDom({
-  toolbarEl: _0x3d8f34,
-  layoutInput: _0x228b26,
-  imageToolbarActions: _0xe2b9ad,
-  normalizeImageToolbarLayout: _0x301155,
-  getToolbarActionFromButton: _0x25ad2c,
+  toolbarEl: toolbarEl,
+  layoutInput: layoutInput,
+  imageToolbarActions: imageToolbarActions,
+  normalizeImageToolbarLayout: normalizeImageToolbarLayout,
+  getToolbarActionFromButton: getToolbarActionFromButton,
 }) {
-  const _0x19848f = getToolbarZones(_0x3d8f34);
-  if (!_0x19848f.outsidePrimary || !_0x19848f.outsideSecondary || !_0x19848f.more) return;
-  const _0x541900 = _0x301155(_0x228b26),
-    _0x1ae906 = collectToolbarActionButtons(_0x3d8f34, _0x25ad2c),
-    _0xd1c9a = new Set();
-  for (const [_0x3b7112, _0x3fd6e3] of Object.entries(_0x541900)) {
-    const _0x2ffbab = _0x19848f[_0x3b7112];
-    if (!_0x2ffbab) continue;
-    _0x3fd6e3.forEach((_0x272561) => {
-      const _0x2649dd = _0x1ae906.get(_0x272561);
-      if (!_0x2649dd) return;
-      (_0x2ffbab.appendChild(_0x2649dd), _0xd1c9a.add(_0x272561));
+  const toolbarZones = getToolbarZones(toolbarEl);
+  if (!toolbarZones.outsidePrimary || !toolbarZones.outsideSecondary || !toolbarZones.more) return;
+  const item = normalizeImageToolbarLayout(layoutInput),
+    map2 = collectToolbarActionButtons(toolbarEl, getToolbarActionFromButton),
+    map3 = new Set();
+  for (const [key, list] of Object.entries(item)) {
+    const el3 = toolbarZones[key];
+    if (!el3) continue;
+    list.forEach((item2) => {
+      const enabled2 = map2.get(item2);
+      if (!enabled2) return;
+      (el3.appendChild(enabled2), map3.add(item2));
     });
   }
-  for (const _0x14feaa of _0xe2b9ad) {
-    if (_0xd1c9a.has(_0x14feaa)) continue;
-    const _0x2c0c47 = _0x1ae906.get(_0x14feaa);
-    if (!_0x2c0c47) continue;
-    _0x19848f.more.appendChild(_0x2c0c47);
+  for (const index of imageToolbarActions) {
+    if (map3.has(index)) continue;
+    const enabled3 = map2.get(index);
+    if (!enabled3) continue;
+    toolbarZones.more.appendChild(enabled3);
   }
-  const _0x6df24a = _0x3d8f34.querySelector('.v2-img-toolbar-main-divider');
-  if (_0x6df24a) {
-    const _0x3a05ae = _0x19848f.outsideSecondary.querySelectorAll('.ftb-btn').length > 0;
-    _0x6df24a.hidden = !_0x3a05ae;
+  const el4 = toolbarEl.querySelector('.v2-img-toolbar-main-divider');
+  if (el4) {
+    const enabled4 = toolbarZones.outsideSecondary.querySelectorAll('.ftb-btn').length > 0;
+    el4.hidden = !enabled4;
   }
 }
-function readToolbarLayoutFromDom(_0x30db61, _0x4f4e72, _0x62c80e, _0x577776 = null) {
-  const _0x49b414 = { outsidePrimary: [], outsideSecondary: [], more: [] },
-    _0x3c79a9 = _0x577776 && typeof _0x577776 === 'object' ? Object.entries(_0x577776) : [];
-  if (_0x3c79a9.length > 0)
+function readToolbarLayoutFromDom(el5, handler2, handler3, result = null) {
+  const enabled5 = { outsidePrimary: [], outsideSecondary: [], more: [] },
+    list2 = result && typeof result === 'object' ? Object.entries(result) : [];
+  if (list2.length > 0)
     return (
-      _0x3c79a9.forEach(([_0x347e23, _0x582566]) => {
-        if (!_0x49b414[_0x347e23] || !_0x582566) return;
-        _0x582566.querySelectorAll('.ftb-btn').forEach((_0x35e3ea) => {
-          const _0x45f6b1 = _0x4f4e72(_0x35e3ea);
-          if (!_0x45f6b1) return;
-          _0x49b414[_0x347e23].push(_0x45f6b1);
+      list2.forEach(([data, el6]) => {
+        if (!enabled5[data] || !el6) return;
+        el6.querySelectorAll('.ftb-btn').forEach((item3) => {
+          const enabled6 = handler2(item3);
+          if (!enabled6) return;
+          enabled5[data].push(enabled6);
         });
       }),
-      _0x62c80e(_0x49b414)
+      handler3(enabled5)
     );
   return (
-    _0x30db61.querySelectorAll('[data-zone]').forEach((_0xa13d4d) => {
-      const _0x5dc09f = String(_0xa13d4d.getAttribute('data-zone') || '').trim(),
-        _0x403435 = IMAGE_TOOLBAR_ZONE_MAP[_0x5dc09f];
-      if (!_0x403435) return;
-      _0xa13d4d.querySelectorAll('.ftb-btn').forEach((_0x201be6) => {
-        const _0x5bae3c = _0x4f4e72(_0x201be6);
-        if (!_0x5bae3c) return;
-        _0x49b414[_0x403435].push(_0x5bae3c);
+    el5.querySelectorAll('[data-zone]').forEach((el7) => {
+      const options = String(el7.getAttribute('data-zone') || '').trim(),
+        enabled7 = IMAGE_TOOLBAR_ZONE_MAP[options];
+      if (!enabled7) return;
+      el7.querySelectorAll('.ftb-btn').forEach((item4) => {
+        const enabled8 = handler2(item4);
+        if (!enabled8) return;
+        enabled5[enabled7].push(enabled8);
       });
     }),
-    _0x62c80e(_0x49b414)
+    handler3(enabled5)
   );
 }
-export function bindImageToolbarLayoutUi(_0x3a9b27, _0x357a52 = {}) {
-  const { store: _0x1ee4ed, getStateSnapshot: _0x4d9b64, getToolbarActionFromButton: _0x55b8a4 } = _0x357a52,
-    _0x330581 = _0x357a52.toolbarActions || _0x357a52.imageToolbarActions || [],
-    _0x346bbb = _0x357a52.normalizeToolbarLayout || _0x357a52.normalizeImageToolbarLayout,
-    _0x237c9f = _0x357a52.serializeToolbarLayout || _0x357a52.serializeImageToolbarLayout,
-    _0x4e62f6 =
-      typeof _0x357a52.getToolbarLayout === 'function'
-        ? _0x357a52.getToolbarLayout
-        : (_0x4c637d) => _0x4c637d?.ui?.imageToolbarLayout,
-    _0x388153 =
-      typeof _0x357a52.setToolbarLayout === 'function'
-        ? _0x357a52.setToolbarLayout
-        : (_0xdc8f0f) => _0x1ee4ed?.setImageToolbarLayout?.(_0xdc8f0f),
-    _0x327e89 = new Set(
-      Array.isArray(_0x357a52.moreMenuStickyActions)
-        ? _0x357a52.moreMenuStickyActions
+export function bindImageToolbarLayoutUi(toolbarEl2, target = {}) {
+  const {
+      store: store,
+      getStateSnapshot: getStateSnapshot,
+      getToolbarActionFromButton: getToolbarActionFromButton2,
+    } = target,
+    imageToolbarActions2 = target.toolbarActions || target.imageToolbarActions || [],
+    normalizeImageToolbarLayout2 = target.normalizeToolbarLayout || target.normalizeImageToolbarLayout,
+    handler4 = target.serializeToolbarLayout || target.serializeImageToolbarLayout,
+    layoutInput2 =
+      typeof target.getToolbarLayout === 'function'
+        ? target.getToolbarLayout
+        : (source) => source?.ui?.imageToolbarLayout,
+    handler5 =
+      typeof target.setToolbarLayout === 'function'
+        ? target.setToolbarLayout
+        : (next) => store?.setImageToolbarLayout?.(next),
+    map4 = new Set(
+      Array.isArray(target.moreMenuStickyActions)
+        ? target.moreMenuStickyActions
         : ['hd', 'auto-subject', 'multigrid'],
     ),
-    _0x3c632d = getToolbarZones(_0x3a9b27),
-    _0x4b0d93 = _0x3a9b27.querySelector('.act-more-tools'),
-    _0xe3f666 = _0x3a9b27.querySelector('[data-role="more-menu"]'),
-    _0x241e62 = _0x3a9b27.querySelector('.act-customize-tools');
+    toolbarZones2 = getToolbarZones(toolbarEl2),
+    el8 = toolbarEl2.querySelector('.act-more-tools'),
+    el9 = toolbarEl2.querySelector('[data-role="more-menu"]'),
+    el10 = toolbarEl2.querySelector('.act-customize-tools');
   if (
-    !_0x3c632d.outsidePrimary ||
-    !_0x3c632d.outsideSecondary ||
-    !_0x3c632d.more ||
-    !_0x4b0d93 ||
-    !_0xe3f666 ||
-    !_0x241e62
+    !toolbarZones2.outsidePrimary ||
+    !toolbarZones2.outsideSecondary ||
+    !toolbarZones2.more ||
+    !el8 ||
+    !el9 ||
+    !el10
   )
     return { closeMoreMenu() {} };
   applyToolbarLayoutToDom({
-    toolbarEl: _0x3a9b27,
-    layoutInput: _0x4e62f6(_0x4d9b64()),
-    imageToolbarActions: _0x330581,
-    normalizeImageToolbarLayout: _0x346bbb,
-    getToolbarActionFromButton: _0x55b8a4,
+    toolbarEl: toolbarEl2,
+    layoutInput: layoutInput2(getStateSnapshot()),
+    imageToolbarActions: imageToolbarActions2,
+    normalizeImageToolbarLayout: normalizeImageToolbarLayout2,
+    getToolbarActionFromButton: getToolbarActionFromButton2,
   });
-  let _0x43eac1 = false,
-    _0x4a6308 = false,
-    _0x3c3b04 = false,
-    _0x3b8ef9 = null,
-    _0x7dbbeb = null,
-    _0x488139 = null,
-    _0x332e8b = 0;
-  const _0x2ad755 = _0xe3f666.parentNode,
-    _0x236872 = _0xe3f666.nextSibling,
-    _0xa934be = () => {
-      if (_0x332e8b) cancelAnimationFrame(_0x332e8b);
-      ((_0x332e8b = 0), _0xe3f666.classList.remove('is-portaled'), _0xe3f666.removeAttribute('style'));
-      if (_0x2ad755 && _0xe3f666.parentNode !== _0x2ad755) {
-        const _0x269788 = _0x236872 && _0x236872.parentNode === _0x2ad755 ? _0x236872 : null;
-        _0x2ad755.insertBefore(_0xe3f666, _0x269788);
+  let enabled9 = false,
+    enabled10 = false,
+    current = false,
+    el11 = null,
+    entry = null,
+    enabled11 = null,
+    requestAnimationFrame2 = 0;
+  const el12 = el9.parentNode,
+    el13 = el9.nextSibling,
+    handler6 = () => {
+      if (requestAnimationFrame2) cancelAnimationFrame(requestAnimationFrame2);
+      ((requestAnimationFrame2 = 0), el9.classList.remove('is-portaled'), el9.removeAttribute('style'));
+      if (el12 && el9.parentNode !== el12) {
+        const record = el13 && el13.parentNode === el12 ? el13 : null;
+        el12.insertBefore(el9, record);
       }
     },
-    _0xc6d38e = () => {
-      if (!_0x43eac1 || _0xe3f666.hidden || !_0x3a9b27.isConnected) {
-        _0xa934be();
+    handler7 = () => {
+      if (!enabled9 || el9.hidden || !toolbarEl2.isConnected) {
+        handler6();
         return;
       }
-      const _0x87b074 = _0x3a9b27.getBoundingClientRect();
-      (_0x87b074.width > 0 &&
-        _0x87b074.height > 0 &&
-        Object.assign(_0xe3f666.style, {
-          left: _0x87b074.left + _0x87b074.width / 2 + 'px',
-          top: _0x87b074.top - 10 + 'px',
+      const left = toolbarEl2.getBoundingClientRect();
+      (left.width > 0 &&
+        left.height > 0 &&
+        Object.assign(el9.style, {
+          left: left.left + left.width / 2 + 'px',
+          top: left.top - 10 + 'px',
         }),
-        (_0x332e8b = requestAnimationFrame(_0xc6d38e)));
+        (requestAnimationFrame2 = requestAnimationFrame(handler7)));
     },
-    _0x2475bf = () => {
-      _0xe3f666.parentNode !== document.body && document.body.appendChild(_0xe3f666);
-      _0xe3f666.classList.add('is-portaled');
-      if (_0x332e8b) cancelAnimationFrame(_0x332e8b);
-      _0x332e8b = 0;
+    handler8 = () => {
+      el9.parentNode !== document.body && document.body.appendChild(el9);
+      el9.classList.add('is-portaled');
+      if (requestAnimationFrame2) cancelAnimationFrame(requestAnimationFrame2);
+      requestAnimationFrame2 = 0;
     },
-    _0x5b2e28 = () => {
-      const _0x5b6c5d = collectToolbarActionButtons(_0x3a9b27, _0x55b8a4);
+    handler9 = () => {
+      const map5 = collectToolbarActionButtons(toolbarEl2, getToolbarActionFromButton2);
       return (
-        collectToolbarActionButtons(_0xe3f666, _0x55b8a4).forEach((_0x175e63, _0x1cb466) =>
-          _0x5b6c5d.set(_0x1cb466, _0x175e63),
+        collectToolbarActionButtons(el9, getToolbarActionFromButton2).forEach((item5, payload) =>
+          map5.set(payload, item5),
         ),
-        _0x5b6c5d
+        map5
       );
     },
-    _0x3e379d = (_0x10b22d, _0x4d2cfa) => {
-      _0x10b22d.classList.toggle('is-drop-target', !!_0x4d2cfa);
+    handler10 = (el14, enabled12) => {
+      el14.classList.toggle('is-drop-target', !!enabled12);
     },
-    _0x5acd90 = (_0x9ac4fb) => {
-      if (_0x7dbbeb === _0x9ac4fb) return;
-      if (_0x7dbbeb) _0x3e379d(_0x7dbbeb, false);
-      _0x7dbbeb = _0x9ac4fb || null;
-      if (_0x7dbbeb) _0x3e379d(_0x7dbbeb, true);
+    handler11 = (handle) => {
+      if (entry === handle) return;
+      if (entry) handler10(entry, false);
+      entry = handle || null;
+      if (entry) handler10(entry, true);
     },
-    _0x3203f2 = () => {
-      (_0x5acd90(null), Object.values(_0x3c632d).forEach((_0x42113e) => _0x3e379d(_0x42113e, false)));
+    handler12 = () => {
+      (handler11(null), Object.values(toolbarZones2).forEach((item6) => handler10(item6, false)));
     },
-    _0x52a812 = (_0x175f9b) => {
-      (_0x3a9b27.classList.toggle('is-toolbar-drag-active', !!_0x175f9b),
-        _0xe3f666.classList.toggle('is-toolbar-drag-active', !!_0x175f9b));
+    handler13 = (enabled13) => {
+      (toolbarEl2.classList.toggle('is-toolbar-drag-active', !!enabled13),
+        el9.classList.toggle('is-toolbar-drag-active', !!enabled13));
     },
-    _0x57051c = () =>
-      Object.values(_0x3c632d).flatMap((_0x451a39) =>
-        Array.from(_0x451a39?.querySelectorAll?.('.ftb-btn') || []).filter((_0x32d292) =>
-          _0x55b8a4(_0x32d292),
+    handler14 = () =>
+      Object.values(toolbarZones2).flatMap((el15) =>
+        Array.from(el15?.querySelectorAll?.('.ftb-btn') || []).filter((item7) =>
+          getToolbarActionFromButton2(item7),
         ),
       ),
-    _0x21fff4 = (_0x55afdb) => {
-      const _0xcfdd1d = _0x57051c(),
-        _0x32ad2a = new Map(
-          _0xcfdd1d.map((_0x27701a) => [_0x27701a, _0x27701a.getBoundingClientRect?.() || {}]),
-        ),
-        _0x51ff6e = _0x55afdb();
-      if (!_0x51ff6e) return false;
+    handler15 = (handler16) => {
+      const list3 = handler14(),
+        map6 = new Map(list3.map((el16) => [el16, el16.getBoundingClientRect?.() || {}])),
+        enabled14 = handler16();
+      if (!enabled14) return false;
       return (
-        _0x57051c().forEach((_0x5ea209) => {
-          const _0x569c75 = _0x32ad2a.get(_0x5ea209);
-          if (!_0x569c75) return;
-          const _0x3f01bd = _0x5ea209.getBoundingClientRect?.() || {},
-            _0x1bfffa = Number(_0x569c75.left || 0) - Number(_0x3f01bd.left || 0),
-            _0x4532e4 = Number(_0x569c75.top || 0) - Number(_0x3f01bd.top || 0);
-          if (_0x1bfffa === 0 && _0x4532e4 === 0) return;
-          ((_0x5ea209.style.transform = 'translate(' + _0x1bfffa + 'px, ' + _0x4532e4 + 'px)'),
-            (_0x5ea209.style.transition = 'none'));
-          const _0x26d665 =
+        handler14().forEach((el17) => {
+          const box = map6.get(el17);
+          if (!box) return;
+          const box2 = el17.getBoundingClientRect?.() || {},
+            count = Number(box.left || 0) - Number(box2.left || 0),
+            count2 = Number(box.top || 0) - Number(box2.top || 0);
+          if (count === 0 && count2 === 0) return;
+          ((el17.style.transform = 'translate(' + count + 'px, ' + count2 + 'px)'),
+            (el17.style.transition = 'none'));
+          const run =
             typeof requestAnimationFrame === 'function'
               ? requestAnimationFrame
-              : (_0x1d4d13) => setTimeout(_0x1d4d13, 0);
-          _0x26d665(() => {
-            ((_0x5ea209.style.transform = ''),
-              (_0x5ea209.style.transition = 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)'));
+              : (state) => setTimeout(state, 0);
+          run(() => {
+            ((el17.style.transform = ''),
+              (el17.style.transition = 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)'));
           });
         }),
         true
       );
     },
-    _0x531b1c = () => {
-      const _0x1a1d8a = readToolbarLayoutFromDom(_0x3a9b27, _0x55b8a4, _0x346bbb, _0x3c632d),
-        _0x176d71 = _0x237c9f(_0x4e62f6(_0x4d9b64())),
-        _0x20de55 = _0x237c9f(_0x1a1d8a);
-      if (_0x176d71 === _0x20de55) return;
-      _0x388153(_0x1a1d8a);
+    handler17 = () => {
+      const toolbarLayoutFromDom = readToolbarLayoutFromDom(
+          toolbarEl2,
+          getToolbarActionFromButton2,
+          normalizeImageToolbarLayout2,
+          toolbarZones2,
+        ),
+        config = handler4(layoutInput2(getStateSnapshot())),
+        scope = handler4(toolbarLayoutFromDom);
+      if (config === scope) return;
+      handler5(toolbarLayoutFromDom);
     },
-    _0x1d4018 = (_0x4c4710, _0x23524e) => {
-      const _0x1734ff = Array.from(_0x4c4710.querySelectorAll('.ftb-btn')).filter(
-        (_0x4653dc) => _0x4653dc !== _0x3b8ef9,
-      );
-      for (const _0x462fdd of _0x1734ff) {
-        const _0x40e4a4 = _0x462fdd.getBoundingClientRect(),
-          _0x57e0fd = _0x40e4a4.left + _0x40e4a4.width / 2;
-        if (_0x23524e < _0x57e0fd) return _0x462fdd;
+    handler18 = (el18, input) => {
+      const output = Array.from(el18.querySelectorAll('.ftb-btn')).filter((item8) => item8 !== el11);
+      for (const el19 of output) {
+        const box3 = el19.getBoundingClientRect(),
+          value2 = box3.left + box3.width / 2;
+        if (input < value2) return el19;
       }
       return null;
     },
-    _0x4c49ab = (_0x44b44c, _0x1e5651) => {
-      const _0x157f35 = _0x1e5651.target?.closest?.('.ftb-btn');
-      if (_0x157f35 === _0x3b8ef9) return _0x3b8ef9;
-      if (_0x157f35 && _0x44b44c.contains(_0x157f35) && _0x55b8a4(_0x157f35)) {
-        const _0x595651 = _0x157f35.getBoundingClientRect(),
-          _0x54342b = _0x595651.left + _0x595651.width / 2;
-        return Number(_0x1e5651.clientX || 0) < _0x54342b ? _0x157f35 : _0x157f35.nextElementSibling;
+    handler19 = (value3, event) => {
+      const el20 = event.target?.closest?.('.ftb-btn');
+      if (el20 === el11) return el11;
+      if (el20 && value3.contains(el20) && getToolbarActionFromButton2(el20)) {
+        const box4 = el20.getBoundingClientRect(),
+          value4 = box4.left + box4.width / 2;
+        return Number(event.clientX || 0) < value4 ? el20 : el20.nextElementSibling;
       }
-      return _0x1d4018(_0x44b44c, _0x1e5651.clientX);
+      return handler18(value3, event.clientX);
     },
-    _0x3e5308 = (_0x37c740, _0x573585) => {
-      if (!_0x3b8ef9 || !_0x37c740) return false;
-      if (_0x573585 === _0x3b8ef9) return false;
-      const _0x2fb966 = _0x573585 || null;
-      if (_0x3b8ef9.parentNode === _0x37c740) {
-        const _0x2b8c74 = _0x3b8ef9.nextElementSibling;
-        if (_0x2fb966 && _0x2b8c74 === _0x2fb966) return false;
-        if (!_0x2fb966 && _0x3b8ef9 === _0x37c740.lastElementChild) return false;
+    handler20 = (el21, value5) => {
+      if (!el11 || !el21) return false;
+      if (value5 === el11) return false;
+      const enabled15 = value5 || null;
+      if (el11.parentNode === el21) {
+        const value6 = el11.nextElementSibling;
+        if (enabled15 && value6 === enabled15) return false;
+        if (!enabled15 && el11 === el21.lastElementChild) return false;
       }
-      return _0x21fff4(() => {
-        return (
-          _0x2fb966 ? _0x37c740.insertBefore(_0x3b8ef9, _0x2fb966) : _0x37c740.appendChild(_0x3b8ef9),
-          true
-        );
+      return handler15(() => {
+        return (enabled15 ? el21.insertBefore(el11, enabled15) : el21.appendChild(el11), true);
       });
     },
-    _0x1e0bd4 = (_0x1abae8) => {
-      ((_0x3c3b04 = !!_0x1abae8), _0x241e62.classList.toggle('is-tooltip-pinned', _0x3c3b04));
+    handler21 = (enabled16) => {
+      ((current = !!enabled16), el10.classList.toggle('is-tooltip-pinned', current));
     },
-    _0x1474e2 = (_0x438258) => {
-      ((_0x4a6308 = !!_0x438258),
-        _0x3a9b27.classList.toggle('is-toolbar-customizing', _0x4a6308),
-        _0xe3f666.classList.toggle('is-toolbar-customizing', _0x4a6308),
-        _0x1e0bd4(_0x4a6308),
-        (_0x241e62.hidden = false),
-        _0x241e62.classList.toggle('is-active', _0x4a6308),
-        (_0x241e62.textContent = _0x4a6308 ? imageToolbarText('done') : imageToolbarText('customize')),
-        _0x241e62.setAttribute(
+    handler22 = (enabled17) => {
+      ((enabled10 = !!enabled17),
+        toolbarEl2.classList.toggle('is-toolbar-customizing', enabled10),
+        el9.classList.toggle('is-toolbar-customizing', enabled10),
+        handler21(enabled10),
+        (el10.hidden = false),
+        el10.classList.toggle('is-active', enabled10),
+        (el10.textContent = enabled10 ? imageToolbarText('done') : imageToolbarText('customize')),
+        el10.setAttribute(
           'aria-label',
-          _0x4a6308 ? imageToolbarText('doneCustomize') : imageToolbarText('customize'),
+          enabled10 ? imageToolbarText('doneCustomize') : imageToolbarText('customize'),
         ),
-        _0x5b2e28().forEach((_0x425492) => {
-          ((_0x425492.draggable = _0x4a6308), _0x425492.classList.toggle('is-toolbar-draggable', _0x4a6308));
+        handler9().forEach((el22) => {
+          ((el22.draggable = enabled10), el22.classList.toggle('is-toolbar-draggable', enabled10));
         }),
-        !_0x4a6308 &&
-          ((_0x3b8ef9 = null),
-          _0x52a812(false),
-          _0x3203f2(),
-          _0x5b2e28().forEach((_0x55e403) => {
-            (_0x55e403.classList.remove('is-toolbar-dragging'),
-              _0x55e403.classList.remove('is-toolbar-dragging-capture'));
+        !enabled10 &&
+          ((el11 = null),
+          handler13(false),
+          handler12(),
+          handler9().forEach((el23) => {
+            (el23.classList.remove('is-toolbar-dragging'),
+              el23.classList.remove('is-toolbar-dragging-capture'));
           })));
     },
-    _0x49e9a1 = () => {
-      if (!_0x43eac1) return;
-      ((_0x43eac1 = false),
-        _0x4a6308 && (_0xa934be(), _0x531b1c()),
-        _0x1474e2(false),
-        _0x4b0d93.classList.remove('is-active'),
-        (_0xe3f666.hidden = true),
-        _0xa934be(),
-        _0x488139 && (document.removeEventListener('pointerdown', _0x488139, true), (_0x488139 = null)));
+    closeMoreMenu2 = () => {
+      if (!enabled9) return;
+      ((enabled9 = false),
+        enabled10 && (handler6(), handler17()),
+        handler22(false),
+        el8.classList.remove('is-active'),
+        (el9.hidden = true),
+        handler6(),
+        enabled11 && (document.removeEventListener('pointerdown', enabled11, true), (enabled11 = null)));
     },
-    _0x2a5c81 = () => {
-      if (_0x43eac1) return;
-      ((_0x43eac1 = true),
-        _0x4b0d93.classList.add('is-active'),
-        _0x2475bf(),
-        (_0xe3f666.hidden = false),
-        _0xc6d38e(),
-        !_0x488139 &&
-          ((_0x488139 = (_0x1624c9) => {
-            !_0x3a9b27.contains(_0x1624c9.target) && !_0xe3f666.contains(_0x1624c9.target) && _0x49e9a1();
+    handler23 = () => {
+      if (enabled9) return;
+      ((enabled9 = true),
+        el8.classList.add('is-active'),
+        handler8(),
+        (el9.hidden = false),
+        handler7(),
+        !enabled11 &&
+          ((enabled11 = (event2) => {
+            !toolbarEl2.contains(event2.target) && !el9.contains(event2.target) && closeMoreMenu2();
           }),
-          document.addEventListener('pointerdown', _0x488139, true)));
+          document.addEventListener('pointerdown', enabled11, true)));
     };
-  (_0x4b0d93.addEventListener('click', (_0x3e9a9b) => {
-    (_0x3e9a9b.preventDefault(), _0x3e9a9b.stopPropagation(), _0x43eac1 ? _0x49e9a1() : _0x2a5c81());
+  (el8.addEventListener('click', (event3) => {
+    (event3.preventDefault(), event3.stopPropagation(), enabled9 ? closeMoreMenu2() : handler23());
   }),
-    _0x241e62.addEventListener('click', (_0x1d66dc) => {
-      (_0x1d66dc.preventDefault(), _0x1d66dc.stopPropagation(), _0x2a5c81());
-      if (_0x4a6308) {
-        (_0x1474e2(false), _0x531b1c());
+    el10.addEventListener('click', (event4) => {
+      (event4.preventDefault(), event4.stopPropagation(), handler23());
+      if (enabled10) {
+        (handler22(false), handler17());
         return;
       }
-      _0x1474e2(true);
+      handler22(true);
     }));
-  const _0x527c7d = (_0x3a0fc3) => {
-    const _0x1a4ece = _0x3a0fc3.target?.closest?.('.ftb-btn');
-    if (!_0x1a4ece) return;
-    const _0x41d4e8 = _0x55b8a4(_0x1a4ece);
-    if (!_0x41d4e8) return;
-    if (_0x4a6308) {
-      (_0x3a0fc3.preventDefault(), _0x3a0fc3.stopPropagation());
+  const value7 = (event5) => {
+    const enabled18 = event5.target?.closest?.('.ftb-btn');
+    if (!enabled18) return;
+    const enabled19 = getToolbarActionFromButton2(enabled18);
+    if (!enabled19) return;
+    if (enabled10) {
+      (event5.preventDefault(), event5.stopPropagation());
       return;
     }
-    if (_0x3c632d.more.contains(_0x1a4ece)) {
-      if (_0x327e89.has(_0x41d4e8)) return;
+    if (toolbarZones2.more.contains(enabled18)) {
+      if (map4.has(enabled19)) return;
       queueMicrotask(() => {
-        if (!_0x3a9b27.isConnected) return;
-        if (_0x4a6308) return;
-        _0x49e9a1();
+        if (!toolbarEl2.isConnected) return;
+        if (enabled10) return;
+        closeMoreMenu2();
       });
     }
   };
   return (
-    _0x3a9b27.addEventListener('click', _0x527c7d, true),
-    _0xe3f666.addEventListener('click', _0x527c7d, true),
-    collectToolbarActionButtons(_0x3a9b27, _0x55b8a4).forEach((_0xfc3c46) => {
-      if (_0xfc3c46.dataset.toolbarDnDBound === '1') return;
-      ((_0xfc3c46.dataset.toolbarDnDBound = '1'),
-        _0xfc3c46.addEventListener('dragstart', (_0x5e105d) => {
-          if (!_0x4a6308) {
-            _0x5e105d.preventDefault();
+    toolbarEl2.addEventListener('click', value7, true),
+    el9.addEventListener('click', value7, true),
+    collectToolbarActionButtons(toolbarEl2, getToolbarActionFromButton2).forEach((el24) => {
+      if (el24.dataset.toolbarDnDBound === '1') return;
+      ((el24.dataset.toolbarDnDBound = '1'),
+        el24.addEventListener('dragstart', (event6) => {
+          if (!enabled10) {
+            event6.preventDefault();
             return;
           }
-          ((_0x3b8ef9 = _0xfc3c46),
-            _0x52a812(true),
-            _0xfc3c46.classList.add('is-toolbar-dragging-capture'),
+          ((el11 = el24),
+            handler13(true),
+            el24.classList.add('is-toolbar-dragging-capture'),
             setTimeout(() => {
-              if (_0x3b8ef9 === _0xfc3c46) _0xfc3c46.classList.add('is-toolbar-dragging');
+              if (el11 === el24) el24.classList.add('is-toolbar-dragging');
             }, 0),
-            _0x5e105d.dataTransfer &&
-              ((_0x5e105d.dataTransfer.effectAllowed = 'move'),
-              _0x5e105d.dataTransfer.setData('text/plain', 'image-toolbar-button')));
+            event6.dataTransfer &&
+              ((event6.dataTransfer.effectAllowed = 'move'),
+              event6.dataTransfer.setData('text/plain', 'image-toolbar-button')));
         }),
-        _0xfc3c46.addEventListener('dragend', () => {
-          (_0xfc3c46.classList.remove('is-toolbar-dragging-capture'),
-            _0xfc3c46.classList.remove('is-toolbar-dragging'),
-            (_0x3b8ef9 = null),
-            _0x52a812(false),
-            _0x3203f2());
+        el24.addEventListener('dragend', () => {
+          (el24.classList.remove('is-toolbar-dragging-capture'),
+            el24.classList.remove('is-toolbar-dragging'),
+            (el11 = null),
+            handler13(false),
+            handler12());
         }));
     }),
-    Object.values(_0x3c632d).forEach((_0x9c8233) => {
-      if (_0x9c8233.dataset.toolbarDropBound === '1') return;
-      ((_0x9c8233.dataset.toolbarDropBound = '1'),
-        _0x9c8233.addEventListener('dragover', (_0x5c5916) => {
-          if (!_0x4a6308 || !_0x3b8ef9) return;
-          (_0x5c5916.preventDefault(), _0x5acd90(_0x9c8233));
-          const _0x1c8609 = _0x4c49ab(_0x9c8233, _0x5c5916);
-          _0x3e5308(_0x9c8233, _0x1c8609);
+    Object.values(toolbarZones2).forEach((el25) => {
+      if (el25.dataset.toolbarDropBound === '1') return;
+      ((el25.dataset.toolbarDropBound = '1'),
+        el25.addEventListener('dragover', (event7) => {
+          if (!enabled10 || !el11) return;
+          (event7.preventDefault(), handler11(el25));
+          const value8 = handler19(el25, event7);
+          handler20(el25, value8);
         }),
-        _0x9c8233.addEventListener('dragleave', (_0x20eb58) => {
-          if (_0x3b8ef9) {
-            const _0x2ed723 = _0x20eb58.relatedTarget || null;
-            if (!_0x2ed723 || _0x9c8233.contains(_0x2ed723)) return;
+        el25.addEventListener('dragleave', (value9) => {
+          if (el11) {
+            const enabled20 = value9.relatedTarget || null;
+            if (!enabled20 || el25.contains(enabled20)) return;
           }
-          if (_0x7dbbeb === _0x9c8233) _0x5acd90(null);
+          if (entry === el25) handler11(null);
         }),
-        _0x9c8233.addEventListener('drop', (_0xc4ca82) => {
-          if (!_0x4a6308 || !_0x3b8ef9) return;
-          (_0xc4ca82.preventDefault(), _0x5acd90(null), _0x531b1c());
+        el25.addEventListener('drop', (event8) => {
+          if (!enabled10 || !el11) return;
+          (event8.preventDefault(), handler11(null), handler17());
         }));
     }),
-    { closeMoreMenu: _0x49e9a1 }
+    { closeMoreMenu: closeMoreMenu2 }
   );
 }

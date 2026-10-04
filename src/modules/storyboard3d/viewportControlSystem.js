@@ -10,241 +10,240 @@ const DEFAULT_SCENE_VIEW = Object['freeze']({
   orbitPitch: 0.35,
   orbitDistance: 0x8,
 });
-function finite(_0x3d761e, _0x5f7ba9 = 0x0) {
-  const _0x3b30df = Number(_0x3d761e);
-  return Number['isFinite'](_0x3b30df) ? _0x3b30df : _0x5f7ba9;
+function finite(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
 }
-function clamp(_0x408aa9, _0x41fe02, _0x5e02bf) {
-  return Math['min'](_0x5e02bf, Math['max'](_0x41fe02, _0x408aa9));
+function clamp(index, result, data) {
+  return Math['min'](data, Math['max'](result, index));
 }
-function positive(_0x5d2340, _0x21bce1, _0x37ea5a, _0x5adde9) {
-  return clamp(finite(_0x5d2340, _0x21bce1), _0x37ea5a, _0x5adde9);
+function positive(options, target, source, next) {
+  return clamp(finite(options, target), source, next);
 }
-function vector3(_0x3c8f7c, _0x5aff8d = DEFAULT_SCENE_VIEW['target']) {
-  const _0x4a51cf = Array['isArray'](_0x3c8f7c)
-    ? { x: _0x3c8f7c[0x0], y: _0x3c8f7c[0x1], z: _0x3c8f7c[0x2] }
-    : _0x3c8f7c;
+function vector3(x, box = DEFAULT_SCENE_VIEW['target']) {
+  const box2 = Array['isArray'](x) ? { x: x[0x0], y: x[0x1], z: x[0x2] } : x;
   return {
-    x: finite(_0x4a51cf?.['x'], _0x5aff8d['x']),
-    y: finite(_0x4a51cf?.['y'], _0x5aff8d['y']),
-    z: finite(_0x4a51cf?.['z'], _0x5aff8d['z']),
+    x: finite(box2?.['x'], box['x']),
+    y: finite(box2?.['y'], box['y']),
+    z: finite(box2?.['z'], box['z']),
   };
 }
-export function normalizeStoryboard3DSceneView(_0xd550b7 = {}) {
-  const _0x10e6b0 = PANORAMA_SCENE_CAMERA_CONSTRAINTS['scene'];
+export function normalizeStoryboard3DSceneView(event = {}) {
+  const current = PANORAMA_SCENE_CAMERA_CONSTRAINTS['scene'];
   return {
-    target: vector3(_0xd550b7['target']),
-    orbitYaw: finite(_0xd550b7['orbitYaw'], DEFAULT_SCENE_VIEW['orbitYaw']),
+    target: vector3(event['target']),
+    orbitYaw: finite(event['orbitYaw'], DEFAULT_SCENE_VIEW['orbitYaw']),
     orbitPitch: clamp(
-      finite(_0xd550b7['orbitPitch'], DEFAULT_SCENE_VIEW['orbitPitch']),
-      _0x10e6b0['orbitPitch']['min'],
-      _0x10e6b0['orbitPitch']['max'],
+      finite(event['orbitPitch'], DEFAULT_SCENE_VIEW['orbitPitch']),
+      current['orbitPitch']['min'],
+      current['orbitPitch']['max'],
     ),
     orbitDistance: clamp(
-      finite(_0xd550b7['orbitDistance'], DEFAULT_SCENE_VIEW['orbitDistance']),
-      _0x10e6b0['orbitDistance']['min'],
-      _0x10e6b0['orbitDistance']['max'],
+      finite(event['orbitDistance'], DEFAULT_SCENE_VIEW['orbitDistance']),
+      current['orbitDistance']['min'],
+      current['orbitDistance']['max'],
     ),
   };
 }
-function normalizeFrame(_0x11a799 = {}, _0x368519 = {}) {
-  const _0x3ed009 = vector3(_0x11a799['center'] || _0x368519['center'], { x: 0x0, y: 0x0, z: 0x0 });
+function normalizeFrame(options2 = {}, entry = {}) {
+  const center = vector3(options2['center'] || entry['center'], { x: 0x0, y: 0x0, z: 0x0 });
   return {
-    center: _0x3ed009,
-    radius: positive(_0x11a799['radius'], finite(_0x368519['radius'], 0x1), 0.05, 0x186a0),
-    aspect: positive(_0x11a799['aspect'], finite(_0x368519['aspect'], 0x10 / 0x9), 0.1, 0x14),
-    fov: positive(_0x11a799['fov'], finite(_0x368519['fov'], 0x32), 0x1, 0xb3),
+    center: center,
+    radius: positive(options2['radius'], finite(entry['radius'], 0x1), 0.05, 0x186a0),
+    aspect: positive(options2['aspect'], finite(entry['aspect'], 0x10 / 0x9), 0.1, 0x14),
+    fov: positive(options2['fov'], finite(entry['fov'], 0x32), 0x1, 0xb3),
   };
 }
 export function createStoryboard3DFocusSceneView({
-  sceneView: _0x1bbde3,
-  frame: _0x5c814e,
+  sceneView: sceneView,
+  frame: frame,
   padding: padding = 1.22,
 } = {}) {
-  const _0x411633 = normalizeStoryboard3DSceneView(_0x1bbde3),
-    _0x459cec = normalizeFrame(_0x5c814e);
+  const args = normalizeStoryboard3DSceneView(sceneView),
+    target2 = normalizeFrame(frame);
   return {
-    ..._0x411633,
-    target: _0x459cec['center'],
+    ...args,
+    target: target2['center'],
     orbitDistance: computePerspectiveFrameDistance({
-      radius: _0x459cec['radius'],
-      fov: _0x459cec['fov'],
-      aspect: _0x459cec['aspect'],
+      radius: target2['radius'],
+      fov: target2['fov'],
+      aspect: target2['aspect'],
       padding: positive(padding, 1.22, 0x1, 0x5),
     }),
   };
 }
 export function createStoryboard3DFitAllSceneView({
-  sceneView: _0x41d7bb,
-  sceneState: _0x1d6b24,
-  bounds: _0x56867c,
+  sceneView: sceneView2,
+  sceneState: sceneState,
+  bounds: bounds,
   aspect: aspect = 0x10 / 0x9,
   fov: fov = 0x32,
   padding: padding = 1.28,
 } = {}) {
-  const _0x4ab682 = _0x56867c || estimateSceneContentBounds(_0x1d6b24);
+  const center2 = bounds || estimateSceneContentBounds(sceneState);
   return createStoryboard3DFocusSceneView({
-    sceneView: _0x41d7bb,
-    frame: { center: _0x4ab682?.['center'], radius: _0x4ab682?.['radius'], aspect: aspect, fov: fov },
+    sceneView: sceneView2,
+    frame: { center: center2?.['center'], radius: center2?.['radius'], aspect: aspect, fov: fov },
     padding: padding,
   });
 }
 export const STORYBOARD_3D_ORTHOGRAPHIC_VIEW_AXES = Object['freeze'](['top', 'front', 'right']);
-function normalizeStoryboard3DOrthographicAxis(_0x9d0bb4) {
-  return STORYBOARD_3D_ORTHOGRAPHIC_VIEW_AXES['includes'](_0x9d0bb4) ? _0x9d0bb4 : 'top';
+function normalizeStoryboard3DOrthographicAxis(record) {
+  return STORYBOARD_3D_ORTHOGRAPHIC_VIEW_AXES['includes'](record) ? record : 'top';
 }
 export function createStoryboard3DAxisView({
   axis: axis = 'top',
-  sceneView: _0x2bb802,
-  sceneState: _0x594aed,
-  bounds: _0x43110a,
+  sceneView: sceneView3,
+  sceneState: sceneState2,
+  bounds: bounds2,
   aspect: aspect = 0x10 / 0x9,
   padding: padding = 1.2,
 } = {}) {
-  const _0x5d664a = normalizeStoryboard3DOrthographicAxis(axis),
-    _0x46412e = _0x43110a || estimateSceneContentBounds(_0x594aed),
-    _0x1be651 = normalizeFrame({
-      center: _0x46412e?.['center'],
-      radius: _0x46412e?.['radius'],
+  const viewMode = normalizeStoryboard3DOrthographicAxis(axis),
+    center3 = bounds2 || estimateSceneContentBounds(sceneState2),
+    frame2 = normalizeFrame({
+      center: center3?.['center'],
+      radius: center3?.['radius'],
       aspect: aspect,
       fov: 0x2d,
     }),
-    _0x38eb4a = normalizeStoryboard3DSceneView(_0x2bb802),
-    _0x6a3b27 = positive(padding, 1.2, 0x1, 0x5),
-    _0x182a84 = createStoryboard3DFocusSceneView({
-      sceneView: _0x38eb4a,
-      frame: _0x1be651,
-      padding: _0x6a3b27,
+    sceneView4 = normalizeStoryboard3DSceneView(sceneView3),
+    padding2 = positive(padding, 1.2, 0x1, 0x5),
+    sceneView5 = createStoryboard3DFocusSceneView({
+      sceneView: sceneView4,
+      frame: frame2,
+      padding: padding2,
     });
   return (
-    (_0x182a84['orbitYaw'] = _0x5d664a === 'right' ? Math['PI'] / 0x2 : 0x0),
-    (_0x182a84['orbitPitch'] =
-      _0x5d664a === 'top' ? PANORAMA_SCENE_CAMERA_CONSTRAINTS['scene']['orbitPitch']['max'] : 0x0),
+    (sceneView5['orbitYaw'] = viewMode === 'right' ? Math['PI'] / 0x2 : 0x0),
+    (sceneView5['orbitPitch'] =
+      viewMode === 'top' ? PANORAMA_SCENE_CAMERA_CONSTRAINTS['scene']['orbitPitch']['max'] : 0x0),
     {
-      viewMode: _0x5d664a,
+      viewMode: viewMode,
       projection: 'orthographic',
-      sceneView: _0x182a84,
+      sceneView: sceneView5,
       orthographic: {
-        axis: _0x5d664a,
-        center: _0x1be651['center'],
-        verticalSize: Math['max'](0.1, _0x1be651['radius'] * 0x2 * _0x6a3b27),
-        aspect: _0x1be651['aspect'],
+        axis: viewMode,
+        center: frame2['center'],
+        verticalSize: Math['max'](0.1, frame2['radius'] * 0x2 * padding2),
+        aspect: frame2['aspect'],
         near: 0.01,
-        far: Math['max'](0x64, _0x1be651['radius'] * 0x8),
-        top: _0x5d664a === 'top',
+        far: Math['max'](0x64, frame2['radius'] * 0x8),
+        top: viewMode === 'top',
       },
     }
   );
 }
-export function createStoryboard3DTopView(_0x4104b1 = {}) {
-  return createStoryboard3DAxisView({ ..._0x4104b1, axis: 'top' });
+export function createStoryboard3DTopView(args2 = {}) {
+  return createStoryboard3DAxisView({ ...args2, axis: 'top' });
 }
 export function createStoryboard3DPerspectiveView({
-  sceneView: _0x1711bf,
-  fallbackSceneView: _0x4bbc52,
+  sceneView: sceneView6,
+  fallbackSceneView: fallbackSceneView,
 } = {}) {
   return {
     viewMode: 'perspective',
     projection: 'perspective',
-    sceneView: normalizeStoryboard3DSceneView(_0x1711bf || _0x4bbc52),
+    sceneView: normalizeStoryboard3DSceneView(sceneView6 || fallbackSceneView),
     orthographic: null,
   };
 }
-export function normalizeStoryboard3DViewportSettings(_0x3813c2 = {}) {
-  const _0x3487da = _0x3813c2['snap'] && typeof _0x3813c2['snap'] === 'object' ? _0x3813c2['snap'] : {};
+export function normalizeStoryboard3DViewportSettings(transformSpace = {}) {
+  const box3 =
+    transformSpace['snap'] && typeof transformSpace['snap'] === 'object' ? transformSpace['snap'] : {};
   return {
-    transformSpace: _0x3813c2['transformSpace'] === 'local' ? 'local' : 'world',
-    groundLock: _0x3813c2['groundLock'] === !![],
-    uniformScale: _0x3813c2['uniformScale'] === !![],
-    snapEnabled: _0x3813c2['snapEnabled'] === !![] || _0x3487da['enabled'] === !![],
-    translationSnap: positive(_0x3813c2['translationSnap'] ?? _0x3487da['translation'], 0.25, 0.01, 0xa),
+    transformSpace: transformSpace['transformSpace'] === 'local' ? 'local' : 'world',
+    groundLock: transformSpace['groundLock'] === !![],
+    uniformScale: transformSpace['uniformScale'] === !![],
+    snapEnabled: transformSpace['snapEnabled'] === !![] || box3['enabled'] === !![],
+    translationSnap: positive(transformSpace['translationSnap'] ?? box3['translation'], 0.25, 0.01, 0xa),
     rotationSnap: positive(
-      _0x3813c2['rotationSnap'] ?? _0x3487da['rotation'],
+      transformSpace['rotationSnap'] ?? box3['rotation'],
       Math['PI'] / 0xc,
       0.001,
       Math['PI'],
     ),
-    scaleSnap: positive(_0x3813c2['scaleSnap'] ?? _0x3487da['scale'], 0.1, 0.01, 0xa),
+    scaleSnap: positive(transformSpace['scaleSnap'] ?? box3['scale'], 0.1, 0.01, 0xa),
   };
 }
 export function createStoryboard3DTransformInteractionOptions(
-  _0x5b2450,
+  payload,
   { mode: mode = 'translate', constraint: constraint = 'free' } = {},
 ) {
-  const _0x3e2200 = normalizeStoryboard3DViewportSettings(_0x5b2450);
+  const space = normalizeStoryboard3DViewportSettings(payload);
   return normalizeTransformInteractionOptions({
     mode: mode,
-    space: _0x3e2200['transformSpace'],
+    space: space['transformSpace'],
     constraint: constraint,
-    groundLock: _0x3e2200['groundLock'],
-    uniformScale: _0x3e2200['uniformScale'],
+    groundLock: space['groundLock'],
+    uniformScale: space['uniformScale'],
     snap: {
-      enabled: _0x3e2200['snapEnabled'],
-      translation: _0x3e2200['translationSnap'],
-      rotation: _0x3e2200['rotationSnap'],
-      scale: _0x3e2200['scaleSnap'],
+      enabled: space['snapEnabled'],
+      translation: space['translationSnap'],
+      rotation: space['rotationSnap'],
+      scale: space['scaleSnap'],
     },
   });
 }
-export function createStoryboard3DDirectorViewportUIPatch(_0x347e8b) {
-  const _0x305268 = normalizeStoryboard3DViewportSettings(_0x347e8b);
+export function createStoryboard3DDirectorViewportUIPatch(handle) {
+  const transformSpace2 = normalizeStoryboard3DViewportSettings(handle);
   return {
-    transformSpace: _0x305268['transformSpace'],
-    groundLock: _0x305268['groundLock'],
-    uniformScale: _0x305268['uniformScale'],
-    snapEnabled: _0x305268['snapEnabled'],
-    translationSnap: _0x305268['translationSnap'],
-    rotationSnap: _0x305268['rotationSnap'],
-    scaleSnap: _0x305268['scaleSnap'],
+    transformSpace: transformSpace2['transformSpace'],
+    groundLock: transformSpace2['groundLock'],
+    uniformScale: transformSpace2['uniformScale'],
+    snapEnabled: transformSpace2['snapEnabled'],
+    translationSnap: transformSpace2['translationSnap'],
+    rotationSnap: transformSpace2['rotationSnap'],
+    scaleSnap: transformSpace2['scaleSnap'],
   };
 }
 export class Storyboard3DWebGLContextController {
   constructor({
-    canvas: _0x1faea1,
-    onStateChange: _0x5ef46f,
-    onLost: _0x264b8b,
-    onRestored: _0xc2ca5c,
-    restore: _0x22f7c6,
+    canvas: canvas,
+    onStateChange: onStateChange,
+    onLost: onLost,
+    onRestored: onRestored,
+    restore: restore,
   } = {}) {
-    if (!_0x1faea1?.['addEventListener'] || !_0x1faea1?.['removeEventListener'])
+    if (!canvas?.['addEventListener'] || !canvas?.['removeEventListener'])
       throw new TypeError('A WebGL canvas event target is required');
-    ((this['canvas'] = _0x1faea1),
-      (this['onStateChange'] = _0x5ef46f),
-      (this['onLost'] = _0x264b8b),
-      (this['onRestored'] = _0xc2ca5c),
-      (this['restore'] = _0x22f7c6),
+    ((this['canvas'] = canvas),
+      (this['onStateChange'] = onStateChange),
+      (this['onLost'] = onLost),
+      (this['onRestored'] = onRestored),
+      (this['restore'] = restore),
       (this['state'] = 'ready'),
       (this['lossCount'] = 0x0),
       (this['destroyed'] = ![]),
       (this['restoreRevision'] = 0x0),
-      (this['_onContextLost'] = (_0x35989f) => {
+      (this['_onContextLost'] = (event2) => {
         if (this['destroyed']) return;
-        (_0x35989f?.['preventDefault']?.(),
+        (event2?.['preventDefault']?.(),
           (this['lossCount'] += 0x1),
           (this['state'] = 'lost'),
-          this['onLost']?.({ event: _0x35989f, lossCount: this['lossCount'] }),
+          this['onLost']?.({ event: event2, lossCount: this['lossCount'] }),
           this['_notify']('context-lost'));
       }),
-      (this['_onContextRestored'] = async (_0x21aacb) => {
+      (this['_onContextRestored'] = async (event3) => {
         if (this['destroyed']) return;
-        const _0x5dc53f = ++this['restoreRevision'];
+        const state = ++this['restoreRevision'];
         ((this['state'] = 'restoring'), this['_notify']('context-restoring'));
         try {
-          await this['restore']?.({ event: _0x21aacb, lossCount: this['lossCount'] });
-          if (this['destroyed'] || _0x5dc53f !== this['restoreRevision']) return;
+          await this['restore']?.({ event: event3, lossCount: this['lossCount'] });
+          if (this['destroyed'] || state !== this['restoreRevision']) return;
           ((this['state'] = 'ready'),
-            this['onRestored']?.({ event: _0x21aacb, lossCount: this['lossCount'] }),
+            this['onRestored']?.({ event: event3, lossCount: this['lossCount'] }),
             this['_notify']('context-restored'));
-        } catch (_0x10d1dd) {
-          if (this['destroyed'] || _0x5dc53f !== this['restoreRevision']) return;
-          ((this['state'] = 'error'), this['_notify']('context-restore-failed', _0x10d1dd));
+        } catch (config) {
+          if (this['destroyed'] || state !== this['restoreRevision']) return;
+          ((this['state'] = 'error'), this['_notify']('context-restore-failed', config));
         }
       }),
-      _0x1faea1['addEventListener']('webglcontextlost', this['_onContextLost'], ![]),
-      _0x1faea1['addEventListener']('webglcontextrestored', this['_onContextRestored'], ![]));
+      canvas['addEventListener']('webglcontextlost', this['_onContextLost'], ![]),
+      canvas['addEventListener']('webglcontextrestored', this['_onContextRestored'], ![]));
   }
-  ['_notify'](_0x54f9b4, _0x417cd3 = null) {
-    this['onStateChange']?.(this['getSnapshot'](), { reason: _0x54f9b4, error: _0x417cd3 });
+  ['_notify'](reason, error = null) {
+    this['onStateChange']?.(this['getSnapshot'](), { reason: reason, error: error });
   }
   ['getSnapshot']() {
     return { state: this['state'], lossCount: this['lossCount'] };
@@ -258,161 +257,160 @@ export class Storyboard3DWebGLContextController {
       (this['state'] = 'destroyed'));
   }
 }
-export function createStoryboard3DWebGLContextController(_0x5d1594) {
-  return new Storyboard3DWebGLContextController(_0x5d1594);
+export function createStoryboard3DWebGLContextController(scope) {
+  return new Storyboard3DWebGLContextController(scope);
 }
 export class Storyboard3DViewportControlSystem {
   constructor({
-    sceneRuntime: _0x1c5db9,
-    initialSceneView: _0x389ab5,
-    initialSettings: _0x159627,
-    applyViewState: _0xa0984b,
-    onChange: _0x457c1d,
-    canvas: _0x1494c3,
-    onContextStateChange: _0x3e7324,
+    sceneRuntime: sceneRuntime,
+    initialSceneView: initialSceneView,
+    initialSettings: initialSettings,
+    applyViewState: applyViewState,
+    onChange: onChange,
+    canvas: canvas2,
+    onContextStateChange: onContextStateChange,
   } = {}) {
-    ((this['runtime'] = _0x1c5db9 || null),
-      (this['applyViewState'] = _0xa0984b),
-      (this['onChange'] = _0x457c1d),
-      (this['sceneView'] = normalizeStoryboard3DSceneView(_0x389ab5)),
+    ((this['runtime'] = sceneRuntime || null),
+      (this['applyViewState'] = applyViewState),
+      (this['onChange'] = onChange),
+      (this['sceneView'] = normalizeStoryboard3DSceneView(initialSceneView)),
       (this['perspectiveSceneView'] = { ...this['sceneView'], target: { ...this['sceneView']['target'] } }),
-      (this['settings'] = normalizeStoryboard3DViewportSettings(_0x159627)),
+      (this['settings'] = normalizeStoryboard3DViewportSettings(initialSettings)),
       (this['viewMode'] = 'perspective'));
-    const _0x58d9a6 = _0x1494c3 || _0x1c5db9?.['bridge']?.['renderer']?.['domElement'] || null;
-    ((this['canvas'] = _0x58d9a6),
-      (this['contextController'] = _0x58d9a6
+    const canvas3 = canvas2 || sceneRuntime?.['bridge']?.['renderer']?.['domElement'] || null;
+    ((this['canvas'] = canvas3),
+      (this['contextController'] = canvas3
         ? createStoryboard3DWebGLContextController({
-            canvas: _0x58d9a6,
-            onStateChange: _0x3e7324,
+            canvas: canvas3,
+            onStateChange: onContextStateChange,
             restore: () => {
               (this['runtime']?.['sync']?.(), this['runtime']?.['renderNow']?.());
             },
           })
         : null));
   }
-  ['_apply'](_0xe921d, _0x1bee53) {
-    ((this['sceneView'] = normalizeStoryboard3DSceneView(_0xe921d['sceneView'])),
-      (this['viewMode'] = _0xe921d['viewMode']));
-    _0xe921d['viewMode'] === 'perspective' &&
+  ['_apply'](args3, reason2) {
+    ((this['sceneView'] = normalizeStoryboard3DSceneView(args3['sceneView'])),
+      (this['viewMode'] = args3['viewMode']));
+    args3['viewMode'] === 'perspective' &&
       (this['perspectiveSceneView'] = { ...this['sceneView'], target: { ...this['sceneView']['target'] } });
-    const _0x279895 = { ..._0xe921d, sceneView: this['sceneView'] },
-      _0x290e01 = _0x279895['projection'] === 'orthographic' ? _0x279895['orthographic'] : null;
+    const type = { ...args3, sceneView: this['sceneView'] },
+      input = type['projection'] === 'orthographic' ? type['orthographic'] : null;
     return (
       typeof this['runtime']?.['setViewProjection'] === 'function'
-        ? this['runtime']['setViewProjection'](_0x279895['projection'], _0x290e01)
+        ? this['runtime']['setViewProjection'](type['projection'], input)
         : this['runtime']?.['bridge']?.['setViewProjection']?.({
-            type: _0x279895['projection'],
-            ...(_0x290e01 || {}),
+            type: type['projection'],
+            ...(input || {}),
           }),
       typeof this['applyViewState'] === 'function'
-        ? this['applyViewState'](_0x279895, { reason: _0x1bee53 })
+        ? this['applyViewState'](type, { reason: reason2 })
         : this['runtime']?.['bridge']?.['setDraftView']?.({
             kind: 'scene-default',
             sceneView: this['sceneView'],
             disableSmoothing: !![],
           }),
-      this['onChange']?.(this['getSnapshot'](), { reason: _0x1bee53 }),
-      _0x279895
+      this['onChange']?.(this['getSnapshot'](), { reason: reason2 }),
+      type
     );
   }
-  ['focusSelection']({ frame: _0x421e8d, padding: _0x33a6d7 } = {}) {
-    const _0x1b33d7 = _0x421e8d || this['runtime']?.['bridge']?.['readSelectionFrame']?.();
-    if (!_0x1b33d7) return null;
-    const _0x27566e = createStoryboard3DFocusSceneView({
+  ['focusSelection']({ frame: frame3, padding: padding3 } = {}) {
+    const frame4 = frame3 || this['runtime']?.['bridge']?.['readSelectionFrame']?.();
+    if (!frame4) return null;
+    const sceneView7 = createStoryboard3DFocusSceneView({
       sceneView: this['sceneView'],
-      frame: _0x1b33d7,
-      padding: _0x33a6d7,
+      frame: frame4,
+      padding: padding3,
     });
-    return this['_apply'](createStoryboard3DPerspectiveView({ sceneView: _0x27566e }), 'focus-selection');
+    return this['_apply'](createStoryboard3DPerspectiveView({ sceneView: sceneView7 }), 'focus-selection');
   }
-  ['focusObject'](_0x11b554, _0x4dac26, { frame: _0x2b7310, padding: _0x20df44 } = {}) {
-    const _0x1f96a4 = _0x2b7310 || this['runtime']?.['bridge']?.['readObjectFrame']?.(_0x11b554, _0x4dac26);
-    if (!_0x1f96a4) return null;
-    const _0x5f0cc7 = createStoryboard3DFocusSceneView({
+  ['focusObject'](output, value2, { frame: frame5, padding: padding4 } = {}) {
+    const frame6 = frame5 || this['runtime']?.['bridge']?.['readObjectFrame']?.(output, value2);
+    if (!frame6) return null;
+    const sceneView8 = createStoryboard3DFocusSceneView({
       sceneView: this['sceneView'],
-      frame: _0x1f96a4,
-      padding: _0x20df44,
+      frame: frame6,
+      padding: padding4,
     });
-    return this['_apply'](createStoryboard3DPerspectiveView({ sceneView: _0x5f0cc7 }), 'focus-object');
+    return this['_apply'](createStoryboard3DPerspectiveView({ sceneView: sceneView8 }), 'focus-object');
   }
-  ['fitAll'](_0x2a0587 = {}) {
-    const _0x4294f2 = _0x2a0587['sceneState'] || this['runtime']?.['adapted']?.['state'];
-    if (!_0x4294f2 && !_0x2a0587['bounds']) return null;
-    const _0x29123d = this['runtime']?.['readCurrentCamera']?.(),
-      _0x2265d6 = this['canvas']?.['getBoundingClientRect']?.(),
-      _0x11f8a2 = Number(_0x2265d6?.['width']) / Math['max'](0x1, Number(_0x2265d6?.['height'])),
-      _0x3a73ac = {
-        ..._0x2a0587,
+  ['fitAll'](args4 = {}) {
+    const sceneState3 = args4['sceneState'] || this['runtime']?.['adapted']?.['state'];
+    if (!sceneState3 && !args4['bounds']) return null;
+    const value3 = this['runtime']?.['readCurrentCamera']?.(),
+      box4 = this['canvas']?.['getBoundingClientRect']?.(),
+      count = Number(box4?.['width']) / Math['max'](0x1, Number(box4?.['height'])),
+      args5 = {
+        ...args4,
         aspect:
-          Number['isFinite'](Number(_0x2a0587['aspect'])) && Number(_0x2a0587['aspect']) > 0x0
-            ? Number(_0x2a0587['aspect'])
-            : Number['isFinite'](_0x11f8a2) && _0x11f8a2 > 0x0
-              ? _0x11f8a2
+          Number['isFinite'](Number(args4['aspect'])) && Number(args4['aspect']) > 0x0
+            ? Number(args4['aspect'])
+            : Number['isFinite'](count) && count > 0x0
+              ? count
               : 0x10 / 0x9,
         fov:
-          Number['isFinite'](Number(_0x2a0587['fov'])) && Number(_0x2a0587['fov']) > 0x0
-            ? Number(_0x2a0587['fov'])
-            : Number(_0x29123d?.['fov']) || 0x32,
+          Number['isFinite'](Number(args4['fov'])) && Number(args4['fov']) > 0x0
+            ? Number(args4['fov'])
+            : Number(value3?.['fov']) || 0x32,
       },
-      _0x1b4a62 = createStoryboard3DFitAllSceneView({
-        ..._0x3a73ac,
-        sceneState: _0x4294f2,
+      sceneView9 = createStoryboard3DFitAllSceneView({
+        ...args5,
+        sceneState: sceneState3,
         sceneView: this['sceneView'],
       });
-    return this['_apply'](createStoryboard3DPerspectiveView({ sceneView: _0x1b4a62 }), 'fit-all');
+    return this['_apply'](createStoryboard3DPerspectiveView({ sceneView: sceneView9 }), 'fit-all');
   }
-  ['showOrthographicView'](_0x318ffe = 'top', _0x5df349 = {}) {
-    const _0x459539 = _0x5df349['sceneState'] || this['runtime']?.['adapted']?.['state'];
-    if (!_0x459539 && !_0x5df349['bounds']) return null;
+  ['showOrthographicView'](axis2 = 'top', args6 = {}) {
+    const sceneState4 = args6['sceneState'] || this['runtime']?.['adapted']?.['state'];
+    if (!sceneState4 && !args6['bounds']) return null;
     return (
       this['viewMode'] === 'perspective' &&
         (this['perspectiveSceneView'] = { ...this['sceneView'], target: { ...this['sceneView']['target'] } }),
       this['_apply'](
         createStoryboard3DAxisView({
-          ..._0x5df349,
-          sceneState: _0x459539,
+          ...args6,
+          sceneState: sceneState4,
           sceneView: this['sceneView'],
-          axis: _0x318ffe,
+          axis: axis2,
         }),
-        _0x318ffe + '-view',
+        axis2 + '-view',
       )
     );
   }
-  ['showTopView'](_0x153ff2 = {}) {
-    return this['showOrthographicView']('top', _0x153ff2);
+  ['showTopView'](options3 = {}) {
+    return this['showOrthographicView']('top', options3);
   }
-  ['showFrontView'](_0x2f2cf4 = {}) {
-    return this['showOrthographicView']('front', _0x2f2cf4);
+  ['showFrontView'](options4 = {}) {
+    return this['showOrthographicView']('front', options4);
   }
-  ['showRightView'](_0x4d30b1 = {}) {
-    return this['showOrthographicView']('right', _0x4d30b1);
+  ['showRightView'](options5 = {}) {
+    return this['showOrthographicView']('right', options5);
   }
-  ['showPerspectiveView'](_0x1d2e0e = this['perspectiveSceneView']) {
+  ['showPerspectiveView'](sceneView10 = this['perspectiveSceneView']) {
     return this['_apply'](
       createStoryboard3DPerspectiveView({
-        sceneView: _0x1d2e0e,
+        sceneView: sceneView10,
         fallbackSceneView: this['perspectiveSceneView'],
       }),
       'perspective-view',
     );
   }
-  ['updateSettings'](_0x5bcadc = {}) {
-    const _0x265a1d = { ...this['settings'], ..._0x5bcadc };
-    if (_0x5bcadc['snap'] && typeof _0x5bcadc['snap'] === 'object') {
-      if (_0x5bcadc['snap']['enabled'] != null) _0x265a1d['snapEnabled'] = _0x5bcadc['snap']['enabled'];
-      if (_0x5bcadc['snap']['translation'] != null)
-        _0x265a1d['translationSnap'] = _0x5bcadc['snap']['translation'];
-      if (_0x5bcadc['snap']['rotation'] != null) _0x265a1d['rotationSnap'] = _0x5bcadc['snap']['rotation'];
-      if (_0x5bcadc['snap']['scale'] != null) _0x265a1d['scaleSnap'] = _0x5bcadc['snap']['scale'];
+  ['updateSettings'](args7 = {}) {
+    const value4 = { ...this['settings'], ...args7 };
+    if (args7['snap'] && typeof args7['snap'] === 'object') {
+      if (args7['snap']['enabled'] != null) value4['snapEnabled'] = args7['snap']['enabled'];
+      if (args7['snap']['translation'] != null) value4['translationSnap'] = args7['snap']['translation'];
+      if (args7['snap']['rotation'] != null) value4['rotationSnap'] = args7['snap']['rotation'];
+      if (args7['snap']['scale'] != null) value4['scaleSnap'] = args7['snap']['scale'];
     }
     return (
-      (this['settings'] = normalizeStoryboard3DViewportSettings(_0x265a1d)),
+      (this['settings'] = normalizeStoryboard3DViewportSettings(value4)),
       this['onChange']?.(this['getSnapshot'](), { reason: 'settings' }),
       { ...this['settings'] }
     );
   }
-  ['getTransformOptions'](_0x531f3f) {
-    return createStoryboard3DTransformInteractionOptions(this['settings'], _0x531f3f);
+  ['getTransformOptions'](value5) {
+    return createStoryboard3DTransformInteractionOptions(this['settings'], value5);
   }
   ['getDirectorUIPatch']() {
     return createStoryboard3DDirectorViewportUIPatch(this['settings']);
@@ -433,6 +431,6 @@ export class Storyboard3DViewportControlSystem {
     (this['contextController']?.['destroy'](), (this['contextController'] = null), (this['canvas'] = null));
   }
 }
-export function createStoryboard3DViewportControlSystem(_0x496eb0) {
-  return new Storyboard3DViewportControlSystem(_0x496eb0);
+export function createStoryboard3DViewportControlSystem(value6) {
+  return new Storyboard3DViewportControlSystem(value6);
 }

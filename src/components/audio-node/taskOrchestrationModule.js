@@ -12,41 +12,39 @@ const DEFAULT_RUNTIME = Object['freeze']({
   resumeTask: resumeTask,
   submitTask: submitTask,
 });
-function normalizeProvider(_0x5bc89e, _0x5d54c3 = 'runninghubwf') {
-  return String(_0x5bc89e || _0x5d54c3)
+function normalizeProvider(value, item = 'runninghubwf') {
+  return String(value || item)
     ['trim']()
     ['toLowerCase']();
 }
-function isRunningHubProvider(_0x382d91) {
-  return _0x382d91 === 'runninghubwf' || _0x382d91 === 'runninghub';
+function isRunningHubProvider(key) {
+  return key === 'runninghubwf' || key === 'runninghub';
 }
-function supportsAudioTaskCancellation(_0x2bf088 = {}) {
-  const _0x5d8fdf = getModelManifest(_0x2bf088['audioWorkflowKey'] || _0x2bf088['model'] || '');
-  return _0x5d8fdf
-    ? _0x5d8fdf['cancellable'] === !![]
-    : normalizeProvider(_0x2bf088['provider']) === 'runninghubwf';
+function supportsAudioTaskCancellation(options = {}) {
+  const modelManifest = getModelManifest(options['audioWorkflowKey'] || options['model'] || '');
+  return modelManifest
+    ? modelManifest['cancellable'] === !![]
+    : normalizeProvider(options['provider']) === 'runninghubwf';
 }
-function getResultPatch(_0x20d446) {
-  if (_0x20d446?.['patch'] && typeof _0x20d446['patch'] === 'object') return _0x20d446['patch'];
-  return _0x20d446 && typeof _0x20d446 === 'object' ? _0x20d446 : {};
+function getResultPatch(index) {
+  if (index?.['patch'] && typeof index['patch'] === 'object') return index['patch'];
+  return index && typeof index === 'object' ? index : {};
 }
-function isAbortLike(_0x3ece93, _0xd92b9e) {
+function isAbortLike(error, result) {
   return (
-    _0xd92b9e?.['aborted'] === !![] ||
-    _0x3ece93?.['name'] === 'AbortError' ||
-    _0x3ece93?.['message'] === 'CANCELLED'
+    result?.['aborted'] === !![] || error?.['name'] === 'AbortError' || error?.['message'] === 'CANCELLED'
   );
 }
-function throwIfAborted(_0x59bfe8) {
-  if (_0x59bfe8?.['aborted'] !== !![]) return;
-  const _0x86b8ce = new Error('CANCELLED');
-  _0x86b8ce['name'] = 'AbortError';
-  throw _0x86b8ce;
+function throwIfAborted(data) {
+  if (data?.['aborted'] !== !![]) return;
+  const error2 = new Error('CANCELLED');
+  error2['name'] = 'AbortError';
+  throw error2;
 }
-export function createAudioNodeTaskOrchestration(_0x179409 = {}) {
+export function createAudioNodeTaskOrchestration(options2 = {}) {
   const {
-    nodeId: _0x114757,
-    store: _0xecc112,
+    nodeId: nodeId,
+    store: store,
     runtime: runtime = DEFAULT_RUNTIME,
     api: api = {},
     ensureConfig: ensureConfig = async () => {},
@@ -61,497 +59,515 @@ export function createAudioNodeTaskOrchestration(_0x179409 = {}) {
     now: now = () => Date['now'](),
     createAbortController: createAbortController = () => new AbortController(),
     messages: messages = {},
-  } = _0x179409;
-  if (!String(_0x114757 || '')['trim']())
+  } = options2;
+  if (!String(nodeId || '')['trim']())
     throw new Error('[audioTaskOrchestration]\x20nodeId\x20is\x20required');
-  if (!_0xecc112 || typeof _0xecc112['getState'] !== 'function')
+  if (!store || typeof store['getState'] !== 'function')
     throw new Error('[audioTaskOrchestration] store is required');
-  let _0x1cae52 = ![],
-    _0x466268 = null,
-    _0x7b2224 = null,
-    _0x3ab923 = null,
-    _0x5324b5 = null,
-    _0x1e73bd = '',
-    _0xc5e21d = '',
-    _0x29ce90 = '',
-    _0x4941ae = '',
-    _0x2b94d2 = ![],
-    _0x5960b6 = ![],
-    _0x2fe015 = ![];
-  const _0x52465a = () => _0xecc112['getState']()?.['nodes']?.[_0x114757] || {},
-    _0x56eb30 = (_0x250ea5, _0x2f81a5) => {
-      if (typeof _0x250ea5?.['updateTaskNode'] === 'function') return _0x250ea5['updateTaskNode'](_0x2f81a5);
-      return (_0xecc112['updateNodeData'](_0x114757, _0x2f81a5), !![]);
+  let enabled = ![],
+    enabled2 = null,
+    enabled3 = null,
+    enabled4 = null,
+    value2 = null,
+    target = '',
+    source = '',
+    next = '',
+    taskProviderProfileId = '',
+    enabled5 = ![],
+    cancelInFlight = ![],
+    enabled6 = ![];
+  const run = () => store['getState']()?.['nodes']?.[nodeId] || {},
+    handler = (current, entry) => {
+      if (typeof current?.['updateTaskNode'] === 'function') return current['updateTaskNode'](entry);
+      return (store['updateNodeData'](nodeId, entry), !![]);
     },
-    _0x4eba51 = (_0x416f80, _0x38df10) => {
-      const _0x7d09c2 = messages[_0x416f80];
-      if (typeof _0x7d09c2 === 'function') return _0x7d09c2() || _0x38df10;
-      return _0x7d09c2 || _0x38df10;
+    rhStatusMessage = (record, payload) => {
+      const run2 = messages[record];
+      if (typeof run2 === 'function') return run2() || payload;
+      return run2 || payload;
     },
-    _0x10bcdf = (_0x2844c4 = {}) => {
+    persistTaskState2 = (options3 = {}) => {
       try {
-        const _0x491752 = persistTaskState(_0x2844c4);
-        _0x491752?.['catch']?.(() => {});
+        const promise = persistTaskState(options3);
+        promise?.['catch']?.(() => {});
       } catch {}
     },
-    _0x188fba = () => {
-      const _0x3fe414 = _0x52465a(),
-        _0x16d0c8 = shouldShowGenerationBusyUi(_0x3fe414);
+    handler2 = () => {
+      const handle = run(),
+        isGenerating = shouldShowGenerationBusyUi(handle);
       return (
         setBusyState({
-          isGenerating: _0x16d0c8,
-          cancelInFlight: _0x5960b6,
-          taskId: String(_0xc5e21d || _0x3fe414['rhTaskId'] || _0x3fe414['taskId'] || ''),
+          isGenerating: isGenerating,
+          cancelInFlight: cancelInFlight,
+          taskId: String(source || handle['rhTaskId'] || handle['taskId'] || ''),
         }),
-        setLoading(_0x16d0c8),
-        _0x16d0c8
+        setLoading(isGenerating),
+        isGenerating
       );
     },
-    _0x1ec13e = ({ resetRecovering: resetRecovering = ![] } = {}) => {
-      (_0x5324b5 && _0x5324b5['signal']['aborted'] !== !![] && _0x5324b5['abort'](),
-        (_0x5324b5 = null),
-        (_0x1e73bd = ''),
-        (_0x3ab923 = null),
+    resetRecovery = ({ resetRecovering: resetRecovering = ![] } = {}) => {
+      (value2 && value2['signal']['aborted'] !== !![] && value2['abort'](),
+        (value2 = null),
+        (target = ''),
+        (enabled4 = null),
         resetRecovering &&
-          _0x52465a()['rhTaskRecovering'] === !![] &&
-          (_0xecc112['updateNodeData'](_0x114757, { rhTaskRecovering: ![] }),
-          _0x10bcdf({ patch: { rhTaskRecovering: ![] } })));
+          run()['rhTaskRecovering'] === !![] &&
+          (store['updateNodeData'](nodeId, { rhTaskRecovering: ![] }),
+          persistTaskState2({ patch: { rhTaskRecovering: ![] } })));
     },
-    _0x1695c9 = async (_0x4a743c, _0x59b632) => ({
-      ...getResultPatch(await buildResultPatch(_0x4a743c, _0x59b632['startedAt'], _0x59b632)),
+    resultBuilder = async (state, config) => ({
+      ...getResultPatch(await buildResultPatch(state, config['startedAt'], config)),
       rhStatusMessage: null,
       rhStatusCode: null,
     }),
-    _0xe8dea0 = (_0x5644b5) => ({
-      rhStatusMessage: _0x5644b5?.['message'] || _0x4eba51('generationFailed', 'Audio generation failed'),
-      rhStatusCode: Number['isFinite'](Number(_0x5644b5?.['code'])) ? Number(_0x5644b5['code']) : null,
+    failureBuilder = (rhStatusMessage2) => ({
+      rhStatusMessage:
+        rhStatusMessage2?.['message'] || rhStatusMessage('generationFailed', 'Audio generation failed'),
+      rhStatusCode: Number['isFinite'](Number(rhStatusMessage2?.['code']))
+        ? Number(rhStatusMessage2['code'])
+        : null,
     }),
-    _0x5e6cc9 = () => ({
+    cancelledBuilder = () => ({
       audioUrl: '',
       src: '',
       localPath: '',
-      rhStatusMessage: _0x4eba51('interrupted', 'Audio\x20generation\x20interrupted'),
+      rhStatusMessage: rhStatusMessage('interrupted', 'Audio\x20generation\x20interrupted'),
     }),
-    _0x8ca2b3 = (_0x1eb909) => {
-      const _0x81edc2 = normalizeProvider(_0x1eb909['provider']),
-        _0xad7441 = {
-          provider: _0x1eb909['provider'],
-          audioWorkflowKey: _0x1eb909['audioWorkflowKey'],
-          audioWorkflowLabel: _0x1eb909['audioWorkflowLabel'],
-          model: _0x1eb909['audioWorkflowKey'],
+    handler3 = (provider) => {
+      const provider2 = normalizeProvider(provider['provider']),
+        scope = {
+          provider: provider['provider'],
+          audioWorkflowKey: provider['audioWorkflowKey'],
+          audioWorkflowLabel: provider['audioWorkflowLabel'],
+          model: provider['audioWorkflowKey'],
         };
       return (
-        isRunningHubProvider(_0x81edc2) && (_0xad7441['rhTaskUseOpenapiQuery'] = !![]),
-        _0x81edc2 === 'runninghubwf' && (_0xad7441['rhInstanceType'] = _0x1eb909['rhInstanceType']),
-        isRunningHubProvider(_0x81edc2) &&
-          _0x1eb909['providerProfileId'] &&
-          ((_0xad7441['providerProfileId'] = _0x1eb909['providerProfileId']),
-          (_0xad7441['rhProviderProfileId'] = _0x1eb909['providerProfileId'])),
-        _0xad7441
+        isRunningHubProvider(provider2) && (scope['rhTaskUseOpenapiQuery'] = !![]),
+        provider2 === 'runninghubwf' && (scope['rhInstanceType'] = provider['rhInstanceType']),
+        isRunningHubProvider(provider2) &&
+          provider['providerProfileId'] &&
+          ((scope['providerProfileId'] = provider['providerProfileId']),
+          (scope['rhProviderProfileId'] = provider['providerProfileId'])),
+        scope
       );
     };
-  async function _0x35bfbe({ payload: _0x193c33, startedAt: startedAt = now() } = {}) {
-    if (_0x1cae52) return { ok: ![], status: 'disposed' };
-    if (_0x466268) return _0x466268;
-    if (!_0x193c33 || typeof _0x193c33 !== 'object')
+  async function runGeneration({ payload: payload2, startedAt: startedAt = now() } = {}) {
+    if (enabled) return { ok: ![], status: 'disposed' };
+    if (enabled2) return enabled2;
+    if (!payload2 || typeof payload2 !== 'object')
       throw new Error('[audioTaskOrchestration] payload is required');
-    _0x1ec13e({ resetRecovering: !![] });
-    const _0x5cfef0 = normalizeProvider(_0x193c33['provider']),
-      _0x2334ce = createAbortController();
-    ((_0x7b2224 = _0x2334ce),
-      (_0x2b94d2 = ![]),
-      (_0x5960b6 = ![]),
-      (_0x2fe015 = ![]),
-      (_0xc5e21d = ''),
-      (_0x29ce90 = String(_0x193c33['apiKey'] || '')['trim']()),
-      (_0x4941ae = String(_0x193c33['providerProfileId'] || _0x193c33['rhProviderProfileId'] || '')[
+    resetRecovery({ resetRecovering: !![] });
+    const provider3 = normalizeProvider(payload2['provider']),
+      signal = createAbortController();
+    ((enabled3 = signal),
+      (enabled5 = ![]),
+      (cancelInFlight = ![]),
+      (enabled6 = ![]),
+      (source = ''),
+      (next = String(payload2['apiKey'] || '')['trim']()),
+      (taskProviderProfileId = String(payload2['providerProfileId'] || payload2['rhProviderProfileId'] || '')[
         'trim'
       ]()),
       setBusyState({ isGenerating: !![], cancelInFlight: ![], taskId: '' }),
       setLoading(!![]));
-    const _0x3dc427 = createGenerationSubmitPlan({
+    const generationSubmitPlan = createGenerationSubmitPlan({
         kind: 'audio',
-        sourceNodeId: _0x114757,
-        targetNodeId: _0x114757,
+        sourceNodeId: nodeId,
+        targetNodeId: nodeId,
         trigger: 'node',
         taskType: 'audio-generation',
-        provider: _0x5cfef0,
-        adapterType: _0x193c33['adapterType'] || 'workflow',
-        modelId: _0x193c33['audioWorkflowKey'] || _0x52465a()['model'] || '',
-        executionId: _0x193c33['executionId'],
-        payload: _0x193c33,
-        cancellable: supportsAudioTaskCancellation(_0x193c33),
-        resumable: isRunningHubProvider(_0x5cfef0),
-        pauseOnAbort: isRunningHubProvider(_0x5cfef0) ? 'afterTaskId' : ![],
-        startBuilder: () => _0x8ca2b3(_0x193c33),
-        persistTaskState: _0x10bcdf,
-        submit: async (_0x572a82, _0x24c1c1) =>
-          api['generateAudio'](_0x193c33, {
-            signal: _0x2334ce['signal'],
-            runningHubWorkflowQueueLease: _0x24c1c1['runningHubWorkflowQueueLease'],
-            onTaskMeta: (_0x30eb58 = {}) => {
-              const _0x31f8d4 = String(_0x30eb58['taskId'] || '')['trim']();
-              if (!_0x31f8d4) return;
-              ((_0x4941ae = String(
-                _0x30eb58['providerProfileId'] || _0x30eb58['rhProviderProfileId'] || _0x4941ae,
+        provider: provider3,
+        adapterType: payload2['adapterType'] || 'workflow',
+        modelId: payload2['audioWorkflowKey'] || run()['model'] || '',
+        executionId: payload2['executionId'],
+        payload: payload2,
+        cancellable: supportsAudioTaskCancellation(payload2),
+        resumable: isRunningHubProvider(provider3),
+        pauseOnAbort: isRunningHubProvider(provider3) ? 'afterTaskId' : ![],
+        startBuilder: () => handler3(payload2),
+        persistTaskState: persistTaskState2,
+        submit: async (input, runningHubWorkflowQueueLease) =>
+          api['generateAudio'](payload2, {
+            signal: signal['signal'],
+            runningHubWorkflowQueueLease: runningHubWorkflowQueueLease['runningHubWorkflowQueueLease'],
+            onTaskMeta: (rhTaskUseOpenapiQuery = {}) => {
+              const taskId = String(rhTaskUseOpenapiQuery['taskId'] || '')['trim']();
+              if (!taskId) return;
+              ((taskProviderProfileId = String(
+                rhTaskUseOpenapiQuery['providerProfileId'] ||
+                  rhTaskUseOpenapiQuery['rhProviderProfileId'] ||
+                  taskProviderProfileId,
               )['trim']()),
-                (_0xc5e21d = _0x31f8d4),
-                (_0x29ce90 =
-                  String(_0x30eb58['apiKey'] || '')['trim']() ||
-                  String(_0x193c33['apiKey'] || '')['trim']() ||
-                  _0x29ce90),
-                _0x24c1c1['onTaskId'](_0x31f8d4),
-                _0x56eb30(_0x24c1c1, {
-                  rhTaskUseOpenapiQuery: _0x30eb58['useOpenapiQuery'] === !![],
-                  ...(_0x4941ae
+                (source = taskId),
+                (next =
+                  String(rhTaskUseOpenapiQuery['apiKey'] || '')['trim']() ||
+                  String(payload2['apiKey'] || '')['trim']() ||
+                  next),
+                runningHubWorkflowQueueLease['onTaskId'](taskId),
+                handler(runningHubWorkflowQueueLease, {
+                  rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery['useOpenapiQuery'] === !![],
+                  ...(taskProviderProfileId
                     ? {
-                        taskProviderProfileId: _0x4941ae,
-                        providerProfileId: _0x4941ae,
-                        rhProviderProfileId: _0x4941ae,
+                        taskProviderProfileId: taskProviderProfileId,
+                        providerProfileId: taskProviderProfileId,
+                        rhProviderProfileId: taskProviderProfileId,
                       }
                     : {}),
                 }),
-                _0x10bcdf({ taskId: _0x31f8d4 }),
-                _0x2b94d2 && !_0x5960b6 && !_0x2fe015 && void _0x4a298a());
+                persistTaskState2({ taskId: taskId }),
+                enabled5 && !cancelInFlight && !enabled6 && void cancelGeneration());
             },
-            onTaskId: (_0x4190d7) => {
-              const _0x1c79a3 = String(_0x4190d7 || '')['trim']();
-              if (!_0x1c79a3) return;
-              ((_0xc5e21d = _0x1c79a3),
-                _0x24c1c1['onTaskId'](_0x1c79a3),
-                _0x56eb30(_0x24c1c1, { rhTaskUseOpenapiQuery: !![] }),
-                _0x10bcdf({ taskId: _0x1c79a3 }),
-                _0x2b94d2 && !_0x5960b6 && !_0x2fe015 && void _0x4a298a());
+            onTaskId: (output) => {
+              const taskId2 = String(output || '')['trim']();
+              if (!taskId2) return;
+              ((source = taskId2),
+                runningHubWorkflowQueueLease['onTaskId'](taskId2),
+                handler(runningHubWorkflowQueueLease, { rhTaskUseOpenapiQuery: !![] }),
+                persistTaskState2({ taskId: taskId2 }),
+                enabled5 && !cancelInFlight && !enabled6 && void cancelGeneration());
             },
           }),
-        cancel: async ({ taskId: _0x591a98 }) => {
-          const _0x5d6275 = String(_0x29ce90 || _0x193c33['apiKey'] || '')['trim']();
-          if (!_0x5d6275 || !_0x591a98) return;
-          ((_0x2fe015 = !![]),
+        cancel: async ({ taskId: taskId3 }) => {
+          const apiKey = String(next || payload2['apiKey'] || '')['trim']();
+          if (!apiKey || !taskId3) return;
+          ((enabled6 = !![]),
             await api['cancelRunningHubAudioTask']?.({
-              apiKey: _0x5d6275,
-              taskId: _0x591a98,
-              ...(_0x4941ae || _0x193c33?.['providerProfileId'] || _0x193c33?.['rhProviderProfileId']
+              apiKey: apiKey,
+              taskId: taskId3,
+              ...(taskProviderProfileId ||
+              payload2?.['providerProfileId'] ||
+              payload2?.['rhProviderProfileId']
                 ? {
                     providerProfileId:
-                      _0x4941ae || _0x193c33?.['providerProfileId'] || _0x193c33?.['rhProviderProfileId'],
+                      taskProviderProfileId ||
+                      payload2?.['providerProfileId'] ||
+                      payload2?.['rhProviderProfileId'],
                   }
                 : {}),
             }));
         },
-        resultBuilder: _0x1695c9,
-        failureBuilder: _0xe8dea0,
-        cancelledBuilder: _0x5e6cc9,
-        parseError: (_0x25c78d) =>
-          _0x25c78d?.['message'] || _0x4eba51('generationFailed', 'Audio generation failed'),
+        resultBuilder: resultBuilder,
+        failureBuilder: failureBuilder,
+        cancelledBuilder: cancelledBuilder,
+        parseError: (error3) =>
+          error3?.['message'] || rhStatusMessage('generationFailed', 'Audio generation failed'),
       }),
-      _0xbd706e = runtime['submitTask'](_0x3dc427, {
-        store: _0xecc112,
+      value3 = runtime['submitTask'](generationSubmitPlan, {
+        store: store,
         startedAt: startedAt,
-        abortController: _0x2334ce,
+        abortController: signal,
       })
-        ['then'](async (_0x8d9ad7) => {
-          if (_0x8d9ad7?.['status'] === 'success' && !_0x1cae52 && _0x2334ce['signal']['aborted'] !== !![]) {
-            const _0x172255 = getResultPatch(_0x8d9ad7['patch'] || _0x52465a());
-            (await afterResultCommit(_0x172255, startedAt, _0x8d9ad7),
-              await onSuccess(_0x8d9ad7, { recovering: ![], payload: _0x193c33 }));
+        ['then'](async (result2) => {
+          if (result2?.['status'] === 'success' && !enabled && signal['signal']['aborted'] !== !![]) {
+            const resultPatch = getResultPatch(result2['patch'] || run());
+            (await afterResultCommit(resultPatch, startedAt, result2),
+              await onSuccess(result2, { recovering: ![], payload: payload2 }));
           } else
-            _0x8d9ad7?.['status'] === 'failed' &&
-              !_0x1cae52 &&
-              (await onFailure(_0x8d9ad7['error'], { payload: _0x193c33, result: _0x8d9ad7 }));
-          return _0x8d9ad7;
+            result2?.['status'] === 'failed' &&
+              !enabled &&
+              (await onFailure(result2['error'], { payload: payload2, result: result2 }));
+          return result2;
         })
         ['finally'](() => {
-          _0x466268 = null;
-          if (_0x7b2224 === _0x2334ce) _0x7b2224 = null;
-          const _0x4486c4 = _0x1cae52 ? ![] : _0x188fba();
-          (!_0x4486c4 && ((_0xc5e21d = ''), !_0x2b94d2 && ((_0x29ce90 = ''), (_0x4941ae = ''))),
-            (_0x2b94d2 = ![]),
-            (_0x5960b6 = ![]),
-            (_0x2fe015 = ![]));
+          enabled2 = null;
+          if (enabled3 === signal) enabled3 = null;
+          const enabled7 = enabled ? ![] : handler2();
+          (!enabled7 && ((source = ''), !enabled5 && ((next = ''), (taskProviderProfileId = ''))),
+            (enabled5 = ![]),
+            (cancelInFlight = ![]),
+            (enabled6 = ![]));
         });
-    return ((_0x466268 = _0xbd706e), _0xbd706e);
+    return ((enabled2 = value3), value3);
   }
-  async function _0x4a298a() {
-    if (!supportsAudioTaskCancellation(_0x52465a())) return { ok: ![], reason: 'not-cancellable' };
-    _0x2b94d2 = !![];
-    if (_0x5960b6) return { ok: !![], status: 'cancelling' };
-    _0x5960b6 = !![];
-    const _0xa44d3 = _0x52465a(),
-      _0x26dc6f = String(_0xc5e21d || _0xa44d3['rhTaskId'] || '')['trim']();
-    _0xc5e21d = _0x26dc6f;
-    let _0x1790ef = String(_0x29ce90 || '')['trim']();
-    const _0x43a566 = String(
-      _0x4941ae ||
-        _0xa44d3['taskProviderProfileId'] ||
-        _0xa44d3['providerProfileId'] ||
-        _0xa44d3['rhProviderProfileId'] ||
+  async function cancelGeneration() {
+    if (!supportsAudioTaskCancellation(run())) return { ok: ![], reason: 'not-cancellable' };
+    enabled5 = !![];
+    if (cancelInFlight) return { ok: !![], status: 'cancelling' };
+    cancelInFlight = !![];
+    const node = run(),
+      taskId4 = String(source || node['rhTaskId'] || '')['trim']();
+    source = taskId4;
+    let apiKey2 = String(next || '')['trim']();
+    const providerProfileId = String(
+      taskProviderProfileId ||
+        node['taskProviderProfileId'] ||
+        node['providerProfileId'] ||
+        node['rhProviderProfileId'] ||
         '',
     )['trim']();
-    if (!_0x1790ef)
+    if (!apiKey2)
       try {
         (await ensureConfig(),
-          (_0x1790ef = String(getProviderConfig(_0x43a566 || 'runninghubwf')?.['apiKey'] || '')['trim']()));
+          (apiKey2 = String(getProviderConfig(providerProfileId || 'runninghubwf')?.['apiKey'] || '')[
+            'trim'
+          ]()));
       } catch {}
-    _0x29ce90 = _0x1790ef;
-    const _0x5aade5 = Number(_0xa44d3['generationStartTime'] || _0xa44d3['rhTaskStartedAt'] || 0x0),
-      _0x4cf190 =
-        _0xa44d3['generationDuration'] != null
-          ? _0xa44d3['generationDuration']
-          : _0x5aade5 > 0x0
-            ? Math['max'](0x0, now() - _0x5aade5)
+    next = apiKey2;
+    const startedAt2 = Number(node['generationStartTime'] || node['rhTaskStartedAt'] || 0x0),
+      generationDuration =
+        node['generationDuration'] != null
+          ? node['generationDuration']
+          : startedAt2 > 0x0
+            ? Math['max'](0x0, now() - startedAt2)
             : 0x0,
-      _0x2c079f = createGenerationCancelPlanFromNode({
+      args = createGenerationCancelPlanFromNode({
         kind: 'audio',
-        node: _0xa44d3,
-        payload: _0xa44d3,
-        sourceNodeId: _0x114757,
-        targetNodeId: _0x114757,
+        node: node,
+        payload: node,
+        sourceNodeId: nodeId,
+        targetNodeId: nodeId,
         trigger: 'node',
         taskType: 'audio-generation',
         taskProtocol: 'workflow',
-        provider: normalizeProvider(_0xa44d3['provider']),
-        adapterType: _0xa44d3['adapterType'] || 'workflow',
-        modelId: _0xa44d3['audioWorkflowKey'] || _0xa44d3['model'] || '',
-        executionId: _0xa44d3['executionId'],
-        taskId: _0x26dc6f,
-        startedAt: _0x5aade5,
-        cancellable: supportsAudioTaskCancellation(_0xa44d3),
+        provider: normalizeProvider(node['provider']),
+        adapterType: node['adapterType'] || 'workflow',
+        modelId: node['audioWorkflowKey'] || node['model'] || '',
+        executionId: node['executionId'],
+        taskId: taskId4,
+        startedAt: startedAt2,
+        cancellable: supportsAudioTaskCancellation(node),
         resumable: !![],
-        persistTaskState: _0x10bcdf,
+        persistTaskState: persistTaskState2,
       }),
-      _0x42ad62 = ({ remoteResult: _0x98ab23, remoteError: _0x4f817a, startedAt: _0x23bda9 } = {}) => {
-        const _0x2af585 = Number(_0x98ab23?.['code']),
-          _0x53feba = !_0x26dc6f
-            ? _0x4eba51(
+      cancelledBuilder2 = ({
+        remoteResult: remoteResult,
+        remoteError: remoteError,
+        startedAt: startedAt3,
+      } = {}) => {
+        const count = Number(remoteResult?.['code']),
+          rhStatusMessage3 = !taskId4
+            ? rhStatusMessage(
                 'interruptedMissingTaskId',
                 'Audio generation interrupted before task id was available',
               )
-            : _0x4f817a
-              ? _0x4f817a['message'] || _0x4eba51('cancelFailed', 'Cancel failed')
-              : _0x2af585 === 0x0
-                ? _0x4eba51('cancelSuccess', 'Cancelled')
-                : _0x2af585 === 0x327
-                  ? _0x4eba51('cancelTaskMissing', 'Task no longer exists')
-                  : _0x98ab23?.['msg'] || _0x4eba51('cancelFailed', 'Cancel failed');
+            : remoteError
+              ? remoteError['message'] || rhStatusMessage('cancelFailed', 'Cancel failed')
+              : count === 0x0
+                ? rhStatusMessage('cancelSuccess', 'Cancelled')
+                : count === 0x327
+                  ? rhStatusMessage('cancelTaskMissing', 'Task no longer exists')
+                  : remoteResult?.['msg'] || rhStatusMessage('cancelFailed', 'Cancel failed');
         return {
           audioUrl: '',
           src: '',
           localPath: '',
-          generationDuration: _0x4cf190,
-          rhStatusMessage: _0x53feba,
-          rhStatusCode: !_0x26dc6f ? 0x32d : Number['isFinite'](_0x2af585) ? _0x2af585 : null,
+          generationDuration: generationDuration,
+          rhStatusMessage: rhStatusMessage3,
+          rhStatusCode: !taskId4 ? 0x32d : Number['isFinite'](count) ? count : null,
           ...buildRunningHubTaskPatch({
-            taskId: _0x26dc6f,
+            taskId: taskId4,
             status: 'cancelled',
-            startedAt: Number(_0x23bda9 || _0x5aade5 || 0x0),
+            startedAt: Number(startedAt3 || startedAt2 || 0x0),
             recovering: ![],
-            useOpenapiQuery: _0xa44d3['rhTaskUseOpenapiQuery'] === !![],
+            useOpenapiQuery: node['rhTaskUseOpenapiQuery'] === !![],
           }),
         };
       };
-    setBusyState({ isGenerating: !![], cancelInFlight: !![], taskId: _0x26dc6f });
+    setBusyState({ isGenerating: !![], cancelInFlight: !![], taskId: taskId4 });
     try {
       return (
-        (_0x2fe015 = !![]),
-        await runtime['cancelTask'](_0x114757, {
-          store: _0xecc112,
-          taskId: _0x26dc6f,
+        (enabled6 = !![]),
+        await runtime['cancelTask'](nodeId, {
+          store: store,
+          taskId: taskId4,
           cancellable: !![],
-          cancel: async ({ taskId: _0x49d082 }) => {
-            if (!_0x1790ef) throw new Error(_0x4eba51('missingApiKey', 'RunningHub API key is required'));
+          cancel: async ({ taskId: taskId5 }) => {
+            if (!apiKey2) throw new Error(rhStatusMessage('missingApiKey', 'RunningHub API key is required'));
             return api['cancelRunningHubAudioTask']?.({
-              apiKey: _0x1790ef,
-              taskId: _0x49d082,
-              ...(_0x43a566 || _0xa44d3?.['providerProfileId'] || _0xa44d3?.['rhProviderProfileId']
+              apiKey: apiKey2,
+              taskId: taskId5,
+              ...(providerProfileId || node?.['providerProfileId'] || node?.['rhProviderProfileId']
                 ? {
                     providerProfileId:
-                      _0x43a566 || _0xa44d3?.['providerProfileId'] || _0xa44d3?.['rhProviderProfileId'],
+                      providerProfileId || node?.['providerProfileId'] || node?.['rhProviderProfileId'],
                   }
                 : {}),
             });
           },
-          cancelledBuilder: _0x42ad62,
-          persistTaskState: _0x10bcdf,
-          spec: { ..._0x2c079f, cancelledBuilder: _0x42ad62 },
+          cancelledBuilder: cancelledBuilder2,
+          persistTaskState: persistTaskState2,
+          spec: { ...args, cancelledBuilder: cancelledBuilder2 },
         })
       );
     } finally {
-      ((_0x5960b6 = ![]), (_0x2fe015 = ![]));
-      const _0x16044c = _0x188fba();
-      !_0x16044c && ((_0xc5e21d = ''), (_0x29ce90 = ''), (_0x4941ae = ''), (_0x2b94d2 = ![]));
+      ((cancelInFlight = ![]), (enabled6 = ![]));
+      const enabled8 = handler2();
+      !enabled8 && ((source = ''), (next = ''), (taskProviderProfileId = ''), (enabled5 = ![]));
     }
   }
-  async function _0x3c20cb({ payload: _0x5f3154, startedAt: _0x581e41 } = {}) {
-    if (_0x1cae52) return { ok: ![], status: 'disposed' };
-    const _0x2c4202 = _0x52465a(),
-      _0x5a4d2c = normalizeProvider(_0x2c4202['provider']),
-      _0x4b13d7 = String(_0x2c4202['rhTaskId'] || '')['trim'](),
-      _0x498ace = String(_0x2c4202['rhTaskStatus'] || '')
+  async function resumeIfNeeded({ payload: payload3, startedAt: startedAt4 } = {}) {
+    if (enabled) return { ok: ![], status: 'disposed' };
+    const useOpenapiQuery = run(),
+      provider4 = normalizeProvider(useOpenapiQuery['provider']),
+      taskId6 = String(useOpenapiQuery['rhTaskId'] || '')['trim'](),
+      value4 = String(useOpenapiQuery['rhTaskStatus'] || '')
         ['trim']()
         ['toLowerCase']();
     if (
-      !isRunningHubProvider(_0x5a4d2c) ||
-      !_0x4b13d7 ||
-      ['success', 'failed', 'idle', 'cancelled', 'canceled']['includes'](_0x498ace)
+      !isRunningHubProvider(provider4) ||
+      !taskId6 ||
+      ['success', 'failed', 'idle', 'cancelled', 'canceled']['includes'](value4)
     )
-      return (_0x1ec13e(), null);
-    if (_0x1e73bd === _0x4b13d7 && _0x3ab923) return _0x3ab923;
-    if (!_0x5f3154 || typeof _0x5f3154 !== 'object')
+      return (resetRecovery(), null);
+    if (target === taskId6 && enabled4) return enabled4;
+    if (!payload3 || typeof payload3 !== 'object')
       throw new Error('[audioTaskOrchestration] resume payload is required');
-    const _0x1faeca = Number(
-        _0x581e41 || _0x2c4202['rhTaskStartedAt'] || _0x2c4202['generationStartTime'] || now(),
+    const startedAt5 = Number(
+        startedAt4 || useOpenapiQuery['rhTaskStartedAt'] || useOpenapiQuery['generationStartTime'] || now(),
       ),
-      _0x371918 = createAbortController();
-    ((_0x5324b5 = _0x371918), (_0x1e73bd = _0x4b13d7), (_0xc5e21d = _0x4b13d7));
-    const _0x15bfa1 = String(
-      _0x2c4202['taskProviderProfileId'] ||
-        _0x2c4202['providerProfileId'] ||
-        _0x2c4202['rhProviderProfileId'] ||
-        _0x5f3154['providerProfileId'] ||
-        _0x5f3154['rhProviderProfileId'] ||
+      signal2 = createAbortController();
+    ((value2 = signal2), (target = taskId6), (source = taskId6));
+    const providerProfileId2 = String(
+      useOpenapiQuery['taskProviderProfileId'] ||
+        useOpenapiQuery['providerProfileId'] ||
+        useOpenapiQuery['rhProviderProfileId'] ||
+        payload3['providerProfileId'] ||
+        payload3['rhProviderProfileId'] ||
         '',
     )['trim']();
-    _0x4941ae = _0x15bfa1;
-    const _0x5a2e95 = {
-      ..._0x5f3154,
-      useOpenapiQuery: _0x2c4202['rhTaskUseOpenapiQuery'] !== ![],
-      ...(_0x15bfa1 ? { providerProfileId: _0x15bfa1, rhProviderProfileId: _0x15bfa1 } : {}),
+    taskProviderProfileId = providerProfileId2;
+    const payload4 = {
+      ...payload3,
+      useOpenapiQuery: useOpenapiQuery['rhTaskUseOpenapiQuery'] !== ![],
+      ...(providerProfileId2
+        ? { providerProfileId: providerProfileId2, rhProviderProfileId: providerProfileId2 }
+        : {}),
     };
-    let _0x7e6cb5 = String(_0x5f3154['apiKey'] || _0x29ce90 || '')['trim']();
-    if (!_0x7e6cb5)
+    let enabled9 = String(payload3['apiKey'] || next || '')['trim']();
+    if (!enabled9)
       try {
         (await ensureConfig(),
-          (_0x7e6cb5 = String(getProviderConfig(_0x15bfa1 || 'runninghubwf')?.['apiKey'] || '')['trim']()));
+          (enabled9 = String(getProviderConfig(providerProfileId2 || 'runninghubwf')?.['apiKey'] || '')[
+            'trim'
+          ]()));
       } catch {}
-    ((_0x29ce90 = _0x7e6cb5),
-      setBusyState({ isGenerating: !![], cancelInFlight: ![], taskId: _0x4b13d7 }),
+    ((next = enabled9),
+      setBusyState({ isGenerating: !![], cancelInFlight: ![], taskId: taskId6 }),
       setLoading(!![]));
-    const _0x4acdeb = createGenerationResumePlanFromNode({
+    const generationResumePlanFromNode = createGenerationResumePlanFromNode({
         kind: 'audio',
-        node: _0x2c4202,
-        payload: _0x5a2e95,
-        sourceNodeId: _0x114757,
-        targetNodeId: _0x114757,
+        node: useOpenapiQuery,
+        payload: payload4,
+        sourceNodeId: nodeId,
+        targetNodeId: nodeId,
         trigger: 'node',
         taskType: 'audio-generation',
         taskProtocol: 'workflow',
-        provider: normalizeProvider(_0x5a2e95['provider'], _0x5a4d2c),
-        adapterType: _0x5a2e95['adapterType'] || 'workflow',
-        modelId: _0x5a2e95['audioWorkflowKey'] || _0x2c4202['model'] || '',
-        executionId: _0x5a2e95['executionId'],
-        taskId: _0x4b13d7,
-        startedAt: _0x1faeca,
-        cancellable: supportsAudioTaskCancellation(_0x5a2e95),
+        provider: normalizeProvider(payload4['provider'], provider4),
+        adapterType: payload4['adapterType'] || 'workflow',
+        modelId: payload4['audioWorkflowKey'] || useOpenapiQuery['model'] || '',
+        executionId: payload4['executionId'],
+        taskId: taskId6,
+        startedAt: startedAt5,
+        cancellable: supportsAudioTaskCancellation(payload4),
         resumable: !![],
         pauseOnAbort: !![],
-        startBuilder: () => _0x8ca2b3(_0x5a2e95),
-        persistTaskState: _0x10bcdf,
+        startBuilder: () => handler3(payload4),
+        persistTaskState: persistTaskState2,
         poll: async () => {
           return (
-            throwIfAborted(_0x371918['signal']),
-            api['resumeRunningHubAudioTask'](_0x4b13d7, _0x5a2e95, {
-              signal: _0x371918['signal'],
-              useOpenapiQuery: _0x5a2e95['useOpenapiQuery'],
+            throwIfAborted(signal2['signal']),
+            api['resumeRunningHubAudioTask'](taskId6, payload4, {
+              signal: signal2['signal'],
+              useOpenapiQuery: payload4['useOpenapiQuery'],
             })
           );
         },
-        resultBuilder: async (_0x97fa0a, _0x508e8b) => ({
-          ...(await _0x1695c9(_0x97fa0a, _0x508e8b)),
+        resultBuilder: async (value5, startedAt6) => ({
+          ...(await resultBuilder(value5, startedAt6)),
           rhStatusMessage: null,
           rhStatusCode: null,
           ...buildRunningHubTaskPatch({
-            taskId: _0x4b13d7,
+            taskId: taskId6,
             status: 'success',
-            startedAt: _0x508e8b['startedAt'],
+            startedAt: startedAt6['startedAt'],
             recovering: ![],
-            useOpenapiQuery: _0x5a2e95['useOpenapiQuery'],
+            useOpenapiQuery: payload4['useOpenapiQuery'],
           }),
         }),
-        failureBuilder: (_0x6e5bc4, _0x3a56e1) => ({
-          ..._0xe8dea0(_0x6e5bc4),
+        failureBuilder: (value6, startedAt7) => ({
+          ...failureBuilder(value6),
           ...buildRunningHubTaskPatch({
-            taskId: _0x4b13d7,
+            taskId: taskId6,
             status: 'failed',
-            startedAt: _0x3a56e1['startedAt'],
+            startedAt: startedAt7['startedAt'],
             recovering: ![],
-            useOpenapiQuery: _0x5a2e95['useOpenapiQuery'],
+            useOpenapiQuery: payload4['useOpenapiQuery'],
           }),
         }),
-        cancelledBuilder: (_0xef4c00) => ({
-          ..._0x5e6cc9(),
+        cancelledBuilder: (startedAt8) => ({
+          ...cancelledBuilder(),
           ...buildRunningHubTaskPatch({
-            taskId: _0x4b13d7,
+            taskId: taskId6,
             status: 'cancelled',
-            startedAt: _0xef4c00['startedAt'],
+            startedAt: startedAt8['startedAt'],
             recovering: ![],
-            useOpenapiQuery: _0x5a2e95['useOpenapiQuery'],
+            useOpenapiQuery: payload4['useOpenapiQuery'],
           }),
         }),
-        parseError: (_0x4401b2) =>
-          _0x4401b2?.['message'] || _0x4eba51('generationFailed', 'Audio generation failed'),
+        parseError: (error4) =>
+          error4?.['message'] || rhStatusMessage('generationFailed', 'Audio generation failed'),
       }),
-      _0x2e1c55 = runtime['resumeTask'](_0x4acdeb, {
-        store: _0xecc112,
-        startedAt: _0x1faeca,
-        abortController: _0x371918,
+      value7 = runtime['resumeTask'](generationResumePlanFromNode, {
+        store: store,
+        startedAt: startedAt5,
+        abortController: signal2,
       })
-        ['then'](async (_0x48f49e) => {
-          if (_0x48f49e?.['status'] === 'success' && !_0x1cae52 && _0x371918['signal']['aborted'] !== !![]) {
-            const _0x4c6be1 = getResultPatch(_0x48f49e['patch'] || _0x52465a());
-            (await afterResultCommit(_0x4c6be1, _0x1faeca, _0x48f49e),
-              await onSuccess(_0x48f49e, { recovering: !![], payload: _0x5a2e95 }));
+        ['then'](async (result3) => {
+          if (result3?.['status'] === 'success' && !enabled && signal2['signal']['aborted'] !== !![]) {
+            const resultPatch2 = getResultPatch(result3['patch'] || run());
+            (await afterResultCommit(resultPatch2, startedAt5, result3),
+              await onSuccess(result3, { recovering: !![], payload: payload4 }));
           } else
-            _0x48f49e?.['status'] === 'failed' &&
-              !_0x1cae52 &&
-              (await onFailure(_0x48f49e['error'], {
-                payload: _0x5a2e95,
-                result: _0x48f49e,
+            result3?.['status'] === 'failed' &&
+              !enabled &&
+              (await onFailure(result3['error'], {
+                payload: payload4,
+                result: result3,
                 recovering: !![],
               }));
-          return _0x48f49e;
+          return result3;
         })
-        ['catch']((_0x259080) => {
-          if (isAbortLike(_0x259080, _0x371918['signal']))
-            return { ok: !![], status: 'pending', paused: !![] };
-          throw _0x259080;
+        ['catch']((value8) => {
+          if (isAbortLike(value8, signal2['signal'])) return { ok: !![], status: 'pending', paused: !![] };
+          throw value8;
         })
         ['finally'](() => {
-          if (_0x5324b5 === _0x371918) _0x5324b5 = null;
-          if (_0x1e73bd === _0x4b13d7) _0x1e73bd = '';
-          _0x3ab923 = null;
-          const _0x5b36ff = _0x1cae52 ? ![] : _0x188fba();
-          if (!_0x5b36ff) _0xc5e21d = '';
+          if (value2 === signal2) value2 = null;
+          if (target === taskId6) target = '';
+          enabled4 = null;
+          const enabled10 = enabled ? ![] : handler2();
+          if (!enabled10) source = '';
         });
-    return ((_0x3ab923 = _0x2e1c55), _0x2e1c55);
+    return ((enabled4 = value7), value7);
   }
-  function _0x5b5f54() {
-    const _0x1435ce = _0x52465a(),
-      _0x9ec6d5 = String(
-        _0x1435ce['jobStatus'] || _0x1435ce['rhTaskStatus'] || (_0x466268 || _0x3ab923 ? 'running' : 'idle'),
+  function getGenerationStatus() {
+    const value9 = run(),
+      jobStatus = String(
+        value9['jobStatus'] || value9['rhTaskStatus'] || (enabled2 || enabled4 ? 'running' : 'idle'),
       );
     return {
-      nodeId: _0x114757,
-      jobStatus: _0x9ec6d5,
-      isGenerating: !!_0x466268 || !!_0x3ab923 || _0x9ec6d5 === 'running' || _0x9ec6d5 === 'pending',
-      taskId: String(_0xc5e21d || _0x1435ce['rhTaskId'] || _0x1435ce['taskId'] || ''),
-      cancellable: supportsAudioTaskCancellation(_0x1435ce),
-      resumable: Boolean(_0x1435ce['rhTaskId']),
-      cancelInFlight: _0x5960b6,
+      nodeId: nodeId,
+      jobStatus: jobStatus,
+      isGenerating: !!enabled2 || !!enabled4 || jobStatus === 'running' || jobStatus === 'pending',
+      taskId: String(source || value9['rhTaskId'] || value9['taskId'] || ''),
+      cancellable: supportsAudioTaskCancellation(value9),
+      resumable: Boolean(value9['rhTaskId']),
+      cancelInFlight: cancelInFlight,
     };
   }
-  function _0x93b12({ preserveTask: preserveTask = ![] } = {}) {
-    _0x1cae52 = !![];
-    !preserveTask && _0x7b2224 && !_0x7b2224['signal']['aborted'] && _0x7b2224['abort']();
-    _0x7b2224 = null;
-    if (!preserveTask) _0x1ec13e();
+  function dispose({ preserveTask: preserveTask = ![] } = {}) {
+    enabled = !![];
+    !preserveTask && enabled3 && !enabled3['signal']['aborted'] && enabled3['abort']();
+    enabled3 = null;
+    if (!preserveTask) resetRecovery();
   }
   return Object['freeze']({
-    runGeneration: _0x35bfbe,
-    cancelGeneration: _0x4a298a,
-    getGenerationStatus: _0x5b5f54,
-    resetRecovery: _0x1ec13e,
-    resumeIfNeeded: _0x3c20cb,
-    dispose: _0x93b12,
+    runGeneration: runGeneration,
+    cancelGeneration: cancelGeneration,
+    getGenerationStatus: getGenerationStatus,
+    resetRecovery: resetRecovery,
+    resumeIfNeeded: resumeIfNeeded,
+    dispose: dispose,
   });
 }

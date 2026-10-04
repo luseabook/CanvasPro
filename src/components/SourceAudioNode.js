@@ -37,8 +37,8 @@ import { bindRunningHubToolbarTaskButton } from './nodeToolbar/runningHubToolbar
 import { bindAudioDownloadAction } from './nodeToolbar/audioActions/downloadAction.js';
 const WAVE =
   'M10,40 L10,40 M15,30 L15,50 M20,20 L20,60 M25,35 L25,45 M30,25 L30,55 M35,15 L35,65 M40,30 L40,50 M45,38 L45,42 M50,22 L50,58 M55,18 L55,62 M60,28 L60,52 M65,32 L65,48 M70,24 L70,56 M75,36 L75,44 M80,20 L80,60 M85,16 L85,64 M90,26 L90,54 M95,34 L95,46 M100,22 L100,58 M105,18 L105,62 M110,30 L110,50 M115,38 L115,42 M120,15 L120,65 M125,25 L125,55 M130,35 L130,45 M135,20 L135,60 M140,30 L140,50 M145,40 L145,40 M150,25 L150,55 M155,15 L155,65 M160,30 L160,50 M165,38 L165,42 M170,22 L170,58 M175,18 L175,62 M180,28 L180,52 M185,32 L185,48 M190,24 L190,56';
-function sourceAudioText(_0x54d1c1, _0x26ff9f = {}) {
-  return t('sourceAudioNode.' + _0x54d1c1, _0x26ff9f);
+function sourceAudioText(value, item = {}) {
+  return t('sourceAudioNode.' + value, item);
 }
 const _SOURCE_AUDIO_NODE_TEMPLATE_ID = 'node:source-audio';
 registerStaticInnerHTML(
@@ -51,10 +51,10 @@ registerStaticInnerHTML(
     '" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"/>\n            <path d="M0,40 L200,40" stroke="var(--blue)" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>\n          </svg>\n        </div>\n        <div class="media-progress-line"></div>\n        <div class="media-progress-bar"></div>\n        \n        <div class="node-upload-hint audio-upload-hint source-upload-hint">\n          <button type="button" class="upload-btn audio-upload-btn source-upload-btn">\n            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>\n          </button>\n        </div>\n\n        <div class="audio-controls">\n           <button type="button" class="audio-play-btn">\n              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>\n           </button>\n           <div class="audio-time-wrap">\n             <span class="audio-time-display">0:00 / 0:00</span>\n           </div>\n        </div>\n        <audio class="audio-player"></audio>\n        <div class="node-port out-port"></div>\n        <div class="node-resizer"></div>\n      </div>',
 );
 export class SourceAudioNode {
-  constructor(_0x4a4aa2) {
-    ((this._data = _0x4a4aa2),
+  constructor(key) {
+    ((this._data = key),
       (this.el = document.createElement('div')),
-      (this.id = _0x4a4aa2.id),
+      (this.id = key.id),
       (this.el.className = 'v2-node-component'),
       (this._currentSrc = null),
       (this._objUrl = null),
@@ -67,33 +67,33 @@ export class SourceAudioNode {
       (this._isUploading = false),
       (this._unsubscribeLocale = null));
   }
-  ['_resolveAudioSrc'](_0x46bd6b) {
-    return resolveCanvasAudioUrl(_0x46bd6b);
+  ['_resolveAudioSrc'](index) {
+    return resolveCanvasAudioUrl(index);
   }
   ['mount']() {
     this._subscribeLocaleChanges();
-    const _0x451953 = this.el;
-    (setStaticInnerHTML(_0x451953, _SOURCE_AUDIO_NODE_TEMPLATE_ID),
-      (this._card = _0x451953.querySelector('.media-card')),
-      (this._audio = _0x451953.querySelector('.audio-player')),
+    const el = this.el;
+    (setStaticInnerHTML(el, _SOURCE_AUDIO_NODE_TEMPLATE_ID),
+      (this._card = el.querySelector('.media-card')),
+      (this._audio = el.querySelector('.audio-player')),
       (this._audio.preload = 'none'),
-      (this._playBtn = _0x451953.querySelector('.audio-play-btn')),
-      (this._timeEl = _0x451953.querySelector('.audio-time-display')),
-      (this._bar = _0x451953.querySelector('.media-progress-bar')),
-      (this._wavePlayed = _0x451953.querySelector('.waveform-unplayed')),
-      (this._progressLine = _0x451953.querySelector('.media-progress-line')),
-      (this._hint = _0x451953.querySelector('.node-upload-hint')),
-      (this._uploadBtn = _0x451953.querySelector('.upload-btn')),
-      (this._clipBtn = _0x451953.querySelector('.act-clip, .clip-btn')),
-      (this._separateBtn = _0x451953.querySelector('.act-separate, .separate-btn')),
-      (this._speedBtn = _0x451953.querySelector('.act-speed, .speed-btn')),
-      (this._downloadBtn = _0x451953.querySelector('.act-download, .download-btn')),
+      (this._playBtn = el.querySelector('.audio-play-btn')),
+      (this._timeEl = el.querySelector('.audio-time-display')),
+      (this._bar = el.querySelector('.media-progress-bar')),
+      (this._wavePlayed = el.querySelector('.waveform-unplayed')),
+      (this._progressLine = el.querySelector('.media-progress-line')),
+      (this._hint = el.querySelector('.node-upload-hint')),
+      (this._uploadBtn = el.querySelector('.upload-btn')),
+      (this._clipBtn = el.querySelector('.act-clip, .clip-btn')),
+      (this._separateBtn = el.querySelector('.act-separate, .separate-btn')),
+      (this._speedBtn = el.querySelector('.act-speed, .speed-btn')),
+      (this._downloadBtn = el.querySelector('.act-download, .download-btn')),
       this._syncLocaleTexts());
     {
-      const _0x4b2fbc = _0x451953.querySelectorAll('.waveform-bg svg path');
-      this._waveBgPath = _0x4b2fbc && _0x4b2fbc.length ? _0x4b2fbc[0] : null;
-      const _0xe06562 = _0x451953.querySelectorAll('.waveform-unplayed svg path');
-      this._waveFgPath = _0xe06562 && _0xe06562.length ? _0xe06562[0] : null;
+      const list = el.querySelectorAll('.waveform-bg svg path');
+      this._waveBgPath = list && list.length ? list[0] : null;
+      const list2 = el.querySelectorAll('.waveform-unplayed svg path');
+      this._waveFgPath = list2 && list2.length ? list2[0] : null;
     }
     this._progressController = createAudioPlaybackProgressController({
       audioEl: this._audio,
@@ -101,116 +101,114 @@ export class SourceAudioNode {
       progressLineEl: this._progressLine,
       timeEl: this._timeEl,
       trackEl: this._bar,
-      formatTime: (_0x25aebd) => this._fmt(_0x25aebd),
+      formatTime: (result) => this._fmt(result),
       shouldSuppressSync: () => this._isSeeking || this._bar?.dataset.dragging === 'true',
     }).attach();
-    const _0x12e2f2 = _0x451953.querySelector('.node-floating-toolbar');
-    if (_0x12e2f2) _0x12e2f2.addEventListener('pointerdown', (_0x5c81f3) => _0x5c81f3.stopPropagation());
+    const el2 = el.querySelector('.node-floating-toolbar');
+    if (el2) el2.addEventListener('pointerdown', (event) => event.stopPropagation());
     ((this._input = document.createElement('input')),
       (this._input.type = 'file'),
       (this._input.accept = 'audio/*'),
       (this._input.style.display = 'none'),
-      _0x451953.appendChild(this._input),
-      this._uploadBtn.addEventListener('pointerdown', (_0x511158) => {
-        (_0x511158.stopPropagation(), this._input.click());
+      el.appendChild(this._input),
+      this._uploadBtn.addEventListener('pointerdown', (event2) => {
+        (event2.stopPropagation(), this._input.click());
       }),
-      this._card.addEventListener('dblclick', (_0x24038e) => {
-        _0x24038e.stopPropagation();
+      this._card.addEventListener('dblclick', (event3) => {
+        event3.stopPropagation();
       }));
-    let _0x95cab0 = { x: 0, y: 0 };
-    (this._card.addEventListener('pointerdown', (_0x57c7fe) => {
-      if (_0x57c7fe.target.closest('.media-progress-bar')) return;
-      _0x95cab0 = { x: _0x57c7fe.clientX, y: _0x57c7fe.clientY };
+    let box = { x: 0, y: 0 };
+    (this._card.addEventListener('pointerdown', (x) => {
+      if (x.target.closest('.media-progress-bar')) return;
+      box = { x: x.clientX, y: x.clientY };
     }),
-      this._card.addEventListener('pointerup', (_0xf191d2) => {
+      this._card.addEventListener('pointerup', (event4) => {
         if (
-          _0xf191d2.target.closest('.media-progress-bar') ||
-          _0xf191d2.target.closest('.audio-play-btn') ||
-          _0xf191d2.target.closest('.upload-btn') ||
-          _0xf191d2.target.closest('.node-floating-toolbar')
+          event4.target.closest('.media-progress-bar') ||
+          event4.target.closest('.audio-play-btn') ||
+          event4.target.closest('.upload-btn') ||
+          event4.target.closest('.node-floating-toolbar')
         )
           return;
-        const _0xcdb31 = Math.hypot(_0xf191d2.clientX - _0x95cab0.x, _0xf191d2.clientY - _0x95cab0.y);
-        if (_0xcdb31 < 5) {
-          const _0x2a4dc7 = this._card.getBoundingClientRect(),
-            _0x18eff9 = Math.max(0, Math.min(1, (_0xf191d2.clientX - _0x2a4dc7.left) / _0x2a4dc7.width)),
-            _0x2b5c00 = this._readAudioDurationSec();
-          if (this._audio && _0x2b5c00 > 0) {
-            const _0x1bfaa3 = _0x18eff9 * _0x2b5c00;
-            ((this._audio.currentTime = _0x1bfaa3),
+        const count = Math.hypot(event4.clientX - box.x, event4.clientY - box.y);
+        if (count < 5) {
+          const box2 = this._card.getBoundingClientRect(),
+            data = Math.max(0, Math.min(1, (event4.clientX - box2.left) / box2.width)),
+            duration = this._readAudioDurationSec();
+          if (this._audio && duration > 0) {
+            const currentTime2 = data * duration;
+            ((this._audio.currentTime = currentTime2),
               this._progressController?.sync({
-                currentTime: _0x1bfaa3,
-                duration: _0x2b5c00,
+                currentTime: currentTime2,
+                duration: duration,
                 force: true,
                 showLine: true,
               }));
           }
         }
       }),
-      this._bar?.addEventListener('click', (_0x4977f3) => {
-        this._seekTo(_0x4977f3.clientX);
+      this._bar?.addEventListener('click', (event5) => {
+        this._seekTo(event5.clientX);
       }),
-      this._input.addEventListener('change', async (_0x5e4a2c) => {
-        const _0x520f43 = _0x5e4a2c.target.files[0];
-        if (!_0x520f43) return;
+      this._input.addEventListener('change', async (event6) => {
+        const error = event6.target.files[0];
+        if (!error) return;
         (startLoading(this._card, { variant: 'static' }), this._progressController?.reset());
-        const _0x2614d5 = Array.from(this._uploadBtn.childNodes).map((_0x2db3af) =>
-          _0x2db3af.cloneNode(true),
-        );
+        const list3 = Array.from(this._uploadBtn.childNodes).map((item2) => item2.cloneNode(true));
         ((this._isUploading = true),
           (this._uploadBtn.textContent = sourceAudioText('upload.uploading')),
           (this._uploadBtn.style.pointerEvents = 'none'));
         try {
-          const _0xc12924 = window.currentProjectId || 'default_v2_project',
-            _0xc8d4e9 = await uploadFile(_0x520f43, _0xc12924),
-            _0x4f8f28 = _0x520f43.name.replace(/\.[^/.]+$/, '');
-          appStore.renameNode(this.id, _0x4f8f28);
-          const _0x101a17 = document.getElementById(this.id),
-            _0x37c373 = _0x101a17?.__v2_name_el;
-          if (_0x37c373) _0x37c373.textContent = _0x4f8f28;
-          const _0x5e289a = _0xc8d4e9.url,
-            _0x3265c7 = pickResultLocalPath(_0xc8d4e9) || urlToLocalPath(_0x5e289a);
+          const options = window.currentProjectId || 'default_v2_project',
+            assetId = await uploadFile(error, options),
+            target = error.name.replace(/\.[^/.]+$/, '');
+          appStore.renameNode(this.id, target);
+          const source = document.getElementById(this.id),
+            el3 = source?.__v2_name_el;
+          if (el3) el3.textContent = target;
+          const src = assetId.url,
+            localPath = pickResultLocalPath(assetId) || urlToLocalPath(src);
           appStore.updateNodeData(this.id, {
-            src: _0x5e289a,
-            localPath: _0x3265c7,
-            audioDuration: Number(_0xc8d4e9.audioDuration || _0xc8d4e9.duration || 0) || 0,
-            assetId: _0xc8d4e9.assetId || '',
-            originalLocalPath: _0xc8d4e9.originalLocalPath || _0xc8d4e9.localPath || '',
-            waveformLocalPath: _0xc8d4e9.waveformLocalPath || '',
-            derivativeStatus: _0xc8d4e9.derivativeStatus || _0xc8d4e9.status || '',
-            mediaTaskId: _0xc8d4e9.mediaTaskId || '',
-            mediaTaskKind: _0xc8d4e9.mediaTaskKind || '',
-            mediaTaskStatus: _0xc8d4e9.mediaTaskStatus || '',
-            mediaTaskProgress: Number(_0xc8d4e9.mediaTaskProgress || 0) || 0,
-            mediaTaskError: _0xc8d4e9.mediaTaskError || '',
-            fileName: _0xc8d4e9.filename || _0x520f43.name,
+            src: src,
+            localPath: localPath,
+            audioDuration: Number(assetId.audioDuration || assetId.duration || 0) || 0,
+            assetId: assetId.assetId || '',
+            originalLocalPath: assetId.originalLocalPath || assetId.localPath || '',
+            waveformLocalPath: assetId.waveformLocalPath || '',
+            derivativeStatus: assetId.derivativeStatus || assetId.status || '',
+            mediaTaskId: assetId.mediaTaskId || '',
+            mediaTaskKind: assetId.mediaTaskKind || '',
+            mediaTaskStatus: assetId.mediaTaskStatus || '',
+            mediaTaskProgress: Number(assetId.mediaTaskProgress || 0) || 0,
+            mediaTaskError: assetId.mediaTaskError || '',
+            fileName: assetId.filename || error.name,
           });
-        } catch (_0x6f5c8) {
-          (console.error('音频上传失败:', _0x6f5c8),
+        } catch (next) {
+          (console.error('音频上传失败:', next),
             window.showToast(sourceAudioText('upload.failedRetry')),
             stopLoading(this._card),
             this._currentSrc && this._progressController?.sync({ force: true, showLine: true }));
         } finally {
-          (this._uploadBtn.replaceChildren(..._0x2614d5.map((_0x3c5f71) => _0x3c5f71.cloneNode(true))),
+          (this._uploadBtn.replaceChildren(...list3.map((item3) => item3.cloneNode(true))),
             (this._uploadBtn.style.pointerEvents = 'auto'),
             (this._isUploading = false),
             this._syncLocaleTexts(),
             (this._input.value = ''));
         }
       }),
-      this._playBtn.addEventListener('pointerdown', (_0x2b7b93) => {
-        (_0x2b7b93.stopPropagation(),
+      this._playBtn.addEventListener('pointerdown', (event7) => {
+        (event7.stopPropagation(),
           this._audio.paused && this._currentSrc ? this._playAudio() : this._audio.pause());
       }));
-    const _0x1503da = [1, 1.25, 1.5, 2];
-    let _0x5993cb = 0;
-    (this._speedBtn?.addEventListener('pointerdown', (_0x47c313) => {
-      (_0x47c313.stopPropagation(), (_0x5993cb = (_0x5993cb + 1) % _0x1503da.length));
-      const _0x4d67b1 = _0x1503da[_0x5993cb];
-      ((this._audio.playbackRate = _0x4d67b1), (this._speedBtn.textContent = _0x4d67b1.toFixed(1) + 'x'));
+    const list4 = [1, 1.25, 1.5, 2];
+    let current = 0;
+    (this._speedBtn?.addEventListener('pointerdown', (event8) => {
+      (event8.stopPropagation(), (current = (current + 1) % list4.length));
+      const entry = list4[current];
+      ((this._audio.playbackRate = entry), (this._speedBtn.textContent = entry.toFixed(1) + 'x'));
     }),
-      this._clipBtn?.addEventListener('pointerdown', (_0x331a2a) => {
-        (_0x331a2a.stopPropagation(), AudioClipController.init(this.id));
+      this._clipBtn?.addEventListener('pointerdown', (event9) => {
+        (event9.stopPropagation(), AudioClipController.init(this.id));
       }),
       bindRunningHubToolbarTaskButton({
         button: this._separateBtn,
@@ -219,14 +217,14 @@ export class SourceAudioNode {
         cancelTooltip: sourceAudioText('toolbar.cancelAudioSeparation'),
         eventTypes: ['pointerdown', 'click'],
       }),
-      this._separateBtn?.addEventListener('pointerdown', (_0x20be1f) => {
+      this._separateBtn?.addEventListener('pointerdown', (event10) => {
         if (getRunningAudioSeparationTaskForNode(this.id)) {
-          (_0x20be1f.preventDefault(),
-            _0x20be1f.stopPropagation(),
+          (event10.preventDefault(),
+            event10.stopPropagation(),
             void cancelAudioSeparationTaskForNode(this.id, { notify: true }));
           return;
         }
-        (_0x20be1f.stopPropagation(), void runAudioSeparationFromNode(this.id));
+        (event10.stopPropagation(), void runAudioSeparationFromNode(this.id));
       }),
       bindAudioDownloadAction({
         button: this._downloadBtn,
@@ -240,56 +238,54 @@ export class SourceAudioNode {
       (this._unregisterAudioPlaybackClient = registerAudioPlaybackClient(this.id, {
         stopForExternalPlayback: () => this._stopAudioForExternalPlayback(),
       })));
-    const _0x2fbe95 = this._resolveAudioSrc(this._data);
-    if (_0x2fbe95) {
-      this._prepareAudio(_0x2fbe95);
+    const record = this._resolveAudioSrc(this._data);
+    if (record) {
+      this._prepareAudio(record);
       if (this._hint) this._hint.style.display = 'block';
     } else {
       this._progressController?.reset();
       if (this._hint) this._hint.style.display = 'block';
     }
-    return (
-      this._syncGeneratingUi(this._data, _0x2fbe95),
-      maybeResumeAudioSeparationLeader(this.id),
-      _0x451953
-    );
+    return (this._syncGeneratingUi(this._data, record), maybeResumeAudioSeparationLeader(this.id), el);
   }
-  ['_syncGeneratingUi'](_0x567c4d, _0x2168b7) {
-    const _0x57bc3b = shouldShowGenerationResultLoadingUi(_0x567c4d, { hasResult: !!_0x2168b7 });
-    if (this._uploadBtn) this._uploadBtn.disabled = _0x57bc3b;
-    if (_0x57bc3b) {
+  ['_syncGeneratingUi'](payload, enabled) {
+    const shouldShowGenerationResultLoadingUi2 = shouldShowGenerationResultLoadingUi(payload, {
+      hasResult: !!enabled,
+    });
+    if (this._uploadBtn) this._uploadBtn.disabled = shouldShowGenerationResultLoadingUi2;
+    if (shouldShowGenerationResultLoadingUi2) {
       startLoading(this._card, { variant: 'full' });
       if (this._hint) this._hint.style.display = 'none';
       return;
     }
-    (stopLoading(this._card), this._clearResolvedAudioTimer(_0x567c4d, _0x2168b7));
-    if (!_0x2168b7 && this._hint) this._hint.style.display = 'block';
+    (stopLoading(this._card), this._clearResolvedAudioTimer(payload, enabled));
+    if (!enabled && this._hint) this._hint.style.display = 'block';
   }
-  ['_clearResolvedAudioTimer'](_0xb20585, _0x2ab07f) {
-    if (!_0x2ab07f || !_0xb20585 || typeof _0xb20585 !== 'object') return;
-    if (!_0xb20585.generationStartTime && _0xb20585.generationDuration == null) return;
-    const _0x41d575 = appStore.getState().nodes?.[this.id];
-    if (!_0x41d575) return;
-    const _0x57e2df = {};
-    if (_0x41d575.generationStartTime) _0x57e2df.generationStartTime = null;
-    if (_0x41d575.generationDuration != null) _0x57e2df.generationDuration = null;
-    if (_0x41d575.isGenerating === true) _0x57e2df.isGenerating = false;
-    Object.keys(_0x57e2df).length > 0 && appStore.updateNodeData(this.id, _0x57e2df);
+  ['_clearResolvedAudioTimer'](enabled2, enabled3) {
+    if (!enabled3 || !enabled2 || typeof enabled2 !== 'object') return;
+    if (!enabled2.generationStartTime && enabled2.generationDuration == null) return;
+    const enabled4 = appStore.getState().nodes?.[this.id];
+    if (!enabled4) return;
+    const handle = {};
+    if (enabled4.generationStartTime) handle.generationStartTime = null;
+    if (enabled4.generationDuration != null) handle.generationDuration = null;
+    if (enabled4.isGenerating === true) handle.isGenerating = false;
+    Object.keys(handle).length > 0 && appStore.updateNodeData(this.id, handle);
   }
-  ['_seekTo'](_0xffd931) {
-    const _0x138286 = this._readAudioDurationSec();
-    if (!this._audio || _0x138286 <= 0) return;
-    const _0x581f69 = this._bar.getBoundingClientRect();
-    if (_0x581f69.width === 0) return;
-    let _0x3a2293 = (_0xffd931 - _0x581f69.left) / _0x581f69.width;
-    _0x3a2293 = Math.max(0, Math.min(1, _0x3a2293));
-    const _0x17eba8 = _0x3a2293 * _0x138286;
-    if (!isFinite(_0x17eba8)) return;
+  ['_seekTo'](state) {
+    const duration2 = this._readAudioDurationSec();
+    if (!this._audio || duration2 <= 0) return;
+    const box3 = this._bar.getBoundingClientRect();
+    if (box3.width === 0) return;
+    let config = (state - box3.left) / box3.width;
+    config = Math.max(0, Math.min(1, config));
+    const currentTime3 = config * duration2;
+    if (!isFinite(currentTime3)) return;
     ((this._isSeeking = true),
-      (this._audio.currentTime = _0x17eba8),
+      (this._audio.currentTime = currentTime3),
       this._progressController?.sync({
-        currentTime: _0x17eba8,
-        duration: _0x138286,
+        currentTime: currentTime3,
+        duration: duration2,
         force: true,
         showLine: true,
       }),
@@ -309,63 +305,66 @@ export class SourceAudioNode {
   }
   ['_isAudioElementReady']() {
     if (!this._audio || !this._getAudioElementCurrentSource()) return false;
-    const _0x3b8b97 = Number(this._audio.readyState || 0);
-    return _0x3b8b97 >= 2;
+    const count2 = Number(this._audio.readyState || 0);
+    return count2 >= 2;
   }
   ['_readAudioDurationSec']() {
-    const _0x4c8b38 = normalizeAudioDurationSec(this._audio?.duration),
-      _0x78d400 = appStore.getState().nodes?.[this.id],
-      _0x27ef64 = pickAudioDurationSec(_0x78d400?.audioDuration, !_0x78d400 ? this._data?.audioDuration : 0);
-    if (_0x27ef64 > 0) {
-      if (!(_0x4c8b38 > 0)) return _0x27ef64;
-      const _0x2fe276 = Math.max(1, _0x27ef64 * 0.25);
-      if (Math.abs(_0x27ef64 - _0x4c8b38) > _0x2fe276) return _0x27ef64;
+    const audioDurationSec = normalizeAudioDurationSec(this._audio?.duration),
+      enabled5 = appStore.getState().nodes?.[this.id],
+      audioDurationSec2 = pickAudioDurationSec(
+        enabled5?.audioDuration,
+        !enabled5 ? this._data?.audioDuration : 0,
+      );
+    if (audioDurationSec2 > 0) {
+      if (!(audioDurationSec > 0)) return audioDurationSec2;
+      const scope = Math.max(1, audioDurationSec2 * 0.25);
+      if (Math.abs(audioDurationSec2 - audioDurationSec) > scope) return audioDurationSec2;
     }
-    return _0x4c8b38;
+    return audioDurationSec;
   }
   ['_syncKnownAudioDurationUi']({ currentTime: currentTime = 0, showLine: showLine = false } = {}) {
-    const _0x114567 = this._readAudioDurationSec();
-    if (!(_0x114567 > 0)) return false;
-    const _0x44d989 = Number(currentTime),
-      _0xee0fb3 = Number.isFinite(_0x44d989) ? Math.max(0, Math.min(_0x44d989, _0x114567)) : 0,
-      _0x550581 = this._progressController?.sync({
-        currentTime: _0xee0fb3,
-        duration: _0x114567,
+    const duration3 = this._readAudioDurationSec();
+    if (!(duration3 > 0)) return false;
+    const input = Number(currentTime),
+      currentTime4 = Number.isFinite(input) ? Math.max(0, Math.min(input, duration3)) : 0,
+      enabled6 = this._progressController?.sync({
+        currentTime: currentTime4,
+        duration: duration3,
         force: true,
         showLine: showLine,
       });
     if (!showLine) this._progressController?.hideLine?.();
     return (
-      !_0x550581 &&
+      !enabled6 &&
         this._timeEl &&
-        (this._timeEl.textContent = this._fmt(_0xee0fb3) + ' / ' + this._fmt(_0x114567)),
+        (this._timeEl.textContent = this._fmt(currentTime4) + ' / ' + this._fmt(duration3)),
       true
     );
   }
-  ['_applyResolvedAudioDuration'](_0x8a4586, _0x5c4313 = this._currentSrc) {
-    if (_0x5c4313 && this._currentSrc !== _0x5c4313) return false;
-    const _0x5c3a49 = normalizeAudioDurationSec(_0x8a4586);
-    if (!(_0x5c3a49 > 0)) return false;
-    const _0x34173d = appStore.getState().nodes?.[this.id],
-      _0x2fc6a5 = pickAudioDurationSec(_0x34173d?.audioDuration, this._data?.audioDuration);
-    if (_0x2fc6a5 > 0) {
-      if (Math.abs(_0x2fc6a5 - _0x5c3a49) <= 0.001)
+  ['_applyResolvedAudioDuration'](output, value2 = this._currentSrc) {
+    if (value2 && this._currentSrc !== value2) return false;
+    const audioDuration = normalizeAudioDurationSec(output);
+    if (!(audioDuration > 0)) return false;
+    const value3 = appStore.getState().nodes?.[this.id],
+      audioDurationSec3 = pickAudioDurationSec(value3?.audioDuration, this._data?.audioDuration);
+    if (audioDurationSec3 > 0) {
+      if (Math.abs(audioDurationSec3 - audioDuration) <= 0.001)
         return this._syncKnownAudioDurationUi({
           currentTime: this._audio?.currentTime || 0,
           showLine: Number(this._audio?.currentTime || 0) > 0,
         });
-      const _0x5b08fe = Math.max(1, _0x2fc6a5 * 0.25);
-      if (Math.abs(_0x2fc6a5 - _0x5c3a49) > _0x5b08fe) return false;
+      const value4 = Math.max(1, audioDurationSec3 * 0.25);
+      if (Math.abs(audioDurationSec3 - audioDuration) > value4) return false;
     }
     return (
-      _0x34173d
-        ? (appStore.updateNodeData(this.id, { audioDuration: _0x5c3a49 }),
-          (this._data = { ...(this._data || {}), audioDuration: _0x5c3a49 }),
+      value3
+        ? (appStore.updateNodeData(this.id, { audioDuration: audioDuration }),
+          (this._data = { ...(this._data || {}), audioDuration: audioDuration }),
           this._syncKnownAudioDurationUi({
             currentTime: this._audio?.currentTime || 0,
             showLine: Number(this._audio?.currentTime || 0) > 0,
           }))
-        : ((this._data = { ...(this._data || {}), audioDuration: _0x5c3a49 }),
+        : ((this._data = { ...(this._data || {}), audioDuration: audioDuration }),
           this._syncKnownAudioDurationUi({
             currentTime: this._audio?.currentTime || 0,
             showLine: Number(this._audio?.currentTime || 0) > 0,
@@ -373,27 +372,27 @@ export class SourceAudioNode {
       true
     );
   }
-  ['_probeAudioDurationIfNeeded'](_0x7dac29) {
-    const _0x229c22 = String(_0x7dac29 || '').trim();
-    if (!_0x229c22 || this._readAudioDurationSec() > 0) return;
-    const _0x59c86a = (this._audioDurationProbeToken || 0) + 1;
-    ((this._audioDurationProbeToken = _0x59c86a),
-      void loadAudioDurationMetadataSec(_0x229c22).then((_0x395e2c) => {
-        if (this._audioDurationProbeToken !== _0x59c86a || this._currentSrc !== _0x229c22) return;
-        this._applyResolvedAudioDuration(_0x395e2c, _0x229c22);
+  ['_probeAudioDurationIfNeeded'](value5) {
+    const enabled7 = String(value5 || '').trim();
+    if (!enabled7 || this._readAudioDurationSec() > 0) return;
+    const value6 = (this._audioDurationProbeToken || 0) + 1;
+    ((this._audioDurationProbeToken = value6),
+      void loadAudioDurationMetadataSec(enabled7).then((value7) => {
+        if (this._audioDurationProbeToken !== value6 || this._currentSrc !== enabled7) return;
+        this._applyResolvedAudioDuration(value7, enabled7);
       }));
   }
   ['_rewindEndedAudioIfNeeded']() {
     if (!this._audio) return;
-    const _0x26a005 = this._readAudioDurationSec();
-    if (!(_0x26a005 > 0)) return;
-    const _0x304675 = Number(this._audio.currentTime || 0),
-      _0x4df770 = Number.isFinite(_0x304675) && _0x304675 >= _0x26a005 - 0.05;
-    if (this._audio.ended !== true && !_0x4df770) return;
+    const duration4 = this._readAudioDurationSec();
+    if (!(duration4 > 0)) return;
+    const value8 = Number(this._audio.currentTime || 0),
+      enabled8 = Number.isFinite(value8) && value8 >= duration4 - 0.05;
+    if (this._audio.ended !== true && !enabled8) return;
     try {
       this._audio.currentTime = 0;
     } catch {}
-    this._progressController?.sync({ currentTime: 0, duration: _0x26a005, force: true, showLine: true });
+    this._progressController?.sync({ currentTime: 0, duration: duration4, force: true, showLine: true });
   }
   ['_clearAudioElementSource']() {
     if (!this._audio) return;
@@ -407,24 +406,24 @@ export class SourceAudioNode {
       this._audio.load?.();
     } catch {}
   }
-  ['_bindAudioLoadHandlers'](_0x1d635d) {
+  ['_bindAudioLoadHandlers'](value9) {
     if (!this._audio) return;
-    const _0x3d9eff = () => {
-      if (this._currentSrc === _0x1d635d) this._rememberAudioDuration(_0x1d635d);
+    const value10 = () => {
+      if (this._currentSrc === value9) this._rememberAudioDuration(value9);
     };
-    ((this._audio.onloadedmetadata = _0x3d9eff), (this._audio.ondurationchange = _0x3d9eff));
-    const _0x45bba0 = () => {
-      this._currentSrc === _0x1d635d && (this._rememberAudioDuration(_0x1d635d), stopLoading(this._card));
+    ((this._audio.onloadedmetadata = value10), (this._audio.ondurationchange = value10));
+    const value11 = () => {
+      this._currentSrc === value9 && (this._rememberAudioDuration(value9), stopLoading(this._card));
     };
-    ((this._audio.onloadeddata = _0x45bba0),
-      (this._audio.oncanplay = _0x45bba0),
-      (this._audio.onplaying = _0x45bba0),
+    ((this._audio.onloadeddata = value11),
+      (this._audio.oncanplay = value11),
+      (this._audio.onplaying = value11),
       (this._audio.onerror = () => {
-        if (this._currentSrc === _0x1d635d) stopLoading(this._card);
+        if (this._currentSrc === value9) stopLoading(this._card);
       }));
   }
-  ['_prepareAudio'](_0x45a0b5) {
-    if (!_0x45a0b5) {
+  ['_prepareAudio'](enabled9) {
+    if (!enabled9) {
       typeof this._cancelDeferredWaveform === 'function' &&
         (this._cancelDeferredWaveform(), (this._cancelDeferredWaveform = null));
       (this._clearAudioElementSource(),
@@ -434,114 +433,116 @@ export class SourceAudioNode {
         stopLoading(this._card));
       return;
     }
-    const _0x351e7d = this._currentSrc,
-      _0x62c5e = _0x351e7d !== _0x45a0b5;
-    _0x62c5e && this._progressController?.reset();
-    this._currentSrc = _0x45a0b5;
-    if (_0x62c5e && _0x351e7d) {
-      const _0x4e8974 = appStore.getState().nodes?.[this.id];
-      Number(_0x4e8974?.audioDuration || 0) > 0 && appStore.updateNodeData(this.id, { audioDuration: 0 });
+    const value12 = this._currentSrc,
+      value13 = value12 !== enabled9;
+    value13 && this._progressController?.reset();
+    this._currentSrc = enabled9;
+    if (value13 && value12) {
+      const value14 = appStore.getState().nodes?.[this.id];
+      Number(value14?.audioDuration || 0) > 0 && appStore.updateNodeData(this.id, { audioDuration: 0 });
     }
     this._getAudioElementSource() && this._clearAudioElementSource();
-    ((this._audio.preload = 'none'), this._bindAudioLoadHandlers(_0x45a0b5));
+    ((this._audio.preload = 'none'), this._bindAudioLoadHandlers(enabled9));
     !this._syncKnownAudioDurationUi({ currentTime: 0, showLine: false }) &&
-      this._probeAudioDurationIfNeeded(_0x45a0b5);
-    (stopLoading(this._card), void this._ensureWaveform(_0x45a0b5, { persistedOnly: true }));
+      this._probeAudioDurationIfNeeded(enabled9);
+    (stopLoading(this._card), void this._ensureWaveform(enabled9, { persistedOnly: true }));
     if (this._hint) this._hint.style.display = 'block';
   }
-  async ['_loadAudio'](_0x1c628a, { showLoading: showLoading = true } = {}) {
-    if (!_0x1c628a) return (this._prepareAudio(''), false);
-    const _0x2ff857 = this._currentSrc,
-      _0x1d8c17 = _0x2ff857 !== _0x1c628a;
-    _0x1d8c17 && this._progressController?.reset();
-    this._currentSrc = _0x1c628a;
-    const _0x5f5ade = !!this._getAudioElementCurrentSource(),
-      _0x5d15c0 = !isMediaElementPlaybackSource(this._audio, _0x1c628a) || !_0x5f5ade;
-    this._bindAudioLoadHandlers(_0x1c628a);
-    if (!_0x5d15c0 && this._isAudioElementReady()) {
+  async ['_loadAudio'](enabled10, { showLoading: showLoading = true } = {}) {
+    if (!enabled10) return (this._prepareAudio(''), false);
+    const value15 = this._currentSrc,
+      value16 = value15 !== enabled10;
+    value16 && this._progressController?.reset();
+    this._currentSrc = enabled10;
+    const enabled11 = !!this._getAudioElementCurrentSource(),
+      enabled12 = !isMediaElementPlaybackSource(this._audio, enabled10) || !enabled11;
+    this._bindAudioLoadHandlers(enabled10);
+    if (!enabled12 && this._isAudioElementReady()) {
       if (this._audio.preload !== 'auto') this._audio.preload = 'auto';
       return (stopLoading(this._card), true);
     }
-    if (showLoading && _0x5d15c0) startLoading(this._card, { variant: 'static' });
-    if (!_0x5d15c0) {
+    if (showLoading && enabled12) startLoading(this._card, { variant: 'static' });
+    if (!enabled12) {
       if (this._audio.preload !== 'auto') this._audio.preload = 'auto';
       try {
         this._audio.load?.();
       } catch {}
     } else
-      await attachMediaElementPlaybackSource(this._audio, _0x1c628a, { preload: 'auto', warmRanges: false });
+      await attachMediaElementPlaybackSource(this._audio, enabled10, { preload: 'auto', warmRanges: false });
     if (this._isAudioElementReady()) stopLoading(this._card);
     typeof this._cancelDeferredWaveform === 'function' &&
       (this._cancelDeferredWaveform(), (this._cancelDeferredWaveform = null));
     this._cancelDeferredWaveform = deferWaveformPathUntilAudioReady(this._audio, () => {
       this._cancelDeferredWaveform = null;
-      if (this._currentSrc !== _0x1c628a) return;
-      void this._ensureWaveform(_0x1c628a);
+      if (this._currentSrc !== enabled10) return;
+      void this._ensureWaveform(enabled10);
     });
     if (this._hint) this._hint.style.display = 'block';
     return true;
   }
-  async ['_ensureWaveform'](_0x1a56ff, { persistedOnly: persistedOnly = false } = {}) {
-    const _0x11a117 = String(_0x1a56ff || '').trim();
-    if (!_0x11a117) return;
-    const _0x541862 = ++this._waveToken;
-    this._waveKey = _0x11a117;
-    const _0x1766e5 = localPathToUrl(this._data?.waveformLocalPath);
+  async ['_ensureWaveform'](value17, { persistedOnly: persistedOnly = false } = {}) {
+    const enabled13 = String(value17 || '').trim();
+    if (!enabled13) return;
+    const value18 = ++this._waveToken;
+    this._waveKey = enabled13;
+    const url = localPathToUrl(this._data?.waveformLocalPath);
     this._waveformLocalPath = String(this._data?.waveformLocalPath || '').trim();
-    const _0x1940d9 = { width: 200, height: 80, samples: 190 };
-    let _0x5e3a59 = '';
-    _0x1766e5 && (_0x5e3a59 = await getWaveformBarsPathFromPersistedUrl(_0x1766e5, _0x1940d9));
-    !_0x5e3a59 && !persistedOnly && (_0x5e3a59 = await getWaveformBarsPathFromUrl(_0x11a117, _0x1940d9));
+    const value19 = { width: 200, height: 80, samples: 190 };
+    let waveformBarsPathFromPersistedUrl = '';
+    url && (waveformBarsPathFromPersistedUrl = await getWaveformBarsPathFromPersistedUrl(url, value19));
+    !waveformBarsPathFromPersistedUrl &&
+      !persistedOnly &&
+      (waveformBarsPathFromPersistedUrl = await getWaveformBarsPathFromUrl(enabled13, value19));
     if (!this._audio || !this.el || !this.el.isConnected) return;
-    if (_0x541862 !== this._waveToken) return;
-    if (!_0x5e3a59) return;
-    if (this._waveBgPath) this._waveBgPath.setAttribute('d', _0x5e3a59);
-    if (this._waveFgPath) this._waveFgPath.setAttribute('d', _0x5e3a59);
+    if (value18 !== this._waveToken) return;
+    if (!waveformBarsPathFromPersistedUrl) return;
+    if (this._waveBgPath) this._waveBgPath.setAttribute('d', waveformBarsPathFromPersistedUrl);
+    if (this._waveFgPath) this._waveFgPath.setAttribute('d', waveformBarsPathFromPersistedUrl);
   }
-  ['_fmt'](_0x53310d) {
-    if (!_0x53310d || isNaN(_0x53310d)) return '0:00';
-    return Math.floor(_0x53310d / 60) + ':' + String(Math.floor(_0x53310d % 60)).padStart(2, '0');
+  ['_fmt'](enabled14) {
+    if (!enabled14 || isNaN(enabled14)) return '0:00';
+    return Math.floor(enabled14 / 60) + ':' + String(Math.floor(enabled14 % 60)).padStart(2, '0');
   }
-  ['_setIcon'](_0x16a5e9) {
-    const _0x2a214b = this._playBtn.querySelector('svg');
-    if (!_0x2a214b) return;
-    const _0x3e1f2c = 'http://www.w3.org/2000/svg';
-    while (_0x2a214b.firstChild) _0x2a214b.removeChild(_0x2a214b.firstChild);
-    if (_0x16a5e9) {
-      const _0x1618cd = document.createElementNS(_0x3e1f2c, 'polygon');
-      (_0x1618cd.setAttribute('points', '5 3 19 12 5 21 5 3'), _0x2a214b.appendChild(_0x1618cd));
+  ['_setIcon'](value20) {
+    const el4 = this._playBtn.querySelector('svg');
+    if (!el4) return;
+    const value21 = 'http://www.w3.org/2000/svg';
+    while (el4.firstChild) el4.removeChild(el4.firstChild);
+    if (value20) {
+      const el5 = document.createElementNS(value21, 'polygon');
+      (el5.setAttribute('points', '5 3 19 12 5 21 5 3'), el4.appendChild(el5));
     } else {
-      const _0x4f6c40 = document.createElementNS(_0x3e1f2c, 'rect');
-      (_0x4f6c40.setAttribute('x', '6'),
-        _0x4f6c40.setAttribute('y', '4'),
-        _0x4f6c40.setAttribute('width', '4'),
-        _0x4f6c40.setAttribute('height', '16'));
-      const _0x100821 = document.createElementNS(_0x3e1f2c, 'rect');
-      (_0x100821.setAttribute('x', '14'),
-        _0x100821.setAttribute('y', '4'),
-        _0x100821.setAttribute('width', '4'),
-        _0x100821.setAttribute('height', '16'),
-        _0x2a214b.appendChild(_0x4f6c40),
-        _0x2a214b.appendChild(_0x100821));
+      const el6 = document.createElementNS(value21, 'rect');
+      (el6.setAttribute('x', '6'),
+        el6.setAttribute('y', '4'),
+        el6.setAttribute('width', '4'),
+        el6.setAttribute('height', '16'));
+      const el7 = document.createElementNS(value21, 'rect');
+      (el7.setAttribute('x', '14'),
+        el7.setAttribute('y', '4'),
+        el7.setAttribute('width', '4'),
+        el7.setAttribute('height', '16'),
+        el4.appendChild(el6),
+        el4.appendChild(el7));
     }
   }
-  ['update'](_0x3f9345) {
-    this._data = _0x3f9345;
+  ['update'](error2) {
+    this._data = error2;
     if (!this._audio) return;
-    const _0xaa0765 = this._resolveAudioSrc(_0x3f9345);
-    this._syncGeneratingUi(_0x3f9345, _0xaa0765);
-    if (_0xaa0765 && _0xaa0765 !== this._currentSrc) this._prepareAudio(_0xaa0765);
+    const enabled15 = this._resolveAudioSrc(error2);
+    this._syncGeneratingUi(error2, enabled15);
+    if (enabled15 && enabled15 !== this._currentSrc) this._prepareAudio(enabled15);
     else {
-      if (_0xaa0765)
+      if (enabled15)
         (!this._syncKnownAudioDurationUi({
           currentTime: this._audio?.currentTime || 0,
           showLine: Number(this._audio?.currentTime || 0) > 0,
-        }) && this._probeAudioDurationIfNeeded(_0xaa0765),
-          String(_0x3f9345?.waveformLocalPath || '').trim() &&
-            String(_0x3f9345?.waveformLocalPath || '').trim() !== this._waveformLocalPath &&
-            void this._ensureWaveform(_0xaa0765, { persistedOnly: true }));
+        }) && this._probeAudioDurationIfNeeded(enabled15),
+          String(error2?.waveformLocalPath || '').trim() &&
+            String(error2?.waveformLocalPath || '').trim() !== this._waveformLocalPath &&
+            void this._ensureWaveform(enabled15, { persistedOnly: true }));
       else
-        !_0xaa0765 &&
+        !enabled15 &&
           (typeof this._cancelDeferredWaveform === 'function' &&
             (this._cancelDeferredWaveform(), (this._cancelDeferredWaveform = null)),
           this._clearAudioElementSource(),
@@ -549,29 +550,29 @@ export class SourceAudioNode {
           this._progressController?.reset(),
           (this._audioDurationProbeToken += 1),
           this._hint &&
-            (this._hint.style.display = shouldShowGenerationResultLoadingUi(_0x3f9345) ? 'none' : 'block'));
+            (this._hint.style.display = shouldShowGenerationResultLoadingUi(error2) ? 'none' : 'block'));
     }
     (maybeResumeAudioSeparationLeader(this.id),
       this._label &&
-        _0x3f9345.name &&
+        error2.name &&
         document.activeElement !== this._label &&
-        (this._label.innerText = _0x3f9345.name));
+        (this._label.innerText = error2.name));
   }
   async ['_playAudio']() {
     if (!this._audio || !this._currentSrc) return;
     (beginAudioPlayback(this.id),
       await this._loadAudio(this._currentSrc, { showLoading: true }),
       this._rewindEndedAudioIfNeeded());
-    const _0x12af44 = this._audio.play();
-    _0x12af44 && typeof _0x12af44.catch === 'function'
-      ? _0x12af44
+    const promise = this._audio.play();
+    promise && typeof promise.catch === 'function'
+      ? promise
           .then(() => {
             (this._rememberAudioDuration(), stopLoading(this._card));
           })
-          .catch((_0x2de02f) => {
+          .catch((error3) => {
             stopLoading(this._card);
-            if (_0x2de02f?.name === 'AbortError') return;
-            console.warn('[source-audio] play failed:', _0x2de02f);
+            if (error3?.name === 'AbortError') return;
+            console.warn('[source-audio] play failed:', error3);
           })
       : stopLoading(this._card);
   }
@@ -586,22 +587,22 @@ export class SourceAudioNode {
       stopLoading(this._card),
       this._setIcon(true));
   }
-  ['_rememberAudioDuration'](_0x5ea5c5 = this._currentSrc) {
-    if (!this._audio || (_0x5ea5c5 && this._currentSrc !== _0x5ea5c5)) return;
-    const _0x500f8e = this._readAudioDurationSec();
-    if (!(_0x500f8e > 0)) return;
-    this._applyResolvedAudioDuration(_0x500f8e, _0x5ea5c5);
+  ['_rememberAudioDuration'](value22 = this._currentSrc) {
+    if (!this._audio || (value22 && this._currentSrc !== value22)) return;
+    const count3 = this._readAudioDurationSec();
+    if (!(count3 > 0)) return;
+    this._applyResolvedAudioDuration(count3, value22);
   }
   ['_subscribeLocaleChanges']() {
     if (this._unsubscribeLocale) return;
     this._unsubscribeLocale = onLocaleChange(() => this._syncLocaleTexts());
   }
-  ['_setUploadButtonLabel'](_0x53492d) {
+  ['_setUploadButtonLabel'](value23) {
     if (!this._uploadBtn) return;
-    const _0x5824bf = this._uploadBtn.querySelector('svg')?.cloneNode(true);
+    const value24 = this._uploadBtn.querySelector('svg')?.cloneNode(true);
     this._uploadBtn.replaceChildren();
-    if (_0x5824bf) this._uploadBtn.appendChild(_0x5824bf);
-    this._uploadBtn.appendChild(document.createTextNode(' ' + _0x53492d));
+    if (value24) this._uploadBtn.appendChild(value24);
+    this._uploadBtn.appendChild(document.createTextNode(' ' + value23));
   }
   ['_syncLocaleTexts']() {
     if (!this._uploadBtn) return;

@@ -231,11 +231,11 @@ const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
     '  • [Intro] 夜色降临 [Verse] 城市的灯光 照亮了谁的梦 [Chorus] 我们在黑夜中跳舞',
     '  • 可在高级设置中填写歌曲标题和风格标签',
   ]['join']('\x0a');
-function createMinimaxSpeechHelpTooltip(_0x169458, _0x2ec67f) {
+function createMinimaxSpeechHelpTooltip(value, item) {
   return [
-    'MiniMax 语音合成 ' + _0x169458 + '\x20(' + _0x2ec67f + ') 用法',
+    'MiniMax 语音合成 ' + value + '\x20(' + item + ') 用法',
     '输入[[red:要合成的文本]]，AI 生成自然语音',
-    '支持多种音色，' + _0x2ec67f + '音质',
+    '支持多种音色，' + item + '音质',
     '[[red:提示词占位举例]]：',
     '  • 大家好，欢迎来到今天的节目，我是你们的主播小AI。',
     '  • 今天天气真好，适合出去走走，感受阳光和微风。',
@@ -422,33 +422,33 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
     }),
   ]);
 export const runningHubAudioModelApiModelManifests = Object['freeze'](
-  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS['map']((_0x278ceb) =>
+  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS['map']((modelId) =>
     createAudioModelApiManifest({
-      modelId: _0x278ceb['modelId'],
-      executionId: _0x278ceb['executionId'],
+      modelId: modelId['modelId'],
+      executionId: modelId['executionId'],
       provider: 'runninghub',
-      displayName: _0x278ceb['displayName'],
+      displayName: modelId['displayName'],
       icon: 'images/RH.png',
-      description: _0x278ceb['description'],
-      fields: _0x278ceb['fields'],
+      description: modelId['description'],
+      fields: modelId['fields'],
       extensions: Object['freeze']({
-        ...(_0x278ceb['extensions'] || {}),
-        providerProfiles: getRunningHubModelApiProfileIds(_0x278ceb['modelId']),
+        ...(modelId['extensions'] || {}),
+        providerProfiles: getRunningHubModelApiProfileIds(modelId['modelId']),
       }),
-      inputSlots: _0x278ceb['inputSlots'],
-      help: _0x278ceb['help'],
-      async: _0x278ceb['async'] !== ![],
-      cancellable: _0x278ceb['cancellable'] !== ![],
-      modelType: _0x278ceb['modelType'],
+      inputSlots: modelId['inputSlots'],
+      help: modelId['help'],
+      async: modelId['async'] !== ![],
+      cancellable: modelId['cancellable'] !== ![],
+      modelType: modelId['modelType'],
     }),
   ),
 );
 export const runningHubAudioModelApiExecutionManifests = Object['freeze'](
-  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS['map']((_0x5b784a) =>
+  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS['map']((id) =>
     createAudioModelApiExecutionManifest({
-      id: _0x5b784a['executionId'],
+      id: id['executionId'],
       provider: 'runninghub',
-      model: _0x5b784a['model'],
+      model: id['model'],
       endpoint: '/openapi/v2',
       method: 'POST',
       bodyMapping: [],
@@ -458,7 +458,7 @@ export const runningHubAudioModelApiExecutionManifests = Object['freeze'](
         errorPath: Object['freeze'](['errorMessage', 'msg', 'message']),
         resultPaths: Object['freeze'](['results[].url', 'url']),
       }),
-      extensions: Object['freeze']({ modelType: _0x5b784a['modelType'] }),
+      extensions: Object['freeze']({ modelType: id['modelType'] }),
     }),
   ),
 );

@@ -8,8 +8,8 @@ import {
 } from '../../services/completionSoundService.js';
 import { showError, showSuccess } from '../../services/toastService.js';
 import { t } from '../../i18n/index.js';
-function completionSoundText(_0x363b9c, _0x58ec83 = {}) {
-  return t('settings.completionSound.' + _0x363b9c, _0x58ec83);
+function completionSoundText(value, item = {}) {
+  return t('settings.completionSound.' + value, item);
 }
 const ELEMENT_IDS = Object.freeze({
   enabledGroup: 'completionSoundEnabledGroup',
@@ -29,185 +29,181 @@ const ELEMENT_IDS = Object.freeze({
 let currentSettings = normalizeCompletionSoundSettings(COMPLETION_SOUND_DEFAULTS),
   currentUserSettings = {},
   currentFiles = [];
-function getElement(_0x54bc03) {
-  return document.getElementById(_0x54bc03);
+function getElement(key) {
+  return document.getElementById(key);
 }
-function normalizeText(_0x4698f0) {
-  return String(_0x4698f0 || '').trim();
+function normalizeText(index) {
+  return String(index || '').trim();
 }
-function normalizePathKey(_0x1edb1e) {
-  return normalizeText(_0x1edb1e).replace(/\\/g, '/').toLowerCase();
+function normalizePathKey(result) {
+  return normalizeText(result).replace(/\\/g, '/').toLowerCase();
 }
-function clampVolumePercent(_0x28ab1e) {
-  const _0x360b80 = Number(_0x28ab1e);
-  if (!Number.isFinite(_0x360b80)) return Math.round(COMPLETION_SOUND_DEFAULTS.volume * 100);
-  return Math.max(0, Math.min(100, Math.round(_0x360b80)));
+function clampVolumePercent(data) {
+  const options = Number(data);
+  if (!Number.isFinite(options)) return Math.round(COMPLETION_SOUND_DEFAULTS.volume * 100);
+  return Math.max(0, Math.min(100, Math.round(options)));
 }
-function isBuiltInNotifyPath(_0x296b69) {
-  const _0x319328 = normalizePathKey(_0x296b69);
-  return _0x319328.endsWith('/assets/sounds/notify.mp3') || _0x319328 === BUILT_IN_COMPLETION_SOUND_PATH;
+function isBuiltInNotifyPath(target) {
+  const pathKey = normalizePathKey(target);
+  return pathKey.endsWith('/assets/sounds/notify.mp3') || pathKey === BUILT_IN_COMPLETION_SOUND_PATH;
 }
 function readSettingsFromControls() {
-  const _0x2fc00d = clampVolumePercent(getElement(ELEMENT_IDS.volumeSlider)?.value);
+  const volume = clampVolumePercent(getElement(ELEMENT_IDS.volumeSlider)?.value);
   return normalizeCompletionSoundSettings({
     ...currentSettings,
-    volume: _0x2fc00d / 100,
+    volume: volume / 100,
     selectedFilePath:
       normalizeText(getElement(ELEMENT_IDS.fileSelect)?.value) || BUILT_IN_COMPLETION_SOUND_PATH,
   });
 }
-function setStatus(_0x401d98 = '', _0x4cad46 = '') {
-  const _0x25732e = getElement(ELEMENT_IDS.status);
-  if (!_0x25732e) return;
-  ((_0x25732e.textContent = _0x401d98),
-    _0x25732e.classList.toggle('is-error', _0x4cad46 === 'error'),
-    _0x25732e.classList.toggle('is-success', _0x4cad46 === 'success'));
+function setStatus(source = '', next = '') {
+  const el = getElement(ELEMENT_IDS.status);
+  if (!el) return;
+  ((el.textContent = source),
+    el.classList.toggle('is-error', next === 'error'),
+    el.classList.toggle('is-success', next === 'success'));
 }
-function syncEnabledButtons(_0x152557) {
-  const _0x963e69 = getElement(ELEMENT_IDS.enabledGroup);
-  if (!_0x963e69) return;
-  _0x963e69.querySelectorAll('.cursor-size-btn').forEach((_0x57fbff) => {
-    const _0x4f7a8e = _0x57fbff.dataset.completionSoundEnabled === 'on';
-    _0x57fbff.classList.toggle('active', _0x4f7a8e === _0x152557);
+function syncEnabledButtons(current) {
+  const el2 = getElement(ELEMENT_IDS.enabledGroup);
+  if (!el2) return;
+  el2.querySelectorAll('.cursor-size-btn').forEach((el3) => {
+    const entry = el3.dataset.completionSoundEnabled === 'on';
+    el3.classList.toggle('active', entry === current);
   });
 }
-function syncNotificationEnabledButtons(_0x4d8f55) {
-  const _0x5f5502 = getElement(ELEMENT_IDS.notificationEnabledGroup);
-  if (!_0x5f5502) return;
-  _0x5f5502.querySelectorAll('.cursor-size-btn').forEach((_0x1872a3) => {
-    const _0x4353b1 = _0x1872a3.dataset.completionNotificationEnabled === 'on';
-    _0x1872a3.classList.toggle('active', _0x4353b1 === _0x4d8f55);
+function syncNotificationEnabledButtons(record) {
+  const el4 = getElement(ELEMENT_IDS.notificationEnabledGroup);
+  if (!el4) return;
+  el4.querySelectorAll('.cursor-size-btn').forEach((el5) => {
+    const payload = el5.dataset.completionNotificationEnabled === 'on';
+    el5.classList.toggle('active', payload === record);
   });
 }
-function renderSettings(_0xa49551) {
-  ((currentSettings = normalizeCompletionSoundSettings(_0xa49551)),
+function renderSettings(handle) {
+  ((currentSettings = normalizeCompletionSoundSettings(handle)),
     setCompletionSoundSettingsCache(currentSettings),
     syncEnabledButtons(currentSettings.enabled),
     syncNotificationEnabledButtons(currentSettings.notificationEnabled));
-  const _0x100bd9 = clampVolumePercent(currentSettings.volume * 100),
-    _0x2c28c5 = getElement(ELEMENT_IDS.volumeSlider),
-    _0x3844ff = getElement(ELEMENT_IDS.volumeValue);
-  if (_0x2c28c5) _0x2c28c5.value = String(_0x100bd9);
-  if (_0x3844ff) _0x3844ff.textContent = _0x100bd9 + '%';
+  const clampVolumePercent2 = clampVolumePercent(currentSettings.volume * 100),
+    el6 = getElement(ELEMENT_IDS.volumeSlider),
+    el7 = getElement(ELEMENT_IDS.volumeValue);
+  if (el6) el6.value = String(clampVolumePercent2);
+  if (el7) el7.textContent = clampVolumePercent2 + '%';
 }
-function selectFilePathFromList(_0x19984b, _0x710b9e) {
-  const _0x2dfd09 = normalizePathKey(_0x710b9e),
-    _0x5754e7 = _0x19984b.find((_0x4090b8) => normalizePathKey(_0x4090b8?.path) === _0x2dfd09);
-  if (_0x5754e7?.path) return _0x5754e7.path;
-  if (isBuiltInNotifyPath(_0x710b9e)) {
-    const _0x2386e1 = _0x19984b.find(
-      (_0x22c522) => normalizeText(_0x22c522?.name).toLowerCase() === 'notify.mp3',
-    );
-    if (_0x2386e1?.path) return _0x2386e1.path;
+function selectFilePathFromList(list, state) {
+  const pathKey2 = normalizePathKey(state),
+    config = list.find((item2) => normalizePathKey(item2?.path) === pathKey2);
+  if (config?.path) return config.path;
+  if (isBuiltInNotifyPath(state)) {
+    const scope = list.find((error) => normalizeText(error?.name).toLowerCase() === 'notify.mp3');
+    if (scope?.path) return scope.path;
   }
-  return _0x19984b[0]?.path || BUILT_IN_COMPLETION_SOUND_PATH;
+  return list[0]?.path || BUILT_IN_COMPLETION_SOUND_PATH;
 }
-function renderFileOptions(_0x5d828f, _0x5bc5ff = '') {
-  currentFiles = Array.isArray(_0x5d828f) ? _0x5d828f : [];
-  const _0x3609f2 = getElement(ELEMENT_IDS.fileSelect),
-    _0x55e4b8 = getElement(ELEMENT_IDS.fileTriggerText),
-    _0x2bc305 = getElement(ELEMENT_IDS.fileMenu);
-  if (!_0x3609f2) return;
-  (_0x3609f2.replaceChildren(), _0x2bc305?.replaceChildren?.());
-  const _0x337f40 = selectFilePathFromList(currentFiles, _0x5bc5ff);
+function renderFileOptions(input, output = '') {
+  currentFiles = Array.isArray(input) ? input : [];
+  const el8 = getElement(ELEMENT_IDS.fileSelect),
+    el9 = getElement(ELEMENT_IDS.fileTriggerText),
+    el10 = getElement(ELEMENT_IDS.fileMenu);
+  if (!el8) return;
+  (el8.replaceChildren(), el10?.replaceChildren?.());
+  const filePathFromList = selectFilePathFromList(currentFiles, output);
   if (currentFiles.length === 0) {
-    const _0x4a1217 = document.createElement('option');
-    ((_0x4a1217.value = BUILT_IN_COMPLETION_SOUND_PATH),
-      (_0x4a1217.textContent = 'notify.mp3'),
-      _0x3609f2.appendChild(_0x4a1217),
-      (_0x3609f2.value = BUILT_IN_COMPLETION_SOUND_PATH));
-    if (_0x55e4b8) _0x55e4b8.textContent = 'notify.mp3';
+    const el11 = document.createElement('option');
+    ((el11.value = BUILT_IN_COMPLETION_SOUND_PATH),
+      (el11.textContent = 'notify.mp3'),
+      el8.appendChild(el11),
+      (el8.value = BUILT_IN_COMPLETION_SOUND_PATH));
+    if (el9) el9.textContent = 'notify.mp3';
     return;
   }
-  for (const _0x321569 of currentFiles) {
-    const _0x5a8f5f = normalizeText(_0x321569?.path);
-    if (!_0x5a8f5f) continue;
-    const _0x4e5e33 = document.createElement('option');
-    ((_0x4e5e33.value = _0x5a8f5f),
-      (_0x4e5e33.textContent = normalizeText(_0x321569?.name) || _0x5a8f5f),
-      _0x3609f2.appendChild(_0x4e5e33));
-    const _0xfa2df5 = document.createElement('button');
-    ((_0xfa2df5.type = 'button'),
-      (_0xfa2df5.className = 'settings-preset-option'),
-      (_0xfa2df5.dataset.value = _0x5a8f5f),
-      (_0xfa2df5.textContent = _0x4e5e33.textContent),
-      _0xfa2df5.setAttribute?.('role', 'option'),
-      _0x2bc305?.appendChild?.(_0xfa2df5));
+  for (const error2 of currentFiles) {
+    const text = normalizeText(error2?.path);
+    if (!text) continue;
+    const el12 = document.createElement('option');
+    ((el12.value = text), (el12.textContent = normalizeText(error2?.name) || text), el8.appendChild(el12));
+    const el13 = document.createElement('button');
+    ((el13.type = 'button'),
+      (el13.className = 'settings-preset-option'),
+      (el13.dataset.value = text),
+      (el13.textContent = el12.textContent),
+      el13.setAttribute?.('role', 'option'),
+      el10?.appendChild?.(el13));
   }
-  ((_0x3609f2.value = _0x337f40), syncFileMenuSelection(_0x337f40));
+  ((el8.value = filePathFromList), syncFileMenuSelection(filePathFromList));
 }
-function getSelectedFileLabel(_0x463d94) {
-  const _0x2517fd = normalizePathKey(_0x463d94),
-    _0x41a22d = currentFiles.find((_0x3256db) => normalizePathKey(_0x3256db?.path) === _0x2517fd);
-  return normalizeText(_0x41a22d?.name) || 'notify.mp3';
+function getSelectedFileLabel(value2) {
+  const pathKey3 = normalizePathKey(value2),
+    error3 = currentFiles.find((item3) => normalizePathKey(item3?.path) === pathKey3);
+  return normalizeText(error3?.name) || 'notify.mp3';
 }
-function syncFileMenuSelection(_0x873d3a) {
-  const _0x3082b1 = getElement(ELEMENT_IDS.fileSelect),
-    _0x2718b1 = getElement(ELEMENT_IDS.fileTriggerText),
-    _0x4b926a = getElement(ELEMENT_IDS.fileMenu);
-  if (_0x3082b1) _0x3082b1.value = _0x873d3a;
-  if (_0x2718b1) _0x2718b1.textContent = getSelectedFileLabel(_0x873d3a);
-  _0x4b926a?.querySelectorAll?.('.settings-preset-option')?.forEach((_0x262ef2) => {
-    const _0x327f0e = normalizePathKey(_0x262ef2.dataset?.value) === normalizePathKey(_0x873d3a);
-    (_0x262ef2.classList.toggle('is-active', _0x327f0e),
-      _0x262ef2.setAttribute?.('aria-selected', _0x327f0e ? 'true' : 'false'));
+function syncFileMenuSelection(value3) {
+  const el14 = getElement(ELEMENT_IDS.fileSelect),
+    el15 = getElement(ELEMENT_IDS.fileTriggerText),
+    el16 = getElement(ELEMENT_IDS.fileMenu);
+  if (el14) el14.value = value3;
+  if (el15) el15.textContent = getSelectedFileLabel(value3);
+  el16?.querySelectorAll?.('.settings-preset-option')?.forEach((el17) => {
+    const pathKey4 = normalizePathKey(el17.dataset?.value) === normalizePathKey(value3);
+    (el17.classList.toggle('is-active', pathKey4),
+      el17.setAttribute?.('aria-selected', pathKey4 ? 'true' : 'false'));
   });
 }
-function setFileMenuOpen(
-  _0x160ec8,
-  { focusMenu: focusMenu = false, focusTrigger: focusTrigger = false } = {},
-) {
-  const _0x2030e4 = getElement(ELEMENT_IDS.fileControl),
-    _0x2e637c = getElement(ELEMENT_IDS.fileTrigger),
-    _0x27d007 = getElement(ELEMENT_IDS.fileMenu);
-  if (!_0x2030e4 || !_0x2e637c || !_0x27d007) return;
-  (_0x2030e4.classList.toggle('is-open', !!_0x160ec8),
-    _0x2e637c.setAttribute?.('aria-expanded', _0x160ec8 ? 'true' : 'false'),
-    (_0x27d007.hidden = !_0x160ec8));
-  if (_0x160ec8 && focusMenu) {
-    const _0x492d1f =
-      Array.from(_0x27d007.querySelectorAll?.('.settings-preset-option') || []).find((_0x45353d) =>
-        _0x45353d.classList?.contains('is-active'),
-      ) || _0x27d007.querySelectorAll?.('.settings-preset-option')?.[0];
-    _0x492d1f?.focus?.();
-  } else !_0x160ec8 && focusTrigger && _0x2e637c.focus?.();
+function setFileMenuOpen(enabled, { focusMenu: focusMenu = false, focusTrigger: focusTrigger = false } = {}) {
+  const el18 = getElement(ELEMENT_IDS.fileControl),
+    el19 = getElement(ELEMENT_IDS.fileTrigger),
+    el20 = getElement(ELEMENT_IDS.fileMenu);
+  if (!el18 || !el19 || !el20) return;
+  (el18.classList.toggle('is-open', !!enabled),
+    el19.setAttribute?.('aria-expanded', enabled ? 'true' : 'false'),
+    (el20.hidden = !enabled));
+  if (enabled && focusMenu) {
+    const el21 =
+      Array.from(el20.querySelectorAll?.('.settings-preset-option') || []).find((el22) =>
+        el22.classList?.contains('is-active'),
+      ) || el20.querySelectorAll?.('.settings-preset-option')?.[0];
+    el21?.focus?.();
+  } else !enabled && focusTrigger && el19.focus?.();
 }
 function isFileMenuOpen() {
   return !!getElement(ELEMENT_IDS.fileControl)?.classList?.contains('is-open');
 }
-async function selectCompletionSoundFile(_0x1d13c5) {
-  const _0x2aab95 = selectFilePathFromList(currentFiles, _0x1d13c5);
-  ((currentSettings = normalizeCompletionSoundSettings({ ...currentSettings, selectedFilePath: _0x2aab95 })),
-    syncFileMenuSelection(_0x2aab95),
+async function selectCompletionSoundFile(value4) {
+  const selectedFilePath = selectFilePathFromList(currentFiles, value4);
+  ((currentSettings = normalizeCompletionSoundSettings({
+    ...currentSettings,
+    selectedFilePath: selectedFilePath,
+  })),
+    syncFileMenuSelection(selectedFilePath),
     setCompletionSoundSettingsCache(currentSettings),
     setFileMenuOpen(false, { focusTrigger: true }),
     await saveCompletionSoundSettings(currentSettings, { silent: true }));
 }
-async function saveCompletionSoundSettings(_0xbe6a4e, { silent: silent = false } = {}) {
-  const _0x1555a2 = normalizeCompletionSoundSettings({ ..._0xbe6a4e, updatedAt: Date.now() });
-  ((currentSettings = _0x1555a2), setCompletionSoundSettingsCache(_0x1555a2));
+async function saveCompletionSoundSettings(args, { silent: silent = false } = {}) {
+  const completionSound = normalizeCompletionSoundSettings({ ...args, updatedAt: Date.now() });
+  ((currentSettings = completionSound), setCompletionSoundSettingsCache(completionSound));
   try {
-    const _0x29547e = await fetchUserSettingsFromServer().catch(() => currentUserSettings || {});
-    currentUserSettings = { ...(_0x29547e || {}), completionSound: _0x1555a2 };
-    const _0x1f0983 = await saveUserSettingsToServer(currentUserSettings);
-    _0x1f0983?.settings &&
-      typeof _0x1f0983.settings === 'object' &&
-      (currentUserSettings = _0x1f0983.settings);
+    const fetchUserSettingsFromServer2 = await fetchUserSettingsFromServer().catch(
+      () => currentUserSettings || {},
+    );
+    currentUserSettings = { ...(fetchUserSettingsFromServer2 || {}), completionSound: completionSound };
+    const server = await saveUserSettingsToServer(currentUserSettings);
+    server?.settings && typeof server.settings === 'object' && (currentUserSettings = server.settings);
     if (!silent) showSuccess(completionSoundText('saved'));
-    return _0x1555a2;
-  } catch (_0xdffd02) {
-    (console.error('[completionSoundSettings] save failed:', _0xdffd02),
+    return completionSound;
+  } catch (error4) {
+    (console.error('[completionSoundSettings] save failed:', error4),
       showError(
         completionSoundText('saveFailed', {
-          error: _0xdffd02?.message || completionSoundText('unknownError'),
+          error: error4?.message || completionSoundText('unknownError'),
         }),
       ));
-    throw _0xdffd02;
+    throw error4;
   }
 }
 async function loadSystemSoundFiles({ saveSelected: saveSelected = false } = {}) {
-  const _0x470757 = globalThis.window?.electronAPI?.notificationSound?.listSystemSounds;
-  if (typeof _0x470757 !== 'function')
+  const run = globalThis.window?.electronAPI?.notificationSound?.listSystemSounds;
+  if (typeof run !== 'function')
     return (
       renderFileOptions([], currentSettings.selectedFilePath),
       setStatus(completionSoundText('listUnsupported'), 'error'),
@@ -215,30 +211,30 @@ async function loadSystemSoundFiles({ saveSelected: saveSelected = false } = {})
     );
   try {
     setStatus(completionSoundText('readingSystemSounds'));
-    const _0x1f1ce3 = await _0x470757(),
-      _0x27ec6b = Array.isArray(_0x1f1ce3?.files) ? _0x1f1ce3.files : [],
-      _0x23a6e6 = selectFilePathFromList(_0x27ec6b, currentSettings.selectedFilePath);
-    (renderFileOptions(_0x27ec6b, _0x23a6e6),
+    const value5 = await run(),
+      count = Array.isArray(value5?.files) ? value5.files : [],
+      selectedFilePath2 = selectFilePathFromList(count, currentSettings.selectedFilePath);
+    (renderFileOptions(count, selectedFilePath2),
       (currentSettings = normalizeCompletionSoundSettings({
         ...currentSettings,
-        selectedFilePath: _0x23a6e6,
+        selectedFilePath: selectedFilePath2,
       })),
       setCompletionSoundSettingsCache(currentSettings),
       setStatus(
-        _0x27ec6b.length
-          ? completionSoundText('foundMp3Files', { count: _0x27ec6b.length })
+        count.length
+          ? completionSoundText('foundMp3Files', { count: count.length })
           : completionSoundText('emptyMp3Directory'),
-        _0x27ec6b.length ? 'success' : '',
+        count.length ? 'success' : '',
       ));
     if (saveSelected) await saveCompletionSoundSettings(currentSettings, { silent: true });
-    return _0x27ec6b;
-  } catch (_0x409de0) {
+    return count;
+  } catch (error5) {
     return (
-      console.error('[completionSoundSettings] list system sounds failed:', _0x409de0),
+      console.error('[completionSoundSettings] list system sounds failed:', error5),
       renderFileOptions([], currentSettings.selectedFilePath),
       setStatus(
         completionSoundText('listFailed', {
-          error: _0x409de0?.message || completionSoundText('unknownError'),
+          error: error5?.message || completionSoundText('unknownError'),
         }),
         'error',
       ),
@@ -247,98 +243,103 @@ async function loadSystemSoundFiles({ saveSelected: saveSelected = false } = {})
   }
 }
 function bindEvents() {
-  const _0x752a45 = getElement(ELEMENT_IDS.enabledGroup);
-  _0x752a45 &&
-    !_0x752a45.__completionSoundBound &&
-    ((_0x752a45.__completionSoundBound = true),
-    _0x752a45.querySelectorAll('.cursor-size-btn').forEach((_0x27c3e) => {
-      _0x27c3e.addEventListener('click', async () => {
-        const _0x566c4c = _0x27c3e.dataset.completionSoundEnabled === 'on',
-          _0x16d46f = normalizeCompletionSoundSettings({ ...currentSettings, enabled: _0x566c4c });
-        (renderSettings(_0x16d46f), await saveCompletionSoundSettings(_0x16d46f, { silent: true }));
-      });
-    }));
-  const _0x2d97ea = getElement(ELEMENT_IDS.notificationEnabledGroup);
-  _0x2d97ea &&
-    !_0x2d97ea.__completionSoundBound &&
-    ((_0x2d97ea.__completionSoundBound = true),
-    _0x2d97ea.querySelectorAll('.cursor-size-btn').forEach((_0x45ccda) => {
-      _0x45ccda.addEventListener('click', async () => {
-        const _0xcc0ed8 = _0x45ccda.dataset.completionNotificationEnabled === 'on',
-          _0x3cea80 = normalizeCompletionSoundSettings({
+  const el23 = getElement(ELEMENT_IDS.enabledGroup);
+  el23 &&
+    !el23.__completionSoundBound &&
+    ((el23.__completionSoundBound = true),
+    el23.querySelectorAll('.cursor-size-btn').forEach((el24) => {
+      el24.addEventListener('click', async () => {
+        const enabled2 = el24.dataset.completionSoundEnabled === 'on',
+          completionSoundSettings = normalizeCompletionSoundSettings({
             ...currentSettings,
-            notificationEnabled: _0xcc0ed8,
+            enabled: enabled2,
           });
-        (renderSettings(_0x3cea80), await saveCompletionSoundSettings(_0x3cea80, { silent: true }));
+        (renderSettings(completionSoundSettings),
+          await saveCompletionSoundSettings(completionSoundSettings, { silent: true }));
       });
     }));
-  const _0x234bb7 = getElement(ELEMENT_IDS.volumeSlider);
-  _0x234bb7 &&
-    !_0x234bb7.__completionSoundBound &&
-    ((_0x234bb7.__completionSoundBound = true),
-    _0x234bb7.addEventListener('input', () => {
-      const _0x2bf903 = clampVolumePercent(_0x234bb7.value),
-        _0x4eade1 = getElement(ELEMENT_IDS.volumeValue);
-      if (_0x4eade1) _0x4eade1.textContent = _0x2bf903 + '%';
+  const el25 = getElement(ELEMENT_IDS.notificationEnabledGroup);
+  el25 &&
+    !el25.__completionSoundBound &&
+    ((el25.__completionSoundBound = true),
+    el25.querySelectorAll('.cursor-size-btn').forEach((el26) => {
+      el26.addEventListener('click', async () => {
+        const notificationEnabled = el26.dataset.completionNotificationEnabled === 'on',
+          completionSoundSettings2 = normalizeCompletionSoundSettings({
+            ...currentSettings,
+            notificationEnabled: notificationEnabled,
+          });
+        (renderSettings(completionSoundSettings2),
+          await saveCompletionSoundSettings(completionSoundSettings2, { silent: true }));
+      });
+    }));
+  const el27 = getElement(ELEMENT_IDS.volumeSlider);
+  el27 &&
+    !el27.__completionSoundBound &&
+    ((el27.__completionSoundBound = true),
+    el27.addEventListener('input', () => {
+      const clampVolumePercent3 = clampVolumePercent(el27.value),
+        el28 = getElement(ELEMENT_IDS.volumeValue);
+      if (el28) el28.textContent = clampVolumePercent3 + '%';
     }),
-    _0x234bb7.addEventListener('change', async () => {
+    el27.addEventListener('change', async () => {
       await saveCompletionSoundSettings(readSettingsFromControls(), { silent: true });
     }));
-  const _0x118fb8 = getElement(ELEMENT_IDS.fileSelect);
-  _0x118fb8 &&
-    !_0x118fb8.__completionSoundBound &&
-    ((_0x118fb8.__completionSoundBound = true),
-    _0x118fb8.addEventListener('change', async () => {
+  const el29 = getElement(ELEMENT_IDS.fileSelect);
+  el29 &&
+    !el29.__completionSoundBound &&
+    ((el29.__completionSoundBound = true),
+    el29.addEventListener('change', async () => {
       await saveCompletionSoundSettings(readSettingsFromControls(), { silent: true });
     }));
-  const _0x9b43b4 = getElement(ELEMENT_IDS.fileTrigger),
-    _0x10b6c8 = getElement(ELEMENT_IDS.fileMenu);
-  (_0x9b43b4 &&
-    _0x10b6c8 &&
-    !_0x9b43b4.__completionSoundBound &&
-    ((_0x9b43b4.__completionSoundBound = true),
-    _0x9b43b4.addEventListener('click', () => {
+  const el30 = getElement(ELEMENT_IDS.fileTrigger),
+    el31 = getElement(ELEMENT_IDS.fileMenu);
+  (el30 &&
+    el31 &&
+    !el30.__completionSoundBound &&
+    ((el30.__completionSoundBound = true),
+    el30.addEventListener('click', () => {
       setFileMenuOpen(!isFileMenuOpen(), { focusMenu: true });
     }),
-    _0x9b43b4.addEventListener('keydown', (_0x1d72e6) => {
-      (_0x1d72e6.key === 'ArrowDown' || _0x1d72e6.key === 'Enter' || _0x1d72e6.key === ' ') &&
-        (_0x1d72e6.preventDefault?.(), setFileMenuOpen(true, { focusMenu: true }));
+    el30.addEventListener('keydown', (event) => {
+      (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') &&
+        (event.preventDefault?.(), setFileMenuOpen(true, { focusMenu: true }));
     }),
-    _0x10b6c8.addEventListener('click', (_0x4bd033) => {
-      const _0x214bbd = _0x4bd033.target?.closest?.('.settings-preset-option');
-      if (!_0x214bbd || _0x214bbd.disabled) return;
-      void selectCompletionSoundFile(_0x214bbd.dataset.value);
+    el31.addEventListener('click', (event2) => {
+      const el32 = event2.target?.closest?.('.settings-preset-option');
+      if (!el32 || el32.disabled) return;
+      void selectCompletionSoundFile(el32.dataset.value);
     }),
-    _0x10b6c8.addEventListener('keydown', (_0x48e521) => {
-      if (_0x48e521.key === 'Escape')
-        (_0x48e521.preventDefault?.(), setFileMenuOpen(false, { focusTrigger: true }));
+    el31.addEventListener('keydown', (event3) => {
+      if (event3.key === 'Escape')
+        (event3.preventDefault?.(), setFileMenuOpen(false, { focusTrigger: true }));
       else {
-        if (_0x48e521.key === 'Enter' || _0x48e521.key === ' ') {
-          _0x48e521.preventDefault?.();
-          const _0x3b75ac = document.activeElement?.closest?.('.settings-preset-option');
-          if (_0x3b75ac && !_0x3b75ac.disabled) void selectCompletionSoundFile(_0x3b75ac.dataset.value);
+        if (event3.key === 'Enter' || event3.key === ' ') {
+          event3.preventDefault?.();
+          const el33 = document.activeElement?.closest?.('.settings-preset-option');
+          if (el33 && !el33.disabled) void selectCompletionSoundFile(el33.dataset.value);
         }
       }
     }),
     typeof document.addEventListener === 'function' &&
-      document.addEventListener('pointerdown', (_0x219bd1) => {
+      document.addEventListener('pointerdown', (event4) => {
         if (!isFileMenuOpen()) return;
-        const _0x54e94b = getElement(ELEMENT_IDS.fileControl);
-        if (typeof _0x54e94b?.contains === 'function' && _0x54e94b.contains(_0x219bd1.target)) return;
+        const element = getElement(ELEMENT_IDS.fileControl);
+        if (typeof element?.contains === 'function' && element.contains(event4.target)) return;
         setFileMenuOpen(false);
       })),
     getElement(ELEMENT_IDS.openFolderButton)?.addEventListener('click', async () => {
-      const _0x358d16 = globalThis.window?.electronAPI?.notificationSound?.openSystemSoundFolder;
-      if (typeof _0x358d16 !== 'function') {
+      const run2 = globalThis.window?.electronAPI?.notificationSound?.openSystemSoundFolder;
+      if (typeof run2 !== 'function') {
         showError(completionSoundText('openFolderUnsupported'));
         return;
       }
       try {
-        await _0x358d16();
-      } catch (_0xa23fbd) {
+        await run2();
+      } catch (error6) {
         showError(
           completionSoundText('openFolderFailed', {
-            error: _0xa23fbd?.message || completionSoundText('unknownError'),
+            error: error6?.message || completionSoundText('unknownError'),
           }),
         );
       }
@@ -356,13 +357,13 @@ export function initCompletionSoundSettings() {
     renderSettings(COMPLETION_SOUND_DEFAULTS),
     renderFileOptions([], BUILT_IN_COMPLETION_SOUND_PATH),
     fetchUserSettingsFromServer()
-      .then(async (_0xeb67ee) => {
-        ((currentUserSettings = _0xeb67ee || {}),
-          renderSettings(_0xeb67ee?.completionSound || COMPLETION_SOUND_DEFAULTS),
+      .then(async (value6) => {
+        ((currentUserSettings = value6 || {}),
+          renderSettings(value6?.completionSound || COMPLETION_SOUND_DEFAULTS),
           await loadSystemSoundFiles({ saveSelected: false }));
       })
-      .catch((_0xab5290) => {
-        (console.error('[completionSoundSettings] load failed:', _0xab5290),
+      .catch((value7) => {
+        (console.error('[completionSoundSettings] load failed:', value7),
           showError(completionSoundText('loadFailed')));
       }));
 }

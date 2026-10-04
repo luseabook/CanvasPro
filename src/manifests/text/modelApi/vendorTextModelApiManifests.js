@@ -1,8 +1,8 @@
 import { AGNES_MODEL_API_PROFILE_IDS } from '../../../modules/agnesProviderProfiles.js';
 function createTextModelApiManifest({
-  modelId: _0xa5dac3,
-  executionId: _0x2e01ec,
-  displayName: _0x4e45d2,
+  modelId: modelId,
+  executionId: executionId,
+  displayName: displayName,
   aliases: aliases = null,
   provider: provider = 'runninghub',
   icon: icon = 'images/RH.png',
@@ -10,15 +10,15 @@ function createTextModelApiManifest({
   inputSlots: inputSlots = null,
   extensions: extensions = null,
 }) {
-  const _0x209c35 = {
+  const value = {
     schemaVersion: '1.0',
-    modelId: _0xa5dac3,
+    modelId: modelId,
     ...(Array.isArray(aliases) ? { aliases: aliases } : {}),
     provider: provider,
     kind: 'text',
     adapterType: 'modelApi',
-    executionId: _0x2e01ec,
-    displayName: _0x4e45d2,
+    executionId: executionId,
+    displayName: displayName,
     icon: icon,
     description: description,
     inputSlots: Object.freeze(
@@ -34,19 +34,19 @@ function createTextModelApiManifest({
     outputType: 'text',
   };
   return (
-    extensions && typeof extensions === 'object' && (_0x209c35.extensions = Object.freeze(extensions)),
-    Object.freeze(_0x209c35)
+    extensions && typeof extensions === 'object' && (value.extensions = Object.freeze(extensions)),
+    Object.freeze(value)
   );
 }
-function createRunningHubTextModelApiManifest(_0x40670c) {
+function createRunningHubTextModelApiManifest(modelId2) {
   return Object.freeze({
     schemaVersion: '1.0',
-    modelId: _0x40670c.modelId,
+    modelId: modelId2.modelId,
     provider: 'runninghub',
     kind: 'text',
     adapterType: 'modelApi',
-    executionId: _0x40670c.executionId,
-    displayName: _0x40670c.displayName,
+    executionId: modelId2.executionId,
+    displayName: modelId2.displayName,
     icon: 'images/RH.png',
     description: 'RunningHub image-to-text model API',
     inputSlots: Object.freeze({
@@ -55,8 +55,8 @@ function createRunningHubTextModelApiManifest(_0x40670c) {
       maxByKind: Object.freeze({ image: 8, video: 0, audio: 0 }),
     }),
     uiSchema: Object.freeze({ fields: Object.freeze([]) }),
-    ...(_0x40670c.extensions && typeof _0x40670c.extensions === 'object'
-      ? { extensions: Object.freeze(_0x40670c.extensions) }
+    ...(modelId2.extensions && typeof modelId2.extensions === 'object'
+      ? { extensions: Object.freeze(modelId2.extensions) }
       : {}),
     async: true,
     cancellable: false,
@@ -64,8 +64,8 @@ function createRunningHubTextModelApiManifest(_0x40670c) {
   });
 }
 function createTextExecutionManifest({
-  id: _0x2a4fc0,
-  model: _0x185e2a,
+  id: id,
+  model: model,
   provider: provider = 'runninghub',
   endpoint: endpoint = '/openapi/v2',
   endpointMode: endpointMode = 'image-to-text',
@@ -76,14 +76,14 @@ function createTextExecutionManifest({
 }) {
   return Object.freeze({
     schemaVersion: '1.0',
-    id: _0x2a4fc0,
+    id: id,
     provider: provider,
     kind: 'text',
     adapterType: 'modelApi',
     endpoint: endpoint,
     endpointMode: endpointMode,
     method: 'POST',
-    model: _0x185e2a,
+    model: model,
     ...(extensions && typeof extensions === 'object' ? { extensions: Object.freeze(extensions) } : {}),
     headers: Object.freeze({ 'Content-Type': 'application/json' }),
     bodyMapping: Object.freeze(bodyMapping || { promptField: 'prompt', inputImageField: 'imageUrl' }),
@@ -453,17 +453,17 @@ const RUNNINGHUB_IMAGE_TO_TEXT_MODELS = Object.freeze([
     }),
   ]);
 export const vendorTextModelApiModelManifests = Object.freeze([
-  ...RUNNINGHUB_IMAGE_TO_TEXT_MODELS.map((_0xc06098) =>
+  ...RUNNINGHUB_IMAGE_TO_TEXT_MODELS.map((modelId3) =>
     createRunningHubTextModelApiManifest({
-      modelId: _0xc06098.modelId,
-      executionId: _0xc06098.executionId,
-      displayName: _0xc06098.displayName,
+      modelId: modelId3.modelId,
+      executionId: modelId3.executionId,
+      displayName: modelId3.displayName,
       extensions: Object.freeze({
         textMenu: Object.freeze({
           group: 'runninghub',
-          order: _0xc06098.modelId.includes('flash') ? 10 : 20,
-          title: _0xc06098.modelId.includes('flash') ? 'gemini3-flash' : 'gemini3-pro',
-          subtitle: _0xc06098.modelId.includes('flash')
+          order: modelId3.modelId.includes('flash') ? 10 : 20,
+          title: modelId3.modelId.includes('flash') ? 'gemini3-flash' : 'gemini3-pro',
+          subtitle: modelId3.modelId.includes('flash')
             ? '闪电级响应速度，适用于高频率对话与实时任务'
             : '旗舰级多模态模型，支持超长文本与深度分析',
           icon: 'gemini',
@@ -471,32 +471,32 @@ export const vendorTextModelApiModelManifests = Object.freeze([
       }),
     }),
   ),
-  ...RUNNINGHUB_LLM_TEXT_MODELS.map((_0x855a94) =>
+  ...RUNNINGHUB_LLM_TEXT_MODELS.map((modelId4) =>
     createTextModelApiManifest({
-      modelId: _0x855a94.modelId,
-      executionId: _0x855a94.executionId,
-      displayName: _0x855a94.displayName,
+      modelId: modelId4.modelId,
+      executionId: modelId4.executionId,
+      displayName: modelId4.displayName,
       provider: 'runninghub',
       icon: 'images/RH.png',
       description: 'RunningHub LLM chat completion model API',
-      inputSlots: _0x855a94.inputSlots || CHAT_COMPLETION_TEXT_ONLY_INPUT_SLOTS,
+      inputSlots: modelId4.inputSlots || CHAT_COMPLETION_TEXT_ONLY_INPUT_SLOTS,
       extensions: Object.freeze({
         textMenu: Object.freeze({
           group: 'runninghub',
-          order: _0x855a94.order,
-          title: _0x855a94.title || _0x855a94.displayName,
-          subtitle: _0x855a94.subtitle,
-          icon: _0x855a94.icon,
+          order: modelId4.order,
+          title: modelId4.title || modelId4.displayName,
+          subtitle: modelId4.subtitle,
+          icon: modelId4.icon,
         }),
       }),
     }),
   ),
-  ...VOLCENGINE_TEXT_MODELS.map((_0x2bc041) =>
+  ...VOLCENGINE_TEXT_MODELS.map((modelId5) =>
     createTextModelApiManifest({
-      modelId: _0x2bc041.modelId,
-      executionId: _0x2bc041.executionId,
-      displayName: _0x2bc041.displayName,
-      aliases: Object.freeze([_0x2bc041.model]),
+      modelId: modelId5.modelId,
+      executionId: modelId5.executionId,
+      displayName: modelId5.displayName,
+      aliases: Object.freeze([modelId5.model]),
       provider: 'volcengine',
       icon: 'images/volcengine.svg',
       description: 'Volcengine Ark chat completion model API',
@@ -504,19 +504,19 @@ export const vendorTextModelApiModelManifests = Object.freeze([
       extensions: Object.freeze({
         textMenu: Object.freeze({
           group: 'volcengine',
-          order: _0x2bc041.order,
-          title: _0x2bc041.title || _0x2bc041.displayName,
-          subtitle: _0x2bc041.subtitle,
-          icon: _0x2bc041.icon,
+          order: modelId5.order,
+          title: modelId5.title || modelId5.displayName,
+          subtitle: modelId5.subtitle,
+          icon: modelId5.icon,
         }),
       }),
     }),
   ),
-  ...GRSAI_TEXT_MODELS.map((_0x53706d) =>
+  ...GRSAI_TEXT_MODELS.map((modelId6) =>
     createTextModelApiManifest({
-      modelId: _0x53706d.modelId,
-      executionId: _0x53706d.executionId,
-      displayName: _0x53706d.displayName,
+      modelId: modelId6.modelId,
+      executionId: modelId6.executionId,
+      displayName: modelId6.displayName,
       provider: 'grsai',
       icon: 'images/grsai.png',
       description: 'GRSAI chat completion model API',
@@ -524,19 +524,19 @@ export const vendorTextModelApiModelManifests = Object.freeze([
       extensions: Object.freeze({
         textMenu: Object.freeze({
           group: 'grsai',
-          order: _0x53706d.order,
-          title: _0x53706d.title || _0x53706d.displayName,
-          subtitle: _0x53706d.subtitle,
-          icon: _0x53706d.icon,
+          order: modelId6.order,
+          title: modelId6.title || modelId6.displayName,
+          subtitle: modelId6.subtitle,
+          icon: modelId6.icon,
         }),
       }),
     }),
   ),
-  ...PPIO_TEXT_MODELS.map((_0x5f4ceb) =>
+  ...PPIO_TEXT_MODELS.map((modelId7) =>
     createTextModelApiManifest({
-      modelId: _0x5f4ceb.modelId,
-      executionId: _0x5f4ceb.executionId,
-      displayName: _0x5f4ceb.displayName,
+      modelId: modelId7.modelId,
+      executionId: modelId7.executionId,
+      displayName: modelId7.displayName,
       provider: 'ppio',
       icon: 'images/ppio.png',
       description: 'PPIO chat completion model API',
@@ -544,20 +544,20 @@ export const vendorTextModelApiModelManifests = Object.freeze([
       extensions: Object.freeze({
         textMenu: Object.freeze({
           group: 'ppio',
-          order: _0x5f4ceb.order,
-          title: _0x5f4ceb.title || _0x5f4ceb.displayName,
-          subtitle: _0x5f4ceb.subtitle,
-          icon: _0x5f4ceb.icon,
+          order: modelId7.order,
+          title: modelId7.title || modelId7.displayName,
+          subtitle: modelId7.subtitle,
+          icon: modelId7.icon,
         }),
       }),
     }),
   ),
-  ...APIMART_TEXT_MODELS.map((_0x12f984) =>
+  ...APIMART_TEXT_MODELS.map((modelId8) =>
     createTextModelApiManifest({
-      modelId: _0x12f984.modelId,
-      executionId: _0x12f984.executionId,
-      displayName: _0x12f984.displayName,
-      aliases: _0x12f984.aliases,
+      modelId: modelId8.modelId,
+      executionId: modelId8.executionId,
+      displayName: modelId8.displayName,
+      aliases: modelId8.aliases,
       provider: 'apimart',
       icon: 'AM',
       description: 'APIMart chat completion model API',
@@ -565,19 +565,19 @@ export const vendorTextModelApiModelManifests = Object.freeze([
       extensions: Object.freeze({
         textMenu: Object.freeze({
           group: 'apimart',
-          order: _0x12f984.order,
-          title: _0x12f984.title || _0x12f984.displayName,
-          subtitle: _0x12f984.subtitle,
-          ...(_0x12f984.icon ? { icon: _0x12f984.icon } : {}),
+          order: modelId8.order,
+          title: modelId8.title || modelId8.displayName,
+          subtitle: modelId8.subtitle,
+          ...(modelId8.icon ? { icon: modelId8.icon } : {}),
         }),
       }),
     }),
   ),
-  ...AGNES_TEXT_MODELS.map((_0x2572a5) =>
+  ...AGNES_TEXT_MODELS.map((modelId9) =>
     createTextModelApiManifest({
-      modelId: _0x2572a5.modelId,
-      executionId: _0x2572a5.executionId,
-      displayName: _0x2572a5.displayName,
+      modelId: modelId9.modelId,
+      executionId: modelId9.executionId,
+      displayName: modelId9.displayName,
       provider: 'agnes',
       icon: 'AG',
       description: 'Agnes AI chat completion model API',
@@ -588,24 +588,24 @@ export const vendorTextModelApiModelManifests = Object.freeze([
         providerProfiles: AGNES_MODEL_API_PROFILE_IDS,
         textMenu: Object.freeze({
           group: 'agnes',
-          order: _0x2572a5.order,
-          title: _0x2572a5.title || _0x2572a5.displayName,
-          subtitle: _0x2572a5.subtitle,
-          icon: _0x2572a5.icon,
+          order: modelId9.order,
+          title: modelId9.title || modelId9.displayName,
+          subtitle: modelId9.subtitle,
+          icon: modelId9.icon,
         }),
       }),
     }),
   ),
 ]);
 export const vendorTextModelApiExecutionManifests = Object.freeze([
-  ...RUNNINGHUB_IMAGE_TO_TEXT_MODELS.map((_0x2610be) =>
-    createTextExecutionManifest({ id: _0x2610be.executionId, model: _0x2610be.model }),
+  ...RUNNINGHUB_IMAGE_TO_TEXT_MODELS.map((id2) =>
+    createTextExecutionManifest({ id: id2.executionId, model: id2.model }),
   ),
-  ...RUNNINGHUB_LLM_TEXT_MODELS.map((_0x295ad9) =>
+  ...RUNNINGHUB_LLM_TEXT_MODELS.map((id3) =>
     createTextExecutionManifest({
-      id: _0x295ad9.executionId,
+      id: id3.executionId,
       provider: 'runninghub',
-      model: _0x295ad9.model,
+      model: id3.model,
       endpoint: '/v1/chat/completions',
       endpointMode: 'chat-completion',
       bodyMapping: Object.freeze({ modelField: 'model', messagesField: 'messages' }),
@@ -614,11 +614,11 @@ export const vendorTextModelApiExecutionManifests = Object.freeze([
       extensions: RUNNINGHUB_LLM_TEXT_EXECUTION_EXTENSIONS,
     }),
   ),
-  ...VOLCENGINE_TEXT_MODELS.map((_0x458f21) =>
+  ...VOLCENGINE_TEXT_MODELS.map((id4) =>
     createTextExecutionManifest({
-      id: _0x458f21.executionId,
+      id: id4.executionId,
       provider: 'volcengine',
-      model: _0x458f21.model,
+      model: id4.model,
       endpoint: '/responses',
       endpointMode: 'responses',
       bodyMapping: Object.freeze({ modelField: 'model', inputField: 'input' }),
@@ -627,11 +627,11 @@ export const vendorTextModelApiExecutionManifests = Object.freeze([
       extensions: VOLCENGINE_TEXT_EXECUTION_EXTENSIONS,
     }),
   ),
-  ...GRSAI_TEXT_MODELS.map((_0x1ccf9b) =>
+  ...GRSAI_TEXT_MODELS.map((id5) =>
     createTextExecutionManifest({
-      id: _0x1ccf9b.executionId,
+      id: id5.executionId,
       provider: 'grsai',
-      model: _0x1ccf9b.model,
+      model: id5.model,
       endpoint: '/v1',
       endpointMode: 'chat-completion',
       bodyMapping: Object.freeze({ modelField: 'model', messagesField: 'messages' }),
@@ -639,11 +639,11 @@ export const vendorTextModelApiExecutionManifests = Object.freeze([
       result: APIMART_TEXT_RESULT,
     }),
   ),
-  ...PPIO_TEXT_MODELS.map((_0x3a94e1) =>
+  ...PPIO_TEXT_MODELS.map((id6) =>
     createTextExecutionManifest({
-      id: _0x3a94e1.executionId,
+      id: id6.executionId,
       provider: 'ppio',
-      model: _0x3a94e1.model,
+      model: id6.model,
       endpoint: '/openai/v1',
       endpointMode: 'chat-completion',
       bodyMapping: Object.freeze({ modelField: 'model', messagesField: 'messages' }),
@@ -651,11 +651,11 @@ export const vendorTextModelApiExecutionManifests = Object.freeze([
       result: APIMART_TEXT_RESULT,
     }),
   ),
-  ...APIMART_TEXT_MODELS.map((_0x5bb549) =>
+  ...APIMART_TEXT_MODELS.map((id7) =>
     createTextExecutionManifest({
-      id: _0x5bb549.executionId,
+      id: id7.executionId,
       provider: 'apimart',
-      model: _0x5bb549.model,
+      model: id7.model,
       endpoint: '/v1/chat/completions',
       endpointMode: 'chat-completion',
       bodyMapping: Object.freeze({ modelField: 'model', messagesField: 'messages' }),
@@ -664,11 +664,11 @@ export const vendorTextModelApiExecutionManifests = Object.freeze([
       extensions: APIMART_TEXT_EXECUTION_EXTENSIONS,
     }),
   ),
-  ...AGNES_TEXT_MODELS.map((_0x5cb6e2) =>
+  ...AGNES_TEXT_MODELS.map((id8) =>
     createTextExecutionManifest({
-      id: _0x5cb6e2.executionId,
+      id: id8.executionId,
       provider: 'agnes',
-      model: _0x5cb6e2.model,
+      model: id8.model,
       endpoint: '/v1/chat/completions',
       endpointMode: 'chat-completion',
       bodyMapping: Object.freeze({ modelField: 'model', messagesField: 'messages' }),

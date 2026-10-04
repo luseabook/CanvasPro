@@ -19,247 +19,240 @@ import { applyVideoAdaptiveAspectRatio } from '../videoAspectRatioExecution.js';
 import { getFixedInputSlotConfigFromManifest } from '../fixedInputAssetRefs.js';
 const MEDIA_KINDS = Object['freeze'](['image', 'video', 'audio']),
   RECOVERABLE_VIDEO_TASK_STATUSES = new Set(['pending', 'queued', 'recovering', 'running', 'submitting']);
-function asObject(_0x3a9ba3) {
-  return _0x3a9ba3 && typeof _0x3a9ba3 === 'object' && !Array['isArray'](_0x3a9ba3) ? _0x3a9ba3 : {};
+function asObject(value) {
+  return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
 }
-function normalizeText(_0x181a63) {
-  return String(_0x181a63 || '')['trim']();
+function normalizeText(item) {
+  return String(item || '')['trim']();
 }
-function resolveStoryClipVideoExecution(_0x2fa6b2, _0x3510fa = '') {
-  return resolveModelExecution(_0x2fa6b2) || resolveModelExecution(_0x2fa6b2, { providerHint: _0x3510fa });
+function resolveStoryClipVideoExecution(key, providerHint = '') {
+  return resolveModelExecution(key) || resolveModelExecution(key, { providerHint: providerHint });
 }
-function resolveStoryClipTaskTargetId(_0x32f264 = {}, _0x3cd429 = {}) {
+function resolveStoryClipTaskTargetId(options = {}, index = {}) {
   return (
-    normalizeText(_0x32f264['targetId']) ||
+    normalizeText(options['targetId']) ||
     'story-clip:' +
-      (normalizeText(_0x32f264['projectId']) || 'project') +
+      (normalizeText(options['projectId']) || 'project') +
       ':' +
-      (normalizeText(_0x32f264['episodeId']) || 'episode') +
+      (normalizeText(options['episodeId']) || 'episode') +
       ':' +
-      (normalizeText(_0x3cd429['id']) || 'clip')
+      (normalizeText(index['id']) || 'clip')
   );
 }
-export function getRecoverableStoryClipVideoTask(_0xc3fb4 = {}) {
-  const _0x3f3b66 = asObject(_0xc3fb4?.['generation']),
-    _0x375f6a = normalizeText(_0x3f3b66['status'])['toLowerCase'](),
-    _0x260a5d = normalizeText(_0x3f3b66['taskId']),
-    _0x14a28c = normalizeText(_0x3f3b66['modelId'] || _0xc3fb4?.['modelId']);
-  if (!RECOVERABLE_VIDEO_TASK_STATUSES['has'](_0x375f6a) || !_0x260a5d || !_0x14a28c) return null;
-  const _0xf82c6a = normalizeText(_0x3f3b66['providerProfileId'] || _0xc3fb4?.['providerProfileId']);
+export function getRecoverableStoryClipVideoTask(options2 = {}) {
+  const response = asObject(options2?.['generation']),
+    status = normalizeText(response['status'])['toLowerCase'](),
+    taskId = normalizeText(response['taskId']),
+    modelId = normalizeText(response['modelId'] || options2?.['modelId']);
+  if (!RECOVERABLE_VIDEO_TASK_STATUSES['has'](status) || !taskId || !modelId) return null;
+  const providerProfileId2 = normalizeText(response['providerProfileId'] || options2?.['providerProfileId']);
   return {
-    status: _0x375f6a,
-    taskId: _0x260a5d,
-    modelId: _0x14a28c,
-    provider: normalizeText(_0x3f3b66['provider'] || _0xc3fb4?.['provider']),
-    ...(_0xf82c6a ? { providerProfileId: _0xf82c6a } : {}),
-    executionId: normalizeText(_0x3f3b66['executionId']),
-    startedAt: Number(_0x3f3b66['startedAt'] || 0x0),
-    ...(_0x3f3b66['useOpenapiQuery'] === !![] ? { useOpenapiQuery: !![] } : {}),
+    status: status,
+    taskId: taskId,
+    modelId: modelId,
+    provider: normalizeText(response['provider'] || options2?.['provider']),
+    ...(providerProfileId2 ? { providerProfileId: providerProfileId2 } : {}),
+    executionId: normalizeText(response['executionId']),
+    startedAt: Number(response['startedAt'] || 0x0),
+    ...(response['useOpenapiQuery'] === !![] ? { useOpenapiQuery: !![] } : {}),
   };
 }
-async function resumeVideoGenerationTask(_0x4808c7, _0x10ca56, _0x20bdfd = {}) {
-  const _0x3cd4c7 = resolveStoryClipVideoExecution(_0x10ca56?.['model'], _0x10ca56?.['provider']),
-    _0x2f411b = _0x3cd4c7?.['modelManifest']
+async function resumeVideoGenerationTask(result, args, data = {}) {
+  const model = resolveStoryClipVideoExecution(args?.['model'], args?.['provider']),
+    target = model?.['modelManifest']
       ? {
-          ..._0x10ca56,
-          model: _0x3cd4c7['modelManifest']['modelId'],
-          provider: _0x3cd4c7['modelManifest']['provider'],
+          ...args,
+          model: model['modelManifest']['modelId'],
+          provider: model['modelManifest']['provider'],
         }
-      : _0x10ca56;
-  if (_0x3cd4c7?.['executionManifest']?.['adapterType'] === 'workflow')
-    return resumeRunningHubVideoTask(_0x4808c7, _0x2f411b, _0x20bdfd);
-  return resumeAsyncVideoTask(_0x4808c7, _0x2f411b, _0x20bdfd);
+      : args;
+  if (model?.['executionManifest']?.['adapterType'] === 'workflow')
+    return resumeRunningHubVideoTask(result, target, data);
+  return resumeAsyncVideoTask(result, target, data);
 }
-function isAsyncStoryClipVideoExecution(_0x25e528, _0xf20773) {
+function isAsyncStoryClipVideoExecution(source, next) {
   return (
-    _0xf20773?.['adapterType'] === 'modelApi' &&
-    (_0x25e528?.['async'] === !![] || Boolean(_0xf20773?.['extensions']?.['taskPolling']))
+    next?.['adapterType'] === 'modelApi' &&
+    (source?.['async'] === !![] || Boolean(next?.['extensions']?.['taskPolling']))
   );
 }
-function normalizeInputItem(_0x4ccdcc, _0x7bdf3b, _0x45ae0a) {
-  const _0x17f589 = typeof _0x4ccdcc === 'string' ? { url: _0x4ccdcc } : asObject(_0x4ccdcc),
-    _0x2ff208 = normalizeText(
-      _0x17f589['url'] ||
-        _0x17f589['localUrl'] ||
-        _0x17f589['imageUrl'] ||
-        _0x17f589['videoUrl'] ||
-        _0x17f589['audioUrl'] ||
-        _0x17f589['localPath'],
+function normalizeInputItem(url, kind, current) {
+  const response2 = typeof url === 'string' ? { url: url } : asObject(url),
+    url2 = normalizeText(
+      response2['url'] ||
+        response2['localUrl'] ||
+        response2['imageUrl'] ||
+        response2['videoUrl'] ||
+        response2['audioUrl'] ||
+        response2['localPath'],
     );
-  if (!_0x2ff208)
-    throw new Error('片段视频的第\x20' + (_0x45ae0a + 0x1) + '\x20个' + _0x7bdf3b + '输入缺少可用地址');
+  if (!url2) throw new Error('片段视频的第\x20' + (current + 0x1) + '\x20个' + kind + '输入缺少可用地址');
   return {
-    ..._0x17f589,
-    kind: _0x7bdf3b,
-    url: _0x2ff208,
-    slotId: normalizeText(_0x17f589['slotId'] || _0x17f589['refSlot']),
+    ...response2,
+    kind: kind,
+    url: url2,
+    slotId: normalizeText(response2['slotId'] || response2['refSlot']),
   };
 }
-function normalizeInputs(_0xddd34e = {}) {
-  const _0xc756 = asObject(_0xddd34e);
+function normalizeInputs(options3 = {}) {
+  const asObject2 = asObject(options3);
   return Object['fromEntries'](
-    MEDIA_KINDS['map']((_0x6a4488) => {
-      const _0x2b1953 = _0x6a4488 + 's',
-        _0xee7dc3 = _0xc756[_0x6a4488] ?? _0xc756[_0x2b1953] ?? [],
-        _0x1feea8 = Array['isArray'](_0xee7dc3) ? _0xee7dc3 : _0xee7dc3 ? [_0xee7dc3] : [];
-      return [
-        _0x6a4488,
-        _0x1feea8['map']((_0x1ad029, _0x1b79da) => normalizeInputItem(_0x1ad029, _0x6a4488, _0x1b79da)),
-      ];
+    MEDIA_KINDS['map']((entry) => {
+      const record = entry + 's',
+        payload = asObject2[entry] ?? asObject2[record] ?? [],
+        list = Array['isArray'](payload) ? payload : payload ? [payload] : [];
+      return [entry, list['map']((handle, state) => normalizeInputItem(handle, entry, state))];
     }),
   );
 }
-function mergePromptAssetInputRefs(_0x45bf03 = {}, _0x28f244 = []) {
-  const _0x17e4aa = normalizeInputs(_0x45bf03),
-    _0xb76f56 = new Set(
-      MEDIA_KINDS['flatMap']((_0x89d0b0) =>
-        _0x17e4aa[_0x89d0b0]['map']((_0x86cdb2) => _0x89d0b0 + ':' + normalizeText(_0x86cdb2['url'])),
+function mergePromptAssetInputRefs(options4 = {}, config = []) {
+  const inputs2 = normalizeInputs(options4),
+    map = new Set(
+      MEDIA_KINDS['flatMap']((scope) =>
+        inputs2[scope]['map']((response3) => scope + ':' + normalizeText(response3['url'])),
       ),
     );
   return (
-    (Array['isArray'](_0x28f244) ? _0x28f244 : [])['forEach']((_0x2f37c8, _0x5b6777) => {
-      const _0x3ca01b = normalizeText(_0x2f37c8?.['type'] || _0x2f37c8?.['kind']);
-      if (!MEDIA_KINDS['includes'](_0x3ca01b)) return;
-      const _0x247216 = normalizeInputItem(_0x2f37c8, _0x3ca01b, _0x5b6777),
-        _0x20e918 = _0x3ca01b + ':' + _0x247216['url'];
-      if (_0xb76f56['has'](_0x20e918)) return;
-      (_0xb76f56['add'](_0x20e918),
-        _0x17e4aa[_0x3ca01b]['push']({
-          ..._0x247216,
-          slotId: normalizeText(_0x2f37c8?.['refSlot'] || _0x2f37c8?.['slotId']),
+    (Array['isArray'](config) ? config : [])['forEach']((input, output) => {
+      const text = normalizeText(input?.['type'] || input?.['kind']);
+      if (!MEDIA_KINDS['includes'](text)) return;
+      const response4 = normalizeInputItem(input, text, output),
+        value2 = text + ':' + response4['url'];
+      if (map['has'](value2)) return;
+      (map['add'](value2),
+        inputs2[text]['push']({
+          ...response4,
+          slotId: normalizeText(input?.['refSlot'] || input?.['slotId']),
         }));
     }),
-    _0x17e4aa
+    inputs2
   );
 }
-function resolveKindLimit(_0x16918f, _0x33e882) {
-  const _0x243dbf = Number(_0x16918f?.['maxByKind']?.[_0x33e882]);
-  if (Number['isFinite'](_0x243dbf)) return Math['max'](0x0, Math['trunc'](_0x243dbf));
-  const _0x2ef087 = (_0x16918f?.['fixedSlots'] || [])['filter'](
-    (_0x53e00c) => normalizeText(_0x53e00c?.['kind']) === _0x33e882,
+function resolveKindLimit(value3, value4) {
+  const value5 = Number(value3?.['maxByKind']?.[value4]);
+  if (Number['isFinite'](value5)) return Math['max'](0x0, Math['trunc'](value5));
+  const count = (value3?.['fixedSlots'] || [])['filter'](
+    (value6) => normalizeText(value6?.['kind']) === value4,
   )['length'];
-  return _0x2ef087 > 0x0 ? _0x2ef087 : Number['POSITIVE_INFINITY'];
+  return count > 0x0 ? count : Number['POSITIVE_INFINITY'];
 }
-function assignFixedSlots(_0x4f4dbf, _0x5da0f8, _0x47fcc8, _0xf73ce5 = {}) {
-  const _0x25db3d = Array['isArray'](_0x5da0f8?.['fixedSlots'])
-      ? [..._0x5da0f8['fixedSlots']]['sort'](
-          (_0x45c722, _0x21d50e) =>
-            Number(_0x45c722?.['displayOrder'] || 0x0) - Number(_0x21d50e?.['displayOrder'] || 0x0),
+function assignFixedSlots(manifest, args2, value7, value8 = {}) {
+  const list2 = Array['isArray'](args2?.['fixedSlots'])
+      ? [...args2['fixedSlots']]['sort'](
+          (value9, value10) =>
+            Number(value9?.['displayOrder'] || 0x0) - Number(value10?.['displayOrder'] || 0x0),
         )
       : [],
-    _0x488662 = _0x25db3d['some']((_0x267042) => _0x267042?.['showWhen'] || _0x267042?.['hideWhen']),
-    _0x40a9a6 = _0x488662 ? getFixedInputSlotConfigFromManifest(_0xf73ce5, { manifest: _0x4f4dbf }) : null,
-    _0x3645c4 = _0x488662
-      ? new Set(_0x40a9a6?.['visibleSlots'] || [])
-      : new Set(_0x25db3d['map']((_0x384fdd) => normalizeText(_0x384fdd?.['id']))['filter'](Boolean)),
-    _0x1166bc = _0x25db3d['filter']((_0x107b4e) => _0x3645c4['has'](normalizeText(_0x107b4e?.['id']))),
-    _0xff22ee = new Map(
-      _0x25db3d['map']((_0x18e7bb) => [normalizeText(_0x18e7bb?.['id']), _0x18e7bb])['filter'](
-        ([_0x7441a]) => _0x7441a,
-      ),
+    value11 = list2['some']((value12) => value12?.['showWhen'] || value12?.['hideWhen']),
+    value13 = value11 ? getFixedInputSlotConfigFromManifest(value8, { manifest: manifest }) : null,
+    map2 = value11
+      ? new Set(value13?.['visibleSlots'] || [])
+      : new Set(list2['map']((value14) => normalizeText(value14?.['id']))['filter'](Boolean)),
+    list3 = list2['filter']((value15) => map2['has'](normalizeText(value15?.['id']))),
+    map3 = new Map(
+      list2['map']((value16) => [normalizeText(value16?.['id']), value16])['filter'](([value17]) => value17),
     ),
-    _0x4d6162 = new Map();
-  for (const _0x1ba483 of MEDIA_KINDS) {
-    for (const _0x23c13c of _0x47fcc8[_0x1ba483]) {
-      if (!_0x23c13c['slotId']) continue;
-      const _0x5a0f23 = _0xff22ee['get'](_0x23c13c['slotId']);
-      if (!_0x5a0f23) throw new Error('视频模型未声明输入槽“' + _0x23c13c['slotId'] + '”');
-      if (normalizeText(_0x5a0f23['kind']) !== _0x1ba483)
+    map4 = new Map();
+  for (const value18 of MEDIA_KINDS) {
+    for (const enabled of value7[value18]) {
+      if (!enabled['slotId']) continue;
+      const enabled2 = map3['get'](enabled['slotId']);
+      if (!enabled2) throw new Error('视频模型未声明输入槽“' + enabled['slotId'] + '”');
+      if (normalizeText(enabled2['kind']) !== value18)
         throw new Error(
-          '输入槽“' + _0x23c13c['slotId'] + '”只接受 ' + _0x5a0f23['kind'] + '，不能接收\x20' + _0x1ba483,
+          '输入槽“' + enabled['slotId'] + '”只接受 ' + enabled2['kind'] + '，不能接收\x20' + value18,
         );
-      if (_0x4d6162['has'](_0x23c13c['slotId']))
-        throw new Error('输入槽“' + _0x23c13c['slotId'] + '”只能接入一个素材');
-      _0x4d6162['set'](_0x23c13c['slotId'], _0x23c13c);
+      if (map4['has'](enabled['slotId']))
+        throw new Error('输入槽“' + enabled['slotId'] + '”只能接入一个素材');
+      map4['set'](enabled['slotId'], enabled);
     }
   }
-  for (const _0x241d85 of MEDIA_KINDS) {
-    const _0x335822 = _0x1166bc['filter'](
-      (_0x593246) =>
-        normalizeText(_0x593246?.['kind']) === _0x241d85 &&
-        !_0x4d6162['has'](normalizeText(_0x593246?.['id'])),
+  for (const value19 of MEDIA_KINDS) {
+    const value20 = list3['filter'](
+      (value21) =>
+        normalizeText(value21?.['kind']) === value19 && !map4['has'](normalizeText(value21?.['id'])),
     );
-    for (const _0x12cf9a of _0x47fcc8[_0x241d85]) {
-      if (_0x12cf9a['slotId']) continue;
-      const _0x5db6ec = _0x335822['shift']();
-      if (_0x5db6ec) _0x4d6162['set'](normalizeText(_0x5db6ec['id']), _0x12cf9a);
+    for (const value22 of value7[value19]) {
+      if (value22['slotId']) continue;
+      const value23 = value20['shift']();
+      if (value23) map4['set'](normalizeText(value23['id']), value22);
     }
   }
-  for (const _0x514ce6 of _0x1166bc) {
-    const _0x147537 = normalizeText(_0x514ce6?.['id']);
-    if (_0x514ce6?.['required'] === !![] && _0x147537 && !_0x4d6162['has'](_0x147537))
-      throw new Error('视频模型缺少必需输入：' + (normalizeText(_0x514ce6['label']) || _0x147537));
+  for (const value24 of list3) {
+    const text2 = normalizeText(value24?.['id']);
+    if (value24?.['required'] === !![] && text2 && !map4['has'](text2))
+      throw new Error('视频模型缺少必需输入：' + (normalizeText(value24['label']) || text2));
   }
-  for (const _0x2ca6f of _0x5da0f8?.['exclusiveGroups'] || []) {
-    const _0x49c6b9 = Array['isArray'](_0x2ca6f?.['slots'])
-      ? _0x2ca6f['slots']['map'](normalizeText)['filter']((_0x3eb148) => _0x3645c4['has'](_0x3eb148))
+  for (const value25 of args2?.['exclusiveGroups'] || []) {
+    const list4 = Array['isArray'](value25?.['slots'])
+      ? value25['slots']['map'](normalizeText)['filter']((value26) => map2['has'](value26))
       : [];
-    if (_0x49c6b9['length'] === 0x0) continue;
-    const _0x410b20 = _0x49c6b9['filter']((_0x53837e) => _0x4d6162['has'](_0x53837e))['length'],
-      _0x5217ff = Number(_0x2ca6f?.['min']),
-      _0x21f9c8 = Number(_0x2ca6f?.['max']),
-      _0x4d2db5 = normalizeText(_0x2ca6f?.['label'] || _0x2ca6f?.['id']) || '互斥输入组';
-    if (Number['isFinite'](_0x5217ff) && _0x410b20 < _0x5217ff)
-      throw new Error(_0x4d2db5 + '至少需要 ' + Math['max'](0x0, Math['trunc'](_0x5217ff)) + ' 个输入');
-    if (Number['isFinite'](_0x21f9c8) && _0x410b20 > _0x21f9c8)
-      throw new Error(_0x4d2db5 + '最多允许 ' + Math['max'](0x0, Math['trunc'](_0x21f9c8)) + ' 个输入');
+    if (list4['length'] === 0x0) continue;
+    const value27 = list4['filter']((value28) => map4['has'](value28))['length'],
+      value29 = Number(value25?.['min']),
+      value30 = Number(value25?.['max']),
+      text3 = normalizeText(value25?.['label'] || value25?.['id']) || '互斥输入组';
+    if (Number['isFinite'](value29) && value27 < value29)
+      throw new Error(text3 + '至少需要 ' + Math['max'](0x0, Math['trunc'](value29)) + ' 个输入');
+    if (Number['isFinite'](value30) && value27 > value30)
+      throw new Error(text3 + '最多允许 ' + Math['max'](0x0, Math['trunc'](value30)) + ' 个输入');
   }
-  return _0x4d6162;
+  return map4;
 }
-export function validateStoryClipVideoInputs(_0x16c9b0, _0x25ff04 = {}, _0x3ee333 = {}) {
-  const _0x59bbfa = asObject(_0x16c9b0?.['inputSlots']),
-    _0x4ca51a = new Set(
-      (Array['isArray'](_0x59bbfa['allowedKinds']) ? _0x59bbfa['allowedKinds'] : [])
+export function validateStoryClipVideoInputs(value31, value32 = {}, value33 = {}) {
+  const asObject3 = asObject(value31?.['inputSlots']),
+    map5 = new Set(
+      (Array['isArray'](asObject3['allowedKinds']) ? asObject3['allowedKinds'] : [])
         ['map'](normalizeText)
         ['filter'](Boolean),
     ),
-    _0x37cd8f = normalizeInputs(_0x25ff04);
-  for (const _0x38e56b of MEDIA_KINDS) {
-    const _0x643ae3 = _0x37cd8f[_0x38e56b]['length'];
-    if (_0x643ae3 > 0x0 && !_0x4ca51a['has'](_0x38e56b))
+    inputs3 = normalizeInputs(value32);
+  for (const value34 of MEDIA_KINDS) {
+    const count2 = inputs3[value34]['length'];
+    if (count2 > 0x0 && !map5['has'](value34))
       throw new Error(
-        '视频模型“' + (_0x16c9b0?.['displayName'] || _0x16c9b0?.['modelId']) + '”不支持' + _0x38e56b + '输入',
+        '视频模型“' + (value31?.['displayName'] || value31?.['modelId']) + '”不支持' + value34 + '输入',
       );
-    const _0x29d210 = resolveKindLimit(_0x59bbfa, _0x38e56b);
-    if (_0x643ae3 > _0x29d210) {
-      if (_0x38e56b === 'audio')
-        throw new Error('参考音频不能超过\x20' + _0x29d210 + ' 个，当前为 ' + _0x643ae3 + '\x20个');
+    const kindLimit = resolveKindLimit(asObject3, value34);
+    if (count2 > kindLimit) {
+      if (value34 === 'audio')
+        throw new Error('参考音频不能超过\x20' + kindLimit + ' 个，当前为 ' + count2 + '\x20个');
       throw new Error(
         '视频模型“' +
-          (_0x16c9b0?.['displayName'] || _0x16c9b0?.['modelId']) +
+          (value31?.['displayName'] || value31?.['modelId']) +
           '”最多支持\x20' +
-          _0x29d210 +
+          kindLimit +
           '\x20个' +
-          _0x38e56b +
+          value34 +
           '输入，当前为\x20' +
-          _0x643ae3 +
+          count2 +
           '\x20个',
       );
     }
-    const _0x335d0c = Number(_0x59bbfa?.['minByKind']?.[_0x38e56b]);
-    if (Number['isFinite'](_0x335d0c) && _0x643ae3 < _0x335d0c)
+    const value35 = Number(asObject3?.['minByKind']?.[value34]);
+    if (Number['isFinite'](value35) && count2 < value35)
       throw new Error(
         '视频模型“' +
-          (_0x16c9b0?.['displayName'] || _0x16c9b0?.['modelId']) +
+          (value31?.['displayName'] || value31?.['modelId']) +
           '”至少需要 ' +
-          Math['max'](0x0, Math['trunc'](_0x335d0c)) +
+          Math['max'](0x0, Math['trunc'](value35)) +
           '\x20个' +
-          _0x38e56b +
+          value34 +
           '输入',
       );
   }
-  return { inputs: _0x37cd8f, assignedSlots: assignFixedSlots(_0x16c9b0, _0x59bbfa, _0x37cd8f, _0x3ee333) };
+  return { inputs: inputs3, assignedSlots: assignFixedSlots(value31, asObject3, inputs3, value33) };
 }
-function assignSlotPayloadFields(_0x497985, _0x3e848b) {
-  const _0x5ca4ad = {};
-  for (const [_0x2ed212, _0x119a1f] of _0x3e848b['entries']()) {
-    ((_0x5ca4ad[_0x2ed212] = _0x119a1f['url']), (_0x497985[_0x2ed212] = _0x119a1f['url']));
-    if (!_0x2ed212['toLowerCase']()['endsWith']('url')) _0x497985[_0x2ed212 + 'Url'] = _0x119a1f['url'];
+function assignSlotPayloadFields(value36, map6) {
+  const value37 = {};
+  for (const [enabled3, response5] of map6['entries']()) {
+    ((value37[enabled3] = response5['url']), (value36[enabled3] = response5['url']));
+    if (!enabled3['toLowerCase']()['endsWith']('url')) value36[enabled3 + 'Url'] = response5['url'];
   }
-  if (Object['keys'](_0x5ca4ad)['length'] > 0x0) _0x497985['inputUrlsBySlot'] = _0x5ca4ad;
+  if (Object['keys'](value37)['length'] > 0x0) value36['inputUrlsBySlot'] = value37;
 }
 export function buildStoryClipVideoPayload({
-  modelId: _0x284ea3,
+  modelId: modelId2,
   provider: provider = '',
   prompt: prompt = '',
   generationParams: generationParams = {},
@@ -268,376 +261,391 @@ export function buildStoryClipVideoPayload({
   installId: installId = '',
   providerProfileId: providerProfileId = '',
 } = {}) {
-  const _0x354f28 = resolveStoryClipVideoExecution(_0x284ea3, provider);
-  if (!_0x354f28?.['modelManifest'] || !_0x354f28?.['executionManifest'])
-    throw new Error(
-      '视频模型缺少 manifest 或 execution manifest：' + (normalizeText(_0x284ea3) || '(empty)'),
-    );
-  const { modelManifest: _0x503367, executionManifest: _0x5ba409 } = _0x354f28;
-  if (_0x503367['kind'] !== 'video' || _0x5ba409['kind'] !== 'video')
-    throw new Error('模型“' + _0x503367['modelId'] + '”不是视频生成模型');
-  const _0x5a5a17 = sanitizeModelUiSchemaParams(_0x503367['modelId'], generationParams),
-    _0x588c88 = validateStoryClipVideoInputs(_0x503367, mergePromptAssetInputRefs(inputs, assetInputRefs), {
-      generationParams: _0x5a5a17,
-    }),
-    _0x483ae6 = _0x588c88['inputs']['image']['map']((_0x3567a5) => _0x3567a5['url']),
-    _0x5d310b = _0x588c88['inputs']['video']['map']((_0x20ca37) => _0x20ca37['url']),
-    _0x3d1e11 = _0x588c88['inputs']['audio']['map']((_0x2ee907) => _0x2ee907['url']),
-    _0x1753ac = {
-      ..._0x5a5a17,
+  const storyClipVideoExecution = resolveStoryClipVideoExecution(modelId2, provider);
+  if (!storyClipVideoExecution?.['modelManifest'] || !storyClipVideoExecution?.['executionManifest'])
+    throw new Error('视频模型缺少 manifest 或 execution manifest：' + (normalizeText(modelId2) || '(empty)'));
+  const { modelManifest: modelManifest, executionManifest: executionManifest } = storyClipVideoExecution;
+  if (modelManifest['kind'] !== 'video' || executionManifest['kind'] !== 'video')
+    throw new Error('模型“' + modelManifest['modelId'] + '”不是视频生成模型');
+  const generationParams2 = sanitizeModelUiSchemaParams(modelManifest['modelId'], generationParams),
+    validateStoryClipVideoInputs2 = validateStoryClipVideoInputs(
+      modelManifest,
+      mergePromptAssetInputRefs(inputs, assetInputRefs),
+      {
+        generationParams: generationParams2,
+      },
+    ),
+    images = validateStoryClipVideoInputs2['inputs']['image']['map']((response6) => response6['url']),
+    videos = validateStoryClipVideoInputs2['inputs']['video']['map']((response7) => response7['url']),
+    audios = validateStoryClipVideoInputs2['inputs']['audio']['map']((response8) => response8['url']),
+    payload2 = {
+      ...generationParams2,
       prompt: String(prompt || ''),
-      model: _0x503367['modelId'],
-      provider: _0x503367['provider'],
-      generationParams: { ..._0x5a5a17 },
-      images: _0x483ae6,
-      videos: _0x5d310b,
-      audios: _0x3d1e11,
-      inputUrls: _0x483ae6,
-      inputImages: _0x483ae6,
-      inputVideos: _0x5d310b,
-      inputAudios: _0x3d1e11,
+      model: modelManifest['modelId'],
+      provider: modelManifest['provider'],
+      generationParams: { ...generationParams2 },
+      images: images,
+      videos: videos,
+      audios: audios,
+      inputUrls: images,
+      inputImages: images,
+      inputVideos: videos,
+      inputAudios: audios,
     };
-  _0x483ae6[0x0] &&
-    ((_0x1753ac['image'] = _0x483ae6[0x0]),
-    (_0x1753ac['imageUrl'] = _0x483ae6[0x0]),
-    (_0x1753ac['refImageUrl'] = _0x483ae6[0x0]));
-  if (_0x5d310b[0x0]) _0x1753ac['videoUrl'] = _0x5d310b[0x0];
-  if (_0x3d1e11[0x0]) _0x1753ac['audioUrl'] = _0x3d1e11[0x0];
-  if (normalizeText(installId)) _0x1753ac['installId'] = normalizeText(installId);
-  normalizeText(providerProfileId) && (_0x1753ac['providerProfileId'] = normalizeText(providerProfileId));
-  assignSlotPayloadFields(_0x1753ac, _0x588c88['assignedSlots']);
-  const _0x59fd26 = getGenerationInputRatioMediaSize(_0x588c88['inputs'], _0x503367);
+  images[0x0] &&
+    ((payload2['image'] = images[0x0]),
+    (payload2['imageUrl'] = images[0x0]),
+    (payload2['refImageUrl'] = images[0x0]));
+  if (videos[0x0]) payload2['videoUrl'] = videos[0x0];
+  if (audios[0x0]) payload2['audioUrl'] = audios[0x0];
+  if (normalizeText(installId)) payload2['installId'] = normalizeText(installId);
+  normalizeText(providerProfileId) && (payload2['providerProfileId'] = normalizeText(providerProfileId));
+  assignSlotPayloadFields(payload2, validateStoryClipVideoInputs2['assignedSlots']);
+  const sourceWidth = getGenerationInputRatioMediaSize(
+    validateStoryClipVideoInputs2['inputs'],
+    modelManifest,
+  );
   return (
-    applyVideoAdaptiveAspectRatio(_0x1753ac, {
-      nodeData: { generationParams: _0x5a5a17 },
-      modelManifest: _0x503367,
-      provider: _0x503367['provider'],
-      model: _0x503367['modelId'],
-      sourceWidth: _0x59fd26?.['width'] || 0x0,
-      sourceHeight: _0x59fd26?.['height'] || 0x0,
+    applyVideoAdaptiveAspectRatio(payload2, {
+      nodeData: { generationParams: generationParams2 },
+      modelManifest: modelManifest,
+      provider: modelManifest['provider'],
+      model: modelManifest['modelId'],
+      sourceWidth: sourceWidth?.['width'] || 0x0,
+      sourceHeight: sourceWidth?.['height'] || 0x0,
     }),
-    { payload: _0x1753ac, modelManifest: _0x503367, executionManifest: _0x5ba409 }
+    { payload: payload2, modelManifest: modelManifest, executionManifest: executionManifest }
   );
 }
-function getResultKey(_0x16d823) {
+function getResultKey(value38) {
   return normalizeText(
-    _0x16d823?.['localPath'] ||
-      _0x16d823?.['videoUrl'] ||
-      _0x16d823?.['displayLocalPath'] ||
-      _0x16d823?.['thumbId'] ||
-      _0x16d823?.['thumbUrl'],
+    value38?.['localPath'] ||
+      value38?.['videoUrl'] ||
+      value38?.['displayLocalPath'] ||
+      value38?.['thumbId'] ||
+      value38?.['thumbUrl'],
   );
 }
-function appendVideoResults(_0x3a0a5a = [], _0x1ed503 = []) {
-  const _0x5001ac = Array['isArray'](_0x3a0a5a) ? _0x3a0a5a['map']((_0x413633) => ({ ..._0x413633 })) : [],
-    _0x5afa9e = new Set(_0x5001ac['map'](getResultKey)['filter'](Boolean));
-  for (const _0x1b8890 of _0x1ed503) {
-    const _0x1a9067 = getResultKey(_0x1b8890);
-    if (_0x1a9067 && _0x5afa9e['has'](_0x1a9067)) continue;
-    _0x5001ac['push']({ ..._0x1b8890 });
-    if (_0x1a9067) _0x5afa9e['add'](_0x1a9067);
+function appendVideoResults(list5 = [], value39 = []) {
+  const list6 = Array['isArray'](list5) ? list5['map']((args3) => ({ ...args3 })) : [],
+    map7 = new Set(list6['map'](getResultKey)['filter'](Boolean));
+  for (const args4 of value39) {
+    const resultKey = getResultKey(args4);
+    if (resultKey && map7['has'](resultKey)) continue;
+    list6['push']({ ...args4 });
+    if (resultKey) map7['add'](resultKey);
   }
-  return _0x5001ac;
+  return list6;
 }
-function mapRuntimeStatus(_0x4c6382) {
-  const _0x2a4efc = resolveGenerationUiState(_0x4c6382);
-  if (_0x2a4efc === 'error') return 'failed';
-  if (_0x2a4efc === 'submitting' || _0x2a4efc === 'recovering') return 'running';
-  return _0x2a4efc;
+function mapRuntimeStatus(value40) {
+  const generationUiState = resolveGenerationUiState(value40);
+  if (generationUiState === 'error') return 'failed';
+  if (generationUiState === 'submitting' || generationUiState === 'recovering') return 'running';
+  return generationUiState;
 }
-function isShallowRecordEqual(_0x6622a4 = {}, _0x18a9bb = {}) {
-  const _0x359f06 = Object['keys'](_0x6622a4),
-    _0x357dd7 = Object['keys'](_0x18a9bb);
+function isShallowRecordEqual(options5 = {}, value41 = {}) {
+  const list7 = Object['keys'](options5),
+    list8 = Object['keys'](value41);
   return (
-    _0x359f06['length'] === _0x357dd7['length'] &&
-    _0x359f06['every']((_0x3d6d38) => Object['is'](_0x6622a4[_0x3d6d38], _0x18a9bb[_0x3d6d38]))
+    list7['length'] === list8['length'] &&
+    list7['every']((value42) => Object['is'](options5[value42], value41[value42]))
   );
 }
 export function createStoryClipTaskStoreAdapter({
-  targetId: _0x51d0e7,
-  getClip: _0x364a5d,
-  updateClip: _0x53fe53,
+  targetId: targetId,
+  getClip: getClip,
+  updateClip: updateClip,
   initialTaskNode: initialTaskNode = {},
 } = {}) {
-  const _0xad75bb = normalizeText(_0x51d0e7);
-  if (!_0xad75bb) throw new Error('story clip task store requires targetId');
-  if (typeof _0x364a5d !== 'function' || typeof _0x53fe53 !== 'function')
+  const id = normalizeText(targetId);
+  if (!id) throw new Error('story clip task store requires targetId');
+  if (typeof getClip !== 'function' || typeof updateClip !== 'function')
     throw new Error('story clip task store requires getClip() and updateClip()');
-  let _0x16dab7 = { id: _0xad75bb, type: 'story-clip-video-task', ...initialTaskNode };
-  const _0xb1f656 = (_0x456b29 = {}) => {
-    _0x16dab7 = { ..._0x16dab7, ..._0x456b29 };
-    const _0x5410aa = asObject(_0x364a5d()),
-      _0x36a212 = asObject(_0x5410aa['generation']),
-      _0x34e459 = asObject(_0x5410aa['video']),
-      _0x30dd7f = Array['isArray'](_0x456b29['videos'])
-        ? normalizeVideoGenerationResult({ videos: _0x456b29['videos'] })['items']
+  let useOpenapiQuery = { id: id, type: 'story-clip-video-task', ...initialTaskNode };
+  const run = (videos2 = {}) => {
+    useOpenapiQuery = { ...useOpenapiQuery, ...videos2 };
+    const args5 = asObject(getClip()),
+      args6 = asObject(args5['generation']),
+      args7 = asObject(args5['video']),
+      list9 = Array['isArray'](videos2['videos'])
+        ? normalizeVideoGenerationResult({ videos: videos2['videos'] })['items']
         : [],
-      _0x236b5d =
-        _0x30dd7f['length'] > 0x0
-          ? appendVideoResults(_0x34e459['results'], _0x30dd7f)
-          : Array['isArray'](_0x34e459['results'])
-            ? _0x34e459['results']
+      results =
+        list9['length'] > 0x0
+          ? appendVideoResults(args7['results'], list9)
+          : Array['isArray'](args7['results'])
+            ? args7['results']
             : [],
-      _0x39db27 =
-        _0x30dd7f['length'] > 0x0
-          ? Math['max'](0x0, _0x236b5d['length'] - 0x1)
-          : Number(_0x34e459['activeIndex'] || 0x0),
-      _0x39cb85 = {
-        ..._0x36a212,
-        status: mapRuntimeStatus(_0x16dab7),
-        taskId: normalizeText(_0x16dab7['rhTaskId'] || _0x16dab7['asyncTaskId'] || _0x16dab7['taskId']),
-        provider: normalizeText(_0x16dab7['taskProvider'] || _0x16dab7['provider']),
-        providerProfileId: normalizeText(_0x16dab7['providerProfileId']),
-        modelId: normalizeText(_0x16dab7['taskModelId'] || _0x16dab7['model']),
-        executionId: normalizeText(_0x16dab7['taskExecutionId']),
-        useOpenapiQuery: _0x16dab7['rhTaskUseOpenapiQuery'] === !![],
-        startedAt: Number(_0x16dab7['generationStartTime'] || 0x0),
+      activeIndex =
+        list9['length'] > 0x0
+          ? Math['max'](0x0, results['length'] - 0x1)
+          : Number(args7['activeIndex'] || 0x0),
+      generation = {
+        ...args6,
+        status: mapRuntimeStatus(useOpenapiQuery),
+        taskId: normalizeText(
+          useOpenapiQuery['rhTaskId'] || useOpenapiQuery['asyncTaskId'] || useOpenapiQuery['taskId'],
+        ),
+        provider: normalizeText(useOpenapiQuery['taskProvider'] || useOpenapiQuery['provider']),
+        providerProfileId: normalizeText(useOpenapiQuery['providerProfileId']),
+        modelId: normalizeText(useOpenapiQuery['taskModelId'] || useOpenapiQuery['model']),
+        executionId: normalizeText(useOpenapiQuery['taskExecutionId']),
+        useOpenapiQuery: useOpenapiQuery['rhTaskUseOpenapiQuery'] === !![],
+        startedAt: Number(useOpenapiQuery['generationStartTime'] || 0x0),
         duration:
-          _0x16dab7['generationDuration'] === null || _0x16dab7['generationDuration'] === undefined
+          useOpenapiQuery['generationDuration'] === null ||
+          useOpenapiQuery['generationDuration'] === undefined
             ? null
-            : Number(_0x16dab7['generationDuration']),
-        error: mapRuntimeStatus(_0x16dab7) === 'failed' ? getTaskMessage(_0x16dab7) : '',
+            : Number(useOpenapiQuery['generationDuration']),
+        error: mapRuntimeStatus(useOpenapiQuery) === 'failed' ? getTaskMessage(useOpenapiQuery) : '',
       },
-      _0x294a6d = { ..._0x34e459, results: _0x236b5d, activeIndex: _0x39db27 };
-    if (isShallowRecordEqual(_0x36a212, _0x39cb85) && isShallowRecordEqual(_0x34e459, _0x294a6d)) return ![];
-    return (_0x53fe53({ ..._0x5410aa, generation: _0x39cb85, video: _0x294a6d }), !![]);
+      video = { ...args7, results: results, activeIndex: activeIndex };
+    if (isShallowRecordEqual(args6, generation) && isShallowRecordEqual(args7, video)) return ![];
+    return (updateClip({ ...args5, generation: generation, video: video }), !![]);
   };
   return {
-    getState: () => ({ nodes: { [_0xad75bb]: _0x16dab7 } }),
-    getStateRaw: () => ({ nodes: { [_0xad75bb]: _0x16dab7 } }),
-    updateNodeData(_0x25959b, _0x1afeff) {
-      if (normalizeText(_0x25959b) !== _0xad75bb)
-        throw new Error('unknown story clip task target: ' + _0x25959b);
-      _0xb1f656(_0x1afeff);
+    getState: () => ({ nodes: { [id]: useOpenapiQuery } }),
+    getStateRaw: () => ({ nodes: { [id]: useOpenapiQuery } }),
+    updateNodeData(value43, value44) {
+      if (normalizeText(value43) !== id) throw new Error('unknown story clip task target: ' + value43);
+      run(value44);
     },
-    addNode(_0x5ab442) {
-      if (normalizeText(_0x5ab442?.['id']) !== _0xad75bb)
-        throw new Error('invalid story clip task node: ' + (_0x5ab442?.['id'] || ''));
-      _0x16dab7 = { ..._0x16dab7, ..._0x5ab442 };
+    addNode(args8) {
+      if (normalizeText(args8?.['id']) !== id)
+        throw new Error('invalid story clip task node: ' + (args8?.['id'] || ''));
+      useOpenapiQuery = { ...useOpenapiQuery, ...args8 };
     },
   };
 }
 export function createStoryClipGenerationController({
-  getClip: _0xe05d3d,
-  updateClip: _0x4ca72a,
+  getClip: getClip2,
+  updateClip: updateClip2,
   submitTask: submitTask = submitTask_2,
   resumeTask: resumeTask = resumeTask_2,
   cancelTask: cancelTask = cancelTask_2,
   runVideoGeneration: runVideoGeneration = generateVideo,
   resumeVideoGeneration: resumeVideoGeneration = resumeVideoGenerationTask,
 } = {}) {
-  if (typeof _0xe05d3d !== 'function' || typeof _0x4ca72a !== 'function')
+  if (typeof getClip2 !== 'function' || typeof updateClip2 !== 'function')
     throw new Error('story\x20clip\x20generation\x20requires\x20getClip()\x20and\x20updateClip()');
-  let _0x49e73f = null;
-  async function _0x54a77b(_0x4ad7da = {}) {
-    if (_0x49e73f) throw new Error('当前片段已有视频生成任务正在运行');
-    const _0x3e5d92 = asObject(_0xe05d3d()),
-      _0xfd8463 = resolveStoryClipTaskTargetId(_0x4ad7da, _0x3e5d92),
-      _0x41f3ee = buildStoryClipVideoPayload({
-        ..._0x4ad7da,
-        prompt: _0x4ad7da['prompt'] ?? _0x3e5d92['prompt'],
+  let enabled4 = null;
+  async function generate(prompt2 = {}) {
+    if (enabled4) throw new Error('当前片段已有视频生成任务正在运行');
+    const asObject4 = asObject(getClip2()),
+      targetId2 = resolveStoryClipTaskTargetId(prompt2, asObject4),
+      model2 = buildStoryClipVideoPayload({
+        ...prompt2,
+        prompt: prompt2['prompt'] ?? asObject4['prompt'],
       }),
-      _0x497b98 = createStoryClipTaskStoreAdapter({
-        targetId: _0xfd8463,
-        getClip: _0xe05d3d,
-        updateClip: _0x4ca72a,
+      store = createStoryClipTaskStoreAdapter({
+        targetId: targetId2,
+        getClip: getClip2,
+        updateClip: updateClip2,
         initialTaskNode: {
-          model: _0x41f3ee['modelManifest']['modelId'],
-          provider: _0x41f3ee['modelManifest']['provider'],
-          taskModelId: _0x41f3ee['modelManifest']['modelId'],
-          taskProvider: _0x41f3ee['modelManifest']['provider'],
-          taskExecutionId: _0x41f3ee['executionManifest']['id'],
-          adapterType: _0x41f3ee['executionManifest']['adapterType'],
-          providerProfileId: normalizeText(_0x41f3ee['payload']['providerProfileId']),
+          model: model2['modelManifest']['modelId'],
+          provider: model2['modelManifest']['provider'],
+          taskModelId: model2['modelManifest']['modelId'],
+          taskProvider: model2['modelManifest']['provider'],
+          taskExecutionId: model2['executionManifest']['id'],
+          adapterType: model2['executionManifest']['adapterType'],
+          providerProfileId: normalizeText(model2['payload']['providerProfileId']),
         },
       }),
-      _0xe2be0a = new AbortController();
-    _0x49e73f = {
-      targetId: _0xfd8463,
-      store: _0x497b98,
-      abortController: _0xe2be0a,
-      modelManifest: _0x41f3ee['modelManifest'],
+      abortController = new AbortController();
+    enabled4 = {
+      targetId: targetId2,
+      store: store,
+      abortController: abortController,
+      modelManifest: model2['modelManifest'],
     };
-    const _0x181e9b = isAsyncStoryClipVideoExecution(
-      _0x41f3ee['modelManifest'],
-      _0x41f3ee['executionManifest'],
-    );
-    let _0x5cc1e2 = ![];
-    const _0x5115e0 = createGenerationSubmitPlan({
+    const resumable = isAsyncStoryClipVideoExecution(model2['modelManifest'], model2['executionManifest']);
+    let rhTaskUseOpenapiQuery = ![];
+    const generationSubmitPlan = createGenerationSubmitPlan({
       kind: 'video',
-      sourceNodeId: _0xfd8463,
-      targetNodeId: _0xfd8463,
+      sourceNodeId: targetId2,
+      targetNodeId: targetId2,
       trigger: 'story-workspace',
       completionFeedback: ![],
       taskType: 'story-clip-video-generation',
-      provider: _0x41f3ee['modelManifest']['provider'],
-      adapterType: _0x41f3ee['executionManifest']['adapterType'],
-      modelId: _0x41f3ee['modelManifest']['modelId'],
-      executionId: _0x41f3ee['executionManifest']['id'],
-      payload: _0x41f3ee['payload'],
-      cancellable: _0x41f3ee['modelManifest']['cancellable'] === !![],
-      resumable: _0x181e9b || _0x41f3ee['executionManifest']['adapterType'] === 'workflow',
+      provider: model2['modelManifest']['provider'],
+      adapterType: model2['executionManifest']['adapterType'],
+      modelId: model2['modelManifest']['modelId'],
+      executionId: model2['executionManifest']['id'],
+      payload: model2['payload'],
+      cancellable: model2['modelManifest']['cancellable'] === !![],
+      resumable: resumable || model2['executionManifest']['adapterType'] === 'workflow',
       pauseOnAbort: 'afterTaskId',
-      async: _0x181e9b,
-      submit: (_0x1b4b87, _0x53b419 = {}) =>
-        runVideoGeneration(_0x1b4b87, {
-          signal: _0x53b419['signal'],
-          runningHubWorkflowQueueLease: _0x53b419['runningHubWorkflowQueueLease'],
-          onRunningHubWorkflowQueueChange: _0x53b419['onRunningHubWorkflowQueueChange'],
-          onTaskId: (_0x1c1e07) => {
-            (_0x53b419['onTaskId']?.(_0x1c1e07),
-              _0x5cc1e2 && _0x53b419['updateTaskNode']?.({ rhTaskUseOpenapiQuery: !![] }));
+      async: resumable,
+      submit: (value45, signal = {}) =>
+        runVideoGeneration(value45, {
+          signal: signal['signal'],
+          runningHubWorkflowQueueLease: signal['runningHubWorkflowQueueLease'],
+          onRunningHubWorkflowQueueChange: signal['onRunningHubWorkflowQueueChange'],
+          onTaskId: (value46) => {
+            (signal['onTaskId']?.(value46),
+              rhTaskUseOpenapiQuery && signal['updateTaskNode']?.({ rhTaskUseOpenapiQuery: !![] }));
           },
-          onTaskMeta: ({ taskId: _0x2e184c, useOpenapiQuery: _0x5be382 } = {}) => {
-            ((_0x5cc1e2 = _0x5be382 === !![]),
-              _0x53b419['onTaskId']?.(_0x2e184c),
-              _0x53b419['updateTaskNode']?.({ rhTaskUseOpenapiQuery: _0x5cc1e2 }));
+          onTaskMeta: ({ taskId: taskId2, useOpenapiQuery: useOpenapiQuery2 } = {}) => {
+            ((rhTaskUseOpenapiQuery = useOpenapiQuery2 === !![]),
+              signal['onTaskId']?.(taskId2),
+              signal['updateTaskNode']?.({ rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery }));
           },
         }),
-      resultBuilder: (_0x476da7, _0x184c30) =>
-        buildVideoGenerationResultPatch(normalizeVideoGenerationResult(_0x476da7), {
-          startedAt: _0x184c30['startedAt'],
-          duration: Date['now']() - _0x184c30['startedAt'],
+      resultBuilder: (value47, startedAt) =>
+        buildVideoGenerationResultPatch(normalizeVideoGenerationResult(value47), {
+          startedAt: startedAt['startedAt'],
+          duration: Date['now']() - startedAt['startedAt'],
         }),
-      failureBuilder: (_0x1ac556) => ({ jobError: normalizeText(_0x1ac556?.['message']) || '视频生成失败' }),
+      failureBuilder: (error) => ({ jobError: normalizeText(error?.['message']) || '视频生成失败' }),
     });
     try {
-      const _0x1adfee = await submitTask(_0x5115e0, { store: _0x497b98, abortController: _0xe2be0a });
-      if (_0x1adfee?.['status'] !== 'pending' && _0x49e73f?.['targetId'] === _0xfd8463) _0x49e73f = null;
-      return _0x1adfee;
-    } catch (_0x1f685f) {
-      if (_0x49e73f?.['targetId'] === _0xfd8463) _0x49e73f = null;
-      throw _0x1f685f;
+      const response9 = await submitTask(generationSubmitPlan, {
+        store: store,
+        abortController: abortController,
+      });
+      if (response9?.['status'] !== 'pending' && enabled4?.['targetId'] === targetId2) enabled4 = null;
+      return response9;
+    } catch (value48) {
+      if (enabled4?.['targetId'] === targetId2) enabled4 = null;
+      throw value48;
     }
   }
-  async function _0x5cc38c(_0x40037c = {}) {
-    if (_0x49e73f) throw new Error('当前片段已有视频生成任务正在运行');
-    const _0x269f8d = asObject(_0xe05d3d()),
-      _0x575460 = {
-        ...(getRecoverableStoryClipVideoTask(_0x269f8d) || {}),
-        ...(_0x40037c['taskId'] ? { taskId: normalizeText(_0x40037c['taskId']) } : {}),
-        ...(_0x40037c['modelId'] ? { modelId: normalizeText(_0x40037c['modelId']) } : {}),
-        ...(_0x40037c['provider'] ? { provider: normalizeText(_0x40037c['provider']) } : {}),
-        ...(_0x40037c['providerProfileId']
-          ? { providerProfileId: normalizeText(_0x40037c['providerProfileId']) }
+  async function resume(options6 = {}) {
+    if (enabled4) throw new Error('当前片段已有视频生成任务正在运行');
+    const asObject5 = asObject(getClip2()),
+      providerProfileId3 = {
+        ...(getRecoverableStoryClipVideoTask(asObject5) || {}),
+        ...(options6['taskId'] ? { taskId: normalizeText(options6['taskId']) } : {}),
+        ...(options6['modelId'] ? { modelId: normalizeText(options6['modelId']) } : {}),
+        ...(options6['provider'] ? { provider: normalizeText(options6['provider']) } : {}),
+        ...(options6['providerProfileId']
+          ? { providerProfileId: normalizeText(options6['providerProfileId']) }
           : {}),
-        ...(_0x40037c['executionId'] ? { executionId: normalizeText(_0x40037c['executionId']) } : {}),
-        ...(_0x40037c['startedAt'] ? { startedAt: Number(_0x40037c['startedAt']) } : {}),
-        ...(_0x40037c['useOpenapiQuery'] === !![] ? { useOpenapiQuery: !![] } : {}),
+        ...(options6['executionId'] ? { executionId: normalizeText(options6['executionId']) } : {}),
+        ...(options6['startedAt'] ? { startedAt: Number(options6['startedAt']) } : {}),
+        ...(options6['useOpenapiQuery'] === !![] ? { useOpenapiQuery: !![] } : {}),
       };
-    if (!_0x575460['taskId']) throw new Error('片段视频任务缺少 taskId，无法恢复轮询');
-    if (!_0x575460['modelId']) throw new Error('片段视频任务缺少 modelId，无法恢复轮询');
-    const _0x2e89a9 = resolveStoryClipVideoExecution(_0x575460['modelId'], _0x575460['provider']);
-    if (!_0x2e89a9?.['modelManifest'] || !_0x2e89a9?.['executionManifest'])
-      throw new Error('视频模型缺少\x20manifest\x20或\x20execution\x20manifest：' + _0x575460['modelId']);
-    const { modelManifest: _0x5f2bf4, executionManifest: _0x42990c } = _0x2e89a9;
-    if (_0x5f2bf4['kind'] !== 'video' || _0x42990c['kind'] !== 'video')
-      throw new Error('模型“' + _0x5f2bf4['modelId'] + '”不是视频生成模型');
-    const _0x444591 = isAsyncStoryClipVideoExecution(_0x5f2bf4, _0x42990c),
-      _0xe3db69 = _0x42990c['adapterType'] === 'workflow';
-    if (!_0x444591 && !_0xe3db69) throw new Error('视频模型“' + _0x5f2bf4['modelId'] + '”不支持恢复异步任务');
-    const _0x32aa03 = resolveStoryClipTaskTargetId(_0x40037c, _0x269f8d),
-      _0x5e3cb5 = Number(_0x575460['startedAt'] || Date['now']()),
-      _0x144f19 = {
-        model: _0x5f2bf4['modelId'],
-        provider: _0x5f2bf4['provider'],
-        ...(_0x575460['providerProfileId'] ? { providerProfileId: _0x575460['providerProfileId'] } : {}),
+    if (!providerProfileId3['taskId']) throw new Error('片段视频任务缺少 taskId，无法恢复轮询');
+    if (!providerProfileId3['modelId']) throw new Error('片段视频任务缺少 modelId，无法恢复轮询');
+    const storyClipVideoExecution2 = resolveStoryClipVideoExecution(
+      providerProfileId3['modelId'],
+      providerProfileId3['provider'],
+    );
+    if (!storyClipVideoExecution2?.['modelManifest'] || !storyClipVideoExecution2?.['executionManifest'])
+      throw new Error(
+        '视频模型缺少\x20manifest\x20或\x20execution\x20manifest：' + providerProfileId3['modelId'],
+      );
+    const { modelManifest: modelManifest2, executionManifest: executionManifest2 } = storyClipVideoExecution2;
+    if (modelManifest2['kind'] !== 'video' || executionManifest2['kind'] !== 'video')
+      throw new Error('模型“' + modelManifest2['modelId'] + '”不是视频生成模型');
+    const async2 = isAsyncStoryClipVideoExecution(modelManifest2, executionManifest2),
+      enabled5 = executionManifest2['adapterType'] === 'workflow';
+    if (!async2 && !enabled5)
+      throw new Error('视频模型“' + modelManifest2['modelId'] + '”不支持恢复异步任务');
+    const targetId3 = resolveStoryClipTaskTargetId(options6, asObject5),
+      generationStartTime = Number(providerProfileId3['startedAt'] || Date['now']()),
+      payload3 = {
+        model: modelManifest2['modelId'],
+        provider: modelManifest2['provider'],
+        ...(providerProfileId3['providerProfileId']
+          ? { providerProfileId: providerProfileId3['providerProfileId'] }
+          : {}),
       },
-      _0x165bd3 = createStoryClipTaskStoreAdapter({
-        targetId: _0x32aa03,
-        getClip: _0xe05d3d,
-        updateClip: _0x4ca72a,
+      store2 = createStoryClipTaskStoreAdapter({
+        targetId: targetId3,
+        getClip: getClip2,
+        updateClip: updateClip2,
         initialTaskNode: {
-          model: _0x5f2bf4['modelId'],
-          provider: _0x5f2bf4['provider'],
-          taskModelId: _0x5f2bf4['modelId'],
-          taskProvider: _0x5f2bf4['provider'],
-          taskExecutionId: _0x42990c['id'],
-          adapterType: _0x42990c['adapterType'],
-          providerProfileId: _0x575460['providerProfileId'],
-          generationStartTime: _0x5e3cb5,
-          asyncTaskId: _0x575460['taskId'],
+          model: modelManifest2['modelId'],
+          provider: modelManifest2['provider'],
+          taskModelId: modelManifest2['modelId'],
+          taskProvider: modelManifest2['provider'],
+          taskExecutionId: executionManifest2['id'],
+          adapterType: executionManifest2['adapterType'],
+          providerProfileId: providerProfileId3['providerProfileId'],
+          generationStartTime: generationStartTime,
+          asyncTaskId: providerProfileId3['taskId'],
           asyncTaskStatus: 'running',
-          asyncTaskStartedAt: _0x5e3cb5,
-          asyncTaskProvider: _0x5f2bf4['provider'],
+          asyncTaskStartedAt: generationStartTime,
+          asyncTaskProvider: modelManifest2['provider'],
           asyncTaskKind: 'video',
           taskResumable: !![],
-          rhTaskUseOpenapiQuery: _0x575460['useOpenapiQuery'] === !![],
+          rhTaskUseOpenapiQuery: providerProfileId3['useOpenapiQuery'] === !![],
         },
       }),
-      _0x1bdf2c = new AbortController();
-    _0x49e73f = {
-      targetId: _0x32aa03,
-      store: _0x165bd3,
-      abortController: _0x1bdf2c,
-      modelManifest: _0x5f2bf4,
+      abortController2 = new AbortController();
+    enabled4 = {
+      targetId: targetId3,
+      store: store2,
+      abortController: abortController2,
+      modelManifest: modelManifest2,
     };
-    const _0x63ddb9 = createGenerationResumePlan({
+    const generationResumePlan = createGenerationResumePlan({
       kind: 'video',
-      sourceNodeId: _0x32aa03,
-      targetNodeId: _0x32aa03,
+      sourceNodeId: targetId3,
+      targetNodeId: targetId3,
       trigger: 'story-workspace-recovery',
       completionFeedback: ![],
       taskType: 'story-clip-video-generation',
-      provider: _0x5f2bf4['provider'],
-      adapterType: _0x42990c['adapterType'],
-      modelId: _0x5f2bf4['modelId'],
-      executionId: _0x42990c['id'],
-      payload: _0x144f19,
-      taskId: _0x575460['taskId'],
-      startedAt: _0x5e3cb5,
-      cancellable: _0x5f2bf4['cancellable'] === !![],
+      provider: modelManifest2['provider'],
+      adapterType: executionManifest2['adapterType'],
+      modelId: modelManifest2['modelId'],
+      executionId: executionManifest2['id'],
+      payload: payload3,
+      taskId: providerProfileId3['taskId'],
+      startedAt: generationStartTime,
+      cancellable: modelManifest2['cancellable'] === !![],
       resumable: !![],
       pauseOnAbort: !![],
-      async: _0x444591,
-      poll: ({ taskId: _0x54e066, payload: _0x3f0726, signal: _0x131959 }) =>
-        resumeVideoGeneration(_0x54e066, _0x3f0726, {
-          signal: _0x131959,
-          useOpenapiQuery: _0x575460['useOpenapiQuery'] === !![],
+      async: async2,
+      poll: ({ taskId: taskId3, payload: payload4, signal: signal2 }) =>
+        resumeVideoGeneration(taskId3, payload4, {
+          signal: signal2,
+          useOpenapiQuery: providerProfileId3['useOpenapiQuery'] === !![],
         }),
-      resultBuilder: (_0x5c5590, _0x29e77b) =>
-        buildVideoGenerationResultPatch(normalizeVideoGenerationResult(_0x5c5590), {
-          startedAt: _0x29e77b['startedAt'],
-          duration: Date['now']() - _0x29e77b['startedAt'],
+      resultBuilder: (value49, startedAt2) =>
+        buildVideoGenerationResultPatch(normalizeVideoGenerationResult(value49), {
+          startedAt: startedAt2['startedAt'],
+          duration: Date['now']() - startedAt2['startedAt'],
         }),
-      failureBuilder: (_0x5a81b9) => ({
-        jobError: normalizeText(_0x5a81b9?.['message']) || '视频任务恢复失败',
+      failureBuilder: (error2) => ({
+        jobError: normalizeText(error2?.['message']) || '视频任务恢复失败',
       }),
     });
     try {
-      const _0x3c54dd = await resumeTask(_0x63ddb9, {
-        store: _0x165bd3,
-        abortController: _0x1bdf2c,
-        startedAt: _0x5e3cb5,
+      const response10 = await resumeTask(generationResumePlan, {
+        store: store2,
+        abortController: abortController2,
+        startedAt: generationStartTime,
       });
-      if (_0x3c54dd?.['status'] !== 'pending' && _0x49e73f?.['targetId'] === _0x32aa03) _0x49e73f = null;
-      return _0x3c54dd;
-    } catch (_0x54769a) {
-      if (_0x49e73f?.['targetId'] === _0x32aa03) _0x49e73f = null;
-      throw _0x54769a;
+      if (response10?.['status'] !== 'pending' && enabled4?.['targetId'] === targetId3) enabled4 = null;
+      return response10;
+    } catch (value50) {
+      if (enabled4?.['targetId'] === targetId3) enabled4 = null;
+      throw value50;
     }
   }
-  async function _0xfa4662() {
-    if (!_0x49e73f) return { ok: ![], reason: 'missing-target' };
-    const _0x9f40a3 = _0x49e73f,
-      _0x460c19 = await cancelTask(_0x9f40a3['targetId'], {
-        store: _0x9f40a3['store'],
-        cancellable: _0x9f40a3['modelManifest']?.['cancellable'] === !![],
+  async function cancel() {
+    if (!enabled4) return { ok: ![], reason: 'missing-target' };
+    const store3 = enabled4,
+      response11 = await cancelTask(store3['targetId'], {
+        store: store3['store'],
+        cancellable: store3['modelManifest']?.['cancellable'] === !![],
         abortLocal: !![],
       });
-    if (_0x460c19?.['ok'] && _0x49e73f?.['targetId'] === _0x9f40a3['targetId']) _0x49e73f = null;
-    return _0x460c19;
+    if (response11?.['ok'] && enabled4?.['targetId'] === store3['targetId']) enabled4 = null;
+    return response11;
   }
-  function _0x336d7c() {
-    if (!_0x49e73f) return { ok: ![], reason: 'missing-target' };
-    const _0x548767 = _0x49e73f['targetId'];
-    return (_0x49e73f['abortController']['abort'](), { ok: !![], status: 'pausing', targetId: _0x548767 });
+  function pause() {
+    if (!enabled4) return { ok: ![], reason: 'missing-target' };
+    const targetId4 = enabled4['targetId'];
+    return (enabled4['abortController']['abort'](), { ok: !![], status: 'pausing', targetId: targetId4 });
   }
   return {
-    generate: _0x54a77b,
-    resume: _0x5cc38c,
-    cancel: _0xfa4662,
-    pause: _0x336d7c,
-    getActiveTargetId: () => _0x49e73f?.['targetId'] || '',
+    generate: generate,
+    resume: resume,
+    cancel: cancel,
+    pause: pause,
+    getActiveTargetId: () => enabled4?.['targetId'] || '',
   };
 }

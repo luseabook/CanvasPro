@@ -226,16 +226,16 @@ const EN_MANIFEST_TEXT = Object.freeze({
   '秒数决定生成视频的时长：数值越大视频越长、耗时与成本越高。':
     'Seconds control the video duration: higher values make longer videos and increase time and cost.',
 });
-export function translateManifestText(_0x3a00b2, _0x20e4e0 = {}) {
-  if (_0x3a00b2 == null) return '';
-  const _0x520f7a = String(_0x3a00b2);
-  if (!_0x520f7a) return '';
-  const _0x5c3d96 = _0x20e4e0.locale || getLocale();
-  if (_0x5c3d96 !== 'en-US') return _0x520f7a;
-  return EN_MANIFEST_TEXT[_0x520f7a] || _0x520f7a;
+export function translateManifestText(value, item = {}) {
+  if (value == null) return '';
+  const enabled = String(value);
+  if (!enabled) return '';
+  const key = item.locale || getLocale();
+  if (key !== 'en-US') return enabled;
+  return EN_MANIFEST_TEXT[enabled] || enabled;
 }
-export function hasManifestTextTranslation(_0x3f9941, _0x38d70c = {}) {
-  const _0x208d9c = _0x38d70c.locale || getLocale();
-  if (_0x208d9c !== 'en-US') return false;
-  return Object.prototype.hasOwnProperty.call(EN_MANIFEST_TEXT, String(_0x3f9941 ?? ''));
+export function hasManifestTextTranslation(index, result = {}) {
+  const data = result.locale || getLocale();
+  if (data !== 'en-US') return false;
+  return Object.prototype.hasOwnProperty.call(EN_MANIFEST_TEXT, String(index ?? ''));
 }

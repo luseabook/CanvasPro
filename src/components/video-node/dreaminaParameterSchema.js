@@ -19,389 +19,442 @@ export const DREAMINA_VIDEO_PARAM_FIELD_IDS = new Set([
   'duration',
 ]);
 const DREAMINA_ROUTE_MODEL_MEMORY_FIELD = 'dreaminaModelByRouteMode';
-function hasOwnParam(_0x103d4a, _0x21a805) {
-  return Object.prototype.hasOwnProperty.call(_0x103d4a || {}, _0x21a805);
+function hasOwnParam(value, item) {
+  return Object.prototype.hasOwnProperty.call(value || {}, item);
 }
-export function getDreaminaEffectiveNodeData(_0x1d6715 = {}) {
-  const _0x2ef73d = _0x1d6715 && typeof _0x1d6715 === 'object' ? _0x1d6715 : {},
-    _0x9280d8 = getPlainGenerationParams(_0x2ef73d.generationParams),
-    _0x4d9bb5 = { ..._0x2ef73d };
-  DREAMINA_VIDEO_PARAM_FIELD_IDS.forEach((_0x187db1) => {
-    hasOwnParam(_0x9280d8, _0x187db1) && (_0x4d9bb5[_0x187db1] = _0x9280d8[_0x187db1]);
+export function getDreaminaEffectiveNodeData(options = {}) {
+  const args = options && typeof options === 'object' ? options : {},
+    args2 = getPlainGenerationParams(args.generationParams),
+    key = { ...args };
+  DREAMINA_VIDEO_PARAM_FIELD_IDS.forEach((item2) => {
+    hasOwnParam(args2, item2) && (key[item2] = args2[item2]);
   });
-  const _0x4314dd = normalizeDreaminaVideoRouteMode(_0x4d9bb5.dreaminaRouteMode, _0x4d9bb5.mode);
-  if (_0x4314dd) _0x4d9bb5.dreaminaRouteMode = _0x4314dd;
-  hasOwnParam(_0x9280d8, 'resolution') && (_0x4d9bb5.videoSize = _0x9280d8.resolution);
-  const _0x3feb8a = { ..._0x9280d8 };
-  !hasOwnParam(_0x3feb8a, 'dreaminaRouteMode') && _0x4314dd && (_0x3feb8a.dreaminaRouteMode = _0x4314dd);
-  !hasOwnParam(_0x3feb8a, 'aspectRatio') && (_0x3feb8a.aspectRatio = _0x4d9bb5.aspectRatio || '自适应');
-  if (!hasOwnParam(_0x3feb8a, 'resolution')) {
-    const _0x20fb79 = _0x4d9bb5.resolution || _0x4d9bb5.videoSize;
-    if (_0x20fb79) _0x3feb8a.resolution = _0x20fb79;
+  const dreaminaVideoRouteMode = normalizeDreaminaVideoRouteMode(key.dreaminaRouteMode, key.mode);
+  if (dreaminaVideoRouteMode) key.dreaminaRouteMode = dreaminaVideoRouteMode;
+  hasOwnParam(args2, 'resolution') && (key.videoSize = args2.resolution);
+  const index = { ...args2 };
+  !hasOwnParam(index, 'dreaminaRouteMode') &&
+    dreaminaVideoRouteMode &&
+    (index.dreaminaRouteMode = dreaminaVideoRouteMode);
+  !hasOwnParam(index, 'aspectRatio') && (index.aspectRatio = key.aspectRatio || '自适应');
+  if (!hasOwnParam(index, 'resolution')) {
+    const result = key.resolution || key.videoSize;
+    if (result) index.resolution = result;
   }
   return (
-    !hasOwnParam(_0x3feb8a, 'duration') &&
-      _0x4d9bb5.duration !== undefined &&
-      (_0x3feb8a.duration = _0x4d9bb5.duration),
-    (_0x4d9bb5.generationParams = _0x3feb8a),
-    _0x4d9bb5
+    !hasOwnParam(index, 'duration') && key.duration !== undefined && (index.duration = key.duration),
+    (key.generationParams = index),
+    key
   );
 }
-export function buildDreaminaParamPatch(_0x4a0069 = {}, _0x2cc814 = {}) {
-  const _0x12619e = getPlainGenerationParams(_0x4a0069?.generationParams);
-  Object.entries(_0x2cc814 || {}).forEach(([_0xeb4732, _0xa0dbd4]) => {
-    if (!DREAMINA_VIDEO_PARAM_FIELD_IDS.has(_0xeb4732)) return;
-    _0x12619e[_0xeb4732] = _0xa0dbd4;
+export function buildDreaminaParamPatch(options2 = {}, data = {}) {
+  const generationParams = getPlainGenerationParams(options2?.generationParams);
+  Object.entries(data || {}).forEach(([target, source]) => {
+    if (!DREAMINA_VIDEO_PARAM_FIELD_IDS.has(target)) return;
+    generationParams[target] = source;
   });
-  const _0x5e4c50 = { generationParams: _0x12619e },
-    _0x14c98e = String(_0x4a0069?.model || '').trim();
+  const next = { generationParams: generationParams },
+    current = String(options2?.model || '').trim();
   return (
-    _0x14c98e &&
-      (_0x5e4c50.generationParamsByModel = {
-        ...getPlainGenerationParams(_0x4a0069?.generationParamsByModel),
-        [_0x14c98e]: _0x12619e,
+    current &&
+      (next.generationParamsByModel = {
+        ...getPlainGenerationParams(options2?.generationParamsByModel),
+        [current]: generationParams,
       }),
-    _0x5e4c50
+    next
   );
 }
-function buildDreaminaModelParamSnapshot(_0x58a614 = {}) {
-  const _0xf7d16e = getDreaminaEffectiveNodeData(_0x58a614),
-    _0x374b65 = getPlainGenerationParams(_0xf7d16e?.generationParams),
-    _0x51ec1e = { ..._0x374b65 };
+function buildDreaminaModelParamSnapshot(options3 = {}) {
+  const dreaminaEffectiveNodeData = getDreaminaEffectiveNodeData(options3),
+    args3 = getPlainGenerationParams(dreaminaEffectiveNodeData?.generationParams),
+    entry = { ...args3 };
   return (
-    DREAMINA_VIDEO_PARAM_FIELD_IDS.forEach((_0x591d63) => {
-      if (_0x51ec1e[_0x591d63] !== undefined) return;
-      _0xf7d16e?.[_0x591d63] !== undefined && (_0x51ec1e[_0x591d63] = _0xf7d16e[_0x591d63]);
+    DREAMINA_VIDEO_PARAM_FIELD_IDS.forEach((item3) => {
+      if (entry[item3] !== undefined) return;
+      dreaminaEffectiveNodeData?.[item3] !== undefined && (entry[item3] = dreaminaEffectiveNodeData[item3]);
     }),
-    _0x51ec1e.resolution === undefined &&
-      _0xf7d16e?.videoSize !== undefined &&
-      (_0x51ec1e.resolution = _0xf7d16e.videoSize),
-    _0x51ec1e[DREAMINA_ROUTE_MODEL_MEMORY_FIELD] === undefined &&
-      _0xf7d16e?.[DREAMINA_ROUTE_MODEL_MEMORY_FIELD] !== undefined &&
-      (_0x51ec1e[DREAMINA_ROUTE_MODEL_MEMORY_FIELD] = getPlainGenerationParams(
-        _0xf7d16e[DREAMINA_ROUTE_MODEL_MEMORY_FIELD],
+    entry.resolution === undefined &&
+      dreaminaEffectiveNodeData?.videoSize !== undefined &&
+      (entry.resolution = dreaminaEffectiveNodeData.videoSize),
+    entry[DREAMINA_ROUTE_MODEL_MEMORY_FIELD] === undefined &&
+      dreaminaEffectiveNodeData?.[DREAMINA_ROUTE_MODEL_MEMORY_FIELD] !== undefined &&
+      (entry[DREAMINA_ROUTE_MODEL_MEMORY_FIELD] = getPlainGenerationParams(
+        dreaminaEffectiveNodeData[DREAMINA_ROUTE_MODEL_MEMORY_FIELD],
       )),
-    _0x51ec1e.dreaminaRouteMode !== undefined &&
-      (_0x51ec1e.dreaminaRouteMode = normalizeDreaminaVideoRouteMode(
-        _0x51ec1e.dreaminaRouteMode,
-        _0xf7d16e?.mode,
+    entry.dreaminaRouteMode !== undefined &&
+      (entry.dreaminaRouteMode = normalizeDreaminaVideoRouteMode(
+        entry.dreaminaRouteMode,
+        dreaminaEffectiveNodeData?.mode,
       )),
-    _0x51ec1e
+    entry
   );
 }
-function getDreaminaRouteModelMemory(_0xc07087 = {}) {
-  const _0x1bd85c = getPlainGenerationParams(_0xc07087?.generationParams),
-    _0x5a16bb = getPlainGenerationParams(_0xc07087?.generationParamsByModel),
-    _0x1b8d66 = {};
+function getDreaminaRouteModelMemory(options4 = {}) {
+  const plainGenerationParams = getPlainGenerationParams(options4?.generationParams),
+    plainGenerationParams2 = getPlainGenerationParams(options4?.generationParamsByModel),
+    args4 = {};
   return (
-    Object.values(_0x5a16bb).forEach((_0x1e4acd) => {
-      Object.assign(_0x1b8d66, getPlainGenerationParams(_0x1e4acd?.[DREAMINA_ROUTE_MODEL_MEMORY_FIELD]));
+    Object.values(plainGenerationParams2).forEach((item4) => {
+      Object.assign(args4, getPlainGenerationParams(item4?.[DREAMINA_ROUTE_MODEL_MEMORY_FIELD]));
     }),
     {
-      ..._0x1b8d66,
-      ...getPlainGenerationParams(_0x1bd85c[DREAMINA_ROUTE_MODEL_MEMORY_FIELD]),
-      ...getPlainGenerationParams(_0xc07087?.[DREAMINA_ROUTE_MODEL_MEMORY_FIELD]),
+      ...args4,
+      ...getPlainGenerationParams(plainGenerationParams[DREAMINA_ROUTE_MODEL_MEMORY_FIELD]),
+      ...getPlainGenerationParams(options4?.[DREAMINA_ROUTE_MODEL_MEMORY_FIELD]),
     }
   );
 }
-function getDreaminaRouteModelMemoryKey(_0x5c8aba, _0x3b385d) {
-  const _0x115148 = String(_0x5c8aba || 'dreamina')
+function getDreaminaRouteModelMemoryKey(record, payload) {
+  const handle = String(record || 'dreamina')
       .trim()
       .toLowerCase(),
-    _0x754898 = normalizeDreaminaVideoRouteMode(_0x3b385d);
-  return _0x115148 + ':' + _0x754898;
+    dreaminaVideoRouteMode2 = normalizeDreaminaVideoRouteMode(payload);
+  return handle + ':' + dreaminaVideoRouteMode2;
 }
-function rememberDreaminaRouteModel(_0x4b4408, _0x557e81, _0x7dc88d, _0x32379e) {
-  const _0x17a873 = _0x4b4408 && typeof _0x4b4408 === 'object' ? _0x4b4408 : {},
-    _0x11dde5 = String(_0x32379e || '').trim();
-  if (!_0x11dde5) return _0x17a873;
-  return ((_0x17a873[getDreaminaRouteModelMemoryKey(_0x557e81, _0x7dc88d)] = _0x11dde5), _0x17a873);
+function rememberDreaminaRouteModel(state, config, scope, input) {
+  const output = state && typeof state === 'object' ? state : {},
+    enabled = String(input || '').trim();
+  if (!enabled) return output;
+  return ((output[getDreaminaRouteModelMemoryKey(config, scope)] = enabled), output);
 }
-function getRememberedDreaminaRouteModel(_0x394e3d, _0x5b6400, _0x32811f) {
-  const _0x2bbc2c = _0x394e3d?.[getDreaminaRouteModelMemoryKey(_0x5b6400, _0x32811f)];
-  return String(_0x2bbc2c || '').trim();
+function getRememberedDreaminaRouteModel(value2, value3, value4) {
+  const value5 = value2?.[getDreaminaRouteModelMemoryKey(value3, value4)];
+  return String(value5 || '').trim();
 }
-function ensureSupportedRouteModel(_0x2fbbed, _0x23c99f, _0x392957) {
-  const _0x2e5e17 = String(_0x23c99f || '').trim();
-  if (!_0x2e5e17) return '';
-  if (!isDreaminaStyleVideoTaskModelSupported(_0x2fbbed, _0x2e5e17, _0x392957)) return '';
-  return ensureDreaminaStyleVideoModelForTask(_0x2fbbed, _0x2e5e17, _0x392957);
+function ensureSupportedRouteModel(value6, value7, value8) {
+  const enabled2 = String(value7 || '').trim();
+  if (!enabled2) return '';
+  if (!isDreaminaStyleVideoTaskModelSupported(value6, enabled2, value8)) return '';
+  return ensureDreaminaStyleVideoModelForTask(value6, enabled2, value8);
 }
 function getSavedDreaminaProviderRouteModel(
-  _0x36b9f1 = {},
-  { provider: _0x3fe41f, routeMode: _0x5de10a, taskType: _0x536bd1, fallbackModel: _0x49127e } = {},
+  options5 = {},
+  { provider: provider, routeMode: routeMode, taskType: taskType, fallbackModel: fallbackModel } = {},
 ) {
-  const _0x270d2e = getPlainGenerationParams(_0x36b9f1?.generationParamsByModel),
-    _0x432912 = [];
-  Object.entries(_0x270d2e).forEach(([_0x5ebe07, _0x49d394]) => {
-    const _0x40a9ca = String(_0x5ebe07 || '').trim();
-    if (!_0x40a9ca) return;
-    const _0x8e750b = resolveDreaminaStyleVideoProvider(_0x40a9ca, _0x3fe41f);
-    if (_0x8e750b !== _0x3fe41f) return;
-    const _0x6add32 = ensureSupportedRouteModel(_0x536bd1, _0x40a9ca, _0x3fe41f);
-    if (!_0x6add32) return;
-    const _0x4c697a = normalizeDreaminaVideoRouteMode(_0x49d394?.dreaminaRouteMode, _0x36b9f1?.mode);
-    if (_0x4c697a !== _0x5de10a) return;
-    _0x432912.push(_0x6add32);
+  const plainGenerationParams3 = getPlainGenerationParams(options5?.generationParamsByModel),
+    list = [];
+  Object.entries(plainGenerationParams3).forEach(([value9, value10]) => {
+    const enabled3 = String(value9 || '').trim();
+    if (!enabled3) return;
+    const dreaminaStyleVideoProvider = resolveDreaminaStyleVideoProvider(enabled3, provider);
+    if (dreaminaStyleVideoProvider !== provider) return;
+    const supportedRouteModel = ensureSupportedRouteModel(taskType, enabled3, provider);
+    if (!supportedRouteModel) return;
+    const dreaminaVideoRouteMode3 = normalizeDreaminaVideoRouteMode(
+      value10?.dreaminaRouteMode,
+      options5?.mode,
+    );
+    if (dreaminaVideoRouteMode3 !== routeMode) return;
+    list.push(supportedRouteModel);
   });
-  if (!_0x432912.length) return '';
-  const _0x561ebb = ensureSupportedRouteModel(_0x536bd1, _0x49127e, _0x3fe41f),
-    _0x561f61 = _0x432912
+  if (!list.length) return '';
+  const supportedRouteModel2 = ensureSupportedRouteModel(taskType, fallbackModel, provider),
+    value11 = list
       .slice()
       .reverse()
-      .find((_0x5aead8) => _0x5aead8 !== _0x561ebb);
-  return _0x561f61 || _0x432912[_0x432912.length - 1] || '';
+      .find((item5) => item5 !== supportedRouteModel2);
+  return value11 || list[list.length - 1] || '';
 }
 export function resolveDreaminaRememberedRouteModel(
-  _0x4701ef = {},
-  { provider: _0x34e9d4, routeMode: _0x36daad, taskType: _0x4ce054, fallbackModel: _0x463bfc } = {},
+  options6 = {},
+  { provider: provider2, routeMode: routeMode2, taskType: taskType2, fallbackModel: fallbackModel2 } = {},
 ) {
-  const _0xaa355c = getDreaminaEffectiveNodeData(_0x4701ef),
-    _0x21cf8b = resolveDreaminaStyleVideoProvider(_0x463bfc, _0x34e9d4 || _0xaa355c?.provider),
-    _0x58db2d = normalizeDreaminaVideoRouteMode(_0x36daad || _0xaa355c?.dreaminaRouteMode, _0xaa355c?.mode),
-    _0x49163b = String(_0x4ce054 || '').trim() || resolveDreaminaVideoTaskType({ routeMode: _0x58db2d }),
-    _0x2aeed9 = getRememberedDreaminaRouteModel(getDreaminaRouteModelMemory(_0xaa355c), _0x21cf8b, _0x58db2d),
-    _0x369bc9 = ensureSupportedRouteModel(_0x49163b, _0x2aeed9, _0x21cf8b);
-  if (_0x369bc9) return _0x369bc9;
-  const _0x2d2afb = String(_0xaa355c?.model || '').trim(),
-    _0x5175c2 = resolveDreaminaStyleVideoProvider(_0x2d2afb, _0xaa355c?.provider),
-    _0xdec2ee = _0x5175c2 === _0x21cf8b ? ensureSupportedRouteModel(_0x49163b, _0x2d2afb, _0x21cf8b) : '';
-  if (_0xdec2ee) return _0xdec2ee;
-  const _0x2ca96d = getSavedDreaminaProviderRouteModel(_0xaa355c, {
-    provider: _0x21cf8b,
-    routeMode: _0x58db2d,
-    taskType: _0x49163b,
-    fallbackModel: _0x463bfc,
+  const dreaminaEffectiveNodeData2 = getDreaminaEffectiveNodeData(options6),
+    provider3 = resolveDreaminaStyleVideoProvider(
+      fallbackModel2,
+      provider2 || dreaminaEffectiveNodeData2?.provider,
+    ),
+    routeMode3 = normalizeDreaminaVideoRouteMode(
+      routeMode2 || dreaminaEffectiveNodeData2?.dreaminaRouteMode,
+      dreaminaEffectiveNodeData2?.mode,
+    ),
+    taskType3 = String(taskType2 || '').trim() || resolveDreaminaVideoTaskType({ routeMode: routeMode3 }),
+    rememberedDreaminaRouteModel = getRememberedDreaminaRouteModel(
+      getDreaminaRouteModelMemory(dreaminaEffectiveNodeData2),
+      provider3,
+      routeMode3,
+    ),
+    supportedRouteModel3 = ensureSupportedRouteModel(taskType3, rememberedDreaminaRouteModel, provider3);
+  if (supportedRouteModel3) return supportedRouteModel3;
+  const value12 = String(dreaminaEffectiveNodeData2?.model || '').trim(),
+    dreaminaStyleVideoProvider2 = resolveDreaminaStyleVideoProvider(
+      value12,
+      dreaminaEffectiveNodeData2?.provider,
+    ),
+    value13 =
+      dreaminaStyleVideoProvider2 === provider3
+        ? ensureSupportedRouteModel(taskType3, value12, provider3)
+        : '';
+  if (value13) return value13;
+  const savedDreaminaProviderRouteModel = getSavedDreaminaProviderRouteModel(dreaminaEffectiveNodeData2, {
+    provider: provider3,
+    routeMode: routeMode3,
+    taskType: taskType3,
+    fallbackModel: fallbackModel2,
   });
-  if (_0x2ca96d) return _0x2ca96d;
-  const _0x1090c4 = resolveDreaminaStyleVideoCounterpartModel(_0x2d2afb, _0x21cf8b, { taskType: _0x49163b }),
-    _0x4d1edb = ensureSupportedRouteModel(_0x49163b, _0x1090c4, _0x21cf8b);
-  if (_0x4d1edb) return _0x4d1edb;
-  return ensureDreaminaStyleVideoModelForTask(_0x49163b, _0x463bfc, _0x21cf8b);
+  if (savedDreaminaProviderRouteModel) return savedDreaminaProviderRouteModel;
+  const dreaminaStyleVideoCounterpartModel = resolveDreaminaStyleVideoCounterpartModel(value12, provider3, {
+      taskType: taskType3,
+    }),
+    supportedRouteModel4 = ensureSupportedRouteModel(
+      taskType3,
+      dreaminaStyleVideoCounterpartModel,
+      provider3,
+    );
+  if (supportedRouteModel4) return supportedRouteModel4;
+  return ensureDreaminaStyleVideoModelForTask(taskType3, fallbackModel2, provider3);
 }
 export function buildDreaminaModelSelectionParamPatch(
-  _0x571070 = {},
+  options7 = {},
   {
-    model: _0x22ecf2,
-    provider: _0x5dd9f1,
-    taskType: _0x25b064,
+    model: model,
+    provider: provider4,
+    taskType: taskType4,
     fallbackValues: fallbackValues = {},
     restoreTargetParams: restoreTargetParams = true,
     rememberCurrentModel: rememberCurrentModel = true,
   } = {},
 ) {
-  const _0x99bcee = getDreaminaEffectiveNodeData(_0x571070),
-    _0x3b97ae = String(_0x22ecf2 || '').trim();
-  if (!_0x3b97ae) return {};
-  const _0x5afbf1 = resolveDreaminaStyleVideoProvider(_0x3b97ae, _0x5dd9f1 || _0x99bcee?.provider),
-    _0x77f241 = getPlainGenerationParams(_0x99bcee?.generationParamsByModel),
-    _0x4b7dcd = String(_0x99bcee?.model || '').trim(),
-    _0x29c4af = resolveDreaminaStyleVideoProvider(_0x4b7dcd, _0x99bcee?.provider),
-    _0xad350 = normalizeDreaminaVideoRouteMode(_0x99bcee?.dreaminaRouteMode, _0x99bcee?.mode),
-    _0x47b79f = getDreaminaRouteModelMemory(_0x99bcee),
-    _0x5cf52b = getPlainGenerationParams(_0x77f241[_0x3b97ae]);
-  Object.assign(_0x47b79f, getPlainGenerationParams(_0x5cf52b[DREAMINA_ROUTE_MODEL_MEMORY_FIELD]));
-  _0x4b7dcd &&
+  const dreaminaEffectiveNodeData3 = getDreaminaEffectiveNodeData(options7),
+    enabled4 = String(model || '').trim();
+  if (!enabled4) return {};
+  const dreaminaStyleVideoProvider3 = resolveDreaminaStyleVideoProvider(
+      enabled4,
+      provider4 || dreaminaEffectiveNodeData3?.provider,
+    ),
+    generationParamsByModel = getPlainGenerationParams(dreaminaEffectiveNodeData3?.generationParamsByModel),
+    value14 = String(dreaminaEffectiveNodeData3?.model || '').trim(),
+    dreaminaStyleVideoProvider4 = resolveDreaminaStyleVideoProvider(
+      value14,
+      dreaminaEffectiveNodeData3?.provider,
+    ),
+    dreaminaVideoRouteMode4 = normalizeDreaminaVideoRouteMode(
+      dreaminaEffectiveNodeData3?.dreaminaRouteMode,
+      dreaminaEffectiveNodeData3?.mode,
+    ),
+    dreaminaRouteModelMemory = getDreaminaRouteModelMemory(dreaminaEffectiveNodeData3),
+    plainGenerationParams4 = getPlainGenerationParams(generationParamsByModel[enabled4]);
+  Object.assign(
+    dreaminaRouteModelMemory,
+    getPlainGenerationParams(plainGenerationParams4[DREAMINA_ROUTE_MODEL_MEMORY_FIELD]),
+  );
+  value14 &&
     rememberCurrentModel &&
-    (rememberDreaminaRouteModel(_0x47b79f, _0x29c4af, _0xad350, _0x4b7dcd),
-    (_0x77f241[_0x4b7dcd] = {
-      ...buildDreaminaModelParamSnapshot(_0x99bcee),
-      [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: _0x47b79f,
+    (rememberDreaminaRouteModel(
+      dreaminaRouteModelMemory,
+      dreaminaStyleVideoProvider4,
+      dreaminaVideoRouteMode4,
+      value14,
+    ),
+    (generationParamsByModel[value14] = {
+      ...buildDreaminaModelParamSnapshot(dreaminaEffectiveNodeData3),
+      [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: dreaminaRouteModelMemory,
     }));
-  const _0x36c357 = {
-      ...buildDreaminaModelParamSnapshot(_0x99bcee),
+  const args5 = {
+      ...buildDreaminaModelParamSnapshot(dreaminaEffectiveNodeData3),
       ...getPlainGenerationParams(fallbackValues),
     },
-    _0x100779 = restoreTargetParams ? _0x5cf52b : {},
-    _0x3fcecf = normalizeDreaminaVideoRouteMode(_0x36c357.dreaminaRouteMode, _0x99bcee?.mode),
-    _0x1ade04 = String(_0x25b064 || '').trim(),
-    _0x3308e7 = _0x1ade04 || resolveDreaminaVideoTaskType({ routeMode: _0x3fcecf }),
-    _0x404e76 = { ..._0x36c357, ..._0x100779, dreaminaRouteMode: _0x3fcecf },
-    _0x53d173 = normalizeDreaminaVideoAspectRatio(_0x404e76.aspectRatio, { preserveAdaptive: true }),
-    _0x1c5789 = normalizeDreaminaStyleVideoResolution(_0x3308e7, _0x3b97ae, _0x404e76.resolution, _0x5afbf1),
-    _0x48653d = normalizeDreaminaStyleVideoDuration(_0x3308e7, _0x3b97ae, _0x404e76.duration, _0x5afbf1),
-    _0x1dffb2 = {
-      ..._0x100779,
-      dreaminaRouteMode: _0x3fcecf,
-      aspectRatio: _0x53d173,
-      duration: _0x48653d,
-      [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: _0x47b79f,
+    args6 = restoreTargetParams ? plainGenerationParams4 : {},
+    routeMode4 = normalizeDreaminaVideoRouteMode(args5.dreaminaRouteMode, dreaminaEffectiveNodeData3?.mode),
+    value15 = String(taskType4 || '').trim(),
+    value16 = value15 || resolveDreaminaVideoTaskType({ routeMode: routeMode4 }),
+    value17 = { ...args5, ...args6, dreaminaRouteMode: routeMode4 },
+    aspectRatio = normalizeDreaminaVideoAspectRatio(value17.aspectRatio, { preserveAdaptive: true }),
+    dreaminaStyleVideoResolution = normalizeDreaminaStyleVideoResolution(
+      value16,
+      enabled4,
+      value17.resolution,
+      dreaminaStyleVideoProvider3,
+    ),
+    duration = normalizeDreaminaStyleVideoDuration(
+      value16,
+      enabled4,
+      value17.duration,
+      dreaminaStyleVideoProvider3,
+    ),
+    generationParams2 = {
+      ...args6,
+      dreaminaRouteMode: routeMode4,
+      aspectRatio: aspectRatio,
+      duration: duration,
+      [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: dreaminaRouteModelMemory,
     };
-  if (_0x1c5789) _0x1dffb2.resolution = _0x1c5789;
+  if (dreaminaStyleVideoResolution) generationParams2.resolution = dreaminaStyleVideoResolution;
   return (
-    rememberDreaminaRouteModel(_0x47b79f, _0x5afbf1, _0x3fcecf, _0x3b97ae),
-    (_0x77f241[_0x3b97ae] = _0x1dffb2),
+    rememberDreaminaRouteModel(dreaminaRouteModelMemory, dreaminaStyleVideoProvider3, routeMode4, enabled4),
+    (generationParamsByModel[enabled4] = generationParams2),
     {
-      dreaminaRouteMode: _0x3fcecf,
-      [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: _0x47b79f,
-      generationParams: _0x1dffb2,
-      generationParamsByModel: _0x77f241,
+      dreaminaRouteMode: routeMode4,
+      [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: dreaminaRouteModelMemory,
+      generationParams: generationParams2,
+      generationParamsByModel: generationParamsByModel,
     }
   );
 }
-export function buildDreaminaStorePatchFromNormalization(_0x3beeaf = {}, _0x12b13e = {}) {
-  const _0x3e2d7d = getDreaminaEffectiveNodeData(_0x3beeaf),
-    _0x7684fa = {},
-    _0x1465ab = {};
-  Object.entries(_0x12b13e || {}).forEach(([_0x190687, _0x772704]) => {
-    DREAMINA_VIDEO_PARAM_FIELD_IDS.has(_0x190687)
-      ? (_0x1465ab[_0x190687] = _0x772704)
-      : (_0x7684fa[_0x190687] = _0x772704);
+export function buildDreaminaStorePatchFromNormalization(options8 = {}, value18 = {}) {
+  const args7 = getDreaminaEffectiveNodeData(options8),
+    args8 = {},
+    value19 = {};
+  Object.entries(value18 || {}).forEach(([value20, value21]) => {
+    DREAMINA_VIDEO_PARAM_FIELD_IDS.has(value20) ? (value19[value20] = value21) : (args8[value20] = value21);
   });
-  const _0x2a945d = Object.keys(_0x1465ab).length
-    ? buildDreaminaParamPatch({ ..._0x3e2d7d, ..._0x7684fa }, _0x1465ab)
-    : {};
-  return { ..._0x7684fa, ..._0x2a945d };
+  const args9 = Object.keys(value19).length ? buildDreaminaParamPatch({ ...args7, ...args8 }, value19) : {};
+  return { ...args8, ...args9 };
 }
 export function buildDreaminaRouteModeUpdate({
-  nextRouteMode: _0x49eca6,
+  nextRouteMode: nextRouteMode,
   baseNodeData: baseNodeData = {},
   incoming: incoming = [],
   nodes: nodes = {},
 } = {}) {
-  const _0x2220a0 = normalizeDreaminaVideoRouteMode(_0x49eca6),
-    _0x2281ec = getDreaminaEffectiveNodeData(baseNodeData);
-  if (!_0x2220a0) return { nodeData: _0x2281ec, patch: {}, edgeIdsToRemove: [] };
-  if (!isDreaminaVideoRouteModeEnabled(_0x2220a0))
-    return { disabled: true, nodeData: _0x2281ec, patch: {}, edgeIdsToRemove: [] };
-  const _0x104c4f = (_0x550285) => {
-      const _0x2b8c1e = Number(_0x550285?.createdAt);
-      if (Number.isFinite(_0x2b8c1e) && _0x2b8c1e > 0) return _0x2b8c1e;
-      const _0x500bf7 = String(_0x550285?.id || ''),
-        _0x51b9b6 = _0x500bf7.match(/(\d{10,})/g);
-      return _0x51b9b6 && _0x51b9b6.length ? Number(_0x51b9b6[_0x51b9b6.length - 1]) || 0 : 0;
+  const routeMode5 = normalizeDreaminaVideoRouteMode(nextRouteMode),
+    nodeData = getDreaminaEffectiveNodeData(baseNodeData);
+  if (!routeMode5) return { nodeData: nodeData, patch: {}, edgeIdsToRemove: [] };
+  if (!isDreaminaVideoRouteModeEnabled(routeMode5))
+    return { disabled: true, nodeData: nodeData, patch: {}, edgeIdsToRemove: [] };
+  const run = (value22) => {
+      const count = Number(value22?.createdAt);
+      if (Number.isFinite(count) && count > 0) return count;
+      const value23 = String(value22?.id || ''),
+        list2 = value23.match(/(\d{10,})/g);
+      return list2 && list2.length ? Number(list2[list2.length - 1]) || 0 : 0;
     },
-    _0x407bbd = [],
-    _0x43c12f = [],
-    _0x217445 = [],
-    _0xfb45dc = [];
-  for (const _0x2fd147 of incoming || []) {
-    const _0x63f219 = nodes?.[_0x2fd147.sourceId],
-      _0x2fbbaf = String(_0x63f219?.type || '').toLowerCase();
-    if (_0x2fbbaf.includes('image')) _0x407bbd.push(_0x2fd147);
+    imageCount = [],
+    videoCount = [],
+    audioCount = [],
+    edgeIdsToRemove = [];
+  for (const value24 of incoming || []) {
+    const value25 = nodes?.[value24.sourceId],
+      list3 = String(value25?.type || '').toLowerCase();
+    if (list3.includes('image')) imageCount.push(value24);
     else {
-      if (_0x2fbbaf.includes('video')) _0x43c12f.push(_0x2fd147);
+      if (list3.includes('video')) videoCount.push(value24);
       else {
-        if (_0x2fbbaf.includes('audio')) _0x217445.push(_0x2fd147);
+        if (list3.includes('audio')) audioCount.push(value24);
         else {
-          if (_0x2220a0 === 'frames2video') _0xfb45dc.push(_0x2fd147.id);
+          if (routeMode5 === 'frames2video') edgeIdsToRemove.push(value24.id);
         }
       }
     }
   }
-  if (_0x2220a0 === 'frames2video') {
-    (_0x43c12f.forEach((_0x4f02c3) => _0xfb45dc.push(_0x4f02c3.id)),
-      _0x217445.forEach((_0x4c0066) => _0xfb45dc.push(_0x4c0066.id)),
-      _0x407bbd.sort((_0x1c9851, _0x18b735) => _0x104c4f(_0x1c9851) - _0x104c4f(_0x18b735)));
-    while (_0x407bbd.length > 2) {
-      const _0x3f2858 = _0x407bbd.shift();
-      if (_0x3f2858?.id) _0xfb45dc.push(_0x3f2858.id);
+  if (routeMode5 === 'frames2video') {
+    (videoCount.forEach((item6) => edgeIdsToRemove.push(item6.id)),
+      audioCount.forEach((item7) => edgeIdsToRemove.push(item7.id)),
+      imageCount.sort((item8, value26) => run(item8) - run(value26)));
+    while (imageCount.length > 2) {
+      const value27 = imageCount.shift();
+      if (value27?.id) edgeIdsToRemove.push(value27.id);
     }
   } else {
-    if (_0x2220a0 === 'multimodal2video') {
-      (_0x407bbd.sort((_0x10068e, _0x55eaff) => _0x104c4f(_0x10068e) - _0x104c4f(_0x55eaff)),
-        _0x43c12f.sort((_0x311483, _0x4de09a) => _0x104c4f(_0x311483) - _0x104c4f(_0x4de09a)),
-        _0x217445.sort((_0xb7a22, _0x4f7872) => _0x104c4f(_0xb7a22) - _0x104c4f(_0x4f7872)));
-      while (_0x407bbd.length > 9) {
-        const _0xf38c2c = _0x407bbd.shift();
-        if (_0xf38c2c?.id) _0xfb45dc.push(_0xf38c2c.id);
+    if (routeMode5 === 'multimodal2video') {
+      (imageCount.sort((item9, value28) => run(item9) - run(value28)),
+        videoCount.sort((item10, value29) => run(item10) - run(value29)),
+        audioCount.sort((item11, value30) => run(item11) - run(value30)));
+      while (imageCount.length > 9) {
+        const value31 = imageCount.shift();
+        if (value31?.id) edgeIdsToRemove.push(value31.id);
       }
-      while (_0x43c12f.length > 3) {
-        const _0x367b42 = _0x43c12f.shift();
-        if (_0x367b42?.id) _0xfb45dc.push(_0x367b42.id);
+      while (videoCount.length > 3) {
+        const value32 = videoCount.shift();
+        if (value32?.id) edgeIdsToRemove.push(value32.id);
       }
-      while (_0x217445.length > 3) {
-        const _0x11131d = _0x217445.shift();
-        if (_0x11131d?.id) _0xfb45dc.push(_0x11131d.id);
+      while (audioCount.length > 3) {
+        const value33 = audioCount.shift();
+        if (value33?.id) edgeIdsToRemove.push(value33.id);
       }
     }
   }
-  const _0x4764c9 = {
-      imageCount: _0x407bbd.length,
-      videoCount: _0x43c12f.length,
-      audioCount: _0x217445.length,
+  const imageCount2 = {
+      imageCount: imageCount.length,
+      videoCount: videoCount.length,
+      audioCount: audioCount.length,
     },
-    _0x5cbec4 = resolveDreaminaVideoTaskType({
-      routeMode: _0x2220a0,
-      imageCount: _0x4764c9.imageCount,
-      videoCount: _0x4764c9.videoCount,
-      audioCount: _0x4764c9.audioCount,
+    taskType5 = resolveDreaminaVideoTaskType({
+      routeMode: routeMode5,
+      imageCount: imageCount2.imageCount,
+      videoCount: imageCount2.videoCount,
+      audioCount: imageCount2.audioCount,
     }),
-    _0x22f608 = resolveDreaminaStyleVideoProvider(_0x2281ec?.model, _0x2281ec?.provider),
-    _0x3fd00b = { provider: _0x22f608 },
-    _0x4102aa = getPlainGenerationParams(_0x2281ec?.generationParamsByModel),
-    _0x4be6a5 = getDreaminaRouteModelMemory(_0x2281ec),
-    _0x5eacbc = normalizeDreaminaVideoRouteMode(_0x2281ec?.dreaminaRouteMode, _0x2281ec?.mode),
-    _0x181ae2 = String(_0x2281ec?.model || '').trim();
-  _0x181ae2 &&
-    (rememberDreaminaRouteModel(_0x4be6a5, _0x22f608, _0x5eacbc, _0x181ae2),
-    (_0x4102aa[_0x181ae2] = {
-      ...buildDreaminaModelParamSnapshot(_0x2281ec),
-      [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: _0x4be6a5,
+    provider5 = resolveDreaminaStyleVideoProvider(nodeData?.model, nodeData?.provider),
+    args10 = { provider: provider5 },
+    generationParamsByModel2 = getPlainGenerationParams(nodeData?.generationParamsByModel),
+    dreaminaRouteModelMemory2 = getDreaminaRouteModelMemory(nodeData),
+    dreaminaVideoRouteMode5 = normalizeDreaminaVideoRouteMode(nodeData?.dreaminaRouteMode, nodeData?.mode),
+    value34 = String(nodeData?.model || '').trim();
+  value34 &&
+    (rememberDreaminaRouteModel(dreaminaRouteModelMemory2, provider5, dreaminaVideoRouteMode5, value34),
+    (generationParamsByModel2[value34] = {
+      ...buildDreaminaModelParamSnapshot(nodeData),
+      [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: dreaminaRouteModelMemory2,
     }));
-  const _0x5c1071 = getRememberedDreaminaRouteModel(_0x4be6a5, _0x22f608, _0x2220a0),
-    _0x5b4210 =
-      _0x5c1071 && isDreaminaStyleVideoTaskModelSupported(_0x5cbec4, _0x5c1071, _0x22f608)
-        ? ensureDreaminaStyleVideoModelForTask(_0x5cbec4, _0x5c1071, _0x22f608)
-        : '',
-    _0x1ebfe = _0x5b4210 || ensureDreaminaStyleVideoModelForTask(_0x5cbec4, _0x2281ec?.model, _0x22f608);
-  if (_0x1ebfe) _0x3fd00b.model = _0x1ebfe;
-  const _0x41d49b = normalizeDreaminaStyleVideoResolution(
-      _0x5cbec4,
-      _0x1ebfe,
-      _0x2281ec?.resolution || _0x2281ec?.videoSize,
-      _0x22f608,
+  const rememberedDreaminaRouteModel2 = getRememberedDreaminaRouteModel(
+      dreaminaRouteModelMemory2,
+      provider5,
+      routeMode5,
     ),
-    _0x24dc57 = normalizeDreaminaStyleVideoDuration(_0x5cbec4, _0x1ebfe, _0x2281ec?.duration, _0x22f608),
-    _0x508b59 = { dreaminaRouteMode: _0x2220a0, duration: _0x24dc57 };
-  if (_0x41d49b) _0x508b59.resolution = _0x41d49b;
-  const _0x154db7 = buildDreaminaModelSelectionParamPatch(
+    value35 =
+      rememberedDreaminaRouteModel2 &&
+      isDreaminaStyleVideoTaskModelSupported(taskType5, rememberedDreaminaRouteModel2, provider5)
+        ? ensureDreaminaStyleVideoModelForTask(taskType5, rememberedDreaminaRouteModel2, provider5)
+        : '',
+    model2 = value35 || ensureDreaminaStyleVideoModelForTask(taskType5, nodeData?.model, provider5);
+  if (model2) args10.model = model2;
+  const dreaminaStyleVideoResolution2 = normalizeDreaminaStyleVideoResolution(
+      taskType5,
+      model2,
+      nodeData?.resolution || nodeData?.videoSize,
+      provider5,
+    ),
+    duration2 = normalizeDreaminaStyleVideoDuration(taskType5, model2, nodeData?.duration, provider5),
+    fallbackValues2 = { dreaminaRouteMode: routeMode5, duration: duration2 };
+  if (dreaminaStyleVideoResolution2) fallbackValues2.resolution = dreaminaStyleVideoResolution2;
+  const args11 = buildDreaminaModelSelectionParamPatch(
       {
-        ..._0x2281ec,
-        ..._0x3fd00b,
-        generationParamsByModel: _0x4102aa,
-        [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: _0x4be6a5,
+        ...nodeData,
+        ...args10,
+        generationParamsByModel: generationParamsByModel2,
+        [DREAMINA_ROUTE_MODEL_MEMORY_FIELD]: dreaminaRouteModelMemory2,
       },
       {
-        model: _0x1ebfe,
-        provider: _0x22f608,
-        taskType: _0x5cbec4,
-        fallbackValues: _0x508b59,
+        model: model2,
+        provider: provider5,
+        taskType: taskType5,
+        fallbackValues: fallbackValues2,
         rememberCurrentModel: false,
       },
     ),
-    _0x4e51d4 = { ..._0x3fd00b, ..._0x154db7 };
+    patch = { ...args10, ...args11 };
   return {
     disabled: false,
-    edgeIdsToRemove: _0xfb45dc,
-    nodeData: getDreaminaEffectiveNodeData({ ..._0x2281ec, ..._0x4e51d4 }),
-    patch: _0x4e51d4,
+    edgeIdsToRemove: edgeIdsToRemove,
+    nodeData: getDreaminaEffectiveNodeData({ ...nodeData, ...patch }),
+    patch: patch,
   };
 }
 export function buildDreaminaParamSchemaFields({
-  routeMode: _0x4b1549,
-  currentRatio: _0x2c84bb,
-  currentResolution: _0x44526b,
-  currentDuration: _0x2f92d7,
-  durationRange: _0x555260,
-  resolutionOptions: _0x3524d7,
+  routeMode: routeMode6,
+  currentRatio: currentRatio,
+  currentResolution: currentResolution,
+  currentDuration: currentDuration,
+  durationRange: durationRange,
+  resolutionOptions: resolutionOptions,
 } = {}) {
-  const _0x58da5e = normalizeDreaminaVideoRouteMode(_0x4b1549),
-    _0x2e8391 = ['自适应', '1:1', '9:16', '16:9', '3:4', '4:3', '3:2', '2:3', '5:4', '4:5', '21:9'].map(
-      (_0x2054f9) => ({
-        value: _0x2054f9,
-        label: _0x2054f9,
-        disabled: _0x2054f9 !== '自适应' && !DREAMINA_VIDEO_ALLOWED_RATIOS.includes(_0x2054f9),
+  const defaultValue = normalizeDreaminaVideoRouteMode(routeMode6),
+    options9 = ['自适应', '1:1', '9:16', '16:9', '3:4', '4:3', '3:2', '2:3', '5:4', '4:5', '21:9'].map(
+      (value36) => ({
+        value: value36,
+        label: value36,
+        disabled: value36 !== '自适应' && !DREAMINA_VIDEO_ALLOWED_RATIOS.includes(value36),
       }),
     ),
-    _0x1459ec = Array.isArray(_0x3524d7) ? _0x3524d7.filter(Boolean) : [],
-    _0x24d1ac = _0x1459ec.length ? _0x1459ec : _0x44526b ? [_0x44526b] : ['720p'];
+    list4 = Array.isArray(resolutionOptions) ? resolutionOptions.filter(Boolean) : [],
+    options10 = list4.length ? list4 : currentResolution ? [currentResolution] : ['720p'];
   return {
     mode: {
       id: 'dreaminaRouteMode',
       type: 'segmented',
       label: '模式',
-      defaultValue: _0x58da5e || 'multimodal2video',
+      defaultValue: defaultValue || 'multimodal2video',
       variant: 'pillMenu',
       options: [
         { value: 'multimodal2video', label: '全能参考', selectedLabel: '全能参考' },
@@ -412,28 +465,28 @@ export function buildDreaminaParamSchemaFields({
       id: 'resolution',
       type: 'segmented',
       label: '分辨率',
-      defaultValue: _0x44526b || _0x24d1ac[0] || '720p',
-      options: _0x24d1ac.map((_0x31c63f) => ({
-        value: _0x31c63f,
-        label: _0x31c63f,
-        disabled: _0x24d1ac.length === 1,
+      defaultValue: currentResolution || options10[0] || '720p',
+      options: options10.map((value37) => ({
+        value: value37,
+        label: value37,
+        disabled: options10.length === 1,
       })),
     },
     aspectRatio: {
       id: 'aspectRatio',
       type: 'segmented',
       label: '比例',
-      defaultValue: _0x2c84bb || '自适应',
-      options: _0x2e8391,
+      defaultValue: currentRatio || '自适应',
+      options: options9,
     },
     duration: {
       id: 'duration',
       type: 'slider',
       label: '视频时长',
-      defaultValue: Number(_0x2f92d7) || Number(_0x555260?.min) || 5,
-      min: Number(_0x555260?.min) || 4,
-      max: Number(_0x555260?.max) || 15,
-      step: Number(_0x555260?.step) || 1,
+      defaultValue: Number(currentDuration) || Number(durationRange?.min) || 5,
+      min: Number(durationRange?.min) || 4,
+      max: Number(durationRange?.max) || 15,
+      step: Number(durationRange?.step) || 1,
       variant: 'durationPill',
     },
   };

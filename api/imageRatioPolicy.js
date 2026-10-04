@@ -19,7 +19,7 @@ const DEFAULT_RATIO_LABEL = '1:1',
     Object.freeze({ label: '21:9', w: 21, h: 9, value: 21 / 9 }),
   ]),
   DREAMINA_RATIO_OPTIONS = Object.freeze(
-    DEFAULT_RATIO_OPTIONS.filter((_0x5637f6) => _0x5637f6.label !== '5:4' && _0x5637f6.label !== '4:5'),
+    DEFAULT_RATIO_OPTIONS.filter((item) => item.label !== '5:4' && item.label !== '4:5'),
   ),
   DIMENSION_QUALITY_PIXEL_MAP = Object.freeze({
     '1K': 0x400 * 0x400,
@@ -31,355 +31,353 @@ const DEFAULT_RATIO_LABEL = '1:1',
   DIMENSION_ALIGN = 8,
   DIMENSION_MIN = 0x200,
   DIMENSION_MAX = 0x2000;
-function isFinitePositive(_0x1989c3) {
-  const _0x532b50 = Number(_0x1989c3);
-  return Number.isFinite(_0x532b50) && _0x532b50 > 0;
+function isFinitePositive(value) {
+  const count = Number(value);
+  return Number.isFinite(count) && count > 0;
 }
-function normalizeImageSizeLabel(_0x4f1bd4) {
-  return String(_0x4f1bd4 || '')
+function normalizeImageSizeLabel(key) {
+  return String(key || '')
     .trim()
     .toUpperCase();
 }
-function resolveManifestRatioContext(_0x300562, _0x3f618d) {
+function resolveManifestRatioContext(providerHint, index) {
   try {
-    return resolveModelExecution(_0x3f618d, { providerHint: _0x300562 }) || null;
+    return resolveModelExecution(index, { providerHint: providerHint }) || null;
   } catch {
     return null;
   }
 }
-function getManifestRatioPolicy(_0x44205c, _0x26b1fb) {
-  const _0x434b76 = resolveManifestRatioContext(_0x44205c, _0x26b1fb),
-    _0x3c26e3 =
-      _0x434b76?.modelManifest?.extensions?.ratioPolicy ||
-      _0x434b76?.executionManifest?.extensions?.ratioPolicy ||
+function getManifestRatioPolicy(result, data) {
+  const resolved = resolveManifestRatioContext(result, data),
+    policy =
+      resolved?.modelManifest?.extensions?.ratioPolicy ||
+      resolved?.executionManifest?.extensions?.ratioPolicy ||
       null;
-  return _0x3c26e3 && typeof _0x3c26e3 === 'object'
-    ? { policy: _0x3c26e3, resolved: _0x434b76 }
-    : { policy: null, resolved: _0x434b76 };
+  return policy && typeof policy === 'object'
+    ? { policy: policy, resolved: resolved }
+    : { policy: null, resolved: resolved };
 }
-function normalizeCompareValue(_0x19640b) {
-  return String(_0x19640b ?? '')
+function normalizeCompareValue(options) {
+  return String(options ?? '')
     .trim()
     .toLowerCase();
 }
-function getNodeFieldValue(_0x335230, _0x524634, _0x2775d3 = '') {
-  if (!_0x335230 || typeof _0x335230 !== 'object') return _0x2775d3;
-  return _0x335230[_0x524634] ?? _0x335230?.generationParams?.[_0x524634] ?? _0x2775d3;
+function getNodeFieldValue(enabled, target, source = '') {
+  if (!enabled || typeof enabled !== 'object') return source;
+  return enabled[target] ?? enabled?.generationParams?.[target] ?? source;
 }
-function getOptionDisableWhen(_0xfc45af) {
-  if (!_0xfc45af || typeof _0xfc45af !== 'object' || Array.isArray(_0xfc45af)) return null;
-  const _0x24e8d8 = _0xfc45af.disableWhen || _0xfc45af.disabledWhen;
-  return _0x24e8d8 &&
-    (Array.isArray(_0x24e8d8) || (typeof _0x24e8d8 === 'object' && !Array.isArray(_0x24e8d8)))
-    ? _0x24e8d8
-    : null;
+function getOptionDisableWhen(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object' || Array.isArray(enabled2)) return null;
+  const next = enabled2.disableWhen || enabled2.disabledWhen;
+  return next && (Array.isArray(next) || (typeof next === 'object' && !Array.isArray(next))) ? next : null;
 }
-function optionDisableWhenMatches(_0x460824, _0x5ca9a3 = {}) {
-  if (Array.isArray(_0x460824))
-    return _0x460824.some((_0x4342a6) => optionDisableWhenMatches(_0x4342a6, _0x5ca9a3));
-  if (!_0x460824 || typeof _0x460824 !== 'object') return false;
-  if (Array.isArray(_0x460824.any))
-    return _0x460824.any.some((_0x42d32b) => optionDisableWhenMatches(_0x42d32b, _0x5ca9a3));
-  if (Array.isArray(_0x460824.all))
-    return _0x460824.all.every((_0x163285) => optionDisableWhenMatches(_0x163285, _0x5ca9a3));
-  const _0x47a7c9 = String(_0x460824?.field || _0x460824?.param || '').trim();
-  if (!_0x47a7c9) return false;
-  const _0x4bc6bd = _0x460824.values !== undefined ? _0x460824.values : _0x460824.value,
-    _0x2c85e8 = Array.isArray(_0x4bc6bd) ? _0x4bc6bd : [_0x4bc6bd],
-    _0x3aef01 = _0x2c85e8.map(normalizeCompareValue);
-  return _0x3aef01.includes(normalizeCompareValue(getNodeFieldValue(_0x5ca9a3, _0x47a7c9, '')));
+function optionDisableWhenMatches(el, current = {}) {
+  if (Array.isArray(el)) return el.some((item2) => optionDisableWhenMatches(item2, current));
+  if (!el || typeof el !== 'object') return false;
+  if (Array.isArray(el.any)) return el.any.some((item3) => optionDisableWhenMatches(item3, current));
+  if (Array.isArray(el.all)) return el.all.every((item4) => optionDisableWhenMatches(item4, current));
+  const enabled3 = String(el?.field || el?.param || '').trim();
+  if (!enabled3) return false;
+  const entry = el.values !== undefined ? el.values : el.value,
+    list = Array.isArray(entry) ? entry : [entry],
+    list2 = list.map(normalizeCompareValue);
+  return list2.includes(normalizeCompareValue(getNodeFieldValue(current, enabled3, '')));
 }
-function isOptionDisabled(_0x1da313, _0x1fa1b4 = {}) {
+function isOptionDisabled(el2, record = {}) {
   return (
-    _0x1da313 &&
-    typeof _0x1da313 === 'object' &&
-    !Array.isArray(_0x1da313) &&
-    (_0x1da313.disabled === true || optionDisableWhenMatches(getOptionDisableWhen(_0x1da313), _0x1fa1b4))
+    el2 &&
+    typeof el2 === 'object' &&
+    !Array.isArray(el2) &&
+    (el2.disabled === true || optionDisableWhenMatches(getOptionDisableWhen(el2), record))
   );
 }
-function findUiSchemaField(_0x27cb4e, _0x244d3b) {
-  return (Array.isArray(_0x27cb4e?.uiSchema?.fields) ? _0x27cb4e.uiSchema.fields : []).find((_0x4c38e1) => {
-    const _0x561335 = String(_0x4c38e1?.id || '').trim(),
-      _0x267c70 = String(_0x4c38e1?.displayRole || '').trim();
-    return _0x561335 === _0x244d3b || _0x267c70 === _0x244d3b;
+function findUiSchemaField(payload, handle) {
+  return (Array.isArray(payload?.uiSchema?.fields) ? payload.uiSchema.fields : []).find((item5) => {
+    const state = String(item5?.id || '').trim(),
+      config = String(item5?.displayRole || '').trim();
+    return state === handle || config === handle;
   });
 }
-function toRatioOption(_0x5516bf) {
-  const _0x3ecd17 = parseRatioLabel(_0x5516bf);
-  if (!_0x3ecd17) return null;
+function toRatioOption(scope) {
+  const label = parseRatioLabel(scope);
+  if (!label) return null;
   return Object.freeze({
-    label: _0x3ecd17.label,
-    w: _0x3ecd17.w,
-    h: _0x3ecd17.h,
-    value: _0x3ecd17.w / _0x3ecd17.h,
+    label: label.label,
+    w: label.w,
+    h: label.h,
+    value: label.w / label.h,
   });
 }
-function labelsToRatioOptions(_0x42b262) {
+function labelsToRatioOptions(input) {
   return Object.freeze(
-    (Array.isArray(_0x42b262) ? _0x42b262 : []).map((_0x34f8bf) => toRatioOption(_0x34f8bf)).filter(Boolean),
+    (Array.isArray(input) ? input : []).map((item6) => toRatioOption(item6)).filter(Boolean),
   );
 }
-function getPolicyRatiosForImageSize(_0x33fe94, _0xa60462) {
-  const _0x2e445c = normalizeImageSizeLabel(_0xa60462),
-    _0x513779 = _0x33fe94?.ratiosByImageSize;
-  if (_0x2e445c && _0x513779 && typeof _0x513779 === 'object' && _0x513779[_0x2e445c])
-    return labelsToRatioOptions(_0x513779[_0x2e445c]);
-  if (Array.isArray(_0x33fe94?.ratios)) return labelsToRatioOptions(_0x33fe94.ratios);
+function getPolicyRatiosForImageSize(output, value2) {
+  const imageSizeLabel = normalizeImageSizeLabel(value2),
+    value3 = output?.ratiosByImageSize;
+  if (imageSizeLabel && value3 && typeof value3 === 'object' && value3[imageSizeLabel])
+    return labelsToRatioOptions(value3[imageSizeLabel]);
+  if (Array.isArray(output?.ratios)) return labelsToRatioOptions(output.ratios);
   return null;
 }
-function getUiSchemaRatioOptions(_0x3a0159, _0x5e784a) {
-  const _0x34fd99 = findUiSchemaField(_0x3a0159?.modelManifest, 'aspectRatio'),
-    _0x49b9bd = Array.isArray(_0x34fd99?.options) ? _0x34fd99.options : [];
-  if (_0x49b9bd.length === 0) return null;
-  const _0x5cb317 = { imageSize: normalizeImageSizeLabel(_0x5e784a) },
-    _0xb24d8d = _0x49b9bd
-      .filter((_0x13ee04) => !isOptionDisabled(_0x13ee04, _0x5cb317))
-      .map((_0x27c91d) => String(_0x27c91d?.value ?? _0x27c91d).trim())
-      .filter((_0xc63e71) => _0xc63e71 && !isAdaptiveRatioLabel(_0xc63e71))
-      .map((_0x214b35) => toRatioOption(_0x214b35))
+function getUiSchemaRatioOptions(value4, value5) {
+  const uiSchemaField = findUiSchemaField(value4?.modelManifest, 'aspectRatio'),
+    list3 = Array.isArray(uiSchemaField?.options) ? uiSchemaField.options : [];
+  if (list3.length === 0) return null;
+  const value6 = { imageSize: normalizeImageSizeLabel(value5) },
+    list4 = list3
+      .filter((item7) => !isOptionDisabled(item7, value6))
+      .map((el3) => String(el3?.value ?? el3).trim())
+      .filter((item8) => item8 && !isAdaptiveRatioLabel(item8))
+      .map((item9) => toRatioOption(item9))
       .filter(Boolean);
-  return _0xb24d8d.length > 0 ? Object.freeze(_0xb24d8d) : null;
+  return list4.length > 0 ? Object.freeze(list4) : null;
 }
-function getManifestAllowedRatios(_0x31f782, _0x24897d, _0xf80db1) {
-  const { policy: _0x9b10ab, resolved: _0x43e1f9 } = getManifestRatioPolicy(_0x31f782, _0x24897d);
-  if (!_0x43e1f9?.modelManifest) return null;
-  const _0x58fe29 = getPolicyRatiosForImageSize(_0x9b10ab, _0xf80db1);
-  if (_0x58fe29?.length > 0) return _0x58fe29;
-  return getUiSchemaRatioOptions(_0x43e1f9, _0xf80db1);
+function getManifestAllowedRatios(value7, value8, value9) {
+  const { policy: policy2, resolved: resolved2 } = getManifestRatioPolicy(value7, value8);
+  if (!resolved2?.modelManifest) return null;
+  const list5 = getPolicyRatiosForImageSize(policy2, value9);
+  if (list5?.length > 0) return list5;
+  return getUiSchemaRatioOptions(resolved2, value9);
 }
-function getManifestRatioCapability(_0x5fc8f7, _0x4e2b14) {
-  const { policy: _0x144083, resolved: _0x5459f4 } = getManifestRatioPolicy(_0x5fc8f7, _0x4e2b14),
-    _0x363ac7 = String(_0x144083?.capability || '').trim();
-  if (_0x363ac7) return _0x363ac7;
-  if (!_0x5459f4?.modelManifest) return '';
-  if (_0x5459f4.modelManifest.adapterType === 'workflow') return 'none';
-  if (findUiSchemaField(_0x5459f4.modelManifest, 'aspectRatio')) return 'aspectRatio';
+function getManifestRatioCapability(value10, value11) {
+  const { policy: policy3, resolved: resolved3 } = getManifestRatioPolicy(value10, value11),
+    value12 = String(policy3?.capability || '').trim();
+  if (value12) return value12;
+  if (!resolved3?.modelManifest) return '';
+  if (resolved3.modelManifest.adapterType === 'workflow') return 'none';
+  if (findUiSchemaField(resolved3.modelManifest, 'aspectRatio')) return 'aspectRatio';
   return '';
 }
-function getRatioFallbackStrategy(_0xe7d19a, _0x2b0818, _0x297f66) {
-  const { policy: _0x14ae3b } = getManifestRatioPolicy(_0xe7d19a, _0x2b0818),
-    _0x1bc3cd = normalizeImageSizeLabel(_0x297f66);
+function getRatioFallbackStrategy(value13, value14, value15) {
+  const { policy: policy4 } = getManifestRatioPolicy(value13, value14),
+    imageSizeLabel2 = normalizeImageSizeLabel(value15);
   if (
-    _0x1bc3cd &&
-    _0x14ae3b?.fallbackStrategyByImageSize &&
-    typeof _0x14ae3b.fallbackStrategyByImageSize === 'object'
+    imageSizeLabel2 &&
+    policy4?.fallbackStrategyByImageSize &&
+    typeof policy4.fallbackStrategyByImageSize === 'object'
   )
-    return String(_0x14ae3b.fallbackStrategyByImageSize[_0x1bc3cd] || '').trim();
-  return String(_0x14ae3b?.fallbackStrategy || '').trim();
+    return String(policy4.fallbackStrategyByImageSize[imageSizeLabel2] || '').trim();
+  return String(policy4?.fallbackStrategy || '').trim();
 }
-export function isAdaptiveRatioLabel(_0xf05c1e) {
-  const _0x2af684 = String(_0xf05c1e || '').trim(),
-    _0x26a5ab = _0x2af684.toLowerCase();
+export function isAdaptiveRatioLabel(value16) {
+  const enabled4 = String(value16 || '').trim(),
+    value17 = enabled4.toLowerCase();
   return (
-    !_0x2af684 ||
-    _0x26a5ab === 'auto' ||
-    _0x26a5ab === 'default' ||
-    _0x26a5ab === 'adaptive' ||
-    _0x2af684 === '自适应' ||
-    _0x2af684 === '默认'
+    !enabled4 ||
+    value17 === 'auto' ||
+    value17 === 'default' ||
+    value17 === 'adaptive' ||
+    enabled4 === '自适应' ||
+    enabled4 === '默认'
   );
 }
-export function normalizeRatioLabelText(_0x5b1b60) {
-  return String(_0x5b1b60 || '')
+export function normalizeRatioLabelText(value18) {
+  return String(value18 || '')
     .trim()
     .replace(/[：∶﹕]/g, ':')
     .replace(/\s+/g, '');
 }
-export function parseRatioLabel(_0x249032) {
-  const _0x144af1 = normalizeRatioLabelText(_0x249032);
-  if (!_0x144af1.includes(':')) return null;
-  const [_0x59fc08, _0x295c9d] = _0x144af1.split(':'),
-    _0x363531 = Number.parseFloat(_0x59fc08),
-    _0xd0c822 = Number.parseFloat(_0x295c9d);
-  if (!(_0x363531 > 0 && _0xd0c822 > 0)) return null;
-  return { w: _0x363531, h: _0xd0c822, label: _0x363531 + ':' + _0xd0c822 };
+export function parseRatioLabel(value19) {
+  const list6 = normalizeRatioLabelText(value19);
+  if (!list6.includes(':')) return null;
+  const [value20, value21] = list6.split(':'),
+    w2 = Number.parseFloat(value20),
+    h2 = Number.parseFloat(value21);
+  if (!(w2 > 0 && h2 > 0)) return null;
+  return { w: w2, h: h2, label: w2 + ':' + h2 };
 }
-function getRatioOptionValue(_0x4c799f) {
-  if (!_0x4c799f || typeof _0x4c799f !== 'object') return null;
-  const _0x4e808d = Number(_0x4c799f.value);
-  if (Number.isFinite(_0x4e808d) && _0x4e808d > 0) return _0x4e808d;
-  const _0xd114e3 = Number(_0x4c799f.w),
-    _0x2a057e = Number(_0x4c799f.h);
-  if (Number.isFinite(_0xd114e3) && _0xd114e3 > 0 && Number.isFinite(_0x2a057e) && _0x2a057e > 0)
-    return _0xd114e3 / _0x2a057e;
-  const _0xcbbb15 = parseRatioLabel(_0x4c799f.label);
-  if (_0xcbbb15) return _0xcbbb15.w / _0xcbbb15.h;
+function getRatioOptionValue(el4) {
+  if (!el4 || typeof el4 !== 'object') return null;
+  const count2 = Number(el4.value);
+  if (Number.isFinite(count2) && count2 > 0) return count2;
+  const count3 = Number(el4.w),
+    count4 = Number(el4.h);
+  if (Number.isFinite(count3) && count3 > 0 && Number.isFinite(count4) && count4 > 0) return count3 / count4;
+  const ratioLabel = parseRatioLabel(el4.label);
+  if (ratioLabel) return ratioLabel.w / ratioLabel.h;
   return null;
 }
-export function pickClosestRatio(_0x5ec8ee, _0x49daa3, _0x73f59d = DEFAULT_RATIO_OPTIONS) {
-  const _0x1626b0 = Array.isArray(_0x73f59d) && _0x73f59d.length > 0 ? _0x73f59d : DEFAULT_RATIO_OPTIONS,
-    _0x168061 = typeof _0x5ec8ee === 'string' ? parseRatioLabel(_0x5ec8ee) : null;
-  let _0x99c7cd = 1;
-  if (_0x168061) _0x99c7cd = _0x168061.w / _0x168061.h;
+export function pickClosestRatio(value22, value23, list7 = DEFAULT_RATIO_OPTIONS) {
+  const list8 = Array.isArray(list7) && list7.length > 0 ? list7 : DEFAULT_RATIO_OPTIONS,
+    value24 = typeof value22 === 'string' ? parseRatioLabel(value22) : null;
+  let value25 = 1;
+  if (value24) value25 = value24.w / value24.h;
   else {
-    const _0x2b2239 = Number(_0x5ec8ee),
-      _0x2c8b57 = Number(_0x49daa3);
-    isFinitePositive(_0x2b2239) && isFinitePositive(_0x2c8b57) && (_0x99c7cd = _0x2b2239 / _0x2c8b57);
+    const value26 = Number(value22),
+      value27 = Number(value23);
+    isFinitePositive(value26) && isFinitePositive(value27) && (value25 = value26 / value27);
   }
-  let _0x23cade = _0x1626b0[0],
-    _0x55951e = getRatioOptionValue(_0x23cade) || 1,
-    _0x21284d = Math.abs(_0x99c7cd - _0x55951e);
-  for (let _0x47766a = 1; _0x47766a < _0x1626b0.length; _0x47766a += 1) {
-    const _0x4d5473 = _0x1626b0[_0x47766a],
-      _0x15137d = getRatioOptionValue(_0x4d5473);
-    if (!(_0x15137d > 0)) continue;
-    const _0x46daf1 = Math.abs(_0x99c7cd - _0x15137d);
-    _0x46daf1 < _0x21284d && ((_0x21284d = _0x46daf1), (_0x23cade = _0x4d5473), (_0x55951e = _0x15137d));
+  let value28 = list8[0],
+    ratioOptionValue = getRatioOptionValue(value28) || 1,
+    value29 = Math.abs(value25 - ratioOptionValue);
+  for (let value30 = 1; value30 < list8.length; value30 += 1) {
+    const value31 = list8[value30],
+      ratioOptionValue2 = getRatioOptionValue(value31);
+    if (!(ratioOptionValue2 > 0)) continue;
+    const value32 = Math.abs(value25 - ratioOptionValue2);
+    value32 < value29 && ((value29 = value32), (value28 = value31), (ratioOptionValue = ratioOptionValue2));
   }
-  return _0x23cade.label;
+  return value28.label;
 }
-function pickClosestDirectionalRatio(_0x50ac6f, _0x3650c7, _0x560c42 = DEFAULT_RATIO_OPTIONS) {
-  const _0x31e19d = Array.isArray(_0x560c42) && _0x560c42.length > 0 ? _0x560c42 : DEFAULT_RATIO_OPTIONS,
-    _0x509a44 = typeof _0x50ac6f === 'string' ? parseRatioLabel(_0x50ac6f) : null;
-  let _0x38c7ea = 1;
-  if (_0x509a44) _0x38c7ea = _0x509a44.w / _0x509a44.h;
+function pickClosestDirectionalRatio(value33, value34, list9 = DEFAULT_RATIO_OPTIONS) {
+  const list10 = Array.isArray(list9) && list9.length > 0 ? list9 : DEFAULT_RATIO_OPTIONS,
+    value35 = typeof value33 === 'string' ? parseRatioLabel(value33) : null;
+  let count5 = 1;
+  if (value35) count5 = value35.w / value35.h;
   else {
-    const _0xffffb0 = Number(_0x50ac6f),
-      _0x1afab1 = Number(_0x3650c7);
-    isFinitePositive(_0xffffb0) && isFinitePositive(_0x1afab1) && (_0x38c7ea = _0xffffb0 / _0x1afab1);
+    const value36 = Number(value33),
+      value37 = Number(value34);
+    isFinitePositive(value36) && isFinitePositive(value37) && (count5 = value36 / value37);
   }
-  if (Math.abs(_0x38c7ea - 1) < 0.000001) {
-    const _0x173f5b = _0x31e19d.find((_0x291d44) => _0x291d44.label === '16:9');
-    if (_0x173f5b) return _0x173f5b.label;
+  if (Math.abs(count5 - 1) < 0.000001) {
+    const value38 = list10.find((item10) => item10.label === '16:9');
+    if (value38) return value38.label;
   }
-  const _0x4b1ae4 = _0x31e19d.filter((_0x1185cf) => {
-    const _0x3c60cb = getRatioOptionValue(_0x1185cf);
-    if (!(_0x3c60cb > 0)) return false;
-    return _0x38c7ea > 1 ? _0x3c60cb > 1 : _0x3c60cb < 1;
+  const list11 = list10.filter((item11) => {
+    const ratioOptionValue3 = getRatioOptionValue(item11);
+    if (!(ratioOptionValue3 > 0)) return false;
+    return count5 > 1 ? ratioOptionValue3 > 1 : ratioOptionValue3 < 1;
   });
-  return pickClosestRatio(_0x50ac6f, _0x3650c7, _0x4b1ae4.length > 0 ? _0x4b1ae4 : _0x31e19d);
+  return pickClosestRatio(value33, value34, list11.length > 0 ? list11 : list10);
 }
 export function pickClosestRatioForProviderModel({
-  provider: _0x4a114d,
-  model: _0x2e9a63,
-  ratioLabel: _0x5e7d32,
-  width: _0x318050,
-  height: _0xd837d,
-  imageSize: _0x131adf,
+  provider: provider,
+  model: model,
+  ratioLabel: ratioLabel2,
+  width: width,
+  height: height,
+  imageSize: imageSize,
 } = {}) {
-  const _0x1ca907 = getAllowedRatiosForProviderModel(_0x4a114d, _0x2e9a63, _0x131adf),
-    _0x4e7a6f = isFinitePositive(_0x318050) && isFinitePositive(_0xd837d),
-    _0x25a3f8 = _0x4e7a6f ? Number(_0x318050) : _0x5e7d32 || DEFAULT_RATIO_LABEL,
-    _0x4d9c03 = _0x4e7a6f ? Number(_0xd837d) : undefined;
-  if (getRatioFallbackStrategy(_0x4a114d, _0x2e9a63, _0x131adf) === 'directional')
-    return pickClosestDirectionalRatio(_0x25a3f8, _0x4d9c03, _0x1ca907);
-  return pickClosestRatio(_0x25a3f8, _0x4d9c03, _0x1ca907);
+  const allowedRatiosForProviderModel = getAllowedRatiosForProviderModel(provider, model, imageSize),
+    isFinitePositive2 = isFinitePositive(width) && isFinitePositive(height),
+    value39 = isFinitePositive2 ? Number(width) : ratioLabel2 || DEFAULT_RATIO_LABEL,
+    value40 = isFinitePositive2 ? Number(height) : undefined;
+  if (getRatioFallbackStrategy(provider, model, imageSize) === 'directional')
+    return pickClosestDirectionalRatio(value39, value40, allowedRatiosForProviderModel);
+  return pickClosestRatio(value39, value40, allowedRatiosForProviderModel);
 }
 export function resolveAdaptiveSourceSize({
-  displayWidth: _0x2c1849,
-  displayHeight: _0x213701,
-  inputWidth: _0x2c9b2e,
-  inputHeight: _0x287366,
+  displayWidth: displayWidth,
+  displayHeight: displayHeight,
+  inputWidth: inputWidth,
+  inputHeight: inputHeight,
 } = {}) {
-  if (isFinitePositive(_0x2c1849) && isFinitePositive(_0x213701))
-    return { width: Number(_0x2c1849), height: Number(_0x213701), source: 'display' };
-  if (isFinitePositive(_0x2c9b2e) && isFinitePositive(_0x287366))
-    return { width: Number(_0x2c9b2e), height: Number(_0x287366), source: 'input-media' };
+  if (isFinitePositive(displayWidth) && isFinitePositive(displayHeight))
+    return { width: Number(displayWidth), height: Number(displayHeight), source: 'display' };
+  if (isFinitePositive(inputWidth) && isFinitePositive(inputHeight))
+    return { width: Number(inputWidth), height: Number(inputHeight), source: 'input-media' };
   return { width: 1, height: 1, source: 'fallback' };
 }
-export function getAllowedRatiosForProviderModel(_0x15b3c4, _0x526e08, _0x455f40 = '') {
-  const _0x3ce4c7 = getManifestAllowedRatios(_0x15b3c4, _0x526e08, _0x455f40);
-  if (_0x3ce4c7?.length > 0) return _0x3ce4c7;
-  const _0x509875 = String(_0x15b3c4 || '')
+export function getAllowedRatiosForProviderModel(value41, value42, value43 = '') {
+  const list12 = getManifestAllowedRatios(value41, value42, value43);
+  if (list12?.length > 0) return list12;
+  const value44 = String(value41 || '')
       .trim()
       .toLowerCase(),
-    _0x393d55 = String(_0x526e08 || '')
+    value45 = String(value42 || '')
       .trim()
       .toLowerCase(),
-    _0x3575fd = _0x509875 === 'grsai',
-    _0x37813d = resolveNanoBananaSelectionFromModel(_0x393d55);
+    value46 = value44 === 'grsai',
+    nanoBananaSelectionFromModel = resolveNanoBananaSelectionFromModel(value45);
   if (
-    _0x3575fd &&
-    _0x37813d &&
-    isNanoBananaFamily(_0x37813d.family) &&
-    _0x37813d.family !== NANO_BANANA_FAMILIES.GPT_IMAGE_2
+    value46 &&
+    nanoBananaSelectionFromModel &&
+    isNanoBananaFamily(nanoBananaSelectionFromModel.family) &&
+    nanoBananaSelectionFromModel.family !== NANO_BANANA_FAMILIES.GPT_IMAGE_2
   )
-    return getNanoBananaAllowedRatioOptions(_0x37813d.family);
-  if (_0x509875 === 'runninghub' && _0x37813d && isNanoBananaFamily(_0x37813d.family))
-    return getNanoBananaAllowedRatioOptions(_0x37813d.family);
-  if (_0x509875 === 'dreamina') return DREAMINA_RATIO_OPTIONS;
+    return getNanoBananaAllowedRatioOptions(nanoBananaSelectionFromModel.family);
+  if (
+    value44 === 'runninghub' &&
+    nanoBananaSelectionFromModel &&
+    isNanoBananaFamily(nanoBananaSelectionFromModel.family)
+  )
+    return getNanoBananaAllowedRatioOptions(nanoBananaSelectionFromModel.family);
+  if (value44 === 'dreamina') return DREAMINA_RATIO_OPTIONS;
   return DEFAULT_RATIO_OPTIONS;
 }
-export function getRatioCapability(_0x50c1a6, _0x14400e) {
-  const _0x472b96 = getManifestRatioCapability(_0x50c1a6, _0x14400e);
-  if (_0x472b96) return _0x472b96;
-  const _0x5d054a = String(_0x50c1a6 || '')
+export function getRatioCapability(value47, value48) {
+  const manifestRatioCapability = getManifestRatioCapability(value47, value48);
+  if (manifestRatioCapability) return manifestRatioCapability;
+  const value49 = String(value47 || '')
     .trim()
     .toLowerCase();
-  if (_0x5d054a === 'runninghubwf') return 'none';
-  if (_0x5d054a === 'runninghub' || _0x5d054a === 'grsai') return 'aspectRatio';
-  if (_0x5d054a === 'ppio' || _0x5d054a === 'apimart') return 'size';
-  if (_0x5d054a === 'dreamina') return 'aspectRatio';
+  if (value49 === 'runninghubwf') return 'none';
+  if (value49 === 'runninghub' || value49 === 'grsai') return 'aspectRatio';
+  if (value49 === 'ppio' || value49 === 'apimart') return 'size';
+  if (value49 === 'dreamina') return 'aspectRatio';
   return 'aspectRatio';
 }
-function alignAndClampDimension(_0x16b31b) {
-  const _0x1093fc = Math.round(Number(_0x16b31b || 0) / DIMENSION_ALIGN) * DIMENSION_ALIGN;
-  return Math.max(DIMENSION_MIN, Math.min(DIMENSION_MAX, _0x1093fc));
+function alignAndClampDimension(value50) {
+  const value51 = Math.round(Number(value50 || 0) / DIMENSION_ALIGN) * DIMENSION_ALIGN;
+  return Math.max(DIMENSION_MIN, Math.min(DIMENSION_MAX, value51));
 }
-function calculateDimensionsByQualityAndRatio(_0x1f7fd6, _0x346f08) {
-  const _0x1eb5c5 = String(_0x1f7fd6 || '')
+function calculateDimensionsByQualityAndRatio(value52, value53) {
+  const value54 = String(value52 || '')
       .trim()
       .toUpperCase(),
-    _0x39f334 =
-      DIMENSION_QUALITY_PIXEL_MAP[_0x1eb5c5] || DIMENSION_QUALITY_PIXEL_MAP[DIMENSION_DEFAULT_QUALITY],
-    _0x44ff4f = parseRatioLabel(_0x346f08) || { w: 1, h: 1 },
-    _0x26d180 = _0x44ff4f.w / _0x44ff4f.h,
-    _0x1747bd = Math.sqrt(_0x39f334 / _0x26d180),
-    _0x180362 = _0x1747bd * _0x26d180;
-  return { width: alignAndClampDimension(_0x180362), height: alignAndClampDimension(_0x1747bd) };
+    value55 = DIMENSION_QUALITY_PIXEL_MAP[value54] || DIMENSION_QUALITY_PIXEL_MAP[DIMENSION_DEFAULT_QUALITY],
+    ratioLabel3 = parseRatioLabel(value53) || { w: 1, h: 1 },
+    value56 = ratioLabel3.w / ratioLabel3.h,
+    value57 = Math.sqrt(value55 / value56),
+    value58 = value57 * value56;
+  return { width: alignAndClampDimension(value58), height: alignAndClampDimension(value57) };
 }
 export function resolveProviderRatioPayload({
-  provider: _0xd129a6,
-  model: _0x118913,
-  ratioLabel: _0x3c5874,
-  imageSize: _0x5920ce,
+  provider: provider2,
+  model: model2,
+  ratioLabel: ratioLabel4,
+  imageSize: imageSize2,
   suppressAspectRatio: suppressAspectRatio = false,
 } = {}) {
-  const _0x296eca = getRatioCapability(_0xd129a6, _0x118913),
-    _0x343b56 = pickClosestRatioForProviderModel({
-      provider: _0xd129a6,
-      model: _0x118913,
-      ratioLabel: _0x3c5874 || DEFAULT_RATIO_LABEL,
-      imageSize: _0x5920ce,
+  const ratioCapability = getRatioCapability(provider2, model2),
+    resolvedRatioLabel = pickClosestRatioForProviderModel({
+      provider: provider2,
+      model: model2,
+      ratioLabel: ratioLabel4 || DEFAULT_RATIO_LABEL,
+      imageSize: imageSize2,
     });
-  if (_0x296eca === 'none' || suppressAspectRatio === true)
+  if (ratioCapability === 'none' || suppressAspectRatio === true)
     return {
-      ratioCapability: _0x296eca,
-      resolvedRatioLabel: _0x343b56,
+      ratioCapability: ratioCapability,
+      resolvedRatioLabel: resolvedRatioLabel,
       params: {},
       suppressAspectRatio: true,
       notice:
-        _0x296eca === 'none' ? 'Model does not support ratio params; falling back to model default.' : '',
+        ratioCapability === 'none'
+          ? 'Model does not support ratio params; falling back to model default.'
+          : '',
     };
-  if (_0x296eca === 'aspectRatio')
+  if (ratioCapability === 'aspectRatio')
     return {
-      ratioCapability: _0x296eca,
-      resolvedRatioLabel: _0x343b56,
-      params: { aspectRatio: _0x343b56 },
+      ratioCapability: ratioCapability,
+      resolvedRatioLabel: resolvedRatioLabel,
+      params: { aspectRatio: resolvedRatioLabel },
       suppressAspectRatio: false,
       notice: '',
     };
-  if (_0x296eca === 'size')
+  if (ratioCapability === 'size')
     return {
-      ratioCapability: _0x296eca,
-      resolvedRatioLabel: _0x343b56,
-      params: { size: _0x343b56 },
+      ratioCapability: ratioCapability,
+      resolvedRatioLabel: resolvedRatioLabel,
+      params: { size: resolvedRatioLabel },
       suppressAspectRatio: false,
       notice: '',
     };
-  if (_0x296eca === 'dimensions') {
-    const _0x395cfb = calculateDimensionsByQualityAndRatio(_0x5920ce, _0x343b56);
+  if (ratioCapability === 'dimensions') {
+    const params = calculateDimensionsByQualityAndRatio(imageSize2, resolvedRatioLabel);
     return {
-      ratioCapability: _0x296eca,
-      resolvedRatioLabel: _0x343b56,
-      params: _0x395cfb,
+      ratioCapability: ratioCapability,
+      resolvedRatioLabel: resolvedRatioLabel,
+      params: params,
       suppressAspectRatio: false,
       notice: '',
     };
   }
   return {
     ratioCapability: 'none',
-    resolvedRatioLabel: _0x343b56,
+    resolvedRatioLabel: resolvedRatioLabel,
     params: {},
     suppressAspectRatio: true,
     notice: 'Unsupported ratio capability; skipping ratio params.',

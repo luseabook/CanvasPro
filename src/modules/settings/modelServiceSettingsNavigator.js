@@ -1,647 +1,482 @@
-import { onLocaleChange, t } from "../../i18n/index.js";
-import { isModelProviderPubliclyListed } from "../../manifests/modelCatalogVisibility.js";
-export const MODEL_SERVICE_CATEGORY_IDS = Object["freeze"]([
-  "all",
-  "text",
-  "image",
-  "video",
-  "audio",
-]);
+import { onLocaleChange, t } from '../../i18n/index.js';
+import { isModelProviderPubliclyListed } from '../../manifests/modelCatalogVisibility.js';
+export const MODEL_SERVICE_CATEGORY_IDS = Object['freeze'](['all', 'text', 'image', 'video', 'audio']);
 const MODEL_SERVICE_CATEGORY_SET = new Set(MODEL_SERVICE_CATEGORY_IDS),
-  PROVIDER_STATUS_TONES = Object["freeze"]([
-    "testing",
-    "success",
-    "partial",
-    "configured",
-    "unconfigured",
-    "deprecated",
-    "danger",
+  PROVIDER_STATUS_TONES = Object['freeze']([
+    'testing',
+    'success',
+    'partial',
+    'configured',
+    'unconfigured',
+    'deprecated',
+    'danger',
   ]),
-  PROVIDER_STATUS_CLASSES = PROVIDER_STATUS_TONES["map"](
-    (_0x52ba0b) => "settings-provider-status--" + _0x52ba0b,
-  );
+  PROVIDER_STATUS_CLASSES = PROVIDER_STATUS_TONES['map']((value) => 'settings-provider-status--' + value);
 let activeNavigator = null;
-export function normalizeModelServiceKinds(_0x2c0f57) {
-  const _0x594b1b = Array["isArray"](_0x2c0f57)
-    ? _0x2c0f57
-    : String(_0x2c0f57 || "")["split"](/[\s,]+/);
-  return Array["from"](
+export function normalizeModelServiceKinds(item) {
+  const key = Array['isArray'](item) ? item : String(item || '')['split'](/[\s,]+/);
+  return Array['from'](
     new Set(
-      _0x594b1b["map"]((_0x3c7349) =>
-        String(_0x3c7349 || "")
-          ["trim"]()
-          ["toLowerCase"](),
-      )["filter"](
-        (_0x527075) =>
-          MODEL_SERVICE_CATEGORY_SET["has"](_0x527075) && _0x527075 !== "all",
-      ),
+      key['map']((index) =>
+        String(index || '')
+          ['trim']()
+          ['toLowerCase'](),
+      )['filter']((result) => MODEL_SERVICE_CATEGORY_SET['has'](result) && result !== 'all'),
     ),
   );
 }
-export function modelServiceKindsMatchCategory(_0x12fce4, _0x1f0d40 = "all") {
-  const _0x1d533f = String(_0x1f0d40 || "all")
-    ["trim"]()
-    ["toLowerCase"]();
-  if (_0x1d533f === "all") return !![];
-  return normalizeModelServiceKinds(_0x12fce4)["includes"](_0x1d533f);
+export function modelServiceKindsMatchCategory(data, options = 'all') {
+  const target = String(options || 'all')
+    ['trim']()
+    ['toLowerCase']();
+  if (target === 'all') return !![];
+  return normalizeModelServiceKinds(data)['includes'](target);
 }
-export function aggregateModelServiceProviderStatus(_0x54aa1f = []) {
-  const _0x2f8421 = _0x54aa1f["map"]((_0x303515) => ({
-    text: String(_0x303515?.["text"] || "")["trim"](),
-    tone: String(_0x303515?.["tone"] || "")
-      ["trim"]()
-      ["toLowerCase"](),
-  }))["filter"]((_0x233071) => _0x233071["text"] || _0x233071["tone"]);
-  if (!_0x2f8421["length"])
+export function aggregateModelServiceProviderStatus(list = []) {
+  const total = list['map']((source) => ({
+    text: String(source?.['text'] || '')['trim'](),
+    tone: String(source?.['tone'] || '')
+      ['trim']()
+      ['toLowerCase'](),
+  }))['filter']((next) => next['text'] || next['tone']);
+  if (!total['length'])
     return {
-      text: t("settings.apiInput.readiness.requiredShort"),
-      tone: "unconfigured",
+      text: t('settings.apiInput.readiness.requiredShort'),
+      tone: 'unconfigured',
     };
-  if (_0x2f8421["length"] === 0x1) return _0x2f8421[0x0];
-  const _0x458e8a = _0x2f8421["filter"](
-    (_0x507837) => _0x507837["tone"] === "success",
-  )["length"];
-  if (_0x458e8a === _0x2f8421["length"])
+  if (total['length'] === 0x1) return total[0x0];
+  const count = total['filter']((current) => current['tone'] === 'success')['length'];
+  if (count === total['length'])
     return {
-      text: t("settings.apiInput.catalog.allRoutesReady"),
-      tone: "success",
+      text: t('settings.apiInput.catalog.allRoutesReady'),
+      tone: 'success',
     };
-  if (_0x458e8a > 0x0)
+  if (count > 0x0)
     return {
-      text: t("settings.apiInput.catalog.routesReady", {
-        count: _0x458e8a,
-        total: _0x2f8421["length"],
+      text: t('settings.apiInput.catalog.routesReady', {
+        count: count,
+        total: total['length'],
       }),
-      tone: "partial",
+      tone: 'partial',
     };
-  const _0x3529a6 = [
-      "testing",
-      "partial",
-      "configured",
-      "danger",
-      "deprecated",
-      "unconfigured",
-    ],
-    _0x95d52f =
-      _0x3529a6["find"]((_0x49a647) =>
-        _0x2f8421["some"]((_0x4c7e06) => _0x4c7e06["tone"] === _0x49a647),
-      ) || _0x2f8421[0x0]["tone"];
+  const entry = ['testing', 'partial', 'configured', 'danger', 'deprecated', 'unconfigured'],
+    record =
+      entry['find']((payload) => total['some']((handle) => handle['tone'] === payload)) || total[0x0]['tone'];
+  return total['find']((state) => state['tone'] === record) || total[0x0];
+}
+function readProviderStatusTone(config) {
   return (
-    _0x2f8421["find"]((_0x207a68) => _0x207a68["tone"] === _0x95d52f) ||
-    _0x2f8421[0x0]
+    PROVIDER_STATUS_TONES['find']((scope) =>
+      config?.['classList']?.['contains']('settings-provider-status--' + scope),
+    ) || ''
   );
 }
-function readProviderStatusTone(_0x5c4a8f) {
-  return (
-    PROVIDER_STATUS_TONES["find"]((_0x45d709) =>
-      _0x5c4a8f?.["classList"]?.["contains"](
-        "settings-provider-status--" + _0x45d709,
-      ),
-    ) || ""
-  );
-}
-function readCardStatus(_0x2e73e5) {
-  const _0x198260 = Array["from"](
-    _0x2e73e5?.["querySelectorAll"]?.(".settings-provider-status") || [],
-  )
-    ["filter"](
-      (_0x509107) =>
-        !_0x509107["hidden"] &&
-        String(_0x509107["textContent"] || "")["trim"](),
-    )
-    ["map"]((_0x231349) => ({
-      text: String(_0x231349["textContent"] || "")["trim"](),
-      tone: readProviderStatusTone(_0x231349),
+function readCardStatus(input) {
+  const output = Array['from'](input?.['querySelectorAll']?.('.settings-provider-status') || [])
+    ['filter']((enabled) => !enabled['hidden'] && String(enabled['textContent'] || '')['trim']())
+    ['map']((value2) => ({
+      text: String(value2['textContent'] || '')['trim'](),
+      tone: readProviderStatusTone(value2),
     }));
-  return _0x198260["length"]
-    ? aggregateModelServiceProviderStatus(_0x198260)
-    : null;
+  return output['length'] ? aggregateModelServiceProviderStatus(output) : null;
 }
-function getProviderLabel(_0x6bf885, _0x451cae) {
+function getProviderLabel(value3, value4) {
   return (
-    String(
-      _0x451cae?.["querySelector"]?.(".settings-card-title")?.["textContent"] ||
-        "",
-    )["trim"]() || _0x6bf885
+    String(value4?.['querySelector']?.('.settings-card-title')?.['textContent'] || '')['trim']() || value3
   );
 }
-function cloneProviderIcon(_0x53a9c3, _0x14c767) {
-  const _0x49577f = _0x14c767?.["querySelector"]?.(".settings-card-head"),
-    _0x2229fe = _0x49577f?.["querySelector"]?.(
-      ".settings-card-icon, .settings-card-badge, svg",
-    ),
-    _0x330904 = _0x53a9c3["createElement"]("span");
-  ((_0x330904["className"] = "model-service-provider-option-icon"),
-    _0x330904["setAttribute"]("aria-hidden", "true"));
-  if (_0x2229fe?.["cloneNode"]) {
-    const _0x42d783 = _0x2229fe["cloneNode"](!![]);
-    (_0x42d783["removeAttribute"]?.("id"), _0x330904["appendChild"](_0x42d783));
+function cloneProviderIcon(value5, value6) {
+  const value7 = value6?.['querySelector']?.('.settings-card-head'),
+    value8 = value7?.['querySelector']?.('.settings-card-icon, .settings-card-badge, svg'),
+    value9 = value5['createElement']('span');
+  ((value9['className'] = 'model-service-provider-option-icon'),
+    value9['setAttribute']('aria-hidden', 'true'));
+  if (value8?.['cloneNode']) {
+    const value10 = value8['cloneNode'](!![]);
+    (value10['removeAttribute']?.('id'), value9['appendChild'](value10));
   }
-  return _0x330904;
+  return value9;
 }
-function getRouteLabel(_0x23455b, _0x4dfa3c) {
-  const _0x540f00 = String(
-    _0x4dfa3c?.["dataset"]?.["modelServiceRouteLabelI18n"] || "",
-  )["trim"]();
-  if (_0x540f00) return t(_0x540f00);
-  if (_0x23455b === "domestic")
-    return t("settings.apiInput.catalog.routeDomestic");
-  if (_0x23455b === "international")
-    return t("settings.apiInput.catalog.routeInternational");
+function getRouteLabel(value11, value12) {
+  const value13 = String(value12?.['dataset']?.['modelServiceRouteLabelI18n'] || '')['trim']();
+  if (value13) return t(value13);
+  if (value11 === 'domestic') return t('settings.apiInput.catalog.routeDomestic');
+  if (value11 === 'international') return t('settings.apiInput.catalog.routeInternational');
   return (
-    String(
-      _0x4dfa3c?.["querySelector"]?.(".settings-card-title")?.["textContent"] ||
-        "",
-    )["trim"]() || _0x23455b
+    String(value12?.['querySelector']?.('.settings-card-title')?.['textContent'] || '')['trim']() || value11
   );
 }
-function isCardAvailable(_0x5c53f9, _0x1f6c82) {
-  if (!_0x5c53f9 || _0x5c53f9["hidden"]) return ![];
+function isCardAvailable(enabled2, enabled3) {
+  if (!enabled2 || enabled2['hidden']) return ![];
+  if (!isModelProviderPubliclyListed(enabled2['dataset']?.['modelServiceProvider'])) return ![];
   if (
-    !isModelProviderPubliclyListed(
-      _0x5c53f9["dataset"]?.["modelServiceProvider"],
-    )
-  )
-    return ![];
-  if (
-    _0x5c53f9["classList"]?.["contains"]("dev-mode-only") &&
-    !_0x1f6c82?.["body"]?.["classList"]?.["contains"]("dev-mode")
+    enabled2['classList']?.['contains']('dev-mode-only') &&
+    !enabled3?.['body']?.['classList']?.['contains']('dev-mode')
   )
     return ![];
   return !![];
 }
-function createProviderGroup(_0x34ec26, _0x1e51a6, _0x5ae2d5, _0x189f5a) {
-  const _0x1154a4 = _0x34ec26["createElement"]("section");
-  ((_0x1154a4["className"] = "model-service-provider-detail"),
-    (_0x1154a4["dataset"]["modelServiceProviderDetail"] = _0x1e51a6),
-    (_0x1154a4["hidden"] = !![]));
-  const _0x25c123 = new Map();
-  if (_0x5ae2d5["length"] > 0x1) {
-    const _0x1c067a = _0x34ec26["createElement"]("div");
-    _0x1c067a["className"] = "model-service-detail-route-header";
-    const _0x30b254 = _0x34ec26["createElement"]("span");
-    ((_0x30b254["className"] = "model-service-detail-route-label"),
-      (_0x30b254["dataset"]["i18n"] = "settings.apiInput.catalog.routeLabel"),
-      (_0x30b254["textContent"] = t("settings.apiInput.catalog.routeLabel")));
-    const _0xd6060c = _0x34ec26["createElement"]("div");
-    ((_0xd6060c["className"] = "model-service-detail-route-tabs"),
-      _0xd6060c["setAttribute"]("role", "tablist"),
-      _0xd6060c["setAttribute"](
-        "aria-label",
-        t("settings.apiInput.catalog.routeAria"),
-      ),
-      _0x5ae2d5["forEach"]((_0x2caedf, _0x178d58) => {
-        const _0x1f9681 =
-            String(_0x2caedf["dataset"]["modelServiceRoute"] || "")["trim"]() ||
-            "route-" + (_0x178d58 + 0x1),
-          _0x57cf98 = _0x34ec26["createElement"]("button");
-        ((_0x57cf98["type"] = "button"),
-          (_0x57cf98["className"] = "model-service-detail-route-tab"),
-          (_0x57cf98["dataset"]["modelServiceRouteTarget"] = _0x1f9681),
-          _0x57cf98["setAttribute"]("role", "tab"),
-          _0x57cf98["setAttribute"]("aria-selected", "false"));
-        const _0xda59ee =
-            _0x2caedf["id"] ||
-            "model-service-route-panel-" + _0x1e51a6 + "-" + _0x1f9681,
-          _0x382d4e = _0xda59ee + "-tab";
-        ((_0x2caedf["id"] = _0xda59ee),
-          (_0x57cf98["id"] = _0x382d4e),
-          _0x57cf98["setAttribute"]("aria-controls", _0xda59ee),
-          _0x2caedf["setAttribute"]("role", "tabpanel"),
-          _0x2caedf["setAttribute"]("aria-labelledby", _0x382d4e));
-        const _0x5a73e5 = _0x34ec26["createElement"]("span");
-        ((_0x5a73e5["className"] = "model-service-detail-route-name"),
-          (_0x5a73e5["textContent"] = getRouteLabel(_0x1f9681, _0x2caedf)));
-        const _0x4ea6d2 = _0x34ec26["createElement"]("span");
-        ((_0x4ea6d2["className"] =
-          "settings-provider-status model-service-detail-route-status settings-provider-status--unconfigured"),
-          (_0x4ea6d2["textContent"] = t(
-            "settings.apiInput.readiness.requiredShort",
-          )),
-          _0x57cf98["append"](_0x5a73e5, _0x4ea6d2),
-          _0xd6060c["appendChild"](_0x57cf98),
-          _0x25c123["set"](_0x1f9681, {
-            button: _0x57cf98,
-            card: _0x2caedf,
-            name: _0x5a73e5,
-            status: _0x4ea6d2,
+function createProviderGroup(value14, id, cards, value15) {
+  const wrapper = value14['createElement']('section');
+  ((wrapper['className'] = 'model-service-provider-detail'),
+    (wrapper['dataset']['modelServiceProviderDetail'] = id),
+    (wrapper['hidden'] = !![]));
+  const routeButtons = new Map();
+  if (cards['length'] > 0x1) {
+    const value16 = value14['createElement']('div');
+    value16['className'] = 'model-service-detail-route-header';
+    const value17 = value14['createElement']('span');
+    ((value17['className'] = 'model-service-detail-route-label'),
+      (value17['dataset']['i18n'] = 'settings.apiInput.catalog.routeLabel'),
+      (value17['textContent'] = t('settings.apiInput.catalog.routeLabel')));
+    const value18 = value14['createElement']('div');
+    ((value18['className'] = 'model-service-detail-route-tabs'),
+      value18['setAttribute']('role', 'tablist'),
+      value18['setAttribute']('aria-label', t('settings.apiInput.catalog.routeAria')),
+      cards['forEach']((card, value19) => {
+        const value20 =
+            String(card['dataset']['modelServiceRoute'] || '')['trim']() || 'route-' + (value19 + 0x1),
+          button = value14['createElement']('button');
+        ((button['type'] = 'button'),
+          (button['className'] = 'model-service-detail-route-tab'),
+          (button['dataset']['modelServiceRouteTarget'] = value20),
+          button['setAttribute']('role', 'tab'),
+          button['setAttribute']('aria-selected', 'false'));
+        const value21 = card['id'] || 'model-service-route-panel-' + id + '-' + value20,
+          value22 = value21 + '-tab';
+        ((card['id'] = value21),
+          (button['id'] = value22),
+          button['setAttribute']('aria-controls', value21),
+          card['setAttribute']('role', 'tabpanel'),
+          card['setAttribute']('aria-labelledby', value22));
+        const name = value14['createElement']('span');
+        ((name['className'] = 'model-service-detail-route-name'),
+          (name['textContent'] = getRouteLabel(value20, card)));
+        const status = value14['createElement']('span');
+        ((status['className'] =
+          'settings-provider-status model-service-detail-route-status settings-provider-status--unconfigured'),
+          (status['textContent'] = t('settings.apiInput.readiness.requiredShort')),
+          button['append'](name, status),
+          value18['appendChild'](button),
+          routeButtons['set'](value20, {
+            button: button,
+            card: card,
+            name: name,
+            status: status,
           }));
       }),
-      _0x1c067a["append"](_0x30b254, _0xd6060c),
-      _0x1154a4["appendChild"](_0x1c067a));
+      value16['append'](value17, value18),
+      wrapper['appendChild'](value16));
   }
-  const _0x39605b = _0x34ec26["createElement"]("div");
+  const value23 = value14['createElement']('div');
   return (
-    (_0x39605b["className"] = "model-service-provider-card-stage"),
-    _0x5ae2d5["forEach"]((_0x43f53d) => {
-      (_0x43f53d["classList"]["add"]("model-service-provider-card"),
-        _0x39605b["appendChild"](_0x43f53d));
+    (value23['className'] = 'model-service-provider-card-stage'),
+    cards['forEach']((value24) => {
+      (value24['classList']['add']('model-service-provider-card'), value23['appendChild'](value24));
     }),
-    _0x1154a4["appendChild"](_0x39605b),
-    _0x189f5a["appendChild"](_0x1154a4),
+    wrapper['appendChild'](value23),
+    value15['appendChild'](wrapper),
     {
-      id: _0x1e51a6,
-      cards: _0x5ae2d5,
-      kinds: Array["from"](
+      id: id,
+      cards: cards,
+      kinds: Array['from'](
         new Set(
-          _0x5ae2d5["flatMap"]((_0x1a3b9e) =>
-            normalizeModelServiceKinds(
-              _0x1a3b9e["dataset"]["modelServiceKinds"],
-            ),
-          ),
+          cards['flatMap']((value25) => normalizeModelServiceKinds(value25['dataset']['modelServiceKinds'])),
         ),
       ),
-      wrapper: _0x1154a4,
-      routeButtons: _0x25c123,
-      activeRouteId: "",
+      wrapper: wrapper,
+      routeButtons: routeButtons,
+      activeRouteId: '',
       button: null,
       buttonName: null,
     }
   );
 }
-function createProviderButton(_0x1d7201, _0x1bd64c, _0x68b445) {
-  const _0x11126c = _0x1bd64c["cards"][0x0],
-    _0x49de4f = _0x1d7201["createElement"]("button");
-  ((_0x49de4f["type"] = "button"),
-    (_0x49de4f["className"] = "model-service-provider-option"),
-    (_0x49de4f["dataset"]["modelServiceProviderTarget"] = _0x1bd64c["id"]),
-    _0x49de4f["setAttribute"]("aria-pressed", "false"));
-  _0x11126c["classList"]?.["contains"]("dev-mode-only") &&
-    _0x49de4f["classList"]["add"]("dev-mode-only");
-  const _0x382f85 = _0x1d7201["createElement"]("span");
-  ((_0x382f85["className"] = "model-service-provider-option-name"),
-    (_0x382f85["textContent"] = getProviderLabel(_0x1bd64c["id"], _0x11126c)),
-    _0x49de4f["append"](cloneProviderIcon(_0x1d7201, _0x11126c), _0x382f85),
-    _0x68b445["appendChild"](_0x49de4f),
-    (_0x1bd64c["button"] = _0x49de4f),
-    (_0x1bd64c["buttonName"] = _0x382f85));
+function createProviderButton(value26, value27, value28) {
+  const value29 = value27['cards'][0x0],
+    value30 = value26['createElement']('button');
+  ((value30['type'] = 'button'),
+    (value30['className'] = 'model-service-provider-option'),
+    (value30['dataset']['modelServiceProviderTarget'] = value27['id']),
+    value30['setAttribute']('aria-pressed', 'false'));
+  value29['classList']?.['contains']('dev-mode-only') && value30['classList']['add']('dev-mode-only');
+  const value31 = value26['createElement']('span');
+  ((value31['className'] = 'model-service-provider-option-name'),
+    (value31['textContent'] = getProviderLabel(value27['id'], value29)),
+    value30['append'](cloneProviderIcon(value26, value29), value31),
+    value28['appendChild'](value30),
+    (value27['button'] = value30),
+    (value27['buttonName'] = value31));
 }
 function createNavigatorController({
-  documentObject: _0x30b0ae,
-  browserEl: _0x4b23d5,
-  pickerEl: _0x26c33e,
-  detailsEl: _0x24aff7,
-  groups: _0x56168d,
+  documentObject: documentObject,
+  browserEl: browserEl,
+  pickerEl: pickerEl,
+  detailsEl: detailsEl,
+  groups: groups,
 }) {
-  let _0xa6b858 = "all",
-    _0xcf43de = "",
-    _0x15e4b8 = null;
-  const _0x551c07 = [],
-    _0x34aa96 = (_0x10d752) =>
-      _0x10d752["cards"]["filter"]((_0x3f7fdd) =>
-        isCardAvailable(_0x3f7fdd, _0x30b0ae),
-      ),
-    _0x461c16 = (_0x14ccf2, _0x1488a4) => {
-      if (!_0x14ccf2) return;
-      ((_0x14ccf2["textContent"] =
-        _0x1488a4?.["text"] || t("settings.apiInput.readiness.requiredShort")),
-        _0x14ccf2["classList"]["remove"](...PROVIDER_STATUS_CLASSES),
-        _0x14ccf2["classList"]["add"](
-          "settings-provider-status--" +
-            (_0x1488a4?.["tone"] || "unconfigured"),
-        ));
+  let value32 = 'all',
+    value33 = '',
+    enabled4 = null;
+  const value34 = [],
+    handler = (value35) => value35['cards']['filter']((value36) => isCardAvailable(value36, documentObject)),
+    handler2 = (enabled5, value37) => {
+      if (!enabled5) return;
+      ((enabled5['textContent'] = value37?.['text'] || t('settings.apiInput.readiness.requiredShort')),
+        enabled5['classList']['remove'](...PROVIDER_STATUS_CLASSES),
+        enabled5['classList']['add']('settings-provider-status--' + (value37?.['tone'] || 'unconfigured')));
     },
-    _0x27db0e = (_0x57b753) => {
-      const _0x1b24f6 = _0x34aa96(_0x57b753),
-        _0x858204 = _0x1b24f6["map"](readCardStatus)["filter"](Boolean),
-        _0x1b9cf7 = aggregateModelServiceProviderStatus(_0x858204),
-        _0x4a42f0 = String(
-          _0x57b753["buttonName"]?.["textContent"] || _0x57b753["id"],
-        )["trim"](),
-        _0x407e8a =
-          String(_0x1b9cf7?.["text"] || "")["trim"]() ||
-          t("settings.apiInput.readiness.requiredShort");
-      ((_0x57b753["button"]["dataset"]["modelServiceStatus"] =
-        _0x1b9cf7?.["tone"] || "unconfigured"),
-        (_0x57b753["button"]["dataset"]["tooltip"] =
-          _0x4a42f0 + "：" + _0x407e8a),
-        _0x57b753["button"]["setAttribute"](
-          "aria-label",
-          _0x4a42f0 + "，" + _0x407e8a,
+    handler3 = (value38) => {
+      const value39 = handler(value38),
+        value40 = value39['map'](readCardStatus)['filter'](Boolean),
+        aggregateModelServiceProviderStatus2 = aggregateModelServiceProviderStatus(value40),
+        value41 = String(value38['buttonName']?.['textContent'] || value38['id'])['trim'](),
+        value42 =
+          String(aggregateModelServiceProviderStatus2?.['text'] || '')['trim']() ||
+          t('settings.apiInput.readiness.requiredShort');
+      ((value38['button']['dataset']['modelServiceStatus'] =
+        aggregateModelServiceProviderStatus2?.['tone'] || 'unconfigured'),
+        (value38['button']['dataset']['tooltip'] = value41 + '：' + value42),
+        value38['button']['setAttribute']('aria-label', value41 + '，' + value42),
+        value38['button']['classList']['toggle'](
+          'is-verified',
+          aggregateModelServiceProviderStatus2?.['tone'] === 'success',
         ),
-        _0x57b753["button"]["classList"]["toggle"](
-          "is-verified",
-          _0x1b9cf7?.["tone"] === "success",
-        ),
-        _0x57b753["routeButtons"]["forEach"](
-          ({ card: _0x9b168e, status: _0x561e3d }) => {
-            _0x461c16(
-              _0x561e3d,
-              readCardStatus(_0x9b168e) || {
-                text: t("settings.apiInput.readiness.requiredShort"),
-                tone: "unconfigured",
-              },
-            );
-          },
-        ));
+        value38['routeButtons']['forEach'](({ card: card2, status: status2 }) => {
+          handler2(
+            status2,
+            readCardStatus(card2) || {
+              text: t('settings.apiInput.readiness.requiredShort'),
+              tone: 'unconfigured',
+            },
+          );
+        }));
     },
-    _0xed3ebc = (_0x409c38, _0x2f2f09 = "") => {
-      if (!_0x409c38?.["routeButtons"]?.["size"]) return ![];
-      const _0x2fcb5c = Array["from"](_0x409c38["routeButtons"]["entries"]())[
-          "filter"
-        ](([, _0x43f053]) => isCardAvailable(_0x43f053["card"], _0x30b0ae)),
-        _0x46c9f1 =
-          _0x2fcb5c["find"](([_0x1e1418]) => _0x1e1418 === _0x2f2f09) ||
-          _0x2fcb5c["find"](
-            ([_0xc37fec]) => _0xc37fec === _0x409c38["activeRouteId"],
-          ) ||
-          _0x2fcb5c[0x0];
-      if (!_0x46c9f1) return ![];
+    activateRoute = (enabled6, value43 = '') => {
+      if (!enabled6?.['routeButtons']?.['size']) return ![];
+      const value44 = Array['from'](enabled6['routeButtons']['entries']())['filter'](([, value45]) =>
+          isCardAvailable(value45['card'], documentObject),
+        ),
+        enabled7 =
+          value44['find'](([value46]) => value46 === value43) ||
+          value44['find'](([value47]) => value47 === enabled6['activeRouteId']) ||
+          value44[0x0];
+      if (!enabled7) return ![];
       return (
-        (_0x409c38["activeRouteId"] = _0x46c9f1[0x0]),
-        _0x409c38["routeButtons"]["forEach"]((_0x50b179, _0x1fee89) => {
-          const _0x3430d9 = _0x1fee89 === _0x409c38["activeRouteId"],
-            _0x24d34e = isCardAvailable(_0x50b179["card"], _0x30b0ae);
-          ((_0x50b179["button"]["hidden"] = !_0x24d34e),
-            _0x50b179["button"]["classList"]["toggle"]("is-active", _0x3430d9),
-            _0x50b179["button"]["setAttribute"](
-              "aria-selected",
-              _0x3430d9 ? "true" : "false",
-            ),
-            _0x50b179["card"]["classList"]["toggle"](
-              "is-route-hidden",
-              !_0x3430d9,
-            ),
-            _0x50b179["card"]["setAttribute"](
-              "aria-hidden",
-              _0x3430d9 ? "false" : "true",
-            ));
+        (enabled6['activeRouteId'] = enabled7[0x0]),
+        enabled6['routeButtons']['forEach']((value48, value49) => {
+          const enabled8 = value49 === enabled6['activeRouteId'],
+            isCardAvailable2 = isCardAvailable(value48['card'], documentObject);
+          ((value48['button']['hidden'] = !isCardAvailable2),
+            value48['button']['classList']['toggle']('is-active', enabled8),
+            value48['button']['setAttribute']('aria-selected', enabled8 ? 'true' : 'false'),
+            value48['card']['classList']['toggle']('is-route-hidden', !enabled8),
+            value48['card']['setAttribute']('aria-hidden', enabled8 ? 'false' : 'true'));
         }),
         !![]
       );
     },
-    _0x457ac3 = (_0x52d83b) =>
-      _0x34aa96(_0x52d83b)["length"] > 0x0 &&
-      modelServiceKindsMatchCategory(_0x52d83b["kinds"], _0xa6b858),
-    _0x2325ee = () =>
-      _0x56168d["find"]((_0x131220) => _0x457ac3(_0x131220)) || null,
-    _0x4c002b = (_0x4611e3, _0x253551 = {}) => {
-      const _0x180d77 = _0x56168d["find"](
-        (_0x276649) => _0x276649["id"] === _0x4611e3,
-      );
-      if (!_0x180d77 || !_0x34aa96(_0x180d77)["length"]) return ![];
-      !modelServiceKindsMatchCategory(_0x180d77["kinds"], _0xa6b858) &&
-        _0xeff205("all", { preserveProvider: !![] });
-      ((_0xcf43de = _0x180d77["id"]),
-        _0x56168d["forEach"]((_0x1dcb83) => {
-          const _0x299c8b = _0x1dcb83["id"] === _0xcf43de;
-          ((_0x1dcb83["wrapper"]["hidden"] = !_0x299c8b),
-            _0x1dcb83["button"]["classList"]["toggle"]("is-active", _0x299c8b),
-            _0x1dcb83["button"]["setAttribute"](
-              "aria-pressed",
-              _0x299c8b ? "true" : "false",
-            ));
+    handler4 = (value50) =>
+      handler(value50)['length'] > 0x0 && modelServiceKindsMatchCategory(value50['kinds'], value32),
+    handler5 = () => groups['find']((value51) => handler4(value51)) || null,
+    activateProvider = (value52, value53 = {}) => {
+      const enabled9 = groups['find']((value54) => value54['id'] === value52);
+      if (!enabled9 || !handler(enabled9)['length']) return ![];
+      !modelServiceKindsMatchCategory(enabled9['kinds'], value32) &&
+        setCategory('all', { preserveProvider: !![] });
+      ((value33 = enabled9['id']),
+        groups['forEach']((value55) => {
+          const enabled10 = value55['id'] === value33;
+          ((value55['wrapper']['hidden'] = !enabled10),
+            value55['button']['classList']['toggle']('is-active', enabled10),
+            value55['button']['setAttribute']('aria-pressed', enabled10 ? 'true' : 'false'));
         }),
-        _0xed3ebc(_0x180d77, _0x253551["routeId"]));
-      if (_0x253551["focusButton"]) _0x180d77["button"]["focus"]?.();
+        activateRoute(enabled9, value53['routeId']));
+      if (value53['focusButton']) enabled9['button']['focus']?.();
       return !![];
     },
-    _0x2ff0f5 = () => {
-      _0x56168d["forEach"]((_0x3e3b0b) => {
-        ((_0x3e3b0b["button"]["hidden"] = !_0x457ac3(_0x3e3b0b)),
-          _0x3e3b0b["routeButtons"]["forEach"](
-            ({ button: _0x33fdbf, card: _0x53c234 }) => {
-              _0x33fdbf["hidden"] = !isCardAvailable(_0x53c234, _0x30b0ae);
-            },
-          ),
-          _0x27db0e(_0x3e3b0b));
+    sync = () => {
+      groups['forEach']((value56) => {
+        ((value56['button']['hidden'] = !handler4(value56)),
+          value56['routeButtons']['forEach'](({ button: button2, card: card3 }) => {
+            button2['hidden'] = !isCardAvailable(card3, documentObject);
+          }),
+          handler3(value56));
       });
-      if (_0x15e4b8) {
-        _0x56168d["forEach"]((_0x40d96b) => {
-          const _0x305219 = _0x34aa96(_0x40d96b)["filter"]((_0x11fa16) =>
-            _0x15e4b8["has"](_0x11fa16),
-          );
-          ((_0x40d96b["wrapper"]["hidden"] = !_0x305219["length"]),
-            _0x40d96b["cards"]["forEach"]((_0x25472d) => {
-              const _0x581e87 = _0x305219["includes"](_0x25472d);
-              (_0x25472d["classList"]["toggle"]("is-route-hidden", !_0x581e87),
-                _0x25472d["setAttribute"](
-                  "aria-hidden",
-                  _0x581e87 ? "false" : "true",
-                ));
+      if (enabled4) {
+        groups['forEach']((value57) => {
+          const enabled11 = handler(value57)['filter']((value58) => enabled4['has'](value58));
+          ((value57['wrapper']['hidden'] = !enabled11['length']),
+            value57['cards']['forEach']((value59) => {
+              const enabled12 = enabled11['includes'](value59);
+              (value59['classList']['toggle']('is-route-hidden', !enabled12),
+                value59['setAttribute']('aria-hidden', enabled12 ? 'false' : 'true'));
             }));
         });
         return;
       }
-      const _0x5398ec = _0x56168d["find"](
-        (_0x2e7e92) => _0x2e7e92["id"] === _0xcf43de,
-      );
-      if (!_0x5398ec || !_0x457ac3(_0x5398ec)) {
-        const _0xe47c42 = _0x2325ee();
-        if (_0xe47c42) _0x4c002b(_0xe47c42["id"]);
+      const enabled13 = groups['find']((value60) => value60['id'] === value33);
+      if (!enabled13 || !handler4(enabled13)) {
+        const value61 = handler5();
+        if (value61) activateProvider(value61['id']);
         return;
       }
-      _0xed3ebc(_0x5398ec, _0x5398ec["activeRouteId"]);
+      activateRoute(enabled13, enabled13['activeRouteId']);
     };
-  function _0xeff205(_0x455533, _0x27391e = {}) {
-    const _0x94b719 = MODEL_SERVICE_CATEGORY_SET["has"](_0x455533)
-      ? _0x455533
-      : "all";
-    ((_0xa6b858 = _0x94b719),
-      _0x4b23d5["querySelectorAll"]?.("[data-model-service-category]")?.[
-        "forEach"
-      ]((_0x3a0f8e) => {
-        const _0x2c72f3 =
-          _0x3a0f8e["dataset"]["modelServiceCategory"] === _0xa6b858;
-        (_0x3a0f8e["classList"]["toggle"]("is-active", _0x2c72f3),
-          _0x3a0f8e["setAttribute"](
-            "aria-pressed",
-            _0x2c72f3 ? "true" : "false",
-          ));
+  function setCategory(value62, enabled14 = {}) {
+    const value63 = MODEL_SERVICE_CATEGORY_SET['has'](value62) ? value62 : 'all';
+    ((value32 = value63),
+      browserEl['querySelectorAll']?.('[data-model-service-category]')?.['forEach']((value64) => {
+        const value65 = value64['dataset']['modelServiceCategory'] === value32;
+        (value64['classList']['toggle']('is-active', value65),
+          value64['setAttribute']('aria-pressed', value65 ? 'true' : 'false'));
       }),
-      _0x56168d["forEach"]((_0x48fd45) => {
-        _0x48fd45["button"]["hidden"] = !_0x457ac3(_0x48fd45);
+      groups['forEach']((value66) => {
+        value66['button']['hidden'] = !handler4(value66);
       }));
-    const _0x25c118 = _0x56168d["find"](
-      (_0x234149) => _0x234149["id"] === _0xcf43de,
-    );
-    if (
-      !_0x27391e["preserveProvider"] &&
-      (!_0x25c118 || !_0x457ac3(_0x25c118))
-    ) {
-      const _0x5cad76 = _0x2325ee();
-      if (_0x5cad76) _0x4c002b(_0x5cad76["id"]);
+    const enabled15 = groups['find']((value67) => value67['id'] === value33);
+    if (!enabled14['preserveProvider'] && (!enabled15 || !handler4(enabled15))) {
+      const value68 = handler5();
+      if (value68) activateProvider(value68['id']);
     }
   }
-  const _0x2fdada = (_0x3edb5c) => {
-    const _0x267819 = _0x3edb5c?.["closest"]?.("[data-model-service-provider]");
-    if (!_0x267819) return ![];
-    const _0x113c7d = String(
-        _0x267819["dataset"]["modelServiceProvider"] || "",
-      )["trim"](),
-      _0x42a6d4 = String(_0x267819["dataset"]["modelServiceRoute"] || "")[
-        "trim"
-      ](),
-      _0xb2a5e4 = _0x56168d["find"](
-        (_0x341576) => _0x341576["id"] === _0x113c7d,
-      );
-    if (!_0xb2a5e4) return ![];
+  const revealField = (value69) => {
+    const enabled16 = value69?.['closest']?.('[data-model-service-provider]');
+    if (!enabled16) return ![];
+    const value70 = String(enabled16['dataset']['modelServiceProvider'] || '')['trim'](),
+      routeId = String(enabled16['dataset']['modelServiceRoute'] || '')['trim'](),
+      enabled17 = groups['find']((value71) => value71['id'] === value70);
+    if (!enabled17) return ![];
     return (
-      !modelServiceKindsMatchCategory(_0xb2a5e4["kinds"], _0xa6b858) &&
-        _0xeff205("all", { preserveProvider: !![] }),
-      _0x4c002b(_0x113c7d, { routeId: _0x42a6d4 })
+      !modelServiceKindsMatchCategory(enabled17['kinds'], value32) &&
+        setCategory('all', { preserveProvider: !![] }),
+      activateProvider(value70, { routeId: routeId })
     );
   };
-  (_0x4b23d5["querySelectorAll"]?.("[data-model-service-category]")?.[
-    "forEach"
-  ]((_0x501dd7) => {
-    (_0x501dd7["addEventListener"]("click", () => {
-      _0xeff205(_0x501dd7["dataset"]["modelServiceCategory"] || "all");
+  (browserEl['querySelectorAll']?.('[data-model-service-category]')?.['forEach']((value72) => {
+    (value72['addEventListener']('click', () => {
+      setCategory(value72['dataset']['modelServiceCategory'] || 'all');
     }),
-      _0x501dd7["addEventListener"]("keydown", (_0x1b94e8) => {
-        if (
-          !["ArrowLeft", "ArrowRight", "Home", "End"]["includes"](
-            _0x1b94e8["key"],
-          )
-        )
-          return;
-        const _0x1dd37f = Array["from"](
-            _0x4b23d5["querySelectorAll"]("[data-model-service-category]"),
-          ),
-          _0x4b063b = Math["max"](0x0, _0x1dd37f["indexOf"](_0x501dd7)),
-          _0xa27aa7 =
-            _0x1b94e8["key"] === "Home"
+      value72['addEventListener']('keydown', (value73) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End']['includes'](value73['key'])) return;
+        const value74 = Array['from'](browserEl['querySelectorAll']('[data-model-service-category]')),
+          value75 = Math['max'](0x0, value74['indexOf'](value72)),
+          value76 =
+            value73['key'] === 'Home'
               ? 0x0
-              : _0x1b94e8["key"] === "End"
-                ? _0x1dd37f["length"] - 0x1
-                : (_0x4b063b +
-                    (_0x1b94e8["key"] === "ArrowRight" ? 0x1 : -0x1) +
-                    _0x1dd37f["length"]) %
-                  _0x1dd37f["length"];
-        (_0x1b94e8["preventDefault"](),
-          _0x1dd37f[_0xa27aa7]?.["focus"]?.(),
-          _0x1dd37f[_0xa27aa7]?.["click"]?.());
+              : value73['key'] === 'End'
+                ? value74['length'] - 0x1
+                : (value75 + (value73['key'] === 'ArrowRight' ? 0x1 : -0x1) + value74['length']) %
+                  value74['length'];
+        (value73['preventDefault'](), value74[value76]?.['focus']?.(), value74[value76]?.['click']?.());
       }));
   }),
-    _0x56168d["forEach"]((_0x95874c) => {
-      (_0x95874c["button"]["addEventListener"]("click", () => {
-        _0x4c002b(_0x95874c["id"]);
+    groups['forEach']((value77) => {
+      (value77['button']['addEventListener']('click', () => {
+        activateProvider(value77['id']);
       }),
-        _0x95874c["routeButtons"]["forEach"](
-          ({ button: _0x1f119f }, _0x58badd) => {
-            _0x1f119f["addEventListener"]("click", () =>
-              _0xed3ebc(_0x95874c, _0x58badd),
-            );
-          },
-        ));
-      if (typeof globalThis["MutationObserver"] === "function") {
-        const _0x4cc65c = new globalThis["MutationObserver"](() => {
-          _0x2ff0f5();
+        value77['routeButtons']['forEach'](({ button: button3 }, value78) => {
+          button3['addEventListener']('click', () => activateRoute(value77, value78));
+        }));
+      if (typeof globalThis['MutationObserver'] === 'function') {
+        const value79 = new globalThis['MutationObserver'](() => {
+          sync();
         });
-        (_0x95874c["cards"]["forEach"]((_0xac0f9c) => {
-          _0x4cc65c["observe"](_0xac0f9c, {
+        (value77['cards']['forEach']((value80) => {
+          value79['observe'](value80, {
             attributes: !![],
-            attributeFilter: ["hidden", "class"],
+            attributeFilter: ['hidden', 'class'],
             childList: !![],
             subtree: !![],
             characterData: !![],
           });
         }),
-          _0x551c07["push"](_0x4cc65c));
+          value34['push'](value79));
       }
     }));
-  if (
-    typeof globalThis["MutationObserver"] === "function" &&
-    _0x30b0ae["body"]
-  ) {
-    const _0x5472cb = new globalThis["MutationObserver"](_0x2ff0f5);
-    (_0x5472cb["observe"](_0x30b0ae["body"], {
+  if (typeof globalThis['MutationObserver'] === 'function' && documentObject['body']) {
+    const value81 = new globalThis['MutationObserver'](sync);
+    (value81['observe'](documentObject['body'], {
       attributes: !![],
-      attributeFilter: ["class"],
+      attributeFilter: ['class'],
     }),
-      _0x551c07["push"](_0x5472cb));
+      value34['push'](value81));
   }
-  const _0x5d2f20 = onLocaleChange(() => {
-    globalThis["queueMicrotask"]?.(() => {
-      _0x56168d["forEach"]((_0x27b9cb) => {
-        ((_0x27b9cb["buttonName"]["textContent"] = getProviderLabel(
-          _0x27b9cb["id"],
-          _0x27b9cb["cards"][0x0],
-        )),
-          _0x27b9cb["routeButtons"]["forEach"](
-            ({ card: _0x910076, name: _0x11d8dc }, _0x3a0431) => {
-              _0x11d8dc["textContent"] = getRouteLabel(_0x3a0431, _0x910076);
-            },
-          ),
-          _0x27db0e(_0x27b9cb));
+  const onLocaleChange2 = onLocaleChange(() => {
+    globalThis['queueMicrotask']?.(() => {
+      groups['forEach']((value82) => {
+        ((value82['buttonName']['textContent'] = getProviderLabel(value82['id'], value82['cards'][0x0])),
+          value82['routeButtons']['forEach'](({ card: card4, name: name2 }, value83) => {
+            name2['textContent'] = getRouteLabel(value83, card4);
+          }),
+          handler3(value82));
       });
     });
   });
-  _0x2ff0f5();
-  const _0x9235c = _0x2325ee();
-  if (_0x9235c) _0x4c002b(_0x9235c["id"]);
+  sync();
+  const value84 = handler5();
+  if (value84) activateProvider(value84['id']);
   return (
-    _0x4b23d5["classList"]["add"]("is-enhanced"),
+    browserEl['classList']['add']('is-enhanced'),
     {
-      activateProvider: _0x4c002b,
-      activateRoute: _0xed3ebc,
-      revealField: _0x2fdada,
-      setCategory: _0xeff205,
-      setSearchCards(_0x21430c) {
-        ((_0x15e4b8 = _0x21430c === null ? null : new Set(_0x21430c)),
-          !_0x15e4b8 &&
-            _0x56168d["forEach"]((_0xf5c26a) => {
-              (_0xf5c26a["cards"]["forEach"]((_0x27f740) => {
-                (_0x27f740["classList"]["remove"]("is-route-hidden"),
-                  _0x27f740["removeAttribute"]("aria-hidden"));
+      activateProvider: activateProvider,
+      activateRoute: activateRoute,
+      revealField: revealField,
+      setCategory: setCategory,
+      setSearchCards(value85) {
+        ((enabled4 = value85 === null ? null : new Set(value85)),
+          !enabled4 &&
+            groups['forEach']((value86) => {
+              (value86['cards']['forEach']((value87) => {
+                (value87['classList']['remove']('is-route-hidden'),
+                  value87['removeAttribute']('aria-hidden'));
               }),
-                _0xed3ebc(_0xf5c26a, _0xf5c26a["activeRouteId"]),
-                (_0xf5c26a["wrapper"]["hidden"] =
-                  _0xf5c26a["id"] !== _0xcf43de));
+                activateRoute(value86, value86['activeRouteId']),
+                (value86['wrapper']['hidden'] = value86['id'] !== value33));
             }),
-          _0x2ff0f5());
+          sync());
       },
-      sync: _0x2ff0f5,
+      sync: sync,
       destroy() {
-        (_0x551c07["forEach"]((_0x865956) => _0x865956["disconnect"]?.()),
-          _0x5d2f20?.());
+        (value34['forEach']((value88) => value88['disconnect']?.()), onLocaleChange2?.());
         if (activeNavigator === this) activeNavigator = null;
       },
     }
   );
 }
-export function initModelServiceSettingsNavigator(
-  _0x5238aa = globalThis["document"],
-) {
-  if (!_0x5238aa?.["getElementById"]) return null;
-  const _0x4ca84a = _0x5238aa["getElementById"]("modelServiceBrowser"),
-    _0x3327ba = _0x5238aa["getElementById"]("modelServiceProviderPicker"),
-    _0x16a1ce = _0x5238aa["getElementById"]("modelServiceProviderDetails");
-  if (!_0x4ca84a || !_0x3327ba || !_0x16a1ce) return null;
+export function initModelServiceSettingsNavigator(documentObject2 = globalThis['document']) {
+  if (!documentObject2?.['getElementById']) return null;
+  const browserEl2 = documentObject2['getElementById']('modelServiceBrowser'),
+    pickerEl2 = documentObject2['getElementById']('modelServiceProviderPicker'),
+    detailsEl2 = documentObject2['getElementById']('modelServiceProviderDetails');
+  if (!browserEl2 || !pickerEl2 || !detailsEl2) return null;
   if (activeNavigator) return activeNavigator;
-  const _0x2122a0 = Array["from"](
-      _0x5238aa["querySelectorAll"]?.("[data-model-service-provider]") || [],
-    ),
-    _0x571165 = new Map();
-  _0x2122a0["forEach"]((_0x2ef320) => {
-    const _0x93f839 = String(
-      _0x2ef320["dataset"]["modelServiceProvider"] || "",
-    )["trim"]();
-    if (!_0x93f839) return;
-    const _0x590ffa = _0x571165["get"](_0x93f839) || [];
-    (_0x590ffa["push"](_0x2ef320), _0x571165["set"](_0x93f839, _0x590ffa));
+  const value89 = Array['from'](documentObject2['querySelectorAll']?.('[data-model-service-provider]') || []),
+    value90 = new Map();
+  value89['forEach']((value91) => {
+    const enabled18 = String(value91['dataset']['modelServiceProvider'] || '')['trim']();
+    if (!enabled18) return;
+    const value92 = value90['get'](enabled18) || [];
+    (value92['push'](value91), value90['set'](enabled18, value92));
   });
-  const _0x1a80ff = Array["from"](_0x571165["entries"]())["map"](
-    ([_0x5d3c1b, _0x53d09e]) =>
-      createProviderGroup(_0x5238aa, _0x5d3c1b, _0x53d09e, _0x16a1ce),
+  const groups2 = Array['from'](value90['entries']())['map'](([value93, value94]) =>
+    createProviderGroup(documentObject2, value93, value94, detailsEl2),
   );
   return (
-    _0x1a80ff["forEach"]((_0x447f6e) =>
-      createProviderButton(_0x5238aa, _0x447f6e, _0x3327ba),
-    ),
+    groups2['forEach']((value95) => createProviderButton(documentObject2, value95, pickerEl2)),
     (activeNavigator = createNavigatorController({
-      documentObject: _0x5238aa,
-      browserEl: _0x4ca84a,
-      pickerEl: _0x3327ba,
-      detailsEl: _0x16a1ce,
-      groups: _0x1a80ff,
+      documentObject: documentObject2,
+      browserEl: browserEl2,
+      pickerEl: pickerEl2,
+      detailsEl: detailsEl2,
+      groups: groups2,
     })),
     activeNavigator
   );
 }
-export function revealModelServiceSettingsField(_0x1ff350) {
-  return activeNavigator?.["revealField"]?.(_0x1ff350) || ![];
+export function revealModelServiceSettingsField(value96) {
+  return activeNavigator?.['revealField']?.(value96) || ![];
 }
-export function setModelServiceSettingsSearchCards(_0xdaf99f) {
-  activeNavigator?.["setSearchCards"](_0xdaf99f);
+export function setModelServiceSettingsSearchCards(value97) {
+  activeNavigator?.['setSearchCards'](value97);
 }

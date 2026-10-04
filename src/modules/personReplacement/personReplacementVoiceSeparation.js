@@ -13,62 +13,57 @@ import {
   resolvePersonReplacementVoiceSeparationState,
   updatePersonReplacementVoiceSeparationState,
 } from './personReplacementVoiceSeparationState.js';
-function normalizeText(_0x5d63aa) {
-  return String(_0x5d63aa ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function cloneJson(_0x48d898) {
-  return _0x48d898 && typeof _0x48d898 === 'object' ? JSON['parse'](JSON['stringify'](_0x48d898)) : _0x48d898;
+function cloneJson(item) {
+  return item && typeof item === 'object' ? JSON['parse'](JSON['stringify'](item)) : item;
 }
 function createRequestId() {
-  const _0x51117a = globalThis['crypto']?.['randomUUID']?.();
+  const key = globalThis['crypto']?.['randomUUID']?.();
   return (
-    'replacement-voice-separation-' +
-    (_0x51117a || Date['now']() + '-' + Math['round'](Math['random']() * 0x186a0))
+    'replacement-voice-separation-' + (key || Date['now']() + '-' + Math['round'](Math['random']() * 0x186a0))
   );
 }
-function resolveSeparationResultUrls(_0x547937 = {}) {
-  const _0x1dbf53 = Array['isArray'](_0x547937?.['audios']) ? _0x547937['audios'] : [],
-    _0x5f1811 = normalizeText(
-      _0x547937['vocalsAudioUrl'] ||
-        _0x1dbf53['find']((_0x263b61) => normalizeText(_0x263b61?.['role'])['toLowerCase']() === 'vocals')?.[
+function resolveSeparationResultUrls(options = {}) {
+  const list = Array['isArray'](options?.['audios']) ? options['audios'] : [],
+    vocalsAudioUrl = normalizeText(
+      options['vocalsAudioUrl'] ||
+        list['find']((index) => normalizeText(index?.['role'])['toLowerCase']() === 'vocals')?.['audioUrl'] ||
+        list[0x0]?.['audioUrl'],
+    ),
+    backgroundAudioUrl = normalizeText(
+      options['backgroundAudioUrl'] ||
+        list['find']((result) => normalizeText(result?.['role'])['toLowerCase']() === 'background')?.[
           'audioUrl'
         ] ||
-        _0x1dbf53[0x0]?.['audioUrl'],
-    ),
-    _0x47342c = normalizeText(
-      _0x547937['backgroundAudioUrl'] ||
-        _0x1dbf53['find'](
-          (_0x5f43ce) => normalizeText(_0x5f43ce?.['role'])['toLowerCase']() === 'background',
-        )?.['audioUrl'] ||
-        _0x1dbf53[0x1]?.['audioUrl'],
+        list[0x1]?.['audioUrl'],
     );
-  if (!_0x5f1811 || !_0x47342c) throw new Error('人声分离完成，但返回结果缺少人声或背景声音频');
-  return { vocalsAudioUrl: _0x5f1811, backgroundAudioUrl: _0x47342c };
+  if (!vocalsAudioUrl || !backgroundAudioUrl) throw new Error('人声分离完成，但返回结果缺少人声或背景声音频');
+  return { vocalsAudioUrl: vocalsAudioUrl, backgroundAudioUrl: backgroundAudioUrl };
 }
-async function persistSeparatedAudio(_0x3f3cee, _0x2f02a8, _0x1070d3 = {}) {
-  const _0x2c101f = await _0x2f02a8(_0x3f3cee, _0x1070d3),
-    _0x2eca59 = normalizeLocalPath(pickResultLocalPath(_0x2c101f)),
-    _0x570ada = normalizeText(
-      _0x2c101f?.['localUrl'] || _0x2c101f?.['audioUrl'] || localPathToUrl(_0x2eca59),
-    );
-  if (!_0x2eca59 || !_0x570ada) throw new Error('清晰人声已生成，但保存到本地失败');
-  return { localPath: _0x2eca59, localUrl: _0x570ada };
+async function persistSeparatedAudio(data, handler, target = {}) {
+  const source = await handler(data, target),
+    localPath = normalizeLocalPath(pickResultLocalPath(source)),
+    localUrl = normalizeText(source?.['localUrl'] || source?.['audioUrl'] || localPathToUrl(localPath));
+  if (!localPath || !localUrl) throw new Error('清晰人声已生成，但保存到本地失败');
+  return { localPath: localPath, localUrl: localUrl };
 }
 async function cancelRemoteSeparationTask({
-  taskId: _0x485365,
+  taskId: taskId2,
   providerProfileId: providerProfileId = '',
 } = {}) {
-  const _0x54c560 = await resolveRunningHubWorkflowAccess(providerProfileId);
-  if (!_0x54c560?.['apiKey']) throw new Error('未配置\x20RunningHub\x20API\x20Key，无法取消远端任务');
+  const apiKey = await resolveRunningHubWorkflowAccess(providerProfileId);
+  if (!apiKey?.['apiKey']) throw new Error('未配置\x20RunningHub\x20API\x20Key，无法取消远端任务');
   return cancelRunningHubAudioTask({
-    apiKey: _0x54c560['apiKey'],
-    taskId: _0x485365,
-    providerProfileId: providerProfileId || _0x54c560['providerProfileId'],
+    apiKey: apiKey['apiKey'],
+    taskId: taskId2,
+    providerProfileId: providerProfileId || apiKey['providerProfileId'],
   });
 }
 export function createPersonReplacementVoiceSeparationRuntime({
-  getProject: _0x24b976,
-  setProject: _0x3659fd,
+  getProject: getProject,
+  setProject: setProject,
   runSeparation: runSeparation = runAudioSeparation,
   resumeSeparation: resumeSeparation = resumeAudioSeparationTask,
   cancelSeparation: cancelSeparation = cancelRemoteSeparationTask,
@@ -79,310 +74,335 @@ export function createPersonReplacementVoiceSeparationRuntime({
   now: now = () => new Date()['toISOString'](),
   createId: createId = createRequestId,
 } = {}) {
-  if (typeof _0x24b976 !== 'function' || typeof _0x3659fd !== 'function')
+  if (typeof getProject !== 'function' || typeof setProject !== 'function')
     throw new TypeError('Voice separation runtime requires project access');
-  let _0x1a2f49 = ![];
-  const _0x5cd7c2 = new Map(),
-    _0x3f9382 = (_0x16d943, _0x30719b) => normalizeText(_0x16d943) + ':' + normalizeText(_0x30719b),
-    _0x23aa5e = (_0x111887, _0x564651) =>
-      (Array['isArray'](_0x111887?.['sources']) ? _0x111887['sources'] : [])['find'](
-        (_0x1f92d4) => normalizeText(_0x1f92d4?.['id']) === normalizeText(_0x564651),
+  let enabled = ![];
+  const map = new Map(),
+    handler2 = (next, current) => normalizeText(next) + ':' + normalizeText(current),
+    handler3 = (entry, record) =>
+      (Array['isArray'](entry?.['sources']) ? entry['sources'] : [])['find'](
+        (payload) => normalizeText(payload?.['id']) === normalizeText(record),
       ),
-    _0x286116 = ({
-      projectId: _0x39465f,
-      sourceId: _0x1a86c5,
-      requestId: _0x1457b7,
-      inputRevision: _0x1c2236,
+    handler4 = ({
+      projectId: projectId,
+      sourceId: sourceId,
+      requestId: requestId,
+      inputRevision: inputRevision,
     }) => {
-      const _0x53f09a = _0x24b976(),
-        _0x30c85e = _0x23aa5e(_0x53f09a, _0x1a86c5),
-        _0x218480 = resolvePersonReplacementVoiceSeparationState(_0x53f09a, _0x1a86c5);
+      const project = getProject(),
+        source2 = handler3(project, sourceId),
+        personReplacementVoiceSeparationState = resolvePersonReplacementVoiceSeparationState(
+          project,
+          sourceId,
+        );
       return (
-        !_0x1a2f49 &&
-        normalizeText(_0x53f09a?.['id']) === normalizeText(_0x39465f) &&
-        normalizeText(_0x218480['requestId']) === normalizeText(_0x1457b7) &&
-        createPersonReplacementVoiceSeparationRevision({ project: _0x53f09a, source: _0x30c85e }) ===
-          _0x1c2236
+        !enabled &&
+        normalizeText(project?.['id']) === normalizeText(projectId) &&
+        normalizeText(personReplacementVoiceSeparationState['requestId']) === normalizeText(requestId) &&
+        createPersonReplacementVoiceSeparationRevision({ project: project, source: source2 }) ===
+          inputRevision
       );
     },
-    _0x557c48 = (_0x8f125c, _0x5cc0d1 = {}, { persistIdentity: persistIdentity = ![] } = {}) => {
-      if (!_0x286116(_0x8f125c)) return null;
-      const _0x1f0fd8 = _0x24b976(),
-        _0x57b99b = resolvePersonReplacementVoiceSeparationState(_0x1f0fd8, _0x8f125c['sourceId']),
-        _0x21b0ea = normalizePersonReplacementVoiceSeparationState({
-          ..._0x57b99b,
-          ..._0x5cc0d1,
-          sourceId: _0x8f125c['sourceId'],
-          requestId: _0x8f125c['requestId'],
-          inputRevision: _0x8f125c['inputRevision'],
+    handler5 = (sourceId2, args = {}, { persistIdentity: persistIdentity = ![] } = {}) => {
+      if (!handler4(sourceId2)) return null;
+      const args2 = getProject(),
+        args3 = resolvePersonReplacementVoiceSeparationState(args2, sourceId2['sourceId']),
+        personReplacementVoiceSeparationState2 = normalizePersonReplacementVoiceSeparationState({
+          ...args3,
+          ...args,
+          sourceId: sourceId2['sourceId'],
+          requestId: sourceId2['requestId'],
+          inputRevision: sourceId2['inputRevision'],
         }),
-        _0x9a15cd = _0x3659fd(
-          { ..._0x1f0fd8, audio: updatePersonReplacementVoiceSeparationState(_0x1f0fd8['audio'], _0x21b0ea) },
+        handle = setProject(
+          {
+            ...args2,
+            audio: updatePersonReplacementVoiceSeparationState(
+              args2['audio'],
+              personReplacementVoiceSeparationState2,
+            ),
+          },
           { renderWorkspace: ![] },
         );
       return (
         onStateChange({
-          sourceId: _0x8f125c['sourceId'],
-          state: cloneJson(_0x21b0ea),
-          project: cloneJson(_0x9a15cd || _0x24b976()),
+          sourceId: sourceId2['sourceId'],
+          state: cloneJson(personReplacementVoiceSeparationState2),
+          project: cloneJson(handle || getProject()),
         }),
         persistIdentity &&
-          _0x21b0ea['taskId'] !== _0x57b99b['taskId'] &&
+          personReplacementVoiceSeparationState2['taskId'] !== args3['taskId'] &&
           void Promise['resolve'](persistNow())['catch'](() => {}),
-        _0x21b0ea
+        personReplacementVoiceSeparationState2
       );
     },
-    _0x1b8998 = ({
-      project: _0x1d445d,
-      source: _0x1f5dbb,
-      requestId: _0x579cf5,
-      inputRevision: _0x1979a1,
+    handler6 = ({
+      project: project2,
+      source: source3,
+      requestId: requestId2,
+      inputRevision: inputRevision2,
     }) => {
-      const _0x2fe28f = resolvePersonReplacementVoiceSeparationState(_0x1d445d, _0x1f5dbb['id']),
-        _0x24c570 = normalizePersonReplacementVoiceSeparationState({
-          ..._0x2fe28f,
-          sourceId: _0x1f5dbb['id'],
+      const args4 = resolvePersonReplacementVoiceSeparationState(project2, source3['id']),
+        personReplacementVoiceSeparationState3 = normalizePersonReplacementVoiceSeparationState({
+          ...args4,
+          sourceId: source3['id'],
           status: 'submitting',
-          requestId: _0x579cf5,
-          inputRevision: _0x1979a1,
+          requestId: requestId2,
+          inputRevision: inputRevision2,
           taskId: '',
           providerProfileId: '',
           startedAt: now(),
           completedAt: '',
           error: '',
         }),
-        _0x25c523 = _0x3659fd(
-          { ..._0x1d445d, audio: updatePersonReplacementVoiceSeparationState(_0x1d445d['audio'], _0x24c570) },
+        state = setProject(
+          {
+            ...project2,
+            audio: updatePersonReplacementVoiceSeparationState(
+              project2['audio'],
+              personReplacementVoiceSeparationState3,
+            ),
+          },
           { renderWorkspace: ![] },
         );
       return (
         onStateChange({
-          sourceId: _0x1f5dbb['id'],
-          state: cloneJson(_0x24c570),
-          project: cloneJson(_0x25c523 || _0x24b976()),
+          sourceId: source3['id'],
+          state: cloneJson(personReplacementVoiceSeparationState3),
+          project: cloneJson(state || getProject()),
         }),
-        _0x24c570
+        personReplacementVoiceSeparationState3
       );
     },
-    _0x4a12ad = async ({
-      projectId: _0x863924,
-      sourceId: _0x4a1540,
-      sourceVideoRef: _0x9e4e0c,
-      requestId: _0x29f893,
-      inputRevision: _0x3c3675,
+    handler7 = async ({
+      projectId: projectId2,
+      sourceId: sourceId3,
+      sourceVideoRef: sourceVideoRef,
+      requestId: requestId3,
+      inputRevision: inputRevision3,
       taskId: taskId = '',
       providerProfileId: providerProfileId = '',
       resume: resume = ![],
-      runtime: _0x4f827f,
+      runtime: runtime,
     }) => {
-      const _0x3174d = {
-        projectId: _0x863924,
-        sourceId: _0x4a1540,
-        requestId: _0x29f893,
-        inputRevision: _0x3c3675,
+      const config = {
+        projectId: projectId2,
+        sourceId: sourceId3,
+        requestId: requestId3,
+        inputRevision: inputRevision3,
       };
       try {
-        const _0x3bde8f = resume
+        const scope = resume
             ? await resumeSeparation(
                 taskId,
                 { providerProfileId: providerProfileId },
-                { signal: _0x4f827f['abortController']['signal'], pollImmediately: !![] },
+                { signal: runtime['abortController']['signal'], pollImmediately: !![] },
               )
             : await runSeparation(
-                { audioUrl: localPathToUrl(_0x9e4e0c) || _0x9e4e0c },
+                { audioUrl: localPathToUrl(sourceVideoRef) || sourceVideoRef },
                 {
-                  signal: _0x4f827f['abortController']['signal'],
-                  onTaskMeta: (_0x480d8f = {}) => {
-                    ((_0x4f827f['taskId'] = normalizeText(_0x480d8f['taskId'])),
-                      (_0x4f827f['providerProfileId'] = normalizeText(_0x480d8f['providerProfileId'])),
-                      _0x557c48(
-                        _0x3174d,
+                  signal: runtime['abortController']['signal'],
+                  onTaskMeta: (options2 = {}) => {
+                    ((runtime['taskId'] = normalizeText(options2['taskId'])),
+                      (runtime['providerProfileId'] = normalizeText(options2['providerProfileId'])),
+                      handler5(
+                        config,
                         {
                           status: 'running',
-                          taskId: _0x4f827f['taskId'],
-                          providerProfileId: _0x4f827f['providerProfileId'],
+                          taskId: runtime['taskId'],
+                          providerProfileId: runtime['providerProfileId'],
                         },
                         { persistIdentity: !![] },
                       ));
                   },
-                  onTaskId: (_0x1fdcfc) => {
-                    ((_0x4f827f['taskId'] = normalizeText(_0x1fdcfc)),
-                      _0x557c48(
-                        _0x3174d,
-                        { status: 'running', taskId: _0x4f827f['taskId'] },
+                  onTaskId: (input) => {
+                    ((runtime['taskId'] = normalizeText(input)),
+                      handler5(
+                        config,
+                        { status: 'running', taskId: runtime['taskId'] },
                         { persistIdentity: !![] },
                       ));
                   },
                 },
               ),
-          _0x5de0d0 = resolveSeparationResultUrls(_0x3bde8f);
-        if (!_0x286116(_0x3174d)) return null;
-        const [_0x2a166f, _0x292ca7] = await Promise['all']([
-          persistSeparatedAudio(_0x5de0d0['vocalsAudioUrl'], saveAudio, {
-            signal: _0x4f827f['abortController']['signal'],
+          separationResultUrls = resolveSeparationResultUrls(scope);
+        if (!handler4(config)) return null;
+        const [vocalsAudioRef, backgroundAudioRef] = await Promise['all']([
+          persistSeparatedAudio(separationResultUrls['vocalsAudioUrl'], saveAudio, {
+            signal: runtime['abortController']['signal'],
           }),
-          persistSeparatedAudio(_0x5de0d0['backgroundAudioUrl'], saveAudio, {
-            signal: _0x4f827f['abortController']['signal'],
+          persistSeparatedAudio(separationResultUrls['backgroundAudioUrl'], saveAudio, {
+            signal: runtime['abortController']['signal'],
           }),
         ]);
-        if (!_0x286116(_0x3174d)) return null;
-        const _0x2b0754 = _0x557c48(_0x3174d, {
+        if (!handler4(config)) return null;
+        const output = handler5(config, {
           status: 'succeeded',
-          taskId: normalizeText(_0x3bde8f?.['taskId'] || _0x4f827f['taskId']),
-          providerProfileId: _0x4f827f['providerProfileId'] || providerProfileId,
+          taskId: normalizeText(scope?.['taskId'] || runtime['taskId']),
+          providerProfileId: runtime['providerProfileId'] || providerProfileId,
           completedAt: now(),
-          vocalsAudioRef: _0x2a166f['localPath'],
-          vocalsAudioUrl: _0x2a166f['localUrl'],
-          backgroundAudioRef: _0x292ca7['localPath'],
-          backgroundAudioUrl: _0x292ca7['localUrl'],
+          vocalsAudioRef: vocalsAudioRef['localPath'],
+          vocalsAudioUrl: vocalsAudioRef['localUrl'],
+          backgroundAudioRef: backgroundAudioRef['localPath'],
+          backgroundAudioUrl: backgroundAudioRef['localUrl'],
           error: '',
         });
         try {
           await persistNow();
         } catch {}
-        return (showToast('清晰人声提取完成，已自动用于声音克隆。', 'success'), _0x2b0754);
-      } catch (_0x459101) {
-        if (_0x4f827f['abortController']['signal']['aborted'] || _0x1a2f49) return null;
-        const _0x42949f = normalizeText(_0x459101?.['message'] || _0x459101) || '清晰人声提取失败',
-          _0x54e1a1 = _0x557c48(_0x3174d, { status: 'failed', completedAt: now(), error: _0x42949f });
-        return (showToast('清晰人声提取失败：' + _0x42949f, 'error'), _0x54e1a1);
+        return (showToast('清晰人声提取完成，已自动用于声音克隆。', 'success'), output);
+      } catch (error) {
+        if (runtime['abortController']['signal']['aborted'] || enabled) return null;
+        const error2 = normalizeText(error?.['message'] || error) || '清晰人声提取失败',
+          value2 = handler5(config, { status: 'failed', completedAt: now(), error: error2 });
+        return (showToast('清晰人声提取失败：' + error2, 'error'), value2);
       } finally {
-        const _0x4f581e = _0x3f9382(_0x863924, _0x4a1540);
-        if (_0x5cd7c2['get'](_0x4f581e) === _0x4f827f) _0x5cd7c2['delete'](_0x4f581e);
+        const value3 = handler2(projectId2, sourceId3);
+        if (map['get'](value3) === runtime) map['delete'](value3);
       }
     },
-    _0x1a16c4 = ({ project: _0x3fc9e6, source: _0x2cfe0d, state: _0x2b6c56, resume: resume = ![] }) => {
-      const _0x599701 = normalizeText(_0x3fc9e6['id']),
-        _0x6b248a = normalizeText(_0x2cfe0d['id']),
-        _0x489311 = _0x3f9382(_0x599701, _0x6b248a),
-        _0x633e69 = _0x5cd7c2['get'](_0x489311);
-      if (_0x633e69?.['promise']) return _0x633e69['promise'];
-      const _0x323e72 = {
+    handler8 = ({ project: project3, source: source4, state: state2, resume: resume = ![] }) => {
+      const projectId3 = normalizeText(project3['id']),
+        sourceId4 = normalizeText(source4['id']),
+        value4 = handler2(projectId3, sourceId4),
+        value5 = map['get'](value4);
+      if (value5?.['promise']) return value5['promise'];
+      const runtime2 = {
         abortController: new AbortController(),
-        taskId: normalizeText(_0x2b6c56['taskId']),
-        providerProfileId: normalizeText(_0x2b6c56['providerProfileId']),
+        taskId: normalizeText(state2['taskId']),
+        providerProfileId: normalizeText(state2['providerProfileId']),
         promise: null,
       };
       return (
-        (_0x323e72['promise'] = _0x4a12ad({
-          projectId: _0x599701,
-          sourceId: _0x6b248a,
-          sourceVideoRef: _0x2cfe0d['videoRef'],
-          requestId: _0x2b6c56['requestId'],
-          inputRevision: _0x2b6c56['inputRevision'],
-          taskId: _0x2b6c56['taskId'],
-          providerProfileId: _0x2b6c56['providerProfileId'],
+        (runtime2['promise'] = handler7({
+          projectId: projectId3,
+          sourceId: sourceId4,
+          sourceVideoRef: source4['videoRef'],
+          requestId: state2['requestId'],
+          inputRevision: state2['inputRevision'],
+          taskId: state2['taskId'],
+          providerProfileId: state2['providerProfileId'],
           resume: resume,
-          runtime: _0x323e72,
+          runtime: runtime2,
         })),
-        _0x5cd7c2['set'](_0x489311, _0x323e72),
-        _0x323e72['promise']
+        map['set'](value4, runtime2),
+        runtime2['promise']
       );
     },
-    _0x2eed14 = (_0xead9f = '') => {
-      if (_0x1a2f49) return Promise['resolve'](null);
-      const _0x104d10 = _0x24b976(),
-        _0x49b7ff = _0x23aa5e(_0x104d10, _0xead9f);
-      if (!_0x49b7ff?.['videoRef'])
+    extract = (value6 = '') => {
+      if (enabled) return Promise['resolve'](null);
+      const project4 = getProject(),
+        source5 = handler3(project4, value6);
+      if (!source5?.['videoRef'])
         return (showToast('原始视频不可用，无法提取清晰人声。', 'warn'), Promise['resolve'](null));
-      const _0x1c7bf8 = resolvePersonReplacementVoiceSeparationState(_0x104d10, _0x49b7ff['id']);
-      if (isPersonReplacementVoiceSeparationActive(_0x1c7bf8)) return _0x73f76d(_0x49b7ff['id']);
-      const _0xe4bcc0 = normalizeText(createId()),
-        _0x27bd92 = createPersonReplacementVoiceSeparationRevision({ project: _0x104d10, source: _0x49b7ff }),
-        _0x3c28fd = _0x1b8998({
-          project: _0x104d10,
-          source: _0x49b7ff,
-          requestId: _0xe4bcc0,
-          inputRevision: _0x27bd92,
+      const personReplacementVoiceSeparationState4 = resolvePersonReplacementVoiceSeparationState(
+        project4,
+        source5['id'],
+      );
+      if (isPersonReplacementVoiceSeparationActive(personReplacementVoiceSeparationState4))
+        return resume2(source5['id']);
+      const requestId4 = normalizeText(createId()),
+        inputRevision4 = createPersonReplacementVoiceSeparationRevision({
+          project: project4,
+          source: source5,
+        }),
+        state3 = handler6({
+          project: project4,
+          source: source5,
+          requestId: requestId4,
+          inputRevision: inputRevision4,
         });
       return (
         showToast('正在从原始视频中提取清晰人声…', 'info'),
-        _0x1a16c4({ project: _0x24b976(), source: _0x49b7ff, state: _0x3c28fd })
+        handler8({ project: getProject(), source: source5, state: state3 })
       );
     },
-    _0x73f76d = (_0x43430f = '') => {
-      if (_0x1a2f49) return Promise['resolve'](null);
-      const _0x2701c1 = _0x24b976(),
-        _0x1dc2ee = _0x23aa5e(_0x2701c1, _0x43430f),
-        _0x24c981 = resolvePersonReplacementVoiceSeparationState(_0x2701c1, _0x43430f);
-      if (!_0x1dc2ee?.['videoRef'] || !isPersonReplacementVoiceSeparationActive(_0x24c981))
+    resume2 = (value7 = '') => {
+      if (enabled) return Promise['resolve'](null);
+      const project5 = getProject(),
+        source6 = handler3(project5, value7),
+        state4 = resolvePersonReplacementVoiceSeparationState(project5, value7);
+      if (!source6?.['videoRef'] || !isPersonReplacementVoiceSeparationActive(state4))
         return Promise['resolve'](null);
-      const _0x1c3904 = createPersonReplacementVoiceSeparationRevision({
-        project: _0x2701c1,
-        source: _0x1dc2ee,
+      const inputRevision5 = createPersonReplacementVoiceSeparationRevision({
+        project: project5,
+        source: source6,
       });
-      if (!_0x24c981['taskId'] || _0x24c981['inputRevision'] !== _0x1c3904) {
-        const _0x24570e = Boolean(_0x24c981['inputRevision'] && _0x24c981['inputRevision'] !== _0x1c3904),
-          _0x36028f = normalizePersonReplacementVoiceSeparationState({
-            ..._0x24c981,
+      if (!state4['taskId'] || state4['inputRevision'] !== inputRevision5) {
+        const value8 = Boolean(state4['inputRevision'] && state4['inputRevision'] !== inputRevision5),
+          personReplacementVoiceSeparationState5 = normalizePersonReplacementVoiceSeparationState({
+            ...state4,
             status: 'failed',
-            inputRevision: _0x1c3904,
+            inputRevision: inputRevision5,
             taskId: '',
             providerProfileId: '',
             completedAt: now(),
             error: '人声提取任务已中断，请重新提取。',
-            ...(_0x24570e
+            ...(value8
               ? { vocalsAudioRef: '', vocalsAudioUrl: '', backgroundAudioRef: '', backgroundAudioUrl: '' }
               : {}),
           }),
-          _0x55990b = _0x3659fd(
+          value9 = setProject(
             {
-              ..._0x2701c1,
-              audio: updatePersonReplacementVoiceSeparationState(_0x2701c1['audio'], _0x36028f),
+              ...project5,
+              audio: updatePersonReplacementVoiceSeparationState(
+                project5['audio'],
+                personReplacementVoiceSeparationState5,
+              ),
             },
             { renderWorkspace: ![] },
           );
         return (
           onStateChange({
-            sourceId: _0x1dc2ee['id'],
-            state: cloneJson(_0x36028f),
-            project: cloneJson(_0x55990b || _0x24b976()),
+            sourceId: source6['id'],
+            state: cloneJson(personReplacementVoiceSeparationState5),
+            project: cloneJson(value9 || getProject()),
           }),
           Promise['resolve'](null)
         );
       }
-      return _0x1a16c4({ project: _0x2701c1, source: _0x1dc2ee, state: _0x24c981, resume: !![] });
+      return handler8({ project: project5, source: source6, state: state4, resume: !![] });
     },
-    _0x5f07c8 = async (_0xf1b0df = '') => {
-      if (_0x1a2f49) return ![];
-      const _0x1fe3ff = _0x24b976(),
-        _0x2f5d44 = _0x23aa5e(_0x1fe3ff, _0xf1b0df),
-        _0x210d41 = resolvePersonReplacementVoiceSeparationState(_0x1fe3ff, _0xf1b0df);
-      if (!_0x2f5d44 || !isPersonReplacementVoiceSeparationActive(_0x210d41)) return ![];
-      const _0x237ee8 = {
-          projectId: _0x1fe3ff['id'],
-          sourceId: _0x2f5d44['id'],
-          requestId: _0x210d41['requestId'],
-          inputRevision: _0x210d41['inputRevision'],
+    cancel = async (value10 = '') => {
+      if (enabled) return ![];
+      const projectId4 = getProject(),
+        sourceId5 = handler3(projectId4, value10),
+        requestId5 = resolvePersonReplacementVoiceSeparationState(projectId4, value10);
+      if (!sourceId5 || !isPersonReplacementVoiceSeparationActive(requestId5)) return ![];
+      const value11 = {
+          projectId: projectId4['id'],
+          sourceId: sourceId5['id'],
+          requestId: requestId5['requestId'],
+          inputRevision: requestId5['inputRevision'],
         },
-        _0x30ea82 = _0x3f9382(_0x1fe3ff['id'], _0x2f5d44['id']),
-        _0x20b775 = _0x5cd7c2['get'](_0x30ea82);
-      (_0x20b775?.['abortController']?.['abort']?.(),
-        _0x5cd7c2['delete'](_0x30ea82),
-        _0x557c48(_0x237ee8, { status: 'cancelled', completedAt: now(), error: '' }));
-      const _0x48185b = normalizeText(_0x210d41['taskId'] || _0x20b775?.['taskId']);
-      if (_0x48185b)
+        value12 = handler2(projectId4['id'], sourceId5['id']),
+        value13 = map['get'](value12);
+      (value13?.['abortController']?.['abort']?.(),
+        map['delete'](value12),
+        handler5(value11, { status: 'cancelled', completedAt: now(), error: '' }));
+      const taskId3 = normalizeText(requestId5['taskId'] || value13?.['taskId']);
+      if (taskId3)
         try {
           await cancelSeparation({
-            taskId: _0x48185b,
-            providerProfileId: _0x210d41['providerProfileId'] || _0x20b775?.['providerProfileId'] || '',
+            taskId: taskId3,
+            providerProfileId: requestId5['providerProfileId'] || value13?.['providerProfileId'] || '',
           });
-        } catch (_0x2ca341) {
-          console['warn']('[replacementStudio]\x20voice\x20separation\x20cancel\x20failed', _0x2ca341);
-          const _0x2d8371 = '已停止本地等待，但云端任务取消失败，可能仍在运行。请到任务平台确认状态。';
-          return (_0x557c48(_0x237ee8, { error: _0x2d8371 }), showToast(_0x2d8371, 'warn'), !![]);
+        } catch (value14) {
+          console['warn']('[replacementStudio]\x20voice\x20separation\x20cancel\x20failed', value14);
+          const error3 = '已停止本地等待，但云端任务取消失败，可能仍在运行。请到任务平台确认状态。';
+          return (handler5(value11, { error: error3 }), showToast(error3, 'warn'), !![]);
         }
       return (showToast('已取消清晰人声提取。', 'info'), !![]);
     };
   return Object['freeze']({
-    extract: _0x2eed14,
-    resume: _0x73f76d,
-    cancel: _0x5f07c8,
+    extract: extract,
+    resume: resume2,
+    cancel: cancel,
     destroy() {
-      if (_0x1a2f49) return;
-      ((_0x1a2f49 = !![]),
-        _0x5cd7c2['forEach']((_0x4a0774) => _0x4a0774['abortController']?.['abort']?.()),
-        _0x5cd7c2['clear']());
+      if (enabled) return;
+      ((enabled = !![]),
+        map['forEach']((value15) => value15['abortController']?.['abort']?.()),
+        map['clear']());
     },
   });
 }

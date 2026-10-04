@@ -32,22 +32,22 @@ const CARET_HTML =
     '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="node-menu-caret"><polyline points="6 9 12 15 18 9"></polyline></svg>',
   FALLBACK_ICON_HTML =
     '<svg\x20width=\x2212\x22\x20height=\x2212\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><polygon\x20points=\x2213\x202\x203\x2014\x2012\x2014\x2011\x2022\x2021\x2010\x2012\x2010\x2013\x202\x22/></svg>';
-function resolveModelLabel(_0x406f4f, _0x4724d4) {
-  return _0x4724d4?.(_0x406f4f) || findTextModelMenuItem(_0x406f4f)?.['title'] || _0x406f4f || '选择模型';
+function resolveModelLabel(value, item) {
+  return item?.(value) || findTextModelMenuItem(value)?.['title'] || value || '选择模型';
 }
-function resolveTriggerIcon(_0xdcfa4f, _0x1fb0fa) {
-  const _0x1d22f4 = buildTextModelSmallIconHTML(_0xdcfa4f);
-  if (_0x1d22f4) return _0x1d22f4;
-  if (['custom', 'openai']['includes'](String(_0x1fb0fa || '')['toLowerCase']()))
+function resolveTriggerIcon(key, index) {
+  const textModelSmallIconHTML = buildTextModelSmallIconHTML(key);
+  if (textModelSmallIconHTML) return textModelSmallIconHTML;
+  if (['custom', 'openai']['includes'](String(index || '')['toLowerCase']()))
     return '<div class="text-model-icon-small text-model-icon-badge">OA</div>';
   return FALLBACK_ICON_HTML;
 }
 export function buildAIGenTextModelMenuMarkup({
   activeModel: activeModel = DEFAULT_AIGEN_TEXT_MODEL_ID,
-  allowedModelIds: _0x44ccd2,
+  allowedModelIds: allowedModelIds,
 } = {}) {
-  const _0x44484a = Array['isArray'](_0x44ccd2),
-    _0x1ee28b = _0x44484a
+  const result = Array['isArray'](allowedModelIds),
+    data = result
       ? ''
       : '<div class="custom-group-header floating-menu-item node-menu-group-header" data-custom-toggle data-node-menu-submenu=".custom-submenu" data-credential-provider="openai">\n          <div class="text-model-icon text-model-icon-badge">OA</div>\n          <div class="fmi-content">\n            <div class="fmi-title" data-aigen-text-locale="customModelTitle">' +
         t('aigenText.customModelTitle') +
@@ -55,9 +55,9 @@ export function buildAIGenTextModelMenuMarkup({
         t('aigenText.customModelSubtitle') +
         '</div>\n          </div>\n          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="node-menu-caret"><polyline points="9 18 15 12 9 6"></polyline></svg>\n        </div>\n        <div class="custom-submenu node-model-submenu node-menu-submenu"></div>';
   return (
-    _0x1ee28b +
+    data +
     '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
-    buildTextProviderMenuGroupsHTML(activeModel, { allowedModelIds: _0x44ccd2 })
+    buildTextProviderMenuGroupsHTML(activeModel, { allowedModelIds: allowedModelIds })
   );
 }
 export function renderAIGenTextModelSelectorMarkup({
@@ -65,331 +65,348 @@ export function renderAIGenTextModelSelectorMarkup({
   provider: provider = '',
   providerProfileId: providerProfileId = '',
   includeRunningHubInternational: includeRunningHubInternational = ![],
-  getDisplayModelName: _0x1eb56e,
+  getDisplayModelName: getDisplayModelName,
   className: className = '',
-  allowedModelIds: _0x2742ab,
+  allowedModelIds: allowedModelIds2,
 } = {}) {
-  const _0x2f6ba8 = String(modelId || DEFAULT_AIGEN_TEXT_MODEL_ID),
-    _0x4a1e92 = resolveModelProviderProfileId({ model: _0x2f6ba8, providerProfileId: providerProfileId }),
-    _0x5abde1 = includeRunningHubInternational
+  const model = String(modelId || DEFAULT_AIGEN_TEXT_MODEL_ID),
+    modelProviderProfileId = resolveModelProviderProfileId({
+      model: model,
+      providerProfileId: providerProfileId,
+    }),
+    options = includeRunningHubInternational
       ? '<button type="button" class="model-provider-profile-selector-toggle' +
-        (getModelProviderProfileIds(_0x2f6ba8)['length'] > 0x1 ? '' : ' is-hidden') +
+        (getModelProviderProfileIds(model)['length'] > 0x1 ? '' : ' is-hidden') +
         '\x22\x20data-provider-profile-id=\x22' +
-        escapeNodeMenuHtml(getModelProviderProfileStyleId(_0x4a1e92)) +
+        escapeNodeMenuHtml(getModelProviderProfileStyleId(modelProviderProfileId)) +
         '" data-provider-profile-value="' +
-        escapeNodeMenuHtml(_0x4a1e92) +
+        escapeNodeMenuHtml(modelProviderProfileId) +
         '\x22>' +
-        escapeNodeMenuHtml(getModelProviderProfileShortLabel(_0x4a1e92)) +
+        escapeNodeMenuHtml(getModelProviderProfileShortLabel(modelProviderProfileId)) +
         '</button>'
       : '',
-    _0x2ea3b6 = ['img-model-pills', 'aigen-text-model-selector', className]
-      ['filter'](Boolean)
-      ['join']('\x20');
+    target = ['img-model-pills', 'aigen-text-model-selector', className]['filter'](Boolean)['join']('\x20');
   return (
     '<div\x20class=\x22' +
-    escapeNodeMenuHtml(_0x2ea3b6) +
+    escapeNodeMenuHtml(target) +
     '" data-aigen-text-model-selector>\n    <div class="img-model-wrap">\n      <button type="button" class="img-pill-btn img-model-btn-trigger">\n        ' +
-    resolveTriggerIcon(_0x2f6ba8, provider) +
+    resolveTriggerIcon(model, provider) +
     '\n        <span class="img-model-label">' +
-    escapeNodeMenuHtml(resolveModelLabel(_0x2f6ba8, _0x1eb56e)) +
+    escapeNodeMenuHtml(resolveModelLabel(model, getDisplayModelName)) +
     '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
     CARET_HTML +
     '\n      </button>\n      <div class="floating-menu img-model-menu node-model-menu">\n        ' +
-    buildAIGenTextModelMenuMarkup({ activeModel: _0x2f6ba8, allowedModelIds: _0x2742ab }) +
+    buildAIGenTextModelMenuMarkup({ activeModel: model, allowedModelIds: allowedModelIds2 }) +
     '\n      </div>\n    </div>\n    ' +
-    _0x5abde1 +
+    options +
     '\x0a\x20\x20\x20\x20<div\x20class=\x22ui-schema-placement\x20ui-schema-mode-slot\x22\x20data-aigen-text-ui-schema-mode-slot\x20hidden></div>\x0a\x20\x20</div>'
   );
 }
-function createCustomModelItem(_0x1d6494, _0x827f14, _0x946960) {
-  const _0x5e3ded = _0x1d6494['createElement']('div');
-  ((_0x5e3ded['className'] =
-    'floating-menu-item\x20custom-model-item' + (_0x946960 === _0x827f14 ? ' active' : '')),
-    (_0x5e3ded['dataset']['value'] = _0x827f14),
-    (_0x5e3ded['dataset']['provider'] = 'custom'));
-  const _0x31ab84 = _0x1d6494['createElement']('div');
-  ((_0x31ab84['className'] = 'text-model-icon text-model-icon-badge custom-model-icon'),
-    (_0x31ab84['textContent'] = 'OA'));
-  const _0x3ec11c = _0x1d6494['createElement']('span');
-  ((_0x3ec11c['className'] = 'custom-model-label'), (_0x3ec11c['textContent'] = _0x827f14));
-  const _0x52e3d3 = _0x1d6494['createElement']('span');
+function createCustomModelItem(el, source, next) {
+  const item2 = el['createElement']('div');
+  ((item2['className'] = 'floating-menu-item\x20custom-model-item' + (next === source ? ' active' : '')),
+    (item2['dataset']['value'] = source),
+    (item2['dataset']['provider'] = 'custom'));
+  const el2 = el['createElement']('div');
+  ((el2['className'] = 'text-model-icon text-model-icon-badge custom-model-icon'),
+    (el2['textContent'] = 'OA'));
+  const el3 = el['createElement']('span');
+  ((el3['className'] = 'custom-model-label'), (el3['textContent'] = source));
+  const remove = el['createElement']('span');
   return (
-    (_0x52e3d3['className'] = 'custom-model-del'),
-    (_0x52e3d3['textContent'] = '×'),
-    _0x5e3ded['addEventListener']('mouseenter', () => _0x52e3d3['classList']['add']('show')),
-    _0x5e3ded['addEventListener']('mouseleave', () => _0x52e3d3['classList']['remove']('show')),
-    _0x5e3ded['append'](_0x31ab84, _0x3ec11c, _0x52e3d3),
-    { item: _0x5e3ded, remove: _0x52e3d3 }
+    (remove['className'] = 'custom-model-del'),
+    (remove['textContent'] = '×'),
+    item2['addEventListener']('mouseenter', () => remove['classList']['add']('show')),
+    item2['addEventListener']('mouseleave', () => remove['classList']['remove']('show')),
+    item2['append'](el2, el3, remove),
+    { item: item2, remove: remove }
   );
 }
 export function bindAIGenTextModelSelector(
-  _0x4c862e,
+  el4,
   {
     modelId: modelId = DEFAULT_AIGEN_TEXT_MODEL_ID,
     provider: provider = '',
     providerProfileId: providerProfileId = '',
-    providerProfileIdByModel: _0x5416a8 = {},
-    getDisplayModelName: _0x2b50e9,
-    onChange: _0x47b0fc,
+    providerProfileIdByModel: providerProfileIdByModel = {},
+    getDisplayModelName: getDisplayModelName2,
+    onChange: onChange,
     getProfileReadiness: getProfileReadiness = getModelProviderProfileReadiness,
-    ensureProfileReady: _0x3bc313,
-    onProfileUnavailable: _0xff46d2,
+    ensureProfileReady: ensureProfileReady,
+    onProfileUnavailable: onProfileUnavailable,
     documentObject: documentObject = globalThis['document'],
   } = {},
 ) {
-  const _0x122a0d =
-      _0x4c862e?.['matches']?.('[data-aigen-text-model-selector]') ||
-      _0x4c862e?.['dataset']?.['aigenTextModelSelector'] !== undefined,
-    _0x1ca3b1 = _0x122a0d ? _0x4c862e : _0x4c862e?.['querySelector']?.('[data-aigen-text-model-selector]');
-  if (!_0x1ca3b1 || !documentObject) return { destroy() {} };
-  const _0x13663e = _0x1ca3b1['querySelector']('.img-model-wrap'),
-    _0x8a92db = _0x1ca3b1['querySelector']('.img-model-btn-trigger'),
-    _0x3974fc = _0x1ca3b1['querySelector']('.img-model-menu'),
-    _0x4db79e = _0x1ca3b1['querySelector']('.img-model-label'),
-    _0x4ace00 = _0x1ca3b1['querySelector']('.custom-submenu'),
-    _0x28d475 = _0x1ca3b1['querySelector']('.model-provider-profile-selector-toggle');
-  let _0x2c4415 = String(modelId || DEFAULT_AIGEN_TEXT_MODEL_ID),
-    _0x197af9 = String(provider || findTextModelMenuItem(_0x2c4415)?.['provider'] || ''),
-    _0x255a30 = _0x5416a8 && typeof _0x5416a8 === 'object' ? { ..._0x5416a8 } : {},
-    _0x16d2ee = resolveModelProviderProfileId({ model: _0x2c4415, providerProfileId: providerProfileId });
-  const _0x333f8c = [],
-    _0x1a3dcf = (_0x6a0e6c) => _0x6a0e6c['stopPropagation']();
-  (_0x1ca3b1['addEventListener']('pointerdown', _0x1a3dcf),
-    _0x333f8c['push'](() => _0x1ca3b1['removeEventListener']('pointerdown', _0x1a3dcf)));
-  const _0x466fce = () => {
-      if (_0x4db79e) _0x4db79e['textContent'] = resolveModelLabel(_0x2c4415, _0x2b50e9);
-      const _0x28cdb7 = resolveTriggerIcon(_0x2c4415, _0x197af9),
-        _0x17b906 = documentObject['createElement']('template');
-      _0x17b906['innerHTML'] = _0x28cdb7['trim']();
-      const _0x4626e2 = _0x17b906['content']?.['firstElementChild'],
-        _0x110880 = _0x8a92db?.['firstElementChild'];
-      if (_0x110880 && _0x4626e2) _0x110880['replaceWith'](_0x4626e2);
+  const current =
+      el4?.['matches']?.('[data-aigen-text-model-selector]') ||
+      el4?.['dataset']?.['aigenTextModelSelector'] !== undefined,
+    root = current ? el4 : el4?.['querySelector']?.('[data-aigen-text-model-selector]');
+  if (!root || !documentObject) return { destroy() {} };
+  const modelWrap = root['querySelector']('.img-model-wrap'),
+    trigger = root['querySelector']('.img-model-btn-trigger'),
+    menu = root['querySelector']('.img-model-menu'),
+    el5 = root['querySelector']('.img-model-label'),
+    el6 = root['querySelector']('.custom-submenu'),
+    el7 = root['querySelector']('.model-provider-profile-selector-toggle');
+  let model2 = String(modelId || DEFAULT_AIGEN_TEXT_MODEL_ID),
+    provider2 = String(provider || findTextModelMenuItem(model2)?.['provider'] || ''),
+    providerProfileIdByModel2 =
+      providerProfileIdByModel && typeof providerProfileIdByModel === 'object'
+        ? { ...providerProfileIdByModel }
+        : {},
+    providerProfileId2 = resolveModelProviderProfileId({
+      model: model2,
+      providerProfileId: providerProfileId,
+    });
+  const list = [],
+    entry = (event) => event['stopPropagation']();
+  (root['addEventListener']('pointerdown', entry),
+    list['push'](() => root['removeEventListener']('pointerdown', entry)));
+  const run = () => {
+      if (el5) el5['textContent'] = resolveModelLabel(model2, getDisplayModelName2);
+      const triggerIcon = resolveTriggerIcon(model2, provider2),
+        el8 = documentObject['createElement']('template');
+      el8['innerHTML'] = triggerIcon['trim']();
+      const record = el8['content']?.['firstElementChild'],
+        payload = trigger?.['firstElementChild'];
+      if (payload && record) payload['replaceWith'](record);
     },
-    _0x214207 = () => {
-      if (!_0x28d475) return;
-      const _0x2b533b = getModelProviderProfileIds(_0x2c4415),
-        _0x2b7749 = _0x2b533b['length'] > 0x1;
-      _0x28d475['classList']['toggle']('is-hidden', !_0x2b7749);
-      if (!_0x2b7749) return;
-      const _0x277d55 = {
-          model: _0x2c4415,
-          providerProfileId: _0x16d2ee,
-          providerProfileIdByModel: _0x255a30,
+    handler = () => {
+      if (!el7) return;
+      const list2 = getModelProviderProfileIds(model2),
+        enabled = list2['length'] > 0x1;
+      el7['classList']['toggle']('is-hidden', !enabled);
+      if (!enabled) return;
+      const args = {
+          model: model2,
+          providerProfileId: providerProfileId2,
+          providerProfileIdByModel: providerProfileIdByModel2,
         },
-        _0x159aea = resolveModelProviderProfileId(_0x277d55),
-        _0x58ffd4 = resolveConfiguredModelProviderProfileId(_0x277d55, getProfileReadiness);
-      let _0x29e0a9 = _0x277d55;
-      if (_0x58ffd4 && _0x58ffd4 !== _0x159aea) {
-        const _0x5be6bb = buildModelProviderProfileSelectionPatch(_0x277d55, _0x2c4415, _0x58ffd4);
-        ((_0x16d2ee = _0x5be6bb['providerProfileId']),
-          (_0x255a30 = _0x5be6bb['providerProfileIdByModel'] || {}),
-          (_0x29e0a9 = { ..._0x277d55, ..._0x5be6bb }));
+        modelProviderProfileId2 = resolveModelProviderProfileId(args),
+        configuredModelProviderProfileId = resolveConfiguredModelProviderProfileId(args, getProfileReadiness);
+      let handle = args;
+      if (configuredModelProviderProfileId && configuredModelProviderProfileId !== modelProviderProfileId2) {
+        const args2 = buildModelProviderProfileSelectionPatch(args, model2, configuredModelProviderProfileId);
+        ((providerProfileId2 = args2['providerProfileId']),
+          (providerProfileIdByModel2 = args2['providerProfileIdByModel'] || {}),
+          (handle = { ...args, ...args2 }));
       }
-      const _0x24362a = getNextModelProviderProfileId(_0x29e0a9),
-        _0x320d0d = getModelProviderProfileShortLabel(_0x58ffd4),
-        _0x4d819c = getModelProviderProfileShortLabel(_0x24362a);
-      ((_0x28d475['textContent'] = _0x320d0d),
-        (_0x28d475['dataset']['providerProfileId'] = getModelProviderProfileStyleId(_0x58ffd4)),
-        (_0x28d475['dataset']['providerProfileValue'] = _0x58ffd4),
-        (_0x28d475['title'] = '当前' + _0x320d0d + '线路，点击切换到' + _0x4d819c),
-        _0x28d475['setAttribute']('aria-label', '当前' + _0x320d0d + '线路，点击切换到' + _0x4d819c));
+      const nextModelProviderProfileId = getNextModelProviderProfileId(handle),
+        modelProviderProfileShortLabel = getModelProviderProfileShortLabel(configuredModelProviderProfileId),
+        modelProviderProfileShortLabel2 = getModelProviderProfileShortLabel(nextModelProviderProfileId);
+      ((el7['textContent'] = modelProviderProfileShortLabel),
+        (el7['dataset']['providerProfileId'] = getModelProviderProfileStyleId(
+          configuredModelProviderProfileId,
+        )),
+        (el7['dataset']['providerProfileValue'] = configuredModelProviderProfileId),
+        (el7['title'] =
+          '当前' + modelProviderProfileShortLabel + '线路，点击切换到' + modelProviderProfileShortLabel2),
+        el7['setAttribute'](
+          'aria-label',
+          '当前' + modelProviderProfileShortLabel + '线路，点击切换到' + modelProviderProfileShortLabel2,
+        ));
     },
-    _0x5a2aa7 = (_0xb9ae0d, _0x43e666, _0x3f29db) => {
-      const _0x3d9e0c = String(_0xb9ae0d || '')['trim']();
-      if (!_0x3d9e0c) return;
-      const _0x3d6711 = buildModelProviderProfileSelectionPatch(
-        { model: _0x2c4415, providerProfileId: _0x16d2ee, providerProfileIdByModel: _0x255a30 },
-        _0x3d9e0c,
-        _0x3f29db,
+    handler2 = (state, config, scope) => {
+      const enabled2 = String(state || '')['trim']();
+      if (!enabled2) return;
+      const modelProviderProfileSelectionPatch = buildModelProviderProfileSelectionPatch(
+        {
+          model: model2,
+          providerProfileId: providerProfileId2,
+          providerProfileIdByModel: providerProfileIdByModel2,
+        },
+        enabled2,
+        scope,
       );
-      ((_0x2c4415 = _0x3d9e0c),
-        (_0x197af9 = String(_0x43e666 || findTextModelMenuItem(_0x3d9e0c)?.['provider'] || '')['trim']()),
-        (_0x16d2ee = _0x3d6711['providerProfileId']),
-        (_0x255a30 = _0x3d6711['providerProfileIdByModel'] || {}),
-        _0x3974fc?.['querySelectorAll']('.floating-menu-item[data-value]')['forEach']((_0x56c441) => {
-          _0x56c441['classList']['toggle']('active', _0x56c441['dataset']['value'] === _0x2c4415);
+      ((model2 = enabled2),
+        (provider2 = String(config || findTextModelMenuItem(enabled2)?.['provider'] || '')['trim']()),
+        (providerProfileId2 = modelProviderProfileSelectionPatch['providerProfileId']),
+        (providerProfileIdByModel2 = modelProviderProfileSelectionPatch['providerProfileIdByModel'] || {}),
+        menu?.['querySelectorAll']('.floating-menu-item[data-value]')['forEach']((el9) => {
+          el9['classList']['toggle']('active', el9['dataset']['value'] === model2);
         }),
-        _0x3974fc?.['classList']['remove']('show'),
-        _0x466fce(),
-        _0x214207(),
-        _0x47b0fc?.({
-          modelId: _0x2c4415,
-          provider: _0x197af9,
-          providerProfileId: _0x16d2ee,
-          providerProfileIdByModel: _0x255a30,
+        menu?.['classList']['remove']('show'),
+        run(),
+        handler(),
+        onChange?.({
+          modelId: model2,
+          provider: provider2,
+          providerProfileId: providerProfileId2,
+          providerProfileIdByModel: providerProfileIdByModel2,
         }));
     },
-    _0x25cf48 = () => {
-      if (!_0x4ace00) return;
-      _0x4ace00['replaceChildren']();
-      const _0x5cb439 = getCustomTextModels();
-      _0x5cb439['forEach']((_0x204151, _0x4bf661) => {
-        const { item: _0x316758, remove: _0x45cf0e } = createCustomModelItem(
-          documentObject,
-          _0x204151,
-          _0x2c4415,
-        );
-        (_0x45cf0e['addEventListener']('click', (_0x491b22) => {
-          (_0x491b22['preventDefault'](),
-            _0x491b22['stopPropagation'](),
-            saveCustomTextModels(_0x5cb439['filter']((_0x5691a6, _0x4e77ae) => _0x4e77ae !== _0x4bf661)),
-            _0x25cf48());
+    handler3 = () => {
+      if (!el6) return;
+      el6['replaceChildren']();
+      const list3 = getCustomTextModels();
+      list3['forEach']((input, output) => {
+        const { item: item3, remove: remove2 } = createCustomModelItem(documentObject, input, model2);
+        (remove2['addEventListener']('click', (event2) => {
+          (event2['preventDefault'](),
+            event2['stopPropagation'](),
+            saveCustomTextModels(list3['filter']((value2, value3) => value3 !== output)),
+            handler3());
         }),
-          _0x4ace00['appendChild'](_0x316758));
+          el6['appendChild'](item3));
       });
-      if (_0x5cb439['length']) {
-        const _0x5b0064 = documentObject['createElement']('div');
-        ((_0x5b0064['className'] = 'custom-model-separator'), _0x4ace00['appendChild'](_0x5b0064));
+      if (list3['length']) {
+        const value4 = documentObject['createElement']('div');
+        ((value4['className'] = 'custom-model-separator'), el6['appendChild'](value4));
       }
-      const _0x59a227 = documentObject['createElement']('div');
-      ((_0x59a227['className'] = 'floating-menu-item custom-model-add'),
-        (_0x59a227['innerHTML'] =
+      const el10 = documentObject['createElement']('div');
+      ((el10['className'] = 'floating-menu-item custom-model-add'),
+        (el10['innerHTML'] =
           '<svg class="custom-model-add-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="custom-model-add-label">' +
           t('aigenText.customModel.addModel') +
           '</span>'),
-        _0x59a227['addEventListener']('click', (_0x2c9305) => {
-          (_0x2c9305['preventDefault'](),
-            _0x2c9305['stopPropagation'](),
-            _0x59a227['replaceChildren'](),
-            _0x59a227['classList']['add']('editing'));
-          const _0x940386 = documentObject['createElement']('input');
-          ((_0x940386['type'] = 'text'),
-            (_0x940386['className'] = 'custom-model-input'),
-            (_0x940386['placeholder'] = t('aigenText.customModel.namePlaceholder')));
-          const _0x45a220 = documentObject['createElement']('button');
-          ((_0x45a220['type'] = 'button'),
-            (_0x45a220['className'] = 'custom-model-confirm'),
-            (_0x45a220['textContent'] = t('aigenText.customModel.confirm')));
-          const _0x33f141 = () => {
-            const _0x506761 = _0x940386['value']['trim']();
-            if (!_0x506761) return;
-            const _0x28aea0 = getCustomTextModels();
-            if (!_0x28aea0['includes'](_0x506761)) saveCustomTextModels([..._0x28aea0, _0x506761]);
-            _0x25cf48();
+        el10['addEventListener']('click', (event3) => {
+          (event3['preventDefault'](),
+            event3['stopPropagation'](),
+            el10['replaceChildren'](),
+            el10['classList']['add']('editing'));
+          const el11 = documentObject['createElement']('input');
+          ((el11['type'] = 'text'),
+            (el11['className'] = 'custom-model-input'),
+            (el11['placeholder'] = t('aigenText.customModel.namePlaceholder')));
+          const el12 = documentObject['createElement']('button');
+          ((el12['type'] = 'button'),
+            (el12['className'] = 'custom-model-confirm'),
+            (el12['textContent'] = t('aigenText.customModel.confirm')));
+          const run2 = () => {
+            const enabled3 = el11['value']['trim']();
+            if (!enabled3) return;
+            const list4 = getCustomTextModels();
+            if (!list4['includes'](enabled3)) saveCustomTextModels([...list4, enabled3]);
+            handler3();
           };
-          (_0x940386['addEventListener']('keydown', (_0xa1d09c) => {
-            _0xa1d09c['stopPropagation']();
-            if (_0xa1d09c['key'] === 'Enter') _0x33f141();
+          (el11['addEventListener']('keydown', (event4) => {
+            event4['stopPropagation']();
+            if (event4['key'] === 'Enter') run2();
           }),
-            _0x940386['addEventListener']('click', (_0x54194d) => _0x54194d['stopPropagation']()),
-            _0x45a220['addEventListener']('click', (_0x1be8f0) => {
-              (_0x1be8f0['stopPropagation'](), _0x33f141());
+            el11['addEventListener']('click', (event5) => event5['stopPropagation']()),
+            el12['addEventListener']('click', (event6) => {
+              (event6['stopPropagation'](), run2());
             }),
-            _0x59a227['append'](_0x940386, _0x45a220),
-            _0x940386['focus']());
+            el10['append'](el11, el12),
+            el11['focus']());
         }),
-        _0x4ace00['appendChild'](_0x59a227));
+        el6['appendChild'](el10));
     },
-    _0x4cd850 = (_0x487a05) => {
-      const _0x2234a0 = _0x487a05['target']?.['closest']?.('.floating-menu-item[data-value]');
-      if (!_0x2234a0 || !_0x3974fc?.['contains'](_0x2234a0) || _0x2234a0['dataset']['disabled'] === 'true')
-        return;
-      (_0x487a05['stopPropagation'](),
-        _0x5a2aa7(
-          _0x2234a0['dataset']['value'],
-          _0x2234a0['dataset']['provider'],
-          _0x2234a0['dataset']['credentialResolvedProviderProfileId'],
+    value5 = (event7) => {
+      const el13 = event7['target']?.['closest']?.('.floating-menu-item[data-value]');
+      if (!el13 || !menu?.['contains'](el13) || el13['dataset']['disabled'] === 'true') return;
+      (event7['stopPropagation'](),
+        handler2(
+          el13['dataset']['value'],
+          el13['dataset']['provider'],
+          el13['dataset']['credentialResolvedProviderProfileId'],
         ));
     };
-  (_0x3974fc?.['addEventListener']('click', _0x4cd850),
-    _0x333f8c['push'](() => _0x3974fc?.['removeEventListener']('click', _0x4cd850)));
-  const _0x571c03 = (_0x53b5ea) => {
-    (_0x53b5ea['preventDefault'](), _0x53b5ea['stopPropagation']());
-    const _0x1a2c97 = { model: _0x2c4415, providerProfileId: _0x16d2ee, providerProfileIdByModel: _0x255a30 },
-      _0x101bb4 = getNextModelProviderProfileId(_0x1a2c97);
-    if (!_0x101bb4) return;
+  (menu?.['addEventListener']('click', value5),
+    list['push'](() => menu?.['removeEventListener']('click', value5)));
+  const value6 = (event8) => {
+    (event8['preventDefault'](), event8['stopPropagation']());
+    const nodeData = {
+        model: model2,
+        providerProfileId: providerProfileId2,
+        providerProfileIdByModel: providerProfileIdByModel2,
+      },
+      targetProfileId = getNextModelProviderProfileId(nodeData);
+    if (!targetProfileId) return;
     void requestModelProviderProfileSelection({
-      nodeData: _0x1a2c97,
-      targetProfileId: _0x101bb4,
+      nodeData: nodeData,
+      targetProfileId: targetProfileId,
       getProfileReadiness: getProfileReadiness,
-      ensureProfileReady: _0x3bc313,
-      onUnavailable: _0xff46d2,
-      onChange: (_0x351f2a) => {
-        ((_0x16d2ee = _0x351f2a['providerProfileId']),
-          (_0x255a30 = _0x351f2a['providerProfileIdByModel'] || {}),
-          _0x214207(),
-          void syncModelCredentialMenu(_0x3974fc, {
+      ensureProfileReady: ensureProfileReady,
+      onUnavailable: onProfileUnavailable,
+      onChange: (value7) => {
+        ((providerProfileId2 = value7['providerProfileId']),
+          (providerProfileIdByModel2 = value7['providerProfileIdByModel'] || {}),
+          handler(),
+          void syncModelCredentialMenu(menu, {
             documentObject: documentObject,
-            getProviderProfileId: () => _0x16d2ee,
+            getProviderProfileId: () => providerProfileId2,
           }),
-          _0x47b0fc?.({
-            modelId: _0x2c4415,
-            provider: _0x197af9,
-            providerProfileId: _0x16d2ee,
-            providerProfileIdByModel: _0x255a30,
+          onChange?.({
+            modelId: model2,
+            provider: provider2,
+            providerProfileId: providerProfileId2,
+            providerProfileIdByModel: providerProfileIdByModel2,
           }));
       },
     });
   };
-  (_0x28d475?.['addEventListener']('click', _0x571c03),
-    _0x333f8c['push'](() => _0x28d475?.['removeEventListener']('click', _0x571c03)),
-    _0x333f8c['push'](bindNodeFooterController(_0x1ca3b1)),
-    _0x333f8c['push'](
+  (el7?.['addEventListener']('click', value6),
+    list['push'](() => el7?.['removeEventListener']('click', value6)),
+    list['push'](bindNodeFooterController(root)),
+    list['push'](
       bindNodeModelMenuTrigger({
-        root: _0x1ca3b1,
-        trigger: _0x8a92db,
-        menu: _0x3974fc,
-        closeOthers: () => closeNodeFooterMenus(_0x1ca3b1, _0x3974fc),
+        root: root,
+        trigger: trigger,
+        menu: menu,
+        closeOthers: () => closeNodeFooterMenus(root, menu),
         activateMenuKeyboard: activateMenuKeyboard,
       }),
     ));
-  const _0x17fe11 = onLocaleChange(() => {
-    (_0x1ca3b1['querySelector']('[data-aigen-text-locale=\x22customModelTitle\x22]')?.['replaceChildren'](
+  const onLocaleChange2 = onLocaleChange(() => {
+    (root['querySelector']('[data-aigen-text-locale=\x22customModelTitle\x22]')?.['replaceChildren'](
       documentObject['createTextNode'](t('aigenText.customModelTitle')),
     ),
-      _0x1ca3b1['querySelector']('[data-aigen-text-locale="customModelSubtitle"]')?.['replaceChildren'](
+      root['querySelector']('[data-aigen-text-locale="customModelSubtitle"]')?.['replaceChildren'](
         documentObject['createTextNode'](t('aigenText.customModelSubtitle')),
       ),
-      _0x25cf48(),
-      _0x466fce());
+      handler3(),
+      run());
   });
-  _0x333f8c['push'](_0x17fe11);
-  const _0x23e121 = () => {
-    _0x214207();
+  list['push'](onLocaleChange2);
+  const value8 = () => {
+    handler();
   };
-  (globalThis['window']?.['addEventListener']?.(API_CONFIG_CHANGED_EVENT, _0x23e121),
-    _0x333f8c['push'](() =>
-      globalThis['window']?.['removeEventListener']?.(API_CONFIG_CHANGED_EVENT, _0x23e121),
-    ),
-    _0x25cf48(),
-    _0x466fce(),
-    _0x214207());
-  const _0x34c1a7 = bindModelCredentialMenu(_0x3974fc, {
+  (globalThis['window']?.['addEventListener']?.(API_CONFIG_CHANGED_EVENT, value8),
+    list['push'](() => globalThis['window']?.['removeEventListener']?.(API_CONFIG_CHANGED_EVENT, value8)),
+    handler3(),
+    run(),
+    handler());
+  const bindModelCredentialMenu2 = bindModelCredentialMenu(menu, {
     documentObject: documentObject,
-    getProviderProfileId: () => _0x16d2ee,
+    getProviderProfileId: () => providerProfileId2,
   });
   return {
-    modelWrap: _0x13663e,
-    trigger: _0x8a92db,
-    menu: _0x3974fc,
+    modelWrap: modelWrap,
+    trigger: trigger,
+    menu: menu,
     getSelection: () => ({
-      modelId: _0x2c4415,
-      provider: _0x197af9,
-      providerProfileId: _0x16d2ee,
-      providerProfileIdByModel: _0x255a30,
+      modelId: model2,
+      provider: provider2,
+      providerProfileId: providerProfileId2,
+      providerProfileIdByModel: providerProfileIdByModel2,
     }),
     setSelection: ({
-      modelId: _0x4cf2e9,
-      provider: _0x1f9f8d,
-      providerProfileId: _0x30dac2,
-      providerProfileIdByModel: _0xbdca17,
+      modelId: modelId2,
+      provider: provider3,
+      providerProfileId: providerProfileId3,
+      providerProfileIdByModel: providerProfileIdByModel3,
     } = {}) => {
-      const _0x1c5692 = _0x2c4415;
-      ((_0x2c4415 = String(_0x4cf2e9 || _0x2c4415)),
-        (_0x197af9 = String(_0x1f9f8d || findTextModelMenuItem(_0x2c4415)?.['provider'] || _0x197af9)));
-      const _0x4acc46 = buildModelProviderProfileSelectionPatch(
-        { model: _0x1c5692, providerProfileId: _0x16d2ee, providerProfileIdByModel: _0xbdca17 || _0x255a30 },
-        _0x2c4415,
-        _0x30dac2,
+      const model3 = model2;
+      ((model2 = String(modelId2 || model2)),
+        (provider2 = String(provider3 || findTextModelMenuItem(model2)?.['provider'] || provider2)));
+      const modelProviderProfileSelectionPatch2 = buildModelProviderProfileSelectionPatch(
+        {
+          model: model3,
+          providerProfileId: providerProfileId2,
+          providerProfileIdByModel: providerProfileIdByModel3 || providerProfileIdByModel2,
+        },
+        model2,
+        providerProfileId3,
       );
-      ((_0x16d2ee = _0x4acc46['providerProfileId']),
-        (_0x255a30 = _0x4acc46['providerProfileIdByModel'] || {}),
-        _0x25cf48(),
-        _0x466fce(),
-        _0x214207());
+      ((providerProfileId2 = modelProviderProfileSelectionPatch2['providerProfileId']),
+        (providerProfileIdByModel2 = modelProviderProfileSelectionPatch2['providerProfileIdByModel'] || {}),
+        handler3(),
+        run(),
+        handler());
     },
     destroy() {
-      (_0x34c1a7?.(), _0x333f8c['forEach']((_0x4ec3e0) => _0x4ec3e0?.()));
+      (bindModelCredentialMenu2?.(), list['forEach']((value9) => value9?.()));
     },
   };
 }

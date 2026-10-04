@@ -7,502 +7,545 @@ import {
 const VIDEO_REFERENCE_LIST_SELECTOR = '[data-person-replacement-video-reference-list]',
   RESULT_HISTORY_TOGGLE_SELECTOR = ':scope\x20>\x20[data-person-replacement-result-history-toggle]',
   imageSourceReconcileTokens = new WeakMap();
-function syncElementAttributes(
-  _0x2bcb99,
-  _0x4fa7bc,
-  { preserveAttributeNames: preserveAttributeNames = [] } = {},
-) {
-  if (!_0x2bcb99 || !_0x4fa7bc) return ![];
-  const _0x2eed7b = new Set(preserveAttributeNames),
-    _0x26ce7b = new Set(Array['from'](_0x4fa7bc['attributes'] || [], (_0x63a114) => _0x63a114['name']));
+function syncElementAttributes(el, enabled, { preserveAttributeNames: preserveAttributeNames = [] } = {}) {
+  if (!el || !enabled) return ![];
+  const map = new Set(preserveAttributeNames),
+    map2 = new Set(Array['from'](enabled['attributes'] || [], (error) => error['name']));
   return (
-    Array['from'](_0x2bcb99['attributes'] || [])['forEach']((_0x5353c5) => {
-      !_0x2eed7b['has'](_0x5353c5['name']) &&
-        !_0x26ce7b['has'](_0x5353c5['name']) &&
-        _0x2bcb99['removeAttribute']?.(_0x5353c5['name']);
+    Array['from'](el['attributes'] || [])['forEach']((error2) => {
+      !map['has'](error2['name']) && !map2['has'](error2['name']) && el['removeAttribute']?.(error2['name']);
     }),
-    Array['from'](_0x4fa7bc['attributes'] || [])['forEach']((_0x5244b3) => {
-      !_0x2eed7b['has'](_0x5244b3['name']) &&
-        _0x2bcb99['getAttribute']?.(_0x5244b3['name']) !== _0x5244b3['value'] &&
-        _0x2bcb99['setAttribute']?.(_0x5244b3['name'], _0x5244b3['value']);
+    Array['from'](enabled['attributes'] || [])['forEach']((el2) => {
+      !map['has'](el2['name']) &&
+        el['getAttribute']?.(el2['name']) !== el2['value'] &&
+        el['setAttribute']?.(el2['name'], el2['value']);
     }),
     !![]
   );
 }
-function hasEquivalentNodeShape(_0x1b9630, _0x47e8e9, _0x4bea71 = '') {
-  if (!_0x1b9630 || !_0x47e8e9 || _0x1b9630['nodeType'] !== _0x47e8e9['nodeType']) return ![];
-  if (_0x1b9630['nodeType'] === 0x1 && _0x1b9630['tagName'] !== _0x47e8e9['tagName']) return ![];
-  if (_0x4bea71 && _0x1b9630['matches']?.(_0x4bea71) && _0x47e8e9['matches']?.(_0x4bea71)) return !![];
-  const _0x299593 = Array['from'](_0x1b9630['childNodes'] || []),
-    _0x353d2c = Array['from'](_0x47e8e9['childNodes'] || []);
+function hasEquivalentNodeShape(enabled2, enabled3, value = '') {
+  if (!enabled2 || !enabled3 || enabled2['nodeType'] !== enabled3['nodeType']) return ![];
+  if (enabled2['nodeType'] === 0x1 && enabled2['tagName'] !== enabled3['tagName']) return ![];
+  if (value && enabled2['matches']?.(value) && enabled3['matches']?.(value)) return !![];
+  const list = Array['from'](enabled2['childNodes'] || []),
+    list2 = Array['from'](enabled3['childNodes'] || []);
   return (
-    _0x299593['length'] === _0x353d2c['length'] &&
-    _0x299593['every']((_0x5d5e45, _0xabd550) =>
-      hasEquivalentNodeShape(_0x5d5e45, _0x353d2c[_0xabd550], _0x4bea71),
-    )
+    list['length'] === list2['length'] &&
+    list['every']((item, key) => hasEquivalentNodeShape(item, list2[key], value))
   );
 }
-function reconcileImageNode(_0x200701, _0x5d25cd) {
-  const _0x3c859c = String(_0x200701['getAttribute']?.('src') || '')['trim'](),
-    _0x440674 = String(_0x5d25cd['getAttribute']?.('src') || '')['trim']();
-  if (_0x3c859c === _0x440674) {
-    imageSourceReconcileTokens['delete'](_0x200701);
-    const _0x3885b0 =
-      _0x200701['classList']?.['contains']?.('is-ready') &&
-      _0x5d25cd['classList']?.['contains']?.('ref-thumb-media');
-    syncElementAttributes(_0x200701, _0x5d25cd, { preserveAttributeNames: _0x3885b0 ? ['class'] : [] });
-    if (_0x3885b0) {
-      const _0x4209b1 = new Set(
-        String(_0x5d25cd['getAttribute']('class') || '')
+function reconcileImageNode(el3, el4) {
+  const index = String(el3['getAttribute']?.('src') || '')['trim'](),
+    enabled4 = String(el4['getAttribute']?.('src') || '')['trim']();
+  if (index === enabled4) {
+    imageSourceReconcileTokens['delete'](el3);
+    const preserveAttributeNames2 =
+      el3['classList']?.['contains']?.('is-ready') && el4['classList']?.['contains']?.('ref-thumb-media');
+    syncElementAttributes(el3, el4, { preserveAttributeNames: preserveAttributeNames2 ? ['class'] : [] });
+    if (preserveAttributeNames2) {
+      const map3 = new Set(
+        String(el4['getAttribute']('class') || '')
           ['split'](/\s+/)
           ['filter'](Boolean),
       );
-      (_0x4209b1['delete']('is-pending'), _0x4209b1['add']('is-ready'));
-      const _0x3246dd = [..._0x4209b1]['join']('\x20');
-      if (_0x200701['getAttribute']('class') !== _0x3246dd) _0x200701['setAttribute']('class', _0x3246dd);
+      (map3['delete']('is-pending'), map3['add']('is-ready'));
+      const result = [...map3]['join']('\x20');
+      if (el3['getAttribute']('class') !== result) el3['setAttribute']('class', result);
     }
     return;
   }
-  const _0x235e7c = Symbol(_0x440674);
-  (imageSourceReconcileTokens['set'](_0x200701, _0x235e7c),
-    syncElementAttributes(_0x200701, _0x5d25cd, { preserveAttributeNames: ['src'] }));
-  const _0x126507 = (_0x1101ee) => {
-    if (imageSourceReconcileTokens['get'](_0x200701) !== _0x235e7c || _0x200701['isConnected'] === ![])
-      return;
-    (syncElementAttributes(_0x200701, _0x5d25cd),
-      _0x1101ee &&
-        _0x200701['classList']?.['contains']?.('ref-thumb-media') &&
-        (_0x200701['classList']['remove']('is-pending'), _0x200701['classList']['add']('is-ready')),
-      imageSourceReconcileTokens['delete'](_0x200701));
+  const symbol = Symbol(enabled4);
+  (imageSourceReconcileTokens['set'](el3, symbol),
+    syncElementAttributes(el3, el4, { preserveAttributeNames: ['src'] }));
+  const run = (data) => {
+    if (imageSourceReconcileTokens['get'](el3) !== symbol || el3['isConnected'] === ![]) return;
+    (syncElementAttributes(el3, el4),
+      data &&
+        el3['classList']?.['contains']?.('ref-thumb-media') &&
+        (el3['classList']['remove']('is-pending'), el3['classList']['add']('is-ready')),
+      imageSourceReconcileTokens['delete'](el3));
   };
-  if (!_0x440674) {
-    _0x126507(![]);
+  if (!enabled4) {
+    run(![]);
     return;
   }
-  ensureThumbDecoded(_0x440674)['then'](_0x126507, () => _0x126507(![]));
+  ensureThumbDecoded(enabled4)['then'](run, () => run(![]));
 }
 function syncEquivalentNodeTree(
-  _0x30abad,
-  _0x2d8b12,
+  options,
+  target,
   { preserveImageNodes: preserveImageNodes = ![], preserveSelector: preserveSelector = '' } = {},
 ) {
-  if (
-    preserveSelector &&
-    _0x30abad['matches']?.(preserveSelector) &&
-    _0x2d8b12['matches']?.(preserveSelector)
-  )
+  if (preserveSelector && options['matches']?.(preserveSelector) && target['matches']?.(preserveSelector))
     return;
   if (
-    _0x30abad?.['nodeType'] === 0x1 &&
-    _0x2d8b12?.['nodeType'] === 0x1 &&
-    _0x30abad['tagName'] === 'IMG' &&
-    _0x2d8b12['tagName'] === 'IMG'
+    options?.['nodeType'] === 0x1 &&
+    target?.['nodeType'] === 0x1 &&
+    options['tagName'] === 'IMG' &&
+    target['tagName'] === 'IMG'
   ) {
-    if (preserveImageNodes) reconcileImageNode(_0x30abad, _0x2d8b12);
+    if (preserveImageNodes) reconcileImageNode(options, target);
     else
-      _0x30abad['getAttribute']?.('src') !== _0x2d8b12['getAttribute']?.('src') &&
-      typeof _0x30abad['replaceWith'] === 'function'
-        ? _0x30abad['replaceWith'](_0x2d8b12)
-        : syncElementAttributes(_0x30abad, _0x2d8b12);
+      options['getAttribute']?.('src') !== target['getAttribute']?.('src') &&
+      typeof options['replaceWith'] === 'function'
+        ? options['replaceWith'](target)
+        : syncElementAttributes(options, target);
     return;
   }
-  if (_0x30abad['nodeType'] === 0x1) syncElementAttributes(_0x30abad, _0x2d8b12);
-  else _0x30abad['nodeValue'] !== _0x2d8b12['nodeValue'] && (_0x30abad['nodeValue'] = _0x2d8b12['nodeValue']);
-  const _0x4cc507 = Array['from'](_0x30abad['childNodes'] || []),
-    _0x159242 = Array['from'](_0x2d8b12['childNodes'] || []);
-  _0x4cc507['forEach']((_0x4680b2, _0x41dd90) => {
-    syncEquivalentNodeTree(_0x4680b2, _0x159242[_0x41dd90], {
+  if (options['nodeType'] === 0x1) syncElementAttributes(options, target);
+  else options['nodeValue'] !== target['nodeValue'] && (options['nodeValue'] = target['nodeValue']);
+  const list3 = Array['from'](options['childNodes'] || []),
+    source = Array['from'](target['childNodes'] || []);
+  list3['forEach']((next, current) => {
+    syncEquivalentNodeTree(next, source[current], {
       preserveImageNodes: preserveImageNodes,
       preserveSelector: preserveSelector,
     });
   });
 }
 export function reconcileElementTree(
-  _0x7510a9,
-  _0x5b59ec,
+  enabled5,
+  enabled6,
   {
     preserveImageNodes: preserveImageNodes = ![],
     preserveSelector: preserveSelector = '',
     preserveChildNodes: preserveChildNodes = ![],
   } = {},
 ) {
-  if (!_0x7510a9 || !_0x5b59ec) return ![];
+  if (!enabled5 || !enabled6) return ![];
   if (preserveChildNodes)
-    return reconcilePersonReplacementStableDom(_0x7510a9, _0x5b59ec, {
+    return reconcilePersonReplacementStableDom(enabled5, enabled6, {
       preserveSelector: preserveSelector,
       syncAttributes: syncElementAttributes,
       syncImage: reconcileImageNode,
     });
-  if (hasEquivalentNodeShape(_0x7510a9, _0x5b59ec, preserveSelector))
+  if (hasEquivalentNodeShape(enabled5, enabled6, preserveSelector))
     return (
-      syncEquivalentNodeTree(_0x7510a9, _0x5b59ec, {
+      syncEquivalentNodeTree(enabled5, enabled6, {
         preserveImageNodes: preserveImageNodes,
         preserveSelector: preserveSelector,
       }),
       !![]
     );
   return (
-    syncElementAttributes(_0x7510a9, _0x5b59ec),
-    _0x7510a9['replaceChildren']?.(...Array['from'](_0x5b59ec['childNodes'] || [])),
+    syncElementAttributes(enabled5, enabled6),
+    enabled5['replaceChildren']?.(...Array['from'](enabled6['childNodes'] || [])),
     !![]
   );
 }
-function getShotTimelineCardRoot(_0x19b343) {
-  const _0x21209d = _0x19b343?.['parentElement'];
-  return _0x21209d?.['matches']?.('.person-replacement-shot-card-shell') ? _0x21209d : _0x19b343;
+function getShotTimelineCardRoot(entry) {
+  const record = entry?.['parentElement'];
+  return record?.['matches']?.('.person-replacement-shot-card-shell') ? record : entry;
 }
-function reconcileShotTimelineCardPair(_0x547003, _0x151f26) {
-  if (!_0x547003 || !_0x151f26) return null;
-  const _0x12b04d = getShotTimelineCardRoot(_0x547003),
-    _0x4fcc55 = getShotTimelineCardRoot(_0x151f26),
-    _0x10235d = _0x12b04d?.['querySelector']?.(RESULT_HISTORY_TOGGLE_SELECTOR),
-    _0x3445ee = _0x4fcc55?.['querySelector']?.(RESULT_HISTORY_TOGGLE_SELECTOR),
-    _0x5d9625 = Array['from'](_0x12b04d?.['querySelectorAll']?.('img') || []),
-    _0x45379c = Array['from'](_0x4fcc55?.['querySelectorAll']?.('img') || []);
+function reconcileShotTimelineCardPair(enabled7, enabled8) {
+  if (!enabled7 || !enabled8) return null;
+  const currentRoot = getShotTimelineCardRoot(enabled7),
+    nextRoot = getShotTimelineCardRoot(enabled8),
+    payload = currentRoot?.['querySelector']?.(RESULT_HISTORY_TOGGLE_SELECTOR),
+    handle = nextRoot?.['querySelector']?.(RESULT_HISTORY_TOGGLE_SELECTOR),
+    list4 = Array['from'](currentRoot?.['querySelectorAll']?.('img') || []),
+    state = Array['from'](nextRoot?.['querySelectorAll']?.('img') || []);
   return (
-    _0x5d9625['forEach']((_0x4c19cd, _0xe08572) => {
-      const _0x423d69 = _0x45379c[_0xe08572];
-      if (!_0x423d69) return;
-      (reconcileElementTree(_0x4c19cd, _0x423d69, { preserveImageNodes: !![] }),
-        _0x423d69['replaceWith'](_0x4c19cd));
+    list4['forEach']((config, scope) => {
+      const enabled9 = state[scope];
+      if (!enabled9) return;
+      (reconcileElementTree(config, enabled9, { preserveImageNodes: !![] }), enabled9['replaceWith'](config));
     }),
-    reconcileElementTree(_0x547003, _0x151f26, { preserveImageNodes: !![] }),
-    _0x151f26['replaceWith'](_0x547003),
-    _0x10235d &&
-      _0x3445ee &&
-      (reconcileElementTree(_0x10235d, _0x3445ee), _0x3445ee['replaceWith'](_0x10235d)),
-    { currentRoot: _0x12b04d, nextRoot: _0x4fcc55 === _0x151f26 ? _0x547003 : _0x4fcc55 }
+    reconcileElementTree(enabled7, enabled8, { preserveImageNodes: !![] }),
+    enabled8['replaceWith'](enabled7),
+    payload && handle && (reconcileElementTree(payload, handle), handle['replaceWith'](payload)),
+    { currentRoot: currentRoot, nextRoot: nextRoot === enabled8 ? enabled7 : nextRoot }
   );
 }
 export function reconcilePersonReplacementShotTimelineCard({
-  currentScroller: _0x56f63e,
-  nextScroller: _0x47b1ab,
+  currentScroller: currentScroller,
+  nextScroller: nextScroller,
   shotId: shotId = '',
 } = {}) {
-  const _0x5da83f = String(shotId ?? '')['trim']();
-  if (!_0x5da83f) return ![];
-  const _0x1881b7 = (_0x376149) =>
-      Array['from'](
-        _0x376149?.['querySelectorAll']?.('[data-person-replacement-shot-card=\x22true\x22]') || [],
-      )['find']((_0x1de7c9) => String(_0x1de7c9['dataset']?.['shotId'] ?? '')['trim']() === _0x5da83f),
-    _0x44572f = _0x1881b7(_0x56f63e),
-    _0x4e3c23 = _0x1881b7(_0x47b1ab);
-  if (!_0x44572f || !_0x4e3c23) return ![];
-  const _0x10e745 = getShotTimelineCardRoot(_0x44572f),
-    _0x1f1513 = _0x10e745?.['parentElement'],
-    _0x2bbda8 = _0x10e745?.['nextSibling'] || null;
-  if (!_0x1f1513 || typeof _0x1f1513['insertBefore'] !== 'function') return ![];
-  const _0x8033ee = reconcileShotTimelineCardPair(_0x44572f, _0x4e3c23);
-  if (!_0x8033ee?.['nextRoot']) return ![];
+  const enabled10 = String(shotId ?? '')['trim']();
+  if (!enabled10) return ![];
+  const run2 = (el5) =>
+      Array['from'](el5?.['querySelectorAll']?.('[data-person-replacement-shot-card=\x22true\x22]') || [])[
+        'find'
+      ]((el6) => String(el6['dataset']?.['shotId'] ?? '')['trim']() === enabled10),
+    enabled11 = run2(currentScroller),
+    enabled12 = run2(nextScroller);
+  if (!enabled11 || !enabled12) return ![];
+  const shotTimelineCardRoot = getShotTimelineCardRoot(enabled11),
+    el7 = shotTimelineCardRoot?.['parentElement'],
+    input = shotTimelineCardRoot?.['nextSibling'] || null;
+  if (!el7 || typeof el7['insertBefore'] !== 'function') return ![];
+  const reconcileShotTimelineCardPair2 = reconcileShotTimelineCardPair(enabled11, enabled12);
+  if (!reconcileShotTimelineCardPair2?.['nextRoot']) return ![];
   return (
-    _0x8033ee['currentRoot']?.['parentElement'] === _0x1f1513
-      ? _0x8033ee['currentRoot']['replaceWith'](_0x8033ee['nextRoot'])
-      : _0x1f1513['insertBefore'](_0x8033ee['nextRoot'], _0x2bbda8),
+    reconcileShotTimelineCardPair2['currentRoot']?.['parentElement'] === el7
+      ? reconcileShotTimelineCardPair2['currentRoot']['replaceWith'](
+          reconcileShotTimelineCardPair2['nextRoot'],
+        )
+      : el7['insertBefore'](reconcileShotTimelineCardPair2['nextRoot'], input),
     !![]
   );
 }
-export function reconcilePersonReplacementShotCardList({ currentList: _0x2610bf, nextList: _0x411eb4 } = {}) {
-  if (!_0x2610bf || !_0x411eb4) return ![];
-  return reconcileElementTree(_0x2610bf, _0x411eb4, { preserveChildNodes: !![] });
+export function reconcilePersonReplacementShotCardList({
+  currentList: currentList,
+  nextList: nextList,
+} = {}) {
+  if (!currentList || !nextList) return ![];
+  return reconcileElementTree(currentList, nextList, { preserveChildNodes: !![] });
 }
-function getDirectShotPreview(_0x975371) {
+function getDirectShotPreview(el8) {
   return (
-    Array['from'](_0x975371?.['children'] || [])['find'](
-      (_0x1dc2df) =>
-        !_0x1dc2df['matches']?.('[data-person-replacement-shot-timeline-stage]') &&
-        !_0x1dc2df['matches']?.('[data-person-replacement-layout-splitter="center"]') &&
-        !_0x1dc2df['matches']?.('.person-replacement-middle-preview-slide--outgoing'),
+    Array['from'](el8?.['children'] || [])['find'](
+      (enabled13) =>
+        !enabled13['matches']?.('[data-person-replacement-shot-timeline-stage]') &&
+        !enabled13['matches']?.('[data-person-replacement-layout-splitter="center"]') &&
+        !enabled13['matches']?.('.person-replacement-middle-preview-slide--outgoing'),
     ) || null
   );
 }
-function getVideoReferenceCards(_0x34e1b3) {
-  return Array['from'](
-    _0x34e1b3?.['querySelectorAll']?.('[data-person-replacement-video-reference-index]') || [],
-  );
+function getVideoReferenceCards(el9) {
+  return Array['from'](el9?.['querySelectorAll']?.('[data-person-replacement-video-reference-index]') || []);
 }
-function getVideoReferenceCardKey(_0x1f212e) {
+function getVideoReferenceCardKey(el10) {
   return String(
-    _0x1f212e?.['dataset']?.['personReplacementVideoReferenceKey'] ||
-      _0x1f212e?.['dataset']?.['personReplacementVideoReferenceIndex'] ||
+    el10?.['dataset']?.['personReplacementVideoReferenceKey'] ||
+      el10?.['dataset']?.['personReplacementVideoReferenceIndex'] ||
       '',
   );
 }
-function prepareVideoReferenceCardPairs(_0x22161d, _0xbab2a7) {
-  const _0x5c0750 = new Map(
-    getVideoReferenceCards(_0xbab2a7)['map']((_0x24db4d) => [getVideoReferenceCardKey(_0x24db4d), _0x24db4d]),
+function prepareVideoReferenceCardPairs(output, value2) {
+  const nextCard = new Map(
+    getVideoReferenceCards(value2)['map']((value3) => [getVideoReferenceCardKey(value3), value3]),
   );
-  return getVideoReferenceCards(_0x22161d)
-    ['map']((_0x321afd) => ({
-      currentCard: _0x321afd,
-      nextCard: _0x5c0750['get'](getVideoReferenceCardKey(_0x321afd)),
+  return getVideoReferenceCards(output)
+    ['map']((currentCard) => ({
+      currentCard: currentCard,
+      nextCard: nextCard['get'](getVideoReferenceCardKey(currentCard)),
     }))
-    ['filter'](({ nextCard: _0x15278c }) => _0x15278c);
+    ['filter'](({ nextCard: nextCard2 }) => nextCard2);
 }
-function reconcileVideoElementTree(_0x529cc3, _0x58b39e) {
-  return reconcileElementTree(_0x529cc3, _0x58b39e, { preserveImageNodes: !![] });
+function reconcileVideoElementTree(value4, value5) {
+  return reconcileElementTree(value4, value5, { preserveImageNodes: !![] });
 }
-function reconcileVideoReferenceRail(_0xb6ecf2, _0x26c873) {
-  if (!_0xb6ecf2 || !_0x26c873) return ![];
-  const _0x53ad28 = captureWorkspaceScrollPosition(
-      _0xb6ecf2['querySelector']?.(VIDEO_REFERENCE_LIST_SELECTOR),
+function reconcileVideoReferenceRail(el11, enabled14) {
+  if (!el11 || !enabled14) return ![];
+  const captureWorkspaceScrollPosition2 = captureWorkspaceScrollPosition(
+      el11['querySelector']?.(VIDEO_REFERENCE_LIST_SELECTOR),
     ),
-    _0xc8a35a = () =>
-      restoreWorkspaceScrollPosition(_0xb6ecf2['querySelector']?.(VIDEO_REFERENCE_LIST_SELECTOR), _0x53ad28);
-  if (hasEquivalentNodeShape(_0xb6ecf2, _0x26c873)) {
-    const _0xb2a242 = reconcileVideoElementTree(_0xb6ecf2, _0x26c873);
-    return (_0xc8a35a(), _0xb2a242);
+    handler = () =>
+      restoreWorkspaceScrollPosition(
+        el11['querySelector']?.(VIDEO_REFERENCE_LIST_SELECTOR),
+        captureWorkspaceScrollPosition2,
+      );
+  if (hasEquivalentNodeShape(el11, enabled14)) {
+    const reconcileVideoElementTree2 = reconcileVideoElementTree(el11, enabled14);
+    return (handler(), reconcileVideoElementTree2);
   }
-  prepareVideoReferenceCardPairs(_0xb6ecf2, _0x26c873)['forEach'](
-    ({ currentCard: _0x1038f9, nextCard: _0x35af84 }) => {
-      (reconcileVideoElementTree(_0x1038f9, _0x35af84), _0x35af84['replaceWith'](_0x1038f9));
+  prepareVideoReferenceCardPairs(el11, enabled14)['forEach'](
+    ({ currentCard: currentCard2, nextCard: nextCard3 }) => {
+      (reconcileVideoElementTree(currentCard2, nextCard3), nextCard3['replaceWith'](currentCard2));
     },
   );
-  const _0x1e184b = reconcileVideoElementTree(_0xb6ecf2, _0x26c873);
-  return (_0xc8a35a(), _0x1e184b);
+  const reconcileVideoElementTree3 = reconcileVideoElementTree(el11, enabled14);
+  return (handler(), reconcileVideoElementTree3);
 }
 export function reconcilePersonReplacementReferenceInputs({
-  currentInputs: _0x347ffe,
-  nextInputs: _0x438811,
+  currentInputs: currentInputs,
+  nextInputs: nextInputs,
 } = {}) {
-  if (!_0x347ffe || !_0x438811) return ![];
-  const _0x13f383 = new Map(
-    Array['from'](_0x438811['querySelectorAll']?.('[data-slot]') || [])['map']((_0x424375) => [
-      String(_0x424375['dataset']?.['slot'] || ''),
-      _0x424375,
+  if (!currentInputs || !nextInputs) return ![];
+  const map4 = new Map(
+    Array['from'](nextInputs['querySelectorAll']?.('[data-slot]') || [])['map']((el12) => [
+      String(el12['dataset']?.['slot'] || ''),
+      el12,
     ]),
   );
   return (
-    Array['from'](_0x347ffe['querySelectorAll']?.('[data-slot]') || [])['forEach']((_0x38b54e) => {
-      const _0x3f4afc = _0x13f383['get'](String(_0x38b54e['dataset']?.['slot'] || ''));
-      if (!_0x3f4afc) return;
-      if (_0x38b54e['tagName'] !== _0x3f4afc['tagName']) return;
-      (reconcileVideoElementTree(_0x38b54e, _0x3f4afc), _0x3f4afc['replaceWith'](_0x38b54e));
+    Array['from'](currentInputs['querySelectorAll']?.('[data-slot]') || [])['forEach']((el13) => {
+      const enabled15 = map4['get'](String(el13['dataset']?.['slot'] || ''));
+      if (!enabled15) return;
+      if (el13['tagName'] !== enabled15['tagName']) return;
+      (reconcileVideoElementTree(el13, enabled15), enabled15['replaceWith'](el13));
     }),
-    reconcileVideoElementTree(_0x347ffe, _0x438811),
-    _0x438811['replaceWith'](_0x347ffe),
+    reconcileVideoElementTree(currentInputs, nextInputs),
+    nextInputs['replaceWith'](currentInputs),
     !![]
   );
 }
 export function reconcilePersonReplacementVideoControlContinuity({
-  currentReferenceRail: _0x62d94c,
-  nextReferenceRail: _0x56a96f,
-  currentReferenceInputs: _0xac0a91,
-  nextReferenceInputs: _0x191cd8,
-  currentPromptEditor: _0x3a7ab4,
-  nextPromptEditor: _0x287df2,
+  currentReferenceRail: currentReferenceRail,
+  nextReferenceRail: nextReferenceRail,
+  currentReferenceInputs: currentReferenceInputs,
+  nextReferenceInputs: nextReferenceInputs,
+  currentPromptEditor: currentPromptEditor,
+  nextPromptEditor: nextPromptEditor,
 } = {}) {
-  if (!_0x62d94c || !_0x56a96f || !_0xac0a91 || !_0x191cd8 || !_0x3a7ab4 || !_0x287df2) return ![];
-  if (!reconcileVideoReferenceRail(_0x62d94c, _0x56a96f)) return ![];
-  if (!reconcilePersonReplacementReferenceInputs({ currentInputs: _0xac0a91, nextInputs: _0x191cd8 }))
+  if (
+    !currentReferenceRail ||
+    !nextReferenceRail ||
+    !currentReferenceInputs ||
+    !nextReferenceInputs ||
+    !currentPromptEditor ||
+    !nextPromptEditor
+  )
     return ![];
-  return (syncElementAttributes(_0x3a7ab4, _0x287df2), _0x287df2['replaceWith'](_0x3a7ab4), !![]);
-}
-function collectVideoShotSelectionElements(_0x55fd63, _0x23f5fb) {
-  const _0xa4cf4a = _0x55fd63?.['querySelector']?.('.person-replacement-middle-layout'),
-    _0x2e44e6 = _0x23f5fb?.['querySelector']?.('.person-replacement-middle-layout'),
-    _0x190332 = _0xa4cf4a?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]'),
-    _0x4c1b6f = _0x2e44e6?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]'),
-    _0x16b733 = _0x55fd63?.['querySelector']?.('.person-replacement-video-generation-panel'),
-    _0x1ce9fc = _0x23f5fb?.['querySelector']?.('.person-replacement-video-generation-panel');
-  return {
-    currentReferenceRail: _0x55fd63?.['querySelector']?.('.person-replacement-video-reference-assets'),
-    nextReferenceRail: _0x23f5fb?.['querySelector']?.('.person-replacement-video-reference-assets'),
-    currentLeftSplitter: _0x55fd63?.['querySelector']?.('[data-person-replacement-layout-splitter="left"]'),
-    nextLeftSplitter: _0x23f5fb?.['querySelector']?.('[data-person-replacement-layout-splitter="left"]'),
-    currentMiddle: _0xa4cf4a,
-    nextMiddle: _0x2e44e6,
-    currentPreview: getDirectShotPreview(_0xa4cf4a),
-    nextPreview: getDirectShotPreview(_0x2e44e6),
-    currentScroller: _0x190332?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
-    nextScroller: _0x4c1b6f?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
-    currentRightSplitter: _0x55fd63?.['querySelector']?.(
-      '[data-person-replacement-layout-splitter=\x22right\x22]',
-    ),
-    nextRightSplitter: _0x23f5fb?.['querySelector']?.(
-      '[data-person-replacement-layout-splitter=\x22right\x22]',
-    ),
-    currentGenerationPanel: _0x16b733,
-    nextGenerationPanel: _0x1ce9fc,
-    currentReferenceInputs: _0x16b733?.['querySelector']?.(
-      '[data-person-replacement-video-reference-inputs]',
-    ),
-    nextReferenceInputs: _0x1ce9fc?.['querySelector']?.('[data-person-replacement-video-reference-inputs]'),
-    currentFooter: _0x55fd63?.['querySelector']?.('.person-replacement-step-footer'),
-    nextFooter: _0x23f5fb?.['querySelector']?.('.person-replacement-step-footer'),
-  };
-}
-export function reconcilePersonReplacementVideoShotSelection({
-  currentPage: _0x757b57,
-  nextPage: _0x1718e0,
-} = {}) {
-  const _0x8b4923 = collectVideoShotSelectionElements(_0x757b57, _0x1718e0);
-  if (Object['values'](_0x8b4923)['some']((_0x2bad5b) => !_0x2bad5b)) return ![];
-  if (!reconcileVideoReferenceRail(_0x8b4923['currentReferenceRail'], _0x8b4923['nextReferenceRail']))
-    return ![];
+  if (!reconcileVideoReferenceRail(currentReferenceRail, nextReferenceRail)) return ![];
   if (
     !reconcilePersonReplacementReferenceInputs({
-      currentInputs: _0x8b4923['currentReferenceInputs'],
-      nextInputs: _0x8b4923['nextReferenceInputs'],
+      currentInputs: currentReferenceInputs,
+      nextInputs: nextReferenceInputs,
     })
   )
     return ![];
   return (
-    reconcileVideoElementTree(_0x8b4923['currentPreview'], _0x8b4923['nextPreview']),
-    _0x8b4923['nextPreview']['replaceWith'](_0x8b4923['currentPreview']),
-    reconcilePersonReplacementShotCardList({
-      currentList: _0x8b4923['currentScroller'],
-      nextList: _0x8b4923['nextScroller'],
-    }),
-    _0x8b4923['nextScroller']['replaceWith'](_0x8b4923['currentScroller']),
-    reconcileVideoElementTree(_0x8b4923['currentLeftSplitter'], _0x8b4923['nextLeftSplitter']),
-    reconcileVideoElementTree(_0x8b4923['currentMiddle'], _0x8b4923['nextMiddle']),
-    reconcileVideoElementTree(_0x8b4923['currentRightSplitter'], _0x8b4923['nextRightSplitter']),
-    reconcileVideoElementTree(_0x8b4923['currentGenerationPanel'], _0x8b4923['nextGenerationPanel']),
-    reconcileVideoElementTree(_0x8b4923['currentFooter'], _0x8b4923['nextFooter']),
+    syncElementAttributes(currentPromptEditor, nextPromptEditor),
+    nextPromptEditor['replaceWith'](currentPromptEditor),
     !![]
   );
 }
-function getTargetCharacterCards(_0x3224e5) {
-  return Array['from'](
-    _0x3224e5?.['querySelectorAll']?.('[data-person-replacement-target-character-id]') || [],
+function collectVideoShotSelectionElements(currentReferenceRail2, nextReferenceRail2) {
+  const currentMiddle = currentReferenceRail2?.['querySelector']?.('.person-replacement-middle-layout'),
+    nextMiddle = nextReferenceRail2?.['querySelector']?.('.person-replacement-middle-layout'),
+    currentScroller2 = currentMiddle?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]'),
+    nextScroller2 = nextMiddle?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]'),
+    currentGenerationPanel = currentReferenceRail2?.['querySelector']?.(
+      '.person-replacement-video-generation-panel',
+    ),
+    nextGenerationPanel = nextReferenceRail2?.['querySelector']?.(
+      '.person-replacement-video-generation-panel',
+    );
+  return {
+    currentReferenceRail: currentReferenceRail2?.['querySelector']?.(
+      '.person-replacement-video-reference-assets',
+    ),
+    nextReferenceRail: nextReferenceRail2?.['querySelector']?.('.person-replacement-video-reference-assets'),
+    currentLeftSplitter: currentReferenceRail2?.['querySelector']?.(
+      '[data-person-replacement-layout-splitter="left"]',
+    ),
+    nextLeftSplitter: nextReferenceRail2?.['querySelector']?.(
+      '[data-person-replacement-layout-splitter="left"]',
+    ),
+    currentMiddle: currentMiddle,
+    nextMiddle: nextMiddle,
+    currentPreview: getDirectShotPreview(currentMiddle),
+    nextPreview: getDirectShotPreview(nextMiddle),
+    currentScroller: currentScroller2?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
+    nextScroller: nextScroller2?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
+    currentRightSplitter: currentReferenceRail2?.['querySelector']?.(
+      '[data-person-replacement-layout-splitter=\x22right\x22]',
+    ),
+    nextRightSplitter: nextReferenceRail2?.['querySelector']?.(
+      '[data-person-replacement-layout-splitter=\x22right\x22]',
+    ),
+    currentGenerationPanel: currentGenerationPanel,
+    nextGenerationPanel: nextGenerationPanel,
+    currentReferenceInputs: currentGenerationPanel?.['querySelector']?.(
+      '[data-person-replacement-video-reference-inputs]',
+    ),
+    nextReferenceInputs: nextGenerationPanel?.['querySelector']?.(
+      '[data-person-replacement-video-reference-inputs]',
+    ),
+    currentFooter: currentReferenceRail2?.['querySelector']?.('.person-replacement-step-footer'),
+    nextFooter: nextReferenceRail2?.['querySelector']?.('.person-replacement-step-footer'),
+  };
+}
+export function reconcilePersonReplacementVideoShotSelection({
+  currentPage: currentPage,
+  nextPage: nextPage,
+} = {}) {
+  const currentInputs2 = collectVideoShotSelectionElements(currentPage, nextPage);
+  if (Object['values'](currentInputs2)['some']((enabled16) => !enabled16)) return ![];
+  if (
+    !reconcileVideoReferenceRail(currentInputs2['currentReferenceRail'], currentInputs2['nextReferenceRail'])
+  )
+    return ![];
+  if (
+    !reconcilePersonReplacementReferenceInputs({
+      currentInputs: currentInputs2['currentReferenceInputs'],
+      nextInputs: currentInputs2['nextReferenceInputs'],
+    })
+  )
+    return ![];
+  return (
+    reconcileVideoElementTree(currentInputs2['currentPreview'], currentInputs2['nextPreview']),
+    currentInputs2['nextPreview']['replaceWith'](currentInputs2['currentPreview']),
+    reconcilePersonReplacementShotCardList({
+      currentList: currentInputs2['currentScroller'],
+      nextList: currentInputs2['nextScroller'],
+    }),
+    currentInputs2['nextScroller']['replaceWith'](currentInputs2['currentScroller']),
+    reconcileVideoElementTree(currentInputs2['currentLeftSplitter'], currentInputs2['nextLeftSplitter']),
+    reconcileVideoElementTree(currentInputs2['currentMiddle'], currentInputs2['nextMiddle']),
+    reconcileVideoElementTree(currentInputs2['currentRightSplitter'], currentInputs2['nextRightSplitter']),
+    reconcileVideoElementTree(
+      currentInputs2['currentGenerationPanel'],
+      currentInputs2['nextGenerationPanel'],
+    ),
+    reconcileVideoElementTree(currentInputs2['currentFooter'], currentInputs2['nextFooter']),
+    !![]
   );
 }
-function prepareTargetCardPairs(_0x5c3863, _0x29e79c) {
-  const _0x4c4119 = new Map(
-    getTargetCharacterCards(_0x29e79c)['map']((_0x548caa) => [
-      _0x548caa['dataset']?.['personReplacementTargetCharacterId'] || '',
-      _0x548caa,
+function getTargetCharacterCards(el14) {
+  return Array['from'](el14?.['querySelectorAll']?.('[data-person-replacement-target-character-id]') || []);
+}
+function prepareTargetCardPairs(value6, value7) {
+  const map5 = new Map(
+    getTargetCharacterCards(value7)['map']((el15) => [
+      el15['dataset']?.['personReplacementTargetCharacterId'] || '',
+      el15,
     ]),
   );
-  return getTargetCharacterCards(_0x5c3863)['map']((_0x1d60f3) => {
-    const _0x176c94 = _0x4c4119['get'](_0x1d60f3['dataset']?.['personReplacementTargetCharacterId'] || '');
+  return getTargetCharacterCards(value6)['map']((currentCard3) => {
+    const nextCard4 = map5['get'](currentCard3['dataset']?.['personReplacementTargetCharacterId'] || '');
     return {
-      currentCard: _0x1d60f3,
-      nextCard: _0x176c94,
-      currentMedia: _0x1d60f3['querySelector']?.('.story-asset-card-media'),
-      nextMedia: _0x176c94?.['querySelector']?.('.story-asset-card-media'),
+      currentCard: currentCard3,
+      nextCard: nextCard4,
+      currentMedia: currentCard3['querySelector']?.('.story-asset-card-media'),
+      nextMedia: nextCard4?.['querySelector']?.('.story-asset-card-media'),
     };
   });
 }
 function reconcileTargetCardPair({
-  currentCard: _0x1fd5fe,
-  nextCard: _0x1555c9,
-  currentMedia: _0x4055ca,
-  nextMedia: _0x404804,
+  currentCard: currentCard4,
+  nextCard: nextCard5,
+  currentMedia: currentMedia,
+  nextMedia: nextMedia,
 }) {
-  (syncElementAttributes(_0x1fd5fe, _0x1555c9),
-    reconcileElementTree(_0x4055ca, _0x404804, { preserveImageNodes: !![] }));
+  (syncElementAttributes(currentCard4, nextCard5),
+    reconcileElementTree(currentMedia, nextMedia, { preserveImageNodes: !![] }));
 }
-function reconcileGenerationCopy(_0x4588ab) {
+function reconcileGenerationCopy(value8) {
   const {
-    currentCopy: _0x3552b8,
-    nextCopy: _0x4ee892,
-    currentPromptField: _0x1150fc,
-    nextPromptField: _0x3d6cb0,
-    currentPromptHeading: _0x12f3d0,
-    nextPromptHeading: _0x342f96,
-    currentPromptReferenceInputs: _0x1fcd7c,
-    nextPromptReferenceInputs: _0x3db58b,
-    currentPromptEditor: _0x3414b5,
-    nextPromptEditor: _0x1c25c2,
-    currentFooter: _0x36eafc,
-    nextFooter: _0xa5fb6f,
-    currentGenerateButton: _0x3a2e79,
-    nextGenerateButton: _0x2ffbc0,
-  } = _0x4588ab;
-  (syncElementAttributes(_0x3552b8, _0x4ee892),
-    syncElementAttributes(_0x1150fc, _0x3d6cb0),
-    reconcilePersonReplacementReferenceInputs({ currentInputs: _0x1fcd7c, nextInputs: _0x3db58b }),
-    reconcileElementTree(_0x12f3d0, _0x342f96, { preserveImageNodes: !![] }),
-    reconcileElementTree(_0x3414b5, _0x1c25c2, { preserveImageNodes: !![] }),
-    syncElementAttributes(_0x36eafc, _0xa5fb6f),
-    _0x3a2e79['replaceWith']?.(_0x2ffbc0),
-    Array['from'](_0x3552b8['children'] || [])
-      ['filter']((_0x1ccd23) => _0x1ccd23 !== _0x1150fc && _0x1ccd23 !== _0x36eafc)
-      ['forEach']((_0x8f7568) => _0x8f7568['remove']?.()));
-  let _0x3560a3 = ![];
-  Array['from'](_0x4ee892['children'] || [])['forEach']((_0x1d7b54) => {
-    if (_0x1d7b54 === _0x3d6cb0) return;
-    if (_0x1d7b54 === _0xa5fb6f) {
-      _0x3560a3 = !![];
+    currentCopy: currentCopy,
+    nextCopy: nextCopy,
+    currentPromptField: currentPromptField,
+    nextPromptField: nextPromptField,
+    currentPromptHeading: currentPromptHeading,
+    nextPromptHeading: nextPromptHeading,
+    currentPromptReferenceInputs: currentPromptReferenceInputs,
+    nextPromptReferenceInputs: nextPromptReferenceInputs,
+    currentPromptEditor: currentPromptEditor2,
+    nextPromptEditor: nextPromptEditor2,
+    currentFooter: currentFooter,
+    nextFooter: nextFooter,
+    currentGenerateButton: currentGenerateButton,
+    nextGenerateButton: nextGenerateButton,
+  } = value8;
+  (syncElementAttributes(currentCopy, nextCopy),
+    syncElementAttributes(currentPromptField, nextPromptField),
+    reconcilePersonReplacementReferenceInputs({
+      currentInputs: currentPromptReferenceInputs,
+      nextInputs: nextPromptReferenceInputs,
+    }),
+    reconcileElementTree(currentPromptHeading, nextPromptHeading, { preserveImageNodes: !![] }),
+    reconcileElementTree(currentPromptEditor2, nextPromptEditor2, { preserveImageNodes: !![] }),
+    syncElementAttributes(currentFooter, nextFooter),
+    currentGenerateButton['replaceWith']?.(nextGenerateButton),
+    Array['from'](currentCopy['children'] || [])
+      ['filter']((value9) => value9 !== currentPromptField && value9 !== currentFooter)
+      ['forEach']((el16) => el16['remove']?.()));
+  let value10 = ![];
+  Array['from'](nextCopy['children'] || [])['forEach']((value11) => {
+    if (value11 === nextPromptField) return;
+    if (value11 === nextFooter) {
+      value10 = !![];
       return;
     }
-    if (_0x3560a3) _0x3552b8['append']?.(_0x1d7b54);
-    else _0x3552b8['insertBefore']?.(_0x1d7b54, _0x36eafc);
+    if (value10) currentCopy['append']?.(value11);
+    else currentCopy['insertBefore']?.(value11, currentFooter);
   });
 }
-function collectImageShotSelectionElements(_0x47bcf0, _0x102707) {
-  const _0x53c4da = _0x47bcf0?.['querySelector']?.('.person-replacement-middle-layout'),
-    _0x39437e = _0x102707?.['querySelector']?.('.person-replacement-middle-layout'),
-    _0x29bdcb = _0x47bcf0?.['querySelector']?.('.person-replacement-target-assets'),
-    _0x4b2963 = _0x102707?.['querySelector']?.('.person-replacement-target-assets'),
-    _0x2d4851 = _0x47bcf0?.['querySelector']?.('.person-replacement-image-generation-panel'),
-    _0x59fb62 = _0x102707?.['querySelector']?.('.person-replacement-image-generation-panel'),
-    _0x6031fc = _0x2d4851?.['querySelector']?.('.person-replacement-generation-copy'),
-    _0x519c30 = _0x59fb62?.['querySelector']?.('.person-replacement-generation-copy'),
-    _0xb6e8ff = _0x6031fc?.['querySelector']?.('.person-replacement-prompt-field'),
-    _0x1be64a = _0x519c30?.['querySelector']?.('.person-replacement-prompt-field'),
-    _0x4ca6f1 = _0x6031fc?.['querySelector']?.('.prompt-panel-footer'),
-    _0x417058 = _0x519c30?.['querySelector']?.('.prompt-panel-footer');
+function collectImageShotSelectionElements(el17, el18) {
+  const currentMiddle2 = el17?.['querySelector']?.('.person-replacement-middle-layout'),
+    nextMiddle2 = el18?.['querySelector']?.('.person-replacement-middle-layout'),
+    currentTargetRail = el17?.['querySelector']?.('.person-replacement-target-assets'),
+    nextTargetRail = el18?.['querySelector']?.('.person-replacement-target-assets'),
+    currentGenerationPanel2 = el17?.['querySelector']?.('.person-replacement-image-generation-panel'),
+    nextGenerationPanel2 = el18?.['querySelector']?.('.person-replacement-image-generation-panel'),
+    currentCopy2 = currentGenerationPanel2?.['querySelector']?.('.person-replacement-generation-copy'),
+    nextCopy2 = nextGenerationPanel2?.['querySelector']?.('.person-replacement-generation-copy'),
+    currentPromptField2 = currentCopy2?.['querySelector']?.('.person-replacement-prompt-field'),
+    nextPromptField2 = nextCopy2?.['querySelector']?.('.person-replacement-prompt-field'),
+    currentFooter2 = currentCopy2?.['querySelector']?.('.prompt-panel-footer'),
+    nextFooter2 = nextCopy2?.['querySelector']?.('.prompt-panel-footer');
   return {
-    currentMiddle: _0x53c4da,
-    nextMiddle: _0x39437e,
-    currentPreview: getDirectShotPreview(_0x53c4da),
-    nextPreview: getDirectShotPreview(_0x39437e),
-    currentTargetRail: _0x29bdcb,
-    nextTargetRail: _0x4b2963,
-    currentGenerationPanel: _0x2d4851,
-    nextGenerationPanel: _0x59fb62,
-    currentResultPreview: _0x2d4851?.['querySelector']?.('.person-replacement-generation-preview'),
-    nextResultPreview: _0x59fb62?.['querySelector']?.('.person-replacement-generation-preview'),
-    currentCopy: _0x6031fc,
-    nextCopy: _0x519c30,
-    currentPromptField: _0xb6e8ff,
-    nextPromptField: _0x1be64a,
-    currentPromptHeading: _0xb6e8ff?.['querySelector']?.('.person-replacement-prompt-field-heading'),
-    nextPromptHeading: _0x1be64a?.['querySelector']?.('.person-replacement-prompt-field-heading'),
-    currentPromptReferenceInputs: _0xb6e8ff?.['querySelector']?.(
+    currentMiddle: currentMiddle2,
+    nextMiddle: nextMiddle2,
+    currentPreview: getDirectShotPreview(currentMiddle2),
+    nextPreview: getDirectShotPreview(nextMiddle2),
+    currentTargetRail: currentTargetRail,
+    nextTargetRail: nextTargetRail,
+    currentGenerationPanel: currentGenerationPanel2,
+    nextGenerationPanel: nextGenerationPanel2,
+    currentResultPreview: currentGenerationPanel2?.['querySelector']?.(
+      '.person-replacement-generation-preview',
+    ),
+    nextResultPreview: nextGenerationPanel2?.['querySelector']?.('.person-replacement-generation-preview'),
+    currentCopy: currentCopy2,
+    nextCopy: nextCopy2,
+    currentPromptField: currentPromptField2,
+    nextPromptField: nextPromptField2,
+    currentPromptHeading: currentPromptField2?.['querySelector']?.(
+      '.person-replacement-prompt-field-heading',
+    ),
+    nextPromptHeading: nextPromptField2?.['querySelector']?.('.person-replacement-prompt-field-heading'),
+    currentPromptReferenceInputs: currentPromptField2?.['querySelector']?.(
       '.person-replacement-prompt-reference-inputs',
     ),
-    nextPromptReferenceInputs: _0x1be64a?.['querySelector']?.('.person-replacement-prompt-reference-inputs'),
-    currentPromptEditor: _0xb6e8ff?.['querySelector']?.(
+    nextPromptReferenceInputs: nextPromptField2?.['querySelector']?.(
+      '.person-replacement-prompt-reference-inputs',
+    ),
+    currentPromptEditor: currentPromptField2?.['querySelector']?.(
       '[data-person-replacement-field=\x22image-prompt\x22]',
     ),
-    nextPromptEditor: _0x1be64a?.['querySelector']?.('[data-person-replacement-field=\x22image-prompt\x22]'),
-    currentFooter: _0x4ca6f1,
-    nextFooter: _0x417058,
-    currentModelSelector: _0x4ca6f1?.['querySelector']?.('[data-aigen-image-model-selector]'),
-    nextModelSelector: _0x417058?.['querySelector']?.('[data-aigen-image-model-selector]'),
-    currentGenerateButton: _0x4ca6f1?.['querySelector']?.(
+    nextPromptEditor: nextPromptField2?.['querySelector']?.(
+      '[data-person-replacement-field=\x22image-prompt\x22]',
+    ),
+    currentFooter: currentFooter2,
+    nextFooter: nextFooter2,
+    currentModelSelector: currentFooter2?.['querySelector']?.('[data-aigen-image-model-selector]'),
+    nextModelSelector: nextFooter2?.['querySelector']?.('[data-aigen-image-model-selector]'),
+    currentGenerateButton: currentFooter2?.['querySelector']?.(
       '[data-person-replacement-action="generate-replacement-image"]',
     ),
-    nextGenerateButton: _0x417058?.['querySelector']?.(
+    nextGenerateButton: nextFooter2?.['querySelector']?.(
       '[data-person-replacement-action=\x22generate-replacement-image\x22]',
     ),
   };
 }
 export function reconcilePersonReplacementImageShotSelection({
-  currentPage: _0x11f33b,
-  nextPage: _0x2e5ef6,
+  currentPage: currentPage2,
+  nextPage: nextPage2,
 } = {}) {
-  const _0x7778e1 = collectImageShotSelectionElements(_0x11f33b, _0x2e5ef6),
-    _0x20dc93 = prepareTargetCardPairs(_0x7778e1['currentTargetRail'], _0x7778e1['nextTargetRail']),
-    _0x2f2de5 = Object['values'](_0x7778e1);
+  const imageShotSelectionElements = collectImageShotSelectionElements(currentPage2, nextPage2),
+    list5 = prepareTargetCardPairs(
+      imageShotSelectionElements['currentTargetRail'],
+      imageShotSelectionElements['nextTargetRail'],
+    ),
+    list6 = Object['values'](imageShotSelectionElements);
   if (
-    _0x2f2de5['some']((_0x310e1c) => !_0x310e1c) ||
-    _0x20dc93['some']((_0x5dab6d) => Object['values'](_0x5dab6d)['some']((_0x1f9f64) => !_0x1f9f64))
+    list6['some']((enabled17) => !enabled17) ||
+    list5['some']((value12) => Object['values'](value12)['some']((enabled18) => !enabled18))
   )
     return ![];
   return (
-    reconcileElementTree(_0x7778e1['currentPreview'], _0x7778e1['nextPreview'], { preserveImageNodes: !![] }),
-    _0x20dc93['forEach'](reconcileTargetCardPair),
-    _0x7778e1['currentResultPreview']
+    reconcileElementTree(
+      imageShotSelectionElements['currentPreview'],
+      imageShotSelectionElements['nextPreview'],
+      { preserveImageNodes: !![] },
+    ),
+    list5['forEach'](reconcileTargetCardPair),
+    imageShotSelectionElements['currentResultPreview']
       ['querySelectorAll']?.('.person-replacement-image-preview-slide--outgoing')
-      ?.['forEach']?.((_0x18a5b8) => _0x18a5b8['remove']?.()),
-    reconcileElementTree(_0x7778e1['currentResultPreview'], _0x7778e1['nextResultPreview'], {
-      preserveImageNodes: !![],
-    }),
-    reconcileGenerationCopy(_0x7778e1),
+      ?.['forEach']?.((el19) => el19['remove']?.()),
+    reconcileElementTree(
+      imageShotSelectionElements['currentResultPreview'],
+      imageShotSelectionElements['nextResultPreview'],
+      {
+        preserveImageNodes: !![],
+      },
+    ),
+    reconcileGenerationCopy(imageShotSelectionElements),
     !![]
   );
 }

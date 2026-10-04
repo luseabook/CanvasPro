@@ -1,15 +1,15 @@
 import { normalizeVideoGenerationResult } from '../../components/video-node/videoGenerationResultRenderer.js';
 import { resolveGenerationResultSelection } from '../../core/generationResultRenderer.js';
 import { buildStoryClipCanvasBindingKey, buildStoryLinkedCanvasName } from './storyCanvasBinding.js';
-function asObject(_0x483547) {
-  return _0x483547 && typeof _0x483547 === 'object' && !Array['isArray'](_0x483547) ? _0x483547 : {};
+function asObject(value) {
+  return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
 }
-function normalizeText(_0x49ea36) {
-  return String(_0x49ea36 || '')['trim']();
+function normalizeText(item) {
+  return String(item || '')['trim']();
 }
-export function buildStoryEpisodeCanvasName(_0x1e279e = {}) {
-  const _0x4849b4 = Number(_0x1e279e['number'] || 0x0);
-  return [_0x4849b4 > 0x0 ? '第\x20' + _0x4849b4 + '\x20集' : '分集', normalizeText(_0x1e279e['title'])]
+export function buildStoryEpisodeCanvasName(options = {}) {
+  const count = Number(options['number'] || 0x0);
+  return [count > 0x0 ? '第\x20' + count + '\x20集' : '分集', normalizeText(options['title'])]
     ['filter'](Boolean)
     ['join'](' · ');
 }
@@ -22,23 +22,23 @@ export function buildStoryClipCanvasNodeData({
   generationParams: generationParams = {},
   generationValidation: generationValidation = null,
 } = {}) {
-  const _0x51994b = asObject(clip['video']),
-    _0x5e1e8c = Array['isArray'](_0x51994b['results']) ? _0x51994b['results'] : [],
-    { items: _0x43f32c, activeIndex: _0x276c8d } = resolveGenerationResultSelection(
-      normalizeVideoGenerationResult({ videos: _0x5e1e8c })['items'],
-      _0x51994b['activeIndex'],
+  const asObject2 = asObject(clip['video']),
+    videos = Array['isArray'](asObject2['results']) ? asObject2['results'] : [],
+    { items: items, activeIndex: activeIndex } = resolveGenerationResultSelection(
+      normalizeVideoGenerationResult({ videos: videos })['items'],
+      asObject2['activeIndex'],
     ),
-    _0xf2b091 = _0x43f32c[_0x276c8d] || {},
-    _0x70061a = Number(episode['number'] || 0x0),
-    _0x187547 = Number(clip['number'] || 0x0),
-    _0x2ce0ac = normalizeText(generationValidation?.['message'] || generationValidation);
+    key = items[activeIndex] || {},
+    count2 = Number(episode['number'] || 0x0),
+    count3 = Number(clip['number'] || 0x0),
+    message = normalizeText(generationValidation?.['message'] || generationValidation);
   return {
     type: 'ai-video',
     name: [
-      _0x70061a > 0x0 ? '第\x20' + _0x70061a + '\x20集' : '分集',
-      _0x187547 > 0x0 ? '片段 ' + _0x187547 : '视频片段',
+      count2 > 0x0 ? '第\x20' + count2 + '\x20集' : '分集',
+      count3 > 0x0 ? '片段 ' + count3 : '视频片段',
       normalizeText(clip['title']),
-      _0x2ce0ac ? '⚠ 时长需调整' : '',
+      message ? '⚠ 时长需调整' : '',
     ]
       ['filter'](Boolean)
       ['join'](' · '),
@@ -47,15 +47,15 @@ export function buildStoryClipCanvasNodeData({
     provider: normalizeText(clip['provider'] || clip['generation']?.['provider'] || provider),
     generationParams: { ...asObject(generationParams), ...asObject(clip['generationParams']) },
     storyWorkspaceInputs: { ...asObject(clip['inputs']) },
-    videos: _0x43f32c,
-    mainVideoIndex: _0x276c8d,
+    videos: items,
+    mainVideoIndex: activeIndex,
     isVideosExpanded: ![],
-    videoUrl: normalizeText(_0xf2b091['videoUrl']),
-    localPath: normalizeText(_0xf2b091['localPath']),
-    displayLocalPath: normalizeText(_0xf2b091['displayLocalPath']),
-    posterLocalPath: normalizeText(_0xf2b091['posterLocalPath']),
-    thumbId: normalizeText(_0xf2b091['thumbId']),
-    thumbUrl: normalizeText(_0xf2b091['thumbUrl']),
+    videoUrl: normalizeText(key['videoUrl']),
+    localPath: normalizeText(key['localPath']),
+    displayLocalPath: normalizeText(key['displayLocalPath']),
+    posterLocalPath: normalizeText(key['posterLocalPath']),
+    thumbId: normalizeText(key['thumbId']),
+    thumbUrl: normalizeText(key['thumbUrl']),
     storyWorkspaceBinding: {
       projectId: normalizeText(project['id']),
       episodeId: normalizeText(episode['id']),
@@ -63,171 +63,165 @@ export function buildStoryClipCanvasNodeData({
       kind: 'clip-video',
       canvasScope: 'project',
     },
-    ...(_0x2ce0ac
-      ? { storyWorkspaceValidation: { generation: { status: 'unsupported', message: _0x2ce0ac } } }
+    ...(message
+      ? { storyWorkspaceValidation: { generation: { status: 'unsupported', message: message } } }
       : {}),
   };
 }
 export function clearDeletedStoryCanvasBindings(
-  _0x46ecbb = {},
+  enabled = {},
   { canvasId: canvasId = '', nodes: nodes = [] } = {},
 ) {
-  if (!_0x46ecbb || typeof _0x46ecbb !== 'object' || Array['isArray'](_0x46ecbb)) return ![];
-  const _0x242646 = new Set(
+  if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled)) return ![];
+  const map = new Set(
     (Array['isArray'](nodes) ? nodes : [])
-      ['map']((_0x3fc368) => normalizeText(_0x3fc368?.['id'] || _0x3fc368))
+      ['map']((index) => normalizeText(index?.['id'] || index))
       ['filter'](Boolean),
   );
-  if (!_0x242646['size']) return ![];
-  const _0xf6e9fb = normalizeText(canvasId),
-    _0x26b093 = (_0x14f2af) =>
-      !_0xf6e9fb || !normalizeText(_0x14f2af) || normalizeText(_0x14f2af) === _0xf6e9fb;
-  let _0x26e5ef = ![];
-  const _0x246f94 = asObject(_0x46ecbb['project']?.['canvasBinding']);
-  if (_0x26b093(_0x246f94['canvasId']) && _0x246f94['nodes']) {
-    const _0x334eaa = { ...asObject(_0x246f94['nodes']) };
-    for (const [_0x6b8ee5, _0x25c65f] of Object['entries'](_0x334eaa)) {
-      if (!_0x242646['has'](normalizeText(_0x25c65f))) continue;
-      (delete _0x334eaa[_0x6b8ee5], (_0x26e5ef = !![]));
+  if (!map['size']) return ![];
+  const text = normalizeText(canvasId),
+    handler = (result) => !text || !normalizeText(result) || normalizeText(result) === text;
+  let data = ![];
+  const args = asObject(enabled['project']?.['canvasBinding']);
+  if (handler(args['canvasId']) && args['nodes']) {
+    const nodes2 = { ...asObject(args['nodes']) };
+    for (const [target, source] of Object['entries'](nodes2)) {
+      if (!map['has'](normalizeText(source))) continue;
+      (delete nodes2[target], (data = !![]));
     }
-    if (_0x26e5ef) _0x46ecbb['project']['canvasBinding'] = { ..._0x246f94, nodes: _0x334eaa };
+    if (data) enabled['project']['canvasBinding'] = { ...args, nodes: nodes2 };
   }
-  for (const _0x568357 of Array['isArray'](_0x46ecbb['episodes']) ? _0x46ecbb['episodes'] : []) {
-    const _0x139dbf = normalizeText(_0x568357?.['canvasId'] || _0x568357?.['canvasBinding']?.['canvasId']);
-    if (!_0x26b093(_0x139dbf)) continue;
-    for (const _0x5aa4d7 of Array['isArray'](_0x568357?.['clips']) ? _0x568357['clips'] : []) {
-      const _0x10b077 = asObject(_0x5aa4d7?.['canvasBinding']);
-      if (!_0x242646['has'](normalizeText(_0x10b077['nodeId']))) continue;
-      (delete _0x5aa4d7['canvasBinding'], (_0x26e5ef = !![]));
+  for (const next of Array['isArray'](enabled['episodes']) ? enabled['episodes'] : []) {
+    const text2 = normalizeText(next?.['canvasId'] || next?.['canvasBinding']?.['canvasId']);
+    if (!handler(text2)) continue;
+    for (const current of Array['isArray'](next?.['clips']) ? next['clips'] : []) {
+      const asObject3 = asObject(current?.['canvasBinding']);
+      if (!map['has'](normalizeText(asObject3['nodeId']))) continue;
+      (delete current['canvasBinding'], (data = !![]));
     }
   }
-  if (Array['isArray'](_0x46ecbb['clipFrames'])) {
-    const _0x23ba80 = _0x46ecbb['clipFrames']['filter'](
-      (_0x32c589) =>
-        !_0x242646['has'](normalizeText(_0x32c589?.['canvasNodeId'])) || !_0x26b093(_0x32c589?.['canvasId']),
+  if (Array['isArray'](enabled['clipFrames'])) {
+    const list = enabled['clipFrames']['filter'](
+      (entry) => !map['has'](normalizeText(entry?.['canvasNodeId'])) || !handler(entry?.['canvasId']),
     );
-    _0x23ba80['length'] !== _0x46ecbb['clipFrames']['length'] &&
-      ((_0x46ecbb['clipFrames'] = _0x23ba80), (_0x26e5ef = !![]));
+    list['length'] !== enabled['clipFrames']['length'] && ((enabled['clipFrames'] = list), (data = !![]));
   }
-  return _0x26e5ef;
+  return data;
 }
 export function createStoryEpisodeCanvasAdapter({
-  canvasTabManager: _0x16b7aa,
-  createNodeAtCursor: _0xdcb94,
-  getGraphState: _0xd133d4,
+  canvasTabManager: canvasTabManager,
+  createNodeAtCursor: createNodeAtCursor,
+  getGraphState: getGraphState,
   getGraphSnapshot: getGraphSnapshot = null,
   restoreGraphSnapshot: restoreGraphSnapshot = null,
-  updateNodeData: _0x42c459,
-  deleteNodes: _0xf39608 = null,
-  focusNodes: _0xa74ffc = null,
+  updateNodeData: updateNodeData,
+  deleteNodes: deleteNodes2 = null,
+  focusNodes: focusNodes2 = null,
   getVideoNodeSize: getVideoNodeSize = () => ({ width: 0x400, height: 0x240 }),
   commit: commit = () => {},
 } = {}) {
   if (
-    typeof _0x16b7aa?.['addCanvas'] !== 'function' ||
-    typeof _0x16b7aa?.['getActiveCanvasId'] !== 'function' ||
-    typeof _0xdcb94 !== 'function' ||
-    typeof _0xd133d4 !== 'function' ||
-    typeof _0x42c459 !== 'function'
+    typeof canvasTabManager?.['addCanvas'] !== 'function' ||
+    typeof canvasTabManager?.['getActiveCanvasId'] !== 'function' ||
+    typeof createNodeAtCursor !== 'function' ||
+    typeof getGraphState !== 'function' ||
+    typeof updateNodeData !== 'function'
   )
     throw new Error('story\x20episode\x20canvas\x20adapter\x20dependencies\x20are\x20incomplete');
-  const _0x18dd3f = (_0x3fe929) => asObject(_0xd133d4()?.['nodes'])[normalizeText(_0x3fe929)] || null;
+  const run = (record) => asObject(getGraphState()?.['nodes'])[normalizeText(record)] || null;
   return {
-    canvasExists(_0x1af899) {
-      const _0x34563f = normalizeText(_0x1af899);
-      if (!_0x34563f) return ![];
-      const _0x26fade = _0x16b7aa['getMultiDataSnapshot']?.() || {};
-      return Array['isArray'](_0x26fade['canvases'])
-        ? _0x26fade['canvases']['some']((_0x2d57f5) => normalizeText(_0x2d57f5?.['id']) === _0x34563f)
-        : normalizeText(_0x16b7aa['getActiveCanvasId']()) === _0x34563f;
+    canvasExists(payload) {
+      const text3 = normalizeText(payload);
+      if (!text3) return ![];
+      const handle = canvasTabManager['getMultiDataSnapshot']?.() || {};
+      return Array['isArray'](handle['canvases'])
+        ? handle['canvases']['some']((state) => normalizeText(state?.['id']) === text3)
+        : normalizeText(canvasTabManager['getActiveCanvasId']()) === text3;
     },
-    async switchCanvas(_0x403265) {
-      const _0x5f0278 = normalizeText(_0x403265);
-      if (!_0x5f0278) return ![];
-      if (normalizeText(_0x16b7aa['getActiveCanvasId']()) === _0x5f0278) return !![];
-      if (typeof _0x16b7aa['switchTo'] !== 'function') return ![];
-      return (await _0x16b7aa['switchTo'](_0x5f0278)) !== ![];
+    async switchCanvas(config) {
+      const text4 = normalizeText(config);
+      if (!text4) return ![];
+      if (normalizeText(canvasTabManager['getActiveCanvasId']()) === text4) return !![];
+      if (typeof canvasTabManager['switchTo'] !== 'function') return ![];
+      return (await canvasTabManager['switchTo'](text4)) !== ![];
     },
-    async createCanvas(_0x4422f0) {
-      await _0x16b7aa['addCanvas']();
-      const _0x39d302 = normalizeText(_0x16b7aa['getActiveCanvasId']());
-      if (!_0x39d302) throw new Error('新建项目关联画布后未获得活动画布 ID');
-      return (_0x16b7aa['renameCanvas']?.(_0x39d302, _0x4422f0), _0x39d302);
+    async createCanvas(scope) {
+      await canvasTabManager['addCanvas']();
+      const text5 = normalizeText(canvasTabManager['getActiveCanvasId']());
+      if (!text5) throw new Error('新建项目关联画布后未获得活动画布 ID');
+      return (canvasTabManager['renameCanvas']?.(text5, scope), text5);
     },
-    renameCanvas(_0xfd0218, _0x2cb938) {
-      _0x16b7aa['renameCanvas']?.(_0xfd0218, _0x2cb938);
+    renameCanvas(input, output) {
+      canvasTabManager['renameCanvas']?.(input, output);
     },
-    nodeExists(_0x550f06) {
-      return Boolean(_0x18dd3f(_0x550f06));
+    nodeExists(value2) {
+      return Boolean(run(value2));
     },
-    async createVideoNode(_0x11c666, { sequenceKey: _0x2f13ba } = {}) {
-      const _0x4ede92 = asObject(getVideoNodeSize()),
-        _0x5719af = _0xdcb94(
+    async createVideoNode(error, { sequenceKey: sequenceKey } = {}) {
+      const box = asObject(getVideoNodeSize()),
+        type2 = createNodeAtCursor(
           'ai-video',
-          Number(_0x4ede92['width'] || 0x400),
-          Number(_0x4ede92['height'] || 0x240),
-          _0x11c666['name'],
-          { placement: 'viewport-center-sequence', sequenceKey: _0x2f13ba, skipCommit: !![] },
+          Number(box['width'] || 0x400),
+          Number(box['height'] || 0x240),
+          error['name'],
+          { placement: 'viewport-center-sequence', sequenceKey: sequenceKey, skipCommit: !![] },
         );
-      if (!_0x5719af?.['id']) throw new Error('创建分集视频节点失败');
-      const { type: _0x37d387, ..._0x274068 } = _0x11c666;
+      if (!type2?.['id']) throw new Error('创建分集视频节点失败');
+      const { type: type3, ...args2 } = error;
       return (
-        _0x42c459(_0x5719af['id'], _0x274068),
-        _0x18dd3f(_0x5719af['id']) || { ..._0x5719af, ..._0x274068, type: _0x5719af['type'] || _0x37d387 }
+        updateNodeData(type2['id'], args2),
+        run(type2['id']) || { ...type2, ...args2, type: type2['type'] || type3 }
       );
     },
-    async updateVideoNode(_0x4933a0, _0x2a4750) {
-      const _0x150602 = normalizeText(_0x4933a0);
-      if (!_0x150602) return null;
-      const { type: _0x75d0a5, ..._0x34807a } = _0x2a4750;
-      return (
-        _0x42c459(_0x150602, _0x34807a),
-        _0x18dd3f(_0x150602) || { id: _0x150602, type: _0x75d0a5 || 'ai-video', ..._0x34807a }
-      );
+    async updateVideoNode(value3, value4) {
+      const id2 = normalizeText(value3);
+      if (!id2) return null;
+      const { type: type4, ...args3 } = value4;
+      return (updateNodeData(id2, args3), run(id2) || { id: id2, type: type4 || 'ai-video', ...args3 });
     },
-    deleteNodes(_0x1b94c6 = []) {
-      if (typeof _0xf39608 !== 'function') return ![];
-      const _0x1a1252 = (Array['isArray'](_0x1b94c6) ? _0x1b94c6 : [])
+    deleteNodes(list2 = []) {
+      if (typeof deleteNodes2 !== 'function') return ![];
+      const list3 = (Array['isArray'](list2) ? list2 : [])
         ['map'](normalizeText)
-        ['filter']((_0x3c01fb) => _0x3c01fb && _0x18dd3f(_0x3c01fb));
-      if (!_0x1a1252['length']) return !![];
-      return (_0xf39608([...new Set(_0x1a1252)]), !![]);
+        ['filter']((value5) => value5 && run(value5));
+      if (!list3['length']) return !![];
+      return (deleteNodes2([...new Set(list3)]), !![]);
     },
     createMutationSnapshot() {
       if (typeof getGraphSnapshot !== 'function') return null;
       return getGraphSnapshot();
     },
-    restoreMutationSnapshot(_0x1cd8dd) {
-      if (!_0x1cd8dd || typeof restoreGraphSnapshot !== 'function') return ![];
-      return restoreGraphSnapshot(_0x1cd8dd) !== ![];
+    restoreMutationSnapshot(enabled2) {
+      if (!enabled2 || typeof restoreGraphSnapshot !== 'function') return ![];
+      return restoreGraphSnapshot(enabled2) !== ![];
     },
-    async deleteCanvas(_0x1ba471) {
-      const _0x1dec06 = normalizeText(_0x1ba471);
-      if (!_0x1dec06 || typeof _0x16b7aa?.['deleteCanvas'] !== 'function') return ![];
-      return (await _0x16b7aa['deleteCanvas'](_0x1dec06, { skipDirtyConfirm: !![] })) !== ![];
+    async deleteCanvas(value6) {
+      const text6 = normalizeText(value6);
+      if (!text6 || typeof canvasTabManager?.['deleteCanvas'] !== 'function') return ![];
+      return (await canvasTabManager['deleteCanvas'](text6, { skipDirtyConfirm: !![] })) !== ![];
     },
-    focusNodes(_0xa5a990, _0x19b991 = {}) {
-      if (typeof _0xa74ffc !== 'function') return ![];
-      const _0x40c1f5 = Array['isArray'](_0xa5a990) ? _0xa5a990['map'](normalizeText)['filter'](Boolean) : [];
-      if (!_0x40c1f5['length']) return ![];
-      return _0xa74ffc(_0x40c1f5, _0x19b991['padding'], _0x19b991['durationMs'], _0x19b991);
+    focusNodes(list4, value7 = {}) {
+      if (typeof focusNodes2 !== 'function') return ![];
+      const list5 = Array['isArray'](list4) ? list4['map'](normalizeText)['filter'](Boolean) : [];
+      if (!list5['length']) return ![];
+      return focusNodes2(list5, value7['padding'], value7['durationMs'], value7);
     },
     commit: commit,
   };
 }
 async function rollbackStoryEpisodeCanvasMutation({
-  adapter: _0x198e83,
+  adapter: adapter,
   canvasId: canvasId = '',
   reused: reused = ![],
-  mutationSnapshot: _0x21589e,
+  mutationSnapshot: mutationSnapshot,
 } = {}) {
-  if (!reused && typeof _0x198e83?.['deleteCanvas'] === 'function')
+  if (!reused && typeof adapter?.['deleteCanvas'] === 'function')
     try {
-      if ((await _0x198e83['deleteCanvas'](canvasId, { skipDirtyConfirm: !![] })) !== ![]) return !![];
+      if ((await adapter['deleteCanvas'](canvasId, { skipDirtyConfirm: !![] })) !== ![]) return !![];
     } catch {}
-  if (_0x21589e && typeof _0x198e83?.['restoreMutationSnapshot'] === 'function')
+  if (mutationSnapshot && typeof adapter?.['restoreMutationSnapshot'] === 'function')
     try {
-      return (await _0x198e83['restoreMutationSnapshot'](_0x21589e, { canvasId: canvasId })) !== ![];
+      return (await adapter['restoreMutationSnapshot'](mutationSnapshot, { canvasId: canvasId })) !== ![];
     } catch {}
   return ![];
 }
@@ -238,9 +232,9 @@ export async function createStoryEpisodeCanvas({
   provider: provider = '',
   generationParams: generationParams = {},
   resolveClipGenerationSettings: resolveClipGenerationSettings = null,
-  adapter: _0x3bfe15,
+  adapter: adapter2,
 } = {}) {
-  const _0x23d115 = [
+  const list6 = [
     'canvasExists',
     'switchCanvas',
     'createCanvas',
@@ -248,167 +242,165 @@ export async function createStoryEpisodeCanvas({
     'createVideoNode',
     'updateVideoNode',
   ];
-  if (_0x23d115['some']((_0x40ea76) => typeof _0x3bfe15?.[_0x40ea76] !== 'function'))
+  if (list6['some']((value8) => typeof adapter2?.[value8] !== 'function'))
     throw new Error('createStoryEpisodeCanvas requires a complete canvas adapter');
-  const _0x19420e = Array['isArray'](episode['clips']) ? episode['clips'] : [],
-    _0x2d48d0 = await Promise['all'](
-      _0x19420e['map'](async (_0x1b1360) => {
+  const list7 = Array['isArray'](episode['clips']) ? episode['clips'] : [],
+    list8 = await Promise['all'](
+      list7['map'](async (clip2) => {
         try {
-          const _0x450b60 =
+          const value9 =
             typeof resolveClipGenerationSettings === 'function'
-              ? asObject(await resolveClipGenerationSettings(_0x1b1360))
+              ? asObject(await resolveClipGenerationSettings(clip2))
               : {};
           return {
-            clip: _0x1b1360,
-            modelId: normalizeText(_0x450b60['modelId']) || modelId,
-            provider: normalizeText(_0x450b60['provider']) || provider,
-            generationParams: Object['keys'](asObject(_0x450b60['generationParams']))['length']
-              ? _0x450b60['generationParams']
+            clip: clip2,
+            modelId: normalizeText(value9['modelId']) || modelId,
+            provider: normalizeText(value9['provider']) || provider,
+            generationParams: Object['keys'](asObject(value9['generationParams']))['length']
+              ? value9['generationParams']
               : generationParams,
             generationValidation: null,
           };
-        } catch (_0x33d68f) {
-          const _0x8091ae = Number(
-              _0x1b1360?.['durationSec'] || _0x1b1360?.['durationSeconds'] || _0x1b1360?.['duration'],
+        } catch (error2) {
+          const duration = Number(
+              clip2?.['durationSec'] || clip2?.['durationSeconds'] || clip2?.['duration'],
             ),
-            _0x8031ca = normalizeText(_0x33d68f?.['message'] || _0x33d68f);
-          if (!(_0x8091ae > 0x0) || !/时长|duration/iu['test'](_0x8031ca)) throw _0x33d68f;
+            message2 = normalizeText(error2?.['message'] || error2);
+          if (!(duration > 0x0) || !/时长|duration/iu['test'](message2)) throw error2;
           return {
-            clip: _0x1b1360,
+            clip: clip2,
             modelId: modelId,
             provider: provider,
-            generationParams: { ...asObject(generationParams), duration: _0x8091ae },
-            generationValidation: { message: _0x8031ca },
+            generationParams: { ...asObject(generationParams), duration: duration },
+            generationValidation: { message: message2 },
           };
         }
       }),
     ),
-    _0x5651cb = buildStoryLinkedCanvasName(project, episode),
-    _0x548f58 = asObject(project['canvasBinding']),
-    _0x372a1e = asObject(_0x548f58['nodes']),
-    _0x27e9f7 = normalizeText(_0x548f58['canvasId']),
-    _0x319b78 =
-      _0x27e9f7 &&
-      typeof _0x3bfe15['canvasExists'] === 'function' &&
-      (await _0x3bfe15['canvasExists'](_0x27e9f7));
-  let _0x473ad0 = '';
-  if (_0x319b78) {
-    const _0x55d18d = await _0x3bfe15['switchCanvas']?.(_0x27e9f7);
-    if (_0x55d18d === ![]) throw new Error('无法切换到已绑定的项目画布：' + _0x27e9f7);
-    _0x473ad0 = _0x27e9f7;
-  } else _0x473ad0 = await _0x3bfe15['createCanvas'](_0x5651cb);
-  const _0x45c984 =
+    canvasName = buildStoryLinkedCanvasName(project, episode),
+    asObject4 = asObject(project['canvasBinding']),
+    args4 = asObject(asObject4['nodes']),
+    text7 = normalizeText(asObject4['canvasId']),
+    value10 =
+      text7 && typeof adapter2['canvasExists'] === 'function' && (await adapter2['canvasExists'](text7));
+  let canvasId2 = '';
+  if (value10) {
+    const value11 = await adapter2['switchCanvas']?.(text7);
+    if (value11 === ![]) throw new Error('无法切换到已绑定的项目画布：' + text7);
+    canvasId2 = text7;
+  } else canvasId2 = await adapter2['createCanvas'](canvasName);
+  const sequenceKey2 =
       'story-project:' +
-      (normalizeText(project['id']) || _0x473ad0) +
+      (normalizeText(project['id']) || canvasId2) +
       ':episode:' +
       (normalizeText(episode['id']) || 'episode'),
-    _0x273997 = [],
-    _0x47b385 = [],
-    _0x56b60a = _0x319b78 ? { ..._0x372a1e } : {};
-  let _0xda4b92 = 0x0,
-    _0x232081 = 0x0,
-    _0x271b4f = 0x0;
-  const _0x32e857 = _0x2d48d0['map'](({ clip: _0x4ffd9c }, _0x5368b3) =>
-      buildStoryClipCanvasBindingKey({ episode: episode, clip: _0x4ffd9c, clipIndex: _0x5368b3 }),
+    nodes3 = [],
+    bindings = [],
+    nodes4 = value10 ? { ...args4 } : {};
+  let createdCount = 0x0,
+    updatedCount = 0x0,
+    deletedCount = 0x0;
+  const list9 = list8['map'](({ clip: clip3 }, clipIndex) =>
+      buildStoryClipCanvasBindingKey({ episode: episode, clip: clip3, clipIndex: clipIndex }),
     ),
-    _0x2bd8d8 = buildStoryClipCanvasBindingKey({
+    storyClipCanvasBindingKey = buildStoryClipCanvasBindingKey({
       episode: episode,
       clip: { id: '__story_episode_prefix__' },
     })['replace'](/:clip:[^:]+$/u, ':clip:'),
-    _0x49d5a1 = Object['keys'](_0x372a1e)['filter'](
-      (_0x192c73) => _0x192c73['startsWith'](_0x2bd8d8) && !_0x32e857['includes'](_0x192c73),
+    list10 = Object['keys'](args4)['filter'](
+      (value12) => value12['startsWith'](storyClipCanvasBindingKey) && !list9['includes'](value12),
     ),
-    _0x277550 = await _0x3bfe15['createMutationSnapshot']?.({ canvasId: _0x473ad0 });
+    mutationSnapshot2 = await adapter2['createMutationSnapshot']?.({ canvasId: canvasId2 });
   try {
-    if (_0x319b78 && _0x49d5a1['length']) {
-      const _0x22ccb4 = [];
-      for (const _0x5d8dd9 of _0x49d5a1) {
-        const _0xf93bcc = normalizeText(_0x372a1e[_0x5d8dd9]);
-        _0xf93bcc && (await _0x3bfe15['nodeExists'](_0xf93bcc, _0x473ad0)) && _0x22ccb4['push'](_0xf93bcc);
+    if (value10 && list10['length']) {
+      const list11 = [];
+      for (const value13 of list10) {
+        const text8 = normalizeText(args4[value13]);
+        text8 && (await adapter2['nodeExists'](text8, canvasId2)) && list11['push'](text8);
       }
-      if (_0x22ccb4['length']) {
-        if (typeof _0x3bfe15['deleteNodes'] !== 'function')
+      if (list11['length']) {
+        if (typeof adapter2['deleteNodes'] !== 'function')
           throw new Error('剧本分集画布适配器缺少旧节点清理能力');
-        const _0x539f20 = [...new Set(_0x22ccb4)];
-        if ((await _0x3bfe15['deleteNodes'](_0x539f20, { canvasId: _0x473ad0 })) === ![])
+        const list12 = [...new Set(list11)];
+        if ((await adapter2['deleteNodes'](list12, { canvasId: canvasId2 })) === ![])
           throw new Error('清理已失效的剧本分集画布节点失败');
-        _0x271b4f = _0x539f20['length'];
+        deletedCount = list12['length'];
       }
-      _0x49d5a1['forEach']((_0x5b7a0b) => {
-        delete _0x56b60a[_0x5b7a0b];
+      list10['forEach']((value14) => {
+        delete nodes4[value14];
       });
     }
-    for (let _0xb850a8 = 0x0; _0xb850a8 < _0x2d48d0['length']; _0xb850a8 += 0x1) {
-      const _0x1677f6 = _0x2d48d0[_0xb850a8],
-        { clip: _0x5c8f92 } = _0x1677f6,
-        _0x338647 = _0x32e857[_0xb850a8],
-        _0x4f9ae3 = buildStoryClipCanvasNodeData({
+    for (let value15 = 0x0; value15 < list8['length']; value15 += 0x1) {
+      const modelId2 = list8[value15],
+        { clip: clip4 } = modelId2,
+        key2 = list9[value15],
+        error3 = buildStoryClipCanvasNodeData({
           project: project,
           episode: episode,
-          clip: _0x5c8f92,
-          modelId: _0x1677f6['modelId'],
-          provider: _0x1677f6['provider'],
-          generationParams: _0x1677f6['generationParams'],
-          generationValidation: _0x1677f6['generationValidation'],
+          clip: clip4,
+          modelId: modelId2['modelId'],
+          provider: modelId2['provider'],
+          generationParams: modelId2['generationParams'],
+          generationValidation: modelId2['generationValidation'],
         }),
-        _0x471866 = normalizeText(_0x372a1e[_0x338647]),
-        _0x784557 = Boolean(_0x319b78 && _0x471866 && (await _0x3bfe15['nodeExists'](_0x471866, _0x473ad0)));
-      _0x784557
-        ? (_0x273997['push'](
-            await _0x3bfe15['updateVideoNode'](_0x471866, _0x4f9ae3, {
-              canvasId: _0x473ad0,
-              sequenceKey: _0x45c984,
+        text9 = normalizeText(args4[key2]),
+        value16 = Boolean(value10 && text9 && (await adapter2['nodeExists'](text9, canvasId2)));
+      value16
+        ? (nodes3['push'](
+            await adapter2['updateVideoNode'](text9, error3, {
+              canvasId: canvasId2,
+              sequenceKey: sequenceKey2,
             }),
           ),
-          (_0x232081 += 0x1))
-        : (_0x273997['push'](
-            await _0x3bfe15['createVideoNode'](_0x4f9ae3, { canvasId: _0x473ad0, sequenceKey: _0x45c984 }),
+          (updatedCount += 0x1))
+        : (nodes3['push'](
+            await adapter2['createVideoNode'](error3, { canvasId: canvasId2, sequenceKey: sequenceKey2 }),
           ),
-          (_0xda4b92 += 0x1));
-      const _0x4451bf = _0x273997['at'](-0x1),
-        _0x42866e = normalizeText(_0x4451bf?.['id'] || (_0x784557 ? _0x471866 : ''));
-      if (!_0x42866e) throw new Error('同步本集到项目画布失败：' + (_0x4f9ae3['name'] || _0x338647));
-      ((_0x56b60a[_0x338647] = _0x42866e),
-        _0x47b385['push']({
-          key: _0x338647,
-          clipId: normalizeText(_0x5c8f92['id']),
-          nodeId: _0x42866e,
-          canvasId: _0x473ad0,
+          (createdCount += 0x1));
+      const value17 = nodes3['at'](-0x1),
+        nodeId = normalizeText(value17?.['id'] || (value16 ? text9 : ''));
+      if (!nodeId) throw new Error('同步本集到项目画布失败：' + (error3['name'] || key2));
+      ((nodes4[key2] = nodeId),
+        bindings['push']({
+          key: key2,
+          clipId: normalizeText(clip4['id']),
+          nodeId: nodeId,
+          canvasId: canvasId2,
         }));
     }
-    (_0x3bfe15['renameCanvas']?.(_0x473ad0, _0x5651cb),
-      _0x3bfe15['commit']?.(),
-      typeof _0x3bfe15['focusNodes'] === 'function' &&
-        _0x273997['length'] &&
-        (await _0x3bfe15['focusNodes'](
-          _0x47b385['map']((_0x2fefd2) => _0x2fefd2['nodeId']),
+    (adapter2['renameCanvas']?.(canvasId2, canvasName),
+      adapter2['commit']?.(),
+      typeof adapter2['focusNodes'] === 'function' &&
+        nodes3['length'] &&
+        (await adapter2['focusNodes'](
+          bindings['map']((value18) => value18['nodeId']),
           { padding: 0x50, durationMs: 0x0, maxZoom: 0.2 },
         )));
-  } catch (_0x81e189) {
+  } catch (value19) {
     await rollbackStoryEpisodeCanvasMutation({
-      adapter: _0x3bfe15,
-      canvasId: _0x473ad0,
-      reused: Boolean(_0x319b78),
-      mutationSnapshot: _0x277550,
+      adapter: adapter2,
+      canvasId: canvasId2,
+      reused: Boolean(value10),
+      mutationSnapshot: mutationSnapshot2,
     });
-    throw _0x81e189;
+    throw value19;
   }
-  const _0x515f0d = {
-    ...(_0x319b78 ? _0x548f58 : {}),
-    canvasId: _0x473ad0,
-    nodes: _0x56b60a,
-    ...(_0x319b78 && _0x548f58['layout'] ? { layout: { ...asObject(_0x548f58['layout']) } } : {}),
+  const binding = {
+    ...(value10 ? asObject4 : {}),
+    canvasId: canvasId2,
+    nodes: nodes4,
+    ...(value10 && asObject4['layout'] ? { layout: { ...asObject(asObject4['layout']) } } : {}),
   };
   return {
-    canvasId: _0x473ad0,
-    canvasName: _0x5651cb,
-    nodes: _0x273997,
-    reused: Boolean(_0x319b78),
-    createdCount: _0xda4b92,
-    updatedCount: _0x232081,
-    deletedCount: _0x271b4f,
-    bindings: _0x47b385,
-    binding: _0x515f0d,
-    canvasBinding: _0x515f0d,
+    canvasId: canvasId2,
+    canvasName: canvasName,
+    nodes: nodes3,
+    reused: Boolean(value10),
+    createdCount: createdCount,
+    updatedCount: updatedCount,
+    deletedCount: deletedCount,
+    bindings: bindings,
+    binding: binding,
+    canvasBinding: binding,
   };
 }

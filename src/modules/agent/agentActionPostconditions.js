@@ -67,10 +67,10 @@ const AUTO_REPAIRABLE_COMMANDS = new Set([
     'viewport.fitAll',
     'viewport.focusNodes',
   ]);
-export function getAgentActionPostconditionPolicy(_0x2f084e = '') {
-  const _0x6cd88 = normalizeId(_0x2f084e);
-  if (STORE_VERIFIED_COMMANDS['has'](_0x6cd88)) return 'store';
-  if (RESULT_VERIFIED_COMMANDS['has'](_0x6cd88)) return 'result';
+export function getAgentActionPostconditionPolicy(value = '') {
+  const id2 = normalizeId(value);
+  if (STORE_VERIFIED_COMMANDS['has'](id2)) return 'store';
+  if (RESULT_VERIFIED_COMMANDS['has'](id2)) return 'result';
   return 'unclassified';
 }
 const TERMINAL_GENERATION_STATUSES = new Set(['completed', 'complete', 'success', 'succeeded']),
@@ -82,330 +82,322 @@ const TERMINAL_GENERATION_STATUSES = new Set(['completed', 'complete', 'success'
     'running',
     'processing',
   ]);
-function normalizeId(_0xacdb5) {
-  return String(_0xacdb5 || '')['trim']();
+function normalizeId(item) {
+  return String(item || '')['trim']();
 }
-function uniqueIds(_0x1a546a = []) {
-  return [...new Set(_0x1a546a['map'](normalizeId)['filter'](Boolean))];
+function uniqueIds(list = []) {
+  return [...new Set(list['map'](normalizeId)['filter'](Boolean))];
 }
-function readCanvasState(_0x5471f9 = {}) {
-  const _0x2023bd = _0x5471f9['store'] || _0x5471f9['graphStore'];
-  return _0x2023bd?.['getStateRaw']?.() ?? _0x2023bd?.['getState']?.() ?? null;
+function readCanvasState(options = {}) {
+  const store = options['store'] || options['graphStore'];
+  return store?.['getStateRaw']?.() ?? store?.['getState']?.() ?? null;
 }
-function valuesEqual(_0x2a867d, _0x2685b9) {
-  if (Object['is'](_0x2a867d, _0x2685b9)) return !![];
-  if (!_0x2a867d || !_0x2685b9 || typeof _0x2a867d !== 'object' || typeof _0x2685b9 !== 'object') return ![];
-  if (Array['isArray'](_0x2a867d) || Array['isArray'](_0x2685b9)) {
-    if (
-      !Array['isArray'](_0x2a867d) ||
-      !Array['isArray'](_0x2685b9) ||
-      _0x2a867d['length'] !== _0x2685b9['length']
-    )
+function valuesEqual(list2, list3) {
+  if (Object['is'](list2, list3)) return !![];
+  if (!list2 || !list3 || typeof list2 !== 'object' || typeof list3 !== 'object') return ![];
+  if (Array['isArray'](list2) || Array['isArray'](list3)) {
+    if (!Array['isArray'](list2) || !Array['isArray'](list3) || list2['length'] !== list3['length'])
       return ![];
-    return _0x2a867d['every']((_0x34859d, _0x575b10) => valuesEqual(_0x34859d, _0x2685b9[_0x575b10]));
+    return list2['every']((key, index) => valuesEqual(key, list3[index]));
   }
-  const _0x50a7c8 = Object['keys'](_0x2a867d)['sort'](),
-    _0x51977c = Object['keys'](_0x2685b9)['sort']();
-  if (!valuesEqual(_0x50a7c8, _0x51977c)) return ![];
-  return _0x50a7c8['every']((_0x3cc4d0) => valuesEqual(_0x2a867d[_0x3cc4d0], _0x2685b9[_0x3cc4d0]));
+  const list4 = Object['keys'](list2)['sort'](),
+    result = Object['keys'](list3)['sort']();
+  if (!valuesEqual(list4, result)) return ![];
+  return list4['every']((data) => valuesEqual(list2[data], list3[data]));
 }
-function sameIds(_0x1de2cb = [], _0x5c3f62 = []) {
-  const _0x395bf8 = uniqueIds(_0x1de2cb)['sort'](),
-    _0x1d0994 = uniqueIds(_0x5c3f62)['sort']();
-  return valuesEqual(_0x395bf8, _0x1d0994);
+function sameIds(list5 = [], target = []) {
+  const uniqueIds2 = uniqueIds(list5)['sort'](),
+    uniqueIds3 = uniqueIds(target)['sort']();
+  return valuesEqual(uniqueIds2, uniqueIds3);
 }
-function createVerificationFailure(_0x381846, _0x847a2e, _0xaec70a = {}) {
-  return { ok: ![], commandId: _0x381846, reason: _0x847a2e, details: _0xaec70a };
+function createVerificationFailure(commandId, reason, details = {}) {
+  return { ok: ![], commandId: commandId, reason: reason, details: details };
 }
-function verifyNodeIds(_0x2785c0, _0x2ef953, _0x4c584c, _0x21a7cb = {}) {
-  const _0x187834 = uniqueIds(_0x4c584c);
-  if (_0x187834['length'] === 0x0)
-    return createVerificationFailure(_0x2785c0, 'missing_result_node_ids', _0x21a7cb);
-  const _0xdb0dd5 = _0x187834['filter']((_0x467f94) => !_0x2ef953[_0x467f94]);
-  if (_0xdb0dd5['length'] > 0x0)
-    return createVerificationFailure(_0x2785c0, 'nodes_not_committed', {
-      ..._0x21a7cb,
-      nodeIds: _0x187834,
-      missingNodeIds: _0xdb0dd5,
+function verifyNodeIds(source, enabled, next, args2 = {}) {
+  const nodeIds = uniqueIds(next);
+  if (nodeIds['length'] === 0x0) return createVerificationFailure(source, 'missing_result_node_ids', args2);
+  const missingNodeIds = nodeIds['filter']((current) => !enabled[current]);
+  if (missingNodeIds['length'] > 0x0)
+    return createVerificationFailure(source, 'nodes_not_committed', {
+      ...args2,
+      nodeIds: nodeIds,
+      missingNodeIds: missingNodeIds,
     });
-  return { ok: !![], nodeIds: _0x187834 };
+  return { ok: !![], nodeIds: nodeIds };
 }
-function verifyEdge(_0xc29d7b, _0x5479b7, _0x217cab = {}) {
-  const _0x1d5fc9 = normalizeId(_0x217cab['id'] || _0x217cab['edgeId']),
-    _0x15f73b = _0x1d5fc9 ? _0x5479b7[_0x1d5fc9] : null;
-  if (!_0x15f73b) return createVerificationFailure(_0xc29d7b, 'edge_not_committed', { edgeId: _0x1d5fc9 });
-  for (const _0x2c1ad5 of ['sourceId', 'targetId', 'refSlot', 'type']) {
+function verifyEdge(entry, record, expected = {}) {
+  const edgeId = normalizeId(expected['id'] || expected['edgeId']),
+    actual = edgeId ? record[edgeId] : null;
+  if (!actual) return createVerificationFailure(entry, 'edge_not_committed', { edgeId: edgeId });
+  for (const field of ['sourceId', 'targetId', 'refSlot', 'type']) {
     if (
-      Object['prototype']['hasOwnProperty']['call'](_0x217cab, _0x2c1ad5) &&
-      _0x217cab[_0x2c1ad5] !== undefined &&
-      _0x217cab[_0x2c1ad5] !== null &&
-      String(_0x15f73b[_0x2c1ad5] ?? '') !== String(_0x217cab[_0x2c1ad5] ?? '')
+      Object['prototype']['hasOwnProperty']['call'](expected, field) &&
+      expected[field] !== undefined &&
+      expected[field] !== null &&
+      String(actual[field] ?? '') !== String(expected[field] ?? '')
     )
-      return createVerificationFailure(_0xc29d7b, 'edge_state_mismatch', {
-        edgeId: _0x1d5fc9,
-        field: _0x2c1ad5,
-        expected: _0x217cab[_0x2c1ad5],
-        actual: _0x15f73b[_0x2c1ad5],
+      return createVerificationFailure(entry, 'edge_state_mismatch', {
+        edgeId: edgeId,
+        field: field,
+        expected: expected[field],
+        actual: actual[field],
       });
   }
-  return { ok: !![], edgeId: _0x1d5fc9 };
+  return { ok: !![], edgeId: edgeId };
 }
-function verifyNodeCreation(_0x87eb01, _0x4c08a7, _0x58039, _0x578a08, _0x3c5ed9) {
-  const _0x578b88 = uniqueIds([
-      _0x58039['nodeId'],
-      _0x58039['node']?.['id'],
-      ...(Array['isArray'](_0x58039['nodeIds']) ? _0x58039['nodeIds'] : []),
-      ...(Array['isArray'](_0x58039['ids']) ? _0x58039['ids'] : []),
+function verifyNodeCreation(payload, handle, id3, state, config) {
+  const actualCount = uniqueIds([
+      id3['nodeId'],
+      id3['node']?.['id'],
+      ...(Array['isArray'](id3['nodeIds']) ? id3['nodeIds'] : []),
+      ...(Array['isArray'](id3['ids']) ? id3['ids'] : []),
     ]),
-    _0x2a70b8 = verifyNodeIds(_0x87eb01, _0x578a08, _0x578b88);
-  if (!_0x2a70b8['ok']) return _0x2a70b8;
-  if (_0x87eb01 === 'node.duplicate') {
-    const _0x1f1cd5 = uniqueIds([
-        ...(Array['isArray'](_0x58039['sourceIds']) ? _0x58039['sourceIds'] : []),
-        ...(Array['isArray'](_0x4c08a7['ids']) ? _0x4c08a7['ids'] : []),
-        _0x4c08a7['nodeId'],
+    response2 = verifyNodeIds(payload, state, actualCount);
+  if (!response2['ok']) return response2;
+  if (payload === 'node.duplicate') {
+    const sourceIds = uniqueIds([
+        ...(Array['isArray'](id3['sourceIds']) ? id3['sourceIds'] : []),
+        ...(Array['isArray'](handle['ids']) ? handle['ids'] : []),
+        handle['nodeId'],
       ]),
-      _0x5eed30 = Math['max'](0x1, Math['trunc'](Number(_0x58039['copies'] ?? _0x4c08a7['copies'] ?? 0x1))),
-      _0x5335ad = _0x1f1cd5['length'] * _0x5eed30;
-    if (_0x5335ad > 0x0 && _0x578b88['length'] !== _0x5335ad)
-      return createVerificationFailure(_0x87eb01, 'duplicate_count_mismatch', {
-        sourceIds: _0x1f1cd5,
-        copies: _0x5eed30,
-        expectedCount: _0x5335ad,
-        actualCount: _0x578b88['length'],
-        nodeIds: _0x578b88,
+      copies = Math['max'](0x1, Math['trunc'](Number(id3['copies'] ?? handle['copies'] ?? 0x1))),
+      expectedCount = sourceIds['length'] * copies;
+    if (expectedCount > 0x0 && actualCount['length'] !== expectedCount)
+      return createVerificationFailure(payload, 'duplicate_count_mismatch', {
+        sourceIds: sourceIds,
+        copies: copies,
+        expectedCount: expectedCount,
+        actualCount: actualCount['length'],
+        nodeIds: actualCount,
       });
   }
-  if (_0x87eb01 === 'node.createConnected') {
-    const _0x5acfc3 = _0x58039['edge'] || {
-      id: _0x58039['edgeId'],
-      sourceId: _0x58039['sourceId'] || _0x4c08a7['sourceId'],
-      targetId: _0x58039['nodeId'],
+  if (payload === 'node.createConnected') {
+    const scope = id3['edge'] || {
+      id: id3['edgeId'],
+      sourceId: id3['sourceId'] || handle['sourceId'],
+      targetId: id3['nodeId'],
     };
-    return verifyEdge(_0x87eb01, _0x3c5ed9, _0x5acfc3);
+    return verifyEdge(payload, config, scope);
   }
-  return { ok: !![], nodeIds: _0x578b88 };
+  return { ok: !![], nodeIds: actualCount };
 }
-function verifySelection(_0x48ad66, _0x3f4785, _0x3dc3eb) {
-  const _0x5e95bb = uniqueIds(_0x3f4785['ids'] || _0x3f4785['nodeIds'] || []);
-  if (_0x5e95bb['length'] === 0x0 || !sameIds(_0x5e95bb, _0x3dc3eb))
-    return createVerificationFailure(_0x48ad66, 'selection_state_mismatch', {
-      expectedIds: _0x5e95bb,
-      actualIds: uniqueIds(_0x3dc3eb || []),
+function verifySelection(input, output, value2) {
+  const expectedIds = uniqueIds(output['ids'] || output['nodeIds'] || []);
+  if (expectedIds['length'] === 0x0 || !sameIds(expectedIds, value2))
+    return createVerificationFailure(input, 'selection_state_mismatch', {
+      expectedIds: expectedIds,
+      actualIds: uniqueIds(value2 || []),
     });
-  return { ok: !![], nodeIds: _0x5e95bb };
+  return { ok: !![], nodeIds: expectedIds };
 }
-function verifyGroup(_0x5b2ed2, _0x2bcd79, _0x16fa7d, _0x50e8a7) {
-  const _0x6ce2a1 = normalizeId(_0x2bcd79['groupId'] || _0x2bcd79['nodeId']),
-    _0x596370 = verifyNodeIds(_0x5b2ed2, _0x16fa7d, [_0x6ce2a1]);
-  if (!_0x596370['ok']) return _0x596370;
-  const _0x4c3125 = uniqueIds(_0x2bcd79['ids'] || []),
-    _0x10942d = _0x4c3125['find'](
-      (_0x5945c5) => !_0x16fa7d[_0x5945c5] || normalizeId(_0x16fa7d[_0x5945c5]['parentId']) !== _0x6ce2a1,
+function verifyGroup(value3, value4, enabled2, value5) {
+  const groupId = normalizeId(value4['groupId'] || value4['nodeId']),
+    response3 = verifyNodeIds(value3, enabled2, [groupId]);
+  if (!response3['ok']) return response3;
+  const childIds = uniqueIds(value4['ids'] || []),
+    childMismatch = childIds['find'](
+      (value6) => !enabled2[value6] || normalizeId(enabled2[value6]['parentId']) !== groupId,
     );
-  if (String(_0x16fa7d[_0x6ce2a1]?.['type'] || '') !== 'group' || _0x4c3125['length'] === 0x0 || _0x10942d)
-    return createVerificationFailure(_0x5b2ed2, 'group_state_mismatch', {
-      groupId: _0x6ce2a1,
-      childIds: _0x4c3125,
-      childMismatch: _0x10942d,
+  if (String(enabled2[groupId]?.['type'] || '') !== 'group' || childIds['length'] === 0x0 || childMismatch)
+    return createVerificationFailure(value3, 'group_state_mismatch', {
+      groupId: groupId,
+      childIds: childIds,
+      childMismatch: childMismatch,
     });
-  if (!sameIds(_0x50e8a7, [_0x6ce2a1]))
-    return createVerificationFailure(_0x5b2ed2, 'selection_state_mismatch', {
-      expectedIds: [_0x6ce2a1],
-      actualIds: uniqueIds(_0x50e8a7 || []),
+  if (!sameIds(value5, [groupId]))
+    return createVerificationFailure(value3, 'selection_state_mismatch', {
+      expectedIds: [groupId],
+      actualIds: uniqueIds(value5 || []),
     });
-  return { ok: !![], nodeIds: [_0x6ce2a1, ..._0x4c3125] };
+  return { ok: !![], nodeIds: [groupId, ...childIds] };
 }
-function verifyUngroup(_0x312c4a, _0x374077, _0x109d0f) {
-  const _0x3de042 = uniqueIds(_0x374077['groupIds'] || []),
-    _0x1fa8b5 = uniqueIds(_0x374077['childIds'] || []),
-    _0x1e9924 = _0x3de042['filter']((_0x1f774e) => _0x109d0f[_0x1f774e]),
-    _0x275657 = _0x1fa8b5['filter'](
-      (_0x4ece07) =>
-        !_0x109d0f[_0x4ece07] || _0x3de042['includes'](normalizeId(_0x109d0f[_0x4ece07]['parentId'])),
+function verifyUngroup(value7, value8, enabled3) {
+  const groupIds = uniqueIds(value8['groupIds'] || []),
+    childIds2 = uniqueIds(value8['childIds'] || []),
+    remainingGroupIds = groupIds['filter']((value9) => enabled3[value9]),
+    attachedChildIds = childIds2['filter'](
+      (value10) => !enabled3[value10] || groupIds['includes'](normalizeId(enabled3[value10]['parentId'])),
     );
-  if (_0x3de042['length'] === 0x0 || _0x1e9924['length'] > 0x0 || _0x275657['length'] > 0x0)
-    return createVerificationFailure(_0x312c4a, 'ungroup_state_mismatch', {
-      groupIds: _0x3de042,
-      childIds: _0x1fa8b5,
-      remainingGroupIds: _0x1e9924,
-      attachedChildIds: _0x275657,
+  if (groupIds['length'] === 0x0 || remainingGroupIds['length'] > 0x0 || attachedChildIds['length'] > 0x0)
+    return createVerificationFailure(value7, 'ungroup_state_mismatch', {
+      groupIds: groupIds,
+      childIds: childIds2,
+      remainingGroupIds: remainingGroupIds,
+      attachedChildIds: attachedChildIds,
     });
-  return { ok: !![], nodeIds: _0x1fa8b5 };
+  return { ok: !![], nodeIds: childIds2 };
 }
-function verifyPastedGraph(_0x9ce1f7, _0x44ac2c, _0x643862, _0x2c44a5, _0x4467b8) {
-  const _0x534aff = uniqueIds(_0x44ac2c['nodeIds'] || _0x44ac2c['ids'] || []),
-    _0xcd8202 = verifyNodeIds(_0x9ce1f7, _0x643862, _0x534aff);
-  if (!_0xcd8202['ok']) return _0xcd8202;
-  const _0x3c2180 = uniqueIds(_0x44ac2c['edgeIds'] || []),
-    _0x36caeb = _0x3c2180['filter']((_0x30e842) => !_0x2c44a5[_0x30e842]);
-  if (_0x36caeb['length'] > 0x0)
-    return createVerificationFailure(_0x9ce1f7, 'edges_not_committed', {
-      edgeIds: _0x3c2180,
-      missingEdgeIds: _0x36caeb,
+function verifyPastedGraph(value11, value12, value13, enabled4, value14) {
+  const expectedIds2 = uniqueIds(value12['nodeIds'] || value12['ids'] || []),
+    response4 = verifyNodeIds(value11, value13, expectedIds2);
+  if (!response4['ok']) return response4;
+  const edgeIds = uniqueIds(value12['edgeIds'] || []),
+    missingEdgeIds = edgeIds['filter']((value15) => !enabled4[value15]);
+  if (missingEdgeIds['length'] > 0x0)
+    return createVerificationFailure(value11, 'edges_not_committed', {
+      edgeIds: edgeIds,
+      missingEdgeIds: missingEdgeIds,
     });
-  if (!sameIds(_0x534aff, _0x4467b8))
-    return createVerificationFailure(_0x9ce1f7, 'selection_state_mismatch', {
-      expectedIds: _0x534aff,
-      actualIds: uniqueIds(_0x4467b8 || []),
+  if (!sameIds(expectedIds2, value14))
+    return createVerificationFailure(value11, 'selection_state_mismatch', {
+      expectedIds: expectedIds2,
+      actualIds: uniqueIds(value14 || []),
     });
-  return { ok: !![], nodeIds: _0x534aff, edgeIds: _0x3c2180 };
+  return { ok: !![], nodeIds: expectedIds2, edgeIds: edgeIds };
 }
-function verifyResultContract(_0x7b6e09, _0x5e259a) {
-  if (['viewport.focusNodes', 'viewport.fitAll', 'task.focusResult']['includes'](_0x7b6e09)) {
-    const _0xc29961 = uniqueIds(_0x5e259a['ids'] || _0x5e259a['nodeIds'] || []);
-    return _0x5e259a['focused'] === !![] && _0xc29961['length'] > 0x0
-      ? { ok: !![], nodeIds: _0xc29961 }
-      : createVerificationFailure(_0x7b6e09, 'viewport_effect_not_acknowledged', { ids: _0xc29961 });
+function verifyResultContract(value16, response5) {
+  if (['viewport.focusNodes', 'viewport.fitAll', 'task.focusResult']['includes'](value16)) {
+    const nodeIds2 = uniqueIds(response5['ids'] || response5['nodeIds'] || []);
+    return response5['focused'] === !![] && nodeIds2['length'] > 0x0
+      ? { ok: !![], nodeIds: nodeIds2 }
+      : createVerificationFailure(value16, 'viewport_effect_not_acknowledged', { ids: nodeIds2 });
   }
-  if (_0x7b6e09 === 'clipboard.copy') {
-    const _0x2b2888 = uniqueIds(_0x5e259a['ids'] || []),
-      _0x204611 = Math['max'](0x0, Math['trunc'](Number(_0x5e259a['nodeCount']) || 0x0));
-    return _0x2b2888['length'] > 0x0 && _0x204611 === _0x2b2888['length']
-      ? { ok: !![], nodeIds: _0x2b2888 }
-      : createVerificationFailure(_0x7b6e09, 'clipboard_result_mismatch', {
-          ids: _0x2b2888,
-          nodeCount: _0x204611,
+  if (value16 === 'clipboard.copy') {
+    const nodeIds3 = uniqueIds(response5['ids'] || []),
+      nodeCount = Math['max'](0x0, Math['trunc'](Number(response5['nodeCount']) || 0x0));
+    return nodeIds3['length'] > 0x0 && nodeCount === nodeIds3['length']
+      ? { ok: !![], nodeIds: nodeIds3 }
+      : createVerificationFailure(value16, 'clipboard_result_mismatch', {
+          ids: nodeIds3,
+          nodeCount: nodeCount,
         });
   }
-  if (_0x7b6e09 === 'node.exportSelected') {
-    const _0x2cb838 = Math['max'](0x0, Math['trunc'](Number(_0x5e259a['exportedCount']) || 0x0)),
-      _0x41df89 = normalizeId(_0x5e259a['path'] || _0x5e259a['outputPath']);
-    return _0x5e259a['success'] === !![] && _0x2cb838 > 0x0 && _0x41df89
-      ? { ok: !![], path: _0x41df89, exportedCount: _0x2cb838 }
-      : createVerificationFailure(_0x7b6e09, 'export_result_unverified', {
-          exportedCount: _0x2cb838,
-          hasPath: Boolean(_0x41df89),
+  if (value16 === 'node.exportSelected') {
+    const exportedCount = Math['max'](0x0, Math['trunc'](Number(response5['exportedCount']) || 0x0)),
+      path = normalizeId(response5['path'] || response5['outputPath']);
+    return response5['success'] === !![] && exportedCount > 0x0 && path
+      ? { ok: !![], path: path, exportedCount: exportedCount }
+      : createVerificationFailure(value16, 'export_result_unverified', {
+          exportedCount: exportedCount,
+          hasPath: Boolean(path),
         });
   }
-  return createVerificationFailure(_0x7b6e09, 'postcondition_policy_missing');
+  return createVerificationFailure(value16, 'postcondition_policy_missing');
 }
-function verifyPrompt(_0x32eae5, _0x73f873, _0x2c9224) {
-  const _0x27ac94 = normalizeId(_0x73f873['nodeId']),
-    _0x37c9c6 = verifyNodeIds(_0x32eae5, _0x2c9224, [_0x27ac94]);
-  if (!_0x37c9c6['ok']) return _0x37c9c6;
-  if (String(_0x2c9224[_0x27ac94]['prompt'] || '') !== String(_0x73f873['prompt'] || ''))
-    return createVerificationFailure(_0x32eae5, 'prompt_state_mismatch', { nodeId: _0x27ac94 });
-  return { ok: !![], nodeIds: [_0x27ac94] };
+function verifyPrompt(value17, value18, value19) {
+  const nodeId = normalizeId(value18['nodeId']),
+    response6 = verifyNodeIds(value17, value19, [nodeId]);
+  if (!response6['ok']) return response6;
+  if (String(value19[nodeId]['prompt'] || '') !== String(value18['prompt'] || ''))
+    return createVerificationFailure(value17, 'prompt_state_mismatch', { nodeId: nodeId });
+  return { ok: !![], nodeIds: [nodeId] };
 }
-function verifyModel(_0x47cdb4, _0x2d61d8, _0x5254c4) {
-  const _0x462373 = normalizeId(_0x2d61d8['nodeId']),
-    _0x4878bb = verifyNodeIds(_0x47cdb4, _0x5254c4, [_0x462373]);
-  if (!_0x4878bb['ok']) return _0x4878bb;
-  const _0x595f78 = _0x5254c4[_0x462373];
-  if (String(_0x595f78['model'] || '') !== String(_0x2d61d8['modelId'] || _0x2d61d8['model'] || ''))
-    return createVerificationFailure(_0x47cdb4, 'model_state_mismatch', { nodeId: _0x462373 });
+function verifyModel(value20, value21, value22) {
+  const nodeId2 = normalizeId(value21['nodeId']),
+    response7 = verifyNodeIds(value20, value22, [nodeId2]);
+  if (!response7['ok']) return response7;
+  const value23 = value22[nodeId2];
+  if (String(value23['model'] || '') !== String(value21['modelId'] || value21['model'] || ''))
+    return createVerificationFailure(value20, 'model_state_mismatch', { nodeId: nodeId2 });
   if (
-    _0x2d61d8['provider'] !== undefined &&
-    String(_0x595f78['provider'] || '') !== String(_0x2d61d8['provider'] || '')
+    value21['provider'] !== undefined &&
+    String(value23['provider'] || '') !== String(value21['provider'] || '')
   )
-    return createVerificationFailure(_0x47cdb4, 'provider_state_mismatch', { nodeId: _0x462373 });
-  if (_0x2d61d8['params'] && !valuesEqual(_0x595f78['generationParams'] || {}, _0x2d61d8['params']))
-    return createVerificationFailure(_0x47cdb4, 'model_params_state_mismatch', { nodeId: _0x462373 });
-  return { ok: !![], nodeIds: [_0x462373] };
+    return createVerificationFailure(value20, 'provider_state_mismatch', { nodeId: nodeId2 });
+  if (value21['params'] && !valuesEqual(value23['generationParams'] || {}, value21['params']))
+    return createVerificationFailure(value20, 'model_params_state_mismatch', { nodeId: nodeId2 });
+  return { ok: !![], nodeIds: [nodeId2] };
 }
-function verifyParams(_0x50a6f3, _0x29230d, _0xaf94f5) {
-  const _0x35079b = normalizeId(_0x29230d['nodeId']),
-    _0x2c037a = verifyNodeIds(_0x50a6f3, _0xaf94f5, [_0x35079b]);
-  if (!_0x2c037a['ok']) return _0x2c037a;
-  const _0x548fc5 = _0xaf94f5[_0x35079b]['generationParams'] || {},
-    _0x14752e = _0x29230d['params'] || {},
-    _0x239838 = Object['keys'](_0x14752e)['filter'](
-      (_0x4bda2f) => !valuesEqual(_0x548fc5[_0x4bda2f], _0x14752e[_0x4bda2f]),
-    );
-  if (_0x239838['length'] > 0x0)
-    return createVerificationFailure(_0x50a6f3, 'params_state_mismatch', { nodeId: _0x35079b });
-  return { ok: !![], nodeIds: [_0x35079b] };
+function verifyParams(value24, value25, value26) {
+  const nodeId3 = normalizeId(value25['nodeId']),
+    response8 = verifyNodeIds(value24, value26, [nodeId3]);
+  if (!response8['ok']) return response8;
+  const value27 = value26[nodeId3]['generationParams'] || {},
+    value28 = value25['params'] || {},
+    list6 = Object['keys'](value28)['filter']((value29) => !valuesEqual(value27[value29], value28[value29]));
+  if (list6['length'] > 0x0)
+    return createVerificationFailure(value24, 'params_state_mismatch', { nodeId: nodeId3 });
+  return { ok: !![], nodeIds: [nodeId3] };
 }
-function verifyLayout(_0x23056e, _0x507159, _0x317a65) {
-  const _0x131271 = uniqueIds(_0x507159['ids'] || _0x507159['movedIds'] || []),
-    _0xe125da = verifyNodeIds(_0x23056e, _0x317a65, _0x131271);
-  if (!_0xe125da['ok']) return _0xe125da;
-  const _0xedd620 =
-    _0x507159['positions'] && typeof _0x507159['positions'] === 'object' ? _0x507159['positions'] : null;
-  if (!_0xedd620) return { ok: !![], nodeIds: _0x131271, status: 'legacy_contract' };
-  for (const [_0x1f7010, _0x2f4d02] of Object['entries'](_0xedd620)) {
-    const _0x31f95f = _0x317a65[_0x1f7010];
+function verifyLayout(value30, value31, value32) {
+  const nodeIds4 = uniqueIds(value31['ids'] || value31['movedIds'] || []),
+    response9 = verifyNodeIds(value30, value32, nodeIds4);
+  if (!response9['ok']) return response9;
+  const enabled5 =
+    value31['positions'] && typeof value31['positions'] === 'object' ? value31['positions'] : null;
+  if (!enabled5) return { ok: !![], nodeIds: nodeIds4, status: 'legacy_contract' };
+  for (const [nodeId4, expected2] of Object['entries'](enabled5)) {
+    const actual2 = value32[nodeId4];
     if (
-      !_0x31f95f ||
-      Math['abs'](Number(_0x31f95f['x']) - Number(_0x2f4d02?.['x'])) > 0.000001 ||
-      Math['abs'](Number(_0x31f95f['y']) - Number(_0x2f4d02?.['y'])) > 0.000001
+      !actual2 ||
+      Math['abs'](Number(actual2['x']) - Number(expected2?.['x'])) > 0.000001 ||
+      Math['abs'](Number(actual2['y']) - Number(expected2?.['y'])) > 0.000001
     )
-      return createVerificationFailure(_0x23056e, 'layout_position_mismatch', {
-        nodeId: _0x1f7010,
-        expected: _0x2f4d02,
-        actual: _0x31f95f ? { x: _0x31f95f['x'], y: _0x31f95f['y'] } : null,
+      return createVerificationFailure(value30, 'layout_position_mismatch', {
+        nodeId: nodeId4,
+        expected: expected2,
+        actual: actual2 ? { x: actual2['x'], y: actual2['y'] } : null,
       });
   }
-  return { ok: !![], nodeIds: _0x131271 };
+  return { ok: !![], nodeIds: nodeIds4 };
 }
-function verifyGenerationEntry(_0x3c5024, _0x431dca, _0x48d6c4) {
-  const _0x164e5e = String(_0x431dca['status'] || '')
+function verifyGenerationEntry(value33, response10, value34) {
+  const status = String(response10['status'] || '')
       ['trim']()
       ['toLowerCase'](),
-    _0x305b5f = normalizeId(_0x431dca['taskId']);
-  if (!_0x164e5e && !_0x305b5f) return { ok: !![], status: 'legacy_contract', nodeIds: [] };
-  const _0x8ad101 = normalizeId(_0x431dca['targetNodeId'] || _0x431dca['nodeId']),
-    _0x289dbd = verifyNodeIds(_0x3c5024, _0x48d6c4, [_0x8ad101]);
-  if (!_0x289dbd['ok']) return _0x289dbd;
-  if (!ACCEPTED_GENERATION_STATUSES['has'](_0x164e5e) && _0x164e5e !== 'failed')
-    return createVerificationFailure(_0x3c5024, 'generation_status_unverified', {
-      nodeId: _0x8ad101,
-      status: _0x164e5e,
+    id4 = normalizeId(response10['taskId']);
+  if (!status && !id4) return { ok: !![], status: 'legacy_contract', nodeIds: [] };
+  const nodeId5 = normalizeId(response10['targetNodeId'] || response10['nodeId']),
+    response11 = verifyNodeIds(value33, value34, [nodeId5]);
+  if (!response11['ok']) return response11;
+  if (!ACCEPTED_GENERATION_STATUSES['has'](status) && status !== 'failed')
+    return createVerificationFailure(value33, 'generation_status_unverified', {
+      nodeId: nodeId5,
+      status: status,
     });
-  if (!_0x305b5f && !TERMINAL_GENERATION_STATUSES['has'](_0x164e5e) && _0x164e5e !== 'failed')
-    return createVerificationFailure(_0x3c5024, 'generation_task_not_bound', {
-      nodeId: _0x8ad101,
-      status: _0x164e5e,
+  if (!id4 && !TERMINAL_GENERATION_STATUSES['has'](status) && status !== 'failed')
+    return createVerificationFailure(value33, 'generation_task_not_bound', {
+      nodeId: nodeId5,
+      status: status,
     });
-  return { ok: !![], nodeIds: [_0x8ad101] };
+  return { ok: !![], nodeIds: [nodeId5] };
 }
-function verifyGeneration(_0x198dd9, _0x51795d, _0x109d26) {
-  const _0x384463 =
-    _0x198dd9 === 'generation.runBatch'
-      ? Array['isArray'](_0x51795d['results'])
-        ? _0x51795d['results']
+function verifyGeneration(value35, value36, value37) {
+  const list7 =
+    value35 === 'generation.runBatch'
+      ? Array['isArray'](value36['results'])
+        ? value36['results']
         : []
-      : [_0x51795d];
-  if (_0x384463['length'] === 0x0) return createVerificationFailure(_0x198dd9, 'generation_results_missing');
-  for (const _0x9a2ff7 of _0x384463) {
-    const _0x670e44 = verifyGenerationEntry(_0x198dd9, _0x9a2ff7 || {}, _0x109d26);
-    if (!_0x670e44['ok']) return _0x670e44;
+      : [value36];
+  if (list7['length'] === 0x0) return createVerificationFailure(value35, 'generation_results_missing');
+  for (const value38 of list7) {
+    const response12 = verifyGenerationEntry(value35, value38 || {}, value37);
+    if (!response12['ok']) return response12;
   }
   return {
     ok: !![],
-    nodeIds: uniqueIds(_0x384463['map']((_0x1de36f) => _0x1de36f?.['targetNodeId'] || _0x1de36f?.['nodeId'])),
+    nodeIds: uniqueIds(list7['map']((value39) => value39?.['targetNodeId'] || value39?.['nodeId'])),
   };
 }
 export function verifyAgentActionPostcondition({
-  commandId: _0x2613d1,
+  commandId: commandId2,
   args: args = {},
   response: response = {},
   commandContext: commandContext = {},
 } = {}) {
-  const _0x4685c9 = normalizeId(_0x2613d1 || response['commandId']);
-  if (response['ok'] !== !![]) return { ok: !![], commandId: _0x4685c9, status: 'not_run' };
-  const _0x2c3f73 = getAgentActionPostconditionPolicy(_0x4685c9),
-    _0x323ca7 = response['result'] && typeof response['result'] === 'object' ? response['result'] : {};
-  if (_0x2c3f73 === 'result') {
-    const _0x399be4 = verifyResultContract(_0x4685c9, _0x323ca7);
-    return _0x399be4['ok']
-      ? { ..._0x399be4, commandId: _0x4685c9, status: 'verified' }
-      : { ..._0x399be4, commandId: _0x4685c9, status: 'failed' };
+  const commandId3 = normalizeId(commandId2 || response['commandId']);
+  if (response['ok'] !== !![]) return { ok: !![], commandId: commandId3, status: 'not_run' };
+  const agentActionPostconditionPolicy = getAgentActionPostconditionPolicy(commandId3),
+    id5 = response['result'] && typeof response['result'] === 'object' ? response['result'] : {};
+  if (agentActionPostconditionPolicy === 'result') {
+    const response13 = verifyResultContract(commandId3, id5);
+    return response13['ok']
+      ? { ...response13, commandId: commandId3, status: 'verified' }
+      : { ...response13, commandId: commandId3, status: 'failed' };
   }
-  const _0xfcb13f = readCanvasState(commandContext);
-  if (!_0xfcb13f || typeof _0xfcb13f !== 'object')
-    return _0x2c3f73 === 'store'
+  const canvasState = readCanvasState(commandContext);
+  if (!canvasState || typeof canvasState !== 'object')
+    return agentActionPostconditionPolicy === 'store'
       ? {
-          ...createVerificationFailure(_0x4685c9, 'state_unavailable'),
-          commandId: _0x4685c9,
+          ...createVerificationFailure(commandId3, 'state_unavailable'),
+          commandId: commandId3,
           status: 'failed',
         }
-      : { ok: !![], commandId: _0x4685c9, status: 'not_applicable' };
-  const _0x10106c = _0xfcb13f['nodes'] || {},
-    _0x3fb47b = _0xfcb13f['edges'] || {},
-    _0x147623 = Array['isArray'](_0xfcb13f['selectedNodeIds']) ? _0xfcb13f['selectedNodeIds'] : [];
-  let _0x25199e;
+      : { ok: !![], commandId: commandId3, status: 'not_applicable' };
+  const enabled6 = canvasState['nodes'] || {},
+    value40 = canvasState['edges'] || {},
+    value41 = Array['isArray'](canvasState['selectedNodeIds']) ? canvasState['selectedNodeIds'] : [];
+  let status2;
   if (
     [
       'node.create',
@@ -414,143 +406,134 @@ export function verifyAgentActionPostcondition({
       'collage.createFromSelection',
       'storyboard.createFromImages',
       'storyboard.createGridFromNode',
-    ]['includes'](_0x4685c9)
+    ]['includes'](commandId3)
   )
-    _0x25199e = verifyNodeCreation(_0x4685c9, args, _0x323ca7, _0x10106c, _0x3fb47b);
+    status2 = verifyNodeCreation(commandId3, args, id5, enabled6, value40);
   else {
     if (
       ['audio.separate', 'image.splitGrid', 'video.extractKeyframes', 'video.reverse', 'video.separateAv'][
         'includes'
-      ](_0x4685c9)
+      ](commandId3)
     )
-      _0x25199e = verifyNodeIds(_0x4685c9, _0x10106c, _0x323ca7['nodeIds'] || []);
+      status2 = verifyNodeIds(commandId3, enabled6, id5['nodeIds'] || []);
     else {
-      if (_0x4685c9 === 'node.select') _0x25199e = verifySelection(_0x4685c9, _0x323ca7, _0x147623);
+      if (commandId3 === 'node.select') status2 = verifySelection(commandId3, id5, value41);
       else {
-        if (_0x4685c9 === 'node.group') _0x25199e = verifyGroup(_0x4685c9, _0x323ca7, _0x10106c, _0x147623);
+        if (commandId3 === 'node.group') status2 = verifyGroup(commandId3, id5, enabled6, value41);
         else {
-          if (_0x4685c9 === 'node.ungroup') _0x25199e = verifyUngroup(_0x4685c9, _0x323ca7, _0x10106c);
+          if (commandId3 === 'node.ungroup') status2 = verifyUngroup(commandId3, id5, enabled6);
           else {
-            if (_0x4685c9 === 'clipboard.paste')
-              _0x25199e = verifyPastedGraph(_0x4685c9, _0x323ca7, _0x10106c, _0x3fb47b, _0x147623);
+            if (commandId3 === 'clipboard.paste')
+              status2 = verifyPastedGraph(commandId3, id5, enabled6, value40, value41);
             else {
-              if (['node.setPrompt', 'node.appendPrompt']['includes'](_0x4685c9))
-                _0x25199e = verifyPrompt(_0x4685c9, _0x323ca7, _0x10106c);
+              if (['node.setPrompt', 'node.appendPrompt']['includes'](commandId3))
+                status2 = verifyPrompt(commandId3, id5, enabled6);
               else {
-                if (['node.setModel', 'node.changeModel']['includes'](_0x4685c9))
-                  _0x25199e = verifyModel(_0x4685c9, _0x323ca7, _0x10106c);
+                if (['node.setModel', 'node.changeModel']['includes'](commandId3))
+                  status2 = verifyModel(commandId3, id5, enabled6);
                 else {
-                  if (_0x4685c9 === 'node.setParams')
-                    _0x25199e = verifyParams(_0x4685c9, _0x323ca7, _0x10106c);
+                  if (commandId3 === 'node.setParams') status2 = verifyParams(commandId3, id5, enabled6);
                   else {
-                    if (_0x4685c9 === 'graph.connect')
-                      _0x25199e = verifyEdge(
-                        _0x4685c9,
-                        _0x3fb47b,
-                        _0x323ca7['edge'] || { id: _0x323ca7['edgeId'] },
-                      );
+                    if (commandId3 === 'graph.connect')
+                      status2 = verifyEdge(commandId3, value40, id5['edge'] || { id: id5['edgeId'] });
                     else {
-                      if (_0x4685c9 === 'node.setInputSlot')
-                        _0x25199e = verifyEdge(
-                          _0x4685c9,
-                          _0x3fb47b,
-                          _0x323ca7['edge'] || { id: _0x323ca7['edgeId'], refSlot: _0x323ca7['refSlot'] },
+                      if (commandId3 === 'node.setInputSlot')
+                        status2 = verifyEdge(
+                          commandId3,
+                          value40,
+                          id5['edge'] || { id: id5['edgeId'], refSlot: id5['refSlot'] },
                         );
                       else {
-                        if (_0x4685c9 === 'graph.disconnect') {
-                          const _0x166a27 = uniqueIds(_0x323ca7['edgeIds'] || []),
-                            _0x5c0bdb = _0x166a27['filter']((_0x5643ab) => _0x3fb47b[_0x5643ab]);
-                          _0x25199e =
-                            _0x5c0bdb['length'] === 0x0
-                              ? { ok: !![], edgeIds: _0x166a27 }
-                              : createVerificationFailure(_0x4685c9, 'edges_not_removed', {
-                                  remainingEdgeIds: _0x5c0bdb,
+                        if (commandId3 === 'graph.disconnect') {
+                          const edgeIds2 = uniqueIds(id5['edgeIds'] || []),
+                            remainingEdgeIds = edgeIds2['filter']((value42) => value40[value42]);
+                          status2 =
+                            remainingEdgeIds['length'] === 0x0
+                              ? { ok: !![], edgeIds: edgeIds2 }
+                              : createVerificationFailure(commandId3, 'edges_not_removed', {
+                                  remainingEdgeIds: remainingEdgeIds,
                                 });
                         } else {
-                          if (_0x4685c9 === 'node.delete') {
-                            const _0x212fa7 = uniqueIds(_0x323ca7['ids'] || []),
-                              _0x529d7e = _0x212fa7['filter']((_0x8fa363) => _0x10106c[_0x8fa363]);
-                            _0x25199e =
-                              _0x212fa7['length'] > 0x0 && _0x529d7e['length'] === 0x0
-                                ? { ok: !![], nodeIds: _0x212fa7 }
-                                : createVerificationFailure(_0x4685c9, 'nodes_not_removed', {
-                                    nodeIds: _0x212fa7,
-                                    remainingNodeIds: _0x529d7e,
+                          if (commandId3 === 'node.delete') {
+                            const nodeIds5 = uniqueIds(id5['ids'] || []),
+                              remainingNodeIds = nodeIds5['filter']((value43) => enabled6[value43]);
+                            status2 =
+                              nodeIds5['length'] > 0x0 && remainingNodeIds['length'] === 0x0
+                                ? { ok: !![], nodeIds: nodeIds5 }
+                                : createVerificationFailure(commandId3, 'nodes_not_removed', {
+                                    nodeIds: nodeIds5,
+                                    remainingNodeIds: remainingNodeIds,
                                   });
                           } else {
-                            if (_0x4685c9 === 'node.rename') {
-                              const _0xf062fb = Array['isArray'](_0x323ca7['renamed'])
-                                  ? _0x323ca7['renamed']
-                                  : uniqueIds(_0x323ca7['ids'] || [_0x323ca7['nodeId']])['map'](
-                                      (_0x384f9d, _0x208866) => ({
-                                        nodeId: _0x384f9d,
-                                        name: Array['isArray'](_0x323ca7['names'])
-                                          ? _0x323ca7['names'][_0x208866]
-                                          : _0x323ca7['name'],
-                                      }),
-                                    ),
-                                _0x385a82 = _0xf062fb['find'](
-                                  (_0x11b783) =>
-                                    !_0x10106c[_0x11b783['nodeId']] ||
-                                    String(_0x10106c[_0x11b783['nodeId']]['name'] || '') !==
-                                      String(_0x11b783['name'] || ''),
+                            if (commandId3 === 'node.rename') {
+                              const list8 = Array['isArray'](id5['renamed'])
+                                  ? id5['renamed']
+                                  : uniqueIds(id5['ids'] || [id5['nodeId']])['map']((nodeId6, value44) => ({
+                                      nodeId: nodeId6,
+                                      name: Array['isArray'](id5['names'])
+                                        ? id5['names'][value44]
+                                        : id5['name'],
+                                    })),
+                                nodeId7 = list8['find'](
+                                  (error) =>
+                                    !enabled6[error['nodeId']] ||
+                                    String(enabled6[error['nodeId']]['name'] || '') !==
+                                      String(error['name'] || ''),
                                 );
-                              _0x25199e = _0x385a82
-                                ? createVerificationFailure(_0x4685c9, 'node_name_mismatch', {
-                                    nodeId: _0x385a82['nodeId'],
+                              status2 = nodeId7
+                                ? createVerificationFailure(commandId3, 'node_name_mismatch', {
+                                    nodeId: nodeId7['nodeId'],
                                   })
                                 : {
                                     ok: !![],
-                                    nodeIds: uniqueIds(_0xf062fb['map']((_0x29643d) => _0x29643d['nodeId'])),
+                                    nodeIds: uniqueIds(list8['map']((value45) => value45['nodeId'])),
                                   };
                             } else {
-                              if (_0x4685c9['startsWith']('layout.'))
-                                _0x25199e = verifyLayout(_0x4685c9, _0x323ca7, _0x10106c);
+                              if (commandId3['startsWith']('layout.'))
+                                status2 = verifyLayout(commandId3, id5, enabled6);
                               else {
-                                if (['generation.run', 'generation.runBatch']['includes'](_0x4685c9))
-                                  _0x25199e = verifyGeneration(_0x4685c9, _0x323ca7, _0x10106c);
+                                if (['generation.run', 'generation.runBatch']['includes'](commandId3))
+                                  status2 = verifyGeneration(commandId3, id5, enabled6);
                                 else {
-                                  if (_0x4685c9 === 'task.retry')
-                                    _0x25199e = verifyGenerationEntry(_0x4685c9, _0x323ca7, _0x10106c);
+                                  if (commandId3 === 'task.retry')
+                                    status2 = verifyGenerationEntry(commandId3, id5, enabled6);
                                   else {
-                                    if (['generation.cancel', 'generation.resume']['includes'](_0x4685c9))
-                                      _0x25199e = verifyNodeIds(_0x4685c9, _0x10106c, [_0x323ca7['nodeId']]);
+                                    if (['generation.cancel', 'generation.resume']['includes'](commandId3))
+                                      status2 = verifyNodeIds(commandId3, enabled6, [id5['nodeId']]);
                                     else {
-                                      if (_0x4685c9['startsWith']('scene.'))
-                                        _0x25199e = verifyNodeIds(_0x4685c9, _0x10106c, [
-                                          _0x323ca7['nodeId'],
-                                        ]);
+                                      if (commandId3['startsWith']('scene.'))
+                                        status2 = verifyNodeIds(commandId3, enabled6, [id5['nodeId']]);
                                       else {
-                                        if (_0x4685c9 === 'media.resetSize') {
-                                          const _0xda3e8e = uniqueIds(_0x323ca7['nodeIds'] || []),
-                                            _0x1c59a2 = verifyNodeIds(_0x4685c9, _0x10106c, _0xda3e8e),
-                                            _0x2a97a5 = _0x1c59a2['ok']
-                                              ? _0xda3e8e['find']((_0x5cc93b) => {
-                                                  const _0x5eafdc = _0x323ca7['sizes']?.[_0x5cc93b];
+                                        if (commandId3 === 'media.resetSize') {
+                                          const nodeIds6 = uniqueIds(id5['nodeIds'] || []),
+                                            response14 = verifyNodeIds(commandId3, enabled6, nodeIds6),
+                                            nodeId8 = response14['ok']
+                                              ? nodeIds6['find']((value46) => {
+                                                  const box = id5['sizes']?.[value46];
                                                   return (
-                                                    _0x5eafdc &&
-                                                    (Number(_0x10106c[_0x5cc93b]['width']) !==
-                                                      Number(_0x5eafdc['width']) ||
-                                                      Number(_0x10106c[_0x5cc93b]['height']) !==
-                                                        Number(_0x5eafdc['height']))
+                                                    box &&
+                                                    (Number(enabled6[value46]['width']) !==
+                                                      Number(box['width']) ||
+                                                      Number(enabled6[value46]['height']) !==
+                                                        Number(box['height']))
                                                   );
                                                 })
                                               : '';
-                                          _0x25199e = !_0x1c59a2['ok']
-                                            ? _0x1c59a2
-                                            : _0x2a97a5
-                                              ? createVerificationFailure(_0x4685c9, 'node_size_mismatch', {
-                                                  nodeId: _0x2a97a5,
+                                          status2 = !response14['ok']
+                                            ? response14
+                                            : nodeId8
+                                              ? createVerificationFailure(commandId3, 'node_size_mismatch', {
+                                                  nodeId: nodeId8,
                                                 })
-                                              : { ok: !![], nodeIds: _0xda3e8e };
+                                              : { ok: !![], nodeIds: nodeIds6 };
                                         } else
-                                          _0x25199e =
-                                            _0x2c3f73 === 'store'
+                                          status2 =
+                                            agentActionPostconditionPolicy === 'store'
                                               ? createVerificationFailure(
-                                                  _0x4685c9,
+                                                  commandId3,
                                                   'postcondition_policy_missing',
                                                 )
-                                              : { ok: !![], commandId: _0x4685c9, status: 'not_applicable' };
+                                              : { ok: !![], commandId: commandId3, status: 'not_applicable' };
                                       }
                                     }
                                   }
@@ -570,31 +553,31 @@ export function verifyAgentActionPostcondition({
       }
     }
   }
-  return _0x25199e['ok']
-    ? { ..._0x25199e, commandId: _0x4685c9, status: _0x25199e['status'] || 'verified' }
-    : { ..._0x25199e, commandId: _0x4685c9, status: 'failed' };
+  return status2['ok']
+    ? { ...status2, commandId: commandId3, status: status2['status'] || 'verified' }
+    : { ...status2, commandId: commandId3, status: 'failed' };
 }
-function buildPostconditionFailure(_0x50d6cb, _0x354a46, _0x432a39 = null) {
+function buildPostconditionFailure(commandId4, reason2, repairAttempted = null) {
   return {
     ok: ![],
-    commandId: _0x50d6cb,
+    commandId: commandId4,
     errorCode: 'AGENT_POSTCONDITION_FAILED',
-    message: _0x50d6cb + ' returned success, but its canvas result could not be verified.',
+    message: commandId4 + ' returned success, but its canvas result could not be verified.',
     details: {
-      reason: _0x354a46['reason'] || 'postcondition_failed',
-      ...(_0x354a46['details'] || {}),
-      repairAttempted: _0x432a39 !== null,
-      ...(_0x432a39
+      reason: reason2['reason'] || 'postcondition_failed',
+      ...(reason2['details'] || {}),
+      repairAttempted: repairAttempted !== null,
+      ...(repairAttempted
         ? {
-            repairErrorCode: String(_0x432a39['errorCode'] || ''),
-            repairMessage: String(_0x432a39['message'] || ''),
+            repairErrorCode: String(repairAttempted['errorCode'] || ''),
+            repairMessage: String(repairAttempted['message'] || ''),
           }
         : {}),
     },
     verification: {
       status: 'failed',
-      attempts: _0x432a39 === null ? 0x0 : 0x1,
-      reason: _0x354a46['reason'] || 'postcondition_failed',
+      attempts: repairAttempted === null ? 0x0 : 0x1,
+      reason: reason2['reason'] || 'postcondition_failed',
     },
   };
 }
@@ -603,38 +586,37 @@ export function createAgentActionPostconditionHandler({
   executeCommand: executeCommand = executeCanvasCommand,
   shouldContinue: shouldContinue = null,
 } = {}) {
-  return async ({ commandId: _0xf6ad10, args: _0x5d12ac, response: _0x4332b4, context: _0x4bcb8a }) => {
-    if (_0x4332b4?.['ok'] !== !![]) return _0x4332b4;
-    const _0x6514c8 = _0x4bcb8a || commandContext,
-      _0x18470e = verifyAgentActionPostcondition({
-        commandId: _0xf6ad10,
-        args: _0x5d12ac,
-        response: _0x4332b4,
-        commandContext: _0x6514c8,
+  return async ({ commandId: commandId5, args: args3, response: response15, context: context }) => {
+    if (response15?.['ok'] !== !![]) return response15;
+    const commandContext2 = context || commandContext,
+      status3 = verifyAgentActionPostcondition({
+        commandId: commandId5,
+        args: args3,
+        response: response15,
+        commandContext: commandContext2,
       });
-    if (_0x18470e['ok'])
-      return { ..._0x4332b4, verification: { status: _0x18470e['status'], attempts: 0x0 } };
+    if (status3['ok']) return { ...response15, verification: { status: status3['status'], attempts: 0x0 } };
     if (
-      !AUTO_REPAIRABLE_COMMANDS['has'](_0xf6ad10) ||
+      !AUTO_REPAIRABLE_COMMANDS['has'](commandId5) ||
       (typeof shouldContinue === 'function' &&
-        shouldContinue({ phase: 'postcondition_repair', commandId: _0xf6ad10 }) === ![])
+        shouldContinue({ phase: 'postcondition_repair', commandId: commandId5 }) === ![])
     )
-      return buildPostconditionFailure(_0xf6ad10, _0x18470e);
-    const _0x1faba2 = await executeCommand(_0xf6ad10, _0x5d12ac, _0x6514c8);
-    if (_0x1faba2?.['ok'] !== !![]) return buildPostconditionFailure(_0xf6ad10, _0x18470e, _0x1faba2 || {});
-    const _0x2537c6 = verifyAgentActionPostcondition({
-      commandId: _0xf6ad10,
-      args: _0x5d12ac,
-      response: _0x1faba2,
-      commandContext: _0x6514c8,
+      return buildPostconditionFailure(commandId5, status3);
+    const response16 = await executeCommand(commandId5, args3, commandContext2);
+    if (response16?.['ok'] !== !![]) return buildPostconditionFailure(commandId5, status3, response16 || {});
+    const response17 = verifyAgentActionPostcondition({
+      commandId: commandId5,
+      args: args3,
+      response: response16,
+      commandContext: commandContext2,
     });
-    if (!_0x2537c6['ok']) return buildPostconditionFailure(_0xf6ad10, _0x2537c6, _0x1faba2);
+    if (!response17['ok']) return buildPostconditionFailure(commandId5, response17, response16);
     return {
-      ..._0x1faba2,
+      ...response16,
       verification: {
         status: 'repaired',
         attempts: 0x1,
-        initialReason: _0x18470e['reason'] || 'postcondition_failed',
+        initialReason: status3['reason'] || 'postcondition_failed',
       },
     };
   };

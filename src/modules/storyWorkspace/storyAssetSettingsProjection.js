@@ -26,93 +26,81 @@ import {
   normalizeStoryCharacterVoiceHistory,
   normalizeStoryCharacterVoiceReference,
 } from './storyCharacterVoice.js';
-function normalizeText(_0xb6aa01) {
-  return String(_0xb6aa01 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function freezeSnapshot(_0x1ba346) {
-  if (Array['isArray'](_0x1ba346))
-    return Object['freeze'](_0x1ba346['map']((_0x6a3fd) => freezeSnapshot(_0x6a3fd)));
+function freezeSnapshot(list) {
+  if (Array['isArray'](list)) return Object['freeze'](list['map']((item) => freezeSnapshot(item)));
   if (
-    _0x1ba346 &&
-    typeof _0x1ba346 === 'object' &&
-    (Object['getPrototypeOf'](_0x1ba346) === Object['prototype'] ||
-      Object['getPrototypeOf'](_0x1ba346) === null)
+    list &&
+    typeof list === 'object' &&
+    (Object['getPrototypeOf'](list) === Object['prototype'] || Object['getPrototypeOf'](list) === null)
   )
     return Object['freeze'](
-      Object['fromEntries'](
-        Object['entries'](_0x1ba346)['map'](([_0x2a1d5d, _0x258123]) => [
-          _0x2a1d5d,
-          freezeSnapshot(_0x258123),
-        ]),
-      ),
+      Object['fromEntries'](Object['entries'](list)['map'](([key, index]) => [key, freezeSnapshot(index)])),
     );
-  return _0x1ba346;
+  return list;
 }
-export function shouldRenderStoryAssetRoleTag(_0x534cbe = '') {
-  return !['scene', 'prop']['includes'](normalizeText(_0x534cbe));
+export function shouldRenderStoryAssetRoleTag(result = '') {
+  return !['scene', 'prop']['includes'](normalizeText(result));
 }
-export function getStoryAssetBatchDirectMode(_0x59501d = '') {
-  return ['scene', 'prop']['includes'](normalizeText(_0x59501d)) ? 'image' : '';
+export function getStoryAssetBatchDirectMode(data = '') {
+  return ['scene', 'prop']['includes'](normalizeText(data)) ? 'image' : '';
 }
-export function formatStoryAssetOccurrences(_0x3c013a = '') {
-  const _0x3cc791 = normalizeText(_0x3c013a);
-  if (!_0x3cc791) return '当前项目';
-  const _0x32a07c = _0x3cc791['split'](/[、,，]/u)
-      ['map']((_0x3bed86) => _0x3bed86['trim']())
+export function formatStoryAssetOccurrences(options = '') {
+  const text = normalizeText(options);
+  if (!text) return '当前项目';
+  const list2 = text['split'](/[、,，]/u)
+      ['map']((target) => target['trim']())
       ['filter'](Boolean),
-    _0x1efe19 = _0x32a07c['map']((_0x3bc47a) => {
-      const _0xa62b8e = /(?:^|[-_])episode-(\d+)$/iu['exec'](_0x3bc47a);
-      return _0xa62b8e ? String(Math['max'](0x1, Number(_0xa62b8e[0x1]) || 0x1)) : '';
+    list3 = list2['map']((source) => {
+      const next = /(?:^|[-_])episode-(\d+)$/iu['exec'](source);
+      return next ? String(Math['max'](0x1, Number(next[0x1]) || 0x1)) : '';
     });
-  if (_0x32a07c['length'] && _0x1efe19['every'](Boolean)) {
-    const _0x330efe = [...new Set(_0x1efe19['map'](Number))]['sort'](
-      (_0x28fd16, _0x5c671a) => _0x28fd16 - _0x5c671a,
-    );
-    return '第\x20' + _0x330efe['join']('、') + '\x20集';
+  if (list2['length'] && list3['every'](Boolean)) {
+    const list4 = [...new Set(list3['map'](Number))]['sort']((current, entry) => current - entry);
+    return '第\x20' + list4['join']('、') + '\x20集';
   }
-  return _0x32a07c['map']((_0x7b63bf, _0x1a4c10) =>
-    _0x1efe19[_0x1a4c10] ? '第\x20' + _0x1efe19[_0x1a4c10] + '\x20集' : _0x7b63bf,
-  )['join']('、');
+  return list2['map']((record, payload) => (list3[payload] ? '第\x20' + list3[payload] + '\x20集' : record))[
+    'join'
+  ]('、');
 }
-export function getSelectedAppearanceIndex(_0x26894c, _0xe95f54) {
-  const _0x5d3c0f = Number(_0x26894c['assetAppearanceIndexes']?.[_0xe95f54?.['id']]),
-    _0x320a0e = Math['max'](0x0, getStoryAssetAppearances(_0xe95f54)['length'] - 0x1);
-  return Math['max'](
-    0x0,
-    Math['min'](_0x320a0e, Number['isFinite'](_0x5d3c0f) ? Math['trunc'](_0x5d3c0f) : 0x0),
-  );
+export function getSelectedAppearanceIndex(handle, state) {
+  const config = Number(handle['assetAppearanceIndexes']?.[state?.['id']]),
+    scope = Math['max'](0x0, getStoryAssetAppearances(state)['length'] - 0x1);
+  return Math['max'](0x0, Math['min'](scope, Number['isFinite'](config) ? Math['trunc'](config) : 0x0));
 }
-function getSelectedAppearance(_0x303db4, _0x3b2faa) {
-  return _0x3b2faa?.['isLibraryAsset']
-    ? _0x3b2faa
-    : getStoryAssetAppearance(_0x3b2faa, getSelectedAppearanceIndex(_0x303db4, _0x3b2faa));
+function getSelectedAppearance(input, output) {
+  return output?.['isLibraryAsset']
+    ? output
+    : getStoryAssetAppearance(output, getSelectedAppearanceIndex(input, output));
 }
-function getAppearanceActionKey(_0xb6d191 = {}, _0x5e387e = {}) {
-  const _0xcfe53f = normalizeText(_0xb6d191?.['id']),
-    _0x30651e = normalizeText(_0x5e387e?.['id']);
-  return _0xcfe53f && _0x30651e ? _0xcfe53f + ':' + _0x30651e : '';
+function getAppearanceActionKey(options2 = {}, value2 = {}) {
+  const text2 = normalizeText(options2?.['id']),
+    text3 = normalizeText(value2?.['id']);
+  return text2 && text3 ? text2 + ':' + text3 : '';
 }
-function isAddedAppearance(_0x4618b4 = {}) {
-  return ['library', 'upload']['includes'](normalizeText(_0x4618b4?.['sourceOrigin']));
+function isAddedAppearance(options3 = {}) {
+  return ['library', 'upload']['includes'](normalizeText(options3?.['sourceOrigin']));
 }
-function getCardPromptPreview(_0x5ea9f7 = {}, _0x362fe8 = {}, _0x3ac548 = {}) {
-  let _0x1be252 = normalizeText(_0x3ac548?.['prompt'] || _0x362fe8?.['prompt']);
-  if (_0x362fe8?.['kind'] !== 'character' || !_0x1be252) return _0x1be252;
-  const _0x162eb8 = _0x5ea9f7?.['data']?.['project'] || {},
-    _0x3e6c7b = resolveStoryStyleSelection({
-      styleId: _0x162eb8['videoStyleId'],
-      stylePrompt: _0x162eb8['videoStylePrompt'],
-      videoStyle: _0x162eb8['videoStyle'],
+function getCardPromptPreview(options4 = {}, value3 = {}, value4 = {}) {
+  let text4 = normalizeText(value4?.['prompt'] || value3?.['prompt']);
+  if (value3?.['kind'] !== 'character' || !text4) return text4;
+  const styleId = options4?.['data']?.['project'] || {},
+    storyStyleSelection = resolveStoryStyleSelection({
+      styleId: styleId['videoStyleId'],
+      stylePrompt: styleId['videoStylePrompt'],
+      videoStyle: styleId['videoStyle'],
     })['stylePrompt'];
   return (
-    [STORY_CHARACTER_ASSET_PROMPT_PREFIX, _0x3e6c7b, '正面全身人物设定图']
+    [STORY_CHARACTER_ASSET_PROMPT_PREFIX, storyStyleSelection, '正面全身人物设定图']
       ['filter'](Boolean)
-      ['forEach']((_0x392e1b) => {
-        _0x1be252 = _0x1be252['split'](_0x392e1b)['join']('');
+      ['forEach']((value5) => {
+        text4 = text4['split'](value5)['join']('');
       }),
-    _0x1be252['split'](/\r?\n/u)
-      ['map']((_0x303878) =>
-        _0x303878['trim']()
+    text4['split'](/\r?\n/u)
+      ['map']((value6) =>
+        value6['trim']()
           ['replace'](/(?:\s*[，,]){2,}/gu, '，')
           ['replace'](/^[\s，,。；;:：|/·-]+|[\s，,。；;:：|/·-]+$/gu, ''),
       )
@@ -120,162 +108,159 @@ function getCardPromptPreview(_0x5ea9f7 = {}, _0x362fe8 = {}, _0x3ac548 = {}) {
       ['join']('\x0a')
   );
 }
-function formatVoiceHistoryTime(_0x3c7d9c) {
-  const _0x4917e5 = new Date(Number(_0x3c7d9c));
-  if (!Number['isFinite'](_0x4917e5['getTime']())) return '历史版本';
-  const _0x2d40ca = (_0xcdbb58) => String(_0xcdbb58)['padStart'](0x2, '0');
+function formatVoiceHistoryTime(value7) {
+  const value8 = new Date(Number(value7));
+  if (!Number['isFinite'](value8['getTime']())) return '历史版本';
+  const run = (value9) => String(value9)['padStart'](0x2, '0');
   return (
-    _0x4917e5['getFullYear']() +
+    value8['getFullYear']() +
     '/' +
-    _0x2d40ca(_0x4917e5['getMonth']() + 0x1) +
+    run(value8['getMonth']() + 0x1) +
     '/' +
-    _0x2d40ca(_0x4917e5['getDate']()) +
+    run(value8['getDate']()) +
     '\x20' +
-    _0x2d40ca(_0x4917e5['getHours']()) +
+    run(value8['getHours']()) +
     ':' +
-    _0x2d40ca(_0x4917e5['getMinutes']())
+    run(value8['getMinutes']())
   );
 }
-function projectPreset(_0x3a3981, _0x261035, _0x56c7ee, _0x21a1ae) {
-  if (!['character', 'scene']['includes'](_0x261035)) return { visible: ![] };
-  const _0xc3991a = _0x261035 === 'scene',
-    _0x22e09f =
-      !_0xc3991a &&
-      Array['isArray'](_0x3a3981['assetPromptPresets']) &&
-      _0x3a3981['assetPromptPresets']['length']
-        ? _0x3a3981['assetPromptPresets']
+function projectPreset(disabled, assetKind, value10, value11) {
+  if (!['character', 'scene']['includes'](assetKind)) return { visible: ![] };
+  const label = assetKind === 'scene',
+    list5 =
+      !label && Array['isArray'](disabled['assetPromptPresets']) && disabled['assetPromptPresets']['length']
+        ? disabled['assetPromptPresets']
         : null,
-    _0x442d28 = _0xc3991a
-      ? STORY_SCENE_ASSET_PROMPT_PRESETS
-      : _0x22e09f || STORY_CHARACTER_ASSET_PROMPT_PRESETS,
-    _0x2a2a51 = _0xc3991a
-      ? getStorySceneAssetPromptPreset(_0x3a3981['sceneAssetPromptPresetId'])
-      : _0x22e09f?.['find']((_0x31a4f2) => _0x31a4f2['id'] === _0x3a3981['assetPromptPresetId']) ||
-        _0x22e09f?.[0x0] ||
-        getStoryCharacterAssetPromptPreset(_0x3a3981['assetPromptPresetId']),
-    _0x5ebf48 =
-      _0x56c7ee && _0x21a1ae
-        ? getStoryAssetGenerationControlState(_0x3a3981, _0x56c7ee['id'], _0x21a1ae['id'])
-        : { disabled: _0x3a3981['isBatchGenerating'] === !![] };
+    options5 = label ? STORY_SCENE_ASSET_PROMPT_PRESETS : list5 || STORY_CHARACTER_ASSET_PROMPT_PRESETS,
+    selectedId = label
+      ? getStorySceneAssetPromptPreset(disabled['sceneAssetPromptPresetId'])
+      : list5?.['find']((value12) => value12['id'] === disabled['assetPromptPresetId']) ||
+        list5?.[0x0] ||
+        getStoryCharacterAssetPromptPreset(disabled['assetPromptPresetId']),
+    el =
+      value10 && value11
+        ? getStoryAssetGenerationControlState(disabled, value10['id'], value11['id'])
+        : { disabled: disabled['isBatchGenerating'] === !![] };
   return {
     visible: !![],
-    assetKind: _0x261035,
-    label: _0xc3991a ? '场景图片预设' : normalizeText(_0x3a3981['assetPromptPresetLabel']) || '角色图片预设',
-    selectedId: _0x2a2a51?.['id'] || '',
-    selectedLabel: _0x2a2a51?.['label'] || '',
-    disabled: Boolean(_0x5ebf48['disabled']),
-    options: _0x442d28['map']((_0x53ea39) => ({
-      id: _0x53ea39['id'],
-      label: _0x53ea39['label'],
-      description: _0x53ea39['description'],
+    assetKind: assetKind,
+    label: label ? '场景图片预设' : normalizeText(disabled['assetPromptPresetLabel']) || '角色图片预设',
+    selectedId: selectedId?.['id'] || '',
+    selectedLabel: selectedId?.['label'] || '',
+    disabled: Boolean(el['disabled']),
+    options: options5['map']((id) => ({
+      id: id['id'],
+      label: id['label'],
+      description: id['description'],
     })),
   };
 }
-function projectLibrarySyncState(_0x55549f, _0x3bef9c) {
-  const _0x5583e2 =
-      _0x55549f?.['totalAssetRef'] && typeof _0x55549f['totalAssetRef'] === 'object'
-        ? _0x55549f['totalAssetRef']
+function projectLibrarySyncState(value13, handler) {
+  const value14 =
+      value13?.['totalAssetRef'] && typeof value13['totalAssetRef'] === 'object'
+        ? value13['totalAssetRef']
         : null,
-    _0x22fdcb = normalizeText(_0x5583e2?.['assetId']),
-    _0x5e2f41 = Math['max'](0x0, Math['trunc'](Number(_0x5583e2?.['itemIndex']) || 0x0));
-  if (!_0x22fdcb) return { exists: ![], synced: ![] };
-  const _0x56beaf = _0x3bef9c({ assetId: _0x22fdcb, itemIndex: _0x5e2f41 });
-  if (!_0x56beaf) return { exists: ![], synced: ![] };
-  const _0x110634 = normalizeText(_0x5583e2?.['itemKey']),
-    _0x59f999 = normalizeText(_0x56beaf?.['nodeData']?.['assetPackageItemKey']),
-    _0x2b3937 = !_0x110634 || !_0x59f999 || _0x110634 === _0x59f999,
-    _0x9b32b9 = normalizeText(_0x55549f?.['imageUrl']),
-    _0x3ae93d = normalizeText(
-      _0x56beaf?.['url'] || _0x56beaf?.['nodeData']?.['imageUrl'] || _0x56beaf?.['nodeData']?.['src'],
+    assetId = normalizeText(value14?.['assetId']),
+    itemIndex = Math['max'](0x0, Math['trunc'](Number(value14?.['itemIndex']) || 0x0));
+  if (!assetId) return { exists: ![], synced: ![] };
+  const response = handler({ assetId: assetId, itemIndex: itemIndex });
+  if (!response) return { exists: ![], synced: ![] };
+  const text5 = normalizeText(value14?.['itemKey']),
+    text6 = normalizeText(response?.['nodeData']?.['assetPackageItemKey']),
+    exists = !text5 || !text6 || text5 === text6,
+    text7 = normalizeText(value13?.['imageUrl']),
+    text8 = normalizeText(
+      response?.['url'] || response?.['nodeData']?.['imageUrl'] || response?.['nodeData']?.['src'],
     );
-  return { exists: _0x2b3937, synced: _0x2b3937 && Boolean(_0x9b32b9) && _0x9b32b9 === _0x3ae93d };
+  return { exists: exists, synced: exists && Boolean(text7) && text7 === text8 };
 }
-function projectPreviewActions(_0x37c9d8, _0x183300, _0x211158, _0x5a1588, _0x445d66, _0x4f08f0) {
-  if (_0x183300['isLibraryAsset'] || _0x445d66)
+function projectPreviewActions(value15, value16, value17, el2, value18, value19) {
+  if (value16['isLibraryAsset'] || value18)
     return {
       canDownload: Boolean(
-        normalizeText(_0x211158?.['imageUrl']) &&
-        normalizeText(_0x183300?.['mediaKind'])['toLowerCase']() !== 'video',
+        normalizeText(value17?.['imageUrl']) &&
+        normalizeText(value16?.['mediaKind'])['toLowerCase']() !== 'video',
       ),
       showProjectActions: ![],
     };
-  const _0xca3c66 = projectLibrarySyncState(_0x211158, _0x4f08f0),
-    _0x250b3c = getAppearanceActionKey(_0x183300, _0x211158),
-    _0x403480 = Boolean(
-      _0x250b3c && normalizeText(_0x37c9d8['pendingDeleteAssetAppearanceKey']) === _0x250b3c,
+  const librarySynced = projectLibrarySyncState(value17, value19),
+    appearanceActionKey = getAppearanceActionKey(value16, value17),
+    isDeleteAppearanceConfirming = Boolean(
+      appearanceActionKey &&
+      normalizeText(value15['pendingDeleteAssetAppearanceKey']) === appearanceActionKey,
     ),
-    _0x1c198e = _0x37c9d8['data']?.['project']?.['sourceMode'] === 'video-replication',
-    _0xdea0fb = _0x1c198e
-      ? Boolean(normalizeText(_0x211158?.['imageUrl'])) ||
-        (['character', 'scene', 'prop']['includes'](_0x183300['kind']) &&
-          getStoryAssetAppearances(_0x183300)['length'] > 0x1)
-      : isAddedAppearance(_0x211158) && getStoryAssetAppearances(_0x183300)['length'] > 0x1,
-    _0x56781b =
-      normalizeText(_0x37c9d8['exportingAssetAppearanceKey']) ===
-      getAppearanceActionKey(_0x183300, _0x211158),
-    _0x5b91d9 = Boolean(
-      normalizeText(_0x211158?.['imageUrl']) &&
-      !_0x5a1588['disabled'] &&
-      !_0x56781b &&
-      !_0xca3c66['synced'] &&
-      !_0x403480,
+    deleteAppearanceLabel = value15['data']?.['project']?.['sourceMode'] === 'video-replication',
+    showDeleteAppearance = deleteAppearanceLabel
+      ? Boolean(normalizeText(value17?.['imageUrl'])) ||
+        (['character', 'scene', 'prop']['includes'](value16['kind']) &&
+          getStoryAssetAppearances(value16)['length'] > 0x1)
+      : isAddedAppearance(value17) && getStoryAssetAppearances(value16)['length'] > 0x1,
+    saveToLibraryLabel =
+      normalizeText(value15['exportingAssetAppearanceKey']) === getAppearanceActionKey(value16, value17),
+    canSaveToLibrary = Boolean(
+      normalizeText(value17?.['imageUrl']) &&
+      !el2['disabled'] &&
+      !saveToLibraryLabel &&
+      !librarySynced['synced'] &&
+      !isDeleteAppearanceConfirming,
     );
   return {
     canDownload: Boolean(
-      normalizeText(_0x211158?.['imageUrl']) &&
-      normalizeText(_0x183300?.['mediaKind'])['toLowerCase']() !== 'video',
+      normalizeText(value17?.['imageUrl']) &&
+      normalizeText(value16?.['mediaKind'])['toLowerCase']() !== 'video',
     ),
     showProjectActions: !![],
-    saveToLibraryLabel: _0x56781b
+    saveToLibraryLabel: saveToLibraryLabel
       ? '正在加入总素材'
-      : _0xca3c66['synced']
+      : librarySynced['synced']
         ? '已加入总素材'
-        : _0xca3c66['exists']
+        : librarySynced['exists']
           ? '更新总素材'
           : '将当前形象加入总素材',
-    canSaveToLibrary: _0x5b91d9,
-    isSavingToLibrary: _0x56781b,
-    canUpload: !_0x56781b && !_0x403480,
-    showDeleteAppearance: _0xdea0fb,
-    deleteAppearanceLabel: _0x1c198e && _0x183300['kind'] !== 'character' ? '删除当前图片' : '删除当前形象',
-    canDeleteAppearance: Boolean(_0xdea0fb && !_0x5a1588['disabled'] && !_0x56781b && !_0x403480),
-    isDeleteAppearanceConfirming: _0x403480,
-    librarySynced: _0xca3c66['synced'],
+    canSaveToLibrary: canSaveToLibrary,
+    isSavingToLibrary: saveToLibraryLabel,
+    canUpload: !saveToLibraryLabel && !isDeleteAppearanceConfirming,
+    showDeleteAppearance: showDeleteAppearance,
+    deleteAppearanceLabel:
+      deleteAppearanceLabel && value16['kind'] !== 'character' ? '删除当前图片' : '删除当前形象',
+    canDeleteAppearance: Boolean(
+      showDeleteAppearance && !el2['disabled'] && !saveToLibraryLabel && !isDeleteAppearanceConfirming,
+    ),
+    isDeleteAppearanceConfirming: isDeleteAppearanceConfirming,
+    librarySynced: librarySynced['synced'],
   };
 }
-function projectVoicePanel(_0x59d2ae, _0x205b4e, _0x2a52bc) {
-  const _0x516091 = _0x59d2ae['characterVoiceEditor'];
+function projectVoicePanel(value20, value21, isActive) {
+  const sampleText = value20['characterVoiceEditor'];
   if (
-    !_0x516091?.['assetId'] ||
-    _0x516091['assetId'] !== _0x205b4e?.['id'] ||
-    _0x205b4e['kind'] !== 'character'
+    !sampleText?.['assetId'] ||
+    sampleText['assetId'] !== value21?.['id'] ||
+    value21['kind'] !== 'character'
   )
     return { visible: ![] };
-  const _0x8dd4f1 = normalizeStoryCharacterVoiceReference(_0x205b4e['voiceReference']),
-    _0x245f50 = normalizeStoryCharacterVoiceHistory(_0x205b4e['voiceReferenceHistory'])['map'](
-      (_0xca0c98) => ({
-        ..._0xca0c98,
-        label:
-          _0xca0c98['modelLabel'] ||
-          _0xca0c98['fileName'] ||
-          (_0xca0c98['source'] === 'generated' ? 'AI\x20生成声音' : '上传声音'),
-        timeLabel: formatVoiceHistoryTime(_0xca0c98['updatedAt']),
-      }),
-    ),
-    _0x228a17 = isStoryAssetVoiceLoading(_0x59d2ae, _0x205b4e['id']);
+  const reference = normalizeStoryCharacterVoiceReference(value21['voiceReference']),
+    history = normalizeStoryCharacterVoiceHistory(value21['voiceReferenceHistory'])['map']((label2) => ({
+      ...label2,
+      label:
+        label2['modelLabel'] ||
+        label2['fileName'] ||
+        (label2['source'] === 'generated' ? 'AI\x20生成声音' : '上传声音'),
+      timeLabel: formatVoiceHistoryTime(label2['updatedAt']),
+    })),
+    isGenerating = isStoryAssetVoiceLoading(value20, value21['id']);
   return {
     visible: !![],
-    isActive: _0x2a52bc,
-    isGenerating: _0x228a17,
-    reference: _0x8dd4f1,
-    history: _0x245f50,
-    sampleText: _0x516091['sampleText'] || '',
-    voiceDescription: _0x516091['voiceDescription'] || '',
-    error: _0x516091['error'] || '',
+    isActive: isActive,
+    isGenerating: isGenerating,
+    reference: reference,
+    history: history,
+    sampleText: sampleText['sampleText'] || '',
+    voiceDescription: sampleText['voiceDescription'] || '',
+    error: sampleText['error'] || '',
     sampleMaxCharacters: STORY_CHARACTER_VOICE_SAMPLE_MAX_CHARACTERS,
     footer: {
-      workflow: getStoryCharacterVoiceWorkflow(_0x516091['nodeData']?.['model']),
-      nodeData: _0x516091['nodeData'],
+      workflow: getStoryCharacterVoiceWorkflow(sampleText['nodeData']?.['model']),
+      nodeData: sampleText['nodeData'],
       workflowItems: getStoryCharacterVoiceWorkflowItems(),
     },
   };
@@ -283,330 +268,333 @@ function projectVoicePanel(_0x59d2ae, _0x205b4e, _0x2a52bc) {
 export function createStoryAssetSettingsProjection({
   resolveLibraryReference: resolveLibraryReference = () => null,
 } = {}) {
-  function _0x23e097(_0x180efa = {}, _0x1a6ff2 = {}, _0x1c45b3 = {}) {
-    const _0x103cbb = _0x1a6ff2['isLibraryAsset'] ? [_0x1a6ff2] : getStoryAssetAppearances(_0x1a6ff2),
-      _0x4ceee8 = _0x1a6ff2['isLibraryAsset']
+  function run2(showRoleTag = {}, generated = {}, statusText = {}) {
+    const appearanceCount = generated['isLibraryAsset'] ? [generated] : getStoryAssetAppearances(generated),
+      stats = generated['isLibraryAsset']
         ? {
             total: 0x1,
-            generated: _0x1a6ff2['imageUrl'] ? 0x1 : 0x0,
+            generated: generated['imageUrl'] ? 0x1 : 0x0,
             failed: 0x0,
-            pending: _0x1a6ff2['imageUrl'] ? 0x0 : 0x1,
+            pending: generated['imageUrl'] ? 0x0 : 0x1,
           }
-        : getStoryAssetAppearanceStats(_0x1a6ff2),
-      _0x42eff6 =
-        _0x1c45b3['previewAppearance'] ||
-        (!_0x1a6ff2['isLibraryAsset'] && getSelectedAppearance(_0x180efa, _0x1a6ff2)) ||
-        getStoryAssetBaseAppearance(_0x1a6ff2) ||
-        _0x103cbb['find']((_0x56c5f6) => normalizeText(_0x56c5f6['imageUrl'])) ||
-        _0x103cbb[0x0] ||
-        _0x1a6ff2,
-      _0x1540da = Array['isArray'](_0x180efa['selectedAssetIds']) ? _0x180efa['selectedAssetIds'] : [],
-      _0x4089ff = _0x180efa['assetSelectionMode'] === !![],
-      _0x157dbb = _0x4089ff && _0x1540da['length'] > 0x1,
-      _0x7dbcd = _0x1540da['includes'](_0x1a6ff2['id']),
-      _0x188b72 = isStoryAssetCardLoading(_0x180efa, _0x1a6ff2['id']),
-      _0x410cc0 =
-        !_0x1a6ff2['isLibraryAsset'] &&
-        ['character', 'scene', 'prop']['includes'](_0x1a6ff2['kind']) &&
-        _0x180efa['data']?.['project']?.['sourceMode'] === 'video-replication',
-      _0x217161 = projectPreviewActions(
-        _0x180efa,
-        _0x1a6ff2,
-        _0x42eff6,
-        getStoryAssetGenerationControlState(_0x180efa, _0x1a6ff2['id'], _0x42eff6['id']),
-        _0x1a6ff2['isLibraryAsset'] === !![],
+        : getStoryAssetAppearanceStats(generated),
+      preview =
+        statusText['previewAppearance'] ||
+        (!generated['isLibraryAsset'] && getSelectedAppearance(showRoleTag, generated)) ||
+        getStoryAssetBaseAppearance(generated) ||
+        appearanceCount['find']((value22) => normalizeText(value22['imageUrl'])) ||
+        appearanceCount[0x0] ||
+        generated,
+      isChecked = Array['isArray'](showRoleTag['selectedAssetIds']) ? showRoleTag['selectedAssetIds'] : [],
+      isSelectionMode = showRoleTag['assetSelectionMode'] === !![],
+      enabled = isSelectionMode && isChecked['length'] > 0x1,
+      isCurrent = isChecked['includes'](generated['id']),
+      isLoading = isStoryAssetCardLoading(showRoleTag, generated['id']),
+      showCardUpload =
+        !generated['isLibraryAsset'] &&
+        ['character', 'scene', 'prop']['includes'](generated['kind']) &&
+        showRoleTag['data']?.['project']?.['sourceMode'] === 'video-replication',
+      canDeleteAppearance = projectPreviewActions(
+        showRoleTag,
+        generated,
+        preview,
+        getStoryAssetGenerationControlState(showRoleTag, generated['id'], preview['id']),
+        generated['isLibraryAsset'] === !![],
         resolveLibraryReference,
       );
     return {
-      id: _0x1a6ff2['id'],
-      name: normalizeText(_0x1a6ff2['name']) || '未命名素材',
-      role: _0x1a6ff2['role'] || '素材',
-      kind: _0x1a6ff2['kind'],
-      appearanceCount: _0x103cbb['length'],
-      showCardVoiceStatus: !_0x1a6ff2['isLibraryAsset'] && !_0x410cc0 && _0x1a6ff2['kind'] === 'character',
-      hasCardVoiceReference: hasStoryCharacterVoiceReference(_0x1a6ff2),
-      showCardUpload: _0x410cc0,
-      showCardImageActions: !_0x410cc0 && !_0x1a6ff2['isLibraryAsset'] && _0x1a6ff2['kind'] === 'character',
-      canNavigateAppearances: !_0x1a6ff2['isLibraryAsset'] && _0x103cbb['length'] > 0x1,
+      id: generated['id'],
+      name: normalizeText(generated['name']) || '未命名素材',
+      role: generated['role'] || '素材',
+      kind: generated['kind'],
+      appearanceCount: appearanceCount['length'],
+      showCardVoiceStatus:
+        !generated['isLibraryAsset'] && !showCardUpload && generated['kind'] === 'character',
+      hasCardVoiceReference: hasStoryCharacterVoiceReference(generated),
+      showCardUpload: showCardUpload,
+      showCardImageActions:
+        !showCardUpload && !generated['isLibraryAsset'] && generated['kind'] === 'character',
+      canNavigateAppearances: !generated['isLibraryAsset'] && appearanceCount['length'] > 0x1,
       showAppearanceDelete:
-        !_0x1a6ff2['isLibraryAsset'] &&
-        !_0x157dbb &&
-        _0x217161['showDeleteAppearance'] &&
-        (!_0x410cc0 || Boolean(normalizeText(_0x42eff6?.['imageUrl']))),
-      canDeleteAppearance: _0x217161['canDeleteAppearance'],
-      preview: _0x42eff6,
-      promptPreview: getCardPromptPreview(_0x180efa, _0x1a6ff2, _0x42eff6),
-      stats: _0x4ceee8,
+        !generated['isLibraryAsset'] &&
+        !enabled &&
+        canDeleteAppearance['showDeleteAppearance'] &&
+        (!showCardUpload || Boolean(normalizeText(preview?.['imageUrl']))),
+      canDeleteAppearance: canDeleteAppearance['canDeleteAppearance'],
+      preview: preview,
+      promptPreview: getCardPromptPreview(showRoleTag, generated, preview),
+      stats: stats,
       statusText:
-        _0x1c45b3['statusText'] ||
-        (_0x410cc0
-          ? _0x4ceee8['generated'] + ' / ' + _0x4ceee8['total']
-          : !_0x1a6ff2['isLibraryAsset'] && ['character', 'scene', 'prop']['includes'](_0x1a6ff2['kind'])
-            ? getSelectedAppearanceIndex(_0x180efa, _0x1a6ff2) + 0x1 + ' / ' + _0x103cbb['length']
+        statusText['statusText'] ||
+        (showCardUpload
+          ? stats['generated'] + ' / ' + stats['total']
+          : !generated['isLibraryAsset'] && ['character', 'scene', 'prop']['includes'](generated['kind'])
+            ? getSelectedAppearanceIndex(showRoleTag, generated) + 0x1 + ' / ' + appearanceCount['length']
             : ''),
-      cardStatusHtml: _0x1c45b3['cardStatusHtml'] || '',
-      isCurrent: _0x7dbcd,
-      isChecked: _0x1540da['includes'](_0x1a6ff2['id']),
-      isSelectionMode: _0x4089ff,
-      isLoading: _0x188b72,
-      showRoleTag: _0x180efa['hideAssetRoleTag'] !== !![] && shouldRenderStoryAssetRoleTag(_0x1a6ff2['kind']),
-      canRename: _0x180efa['allowAssetRename'] === !![] && !_0x1a6ff2['isLibraryAsset'],
-      canDelete: Boolean(_0x180efa['allowDeleteAssetCard'] && !_0x1a6ff2['isLibraryAsset'] && !_0x157dbb),
-      draggable: _0x1c45b3['draggable'] === !![],
+      cardStatusHtml: statusText['cardStatusHtml'] || '',
+      isCurrent: isCurrent,
+      isChecked: isChecked['includes'](generated['id']),
+      isSelectionMode: isSelectionMode,
+      isLoading: isLoading,
+      showRoleTag:
+        showRoleTag['hideAssetRoleTag'] !== !![] && shouldRenderStoryAssetRoleTag(generated['kind']),
+      canRename: showRoleTag['allowAssetRename'] === !![] && !generated['isLibraryAsset'],
+      canDelete: Boolean(showRoleTag['allowDeleteAssetCard'] && !generated['isLibraryAsset'] && !enabled),
+      draggable: statusText['draggable'] === !![],
       cardClassName: [
-        _0x1c45b3['cardClassName'],
-        !_0x1a6ff2['isLibraryAsset'] && ['character', 'scene', 'prop']['includes'](_0x1a6ff2['kind'])
+        statusText['cardClassName'],
+        !generated['isLibraryAsset'] && ['character', 'scene', 'prop']['includes'](generated['kind'])
           ? 'workspace-portrait-card'
           : '',
-        _0x410cc0 ? 'story-replication-character-card' : '',
-        _0x410cc0 ? 'story-replication-portrait-card' : '',
+        showCardUpload ? 'story-replication-character-card' : '',
+        showCardUpload ? 'story-replication-portrait-card' : '',
       ]
         ['filter'](Boolean)
         ['join']('\x20'),
-      cardAttributes: _0x1c45b3['cardAttributes'] || '',
-      shellClassName: _0x1c45b3['shellClassName'] || '',
-      accessoryHtml: _0x1c45b3['accessoryHtml'] || '',
-      cardMetaHtml: _0x1c45b3['cardMetaHtml'] || '',
-      cardMediaHtml: _0x1c45b3['cardMediaHtml'] || '',
-      fallbackImageUrl: _0x1c45b3['fallbackImageUrl'] || '',
-      workspaceAssetLibraryImage: _0x1c45b3['workspaceAssetLibraryImage'] === !![],
+      cardAttributes: statusText['cardAttributes'] || '',
+      shellClassName: statusText['shellClassName'] || '',
+      accessoryHtml: statusText['accessoryHtml'] || '',
+      cardMetaHtml: statusText['cardMetaHtml'] || '',
+      cardMediaHtml: statusText['cardMediaHtml'] || '',
+      fallbackImageUrl: statusText['fallbackImageUrl'] || '',
+      workspaceAssetLibraryImage: statusText['workspaceAssetLibraryImage'] === !![],
     };
   }
-  function _0x45051f(_0xed7ff8, _0x3bfc5a = {}) {
-    if (_0xed7ff8 === 'batch-generation') {
-      const _0x4a4b5c = _0x3bfc5a['state'] || _0x3bfc5a,
-        _0x359a3f = Array['isArray'](_0x4a4b5c['selectedAssetIds'])
-          ? _0x4a4b5c['selectedAssetIds']['length']
+  function promptControl(value23, selectionMode = {}) {
+    if (value23 === 'batch-generation') {
+      const value24 = selectionMode['state'] || selectionMode,
+        selectedCount = Array['isArray'](value24['selectedAssetIds'])
+          ? value24['selectedAssetIds']['length']
           : 0x0,
-        _0x2fb061 = _0x4a4b5c['isBatchGenerating'] === !![],
-        _0xe5f535 = _0x4a4b5c['assetBatchCancelRequested'] === !![];
+        action = value24['isBatchGenerating'] === !![],
+        cancelRequested = value24['assetBatchCancelRequested'] === !![];
       return {
-        selectedCount: _0x359a3f,
-        action: _0x2fb061 ? 'cancel-asset-batch-generation' : 'batch-generate-assets',
-        isCancellation: _0x2fb061,
+        selectedCount: selectedCount,
+        action: action ? 'cancel-asset-batch-generation' : 'batch-generate-assets',
+        isCancellation: action,
         busy: ![],
-        cancelRequested: _0xe5f535,
-        disabled: _0x2fb061 ? _0xe5f535 : !_0x359a3f,
-        label: _0x2fb061
+        cancelRequested: cancelRequested,
+        disabled: action ? cancelRequested : !selectedCount,
+        label: action
           ? '' +
-            (_0xe5f535 ? '已取消后续生成' : '取消后续生成') +
-            (_0x359a3f ? '\x20(' + _0x359a3f + ')' : '')
-          : '批量生成' + (_0x359a3f ? '\x20(' + _0x359a3f + ')' : ''),
-        directMode: _0x2fb061 ? '' : getStoryAssetBatchDirectMode(_0x4a4b5c['assetFilter']),
+            (cancelRequested ? '已取消后续生成' : '取消后续生成') +
+            (selectedCount ? '\x20(' + selectedCount + ')' : '')
+          : '批量生成' + (selectedCount ? '\x20(' + selectedCount + ')' : ''),
+        directMode: action ? '' : getStoryAssetBatchDirectMode(value24['assetFilter']),
       };
     }
-    if (_0xed7ff8 === 'prompt-generation') {
-      const _0x1ea879 = _0x3bfc5a['state'] || {},
-        _0x53dd88 = _0x3bfc5a['generationControl'] || {},
-        _0x280443 = Array['isArray'](_0x1ea879['selectedAssetIds'])
-          ? _0x1ea879['selectedAssetIds']['length']
+    if (value23 === 'prompt-generation') {
+      const value25 = selectionMode['state'] || {},
+        el3 = selectionMode['generationControl'] || {},
+        selectedCount2 = Array['isArray'](value25['selectedAssetIds'])
+          ? value25['selectedAssetIds']['length']
           : 0x0,
-        _0x3756dd = _0x1ea879['assetSelectionMode'] === !![] && _0x280443 > 0x1,
-        _0x401c6f = _0x3756dd && _0x1ea879['isBatchGenerating'] === !![],
-        _0x426b45 = _0x1ea879['assetBatchCancelRequested'] === !![];
+        isMultiSelection = value25['assetSelectionMode'] === !![] && selectedCount2 > 0x1,
+        action2 = isMultiSelection && value25['isBatchGenerating'] === !![],
+        cancelRequested2 = value25['assetBatchCancelRequested'] === !![];
       return {
-        isMultiSelection: _0x3756dd,
-        selectedCount: _0x280443,
-        action: _0x401c6f ? 'cancel-asset-batch-generation' : 'batch-generate-assets',
-        isCancellation: _0x401c6f,
-        busy: !_0x3756dd && _0x53dd88['isGenerating'] === !![],
-        cancelRequested: _0x426b45,
-        disabled: _0x3756dd ? _0x401c6f && _0x426b45 : Boolean(_0x53dd88['disabled']),
-        label: _0x3756dd
-          ? _0x401c6f
-            ? (_0x426b45 ? '已取消后续生成' : '取消后续生成') + '\x20(' + _0x280443 + ')'
-            : '批量生成\x20(' + _0x280443 + ')'
-          : _0x53dd88['label'] || '生成素材图',
+        isMultiSelection: isMultiSelection,
+        selectedCount: selectedCount2,
+        action: action2 ? 'cancel-asset-batch-generation' : 'batch-generate-assets',
+        isCancellation: action2,
+        busy: !isMultiSelection && el3['isGenerating'] === !![],
+        cancelRequested: cancelRequested2,
+        disabled: isMultiSelection ? action2 && cancelRequested2 : Boolean(el3['disabled']),
+        label: isMultiSelection
+          ? action2
+            ? (cancelRequested2 ? '已取消后续生成' : '取消后续生成') + '\x20(' + selectedCount2 + ')'
+            : '批量生成\x20(' + selectedCount2 + ')'
+          : el3['label'] || '生成素材图',
       };
     }
-    if (_0xed7ff8 === 'library-selection') {
-      const _0x5bfc6e = Math['max'](0x0, Math['trunc'](Number(_0x3bfc5a['selectedCount']) || 0x0)),
-        _0x2011fe = Array['isArray'](_0x3bfc5a['projectAssets']) ? _0x3bfc5a['projectAssets'] : [];
+    if (value23 === 'library-selection') {
+      const selectedCount3 = Math['max'](0x0, Math['trunc'](Number(selectionMode['selectedCount']) || 0x0)),
+        targets = Array['isArray'](selectionMode['projectAssets']) ? selectionMode['projectAssets'] : [];
       return {
-        selectionMode: _0x3bfc5a['selectionMode'] === !![],
-        selectedCount: _0x5bfc6e,
-        allSelected: _0x3bfc5a['allSelected'] === !![],
-        targetGroups: ['character', 'scene', 'prop']['map']((_0x15480e) => ({
-          kind: _0x15480e,
-          label: _0x3bfc5a['getTabLabel']?.(_0x15480e) || _0x15480e,
-          targets: _0x2011fe['filter']((_0x4a2100) => normalizeText(_0x4a2100?.['kind']) === _0x15480e)[
-            'map'
-          ]((_0x5c29e3) => {
-            const _0x1083e9 = getStoryAssetAppearances(_0x5c29e3);
+        selectionMode: selectionMode['selectionMode'] === !![],
+        selectedCount: selectedCount3,
+        allSelected: selectionMode['allSelected'] === !![],
+        targetGroups: ['character', 'scene', 'prop']['map']((kind) => ({
+          kind: kind,
+          label: selectionMode['getTabLabel']?.(kind) || kind,
+          targets: targets['filter']((value26) => normalizeText(value26?.['kind']) === kind)['map']((id2) => {
+            const appearanceCount2 = getStoryAssetAppearances(id2);
             return {
-              id: _0x5c29e3['id'],
-              kind: _0x5c29e3['kind'],
-              name: _0x5c29e3['name'],
-              appearanceCount: _0x1083e9['length'],
-              appearances: _0x1083e9['map']((_0x4fd9e6) => ({
-                id: _0x4fd9e6['id'],
-                name: _0x4fd9e6['name'],
-                imageUrl: _0x4fd9e6['imageUrl'],
+              id: id2['id'],
+              kind: id2['kind'],
+              name: id2['name'],
+              appearanceCount: appearanceCount2['length'],
+              appearances: appearanceCount2['map']((id3) => ({
+                id: id3['id'],
+                name: id3['name'],
+                imageUrl: id3['imageUrl'],
               })),
               preview:
-                getStoryAssetBaseAppearance(_0x5c29e3) ||
-                _0x1083e9['find']((_0x52618a) => normalizeText(_0x52618a?.['imageUrl'])) ||
-                _0x1083e9[0x0] ||
+                getStoryAssetBaseAppearance(id2) ||
+                appearanceCount2['find']((value27) => normalizeText(value27?.['imageUrl'])) ||
+                appearanceCount2[0x0] ||
                 {},
             };
           }),
         })),
       };
     }
-    if (_0xed7ff8 === 'preset') {
-      const _0x383e20 = _0x3bfc5a['state'] || {},
-        _0x331f56 =
-          _0x3bfc5a['asset'] ||
-          (Array['isArray'](_0x383e20['data']?.['assets'])
-            ? _0x383e20['data']['assets']['find'](
-                (_0x232d25) => _0x232d25['id'] === _0x383e20['selectedAssetId'],
-              )
+    if (value23 === 'preset') {
+      const value28 = selectionMode['state'] || {},
+        value29 =
+          selectionMode['asset'] ||
+          (Array['isArray'](value28['data']?.['assets'])
+            ? value28['data']['assets']['find']((value30) => value30['id'] === value28['selectedAssetId'])
             : null);
       return projectPreset(
-        _0x383e20,
-        _0x3bfc5a['assetKind'],
-        _0x331f56,
-        _0x331f56 ? getSelectedAppearance(_0x383e20, _0x331f56) : null,
+        value28,
+        selectionMode['assetKind'],
+        value29,
+        value29 ? getSelectedAppearance(value28, value29) : null,
       );
     }
-    if (_0xed7ff8 === 'preview-actions')
+    if (value23 === 'preview-actions')
       return projectPreviewActions(
-        _0x3bfc5a['state'] || {},
-        _0x3bfc5a['asset'] || {},
-        _0x3bfc5a['appearance'] || {},
-        _0x3bfc5a['generationControl'] || {},
-        _0x3bfc5a['readOnly'] === !![],
+        selectionMode['state'] || {},
+        selectionMode['asset'] || {},
+        selectionMode['appearance'] || {},
+        selectionMode['generationControl'] || {},
+        selectionMode['readOnly'] === !![],
         resolveLibraryReference,
       );
-    if (_0xed7ff8 === 'voice-capsule') {
-      const _0x38587e = _0x3bfc5a['state'] || {},
-        _0x31ea62 = _0x3bfc5a['asset'] || {};
+    if (value23 === 'voice-capsule') {
+      const value31 = selectionMode['state'] || {},
+        visible = selectionMode['asset'] || {};
       return {
-        visible: _0x31ea62['kind'] === 'character' && !_0x31ea62['isLibraryAsset'],
-        hasReference: hasStoryCharacterVoiceReference(_0x31ea62),
-        isOpen: _0x3bfc5a['isOpen'] === !![],
-        uploadLabel: normalizeText(_0x38587e['assetVoiceUploadLabel']),
+        visible: visible['kind'] === 'character' && !visible['isLibraryAsset'],
+        hasReference: hasStoryCharacterVoiceReference(visible),
+        isOpen: selectionMode['isOpen'] === !![],
+        uploadLabel: normalizeText(value31['assetVoiceUploadLabel']),
       };
     }
-    if (_0xed7ff8 === 'voice-player') {
-      const _0x2aa510 = _0x3bfc5a['asset'] || {};
+    if (value23 === 'voice-player') {
+      const visible2 = selectionMode['asset'] || {};
       return {
         visible:
-          _0x2aa510['kind'] === 'character' &&
-          !_0x2aa510['isLibraryAsset'] &&
-          hasStoryCharacterVoiceReference(_0x2aa510),
-        id: _0x2aa510['id'],
-        name: _0x2aa510['name'],
+          visible2['kind'] === 'character' &&
+          !visible2['isLibraryAsset'] &&
+          hasStoryCharacterVoiceReference(visible2),
+        id: visible2['id'],
+        name: visible2['name'],
       };
     }
     return {};
   }
-  function _0x3950c4(
-    _0x3aaa0c = {},
-    _0x3d518b = null,
+  function run3(
+    emptyDescription = {},
+    id4 = null,
     { showEmptyDescription: showEmptyDescription = !![], readOnly: readOnly = ![] } = {},
   ) {
-    if (!_0x3d518b)
+    if (!id4)
       return {
         empty: !![],
         emptyDescription:
-          _0x3aaa0c['assetFilter'] === 'library'
+          emptyDescription['assetFilter'] === 'library'
             ? '总素材中还没有可引用的图片或视频。'
             : '完成剧本分析后，角色、场景和道具会显示在这里。',
         showEmptyDescription: showEmptyDescription,
       };
-    const _0x3af82b = _0x3d518b['isLibraryAsset'] ? [_0x3d518b] : getStoryAssetAppearances(_0x3d518b),
-      _0x25afd1 = getSelectedAppearanceIndex(_0x3aaa0c, _0x3d518b),
-      _0x373029 = getSelectedAppearance(_0x3aaa0c, _0x3d518b) || _0x3d518b,
-      _0x45db6c = !_0x3d518b['isLibraryAsset'] && !readOnly && _0x3af82b['length'] > 0x1,
-      _0x431b2a = _0x3d518b['kind'] === 'character' && !_0x3d518b['isLibraryAsset'] && !readOnly,
-      _0x43521f = _0x431b2a && isStoryAssetBaseAppearance(_0x3d518b, _0x373029),
-      _0xb9e806 = getStoryAssetGenerationControlState(_0x3aaa0c, _0x3d518b['id'], _0x373029['id']),
-      _0x3c9f03 = _0x3aaa0c['characterVoiceEditor']?.['assetId'] === _0x3d518b['id'],
-      _0x263749 = _0x3c9f03 && _0x3aaa0c['characterVoicePanelMotion'] !== 'to-asset',
-      _0x792e38 =
-        _0x3aaa0c['characterVoicePanelMotion'] === 'to-voice'
+    const appearanceCount3 = id4['isLibraryAsset'] ? [id4] : getStoryAssetAppearances(id4),
+      appearanceIndex = getSelectedAppearanceIndex(emptyDescription, id4),
+      appearance = getSelectedAppearance(emptyDescription, id4) || id4,
+      hasMultipleAppearances = !id4['isLibraryAsset'] && !readOnly && appearanceCount3['length'] > 0x1,
+      supportsBaseAppearance = id4['kind'] === 'character' && !id4['isLibraryAsset'] && !readOnly,
+      isBaseAppearance = supportsBaseAppearance && isStoryAssetBaseAppearance(id4, appearance),
+      generationControl = getStoryAssetGenerationControlState(emptyDescription, id4['id'], appearance['id']),
+      value32 = emptyDescription['characterVoiceEditor']?.['assetId'] === id4['id'],
+      isOpen = value32 && emptyDescription['characterVoicePanelMotion'] !== 'to-asset',
+      motionClass =
+        emptyDescription['characterVoicePanelMotion'] === 'to-voice'
           ? 'is-flipping-to-voice'
-          : _0x3aaa0c['characterVoicePanelMotion'] === 'to-asset'
+          : emptyDescription['characterVoicePanelMotion'] === 'to-asset'
             ? 'is-flipping-to-asset'
             : '',
-      _0xd46a9f = Array['isArray'](_0x3aaa0c['data']?.['assets'])
-        ? _0x3aaa0c['data']['assets']['find']((_0x3a7ccb) => _0x3a7ccb['id'] === _0x3aaa0c['selectedAssetId'])
-        : _0x3d518b,
-      _0x28dd69 = _0xd46a9f ? getSelectedAppearance(_0x3aaa0c, _0xd46a9f) : _0x373029;
+      value33 = Array['isArray'](emptyDescription['data']?.['assets'])
+        ? emptyDescription['data']['assets']['find'](
+            (value34) => value34['id'] === emptyDescription['selectedAssetId'],
+          )
+        : id4,
+      value35 = value33 ? getSelectedAppearance(emptyDescription, value33) : appearance;
     return {
       empty: ![],
       asset: {
-        id: _0x3d518b['id'],
-        name: normalizeText(_0x3d518b['name']) || '未命名素材',
-        role: _0x3d518b['role'],
-        kind: _0x3d518b['kind'],
-        mediaKind: _0x3d518b['mediaKind'],
-        isLibraryAsset: _0x3d518b['isLibraryAsset'] === !![],
-        description: _0x3d518b['description'] || '',
+        id: id4['id'],
+        name: normalizeText(id4['name']) || '未命名素材',
+        role: id4['role'],
+        kind: id4['kind'],
+        mediaKind: id4['mediaKind'],
+        isLibraryAsset: id4['isLibraryAsset'] === !![],
+        description: id4['description'] || '',
       },
-      appearance: _0x373029,
-      appearanceIndex: _0x25afd1,
-      appearanceCount: _0x3af82b['length'],
-      hasMultipleAppearances: _0x45db6c,
-      supportsBaseAppearance: _0x431b2a,
+      appearance: appearance,
+      appearanceIndex: appearanceIndex,
+      appearanceCount: appearanceCount3['length'],
+      hasMultipleAppearances: hasMultipleAppearances,
+      supportsBaseAppearance: supportsBaseAppearance,
       showBaseAppearanceControl:
-        _0x431b2a && _0x3aaa0c['data']?.['project']?.['sourceMode'] !== 'video-replication',
-      isBaseAppearance: _0x43521f,
-      canRename: _0x3aaa0c['allowAssetRename'] === !![] && !_0x3d518b['isLibraryAsset'],
-      isBaseAppearanceSelectionDisabled: Boolean(isStoryAssetCardLoading(_0x3aaa0c, _0x3d518b['id'])),
-      canSetBaseAppearance: _0x45db6c && !isStoryAssetCardLoading(_0x3aaa0c, _0x3d518b['id']),
-      showStyleReference: _0x43521f && _0x3aaa0c['allowAssetStyleReference'] !== ![],
+        supportsBaseAppearance &&
+        emptyDescription['data']?.['project']?.['sourceMode'] !== 'video-replication',
+      isBaseAppearance: isBaseAppearance,
+      canRename: emptyDescription['allowAssetRename'] === !![] && !id4['isLibraryAsset'],
+      isBaseAppearanceSelectionDisabled: Boolean(isStoryAssetCardLoading(emptyDescription, id4['id'])),
+      canSetBaseAppearance: hasMultipleAppearances && !isStoryAssetCardLoading(emptyDescription, id4['id']),
+      showStyleReference: isBaseAppearance && emptyDescription['allowAssetStyleReference'] !== ![],
       styleReference: {
-        referenceImageUrl: _0x373029['referenceImageUrl'],
-        disabled: Boolean(_0xb9e806['disabled']),
+        referenceImageUrl: appearance['referenceImageUrl'],
+        disabled: Boolean(generationControl['disabled']),
       },
       voiceCapsule: {
-        visible: _0x3d518b['kind'] === 'character' && !_0x3d518b['isLibraryAsset'],
-        hasReference: hasStoryCharacterVoiceReference(_0x3d518b),
-        isOpen: _0x263749,
+        visible: id4['kind'] === 'character' && !id4['isLibraryAsset'],
+        hasReference: hasStoryCharacterVoiceReference(id4),
+        isOpen: isOpen,
         useSourceMenu: !![],
-        uploadLabel: normalizeText(_0x3aaa0c['assetVoiceUploadLabel']),
+        uploadLabel: normalizeText(emptyDescription['assetVoiceUploadLabel']),
       },
       voicePlayer: {
         visible:
-          _0x3d518b['kind'] === 'character' &&
-          !_0x3d518b['isLibraryAsset'] &&
-          hasStoryCharacterVoiceReference(_0x3d518b),
+          id4['kind'] === 'character' && !id4['isLibraryAsset'] && hasStoryCharacterVoiceReference(id4),
       },
       previewActions: projectPreviewActions(
-        _0x3aaa0c,
-        _0x3d518b,
-        _0x373029,
-        _0xb9e806,
+        emptyDescription,
+        id4,
+        appearance,
+        generationControl,
         readOnly,
         resolveLibraryReference,
       ),
-      generationControl: _0xb9e806,
-      promptControl: _0x45051f('prompt-generation', { state: _0x3aaa0c, generationControl: _0xb9e806 }),
-      preset: projectPreset(_0x3aaa0c, _0x3d518b['kind'], _0xd46a9f, _0x28dd69),
+      generationControl: generationControl,
+      promptControl: promptControl('prompt-generation', {
+        state: emptyDescription,
+        generationControl: generationControl,
+      }),
+      preset: projectPreset(emptyDescription, id4['kind'], value33, value35),
       imageModel: {
-        modelId: _0x3aaa0c['models']?.['image'],
-        provider: _0x3aaa0c['imageProvider'],
-        generationParams: _0x3aaa0c['imageGenerationParams'],
+        modelId: emptyDescription['models']?.['image'],
+        provider: emptyDescription['imageProvider'],
+        generationParams: emptyDescription['imageGenerationParams'],
       },
       readOnly: readOnly,
-      isGeneratingAppearance: Boolean(_0xb9e806['isGenerating']),
-      motionClass: _0x3aaa0c['assetAppearanceMotion']
-        ? 'is-sliding-' + _0x3aaa0c['assetAppearanceMotion']
+      isGeneratingAppearance: Boolean(generationControl['isGenerating']),
+      motionClass: emptyDescription['assetAppearanceMotion']
+        ? 'is-sliding-' + emptyDescription['assetAppearanceMotion']
         : '',
-      panel: { isVoice: _0x263749, motionClass: _0x792e38, isAnimating: Boolean(_0x792e38) },
-      voicePanel: projectVoicePanel(_0x3aaa0c, _0x3d518b, _0x263749),
+      panel: { isVoice: isOpen, motionClass: motionClass, isAnimating: Boolean(motionClass) },
+      voicePanel: projectVoicePanel(emptyDescription, id4, isOpen),
       captionMeta:
-        (_0x373029['name'] || _0x3d518b['role'] || '素材') +
+        (appearance['name'] || id4['role'] || '素材') +
         ' · ' +
-        formatStoryAssetOccurrences(_0x373029['occurrences'] || _0x3d518b['occurrences'] || '当前项目') +
-        (_0x45db6c ? ' · ' + (_0x25afd1 + 0x1) + '/' + _0x3af82b['length'] : ''),
+        formatStoryAssetOccurrences(appearance['occurrences'] || id4['occurrences'] || '当前项目') +
+        (hasMultipleAppearances ? ' · ' + (appearanceIndex + 0x1) + '/' + appearanceCount3['length'] : ''),
     };
   }
   return Object['freeze']({
-    projectAssetCard: (..._0x31b54f) => freezeSnapshot(_0x23e097(..._0x31b54f)),
-    projectAssetControl: (..._0x1ab190) => freezeSnapshot(_0x45051f(..._0x1ab190)),
-    projectAssetDetail: (..._0x5c0a14) => freezeSnapshot(_0x3950c4(..._0x5c0a14)),
+    projectAssetCard: (...args) => freezeSnapshot(run2(...args)),
+    projectAssetControl: (...args2) => freezeSnapshot(promptControl(...args2)),
+    projectAssetDetail: (...args3) => freezeSnapshot(run3(...args3)),
   });
 }

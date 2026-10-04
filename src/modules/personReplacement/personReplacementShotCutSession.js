@@ -29,18 +29,18 @@ const DEFAULT_TIMELINE_ZOOM = 0x1,
     'merge-shot-cuts': 'merge',
     'preview-shot-cut': 'preview',
   });
-function clone(_0x50dd75) {
+function clone(value) {
   if (typeof structuredClone === 'function')
     try {
-      return structuredClone(_0x50dd75);
+      return structuredClone(value);
     } catch {}
-  return JSON['parse'](JSON['stringify'](_0x50dd75));
+  return JSON['parse'](JSON['stringify'](value));
 }
-function normalizeId(_0x3857ae) {
-  return String(_0x3857ae ?? '')['trim']();
+function normalizeId(item) {
+  return String(item ?? '')['trim']();
 }
-function resolveProjectIdentity(_0x2f80cd = {}) {
-  return normalizeId(_0x2f80cd['id'] || _0x2f80cd['projectId'] || _0x2f80cd['sessionId']);
+function resolveProjectIdentity(options = {}) {
+  return normalizeId(options['id'] || options['projectId'] || options['sessionId']);
 }
 function createInitialState() {
   return {
@@ -82,9 +82,9 @@ function createInitialState() {
     previewFrameCallbackVideo: null,
   };
 }
-function clampTimelineSec(_0x4eee3b, _0x1ca4d2) {
-  const _0xc9a4ad = getPersonReplacementShotCutTotalDuration(_0x4eee3b);
-  return Math['min'](_0xc9a4ad, Math['max'](0x0, Number(_0x1ca4d2) || 0x0));
+function clampTimelineSec(key, index) {
+  const personReplacementShotCutTotalDuration = getPersonReplacementShotCutTotalDuration(key);
+  return Math['min'](personReplacementShotCutTotalDuration, Math['max'](0x0, Number(index) || 0x0));
 }
 export function createPersonReplacementShotCutSession({
   initialProject: initialProject = {},
@@ -96,410 +96,441 @@ export function createPersonReplacementShotCutSession({
   onReverseRequested: onReverseRequested = () => {},
   onDetectionRequested: onDetectionRequested = () => [],
 } = {}) {
-  const _0x46fcda = createInitialState();
-  let _0x28523e = resolveProjectIdentity(initialProject),
-    _0x1de379 = ![],
-    _0x15313 = null,
-    _0x222f6b = Object['freeze']({});
-  const _0xad38a8 = playbackControllerOptions
+  const soundEnabled = createInitialState();
+  let projectIdentity = resolveProjectIdentity(initialProject),
+    enabled = ![],
+    value2 = null,
+    result = Object['freeze']({});
+  const playback = playbackControllerOptions
       ? createPersonReplacementShotCutPlaybackController(playbackControllerOptions)
       : null,
-    _0x19323f = () => !_0x1de379,
-    _0x3a024f = () => {
-      (_0x46fcda['openingCleanup']?.(), (_0x46fcda['openingCleanup'] = null));
+    handler = () => !enabled,
+    handler2 = () => {
+      (soundEnabled['openingCleanup']?.(), (soundEnabled['openingCleanup'] = null));
     },
-    _0x555a58 = () => {
-      if (!_0x46fcda['motionTimer']) return ![];
+    clearMotionTimer = () => {
+      if (!soundEnabled['motionTimer']) return ![];
       return (
-        windowObject?.['clearTimeout']?.(_0x46fcda['motionTimer']),
-        (_0x46fcda['motionTimer'] = 0x0),
+        windowObject?.['clearTimeout']?.(soundEnabled['motionTimer']),
+        (soundEnabled['motionTimer'] = 0x0),
         !![]
       );
     },
-    _0x42295 = () => {
-      (_0x46fcda['boundaryDrag']?.['cleanup']?.(),
-        (_0x46fcda['boundaryDrag'] = null),
+    stopBoundaryDrag = () => {
+      (soundEnabled['boundaryDrag']?.['cleanup']?.(),
+        (soundEnabled['boundaryDrag'] = null),
         onBoundaryDragStopped());
     },
-    _0x580833 = () => {
-      (_0x46fcda['previewMetadataCleanup']?.(), (_0x46fcda['previewMetadataCleanup'] = null));
+    clearPreviewMetadata = () => {
+      (soundEnabled['previewMetadataCleanup']?.(), (soundEnabled['previewMetadataCleanup'] = null));
     },
-    _0x1a8364 = () => {
-      (_0x46fcda['bufferedWarmupCleanup']?.(), (_0x46fcda['bufferedWarmupCleanup'] = null));
+    clearBufferedWarmup = () => {
+      (soundEnabled['bufferedWarmupCleanup']?.(), (soundEnabled['bufferedWarmupCleanup'] = null));
     },
-    _0x2f1613 = () => {
-      if (_0x46fcda['hoverPreviewRaf']) {
+    cancelHoverPreview = () => {
+      if (soundEnabled['hoverPreviewRaf']) {
         try {
-          windowObject?.['cancelAnimationFrame']?.(_0x46fcda['hoverPreviewRaf']);
+          windowObject?.['cancelAnimationFrame']?.(soundEnabled['hoverPreviewRaf']);
         } catch {}
         try {
-          windowObject?.['clearTimeout']?.(_0x46fcda['hoverPreviewRaf']);
+          windowObject?.['clearTimeout']?.(soundEnabled['hoverPreviewRaf']);
         } catch {}
-        _0x46fcda['hoverPreviewRaf'] = 0x0;
+        soundEnabled['hoverPreviewRaf'] = 0x0;
       }
-      _0x46fcda['hoverPreviewRequest'] = null;
+      soundEnabled['hoverPreviewRequest'] = null;
     },
-    _0x1d40c9 = () => {
-      (_0x1a8364(), _0x15313?.(), (_0x15313 = null));
-      if (_0x46fcda['bufferedVideo'] !== null) {
-        const _0x410559 = _0x46fcda['bufferedVideo'];
-        releasePreviewBuffer(_0x410559);
+    releasePreviewBuffer2 = () => {
+      (clearBufferedWarmup(), value2?.(), (value2 = null));
+      if (soundEnabled['bufferedVideo'] !== null) {
+        const data = soundEnabled['bufferedVideo'];
+        releasePreviewBuffer(data);
         try {
-          _0x410559['pause']?.();
+          data['pause']?.();
         } catch {}
         try {
-          (_0x410559['removeAttribute']?.('src'), _0x410559['load']?.());
+          (data['removeAttribute']?.('src'), data['load']?.());
         } catch {}
         return (
-          (_0x46fcda['bufferedVideo'] = null),
-          (_0x46fcda['bufferedSourceId'] = ''),
-          (_0x46fcda['bufferedMediaRef'] = ''),
+          (soundEnabled['bufferedVideo'] = null),
+          (soundEnabled['bufferedSourceId'] = ''),
+          (soundEnabled['bufferedMediaRef'] = ''),
           !![]
         );
       }
       return ![];
     },
-    _0x1b0853 = () => {
-      (_0xad38a8?.['stop']?.(),
+    stopPlayback2 = () => {
+      (playback?.['stop']?.(),
         stopPlayback(),
-        (_0x46fcda['hoverPreviewActive'] = ![]),
-        (_0x46fcda['hoverPreviewTimeSec'] = null));
+        (soundEnabled['hoverPreviewActive'] = ![]),
+        (soundEnabled['hoverPreviewTimeSec'] = null));
     },
-    _0x426fc4 = () => {
-      const _0x5c7efb = _0x46fcda['previewFrameCallbackVideo'],
-        _0x53fa05 = _0x46fcda['previewFrameCallbackId'];
-      if (_0x53fa05 != null && _0x5c7efb?.['cancelVideoFrameCallback'])
+    cancelPreviewFrameWait = () => {
+      const target = soundEnabled['previewFrameCallbackVideo'],
+        source = soundEnabled['previewFrameCallbackId'];
+      if (source != null && target?.['cancelVideoFrameCallback'])
         try {
-          _0x5c7efb['cancelVideoFrameCallback'](_0x53fa05);
+          target['cancelVideoFrameCallback'](source);
         } catch {}
-      ((_0x46fcda['previewFrameCallbackId'] = null), (_0x46fcda['previewFrameCallbackVideo'] = null));
+      ((soundEnabled['previewFrameCallbackId'] = null), (soundEnabled['previewFrameCallbackVideo'] = null));
     },
-    _0x43e633 = ({ releaseBuffer: _0xb56106 = !![] } = {}) => {
-      (_0x3a024f(), _0x555a58(), _0x42295(), _0x580833(), _0x1a8364(), _0x2f1613(), _0x426fc4(), _0x1b0853());
-      const _0x5d59fd = _0x46fcda['bufferedVideo'],
-        _0x4d3390 = _0x46fcda['bufferedSourceId'],
-        _0xb15682 = _0x46fcda['bufferedMediaRef'];
-      if (_0xb56106) _0x1d40c9();
-      const _0x3b8088 = _0x46fcda['smartDetectionToken'] + 0x1,
-        _0x2a786b = _0x46fcda['boundPreviewVideos'];
-      Object['assign'](_0x46fcda, createInitialState(), {
-        smartDetectionToken: _0x3b8088,
-        boundPreviewVideos: _0x2a786b,
-        ...(!_0xb56106 && _0x5d59fd
-          ? { bufferedVideo: _0x5d59fd, bufferedSourceId: _0x4d3390, bufferedMediaRef: _0xb15682 }
+    handler3 = ({ releaseBuffer: releaseBuffer = !![] } = {}) => {
+      (handler2(),
+        clearMotionTimer(),
+        stopBoundaryDrag(),
+        clearPreviewMetadata(),
+        clearBufferedWarmup(),
+        cancelHoverPreview(),
+        cancelPreviewFrameWait(),
+        stopPlayback2());
+      const bufferedVideo = soundEnabled['bufferedVideo'],
+        bufferedSourceId = soundEnabled['bufferedSourceId'],
+        bufferedMediaRef = soundEnabled['bufferedMediaRef'];
+      if (releaseBuffer) releasePreviewBuffer2();
+      const smartDetectionToken = soundEnabled['smartDetectionToken'] + 0x1,
+        boundPreviewVideos = soundEnabled['boundPreviewVideos'];
+      Object['assign'](soundEnabled, createInitialState(), {
+        smartDetectionToken: smartDetectionToken,
+        boundPreviewVideos: boundPreviewVideos,
+        ...(!releaseBuffer && bufferedVideo
+          ? {
+              bufferedVideo: bufferedVideo,
+              bufferedSourceId: bufferedSourceId,
+              bufferedMediaRef: bufferedMediaRef,
+            }
           : {}),
       });
     },
-    _0x134711 = (_0x121346 = initialProject, _0x420b1c = null) => {
-      if (!_0x19323f()) return ![];
-      const _0x20cd8e = Array['isArray'](_0x420b1c)
-        ? clone(_0x420b1c)
-        : createPersonReplacementShotCutDraft(_0x121346);
-      if (!_0x20cd8e['length']) return ![];
-      ((_0x28523e = resolveProjectIdentity(_0x121346)), _0x1b0853());
-      const _0x2e3596 = _0x46fcda['boundPreviewVideos'],
-        _0x5c64f3 = _0x46fcda['bufferedVideo'],
-        _0x2ccd20 = _0x46fcda['bufferedSourceId'],
-        _0x2fb0d6 = _0x46fcda['bufferedMediaRef'];
+    open = (next = initialProject, current = null) => {
+      if (!handler()) return ![];
+      const draft = Array['isArray'](current) ? clone(current) : createPersonReplacementShotCutDraft(next);
+      if (!draft['length']) return ![];
+      ((projectIdentity = resolveProjectIdentity(next)), stopPlayback2());
+      const boundPreviewVideos2 = soundEnabled['boundPreviewVideos'],
+        bufferedVideo2 = soundEnabled['bufferedVideo'],
+        bufferedSourceId2 = soundEnabled['bufferedSourceId'],
+        bufferedMediaRef2 = soundEnabled['bufferedMediaRef'];
       return (
-        Object['assign'](_0x46fcda, createInitialState(), {
+        Object['assign'](soundEnabled, createInitialState(), {
           isOpen: !![],
-          draft: _0x20cd8e,
-          initialDraft: clone(_0x20cd8e),
-          previewShotId: normalizeId(
-            _0x121346?.['workspace']?.['selectedShotId'] || _0x20cd8e[0x0]?.['shotId'],
-          ),
-          soundEnabled: _0x46fcda['soundEnabled'],
-          timelineZoom: _0x46fcda['timelineZoom'],
-          smartDetectionToken: _0x46fcda['smartDetectionToken'] + 0x1,
-          boundPreviewVideos: _0x2e3596,
-          ...(_0x5c64f3
-            ? { bufferedVideo: _0x5c64f3, bufferedSourceId: _0x2ccd20, bufferedMediaRef: _0x2fb0d6 }
+          draft: draft,
+          initialDraft: clone(draft),
+          previewShotId: normalizeId(next?.['workspace']?.['selectedShotId'] || draft[0x0]?.['shotId']),
+          soundEnabled: soundEnabled['soundEnabled'],
+          timelineZoom: soundEnabled['timelineZoom'],
+          smartDetectionToken: soundEnabled['smartDetectionToken'] + 0x1,
+          boundPreviewVideos: boundPreviewVideos2,
+          ...(bufferedVideo2
+            ? {
+                bufferedVideo: bufferedVideo2,
+                bufferedSourceId: bufferedSourceId2,
+                bufferedMediaRef: bufferedMediaRef2,
+              }
             : {}),
         }),
         !![]
       );
     },
-    _0x244132 = ({ releaseBuffer: _0x1185ed = ![] } = {}) => {
-      if (!_0x19323f()) return ![];
-      const _0x51fd7e = _0x46fcda['isOpen'] || _0x46fcda['isOpening'] || Boolean(_0x46fcda['motion']);
-      return (_0x43e633({ releaseBuffer: _0x1185ed }), _0x51fd7e);
+    close = ({ releaseBuffer: releaseBuffer2 = ![] } = {}) => {
+      if (!handler()) return ![];
+      const entry = soundEnabled['isOpen'] || soundEnabled['isOpening'] || Boolean(soundEnabled['motion']);
+      return (handler3({ releaseBuffer: releaseBuffer2 }), entry);
     },
-    _0x33a3fe = (_0x27ad8c = {}) => {
-      if (!_0x19323f()) return ![];
-      const _0x49f072 = resolveProjectIdentity(_0x27ad8c);
-      if (_0x49f072 === _0x28523e) return ![];
-      return ((_0x28523e = _0x49f072), _0x43e633({ releaseBuffer: !![] }), !![]);
+    syncProject = (options2 = {}) => {
+      if (!handler()) return ![];
+      const projectIdentity2 = resolveProjectIdentity(options2);
+      if (projectIdentity2 === projectIdentity) return ![];
+      return ((projectIdentity = projectIdentity2), handler3({ releaseBuffer: !![] }), !![]);
     },
-    _0x55f0b4 = (_0x438a56, { recordHistory: recordHistory = !![] } = {}) => {
-      if (!_0x19323f() || !_0x46fcda['isOpen'] || !Array['isArray'](_0x438a56)) return ![];
-      if (JSON['stringify'](_0x46fcda['draft']) === JSON['stringify'](_0x438a56)) return ![];
+    commitDraft = (record, { recordHistory: recordHistory = !![] } = {}) => {
+      if (!handler() || !soundEnabled['isOpen'] || !Array['isArray'](record)) return ![];
+      if (JSON['stringify'](soundEnabled['draft']) === JSON['stringify'](record)) return ![];
       if (recordHistory) {
-        _0x46fcda['undoStack']['push'](clone(_0x46fcda['draft']));
-        if (_0x46fcda['undoStack']['length'] > 0x32) _0x46fcda['undoStack']['shift']();
+        soundEnabled['undoStack']['push'](clone(soundEnabled['draft']));
+        if (soundEnabled['undoStack']['length'] > 0x32) soundEnabled['undoStack']['shift']();
       }
-      _0x46fcda['draft'] = clone(_0x438a56);
-      const _0x599c61 = new Set(
-        _0x46fcda['draft']['map']((_0x4e11fc) => normalizeId(_0x4e11fc?.['shotId']))['filter'](Boolean),
+      soundEnabled['draft'] = clone(record);
+      const map = new Set(
+        soundEnabled['draft']['map']((payload) => normalizeId(payload?.['shotId']))['filter'](Boolean),
       );
       return (
-        (_0x46fcda['selectedShotIds'] = _0x46fcda['selectedShotIds']['filter']((_0x3a22ab) =>
-          _0x599c61['has'](_0x3a22ab),
+        (soundEnabled['selectedShotIds'] = soundEnabled['selectedShotIds']['filter']((handle) =>
+          map['has'](handle),
         )),
-        (_0x46fcda['playheadSec'] = clampTimelineSec(_0x46fcda['draft'], _0x46fcda['playheadSec'])),
+        (soundEnabled['playheadSec'] = clampTimelineSec(soundEnabled['draft'], soundEnabled['playheadSec'])),
         !![]
       );
     },
-    _0x2ad128 = () => {
-      if (!_0x19323f() || !_0x46fcda['isOpen'] || !_0x46fcda['undoStack']['length']) return ![];
-      ((_0x46fcda['draft'] = _0x46fcda['undoStack']['pop']()),
-        (_0x46fcda['playheadSec'] = clampTimelineSec(_0x46fcda['draft'], _0x46fcda['playheadSec'])));
-      const _0x4bdc20 = getPersonReplacementShotCutPositionAtTimelineSec(
-        _0x46fcda['draft'],
-        _0x46fcda['playheadSec'],
+    undo = () => {
+      if (!handler() || !soundEnabled['isOpen'] || !soundEnabled['undoStack']['length']) return ![];
+      ((soundEnabled['draft'] = soundEnabled['undoStack']['pop']()),
+        (soundEnabled['playheadSec'] = clampTimelineSec(soundEnabled['draft'], soundEnabled['playheadSec'])));
+      const personReplacementShotCutPositionAtTimelineSec = getPersonReplacementShotCutPositionAtTimelineSec(
+        soundEnabled['draft'],
+        soundEnabled['playheadSec'],
       );
       return (
-        (_0x46fcda['previewShotId'] = _0x4bdc20['shotId'] || _0x46fcda['draft'][0x0]?.['shotId'] || ''),
-        (_0x46fcda['selectedShotIds'] = []),
+        (soundEnabled['previewShotId'] =
+          personReplacementShotCutPositionAtTimelineSec['shotId'] ||
+          soundEnabled['draft'][0x0]?.['shotId'] ||
+          ''),
+        (soundEnabled['selectedShotIds'] = []),
         !![]
       );
     },
-    _0x3d9fdb = () => {
-      if (!_0x19323f() || !_0x46fcda['isOpen']) return ![];
-      const _0x339179 = _0x55f0b4(_0x46fcda['initialDraft']);
-      if (_0x339179) _0x46fcda['selectedShotIds'] = [];
-      return _0x339179;
+    resetDraft = () => {
+      if (!handler() || !soundEnabled['isOpen']) return ![];
+      const state = commitDraft(soundEnabled['initialDraft']);
+      if (state) soundEnabled['selectedShotIds'] = [];
+      return state;
     },
-    _0x170570 = () => {
-      if (!_0x19323f() || !_0x46fcda['isOpen']) return ![];
-      const _0x3a9332 = splitPersonReplacementShotCutAtTimelineSec(
-        _0x46fcda['draft'],
-        _0x46fcda['playheadSec'],
+    splitAtPlayhead = () => {
+      if (!handler() || !soundEnabled['isOpen']) return ![];
+      const list = splitPersonReplacementShotCutAtTimelineSec(
+        soundEnabled['draft'],
+        soundEnabled['playheadSec'],
       );
-      if (_0x3a9332 === _0x46fcda['draft'] || _0x3a9332['length'] === _0x46fcda['draft']['length'])
-        return ![];
-      const _0x59d22d = getPersonReplacementShotCutPositionAtTimelineSec(_0x3a9332, _0x46fcda['playheadSec']);
+      if (list === soundEnabled['draft'] || list['length'] === soundEnabled['draft']['length']) return ![];
+      const personReplacementShotCutPositionAtTimelineSec2 = getPersonReplacementShotCutPositionAtTimelineSec(
+        list,
+        soundEnabled['playheadSec'],
+      );
       return (
-        _0x55f0b4(_0x3a9332),
-        (_0x46fcda['previewShotId'] = _0x59d22d['shotId'] || _0x46fcda['previewShotId']),
-        (_0x46fcda['selectedShotIds'] = []),
+        commitDraft(list),
+        (soundEnabled['previewShotId'] =
+          personReplacementShotCutPositionAtTimelineSec2['shotId'] || soundEnabled['previewShotId']),
+        (soundEnabled['selectedShotIds'] = []),
         !![]
       );
     },
-    _0x39e5ac = () => {
-      if (!_0x19323f() || !_0x46fcda['isOpen']) return ![];
-      const _0x11c291 = _0x46fcda['selectedShotIds']
-          ['map']((_0x3d7f58) =>
-            _0x46fcda['draft']['findIndex'](
-              (_0x5c320a) => normalizeId(_0x5c320a?.['shotId']) === normalizeId(_0x3d7f58),
+    mergeSelectedRanges = () => {
+      if (!handler() || !soundEnabled['isOpen']) return ![];
+      const config = soundEnabled['selectedShotIds']
+          ['map']((scope) =>
+            soundEnabled['draft']['findIndex'](
+              (input) => normalizeId(input?.['shotId']) === normalizeId(scope),
             ),
           )
-          ['filter']((_0x327319) => _0x327319 >= 0x0)
-          ['sort']((_0x3eed42, _0x4ca775) => _0x3eed42 - _0x4ca775),
-        _0x15f847 = _0x11c291[0x0],
-        _0x1dce19 = mergePersonReplacementShotCutRanges(_0x46fcda['draft'], _0x46fcda['selectedShotIds'], {
-          preferredShotId: _0x46fcda['previewShotId'],
-        });
-      if (_0x1dce19 === _0x46fcda['draft'] || !_0x55f0b4(_0x1dce19)) return ![];
-      const _0x454d8c = _0x46fcda['draft'][_0x15f847];
+          ['filter']((count) => count >= 0x0)
+          ['sort']((output, value3) => output - value3),
+        value4 = config[0x0],
+        personReplacementShotCutRanges = mergePersonReplacementShotCutRanges(
+          soundEnabled['draft'],
+          soundEnabled['selectedShotIds'],
+          {
+            preferredShotId: soundEnabled['previewShotId'],
+          },
+        );
+      if (
+        personReplacementShotCutRanges === soundEnabled['draft'] ||
+        !commitDraft(personReplacementShotCutRanges)
+      )
+        return ![];
+      const value5 = soundEnabled['draft'][value4];
       return (
-        (_0x46fcda['selectedShotIds'] = []),
-        (_0x46fcda['previewShotId'] = normalizeId(_0x454d8c?.['shotId'])),
-        (_0x46fcda['playheadSec'] = getPersonReplacementShotCutTimelineSec(
-          _0x46fcda['draft'],
-          _0x454d8c?.['shotId'],
-          _0x454d8c?.['startSec'],
+        (soundEnabled['selectedShotIds'] = []),
+        (soundEnabled['previewShotId'] = normalizeId(value5?.['shotId'])),
+        (soundEnabled['playheadSec'] = getPersonReplacementShotCutTimelineSec(
+          soundEnabled['draft'],
+          value5?.['shotId'],
+          value5?.['startSec'],
         )),
         !![]
       );
     },
-    _0x348991 = (_0x44c39c, _0x671ed5, { recordHistory: recordHistory = !![] } = {}) => {
-      if (!_0x19323f() || !_0x46fcda['isOpen']) return ![];
-      const _0x38df1b = movePersonReplacementShotCutBoundary(_0x46fcda['draft'], _0x44c39c, _0x671ed5);
-      return _0x55f0b4(_0x38df1b, { recordHistory: recordHistory });
+    moveBoundary = (value6, value7, { recordHistory: recordHistory = !![] } = {}) => {
+      if (!handler() || !soundEnabled['isOpen']) return ![];
+      const movePersonReplacementShotCutBoundary2 = movePersonReplacementShotCutBoundary(
+        soundEnabled['draft'],
+        value6,
+        value7,
+      );
+      return commitDraft(movePersonReplacementShotCutBoundary2, { recordHistory: recordHistory });
     },
-    _0x486379 = async (_0x251fd8 = _0x46fcda['playheadSec']) => {
-      if (!_0x19323f() || !_0x46fcda['isOpen']) return ![];
-      const _0x3a213b = clone(_0x46fcda['draft']),
-        _0x4c228e = togglePersonReplacementShotReverseAtTimelineSec(_0x46fcda['draft'], _0x251fd8);
-      if (!_0x4c228e?.['draft'] || !_0x55f0b4(_0x4c228e['draft'])) return ![];
-      const _0x4b64a1 = _0x46fcda['draft'][_0x4c228e['position']?.['shotIndex']];
+    toggleReverse = async (value8 = soundEnabled['playheadSec']) => {
+      if (!handler() || !soundEnabled['isOpen']) return ![];
+      const clone2 = clone(soundEnabled['draft']),
+        shotId = togglePersonReplacementShotReverseAtTimelineSec(soundEnabled['draft'], value8);
+      if (!shotId?.['draft'] || !commitDraft(shotId['draft'])) return ![];
+      const originShotId = soundEnabled['draft'][shotId['position']?.['shotIndex']];
       try {
         return (
           await onReverseRequested({
-            shotId: _0x4c228e['position']?.['shotId'] || _0x4b64a1?.['shotId'] || '',
-            originShotId: _0x4b64a1?.['originShotId'] || _0x4b64a1?.['shotId'] || '',
-            isReversed: _0x4c228e['isReversed'] === !![],
+            shotId: shotId['position']?.['shotId'] || originShotId?.['shotId'] || '',
+            originShotId: originShotId?.['originShotId'] || originShotId?.['shotId'] || '',
+            isReversed: shotId['isReversed'] === !![],
           }),
           !![]
         );
-      } catch (_0x1bbec8) {
-        ((_0x46fcda['draft'] = _0x3a213b), _0x46fcda['undoStack']['pop']());
-        throw _0x1bbec8;
+      } catch (value9) {
+        ((soundEnabled['draft'] = clone2), soundEnabled['undoStack']['pop']());
+        throw value9;
       }
     },
-    _0x3f8f52 = async (_0x10d3d6 = {}) => {
-      if (!_0x19323f() || !_0x46fcda['isOpen'] || _0x46fcda['isSmartDetecting']) return ![];
-      const _0x7060c2 = ++_0x46fcda['smartDetectionToken'];
-      ((_0x46fcda['isSmartDetecting'] = !![]), (_0x46fcda['isSmartDetectOpen'] = ![]));
+    beginSmartDetection = async (options3 = {}) => {
+      if (!handler() || !soundEnabled['isOpen'] || soundEnabled['isSmartDetecting']) return ![];
+      const value10 = ++soundEnabled['smartDetectionToken'];
+      ((soundEnabled['isSmartDetecting'] = !![]), (soundEnabled['isSmartDetectOpen'] = ![]));
       try {
-        const _0x34bd00 = await onDetectionRequested(_0x10d3d6);
+        const list2 = await onDetectionRequested(options3);
         if (
-          _0x1de379 ||
-          !_0x46fcda['isOpen'] ||
-          _0x7060c2 !== _0x46fcda['smartDetectionToken'] ||
-          !Array['isArray'](_0x34bd00) ||
-          !_0x34bd00['length']
+          enabled ||
+          !soundEnabled['isOpen'] ||
+          value10 !== soundEnabled['smartDetectionToken'] ||
+          !Array['isArray'](list2) ||
+          !list2['length']
         )
           return ![];
         return (
-          _0x55f0b4(_0x34bd00),
-          (_0x46fcda['playheadSec'] = 0x0),
-          (_0x46fcda['previewShotId'] = _0x34bd00[0x0]?.['shotId'] || ''),
-          (_0x46fcda['selectedShotIds'] = []),
+          commitDraft(list2),
+          (soundEnabled['playheadSec'] = 0x0),
+          (soundEnabled['previewShotId'] = list2[0x0]?.['shotId'] || ''),
+          (soundEnabled['selectedShotIds'] = []),
           !![]
         );
       } finally {
-        !_0x1de379 && _0x7060c2 === _0x46fcda['smartDetectionToken'] && (_0x46fcda['isSmartDetecting'] = ![]);
+        !enabled &&
+          value10 === soundEnabled['smartDetectionToken'] &&
+          (soundEnabled['isSmartDetecting'] = ![]);
       }
     },
-    _0x133897 = () => ({
-      isOpen: _0x46fcda['isOpen'],
-      isOpening: _0x46fcda['isOpening'],
-      motion: _0x46fcda['motion'],
-      draft: clone(_0x46fcda['draft']),
-      initialDraft: clone(_0x46fcda['initialDraft']),
-      canUndo: _0x46fcda['undoStack']['length'] > 0x0,
-      isSubmitting: _0x46fcda['isSubmitting'],
-      isKeyframeCapturing: _0x46fcda['isKeyframeCapturing'],
-      isSmartDetectOpen: _0x46fcda['isSmartDetectOpen'],
-      isSmartDetecting: _0x46fcda['isSmartDetecting'],
-      previewShotId: _0x46fcda['previewShotId'],
-      playheadSec: _0x46fcda['playheadSec'],
-      hoverPreviewActive: _0x46fcda['hoverPreviewActive'],
-      hoverPreviewTimeSec: _0x46fcda['hoverPreviewTimeSec'],
-      timelineZoom: _0x46fcda['timelineZoom'],
-      soundEnabled: _0x46fcda['soundEnabled'],
-      selectedShotIds: [..._0x46fcda['selectedShotIds']],
+    getPresentation = () => ({
+      isOpen: soundEnabled['isOpen'],
+      isOpening: soundEnabled['isOpening'],
+      motion: soundEnabled['motion'],
+      draft: clone(soundEnabled['draft']),
+      initialDraft: clone(soundEnabled['initialDraft']),
+      canUndo: soundEnabled['undoStack']['length'] > 0x0,
+      isSubmitting: soundEnabled['isSubmitting'],
+      isKeyframeCapturing: soundEnabled['isKeyframeCapturing'],
+      isSmartDetectOpen: soundEnabled['isSmartDetectOpen'],
+      isSmartDetecting: soundEnabled['isSmartDetecting'],
+      previewShotId: soundEnabled['previewShotId'],
+      playheadSec: soundEnabled['playheadSec'],
+      hoverPreviewActive: soundEnabled['hoverPreviewActive'],
+      hoverPreviewTimeSec: soundEnabled['hoverPreviewTimeSec'],
+      timelineZoom: soundEnabled['timelineZoom'],
+      soundEnabled: soundEnabled['soundEnabled'],
+      selectedShotIds: [...soundEnabled['selectedShotIds']],
     }),
-    _0x35e168 = (_0x3c248b = {}) => ({
-      cutEditorOpen: _0x46fcda['isOpen'],
-      cutEditorOpening: _0x46fcda['isOpening'],
-      cutEditorMotion: _0x46fcda['motion'],
-      cutEditorDraft: _0x46fcda['draft'],
-      cutEditorSubmitting: _0x46fcda['isSubmitting'],
-      cutEditorKeyframeCapturing: _0x46fcda['isKeyframeCapturing'],
-      cutEditorSmartDetectOpen: _0x46fcda['isSmartDetectOpen'],
-      cutEditorSmartDetecting: _0x46fcda['isSmartDetecting'],
-      cutEditorPreviewShotId: _0x46fcda['previewShotId'],
-      cutEditorPlayheadSec: _0x46fcda['playheadSec'],
-      cutEditorTimelineZoom: _0x46fcda['timelineZoom'],
-      cutEditorSoundEnabled: _0x46fcda['soundEnabled'],
-      cutEditorSelectedShotIds: [..._0x46fcda['selectedShotIds']],
-      cutEditorBufferedMediaRef: _0x46fcda['bufferedVideo'] ? _0x46fcda['bufferedMediaRef'] : '',
-      cutEditorCanUndo: _0x46fcda['undoStack']['length'] > 0x0,
-      ..._0x3c248b,
+    getWorkspacePresentation = (args = {}) => ({
+      cutEditorOpen: soundEnabled['isOpen'],
+      cutEditorOpening: soundEnabled['isOpening'],
+      cutEditorMotion: soundEnabled['motion'],
+      cutEditorDraft: soundEnabled['draft'],
+      cutEditorSubmitting: soundEnabled['isSubmitting'],
+      cutEditorKeyframeCapturing: soundEnabled['isKeyframeCapturing'],
+      cutEditorSmartDetectOpen: soundEnabled['isSmartDetectOpen'],
+      cutEditorSmartDetecting: soundEnabled['isSmartDetecting'],
+      cutEditorPreviewShotId: soundEnabled['previewShotId'],
+      cutEditorPlayheadSec: soundEnabled['playheadSec'],
+      cutEditorTimelineZoom: soundEnabled['timelineZoom'],
+      cutEditorSoundEnabled: soundEnabled['soundEnabled'],
+      cutEditorSelectedShotIds: [...soundEnabled['selectedShotIds']],
+      cutEditorBufferedMediaRef: soundEnabled['bufferedVideo'] ? soundEnabled['bufferedMediaRef'] : '',
+      cutEditorCanUndo: soundEnabled['undoStack']['length'] > 0x0,
+      ...args,
     }),
-    _0xe2dafe = () => {
-      if (_0x1de379) return;
-      (_0x43e633({ releaseBuffer: !![] }), (_0x1de379 = !![]));
+    dispose = () => {
+      if (enabled) return;
+      (handler3({ releaseBuffer: !![] }), (enabled = !![]));
     },
-    _0x21fa84 = (_0x4df50b = {}) => {
-      if (!_0x19323f()) return ![];
-      return ((_0x222f6b = Object['freeze']({ ..._0x4df50b })), !![]);
+    configureActionHandlers = (args2 = {}) => {
+      if (!handler()) return ![];
+      return ((result = Object['freeze']({ ...args2 })), !![]);
     },
-    _0xaedb79 = (_0x3f6cec, _0x83c51d = {}) => {
-      if (!_0x19323f()) return ![];
-      const _0x5ed7d0 = SHOT_CUT_ACTIONS[normalizeId(_0x3f6cec)];
-      if (!_0x5ed7d0) return ![];
-      const _0x535478 = _0x222f6b[_0x5ed7d0];
-      if (typeof _0x535478 === 'function') _0x535478(_0x83c51d);
+    handleAction = (value11, value12 = {}) => {
+      if (!handler()) return ![];
+      const enabled2 = SHOT_CUT_ACTIONS[normalizeId(value11)];
+      if (!enabled2) return ![];
+      const run = result[enabled2];
+      if (typeof run === 'function') run(value12);
       return !![];
     };
   return Object['freeze']({
-    open: _0x134711,
-    close: _0x244132,
-    syncProject: _0x33a3fe,
-    dispose: _0xe2dafe,
-    commitDraft: _0x55f0b4,
-    undo: _0x2ad128,
-    resetDraft: _0x3d9fdb,
-    splitAtPlayhead: _0x170570,
-    mergeSelectedRanges: _0x39e5ac,
-    moveBoundary: _0x348991,
-    toggleReverse: _0x486379,
-    beginSmartDetection: _0x3f8f52,
-    getPresentation: _0x133897,
-    getWorkspacePresentation: _0x35e168,
-    configureActionHandlers: _0x21fa84,
-    handleAction: _0xaedb79,
-    playback: _0xad38a8,
-    stopPlayback: _0x1b0853,
-    workspaceState: _0x46fcda,
-    clearMotionTimer: _0x555a58,
-    stopBoundaryDrag: _0x42295,
-    clearPreviewMetadata: _0x580833,
-    clearBufferedWarmup: _0x1a8364,
-    cancelHoverPreview: _0x2f1613,
-    cancelPreviewFrameWait: _0x426fc4,
-    setOpening(_0x475b0f) {
-      if (_0x19323f()) _0x46fcda['isOpening'] = Boolean(_0x475b0f);
+    open: open,
+    close: close,
+    syncProject: syncProject,
+    dispose: dispose,
+    commitDraft: commitDraft,
+    undo: undo,
+    resetDraft: resetDraft,
+    splitAtPlayhead: splitAtPlayhead,
+    mergeSelectedRanges: mergeSelectedRanges,
+    moveBoundary: moveBoundary,
+    toggleReverse: toggleReverse,
+    beginSmartDetection: beginSmartDetection,
+    getPresentation: getPresentation,
+    getWorkspacePresentation: getWorkspacePresentation,
+    configureActionHandlers: configureActionHandlers,
+    handleAction: handleAction,
+    playback: playback,
+    stopPlayback: stopPlayback2,
+    workspaceState: soundEnabled,
+    clearMotionTimer: clearMotionTimer,
+    stopBoundaryDrag: stopBoundaryDrag,
+    clearPreviewMetadata: clearPreviewMetadata,
+    clearBufferedWarmup: clearBufferedWarmup,
+    cancelHoverPreview: cancelHoverPreview,
+    cancelPreviewFrameWait: cancelPreviewFrameWait,
+    setOpening(value13) {
+      if (handler()) soundEnabled['isOpening'] = Boolean(value13);
     },
-    setMotion(_0x5538bc) {
-      if (_0x19323f()) _0x46fcda['motion'] = normalizeId(_0x5538bc);
+    setMotion(value14) {
+      if (handler()) soundEnabled['motion'] = normalizeId(value14);
     },
-    setSubmitting(_0x5f4e2f) {
-      if (_0x19323f()) _0x46fcda['isSubmitting'] = _0x5f4e2f || ![];
+    setSubmitting(value15) {
+      if (handler()) soundEnabled['isSubmitting'] = value15 || ![];
     },
-    setKeyframeCapturing(_0x7aa4c9) {
-      if (_0x19323f()) _0x46fcda['isKeyframeCapturing'] = Boolean(_0x7aa4c9);
+    setKeyframeCapturing(value16) {
+      if (handler()) soundEnabled['isKeyframeCapturing'] = Boolean(value16);
     },
-    setSmartDetectOpen(_0x1217e6) {
-      if (_0x19323f()) _0x46fcda['isSmartDetectOpen'] = Boolean(_0x1217e6);
+    setSmartDetectOpen(value17) {
+      if (handler()) soundEnabled['isSmartDetectOpen'] = Boolean(value17);
     },
-    setPreviewShotId(_0x4b265e) {
-      if (_0x19323f()) _0x46fcda['previewShotId'] = normalizeId(_0x4b265e);
+    setPreviewShotId(value18) {
+      if (handler()) soundEnabled['previewShotId'] = normalizeId(value18);
     },
-    setPlayheadSec(_0x3864a0) {
-      _0x19323f() && (_0x46fcda['playheadSec'] = clampTimelineSec(_0x46fcda['draft'], _0x3864a0));
+    setPlayheadSec(value19) {
+      handler() && (soundEnabled['playheadSec'] = clampTimelineSec(soundEnabled['draft'], value19));
     },
     setHoverPreview({ active: active = ![], timeSec: timeSec = null } = {}) {
-      if (!_0x19323f()) return;
-      ((_0x46fcda['hoverPreviewActive'] = Boolean(active)),
-        (_0x46fcda['hoverPreviewTimeSec'] =
+      if (!handler()) return;
+      ((soundEnabled['hoverPreviewActive'] = Boolean(active)),
+        (soundEnabled['hoverPreviewTimeSec'] =
           active && Number['isFinite'](Number(timeSec)) ? Number(timeSec) : null));
     },
-    setTimelineZoom(_0x171d09) {
-      _0x19323f() &&
-        (_0x46fcda['timelineZoom'] = Math['max'](0x1, Number(_0x171d09) || DEFAULT_TIMELINE_ZOOM));
+    setTimelineZoom(value20) {
+      handler() &&
+        (soundEnabled['timelineZoom'] = Math['max'](0x1, Number(value20) || DEFAULT_TIMELINE_ZOOM));
     },
-    setSoundEnabled(_0x1e37ba) {
-      if (_0x19323f()) _0x46fcda['soundEnabled'] = Boolean(_0x1e37ba);
+    setSoundEnabled(value21) {
+      if (handler()) soundEnabled['soundEnabled'] = Boolean(value21);
     },
-    setSelectedShotIds(_0x20fb6f = []) {
-      if (!_0x19323f()) return;
-      const _0x573d63 = new Set(
-        _0x46fcda['draft']['map']((_0x57b9eb) => normalizeId(_0x57b9eb?.['shotId']))['filter'](Boolean),
+    setSelectedShotIds(list3 = []) {
+      if (!handler()) return;
+      const map2 = new Set(
+        soundEnabled['draft']['map']((value22) => normalizeId(value22?.['shotId']))['filter'](Boolean),
       );
-      _0x46fcda['selectedShotIds'] = [
+      soundEnabled['selectedShotIds'] = [
         ...new Set(
-          (Array['isArray'](_0x20fb6f) ? _0x20fb6f : [])
+          (Array['isArray'](list3) ? list3 : [])
             ['map'](normalizeId)
-            ['filter']((_0x4f6b32) => _0x573d63['has'](_0x4f6b32)),
+            ['filter']((value23) => map2['has'](value23)),
         ),
       ];
     },
-    attachPreviewBuffer(_0x1b786b, _0xc152e4 = null) {
-      if (!_0x19323f()) return ![];
-      const _0x4f7498 = _0x46fcda['bufferedVideo'] !== _0x1b786b;
-      if (_0x4f7498) _0x1d40c9();
-      _0x46fcda['bufferedVideo'] = _0x1b786b || null;
-      if (typeof _0xc152e4 === 'function') {
-        if (!_0x4f7498) _0x15313?.();
-        _0x15313 = _0xc152e4;
-      } else _0x4f7498 && (_0x15313 = null);
-      return Boolean(_0x46fcda['bufferedVideo']);
+    attachPreviewBuffer(value24, value25 = null) {
+      if (!handler()) return ![];
+      const enabled3 = soundEnabled['bufferedVideo'] !== value24;
+      if (enabled3) releasePreviewBuffer2();
+      soundEnabled['bufferedVideo'] = value24 || null;
+      if (typeof value25 === 'function') {
+        if (!enabled3) value2?.();
+        value2 = value25;
+      } else enabled3 && (value2 = null);
+      return Boolean(soundEnabled['bufferedVideo']);
     },
-    releasePreviewBuffer: _0x1d40c9,
+    releasePreviewBuffer: releasePreviewBuffer2,
   });
 }

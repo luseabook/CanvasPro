@@ -11,13 +11,13 @@ import {
 import { t } from '../i18n/index.js';
 export const INPUT_KIND_ORDER = Object.freeze(['text', 'image', 'video', 'audio']);
 export const INPUT_KIND_LABELS = Object.freeze({ text: '文本', image: '图片', video: '视频', audio: '音频' });
-function modelInputPolicyText(_0x4d3bbf, _0x18f991 = {}) {
-  return t('modelInputPolicy.' + _0x4d3bbf, _0x18f991);
+function modelInputPolicyText(value, item = {}) {
+  return t('modelInputPolicy.' + value, item);
 }
-export function getInputKindLabel(_0x178493) {
-  const _0x359b50 = normalizeInputKind(_0x178493);
-  if (!_0x359b50) return modelInputPolicyText('inputKinds.material');
-  return modelInputPolicyText('inputKinds.' + _0x359b50);
+export function getInputKindLabel(key) {
+  const inputKind = normalizeInputKind(key);
+  if (!inputKind) return modelInputPolicyText('inputKinds.material');
+  return modelInputPolicyText('inputKinds.' + inputKind);
 }
 export const RH_PERSON_REPLACE_V21_MODEL = PERSON_REPLACE_V21_MODEL_ID;
 export const RH_QWEN_IMAGE_EDIT_MODEL = QWEN_IMAGE_EDIT_MODEL_ID;
@@ -40,151 +40,150 @@ const HAPPYHORSE_BODY_RESOLVERS = new Set(['apimartHappyHorseVideo', 'runninghub
     'storyboard',
     'storyboard-script',
   ]);
-function normalizeText(_0x1edf4b) {
-  return String(_0x1edf4b || '').trim();
+function normalizeText(index) {
+  return String(index || '').trim();
 }
-export function isRhPersonReplaceV3Model(_0x2ca372) {
-  return getModelManifest(_0x2ca372)?.modelId === PERSON_REPLACE_V3_MODEL_ID;
+export function isRhPersonReplaceV3Model(result) {
+  return getModelManifest(result)?.modelId === PERSON_REPLACE_V3_MODEL_ID;
 }
-function hasExactPersonReplaceFixedImageSlotCapability(_0x2780a1) {
-  const _0x52eec8 = _0x2780a1?.capabilities?.fixedImageSlots;
+function hasExactPersonReplaceFixedImageSlotCapability(data) {
+  const list = data?.capabilities?.fixedImageSlots;
   return (
-    Array.isArray(_0x52eec8) &&
-    _0x52eec8.length === RH_PERSON_REPLACE_FIXED_IMAGE_SLOTS.length &&
-    _0x52eec8.every((_0x6a9bf4, _0x50ff93) => _0x6a9bf4 === RH_PERSON_REPLACE_FIXED_IMAGE_SLOTS[_0x50ff93])
+    Array.isArray(list) &&
+    list.length === RH_PERSON_REPLACE_FIXED_IMAGE_SLOTS.length &&
+    list.every((item2, options) => item2 === RH_PERSON_REPLACE_FIXED_IMAGE_SLOTS[options])
   );
 }
-function hasPersonReplaceFixedImageInputSlots(_0x142304) {
-  const _0x5c00a5 = _0x142304?.inputSlots?.fixedSlots;
-  if (!Array.isArray(_0x5c00a5)) return false;
-  return RH_PERSON_REPLACE_FIXED_IMAGE_SLOTS.every((_0x254e2c) =>
-    _0x5c00a5.some((_0x370909) => _0x370909?.id === _0x254e2c && _0x370909?.kind === 'image'),
+function hasPersonReplaceFixedImageInputSlots(target) {
+  const list2 = target?.inputSlots?.fixedSlots;
+  if (!Array.isArray(list2)) return false;
+  return RH_PERSON_REPLACE_FIXED_IMAGE_SLOTS.every((item3) =>
+    list2.some((item4) => item4?.id === item3 && item4?.kind === 'image'),
   );
 }
-function isDreaminaManifestOrModel(_0x146855, _0x4ea3b7 = '') {
-  return resolveTargetProvider(_0x146855, _0x4ea3b7) === 'dreamina';
+function isDreaminaManifestOrModel(source, next = '') {
+  return resolveTargetProvider(source, next) === 'dreamina';
 }
-function isHappyHorseVideoModel(_0x1fd337, _0x5be303 = '') {
-  const _0x15fb60 =
-      resolveModelExecution(_0x1fd337, { providerHint: _0x5be303 }) || resolveModelExecution(_0x1fd337),
-    _0x355af8 = normalizeText(_0x15fb60?.executionManifest?.extensions?.bodyResolver);
-  return _0x355af8 && HAPPYHORSE_BODY_RESOLVERS.has(_0x355af8);
+function isHappyHorseVideoModel(current, providerHint = '') {
+  const modelExecution =
+      resolveModelExecution(current, { providerHint: providerHint }) || resolveModelExecution(current),
+    text = normalizeText(modelExecution?.executionManifest?.extensions?.bodyResolver);
+  return text && HAPPYHORSE_BODY_RESOLVERS.has(text);
 }
-function isSeedance2VideoModel(_0x47473, _0xde6f29 = '') {
-  const _0x3f14ef =
-      resolveModelExecution(_0x47473, { providerHint: _0xde6f29 }) || resolveModelExecution(_0x47473),
-    _0x5a9d17 = normalizeText(_0x3f14ef?.executionManifest?.extensions?.bodyResolver);
-  return _0x5a9d17 && SEEDANCE_2_BODY_RESOLVERS.has(_0x5a9d17);
+function isSeedance2VideoModel(entry, providerHint2 = '') {
+  const modelExecution2 =
+      resolveModelExecution(entry, { providerHint: providerHint2 }) || resolveModelExecution(entry),
+    text2 = normalizeText(modelExecution2?.executionManifest?.extensions?.bodyResolver);
+  return text2 && SEEDANCE_2_BODY_RESOLVERS.has(text2);
 }
-function isApimartWan27VideoModel(_0x18ab3b, _0x58165a = '') {
-  const _0x520459 =
-      resolveModelExecution(_0x18ab3b, { providerHint: _0x58165a }) || resolveModelExecution(_0x18ab3b),
-    _0x5d910e = _0x520459?.modelManifest || getModelManifest(_0x18ab3b),
-    _0x384581 = normalizeText(_0x520459?.canonicalModelId || _0x5d910e?.modelId || _0x18ab3b);
-  if (_0x384581 !== APIMART_WAN27_MODEL_ID) return false;
-  const _0x5b08f7 = normalizeProviderId(_0x5d910e?.provider) || resolveTargetProvider(_0x18ab3b, _0x58165a);
-  return !_0x5b08f7 || _0x5b08f7 === 'apimart';
+function isApimartWan27VideoModel(record, providerHint3 = '') {
+  const modelExecution3 =
+      resolveModelExecution(record, { providerHint: providerHint3 }) || resolveModelExecution(record),
+    payload = modelExecution3?.modelManifest || getModelManifest(record),
+    text3 = normalizeText(modelExecution3?.canonicalModelId || payload?.modelId || record);
+  if (text3 !== APIMART_WAN27_MODEL_ID) return false;
+  const providerId = normalizeProviderId(payload?.provider) || resolveTargetProvider(record, providerHint3);
+  return !providerId || providerId === 'apimart';
 }
-function isApimartKlingV3OmniVideoModel(_0x5ce851, _0x4ee3e2 = '') {
-  const _0x36e5da =
-      resolveModelExecution(_0x5ce851, { providerHint: _0x4ee3e2 }) || resolveModelExecution(_0x5ce851),
-    _0x410218 = _0x36e5da?.modelManifest || getModelManifest(_0x5ce851),
-    _0x3935a7 = normalizeText(_0x36e5da?.canonicalModelId || _0x410218?.modelId || _0x5ce851);
-  if (_0x3935a7 !== APIMART_KLING_V3_OMNI_MODEL_ID) return false;
-  const _0x5c3187 = normalizeProviderId(_0x410218?.provider) || resolveTargetProvider(_0x5ce851, _0x4ee3e2);
-  return !_0x5c3187 || _0x5c3187 === 'apimart';
+function isApimartKlingV3OmniVideoModel(handle, providerHint4 = '') {
+  const modelExecution4 =
+      resolveModelExecution(handle, { providerHint: providerHint4 }) || resolveModelExecution(handle),
+    state = modelExecution4?.modelManifest || getModelManifest(handle),
+    text4 = normalizeText(modelExecution4?.canonicalModelId || state?.modelId || handle);
+  if (text4 !== APIMART_KLING_V3_OMNI_MODEL_ID) return false;
+  const providerId2 = normalizeProviderId(state?.provider) || resolveTargetProvider(handle, providerHint4);
+  return !providerId2 || providerId2 === 'apimart';
 }
-function isApimartViduQ3VideoModel(_0x57daae, _0x549427 = '') {
-  const _0x5a1103 =
-      resolveModelExecution(_0x57daae, { providerHint: _0x549427 }) || resolveModelExecution(_0x57daae),
-    _0x32cdc1 = _0x5a1103?.modelManifest || getModelManifest(_0x57daae),
-    _0x54e4bc = normalizeText(_0x5a1103?.canonicalModelId || _0x32cdc1?.modelId || _0x57daae);
-  if (_0x54e4bc !== APIMART_VIDU_Q3_MODEL_ID) return false;
-  const _0x532930 = normalizeProviderId(_0x32cdc1?.provider) || resolveTargetProvider(_0x57daae, _0x549427);
-  return !_0x532930 || _0x532930 === 'apimart';
+function isApimartViduQ3VideoModel(config, providerHint5 = '') {
+  const modelExecution5 =
+      resolveModelExecution(config, { providerHint: providerHint5 }) || resolveModelExecution(config),
+    scope = modelExecution5?.modelManifest || getModelManifest(config),
+    text5 = normalizeText(modelExecution5?.canonicalModelId || scope?.modelId || config);
+  if (text5 !== APIMART_VIDU_Q3_MODEL_ID) return false;
+  const providerId3 = normalizeProviderId(scope?.provider) || resolveTargetProvider(config, providerHint5);
+  return !providerId3 || providerId3 === 'apimart';
 }
-function resolveTargetProvider(_0xe6da2, _0x258b1b = '') {
-  const _0x1df24a = normalizeProviderId(_0x258b1b);
-  if (_0x1df24a) return _0x1df24a;
+function resolveTargetProvider(input, output = '') {
+  const providerId4 = normalizeProviderId(output);
+  if (providerId4) return providerId4;
   return (
-    resolveModelProvider(_0xe6da2, '', { allowProviderHint: false, allowPrefixInference: false }) ||
-    normalizeProviderId(getModelManifest(_0xe6da2)?.provider)
+    resolveModelProvider(input, '', { allowProviderHint: false, allowPrefixInference: false }) ||
+    normalizeProviderId(getModelManifest(input)?.provider)
   );
 }
-export function isRhPersonReplaceWorkflowModel(_0x181cf1) {
-  const _0x15720 = getModelManifest(_0x181cf1);
+export function isRhPersonReplaceWorkflowModel(value2) {
+  const modelManifest = getModelManifest(value2);
   return (
-    _0x15720?.kind === 'image' &&
-    hasExactPersonReplaceFixedImageSlotCapability(_0x15720) &&
-    hasPersonReplaceFixedImageInputSlots(_0x15720)
+    modelManifest?.kind === 'image' &&
+    hasExactPersonReplaceFixedImageSlotCapability(modelManifest) &&
+    hasPersonReplaceFixedImageInputSlots(modelManifest)
   );
 }
-export function isRhQwenImageEditModel(_0x1c2757) {
-  return normalizeText(_0x1c2757) === RH_QWEN_IMAGE_EDIT_MODEL;
+export function isRhQwenImageEditModel(value3) {
+  return normalizeText(value3) === RH_QWEN_IMAGE_EDIT_MODEL;
 }
 const VIDEO_PATH_RE = /\.(?:mp4|mov|m4v|webm|mkv|avi|mpeg|mpg|3gp)(?:[?#].*)?$/i,
   AUDIO_PATH_RE = /\.(?:mp3|wav|m4a|aac|flac|ogg|opus|wma)(?:[?#].*)?$/i,
   IMAGE_PATH_RE = /\.(?:png|jpe?g|webp|gif|bmp|tiff?|avif)(?:[?#].*)?$/i;
-export function normalizeInputKind(_0x23f852) {
-  const _0x2c95e0 =
-    _0x23f852 && typeof _0x23f852 === 'object' ? normalizeText(_0x23f852.type) : normalizeText(_0x23f852);
-  if (!_0x2c95e0) return '';
-  if (_0x2c95e0 === 'text' || _0x2c95e0 === 'source-text' || _0x2c95e0 === 'ai-text') return 'text';
-  if (_0x2c95e0 === 'image' || _0x2c95e0 === 'source-image' || _0x2c95e0 === 'ai-image') return 'image';
-  if (_0x2c95e0 === 'video' || _0x2c95e0 === 'source-video' || _0x2c95e0 === 'ai-video') return 'video';
-  if (_0x2c95e0 === 'audio' || _0x2c95e0 === 'source-audio' || _0x2c95e0 === 'ai-audio') return 'audio';
-  if (_0x2c95e0.includes('text')) return 'text';
-  if (_0x2c95e0.includes('video')) return 'video';
-  if (_0x2c95e0.includes('audio')) return 'audio';
-  if (_0x2c95e0.includes('image')) return 'image';
+export function normalizeInputKind(value4) {
+  const list3 = value4 && typeof value4 === 'object' ? normalizeText(value4.type) : normalizeText(value4);
+  if (!list3) return '';
+  if (list3 === 'text' || list3 === 'source-text' || list3 === 'ai-text') return 'text';
+  if (list3 === 'image' || list3 === 'source-image' || list3 === 'ai-image') return 'image';
+  if (list3 === 'video' || list3 === 'source-video' || list3 === 'ai-video') return 'video';
+  if (list3 === 'audio' || list3 === 'source-audio' || list3 === 'ai-audio') return 'audio';
+  if (list3.includes('text')) return 'text';
+  if (list3.includes('video')) return 'video';
+  if (list3.includes('audio')) return 'audio';
+  if (list3.includes('image')) return 'image';
   return '';
 }
-function normalizeExplicitMediaKind(_0x42293b) {
-  const _0x101755 = normalizeText(_0x42293b).toLowerCase();
-  if (!_0x101755) return '';
-  if (_0x101755 === 'text' || _0x101755 === 'source-text' || _0x101755 === 'ai-text') return 'text';
+function normalizeExplicitMediaKind(value5) {
+  const text6 = normalizeText(value5).toLowerCase();
+  if (!text6) return '';
+  if (text6 === 'text' || text6 === 'source-text' || text6 === 'ai-text') return 'text';
   if (
-    _0x101755 === 'image' ||
-    _0x101755 === 'source-image' ||
-    _0x101755 === 'ai-image' ||
-    _0x101755 === 'asset-image' ||
-    _0x101755.startsWith('image/')
+    text6 === 'image' ||
+    text6 === 'source-image' ||
+    text6 === 'ai-image' ||
+    text6 === 'asset-image' ||
+    text6.startsWith('image/')
   )
     return 'image';
   if (
-    _0x101755 === 'video' ||
-    _0x101755 === 'source-video' ||
-    _0x101755 === 'ai-video' ||
-    _0x101755 === 'asset-video' ||
-    _0x101755.startsWith('video/')
+    text6 === 'video' ||
+    text6 === 'source-video' ||
+    text6 === 'ai-video' ||
+    text6 === 'asset-video' ||
+    text6.startsWith('video/')
   )
     return 'video';
   if (
-    _0x101755 === 'audio' ||
-    _0x101755 === 'source-audio' ||
-    _0x101755 === 'ai-audio' ||
-    _0x101755 === 'asset-audio' ||
-    _0x101755.startsWith('audio/')
+    text6 === 'audio' ||
+    text6 === 'source-audio' ||
+    text6 === 'ai-audio' ||
+    text6 === 'asset-audio' ||
+    text6.startsWith('audio/')
   )
     return 'audio';
   return '';
 }
-function hasPathLikeValue(_0x954199, _0x319eba, _0x2548d6) {
-  if (!_0x954199 || typeof _0x954199 !== 'object') return false;
-  return _0x319eba.some((_0x123a0b) => _0x2548d6(normalizeText(_0x954199?.[_0x123a0b])));
+function hasPathLikeValue(enabled, list4, handler) {
+  if (!enabled || typeof enabled !== 'object') return false;
+  return list4.some((item5) => handler(normalizeText(enabled?.[item5])));
 }
-function isVideoPath(_0x29f6aa) {
-  return VIDEO_PATH_RE.test(normalizeText(_0x29f6aa));
+function isVideoPath(value6) {
+  return VIDEO_PATH_RE.test(normalizeText(value6));
 }
-function isAudioPath(_0x31d2df) {
-  return AUDIO_PATH_RE.test(normalizeText(_0x31d2df));
+function isAudioPath(value7) {
+  return AUDIO_PATH_RE.test(normalizeText(value7));
 }
-function isImagePath(_0x47c737) {
-  return IMAGE_PATH_RE.test(normalizeText(_0x47c737));
+function isImagePath(value8) {
+  return IMAGE_PATH_RE.test(normalizeText(value8));
 }
-function hasExplicitKind(_0x3f8f7d, _0x38434e) {
-  if (!_0x3f8f7d || typeof _0x3f8f7d !== 'object') return false;
-  const _0x1d753c = [
+function hasExplicitKind(enabled2, value9) {
+  if (!enabled2 || typeof enabled2 !== 'object') return false;
+  const list5 = [
     'kind',
     'mediaKind',
     'mediaTaskKind',
@@ -194,17 +193,16 @@ function hasExplicitKind(_0x3f8f7d, _0x38434e) {
     'mediaType',
     'mimeType',
   ];
-  return _0x1d753c.some((_0x53048) => normalizeExplicitMediaKind(_0x3f8f7d?.[_0x53048]) === _0x38434e);
+  return list5.some((item6) => normalizeExplicitMediaKind(enabled2?.[item6]) === value9);
 }
-function hasVideoEvidence(_0x2ff5f3 = {}, _0x3e6cd1 = null) {
-  if (!_0x2ff5f3 || typeof _0x2ff5f3 !== 'object') return false;
-  if (hasExplicitKind(_0x2ff5f3, 'video')) return true;
-  const _0x3ec90b = Array.isArray(_0x2ff5f3.videos) ? _0x2ff5f3.videos : [];
-  if (_0x3ec90b.some((_0x4c6834) => getVideoSourceKey(_0x4c6834) || hasExplicitKind(_0x4c6834, 'video')))
-    return true;
+function hasVideoEvidence(enabled3 = {}, value10 = null) {
+  if (!enabled3 || typeof enabled3 !== 'object') return false;
+  if (hasExplicitKind(enabled3, 'video')) return true;
+  const list6 = Array.isArray(enabled3.videos) ? enabled3.videos : [];
+  if (list6.some((item7) => getVideoSourceKey(item7) || hasExplicitKind(item7, 'video'))) return true;
   if (
     hasPathLikeValue(
-      _0x2ff5f3,
+      enabled3,
       [
         'videoUrl',
         'videoLocalPath',
@@ -221,15 +219,15 @@ function hasVideoEvidence(_0x2ff5f3 = {}, _0x3e6cd1 = null) {
     )
   )
     return true;
-  return hasPathLikeValue(_0x3e6cd1, ['sourceMediaKey', 'videoUrl', 'localPath'], isVideoPath);
+  return hasPathLikeValue(value10, ['sourceMediaKey', 'videoUrl', 'localPath'], isVideoPath);
 }
-function hasAudioEvidence(_0x3f6d65 = {}, _0x1964e2 = null) {
-  if (!_0x3f6d65 || typeof _0x3f6d65 !== 'object') return false;
-  if (hasExplicitKind(_0x3f6d65, 'audio')) return true;
-  if (Array.isArray(_0x3f6d65.audios) && _0x3f6d65.audios.length > 0) return true;
+function hasAudioEvidence(enabled4 = {}, value11 = null) {
+  if (!enabled4 || typeof enabled4 !== 'object') return false;
+  if (hasExplicitKind(enabled4, 'audio')) return true;
+  if (Array.isArray(enabled4.audios) && enabled4.audios.length > 0) return true;
   if (
     hasPathLikeValue(
-      _0x3f6d65,
+      enabled4,
       [
         'audioUrl',
         'audioLocalPath',
@@ -245,16 +243,16 @@ function hasAudioEvidence(_0x3f6d65 = {}, _0x1964e2 = null) {
     )
   )
     return true;
-  return hasPathLikeValue(_0x1964e2, ['sourceMediaKey', 'audioUrl', 'localPath'], isAudioPath);
+  return hasPathLikeValue(value11, ['sourceMediaKey', 'audioUrl', 'localPath'], isAudioPath);
 }
-function hasImageEvidence(_0x59d65a = {}, _0x4ed2bb = null) {
-  if (!_0x59d65a || typeof _0x59d65a !== 'object') return false;
-  if (hasExplicitKind(_0x59d65a, 'image')) return true;
-  if (Array.isArray(_0x59d65a.images) && _0x59d65a.images.length > 0) return true;
-  if (_0x59d65a.thumbId || _0x59d65a.thumbUrl || _0x59d65a.imageUrl || _0x59d65a.posterLocalPath) return true;
+function hasImageEvidence(enabled5 = {}, value12 = null) {
+  if (!enabled5 || typeof enabled5 !== 'object') return false;
+  if (hasExplicitKind(enabled5, 'image')) return true;
+  if (Array.isArray(enabled5.images) && enabled5.images.length > 0) return true;
+  if (enabled5.thumbId || enabled5.thumbUrl || enabled5.imageUrl || enabled5.posterLocalPath) return true;
   if (
     hasPathLikeValue(
-      _0x59d65a,
+      enabled5,
       [
         'imageUrl',
         'localPath',
@@ -269,344 +267,343 @@ function hasImageEvidence(_0x59d65a = {}, _0x4ed2bb = null) {
     )
   )
     return true;
-  return hasPathLikeValue(_0x4ed2bb, ['sourceMediaKey', 'imageUrl', 'localPath'], isImagePath);
+  return hasPathLikeValue(value12, ['sourceMediaKey', 'imageUrl', 'localPath'], isImagePath);
 }
-export function resolveEffectiveInputKind(_0x15bbb1, _0x4ced6 = null) {
-  if (!_0x15bbb1 || typeof _0x15bbb1 !== 'object') return normalizeInputKind(_0x15bbb1);
-  const _0x58185d = normalizeInputKind(_0x15bbb1);
-  if (hasVideoEvidence(_0x15bbb1, _0x4ced6)) return 'video';
-  if (hasAudioEvidence(_0x15bbb1, _0x4ced6)) return 'audio';
-  if (_0x58185d) return _0x58185d;
-  if (hasImageEvidence(_0x15bbb1, _0x4ced6)) return 'image';
+export function resolveEffectiveInputKind(enabled6, value13 = null) {
+  if (!enabled6 || typeof enabled6 !== 'object') return normalizeInputKind(enabled6);
+  const inputKind2 = normalizeInputKind(enabled6);
+  if (hasVideoEvidence(enabled6, value13)) return 'video';
+  if (hasAudioEvidence(enabled6, value13)) return 'audio';
+  if (inputKind2) return inputKind2;
+  if (hasImageEvidence(enabled6, value13)) return 'image';
   return '';
 }
-function makePolicy(_0x3f68c5, _0x54605a = {}) {
-  const _0x37fa45 = new Set(
-    ['text', ...(Array.isArray(_0x3f68c5) ? _0x3f68c5 : [])]
-      .map((_0x10d27a) => normalizeInputKind(_0x10d27a))
+function makePolicy(value14, args = {}) {
+  const map = new Set(
+    ['text', ...(Array.isArray(value14) ? value14 : [])]
+      .map((item8) => normalizeInputKind(item8))
       .filter(Boolean),
   );
   return {
-    allowedKinds: INPUT_KIND_ORDER.filter((_0x28c476) => _0x37fa45.has(_0x28c476)),
-    maxByKind: { ..._0x54605a },
+    allowedKinds: INPUT_KIND_ORDER.filter((item9) => map.has(item9)),
+    maxByKind: { ...args },
   };
 }
-function normalizePolicyCompareValue(_0x44ca62) {
-  return String(_0x44ca62 ?? '')
+function normalizePolicyCompareValue(value15) {
+  return String(value15 ?? '')
     .trim()
     .toLowerCase();
 }
-function manifestPolicyConditionMatches(_0x147704, _0x2a5a5c = {}) {
-  if (Array.isArray(_0x147704))
-    return _0x147704.some((_0x54d8f7) => manifestPolicyConditionMatches(_0x54d8f7, _0x2a5a5c));
-  if (!_0x147704 || typeof _0x147704 !== 'object') return false;
-  if (Array.isArray(_0x147704.any))
-    return _0x147704.any.some((_0x30b5a4) => manifestPolicyConditionMatches(_0x30b5a4, _0x2a5a5c));
-  if (Array.isArray(_0x147704.all))
-    return _0x147704.all.every((_0x149cec) => manifestPolicyConditionMatches(_0x149cec, _0x2a5a5c));
-  const _0x2f269f = normalizeText(_0x147704.field ?? _0x147704.param);
-  if (!_0x2f269f) return false;
-  const _0x12e9b8 = _0x147704.values !== undefined ? _0x147704.values : _0x147704.value,
-    _0x5435d4 = (Array.isArray(_0x12e9b8) ? _0x12e9b8 : [_0x12e9b8]).map(normalizePolicyCompareValue),
-    _0x5cd3e8 = _0x5435d4.includes(normalizePolicyCompareValue(_0x2a5a5c?.[_0x2f269f]));
-  return _0x147704.not === true ? !_0x5cd3e8 : _0x5cd3e8;
+function manifestPolicyConditionMatches(el, value16 = {}) {
+  if (Array.isArray(el)) return el.some((item10) => manifestPolicyConditionMatches(item10, value16));
+  if (!el || typeof el !== 'object') return false;
+  if (Array.isArray(el.any)) return el.any.some((item11) => manifestPolicyConditionMatches(item11, value16));
+  if (Array.isArray(el.all)) return el.all.every((item12) => manifestPolicyConditionMatches(item12, value16));
+  const text7 = normalizeText(el.field ?? el.param);
+  if (!text7) return false;
+  const value17 = el.values !== undefined ? el.values : el.value,
+    list7 = (Array.isArray(value17) ? value17 : [value17]).map(normalizePolicyCompareValue),
+    enabled7 = list7.includes(normalizePolicyCompareValue(value16?.[text7]));
+  return el.not === true ? !enabled7 : enabled7;
 }
-export function getActiveManifestInputPolicyVariant(_0x50aaa8, _0x57ef12 = {}) {
-  const _0x110494 = Array.isArray(_0x50aaa8?.policyVariants) ? _0x50aaa8.policyVariants : [];
-  if (_0x110494.length === 0) return null;
-  const _0x10e812 =
-      _0x57ef12?.generationParams &&
-      typeof _0x57ef12.generationParams === 'object' &&
-      !Array.isArray(_0x57ef12.generationParams)
-        ? _0x57ef12.generationParams
+export function getActiveManifestInputPolicyVariant(value18, args2 = {}) {
+  const list8 = Array.isArray(value18?.policyVariants) ? value18.policyVariants : [];
+  if (list8.length === 0) return null;
+  const args3 =
+      args2?.generationParams &&
+      typeof args2.generationParams === 'object' &&
+      !Array.isArray(args2.generationParams)
+        ? args2.generationParams
         : {},
-    _0x222265 = { ..._0x57ef12, ..._0x10e812 };
-  return _0x110494.find((_0x1fbd54) => manifestPolicyConditionMatches(_0x1fbd54?.when, _0x222265)) || null;
+    value19 = { ...args2, ...args3 };
+  return list8.find((item13) => manifestPolicyConditionMatches(item13?.when, value19)) || null;
 }
-function makeManifestInputPolicy(_0x3c9671, _0x10c6a8 = {}) {
-  if (!_0x3c9671 || typeof _0x3c9671 !== 'object') return null;
-  const _0x507ccf = getActiveManifestInputPolicyVariant(_0x3c9671, _0x10c6a8),
-    _0xab5035 = Array.isArray(_0x507ccf?.allowedKinds)
-      ? _0x507ccf.allowedKinds
-      : Array.isArray(_0x3c9671.allowedKinds)
-        ? _0x3c9671.allowedKinds
+function makeManifestInputPolicy(enabled8, value20 = {}) {
+  if (!enabled8 || typeof enabled8 !== 'object') return null;
+  const activeManifestInputPolicyVariant = getActiveManifestInputPolicyVariant(enabled8, value20),
+    list9 = Array.isArray(activeManifestInputPolicyVariant?.allowedKinds)
+      ? activeManifestInputPolicyVariant.allowedKinds
+      : Array.isArray(enabled8.allowedKinds)
+        ? enabled8.allowedKinds
         : [];
   return {
-    allowedKinds: INPUT_KIND_ORDER.filter((_0x240ba6) => _0xab5035.includes(_0x240ba6)),
-    maxByKind: { ...(_0x3c9671.maxByKind || {}), ...(_0x507ccf?.maxByKind || {}) },
+    allowedKinds: INPUT_KIND_ORDER.filter((item14) => list9.includes(item14)),
+    maxByKind: { ...(enabled8.maxByKind || {}), ...(activeManifestInputPolicyVariant?.maxByKind || {}) },
   };
 }
-export function manifestInputPolicyReferencesField(_0x287764, _0x1c853e) {
-  const _0x598dd7 = normalizeText(_0x1c853e);
-  if (!_0x598dd7) return false;
-  const _0x27b5a3 = (_0x33389a) => {
-    if (Array.isArray(_0x33389a)) return _0x33389a.some(_0x27b5a3);
-    if (!_0x33389a || typeof _0x33389a !== 'object') return false;
-    if (Array.isArray(_0x33389a.any) && _0x33389a.any.some(_0x27b5a3)) return true;
-    if (Array.isArray(_0x33389a.all) && _0x33389a.all.some(_0x27b5a3)) return true;
-    return normalizeText(_0x33389a.field ?? _0x33389a.param) === _0x598dd7;
+export function manifestInputPolicyReferencesField(value21, value22) {
+  const text8 = normalizeText(value22);
+  if (!text8) return false;
+  const run = (list10) => {
+    if (Array.isArray(list10)) return list10.some(run);
+    if (!list10 || typeof list10 !== 'object') return false;
+    if (Array.isArray(list10.any) && list10.any.some(run)) return true;
+    if (Array.isArray(list10.all) && list10.all.some(run)) return true;
+    return normalizeText(list10.field ?? list10.param) === text8;
   };
-  return (Array.isArray(_0x287764?.policyVariants) ? _0x287764.policyVariants : []).some((_0x1f3292) =>
-    _0x27b5a3(_0x1f3292?.when),
+  return (Array.isArray(value21?.policyVariants) ? value21.policyVariants : []).some((item15) =>
+    run(item15?.when),
   );
 }
-function makeDreaminaStyleVideoPolicy(_0x150ca4) {
-  const _0x46af14 =
-      _0x150ca4?.generationParams && typeof _0x150ca4.generationParams === 'object'
-        ? _0x150ca4.generationParams
+function makeDreaminaStyleVideoPolicy(value23) {
+  const value24 =
+      value23?.generationParams && typeof value23.generationParams === 'object'
+        ? value23.generationParams
         : {},
-    _0x2d3631 = normalizeDreaminaVideoRouteMode(
-      _0x46af14.dreaminaRouteMode ?? _0x150ca4?.dreaminaRouteMode,
-      _0x150ca4?.mode,
+    dreaminaVideoRouteMode = normalizeDreaminaVideoRouteMode(
+      value24.dreaminaRouteMode ?? value23?.dreaminaRouteMode,
+      value23?.mode,
     );
-  if (_0x2d3631 === 'frames2video') return makePolicy(['text', 'image'], { image: 2, video: 0, audio: 0 });
-  if (_0x2d3631 === 'multiframe2video')
+  if (dreaminaVideoRouteMode === 'frames2video')
+    return makePolicy(['text', 'image'], { image: 2, video: 0, audio: 0 });
+  if (dreaminaVideoRouteMode === 'multiframe2video')
     return makePolicy(['text', 'image'], { image: 20, video: 0, audio: 0 });
   return makePolicy(['text', 'image', 'video', 'audio'], { image: 9, video: 3, audio: 3 });
 }
-function normalizeHappyHorseVideoMode(_0x42adc7) {
-  const _0x53bcdb = normalizeText(_0x42adc7).toLowerCase();
-  return _0x53bcdb === 'image' || _0x53bcdb === 'reference' || _0x53bcdb === 'edit' ? _0x53bcdb : 'auto';
+function normalizeHappyHorseVideoMode(value25) {
+  const text9 = normalizeText(value25).toLowerCase();
+  return text9 === 'image' || text9 === 'reference' || text9 === 'edit' ? text9 : 'auto';
 }
-function getHappyHorseVideoMode(_0x5ae57c = {}) {
-  const _0x259683 =
-    _0x5ae57c?.generationParams && typeof _0x5ae57c.generationParams === 'object'
-      ? _0x5ae57c.generationParams
+function getHappyHorseVideoMode(options2 = {}) {
+  const value26 =
+    options2?.generationParams && typeof options2.generationParams === 'object'
+      ? options2.generationParams
       : {};
-  return normalizeHappyHorseVideoMode(_0x259683.happyhorse_mode ?? _0x5ae57c?.happyhorse_mode);
+  return normalizeHappyHorseVideoMode(value26.happyhorse_mode ?? options2?.happyhorse_mode);
 }
-function makeHappyHorseVideoPolicy(_0x14d6e4) {
-  const _0x3793fb = getHappyHorseVideoMode(_0x14d6e4);
-  if (_0x3793fb === 'image') return makePolicy(['text', 'image'], { image: 1, video: 0, audio: 0 });
-  if (_0x3793fb === 'reference') return makePolicy(['text', 'image'], { image: 9, video: 0, audio: 0 });
-  if (_0x3793fb === 'edit') return makePolicy(['text', 'image', 'video'], { image: 5, video: 1, audio: 0 });
+function makeHappyHorseVideoPolicy(value27) {
+  const happyHorseVideoMode = getHappyHorseVideoMode(value27);
+  if (happyHorseVideoMode === 'image') return makePolicy(['text', 'image'], { image: 1, video: 0, audio: 0 });
+  if (happyHorseVideoMode === 'reference')
+    return makePolicy(['text', 'image'], { image: 9, video: 0, audio: 0 });
+  if (happyHorseVideoMode === 'edit')
+    return makePolicy(['text', 'image', 'video'], { image: 5, video: 1, audio: 0 });
   return makePolicy(['text'], { image: 0, video: 0, audio: 0 });
 }
-function normalizeSeedance2VideoMode(_0x36947a, _0x7f5559 = 'text2video') {
-  const _0x16ad64 = normalizeText(_0x36947a).toLowerCase();
-  if (_0x16ad64 === 'multimodal2video' || _0x16ad64 === 'reference') return 'multimodal2video';
-  if (_0x16ad64 === 'frames2video' || _0x16ad64 === 'frames') return 'frames2video';
-  if (_0x16ad64 === 'image2video' || _0x16ad64 === 'image' || _0x16ad64 === 'frame') return 'image2video';
-  if (_0x16ad64 === 'text2video' || _0x16ad64 === 'text') return 'text2video';
-  return _0x7f5559 === 'multimodal2video' ? 'multimodal2video' : 'text2video';
+function normalizeSeedance2VideoMode(value28, value29 = 'text2video') {
+  const text10 = normalizeText(value28).toLowerCase();
+  if (text10 === 'multimodal2video' || text10 === 'reference') return 'multimodal2video';
+  if (text10 === 'frames2video' || text10 === 'frames') return 'frames2video';
+  if (text10 === 'image2video' || text10 === 'image' || text10 === 'frame') return 'image2video';
+  if (text10 === 'text2video' || text10 === 'text') return 'text2video';
+  return value29 === 'multimodal2video' ? 'multimodal2video' : 'text2video';
 }
-function getSeedance2VideoMode(_0x26b282 = {}) {
-  const _0x126c94 =
-      _0x26b282?.generationParams && typeof _0x26b282.generationParams === 'object'
-        ? _0x26b282.generationParams
+function getSeedance2VideoMode(options3 = {}) {
+  const value30 =
+      options3?.generationParams && typeof options3.generationParams === 'object'
+        ? options3.generationParams
         : {},
-    _0x388e52 = normalizeText(_0x26b282?.provider).toLowerCase(),
-    _0x2dfbbd = normalizeText(_0x26b282?.model).toLowerCase(),
-    _0xb3a77a = _0x388e52 === 'volcengine' || _0x2dfbbd.startsWith('volcengine/');
+    text11 = normalizeText(options3?.provider).toLowerCase(),
+    text12 = normalizeText(options3?.model).toLowerCase(),
+    value31 = text11 === 'volcengine' || text12.startsWith('volcengine/');
   return normalizeSeedance2VideoMode(
-    _0x126c94.rh_seedance_2_mode ??
-      _0x126c94.volcengine_seedance_2_mode ??
-      _0x26b282?.rh_seedance_2_mode ??
-      _0x26b282?.volcengine_seedance_2_mode,
-    _0xb3a77a ? 'multimodal2video' : 'text2video',
+    value30.rh_seedance_2_mode ??
+      value30.volcengine_seedance_2_mode ??
+      options3?.rh_seedance_2_mode ??
+      options3?.volcengine_seedance_2_mode,
+    value31 ? 'multimodal2video' : 'text2video',
   );
 }
-function makeSeedance2VideoPolicy(_0x4aebab) {
-  const _0x2ecea9 = getSeedance2VideoMode(_0x4aebab);
-  if (_0x2ecea9 === 'multimodal2video') {
-    const _0x5b06da = _0x4aebab?.model,
-      _0x355127 = _0x4aebab?.provider,
-      _0xa1f974 =
-        resolveModelExecution(_0x5b06da, { providerHint: _0x355127 }) || resolveModelExecution(_0x5b06da),
-      _0x3dabea = _0xa1f974?.modelManifest || getModelManifest(_0x5b06da),
-      _0x35c6af = makeManifestInputPolicy(_0x3dabea?.inputSlots, _0x4aebab);
+function makeSeedance2VideoPolicy(value32) {
+  const seedance2VideoMode = getSeedance2VideoMode(value32);
+  if (seedance2VideoMode === 'multimodal2video') {
+    const value33 = value32?.model,
+      providerHint6 = value32?.provider,
+      modelExecution6 =
+        resolveModelExecution(value33, { providerHint: providerHint6 }) || resolveModelExecution(value33),
+      value34 = modelExecution6?.modelManifest || getModelManifest(value33),
+      image = makeManifestInputPolicy(value34?.inputSlots, value32);
     return makePolicy(['text', 'image', 'video', 'audio'], {
-      image: _0x35c6af?.maxByKind?.image ?? 9,
-      video: _0x35c6af?.maxByKind?.video ?? 3,
-      audio: _0x35c6af?.maxByKind?.audio ?? 3,
+      image: image?.maxByKind?.image ?? 9,
+      video: image?.maxByKind?.video ?? 3,
+      audio: image?.maxByKind?.audio ?? 3,
     });
   }
-  if (_0x2ecea9 === 'frames2video') return makePolicy(['text', 'image'], { image: 2, video: 0, audio: 0 });
-  if (_0x2ecea9 === 'image2video') return makePolicy(['text', 'image'], { image: 1, video: 0, audio: 0 });
+  if (seedance2VideoMode === 'frames2video')
+    return makePolicy(['text', 'image'], { image: 2, video: 0, audio: 0 });
+  if (seedance2VideoMode === 'image2video')
+    return makePolicy(['text', 'image'], { image: 1, video: 0, audio: 0 });
   return makePolicy(['text'], { image: 0, video: 0, audio: 0 });
 }
-function normalizeWan27VideoMode(_0x36b7f6) {
-  const _0x34485a = normalizeText(_0x36b7f6).toLowerCase();
-  return _0x34485a === 'video' || _0x34485a === 'reference' || _0x34485a === 'edit' ? _0x34485a : 'image';
+function normalizeWan27VideoMode(value35) {
+  const text13 = normalizeText(value35).toLowerCase();
+  return text13 === 'video' || text13 === 'reference' || text13 === 'edit' ? text13 : 'image';
 }
-function getWan27VideoMode(_0x397295 = {}) {
-  const _0x2b7f64 =
-    _0x397295?.generationParams && typeof _0x397295.generationParams === 'object'
-      ? _0x397295.generationParams
+function getWan27VideoMode(options4 = {}) {
+  const value36 =
+    options4?.generationParams && typeof options4.generationParams === 'object'
+      ? options4.generationParams
       : {};
-  return normalizeWan27VideoMode(_0x2b7f64.wan27_mode ?? _0x397295?.wan27_mode);
+  return normalizeWan27VideoMode(value36.wan27_mode ?? options4?.wan27_mode);
 }
-function makeWan27VideoPolicy(_0x29a6a3) {
-  const _0x2038c8 = getWan27VideoMode(_0x29a6a3);
-  if (_0x2038c8 === 'video') return makePolicy(['text', 'video'], { image: 0, video: 1, audio: 0 });
-  if (_0x2038c8 === 'reference')
+function makeWan27VideoPolicy(value37) {
+  const wan27VideoMode = getWan27VideoMode(value37);
+  if (wan27VideoMode === 'video') return makePolicy(['text', 'video'], { image: 0, video: 1, audio: 0 });
+  if (wan27VideoMode === 'reference')
     return makePolicy(['text', 'image', 'video', 'audio'], { image: 1, video: 1, audio: 1 });
-  if (_0x2038c8 === 'edit') return makePolicy(['text', 'video'], { image: 0, video: 2, audio: 0 });
+  if (wan27VideoMode === 'edit') return makePolicy(['text', 'video'], { image: 0, video: 2, audio: 0 });
   return makePolicy(['text', 'image', 'audio'], { image: 2, video: 0, audio: 1 });
 }
-function normalizeKlingV3OmniVideoMode(_0x3fb7d6) {
-  const _0x27f269 = normalizeText(_0x3fb7d6).toLowerCase();
-  return _0x27f269 === 'reference' || _0x27f269 === 'edit' ? _0x27f269 : 'image';
+function normalizeKlingV3OmniVideoMode(value38) {
+  const text14 = normalizeText(value38).toLowerCase();
+  return text14 === 'reference' || text14 === 'edit' ? text14 : 'image';
 }
-function getKlingV3OmniVideoMode(_0x4317fe = {}) {
-  const _0x4c65a2 =
-    _0x4317fe?.generationParams && typeof _0x4317fe.generationParams === 'object'
-      ? _0x4317fe.generationParams
+function getKlingV3OmniVideoMode(options5 = {}) {
+  const value39 =
+    options5?.generationParams && typeof options5.generationParams === 'object'
+      ? options5.generationParams
       : {};
-  return normalizeKlingV3OmniVideoMode(_0x4c65a2.kling_v3_omni_mode ?? _0x4317fe?.kling_v3_omni_mode);
+  return normalizeKlingV3OmniVideoMode(value39.kling_v3_omni_mode ?? options5?.kling_v3_omni_mode);
 }
-function makeKlingV3OmniVideoPolicy(_0x3be5da) {
-  const _0x278047 = getKlingV3OmniVideoMode(_0x3be5da);
-  if (_0x278047 === 'reference')
+function makeKlingV3OmniVideoPolicy(value40) {
+  const klingV3OmniVideoMode = getKlingV3OmniVideoMode(value40);
+  if (klingV3OmniVideoMode === 'reference')
     return makePolicy(['text', 'image', 'video'], { image: 1, video: 1, audio: 0 });
-  if (_0x278047 === 'edit') return makePolicy(['text', 'video'], { image: 0, video: 1, audio: 0 });
+  if (klingV3OmniVideoMode === 'edit') return makePolicy(['text', 'video'], { image: 0, video: 1, audio: 0 });
   return makePolicy(['text', 'image'], { image: 2, video: 0, audio: 0 });
 }
-function normalizeViduQ3GenerationMode(_0x43318c) {
-  const _0x420172 = normalizeText(_0x43318c).toLowerCase();
-  return _0x420172 === 'reference' ? 'reference' : 'video';
+function normalizeViduQ3GenerationMode(value41) {
+  const text15 = normalizeText(value41).toLowerCase();
+  return text15 === 'reference' ? 'reference' : 'video';
 }
-function getViduQ3GenerationMode(_0x48da77 = {}) {
-  const _0x42a48f =
-    _0x48da77?.generationParams && typeof _0x48da77.generationParams === 'object'
-      ? _0x48da77.generationParams
+function getViduQ3GenerationMode(options6 = {}) {
+  const value42 =
+    options6?.generationParams && typeof options6.generationParams === 'object'
+      ? options6.generationParams
       : {};
-  return normalizeViduQ3GenerationMode(
-    _0x42a48f.vidu_q3_generation_mode ?? _0x48da77?.vidu_q3_generation_mode,
-  );
+  return normalizeViduQ3GenerationMode(value42.vidu_q3_generation_mode ?? options6?.vidu_q3_generation_mode);
 }
-function makeViduQ3VideoPolicy(_0x147e3d) {
-  const _0x43e0b1 = getViduQ3GenerationMode(_0x147e3d);
-  return makePolicy(['text', 'image'], { image: _0x43e0b1 === 'reference' ? 7 : 2, video: 0, audio: 0 });
+function makeViduQ3VideoPolicy(value43) {
+  const image2 = getViduQ3GenerationMode(value43);
+  return makePolicy(['text', 'image'], { image: image2 === 'reference' ? 7 : 2, video: 0, audio: 0 });
 }
-export function getTargetInputPolicy(_0x1526f0 = {}) {
-  const _0x32f7fc = normalizeText(_0x1526f0?.type),
-    _0x506028 = normalizeText(_0x1526f0?.model),
-    _0x49a58a = normalizeText(_0x1526f0?.provider).toLowerCase(),
-    _0x379dc6 = normalizeText(_0x1526f0?.audioWorkflowKey);
-  if (_0x32f7fc === 'ai-image') {
-    const _0x172ecb = makeManifestInputPolicy(getModelManifest(_0x506028)?.inputSlots, _0x1526f0);
-    if (_0x172ecb) return _0x172ecb;
-    const _0x24ebc9 = isRhPersonReplaceWorkflowModel(_0x506028)
+export function getTargetInputPolicy(options7 = {}) {
+  const text16 = normalizeText(options7?.type),
+    text17 = normalizeText(options7?.model),
+    text18 = normalizeText(options7?.provider).toLowerCase(),
+    audio = normalizeText(options7?.audioWorkflowKey);
+  if (text16 === 'ai-image') {
+    const manifestInputPolicy = makeManifestInputPolicy(getModelManifest(text17)?.inputSlots, options7);
+    if (manifestInputPolicy) return manifestInputPolicy;
+    const image3 = isRhPersonReplaceWorkflowModel(text17)
       ? 2
-      : isDreaminaManifestOrModel(_0x506028, _0x49a58a)
+      : isDreaminaManifestOrModel(text17, text18)
         ? 1
         : 9;
-    return makePolicy(['text', 'image'], { image: _0x24ebc9, video: 0, audio: 0 });
+    return makePolicy(['text', 'image'], { image: image3, video: 0, audio: 0 });
   }
-  if (_0x32f7fc === 'ai-video') {
-    if (isDreaminaStyleVideoModel(_0x506028, _0x49a58a)) return makeDreaminaStyleVideoPolicy(_0x1526f0);
-    if (isHappyHorseVideoModel(_0x506028, _0x49a58a)) return makeHappyHorseVideoPolicy(_0x1526f0);
-    if (isSeedance2VideoModel(_0x506028, _0x49a58a)) return makeSeedance2VideoPolicy(_0x1526f0);
-    if (isApimartWan27VideoModel(_0x506028, _0x49a58a)) return makeWan27VideoPolicy(_0x1526f0);
-    if (isApimartKlingV3OmniVideoModel(_0x506028, _0x49a58a)) return makeKlingV3OmniVideoPolicy(_0x1526f0);
-    if (isApimartViduQ3VideoModel(_0x506028, _0x49a58a)) return makeViduQ3VideoPolicy(_0x1526f0);
-    const _0x39bbef = makeManifestInputPolicy(getModelManifest(_0x506028)?.inputSlots, _0x1526f0);
-    if (_0x39bbef) return _0x39bbef;
+  if (text16 === 'ai-video') {
+    if (isDreaminaStyleVideoModel(text17, text18)) return makeDreaminaStyleVideoPolicy(options7);
+    if (isHappyHorseVideoModel(text17, text18)) return makeHappyHorseVideoPolicy(options7);
+    if (isSeedance2VideoModel(text17, text18)) return makeSeedance2VideoPolicy(options7);
+    if (isApimartWan27VideoModel(text17, text18)) return makeWan27VideoPolicy(options7);
+    if (isApimartKlingV3OmniVideoModel(text17, text18)) return makeKlingV3OmniVideoPolicy(options7);
+    if (isApimartViduQ3VideoModel(text17, text18)) return makeViduQ3VideoPolicy(options7);
+    const manifestInputPolicy2 = makeManifestInputPolicy(getModelManifest(text17)?.inputSlots, options7);
+    if (manifestInputPolicy2) return manifestInputPolicy2;
     return makePolicy(['text', 'image', 'video'], { audio: 0 });
   }
-  if (_0x32f7fc === 'ai-audio') {
-    const _0x1e80a9 = makeManifestInputPolicy(
-      getModelManifest(_0x379dc6 || _0x506028)?.inputSlots,
-      _0x1526f0,
+  if (text16 === 'ai-audio') {
+    const manifestInputPolicy3 = makeManifestInputPolicy(
+      getModelManifest(audio || text17)?.inputSlots,
+      options7,
     );
-    if (_0x1e80a9) return _0x1e80a9;
+    if (manifestInputPolicy3) return manifestInputPolicy3;
     return makePolicy(['text', 'audio'], {
       image: 0,
       video: 0,
-      audio: _0x379dc6 === 'voice_convert' ? 2 : 1,
+      audio: audio === 'voice_convert' ? 2 : 1,
     });
   }
-  if (_0x32f7fc === 'ai-text') {
-    const _0xad477d = getModelManifest(_0x506028),
-      _0x15f8c0 = makeManifestInputPolicy(_0xad477d?.inputSlots, _0x1526f0);
-    if (_0x15f8c0) return _0x15f8c0;
-    const _0x37bae8 = resolveTargetProvider(_0x506028, _0x49a58a) || normalizeProviderId(_0xad477d?.provider);
-    if (_0x37bae8 === 'apimart') return makePolicy(['text', 'image'], { video: 0, audio: 0 });
+  if (text16 === 'ai-text') {
+    const modelManifest2 = getModelManifest(text17),
+      manifestInputPolicy4 = makeManifestInputPolicy(modelManifest2?.inputSlots, options7);
+    if (manifestInputPolicy4) return manifestInputPolicy4;
+    const targetProvider =
+      resolveTargetProvider(text17, text18) || normalizeProviderId(modelManifest2?.provider);
+    if (targetProvider === 'apimart') return makePolicy(['text', 'image'], { video: 0, audio: 0 });
     return makePolicy(['text', 'image', 'video', 'audio'], {});
   }
-  if (_0x32f7fc === 'media-clip')
-    return { allowedKinds: ['image', 'video', 'audio'], maxByKind: { text: 0 } };
-  if (_0x32f7fc === 'whiteboard')
+  if (text16 === 'media-clip') return { allowedKinds: ['image', 'video', 'audio'], maxByKind: { text: 0 } };
+  if (text16 === 'whiteboard')
     return {
       allowedKinds: ['image'],
       maxByKind: { text: 0, image: 1, video: 0, audio: 0 },
     };
-  if (_0x32f7fc === 'storyboard-script') {
-    const _0x1e367d = normalizeText(_0x1526f0.storyboardScript?.model) || _0x506028,
-      _0x1fc807 = makeManifestInputPolicy(getModelManifest(_0x1e367d)?.inputSlots, _0x1526f0);
-    if (_0x1fc807) return _0x1fc807;
+  if (text16 === 'storyboard-script') {
+    const text19 = normalizeText(options7.storyboardScript?.model) || text17,
+      manifestInputPolicy5 = makeManifestInputPolicy(getModelManifest(text19)?.inputSlots, options7);
+    if (manifestInputPolicy5) return manifestInputPolicy5;
   }
-  if (_0x32f7fc === 'storyboard' || _0x32f7fc === 'storyboard-script')
+  if (text16 === 'storyboard' || text16 === 'storyboard-script')
     return makePolicy(['text', 'image', 'video'], { audio: 0 });
   return makePolicy(['text', 'image', 'video', 'audio'], {});
 }
-export function canTargetReceiveInputs(_0x193845 = {}) {
-  return INPUT_TARGET_NODE_TYPES.has(normalizeText(_0x193845?.type));
+export function canTargetReceiveInputs(options8 = {}) {
+  return INPUT_TARGET_NODE_TYPES.has(normalizeText(options8?.type));
 }
-export function getVideoSourceKey(_0x52c3ce) {
-  if (!_0x52c3ce || typeof _0x52c3ce !== 'object') return '';
+export function getVideoSourceKey(response) {
+  if (!response || typeof response !== 'object') return '';
   return (
-    normalizeText(_0x52c3ce.localPath) ||
-    normalizeText(_0x52c3ce.displayLocalPath) ||
-    normalizeText(_0x52c3ce.originalLocalPath) ||
-    normalizeText(_0x52c3ce.videoLocalPath) ||
-    normalizeText(_0x52c3ce.videoUrl) ||
-    normalizeText(_0x52c3ce.src) ||
-    normalizeText(_0x52c3ce.url) ||
-    normalizeText(_0x52c3ce.resultUrl) ||
-    normalizeText(_0x52c3ce.sourceUrl)
+    normalizeText(response.localPath) ||
+    normalizeText(response.displayLocalPath) ||
+    normalizeText(response.originalLocalPath) ||
+    normalizeText(response.videoLocalPath) ||
+    normalizeText(response.videoUrl) ||
+    normalizeText(response.src) ||
+    normalizeText(response.url) ||
+    normalizeText(response.resultUrl) ||
+    normalizeText(response.sourceUrl)
   );
 }
-function isUnavailableVideoRecord(_0xf8f554) {
-  const _0x550e54 = getVideoSourceKey(_0xf8f554);
-  if (!_0x550e54) return false;
+function isUnavailableVideoRecord(value44) {
+  const videoSourceKey = getVideoSourceKey(value44);
+  if (!videoSourceKey) return false;
   return (
-    _0xf8f554?.mediaUnavailable === true && normalizeText(_0xf8f554?.mediaUnavailableSource) === _0x550e54
+    value44?.mediaUnavailable === true && normalizeText(value44?.mediaUnavailableSource) === videoSourceKey
   );
 }
-export function hasUsableInputNodeSource(_0x2d03cf = {}, _0xb2bad2 = {}) {
-  const _0x4cd2f6 = _0xb2bad2?.edge || _0xb2bad2 || null,
-    _0x54bb6c = normalizeInputKind(_0xb2bad2?.kind) || resolveEffectiveInputKind(_0x2d03cf, _0x4cd2f6);
-  if (!_0x54bb6c) return false;
-  if (_0x54bb6c !== 'video') return true;
-  const _0x1fdf78 = Array.isArray(_0x2d03cf?.videos) ? _0x2d03cf.videos : [];
-  if (_0x1fdf78.some((_0x5b274b) => getVideoSourceKey(_0x5b274b) && !isUnavailableVideoRecord(_0x5b274b)))
-    return true;
-  if (getVideoSourceKey(_0x2d03cf) && !isUnavailableVideoRecord(_0x2d03cf)) return true;
-  const _0x76b236 = isVideoPath(_0x4cd2f6?.sourceMediaKey) ? normalizeText(_0x4cd2f6?.sourceMediaKey) : '';
-  return Boolean(_0x76b236);
+export function hasUsableInputNodeSource(options9 = {}, value45 = {}) {
+  const value46 = value45?.edge || value45 || null,
+    inputKind3 = normalizeInputKind(value45?.kind) || resolveEffectiveInputKind(options9, value46);
+  if (!inputKind3) return false;
+  if (inputKind3 !== 'video') return true;
+  const list11 = Array.isArray(options9?.videos) ? options9.videos : [];
+  if (list11.some((item16) => getVideoSourceKey(item16) && !isUnavailableVideoRecord(item16))) return true;
+  if (getVideoSourceKey(options9) && !isUnavailableVideoRecord(options9)) return true;
+  const isVideoPath2 = isVideoPath(value46?.sourceMediaKey) ? normalizeText(value46?.sourceMediaKey) : '';
+  return Boolean(isVideoPath2);
 }
-export function isInputNodeCompatibleWithTarget(_0xbf43f7 = {}, _0x5267e6 = {}, _0x1b98ec = null) {
-  if (!canTargetReceiveInputs(_0x5267e6)) return false;
-  const _0x5a0757 = resolveEffectiveInputKind(_0xbf43f7, _0x1b98ec);
-  if (!_0x5a0757) return false;
-  if (!isInputKindAllowed(getTargetInputPolicy(_0x5267e6), _0x5a0757)) return false;
-  return hasUsableInputNodeSource(_0xbf43f7, { edge: _0x1b98ec, kind: _0x5a0757 });
+export function isInputNodeCompatibleWithTarget(options10 = {}, value47 = {}, edge = null) {
+  if (!canTargetReceiveInputs(value47)) return false;
+  const kind = resolveEffectiveInputKind(options10, edge);
+  if (!kind) return false;
+  if (!isInputKindAllowed(getTargetInputPolicy(value47), kind)) return false;
+  return hasUsableInputNodeSource(options10, { edge: edge, kind: kind });
 }
-export function canAppendInputKindWithinLimit(_0x335300, _0x3f0b6b, _0x12d9b6 = {}) {
-  const _0x202a18 = normalizeInputKind(_0x3f0b6b);
-  if (!_0x202a18) return false;
-  if (!isInputKindAllowed(_0x335300, _0x202a18)) return false;
-  const _0x54f28a = Number(_0x335300?.maxByKind?.[_0x202a18]);
-  if (!Number.isFinite(_0x54f28a)) return true;
-  if (_0x54f28a <= 0) return false;
-  return Number(_0x12d9b6?.[_0x202a18] || 0) < _0x54f28a;
+export function canAppendInputKindWithinLimit(value48, value49, value50 = {}) {
+  const inputKind4 = normalizeInputKind(value49);
+  if (!inputKind4) return false;
+  if (!isInputKindAllowed(value48, inputKind4)) return false;
+  const count = Number(value48?.maxByKind?.[inputKind4]);
+  if (!Number.isFinite(count)) return true;
+  if (count <= 0) return false;
+  return Number(value50?.[inputKind4] || 0) < count;
 }
-export function isInputKindAllowed(_0x36fbb1, _0x172464) {
-  const _0x224a98 = normalizeInputKind(_0x172464);
-  if (!_0x224a98) return false;
-  const _0x7a904f = Array.isArray(_0x36fbb1?.allowedKinds) ? _0x36fbb1.allowedKinds : INPUT_KIND_ORDER;
-  return _0x7a904f.includes(_0x224a98);
+export function isInputKindAllowed(value51, value52) {
+  const inputKind5 = normalizeInputKind(value52);
+  if (!inputKind5) return false;
+  const list12 = Array.isArray(value51?.allowedKinds) ? value51.allowedKinds : INPUT_KIND_ORDER;
+  return list12.includes(inputKind5);
 }
-export function getInputLimitReason(_0x42eff4, _0x53f441, _0x2c577e = {}) {
-  const _0x5af408 = normalizeInputKind(_0x53f441);
-  if (!_0x5af408) return '';
-  if (!isInputKindAllowed(_0x42eff4, _0x5af408)) return modelInputPolicyText('unsupported');
-  const _0x358c86 = Number(_0x42eff4?.maxByKind?.[_0x5af408]);
-  if (!Number.isFinite(_0x358c86)) return '';
-  if (_0x358c86 <= 0) return modelInputPolicyText('unsupported');
-  const _0x214b78 = Number(_0x2c577e?.[_0x5af408] || 0);
-  if (_0x214b78 < _0x358c86) return '';
-  return modelInputPolicyText('limitReached', { max: _0x358c86, type: getInputKindLabel(_0x5af408) });
+export function getInputLimitReason(value53, value54, value55 = {}) {
+  const inputKind6 = normalizeInputKind(value54);
+  if (!inputKind6) return '';
+  if (!isInputKindAllowed(value53, inputKind6)) return modelInputPolicyText('unsupported');
+  const max = Number(value53?.maxByKind?.[inputKind6]);
+  if (!Number.isFinite(max)) return '';
+  if (max <= 0) return modelInputPolicyText('unsupported');
+  const value56 = Number(value55?.[inputKind6] || 0);
+  if (value56 < max) return '';
+  return modelInputPolicyText('limitReached', { max: max, type: getInputKindLabel(inputKind6) });
 }

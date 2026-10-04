@@ -20,435 +20,422 @@ const SOFT_OCCLUSION_SELECTOR = '.header',
   FREEZE_SETTLING_BODY_CLASS = 'is-web-preview-freeze-settling',
   WEB_PREVIEW_FREEZE_BODY_CLASSES = new Set([FREEZE_ACTIVE_BODY_CLASS, FREEZE_SETTLING_BODY_CLASS]),
   registeredSlotsByNodeId = new Map();
-function normalizeNodeId(_0x55a075) {
-  return String(_0x55a075 || '').trim();
+function normalizeNodeId(value) {
+  return String(value || '').trim();
 }
-function getViewKey(_0x245f97 = {}) {
-  return normalizeNodeId(_0x245f97.nodeId) + '\n' + String(_0x245f97.tabId || '').trim();
+function getViewKey(options = {}) {
+  return normalizeNodeId(options.nodeId) + '\n' + String(options.tabId || '').trim();
 }
 function getNowMs() {
-  const _0x57f43a = globalThis.performance?.now?.();
-  return Number.isFinite(_0x57f43a) ? _0x57f43a : Date.now();
+  const item = globalThis.performance?.now?.();
+  return Number.isFinite(item) ? item : Date.now();
 }
 function readCanvasSpaceHeld() {
   return globalThis.window?._spaceHeld === true;
 }
 function getRequestAnimationFrame() {
-  return (
-    globalThis.window?.requestAnimationFrame?.bind(globalThis.window) ||
-    ((_0x4f7341) => setTimeout(_0x4f7341, 16))
-  );
+  return globalThis.window?.requestAnimationFrame?.bind(globalThis.window) || ((key) => setTimeout(key, 16));
 }
 function getCancelAnimationFrame() {
   return globalThis.window?.cancelAnimationFrame?.bind(globalThis.window) || clearTimeout;
 }
-function rectIntersects(_0x181a35, _0x159315) {
-  return (
-    _0x181a35.left < _0x159315.right &&
-    _0x181a35.right > _0x159315.left &&
-    _0x181a35.top < _0x159315.bottom &&
-    _0x181a35.bottom > _0x159315.top
-  );
+function rectIntersects(box, box2) {
+  return box.left < box2.right && box.right > box2.left && box.top < box2.bottom && box.bottom > box2.top;
 }
-function getRectArea(_0x40f54e) {
-  return Math.max(0, Number(_0x40f54e?.width) || 0) * Math.max(0, Number(_0x40f54e?.height) || 0);
+function getRectArea(box3) {
+  return Math.max(0, Number(box3?.width) || 0) * Math.max(0, Number(box3?.height) || 0);
 }
-function getIntersectionArea(_0x3b551e, _0x3c8c81) {
-  if (!rectIntersects(_0x3b551e, _0x3c8c81)) return 0;
-  const _0x2f5cfc = Math.min(_0x3b551e.right, _0x3c8c81.right) - Math.max(_0x3b551e.left, _0x3c8c81.left),
-    _0x4b4f19 = Math.min(_0x3b551e.bottom, _0x3c8c81.bottom) - Math.max(_0x3b551e.top, _0x3c8c81.top);
-  return Math.max(0, _0x2f5cfc) * Math.max(0, _0x4b4f19);
+function getIntersectionArea(box4, box5) {
+  if (!rectIntersects(box4, box5)) return 0;
+  const index = Math.min(box4.right, box5.right) - Math.max(box4.left, box5.left),
+    result = Math.min(box4.bottom, box5.bottom) - Math.max(box4.top, box5.top);
+  return Math.max(0, index) * Math.max(0, result);
 }
-function hasVisibleViewportIntersection(_0x14bb73) {
-  const _0x244309 = Number(_0x14bb73?.width) || 0,
-    _0x121615 = Number(_0x14bb73?.height) || 0;
-  if (_0x244309 < 16 || _0x121615 < 16) return false;
-  const _0x2b031f = globalThis.window || {},
-    _0x5096d8 = Number(_0x2b031f.innerWidth) || 0,
-    _0x1076fa = Number(_0x2b031f.innerHeight) || 0;
-  if (_0x5096d8 <= 0 || _0x1076fa <= 0) return false;
-  const _0x22b664 = Math.min(_0x14bb73.right, _0x5096d8) - Math.max(_0x14bb73.left, 0),
-    _0x5dcdc8 = Math.min(_0x14bb73.bottom, _0x1076fa) - Math.max(_0x14bb73.top, 0);
-  return _0x22b664 >= MIN_VISIBLE_INTERSECTION_SIZE && _0x5dcdc8 >= MIN_VISIBLE_INTERSECTION_SIZE;
+function hasVisibleViewportIntersection(box6) {
+  const count = Number(box6?.width) || 0,
+    count2 = Number(box6?.height) || 0;
+  if (count < 16 || count2 < 16) return false;
+  const data = globalThis.window || {},
+    count3 = Number(data.innerWidth) || 0,
+    count4 = Number(data.innerHeight) || 0;
+  if (count3 <= 0 || count4 <= 0) return false;
+  const target = Math.min(box6.right, count3) - Math.max(box6.left, 0),
+    source = Math.min(box6.bottom, count4) - Math.max(box6.top, 0);
+  return target >= MIN_VISIBLE_INTERSECTION_SIZE && source >= MIN_VISIBLE_INTERSECTION_SIZE;
 }
-function collectOcclusionRects(_0x39060c = document, _0x1e0663 = SOFT_OCCLUSION_SELECTOR) {
-  const _0x4a2e2e = _0x39060c.querySelectorAll?.(_0x1e0663) || [],
-    _0x12c5f8 = [];
-  for (const _0xca23a9 of _0x4a2e2e) {
-    if (!_0xca23a9 || _0xca23a9.hidden) continue;
-    const _0x3a2335 = globalThis.window?.getComputedStyle?.(_0xca23a9);
-    if (_0x3a2335?.display === 'none' || _0x3a2335?.visibility === 'hidden') continue;
-    const _0x8e783d = Number(_0x3a2335?.opacity);
-    if (Number.isFinite(_0x8e783d) && _0x8e783d <= 0) continue;
-    if (_0x3a2335?.pointerEvents === 'none') continue;
-    const _0x2d60be = _0xca23a9.getBoundingClientRect?.();
-    if (_0x2d60be) _0x12c5f8.push(_0x2d60be);
+function collectOcclusionRects(el = document, next = SOFT_OCCLUSION_SELECTOR) {
+  const current = el.querySelectorAll?.(next) || [],
+    list = [];
+  for (const el2 of current) {
+    if (!el2 || el2.hidden) continue;
+    const entry = globalThis.window?.getComputedStyle?.(el2);
+    if (entry?.display === 'none' || entry?.visibility === 'hidden') continue;
+    const count5 = Number(entry?.opacity);
+    if (Number.isFinite(count5) && count5 <= 0) continue;
+    if (entry?.pointerEvents === 'none') continue;
+    const record = el2.getBoundingClientRect?.();
+    if (record) list.push(record);
   }
-  return _0x12c5f8;
+  return list;
 }
-function isOccludedByRects(_0x42eafe, _0xc2114 = []) {
-  return _0xc2114.some((_0xe7fb89) => rectIntersects(_0x42eafe, _0xe7fb89));
+function isOccludedByRects(payload, list2 = []) {
+  return list2.some((item2) => rectIntersects(payload, item2));
 }
-function isSignificantlyOccludedByRects(_0x113480, _0x2a1199 = []) {
-  const _0x7db3e0 = getRectArea(_0x113480);
-  if (_0x7db3e0 <= 0) return false;
-  let _0x40706b = 0;
-  for (const _0x41d458 of _0x2a1199) {
-    _0x40706b += getIntersectionArea(_0x113480, _0x41d458);
-    if (_0x40706b / _0x7db3e0 >= SOFT_OCCLUSION_HIDE_RATIO) return true;
+function isSignificantlyOccludedByRects(handle, state = []) {
+  const rectArea = getRectArea(handle);
+  if (rectArea <= 0) return false;
+  let config = 0;
+  for (const scope of state) {
+    config += getIntersectionArea(handle, scope);
+    if (config / rectArea >= SOFT_OCCLUSION_HIDE_RATIO) return true;
   }
   return false;
 }
-function nodeMatchesOcclusionSelector(_0x29df02) {
-  if (!_0x29df02 || _0x29df02.nodeType === 3) return false;
+function nodeMatchesOcclusionSelector(el3) {
+  if (!el3 || el3.nodeType === 3) return false;
   try {
-    if (typeof _0x29df02.matches === 'function' && _0x29df02.matches(OCCLUSION_OBSERVER_SELECTOR))
-      return true;
-    return Boolean(_0x29df02.querySelector?.(OCCLUSION_OBSERVER_SELECTOR));
+    if (typeof el3.matches === 'function' && el3.matches(OCCLUSION_OBSERVER_SELECTOR)) return true;
+    return Boolean(el3.querySelector?.(OCCLUSION_OBSERVER_SELECTOR));
   } catch {
     return false;
   }
 }
-function isCanvasPanSurfaceTarget(_0xe5da7e) {
-  if (!_0xe5da7e) return false;
-  const _0xcbbf85 = globalThis.document?.getElementById?.('v2-wrap');
-  if (_0xcbbf85?.contains?.(_0xe5da7e)) return true;
-  return Boolean(_0xe5da7e.closest?.('.side-plus-btn'));
+function isCanvasPanSurfaceTarget(el4) {
+  if (!el4) return false;
+  const input = globalThis.document?.getElementById?.('v2-wrap');
+  if (input?.contains?.(el4)) return true;
+  return Boolean(el4.closest?.('.side-plus-btn'));
 }
-function isPotentialCanvasPanStartEvent(_0x4c63bd) {
-  if (!isCanvasPanSurfaceTarget(_0x4c63bd?.target)) return false;
-  const _0x34366e = Number(_0x4c63bd?.button);
-  if (_0x34366e === 1) return true;
-  return _0x34366e === 0 && globalThis.window?._spaceHeld === true;
+function isPotentialCanvasPanStartEvent(event) {
+  if (!isCanvasPanSurfaceTarget(event?.target)) return false;
+  const count6 = Number(event?.button);
+  if (count6 === 1) return true;
+  return count6 === 0 && globalThis.window?._spaceHeld === true;
 }
-function isNativePanStartPreviewEvent(_0x3174c0) {
-  return _0x3174c0?.type === 'pan-start-preview';
+function isNativePanStartPreviewEvent(output) {
+  return output?.type === 'pan-start-preview';
 }
-function normalizeObservedClassName(_0x24c56d = '') {
-  return String(_0x24c56d || '')
+function normalizeObservedClassName(value2 = '') {
+  return String(value2 || '')
     .split(/\s+/)
-    .map((_0x3c4ef0) => _0x3c4ef0.trim())
-    .filter((_0x139456) => _0x139456 && !WEB_PREVIEW_FREEZE_BODY_CLASSES.has(_0x139456))
+    .map((item3) => item3.trim())
+    .filter((item4) => item4 && !WEB_PREVIEW_FREEZE_BODY_CLASSES.has(item4))
     .sort()
     .join(' ');
 }
-function isOwnFreezeClassMutation(_0x2da4e0) {
-  if (_0x2da4e0?.type !== 'attributes' || _0x2da4e0?.attributeName !== 'class') return false;
-  if (_0x2da4e0.target !== globalThis.document?.body) return false;
-  return (
-    normalizeObservedClassName(_0x2da4e0.oldValue) === normalizeObservedClassName(_0x2da4e0.target?.className)
-  );
+function isOwnFreezeClassMutation(event2) {
+  if (event2?.type !== 'attributes' || event2?.attributeName !== 'class') return false;
+  if (event2.target !== globalThis.document?.body) return false;
+  return normalizeObservedClassName(event2.oldValue) === normalizeObservedClassName(event2.target?.className);
 }
-function shouldSyncForOcclusionMutation(_0x2052c7 = []) {
-  for (const _0x3e85b2 of _0x2052c7) {
-    if (isOwnFreezeClassMutation(_0x3e85b2)) continue;
-    if (nodeMatchesOcclusionSelector(_0x3e85b2?.target)) return true;
-    for (const _0x4578e4 of _0x3e85b2?.addedNodes || []) {
-      if (nodeMatchesOcclusionSelector(_0x4578e4)) return true;
+function shouldSyncForOcclusionMutation(list3 = []) {
+  for (const event3 of list3) {
+    if (isOwnFreezeClassMutation(event3)) continue;
+    if (nodeMatchesOcclusionSelector(event3?.target)) return true;
+    for (const value3 of event3?.addedNodes || []) {
+      if (nodeMatchesOcclusionSelector(value3)) return true;
     }
-    for (const _0x5c3a41 of _0x3e85b2?.removedNodes || []) {
-      if (nodeMatchesOcclusionSelector(_0x5c3a41)) return true;
+    for (const value4 of event3?.removedNodes || []) {
+      if (nodeMatchesOcclusionSelector(value4)) return true;
     }
   }
   return false;
 }
-function appendSlotToIndex(_0x371ad3, _0x5c02dc) {
-  const _0x48c930 = _0x5c02dc?.dataset?.nodeId;
-  if (!_0x48c930) return;
-  const _0x33080f = _0x371ad3.get(_0x48c930);
-  if (_0x5c02dc.dataset.webPreviewFullscreen === 'true') {
-    _0x371ad3.set(_0x48c930, _0x5c02dc);
+function appendSlotToIndex(map, el5) {
+  const enabled = el5?.dataset?.nodeId;
+  if (!enabled) return;
+  const enabled2 = map.get(enabled);
+  if (el5.dataset.webPreviewFullscreen === 'true') {
+    map.set(enabled, el5);
     return;
   }
-  if (!_0x33080f) _0x371ad3.set(_0x48c930, _0x5c02dc);
+  if (!enabled2) map.set(enabled, el5);
 }
-function buildSlotIndex(_0x3d1bd4 = document, _0x4d3a53 = []) {
-  const _0x5351e3 = new Map(),
-    _0x1d5da0 = new Set();
-  for (const _0x4c64d2 of registeredSlotsByNodeId.values()) {
-    for (const _0x2742ce of _0x4c64d2) {
-      if (!_0x2742ce || _0x2742ce.isConnected === false || _0x1d5da0.has(_0x2742ce)) continue;
-      (_0x1d5da0.add(_0x2742ce), appendSlotToIndex(_0x5351e3, _0x2742ce));
+function buildSlotIndex(el6 = document, list4 = []) {
+  const map2 = new Map(),
+    map3 = new Set();
+  for (const value5 of registeredSlotsByNodeId.values()) {
+    for (const el7 of value5) {
+      if (!el7 || el7.isConnected === false || map3.has(el7)) continue;
+      (map3.add(el7), appendSlotToIndex(map2, el7));
     }
   }
-  if (_0x4d3a53.length > 0 && _0x4d3a53.every((_0x56207f) => _0x5351e3.has(_0x56207f))) return _0x5351e3;
-  const _0x28fd77 = _0x3d1bd4.querySelectorAll?.("[data-web-preview-slot='true']") || [];
-  for (const _0x43b01f of _0x28fd77) {
-    if (!_0x43b01f || _0x1d5da0.has(_0x43b01f)) continue;
-    (_0x1d5da0.add(_0x43b01f), appendSlotToIndex(_0x5351e3, _0x43b01f));
+  if (list4.length > 0 && list4.every((item5) => map2.has(item5))) return map2;
+  const value6 = el6.querySelectorAll?.("[data-web-preview-slot='true']") || [];
+  for (const enabled3 of value6) {
+    if (!enabled3 || map3.has(enabled3)) continue;
+    (map3.add(enabled3), appendSlotToIndex(map2, enabled3));
   }
-  return _0x5351e3;
+  return map2;
 }
-export function registerWebPreviewSlot(_0x182b1a, _0x13d794) {
-  const _0x5e4bcc = normalizeNodeId(_0x182b1a);
-  if (!_0x5e4bcc || !_0x13d794) return () => {};
-  let _0x34cdef = registeredSlotsByNodeId.get(_0x5e4bcc);
+export function registerWebPreviewSlot(value7, enabled4) {
+  const nodeId = normalizeNodeId(value7);
+  if (!nodeId || !enabled4) return () => {};
+  let enabled5 = registeredSlotsByNodeId.get(nodeId);
   return (
-    !_0x34cdef && ((_0x34cdef = new Set()), registeredSlotsByNodeId.set(_0x5e4bcc, _0x34cdef)),
-    _0x34cdef.add(_0x13d794),
+    !enabled5 && ((enabled5 = new Set()), registeredSlotsByNodeId.set(nodeId, enabled5)),
+    enabled5.add(enabled4),
     () => {
-      const _0x552bbd = registeredSlotsByNodeId.get(_0x5e4bcc);
-      if (!_0x552bbd) return;
-      _0x552bbd.delete(_0x13d794);
-      if (_0x552bbd.size === 0) registeredSlotsByNodeId.delete(_0x5e4bcc);
+      const map4 = registeredSlotsByNodeId.get(nodeId);
+      if (!map4) return;
+      map4.delete(enabled4);
+      if (map4.size === 0) registeredSlotsByNodeId.delete(nodeId);
     }
   );
 }
 export function _clearWebPreviewSlotRegistryForTest() {
   registeredSlotsByNodeId.clear();
 }
-function hasActiveWebPreviewNodes(_0x4cdcec) {
-  const _0x417532 =
-    typeof _0x4cdcec?.getStateRaw === 'function' ? _0x4cdcec.getStateRaw() : _0x4cdcec?.getState?.() || {};
-  return Object.values(_0x417532.nodes || {}).some(
-    (_0x4cdb2c) =>
-      _0x4cdb2c?.type === 'web-preview' &&
-      normalizeWebPreviewTabs(_0x4cdb2c).tabs.some(
-        (_0x205f84) => normalizeWebPreviewUrl(_0x205f84.url) || _0x205f84.pendingPopup === true,
+function hasActiveWebPreviewNodes(store) {
+  const value8 = typeof store?.getStateRaw === 'function' ? store.getStateRaw() : store?.getState?.() || {};
+  return Object.values(value8.nodes || {}).some(
+    (item6) =>
+      item6?.type === 'web-preview' &&
+      normalizeWebPreviewTabs(item6).tabs.some(
+        (response) => normalizeWebPreviewUrl(response.url) || response.pendingPopup === true,
       ),
   );
 }
-function normalizeCanvasZoom(_0x15d971) {
-  const _0x1c2a93 = Number(_0x15d971);
-  if (!Number.isFinite(_0x1c2a93) || _0x1c2a93 <= 0) return 1;
-  return Math.min(5, Math.max(0.25, _0x1c2a93));
+function normalizeCanvasZoom(value9) {
+  const count7 = Number(value9);
+  if (!Number.isFinite(count7) || count7 <= 0) return 1;
+  return Math.min(5, Math.max(0.25, count7));
 }
 function getCanvasInteractionState() {
-  const _0x330f7b = globalThis.document?.body?.classList,
-    _0x1bc276 = Boolean(_0x330f7b?.contains?.('is-viewport-animating'));
+  const value10 = globalThis.document?.body?.classList,
+    frozen = Boolean(value10?.contains?.('is-viewport-animating'));
   return {
-    frozen: _0x1bc276,
-    deferZoomFactor: _0x1bc276,
-    settleSnapshot: _0x1bc276,
-    showSnapshot: _0x1bc276,
+    frozen: frozen,
+    deferZoomFactor: frozen,
+    settleSnapshot: frozen,
+    showSnapshot: frozen,
   };
 }
-function getSlotFullscreen(_0x1726bf) {
-  return _0x1726bf?.dataset?.webPreviewFullscreen === 'true';
+function getSlotFullscreen(el8) {
+  return el8?.dataset?.webPreviewFullscreen === 'true';
 }
-function getSlotSnapshotComponent(_0x39b8e8) {
-  return _0x39b8e8?.closest?.('.web-preview-component') || null;
+function getSlotSnapshotComponent(el9) {
+  return el9?.closest?.('.web-preview-component') || null;
 }
-function getSlotSnapshotReady(_0x1a487e, _0x30d670 = '', { allowAnyToken: allowAnyToken = false } = {}) {
-  const _0x256460 = getSlotSnapshotComponent(_0x1a487e);
-  if (!_0x256460?.classList?.contains?.('has-freeze-snapshot')) return false;
+function getSlotSnapshotReady(value11, value12 = '', { allowAnyToken: allowAnyToken = false } = {}) {
+  const el10 = getSlotSnapshotComponent(value11);
+  if (!el10?.classList?.contains?.('has-freeze-snapshot')) return false;
   if (allowAnyToken) return true;
-  const _0x2cd51a = String(_0x30d670 || '').trim();
-  if (!_0x2cd51a) return true;
-  const _0x58f814 = String(_0x256460?.dataset?.webPreviewSnapshotToken || '').trim();
-  return _0x58f814 === _0x2cd51a;
+  const enabled6 = String(value12 || '').trim();
+  if (!enabled6) return true;
+  const value13 = String(el10?.dataset?.webPreviewSnapshotToken || '').trim();
+  return value13 === enabled6;
 }
-function getSlotSnapshotHold(_0x3e2338) {
-  return Boolean(getSlotSnapshotComponent(_0x3e2338)?.classList?.contains?.('is-web-preview-loading'));
+function getSlotSnapshotHold(value14) {
+  return Boolean(getSlotSnapshotComponent(value14)?.classList?.contains?.('is-web-preview-loading'));
 }
 function buildViewPayload({
-  node: _0x28b066,
-  tabId: _0x36e8e4,
-  webUrl: _0x5081c1,
-  slot: _0x49187d,
-  active: _0x1bcd3f,
-  selected: _0x25eab2,
-  canvasZoom: _0x458525,
-  interactionState: _0x390bb3,
-  freezeToken: _0x249fb0,
-  fullscreenBlockerRects: _0x7884a3,
-  softBlockerRects: _0x1f5781,
-  hardBlockerRects: _0xf5c945,
+  node: node,
+  tabId: tabId,
+  webUrl: webUrl,
+  slot: slot,
+  active: active,
+  selected: selected,
+  canvasZoom: canvasZoom,
+  interactionState: interactionState2,
+  freezeToken: freezeToken2,
+  fullscreenBlockerRects: fullscreenBlockerRects,
+  softBlockerRects: softBlockerRects,
+  hardBlockerRects: hardBlockerRects,
   canvasSpaceHeld: canvasSpaceHeld = false,
   pendingPopup: pendingPopup = false,
 }) {
-  let _0x3cf171 = false,
-    _0x5196bf = null;
-  const _0x353be6 = getSlotFullscreen(_0x49187d);
-  if (_0x49187d?.isConnected !== false) {
-    const _0x40a517 = _0x49187d?.getBoundingClientRect?.(),
-      _0x32db77 = _0x40a517 ? isOccludedByRects(_0x40a517, _0x7884a3) : false,
-      _0xdb1d0d = _0x40a517 && !_0x353be6 ? isOccludedByRects(_0x40a517, _0xf5c945) : false,
-      _0x14aa27 = _0x40a517 && !_0x353be6 ? isSignificantlyOccludedByRects(_0x40a517, _0x1f5781) : false;
-    _0x40a517 &&
-      hasVisibleViewportIntersection(_0x40a517) &&
-      !_0x32db77 &&
-      !_0xdb1d0d &&
-      !_0x14aa27 &&
-      ((_0x3cf171 = true),
-      (_0x5196bf = {
-        x: Math.round(_0x40a517.left),
-        y: Math.round(_0x40a517.top),
-        width: Math.round(_0x40a517.width),
-        height: Math.round(_0x40a517.height),
+  let visible = false,
+    bounds = null;
+  const zoomFactor = getSlotFullscreen(slot);
+  if (slot?.isConnected !== false) {
+    const box7 = slot?.getBoundingClientRect?.(),
+      enabled7 = box7 ? isOccludedByRects(box7, fullscreenBlockerRects) : false,
+      enabled8 = box7 && !zoomFactor ? isOccludedByRects(box7, hardBlockerRects) : false,
+      enabled9 = box7 && !zoomFactor ? isSignificantlyOccludedByRects(box7, softBlockerRects) : false;
+    box7 &&
+      hasVisibleViewportIntersection(box7) &&
+      !enabled7 &&
+      !enabled8 &&
+      !enabled9 &&
+      ((visible = true),
+      (bounds = {
+        x: Math.round(box7.left),
+        y: Math.round(box7.top),
+        width: Math.round(box7.width),
+        height: Math.round(box7.height),
       }));
   }
-  const _0x51e262 = getSlotSnapshotHold(_0x49187d),
-    _0x142b0c = Boolean((_0x390bb3.frozen || _0x51e262) && !_0x353be6 && _0x3cf171),
-    _0x50440f = _0x142b0c ? String(_0x249fb0 || '0') : '',
-    _0x24dd48 = Boolean(_0x142b0c && (_0x390bb3.showSnapshot || _0x51e262)),
-    _0x3e4480 = _0x24dd48 || _0x51e262;
+  const snapshotHold = getSlotSnapshotHold(slot),
+    frozen2 = Boolean((interactionState2.frozen || snapshotHold) && !zoomFactor && visible),
+    freezeToken3 = frozen2 ? String(freezeToken2 || '0') : '',
+    snapshotReady = Boolean(frozen2 && (interactionState2.showSnapshot || snapshotHold)),
+    allowAnyToken2 = snapshotReady || snapshotHold;
   return {
-    nodeId: _0x28b066.id,
-    tabId: _0x36e8e4,
-    webUrl: _0x5081c1,
+    nodeId: node.id,
+    tabId: tabId,
+    webUrl: webUrl,
     pendingPopup: pendingPopup,
-    browserProfileId: _0x28b066.browserProfileId || '',
-    active: _0x1bcd3f,
-    visible: _0x3cf171,
-    bounds: _0x5196bf,
-    zoomFactor: _0x353be6 ? 1 : _0x458525,
-    deferZoomFactor: _0x353be6 ? false : _0x390bb3.deferZoomFactor,
-    frozen: _0x142b0c,
-    freezeToken: _0x50440f,
-    snapshotReady: _0x24dd48
-      ? getSlotSnapshotReady(_0x49187d, _0x50440f, { allowAnyToken: _0x3e4480 })
+    browserProfileId: node.browserProfileId || '',
+    active: active,
+    visible: visible,
+    bounds: bounds,
+    zoomFactor: zoomFactor ? 1 : canvasZoom,
+    deferZoomFactor: zoomFactor ? false : interactionState2.deferZoomFactor,
+    frozen: frozen2,
+    freezeToken: freezeToken3,
+    snapshotReady: snapshotReady
+      ? getSlotSnapshotReady(slot, freezeToken3, { allowAnyToken: allowAnyToken2 })
       : false,
-    snapshotHold: _0x51e262,
-    showSnapshot: _0x24dd48,
-    fullscreen: _0x353be6,
-    selected: _0x25eab2,
+    snapshotHold: snapshotHold,
+    showSnapshot: snapshotReady,
+    fullscreen: zoomFactor,
+    selected: selected,
     canvasSpaceHeld: canvasSpaceHeld === true,
   };
 }
-function syncCachedViewsForBudget(_0x54b3cf, _0x56af16) {
-  if (!_0x56af16) return _0x54b3cf;
-  const _0xc04625 = getNowMs(),
-    _0x15c460 = _0x54b3cf.some((_0xb86497) => _0xb86497?.frozen || _0xb86497?.deferZoomFactor),
-    _0x4cd470 = new Set(_0x54b3cf.map(getViewKey));
-  for (const _0x5eb2c2 of [..._0x56af16.cachedViewsByNodeId.keys()]) {
-    if (!_0x4cd470.has(_0x5eb2c2)) _0x56af16.cachedViewsByNodeId.delete(_0x5eb2c2);
+function syncCachedViewsForBudget(list5, args) {
+  if (!args) return list5;
+  const nowMs = getNowMs(),
+    enabled10 = list5.some((item7) => item7?.frozen || item7?.deferZoomFactor),
+    map5 = new Set(list5.map(getViewKey));
+  for (const value15 of [...args.cachedViewsByNodeId.keys()]) {
+    if (!map5.has(value15)) args.cachedViewsByNodeId.delete(value15);
   }
-  if (!_0x15c460) {
-    _0x56af16.lastBackgroundSyncAt = _0xc04625;
-    for (const _0x317d37 of _0x54b3cf) _0x56af16.cachedViewsByNodeId.set(getViewKey(_0x317d37), _0x317d37);
-    return _0x54b3cf;
+  if (!enabled10) {
+    args.lastBackgroundSyncAt = nowMs;
+    for (const value16 of list5) args.cachedViewsByNodeId.set(getViewKey(value16), value16);
+    return list5;
   }
-  const _0x312476 = _0xc04625 - _0x56af16.lastBackgroundSyncAt >= BACKGROUND_SYNC_INTERVAL_MS;
-  if (_0x312476) _0x56af16.lastBackgroundSyncAt = _0xc04625;
-  return _0x54b3cf.map((_0x1a8d6c) => {
-    const _0x6693c2 = getViewKey(_0x1a8d6c),
-      _0x23557c = _0x56af16.cachedViewsByNodeId.get(_0x6693c2),
-      _0x4fa4b7 =
-        _0x1a8d6c.frozen === true &&
-        _0x1a8d6c.visible === true &&
-        _0x23557c?.visible === true &&
-        _0x23557c?.bounds &&
-        _0x23557c.webUrl === _0x1a8d6c.webUrl &&
-        _0x23557c.pendingPopup === _0x1a8d6c.pendingPopup &&
-        _0x23557c.active === _0x1a8d6c.active;
-    if (_0x4fa4b7) {
-      const _0x2921e6 = {
-        ..._0x23557c,
-        selected: _0x1a8d6c.selected,
-        zoomFactor: _0x1a8d6c.zoomFactor,
-        deferZoomFactor: _0x1a8d6c.deferZoomFactor,
+  const value17 = nowMs - args.lastBackgroundSyncAt >= BACKGROUND_SYNC_INTERVAL_MS;
+  if (value17) args.lastBackgroundSyncAt = nowMs;
+  return list5.map((selected2) => {
+    const viewKey = getViewKey(selected2),
+      syncPriority = args.cachedViewsByNodeId.get(viewKey),
+      value18 =
+        selected2.frozen === true &&
+        selected2.visible === true &&
+        syncPriority?.visible === true &&
+        syncPriority?.bounds &&
+        syncPriority.webUrl === selected2.webUrl &&
+        syncPriority.pendingPopup === selected2.pendingPopup &&
+        syncPriority.active === selected2.active;
+    if (value18) {
+      const value19 = {
+        ...syncPriority,
+        selected: selected2.selected,
+        zoomFactor: selected2.zoomFactor,
+        deferZoomFactor: selected2.deferZoomFactor,
         frozen: true,
-        freezeToken: _0x1a8d6c.freezeToken,
-        snapshotReady: _0x1a8d6c.snapshotReady,
-        snapshotHold: _0x1a8d6c.snapshotHold,
-        showSnapshot: _0x1a8d6c.showSnapshot,
-        syncPriority: _0x23557c.frozen === true ? 'background-throttled' : undefined,
+        freezeToken: selected2.freezeToken,
+        snapshotReady: selected2.snapshotReady,
+        snapshotHold: selected2.snapshotHold,
+        showSnapshot: selected2.showSnapshot,
+        syncPriority: syncPriority.frozen === true ? 'background-throttled' : undefined,
       };
-      return (_0x56af16.cachedViewsByNodeId.set(_0x6693c2, _0x2921e6), _0x2921e6);
+      return (args.cachedViewsByNodeId.set(viewKey, value19), value19);
     }
-    const _0x32e9dc = _0x312476 && _0x1a8d6c.frozen !== true,
-      _0xfbc2c8 =
-        _0x1a8d6c.deferZoomFactor === true && _0x1a8d6c.frozen !== true && _0x1a8d6c.visible === true,
-      _0x281c31 =
-        _0x1a8d6c.fullscreen ||
-        (_0x1a8d6c.selected && !_0x1a8d6c.frozen) ||
-        _0xfbc2c8 ||
-        _0x32e9dc ||
-        !_0x23557c ||
-        _0x23557c.active !== _0x1a8d6c.active ||
-        _0x23557c.webUrl !== _0x1a8d6c.webUrl ||
-        _0x23557c.pendingPopup !== _0x1a8d6c.pendingPopup ||
-        _0x23557c.visible !== _0x1a8d6c.visible ||
-        _0x23557c.frozen !== _0x1a8d6c.frozen ||
-        _0x23557c.freezeToken !== _0x1a8d6c.freezeToken ||
-        _0x23557c.snapshotReady !== _0x1a8d6c.snapshotReady ||
-        _0x23557c.snapshotHold !== _0x1a8d6c.snapshotHold;
-    if (_0x281c31) return (_0x56af16.cachedViewsByNodeId.set(_0x6693c2, _0x1a8d6c), _0x1a8d6c);
+    const value20 = value17 && selected2.frozen !== true,
+      value21 = selected2.deferZoomFactor === true && selected2.frozen !== true && selected2.visible === true,
+      value22 =
+        selected2.fullscreen ||
+        (selected2.selected && !selected2.frozen) ||
+        value21 ||
+        value20 ||
+        !syncPriority ||
+        syncPriority.active !== selected2.active ||
+        syncPriority.webUrl !== selected2.webUrl ||
+        syncPriority.pendingPopup !== selected2.pendingPopup ||
+        syncPriority.visible !== selected2.visible ||
+        syncPriority.frozen !== selected2.frozen ||
+        syncPriority.freezeToken !== selected2.freezeToken ||
+        syncPriority.snapshotReady !== selected2.snapshotReady ||
+        syncPriority.snapshotHold !== selected2.snapshotHold;
+    if (value22) return (args.cachedViewsByNodeId.set(viewKey, selected2), selected2);
     return {
-      ..._0x23557c,
-      webUrl: _0x1a8d6c.webUrl,
-      pendingPopup: _0x1a8d6c.pendingPopup,
-      active: _0x1a8d6c.active,
-      selected: _0x1a8d6c.selected,
-      zoomFactor: _0x1a8d6c.zoomFactor,
-      deferZoomFactor: _0x1a8d6c.deferZoomFactor,
-      frozen: _0x1a8d6c.frozen,
-      freezeToken: _0x1a8d6c.freezeToken,
-      snapshotReady: _0x1a8d6c.snapshotReady,
-      snapshotHold: _0x1a8d6c.snapshotHold,
-      showSnapshot: _0x1a8d6c.showSnapshot,
+      ...syncPriority,
+      webUrl: selected2.webUrl,
+      pendingPopup: selected2.pendingPopup,
+      active: selected2.active,
+      selected: selected2.selected,
+      zoomFactor: selected2.zoomFactor,
+      deferZoomFactor: selected2.deferZoomFactor,
+      frozen: selected2.frozen,
+      freezeToken: selected2.freezeToken,
+      snapshotReady: selected2.snapshotReady,
+      snapshotHold: selected2.snapshotHold,
+      showSnapshot: selected2.showSnapshot,
       syncPriority: 'background-throttled',
     };
   });
 }
-function buildViewsSignature(_0x5b147e = []) {
-  return _0x5b147e
-    .map((_0x1756bb) => {
-      const _0x43e69a = _0x1756bb?.bounds || {};
+function buildViewsSignature(list6 = []) {
+  return list6
+    .map((item8) => {
+      const box8 = item8?.bounds || {};
       return [
-        _0x1756bb?.nodeId || '',
-        _0x1756bb?.tabId || '',
-        _0x1756bb?.webUrl || '',
-        _0x1756bb?.pendingPopup === true ? 1 : 0,
-        _0x1756bb?.browserProfileId || '',
-        _0x1756bb?.active === true ? 1 : 0,
-        _0x1756bb?.visible === true ? 1 : 0,
-        Number(_0x43e69a.x || 0),
-        Number(_0x43e69a.y || 0),
-        Number(_0x43e69a.width || 0),
-        Number(_0x43e69a.height || 0),
-        Number(_0x1756bb?.zoomFactor || 1).toFixed(3),
-        _0x1756bb?.deferZoomFactor === true ? 1 : 0,
-        _0x1756bb?.frozen === true ? 1 : 0,
-        _0x1756bb?.freezeToken || '',
-        _0x1756bb?.snapshotReady === true ? 1 : 0,
-        _0x1756bb?.snapshotHold === true ? 1 : 0,
-        _0x1756bb?.showSnapshot === true ? 1 : 0,
-        _0x1756bb?.fullscreen === true ? 1 : 0,
-        _0x1756bb?.selected === true ? 1 : 0,
-        _0x1756bb?.canvasSpaceHeld === true ? 1 : 0,
+        item8?.nodeId || '',
+        item8?.tabId || '',
+        item8?.webUrl || '',
+        item8?.pendingPopup === true ? 1 : 0,
+        item8?.browserProfileId || '',
+        item8?.active === true ? 1 : 0,
+        item8?.visible === true ? 1 : 0,
+        Number(box8.x || 0),
+        Number(box8.y || 0),
+        Number(box8.width || 0),
+        Number(box8.height || 0),
+        Number(item8?.zoomFactor || 1).toFixed(3),
+        item8?.deferZoomFactor === true ? 1 : 0,
+        item8?.frozen === true ? 1 : 0,
+        item8?.freezeToken || '',
+        item8?.snapshotReady === true ? 1 : 0,
+        item8?.snapshotHold === true ? 1 : 0,
+        item8?.showSnapshot === true ? 1 : 0,
+        item8?.fullscreen === true ? 1 : 0,
+        item8?.selected === true ? 1 : 0,
+        item8?.canvasSpaceHeld === true ? 1 : 0,
       ].join(':');
     })
     .join('|');
 }
-function clearFinalSyncTimer(_0x53f961) {
-  if (!_0x53f961?.finalSyncTimer) return;
-  (clearTimeout(_0x53f961.finalSyncTimer), (_0x53f961.finalSyncTimer = null));
+function clearFinalSyncTimer(enabled11) {
+  if (!enabled11?.finalSyncTimer) return;
+  (clearTimeout(enabled11.finalSyncTimer), (enabled11.finalSyncTimer = null));
 }
-function setBodyClass(_0xbac539, _0x3b755c) {
-  const _0x5c2010 = globalThis.document?.body?.classList;
-  if (!_0x5c2010) return;
-  const _0xd907f8 = Boolean(_0x5c2010.contains?.(_0xbac539));
-  if (_0x3b755c) {
-    if (!_0xd907f8) _0x5c2010.add?.(_0xbac539);
-  } else _0xd907f8 && _0x5c2010.remove?.(_0xbac539);
+function setBodyClass(value23, value24) {
+  const el11 = globalThis.document?.body?.classList;
+  if (!el11) return;
+  const enabled12 = Boolean(el11.contains?.(value23));
+  if (value24) {
+    if (!enabled12) el11.add?.(value23);
+  } else enabled12 && el11.remove?.(value23);
 }
-function setFreezeActiveClass(_0x31e185) {
-  setBodyClass(FREEZE_ACTIVE_BODY_CLASS, _0x31e185);
+function setFreezeActiveClass(value25) {
+  setBodyClass(FREEZE_ACTIVE_BODY_CLASS, value25);
 }
-function setFreezeSettlingClass(_0x4e4d48) {
-  setBodyClass(FREEZE_SETTLING_BODY_CLASS, _0x4e4d48);
+function setFreezeSettlingClass(value26) {
+  setBodyClass(FREEZE_SETTLING_BODY_CLASS, value26);
 }
-function clearFreezeSettlingTimer(_0x633ce7) {
-  if (!_0x633ce7?.freezeSettlingTimer) return;
-  (clearTimeout(_0x633ce7.freezeSettlingTimer), (_0x633ce7.freezeSettlingTimer = null));
+function clearFreezeSettlingTimer(enabled13) {
+  if (!enabled13?.freezeSettlingTimer) return;
+  (clearTimeout(enabled13.freezeSettlingTimer), (enabled13.freezeSettlingTimer = null));
 }
-function scheduleFreezeSettlingClear(_0x19439b) {
-  if (!_0x19439b) return;
+function scheduleFreezeSettlingClear(enabled14) {
+  if (!enabled14) return;
   (setFreezeSettlingClass(true),
-    clearFreezeSettlingTimer(_0x19439b),
-    (_0x19439b.freezeSettlingUntil = getNowMs() + FREEZE_SETTLE_HOLD_MS),
-    (_0x19439b.freezeSettlingTimer = setTimeout(() => {
-      ((_0x19439b.freezeSettlingTimer = null),
-        (_0x19439b.freezeSettlingUntil = 0),
+    clearFreezeSettlingTimer(enabled14),
+    (enabled14.freezeSettlingUntil = getNowMs() + FREEZE_SETTLE_HOLD_MS),
+    (enabled14.freezeSettlingTimer = setTimeout(() => {
+      ((enabled14.freezeSettlingTimer = null),
+        (enabled14.freezeSettlingUntil = 0),
         setFreezeSettlingClass(false));
       if (!getCanvasInteractionState().frozen) setFreezeActiveClass(false);
-      _0x19439b.scheduleFinalSync();
+      enabled14.scheduleFinalSync();
     }, FREEZE_SETTLE_HOLD_MS)));
 }
-function createSyncBudgetState(_0x441c99) {
-  const _0x2858df = {
+function createSyncBudgetState(handler) {
+  const value27 = {
     cachedViewsByNodeId: new Map(),
     finalSyncTimer: null,
     freezeSettlingTimer: null,
@@ -461,233 +448,227 @@ function createSyncBudgetState(_0x441c99) {
     lastBackgroundSyncAt: 0,
     lastViewsSignature: '',
     scheduleFinalSync() {
-      (clearFinalSyncTimer(_0x2858df),
-        (_0x2858df.finalSyncTimer = setTimeout(() => {
-          ((_0x2858df.finalSyncTimer = null), _0x441c99());
+      (clearFinalSyncTimer(value27),
+        (value27.finalSyncTimer = setTimeout(() => {
+          ((value27.finalSyncTimer = null), handler());
         }, FINAL_INTERACTION_SYNC_DELAY_MS)));
     },
   };
-  return _0x2858df;
+  return value27;
 }
-function markInteractionTransition(_0x2a50c0, _0x90515a) {
-  if (!_0x2a50c0) return;
-  const _0x515150 = Boolean(_0x90515a?.frozen),
-    _0x249f1a = Boolean(_0x90515a?.showSnapshot),
-    _0x4083cf = Boolean(_0x90515a?.settleSnapshot),
-    _0x55483c = _0x515150 && !_0x2a50c0.freezeActive,
-    _0x2f9e38 = _0x515150 && _0x249f1a && !_0x2a50c0.snapshotFreezeActive;
-  if (_0x55483c || _0x2f9e38)
-    (clearFreezeSettlingTimer(_0x2a50c0),
-      (_0x2a50c0.freezeSettlingUntil = 0),
+function markInteractionTransition(enabled15, value28) {
+  if (!enabled15) return;
+  const enabled16 = Boolean(value28?.frozen),
+    value29 = Boolean(value28?.showSnapshot),
+    value30 = Boolean(value28?.settleSnapshot),
+    value31 = enabled16 && !enabled15.freezeActive,
+    value32 = enabled16 && value29 && !enabled15.snapshotFreezeActive;
+  if (value31 || value32)
+    (clearFreezeSettlingTimer(enabled15),
+      (enabled15.freezeSettlingUntil = 0),
       setFreezeSettlingClass(false),
-      (_0x2a50c0.freezeToken += 1),
-      (_0x2a50c0.lastBackgroundSyncAt = 0));
+      (enabled15.freezeToken += 1),
+      (enabled15.lastBackgroundSyncAt = 0));
   else
-    !_0x515150 &&
-      _0x2a50c0.freezeActive &&
-      ((_0x2a50c0.lastBackgroundSyncAt = 0),
-      _0x2a50c0.snapshotSettleActive
-        ? scheduleFreezeSettlingClear(_0x2a50c0)
-        : ((_0x2a50c0.freezeSettlingUntil = 0),
+    !enabled16 &&
+      enabled15.freezeActive &&
+      ((enabled15.lastBackgroundSyncAt = 0),
+      enabled15.snapshotSettleActive
+        ? scheduleFreezeSettlingClear(enabled15)
+        : ((enabled15.freezeSettlingUntil = 0),
           setFreezeSettlingClass(false),
           setFreezeActiveClass(false),
-          _0x2a50c0.scheduleFinalSync()));
-  ((_0x2a50c0.freezeActive = _0x515150),
-    (_0x2a50c0.snapshotFreezeActive = _0x515150 && _0x249f1a),
-    (_0x2a50c0.snapshotSettleActive = _0x515150 && _0x4083cf));
+          enabled15.scheduleFinalSync()));
+  ((enabled15.freezeActive = enabled16),
+    (enabled15.snapshotFreezeActive = enabled16 && value29),
+    (enabled15.snapshotSettleActive = enabled16 && value30));
 }
-function getEffectiveInteractionState(_0x329a49, _0x19f0bb) {
-  const _0x148be9 = !_0x329a49?.frozen && Number(_0x19f0bb?.freezeSettlingUntil || 0) > getNowMs();
-  if (!_0x148be9) return _0x329a49;
+function getEffectiveInteractionState(enabled17, value33) {
+  const enabled18 = !enabled17?.frozen && Number(value33?.freezeSettlingUntil || 0) > getNowMs();
+  if (!enabled18) return enabled17;
   return { frozen: true, deferZoomFactor: true, settleSnapshot: true, showSnapshot: true };
 }
 function collectWebPreviewViews({
-  graphStore: _0xd554e1,
+  graphStore: graphStore,
   root: root = document,
   freezeToken: freezeToken = 0,
   interactionState: interactionState = getCanvasInteractionState(),
   canvasSpaceHeld: canvasSpaceHeld = readCanvasSpaceHeld(),
 } = {}) {
-  const _0x3319e4 =
-      typeof _0xd554e1?.getStateRaw === 'function' ? _0xd554e1.getStateRaw() : _0xd554e1?.getState?.() || {},
-    _0x44e556 = new Set(_0x3319e4.selectedNodeIds || []),
-    _0x24aa5a = Object.values(_0x3319e4.nodes || {})
-      .filter((_0x4fded4) => _0x4fded4?.type === 'web-preview')
-      .map((_0x123989) => {
-        const _0xaec0fc = normalizeWebPreviewTabs(_0x123989);
+  const value34 =
+      typeof graphStore?.getStateRaw === 'function'
+        ? graphStore.getStateRaw()
+        : graphStore?.getState?.() || {},
+    map6 = new Set(value34.selectedNodeIds || []),
+    list7 = Object.values(value34.nodes || {})
+      .filter((item9) => item9?.type === 'web-preview')
+      .map((node2) => {
+        const tabState = normalizeWebPreviewTabs(node2);
         return {
-          node: _0x123989,
-          tabState: _0xaec0fc,
-          tabs: _0xaec0fc.tabs
-            .map((_0x2bc605) => ({
-              tab: _0x2bc605,
-              webUrl: normalizeWebPreviewUrl(_0x2bc605.url),
-              pendingPopup: _0x2bc605.pendingPopup === true,
-              active: _0x2bc605.id === _0xaec0fc.activeTabId,
+          node: node2,
+          tabState: tabState,
+          tabs: tabState.tabs
+            .map((tab) => ({
+              tab: tab,
+              webUrl: normalizeWebPreviewUrl(tab.url),
+              pendingPopup: tab.pendingPopup === true,
+              active: tab.id === tabState.activeTabId,
             }))
-            .filter((_0xd26072) => _0xd26072.webUrl || _0xd26072.pendingPopup),
+            .filter((item10) => item10.webUrl || item10.pendingPopup),
         };
       })
-      .filter((_0x42df20) => _0x42df20.tabs.length > 0),
-    _0x402b64 = normalizeCanvasZoom(_0x3319e4.viewport?.zoom),
-    _0x1b866f = buildSlotIndex(
+      .filter((item11) => item11.tabs.length > 0),
+    canvasZoom2 = normalizeCanvasZoom(value34.viewport?.zoom),
+    map7 = buildSlotIndex(
       root,
-      _0x24aa5a.map((_0x3ab123) => _0x3ab123.node.id),
+      list7.map((item12) => item12.node.id),
     ),
-    _0x2c8f65 = collectOcclusionRects(root, SOFT_OCCLUSION_SELECTOR),
-    _0x39bdb1 = collectOcclusionRects(root, HARD_OCCLUSION_SELECTOR),
-    _0x333e53 = collectOcclusionRects(root, FULLSCREEN_OCCLUSION_SELECTOR),
-    _0x2f275d = [];
-  for (const { node: _0x36272c, tabs: _0x52dbc6 } of _0x24aa5a) {
-    const _0x3a078a = _0x1b866f.get(_0x36272c.id);
-    for (const {
-      tab: _0x1930e4,
-      webUrl: _0x18aa12,
-      pendingPopup: _0xf781ec,
-      active: _0x3e2ffc,
-    } of _0x52dbc6) {
-      _0x2f275d.push(
+    softBlockerRects2 = collectOcclusionRects(root, SOFT_OCCLUSION_SELECTOR),
+    hardBlockerRects2 = collectOcclusionRects(root, HARD_OCCLUSION_SELECTOR),
+    fullscreenBlockerRects2 = collectOcclusionRects(root, FULLSCREEN_OCCLUSION_SELECTOR),
+    list8 = [];
+  for (const { node: node3, tabs: tabs } of list7) {
+    const value35 = map7.get(node3.id);
+    for (const { tab: tab2, webUrl: webUrl2, pendingPopup: pendingPopup2, active: active2 } of tabs) {
+      list8.push(
         buildViewPayload({
-          node: _0x36272c,
-          tabId: _0x1930e4.id,
-          webUrl: _0x18aa12,
-          pendingPopup: _0xf781ec,
-          slot: _0x3e2ffc ? _0x3a078a : null,
-          active: _0x3e2ffc,
-          selected: _0x3e2ffc && _0x44e556.has(_0x36272c.id),
-          canvasZoom: _0x402b64,
+          node: node3,
+          tabId: tab2.id,
+          webUrl: webUrl2,
+          pendingPopup: pendingPopup2,
+          slot: active2 ? value35 : null,
+          active: active2,
+          selected: active2 && map6.has(node3.id),
+          canvasZoom: canvasZoom2,
           interactionState: interactionState,
           freezeToken: freezeToken,
           canvasSpaceHeld: canvasSpaceHeld,
-          fullscreenBlockerRects: _0x333e53,
-          softBlockerRects: _0x2c8f65,
-          hardBlockerRects: _0x39bdb1,
+          fullscreenBlockerRects: fullscreenBlockerRects2,
+          softBlockerRects: softBlockerRects2,
+          hardBlockerRects: hardBlockerRects2,
         }),
       );
     }
   }
-  return (
-    _0x2f275d.sort((_0x2aa9da, _0x1515e8) => Number(_0x2aa9da.selected) - Number(_0x1515e8.selected)),
-    _0x2f275d
-  );
+  return (list8.sort((item13, value36) => Number(item13.selected) - Number(value36.selected)), list8);
 }
-export function initWebPreviewViewSyncService({ graphStore: _0x5bc956, root: root = document } = {}) {
-  const _0x498fbf = globalThis.window?.electronAPI?.webPreview;
-  if (!_0x498fbf || typeof _0x498fbf.syncViews !== 'function') return { dispose() {} };
-  const _0x55951b = getRequestAnimationFrame(),
-    _0x282f64 = getCancelAnimationFrame(),
-    _0x17a1fc = typeof _0x498fbf.syncViewsFast === 'function' ? _0x498fbf.syncViewsFast : _0x498fbf.syncViews;
-  let _0x2d4e7a = null,
-    _0x31848c = false,
-    _0x20a858 = hasActiveWebPreviewNodes(_0x5bc956),
-    _0x10c62f = null;
-  const _0xe75f76 = () => {
-      _0x2d4e7a = null;
-      if (_0x31848c) return;
-      const _0xad173d = getCanvasInteractionState();
-      markInteractionTransition(_0x10c62f, _0xad173d);
-      const _0x260d46 = getEffectiveInteractionState(_0xad173d, _0x10c62f),
-        _0x22d0a5 = syncCachedViewsForBudget(
+export function initWebPreviewViewSyncService({ graphStore: graphStore2, root: root = document } = {}) {
+  const enabled19 = globalThis.window?.electronAPI?.webPreview;
+  if (!enabled19 || typeof enabled19.syncViews !== 'function') return { dispose() {} };
+  const run = getRequestAnimationFrame(),
+    handler2 = getCancelAnimationFrame(),
+    handler3 = typeof enabled19.syncViewsFast === 'function' ? enabled19.syncViewsFast : enabled19.syncViews;
+  let value37 = null,
+    value38 = false,
+    hasActiveWebPreviewNodes2 = hasActiveWebPreviewNodes(graphStore2),
+    freezeToken4 = null;
+  const run2 = () => {
+      value37 = null;
+      if (value38) return;
+      const canvasInteractionState = getCanvasInteractionState();
+      markInteractionTransition(freezeToken4, canvasInteractionState);
+      const interactionState3 = getEffectiveInteractionState(canvasInteractionState, freezeToken4),
+        views = syncCachedViewsForBudget(
           collectWebPreviewViews({
-            graphStore: _0x5bc956,
+            graphStore: graphStore2,
             root: root,
-            freezeToken: _0x10c62f?.freezeToken || 0,
-            interactionState: _0x260d46,
-            canvasSpaceHeld: _0x10c62f?.canvasSpaceHeld === true,
+            freezeToken: freezeToken4?.freezeToken || 0,
+            interactionState: interactionState3,
+            canvasSpaceHeld: freezeToken4?.canvasSpaceHeld === true,
           }),
-          _0x10c62f,
+          freezeToken4,
         );
-      setFreezeActiveClass(_0x22d0a5.some((_0x56f076) => _0x56f076?.showSnapshot === true));
-      const _0x1b7d3a = buildViewsSignature(_0x22d0a5);
-      if (_0x1b7d3a === _0x10c62f?.lastViewsSignature) return;
-      if (_0x10c62f) _0x10c62f.lastViewsSignature = _0x1b7d3a;
+      setFreezeActiveClass(views.some((item14) => item14?.showSnapshot === true));
+      const viewsSignature = buildViewsSignature(views);
+      if (viewsSignature === freezeToken4?.lastViewsSignature) return;
+      if (freezeToken4) freezeToken4.lastViewsSignature = viewsSignature;
       try {
-        const _0x581a46 = _0x17a1fc({ views: _0x22d0a5 });
-        _0x581a46 && typeof _0x581a46.catch === 'function' && void _0x581a46.catch(() => {});
+        const promise = handler3({ views: views });
+        promise && typeof promise.catch === 'function' && void promise.catch(() => {});
       } catch {}
     },
-    _0x3b51a0 = () => {
-      if (_0x31848c || _0x2d4e7a !== null) return;
-      _0x2d4e7a = _0x55951b(_0xe75f76);
+    handler4 = () => {
+      if (value38 || value37 !== null) return;
+      value37 = run(run2);
     },
-    _0x278cfa = () => {
-      if (_0x31848c) return;
-      (_0x2d4e7a !== null && (_0x282f64(_0x2d4e7a), (_0x2d4e7a = null)), _0xe75f76());
+    handler5 = () => {
+      if (value38) return;
+      (value37 !== null && (handler2(value37), (value37 = null)), run2());
     },
-    _0x10144e = () => {
-      const _0x395cc1 = getCanvasInteractionState();
+    handler6 = () => {
+      const canvasInteractionState2 = getCanvasInteractionState();
       return (
-        _0x395cc1.frozen ||
-        _0x395cc1.deferZoomFactor ||
-        _0x10c62f?.freezeActive === true ||
-        Number(_0x10c62f?.freezeSettlingUntil || 0) > getNowMs()
+        canvasInteractionState2.frozen ||
+        canvasInteractionState2.deferZoomFactor ||
+        freezeToken4?.freezeActive === true ||
+        Number(freezeToken4?.freezeSettlingUntil || 0) > getNowMs()
       );
     },
-    _0x987633 = () => {
-      if (_0x10144e()) {
-        _0x278cfa();
+    handler7 = () => {
+      if (handler6()) {
+        handler5();
         return;
       }
-      _0x3b51a0();
+      handler4();
     },
-    _0x45a0bc = () => {
-      if (!_0x20a858) return;
-      _0x278cfa();
+    handler8 = () => {
+      if (!hasActiveWebPreviewNodes2) return;
+      handler5();
     };
-  _0x10c62f = createSyncBudgetState(_0x3b51a0);
-  const _0x3880f9 = () => {
-      if (!_0x20a858) return;
+  freezeToken4 = createSyncBudgetState(handler4);
+  const run3 = () => {
+      if (!hasActiveWebPreviewNodes2) return;
       if (isViewportPanPreviewActive()) return;
-      _0x3b51a0();
+      handler4();
     },
-    _0x25da6d = () => {
-      if (!_0x20a858) return;
-      _0x278cfa();
+    value39 = () => {
+      if (!hasActiveWebPreviewNodes2) return;
+      handler5();
     },
-    _0x4abd54 = () => {
-      if (!_0x20a858) return;
-      _0x278cfa();
+    handler9 = () => {
+      if (!hasActiveWebPreviewNodes2) return;
+      handler5();
     },
-    _0x136894 = (_0x4113f9) => {
-      if (!_0x20a858) return;
-      if (isPotentialCanvasPanStartEvent(_0x4113f9)) {
-        _0x4abd54();
+    value40 = (value41) => {
+      if (!hasActiveWebPreviewNodes2) return;
+      if (isPotentialCanvasPanStartEvent(value41)) {
+        handler9();
         return;
       }
-      _0x3b51a0();
+      handler4();
     },
-    _0x303b9f = () => {
-      _0x3880f9();
+    value42 = () => {
+      run3();
     },
-    _0x165115 = () => {
-      if (!_0x20a858 || !_0x10c62f) return;
-      const _0x3b98f9 = readCanvasSpaceHeld();
-      if (_0x10c62f.canvasSpaceHeld === _0x3b98f9) return;
-      ((_0x10c62f.canvasSpaceHeld = _0x3b98f9), _0x278cfa());
+    value43 = () => {
+      if (!hasActiveWebPreviewNodes2 || !freezeToken4) return;
+      const canvasSpaceHeld2 = readCanvasSpaceHeld();
+      if (freezeToken4.canvasSpaceHeld === canvasSpaceHeld2) return;
+      ((freezeToken4.canvasSpaceHeld = canvasSpaceHeld2), handler5());
     },
-    _0x3aa7cd = () => {
-      ((_0x20a858 = hasActiveWebPreviewNodes(_0x5bc956)), _0x987633());
+    value44 = () => {
+      ((hasActiveWebPreviewNodes2 = hasActiveWebPreviewNodes(graphStore2)), handler7());
     },
-    _0x3b4dca = typeof _0x5bc956?.subscribeRaw === 'function' ? _0x5bc956.subscribeRaw(_0x3aa7cd) : () => {},
-    _0x5ee314 =
-      typeof _0x498fbf.onEvent === 'function'
-        ? _0x498fbf.onEvent((_0xa9f81d) => {
-            if (isNativePanStartPreviewEvent(_0xa9f81d)) _0x4abd54();
+    value45 = typeof graphStore2?.subscribeRaw === 'function' ? graphStore2.subscribeRaw(value44) : () => {},
+    value46 =
+      typeof enabled19.onEvent === 'function'
+        ? enabled19.onEvent((detail) => {
+            if (isNativePanStartPreviewEvent(detail)) handler9();
             globalThis.window?.dispatchEvent?.(
-              new CustomEvent('web-preview:native-event', { detail: _0xa9f81d }),
+              new CustomEvent('web-preview:native-event', { detail: detail }),
             );
           })
         : () => {},
-    _0x3f2498 = globalThis.window?.MutationObserver || globalThis.MutationObserver,
-    _0x440369 =
-      typeof _0x3f2498 === 'function'
-        ? new _0x3f2498((_0x2247de) => {
-            if (shouldSyncForOcclusionMutation(_0x2247de)) _0x45a0bc();
+    handler10 = globalThis.window?.MutationObserver || globalThis.MutationObserver,
+    value47 =
+      typeof handler10 === 'function'
+        ? new handler10((value48) => {
+            if (shouldSyncForOcclusionMutation(value48)) handler8();
           })
         : null,
-    _0x1d2e94 = root?.body || root?.documentElement || root;
+    value49 = root?.body || root?.documentElement || root;
   try {
-    _0x440369?.observe?.(_0x1d2e94, {
+    value47?.observe?.(value49, {
       attributes: true,
       attributeFilter: ['class', 'style', 'hidden'],
       attributeOldValue: true,
@@ -696,42 +677,42 @@ export function initWebPreviewViewSyncService({ graphStore: _0x5bc956, root: roo
     });
   } catch {}
   return (
-    globalThis.window?.addEventListener?.('resize', _0x3b51a0),
-    globalThis.window?.addEventListener?.('scroll', _0x3b51a0, true),
-    globalThis.window?.addEventListener?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, _0x25da6d),
-    globalThis.window?.addEventListener?.('pointerdown', _0x136894, true),
-    globalThis.window?.addEventListener?.('pointermove', _0x3880f9),
-    globalThis.window?.addEventListener?.('pointerup', _0x303b9f),
-    globalThis.window?.addEventListener?.('pointercancel', _0x303b9f),
-    globalThis.window?.addEventListener?.('keydown', _0x165115),
-    globalThis.window?.addEventListener?.('keyup', _0x165115),
-    globalThis.window?.addEventListener?.('blur', _0x165115),
-    globalThis.window?.addEventListener?.('wheel', _0x3880f9, { passive: true }),
-    globalThis.window?.addEventListener?.('web-preview:force-sync', _0x278cfa),
-    _0x3b51a0(),
+    globalThis.window?.addEventListener?.('resize', handler4),
+    globalThis.window?.addEventListener?.('scroll', handler4, true),
+    globalThis.window?.addEventListener?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, value39),
+    globalThis.window?.addEventListener?.('pointerdown', value40, true),
+    globalThis.window?.addEventListener?.('pointermove', run3),
+    globalThis.window?.addEventListener?.('pointerup', value42),
+    globalThis.window?.addEventListener?.('pointercancel', value42),
+    globalThis.window?.addEventListener?.('keydown', value43),
+    globalThis.window?.addEventListener?.('keyup', value43),
+    globalThis.window?.addEventListener?.('blur', value43),
+    globalThis.window?.addEventListener?.('wheel', run3, { passive: true }),
+    globalThis.window?.addEventListener?.('web-preview:force-sync', handler5),
+    handler4(),
     {
       dispose() {
-        ((_0x31848c = true), clearFinalSyncTimer(_0x10c62f), clearFreezeSettlingTimer(_0x10c62f));
-        if (_0x10c62f) _0x10c62f.freezeSettlingUntil = 0;
+        ((value38 = true), clearFinalSyncTimer(freezeToken4), clearFreezeSettlingTimer(freezeToken4));
+        if (freezeToken4) freezeToken4.freezeSettlingUntil = 0;
         (setFreezeActiveClass(false), setFreezeSettlingClass(false));
-        if (_0x2d4e7a !== null) _0x282f64(_0x2d4e7a);
-        ((_0x2d4e7a = null),
-          _0x3b4dca?.(),
-          _0x5ee314?.(),
-          globalThis.window?.removeEventListener?.('resize', _0x3b51a0),
-          globalThis.window?.removeEventListener?.('scroll', _0x3b51a0, true),
-          globalThis.window?.removeEventListener?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, _0x25da6d),
-          globalThis.window?.removeEventListener?.('pointerdown', _0x136894, true),
-          globalThis.window?.removeEventListener?.('pointermove', _0x3880f9),
-          globalThis.window?.removeEventListener?.('pointerup', _0x303b9f),
-          globalThis.window?.removeEventListener?.('pointercancel', _0x303b9f),
-          globalThis.window?.removeEventListener?.('keydown', _0x165115),
-          globalThis.window?.removeEventListener?.('keyup', _0x165115),
-          globalThis.window?.removeEventListener?.('blur', _0x165115),
-          globalThis.window?.removeEventListener?.('wheel', _0x3880f9, { passive: true }),
-          globalThis.window?.removeEventListener?.('web-preview:force-sync', _0x278cfa),
-          _0x440369?.disconnect?.(),
-          void _0x498fbf.disposeViews?.());
+        if (value37 !== null) handler2(value37);
+        ((value37 = null),
+          value45?.(),
+          value46?.(),
+          globalThis.window?.removeEventListener?.('resize', handler4),
+          globalThis.window?.removeEventListener?.('scroll', handler4, true),
+          globalThis.window?.removeEventListener?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, value39),
+          globalThis.window?.removeEventListener?.('pointerdown', value40, true),
+          globalThis.window?.removeEventListener?.('pointermove', run3),
+          globalThis.window?.removeEventListener?.('pointerup', value42),
+          globalThis.window?.removeEventListener?.('pointercancel', value42),
+          globalThis.window?.removeEventListener?.('keydown', value43),
+          globalThis.window?.removeEventListener?.('keyup', value43),
+          globalThis.window?.removeEventListener?.('blur', value43),
+          globalThis.window?.removeEventListener?.('wheel', run3, { passive: true }),
+          globalThis.window?.removeEventListener?.('web-preview:force-sync', handler5),
+          value47?.disconnect?.(),
+          void enabled19.disposeViews?.());
       },
     }
   );

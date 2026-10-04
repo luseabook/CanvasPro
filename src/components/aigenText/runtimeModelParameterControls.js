@@ -29,246 +29,235 @@ const RUNTIME_OPTIONS_SOURCE = 'cliProviderModelCatalog',
     max: '最大',
     ultra: '极致',
   });
-function isPlainObject(_0x1237ec) {
-  return !!_0x1237ec && typeof _0x1237ec === 'object' && !Array['isArray'](_0x1237ec);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array['isArray'](enabled);
 }
-function getRuntimeOptions(_0x262f30 = {}) {
-  const _0x93076e = _0x262f30?.['extensions']?.['runtimeOptions'];
-  return isPlainObject(_0x93076e) ? _0x93076e : null;
+function getRuntimeOptions(options = {}) {
+  const item = options?.['extensions']?.['runtimeOptions'];
+  return isPlainObject(item) ? item : null;
 }
-function getRuntimeParameterContract(_0x457587 = '') {
-  const _0x2a77b6 = String(_0x457587 || '')['trim']();
-  if (!_0x2a77b6) return null;
-  let _0x210996 = null;
+function getRuntimeParameterContract(key = '') {
+  const modelId2 = String(key || '')['trim']();
+  if (!modelId2) return null;
+  let modelExecution = null;
   try {
-    _0x210996 = resolveModelExecution(_0x2a77b6);
+    modelExecution = resolveModelExecution(modelId2);
   } catch {
-    _0x210996 = null;
+    modelExecution = null;
   }
-  const _0x5476b7 = _0x210996?.['modelManifest'] || getModelManifest(_0x2a77b6),
-    _0x14189c = (
-      Array['isArray'](_0x5476b7?.['uiSchema']?.['fields']) ? _0x5476b7['uiSchema']['fields'] : []
-    )['filter']((_0x545f11) => _0x545f11['placement'] === 'mode');
-  if (!_0x14189c['length']) return null;
-  const _0x4597f2 = String(_0x210996?.['executionManifest']?.['extensions']?.['cliProvider'] || '')['trim']();
-  return { modelId: _0x2a77b6, cliProvider: _0x4597f2, fields: _0x14189c };
+  const index = modelExecution?.['modelManifest'] || getModelManifest(modelId2),
+    fields = (Array['isArray'](index?.['uiSchema']?.['fields']) ? index['uiSchema']['fields'] : [])['filter'](
+      (result) => result['placement'] === 'mode',
+    );
+  if (!fields['length']) return null;
+  const cliProvider = String(modelExecution?.['executionManifest']?.['extensions']?.['cliProvider'] || '')[
+    'trim'
+  ]();
+  return { modelId: modelId2, cliProvider: cliProvider, fields: fields };
 }
-function captureOpenRuntimeParameterMenu(_0x15d78a) {
-  const _0x1e160b = _0x15d78a?.['querySelectorAll']?.('[data-ui-schema-field]') || [];
-  for (const _0x14e8a6 of _0x1e160b) {
-    const _0x3c4235 =
-      _0x14e8a6?.['__uiSchemaPortaledPopup'] ||
-      _0x14e8a6?.['querySelector']?.('.ui-schema-floating-menu.show, .ui-schema-popup.show');
-    if (!_0x3c4235?.['classList']?.['contains']?.('show')) continue;
-    const _0x3ce50c = _0x3c4235['ownerDocument']?.['activeElement'],
-      _0x1ebbaf = _0x3c4235['contains']?.(_0x3ce50c)
-        ? String(_0x3ce50c?.['dataset']?.['uiSchemaValue'] || '')['trim']()
+function captureOpenRuntimeParameterMenu(el) {
+  const data = el?.['querySelectorAll']?.('[data-ui-schema-field]') || [];
+  for (const el2 of data) {
+    const el3 =
+      el2?.['__uiSchemaPortaledPopup'] ||
+      el2?.['querySelector']?.('.ui-schema-floating-menu.show, .ui-schema-popup.show');
+    if (!el3?.['classList']?.['contains']?.('show')) continue;
+    const el4 = el3['ownerDocument']?.['activeElement'],
+      focusedValue = el3['contains']?.(el4)
+        ? String(el4?.['dataset']?.['uiSchemaValue'] || '')['trim']()
         : '';
     return {
-      fieldId: String(_0x14e8a6?.['dataset']?.['uiSchemaField'] || '')['trim'](),
-      focusedValue: _0x1ebbaf,
-      scrollLeft: Number(_0x3c4235['scrollLeft']) || 0x0,
-      scrollTop: Number(_0x3c4235['scrollTop']) || 0x0,
+      fieldId: String(el2?.['dataset']?.['uiSchemaField'] || '')['trim'](),
+      focusedValue: focusedValue,
+      scrollLeft: Number(el3['scrollLeft']) || 0x0,
+      scrollTop: Number(el3['scrollTop']) || 0x0,
     };
   }
   return null;
 }
-function restoreRuntimeParameterMenu(_0x3b860a, _0x52a13b) {
-  const _0x50b895 = String(_0x52a13b?.['fieldId'] || '')['trim']();
-  if (!_0x50b895) return;
-  const _0x103c8b = Array['from'](_0x3b860a?.['querySelectorAll']?.('[data-ui-schema-field]') || [])['find'](
-      (_0x3defac) => String(_0x3defac?.['dataset']?.['uiSchemaField'] || '')['trim']() === _0x50b895,
+function restoreRuntimeParameterMenu(el5, target) {
+  const enabled2 = String(target?.['fieldId'] || '')['trim']();
+  if (!enabled2) return;
+  const el6 = Array['from'](el5?.['querySelectorAll']?.('[data-ui-schema-field]') || [])['find'](
+      (el7) => String(el7?.['dataset']?.['uiSchemaField'] || '')['trim']() === enabled2,
     ),
-    _0x2c3e1a = _0x103c8b?.['querySelector']?.('[data-ui-schema-menu-trigger]');
-  if (!_0x2c3e1a || _0x2c3e1a['disabled'] === !![]) return;
-  _0x2c3e1a['click']?.();
-  const _0xc6fd3 =
-    _0x103c8b?.['__uiSchemaPortaledPopup'] ||
-    _0x103c8b?.['querySelector']?.('.ui-schema-floating-menu.show, .ui-schema-popup.show');
-  if (!_0xc6fd3?.['classList']?.['contains']?.('show')) return;
-  ((_0xc6fd3['scrollLeft'] = Number(_0x52a13b?.['scrollLeft']) || 0x0),
-    (_0xc6fd3['scrollTop'] = Number(_0x52a13b?.['scrollTop']) || 0x0));
-  const _0xc33461 = String(_0x52a13b?.['focusedValue'] || '')['trim']();
-  if (!_0xc33461) return;
-  const _0x1b1ad7 = Array['from'](_0xc6fd3['querySelectorAll']?.('[data-ui-schema-value]') || [])['find'](
-    (_0x16fd81) => String(_0x16fd81?.['dataset']?.['uiSchemaValue'] || '')['trim']() === _0xc33461,
+    el8 = el6?.['querySelector']?.('[data-ui-schema-menu-trigger]');
+  if (!el8 || el8['disabled'] === !![]) return;
+  el8['click']?.();
+  const el9 =
+    el6?.['__uiSchemaPortaledPopup'] ||
+    el6?.['querySelector']?.('.ui-schema-floating-menu.show, .ui-schema-popup.show');
+  if (!el9?.['classList']?.['contains']?.('show')) return;
+  ((el9['scrollLeft'] = Number(target?.['scrollLeft']) || 0x0),
+    (el9['scrollTop'] = Number(target?.['scrollTop']) || 0x0));
+  const enabled3 = String(target?.['focusedValue'] || '')['trim']();
+  if (!enabled3) return;
+  const el10 = Array['from'](el9['querySelectorAll']?.('[data-ui-schema-value]') || [])['find'](
+    (el11) => String(el11?.['dataset']?.['uiSchemaValue'] || '')['trim']() === enabled3,
   );
-  _0x1b1ad7?.['focus']?.({ preventScroll: !![] });
+  el10?.['focus']?.({ preventScroll: !![] });
 }
-function normalizeCatalogModels(_0x15ff57 = {}) {
-  const _0x217f04 = Array['isArray'](_0x15ff57?.['models']) ? _0x15ff57['models'] : [],
-    _0x177d5b = new Set();
-  return _0x217f04['reduce']((_0x58acbe, _0x48418f) => {
-    if (!isPlainObject(_0x48418f)) return _0x58acbe;
-    const _0x5edb7a = String(_0x48418f['id'] || _0x48418f['model'] || '')['trim']();
-    if (!_0x5edb7a || _0x177d5b['has'](_0x5edb7a)) return _0x58acbe;
-    _0x177d5b['add'](_0x5edb7a);
-    const _0x36a071 = (
-      Array['isArray'](_0x48418f['supportedReasoningEfforts']) ? _0x48418f['supportedReasoningEfforts'] : []
+function normalizeCatalogModels(options2 = {}) {
+  const list = Array['isArray'](options2?.['models']) ? options2['models'] : [],
+    map = new Set();
+  return list['reduce']((list2, isDefault) => {
+    if (!isPlainObject(isDefault)) return list2;
+    const id = String(isDefault['id'] || isDefault['model'] || '')['trim']();
+    if (!id || map['has'](id)) return list2;
+    map['add'](id);
+    const source = (
+      Array['isArray'](isDefault['supportedReasoningEfforts']) ? isDefault['supportedReasoningEfforts'] : []
     )
-      ['map']((_0x114d39) =>
+      ['map']((el12) =>
         String(
-          isPlainObject(_0x114d39)
-            ? _0x114d39['reasoningEffort'] || _0x114d39['effort'] || _0x114d39['value'] || ''
-            : _0x114d39 || '',
+          isPlainObject(el12) ? el12['reasoningEffort'] || el12['effort'] || el12['value'] || '' : el12 || '',
         )
           ['trim']()
           ['toLowerCase'](),
       )
       ['filter'](Boolean);
     return (
-      _0x58acbe['push']({
-        id: _0x5edb7a,
-        model: String(_0x48418f['model'] || _0x5edb7a)['trim']() || _0x5edb7a,
-        displayName:
-          String(_0x48418f['displayName'] || _0x48418f['name'] || _0x5edb7a)['trim']() || _0x5edb7a,
-        isDefault: _0x48418f['isDefault'] === !![],
-        defaultReasoningEffort: String(_0x48418f['defaultReasoningEffort'] || '')
+      list2['push']({
+        id: id,
+        model: String(isDefault['model'] || id)['trim']() || id,
+        displayName: String(isDefault['displayName'] || isDefault['name'] || id)['trim']() || id,
+        isDefault: isDefault['isDefault'] === !![],
+        defaultReasoningEffort: String(isDefault['defaultReasoningEffort'] || '')
           ['trim']()
           ['toLowerCase'](),
-        supportedReasoningEfforts: Array['from'](new Set(_0x36a071)),
+        supportedReasoningEfforts: Array['from'](new Set(source)),
       }),
-      _0x58acbe
+      list2
     );
   }, []);
 }
-function findDefaultCatalogModel(_0x35532b, _0x1a55b) {
-  const _0x1a6abb = String(_0x35532b?.['defaultModel'] || '')['trim']();
+function findDefaultCatalogModel(next, list3) {
+  const current = String(next?.['defaultModel'] || '')['trim']();
   return (
-    _0x1a55b['find']((_0x1db80c) => _0x1a6abb && _0x1db80c['id'] === _0x1a6abb) ||
-    _0x1a55b['find']((_0x2661ac) => _0x2661ac['isDefault']) ||
+    list3['find']((entry) => current && entry['id'] === current) ||
+    list3['find']((record) => record['isDefault']) ||
     null
   );
 }
-function ensureSelectedOption(_0x16d2b6, _0x2b0f07, _0x49dc80 = '') {
-  const _0x3f100e = String(_0x2b0f07 || '')['trim']();
-  if (!_0x3f100e || _0x16d2b6['some']((_0x10618a) => String(_0x10618a?.['value'] || '') === _0x3f100e))
-    return _0x16d2b6;
+function ensureSelectedOption(list4, payload, selectedLabel = '') {
+  const value2 = String(payload || '')['trim']();
+  if (!value2 || list4['some']((el13) => String(el13?.['value'] || '') === value2)) return list4;
   return [
-    ..._0x16d2b6,
+    ...list4,
     {
-      value: _0x3f100e,
-      label: _0x3f100e,
-      selectedLabel: _0x49dc80 || _0x3f100e,
+      value: value2,
+      label: value2,
+      selectedLabel: selectedLabel || value2,
       subtitle: '当前保存值（目录中暂不可用）',
     },
   ];
 }
-function appendCatalogStatusOption(_0x4ec65c, _0x4c97f4 = '') {
-  const _0x28916e = String(_0x4c97f4 || '')['trim'](),
-    _0x491264 = CATALOG_STATUS_OPTION_VALUES[_0x28916e];
-  if (!_0x491264) return _0x4ec65c;
+function appendCatalogStatusOption(args, handle = '') {
+  const label = String(handle || '')['trim'](),
+    value3 = CATALOG_STATUS_OPTION_VALUES[label];
+  if (!value3) return args;
   return [
-    ..._0x4ec65c,
+    ...args,
     {
-      value: _0x491264,
-      label: _0x28916e === 'loading' ? '正在读取模型…' : '模型列表读取失败',
+      value: value3,
+      label: label === 'loading' ? '正在读取模型…' : '模型列表读取失败',
       disabled: !![],
     },
   ];
 }
-function buildModelOptions(_0x3c377f, _0x2cd0ad, _0x364429, _0x5e861b, _0x4e5317) {
-  const _0x5350f1 = findDefaultCatalogModel(_0x2cd0ad, _0x364429),
-    _0x235a5d =
-      (Array['isArray'](_0x3c377f?.['options']) ? _0x3c377f['options'] : [])['find'](
-        (_0x488c29) => String(_0x488c29?.['value'] || '') === AUTO_VALUE,
+function buildModelOptions(state, config, list5, scope, input) {
+  const subtitle = findDefaultCatalogModel(config, list5),
+    args2 =
+      (Array['isArray'](state?.['options']) ? state['options'] : [])['find'](
+        (el14) => String(el14?.['value'] || '') === AUTO_VALUE,
       ) || {},
-    _0x2ccba8 = {
-      ..._0x235a5d,
+    output = {
+      ...args2,
       value: AUTO_VALUE,
       label: '自动',
       selectedLabel: '模型：自动',
-      subtitle: _0x5350f1
-        ? '跟随 CLI 默认模型：' + _0x5350f1['displayName']
+      subtitle: subtitle
+        ? '跟随 CLI 默认模型：' + subtitle['displayName']
         : '跟随\x20OpenAI\x20CLI\x20默认模型',
     },
-    _0x25db61 = [
-      _0x2ccba8,
-      ..._0x364429['map']((_0x193315) => ({
-        value: _0x193315['id'],
-        label: _0x193315['displayName'],
-        selectedLabel: _0x193315['displayName'],
+    value4 = [
+      output,
+      ...list5['map']((value5) => ({
+        value: value5['id'],
+        label: value5['displayName'],
+        selectedLabel: value5['displayName'],
         subtitle: [
-          _0x193315['displayName'] === _0x193315['id'] ? '' : _0x193315['id'],
-          _0x193315['isDefault'] ? 'CLI\x20默认' : '',
+          value5['displayName'] === value5['id'] ? '' : value5['id'],
+          value5['isDefault'] ? 'CLI\x20默认' : '',
         ]
           ['filter'](Boolean)
           ['join'](' · '),
       })),
     ];
-  return appendCatalogStatusOption(ensureSelectedOption(_0x25db61, _0x5e861b), _0x4e5317);
+  return appendCatalogStatusOption(ensureSelectedOption(value4, scope), input);
 }
-function buildReasoningOptions(_0x1ef7b2, _0x1f3865, _0x9a922b, _0x2e2763, _0x3de17e, _0x3a567f) {
-  const _0xebebf1 = findDefaultCatalogModel(_0x1f3865, _0x9a922b),
-    _0x4a413e =
-      _0x2e2763 && _0x2e2763 !== AUTO_VALUE
-        ? _0x9a922b['find'](
-            (_0x5f5403) => _0x5f5403['id'] === _0x2e2763 || _0x5f5403['model'] === _0x2e2763,
-          ) || null
-        : _0xebebf1,
-    _0x3379e9 =
-      (Array['isArray'](_0x1ef7b2?.['options']) ? _0x1ef7b2['options'] : [])['find'](
-        (_0x39d0c3) => String(_0x39d0c3?.['value'] || '') === AUTO_VALUE,
+function buildReasoningOptions(value6, value7, list6, value8, value9, value10) {
+  const defaultCatalogModel = findDefaultCatalogModel(value7, list6),
+    value11 =
+      value8 && value8 !== AUTO_VALUE
+        ? list6['find']((value12) => value12['id'] === value8 || value12['model'] === value8) || null
+        : defaultCatalogModel,
+    args3 =
+      (Array['isArray'](value6?.['options']) ? value6['options'] : [])['find'](
+        (el15) => String(el15?.['value'] || '') === AUTO_VALUE,
       ) || {},
-    _0xf61c35 = [
-      { ..._0x3379e9, value: AUTO_VALUE, label: '自动', selectedLabel: '推理：自动' },
-      ...(_0x4a413e?.['supportedReasoningEfforts'] || [])['map']((_0x27cf67) => {
-        const _0x48e54e = REASONING_EFFORT_LABELS[_0x27cf67] || _0x27cf67;
-        return { value: _0x27cf67, label: _0x48e54e, selectedLabel: '推理：' + _0x48e54e };
+    value13 = [
+      { ...args3, value: AUTO_VALUE, label: '自动', selectedLabel: '推理：自动' },
+      ...(value11?.['supportedReasoningEfforts'] || [])['map']((value14) => {
+        const label2 = REASONING_EFFORT_LABELS[value14] || value14;
+        return { value: value14, label: label2, selectedLabel: '推理：' + label2 };
       }),
     ];
   return appendCatalogStatusOption(
-    ensureSelectedOption(_0xf61c35, _0x3de17e, '推理：' + (REASONING_EFFORT_LABELS[_0x3de17e] || _0x3de17e)),
-    _0x3a567f,
+    ensureSelectedOption(value13, value9, '推理：' + (REASONING_EFFORT_LABELS[value9] || value9)),
+    value10,
   );
 }
 export function buildAIGenTextRuntimeParameterFields(
-  _0x2b7733,
-  _0x4943fc = {},
-  _0x386c20 = {},
+  value15,
+  value16 = {},
+  value17 = {},
   { catalogStatus: catalogStatus = '' } = {},
 ) {
-  const _0x5368dc = getRuntimeParameterContract(_0x2b7733);
-  if (!_0x5368dc) return [];
-  const _0x720d16 = normalizeGenerationParams(_0x4943fc?.['generationParams']),
-    _0x3a4341 = normalizeCatalogModels(_0x386c20),
-    _0x75f89c = String(_0x720d16['cliModel'] || AUTO_VALUE)['trim'](),
-    _0x37de7b = String(_0x720d16['reasoningEffort'] || AUTO_VALUE)['trim']();
-  return _0x5368dc['fields']['map']((_0x34a051) => {
-    const _0x90daef = getRuntimeOptions(_0x34a051);
-    if (_0x90daef?.['source'] !== RUNTIME_OPTIONS_SOURCE) return _0x34a051;
-    const _0x41f059 = String(_0x90daef?.['kind'] || '')['trim'](),
-      _0x480f3a =
-        _0x41f059 === 'model'
-          ? buildModelOptions(_0x34a051, _0x386c20, _0x3a4341, _0x75f89c, catalogStatus)
-          : _0x41f059 === 'reasoningEffort'
-            ? buildReasoningOptions(_0x34a051, _0x386c20, _0x3a4341, _0x75f89c, _0x37de7b, catalogStatus)
-            : Array['isArray'](_0x34a051?.['options'])
-              ? [..._0x34a051['options']]
+  const runtimeParameterContract = getRuntimeParameterContract(value15);
+  if (!runtimeParameterContract) return [];
+  const generationParams = normalizeGenerationParams(value16?.['generationParams']),
+    catalogModels = normalizeCatalogModels(value17),
+    value18 = String(generationParams['cliModel'] || AUTO_VALUE)['trim'](),
+    value19 = String(generationParams['reasoningEffort'] || AUTO_VALUE)['trim']();
+  return runtimeParameterContract['fields']['map']((args4) => {
+    const runtimeOptions = getRuntimeOptions(args4);
+    if (runtimeOptions?.['source'] !== RUNTIME_OPTIONS_SOURCE) return args4;
+    const value20 = String(runtimeOptions?.['kind'] || '')['trim'](),
+      options3 =
+        value20 === 'model'
+          ? buildModelOptions(args4, value17, catalogModels, value18, catalogStatus)
+          : value20 === 'reasoningEffort'
+            ? buildReasoningOptions(args4, value17, catalogModels, value18, value19, catalogStatus)
+            : Array['isArray'](args4?.['options'])
+              ? [...args4['options']]
               : [];
-    return { ..._0x34a051, options: _0x480f3a };
+    return { ...args4, options: options3 };
   });
 }
-export function renderAIGenTextRuntimeParameterMarkup(
-  _0x32129a,
-  _0x2edd44 = {},
-  _0x33bc55 = {},
-  _0x1dc7f1 = {},
-) {
-  const _0x7b3a7d = buildAIGenTextRuntimeParameterFields(_0x32129a, _0x2edd44, _0x33bc55, _0x1dc7f1);
-  if (!_0x7b3a7d['length']) return '';
-  const _0x228f07 = Object['fromEntries'](
-    _0x7b3a7d['map']((_0x5f283b) => [
-      String(_0x5f283b?.['id'] || '')['trim'](),
-      { options: Array['isArray'](_0x5f283b?.['options']) ? _0x5f283b['options'] : [] },
+export function renderAIGenTextRuntimeParameterMarkup(value21, value22 = {}, value23 = {}, value24 = {}) {
+  const sourceId = buildAIGenTextRuntimeParameterFields(value21, value22, value23, value24);
+  if (!sourceId['length']) return '';
+  const fieldOverrides = Object['fromEntries'](
+    sourceId['map']((value25) => [
+      String(value25?.['id'] || '')['trim'](),
+      { options: Array['isArray'](value25?.['options']) ? value25['options'] : [] },
     ]),
   );
-  return renderModelUiSchemaControls(_0x32129a, _0x2edd44, {
+  return renderModelUiSchemaControls(value21, value22, {
     placement: 'mode',
-    fieldOverrides: _0x228f07,
-    sourceId: _0x7b3a7d['some'](
-      (_0x403cc7) => getRuntimeOptions(_0x403cc7)?.['source'] === RUNTIME_OPTIONS_SOURCE,
-    )
+    fieldOverrides: fieldOverrides,
+    sourceId: sourceId['some']((value26) => getRuntimeOptions(value26)?.['source'] === RUNTIME_OPTIONS_SOURCE)
       ? RUNTIME_OPTIONS_SOURCE
       : 'manifest',
   });
@@ -280,180 +269,180 @@ export function buildAIGenTextRuntimeParameterPatch({
   value: value = '',
   catalog: catalog = {},
 } = {}) {
-  const _0x35e4b3 = { ...nodeData, model: String(modelId || nodeData?.['model'] || '')['trim']() };
-  let _0x2f75 = buildActiveModelGenerationParamPatch(_0x35e4b3, fieldId, value);
-  if (!Object['keys'](_0x2f75)['length'] || fieldId !== 'cliModel') return _0x2f75;
-  const _0x1abe7e = { ..._0x35e4b3, ..._0x2f75 },
-    _0x201159 = normalizeCatalogModels(catalog),
-    _0x5d51f2 = String(_0x1abe7e?.['generationParams']?.['cliModel'] || AUTO_VALUE)['trim'](),
-    _0x3110b3 =
-      _0x5d51f2 === AUTO_VALUE
-        ? findDefaultCatalogModel(catalog, _0x201159)
-        : _0x201159['find'](
-            (_0x14bfe4) => _0x14bfe4['id'] === _0x5d51f2 || _0x14bfe4['model'] === _0x5d51f2,
-          ) || null;
-  if (!_0x3110b3) return _0x2f75;
-  const _0x2d41c3 = new Set([AUTO_VALUE, ..._0x3110b3['supportedReasoningEfforts']]),
-    _0xefabd4 = String(_0x1abe7e?.['generationParams']?.['reasoningEffort'] || AUTO_VALUE);
-  if (_0x2d41c3['has'](_0xefabd4)) return _0x2f75;
-  const _0x256b14 = buildActiveModelGenerationParamPatch(_0x1abe7e, 'reasoningEffort', AUTO_VALUE);
-  return ((_0x2f75 = { ..._0x2f75, ..._0x256b14 }), _0x2f75);
+  const args5 = { ...nodeData, model: String(modelId || nodeData?.['model'] || '')['trim']() };
+  let args6 = buildActiveModelGenerationParamPatch(args5, fieldId, value);
+  if (!Object['keys'](args6)['length'] || fieldId !== 'cliModel') return args6;
+  const value27 = { ...args5, ...args6 },
+    list7 = normalizeCatalogModels(catalog),
+    value28 = String(value27?.['generationParams']?.['cliModel'] || AUTO_VALUE)['trim'](),
+    args7 =
+      value28 === AUTO_VALUE
+        ? findDefaultCatalogModel(catalog, list7)
+        : list7['find']((value29) => value29['id'] === value28 || value29['model'] === value28) || null;
+  if (!args7) return args6;
+  const map2 = new Set([AUTO_VALUE, ...args7['supportedReasoningEfforts']]),
+    value30 = String(value27?.['generationParams']?.['reasoningEffort'] || AUTO_VALUE);
+  if (map2['has'](value30)) return args6;
+  const args8 = buildActiveModelGenerationParamPatch(value27, 'reasoningEffort', AUTO_VALUE);
+  return ((args6 = { ...args6, ...args8 }), args6);
 }
 export function bindAIGenTextRuntimeParameterControls(
-  _0x3c815d,
+  el16,
   {
     modelId: modelId = '',
     nodeId: nodeId = '',
     store: store = null,
-    getState: _0x4bb5a2,
-    onChange: _0x402ab7,
+    getState: getState,
+    onChange: onChange,
     windowObject: windowObject = globalThis['window'],
   } = {},
 ) {
-  const _0x482683 =
-      _0x3c815d?.['matches']?.('[data-aigen-text-ui-schema-mode-slot]') ||
-      _0x3c815d?.['dataset']?.['aigenTextUiSchemaModeSlot'] !== undefined,
-    _0x4b8860 = _0x482683
-      ? _0x3c815d
-      : _0x3c815d?.['querySelector']?.('[data-aigen-text-ui-schema-mode-slot]');
-  if (!_0x4b8860) return { destroy() {}, setModel() {}, sync() {} };
-  const _0x2f5656 = String(nodeId || '')['trim'](),
-    _0x53dc77 = _0x2f5656 || 'aigen-text-runtime-schema',
-    _0x4bcd16 =
-      !!_0x2f5656 &&
+  const value31 =
+      el16?.['matches']?.('[data-aigen-text-ui-schema-mode-slot]') ||
+      el16?.['dataset']?.['aigenTextUiSchemaModeSlot'] !== undefined,
+    el17 = value31 ? el16 : el16?.['querySelector']?.('[data-aigen-text-ui-schema-mode-slot]');
+  if (!el17) return { destroy() {}, setModel() {}, sync() {} };
+  const enabled4 = String(nodeId || '')['trim'](),
+    nodeId2 = enabled4 || 'aigen-text-runtime-schema',
+    value32 =
+      !!enabled4 &&
       !!store &&
       typeof store['getState'] === 'function' &&
       typeof store['updateNodeData'] === 'function',
-    _0x566ad8 = _0x4bb5a2?.();
-  let _0x1ded22 = isPlainObject(_0x566ad8) ? _0x566ad8 : {};
-  const _0x54b058 = () => {
-      if (_0x4bcd16) {
-        const _0x32d22d = store['getState']?.()?.['nodes']?.[_0x2f5656];
-        if (isPlainObject(_0x32d22d)) return _0x32d22d;
+    value33 = getState?.();
+  let isPlainObject2 = isPlainObject(value33) ? value33 : {};
+  const run = () => {
+      if (value32) {
+        const value34 = store['getState']?.()?.['nodes']?.[enabled4];
+        if (isPlainObject(value34)) return value34;
       }
-      const _0x2392d0 = _0x4bb5a2?.();
-      if (isPlainObject(_0x2392d0)) return ((_0x1ded22 = _0x2392d0), _0x2392d0);
-      return _0x1ded22;
+      const value35 = getState?.();
+      if (isPlainObject(value35)) return ((isPlainObject2 = value35), value35);
+      return isPlainObject2;
     },
-    _0xee6afc = _0x4bcd16
+    store2 = value32
       ? store
       : {
-          getState: () => ({ nodes: { [_0x53dc77]: _0x54b058() } }),
-          updateNodeData: (_0x199fe0, _0x4491f3 = {}) => {
-            const _0x266318 = _0x54b058(),
-              _0x474001 = _0x402ab7?.(_0x4491f3);
-            _0x1ded22 = isPlainObject(_0x474001) ? _0x474001 : { ..._0x266318, ..._0x4491f3 };
+          getState: () => ({ nodes: { [nodeId2]: run() } }),
+          updateNodeData: (value36, args9 = {}) => {
+            const args10 = run(),
+              value37 = onChange?.(args9);
+            isPlainObject2 = isPlainObject(value37) ? value37 : { ...args10, ...args9 };
           },
         };
-  let _0x3e7390 = String(modelId || _0x54b058()?.['model'] || '')['trim'](),
-    _0x840c60 = {},
-    _0x156157 = () => {},
-    _0x27c363 = ![],
-    _0x929bdf = 0x0,
-    _0x4addf5 = ![],
-    _0x1dbda1 = ![],
-    _0x52739f = '';
-  const _0x3203e7 = () => {
-      if (_0x27c363) return;
-      const _0xc3c715 = captureOpenRuntimeParameterMenu(_0x4b8860);
-      _0x156157?.();
-      const _0x19d8e4 = _0x54b058(),
-        _0x4bbe0a = _0x4addf5 ? 'loading' : _0x1dbda1 ? 'error' : '',
-        _0x407fa2 = buildAIGenTextRuntimeParameterFields(_0x3e7390, _0x19d8e4, _0x840c60, {
-          catalogStatus: _0x4bbe0a,
+  let modelId3 = String(modelId || run()?.['model'] || '')['trim'](),
+    catalog2 = {},
+    bindModelUiSchemaControls2 = () => {},
+    value38 = ![],
+    value39 = 0x0,
+    enabled5 = ![],
+    enabled6 = ![],
+    value40 = '';
+  const run2 = () => {
+      if (value38) return;
+      const captureOpenRuntimeParameterMenu2 = captureOpenRuntimeParameterMenu(el17);
+      bindModelUiSchemaControls2?.();
+      const nodeData2 = run(),
+        catalogStatus2 = enabled5 ? 'loading' : enabled6 ? 'error' : '',
+        list8 = buildAIGenTextRuntimeParameterFields(modelId3, nodeData2, catalog2, {
+          catalogStatus: catalogStatus2,
         }),
-        _0x18be4a = _0x407fa2['length'] > 0x0;
-      ((_0x4b8860['hidden'] = !_0x18be4a),
-        (_0x4b8860['innerHTML'] = _0x18be4a
-          ? renderAIGenTextRuntimeParameterMarkup(_0x3e7390, _0x19d8e4, _0x840c60, {
-              catalogStatus: _0x4bbe0a,
+        enabled7 = list8['length'] > 0x0;
+      ((el17['hidden'] = !enabled7),
+        (el17['innerHTML'] = enabled7
+          ? renderAIGenTextRuntimeParameterMarkup(modelId3, nodeData2, catalog2, {
+              catalogStatus: catalogStatus2,
             })
           : ''),
-        (_0x52739f = String(_0x19d8e4?.['generationParams']?.['cliModel'] || AUTO_VALUE)['trim']()));
-      if (!_0x18be4a) {
-        _0x156157 = () => {};
+        (value40 = String(nodeData2?.['generationParams']?.['cliModel'] || AUTO_VALUE)['trim']()));
+      if (!enabled7) {
+        bindModelUiSchemaControls2 = () => {};
         return;
       }
-      ((_0x156157 = bindModelUiSchemaControls(_0x4b8860, {
-        nodeId: _0x53dc77,
-        nodeData: _0x19d8e4,
-        store: _0xee6afc,
-        buildPatch: (_0x24bd77, _0x252162, _0x4cdc3b) =>
+      ((bindModelUiSchemaControls2 = bindModelUiSchemaControls(el17, {
+        nodeId: nodeId2,
+        nodeData: nodeData2,
+        store: store2,
+        buildPatch: (nodeData3, fieldId2, value41) =>
           buildAIGenTextRuntimeParameterPatch({
-            modelId: _0x3e7390,
-            nodeData: _0x24bd77,
-            fieldId: _0x252162,
-            value: _0x4cdc3b,
-            catalog: _0x840c60,
+            modelId: modelId3,
+            nodeData: nodeData3,
+            fieldId: fieldId2,
+            value: value41,
+            catalog: catalog2,
           }),
-        afterCommit: (_0x46a7d) => {
-          if (_0x46a7d === 'cliModel') {
-            const _0x52f689 =
-              globalThis['queueMicrotask'] || ((_0x3755f7) => Promise['resolve']()['then'](_0x3755f7));
-            _0x52f689(_0x3203e7);
+        afterCommit: (value42) => {
+          if (value42 === 'cliModel') {
+            const run3 = globalThis['queueMicrotask'] || ((value43) => Promise['resolve']()['then'](value43));
+            run3(run2);
           }
         },
       })),
-        restoreRuntimeParameterMenu(_0x4b8860, _0xc3c715));
+        restoreRuntimeParameterMenu(el17, captureOpenRuntimeParameterMenu2));
     },
-    _0x501ac3 = async ({ force: force = ![] } = {}) => {
-      const _0x747fb4 = ++_0x929bdf;
-      ((_0x4addf5 = !![]), (_0x1dbda1 = ![]), (_0x840c60 = {}), _0x3203e7());
-      const _0x1f3aaf = getRuntimeParameterContract(_0x3e7390);
-      if (!_0x1f3aaf?.['cliProvider']) {
-        _0x4addf5 = ![];
+    handler = async ({ force: force = ![] } = {}) => {
+      const value44 = ++value39;
+      ((enabled5 = !![]), (enabled6 = ![]), (catalog2 = {}), run2());
+      const runtimeParameterContract2 = getRuntimeParameterContract(modelId3);
+      if (!runtimeParameterContract2?.['cliProvider']) {
+        enabled5 = ![];
         return;
       }
       try {
-        const _0x11afdf = await fetchCliProviderModels(_0x1f3aaf['cliProvider'], { force: force });
-        if (_0x27c363 || _0x747fb4 !== _0x929bdf) return;
-        _0x840c60 = isPlainObject(_0x11afdf) ? _0x11afdf : {};
+        const fetchCliProviderModels2 = await fetchCliProviderModels(
+          runtimeParameterContract2['cliProvider'],
+          { force: force },
+        );
+        if (value38 || value44 !== value39) return;
+        catalog2 = isPlainObject(fetchCliProviderModels2) ? fetchCliProviderModels2 : {};
       } catch {
-        if (_0x27c363 || _0x747fb4 !== _0x929bdf) return;
-        ((_0x840c60 = {}), (_0x1dbda1 = !![]));
+        if (value38 || value44 !== value39) return;
+        ((catalog2 = {}), (enabled6 = !![]));
       }
-      ((_0x4addf5 = ![]), _0x3203e7());
+      ((enabled5 = ![]), run2());
     },
-    _0x5b8fe4 = () => {
-      const _0x37d406 = getRuntimeParameterContract(_0x3e7390);
-      if (!_0x37d406?.['cliProvider']) return;
-      const _0x51d7d4 = getCachedCliProviderStatus(_0x37d406['cliProvider']),
-        _0xa220d6 = _0x51d7d4?.['loggedIn'] === !![] || _0x51d7d4?.['authConfigured'] === !![];
-      if (!_0xa220d6) return;
-      !_0x4addf5 && normalizeCatalogModels(_0x840c60)['length'] === 0x0 && void _0x501ac3({ force: !![] });
+    value45 = () => {
+      const runtimeParameterContract3 = getRuntimeParameterContract(modelId3);
+      if (!runtimeParameterContract3?.['cliProvider']) return;
+      const cachedCliProviderStatus = getCachedCliProviderStatus(runtimeParameterContract3['cliProvider']),
+        enabled8 =
+          cachedCliProviderStatus?.['loggedIn'] === !![] ||
+          cachedCliProviderStatus?.['authConfigured'] === !![];
+      if (!enabled8) return;
+      !enabled5 && normalizeCatalogModels(catalog2)['length'] === 0x0 && void handler({ force: !![] });
     };
   return (
-    windowObject?.['addEventListener']?.(CLI_PROVIDER_STATUS_CHANGED_EVENT, _0x5b8fe4),
-    void _0x501ac3(),
+    windowObject?.['addEventListener']?.(CLI_PROVIDER_STATUS_CHANGED_EVENT, value45),
+    void handler(),
     {
-      setModel(_0x534429) {
-        const _0x40ffca = String(_0x534429 || '')['trim']();
-        if (_0x40ffca === _0x3e7390) {
-          this['sync'](_0x54b058());
+      setModel(value46) {
+        const value47 = String(value46 || '')['trim']();
+        if (value47 === modelId3) {
+          this['sync'](run());
           return;
         }
-        ((_0x3e7390 = _0x40ffca), void _0x501ac3());
+        ((modelId3 = value47), void handler());
       },
-      sync(_0xe002e8 = _0x54b058()) {
-        if (_0x27c363) return;
-        const _0x966c92 = String(_0xe002e8?.['model'] || _0x3e7390)['trim']();
-        if (_0x966c92 !== _0x3e7390) {
-          ((_0x3e7390 = _0x966c92), void _0x501ac3());
+      sync(value48 = run()) {
+        if (value38) return;
+        const value49 = String(value48?.['model'] || modelId3)['trim']();
+        if (value49 !== modelId3) {
+          ((modelId3 = value49), void handler());
           return;
         }
-        const _0x12c58d = String(_0xe002e8?.['generationParams']?.['cliModel'] || AUTO_VALUE)['trim']();
-        if (_0x12c58d !== _0x52739f) {
-          _0x3203e7();
+        const value50 = String(value48?.['generationParams']?.['cliModel'] || AUTO_VALUE)['trim']();
+        if (value50 !== value40) {
+          run2();
           return;
         }
-        syncModelUiSchemaControls(_0x4b8860, _0xe002e8);
+        syncModelUiSchemaControls(el17, value48);
       },
       destroy() {
-        ((_0x27c363 = !![]),
-          (_0x929bdf += 0x1),
-          _0x156157?.(),
-          windowObject?.['removeEventListener']?.(CLI_PROVIDER_STATUS_CHANGED_EVENT, _0x5b8fe4),
-          _0x4b8860['replaceChildren']?.());
+        ((value38 = !![]),
+          (value39 += 0x1),
+          bindModelUiSchemaControls2?.(),
+          windowObject?.['removeEventListener']?.(CLI_PROVIDER_STATUS_CHANGED_EVENT, value45),
+          el17['replaceChildren']?.());
       },
     }
   );

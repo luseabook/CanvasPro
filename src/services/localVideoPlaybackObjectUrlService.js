@@ -16,154 +16,147 @@ const LOCAL_VIDEO_PLAYBACK_MAX_BYTES = 0x40 * 0x400 * 0x400,
   warmupBypassUntilBySource = new Map();
 let queuedEntries = [],
   activeFetchCount = 0x0;
-function resolveCanonicalLocalSource(_0x4ead17) {
-  const _0x253d35 = String(_0x4ead17 || '')['trim'](),
-    _0xac5b1d = globalThis['location'] || globalThis['window']?.['location'],
-    _0x17eba7 = String(_0xac5b1d?.['href'] || '')['trim'](),
-    _0x69c436 = String(_0xac5b1d?.['origin'] || '')['trim']();
-  if (!_0x253d35 || !_0x17eba7 || !_0x69c436 || _0x69c436 === 'null') return '';
+function resolveCanonicalLocalSource(value) {
+  const enabled = String(value || '')['trim'](),
+    item = globalThis['location'] || globalThis['window']?.['location'],
+    enabled2 = String(item?.['href'] || '')['trim'](),
+    enabled3 = String(item?.['origin'] || '')['trim']();
+  if (!enabled || !enabled2 || !enabled3 || enabled3 === 'null') return '';
   try {
-    const _0x5d2756 = new URL(_0x253d35, _0x17eba7);
+    const uRL = new URL(enabled, enabled2);
     if (
-      _0x5d2756['origin'] !== _0x69c436 ||
-      _0x5d2756['username'] ||
-      _0x5d2756['password'] ||
-      !LOCAL_VIDEO_PATH_RE['test'](_0x5d2756['pathname'])
+      uRL['origin'] !== enabled3 ||
+      uRL['username'] ||
+      uRL['password'] ||
+      !LOCAL_VIDEO_PATH_RE['test'](uRL['pathname'])
     )
       return '';
-    return ((_0x5d2756['hash'] = ''), _0x5d2756['href']);
+    return ((uRL['hash'] = ''), uRL['href']);
   } catch {
     return '';
   }
 }
-function isWarmupBypassed(_0xc7f31f) {
-  const _0x47fdc9 = Number(warmupBypassUntilBySource['get'](_0xc7f31f) || 0x0);
-  if (!(_0x47fdc9 > Date['now']())) return (warmupBypassUntilBySource['delete'](_0xc7f31f), ![]);
+function isWarmupBypassed(key) {
+  const index = Number(warmupBypassUntilBySource['get'](key) || 0x0);
+  if (!(index > Date['now']())) return (warmupBypassUntilBySource['delete'](key), ![]);
   return !![];
 }
-function hasReferences(_0x1bbf98) {
+function hasReferences(result) {
   return (
-    _0x1bbf98['ownerRefs']['size'] > 0x0 ||
-    _0x1bbf98['warmupRefs']['size'] > 0x0 ||
-    _0x1bbf98['handoffRetained'] === !![]
+    result['ownerRefs']['size'] > 0x0 ||
+    result['warmupRefs']['size'] > 0x0 ||
+    result['handoffRetained'] === !![]
   );
 }
-function clearWarmupExpiry(_0x1a6f1d) {
-  if (_0x1a6f1d?.['warmupExpiryTimer'] == null) return;
-  (clearTimeout(_0x1a6f1d['warmupExpiryTimer']), (_0x1a6f1d['warmupExpiryTimer'] = null));
+function clearWarmupExpiry(data) {
+  if (data?.['warmupExpiryTimer'] == null) return;
+  (clearTimeout(data['warmupExpiryTimer']), (data['warmupExpiryTimer'] = null));
 }
-function getWarmupBlobBytes(_0x3d720a = null) {
-  let _0x5077d7 = 0x0;
-  for (const _0x40a828 of entriesBySource['values']()) {
-    if (_0x40a828 === _0x3d720a || !_0x40a828['blob'] || _0x40a828['ownerRefs']['size'] > 0x0) continue;
-    _0x5077d7 += Number(_0x40a828['blob']['size'] || 0x0);
+function getWarmupBlobBytes(value2 = null) {
+  let options = 0x0;
+  for (const enabled4 of entriesBySource['values']()) {
+    if (enabled4 === value2 || !enabled4['blob'] || enabled4['ownerRefs']['size'] > 0x0) continue;
+    options += Number(enabled4['blob']['size'] || 0x0);
   }
-  return _0x5077d7;
+  return options;
 }
-function expireWarmupEntry(_0x4c6de8) {
-  clearWarmupExpiry(_0x4c6de8);
-  if (!_0x4c6de8 || _0x4c6de8['ownerRefs']['size'] > 0x0) return;
-  for (const _0x118581 of _0x4c6de8['warmupRefs']) {
-    const _0x443726 = sourcesByWarmupScope['get'](_0x118581);
-    _0x443726?.['delete'](_0x4c6de8['sourceUrl']);
-    if (_0x443726?.['size'] === 0x0) sourcesByWarmupScope['delete'](_0x118581);
+function expireWarmupEntry(enabled5) {
+  clearWarmupExpiry(enabled5);
+  if (!enabled5 || enabled5['ownerRefs']['size'] > 0x0) return;
+  for (const target of enabled5['warmupRefs']) {
+    const map = sourcesByWarmupScope['get'](target);
+    map?.['delete'](enabled5['sourceUrl']);
+    if (map?.['size'] === 0x0) sourcesByWarmupScope['delete'](target);
   }
-  (_0x4c6de8['warmupRefs']['clear'](),
-    (_0x4c6de8['handoffRetained'] = ![]),
-    removeEntryIfUnreferenced(_0x4c6de8));
+  (enabled5['warmupRefs']['clear'](),
+    (enabled5['handoffRetained'] = ![]),
+    removeEntryIfUnreferenced(enabled5));
 }
-function scheduleWarmupExpiry(_0x4a1125) {
-  clearWarmupExpiry(_0x4a1125);
-  if (!_0x4a1125 || _0x4a1125['ownerRefs']['size'] > 0x0) return;
-  ((_0x4a1125['warmupExpiryTimer'] = setTimeout(
-    () => expireWarmupEntry(_0x4a1125),
-    LOCAL_VIDEO_WARMUP_TTL_MS,
-  )),
-    _0x4a1125['warmupExpiryTimer']?.['unref']?.());
+function scheduleWarmupExpiry(enabled6) {
+  clearWarmupExpiry(enabled6);
+  if (!enabled6 || enabled6['ownerRefs']['size'] > 0x0) return;
+  ((enabled6['warmupExpiryTimer'] = setTimeout(() => expireWarmupEntry(enabled6), LOCAL_VIDEO_WARMUP_TTL_MS)),
+    enabled6['warmupExpiryTimer']?.['unref']?.());
 }
-function evictWarmupBlobsForBudget(_0x6dd77e, _0x214d8c = null) {
-  let _0x3f3064 = getWarmupBlobBytes(_0x214d8c);
-  if (_0x3f3064 + _0x6dd77e <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return !![];
-  const _0x2ded7f = Array['from'](entriesBySource['values']())
-    ['filter'](
-      (_0x2c6118) => _0x2c6118 !== _0x214d8c && _0x2c6118['blob'] && _0x2c6118['ownerRefs']['size'] === 0x0,
-    )
+function evictWarmupBlobsForBudget(source, next = null) {
+  let warmupBlobBytes = getWarmupBlobBytes(next);
+  if (warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return !![];
+  const current = Array['from'](entriesBySource['values']())
+    ['filter']((entry) => entry !== next && entry['blob'] && entry['ownerRefs']['size'] === 0x0)
     ['sort'](
-      (_0x41a84e, _0x117d00) =>
-        Number(_0x41a84e['blobReadyAt'] || 0x0) - Number(_0x117d00['blobReadyAt'] || 0x0),
+      (record, payload) => Number(record['blobReadyAt'] || 0x0) - Number(payload['blobReadyAt'] || 0x0),
     );
-  for (const _0x1dc0a of _0x2ded7f) {
-    const _0x87824e = Number(_0x1dc0a['blob']?.['size'] || 0x0);
-    (expireWarmupEntry(_0x1dc0a), (_0x3f3064 = Math['max'](0x0, _0x3f3064 - _0x87824e)));
-    if (_0x3f3064 + _0x6dd77e <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return !![];
+  for (const handle of current) {
+    const state = Number(handle['blob']?.['size'] || 0x0);
+    (expireWarmupEntry(handle), (warmupBlobBytes = Math['max'](0x0, warmupBlobBytes - state)));
+    if (warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return !![];
   }
-  return _0x3f3064 + _0x6dd77e <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES;
+  return warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES;
 }
-function settleEntry(_0x5cfe8f, _0x4c8c2f = '') {
-  if (_0x5cfe8f['settled']) return;
-  ((_0x5cfe8f['settled'] = !![]), _0x5cfe8f['resolvePromise'](_0x4c8c2f));
+function settleEntry(config, input = '') {
+  if (config['settled']) return;
+  ((config['settled'] = !![]), config['resolvePromise'](input));
 }
-function createPlaybackResult(_0x556b24, _0x1e76aa = '', _0x21c7bc = 0x0) {
+function createPlaybackResult(output, value3 = '', value4 = 0x0) {
   return {
-    status: String(_0x556b24 || 'failed'),
-    playbackUrl: String(_0x1e76aa || ''),
-    httpStatus: Number(_0x21c7bc || 0x0),
+    status: String(output || 'failed'),
+    playbackUrl: String(value3 || ''),
+    httpStatus: Number(value4 || 0x0),
   };
 }
-function disposeEntry(_0x39db9f) {
-  if (!_0x39db9f || _0x39db9f['disposed']) return;
-  ((_0x39db9f['disposed'] = !![]),
-    clearWarmupExpiry(_0x39db9f),
-    _0x39db9f['controller']['abort'](),
-    (_0x39db9f['queued'] = ![]),
-    _0x39db9f['objectUrl'] &&
-      (revokeTrackedMediaObjectUrl(_0x39db9f['objectUrl']), (_0x39db9f['objectUrl'] = '')),
-    (_0x39db9f['blob'] = null),
-    settleEntry(_0x39db9f, ''));
+function disposeEntry(enabled7) {
+  if (!enabled7 || enabled7['disposed']) return;
+  ((enabled7['disposed'] = !![]),
+    clearWarmupExpiry(enabled7),
+    enabled7['controller']['abort'](),
+    (enabled7['queued'] = ![]),
+    enabled7['objectUrl'] &&
+      (revokeTrackedMediaObjectUrl(enabled7['objectUrl']), (enabled7['objectUrl'] = '')),
+    (enabled7['blob'] = null),
+    settleEntry(enabled7, ''));
 }
-function syncEntryObjectUrl(_0x23fb95) {
-  if (!_0x23fb95 || _0x23fb95['disposed']) return '';
-  if (_0x23fb95['ownerRefs']['size'] === 0x0) {
-    _0x23fb95['objectUrl'] &&
-      (revokeTrackedMediaObjectUrl(_0x23fb95['objectUrl']), (_0x23fb95['objectUrl'] = ''));
+function syncEntryObjectUrl(ownerId) {
+  if (!ownerId || ownerId['disposed']) return '';
+  if (ownerId['ownerRefs']['size'] === 0x0) {
+    ownerId['objectUrl'] && (revokeTrackedMediaObjectUrl(ownerId['objectUrl']), (ownerId['objectUrl'] = ''));
     if (
-      _0x23fb95['blob'] &&
-      (_0x23fb95['blob']['size'] > LOCAL_VIDEO_WARMUP_MAX_BYTES ||
-        !evictWarmupBlobsForBudget(_0x23fb95['blob']['size'], _0x23fb95))
+      ownerId['blob'] &&
+      (ownerId['blob']['size'] > LOCAL_VIDEO_WARMUP_MAX_BYTES ||
+        !evictWarmupBlobsForBudget(ownerId['blob']['size'], ownerId))
     )
-      return (expireWarmupEntry(_0x23fb95), '');
-    return (scheduleWarmupExpiry(_0x23fb95), '');
+      return (expireWarmupEntry(ownerId), '');
+    return (scheduleWarmupExpiry(ownerId), '');
   }
   return (
-    (_0x23fb95['handoffRetained'] = ![]),
-    clearWarmupExpiry(_0x23fb95),
-    !_0x23fb95['objectUrl'] &&
-      _0x23fb95['blob'] &&
-      (_0x23fb95['objectUrl'] = createTrackedMediaObjectUrl(_0x23fb95['blob'], {
+    (ownerId['handoffRetained'] = ![]),
+    clearWarmupExpiry(ownerId),
+    !ownerId['objectUrl'] &&
+      ownerId['blob'] &&
+      (ownerId['objectUrl'] = createTrackedMediaObjectUrl(ownerId['blob'], {
         kind: 'video',
-        ownerId: _0x23fb95['firstOwnerId'],
-        sourceUrl: _0x23fb95['sourceUrl'],
+        ownerId: ownerId['firstOwnerId'],
+        sourceUrl: ownerId['sourceUrl'],
       })),
-    _0x23fb95['objectUrl']
+    ownerId['objectUrl']
   );
 }
-function removeEntryIfUnreferenced(_0x411b17) {
-  if (!_0x411b17 || hasReferences(_0x411b17)) return ![];
+function removeEntryIfUnreferenced(enabled8) {
+  if (!enabled8 || hasReferences(enabled8)) return ![];
   return (
-    entriesBySource['get'](_0x411b17['sourceUrl']) === _0x411b17 &&
-      entriesBySource['delete'](_0x411b17['sourceUrl']),
-    disposeEntry(_0x411b17),
+    entriesBySource['get'](enabled8['sourceUrl']) === enabled8 &&
+      entriesBySource['delete'](enabled8['sourceUrl']),
+    disposeEntry(enabled8),
     !![]
   );
 }
-function createEntry(_0xacebb2, _0x156aea = '') {
-  let _0x229d78;
-  const _0x3ba0b5 = new Promise((_0x1564dd) => {
-      _0x229d78 = _0x1564dd;
+function createEntry(sourceUrl, value5 = '') {
+  let resolvePromise;
+  const promise = new Promise((value6) => {
+      resolvePromise = value6;
     }),
-    _0x236e1a = {
-      sourceUrl: _0xacebb2,
-      firstOwnerId: String(_0x156aea || ''),
+    value7 = {
+      sourceUrl: sourceUrl,
+      firstOwnerId: String(value5 || ''),
       playbackMaxBytes: LOCAL_VIDEO_PLAYBACK_MAX_BYTES,
       playbackTimeoutMs: LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS,
       ownerRefs: new Set(),
@@ -175,8 +168,8 @@ function createEntry(_0xacebb2, _0x156aea = '') {
       objectUrl: '',
       status: 'pending',
       httpStatus: 0x0,
-      promise: _0x3ba0b5,
-      resolvePromise: _0x229d78,
+      promise: promise,
+      resolvePromise: resolvePromise,
       settled: ![],
       disposed: ![],
       queued: ![],
@@ -184,116 +177,115 @@ function createEntry(_0xacebb2, _0x156aea = '') {
       bypassConcurrencyLimitRequested: ![],
       warmupExpiryTimer: null,
     };
-  return (entriesBySource['set'](_0xacebb2, _0x236e1a), _0x236e1a);
+  return (entriesBySource['set'](sourceUrl, value7), value7);
 }
-function getOrCreateEntry(_0x3e0d80, _0x1bf67c = '') {
-  return entriesBySource['get'](_0x3e0d80) || createEntry(_0x3e0d80, _0x1bf67c);
+function getOrCreateEntry(value8, value9 = '') {
+  return entriesBySource['get'](value8) || createEntry(value8, value9);
 }
-function removeOwnerReference(_0x534ed5) {
-  const _0x2cf027 = String(_0x534ed5 || '')['trim'](),
-    _0x2c01e2 = sourceByOwner['get'](_0x2cf027);
-  if (!_0x2cf027 || !_0x2c01e2) return ![];
-  sourceByOwner['delete'](_0x2cf027);
-  const _0x1c22b6 = entriesBySource['get'](_0x2c01e2);
-  if (!_0x1c22b6) return ![];
+function removeOwnerReference(value10) {
+  const enabled9 = String(value10 || '')['trim'](),
+    enabled10 = sourceByOwner['get'](enabled9);
+  if (!enabled9 || !enabled10) return ![];
+  sourceByOwner['delete'](enabled9);
+  const enabled11 = entriesBySource['get'](enabled10);
+  if (!enabled11) return ![];
   return (
-    _0x1c22b6['ownerRefs']['delete'](_0x2cf027),
-    syncEntryObjectUrl(_0x1c22b6),
-    removeEntryIfUnreferenced(_0x1c22b6),
+    enabled11['ownerRefs']['delete'](enabled9),
+    syncEntryObjectUrl(enabled11),
+    removeEntryIfUnreferenced(enabled11),
     !![]
   );
 }
-async function startEntryFetch(_0x37a074) {
-  ((_0x37a074['active'] = !![]), (activeFetchCount += 0x1));
-  const _0x214130 = _0x37a074['ownerRefs']['size'] === 0x0;
-  let _0x3b1cf3 = ![];
-  const _0x344865 = () =>
-    _0x214130 &&
-    _0x37a074['ownerRefs']['size'] > 0x0 &&
-    !_0x37a074['disposed'] &&
-    !_0x37a074['controller']['signal']['aborted'] &&
-    entriesBySource['get'](_0x37a074['sourceUrl']) === _0x37a074;
+async function startEntryFetch(signal2) {
+  ((signal2['active'] = !![]), (activeFetchCount += 0x1));
+  const timeout2 = signal2['ownerRefs']['size'] === 0x0;
+  let value11 = ![];
+  const run = () =>
+    timeout2 &&
+    signal2['ownerRefs']['size'] > 0x0 &&
+    !signal2['disposed'] &&
+    !signal2['controller']['signal']['aborted'] &&
+    entriesBySource['get'](signal2['sourceUrl']) === signal2;
   try {
-    const _0x487fb0 = _0x214130 ? LOCAL_VIDEO_WARMUP_MAX_BYTES : _0x37a074['playbackMaxBytes'],
-      _0x149686 = Array['from'](entriesBySource['values']())['reduce'](
-        (_0x1b1dc8, _0xe6d2e) =>
-          _0x1b1dc8 + Number(_0xe6d2e['blob']?.['size'] || _0xe6d2e['reservedBytes'] || 0x0),
+    const maxBytes2 = timeout2 ? LOCAL_VIDEO_WARMUP_MAX_BYTES : signal2['playbackMaxBytes'],
+      value12 = Array['from'](entriesBySource['values']())['reduce'](
+        (value13, value14) => value13 + Number(value14['blob']?.['size'] || value14['reservedBytes'] || 0x0),
         0x0,
       );
-    if (_0x149686 + _0x487fb0 > LOCAL_VIDEO_PLAYBACK_TOTAL_BYTES) {
-      ((_0x37a074['status'] = 'budget-exceeded'), settleEntry(_0x37a074, ''));
+    if (value12 + maxBytes2 > LOCAL_VIDEO_PLAYBACK_TOTAL_BYTES) {
+      ((signal2['status'] = 'budget-exceeded'), settleEntry(signal2, ''));
       return;
     }
-    _0x37a074['reservedBytes'] = _0x487fb0;
-    const _0x3bbd3f = await fetchLocalMediaPlaybackBlob(_0x37a074['sourceUrl'], {
-        signal: _0x37a074['controller']['signal'],
-        timeout: _0x214130 ? LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS : _0x37a074['playbackTimeoutMs'],
-        maxBytes: _0x487fb0,
+    signal2['reservedBytes'] = maxBytes2;
+    const response = await fetchLocalMediaPlaybackBlob(signal2['sourceUrl'], {
+        signal: signal2['controller']['signal'],
+        timeout: timeout2 ? LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS : signal2['playbackTimeoutMs'],
+        maxBytes: maxBytes2,
         resultMode: 'typed',
       }),
-      _0x8259f2 = _0x3bbd3f?.['blob'] || null;
-    ((_0x37a074['status'] = String(_0x3bbd3f?.['status'] || (_0x8259f2 ? 'ready' : 'failed'))),
-      (_0x37a074['httpStatus'] = Number(_0x3bbd3f?.['httpStatus'] || 0x0)));
+      enabled12 = response?.['blob'] || null;
+    ((signal2['status'] = String(response?.['status'] || (enabled12 ? 'ready' : 'failed'))),
+      (signal2['httpStatus'] = Number(response?.['httpStatus'] || 0x0)));
     if (
-      !_0x8259f2 ||
-      _0x37a074['disposed'] ||
-      _0x37a074['controller']['signal']['aborted'] ||
-      entriesBySource['get'](_0x37a074['sourceUrl']) !== _0x37a074 ||
-      !hasReferences(_0x37a074)
+      !enabled12 ||
+      signal2['disposed'] ||
+      signal2['controller']['signal']['aborted'] ||
+      entriesBySource['get'](signal2['sourceUrl']) !== signal2 ||
+      !hasReferences(signal2)
     ) {
-      if (_0x344865()) {
-        _0x3b1cf3 = !![];
+      if (run()) {
+        value11 = !![];
         return;
       }
-      _0x214130 &&
-        !_0x37a074['disposed'] &&
-        !_0x37a074['controller']['signal']['aborted'] &&
-        warmupBypassUntilBySource['set'](_0x37a074['sourceUrl'], Date['now']() + LOCAL_VIDEO_WARMUP_TTL_MS);
-      settleEntry(_0x37a074, '');
+      timeout2 &&
+        !signal2['disposed'] &&
+        !signal2['controller']['signal']['aborted'] &&
+        warmupBypassUntilBySource['set'](signal2['sourceUrl'], Date['now']() + LOCAL_VIDEO_WARMUP_TTL_MS);
+      settleEntry(signal2, '');
       return;
     }
-    const _0x2c4efb = Number(_0x8259f2['size'] || 0x0);
+    const value15 = Number(enabled12['size'] || 0x0);
     if (
-      _0x37a074['ownerRefs']['size'] === 0x0 &&
-      (_0x2c4efb > LOCAL_VIDEO_WARMUP_MAX_BYTES || !evictWarmupBlobsForBudget(_0x2c4efb, _0x37a074))
+      signal2['ownerRefs']['size'] === 0x0 &&
+      (value15 > LOCAL_VIDEO_WARMUP_MAX_BYTES || !evictWarmupBlobsForBudget(value15, signal2))
     ) {
-      settleEntry(_0x37a074, '');
+      settleEntry(signal2, '');
       return;
     }
-    ((_0x37a074['blob'] = _0x8259f2),
-      (_0x37a074['blobReadyAt'] = Date['now']()),
-      (_0x37a074['status'] = 'ready'),
-      (_0x37a074['httpStatus'] = 0x0));
-    const _0xcabd40 = syncEntryObjectUrl(_0x37a074);
-    settleEntry(_0x37a074, _0xcabd40);
+    ((signal2['blob'] = enabled12),
+      (signal2['blobReadyAt'] = Date['now']()),
+      (signal2['status'] = 'ready'),
+      (signal2['httpStatus'] = 0x0));
+    const syncEntryObjectUrl2 = syncEntryObjectUrl(signal2);
+    settleEntry(signal2, syncEntryObjectUrl2);
   } catch {
-    ((_0x37a074['status'] = _0x37a074['controller']['signal']['aborted'] ? 'aborted' : 'failed'),
-      (_0x37a074['httpStatus'] = 0x0));
-    if (_0x344865()) _0x3b1cf3 = !![];
-    else settleEntry(_0x37a074, '');
+    ((signal2['status'] = signal2['controller']['signal']['aborted'] ? 'aborted' : 'failed'),
+      (signal2['httpStatus'] = 0x0));
+    if (run()) value11 = !![];
+    else settleEntry(signal2, '');
   } finally {
-    ((_0x37a074['reservedBytes'] = 0x0),
-      (_0x37a074['active'] = ![]),
+    ((signal2['reservedBytes'] = 0x0),
+      (signal2['active'] = ![]),
       (activeFetchCount = Math['max'](0x0, activeFetchCount - 0x1)));
-    if (_0x3b1cf3)
-      ((_0x37a074['controller'] = new AbortController()),
-        (_0x37a074['status'] = 'pending'),
-        (_0x37a074['httpStatus'] = 0x0),
-        enqueueEntry(_0x37a074, {
+    if (value11)
+      ((signal2['controller'] = new AbortController()),
+        (signal2['status'] = 'pending'),
+        (signal2['httpStatus'] = 0x0),
+        enqueueEntry(signal2, {
           urgent: !![],
-          bypassConcurrencyLimit: _0x37a074['bypassConcurrencyLimitRequested'],
+          bypassConcurrencyLimit: signal2['bypassConcurrencyLimitRequested'],
         }));
     else {
       if (
-        !_0x37a074['blob'] &&
-        !_0x37a074['objectUrl'] &&
-        entriesBySource['get'](_0x37a074['sourceUrl']) === _0x37a074
+        !signal2['blob'] &&
+        !signal2['objectUrl'] &&
+        entriesBySource['get'](signal2['sourceUrl']) === signal2
       ) {
-        entriesBySource['delete'](_0x37a074['sourceUrl']);
-        for (const _0x1a9b3a of _0x37a074['ownerRefs']) {
-          if (sourceByOwner['get'](_0x1a9b3a) === _0x37a074['sourceUrl']) sourceByOwner['delete'](_0x1a9b3a);
+        entriesBySource['delete'](signal2['sourceUrl']);
+        for (const value16 of signal2['ownerRefs']) {
+          if (sourceByOwner['get'](value16) === signal2['sourceUrl']) sourceByOwner['delete'](value16);
         }
-        (_0x37a074['ownerRefs']['clear'](), _0x37a074['warmupRefs']['clear']());
+        (signal2['ownerRefs']['clear'](), signal2['warmupRefs']['clear']());
       }
     }
     drainQueue();
@@ -301,96 +293,88 @@ async function startEntryFetch(_0x37a074) {
 }
 function drainQueue() {
   while (activeFetchCount < LOCAL_VIDEO_PLAYBACK_CONCURRENCY && queuedEntries['length'] > 0x0) {
-    const _0x52b9cb = queuedEntries['shift']();
-    if (!_0x52b9cb) continue;
-    _0x52b9cb['queued'] = ![];
+    const enabled13 = queuedEntries['shift']();
+    if (!enabled13) continue;
+    enabled13['queued'] = ![];
     if (
-      _0x52b9cb['disposed'] ||
-      _0x52b9cb['active'] ||
-      _0x52b9cb['objectUrl'] ||
-      entriesBySource['get'](_0x52b9cb['sourceUrl']) !== _0x52b9cb ||
-      !hasReferences(_0x52b9cb)
+      enabled13['disposed'] ||
+      enabled13['active'] ||
+      enabled13['objectUrl'] ||
+      entriesBySource['get'](enabled13['sourceUrl']) !== enabled13 ||
+      !hasReferences(enabled13)
     )
       continue;
-    void startEntryFetch(_0x52b9cb);
+    void startEntryFetch(enabled13);
   }
 }
 function enqueueEntry(
-  _0x2fc4e4,
+  enabled14,
   { urgent: urgent = ![], bypassConcurrencyLimit: bypassConcurrencyLimit = ![] } = {},
 ) {
   if (
-    !_0x2fc4e4 ||
-    _0x2fc4e4['disposed'] ||
-    _0x2fc4e4['active'] ||
-    _0x2fc4e4['blob'] ||
-    _0x2fc4e4['objectUrl']
+    !enabled14 ||
+    enabled14['disposed'] ||
+    enabled14['active'] ||
+    enabled14['blob'] ||
+    enabled14['objectUrl']
   )
     return;
   if (bypassConcurrencyLimit) {
-    _0x2fc4e4['queued'] &&
-      ((queuedEntries = queuedEntries['filter']((_0x3abe7e) => _0x3abe7e !== _0x2fc4e4)),
-      (_0x2fc4e4['queued'] = ![]));
-    void startEntryFetch(_0x2fc4e4);
+    enabled14['queued'] &&
+      ((queuedEntries = queuedEntries['filter']((value17) => value17 !== enabled14)),
+      (enabled14['queued'] = ![]));
+    void startEntryFetch(enabled14);
     return;
   }
-  if (_0x2fc4e4['queued']) {
-    urgent &&
-      (queuedEntries = [_0x2fc4e4, ...queuedEntries['filter']((_0x1d3bbd) => _0x1d3bbd !== _0x2fc4e4)]);
+  if (enabled14['queued']) {
+    urgent && (queuedEntries = [enabled14, ...queuedEntries['filter']((value18) => value18 !== enabled14)]);
     return;
   }
-  _0x2fc4e4['queued'] = !![];
-  if (urgent) queuedEntries['unshift'](_0x2fc4e4);
-  else queuedEntries['push'](_0x2fc4e4);
+  enabled14['queued'] = !![];
+  if (urgent) queuedEntries['unshift'](enabled14);
+  else queuedEntries['push'](enabled14);
   drainQueue();
 }
-function removeOwnerReferenceForSource(_0x96681e, _0x58c3a5) {
-  const _0x590cf3 = String(_0x96681e || '')['trim'](),
-    _0x52eb8e = String(_0x58c3a5 || '')['trim']();
-  if (!_0x590cf3 || !_0x52eb8e || sourceByOwner['get'](_0x590cf3) !== _0x52eb8e) return ![];
-  return removeOwnerReference(_0x590cf3);
+function removeOwnerReferenceForSource(value19, value20) {
+  const enabled15 = String(value19 || '')['trim'](),
+    enabled16 = String(value20 || '')['trim']();
+  if (!enabled15 || !enabled16 || sourceByOwner['get'](enabled15) !== enabled16) return ![];
+  return removeOwnerReference(enabled15);
 }
-function waitForPlaybackEntry(
-  _0x5ab66c,
-  _0x13a006,
-  _0x3e2646,
-  { signal: _0x21d92d, timeout: _0x4e898a } = {},
-) {
-  if (_0x5ab66c['settled']) return Promise['resolve']('settled');
-  const _0x591853 = Number['isFinite'](Number(_0x4e898a))
-    ? Math['max'](0x0, Number(_0x4e898a))
+function waitForPlaybackEntry(value21, value22, value23, { signal: signal3, timeout: timeout3 } = {}) {
+  if (value21['settled']) return Promise['resolve']('settled');
+  const count = Number['isFinite'](Number(timeout3))
+    ? Math['max'](0x0, Number(timeout3))
     : LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS;
-  return new Promise((_0x337140) => {
-    let _0xef6138 = ![],
-      _0x2d64a1 = null,
-      _0x40f8ea = null;
-    const _0x479ff3 = (_0x30075b) => {
-      if (_0xef6138) return;
-      _0xef6138 = !![];
-      if (_0x2d64a1 !== null) clearTimeout(_0x2d64a1);
-      if (_0x21d92d && _0x40f8ea) _0x21d92d['removeEventListener']?.('abort', _0x40f8ea);
-      _0x337140(_0x30075b);
+  return new Promise((handler) => {
+    let value24 = ![],
+      timer = null,
+      value25 = null;
+    const run2 = (value26) => {
+      if (value24) return;
+      value24 = !![];
+      if (timer !== null) clearTimeout(timer);
+      if (signal3 && value25) signal3['removeEventListener']?.('abort', value25);
+      handler(value26);
     };
-    if (_0x21d92d?.['aborted']) {
-      _0x479ff3('aborted');
+    if (signal3?.['aborted']) {
+      run2('aborted');
       return;
     }
-    (_0x21d92d &&
-      ((_0x40f8ea = () => _0x479ff3('aborted')),
-      _0x21d92d['addEventListener']?.('abort', _0x40f8ea, { once: !![] })),
-      _0x591853 > 0x0 &&
-        ((_0x2d64a1 = setTimeout(() => _0x479ff3('timeout'), _0x591853)), _0x2d64a1?.['unref']?.()),
-      _0x5ab66c['promise']['then'](
-        () => _0x479ff3('settled'),
-        () => _0x479ff3('settled'),
+    (signal3 &&
+      ((value25 = () => run2('aborted')), signal3['addEventListener']?.('abort', value25, { once: !![] })),
+      count > 0x0 && ((timer = setTimeout(() => run2('timeout'), count)), timer?.['unref']?.()),
+      value21['promise']['then'](
+        () => run2('settled'),
+        () => run2('settled'),
       ));
-  })['then']((_0x475934) => {
-    return (_0x475934 !== 'settled' && removeOwnerReferenceForSource(_0x13a006, _0x3e2646), _0x475934);
+  })['then']((value27) => {
+    return (value27 !== 'settled' && removeOwnerReferenceForSource(value22, value23), value27);
   });
 }
 export async function acquireLocalVideoPlaybackObjectUrlResult(
-  _0x165807,
-  _0x4e8e5a,
+  value28,
+  value29,
   {
     bypassConcurrencyLimit: bypassConcurrencyLimit = ![],
     maxBytes: maxBytes = LOCAL_VIDEO_PLAYBACK_MAX_BYTES,
@@ -399,114 +383,122 @@ export async function acquireLocalVideoPlaybackObjectUrlResult(
     playbackStrategy: playbackStrategy = 'blob',
   } = {},
 ) {
-  const _0xa7cd69 = resolveCanonicalLocalSource(_0x165807),
-    _0x5e300d = String(_0x4e8e5a || '')['trim']();
-  if (!_0x5e300d) return createPlaybackResult('missing-owner');
-  const _0x457518 = sourceByOwner['get'](_0x5e300d) || '';
-  if (!_0xa7cd69) return (removeOwnerReference(_0x5e300d), createPlaybackResult('not-local'));
-  if (_0x457518 && _0x457518 !== _0xa7cd69) removeOwnerReference(_0x5e300d);
+  const canonicalLocalSource = resolveCanonicalLocalSource(value28),
+    enabled17 = String(value29 || '')['trim']();
+  if (!enabled17) return createPlaybackResult('missing-owner');
+  const enabled18 = sourceByOwner['get'](enabled17) || '';
+  if (!canonicalLocalSource) return (removeOwnerReference(enabled17), createPlaybackResult('not-local'));
+  if (enabled18 && enabled18 !== canonicalLocalSource) removeOwnerReference(enabled17);
   if (signal?.['aborted']) return createPlaybackResult('aborted');
-  if (playbackStrategy === 'range' && !_0x457518 && !entriesBySource['has'](_0xa7cd69))
-    return createPlaybackResult('ready', _0xa7cd69);
-  warmupBypassUntilBySource['delete'](_0xa7cd69);
-  const _0x2dbc3d = getOrCreateEntry(_0xa7cd69, _0x5e300d);
-  ((_0x2dbc3d['playbackMaxBytes'] = Math['max'](
-    _0x2dbc3d['playbackMaxBytes'],
+  if (playbackStrategy === 'range' && !enabled18 && !entriesBySource['has'](canonicalLocalSource))
+    return createPlaybackResult('ready', canonicalLocalSource);
+  warmupBypassUntilBySource['delete'](canonicalLocalSource);
+  const response2 = getOrCreateEntry(canonicalLocalSource, enabled17);
+  ((response2['playbackMaxBytes'] = Math['max'](
+    response2['playbackMaxBytes'],
     Math['min'](
       LOCAL_VIDEO_PLAYBACK_MAX_REQUEST_BYTES,
       Math['max'](LOCAL_VIDEO_PLAYBACK_MAX_BYTES, Math['trunc'](Number(maxBytes) || 0x0)),
     ),
   )),
-    (_0x2dbc3d['playbackTimeoutMs'] = Math['max'](
-      _0x2dbc3d['playbackTimeoutMs'],
+    (response2['playbackTimeoutMs'] = Math['max'](
+      response2['playbackTimeoutMs'],
       Math['min'](
         LOCAL_VIDEO_PLAYBACK_MAX_REQUEST_TIMEOUT_MS,
         Math['max'](LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS, Math['trunc'](Number(timeout) || 0x0)),
       ),
     )));
-  (!_0x2dbc3d['firstOwnerId'] || _0x2dbc3d['firstOwnerId']['startsWith']('warmup:')) &&
-    (_0x2dbc3d['firstOwnerId'] = _0x5e300d);
-  (_0x2dbc3d['ownerRefs']['add'](_0x5e300d), sourceByOwner['set'](_0x5e300d, _0xa7cd69));
-  if (bypassConcurrencyLimit) _0x2dbc3d['bypassConcurrencyLimitRequested'] = !![];
-  const _0x44963f = syncEntryObjectUrl(_0x2dbc3d);
-  if (_0x44963f) return createPlaybackResult('ready', _0x44963f);
-  enqueueEntry(_0x2dbc3d, { urgent: !![], bypassConcurrencyLimit: bypassConcurrencyLimit });
-  const _0x3fee7e = await waitForPlaybackEntry(_0x2dbc3d, _0x5e300d, _0xa7cd69, {
+  (!response2['firstOwnerId'] || response2['firstOwnerId']['startsWith']('warmup:')) &&
+    (response2['firstOwnerId'] = enabled17);
+  (response2['ownerRefs']['add'](enabled17), sourceByOwner['set'](enabled17, canonicalLocalSource));
+  if (bypassConcurrencyLimit) response2['bypassConcurrencyLimitRequested'] = !![];
+  const syncEntryObjectUrl3 = syncEntryObjectUrl(response2);
+  if (syncEntryObjectUrl3) return createPlaybackResult('ready', syncEntryObjectUrl3);
+  enqueueEntry(response2, { urgent: !![], bypassConcurrencyLimit: bypassConcurrencyLimit });
+  const waitForPlaybackEntry2 = await waitForPlaybackEntry(response2, enabled17, canonicalLocalSource, {
     signal: signal,
     timeout: timeout,
   });
-  if (_0x3fee7e === 'timeout') return createPlaybackResult('timeout');
-  if (_0x3fee7e === 'aborted') return createPlaybackResult('aborted');
-  const _0x803d2e = syncEntryObjectUrl(_0x2dbc3d);
-  if (sourceByOwner['get'](_0x5e300d) === _0xa7cd69 && _0x2dbc3d['ownerRefs']['has'](_0x5e300d) && _0x803d2e)
-    return createPlaybackResult('ready', _0x803d2e);
-  return createPlaybackResult(_0x2dbc3d['status'], '', _0x2dbc3d['httpStatus']);
+  if (waitForPlaybackEntry2 === 'timeout') return createPlaybackResult('timeout');
+  if (waitForPlaybackEntry2 === 'aborted') return createPlaybackResult('aborted');
+  const syncEntryObjectUrl4 = syncEntryObjectUrl(response2);
+  if (
+    sourceByOwner['get'](enabled17) === canonicalLocalSource &&
+    response2['ownerRefs']['has'](enabled17) &&
+    syncEntryObjectUrl4
+  )
+    return createPlaybackResult('ready', syncEntryObjectUrl4);
+  return createPlaybackResult(response2['status'], '', response2['httpStatus']);
 }
-export async function acquireLocalVideoPlaybackObjectUrl(_0x4a4c4e, _0x2a0a4a, _0x3a42a9 = {}) {
-  const _0x350761 = await acquireLocalVideoPlaybackObjectUrlResult(_0x4a4c4e, _0x2a0a4a, _0x3a42a9);
-  return _0x350761['playbackUrl'];
+export async function acquireLocalVideoPlaybackObjectUrl(value30, value31, value32 = {}) {
+  const acquireLocalVideoPlaybackObjectUrlResult2 = await acquireLocalVideoPlaybackObjectUrlResult(
+    value30,
+    value31,
+    value32,
+  );
+  return acquireLocalVideoPlaybackObjectUrlResult2['playbackUrl'];
 }
-export function releaseLocalVideoPlaybackObjectUrlOwner(_0x166518) {
-  return removeOwnerReference(_0x166518);
+export function releaseLocalVideoPlaybackObjectUrlOwner(value33) {
+  return removeOwnerReference(value33);
 }
-export function releaseLocalVideoPlaybackObjectUrlOwnerScope(_0x36c40a) {
-  const _0x423ddb = String(_0x36c40a || '')['trim']();
-  if (!_0x423ddb) return 0x0;
-  let _0x50bd0c = 0x0;
-  for (const _0x44a9ae of Array['from'](sourceByOwner['keys']())) {
-    (_0x44a9ae === _0x423ddb || _0x44a9ae['startsWith'](_0x423ddb + ':')) &&
-      (_0x50bd0c += removeOwnerReference(_0x44a9ae) ? 0x1 : 0x0);
+export function releaseLocalVideoPlaybackObjectUrlOwnerScope(value34) {
+  const enabled19 = String(value34 || '')['trim']();
+  if (!enabled19) return 0x0;
+  let value35 = 0x0;
+  for (const value36 of Array['from'](sourceByOwner['keys']())) {
+    (value36 === enabled19 || value36['startsWith'](enabled19 + ':')) &&
+      (value35 += removeOwnerReference(value36) ? 0x1 : 0x0);
   }
-  return _0x50bd0c;
+  return value35;
 }
 export function syncLocalVideoPlaybackWarmupSources(
-  _0x37766a,
+  value37,
   { scope: scope = 'canvas-low-zoom', maxSources: maxSources = 0x3 } = {},
 ) {
-  const _0x109b36 = String(scope || '')['trim']();
-  if (!_0x109b36) return { sources: [], scheduledCount: 0x0 };
-  const _0xf737ed = Math['max'](0x0, Math['min'](0x3, Math['trunc'](Number(maxSources) || 0x0))),
-    _0x38fcf2 = [],
-    _0x5f3390 = new Set();
-  for (const _0x1efc88 of _0x37766a || []) {
-    const _0x1533f2 = resolveCanonicalLocalSource(_0x1efc88);
-    if (!_0x1533f2 || _0x5f3390['has'](_0x1533f2)) continue;
-    (_0x5f3390['add'](_0x1533f2), _0x38fcf2['push'](_0x1533f2));
-    if (_0x38fcf2['length'] >= _0xf737ed) break;
+  const enabled20 = String(scope || '')['trim']();
+  if (!enabled20) return { sources: [], scheduledCount: 0x0 };
+  const value38 = Math['max'](0x0, Math['min'](0x3, Math['trunc'](Number(maxSources) || 0x0))),
+    sources = [],
+    map2 = new Set();
+  for (const value39 of value37 || []) {
+    const canonicalLocalSource2 = resolveCanonicalLocalSource(value39);
+    if (!canonicalLocalSource2 || map2['has'](canonicalLocalSource2)) continue;
+    (map2['add'](canonicalLocalSource2), sources['push'](canonicalLocalSource2));
+    if (sources['length'] >= value38) break;
   }
-  const _0x35d2a8 = sourcesByWarmupScope['get'](_0x109b36) || new Set(),
-    _0x149969 = new Set(_0x38fcf2);
-  for (const _0x3afca8 of _0x35d2a8) {
-    if (_0x149969['has'](_0x3afca8)) continue;
-    const _0x3c2fd4 = entriesBySource['get'](_0x3afca8);
-    (_0x3c2fd4?.['warmupRefs']['delete'](_0x109b36),
-      _0x3c2fd4 &&
-      _0x3c2fd4['ownerRefs']['size'] === 0x0 &&
-      _0x3c2fd4['warmupRefs']['size'] === 0x0 &&
-      (_0x3c2fd4['blob'] || _0x3c2fd4['active'] || _0x3c2fd4['queued'])
-        ? ((_0x3c2fd4['handoffRetained'] = !![]), scheduleWarmupExpiry(_0x3c2fd4))
-        : removeEntryIfUnreferenced(_0x3c2fd4));
+  const value40 = sourcesByWarmupScope['get'](enabled20) || new Set(),
+    map3 = new Set(sources);
+  for (const value41 of value40) {
+    if (map3['has'](value41)) continue;
+    const value42 = entriesBySource['get'](value41);
+    (value42?.['warmupRefs']['delete'](enabled20),
+      value42 &&
+      value42['ownerRefs']['size'] === 0x0 &&
+      value42['warmupRefs']['size'] === 0x0 &&
+      (value42['blob'] || value42['active'] || value42['queued'])
+        ? ((value42['handoffRetained'] = !![]), scheduleWarmupExpiry(value42))
+        : removeEntryIfUnreferenced(value42));
   }
-  if (_0x149969['size'] > 0x0) sourcesByWarmupScope['set'](_0x109b36, _0x149969);
-  else sourcesByWarmupScope['delete'](_0x109b36);
-  for (const _0x397d1c of _0x38fcf2) {
-    if (isWarmupBypassed(_0x397d1c)) continue;
-    const _0x148ffb = getOrCreateEntry(_0x397d1c, 'warmup:' + _0x109b36);
-    ((_0x148ffb['handoffRetained'] = ![]),
-      _0x148ffb['warmupRefs']['add'](_0x109b36),
-      scheduleWarmupExpiry(_0x148ffb),
-      enqueueEntry(_0x148ffb));
+  if (map3['size'] > 0x0) sourcesByWarmupScope['set'](enabled20, map3);
+  else sourcesByWarmupScope['delete'](enabled20);
+  for (const value43 of sources) {
+    if (isWarmupBypassed(value43)) continue;
+    const orCreateEntry = getOrCreateEntry(value43, 'warmup:' + enabled20);
+    ((orCreateEntry['handoffRetained'] = ![]),
+      orCreateEntry['warmupRefs']['add'](enabled20),
+      scheduleWarmupExpiry(orCreateEntry),
+      enqueueEntry(orCreateEntry));
   }
-  return { sources: _0x38fcf2, scheduledCount: _0x38fcf2['length'] };
+  return { sources: sources, scheduledCount: sources['length'] };
 }
-export function clearLocalVideoPlaybackWarmupScope(_0xe195a8 = 'canvas-low-zoom') {
-  const _0x48ea31 = String(_0xe195a8 || '')['trim'](),
-    _0x10163a = sourcesByWarmupScope['get'](_0x48ea31)?.['size'] || 0x0;
-  return (syncLocalVideoPlaybackWarmupSources([], { scope: _0x48ea31, maxSources: 0x0 }), _0x10163a);
+export function clearLocalVideoPlaybackWarmupScope(value44 = 'canvas-low-zoom') {
+  const scope2 = String(value44 || '')['trim'](),
+    value45 = sourcesByWarmupScope['get'](scope2)?.['size'] || 0x0;
+  return (syncLocalVideoPlaybackWarmupSources([], { scope: scope2, maxSources: 0x0 }), value45);
 }
 export const __localVideoPlaybackObjectUrlServiceForTest = {
   clear() {
-    for (const _0x23c465 of entriesBySource['values']()) disposeEntry(_0x23c465);
+    for (const value46 of entriesBySource['values']()) disposeEntry(value46);
     (entriesBySource['clear'](),
       sourceByOwner['clear'](),
       sourcesByWarmupScope['clear'](),
@@ -517,21 +509,21 @@ export const __localVideoPlaybackObjectUrlServiceForTest = {
   snapshot() {
     return {
       activeFetchCount: activeFetchCount,
-      queuedCount: queuedEntries['filter']((_0x586016) => _0x586016['queued'])['length'],
+      queuedCount: queuedEntries['filter']((value47) => value47['queued'])['length'],
       warmupBlobBytes: getWarmupBlobBytes(),
       warmupBypassedSources: Array['from'](warmupBypassUntilBySource['keys']()),
-      entries: Array['from'](entriesBySource['values']())['map']((_0x29da42) => ({
-        sourceUrl: _0x29da42['sourceUrl'],
-        blobSize: Number(_0x29da42['blob']?.['size'] || 0x0),
-        objectUrl: _0x29da42['objectUrl'],
-        status: _0x29da42['status'],
-        httpStatus: _0x29da42['httpStatus'],
-        ownerRefs: Array['from'](_0x29da42['ownerRefs']),
-        warmupRefs: Array['from'](_0x29da42['warmupRefs']),
-        handoffRetained: _0x29da42['handoffRetained'] === !![],
-        queued: _0x29da42['queued'],
-        active: _0x29da42['active'],
-        aborted: _0x29da42['controller']['signal']['aborted'],
+      entries: Array['from'](entriesBySource['values']())['map']((sourceUrl2) => ({
+        sourceUrl: sourceUrl2['sourceUrl'],
+        blobSize: Number(sourceUrl2['blob']?.['size'] || 0x0),
+        objectUrl: sourceUrl2['objectUrl'],
+        status: sourceUrl2['status'],
+        httpStatus: sourceUrl2['httpStatus'],
+        ownerRefs: Array['from'](sourceUrl2['ownerRefs']),
+        warmupRefs: Array['from'](sourceUrl2['warmupRefs']),
+        handoffRetained: sourceUrl2['handoffRetained'] === !![],
+        queued: sourceUrl2['queued'],
+        active: sourceUrl2['active'],
+        aborted: sourceUrl2['controller']['signal']['aborted'],
       })),
     };
   },

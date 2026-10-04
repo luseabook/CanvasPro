@@ -2,245 +2,239 @@ import { buildApiUrl } from './apiBase.js';
 import { get, post, del, requester } from './requester.js';
 import { normalizeLocalPath } from '../src/utils/localMediaPath.js';
 import { unwrapProjectReadResponse } from '../src/services/projectDocumentGuard.js';
-import {
-  assertLocalAssetUploadSize,
-  parseLocalAssetUploadError,
-} from './localAssetUploadPolicy.js';
+import { assertLocalAssetUploadSize, parseLocalAssetUploadError } from './localAssetUploadPolicy.js';
 const WORKFLOWS_FALLBACK_USER_FILE = '/api/v2/user/workflows.json',
   ASSET_CATEGORIES_USER_FILE = '/api/v2/user/asset-categories.json',
   ASSET_STAGE_UPLOAD_TIMEOUT_MS = 30 * 60 * 1000,
   _saveOutputFromUrlInflight = new Map(),
   _saveOutputFromUrlCache = new Map(),
   SAVE_OUTPUT_FROM_URL_CACHE_LIMIT = 0x1f4;
-function _rememberSavedOutput(_0x347190, _0x16b4c3) {
-  if (!_0x347190 || !_0x16b4c3 || typeof _0x16b4c3 !== 'object') return;
-  _saveOutputFromUrlCache.set(_0x347190, _0x16b4c3);
+function _rememberSavedOutput(enabled, enabled2) {
+  if (!enabled || !enabled2 || typeof enabled2 !== 'object') return;
+  _saveOutputFromUrlCache.set(enabled, enabled2);
   if (_saveOutputFromUrlCache.size > SAVE_OUTPUT_FROM_URL_CACHE_LIMIT) {
-    const _0x59f68d = _saveOutputFromUrlCache.keys().next().value;
-    if (_0x59f68d) _saveOutputFromUrlCache.delete(_0x59f68d);
+    const value = _saveOutputFromUrlCache.keys().next().value;
+    if (value) _saveOutputFromUrlCache.delete(value);
   }
 }
-function _normalizeProjectFilename(_0x20aaf7) {
-  const _0x4506f2 = String(_0x20aaf7 || '').trim();
-  if (!_0x4506f2) return 'default_v2_project.json';
-  return _0x4506f2.endsWith('.json') ? _0x4506f2 : _0x4506f2 + '.json';
+function _normalizeProjectFilename(item) {
+  const enabled3 = String(item || '').trim();
+  if (!enabled3) return 'default_v2_project.json';
+  return enabled3.endsWith('.json') ? enabled3 : enabled3 + '.json';
 }
-function _isNotFoundError(_0x4cd12c) {
-  return Number(_0x4cd12c?.status) === 0x194 || /not found/i.test(String(_0x4cd12c?.message || ''));
+function _isNotFoundError(error) {
+  return Number(error?.status) === 0x194 || /not found/i.test(String(error?.message || ''));
 }
-function _extractWorkflowItems(_0x53d573) {
-  if (Array.isArray(_0x53d573)) return _0x53d573;
-  if (_0x53d573 && typeof _0x53d573 === 'object' && Array.isArray(_0x53d573.items)) return _0x53d573.items;
+function _extractWorkflowItems(key) {
+  if (Array.isArray(key)) return key;
+  if (key && typeof key === 'object' && Array.isArray(key.items)) return key.items;
   return [];
 }
-function _upsertWorkflowItems(_0x36d3ec, _0x2760c9) {
-  const _0x1218aa = Array.isArray(_0x36d3ec) ? [..._0x36d3ec] : [],
-    _0x1b40b4 = String(_0x2760c9?.id || '').trim();
-  if (!_0x1b40b4) return _0x1218aa;
-  const _0x851fda = _0x1218aa.findIndex((_0x3dca1e) => String(_0x3dca1e?.id || '').trim() === _0x1b40b4);
+function _upsertWorkflowItems(args, index) {
+  const list = Array.isArray(args) ? [...args] : [],
+    enabled4 = String(index?.id || '').trim();
+  if (!enabled4) return list;
+  const count = list.findIndex((item2) => String(item2?.id || '').trim() === enabled4);
   return (
-    _0x851fda >= 0
-      ? (_0x1218aa[_0x851fda] = { ..._0x1218aa[_0x851fda], ...(_0x2760c9 || {}) })
-      : _0x1218aa.unshift(_0x2760c9),
-    _0x1218aa.sort(
-      (_0x164057, _0x2565a7) => Number(_0x2565a7?.updatedAt || 0) - Number(_0x164057?.updatedAt || 0),
-    ),
-    _0x1218aa
+    count >= 0 ? (list[count] = { ...list[count], ...(index || {}) }) : list.unshift(index),
+    list.sort((item3, result) => Number(result?.updatedAt || 0) - Number(item3?.updatedAt || 0)),
+    list
   );
 }
-export async function fetchV2ProjectFromServer(_0xd9f3df) {
-  const _0x45e96c = _normalizeProjectFilename(_0xd9f3df),
-    _0x4ff162 = '/api/v2/projects/' + encodeURIComponent(_0x45e96c),
-    _0x5682bc = await get(_0x4ff162, { allow404Null: true, provider: 'local', returnMeta: true });
-  return unwrapProjectReadResponse(_0x5682bc);
+export async function fetchV2ProjectFromServer(data) {
+  const _normalizeProjectFilename2 = _normalizeProjectFilename(data),
+    options = '/api/v2/projects/' + encodeURIComponent(_normalizeProjectFilename2),
+    get2 = await get(options, { allow404Null: true, provider: 'local', returnMeta: true });
+  return unwrapProjectReadResponse(get2);
 }
-export async function saveV2ProjectToServer(_0x28bc8f) {
-  const _0x349c86 = await post('/api/v2/projects/save', _0x28bc8f || {}, { provider: 'local' });
-  return _0x349c86;
+export async function saveV2ProjectToServer(target) {
+  const post2 = await post('/api/v2/projects/save', target || {}, { provider: 'local' });
+  return post2;
 }
 export async function fetchV2ProjectsFromServer() {
   try {
-    const _0x481d15 = await get('/api/v2/projects', { provider: 'local' });
-    return Array.isArray(_0x481d15) ? _0x481d15 : [];
+    const get3 = await get('/api/v2/projects', { provider: 'local' });
+    return Array.isArray(get3) ? get3 : [];
   } catch {
     return [];
   }
 }
-export async function deleteV2ProjectFromServer(_0x550b7e) {
-  const _0x30e916 = _normalizeProjectFilename(_0x550b7e);
+export async function deleteV2ProjectFromServer(source) {
+  const _normalizeProjectFilename3 = _normalizeProjectFilename(source);
   try {
-    return (await del('/api/v2/projects/' + encodeURIComponent(_0x30e916), { provider: 'local' }), true);
+    return (
+      await del('/api/v2/projects/' + encodeURIComponent(_normalizeProjectFilename3), { provider: 'local' }),
+      true
+    );
   } catch {
     return false;
   }
 }
-export async function fetchAssetsFromServer(_0x16046a = {}) {
+export async function fetchAssetsFromServer(options2 = {}) {
   try {
-    const _0x140fc3 = new URLSearchParams();
-    for (const [_0x227bf1, _0xd668e5] of Object.entries(_0x16046a || {})) {
-      if (_0xd668e5 === undefined || _0xd668e5 === null || _0xd668e5 === '') continue;
-      _0x140fc3.set(_0x227bf1, String(_0xd668e5));
+    const map = new URLSearchParams();
+    for (const [next, current] of Object.entries(options2 || {})) {
+      if (current === undefined || current === null || current === '') continue;
+      map.set(next, String(current));
     }
-    const _0x2f2b98 = _0x140fc3.toString() ? '?' + _0x140fc3.toString() : '',
-      _0x40b062 = await get('/api/v2/assets' + _0x2f2b98, { provider: 'local' });
-    if (Array.isArray(_0x40b062)) return _0x40b062;
-    if (_0x40b062 && typeof _0x40b062 === 'object' && Array.isArray(_0x40b062.items)) return _0x40b062;
+    const entry = map.toString() ? '?' + map.toString() : '',
+      get4 = await get('/api/v2/assets' + entry, { provider: 'local' });
+    if (Array.isArray(get4)) return get4;
+    if (get4 && typeof get4 === 'object' && Array.isArray(get4.items)) return get4;
     return [];
   } catch {
-    return _0x16046a && Object.keys(_0x16046a).length > 0
+    return options2 && Object.keys(options2).length > 0
       ? { items: [], total: 0, nextOffset: null, hasMore: false }
       : [];
   }
 }
-export async function fetchOutputFilesFromServer(_0x16a3df = {}) {
+export async function fetchOutputFilesFromServer(options3 = {}) {
   try {
-    const _0x265f05 = new URLSearchParams();
-    for (const [_0x3fbbca, _0x4b5789] of Object.entries(_0x16a3df || {})) {
-      if (_0x4b5789 === undefined || _0x4b5789 === null || _0x4b5789 === '') continue;
-      _0x265f05.set(_0x3fbbca, String(_0x4b5789));
+    const map2 = new URLSearchParams();
+    for (const [record, payload] of Object.entries(options3 || {})) {
+      if (payload === undefined || payload === null || payload === '') continue;
+      map2.set(record, String(payload));
     }
-    const _0x58a8e8 = _0x265f05.toString() ? '?' + _0x265f05.toString() : '',
-      _0x163230 = await get('/api/v2/output-files' + _0x58a8e8, { provider: 'local' });
-    return _0x163230 && typeof _0x163230 === 'object' ? _0x163230 : { items: [] };
+    const handle = map2.toString() ? '?' + map2.toString() : '',
+      get5 = await get('/api/v2/output-files' + handle, { provider: 'local' });
+    return get5 && typeof get5 === 'object' ? get5 : { items: [] };
   } catch {
     return { items: [] };
   }
 }
-export async function deleteOutputFilesFromServer(_0x3da673 = {}) {
-  const _0x561943 = await post('/api/v2/output-files/delete', _0x3da673 || {}, { provider: 'local' });
-  return _0x561943;
+export async function deleteOutputFilesFromServer(options4 = {}) {
+  const post3 = await post('/api/v2/output-files/delete', options4 || {}, { provider: 'local' });
+  return post3;
 }
-export async function saveAssetToServer(_0x5841fa) {
-  const _0x1abaab = await post('/api/v2/assets/save', _0x5841fa || {}, { provider: 'local' });
-  return _0x1abaab;
+export async function saveAssetToServer(state) {
+  const post4 = await post('/api/v2/assets/save', state || {}, { provider: 'local' });
+  return post4;
 }
-export async function deleteAssetFromServer(_0xe934e4) {
-  const _0x349fb7 = _0xe934e4 + '.json';
+export async function deleteAssetFromServer(config) {
+  const scope = config + '.json';
   try {
-    return (await del('/api/v2/assets/' + encodeURIComponent(_0x349fb7), { provider: 'local' }), true);
+    return (await del('/api/v2/assets/' + encodeURIComponent(scope), { provider: 'local' }), true);
   } catch {
     return false;
   }
 }
 export async function fetchAssetCategoriesFromServer() {
   try {
-    const _0x21ca43 = await get(ASSET_CATEGORIES_USER_FILE, { provider: 'local' });
-    if (Array.isArray(_0x21ca43)) return _0x21ca43;
-    if (_0x21ca43 && typeof _0x21ca43 === 'object') {
-      if (Array.isArray(_0x21ca43.categories)) return _0x21ca43.categories;
-      if (Array.isArray(_0x21ca43.items)) return _0x21ca43.items;
+    const get6 = await get(ASSET_CATEGORIES_USER_FILE, { provider: 'local' });
+    if (Array.isArray(get6)) return get6;
+    if (get6 && typeof get6 === 'object') {
+      if (Array.isArray(get6.categories)) return get6.categories;
+      if (Array.isArray(get6.items)) return get6.items;
     }
     return [];
   } catch {
     return [];
   }
 }
-export async function saveAssetCategoriesToServer(_0x42ec58 = []) {
-  const _0x3cdcca = Array.isArray(_0x42ec58) ? _0x42ec58 : [],
-    _0x3449d5 = await post(
+export async function saveAssetCategoriesToServer(list2 = []) {
+  const categories = Array.isArray(list2) ? list2 : [],
+    post5 = await post(
       ASSET_CATEGORIES_USER_FILE,
-      { version: 1, categories: _0x3cdcca },
+      { version: 1, categories: categories },
       { provider: 'local' },
     );
-  return _0x3449d5;
+  return post5;
 }
-export async function saveAssetThumbToServer(_0x344919) {
-  const _0x26f9b5 = String(_0x344919?.assetId ?? _0x344919?.id ?? '').trim(),
-    _0x5e84fe = String(_0x344919?.dataUrl || '');
-  if (!_0x26f9b5) throw new Error('保存资产缩略图失败: 缺少 assetId');
-  if (!_0x5e84fe.startsWith('data:image/')) throw new Error('保存资产缩略图失败: dataUrl 非法');
-  const _0x5e13d1 = await post(
+export async function saveAssetThumbToServer(input) {
+  const assetId = String(input?.assetId ?? input?.id ?? '').trim(),
+    enabled5 = String(input?.dataUrl || '');
+  if (!assetId) throw new Error('保存资产缩略图失败: 缺少 assetId');
+  if (!enabled5.startsWith('data:image/')) throw new Error('保存资产缩略图失败: dataUrl 非法');
+  const post6 = await post(
     '/api/v2/assets/thumb/save',
-    { ...(_0x344919 || {}), assetId: _0x26f9b5 },
+    { ...(input || {}), assetId: assetId },
     { provider: 'local' },
   );
-  return _0x5e13d1;
+  return post6;
 }
 export async function fetchWorkflowsFromServer() {
   try {
-    const _0x1df45b = await get('/api/v2/workflows', { provider: 'local' });
-    return Array.isArray(_0x1df45b) ? _0x1df45b : [];
-  } catch (_0x325a71) {
-    if (!_isNotFoundError(_0x325a71)) return [];
+    const get7 = await get('/api/v2/workflows', { provider: 'local' });
+    return Array.isArray(get7) ? get7 : [];
+  } catch (output) {
+    if (!_isNotFoundError(output)) return [];
     try {
-      const _0x9e712e = await get(WORKFLOWS_FALLBACK_USER_FILE, { provider: 'local' });
-      return _extractWorkflowItems(_0x9e712e);
+      const get8 = await get(WORKFLOWS_FALLBACK_USER_FILE, { provider: 'local' });
+      return _extractWorkflowItems(get8);
     } catch {
       return [];
     }
   }
 }
-async function deleteWorkflowFromFallbackFile(_0x38885e) {
-  const _0x5d0b65 = await get(WORKFLOWS_FALLBACK_USER_FILE, { provider: 'local' }).catch(() => ({})),
-    _0x444b67 = String(_0x38885e || '').trim(),
-    _0x40f22a = _extractWorkflowItems(_0x5d0b65).filter(
-      (_0x208930) => String(_0x208930?.id || '').trim() !== _0x444b67,
-    );
-  return (await post(WORKFLOWS_FALLBACK_USER_FILE, { items: _0x40f22a }, { provider: 'local' }), true);
+async function deleteWorkflowFromFallbackFile(value2) {
+  const get9 = await get(WORKFLOWS_FALLBACK_USER_FILE, { provider: 'local' }).catch(() => ({})),
+    value3 = String(value2 || '').trim(),
+    items = _extractWorkflowItems(get9).filter((item4) => String(item4?.id || '').trim() !== value3);
+  return (await post(WORKFLOWS_FALLBACK_USER_FILE, { items: items }, { provider: 'local' }), true);
 }
-async function saveWorkflowToFallbackFile(_0x1a71d6) {
-  const _0x14b996 = await get(WORKFLOWS_FALLBACK_USER_FILE, { provider: 'local' }).catch(() => ({})),
-    _0x28b39d = _upsertWorkflowItems(_extractWorkflowItems(_0x14b996), _0x1a71d6 || {});
+async function saveWorkflowToFallbackFile(id) {
+  const get10 = await get(WORKFLOWS_FALLBACK_USER_FILE, { provider: 'local' }).catch(() => ({})),
+    items2 = _upsertWorkflowItems(_extractWorkflowItems(get10), id || {});
   return (
-    await post(WORKFLOWS_FALLBACK_USER_FILE, { items: _0x28b39d }, { provider: 'local' }),
-    { success: true, id: _0x1a71d6?.id }
+    await post(WORKFLOWS_FALLBACK_USER_FILE, { items: items2 }, { provider: 'local' }),
+    { success: true, id: id?.id }
   );
 }
-export async function saveWorkflowToServer(_0x4a6449) {
+export async function saveWorkflowToServer(value4) {
   try {
-    const _0x5491e0 = await post('/api/v2/workflows/save', _0x4a6449 || {}, { provider: 'local' });
-    return _0x5491e0;
-  } catch (_0x1f8a31) {
-    if (!_isNotFoundError(_0x1f8a31)) throw _0x1f8a31;
-    return await saveWorkflowToFallbackFile(_0x4a6449);
+    const post7 = await post('/api/v2/workflows/save', value4 || {}, { provider: 'local' });
+    return post7;
+  } catch (value5) {
+    if (!_isNotFoundError(value5)) throw value5;
+    return await saveWorkflowToFallbackFile(value4);
   }
 }
-export async function deleteWorkflowFromServer(_0x3fa57c) {
-  const _0x4280a5 = String(_0x3fa57c || '').trim();
-  if (!_0x4280a5) return false;
-  const _0x27fc43 = _0x4280a5 + '.json';
+export async function deleteWorkflowFromServer(value6) {
+  const enabled6 = String(value6 || '').trim();
+  if (!enabled6) return false;
+  const value7 = enabled6 + '.json';
   try {
-    return (await del('/api/v2/workflows/' + encodeURIComponent(_0x27fc43), { provider: 'local' }), true);
-  } catch (_0x4e81cf) {
-    if (!_isNotFoundError(_0x4e81cf)) return false;
+    return (await del('/api/v2/workflows/' + encodeURIComponent(value7), { provider: 'local' }), true);
+  } catch (value8) {
+    if (!_isNotFoundError(value8)) return false;
     try {
-      return await deleteWorkflowFromFallbackFile(_0x4280a5);
+      return await deleteWorkflowFromFallbackFile(enabled6);
     } catch {
       return false;
     }
   }
 }
-export async function saveWorkflowThumbToServer(_0x3c3fa1) {
-  const _0x343ccb = String(_0x3c3fa1?.workflowId ?? _0x3c3fa1?.id ?? '').trim(),
-    _0x4cadcf = String(_0x3c3fa1?.dataUrl || '');
-  if (!_0x343ccb) throw new Error('保存工作流封面失败: 缺少 workflowId');
-  if (!_0x4cadcf.startsWith('data:image/')) throw new Error('保存工作流封面失败: dataUrl 非法');
+export async function saveWorkflowThumbToServer(value9) {
+  const workflowId = String(value9?.workflowId ?? value9?.id ?? '').trim(),
+    url = String(value9?.dataUrl || '');
+  if (!workflowId) throw new Error('保存工作流封面失败: 缺少 workflowId');
+  if (!url.startsWith('data:image/')) throw new Error('保存工作流封面失败: dataUrl 非法');
   try {
-    const _0x58e44b = await post(
+    const post8 = await post(
       '/api/v2/workflows/thumb/save',
-      { ...(_0x3c3fa1 || {}), workflowId: _0x343ccb },
+      { ...(value9 || {}), workflowId: workflowId },
       { provider: 'local' },
     );
-    return _0x58e44b;
-  } catch (_0x12c546) {
-    if (!_isNotFoundError(_0x12c546)) throw _0x12c546;
-    return { success: true, url: _0x4cadcf, localPath: _0x4cadcf, filename: _0x343ccb + '_cover.inline' };
+    return post8;
+  } catch (value10) {
+    if (!_isNotFoundError(value10)) throw value10;
+    return { success: true, url: url, localPath: url, filename: workflowId + '_cover.inline' };
   }
 }
-export async function uploadFileToServer(_0x8efb47) {
-  const _0xba85fb = _0x8efb47?.name ? String(_0x8efb47.name) : 'file',
-    _0x3149f6 = new FormData();
-  _0x3149f6.append('file', _0x8efb47, _0xba85fb);
-  const _0x1c53eb = await post('/api/upload?filename=' + encodeURIComponent(_0xba85fb), _0x3149f6, {
+export async function uploadFileToServer(error2) {
+  const value11 = error2?.name ? String(error2.name) : 'file',
+    formData = new FormData();
+  formData.append('file', error2, value11);
+  const post9 = await post('/api/upload?filename=' + encodeURIComponent(value11), formData, {
     provider: 'local',
   });
-  return _0x1c53eb;
+  return post9;
 }
 
-export async function stageAssetUploadToServer(_0x31c5c0) {
-  assertLocalAssetUploadSize(_0x31c5c0);
-  const _0x30d9d4 = _0x31c5c0?.name ? String(_0x31c5c0.name) : 'file';
-  return await post('/api/v2/assets/stage?filename=' + encodeURIComponent(_0x30d9d4), _0x31c5c0, {
+export async function stageAssetUploadToServer(error3) {
+  assertLocalAssetUploadSize(error3);
+  const value12 = error3?.name ? String(error3.name) : 'file';
+  return await post('/api/v2/assets/stage?filename=' + encodeURIComponent(value12), error3, {
     provider: 'local',
     timeout: ASSET_STAGE_UPLOAD_TIMEOUT_MS,
     retries: 0,
@@ -248,107 +242,102 @@ export async function stageAssetUploadToServer(_0x31c5c0) {
     errorParser: parseLocalAssetUploadError,
   });
 }
-export async function fetchRemoteBlob(_0x525ea0, _0x1ecb1c = {}) {
-  const _0x58ff8a = await get(_0x525ea0, {
+export async function fetchRemoteBlob(value13, signal = {}) {
+  const get11 = await get(value13, {
     provider: 'remote',
     buildUrl: false,
     responseType: 'blob',
-    signal: _0x1ecb1c?.signal,
-    timeout: _0x1ecb1c?.timeout,
+    signal: signal?.signal,
+    timeout: signal?.timeout,
   });
-  return _0x58ff8a;
+  return get11;
 }
-export async function saveOutputToServer(_0x298611, _0x393c19 = {}) {
-  const _0x594985 =
-      String(_0x393c19?.ext || '')
+export async function saveOutputToServer(value14, value15 = {}) {
+  const ext =
+      String(value15?.ext || '')
         .trim()
         .toLowerCase() || 'bin',
-    _0xb418ce = String(_0x393c19?.subDir || '').trim(),
-    _0x3530a1 = String(_0x393c19?.kind || '').trim(),
-    _0x2c6c84 = new URLSearchParams({ ext: _0x594985 });
-  if (_0xb418ce) _0x2c6c84.set('subDir', _0xb418ce);
-  if (_0x3530a1) _0x2c6c84.set('kind', _0x3530a1);
-  const _0x405423 = await post('/api/v2/save_output?' + _0x2c6c84.toString(), _0x298611, {
+    value16 = String(value15?.subDir || '').trim(),
+    value17 = String(value15?.kind || '').trim(),
+    map3 = new URLSearchParams({ ext: ext });
+  if (value16) map3.set('subDir', value16);
+  if (value17) map3.set('kind', value17);
+  const post10 = await post('/api/v2/save_output?' + map3.toString(), value14, {
     provider: 'local',
     headers: { 'Content-Type': 'application/octet-stream' },
   });
-  return _0x405423;
+  return post10;
 }
-export async function saveOutputFromUrlToServer(_0x54d9b9) {
-  const _0x1ef6fd = String(_0x54d9b9?.url || '').trim();
-  if (!_0x1ef6fd) throw new Error('保存到 output 失败: 缺少 url');
-  const _0x49e298 = String(
-      _0x54d9b9?.dedupeKey || (_0x54d9b9?.taskKey ? _0x54d9b9.taskKey + ':' + _0x1ef6fd : _0x1ef6fd),
-    ).trim(),
-    _0x238945 = _0x49e298 || _0x1ef6fd;
-  if (_saveOutputFromUrlCache.has(_0x238945)) return _saveOutputFromUrlCache.get(_0x238945);
-  if (_saveOutputFromUrlInflight.has(_0x238945)) return _saveOutputFromUrlInflight.get(_0x238945);
-  const _0x435d06 = {
-      url: _0x1ef6fd,
-      ext: _0x54d9b9?.ext,
-      maxBytes: _0x54d9b9?.maxBytes,
-      dedupeKey: _0x49e298,
+export async function saveOutputFromUrlToServer(ext2) {
+  const url2 = String(ext2?.url || '').trim();
+  if (!url2) throw new Error('保存到 output 失败: 缺少 url');
+  const dedupeKey = String(ext2?.dedupeKey || (ext2?.taskKey ? ext2.taskKey + ':' + url2 : url2)).trim(),
+    value18 = dedupeKey || url2;
+  if (_saveOutputFromUrlCache.has(value18)) return _saveOutputFromUrlCache.get(value18);
+  if (_saveOutputFromUrlInflight.has(value18)) return _saveOutputFromUrlInflight.get(value18);
+  const value19 = {
+      url: url2,
+      ext: ext2?.ext,
+      maxBytes: ext2?.maxBytes,
+      dedupeKey: dedupeKey,
     },
-    _0x409d80 = post('/api/v2/save_output_from_url', _0x435d06, { provider: 'local' }).then((_0x28539b) => {
-      return (_rememberSavedOutput(_0x238945, _0x28539b), _0x28539b);
+    promise = post('/api/v2/save_output_from_url', value19, { provider: 'local' }).then((value20) => {
+      return (_rememberSavedOutput(value18, value20), value20);
     });
   return (
-    _saveOutputFromUrlInflight.set(_0x238945, _0x409d80),
-    _0x409d80
+    _saveOutputFromUrlInflight.set(value18, promise),
+    promise
       .finally(() => {
-        _saveOutputFromUrlInflight.get(_0x238945) === _0x409d80 &&
-          _saveOutputFromUrlInflight.delete(_0x238945);
+        _saveOutputFromUrlInflight.get(value18) === promise && _saveOutputFromUrlInflight.delete(value18);
       })
       .catch(() => {}),
-    _0x409d80
+    promise
   );
 }
-export async function cropGridTilesToServer(_0x5be95a = {}) {
-  const _0x3146ed = String(_0x5be95a?.localPath || _0x5be95a?.path || '').trim();
-  if (!_0x3146ed) throw new Error('宫格裁切失败: 缺少 localPath');
-  const _0x5aa17b = Math.round(Number(_0x5be95a?.cols) || 0),
-    _0x34bfc3 = Math.round(Number(_0x5be95a?.rows) || 0);
-  if (_0x5aa17b <= 0 || _0x34bfc3 <= 0) throw new Error('宫格裁切失败: 网格尺寸非法');
-  const _0x1ff9f6 = {
-      localPath: _0x3146ed,
-      cols: _0x5aa17b,
-      rows: _0x34bfc3,
+export async function cropGridTilesToServer(options5 = {}) {
+  const localPath = String(options5?.localPath || options5?.path || '').trim();
+  if (!localPath) throw new Error('宫格裁切失败: 缺少 localPath');
+  const cols = Math.round(Number(options5?.cols) || 0),
+    rows = Math.round(Number(options5?.rows) || 0);
+  if (cols <= 0 || rows <= 0) throw new Error('宫格裁切失败: 网格尺寸非法');
+  const value21 = {
+      localPath: localPath,
+      cols: cols,
+      rows: rows,
       ext:
-        String(_0x5be95a?.ext || 'jpg')
+        String(options5?.ext || 'jpg')
           .trim()
           .toLowerCase() || 'jpg',
-      quality: Number(_0x5be95a?.quality || 85),
+      quality: Number(options5?.quality || 85),
     },
-    _0x4126af = String(_0x5be95a?.subDir || '').trim();
-  if (_0x4126af) _0x1ff9f6.subDir = _0x4126af;
-  const _0x4e14a8 = await post('/api/v2/grid_tiles/crop', _0x1ff9f6, { provider: 'local' });
-  return _0x4e14a8;
+    value22 = String(options5?.subDir || '').trim();
+  if (value22) value21.subDir = value22;
+  const post11 = await post('/api/v2/grid_tiles/crop', value21, { provider: 'local' });
+  return post11;
 }
-export async function ensureImageDerivativesToServer(_0xa3260c) {
-  const _0x322608 = String(_0xa3260c?.localPath || _0xa3260c?.path || '').trim();
-  if (!_0x322608) throw new Error('生成图片派生文件失败: 缺少 localPath');
-  const _0x46c3c4 = await post(
+export async function ensureImageDerivativesToServer(value23) {
+  const localPath2 = String(value23?.localPath || value23?.path || '').trim();
+  if (!localPath2) throw new Error('生成图片派生文件失败: 缺少 localPath');
+  const post12 = await post(
     '/api/v2/images/derivatives/ensure',
-    { localPath: _0x322608 },
+    { localPath: localPath2 },
     { provider: 'local' },
   );
-  return _0x46c3c4;
+  return post12;
 }
-function _localPathToStaticRequestPath(_0x51b907) {
-  const _0x3f9bdb = normalizeLocalPath(_0x51b907);
-  if (!_0x3f9bdb) return '';
-  return '/' + _0x3f9bdb.split('/').map(encodeURIComponent).join('/');
+function _localPathToStaticRequestPath(value24) {
+  const localPath3 = normalizeLocalPath(value24);
+  if (!localPath3) return '';
+  return '/' + localPath3.split('/').map(encodeURIComponent).join('/');
 }
-export async function checkLocalMediaExistsOnServer(_0x40e715) {
-  const _0xf921fc =
-      typeof _0x40e715 === 'string'
-        ? _0x40e715
-        : String(_0x40e715?.localPath || _0x40e715?.path || '').trim(),
-    _0x4cac77 = _localPathToStaticRequestPath(_0xf921fc);
-  if (!_0x4cac77) return false;
+export async function checkLocalMediaExistsOnServer(value25) {
+  const value26 =
+      typeof value25 === 'string' ? value25 : String(value25?.localPath || value25?.path || '').trim(),
+    url3 = _localPathToStaticRequestPath(value26);
+  if (!url3) return false;
   try {
-    const _0x226c6b = await requester({
-        url: _0x4cac77,
+    const response = await requester({
+        url: url3,
         method: 'HEAD',
         provider: 'local',
         responseType: 'text',
@@ -356,8 +345,8 @@ export async function checkLocalMediaExistsOnServer(_0x40e715) {
         returnMeta: true,
         timeout: 0x2710,
       }),
-      _0x232842 = Number(_0x226c6b?.status || 0);
-    return _0x232842 >= 200 && _0x232842 < 0x190;
+      count2 = Number(response?.status || 0);
+    return count2 >= 200 && count2 < 0x190;
   } catch {
     return false;
   }
@@ -372,114 +361,112 @@ const _localMediaStatInflight = new Map(),
   LOCAL_MEDIA_EXISTS_TRUE_CACHE_TTL_MS = 0x1e * 0x3e8,
   LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS = 0x3 * 0x3e8;
 
-function isLocalRelativeUrl(_0x33bf0b) {
-  const _0x1c5ce9 = String(_0x33bf0b || '')['trim']();
-  return _0x1c5ce9['startsWith']('/') && !_0x1c5ce9['startsWith']('//');
+function isLocalRelativeUrl(value27) {
+  const enabled7 = String(value27 || '')['trim']();
+  return enabled7['startsWith']('/') && !enabled7['startsWith']('//');
 }
 
-function normalizePositiveTimeoutMs(_0x4e6db4, _0x123f3c) {
-  const _0x3ca3f4 = Number(_0x4e6db4);
-  return Number['isFinite'](_0x3ca3f4) && _0x3ca3f4 > 0x0 ? _0x3ca3f4 : _0x123f3c;
+function normalizePositiveTimeoutMs(value28, value29) {
+  const count3 = Number(value28);
+  return Number['isFinite'](count3) && count3 > 0x0 ? count3 : value29;
 }
 
-function _collectNormalizedLocalPaths(_0xd502e9) {
-  const _0x1c1446 = new Set();
-  for (const _0x8b2a66 of Array['isArray'](_0xd502e9) ? _0xd502e9 : []) {
-    const _0x4c8f33 = normalizeLocalPath(_0x8b2a66);
-    if (_0x4c8f33) _0x1c1446['add'](_0x4c8f33);
+function _collectNormalizedLocalPaths(value30) {
+  const value31 = new Set();
+  for (const value32 of Array['isArray'](value30) ? value30 : []) {
+    const localPath4 = normalizeLocalPath(value32);
+    if (localPath4) value31['add'](localPath4);
   }
-  return _0x1c1446;
+  return value31;
 }
 
-function _evictSavedOutputCacheByLocalPaths(_0x329a3a) {
-  const _0xe48b45 = _collectNormalizedLocalPaths(_0x329a3a);
-  if (_0xe48b45['size'] === 0x0) return;
-  for (const [_0x4d5049, _0x5a0845] of _saveOutputFromUrlCache['entries']()) {
-    const _0x45d52c = normalizeLocalPath(
-      _0x5a0845?.['localPath'] || _0x5a0845?.['path'] || _0x5a0845?.['url'],
+function _evictSavedOutputCacheByLocalPaths(value33) {
+  const map4 = _collectNormalizedLocalPaths(value33);
+  if (map4['size'] === 0x0) return;
+  for (const [value34, response2] of _saveOutputFromUrlCache['entries']()) {
+    const localPath5 = normalizeLocalPath(
+      response2?.['localPath'] || response2?.['path'] || response2?.['url'],
     );
-    _0x45d52c && _0xe48b45['has'](_0x45d52c) && _saveOutputFromUrlCache['delete'](_0x4d5049);
+    localPath5 && map4['has'](localPath5) && _saveOutputFromUrlCache['delete'](value34);
   }
 }
 
-function _evictLocalMediaExistsCacheByLocalPaths(_0x35fe3f) {
-  const _0x3eae5a = _collectNormalizedLocalPaths(_0x35fe3f);
-  for (const _0x2225b7 of _0x3eae5a) {
-    const _0x556a93 = _localPathToStaticRequestPath(_0x2225b7);
-    if (_0x556a93) _localMediaStatCache['delete'](_0x556a93);
+function _evictLocalMediaExistsCacheByLocalPaths(value35) {
+  const _collectNormalizedLocalPaths2 = _collectNormalizedLocalPaths(value35);
+  for (const value36 of _collectNormalizedLocalPaths2) {
+    const _localPathToStaticRequestPath2 = _localPathToStaticRequestPath(value36);
+    if (_localPathToStaticRequestPath2) _localMediaStatCache['delete'](_localPathToStaticRequestPath2);
   }
 }
 
-function _readLocalMediaStatCache(_0x1724bc) {
-  const _0x3d20b8 = _localMediaStatCache['get'](_0x1724bc);
-  if (!_0x3d20b8) return undefined;
-  if (Number(_0x3d20b8['expiresAt'] || 0x0) <= Date['now']())
-    return (_localMediaStatCache['delete'](_0x1724bc), undefined);
-  return _0x3d20b8['stat'];
+function _readLocalMediaStatCache(value37) {
+  const enabled8 = _localMediaStatCache['get'](value37);
+  if (!enabled8) return undefined;
+  if (Number(enabled8['expiresAt'] || 0x0) <= Date['now']())
+    return (_localMediaStatCache['delete'](value37), undefined);
+  return enabled8['stat'];
 }
 
-function _rememberLocalMediaStat(_0x43c91c, _0x4e295d) {
-  if (!_0x43c91c) return;
-  const _0x51b3eb = {
-      exists: _0x4e295d?.['exists'] === !![],
+function _rememberLocalMediaStat(enabled9, exists) {
+  if (!enabled9) return;
+  const stat = {
+      exists: exists?.['exists'] === !![],
       sizeBytes:
-        Number['isSafeInteger'](Number(_0x4e295d?.['sizeBytes'])) && Number(_0x4e295d['sizeBytes']) >= 0x0
-          ? Number(_0x4e295d['sizeBytes'])
+        Number['isSafeInteger'](Number(exists?.['sizeBytes'])) && Number(exists['sizeBytes']) >= 0x0
+          ? Number(exists['sizeBytes'])
           : 0x0,
-      contentType: String(_0x4e295d?.['contentType'] || '')['trim'](),
-      lastModified: String(_0x4e295d?.['lastModified'] || '')['trim'](),
+      contentType: String(exists?.['contentType'] || '')['trim'](),
+      lastModified: String(exists?.['lastModified'] || '')['trim'](),
     },
-    _0x52ce82 = _0x51b3eb['exists']
-      ? LOCAL_MEDIA_EXISTS_TRUE_CACHE_TTL_MS
-      : LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS;
-  _localMediaStatCache['set'](_0x43c91c, { stat: _0x51b3eb, expiresAt: Date['now']() + _0x52ce82 });
+    value38 = stat['exists'] ? LOCAL_MEDIA_EXISTS_TRUE_CACHE_TTL_MS : LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS;
+  _localMediaStatCache['set'](enabled9, { stat: stat, expiresAt: Date['now']() + value38 });
   if (_localMediaStatCache['size'] > LOCAL_MEDIA_EXISTS_CACHE_LIMIT) {
-    const _0x40b677 = _localMediaStatCache['keys']()['next']()['value'];
-    if (_0x40b677) _localMediaStatCache['delete'](_0x40b677);
+    const value39 = _localMediaStatCache['keys']()['next']()['value'];
+    if (value39) _localMediaStatCache['delete'](value39);
   }
-  return _0x51b3eb;
+  return stat;
 }
 
-function _normalizeLegacyProjectFilename(_0x3be800) {
-  const _0x5815ec = String(_0x3be800 || '')['trim']();
-  if (!_0x5815ec) return 'default_v2_project.json';
-  return PROJECT_FILE_EXTENSION_RE['test'](_0x5815ec) ? _0x5815ec : _0x5815ec + '.json';
+function _normalizeLegacyProjectFilename(value40) {
+  const enabled10 = String(value40 || '')['trim']();
+  if (!enabled10) return 'default_v2_project.json';
+  return PROJECT_FILE_EXTENSION_RE['test'](enabled10) ? enabled10 : enabled10 + '.json';
 }
 
-export async function renameV2ProjectOnServer(_0x535b01, _0x1cc162) {
-  const _0x153bcc = String(_0x1cc162 || '')['trim']();
-  if (!_0x153bcc) return { success: ![] };
-  const _0x18102f = _normalizeProjectFilename(_0x535b01);
+export async function renameV2ProjectOnServer(value41, value42) {
+  const name = String(value42 || '')['trim']();
+  if (!name) return { success: ![] };
+  const _normalizeProjectFilename4 = _normalizeProjectFilename(value41);
   return await requester({
-    url: '/api/v2/projects/' + encodeURIComponent(_0x18102f),
+    url: '/api/v2/projects/' + encodeURIComponent(_normalizeProjectFilename4),
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON['stringify']({ name: _0x153bcc }),
+    body: JSON['stringify']({ name: name }),
     provider: 'local',
   });
 }
 
-export async function saveOutputVideoThumbnailToServer(_0x30690f = {}) {
-  return await post('/api/v2/output-files/video-thumbnail', _0x30690f || {}, { provider: 'local' });
+export async function saveOutputVideoThumbnailToServer(options6 = {}) {
+  return await post('/api/v2/output-files/video-thumbnail', options6 || {}, { provider: 'local' });
 }
 
 export async function fetchAssetCategorySettingsFromServer() {
   try {
-    const _0x256dee = await get(ASSET_CATEGORIES_USER_FILE, { provider: 'local' });
-    if (Array['isArray'](_0x256dee)) return { categories: _0x256dee, displayNames: {}, parents: {} };
-    if (_0x256dee && typeof _0x256dee === 'object') {
-      const _0x3d7357 = Array['isArray'](_0x256dee['categories'])
-          ? _0x256dee['categories']
-          : Array['isArray'](_0x256dee['items'])
-            ? _0x256dee['items']
+    const categories2 = await get(ASSET_CATEGORIES_USER_FILE, { provider: 'local' });
+    if (Array['isArray'](categories2)) return { categories: categories2, displayNames: {}, parents: {} };
+    if (categories2 && typeof categories2 === 'object') {
+      const categories3 = Array['isArray'](categories2['categories'])
+          ? categories2['categories']
+          : Array['isArray'](categories2['items'])
+            ? categories2['items']
             : [],
-        _0x51c54b =
-          _0x256dee['displayNames'] && typeof _0x256dee['displayNames'] === 'object'
-            ? _0x256dee['displayNames']
+        displayNames =
+          categories2['displayNames'] && typeof categories2['displayNames'] === 'object'
+            ? categories2['displayNames']
             : {},
-        _0x12be99 =
-          _0x256dee['parents'] && typeof _0x256dee['parents'] === 'object' ? _0x256dee['parents'] : {};
-      return { categories: _0x3d7357, displayNames: _0x51c54b, parents: _0x12be99 };
+        parents =
+          categories2['parents'] && typeof categories2['parents'] === 'object' ? categories2['parents'] : {};
+      return { categories: categories3, displayNames: displayNames, parents: parents };
     }
     return { categories: [], displayNames: {}, parents: {} };
   } catch {
@@ -487,30 +474,30 @@ export async function fetchAssetCategorySettingsFromServer() {
   }
 }
 
-export async function discardStagedAssetUploadToServer(_0x406340) {
-  const _0x1dadd2 = String(_0x406340 || '')
+export async function discardStagedAssetUploadToServer(value43) {
+  const stageId = String(value43 || '')
     ['trim']()
     ['toLowerCase']();
-  if (!/^[a-f0-9]{32}$/['test'](_0x1dadd2)) return { success: ![], removed: ![] };
+  if (!/^[a-f0-9]{32}$/['test'](stageId)) return { success: ![], removed: ![] };
   return await post(
     '/api/v2/assets/stage/discard',
-    { stageId: _0x1dadd2 },
+    { stageId: stageId },
     { provider: 'local', timeout: 0x1e * 0x3e8, retries: 0x0 },
   );
 }
 
-export async function statLocalMediaOnServer(_0x45abbc) {
-  const _0x2e96d7 =
-      typeof _0x45abbc === 'string'
-        ? _0x45abbc
-        : String(_0x45abbc?.['localPath'] || _0x45abbc?.['path'] || '')['trim'](),
-    _0xcdf4fd = _localPathToStaticRequestPath(_0x2e96d7);
-  if (!_0xcdf4fd) return { exists: ![], sizeBytes: 0x0, contentType: '', lastModified: '' };
-  const _0x562dcb = _readLocalMediaStatCache(_0xcdf4fd);
-  if (_0x562dcb !== undefined) return _0x562dcb;
-  if (_localMediaStatInflight['has'](_0xcdf4fd)) return await _localMediaStatInflight['get'](_0xcdf4fd);
-  const _0x44b53c = requester({
-    url: _0xcdf4fd,
+export async function statLocalMediaOnServer(value44) {
+  const value45 =
+      typeof value44 === 'string'
+        ? value44
+        : String(value44?.['localPath'] || value44?.['path'] || '')['trim'](),
+    url4 = _localPathToStaticRequestPath(value45);
+  if (!url4) return { exists: ![], sizeBytes: 0x0, contentType: '', lastModified: '' };
+  const _readLocalMediaStatCache2 = _readLocalMediaStatCache(url4);
+  if (_readLocalMediaStatCache2 !== undefined) return _readLocalMediaStatCache2;
+  if (_localMediaStatInflight['has'](url4)) return await _localMediaStatInflight['get'](url4);
+  const promise2 = requester({
+    url: url4,
     method: 'HEAD',
     provider: 'local',
     responseType: 'text',
@@ -518,23 +505,21 @@ export async function statLocalMediaOnServer(_0x45abbc) {
     returnMeta: !![],
     timeout: 0x2710,
   })
-    ['then']((_0x5847df) => {
-      const _0xaf6a10 = Number(_0x5847df?.['status'] || 0x0),
-        _0x19b172 = _0xaf6a10 >= 0xc8 && _0xaf6a10 < 0x190,
-        _0x344ebe = Number(_0x5847df?.['headers']?.['get']?.('content-length') || 0x0);
-      return _rememberLocalMediaStat(_0xcdf4fd, {
-        exists: _0x19b172,
-        sizeBytes: _0x19b172 && Number['isSafeInteger'](_0x344ebe) && _0x344ebe >= 0x0 ? _0x344ebe : 0x0,
-        contentType: _0x19b172
-          ? String(_0x5847df?.['headers']?.['get']?.('content-type') || '')['trim']()
-          : '',
-        lastModified: _0x19b172
-          ? String(_0x5847df?.['headers']?.['get']?.('last-modified') || '')['trim']()
+    ['then']((response3) => {
+      const count4 = Number(response3?.['status'] || 0x0),
+        exists2 = count4 >= 0xc8 && count4 < 0x190,
+        count5 = Number(response3?.['headers']?.['get']?.('content-length') || 0x0);
+      return _rememberLocalMediaStat(url4, {
+        exists: exists2,
+        sizeBytes: exists2 && Number['isSafeInteger'](count5) && count5 >= 0x0 ? count5 : 0x0,
+        contentType: exists2 ? String(response3?.['headers']?.['get']?.('content-type') || '')['trim']() : '',
+        lastModified: exists2
+          ? String(response3?.['headers']?.['get']?.('last-modified') || '')['trim']()
           : '',
       });
     })
     ['catch'](() => {
-      return _rememberLocalMediaStat(_0xcdf4fd, {
+      return _rememberLocalMediaStat(url4, {
         exists: ![],
         sizeBytes: 0x0,
         contentType: '',
@@ -542,10 +527,10 @@ export async function statLocalMediaOnServer(_0x45abbc) {
       });
     });
   return (
-    _localMediaStatInflight['set'](_0xcdf4fd, _0x44b53c),
-    _0x44b53c['finally'](() => {
-      _localMediaStatInflight['get'](_0xcdf4fd) === _0x44b53c && _localMediaStatInflight['delete'](_0xcdf4fd);
+    _localMediaStatInflight['set'](url4, promise2),
+    promise2['finally'](() => {
+      _localMediaStatInflight['get'](url4) === promise2 && _localMediaStatInflight['delete'](url4);
     })['catch'](() => {}),
-    await _0x44b53c
+    await promise2
   );
 }

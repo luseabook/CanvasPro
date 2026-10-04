@@ -7,12 +7,12 @@ import { collectGroupSyncPlayableVideoEntries, syncPlayGroupVideos } from '../mo
 import { onLocaleChange, t } from '../i18n/index.js';
 const getStateSnapshot = () =>
   typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
-function groupText(_0x396043, _0x822db6 = {}) {
-  return t('groupNode.' + _0x396043, _0x822db6);
+function groupText(value, item = {}) {
+  return t('groupNode.' + value, item);
 }
 export class GroupNode {
-  constructor(_0x3f5816) {
-    ((this._data = _0x3f5816),
+  constructor(key) {
+    ((this._data = key),
       (this._rootEl = null),
       (this._titleEl = null),
       (this._toolbarEl = null),
@@ -34,82 +34,76 @@ export class GroupNode {
       (this._titleEl.spellcheck = false),
       (this._titleEl.title = groupText('renameTooltip')),
       (this._titleEl.textContent = this._data.name || groupText('defaultName')),
-      this._titleEl.addEventListener('pointerdown', (_0x1fe4eb) => _0x1fe4eb.stopPropagation()),
-      this._titleEl.addEventListener('keydown', (_0x193a93) => {
-        _0x193a93.key === 'Enter' && (_0x193a93.preventDefault(), this._titleEl.blur());
+      this._titleEl.addEventListener('pointerdown', (event) => event.stopPropagation()),
+      this._titleEl.addEventListener('keydown', (event2) => {
+        event2.key === 'Enter' && (event2.preventDefault(), this._titleEl.blur());
       }),
       this._titleEl.addEventListener('blur', () => {
         (appStore.updateNodeData(this._data.id, { name: this._titleEl.textContent }), commit());
       }),
       this._rootEl.appendChild(this._titleEl));
-    const _0x5a7ab6 = document.createElement('div');
-    ((_0x5a7ab6.className = 'group-toolbar'),
-      (_0x5a7ab6.dataset.groupToolbarFor = this._data.id),
-      (_0x5a7ab6.onpointerdown = (_0x49f541) => _0x49f541.stopPropagation()),
-      (this._toolbarEl = _0x5a7ab6));
-    const _0x1d22a4 = 'http://www.w3.org/2000/svg',
-      _0x7b56c = () => {
-        const _0x122f02 = document.createElementNS(_0x1d22a4, 'svg');
+    const el = document.createElement('div');
+    ((el.className = 'group-toolbar'),
+      (el.dataset.groupToolbarFor = this._data.id),
+      (el.onpointerdown = (event3) => event3.stopPropagation()),
+      (this._toolbarEl = el));
+    const index = 'http://www.w3.org/2000/svg',
+      handler = () => {
+        const el2 = document.createElementNS(index, 'svg');
         return (
-          _0x122f02.setAttribute('viewBox', '0 0 24 24'),
-          _0x122f02.setAttribute('fill', 'none'),
-          _0x122f02.setAttribute('stroke', 'currentColor'),
-          _0x122f02.setAttribute('stroke-linecap', 'round'),
-          _0x122f02.setAttribute('stroke-linejoin', 'round'),
-          _0x122f02
+          el2.setAttribute('viewBox', '0 0 24 24'),
+          el2.setAttribute('fill', 'none'),
+          el2.setAttribute('stroke', 'currentColor'),
+          el2.setAttribute('stroke-linecap', 'round'),
+          el2.setAttribute('stroke-linejoin', 'round'),
+          el2
         );
       },
-      _0x52fc80 = (_0x25c042, _0x3b6646) => {
-        _0x25c042.type = 'button';
-        const _0x33520b = groupText(_0x3b6646);
-        ((_0x25c042.title = _0x33520b), _0x25c042.setAttribute('aria-label', _0x33520b));
+      handler2 = (el3, result) => {
+        el3.type = 'button';
+        const groupText2 = groupText(result);
+        ((el3.title = groupText2), el3.setAttribute('aria-label', groupText2));
       },
-      _0x4144cd = (_0x74ab72, _0x5f581d) => {
-        const _0x473a8e = document.createElementNS(_0x1d22a4, 'path');
-        return (_0x473a8e.setAttribute('d', _0x5f581d), _0x74ab72.appendChild(_0x473a8e), _0x473a8e);
+      handler3 = (el4, data) => {
+        const el5 = document.createElementNS(index, 'path');
+        return (el5.setAttribute('d', data), el4.appendChild(el5), el5);
       },
-      _0x247221 = document.createElement('button');
-    ((_0x247221.className = 'gt-btn gt-btn-run'),
-      _0x52fc80(_0x247221, 'toolbar.runGroup'),
-      _0x247221.replaceChildren());
-    const _0x54952d = _0x7b56c();
-    (_0x54952d.setAttribute('stroke-width', '2'),
-      _0x4144cd(_0x54952d, 'M12 3l1.2 4.1L17 8.3l-3.8 1.2L12 13.5l-1.2-4-3.8-1.2 3.8-1.2L12 3z'),
-      _0x4144cd(_0x54952d, 'M18 14l.7 2.3L21 17l-2.3.7L18 20l-.7-2.3L15 17l2.3-.7L18 14z'),
-      _0x4144cd(_0x54952d, 'M6 13l.8 2.7L9.5 16.5l-2.7.8L6 20l-.8-2.7-2.7-.8 2.7-.8L6 13z'),
-      _0x247221.appendChild(_0x54952d),
-      (_0x247221.onclick = (_0x59d2ee) => {
-        (_0x59d2ee.stopPropagation(), this._runGroup());
+      el6 = document.createElement('button');
+    ((el6.className = 'gt-btn gt-btn-run'), handler2(el6, 'toolbar.runGroup'), el6.replaceChildren());
+    const el7 = handler();
+    (el7.setAttribute('stroke-width', '2'),
+      handler3(el7, 'M12 3l1.2 4.1L17 8.3l-3.8 1.2L12 13.5l-1.2-4-3.8-1.2 3.8-1.2L12 3z'),
+      handler3(el7, 'M18 14l.7 2.3L21 17l-2.3.7L18 20l-.7-2.3L15 17l2.3-.7L18 14z'),
+      handler3(el7, 'M6 13l.8 2.7L9.5 16.5l-2.7.8L6 20l-.8-2.7-2.7-.8 2.7-.8L6 13z'),
+      el6.appendChild(el7),
+      (el6.onclick = (event4) => {
+        (event4.stopPropagation(), this._runGroup());
       }),
-      _0x5a7ab6.appendChild(_0x247221));
-    const _0x4295f4 = document.createElement('button');
-    ((_0x4295f4.className = 'gt-btn gt-btn-sync-play'),
-      _0x52fc80(_0x4295f4, 'toolbar.syncPlay'),
-      _0x4295f4.replaceChildren());
-    const _0x25ede5 = _0x7b56c();
-    _0x25ede5.setAttribute('stroke-width', '2.5');
-    const _0x33c0fc = document.createElementNS(_0x1d22a4, 'polygon');
-    (_0x33c0fc.setAttribute('points', '5 3 19 12 5 21 5 3'),
-      _0x25ede5.appendChild(_0x33c0fc),
-      _0x4295f4.appendChild(_0x25ede5),
-      (_0x4295f4.style.display = 'none'),
-      (_0x4295f4.onclick = (_0x4ffc29) => {
-        (_0x4ffc29.stopPropagation(), this._syncPlayGroupVideos());
+      el.appendChild(el6));
+    const el8 = document.createElement('button');
+    ((el8.className = 'gt-btn gt-btn-sync-play'), handler2(el8, 'toolbar.syncPlay'), el8.replaceChildren());
+    const el9 = handler();
+    el9.setAttribute('stroke-width', '2.5');
+    const el10 = document.createElementNS(index, 'polygon');
+    (el10.setAttribute('points', '5 3 19 12 5 21 5 3'),
+      el9.appendChild(el10),
+      el8.appendChild(el9),
+      (el8.style.display = 'none'),
+      (el8.onclick = (event5) => {
+        (event5.stopPropagation(), this._syncPlayGroupVideos());
       }),
-      _0x5a7ab6.appendChild(_0x4295f4));
-    const _0x528046 = document.createElement('div');
-    _0x528046.className = 'gt-color-wrap';
-    const _0x505f7a = document.createElement('button');
-    ((_0x505f7a.className = 'gt-btn gt-btn-color'),
-      _0x52fc80(_0x505f7a, 'toolbar.color'),
-      _0x505f7a.replaceChildren());
-    const _0x4174c6 = document.createElement('div');
-    ((_0x4174c6.className = 'color-dot'),
-      (_0x4174c6.style.background = this._data.color || 'var(--indigo)'),
-      _0x505f7a.appendChild(_0x4174c6));
-    const _0x5cf927 = document.createElement('div');
-    _0x5cf927.className = 'gt-color-menu';
-    const _0x5fd3e8 = [
+      el.appendChild(el8));
+    const el11 = document.createElement('div');
+    el11.className = 'gt-color-wrap';
+    const el12 = document.createElement('button');
+    ((el12.className = 'gt-btn gt-btn-color'), handler2(el12, 'toolbar.color'), el12.replaceChildren());
+    const el13 = document.createElement('div');
+    ((el13.className = 'color-dot'),
+      (el13.style.background = this._data.color || 'var(--indigo)'),
+      el12.appendChild(el13));
+    const el14 = document.createElement('div');
+    el14.className = 'gt-color-menu';
+    const list = [
       'var(--indigo)',
       'var(--green)',
       'var(--gold)',
@@ -119,116 +113,112 @@ export class GroupNode {
       'var(--group-slate)',
       'var(--cyan)',
     ];
-    ((_0x505f7a.onclick = (_0x4d2ba1) => {
-      _0x4d2ba1.stopPropagation();
-      const _0x4ef1e7 = _0x5cf927.classList.contains('show');
-      document
-        .querySelectorAll('.gt-color-menu.show')
-        .forEach((_0x221b07) => _0x221b07.classList.remove('show'));
-      if (!_0x4ef1e7) _0x5cf927.classList.add('show');
+    ((el12.onclick = (event6) => {
+      event6.stopPropagation();
+      const enabled = el14.classList.contains('show');
+      document.querySelectorAll('.gt-color-menu.show').forEach((el15) => el15.classList.remove('show'));
+      if (!enabled) el14.classList.add('show');
     }),
-      _0x5fd3e8.forEach((_0x512f9d) => {
-        const _0x2db56a = document.createElement('div');
-        ((_0x2db56a.className = 'color-option'),
-          (_0x2db56a.dataset.groupColor = _0x512f9d),
-          (_0x2db56a.style.background = _0x512f9d),
-          (_0x2db56a.onclick = (_0x1e3845) => {
-            (_0x1e3845.stopPropagation(), this._setColor(_0x512f9d));
+      list.forEach((item2) => {
+        const el16 = document.createElement('div');
+        ((el16.className = 'color-option'),
+          (el16.dataset.groupColor = item2),
+          (el16.style.background = item2),
+          (el16.onclick = (event7) => {
+            (event7.stopPropagation(), this._setColor(item2));
           }),
-          _0x5cf927.appendChild(_0x2db56a));
+          el14.appendChild(el16));
       }),
-      (this._colorMenuOutsidePointerDown = () => _0x5cf927.classList.remove('show')),
+      (this._colorMenuOutsidePointerDown = () => el14.classList.remove('show')),
       window.addEventListener('pointerdown', this._colorMenuOutsidePointerDown),
-      _0x528046.appendChild(_0x505f7a),
-      _0x528046.appendChild(_0x5cf927),
-      _0x5a7ab6.appendChild(_0x528046));
-    const _0x444307 = document.createElement('button');
-    ((_0x444307.className = 'gt-btn gt-btn-workflow'),
-      _0x52fc80(_0x444307, 'toolbar.createWorkflow'),
-      _0x444307.replaceChildren());
-    const _0xf895ed = _0x7b56c();
-    _0xf895ed.setAttribute('stroke-width', '1.8');
-    const _0x5e0b53 = document.createElementNS(_0x1d22a4, 'rect');
-    (_0x5e0b53.setAttribute('x', '3'),
-      _0x5e0b53.setAttribute('y', '3'),
-      _0x5e0b53.setAttribute('width', '18'),
-      _0x5e0b53.setAttribute('height', '18'),
-      _0x5e0b53.setAttribute('rx', '2'),
-      _0x5e0b53.setAttribute('ry', '2'));
-    const _0x35a092 = document.createElementNS(_0x1d22a4, 'line');
-    (_0x35a092.setAttribute('x1', '3'),
-      _0x35a092.setAttribute('y1', '9'),
-      _0x35a092.setAttribute('x2', '21'),
-      _0x35a092.setAttribute('y2', '9'));
-    const _0x192097 = document.createElementNS(_0x1d22a4, 'line');
-    (_0x192097.setAttribute('x1', '9'),
-      _0x192097.setAttribute('y1', '21'),
-      _0x192097.setAttribute('x2', '9'),
-      _0x192097.setAttribute('y2', '9'),
-      _0xf895ed.appendChild(_0x5e0b53),
-      _0xf895ed.appendChild(_0x35a092),
-      _0xf895ed.appendChild(_0x192097),
-      _0x444307.appendChild(_0xf895ed),
-      (_0x444307.onclick = (_0x1acc5e) => {
-        (_0x1acc5e.stopPropagation(), this._requestWorkflow());
+      el11.appendChild(el12),
+      el11.appendChild(el14),
+      el.appendChild(el11));
+    const el17 = document.createElement('button');
+    ((el17.className = 'gt-btn gt-btn-workflow'),
+      handler2(el17, 'toolbar.createWorkflow'),
+      el17.replaceChildren());
+    const el18 = handler();
+    el18.setAttribute('stroke-width', '1.8');
+    const el19 = document.createElementNS(index, 'rect');
+    (el19.setAttribute('x', '3'),
+      el19.setAttribute('y', '3'),
+      el19.setAttribute('width', '18'),
+      el19.setAttribute('height', '18'),
+      el19.setAttribute('rx', '2'),
+      el19.setAttribute('ry', '2'));
+    const el20 = document.createElementNS(index, 'line');
+    (el20.setAttribute('x1', '3'),
+      el20.setAttribute('y1', '9'),
+      el20.setAttribute('x2', '21'),
+      el20.setAttribute('y2', '9'));
+    const el21 = document.createElementNS(index, 'line');
+    (el21.setAttribute('x1', '9'),
+      el21.setAttribute('y1', '21'),
+      el21.setAttribute('x2', '9'),
+      el21.setAttribute('y2', '9'),
+      el18.appendChild(el19),
+      el18.appendChild(el20),
+      el18.appendChild(el21),
+      el17.appendChild(el18),
+      (el17.onclick = (event8) => {
+        (event8.stopPropagation(), this._requestWorkflow());
       }),
-      _0x5a7ab6.appendChild(_0x444307));
-    const _0x4a622b = document.createElement('button');
-    ((_0x4a622b.className = 'gt-btn gt-btn-ungroup'),
-      _0x52fc80(_0x4a622b, 'toolbar.ungroup'),
-      _0x4a622b.replaceChildren());
-    const _0x4630cd = _0x7b56c();
-    _0x4630cd.setAttribute('stroke-width', '2');
-    const _0x400862 = document.createElementNS(_0x1d22a4, 'path');
-    _0x400862.setAttribute('d', 'M3 6h18');
-    const _0x419336 = document.createElementNS(_0x1d22a4, 'path');
-    _0x419336.setAttribute('d', 'M8 6V4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2');
-    const _0x26a2e0 = document.createElementNS(_0x1d22a4, 'path');
-    _0x26a2e0.setAttribute('d', 'M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6');
-    const _0x381e36 = document.createElementNS(_0x1d22a4, 'line');
-    (_0x381e36.setAttribute('x1', '10'),
-      _0x381e36.setAttribute('y1', '11'),
-      _0x381e36.setAttribute('x2', '10'),
-      _0x381e36.setAttribute('y2', '17'));
-    const _0x1a9bef = document.createElementNS(_0x1d22a4, 'line');
-    (_0x1a9bef.setAttribute('x1', '14'),
-      _0x1a9bef.setAttribute('y1', '11'),
-      _0x1a9bef.setAttribute('x2', '14'),
-      _0x1a9bef.setAttribute('y2', '17'),
-      _0x4630cd.appendChild(_0x400862),
-      _0x4630cd.appendChild(_0x419336),
-      _0x4630cd.appendChild(_0x26a2e0),
-      _0x4630cd.appendChild(_0x381e36),
-      _0x4630cd.appendChild(_0x1a9bef),
-      _0x4a622b.appendChild(_0x4630cd),
-      (_0x4a622b.onclick = (_0x360bf0) => {
-        (_0x360bf0.stopPropagation(), this._ungroup());
+      el.appendChild(el17));
+    const el22 = document.createElement('button');
+    ((el22.className = 'gt-btn gt-btn-ungroup'), handler2(el22, 'toolbar.ungroup'), el22.replaceChildren());
+    const el23 = handler();
+    el23.setAttribute('stroke-width', '2');
+    const el24 = document.createElementNS(index, 'path');
+    el24.setAttribute('d', 'M3 6h18');
+    const el25 = document.createElementNS(index, 'path');
+    el25.setAttribute('d', 'M8 6V4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2');
+    const el26 = document.createElementNS(index, 'path');
+    el26.setAttribute('d', 'M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6');
+    const el27 = document.createElementNS(index, 'line');
+    (el27.setAttribute('x1', '10'),
+      el27.setAttribute('y1', '11'),
+      el27.setAttribute('x2', '10'),
+      el27.setAttribute('y2', '17'));
+    const el28 = document.createElementNS(index, 'line');
+    (el28.setAttribute('x1', '14'),
+      el28.setAttribute('y1', '11'),
+      el28.setAttribute('x2', '14'),
+      el28.setAttribute('y2', '17'),
+      el23.appendChild(el24),
+      el23.appendChild(el25),
+      el23.appendChild(el26),
+      el23.appendChild(el27),
+      el23.appendChild(el28),
+      el22.appendChild(el23),
+      (el22.onclick = (event9) => {
+        (event9.stopPropagation(), this._ungroup());
       }),
-      _0x5a7ab6.appendChild(_0x4a622b),
-      this._rootEl.appendChild(_0x5a7ab6),
-      this._mountDetachedToolbar(_0x5a7ab6));
-    const _0x39c6e = document.createElement('div');
+      el.appendChild(el22),
+      this._rootEl.appendChild(el),
+      this._mountDetachedToolbar(el));
+    const el29 = document.createElement('div');
     return (
-      (_0x39c6e.className = 'group-resizer'),
-      (_0x39c6e.style.pointerEvents = 'auto'),
-      _0x39c6e.addEventListener('pointerdown', (_0x32444b) => {
+      (el29.className = 'group-resizer'),
+      (el29.style.pointerEvents = 'auto'),
+      el29.addEventListener('pointerdown', (event10) => {
         startNodeResizePreview({
-          event: _0x32444b,
+          event: event10,
           nodeId: this._data.id,
           getNode: () => getStateSnapshot().nodes?.[this._data.id] || this._data,
           getViewport: () => getStateSnapshot().viewport,
-          resolveSize: ({ startWidth: _0x3ee4b0, startHeight: _0x571b62, dx: _0x442568, dy: _0x2f1049 }) => ({
-            width: Math.max(150, _0x3ee4b0 + _0x442568),
-            height: Math.max(100, _0x571b62 + _0x2f1049),
+          resolveSize: ({ startWidth: startWidth, startHeight: startHeight, dx: dx2, dy: dy2 }) => ({
+            width: Math.max(150, startWidth + dx2),
+            height: Math.max(100, startHeight + dy2),
           }),
-          applyPatch: (_0x40c3a0) => appStore.updateNodeData(this._data.id, _0x40c3a0),
-          onPreview: (_0x4a28cc) => this._syncToolbarPosition(_0x4a28cc.width),
+          applyPatch: (options) => appStore.updateNodeData(this._data.id, options),
+          onPreview: (box) => this._syncToolbarPosition(box.width),
           afterApply: () => this._syncContainedChildren(),
           commit: commit,
           label: 'group-resize',
         });
       }),
-      this._rootEl.appendChild(_0x39c6e),
+      this._rootEl.appendChild(el29),
       this._syncColor(this._data.color || 'var(--indigo)'),
       this._syncGroupSyncPlaybackButton(getStateSnapshot().nodes || {}),
       (this._unsubscribeLocale = onLocaleChange(() => this._syncLocaleTexts())),
@@ -241,53 +231,49 @@ export class GroupNode {
       !String(this._data?.name || '').trim() &&
         document.activeElement !== this._titleEl &&
         (this._titleEl.textContent = groupText('defaultName')));
-    const _0x129ec6 = [
+    const target = [
       ['.gt-btn-run', 'toolbar.runGroup'],
       ['.gt-btn-sync-play', 'toolbar.syncPlay'],
       ['.gt-btn-color', 'toolbar.color'],
       ['.gt-btn-workflow', 'toolbar.createWorkflow'],
       ['.gt-btn-ungroup', 'toolbar.ungroup'],
     ];
-    for (const _0x1af236 of [this._toolbarEl, this._detachedToolbarEl]) {
-      if (!_0x1af236) continue;
-      for (const [_0x45f3eb, _0x1e0f08] of _0x129ec6) {
-        const _0x4a2ae7 = _0x1af236.querySelector(_0x45f3eb);
-        if (!_0x4a2ae7) continue;
-        const _0x2c70bb = groupText(_0x1e0f08);
-        ((_0x4a2ae7.title = _0x2c70bb), _0x4a2ae7.setAttribute('aria-label', _0x2c70bb));
+    for (const el30 of [this._toolbarEl, this._detachedToolbarEl]) {
+      if (!el30) continue;
+      for (const [source, next] of target) {
+        const el31 = el30.querySelector(source);
+        if (!el31) continue;
+        const groupText3 = groupText(next);
+        ((el31.title = groupText3), el31.setAttribute('aria-label', groupText3));
       }
     }
   }
-  ['_mountDetachedToolbar'](_0x4455fe) {
-    const _0x5de853 = document.getElementById('v2-canvas');
-    if (!_0x5de853) return;
-    const _0x30c7e5 = _0x4455fe.cloneNode(true);
-    (_0x30c7e5.classList.add('group-toolbar--detached'),
-      (_0x30c7e5.onpointerdown = (_0x337370) => _0x337370.stopPropagation()),
-      _0x30c7e5.addEventListener('click', (_0x578c83) => this._handleDetachedToolbarClick(_0x578c83)),
-      _0x5de853.appendChild(_0x30c7e5),
-      (this._detachedToolbarEl = _0x30c7e5),
+  ['_mountDetachedToolbar'](current) {
+    const el32 = document.getElementById('v2-canvas');
+    if (!el32) return;
+    const el33 = current.cloneNode(true);
+    (el33.classList.add('group-toolbar--detached'),
+      (el33.onpointerdown = (event11) => event11.stopPropagation()),
+      el33.addEventListener('click', (entry) => this._handleDetachedToolbarClick(entry)),
+      el32.appendChild(el33),
+      (this._detachedToolbarEl = el33),
       this._syncToolbarPosition());
   }
-  ['_syncToolbarPosition'](_0x2d1ef8 = null) {
+  ['_syncToolbarPosition'](value2 = null) {
     if (!this._detachedToolbarEl) return;
-    const _0x5aefc6 = Number.isFinite(this._data.x) ? this._data.x : 0,
-      _0x2c151d = Number.isFinite(this._data.y) ? this._data.y : 0,
-      _0x12a415 = Number.isFinite(_0x2d1ef8)
-        ? _0x2d1ef8
-        : Number.isFinite(this._data.width)
-          ? this._data.width
-          : 0,
-      _0xe6b386 = _0x5aefc6 + this._toolbarPreviewOffsetX + _0x12a415 / 2;
-    ((this._detachedToolbarEl.style.left = _0xe6b386 + 'px'),
-      (this._detachedToolbarEl.style.top = _0x2c151d + this._toolbarPreviewOffsetY + 'px'));
+    const record = Number.isFinite(this._data.x) ? this._data.x : 0,
+      payload = Number.isFinite(this._data.y) ? this._data.y : 0,
+      handle = Number.isFinite(value2) ? value2 : Number.isFinite(this._data.width) ? this._data.width : 0,
+      state = record + this._toolbarPreviewOffsetX + handle / 2;
+    ((this._detachedToolbarEl.style.left = state + 'px'),
+      (this._detachedToolbarEl.style.top = payload + this._toolbarPreviewOffsetY + 'px'));
   }
   ['syncDragPreview']({ dx: dx = 0, dy: dy = 0, active: active = false } = {}) {
-    const _0x43eeaf = active && Number.isFinite(dx) ? dx : 0,
-      _0x38af0e = active && Number.isFinite(dy) ? dy : 0;
-    if (_0x43eeaf === this._toolbarPreviewOffsetX && _0x38af0e === this._toolbarPreviewOffsetY) return;
-    ((this._toolbarPreviewOffsetX = _0x43eeaf),
-      (this._toolbarPreviewOffsetY = _0x38af0e),
+    const config = active && Number.isFinite(dx) ? dx : 0,
+      scope = active && Number.isFinite(dy) ? dy : 0;
+    if (config === this._toolbarPreviewOffsetX && scope === this._toolbarPreviewOffsetY) return;
+    ((this._toolbarPreviewOffsetX = config),
+      (this._toolbarPreviewOffsetY = scope),
       this._syncToolbarPosition());
   }
   ['syncSelectionState']({
@@ -298,26 +284,24 @@ export class GroupNode {
   } = {}) {
     if (!this._detachedToolbarEl) return;
     this._syncGroupSyncPlaybackButton(nodes || getStateSnapshot().nodes || {});
-    const _0x36a8a2 = visible && selected && singleSelected;
-    this._detachedToolbarEl.classList.toggle('is-visible', _0x36a8a2);
-    if (!_0x36a8a2) {
+    const enabled2 = visible && selected && singleSelected;
+    this._detachedToolbarEl.classList.toggle('is-visible', enabled2);
+    if (!enabled2) {
       this._toolbarInteractivityRaf !== null &&
         (cancelAnimationFrame(this._toolbarInteractivityRaf), (this._toolbarInteractivityRaf = null));
       this._syncDetachedToolbarInteractivity(false);
       return;
     }
-    this._scheduleDetachedToolbarInteractivitySync(_0x36a8a2);
+    this._scheduleDetachedToolbarInteractivitySync(enabled2);
   }
-  ['_syncColor'](_0x3e578e) {
-    [this._toolbarEl, this._detachedToolbarEl].forEach((_0x4b8a70) => {
-      const _0x486cf0 = _0x4b8a70?.querySelector('.color-dot');
-      if (_0x486cf0) _0x486cf0.style.background = _0x3e578e;
+  ['_syncColor'](input) {
+    [this._toolbarEl, this._detachedToolbarEl].forEach((el34) => {
+      const el35 = el34?.querySelector('.color-dot');
+      if (el35) el35.style.background = input;
     });
   }
   ['_closeColorMenus']() {
-    document
-      .querySelectorAll('.gt-color-menu.show')
-      .forEach((_0x1270fc) => _0x1270fc.classList.remove('show'));
+    document.querySelectorAll('.gt-color-menu.show').forEach((el36) => el36.classList.remove('show'));
   }
   ['_runGroup']() {
     executeGroupGenerateButtons({ groupId: this._data.id });
@@ -325,33 +309,36 @@ export class GroupNode {
   ['_syncPlayGroupVideos']() {
     void syncPlayGroupVideos({ groupId: this._data.id, state: getStateSnapshot() });
   }
-  ['_syncGroupSyncPlaybackButton'](_0xb5911e = {}) {
-    const _0x59951d = collectGroupSyncPlayableVideoEntries(_0xb5911e, this._data.id).length;
-    if (_0x59951d === this._lastSyncPlayableVideoCount) return;
-    this._lastSyncPlayableVideoCount = _0x59951d;
-    const _0x1714a2 = _0x59951d >= 2;
-    [this._toolbarEl, this._detachedToolbarEl].forEach((_0x429224) => {
-      const _0x2fa678 = _0x429224?.querySelector?.('.gt-btn-sync-play');
-      if (!_0x2fa678) return;
-      ((_0x2fa678.style.display = _0x1714a2 ? '' : 'none'),
-        (_0x2fa678.disabled = !_0x1714a2),
-        _0x2fa678.classList.toggle('is-disabled', !_0x1714a2));
+  ['_syncGroupSyncPlaybackButton'](options2 = {}) {
+    const groupSyncPlayableVideoEntries = collectGroupSyncPlayableVideoEntries(
+      options2,
+      this._data.id,
+    ).length;
+    if (groupSyncPlayableVideoEntries === this._lastSyncPlayableVideoCount) return;
+    this._lastSyncPlayableVideoCount = groupSyncPlayableVideoEntries;
+    const enabled3 = groupSyncPlayableVideoEntries >= 2;
+    [this._toolbarEl, this._detachedToolbarEl].forEach((el37) => {
+      const el38 = el37?.querySelector?.('.gt-btn-sync-play');
+      if (!el38) return;
+      ((el38.style.display = enabled3 ? '' : 'none'),
+        (el38.disabled = !enabled3),
+        el38.classList.toggle('is-disabled', !enabled3));
     });
   }
-  ['_setColor'](_0xa8f28d) {
-    (appStore.updateNodeData(this._data.id, { color: _0xa8f28d }), this._closeColorMenus(), commit());
+  ['_setColor'](color) {
+    (appStore.updateNodeData(this._data.id, { color: color }), this._closeColorMenus(), commit());
   }
   ['_syncContainedChildren']() {
-    const { nodes: _0x5440bb } = getStateSnapshot(),
-      _0x472386 = collectGroupContainmentReparentOps(_0x5440bb, [this._data.id]);
-    if (_0x472386.length === 0) return false;
-    const _0x28bacf = () => {
-      _0x472386.forEach(({ nodeId: _0x377698, parentId: _0x3f92ed }) => {
-        appStore.groupNodes([_0x377698], _0x3f92ed);
+    const { nodes: nodes2 } = getStateSnapshot(),
+      list2 = collectGroupContainmentReparentOps(nodes2, [this._data.id]);
+    if (list2.length === 0) return false;
+    const run = () => {
+      list2.forEach(({ nodeId: nodeId, parentId: parentId }) => {
+        appStore.groupNodes([nodeId], parentId);
       });
     };
-    if (typeof appStore.batch === 'function') return (appStore.batch(_0x28bacf), true);
-    return (_0x28bacf(), true);
+    if (typeof appStore.batch === 'function') return (appStore.batch(run), true);
+    return (run(), true);
   }
   ['_requestWorkflow']() {
     window.dispatchEvent(
@@ -361,83 +348,83 @@ export class GroupNode {
     );
   }
   ['_ungroup']() {
-    const { nodes: _0x570545 } = appStore.getState();
-    (Object.values(_0x570545).forEach((_0x47dc25) => {
-      _0x47dc25.parentId === this._data.id && appStore.updateNodeData(_0x47dc25.id, { parentId: undefined });
+    const { nodes: nodes3 } = appStore.getState();
+    (Object.values(nodes3).forEach((item3) => {
+      item3.parentId === this._data.id && appStore.updateNodeData(item3.id, { parentId: undefined });
     }),
       appStore.deleteNodes([this._data.id]),
       commit());
   }
-  ['_handleDetachedToolbarClick'](_0x43814a) {
-    const _0x40eb5a = _0x43814a.target;
-    if (!(_0x40eb5a instanceof Element)) return;
-    const _0x27bde5 = _0x40eb5a.closest(
+  ['_handleDetachedToolbarClick'](event12) {
+    const el39 = event12.target;
+    if (!(el39 instanceof Element)) return;
+    const el40 = el39.closest(
       '.gt-btn-run, .gt-btn-sync-play, .gt-btn-color, .gt-btn-workflow, .gt-btn-ungroup, .color-option',
     );
-    if (!_0x27bde5 || !this._detachedToolbarEl?.contains(_0x27bde5)) return;
-    _0x43814a.stopPropagation();
-    if (_0x27bde5.classList.contains('color-option')) {
-      const _0x18e66f = _0x27bde5.dataset.groupColor || _0x27bde5.style.background;
-      if (_0x18e66f) this._setColor(_0x18e66f);
+    if (!el40 || !this._detachedToolbarEl?.contains(el40)) return;
+    event12.stopPropagation();
+    if (el40.classList.contains('color-option')) {
+      const output = el40.dataset.groupColor || el40.style.background;
+      if (output) this._setColor(output);
       return;
     }
-    if (_0x27bde5.classList.contains('gt-btn-run')) {
+    if (el40.classList.contains('gt-btn-run')) {
       this._runGroup();
       return;
     }
-    if (_0x27bde5.classList.contains('gt-btn-sync-play')) {
+    if (el40.classList.contains('gt-btn-sync-play')) {
       this._syncPlayGroupVideos();
       return;
     }
-    if (_0x27bde5.classList.contains('gt-btn-workflow')) {
+    if (el40.classList.contains('gt-btn-workflow')) {
       this._requestWorkflow();
       return;
     }
-    if (_0x27bde5.classList.contains('gt-btn-ungroup')) {
+    if (el40.classList.contains('gt-btn-ungroup')) {
       this._ungroup();
       return;
     }
-    if (_0x27bde5.classList.contains('gt-btn-color')) {
-      const _0x2ba269 = this._detachedToolbarEl.querySelector('.gt-color-menu'),
-        _0x105c77 = _0x2ba269?.classList.contains('show');
+    if (el40.classList.contains('gt-btn-color')) {
+      const el41 = this._detachedToolbarEl.querySelector('.gt-color-menu'),
+        enabled4 = el41?.classList.contains('show');
       this._closeColorMenus();
-      if (_0x2ba269 && !_0x105c77) _0x2ba269.classList.add('show');
+      if (el41 && !enabled4) el41.classList.add('show');
     }
   }
-  ['_syncDetachedToolbarInteractivity'](_0x240a1e) {
+  ['_syncDetachedToolbarInteractivity'](enabled5) {
     if (!this._detachedToolbarEl) return;
     this._detachedToolbarEl.classList.remove('is-interactive');
-    if (!_0x240a1e || !this._toolbarEl) return;
-    const _0x117ae4 = Array.from(this._toolbarEl.querySelectorAll('.gt-btn'))
-        .map((_0x156d0d) => _0x156d0d.getBoundingClientRect())
-        .filter((_0x1d3ebe) => _0x1d3ebe.width > 0 && _0x1d3ebe.height > 0),
-      _0x303764 = this._toolbarEl.getBoundingClientRect();
-    _0x303764.width > 0 && _0x303764.height > 0 && _0x117ae4.push(_0x303764);
-    const _0x21b8be = _0x117ae4.some((_0x26a754) => {
-      const _0x331829 = _0x26a754.left + _0x26a754.width / 2,
-        _0x386234 = _0x26a754.top + _0x26a754.height / 2,
-        _0x128f81 = document.elementFromPoint(_0x331829, _0x386234);
-      return _0x128f81 && !this._toolbarEl.contains(_0x128f81);
+    if (!enabled5 || !this._toolbarEl) return;
+    const list3 = Array.from(this._toolbarEl.querySelectorAll('.gt-btn'))
+        .map((el42) => el42.getBoundingClientRect())
+        .filter((box2) => box2.width > 0 && box2.height > 0),
+      box3 = this._toolbarEl.getBoundingClientRect();
+    box3.width > 0 && box3.height > 0 && list3.push(box3);
+    const value3 = list3.some((box4) => {
+      const value4 = box4.left + box4.width / 2,
+        value5 = box4.top + box4.height / 2,
+        value6 = document.elementFromPoint(value4, value5);
+      return value6 && !this._toolbarEl.contains(value6);
     });
-    this._detachedToolbarEl.classList.toggle('is-interactive', _0x21b8be);
+    this._detachedToolbarEl.classList.toggle('is-interactive', value3);
   }
-  ['_scheduleDetachedToolbarInteractivitySync'](_0x3cc535) {
-    this._syncDetachedToolbarInteractivity(_0x3cc535);
+  ['_scheduleDetachedToolbarInteractivitySync'](value7) {
+    this._syncDetachedToolbarInteractivity(value7);
     this._toolbarInteractivityRaf !== null &&
       (cancelAnimationFrame(this._toolbarInteractivityRaf), (this._toolbarInteractivityRaf = null));
     if (typeof requestAnimationFrame !== 'function') return;
     this._toolbarInteractivityRaf = requestAnimationFrame(() => {
-      ((this._toolbarInteractivityRaf = null), this._syncDetachedToolbarInteractivity(_0x3cc535));
+      ((this._toolbarInteractivityRaf = null), this._syncDetachedToolbarInteractivity(value7));
     });
   }
-  ['update'](_0x5cd432) {
-    (_0x5cd432.name !== this._data.name &&
+  ['update'](error) {
+    (error.name !== this._data.name &&
       document.activeElement !== this._titleEl &&
-      (this._titleEl.textContent = _0x5cd432.name || groupText('defaultName')),
-      _0x5cd432.color !== this._data.color && this._syncColor(_0x5cd432.color || 'var(--indigo)'),
+      (this._titleEl.textContent = error.name || groupText('defaultName')),
+      error.color !== this._data.color && this._syncColor(error.color || 'var(--indigo)'),
       (this._toolbarPreviewOffsetX = 0),
       (this._toolbarPreviewOffsetY = 0),
-      (this._data = _0x5cd432),
+      (this._data = error),
       this._syncToolbarPosition(),
       this._syncGroupSyncPlaybackButton(getStateSnapshot().nodes || {}));
   }

@@ -2,454 +2,424 @@ import { createDefaultCommentNoteStyle } from '../../components/commentNoteStyle
 import { findAvailablePosition, generateId, screenToWorld } from '../../core/math.js';
 import { t } from '../../i18n/index.js';
 import { getNodeSpawnPrefs } from '../nodeSpawn.js';
-function getMimeExtension(_0x3f3b55, _0x43bf8b = 'bin') {
-  const _0x4f2e86 = String(_0x3f3b55 || '')
+function getMimeExtension(value, item = 'bin') {
+  const list = String(value || '')
     .split(';')[0]
     .trim()
     .toLowerCase();
-  if (!_0x4f2e86.includes('/')) return _0x43bf8b;
-  const _0x397ec3 = _0x4f2e86.split('/')[1] || _0x43bf8b;
-  return _0x397ec3.replace(/[^a-z0-9]/g, '') || _0x43bf8b;
+  if (!list.includes('/')) return item;
+  const key = list.split('/')[1] || item;
+  return key.replace(/[^a-z0-9]/g, '') || item;
 }
 function buildSystemClipboardSignature({
-  pastedMedia: _0x2b340d,
-  pastedText: _0x2d31fd,
-  pastedFiles: _0x4341f5,
+  pastedMedia: pastedMedia,
+  pastedText: pastedText,
+  pastedFiles: pastedFiles,
 }) {
-  if (Array.isArray(_0x4341f5) && _0x4341f5.length > 0) {
-    const _0x34f2f5 = _0x4341f5
-      .map((_0x108201) => String(_0x108201?.path || _0x108201?.name || ''))
+  if (Array.isArray(pastedFiles) && pastedFiles.length > 0) {
+    const index = pastedFiles
+      .map((error) => String(error?.path || error?.name || ''))
       .filter(Boolean)
       .slice(0, 8)
       .join('|');
-    return 'files:' + _0x34f2f5 + '|len:' + _0x4341f5.length;
+    return 'files:' + index + '|len:' + pastedFiles.length;
   }
-  if (_0x2b340d?.mimeType) {
-    const _0x284a2e = String(_0x2b340d.mimeType).toLowerCase(),
-      _0x5ca084 = Number(_0x2b340d?.blob?.size) || 0;
-    return 'media:' + _0x284a2e + '|' + _0x5ca084;
+  if (pastedMedia?.mimeType) {
+    const result = String(pastedMedia.mimeType).toLowerCase(),
+      data = Number(pastedMedia?.blob?.size) || 0;
+    return 'media:' + result + '|' + data;
   }
-  const _0x446aa1 = String(_0x2d31fd || '');
-  if (!_0x446aa1.trim()) return '';
-  const _0x16975a = _0x446aa1.slice(0, 0x100);
-  return 'text:' + _0x16975a + '|len:' + _0x446aa1.length;
+  const list2 = String(pastedText || '');
+  if (!list2.trim()) return '';
+  const options = list2.slice(0, 0x100);
+  return 'text:' + options + '|len:' + list2.length;
 }
-function resolvePastedMediaDescriptor(_0xf4f063, _0x197c3c = {}) {
-  const _0x1504d5 = String(_0x197c3c.nodeName || _0x197c3c.name || '').trim(),
-    _0x1c51fc = String(_0x197c3c.typeSlug || '').trim();
-  if (_0xf4f063.startsWith('image/'))
+function resolvePastedMediaDescriptor(target, error2 = {}) {
+  const nodeName = String(error2.nodeName || error2.name || '').trim(),
+    typeSlug = String(error2.typeSlug || '').trim();
+  if (target.startsWith('image/'))
     return {
       nodeType: 'source-image',
-      nodeName: _0x1504d5 || t('canvasNodeFlows.paste.nodeName.image'),
-      typeSlug: _0x1c51fc || 'image',
+      nodeName: nodeName || t('canvasNodeFlows.paste.nodeName.image'),
+      typeSlug: typeSlug || 'image',
     };
-  if (_0xf4f063.startsWith('video/'))
+  if (target.startsWith('video/'))
     return {
       nodeType: 'source-video',
-      nodeName: _0x1504d5 || t('canvasNodeFlows.paste.nodeName.video'),
-      typeSlug: _0x1c51fc || 'video',
+      nodeName: nodeName || t('canvasNodeFlows.paste.nodeName.video'),
+      typeSlug: typeSlug || 'video',
     };
-  if (_0xf4f063.startsWith('audio/'))
+  if (target.startsWith('audio/'))
     return {
       nodeType: 'source-audio',
-      nodeName: _0x1504d5 || t('canvasNodeFlows.paste.nodeName.audio'),
-      typeSlug: _0x1c51fc || 'audio',
+      nodeName: nodeName || t('canvasNodeFlows.paste.nodeName.audio'),
+      typeSlug: typeSlug || 'audio',
     };
   return null;
 }
-function centerNodeAtWorldPosition(_0x41572a, _0x2408ed, _0x13c76f) {
-  const _0x1ca5f8 = Number(_0x41572a?.width) || 0,
-    _0x1784ac = Number(_0x41572a?.height) || 0;
-  return { ..._0x41572a, x: _0x2408ed - _0x1ca5f8 / 2, y: _0x13c76f - _0x1784ac / 2 };
+function centerNodeAtWorldPosition(box, x2, y2) {
+  const source = Number(box?.width) || 0,
+    next = Number(box?.height) || 0;
+  return { ...box, x: x2 - source / 2, y: y2 - next / 2 };
 }
-function decodeBase64Bytes(_0x574ea4) {
-  const _0x47e637 = String(_0x574ea4 || '').trim();
-  if (!_0x47e637) return new Uint8Array();
+function decodeBase64Bytes(current) {
+  const enabled = String(current || '').trim();
+  if (!enabled) return new Uint8Array();
   if (typeof atob === 'function') {
-    const _0xfd77b8 = atob(_0x47e637),
-      _0x153065 = new Uint8Array(_0xfd77b8.length);
-    for (let _0x42f4e8 = 0; _0x42f4e8 < _0xfd77b8.length; _0x42f4e8 += 1) {
-      _0x153065[_0x42f4e8] = _0xfd77b8.charCodeAt(_0x42f4e8);
+    const list3 = atob(enabled),
+      uint8Array = new Uint8Array(list3.length);
+    for (let entry = 0; entry < list3.length; entry += 1) {
+      uint8Array[entry] = list3.charCodeAt(entry);
     }
-    return _0x153065;
+    return uint8Array;
   }
-  if (typeof Buffer !== 'undefined') return new Uint8Array(Buffer.from(_0x47e637, 'base64'));
+  if (typeof Buffer !== 'undefined') return new Uint8Array(Buffer.from(enabled, 'base64'));
   return new Uint8Array();
 }
-function blobFromBase64(_0x2bc25f, _0x395393) {
-  const _0x16439d = decodeBase64Bytes(_0x2bc25f);
-  if (!_0x16439d.length) return null;
-  return new Blob([_0x16439d], { type: _0x395393 || 'application/octet-stream' });
+function blobFromBase64(record, type2) {
+  const list4 = decodeBase64Bytes(record);
+  if (!list4.length) return null;
+  return new Blob([list4], { type: type2 || 'application/octet-stream' });
 }
-function normalizeSpawnDirection(_0x362ff1) {
-  return _0x362ff1 === 'left' || _0x362ff1 === 'down' ? _0x362ff1 : 'right';
+function normalizeSpawnDirection(payload) {
+  return payload === 'left' || payload === 'down' ? payload : 'right';
 }
-function getSequenceNodes(_0x3a8c3d, _0x368e73) {
-  if (!_0x368e73 || !_0x3a8c3d || typeof _0x3a8c3d !== 'object') return {};
+function getSequenceNodes(enabled2, enabled3) {
+  if (!enabled3 || !enabled2 || typeof enabled2 !== 'object') return {};
   return Object.fromEntries(
-    Object.entries(_0x3a8c3d).filter(
-      ([, _0x51ffa7]) => String(_0x51ffa7?.spawnSequenceKey || '') === _0x368e73,
-    ),
+    Object.entries(enabled2).filter(([, handle]) => String(handle?.spawnSequenceKey || '') === enabled3),
   );
 }
 async function readElectronClipboardContents() {
-  const _0x54eebd = globalThis?.window?.electronAPI?.clipboard;
-  if (!_0x54eebd) return { pastedFiles: [], pastedMedia: null, pastedText: '', failed: false };
-  const _0x375f71 = { pastedFiles: [], pastedMedia: null, pastedText: '', failed: false };
+  const enabled4 = globalThis?.window?.electronAPI?.clipboard;
+  if (!enabled4) return { pastedFiles: [], pastedMedia: null, pastedText: '', failed: false };
+  const state = { pastedFiles: [], pastedMedia: null, pastedText: '', failed: false };
   try {
-    if (typeof _0x54eebd.readFileReferences === 'function') {
-      const _0x5a9fa6 = await _0x54eebd.readFileReferences();
-      _0x5a9fa6?.ok && Array.isArray(_0x5a9fa6.files) && (_0x375f71.pastedFiles = _0x5a9fa6.files);
+    if (typeof enabled4.readFileReferences === 'function') {
+      const response = await enabled4.readFileReferences();
+      response?.ok && Array.isArray(response.files) && (state.pastedFiles = response.files);
     }
-    if (_0x375f71.pastedFiles.length === 0 && typeof _0x54eebd.readImage === 'function') {
-      const _0x4aab26 = await _0x54eebd.readImage();
-      if (_0x4aab26?.ok && _0x4aab26.dataBase64) {
-        const _0x2cacfe = String(_0x4aab26.mimeType || 'image/png'),
-          _0x3955f7 = blobFromBase64(_0x4aab26.dataBase64, _0x2cacfe);
-        _0x3955f7 && (_0x375f71.pastedMedia = { mimeType: _0x2cacfe, blob: _0x3955f7 });
+    if (state.pastedFiles.length === 0 && typeof enabled4.readImage === 'function') {
+      const response2 = await enabled4.readImage();
+      if (response2?.ok && response2.dataBase64) {
+        const mimeType = String(response2.mimeType || 'image/png'),
+          blob = blobFromBase64(response2.dataBase64, mimeType);
+        blob && (state.pastedMedia = { mimeType: mimeType, blob: blob });
       }
     }
-    if (typeof _0x54eebd.readText === 'function') {
-      const _0x3dd122 = await _0x54eebd.readText();
-      _0x3dd122?.ok && typeof _0x3dd122.text === 'string' && (_0x375f71.pastedText = _0x3dd122.text);
+    if (typeof enabled4.readText === 'function') {
+      const response3 = await enabled4.readText();
+      response3?.ok && typeof response3.text === 'string' && (state.pastedText = response3.text);
     }
-  } catch (_0x3e5073) {
-    (console.warn('[paste] Electron 剪贴板读取失败:', _0x3e5073), (_0x375f71.failed = true));
+  } catch (config) {
+    (console.warn('[paste] Electron 剪贴板读取失败:', config), (state.failed = true));
   }
-  return _0x375f71;
+  return state;
 }
 async function readSystemClipboardContents() {
-  let _0x4e7f33 = null,
-    _0x2d4256 = '',
-    _0x52e374 = [],
-    _0x4f98a3 = false;
-  const _0x3ff438 = await readElectronClipboardContents();
-  ((_0x52e374 = _0x3ff438.pastedFiles),
-    (_0x4e7f33 = _0x3ff438.pastedMedia),
-    (_0x2d4256 = _0x3ff438.pastedText),
-    (_0x4f98a3 = !!_0x3ff438.failed));
+  let pastedMedia2 = null,
+    pastedText2 = '',
+    pastedFiles2 = [],
+    clipboardReadFailed = false;
+  const electronClipboardContents = await readElectronClipboardContents();
+  ((pastedFiles2 = electronClipboardContents.pastedFiles),
+    (pastedMedia2 = electronClipboardContents.pastedMedia),
+    (pastedText2 = electronClipboardContents.pastedText),
+    (clipboardReadFailed = !!electronClipboardContents.failed));
   try {
-    const _0x3bcc81 = globalThis?.navigator?.clipboard,
-      _0xb64896 = typeof _0x3bcc81?.read === 'function',
-      _0x426569 = typeof _0x3bcc81?.readText === 'function';
-    if (_0x52e374.length === 0 && !_0x4e7f33 && _0xb64896) {
-      const _0x2c24ca = await _0x3bcc81.read();
-      for (const _0x4ed5d6 of _0x2c24ca) {
-        const _0x40a6be = _0x4ed5d6.types.find(
-          (_0x4182af) =>
-            _0x4182af.startsWith('image/') ||
-            _0x4182af.startsWith('video/') ||
-            _0x4182af.startsWith('audio/'),
+    const scope = globalThis?.navigator?.clipboard,
+      input = typeof scope?.read === 'function',
+      output = typeof scope?.readText === 'function';
+    if (pastedFiles2.length === 0 && !pastedMedia2 && input) {
+      const value2 = await scope.read();
+      for (const value3 of value2) {
+        const mimeType2 = value3.types.find(
+          (item2) => item2.startsWith('image/') || item2.startsWith('video/') || item2.startsWith('audio/'),
         );
-        if (!_0x4e7f33 && _0x40a6be) {
-          _0x4e7f33 = { mimeType: _0x40a6be, blob: await _0x4ed5d6.getType(_0x40a6be) };
+        if (!pastedMedia2 && mimeType2) {
+          pastedMedia2 = { mimeType: mimeType2, blob: await value3.getType(mimeType2) };
           continue;
         }
-        if (!_0x2d4256 && _0x4ed5d6.types.includes('text/plain')) {
-          const _0x3f1544 = await _0x4ed5d6.getType('text/plain');
-          _0x2d4256 = await _0x3f1544.text();
+        if (!pastedText2 && value3.types.includes('text/plain')) {
+          const response4 = await value3.getType('text/plain');
+          pastedText2 = await response4.text();
         }
       }
     }
-    !_0x2d4256 && _0x426569 && (_0x2d4256 = await _0x3bcc81.readText());
-  } catch (_0x8ea037) {
-    (console.warn('[paste] 剪贴板读取失败:', _0x8ea037), (_0x4f98a3 = true));
+    !pastedText2 && output && (pastedText2 = await scope.readText());
+  } catch (value4) {
+    (console.warn('[paste] 剪贴板读取失败:', value4), (clipboardReadFailed = true));
   }
   return {
-    pastedFiles: _0x52e374,
-    pastedMedia: _0x4e7f33,
-    pastedText: _0x2d4256,
-    clipboardReadFailed: _0x4f98a3,
+    pastedFiles: pastedFiles2,
+    pastedMedia: pastedMedia2,
+    pastedText: pastedText2,
+    clipboardReadFailed: clipboardReadFailed,
   };
 }
 export function createAppCanvasNodeFlows({
-  graphStore: _0x232205,
-  commit: _0x121662,
-  getCursorScreenPosition: _0x217380,
-  getNodeDefaultSize: _0x5e30e0,
-  getAIGenerationDefaultSizeByType: _0x3f2468,
-  getAIGenerationNodeSize: _0x573d6b,
-  createPanoramaNodeDataByType: _0x64efca,
-  processFile: _0x3c1a9b,
-  executeCommand: _0x8a019b,
-  getCurrentProjectId: _0x57c8d1,
-  showToast: _0xa183f,
+  graphStore: graphStore,
+  commit: commit,
+  getCursorScreenPosition: getCursorScreenPosition,
+  getNodeDefaultSize: getNodeDefaultSize,
+  getAIGenerationDefaultSizeByType: getAIGenerationDefaultSizeByType,
+  getAIGenerationNodeSize: getAIGenerationNodeSize,
+  createPanoramaNodeDataByType: createPanoramaNodeDataByType,
+  processFile: processFile,
+  executeCommand: executeCommand,
+  getCurrentProjectId: getCurrentProjectId,
+  showToast: showToast,
   loadClipboardModule: loadClipboardModule = () => import('../clipboard.js'),
 } = {}) {
-  function _0x549398() {
-    return _0x232205?.getStateRaw?.() ?? _0x232205?.getState?.() ?? {};
+  function run() {
+    return graphStore?.getStateRaw?.() ?? graphStore?.getState?.() ?? {};
   }
-  function _0x3af476(_0x5d3bcc = {}) {
-    if (_0x5d3bcc.placement === 'viewport-center-sequence') return _0x2b1d5b();
-    const _0x5b7920 = _0x217380?.() || {},
-      _0x5b0a5b =
-        typeof _0x5b7920.x === 'number' && Number.isFinite(_0x5b7920.x) ? _0x5b7920.x : window.innerWidth / 2,
-      _0x170fa3 =
-        typeof _0x5b7920.y === 'number' && Number.isFinite(_0x5b7920.y)
-          ? _0x5b7920.y
-          : window.innerHeight / 2,
-      _0x34c955 =
-        typeof _0x5d3bcc.screenX === 'number' && Number.isFinite(_0x5d3bcc.screenX)
-          ? _0x5d3bcc.screenX
-          : _0x5b0a5b,
-      _0x5bf50b =
-        typeof _0x5d3bcc.screenY === 'number' && Number.isFinite(_0x5d3bcc.screenY)
-          ? _0x5d3bcc.screenY
-          : _0x170fa3,
-      { viewport: _0x17f63b } = _0x549398();
-    return screenToWorld(_0x34c955, _0x5bf50b, _0x17f63b);
+  function run2(options2 = {}) {
+    if (options2.placement === 'viewport-center-sequence') return run3();
+    const box2 = getCursorScreenPosition?.() || {},
+      value5 = typeof box2.x === 'number' && Number.isFinite(box2.x) ? box2.x : window.innerWidth / 2,
+      value6 = typeof box2.y === 'number' && Number.isFinite(box2.y) ? box2.y : window.innerHeight / 2,
+      value7 =
+        typeof options2.screenX === 'number' && Number.isFinite(options2.screenX) ? options2.screenX : value5,
+      value8 =
+        typeof options2.screenY === 'number' && Number.isFinite(options2.screenY) ? options2.screenY : value6,
+      { viewport: viewport } = run();
+    return screenToWorld(value7, value8, viewport);
   }
-  function _0x2b1d5b() {
-    const _0x16fc90 = window.innerWidth / 2,
-      _0x56a241 = window.innerHeight / 2,
-      { viewport: _0x42ca43 } = _0x549398();
-    return screenToWorld(_0x16fc90, _0x56a241, _0x42ca43);
+  function run3() {
+    const value9 = window.innerWidth / 2,
+      value10 = window.innerHeight / 2,
+      { viewport: viewport2 } = run();
+    return screenToWorld(value9, value10, viewport2);
   }
-  function _0x3e727b(_0x3a1b7d, _0x10cb97, _0x51a427, _0x52e76c, _0x1b2c0e = {}) {
-    const { x: _0x544551, y: _0xdfeb98 } = _0x3af476(_0x1b2c0e),
-      _0x56d588 = generateId(_0x3a1b7d),
-      _0x33043b =
-        _0x3a1b7d === 'ai-text'
-          ? _0x3f2468('ai-text')
-          : _0x3a1b7d === 'ai-image' || _0x3a1b7d === 'ai-video'
-            ? _0x573d6b(_0x10cb97, _0x51a427)
-            : { width: _0x10cb97, height: _0x51a427 },
-      _0x1f1cb1 = _0x33043b.width,
-      _0x2c2c61 = _0x33043b.height,
-      _0x53c86e = _0x64efca?.({
-        type: _0x3a1b7d,
-        id: _0x56d588,
-        x: _0x544551 - _0x1f1cb1 / 2,
-        y: _0xdfeb98 - _0x2c2c61 / 2,
-        width: _0x1f1cb1,
-        height: _0x2c2c61,
-        name: _0x52e76c,
+  function createNodeAtCursor(type3, width2, height2, name2, value11 = {}) {
+    const { x: x3, y: y3 } = run2(value11),
+      id2 = generateId(type3),
+      box3 =
+        type3 === 'ai-text'
+          ? getAIGenerationDefaultSizeByType('ai-text')
+          : type3 === 'ai-image' || type3 === 'ai-video'
+            ? getAIGenerationNodeSize(width2, height2)
+            : { width: width2, height: height2 },
+      width3 = box3.width,
+      height3 = box3.height,
+      box4 = createPanoramaNodeDataByType?.({
+        type: type3,
+        id: id2,
+        x: x3 - width3 / 2,
+        y: y3 - height3 / 2,
+        width: width3,
+        height: height3,
+        name: name2,
       }) || {
-        id: _0x56d588,
-        type: _0x3a1b7d,
-        x: _0x544551 - _0x1f1cb1 / 2,
-        y: _0xdfeb98 - _0x2c2c61 / 2,
-        width: _0x1f1cb1,
-        height: _0x2c2c61,
-        name: _0x52e76c,
+        id: id2,
+        type: type3,
+        x: x3 - width3 / 2,
+        y: y3 - height3 / 2,
+        width: width3,
+        height: height3,
+        name: name2,
       };
-    _0x3a1b7d === 'comment-note' &&
-      ((_0x53c86e.name = ''), (_0x53c86e.content = ''), (_0x53c86e.style = createDefaultCommentNoteStyle()));
-    if (_0x1b2c0e.placement === 'viewport-center-sequence') {
-      const { spacing: _0x56fab1, direction: _0x3c1251, avoidOverlap: _0x5bf912 } = getNodeSpawnPrefs(),
-        _0x395738 = normalizeSpawnDirection(_0x3c1251),
-        _0x6b9b7a = _0x544551 - _0x1f1cb1 / 2,
-        _0x53166c = _0xdfeb98 - _0x2c2c61 / 2,
-        _0x2cc25e = _0x549398().nodes || {},
-        _0x5c6424 = String(_0x1b2c0e.sequenceKey || '').trim(),
-        _0x2d01f4 = _0x5bf912 ? _0x2cc25e : getSequenceNodes(_0x2cc25e, _0x5c6424),
-        _0x4cc574 = findAvailablePosition(
-          _0x2d01f4,
-          _0x6b9b7a,
-          _0x53166c,
-          _0x1f1cb1,
-          _0x2c2c61,
-          _0x56fab1,
-          _0x395738,
-        );
-      ((_0x53c86e.x = _0x4cc574.x), (_0x53c86e.y = _0x4cc574.y));
-      if (_0x5c6424) _0x53c86e.spawnSequenceKey = _0x5c6424;
+    type3 === 'comment-note' &&
+      ((box4.name = ''), (box4.content = ''), (box4.style = createDefaultCommentNoteStyle()));
+    if (value11.placement === 'viewport-center-sequence') {
+      const { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
+        spawnDirection = normalizeSpawnDirection(direction),
+        value12 = x3 - width3 / 2,
+        value13 = y3 - height3 / 2,
+        value14 = run().nodes || {},
+        value15 = String(value11.sequenceKey || '').trim(),
+        value16 = avoidOverlap ? value14 : getSequenceNodes(value14, value15),
+        box5 = findAvailablePosition(value16, value12, value13, width3, height3, spacing, spawnDirection);
+      ((box4.x = box5.x), (box4.y = box5.y));
+      if (value15) box4.spawnSequenceKey = value15;
     }
     return (
-      _0x232205.addNode(_0x53c86e),
-      _0x232205.setSelectedNodes([_0x56d588]),
-      _0x1b2c0e.skipCommit !== !![] && _0x121662(),
-      _0x53c86e
+      graphStore.addNode(box4),
+      graphStore.setSelectedNodes([id2]),
+      value11.skipCommit !== !![] && commit(),
+      box4
     );
   }
-  async function _0x254a54(_0x2d7cc9, _0x126973, _0x101a1a, _0x2089f7, _0x1b2c0e = {}) {
-    if (!_0x2d7cc9 || !_0x126973) return false;
-    const _0x10154f = resolvePastedMediaDescriptor(String(_0x126973), _0x1b2c0e);
-    if (!_0x10154f) return false;
-    const _0xfcf6c = getMimeExtension(_0x126973, 'dat'),
-      _0xff4ee2 = 'pasted-' + _0x10154f.typeSlug + '-' + Date.now() + '.' + _0xfcf6c,
-      _0x4c2c9b = new File([_0x2d7cc9], _0xff4ee2, { type: _0x126973 }),
-      _0x874fcf = _0x57c8d1?.() || 'default_v2_project',
-      _0x544cb3 = await _0x3c1a9b(_0x4c2c9b, _0x101a1a, _0x2089f7, _0x874fcf);
-    if (!_0x544cb3) return false;
-    const _0x1fdbef = centerNodeAtWorldPosition(_0x544cb3, _0x101a1a, _0x2089f7);
-    if (_0x1b2c0e.placement === 'viewport-center-sequence') {
-      const { spacing: _0x56fab1, direction: _0x3c1251, avoidOverlap: _0x5bf912 } = getNodeSpawnPrefs(),
-        _0x395738 = normalizeSpawnDirection(_0x3c1251),
-        _0x5aa505 = Number(_0x1fdbef.width) || 0x12c,
-        _0x1761ac = Number(_0x1fdbef.height) || 200,
-        _0x6b9b7a = _0x101a1a - _0x5aa505 / 2,
-        _0x53166c = _0x2089f7 - _0x1761ac / 2,
-        _0x2cc25e = _0x549398().nodes || {},
-        _0x5c6424 = String(_0x1b2c0e.sequenceKey || '').trim(),
-        _0x2d01f4 = _0x5bf912 ? _0x2cc25e : getSequenceNodes(_0x2cc25e, _0x5c6424),
-        _0x4cc574 = findAvailablePosition(
-          _0x2d01f4,
-          _0x6b9b7a,
-          _0x53166c,
-          _0x5aa505,
-          _0x1761ac,
-          _0x56fab1,
-          _0x395738,
-        );
-      ((_0x1fdbef.x = _0x4cc574.x), (_0x1fdbef.y = _0x4cc574.y));
-      if (_0x5c6424) _0x1fdbef.spawnSequenceKey = _0x5c6424;
+  async function run4(enabled5, type4, value17, value18, value11 = {}) {
+    if (!enabled5 || !type4) return false;
+    const pastedMediaDescriptor = resolvePastedMediaDescriptor(String(type4), value11);
+    if (!pastedMediaDescriptor) return false;
+    const mimeExtension = getMimeExtension(type4, 'dat'),
+      value19 = 'pasted-' + pastedMediaDescriptor.typeSlug + '-' + Date.now() + '.' + mimeExtension,
+      file = new File([enabled5], value19, { type: type4 }),
+      value20 = getCurrentProjectId?.() || 'default_v2_project',
+      enabled6 = await processFile(file, value17, value18, value20);
+    if (!enabled6) return false;
+    const box6 = centerNodeAtWorldPosition(enabled6, value17, value18);
+    if (value11.placement === 'viewport-center-sequence') {
+      const { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
+        spawnDirection = normalizeSpawnDirection(direction),
+        value21 = Number(box6.width) || 0x12c,
+        value22 = Number(box6.height) || 200,
+        value12 = value17 - value21 / 2,
+        value13 = value18 - value22 / 2,
+        value14 = run().nodes || {},
+        value15 = String(value11.sequenceKey || '').trim(),
+        value16 = avoidOverlap ? value14 : getSequenceNodes(value14, value15),
+        box5 = findAvailablePosition(value16, value12, value13, value21, value22, spacing, spawnDirection);
+      ((box6.x = box5.x), (box6.y = box5.y));
+      if (value15) box6.spawnSequenceKey = value15;
     }
     return (
-      (_0x1fdbef.name = _0x10154f.nodeName),
-      _0x232205.addNode(_0x1fdbef),
-      _0x232205.setSelectedNodes([_0x1fdbef.id]),
-      _0x121662(),
+      (box6.name = pastedMediaDescriptor.nodeName),
+      graphStore.addNode(box6),
+      graphStore.setSelectedNodes([box6.id]),
+      commit(),
       true
     );
   }
-  async function _0x3f5974(_0x7870da, _0x29532f, _0x39ac0c = {}) {
-    const { x: _0x4d4d17, y: _0x1fa2ad } = _0x3af476(_0x39ac0c);
-    return await _0x254a54(_0x7870da, _0x29532f, _0x4d4d17, _0x1fa2ad, _0x39ac0c);
+  async function createMediaNodeFromBlob(value23, value24, value25 = {}) {
+    const { x: x4, y: y4 } = run2(value25);
+    return await run4(value23, value24, x4, y4, value25);
   }
-  function _0x3b38e3(_0x28646e) {
+  function run5(error3) {
     if (typeof File !== 'function') return null;
-    const _0x5a4477 = String(_0x28646e?.path || '').trim(),
-      _0x253467 = String(_0x28646e?.name || _0x5a4477.split(/[\\/]/).pop() || 'clipboard-file'),
-      _0x5a3c2b = String(_0x28646e?.type || '').trim();
-    if (!_0x5a4477 || !_0x5a3c2b) return null;
-    const _0x61a0ba = new File([], _0x253467, { type: _0x5a3c2b });
+    const value26 = String(error3?.path || '').trim(),
+      value27 = String(error3?.name || value26.split(/[\\/]/).pop() || 'clipboard-file'),
+      type5 = String(error3?.type || '').trim();
+    if (!value26 || !type5) return null;
+    const file2 = new File([], value27, { type: type5 });
     try {
-      Object.defineProperty(_0x61a0ba, 'path', { value: _0x5a4477, configurable: true });
+      Object.defineProperty(file2, 'path', { value: value26, configurable: true });
     } catch {
-      _0x61a0ba.path = _0x5a4477;
+      file2.path = value26;
     }
-    return _0x61a0ba;
+    return file2;
   }
-  async function _0x2153d3(_0x5cc147, _0x3eb44b, _0x5595e5) {
-    const _0x42d400 = String(_0x5cc147?.type || '').trim(),
-      _0x220b3e = resolvePastedMediaDescriptor(_0x42d400);
-    if (!_0x220b3e) return false;
-    const _0x22f61b = _0x3b38e3(_0x5cc147);
-    if (!_0x22f61b) return false;
-    const _0xfde7f2 = _0x57c8d1?.() || 'default_v2_project',
-      _0x3bd428 = await _0x3c1a9b(_0x22f61b, _0x3eb44b, _0x5595e5, _0xfde7f2);
-    if (!_0x3bd428) return false;
-    const _0x5558a6 = centerNodeAtWorldPosition(_0x3bd428, _0x3eb44b, _0x5595e5);
+  async function run6(value28, value29, value30) {
+    const value31 = String(value28?.type || '').trim(),
+      pastedMediaDescriptor2 = resolvePastedMediaDescriptor(value31);
+    if (!pastedMediaDescriptor2) return false;
+    const enabled7 = run5(value28);
+    if (!enabled7) return false;
+    const value32 = getCurrentProjectId?.() || 'default_v2_project',
+      enabled8 = await processFile(enabled7, value29, value30, value32);
+    if (!enabled8) return false;
+    const error4 = centerNodeAtWorldPosition(enabled8, value29, value30);
     return (
-      (_0x5558a6.name = _0x220b3e.nodeName),
-      _0x232205.addNode(_0x5558a6),
-      _0x232205.setSelectedNodes([_0x5558a6.id]),
-      _0x121662(),
+      (error4.name = pastedMediaDescriptor2.nodeName),
+      graphStore.addNode(error4),
+      graphStore.setSelectedNodes([error4.id]),
+      commit(),
       true
     );
   }
-  async function _0x47cdb5(_0x486cec, _0x5304f9, _0x2c090a) {
-    if (!Array.isArray(_0x486cec) || _0x486cec.length === 0) return 0;
-    let _0x23b493 = 0;
-    for (const _0x527286 of _0x486cec) {
-      const _0x5d2854 = _0x23b493 * 30,
-        _0x2a1c93 = await _0x2153d3(_0x527286, _0x5304f9 + _0x5d2854, _0x2c090a + _0x5d2854);
-      if (_0x2a1c93) _0x23b493 += 1;
+  async function run7(list5, value33, value34) {
+    if (!Array.isArray(list5) || list5.length === 0) return 0;
+    let value35 = 0;
+    for (const value36 of list5) {
+      const value37 = value35 * 30,
+        value38 = await run6(value36, value33 + value37, value34 + value37);
+      if (value38) value35 += 1;
     }
-    return _0x23b493;
+    return value35;
   }
-  function _0x37d3a5(_0x358c49, _0x29482d, _0x2aefc5) {
-    const { width: _0x115689, height: _0xc84d46 } = _0x5e30e0('source-text'),
-      _0x3457d7 = generateId('source-text');
-    (_0x232205.addNode({
-      id: _0x3457d7,
+  function run8(value39, x5, y5) {
+    const { width: width4, height: height4 } = getNodeDefaultSize('source-text'),
+      id3 = generateId('source-text');
+    (graphStore.addNode({
+      id: id3,
       type: 'source-text',
-      x: _0x29482d - _0x115689 / 2,
-      y: _0x2aefc5 - _0xc84d46 / 2,
-      width: _0x115689,
-      height: _0xc84d46,
+      x: x5 - width4 / 2,
+      y: y5 - height4 / 2,
+      width: width4,
+      height: height4,
       name: t('canvasNodeFlows.paste.nodeName.text'),
-      content: String(_0x358c49 || ''),
+      content: String(value39 || ''),
     }),
-      _0x232205.setSelectedNodes([_0x3457d7]),
-      _0x121662());
+      graphStore.setSelectedNodes([id3]),
+      commit());
   }
-  async function _0x16678c(_0x56083 = {}) {
-    const { x: _0x2b6004, y: _0x57a6be } = _0x3af476(_0x56083),
+  async function handlePasteFromClipboard(options3 = {}) {
+    const { x: x6, y: y6 } = run2(options3),
       {
-        getClipboard: _0x4f1a3f,
-        getClipboardMeta: _0x5e2ca8,
-        observeSystemClipboardSignature: _0x2d8888,
+        getClipboard: getClipboard,
+        getClipboardMeta: getClipboardMeta,
+        observeSystemClipboardSignature: observeSystemClipboardSignature,
       } = await loadClipboardModule(),
-      _0x166494 = _0x4f1a3f(),
-      _0x1cd57a = _0x5e2ca8(),
+      list6 = getClipboard(),
+      value40 = getClipboardMeta(),
       {
-        pastedFiles: _0x385ae7,
-        pastedMedia: _0x32f285,
-        pastedText: _0x6c48ab,
-        clipboardReadFailed: _0x3c904e,
+        pastedFiles: pastedFiles3,
+        pastedMedia: pastedMedia3,
+        pastedText: pastedText3,
+        clipboardReadFailed: clipboardReadFailed2,
       } = await readSystemClipboardContents(),
-      _0x8b7e3a = String(_0x6c48ab || '').trim(),
-      _0x4043c9 = (Array.isArray(_0x385ae7) && _0x385ae7.length > 0) || !!_0x32f285 || !!_0x8b7e3a,
-      _0x44c6ad = _0x4043c9
+      enabled9 = String(pastedText3 || '').trim(),
+      enabled10 = (Array.isArray(pastedFiles3) && pastedFiles3.length > 0) || !!pastedMedia3 || !!enabled9,
+      enabled11 = enabled10
         ? buildSystemClipboardSignature({
-            pastedFiles: _0x385ae7,
-            pastedMedia: _0x32f285,
-            pastedText: _0x6c48ab,
+            pastedFiles: pastedFiles3,
+            pastedMedia: pastedMedia3,
+            pastedText: pastedText3,
           })
         : '',
-      _0x4b1a7f = _0x166494 && _0x166494.length > 0,
-      _0x95c327 = Number(_0x1cd57a?.copiedAt) || 0,
-      _0x117960 = Number(_0x1cd57a?.systemCopiedAt) || 0,
-      _0x2a5922 = String(_0x1cd57a?.systemSignatureAtCopy || ''),
-      _0x5088b6 = String(_0x1cd57a?.systemSignature || '');
-    _0x44c6ad && _0x2d8888(_0x44c6ad);
-    if (_0x4b1a7f) {
-      const _0x4c2eea = _0x117960 > _0x95c327 && _0x95c327 > 0,
-        _0x3a2601 = _0x95c327 > _0x117960 && _0x117960 > 0,
-        _0x16f10b = !!_0x2a5922 && !!_0x44c6ad,
-        _0x5a9128 = _0x16f10b ? _0x2a5922 === _0x44c6ad : false,
-        _0x218d1a = _0x16f10b ? _0x2a5922 !== _0x44c6ad : false,
-        _0x482e42 = !_0x2a5922 && !!_0x5088b6 && _0x5088b6 === _0x44c6ad,
-        _0x31d11a = !_0x4043c9 || _0x5a9128 || (_0x3a2601 && _0x482e42);
-      if (_0x31d11a && !_0x4c2eea && !_0x218d1a) {
-        _0x8a019b('paste', { x: _0x2b6004, y: _0x57a6be });
+      value41 = list6 && list6.length > 0,
+      count = Number(value40?.copiedAt) || 0,
+      count2 = Number(value40?.systemCopiedAt) || 0,
+      enabled12 = String(value40?.systemSignatureAtCopy || ''),
+      enabled13 = String(value40?.systemSignature || '');
+    enabled11 && observeSystemClipboardSignature(enabled11);
+    if (value41) {
+      const enabled14 = count2 > count && count > 0,
+        value42 = count > count2 && count2 > 0,
+        value43 = !!enabled12 && !!enabled11,
+        value44 = value43 ? enabled12 === enabled11 : false,
+        enabled15 = value43 ? enabled12 !== enabled11 : false,
+        value45 = !enabled12 && !!enabled13 && enabled13 === enabled11,
+        value46 = !enabled10 || value44 || (value42 && value45);
+      if (value46 && !enabled14 && !enabled15) {
+        executeCommand('paste', { x: x6, y: y6 });
         return;
       }
     }
-    if (Array.isArray(_0x385ae7) && _0x385ae7.length > 0) {
-      const _0x2c5df1 = await _0x47cdb5(_0x385ae7, _0x2b6004, _0x57a6be);
-      if (_0x2c5df1 > 0) {
-        _0xa183f?.(
-          _0x2c5df1 === 1
+    if (Array.isArray(pastedFiles3) && pastedFiles3.length > 0) {
+      const count3 = await run7(pastedFiles3, x6, y6);
+      if (count3 > 0) {
+        showToast?.(
+          count3 === 1
             ? t('canvasNodeFlows.paste.filePasted')
-            : t('canvasNodeFlows.paste.filesPasted', { count: _0x2c5df1 }),
+            : t('canvasNodeFlows.paste.filesPasted', { count: count3 }),
           'success',
         );
         return;
       }
     }
-    if (_0x32f285) {
-      const _0x23f80e = await _0x254a54(_0x32f285.blob, _0x32f285.mimeType, _0x2b6004, _0x57a6be);
-      if (_0x23f80e) {
-        const _0x555a6a = _0x32f285.mimeType.startsWith('image/')
+    if (pastedMedia3) {
+      const value47 = await run4(pastedMedia3.blob, pastedMedia3.mimeType, x6, y6);
+      if (value47) {
+        const label = pastedMedia3.mimeType.startsWith('image/')
           ? t('canvasNodeFlows.media.image')
-          : _0x32f285.mimeType.startsWith('video/')
+          : pastedMedia3.mimeType.startsWith('video/')
             ? t('canvasNodeFlows.media.video')
             : t('canvasNodeFlows.media.audio');
-        _0xa183f?.(t('canvasNodeFlows.paste.mediaPasted', { label: _0x555a6a }), 'success');
+        showToast?.(t('canvasNodeFlows.paste.mediaPasted', { label: label }), 'success');
         return;
       }
     }
-    if (_0x8b7e3a) {
-      (_0x37d3a5(_0x8b7e3a, _0x2b6004, _0x57a6be),
-        _0xa183f?.(t('canvasNodeFlows.paste.textPasted'), 'success'));
+    if (enabled9) {
+      (run8(enabled9, x6, y6), showToast?.(t('canvasNodeFlows.paste.textPasted'), 'success'));
       return;
     }
-    if (_0x166494 && _0x166494.length > 0) {
-      _0x8a019b('paste', { x: _0x2b6004, y: _0x57a6be });
+    if (list6 && list6.length > 0) {
+      executeCommand('paste', { x: x6, y: y6 });
       return;
     }
-    if (_0x3c904e) {
-      _0xa183f?.(t('canvasNodeFlows.paste.clipboardReadFailed'), 'error');
+    if (clipboardReadFailed2) {
+      showToast?.(t('canvasNodeFlows.paste.clipboardReadFailed'), 'error');
       return;
     }
-    _0xa183f?.(t('canvasNodeFlows.paste.clipboardEmpty'), 'warning');
+    showToast?.(t('canvasNodeFlows.paste.clipboardEmpty'), 'warning');
   }
   return {
-    createNodeAtCursor: _0x3e727b,
-    createMediaNodeFromBlob: _0x3f5974,
-    handlePasteFromClipboard: _0x16678c,
+    createNodeAtCursor: createNodeAtCursor,
+    createMediaNodeFromBlob: createMediaNodeFromBlob,
+    handlePasteFromClipboard: handlePasteFromClipboard,
   };
 }

@@ -1,1 +1,522 @@
-import{normalizeDirectorMotion,applyDirectorCameraConstraint,sampleDirectorActions,directorConstraintAt}from'./directorMotion.js';import{normalizeDirectorCameraPath}from'./directorCameraPath.js';import{normalizeCurveVector,normalizeEasingCurve,sampleBezierEase,sampleSpatialCurve}from'./directorCurves.js';import{normalizeDirectorClips,resolveDirectorClipSample}from'./directorClips.js';const DEFAULT_DURATION_SECONDS=0x6,DEFAULT_FPS=0x18,MIN_DURATION_SECONDS=0.1,MAX_DURATION_SECONDS=0xe10,MIN_FPS=0x1,MAX_FPS=0x78,EASING_VALUES=new Set(["linear","ease-in","ease-out","ease-in-out"]);export const STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES=Object["freeze"](['position',"rotation","scale"]);function finiteNumber(_0x50e250,_0x12036=0x0){const _0x421b09=Number(_0x50e250);return Number["isFinite"](_0x421b09)?_0x421b09:_0x12036;}function clamp(_0x56df69,_0x2da851,_0x4f4148){return Math['min'](_0x4f4148,Math["max"](_0x2da851,_0x56df69));}function normalizeVector3(_0x5d7b0f,_0x38ef1e){const _0x150aa3=Array["isArray"](_0x5d7b0f)?_0x5d7b0f:[];return[0x0,0x1,0x2]["map"](_0x2d86c7=>finiteNumber(_0x150aa3[_0x2d86c7],_0x38ef1e[_0x2d86c7]));}function normalizeScale(_0x1b0296){return normalizeVector3(_0x1b0296,[0x1,0x1,0x1])["map"](_0x12702c=>Math["max"](0.001,_0x12702c));}function normalizeTransform(_0x4f0825={}){return{'position':normalizeVector3(_0x4f0825['position'],[0x0,0x0,0x0]),'rotation':normalizeVector3(_0x4f0825["rotation"],[0x0,0x0,0x0]),'scale':normalizeScale(_0x4f0825["scale"])};}function normalizeCamera(_0x38f960={}){const _0x294945=Math["max"](0.001,finiteNumber(_0x38f960["near"],0.1)),_0x229a79={'position':normalizeVector3(_0x38f960["position"],[0x5,0x4,0x7]),'target':normalizeVector3(_0x38f960["target"],[0x0,1.2,0x0]),'focalLength':clamp(finiteNumber(_0x38f960["focalLength"],0x23),0x1,0x1f4),'near':_0x294945,'far':Math["max"](_0x294945+0.001,finiteNumber(_0x38f960["far"],0x3e8)),'aspectRatio':String(_0x38f960["aspectRatio"]||"16:9")};return _0x38f960["fov"]!=null&&Number['isFinite'](Number(_0x38f960["fov"]))&&(_0x229a79['fov']=clamp(Number(_0x38f960["fov"]),0x1,0xb3)),_0x38f960['roll']!=null&&Number["isFinite"](Number(_0x38f960["roll"]))&&(_0x229a79["roll"]=clamp(Number(_0x38f960["roll"]),-Math['PI'],Math['PI'])),_0x229a79;}function normalizeEasing(_0x5653ab){const _0x215436=String(_0x5653ab||"ease-in-out")['trim']()["toLowerCase"]();return EASING_VALUES["has"](_0x215436)?_0x215436:'ease-in-out';}function createKeyframeId(_0x17380a="keyframe",_0x21a5b6){if(typeof _0x21a5b6==='function')return String(_0x21a5b6(_0x17380a));const _0xf19903=globalThis["crypto"];if(typeof _0xf19903?.["randomUUID"]==='function')return _0x17380a+'-'+_0xf19903["randomUUID"]();return _0x17380a+'-'+Date["now"]()+'-'+Math['random']()['toString'](0x24)["slice"](0x2,0x9);}function normalizeCameraKeyframe(_0x9ead8d,_0x52a9cb,_0x59eed2){return{...normalizeCurveVector(_0x9ead8d?.["inTangent"])?{'inTangent':normalizeCurveVector(_0x9ead8d["inTangent"])}:{},...normalizeCurveVector(_0x9ead8d?.["outTangent"])?{'outTangent':normalizeCurveVector(_0x9ead8d["outTangent"])}:{},...normalizeEasingCurve(_0x9ead8d?.["easingCurve"])?{'easingCurve':normalizeEasingCurve(_0x9ead8d["easingCurve"])}:{},'id':String(_0x9ead8d?.['id']||"camera-keyframe-"+(_0x52a9cb+0x1)),'time':Math["max"](0x0,finiteNumber(_0x9ead8d?.["time"],_0x52a9cb)),'camera':normalizeCamera(_0x9ead8d?.["camera"]||_0x59eed2),'easing':normalizeEasing(_0x9ead8d?.["easing"])};}function normalizePropertyKeyframe(_0x256a85,_0x170097,_0xbb9087,_0x1de4fe){const _0x5c4306=normalizeTransform(_0x1de4fe)[_0xbb9087],_0x63fa7a=_0xbb9087==='scale'?normalizeScale(_0x256a85?.["value"]):normalizeVector3(_0x256a85?.["value"],_0x5c4306);return{..._0xbb9087==="position"&&normalizeCurveVector(_0x256a85?.['inTangent'])?{'inTangent':normalizeCurveVector(_0x256a85['inTangent'])}:{},..._0xbb9087==="position"&&normalizeCurveVector(_0x256a85?.["outTangent"])?{'outTangent':normalizeCurveVector(_0x256a85["outTangent"])}:{},...normalizeEasingCurve(_0x256a85?.["easingCurve"])?{'easingCurve':normalizeEasingCurve(_0x256a85["easingCurve"])}:{},'id':String(_0x256a85?.['id']||_0xbb9087+"-keyframe-"+(_0x170097+0x1)),'time':Math["max"](0x0,finiteNumber(_0x256a85?.["time"],_0x170097)),'value':_0x63fa7a,'easing':normalizeEasing(_0x256a85?.["easing"])};}function uniqueSortedKeyframes(_0x383c40,_0x2845f8){const _0x1ba459=new Map();return(Array['isArray'](_0x383c40)?_0x383c40:[])["forEach"]((_0x310455,_0x5ba120)=>{const _0x43ac53=_0x2845f8(_0x310455,_0x5ba120);if(_0x43ac53['id'])_0x1ba459['set'](_0x43ac53['id'],_0x43ac53);}),[..._0x1ba459["values"]()]["sort"]((_0x47e7a1,_0x4c0c33)=>_0x47e7a1['time']-_0x4c0c33['time']||_0x47e7a1['id']["localeCompare"](_0x4c0c33['id']));}function normalizeObjectTrack(_0x198d65,_0x4b3d29,_0x4d546c){const _0x3ffed2={'objectId':_0x4b3d29};return STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['forEach'](_0xeb4703=>{const _0x35a181=_0xeb4703+'Keyframes';_0x3ffed2[_0x35a181]=uniqueSortedKeyframes(_0x198d65?.[_0x35a181],(_0x2ae63d,_0xc1f7f2)=>normalizePropertyKeyframe(_0x2ae63d,_0xc1f7f2,_0xeb4703,_0x4d546c));}),_0x3ffed2;}export function createStoryboard3DShotAnimation({camera:_0x1a6bae,duration:duration=DEFAULT_DURATION_SECONDS,fps:fps=DEFAULT_FPS,idFactory:_0x393d3c}={}){return{'duration':clamp(finiteNumber(duration,DEFAULT_DURATION_SECONDS),MIN_DURATION_SECONDS,MAX_DURATION_SECONDS),'fps':clamp(Math["round"](finiteNumber(fps,DEFAULT_FPS)),MIN_FPS,MAX_FPS),'loop':![],'cameraKeyframes':[{'id':createKeyframeId('camera-keyframe',_0x393d3c),'time':0x0,'camera':normalizeCamera(_0x1a6bae),'easing':'ease-in-out'}],'objectTracks':[],...normalizeDirectorMotion()};}export function normalizeStoryboard3DShotAnimation(_0x1a9860={},{camera:_0x57c004,objectIds:_0x8dd6df,objectTransforms:objectTransforms={},idFactory:_0x540123}={}){const _0x48143b=_0x8dd6df instanceof Set?_0x8dd6df:Array["isArray"](_0x8dd6df)?new Set(_0x8dd6df):null,_0x3a2923=uniqueSortedKeyframes(_0x1a9860?.["cameraKeyframes"],(_0x4d4abf,_0x473ce3)=>normalizeCameraKeyframe(_0x4d4abf,_0x473ce3,_0x57c004));_0x3a2923["length"]===0x0&&_0x3a2923["push"]({'id':createKeyframeId("camera-keyframe",_0x540123),'time':0x0,'camera':normalizeCamera(_0x57c004),'easing':'ease-in-out'});const _0x416403=(Array["isArray"](_0x1a9860?.["objectTracks"])?_0x1a9860['objectTracks']:[])['map'](_0x3cddbd=>{const _0x1dd8ab=String(_0x3cddbd?.["objectId"]||'')["trim"]();if(!_0x1dd8ab||_0x48143b&&!_0x48143b['has'](_0x1dd8ab))return null;return normalizeObjectTrack(_0x3cddbd,_0x1dd8ab,objectTransforms[_0x1dd8ab]);})["filter"](Boolean),_0x2d0dcb=normalizeDirectorMotion(_0x1a9860,_0x48143b),_0x4c1d17=normalizeDirectorClips(_0x1a9860?.['motionClips'],{'cameraKeyframes':_0x3a2923,'objectTracks':_0x416403}),_0x2a372a=Math["max"](0x0,..._0x2d0dcb["actionClips"]["map"](_0x966595=>_0x966595["end"]),..._0x2d0dcb['cameraConstraintClips']['map'](_0x580935=>_0x580935["end"]),..._0x4c1d17["map"](_0x40ecd4=>_0x40ecd4["end"]),..._0x3a2923["map"](_0x40a3aa=>_0x40a3aa["time"]),..._0x416403["flatMap"](_0x171ded=>STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES["flatMap"](_0x1fa988=>_0x171ded[_0x1fa988+"Keyframes"]['map'](_0x56ec29=>_0x56ec29["time"]))));return{'duration':clamp(Math["max"](MIN_DURATION_SECONDS,finiteNumber(_0x1a9860?.['duration'],DEFAULT_DURATION_SECONDS),_0x2a372a),MIN_DURATION_SECONDS,MAX_DURATION_SECONDS),'fps':clamp(Math["round"](finiteNumber(_0x1a9860?.['fps'],DEFAULT_FPS)),MIN_FPS,MAX_FPS),'loop':_0x1a9860?.["loop"]===!![],'cameraKeyframes':_0x3a2923,'cameraPath':normalizeDirectorCameraPath(_0x1a9860?.["cameraPath"],_0x3a2923),'objectPaths':Object["fromEntries"](_0x416403["filter"](_0x3e8637=>_0x1a9860?.["objectPaths"]?.[_0x3e8637["objectId"]])["map"](_0x2bd130=>[_0x2bd130["objectId"],normalizeDirectorCameraPath(_0x1a9860["objectPaths"][_0x2bd130["objectId"]],_0x2bd130["positionKeyframes"])])),'objectTracks':_0x416403,'motionClips':_0x4c1d17,..._0x2d0dcb};}function upsertAtTime(_0x360c2c,_0x5ec12e,_0x4711aa){const _0x30a81a=0.5/Math["max"](MIN_FPS,_0x4711aa),_0x374453=_0x360c2c["find"](_0xfe57ee=>Math["abs"](_0xfe57ee["time"]-_0x5ec12e["time"])<=_0x30a81a),_0x55f0ca=_0x360c2c['filter'](_0x5dbd9d=>_0x5dbd9d['id']!==_0x374453?.['id']&&_0x5dbd9d['id']!==_0x5ec12e['id']);return _0x55f0ca["push"]({..._0x5ec12e,'id':_0x374453?.['id']||_0x5ec12e['id']}),_0x55f0ca["sort"]((_0x2948ed,_0x535d15)=>_0x2948ed["time"]-_0x535d15['time']||_0x2948ed['id']['localeCompare'](_0x535d15['id']));}export function upsertStoryboard3DCameraKeyframe(_0x5383a4,{time:time=0x0,camera:_0x11d5ed,easing:easing="ease-in-out"}={},{idFactory:_0x304b79}={}){const _0x10da1f=normalizeStoryboard3DShotAnimation(_0x5383a4,{'camera':_0x11d5ed,'idFactory':_0x304b79}),_0x49afa6=normalizeCameraKeyframe({'id':createKeyframeId("camera-keyframe",_0x304b79),'time':time,'camera':_0x11d5ed,'easing':easing},_0x10da1f["cameraKeyframes"]["length"],_0x11d5ed);return _0x10da1f["cameraKeyframes"]=upsertAtTime(_0x10da1f["cameraKeyframes"],_0x49afa6,_0x10da1f["fps"]),_0x10da1f["duration"]=Math["max"](_0x10da1f["duration"],_0x49afa6["time"]),_0x10da1f;}export function upsertStoryboard3DObjectKeyframe(_0x235018,{objectId:_0x545261,property:_0x568f16,time:time=0x0,transform:_0x32e1e1,value:_0xb1098d,easing:easing="ease-in-out"}={},{idFactory:_0x1e83bf}={}){const _0x536f98=String(_0x545261||'')['trim']();if(!_0x536f98)throw new Error("An object id is required for an object keyframe");if(!STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES["includes"](_0x568f16))throw new Error("Unsupported object animation property: "+_0x568f16);const _0x57bdfb=normalizeStoryboard3DShotAnimation(_0x235018,{'idFactory':_0x1e83bf});let _0x8dd158=_0x57bdfb["objectTracks"]["find"](_0x3a4e53=>_0x3a4e53["objectId"]===_0x536f98);!_0x8dd158&&(_0x8dd158=normalizeObjectTrack({},_0x536f98,_0x32e1e1),_0x57bdfb["objectTracks"]['push'](_0x8dd158));const _0x28be5f=_0x568f16+'Keyframes',_0x5eeaff=normalizePropertyKeyframe({'id':createKeyframeId(_0x568f16+"-keyframe",_0x1e83bf),'time':time,'value':_0xb1098d||_0x32e1e1?.[_0x568f16],'easing':easing},_0x8dd158[_0x28be5f]["length"],_0x568f16,_0x32e1e1);return _0x8dd158[_0x28be5f]=upsertAtTime(_0x8dd158[_0x28be5f],_0x5eeaff,_0x57bdfb["fps"]),_0x57bdfb["duration"]=Math["max"](_0x57bdfb["duration"],_0x5eeaff["time"]),_0x57bdfb;}export function removeStoryboard3DAnimationKeyframe(_0x19072d,{type:_0x3bad6e,objectId:_0x45e364,property:_0x1a012c,keyframeId:_0x52fb6c}={}){const _0x31f938=normalizeStoryboard3DShotAnimation(_0x19072d),_0x3ffc8f=String(_0x52fb6c||'')["trim"]();if(!_0x3ffc8f)return _0x31f938;if(_0x3bad6e==="camera"){if(_0x31f938['cameraKeyframes']["length"]<=0x1)return _0x31f938;return _0x31f938["cameraKeyframes"]=_0x31f938['cameraKeyframes']["filter"](_0x43647e=>_0x43647e['id']!==_0x3ffc8f),_0x31f938;}const _0x5d0de1=_0x31f938["objectTracks"]['find'](_0x202449=>_0x202449["objectId"]===String(_0x45e364||''));if(!_0x5d0de1||!STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['includes'](_0x1a012c))return _0x31f938;const _0x141680=_0x1a012c+"Keyframes";return _0x5d0de1[_0x141680]=_0x5d0de1[_0x141680]['filter'](_0xe3027e=>_0xe3027e['id']!==_0x3ffc8f),_0x31f938;}export function updateStoryboard3DShotAnimationSettings(_0x4fcca5,_0x514b4d={}){return normalizeStoryboard3DShotAnimation({..._0x4fcca5,..._0x514b4d,'cameraKeyframes':_0x4fcca5?.['cameraKeyframes'],'objectTracks':_0x4fcca5?.["objectTracks"]});}export function applyStoryboard3DAnimationEasing(_0x2b8263,_0x1520bd='linear'){const _0x35250a=clamp(finiteNumber(_0x2b8263),0x0,0x1);switch(normalizeEasing(_0x1520bd)){case "ease-in":return _0x35250a*_0x35250a;case'ease-out':return 0x1-(0x1-_0x35250a)*(0x1-_0x35250a);case "ease-in-out":return _0x35250a<0.5?0x2*_0x35250a*_0x35250a:0x1-Math["pow"](-0x2*_0x35250a+0x2,0x2)/0x2;default:return _0x35250a;}}function interpolateNumber(_0x2dc3e8,_0x23aabe,_0x21ca39){return _0x2dc3e8+(_0x23aabe-_0x2dc3e8)*_0x21ca39;}function interpolateAngle(_0x57c0f8,_0x17a6fe,_0x354cbd){const _0x3f8fd7=((_0x17a6fe-_0x57c0f8+Math['PI'])%(Math['PI']*0x2)+Math['PI']*0x2)%(Math['PI']*0x2)-Math['PI'];return _0x57c0f8+_0x3f8fd7*_0x354cbd;}function interpolateVector(_0x47c195,_0x22d9d0,_0x18d7f2,{angles:angles=![]}={}){return _0x47c195["map"]((_0x2da206,_0x3522a2)=>angles?interpolateAngle(_0x2da206,_0x22d9d0[_0x3522a2],_0x18d7f2):interpolateNumber(_0x2da206,_0x22d9d0[_0x3522a2],_0x18d7f2));}function sampleKeyframes(_0x475784,_0x5a0255,_0x52015f){if(!Array["isArray"](_0x475784)||_0x475784["length"]===0x0)return null;if(_0x475784["length"]===0x1||_0x5a0255<=_0x475784[0x0]["time"])return{..._0x475784[0x0],'progress':0x0};const _0x435d8c=_0x475784['at'](-0x1);if(_0x5a0255>=_0x435d8c["time"])return{..._0x435d8c,'progress':0x0};let _0x47a841=_0x475784[0x0],_0x4eea9f=_0x475784[0x1];for(let _0x593fba=0x1;_0x593fba<_0x475784['length'];_0x593fba+=0x1){_0x4eea9f=_0x475784[_0x593fba];if(_0x5a0255<=_0x4eea9f["time"])break;_0x47a841=_0x4eea9f;}const _0x20c091=Math['max'](1e-8,_0x4eea9f["time"]-_0x47a841['time']),_0xaaa8d1=(_0x5a0255-_0x47a841["time"])/_0x20c091,_0x370cd8=_0x47a841['easingCurve']?sampleBezierEase(_0xaaa8d1,_0x47a841["easingCurve"]):applyStoryboard3DAnimationEasing(_0xaaa8d1,_0x47a841['easing']);return{..._0x47a841,'value':_0x52015f(_0x47a841,_0x4eea9f,_0x370cd8),'fromKeyframeId':_0x47a841['id'],'toKeyframeId':_0x4eea9f['id'],'progress':_0x370cd8};}function sampleCameraKeyframes(_0x5c5990,_0x169c91){const _0x296bd0=sampleKeyframes(_0x5c5990,_0x169c91,(_0x458b11,_0x482e62,_0x4be00c)=>({'position':sampleSpatialCurve(_0x458b11,_0x482e62,_0x4be00c,'camera'),'target':interpolateVector(_0x458b11["camera"]["target"],_0x482e62["camera"]["target"],_0x4be00c),'focalLength':interpolateNumber(_0x458b11['camera']["focalLength"],_0x482e62["camera"]["focalLength"],_0x4be00c),'roll':interpolateAngle(_0x458b11["camera"]["roll"]||0x0,_0x482e62['camera']["roll"]||0x0,_0x4be00c),'near':interpolateNumber(_0x458b11["camera"]["near"],_0x482e62['camera']["near"],_0x4be00c),'far':interpolateNumber(_0x458b11["camera"]["far"],_0x482e62['camera']['far'],_0x4be00c),'aspectRatio':_0x4be00c<0.5?_0x458b11['camera']["aspectRatio"]:_0x482e62["camera"]["aspectRatio"]}));if(!_0x296bd0)return null;return _0x296bd0["value"]||_0x296bd0["camera"];}export function sampleStoryboard3DShotAnimation(_0x25b6fa,_0x2df080,{camera:_0x7d6c47,objectTransforms:objectTransforms={},objects:objects=[]}={}){const _0x4b43b8=normalizeStoryboard3DShotAnimation(_0x25b6fa,{'camera':_0x7d6c47,'objectTransforms':objectTransforms});let _0x3ed174=finiteNumber(_0x2df080);_0x4b43b8["loop"]&&_0x4b43b8["duration"]>0x0?_0x3ed174=(_0x3ed174%_0x4b43b8["duration"]+_0x4b43b8['duration'])%_0x4b43b8['duration']:_0x3ed174=clamp(_0x3ed174,0x0,_0x4b43b8['duration']);const _0x3cbb3e={};_0x4b43b8['objectTracks']["forEach"](_0x35d2df=>{const _0x196f55=normalizeTransform(objectTransforms[_0x35d2df["objectId"]]),_0x8a5e85={..._0x196f55};let _0x46d70a=![];STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES["forEach"](_0x9e3341=>{const _0x32117f=resolveDirectorClipSample(_0x4b43b8["motionClips"],_0x35d2df[_0x9e3341+"Keyframes"],_0x3ed174),_0x4dd818=sampleKeyframes(_0x32117f["keys"],_0x32117f["time"],(_0x40e897,_0x336fcc,_0x10bde1)=>_0x9e3341==="position"?sampleSpatialCurve(_0x40e897,_0x336fcc,_0x10bde1):interpolateVector(_0x40e897["value"],_0x336fcc['value'],_0x10bde1,{'angles':_0x9e3341==="rotation"}));_0x4dd818&&(_0x8a5e85[_0x9e3341]=_0x4dd818["value"],_0x46d70a=!![]);});if(_0x46d70a)_0x3cbb3e[_0x35d2df['objectId']]=_0x8a5e85;});const _0x562977=resolveDirectorClipSample(_0x4b43b8["motionClips"],_0x4b43b8["cameraKeyframes"],_0x3ed174);return{'time':_0x3ed174,'camera':applyDirectorCameraConstraint(sampleCameraKeyframes(_0x562977["keys"],_0x562977["time"])||normalizeCamera(_0x7d6c47),directorConstraintAt(_0x4b43b8,_0x3ed174),_0x3cbb3e,objectTransforms),'objectTransforms':_0x3cbb3e,'characterActions':sampleDirectorActions(_0x4b43b8['actionClips'],_0x3ed174,objects)};}export function getStoryboard3DObjectAnimationTrack(_0x5d40ea,_0xa549ff){return normalizeStoryboard3DShotAnimation(_0x5d40ea)["objectTracks"]['find'](_0x5e02c6=>_0x5e02c6["objectId"]===String(_0xa549ff||''))||null;}export function remapStoryboard3DAnimationObjectIds(_0x1e74be,_0x2f6217){const _0x156b42=normalizeStoryboard3DShotAnimation(_0x1e74be),_0x2c5bbc=_0x469b83=>_0x2f6217['get'](_0x469b83)||'';return normalizeStoryboard3DShotAnimation({..._0x156b42,'objectTracks':_0x156b42["objectTracks"]['map'](_0x4c2317=>({..._0x4c2317,'objectId':_0x2c5bbc(_0x4c2317['objectId'])})),'actionClips':_0x156b42['actionClips']["map"](_0x1065d7=>({..._0x1065d7,'objectId':_0x2c5bbc(_0x1065d7["objectId"])})),'objectPaths':Object["fromEntries"](Object["entries"](_0x156b42["objectPaths"]||{})['map'](([_0x5a6433,_0x5cbcc7])=>[_0x2c5bbc(_0x5a6433),_0x5cbcc7])),'cameraConstraintClips':_0x156b42["cameraConstraintClips"]["map"](_0x43d3e2=>({..._0x43d3e2,'followObjectId':_0x2c5bbc(_0x43d3e2["followObjectId"]),'lookAtObjectId':_0x2c5bbc(_0x43d3e2['lookAtObjectId'])})),'cameraConstraint':{..._0x156b42["cameraConstraint"],'followObjectId':_0x2c5bbc(_0x156b42['cameraConstraint']["followObjectId"]),'lookAtObjectId':_0x2c5bbc(_0x156b42['cameraConstraint']['lookAtObjectId'])}});}
+import {
+  normalizeDirectorMotion,
+  applyDirectorCameraConstraint,
+  sampleDirectorActions,
+  directorConstraintAt,
+} from './directorMotion.js';
+import { normalizeDirectorCameraPath } from './directorCameraPath.js';
+import {
+  normalizeCurveVector,
+  normalizeEasingCurve,
+  sampleBezierEase,
+  sampleSpatialCurve,
+} from './directorCurves.js';
+import { normalizeDirectorClips, resolveDirectorClipSample } from './directorClips.js';
+const DEFAULT_DURATION_SECONDS = 0x6,
+  DEFAULT_FPS = 0x18,
+  MIN_DURATION_SECONDS = 0.1,
+  MAX_DURATION_SECONDS = 0xe10,
+  MIN_FPS = 0x1,
+  MAX_FPS = 0x78,
+  EASING_VALUES = new Set(['linear', 'ease-in', 'ease-out', 'ease-in-out']);
+export const STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES = Object['freeze'](['position', 'rotation', 'scale']);
+function finiteNumber(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
+}
+function clamp(index, result, data) {
+  return Math['min'](data, Math['max'](result, index));
+}
+function normalizeVector3(options, target) {
+  const source = Array['isArray'](options) ? options : [];
+  return [0x0, 0x1, 0x2]['map']((next) => finiteNumber(source[next], target[next]));
+}
+function normalizeScale(current) {
+  return normalizeVector3(current, [0x1, 0x1, 0x1])['map']((entry) => Math['max'](0.001, entry));
+}
+function normalizeTransform(options2 = {}) {
+  return {
+    position: normalizeVector3(options2['position'], [0x0, 0x0, 0x0]),
+    rotation: normalizeVector3(options2['rotation'], [0x0, 0x0, 0x0]),
+    scale: normalizeScale(options2['scale']),
+  };
+}
+function normalizeCamera(options3 = {}) {
+  const record = Math['max'](0.001, finiteNumber(options3['near'], 0.1)),
+    payload = {
+      position: normalizeVector3(options3['position'], [0x5, 0x4, 0x7]),
+      target: normalizeVector3(options3['target'], [0x0, 1.2, 0x0]),
+      focalLength: clamp(finiteNumber(options3['focalLength'], 0x23), 0x1, 0x1f4),
+      near: record,
+      far: Math['max'](record + 0.001, finiteNumber(options3['far'], 0x3e8)),
+      aspectRatio: String(options3['aspectRatio'] || '16:9'),
+    };
+  return (
+    options3['fov'] != null &&
+      Number['isFinite'](Number(options3['fov'])) &&
+      (payload['fov'] = clamp(Number(options3['fov']), 0x1, 0xb3)),
+    options3['roll'] != null &&
+      Number['isFinite'](Number(options3['roll'])) &&
+      (payload['roll'] = clamp(Number(options3['roll']), -Math['PI'], Math['PI'])),
+    payload
+  );
+}
+function normalizeEasing(handle) {
+  const state = String(handle || 'ease-in-out')
+    ['trim']()
+    ['toLowerCase']();
+  return EASING_VALUES['has'](state) ? state : 'ease-in-out';
+}
+function createKeyframeId(config = 'keyframe', handler) {
+  if (typeof handler === 'function') return String(handler(config));
+  const scope = globalThis['crypto'];
+  if (typeof scope?.['randomUUID'] === 'function') return config + '-' + scope['randomUUID']();
+  return config + '-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x9);
+}
+function normalizeCameraKeyframe(input, output, value2) {
+  return {
+    ...(normalizeCurveVector(input?.['inTangent'])
+      ? { inTangent: normalizeCurveVector(input['inTangent']) }
+      : {}),
+    ...(normalizeCurveVector(input?.['outTangent'])
+      ? { outTangent: normalizeCurveVector(input['outTangent']) }
+      : {}),
+    ...(normalizeEasingCurve(input?.['easingCurve'])
+      ? { easingCurve: normalizeEasingCurve(input['easingCurve']) }
+      : {}),
+    id: String(input?.['id'] || 'camera-keyframe-' + (output + 0x1)),
+    time: Math['max'](0x0, finiteNumber(input?.['time'], output)),
+    camera: normalizeCamera(input?.['camera'] || value2),
+    easing: normalizeEasing(input?.['easing']),
+  };
+}
+function normalizePropertyKeyframe(value3, value4, args, value5) {
+  const transform = normalizeTransform(value5)[args],
+    value6 =
+      args === 'scale' ? normalizeScale(value3?.['value']) : normalizeVector3(value3?.['value'], transform);
+  return {
+    ...(args === 'position' && normalizeCurveVector(value3?.['inTangent'])
+      ? { inTangent: normalizeCurveVector(value3['inTangent']) }
+      : {}),
+    ...(args === 'position' && normalizeCurveVector(value3?.['outTangent'])
+      ? { outTangent: normalizeCurveVector(value3['outTangent']) }
+      : {}),
+    ...(normalizeEasingCurve(value3?.['easingCurve'])
+      ? { easingCurve: normalizeEasingCurve(value3['easingCurve']) }
+      : {}),
+    id: String(value3?.['id'] || args + '-keyframe-' + (value4 + 0x1)),
+    time: Math['max'](0x0, finiteNumber(value3?.['time'], value4)),
+    value: value6,
+    easing: normalizeEasing(value3?.['easing']),
+  };
+}
+function uniqueSortedKeyframes(value7, handler2) {
+  const map = new Map();
+  return (
+    (Array['isArray'](value7) ? value7 : [])['forEach']((value8, value9) => {
+      const value10 = handler2(value8, value9);
+      if (value10['id']) map['set'](value10['id'], value10);
+    }),
+    [...map['values']()]['sort'](
+      (value11, value12) =>
+        value11['time'] - value12['time'] || value11['id']['localeCompare'](value12['id']),
+    )
+  );
+}
+function normalizeObjectTrack(value13, value14, value15) {
+  const value16 = { objectId: value14 };
+  return (
+    STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['forEach']((value17) => {
+      const value18 = value17 + 'Keyframes';
+      value16[value18] = uniqueSortedKeyframes(value13?.[value18], (value19, value20) =>
+        normalizePropertyKeyframe(value19, value20, value17, value15),
+      );
+    }),
+    value16
+  );
+}
+export function createStoryboard3DShotAnimation({
+  camera: camera,
+  duration: duration = DEFAULT_DURATION_SECONDS,
+  fps: fps = DEFAULT_FPS,
+  idFactory: idFactory,
+} = {}) {
+  return {
+    duration: clamp(
+      finiteNumber(duration, DEFAULT_DURATION_SECONDS),
+      MIN_DURATION_SECONDS,
+      MAX_DURATION_SECONDS,
+    ),
+    fps: clamp(Math['round'](finiteNumber(fps, DEFAULT_FPS)), MIN_FPS, MAX_FPS),
+    loop: ![],
+    cameraKeyframes: [
+      {
+        id: createKeyframeId('camera-keyframe', idFactory),
+        time: 0x0,
+        camera: normalizeCamera(camera),
+        easing: 'ease-in-out',
+      },
+    ],
+    objectTracks: [],
+    ...normalizeDirectorMotion(),
+  };
+}
+export function normalizeStoryboard3DShotAnimation(
+  options4 = {},
+  {
+    camera: camera2,
+    objectIds: objectIds,
+    objectTransforms: objectTransforms = {},
+    idFactory: idFactory2,
+  } = {},
+) {
+  const map2 = objectIds instanceof Set ? objectIds : Array['isArray'](objectIds) ? new Set(objectIds) : null,
+    args2 = uniqueSortedKeyframes(options4?.['cameraKeyframes'], (value21, value22) =>
+      normalizeCameraKeyframe(value21, value22, camera2),
+    );
+  args2['length'] === 0x0 &&
+    args2['push']({
+      id: createKeyframeId('camera-keyframe', idFactory2),
+      time: 0x0,
+      camera: normalizeCamera(camera2),
+      easing: 'ease-in-out',
+    });
+  const args3 = (Array['isArray'](options4?.['objectTracks']) ? options4['objectTracks'] : [])
+      ['map']((value23) => {
+        const enabled = String(value23?.['objectId'] || '')['trim']();
+        if (!enabled || (map2 && !map2['has'](enabled))) return null;
+        return normalizeObjectTrack(value23, enabled, objectTransforms[enabled]);
+      })
+      ['filter'](Boolean),
+    args4 = normalizeDirectorMotion(options4, map2),
+    args5 = normalizeDirectorClips(options4?.['motionClips'], {
+      cameraKeyframes: args2,
+      objectTracks: args3,
+    }),
+    value24 = Math['max'](
+      0x0,
+      ...args4['actionClips']['map']((value25) => value25['end']),
+      ...args4['cameraConstraintClips']['map']((value26) => value26['end']),
+      ...args5['map']((value27) => value27['end']),
+      ...args2['map']((value28) => value28['time']),
+      ...args3['flatMap']((value29) =>
+        STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['flatMap']((value30) =>
+          value29[value30 + 'Keyframes']['map']((value31) => value31['time']),
+        ),
+      ),
+    );
+  return {
+    duration: clamp(
+      Math['max'](
+        MIN_DURATION_SECONDS,
+        finiteNumber(options4?.['duration'], DEFAULT_DURATION_SECONDS),
+        value24,
+      ),
+      MIN_DURATION_SECONDS,
+      MAX_DURATION_SECONDS,
+    ),
+    fps: clamp(Math['round'](finiteNumber(options4?.['fps'], DEFAULT_FPS)), MIN_FPS, MAX_FPS),
+    loop: options4?.['loop'] === !![],
+    cameraKeyframes: args2,
+    cameraPath: normalizeDirectorCameraPath(options4?.['cameraPath'], args2),
+    objectPaths: Object['fromEntries'](
+      args3['filter']((value32) => options4?.['objectPaths']?.[value32['objectId']])['map']((value33) => [
+        value33['objectId'],
+        normalizeDirectorCameraPath(
+          options4['objectPaths'][value33['objectId']],
+          value33['positionKeyframes'],
+        ),
+      ]),
+    ),
+    objectTracks: args3,
+    motionClips: args5,
+    ...args4,
+  };
+}
+function upsertAtTime(list, args6, value34) {
+  const value35 = 0.5 / Math['max'](MIN_FPS, value34),
+    value36 = list['find']((value37) => Math['abs'](value37['time'] - args6['time']) <= value35),
+    value38 = list['filter']((value39) => value39['id'] !== value36?.['id'] && value39['id'] !== args6['id']);
+  return (
+    value38['push']({ ...args6, id: value36?.['id'] || args6['id'] }),
+    value38['sort'](
+      (value40, value41) =>
+        value40['time'] - value41['time'] || value40['id']['localeCompare'](value41['id']),
+    )
+  );
+}
+export function upsertStoryboard3DCameraKeyframe(
+  value42,
+  { time: time = 0x0, camera: camera3, easing: easing = 'ease-in-out' } = {},
+  { idFactory: idFactory3 } = {},
+) {
+  const storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(value42, {
+      camera: camera3,
+      idFactory: idFactory3,
+    }),
+    cameraKeyframe = normalizeCameraKeyframe(
+      { id: createKeyframeId('camera-keyframe', idFactory3), time: time, camera: camera3, easing: easing },
+      storyboard3DShotAnimation['cameraKeyframes']['length'],
+      camera3,
+    );
+  return (
+    (storyboard3DShotAnimation['cameraKeyframes'] = upsertAtTime(
+      storyboard3DShotAnimation['cameraKeyframes'],
+      cameraKeyframe,
+      storyboard3DShotAnimation['fps'],
+    )),
+    (storyboard3DShotAnimation['duration'] = Math['max'](
+      storyboard3DShotAnimation['duration'],
+      cameraKeyframe['time'],
+    )),
+    storyboard3DShotAnimation
+  );
+}
+export function upsertStoryboard3DObjectKeyframe(
+  value43,
+  {
+    objectId: objectId,
+    property: property,
+    time: time = 0x0,
+    transform: transform2,
+    value: value44,
+    easing: easing = 'ease-in-out',
+  } = {},
+  { idFactory: idFactory4 } = {},
+) {
+  const enabled2 = String(objectId || '')['trim']();
+  if (!enabled2) throw new Error('An object id is required for an object keyframe');
+  if (!STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['includes'](property))
+    throw new Error('Unsupported object animation property: ' + property);
+  const storyboard3DShotAnimation2 = normalizeStoryboard3DShotAnimation(value43, { idFactory: idFactory4 });
+  let objectTrack = storyboard3DShotAnimation2['objectTracks']['find'](
+    (value45) => value45['objectId'] === enabled2,
+  );
+  !objectTrack &&
+    ((objectTrack = normalizeObjectTrack({}, enabled2, transform2)),
+    storyboard3DShotAnimation2['objectTracks']['push'](objectTrack));
+  const value46 = property + 'Keyframes',
+    propertyKeyframe = normalizePropertyKeyframe(
+      {
+        id: createKeyframeId(property + '-keyframe', idFactory4),
+        time: time,
+        value: value44 || transform2?.[property],
+        easing: easing,
+      },
+      objectTrack[value46]['length'],
+      property,
+      transform2,
+    );
+  return (
+    (objectTrack[value46] = upsertAtTime(
+      objectTrack[value46],
+      propertyKeyframe,
+      storyboard3DShotAnimation2['fps'],
+    )),
+    (storyboard3DShotAnimation2['duration'] = Math['max'](
+      storyboard3DShotAnimation2['duration'],
+      propertyKeyframe['time'],
+    )),
+    storyboard3DShotAnimation2
+  );
+}
+export function removeStoryboard3DAnimationKeyframe(
+  value47,
+  { type: type, objectId: objectId2, property: property2, keyframeId: keyframeId } = {},
+) {
+  const storyboard3DShotAnimation3 = normalizeStoryboard3DShotAnimation(value47),
+    enabled3 = String(keyframeId || '')['trim']();
+  if (!enabled3) return storyboard3DShotAnimation3;
+  if (type === 'camera') {
+    if (storyboard3DShotAnimation3['cameraKeyframes']['length'] <= 0x1) return storyboard3DShotAnimation3;
+    return (
+      (storyboard3DShotAnimation3['cameraKeyframes'] = storyboard3DShotAnimation3['cameraKeyframes'][
+        'filter'
+      ]((value48) => value48['id'] !== enabled3)),
+      storyboard3DShotAnimation3
+    );
+  }
+  const enabled4 = storyboard3DShotAnimation3['objectTracks']['find'](
+    (value49) => value49['objectId'] === String(objectId2 || ''),
+  );
+  if (!enabled4 || !STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['includes'](property2))
+    return storyboard3DShotAnimation3;
+  const value50 = property2 + 'Keyframes';
+  return (
+    (enabled4[value50] = enabled4[value50]['filter']((value51) => value51['id'] !== enabled3)),
+    storyboard3DShotAnimation3
+  );
+}
+export function updateStoryboard3DShotAnimationSettings(args7, args8 = {}) {
+  return normalizeStoryboard3DShotAnimation({
+    ...args7,
+    ...args8,
+    cameraKeyframes: args7?.['cameraKeyframes'],
+    objectTracks: args7?.['objectTracks'],
+  });
+}
+export function applyStoryboard3DAnimationEasing(value52, value53 = 'linear') {
+  const clamp2 = clamp(finiteNumber(value52), 0x0, 0x1);
+  switch (normalizeEasing(value53)) {
+    case 'ease-in':
+      return clamp2 * clamp2;
+    case 'ease-out':
+      return 0x1 - (0x1 - clamp2) * (0x1 - clamp2);
+    case 'ease-in-out':
+      return clamp2 < 0.5 ? 0x2 * clamp2 * clamp2 : 0x1 - Math['pow'](-0x2 * clamp2 + 0x2, 0x2) / 0x2;
+    default:
+      return clamp2;
+  }
+}
+function interpolateNumber(value54, value55, value56) {
+  return value54 + (value55 - value54) * value56;
+}
+function interpolateAngle(value57, value58, value59) {
+  const value60 =
+    ((((value58 - value57 + Math['PI']) % (Math['PI'] * 0x2)) + Math['PI'] * 0x2) % (Math['PI'] * 0x2)) -
+    Math['PI'];
+  return value57 + value60 * value59;
+}
+function interpolateVector(value61, value62, value63, { angles: angles = ![] } = {}) {
+  return value61['map']((value64, value65) =>
+    angles
+      ? interpolateAngle(value64, value62[value65], value63)
+      : interpolateNumber(value64, value62[value65], value63),
+  );
+}
+function sampleKeyframes(list2, value66, handler3) {
+  if (!Array['isArray'](list2) || list2['length'] === 0x0) return null;
+  if (list2['length'] === 0x1 || value66 <= list2[0x0]['time']) return { ...list2[0x0], progress: 0x0 };
+  const args9 = list2['at'](-0x1);
+  if (value66 >= args9['time']) return { ...args9, progress: 0x0 };
+  let args10 = list2[0x0],
+    value67 = list2[0x1];
+  for (let value68 = 0x1; value68 < list2['length']; value68 += 0x1) {
+    value67 = list2[value68];
+    if (value66 <= value67['time']) break;
+    args10 = value67;
+  }
+  const value69 = Math['max'](1e-8, value67['time'] - args10['time']),
+    value70 = (value66 - args10['time']) / value69,
+    value71 = args10['easingCurve']
+      ? sampleBezierEase(value70, args10['easingCurve'])
+      : applyStoryboard3DAnimationEasing(value70, args10['easing']);
+  return {
+    ...args10,
+    value: handler3(args10, value67, value71),
+    fromKeyframeId: args10['id'],
+    toKeyframeId: value67['id'],
+    progress: value71,
+  };
+}
+function sampleCameraKeyframes(value72, value73) {
+  const sampleKeyframes2 = sampleKeyframes(value72, value73, (value74, value75, count) => ({
+    position: sampleSpatialCurve(value74, value75, count, 'camera'),
+    target: interpolateVector(value74['camera']['target'], value75['camera']['target'], count),
+    focalLength: interpolateNumber(value74['camera']['focalLength'], value75['camera']['focalLength'], count),
+    roll: interpolateAngle(value74['camera']['roll'] || 0x0, value75['camera']['roll'] || 0x0, count),
+    near: interpolateNumber(value74['camera']['near'], value75['camera']['near'], count),
+    far: interpolateNumber(value74['camera']['far'], value75['camera']['far'], count),
+    aspectRatio: count < 0.5 ? value74['camera']['aspectRatio'] : value75['camera']['aspectRatio'],
+  }));
+  if (!sampleKeyframes2) return null;
+  return sampleKeyframes2['value'] || sampleKeyframes2['camera'];
+}
+export function sampleStoryboard3DShotAnimation(
+  value76,
+  value77,
+  { camera: camera4, objectTransforms: objectTransforms = {}, objects: objects = [] } = {},
+) {
+  const storyboard3DShotAnimation4 = normalizeStoryboard3DShotAnimation(value76, {
+    camera: camera4,
+    objectTransforms: objectTransforms,
+  });
+  let finiteNumber2 = finiteNumber(value77);
+  storyboard3DShotAnimation4['loop'] && storyboard3DShotAnimation4['duration'] > 0x0
+    ? (finiteNumber2 =
+        ((finiteNumber2 % storyboard3DShotAnimation4['duration']) + storyboard3DShotAnimation4['duration']) %
+        storyboard3DShotAnimation4['duration'])
+    : (finiteNumber2 = clamp(finiteNumber2, 0x0, storyboard3DShotAnimation4['duration']));
+  const value78 = {};
+  storyboard3DShotAnimation4['objectTracks']['forEach']((value79) => {
+    const args11 = normalizeTransform(objectTransforms[value79['objectId']]),
+      value80 = { ...args11 };
+    let value81 = ![];
+    STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['forEach']((value82) => {
+      const directorClipSample = resolveDirectorClipSample(
+          storyboard3DShotAnimation4['motionClips'],
+          value79[value82 + 'Keyframes'],
+          finiteNumber2,
+        ),
+        sampleKeyframes3 = sampleKeyframes(
+          directorClipSample['keys'],
+          directorClipSample['time'],
+          (value83, el, value84) =>
+            value82 === 'position'
+              ? sampleSpatialCurve(value83, el, value84)
+              : interpolateVector(value83['value'], el['value'], value84, { angles: value82 === 'rotation' }),
+        );
+      sampleKeyframes3 && ((value80[value82] = sampleKeyframes3['value']), (value81 = !![]));
+    });
+    if (value81) value78[value79['objectId']] = value80;
+  });
+  const directorClipSample2 = resolveDirectorClipSample(
+    storyboard3DShotAnimation4['motionClips'],
+    storyboard3DShotAnimation4['cameraKeyframes'],
+    finiteNumber2,
+  );
+  return {
+    time: finiteNumber2,
+    camera: applyDirectorCameraConstraint(
+      sampleCameraKeyframes(directorClipSample2['keys'], directorClipSample2['time']) ||
+        normalizeCamera(camera4),
+      directorConstraintAt(storyboard3DShotAnimation4, finiteNumber2),
+      value78,
+      objectTransforms,
+    ),
+    objectTransforms: value78,
+    characterActions: sampleDirectorActions(
+      storyboard3DShotAnimation4['actionClips'],
+      finiteNumber2,
+      objects,
+    ),
+  };
+}
+export function getStoryboard3DObjectAnimationTrack(value85, value86) {
+  return (
+    normalizeStoryboard3DShotAnimation(value85)['objectTracks']['find'](
+      (value87) => value87['objectId'] === String(value86 || ''),
+    ) || null
+  );
+}
+export function remapStoryboard3DAnimationObjectIds(value88, map3) {
+  const args12 = normalizeStoryboard3DShotAnimation(value88),
+    handler4 = (value89) => map3['get'](value89) || '';
+  return normalizeStoryboard3DShotAnimation({
+    ...args12,
+    objectTracks: args12['objectTracks']['map']((args13) => ({
+      ...args13,
+      objectId: handler4(args13['objectId']),
+    })),
+    actionClips: args12['actionClips']['map']((args14) => ({
+      ...args14,
+      objectId: handler4(args14['objectId']),
+    })),
+    objectPaths: Object['fromEntries'](
+      Object['entries'](args12['objectPaths'] || {})['map'](([value90, value91]) => [
+        handler4(value90),
+        value91,
+      ]),
+    ),
+    cameraConstraintClips: args12['cameraConstraintClips']['map']((args15) => ({
+      ...args15,
+      followObjectId: handler4(args15['followObjectId']),
+      lookAtObjectId: handler4(args15['lookAtObjectId']),
+    })),
+    cameraConstraint: {
+      ...args12['cameraConstraint'],
+      followObjectId: handler4(args12['cameraConstraint']['followObjectId']),
+      lookAtObjectId: handler4(args12['cameraConstraint']['lookAtObjectId']),
+    },
+  });
+}

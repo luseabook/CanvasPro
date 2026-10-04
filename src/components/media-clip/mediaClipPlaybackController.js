@@ -5,671 +5,686 @@ const MEDIA_CLIP_PLAYBACK_EDGE_EPSILON_SEC = 0.04,
   MEDIA_CLIP_REPLACEMENT_AUDIO_SYNC_STEP_SEC = 0.08,
   MEDIA_CLIP_REPLACEMENT_AUDIO_DRIFT_SEEK_SEC = 0.35,
   MEDIA_CLIP_REPLACEMENT_AUDIO_PLAYING_HARD_SEEK_SEC = 0.95;
-function mediaClipText(_0x127736, _0x33c383 = {}) {
-  return t('mediaClip.' + _0x127736, _0x33c383);
+function mediaClipText(value, item = {}) {
+  return t('mediaClip.' + value, item);
 }
-function toNumber(_0x156121, _0x2c7a1a = 0) {
-  const _0x3336db = Number(_0x156121);
-  return Number.isFinite(_0x3336db) ? _0x3336db : _0x2c7a1a;
+function toNumber(key, index = 0) {
+  const result = Number(key);
+  return Number.isFinite(result) ? result : index;
 }
-function clampNumber(_0x388118, _0xb5952b, _0x31dbb8) {
-  const _0x4a06e6 = toNumber(_0xb5952b, 0),
-    _0x118346 = Math.max(_0x4a06e6, toNumber(_0x31dbb8, _0x4a06e6));
-  return Math.max(_0x4a06e6, Math.min(_0x118346, toNumber(_0x388118, _0x4a06e6)));
+function clampNumber(data, options, target) {
+  const toNumber2 = toNumber(options, 0),
+    source = Math.max(toNumber2, toNumber(target, toNumber2));
+  return Math.max(toNumber2, Math.min(source, toNumber(data, toNumber2)));
 }
-function clipSourceStartSec(_0x11e23a = {}) {
-  return toNumber(_0x11e23a.startSec, 0);
+function clipSourceStartSec(options2 = {}) {
+  return toNumber(options2.startSec, 0);
 }
-function clipSourceEndSec(_0x34e208 = {}) {
-  const _0x49e2a0 = clipSourceStartSec(_0x34e208);
-  return Math.max(_0x49e2a0, toNumber(_0x34e208.endSec, _0x49e2a0));
+function clipSourceEndSec(options3 = {}) {
+  const clipSourceStartSec2 = clipSourceStartSec(options3);
+  return Math.max(clipSourceStartSec2, toNumber(options3.endSec, clipSourceStartSec2));
 }
-function clipTimelineStartSec(_0x383230 = {}) {
-  return toNumber(_0x383230.timelineStartSec, 0);
+function clipTimelineStartSec(options4 = {}) {
+  return toNumber(options4.timelineStartSec, 0);
 }
-function clipTimelineEndSec(_0x26caef = {}) {
-  const _0x323fd4 = clipTimelineStartSec(_0x26caef);
-  return Math.max(_0x323fd4, toNumber(_0x26caef.timelineEndSec, _0x323fd4));
+function clipTimelineEndSec(options5 = {}) {
+  const clipTimelineStartSec2 = clipTimelineStartSec(options5);
+  return Math.max(clipTimelineStartSec2, toNumber(options5.timelineEndSec, clipTimelineStartSec2));
 }
-function clipTimelineSecFromMedia(_0x4aaa10 = {}, _0xd06772 = null, _0x402b9d = 0) {
-  const _0x105acc = clipTimelineStartSec(_0x4aaa10),
-    _0x17888a = clipTimelineEndSec(_0x4aaa10),
-    _0x356b85 = clipSourceStartSec(_0x4aaa10),
-    _0x277370 = toNumber(_0xd06772?.currentTime, Number.NaN);
-  if (!Number.isFinite(_0x277370)) return clampNumber(_0x402b9d, _0x105acc, _0x17888a);
-  return clampNumber(_0x105acc + (_0x277370 - _0x356b85), _0x105acc, _0x17888a);
+function clipTimelineSecFromMedia(options6 = {}, next = null, current = 0) {
+  const clipTimelineStartSec3 = clipTimelineStartSec(options6),
+    clipTimelineEndSec2 = clipTimelineEndSec(options6),
+    clipSourceStartSec3 = clipSourceStartSec(options6),
+    toNumber3 = toNumber(next?.currentTime, Number.NaN);
+  if (!Number.isFinite(toNumber3)) return clampNumber(current, clipTimelineStartSec3, clipTimelineEndSec2);
+  return clampNumber(
+    clipTimelineStartSec3 + (toNumber3 - clipSourceStartSec3),
+    clipTimelineStartSec3,
+    clipTimelineEndSec2,
+  );
 }
-function clipSourceSecFromTimeline(_0x2d4698 = {}, _0x451562 = 0) {
-  const _0x575acf = clipSourceStartSec(_0x2d4698),
-    _0x6c099a = clipSourceEndSec(_0x2d4698),
-    _0x48e15e = clipTimelineStartSec(_0x2d4698);
-  return clampNumber(_0x575acf + (toNumber(_0x451562, _0x48e15e) - _0x48e15e), _0x575acf, _0x6c099a);
+function clipSourceSecFromTimeline(options7 = {}, entry = 0) {
+  const clipSourceStartSec4 = clipSourceStartSec(options7),
+    clipSourceEndSec2 = clipSourceEndSec(options7),
+    clipTimelineStartSec4 = clipTimelineStartSec(options7);
+  return clampNumber(
+    clipSourceStartSec4 + (toNumber(entry, clipTimelineStartSec4) - clipTimelineStartSec4),
+    clipSourceStartSec4,
+    clipSourceEndSec2,
+  );
 }
-function mediaSourceSec(_0x245c7c = null, _0x286152 = 0) {
-  return toNumber(_0x245c7c?.currentTime, _0x286152);
+function mediaSourceSec(value2 = null, record = 0) {
+  return toNumber(value2?.currentTime, record);
 }
-function lastAppliedSeekSec(_0x271ce3, _0x3758d4 = '') {
+function lastAppliedSeekSec(payload, handle = '') {
   return toNumber(
-    _0x271ce3?._previewSeekState?.[_0x3758d4]?.lastAppliedSec ??
-      _0x271ce3?._getPreviewSeekState?.(_0x3758d4)?.lastAppliedSec,
+    payload?._previewSeekState?.[handle]?.lastAppliedSec ??
+      payload?._getPreviewSeekState?.(handle)?.lastAppliedSec,
     Number.NaN,
   );
 }
-function hasAppliedSeekNear(
-  _0x5db31a,
-  _0x344e33,
-  _0x29e3a4,
-  _0x45e171 = MEDIA_CLIP_PLAYBACK_OUT_OF_RANGE_SEEK_SEC,
-) {
-  const _0x20edc3 = lastAppliedSeekSec(_0x5db31a, _0x344e33);
-  return Number.isFinite(_0x20edc3) && Math.abs(_0x20edc3 - toNumber(_0x29e3a4, _0x20edc3)) <= _0x45e171;
-}
-function isMediaBeforeClipStart(_0x8d8cbd = null, _0x32176a = {}) {
-  const _0x192c70 = toNumber(_0x8d8cbd?.currentTime, Number.NaN);
+function hasAppliedSeekNear(state, config, scope, input = MEDIA_CLIP_PLAYBACK_OUT_OF_RANGE_SEEK_SEC) {
+  const appliedSeekSec = lastAppliedSeekSec(state, config);
   return (
-    Number.isFinite(_0x192c70) &&
-    _0x192c70 < clipSourceStartSec(_0x32176a) - MEDIA_CLIP_PLAYBACK_OUT_OF_RANGE_SEEK_SEC
+    Number.isFinite(appliedSeekSec) && Math.abs(appliedSeekSec - toNumber(scope, appliedSeekSec)) <= input
   );
 }
-function shouldSeekMediaToSource(_0x461beb, _0x44a3c1, _0x46a999, _0x8dd5d4) {
-  if (_0x46a999?.seeking === true) return false;
-  return !hasAppliedSeekNear(_0x461beb, _0x44a3c1, _0x8dd5d4);
+function isMediaBeforeClipStart(value3 = null, output = {}) {
+  const toNumber4 = toNumber(value3?.currentTime, Number.NaN);
+  return (
+    Number.isFinite(toNumber4) &&
+    toNumber4 < clipSourceStartSec(output) - MEDIA_CLIP_PLAYBACK_OUT_OF_RANGE_SEEK_SEC
+  );
 }
-function clockTimelineSecForClip(_0x3685d6, _0x40c3da = {}) {
+function shouldSeekMediaToSource(value4, value5, value6, value7) {
+  if (value6?.seeking === true) return false;
+  return !hasAppliedSeekNear(value4, value5, value7);
+}
+function clockTimelineSecForClip(value8, value9 = {}) {
   return clampNumber(
-    _0x3685d6?._playbackClockTimelineSec?.(_0x3685d6._playheadSec),
-    clipTimelineStartSec(_0x40c3da),
-    clipTimelineEndSec(_0x40c3da),
+    value8?._playbackClockTimelineSec?.(value8._playheadSec),
+    clipTimelineStartSec(value9),
+    clipTimelineEndSec(value9),
   );
 }
-function playbackTimelineSecForClip(_0x17dabe, _0x3c3c01 = {}, _0x78518b = null, _0x509dcc = 0) {
-  const _0xc1ead9 = clockTimelineSecForClip(_0x17dabe, _0x3c3c01),
-    _0x3f8601 = clipTimelineSecFromMedia(_0x3c3c01, _0x78518b, _0x509dcc);
+function playbackTimelineSecForClip(value10, value11 = {}, value12 = null, value13 = 0) {
+  const clockTimelineSecForClip2 = clockTimelineSecForClip(value10, value11),
+    clipTimelineSecFromMedia2 = clipTimelineSecFromMedia(value11, value12, value13);
   return clampNumber(
-    Math.max(_0xc1ead9, _0x3f8601),
-    clipTimelineStartSec(_0x3c3c01),
-    clipTimelineEndSec(_0x3c3c01),
+    Math.max(clockTimelineSecForClip2, clipTimelineSecFromMedia2),
+    clipTimelineStartSec(value11),
+    clipTimelineEndSec(value11),
   );
 }
-function isClipPlaybackFinished(_0x5ecf0c = null, _0x245894 = {}, _0x47b24b = 0) {
-  if (toNumber(_0x47b24b, 0) >= clipTimelineEndSec(_0x245894) - MEDIA_CLIP_PLAYBACK_EDGE_EPSILON_SEC)
-    return true;
-  if (_0x5ecf0c?.ended === true) return true;
-  const _0x5b9373 = toNumber(_0x5ecf0c?.currentTime, Number.NaN);
-  if (Number.isFinite(_0x5b9373))
-    return _0x5b9373 >= clipSourceEndSec(_0x245894) - MEDIA_CLIP_PLAYBACK_EDGE_EPSILON_SEC;
+function isClipPlaybackFinished(value14 = null, value15 = {}, value16 = 0) {
+  if (toNumber(value16, 0) >= clipTimelineEndSec(value15) - MEDIA_CLIP_PLAYBACK_EDGE_EPSILON_SEC) return true;
+  if (value14?.ended === true) return true;
+  const toNumber5 = toNumber(value14?.currentTime, Number.NaN);
+  if (Number.isFinite(toNumber5))
+    return toNumber5 >= clipSourceEndSec(value15) - MEDIA_CLIP_PLAYBACK_EDGE_EPSILON_SEC;
   return false;
 }
-function ensureMediaPlaying(_0x4128bc = null) {
-  if (!_0x4128bc || _0x4128bc.paused === false) return;
+function ensureMediaPlaying(enabled = null) {
+  if (!enabled || enabled.paused === false) return;
   try {
-    _0x4128bc.play?.()?.catch?.(() => {});
+    enabled.play?.()?.catch?.(() => {});
   } catch {}
 }
-function pauseMedia(_0x346db2 = null) {
-  if (!_0x346db2 || _0x346db2.paused === true) return;
+function pauseMedia(enabled2 = null) {
+  if (!enabled2 || enabled2.paused === true) return;
   try {
-    _0x346db2.pause?.();
+    enabled2.pause?.();
   } catch {}
 }
-function hasPendingVideoSourceSeek(_0x9934c2) {
-  return !!_0x9934c2?._videoPreview?.__mediaClipPendingSourceSeek;
+function hasPendingVideoSourceSeek(enabled3) {
+  return !!enabled3?._videoPreview?.__mediaClipPendingSourceSeek;
 }
-function setMediaPlaybackRate(_0x40d643 = null, _0x210a6b = 1) {
-  if (!_0x40d643 || !Number.isFinite(Number(_0x210a6b))) return;
+function setMediaPlaybackRate(enabled4 = null, value17 = 1) {
+  if (!enabled4 || !Number.isFinite(Number(value17))) return;
   try {
-    _0x40d643.playbackRate = _0x210a6b;
+    enabled4.playbackRate = value17;
   } catch {}
 }
-function resetMediaPlaybackRate(_0x5f313d = null) {
-  setMediaPlaybackRate(_0x5f313d, 1);
+function resetMediaPlaybackRate(value18 = null) {
+  setMediaPlaybackRate(value18, 1);
 }
-function syncReplacementAudioOnTimeline(_0x3dfaa0, _0x151816, _0x3eaa1f = {}) {
-  const _0x3a342f = Math.max(0, toNumber(_0x151816, 0)),
-    _0x398a6d = _0x3eaa1f.immediate === true,
-    _0x24f730 = toNumber(_0x3dfaa0._lastReplacementAudioSyncTimelineSec, Number.NaN);
+function syncReplacementAudioOnTimeline(value19, value20, value21 = {}) {
+  const value22 = Math.max(0, toNumber(value20, 0)),
+    enabled5 = value21.immediate === true,
+    toNumber6 = toNumber(value19._lastReplacementAudioSyncTimelineSec, Number.NaN);
   if (
-    !_0x398a6d &&
-    Number.isFinite(_0x24f730) &&
-    Math.abs(_0x3a342f - _0x24f730) < MEDIA_CLIP_REPLACEMENT_AUDIO_SYNC_STEP_SEC
+    !enabled5 &&
+    Number.isFinite(toNumber6) &&
+    Math.abs(value22 - toNumber6) < MEDIA_CLIP_REPLACEMENT_AUDIO_SYNC_STEP_SEC
   )
     return;
-  ((_0x3dfaa0._lastReplacementAudioSyncTimelineSec = _0x3a342f),
-    _0x3dfaa0._syncReplacementAudioFromVideo(_0x3a342f, _0x3eaa1f));
+  ((value19._lastReplacementAudioSyncTimelineSec = value22),
+    value19._syncReplacementAudioFromVideo(value22, value21));
 }
-function formatPreviewTime(_0x36012b) {
-  const _0x3d7101 = Math.max(0, toNumber(_0x36012b, 0)),
-    _0x459063 = Math.floor(_0x3d7101 / 60),
-    _0x3447c5 = Math.floor(_0x3d7101 % 60);
-  return String(_0x459063).padStart(2, '0') + ':' + String(_0x3447c5).padStart(2, '0');
+function formatPreviewTime(value23) {
+  const value24 = Math.max(0, toNumber(value23, 0)),
+    value25 = Math.floor(value24 / 60),
+    value26 = Math.floor(value24 % 60);
+  return String(value25).padStart(2, '0') + ':' + String(value26).padStart(2, '0');
 }
 function mediaClipNowMs() {
-  const _0x384086 = globalThis.performance?.now?.();
-  return Number.isFinite(_0x384086) ? _0x384086 : Date.now();
+  const value27 = globalThis.performance?.now?.();
+  return Number.isFinite(value27) ? value27 : Date.now();
 }
-function stopPointer(_0x271369) {
-  if (!_0x271369) return;
-  (_0x271369.preventDefault?.(), _0x271369.stopPropagation?.());
+function stopPointer(event) {
+  if (!event) return;
+  (event.preventDefault?.(), event.stopPropagation?.());
 }
-function getPendingMediaClipSourcePromise(_0x5502a5) {
-  const _0x5946b4 = _0x5502a5?.__mediaClipSourcePromise;
-  return _0x5946b4 && typeof _0x5946b4.then === 'function' ? _0x5946b4 : null;
+function getPendingMediaClipSourcePromise(value28) {
+  const promise = value28?.__mediaClipSourcePromise;
+  return promise && typeof promise.then === 'function' ? promise : null;
 }
-function waitForMediaClipReady(_0x235376, _0x16a256 = 1, _0x4347db = 0x384) {
-  if (!_0x235376 || toNumber(_0x235376.readyState, 0) >= _0x16a256) return Promise.resolve(true);
-  const _0x3ffc17 =
-    _0x16a256 >= 2
+function waitForMediaClipReady(el, count = 1, value29 = 0x384) {
+  if (!el || toNumber(el.readyState, 0) >= count) return Promise.resolve(true);
+  const list =
+    count >= 2
       ? ['loadeddata', 'canplay', 'canplaythrough', 'seeked', 'timeupdate', 'error']
       : ['loadedmetadata', 'loadeddata', 'canplay', 'error'];
-  return new Promise((_0x41fa1c) => {
-    let _0x103dd5 = false;
-    const _0xebcee5 = () => {
-        if (_0x103dd5) return;
-        ((_0x103dd5 = true),
-          clearTimeout(_0x494c8b),
-          _0x3ffc17.forEach((_0x3927fa) => {
-            _0x235376.removeEventListener?.(_0x3927fa, _0x2df2e5);
+  return new Promise((handler) => {
+    let value30 = false;
+    const run = () => {
+        if (value30) return;
+        ((value30 = true),
+          clearTimeout(setTimeout2),
+          list.forEach((item2) => {
+            el.removeEventListener?.(item2, value31);
           }));
       },
-      _0x2df2e5 = (_0x579d4d) => {
-        _0xebcee5();
-        if (_0x579d4d?.type === 'error') {
-          _0x41fa1c(false);
+      value31 = (value32) => {
+        run();
+        if (value32?.type === 'error') {
+          handler(false);
           return;
         }
-        _0x41fa1c(true);
+        handler(true);
       },
-      _0x494c8b = setTimeout(
+      setTimeout2 = setTimeout(
         () => {
-          (_0xebcee5(), _0x41fa1c(toNumber(_0x235376.readyState, 0) >= _0x16a256));
+          (run(), handler(toNumber(el.readyState, 0) >= count));
         },
-        Math.max(100, toNumber(_0x4347db, 0x384)),
+        Math.max(100, toNumber(value29, 0x384)),
       );
-    _0x3ffc17.forEach((_0x13df82) => {
-      _0x235376.addEventListener?.(_0x13df82, _0x2df2e5);
+    list.forEach((item3) => {
+      el.addEventListener?.(item3, value31);
     });
   });
 }
-function waitForMediaClipPlaybackStart(_0x2b1b1a, _0x27233b = 0x384) {
-  if (!_0x2b1b1a) return Promise.resolve(false);
-  const _0x34cf71 = () => _0x2b1b1a.paused === false && _0x2b1b1a.ended !== true;
-  if (_0x34cf71()) return Promise.resolve(true);
-  const _0x440873 = ['playing', 'timeupdate', 'canplay', 'loadeddata', 'error'];
-  return new Promise((_0x5418a5) => {
-    let _0x35414a = false;
-    const _0x2d9c01 = () => {
-        if (_0x35414a) return;
-        ((_0x35414a = true),
-          clearTimeout(_0xc6e865),
-          _0x440873.forEach((_0x34e8e5) => {
-            _0x2b1b1a.removeEventListener?.(_0x34e8e5, _0x396806);
+function waitForMediaClipPlaybackStart(el2, value33 = 0x384) {
+  if (!el2) return Promise.resolve(false);
+  const run2 = () => el2.paused === false && el2.ended !== true;
+  if (run2()) return Promise.resolve(true);
+  const list2 = ['playing', 'timeupdate', 'canplay', 'loadeddata', 'error'];
+  return new Promise((handler2) => {
+    let value34 = false;
+    const run3 = () => {
+        if (value34) return;
+        ((value34 = true),
+          clearTimeout(setTimeout3),
+          list2.forEach((item4) => {
+            el2.removeEventListener?.(item4, value35);
           }));
       },
-      _0xaa149c = (_0x5be870) => {
-        (_0x2d9c01(), _0x5418a5(_0x5be870));
+      handler3 = (value36) => {
+        (run3(), handler2(value36));
       },
-      _0x396806 = (_0x4f762c) => {
-        if (_0x4f762c?.type === 'error') {
-          _0xaa149c(false);
+      value35 = (value37) => {
+        if (value37?.type === 'error') {
+          handler3(false);
           return;
         }
-        (_0x34cf71() || _0x4f762c?.type === 'timeupdate' || _0x4f762c?.type === 'playing') && _0xaa149c(true);
+        (run2() || value37?.type === 'timeupdate' || value37?.type === 'playing') && handler3(true);
       },
-      _0xc6e865 = setTimeout(() => _0xaa149c(_0x34cf71()), Math.max(100, toNumber(_0x27233b, 0x384)));
-    _0x440873.forEach((_0x1ea746) => {
-      _0x2b1b1a.addEventListener?.(_0x1ea746, _0x396806);
+      setTimeout3 = setTimeout(() => handler3(run2()), Math.max(100, toNumber(value33, 0x384)));
+    list2.forEach((item5) => {
+      el2.addEventListener?.(item5, value35);
     });
   });
 }
-export function pausePreviewPlayback(_0x2f0cd1, _0x39950d = {}) {
-  ((_0x2f0cd1._playing = false),
-    (_0x2f0cd1._playbackStartedAtMs = Number.NaN),
-    (_0x2f0cd1._playbackStartSec = 0),
-    (_0x2f0cd1._imagePlaybackStartedAt = 0),
-    (_0x2f0cd1._imagePlaybackStartSec = 0),
-    (_0x2f0cd1._lastReplacementAudioSyncTimelineSec = Number.NaN),
-    _0x2f0cd1._cancelPlaybackLoop());
+export function pausePreviewPlayback(value38, value39 = {}) {
+  ((value38._playing = false),
+    (value38._playbackStartedAtMs = Number.NaN),
+    (value38._playbackStartSec = 0),
+    (value38._imagePlaybackStartedAt = 0),
+    (value38._imagePlaybackStartSec = 0),
+    (value38._lastReplacementAudioSyncTimelineSec = Number.NaN),
+    value38._cancelPlaybackLoop());
   try {
-    _0x2f0cd1._videoPreview?.pause?.();
+    value38._videoPreview?.pause?.();
   } catch {}
   try {
-    _0x2f0cd1._audioPreview?.pause?.();
+    value38._audioPreview?.pause?.();
   } catch {}
-  (resetMediaPlaybackRate(_0x2f0cd1._videoPreview),
-    resetMediaPlaybackRate(_0x2f0cd1._audioPreview),
-    _0x2f0cd1.el?.classList?.remove('is-playing'));
-  if (_0x39950d.updateControls !== false) _0x2f0cd1._updatePreviewControls();
+  (resetMediaPlaybackRate(value38._videoPreview),
+    resetMediaPlaybackRate(value38._audioPreview),
+    value38.el?.classList?.remove('is-playing'));
+  if (value39.updateControls !== false) value38._updatePreviewControls();
 }
-export function resetPlaybackClock(_0x53fb5f, _0x2e1e74 = _0x53fb5f._playheadSec) {
-  ((_0x53fb5f._playbackStartSec = Math.max(0, toNumber(_0x2e1e74, 0))),
-    (_0x53fb5f._playbackStartedAtMs = mediaClipNowMs()));
+export function resetPlaybackClock(value40, value41 = value40._playheadSec) {
+  ((value40._playbackStartSec = Math.max(0, toNumber(value41, 0))),
+    (value40._playbackStartedAtMs = mediaClipNowMs()));
 }
-export function playbackClockTimelineSec(_0x38d479, _0xc534e6 = _0x38d479._playheadSec) {
-  if (!Number.isFinite(_0x38d479._playbackStartedAtMs))
-    return (_0x38d479._resetPlaybackClock(_0xc534e6), Math.max(0, toNumber(_0xc534e6, 0)));
-  const _0x2d41db = Math.max(0, (mediaClipNowMs() - _0x38d479._playbackStartedAtMs) / 0x3e8);
-  return Math.max(0, _0x38d479._playbackStartSec + _0x2d41db);
+export function playbackClockTimelineSec(value42, value43 = value42._playheadSec) {
+  if (!Number.isFinite(value42._playbackStartedAtMs))
+    return (value42._resetPlaybackClock(value43), Math.max(0, toNumber(value43, 0)));
+  const value44 = Math.max(0, (mediaClipNowMs() - value42._playbackStartedAtMs) / 0x3e8);
+  return Math.max(0, value42._playbackStartSec + value44);
 }
-export async function preparePreviewMediaForPlayback(_0x43e3b3, _0x27a2f4, _0x51ac2b = null) {
-  const _0x1dbac1 = _0x43e3b3._getPreviewMedia(_0x27a2f4);
-  if (!_0x1dbac1) return false;
-  const _0xb0cfa3 = getPendingMediaClipSourcePromise(_0x1dbac1);
-  if (_0xb0cfa3)
+export async function preparePreviewMediaForPlayback(value45, value46, value47 = null) {
+  const enabled6 = value45._getPreviewMedia(value46);
+  if (!enabled6) return false;
+  const pendingMediaClipSourcePromise = getPendingMediaClipSourcePromise(enabled6);
+  if (pendingMediaClipSourcePromise)
     try {
-      await _0xb0cfa3;
+      await pendingMediaClipSourcePromise;
     } catch {}
-  _0x51ac2b !== null &&
-    _0x51ac2b !== undefined &&
-    _0x43e3b3._syncPreviewTime(_0x27a2f4, _0x51ac2b, { immediate: true });
-  const _0x134f7c = _0x27a2f4 === 'video' ? 2 : 1,
-    _0x1b1bb7 = await waitForMediaClipReady(_0x1dbac1, _0x134f7c, _0x27a2f4 === 'video' ? 0x578 : 0x384);
-  if (!_0x1b1bb7) return false;
+  value47 !== null &&
+    value47 !== undefined &&
+    value45._syncPreviewTime(value46, value47, { immediate: true });
+  const value48 = value46 === 'video' ? 2 : 1,
+    waitForMediaClipReady2 = await waitForMediaClipReady(
+      enabled6,
+      value48,
+      value46 === 'video' ? 0x578 : 0x384,
+    );
+  if (!waitForMediaClipReady2) return false;
   return (
-    _0x51ac2b !== null &&
-      _0x51ac2b !== undefined &&
-      _0x43e3b3._syncPreviewTime(_0x27a2f4, _0x51ac2b, { immediate: true }),
+    value47 !== null &&
+      value47 !== undefined &&
+      value45._syncPreviewTime(value46, value47, { immediate: true }),
     true
   );
 }
-export function togglePreviewPlayback(_0x4189ea, _0x3cc785) {
-  stopPointer(_0x3cc785);
-  if (_0x4189ea._playing) {
-    _0x4189ea._pausePreviewPlayback();
+export function togglePreviewPlayback(value49, value50) {
+  stopPointer(value50);
+  if (value49._playing) {
+    value49._pausePreviewPlayback();
     return;
   }
-  if (_0x4189ea._playPreviewPending) return _0x4189ea._playPreviewPending;
-  const _0x21066a = _0x4189ea._playPreview().finally(() => {
-    _0x4189ea._playPreviewPending === _0x21066a && (_0x4189ea._playPreviewPending = null);
+  if (value49._playPreviewPending) return value49._playPreviewPending;
+  const value51 = value49._playPreview().finally(() => {
+    value49._playPreviewPending === value51 && (value49._playPreviewPending = null);
   });
-  return ((_0x4189ea._playPreviewPending = _0x21066a), _0x21066a);
+  return ((value49._playPreviewPending = value51), value51);
 }
-export async function playPreview(_0x3e9304) {
-  const _0xb20567 = _0x3e9304._mediaClip?.tracks?.video ? 'video' : _0x3e9304._getPlaybackKind(),
-    _0xea4885 = _0x3e9304._getPlaybackTrack(_0xb20567);
-  let _0x115b71 = _0x3e9304._getPlaybackMedia(_0xb20567);
-  if (!_0xb20567 || !_0xea4885) return;
-  (_0x3e9304._clearTimelinePlaybackVisualLocks?.(), _0x3e9304._hideTimelineHoverPlayhead?.());
-  if (_0xb20567 === 'video') _0x3e9304._clearPreviewVideoFallback?.();
-  (_0x3e9304._cancelPreviewSeek?.('video'), _0x3e9304._cancelPreviewSeek?.('audio'));
-  let _0x41770c = _0xea4885.startSec,
-    _0x1037cf = _0x41770c;
-  if (_0xb20567 === 'video') {
-    const _0x449d35 = _0x3e9304._getVideoClipAtTimelineSec(_0x3e9304._playheadSec);
-    if (!_0x449d35) return;
-    const _0x243118 = _0x3e9304._videoClipSource(
-        _0x449d35,
-        _0x3e9304._clipIndexAtTimelineSec(_0x3e9304._playheadSec),
+export async function playPreview(value52) {
+  const enabled7 = value52._mediaClip?.tracks?.video ? 'video' : value52._getPlaybackKind(),
+    enabled8 = value52._getPlaybackTrack(enabled7);
+  let enabled9 = value52._getPlaybackMedia(enabled7);
+  if (!enabled7 || !enabled8) return;
+  (value52._clearTimelinePlaybackVisualLocks?.(), value52._hideTimelineHoverPlayhead?.());
+  if (enabled7 === 'video') value52._clearPreviewVideoFallback?.();
+  (value52._cancelPreviewSeek?.('video'), value52._cancelPreviewSeek?.('audio'));
+  let value53 = enabled8.startSec,
+    value54 = value53;
+  if (enabled7 === 'video') {
+    const enabled10 = value52._getVideoClipAtTimelineSec(value52._playheadSec);
+    if (!enabled10) return;
+    const value55 = value52._videoClipSource(
+        enabled10,
+        value52._clipIndexAtTimelineSec(value52._playheadSec),
       ),
-      _0x20d00b = _0x3e9304._visualClipKind(_0x449d35, _0x243118),
-      _0x5bb4fb = toNumber(_0x449d35.timelineStartSec, 0),
-      _0x8cf16f = toNumber(_0x449d35.timelineEndSec, _0x5bb4fb),
-      _0x22e693 = toNumber(_0x3e9304._playheadSec, _0x5bb4fb);
-    ((_0x41770c = _0x22e693 >= _0x5bb4fb && _0x22e693 < _0x8cf16f ? _0x22e693 : _0x5bb4fb),
-      (_0x1037cf = _0x3e9304._videoSourceSecForPlayhead(_0x41770c)),
-      _0x3e9304._syncVideoPreviewSourceForTimelineSec(_0x41770c));
-    if (_0x20d00b === 'image') {
-      ((_0x3e9304._playheadSec = _0x41770c),
-        (_0x3e9304._imagePlaybackStartSec = _0x41770c),
-        (_0x3e9304._imagePlaybackStartedAt = globalThis.performance?.now?.() || Date.now()),
-        syncReplacementAudioOnTimeline(_0x3e9304, _0x41770c, { immediate: true }),
-        await _0x3e9304._playReplacementAudioFromVideo(_0x41770c),
-        (_0x3e9304._playing = true),
-        _0x3e9304.el?.classList?.add('is-playing'),
-        _0x3e9304._updatePlaybackVisuals(_0xb20567),
-        _0x3e9304._updatePreviewControls(),
-        _0x3e9304._startPlaybackLoop(_0xb20567));
+      value56 = value52._visualClipKind(enabled10, value55),
+      toNumber7 = toNumber(enabled10.timelineStartSec, 0),
+      toNumber8 = toNumber(enabled10.timelineEndSec, toNumber7),
+      toNumber9 = toNumber(value52._playheadSec, toNumber7);
+    ((value53 = toNumber9 >= toNumber7 && toNumber9 < toNumber8 ? toNumber9 : toNumber7),
+      (value54 = value52._videoSourceSecForPlayhead(value53)),
+      value52._syncVideoPreviewSourceForTimelineSec(value53));
+    if (value56 === 'image') {
+      ((value52._playheadSec = value53),
+        (value52._imagePlaybackStartSec = value53),
+        (value52._imagePlaybackStartedAt = globalThis.performance?.now?.() || Date.now()),
+        syncReplacementAudioOnTimeline(value52, value53, { immediate: true }),
+        await value52._playReplacementAudioFromVideo(value53),
+        (value52._playing = true),
+        value52.el?.classList?.add('is-playing'),
+        value52._updatePlaybackVisuals(enabled7),
+        value52._updatePreviewControls(),
+        value52._startPlaybackLoop(enabled7));
       return;
     }
-    _0x115b71 = _0x3e9304._getPlaybackMedia(_0xb20567);
-    if (!_0x115b71) return;
+    enabled9 = value52._getPlaybackMedia(enabled7);
+    if (!enabled9) return;
   } else {
-    if (!_0x115b71) return;
-    const _0x5971f8 = _0x3e9304._audioTimelineClips(_0xea4885),
-      _0x25d6b3 = _0x3e9304._audioClipIndexAtTimelineSec(_0x3e9304._playheadSec, _0x5971f8),
-      _0x29468d = _0x5971f8[_0x25d6b3] || _0x5971f8[0] || null;
-    if (_0x29468d) {
-      const _0x59c5d7 = toNumber(_0x29468d.timelineStartSec, 0),
-        _0x2c4af2 = Math.max(_0x59c5d7, toNumber(_0x29468d.timelineEndSec, _0x59c5d7)),
-        _0x7431f2 = toNumber(_0x3e9304._playheadSec, _0x59c5d7);
-      ((_0x41770c = _0x7431f2 >= _0x59c5d7 && _0x7431f2 < _0x2c4af2 ? _0x7431f2 : _0x59c5d7),
-        _0x3e9304._setActiveAudioClipIndex(_0x25d6b3),
-        _0x3e9304._syncAudioPreviewSourceForTimelineSec(_0x41770c),
-        (_0x1037cf = _0x3e9304._audioSourceSecForPlayhead(_0x41770c)));
+    if (!enabled9) return;
+    const value57 = value52._audioTimelineClips(enabled8),
+      value58 = value52._audioClipIndexAtTimelineSec(value52._playheadSec, value57),
+      value59 = value57[value58] || value57[0] || null;
+    if (value59) {
+      const toNumber10 = toNumber(value59.timelineStartSec, 0),
+        value60 = Math.max(toNumber10, toNumber(value59.timelineEndSec, toNumber10)),
+        toNumber11 = toNumber(value52._playheadSec, toNumber10);
+      ((value53 = toNumber11 >= toNumber10 && toNumber11 < value60 ? toNumber11 : toNumber10),
+        value52._setActiveAudioClipIndex(value58),
+        value52._syncAudioPreviewSourceForTimelineSec(value53),
+        (value54 = value52._audioSourceSecForPlayhead(value53)));
     } else {
-      const _0x525904 = toNumber(_0x115b71.currentTime, _0x3e9304._playheadSec);
-      ((_0x41770c =
-        _0x3e9304._isSecInsideTrack(_0xea4885, _0x525904) && _0x525904 < _0xea4885.endSec
-          ? _0x525904
-          : _0xea4885.startSec),
-        (_0x1037cf = _0x41770c));
+      const toNumber12 = toNumber(enabled9.currentTime, value52._playheadSec);
+      ((value53 =
+        value52._isSecInsideTrack(enabled8, toNumber12) && toNumber12 < enabled8.endSec
+          ? toNumber12
+          : enabled8.startSec),
+        (value54 = value53));
     }
   }
-  ((_0x3e9304._playheadSec = _0x41770c),
-    _0x3e9304._syncPreviewTime(_0xb20567, _0x1037cf, { immediate: true }));
+  ((value52._playheadSec = value53), value52._syncPreviewTime(enabled7, value54, { immediate: true }));
   try {
-    if (_0xb20567 === 'video') {
-      const _0x8f6286 = await _0x3e9304._preparePreviewMediaForPlayback(_0xb20567, _0x1037cf);
-      if (!_0x8f6286) throw new Error('Media clip preview video is not ready');
-      syncReplacementAudioOnTimeline(_0x3e9304, _0x41770c, { immediate: true });
+    if (enabled7 === 'video') {
+      const enabled11 = await value52._preparePreviewMediaForPlayback(enabled7, value54);
+      if (!enabled11) throw new Error('Media clip preview video is not ready');
+      syncReplacementAudioOnTimeline(value52, value53, { immediate: true });
     }
-    await _0x115b71.play?.();
-    if (_0xb20567 === 'video') {
-      const _0x54279a = await waitForMediaClipPlaybackStart(_0x115b71, 0x384);
-      if (!_0x54279a) throw new Error('Media clip preview video did not start');
-      await _0x3e9304._playReplacementAudioFromVideo(_0x41770c);
+    await enabled9.play?.();
+    if (enabled7 === 'video') {
+      const waitForMediaClipPlaybackStart2 = await waitForMediaClipPlaybackStart(enabled9, 0x384);
+      if (!waitForMediaClipPlaybackStart2) throw new Error('Media clip preview video did not start');
+      await value52._playReplacementAudioFromVideo(value53);
     }
-    ((_0x3e9304._playing = true),
-      _0x3e9304.el?.classList?.add('is-playing'),
-      _0x3e9304._updatePlaybackVisuals(_0xb20567),
-      _0x3e9304._updatePreviewControls(),
-      _0x3e9304._startPlaybackLoop(_0xb20567));
-  } catch (_0x887ad) {
-    (_0x3e9304._pausePreviewPlayback(),
+    ((value52._playing = true),
+      value52.el?.classList?.add('is-playing'),
+      value52._updatePlaybackVisuals(enabled7),
+      value52._updatePreviewControls(),
+      value52._startPlaybackLoop(enabled7));
+  } catch (value61) {
+    (value52._pausePreviewPlayback(),
       globalThis.window?.showToast?.(mediaClipText('playback.previewUnavailable')));
   }
 }
-export async function playReplacementAudioFromVideo(_0x5c5248, _0x1a83d6) {
-  const _0x26a1e2 = _0x5c5248._mediaClip.tracks?.video,
-    _0xe74070 = _0x5c5248._mediaClip.tracks?.audio,
-    _0x4eeb97 = _0x5c5248._audioPreview;
-  if (!_0x26a1e2 || !_0xe74070 || !_0x4eeb97) return;
-  const _0x4b7294 = _0x5c5248._getAudioClipContextAtTimelineSec(_0x1a83d6, {
+export async function playReplacementAudioFromVideo(enabled12, value62) {
+  const enabled13 = enabled12._mediaClip.tracks?.video,
+    enabled14 = enabled12._mediaClip.tracks?.audio,
+    enabled15 = enabled12._audioPreview;
+  if (!enabled13 || !enabled14 || !enabled15) return;
+  const response = enabled12._getAudioClipContextAtTimelineSec(value62, {
     audibleOnly: true,
     nearest: false,
   });
-  !_0x5c5248._previewAudioSrc && _0x4b7294.url && _0x5c5248._syncAudioPreviewSourceForTimelineSec(_0x1a83d6);
-  const _0x15e8cc = Array.isArray(_0x5c5248._mediaClip.audioClips) && _0x5c5248._mediaClip.audioClips.length,
-    _0x466647 = _0x4b7294.clip
-      ? _0x4b7294.sourceSec
-      : _0x15e8cc
+  !enabled12._previewAudioSrc && response.url && enabled12._syncAudioPreviewSourceForTimelineSec(value62);
+  const value63 = Array.isArray(enabled12._mediaClip.audioClips) && enabled12._mediaClip.audioClips.length,
+    value64 = response.clip
+      ? response.sourceSec
+      : value63
         ? null
-        : mapMediaClipVideoSecToAudioSec(_0x1a83d6, _0x26a1e2, _0xe74070);
-  if (_0x466647 == null) {
-    resetMediaPlaybackRate(_0x4eeb97);
+        : mapMediaClipVideoSecToAudioSec(value62, enabled13, enabled14);
+  if (value64 == null) {
+    resetMediaPlaybackRate(enabled15);
     try {
-      _0x4eeb97.pause?.();
+      enabled15.pause?.();
     } catch {}
     return;
   }
-  if (_0x4b7294.clip) _0x5c5248._syncAudioPreviewSourceForTimelineSec(_0x1a83d6);
-  (resetMediaPlaybackRate(_0x4eeb97),
-    (_0x5c5248._pendingPreviewSeek.audio = _0x466647),
-    _0x5c5248._applyPreviewSeek('audio', { immediate: true }),
-    (_0x5c5248._lastReplacementAudioSyncTimelineSec = Math.max(0, toNumber(_0x1a83d6, 0))));
+  if (response.clip) enabled12._syncAudioPreviewSourceForTimelineSec(value62);
+  (resetMediaPlaybackRate(enabled15),
+    (enabled12._pendingPreviewSeek.audio = value64),
+    enabled12._applyPreviewSeek('audio', { immediate: true }),
+    (enabled12._lastReplacementAudioSyncTimelineSec = Math.max(0, toNumber(value62, 0))));
   try {
-    await _0x4eeb97.play?.();
+    await enabled15.play?.();
   } catch {}
 }
-export function syncReplacementAudioFromVideo(_0x2faf4b, _0x419a58, _0x444994 = {}) {
-  const _0x415c40 = _0x2faf4b._mediaClip.tracks?.video,
-    _0x41250f = _0x2faf4b._mediaClip.tracks?.audio,
-    _0x54f45c = _0x2faf4b._audioPreview;
-  if (!_0x415c40 || !_0x41250f || !_0x54f45c) return;
-  const _0xc7864b = _0x2faf4b._getAudioClipContextAtTimelineSec(_0x419a58, {
+export function syncReplacementAudioFromVideo(enabled16, value65, value66 = {}) {
+  const enabled17 = enabled16._mediaClip.tracks?.video,
+    enabled18 = enabled16._mediaClip.tracks?.audio,
+    enabled19 = enabled16._audioPreview;
+  if (!enabled17 || !enabled18 || !enabled19) return;
+  const response2 = enabled16._getAudioClipContextAtTimelineSec(value65, {
     audibleOnly: true,
     nearest: false,
   });
-  let _0x18ea66 = false;
-  !_0x2faf4b._previewAudioSrc &&
-    _0xc7864b.url &&
-    (_0x18ea66 = _0x2faf4b._syncAudioPreviewSourceForTimelineSec(_0x419a58));
-  const _0x3c4af5 = Array.isArray(_0x2faf4b._mediaClip.audioClips) && _0x2faf4b._mediaClip.audioClips.length,
-    _0x1b2d8d = _0xc7864b.clip
-      ? _0xc7864b.sourceSec
-      : _0x3c4af5
+  let value67 = false;
+  !enabled16._previewAudioSrc &&
+    response2.url &&
+    (value67 = enabled16._syncAudioPreviewSourceForTimelineSec(value65));
+  const value68 = Array.isArray(enabled16._mediaClip.audioClips) && enabled16._mediaClip.audioClips.length,
+    value69 = response2.clip
+      ? response2.sourceSec
+      : value68
         ? null
-        : mapMediaClipVideoSecToAudioSec(_0x419a58, _0x415c40, _0x41250f);
-  if (_0x1b2d8d == null) {
-    resetMediaPlaybackRate(_0x54f45c);
+        : mapMediaClipVideoSecToAudioSec(value65, enabled17, enabled18);
+  if (value69 == null) {
+    resetMediaPlaybackRate(enabled19);
     try {
-      _0x54f45c.pause?.();
+      enabled19.pause?.();
     } catch {}
     return;
   }
-  _0xc7864b.clip && (_0x18ea66 = _0x2faf4b._syncAudioPreviewSourceForTimelineSec(_0x419a58) || _0x18ea66);
-  const _0x116ad9 = Math.abs(toNumber(_0x54f45c.currentTime, _0x1b2d8d) - _0x1b2d8d),
-    _0x14d027 = _0x54f45c.seeking === true,
-    _0x385cec = _0x2faf4b._playing
+  response2.clip && (value67 = enabled16._syncAudioPreviewSourceForTimelineSec(value65) || value67);
+  const value70 = Math.abs(toNumber(enabled19.currentTime, value69) - value69),
+    enabled20 = enabled19.seeking === true,
+    value71 = enabled16._playing
       ? MEDIA_CLIP_REPLACEMENT_AUDIO_PLAYING_HARD_SEEK_SEC
       : MEDIA_CLIP_REPLACEMENT_AUDIO_DRIFT_SEEK_SEC,
-    _0x246a9d =
-      _0x444994.immediate === true ||
-      _0x18ea66 ||
-      (!_0x14d027 && (!_0x2faf4b._playing || _0x116ad9 > _0x385cec));
-  _0x246a9d
-    ? (resetMediaPlaybackRate(_0x54f45c),
-      (_0x2faf4b._pendingPreviewSeek.audio = _0x1b2d8d),
-      _0x444994.immediate === true
-        ? _0x2faf4b._applyPreviewSeek('audio', { immediate: true })
-        : _0x2faf4b._schedulePreviewSeek('audio'))
-    : resetMediaPlaybackRate(_0x54f45c);
-  if (_0x2faf4b._playing && _0x54f45c.paused)
+    value72 =
+      value66.immediate === true || value67 || (!enabled20 && (!enabled16._playing || value70 > value71));
+  value72
+    ? (resetMediaPlaybackRate(enabled19),
+      (enabled16._pendingPreviewSeek.audio = value69),
+      value66.immediate === true
+        ? enabled16._applyPreviewSeek('audio', { immediate: true })
+        : enabled16._schedulePreviewSeek('audio'))
+    : resetMediaPlaybackRate(enabled19);
+  if (enabled16._playing && enabled19.paused)
     try {
-      _0x54f45c.play?.()?.catch?.(() => {});
+      enabled19.play?.()?.catch?.(() => {});
     } catch {}
 }
-export function startPlaybackLoop(_0x4f6790, _0x4ed171) {
-  (_0x4f6790._cancelPlaybackLoop(), _0x4f6790._resetPlaybackClock(_0x4f6790._playheadSec));
-  const _0x21adea =
+export function startPlaybackLoop(enabled21, value73) {
+  (enabled21._cancelPlaybackLoop(), enabled21._resetPlaybackClock(enabled21._playheadSec));
+  const run4 =
       typeof requestAnimationFrame === 'function'
-        ? (_0xd357a1) => requestAnimationFrame(_0xd357a1)
-        : (_0x480e0e) => setTimeout(_0x480e0e, 16),
-    _0x168c29 = () => {
-      if (!_0x4f6790._playing) return;
-      const _0x306f85 = _0x4f6790._getPreviewMedia(_0x4ed171),
-        _0x45de8c = _0x4f6790._getPlaybackTrack(_0x4ed171);
-      if (!_0x306f85 || !_0x45de8c) {
-        _0x4f6790._pausePreviewPlayback();
+        ? (value74) => requestAnimationFrame(value74)
+        : (value75) => setTimeout(value75, 16),
+    value76 = () => {
+      if (!enabled21._playing) return;
+      const enabled22 = enabled21._getPreviewMedia(value73),
+        enabled23 = enabled21._getPlaybackTrack(value73);
+      if (!enabled22 || !enabled23) {
+        enabled21._pausePreviewPlayback();
         return;
       }
-      if (_0x4ed171 === 'video') {
-        const _0x39e341 = _0x4f6790._videoTimelineClips(_0x45de8c),
-          _0x429217 = _0x4f6790._clipIndexAtTimelineSec(_0x4f6790._playheadSec, _0x39e341),
-          _0x5d8328 =
-            _0x39e341[_0x429217] || _0x4f6790._getVideoClipAtTimelineSec(_0x4f6790._playheadSec, _0x39e341);
-        if (!_0x5d8328) {
-          _0x4f6790._pausePreviewPlayback();
+      if (value73 === 'video') {
+        const value77 = enabled21._videoTimelineClips(enabled23),
+          value78 = enabled21._clipIndexAtTimelineSec(enabled21._playheadSec, value77),
+          enabled24 =
+            value77[value78] || enabled21._getVideoClipAtTimelineSec(enabled21._playheadSec, value77);
+        if (!enabled24) {
+          enabled21._pausePreviewPlayback();
           return;
         }
-        const _0x24b13c = toNumber(_0x5d8328.startSec, 0),
-          _0x38c6f5 = Math.max(_0x24b13c, toNumber(_0x5d8328.endSec, _0x24b13c)),
-          _0x5962e4 = toNumber(_0x5d8328.timelineStartSec, 0),
-          _0x2edcb5 = Math.max(_0x5962e4, toNumber(_0x5d8328.timelineEndSec, _0x5962e4)),
-          _0x1b8ec8 = _0x4f6790._videoClipSource(_0x5d8328, _0x429217);
-        if (_0x4f6790._visualClipKind(_0x5d8328, _0x1b8ec8) === 'image') {
-          const _0x4e52ce = globalThis.performance?.now?.() || Date.now();
-          !_0x4f6790._imagePlaybackStartedAt &&
-            ((_0x4f6790._imagePlaybackStartedAt = _0x4e52ce),
-            (_0x4f6790._imagePlaybackStartSec = Math.max(
-              _0x5962e4,
-              Math.min(_0x2edcb5, _0x4f6790._playheadSec),
+        const toNumber13 = toNumber(enabled24.startSec, 0),
+          value79 = Math.max(toNumber13, toNumber(enabled24.endSec, toNumber13)),
+          toNumber14 = toNumber(enabled24.timelineStartSec, 0),
+          value80 = Math.max(toNumber14, toNumber(enabled24.timelineEndSec, toNumber14)),
+          value81 = enabled21._videoClipSource(enabled24, value78);
+        if (enabled21._visualClipKind(enabled24, value81) === 'image') {
+          const value82 = globalThis.performance?.now?.() || Date.now();
+          !enabled21._imagePlaybackStartedAt &&
+            ((enabled21._imagePlaybackStartedAt = value82),
+            (enabled21._imagePlaybackStartSec = Math.max(
+              toNumber14,
+              Math.min(value80, enabled21._playheadSec),
             )),
-            _0x4f6790._syncVideoPreviewSourceForTimelineSec(_0x4f6790._imagePlaybackStartSec));
-          const _0x55c880 = Math.max(0, (_0x4e52ce - _0x4f6790._imagePlaybackStartedAt) / 0x3e8),
-            _0x3d0d49 = _0x4f6790._imagePlaybackStartSec + _0x55c880;
-          if (_0x3d0d49 >= _0x2edcb5) {
-            const _0x3da547 = _0x39e341[_0x429217 + 1] || null;
-            if (_0x3da547) {
-              ((_0x4f6790._playheadSec = toNumber(_0x3da547.timelineStartSec, _0x2edcb5)),
-                _0x4f6790._resetPlaybackClock(_0x4f6790._playheadSec),
-                (_0x4f6790._imagePlaybackStartedAt = 0),
-                (_0x4f6790._imagePlaybackStartSec = _0x4f6790._playheadSec));
-              const _0xe90402 = _0x4f6790._syncVideoPreviewSourceForTimelineSec(_0x4f6790._playheadSec);
-              !_0xe90402 &&
-                _0x4f6790._syncPreviewTime(
+            enabled21._syncVideoPreviewSourceForTimelineSec(enabled21._imagePlaybackStartSec));
+          const value83 = Math.max(0, (value82 - enabled21._imagePlaybackStartedAt) / 0x3e8),
+            value84 = enabled21._imagePlaybackStartSec + value83;
+          if (value84 >= value80) {
+            const value85 = value77[value78 + 1] || null;
+            if (value85) {
+              ((enabled21._playheadSec = toNumber(value85.timelineStartSec, value80)),
+                enabled21._resetPlaybackClock(enabled21._playheadSec),
+                (enabled21._imagePlaybackStartedAt = 0),
+                (enabled21._imagePlaybackStartSec = enabled21._playheadSec));
+              const enabled25 = enabled21._syncVideoPreviewSourceForTimelineSec(enabled21._playheadSec);
+              !enabled25 &&
+                enabled21._syncPreviewTime(
                   'video',
-                  _0x4f6790._videoSourceSecForPlayhead(_0x4f6790._playheadSec),
+                  enabled21._videoSourceSecForPlayhead(enabled21._playheadSec),
                   { immediate: true },
                 );
-              const _0x56b294 = _0x4f6790._videoClipSource(_0x3da547, _0x429217 + 1);
-              if (_0x4f6790._visualClipKind(_0x3da547, _0x56b294) !== 'image') {
-                const _0x29b1da = _0x4f6790._getPreviewMedia('video');
-                _0xe90402
-                  ? (pauseMedia(_0x29b1da), pauseMedia(_0x4f6790._audioPreview))
-                  : (syncReplacementAudioOnTimeline(_0x4f6790, _0x4f6790._playheadSec, { immediate: true }),
-                    ensureMediaPlaying(_0x29b1da),
-                    void _0x4f6790._playReplacementAudioFromVideo(_0x4f6790._playheadSec));
+              const value86 = enabled21._videoClipSource(value85, value78 + 1);
+              if (enabled21._visualClipKind(value85, value86) !== 'image') {
+                const value87 = enabled21._getPreviewMedia('video');
+                enabled25
+                  ? (pauseMedia(value87), pauseMedia(enabled21._audioPreview))
+                  : (syncReplacementAudioOnTimeline(enabled21, enabled21._playheadSec, { immediate: true }),
+                    ensureMediaPlaying(value87),
+                    void enabled21._playReplacementAudioFromVideo(enabled21._playheadSec));
               }
-              (_0x4f6790._updatePlaybackVisuals(_0x4ed171),
-                _0x4f6790._updatePreviewControls(),
-                (_0x4f6790._playbackRaf = _0x21adea(_0x168c29)));
+              (enabled21._updatePlaybackVisuals(value73),
+                enabled21._updatePreviewControls(),
+                (enabled21._playbackRaf = run4(value76)));
               return;
             }
-            ((_0x4f6790._playheadSec = _0x2edcb5),
-              _0x4f6790._updatePlaybackVisuals(_0x4ed171),
-              _0x4f6790._updatePreviewControls(),
-              _0x4f6790._pausePreviewPlayback());
+            ((enabled21._playheadSec = value80),
+              enabled21._updatePlaybackVisuals(value73),
+              enabled21._updatePreviewControls(),
+              enabled21._pausePreviewPlayback());
             return;
           }
-          ((_0x4f6790._playheadSec = Math.max(_0x5962e4, Math.min(_0x2edcb5, _0x3d0d49))),
-            syncReplacementAudioOnTimeline(_0x4f6790, _0x4f6790._playheadSec),
-            _0x4f6790._updatePlaybackVisuals(_0x4ed171),
-            _0x4f6790._updatePreviewControls(),
-            (_0x4f6790._playbackRaf = _0x21adea(_0x168c29)));
+          ((enabled21._playheadSec = Math.max(toNumber14, Math.min(value80, value84))),
+            syncReplacementAudioOnTimeline(enabled21, enabled21._playheadSec),
+            enabled21._updatePlaybackVisuals(value73),
+            enabled21._updatePreviewControls(),
+            (enabled21._playbackRaf = run4(value76)));
           return;
         }
-        _0x4f6790._imagePlaybackStartedAt = 0;
-        if (hasPendingVideoSourceSeek(_0x4f6790)) {
-          (pauseMedia(_0x306f85),
-            pauseMedia(_0x4f6790._audioPreview),
-            (_0x4f6790._playheadSec = _0x5962e4),
-            _0x4f6790._resetPlaybackClock(_0x4f6790._playheadSec),
-            _0x4f6790._updatePlaybackVisuals(_0x4ed171),
-            _0x4f6790._updatePreviewControls(),
-            (_0x4f6790._playbackRaf = _0x21adea(_0x168c29)));
+        enabled21._imagePlaybackStartedAt = 0;
+        if (hasPendingVideoSourceSeek(enabled21)) {
+          (pauseMedia(enabled22),
+            pauseMedia(enabled21._audioPreview),
+            (enabled21._playheadSec = toNumber14),
+            enabled21._resetPlaybackClock(enabled21._playheadSec),
+            enabled21._updatePlaybackVisuals(value73),
+            enabled21._updatePreviewControls(),
+            (enabled21._playbackRaf = run4(value76)));
           return;
         }
-        ensureMediaPlaying(_0x306f85);
-        const _0x3752ea = playbackTimelineSecForClip(_0x4f6790, _0x5d8328, _0x306f85, _0x4f6790._playheadSec);
-        if (isClipPlaybackFinished(_0x306f85, _0x5d8328, _0x3752ea)) {
-          const _0x21fd48 = _0x39e341[_0x429217 + 1] || null;
-          if (_0x21fd48) {
-            ((_0x4f6790._playheadSec = toNumber(_0x21fd48.timelineStartSec, _0x2edcb5)),
-              _0x4f6790._resetPlaybackClock(_0x4f6790._playheadSec));
-            const _0x323994 = _0x4f6790._syncVideoPreviewSourceForTimelineSec(_0x4f6790._playheadSec);
-            _0x323994
-              ? (pauseMedia(_0x4f6790._getPreviewMedia('video')), pauseMedia(_0x4f6790._audioPreview))
-              : (_0x4f6790._syncPreviewTime(
-                  _0x4ed171,
-                  _0x4f6790._videoSourceSecForPlayhead(_0x4f6790._playheadSec),
+        ensureMediaPlaying(enabled22);
+        const playbackTimelineSecForClip2 = playbackTimelineSecForClip(
+          enabled21,
+          enabled24,
+          enabled22,
+          enabled21._playheadSec,
+        );
+        if (isClipPlaybackFinished(enabled22, enabled24, playbackTimelineSecForClip2)) {
+          const value88 = value77[value78 + 1] || null;
+          if (value88) {
+            ((enabled21._playheadSec = toNumber(value88.timelineStartSec, value80)),
+              enabled21._resetPlaybackClock(enabled21._playheadSec));
+            const value89 = enabled21._syncVideoPreviewSourceForTimelineSec(enabled21._playheadSec);
+            value89
+              ? (pauseMedia(enabled21._getPreviewMedia('video')), pauseMedia(enabled21._audioPreview))
+              : (enabled21._syncPreviewTime(
+                  value73,
+                  enabled21._videoSourceSecForPlayhead(enabled21._playheadSec),
                   { immediate: true },
                 ),
-                syncReplacementAudioOnTimeline(_0x4f6790, _0x4f6790._playheadSec, { immediate: true }),
-                ensureMediaPlaying(_0x4f6790._getPreviewMedia('video')),
-                void _0x4f6790._playReplacementAudioFromVideo(_0x4f6790._playheadSec));
-            (_0x4f6790._updatePlaybackVisuals(_0x4ed171),
-              _0x4f6790._updatePreviewControls(),
-              (_0x4f6790._playbackRaf = _0x21adea(_0x168c29)));
+                syncReplacementAudioOnTimeline(enabled21, enabled21._playheadSec, { immediate: true }),
+                ensureMediaPlaying(enabled21._getPreviewMedia('video')),
+                void enabled21._playReplacementAudioFromVideo(enabled21._playheadSec));
+            (enabled21._updatePlaybackVisuals(value73),
+              enabled21._updatePreviewControls(),
+              (enabled21._playbackRaf = run4(value76)));
             return;
           }
-          ((_0x4f6790._playheadSec = _0x2edcb5),
-            _0x4f6790._syncPreviewTime(_0x4ed171, _0x38c6f5, { immediate: true }),
-            _0x4f6790._updatePlaybackVisuals(_0x4ed171),
-            _0x4f6790._pausePreviewPlayback());
+          ((enabled21._playheadSec = value80),
+            enabled21._syncPreviewTime(value73, value79, { immediate: true }),
+            enabled21._updatePlaybackVisuals(value73),
+            enabled21._pausePreviewPlayback());
           return;
         }
-        _0x4f6790._playheadSec = Math.max(_0x5962e4, Math.min(_0x2edcb5, _0x3752ea));
-        const _0x22ca50 = clipSourceSecFromTimeline(_0x5d8328, _0x4f6790._playheadSec),
-          _0x20a6ff = mediaSourceSec(_0x306f85, _0x22ca50);
-        if (isMediaBeforeClipStart(_0x306f85, _0x5d8328))
-          shouldSeekMediaToSource(_0x4f6790, _0x4ed171, _0x306f85, _0x24b13c)
-            ? _0x4f6790._syncPreviewTime(_0x4ed171, _0x24b13c, { immediate: true })
-            : (_0x4f6790._playheadSec = clockTimelineSecForClip(_0x4f6790, _0x5d8328));
+        enabled21._playheadSec = Math.max(toNumber14, Math.min(value80, playbackTimelineSecForClip2));
+        const clipSourceSecFromTimeline2 = clipSourceSecFromTimeline(enabled24, enabled21._playheadSec),
+          mediaSourceSec2 = mediaSourceSec(enabled22, clipSourceSecFromTimeline2);
+        if (isMediaBeforeClipStart(enabled22, enabled24))
+          shouldSeekMediaToSource(enabled21, value73, enabled22, toNumber13)
+            ? enabled21._syncPreviewTime(value73, toNumber13, { immediate: true })
+            : (enabled21._playheadSec = clockTimelineSecForClip(enabled21, enabled24));
         else
-          _0x20a6ff > _0x38c6f5 + MEDIA_CLIP_PLAYBACK_OUT_OF_RANGE_SEEK_SEC &&
-            (_0x4f6790._playheadSec = _0x2edcb5);
-        (syncReplacementAudioOnTimeline(_0x4f6790, _0x4f6790._playheadSec),
-          _0x4f6790._updatePlaybackVisuals(_0x4ed171),
-          _0x4f6790._updatePreviewControls(),
-          (_0x4f6790._playbackRaf = _0x21adea(_0x168c29)));
+          mediaSourceSec2 > value79 + MEDIA_CLIP_PLAYBACK_OUT_OF_RANGE_SEEK_SEC &&
+            (enabled21._playheadSec = value80);
+        (syncReplacementAudioOnTimeline(enabled21, enabled21._playheadSec),
+          enabled21._updatePlaybackVisuals(value73),
+          enabled21._updatePreviewControls(),
+          (enabled21._playbackRaf = run4(value76)));
         return;
       }
-      if (_0x4ed171 === 'audio') {
-        const _0x3c5096 = _0x4f6790._audioTimelineClips(_0x45de8c),
-          _0x4b348d = _0x4f6790._audioClipIndexAtTimelineSec(_0x4f6790._playheadSec, _0x3c5096),
-          _0x3b9aeb = _0x3c5096[_0x4b348d] || _0x3c5096[0] || null;
-        if (!_0x3b9aeb) {
-          _0x4f6790._pausePreviewPlayback();
+      if (value73 === 'audio') {
+        const value90 = enabled21._audioTimelineClips(enabled23),
+          value91 = enabled21._audioClipIndexAtTimelineSec(enabled21._playheadSec, value90),
+          enabled26 = value90[value91] || value90[0] || null;
+        if (!enabled26) {
+          enabled21._pausePreviewPlayback();
           return;
         }
-        const _0x5a7582 = toNumber(_0x3b9aeb.startSec, 0),
-          _0x14ae19 = Math.max(_0x5a7582, toNumber(_0x3b9aeb.endSec, _0x5a7582)),
-          _0x197ecb = toNumber(_0x3b9aeb.timelineStartSec, 0),
-          _0x2a5bee = Math.max(_0x197ecb, toNumber(_0x3b9aeb.timelineEndSec, _0x197ecb));
-        ensureMediaPlaying(_0x306f85);
-        const _0x5b9372 = playbackTimelineSecForClip(_0x4f6790, _0x3b9aeb, _0x306f85, _0x4f6790._playheadSec);
-        if (isClipPlaybackFinished(_0x306f85, _0x3b9aeb, _0x5b9372)) {
-          const _0x112df4 = _0x3c5096[_0x4b348d + 1] || null;
-          if (_0x112df4) {
-            ((_0x4f6790._playheadSec = toNumber(_0x112df4.timelineStartSec, _0x2a5bee)),
-              _0x4f6790._resetPlaybackClock(_0x4f6790._playheadSec),
-              _0x4f6790._setActiveAudioClipIndex(_0x4b348d + 1),
-              _0x4f6790._syncAudioPreviewSourceForTimelineSec(_0x4f6790._playheadSec),
-              _0x4f6790._syncPreviewTime('audio', toNumber(_0x112df4.startSec, 0), { immediate: true }),
-              ensureMediaPlaying(_0x4f6790._getPreviewMedia('audio')),
-              _0x4f6790._updatePlaybackVisuals(_0x4ed171),
-              _0x4f6790._updatePreviewControls(),
-              (_0x4f6790._playbackRaf = _0x21adea(_0x168c29)));
+        const toNumber15 = toNumber(enabled26.startSec, 0),
+          value92 = Math.max(toNumber15, toNumber(enabled26.endSec, toNumber15)),
+          toNumber16 = toNumber(enabled26.timelineStartSec, 0),
+          value93 = Math.max(toNumber16, toNumber(enabled26.timelineEndSec, toNumber16));
+        ensureMediaPlaying(enabled22);
+        const playbackTimelineSecForClip3 = playbackTimelineSecForClip(
+          enabled21,
+          enabled26,
+          enabled22,
+          enabled21._playheadSec,
+        );
+        if (isClipPlaybackFinished(enabled22, enabled26, playbackTimelineSecForClip3)) {
+          const value94 = value90[value91 + 1] || null;
+          if (value94) {
+            ((enabled21._playheadSec = toNumber(value94.timelineStartSec, value93)),
+              enabled21._resetPlaybackClock(enabled21._playheadSec),
+              enabled21._setActiveAudioClipIndex(value91 + 1),
+              enabled21._syncAudioPreviewSourceForTimelineSec(enabled21._playheadSec),
+              enabled21._syncPreviewTime('audio', toNumber(value94.startSec, 0), { immediate: true }),
+              ensureMediaPlaying(enabled21._getPreviewMedia('audio')),
+              enabled21._updatePlaybackVisuals(value73),
+              enabled21._updatePreviewControls(),
+              (enabled21._playbackRaf = run4(value76)));
             return;
           }
-          ((_0x4f6790._playheadSec = _0x2a5bee),
-            _0x4f6790._syncPreviewTime(_0x4ed171, _0x14ae19, { immediate: true }),
-            _0x4f6790._updatePlaybackVisuals(_0x4ed171),
-            _0x4f6790._pausePreviewPlayback());
+          ((enabled21._playheadSec = value93),
+            enabled21._syncPreviewTime(value73, value92, { immediate: true }),
+            enabled21._updatePlaybackVisuals(value73),
+            enabled21._pausePreviewPlayback());
           return;
         }
-        _0x4f6790._playheadSec = Math.max(_0x197ecb, Math.min(_0x2a5bee, _0x5b9372));
-        const _0x2d2823 = clipSourceSecFromTimeline(_0x3b9aeb, _0x4f6790._playheadSec),
-          _0x542279 = mediaSourceSec(_0x306f85, _0x2d2823);
-        if (isMediaBeforeClipStart(_0x306f85, _0x3b9aeb))
-          shouldSeekMediaToSource(_0x4f6790, _0x4ed171, _0x306f85, _0x5a7582)
-            ? _0x4f6790._syncPreviewTime(_0x4ed171, _0x5a7582, { immediate: true })
-            : (_0x4f6790._playheadSec = clockTimelineSecForClip(_0x4f6790, _0x3b9aeb));
+        enabled21._playheadSec = Math.max(toNumber16, Math.min(value93, playbackTimelineSecForClip3));
+        const clipSourceSecFromTimeline3 = clipSourceSecFromTimeline(enabled26, enabled21._playheadSec),
+          mediaSourceSec3 = mediaSourceSec(enabled22, clipSourceSecFromTimeline3);
+        if (isMediaBeforeClipStart(enabled22, enabled26))
+          shouldSeekMediaToSource(enabled21, value73, enabled22, toNumber15)
+            ? enabled21._syncPreviewTime(value73, toNumber15, { immediate: true })
+            : (enabled21._playheadSec = clockTimelineSecForClip(enabled21, enabled26));
         else
-          _0x542279 > _0x14ae19 + MEDIA_CLIP_PLAYBACK_OUT_OF_RANGE_SEEK_SEC &&
-            (_0x4f6790._playheadSec = _0x2a5bee);
+          mediaSourceSec3 > value92 + MEDIA_CLIP_PLAYBACK_OUT_OF_RANGE_SEEK_SEC &&
+            (enabled21._playheadSec = value93);
       } else {
-        const _0xd1fe85 = _0x4f6790._playbackClockTimelineSec(_0x4f6790._playheadSec);
-        if (_0xd1fe85 >= _0x45de8c.endSec) {
-          ((_0x4f6790._playheadSec = _0x45de8c.endSec),
-            _0x4f6790._syncPreviewTime(_0x4ed171, _0x45de8c.endSec, { immediate: true }),
-            _0x4f6790._updatePlaybackVisuals(_0x4ed171),
-            _0x4f6790._pausePreviewPlayback());
+        const value95 = enabled21._playbackClockTimelineSec(enabled21._playheadSec);
+        if (value95 >= enabled23.endSec) {
+          ((enabled21._playheadSec = enabled23.endSec),
+            enabled21._syncPreviewTime(value73, enabled23.endSec, { immediate: true }),
+            enabled21._updatePlaybackVisuals(value73),
+            enabled21._pausePreviewPlayback());
           return;
         }
-        _0x4f6790._playheadSec = Math.max(_0x45de8c.startSec, Math.min(_0x45de8c.endSec, _0xd1fe85));
-        if (_0x4ed171 === 'video') _0x4f6790._syncReplacementAudioFromVideo(_0x4f6790._playheadSec);
+        enabled21._playheadSec = Math.max(enabled23.startSec, Math.min(enabled23.endSec, value95));
+        if (value73 === 'video') enabled21._syncReplacementAudioFromVideo(enabled21._playheadSec);
       }
-      (_0x4f6790._updatePlaybackVisuals(_0x4ed171),
-        _0x4f6790._updatePreviewControls(),
-        (_0x4f6790._playbackRaf = _0x21adea(_0x168c29)));
+      (enabled21._updatePlaybackVisuals(value73),
+        enabled21._updatePreviewControls(),
+        (enabled21._playbackRaf = run4(value76)));
     };
-  _0x4f6790._playbackRaf = _0x21adea(_0x168c29);
+  enabled21._playbackRaf = run4(value76);
 }
-export function setPreviewPlayIcon(_0x57c1ef, _0x3f6c16 = _0x57c1ef._previewPlayButton) {
-  if (!_0x3f6c16) return;
-  const _0x3cc8f0 = _0x57c1ef._playing ? 'playing' : 'paused',
-    _0x53cafe = _0x3f6c16.dataset?.mediaClipPlayState || _0x3f6c16.__mediaClipPlayState || '';
-  if (_0x53cafe !== _0x3cc8f0) {
-    _0x3f6c16.innerHTML = _0x57c1ef._playing
+export function setPreviewPlayIcon(value96, el3 = value96._previewPlayButton) {
+  if (!el3) return;
+  const value97 = value96._playing ? 'playing' : 'paused',
+    value98 = el3.dataset?.mediaClipPlayState || el3.__mediaClipPlayState || '';
+  if (value98 !== value97) {
+    el3.innerHTML = value96._playing
       ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7z"/><path d="M13 5h4v14h-4z"/></svg>'
       : '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
-    const _0x3f6336 = mediaClipText(_0x57c1ef._playing ? 'playback.pause' : 'playback.play');
-    (_0x3f6c16.setAttribute('aria-label', _0x3f6336), (_0x3f6c16.title = _0x3f6336));
-    if (_0x3f6c16.dataset) _0x3f6c16.dataset.mediaClipPlayState = _0x3cc8f0;
-    _0x3f6c16.__mediaClipPlayState = _0x3cc8f0;
+    const mediaClipText2 = mediaClipText(value96._playing ? 'playback.pause' : 'playback.play');
+    (el3.setAttribute('aria-label', mediaClipText2), (el3.title = mediaClipText2));
+    if (el3.dataset) el3.dataset.mediaClipPlayState = value97;
+    el3.__mediaClipPlayState = value97;
   }
-  _0x3f6c16.classList.toggle('is-playing', _0x57c1ef._playing);
+  el3.classList.toggle('is-playing', value96._playing);
 }
-export function updatePreviewControls(_0x13ea1b) {
-  _0x13ea1b._setPreviewPlayIcon();
-  const _0x4cf866 = _0x13ea1b._getPlaybackKind(),
-    _0x5b04cd = _0x13ea1b._getPlaybackTrack(_0x4cf866);
-  if (_0x13ea1b._previewTimeLabel && _0x5b04cd) {
-    const _0x241708 = _0x13ea1b._timelineDisplayEnd(_0x4cf866),
-      _0x3879a1 = Math.max(0, Math.min(toNumber(_0x13ea1b._playheadSec, 0), _0x241708)),
-      _0x207f8d = formatPreviewTime(_0x3879a1) + ' / ' + formatPreviewTime(_0x241708);
-    _0x13ea1b._previewTimeLabel.textContent !== _0x207f8d &&
-      (_0x13ea1b._previewTimeLabel.textContent = _0x207f8d);
+export function updatePreviewControls(value99) {
+  value99._setPreviewPlayIcon();
+  const value100 = value99._getPlaybackKind(),
+    value101 = value99._getPlaybackTrack(value100);
+  if (value99._previewTimeLabel && value101) {
+    const value102 = value99._timelineDisplayEnd(value100),
+      value103 = Math.max(0, Math.min(toNumber(value99._playheadSec, 0), value102)),
+      formatPreviewTime2 = formatPreviewTime(value103) + ' / ' + formatPreviewTime(value102);
+    value99._previewTimeLabel.textContent !== formatPreviewTime2 &&
+      (value99._previewTimeLabel.textContent = formatPreviewTime2);
   }
 }

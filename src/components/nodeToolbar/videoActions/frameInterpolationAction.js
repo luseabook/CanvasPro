@@ -1,220 +1,205 @@
 import { RH_VIDEO_FRAME_INTERPOLATION_MODEL_ID, resolveModelExecution } from '../../../manifests/index.js';
 import { t } from '../../../i18n/index.js';
-function frameInterpolationText(_0x22e3e1, _0x1a6ca1 = {}) {
-  return t('nodeToolbar.videoFrameInterpolation.' + _0x22e3e1, _0x1a6ca1);
+function frameInterpolationText(value, item = {}) {
+  return t('nodeToolbar.videoFrameInterpolation.' + value, item);
 }
-function uniqueList(_0x59cf64) {
-  return Array.from(new Set(_0x59cf64.map((_0x5ec9aa) => String(_0x5ec9aa || '').trim()).filter(Boolean)));
+function uniqueList(list) {
+  return Array.from(new Set(list.map((item2) => String(item2 || '').trim()).filter(Boolean)));
 }
-function getFrameTaskOutputText(_0x4ea6ca, { error: error = '' } = {}) {
-  const _0x3d71cc = frameInterpolationText('outputText', {
+function getFrameTaskOutputText(status, { error: error = '' } = {}) {
+  const outputText = frameInterpolationText('outputText', {
     model: frameInterpolationText('modelLabel'),
-    status: _0x4ea6ca,
+    status: status,
   });
   return error
-    ? frameInterpolationText('outputTextWithError', { outputText: _0x3d71cc, error: error })
-    : _0x3d71cc;
+    ? frameInterpolationText('outputTextWithError', { outputText: outputText, error: error })
+    : outputText;
 }
-function getFrameTaskOutputTextIncludes(_0x2eef38) {
-  return uniqueList([
-    ...(_0x2eef38?.toolbarTaskOutputTextIncludes || []),
-    frameInterpolationText('modelLabel'),
-  ]);
+function getFrameTaskOutputTextIncludes(key) {
+  return uniqueList([...(key?.toolbarTaskOutputTextIncludes || []), frameInterpolationText('modelLabel')]);
 }
 function getVideoFrameInterpolationConfig() {
-  const _0x9265b3 = resolveModelExecution(RH_VIDEO_FRAME_INTERPOLATION_MODEL_ID),
-    _0xf08b03 = _0x9265b3?.modelManifest?.extensions?.videoFrameInterpolation || null,
-    _0x89d2a7 = _0x9265b3?.executionManifest?.mapping?.sourceVideoNode || null,
-    _0x179e54 = String(
-      _0x9265b3?.executionManifest?.appId || _0x9265b3?.executionManifest?.workflowId || '',
-    ).trim(),
-    _0xfe6a8 = String(_0xf08b03?.taskType || '').trim();
-  if (!_0x9265b3 || !_0xf08b03 || !_0x89d2a7 || !_0x179e54 || !_0xfe6a8)
+  const modelId = resolveModelExecution(RH_VIDEO_FRAME_INTERPOLATION_MODEL_ID),
+    enabled = modelId?.modelManifest?.extensions?.videoFrameInterpolation || null,
+    sourceVideoNode = modelId?.executionManifest?.mapping?.sourceVideoNode || null,
+    appId = String(modelId?.executionManifest?.appId || modelId?.executionManifest?.workflowId || '').trim(),
+    taskType = String(enabled?.taskType || '').trim();
+  if (!modelId || !enabled || !sourceVideoNode || !appId || !taskType)
     throw new Error('Video frame interpolation manifest extension missing');
   return {
-    modelId: _0x9265b3.modelManifest.modelId,
-    provider: _0x9265b3.modelManifest.provider,
-    adapterType: _0x9265b3.modelManifest.adapterType,
-    executionId: _0x9265b3.executionManifest.id,
-    appId: _0x179e54,
-    taskType: _0xfe6a8,
-    toolbarTaskOutputTextIncludes: Array.isArray(_0xf08b03.toolbarTaskOutputTextIncludes)
-      ? _0xf08b03.toolbarTaskOutputTextIncludes
-          .map((_0x56d4b3) => String(_0x56d4b3 || '').trim())
-          .filter(Boolean)
+    modelId: modelId.modelManifest.modelId,
+    provider: modelId.modelManifest.provider,
+    adapterType: modelId.modelManifest.adapterType,
+    executionId: modelId.executionManifest.id,
+    appId: appId,
+    taskType: taskType,
+    toolbarTaskOutputTextIncludes: Array.isArray(enabled.toolbarTaskOutputTextIncludes)
+      ? enabled.toolbarTaskOutputTextIncludes.map((item3) => String(item3 || '').trim()).filter(Boolean)
       : [],
-    sourceVideoNode: _0x89d2a7,
-    instanceType: _0x9265b3.executionManifest.instanceType?.defaultValue || 'default',
+    sourceVideoNode: sourceVideoNode,
+    instanceType: modelId.executionManifest.instanceType?.defaultValue || 'default',
   };
 }
-export function bindVideoFrameInterpolationAction(_0x3dbb2e) {
+export function bindVideoFrameInterpolationAction(index) {
   const {
-      toolbarEl: _0x159e15,
-      nodeData: _0x217bf5,
-      store: _0xb4d852,
-      submitTask: _0x34cbd9,
-      createRunningHubTaskStateMachine: _0x5dc9ab,
-      runRunninghubAiApp: _0x2b980d,
-      resumeRunninghubWorkflowTask: _0x119576,
-      processInputVideos: _0x42c654,
-      getProviderConfig: _0x28cd67,
-      ensureConfig: _0x277bd5,
-      calcSafeSpawnPosNearNode: _0x2cc767,
-      buildSourceMediaNodePayload: _0xe594c2,
-      getAutoMediaSizeByShortSide: _0xa4495e,
-      buildCanvasLocalVideoFields: _0x34d163,
-      buildVideoGenerationFailurePatch: _0x2f1a23,
-      buildVideoGenerationResultPatch: _0x32a7a4,
-      bindRunningHubToolbarTaskButton: _0x20f378,
-      cancelRunningHubResultTask: _0x39c3a5,
-      findRunningHubToolbarTaskForNode: _0x9bed62,
-      isRunningHubToolbarTaskCancelled: _0x43fd9d,
-      notifyRunningHubToolbarTasksChanged: _0xcfa116,
-      _getCurrentVideoUrl: _0x1a16e9,
-      _ensureVideoHdDurationAllowed: _0x13f1d2,
-      _extractFirstUrl: _0x271060,
-      _saveRemoteVideoResult: _0x217eb0,
-    } = _0x3dbb2e,
-    _0x1e238f = getVideoFrameInterpolationConfig(),
-    _0x316162 = _0x5dc9ab(),
-    _0x304556 = _0x316162.state,
-    _0x4d3f3b = _0x159e15.querySelector('.act-replace');
-  _0x4d3f3b &&
-    (_0x316162.bindButton(_0x4d3f3b),
-    _0x20f378({
-      button: _0x4d3f3b,
+      toolbarEl: toolbarEl,
+      nodeData: nodeData,
+      store: store,
+      submitTask: submitTask,
+      createRunningHubTaskStateMachine: createRunningHubTaskStateMachine,
+      runRunninghubAiApp: runRunninghubAiApp,
+      resumeRunninghubWorkflowTask: resumeRunninghubWorkflowTask,
+      processInputVideos: processInputVideos,
+      getProviderConfig: getProviderConfig,
+      ensureConfig: ensureConfig,
+      calcSafeSpawnPosNearNode: calcSafeSpawnPosNearNode,
+      buildSourceMediaNodePayload: buildSourceMediaNodePayload,
+      getAutoMediaSizeByShortSide: getAutoMediaSizeByShortSide,
+      buildCanvasLocalVideoFields: buildCanvasLocalVideoFields,
+      buildVideoGenerationFailurePatch: buildVideoGenerationFailurePatch,
+      buildVideoGenerationResultPatch: buildVideoGenerationResultPatch,
+      bindRunningHubToolbarTaskButton: bindRunningHubToolbarTaskButton,
+      cancelRunningHubResultTask: cancelRunningHubResultTask,
+      findRunningHubToolbarTaskForNode: findRunningHubToolbarTaskForNode,
+      isRunningHubToolbarTaskCancelled: isRunningHubToolbarTaskCancelled,
+      notifyRunningHubToolbarTasksChanged: notifyRunningHubToolbarTasksChanged,
+      _getCurrentVideoUrl: _getCurrentVideoUrl,
+      _ensureVideoHdDurationAllowed: _ensureVideoHdDurationAllowed,
+      _extractFirstUrl: _extractFirstUrl,
+      _saveRemoteVideoResult: _saveRemoteVideoResult,
+    } = index,
+    taskType2 = getVideoFrameInterpolationConfig(),
+    result = createRunningHubTaskStateMachine(),
+    outId = result.state,
+    button = toolbarEl.querySelector('.act-replace');
+  button &&
+    (result.bindButton(button),
+    bindRunningHubToolbarTaskButton({
+      button: button,
       getTask: () =>
-        _0x9bed62(_0x217bf5.id, {
-          models: [_0x1e238f.modelId],
-          taskTypes: [_0x1e238f.taskType],
-          outputTextIncludes: getFrameTaskOutputTextIncludes(_0x1e238f),
+        findRunningHubToolbarTaskForNode(nodeData.id, {
+          models: [taskType2.modelId],
+          taskTypes: [taskType2.taskType],
+          outputTextIncludes: getFrameTaskOutputTextIncludes(taskType2),
         }),
-      cancelTask: async (_0x15a30f) => {
+      cancelTask: async (data) => {
         try {
-          if (_0x304556.active && String(_0x304556.outNodeId || '') === _0x15a30f.outId)
+          if (outId.active && String(outId.outNodeId || '') === data.outId)
             try {
-              await _0x316162.cancel();
-            } catch (_0x52855e) {
-              console.warn('[VideoFrameInterpolation] cancel request failed:', _0x52855e);
+              await result.cancel();
+            } catch (options) {
+              console.warn('[VideoFrameInterpolation] cancel request failed:', options);
             }
-          return await _0x39c3a5(_0x15a30f, {
+          return await cancelRunningHubResultTask(data, {
             name: frameInterpolationText('cancelledName'),
             outputText: getFrameTaskOutputText(frameInterpolationText('status.cancelled')),
             notifyMessage: frameInterpolationText('cancelledToast'),
           });
         } finally {
-          _0x304556.active &&
-            String(_0x304556.outNodeId || '') === _0x15a30f.outId &&
-            _0x316162.reset(_0x4d3f3b);
+          outId.active && String(outId.outNodeId || '') === data.outId && result.reset(button);
         }
       },
       cancelTooltip: frameInterpolationText('cancelTooltip'),
     }),
-    _0x4d3f3b.addEventListener('click', (_0x4bcdb1) => {
-      (_0x4bcdb1.stopPropagation(), _0x4bcdb1.preventDefault());
-      if (_0x304556.active) {
+    button.addEventListener('click', (event) => {
+      (event.stopPropagation(), event.preventDefault());
+      if (outId.active) {
         (async () => {
-          let _0x56e61b = null;
+          let target = null;
           try {
-            const _0xea01e1 = _0x304556.outNodeId
+            const source = outId.outNodeId
               ? {
-                  outId: _0x304556.outNodeId,
-                  targetNodeId: _0x304556.outNodeId,
-                  taskId: _0x304556.taskId,
-                  apiKey: _0x304556.apiKey,
-                  sourceNodeId: _0x217bf5.id,
+                  outId: outId.outNodeId,
+                  targetNodeId: outId.outNodeId,
+                  taskId: outId.taskId,
+                  apiKey: outId.apiKey,
+                  sourceNodeId: nodeData.id,
                 }
               : null;
-            _0xea01e1
-              ? await _0x39c3a5(_0xea01e1, {
+            source
+              ? await cancelRunningHubResultTask(source, {
                   name: frameInterpolationText('cancelledName'),
                   outputText: getFrameTaskOutputText(frameInterpolationText('status.cancelled')),
                   notifyMessage: frameInterpolationText('cancelledToast'),
                 })
-              : (await _0x316162.cancel(),
-                window.showToast?.(frameInterpolationText('taskCancelled'), 'info'));
-          } catch (_0x26960d) {
-            _0x56e61b = _0x26960d;
+              : (await result.cancel(), window.showToast?.(frameInterpolationText('taskCancelled'), 'info'));
+          } catch (next) {
+            target = next;
           }
           try {
-            _0x56e61b && console.warn('[VideoFrameInterpolation] cancel request failed:', _0x56e61b);
+            target && console.warn('[VideoFrameInterpolation] cancel request failed:', target);
           } finally {
-            _0x316162.reset(_0x4d3f3b);
+            result.reset(button);
           }
         })();
         return;
       }
       (async () => {
-        let _0x25275c = null;
-        const _0x12f270 = Date.now(),
-          _0x42a173 = new AbortController();
+        let id = null;
+        const startedAt = Date.now(),
+          abortController = new AbortController();
         try {
-          const _0x2a2a39 = _0xb4d852.getState().nodes?.[_0x217bf5.id];
-          if (!_0x2a2a39) {
+          const sourceNodeId = store.getState().nodes?.[nodeData.id];
+          if (!sourceNodeId) {
             window.showToast?.(frameInterpolationText('sourceNodeMissing'), 'error');
             return;
           }
-          const _0x20cce5 = _0x1a16e9();
-          if (!_0x20cce5) {
+          const inputVideoUrl = _getCurrentVideoUrl();
+          if (!inputVideoUrl) {
             window.showToast?.(frameInterpolationText('noProcessableVideo'), 'error');
             return;
           }
-          if (!(await _0x13f1d2(_0x20cce5))) return;
-          await _0x277bd5();
-          const _0x19a1f6 = _0x28cd67('runninghubwf'),
-            _0x126f9e = String(_0x19a1f6?.apiKey || '').trim();
-          if (!_0x126f9e) {
+          if (!(await _ensureVideoHdDurationAllowed(inputVideoUrl))) return;
+          await ensureConfig();
+          const current = getProviderConfig('runninghubwf'),
+            apiKey = String(current?.apiKey || '').trim();
+          if (!apiKey) {
             window.showToast?.(frameInterpolationText('apiKeyMissing'), 'error');
             return;
           }
-          const _0x1dc537 = _0x2a2a39.width || 0x12c,
-            _0x1c7360 = _0x2a2a39.height || 0x12c,
-            { width: _0x2720d3, height: _0x284581 } = _0xa4495e(_0x1dc537, _0x1c7360),
-            { x: _0x293b5b, y: _0x300445 } = _0x2cc767(
-              _0xb4d852.getState().nodes,
-              _0x2a2a39,
-              _0x2720d3,
-              _0x284581,
-            );
-          _0x25275c = 'source-video-frame-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-          const _0x56e716 = await _0x34cbd9(
+          const entry = sourceNodeId.width || 0x12c,
+            record = sourceNodeId.height || 0x12c,
+            { width: width, height: height } = getAutoMediaSizeByShortSide(entry, record),
+            { x: x, y: y } = calcSafeSpawnPosNearNode(store.getState().nodes, sourceNodeId, width, height);
+          id = 'source-video-frame-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+          const response = await submitTask(
             {
-              sourceNodeId: _0x2a2a39.id,
+              sourceNodeId: sourceNodeId.id,
               trigger: 'toolbar',
-              taskType: _0x1e238f.taskType,
-              provider: _0x1e238f.provider,
-              adapterType: _0x1e238f.adapterType,
-              modelId: _0x1e238f.modelId,
-              executionId: _0x1e238f.executionId,
-              payload: { apiKey: _0x126f9e, inputVideoUrl: _0x20cce5, appId: _0x1e238f.appId },
+              taskType: taskType2.taskType,
+              provider: taskType2.provider,
+              adapterType: taskType2.adapterType,
+              modelId: taskType2.modelId,
+              executionId: taskType2.executionId,
+              payload: { apiKey: apiKey, inputVideoUrl: inputVideoUrl, appId: taskType2.appId },
               cancellable: true,
               resumable: true,
               pauseOnAbort: 'afterTaskId',
-              onTaskChange: ({ sourceNodeId: _0x15fffc, targetNodeId: _0x400380 }) =>
-                _0xcfa116({ sourceNodeId: _0x15fffc, outId: _0x400380 }),
-              createTargetNode: ({ startPatch: _0x3bf036, protocolPatch: _0x15ef1b }) =>
-                _0xe594c2({
-                  id: _0x25275c,
+              onTaskChange: ({ sourceNodeId: sourceNodeId2, targetNodeId: targetNodeId }) =>
+                notifyRunningHubToolbarTasksChanged({ sourceNodeId: sourceNodeId2, outId: targetNodeId }),
+              createTargetNode: ({ startPatch: startPatch, protocolPatch: protocolPatch }) =>
+                buildSourceMediaNodePayload({
+                  id: id,
                   type: 'source-video',
-                  x: _0x293b5b,
-                  y: _0x300445,
-                  width: _0x2720d3,
-                  height: _0x284581,
+                  x: x,
+                  y: y,
+                  width: width,
+                  height: height,
                   name: frameInterpolationText('processingName'),
                   src: '',
                   localPath: '',
                   fileName: 'frame_' + Date.now() + '.mp4',
-                  ..._0x3bf036,
-                  provider: _0x1e238f.provider,
-                  model: _0x1e238f.modelId,
+                  ...startPatch,
+                  provider: taskType2.provider,
+                  model: taskType2.modelId,
                   rhTaskUseOpenapiQuery: true,
-                  ..._0x15ef1b,
+                  ...protocolPatch,
                   outputText: getFrameTaskOutputText(frameInterpolationText('status.processing')),
                 }),
-              cancel: async ({ taskId: _0x49379b }) => {
-                if (!_0x126f9e || !_0x49379b) return;
-                await _0x39c3a5(
-                  { outId: _0x25275c, taskId: _0x49379b, sourceNodeId: _0x2a2a39.id, apiKey: _0x126f9e },
+              cancel: async ({ taskId: taskId }) => {
+                if (!apiKey || !taskId) return;
+                await cancelRunningHubResultTask(
+                  { outId: id, taskId: taskId, sourceNodeId: sourceNodeId.id, apiKey: apiKey },
                   {
                     name: frameInterpolationText('cancelledName'),
                     outputText: getFrameTaskOutputText(frameInterpolationText('status.cancelled')),
@@ -222,60 +207,56 @@ export function bindVideoFrameInterpolationAction(_0x3dbb2e) {
                   },
                 );
               },
-              submit: async (_0x4d661e, _0x2568b5) => {
-                (_0x316162.activate({
-                  button: _0x4d3f3b,
-                  apiKey: _0x126f9e,
-                  abortController: _0x42a173,
-                  outNodeId: _0x2568b5.targetNodeId,
+              submit: async (appId2, outNodeId) => {
+                (result.activate({
+                  button: button,
+                  apiKey: apiKey,
+                  abortController: abortController,
+                  outNodeId: outNodeId.targetNodeId,
                 }),
-                  _0xb4d852.setSelectedNodes([_0x2568b5.targetNodeId]));
+                  store.setSelectedNodes([outNodeId.targetNodeId]));
                 typeof window.v2FocusOnNodes === 'function'
-                  ? window.v2FocusOnNodes([_0x2a2a39.id, _0x2568b5.targetNodeId])
-                  : window.v2FocusOnNode?.(_0x2568b5.targetNodeId);
+                  ? window.v2FocusOnNodes([sourceNodeId.id, outNodeId.targetNodeId])
+                  : window.v2FocusOnNode?.(outNodeId.targetNodeId);
                 window.showToast?.(frameInterpolationText('uploading'), 'info');
-                const _0x1e96bb = await _0x42c654([_0x4d661e.inputVideoUrl], _0x126f9e),
-                  _0x54bb03 = _0x1e96bb[0];
-                if (!_0x54bb03) throw new Error(frameInterpolationText('uploadNoDownloadUrl'));
-                if (_0x43fd9d(_0x2568b5.targetNodeId)) throw new Error('CANCELLED');
+                const payload = await processInputVideos([appId2.inputVideoUrl], apiKey),
+                  fieldValue = payload[0];
+                if (!fieldValue) throw new Error(frameInterpolationText('uploadNoDownloadUrl'));
+                if (isRunningHubToolbarTaskCancelled(outNodeId.targetNodeId)) throw new Error('CANCELLED');
                 window.showToast?.(frameInterpolationText('processingToast'), 'info');
-                const _0x575740 = await _0x2b980d(
+                const handle = await runRunninghubAiApp(
                     {
-                      apiKey: _0x126f9e,
-                      appId: _0x4d661e.appId,
+                      apiKey: apiKey,
+                      appId: appId2.appId,
                       nodeInfoList: [
                         {
-                          nodeId: String(_0x1e238f.sourceVideoNode.nodeId || ''),
-                          fieldName: String(_0x1e238f.sourceVideoNode.fieldName || ''),
-                          fieldValue: _0x54bb03,
+                          nodeId: String(taskType2.sourceVideoNode.nodeId || ''),
+                          fieldName: String(taskType2.sourceVideoNode.fieldName || ''),
+                          fieldValue: fieldValue,
                           description: String(
-                            _0x1e238f.sourceVideoNode.description ||
-                              _0x1e238f.sourceVideoNode.fieldName ||
+                            taskType2.sourceVideoNode.description ||
+                              taskType2.sourceVideoNode.fieldName ||
                               'video',
                           ),
                         },
                       ],
-                      instanceType: _0x1e238f.instanceType,
+                      instanceType: taskType2.instanceType,
                       usePersonalQueue: 'false',
                     },
-                    { signal: _0x2568b5.signal },
+                    { signal: outNodeId.signal },
                   ),
-                  _0x935526 = String(
-                    _0x575740?.data?.taskId ||
-                      _0x575740?.data?.task_id ||
-                      _0x575740?.taskId ||
-                      _0x575740?.task_id ||
-                      '',
+                  taskId2 = String(
+                    handle?.data?.taskId || handle?.data?.task_id || handle?.taskId || handle?.task_id || '',
                   ).trim();
-                if (!_0x935526) throw new Error(frameInterpolationText('taskIdMissing'));
-                (_0x316162.setTaskId(_0x935526), _0x2568b5.onTaskId?.(_0x935526));
-                if (_0x316162.isCancelled() || _0x43fd9d(_0x2568b5.targetNodeId)) {
-                  await _0x39c3a5(
+                if (!taskId2) throw new Error(frameInterpolationText('taskIdMissing'));
+                (result.setTaskId(taskId2), outNodeId.onTaskId?.(taskId2));
+                if (result.isCancelled() || isRunningHubToolbarTaskCancelled(outNodeId.targetNodeId)) {
+                  await cancelRunningHubResultTask(
                     {
-                      outId: _0x2568b5.targetNodeId,
-                      taskId: _0x935526,
-                      sourceNodeId: _0x2a2a39.id,
-                      apiKey: _0x126f9e,
+                      outId: outNodeId.targetNodeId,
+                      taskId: taskId2,
+                      sourceNodeId: sourceNodeId.id,
+                      apiKey: apiKey,
                     },
                     {
                       name: frameInterpolationText('cancelledName'),
@@ -285,48 +266,49 @@ export function bindVideoFrameInterpolationAction(_0x3dbb2e) {
                   );
                   throw new Error('CANCELLED');
                 }
-                return { taskId: _0x935526 };
+                return { taskId: taskId2 };
               },
-              poll: async ({ taskId: _0x3cee2a, signal: _0xcf23a3, targetNodeId: _0x314c70 }) => {
-                const _0x1b0b6b = await _0x119576(
-                  { apiKey: _0x126f9e, taskId: _0x3cee2a },
-                  { signal: _0xcf23a3, useOpenapiQuery: true },
+              poll: async ({ taskId: taskId3, signal: signal, targetNodeId: targetNodeId2 }) => {
+                const state = await resumeRunninghubWorkflowTask(
+                  { apiKey: apiKey, taskId: taskId3 },
+                  { signal: signal, useOpenapiQuery: true },
                 );
-                if (_0x43fd9d(_0x314c70)) throw new Error('CANCELLED');
-                const _0x1551ca = _0x271060(_0x1b0b6b);
-                if (!_0x1551ca) throw new Error(frameInterpolationText('missingOutputUrl'));
-                const _0x473de1 = await _0x217eb0(_0x1551ca);
-                if (_0x43fd9d(_0x314c70)) throw new Error('CANCELLED');
-                if (!_0x473de1) throw new Error(frameInterpolationText('localSaveFailed'));
+                if (isRunningHubToolbarTaskCancelled(targetNodeId2)) throw new Error('CANCELLED');
+                const resultUrl = _extractFirstUrl(state);
+                if (!resultUrl) throw new Error(frameInterpolationText('missingOutputUrl'));
+                const localPath = await _saveRemoteVideoResult(resultUrl);
+                if (isRunningHubToolbarTaskCancelled(targetNodeId2)) throw new Error('CANCELLED');
+                if (!localPath) throw new Error(frameInterpolationText('localSaveFailed'));
                 return {
-                  resultUrl: _0x1551ca,
-                  localVideoFields: _0x34d163({ localPath: _0x473de1, videoUrl: _0x1551ca }),
+                  resultUrl: resultUrl,
+                  localVideoFields: buildCanvasLocalVideoFields({
+                    localPath: localPath,
+                    videoUrl: resultUrl,
+                  }),
                 };
               },
-              resultBuilder: ({ localVideoFields: _0x4bcb5d }) => {
-                const _0x2e0df0 =
-                  Date.now() -
-                  Number(_0xb4d852.getState().nodes?.[_0x25275c]?.generationStartTime || _0x12f270);
+              resultBuilder: ({ localVideoFields: localVideoFields }) => {
+                const duration =
+                  Date.now() - Number(store.getState().nodes?.[id]?.generationStartTime || startedAt);
                 return {
                   name: frameInterpolationText('resultName'),
-                  ..._0x32a7a4(_0x4bcb5d, { duration: _0x2e0df0 }),
-                  ..._0x4bcb5d,
+                  ...buildVideoGenerationResultPatch(localVideoFields, { duration: duration }),
+                  ...localVideoFields,
                   fileName: 'frame_' + Date.now() + '.mp4',
                   outputText: getFrameTaskOutputText(frameInterpolationText('status.complete')),
                 };
               },
-              failureBuilder: (_0x57d98e) => {
-                const _0x4bb6ee = _0x57d98e instanceof Error ? _0x57d98e.message : String(_0x57d98e || ''),
-                  _0x4c5897 =
-                    Date.now() -
-                    Number(_0xb4d852.getState().nodes?.[_0x25275c]?.generationStartTime || _0x12f270);
+              failureBuilder: (error2) => {
+                const name = error2 instanceof Error ? error2.message : String(error2 || ''),
+                  duration2 =
+                    Date.now() - Number(store.getState().nodes?.[id]?.generationStartTime || startedAt);
                 return {
                   name:
-                    _0x4bb6ee === frameInterpolationText('localSaveFailed')
+                    name === frameInterpolationText('localSaveFailed')
                       ? frameInterpolationText('resultName')
                       : frameInterpolationText('failedName'),
-                  ..._0x2f1a23({ error: _0x4bb6ee, duration: _0x4c5897 }),
-                  ...(_0x4bb6ee === frameInterpolationText('localSaveFailed')
+                  ...buildVideoGenerationFailurePatch({ error: name, duration: duration2 }),
+                  ...(name === frameInterpolationText('localSaveFailed')
                     ? {
                         src: '',
                         videoUrl: '',
@@ -334,13 +316,13 @@ export function bindVideoFrameInterpolationAction(_0x3dbb2e) {
                         thumbUrl: '',
                         videoMetaSrc: '',
                         fileName: 'frame_' + Date.now() + '.mp4',
-                        rhStatusMessage: _0x4bb6ee,
+                        rhStatusMessage: name,
                       }
                     : {}),
                   outputText:
-                    _0x4bb6ee === frameInterpolationText('localSaveFailed')
+                    name === frameInterpolationText('localSaveFailed')
                       ? getFrameTaskOutputText(frameInterpolationText('status.failed'))
-                      : getFrameTaskOutputText(frameInterpolationText('status.failed'), { error: _0x4bb6ee }),
+                      : getFrameTaskOutputText(frameInterpolationText('status.failed'), { error: name }),
                 };
               },
               cancelledBuilder: () => ({
@@ -348,38 +330,36 @@ export function bindVideoFrameInterpolationAction(_0x3dbb2e) {
                 outputText: getFrameTaskOutputText(frameInterpolationText('status.cancelled')),
               }),
             },
-            { store: _0xb4d852, abortController: _0x42a173, startedAt: _0x12f270 },
+            { store: store, abortController: abortController, startedAt: startedAt },
           );
-          if (_0x56e716.status === 'success')
+          if (response.status === 'success')
             (window._triggerLocalCacheSave?.(),
               window.showToast?.(frameInterpolationText('successToast'), 'success'));
           else {
-            if (_0x56e716.status === 'cancelled')
-              !_0x304556.cancelRequested &&
-                window.showToast?.(frameInterpolationText('taskCancelled'), 'info');
+            if (response.status === 'cancelled')
+              !outId.cancelRequested && window.showToast?.(frameInterpolationText('taskCancelled'), 'info');
             else {
-              if (_0x56e716.status === 'failed') {
-                const _0x12676a =
-                  _0x56e716.error instanceof Error ? _0x56e716.error.message : String(_0x56e716.error || '');
-                window.showToast?.(frameInterpolationText('failedWithError', { error: _0x12676a }), 'error');
+              if (response.status === 'failed') {
+                const error3 =
+                  response.error instanceof Error ? response.error.message : String(response.error || '');
+                window.showToast?.(frameInterpolationText('failedWithError', { error: error3 }), 'error');
               }
             }
           }
-        } catch (_0x1121e3) {
-          const _0x4a7cf9 = _0x1121e3 instanceof Error ? _0x1121e3.message : String(_0x1121e3 || ''),
-            _0x361b76 =
-              _0x304556.cancelRequested ||
-              _0x316162.isCancelled() ||
-              _0x4a7cf9 === 'CANCELLED' ||
-              _0x4a7cf9 === frameInterpolationText('taskCancelled') ||
-              _0x4a7cf9 === '任务已取消' ||
-              _0x4a7cf9.includes('aborted');
-          _0x361b76
-            ? !_0x304556.cancelRequested &&
-              window.showToast?.(frameInterpolationText('taskCancelled'), 'info')
-            : window.showToast?.(frameInterpolationText('failedWithError', { error: _0x4a7cf9 }), 'error');
+        } catch (error4) {
+          const error5 = error4 instanceof Error ? error4.message : String(error4 || ''),
+            config =
+              outId.cancelRequested ||
+              result.isCancelled() ||
+              error5 === 'CANCELLED' ||
+              error5 === frameInterpolationText('taskCancelled') ||
+              error5 === '任务已取消' ||
+              error5.includes('aborted');
+          config
+            ? !outId.cancelRequested && window.showToast?.(frameInterpolationText('taskCancelled'), 'info')
+            : window.showToast?.(frameInterpolationText('failedWithError', { error: error5 }), 'error');
         } finally {
-          _0x316162.reset(_0x4d3f3b);
+          result.reset(button);
         }
       })();
     }));

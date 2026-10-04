@@ -24,111 +24,111 @@ const pendingUpdates = new Map(),
   videoProxyMigrationUpdateListeners = new Set();
 export function createProxyMigrationRequestTracker({
   retryDelayMs: retryDelayMs = 0x3e8,
-  schedule: schedule = (_0x42000d, _0x24a20b) => setTimeout(_0x42000d, _0x24a20b),
+  schedule: schedule = (value, item) => setTimeout(value, item),
   maxPendingTerminalCount: maxPendingTerminalCount = MAX_PENDING_PROXY_MIGRATION_TERMINAL_COUNT,
 } = {}) {
-  const _0x1778cb = new Set(),
-    _0x2d4d58 = new Map(),
-    _0x2b4f6c = new Map(),
-    _0x433106 = Math['max'](
+  const requestedKeys2 = new Set(),
+    map = new Map(),
+    map2 = new Map(),
+    key = Math['max'](
       0x1,
       Math['min'](
         MAX_PENDING_PROXY_MIGRATION_TERMINAL_COUNT,
         Math['trunc'](Number(maxPendingTerminalCount) || 0x0) || MAX_PENDING_PROXY_MIGRATION_TERMINAL_COUNT,
       ),
     ),
-    _0x789697 = (_0x5e4b4a = {}) => {
-      const _0x40eb88 = String(_0x5e4b4a?.['taskId'] || _0x5e4b4a?.['id'] || '')['trim'](),
-        _0x39d423 = _0x2d4d58['get'](_0x40eb88),
-        _0x21b20c = String(_0x5e4b4a?.['status'] || '')
+    release = (response = {}) => {
+      const index = String(response?.['taskId'] || response?.['id'] || '')['trim'](),
+        enabled = map['get'](index),
+        result = String(response?.['status'] || '')
           ['trim']()
           ['toLowerCase']();
-      if (!_0x39d423) {
+      if (!enabled) {
         if (
-          _0x40eb88 &&
-          TERMINAL_STATUSES['has'](_0x21b20c) &&
-          String(_0x5e4b4a?.['purpose'] || '')['trim']() === VIDEO_PROXY_MIGRATION_PURPOSE
+          index &&
+          TERMINAL_STATUSES['has'](result) &&
+          String(response?.['purpose'] || '')['trim']() === VIDEO_PROXY_MIGRATION_PURPOSE
         ) {
-          _0x2b4f6c['has'](_0x40eb88) && _0x2b4f6c['delete'](_0x40eb88);
-          while (_0x2b4f6c['size'] >= _0x433106) {
-            const _0x40efc5 = _0x2b4f6c['keys']()['next']()['value'];
-            _0x2b4f6c['delete'](_0x40efc5);
+          map2['has'](index) && map2['delete'](index);
+          while (map2['size'] >= key) {
+            const data = map2['keys']()['next']()['value'];
+            map2['delete'](data);
           }
-          _0x2b4f6c['set'](_0x40eb88, _0x5e4b4a);
+          map2['set'](index, response);
         }
         return null;
       }
-      _0x2d4d58['delete'](_0x40eb88);
-      if (_0x21b20c === 'complete' || _0x21b20c === 'cancelled')
-        return (_0x1778cb['delete'](_0x39d423), _0x5e4b4a);
+      map['delete'](index);
+      if (result === 'complete' || result === 'cancelled')
+        return (requestedKeys2['delete'](enabled), response);
       return (
-        _0x21b20c === 'failed' &&
-          schedule(() => _0x1778cb['delete'](_0x39d423), Math['max'](0x0, Number(retryDelayMs) || 0x0)),
-        _0x5e4b4a
+        result === 'failed' &&
+          schedule(() => requestedKeys2['delete'](enabled), Math['max'](0x0, Number(retryDelayMs) || 0x0)),
+        response
       );
     },
-    _0x159db4 = (_0x2eeb6d = {}, _0x3ec347 = '') => {
-      const _0x17d4eb = String(_0x2eeb6d?.['taskId'] || _0x2eeb6d?.['id'] || '')['trim'](),
-        _0x225072 = String(_0x3ec347 || '')['trim']();
-      _0x17d4eb && _0x225072 && (_0x1778cb['add'](_0x225072), _0x2d4d58['set'](_0x17d4eb, _0x225072));
-      const _0x146ccc = String(_0x2eeb6d?.['status'] || '')
+    track = (response2 = {}, options = '') => {
+      const enabled2 = String(response2?.['taskId'] || response2?.['id'] || '')['trim'](),
+        enabled3 = String(options || '')['trim']();
+      enabled2 && enabled3 && (requestedKeys2['add'](enabled3), map['set'](enabled2, enabled3));
+      const target = String(response2?.['status'] || '')
           ['trim']()
           ['toLowerCase'](),
-        _0x748ffd = _0x2b4f6c['get'](_0x17d4eb) || null,
-        _0x8ee98b = _0x748ffd || (TERMINAL_STATUSES['has'](_0x146ccc) ? _0x2eeb6d : null);
-      if (!_0x8ee98b || !_0x17d4eb || !_0x225072) return null;
-      return (_0x2b4f6c['delete'](_0x17d4eb), _0x789697(_0x8ee98b), _0x8ee98b);
+        source = map2['get'](enabled2) || null,
+        enabled4 = source || (TERMINAL_STATUSES['has'](target) ? response2 : null);
+      if (!enabled4 || !enabled2 || !enabled3) return null;
+      return (map2['delete'](enabled2), release(enabled4), enabled4);
     };
-  return { requestedKeys: _0x1778cb, track: _0x159db4, release: _0x789697 };
+  return { requestedKeys: requestedKeys2, track: track, release: release };
 }
 const proxyMigrationRequestTracker = createProxyMigrationRequestTracker();
 export function createMediaTaskListCache({
-  list: _0x528869,
+  list: list,
   ttlMs: ttlMs = PROXY_MIGRATION_TASK_LIST_CACHE_MS,
   now: now = () => Date['now'](),
 } = {}) {
-  let _0x9b2679 = null;
+  let next = null;
   return {
-    async get(_0xffb301 = '') {
-      const _0x2721a6 = Number(now()) || 0x0;
+    async get(enabled5 = '') {
+      const createdAt = Number(now()) || 0x0;
       if (
-        _0x9b2679 &&
-        _0x2721a6 - _0x9b2679['createdAt'] < Math['max'](0x0, Number(ttlMs) || 0x0) &&
-        (_0x9b2679['pending'] || !_0xffb301 || _0x9b2679['taskIds']['has'](_0xffb301))
+        next &&
+        createdAt - next['createdAt'] < Math['max'](0x0, Number(ttlMs) || 0x0) &&
+        (next['pending'] || !enabled5 || next['taskIds']['has'](enabled5))
       )
-        return _0x9b2679['promise'];
-      const _0x3d83b7 = {
-        createdAt: _0x2721a6,
+        return next['promise'];
+      const current = {
+        createdAt: createdAt,
         pending: !![],
-        taskIds: new Set(_0xffb301 ? [_0xffb301] : []),
+        taskIds: new Set(enabled5 ? [enabled5] : []),
         promise: null,
       };
       return (
-        (_0x3d83b7['promise'] = Promise['resolve']()
-          ['then'](() => _0x528869?.())
-          ['then']((_0x2161a1) => {
-            const _0xf31ede = Array['isArray'](_0x2161a1?.['tasks'])
-              ? _0x2161a1['tasks']
-              : Array['isArray'](_0x2161a1)
-                ? _0x2161a1
+        (current['promise'] = Promise['resolve']()
+          ['then'](() => list?.())
+          ['then']((entry) => {
+            const list2 = Array['isArray'](entry?.['tasks'])
+              ? entry['tasks']
+              : Array['isArray'](entry)
+                ? entry
                 : [];
             return (
-              _0xf31ede['forEach']((_0x1dde55) => {
-                const _0x566bc6 = String(_0x1dde55?.['taskId'] || _0x1dde55?.['id'] || '')['trim']();
-                if (_0x566bc6) _0x3d83b7['taskIds']['add'](_0x566bc6);
+              list2['forEach']((record) => {
+                const payload = String(record?.['taskId'] || record?.['id'] || '')['trim']();
+                if (payload) current['taskIds']['add'](payload);
               }),
-              _0xf31ede
+              list2
             );
           })
-          ['catch']((_0x25476c) => {
-            if (_0x9b2679 === _0x3d83b7) _0x9b2679 = null;
-            throw _0x25476c;
+          ['catch']((handle) => {
+            if (next === current) next = null;
+            throw handle;
           })
           ['finally'](() => {
-            _0x3d83b7['pending'] = ![];
+            current['pending'] = ![];
           })),
-        (_0x9b2679 = _0x3d83b7),
-        _0x3d83b7['promise']
+        (next = current),
+        current['promise']
       );
     },
   };
@@ -136,150 +136,152 @@ export function createMediaTaskListCache({
 const mediaTaskListCache = createMediaTaskListCache({
   list: () => desktopBridge['mediaTask']['list']({ limit: 0x1f4 }),
 });
-function normalizeStatus(_0x5eb928) {
-  return String(_0x5eb928 || '')['trim']();
+function normalizeStatus(state) {
+  return String(state || '')['trim']();
 }
-function buildStatusPatch(_0x63b9c1 = {}) {
-  const _0x389691 = normalizeStatus(_0x63b9c1['status']),
-    _0x1c8164 = {
-      mediaTaskId: String(_0x63b9c1['taskId'] || ''),
-      mediaTaskKind: String(_0x63b9c1['kind'] || ''),
-      mediaTaskStatus: _0x389691,
-      mediaTaskProgress: Number(_0x63b9c1['progress'] || 0x0) || 0x0,
-      mediaTaskError: String(_0x63b9c1['error'] || ''),
+function buildStatusPatch(nodeId = {}) {
+  const mediaTaskStatus = normalizeStatus(nodeId['status']),
+    message = {
+      mediaTaskId: String(nodeId['taskId'] || ''),
+      mediaTaskKind: String(nodeId['kind'] || ''),
+      mediaTaskStatus: mediaTaskStatus,
+      mediaTaskProgress: Number(nodeId['progress'] || 0x0) || 0x0,
+      mediaTaskError: String(nodeId['error'] || ''),
     };
-  if (_0x389691 === 'waiting' || _0x389691 === 'processing')
-    ((_0x1c8164['isGenerating'] = !![]),
-      (_0x1c8164['jobStatus'] = 'running'),
-      (_0x1c8164['jobError'] = null));
+  if (mediaTaskStatus === 'waiting' || mediaTaskStatus === 'processing')
+    ((message['isGenerating'] = !![]), (message['jobStatus'] = 'running'), (message['jobError'] = null));
   else {
-    if (_0x389691 === 'complete')
-      ((_0x1c8164['isGenerating'] = ![]),
-        (_0x1c8164['jobStatus'] = 'success'),
-        (_0x1c8164['jobError'] = null));
+    if (mediaTaskStatus === 'complete')
+      ((message['isGenerating'] = ![]), (message['jobStatus'] = 'success'), (message['jobError'] = null));
     else {
-      if (_0x389691 === 'failed')
-        ((_0x1c8164['isGenerating'] = ![]),
-          (_0x1c8164['jobStatus'] = 'error'),
-          (_0x1c8164['jobError'] = _0x1c8164['mediaTaskError'] || 'Media task failed'),
+      if (mediaTaskStatus === 'failed')
+        ((message['isGenerating'] = ![]),
+          (message['jobStatus'] = 'error'),
+          (message['jobError'] = message['mediaTaskError'] || 'Media task failed'),
           void logDiagnosticEvent({
             type: 'generation.media_task_failed',
             level: 'error',
             source: 'renderer',
-            message: _0x1c8164['jobError'],
+            message: message['jobError'],
             context: {
-              taskId: _0x1c8164['mediaTaskId'],
-              kind: _0x1c8164['mediaTaskKind'],
-              nodeId: _0x63b9c1['nodeId'] || '',
-              assetId: _0x63b9c1['assetId'] || '',
+              taskId: message['mediaTaskId'],
+              kind: message['mediaTaskKind'],
+              nodeId: nodeId['nodeId'] || '',
+              assetId: nodeId['assetId'] || '',
             },
           }));
       else
-        _0x389691 === 'cancelled' &&
-          ((_0x1c8164['isGenerating'] = ![]),
-          (_0x1c8164['jobStatus'] = null),
-          (_0x1c8164['jobError'] = null));
+        mediaTaskStatus === 'cancelled' &&
+          ((message['isGenerating'] = ![]), (message['jobStatus'] = null), (message['jobError'] = null));
     }
   }
-  return _0x1c8164;
+  return message;
 }
-function isVideoProxyMigrationEvent(_0x1c7dbc = {}) {
-  return String(_0x1c7dbc?.['purpose'] || '')['trim']() === VIDEO_PROXY_MIGRATION_PURPOSE;
+function isVideoProxyMigrationEvent(options2 = {}) {
+  return String(options2?.['purpose'] || '')['trim']() === VIDEO_PROXY_MIGRATION_PURPOSE;
 }
-function publishVideoProxyMigrationUpdate(_0x22c14a = {}) {
-  if (!isVideoProxyMigrationEvent(_0x22c14a)) return;
-  for (const _0x2429ee of videoProxyMigrationUpdateListeners) {
+function publishVideoProxyMigrationUpdate(options3 = {}) {
+  if (!isVideoProxyMigrationEvent(options3)) return;
+  for (const run of videoProxyMigrationUpdateListeners) {
     try {
-      _0x2429ee(_0x22c14a);
-    } catch (_0x34cdca) {
-      console['warn']('[mediaTaskService]\x20video\x20proxy\x20migration\x20listener\x20failed:', _0x34cdca);
+      run(options3);
+    } catch (config) {
+      console['warn']('[mediaTaskService]\x20video\x20proxy\x20migration\x20listener\x20failed:', config);
     }
   }
 }
-export function subscribeVideoProxyMigrationUpdates(_0x92dd51) {
-  if (typeof _0x92dd51 !== 'function') return () => {};
+export function subscribeVideoProxyMigrationUpdates(scope) {
+  if (typeof scope !== 'function') return () => {};
   return (
-    videoProxyMigrationUpdateListeners['add'](_0x92dd51),
+    videoProxyMigrationUpdateListeners['add'](scope),
     installMediaTaskUpdateListener(),
-    () => videoProxyMigrationUpdateListeners['delete'](_0x92dd51)
+    () => videoProxyMigrationUpdateListeners['delete'](scope)
   );
 }
-export function shouldApplyMediaTaskEventToNode(_0x401d46 = {}, _0x3e642e = {}) {
-  const _0x2fb136 = String(_0x3e642e?.['taskId'] || _0x3e642e?.['id'] || '')['trim']();
-  if (!_0x2fb136) return !![];
-  const _0xf2cdba = String(
-    isVideoProxyMigrationEvent(_0x3e642e)
-      ? _0x401d46?.['videoProxyMigrationTaskId']
-      : _0x401d46?.['mediaTaskId'],
+export function shouldApplyMediaTaskEventToNode(options4 = {}, input = {}) {
+  const enabled6 = String(input?.['taskId'] || input?.['id'] || '')['trim']();
+  if (!enabled6) return !![];
+  const enabled7 = String(
+    isVideoProxyMigrationEvent(input) ? options4?.['videoProxyMigrationTaskId'] : options4?.['mediaTaskId'],
   )['trim']();
-  return !_0xf2cdba || _0xf2cdba === _0x2fb136;
+  return !enabled7 || enabled7 === enabled6;
 }
-function buildVideoProxyMigrationStatusPatch(_0x492ae4 = {}) {
-  const _0x204e5a = normalizeStatus(_0x492ae4['status']);
+function buildVideoProxyMigrationStatusPatch(response3 = {}) {
+  const videoProxyMigrationStatus = normalizeStatus(response3['status']);
   return {
-    videoProxyMigrationTaskId: String(_0x492ae4['taskId'] || ''),
-    videoProxyMigrationStatus: _0x204e5a,
-    videoProxyMigrationError: _0x204e5a === 'failed' ? String(_0x492ae4['error'] || '') : '',
+    videoProxyMigrationTaskId: String(response3['taskId'] || ''),
+    videoProxyMigrationStatus: videoProxyMigrationStatus,
+    videoProxyMigrationError: videoProxyMigrationStatus === 'failed' ? String(response3['error'] || '') : '',
   };
 }
-function shouldClearVideoCapturePreview(_0x57e986 = {}, _0x35acef = {}) {
-  const _0x159bef = String(_0x35acef['videoProxyStatus'] || '')
+function shouldClearVideoCapturePreview(args = {}, args2 = {}) {
+  const output = String(args2['videoProxyStatus'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x159bef !== 'generated' && _0x159bef !== 'not_required') return ![];
-  return !!resolveCanvasVideoUrl({ ..._0x57e986, ..._0x35acef });
+  if (output !== 'generated' && output !== 'not_required') return ![];
+  return !!resolveCanvasVideoUrl({ ...args, ...args2 });
 }
-function buildResultPatch(_0x22468f = {}, _0x541d74 = {}) {
-  const _0x258ec2 = _0x22468f['result'] && typeof _0x22468f['result'] === 'object' ? _0x22468f['result'] : {},
-    _0x409643 = String(_0x22468f['kind'] || '');
-  if (!_0x258ec2 || Object['keys'](_0x258ec2)['length'] === 0x0) return {};
-  if (_0x409643 === 'videoPoster' && isVideoProxyMigrationEvent(_0x22468f))
+function buildResultPatch(options5 = {}, value2 = {}) {
+  const pendingVideoProxyLocalPath =
+      options5['result'] && typeof options5['result'] === 'object' ? options5['result'] : {},
+    value3 = String(options5['kind'] || '');
+  if (!pendingVideoProxyLocalPath || Object['keys'](pendingVideoProxyLocalPath)['length'] === 0x0) return {};
+  if (value3 === 'videoPoster' && isVideoProxyMigrationEvent(options5))
     return buildCanvasLocalVideoFields({
-      pendingVideoProxyLocalPath: _0x258ec2['displayLocalPath'] || '',
-      pendingVideoProxyVersion: _0x258ec2['videoProxyVersion'] || '',
+      pendingVideoProxyLocalPath: pendingVideoProxyLocalPath['displayLocalPath'] || '',
+      pendingVideoProxyVersion: pendingVideoProxyLocalPath['videoProxyVersion'] || '',
     });
-  if (_0x409643 === 'videoPoster' || _0x409643 === 'videoFirstFrame') {
-    const _0x59a8a4 = buildCanvasLocalVideoFields({
-      ...(_0x409643 === 'videoPoster' && _0x258ec2['displayLocalPath']
-        ? { displayLocalPath: _0x258ec2['displayLocalPath'] }
+  if (value3 === 'videoPoster' || value3 === 'videoFirstFrame') {
+    const canvasLocalVideoFields = buildCanvasLocalVideoFields({
+      ...(value3 === 'videoPoster' && pendingVideoProxyLocalPath['displayLocalPath']
+        ? { displayLocalPath: pendingVideoProxyLocalPath['displayLocalPath'] }
         : {}),
-      ...(_0x409643 === 'videoPoster'
+      ...(value3 === 'videoPoster'
         ? {
-            videoProxyStatus: _0x258ec2['videoProxyStatus'] || '',
-            videoProxyVersion: _0x258ec2['videoProxyVersion'] || '',
-            videoCodec: _0x258ec2['videoCodec'] || '',
+            videoProxyStatus: pendingVideoProxyLocalPath['videoProxyStatus'] || '',
+            videoProxyVersion: pendingVideoProxyLocalPath['videoProxyVersion'] || '',
+            videoCodec: pendingVideoProxyLocalPath['videoCodec'] || '',
           }
         : {}),
       posterLocalPath:
-        _0x258ec2['posterLocalPath'] || _0x258ec2['thumbLocalPath'] || _0x258ec2['localPath'] || '',
-      thumbUrl: _0x258ec2['posterUrl'] || _0x258ec2['thumbUrl'] || _0x258ec2['url'] || '',
-      videoThumbSrc: _0x258ec2['src'] || '',
+        pendingVideoProxyLocalPath['posterLocalPath'] ||
+        pendingVideoProxyLocalPath['thumbLocalPath'] ||
+        pendingVideoProxyLocalPath['localPath'] ||
+        '',
+      thumbUrl:
+        pendingVideoProxyLocalPath['posterUrl'] ||
+        pendingVideoProxyLocalPath['thumbUrl'] ||
+        pendingVideoProxyLocalPath['url'] ||
+        '',
+      videoThumbSrc: pendingVideoProxyLocalPath['src'] || '',
     });
     return (
-      _0x409643 === 'videoPoster' &&
-        shouldClearVideoCapturePreview(_0x541d74, _0x59a8a4) &&
-        (_0x59a8a4['capturePreviewUrl'] = ''),
-      _0x59a8a4
+      value3 === 'videoPoster' &&
+        shouldClearVideoCapturePreview(value2, canvasLocalVideoFields) &&
+        (canvasLocalVideoFields['capturePreviewUrl'] = ''),
+      canvasLocalVideoFields
     );
   }
-  if (_0x409643 === 'audioWaveform')
-    return buildCanvasLocalAudioFields({ waveformLocalPath: _0x258ec2['waveformLocalPath'] || '' });
+  if (value3 === 'audioWaveform')
+    return buildCanvasLocalAudioFields({
+      waveformLocalPath: pendingVideoProxyLocalPath['waveformLocalPath'] || '',
+    });
   return {};
 }
-function buildMediaTaskUpdatePatch(_0x412810 = {}, _0x2c17e3 = {}) {
+function buildMediaTaskUpdatePatch(response4 = {}, value4 = {}) {
   return {
-    ...(isVideoProxyMigrationEvent(_0x412810)
-      ? buildVideoProxyMigrationStatusPatch(_0x412810)
-      : buildStatusPatch(_0x412810)),
-    ...(normalizeStatus(_0x412810['status']) === 'complete' ? buildResultPatch(_0x412810, _0x2c17e3) : {}),
+    ...(isVideoProxyMigrationEvent(response4)
+      ? buildVideoProxyMigrationStatusPatch(response4)
+      : buildStatusPatch(response4)),
+    ...(normalizeStatus(response4['status']) === 'complete' ? buildResultPatch(response4, value4) : {}),
   };
 }
-function getUpdateKey(_0x30dbdd = {}) {
+function getUpdateKey(options6 = {}) {
   return [
-    String(_0x30dbdd['taskId'] || ''),
-    String(_0x30dbdd['kind'] || ''),
-    String(_0x30dbdd['nodeId'] || ''),
-    String(_0x30dbdd['assetId'] || ''),
+    String(options6['taskId'] || ''),
+    String(options6['kind'] || ''),
+    String(options6['nodeId'] || ''),
+    String(options6['assetId'] || ''),
   ]['join']('|');
 }
 function nowMs() {
@@ -287,307 +289,309 @@ function nowMs() {
 }
 function flushPendingUpdates() {
   ((pendingUpdateTimer = null), (lastPendingUpdateFlushAt = nowMs()));
-  const _0x4438ea = Array['from'](pendingUpdates['values']());
+  const list3 = Array['from'](pendingUpdates['values']());
   (pendingUpdates['clear'](),
-    _0x4438ea['forEach']((_0x52fcd2) => {
+    list3['forEach']((value5) => {
       try {
-        applyMediaTaskUpdate(_0x52fcd2);
-      } catch (_0xa36daf) {
-        console['warn']('[mediaTaskService] failed to apply media task update:', _0xa36daf);
+        applyMediaTaskUpdate(value5);
+      } catch (value6) {
+        console['warn']('[mediaTaskService] failed to apply media task update:', value6);
       }
     }));
 }
 function schedulePendingUpdateFlush() {
   if (pendingUpdateTimer !== null) return;
-  const _0x3cf9a9 = nowMs() - lastPendingUpdateFlushAt,
-    _0x1b98ec = Math['max'](0x0, COALESCED_UPDATE_INTERVAL_MS - _0x3cf9a9);
-  pendingUpdateTimer = setTimeout(flushPendingUpdates, _0x1b98ec);
+  const nowMs2 = nowMs() - lastPendingUpdateFlushAt,
+    value7 = Math['max'](0x0, COALESCED_UPDATE_INTERVAL_MS - nowMs2);
+  pendingUpdateTimer = setTimeout(flushPendingUpdates, value7);
 }
-function handleMediaTaskUpdate(_0x1929fd = {}) {
-  publishVideoProxyMigrationUpdate(_0x1929fd);
-  const _0x21043a = normalizeStatus(_0x1929fd['status']),
-    _0x4d2a55 = getUpdateKey(_0x1929fd);
-  if (TERMINAL_STATUSES['has'](_0x21043a)) {
-    const _0x2428b8 = pendingUpdates['get'](_0x4d2a55);
-    if (_0x2428b8) pendingUpdates['delete'](_0x4d2a55);
-    (proxyMigrationRequestTracker['release'](_0x1929fd),
-      applyMediaTaskUpdate({ ...(_0x2428b8 || {}), ..._0x1929fd }));
+function handleMediaTaskUpdate(response5 = {}) {
+  publishVideoProxyMigrationUpdate(response5);
+  const status = normalizeStatus(response5['status']),
+    updateKey = getUpdateKey(response5);
+  if (TERMINAL_STATUSES['has'](status)) {
+    const value8 = pendingUpdates['get'](updateKey);
+    if (value8) pendingUpdates['delete'](updateKey);
+    (proxyMigrationRequestTracker['release'](response5),
+      applyMediaTaskUpdate({ ...(value8 || {}), ...response5 }));
     return;
   }
-  if (COALESCED_STATUSES['has'](_0x21043a)) {
-    (pendingUpdates['set'](_0x4d2a55, _0x1929fd), schedulePendingUpdateFlush());
+  if (COALESCED_STATUSES['has'](status)) {
+    (pendingUpdates['set'](updateKey, response5), schedulePendingUpdateFlush());
     return;
   }
-  applyMediaTaskUpdate(_0x1929fd);
+  applyMediaTaskUpdate(response5);
 }
-function resolveMatchingNodeIds(_0x424a36 = {}, _0x9efc6a = {}) {
-  const _0x204ab0 = String(_0x9efc6a['nodeId'] || '')['trim'](),
-    _0x1a1437 = String(_0x9efc6a['assetId'] || '')['trim'](),
-    _0x2ddd23 = [];
-  if (_0x204ab0 && _0x424a36[_0x204ab0]) _0x2ddd23['push'](_0x204ab0);
-  const _0x50e10a =
-    !_0x204ab0 ||
-    (String(_0x9efc6a?.['status'] || '')
+function resolveMatchingNodeIds(options7 = {}, response6 = {}) {
+  const enabled8 = String(response6['nodeId'] || '')['trim'](),
+    value9 = String(response6['assetId'] || '')['trim'](),
+    list4 = [];
+  if (enabled8 && options7[enabled8]) list4['push'](enabled8);
+  const value10 =
+    !enabled8 ||
+    (String(response6?.['status'] || '')
       ['trim']()
       ['toLowerCase']() === 'complete' &&
-      SHARED_ASSET_RESULT_TASK_KINDS['has'](String(_0x9efc6a?.['kind'] || '')['trim']()));
+      SHARED_ASSET_RESULT_TASK_KINDS['has'](String(response6?.['kind'] || '')['trim']()));
   return (
-    _0x1a1437 &&
-      _0x50e10a &&
-      Object['values'](_0x424a36)['forEach']((_0x2ca1c1) => {
-        if (String(_0x2ca1c1?.['assetId'] || '')['trim']() !== _0x1a1437) return;
-        if (_0x2ca1c1?.['id'] && !_0x2ddd23['includes'](_0x2ca1c1['id'])) _0x2ddd23['push'](_0x2ca1c1['id']);
+    value9 &&
+      value10 &&
+      Object['values'](options7)['forEach']((value11) => {
+        if (String(value11?.['assetId'] || '')['trim']() !== value9) return;
+        if (value11?.['id'] && !list4['includes'](value11['id'])) list4['push'](value11['id']);
       }),
-    _0x2ddd23
+    list4
   );
 }
-function getMatchingNodeIds(_0x275c17 = {}) {
-  const _0x276936 =
+function getMatchingNodeIds(options8 = {}) {
+  const value12 =
     typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']();
-  return resolveMatchingNodeIds(_0x276936?.['nodes'] || {}, _0x275c17);
+  return resolveMatchingNodeIds(value12?.['nodes'] || {}, options8);
 }
-function applyMediaTaskUpdate(_0x135a40 = {}) {
-  const _0x2d2ef5 = getMatchingNodeIds(_0x135a40);
-  if (!_0x2d2ef5['length']) return;
-  const _0x14d4e8 =
+function applyMediaTaskUpdate(options9 = {}) {
+  const list5 = getMatchingNodeIds(options9);
+  if (!list5['length']) return;
+  const value13 =
       typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState'](),
-    _0x1fa0a5 = {};
-  _0x2d2ef5['forEach']((_0x559915) => {
-    const _0xc1c670 = _0x14d4e8?.['nodes']?.[_0x559915];
-    if (!shouldApplyMediaTaskEventToNode(_0xc1c670, _0x135a40)) return;
-    const _0x5d7cd8 = buildMediaTaskUpdatePatch(_0x135a40, _0xc1c670),
-      _0x34659d = Object['entries'](_0x5d7cd8)['some'](
-        ([_0x52288e, _0xb69579]) => _0xc1c670?.[_0x52288e] !== _0xb69579,
+    value14 = {};
+  list5['forEach']((value15) => {
+    const value16 = value13?.['nodes']?.[value15];
+    if (!shouldApplyMediaTaskEventToNode(value16, options9)) return;
+    const mediaTaskUpdatePatch = buildMediaTaskUpdatePatch(options9, value16),
+      value17 = Object['entries'](mediaTaskUpdatePatch)['some'](
+        ([value18, value19]) => value16?.[value18] !== value19,
       );
-    if (_0x34659d) _0x1fa0a5[_0x559915] = _0x5d7cd8;
+    if (value17) value14[value15] = mediaTaskUpdatePatch;
   });
-  const _0x440abe = Object['keys'](_0x1fa0a5);
-  if (!_0x440abe['length']) return;
-  if (typeof appStore['updateNodesData'] === 'function' && _0x440abe['length'] > 0x1) {
-    appStore['updateNodesData'](_0x1fa0a5);
+  const list6 = Object['keys'](value14);
+  if (!list6['length']) return;
+  if (typeof appStore['updateNodesData'] === 'function' && list6['length'] > 0x1) {
+    appStore['updateNodesData'](value14);
     return;
   }
-  _0x440abe['forEach']((_0xe83b52) => appStore['updateNodeData'](_0xe83b52, _0x1fa0a5[_0xe83b52]));
+  list6['forEach']((value20) => appStore['updateNodeData'](value20, value14[value20]));
 }
-function normalizeProxyPath(_0x578733) {
-  return normalizeCanvasLocalPath(_0x578733)['replace'](/\\/g, '/');
+function normalizeProxyPath(value21) {
+  return normalizeCanvasLocalPath(value21)['replace'](/\\/g, '/');
 }
-function isLegacyProjectImportProxyPath(_0x510212) {
-  const _0x113240 = normalizeProxyPath(_0x510212);
-  return /(?:^|\/)ProjectImports\/[^/]+(?:\/.*)?\.proxy\.mp4$/i['test'](_0x113240);
+function isLegacyProjectImportProxyPath(value22) {
+  const proxyPath = normalizeProxyPath(value22);
+  return /(?:^|\/)ProjectImports\/[^/]+(?:\/.*)?\.proxy\.mp4$/i['test'](proxyPath);
 }
-export function getLegacyVideoProxyAssetId(_0x2f9925) {
-  const _0x386004 = normalizeProxyPath(_0x2f9925);
-  if (!_0x386004) return '';
-  let _0x2f88ec = 0xcbf29ce484222325n;
-  for (let _0x427ea2 = 0x0; _0x427ea2 < _0x386004['length']; _0x427ea2 += 0x1) {
-    ((_0x2f88ec ^= BigInt(_0x386004['charCodeAt'](_0x427ea2))),
-      (_0x2f88ec = BigInt['asUintN'](0x40, _0x2f88ec * 0x100000001b3n)));
+export function getLegacyVideoProxyAssetId(value23) {
+  const list7 = normalizeProxyPath(value23);
+  if (!list7) return '';
+  let value24 = 0xcbf29ce484222325n;
+  for (let value25 = 0x0; value25 < list7['length']; value25 += 0x1) {
+    ((value24 ^= BigInt(list7['charCodeAt'](value25))),
+      (value24 = BigInt['asUintN'](0x40, value24 * 0x100000001b3n)));
   }
-  return 'legacy-' + _0x2f88ec['toString'](0x10)['padStart'](0x10, '0');
+  return 'legacy-' + value24['toString'](0x10)['padStart'](0x10, '0');
 }
-export function getLegacyProjectImportVideoProxyMigration(_0x2c9691 = {}) {
+export function getLegacyProjectImportVideoProxyMigration(response7 = {}) {
   if (
-    String(_0x2c9691?.['type'] || '')
+    String(response7?.['type'] || '')
       ['trim']()
       ['toLowerCase']() !== 'source-video'
   )
     return null;
-  if (String(_0x2c9691?.['videoProxyVersion'] || '')['trim']() === VIDEO_PROXY_VERSION_V2_1280) return null;
+  if (String(response7?.['videoProxyVersion'] || '')['trim']() === VIDEO_PROXY_VERSION_V2_1280) return null;
   if (
-    String(_0x2c9691?.['pendingVideoProxyVersion'] || '')['trim']() === VIDEO_PROXY_VERSION_V2_1280 &&
-    normalizeProxyPath(_0x2c9691?.['pendingVideoProxyLocalPath'])
+    String(response7?.['pendingVideoProxyVersion'] || '')['trim']() === VIDEO_PROXY_VERSION_V2_1280 &&
+    normalizeProxyPath(response7?.['pendingVideoProxyLocalPath'])
   )
     return null;
-  const _0x350177 = [
-      _0x2c9691?.['originalLocalPath'],
-      _0x2c9691?.['localPath'],
-      _0x2c9691?.['displayLocalPath'],
-      _0x2c9691?.['videoUrl'],
-      _0x2c9691?.['src'],
-      _0x2c9691?.['url'],
-      _0x2c9691?.['resultUrl'],
+  const sourceLocalPath = [
+      response7?.['originalLocalPath'],
+      response7?.['localPath'],
+      response7?.['displayLocalPath'],
+      response7?.['videoUrl'],
+      response7?.['src'],
+      response7?.['url'],
+      response7?.['resultUrl'],
     ]
       ['map'](normalizeProxyPath)
       ['find'](isLegacyProjectImportProxyPath),
-    _0x317a5f = String(_0x2c9691?.['assetId'] || '')['trim'](),
-    _0x3d3022 =
-      (/^[a-z0-9_-]+$/i['test'](_0x317a5f) ? _0x317a5f : '') || getLegacyVideoProxyAssetId(_0x350177),
-    _0x1577c7 = String(_0x2c9691?.['id'] || '')['trim']();
-  if (!_0x350177 || !_0x3d3022 || !_0x1577c7) return null;
+    value26 = String(response7?.['assetId'] || '')['trim'](),
+    assetId =
+      (/^[a-z0-9_-]+$/i['test'](value26) ? value26 : '') || getLegacyVideoProxyAssetId(sourceLocalPath),
+    nodeId2 = String(response7?.['id'] || '')['trim']();
+  if (!sourceLocalPath || !assetId || !nodeId2) return null;
   return {
-    nodeId: _0x1577c7,
-    assetId: _0x3d3022,
-    sourceLocalPath: _0x350177,
-    hasDisplayLocalPath: !!normalizeProxyPath(_0x2c9691?.['displayLocalPath']),
+    nodeId: nodeId2,
+    assetId: assetId,
+    sourceLocalPath: sourceLocalPath,
+    hasDisplayLocalPath: !!normalizeProxyPath(response7?.['displayLocalPath']),
     targetVersion: VIDEO_PROXY_VERSION_V2_1280,
-    key: _0x3d3022 + '|' + _0x350177 + '|' + VIDEO_PROXY_VERSION_V2_1280,
+    key: assetId + '|' + sourceLocalPath + '|' + VIDEO_PROXY_VERSION_V2_1280,
   };
 }
-export function getVisibleVideoProxyMigration(_0x5db22e = {}) {
-  const _0x4385a4 = getLegacyProjectImportVideoProxyMigration(_0x5db22e);
-  if (_0x4385a4) return _0x4385a4;
+export function getVisibleVideoProxyMigration(options10 = {}) {
+  const legacyProjectImportVideoProxyMigration = getLegacyProjectImportVideoProxyMigration(options10);
+  if (legacyProjectImportVideoProxyMigration) return legacyProjectImportVideoProxyMigration;
   if (
-    String(_0x5db22e?.['type'] || '')
+    String(options10?.['type'] || '')
       ['trim']()
       ['toLowerCase']() !== 'source-video'
   )
     return null;
-  if (String(_0x5db22e?.['videoProxyVersion'] || '')['trim']() === VIDEO_PROXY_VERSION_V2_1280) return null;
-  const _0x34499e = String(_0x5db22e?.['videoProxyStatus'] || '')
+  if (String(options10?.['videoProxyVersion'] || '')['trim']() === VIDEO_PROXY_VERSION_V2_1280) return null;
+  const value27 = String(options10?.['videoProxyStatus'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x34499e !== 'processing' && _0x34499e !== 'waiting') return null;
-  if (normalizeProxyPath(_0x5db22e?.['displayLocalPath'])) return null;
-  const _0x5ba1d5 = String(_0x5db22e?.['id'] || '')['trim'](),
-    _0x528d6f = String(_0x5db22e?.['assetId'] || '')['trim'](),
-    _0xd571e5 = normalizeProxyPath(
-      _0x5db22e?.['originalLocalPath'] ||
-        _0x5db22e?.['localPath'] ||
-        _0x5db22e?.['videoUrl'] ||
-        _0x5db22e?.['src'],
+  if (value27 !== 'processing' && value27 !== 'waiting') return null;
+  if (normalizeProxyPath(options10?.['displayLocalPath'])) return null;
+  const nodeId3 = String(options10?.['id'] || '')['trim'](),
+    assetId2 = String(options10?.['assetId'] || '')['trim'](),
+    sourceLocalPath2 = normalizeProxyPath(
+      options10?.['originalLocalPath'] ||
+        options10?.['localPath'] ||
+        options10?.['videoUrl'] ||
+        options10?.['src'],
     );
-  if (!_0x5ba1d5 || !/^[a-z0-9_-]+$/i['test'](_0x528d6f) || !_0xd571e5) return null;
+  if (!nodeId3 || !/^[a-z0-9_-]+$/i['test'](assetId2) || !sourceLocalPath2) return null;
   return {
-    nodeId: _0x5ba1d5,
-    assetId: _0x528d6f,
-    sourceLocalPath: _0xd571e5,
+    nodeId: nodeId3,
+    assetId: assetId2,
+    sourceLocalPath: sourceLocalPath2,
     hasDisplayLocalPath: ![],
     targetVersion: VIDEO_PROXY_VERSION_V2_1280,
-    key: _0x528d6f + '|' + _0xd571e5 + '|' + VIDEO_PROXY_VERSION_V2_1280,
+    key: assetId2 + '|' + sourceLocalPath2 + '|' + VIDEO_PROXY_VERSION_V2_1280,
   };
 }
-export function isMediaTaskActiveInList(_0x78819f = {}, _0x579ab6 = []) {
-  const _0x395208 = String(_0x78819f?.['mediaTaskId'] || '')['trim'](),
-    _0x38dfca = String(_0x78819f?.['mediaTaskStatus'] || '')
+export function isMediaTaskActiveInList(options11 = {}, value28 = []) {
+  const enabled9 = String(options11?.['mediaTaskId'] || '')['trim'](),
+    value29 = String(options11?.['mediaTaskStatus'] || '')
       ['trim']()
       ['toLowerCase']();
-  if (!_0x395208 || !ACTIVE_TASK_STATUSES['has'](_0x38dfca)) return ![];
-  return (Array['isArray'](_0x579ab6) ? _0x579ab6 : [])['some']((_0x487dde) => {
-    const _0x46148b = String(_0x487dde?.['taskId'] || _0x487dde?.['id'] || '')['trim'](),
-      _0x45e75f = String(_0x487dde?.['status'] || '')
+  if (!enabled9 || !ACTIVE_TASK_STATUSES['has'](value29)) return ![];
+  return (Array['isArray'](value28) ? value28 : [])['some']((response8) => {
+    const value30 = String(response8?.['taskId'] || response8?.['id'] || '')['trim'](),
+      value31 = String(response8?.['status'] || '')
         ['trim']()
         ['toLowerCase']();
-    return _0x46148b === _0x395208 && ACTIVE_TASK_STATUSES['has'](_0x45e75f);
+    return value30 === enabled9 && ACTIVE_TASK_STATUSES['has'](value31);
   });
 }
-async function listMediaTasksCached(_0x1a08b1 = '') {
-  return mediaTaskListCache['get'](_0x1a08b1);
+async function listMediaTasksCached(value32 = '') {
+  return mediaTaskListCache['get'](value32);
 }
 async function enqueueVideoProxyMigration(
-  _0x203178,
+  migrationKey,
   {
-    enqueue: enqueue = (_0x507823) => desktopBridge['mediaTask']['enqueue'](_0x507823),
-    updateNode: updateNode = (_0x26df40, _0x4c0a06) => appStore['updateNodeData'](_0x26df40, _0x4c0a06),
+    enqueue: enqueue = (value33) => desktopBridge['mediaTask']['enqueue'](value33),
+    updateNode: updateNode = (value34, value35) => appStore['updateNodeData'](value34, value35),
     requestTracker: requestTracker = proxyMigrationRequestTracker,
     requestedKeys: requestedKeys = requestTracker?.['requestedKeys'] ||
       proxyMigrationRequestTracker['requestedKeys'],
   } = {},
 ) {
-  if (!_0x203178 || requestedKeys['has'](_0x203178['key'])) return null;
-  requestedKeys['add'](_0x203178['key']);
+  if (!migrationKey || requestedKeys['has'](migrationKey['key'])) return null;
+  requestedKeys['add'](migrationKey['key']);
   try {
-    const _0x1cd947 = await enqueue({
+    const args3 = await enqueue({
       kind: 'videoPoster',
       purpose: VIDEO_PROXY_MIGRATION_PURPOSE,
       priority: VIDEO_PROXY_MIGRATION_PRIORITY,
-      migrationKey: _0x203178['key'],
-      nodeId: _0x203178['nodeId'],
-      assetId: _0x203178['assetId'],
-      src: _0x203178['sourceLocalPath'],
-      originalLocalPath: _0x203178['sourceLocalPath'],
-      videoProxyTargetVersion: _0x203178['targetVersion'],
+      migrationKey: migrationKey['key'],
+      nodeId: migrationKey['nodeId'],
+      assetId: migrationKey['assetId'],
+      src: migrationKey['sourceLocalPath'],
+      originalLocalPath: migrationKey['sourceLocalPath'],
+      videoProxyTargetVersion: migrationKey['targetVersion'],
     });
-    if (!_0x1cd947 || typeof _0x1cd947 !== 'object') return (requestedKeys['delete'](_0x203178['key']), null);
-    const _0x41e6a9 =
+    if (!args3 || typeof args3 !== 'object') return (requestedKeys['delete'](migrationKey['key']), null);
+    const args4 =
         requestTracker?.['requestedKeys'] === requestedKeys && typeof requestTracker?.['track'] === 'function'
-          ? requestTracker['track'](_0x1cd947, _0x203178['key'])
+          ? requestTracker['track'](args3, migrationKey['key'])
           : null,
-      _0x1893d8 = _0x41e6a9 ? { ..._0x1cd947, ..._0x41e6a9 } : _0x1cd947,
-      _0x1d5c4e = { ..._0x1893d8, purpose: VIDEO_PROXY_MIGRATION_PURPOSE },
-      _0x5369a1 = normalizeStatus(_0x1d5c4e['status'])['toLowerCase']();
+      args5 = args4 ? { ...args3, ...args4 } : args3,
+      response9 = { ...args5, purpose: VIDEO_PROXY_MIGRATION_PURPOSE },
+      status2 = normalizeStatus(response9['status'])['toLowerCase']();
     return (
-      updateNode(_0x203178['nodeId'], {
-        ...buildVideoProxyMigrationStatusPatch(_0x1d5c4e),
-        ...(_0x5369a1 === 'complete' ? buildResultPatch(_0x1d5c4e) : {}),
-        assetId: _0x203178['assetId'],
-        ...(ACTIVE_TASK_STATUSES['has'](_0x5369a1) ? { videoProxyStatus: 'processing' } : {}),
-        ...(!_0x203178['hasDisplayLocalPath'] ? { displayLocalPath: _0x203178['sourceLocalPath'] } : {}),
+      updateNode(migrationKey['nodeId'], {
+        ...buildVideoProxyMigrationStatusPatch(response9),
+        ...(status2 === 'complete' ? buildResultPatch(response9) : {}),
+        assetId: migrationKey['assetId'],
+        ...(ACTIVE_TASK_STATUSES['has'](status2) ? { videoProxyStatus: 'processing' } : {}),
+        ...(!migrationKey['hasDisplayLocalPath']
+          ? { displayLocalPath: migrationKey['sourceLocalPath'] }
+          : {}),
       }),
-      _0x1893d8 || null
+      args5 || null
     );
-  } catch (_0x4f246b) {
-    requestedKeys['delete'](_0x203178['key']);
-    throw _0x4f246b;
+  } catch (value36) {
+    requestedKeys['delete'](migrationKey['key']);
+    throw value36;
   }
 }
-export async function requestVisibleVideoProxyMigration(_0x2deee7) {
-  const _0x898d7b = String(_0x2deee7 || '')['trim']();
-  if (!_0x898d7b) return null;
-  const _0x30f1d3 =
+export async function requestVisibleVideoProxyMigration(value37) {
+  const enabled10 = String(value37 || '')['trim']();
+  if (!enabled10) return null;
+  const value38 =
       typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState'](),
-    _0x38acc6 = _0x30f1d3?.['nodes']?.[_0x898d7b],
-    _0x3bbcd1 = getVisibleVideoProxyMigration(_0x38acc6);
-  if (!_0x3bbcd1) return null;
-  if (!getLegacyProjectImportVideoProxyMigration(_0x38acc6))
+    value39 = value38?.['nodes']?.[enabled10],
+    visibleVideoProxyMigration = getVisibleVideoProxyMigration(value39);
+  if (!visibleVideoProxyMigration) return null;
+  if (!getLegacyProjectImportVideoProxyMigration(value39))
     try {
       if (
         isMediaTaskActiveInList(
-          _0x38acc6,
-          await listMediaTasksCached(String(_0x38acc6?.['mediaTaskId'] || '')['trim']()),
+          value39,
+          await listMediaTasksCached(String(value39?.['mediaTaskId'] || '')['trim']()),
         )
       )
         return null;
     } catch {
       return null;
     }
-  return enqueueVideoProxyMigration(_0x3bbcd1);
+  return enqueueVideoProxyMigration(visibleVideoProxyMigration);
 }
 async function cancelVideoProxyMigrationTaskWithDeps(
-  _0x142b06,
-  { cancel: cancel = (_0x13dd04) => desktopBridge['mediaTask']['cancel'](_0x13dd04) } = {},
+  value40,
+  { cancel: cancel = (value41) => desktopBridge['mediaTask']['cancel'](value41) } = {},
 ) {
-  const _0x5c1f4c = String(_0x142b06 || '')['trim']();
-  if (!_0x5c1f4c) return { ok: ![], error: 'Missing media task id' };
-  return cancel({ taskId: _0x5c1f4c, onlyIfWaiting: !![] });
+  const taskId = String(value40 || '')['trim']();
+  if (!taskId) return { ok: ![], error: 'Missing media task id' };
+  return cancel({ taskId: taskId, onlyIfWaiting: !![] });
 }
-export function cancelVideoProxyMigrationTask(_0x22804c) {
-  return cancelVideoProxyMigrationTaskWithDeps(_0x22804c);
+export function cancelVideoProxyMigrationTask(value42) {
+  return cancelVideoProxyMigrationTaskWithDeps(value42);
 }
-export function __enqueueVideoProxyMigrationForTest(_0x119924, _0x1db9aa) {
-  return enqueueVideoProxyMigration(_0x119924, _0x1db9aa);
+export function __enqueueVideoProxyMigrationForTest(value43, value44) {
+  return enqueueVideoProxyMigration(value43, value44);
 }
-export function __cancelVideoProxyMigrationTaskForTest(_0x128536, _0x4429ff) {
-  return cancelVideoProxyMigrationTaskWithDeps(_0x128536, _0x4429ff);
+export function __cancelVideoProxyMigrationTaskForTest(value45, value46) {
+  return cancelVideoProxyMigrationTaskWithDeps(value45, value46);
 }
-export function __resolveMatchingMediaTaskNodeIdsForTest(_0x168d20, _0x5a2005) {
-  return resolveMatchingNodeIds(_0x168d20, _0x5a2005);
+export function __resolveMatchingMediaTaskNodeIdsForTest(value47, value48) {
+  return resolveMatchingNodeIds(value47, value48);
 }
 export function installMediaTaskUpdateListener() {
   if (installed) return;
   installed = !![];
-  const _0x3e0260 = desktopBridge['mediaTask']['onUpdate'];
-  typeof _0x3e0260 === 'function' &&
-    _0x3e0260((_0x3eb6b5) => {
+  const run2 = desktopBridge['mediaTask']['onUpdate'];
+  typeof run2 === 'function' &&
+    run2((value49) => {
       try {
-        handleMediaTaskUpdate(_0x3eb6b5 || {});
-      } catch (_0x3c518b) {
-        console['warn']('[mediaTaskService] failed to apply media task update:', _0x3c518b);
+        handleMediaTaskUpdate(value49 || {});
+      } catch (value50) {
+        console['warn']('[mediaTaskService] failed to apply media task update:', value50);
       }
     });
 }
-export function __buildMediaTaskStatusPatchForTest(_0x1d9d8e = {}) {
-  return buildStatusPatch(_0x1d9d8e);
+export function __buildMediaTaskStatusPatchForTest(options12 = {}) {
+  return buildStatusPatch(options12);
 }
-export function __buildMediaTaskResultPatchForTest(_0x523915 = {}, _0x3c5fd9 = {}) {
-  return buildResultPatch(_0x523915, _0x3c5fd9);
+export function __buildMediaTaskResultPatchForTest(options13 = {}, value51 = {}) {
+  return buildResultPatch(options13, value51);
 }
-export function __buildMediaTaskUpdatePatchForTest(_0x31afcc = {}, _0x1933c4 = {}) {
-  return buildMediaTaskUpdatePatch(_0x31afcc, _0x1933c4);
+export function __buildMediaTaskUpdatePatchForTest(options14 = {}, value52 = {}) {
+  return buildMediaTaskUpdatePatch(options14, value52);
 }
-export function __applyMediaTaskUpdateForTest(_0x2d43dd = {}) {
-  return applyMediaTaskUpdate(_0x2d43dd);
+export function __applyMediaTaskUpdateForTest(options15 = {}) {
+  return applyMediaTaskUpdate(options15);
 }
-export function __handleMediaTaskUpdateForTest(_0x2a5d81 = {}) {
-  return handleMediaTaskUpdate(_0x2a5d81);
+export function __handleMediaTaskUpdateForTest(options16 = {}) {
+  return handleMediaTaskUpdate(options16);
 }

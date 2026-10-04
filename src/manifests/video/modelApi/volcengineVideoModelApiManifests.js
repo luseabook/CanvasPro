@@ -282,7 +282,7 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
   }),
   VOLCENGINE_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
     -0x1,
-    ...Array['from']({ length: 0x1b }, (_0x1d0624, _0x4372cd) => _0x4372cd + 0x4),
+    ...Array['from']({ length: 0x1b }, (value, item) => item + 0x4),
   ]),
   VOLCENGINE_SEEDANCE_2_5_DURATION_RANGE = Object['freeze']({
     min: 0x4,
@@ -364,8 +364,8 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     }),
   }),
   VOLCENGINE_SEEDANCE_2_5_BODY_MAPPING = freezeBodyMapping([
-    ...VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING['map']((_0x20012f) =>
-      _0x20012f['path'] === 'duration' ? Object['freeze']({ ..._0x20012f, defaultValue: -0x1 }) : _0x20012f,
+    ...VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING['map']((args) =>
+      args['path'] === 'duration' ? Object['freeze']({ ...args, defaultValue: -0x1 }) : args,
     ),
     Object['freeze']({
       path: 'output_format',

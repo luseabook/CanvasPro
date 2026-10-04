@@ -129,324 +129,320 @@ const BINGHUO_EXECUTION_POLICY = Object['freeze']({
     'templateFamilyId',
     'templateFamilyLabel',
   ]);
-function normalizeIdentity(_0x326428) {
-  return String(_0x326428 || '')['trim']();
+function normalizeIdentity(value) {
+  return String(value || '')['trim']();
 }
-function normalizeExpirySeconds(_0x3aa9ce) {
-  if (_0x3aa9ce === null || _0x3aa9ce === undefined || _0x3aa9ce === '') return null;
-  const _0x4155e3 = Number(_0x3aa9ce);
-  if (Number['isFinite'](_0x4155e3) && _0x4155e3 > 0x0)
-    return _0x4155e3 > 0x174876e800 ? Math['floor'](_0x4155e3 / 0x3e8) : Math['floor'](_0x4155e3);
-  const _0x300ea8 = Date['parse'](String(_0x3aa9ce));
-  return Number['isFinite'](_0x300ea8) && _0x300ea8 > 0x0 ? Math['floor'](_0x300ea8 / 0x3e8) : null;
+function normalizeExpirySeconds(item) {
+  if (item === null || item === undefined || item === '') return null;
+  const count = Number(item);
+  if (Number['isFinite'](count) && count > 0x0)
+    return count > 0x174876e800 ? Math['floor'](count / 0x3e8) : Math['floor'](count);
+  const count2 = Date['parse'](String(item));
+  return Number['isFinite'](count2) && count2 > 0x0 ? Math['floor'](count2 / 0x3e8) : null;
 }
-function isActiveSubscription(_0x2a4ef6, _0x7006b0) {
+function isActiveSubscription(response, key) {
   if (
-    String(_0x2a4ef6?.['status'] || '')
+    String(response?.['status'] || '')
       ['trim']()
       ['toLowerCase']() !== 'active'
   )
     return ![];
-  const _0x26ce7e = normalizeExpirySeconds(_0x2a4ef6?.['expiresAt']);
-  return _0x26ce7e === null || _0x26ce7e > Math['floor'](_0x7006b0 / 0x3e8);
+  const expirySeconds = normalizeExpirySeconds(response?.['expiresAt']);
+  return expirySeconds === null || expirySeconds > Math['floor'](key / 0x3e8);
 }
-function assertExactValue(_0x5be57f, _0x249b9b, _0x3fa16c) {
-  if (_0x5be57f !== _0x249b9b) throw new Error('[modelCatalog] invalid ' + _0x3fa16c);
+function assertExactValue(index, result, data) {
+  if (index !== result) throw new Error('[modelCatalog] invalid ' + data);
 }
-function assertObjectKeysAllowed(_0x2ac908, _0x54990e, _0x44460f) {
-  if (!_0x2ac908 || typeof _0x2ac908 !== 'object' || Array['isArray'](_0x2ac908))
-    throw new Error('[modelCatalog] invalid ' + _0x44460f);
-  for (const _0x20c8ad of Object['keys'](_0x2ac908)) {
-    if (!_0x54990e['has'](_0x20c8ad))
-      throw new Error('[modelCatalog] ' + _0x44460f + '.' + _0x20c8ad + '\x20is\x20not\x20allowed');
+function assertObjectKeysAllowed(enabled, map, options) {
+  if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled))
+    throw new Error('[modelCatalog] invalid ' + options);
+  for (const target of Object['keys'](enabled)) {
+    if (!map['has'](target))
+      throw new Error('[modelCatalog] ' + options + '.' + target + '\x20is\x20not\x20allowed');
   }
 }
-function assertBinghuoModelCatalogMetadata(_0x47b51a, _0x43ef7d) {
-  if (_0x47b51a === undefined || _0x47b51a === null) return;
-  assertObjectKeysAllowed(_0x47b51a, BINGHUO_MODEL_CATALOG_EXTENSION_KEYS, _0x43ef7d);
-  for (const _0x5e39fc of BINGHUO_MODEL_CATALOG_EXTENSION_KEYS) {
-    if (!Object['hasOwn'](_0x47b51a, _0x5e39fc))
-      throw new Error('[modelCatalog] ' + _0x43ef7d + '.' + _0x5e39fc + '\x20is\x20required');
+function assertBinghuoModelCatalogMetadata(source, next) {
+  if (source === undefined || source === null) return;
+  assertObjectKeysAllowed(source, BINGHUO_MODEL_CATALOG_EXTENSION_KEYS, next);
+  for (const current of BINGHUO_MODEL_CATALOG_EXTENSION_KEYS) {
+    if (!Object['hasOwn'](source, current))
+      throw new Error('[modelCatalog] ' + next + '.' + current + '\x20is\x20required');
   }
   if (
-    typeof _0x47b51a['templateFamilyId'] !== 'string' ||
-    !/^[a-z0-9][a-z0-9._-]{0,127}$/['test'](_0x47b51a['templateFamilyId'])
+    typeof source['templateFamilyId'] !== 'string' ||
+    !/^[a-z0-9][a-z0-9._-]{0,127}$/['test'](source['templateFamilyId'])
   )
-    throw new Error('[modelCatalog]\x20invalid\x20' + _0x43ef7d + '.templateFamilyId');
+    throw new Error('[modelCatalog]\x20invalid\x20' + next + '.templateFamilyId');
   if (
-    typeof _0x47b51a['templateFamilyLabel'] !== 'string' ||
-    _0x47b51a['templateFamilyLabel'] !== _0x47b51a['templateFamilyLabel']['trim']() ||
-    _0x47b51a['templateFamilyLabel']['length'] === 0x0 ||
-    _0x47b51a['templateFamilyLabel']['length'] > 0x80 ||
-    /[\u0000-\u001f]/['test'](_0x47b51a['templateFamilyLabel'])
+    typeof source['templateFamilyLabel'] !== 'string' ||
+    source['templateFamilyLabel'] !== source['templateFamilyLabel']['trim']() ||
+    source['templateFamilyLabel']['length'] === 0x0 ||
+    source['templateFamilyLabel']['length'] > 0x80 ||
+    /[\u0000-\u001f]/['test'](source['templateFamilyLabel'])
   )
-    throw new Error('[modelCatalog] invalid ' + _0x43ef7d + '.templateFamilyLabel');
-  if (typeof _0x47b51a['templateFamilyDefault'] !== 'boolean')
-    throw new Error('[modelCatalog] invalid ' + _0x43ef7d + '.templateFamilyDefault');
+    throw new Error('[modelCatalog] invalid ' + next + '.templateFamilyLabel');
+  if (typeof source['templateFamilyDefault'] !== 'boolean')
+    throw new Error('[modelCatalog] invalid ' + next + '.templateFamilyDefault');
 }
-function normalizeMappingTransformNames(_0x3c7f4e) {
-  const _0x2c4355 = Array['isArray'](_0x3c7f4e) ? _0x3c7f4e : [_0x3c7f4e];
-  return _0x2c4355['filter'](
-    (_0x59a38b) => _0x59a38b !== undefined && _0x59a38b !== null && _0x59a38b !== '',
-  )['map']((_0x4cd9a3) =>
-    typeof _0x4cd9a3 === 'string' ? _0x4cd9a3 : String(_0x4cd9a3?.['name'] || '')['trim'](),
+function normalizeMappingTransformNames(entry) {
+  const list = Array['isArray'](entry) ? entry : [entry];
+  return list['filter']((record) => record !== undefined && record !== null && record !== '')['map'](
+    (error2) => (typeof error2 === 'string' ? error2 : String(error2?.['name'] || '')['trim']()),
   );
 }
-function assertBinghuoBodyMapping(_0x12b4ea, _0xba6619) {
-  if (!Array['isArray'](_0x12b4ea)) throw new Error('[modelCatalog] invalid ' + _0xba6619);
-  _0x12b4ea['forEach']((_0x245d25, _0x32afeb) => {
-    const _0x361382 = _0xba6619 + '[' + _0x32afeb + ']';
+function assertBinghuoBodyMapping(list2, payload) {
+  if (!Array['isArray'](list2)) throw new Error('[modelCatalog] invalid ' + payload);
+  list2['forEach']((handle, state) => {
+    const config = payload + '[' + state + ']';
     assertObjectKeysAllowed(
-      _0x245d25,
+      handle,
       new Set(['defaultValue', 'field', 'from', 'omitWhenEmpty', 'path', 'transform', 'value']),
-      _0x361382,
+      config,
     );
-    const _0x3427cb = String(_0x245d25['path'] || '')['trim']();
-    if (!BINGHUO_BODY_MAPPING_PATHS['has'](_0x3427cb))
-      throw new Error('[modelCatalog]\x20invalid\x20' + _0x361382 + '.path');
-    const _0x11bade = String(_0x245d25['from'] || '')['trim']();
-    if (!BINGHUO_BODY_MAPPING_SOURCES['has'](_0x11bade))
-      throw new Error('[modelCatalog]\x20invalid\x20' + _0x361382 + '.from');
-    for (const _0x4b09fe of normalizeMappingTransformNames(_0x245d25['transform'])) {
-      if (!BINGHUO_BODY_MAPPING_TRANSFORMS['has'](_0x4b09fe))
-        throw new Error('[modelCatalog] invalid ' + _0x361382 + '.transform');
+    const scope = String(handle['path'] || '')['trim']();
+    if (!BINGHUO_BODY_MAPPING_PATHS['has'](scope))
+      throw new Error('[modelCatalog]\x20invalid\x20' + config + '.path');
+    const input = String(handle['from'] || '')['trim']();
+    if (!BINGHUO_BODY_MAPPING_SOURCES['has'](input))
+      throw new Error('[modelCatalog]\x20invalid\x20' + config + '.from');
+    for (const output of normalizeMappingTransformNames(handle['transform'])) {
+      if (!BINGHUO_BODY_MAPPING_TRANSFORMS['has'](output))
+        throw new Error('[modelCatalog] invalid ' + config + '.transform');
     }
   });
 }
-function assertBinghuoAssetUploadPolicy(_0x39bbc8, _0x4509ee, _0x2fd7c3) {
-  if (_0x39bbc8 === undefined || _0x39bbc8 === null) return;
-  (assertObjectKeysAllowed(_0x39bbc8, BINGHUO_UPLOAD_POLICY_KEYS, _0x4509ee),
+function assertBinghuoAssetUploadPolicy(value2, value3, value4) {
+  if (value2 === undefined || value2 === null) return;
+  (assertObjectKeysAllowed(value2, BINGHUO_UPLOAD_POLICY_KEYS, value3),
     assertExactValue(
-      String(_0x39bbc8['provider'] || '')['trim'](),
+      String(value2['provider'] || '')['trim'](),
       BINGHUO_ASSET_UPLOAD_PROVIDER,
-      _0x4509ee + '.provider',
+      value3 + '.provider',
     ),
     assertExactValue(
-      String(_0x39bbc8['endpoint'] || '')['trim'](),
+      String(value2['endpoint'] || '')['trim'](),
       BINGHUO_ASSET_UPLOAD_ENDPOINT,
-      _0x4509ee + '.endpoint',
+      value3 + '.endpoint',
     ));
-  if (_0x39bbc8['forceProviderUpload'] !== !![])
-    throw new Error('[modelCatalog] invalid ' + _0x4509ee + '.forceProviderUpload');
+  if (value2['forceProviderUpload'] !== !![])
+    throw new Error('[modelCatalog] invalid ' + value3 + '.forceProviderUpload');
   if (
-    _0x39bbc8['multipartField'] !== 'file' ||
-    _0x39bbc8['responsePath'] !== 'url' ||
-    _0x39bbc8['strictUpload'] !== !![] ||
-    !Array['isArray'](_0x39bbc8['inputKinds']) ||
-    _0x39bbc8['inputKinds']['length'] !== 0x1 ||
-    _0x39bbc8['inputKinds'][0x0] !== _0x2fd7c3
+    value2['multipartField'] !== 'file' ||
+    value2['responsePath'] !== 'url' ||
+    value2['strictUpload'] !== !![] ||
+    !Array['isArray'](value2['inputKinds']) ||
+    value2['inputKinds']['length'] !== 0x1 ||
+    value2['inputKinds'][0x0] !== value4
   )
-    throw new Error('[modelCatalog]\x20invalid\x20' + _0x4509ee + ' contract');
+    throw new Error('[modelCatalog]\x20invalid\x20' + value3 + ' contract');
 }
-function assertStatusList(_0x4876d5, _0x57e407) {
+function assertStatusList(list3, value5) {
   if (
-    !Array['isArray'](_0x4876d5) ||
-    _0x4876d5['length'] === 0x0 ||
-    _0x4876d5['some']((_0xe65653) => !/^[a-z][a-z0-9_-]{0,63}$/['test'](String(_0xe65653 || '')))
+    !Array['isArray'](list3) ||
+    list3['length'] === 0x0 ||
+    list3['some']((value6) => !/^[a-z][a-z0-9_-]{0,63}$/['test'](String(value6 || '')))
   )
-    throw new Error('[modelCatalog] invalid ' + _0x57e407);
+    throw new Error('[modelCatalog] invalid ' + value5);
 }
-function assertHttpStatusList(_0x2a807b, _0xe0e32) {
+function assertHttpStatusList(list4, value7) {
   if (
-    !Array['isArray'](_0x2a807b) ||
-    _0x2a807b['some'](
-      (_0x1dd9ca) => !Number['isInteger'](_0x1dd9ca) || _0x1dd9ca < 0x190 || _0x1dd9ca > 0x257,
-    )
+    !Array['isArray'](list4) ||
+    list4['some']((count3) => !Number['isInteger'](count3) || count3 < 0x190 || count3 > 0x257)
   )
-    throw new Error('[modelCatalog] invalid ' + _0xe0e32);
+    throw new Error('[modelCatalog] invalid ' + value7);
 }
-function assertBinghuoTaskPolling(_0x15e9f6, _0x37d5e2) {
-  if (!_0x37d5e2['pollingUrlTemplate']) {
-    if (_0x15e9f6 !== undefined && _0x15e9f6 !== null)
+function assertBinghuoTaskPolling(value8, enabled2) {
+  if (!enabled2['pollingUrlTemplate']) {
+    if (value8 !== undefined && value8 !== null)
       throw new Error('[modelCatalog] image task polling is not allowed');
     return;
   }
-  (assertObjectKeysAllowed(_0x15e9f6, BINGHUO_TASK_POLLING_KEYS, 'execution extensions.taskPolling'),
-    assertExactValue(_0x15e9f6['mode'], 'task-proxy', 'task polling mode'),
-    assertExactValue(_0x15e9f6['method'], 'GET', 'task polling method'),
-    assertExactValue(_0x15e9f6['headersMode'], 'bearer', 'task\x20polling\x20headersMode'),
+  (assertObjectKeysAllowed(value8, BINGHUO_TASK_POLLING_KEYS, 'execution extensions.taskPolling'),
+    assertExactValue(value8['mode'], 'task-proxy', 'task polling mode'),
+    assertExactValue(value8['method'], 'GET', 'task polling method'),
+    assertExactValue(value8['headersMode'], 'bearer', 'task\x20polling\x20headersMode'),
     assertExactValue(
-      _0x15e9f6['urlTemplate'],
-      _0x37d5e2['pollingUrlTemplate'],
+      value8['urlTemplate'],
+      enabled2['pollingUrlTemplate'],
       'execution task polling endpoint',
     ));
-  const _0x2df713 = Number(_0x15e9f6['pollIntervalMs']),
-    _0x2102ad = Number(_0x15e9f6['maxWaitMs']);
+  const count4 = Number(value8['pollIntervalMs']),
+    count5 = Number(value8['maxWaitMs']);
   if (
-    !Number['isFinite'](_0x2df713) ||
-    _0x2df713 < 0x3e8 ||
-    _0x2df713 > 0x7530 ||
-    !Number['isFinite'](_0x2102ad) ||
-    _0x2102ad < 0xea60 ||
-    _0x2102ad > 0x6ddd00
+    !Number['isFinite'](count4) ||
+    count4 < 0x3e8 ||
+    count4 > 0x7530 ||
+    !Number['isFinite'](count5) ||
+    count5 < 0xea60 ||
+    count5 > 0x6ddd00
   )
     throw new Error('[modelCatalog] invalid task polling timing');
-  (assertStatusList(_0x15e9f6['successStatuses'], 'task\x20polling\x20successStatuses'),
-    assertStatusList(_0x15e9f6['failedStatuses'], 'task polling failedStatuses'));
-  const _0x30525b = _0x15e9f6['transportErrorPolicy'];
+  (assertStatusList(value8['successStatuses'], 'task\x20polling\x20successStatuses'),
+    assertStatusList(value8['failedStatuses'], 'task polling failedStatuses'));
+  const value9 = value8['transportErrorPolicy'];
   assertObjectKeysAllowed(
-    _0x30525b,
+    value9,
     BINGHUO_TASK_TRANSPORT_POLICY_KEYS,
     'execution extensions.taskPolling.transportErrorPolicy',
   );
   if (
-    !Number['isInteger'](_0x30525b['maxConsecutiveErrors']) ||
-    _0x30525b['maxConsecutiveErrors'] < 0x1 ||
-    _0x30525b['maxConsecutiveErrors'] > 0xa ||
-    _0x30525b['surfaceLastError'] !== !![]
+    !Number['isInteger'](value9['maxConsecutiveErrors']) ||
+    value9['maxConsecutiveErrors'] < 0x1 ||
+    value9['maxConsecutiveErrors'] > 0xa ||
+    value9['surfaceLastError'] !== !![]
   )
     throw new Error('[modelCatalog] invalid task polling transport policy');
-  (assertHttpStatusList(_0x30525b['retryableStatuses'], 'task polling retryableStatuses'),
-    assertHttpStatusList(_0x30525b['terminalStatuses'], 'task polling terminalStatuses'));
+  (assertHttpStatusList(value9['retryableStatuses'], 'task polling retryableStatuses'),
+    assertHttpStatusList(value9['terminalStatuses'], 'task polling terminalStatuses'));
 }
-function assertBinghuoExecutionPolicy(_0x13bf1b) {
-  assertObjectKeysAllowed(_0x13bf1b, BINGHUO_EXECUTION_KEYS, 'execution');
-  const _0x144c3f = String(_0x13bf1b?.['kind'] || '')
+function assertBinghuoExecutionPolicy(response2) {
+  assertObjectKeysAllowed(response2, BINGHUO_EXECUTION_KEYS, 'execution');
+  const value10 = String(response2?.['kind'] || '')
       ['trim']()
       ['toLowerCase'](),
-    _0x2fa5b5 = BINGHUO_EXECUTION_POLICY[_0x144c3f];
-  if (!_0x2fa5b5)
+    enabled3 = BINGHUO_EXECUTION_POLICY[value10];
+  if (!enabled3)
     throw new Error('[modelCatalog]\x20catalog\x20contains\x20an\x20unsupported\x20execution\x20kind');
-  (assertExactValue(String(_0x13bf1b?.['adapterType'] || '')['trim'](), 'modelApi', 'execution adapterType'),
+  (assertExactValue(String(response2?.['adapterType'] || '')['trim'](), 'modelApi', 'execution adapterType'),
     assertExactValue(
-      String(_0x13bf1b?.['method'] || '')
+      String(response2?.['method'] || '')
         ['trim']()
         ['toUpperCase'](),
       'POST',
       'execution method',
     ),
     assertExactValue(
-      String(_0x13bf1b?.['endpoint'] || '')['trim'](),
-      _0x2fa5b5['endpoint'],
+      String(response2?.['endpoint'] || '')['trim'](),
+      enabled3['endpoint'],
       'execution endpoint',
     ),
     assertExactValue(
-      String(_0x13bf1b?.['extensions']?.['bodyResolver'] || '')['trim'](),
-      _0x2fa5b5['bodyResolver'],
+      String(response2?.['extensions']?.['bodyResolver'] || '')['trim'](),
+      enabled3['bodyResolver'],
       'execution bodyResolver',
     ));
-  if (_0x13bf1b?.['extensions']?.['endpointResolver'] !== undefined)
+  if (response2?.['extensions']?.['endpointResolver'] !== undefined)
     throw new Error('[modelCatalog] endpointResolver is not allowed');
-  const _0x3c85b7 = _0x13bf1b?.['extensions'] || {};
-  (assertObjectKeysAllowed(_0x3c85b7, BINGHUO_EXECUTION_EXTENSION_KEYS, 'execution extensions'),
+  const value11 = response2?.['extensions'] || {};
+  (assertObjectKeysAllowed(value11, BINGHUO_EXECUTION_EXTENSION_KEYS, 'execution extensions'),
     assertExactValue(
-      JSON['stringify'](_0x13bf1b?.['headers'] || {}),
+      JSON['stringify'](response2?.['headers'] || {}),
       JSON['stringify']({ 'Content-Type': 'application/json' }),
       'execution headers',
     ),
-    assertBinghuoBodyMapping(_0x13bf1b?.['bodyMapping'], 'execution bodyMapping'),
-    assertBinghuoTaskPolling(_0x13bf1b?.['extensions']?.['taskPolling'], _0x2fa5b5));
-  for (const [_0x5534ab, _0x1468ec] of [
+    assertBinghuoBodyMapping(response2?.['bodyMapping'], 'execution bodyMapping'),
+    assertBinghuoTaskPolling(response2?.['extensions']?.['taskPolling'], enabled3));
+  for (const [value12, value13] of [
     ['imageInputUpload', 'image'],
     ['videoInputUpload', 'video'],
     ['audioInputUpload', 'audio'],
   ]) {
     assertBinghuoAssetUploadPolicy(
-      _0x13bf1b?.['extensions']?.[_0x5534ab],
-      'execution\x20extensions.' + _0x5534ab,
-      _0x1468ec,
+      response2?.['extensions']?.[value12],
+      'execution\x20extensions.' + value12,
+      value13,
     );
   }
 }
-function assertBinghuoBundle(_0x2ade9d) {
-  if (!_0x2ade9d || typeof _0x2ade9d !== 'object' || Array['isArray'](_0x2ade9d))
+function assertBinghuoBundle(enabled4) {
+  if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4))
     throw new TypeError('[modelCatalog]\x20catalog\x20bundle\x20must\x20be\x20an\x20object');
-  if (_0x2ade9d['schemaVersion'] !== '1.0')
+  if (enabled4['schemaVersion'] !== '1.0')
     throw new Error('[modelCatalog] unsupported catalog schemaVersion');
-  if (_0x2ade9d['sourceId'] !== BINGHUO_MODEL_CATALOG_SOURCE_ID)
+  if (enabled4['sourceId'] !== BINGHUO_MODEL_CATALOG_SOURCE_ID)
     throw new Error('[modelCatalog] invalid catalog sourceId');
-  if (!Number['isInteger'](_0x2ade9d['version']) || _0x2ade9d['version'] < 0x1)
+  if (!Number['isInteger'](enabled4['version']) || enabled4['version'] < 0x1)
     throw new Error('[modelCatalog] catalog version must be a positive integer');
-  if (!Array['isArray'](_0x2ade9d['models']) || !Array['isArray'](_0x2ade9d['executions']))
+  if (!Array['isArray'](enabled4['models']) || !Array['isArray'](enabled4['executions']))
     throw new Error('[modelCatalog]\x20catalog\x20models/executions\x20must\x20be\x20arrays');
-  const _0x590f9b = new Set(),
-    _0x565a2 = new Set();
-  (_0x2ade9d['models']['forEach']((_0x15169e) => {
-    const _0x475208 = String(_0x15169e?.['provider'] || '')
+  const enabled5 = new Set(),
+    enabled6 = new Set();
+  (enabled4['models']['forEach']((value14) => {
+    const value15 = String(value14?.['provider'] || '')
         ['trim']()
         ['toLowerCase'](),
-      _0x51c11b = String(_0x15169e?.['modelId'] || '')['trim'](),
-      _0x1c51d3 = String(_0x15169e?.['kind'] || '')
+      enabled7 = String(value14?.['modelId'] || '')['trim'](),
+      value16 = String(value14?.['kind'] || '')
         ['trim']()
         ['toLowerCase']();
-    (assertObjectKeysAllowed(_0x15169e, BINGHUO_MODEL_KEYS, 'model'),
+    (assertObjectKeysAllowed(value14, BINGHUO_MODEL_KEYS, 'model'),
       assertObjectKeysAllowed(
-        _0x15169e?.['extensions'] || {},
-        BINGHUO_MODEL_EXTENSION_KEYS[_0x1c51d3] || new Set(),
+        value14?.['extensions'] || {},
+        BINGHUO_MODEL_EXTENSION_KEYS[value16] || new Set(),
         'model extensions',
       ),
       assertBinghuoModelCatalogMetadata(
-        _0x15169e?.['extensions']?.['modelCatalog'],
+        value14?.['extensions']?.['modelCatalog'],
         'model\x20extensions.modelCatalog',
       ));
     if (
-      _0x475208 !== 'binghuo' ||
-      !_0x51c11b['startsWith']('binghuo/') ||
-      String(_0x15169e?.['adapterType'] || '')['trim']() !== 'modelApi' ||
-      _0x15169e?.['outputType'] !== _0x1c51d3
+      value15 !== 'binghuo' ||
+      !enabled7['startsWith']('binghuo/') ||
+      String(value14?.['adapterType'] || '')['trim']() !== 'modelApi' ||
+      value14?.['outputType'] !== value16
     )
       throw new Error('[modelCatalog] catalog contains a non-Binghuo model');
-    _0x590f9b['add'](_0x1c51d3);
+    enabled5['add'](value16);
   }),
-    _0x2ade9d['executions']['forEach']((_0x5f4e6a) => {
+    enabled4['executions']['forEach']((value17) => {
       if (
-        String(_0x5f4e6a?.['provider'] || '')
+        String(value17?.['provider'] || '')
           ['trim']()
           ['toLowerCase']() !== 'binghuo'
       )
         throw new Error('[modelCatalog] catalog contains a non-Binghuo execution');
-      (assertBinghuoExecutionPolicy(_0x5f4e6a),
-        _0x565a2['add'](
-          String(_0x5f4e6a?.['kind'] || '')
+      (assertBinghuoExecutionPolicy(value17),
+        enabled6['add'](
+          String(value17?.['kind'] || '')
             ['trim']()
             ['toLowerCase'](),
         ));
     }));
-  if (!_0x590f9b['size'] || !_0x565a2['size'])
+  if (!enabled5['size'] || !enabled6['size'])
     throw new Error(
       '[modelCatalog]\x20catalog\x20must\x20include\x20at\x20least\x20one\x20executable\x20model',
     );
-  return _0x2ade9d;
+  return enabled4;
 }
-function readCache(_0x2df30a) {
+function readCache(value18) {
   try {
-    const _0x211489 = _0x2df30a?.['getItem']?.(BINGHUO_MODEL_CATALOG_CACHE_KEY);
-    if (!_0x211489) return null;
-    const _0x3970a0 = JSON['parse'](_0x211489);
-    return _0x3970a0 && typeof _0x3970a0 === 'object' ? _0x3970a0 : null;
+    const enabled8 = value18?.['getItem']?.(BINGHUO_MODEL_CATALOG_CACHE_KEY);
+    if (!enabled8) return null;
+    const value19 = JSON['parse'](enabled8);
+    return value19 && typeof value19 === 'object' ? value19 : null;
   } catch {
     return null;
   }
 }
-function removeCache(_0x368e20) {
+function removeCache(value20) {
   try {
-    _0x368e20?.['removeItem']?.(BINGHUO_MODEL_CATALOG_CACHE_KEY);
+    value20?.['removeItem']?.(BINGHUO_MODEL_CATALOG_CACHE_KEY);
   } catch {}
 }
-function writeCache(_0x3ffe44, _0x3ae5ce) {
+function writeCache(value21, value22) {
   try {
-    return (_0x3ffe44?.['setItem']?.(BINGHUO_MODEL_CATALOG_CACHE_KEY, JSON['stringify'](_0x3ae5ce)), !![]);
+    return (value21?.['setItem']?.(BINGHUO_MODEL_CATALOG_CACHE_KEY, JSON['stringify'](value22)), !![]);
   } catch {
     return ![];
   }
 }
-function isCacheEligible(_0x274aff, { installId: _0x555f15, deviceId: _0xc0ef01, nowMs: _0xc97dd5 }) {
-  const _0x3605e7 = normalizeExpirySeconds(_0x274aff?.['authorization']?.['expiresAt']);
+function isCacheEligible(value23, { installId: installId, deviceId: deviceId, nowMs: nowMs }) {
+  const expirySeconds2 = normalizeExpirySeconds(value23?.['authorization']?.['expiresAt']);
   return (
-    _0x274aff?.['schemaVersion'] === '1.0' &&
-    _0x274aff?.['provider'] === 'binghuo' &&
-    _0x274aff?.['authorization']?.['status'] === 'active' &&
-    normalizeIdentity(_0x274aff?.['subject']?.['installId']) === normalizeIdentity(_0x555f15) &&
-    normalizeIdentity(_0x274aff?.['subject']?.['deviceId']) === normalizeIdentity(_0xc0ef01) &&
-    _0x3605e7 !== null &&
-    _0x3605e7 > Math['floor'](_0xc97dd5 / 0x3e8) &&
-    _0x274aff?.['bundle']?.['sourceId'] === BINGHUO_MODEL_CATALOG_SOURCE_ID
+    value23?.['schemaVersion'] === '1.0' &&
+    value23?.['provider'] === 'binghuo' &&
+    value23?.['authorization']?.['status'] === 'active' &&
+    normalizeIdentity(value23?.['subject']?.['installId']) === normalizeIdentity(installId) &&
+    normalizeIdentity(value23?.['subject']?.['deviceId']) === normalizeIdentity(deviceId) &&
+    expirySeconds2 !== null &&
+    expirySeconds2 > Math['floor'](nowMs / 0x3e8) &&
+    value23?.['bundle']?.['sourceId'] === BINGHUO_MODEL_CATALOG_SOURCE_ID
   );
 }
-function readCachedAuthorization(_0x240d39) {
-  return { status: 'active', expiresAt: normalizeExpirySeconds(_0x240d39?.['authorization']?.['expiresAt']) };
+function readCachedAuthorization(value24) {
+  return { status: 'active', expiresAt: normalizeExpirySeconds(value24?.['authorization']?.['expiresAt']) };
 }
-function createCatalogState(_0x155a37 = {}) {
+function createCatalogState(args = {}) {
   return {
     provider: 'binghuo',
     status: 'idle',
@@ -459,11 +455,11 @@ function createCatalogState(_0x155a37 = {}) {
     lastLoadedAt: 0x0,
     lastSyncAt: 0x0,
     error: null,
-    ..._0x155a37,
+    ...args,
   };
 }
 export function createModelCatalogService({
-  store: _0x23bc1b,
+  store: store,
   storage: storage = globalThis['localStorage'],
   fetchCatalog: fetchCatalog = fetchBinghuoModelCatalog,
   validateBundle: validateBundle = validateManifestBundle,
@@ -471,47 +467,46 @@ export function createModelCatalogService({
   unregisterBundle: unregisterBundle = unregisterManifestBundle,
   now: now = () => Date['now'](),
 } = {}) {
-  let _0x28e0d4 = null,
-    _0x5bc09d = 0x0;
-  function _0x391353(_0x51b45c) {
-    const _0x58442d = _0x23bc1b?.['getStateRaw']?.()?.['modelCatalog'] || {};
-    _0x23bc1b?.['setModelCatalogState']?.({ ..._0x58442d, ...createCatalogState(), ..._0x51b45c });
+  let status2 = null,
+    value25 = 0x0;
+  function run(args2) {
+    const args3 = store?.['getStateRaw']?.()?.['modelCatalog'] || {};
+    store?.['setModelCatalogState']?.({ ...args3, ...createCatalogState(), ...args2 });
   }
-  function _0x577420(_0x8c5779) {
-    (assertBinghuoBundle(_0x8c5779), (_0x8c5779 = withoutBinghuoCatalogPrices(_0x8c5779)));
-    const _0x22b883 = _0x28e0d4;
-    if (_0x22b883) unregisterBundle(_0x22b883);
+  function run2(withoutBinghuoCatalogPrices2) {
+    (assertBinghuoBundle(withoutBinghuoCatalogPrices2),
+      (withoutBinghuoCatalogPrices2 = withoutBinghuoCatalogPrices(withoutBinghuoCatalogPrices2)));
+    const value26 = status2;
+    if (value26) unregisterBundle(value26);
     try {
-      (validateBundle(_0x8c5779), registerBundle(_0x8c5779), (_0x28e0d4 = _0x8c5779));
-    } catch (_0x1ff877) {
-      _0x22b883 && (registerBundle(_0x22b883), (_0x28e0d4 = _0x22b883));
-      throw _0x1ff877;
+      (validateBundle(withoutBinghuoCatalogPrices2),
+        registerBundle(withoutBinghuoCatalogPrices2),
+        (status2 = withoutBinghuoCatalogPrices2));
+    } catch (value27) {
+      value26 && (registerBundle(value26), (status2 = value26));
+      throw value27;
     }
   }
-  function _0x2323c4(_0x27ffda, { source: _0x4f5610, etag: etag = '', synced: synced = ![] }) {
-    const _0x20df1b = now();
-    _0x391353({
+  function run3(sourceId, { source: source2, etag: etag = '', synced: synced = ![] }) {
+    const lastLoadedAt = now();
+    run({
       status: 'ready',
-      source: _0x4f5610,
-      sourceId: _0x27ffda['sourceId'],
-      version: _0x27ffda['version'],
+      source: source2,
+      sourceId: sourceId['sourceId'],
+      version: sourceId['version'],
       etag: etag,
-      modelCount: _0x27ffda['models']['length'],
-      executionCount: _0x27ffda['executions']['length'],
-      lastLoadedAt: _0x20df1b,
-      lastSyncAt: synced ? _0x20df1b : 0x0,
+      modelCount: sourceId['models']['length'],
+      executionCount: sourceId['executions']['length'],
+      lastLoadedAt: lastLoadedAt,
+      lastSyncAt: synced ? lastLoadedAt : 0x0,
       error: null,
     });
   }
-  function _0x3849ad({
-    clearCache: clearCache = ![],
-    status: status = 'unavailable',
-    error: error = null,
-  } = {}) {
-    if (_0x28e0d4) unregisterBundle(_0x28e0d4);
-    _0x28e0d4 = null;
+  function run4({ clearCache: clearCache = ![], status: status = 'unavailable', error: error = null } = {}) {
+    if (status2) unregisterBundle(status2);
+    status2 = null;
     if (clearCache) removeCache(storage);
-    _0x391353({
+    run({
       status: status,
       source: 'none',
       sourceId: '',
@@ -524,155 +519,153 @@ export function createModelCatalogService({
       error: error,
     });
   }
-  function _0x5f1c07({ installId: _0x9b088e, deviceId: _0x230b1e } = {}) {
-    const _0x37072d = readCache(storage);
-    if (!isCacheEligible(_0x37072d, { installId: _0x9b088e, deviceId: _0x230b1e, nowMs: now() })) {
-      if (_0x37072d) removeCache(storage);
+  function loadCachedCatalog({ installId: installId2, deviceId: deviceId2 } = {}) {
+    const bundle = readCache(storage);
+    if (!isCacheEligible(bundle, { installId: installId2, deviceId: deviceId2, nowMs: now() })) {
+      if (bundle) removeCache(storage);
       return { loaded: ![], reason: 'cache-ineligible' };
     }
     try {
       return (
-        _0x577420(_0x37072d['bundle']),
-        _0x2323c4(_0x37072d['bundle'], { source: 'cache', etag: String(_0x37072d['etag'] || '') }),
-        { loaded: !![], bundle: _0x37072d['bundle'], authorization: readCachedAuthorization(_0x37072d) }
+        run2(bundle['bundle']),
+        run3(bundle['bundle'], { source: 'cache', etag: String(bundle['etag'] || '') }),
+        { loaded: !![], bundle: bundle['bundle'], authorization: readCachedAuthorization(bundle) }
       );
-    } catch (_0xe1f937) {
+    } catch (error3) {
       return (
         removeCache(storage),
-        _0x3849ad({ status: 'error', error: _0xe1f937?.['message'] || String(_0xe1f937) }),
-        { loaded: ![], reason: 'cache-invalid', error: _0xe1f937 }
+        run4({ status: 'error', error: error3?.['message'] || String(error3) }),
+        { loaded: ![], reason: 'cache-invalid', error: error3 }
       );
     }
   }
-  function _0x1a02e3({ installId: _0x4f1a89, deviceId: _0x214234, error: _0x1e66dd } = {}) {
-    _0x5bc09d += 0x1;
-    const _0x473799 = readCache(storage);
-    if (!isCacheEligible(_0x473799, { installId: _0x4f1a89, deviceId: _0x214234, nowMs: now() })) {
-      if (_0x473799) removeCache(storage);
+  function retainCachedCatalogAfterSubscriptionError({
+    installId: installId3,
+    deviceId: deviceId3,
+    error: error4,
+  } = {}) {
+    value25 += 0x1;
+    const bundle2 = readCache(storage);
+    if (!isCacheEligible(bundle2, { installId: installId3, deviceId: deviceId3, nowMs: now() })) {
+      if (bundle2) removeCache(storage);
       return (
-        _0x3849ad({ status: 'error', error: _0x1e66dd?.['message'] || String(_0x1e66dd || '') }),
-        { status: 'error', error: _0x1e66dd }
+        run4({ status: 'error', error: error4?.['message'] || String(error4 || '') }),
+        { status: 'error', error: error4 }
       );
     }
     try {
       return (
-        (!_0x28e0d4 || _0x28e0d4['version'] !== _0x473799['bundle']['version']) &&
-          _0x577420(_0x473799['bundle']),
-        _0x2323c4(_0x473799['bundle'], {
+        (!status2 || status2['version'] !== bundle2['bundle']['version']) && run2(bundle2['bundle']),
+        run3(bundle2['bundle'], {
           source: 'cache-fallback',
-          etag: String(_0x473799['etag'] || ''),
+          etag: String(bundle2['etag'] || ''),
           synced: !![],
         }),
         {
           status: 'cache-fallback',
-          bundle: _0x473799['bundle'],
-          authorization: readCachedAuthorization(_0x473799),
-          error: _0x1e66dd,
+          bundle: bundle2['bundle'],
+          authorization: readCachedAuthorization(bundle2),
+          error: error4,
         }
       );
-    } catch (_0x29ce2f) {
+    } catch (error5) {
       return (
         removeCache(storage),
-        _0x3849ad({ status: 'error', error: _0x29ce2f?.['message'] || String(_0x29ce2f) }),
-        { status: 'error', error: _0x29ce2f }
+        run4({ status: 'error', error: error5?.['message'] || String(error5) }),
+        { status: 'error', error: error5 }
       );
     }
   }
-  async function _0x28fd55({
-    subscriptionState: _0x24f41c,
-    installId: _0x336d23,
-    deviceId: _0x22a0a2,
+  async function sync({
+    subscriptionState: subscriptionState,
+    installId: installId4,
+    deviceId: deviceId4,
     force: force = ![],
   } = {}) {
-    const _0x4b18e4 = ++_0x5bc09d,
-      _0x41dd3d = now();
-    if (!isActiveSubscription(_0x24f41c, _0x41dd3d))
-      return (_0x3849ad({ clearCache: !![], status: 'unavailable' }), { status: 'unauthorized' });
-    const _0x1d56b0 = normalizeIdentity(_0x336d23),
-      _0x492095 = normalizeIdentity(_0x22a0a2);
-    if (!_0x1d56b0 || !_0x492095)
+    const value28 = ++value25,
+      nowMs2 = now();
+    if (!isActiveSubscription(subscriptionState, nowMs2))
+      return (run4({ clearCache: !![], status: 'unavailable' }), { status: 'unauthorized' });
+    const installId5 = normalizeIdentity(installId4),
+      deviceId5 = normalizeIdentity(deviceId4);
+    if (!installId5 || !deviceId5)
       return (
-        _0x3849ad({ status: 'error', error: '缺少模型目录授权主体信息' }),
+        run4({ status: 'error', error: '缺少模型目录授权主体信息' }),
         { status: 'error', error: 'missing-subject' }
       );
-    const _0x3d365b = readCache(storage),
-      _0x229f21 = isCacheEligible(_0x3d365b, { installId: _0x1d56b0, deviceId: _0x492095, nowMs: _0x41dd3d })
-        ? _0x3d365b
+    const cache = readCache(storage),
+      bundle3 = isCacheEligible(cache, { installId: installId5, deviceId: deviceId5, nowMs: nowMs2 })
+        ? cache
         : null;
-    if (_0x3d365b && !_0x229f21) removeCache(storage);
-    _0x391353({
-      status: _0x28e0d4 ? 'refreshing' : 'loading',
-      source: _0x28e0d4 ? 'cache' : 'none',
+    if (cache && !bundle3) removeCache(storage);
+    run({
+      status: status2 ? 'refreshing' : 'loading',
+      source: status2 ? 'cache' : 'none',
       error: null,
     });
     try {
-      let _0x2a77f2 = await fetchCatalog({
-        installId: _0x1d56b0,
-        deviceId: _0x492095,
-        etag: force ? '' : String(_0x229f21?.['etag'] || ''),
+      let etag2 = await fetchCatalog({
+        installId: installId5,
+        deviceId: deviceId5,
+        etag: force ? '' : String(bundle3?.['etag'] || ''),
       });
-      if (_0x4b18e4 !== _0x5bc09d) return { status: 'superseded' };
-      if (_0x2a77f2?.['status'] === 'not-modified' && !_0x229f21) {
-        _0x2a77f2 = await fetchCatalog({ installId: _0x1d56b0, deviceId: _0x492095, etag: '' });
-        if (_0x4b18e4 !== _0x5bc09d) return { status: 'superseded' };
+      if (value28 !== value25) return { status: 'superseded' };
+      if (etag2?.['status'] === 'not-modified' && !bundle3) {
+        etag2 = await fetchCatalog({ installId: installId5, deviceId: deviceId5, etag: '' });
+        if (value28 !== value25) return { status: 'superseded' };
       }
-      if (_0x2a77f2?.['status'] === 'not-modified')
+      if (etag2?.['status'] === 'not-modified')
         return (
-          (!_0x28e0d4 || _0x28e0d4['version'] !== _0x229f21['bundle']['version']) &&
-            _0x577420(_0x229f21['bundle']),
-          _0x2323c4(_0x229f21['bundle'], {
+          (!status2 || status2['version'] !== bundle3['bundle']['version']) && run2(bundle3['bundle']),
+          run3(bundle3['bundle'], {
             source: 'cache',
-            etag: _0x2a77f2['etag'] || _0x229f21['etag'],
+            etag: etag2['etag'] || bundle3['etag'],
             synced: !![],
           }),
-          { status: 'not-modified', bundle: _0x229f21['bundle'] }
+          { status: 'not-modified', bundle: bundle3['bundle'] }
         );
-      const _0x54e2c8 = assertBinghuoBundle(_0x2a77f2?.['bundle']);
-      _0x577420(_0x54e2c8);
-      const _0x26ed6a = normalizeExpirySeconds(_0x24f41c?.['expiresAt']);
+      const version = assertBinghuoBundle(etag2?.['bundle']);
+      run2(version);
+      const expiresAt = normalizeExpirySeconds(subscriptionState?.['expiresAt']);
       return (
-        _0x26ed6a !== null && _0x26ed6a > Math['floor'](now() / 0x3e8)
+        expiresAt !== null && expiresAt > Math['floor'](now() / 0x3e8)
           ? writeCache(storage, {
               schemaVersion: '1.0',
               provider: 'binghuo',
-              subject: { installId: _0x1d56b0, deviceId: _0x492095 },
-              authorization: { status: 'active', expiresAt: _0x26ed6a },
-              version: _0x54e2c8['version'],
-              etag: String(_0x2a77f2?.['etag'] || ''),
+              subject: { installId: installId5, deviceId: deviceId5 },
+              authorization: { status: 'active', expiresAt: expiresAt },
+              version: version['version'],
+              etag: String(etag2?.['etag'] || ''),
               cachedAt: now(),
-              bundle: _0x54e2c8,
+              bundle: version,
             })
           : removeCache(storage),
-        _0x2323c4(_0x54e2c8, { source: 'remote', etag: String(_0x2a77f2?.['etag'] || ''), synced: !![] }),
-        { status: 'updated', bundle: _0x54e2c8 }
+        run3(version, { source: 'remote', etag: String(etag2?.['etag'] || ''), synced: !![] }),
+        { status: 'updated', bundle: version }
       );
-    } catch (_0x570068) {
-      if (_0x4b18e4 !== _0x5bc09d) return { status: 'superseded', error: _0x570068 };
-      if (_0x570068?.['status'] === 0x191 || _0x570068?.['status'] === 0x193)
+    } catch (error6) {
+      if (value28 !== value25) return { status: 'superseded', error: error6 };
+      if (error6?.['status'] === 0x191 || error6?.['status'] === 0x193)
+        return (run4({ clearCache: !![], status: 'unavailable' }), { status: 'unauthorized', error: error6 });
+      if (bundle3)
         return (
-          _0x3849ad({ clearCache: !![], status: 'unavailable' }),
-          { status: 'unauthorized', error: _0x570068 }
-        );
-      if (_0x229f21)
-        return (
-          (!_0x28e0d4 || _0x28e0d4['version'] !== _0x229f21['bundle']['version']) &&
-            _0x577420(_0x229f21['bundle']),
-          _0x2323c4(_0x229f21['bundle'], { source: 'cache-fallback', etag: _0x229f21['etag'], synced: !![] }),
-          { status: 'cache-fallback', bundle: _0x229f21['bundle'], error: _0x570068 }
+          (!status2 || status2['version'] !== bundle3['bundle']['version']) && run2(bundle3['bundle']),
+          run3(bundle3['bundle'], { source: 'cache-fallback', etag: bundle3['etag'], synced: !![] }),
+          { status: 'cache-fallback', bundle: bundle3['bundle'], error: error6 }
         );
       return (
-        _0x3849ad({ status: 'error', error: _0x570068?.['message'] || String(_0x570068) }),
-        { status: 'error', error: _0x570068 }
+        run4({ status: 'error', error: error6?.['message'] || String(error6) }),
+        { status: 'error', error: error6 }
       );
     }
   }
-  function _0x369763() {
-    ((_0x5bc09d += 0x1), _0x3849ad({ clearCache: !![], status: 'unavailable' }));
+  function clear() {
+    ((value25 += 0x1), run4({ clearCache: !![], status: 'unavailable' }));
   }
   return {
-    loadCachedCatalog: _0x5f1c07,
-    retainCachedCatalogAfterSubscriptionError: _0x1a02e3,
-    sync: _0x28fd55,
-    clear: _0x369763,
+    loadCachedCatalog: loadCachedCatalog,
+    retainCachedCatalogAfterSubscriptionError: retainCachedCatalogAfterSubscriptionError,
+    sync: sync,
+    clear: clear,
   };
 }

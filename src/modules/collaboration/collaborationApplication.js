@@ -9,11 +9,11 @@ import { createCollaborationCanvasBinding } from './collaborationCanvasBinding.j
 const STORAGE_KEY = 'aicanvas.collaboration.session.v2',
   RESUME_KEY = 'aicanvas.collaboration.resume.v3';
 export function createCollaborationApplication({
-  store: _0x59e192,
-  canvasTabs: _0xc49d83,
-  ensureInstallId: _0x402a9,
-  ensureDeviceId: _0x3d311e,
-  resetHistory: _0x27b877,
+  store: store,
+  canvasTabs: canvasTabs,
+  ensureInstallId: ensureInstallId,
+  ensureDeviceId: ensureDeviceId,
+  resetHistory: resetHistory,
   storage: storage = globalThis['sessionStorage'],
   fetchConfig: fetchConfig = fetchCollaborationConfig,
   createApi: createApi = createCollaborationApi,
@@ -22,15 +22,15 @@ export function createCollaborationApplication({
   onPresence: onPresence = () => {},
   onNotice: onNotice = () => {},
   onComment: onComment = () => {},
-  saveProject: _0x2a4821,
-  resumeStorage: _0x258962,
+  saveProject: saveProject,
+  resumeStorage: resumeStorage,
 }) {
-  let _0x1fab68 = _0x258962 || storage;
-  if (!_0x258962)
+  let storage2 = resumeStorage || storage;
+  if (!resumeStorage)
     try {
-      _0x1fab68 = globalThis['localStorage'] || storage;
+      storage2 = globalThis['localStorage'] || storage;
     } catch {}
-  const _0x25adc3 = {
+  const actorId = {
     authenticated: ![],
     authenticating: ![],
     authError: null,
@@ -39,578 +39,569 @@ export function createCollaborationApplication({
     session: null,
     nodeCount: 0x0,
   };
-  let _0x5b801d = null,
-    _0x5f5891 = null,
-    _0x3c0538 = () => {},
-    _0x297dc0 = null,
-    _0x51208c = '成员',
-    _0xfbca95 = crypto['randomUUID'](),
-    _0x1a70af = 0x0,
-    _0x575f4d = ![],
-    _0x2a5d00 = ![],
-    _0x1e1915 = null,
-    _0xf84714 = 0x0,
-    _0x1e6d38 = null,
-    _0x58ad4c = 0x0;
-  const _0x31be87 = () => {
-      if (_0x575f4d) throw new DOMException('Aborted', 'AbortError');
+  let api = null,
+    resumeRoom = null,
+    handler = () => {},
+    serverUrl = null,
+    displayName = '成员',
+    clientId = crypto['randomUUID'](),
+    value = 0x0,
+    enabled = ![],
+    item = ![],
+    enabled2 = null,
+    key = 0x0,
+    value2 = null,
+    index = 0x0;
+  const run = () => {
+      if (enabled) throw new DOMException('Aborted', 'AbortError');
     },
-    _0x276786 = () => _0xc49d83['getActiveCanvasId'](),
-    _0x6b61c3 = createCollaborationCanvasBinding({
-      storage: _0x1fab68,
-      canvasTabs: _0xc49d83,
-      actorId: () => _0x25adc3['actorId'],
+    getCanvasId = () => canvasTabs['getActiveCanvasId'](),
+    collaborationCanvasBinding = createCollaborationCanvasBinding({
+      storage: storage2,
+      canvasTabs: canvasTabs,
+      actorId: () => actorId['actorId'],
     }),
-    _0x1bfb74 = createCollaborationCanvasBinding({
-      storage: _0x1fab68,
-      canvasTabs: _0xc49d83,
-      actorId: () => _0x25adc3['actorId'],
+    collaborationCanvasBinding2 = createCollaborationCanvasBinding({
+      storage: storage2,
+      canvasTabs: canvasTabs,
+      actorId: () => actorId['actorId'],
       hosting: ![],
     }),
-    _0x10f9f3 = () => ({
-      ..._0x25adc3,
+    getState = () => ({
+      ...actorId,
       hostPortConflict:
-        !_0x5f5891 &&
-        _0x1e1915?.['canvasId'] === _0x276786() &&
-        _0x1e1915?.['actorId'] === _0x25adc3['actorId']
-          ? _0x1e1915['details']
+        !resumeRoom &&
+        enabled2?.['canvasId'] === getCanvasId() &&
+        enabled2?.['actorId'] === actorId['actorId']
+          ? enabled2['details']
           : null,
-      resumeRoom: _0x5f5891
+      resumeRoom: resumeRoom
         ? null
-        : _0x6b61c3['resumeFor'](_0x276786()) ||
-          _0x1bfb74['resumeFor'](_0x276786()) ||
-          (_0x25adc3['resumeRoom']?.['canvasId'] === _0x276786() &&
-          _0x25adc3['resumeRoom']?.['actorId'] === _0x25adc3['actorId']
-            ? _0x25adc3['resumeRoom']
+        : collaborationCanvasBinding['resumeFor'](getCanvasId()) ||
+          collaborationCanvasBinding2['resumeFor'](getCanvasId()) ||
+          (actorId['resumeRoom']?.['canvasId'] === getCanvasId() &&
+          actorId['resumeRoom']?.['actorId'] === actorId['actorId']
+            ? actorId['resumeRoom']
             : null),
-      displayName: _0x51208c,
-      nodeCount: Object['keys'](_0x59e192['getStateRaw']()['nodes'] || {})['length'],
+      displayName: displayName,
+      nodeCount: Object['keys'](store['getStateRaw']()['nodes'] || {})['length'],
     }),
-    _0x25a171 = () => {
-      if (!_0x575f4d) onChange(_0x10f9f3());
+    refreshCanvas = () => {
+      if (!enabled) onChange(getState());
     };
-  async function _0x188662() {
-    if (!_0x297dc0) {
-      const _0x56a48e = await fetchConfig();
-      (_0x31be87(), (_0x297dc0 = _0x56a48e));
+  async function run2() {
+    if (!serverUrl) {
+      const fetchConfig2 = await fetchConfig();
+      (run(), (serverUrl = fetchConfig2));
     }
-    _0x31be87();
-    if (!_0x5b801d) _0x5b801d = createApi(_0x297dc0);
-    return _0x5b801d;
+    run();
+    if (!api) api = createApi(serverUrl);
+    return api;
   }
-  async function _0xf87f3c(_0x248850) {
-    if (!_0x25adc3['authenticated']) throw new Error('请先验证已激活的画布身份');
+  async function run3(args) {
+    if (!actorId['authenticated']) throw new Error('请先验证已激活的画布身份');
     try {
-      return await _0x5b801d['rpc']({ ..._0x248850, clientId: _0xfbca95 });
-    } catch (_0x2a469c) {
-      ['SESSION_EXPIRED', 'ACTIVATION_REQUIRED']['includes'](_0x2a469c['code']) &&
-        !_0x5f5891 &&
-        ((_0x25adc3['authenticated'] = ![]), storage?.['removeItem'](STORAGE_KEY), _0x25a171());
-      throw _0x2a469c;
+      return await api['rpc']({ ...args, clientId: clientId });
+    } catch (result) {
+      ['SESSION_EXPIRED', 'ACTIVATION_REQUIRED']['includes'](result['code']) &&
+        !resumeRoom &&
+        ((actorId['authenticated'] = ![]), storage?.['removeItem'](STORAGE_KEY), refreshCanvas());
+      throw result;
     }
   }
-  async function _0x60d883() {
-    const _0x5dfba2 = _0x5b801d,
-      _0x1e8c65 = _0xf84714;
+  async function refreshRooms() {
+    const data = api,
+      options = key;
     try {
-      const _0x445438 = await _0x5dfba2['listRooms'](_0xfbca95);
-      if (_0x575f4d || _0x5b801d !== _0x5dfba2 || _0x1e8c65 !== _0xf84714) return;
-      ((_0x25adc3['rooms'] = _0x445438['rooms']), _0x25a171());
-    } catch (_0x5669f2) {
-      !_0x575f4d &&
-        _0x5b801d === _0x5dfba2 &&
-        _0x1e8c65 === _0xf84714 &&
-        ['SESSION_EXPIRED', 'ACTIVATION_REQUIRED']['includes'](_0x5669f2['code']) &&
-        !_0x5f5891 &&
-        ((_0x25adc3['authenticated'] = ![]), storage?.['removeItem'](STORAGE_KEY), _0x25a171());
-      throw _0x5669f2;
+      const target = await data['listRooms'](clientId);
+      if (enabled || api !== data || options !== key) return;
+      ((actorId['rooms'] = target['rooms']), refreshCanvas());
+    } catch (source) {
+      !enabled &&
+        api === data &&
+        options === key &&
+        ['SESSION_EXPIRED', 'ACTIVATION_REQUIRED']['includes'](source['code']) &&
+        !resumeRoom &&
+        ((actorId['authenticated'] = ![]), storage?.['removeItem'](STORAGE_KEY), refreshCanvas());
+      throw source;
     }
   }
-  function _0x4149e0() {
-    _0x31be87();
-    if (_0x5f5891 || _0x2a5d00) throw new Error('请先结束当前画布的联机');
+  function run4() {
+    run();
+    if (resumeRoom || item) throw new Error('请先结束当前画布的联机');
     if (
-      Object['values'](_0x59e192['getStateRaw']()['nodes'] || {})['some'](
-        (_0x57d91c) => _0x57d91c['isGenerating'] || _0x57d91c['isLoading'],
+      Object['values'](store['getStateRaw']()['nodes'] || {})['some'](
+        (next) => next['isGenerating'] || next['isLoading'],
       )
     )
       throw new Error('请等待当前生成任务结束后开启协作');
   }
-  async function _0x2cc613(_0x2ccada, _0x3896e1 = ![]) {
-    _0x31be87();
-    if (
-      !_0x2ccada['roomId'] ||
-      !_0x2ccada['document'] ||
-      !_0x2ccada['role'] ||
-      !Array['isArray'](_0x2ccada['members'])
-    )
+  async function run5(room, publish = ![]) {
+    run();
+    if (!room['roomId'] || !room['document'] || !room['role'] || !Array['isArray'](room['members']))
       throw new Error('协作房间响应无效，请检查服务部署');
-    const _0x1fdd72 = ++_0x1a70af,
-      _0x490af4 = !!_0x5b801d['getConnection']()?.['hosting'],
-      _0x208891 = _0x490af4 ? _0x6b61c3 : _0x1bfb74,
-      _0xa410c9 = !_0x3896e1 && (await _0x208891['activate'](_0x2ccada['roomId'])),
-      _0x3eec3d = _0xa410c9 ? await _0x208891['baseline'](_0x2ccada['roomId']) : null;
-    if (_0xa410c9 && !_0x3eec3d) throw new Error('此画布的上次同步记录不可用，已保留本机内容，请勿覆盖保存');
-    _0x31be87();
-    if (!_0x3896e1 && !_0xa410c9) {
-      if ((await _0xc49d83['addCanvas']()) === ![]) throw new Error('无法创建协作画布标签页');
-      (_0x31be87(), _0xc49d83['renameCanvas'](_0x276786(), _0x2ccada['name']));
+    const current = ++value,
+      label = !!api['getConnection']()?.['hosting'],
+      entry = label ? collaborationCanvasBinding : collaborationCanvasBinding2,
+      mediaBindings = !publish && (await entry['activate'](room['roomId'])),
+      hostBase = mediaBindings ? await entry['baseline'](room['roomId']) : null;
+    if (mediaBindings && !hostBase)
+      throw new Error('此画布的上次同步记录不可用，已保留本机内容，请勿覆盖保存');
+    run();
+    if (!publish && !mediaBindings) {
+      if ((await canvasTabs['addCanvas']()) === ![]) throw new Error('无法创建协作画布标签页');
+      (run(), canvasTabs['renameCanvas'](getCanvasId(), room['name']));
     }
-    const _0xa116e1 = _0x276786(),
-      _0x5c9d95 = _0xc49d83['getCanvasProjectAccess']?.(_0xa116e1),
-      _0x299fb0 = _0xa410c9 ? _0x208891['originalAccess'](_0x2ccada['roomId'], _0x5c9d95) : _0x5c9d95,
-      _0x42967f = (_0x4e3aba) => {
-        const _0x44cb5c = _0x490af4 && !_0x4e3aba['mediaNodes']?.['some']((_0x3c4be1) => !_0x3c4be1['owned']),
-          _0x43b1c5 =
-            _0x4e3aba['status'] === 'online' && _0x4e3aba['presenceStatus'] !== 'offline'
-              ? _0x490af4
+    const canvasId = getCanvasId(),
+      record = canvasTabs['getCanvasProjectAccess']?.(canvasId),
+      payload = mediaBindings ? entry['originalAccess'](room['roomId'], record) : record,
+      handler2 = (response) => {
+        const canSave = label && !response['mediaNodes']?.['some']((enabled3) => !enabled3['owned']),
+          badge =
+            response['status'] === 'online' && response['presenceStatus'] !== 'offline'
+              ? label
                 ? 'shared-host'
                 : 'shared'
               : '',
-          _0x35a4c4 = _0xc49d83['getCanvasProjectAccess']?.(_0xa116e1);
-        if (_0x35a4c4?.['canSave'] !== _0x44cb5c || _0x35a4c4?.['badge'] !== _0x43b1c5)
-          _0xc49d83['setCanvasProjectAccess']?.(_0xa116e1, {
-            badge: _0x43b1c5,
-            label: _0x490af4 ? '协作房主' : '协作成员',
-            canSave: _0x44cb5c,
-            saveMessage: _0x44cb5c
+          handle = canvasTabs['getCanvasProjectAccess']?.(canvasId);
+        if (handle?.['canSave'] !== canSave || handle?.['badge'] !== badge)
+          canvasTabs['setCanvasProjectAccess']?.(canvasId, {
+            badge: badge,
+            label: label ? '协作房主' : '协作成员',
+            canSave: canSave,
+            saveMessage: canSave
               ? ''
-              : _0x490af4
+              : label
                 ? '成员素材尚未传输完成，请等待完成后保存'
                 : '这是协作项目，只能由房主保存',
           });
       };
-    ((_0x5f5891 = createSession({
-      store: _0x59e192,
-      api: _0x5b801d,
-      room: _0x2ccada,
-      actorId: _0x25adc3['actorId'],
-      clientId: _0xfbca95,
-      getCanvasId: _0x276786,
-      hosting: _0x490af4,
-      onChange(_0x52a11d) {
-        if (_0x1fdd72 !== _0x1a70af) return;
-        (_0x42967f(_0x52a11d),
-          (_0x25adc3['session'] = {
-            ..._0x52a11d,
-            hosting: _0x490af4,
-            hostAddresses: _0x5b801d['getConnection']()?.['endpoint']?.['addresses'] || [],
+    ((resumeRoom = createSession({
+      store: store,
+      api: api,
+      room: room,
+      actorId: actorId['actorId'],
+      clientId: clientId,
+      getCanvasId: getCanvasId,
+      hosting: label,
+      onChange(args2) {
+        if (current !== value) return;
+        (handler2(args2),
+          (actorId['session'] = {
+            ...args2,
+            hosting: label,
+            hostAddresses: api['getConnection']()?.['endpoint']?.['addresses'] || [],
           }),
-          _0x25a171());
+          refreshCanvas());
       },
-      onPresence(_0x43bf7f) {
-        if (_0x1fdd72 !== _0x1a70af || !_0x25adc3['session']) return;
-        (Object['assign'](_0x25adc3['session'], _0x43bf7f),
-          _0x42967f(_0x25adc3['session']),
-          onPresence(_0x25adc3['session']));
+      onPresence(state) {
+        if (current !== value || !actorId['session']) return;
+        (Object['assign'](actorId['session'], state),
+          handler2(actorId['session']),
+          onPresence(actorId['session']));
       },
-      onConfirmed(_0x106c11, _0x21a282) {
-        return _0x208891['checkpoint'](_0x2ccada['roomId'], _0x106c11, _0x21a282);
+      onConfirmed(config, scope) {
+        return entry['checkpoint'](room['roomId'], config, scope);
       },
-      onAttention(_0x2d528f) {
-        if (_0x1fdd72 === _0x1a70af && !_0x575f4d)
+      onAttention(input) {
+        if (current === value && !enabled)
           onNotice(
-            _0x2d528f
-              ? '房主已召集你到\x20TA\x20的视角'
-              : '房主发起了召集；你已关闭自动跟随，当前视角保持不变',
+            input ? '房主已召集你到\x20TA\x20的视角' : '房主发起了召集；你已关闭自动跟随，当前视角保持不变',
           );
       },
       onNotice: onNotice,
       onComment: onComment,
       onDetach() {
-        if (_0x1fdd72 !== _0x1a70af) return;
-        (_0x3c0538(),
-          (_0x1a70af += 0x1),
-          (_0x5f5891 = null),
-          (_0x25adc3['session'] = null),
-          (_0x25adc3['resumeRoom'] = null),
-          _0x1fab68?.['removeItem'](RESUME_KEY),
-          _0x27b877(),
-          _0x25a171());
+        if (current !== value) return;
+        (handler(),
+          (value += 0x1),
+          (resumeRoom = null),
+          (actorId['session'] = null),
+          (actorId['resumeRoom'] = null),
+          storage2?.['removeItem'](RESUME_KEY),
+          resetHistory(),
+          refreshCanvas());
       },
     })),
-      (_0x3c0538 = () => {
-        _0x3c0538 = () => {};
-        const _0xb49732 =
-          _0x490af4 && _0x25adc3['session']?.['mediaNodes']?.['some']((_0x2733a5) => !_0x2733a5['owned']);
-        _0xc49d83['setCanvasProjectAccess']?.(
-          _0xa116e1,
-          _0x490af4 && !_0xb49732
-            ? _0x299fb0
-            : { ..._0xc49d83['getCanvasProjectAccess']?.(_0xa116e1), badge: '' },
+      (handler = () => {
+        handler = () => {};
+        const enabled4 =
+          label && actorId['session']?.['mediaNodes']?.['some']((enabled5) => !enabled5['owned']);
+        canvasTabs['setCanvasProjectAccess']?.(
+          canvasId,
+          label && !enabled4 ? payload : { ...canvasTabs['getCanvasProjectAccess']?.(canvasId), badge: '' },
         );
       }),
-      _0xc49d83['setCanvasProjectAccess']?.(_0xa116e1, {
+      canvasTabs['setCanvasProjectAccess']?.(canvasId, {
         badge: '',
         label: '协作项目',
-        canSave: _0x490af4,
+        canSave: label,
         saveMessage: '这是协作项目，只能由房主保存',
       }));
     try {
-      (await _0x5f5891['start']({
-        publish: _0x3896e1,
-        hostBase: _0x3eec3d,
-        mediaBindings: _0xa410c9 && !_0x490af4 ? await _0x208891['mediaBindings'](_0x2ccada['roomId']) : [],
+      (await resumeRoom['start']({
+        publish: publish,
+        hostBase: hostBase,
+        mediaBindings: mediaBindings && !label ? await entry['mediaBindings'](room['roomId']) : [],
       }),
-        _0x31be87());
-      const _0x412f15 = _0x5b801d['getConnection'](),
-        _0x3e8650 = {
-          roomId: _0x2ccada['roomId'],
-          name: _0x2ccada['name'],
-          clientId: _0xfbca95,
-          endpoint: _0x412f15['endpoint'],
-          hosting: _0x490af4,
-          canvasId: _0xa116e1,
-          actorId: _0x25adc3['actorId'],
+        run());
+      const endpoint = api['getConnection'](),
+        output = {
+          roomId: room['roomId'],
+          name: room['name'],
+          clientId: clientId,
+          endpoint: endpoint['endpoint'],
+          hosting: label,
+          canvasId: canvasId,
+          actorId: actorId['actorId'],
         };
-      (_0x1fab68?.['setItem'](RESUME_KEY, JSON['stringify'](_0x3e8650)),
-        _0x208891['remember'](_0x2ccada['roomId'], _0xa116e1, _0x299fb0, _0x3e8650));
-    } catch (_0x1b6809) {
-      ((_0x1a70af += 0x1), (_0x3c0538 = () => {}));
-      const _0x44c99a =
-        _0x490af4 && _0x25adc3['session']?.['mediaNodes']?.['some']((_0x2270a5) => !_0x2270a5['owned']);
-      _0xc49d83['setCanvasProjectAccess']?.(
-        _0xa116e1,
-        _0x44c99a ? { ..._0xc49d83['getCanvasProjectAccess']?.(_0xa116e1), badge: '' } : _0x5c9d95,
+      (storage2?.['setItem'](RESUME_KEY, JSON['stringify'](output)),
+        entry['remember'](room['roomId'], canvasId, payload, output));
+    } catch (value3) {
+      ((value += 0x1), (handler = () => {}));
+      const value4 = label && actorId['session']?.['mediaNodes']?.['some']((enabled6) => !enabled6['owned']);
+      canvasTabs['setCanvasProjectAccess']?.(
+        canvasId,
+        value4 ? { ...canvasTabs['getCanvasProjectAccess']?.(canvasId), badge: '' } : record,
       );
-      throw _0x1b6809;
+      throw value3;
     }
-    _0x25a171();
+    refreshCanvas();
   }
-  async function _0x2f07ca(_0xba4aa0, _0x40a059, _0x5bc8ca = ![], _0x548fe6 = _0x276786(), _0x5e5b2e = ![]) {
-    _0x4149e0();
-    if (!_0x25adc3['authenticated'] || !_0x5b801d) throw new Error('请先验证已激活的画布身份');
-    const _0x1fc2bd = _0x5b801d;
-    _0x1e1915 = null;
-    let _0x8b8cc5 = ![];
-    _0x2a5d00 = !![];
+  async function run6(handler3, handler4, value5 = ![], canvasId2 = getCanvasId(), replacePort = ![]) {
+    run4();
+    if (!actorId['authenticated'] || !api) throw new Error('请先验证已激活的画布身份');
+    const value6 = api;
+    enabled2 = null;
+    let enabled7 = ![];
+    item = !![];
     try {
-      (await _0xba4aa0(_0x1fc2bd, { replacePort: _0x5e5b2e }), _0x31be87());
-      const _0x1bd0e6 = await _0x40a059();
-      _0x31be87();
-      if (_0x548fe6 && _0x276786() !== _0x548fe6) throw new Error('画布已切换，请返回原画布重新开房');
-      (await _0x2cc613(_0x1bd0e6, _0x5bc8ca), (_0x8b8cc5 = !![]));
-      if (_0x5e5b2e)
+      (await handler3(value6, { replacePort: replacePort }), run());
+      const value7 = await handler4();
+      run();
+      if (canvasId2 && getCanvasId() !== canvasId2) throw new Error('画布已切换，请返回原画布重新开房');
+      (await run5(value7, value5), (enabled7 = !![]));
+      if (replacePort)
         onNotice('协作端口已更换，请在邀请区域生成并重新发送邀请信息；此前所有房间的旧邀请地址不再可用');
-      if (_0x5bc8ca) await _0x60d883();
-    } catch (_0xc19eb3) {
-      !_0x8b8cc5 &&
-        !_0x575f4d &&
-        _0x5f5891 &&
-        (await _0x5f5891['destroy'](),
-        (_0x1a70af += 0x1),
-        (_0x5f5891 = null),
-        (_0x25adc3['session'] = null),
-        _0x27b877(),
-        _0x25a171());
-      if (!_0x5f5891 || _0x575f4d) await _0x1fc2bd['disconnect']();
-      !_0x575f4d &&
-        _0xc19eb3['code'] === 'HOST_PORT_BUSY' &&
-        _0x276786() === _0x548fe6 &&
-        ((_0x1e1915 = {
-          canvasId: _0x548fe6,
-          actorId: _0x25adc3['actorId'],
-          details: { ..._0xc19eb3['details'], message: _0xc19eb3['message'] },
-          retry: (_0x1b849a) => _0x2f07ca(_0xba4aa0, _0x40a059, _0x5bc8ca, _0x548fe6, _0x1b849a),
+      if (value5) await refreshRooms();
+    } catch (message) {
+      !enabled7 &&
+        !enabled &&
+        resumeRoom &&
+        (await resumeRoom['destroy'](),
+        (value += 0x1),
+        (resumeRoom = null),
+        (actorId['session'] = null),
+        resetHistory(),
+        refreshCanvas());
+      if (!resumeRoom || enabled) await value6['disconnect']();
+      !enabled &&
+        message['code'] === 'HOST_PORT_BUSY' &&
+        getCanvasId() === canvasId2 &&
+        ((enabled2 = {
+          canvasId: canvasId2,
+          actorId: actorId['actorId'],
+          details: { ...message['details'], message: message['message'] },
+          retry: (value8) => run6(handler3, handler4, value5, canvasId2, value8),
         }),
-        _0x25a171());
-      throw _0xc19eb3;
+        refreshCanvas());
+      throw message;
     } finally {
-      _0x2a5d00 = ![];
+      item = ![];
     }
   }
-  const _0xca3dbc = {
-    async retryHostPort(_0x3f8869 = ![]) {
-      _0x4149e0();
-      if (
-        !_0x1e1915 ||
-        _0x1e1915['canvasId'] !== _0x276786() ||
-        _0x1e1915['actorId'] !== _0x25adc3['actorId']
-      )
+  const actions = {
+    async retryHostPort(enabled8 = ![]) {
+      run4();
+      if (!enabled2 || enabled2['canvasId'] !== getCanvasId() || enabled2['actorId'] !== actorId['actorId'])
         throw new Error('画布已切换，请重新开房');
-      return _0x1e1915['retry'](_0x3f8869 === !![]);
+      return enabled2['retry'](enabled8 === !![]);
     },
-    async authenticate(_0x590929 = {}) {
-      (await _0x24e44f, _0x31be87());
-      if (_0x1e6d38) return _0x1e6d38;
-      if (_0x5f5891 || _0x2a5d00) throw new Error('请先结束当前画布的联机');
-      const _0x2912ba = ++_0xf84714;
+    async authenticate(options2 = {}) {
+      (await ready, run());
+      if (value2) return value2;
+      if (resumeRoom || item) throw new Error('请先结束当前画布的联机');
+      const value9 = ++key;
       return (
-        (_0x25adc3['authenticating'] = !![]),
-        (_0x25adc3['authError'] = null),
-        _0x25a171(),
-        (_0x1e6d38 = (async () => {
+        (actorId['authenticating'] = !![]),
+        (actorId['authError'] = null),
+        refreshCanvas(),
+        (value2 = (async () => {
           try {
-            const _0x556627 = await _0x188662(),
-              _0x471108 = await _0x402a9(),
-              _0xf17647 = await _0x3d311e(_0x471108);
-            _0x31be87();
-            if (_0x2912ba !== _0xf84714) return;
-            const _0x4e019c = await _0x556627['authenticate']({ installId: _0x471108, deviceId: _0xf17647 });
-            _0x31be87();
-            if (_0x2912ba !== _0xf84714) return;
-            ((_0x51208c = String(
-              _0x590929['displayName'] ||
-                (_0x51208c !== '成员' ? _0x51208c : '成员 ' + _0x4e019c['actorId']['slice'](0x0, 0x4)),
+            const value10 = await run2(),
+              installId = await ensureInstallId(),
+              deviceId = await ensureDeviceId(installId);
+            run();
+            if (value9 !== key) return;
+            const args3 = await value10['authenticate']({ installId: installId, deviceId: deviceId });
+            run();
+            if (value9 !== key) return;
+            ((displayName = String(
+              options2['displayName'] ||
+                (displayName !== '成员' ? displayName : '成员 ' + args3['actorId']['slice'](0x0, 0x4)),
             )
               ['trim']()
               ['slice'](0x0, 0x20)),
-              (_0x25adc3['authenticated'] = !![]),
-              (_0x25adc3['actorId'] = _0x4e019c['actorId']),
-              (_0x58ad4c = _0x4e019c['expiresAt']),
+              (actorId['authenticated'] = !![]),
+              (actorId['actorId'] = args3['actorId']),
+              (index = args3['expiresAt']),
               storage?.['setItem'](
                 STORAGE_KEY,
                 JSON['stringify']({
-                  ..._0x4e019c,
-                  serverUrl: _0x297dc0['serverUrl'],
-                  displayName: _0x51208c,
-                  clientId: _0xfbca95,
+                  ...args3,
+                  serverUrl: serverUrl['serverUrl'],
+                  displayName: displayName,
+                  clientId: clientId,
                 }),
               ),
-              await _0x60d883());
-          } catch (_0x370258) {
-            !_0x575f4d &&
-              _0x2912ba === _0xf84714 &&
-              ((_0x25adc3['authenticated'] = ![]),
-              (_0x25adc3['rooms'] = []),
-              (_0x25adc3['authError'] = {
-                code: _0x370258['code'] || 'AUTH_UNAVAILABLE',
-                message: _0x370258['message'] || '暂时无法验证画布授权，请重试',
+              await refreshRooms());
+          } catch (code) {
+            !enabled &&
+              value9 === key &&
+              ((actorId['authenticated'] = ![]),
+              (actorId['rooms'] = []),
+              (actorId['authError'] = {
+                code: code['code'] || 'AUTH_UNAVAILABLE',
+                message: code['message'] || '暂时无法验证画布授权，请重试',
               }),
               storage?.['removeItem'](STORAGE_KEY));
-            throw _0x370258;
+            throw code;
           } finally {
-            ((_0x1e6d38 = null),
-              !_0x575f4d && _0x2912ba === _0xf84714 && ((_0x25adc3['authenticating'] = ![]), _0x25a171()));
+            ((value2 = null),
+              !enabled && value9 === key && ((actorId['authenticating'] = ![]), refreshCanvas()));
           }
         })()),
-        _0x1e6d38
+        value2
       );
     },
-    setDisplayName(_0x5d151d) {
-      (_0x31be87(),
-        (_0x51208c =
-          String(_0x5d151d || '')
+    setDisplayName(value11) {
+      (run(),
+        (displayName =
+          String(value11 || '')
             ['trim']()
-            ['slice'](0x0, 0x20) || '成员 ' + _0x25adc3['actorId']['slice'](0x0, 0x4)));
+            ['slice'](0x0, 0x20) || '成员 ' + actorId['actorId']['slice'](0x0, 0x4)));
       try {
-        const _0x5630bc = JSON['parse'](storage?.['getItem'](STORAGE_KEY) || 'null');
-        if (_0x5630bc)
-          storage?.['setItem'](STORAGE_KEY, JSON['stringify']({ ..._0x5630bc, displayName: _0x51208c }));
+        const args4 = JSON['parse'](storage?.['getItem'](STORAGE_KEY) || 'null');
+        if (args4)
+          storage?.['setItem'](STORAGE_KEY, JSON['stringify']({ ...args4, displayName: displayName }));
       } catch {}
-      _0x25a171();
+      refreshCanvas();
     },
     async create({ fresh: fresh = ![] } = {}) {
-      const _0x10c776 = _0x276786(),
-        _0x5f0a95 = _0x6b61c3['roomFor'](
-          _0x10c776,
-          _0x25adc3['rooms']['map']((_0x209793) => _0x209793['id']),
+      const value12 = getCanvasId(),
+        value13 = collaborationCanvasBinding['roomFor'](
+          value12,
+          actorId['rooms']['map']((value14) => value14['id']),
         );
-      if (_0x5f0a95 && !fresh) return _0xca3dbc['openRoom'](_0x5f0a95);
-      return _0x2f07ca(
-        (_0x242a7f, _0x6a74d) => _0x242a7f['startHost'](undefined, _0x6a74d),
+      if (value13 && !fresh) return actions['openRoom'](value13);
+      return run6(
+        (value15, value16) => value15['startHost'](undefined, value16),
         () =>
-          _0xf87f3c({
+          run3({
             action: 'create',
-            name: _0xc49d83['getCanvasProjectContext'](_0x10c776)?.['projectName'] || '协作画布',
-            displayName: _0x51208c,
+            name: canvasTabs['getCanvasProjectContext'](value12)?.['projectName'] || '协作画布',
+            displayName: displayName,
             document: { nodes: {}, edges: {} },
           }),
         !![],
-        _0x10c776,
+        value12,
       );
     },
-    async join(_0x4e61ef) {
-      const _0x3d2f73 = decodeCollaborationInvite(_0x4e61ef);
-      return _0x2f07ca(
-        (_0x38d707) => _0x38d707['connectHost'](_0x3d2f73['endpoint']),
-        () => _0xf87f3c({ action: 'join', invite: _0x3d2f73['invite'], displayName: _0x51208c }),
+    async join(value17) {
+      const invite2 = decodeCollaborationInvite(value17);
+      return run6(
+        (value18) => value18['connectHost'](invite2['endpoint']),
+        () => run3({ action: 'join', invite: invite2['invite'], displayName: displayName }),
       );
     },
-    async openRoom(_0xcdb0ba) {
-      return _0x2f07ca(
-        (_0x40961d, _0x2144d0) => _0x40961d['startHost'](undefined, _0x2144d0),
-        () => _0xf87f3c({ action: 'open', roomId: _0xcdb0ba }),
+    async openRoom(roomId) {
+      return run6(
+        (value19, value20) => value19['startHost'](undefined, value20),
+        () => run3({ action: 'open', roomId: roomId }),
       );
     },
     async resume() {
-      const _0x4cfadb = _0x10f9f3()['resumeRoom'];
-      if (!_0x4cfadb) return;
-      return _0x2f07ca(
-        (_0x47e35e, _0x390080) =>
-          _0x4cfadb['hosting']
-            ? _0x47e35e['startHost'](undefined, _0x390080)
-            : _0x47e35e['connectHost'](_0x4cfadb['endpoint']),
+      const roomId2 = getState()['resumeRoom'];
+      if (!roomId2) return;
+      return run6(
+        (value21, value22) =>
+          roomId2['hosting']
+            ? value21['startHost'](undefined, value22)
+            : value21['connectHost'](roomId2['endpoint']),
         async () => {
-          const _0x538286 = await _0xf87f3c({ action: 'open', roomId: _0x4cfadb['roomId'] });
-          if (_0x4cfadb['clientId'] && _0x4cfadb['clientId'] !== _0xfbca95) {
+          const value23 = await run3({ action: 'open', roomId: roomId2['roomId'] });
+          if (roomId2['clientId'] && roomId2['clientId'] !== clientId) {
             if (
-              _0x538286['presence']?.['some'](
-                (_0x5cf16b) =>
-                  _0x5cf16b['clientId'] === _0x4cfadb['clientId'] &&
-                  _0x5cf16b['expiresAt'] * 0x3e8 > Date['now'](),
+              value23['presence']?.['some'](
+                (value24) =>
+                  value24['clientId'] === roomId2['clientId'] && value24['expiresAt'] * 0x3e8 > Date['now'](),
               )
             )
               throw new Error('原窗口仍在协作；如果它已关闭，请稍后重试恢复');
-            _0xfbca95 = _0x4cfadb['clientId'];
-            const _0xf5de6f = JSON['parse'](storage?.['getItem'](STORAGE_KEY) || 'null');
-            if (_0xf5de6f)
-              storage?.['setItem'](STORAGE_KEY, JSON['stringify']({ ..._0xf5de6f, clientId: _0xfbca95 }));
+            clientId = roomId2['clientId'];
+            const args5 = JSON['parse'](storage?.['getItem'](STORAGE_KEY) || 'null');
+            if (args5) storage?.['setItem'](STORAGE_KEY, JSON['stringify']({ ...args5, clientId: clientId }));
           }
-          return _0x538286;
+          return value23;
         },
       );
     },
-    async invite(_0x40e60b, _0x38444e, _0x24a8e5 = 'permanent') {
-      const _0x240802 = await _0x5f5891['command']('invite', { role: _0x40e60b, validity: _0x24a8e5 }),
-        _0x4b7164 = _0x5b801d['getConnection']()['endpoint'];
+    async invite(role, url, validity = 'permanent') {
+      const value25 = await resumeRoom['command']('invite', { role: role, validity: validity }),
+        response2 = api['getConnection']()['endpoint'];
       return encodeCollaborationInvite(
-        { ..._0x4b7164, url: _0x38444e || _0x4b7164['addresses']?.[0x0] || _0x4b7164['url'] },
-        _0x240802['invite'],
+        { ...response2, url: url || response2['addresses']?.[0x0] || response2['url'] },
+        value25['invite'],
       );
     },
-    member: (_0x17e692, _0x3fd2b0) =>
-      _0x5f5891['command']('member', { memberId: _0x17e692, role: _0x3fd2b0 }),
-    async renameSelf(_0x1c0434) {
-      _0x31be87();
-      const _0x383cf3 = _0x5f5891;
-      if (!_0x383cf3) throw new Error('请先加入协作房间');
-      const _0x1c3455 = await _0x383cf3['command']('renameSelf', {
-        displayName: String(_0x1c0434 || '')['trim'](),
+    member: (memberId, role2) => resumeRoom['command']('member', { memberId: memberId, role: role2 }),
+    async renameSelf(value26) {
+      run();
+      const enabled9 = resumeRoom;
+      if (!enabled9) throw new Error('请先加入协作房间');
+      const value27 = await enabled9['command']('renameSelf', {
+        displayName: String(value26 || '')['trim'](),
       });
-      _0x31be87();
-      if (_0x5f5891 !== _0x383cf3) throw new DOMException('Aborted', 'AbortError');
-      _0xca3dbc['setDisplayName'](_0x1c3455['displayName']);
+      run();
+      if (resumeRoom !== enabled9) throw new DOMException('Aborted', 'AbortError');
+      actions['setDisplayName'](value27['displayName']);
     },
-    follow(_0x3c2f67) {
+    follow(value28) {
       if (
-        _0x3c2f67 &&
-        !_0x25adc3['session']['presence']?.['some'](
-          (_0x2c3f3c) =>
-            _0x2c3f3c['actorId'] === _0x3c2f67 &&
-            _0x2c3f3c['clientId'] !== _0xfbca95 &&
-            (!_0x2c3f3c['expiresAt'] || _0x2c3f3c['expiresAt'] * 0x3e8 > Date['now']()),
+        value28 &&
+        !actorId['session']['presence']?.['some'](
+          (enabled10) =>
+            enabled10['actorId'] === value28 &&
+            enabled10['clientId'] !== clientId &&
+            (!enabled10['expiresAt'] || enabled10['expiresAt'] * 0x3e8 > Date['now']()),
         )
       )
         throw new Error('该成员当前不在线');
-      _0x5f5891?.['follow'](_0x3c2f67);
+      resumeRoom?.['follow'](value28);
     },
-    locate: (_0x4b4365) => _0x5f5891['locate'](_0x4b4365),
-    summon: () => _0x5f5891['summon'](),
-    resolveConflicts: (_0x3b1e59) => _0x5f5891['resolveConflicts'](_0x3b1e59),
-    resolveTask: (_0x176e49) =>
-      _0x5f5891['command']('resolveTask', {
-        nodeId: _0x176e49['node'],
-        taskId: _0x176e49['id'],
+    locate: (value29) => resumeRoom['locate'](value29),
+    summon: () => resumeRoom['summon'](),
+    resolveConflicts: (value30) => resumeRoom['resolveConflicts'](value30),
+    resolveTask: (nodeId) =>
+      resumeRoom['command']('resolveTask', {
+        nodeId: nodeId['node'],
+        taskId: nodeId['id'],
         confirmedStopped: !![],
       }),
-    remove: (_0x1d825f) => _0x5f5891['command']('remove', { memberId: _0x1d825f }),
-    revokeInvites: () => _0x5f5891['command']('revokeInvites'),
+    remove: (memberId2) => resumeRoom['command']('remove', { memberId: memberId2 }),
+    revokeInvites: () => resumeRoom['command']('revokeInvites'),
     async closeRoom() {
-      const _0x1351a0 = _0x25adc3['session']['roomId'],
-        _0x2aac59 = _0x25adc3['session']['hosting'] ? _0x6b61c3 : _0x1bfb74;
-      (await _0x5f5891['command']('close'), _0x2aac59['forget'](_0x1351a0), _0x25a171(), await _0x60d883());
+      const value31 = actorId['session']['roomId'],
+        value32 = actorId['session']['hosting'] ? collaborationCanvasBinding : collaborationCanvasBinding2;
+      (await resumeRoom['command']('close'),
+        value32['forget'](value31),
+        refreshCanvas(),
+        await refreshRooms());
     },
     async leaveRoom() {
-      const _0x3c0ec4 = _0x25adc3['session']['roomId'];
-      (await _0x5f5891['command']('leave'), _0x1bfb74['forget'](_0x3c0ec4), _0x25a171(), await _0x60d883());
+      const value33 = actorId['session']['roomId'];
+      (await resumeRoom['command']('leave'),
+        collaborationCanvasBinding2['forget'](value33),
+        refreshCanvas(),
+        await refreshRooms());
     },
-    async disconnect(_0x264e16) {
-      const _0x3f2296 = _0x5f5891;
-      if (!_0x3f2296) return;
-      if (!_0x264e16?.['preserveDraft']) await _0x3f2296['prepareDetach'](_0x264e16);
-      if (_0x5f5891 !== _0x3f2296 || _0x264e16?.['signal']?.['aborted'])
+    async disconnect(force) {
+      const enabled11 = resumeRoom;
+      if (!enabled11) return;
+      if (!force?.['preserveDraft']) await enabled11['prepareDetach'](force);
+      if (resumeRoom !== enabled11 || force?.['signal']?.['aborted'])
         throw new DOMException('Aborted', 'AbortError');
-      await _0x3f2296['detach']({ force: _0x264e16?.['preserveDraft'] === !![] });
+      await enabled11['detach']({ force: force?.['preserveDraft'] === !![] });
     },
-    async saveAndDisconnect(_0x1d9d10) {
-      const _0xbf7faf = _0x5f5891,
-        _0x1a47f9 = _0x276786();
-      if (!_0xbf7faf || !_0x25adc3['session']?.['hosting'])
+    async saveAndDisconnect(value34) {
+      const enabled12 = resumeRoom,
+        value35 = getCanvasId();
+      if (!enabled12 || !actorId['session']?.['hosting'])
         throw new Error('协作项目只能由房主保存；可以选择“确定”直接结束联机');
-      if (typeof _0x2a4821 !== 'function') throw new Error('项目保存入口尚未就绪，请稍后重试');
-      await _0xbf7faf['prepareDetach'](_0x1d9d10);
-      if (_0x5f5891 !== _0xbf7faf || _0x1d9d10?.['signal']?.['aborted'])
+      if (typeof saveProject !== 'function') throw new Error('项目保存入口尚未就绪，请稍后重试');
+      await enabled12['prepareDetach'](value34);
+      if (resumeRoom !== enabled12 || value34?.['signal']?.['aborted'])
         throw new DOMException('Aborted', 'AbortError');
-      const _0x1f8e4f = await _0x2a4821();
-      if (_0x5f5891 !== _0xbf7faf || _0x276786() !== _0x1a47f9 || _0x1d9d10?.['signal']?.['aborted'])
+      const value36 = await saveProject();
+      if (resumeRoom !== enabled12 || getCanvasId() !== value35 || value34?.['signal']?.['aborted'])
         throw new DOMException('Aborted', 'AbortError');
-      if (_0x1f8e4f !== !![]) throw new Error('未完成项目保存，已保留联机状态');
-      if (!_0xbf7faf['canDetach']() || _0xc49d83['isCanvasDirty']?.(_0x1a47f9))
+      if (value36 !== !![]) throw new Error('未完成项目保存，已保留联机状态');
+      if (!enabled12['canDetach']() || canvasTabs['isCanvasDirty']?.(value35))
         throw new Error('保存期间画布又有修改，请再次保存后结束；或选择“确定”直接结束联机');
-      await _0xbf7faf['detach']();
+      await enabled12['detach']();
     },
-    refreshRooms: _0x60d883,
+    refreshRooms: refreshRooms,
     signOut() {
-      (_0x4149e0(),
-        (_0x1e1915 = null),
-        (_0xf84714 += 0x1),
-        void _0x5b801d?.['disconnect'](),
-        (_0x5b801d = null),
-        (_0x25adc3['authenticated'] = ![]),
-        (_0x25adc3['authenticating'] = ![]),
-        (_0x25adc3['authError'] = null),
-        (_0x25adc3['actorId'] = ''),
-        (_0x25adc3['rooms'] = []),
+      (run4(),
+        (enabled2 = null),
+        (key += 0x1),
+        void api?.['disconnect'](),
+        (api = null),
+        (actorId['authenticated'] = ![]),
+        (actorId['authenticating'] = ![]),
+        (actorId['authError'] = null),
+        (actorId['actorId'] = ''),
+        (actorId['rooms'] = []),
         storage?.['removeItem'](STORAGE_KEY),
-        _0x25a171());
+        refreshCanvas());
     },
   };
-  async function _0x439f24() {
-    if (_0x575f4d) return;
-    const _0xc9d793 = _0xf84714;
+  async function run7() {
+    if (enabled) return;
+    const value37 = key;
     try {
-      const _0x16323a = JSON['parse'](storage?.['getItem'](STORAGE_KEY) || 'null');
-      if (_0x16323a?.['clientId']) _0xfbca95 = _0x16323a['clientId'];
-      _0x25adc3['resumeRoom'] = JSON['parse'](_0x1fab68?.['getItem'](RESUME_KEY) || 'null');
-      if (!_0x16323a || _0x16323a['expiresAt'] * 0x3e8 <= Date['now']()) return;
-      const _0x47a57e = await fetchConfig();
-      if (_0x575f4d || _0xc9d793 !== _0xf84714) return;
-      _0x297dc0 = _0x47a57e;
-      if (_0x16323a['serverUrl'] !== _0x297dc0['serverUrl']) return;
-      ((_0x5b801d = createApi({ ..._0x297dc0, token: _0x16323a['token'] })),
-        (_0x51208c = _0x16323a['displayName']),
-        (_0xfbca95 = _0x16323a['clientId'] || _0xfbca95),
-        (_0x25adc3['authenticated'] = !![]),
-        (_0x25adc3['actorId'] = _0x16323a['actorId']),
-        (_0x58ad4c = _0x16323a['expiresAt']),
-        await _0x60d883());
+      const token = JSON['parse'](storage?.['getItem'](STORAGE_KEY) || 'null');
+      if (token?.['clientId']) clientId = token['clientId'];
+      actorId['resumeRoom'] = JSON['parse'](storage2?.['getItem'](RESUME_KEY) || 'null');
+      if (!token || token['expiresAt'] * 0x3e8 <= Date['now']()) return;
+      const fetchConfig3 = await fetchConfig();
+      if (enabled || value37 !== key) return;
+      serverUrl = fetchConfig3;
+      if (token['serverUrl'] !== serverUrl['serverUrl']) return;
+      ((api = createApi({ ...serverUrl, token: token['token'] })),
+        (displayName = token['displayName']),
+        (clientId = token['clientId'] || clientId),
+        (actorId['authenticated'] = !![]),
+        (actorId['actorId'] = token['actorId']),
+        (index = token['expiresAt']),
+        await refreshRooms());
     } catch {
-      !_0x575f4d && _0xc9d793 === _0xf84714 && ((_0x25adc3['authenticated'] = ![]), _0x25a171());
+      !enabled && value37 === key && ((actorId['authenticated'] = ![]), refreshCanvas());
     }
   }
-  const _0x24e44f = Promise['resolve']()['then'](_0x439f24);
-  let _0xb5ab7f = null;
+  const ready = Promise['resolve']()['then'](run7);
+  let value38 = null;
   return {
-    ready: _0x24e44f,
-    actions: _0xca3dbc,
-    getState: _0x10f9f3,
-    getSession: () => _0x5f5891,
-    refreshCanvas: _0x25a171,
+    ready: ready,
+    actions: actions,
+    getState: getState,
+    getSession: () => resumeRoom,
+    refreshCanvas: refreshCanvas,
     async ensureAuthenticated() {
-      _0x31be87();
-      if (_0x5f5891) return;
-      const _0x2678ef = _0xf84714;
-      (!_0x25adc3['authenticated'] || _0x58ad4c * 0x3e8 <= Date['now']()) &&
-        ((_0x25adc3['authenticating'] = !![]), _0x25a171());
-      (await _0x24e44f, _0x31be87());
-      if (_0x1e6d38) return _0x1e6d38;
-      if (_0x2678ef !== _0xf84714) return;
-      if (!_0x25adc3['authenticated'] || _0x58ad4c * 0x3e8 <= Date['now']())
-        await _0xca3dbc['authenticate']();
-      else ((_0x25adc3['authenticating'] = ![]), _0x25a171());
+      run();
+      if (resumeRoom) return;
+      const value39 = key;
+      (!actorId['authenticated'] || index * 0x3e8 <= Date['now']()) &&
+        ((actorId['authenticating'] = !![]), refreshCanvas());
+      (await ready, run());
+      if (value2) return value2;
+      if (value39 !== key) return;
+      if (!actorId['authenticated'] || index * 0x3e8 <= Date['now']()) await actions['authenticate']();
+      else ((actorId['authenticating'] = ![]), refreshCanvas());
     },
     destroy() {
-      if (_0x575f4d) return _0xb5ab7f;
+      if (enabled) return value38;
       return (
-        (_0x575f4d = !![]),
-        (_0x1a70af += 0x1),
-        (_0xf84714 += 0x1),
-        _0x3c0538(),
-        (_0xb5ab7f = Promise['resolve'](_0x5f5891 ? _0x5f5891['destroy']() : _0x5b801d?.['disconnect']())[
+        (enabled = !![]),
+        (value += 0x1),
+        (key += 0x1),
+        handler(),
+        (value38 = Promise['resolve'](resumeRoom ? resumeRoom['destroy']() : api?.['disconnect']())[
           'finally'
-        ](() => Promise['all']([_0x6b61c3['close'](), _0x1bfb74['close']()]))),
-        _0xb5ab7f
+        ](() =>
+          Promise['all']([collaborationCanvasBinding['close'](), collaborationCanvasBinding2['close']()]),
+        )),
+        value38
       );
     },
   };

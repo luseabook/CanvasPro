@@ -2,313 +2,309 @@ const STORYBOARD_CELL_GAP = 0,
   STORYBOARD_CELL_INSET = 1.5,
   STORYBOARD_MIN_TRACK_WEIGHT = 0.2;
 export const STORYBOARD_GRID_GAP_MAX = 80;
-function _trimString(_0x4cae0f) {
-  return typeof _0x4cae0f === 'string' ? _0x4cae0f.trim() : '';
+function _trimString(value) {
+  return typeof value === 'string' ? value.trim() : '';
 }
-function _normalizeLocalPath(_0xd3dc6b) {
-  const _0x38c667 = _trimString(_0xd3dc6b);
-  if (!_0x38c667) return '';
-  return _0x38c667.startsWith('/') ? _0x38c667 : '/' + _0x38c667;
+function _normalizeLocalPath(item) {
+  const _trimString2 = _trimString(item);
+  if (!_trimString2) return '';
+  return _trimString2.startsWith('/') ? _trimString2 : '/' + _trimString2;
 }
-function _toPositiveNumber(_0x5f21e5) {
-  const _0x5ddf37 = Number(_0x5f21e5);
-  return Number.isFinite(_0x5ddf37) && _0x5ddf37 > 0 ? _0x5ddf37 : null;
+function _toPositiveNumber(key) {
+  const count = Number(key);
+  return Number.isFinite(count) && count > 0 ? count : null;
 }
-function _isUsableNonDataSrc(_0x9a0a96) {
-  const _0x1d6cb2 = _trimString(_0x9a0a96);
-  return !!_0x1d6cb2 && !_0x1d6cb2.startsWith('data:');
+function _isUsableNonDataSrc(index) {
+  const _trimString3 = _trimString(index);
+  return !!_trimString3 && !_trimString3.startsWith('data:');
 }
-function _isUsablePreviewSrc(_0x262b46) {
-  return !!_trimString(_0x262b46);
+function _isUsablePreviewSrc(result) {
+  return !!_trimString(result);
 }
-function _getSafeGridCount(_0x334370) {
-  const _0xb056ee = Math.round(Number(_0x334370) || 0);
-  return Math.max(1, _0xb056ee);
+function _getSafeGridCount(data) {
+  const options = Math.round(Number(data) || 0);
+  return Math.max(1, options);
 }
-export function resolveStoryboardCellSourceIndex(_0x59cdcb, _0x1ad950, _0xffb840 = null) {
-  const _0x3ec7ca = Math.trunc(Number(_0x1ad950)),
-    _0x1d7265 = Number.isInteger(_0x3ec7ca) && _0x3ec7ca >= 0 ? _0x3ec7ca : 0,
-    _0x43c914 = Math.trunc(Number(_0x59cdcb?.storyboardSourceIndex)),
-    _0x3b14f8 = _getSafeGridCount(_0xffb840?.cols) * _getSafeGridCount(_0xffb840?.rows),
-    _0x124e9c = Number.isInteger(_0x43c914) && _0x43c914 >= 0 ? _0x43c914 : _0x1d7265;
-  if (!Number.isInteger(_0x124e9c) || _0x124e9c < 0) return _0x1d7265;
-  if (_0xffb840 && _0x124e9c >= _0x3b14f8) return _0x1d7265;
-  return _0x124e9c;
+export function resolveStoryboardCellSourceIndex(target, source, next = null) {
+  const count2 = Math.trunc(Number(source)),
+    current = Number.isInteger(count2) && count2 >= 0 ? count2 : 0,
+    count3 = Math.trunc(Number(target?.storyboardSourceIndex)),
+    _getSafeGridCount2 = _getSafeGridCount(next?.cols) * _getSafeGridCount(next?.rows),
+    count4 = Number.isInteger(count3) && count3 >= 0 ? count3 : current;
+  if (!Number.isInteger(count4) || count4 < 0) return current;
+  if (next && count4 >= _getSafeGridCount2) return current;
+  return count4;
 }
-function _clamp(_0x4606eb, _0x1d5005, _0x2f5ff0) {
-  return Math.min(Math.max(_0x4606eb, _0x1d5005), _0x2f5ff0);
+function _clamp(entry, record, payload) {
+  return Math.min(Math.max(entry, record), payload);
 }
-function _roundTrackWeight(_0x3d5e36) {
-  return Math.round(_0x3d5e36 * 0x2710) / 0x2710;
+function _roundTrackWeight(handle) {
+  return Math.round(handle * 0x2710) / 0x2710;
 }
-function _getTrackTotal(_0x4b1ba0) {
-  return _0x4b1ba0.reduce((_0x486c20, _0x5220f7) => _0x486c20 + _0x5220f7, 0);
+function _getTrackTotal(list) {
+  return list.reduce((item2, state) => item2 + state, 0);
 }
-function _getEqualTracks(_0x39496b) {
-  return Array.from({ length: _0x39496b }, () => 1);
+function _getEqualTracks(length) {
+  return Array.from({ length: length }, () => 1);
 }
-export function resolveStoryboardGridTracks(_0x12828b, _0x3bd8c7) {
-  const _0x1480d3 = _getSafeGridCount(_0x3bd8c7);
-  if (!Array.isArray(_0x12828b) || _0x12828b.length !== _0x1480d3) return _getEqualTracks(_0x1480d3);
-  const _0x456db4 = _0x12828b.map((_0xe43c2a) => Number(_0xe43c2a));
-  if (_0x456db4.some((_0x146690) => !Number.isFinite(_0x146690) || _0x146690 < STORYBOARD_MIN_TRACK_WEIGHT))
-    return _getEqualTracks(_0x1480d3);
-  const _0x1801f8 = _getTrackTotal(_0x456db4);
-  if (!Number.isFinite(_0x1801f8) || _0x1801f8 <= 0) return _getEqualTracks(_0x1480d3);
-  const _0x5b1ac0 = _0x1480d3 / _0x1801f8;
-  return _0x456db4.map((_0x1264b5) => _roundTrackWeight(_0x1264b5 * _0x5b1ac0));
+export function resolveStoryboardGridTracks(list2, config) {
+  const _getSafeGridCount3 = _getSafeGridCount(config);
+  if (!Array.isArray(list2) || list2.length !== _getSafeGridCount3)
+    return _getEqualTracks(_getSafeGridCount3);
+  const list3 = list2.map((item3) => Number(item3));
+  if (list3.some((item4) => !Number.isFinite(item4) || item4 < STORYBOARD_MIN_TRACK_WEIGHT))
+    return _getEqualTracks(_getSafeGridCount3);
+  const _getTrackTotal2 = _getTrackTotal(list3);
+  if (!Number.isFinite(_getTrackTotal2) || _getTrackTotal2 <= 0) return _getEqualTracks(_getSafeGridCount3);
+  const scope = _getSafeGridCount3 / _getTrackTotal2;
+  return list3.map((item5) => _roundTrackWeight(item5 * scope));
 }
-export function resolveStoryboardGridLayout(_0x1f41d3) {
-  const _0x4ff5a3 = _getSafeGridCount(_0x1f41d3?.cols),
-    _0x35341e = _getSafeGridCount(_0x1f41d3?.rows),
-    _0x30c450 = _0x1f41d3?.gridLayout && typeof _0x1f41d3.gridLayout === 'object' ? _0x1f41d3.gridLayout : {};
+export function resolveStoryboardGridLayout(input) {
+  const cols = _getSafeGridCount(input?.cols),
+    rows = _getSafeGridCount(input?.rows),
+    output = input?.gridLayout && typeof input.gridLayout === 'object' ? input.gridLayout : {};
   return {
-    cols: _0x4ff5a3,
-    rows: _0x35341e,
-    columns: resolveStoryboardGridTracks(_0x30c450.columns, _0x4ff5a3),
-    rowTracks: resolveStoryboardGridTracks(_0x30c450.rows, _0x35341e),
+    cols: cols,
+    rows: rows,
+    columns: resolveStoryboardGridTracks(output.columns, cols),
+    rowTracks: resolveStoryboardGridTracks(output.rows, rows),
   };
 }
-export function normalizeStoryboardGridGap(_0x564976, _0x43d64b = STORYBOARD_CELL_GAP) {
-  const _0x2df243 = Number(_0x564976),
-    _0x85eeaa = Number(_0x43d64b),
-    _0x3d8dd6 = Number.isFinite(_0x2df243) ? _0x2df243 : Number.isFinite(_0x85eeaa) ? _0x85eeaa : 0;
-  return Math.round(_clamp(_0x3d8dd6, 0, STORYBOARD_GRID_GAP_MAX));
+export function normalizeStoryboardGridGap(value2, value3 = STORYBOARD_CELL_GAP) {
+  const value4 = Number(value2),
+    value5 = Number(value3),
+    value6 = Number.isFinite(value4) ? value4 : Number.isFinite(value5) ? value5 : 0;
+  return Math.round(_clamp(value6, 0, STORYBOARD_GRID_GAP_MAX));
 }
-export function buildStoryboardGridTemplate(_0x3ded85, _0x5176c6) {
-  return resolveStoryboardGridTracks(_0x3ded85, _0x5176c6)
-    .map((_0x3b905a) => _roundTrackWeight(_0x3b905a) + 'fr')
+export function buildStoryboardGridTemplate(value7, value8) {
+  return resolveStoryboardGridTracks(value7, value8)
+    .map((item6) => _roundTrackWeight(item6) + 'fr')
     .join(' ');
 }
-export function getStoryboardGridDividerPositions(_0x5ef06, _0x4a224b = {}) {
-  if (!_0x5ef06 || typeof _0x5ef06 !== 'object') return { vertical: [], horizontal: [] };
-  const _0x18eb15 = resolveStoryboardGridLayout(_0x5ef06),
-    _0x5037d6 = Math.max(
+export function getStoryboardGridDividerPositions(box, box2 = {}) {
+  if (!box || typeof box !== 'object') return { vertical: [], horizontal: [] };
+  const cols2 = resolveStoryboardGridLayout(box),
+    width = Math.max(
       0,
-      Number(Object.prototype.hasOwnProperty.call(_0x4a224b, 'width') ? _0x4a224b.width : _0x5ef06.width) ||
-        0,
+      Number(Object.prototype.hasOwnProperty.call(box2, 'width') ? box2.width : box.width) || 0,
     ),
-    _0x24b67c = Math.max(
+    height = Math.max(
       0,
-      Number(
-        Object.prototype.hasOwnProperty.call(_0x4a224b, 'height') ? _0x4a224b.height : _0x5ef06.height,
-      ) || 0,
+      Number(Object.prototype.hasOwnProperty.call(box2, 'height') ? box2.height : box.height) || 0,
     ),
-    _0x57fbda = Math.max(
+    position = Math.max(
       0,
-      Number(
-        Object.prototype.hasOwnProperty.call(_0x4a224b, 'inset') ? _0x4a224b.inset : STORYBOARD_CELL_INSET,
-      ) || 0,
+      Number(Object.prototype.hasOwnProperty.call(box2, 'inset') ? box2.inset : STORYBOARD_CELL_INSET) || 0,
     ),
-    _0x2426b6 = Math.max(0, _0x5037d6 - _0x57fbda * 2),
-    _0x50cb52 = Math.max(0, _0x24b67c - _0x57fbda * 2),
-    _0x2f236b = (_0x250c6b, _0x1a6c99) => {
-      const _0x51bfaf = _getTrackTotal(_0x250c6b);
-      if (_0x51bfaf <= 0 || _0x1a6c99 <= 0) return [];
-      const _0x2fe763 = [];
-      let _0x4663d7 = 0;
-      for (let _0x2735bc = 0; _0x2735bc < _0x250c6b.length - 1; _0x2735bc++) {
-        _0x4663d7 += _0x250c6b[_0x2735bc];
-        const _0x4508b8 = _0x4663d7 / _0x51bfaf;
-        _0x2fe763.push({ index: _0x2735bc, ratio: _0x4508b8, position: _0x57fbda + _0x4508b8 * _0x1a6c99 });
+    innerWidth = Math.max(0, width - position * 2),
+    innerHeight = Math.max(0, height - position * 2),
+    vertical = (list4, count5) => {
+      const _getTrackTotal3 = _getTrackTotal(list4);
+      if (_getTrackTotal3 <= 0 || count5 <= 0) return [];
+      const list5 = [];
+      let value9 = 0;
+      for (let index2 = 0; index2 < list4.length - 1; index2++) {
+        value9 += list4[index2];
+        const ratio = value9 / _getTrackTotal3;
+        list5.push({ index: index2, ratio: ratio, position: position + ratio * count5 });
       }
-      return _0x2fe763;
+      return list5;
     };
   return {
-    vertical: _0x2f236b(_0x18eb15.columns, _0x2426b6),
-    horizontal: _0x2f236b(_0x18eb15.rowTracks, _0x50cb52),
-    cols: _0x18eb15.cols,
-    rows: _0x18eb15.rows,
-    width: _0x5037d6,
-    height: _0x24b67c,
-    inset: _0x57fbda,
-    innerWidth: _0x2426b6,
-    innerHeight: _0x50cb52,
+    vertical: vertical(cols2.columns, innerWidth),
+    horizontal: vertical(cols2.rowTracks, innerHeight),
+    cols: cols2.cols,
+    rows: cols2.rows,
+    width: width,
+    height: height,
+    inset: position,
+    innerWidth: innerWidth,
+    innerHeight: innerHeight,
   };
 }
-export function getStoryboardScaledGridGap(_0x228ab8, _0x611c1d = {}) {
-  const _0x3bb0a3 = normalizeStoryboardGridGap(_0x228ab8?.gridGap),
-    _0x37584a = Math.max(0, Number(_0x611c1d.width) || 0),
-    _0x5cdafa = Math.max(0, Number(_0x611c1d.height) || 0),
-    _0x1ff11b = Math.max(1, Number(_0x611c1d.nodeWidth ?? _0x228ab8?.width ?? _0x37584a) || _0x37584a || 1),
-    _0xed4e7b = Math.max(1, Number(_0x611c1d.nodeHeight ?? _0x228ab8?.height ?? _0x5cdafa) || _0x5cdafa || 1);
+export function getStoryboardScaledGridGap(box3, box4 = {}) {
+  const storyboardGridGap = normalizeStoryboardGridGap(box3?.gridGap),
+    x = Math.max(0, Number(box4.width) || 0),
+    y = Math.max(0, Number(box4.height) || 0),
+    value10 = Math.max(1, Number(box4.nodeWidth ?? box3?.width ?? x) || x || 1),
+    value11 = Math.max(1, Number(box4.nodeHeight ?? box3?.height ?? y) || y || 1);
   return {
-    x: _0x37584a > 0 ? _0x3bb0a3 * (_0x37584a / _0x1ff11b) : _0x3bb0a3,
-    y: _0x5cdafa > 0 ? _0x3bb0a3 * (_0x5cdafa / _0xed4e7b) : _0x3bb0a3,
+    x: x > 0 ? storyboardGridGap * (x / value10) : storyboardGridGap,
+    y: y > 0 ? storyboardGridGap * (y / value11) : storyboardGridGap,
   };
 }
-function _getTrackBounds(_0x4687dc, _0x5ec0d2, _0x47549f, _0xf4b887) {
-  const _0x105b8d = _getTrackTotal(_0x4687dc);
-  if (_0x105b8d <= 0 || _0x47549f <= 0) return { start: 0, end: 0 };
-  let _0x9e417c = 0;
-  for (let _0x5e9ef7 = 0; _0x5e9ef7 < _0x4687dc.length; _0x5e9ef7++) {
-    const _0xa57e40 = (_0x4687dc[_0x5e9ef7] / _0x105b8d) * _0x47549f,
-      _0x591c0b = _0x9e417c,
-      _0x3ec312 = _0x9e417c + _0xa57e40;
-    if (_0x5e9ef7 === _0x5ec0d2) return { start: _0x591c0b, end: _0x3ec312 };
-    _0x9e417c = _0x3ec312 + Math.max(0, _0xf4b887);
+function _getTrackBounds(list6, value12, count6, value13) {
+  const _getTrackTotal4 = _getTrackTotal(list6);
+  if (_getTrackTotal4 <= 0 || count6 <= 0) return { start: 0, end: 0 };
+  let value14 = 0;
+  for (let value15 = 0; value15 < list6.length; value15++) {
+    const value16 = (list6[value15] / _getTrackTotal4) * count6,
+      start = value14,
+      end = value14 + value16;
+    if (value15 === value12) return { start: start, end: end };
+    value14 = end + Math.max(0, value13);
   }
   return { start: 0, end: 0 };
 }
-function _getCenteredGapTrackBounds(_0x18ff71, _0x533eb0, _0x252fb, _0x3eb2b2) {
-  const _0x856434 = _getTrackTotal(_0x18ff71);
-  if (_0x856434 <= 0 || _0x252fb <= 0) return { start: 0, end: 0 };
-  const _0x1e5aa5 = Math.max(0, Number(_0x3eb2b2) || 0) / 2;
-  let _0x4d4a38 = 0,
-    _0x256bee = 0,
-    _0x92ccc1 = _0x252fb;
-  for (let _0x63873d = 0; _0x63873d < _0x18ff71.length - 1; _0x63873d++) {
-    _0x4d4a38 += _0x18ff71[_0x63873d];
-    const _0x3a9820 = (_0x4d4a38 / _0x856434) * _0x252fb;
-    if (_0x63873d === _0x533eb0 - 1) _0x256bee = _0x3a9820;
-    if (_0x63873d === _0x533eb0) {
-      _0x92ccc1 = _0x3a9820;
+function _getCenteredGapTrackBounds(list7, count7, count8, value17) {
+  const _getTrackTotal5 = _getTrackTotal(list7);
+  if (_getTrackTotal5 <= 0 || count8 <= 0) return { start: 0, end: 0 };
+  const value18 = Math.max(0, Number(value17) || 0) / 2;
+  let value19 = 0,
+    value20 = 0,
+    value21 = count8;
+  for (let value22 = 0; value22 < list7.length - 1; value22++) {
+    value19 += list7[value22];
+    const value23 = (value19 / _getTrackTotal5) * count8;
+    if (value22 === count7 - 1) value20 = value23;
+    if (value22 === count7) {
+      value21 = value23;
       break;
     }
   }
-  let _0x101fe7 = _0x533eb0 === 0 ? 0 : _0x256bee + _0x1e5aa5,
-    _0x4dc8c7 = _0x533eb0 === _0x18ff71.length - 1 ? _0x252fb : _0x92ccc1 - _0x1e5aa5;
-  ((_0x101fe7 = _clamp(_0x101fe7, 0, _0x252fb)), (_0x4dc8c7 = _clamp(_0x4dc8c7, 0, _0x252fb)));
-  if (_0x4dc8c7 < _0x101fe7) {
-    const _0x1a6700 = _clamp((_0x101fe7 + _0x4dc8c7) / 2, 0, _0x252fb);
-    return { start: _0x1a6700, end: _0x1a6700 };
+  let start2 = count7 === 0 ? 0 : value20 + value18,
+    end2 = count7 === list7.length - 1 ? count8 : value21 - value18;
+  ((start2 = _clamp(start2, 0, count8)), (end2 = _clamp(end2, 0, count8)));
+  if (end2 < start2) {
+    const start3 = _clamp((start2 + end2) / 2, 0, count8);
+    return { start: start3, end: start3 };
   }
-  return { start: _0x101fe7, end: _0x4dc8c7 };
+  return { start: start2, end: end2 };
 }
-export function resolveStoryboardCellPreviewSrc(_0x1e87b1) {
-  if (!_0x1e87b1 || typeof _0x1e87b1 !== 'object') return '';
-  const _0x964309 = _normalizeLocalPath(_0x1e87b1.thumbLocalPath);
-  if (_0x964309) return _0x964309;
-  const _0x326c16 = _normalizeLocalPath(_0x1e87b1.displayLocalPath);
-  if (_0x326c16) return _0x326c16;
-  const _0x36ce5c = _normalizeLocalPath(_0x1e87b1.localPath);
-  if (_0x36ce5c) return _0x36ce5c;
-  if (_isUsablePreviewSrc(_0x1e87b1.capturePreviewUrl)) return _trimString(_0x1e87b1.capturePreviewUrl);
-  if (_isUsableNonDataSrc(_0x1e87b1.thumbUrl)) return _trimString(_0x1e87b1.thumbUrl);
-  if (_isUsableNonDataSrc(_0x1e87b1.url)) return _trimString(_0x1e87b1.url);
+export function resolveStoryboardCellPreviewSrc(response) {
+  if (!response || typeof response !== 'object') return '';
+  const _normalizeLocalPath2 = _normalizeLocalPath(response.thumbLocalPath);
+  if (_normalizeLocalPath2) return _normalizeLocalPath2;
+  const _normalizeLocalPath3 = _normalizeLocalPath(response.displayLocalPath);
+  if (_normalizeLocalPath3) return _normalizeLocalPath3;
+  const _normalizeLocalPath4 = _normalizeLocalPath(response.localPath);
+  if (_normalizeLocalPath4) return _normalizeLocalPath4;
+  if (_isUsablePreviewSrc(response.capturePreviewUrl)) return _trimString(response.capturePreviewUrl);
+  if (_isUsableNonDataSrc(response.thumbUrl)) return _trimString(response.thumbUrl);
+  if (_isUsableNonDataSrc(response.url)) return _trimString(response.url);
   return '';
 }
-export function resolveStoryboardCellAssetSrc(_0x4d4d38) {
-  if (!_0x4d4d38 || typeof _0x4d4d38 !== 'object') return '';
-  const _0x2b5b40 = _normalizeLocalPath(_0x4d4d38.localPath);
-  if (_0x2b5b40) return _0x2b5b40;
-  const _0x12de76 = _normalizeLocalPath(_0x4d4d38.originalLocalPath);
-  if (_0x12de76) return _0x12de76;
-  const _0x42829b = _normalizeLocalPath(_0x4d4d38.displayLocalPath);
-  if (_0x42829b) return _0x42829b;
-  const _0x3b3ec8 = _normalizeLocalPath(_0x4d4d38.thumbLocalPath);
-  if (_0x3b3ec8) return _0x3b3ec8;
-  if (_isUsablePreviewSrc(_0x4d4d38.capturePreviewUrl)) return _trimString(_0x4d4d38.capturePreviewUrl);
-  if (_isUsableNonDataSrc(_0x4d4d38.url)) return _trimString(_0x4d4d38.url);
-  if (_isUsableNonDataSrc(_0x4d4d38.thumbUrl)) return _trimString(_0x4d4d38.thumbUrl);
+export function resolveStoryboardCellAssetSrc(response2) {
+  if (!response2 || typeof response2 !== 'object') return '';
+  const _normalizeLocalPath5 = _normalizeLocalPath(response2.localPath);
+  if (_normalizeLocalPath5) return _normalizeLocalPath5;
+  const _normalizeLocalPath6 = _normalizeLocalPath(response2.originalLocalPath);
+  if (_normalizeLocalPath6) return _normalizeLocalPath6;
+  const _normalizeLocalPath7 = _normalizeLocalPath(response2.displayLocalPath);
+  if (_normalizeLocalPath7) return _normalizeLocalPath7;
+  const _normalizeLocalPath8 = _normalizeLocalPath(response2.thumbLocalPath);
+  if (_normalizeLocalPath8) return _normalizeLocalPath8;
+  if (_isUsablePreviewSrc(response2.capturePreviewUrl)) return _trimString(response2.capturePreviewUrl);
+  if (_isUsableNonDataSrc(response2.url)) return _trimString(response2.url);
+  if (_isUsableNonDataSrc(response2.thumbUrl)) return _trimString(response2.thumbUrl);
   return '';
 }
-export function isStoryboardCellEmpty(_0x226a9c) {
-  if (!_0x226a9c || typeof _0x226a9c !== 'object') return true;
-  if (_0x226a9c.isEmpty === true) return true;
+export function isStoryboardCellEmpty(response3) {
+  if (!response3 || typeof response3 !== 'object') return true;
+  if (response3.isEmpty === true) return true;
   return !(
-    _trimString(_0x226a9c.url) ||
-    _trimString(_0x226a9c.localPath) ||
-    _trimString(_0x226a9c.originalLocalPath) ||
-    _trimString(_0x226a9c.displayLocalPath) ||
-    _trimString(_0x226a9c.capturePreviewUrl) ||
-    _trimString(_0x226a9c.thumbUrl) ||
-    _trimString(_0x226a9c.thumbLocalPath) ||
-    _trimString(_0x226a9c.thumbId) ||
-    _trimString(_0x226a9c.sourceId) ||
-    _trimString(_0x226a9c.sourceLocalPath) ||
-    _trimString(_0x226a9c.sourceUrl)
+    _trimString(response3.url) ||
+    _trimString(response3.localPath) ||
+    _trimString(response3.originalLocalPath) ||
+    _trimString(response3.displayLocalPath) ||
+    _trimString(response3.capturePreviewUrl) ||
+    _trimString(response3.thumbUrl) ||
+    _trimString(response3.thumbLocalPath) ||
+    _trimString(response3.thumbId) ||
+    _trimString(response3.sourceId) ||
+    _trimString(response3.sourceLocalPath) ||
+    _trimString(response3.sourceUrl)
   );
 }
-function _hasLocalStoryboardCellAsset(_0x1ad63f) {
+function _hasLocalStoryboardCellAsset(value24) {
   return !!(
-    _trimString(_0x1ad63f?.localPath) ||
-    _trimString(_0x1ad63f?.originalLocalPath) ||
-    _trimString(_0x1ad63f?.displayLocalPath) ||
-    _trimString(_0x1ad63f?.thumbLocalPath)
+    _trimString(value24?.localPath) ||
+    _trimString(value24?.originalLocalPath) ||
+    _trimString(value24?.displayLocalPath) ||
+    _trimString(value24?.thumbLocalPath)
   );
 }
-function _hasStoryboardCellSwapAsset(_0x2adf40) {
+function _hasStoryboardCellSwapAsset(response4) {
   return !!(
-    _hasLocalStoryboardCellAsset(_0x2adf40) ||
-    _trimString(_0x2adf40?.capturePreviewUrl) ||
-    _trimString(_0x2adf40?.url) ||
-    _trimString(_0x2adf40?.thumbUrl)
+    _hasLocalStoryboardCellAsset(response4) ||
+    _trimString(response4?.capturePreviewUrl) ||
+    _trimString(response4?.url) ||
+    _trimString(response4?.thumbUrl)
   );
 }
-function _isSourceBackedStoryboardCell(_0x1a0e66) {
+function _isSourceBackedStoryboardCell(value25) {
   return !!(
-    _0x1a0e66?.storyboardSourceCrop === true ||
-    _trimString(_0x1a0e66?.sourceLocalPath) ||
-    _trimString(_0x1a0e66?.sourceUrl)
+    value25?.storyboardSourceCrop === true ||
+    _trimString(value25?.sourceLocalPath) ||
+    _trimString(value25?.sourceUrl)
   );
 }
-export function isFrozenStoryboardDisplayCell(_0x343869) {
-  if (!_0x343869 || typeof _0x343869 !== 'object' || isStoryboardCellEmpty(_0x343869)) return false;
-  if (!resolveStoryboardCellAssetSrc(_0x343869)) return false;
-  if (_0x343869.storyboardPiece === true && _0x343869.storyboardExtractedCell !== true) return false;
-  if (_0x343869.storyboardExtractedCell === true || _0x343869.storyboardLockedCell === true) return true;
-  return !_isSourceBackedStoryboardCell(_0x343869) && _0x343869.storyboardPiece !== true;
+export function isFrozenStoryboardDisplayCell(enabled) {
+  if (!enabled || typeof enabled !== 'object' || isStoryboardCellEmpty(enabled)) return false;
+  if (!resolveStoryboardCellAssetSrc(enabled)) return false;
+  if (enabled.storyboardPiece === true && enabled.storyboardExtractedCell !== true) return false;
+  if (enabled.storyboardExtractedCell === true || enabled.storyboardLockedCell === true) return true;
+  return !_isSourceBackedStoryboardCell(enabled) && enabled.storyboardPiece !== true;
 }
-export function detachStoryboardCellSourceContext(_0x2ed024, _0x247415 = {}) {
-  const _0x11870e = _0x2ed024 && typeof _0x2ed024 === 'object' ? { ..._0x2ed024 } : {},
-    _0x4954f9 = _trimString(_0x11870e.pieceId) || _trimString(_0x11870e.id) || _trimString(_0x247415.pieceId);
-  if (_0x4954f9) _0x11870e.pieceId = _0x4954f9;
-  ((_0x11870e.sourceId = null),
-    (_0x11870e.sourceLocalPath = null),
-    (_0x11870e.sourceUrl = ''),
-    (_0x11870e.sourceWidth = null),
-    (_0x11870e.sourceHeight = null),
-    (_0x11870e.storyboardSourceCrop = false),
-    (_0x11870e.storyboardPiece = false));
-  if (_0x247415.locked === true) _0x11870e.storyboardLockedCell = true;
+export function detachStoryboardCellSourceContext(args, value26 = {}) {
+  const value27 = args && typeof args === 'object' ? { ...args } : {},
+    _trimString4 = _trimString(value27.pieceId) || _trimString(value27.id) || _trimString(value26.pieceId);
+  if (_trimString4) value27.pieceId = _trimString4;
+  ((value27.sourceId = null),
+    (value27.sourceLocalPath = null),
+    (value27.sourceUrl = ''),
+    (value27.sourceWidth = null),
+    (value27.sourceHeight = null),
+    (value27.storyboardSourceCrop = false),
+    (value27.storyboardPiece = false));
+  if (value26.locked === true) value27.storyboardLockedCell = true;
   return (
-    Object.prototype.hasOwnProperty.call(_0x247415, 'extracted') &&
-      (_0x11870e.storyboardExtractedCell = _0x247415.extracted === true),
-    _0x11870e
+    Object.prototype.hasOwnProperty.call(value26, 'extracted') &&
+      (value27.storyboardExtractedCell = value26.extracted === true),
+    value27
   );
 }
-export function cloneStoryboardCellForSwap(_0x1814d0) {
-  const _0x71e819 = _0x1814d0 && typeof _0x1814d0 === 'object' ? { ..._0x1814d0 } : {};
-  if (_hasLocalStoryboardCellAsset(_0x71e819)) {
-    if (_trimString(_0x71e819.url).startsWith('data:')) _0x71e819.url = '';
-    if (_trimString(_0x71e819.thumbUrl).startsWith('data:')) _0x71e819.thumbUrl = '';
+export function cloneStoryboardCellForSwap(args2) {
+  const response5 = args2 && typeof args2 === 'object' ? { ...args2 } : {};
+  if (_hasLocalStoryboardCellAsset(response5)) {
+    if (_trimString(response5.url).startsWith('data:')) response5.url = '';
+    if (_trimString(response5.thumbUrl).startsWith('data:')) response5.thumbUrl = '';
   }
-  return _0x71e819;
+  return response5;
 }
-export function cloneStoryboardCellForSwapDestination(_0x15df02) {
-  const _0x477d09 = cloneStoryboardCellForSwap(_0x15df02);
+export function cloneStoryboardCellForSwapDestination(value28) {
+  const locked = cloneStoryboardCellForSwap(value28);
   if (
-    _isSourceBackedStoryboardCell(_0x477d09) &&
-    !isStoryboardCellEmpty(_0x477d09) &&
-    _hasStoryboardCellSwapAsset(_0x477d09)
+    _isSourceBackedStoryboardCell(locked) &&
+    !isStoryboardCellEmpty(locked) &&
+    _hasStoryboardCellSwapAsset(locked)
   )
-    return detachStoryboardCellSourceContext(_0x477d09, {
+    return detachStoryboardCellSourceContext(locked, {
       extracted: true,
-      locked: _0x477d09.storyboardLockedCell === true,
+      locked: locked.storyboardLockedCell === true,
     });
-  return _0x477d09;
+  return locked;
 }
-export function normalizeEmptyStoryboardCell(_0x336aec) {
-  const _0x2cd330 = _trimString(_0x336aec?.sourceLocalPath),
-    _0x3dd9d9 = _trimString(_0x336aec?.sourceUrl),
-    _0x3a50dc =
-      _trimString(_0x336aec?.localPath) ||
-      _trimString(_0x336aec?.originalLocalPath) ||
-      _trimString(_0x336aec?.displayLocalPath) ||
-      _trimString(_0x336aec?.thumbLocalPath),
-    _0x910c02 =
-      _trimString(_0x336aec?.url) ||
-      _trimString(_0x336aec?.capturePreviewUrl) ||
-      _trimString(_0x336aec?.thumbUrl),
-    _0x230054 = !!(_0x2cd330 || _0x3dd9d9),
-    _0x179486 = _trimString(_0x336aec?.residualImageLocalPath) || _0x2cd330 || _0x3a50dc,
-    _0x43af70 = _trimString(_0x336aec?.residualImageUrl) || _0x3dd9d9 || _0x910c02,
-    _0x1455af =
-      _trimString(_0x336aec?.residualImageMode) ||
-      (_0x230054 ? 'source' : _0x179486 || _0x43af70 ? 'cell' : ''),
-    _0x5c8848 = {
-      ...(_0x336aec && typeof _0x336aec === 'object' ? _0x336aec : {}),
+export function normalizeEmptyStoryboardCell(response6) {
+  const _trimString5 = _trimString(response6?.sourceLocalPath),
+    _trimString6 = _trimString(response6?.sourceUrl),
+    _trimString7 =
+      _trimString(response6?.localPath) ||
+      _trimString(response6?.originalLocalPath) ||
+      _trimString(response6?.displayLocalPath) ||
+      _trimString(response6?.thumbLocalPath),
+    _trimString8 =
+      _trimString(response6?.url) ||
+      _trimString(response6?.capturePreviewUrl) ||
+      _trimString(response6?.thumbUrl),
+    value29 = !!(_trimString5 || _trimString6),
+    residualImageLocalPath = _trimString(response6?.residualImageLocalPath) || _trimString5 || _trimString7,
+    residualImageUrl = _trimString(response6?.residualImageUrl) || _trimString6 || _trimString8,
+    residualImageMode =
+      _trimString(response6?.residualImageMode) ||
+      (value29 ? 'source' : residualImageLocalPath || residualImageUrl ? 'cell' : ''),
+    value30 = {
+      ...(response6 && typeof response6 === 'object' ? response6 : {}),
       url: '',
       localPath: null,
       originalLocalPath: null,
@@ -324,261 +320,236 @@ export function normalizeEmptyStoryboardCell(_0x336aec) {
       storyboardSourceCrop: false,
       storyboardPiece: false,
       storyboardLockedCell: false,
-      residualImageLocalPath: _0x179486 || null,
-      residualImageUrl: _0x43af70 || '',
+      residualImageLocalPath: residualImageLocalPath || null,
+      residualImageUrl: residualImageUrl || '',
       residualImageWidth:
-        _toPositiveNumber(_0x336aec?.residualImageWidth) ||
-        _toPositiveNumber(_0x336aec?.sourceWidth) ||
-        _toPositiveNumber(_0x336aec?.originalWidth) ||
-        _toPositiveNumber(_0x336aec?.imageWidth) ||
+        _toPositiveNumber(response6?.residualImageWidth) ||
+        _toPositiveNumber(response6?.sourceWidth) ||
+        _toPositiveNumber(response6?.originalWidth) ||
+        _toPositiveNumber(response6?.imageWidth) ||
         null,
       residualImageHeight:
-        _toPositiveNumber(_0x336aec?.residualImageHeight) ||
-        _toPositiveNumber(_0x336aec?.sourceHeight) ||
-        _toPositiveNumber(_0x336aec?.originalHeight) ||
-        _toPositiveNumber(_0x336aec?.imageHeight) ||
+        _toPositiveNumber(response6?.residualImageHeight) ||
+        _toPositiveNumber(response6?.sourceHeight) ||
+        _toPositiveNumber(response6?.originalHeight) ||
+        _toPositiveNumber(response6?.imageHeight) ||
         null,
-      residualImageMode: _0x1455af,
+      residualImageMode: residualImageMode,
       isEmpty: true,
     };
   return (
-    _0x336aec &&
-      Object.prototype.hasOwnProperty.call(_0x336aec, 'capturePreviewUrl') &&
-      (_0x5c8848.capturePreviewUrl = ''),
-    _0x336aec &&
-      Object.prototype.hasOwnProperty.call(_0x336aec, 'storyboardExtractedCell') &&
-      (_0x5c8848.storyboardExtractedCell = false),
-    _0x5c8848
+    response6 &&
+      Object.prototype.hasOwnProperty.call(response6, 'capturePreviewUrl') &&
+      (value30.capturePreviewUrl = ''),
+    response6 &&
+      Object.prototype.hasOwnProperty.call(response6, 'storyboardExtractedCell') &&
+      (value30.storyboardExtractedCell = false),
+    value30
   );
 }
-export function getStoryboardCellMetrics(_0x4d4764) {
-  const _0x50fc25 = _getSafeGridCount(_0x4d4764?.cols),
-    _0x15b0ba = _getSafeGridCount(_0x4d4764?.rows),
-    _0x71e0e3 = resolveStoryboardGridLayout(_0x4d4764),
-    _0x1d17ce = STORYBOARD_CELL_GAP,
-    _0x403c5b = Math.max(0, Number(_0x4d4764?.width) || 0),
-    _0x27cacf = Math.max(0, Number(_0x4d4764?.height) || 0),
-    _0xde7c73 = Math.max(0, _0x403c5b - STORYBOARD_CELL_INSET * 2),
-    _0x32c82e = Math.max(0, _0x27cacf - STORYBOARD_CELL_INSET * 2),
-    _0x319f93 = Math.max(0, (_0xde7c73 - (_0x50fc25 - 1) * _0x1d17ce) / _0x50fc25),
-    _0x324e45 = Math.max(0, (_0x32c82e - (_0x15b0ba - 1) * _0x1d17ce) / _0x15b0ba);
+export function getStoryboardCellMetrics(box5) {
+  const cols3 = _getSafeGridCount(box5?.cols),
+    rows2 = _getSafeGridCount(box5?.rows),
+    columnWeights = resolveStoryboardGridLayout(box5),
+    gap = STORYBOARD_CELL_GAP,
+    width2 = Math.max(0, Number(box5?.width) || 0),
+    height2 = Math.max(0, Number(box5?.height) || 0),
+    innerWidth2 = Math.max(0, width2 - STORYBOARD_CELL_INSET * 2),
+    innerHeight2 = Math.max(0, height2 - STORYBOARD_CELL_INSET * 2),
+    cellWidth = Math.max(0, (innerWidth2 - (cols3 - 1) * gap) / cols3),
+    cellHeight = Math.max(0, (innerHeight2 - (rows2 - 1) * gap) / rows2);
   return {
-    cols: _0x50fc25,
-    rows: _0x15b0ba,
-    width: _0x403c5b,
-    height: _0x27cacf,
-    gap: _0x1d17ce,
+    cols: cols3,
+    rows: rows2,
+    width: width2,
+    height: height2,
+    gap: gap,
     inset: STORYBOARD_CELL_INSET,
-    innerWidth: _0xde7c73,
-    innerHeight: _0x32c82e,
-    cellWidth: _0x319f93,
-    cellHeight: _0x324e45,
-    columnWeights: _0x71e0e3.columns,
-    rowWeights: _0x71e0e3.rowTracks,
+    innerWidth: innerWidth2,
+    innerHeight: innerHeight2,
+    cellWidth: cellWidth,
+    cellHeight: cellHeight,
+    columnWeights: columnWeights.columns,
+    rowWeights: columnWeights.rowTracks,
   };
 }
-export function getStoryboardCellBounds(_0x39d653, _0x164d86, _0x46fea7 = {}) {
-  if (!_0x39d653 || typeof _0x39d653 !== 'object') return null;
-  const _0xdb660e = resolveStoryboardGridLayout(_0x39d653),
-    _0x4f4760 = Math.trunc(Number(_0x164d86));
-  if (!Number.isInteger(_0x4f4760) || _0x4f4760 < 0) return null;
-  if (_0x4f4760 >= _0xdb660e.cols * _0xdb660e.rows) return null;
-  const _0xcfb352 = Math.max(
+export function getStoryboardCellBounds(box6, value31, box7 = {}) {
+  if (!box6 || typeof box6 !== 'object') return null;
+  const storyboardGridLayout = resolveStoryboardGridLayout(box6),
+    count9 = Math.trunc(Number(value31));
+  if (!Number.isInteger(count9) || count9 < 0) return null;
+  if (count9 >= storyboardGridLayout.cols * storyboardGridLayout.rows) return null;
+  const value32 = Math.max(
       0,
-      Number(Object.prototype.hasOwnProperty.call(_0x46fea7, 'width') ? _0x46fea7.width : _0x39d653.width) ||
-        0,
+      Number(Object.prototype.hasOwnProperty.call(box7, 'width') ? box7.width : box6.width) || 0,
     ),
-    _0xc4d344 = Math.max(
+    value33 = Math.max(
       0,
-      Number(
-        Object.prototype.hasOwnProperty.call(_0x46fea7, 'height') ? _0x46fea7.height : _0x39d653.height,
-      ) || 0,
+      Number(Object.prototype.hasOwnProperty.call(box7, 'height') ? box7.height : box6.height) || 0,
     ),
-    _0x1e4f59 = Math.max(
+    value34 = Math.max(
       0,
-      Number(
-        Object.prototype.hasOwnProperty.call(_0x46fea7, 'inset') ? _0x46fea7.inset : STORYBOARD_CELL_INSET,
-      ) || 0,
+      Number(Object.prototype.hasOwnProperty.call(box7, 'inset') ? box7.inset : STORYBOARD_CELL_INSET) || 0,
     ),
-    _0x72178e = Object.prototype.hasOwnProperty.call(_0x46fea7, 'gap'),
-    _0x2b1860 = Object.prototype.hasOwnProperty.call(_0x46fea7, 'gapX'),
-    _0x1cd360 = Object.prototype.hasOwnProperty.call(_0x46fea7, 'gapY'),
-    _0x20552b = Math.max(
-      0,
-      Number(_0x72178e ? _0x46fea7.gap : normalizeStoryboardGridGap(_0x39d653.gridGap)) || 0,
-    ),
-    _0x9199f5 = Math.max(0, Number(_0x2b1860 ? _0x46fea7.gapX : _0x20552b) || 0),
-    _0x9f104b = Math.max(0, Number(_0x1cd360 ? _0x46fea7.gapY : _0x20552b) || 0),
-    _0x1a15f7 = _0x46fea7.gapMode !== 'track',
-    _0x135478 = _0x46fea7.gapMode !== 'track',
-    _0x4e5148 = Math.max(0, _0xcfb352 - _0x1e4f59 * 2),
-    _0x3d57ba = Math.max(0, _0xc4d344 - _0x1e4f59 * 2),
-    _0x2dfea6 = _0x1a15f7 ? _0x4e5148 : Math.max(0, _0x4e5148 - (_0xdb660e.cols - 1) * _0x9199f5),
-    _0x1fc2ee = _0x135478 ? _0x3d57ba : Math.max(0, _0x3d57ba - (_0xdb660e.rows - 1) * _0x9f104b),
-    _0x250df9 = _0x4f4760 % _0xdb660e.cols,
-    _0x4fd1bc = Math.floor(_0x4f4760 / _0xdb660e.cols),
-    _0x18207a = _0x1a15f7
-      ? _getCenteredGapTrackBounds(_0xdb660e.columns, _0x250df9, _0x2dfea6, _0x9199f5)
-      : _getTrackBounds(_0xdb660e.columns, _0x250df9, _0x2dfea6, _0x9199f5),
-    _0x1a4bd7 = _0x135478
-      ? _getCenteredGapTrackBounds(_0xdb660e.rowTracks, _0x4fd1bc, _0x1fc2ee, _0x9f104b)
-      : _getTrackBounds(_0xdb660e.rowTracks, _0x4fd1bc, _0x1fc2ee, _0x9f104b),
-    _0x37a344 = _0x1e4f59 + _0x18207a.start,
-    _0x535696 = _0x1e4f59 + _0x18207a.end,
-    _0xf51bd5 = _0x1e4f59 + _0x1a4bd7.start,
-    _0x49d285 = _0x1e4f59 + _0x1a4bd7.end;
+    value35 = Object.prototype.hasOwnProperty.call(box7, 'gap'),
+    value36 = Object.prototype.hasOwnProperty.call(box7, 'gapX'),
+    value37 = Object.prototype.hasOwnProperty.call(box7, 'gapY'),
+    value38 = Math.max(0, Number(value35 ? box7.gap : normalizeStoryboardGridGap(box6.gridGap)) || 0),
+    value39 = Math.max(0, Number(value36 ? box7.gapX : value38) || 0),
+    value40 = Math.max(0, Number(value37 ? box7.gapY : value38) || 0),
+    value41 = box7.gapMode !== 'track',
+    value42 = box7.gapMode !== 'track',
+    value43 = Math.max(0, value32 - value34 * 2),
+    value44 = Math.max(0, value33 - value34 * 2),
+    value45 = value41 ? value43 : Math.max(0, value43 - (storyboardGridLayout.cols - 1) * value39),
+    value46 = value42 ? value44 : Math.max(0, value44 - (storyboardGridLayout.rows - 1) * value40),
+    col = count9 % storyboardGridLayout.cols,
+    row = Math.floor(count9 / storyboardGridLayout.cols),
+    value47 = value41
+      ? _getCenteredGapTrackBounds(storyboardGridLayout.columns, col, value45, value39)
+      : _getTrackBounds(storyboardGridLayout.columns, col, value45, value39),
+    value48 = value42
+      ? _getCenteredGapTrackBounds(storyboardGridLayout.rowTracks, row, value46, value40)
+      : _getTrackBounds(storyboardGridLayout.rowTracks, row, value46, value40),
+    x0 = value34 + value47.start,
+    x1 = value34 + value47.end,
+    y0 = value34 + value48.start,
+    y1 = value34 + value48.end;
   return {
-    col: _0x250df9,
-    row: _0x4fd1bc,
-    x0: _0x37a344,
-    y0: _0xf51bd5,
-    x1: _0x535696,
-    y1: _0x49d285,
-    width: Math.max(0, _0x535696 - _0x37a344),
-    height: Math.max(0, _0x49d285 - _0xf51bd5),
+    col: col,
+    row: row,
+    x0: x0,
+    y0: y0,
+    x1: x1,
+    y1: y1,
+    width: Math.max(0, x1 - x0),
+    height: Math.max(0, y1 - y0),
   };
 }
-export function getStoryboardCellPixelBounds(_0xd36d0c, _0x3cccec, _0x1e7dd4 = {}) {
-  const _0x3ca8d9 = getStoryboardCellBounds(_0xd36d0c, _0x3cccec, _0x1e7dd4);
-  if (!_0x3ca8d9) return null;
-  const _0x444c82 = resolveStoryboardGridLayout(_0xd36d0c),
-    _0xbf97af = Math.max(
+export function getStoryboardCellPixelBounds(box8, value49, box9 = {}) {
+  const args3 = getStoryboardCellBounds(box8, value49, box9);
+  if (!args3) return null;
+  const storyboardGridLayout2 = resolveStoryboardGridLayout(box8),
+    value50 = Math.max(
       0,
-      Number(Object.prototype.hasOwnProperty.call(_0x1e7dd4, 'width') ? _0x1e7dd4.width : _0xd36d0c?.width) ||
-        0,
+      Number(Object.prototype.hasOwnProperty.call(box9, 'width') ? box9.width : box8?.width) || 0,
     ),
-    _0x49f0df = Math.max(
+    value51 = Math.max(
       0,
-      Number(
-        Object.prototype.hasOwnProperty.call(_0x1e7dd4, 'height') ? _0x1e7dd4.height : _0xd36d0c?.height,
-      ) || 0,
+      Number(Object.prototype.hasOwnProperty.call(box9, 'height') ? box9.height : box8?.height) || 0,
     ),
-    _0x40d77e = Math.max(
+    value52 = Math.max(
       0,
-      Number(
-        Object.prototype.hasOwnProperty.call(_0x1e7dd4, 'inset') ? _0x1e7dd4.inset : STORYBOARD_CELL_INSET,
-      ) || 0,
+      Number(Object.prototype.hasOwnProperty.call(box9, 'inset') ? box9.inset : STORYBOARD_CELL_INSET) || 0,
     ),
-    _0x178a6b = Math.floor(_0x40d77e),
-    _0x39f49 = Math.floor(_0x40d77e),
-    _0x136287 = Math.max(_0x178a6b, Math.ceil(_0xbf97af - _0x40d77e)),
-    _0x59664d = Math.max(_0x39f49, Math.ceil(_0x49f0df - _0x40d77e));
-  let _0x53f4f3 = _clamp(Math.floor(_0x3ca8d9.x0), _0x178a6b, _0x136287),
-    _0x147b58 = _clamp(Math.floor(_0x3ca8d9.y0), _0x39f49, _0x59664d),
-    _0x348a62 = _clamp(Math.ceil(_0x3ca8d9.x1), _0x178a6b, _0x136287),
-    _0x561053 = _clamp(Math.ceil(_0x3ca8d9.y1), _0x39f49, _0x59664d);
-  if (_0x3ca8d9.col <= 0) _0x53f4f3 = _0x178a6b;
-  if (_0x3ca8d9.row <= 0) _0x147b58 = _0x39f49;
-  if (_0x3ca8d9.col >= _0x444c82.cols - 1) _0x348a62 = _0x136287;
-  if (_0x3ca8d9.row >= _0x444c82.rows - 1) _0x561053 = _0x59664d;
-  if (_0x348a62 < _0x53f4f3) _0x348a62 = _0x53f4f3;
-  if (_0x561053 < _0x147b58) _0x561053 = _0x147b58;
+    value53 = Math.floor(value52),
+    value54 = Math.floor(value52),
+    value55 = Math.max(value53, Math.ceil(value50 - value52)),
+    value56 = Math.max(value54, Math.ceil(value51 - value52));
+  let x02 = _clamp(Math.floor(args3.x0), value53, value55),
+    y02 = _clamp(Math.floor(args3.y0), value54, value56),
+    x12 = _clamp(Math.ceil(args3.x1), value53, value55),
+    y12 = _clamp(Math.ceil(args3.y1), value54, value56);
+  if (args3.col <= 0) x02 = value53;
+  if (args3.row <= 0) y02 = value54;
+  if (args3.col >= storyboardGridLayout2.cols - 1) x12 = value55;
+  if (args3.row >= storyboardGridLayout2.rows - 1) y12 = value56;
+  if (x12 < x02) x12 = x02;
+  if (y12 < y02) y12 = y02;
   return {
-    ..._0x3ca8d9,
-    x0: _0x53f4f3,
-    y0: _0x147b58,
-    x1: _0x348a62,
-    y1: _0x561053,
-    width: Math.max(0, _0x348a62 - _0x53f4f3),
-    height: Math.max(0, _0x561053 - _0x147b58),
+    ...args3,
+    x0: x02,
+    y0: y02,
+    x1: x12,
+    y1: y12,
+    width: Math.max(0, x12 - x02),
+    height: Math.max(0, y12 - y02),
   };
 }
-export function buildStoryboardCropRect(_0x426cfb, _0x841b5e, _0x584b8b = {}) {
-  if (!_0x426cfb || typeof _0x426cfb !== 'object') return null;
-  const _0x964f26 = Math.max(1, Math.trunc(Number(_0x584b8b.width) || 0)),
-    _0x13abc1 = Math.max(1, Math.trunc(Number(_0x584b8b.height) || 0));
-  if (_0x964f26 <= 0 || _0x13abc1 <= 0) return null;
-  const _0x15c7b8 = Math.max(
+export function buildStoryboardCropRect(enabled2, value57, gapMode = {}) {
+  if (!enabled2 || typeof enabled2 !== 'object') return null;
+  const width3 = Math.max(1, Math.trunc(Number(gapMode.width) || 0)),
+    height3 = Math.max(1, Math.trunc(Number(gapMode.height) || 0));
+  if (width3 <= 0 || height3 <= 0) return null;
+  const inset = Math.max(
       0,
-      Number(Object.prototype.hasOwnProperty.call(_0x584b8b, 'inset') ? _0x584b8b.inset : 0) || 0,
+      Number(Object.prototype.hasOwnProperty.call(gapMode, 'inset') ? gapMode.inset : 0) || 0,
     ),
-    _0x5ab5c1 = Object.prototype.hasOwnProperty.call(_0x584b8b, 'gap'),
-    _0x17a6db = Object.prototype.hasOwnProperty.call(_0x584b8b, 'gapX'),
-    _0x3e2094 = Object.prototype.hasOwnProperty.call(_0x584b8b, 'gapY'),
-    _0x22877f = getStoryboardScaledGridGap(_0x426cfb, { width: _0x964f26, height: _0x13abc1 }),
-    _0x5d2a92 = _0x5ab5c1 ? Math.max(0, Number(_0x584b8b.gap) || 0) : undefined,
-    _0x427aac = _0x17a6db ? Math.max(0, Number(_0x584b8b.gapX) || 0) : _0x5ab5c1 ? _0x5d2a92 : _0x22877f.x,
-    _0x2d04b3 = _0x3e2094 ? Math.max(0, Number(_0x584b8b.gapY) || 0) : _0x5ab5c1 ? _0x5d2a92 : _0x22877f.y,
-    _0xe3074f = getStoryboardCellPixelBounds(_0x426cfb, _0x841b5e, {
-      width: _0x964f26,
-      height: _0x13abc1,
-      inset: _0x15c7b8,
-      gapX: _0x427aac,
-      gapY: _0x2d04b3,
-      ...(Object.prototype.hasOwnProperty.call(_0x584b8b, 'gapMode') ? { gapMode: _0x584b8b.gapMode } : {}),
+    value58 = Object.prototype.hasOwnProperty.call(gapMode, 'gap'),
+    value59 = Object.prototype.hasOwnProperty.call(gapMode, 'gapX'),
+    value60 = Object.prototype.hasOwnProperty.call(gapMode, 'gapY'),
+    box10 = getStoryboardScaledGridGap(enabled2, { width: width3, height: height3 }),
+    value61 = value58 ? Math.max(0, Number(gapMode.gap) || 0) : undefined,
+    gapX = value59 ? Math.max(0, Number(gapMode.gapX) || 0) : value58 ? value61 : box10.x,
+    gapY = value60 ? Math.max(0, Number(gapMode.gapY) || 0) : value58 ? value61 : box10.y,
+    bounds = getStoryboardCellPixelBounds(enabled2, value57, {
+      width: width3,
+      height: height3,
+      inset: inset,
+      gapX: gapX,
+      gapY: gapY,
+      ...(Object.prototype.hasOwnProperty.call(gapMode, 'gapMode') ? { gapMode: gapMode.gapMode } : {}),
     });
-  if (!_0xe3074f || _0xe3074f.width <= 0 || _0xe3074f.height <= 0) return null;
-  const _0x331808 = _clamp(_0xe3074f.x0, 0, Math.max(0, _0x964f26 - 1)),
-    _0x5ca25d = _clamp(_0xe3074f.y0, 0, Math.max(0, _0x13abc1 - 1)),
-    _0x3c96eb = _clamp(_0xe3074f.x1, _0x331808 + 1, _0x964f26),
-    _0x22d227 = _clamp(_0xe3074f.y1, _0x5ca25d + 1, _0x13abc1),
-    _0x48e077 = Math.max(1, _0x3c96eb - _0x331808),
-    _0x4bfe65 = Math.max(1, _0x22d227 - _0x5ca25d);
+  if (!bounds || bounds.width <= 0 || bounds.height <= 0) return null;
+  const sx = _clamp(bounds.x0, 0, Math.max(0, width3 - 1)),
+    sy = _clamp(bounds.y0, 0, Math.max(0, height3 - 1)),
+    x13 = _clamp(bounds.x1, sx + 1, width3),
+    y13 = _clamp(bounds.y1, sy + 1, height3),
+    sw = Math.max(1, x13 - sx),
+    sh = Math.max(1, y13 - sy);
   return {
-    sx: _0x331808,
-    sy: _0x5ca25d,
-    sw: _0x48e077,
-    sh: _0x4bfe65,
-    x0: _0x331808,
-    y0: _0x5ca25d,
-    x1: _0x3c96eb,
-    y1: _0x22d227,
-    width: _0x48e077,
-    height: _0x4bfe65,
-    bounds: _0xe3074f,
+    sx: sx,
+    sy: sy,
+    sw: sw,
+    sh: sh,
+    x0: sx,
+    y0: sy,
+    x1: x13,
+    y1: y13,
+    width: sw,
+    height: sh,
+    bounds: bounds,
   };
 }
-export function getStoryboardCellIndexAtWorldPoint(_0x505963, _0xaa643b, _0x58cc75) {
-  if (!_0x505963 || typeof _0x505963 !== 'object') return -1;
-  const _0x1c4aaf = Number(_0x505963.x) || 0,
-    _0x19ddfa = Number(_0x505963.y) || 0,
-    _0x23f4db = _0xaa643b - _0x1c4aaf,
-    _0x2e57cc = _0x58cc75 - _0x19ddfa,
-    _0x5f2a8e = getStoryboardCellMetrics(_0x505963);
-  if (_0x23f4db < 0 || _0x23f4db > _0x5f2a8e.width || _0x2e57cc < 0 || _0x2e57cc > _0x5f2a8e.height)
-    return -1;
-  const _0x3203f0 = _0x5f2a8e.cols * _0x5f2a8e.rows;
-  for (let _0x59a18c = 0; _0x59a18c < _0x3203f0; _0x59a18c++) {
-    const _0xaaba01 = getStoryboardCellPixelBounds(_0x505963, _0x59a18c);
-    if (!_0xaaba01 || _0xaaba01.width <= 0 || _0xaaba01.height <= 0) continue;
-    if (
-      _0x23f4db >= _0xaaba01.x0 &&
-      _0x23f4db <= _0xaaba01.x1 &&
-      _0x2e57cc >= _0xaaba01.y0 &&
-      _0x2e57cc <= _0xaaba01.y1
-    )
-      return _0x59a18c;
+export function getStoryboardCellIndexAtWorldPoint(box11, value62, value63) {
+  if (!box11 || typeof box11 !== 'object') return -1;
+  const value64 = Number(box11.x) || 0,
+    value65 = Number(box11.y) || 0,
+    count10 = value62 - value64,
+    count11 = value63 - value65,
+    box12 = getStoryboardCellMetrics(box11);
+  if (count10 < 0 || count10 > box12.width || count11 < 0 || count11 > box12.height) return -1;
+  const value66 = box12.cols * box12.rows;
+  for (let value67 = 0; value67 < value66; value67++) {
+    const box13 = getStoryboardCellPixelBounds(box11, value67);
+    if (!box13 || box13.width <= 0 || box13.height <= 0) continue;
+    if (count10 >= box13.x0 && count10 <= box13.x1 && count11 >= box13.y0 && count11 <= box13.y1)
+      return value67;
   }
   return -1;
 }
-export function getStoryboardNearestCellIndexAtWorldPoint(_0x2d8acb, _0x2e4132, _0x57c66a) {
-  if (!_0x2d8acb || typeof _0x2d8acb !== 'object') return -1;
-  const _0x4f2bc6 = getStoryboardCellIndexAtWorldPoint(_0x2d8acb, _0x2e4132, _0x57c66a);
-  if (_0x4f2bc6 >= 0) return _0x4f2bc6;
-  const _0x13b789 = Number(_0x2d8acb.x) || 0,
-    _0x55f96c = Number(_0x2d8acb.y) || 0,
-    _0x3ad63d = _0x2e4132 - _0x13b789,
-    _0x5e127b = _0x57c66a - _0x55f96c,
-    _0x1e7586 = getStoryboardCellMetrics(_0x2d8acb);
-  if (_0x3ad63d < 0 || _0x3ad63d > _0x1e7586.width || _0x5e127b < 0 || _0x5e127b > _0x1e7586.height)
-    return -1;
-  const _0x440b9e = _0x1e7586.cols * _0x1e7586.rows;
-  let _0x377cb3 = -1,
-    _0x50117e = Infinity;
-  for (let _0x2a7003 = 0; _0x2a7003 < _0x440b9e; _0x2a7003++) {
-    const _0x4925d1 = getStoryboardCellPixelBounds(_0x2d8acb, _0x2a7003, { gap: 0 });
-    if (!_0x4925d1 || _0x4925d1.width <= 0 || _0x4925d1.height <= 0) continue;
-    if (
-      _0x3ad63d >= _0x4925d1.x0 &&
-      _0x3ad63d <= _0x4925d1.x1 &&
-      _0x5e127b >= _0x4925d1.y0 &&
-      _0x5e127b <= _0x4925d1.y1
-    )
-      return _0x2a7003;
-    const _0x5b33fa = _0x4925d1.x0 + _0x4925d1.width / 2,
-      _0x136d2b = _0x4925d1.y0 + _0x4925d1.height / 2,
-      _0x386001 = (_0x3ad63d - _0x5b33fa) ** 2 + (_0x5e127b - _0x136d2b) ** 2;
-    _0x386001 < _0x50117e && ((_0x50117e = _0x386001), (_0x377cb3 = _0x2a7003));
+export function getStoryboardNearestCellIndexAtWorldPoint(box14, value68, value69) {
+  if (!box14 || typeof box14 !== 'object') return -1;
+  const storyboardCellIndexAtWorldPoint = getStoryboardCellIndexAtWorldPoint(box14, value68, value69);
+  if (storyboardCellIndexAtWorldPoint >= 0) return storyboardCellIndexAtWorldPoint;
+  const value70 = Number(box14.x) || 0,
+    value71 = Number(box14.y) || 0,
+    count12 = value68 - value70,
+    count13 = value69 - value71,
+    box15 = getStoryboardCellMetrics(box14);
+  if (count12 < 0 || count12 > box15.width || count13 < 0 || count13 > box15.height) return -1;
+  const value72 = box15.cols * box15.rows;
+  let value73 = -1,
+    value74 = Infinity;
+  for (let value75 = 0; value75 < value72; value75++) {
+    const box16 = getStoryboardCellPixelBounds(box14, value75, { gap: 0 });
+    if (!box16 || box16.width <= 0 || box16.height <= 0) continue;
+    if (count12 >= box16.x0 && count12 <= box16.x1 && count13 >= box16.y0 && count13 <= box16.y1)
+      return value75;
+    const value76 = box16.x0 + box16.width / 2,
+      value77 = box16.y0 + box16.height / 2,
+      value78 = (count12 - value76) ** 2 + (count13 - value77) ** 2;
+    value78 < value74 && ((value74 = value78), (value73 = value75));
   }
-  return _0x377cb3;
+  return value73;
 }

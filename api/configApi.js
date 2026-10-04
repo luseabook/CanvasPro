@@ -37,236 +37,236 @@ export function isApiConfigLoaded() {
 export function getApiConfigSnapshot() {
   return cloneConfig(apiConfig || {});
 }
-function notifyApiConfigChanged(_0x3f7a61 = 'updated') {
-  const _0x498ec2 = globalThis['window'];
-  if (!_0x498ec2 || typeof _0x498ec2['dispatchEvent'] !== 'function') return;
-  const _0x1e684f = { reason: _0x3f7a61 },
-    _0x17065d =
+function notifyApiConfigChanged(reason = 'updated') {
+  const enabled = globalThis['window'];
+  if (!enabled || typeof enabled['dispatchEvent'] !== 'function') return;
+  const detail = { reason: reason },
+    value =
       typeof globalThis['CustomEvent'] === 'function'
-        ? new globalThis['CustomEvent'](API_CONFIG_CHANGED_EVENT, { detail: _0x1e684f })
-        : { type: API_CONFIG_CHANGED_EVENT, detail: _0x1e684f };
-  _0x498ec2['dispatchEvent'](_0x17065d);
+        ? new globalThis['CustomEvent'](API_CONFIG_CHANGED_EVENT, { detail: detail })
+        : { type: API_CONFIG_CHANGED_EVENT, detail: detail };
+  enabled['dispatchEvent'](value);
 }
-function isPlainObject(_0x2cda2c) {
-  return !!_0x2cda2c && typeof _0x2cda2c === 'object' && !Array['isArray'](_0x2cda2c);
+function isPlainObject(enabled2) {
+  return !!enabled2 && typeof enabled2 === 'object' && !Array['isArray'](enabled2);
 }
-function cloneConfig(_0x45dda4) {
-  return isPlainObject(_0x45dda4) ? JSON['parse'](JSON['stringify'](_0x45dda4)) : {};
+function cloneConfig(item) {
+  return isPlainObject(item) ? JSON['parse'](JSON['stringify'](item)) : {};
 }
-function normalizeProviderId(_0x462516) {
-  return String(_0x462516 || '')
+function normalizeProviderId(key) {
+  return String(key || '')
     ['trim']()
     ['replace'](/[^A-Za-z0-9_-]/g, '');
 }
-function normalizeComfyUiBaseUrl(_0x4abfa5, _0x1c51a9 = '') {
-  const _0x16b003 = String(_0x4abfa5 || _0x1c51a9 || '')['trim']();
-  if (!_0x16b003) return '';
-  const _0x19ba85 = /^[a-z][a-z0-9+.-]*:\/\//i['test'](_0x16b003);
+function normalizeComfyUiBaseUrl(index, result = '') {
+  const enabled3 = String(index || result || '')['trim']();
+  if (!enabled3) return '';
+  const data = /^[a-z][a-z0-9+.-]*:\/\//i['test'](enabled3);
   try {
-    const _0x598842 = new URL(_0x19ba85 ? _0x16b003 : 'http://' + _0x16b003);
-    return (
-      (_0x598842['search'] = ''),
-      (_0x598842['hash'] = ''),
-      _0x598842['toString']()['replace'](/\/+$/, '')
-    );
+    const uRL = new URL(data ? enabled3 : 'http://' + enabled3);
+    return ((uRL['search'] = ''), (uRL['hash'] = ''), uRL['toString']()['replace'](/\/+$/, ''));
   } catch {
-    const _0xbe881e = _0x16b003['replace'](/[?#].*$/, '')['replace'](/\/+$/, '');
-    if (!_0xbe881e) return '';
-    return _0x19ba85 ? _0xbe881e : 'http://' + _0xbe881e;
+    const enabled4 = enabled3['replace'](/[?#].*$/, '')['replace'](/\/+$/, '');
+    if (!enabled4) return '';
+    return data ? enabled4 : 'http://' + enabled4;
   }
 }
-function buildProviderSecureKey(_0x21ae26, _0x396e0b) {
-  const _0x118ce8 = normalizeProviderId(_0x21ae26),
-    _0x20afa5 = String(_0x396e0b || '')['trim']();
-  if (!_0x118ce8 || !SECURE_PROVIDER_FIELDS['includes'](_0x20afa5)) return '';
-  return 'apiConfig.providers.' + _0x118ce8 + '.' + _0x20afa5;
+function buildProviderSecureKey(options, target) {
+  const providerId = normalizeProviderId(options),
+    source = String(target || '')['trim']();
+  if (!providerId || !SECURE_PROVIDER_FIELDS['includes'](source)) return '';
+  return 'apiConfig.providers.' + providerId + '.' + source;
 }
-function buildObjectStorageSecureKey(_0xce6b36, _0x741727 = '') {
-  const _0x23627a = String(_0xce6b36 || '')['trim']();
-  if (!SECURE_OBJECT_STORAGE_FIELDS['includes'](_0x23627a)) return '';
-  const _0x2f920b = normalizeProviderId(_0x741727);
-  if (_0x2f920b) return 'apiConfig.objectStorage.profiles.' + _0x2f920b + '.' + _0x23627a;
-  return 'apiConfig.objectStorage.' + _0x23627a;
+function buildObjectStorageSecureKey(next, current = '') {
+  const entry = String(next || '')['trim']();
+  if (!SECURE_OBJECT_STORAGE_FIELDS['includes'](entry)) return '';
+  const providerId2 = normalizeProviderId(current);
+  if (providerId2) return 'apiConfig.objectStorage.profiles.' + providerId2 + '.' + entry;
+  return 'apiConfig.objectStorage.' + entry;
 }
 function getSecureSettingsApi() {
   if (!desktopBridge['isElectron'] && !desktopBridge['isChromeShell']) return null;
-  const _0x5ee63a = desktopBridge['secureSettings'];
+  const map = desktopBridge['secureSettings'];
   if (
-    _0x5ee63a &&
-    typeof _0x5ee63a['get'] === 'function' &&
-    typeof _0x5ee63a['set'] === 'function' &&
-    typeof _0x5ee63a['delete'] === 'function'
+    map &&
+    typeof map['get'] === 'function' &&
+    typeof map['set'] === 'function' &&
+    typeof map['delete'] === 'function'
   )
-    return _0x5ee63a;
+    return map;
   return null;
 }
-function collectProviderIds(_0x37d8bb = {}) {
-  const _0xbf6c80 = new Set(DEFAULT_SECURE_PROVIDER_IDS);
+function collectProviderIds(options2 = {}) {
+  const args = new Set(DEFAULT_SECURE_PROVIDER_IDS);
   return (
-    isPlainObject(_0x37d8bb['providers']) &&
-      Object['keys'](_0x37d8bb['providers'])['forEach']((_0x31ee51) => {
-        const _0x25530c = normalizeProviderId(_0x31ee51);
-        if (_0x25530c) _0xbf6c80['add'](_0x25530c);
+    isPlainObject(options2['providers']) &&
+      Object['keys'](options2['providers'])['forEach']((record) => {
+        const providerId3 = normalizeProviderId(record);
+        if (providerId3) args['add'](providerId3);
       }),
-    [..._0xbf6c80]
+    [...args]
   );
 }
-function collectSecureKeys(_0x1fea57 = {}) {
-  const _0x19ac07 = [];
-  (collectProviderIds(_0x1fea57)['forEach']((_0x2053e0) => {
-    SECURE_PROVIDER_FIELDS['forEach']((_0x5b3754) => {
-      const _0x3bd1d1 = buildProviderSecureKey(_0x2053e0, _0x5b3754);
-      if (_0x3bd1d1) _0x19ac07['push'](_0x3bd1d1);
+function collectSecureKeys(options3 = {}) {
+  const list = [];
+  (collectProviderIds(options3)['forEach']((payload) => {
+    SECURE_PROVIDER_FIELDS['forEach']((handle) => {
+      const providerSecureKey = buildProviderSecureKey(payload, handle);
+      if (providerSecureKey) list['push'](providerSecureKey);
     });
   }),
-    SECURE_OBJECT_STORAGE_FIELDS['forEach']((_0x1872cd) => {
-      const _0x4656c7 = buildObjectStorageSecureKey(_0x1872cd);
-      if (_0x4656c7) _0x19ac07['push'](_0x4656c7);
+    SECURE_OBJECT_STORAGE_FIELDS['forEach']((state) => {
+      const objectStorageSecureKey = buildObjectStorageSecureKey(state);
+      if (objectStorageSecureKey) list['push'](objectStorageSecureKey);
     }));
-  const _0x539996 = new Set(OBJECT_STORAGE_PROVIDER_IDS);
+  const list2 = new Set(OBJECT_STORAGE_PROVIDER_IDS);
   return (
-    isPlainObject(_0x1fea57?.['objectStorage']?.['profiles']) &&
-      Object['keys'](_0x1fea57['objectStorage']['profiles'])['forEach']((_0x1cf321) => {
-        const _0x3455bd = normalizeProviderId(_0x1cf321);
-        if (_0x3455bd) _0x539996['add'](_0x3455bd);
+    isPlainObject(options3?.['objectStorage']?.['profiles']) &&
+      Object['keys'](options3['objectStorage']['profiles'])['forEach']((config) => {
+        const providerId4 = normalizeProviderId(config);
+        if (providerId4) list2['add'](providerId4);
       }),
-    _0x539996['forEach']((_0x1b1877) => {
-      SECURE_OBJECT_STORAGE_FIELDS['forEach']((_0x3aa0fd) => {
-        const _0x4f0b83 = buildObjectStorageSecureKey(_0x3aa0fd, _0x1b1877);
-        if (_0x4f0b83) _0x19ac07['push'](_0x4f0b83);
+    list2['forEach']((scope) => {
+      SECURE_OBJECT_STORAGE_FIELDS['forEach']((input) => {
+        const objectStorageSecureKey2 = buildObjectStorageSecureKey(input, scope);
+        if (objectStorageSecureKey2) list['push'](objectStorageSecureKey2);
       });
     }),
-    _0x19ac07
+    list
   );
 }
-function stripSensitiveConfigValues(_0x1cf6d2 = {}) {
-  const _0x3570e6 = cloneConfig(_0x1cf6d2);
+function stripSensitiveConfigValues(options4 = {}) {
+  const cloneConfig2 = cloneConfig(options4);
   return (
-    isPlainObject(_0x3570e6['providers']) &&
-      Object['values'](_0x3570e6['providers'])['forEach']((_0x296a95) => {
-        if (!isPlainObject(_0x296a95)) return;
-        SECURE_PROVIDER_FIELDS['forEach']((_0xb85567) => {
-          delete _0x296a95[_0xb85567];
+    isPlainObject(cloneConfig2['providers']) &&
+      Object['values'](cloneConfig2['providers'])['forEach']((output) => {
+        if (!isPlainObject(output)) return;
+        SECURE_PROVIDER_FIELDS['forEach']((value2) => {
+          delete output[value2];
         });
       }),
-    isPlainObject(_0x3570e6['objectStorage']) &&
-      (SECURE_OBJECT_STORAGE_FIELDS['forEach']((_0x197d3e) => {
-        delete _0x3570e6['objectStorage'][_0x197d3e];
+    isPlainObject(cloneConfig2['objectStorage']) &&
+      (SECURE_OBJECT_STORAGE_FIELDS['forEach']((value3) => {
+        delete cloneConfig2['objectStorage'][value3];
       }),
-      isPlainObject(_0x3570e6['objectStorage']['profiles']) &&
-        Object['values'](_0x3570e6['objectStorage']['profiles'])['forEach']((_0x52913) => {
-          if (!isPlainObject(_0x52913)) return;
-          SECURE_OBJECT_STORAGE_FIELDS['forEach']((_0x5ee5ab) => {
-            delete _0x52913[_0x5ee5ab];
+      isPlainObject(cloneConfig2['objectStorage']['profiles']) &&
+        Object['values'](cloneConfig2['objectStorage']['profiles'])['forEach']((value4) => {
+          if (!isPlainObject(value4)) return;
+          SECURE_OBJECT_STORAGE_FIELDS['forEach']((value5) => {
+            delete value4[value5];
           });
         })),
-    LEGACY_GRSAI_KEY_FIELDS['forEach']((_0x55a14c) => {
-      delete _0x3570e6[_0x55a14c];
+    LEGACY_GRSAI_KEY_FIELDS['forEach']((value6) => {
+      delete cloneConfig2[value6];
     }),
-    _0x3570e6
+    cloneConfig2
   );
 }
-function normalizeConfigForStorage(_0x5848ac = {}) {
-  const _0x3096c0 = cloneConfig(_0x5848ac),
-    _0x2342ce = _0x3096c0['providers']?.['comfyui'];
+function normalizeConfigForStorage(options5 = {}) {
+  const cloneConfig3 = cloneConfig(options5),
+    value7 = cloneConfig3['providers']?.['comfyui'];
   return (
-    isPlainObject(_0x2342ce) &&
-      ((Object['prototype']['hasOwnProperty']['call'](_0x2342ce, 'apiUrl') ||
-        Object['prototype']['hasOwnProperty']['call'](_0x2342ce, 'baseUrl')) &&
-        (_0x2342ce['apiUrl'] = normalizeComfyUiBaseUrl(_0x2342ce['apiUrl'] || _0x2342ce['baseUrl'] || '')),
-      (Object['prototype']['hasOwnProperty']['call'](_0x2342ce, 'cloudApiUrl') ||
-        Object['prototype']['hasOwnProperty']['call'](_0x2342ce, 'cloudBaseUrl')) &&
-        (_0x2342ce['cloudApiUrl'] = normalizeComfyUiBaseUrl(
-          _0x2342ce['cloudApiUrl'] || _0x2342ce['cloudBaseUrl'] || '',
+    isPlainObject(value7) &&
+      ((Object['prototype']['hasOwnProperty']['call'](value7, 'apiUrl') ||
+        Object['prototype']['hasOwnProperty']['call'](value7, 'baseUrl')) &&
+        (value7['apiUrl'] = normalizeComfyUiBaseUrl(value7['apiUrl'] || value7['baseUrl'] || '')),
+      (Object['prototype']['hasOwnProperty']['call'](value7, 'cloudApiUrl') ||
+        Object['prototype']['hasOwnProperty']['call'](value7, 'cloudBaseUrl')) &&
+        (value7['cloudApiUrl'] = normalizeComfyUiBaseUrl(
+          value7['cloudApiUrl'] || value7['cloudBaseUrl'] || '',
         ))),
-    _0x3096c0
+    cloneConfig3
   );
 }
-function extractPlaintextSecureValues(_0x411905 = {}) {
-  const _0x1fe841 = new Map(),
-    _0x17cdbb = isPlainObject(_0x411905['providers']) ? _0x411905['providers'] : {};
-  Object['entries'](_0x17cdbb)['forEach'](([_0x5609d1, _0x57376e]) => {
-    if (!isPlainObject(_0x57376e)) return;
-    SECURE_PROVIDER_FIELDS['forEach']((_0x41f180) => {
-      if (!Object['prototype']['hasOwnProperty']['call'](_0x57376e, _0x41f180)) return;
-      const _0x130fc3 = buildProviderSecureKey(_0x5609d1, _0x41f180);
-      if (!_0x130fc3) return;
-      _0x1fe841['set'](_0x130fc3, String(_0x57376e[_0x41f180] || ''));
+function extractPlaintextSecureValues(options6 = {}) {
+  const map2 = new Map(),
+    isPlainObject2 = isPlainObject(options6['providers']) ? options6['providers'] : {};
+  Object['entries'](isPlainObject2)['forEach'](([value8, value9]) => {
+    if (!isPlainObject(value9)) return;
+    SECURE_PROVIDER_FIELDS['forEach']((value10) => {
+      if (!Object['prototype']['hasOwnProperty']['call'](value9, value10)) return;
+      const providerSecureKey2 = buildProviderSecureKey(value8, value10);
+      if (!providerSecureKey2) return;
+      map2['set'](providerSecureKey2, String(value9[value10] || ''));
     });
   });
-  isPlainObject(_0x411905['objectStorage']) &&
-    (SECURE_OBJECT_STORAGE_FIELDS['forEach']((_0x3aa8ba) => {
-      if (!Object['prototype']['hasOwnProperty']['call'](_0x411905['objectStorage'], _0x3aa8ba)) return;
-      const _0x20066b = buildObjectStorageSecureKey(_0x3aa8ba);
-      if (!_0x20066b) return;
-      _0x1fe841['set'](_0x20066b, String(_0x411905['objectStorage'][_0x3aa8ba] || ''));
+  isPlainObject(options6['objectStorage']) &&
+    (SECURE_OBJECT_STORAGE_FIELDS['forEach']((value11) => {
+      if (!Object['prototype']['hasOwnProperty']['call'](options6['objectStorage'], value11)) return;
+      const objectStorageSecureKey3 = buildObjectStorageSecureKey(value11);
+      if (!objectStorageSecureKey3) return;
+      map2['set'](objectStorageSecureKey3, String(options6['objectStorage'][value11] || ''));
     }),
-    isPlainObject(_0x411905['objectStorage']['profiles']) &&
-      Object['entries'](_0x411905['objectStorage']['profiles'])['forEach'](([_0x52a725, _0x382e11]) => {
-        if (!isPlainObject(_0x382e11)) return;
-        SECURE_OBJECT_STORAGE_FIELDS['forEach']((_0x32c454) => {
-          if (!Object['prototype']['hasOwnProperty']['call'](_0x382e11, _0x32c454)) return;
-          const _0xaa3674 = buildObjectStorageSecureKey(_0x32c454, _0x52a725);
-          if (!_0xaa3674) return;
-          _0x1fe841['set'](_0xaa3674, String(_0x382e11[_0x32c454] || ''));
+    isPlainObject(options6['objectStorage']['profiles']) &&
+      Object['entries'](options6['objectStorage']['profiles'])['forEach'](([value12, value13]) => {
+        if (!isPlainObject(value13)) return;
+        SECURE_OBJECT_STORAGE_FIELDS['forEach']((value14) => {
+          if (!Object['prototype']['hasOwnProperty']['call'](value13, value14)) return;
+          const objectStorageSecureKey4 = buildObjectStorageSecureKey(value14, value12);
+          if (!objectStorageSecureKey4) return;
+          map2['set'](objectStorageSecureKey4, String(value13[value14] || ''));
         });
       }));
-  const _0x1782ac = !!String(_0x17cdbb?.['grsai']?.['apiKey'] || '')['trim']();
-  if (!_0x1782ac)
-    for (const _0x460caa of LEGACY_GRSAI_KEY_FIELDS) {
-      if (!Object['prototype']['hasOwnProperty']['call'](_0x411905, _0x460caa)) continue;
-      const _0x51ef75 = String(_0x411905[_0x460caa] || '');
-      if (_0x51ef75) _0x1fe841['set'](buildProviderSecureKey('grsai', 'apiKey'), _0x51ef75);
+  const enabled5 = !!String(isPlainObject2?.['grsai']?.['apiKey'] || '')['trim']();
+  if (!enabled5)
+    for (const value15 of LEGACY_GRSAI_KEY_FIELDS) {
+      if (!Object['prototype']['hasOwnProperty']['call'](options6, value15)) continue;
+      const value16 = String(options6[value15] || '');
+      if (value16) map2['set'](buildProviderSecureKey('grsai', 'apiKey'), value16);
     }
-  return _0x1fe841;
+  return map2;
 }
-function mergeSecureValuesIntoConfig(_0x650f18 = {}, _0x11c626 = {}) {
-  const _0x242d2e = stripSensitiveConfigValues(_0x650f18);
+function mergeSecureValuesIntoConfig(options7 = {}, value17 = {}) {
+  const stripSensitiveConfigValues2 = stripSensitiveConfigValues(options7);
   return (
-    Object['entries'](_0x11c626 || {})['forEach'](([_0x167f04, _0xd27e0c]) => {
-      const _0x914b77 = String(_0x167f04 || '')['match'](
+    Object['entries'](value17 || {})['forEach'](([value18, value19]) => {
+      const value20 = String(value18 || '')['match'](
         /^apiConfig\.objectStorage\.profiles\.([A-Za-z0-9_-]+)\.(accessKeyId|secretAccessKey|sessionToken)$/,
       );
-      if (_0x914b77) {
-        const _0x142beb = String(_0xd27e0c || '');
-        if (!_0x142beb) return;
-        const _0xb6f6b0 = _0x914b77[0x1],
-          _0x5d65b2 = _0x914b77[0x2];
-        if (!isPlainObject(_0x242d2e['objectStorage'])) _0x242d2e['objectStorage'] = {};
-        !isPlainObject(_0x242d2e['objectStorage']['profiles']) &&
-          (_0x242d2e['objectStorage']['profiles'] = {});
-        !isPlainObject(_0x242d2e['objectStorage']['profiles'][_0xb6f6b0]) &&
-          (_0x242d2e['objectStorage']['profiles'][_0xb6f6b0] = {});
-        _0x242d2e['objectStorage']['profiles'][_0xb6f6b0][_0x5d65b2] = _0x142beb;
+      if (value20) {
+        const enabled6 = String(value19 || '');
+        if (!enabled6) return;
+        const value21 = value20[0x1],
+          value22 = value20[0x2];
+        if (!isPlainObject(stripSensitiveConfigValues2['objectStorage']))
+          stripSensitiveConfigValues2['objectStorage'] = {};
+        !isPlainObject(stripSensitiveConfigValues2['objectStorage']['profiles']) &&
+          (stripSensitiveConfigValues2['objectStorage']['profiles'] = {});
+        !isPlainObject(stripSensitiveConfigValues2['objectStorage']['profiles'][value21]) &&
+          (stripSensitiveConfigValues2['objectStorage']['profiles'][value21] = {});
+        stripSensitiveConfigValues2['objectStorage']['profiles'][value21][value22] = enabled6;
         return;
       }
-      const _0x140427 = String(_0x167f04 || '')['match'](
+      const value23 = String(value18 || '')['match'](
         /^apiConfig\.objectStorage\.(accessKeyId|secretAccessKey|sessionToken)$/,
       );
-      if (_0x140427) {
-        const _0x31a44d = String(_0xd27e0c || '');
-        if (!_0x31a44d) return;
-        if (!isPlainObject(_0x242d2e['objectStorage'])) _0x242d2e['objectStorage'] = {};
-        _0x242d2e['objectStorage'][_0x140427[0x1]] = _0x31a44d;
+      if (value23) {
+        const enabled7 = String(value19 || '');
+        if (!enabled7) return;
+        if (!isPlainObject(stripSensitiveConfigValues2['objectStorage']))
+          stripSensitiveConfigValues2['objectStorage'] = {};
+        stripSensitiveConfigValues2['objectStorage'][value23[0x1]] = enabled7;
         return;
       }
-      const _0x1e1d3c = String(_0x167f04 || '')['match'](
+      const enabled8 = String(value18 || '')['match'](
         /^apiConfig\.providers\.([A-Za-z0-9_-]+)\.(apiKey|modelApiKey)$/,
       );
-      if (!_0x1e1d3c) return;
-      const _0x594515 = _0x1e1d3c[0x1],
-        _0x2c9539 = _0x1e1d3c[0x2],
-        _0x507674 = String(_0xd27e0c || '');
-      if (!_0x507674) return;
-      if (!isPlainObject(_0x242d2e['providers'])) _0x242d2e['providers'] = {};
-      if (!isPlainObject(_0x242d2e['providers'][_0x594515])) _0x242d2e['providers'][_0x594515] = {};
-      _0x242d2e['providers'][_0x594515][_0x2c9539] = _0x507674;
+      if (!enabled8) return;
+      const value24 = enabled8[0x1],
+        value25 = enabled8[0x2],
+        enabled9 = String(value19 || '');
+      if (!enabled9) return;
+      if (!isPlainObject(stripSensitiveConfigValues2['providers']))
+        stripSensitiveConfigValues2['providers'] = {};
+      if (!isPlainObject(stripSensitiveConfigValues2['providers'][value24]))
+        stripSensitiveConfigValues2['providers'][value24] = {};
+      stripSensitiveConfigValues2['providers'][value24][value25] = enabled9;
     }),
-    _0x242d2e
+    stripSensitiveConfigValues2
   );
 }
-function hasProviderConfigValue(_0xb92405 = {}) {
-  if (!isPlainObject(_0xb92405)) return ![];
+function hasProviderConfigValue(options8 = {}) {
+  if (!isPlainObject(options8)) return ![];
   return [
     'apiUrl',
     'cloudApiUrl',
@@ -276,200 +276,202 @@ function hasProviderConfigValue(_0xb92405 = {}) {
     'concurrentLimit',
     'workflowConcurrentLimit',
     'modelConcurrentLimit',
-  ]['some']((_0x18d80a) => {
-    const _0x296987 = _0xb92405[_0x18d80a];
-    return _0x296987 !== undefined && _0x296987 !== null && String(_0x296987)['trim']() !== '';
+  ]['some']((value26) => {
+    const value27 = options8[value26];
+    return value27 !== undefined && value27 !== null && String(value27)['trim']() !== '';
   });
 }
-async function readSecureValues(_0x209572 = {}) {
-  const _0x351602 = getSecureSettingsApi();
-  if (!_0x351602) return { available: ![], values: {} };
+async function readSecureValues(options9 = {}) {
+  const map3 = getSecureSettingsApi();
+  if (!map3) return { available: ![], values: {} };
   try {
-    const _0x475e7f = await _0x351602['get']({ keys: collectSecureKeys(_0x209572) });
-    if (!_0x475e7f?.['available']) return { available: ![], values: {} };
-    return { available: !![], values: isPlainObject(_0x475e7f['values']) ? _0x475e7f['values'] : {} };
+    const map4 = await map3['get']({ keys: collectSecureKeys(options9) });
+    if (!map4?.['available']) return { available: ![], values: {} };
+    return { available: !![], values: isPlainObject(map4['values']) ? map4['values'] : {} };
   } catch {
     return { available: ![], values: {} };
   }
 }
-async function writeSecureValues(_0xc8243f) {
-  const _0x337de4 = getSecureSettingsApi();
-  if (!_0x337de4 || !(_0xc8243f instanceof Map)) return { available: ![], changed: ![] };
-  const _0x123434 = await _0x337de4['get']({ keys: [] })['catch'](() => null);
-  if (!_0x123434?.['available']) return { available: ![], changed: ![] };
-  let _0xa7a0ef = ![],
-    _0x4a80f6 = ![];
-  for (const [_0x52bf8e, _0x9c4703] of _0xc8243f['entries']()) {
-    if (!_0x52bf8e) continue;
-    const _0x420755 = String(_0x9c4703 || '');
-    if (_0x420755) {
-      const _0x36fc64 = await _0x337de4['set']({ key: _0x52bf8e, value: _0x420755 });
-      if (_0x36fc64?.['ok']) _0xa7a0ef = !![];
-      else _0x4a80f6 = !![];
+async function writeSecureValues(map5) {
+  const map6 = getSecureSettingsApi();
+  if (!map6 || !(map5 instanceof Map)) return { available: ![], changed: ![] };
+  const enabled10 = await map6['get']({ keys: [] })['catch'](() => null);
+  if (!enabled10?.['available']) return { available: ![], changed: ![] };
+  let changed = ![],
+    failed = ![];
+  for (const [key2, value28] of map5['entries']()) {
+    if (!key2) continue;
+    const value29 = String(value28 || '');
+    if (value29) {
+      const response = await map6['set']({ key: key2, value: value29 });
+      if (response?.['ok']) changed = !![];
+      else failed = !![];
     } else {
-      const _0x782f16 = await _0x337de4['delete']({ key: _0x52bf8e });
-      if (_0x782f16?.['ok']) _0xa7a0ef = !![];
-      else _0x4a80f6 = !![];
+      const response2 = await map6['delete']({ key: key2 });
+      if (response2?.['ok']) changed = !![];
+      else failed = !![];
     }
   }
-  return { available: !![], changed: _0xa7a0ef, failed: _0x4a80f6 };
+  return { available: !![], changed: changed, failed: failed };
 }
-async function hydrateConfigFromSecureStorage(_0x35f755 = {}) {
-  const _0x306a02 = extractPlaintextSecureValues(_0x35f755),
-    { available: _0xc5b23d, values: _0x2eae7a } = await readSecureValues(_0x35f755);
-  if (!_0xc5b23d) return _0x35f755;
-  let _0x20fc9b = { ..._0x2eae7a };
-  if (_0x306a02['size'] > 0x0) {
-    const _0x3fb769 = await writeSecureValues(_0x306a02);
-    if (_0x3fb769['available'] && !_0x3fb769['failed']) {
-      _0x306a02['forEach']((_0xc9f553, _0x2754a5) => {
-        if (String(_0xc9f553 || '')) _0x20fc9b[_0x2754a5] = String(_0xc9f553 || '');
-        else delete _0x20fc9b[_0x2754a5];
+async function hydrateConfigFromSecureStorage(options10 = {}) {
+  const list3 = extractPlaintextSecureValues(options10),
+    { available: available, values: values } = await readSecureValues(options10);
+  if (!available) return options10;
+  let value30 = { ...values };
+  if (list3['size'] > 0x0) {
+    const writeSecureValues2 = await writeSecureValues(list3);
+    if (writeSecureValues2['available'] && !writeSecureValues2['failed']) {
+      list3['forEach']((value31, value32) => {
+        if (String(value31 || '')) value30[value32] = String(value31 || '');
+        else delete value30[value32];
       });
-      const _0x4300f4 = stripSensitiveConfigValues(_0x35f755);
-      await post('/api/config', _0x4300f4)['catch'](() => null);
+      const stripSensitiveConfigValues3 = stripSensitiveConfigValues(options10);
+      await post('/api/config', stripSensitiveConfigValues3)['catch'](() => null);
     }
   }
-  return mergeSecureValuesIntoConfig(_0x35f755, _0x20fc9b);
+  return mergeSecureValuesIntoConfig(options10, value30);
 }
-function _syncLegacyWindowApiKeys(_0x53679c) {
+function _syncLegacyWindowApiKeys(value33) {
   if (typeof window === 'undefined') return;
-  const _0x7f16b7 = _0x53679c?.['providers'] || {},
-    _0x164f44 = _0x53679c?.['apiKey'] || '';
-  ((window['_appApiKey'] = _0x7f16b7['grsai']?.['apiKey'] || _0x164f44 || ''),
-    (window['_runningHubApiKey'] = _0x7f16b7['runninghub']?.['apiKey'] || ''),
-    (window['_runningHubModelApiKey'] = _0x7f16b7['runninghub']?.['modelApiKey'] || ''));
+  const value34 = value33?.['providers'] || {},
+    value35 = value33?.['apiKey'] || '';
+  ((window['_appApiKey'] = value34['grsai']?.['apiKey'] || value35 || ''),
+    (window['_runningHubApiKey'] = value34['runninghub']?.['apiKey'] || ''),
+    (window['_runningHubModelApiKey'] = value34['runninghub']?.['modelApiKey'] || ''));
 }
 export async function fetchApiConfigFromServer() {
   if (apiConfigLoadPromise) return apiConfigLoadPromise;
-  const _0x5db757 = (async () => {
-    const _0x5ea5ea = await get('/api/config');
-    if (!_0x5ea5ea['success']) throw new Error(_0x5ea5ea['error'] || '获取配置失败');
+  const value36 = (async () => {
+    const response3 = await get('/api/config');
+    if (!response3['success']) throw new Error(response3['error'] || '获取配置失败');
     return (
-      (apiConfig = await hydrateConfigFromSecureStorage(_0x5ea5ea['data'] || {})),
+      (apiConfig = await hydrateConfigFromSecureStorage(response3['data'] || {})),
       (lastPersistedApiConfig = cloneConfig(apiConfig)),
       _syncLegacyWindowApiKeys(apiConfig),
       notifyApiConfigChanged('loaded'),
       apiConfig
     );
   })();
-  apiConfigLoadPromise = _0x5db757;
+  apiConfigLoadPromise = value36;
   try {
-    return await _0x5db757;
+    return await value36;
   } finally {
-    apiConfigLoadPromise === _0x5db757 && (apiConfigLoadPromise = null);
+    apiConfigLoadPromise === value36 && (apiConfigLoadPromise = null);
   }
 }
-async function persistApiConfigToServer(_0x2fd03b, _0x544dfc) {
-  const _0x55f256 = normalizeConfigForStorage(_0x2fd03b || {}),
-    _0x1630d6 = extractPlaintextSecureValues(_0x55f256),
-    _0x1febad = await writeSecureValues(_0x1630d6),
-    _0x1c7dbc = [..._0x1630d6['keys']()]['some']((_0x4d6505) =>
-      String(_0x4d6505 || '')['startsWith']('apiConfig.objectStorage.'),
+async function persistApiConfigToServer(value37, value38) {
+  const providers = normalizeConfigForStorage(value37 || {}),
+    map7 = extractPlaintextSecureValues(providers),
+    writeSecureValues3 = await writeSecureValues(map7),
+    value39 = [...map7['keys']()]['some']((value40) =>
+      String(value40 || '')['startsWith']('apiConfig.objectStorage.'),
     );
-  if (_0x1c7dbc && (!_0x1febad['available'] || _0x1febad['failed']))
+  if (value39 && (!writeSecureValues3['available'] || writeSecureValues3['failed']))
     throw new Error('安全存储不可用，无法保存对象存储访问密钥');
-  const _0x267e32 =
-      _0x1febad['available'] && !_0x1febad['failed'] ? stripSensitiveConfigValues(_0x55f256) : _0x55f256,
-    _0x1c019f = await post('/api/config', _0x267e32);
-  if (!_0x1c019f['success']) throw new Error(_0x1c019f['error'] || '保存配置失败');
+  const value41 =
+      writeSecureValues3['available'] && !writeSecureValues3['failed']
+        ? stripSensitiveConfigValues(providers)
+        : providers,
+    response4 = await post('/api/config', value41);
+  if (!response4['success']) throw new Error(response4['error'] || '保存配置失败');
   return (
-    (lastPersistedApiConfig = cloneConfig(_0x55f256)),
-    _0x544dfc === apiConfigSaveRevision &&
-      ((apiConfig = cloneConfig(_0x55f256)),
-      _syncLegacyWindowApiKeys({ providers: _0x55f256?.['providers'] || {} }),
+    (lastPersistedApiConfig = cloneConfig(providers)),
+    value38 === apiConfigSaveRevision &&
+      ((apiConfig = cloneConfig(providers)),
+      _syncLegacyWindowApiKeys({ providers: providers?.['providers'] || {} }),
       notifyApiConfigChanged('saved')),
-    _0x1c019f['data']
+    response4['data']
   );
 }
-export function saveApiConfigToServer(_0x255c10) {
-  const _0x28725a = normalizeConfigForStorage(_0x255c10 || {}),
-    _0x163732 = ++apiConfigSaveRevision;
-  ((apiConfig = cloneConfig(_0x28725a)),
-    _syncLegacyWindowApiKeys({ providers: _0x28725a?.['providers'] || {} }),
+export function saveApiConfigToServer(value42) {
+  const providers2 = normalizeConfigForStorage(value42 || {}),
+    value43 = ++apiConfigSaveRevision;
+  ((apiConfig = cloneConfig(providers2)),
+    _syncLegacyWindowApiKeys({ providers: providers2?.['providers'] || {} }),
     notifyApiConfigChanged('save-pending'),
     (apiConfigSavePendingCount += 0x1));
-  const _0x532cb7 = apiConfigSaveQueue['catch'](() => {})
-    ['then'](() => persistApiConfigToServer(_0x28725a, _0x163732))
-    ['catch']((_0x56f766) => {
-      _0x163732 === apiConfigSaveRevision &&
+  const value44 = apiConfigSaveQueue['catch'](() => {})
+    ['then'](() => persistApiConfigToServer(providers2, value43))
+    ['catch']((value45) => {
+      value43 === apiConfigSaveRevision &&
         ((apiConfig = lastPersistedApiConfig === null ? null : cloneConfig(lastPersistedApiConfig)),
         _syncLegacyWindowApiKeys({ providers: apiConfig?.['providers'] || {} }),
         notifyApiConfigChanged('save-failed'));
-      throw _0x56f766;
+      throw value45;
     })
     ['finally'](() => {
       apiConfigSavePendingCount = Math['max'](0x0, apiConfigSavePendingCount - 0x1);
     });
-  return ((apiConfigSaveQueue = _0x532cb7), _0x532cb7);
+  return ((apiConfigSaveQueue = value44), value44);
 }
 export async function ensureConfig() {
   apiConfigSavePendingCount > 0x0 && (await apiConfigSaveQueue['catch'](() => {}));
   if (apiConfig) return;
   await fetchApiConfigFromServer();
 }
-export function getProviderConfig(_0x475dbf) {
-  if (_0x475dbf === 'runninghubwf') {
-    const _0x1d6183 = getRunningHubWorkflowDefaultProfileId(apiConfig || {}),
-      _0x572f16 = PROVIDERS_META[_0x1d6183],
-      _0x4470bb = _0x572f16?.['defaultUrl'] || 'https://www.runninghub.cn',
-      _0xa7e442 = apiConfig?.['providers']?.[_0x1d6183] || {};
+export function getProviderConfig(value46) {
+  if (value46 === 'runninghubwf') {
+    const providerProfileId = getRunningHubWorkflowDefaultProfileId(apiConfig || {}),
+      value47 = PROVIDERS_META[providerProfileId],
+      value48 = value47?.['defaultUrl'] || 'https://www.runninghub.cn',
+      apiKey = apiConfig?.['providers']?.[providerProfileId] || {};
     return {
-      ..._0xa7e442,
-      apiUrl: (_0xa7e442['apiUrl'] || _0x4470bb)['replace'](/\/+$/, ''),
-      apiKey: _0xa7e442['apiKey'] || '',
+      ...apiKey,
+      apiUrl: (apiKey['apiUrl'] || value48)['replace'](/\/+$/, ''),
+      apiKey: apiKey['apiKey'] || '',
       modelApiKey: '',
-      providerProfileId: _0x1d6183,
-      rhProviderProfileId: _0x1d6183,
+      providerProfileId: providerProfileId,
+      rhProviderProfileId: providerProfileId,
     };
   }
-  const _0x1f9d94 = PROVIDERS_META[_0x475dbf],
-    _0x2e2af1 = _0x1f9d94?.['defaultUrl'] || 'https://grsai.dakka.com.cn',
-    _0x276f62 = apiConfig?.['providers']?.[_0x475dbf];
-  if (hasProviderConfigValue(_0x276f62)) {
-    const _0x22feb1 = resolveProviderApiRoute(_0x475dbf, _0x276f62);
-    if (_0x22feb1)
+  const value49 = PROVIDERS_META[value46],
+    apiUrl = value49?.['defaultUrl'] || 'https://grsai.dakka.com.cn',
+    apiKey2 = apiConfig?.['providers']?.[value46];
+  if (hasProviderConfigValue(apiKey2)) {
+    const args2 = resolveProviderApiRoute(value46, apiKey2);
+    if (args2)
       return {
-        ..._0x276f62,
-        ..._0x22feb1,
-        apiKey: _0x276f62['apiKey'] || '',
-        modelApiKey: _0x276f62['modelApiKey'] || '',
+        ...apiKey2,
+        ...args2,
+        apiKey: apiKey2['apiKey'] || '',
+        modelApiKey: apiKey2['modelApiKey'] || '',
       };
-    if (_0x475dbf === 'comfyui')
+    if (value46 === 'comfyui')
       return {
-        ..._0x276f62,
-        apiUrl: normalizeComfyUiBaseUrl(_0x276f62['apiUrl'] || _0x276f62['baseUrl'], _0x2e2af1),
-        cloudApiUrl: normalizeComfyUiBaseUrl(_0x276f62['cloudApiUrl'] || _0x276f62['cloudBaseUrl'] || ''),
-        apiKey: _0x276f62['apiKey'] || '',
-        modelApiKey: _0x276f62['modelApiKey'] || '',
+        ...apiKey2,
+        apiUrl: normalizeComfyUiBaseUrl(apiKey2['apiUrl'] || apiKey2['baseUrl'], apiUrl),
+        cloudApiUrl: normalizeComfyUiBaseUrl(apiKey2['cloudApiUrl'] || apiKey2['cloudBaseUrl'] || ''),
+        apiKey: apiKey2['apiKey'] || '',
+        modelApiKey: apiKey2['modelApiKey'] || '',
       };
     return {
-      ..._0x276f62,
-      apiUrl: (_0x276f62['apiUrl'] || _0x2e2af1)['replace'](/\/+$/, ''),
-      apiKey: _0x276f62['apiKey'] || '',
-      modelApiKey: _0x276f62['modelApiKey'] || '',
+      ...apiKey2,
+      apiUrl: (apiKey2['apiUrl'] || apiUrl)['replace'](/\/+$/, ''),
+      apiKey: apiKey2['apiKey'] || '',
+      modelApiKey: apiKey2['modelApiKey'] || '',
     };
   }
-  if (_0x475dbf === 'grsai')
+  if (value46 === 'grsai')
     return {
-      apiUrl: (apiConfig?.['apiUrlInput'] || apiConfig?.['apiUrl'] || _0x2e2af1)['replace'](/\/+$/, ''),
+      apiUrl: (apiConfig?.['apiUrlInput'] || apiConfig?.['apiUrl'] || apiUrl)['replace'](/\/+$/, ''),
       apiKey: apiConfig?.['apiKeyInput'] || apiConfig?.['apiKey'] || '',
       modelApiKey: '',
     };
-  const _0x336285 = resolveProviderApiRoute(_0x475dbf);
-  if (_0x336285) return { ..._0x336285, apiKey: '', modelApiKey: '' };
-  return { apiUrl: _0x2e2af1, apiKey: '', modelApiKey: '' };
+  const args3 = resolveProviderApiRoute(value46);
+  if (args3) return { ...args3, apiKey: '', modelApiKey: '' };
+  return { apiUrl: apiUrl, apiKey: '', modelApiKey: '' };
 }
-export async function resolveRunningHubWorkflowAccess(_0x270476 = '') {
+export async function resolveRunningHubWorkflowAccess(value50 = '') {
   await ensureConfig();
-  const _0x27e489 = String(_0x270476 || '')['trim'](),
-    _0xd6036d = getProviderConfig(_0x27e489 || 'runninghubwf');
+  const value51 = String(value50 || '')['trim'](),
+    providerConfig = getProviderConfig(value51 || 'runninghubwf');
   return {
-    apiKey: String(_0xd6036d?.['apiKey'] || '')['trim'](),
-    apiUrl: String(_0xd6036d?.['apiUrl'] || '')
+    apiKey: String(providerConfig?.['apiKey'] || '')['trim'](),
+    apiUrl: String(providerConfig?.['apiUrl'] || '')
       ['trim']()
       ['replace'](/\/+$/, ''),
-    providerProfileId: String(_0x27e489 || _0xd6036d?.['providerProfileId'] || '')['trim'](),
+    providerProfileId: String(value51 || providerConfig?.['providerProfileId'] || '')['trim'](),
   };
 }
 export function getObjectStorageConfig() {

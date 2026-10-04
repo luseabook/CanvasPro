@@ -15,138 +15,151 @@ const STORY_VIDEO_REFERENCE_DEFAULT_MODE_FIELDS = Object['freeze']({
   'runninghub-model/hailuo-h3': 'rh_hailuo_h3_mode',
   'runninghub/2084286867645755393': 'rh_hailuo_h3_mode',
 });
-function normalizeText(_0x1ad9b1) {
-  return String(_0x1ad9b1 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-export function resolveStoryVideoProvider(_0x1a06dc, _0x44c654 = '') {
+export function resolveStoryVideoProvider(item, key = '') {
   return (
-    resolveModelProvider(_0x1a06dc, '', { allowProviderHint: ![], allowPrefixInference: ![] }) ||
-    resolveModelProvider(_0x1a06dc, _0x44c654)
+    resolveModelProvider(item, '', { allowProviderHint: ![], allowPrefixInference: ![] }) ||
+    resolveModelProvider(item, key)
   );
 }
-export function resolveStoryPromptModeForVideoModel(_0x58a67b, _0x23322f = 'seedance-2.0') {
-  const _0x89c223 = resolveModelExecution(_0x58a67b);
+export function resolveStoryPromptModeForVideoModel(index, result = 'seedance-2.0') {
+  const modelExecution = resolveModelExecution(index);
   return normalizeStoryPromptMode(
-    _0x89c223?.['modelManifest']?.['extensions']?.['storyWorkspace']?.['promptMode'] || _0x23322f,
+    modelExecution?.['modelManifest']?.['extensions']?.['storyWorkspace']?.['promptMode'] || result,
     { allowDeveloperModes: !![] },
   );
 }
 export function syncStoryPromptModeForVideoModel(
-  _0x36bc14 = {},
-  _0x302ec4 = _0x36bc14?.['models']?.['video'],
-  _0x4e6846 = null,
+  options = {},
+  data = options?.['models']?.['video'],
+  target = null,
 ) {
-  const _0x300f06 = rememberStoryEpisodeVideoModelSelection(_0x4e6846, _0x302ec4),
-    _0x18f158 = _0x36bc14?.['data']?.['project'];
-  if (!_0x18f158 || typeof _0x18f158 !== 'object') return _0x300f06;
-  const _0x398f93 = normalizeStoryPromptMode(_0x18f158?.['planning']?.['promptMode'], {
+  const rememberStoryEpisodeVideoModelSelection2 = rememberStoryEpisodeVideoModelSelection(target, data),
+    enabled = options?.['data']?.['project'];
+  if (!enabled || typeof enabled !== 'object') return rememberStoryEpisodeVideoModelSelection2;
+  const storyPromptMode = normalizeStoryPromptMode(enabled?.['planning']?.['promptMode'], {
       allowDeveloperModes: !![],
     }),
-    _0x34392c = resolveStoryPromptModeForVideoModel(_0x302ec4, _0x398f93);
-  if (_0x34392c === _0x398f93) return _0x300f06;
-  return ((_0x18f158['planning'] = { ...(_0x18f158['planning'] || {}), promptMode: _0x34392c }), !![]);
+    promptMode = resolveStoryPromptModeForVideoModel(data, storyPromptMode);
+  if (promptMode === storyPromptMode) return rememberStoryEpisodeVideoModelSelection2;
+  return ((enabled['planning'] = { ...(enabled['planning'] || {}), promptMode: promptMode }), !![]);
 }
-function getStoryVideoDurationSchemaField(_0x16f6e1) {
-  const _0x441af8 = resolveModelExecution(_0x16f6e1),
-    _0x5d53d0 = Array['isArray'](_0x441af8?.['modelManifest']?.['uiSchema']?.['fields'])
-      ? _0x441af8['modelManifest']['uiSchema']['fields']
+function getStoryVideoDurationSchemaField(source) {
+  const modelExecution2 = resolveModelExecution(source),
+    list = Array['isArray'](modelExecution2?.['modelManifest']?.['uiSchema']?.['fields'])
+      ? modelExecution2['modelManifest']['uiSchema']['fields']
       : [];
-  return _0x5d53d0['find']((_0x4179ed) => normalizeText(_0x4179ed?.['id']) === 'duration') || null;
+  return list['find']((next) => normalizeText(next?.['id']) === 'duration') || null;
 }
-function normalizeDurationSeconds(_0xd70004) {
-  const _0x2ff812 = String(_0xd70004 ?? '')['match'](/\d+(?:\.\d+)?/),
-    _0x550f26 = Number(_0x2ff812?.[0x0]);
-  return Number['isFinite'](_0x550f26) && _0x550f26 > 0x0 ? Number(_0x550f26['toFixed'](0x1)) : 0x0;
+function normalizeDurationSeconds(current) {
+  const entry = String(current ?? '')['match'](/\d+(?:\.\d+)?/),
+    count = Number(entry?.[0x0]);
+  return Number['isFinite'](count) && count > 0x0 ? Number(count['toFixed'](0x1)) : 0x0;
 }
-export function resolveStoryVideoGenerationDurationSeconds(_0x25a0d2, _0x4a4d24 = {}) {
-  const _0x59b740 = getStoryVideoDurationSchemaField(_0x25a0d2);
-  if (!_0x59b740?.['id']) return 0x0;
-  const _0x3648b2 = normalizeStoryVideoGenerationParams(_0x25a0d2, _0x4a4d24);
-  return normalizeDurationSeconds(_0x3648b2[_0x59b740['id']]);
+export function resolveStoryVideoGenerationDurationSeconds(record, payload = {}) {
+  const storyVideoDurationSchemaField = getStoryVideoDurationSchemaField(record);
+  if (!storyVideoDurationSchemaField?.['id']) return 0x0;
+  const storyVideoGenerationParams = normalizeStoryVideoGenerationParams(record, payload);
+  return normalizeDurationSeconds(storyVideoGenerationParams[storyVideoDurationSchemaField['id']]);
 }
-export function applyStoryVideoGenerationDurationSeconds(_0x3e9c4c, _0x184578 = {}, _0x16bff2 = 0x0) {
-  const _0x310e0c = getStoryVideoDurationSchemaField(_0x3e9c4c),
-    _0x2fcd2a = normalizeStoryVideoGenerationParams(_0x3e9c4c, _0x184578),
-    _0x13d750 = normalizeDurationSeconds(_0x16bff2);
-  if (!_0x310e0c?.['id'] || !_0x13d750) return _0x2fcd2a;
-  const _0x457f05 = Number(resolveStoryVideoClipDurationConstraints(_0x3e9c4c)?.['maxSeconds']) || 0x0,
-    _0x1b2f58 = _0x457f05 > 0x0 ? Math['min'](_0x13d750, _0x457f05) : _0x13d750;
-  return normalizeStoryVideoGenerationParams(_0x3e9c4c, { ..._0x2fcd2a, [_0x310e0c['id']]: _0x1b2f58 });
+export function applyStoryVideoGenerationDurationSeconds(handle, state = {}, config = 0x0) {
+  const storyVideoDurationSchemaField2 = getStoryVideoDurationSchemaField(handle),
+    args = normalizeStoryVideoGenerationParams(handle, state),
+    durationSeconds = normalizeDurationSeconds(config);
+  if (!storyVideoDurationSchemaField2?.['id'] || !durationSeconds) return args;
+  const count2 = Number(resolveStoryVideoClipDurationConstraints(handle)?.['maxSeconds']) || 0x0,
+    scope = count2 > 0x0 ? Math['min'](durationSeconds, count2) : durationSeconds;
+  return normalizeStoryVideoGenerationParams(handle, {
+    ...args,
+    [storyVideoDurationSchemaField2['id']]: scope,
+  });
 }
-export function getStoryClipVideoGenerationDurationOverride(_0x326835 = {}) {
-  return normalizeDurationSeconds(_0x326835?.['videoGenerationDurationSec']);
+export function getStoryClipVideoGenerationDurationOverride(options2 = {}) {
+  return normalizeDurationSeconds(options2?.['videoGenerationDurationSec']);
 }
-export function resolveStoryVideoInitialGenerationDurationSeconds(_0x5abba2, _0x535d9e = 0x0) {
-  const _0x4a53e6 = getStoryVideoDurationSchemaField(_0x5abba2),
-    _0x5f0f1d = normalizeDurationSeconds(_0x535d9e);
-  if (!_0x4a53e6?.['id'] || !_0x5f0f1d) return 0x0;
-  const _0x48c0fa = resolveStoryVideoClipDurationConstraints(_0x5abba2),
-    _0x2e73c0 = Array['isArray'](_0x48c0fa?.['allowedSeconds']) ? _0x48c0fa['allowedSeconds'] : [];
-  if (_0x2e73c0['length'])
-    return _0x2e73c0['find']((_0x5281f9) => _0x5281f9 >= _0x5f0f1d) || _0x2e73c0['at'](-0x1) || 0x0;
-  const _0xd0b463 = Number(_0x48c0fa?.['minSeconds']) || 0x0,
-    _0x25624a = Number(_0x48c0fa?.['maxSeconds']) || 0x0,
-    _0x561e83 = Number(_0x48c0fa?.['stepSeconds']) || 0x0;
-  let _0x11bd5b = Math['max'](_0xd0b463, _0x5f0f1d);
-  if (_0x561e83 > 0x0) {
-    const _0xa1bbb0 = _0xd0b463 || 0x0;
-    _0x11bd5b = _0xa1bbb0 + Math['ceil']((_0x11bd5b - _0xa1bbb0 - 1e-9) / _0x561e83) * _0x561e83;
+export function resolveStoryVideoInitialGenerationDurationSeconds(input, output = 0x0) {
+  const storyVideoDurationSchemaField3 = getStoryVideoDurationSchemaField(input),
+    durationSeconds2 = normalizeDurationSeconds(output);
+  if (!storyVideoDurationSchemaField3?.['id'] || !durationSeconds2) return 0x0;
+  const storyVideoClipDurationConstraints = resolveStoryVideoClipDurationConstraints(input),
+    list2 = Array['isArray'](storyVideoClipDurationConstraints?.['allowedSeconds'])
+      ? storyVideoClipDurationConstraints['allowedSeconds']
+      : [];
+  if (list2['length'])
+    return list2['find']((value2) => value2 >= durationSeconds2) || list2['at'](-0x1) || 0x0;
+  const value3 = Number(storyVideoClipDurationConstraints?.['minSeconds']) || 0x0,
+    count3 = Number(storyVideoClipDurationConstraints?.['maxSeconds']) || 0x0,
+    count4 = Number(storyVideoClipDurationConstraints?.['stepSeconds']) || 0x0;
+  let value4 = Math['max'](value3, durationSeconds2);
+  if (count4 > 0x0) {
+    const value5 = value3 || 0x0;
+    value4 = value5 + Math['ceil']((value4 - value5 - 1e-9) / count4) * count4;
   }
-  if (_0x25624a > 0x0) _0x11bd5b = Math['min'](_0x11bd5b, _0x25624a);
-  return normalizeDurationSeconds(_0x11bd5b);
+  if (count3 > 0x0) value4 = Math['min'](value4, count3);
+  return normalizeDurationSeconds(value4);
 }
-export function initializeStoryClipVideoGenerationDuration(_0x157e78, _0x40d814) {
-  if (!_0x157e78 || typeof _0x157e78 !== 'object') return ![];
-  if (getStoryClipVideoGenerationDurationOverride(_0x157e78)) return ![];
-  const _0x150b98 = normalizeDurationSeconds(
-      _0x157e78['durationSec'] || _0x157e78['durationSeconds'] || _0x157e78['duration'],
+export function initializeStoryClipVideoGenerationDuration(enabled2, value6) {
+  if (!enabled2 || typeof enabled2 !== 'object') return ![];
+  if (getStoryClipVideoGenerationDurationOverride(enabled2)) return ![];
+  const durationSeconds3 = normalizeDurationSeconds(
+      enabled2['durationSec'] || enabled2['durationSeconds'] || enabled2['duration'],
     ),
-    _0x196ade = resolveStoryVideoInitialGenerationDurationSeconds(_0x40d814, _0x150b98);
-  if (!_0x196ade) return ![];
-  return ((_0x157e78['videoGenerationDurationSec'] = _0x196ade), !![]);
+    storyVideoInitialGenerationDurationSeconds = resolveStoryVideoInitialGenerationDurationSeconds(
+      value6,
+      durationSeconds3,
+    );
+  if (!storyVideoInitialGenerationDurationSeconds) return ![];
+  return ((enabled2['videoGenerationDurationSec'] = storyVideoInitialGenerationDurationSeconds), !![]);
 }
-export function initializeStoryEpisodeVideoGenerationDurations(_0x3caa5d, _0x3f9b8b) {
-  if (!_0x3caa5d || typeof _0x3caa5d !== 'object') return 0x0;
-  return (Array['isArray'](_0x3caa5d['clips']) ? _0x3caa5d['clips'] : [])['reduce'](
-    (_0x568c20, _0x597d0e) =>
-      _0x568c20 + Number(initializeStoryClipVideoGenerationDuration(_0x597d0e, _0x3f9b8b)),
+export function initializeStoryEpisodeVideoGenerationDurations(enabled3, value7) {
+  if (!enabled3 || typeof enabled3 !== 'object') return 0x0;
+  return (Array['isArray'](enabled3['clips']) ? enabled3['clips'] : [])['reduce'](
+    (value8, value9) => value8 + Number(initializeStoryClipVideoGenerationDuration(value9, value7)),
     0x0,
   );
 }
-export function setStoryClipVideoGenerationDurationOverride(_0x1d7d78, _0x37238e) {
-  if (!_0x1d7d78 || typeof _0x1d7d78 !== 'object') return ![];
-  const _0x5085bc = normalizeDurationSeconds(_0x37238e),
-    _0x1bbac8 = getStoryClipVideoGenerationDurationOverride(_0x1d7d78);
+export function setStoryClipVideoGenerationDurationOverride(enabled4, value10) {
+  if (!enabled4 || typeof enabled4 !== 'object') return ![];
+  const durationSeconds4 = normalizeDurationSeconds(value10),
+    storyClipVideoGenerationDurationOverride = getStoryClipVideoGenerationDurationOverride(enabled4);
   return (
-    !_0x5085bc
-      ? delete _0x1d7d78['videoGenerationDurationSec']
-      : (_0x1d7d78['videoGenerationDurationSec'] = _0x5085bc),
-    _0x1bbac8 !== getStoryClipVideoGenerationDurationOverride(_0x1d7d78)
+    !durationSeconds4
+      ? delete enabled4['videoGenerationDurationSec']
+      : (enabled4['videoGenerationDurationSec'] = durationSeconds4),
+    storyClipVideoGenerationDurationOverride !== getStoryClipVideoGenerationDurationOverride(enabled4)
   );
 }
-export function resolveStoryClipVideoGenerationParams(_0x21419e, _0x33a234, _0x20b573 = {}) {
-  const _0x3e1aea = getStoryClipVideoGenerationDurationOverride(_0x21419e);
-  return _0x3e1aea
-    ? applyStoryVideoGenerationDurationSeconds(_0x33a234, _0x20b573, _0x3e1aea)
-    : normalizeStoryVideoGenerationParams(_0x33a234, _0x20b573);
+export function resolveStoryClipVideoGenerationParams(value11, value12, value13 = {}) {
+  const storyClipVideoGenerationDurationOverride2 = getStoryClipVideoGenerationDurationOverride(value11);
+  return storyClipVideoGenerationDurationOverride2
+    ? applyStoryVideoGenerationDurationSeconds(value12, value13, storyClipVideoGenerationDurationOverride2)
+    : normalizeStoryVideoGenerationParams(value12, value13);
 }
-export function resolveStoryClipVideoGenerationDurationSeconds(_0x55f2da, _0xeb0dd, _0x378650 = {}) {
+export function resolveStoryClipVideoGenerationDurationSeconds(value14, value15, value16 = {}) {
   return (
     resolveStoryVideoGenerationDurationSeconds(
-      _0xeb0dd,
-      resolveStoryClipVideoGenerationParams(_0x55f2da, _0xeb0dd, _0x378650),
+      value15,
+      resolveStoryClipVideoGenerationParams(value14, value15, value16),
     ) ||
     normalizeDurationSeconds(
-      _0x55f2da?.['durationSec'] || _0x55f2da?.['durationSeconds'] || _0x55f2da?.['duration'],
+      value14?.['durationSec'] || value14?.['durationSeconds'] || value14?.['duration'],
     )
   );
 }
-export function formatStoryClipVideoGenerationDuration(_0x2638a2, _0x60b71d, _0x5dafec = {}) {
-  const _0x3695fa = resolveStoryClipVideoGenerationDurationSeconds(_0x2638a2, _0x60b71d, _0x5dafec);
-  return _0x3695fa ? _0x3695fa['toFixed'](0x1) + 's' : '--';
+export function formatStoryClipVideoGenerationDuration(value17, value18, value19 = {}) {
+  const storyClipVideoGenerationDurationSeconds = resolveStoryClipVideoGenerationDurationSeconds(
+    value17,
+    value18,
+    value19,
+  );
+  return storyClipVideoGenerationDurationSeconds
+    ? storyClipVideoGenerationDurationSeconds['toFixed'](0x1) + 's'
+    : '--';
 }
 export function reconcileStoryClipVideoGenerationDurationChange({
-  clip: _0x52446e,
+  clip: clip2,
   previousModelId: previousModelId = '',
   modelId: modelId = previousModelId,
   previousGenerationParams: previousGenerationParams = {},
@@ -154,255 +167,280 @@ export function reconcileStoryClipVideoGenerationDurationChange({
   generationParamsChanged: generationParamsChanged = ![],
   modelChanged: modelChanged = ![],
 } = {}) {
-  const _0xf9ba1a = normalizeStoryVideoGenerationParams(previousModelId, previousGenerationParams);
-  let _0x7e8188 = normalizeStoryVideoGenerationParams(modelId, nextGenerationParams);
-  if (!_0x52446e || modelChanged)
-    return { generationParams: _0x7e8188, durationChanged: ![], overrideChanged: ![] };
-  const _0x30c33e = resolveStoryVideoGenerationDurationSeconds(previousModelId, _0xf9ba1a),
-    _0x204a76 = resolveStoryClipVideoGenerationDurationSeconds(_0x52446e, previousModelId, _0xf9ba1a),
-    _0x26dff3 = resolveStoryVideoGenerationDurationSeconds(modelId, _0x7e8188),
-    _0x2d9ba3 = Boolean(getStoryClipVideoGenerationDurationOverride(_0x52446e)),
-    _0x557ac1 = Boolean(generationParamsChanged) && _0x26dff3 > 0x0 && _0x26dff3 !== _0x204a76,
-    _0x54d8e9 = _0x557ac1 ? setStoryClipVideoGenerationDurationOverride(_0x52446e, _0x26dff3) : ![];
+  const storyVideoGenerationParams2 = normalizeStoryVideoGenerationParams(
+    previousModelId,
+    previousGenerationParams,
+  );
+  let generationParams = normalizeStoryVideoGenerationParams(modelId, nextGenerationParams);
+  if (!clip2 || modelChanged)
+    return { generationParams: generationParams, durationChanged: ![], overrideChanged: ![] };
+  const storyVideoGenerationDurationSeconds = resolveStoryVideoGenerationDurationSeconds(
+      previousModelId,
+      storyVideoGenerationParams2,
+    ),
+    storyClipVideoGenerationDurationSeconds2 = resolveStoryClipVideoGenerationDurationSeconds(
+      clip2,
+      previousModelId,
+      storyVideoGenerationParams2,
+    ),
+    storyVideoGenerationDurationSeconds2 = resolveStoryVideoGenerationDurationSeconds(
+      modelId,
+      generationParams,
+    ),
+    value20 = Boolean(getStoryClipVideoGenerationDurationOverride(clip2)),
+    durationChanged =
+      Boolean(generationParamsChanged) &&
+      storyVideoGenerationDurationSeconds2 > 0x0 &&
+      storyVideoGenerationDurationSeconds2 !== storyClipVideoGenerationDurationSeconds2,
+    overrideChanged = durationChanged
+      ? setStoryClipVideoGenerationDurationOverride(clip2, storyVideoGenerationDurationSeconds2)
+      : ![];
   return (
-    _0x30c33e > 0x0 &&
-      (_0x557ac1 || _0x2d9ba3 || getStoryClipVideoGenerationDurationOverride(_0x52446e)) &&
-      (_0x7e8188 = applyStoryVideoGenerationDurationSeconds(modelId, _0x7e8188, _0x30c33e)),
-    { generationParams: _0x7e8188, durationChanged: _0x557ac1, overrideChanged: _0x54d8e9 }
+    storyVideoGenerationDurationSeconds > 0x0 &&
+      (durationChanged || value20 || getStoryClipVideoGenerationDurationOverride(clip2)) &&
+      (generationParams = applyStoryVideoGenerationDurationSeconds(
+        modelId,
+        generationParams,
+        storyVideoGenerationDurationSeconds,
+      )),
+    { generationParams: generationParams, durationChanged: durationChanged, overrideChanged: overrideChanged }
   );
 }
-function getStoryVideoAspectRatioSchemaField(_0x476802) {
-  const _0x48f495 = resolveModelExecution(_0x476802),
-    _0x34323f = Array['isArray'](_0x48f495?.['modelManifest']?.['uiSchema']?.['fields'])
-      ? _0x48f495['modelManifest']['uiSchema']['fields']
+function getStoryVideoAspectRatioSchemaField(value21) {
+  const modelExecution3 = resolveModelExecution(value21),
+    list3 = Array['isArray'](modelExecution3?.['modelManifest']?.['uiSchema']?.['fields'])
+      ? modelExecution3['modelManifest']['uiSchema']['fields']
       : [];
   return (
-    _0x34323f['find'](
-      (_0x27c7d6) =>
-        normalizeText(_0x27c7d6?.['id']) === 'aspectRatio' ||
-        normalizeText(_0x27c7d6?.['displayRole']) === 'aspectRatio',
+    list3['find'](
+      (value22) =>
+        normalizeText(value22?.['id']) === 'aspectRatio' ||
+        normalizeText(value22?.['displayRole']) === 'aspectRatio',
     ) || null
   );
 }
-function getStoryVideoSchemaOptionValues(_0x229c90) {
-  return (Array['isArray'](_0x229c90?.['options']) ? _0x229c90['options'] : [])
-    ['map']((_0x16d2f7) =>
-      normalizeText(_0x16d2f7 && typeof _0x16d2f7 === 'object' ? _0x16d2f7['value'] : _0x16d2f7),
-    )
+function getStoryVideoSchemaOptionValues(value23) {
+  return (Array['isArray'](value23?.['options']) ? value23['options'] : [])
+    ['map']((el) => normalizeText(el && typeof el === 'object' ? el['value'] : el))
     ['filter'](Boolean);
 }
-export function resolveStoryVideoClipDurationConstraints(_0x1a6980) {
-  const _0x22efa0 = getStoryVideoDurationSchemaField(_0x1a6980);
-  if (!_0x22efa0) return null;
-  const _0x462cab = [
+export function resolveStoryVideoClipDurationConstraints(value24) {
+  const storyVideoDurationSchemaField4 = getStoryVideoDurationSchemaField(value24);
+  if (!storyVideoDurationSchemaField4) return null;
+  const allowedSeconds = [
       ...new Set(
-        (Array['isArray'](_0x22efa0['options']) ? _0x22efa0['options'] : [])
-          ['map']((_0x5d9825) =>
-            Number(_0x5d9825 && typeof _0x5d9825 === 'object' ? _0x5d9825['value'] : _0x5d9825),
-          )
-          ['filter']((_0x31bed0) => Number['isFinite'](_0x31bed0) && _0x31bed0 > 0x0),
+        (Array['isArray'](storyVideoDurationSchemaField4['options'])
+          ? storyVideoDurationSchemaField4['options']
+          : [])
+          ['map']((el2) => Number(el2 && typeof el2 === 'object' ? el2['value'] : el2))
+          ['filter']((count5) => Number['isFinite'](count5) && count5 > 0x0),
       ),
-    ]['sort']((_0x4fe60b, _0x40e44f) => _0x4fe60b - _0x40e44f),
-    _0x27239f = Number(_0x22efa0['min']),
-    _0x1cf4b8 = Number(_0x22efa0['max']),
-    _0x45e1de = Number(_0x22efa0['step']),
-    _0x5bdbf7 = {
-      minSeconds: Number['isFinite'](_0x27239f) && _0x27239f > 0x0 ? _0x27239f : _0x462cab[0x0] || 0x0,
-      maxSeconds: Number['isFinite'](_0x1cf4b8) && _0x1cf4b8 > 0x0 ? _0x1cf4b8 : _0x462cab['at'](-0x1) || 0x0,
-      stepSeconds: Number['isFinite'](_0x45e1de) && _0x45e1de > 0x0 ? _0x45e1de : 0x0,
-      allowedSeconds: _0x462cab,
+    ]['sort']((value25, value26) => value25 - value26),
+    count6 = Number(storyVideoDurationSchemaField4['min']),
+    count7 = Number(storyVideoDurationSchemaField4['max']),
+    count8 = Number(storyVideoDurationSchemaField4['step']),
+    value27 = {
+      minSeconds: Number['isFinite'](count6) && count6 > 0x0 ? count6 : allowedSeconds[0x0] || 0x0,
+      maxSeconds: Number['isFinite'](count7) && count7 > 0x0 ? count7 : allowedSeconds['at'](-0x1) || 0x0,
+      stepSeconds: Number['isFinite'](count8) && count8 > 0x0 ? count8 : 0x0,
+      allowedSeconds: allowedSeconds,
     };
-  return _0x5bdbf7['minSeconds'] || _0x5bdbf7['maxSeconds'] || _0x5bdbf7['allowedSeconds']['length']
-    ? _0x5bdbf7
+  return value27['minSeconds'] || value27['maxSeconds'] || value27['allowedSeconds']['length']
+    ? value27
     : null;
 }
-export function getStoryVideoFixedInputVisibilityKey(_0x3e2116, _0x452e33 = '', _0x57e286 = {}) {
-  const _0x1fead0 = resolveModelExecution(_0x3e2116, { providerHint: _0x452e33 }),
-    _0x2eb681 = getFixedInputSlotConfigFromManifest(
-      { model: _0x3e2116, provider: _0x452e33, generationParams: _0x57e286 },
-      { manifest: _0x1fead0?.['modelManifest'] || null },
+export function getStoryVideoFixedInputVisibilityKey(model, providerHint = '', generationParams2 = {}) {
+  const manifest = resolveModelExecution(model, { providerHint: providerHint }),
+    fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(
+      { model: model, provider: providerHint, generationParams: generationParams2 },
+      { manifest: manifest?.['modelManifest'] || null },
     );
-  if (shouldHideFixedInputSlots(_0x2eb681)) return '';
-  return normalizeText(_0x2eb681?.['visibilityLayoutKey']);
+  if (shouldHideFixedInputSlots(fixedInputSlotConfigFromManifest)) return '';
+  return normalizeText(fixedInputSlotConfigFromManifest?.['visibilityLayoutKey']);
 }
-export function applyStoryVideoInitialModeDefault(_0x26f556, _0x3cc7b6 = {}) {
-  const _0x515dd4 = getStoryVideoInitialGenerationDefaults(_0x26f556);
-  if (!Object['keys'](_0x515dd4)['length']) return _0x3cc7b6;
-  return { ...(_0x3cc7b6 && typeof _0x3cc7b6 === 'object' ? _0x3cc7b6 : {}), ..._0x515dd4 };
+export function applyStoryVideoInitialModeDefault(value28, value29 = {}) {
+  const args2 = getStoryVideoInitialGenerationDefaults(value28);
+  if (!Object['keys'](args2)['length']) return value29;
+  return { ...(value29 && typeof value29 === 'object' ? value29 : {}), ...args2 };
 }
-function getStoryVideoInitialGenerationDefaults(_0x589629) {
-  const _0x315027 = STORY_VIDEO_REFERENCE_DEFAULT_MODE_FIELDS[_0x589629],
-    _0x153178 = resolveModelExecution(_0x589629),
-    _0x480efc = _0x153178?.['modelManifest']?.['extensions']?.['storyWorkspace']?.['defaultGenerationParams'];
+function getStoryVideoInitialGenerationDefaults(value30) {
+  const value31 = STORY_VIDEO_REFERENCE_DEFAULT_MODE_FIELDS[value30],
+    modelExecution4 = resolveModelExecution(value30),
+    value32 =
+      modelExecution4?.['modelManifest']?.['extensions']?.['storyWorkspace']?.['defaultGenerationParams'];
   return {
-    ...(_0x315027 ? { [_0x315027]: 'reference' } : {}),
-    ...(_0x480efc && typeof _0x480efc === 'object' && !Array['isArray'](_0x480efc) ? _0x480efc : {}),
+    ...(value31 ? { [value31]: 'reference' } : {}),
+    ...(value32 && typeof value32 === 'object' && !Array['isArray'](value32) ? value32 : {}),
   };
 }
-export function normalizeStoryVideoGenerationParams(_0x4b4101, _0x586648 = {}) {
-  const _0x4f4c1e = _0x586648 && typeof _0x586648 === 'object' ? _0x586648 : {},
-    _0x280638 = getStoryVideoInitialGenerationDefaults(_0x4b4101),
-    _0x9f0c75 = Object['keys'](_0x280638)['some']((_0x1bad62) => !Object['hasOwn'](_0x4f4c1e, _0x1bad62))
-      ? { ..._0x280638, ..._0x4f4c1e }
-      : _0x4f4c1e;
-  return sanitizeModelUiSchemaParams(_0x4b4101, _0x9f0c75, { includeDefaults: !![] });
+export function normalizeStoryVideoGenerationParams(value33, value34 = {}) {
+  const args3 = value34 && typeof value34 === 'object' ? value34 : {},
+    args4 = getStoryVideoInitialGenerationDefaults(value33),
+    value35 = Object['keys'](args4)['some']((value36) => !Object['hasOwn'](args3, value36))
+      ? { ...args4, ...args3 }
+      : args3;
+  return sanitizeModelUiSchemaParams(value33, value35, { includeDefaults: !![] });
 }
-export function applyStoryAspectRatioToVideoGenerationParams(_0x5cdbd2, _0x3eab50 = {}, _0x732cdc = '16:9') {
-  const _0x5353ef = getStoryVideoAspectRatioSchemaField(_0x5cdbd2),
-    _0x4267e3 = normalizeStoryVideoGenerationParams(_0x5cdbd2, _0x3eab50);
-  if (!_0x5353ef?.['id']) return _0x4267e3;
-  const _0x1abf89 = normalizeStoryAspectRatio(_0x732cdc),
-    _0xa07377 = getStoryVideoSchemaOptionValues(_0x5353ef);
-  if (_0xa07377['length'] && !_0xa07377['includes'](_0x1abf89)) return _0x4267e3;
-  return normalizeStoryVideoGenerationParams(_0x5cdbd2, { ..._0x4267e3, [_0x5353ef['id']]: _0x1abf89 });
+export function applyStoryAspectRatioToVideoGenerationParams(value37, value38 = {}, value39 = '16:9') {
+  const storyVideoAspectRatioSchemaField = getStoryVideoAspectRatioSchemaField(value37),
+    args5 = normalizeStoryVideoGenerationParams(value37, value38);
+  if (!storyVideoAspectRatioSchemaField?.['id']) return args5;
+  const storyAspectRatio = normalizeStoryAspectRatio(value39),
+    list4 = getStoryVideoSchemaOptionValues(storyVideoAspectRatioSchemaField);
+  if (list4['length'] && !list4['includes'](storyAspectRatio)) return args5;
+  return normalizeStoryVideoGenerationParams(value37, {
+    ...args5,
+    [storyVideoAspectRatioSchemaField['id']]: storyAspectRatio,
+  });
 }
-export function seedStoryAspectRatioInVideoGenerationParams(_0x2a29c1, _0x2f386f = {}, _0x358dae = '16:9') {
-  const _0x5422a3 = getStoryVideoAspectRatioSchemaField(_0x2a29c1),
-    _0x52594f = normalizeStoryVideoGenerationParams(_0x2a29c1, _0x2f386f);
-  if (!_0x5422a3?.['id']) return _0x52594f;
-  const _0x474ec3 = normalizeText(_0x2f386f?.[_0x5422a3['id']]),
-    _0x2c64e3 = getStoryVideoSchemaOptionValues(_0x5422a3);
-  if (_0x474ec3 && (!_0x2c64e3['length'] || _0x2c64e3['includes'](_0x474ec3))) return _0x52594f;
-  return applyStoryAspectRatioToVideoGenerationParams(_0x2a29c1, _0x52594f, _0x358dae);
+export function seedStoryAspectRatioInVideoGenerationParams(value40, value41 = {}, value42 = '16:9') {
+  const storyVideoAspectRatioSchemaField2 = getStoryVideoAspectRatioSchemaField(value40),
+    storyVideoGenerationParams3 = normalizeStoryVideoGenerationParams(value40, value41);
+  if (!storyVideoAspectRatioSchemaField2?.['id']) return storyVideoGenerationParams3;
+  const text = normalizeText(value41?.[storyVideoAspectRatioSchemaField2['id']]),
+    list5 = getStoryVideoSchemaOptionValues(storyVideoAspectRatioSchemaField2);
+  if (text && (!list5['length'] || list5['includes'](text))) return storyVideoGenerationParams3;
+  return applyStoryAspectRatioToVideoGenerationParams(value40, storyVideoGenerationParams3, value42);
 }
-export function recoverUnavailableStoryVideoModelState(_0x99f216 = {}, { clip: clip = null } = {}) {
-  const _0x41e3ae = normalizeText(_0x99f216['models']?.['video']),
-    _0x2888f6 = normalizeText(_0x99f216['videoProvider']),
-    _0x86b2bb =
-      resolveModelExecution(_0x41e3ae) || resolveModelExecution(_0x41e3ae, { providerHint: _0x2888f6 });
+export function recoverUnavailableStoryVideoModelState(
+  providerProfileIdByModel = {},
+  { clip: clip = null } = {},
+) {
+  const text2 = normalizeText(providerProfileIdByModel['models']?.['video']),
+    providerHint2 = normalizeText(providerProfileIdByModel['videoProvider']),
+    modelExecution5 =
+      resolveModelExecution(text2) || resolveModelExecution(text2, { providerHint: providerHint2 });
   if (
-    _0x86b2bb?.['modelManifest']?.['kind'] === 'video' &&
-    _0x86b2bb?.['executionManifest']?.['kind'] === 'video' &&
-    isStoryWorkspaceModelVisible('video', _0x86b2bb['modelManifest'])
+    modelExecution5?.['modelManifest']?.['kind'] === 'video' &&
+    modelExecution5?.['executionManifest']?.['kind'] === 'video' &&
+    isStoryWorkspaceModelVisible('video', modelExecution5['modelManifest'])
   ) {
-    const _0x3e965a = normalizeText(_0x86b2bb['modelManifest']['provider']);
-    if (_0x3e965a && _0x3e965a !== _0x2888f6) return ((_0x99f216['videoProvider'] = _0x3e965a), !![]);
+    const text3 = normalizeText(modelExecution5['modelManifest']['provider']);
+    if (text3 && text3 !== providerHint2) return ((providerProfileIdByModel['videoProvider'] = text3), !![]);
     return ![];
   }
-  const _0x386b9e = resolveStoryWorkspaceModelId('video'),
-    _0x5a07de = resolveModelExecution(_0x386b9e);
+  const video = resolveStoryWorkspaceModelId('video'),
+    modelExecution6 = resolveModelExecution(video);
   if (
-    !_0x386b9e ||
-    _0x5a07de?.['modelManifest']?.['kind'] !== 'video' ||
-    _0x5a07de?.['executionManifest']?.['kind'] !== 'video'
+    !video ||
+    modelExecution6?.['modelManifest']?.['kind'] !== 'video' ||
+    modelExecution6?.['executionManifest']?.['kind'] !== 'video'
   )
     return ![];
-  const _0xe97d1d =
-      _0x99f216['videoGenerationParamsByModel'] &&
-      typeof _0x99f216['videoGenerationParamsByModel'] === 'object'
-        ? _0x99f216['videoGenerationParamsByModel']
+  const args6 =
+      providerProfileIdByModel['videoGenerationParamsByModel'] &&
+      typeof providerProfileIdByModel['videoGenerationParamsByModel'] === 'object'
+        ? providerProfileIdByModel['videoGenerationParamsByModel']
         : {},
-    _0x270a0e = _0xe97d1d[_0x386b9e] && typeof _0xe97d1d[_0x386b9e] === 'object' ? _0xe97d1d[_0x386b9e] : {},
-    _0x3c4afb = normalizeStoryVideoGenerationParams(
-      _0x386b9e,
+    value43 = args6[video] && typeof args6[video] === 'object' ? args6[video] : {},
+    args7 = normalizeStoryVideoGenerationParams(
+      video,
       seedStoryAspectRatioInVideoGenerationParams(
-        _0x386b9e,
-        _0x270a0e,
-        _0x99f216['data']?.['project']?.['aspectRatio'],
+        video,
+        value43,
+        providerProfileIdByModel['data']?.['project']?.['aspectRatio'],
       ),
       { clip: clip },
     );
   return (
-    (_0x99f216['models'] = { ...(_0x99f216['models'] || {}), video: _0x386b9e }),
-    (_0x99f216['videoProvider'] = normalizeText(_0x5a07de['modelManifest']['provider'])),
-    (_0x99f216['videoProviderProfileId'] = resolveModelProviderProfileId({
-      model: _0x386b9e,
+    (providerProfileIdByModel['models'] = { ...(providerProfileIdByModel['models'] || {}), video: video }),
+    (providerProfileIdByModel['videoProvider'] = normalizeText(modelExecution6['modelManifest']['provider'])),
+    (providerProfileIdByModel['videoProviderProfileId'] = resolveModelProviderProfileId({
+      model: video,
       providerProfileId: '',
-      providerProfileIdByModel: _0x99f216['videoProviderProfileIdByModel'],
+      providerProfileIdByModel: providerProfileIdByModel['videoProviderProfileIdByModel'],
     })),
-    (_0x99f216['videoGenerationParams'] = _0x3c4afb),
-    (_0x99f216['videoGenerationParamsByModel'] = { ..._0xe97d1d, [_0x386b9e]: { ..._0x3c4afb } }),
+    (providerProfileIdByModel['videoGenerationParams'] = args7),
+    (providerProfileIdByModel['videoGenerationParamsByModel'] = { ...args6, [video]: { ...args7 } }),
     !![]
   );
 }
-export function applyStoryPromptModeVideoModelDefault(_0x36e63b = {}, _0x1e48b4 = 'seedance-2.0') {
-  const _0x45d025 = resolveStoryPromptModeDefaultVideoModelId(_0x1e48b4);
-  return applyStoryVideoModelDefault(_0x36e63b, _0x45d025);
+export function applyStoryPromptModeVideoModelDefault(options3 = {}, value44 = 'seedance-2.0') {
+  const storyPromptModeDefaultVideoModelId = resolveStoryPromptModeDefaultVideoModelId(value44);
+  return applyStoryVideoModelDefault(options3, storyPromptModeDefaultVideoModelId);
 }
-export function applyStoryVideoModelDefault(_0x29f47d = {}, _0x205de4 = '') {
-  if (!normalizeText(_0x205de4)) return ![];
-  const _0x1af41c = resolveStoryWorkspaceModelId('video', _0x205de4);
-  if (!_0x1af41c || _0x1af41c !== _0x205de4) return ![];
-  const _0x48fe56 = resolveModelExecution(_0x1af41c);
+export function applyStoryVideoModelDefault(providerProfileIdByModel2 = {}, value45 = '') {
+  if (!normalizeText(value45)) return ![];
+  const video2 = resolveStoryWorkspaceModelId('video', value45);
+  if (!video2 || video2 !== value45) return ![];
+  const modelExecution7 = resolveModelExecution(video2);
   if (
-    _0x48fe56?.['modelManifest']?.['kind'] !== 'video' ||
-    _0x48fe56?.['executionManifest']?.['kind'] !== 'video'
+    modelExecution7?.['modelManifest']?.['kind'] !== 'video' ||
+    modelExecution7?.['executionManifest']?.['kind'] !== 'video'
   )
     return ![];
-  const _0x27cc89 =
-      _0x29f47d['videoGenerationParamsByModel'] &&
-      typeof _0x29f47d['videoGenerationParamsByModel'] === 'object'
-        ? _0x29f47d['videoGenerationParamsByModel']
+  const args8 =
+      providerProfileIdByModel2['videoGenerationParamsByModel'] &&
+      typeof providerProfileIdByModel2['videoGenerationParamsByModel'] === 'object'
+        ? providerProfileIdByModel2['videoGenerationParamsByModel']
         : {},
-    _0x7b2c86 = _0x27cc89[_0x1af41c] && typeof _0x27cc89[_0x1af41c] === 'object' ? _0x27cc89[_0x1af41c] : {},
-    _0x1cff77 = applyStoryAspectRatioToVideoGenerationParams(
-      _0x1af41c,
-      normalizeStoryVideoGenerationParams(_0x1af41c, _0x7b2c86),
-      _0x29f47d['data']?.['project']?.['aspectRatio'],
+    value46 = args8[video2] && typeof args8[video2] === 'object' ? args8[video2] : {},
+    args9 = applyStoryAspectRatioToVideoGenerationParams(
+      video2,
+      normalizeStoryVideoGenerationParams(video2, value46),
+      providerProfileIdByModel2['data']?.['project']?.['aspectRatio'],
     );
   return (
-    (_0x29f47d['models'] = { ...(_0x29f47d['models'] || {}), video: _0x1af41c }),
-    (_0x29f47d['videoProvider'] = resolveStoryVideoProvider(_0x1af41c)),
-    (_0x29f47d['videoProviderProfileId'] = resolveModelProviderProfileId({
-      model: _0x1af41c,
+    (providerProfileIdByModel2['models'] = { ...(providerProfileIdByModel2['models'] || {}), video: video2 }),
+    (providerProfileIdByModel2['videoProvider'] = resolveStoryVideoProvider(video2)),
+    (providerProfileIdByModel2['videoProviderProfileId'] = resolveModelProviderProfileId({
+      model: video2,
       providerProfileId: '',
-      providerProfileIdByModel: _0x29f47d['videoProviderProfileIdByModel'],
+      providerProfileIdByModel: providerProfileIdByModel2['videoProviderProfileIdByModel'],
     })),
-    (_0x29f47d['videoGenerationParams'] = _0x1cff77),
-    (_0x29f47d['videoGenerationParamsByModel'] = { ..._0x27cc89, [_0x1af41c]: { ..._0x1cff77 } }),
+    (providerProfileIdByModel2['videoGenerationParams'] = args9),
+    (providerProfileIdByModel2['videoGenerationParamsByModel'] = { ...args8, [video2]: { ...args9 } }),
     !![]
   );
 }
-export function applyStoryEpisodeVideoModelDefault(_0x57798e = {}, _0x6274de = {}) {
-  const _0x17d7a8 =
-    normalizeText(_0x6274de?.['videoModelId']) ||
-    resolveStoryPromptModeDefaultVideoModelId(_0x6274de?.['promptMode']);
-  return applyStoryVideoModelDefault(_0x57798e, _0x17d7a8);
+export function applyStoryEpisodeVideoModelDefault(options4 = {}, value47 = {}) {
+  const text4 =
+    normalizeText(value47?.['videoModelId']) ||
+    resolveStoryPromptModeDefaultVideoModelId(value47?.['promptMode']);
+  return applyStoryVideoModelDefault(options4, text4);
 }
-export function rememberStoryEpisodeVideoModelSelection(_0x10c70e = {}, _0x52ae1b = '') {
-  if (!_0x10c70e || typeof _0x10c70e !== 'object' || Array['isArray'](_0x10c70e)) return ![];
-  const _0x3c9d65 = normalizeText(_0x52ae1b);
+export function rememberStoryEpisodeVideoModelSelection(enabled5 = {}, value48 = '') {
+  if (!enabled5 || typeof enabled5 !== 'object' || Array['isArray'](enabled5)) return ![];
+  const text5 = normalizeText(value48);
   if (
-    !_0x3c9d65 ||
-    resolveStoryWorkspaceModelId('video', _0x3c9d65) !== _0x3c9d65 ||
-    normalizeText(_0x10c70e['videoModelId']) === _0x3c9d65
+    !text5 ||
+    resolveStoryWorkspaceModelId('video', text5) !== text5 ||
+    normalizeText(enabled5['videoModelId']) === text5
   )
     return ![];
-  return ((_0x10c70e['videoModelId'] = _0x3c9d65), !![]);
+  return ((enabled5['videoModelId'] = text5), !![]);
 }
 export function resolveStoryClipVideoGenerationSettings(
-  _0xfeaea0,
-  _0x56ca05 = {},
+  value49,
+  value50 = {},
   { fallbackModelId: fallbackModelId = '', fallbackProvider: fallbackProvider = '' } = {},
 ) {
-  const _0x14ead5 = _0x56ca05['modelSettings'] || {},
-    _0x53b556 = _0x14ead5['models']?.['video'] || fallbackModelId,
-    _0x294877 = resolveStoryWorkspaceModelId('video', _0x53b556),
-    _0x3a97f0 = resolveStoryVideoProvider(_0x294877, _0x14ead5['videoProvider'] || fallbackProvider),
-    _0x1f654c = _0x14ead5['videoGenerationParamsByModel']?.[_0x294877],
-    _0x1da971 = _0x14ead5['videoGenerationParams'],
-    _0x51211f =
-      _0x1da971 && typeof _0x1da971 === 'object' && Object['keys'](_0x1da971)['length']
-        ? _0x1da971
-        : _0x1f654c || {},
-    _0x55c3b2 = resolveStoryClipVideoGenerationParams(
-      _0xfeaea0,
-      _0x294877,
+  const providerProfileId = value50['modelSettings'] || {},
+    value51 = providerProfileId['models']?.['video'] || fallbackModelId,
+    model2 = resolveStoryWorkspaceModelId('video', value51),
+    provider = resolveStoryVideoProvider(model2, providerProfileId['videoProvider'] || fallbackProvider),
+    value52 = providerProfileId['videoGenerationParamsByModel']?.[model2],
+    value53 = providerProfileId['videoGenerationParams'],
+    value54 =
+      value53 && typeof value53 === 'object' && Object['keys'](value53)['length'] ? value53 : value52 || {},
+    generationParams3 = resolveStoryClipVideoGenerationParams(
+      value49,
+      model2,
       seedStoryAspectRatioInVideoGenerationParams(
-        _0x294877,
-        _0x51211f,
-        _0x56ca05['data']?.['project']?.['aspectRatio'],
+        model2,
+        value54,
+        value50['data']?.['project']?.['aspectRatio'],
       ),
     ),
-    _0x541268 = resolveModelProviderProfileId({
-      model: _0x294877,
-      providerProfileId: _0x14ead5['videoProviderProfileId'],
-      providerProfileIdByModel: _0x14ead5['videoProviderProfileIdByModel'],
+    providerProfileId2 = resolveModelProviderProfileId({
+      model: model2,
+      providerProfileId: providerProfileId['videoProviderProfileId'],
+      providerProfileIdByModel: providerProfileId['videoProviderProfileIdByModel'],
     });
   return {
-    modelId: _0x294877,
-    provider: _0x3a97f0,
-    providerProfileId: _0x541268,
-    generationParams: _0x55c3b2,
+    modelId: model2,
+    provider: provider,
+    providerProfileId: providerProfileId2,
+    generationParams: generationParams3,
   };
 }

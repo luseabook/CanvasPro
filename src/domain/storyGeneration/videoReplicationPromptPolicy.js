@@ -36,55 +36,53 @@ export function getReplicationGenerationSystemPrompt() {
     REPLICATION_TIMELINE_RULE,
   ]['join']('\x0a');
 }
-export function projectReplicationPromptEvidence(_0x20a3fc, _0x84ef65) {
-  if (!_0x20a3fc) return _0x20a3fc;
-  const _0x41e533 = _0x20a3fc['segmentPlan']?.['length']
-    ? _0x20a3fc['segmentPlan']['filter']((_0x302c93) => !_0x84ef65 || _0x84ef65['has'](_0x302c93['ref']))
+export function projectReplicationPromptEvidence(sourceDurationSec, map) {
+  if (!sourceDurationSec) return sourceDurationSec;
+  const segmentPlan = sourceDurationSec['segmentPlan']?.['length']
+    ? sourceDurationSec['segmentPlan']['filter']((value) => !map || map['has'](value['ref']))
     : null;
   return {
-    sourceDurationSec: _0x20a3fc['sourceDurationSec'],
-    sourceLanguage: _0x20a3fc['sourceLanguage'],
-    contentType: _0x20a3fc['contentType'],
-    contentTypeReason: _0x20a3fc['contentTypeReason'],
-    characters: _0x20a3fc['characters'],
-    speechPolicy: _0x20a3fc['speechPolicy'],
-    ...(_0x41e533 ? { segmentPlan: _0x41e533 } : { events: _0x20a3fc['events'] }),
-    adaptation: _0x20a3fc['adaptation'] && {
-      targetLocale: _0x20a3fc['adaptation']['targetLocale'],
-      audioLanguage: _0x20a3fc['adaptation']['audioLanguage'],
-      characterBindings: _0x20a3fc['adaptation']['characterBindings'],
-      replacements: _0x20a3fc['adaptation']['replacements']?.['map'](
-        ({ assetId: _0x2bc74c, assetRef: _0x4f4e5f, targetName: _0x44ee10, original: _0x593915 }) => ({
-          assetId: _0x2bc74c,
-          assetRef: _0x4f4e5f,
-          targetName: _0x44ee10,
-          original: _0x593915,
+    sourceDurationSec: sourceDurationSec['sourceDurationSec'],
+    sourceLanguage: sourceDurationSec['sourceLanguage'],
+    contentType: sourceDurationSec['contentType'],
+    contentTypeReason: sourceDurationSec['contentTypeReason'],
+    characters: sourceDurationSec['characters'],
+    speechPolicy: sourceDurationSec['speechPolicy'],
+    ...(segmentPlan ? { segmentPlan: segmentPlan } : { events: sourceDurationSec['events'] }),
+    adaptation: sourceDurationSec['adaptation'] && {
+      targetLocale: sourceDurationSec['adaptation']['targetLocale'],
+      audioLanguage: sourceDurationSec['adaptation']['audioLanguage'],
+      characterBindings: sourceDurationSec['adaptation']['characterBindings'],
+      replacements: sourceDurationSec['adaptation']['replacements']?.['map'](
+        ({ assetId: assetId, assetRef: assetRef, targetName: targetName, original: original }) => ({
+          assetId: assetId,
+          assetRef: assetRef,
+          targetName: targetName,
+          original: original,
         }),
       ),
     },
   };
 }
-export function serializeReplicationGenerationPrompt(_0x5df13a, _0x199f1a) {
-  if (!_0x199f1a['replication']?.['sourceAnalysis']) return JSON['stringify'](_0x5df13a);
-  const _0x360387 = isStoryContinuousTimelinePromptMode(_0x5df13a['promptMode']);
+export function serializeReplicationGenerationPrompt(task, enabled) {
+  if (!enabled['replication']?.['sourceAnalysis']) return JSON['stringify'](task);
+  const isStoryContinuousTimelinePromptMode2 = isStoryContinuousTimelinePromptMode(task['promptMode']);
   return JSON['stringify']({
-    task: _0x5df13a['task'],
-    schemaVersion: _0x5df13a['schemaVersion'],
-    promptMode: _0x5df13a['promptMode'] || 'seedance-2.0',
+    task: task['task'],
+    schemaVersion: task['schemaVersion'],
+    promptMode: task['promptMode'] || 'seedance-2.0',
     episode: {
-      ref: _0x5df13a['episode']['ref'],
-      title: _0x5df13a['episode']['title'],
-      ...(_0x199f1a['replication']['generationPrepared']
-        ? { preparedScript: _0x5df13a['episode']['text'] }
-        : {}),
+      ref: task['episode']['ref'],
+      title: task['episode']['title'],
+      ...(enabled['replication']['generationPrepared'] ? { preparedScript: task['episode']['text'] } : {}),
     },
-    sourceVideoEvidence: projectReplicationPromptEvidence(_0x5df13a['sourceVideoEvidence']),
-    assets: _0x5df13a['assets'],
-    scenes: _0x5df13a['scenes'] || _0x5df13a['episode']['scenes'],
-    constraints: _0x5df13a['constraints'] || { clipMaxSeconds: _0x5df13a['clipMaxSeconds'] },
-    timingContract: buildReplicationTimingContract(_0x199f1a, _0x5df13a['promptMode']),
-    promptRoute: replicationRoutePolicy(_0x199f1a['replication']['sourceAnalysis']['contentType']),
-    ...(resolveReplicationContentType(_0x199f1a['replication']['sourceAnalysis']['contentType']) === 'unknown'
+    sourceVideoEvidence: projectReplicationPromptEvidence(task['sourceVideoEvidence']),
+    assets: task['assets'],
+    scenes: task['scenes'] || task['episode']['scenes'],
+    constraints: task['constraints'] || { clipMaxSeconds: task['clipMaxSeconds'] },
+    timingContract: buildReplicationTimingContract(enabled, task['promptMode']),
+    promptRoute: replicationRoutePolicy(enabled['replication']['sourceAnalysis']['contentType']),
+    ...(resolveReplicationContentType(enabled['replication']['sourceAnalysis']['contentType']) === 'unknown'
       ? { availableRoutes: REPLICATION_CONTENT_TYPES['map'](replicationRoutePolicy) }
       : {}),
     requirements: [
@@ -97,13 +95,13 @@ export function serializeReplicationGenerationPrompt(_0x5df13a, _0x199f1a) {
       REPLICATION_VISUAL_STATE_RULE,
       '字段职责：v 写动作和表情，c 写摄影，textElements 写有用途分类和承载位置的文字，spatialStart/spatialEnd 写边界空间关系，q/o 写人声，a 写环境声音及画外音时间。来源旧文字字段仅是观察证据，不能照抄为新的分类条目；按其实际用途拆分。场戏、镜头和片段边界不得改动，空间关系只使用对应边界有依据的信息。',
       '原片已识别的人声全部保留，包括存疑的字和[听不清]占位。错字与说话人疑点留给用户修改，不因 uncertain 删除、概括或擅自改写台词；局部占位不得吞掉前后文字。',
-      ...(_0x199f1a['replication']['generationPrepared']
+      ...(enabled['replication']['generationPrepared']
         ? [
             'episode.preparedScript 是已确认的目标语言正文，沿用其中的译文和人物对应；来源只用于核对声音类型、顺序、画面与时间，不把已确认译文重新翻译。',
           ]
         : []),
       REPLICATION_SOURCE_CUT_RULE,
-      _0x360387
+      isStoryContinuousTimelinePromptMode2
         ? REPLICATION_INTEGER_TIMING_RULE
         : '镜头\x20durationSec/d\x20使用当前模式允许的秒数，按顺序合计等于计划\x20durationSec，不重新估算动作时长。',
       'visual/v 与 camera/c 使用简体中文；声音使用 adaptation.targetLocale 指定语言。v 与 c 保留来源逐镜记录中有助于还原的具体信息，不把动作过程缩成‘交谈、递东西、离开’等结果摘要；a 仅写有依据的声音。不写创作解释、审片结论或重复素材外观。来源细节不足时如实沿用，不靠扩写编造，直接交给用户编辑。',
@@ -111,63 +109,61 @@ export function serializeReplicationGenerationPrompt(_0x5df13a, _0x199f1a) {
     shotVisualSchema: replicationVisualSchema(),
     outputFormat:
       '{\x22contentType\x22:\x22story/narrated_story/advertisement/unknown\x22,\x22clips\x22:[{\x22ref\x22:\x22计划ref\x22,\x22s\x22:\x22scenes.code\x22,\x22durationSec\x22:计划秒数,\x22shots\x22:[{\x22d\x22:镜头秒数,' +
-      (_0x360387 ? '"startSec":局部起秒,"endSec":局部止秒,' : '') +
+      (isStoryContinuousTimelinePromptMode2 ? '"startSec":局部起秒,"endSec":局部止秒,' : '') +
       '"v":"画面","c":"摄影","sceneKey":"场戏标识","textElements":[],"spatialStart":[],"spatialEnd":[],"q":"人物对白","o":"画外音","a":"环境声音及画外音时间","assetUsages":[{"assetRef":"素材ref","appearanceRef":"形象ref"}]}]}]}',
   });
 }
-export function getReplicationLockedTiming(_0x43bdfc, _0x391d3f) {
-  const _0x39119f = _0x391d3f['replication']?.['segmentPlan']?.['find'](
-    (_0x171a20) => _0x171a20['ref'] === _0x43bdfc['ref'],
+export function getReplicationLockedTiming(item, key) {
+  const sourceStartSec = key['replication']?.['segmentPlan']?.['find'](
+    (index) => index['ref'] === item['ref'],
   );
-  let _0x555ece = 0x0;
+  let result = 0x0;
   return {
-    durationSec: Number(_0x39119f?.['durationSec'] ?? _0x43bdfc['durationSec']),
-    sourceStartSec: _0x39119f?.['sourceStartSec'] ?? _0x43bdfc['sourceStartSec'],
-    sourceEndSec: _0x39119f?.['sourceEndSec'] ?? _0x43bdfc['sourceEndSec'],
-    shotBoundaries: (_0x43bdfc['shots'] || [])
+    durationSec: Number(sourceStartSec?.['durationSec'] ?? item['durationSec']),
+    sourceStartSec: sourceStartSec?.['sourceStartSec'] ?? item['sourceStartSec'],
+    sourceEndSec: sourceStartSec?.['sourceEndSec'] ?? item['sourceEndSec'],
+    shotBoundaries: (item['shots'] || [])
       ['slice'](0x0, -0x1)
-      ['map']((_0x56bb8e) => (_0x555ece += Number(_0x56bb8e['durationSec']))),
+      ['map']((data) => (result += Number(data['durationSec']))),
   };
 }
-export function buildReplicationReviewRequest(_0xf2d474, _0x1307fe, _0x9c2fd5, _0x98a7d0 = {}) {
-  const _0x58d714 = JSON['parse'](_0xf2d474['prompt']),
-    _0x458db6 = _0x58d714['task'] === 'repair_story_episode_split_quality',
-    _0xc8b7b7 = _0x458db6
-      ? _0x58d714['failedClips']['map']((_0x4f92c7) => _0x4f92c7['clip'])
-      : _0x58d714['clips'],
-    _0x5711b2 = projectReplicationPromptEvidence(
-      _0x1307fe,
-      new Set(_0xc8b7b7['map']((_0x2faa66) => _0x2faa66['ref'])),
+export function buildReplicationReviewRequest(args, options, target, source = {}) {
+  const task2 = JSON['parse'](args['prompt']),
+    next = task2['task'] === 'repair_story_episode_split_quality',
+    list = next ? task2['failedClips']['map']((current) => current['clip']) : task2['clips'],
+    sourceVideoEvidence = projectReplicationPromptEvidence(
+      options,
+      new Set(list['map']((entry) => entry['ref'])),
     ),
-    _0x4491d0 = {
-      task: _0x58d714['task'],
-      schemaVersion: _0x58d714['schemaVersion'],
-      episodeRef: _0x58d714['episodeRef'],
+    args2 = {
+      task: task2['task'],
+      schemaVersion: task2['schemaVersion'],
+      episodeRef: task2['episodeRef'],
       timingContract: buildReplicationTimingContract(
-        _0x9c2fd5,
-        _0x98a7d0['promptMode'] || _0x9c2fd5['promptMode'] || 'seedance-2.0',
-        _0xc8b7b7,
+        target,
+        source['promptMode'] || target['promptMode'] || 'seedance-2.0',
+        list,
       ),
-      sourceVideoEvidence: _0x5711b2,
-      assets: _0x58d714['assets'],
-      productionLimits: { maxClipDurationSeconds: _0x58d714['productionLimits']['maxClipDurationSeconds'] },
+      sourceVideoEvidence: sourceVideoEvidence,
+      assets: task2['assets'],
+      productionLimits: { maxClipDurationSeconds: task2['productionLimits']['maxClipDurationSeconds'] },
       promptRoute: replicationRoutePolicy(
-        resolveReplicationContentType(_0x1307fe['contentType'], _0xc8b7b7[0x0]?.['replicationContentType']),
+        resolveReplicationContentType(options['contentType'], list[0x0]?.['replicationContentType']),
       ),
       outputContract:
-        (_0x58d714['outputContract'] || '') +
+        (task2['outputContract'] || '') +
         '；复刻 shots 还须原样保留 sceneKey、textElements、spatialStart、spatialEnd。',
     },
-    _0x287363 = _0x458db6
+    record = next
       ? {
-          ..._0x4491d0,
-          repairRound: _0x58d714['repairRound'],
-          failedClips: _0x58d714['failedClips']['map'](({ timingBudget: _0x30471c, ..._0x51aa21 }) => ({
-            ..._0x51aa21,
-            lockedTiming: getReplicationLockedTiming(_0x51aa21['clip'], _0x9c2fd5),
+          ...args2,
+          repairRound: task2['repairRound'],
+          failedClips: task2['failedClips']['map'](({ timingBudget: timingBudget, ...args3 }) => ({
+            ...args3,
+            lockedTiming: getReplicationLockedTiming(args3['clip'], target),
           })),
-          readOnlyNeighboringClips: _0x58d714['readOnlyNeighboringClips'],
-          allowedAssetReferences: _0x58d714['allowedAssetReferences'],
+          readOnlyNeighboringClips: task2['readOnlyNeighboringClips'],
+          allowedAssetReferences: task2['allowedAssetReferences'],
           instruction: [
             '只返回 failedClips 的修补，每个 sourceClipRef 恰好一个同 ref 的 clip。lockedTiming 固定原片起止、总时长及 shotBoundaries 中的已有切点；允许按原片补充切点，但不能删除或移动已有切点。',
             REPLICATION_VISUAL_RULE,
@@ -177,12 +173,12 @@ export function buildReplicationReviewRequest(_0xf2d474, _0x1307fe, _0x9c2fd5, _
           ],
         }
       : {
-          ..._0x4491d0,
-          batchRef: _0x58d714['batchRef'],
-          phase: _0x58d714['phase'],
-          clips: _0x58d714['clips'],
-          neighboringClips: _0x58d714['neighboringClips'],
-          localSignals: _0x58d714['localSignals'],
+          ...args2,
+          batchRef: task2['batchRef'],
+          phase: task2['phase'],
+          clips: task2['clips'],
+          neighboringClips: task2['neighboringClips'],
+          localSignals: task2['localSignals'],
           criteria: [
             '对照来源逐句检查人声重复、遗漏、说话人、类型与穿插顺序，再检查画面和资产对应，最后检查切点与固定片段时长。',
             REPLICATION_VISUAL_RULE,
@@ -193,87 +189,83 @@ export function buildReplicationReviewRequest(_0xf2d474, _0x1307fe, _0x9c2fd5, _
           ],
         };
   return {
-    ..._0xf2d474,
-    prompt: JSON['stringify'](_0x287363),
+    ...args,
+    prompt: JSON['stringify'](record),
     systemPrompt: [
-      _0x458db6
+      next
         ? '你是原片分镜的局部纠错员。只修指定问题，返回严格 JSON。'
         : '你在核对已识别的原片证据和候选分镜，未提供原视频时不声称回看。只返回严格 JSON。',
       REPLICATION_CONTENT_RULE,
       REPLICATION_TIMELINE_RULE,
       REPLICATION_SOURCE_CUT_RULE,
-      ...(isStoryContinuousTimelinePromptMode(_0x98a7d0['promptMode'] || _0x9c2fd5['promptMode'])
+      ...(isStoryContinuousTimelinePromptMode(source['promptMode'] || target['promptMode'])
         ? [REPLICATION_INTEGER_TIMING_RULE]
         : []),
-      ...(_0x1307fe['adaptation']?.['audioLanguage'] ? [_0x1307fe['adaptation']['audioLanguage']] : []),
+      ...(options['adaptation']?.['audioLanguage'] ? [options['adaptation']['audioLanguage']] : []),
     ]['join']('\x0a'),
   };
 }
-export function assertReplicationRepairTiming(_0x311e12, _0x314649, _0x1bbbbd, _0x1dbb4a = {}) {
-  const _0x22b260 = getReplicationLockedTiming(_0x314649, _0x1bbbbd);
-  if (_0x311e12['length'] !== 0x1 || _0x311e12[0x0]['ref'] !== _0x314649['ref'])
+export function assertReplicationRepairTiming(list2, payload, handle, state = {}) {
+  const replicationLockedTiming = getReplicationLockedTiming(payload, handle);
+  if (list2['length'] !== 0x1 || list2[0x0]['ref'] !== payload['ref'])
     throw new Error('复刻修补不得改变片段数量或引用。');
-  const _0x44af9c = _0x311e12[0x0],
-    _0x34ab98 = (_0x44af9c['shots'] || [])['reduce'](
-      (_0x495a56, _0x1c73c4) => _0x495a56 + Number(_0x1c73c4['durationSec']),
-      0x0,
-    );
+  const config = list2[0x0],
+    scope = (config['shots'] || [])['reduce']((input, output) => input + Number(output['durationSec']), 0x0);
   if (
-    !Number['isFinite'](_0x34ab98) ||
-    !Number['isFinite'](Number(_0x44af9c['durationSec'])) ||
-    Math['abs'](_0x34ab98 - _0x22b260['durationSec']) > 0.001 ||
-    Math['abs'](Number(_0x44af9c['durationSec']) - _0x22b260['durationSec']) > 0.001 ||
+    !Number['isFinite'](scope) ||
+    !Number['isFinite'](Number(config['durationSec'])) ||
+    Math['abs'](scope - replicationLockedTiming['durationSec']) > 0.001 ||
+    Math['abs'](Number(config['durationSec']) - replicationLockedTiming['durationSec']) > 0.001 ||
     ['sourceStartSec', 'sourceEndSec']['some'](
-      (_0x850c02) =>
-        _0x44af9c[_0x850c02] != null &&
-        _0x22b260[_0x850c02] != null &&
-        _0x44af9c[_0x850c02] !== _0x22b260[_0x850c02],
+      (value2) =>
+        config[value2] != null &&
+        replicationLockedTiming[value2] != null &&
+        config[value2] !== replicationLockedTiming[value2],
     )
   )
     throw new Error(
-      '复刻修补时间已锁定为\x20' + _0x22b260['durationSec'] + ' 秒，禁止改变原片范围或片段总时长。',
+      '复刻修补时间已锁定为\x20' +
+        replicationLockedTiming['durationSec'] +
+        ' 秒，禁止改变原片范围或片段总时长。',
     );
-  let _0x2a698 = 0x0;
-  const _0x402976 = [];
-  for (const _0x28c2b2 of _0x44af9c['shots'] || []) {
-    if (
-      isStoryContinuousTimelinePromptMode(_0x1dbb4a['promptMode']) &&
-      !isValidIntegerTimelineShot(_0x28c2b2)
-    )
+  let value3 = 0x0;
+  const list3 = [];
+  for (const value4 of config['shots'] || []) {
+    if (isStoryContinuousTimelinePromptMode(state['promptMode']) && !isValidIntegerTimelineShot(value4))
       throw new Error(
         '复刻修补必须使用片段局部连续整数秒；小数切点须按 timingContract 映射，不能改变已有时间。',
       );
-    const _0x55de08 = _0x2a698;
-    _0x2a698 += Number(_0x28c2b2['durationSec']);
+    const value5 = value3;
+    value3 += Number(value4['durationSec']);
     if (
-      !(_0x2a698 > _0x55de08) ||
+      !(value3 > value5) ||
       ['startSec', 'endSec']['some'](
-        (_0x1185f7, _0x56bda0) =>
-          _0x28c2b2[_0x1185f7] != null &&
-          (!Number['isFinite'](Number(_0x28c2b2[_0x1185f7])) ||
-            Math['abs'](Number(_0x28c2b2[_0x1185f7]) - [_0x55de08, _0x2a698][_0x56bda0]) > 0.001),
+        (value6, value7) =>
+          value4[value6] != null &&
+          (!Number['isFinite'](Number(value4[value6])) ||
+            Math['abs'](Number(value4[value6]) - [value5, value3][value7]) > 0.001),
       )
     )
       throw new Error('复刻修补镜头时间无效，起止必须与原位累计时长一致。');
-    _0x402976['push'](_0x2a698);
+    list3['push'](value3);
   }
   if (
-    _0x22b260['shotBoundaries']['some'](
-      (_0x3fcdb2) =>
-        Number['isFinite'](_0x3fcdb2) &&
-        _0x3fcdb2 > 0x0 &&
-        _0x3fcdb2 < _0x22b260['durationSec'] &&
-        !_0x402976['some']((_0x57b1bf) => Math['abs'](_0x57b1bf - _0x3fcdb2) <= 0.001),
+    replicationLockedTiming['shotBoundaries']['some'](
+      (count) =>
+        Number['isFinite'](count) &&
+        count > 0x0 &&
+        count < replicationLockedTiming['durationSec'] &&
+        !list3['some']((value8) => Math['abs'](value8 - count) <= 0.001),
     )
   )
     throw new Error('复刻修补不得移动或删除已有镜头切点，原镜头时间已锁定。');
-  const _0x49bf3e = getReplicationClipTiming(_0x314649, _0x1bbbbd, _0x1dbb4a['promptMode']);
+  const replicationClipTiming = getReplicationClipTiming(payload, handle, state['promptMode']);
   if (
-    _0x1bbbbd['replication']?.['segmentPlan']?.['length'] &&
-    _0x402976['slice'](0x0, -0x1)['some'](
-      (_0x1a91d1) =>
-        !_0x22b260['shotBoundaries']['includes'](_0x1a91d1) &&
-        !_0x49bf3e['observedBoundaries']['includes'](_0x1a91d1),
+    handle['replication']?.['segmentPlan']?.['length'] &&
+    list3['slice'](0x0, -0x1)['some'](
+      (value9) =>
+        !replicationLockedTiming['shotBoundaries']['includes'](value9) &&
+        !replicationClipTiming['observedBoundaries']['includes'](value9),
     )
   )
     throw new Error('修补新增切点缺少原片逐镜依据，未采用猜测的镜头时间；请先核对原片镜头。');

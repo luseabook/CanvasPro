@@ -4,100 +4,100 @@ const DOUYIN_DETAIL_API_PATH_RE = /\/aweme\/v1\/web\/aweme\/detail\//i,
   MAX_DOUYIN_DETAIL_API_REPLAY = 6,
   MAX_DOUYIN_AWEME_SCAN_DEPTH = 8,
   MAX_DOUYIN_AWEME_DETAILS = 40;
-function normalizeHttpUrl(_0x47c312, _0x41da29 = '') {
-  const _0x187e49 = String(_0x47c312 || '').trim();
-  if (!_0x187e49) return '';
+function normalizeHttpUrl(value, item = '') {
+  const enabled = String(value || '').trim();
+  if (!enabled) return '';
   try {
-    const _0x4f8ef1 = _0x41da29 ? new URL(_0x187e49, _0x41da29) : new URL(_0x187e49);
-    if (_0x4f8ef1.protocol !== 'http:' && _0x4f8ef1.protocol !== 'https:') return '';
-    return ((_0x4f8ef1.username = ''), (_0x4f8ef1.password = ''), _0x4f8ef1.href);
+    const key = item ? new URL(enabled, item) : new URL(enabled);
+    if (key.protocol !== 'http:' && key.protocol !== 'https:') return '';
+    return ((key.username = ''), (key.password = ''), key.href);
   } catch {
     return '';
   }
 }
-function isDouyinHost(_0x111056) {
-  const _0x533d7f = String(_0x111056 || '')
+function isDouyinHost(index) {
+  const result = String(index || '')
     .trim()
     .toLowerCase()
     .replace(/\.$/, '');
   return (
-    _0x533d7f === 'douyin.com' ||
-    _0x533d7f.endsWith('.douyin.com') ||
-    _0x533d7f === 'iesdouyin.com' ||
-    _0x533d7f.endsWith('.iesdouyin.com')
+    result === 'douyin.com' ||
+    result.endsWith('.douyin.com') ||
+    result === 'iesdouyin.com' ||
+    result.endsWith('.iesdouyin.com')
   );
 }
-export function extractDouyinAwemeIdFromUrl(_0x143c74) {
-  const _0x4ff89d = normalizeHttpUrl(_0x143c74);
-  if (!_0x4ff89d) return '';
+export function extractDouyinAwemeIdFromUrl(data) {
+  const httpUrl = normalizeHttpUrl(data);
+  if (!httpUrl) return '';
   try {
-    const _0x1c53df = new URL(_0x4ff89d);
-    if (!isDouyinHost(_0x1c53df.hostname)) return '';
-    for (const _0xda54f7 of ['aweme_id', 'modal_id', 'item_id', 'group_id']) {
-      const _0x449c62 = _0x1c53df.searchParams.get(_0xda54f7);
-      if (DOUYIN_WORK_ID_RE.test(_0x449c62 || '')) return _0x449c62.match(DOUYIN_WORK_ID_RE)[0];
+    const uRL = new URL(httpUrl);
+    if (!isDouyinHost(uRL.hostname)) return '';
+    for (const options of ['aweme_id', 'modal_id', 'item_id', 'group_id']) {
+      const target = uRL.searchParams.get(options);
+      if (DOUYIN_WORK_ID_RE.test(target || '')) return target.match(DOUYIN_WORK_ID_RE)[0];
     }
-    const _0x1e0718 = _0x1c53df.pathname.match(
+    const source = uRL.pathname.match(
       /\/(?:video|note|slides|share\/(?:video|note|slides))\/(\d{15,25})(?:\/|$)/i,
     );
-    if (_0x1e0718?.[1]) return _0x1e0718[1];
-    const _0x368840 = _0x1c53df.pathname.match(DOUYIN_WORK_ID_RE);
-    return _0x368840?.[0] || '';
+    if (source?.[1]) return source[1];
+    const next = uRL.pathname.match(DOUYIN_WORK_ID_RE);
+    return next?.[0] || '';
   } catch {
     return '';
   }
 }
-function isDouyinDetailApiUrl(_0x15bbc2) {
-  const _0x3c0630 = normalizeHttpUrl(_0x15bbc2);
-  if (!_0x3c0630) return false;
+function isDouyinDetailApiUrl(current) {
+  const httpUrl2 = normalizeHttpUrl(current);
+  if (!httpUrl2) return false;
   try {
-    const _0x7e60f5 = new URL(_0x3c0630);
+    const uRL2 = new URL(httpUrl2);
     return (
-      isDouyinHost(_0x7e60f5.hostname) &&
-      DOUYIN_DETAIL_API_PATH_RE.test(_0x7e60f5.pathname) &&
-      DOUYIN_WORK_ID_RE.test(_0x7e60f5.searchParams.get('aweme_id') || '')
+      isDouyinHost(uRL2.hostname) &&
+      DOUYIN_DETAIL_API_PATH_RE.test(uRL2.pathname) &&
+      DOUYIN_WORK_ID_RE.test(uRL2.searchParams.get('aweme_id') || '')
     );
   } catch {
     return false;
   }
 }
-function normalizeDouyinDetailApiUrls(_0x2a87a9 = []) {
-  const _0x4268b8 = [],
-    _0x1c6806 = new Set();
-  for (const _0x2ff186 of Array.isArray(_0x2a87a9) ? _0x2a87a9 : []) {
-    const _0x41da35 = normalizeHttpUrl(_0x2ff186);
-    if (!_0x41da35 || _0x1c6806.has(_0x41da35) || !isDouyinDetailApiUrl(_0x41da35)) continue;
-    (_0x1c6806.add(_0x41da35), _0x4268b8.push(_0x41da35));
-    if (_0x4268b8.length >= MAX_DOUYIN_DETAIL_API_REPLAY) break;
+function normalizeDouyinDetailApiUrls(list = []) {
+  const list2 = [],
+    map = new Set();
+  for (const entry of Array.isArray(list) ? list : []) {
+    const httpUrl3 = normalizeHttpUrl(entry);
+    if (!httpUrl3 || map.has(httpUrl3) || !isDouyinDetailApiUrl(httpUrl3)) continue;
+    (map.add(httpUrl3), list2.push(httpUrl3));
+    if (list2.length >= MAX_DOUYIN_DETAIL_API_REPLAY) break;
   }
-  return _0x4268b8;
+  return list2;
 }
-function toArray(_0x15a721) {
-  if (Array.isArray(_0x15a721)) return _0x15a721;
-  return _0x15a721 === undefined || _0x15a721 === null ? [] : [_0x15a721];
+function toArray(record) {
+  if (Array.isArray(record)) return record;
+  return record === undefined || record === null ? [] : [record];
 }
-function readObjectValue(_0xbaa714, _0x403f8a = []) {
-  if (!_0xbaa714 || typeof _0xbaa714 !== 'object') return undefined;
-  for (const _0x2f7847 of _0x403f8a) {
-    if (Object.prototype.hasOwnProperty.call(_0xbaa714, _0x2f7847)) return _0xbaa714[_0x2f7847];
+function readObjectValue(enabled2, payload = []) {
+  if (!enabled2 || typeof enabled2 !== 'object') return undefined;
+  for (const handle of payload) {
+    if (Object.prototype.hasOwnProperty.call(enabled2, handle)) return enabled2[handle];
   }
   return undefined;
 }
-function readNumber(_0x3b863b, _0x3d50a9 = []) {
-  const _0x26c7ed = Array.isArray(_0x3d50a9) ? readObjectValue(_0x3b863b, _0x3d50a9) : _0x3b863b,
-    _0x134884 = Number(_0x26c7ed);
-  return Number.isFinite(_0x134884) && _0x134884 > 0 ? _0x134884 : 0;
+function readNumber(state, config = []) {
+  const scope = Array.isArray(config) ? readObjectValue(state, config) : state,
+    count = Number(scope);
+  return Number.isFinite(count) && count > 0 ? count : 0;
 }
-function sanitizeTitle(_0xb1573, _0x387a5e = '抖音素材') {
+function sanitizeTitle(input, output = '抖音素材') {
   return (
-    String(_0xb1573 || _0x387a5e)
+    String(input || output)
       .trim()
       .replace(/\s+/g, ' ')
-      .slice(0, 160) || _0x387a5e
+      .slice(0, 160) || output
   );
 }
-function normalizeEscapedUrlText(_0x27dc48) {
-  return String(_0x27dc48 || '')
+function normalizeEscapedUrlText(value2) {
+  return String(value2 || '')
     .replace(/\\u002[fF]/g, '/')
     .replace(/\\u0026/g, '&')
     .replace(/\\u003[dD]/g, '=')
@@ -105,34 +105,34 @@ function normalizeEscapedUrlText(_0x27dc48) {
     .replace(/&amp;/g, '&')
     .trim();
 }
-function extractUrlsFromValue(_0x3e520b) {
-  const _0x3f31e3 = normalizeEscapedUrlText(_0x3e520b);
-  if (!_0x3f31e3) return [];
-  const _0x3f87e6 = [],
-    _0x1ec134 = normalizeHttpUrl(_0x3f31e3);
-  if (_0x1ec134) _0x3f87e6.push(_0x1ec134);
-  const _0x498d7b = /https?:\/\/[^"'\s<>]+/g;
-  let _0x2c7e92 = null;
-  while ((_0x2c7e92 = _0x498d7b.exec(_0x3f31e3))) {
-    const _0x29d1b5 = normalizeHttpUrl(_0x2c7e92[0].replace(/[),.;，。；）]+$/u, ''));
-    if (_0x29d1b5) _0x3f87e6.push(_0x29d1b5);
+function extractUrlsFromValue(value3) {
+  const escapedUrlText = normalizeEscapedUrlText(value3);
+  if (!escapedUrlText) return [];
+  const list3 = [],
+    httpUrl4 = normalizeHttpUrl(escapedUrlText);
+  if (httpUrl4) list3.push(httpUrl4);
+  const value4 = /https?:\/\/[^"'\s<>]+/g;
+  let value5 = null;
+  while ((value5 = value4.exec(escapedUrlText))) {
+    const httpUrl5 = normalizeHttpUrl(value5[0].replace(/[),.;，。；）]+$/u, ''));
+    if (httpUrl5) list3.push(httpUrl5);
   }
-  return Array.from(new Set(_0x3f87e6));
+  return Array.from(new Set(list3));
 }
-function addressUrlCandidates(_0x223f42) {
-  const _0xa35205 = [],
-    _0x4972fa = (_0x13613e, _0x15368c = 0) => {
-      if (_0x15368c > 6 || _0x13613e === undefined || _0x13613e === null) return;
-      if (typeof _0x13613e === 'string') {
-        _0xa35205.push(...extractUrlsFromValue(_0x13613e));
+function addressUrlCandidates(value6) {
+  const list4 = [],
+    handler = (value7, count2 = 0) => {
+      if (count2 > 6 || value7 === undefined || value7 === null) return;
+      if (typeof value7 === 'string') {
+        list4.push(...extractUrlsFromValue(value7));
         return;
       }
-      if (Array.isArray(_0x13613e)) {
-        for (const _0x40e0a2 of _0x13613e) _0x4972fa(_0x40e0a2, _0x15368c + 1);
+      if (Array.isArray(value7)) {
+        for (const value8 of value7) handler(value8, count2 + 1);
         return;
       }
-      if (typeof _0x13613e !== 'object') return;
-      for (const _0xa14970 of [
+      if (typeof value7 !== 'object') return;
+      for (const value9 of [
         'url_list',
         'urlList',
         'url',
@@ -153,82 +153,81 @@ function addressUrlCandidates(_0x223f42) {
         'imageUrl',
         'uri',
       ]) {
-        Object.prototype.hasOwnProperty.call(_0x13613e, _0xa14970) &&
-          _0x4972fa(_0x13613e[_0xa14970], _0x15368c + 1);
+        Object.prototype.hasOwnProperty.call(value7, value9) && handler(value7[value9], count2 + 1);
       }
     };
-  return (_0x4972fa(_0x223f42), Array.from(new Set(_0xa35205)));
+  return (handler(value6), Array.from(new Set(list4)));
 }
-function pickPreferredAddressUrl(_0x1a2b4d) {
-  const _0x5d4524 = addressUrlCandidates(_0x1a2b4d);
-  return _0x5d4524.at(-1) || '';
+function pickPreferredAddressUrl(value10) {
+  const addressUrlCandidates2 = addressUrlCandidates(value10);
+  return addressUrlCandidates2.at(-1) || '';
 }
-function normalizeDouyinDurationSeconds(_0x46be38) {
-  const _0x2f0a49 = Number(_0x46be38);
-  if (!Number.isFinite(_0x2f0a49) || _0x2f0a49 <= 0) return 0;
-  return _0x2f0a49 >= 0x3e8 ? _0x2f0a49 / 0x3e8 : _0x2f0a49;
+function normalizeDouyinDurationSeconds(value11) {
+  const count3 = Number(value11);
+  if (!Number.isFinite(count3) || count3 <= 0) return 0;
+  return count3 >= 0x3e8 ? count3 / 0x3e8 : count3;
 }
-function getDouyinVideoTitle(_0x3addd6, _0x18206a = '抖音视频') {
+function getDouyinVideoTitle(value12, value13 = '抖音视频') {
   return sanitizeTitle(
-    _0x3addd6?.desc ||
-      _0x3addd6?.item_title ||
-      _0x3addd6?.itemTitle ||
-      _0x3addd6?.share_info?.share_title ||
-      _0x3addd6?.shareInfo?.shareTitle,
-    _0x18206a,
+    value12?.desc ||
+      value12?.item_title ||
+      value12?.itemTitle ||
+      value12?.share_info?.share_title ||
+      value12?.shareInfo?.shareTitle,
+    value13,
   );
 }
-function getVideoAddress(_0x4e4a92) {
+function getVideoAddress(value14) {
   return (
-    _0x4e4a92?.play_addr ||
-    _0x4e4a92?.playAddr ||
-    _0x4e4a92?.PlayAddr ||
-    _0x4e4a92?.download_addr ||
-    _0x4e4a92?.downloadAddr ||
-    _0x4e4a92
+    value14?.play_addr ||
+    value14?.playAddr ||
+    value14?.PlayAddr ||
+    value14?.download_addr ||
+    value14?.downloadAddr ||
+    value14
   );
 }
-function scoreBitRateItem(_0x23a0c8 = {}) {
-  const _0x268442 = getVideoAddress(_0x23a0c8),
-    _0x213a3d = readNumber(_0x268442, ['height', 'h']) || readNumber(_0x23a0c8, ['height', 'h']),
-    _0x5d8bc9 = readNumber(_0x268442, ['width', 'w']) || readNumber(_0x23a0c8, ['width', 'w']),
-    _0x1a29ae = readNumber(_0x23a0c8, ['FPS', 'fps']),
-    _0x256b7f = readNumber(_0x23a0c8, ['bit_rate', 'bitRate', 'bitrate']),
-    _0x151e37 =
-      readNumber(_0x268442, ['data_size', 'dataSize']) || readNumber(_0x23a0c8, ['data_size', 'dataSize']);
-  return [Math.max(_0x213a3d, _0x5d8bc9), _0x1a29ae, _0x256b7f, _0x151e37];
+function scoreBitRateItem(options2 = {}) {
+  const videoAddress = getVideoAddress(options2),
+    number = readNumber(videoAddress, ['height', 'h']) || readNumber(options2, ['height', 'h']),
+    number2 = readNumber(videoAddress, ['width', 'w']) || readNumber(options2, ['width', 'w']),
+    number3 = readNumber(options2, ['FPS', 'fps']),
+    number4 = readNumber(options2, ['bit_rate', 'bitRate', 'bitrate']),
+    number5 =
+      readNumber(videoAddress, ['data_size', 'dataSize']) || readNumber(options2, ['data_size', 'dataSize']);
+  return [Math.max(number, number2), number3, number4, number5];
 }
-function compareScore(_0x40f87d, _0x3af3db) {
-  for (let _0x11c126 = 0; _0x11c126 < Math.max(_0x40f87d.length, _0x3af3db.length); _0x11c126 += 1) {
-    const _0x406080 = Number(_0x40f87d[_0x11c126] || 0) - Number(_0x3af3db[_0x11c126] || 0);
-    if (_0x406080 !== 0) return _0x406080;
+function compareScore(list5, list6) {
+  for (let value15 = 0; value15 < Math.max(list5.length, list6.length); value15 += 1) {
+    const count4 = Number(list5[value15] || 0) - Number(list6[value15] || 0);
+    if (count4 !== 0) return count4;
   }
   return 0;
 }
-function pickBestBitRateVideo(_0x5b47df = {}) {
-  const _0x39f98a = toArray(
-      _0x5b47df?.bit_rate || _0x5b47df?.bitRate || _0x5b47df?.bitrate_info || _0x5b47df?.bitrateInfo,
-    ).filter((_0x26dfcd) => _0x26dfcd && typeof _0x26dfcd === 'object'),
-    _0x5e9936 = _0x39f98a
-      .map((_0x539bb4) => {
-        const _0x51c1ec = getVideoAddress(_0x539bb4),
-          _0xcdf5b7 = pickPreferredAddressUrl(_0x51c1ec);
-        if (!_0xcdf5b7) return null;
+function pickBestBitRateVideo(options3 = {}) {
+  const list7 = toArray(
+      options3?.bit_rate || options3?.bitRate || options3?.bitrate_info || options3?.bitrateInfo,
+    ).filter((item2) => item2 && typeof item2 === 'object'),
+    value16 = list7
+      .map((item3) => {
+        const videoAddress2 = getVideoAddress(item3),
+          url = pickPreferredAddressUrl(videoAddress2);
+        if (!url) return null;
         return {
-          url: _0xcdf5b7,
-          score: scoreBitRateItem(_0x539bb4),
-          width: readNumber(_0x51c1ec, ['width', 'w']) || readNumber(_0x539bb4, ['width', 'w']),
-          height: readNumber(_0x51c1ec, ['height', 'h']) || readNumber(_0x539bb4, ['height', 'h']),
+          url: url,
+          score: scoreBitRateItem(item3),
+          width: readNumber(videoAddress2, ['width', 'w']) || readNumber(item3, ['width', 'w']),
+          height: readNumber(videoAddress2, ['height', 'h']) || readNumber(item3, ['height', 'h']),
         };
       })
       .filter(Boolean)
-      .sort((_0x3d8692, _0x4f1ed7) => compareScore(_0x3d8692.score, _0x4f1ed7.score));
-  return _0x5e9936.at(-1) || null;
+      .sort((item4, value17) => compareScore(item4.score, value17.score));
+  return value16.at(-1) || null;
 }
-function pickDouyinVideoDownload(_0x36e8b2 = {}) {
-  const _0x49bcb4 = pickBestBitRateVideo(_0x36e8b2);
-  if (_0x49bcb4?.url) return _0x49bcb4;
-  for (const _0x439929 of [
+function pickDouyinVideoDownload(options4 = {}) {
+  const response = pickBestBitRateVideo(options4);
+  if (response?.url) return response;
+  for (const value18 of [
     'play_addr_h264',
     'playAddrH264',
     'play_addr_256',
@@ -238,190 +237,189 @@ function pickDouyinVideoDownload(_0x36e8b2 = {}) {
     'download_addr',
     'downloadAddr',
   ]) {
-    const _0x5030b2 = pickPreferredAddressUrl(_0x36e8b2?.[_0x439929]);
-    if (!_0x5030b2) continue;
+    const url2 = pickPreferredAddressUrl(options4?.[value18]);
+    if (!url2) continue;
     return {
-      url: _0x5030b2,
-      width: readNumber(_0x36e8b2?.[_0x439929], ['width', 'w']) || readNumber(_0x36e8b2, ['width', 'w']),
-      height: readNumber(_0x36e8b2?.[_0x439929], ['height', 'h']) || readNumber(_0x36e8b2, ['height', 'h']),
+      url: url2,
+      width: readNumber(options4?.[value18], ['width', 'w']) || readNumber(options4, ['width', 'w']),
+      height: readNumber(options4?.[value18], ['height', 'h']) || readNumber(options4, ['height', 'h']),
     };
   }
   return null;
 }
-function normalizeDouyinVideoCandidate(_0x43bbac, _0x5bb8e4 = {}) {
-  const _0x4acbf6 = _0x5bb8e4.video || _0x43bbac?.video;
-  if (!_0x4acbf6 || typeof _0x4acbf6 !== 'object') return null;
-  const _0x224e5d = pickDouyinVideoDownload(_0x4acbf6);
-  if (!_0x224e5d?.url) return null;
-  const _0x844b35 = sanitizeTitle(_0x5bb8e4.title || getDouyinVideoTitle(_0x43bbac), '抖音视频');
+function normalizeDouyinVideoCandidate(value19, value20 = {}) {
+  const enabled3 = value20.video || value19?.video;
+  if (!enabled3 || typeof enabled3 !== 'object') return null;
+  const url3 = pickDouyinVideoDownload(enabled3);
+  if (!url3?.url) return null;
+  const title = sanitizeTitle(value20.title || getDouyinVideoTitle(value19), '抖音视频');
   return {
     kind: 'video',
-    url: _0x224e5d.url,
-    title: _0x844b35,
-    pageUrl: normalizeHttpUrl(_0x5bb8e4.pageUrl),
-    pageTitle: sanitizeTitle(_0x5bb8e4.pageTitle || _0x844b35, ''),
-    nodeId: String(_0x5bb8e4.nodeId || '').trim(),
-    tabId: String(_0x5bb8e4.tabId || '').trim(),
+    url: url3.url,
+    title: title,
+    pageUrl: normalizeHttpUrl(value20.pageUrl),
+    pageTitle: sanitizeTitle(value20.pageTitle || title, ''),
+    nodeId: String(value20.nodeId || '').trim(),
+    tabId: String(value20.tabId || '').trim(),
     width:
-      Math.max(0, Math.round(Number(_0x224e5d.width || 0) || 0)) ||
-      Math.max(0, Math.round(readNumber(_0x4acbf6, ['width', 'w', 'videoWidth']))),
+      Math.max(0, Math.round(Number(url3.width || 0) || 0)) ||
+      Math.max(0, Math.round(readNumber(enabled3, ['width', 'w', 'videoWidth']))),
     height:
-      Math.max(0, Math.round(Number(_0x224e5d.height || 0) || 0)) ||
-      Math.max(0, Math.round(readNumber(_0x4acbf6, ['height', 'h', 'videoHeight']))),
+      Math.max(0, Math.round(Number(url3.height || 0) || 0)) ||
+      Math.max(0, Math.round(readNumber(enabled3, ['height', 'h', 'videoHeight']))),
     duration: normalizeDouyinDurationSeconds(
-      _0x4acbf6?.duration || _0x43bbac?.duration || _0x4acbf6?.videoDuration,
+      enabled3?.duration || value19?.duration || enabled3?.videoDuration,
     ),
     sourceType: DOUYIN_VIDEO_SOURCE_TYPE,
     mimeType: 'video/mp4',
   };
 }
-function readDouyinImageList(_0x1df0fc = {}) {
-  const _0x1a21f6 = toArray(_0x1df0fc?.images).filter(Boolean),
-    _0x15a23c = toArray(_0x1df0fc?.image_post_info?.images || _0x1df0fc?.imagePostInfo?.images).filter(
-      Boolean,
-    );
-  return _0x1a21f6.length ? _0x1a21f6 : _0x15a23c;
+function readDouyinImageList(options5 = {}) {
+  const list8 = toArray(options5?.images).filter(Boolean),
+    toArray2 = toArray(options5?.image_post_info?.images || options5?.imagePostInfo?.images).filter(Boolean);
+  return list8.length ? list8 : toArray2;
 }
-function normalizeDouyinImageCandidates(_0xbd5680, _0x287b60 = {}) {
-  const _0xb043b8 = sanitizeTitle(getDouyinVideoTitle(_0xbd5680, '抖音图集'), '抖音图集'),
-    _0x4d6a37 = [],
-    _0x5a584b = [];
+function normalizeDouyinImageCandidates(value21, args = {}) {
+  const title2 = sanitizeTitle(getDouyinVideoTitle(value21, '抖音图集'), '抖音图集'),
+    images = [],
+    videos = [];
   return (
-    readDouyinImageList(_0xbd5680).forEach((_0x278e6a, _0x1646d9) => {
-      if (!_0x278e6a || typeof _0x278e6a !== 'object') return;
-      if (_0x278e6a.video && typeof _0x278e6a.video === 'object') {
-        const _0x418e60 = normalizeDouyinVideoCandidate(_0xbd5680, {
-          ..._0x287b60,
-          video: _0x278e6a.video,
-          title: _0xb043b8 + ' #' + (_0x1646d9 + 1),
+    readDouyinImageList(value21).forEach((video, value22) => {
+      if (!video || typeof video !== 'object') return;
+      if (video.video && typeof video.video === 'object') {
+        const douyinVideoCandidate = normalizeDouyinVideoCandidate(value21, {
+          ...args,
+          video: video.video,
+          title: title2 + ' #' + (value22 + 1),
         });
-        if (_0x418e60) _0x5a584b.push(_0x418e60);
+        if (douyinVideoCandidate) videos.push(douyinVideoCandidate);
         return;
       }
-      const _0x574df2 = pickPreferredAddressUrl(_0x278e6a);
-      if (!_0x574df2) return;
-      _0x4d6a37.push({
+      const url4 = pickPreferredAddressUrl(video);
+      if (!url4) return;
+      images.push({
         kind: 'image',
-        url: _0x574df2,
-        title: _0xb043b8 + ' #' + (_0x1646d9 + 1),
-        pageUrl: normalizeHttpUrl(_0x287b60.pageUrl),
-        pageTitle: sanitizeTitle(_0x287b60.pageTitle || _0xb043b8, ''),
-        nodeId: String(_0x287b60.nodeId || '').trim(),
-        tabId: String(_0x287b60.tabId || '').trim(),
-        width: Math.max(0, Math.round(readNumber(_0x278e6a, ['width', 'w']))),
-        height: Math.max(0, Math.round(readNumber(_0x278e6a, ['height', 'h']))),
+        url: url4,
+        title: title2 + ' #' + (value22 + 1),
+        pageUrl: normalizeHttpUrl(args.pageUrl),
+        pageTitle: sanitizeTitle(args.pageTitle || title2, ''),
+        nodeId: String(args.nodeId || '').trim(),
+        tabId: String(args.tabId || '').trim(),
+        width: Math.max(0, Math.round(readNumber(video, ['width', 'w']))),
+        height: Math.max(0, Math.round(readNumber(video, ['height', 'h']))),
         sourceType: 'douyin-detail',
       });
     }),
-    { images: _0x4d6a37, videos: _0x5a584b }
+    { images: images, videos: videos }
   );
 }
-export function normalizeDouyinAwemeMedia(_0xc1376d, _0x53ae78 = {}) {
-  if (!_0xc1376d || typeof _0xc1376d !== 'object') return { images: [], videos: [] };
-  const _0x48478d = normalizeDouyinImageCandidates(_0xc1376d, _0x53ae78);
-  if (_0x48478d.images.length || _0x48478d.videos.length) return _0x48478d;
-  const _0x2953ec = normalizeDouyinVideoCandidate(_0xc1376d, _0x53ae78);
-  return { images: [], videos: _0x2953ec ? [_0x2953ec] : [] };
+export function normalizeDouyinAwemeMedia(enabled4, value23 = {}) {
+  if (!enabled4 || typeof enabled4 !== 'object') return { images: [], videos: [] };
+  const douyinImageCandidates = normalizeDouyinImageCandidates(enabled4, value23);
+  if (douyinImageCandidates.images.length || douyinImageCandidates.videos.length)
+    return douyinImageCandidates;
+  const videos2 = normalizeDouyinVideoCandidate(enabled4, value23);
+  return { images: [], videos: videos2 ? [videos2] : [] };
 }
-function looksLikeAwemeDetail(_0x492446) {
-  if (!_0x492446 || typeof _0x492446 !== 'object') return false;
+function looksLikeAwemeDetail(enabled5) {
+  if (!enabled5 || typeof enabled5 !== 'object') return false;
   return Boolean(
-    _0x492446.video ||
-    _0x492446.images ||
-    _0x492446.image_post_info ||
-    _0x492446.imagePostInfo ||
-    _0x492446.aweme_id ||
-    _0x492446.awemeId,
+    enabled5.video ||
+    enabled5.images ||
+    enabled5.image_post_info ||
+    enabled5.imagePostInfo ||
+    enabled5.aweme_id ||
+    enabled5.awemeId,
   );
 }
-export function collectDouyinAwemeDetails(_0x50c0e4) {
-  const _0x547c40 = [],
-    _0x429526 = new WeakSet(),
-    _0x424507 = new Set(),
-    _0x4a4490 = (_0x481617) => {
-      if (!looksLikeAwemeDetail(_0x481617)) return;
-      const _0x530be3 = String(_0x481617.aweme_id || _0x481617.awemeId || _0x481617.id || '').trim(),
-        _0x199a98 = _0x530be3 || _0x547c40.length + ':' + (_0x481617.desc || '');
-      if (_0x424507.has(_0x199a98)) return;
-      (_0x424507.add(_0x199a98), _0x547c40.push(_0x481617));
+export function collectDouyinAwemeDetails(value24) {
+  const list9 = [],
+    map2 = new WeakSet(),
+    map3 = new Set(),
+    handler2 = (value25) => {
+      if (!looksLikeAwemeDetail(value25)) return;
+      const value26 = String(value25.aweme_id || value25.awemeId || value25.id || '').trim(),
+        value27 = value26 || list9.length + ':' + (value25.desc || '');
+      if (map3.has(value27)) return;
+      (map3.add(value27), list9.push(value25));
     },
-    _0x42501e = (_0x3691c1, _0x475cdd = 0) => {
+    handler3 = (enabled6, value28 = 0) => {
       if (
-        _0x475cdd > MAX_DOUYIN_AWEME_SCAN_DEPTH ||
-        _0x547c40.length >= MAX_DOUYIN_AWEME_DETAILS ||
-        !_0x3691c1 ||
-        typeof _0x3691c1 !== 'object'
+        value28 > MAX_DOUYIN_AWEME_SCAN_DEPTH ||
+        list9.length >= MAX_DOUYIN_AWEME_DETAILS ||
+        !enabled6 ||
+        typeof enabled6 !== 'object'
       )
         return;
-      if (_0x429526.has(_0x3691c1)) return;
-      _0x429526.add(_0x3691c1);
-      if (looksLikeAwemeDetail(_0x3691c1)) _0x4a4490(_0x3691c1);
-      const _0x1c654b = _0x3691c1.aweme_detail || _0x3691c1.awemeDetail;
-      if (_0x1c654b) _0x42501e(_0x1c654b, _0x475cdd + 1);
-      for (const _0x63919c of ['aweme_list', 'awemeList', 'items', 'data']) {
-        const _0x25fe29 = _0x3691c1[_0x63919c];
-        if (!_0x25fe29) continue;
-        if (Array.isArray(_0x25fe29)) {
-          for (const _0x5c2df7 of _0x25fe29) _0x42501e(_0x5c2df7, _0x475cdd + 1);
-        } else _0x42501e(_0x25fe29, _0x475cdd + 1);
+      if (map2.has(enabled6)) return;
+      map2.add(enabled6);
+      if (looksLikeAwemeDetail(enabled6)) handler2(enabled6);
+      const value29 = enabled6.aweme_detail || enabled6.awemeDetail;
+      if (value29) handler3(value29, value28 + 1);
+      for (const value30 of ['aweme_list', 'awemeList', 'items', 'data']) {
+        const enabled7 = enabled6[value30];
+        if (!enabled7) continue;
+        if (Array.isArray(enabled7)) {
+          for (const value31 of enabled7) handler3(value31, value28 + 1);
+        } else handler3(enabled7, value28 + 1);
       }
     };
-  return (_0x42501e(_0x50c0e4), _0x547c40);
+  return (handler3(value24), list9);
 }
-async function readJsonResponse(_0x411d0d) {
-  if (typeof _0x411d0d?.json === 'function') return await _0x411d0d.json();
-  if (typeof _0x411d0d?.text === 'function') {
-    const _0x2b698c = await _0x411d0d.text();
-    return JSON.parse(_0x2b698c);
+async function readJsonResponse(response2) {
+  if (typeof response2?.json === 'function') return await response2.json();
+  if (typeof response2?.text === 'function') {
+    const value32 = await response2.text();
+    return JSON.parse(value32);
   }
   return null;
 }
 async function fetchDouyinDetailPayloads({
   detailApiUrls: detailApiUrls = [],
-  sessionRef: _0xe294a9,
+  sessionRef: sessionRef,
   pageUrl: pageUrl = '',
-  logDiagnosticEvent: _0x699e54,
+  logDiagnosticEvent: logDiagnosticEvent,
 } = {}) {
-  if (typeof _0xe294a9?.fetch !== 'function') return [];
-  const _0x28ab89 = [],
-    _0x4389a6 = normalizeHttpUrl(pageUrl) || 'https://www.douyin.com/',
-    _0x1a1d6f = String(_0xe294a9?.getUserAgent?.() || '').trim();
-  for (const _0x647b83 of normalizeDouyinDetailApiUrls(detailApiUrls)) {
+  if (typeof sessionRef?.fetch !== 'function') return [];
+  const list10 = [],
+    Referer = normalizeHttpUrl(pageUrl) || 'https://www.douyin.com/',
+    value33 = String(sessionRef?.getUserAgent?.() || '').trim();
+  for (const url5 of normalizeDouyinDetailApiUrls(detailApiUrls)) {
     try {
-      const _0x4617dd = await _0xe294a9.fetch(_0x647b83, {
+      const response3 = await sessionRef.fetch(url5, {
         method: 'GET',
         redirect: 'follow',
         headers: {
           Accept: 'application/json,text/plain,*/*',
-          Referer: _0x4389a6,
-          ...(_0x1a1d6f ? { 'User-Agent': _0x1a1d6f } : {}),
+          Referer: Referer,
+          ...(value33 ? { 'User-Agent': value33 } : {}),
         },
       });
-      if (!_0x4617dd?.ok) throw new Error('Douyin detail HTTP ' + (_0x4617dd?.status || 0));
-      const _0x4a113a = await readJsonResponse(_0x4617dd);
-      if (_0x4a113a && typeof _0x4a113a === 'object') _0x28ab89.push(_0x4a113a);
-    } catch (_0x49ce07) {
-      _0x699e54?.({
+      if (!response3?.ok) throw new Error('Douyin detail HTTP ' + (response3?.status || 0));
+      const jsonResponse = await readJsonResponse(response3);
+      if (jsonResponse && typeof jsonResponse === 'object') list10.push(jsonResponse);
+    } catch (error) {
+      logDiagnosticEvent?.({
         type: 'web_preview.douyin_detail_fetch_failed',
         level: 'warn',
         source: 'main',
         message: 'Douyin detail replay failed',
-        error: _0x49ce07,
-        context: { url: _0x647b83, pageUrl: _0x4389a6, awemeId: extractDouyinAwemeIdFromUrl(_0x647b83) },
+        error: error,
+        context: { url: url5, pageUrl: Referer, awemeId: extractDouyinAwemeIdFromUrl(url5) },
       });
     }
   }
-  return _0x28ab89;
+  return list10;
 }
-function dedupeCandidates(_0x62dffe = []) {
-  const _0x51b55a = [],
-    _0x1f343a = new Set();
-  for (const _0x415823 of _0x62dffe) {
-    const _0x434871 = normalizeHttpUrl(_0x415823?.url);
-    if (!_0x434871 || _0x1f343a.has(_0x434871)) continue;
-    (_0x1f343a.add(_0x434871), _0x51b55a.push({ ..._0x415823, url: _0x434871 }));
+function dedupeCandidates(list11 = []) {
+  const list12 = [],
+    map4 = new Set();
+  for (const response4 of list11) {
+    const url6 = normalizeHttpUrl(response4?.url);
+    if (!url6 || map4.has(url6)) continue;
+    (map4.add(url6), list12.push({ ...response4, url: url6 }));
   }
-  return _0x51b55a;
+  return list12;
 }
 export async function resolveDouyinCurrentPageMedia({
   pageUrl: pageUrl = '',
@@ -429,34 +427,34 @@ export async function resolveDouyinCurrentPageMedia({
   nodeId: nodeId = '',
   tabId: tabId = '',
   videoResult: videoResult = {},
-  webContents: _0x192401,
-  logDiagnosticEvent: _0x297f05,
+  webContents: webContents,
+  logDiagnosticEvent: logDiagnosticEvent2,
 } = {}) {
-  const _0x2a7c5d = normalizeDouyinDetailApiUrls(videoResult?.douyinDetailApiUrls);
-  if (!_0x2a7c5d.length) return { images: [], videos: [], detailApiUrls: [], fetchedCount: 0 };
-  const _0x52f812 = await fetchDouyinDetailPayloads({
-      detailApiUrls: _0x2a7c5d,
-      sessionRef: _0x192401?.session,
+  const detailApiUrls2 = normalizeDouyinDetailApiUrls(videoResult?.douyinDetailApiUrls);
+  if (!detailApiUrls2.length) return { images: [], videos: [], detailApiUrls: [], fetchedCount: 0 };
+  const fetchedCount = await fetchDouyinDetailPayloads({
+      detailApiUrls: detailApiUrls2,
+      sessionRef: webContents?.session,
       pageUrl: pageUrl,
-      logDiagnosticEvent: _0x297f05,
+      logDiagnosticEvent: logDiagnosticEvent2,
     }),
-    _0x5c8a70 = [],
-    _0x273528 = [];
-  for (const _0x21ce41 of _0x52f812) {
-    for (const _0x1a0902 of collectDouyinAwemeDetails(_0x21ce41)) {
-      const _0x374309 = normalizeDouyinAwemeMedia(_0x1a0902, {
+    list13 = [],
+    list14 = [];
+  for (const value34 of fetchedCount) {
+    for (const value35 of collectDouyinAwemeDetails(value34)) {
+      const args2 = normalizeDouyinAwemeMedia(value35, {
         pageUrl: pageUrl,
         pageTitle: pageTitle,
         nodeId: nodeId,
         tabId: tabId,
       });
-      (_0x5c8a70.push(..._0x374309.images), _0x273528.push(..._0x374309.videos));
+      (list13.push(...args2.images), list14.push(...args2.videos));
     }
   }
   return {
-    images: dedupeCandidates(_0x5c8a70),
-    videos: dedupeCandidates(_0x273528),
-    detailApiUrls: _0x2a7c5d,
-    fetchedCount: _0x52f812.length,
+    images: dedupeCandidates(list13),
+    videos: dedupeCandidates(list14),
+    detailApiUrls: detailApiUrls2,
+    fetchedCount: fetchedCount.length,
   };
 }

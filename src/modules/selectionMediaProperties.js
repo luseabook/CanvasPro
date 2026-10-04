@@ -10,57 +10,57 @@ const VIDEO_META_RETRY_DELAY_MS = 0x7530,
   VIDEO_NODE_TYPES = new Set(['source-video', 'ai-video']),
   AUDIO_NODE_TYPES = new Set(['source-audio', 'ai-audio']),
   TEXT_EDITOR_SELECTOR = '.prompt-textarea, .source-text-content';
-function toPositiveNumber(_0x43f789) {
-  const _0x218e17 = Number(_0x43f789);
-  return Number['isFinite'](_0x218e17) && _0x218e17 > 0x0 ? _0x218e17 : 0x0;
+function toPositiveNumber(value) {
+  const count = Number(value);
+  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
 }
-function pickPositiveNumber(..._0x3032e1) {
-  for (const _0x5cd4ff of _0x3032e1) {
-    const _0x2f5c98 = toPositiveNumber(_0x5cd4ff);
-    if (_0x2f5c98 > 0x0) return _0x2f5c98;
+function pickPositiveNumber(...args) {
+  for (const item of args) {
+    const toPositiveNumber2 = toPositiveNumber(item);
+    if (toPositiveNumber2 > 0x0) return toPositiveNumber2;
   }
   return 0x0;
 }
-function normalizeMetaSourceIdentity(_0x36c134) {
-  return normalizeLocalPath(_0x36c134) || String(_0x36c134 || '')['trim']();
+function normalizeMetaSourceIdentity(key) {
+  return normalizeLocalPath(key) || String(key || '')['trim']();
 }
-function pickMainItem(_0x5a215b, _0x8a9e55) {
-  if (!Array['isArray'](_0x5a215b) || _0x5a215b['length'] === 0x0) return null;
-  const _0x2a9b93 = Number(_0x8a9e55),
-    _0x1e6184 = Number['isFinite'](_0x2a9b93) ? Math['max'](0x0, Math['trunc'](_0x2a9b93)) : 0x0;
-  return _0x5a215b[_0x1e6184] || _0x5a215b[0x0] || null;
+function pickMainItem(list, index) {
+  if (!Array['isArray'](list) || list['length'] === 0x0) return null;
+  const result = Number(index),
+    data = Number['isFinite'](result) ? Math['max'](0x0, Math['trunc'](result)) : 0x0;
+  return list[data] || list[0x0] || null;
 }
-function resolveNodeName(_0x40af98, _0x28f3cd) {
-  return String(
-    _0x40af98?.['name'] || _0x40af98?.['fileName'] || _0x28f3cd?.['name'] || _0x28f3cd?.['fileName'] || '',
-  )['trim']();
+function resolveNodeName(error, error2) {
+  return String(error?.['name'] || error?.['fileName'] || error2?.['name'] || error2?.['fileName'] || '')[
+    'trim'
+  ]();
 }
-function buildImageModel(_0x3223ed) {
-  const _0xdad676 = { ..._0x3223ed, type: normalizeNodeType(_0x3223ed?.['type']) },
-    _0x262001 = pickMainItem(_0xdad676['images'], _0xdad676['mainImageIndex']) || _0xdad676,
-    _0x2df3f5 = resolveNodeDisplayedMediaMetrics(_0xdad676)['image'],
-    _0x2125b4 = pickPositiveNumber(
-      _0x262001?.['originalWidth'],
-      _0x262001?.['imageWidth'],
-      _0x2df3f5?.['w'],
-      _0xdad676['originalWidth'],
-      _0xdad676['imageWidth'],
-      _0xdad676['naturalWidth'],
+function buildImageModel(args2) {
+  const options = { ...args2, type: normalizeNodeType(args2?.['type']) },
+    mainItem = pickMainItem(options['images'], options['mainImageIndex']) || options,
+    nodeDisplayedMediaMetrics = resolveNodeDisplayedMediaMetrics(options)['image'],
+    width = pickPositiveNumber(
+      mainItem?.['originalWidth'],
+      mainItem?.['imageWidth'],
+      nodeDisplayedMediaMetrics?.['w'],
+      options['originalWidth'],
+      options['imageWidth'],
+      options['naturalWidth'],
     ),
-    _0x2d6f85 = pickPositiveNumber(
-      _0x262001?.['originalHeight'],
-      _0x262001?.['imageHeight'],
-      _0x2df3f5?.['h'],
-      _0xdad676['originalHeight'],
-      _0xdad676['imageHeight'],
-      _0xdad676['naturalHeight'],
+    height = pickPositiveNumber(
+      mainItem?.['originalHeight'],
+      mainItem?.['imageHeight'],
+      nodeDisplayedMediaMetrics?.['h'],
+      options['originalHeight'],
+      options['imageHeight'],
+      options['naturalHeight'],
     );
   return {
-    nodeId: String(_0xdad676['id'] || ''),
+    nodeId: String(options['id'] || ''),
     kind: 'image',
-    name: resolveNodeName(_0xdad676, _0x262001),
-    width: _0x2125b4,
-    height: _0x2d6f85,
+    name: resolveNodeName(options, mainItem),
+    width: width,
+    height: height,
     duration: 0x0,
     fps: 0x0,
     frameCount: 0x0,
@@ -69,85 +69,84 @@ function buildImageModel(_0x3223ed) {
     needsVideoProbe: ![],
   };
 }
-function buildVideoModel(_0x558451) {
-  const _0x11f659 = { ..._0x558451, type: normalizeNodeType(_0x558451?.['type']) },
-    _0xd71cba = pickMainItem(_0x11f659['videos'], _0x11f659['mainVideoIndex']) || _0x11f659,
-    _0x508bee = resolveSourceVideoMediaTaskSrc(_0x11f659),
-    _0x58d8b0 = normalizeMetaSourceIdentity(_0x508bee),
-    _0x101578 = normalizeMetaSourceIdentity(_0x11f659['videoMetaSrc']),
-    _0x141179 = !_0x101578 || !_0x58d8b0 || _0x101578 === _0x58d8b0,
-    _0x29a5fb = resolveNodeDisplayedMediaMetrics(_0x11f659)['video'],
-    _0x53757c = pickPositiveNumber(
-      _0xd71cba?.['videoWidth'],
-      _0xd71cba?.['originalWidth'],
-      _0xd71cba?.['width'],
-      _0x29a5fb?.['w'],
-      _0x141179 ? _0x11f659['videoWidth'] : 0x0,
-      _0x11f659['naturalWidth'],
+function buildVideoModel(args3) {
+  const target = { ...args3, type: normalizeNodeType(args3?.['type']) },
+    box = pickMainItem(target['videos'], target['mainVideoIndex']) || target,
+    metaSource = resolveSourceVideoMediaTaskSrc(target),
+    metaSourceIdentity = normalizeMetaSourceIdentity(metaSource),
+    metaSourceIdentity2 = normalizeMetaSourceIdentity(target['videoMetaSrc']),
+    source = !metaSourceIdentity2 || !metaSourceIdentity || metaSourceIdentity2 === metaSourceIdentity,
+    nodeDisplayedMediaMetrics2 = resolveNodeDisplayedMediaMetrics(target)['video'],
+    width2 = pickPositiveNumber(
+      box?.['videoWidth'],
+      box?.['originalWidth'],
+      box?.['width'],
+      nodeDisplayedMediaMetrics2?.['w'],
+      source ? target['videoWidth'] : 0x0,
+      target['naturalWidth'],
     ),
-    _0xa946c9 = pickPositiveNumber(
-      _0xd71cba?.['videoHeight'],
-      _0xd71cba?.['originalHeight'],
-      _0xd71cba?.['height'],
-      _0x29a5fb?.['h'],
-      _0x141179 ? _0x11f659['videoHeight'] : 0x0,
-      _0x11f659['naturalHeight'],
+    height2 = pickPositiveNumber(
+      box?.['videoHeight'],
+      box?.['originalHeight'],
+      box?.['height'],
+      nodeDisplayedMediaMetrics2?.['h'],
+      source ? target['videoHeight'] : 0x0,
+      target['naturalHeight'],
     ),
-    _0xe8bacd = pickPositiveNumber(
-      _0xd71cba?.['videoDuration'],
-      _0xd71cba?.['duration'],
-      _0x141179 ? _0x11f659['videoDuration'] : 0x0,
-      _0x11f659['duration'],
+    duration = pickPositiveNumber(
+      box?.['videoDuration'],
+      box?.['duration'],
+      source ? target['videoDuration'] : 0x0,
+      target['duration'],
     ),
-    _0x2a4a20 = pickPositiveNumber(
-      _0xd71cba?.['videoFps'],
-      _0xd71cba?.['fps'],
-      _0x141179 ? _0x11f659['videoFps'] : 0x0,
-      _0x11f659['fps'],
-      _0x11f659['frameRate'],
+    fps = pickPositiveNumber(
+      box?.['videoFps'],
+      box?.['fps'],
+      source ? target['videoFps'] : 0x0,
+      target['fps'],
+      target['frameRate'],
     ),
-    _0x9289e2 = pickPositiveNumber(
-      _0xd71cba?.['videoFrameCount'],
-      _0xd71cba?.['frameCount'],
-      _0x141179 ? _0x11f659['videoFrameCount'] : 0x0,
-      _0x11f659['frameCount'],
+    frameCount = pickPositiveNumber(
+      box?.['videoFrameCount'],
+      box?.['frameCount'],
+      source ? target['videoFrameCount'] : 0x0,
+      target['frameCount'],
     ),
-    _0x1e2d02 =
-      _0x9289e2 <= 0x0 && _0xe8bacd > 0x0 && _0x2a4a20 > 0x0
-        ? Math['max'](0x1, Math['round'](_0xe8bacd * _0x2a4a20))
+    count2 =
+      frameCount <= 0x0 && duration > 0x0 && fps > 0x0
+        ? Math['max'](0x1, Math['round'](duration * fps))
         : 0x0;
   return {
-    nodeId: String(_0x11f659['id'] || ''),
+    nodeId: String(target['id'] || ''),
     kind: 'video',
-    name: resolveNodeName(_0x11f659, _0xd71cba),
-    width: _0x53757c,
-    height: _0xa946c9,
-    duration: _0xe8bacd,
-    fps: _0x2a4a20,
-    frameCount: _0x9289e2 || _0x1e2d02,
-    frameCountApproximate: _0x9289e2 <= 0x0 && _0x1e2d02 > 0x0,
-    metaSource: _0x508bee,
+    name: resolveNodeName(target, box),
+    width: width2,
+    height: height2,
+    duration: duration,
+    fps: fps,
+    frameCount: frameCount || count2,
+    frameCountApproximate: frameCount <= 0x0 && count2 > 0x0,
+    metaSource: metaSource,
     needsVideoProbe:
-      !!_0x508bee &&
-      (_0x53757c <= 0x0 || _0xa946c9 <= 0x0 || _0xe8bacd <= 0x0 || _0x2a4a20 <= 0x0 || _0x9289e2 <= 0x0),
+      !!metaSource && (width2 <= 0x0 || height2 <= 0x0 || duration <= 0x0 || fps <= 0x0 || frameCount <= 0x0),
   };
 }
-function buildAudioModel(_0x1789fc) {
-  const _0x5b3b32 = { ..._0x1789fc, type: normalizeNodeType(_0x1789fc?.['type']) },
-    _0x1ce459 = pickMainItem(_0x5b3b32['audios'], _0x5b3b32['mainAudioIndex']) || _0x5b3b32,
-    _0xcbf8b0 = pickPositiveNumber(
-      _0x1ce459?.['audioDuration'],
-      _0x1ce459?.['duration'],
-      _0x5b3b32['audioDuration'],
-      _0x5b3b32['duration'],
+function buildAudioModel(args4) {
+  const next = { ...args4, type: normalizeNodeType(args4?.['type']) },
+    mainItem2 = pickMainItem(next['audios'], next['mainAudioIndex']) || next,
+    duration2 = pickPositiveNumber(
+      mainItem2?.['audioDuration'],
+      mainItem2?.['duration'],
+      next['audioDuration'],
+      next['duration'],
     );
   return {
-    nodeId: String(_0x5b3b32['id'] || ''),
+    nodeId: String(next['id'] || ''),
     kind: 'audio',
-    name: resolveNodeName(_0x5b3b32, _0x1ce459),
+    name: resolveNodeName(next, mainItem2),
     width: 0x0,
     height: 0x0,
-    duration: _0xcbf8b0,
+    duration: duration2,
     fps: 0x0,
     frameCount: 0x0,
     frameCountApproximate: ![],
@@ -155,299 +154,292 @@ function buildAudioModel(_0x1789fc) {
     needsVideoProbe: ![],
   };
 }
-function buildTextEditingModel(_0x38b24f, _0x55d248) {
+function buildTextEditingModel(current, characterCount) {
   return {
-    nodeId: String(_0x38b24f?.['id'] || ''),
+    nodeId: String(current?.['id'] || ''),
     kind: 'text',
-    name: resolveNodeName(_0x38b24f),
+    name: resolveNodeName(current),
     width: 0x0,
     height: 0x0,
     duration: 0x0,
     fps: 0x0,
     frameCount: 0x0,
     frameCountApproximate: ![],
-    characterCount: _0x55d248,
+    characterCount: characterCount,
     metaSource: '',
     needsVideoProbe: ![],
   };
 }
-export function buildSelectionMediaPropertiesModel(_0x4f16e0) {
-  const _0xf839d9 = normalizeNodeType(_0x4f16e0?.['type']);
-  if (IMAGE_NODE_TYPES['has'](_0xf839d9)) return buildImageModel(_0x4f16e0);
-  if (VIDEO_NODE_TYPES['has'](_0xf839d9)) return buildVideoModel(_0x4f16e0);
-  if (AUDIO_NODE_TYPES['has'](_0xf839d9)) return buildAudioModel(_0x4f16e0);
+export function buildSelectionMediaPropertiesModel(entry) {
+  const nodeType = normalizeNodeType(entry?.['type']);
+  if (IMAGE_NODE_TYPES['has'](nodeType)) return buildImageModel(entry);
+  if (VIDEO_NODE_TYPES['has'](nodeType)) return buildVideoModel(entry);
+  if (AUDIO_NODE_TYPES['has'](nodeType)) return buildAudioModel(entry);
   return null;
 }
-export function selectSelectionMediaPropertiesModel(_0xbb6985 = {}) {
-  const _0x400cff = Array['isArray'](_0xbb6985['selectedNodeIds']) ? _0xbb6985['selectedNodeIds'] : [];
-  if (_0x400cff['length'] !== 0x1) return null;
-  const _0x4286ff = _0xbb6985['nodes']?.[_0x400cff[0x0]];
-  return buildSelectionMediaPropertiesModel(_0x4286ff);
+export function selectSelectionMediaPropertiesModel(state = {}) {
+  const list2 = Array['isArray'](state['selectedNodeIds']) ? state['selectedNodeIds'] : [];
+  if (list2['length'] !== 0x1) return null;
+  const record = state['nodes']?.[list2[0x0]];
+  return buildSelectionMediaPropertiesModel(record);
 }
-function isSupportedTextEditor(_0x2b7214) {
-  if (!_0x2b7214?.['matches']?.(TEXT_EDITOR_SELECTOR)) return ![];
-  if (!_0x2b7214['matches']('.source-text-content')) return !![];
-  return _0x2b7214['isContentEditable'] === !![] || _0x2b7214['getAttribute']?.('contenteditable') === 'true';
+function isSupportedTextEditor(enabled) {
+  if (!enabled?.['matches']?.(TEXT_EDITOR_SELECTOR)) return ![];
+  if (!enabled['matches']('.source-text-content')) return !![];
+  return enabled['isContentEditable'] === !![] || enabled['getAttribute']?.('contenteditable') === 'true';
 }
-function readEditorText(_0x18af41) {
-  if (typeof _0x18af41?.['value'] === 'string') return _0x18af41['value'];
-  if (typeof _0x18af41?.['innerText'] === 'string') return _0x18af41['innerText'];
-  return String(_0x18af41?.['textContent'] || '');
+function readEditorText(el) {
+  if (typeof el?.['value'] === 'string') return el['value'];
+  if (typeof el?.['innerText'] === 'string') return el['innerText'];
+  return String(el?.['textContent'] || '');
 }
-export function selectActiveTextEditingProperties(_0xdaab7d = {}, _0x38040d = globalThis['document']) {
-  const _0x3d9186 = _0x38040d?.['activeElement'];
-  if (!isSupportedTextEditor(_0x3d9186)) return null;
-  const _0x1cfeb2 = _0x3d9186['closest']?.('[data-node-id]'),
-    _0x3dfb64 = String(
-      _0x1cfeb2?.['dataset']?.['nodeId'] || _0x1cfeb2?.['getAttribute']?.('data-node-id') || '',
-    )['trim']();
-  if (!_0x3dfb64 || !_0xdaab7d['nodes']?.[_0x3dfb64]) return null;
-  return { nodeId: _0x3dfb64, characterCount: readEditorText(_0x3d9186)['length'] };
+export function selectActiveTextEditingProperties(enabled2 = {}, dom = globalThis['document']) {
+  const el2 = dom?.['activeElement'];
+  if (!isSupportedTextEditor(el2)) return null;
+  const el3 = el2['closest']?.('[data-node-id]'),
+    nodeId = String(el3?.['dataset']?.['nodeId'] || el3?.['getAttribute']?.('data-node-id') || '')['trim']();
+  if (!nodeId || !enabled2['nodes']?.[nodeId]) return null;
+  return { nodeId: nodeId, characterCount: readEditorText(el2)['length'] };
 }
-export function selectSelectionPropertiesDisplayModel(_0x495fa1 = {}, _0x58d70f = globalThis['document']) {
-  const _0x2d14d2 = selectActiveTextEditingProperties(_0x495fa1, _0x58d70f);
-  if (!_0x2d14d2) return selectSelectionMediaPropertiesModel(_0x495fa1);
-  const _0x7d4df1 = _0x495fa1['nodes']?.[_0x2d14d2['nodeId']],
-    _0x27dd3f =
-      buildSelectionMediaPropertiesModel(_0x7d4df1) ||
-      buildTextEditingModel(_0x7d4df1, _0x2d14d2['characterCount']);
-  return { ..._0x27dd3f, characterCount: _0x2d14d2['characterCount'] };
+export function selectSelectionPropertiesDisplayModel(state2 = {}, payload = globalThis['document']) {
+  const characterCount2 = selectActiveTextEditingProperties(state2, payload);
+  if (!characterCount2) return selectSelectionMediaPropertiesModel(state2);
+  const handle = state2['nodes']?.[characterCount2['nodeId']],
+    args5 =
+      buildSelectionMediaPropertiesModel(handle) ||
+      buildTextEditingModel(handle, characterCount2['characterCount']);
+  return { ...args5, characterCount: characterCount2['characterCount'] };
 }
-function formatDecimal(_0x12eba9, _0x51af19 = 0x2) {
-  const _0x46764e = toPositiveNumber(_0x12eba9);
-  if (_0x46764e <= 0x0) return '';
-  return new Intl['NumberFormat'](undefined, { maximumFractionDigits: _0x51af19 })['format'](_0x46764e);
-}
-function formatDimension(_0x2e0b5c, _0x83fd3) {
-  const _0x39051b = Math['round'](toPositiveNumber(_0x2e0b5c)),
-    _0x1ce060 = Math['round'](toPositiveNumber(_0x83fd3));
-  if (_0x39051b <= 0x0 || _0x1ce060 <= 0x0) return '—';
-  return _0x39051b + ' × ' + _0x1ce060;
-}
-function formatDuration(_0x7fc9b0) {
-  const _0x5c13db = formatDecimal(_0x7fc9b0);
-  return _0x5c13db ? t('selectionMediaProperties.values.seconds', { value: _0x5c13db }) : '—';
-}
-function formatFps(_0x16e610) {
-  const _0x235c2a = formatDecimal(_0x16e610);
-  return _0x235c2a ? _0x235c2a + ' fps' : '—';
-}
-function formatFrameCount(_0xadf90c, _0x5756c0) {
-  const _0x376f68 = Math['round'](toPositiveNumber(_0xadf90c));
-  if (_0x376f68 <= 0x0) return '—';
-  return t(
-    _0x5756c0
-      ? 'selectionMediaProperties.values.framesApproximate'
-      : 'selectionMediaProperties.values.frames',
-    { value: new Intl['NumberFormat']()['format'](_0x376f68) },
+function formatDecimal(config, maximumFractionDigits = 0x2) {
+  const toPositiveNumber3 = toPositiveNumber(config);
+  if (toPositiveNumber3 <= 0x0) return '';
+  return new Intl['NumberFormat'](undefined, { maximumFractionDigits: maximumFractionDigits })['format'](
+    toPositiveNumber3,
   );
 }
-function formatCharacterCount(_0x366413) {
-  const _0x5c388d = Number(_0x366413),
-    _0x59b8ba = Number['isFinite'](_0x5c388d) ? Math['max'](0x0, Math['trunc'](_0x5c388d)) : 0x0;
-  return new Intl['NumberFormat']()['format'](_0x59b8ba);
+function formatDimension(scope, input) {
+  const count3 = Math['round'](toPositiveNumber(scope)),
+    count4 = Math['round'](toPositiveNumber(input));
+  if (count3 <= 0x0 || count4 <= 0x0) return '—';
+  return count3 + ' × ' + count4;
 }
-function setText(_0x5ab68b, _0x44e686, _0x465f4f) {
-  const _0x2911e7 = _0x5ab68b?.['querySelector']?.(_0x44e686);
-  if (_0x2911e7 && _0x2911e7['textContent'] !== _0x465f4f) _0x2911e7['textContent'] = _0x465f4f;
+function formatDuration(output) {
+  const value2 = formatDecimal(output);
+  return value2 ? t('selectionMediaProperties.values.seconds', { value: value2 }) : '—';
 }
-function setRowVisible(_0x1c9099, _0x361121, _0x292916) {
-  const _0x2ad291 = _0x1c9099?.['querySelector']?.('[data-selection-media-row="' + _0x361121 + '\x22]');
-  if (_0x2ad291) _0x2ad291['hidden'] = _0x292916 !== !![];
+function formatFps(value3) {
+  const formatDecimal2 = formatDecimal(value3);
+  return formatDecimal2 ? formatDecimal2 + ' fps' : '—';
 }
-export function renderSelectionMediaProperties(_0x5a70cd, _0x646251) {
-  if (!_0x5a70cd) return;
-  if (!_0x646251) {
-    ((_0x5a70cd['hidden'] = !![]), _0x5a70cd['removeAttribute']?.('data-media-kind'));
+function formatFrameCount(value4, value5) {
+  const count5 = Math['round'](toPositiveNumber(value4));
+  if (count5 <= 0x0) return '—';
+  return t(
+    value5 ? 'selectionMediaProperties.values.framesApproximate' : 'selectionMediaProperties.values.frames',
+    { value: new Intl['NumberFormat']()['format'](count5) },
+  );
+}
+function formatCharacterCount(value6) {
+  const value7 = Number(value6),
+    value8 = Number['isFinite'](value7) ? Math['max'](0x0, Math['trunc'](value7)) : 0x0;
+  return new Intl['NumberFormat']()['format'](value8);
+}
+function setText(el4, value9, value10) {
+  const el5 = el4?.['querySelector']?.(value9);
+  if (el5 && el5['textContent'] !== value10) el5['textContent'] = value10;
+}
+function setRowVisible(el6, value11, value12) {
+  const el7 = el6?.['querySelector']?.('[data-selection-media-row="' + value11 + '\x22]');
+  if (el7) el7['hidden'] = value12 !== !![];
+}
+export function renderSelectionMediaProperties(el8, box2) {
+  if (!el8) return;
+  if (!box2) {
+    ((el8['hidden'] = !![]), el8['removeAttribute']?.('data-media-kind'));
     return;
   }
-  ((_0x5a70cd['hidden'] = ![]),
-    _0x5a70cd['setAttribute']?.('data-media-kind', _0x646251['kind']),
-    setText(_0x5a70cd, '[data-selection-media-kind]', t('selectionMediaProperties.' + _0x646251['kind'])),
+  ((el8['hidden'] = ![]),
+    el8['setAttribute']?.('data-media-kind', box2['kind']),
+    setText(el8, '[data-selection-media-kind]', t('selectionMediaProperties.' + box2['kind'])),
     setText(
-      _0x5a70cd,
+      el8,
       '[data-selection-media-name]',
-      _0x646251['name'] || t('selectionMediaProperties.' + _0x646251['kind']),
+      box2['name'] || t('selectionMediaProperties.' + box2['kind']),
     ),
     setText(
-      _0x5a70cd,
+      el8,
       '[data-selection-media-value="dimensions"]',
-      formatDimension(_0x646251['width'], _0x646251['height']),
+      formatDimension(box2['width'], box2['height']),
     ));
-  const _0x58402f = _0x646251['kind'] === 'image' || _0x646251['kind'] === 'video',
-    _0x467618 = _0x646251['kind'] === 'video',
-    _0xe6c802 = _0x467618 || _0x646251['kind'] === 'audio',
-    _0x13904c = Number['isFinite'](_0x646251['characterCount']);
-  (setRowVisible(_0x5a70cd, 'dimensions', _0x58402f),
-    setRowVisible(_0x5a70cd, 'duration', _0xe6c802),
-    setRowVisible(_0x5a70cd, 'fps', _0x467618),
-    setRowVisible(_0x5a70cd, 'frames', _0x467618),
-    setRowVisible(_0x5a70cd, 'characters', _0x13904c),
-    _0xe6c802 &&
-      setText(_0x5a70cd, '[data-selection-media-value="duration"]', formatDuration(_0x646251['duration'])),
-    _0x467618 &&
-      (setText(_0x5a70cd, '[data-selection-media-value="fps"]', formatFps(_0x646251['fps'])),
+  const value13 = box2['kind'] === 'image' || box2['kind'] === 'video',
+    value14 = box2['kind'] === 'video',
+    value15 = value14 || box2['kind'] === 'audio',
+    value16 = Number['isFinite'](box2['characterCount']);
+  (setRowVisible(el8, 'dimensions', value13),
+    setRowVisible(el8, 'duration', value15),
+    setRowVisible(el8, 'fps', value14),
+    setRowVisible(el8, 'frames', value14),
+    setRowVisible(el8, 'characters', value16),
+    value15 && setText(el8, '[data-selection-media-value="duration"]', formatDuration(box2['duration'])),
+    value14 &&
+      (setText(el8, '[data-selection-media-value="fps"]', formatFps(box2['fps'])),
       setText(
-        _0x5a70cd,
+        el8,
         '[data-selection-media-value="frames"]',
-        formatFrameCount(_0x646251['frameCount'], _0x646251['frameCountApproximate'] === !![]),
+        formatFrameCount(box2['frameCount'], box2['frameCountApproximate'] === !![]),
       )),
-    _0x13904c &&
+    value16 &&
       setText(
-        _0x5a70cd,
+        el8,
         '[data-selection-media-value="characters"]',
-        formatCharacterCount(_0x646251['characterCount']),
+        formatCharacterCount(box2['characterCount']),
       ));
 }
-function buildVideoMetaPatch(_0x3c27e6, _0x2670c4) {
-  const _0x204189 = { videoMetaSrc: _0x2670c4 },
-    _0x2e33b1 = toPositiveNumber(_0x3c27e6?.['fps']),
-    _0x43abe7 = toPositiveNumber(_0x3c27e6?.['frameCount']),
-    _0x5a560d = toPositiveNumber(_0x3c27e6?.['duration']),
-    _0x495271 = toPositiveNumber(_0x3c27e6?.['width']),
-    _0x39ce09 = toPositiveNumber(_0x3c27e6?.['height']);
-  if (_0x2e33b1 > 0x0) _0x204189['videoFps'] = _0x2e33b1;
-  if (_0x43abe7 > 0x0) _0x204189['videoFrameCount'] = Math['round'](_0x43abe7);
-  if (_0x5a560d > 0x0) _0x204189['videoDuration'] = _0x5a560d;
-  if (_0x495271 > 0x0) _0x204189['videoWidth'] = Math['round'](_0x495271);
-  if (_0x39ce09 > 0x0) _0x204189['videoHeight'] = Math['round'](_0x39ce09);
-  return _0x204189;
+function buildVideoMetaPatch(box3, videoMetaSrc) {
+  const value17 = { videoMetaSrc: videoMetaSrc },
+    toPositiveNumber4 = toPositiveNumber(box3?.['fps']),
+    toPositiveNumber5 = toPositiveNumber(box3?.['frameCount']),
+    toPositiveNumber6 = toPositiveNumber(box3?.['duration']),
+    toPositiveNumber7 = toPositiveNumber(box3?.['width']),
+    toPositiveNumber8 = toPositiveNumber(box3?.['height']);
+  if (toPositiveNumber4 > 0x0) value17['videoFps'] = toPositiveNumber4;
+  if (toPositiveNumber5 > 0x0) value17['videoFrameCount'] = Math['round'](toPositiveNumber5);
+  if (toPositiveNumber6 > 0x0) value17['videoDuration'] = toPositiveNumber6;
+  if (toPositiveNumber7 > 0x0) value17['videoWidth'] = Math['round'](toPositiveNumber7);
+  if (toPositiveNumber8 > 0x0) value17['videoHeight'] = Math['round'](toPositiveNumber8);
+  return value17;
 }
 export function initSelectionMediaProperties({
-  graphStore: _0x52a5ce,
-  uiStore: _0x17f807,
-  element: _0x295363,
+  graphStore: graphStore,
+  uiStore: uiStore,
+  element: element,
   fetchVideoMeta: fetchVideoMeta = fetchVideoMetaFromServer,
   scheduleIdleTask: scheduleIdleTask = scheduleSourceVideoIdleTask,
   now: now = () => Date['now'](),
   documentObject: documentObject = globalThis['document'],
 } = {}) {
-  if (!_0x52a5ce?.['subscribeSelector'] || !_0x17f807?.['subscribeSelector'] || !_0x295363) return () => {};
-  let _0x5198f2 = _0x17f807['getState']?.()?.['ui']?.['showSelectionMediaProperties'] !== ![],
-    _0x3da710 = selectSelectionMediaPropertiesModel(
-      _0x52a5ce['getStateRaw']?.() || _0x52a5ce['getState']?.(),
+  if (!graphStore?.['subscribeSelector'] || !uiStore?.['subscribeSelector'] || !element) return () => {};
+  let enabled3 = uiStore['getState']?.()?.['ui']?.['showSelectionMediaProperties'] !== ![],
+    selectionMediaPropertiesModel = selectSelectionMediaPropertiesModel(
+      graphStore['getStateRaw']?.() || graphStore['getState']?.(),
     ),
-    _0x112b44 = null,
-    _0x50824f = '',
-    _0x5d7ca7 = ![],
-    _0x3261db = ![];
-  const _0x47263f = new Map(),
-    _0x5a9179 = () => {
-      (_0x112b44?.(), (_0x112b44 = null), (_0x50824f = ''));
+    scheduleIdleTask2 = null,
+    value18 = '',
+    enabled4 = ![],
+    value19 = ![];
+  const map = new Map(),
+    handler = () => {
+      (scheduleIdleTask2?.(), (scheduleIdleTask2 = null), (value18 = ''));
     },
-    _0x3b0001 = (_0x2fdb1d) => {
-      const _0x4dbb81 = String(_0x2fdb1d?.['metaSource'] || '')['trim']();
-      if (
-        !_0x5198f2 ||
-        _0x2fdb1d?.['kind'] !== 'video' ||
-        _0x2fdb1d?.['needsVideoProbe'] !== !![] ||
-        !_0x4dbb81
-      ) {
-        _0x5a9179();
+    handler2 = (value20) => {
+      const enabled5 = String(value20?.['metaSource'] || '')['trim']();
+      if (!enabled3 || value20?.['kind'] !== 'video' || value20?.['needsVideoProbe'] !== !![] || !enabled5) {
+        handler();
         return;
       }
-      const _0x229265 = _0x47263f['get'](_0x4dbb81);
-      if (_0x229265?.['status'] === 'success') {
-        _0x229265['patch'] &&
-          !_0x229265['appliedNodeIds']?.['has'](_0x2fdb1d['nodeId']) &&
-          (_0x229265['appliedNodeIds']['add'](_0x2fdb1d['nodeId']),
-          _0x52a5ce['updateNodeData']?.(_0x2fdb1d['nodeId'], _0x229265['patch']));
+      const response = map['get'](enabled5);
+      if (response?.['status'] === 'success') {
+        response['patch'] &&
+          !response['appliedNodeIds']?.['has'](value20['nodeId']) &&
+          (response['appliedNodeIds']['add'](value20['nodeId']),
+          graphStore['updateNodeData']?.(value20['nodeId'], response['patch']));
         return;
       }
       if (
-        _0x229265?.['status'] === 'pending' ||
-        (_0x229265?.['status'] === 'failed' &&
-          now() - Number(_0x229265['failedAt'] || 0x0) < VIDEO_META_RETRY_DELAY_MS)
+        response?.['status'] === 'pending' ||
+        (response?.['status'] === 'failed' &&
+          now() - Number(response['failedAt'] || 0x0) < VIDEO_META_RETRY_DELAY_MS)
       )
         return;
-      if (_0x50824f === _0x4dbb81) return;
-      (_0x5a9179(),
-        (_0x50824f = _0x4dbb81),
-        (_0x112b44 = scheduleIdleTask(async () => {
-          ((_0x112b44 = null), (_0x50824f = ''));
-          if (_0x5d7ca7) return;
-          const _0x40fb8b = selectSelectionMediaPropertiesModel(
-            _0x52a5ce['getStateRaw']?.() || _0x52a5ce['getState']?.(),
+      if (value18 === enabled5) return;
+      (handler(),
+        (value18 = enabled5),
+        (scheduleIdleTask2 = scheduleIdleTask(async () => {
+          ((scheduleIdleTask2 = null), (value18 = ''));
+          if (enabled4) return;
+          const selectionMediaPropertiesModel2 = selectSelectionMediaPropertiesModel(
+            graphStore['getStateRaw']?.() || graphStore['getState']?.(),
           );
           if (
-            !_0x5198f2 ||
-            _0x40fb8b?.['nodeId'] !== _0x2fdb1d['nodeId'] ||
-            _0x40fb8b?.['metaSource'] !== _0x4dbb81 ||
-            _0x40fb8b?.['needsVideoProbe'] !== !![]
+            !enabled3 ||
+            selectionMediaPropertiesModel2?.['nodeId'] !== value20['nodeId'] ||
+            selectionMediaPropertiesModel2?.['metaSource'] !== enabled5 ||
+            selectionMediaPropertiesModel2?.['needsVideoProbe'] !== !![]
           )
             return;
-          _0x47263f['set'](_0x4dbb81, { status: 'pending' });
+          map['set'](enabled5, { status: 'pending' });
           try {
-            const _0x1971e3 = await fetchVideoMeta(_0x4dbb81);
-            if (_0x5d7ca7) return;
-            if (!_0x1971e3 || _0x1971e3['success'] !== !![]) throw new Error('video metadata unavailable');
-            const _0x41bdea = buildVideoMetaPatch(_0x1971e3, _0x4dbb81);
-            _0x47263f['set'](_0x4dbb81, {
+            const response2 = await fetchVideoMeta(enabled5);
+            if (enabled4) return;
+            if (!response2 || response2['success'] !== !![]) throw new Error('video metadata unavailable');
+            const patch = buildVideoMetaPatch(response2, enabled5);
+            map['set'](enabled5, {
               status: 'success',
-              patch: _0x41bdea,
-              appliedNodeIds: new Set([_0x2fdb1d['nodeId']]),
+              patch: patch,
+              appliedNodeIds: new Set([value20['nodeId']]),
             });
-            const _0x838557 = selectSelectionMediaPropertiesModel(
-              _0x52a5ce['getStateRaw']?.() || _0x52a5ce['getState']?.(),
+            const selectionMediaPropertiesModel3 = selectSelectionMediaPropertiesModel(
+              graphStore['getStateRaw']?.() || graphStore['getState']?.(),
             );
-            _0x838557?.['nodeId'] === _0x2fdb1d['nodeId'] &&
-              _0x838557?.['metaSource'] === _0x4dbb81 &&
-              _0x52a5ce['updateNodeData']?.(_0x2fdb1d['nodeId'], _0x41bdea);
+            selectionMediaPropertiesModel3?.['nodeId'] === value20['nodeId'] &&
+              selectionMediaPropertiesModel3?.['metaSource'] === enabled5 &&
+              graphStore['updateNodeData']?.(value20['nodeId'], patch);
           } catch {
-            if (_0x5d7ca7) return;
-            _0x47263f['set'](_0x4dbb81, { status: 'failed', failedAt: now() });
+            if (enabled4) return;
+            map['set'](enabled5, { status: 'failed', failedAt: now() });
           }
         })));
     },
-    _0x270a33 = () => {
-      const _0x36685a = selectSelectionPropertiesDisplayModel(
-        _0x52a5ce['getStateRaw']?.() || _0x52a5ce['getState']?.(),
+    handler3 = () => {
+      const selectionPropertiesDisplayModel = selectSelectionPropertiesDisplayModel(
+        graphStore['getStateRaw']?.() || graphStore['getState']?.(),
         documentObject,
       );
-      (renderSelectionMediaProperties(_0x295363, _0x5198f2 ? _0x36685a || _0x3da710 : null),
-        _0x3b0001(_0x5198f2 ? _0x36685a || _0x3da710 : null));
+      (renderSelectionMediaProperties(
+        element,
+        enabled3 ? selectionPropertiesDisplayModel || selectionMediaPropertiesModel : null,
+      ),
+        handler2(enabled3 ? selectionPropertiesDisplayModel || selectionMediaPropertiesModel : null));
     },
-    _0x2ee8cf = () => {
-      if (_0x3261db || _0x5d7ca7) return;
-      _0x3261db = !![];
-      const _0x48d301 = () => {
-        _0x3261db = ![];
-        if (!_0x5d7ca7) _0x270a33();
+    handler4 = () => {
+      if (value19 || enabled4) return;
+      value19 = !![];
+      const value21 = () => {
+        value19 = ![];
+        if (!enabled4) handler3();
       };
-      typeof queueMicrotask === 'function'
-        ? queueMicrotask(_0x48d301)
-        : Promise['resolve']()['then'](_0x48d301);
+      typeof queueMicrotask === 'function' ? queueMicrotask(value21) : Promise['resolve']()['then'](value21);
     },
-    _0x626858 = (_0x1310f4) => {
-      (isSupportedTextEditor(_0x1310f4?.['target']) || isSupportedTextEditor(_0x1310f4?.['relatedTarget'])) &&
-        _0x2ee8cf();
+    value22 = (event) => {
+      (isSupportedTextEditor(event?.['target']) || isSupportedTextEditor(event?.['relatedTarget'])) &&
+        handler4();
     },
-    _0x2ccb20 = (_0x57837c) => {
-      if (isSupportedTextEditor(_0x57837c?.['target'])) _0x270a33();
+    value23 = (event2) => {
+      if (isSupportedTextEditor(event2?.['target'])) handler3();
     },
-    _0x16e2c1 = _0x52a5ce['subscribeSelector'](selectSelectionMediaPropertiesModel, (_0x4dba0d) => {
-      ((_0x3da710 = _0x4dba0d), _0x270a33());
+    value24 = graphStore['subscribeSelector'](selectSelectionMediaPropertiesModel, (value25) => {
+      ((selectionMediaPropertiesModel = value25), handler3());
     }),
-    _0x2b8882 = _0x17f807['subscribeSelector'](
-      (_0x11341e) => _0x11341e['ui']?.['showSelectionMediaProperties'] !== ![],
-      (_0x262bb5) => {
-        ((_0x5198f2 = _0x262bb5 !== ![]), _0x270a33());
+    value26 = uiStore['subscribeSelector'](
+      (value27) => value27['ui']?.['showSelectionMediaProperties'] !== ![],
+      (value28) => {
+        ((enabled3 = value28 !== ![]), handler3());
       },
     ),
-    _0x1f1a81 = onLocaleChange(_0x270a33);
+    onLocaleChange2 = onLocaleChange(handler3);
   return (
-    documentObject?.['addEventListener']?.('focusin', _0x626858, !![]),
-    documentObject?.['addEventListener']?.('focusout', _0x626858, !![]),
-    documentObject?.['addEventListener']?.('input', _0x2ccb20, !![]),
+    documentObject?.['addEventListener']?.('focusin', value22, !![]),
+    documentObject?.['addEventListener']?.('focusout', value22, !![]),
+    documentObject?.['addEventListener']?.('input', value23, !![]),
     () => {
-      ((_0x5d7ca7 = !![]),
-        _0x5a9179(),
-        _0x16e2c1?.(),
-        _0x2b8882?.(),
-        _0x1f1a81?.(),
-        documentObject?.['removeEventListener']?.('focusin', _0x626858, !![]),
-        documentObject?.['removeEventListener']?.('focusout', _0x626858, !![]),
-        documentObject?.['removeEventListener']?.('input', _0x2ccb20, !![]));
+      ((enabled4 = !![]),
+        handler(),
+        value24?.(),
+        value26?.(),
+        onLocaleChange2?.(),
+        documentObject?.['removeEventListener']?.('focusin', value22, !![]),
+        documentObject?.['removeEventListener']?.('focusout', value22, !![]),
+        documentObject?.['removeEventListener']?.('input', value23, !![]));
     }
   );
 }

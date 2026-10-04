@@ -8,110 +8,114 @@ import {
 } from './rendererFastPreviewAdmission.js';
 import { RENDERER_VIRTUALIZATION_CONFIG } from './rendererVirtualization.js';
 const DENSE_RASTER_MEDIA_DEFER_NODE_COUNT = 0x140;
-function toIdSet(_0x16d57f) {
-  if (_0x16d57f instanceof Set) return new Set(_0x16d57f);
-  if (Array['isArray'](_0x16d57f)) return new Set(_0x16d57f);
+function toIdSet(value) {
+  if (value instanceof Set) return new Set(value);
+  if (Array['isArray'](value)) return new Set(value);
   return new Set();
 }
-function defaultSupportsRasterPreview(_0xfc434d) {
-  const _0x2fa097 = String(_0xfc434d?.['type'] || '')
+function defaultSupportsRasterPreview(item) {
+  const key = String(item?.['type'] || '')
     ['trim']()
     ['toLowerCase']();
-  return !['web-preview', 'source-audio', 'ai-audio', 'audio']['includes'](_0x2fa097);
+  return !['web-preview', 'source-audio', 'ai-audio', 'audio']['includes'](key);
 }
-function getNode(_0x54614e, _0x3da2c7) {
-  if (_0x54614e instanceof Map) return _0x54614e['get'](_0x3da2c7) || null;
-  return _0x54614e?.[_0x3da2c7] || null;
+function getNode(map, index) {
+  if (map instanceof Map) return map['get'](index) || null;
+  return map?.[index] || null;
 }
-function isVisualMediaNode(_0x271d80) {
-  const _0x3ede66 = getRendererNodeLabelKind(_0x271d80?.['type']);
-  if (_0x3ede66) return _0x3ede66 === 'image' || _0x3ede66 === 'video';
-  const _0x5726d4 = String(_0x271d80?.['type'] || '')
+function isVisualMediaNode(result) {
+  const rendererNodeLabelKind = getRendererNodeLabelKind(result?.['type']);
+  if (rendererNodeLabelKind) return rendererNodeLabelKind === 'image' || rendererNodeLabelKind === 'video';
+  const list = String(result?.['type'] || '')
     ['trim']()
     ['toLowerCase']();
+  return list['includes']('image') || list['includes']('video') || list['includes']('media-clip');
+}
+function resolveRenderScale(box, data) {
+  const count = Number(box?.['zoom']),
+    count2 = Number(data);
   return (
-    _0x5726d4['includes']('image') || _0x5726d4['includes']('video') || _0x5726d4['includes']('media-clip')
+    (Number['isFinite'](count) && count > 0x0 ? count : 0x1) *
+    (Number['isFinite'](count2) && count2 > 0x0 ? count2 : 0x1)
   );
 }
-function resolveRenderScale(_0x478b67, _0x29b768) {
-  const _0x57fb10 = Number(_0x478b67?.['zoom']),
-    _0x48baef = Number(_0x29b768);
-  return (
-    (Number['isFinite'](_0x57fb10) && _0x57fb10 > 0x0 ? _0x57fb10 : 0x1) *
-    (Number['isFinite'](_0x48baef) && _0x48baef > 0x0 ? _0x48baef : 0x1)
-  );
-}
-function buildRasterVisualStateSignature(_0x3b98a0, _0x4bc4af) {
-  return [...toIdSet(_0x3b98a0?.['invalidNodeIds'])]
-    ['filter']((_0x5957da) => _0x4bc4af['has'](_0x5957da))
+function buildRasterVisualStateSignature(options, map2) {
+  return [...toIdSet(options?.['invalidNodeIds'])]
+    ['filter']((target) => map2['has'](target))
     ['map'](String)
     ['sort']()
     ['join']('\x1f');
 }
-function buildRasterPresentationIdentity(_0x4469bd, _0x641215 = resolveRendererPreviewNodePresentation) {
-  if (!_0x4469bd || typeof _0x4469bd !== 'object') return '';
-  const _0x5d6029 = _0x641215(_0x4469bd, { displayFirst: !![] }),
-    _0x24310f = _0x5d6029['geometry'] || {};
+function buildRasterPresentationIdentity(enabled, handler = resolveRendererPreviewNodePresentation) {
+  if (!enabled || typeof enabled !== 'object') return '';
+  const response = handler(enabled, { displayFirst: !![] }),
+    box2 = response['geometry'] || {};
   return [
-    _0x5d6029['kind'],
-    _0x5d6029['text'],
-    Number['isFinite'](Number(_0x24310f['x'])) ? Number(_0x24310f['x']) : 0x0,
-    Number['isFinite'](Number(_0x24310f['y'])) ? Number(_0x24310f['y']) : 0x0,
-    Math['max'](0x1, Number(_0x24310f['width']) || 0x1),
-    Math['max'](0x1, Number(_0x24310f['height']) || 0x1),
-    ..._0x5d6029['sources'],
+    response['kind'],
+    response['text'],
+    Number['isFinite'](Number(box2['x'])) ? Number(box2['x']) : 0x0,
+    Number['isFinite'](Number(box2['y'])) ? Number(box2['y']) : 0x0,
+    Math['max'](0x1, Number(box2['width']) || 0x1),
+    Math['max'](0x1, Number(box2['height']) || 0x1),
+    ...response['sources'],
   ]['join']('\x1f');
 }
-function buildRasterPresentationIdentityCacheKey(_0x1e55c0) {
-  const _0x3ba1d2 = Number(_0x1e55c0?.['_bizRev']);
-  if (!Number['isFinite'](_0x3ba1d2)) return null;
-  const _0x4d209f = (_0x106c21, _0x238fc7) => {
-    const _0x5e8ffb = Number(_0x106c21);
-    return Number['isFinite'](_0x5e8ffb) ? _0x5e8ffb : _0x238fc7;
+function buildRasterPresentationIdentityCacheKey(box3) {
+  const source = Number(box3?.['_bizRev']);
+  if (!Number['isFinite'](source)) return null;
+  const run = (next, current) => {
+    const entry = Number(next);
+    return Number['isFinite'](entry) ? entry : current;
   };
   return [
-    _0x3ba1d2,
-    _0x4d209f(_0x1e55c0?.['x'], 0x0),
-    _0x4d209f(_0x1e55c0?.['y'], 0x0),
-    Math['max'](0x1, _0x4d209f(_0x1e55c0?.['width'], 0xa0)),
-    Math['max'](0x1, _0x4d209f(_0x1e55c0?.['height'], 0x78)),
+    source,
+    run(box3?.['x'], 0x0),
+    run(box3?.['y'], 0x0),
+    Math['max'](0x1, run(box3?.['width'], 0xa0)),
+    Math['max'](0x1, run(box3?.['height'], 0x78)),
   ]['join']('\x1f');
 }
 function collectExplicitDomRequiredIds({
-  selectedNodeIds: _0x5d334d,
-  hoveredNodeIds: _0x5170ed,
-  hoverNodeId: _0x68a981,
-  dragNodeIds: _0x1b05bb,
-  connOverlay: _0x418ad8,
-  pickConnectMode: _0x3442e7,
-  activeMediaNodeIds: _0x200431,
-  domRequiredNodeIds: _0x12df3c,
+  selectedNodeIds: selectedNodeIds,
+  hoveredNodeIds: hoveredNodeIds,
+  hoverNodeId: hoverNodeId,
+  dragNodeIds: dragNodeIds,
+  connOverlay: connOverlay,
+  pickConnectMode: pickConnectMode,
+  activeMediaNodeIds: activeMediaNodeIds,
+  domRequiredNodeIds: domRequiredNodeIds,
 } = {}) {
-  const _0x49bc05 = new Set();
-  for (const _0x1adee6 of [_0x5d334d, _0x5170ed, _0x1b05bb, _0x200431, _0x12df3c]) {
-    for (const _0x17f80a of toIdSet(_0x1adee6)) _0x49bc05['add'](_0x17f80a);
-  }
-  for (const _0x4eb530 of [
-    _0x68a981,
-    _0x418ad8?.['srcId'],
-    _0x418ad8?.['hoverId'],
-    _0x3442e7?.['active'] ? _0x3442e7['sourceNodeId'] : null,
-    _0x3442e7?.['active'] ? _0x3442e7['srcId'] : null,
-    _0x3442e7?.['active'] ? _0x3442e7['hoverNodeId'] : null,
-    _0x3442e7?.['active'] ? _0x3442e7['hoverId'] : null,
+  const record = new Set();
+  for (const payload of [
+    selectedNodeIds,
+    hoveredNodeIds,
+    dragNodeIds,
+    activeMediaNodeIds,
+    domRequiredNodeIds,
   ]) {
-    if (_0x4eb530 != null && _0x4eb530 !== '') _0x49bc05['add'](_0x4eb530);
+    for (const handle of toIdSet(payload)) record['add'](handle);
   }
-  for (const _0x1a33f2 of [
-    _0x418ad8?.['activeNodeIds'],
-    _0x3442e7?.['active'] ? _0x3442e7['activeNodeIds'] : null,
+  for (const state of [
+    hoverNodeId,
+    connOverlay?.['srcId'],
+    connOverlay?.['hoverId'],
+    pickConnectMode?.['active'] ? pickConnectMode['sourceNodeId'] : null,
+    pickConnectMode?.['active'] ? pickConnectMode['srcId'] : null,
+    pickConnectMode?.['active'] ? pickConnectMode['hoverNodeId'] : null,
+    pickConnectMode?.['active'] ? pickConnectMode['hoverId'] : null,
   ]) {
-    for (const _0x3d8ce5 of toIdSet(_0x1a33f2)) _0x49bc05['add'](_0x3d8ce5);
+    if (state != null && state !== '') record['add'](state);
   }
-  return _0x49bc05;
+  for (const config of [
+    connOverlay?.['activeNodeIds'],
+    pickConnectMode?.['active'] ? pickConnectMode['activeNodeIds'] : null,
+  ]) {
+    for (const scope of toIdSet(config)) record['add'](scope);
+  }
+  return record;
 }
-export function resolveRendererRasterPreviewSources(_0x1b2bd5) {
-  return resolveRendererPreviewNodePresentation(_0x1b2bd5, { displayFirst: ![] })['sources'];
+export function resolveRendererRasterPreviewSources(input) {
+  return resolveRendererPreviewNodePresentation(input, { displayFirst: ![] })['sources'];
 }
 export function createRendererRasterPreviewCoordinator({
   layer: layer = null,
@@ -123,426 +127,427 @@ export function createRendererRasterPreviewCoordinator({
   onRasterHandoffFrame: onRasterHandoffFrame = null,
   resolvePresentation: resolvePresentation = resolveRendererPreviewNodePresentation,
 } = {}) {
-  const _0x1e0b39 = () =>
-    createLayer({ resolveMediaSources: resolveRendererRasterPreviewSources, onMediaPresented: _0x240859 });
-  let _0x90c1dc = layer || _0x1e0b39(),
-    _0x3874f6 = new Set(),
-    _0x1c7a20 = new Set(),
-    _0x263f1d = new Set(),
-    _0x1e4294 = new Set(),
-    _0x3243ae = new Map();
-  const _0x2c340b = new Map();
-  let _0x50c10d = '',
-    _0x21f7e8 = ![],
-    _0x47be10 = ![],
-    _0x16cfdf = null,
-    _0x177685 = { active: ![] },
-    _0x24de3a = null;
-  function _0x240859(_0x254047) {
-    const _0x5eaba8 = _0x24de3a,
-      _0xe02c59 = _0x5eaba8
-        ? (_0x254047?.['nodeIds'] || [])['filter'](
-            (_0x1c9e4f) =>
-              _0x5eaba8['identities']['has'](_0x1c9e4f) &&
-              _0x5eaba8['identities']['get'](_0x1c9e4f) ===
-                buildRasterPresentationIdentity(getNode(_0x5eaba8['nodes'], _0x1c9e4f), resolvePresentation),
+  const run2 = () =>
+    createLayer({
+      resolveMediaSources: resolveRendererRasterPreviewSources,
+      onMediaPresented: onMediaPresented2,
+    });
+  let output = layer || run2(),
+    previousRasterIds = new Set(),
+    map3 = new Set(),
+    map4 = new Set(),
+    map5 = new Set(),
+    map6 = new Map();
+  const map7 = new Map();
+  let value2 = '',
+    mediaLoadingBusy2 = ![],
+    enabled2 = ![],
+    box4 = null,
+    previewMotion = { active: ![] },
+    value3 = null;
+  function onMediaPresented2(value4) {
+    const state2 = value3,
+      list2 = state2
+        ? (value4?.['nodeIds'] || [])['filter'](
+            (value5) =>
+              state2['identities']['has'](value5) &&
+              state2['identities']['get'](value5) ===
+                buildRasterPresentationIdentity(getNode(state2['nodes'], value5), resolvePresentation),
           )
         : [];
-    if (_0xe02c59['length']) {
-      for (const _0x3bf40c of _0xe02c59) {
-        (_0x1e4294['add'](_0x3bf40c), _0x3874f6['add'](_0x3bf40c), _0x1c7a20['delete'](_0x3bf40c));
+    if (list2['length']) {
+      for (const value6 of list2) {
+        (map5['add'](value6), previousRasterIds['add'](value6), map3['delete'](value6));
       }
-      onRasterMediaClaimed?.(_0xe02c59);
+      onRasterMediaClaimed?.(list2);
     }
-    onMediaPresented?.(_0x254047);
+    onMediaPresented?.(value4);
   }
-  function _0xe40e69(_0xcd49bb, _0x3b72cd) {
-    const _0x3fbd7e = buildRasterPresentationIdentityCacheKey(_0x3b72cd),
-      _0x1dbd9d = _0x2c340b['get'](_0xcd49bb);
-    if (_0x3fbd7e !== null && _0x1dbd9d?.['cacheKey'] === _0x3fbd7e) return _0x1dbd9d['identity'];
-    const _0x1cb808 = buildRasterPresentationIdentity(_0x3b72cd, resolvePresentation);
-    if (_0x3fbd7e === null) _0x2c340b['delete'](_0xcd49bb);
-    else _0x2c340b['set'](_0xcd49bb, { cacheKey: _0x3fbd7e, identity: _0x1cb808 });
-    return _0x1cb808;
+  function run3(value7, value8) {
+    const cacheKey = buildRasterPresentationIdentityCacheKey(value8),
+      value9 = map7['get'](value7);
+    if (cacheKey !== null && value9?.['cacheKey'] === cacheKey) return value9['identity'];
+    const identity = buildRasterPresentationIdentity(value8, resolvePresentation);
+    if (cacheKey === null) map7['delete'](value7);
+    else map7['set'](value7, { cacheKey: cacheKey, identity: identity });
+    return identity;
   }
-  function _0x14a198({
-    canvasEl: _0x2af3a1,
-    nodes: _0x1cce44,
-    scenePlan: _0x4d68f7,
-    selectedNodeIds: _0x583ac0,
-    hoveredNodeIds: _0x607e7d,
-    hoverNodeId: _0x26dbf4,
-    dragNodeIds: _0x2a56b7,
-    connOverlay: _0x18709b,
-    pickConnectMode: _0x380dfe,
-    activeMediaNodeIds: _0x526889,
-    domRequiredNodeIds: _0x6fc69,
-    viewport: _0x206209,
-    containerWidth: _0x45815b,
-    containerHeight: _0x1c74f9,
+  function sync({
+    canvasEl: canvasEl,
+    nodes: nodes,
+    scenePlan: scenePlan,
+    selectedNodeIds: selectedNodeIds2,
+    hoveredNodeIds: hoveredNodeIds2,
+    hoverNodeId: hoverNodeId2,
+    dragNodeIds: dragNodeIds2,
+    connOverlay: connOverlay2,
+    pickConnectMode: pickConnectMode2,
+    activeMediaNodeIds: activeMediaNodeIds2,
+    domRequiredNodeIds: domRequiredNodeIds2,
+    viewport: viewport,
+    containerWidth: containerWidth,
+    containerHeight: containerHeight,
     viewportBusy: viewportBusy = ![],
     mediaLoadingBusy: mediaLoadingBusy = viewportBusy,
     freezeRasterSurface: freezeRasterSurface = ![],
     lockRasterParticipation: lockRasterParticipation = ![],
     deferInitialPlanning: deferInitialPlanning = ![],
-    releaseFullSurface: _0x531c91,
+    releaseFullSurface: releaseFullSurface,
     devicePixelRatio: devicePixelRatio = typeof window !== 'undefined' ? window['devicePixelRatio'] : 0x1,
   } = {}) {
-    ((_0x24de3a = null), (_0x21f7e8 = mediaLoadingBusy === !![]));
-    const _0x4d2d14 =
-      _0x16cfdf && _0x206209?.['zoom'] === _0x16cfdf['zoom']
+    ((value3 = null), (mediaLoadingBusy2 = mediaLoadingBusy === !![]));
+    const enabled3 =
+      box4 && viewport?.['zoom'] === box4['zoom']
         ? {
             active: !![],
-            dx: (_0x16cfdf['x'] - _0x206209['x']) / _0x206209['zoom'],
-            dy: (_0x16cfdf['y'] - _0x206209['y']) / _0x206209['zoom'],
+            dx: (box4['x'] - viewport['x']) / viewport['zoom'],
+            dy: (box4['y'] - viewport['y']) / viewport['zoom'],
           }
         : { active: ![] };
-    if (!_0x4d2d14['dx'] && !_0x4d2d14['dy']) _0x4d2d14['active'] = ![];
-    if (_0x4d2d14['active'] || !viewportBusy || _0x206209?.['zoom'] !== _0x16cfdf?.['zoom'])
-      _0x177685 = _0x4d2d14;
-    _0x16cfdf = _0x206209 ? { ..._0x206209 } : null;
-    const _0x4f0b16 = toIdSet(_0x4d68f7?.['fullSurfaceIds']),
-      _0x5ac25f = toIdSet(_0x4d68f7?.['proxySurfaceIds']),
-      _0x4b9e45 = toIdSet(_0x4d68f7?.['fullSurfaceReleaseIds']),
-      _0x7664a1 = toIdSet(_0x4d68f7?.['exactVisibleIds']),
-      _0x334698 =
-        _0x21f7e8 && _0x5ac25f['size'] >= DENSE_RASTER_MEDIA_DEFER_NODE_COUNT && _0x263f1d['size'] === 0x0;
-    if (_0x263f1d['size'] === 0x0 && (deferInitialPlanning === !![] || _0x334698)) {
-      const _0x3f6fb7 = new Set(),
-        _0x4aae52 = new Set([..._0x7664a1]['filter']((_0x3332be) => !_0x4f0b16['has'](_0x3332be))),
-        _0x5be6d5 = new Set([..._0x4f0b16, ..._0x4aae52]),
-        _0x4e9f64 = new Set([..._0x5be6d5]['filter']((_0x30d656) => _0x7664a1['has'](_0x30d656))),
-        _0x2bc1de = new Set(
-          [..._0x4b9e45]['filter'](
-            (_0x5f1255) => !_0x7664a1['has'](_0x5f1255) || !isVisualMediaNode(getNode(_0x1cce44, _0x5f1255)),
+    if (!enabled3['dx'] && !enabled3['dy']) enabled3['active'] = ![];
+    if (enabled3['active'] || !viewportBusy || viewport?.['zoom'] !== box4?.['zoom'])
+      previewMotion = enabled3;
+    box4 = viewport ? { ...viewport } : null;
+    const fullSurfaceIds = toIdSet(scenePlan?.['fullSurfaceIds']),
+      proxyCount = toIdSet(scenePlan?.['proxySurfaceIds']),
+      args = toIdSet(scenePlan?.['fullSurfaceReleaseIds']),
+      exactVisibleCount = toIdSet(scenePlan?.['exactVisibleIds']),
+      value10 =
+        mediaLoadingBusy2 &&
+        proxyCount['size'] >= DENSE_RASTER_MEDIA_DEFER_NODE_COUNT &&
+        map4['size'] === 0x0;
+    if (map4['size'] === 0x0 && (deferInitialPlanning === !![] || value10)) {
+      const rasterIds = new Set(),
+        domProxyIds = new Set([...exactVisibleCount]['filter']((value11) => !fullSurfaceIds['has'](value11))),
+        domPreviewCandidateIds = new Set([...fullSurfaceIds, ...domProxyIds]),
+        domPreviewMediaSourceOwnerIds = new Set(
+          [...domPreviewCandidateIds]['filter']((value12) => exactVisibleCount['has'](value12)),
+        ),
+        releasableFullSurfaceIds = new Set(
+          [...args]['filter'](
+            (value13) => !exactVisibleCount['has'](value13) || !isVisualMediaNode(getNode(nodes, value13)),
           ),
         );
-      if (typeof _0x531c91 === 'function')
-        for (const _0x44b2c7 of _0x2bc1de) {
-          _0x531c91(_0x44b2c7);
+      if (typeof releaseFullSurface === 'function')
+        for (const value14 of releasableFullSurfaceIds) {
+          releaseFullSurface(value14);
         }
-      ((_0x3874f6 = _0x3f6fb7), (_0x1c7a20 = new Set(_0x4e9f64)));
-      const _0x4b0399 = 'deferred-initial:' + _0x4f0b16['size'] + ':' + _0x4aae52['size'],
-        _0x48e454 = {
+      ((previousRasterIds = rasterIds), (map3 = new Set(domPreviewMediaSourceOwnerIds)));
+      const signature = 'deferred-initial:' + fullSurfaceIds['size'] + ':' + domProxyIds['size'],
+        policy = {
           active: ![],
-          rasterIds: _0x3f6fb7,
-          domProxyIds: _0x4aae52,
+          rasterIds: rasterIds,
+          domProxyIds: domProxyIds,
           reason: 'deferred-initial-raster-planning',
-          signature: _0x4b0399,
-          coverageSignature: _0x4b0399,
+          signature: signature,
+          coverageSignature: signature,
           stats: {
-            scenePressure: Number(_0x4d68f7?.['pressure']) || 0x0,
+            scenePressure: Number(scenePlan?.['pressure']) || 0x0,
             proxyPressure: 0x0,
             activationSignal: 0x0,
             activationFloor: 0x0,
             rasterShare: 0x0,
-            proxyCount: _0x5ac25f['size'],
+            proxyCount: proxyCount['size'],
             rasterCandidateCount: 0x0,
             rasterCount: 0x0,
-            domProxyCount: _0x4aae52['size'],
+            domProxyCount: domProxyIds['size'],
             interactiveDomCount: 0x0,
             unsupportedDomCount: 0x0,
             projectedDomCount: 0x0,
-            exactVisibleCount: _0x7664a1['size'],
-            exactVisibleCoveredCount: _0x7664a1['size'],
+            exactVisibleCount: exactVisibleCount['size'],
+            exactVisibleCoveredCount: exactVisibleCount['size'],
             exactVisibleMissingCount: 0x0,
           },
         };
       return {
         active: ![],
-        rasterIds: _0x3f6fb7,
-        domProxyIds: _0x4aae52,
-        domPreviewCandidateIds: _0x5be6d5,
-        domPreviewMediaSourceOwnerIds: _0x4e9f64,
-        releasableFullSurfaceIds: _0x2bc1de,
-        policy: _0x48e454,
+        rasterIds: rasterIds,
+        domProxyIds: domProxyIds,
+        domPreviewCandidateIds: domPreviewCandidateIds,
+        domPreviewMediaSourceOwnerIds: domPreviewMediaSourceOwnerIds,
+        releasableFullSurfaceIds: releasableFullSurfaceIds,
+        policy: policy,
         layerStats: { active: ![], supported: !![], deferred: !![], drawnNodeIds: [], drawnMediaNodeIds: [] },
         freezeActive: ![],
-        signature: _0x4b0399,
+        signature: signature,
       };
     }
-    const _0x1bbe7d = new Set(
-        [..._0x5ac25f]['filter']((_0x3fac0d) => {
-          const _0x2b6e4e = getNode(_0x1cce44, _0x3fac0d);
-          if (!isRasterSupportedNode(_0x2b6e4e, _0x3fac0d)) return ![];
-          return !(_0x334698 && _0x7664a1['has'](_0x3fac0d) && isVisualMediaNode(_0x2b6e4e));
+    const rasterSupportedNodeIds = new Set(
+        [...proxyCount]['filter']((value15) => {
+          const node = getNode(nodes, value15);
+          if (!isRasterSupportedNode(node, value15)) return ![];
+          return !(value10 && exactVisibleCount['has'](value15) && isVisualMediaNode(node));
         }),
       ),
-      _0x382967 = planRendererRasterProxies({
-        nodes: _0x1cce44,
-        fullSurfaceIds: _0x4f0b16,
-        proxySurfaceIds: _0x5ac25f,
-        exactVisibleIds: _0x4d68f7?.['exactVisibleIds'],
-        rasterSupportedNodeIds: _0x1bbe7d,
-        previousRasterIds: _0x3874f6,
-        selectedNodeIds: _0x583ac0,
-        hoveredNodeIds: _0x607e7d,
-        hoverNodeId: _0x26dbf4,
-        dragNodeIds: _0x2a56b7,
-        connOverlay: _0x18709b,
-        pickConnectMode: _0x380dfe,
-        activeMediaNodeIds: _0x526889,
-        domRequiredNodeIds: _0x6fc69,
-        viewport: _0x206209,
-        scenePressure: _0x4d68f7?.['pressure'],
+      policy2 = planRendererRasterProxies({
+        nodes: nodes,
+        fullSurfaceIds: fullSurfaceIds,
+        proxySurfaceIds: proxyCount,
+        exactVisibleIds: scenePlan?.['exactVisibleIds'],
+        rasterSupportedNodeIds: rasterSupportedNodeIds,
+        previousRasterIds: previousRasterIds,
+        selectedNodeIds: selectedNodeIds2,
+        hoveredNodeIds: hoveredNodeIds2,
+        hoverNodeId: hoverNodeId2,
+        dragNodeIds: dragNodeIds2,
+        connOverlay: connOverlay2,
+        pickConnectMode: pickConnectMode2,
+        activeMediaNodeIds: activeMediaNodeIds2,
+        domRequiredNodeIds: domRequiredNodeIds2,
+        viewport: viewport,
+        scenePressure: scenePlan?.['pressure'],
       }),
-      _0x10b6fd = collectExplicitDomRequiredIds({
-        selectedNodeIds: _0x583ac0,
-        hoveredNodeIds: _0x607e7d,
-        hoverNodeId: _0x26dbf4,
-        dragNodeIds: _0x2a56b7,
-        connOverlay: _0x18709b,
-        pickConnectMode: _0x380dfe,
-        activeMediaNodeIds: _0x526889,
-        domRequiredNodeIds: _0x6fc69,
+      map8 = collectExplicitDomRequiredIds({
+        selectedNodeIds: selectedNodeIds2,
+        hoveredNodeIds: hoveredNodeIds2,
+        hoverNodeId: hoverNodeId2,
+        dragNodeIds: dragNodeIds2,
+        connOverlay: connOverlay2,
+        pickConnectMode: pickConnectMode2,
+        activeMediaNodeIds: activeMediaNodeIds2,
+        domRequiredNodeIds: domRequiredNodeIds2,
       }),
-      _0x15b5d8 = new Set(),
-      _0x43ab21 = new Set();
-    if (typeof _0x90c1dc['captureNodeFrame'] === 'function' && typeof onRasterHandoffFrame === 'function')
-      for (const _0x152ea1 of _0x1e4294) {
-        if (!_0x10b6fd['has'](_0x152ea1) || !_0x7664a1['has'](_0x152ea1)) continue;
-        const _0x493049 = getNode(_0x1cce44, _0x152ea1);
-        if (!_0x493049 || _0x3243ae['get'](_0x152ea1) !== _0xe40e69(_0x152ea1, _0x493049)) continue;
-        let _0x2f9fa2 = ![];
+      map9 = new Set(),
+      map10 = new Set();
+    if (typeof output['captureNodeFrame'] === 'function' && typeof onRasterHandoffFrame === 'function')
+      for (const value16 of map5) {
+        if (!map8['has'](value16) || !exactVisibleCount['has'](value16)) continue;
+        const node2 = getNode(nodes, value16);
+        if (!node2 || map6['get'](value16) !== run3(value16, node2)) continue;
+        let value17 = ![];
         try {
-          _0x2f9fa2 = isDomMediaPresented?.(_0x152ea1, _0x493049) === !![];
+          value17 = isDomMediaPresented?.(value16, node2) === !![];
         } catch {}
-        if (_0x2f9fa2) continue;
-        _0x15b5d8['add'](_0x152ea1);
-        const _0x509244 = _0x90c1dc['captureNodeFrame'](_0x152ea1);
-        if (!_0x509244) continue;
+        if (value17) continue;
+        map9['add'](value16);
+        const enabled4 = output['captureNodeFrame'](value16);
+        if (!enabled4) continue;
         try {
-          (onRasterHandoffFrame(_0x152ea1, _0x509244), _0x43ab21['add'](_0x152ea1));
+          (onRasterHandoffFrame(value16, enabled4), map10['add'](value16));
         } catch {}
       }
-    const _0x18eb0e = new Set(
-        [..._0x1e4294]['filter']((_0x230f23) => {
-          const _0x3694f5 = _0x10b6fd['has'](_0x230f23);
+    const args2 = new Set(
+        [...map5]['filter']((value18) => {
+          const value19 = map8['has'](value18);
           if (
             typeof isDomMediaPresented !== 'function' ||
-            _0x382967['rasterIds']['has'](_0x230f23) ||
-            !_0x7664a1['has'](_0x230f23) ||
-            (_0x3694f5 && !_0x15b5d8['has'](_0x230f23)) ||
-            _0x43ab21['has'](_0x230f23)
+            policy2['rasterIds']['has'](value18) ||
+            !exactVisibleCount['has'](value18) ||
+            (value19 && !map9['has'](value18)) ||
+            map10['has'](value18)
           )
             return ![];
-          const _0x49d7d7 = getNode(_0x1cce44, _0x230f23);
-          if (!_0x49d7d7 || !isVisualMediaNode(_0x49d7d7)) return ![];
-          if (_0x3243ae['get'](_0x230f23) !== _0xe40e69(_0x230f23, _0x49d7d7)) return ![];
+          const node3 = getNode(nodes, value18);
+          if (!node3 || !isVisualMediaNode(node3)) return ![];
+          if (map6['get'](value18) !== run3(value18, node3)) return ![];
           try {
-            return isDomMediaPresented?.(_0x230f23, _0x49d7d7) !== !![];
+            return isDomMediaPresented?.(value18, node3) !== !![];
           } catch {
             return !![];
           }
         }),
       ),
-      _0x24d0be = lockRasterParticipation === !![] && freezeRasterSurface === !![] && viewportBusy === !![],
-      _0x305e3b = _0x24d0be && _0x263f1d['size'] === 0x0 ? new Set() : _0x382967['rasterIds'],
-      _0x466ffb = new Set([..._0x305e3b, ..._0x18eb0e]),
-      _0x3de1aa = [..._0x305e3b]['filter']((_0x304885) => _0x7664a1['has'](_0x304885)),
-      _0xd03955 = [..._0x263f1d]['some']((_0x57a634) => !_0x466ffb['has'](_0x57a634)),
-      _0x4ed407 = buildRasterVisualStateSignature(_0x18709b, _0x382967['rasterIds']),
-      _0x323769 = _0x4ed407 !== _0x50c10d,
-      _0x385f0f = [..._0x263f1d]['some']((_0x31b7b7) => {
-        const _0x407496 = getNode(_0x1cce44, _0x31b7b7);
-        return !_0x407496 || _0x3243ae['get'](_0x31b7b7) !== _0xe40e69(_0x31b7b7, _0x407496);
+      value20 = lockRasterParticipation === !![] && freezeRasterSurface === !![] && viewportBusy === !![],
+      map11 = value20 && map4['size'] === 0x0 ? new Set() : policy2['rasterIds'],
+      map12 = new Set([...map11, ...args2]),
+      list3 = [...map11]['filter']((value21) => exactVisibleCount['has'](value21)),
+      value22 = [...map4]['some']((value23) => !map12['has'](value23)),
+      rasterVisualStateSignature = buildRasterVisualStateSignature(connOverlay2, policy2['rasterIds']),
+      enabled5 = rasterVisualStateSignature !== value2,
+      enabled6 = [...map4]['some']((value24) => {
+        const node4 = getNode(nodes, value24);
+        return !node4 || map6['get'](value24) !== run3(value24, node4);
       }),
-      _0xa06ff0 = [..._0x263f1d]['some']((_0x1dbae2) => _0x10b6fd['has'](_0x1dbae2)),
-      _0x2cfc44 =
+      enabled7 = [...map4]['some']((value25) => map8['has'](value25)),
+      reuseWhileBusy =
         freezeRasterSurface === !![] &&
         viewportBusy &&
-        _0x263f1d['size'] > 0x0 &&
-        (_0x305e3b['size'] > 0x0 || _0x24d0be) &&
-        !_0x323769 &&
-        !_0x385f0f &&
-        !_0xa06ff0,
-      _0x4faae5 = _0x323769 || _0x385f0f || _0xa06ff0 || (!_0x2cfc44 && _0xd03955),
-      _0x3d51de = _0x2cfc44 ? _0x263f1d : _0x466ffb;
-    _0x24de3a = {
-      nodes: _0x1cce44,
+        map4['size'] > 0x0 &&
+        (map11['size'] > 0x0 || value20) &&
+        !enabled5 &&
+        !enabled6 &&
+        !enabled7,
+      forceRender = enabled5 || enabled6 || enabled7 || (!reuseWhileBusy && value22),
+      args3 = reuseWhileBusy ? map4 : map12;
+    value3 = {
+      nodes: nodes,
       identities: new Map(
-        [..._0x3d51de]
-          ['filter']((_0x4afc0d) => !_0x10b6fd['has'](_0x4afc0d) && _0x305e3b['has'](_0x4afc0d))
-          ['map']((_0x2aaacf) => [_0x2aaacf, _0xe40e69(_0x2aaacf, getNode(_0x1cce44, _0x2aaacf))]),
+        [...args3]
+          ['filter']((value26) => !map8['has'](value26) && map11['has'](value26))
+          ['map']((value27) => [value27, run3(value27, getNode(nodes, value27))]),
       ),
     };
-    const _0x450834 = _0x90c1dc['sync'](_0x2af3a1, _0x1cce44, _0x3d51de, {
-        forceRender: _0x4faae5,
+    const layerStats = output['sync'](canvasEl, nodes, args3, {
+        forceRender: forceRender,
         reuseWhileBusy:
-          _0x2cfc44 ||
-          (viewportBusy && !_0x4faae5 && _0x3de1aa['every']((_0x504c4e) => _0x3874f6['has'](_0x504c4e))),
-        renderScale: resolveRenderScale(_0x206209, devicePixelRatio),
-        mediaLoadNodeIds: _0x7664a1,
-        viewport: _0x206209,
+          reuseWhileBusy ||
+          (viewportBusy && !forceRender && list3['every']((value28) => previousRasterIds['has'](value28))),
+        renderScale: resolveRenderScale(viewport, devicePixelRatio),
+        mediaLoadNodeIds: exactVisibleCount,
+        viewport: viewport,
         viewportBusy: viewportBusy,
-        mediaLoadingBusy: _0x21f7e8 || _0x47be10,
-        invalidNodeIds: _0x18709b?.['invalidNodeIds'],
-        sourceNodeId: _0x18709b?.['srcId'],
-        hoverNodeId: _0x18709b?.['hoverId'] || (_0x380dfe?.['active'] ? _0x380dfe['hoverNodeId'] : null),
+        mediaLoadingBusy: mediaLoadingBusy2 || enabled2,
+        invalidNodeIds: connOverlay2?.['invalidNodeIds'],
+        sourceNodeId: connOverlay2?.['srcId'],
+        hoverNodeId:
+          connOverlay2?.['hoverId'] ||
+          (pickConnectMode2?.['active'] ? pickConnectMode2['hoverNodeId'] : null),
       }),
-      _0x2e7b21 =
-        _0x450834?.['supported'] === !![] && _0x450834?.['active'] === !![]
-          ? toIdSet(_0x450834['drawnNodeIds'])
+      map13 =
+        layerStats?.['supported'] === !![] && layerStats?.['active'] === !![]
+          ? toIdSet(layerStats['drawnNodeIds'])
           : new Set(),
-      _0x2a092e =
-        _0x450834?.['supported'] === !![] && _0x450834?.['active'] === !![]
-          ? toIdSet(_0x450834['drawnMediaNodeIds'])
+      map14 =
+        layerStats?.['supported'] === !![] && layerStats?.['active'] === !![]
+          ? toIdSet(layerStats['drawnMediaNodeIds'])
           : new Set();
-    ((_0x263f1d = _0x2e7b21),
-      (_0x1e4294 = _0x2a092e),
-      (_0x3243ae = new Map(
-        [..._0x2e7b21]['map']((_0x33919d) => [
-          _0x33919d,
-          _0xe40e69(_0x33919d, getNode(_0x1cce44, _0x33919d)),
-        ]),
-      )));
-    for (const _0x143804 of _0x2c340b['keys']()) {
-      !_0x2e7b21['has'](_0x143804) && _0x2c340b['delete'](_0x143804);
+    ((map4 = map13),
+      (map5 = map14),
+      (map6 = new Map([...map13]['map']((value29) => [value29, run3(value29, getNode(nodes, value29))]))));
+    for (const value30 of map7['keys']()) {
+      !map13['has'](value30) && map7['delete'](value30);
     }
-    _0x50c10d = _0x4ed407;
-    const _0x444911 = new Set(
-        [...(_0x2cfc44 ? _0x2e7b21 : _0x305e3b)]['filter'](
-          (_0x558101) =>
-            _0x2e7b21['has'](_0x558101) &&
-            (!isVisualMediaNode(getNode(_0x1cce44, _0x558101)) ||
-              _0x2a092e['has'](_0x558101) ||
-              (_0x2cfc44 &&
-                _0x206209?.['zoom'] <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
-                !isRendererFastPreviewMediaReadable(getNode(_0x1cce44, _0x558101), { viewport: _0x206209 }) &&
-                !_0x1c7a20['has'](_0x558101))) &&
-            getNode(_0x1cce44, _0x558101) &&
-            !_0x10b6fd['has'](_0x558101),
+    value2 = rasterVisualStateSignature;
+    const active = new Set(
+        [...(reuseWhileBusy ? map13 : map11)]['filter'](
+          (value31) =>
+            map13['has'](value31) &&
+            (!isVisualMediaNode(getNode(nodes, value31)) ||
+              map14['has'](value31) ||
+              (reuseWhileBusy &&
+                viewport?.['zoom'] <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
+                !isRendererFastPreviewMediaReadable(getNode(nodes, value31), { viewport: viewport }) &&
+                !map3['has'](value31))) &&
+            getNode(nodes, value31) &&
+            !map8['has'](value31),
         ),
       ),
-      _0x3331e1 = new Set(_0x382967['domProxyIds']),
-      _0x38d318 = viewportBusy
+      domProxyIds2 = new Set(policy2['domProxyIds']),
+      map15 = viewportBusy
         ? selectRendererMotionAheadMediaIds(
-            [..._0x382967['rasterIds']]
-              ['filter'](
-                (_0x537c9d) =>
-                  !_0x444911['has'](_0x537c9d) && isVisualMediaNode(getNode(_0x1cce44, _0x537c9d)),
-              )
-              ['map']((_0x906fea) => ({ nodeId: _0x906fea, geometry: getNode(_0x1cce44, _0x906fea) })),
+            [...policy2['rasterIds']]
+              ['filter']((value32) => !active['has'](value32) && isVisualMediaNode(getNode(nodes, value32)))
+              ['map']((nodeId) => ({ nodeId: nodeId, geometry: getNode(nodes, nodeId) })),
             {
-              viewport: _0x206209,
-              previewMotion: _0x177685,
-              containerWidth: _0x45815b,
-              containerHeight: _0x1c74f9,
+              viewport: viewport,
+              previewMotion: previewMotion,
+              containerWidth: containerWidth,
+              containerHeight: containerHeight,
             },
           )
         : new Set();
-    for (const _0x514206 of _0x382967['rasterIds']) {
-      !_0x444911['has'](_0x514206) &&
-        (_0x450834?.['active'] !== !![] || _0x7664a1['has'](_0x514206) || _0x38d318['has'](_0x514206)) &&
-        _0x3331e1['add'](_0x514206);
+    for (const value33 of policy2['rasterIds']) {
+      !active['has'](value33) &&
+        (layerStats?.['active'] !== !![] || exactVisibleCount['has'](value33) || map15['has'](value33)) &&
+        domProxyIds2['add'](value33);
     }
-    _0x3874f6 = _0x444911;
-    const _0x5569e1 = new Set([..._0x4f0b16, ..._0x3331e1]);
-    for (const _0x4bfeb0 of _0x444911) {
-      (_0x5569e1['delete'](_0x4bfeb0), _0x3331e1['delete'](_0x4bfeb0));
+    previousRasterIds = active;
+    const domPreviewCandidateIds2 = new Set([...fullSurfaceIds, ...domProxyIds2]);
+    for (const value34 of active) {
+      (domPreviewCandidateIds2['delete'](value34), domProxyIds2['delete'](value34));
     }
-    const _0x123ddd = new Set(
-        _0x2cfc44 ? [..._0x382967['rasterIds']]['filter']((_0x2338d4) => !_0x444911['has'](_0x2338d4)) : [],
+    const map16 = new Set(
+        reuseWhileBusy ? [...policy2['rasterIds']]['filter']((value35) => !active['has'](value35)) : [],
       ),
-      _0x4ec7fb = new Set(
-        [..._0x5569e1]['filter'](
-          (_0x353c93) =>
-            (_0x7664a1['has'](_0x353c93) && !_0x123ddd['has'](_0x353c93)) || _0x38d318['has'](_0x353c93),
+      domPreviewMediaSourceOwnerIds2 = new Set(
+        [...domPreviewCandidateIds2]['filter'](
+          (value36) => (exactVisibleCount['has'](value36) && !map16['has'](value36)) || map15['has'](value36),
         ),
       );
-    if (_0x2cfc44)
-      for (const _0x353806 of _0x1c7a20) {
-        _0x5569e1['has'](_0x353806) &&
-          _0x7664a1['has'](_0x353806) &&
-          !_0x2a092e['has'](_0x353806) &&
-          _0x4ec7fb['add'](_0x353806);
+    if (reuseWhileBusy)
+      for (const value37 of map3) {
+        domPreviewCandidateIds2['has'](value37) &&
+          exactVisibleCount['has'](value37) &&
+          !map14['has'](value37) &&
+          domPreviewMediaSourceOwnerIds2['add'](value37);
       }
-    if (_0x24d0be)
-      for (const _0x44ba07 of _0x1c7a20) {
-        if (_0x2a092e['has'](_0x44ba07) || !getNode(_0x1cce44, _0x44ba07)) continue;
-        (_0x5569e1['add'](_0x44ba07), _0x3331e1['add'](_0x44ba07), _0x4ec7fb['add'](_0x44ba07));
+    if (value20)
+      for (const value38 of map3) {
+        if (map14['has'](value38) || !getNode(nodes, value38)) continue;
+        (domPreviewCandidateIds2['add'](value38),
+          domProxyIds2['add'](value38),
+          domPreviewMediaSourceOwnerIds2['add'](value38));
       }
-    _0x1c7a20 = new Set(_0x4ec7fb);
-    const _0x1cac82 = new Set(
-      [..._0x4b9e45]['filter'](
-        (_0x681e82) =>
-          !_0x7664a1['has'](_0x681e82) ||
-          !isVisualMediaNode(getNode(_0x1cce44, _0x681e82)) ||
-          _0x444911['has'](_0x681e82),
+    map3 = new Set(domPreviewMediaSourceOwnerIds2);
+    const releasableFullSurfaceIds2 = new Set(
+      [...args]['filter'](
+        (value39) =>
+          !exactVisibleCount['has'](value39) ||
+          !isVisualMediaNode(getNode(nodes, value39)) ||
+          active['has'](value39),
       ),
     );
-    if (typeof _0x531c91 === 'function')
-      for (const _0x4303a7 of _0x1cac82) {
-        _0x531c91(_0x4303a7);
+    if (typeof releaseFullSurface === 'function')
+      for (const value40 of releasableFullSurfaceIds2) {
+        releaseFullSurface(value40);
       }
     return {
-      active: _0x444911['size'] > 0x0,
-      rasterIds: _0x444911,
-      domProxyIds: _0x3331e1,
-      domPreviewCandidateIds: _0x5569e1,
-      domPreviewMediaSourceOwnerIds: _0x4ec7fb,
-      releasableFullSurfaceIds: _0x1cac82,
-      policy: _0x382967,
-      layerStats: _0x450834,
-      freezeActive: _0x2cfc44,
+      active: active['size'] > 0x0,
+      rasterIds: active,
+      domProxyIds: domProxyIds2,
+      domPreviewCandidateIds: domPreviewCandidateIds2,
+      domPreviewMediaSourceOwnerIds: domPreviewMediaSourceOwnerIds2,
+      releasableFullSurfaceIds: releasableFullSurfaceIds2,
+      policy: policy2,
+      layerStats: layerStats,
+      freezeActive: reuseWhileBusy,
       signature:
-        _0x382967['signature'] +
+        policy2['signature'] +
         '|claimed:' +
-        [..._0x444911]['join']('\x1f') +
+        [...active]['join']('\x1f') +
         '|handoff:' +
-        [..._0x18eb0e]['join']('\x1f'),
+        [...args2]['join']('\x1f'),
     };
   }
-  function _0x154adf() {
-    ((_0x24de3a = null),
-      (_0x3874f6 = new Set()),
-      (_0x1c7a20 = new Set()),
-      (_0x263f1d = new Set()),
-      (_0x1e4294 = new Set()),
-      (_0x3243ae = new Map()),
-      _0x2c340b['clear'](),
-      (_0x50c10d = ''),
-      (_0x21f7e8 = ![]),
-      (_0x47be10 = ![]),
-      (_0x16cfdf = null),
-      (_0x177685 = { active: ![] }),
-      _0x90c1dc['destroy']?.());
-    if (!layer) _0x90c1dc = _0x1e0b39();
+  function reset() {
+    ((value3 = null),
+      (previousRasterIds = new Set()),
+      (map3 = new Set()),
+      (map4 = new Set()),
+      (map5 = new Set()),
+      (map6 = new Map()),
+      map7['clear'](),
+      (value2 = ''),
+      (mediaLoadingBusy2 = ![]),
+      (enabled2 = ![]),
+      (box4 = null),
+      (previewMotion = { active: ![] }),
+      output['destroy']?.());
+    if (!layer) output = run2();
   }
-  function _0x5df7b3(_0x184d83) {
+  function setMediaLoadingBusy(value41) {
     return (
-      (_0x47be10 = _0x184d83 === !![]),
-      _0x90c1dc['setMediaLoadingBusy']?.(_0x21f7e8 || _0x47be10) || null
+      (enabled2 = value41 === !![]),
+      output['setMediaLoadingBusy']?.(mediaLoadingBusy2 || enabled2) || null
     );
   }
-  function _0x26a56c(_0xbfffc6) {
-    const _0x21f0c2 = String(_0xbfffc6 || '')['trim']();
-    if (!_0x21f0c2) return ![];
-    const _0x5c9f68 =
-      _0x263f1d['has'](_0x21f0c2) || _0x1e4294['has'](_0x21f0c2) || _0x3874f6['has'](_0x21f0c2);
-    if (typeof _0x90c1dc['excludeNode'] !== 'function') return ![];
-    const _0x2d3e50 = _0x90c1dc['excludeNode'](_0x21f0c2) === !![];
-    if (!_0x2d3e50 && !_0x5c9f68) return ![];
+  function excludeNode(value42) {
+    const enabled8 = String(value42 || '')['trim']();
+    if (!enabled8) return ![];
+    const enabled9 = map4['has'](enabled8) || map5['has'](enabled8) || previousRasterIds['has'](enabled8);
+    if (typeof output['excludeNode'] !== 'function') return ![];
+    const enabled10 = output['excludeNode'](enabled8) === !![];
+    if (!enabled10 && !enabled9) return ![];
     return (
-      _0x263f1d['delete'](_0x21f0c2),
-      _0x1e4294['delete'](_0x21f0c2),
-      _0x3243ae['delete'](_0x21f0c2),
-      _0x2c340b['delete'](_0x21f0c2),
-      _0x3874f6['delete'](_0x21f0c2),
+      map4['delete'](enabled8),
+      map5['delete'](enabled8),
+      map6['delete'](enabled8),
+      map7['delete'](enabled8),
+      previousRasterIds['delete'](enabled8),
       !![]
     );
   }
-  function _0x3d4e39(_0x4075cf) {
-    const _0x619ec6 = String(_0x4075cf || '')['trim']();
-    if (!_0x619ec6 || !_0x263f1d['has'](_0x619ec6)) return null;
-    return _0x90c1dc['captureNodeFrame']?.(_0x619ec6) || null;
+  function captureNodeFrame(value43) {
+    const enabled11 = String(value43 || '')['trim']();
+    if (!enabled11 || !map4['has'](enabled11)) return null;
+    return output['captureNodeFrame']?.(enabled11) || null;
   }
   return {
-    sync: _0x14a198,
-    reset: _0x154adf,
-    captureNodeFrame: _0x3d4e39,
-    excludeNode: _0x26a56c,
-    setMediaLoadingBusy: _0x5df7b3,
-    getStats: () => _0x90c1dc['getStats']?.() || null,
+    sync: sync,
+    reset: reset,
+    captureNodeFrame: captureNodeFrame,
+    excludeNode: excludeNode,
+    setMediaLoadingBusy: setMediaLoadingBusy,
+    getStats: () => output['getStats']?.() || null,
   };
 }

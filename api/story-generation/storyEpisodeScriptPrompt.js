@@ -28,147 +28,147 @@ export const STORY_EPISODE_SCRIPT_CONTENT_REVISION_SYSTEM_PROMPT = [
   '只返回与单集剧本相同结构的严格\x20JSON，不要输出说明、对比稿或\x20Markdown。',
 ]['join']('\x0a');
 export function createStoryEpisodeScriptPromptApi({
-  normalizeText: _0x155950,
-  normalizeStringArray: _0x53415a,
-  normalizePositiveNumber: _0x3de5bf,
-  normalizeStoryScriptMode: _0x4d7e94,
-  normalizeStorySummaryCharacter: _0x8cdd5b,
-  normalizeStoryContinuityFacts: _0x2eaee5,
-  normalizeStoryContinuityState: _0x1f393e,
-  createStoryEpisodeScriptRuntimeGuidance: _0x5834ec,
-  schemaVersion: _0x312878,
-  narrationMode: _0x54026f,
+  normalizeText: normalizeText,
+  normalizeStringArray: normalizeStringArray,
+  normalizePositiveNumber: normalizePositiveNumber,
+  normalizeStoryScriptMode: normalizeStoryScriptMode,
+  normalizeStorySummaryCharacter: normalizeStorySummaryCharacter,
+  normalizeStoryContinuityFacts: normalizeStoryContinuityFacts,
+  normalizeStoryContinuityState: normalizeStoryContinuityState,
+  createStoryEpisodeScriptRuntimeGuidance: createStoryEpisodeScriptRuntimeGuidance,
+  schemaVersion: schemaVersion,
+  narrationMode: narrationMode,
 } = {}) {
-  const _0x1c4fd8 = 0x320;
-  function _0x464af6(_0x376ac1 = {}) {
-    const _0x3dc3bb =
-      _0x376ac1 && typeof _0x376ac1 === 'object' && !Array['isArray'](_0x376ac1) ? _0x376ac1 : {};
+  const value = 0x320;
+  function storyContract(options = {}) {
+    const item = options && typeof options === 'object' && !Array['isArray'](options) ? options : {};
     return {
-      protagonistGoal: _0x155950(_0x3dc3bb['protagonistGoal']),
-      centralConflict: _0x155950(_0x3dc3bb['centralConflict']),
-      stakes: _0x155950(_0x3dc3bb['stakes']),
-      progressionDriver: _0x155950(_0x3dc3bb['progressionDriver']),
-      constraints: _0x155950(_0x3dc3bb['constraints']),
-      climax: _0x155950(_0x3dc3bb['climax']),
-      ending: _0x155950(_0x3dc3bb['ending']),
+      protagonistGoal: normalizeText(item['protagonistGoal']),
+      centralConflict: normalizeText(item['centralConflict']),
+      stakes: normalizeText(item['stakes']),
+      progressionDriver: normalizeText(item['progressionDriver']),
+      constraints: normalizeText(item['constraints']),
+      climax: normalizeText(item['climax']),
+      ending: normalizeText(item['ending']),
     };
   }
-  function _0x4a34ab(_0x4ebaed = {}) {
-    const _0x1c5462 = {
-      title: _0x155950(_0x4ebaed?.['title']),
-      storyType: _0x155950(_0x4ebaed?.['storyType']),
-      targetAudience: _0x155950(_0x4ebaed?.['targetAudience']),
-      summary: _0x155950(_0x4ebaed?.['summary'] || _0x4ebaed?.['storySummary']),
-      background: _0x155950(_0x4ebaed?.['background'] || _0x4ebaed?.['storyBackground']),
-      setting: _0x155950(_0x4ebaed?.['setting'] || _0x4ebaed?.['storySetting']),
-      coreHook: _0x155950(_0x4ebaed?.['coreHook']),
-      logline: _0x155950(_0x4ebaed?.['logline']),
-      storyContract: _0x464af6(_0x4ebaed?.['storyContract']),
-      plotBeats: (Array['isArray'](_0x4ebaed?.['plotBeats']) ? _0x4ebaed['plotBeats'] : [])
-        ['map']((_0x19b6ce) => ({
-          ref: _0x155950(_0x19b6ce?.['ref']),
-          stage: _0x155950(_0x19b6ce?.['stage']),
-          event: _0x155950(_0x19b6ce?.['event']),
-          consequence: _0x155950(_0x19b6ce?.['consequence']),
+  function run(options2 = {}) {
+    const enabled = {
+      title: normalizeText(options2?.['title']),
+      storyType: normalizeText(options2?.['storyType']),
+      targetAudience: normalizeText(options2?.['targetAudience']),
+      summary: normalizeText(options2?.['summary'] || options2?.['storySummary']),
+      background: normalizeText(options2?.['background'] || options2?.['storyBackground']),
+      setting: normalizeText(options2?.['setting'] || options2?.['storySetting']),
+      coreHook: normalizeText(options2?.['coreHook']),
+      logline: normalizeText(options2?.['logline']),
+      storyContract: storyContract(options2?.['storyContract']),
+      plotBeats: (Array['isArray'](options2?.['plotBeats']) ? options2['plotBeats'] : [])
+        ['map']((key) => ({
+          ref: normalizeText(key?.['ref']),
+          stage: normalizeText(key?.['stage']),
+          event: normalizeText(key?.['event']),
+          consequence: normalizeText(key?.['consequence']),
         }))
-        ['filter']((_0x345a97) => _0x345a97['stage'] || _0x345a97['event'] || _0x345a97['consequence']),
-      storyFacts: _0x2eaee5([
-        ...(Array['isArray'](_0x4ebaed?.['continuityFacts']) ? _0x4ebaed['continuityFacts'] : []),
-        ...(Array['isArray'](_0x4ebaed?.['storyFacts']) ? _0x4ebaed['storyFacts'] : []),
+        ['filter']((index) => index['stage'] || index['event'] || index['consequence']),
+      storyFacts: normalizeStoryContinuityFacts([
+        ...(Array['isArray'](options2?.['continuityFacts']) ? options2['continuityFacts'] : []),
+        ...(Array['isArray'](options2?.['storyFacts']) ? options2['storyFacts'] : []),
       ]),
-      characters: (Array['isArray'](_0x4ebaed?.['characters']) ? _0x4ebaed['characters'] : [])
-        ['map'](_0x8cdd5b)
+      characters: (Array['isArray'](options2?.['characters']) ? options2['characters'] : [])
+        ['map'](normalizeStorySummaryCharacter)
         ['filter'](Boolean)
-        ['map']((_0x39c420) => ({
-          ref: _0x39c420['ref'],
-          name: _0x39c420['name'],
-          roleType: _0x39c420['roleType'],
-          fixedTraits: _0x39c420['fixedTraits'],
-          coreTags: _0x39c420['coreTags'],
-          profile: _0x39c420['profile'],
-          motivation: _0x39c420['motivation'],
-          relationships: _0x39c420['relationships'],
-          personality: _0x39c420['personality'],
-          arc: _0x39c420['arc'],
+        ['map']((ref) => ({
+          ref: ref['ref'],
+          name: ref['name'],
+          roleType: ref['roleType'],
+          fixedTraits: ref['fixedTraits'],
+          coreTags: ref['coreTags'],
+          profile: ref['profile'],
+          motivation: ref['motivation'],
+          relationships: ref['relationships'],
+          personality: ref['personality'],
+          arc: ref['arc'],
         })),
     };
-    if (!_0x1c5462['title'] || !_0x1c5462['summary'] || !_0x1c5462['logline'])
+    if (!enabled['title'] || !enabled['summary'] || !enabled['logline'])
       throw new Error('请先生成剧本摘要。');
-    return _0x1c5462;
+    return enabled;
   }
-  function _0x5afa0e(_0x48c7a5, _0xec3734, _0xf72448) {
-    if (!_0x48c7a5) return null;
-    const _0xaca4e = Array['isArray'](_0x48c7a5?.['script']?.['scenes']) ? _0x48c7a5['script']['scenes'] : [],
-      _0xc55961 = _0xaca4e['findLast']((_0x3d05ab) => _0x155950(_0x3d05ab?.['body'])),
-      _0x32e3ab = _0x155950(_0xc55961?.['body'] || _0xf72448),
-      _0xa276b5 = _0x32e3ab['length'] > _0x1c4fd8 ? _0x32e3ab['slice'](-_0x1c4fd8) : _0x32e3ab;
+  function previousEpisode2(enabled2, result, data) {
+    if (!enabled2) return null;
+    const target = Array['isArray'](enabled2?.['script']?.['scenes']) ? enabled2['script']['scenes'] : [],
+      dom = target['findLast']((dom2) => normalizeText(dom2?.['body'])),
+      list = normalizeText(dom?.['body'] || data),
+      body = list['length'] > value ? list['slice'](-value) : list;
     return {
-      number: Number(_0x48c7a5?.['number']) || _0xec3734 - 0x1,
-      title: _0x155950(_0x48c7a5?.['title']),
-      synopsis: _0x155950(_0x48c7a5?.['synopsis']),
-      hook: _0x155950(_0x48c7a5?.['hook']),
-      continuityFacts: _0x2eaee5(_0x48c7a5?.['continuityFacts']),
-      endingState: _0x1f393e(_0x48c7a5?.['endingState']),
-      ...(_0xc55961
+      number: Number(enabled2?.['number']) || result - 0x1,
+      title: normalizeText(enabled2?.['title']),
+      synopsis: normalizeText(enabled2?.['synopsis']),
+      hook: normalizeText(enabled2?.['hook']),
+      continuityFacts: normalizeStoryContinuityFacts(enabled2?.['continuityFacts']),
+      endingState: normalizeStoryContinuityState(enabled2?.['endingState']),
+      ...(dom
         ? {
             endingScene: {
-              heading: _0x155950(_0xc55961?.['heading']),
-              characters: _0x53415a(_0xc55961?.['characters']),
-              body: _0xa276b5,
+              heading: normalizeText(dom?.['heading']),
+              characters: normalizeStringArray(dom?.['characters']),
+              body: body,
             },
           }
-        : { endingExcerpt: _0xa276b5 }),
+        : { endingExcerpt: body }),
     };
   }
-  function _0x357e3d({
+  function buildPrompt({
     project: project = {},
     episode: episode = {},
     previousEpisode: previousEpisode = null,
     nextEpisode: nextEpisode = null,
   } = {}) {
-    const _0x44fd75 = _0x4a34ab(project),
-      _0x194c76 = _0x4d7e94(project?.['scriptMode']),
-      _0x4bf6d2 = Math['max'](0x1, Math['trunc'](Number(episode?.['number']) || 0x1)),
-      _0x7245ee = {
+    const storySummary = run(project),
+      scriptMode = normalizeStoryScriptMode(project?.['scriptMode']),
+      number = Math['max'](0x1, Math['trunc'](Number(episode?.['number']) || 0x1)),
+      currentEpisode = {
         ref:
-          _0x155950(episode?.['ref'] || episode?.['planningRef'] || episode?.['id']) ||
-          'episode-' + _0x4bf6d2,
-        number: _0x4bf6d2,
-        title: _0x155950(episode?.['title']),
-        synopsis: _0x155950(episode?.['synopsis']),
-        hook: _0x155950(episode?.['hook']),
-        coreBeat: _0x155950(episode?.['coreBeat']),
-        endingEvent: _0x155950(episode?.['endingEvent']),
+          normalizeText(episode?.['ref'] || episode?.['planningRef'] || episode?.['id']) ||
+          'episode-' + number,
+        number: number,
+        title: normalizeText(episode?.['title']),
+        synopsis: normalizeText(episode?.['synopsis']),
+        hook: normalizeText(episode?.['hook']),
+        coreBeat: normalizeText(episode?.['coreBeat']),
+        endingEvent: normalizeText(episode?.['endingEvent']),
         outlineEstimateSeconds:
-          _0x3de5bf(episode?.['estimatedDurationSeconds'] || episode?.['durationSeconds']) || null,
-        continuityFacts: _0x2eaee5(episode?.['continuityFacts']),
-        requiredEndingState: _0x1f393e(episode?.['endingState']),
+          normalizePositiveNumber(episode?.['estimatedDurationSeconds'] || episode?.['durationSeconds']) ||
+          null,
+        continuityFacts: normalizeStoryContinuityFacts(episode?.['continuityFacts']),
+        requiredEndingState: normalizeStoryContinuityState(episode?.['endingState']),
       };
-    if (!_0x7245ee['title'] || !_0x7245ee['synopsis'])
+    if (!currentEpisode['title'] || !currentEpisode['synopsis'])
       throw new Error('当前分集缺少标题或简介，无法生成完整剧本。');
-    const _0x5378fc = _0x155950(
+    const enabled3 = normalizeText(
       previousEpisode?.['script']?.['fullText'] ||
         previousEpisode?.['fullScript'] ||
         previousEpisode?.['scriptText'],
     );
-    if (_0x4bf6d2 > 0x1 && !_0x5378fc)
-      throw new Error('必须先完成第 ' + (_0x4bf6d2 - 0x1) + ' 集剧本，才能生成第 ' + _0x4bf6d2 + ' 集。');
+    if (number > 0x1 && !enabled3)
+      throw new Error('必须先完成第 ' + (number - 0x1) + ' 集剧本，才能生成第 ' + number + ' 集。');
     return JSON['stringify']({
       task: 'write_story_episode_script',
-      schemaVersion: _0x312878,
-      scriptMode: _0x194c76,
-      storySummary: _0x44fd75,
-      currentEpisode: _0x7245ee,
-      runtimeGuidance: _0x5834ec(episode),
+      schemaVersion: schemaVersion,
+      scriptMode: scriptMode,
+      storySummary: storySummary,
+      currentEpisode: currentEpisode,
+      runtimeGuidance: createStoryEpisodeScriptRuntimeGuidance(episode),
       continuity: {
-        previousEpisode: _0x5afa0e(previousEpisode, _0x4bf6d2, _0x5378fc),
+        previousEpisode: previousEpisode2(previousEpisode, number, enabled3),
         nextEpisode: nextEpisode
           ? {
-              number: Number(nextEpisode?.['number']) || _0x4bf6d2 + 0x1,
-              title: _0x155950(nextEpisode?.['title']),
-              synopsis: _0x155950(nextEpisode?.['synopsis']),
-              coreBeat: _0x155950(nextEpisode?.['coreBeat']),
-              continuityFacts: _0x2eaee5(nextEpisode?.['continuityFacts']),
+              number: Number(nextEpisode?.['number']) || number + 0x1,
+              title: normalizeText(nextEpisode?.['title']),
+              synopsis: normalizeText(nextEpisode?.['synopsis']),
+              coreBeat: normalizeText(nextEpisode?.['coreBeat']),
+              continuityFacts: normalizeStoryContinuityFacts(nextEpisode?.['continuityFacts']),
             }
           : null,
       },
@@ -187,7 +187,7 @@ export function createStoryEpisodeScriptPromptApi({
         '不得在\x20body\x20末尾添加“本集完”“全剧终”“待续”等编辑标记；确需观众看见文字时，明确写成“屏幕字幕：“文字””。',
         '人物称呼、关系、目标和世界规则必须与 storySummary 一致。',
         '只生成完整分场剧本，不写分镜编号、景别、运镜、视频参数或绘图提示词。',
-        ...(_0x194c76 === _0x54026f
+        ...(scriptMode === narrationMode
           ? [
               '以第三人称旁白为主要叙事载体，旁白应占全部可配音文本的\x2080%\x20以上，并统一使用“旁白：”标注。',
               '旁白按信息节拍分成短句和短段，每段只推进一个事件、发现、因果或情绪转折，适配单人口播。',
@@ -200,15 +200,15 @@ export function createStoryEpisodeScriptPromptApi({
           : ['以人物行动、关系碰撞和对白推进剧情；旁白只用于无法通过表演清晰传达的必要信息。']),
       ],
       outputSchema: {
-        episodeRef: _0x7245ee['ref'],
-        title: _0x7245ee['title'],
+        episodeRef: currentEpisode['ref'],
+        title: currentEpisode['title'],
         scenes: [
           {
-            ref: _0x7245ee['ref'] + '-scene-1',
+            ref: currentEpisode['ref'] + '-scene-1',
             heading: '夜\x20内\x20故障电梯',
             characters: ['人物名'],
             body:
-              _0x194c76 === _0x54026f
+              scriptMode === narrationMode
                 ? '以“旁白：”为主体，穿插可视化动作和少量“角色名：关键对白”的完整场次正文；体量按本集内容自然决定'
                 : '包含动作、标准“角色名：“完整对白””及必要 VO/OS 的完整场次正文；体量按本集内容与自然表演时长决定',
           },
@@ -224,7 +224,7 @@ export function createStoryEpisodeScriptPromptApi({
       },
     });
   }
-  function _0x55f34f({
+  function buildContentRevisionPrompt({
     grounding: grounding = {},
     script: script = {},
     timingReview: timingReview = {},
@@ -239,18 +239,18 @@ export function createStoryEpisodeScriptPromptApi({
         continuity: grounding?.['continuity'],
       },
       currentScript: {
-        episodeRef: _0x155950(script?.['episodeRef']),
-        title: _0x155950(script?.['title']),
+        episodeRef: normalizeText(script?.['episodeRef']),
+        title: normalizeText(script?.['title']),
         scenes: Array['isArray'](script?.['scenes']) ? script['scenes'] : [],
-        continuityFacts: _0x2eaee5(script?.['continuityFacts']),
-        endingState: _0x1f393e(script?.['endingState']),
+        continuityFacts: normalizeStoryContinuityFacts(script?.['continuityFacts']),
+        endingState: normalizeStoryContinuityState(script?.['endingState']),
       },
       timingReview: {
-        verdict: _0x155950(timingReview?.['verdict']),
-        naturalDurationSeconds: _0x3de5bf(timingReview?.['naturalDurationSeconds']) || null,
+        verdict: normalizeText(timingReview?.['verdict']),
+        naturalDurationSeconds: normalizePositiveNumber(timingReview?.['naturalDurationSeconds']) || null,
         reasonableRangeSeconds: timingReview?.['reasonableRangeSeconds'],
-        reason: _0x155950(timingReview?.['reason']),
-        findings: _0x53415a(timingReview?.['findings']),
+        reason: normalizeText(timingReview?.['reason']),
+        findings: normalizeStringArray(timingReview?.['findings']),
       },
       requirements: [
         '逐项修复 timingReview.findings，不得仅改写措辞后保留同一重复功能。',
@@ -261,5 +261,5 @@ export function createStoryEpisodeScriptPromptApi({
       ],
     });
   }
-  return { buildPrompt: _0x357e3d, buildContentRevisionPrompt: _0x55f34f };
+  return { buildPrompt: buildPrompt, buildContentRevisionPrompt: buildContentRevisionPrompt };
 }

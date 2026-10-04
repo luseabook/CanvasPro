@@ -1,473 +1,493 @@
 import { t } from '../../../i18n/index.js';
 import { createToolbarActionPopupAnchorPositionGetter } from '../actionMenu.js';
 const IMAGE_HD_LEGACY_MODEL_LABEL = 'RH高清放大';
-function imageHdText(_0x272bce, _0x1c95c0 = {}) {
-  return t('nodeToolbar.imageHd.' + _0x272bce, _0x1c95c0);
+function imageHdText(value, item = {}) {
+  return t('nodeToolbar.imageHd.' + value, item);
 }
-function uniqueList(_0x324457) {
-  return Array.from(new Set(_0x324457.map((_0x7d4110) => String(_0x7d4110 || '').trim()).filter(Boolean)));
+function uniqueList(list) {
+  return Array.from(new Set(list.map((item2) => String(item2 || '').trim()).filter(Boolean)));
 }
 function imageHdOutputText({ resolution: resolution = '', status: status = '', error: error = '' } = {}) {
-  const _0x13d507 = imageHdText('outputText', {
+  const outputText = imageHdText('outputText', {
       model: imageHdText('modelLabel'),
       prompt: imageHdText('promptLabel'),
       resolution: resolution,
     }),
-    _0x21fe9b = status
-      ? imageHdText('outputTextWithStatus', { outputText: _0x13d507, status: status })
-      : _0x13d507;
-  return error ? imageHdText('outputTextWithError', { outputText: _0x21fe9b, error: error }) : _0x21fe9b;
+    outputText2 = status
+      ? imageHdText('outputTextWithStatus', { outputText: outputText, status: status })
+      : outputText;
+  return error ? imageHdText('outputTextWithError', { outputText: outputText2, error: error }) : outputText2;
 }
-export function bindImageHdAction(_0x35061c) {
+export function bindImageHdAction(key) {
   const {
-      toolbarEl: _0x273412,
-      nodeId: _0x4b2516,
-      getNodeData: _0x5d392a,
-      _hdTaskMachine: _0xd4f392,
-      _hdState: _0x102ed1,
-      store: _0xb172b1,
-      submitTask: _0x2ee60d,
-      buildSourceMediaNodePayload: _0x3a6ba1,
-      buildImageGenerationFailurePatch: _0x5cf7a7,
-      buildImageGenerationResultPatch: _0x50a214,
-      calcDisplaySizeByMedia: _0x57752a,
-      runRunninghubWorkflow: _0x37ea35,
-      resumeRunninghubWorkflowTask: _0x1d0f57,
-      processInputImages: _0x3cdb51,
-      getProviderConfig: _0x411d35,
-      ensureConfig: _0x536e7e,
-      calcSafeSpawnPosNearNode: _0x1bd3cb,
-      bindRunningHubToolbarTaskButton: _0x29d8f0,
-      cancelRunningHubResultTask: _0x21f984,
-      findRunningHubToolbarTaskForNode: _0x39f2fa,
-      isRunningHubToolbarTaskCancelled: _0x155829,
-      saveRemoteImageResultLocally: _0x3df074,
-      extractFirstImageUrl: _0x41a3ba,
-      resolveApiInputRatioBasis: _0x3f0ae7,
-      resolveFinalResultDisplaySize: _0x563dec,
-      createToolbarCancelledError: _0x577b9a,
-      isToolbarCancelledError: _0x443bde,
-      createLocalSaveFailureError: _0x4c4822,
-      isLocalSaveFailure: _0x435ba1,
-      throwIfToolbarTaskCancelled: _0x13043f,
-      cancelRunningHubRemoteTaskQuietly: _0x22d01e,
-      focusToolbarTaskNodes: _0x10b746,
-      notifyImageToolbarTaskChange: _0x130501,
-      buildClearedImageMediaFields: _0x3f475e,
-      IMAGE_LOCAL_SAVE_FAILURE_MESSAGE: _0x19448c,
-    } = _0x35061c,
-    _0x2a8bac = _0x273412.querySelector('.act-hd');
-  _0x2a8bac &&
-    (_0xd4f392.bindButton(_0x2a8bac),
-    _0x29d8f0({
-      button: _0x2a8bac,
+      toolbarEl: toolbarEl,
+      nodeId: nodeId,
+      getNodeData: getNodeData,
+      _hdTaskMachine: _hdTaskMachine,
+      _hdState: _hdState,
+      store: store,
+      submitTask: submitTask,
+      buildSourceMediaNodePayload: buildSourceMediaNodePayload,
+      buildImageGenerationFailurePatch: buildImageGenerationFailurePatch,
+      buildImageGenerationResultPatch: buildImageGenerationResultPatch,
+      calcDisplaySizeByMedia: calcDisplaySizeByMedia,
+      runRunninghubWorkflow: runRunninghubWorkflow,
+      resumeRunninghubWorkflowTask: resumeRunninghubWorkflowTask,
+      processInputImages: processInputImages,
+      getProviderConfig: getProviderConfig,
+      ensureConfig: ensureConfig,
+      calcSafeSpawnPosNearNode: calcSafeSpawnPosNearNode,
+      bindRunningHubToolbarTaskButton: bindRunningHubToolbarTaskButton,
+      cancelRunningHubResultTask: cancelRunningHubResultTask,
+      findRunningHubToolbarTaskForNode: findRunningHubToolbarTaskForNode,
+      isRunningHubToolbarTaskCancelled: isRunningHubToolbarTaskCancelled,
+      saveRemoteImageResultLocally: saveRemoteImageResultLocally,
+      extractFirstImageUrl: extractFirstImageUrl,
+      resolveApiInputRatioBasis: resolveApiInputRatioBasis,
+      resolveFinalResultDisplaySize: resolveFinalResultDisplaySize,
+      createToolbarCancelledError: createToolbarCancelledError,
+      isToolbarCancelledError: isToolbarCancelledError,
+      createLocalSaveFailureError: createLocalSaveFailureError,
+      isLocalSaveFailure: isLocalSaveFailure,
+      throwIfToolbarTaskCancelled: throwIfToolbarTaskCancelled,
+      cancelRunningHubRemoteTaskQuietly: cancelRunningHubRemoteTaskQuietly,
+      focusToolbarTaskNodes: focusToolbarTaskNodes,
+      notifyImageToolbarTaskChange: notifyImageToolbarTaskChange,
+      buildClearedImageMediaFields: buildClearedImageMediaFields,
+      IMAGE_LOCAL_SAVE_FAILURE_MESSAGE: IMAGE_LOCAL_SAVE_FAILURE_MESSAGE,
+    } = key,
+    button = toolbarEl.querySelector('.act-hd');
+  button &&
+    (_hdTaskMachine.bindButton(button),
+    bindRunningHubToolbarTaskButton({
+      button: button,
       getTask: () =>
-        _0x39f2fa(_0x4b2516, {
+        findRunningHubToolbarTaskForNode(nodeId, {
           models: ['runninghub/2012862147813974018'],
           taskTypes: ['image-hd'],
           outputTextIncludes: uniqueList([IMAGE_HD_LEGACY_MODEL_LABEL, imageHdText('modelLabel')]),
         }),
-      cancelTask: async (_0x39308b) => {
+      cancelTask: async (index) => {
         try {
-          if (_0x102ed1.active && String(_0x102ed1.outNodeId || '') === _0x39308b.outId)
+          if (_hdState.active && String(_hdState.outNodeId || '') === index.outId)
             try {
-              await _0xd4f392.cancel();
-            } catch (_0x8140d2) {
-              console.warn('[ImageHD] cancel request failed:', _0x8140d2);
+              await _hdTaskMachine.cancel();
+            } catch (result) {
+              console.warn('[ImageHD] cancel request failed:', result);
             }
-          return await _0x21f984(_0x39308b, {
+          return await cancelRunningHubResultTask(index, {
             name: imageHdText('cancelledName'),
             outputText: imageHdOutputText({ status: imageHdText('status.cancelled') }),
             notifyMessage: imageHdText('cancelledToast'),
           });
         } finally {
-          _0x102ed1.active &&
-            String(_0x102ed1.outNodeId || '') === _0x39308b.outId &&
-            _0xd4f392.reset(_0x2a8bac);
+          _hdState.active && String(_hdState.outNodeId || '') === index.outId && _hdTaskMachine.reset(button);
         }
       },
       cancelTooltip: imageHdText('cancelTooltip'),
     }),
-    _0x2a8bac.addEventListener('click', (_0x5a6815) => {
-      (_0x5a6815.stopPropagation(), _0x5a6815.preventDefault());
-      if (_0x102ed1.active) {
+    button.addEventListener('click', (event) => {
+      (event.stopPropagation(), event.preventDefault());
+      if (_hdState.active) {
         (async () => {
-          let _0x941820 = null;
+          let data = null;
           try {
-            const _0x5521c0 = _0x102ed1.outNodeId
+            const options = _hdState.outNodeId
               ? {
-                  outId: _0x102ed1.outNodeId,
-                  targetNodeId: _0x102ed1.outNodeId,
-                  taskId: _0x102ed1.taskId,
-                  apiKey: _0x102ed1.apiKey,
-                  sourceNodeId: _0x4b2516,
+                  outId: _hdState.outNodeId,
+                  targetNodeId: _hdState.outNodeId,
+                  taskId: _hdState.taskId,
+                  apiKey: _hdState.apiKey,
+                  sourceNodeId: nodeId,
                 }
               : null;
-            _0x5521c0
-              ? await _0x21f984(_0x5521c0, {
+            options
+              ? await cancelRunningHubResultTask(options, {
                   name: imageHdText('cancelledName'),
                   outputText: imageHdOutputText({ status: imageHdText('status.cancelled') }),
                   notifyMessage: imageHdText('cancelledToast'),
                 })
-              : (await _0xd4f392.cancel(), window.showToast?.(imageHdText('taskCancelled'), 'info'));
-          } catch (_0x6ec41c) {
-            _0x941820 = _0x6ec41c;
+              : (await _hdTaskMachine.cancel(), window.showToast?.(imageHdText('taskCancelled'), 'info'));
+          } catch (target) {
+            data = target;
           }
           try {
-            _0x941820 && console.warn('[ImageHD] cancel request failed:', _0x941820);
+            data && console.warn('[ImageHD] cancel request failed:', data);
           } finally {
-            _0xd4f392.reset(_0x2a8bac);
+            _hdTaskMachine.reset(button);
           }
         })();
         return;
       }
-      const _0x461ace = document.querySelector('.v2-hd-popup');
-      if (_0x461ace) {
-        const _0x3a234c = _0x461ace.__v2HdAnchorBtn && _0x461ace.__v2HdAnchorBtn === _0x2a8bac,
-          _0x15d156 =
-            typeof _0x461ace.__v2HdClose === 'function' ? _0x461ace.__v2HdClose : () => _0x461ace.remove();
-        _0x15d156();
-        if (_0x3a234c) return;
+      const el = document.querySelector('.v2-hd-popup');
+      if (el) {
+        const source = el.__v2HdAnchorBtn && el.__v2HdAnchorBtn === button,
+          handler = typeof el.__v2HdClose === 'function' ? el.__v2HdClose : () => el.remove();
+        handler();
+        if (source) return;
       }
-      const _0x4c3916 = document.createElement('div');
-      ((_0x4c3916.className = 'v2-hd-popup node-toolbar-action-menu'),
-        (_0x4c3916.__v2HdAnchorBtn = _0x2a8bac));
-      const _0x293ed8 = createToolbarActionPopupAnchorPositionGetter(_0x2a8bac),
-        _0xcae495 = _0x293ed8();
-      Object.assign(_0x4c3916.style, {
+      const el2 = document.createElement('div');
+      ((el2.className = 'v2-hd-popup node-toolbar-action-menu'), (el2.__v2HdAnchorBtn = button));
+      const run = createToolbarActionPopupAnchorPositionGetter(button),
+        left = run();
+      Object.assign(el2.style, {
         position: 'fixed',
-        left: _0xcae495.left + 'px',
-        top: _0xcae495.top + 'px',
+        left: left.left + 'px',
+        top: left.top + 'px',
         transform: 'translate(-50%, calc(-100% + 10px))',
         opacity: '0',
         pointerEvents: 'none',
       });
-      const _0x5c370b = document.createElement('div');
-      ((_0x5c370b.className = 'node-toolbar-action-menu-title'),
-        (_0x5c370b.textContent = imageHdText('choosePlan')),
-        _0x4c3916.appendChild(_0x5c370b));
-      const _0xc4b31d = [0x500, 0x780, 0xa00],
-        _0x3eeffc = () => {
-          const _0x3d6bd0 = document.createElement('div');
-          _0x3d6bd0.className = 'node-toolbar-action-menu-item';
-          const _0x4cfed6 = document.createElement('div');
-          _0x4cfed6.className = 'node-toolbar-action-menu-icon';
-          const _0x4deb23 = document.createElement('img');
-          ((_0x4deb23.className = 'node-toolbar-action-provider-logo'),
-            (_0x4deb23.src = 'images/RH.png'),
-            (_0x4deb23.alt = 'runninghub'),
-            _0x4cfed6.appendChild(_0x4deb23),
-            _0x3d6bd0.appendChild(_0x4cfed6));
-          const _0x5897ca = document.createElement('div');
-          _0x5897ca.className = 'node-toolbar-action-menu-body';
-          const _0x1ef721 = document.createElement('span');
-          ((_0x1ef721.className = 'node-toolbar-action-menu-item-title'),
-            (_0x1ef721.textContent = imageHdText('modelLabel')),
-            _0x5897ca.appendChild(_0x1ef721));
-          const _0x11cfb9 = document.createElement('span');
-          ((_0x11cfb9.className = 'node-toolbar-action-menu-item-desc'),
-            (_0x11cfb9.textContent = imageHdText('modelDesc')),
-            _0x5897ca.appendChild(_0x11cfb9),
-            _0x3d6bd0.appendChild(_0x5897ca));
-          const _0x12a695 = document.createElement('div');
-          ((_0x12a695.className = 'node-toolbar-action-caret'),
-            (_0x12a695.innerHTML = '&gt;'),
-            _0x3d6bd0.appendChild(_0x12a695));
-          let _0x3cb45b = null,
-            _0x2e4f80 = 0,
-            _0xb15081 = 0,
-            _0x2daffc = 0,
-            _0x1a2b81 = null;
-          const _0x1107e9 = () => {
-              if (_0x2e4f80) clearTimeout(_0x2e4f80);
-              _0x2e4f80 = 0;
-              if (_0xb15081) clearTimeout(_0xb15081);
-              _0xb15081 = 0;
-              if (_0x2daffc) cancelAnimationFrame(_0x2daffc);
-              ((_0x2daffc = 0),
-                _0x1a2b81 && (document.removeEventListener('pointerdown', _0x1a2b81), (_0x1a2b81 = null)));
+      const el3 = document.createElement('div');
+      ((el3.className = 'node-toolbar-action-menu-title'),
+        (el3.textContent = imageHdText('choosePlan')),
+        el2.appendChild(el3));
+      const list2 = [0x500, 0x780, 0xa00],
+        handler2 = () => {
+          const el4 = document.createElement('div');
+          el4.className = 'node-toolbar-action-menu-item';
+          const el5 = document.createElement('div');
+          el5.className = 'node-toolbar-action-menu-icon';
+          const next = document.createElement('img');
+          ((next.className = 'node-toolbar-action-provider-logo'),
+            (next.src = 'images/RH.png'),
+            (next.alt = 'runninghub'),
+            el5.appendChild(next),
+            el4.appendChild(el5));
+          const el6 = document.createElement('div');
+          el6.className = 'node-toolbar-action-menu-body';
+          const el7 = document.createElement('span');
+          ((el7.className = 'node-toolbar-action-menu-item-title'),
+            (el7.textContent = imageHdText('modelLabel')),
+            el6.appendChild(el7));
+          const el8 = document.createElement('span');
+          ((el8.className = 'node-toolbar-action-menu-item-desc'),
+            (el8.textContent = imageHdText('modelDesc')),
+            el6.appendChild(el8),
+            el4.appendChild(el6));
+          const el9 = document.createElement('div');
+          ((el9.className = 'node-toolbar-action-caret'), (el9.innerHTML = '&gt;'), el4.appendChild(el9));
+          let el10 = null,
+            setTimeout2 = 0,
+            setTimeout3 = 0,
+            requestAnimationFrame2 = 0,
+            value2 = null;
+          const run2 = () => {
+              if (setTimeout2) clearTimeout(setTimeout2);
+              setTimeout2 = 0;
+              if (setTimeout3) clearTimeout(setTimeout3);
+              setTimeout3 = 0;
+              if (requestAnimationFrame2) cancelAnimationFrame(requestAnimationFrame2);
+              ((requestAnimationFrame2 = 0),
+                value2 && (document.removeEventListener('pointerdown', value2), (value2 = null)));
             },
-            _0x11977f = () => {
-              if (!_0x3cb45b) return;
-              const _0x5dc6f9 = _0x3cb45b;
-              _0x3cb45b = null;
-              if (_0x4c3916.__v2HdSubmenuEl === _0x5dc6f9) _0x4c3916.__v2HdSubmenuEl = null;
-              (_0x3d6bd0.classList.remove('is-open'), _0x1107e9());
-              if (document.body.contains(_0x5dc6f9)) _0x5dc6f9.remove();
+            handler3 = () => {
+              if (!el10) return;
+              const el11 = el10;
+              el10 = null;
+              if (el2.__v2HdSubmenuEl === el11) el2.__v2HdSubmenuEl = null;
+              (el4.classList.remove('is-open'), run2());
+              if (document.body.contains(el11)) el11.remove();
             },
-            _0x3cc49b = () => {
-              if (_0xb15081) clearTimeout(_0xb15081);
-              _0xb15081 = 0;
+            handler4 = () => {
+              if (setTimeout3) clearTimeout(setTimeout3);
+              setTimeout3 = 0;
             },
-            _0x466db2 = () => {
-              (_0x3cc49b(), (_0xb15081 = setTimeout(() => _0x11977f(), 160)));
+            handler5 = () => {
+              (handler4(), (setTimeout3 = setTimeout(() => handler3(), 160)));
             },
-            _0x4983d6 = () => {
-              if (_0x3cb45b && document.body.contains(_0x3cb45b)) return _0x3cb45b;
-              const _0x179876 = document.querySelector('.v2-hd-submenu');
-              if (_0x179876) _0x179876.remove();
-              ((_0x3cb45b = document.createElement('div')),
-                (_0x3cb45b.className = 'v2-hd-submenu node-toolbar-action-submenu'),
-                (_0x4c3916.__v2HdSubmenuEl = _0x3cb45b),
-                _0x3d6bd0.classList.add('is-open'),
-                Object.assign(_0x3cb45b.style, { position: 'fixed', opacity: '0', pointerEvents: 'none' }));
-              const _0x40f6f7 = () => {
-                if (!_0x3cb45b || !document.body.contains(_0x3cb45b) || !document.body.contains(_0x3d6bd0)) {
-                  if (_0x2daffc) cancelAnimationFrame(_0x2daffc);
-                  _0x2daffc = 0;
+            handler6 = () => {
+              if (el10 && document.body.contains(el10)) return el10;
+              const el12 = document.querySelector('.v2-hd-submenu');
+              if (el12) el12.remove();
+              ((el10 = document.createElement('div')),
+                (el10.className = 'v2-hd-submenu node-toolbar-action-submenu'),
+                (el2.__v2HdSubmenuEl = el10),
+                el4.classList.add('is-open'),
+                Object.assign(el10.style, { position: 'fixed', opacity: '0', pointerEvents: 'none' }));
+              const current = () => {
+                if (!el10 || !document.body.contains(el10) || !document.body.contains(el4)) {
+                  if (requestAnimationFrame2) cancelAnimationFrame(requestAnimationFrame2);
+                  requestAnimationFrame2 = 0;
                   return;
                 }
-                const _0x3a53ac = _0x3d6bd0.getBoundingClientRect();
-                if (_0x3a53ac.width <= 0 || _0x3a53ac.height <= 0) {
-                  _0x2daffc = requestAnimationFrame(_0x40f6f7);
+                const box = el4.getBoundingClientRect();
+                if (box.width <= 0 || box.height <= 0) {
+                  requestAnimationFrame2 = requestAnimationFrame(current);
                   return;
                 }
-                const _0x2f3eac = 12,
-                  _0x28a461 = 8,
-                  _0x52c41b = _0x3cb45b.offsetWidth || 180,
-                  _0x384784 = _0x3a53ac.right + _0x2f3eac,
-                  _0x2973ac = _0x3a53ac.left - _0x52c41b - _0x2f3eac,
-                  _0x32ad09 = window.innerWidth - _0x52c41b - _0x28a461,
-                  _0x5c767b = _0x384784 <= _0x32ad09 ? _0x384784 : Math.max(_0x28a461, _0x2973ac);
-                ((_0x3cb45b.style.left = _0x5c767b + 'px'),
-                  (_0x3cb45b.style.top = _0x3a53ac.top + 'px'),
-                  (_0x2daffc = requestAnimationFrame(_0x40f6f7)));
+                const entry = 12,
+                  record = 8,
+                  payload = el10.offsetWidth || 180,
+                  handle = box.right + entry,
+                  state = box.left - payload - entry,
+                  config = window.innerWidth - payload - record,
+                  scope = handle <= config ? handle : Math.max(record, state);
+                ((el10.style.left = scope + 'px'),
+                  (el10.style.top = box.top + 'px'),
+                  (requestAnimationFrame2 = requestAnimationFrame(current)));
               };
-              ((_0x2daffc = requestAnimationFrame(_0x40f6f7)),
-                _0x3cb45b.addEventListener('pointerenter', (_0x1a4d1f) => {
-                  if (_0x1a4d1f.pointerType !== 'mouse') return;
-                  _0x3cc49b();
+              ((requestAnimationFrame2 = requestAnimationFrame(current)),
+                el10.addEventListener('pointerenter', (input) => {
+                  if (input.pointerType !== 'mouse') return;
+                  handler4();
                 }),
-                _0x3cb45b.addEventListener('pointerleave', (_0x1fbc75) => {
-                  if (_0x1fbc75.pointerType !== 'mouse') return;
-                  _0x466db2();
+                el10.addEventListener('pointerleave', (output) => {
+                  if (output.pointerType !== 'mouse') return;
+                  handler5();
                 }));
-              const _0xa096d6 = document.createElement('div');
+              const el13 = document.createElement('div');
               return (
-                (_0xa096d6.className = 'node-toolbar-action-menu-title'),
-                (_0xa096d6.textContent = imageHdText('chooseResolution')),
-                _0x3cb45b.appendChild(_0xa096d6),
-                _0xc4b31d.forEach((_0x1ef574) => {
-                  const _0x2b3e89 = document.createElement('div');
-                  ((_0x2b3e89.className = 'node-toolbar-action-menu-item node-toolbar-action-submenu-item'),
-                    (_0x2b3e89.textContent = _0x1ef574),
-                    _0x2b3e89.addEventListener('click', async (_0x613ec5) => {
-                      (_0x613ec5.stopPropagation(), _0x11977f(), _0x445311());
-                      const _0x47e639 = _0x1ef574,
-                        _0x4502e6 = _0x4b2516,
-                        _0x40560e = _0x2a8bac.querySelector('svg');
-                      if (_0x40560e) _0x40560e.classList.add('v2-spinning');
-                      const _0x1763e9 = new AbortController();
-                      let _0x21b762 = '',
-                        _0x24316f = '',
-                        _0x4e67fa = null,
-                        _0x42c0e4 = '',
-                        _0x3cd94a = '',
-                        _0x34426b = '';
+                (el13.className = 'node-toolbar-action-menu-title'),
+                (el13.textContent = imageHdText('chooseResolution')),
+                el10.appendChild(el13),
+                list2.forEach((item3) => {
+                  const el14 = document.createElement('div');
+                  ((el14.className = 'node-toolbar-action-menu-item node-toolbar-action-submenu-item'),
+                    (el14.textContent = item3),
+                    el14.addEventListener('click', async (event2) => {
+                      (event2.stopPropagation(), handler3(), handler7());
+                      const resolution2 = item3,
+                        value3 = nodeId,
+                        el15 = button.querySelector('svg');
+                      if (el15) el15.classList.add('v2-spinning');
+                      const abortController = new AbortController();
+                      let taskId = '',
+                        apiKey = '',
+                        width = null,
+                        imageUrl = '',
+                        thumbUrl = '',
+                        localPath = '';
                       try {
-                        const _0x4041fd = _0x5d392a(),
-                          _0x3a696a =
-                            _0x4041fd?.localPath ||
-                            (_0x4041fd?.images && _0x4041fd.images[_0x4041fd.mainImageIndex || 0]?.localPath),
-                          _0x4402c8 = _0x3a696a ? '/' + _0x3a696a : _0x4041fd?.src || _0x4041fd?.sourceUrl;
-                        if (!_0x4402c8) {
+                        const value4 = getNodeData(),
+                          value5 =
+                            value4?.localPath ||
+                            (value4?.images && value4.images[value4.mainImageIndex || 0]?.localPath),
+                          imgUrl = value5 ? '/' + value5 : value4?.src || value4?.sourceUrl;
+                        if (!imgUrl) {
                           window.showToast?.(imageHdText('noProcessableImage'), 'error');
                           return;
                         }
-                        await _0x536e7e();
-                        const _0x2f5ba1 = _0x411d35('runninghubwf');
-                        _0x24316f = String(_0x2f5ba1?.apiKey || '').trim();
-                        if (!_0x24316f) {
+                        await ensureConfig();
+                        const value6 = getProviderConfig('runninghubwf');
+                        apiKey = String(value6?.apiKey || '').trim();
+                        if (!apiKey) {
                           window.showToast?.(imageHdText('apiKeyMissing'), 'error');
                           return;
                         }
-                        const _0x15238e = _0xb172b1.getState().nodes[_0x4502e6] || _0x4041fd;
-                        if (!_0x15238e) {
+                        const sourceNodeId = store.getState().nodes[value3] || value4;
+                        if (!sourceNodeId) {
                           window.showToast?.(imageHdText('sourceNodeMissing'), 'error');
                           return;
                         }
-                        const _0x1ec266 = await _0x3f0ae7(_0x15238e, _0x4402c8),
-                          { width: _0x3f16e9, height: _0x870ea6 } = _0x57752a(
-                            _0x1ec266.width,
-                            _0x1ec266.height,
+                        const inputBasis = await resolveApiInputRatioBasis(sourceNodeId, imgUrl),
+                          { width: width2, height: height } = calcDisplaySizeByMedia(
+                            inputBasis.width,
+                            inputBasis.height,
                           ),
-                          { x: _0x16dbc4, y: _0x198fbd } = _0x1bd3cb(
-                            _0xb172b1.getState().nodes,
-                            _0x15238e,
-                            _0x3f16e9,
-                            _0x870ea6,
+                          { x: x, y: y } = calcSafeSpawnPosNearNode(
+                            store.getState().nodes,
+                            sourceNodeId,
+                            width2,
+                            height,
                           ),
-                          _0x49b67d = '2012862147813974018',
-                          _0x3d0d0e = 'runninghub/' + _0x49b67d,
-                          _0x39b6b0 =
-                            'source-image-hd-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
-                          _0x354bfe = imageHdOutputText({ resolution: _0x47e639 }),
-                          _0x11a6b1 = await _0x2ee60d(
+                          workflowId = '2012862147813974018',
+                          modelId = 'runninghub/' + workflowId,
+                          id = 'source-image-hd-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                          outputText3 = imageHdOutputText({ resolution: resolution2 }),
+                          response = await submitTask(
                             {
-                              sourceNodeId: _0x15238e.id,
+                              sourceNodeId: sourceNodeId.id,
                               trigger: 'toolbar',
                               taskType: 'image-hd',
                               provider: 'runninghubwf',
                               adapterType: 'workflow',
-                              modelId: _0x3d0d0e,
+                              modelId: modelId,
                               executionId: 'runninghub.image-hd',
                               payload: {
-                                apiKey: _0x24316f,
-                                imgUrl: _0x4402c8,
-                                inputBasis: _0x1ec266,
-                                selectedResolution: _0x47e639,
-                                outputText: _0x354bfe,
+                                apiKey: apiKey,
+                                imgUrl: imgUrl,
+                                inputBasis: inputBasis,
+                                selectedResolution: resolution2,
+                                outputText: outputText3,
                               },
                               cancellable: true,
                               resumable: true,
-                              onTaskChange: _0x130501,
+                              onTaskChange: notifyImageToolbarTaskChange,
                               createTargetNode: ({
-                                startedAt: _0x546881,
-                                startPatch: _0x46a309,
-                                protocolPatch: _0x325a6e,
+                                startedAt: startedAt,
+                                startPatch: startPatch,
+                                protocolPatch: protocolPatch,
                               }) =>
-                                _0x3a6ba1({
-                                  id: _0x39b6b0,
+                                buildSourceMediaNodePayload({
+                                  id: id,
                                   type: 'source-image',
-                                  x: _0x16dbc4,
-                                  y: _0x198fbd,
-                                  width: _0x3f16e9,
-                                  height: _0x870ea6,
+                                  x: x,
+                                  y: y,
+                                  width: width2,
+                                  height: height,
                                   needsAutoResize: false,
                                   name: imageHdText('processingName'),
                                   src: '',
-                                  outputText: _0x354bfe,
+                                  outputText: outputText3,
                                   localPath: '',
                                   fileName: 'hd_' + Date.now() + '.jpg',
                                   provider: 'runninghubwf',
-                                  model: _0x3d0d0e,
+                                  model: modelId,
                                   rhTaskUseOpenapiQuery: false,
-                                  ..._0x46a309,
-                                  ..._0x325a6e,
-                                  generationStartTime: _0x546881,
-                                  rhTaskStartedAt: _0x546881,
+                                  ...startPatch,
+                                  ...protocolPatch,
+                                  generationStartTime: startedAt,
+                                  rhTaskStartedAt: startedAt,
                                 }),
-                              submit: async (_0x33544d, _0x1ca7a9) => {
-                                (_0x10b746(_0x15238e.id, _0x1ca7a9.targetNodeId),
-                                  _0xd4f392.activate({
-                                    button: _0x2a8bac,
-                                    apiKey: _0x24316f,
-                                    abortController: _0x1763e9,
-                                    outNodeId: _0x1ca7a9.targetNodeId,
+                              submit: async (value7, outNodeId) => {
+                                (focusToolbarTaskNodes(sourceNodeId.id, outNodeId.targetNodeId),
+                                  _hdTaskMachine.activate({
+                                    button: button,
+                                    apiKey: apiKey,
+                                    abortController: abortController,
+                                    outNodeId: outNodeId.targetNodeId,
                                   }));
-                                const _0x56f526 = await _0x3cdb51([_0x33544d.imgUrl], _0x24316f, {
+                                const list3 = await processInputImages([value7.imgUrl], apiKey, {
                                   applyInputQualityProfile: true,
                                   provider: 'runninghub',
                                 });
-                                if (_0x56f526.length === 0) throw new Error(imageHdText('uploadEmpty'));
-                                const _0x2852c4 = String(_0x56f526[0] || '').trim();
-                                if (!_0x2852c4) throw new Error(imageHdText('uploadFailed'));
-                                _0x13043f(_0x1ca7a9.targetNodeId);
-                                const _0x27511e = await _0x37ea35(
+                                if (list3.length === 0) throw new Error(imageHdText('uploadEmpty'));
+                                const fieldValue = String(list3[0] || '').trim();
+                                if (!fieldValue) throw new Error(imageHdText('uploadFailed'));
+                                throwIfToolbarTaskCancelled(outNodeId.targetNodeId);
+                                const value8 = await runRunninghubWorkflow(
                                   {
-                                    apiKey: _0x24316f,
-                                    workflowId: _0x49b67d,
+                                    apiKey: apiKey,
+                                    workflowId: workflowId,
                                     addMetadata: false,
                                     nodeInfoList: [
-                                      { nodeId: '416', fieldName: 'image', fieldValue: _0x2852c4 },
-                                      { nodeId: '413', fieldName: 'value', fieldValue: _0x47e639 },
+                                      { nodeId: '416', fieldName: 'image', fieldValue: fieldValue },
+                                      { nodeId: '413', fieldName: 'value', fieldValue: resolution2 },
                                     ],
                                     instanceType: 'default',
                                     usePersonalQueue: 'false',
                                   },
-                                  { signal: _0x1763e9.signal },
+                                  { signal: abortController.signal },
                                 );
-                                _0x21b762 = String(_0x27511e?.data?.taskId || _0x27511e?.taskId || '').trim();
-                                if (!_0x21b762) throw new Error(imageHdText('taskIdMissing'));
-                                (_0xd4f392.setTaskId(_0x21b762), _0x1ca7a9.onTaskId(_0x21b762));
-                                if (_0xd4f392.isCancelled() || _0x155829(_0x1ca7a9.targetNodeId)) {
-                                  await _0x22d01e({ apiKey: _0x24316f, taskId: _0x21b762, label: 'ImageHD' });
-                                  throw _0x577b9a();
+                                taskId = String(value8?.data?.taskId || value8?.taskId || '').trim();
+                                if (!taskId) throw new Error(imageHdText('taskIdMissing'));
+                                (_hdTaskMachine.setTaskId(taskId), outNodeId.onTaskId(taskId));
+                                if (
+                                  _hdTaskMachine.isCancelled() ||
+                                  isRunningHubToolbarTaskCancelled(outNodeId.targetNodeId)
+                                ) {
+                                  await cancelRunningHubRemoteTaskQuietly({
+                                    apiKey: apiKey,
+                                    taskId: taskId,
+                                    label: 'ImageHD',
+                                  });
+                                  throw createToolbarCancelledError();
                                 }
-                                return { taskId: _0x21b762 };
+                                return { taskId: taskId };
                               },
                               poll: async ({
-                                taskId: _0x182327,
-                                signal: _0x53cdea,
-                                targetNodeId: _0x99465b,
+                                taskId: taskId2,
+                                signal: signal,
+                                targetNodeId: targetNodeId,
                               }) => {
-                                if (_0xd4f392.isCancelled() || _0x155829(_0x99465b)) throw _0x577b9a();
-                                const _0x10f7bd = await _0x1d0f57(
-                                  { apiKey: _0x24316f, taskId: _0x182327 },
-                                  { signal: _0x53cdea, taskKind: 'image' },
+                                if (
+                                  _hdTaskMachine.isCancelled() ||
+                                  isRunningHubToolbarTaskCancelled(targetNodeId)
+                                )
+                                  throw createToolbarCancelledError();
+                                const value9 = await resumeRunninghubWorkflowTask(
+                                  { apiKey: apiKey, taskId: taskId2 },
+                                  { signal: signal, taskKind: 'image' },
                                 );
-                                if (_0xd4f392.isCancelled() || _0x155829(_0x99465b)) throw _0x577b9a();
-                                const _0x1c2838 = _0x41a3ba(_0x10f7bd);
-                                if (!_0x1c2838) throw new Error(imageHdText('missingResultImage'));
-                                return { resultUrl: _0x1c2838 };
+                                if (
+                                  _hdTaskMachine.isCancelled() ||
+                                  isRunningHubToolbarTaskCancelled(targetNodeId)
+                                )
+                                  throw createToolbarCancelledError();
+                                const resultUrl = extractFirstImageUrl(value9);
+                                if (!resultUrl) throw new Error(imageHdText('missingResultImage'));
+                                return { resultUrl: resultUrl };
                               },
-                              cancel: ({ taskId: _0x29e89d }) =>
-                                _0x22d01e({ apiKey: _0x24316f, taskId: _0x29e89d, label: 'ImageHD' }),
-                              resultBuilder: async (_0x1aa3ab, _0x18a930) => {
-                                const _0x1796b6 = String(_0x1aa3ab?.resultUrl || '').trim();
-                                if (!_0x1796b6) throw new Error(imageHdText('missingResultImage'));
-                                _0x42c0e4 = _0x1796b6;
-                                let _0x5d19e0 = null;
+                              cancel: ({ taskId: taskId3 }) =>
+                                cancelRunningHubRemoteTaskQuietly({
+                                  apiKey: apiKey,
+                                  taskId: taskId3,
+                                  label: 'ImageHD',
+                                }),
+                              resultBuilder: async (value10, startedAt2) => {
+                                const imageUrl2 = String(value10?.resultUrl || '').trim();
+                                if (!imageUrl2) throw new Error(imageHdText('missingResultImage'));
+                                imageUrl = imageUrl2;
+                                let args = null;
                                 try {
-                                  _0x5d19e0 = await _0x3df074(_0x1796b6, {
+                                  args = await saveRemoteImageResultLocally(imageUrl2, {
                                     projectId: window.currentProjectId || 'default_v2_project',
                                     includeSrc: true,
                                   });
-                                } catch (_0x40d0db) {
-                                  console.error('保存图片失败:', _0x40d0db);
+                                } catch (value11) {
+                                  console.error('保存图片失败:', value11);
                                 }
-                                ((_0x34426b = _0x5d19e0?.localPath || ''),
-                                  (_0x3cd94a = _0x5d19e0?.thumbUrl || _0x1796b6));
-                                if (!_0x34426b) throw _0x4c4822();
+                                ((localPath = args?.localPath || ''),
+                                  (thumbUrl = args?.thumbUrl || imageUrl2));
+                                if (!localPath) throw createLocalSaveFailureError();
                                 return (
-                                  (_0x4e67fa = await _0x563dec(_0x1ec266, {
-                                    localPath: _0x34426b,
-                                    imageUrl: _0x1796b6,
-                                    sourceUrl: _0x1796b6,
-                                    thumbUrl: _0x3cd94a,
-                                    src: _0x3cd94a || _0x1796b6,
+                                  (width = await resolveFinalResultDisplaySize(inputBasis, {
+                                    localPath: localPath,
+                                    imageUrl: imageUrl2,
+                                    sourceUrl: imageUrl2,
+                                    thumbUrl: thumbUrl,
+                                    src: thumbUrl || imageUrl2,
                                   })),
                                   {
                                     name: imageHdText('resultName'),
-                                    ..._0x50a214(_0x5d19e0.fields, { startedAt: _0x18a930.startedAt }),
-                                    ..._0x5d19e0.fields,
+                                    ...buildImageGenerationResultPatch(args.fields, {
+                                      startedAt: startedAt2.startedAt,
+                                    }),
+                                    ...args.fields,
                                     fileName: 'hd_' + Date.now() + '.jpg',
-                                    width: _0x4e67fa.width,
-                                    height: _0x4e67fa.height,
-                                    outputText: _0x354bfe,
+                                    width: width.width,
+                                    height: width.height,
+                                    outputText: outputText3,
                                   }
                                 );
                               },
-                              failureBuilder: async (_0x58fd63, _0x261ff8) => {
-                                const _0x5049ca =
-                                  _0x58fd63 instanceof Error
-                                    ? _0x58fd63.message
-                                    : String(_0x58fd63 || imageHdText('unknownError'));
-                                if (_0x435ba1(_0x58fd63))
+                              failureBuilder: async (error2, startedAt3) => {
+                                const error3 =
+                                  error2 instanceof Error
+                                    ? error2.message
+                                    : String(error2 || imageHdText('unknownError'));
+                                if (isLocalSaveFailure(error2))
                                   return (
-                                    (_0x4e67fa ||= await _0x563dec(_0x1ec266, {
-                                      localPath: _0x34426b,
-                                      imageUrl: _0x42c0e4,
-                                      sourceUrl: _0x42c0e4,
-                                      thumbUrl: _0x3cd94a,
-                                      src: _0x3cd94a || _0x42c0e4,
+                                    (width ||= await resolveFinalResultDisplaySize(inputBasis, {
+                                      localPath: localPath,
+                                      imageUrl: imageUrl,
+                                      sourceUrl: imageUrl,
+                                      thumbUrl: thumbUrl,
+                                      src: thumbUrl || imageUrl,
                                     })),
                                     {
                                       name: imageHdText('resultName'),
-                                      ..._0x3f475e(),
-                                      width: _0x4e67fa.width,
-                                      height: _0x4e67fa.height,
-                                      outputText: _0x354bfe,
-                                      ..._0x5cf7a7({ error: _0x19448c, startedAt: _0x261ff8.startedAt }),
-                                      rhStatusMessage: _0x19448c,
+                                      ...buildClearedImageMediaFields(),
+                                      width: width.width,
+                                      height: width.height,
+                                      outputText: outputText3,
+                                      ...buildImageGenerationFailurePatch({
+                                        error: IMAGE_LOCAL_SAVE_FAILURE_MESSAGE,
+                                        startedAt: startedAt3.startedAt,
+                                      }),
+                                      rhStatusMessage: IMAGE_LOCAL_SAVE_FAILURE_MESSAGE,
                                     }
                                   );
                                 return {
                                   name: imageHdText('failedName'),
-                                  ..._0x5cf7a7({ error: _0x5049ca, startedAt: _0x261ff8.startedAt }),
+                                  ...buildImageGenerationFailurePatch({
+                                    error: error3,
+                                    startedAt: startedAt3.startedAt,
+                                  }),
                                   outputText: imageHdText('outputTextWithError', {
-                                    outputText: _0x354bfe,
-                                    error: _0x5049ca,
+                                    outputText: outputText3,
+                                    error: error3,
                                   }),
                                 };
                               },
@@ -476,132 +496,125 @@ export function bindImageHdAction(_0x35061c) {
                                 outputText: imageHdOutputText({ status: imageHdText('status.cancelled') }),
                               }),
                             },
-                            { abortController: _0x1763e9 },
+                            { abortController: abortController },
                           );
-                        if (_0x11a6b1.status === 'success')
+                        if (response.status === 'success')
                           window.showToast?.(imageHdText('successToast'), 'success');
                         else {
-                          if (_0x11a6b1.status === 'failed') {
-                            if (_0x435ba1(_0x11a6b1.error)) window.showToast?.('⚠️ ' + _0x19448c, 'warn');
+                          if (response.status === 'failed') {
+                            if (isLocalSaveFailure(response.error))
+                              window.showToast?.('⚠️ ' + IMAGE_LOCAL_SAVE_FAILURE_MESSAGE, 'warn');
                             else {
-                              const _0x30117d =
-                                _0x11a6b1.error instanceof Error
-                                  ? _0x11a6b1.error.message
-                                  : String(_0x11a6b1.error || imageHdText('unknownError'));
-                              window.showToast?.(
-                                imageHdText('failedWithError', { error: _0x30117d }),
-                                'error',
-                              );
+                              const error4 =
+                                response.error instanceof Error
+                                  ? response.error.message
+                                  : String(response.error || imageHdText('unknownError'));
+                              window.showToast?.(imageHdText('failedWithError', { error: error4 }), 'error');
                             }
                           } else
-                            _0x11a6b1.status === 'cancelled' &&
+                            response.status === 'cancelled' &&
                               window.showToast?.(imageHdText('cancelledToast'), 'info');
                         }
-                      } catch (_0x11fb46) {
-                        const _0xb1b0a3 =
-                          _0x11fb46 instanceof Error ? _0x11fb46.message : String(_0x11fb46 || '');
-                        _0x443bde(_0x11fb46)
+                      } catch (error5) {
+                        const error6 = error5 instanceof Error ? error5.message : String(error5 || '');
+                        isToolbarCancelledError(error5)
                           ? window.showToast?.(imageHdText('cancelledToast'), 'info')
-                          : (console.error('RH高清放大失败:', _0x11fb46),
-                            window.showToast?.(
-                              imageHdText('failedWithError', { error: _0xb1b0a3 }),
-                              'error',
-                            ));
+                          : (console.error('RH高清放大失败:', error5),
+                            window.showToast?.(imageHdText('failedWithError', { error: error6 }), 'error'));
                       } finally {
-                        if (_0x40560e) _0x40560e.classList.remove('v2-spinning');
-                        _0xd4f392.reset(_0x2a8bac);
+                        if (el15) el15.classList.remove('v2-spinning');
+                        _hdTaskMachine.reset(button);
                       }
                     }),
-                    _0x3cb45b.appendChild(_0x2b3e89));
+                    el10.appendChild(el14));
                 }),
-                document.body.appendChild(_0x3cb45b),
-                _0x3cb45b.offsetHeight,
-                (_0x3cb45b.style.opacity = '1'),
-                (_0x3cb45b.style.pointerEvents = 'auto'),
-                (_0x1a2b81 = (_0x455112) => {
-                  if (!_0x3cb45b) return;
-                  if (!_0x3cb45b.contains(_0x455112.target) && !_0x3d6bd0.contains(_0x455112.target))
-                    _0x11977f();
+                document.body.appendChild(el10),
+                el10.offsetHeight,
+                (el10.style.opacity = '1'),
+                (el10.style.pointerEvents = 'auto'),
+                (value2 = (event3) => {
+                  if (!el10) return;
+                  if (!el10.contains(event3.target) && !el4.contains(event3.target)) handler3();
                 }),
-                document.addEventListener('pointerdown', _0x1a2b81),
-                _0x3cb45b
+                document.addEventListener('pointerdown', value2),
+                el10
               );
             };
-          ((_0x3d6bd0.__v2LastPointerType = 'mouse'),
-            _0x3d6bd0.addEventListener('pointerdown', (_0x5f0dd4) => {
-              _0x3d6bd0.__v2LastPointerType = _0x5f0dd4.pointerType || 'mouse';
+          ((el4.__v2LastPointerType = 'mouse'),
+            el4.addEventListener('pointerdown', (value12) => {
+              el4.__v2LastPointerType = value12.pointerType || 'mouse';
             }));
-          const _0x2b9d69 = () => {
-            _0x3cc49b();
-            if (_0x2e4f80) clearTimeout(_0x2e4f80);
-            _0x2e4f80 = setTimeout(() => _0x4983d6(), 60);
+          const run3 = () => {
+            handler4();
+            if (setTimeout2) clearTimeout(setTimeout2);
+            setTimeout2 = setTimeout(() => handler6(), 60);
           };
           return (
-            _0x3d6bd0.addEventListener('pointerenter', (_0x11d165) => {
-              if (_0x11d165.pointerType !== 'mouse') return;
-              _0x2b9d69();
+            el4.addEventListener('pointerenter', (value13) => {
+              if (value13.pointerType !== 'mouse') return;
+              run3();
             }),
-            _0x3d6bd0.addEventListener('pointerleave', (_0x52bdd8) => {
-              if (_0x52bdd8.pointerType !== 'mouse') return;
-              _0x466db2();
+            el4.addEventListener('pointerleave', (value14) => {
+              if (value14.pointerType !== 'mouse') return;
+              handler5();
             }),
-            _0x3d6bd0.addEventListener('click', (_0x458b52) => {
-              _0x458b52.stopPropagation();
-              if (_0x3d6bd0.__v2LastPointerType === 'touch') {
-                if (_0x3cb45b && document.body.contains(_0x3cb45b)) _0x11977f();
-                else _0x4983d6();
+            el4.addEventListener('click', (event4) => {
+              event4.stopPropagation();
+              if (el4.__v2LastPointerType === 'touch') {
+                if (el10 && document.body.contains(el10)) handler3();
+                else handler6();
                 return;
               }
-              _0x4983d6();
+              handler6();
             }),
-            _0x3d6bd0
+            el4
           );
         };
-      (_0x4c3916.appendChild(_0x3eeffc()),
-        document.body.appendChild(_0x4c3916),
-        _0x4c3916.offsetHeight,
-        (_0x4c3916.style.pointerEvents = 'auto'),
-        (_0x4c3916.style.opacity = '1'),
-        (_0x4c3916.style.transform = 'translate(-50%, -100%)'));
-      let _0x16483b = 0,
-        _0x17fd66 = null;
-      const _0x3c3827 = () => {
-          if (_0x16483b) cancelAnimationFrame(_0x16483b);
-          ((_0x16483b = 0),
-            _0x17fd66 && (document.removeEventListener('pointerdown', _0x17fd66), (_0x17fd66 = null)));
+      (el2.appendChild(handler2()),
+        document.body.appendChild(el2),
+        el2.offsetHeight,
+        (el2.style.pointerEvents = 'auto'),
+        (el2.style.opacity = '1'),
+        (el2.style.transform = 'translate(-50%, -100%)'));
+      let requestAnimationFrame3 = 0,
+        value15 = null;
+      const run4 = () => {
+          if (requestAnimationFrame3) cancelAnimationFrame(requestAnimationFrame3);
+          ((requestAnimationFrame3 = 0),
+            value15 && (document.removeEventListener('pointerdown', value15), (value15 = null)));
         },
-        _0x445311 = () => {
-          if (_0x4c3916.__v2HdClosing) return;
-          ((_0x4c3916.__v2HdClosing = true),
-            _0x3c3827(),
-            (_0x4c3916.style.opacity = '0'),
-            (_0x4c3916.style.pointerEvents = 'none'),
-            (_0x4c3916.style.transform = 'translate(-50%, calc(-100% + 10px))'),
-            setTimeout(() => _0x4c3916.remove(), 250));
+        handler7 = () => {
+          if (el2.__v2HdClosing) return;
+          ((el2.__v2HdClosing = true),
+            run4(),
+            (el2.style.opacity = '0'),
+            (el2.style.pointerEvents = 'none'),
+            (el2.style.transform = 'translate(-50%, calc(-100% + 10px))'),
+            setTimeout(() => el2.remove(), 250));
         };
-      _0x4c3916.__v2HdClose = _0x445311;
-      const _0x3397d0 = () => {
-        if (!document.body.contains(_0x4c3916) || !document.body.contains(_0x2a8bac)) {
-          _0x3c3827();
+      el2.__v2HdClose = handler7;
+      const value16 = () => {
+        if (!document.body.contains(el2) || !document.body.contains(button)) {
+          run4();
           return;
         }
-        if (!_0x293ed8.hasVisibleAnchor()) {
-          _0x16483b = requestAnimationFrame(_0x3397d0);
+        if (!run.hasVisibleAnchor()) {
+          requestAnimationFrame3 = requestAnimationFrame(value16);
           return;
         }
-        const _0x23725c = _0x293ed8();
-        ((_0x4c3916.style.left = _0x23725c.left + 'px'),
-          (_0x4c3916.style.top = _0x23725c.top + 'px'),
-          (_0x16483b = requestAnimationFrame(_0x3397d0)));
+        const box2 = run();
+        ((el2.style.left = box2.left + 'px'),
+          (el2.style.top = box2.top + 'px'),
+          (requestAnimationFrame3 = requestAnimationFrame(value16)));
       };
-      ((_0x16483b = requestAnimationFrame(_0x3397d0)),
-        (_0x17fd66 = (_0x4aad9e) => {
-          if (_0x4c3916.__v2HdClosing) return;
-          const _0x679c7a = _0x4c3916.__v2HdSubmenuEl,
-            _0x2e052d = _0x4c3916.contains(_0x4aad9e.target),
-            _0x191e52 = _0x679c7a && _0x679c7a.contains(_0x4aad9e.target);
-          if (!_0x2e052d && !_0x191e52 && _0x4aad9e.target !== _0x2a8bac) _0x445311();
+      ((requestAnimationFrame3 = requestAnimationFrame(value16)),
+        (value15 = (event5) => {
+          if (el2.__v2HdClosing) return;
+          const value17 = el2.__v2HdSubmenuEl,
+            enabled = el2.contains(event5.target),
+            enabled2 = value17 && value17.contains(event5.target);
+          if (!enabled && !enabled2 && event5.target !== button) handler7();
         }),
-        setTimeout(() => document.addEventListener('pointerdown', _0x17fd66), 10));
+        setTimeout(() => document.addEventListener('pointerdown', value15), 10));
     }));
 }

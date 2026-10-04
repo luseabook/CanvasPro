@@ -21,45 +21,45 @@ import {
   isTextGenerationTimeoutError,
 } from './textGenerationResultRenderer.js';
 import { t } from '../../i18n/index.js';
-function toLocalPathUrl(_0x37758f) {
-  return localPathToUrl(_0x37758f);
+function toLocalPathUrl(value) {
+  return localPathToUrl(value);
 }
-function pickResultItem(_0x34e496, _0x3acf8f) {
-  if (!Array.isArray(_0x34e496) || _0x34e496.length === 0) return null;
-  const _0x502330 = Number(_0x3acf8f),
-    _0x3529a3 = Number.isFinite(_0x502330) ? Math.max(0, Math.trunc(_0x502330)) : 0;
-  return _0x34e496[Math.min(_0x3529a3, _0x34e496.length - 1)] || null;
+function pickResultItem(list, item) {
+  if (!Array.isArray(list) || list.length === 0) return null;
+  const key = Number(item),
+    index = Number.isFinite(key) ? Math.max(0, Math.trunc(key)) : 0;
+  return list[Math.min(index, list.length - 1)] || null;
 }
-function resolveImageRefUrl(_0x52256d) {
-  return resolveGenerationInputImageUrl(_0x52256d);
+function resolveImageRefUrl(result) {
+  return resolveGenerationInputImageUrl(result);
 }
-function resolveVideoRefUrl(_0x4451e0) {
-  const _0x3e26ab = pickResultItem(_0x4451e0?.videos, _0x4451e0?.mainVideoIndex);
+function resolveVideoRefUrl(data) {
+  const response = pickResultItem(data?.videos, data?.mainVideoIndex);
   return (
     [
-      String(_0x3e26ab?.videoUrl || '').trim(),
-      String(_0x3e26ab?.url || '').trim(),
-      String(_0x3e26ab?.src || '').trim(),
-      toLocalPathUrl(_0x3e26ab?.localPath),
-      String(_0x4451e0?.videoUrl || '').trim(),
-      String(_0x4451e0?.src || '').trim(),
-      toLocalPathUrl(_0x4451e0?.localPath),
-      String(_0x4451e0?.thumbUrl || '').trim(),
-      String(_0x4451e0?.imageUrl || '').trim(),
-      String(_0x3e26ab?.thumbUrl || '').trim(),
-      toLocalPathUrl(_0x3e26ab?.thumbLocalPath),
-      String(_0x3e26ab?.poster || '').trim(),
+      String(response?.videoUrl || '').trim(),
+      String(response?.url || '').trim(),
+      String(response?.src || '').trim(),
+      toLocalPathUrl(response?.localPath),
+      String(data?.videoUrl || '').trim(),
+      String(data?.src || '').trim(),
+      toLocalPathUrl(data?.localPath),
+      String(data?.thumbUrl || '').trim(),
+      String(data?.imageUrl || '').trim(),
+      String(response?.thumbUrl || '').trim(),
+      toLocalPathUrl(response?.thumbLocalPath),
+      String(response?.poster || '').trim(),
     ].find(Boolean) || ''
   );
 }
-function resolveAudioRefUrl(_0x17bec5) {
+function resolveAudioRefUrl(options) {
   return (
     [
-      String(_0x17bec5?.thumbUrl || '').trim(),
-      String(_0x17bec5?.imageUrl || '').trim(),
-      String(_0x17bec5?.src || '').trim(),
-      toLocalPathUrl(_0x17bec5?.localPath),
-      String(_0x17bec5?.audioUrl || '').trim(),
+      String(options?.thumbUrl || '').trim(),
+      String(options?.imageUrl || '').trim(),
+      String(options?.src || '').trim(),
+      toLocalPathUrl(options?.localPath),
+      String(options?.audioUrl || '').trim(),
     ].find(Boolean) || ''
   );
 }
@@ -70,294 +70,284 @@ const REFERENCE_LABEL_ALIASES = Object.freeze({
   audio: Object.freeze(['音频', 'Audio']),
   other: Object.freeze(['节点', 'Node']),
 });
-function getReferenceTypeLabel(_0x30bc59) {
-  const _0x2c5680 = {
+function getReferenceTypeLabel(target) {
+  const source = {
     text: t('aigenText.refs.types.text'),
     image: t('aigenText.refs.types.image'),
     video: t('aigenText.refs.types.video'),
     audio: t('aigenText.refs.types.audio'),
     other: t('aigenText.refs.types.other'),
   };
-  return _0x2c5680[_0x30bc59] || _0x2c5680.other;
+  return source[target] || source.other;
 }
-function buildReferenceLabelAliases(_0x3e8406, _0x1d3ea0) {
-  const _0x453469 = [
-    '@' + getReferenceTypeLabel(_0x3e8406) + _0x1d3ea0,
-    ...(REFERENCE_LABEL_ALIASES[_0x3e8406] || []).map((_0x2b60cb) => '@' + _0x2b60cb + _0x1d3ea0),
+function buildReferenceLabelAliases(next, current) {
+  const entry = [
+    '@' + getReferenceTypeLabel(next) + current,
+    ...(REFERENCE_LABEL_ALIASES[next] || []).map((item2) => '@' + item2 + current),
   ];
-  return Array.from(new Set(_0x453469));
+  return Array.from(new Set(entry));
 }
-function isRunningHubImageToTextModel(_0x504ac3, _0x15af5d) {
+function isRunningHubImageToTextModel(record, payload) {
   return (
-    _0x15af5d === 'runninghub' &&
-    isModelApiModel(_0x504ac3, _0x15af5d) &&
-    String(_0x504ac3 || '').endsWith('/image-to-text')
+    payload === 'runninghub' &&
+    isModelApiModel(record, payload) &&
+    String(record || '').endsWith('/image-to-text')
   );
 }
-export function createAIGenTextNodeTaskOrchestrationModule(_0x605324) {
+export function createAIGenTextNodeTaskOrchestrationModule(handle) {
   const {
-    store: _0x2f8dc8,
-    api: _0x224985,
-    getDisplayModelName: _0x1be779,
-    ensureThumbDecoded: _0x4f8e92,
-    revealRefThumbMedia: _0x37a085,
-    commit: _0x2ee007,
-    TEXT_TOOLBAR_HTML: _0x3b00d9,
-    bindTextToolbarEvents: _0x4a60c7,
-    getPromptPresets: _0x241105,
-    openCustomPresetsManager: _0x5ca281,
-    startLoading: _0x708bc3,
-    stopLoading: _0x320307,
-    bindRefThumbHoverPreview: _0x47f21a,
-    checkSlashTrigger: _0xe6c3e9,
-    handleSlashKeyboardNavigation: _0x5edf0a,
-    closeSlashMenu: _0x33be2e,
-    activateMenuKeyboard: _0x139097,
-    _checkAtTrigger: _0x28b2aa,
-    _populateMentionMenu: _0x197cd6,
-    _handleMentionMenuKeyboard: _0x340da4,
-    _handlePillKeyboard: _0x29fa3d,
-    _rehydratePromptPills: _0x4afe48,
-    _handlePillHover: _0x150de8,
-    _handlePillOut: _0x5154a9,
-    _syncEdgesOrderFromPills: _0x3b22ac,
-    _syncPillLabels: _0x3a6cb1,
-    getCustomTextModels: _0x34c666,
-    saveCustomTextModels: _0xa98717,
-  } = _0x605324;
-  class _0x5b3494 {
-    async ['_buildPayload'](_0xb432f2 = null) {
-      const _0x59b591 = _0x2f8dc8.getState(),
-        _0x1f6cae = _0x2f8dc8.getIncomingEdges(this.nodeId),
-        _0x2073e4 = _0x59b591.nodes || {},
-        _0x538d5e = { text: [], image: [], video: [], audio: [] },
-        _0x3672bc = { text: 0, image: 0, video: 0, audio: 0 };
-      _0x1f6cae.forEach((_0x31a452) => {
-        const _0x379579 = _0x2073e4[_0x31a452.sourceId];
-        if (!_0x379579) return;
-        let _0x3a3c6d = '';
-        const _0x1c44f6 = _0x379579.type || '';
-        if (_0x1c44f6 === 'text' || _0x1c44f6 === 'source-text' || _0x1c44f6 === 'ai-text')
-          _0x3a3c6d = 'text';
+    store: store,
+    api: api,
+    getDisplayModelName: getDisplayModelName,
+    ensureThumbDecoded: ensureThumbDecoded,
+    revealRefThumbMedia: revealRefThumbMedia,
+    commit: commit,
+    TEXT_TOOLBAR_HTML: TEXT_TOOLBAR_HTML,
+    bindTextToolbarEvents: bindTextToolbarEvents,
+    getPromptPresets: getPromptPresets,
+    openCustomPresetsManager: openCustomPresetsManager,
+    startLoading: startLoading,
+    stopLoading: stopLoading,
+    bindRefThumbHoverPreview: bindRefThumbHoverPreview,
+    checkSlashTrigger: checkSlashTrigger,
+    handleSlashKeyboardNavigation: handleSlashKeyboardNavigation,
+    closeSlashMenu: closeSlashMenu,
+    activateMenuKeyboard: activateMenuKeyboard,
+    _checkAtTrigger: _checkAtTrigger,
+    _populateMentionMenu: _populateMentionMenu,
+    _handleMentionMenuKeyboard: _handleMentionMenuKeyboard,
+    _handlePillKeyboard: _handlePillKeyboard,
+    _rehydratePromptPills: _rehydratePromptPills,
+    _handlePillHover: _handlePillHover,
+    _handlePillOut: _handlePillOut,
+    _syncEdgesOrderFromPills: _syncEdgesOrderFromPills,
+    _syncPillLabels: _syncPillLabels,
+    getCustomTextModels: getCustomTextModels,
+    saveCustomTextModels: saveCustomTextModels,
+  } = handle;
+  class state {
+    async ['_buildPayload'](value2 = null) {
+      const config = store.getState(),
+        list2 = store.getIncomingEdges(this.nodeId),
+        scope = config.nodes || {},
+        response2 = { text: [], image: [], video: [], audio: [] },
+        input = { text: 0, image: 0, video: 0, audio: 0 };
+      list2.forEach((item3) => {
+        const response3 = scope[item3.sourceId];
+        if (!response3) return;
+        let type = '';
+        const output = response3.type || '';
+        if (output === 'text' || output === 'source-text' || output === 'ai-text') type = 'text';
         else {
-          if (_0x1c44f6 === 'source-image' || _0x1c44f6 === 'ai-image') _0x3a3c6d = 'image';
+          if (output === 'source-image' || output === 'ai-image') type = 'image';
           else {
-            if (_0x1c44f6 === 'source-video' || _0x1c44f6 === 'video' || _0x1c44f6 === 'ai-video')
-              _0x3a3c6d = 'video';
+            if (output === 'source-video' || output === 'video' || output === 'ai-video') type = 'video';
             else {
-              if (_0x1c44f6 === 'source-audio' || _0x1c44f6 === 'audio' || _0x1c44f6 === 'ai-audio')
-                _0x3a3c6d = 'audio';
-              else _0x3a3c6d = 'other';
+              if (output === 'source-audio' || output === 'audio' || output === 'ai-audio') type = 'audio';
+              else type = 'other';
             }
           }
         }
-        let _0x234a1a = '',
-          _0x3f6879 = '';
-        if (_0x3a3c6d === 'text')
-          _0x234a1a = _0x379579.outputText || _0x379579.text || _0x379579.content || _0x379579.prompt || '';
+        let content = '',
+          url = '';
+        if (type === 'text')
+          content = response3.outputText || response3.text || response3.content || response3.prompt || '';
         else {
-          if (_0x3a3c6d === 'image') {
-            _0x3f6879 = resolveImageRefUrl(_0x379579);
-            if (!_0x3f6879) return;
+          if (type === 'image') {
+            url = resolveImageRefUrl(response3);
+            if (!url) return;
           } else {
-            if (_0x3a3c6d === 'video') {
-              _0x3f6879 = resolveVideoRefUrl(_0x379579);
-              if (!_0x3f6879) return;
+            if (type === 'video') {
+              url = resolveVideoRefUrl(response3);
+              if (!url) return;
             } else {
-              if (_0x3a3c6d === 'audio') {
-                _0x3f6879 = resolveAudioRefUrl(_0x379579);
-                if (!_0x3f6879) return;
+              if (type === 'audio') {
+                url = resolveAudioRefUrl(response3);
+                if (!url) return;
               } else {
-                _0x3f6879 = String(_0x379579.src || _0x379579.imageUrl || '').trim();
-                if (!_0x3f6879) return;
+                url = String(response3.src || response3.imageUrl || '').trim();
+                if (!url) return;
               }
             }
           }
         }
-        _0x3672bc[_0x3a3c6d]++;
-        const _0x4dfc74 = buildReferenceLabelAliases(_0x3a3c6d, _0x3672bc[_0x3a3c6d]),
-          _0x796188 = _0x4dfc74[0];
-        _0x538d5e[_0x3a3c6d].push({
-          label: _0x796188,
-          labels: _0x4dfc74,
-          content: _0x234a1a,
-          url: _0x3f6879,
+        input[type]++;
+        const labels = buildReferenceLabelAliases(type, input[type]),
+          label = labels[0];
+        response2[type].push({
+          label: label,
+          labels: labels,
+          content: content,
+          url: url,
           used: false,
-          type: _0x3a3c6d,
-          sourceId: String(_0x31a452.sourceId || ''),
+          type: type,
+          sourceId: String(item3.sourceId || ''),
         });
       });
-      const _0x48be19 = [..._0x538d5e.text, ..._0x538d5e.image, ..._0x538d5e.video, ..._0x538d5e.audio],
-        _0x123636 = {},
-        _0x291449 = {};
-      _0x48be19.forEach((_0x477052) => {
-        (_0x477052.labels || [_0x477052.label]).forEach((_0x3b07e2) => {
-          _0x123636[_0x3b07e2.replace(/\s+/g, '')] = _0x477052;
+      const list3 = [...response2.text, ...response2.image, ...response2.video, ...response2.audio],
+        value3 = {},
+        value4 = {};
+      list3.forEach((item4) => {
+        (item4.labels || [item4.label]).forEach((item5) => {
+          value3[item5.replace(/\s+/g, '')] = item4;
         });
-        if (_0x477052.sourceId) _0x291449[_0x477052.sourceId] = _0x477052;
+        if (item4.sourceId) value4[item4.sourceId] = item4;
       });
-      let _0x1f8e8d = [],
-        _0x50558f = [],
-        _0x466a0d = [];
-      const _0x444fca = [],
-        _0x1264d5 = { image: 0, video: 0, audio: 0 },
-        _0x23dea0 = (_0x3ce0b9) => {
-          if (!_0x3ce0b9?.url) return;
-          if (!_0x1f8e8d.includes(_0x3ce0b9.url)) _0x1f8e8d.push(_0x3ce0b9.url);
-          (_0x3ce0b9.type === 'image' && !_0x50558f.includes(_0x3ce0b9.url) && _0x50558f.push(_0x3ce0b9.url),
-            _0x3ce0b9.type === 'video' &&
-              !_0x466a0d.includes(_0x3ce0b9.url) &&
-              _0x466a0d.push(_0x3ce0b9.url));
+      let inputUrls = [],
+        inputImageUrls = [],
+        inputVideoUrls = [];
+      const inputRefs = [],
+        mediaCounts = { image: 0, video: 0, audio: 0 },
+        handler = (response4) => {
+          if (!response4?.url) return;
+          if (!inputUrls.includes(response4.url)) inputUrls.push(response4.url);
+          (response4.type === 'image' &&
+            !inputImageUrls.includes(response4.url) &&
+            inputImageUrls.push(response4.url),
+            response4.type === 'video' &&
+              !inputVideoUrls.includes(response4.url) &&
+              inputVideoUrls.push(response4.url));
         },
-        _0x2edd0d = (_0x22a903) => {
-          let _0x58cdb6 = '';
-          const _0x2bb04c = (_0x69e9bb) => {
-            for (const _0x520e6b of _0x69e9bb.childNodes) {
-              if (_0x520e6b.nodeType === Node.TEXT_NODE) _0x58cdb6 += _0x520e6b.textContent;
+        handler2 = (enabled) => {
+          let value5 = '';
+          const run = (value6) => {
+            for (const domNode of value6.childNodes) {
+              if (domNode.nodeType === Node.TEXT_NODE) value5 += domNode.textContent;
               else {
-                if (_0x520e6b.nodeType === Node.ELEMENT_NODE) {
-                  if (_0x520e6b.classList.contains('ref-pill')) {
-                    const _0x149459 = _0x520e6b.dataset.nodeId || '',
-                      _0x41949e = _0x520e6b.dataset.label || _0x520e6b.textContent.trim(),
-                      _0x902abb = [];
+                if (domNode.nodeType === Node.ELEMENT_NODE) {
+                  if (domNode.classList.contains('ref-pill')) {
+                    const value7 = domNode.dataset.nodeId || '',
+                      rawLabel = domNode.dataset.label || domNode.textContent.trim(),
+                      promptParts = [];
                     if (
                       appendAssetMentionToPrompt({
-                        domNode: _0x520e6b,
-                        rawLabel: _0x41949e,
-                        promptParts: _0x902abb,
-                        inputRefs: _0x444fca,
-                        mediaCounts: _0x1264d5,
+                        domNode: domNode,
+                        rawLabel: rawLabel,
+                        promptParts: promptParts,
+                        inputRefs: inputRefs,
+                        mediaCounts: mediaCounts,
                       })
                     ) {
-                      ((_0x58cdb6 += _0x902abb.join('')), _0x444fca.forEach(_0x23dea0));
+                      ((value5 += promptParts.join('')), inputRefs.forEach(handler));
                       continue;
                     }
-                    const _0x1b28b6 = _0x41949e.replace(/\s+/g, ''),
-                      _0x58eaea = (_0x149459 && _0x291449[_0x149459]) || _0x123636[_0x1b28b6];
-                    if (_0x58eaea) {
-                      _0x58eaea.used = true;
-                      if (_0x58eaea.content) _0x58cdb6 += ' ' + _0x58eaea.content + ' ';
-                      else _0x58eaea.url && ((_0x58cdb6 += ' ' + _0x41949e + ' '), _0x23dea0(_0x58eaea));
-                    } else _0x58cdb6 += ' ' + _0x41949e + ' ';
-                  } else _0x520e6b.tagName === 'BR' ? (_0x58cdb6 += '\n') : _0x2bb04c(_0x520e6b);
+                    const value8 = rawLabel.replace(/\s+/g, ''),
+                      response5 = (value7 && value4[value7]) || value3[value8];
+                    if (response5) {
+                      response5.used = true;
+                      if (response5.content) value5 += ' ' + response5.content + ' ';
+                      else response5.url && ((value5 += ' ' + rawLabel + ' '), handler(response5));
+                    } else value5 += ' ' + rawLabel + ' ';
+                  } else domNode.tagName === 'BR' ? (value5 += '\n') : run(domNode);
                 }
               }
             }
           };
-          if (!_0x22a903) return '';
-          _0x2bb04c(_0x22a903);
-          let _0x32767f = _0x58cdb6.replace(/[\s\u00A0]+/g, ' ').trim();
+          if (!enabled) return '';
+          run(enabled);
+          let promptPresetTemplate = value5.replace(/[\s\u00A0]+/g, ' ').trim();
           return (
-            _0xb432f2
-              ? (_0x32767f = resolvePromptPresetTemplate(_0xb432f2, _0x32767f))
-              : (_0x32767f = _0x32767f || ''),
-            _0x32767f
+            value2
+              ? (promptPresetTemplate = resolvePromptPresetTemplate(value2, promptPresetTemplate))
+              : (promptPresetTemplate = promptPresetTemplate || ''),
+            promptPresetTemplate
           );
         };
-      let _0x3a18ee = _0x2edd0d(this.promptEl);
-      const _0x12c2bc = _0x48be19
-        .flatMap((_0x40dad3) =>
-          (_0x40dad3.labels || [_0x40dad3.label]).map((_0x30da12) => ({ ref: _0x40dad3, label: _0x30da12 })),
-        )
-        .sort((_0x54b630, _0x3b0948) => _0x3b0948.label.length - _0x54b630.label.length);
-      _0x12c2bc.forEach(({ ref: _0x3b5fae, label: _0x2f473d }) => {
-        if (!_0x3b5fae.used) {
-          const _0xd71838 = new RegExp(
-            _0x2f473d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '[\\s\\u00A0]*'),
+      let prompt = handler2(this.promptEl);
+      const list4 = list3
+        .flatMap((ref) => (ref.labels || [ref.label]).map((label2) => ({ ref: ref, label: label2 })))
+        .sort((item6, value9) => value9.label.length - item6.label.length);
+      list4.forEach(({ ref: ref2, label: label3 }) => {
+        if (!ref2.used) {
+          const regExp = new RegExp(
+            label3.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '[\\s\\u00A0]*'),
             'g',
           );
-          if (_0xd71838.test(_0x3a18ee)) {
-            _0x3b5fae.used = true;
-            if (_0x3b5fae.content) _0x3a18ee = _0x3a18ee.replace(_0xd71838, ' ' + _0x3b5fae.content + ' ');
-            else
-              _0x3b5fae.url &&
-                ((_0x3a18ee = _0x3a18ee.replace(_0xd71838, ' ' + _0x2f473d.trim() + ' ')),
-                _0x23dea0(_0x3b5fae));
+          if (regExp.test(prompt)) {
+            ref2.used = true;
+            if (ref2.content) prompt = prompt.replace(regExp, ' ' + ref2.content + ' ');
+            else ref2.url && ((prompt = prompt.replace(regExp, ' ' + label3.trim() + ' ')), handler(ref2));
           }
         }
       });
-      let _0x2d44c2 = '';
-      _0x538d5e.text.forEach((_0x5354f4) => {
-        !_0x5354f4.used &&
-          _0x5354f4.content &&
-          ((_0x2d44c2 += _0x5354f4.content + '\n'), (_0x5354f4.used = true));
+      let value10 = '';
+      response2.text.forEach((enabled2) => {
+        !enabled2.used && enabled2.content && ((value10 += enabled2.content + '\n'), (enabled2.used = true));
       });
-      _0x2d44c2 && (_0x3a18ee = _0x2d44c2 + _0x3a18ee);
-      _0x48be19.forEach((_0x219d20) => {
-        !_0x219d20.used && _0x219d20.url && !_0x1f8e8d.includes(_0x219d20.url) && _0x23dea0(_0x219d20);
+      value10 && (prompt = value10 + prompt);
+      list3.forEach((response6) => {
+        !response6.used && response6.url && !inputUrls.includes(response6.url) && handler(response6);
       });
-      if (!_0x3a18ee) return (window.showToast?.(t('aigenText.task.promptRequired'), 'warn'), null);
-      const _0xbf8bd7 = this._data.model || 'apimart/kimi-k2-instruct';
-      let _0x32edac = this._data.provider;
-      !_0x32edac &&
-        (_0x32edac =
-          resolveModelProvider(_0xbf8bd7) ||
-          ((_0xbf8bd7.startsWith('gemini') ||
-            _0xbf8bd7.startsWith('gpt') ||
-            _0xbf8bd7.startsWith('claude')) &&
-          !_0xbf8bd7.includes('/')
+      if (!prompt) return (window.showToast?.(t('aigenText.task.promptRequired'), 'warn'), null);
+      const model = this._data.model || 'apimart/kimi-k2-instruct';
+      let provider = this._data.provider;
+      !provider &&
+        (provider =
+          resolveModelProvider(model) ||
+          ((model.startsWith('gemini') || model.startsWith('gpt') || model.startsWith('claude')) &&
+          !model.includes('/')
             ? 'grsai'
             : 'openai'));
-      const _0x3f5e5e = _0x34c666();
-      _0x3f5e5e.includes(_0xbf8bd7) && (_0x32edac = 'custom');
-      if (isRunningHubImageToTextModel(_0xbf8bd7, _0x32edac) && _0x50558f.length === 0)
+      const list5 = getCustomTextModels();
+      list5.includes(model) && (provider = 'custom');
+      if (isRunningHubImageToTextModel(model, provider) && inputImageUrls.length === 0)
         return (window.showToast?.(t('aigenText.task.imageReferenceRequired'), 'warn'), null);
       return {
-        prompt: _0x3a18ee,
-        inputUrls: _0x1f8e8d,
-        inputImageUrls: _0x50558f,
-        inputVideoUrls: _0x466a0d,
-        model: _0xbf8bd7,
-        provider: _0x32edac,
+        prompt: prompt,
+        inputUrls: inputUrls,
+        inputImageUrls: inputImageUrls,
+        inputVideoUrls: inputVideoUrls,
+        model: model,
+        provider: provider,
         nodeId: this.nodeId,
       };
     }
     ['_getPreviewGenerateButtonLoadingOptions']() {
       return createPreviewGenerateButtonCallbacks(this, t('aigenText.generate'));
     }
-    async ['runGeneration'](_0x1f52c4 = {}) {
-      return this._onGenerate(null, _0x1f52c4);
+    async ['runGeneration'](options2 = {}) {
+      return this._onGenerate(null, options2);
     }
     ['cancelGeneration']() {
       return { ok: false, status: 'not-cancellable', message: 'Text generation is not cancellable yet.' };
     }
     ['getGenerationStatus']() {
-      const _0x528e1c = _0x2f8dc8.getState?.()?.nodes?.[this.nodeId] || this._data || {},
-        _0x3e1f90 = String(
-          _0x528e1c.jobStatus || _0x528e1c.textJobStatus || (this._isGenerating ? 'running' : 'idle'),
+      const value11 = store.getState?.()?.nodes?.[this.nodeId] || this._data || {},
+        jobStatus = String(
+          value11.jobStatus || value11.textJobStatus || (this._isGenerating ? 'running' : 'idle'),
         );
       return {
         nodeId: this.nodeId,
-        jobStatus: _0x3e1f90,
-        isGenerating: this._isGenerating === true || _0x3e1f90 === 'running' || _0x3e1f90 === 'pending',
-        taskId: String(_0x528e1c.taskId || _0x528e1c.asyncTaskId || ''),
+        jobStatus: jobStatus,
+        isGenerating: this._isGenerating === true || jobStatus === 'running' || jobStatus === 'pending',
+        taskId: String(value11.taskId || value11.asyncTaskId || ''),
         cancellable: false,
         resumable: false,
       };
     }
-    async ['_onGenerate'](_0x36a7bd = null, _0x4cf71d = {}) {
+    async ['_onGenerate'](template = null, value12 = {}) {
       if (this._isGenerating) return;
-      if (_0x4cf71d?.insertPrompt === true) {
+      if (value12?.insertPrompt === true) {
         (insertPresetPromptIntoEditor({
-          storeApi: _0x2f8dc8,
+          storeApi: store,
           nodeId: this.nodeId,
           promptEl: this.promptEl,
-          template: _0x36a7bd,
-          inEdges: _0x2f8dc8.getIncomingEdges(this.nodeId),
-          nodes: _0x2f8dc8.getState().nodes || {},
+          template: template,
+          inEdges: store.getIncomingEdges(this.nodeId),
+          nodes: store.getState().nodes || {},
           allowedAssetTypes: ['text', 'image', 'video', 'audio'],
         }),
           this._updateSubmitButtonState?.());
         return;
       }
-      if (shouldUsePromptPreviewForPreset(_0x36a7bd)) {
-        const _0x40f0e8 = await this._buildPayload(_0x36a7bd);
-        if (!_0x40f0e8) return;
+      if (shouldUsePromptPreviewForPreset(template)) {
+        const promptText = await this._buildPayload(template);
+        if (!promptText) return;
         previewPresetPromptInEditor({
-          storeApi: _0x2f8dc8,
+          storeApi: store,
           nodeId: this.nodeId,
           promptEl: this.promptEl,
-          promptText: _0x40f0e8.prompt,
+          promptText: promptText.prompt,
         });
         return;
       }
@@ -370,63 +360,71 @@ export function createAIGenTextNodeTaskOrchestrationModule(_0x605324) {
           );
         return;
       }
-      const _0x2ae2de = await this._buildPayload(_0x36a7bd);
-      if (!_0x2ae2de) return;
-      ((this._isGenerating = true), _0x708bc3(this.previewEl));
-      const _0xbd65a6 = Date.now();
+      const provider2 = await this._buildPayload(template);
+      if (!provider2) return;
+      ((this._isGenerating = true), startLoading(this.previewEl));
+      const startedAt = Date.now();
       this._updateSubmitButtonState?.();
-      let _0x31c321 = null;
+      let response7 = null;
       try {
-        _0x31c321 = await submitTask(
+        response7 = await submitTask(
           {
             sourceNodeId: this.nodeId,
             targetNodeId: this.nodeId,
             trigger: 'node',
             taskType: 'text-generation',
-            provider: _0x2ae2de.provider || this._data.provider || '',
+            provider: provider2.provider || this._data.provider || '',
             adapterType: 'modelApi',
-            modelId: _0x2ae2de.model || this._data.model || '',
+            modelId: provider2.model || this._data.model || '',
             executionId:
               'text.' +
-              (_0x2ae2de.provider || this._data.provider || 'modelApi') +
+              (provider2.provider || this._data.provider || 'modelApi') +
               '.' +
-              (_0x2ae2de.model || this._data.model || 'default'),
-            payload: _0x2ae2de,
+              (provider2.model || this._data.model || 'default'),
+            payload: provider2,
             cancellable: false,
             resumable: false,
             async: false,
-            submit: () => _0x224985.generateText(_0x2ae2de),
-            resultBuilder: async (_0x152672, _0x2cad54) => {
-              const _0x4d377d = buildTextGenerationResultPatch(_0x152672, { startedAt: _0x2cad54.startedAt }),
-                _0x366f02 = String(_0x4d377d?.outputText || '').trim();
-              return (_0x366f02 && this.outputEl && this._renderOutputText?.(_0x366f02), _0x4d377d);
-            },
-            failureBuilder: (_0x45dac7, _0x151d98) => {
-              const _0x3bfd68 = buildTextGenerationFailurePatch({
-                  error: _0x45dac7 || t('aigenText.task.generationFailed'),
-                  startedAt: _0x151d98.startedAt,
+            submit: () => api.generateText(provider2),
+            resultBuilder: async (value13, startedAt2) => {
+              const textGenerationResultPatch = buildTextGenerationResultPatch(value13, {
+                  startedAt: startedAt2.startedAt,
                 }),
-                _0x450e35 = String(_0x3bfd68?.outputText || '').trim();
-              return (_0x450e35 && this.outputEl && this._renderOutputText?.(_0x450e35), _0x3bfd68);
+                value14 = String(textGenerationResultPatch?.outputText || '').trim();
+              return (
+                value14 && this.outputEl && this._renderOutputText?.(value14),
+                textGenerationResultPatch
+              );
             },
-            parseError: (_0x5e6e1d) => _0x5e6e1d?.message || t('aigenText.task.generationFailed'),
+            failureBuilder: (error, startedAt3) => {
+              const textGenerationFailurePatch = buildTextGenerationFailurePatch({
+                  error: error || t('aigenText.task.generationFailed'),
+                  startedAt: startedAt3.startedAt,
+                }),
+                value15 = String(textGenerationFailurePatch?.outputText || '').trim();
+              return (
+                value15 && this.outputEl && this._renderOutputText?.(value15),
+                textGenerationFailurePatch
+              );
+            },
+            parseError: (error2) => error2?.message || t('aigenText.task.generationFailed'),
           },
-          { store: _0x2f8dc8, startedAt: _0xbd65a6 },
+          { store: store, startedAt: startedAt },
         );
-        if (_0x31c321.status === 'failed') {
-          const _0x21bac2 = _0x31c321.error;
-          (console.error('[AIGenTextNode] 生成失败:', _0x21bac2),
-            !isTextGenerationTimeoutError(_0x21bac2) &&
+        if (response7.status === 'failed') {
+          const error3 = response7.error;
+          (console.error('[AIGenTextNode] 生成失败:', error3),
+            !isTextGenerationTimeoutError(error3) &&
               window.showToast?.(
-                t('aigenText.task.generationFailedWithError', { error: _0x21bac2?.message || _0x21bac2 }),
+                t('aigenText.task.generationFailedWithError', { error: error3?.message || error3 }),
                 'error',
               ));
         }
-        return _0x31c321;
+        return response7;
       } finally {
-        ((this._isGenerating = false), this._updateSubmitButtonState?.(), _0x320307(this.previewEl));
+        ((this._isGenerating = false), this._updateSubmitButtonState?.(), stopLoading(this.previewEl));
       }
     }
   }
-  return _0x5b3494.prototype;
+  return state.prototype;
 }

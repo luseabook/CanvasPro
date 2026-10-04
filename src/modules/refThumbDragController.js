@@ -3,492 +3,483 @@ import { resolveGroupOutputSourceOrder } from './groupDynamicOutput.js';
 const THUMB_CONTAINER_SELECTOR = '.ref-thumb-container',
   THUMB_ITEM_SELECTOR = '.ref-thumb-wrap',
   orderDragStateByContainer = new WeakMap();
-function matchesSelector(_0x5a1ff5, _0x39b960) {
-  return typeof _0x5a1ff5?.matches === 'function' && _0x5a1ff5.matches(_0x39b960);
+function matchesSelector(value, item) {
+  return typeof value?.matches === 'function' && value.matches(item);
 }
-function resolveThumbContainer(_0x31fb5d) {
-  if (!_0x31fb5d) return null;
-  if (matchesSelector(_0x31fb5d, THUMB_CONTAINER_SELECTOR)) return _0x31fb5d;
-  return _0x31fb5d.querySelector?.(THUMB_CONTAINER_SELECTOR) || null;
+function resolveThumbContainer(el) {
+  if (!el) return null;
+  if (matchesSelector(el, THUMB_CONTAINER_SELECTOR)) return el;
+  return el.querySelector?.(THUMB_CONTAINER_SELECTOR) || null;
 }
-function queryThumbItems(_0xcdbdaa) {
-  return Array.from(_0xcdbdaa?.querySelectorAll?.(THUMB_ITEM_SELECTOR) || []);
+function queryThumbItems(el2) {
+  return Array.from(el2?.querySelectorAll?.(THUMB_ITEM_SELECTOR) || []);
 }
-function getDataset(_0x8aeb0f) {
-  return _0x8aeb0f?.dataset || {};
+function getDataset(el3) {
+  return el3?.dataset || {};
 }
-function isAssetRef(_0x55cfc1) {
-  const _0x20c165 = getDataset(_0x55cfc1);
+function isAssetRef(key) {
+  const dataset = getDataset(key);
   return (
-    _0x20c165.refOrigin === 'asset' ||
-    !!_0x20c165.assetId ||
-    String(_0x20c165.refKey || '').startsWith('asset:')
+    dataset.refOrigin === 'asset' || !!dataset.assetId || String(dataset.refKey || '').startsWith('asset:')
   );
 }
-function getEdgeId(_0x5cc8e3) {
-  return String(getDataset(_0x5cc8e3).edgeId || '').trim();
+function getEdgeId(index) {
+  return String(getDataset(index).edgeId || '').trim();
 }
-function isNodeEdgeThumb(_0x3fbc6e) {
-  return !!getEdgeId(_0x3fbc6e) && !isAssetRef(_0x3fbc6e);
+function isNodeEdgeThumb(result) {
+  return !!getEdgeId(result) && !isAssetRef(result);
 }
-function isGroupOutputEdge(_0x3dde00) {
-  return !!(_0x3dde00?.isGroupOutput && _0x3dde00?.groupOutputEdgeId);
+function isGroupOutputEdge(data) {
+  return !!(data?.isGroupOutput && data?.groupOutputEdgeId);
 }
-function isReadOnlyDerivedGroupEdge(_0x47c0d8) {
-  if (!_0x47c0d8) return false;
-  if (isGroupOutputEdge(_0x47c0d8)) return false;
-  if (_0x47c0d8.isGroupShared) return false;
-  return !!_0x47c0d8.effectiveTargetId && !isGroupOutputEdge(_0x47c0d8);
+function isReadOnlyDerivedGroupEdge(enabled) {
+  if (!enabled) return false;
+  if (isGroupOutputEdge(enabled)) return false;
+  if (enabled.isGroupShared) return false;
+  return !!enabled.effectiveTargetId && !isGroupOutputEdge(enabled);
 }
-function findIncomingEdge(_0xee447, _0x409423, _0x473664) {
-  const _0x5cd1e8 = String(_0x473664 || '').trim();
-  if (!_0x5cd1e8 || typeof _0xee447?.getIncomingEdges !== 'function') return null;
+function findIncomingEdge(store, options, target) {
+  const enabled2 = String(target || '').trim();
+  if (!enabled2 || typeof store?.getIncomingEdges !== 'function') return null;
   return (
-    (_0xee447.getIncomingEdges(_0x409423) || []).find(
-      (_0x5488d8) => String(_0x5488d8?.id || '').trim() === _0x5cd1e8,
-    ) || null
+    (store.getIncomingEdges(options) || []).find((item2) => String(item2?.id || '').trim() === enabled2) ||
+    null
   );
 }
-function isMutableNodeEdgeThumb(_0x4930e3, _0x3d3eda, _0x3a9984) {
-  if (!isNodeEdgeThumb(_0x4930e3)) return false;
-  const _0x27e7b1 = findIncomingEdge(_0x3d3eda, _0x3a9984, getEdgeId(_0x4930e3));
-  return !isReadOnlyDerivedGroupEdge(_0x27e7b1);
+function isMutableNodeEdgeThumb(source, next, current) {
+  if (!isNodeEdgeThumb(source)) return false;
+  const incomingEdge = findIncomingEdge(next, current, getEdgeId(source));
+  return !isReadOnlyDerivedGroupEdge(incomingEdge);
 }
-function getFixedSlotEdgeContext(_0x4b8b16, _0x4c062f, _0x1bfe73) {
-  if (!_0x4c062f) return null;
-  const _0x4dff77 = _0x4b8b16?.getState?.() || {},
-    _0x5bb27d = String(_0x1bfe73 || '');
-  if (isGroupOutputEdge(_0x4c062f)) {
-    if (String(_0x4c062f.effectiveTargetId || '') !== _0x5bb27d) return null;
-    const _0x411f21 = String(_0x4c062f.groupOutputEdgeId || '').trim(),
-      _0x29fbe4 = _0x4dff77.edges?.[_0x411f21] || null;
-    if (!_0x29fbe4?.id) return null;
+function getFixedSlotEdgeContext(store2, incomingEdge2, entry) {
+  if (!incomingEdge2) return null;
+  const record = store2?.getState?.() || {},
+    payload = String(entry || '');
+  if (isGroupOutputEdge(incomingEdge2)) {
+    if (String(incomingEdge2.effectiveTargetId || '') !== payload) return null;
+    const handle = String(incomingEdge2.groupOutputEdgeId || '').trim(),
+      rawEdge = record.edges?.[handle] || null;
+    if (!rawEdge?.id) return null;
     return {
       kind: 'groupOutput',
-      incomingEdge: _0x4c062f,
-      rawEdge: _0x29fbe4,
-      dragEdgeId: String(_0x4c062f.id || '').trim(),
+      incomingEdge: incomingEdge2,
+      rawEdge: rawEdge,
+      dragEdgeId: String(incomingEdge2.id || '').trim(),
     };
   }
-  const _0x30facf = _0x4dff77.edges?.[String(_0x4c062f.id || '').trim()] || null;
-  if (!_0x30facf?.id) return null;
-  if (String(_0x30facf.targetId || '') === _0x5bb27d)
-    return { kind: 'edge', incomingEdge: _0x4c062f, rawEdge: _0x30facf, dragEdgeId: _0x30facf.id };
-  if (_0x4c062f.isGroupShared && String(_0x4c062f.effectiveTargetId || '') === _0x5bb27d)
-    return { kind: 'edge', incomingEdge: _0x4c062f, rawEdge: _0x30facf, dragEdgeId: _0x30facf.id };
+  const rawEdge2 = record.edges?.[String(incomingEdge2.id || '').trim()] || null;
+  if (!rawEdge2?.id) return null;
+  if (String(rawEdge2.targetId || '') === payload)
+    return { kind: 'edge', incomingEdge: incomingEdge2, rawEdge: rawEdge2, dragEdgeId: rawEdge2.id };
+  if (incomingEdge2.isGroupShared && String(incomingEdge2.effectiveTargetId || '') === payload)
+    return { kind: 'edge', incomingEdge: incomingEdge2, rawEdge: rawEdge2, dragEdgeId: rawEdge2.id };
   return null;
 }
-function resolveMutableFixedSlotThumb(_0x357a27, _0x262f14, _0x50a9c5) {
-  if (!isMutableNodeEdgeThumb(_0x357a27, _0x262f14, _0x50a9c5)) return null;
-  const _0x16bf7c = findIncomingEdge(_0x262f14, _0x50a9c5, getEdgeId(_0x357a27));
-  return getFixedSlotEdgeContext(_0x262f14, _0x16bf7c, _0x50a9c5);
+function resolveMutableFixedSlotThumb(state, config, scope) {
+  if (!isMutableNodeEdgeThumb(state, config, scope)) return null;
+  const incomingEdge3 = findIncomingEdge(config, scope, getEdgeId(state));
+  return getFixedSlotEdgeContext(config, incomingEdge3, scope);
 }
-function resolveMutableFixedSlotEdgeById(_0x4dff1f, _0xeec999, _0x320c2d) {
-  const _0x1d421e = findIncomingEdge(_0x4dff1f, _0xeec999, _0x320c2d);
-  return getFixedSlotEdgeContext(_0x4dff1f, _0x1d421e, _0xeec999);
+function resolveMutableFixedSlotEdgeById(input, output, value2) {
+  const incomingEdge4 = findIncomingEdge(input, output, value2);
+  return getFixedSlotEdgeContext(input, incomingEdge4, output);
 }
-function isFixedSlotThumb(_0x382b1f, _0x36c182 = null) {
-  const _0x6d8f8a = getDataset(_0x382b1f);
+function isFixedSlotThumb(value3, value4 = null) {
+  const dataset2 = getDataset(value3);
   return !!(
-    String(_0x6d8f8a.slot || '').trim() ||
-    String(_0x6d8f8a.refSlot || '').trim() ||
-    String(_0x36c182?.refSlot || '').trim()
+    String(dataset2.slot || '').trim() ||
+    String(dataset2.refSlot || '').trim() ||
+    String(value4?.refSlot || '').trim()
   );
 }
-function isOrderableNodeEdgeThumb(_0xc5b551, _0x3e0b06, _0x137489) {
-  if (!isNodeEdgeThumb(_0xc5b551)) return false;
-  const _0x1a5d37 = findIncomingEdge(_0x3e0b06, _0x137489, getEdgeId(_0xc5b551));
-  if (isReadOnlyDerivedGroupEdge(_0x1a5d37)) return false;
-  return !isFixedSlotThumb(_0xc5b551, _0x1a5d37);
+function isOrderableNodeEdgeThumb(value5, value6, value7) {
+  if (!isNodeEdgeThumb(value5)) return false;
+  const incomingEdge5 = findIncomingEdge(value6, value7, getEdgeId(value5));
+  if (isReadOnlyDerivedGroupEdge(incomingEdge5)) return false;
+  return !isFixedSlotThumb(value5, incomingEdge5);
 }
-function setDragData(_0x54a461, _0x28149a) {
-  if (!_0x54a461?.dataTransfer) return;
-  ((_0x54a461.dataTransfer.effectAllowed = 'move'),
-    _0x54a461.dataTransfer.setData?.('text/plain', _0x28149a));
+function setDragData(enabled3, value8) {
+  if (!enabled3?.dataTransfer) return;
+  ((enabled3.dataTransfer.effectAllowed = 'move'), enabled3.dataTransfer.setData?.('text/plain', value8));
 }
-function setDropMove(_0x432a7e) {
-  if (!_0x432a7e?.dataTransfer) return;
-  _0x432a7e.dataTransfer.dropEffect = 'move';
+function setDropMove(enabled4) {
+  if (!enabled4?.dataTransfer) return;
+  enabled4.dataTransfer.dropEffect = 'move';
 }
-function setOwnerDragging(_0x15dd2f, _0x37f7dc) {
-  if (!_0x15dd2f) return;
-  _0x15dd2f._isDraggingSorting = _0x37f7dc;
+function setOwnerDragging(enabled5, value9) {
+  if (!enabled5) return;
+  enabled5._isDraggingSorting = value9;
 }
-function getOrderDragState(_0xa8951d) {
-  if (!_0xa8951d || typeof _0xa8951d !== 'object') return { dragEl: null };
-  let _0x3e36b4 = orderDragStateByContainer.get(_0xa8951d);
+function getOrderDragState(enabled6) {
+  if (!enabled6 || typeof enabled6 !== 'object') return { dragEl: null };
+  let enabled7 = orderDragStateByContainer.get(enabled6);
   return (
-    !_0x3e36b4 && ((_0x3e36b4 = { dragEl: null }), orderDragStateByContainer.set(_0xa8951d, _0x3e36b4)),
-    _0x3e36b4
+    !enabled7 && ((enabled7 = { dragEl: null }), orderDragStateByContainer.set(enabled6, enabled7)),
+    enabled7
   );
 }
-function animateReorder(_0x172a8e, _0x3e391f) {
-  const _0x41d8cd = queryThumbItems(_0x172a8e),
-    _0x18f04e = _0x41d8cd.map((_0x1a89a8) => _0x1a89a8.getBoundingClientRect?.() || {});
-  _0x3e391f();
-  const _0x5e3720 = _0x41d8cd.map((_0x198f4d) => _0x198f4d.getBoundingClientRect?.() || {});
-  _0x41d8cd.forEach((_0x29c79a, _0x4ab96f) => {
-    const _0x1f0c49 = Number(_0x18f04e[_0x4ab96f]?.left || 0) - Number(_0x5e3720[_0x4ab96f]?.left || 0),
-      _0x21f2f0 = Number(_0x18f04e[_0x4ab96f]?.top || 0) - Number(_0x5e3720[_0x4ab96f]?.top || 0);
-    if (_0x1f0c49 === 0 && _0x21f2f0 === 0) return;
-    ((_0x29c79a.style.transform = 'translate(' + _0x1f0c49 + 'px, ' + _0x21f2f0 + 'px)'),
-      (_0x29c79a.style.transition = 'none'));
-    const _0x4ef02e =
+function animateReorder(value10, handler) {
+  const list = queryThumbItems(value10),
+    value11 = list.map((el4) => el4.getBoundingClientRect?.() || {});
+  handler();
+  const value12 = list.map((el5) => el5.getBoundingClientRect?.() || {});
+  list.forEach((el6, value13) => {
+    const count = Number(value11[value13]?.left || 0) - Number(value12[value13]?.left || 0),
+      count2 = Number(value11[value13]?.top || 0) - Number(value12[value13]?.top || 0);
+    if (count === 0 && count2 === 0) return;
+    ((el6.style.transform = 'translate(' + count + 'px, ' + count2 + 'px)'), (el6.style.transition = 'none'));
+    const run =
       typeof requestAnimationFrame === 'function'
         ? requestAnimationFrame
-        : (_0x308c2c) => setTimeout(_0x308c2c, 0);
-    _0x4ef02e(() => {
-      ((_0x29c79a.style.transform = ''),
-        (_0x29c79a.style.transition = 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)'));
+        : (value14) => setTimeout(value14, 0);
+    run(() => {
+      ((el6.style.transform = ''), (el6.style.transition = 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)'));
     });
   });
 }
-function getTargetIncomingEdges(_0x5ee140, _0x5e6331) {
-  return (_0x5ee140?.getIncomingEdges?.(_0x5e6331) || []).filter((_0x5b1146) => {
-    if (!_0x5b1146 || !String(_0x5b1146.id || '').trim()) return false;
-    const _0x788e50 = String(_0x5e6331 || '');
-    if (String(_0x5b1146.targetId || '') === _0x788e50) return true;
+function getTargetIncomingEdges(store3, value15) {
+  return (store3?.getIncomingEdges?.(value15) || []).filter((enabled8) => {
+    if (!enabled8 || !String(enabled8.id || '').trim()) return false;
+    const value16 = String(value15 || '');
+    if (String(enabled8.targetId || '') === value16) return true;
     return (
-      (_0x5b1146.isGroupShared && String(_0x5b1146.effectiveTargetId || '') === _0x788e50) ||
-      (isGroupOutputEdge(_0x5b1146) && String(_0x5b1146.effectiveTargetId || '') === _0x788e50)
+      (enabled8.isGroupShared && String(enabled8.effectiveTargetId || '') === value16) ||
+      (isGroupOutputEdge(enabled8) && String(enabled8.effectiveTargetId || '') === value16)
     );
   });
 }
-function resolveEdge(_0x4d94f1, _0x3d6c4a, _0x130019) {
-  const _0x43e26e = _0x4d94f1?.getState?.() || {};
-  return _0x43e26e.edges?.[_0x3d6c4a] || _0x130019.find((_0x457db4) => _0x457db4.id === _0x3d6c4a) || null;
+function resolveEdge(store4, value17, list2) {
+  const value18 = store4?.getState?.() || {};
+  return value18.edges?.[value17] || list2.find((item3) => item3.id === value17) || null;
 }
-function uniqueSourceIds(_0x3ddd70) {
-  const _0x57f812 = new Set(),
-    _0x239556 = [];
+function uniqueSourceIds(list3) {
+  const map = new Set(),
+    list4 = [];
   return (
-    _0x3ddd70.forEach((_0x5c17cf) => {
-      const _0x5a9a74 = String(_0x5c17cf?.sourceId || '').trim();
-      if (!_0x5a9a74 || _0x57f812.has(_0x5a9a74)) return;
-      (_0x57f812.add(_0x5a9a74), _0x239556.push(_0x5a9a74));
+    list3.forEach((item4) => {
+      const enabled9 = String(item4?.sourceId || '').trim();
+      if (!enabled9 || map.has(enabled9)) return;
+      (map.add(enabled9), list4.push(enabled9));
     }),
-    _0x239556
+    list4
   );
 }
-function mergeVisibleSourceOrder(_0x2f52b4, _0x2502de) {
-  const _0x4be053 = [..._0x2502de],
-    _0x11f170 = new Set(_0x4be053);
+function mergeVisibleSourceOrder(value19, args) {
+  const list5 = [...args],
+    map2 = new Set(list5);
   return (
-    (Array.isArray(_0x2f52b4) ? _0x2f52b4 : []).forEach((_0x15a43b) => {
-      const _0x5eeb8b = String(_0x15a43b || '').trim();
-      if (!_0x5eeb8b || _0x11f170.has(_0x5eeb8b)) return;
-      (_0x11f170.add(_0x5eeb8b), _0x4be053.push(_0x5eeb8b));
+    (Array.isArray(value19) ? value19 : []).forEach((item5) => {
+      const enabled10 = String(item5 || '').trim();
+      if (!enabled10 || map2.has(enabled10)) return;
+      (map2.add(enabled10), list5.push(enabled10));
     }),
-    _0x4be053
+    list5
   );
 }
-function getGroupOutputOrderTargetId(_0x1929d9) {
-  const _0x3e2550 = new Set();
-  for (const _0x33b542 of _0x1929d9 || []) {
-    if (!_0x33b542?.isGroupShared) return '';
-    const _0x15b5d3 = String(_0x33b542.effectiveTargetId || '').trim();
-    if (!_0x15b5d3) return '';
-    _0x3e2550.add(_0x15b5d3);
+function getGroupOutputOrderTargetId(value20) {
+  const value21 = new Set();
+  for (const enabled11 of value20 || []) {
+    if (!enabled11?.isGroupShared) return '';
+    const enabled12 = String(enabled11.effectiveTargetId || '').trim();
+    if (!enabled12) return '';
+    value21.add(enabled12);
   }
-  return _0x3e2550.size === 1 ? Array.from(_0x3e2550)[0] : '';
+  return value21.size === 1 ? Array.from(value21)[0] : '';
 }
-function applyGroupOutputSourceOrder(_0x2d9ff3, _0x32a670, _0x6400fd) {
-  if (!_0x32a670) return { ..._0x2d9ff3, groupOutputSourceOrder: _0x6400fd };
-  const _0x3c3875 = _0x2d9ff3.groupOutputSourceOrderByTarget,
-    _0x12a07f =
-      _0x3c3875 && typeof _0x3c3875 === 'object' && !Array.isArray(_0x3c3875) ? { ..._0x3c3875 } : {};
-  return ((_0x12a07f[_0x32a670] = _0x6400fd), { ..._0x2d9ff3, groupOutputSourceOrderByTarget: _0x12a07f });
-}
-function collectGroupOutputEdgeUpdates(_0x43b28a, _0xd95e77) {
-  const _0x46fc17 = _0x43b28a?.getState?.() || {},
-    _0x56444c = new Map();
-  _0xd95e77.forEach((_0x2750c2) => {
-    if (!isGroupOutputEdge(_0x2750c2)) return;
-    const _0x2782ba = String(_0x2750c2.groupOutputEdgeId || '').trim();
-    if (!_0x2782ba) return;
-    if (!_0x56444c.has(_0x2782ba)) _0x56444c.set(_0x2782ba, []);
-    _0x56444c.get(_0x2782ba).push(_0x2750c2);
-  });
-  const _0x411236 = [];
+function applyGroupOutputSourceOrder(args2, enabled13, groupOutputSourceOrder) {
+  if (!enabled13) return { ...args2, groupOutputSourceOrder: groupOutputSourceOrder };
+  const args3 = args2.groupOutputSourceOrderByTarget,
+    groupOutputSourceOrderByTarget =
+      args3 && typeof args3 === 'object' && !Array.isArray(args3) ? { ...args3 } : {};
   return (
-    _0x56444c.forEach((_0x3bc410, _0x2f318f) => {
-      const _0x482efa = _0x46fc17.edges?.[_0x2f318f];
-      if (!_0x482efa?.id) return;
-      const _0x3ae6b9 = uniqueSourceIds(_0x3bc410);
-      if (_0x3ae6b9.length <= 1) return;
-      const _0x18f579 = getGroupOutputOrderTargetId(_0x3bc410),
-        _0x402df9 = resolveGroupOutputSourceOrder(_0x482efa, _0x18f579),
-        _0x5cdae8 = mergeVisibleSourceOrder(_0x402df9, _0x3ae6b9);
-      if (isSameStringOrder(_0x5cdae8, _0x402df9 || [])) return;
-      _0x411236.push({
-        removeId: _0x2f318f,
-        edge: applyGroupOutputSourceOrder(_0x482efa, _0x18f579, _0x5cdae8),
+    (groupOutputSourceOrderByTarget[enabled13] = groupOutputSourceOrder),
+    { ...args2, groupOutputSourceOrderByTarget: groupOutputSourceOrderByTarget }
+  );
+}
+function collectGroupOutputEdgeUpdates(store5, list6) {
+  const value22 = store5?.getState?.() || {},
+    map3 = new Map();
+  list6.forEach((item6) => {
+    if (!isGroupOutputEdge(item6)) return;
+    const enabled14 = String(item6.groupOutputEdgeId || '').trim();
+    if (!enabled14) return;
+    if (!map3.has(enabled14)) map3.set(enabled14, []);
+    map3.get(enabled14).push(item6);
+  });
+  const list7 = [];
+  return (
+    map3.forEach((item7, removeId) => {
+      const enabled15 = value22.edges?.[removeId];
+      if (!enabled15?.id) return;
+      const list8 = uniqueSourceIds(item7);
+      if (list8.length <= 1) return;
+      const groupOutputOrderTargetId = getGroupOutputOrderTargetId(item7),
+        groupOutputSourceOrder2 = resolveGroupOutputSourceOrder(enabled15, groupOutputOrderTargetId),
+        visibleSourceOrder = mergeVisibleSourceOrder(groupOutputSourceOrder2, list8);
+      if (isSameStringOrder(visibleSourceOrder, groupOutputSourceOrder2 || [])) return;
+      list7.push({
+        removeId: removeId,
+        edge: applyGroupOutputSourceOrder(enabled15, groupOutputOrderTargetId, visibleSourceOrder),
       });
     }),
-    _0x411236
+    list7
   );
 }
-function collectOrderedEdgeIds(_0x41f1b6, _0x5e0baa, _0x559d1b) {
-  return queryThumbItems(_0x41f1b6)
-    .filter((_0x147698) => isOrderableNodeEdgeThumb(_0x147698, _0x5e0baa, _0x559d1b))
-    .map((_0x5a8854) => getEdgeId(_0x5a8854))
+function collectOrderedEdgeIds(value23, value24, value25) {
+  return queryThumbItems(value23)
+    .filter((item8) => isOrderableNodeEdgeThumb(item8, value24, value25))
+    .map((item9) => getEdgeId(item9))
     .filter(Boolean);
 }
-function commitOrder(_0x3ccaf2, _0x23cfe1, _0x5b9d1a) {
-  const _0x2dbf7c = collectOrderedEdgeIds(_0x3ccaf2, _0x23cfe1, _0x5b9d1a);
-  if (_0x2dbf7c.length === 0) return;
-  const _0x4ab1df = new Set(_0x2dbf7c),
-    _0x124e37 = getTargetIncomingEdges(_0x23cfe1, _0x5b9d1a).filter((_0x3b0da9) =>
-      _0x4ab1df.has(_0x3b0da9.id),
-    ),
-    _0x87bd8 = _0x124e37.map((_0x6a3d1c) => _0x6a3d1c.id);
-  if (_0x87bd8.length !== _0x2dbf7c.length) return;
-  if (isSameStringOrder(_0x2dbf7c, _0x87bd8)) return;
-  const _0x6d9f2 = _0x2dbf7c.map((_0x1f5e7f) => resolveEdge(_0x23cfe1, _0x1f5e7f, _0x124e37)).filter(Boolean);
-  if (_0x6d9f2.length !== _0x87bd8.length) return;
-  const _0x4e6f2c = collectGroupOutputEdgeUpdates(_0x23cfe1, _0x6d9f2),
-    _0x3f25d0 = _0x6d9f2.filter((_0x58c19c) => !isGroupOutputEdge(_0x58c19c)),
-    _0x6e41dd = _0x124e37
-      .filter((_0x40ed32) => !isGroupOutputEdge(_0x40ed32))
-      .map((_0x3d68ab) => _0x3d68ab.id),
-    _0x590adc = _0x3f25d0.map((_0x5315e2) => _0x5315e2.id),
-    _0x12cd42 = [],
-    _0x427b2c = [];
-  _0x6e41dd.length > 1 &&
-    !isSameStringOrder(_0x590adc, _0x6e41dd) &&
-    (_0x12cd42.push(..._0x6e41dd), _0x427b2c.push(..._0x3f25d0));
-  _0x4e6f2c.forEach((_0x2c5463) => {
-    (_0x12cd42.push(_0x2c5463.removeId), _0x427b2c.push(_0x2c5463.edge));
+function commitOrder(value26, value27, value28) {
+  const list9 = collectOrderedEdgeIds(value26, value27, value28);
+  if (list9.length === 0) return;
+  const map4 = new Set(list9),
+    list10 = getTargetIncomingEdges(value27, value28).filter((item10) => map4.has(item10.id)),
+    list11 = list10.map((item11) => item11.id);
+  if (list11.length !== list9.length) return;
+  if (isSameStringOrder(list9, list11)) return;
+  const list12 = list9.map((item12) => resolveEdge(value27, item12, list10)).filter(Boolean);
+  if (list12.length !== list11.length) return;
+  const list13 = collectGroupOutputEdgeUpdates(value27, list12),
+    list14 = list12.filter((item13) => !isGroupOutputEdge(item13)),
+    list15 = list10.filter((item14) => !isGroupOutputEdge(item14)).map((item15) => item15.id),
+    value29 = list14.map((item16) => item16.id),
+    list16 = [],
+    list17 = [];
+  list15.length > 1 &&
+    !isSameStringOrder(value29, list15) &&
+    (list16.push(...list15), list17.push(...list14));
+  list13.forEach((item17) => {
+    (list16.push(item17.removeId), list17.push(item17.edge));
   });
-  if (_0x12cd42.length === 0) return;
-  _0x23cfe1.updateEdgesBatch?.(_0x12cd42, _0x427b2c);
+  if (list16.length === 0) return;
+  value27.updateEdgesBatch?.(list16, list17);
 }
 export function bindRefThumbOrderDrag({
-  owner: _0x47fe09,
-  container: _0x33cbd6,
-  store: _0x341383,
-  nodeId: _0x36f2cb,
+  owner: owner,
+  container: container,
+  store: store6,
+  nodeId: nodeId,
 } = {}) {
-  const _0x4b0b8d = resolveThumbContainer(_0x33cbd6);
-  if (!_0x4b0b8d || !_0x341383 || !_0x36f2cb) return;
-  const _0x80babc = getOrderDragState(_0x4b0b8d);
-  (queryThumbItems(_0x4b0b8d).forEach((_0x37931) => {
-    if (!isOrderableNodeEdgeThumb(_0x37931, _0x341383, _0x36f2cb)) {
-      const _0x266c06 = findIncomingEdge(_0x341383, _0x36f2cb, getEdgeId(_0x37931));
-      isNodeEdgeThumb(_0x37931) &&
-        isReadOnlyDerivedGroupEdge(_0x266c06) &&
-        _0x37931.setAttribute?.('draggable', 'false');
+  const el7 = resolveThumbContainer(container);
+  if (!el7 || !store6 || !nodeId) return;
+  const orderDragState = getOrderDragState(el7);
+  (queryThumbItems(el7).forEach((el8) => {
+    if (!isOrderableNodeEdgeThumb(el8, store6, nodeId)) {
+      const incomingEdge6 = findIncomingEdge(store6, nodeId, getEdgeId(el8));
+      isNodeEdgeThumb(el8) &&
+        isReadOnlyDerivedGroupEdge(incomingEdge6) &&
+        el8.setAttribute?.('draggable', 'false');
       return;
     }
-    if (_0x37931.dataset.dragBound === '1') return;
-    ((_0x37931.dataset.dragBound = '1'),
-      _0x37931.setAttribute?.('draggable', 'true'),
-      _0x37931.addEventListener('dragstart', (_0x142a24) => {
-        if (!isOrderableNodeEdgeThumb(_0x37931, _0x341383, _0x36f2cb)) return;
-        ((_0x80babc.dragEl = _0x37931),
-          setOwnerDragging(_0x47fe09, true),
-          setDragData(_0x142a24, getEdgeId(_0x37931) || 'dragging'),
-          _0x37931.classList?.add('dragging-capture'),
+    if (el8.dataset.dragBound === '1') return;
+    ((el8.dataset.dragBound = '1'),
+      el8.setAttribute?.('draggable', 'true'),
+      el8.addEventListener('dragstart', (value30) => {
+        if (!isOrderableNodeEdgeThumb(el8, store6, nodeId)) return;
+        ((orderDragState.dragEl = el8),
+          setOwnerDragging(owner, true),
+          setDragData(value30, getEdgeId(el8) || 'dragging'),
+          el8.classList?.add('dragging-capture'),
           setTimeout(() => {
-            (_0x37931.classList?.add('dragging'), (_0x37931.style.opacity = '0.1'));
+            (el8.classList?.add('dragging'), (el8.style.opacity = '0.1'));
           }, 0));
       }),
-      _0x37931.addEventListener('dragend', () => {
-        if (_0x80babc.dragEl) _0x80babc.dragEl.style.opacity = '1';
-        (_0x37931.classList?.remove('dragging'), _0x37931.classList?.remove('dragging-capture'));
+      el8.addEventListener('dragend', () => {
+        if (orderDragState.dragEl) orderDragState.dragEl.style.opacity = '1';
+        (el8.classList?.remove('dragging'), el8.classList?.remove('dragging-capture'));
         try {
-          commitOrder(_0x4b0b8d, _0x341383, _0x36f2cb);
+          commitOrder(el7, store6, nodeId);
         } finally {
-          ((_0x80babc.dragEl = null), setOwnerDragging(_0x47fe09, false));
+          ((orderDragState.dragEl = null), setOwnerDragging(owner, false));
         }
       }),
-      _0x37931.addEventListener('dragover', (_0x3e0cab) => {
-        const _0x1d2fc6 = _0x80babc.dragEl;
-        if (!_0x1d2fc6 || _0x1d2fc6 === _0x37931) return;
+      el8.addEventListener('dragover', (event) => {
+        const enabled16 = orderDragState.dragEl;
+        if (!enabled16 || enabled16 === el8) return;
         if (
-          !isOrderableNodeEdgeThumb(_0x1d2fc6, _0x341383, _0x36f2cb) ||
-          !isOrderableNodeEdgeThumb(_0x37931, _0x341383, _0x36f2cb)
+          !isOrderableNodeEdgeThumb(enabled16, store6, nodeId) ||
+          !isOrderableNodeEdgeThumb(el8, store6, nodeId)
         )
           return;
-        (_0x3e0cab.preventDefault?.(), setDropMove(_0x3e0cab));
-        const _0x4c9d07 = _0x37931.getBoundingClientRect?.() || {},
-          _0x21adcd = Number(_0x4c9d07.left || 0) + Number(_0x4c9d07.width || 0) / 2;
-        animateReorder(_0x4b0b8d, () => {
-          Number(_0x3e0cab.clientX || 0) < _0x21adcd
-            ? _0x37931.parentNode?.insertBefore(_0x1d2fc6, _0x37931)
-            : _0x37931.parentNode?.insertBefore(_0x1d2fc6, _0x37931.nextSibling);
+        (event.preventDefault?.(), setDropMove(event));
+        const box = el8.getBoundingClientRect?.() || {},
+          value31 = Number(box.left || 0) + Number(box.width || 0) / 2;
+        animateReorder(el7, () => {
+          Number(event.clientX || 0) < value31
+            ? el8.parentNode?.insertBefore(enabled16, el8)
+            : el8.parentNode?.insertBefore(enabled16, el8.nextSibling);
         });
       }));
   }),
-    _0x4b0b8d.dataset.dragContainerBound !== '1' &&
-      ((_0x4b0b8d.dataset.dragContainerBound = '1'),
-      _0x4b0b8d.addEventListener('dragover', (_0x19d070) => _0x19d070.preventDefault?.()),
-      _0x4b0b8d.addEventListener('drop', (_0xec18aa) => _0xec18aa.preventDefault?.())));
+    el7.dataset.dragContainerBound !== '1' &&
+      ((el7.dataset.dragContainerBound = '1'),
+      el7.addEventListener('dragover', (event2) => event2.preventDefault?.()),
+      el7.addEventListener('drop', (event3) => event3.preventDefault?.())));
 }
-function defaultGetKindByNode(_0x46d389) {
-  const _0x1777bb = String(_0x46d389?.type || '');
-  if (_0x1777bb.includes('text')) return 'text';
-  if (_0x1777bb.includes('video')) return 'video';
-  if (_0x1777bb.includes('audio')) return 'audio';
-  return _0x1777bb ? 'image' : '';
+function defaultGetKindByNode(value32) {
+  const list18 = String(value32?.type || '');
+  if (list18.includes('text')) return 'text';
+  if (list18.includes('video')) return 'video';
+  if (list18.includes('audio')) return 'audio';
+  return list18 ? 'image' : '';
 }
-function clearDropState(_0x1caeed) {
-  queryThumbItems(_0x1caeed)
-    .filter((_0x3e594f) => _0x3e594f.classList?.contains?.('is-drop-allow'))
-    .forEach((_0x5157a0) => _0x5157a0.classList?.remove('is-drop-allow'));
+function clearDropState(value33) {
+  queryThumbItems(value33)
+    .filter((el9) => el9.classList?.contains?.('is-drop-allow'))
+    .forEach((el10) => el10.classList?.remove('is-drop-allow'));
 }
-function getSlot(_0x544683) {
-  return String(getDataset(_0x544683).slot || '').trim();
+function getSlot(value34) {
+  return String(getDataset(value34).slot || '').trim();
 }
-function getSlotKind(_0x4dbd0d, _0x4c20ba, _0x278af3, _0x22fd60) {
-  const _0x2b10c1 = getSlot(_0x4dbd0d),
-    _0xb7dcbb = String(getDataset(_0x4dbd0d).kind || '').trim();
-  if (_0xb7dcbb) return _0xb7dcbb;
-  const _0x463a14 = String(getDataset(_0x4dbd0d).sourceId || '').trim(),
-    _0x5b077e = _0x463a14 ? _0x22fd60?.getState?.()?.nodes?.[_0x463a14] : null;
-  return _0x278af3(_0x5b077e) || String(_0x4c20ba?.[_0x2b10c1] || '').trim();
+function getSlotKind(value35, value36, handler2, store7) {
+  const slot = getSlot(value35),
+    value37 = String(getDataset(value35).kind || '').trim();
+  if (value37) return value37;
+  const value38 = String(getDataset(value35).sourceId || '').trim(),
+    value39 = value38 ? store7?.getState?.()?.nodes?.[value38] : null;
+  return handler2(value39) || String(value36?.[slot] || '').trim();
 }
-function findSlotTarget(_0x45dac6) {
-  return _0x45dac6?.target?.closest?.('[data-slot]') || null;
+function findSlotTarget(event4) {
+  return event4?.target?.closest?.('[data-slot]') || null;
 }
-function resolveFixedSlotTargetEdgeContext(_0x460579, _0x11e925, _0x41ef63, _0x2b9fe3) {
-  const _0x68defe = getEdgeId(_0x460579);
-  if (_0x68defe) return resolveMutableFixedSlotEdgeById(_0x11e925, _0x41ef63, _0x68defe);
+function resolveFixedSlotTargetEdgeContext(value40, value41, value42, value43) {
+  const edgeId = getEdgeId(value40);
+  if (edgeId) return resolveMutableFixedSlotEdgeById(value41, value42, edgeId);
   return (
-    getTargetIncomingEdges(_0x11e925, _0x41ef63)
-      .map((_0x458514) => getFixedSlotEdgeContext(_0x11e925, _0x458514, _0x41ef63))
+    getTargetIncomingEdges(value41, value42)
+      .map((item18) => getFixedSlotEdgeContext(value41, item18, value42))
       .filter(Boolean)
       .find(
-        ({ incomingEdge: _0x3bcc77, rawEdge: _0x5b95c2 }) =>
-          _0x5b95c2 && String(_0x3bcc77?.refSlot || '').trim() === String(_0x2b9fe3 || ''),
+        ({ incomingEdge: incomingEdge7, rawEdge: rawEdge3 }) =>
+          rawEdge3 && String(incomingEdge7?.refSlot || '').trim() === String(value43 || ''),
       ) || null
   );
 }
-function getFixedSlotAcceptMap(_0x2327f9, _0x4f2a77) {
-  return _0x2327f9?._refThumbFixedSlotAcceptMap || _0x4f2a77 || {};
+function getFixedSlotAcceptMap(value44, value45) {
+  return value44?._refThumbFixedSlotAcceptMap || value45 || {};
 }
-function getContextSourceKind(_0x50ee74, _0x1645ce, _0x35a186) {
-  const _0x439413 = String(_0x50ee74?.incomingEdge?.sourceId || '').trim();
-  if (!_0x439413) return '';
-  return _0x35a186(_0x1645ce?.nodes?.[_0x439413] || null);
+function getContextSourceKind(value46, value47, handler3) {
+  const enabled17 = String(value46?.incomingEdge?.sourceId || '').trim();
+  if (!enabled17) return '';
+  return handler3(value47?.nodes?.[enabled17] || null);
 }
 function collectFixedSlotGroupOutputUpdates({
-  store: _0x42e2ec,
-  nodeId: _0x2cd9c8,
-  slotOrder: _0x31fc52,
-  contextA: _0xb82383,
-  contextB: _0x13dcdf,
-  fromSlot: _0x70319b,
-  toSlot: _0xe71d2c,
+  store: store8,
+  nodeId: nodeId2,
+  slotOrder: slotOrder,
+  contextA: contextA,
+  contextB: contextB,
+  fromSlot: fromSlot,
+  toSlot: toSlot,
 }) {
-  if (_0xb82383?.kind !== 'groupOutput' && _0x13dcdf?.kind !== 'groupOutput') return [];
-  const _0x1560e8 = new Map();
-  getTargetIncomingEdges(_0x42e2ec, _0x2cd9c8)
+  if (contextA?.kind !== 'groupOutput' && contextB?.kind !== 'groupOutput') return [];
+  const map5 = new Map();
+  getTargetIncomingEdges(store8, nodeId2)
     .filter(isGroupOutputEdge)
-    .forEach((_0x227aa6) => {
-      const _0xcb75fb = String(_0x227aa6?.refSlot || '').trim();
-      if (_0xcb75fb) _0x1560e8.set(_0xcb75fb, _0x227aa6);
+    .forEach((item19) => {
+      const value48 = String(item19?.refSlot || '').trim();
+      if (value48) map5.set(value48, item19);
     });
-  _0xb82383?.kind === 'groupOutput' && _0x1560e8.delete(_0x70319b);
-  _0x13dcdf?.kind === 'groupOutput' && _0x1560e8.delete(_0xe71d2c);
-  _0xb82383?.kind === 'groupOutput' && _0x1560e8.set(_0xe71d2c, _0xb82383.incomingEdge);
-  _0x13dcdf?.kind === 'groupOutput' && _0x1560e8.set(_0x70319b, _0x13dcdf.incomingEdge);
-  const _0x52f267 = _0x31fc52.map((_0x316469) => _0x1560e8.get(_0x316469)).filter(Boolean);
-  return collectGroupOutputEdgeUpdates(_0x42e2ec, _0x52f267);
+  contextA?.kind === 'groupOutput' && map5.delete(fromSlot);
+  contextB?.kind === 'groupOutput' && map5.delete(toSlot);
+  contextA?.kind === 'groupOutput' && map5.set(toSlot, contextA.incomingEdge);
+  contextB?.kind === 'groupOutput' && map5.set(fromSlot, contextB.incomingEdge);
+  const value49 = slotOrder.map((item20) => map5.get(item20)).filter(Boolean);
+  return collectGroupOutputEdgeUpdates(store8, value49);
 }
 export function bindRefThumbFixedSlotDrag({
-  owner: _0x5a9eb7,
-  container: _0x38cd8d,
-  store: _0x3d6773,
-  nodeId: _0x108a00,
-  acceptMap: _0x386011,
+  owner: owner2,
+  container: container2,
+  store: store9,
+  nodeId: nodeId3,
+  acceptMap: acceptMap,
   getKindByNode: getKindByNode = defaultGetKindByNode,
 } = {}) {
-  if (!_0x38cd8d || !_0x3d6773 || !_0x108a00 || !_0x386011) return;
-  if (_0x5a9eb7) _0x5a9eb7._refThumbFixedSlotAcceptMap = _0x386011 || null;
-  if (_0x38cd8d.dataset.fixedSlotDragBound === '1') return;
-  ((_0x38cd8d.dataset.fixedSlotDragBound = '1'),
-    _0x38cd8d.addEventListener('dragstart', (_0x201be2) => {
-      const _0x4b1533 = _0x201be2.target?.closest?.(THUMB_ITEM_SELECTOR),
-        _0x32e98d = _0x4b1533 ? resolveMutableFixedSlotThumb(_0x4b1533, _0x3d6773, _0x108a00) : null;
-      if (!_0x4b1533 || !_0x32e98d) return;
-      const _0x1aa09b = String(_0x32e98d.dragEdgeId || _0x32e98d.rawEdge.id || '').trim(),
-        _0x4522c7 = getSlot(_0x4b1533);
-      if (!_0x1aa09b || !_0x4522c7) return;
-      const _0x4a89e5 = getFixedSlotAcceptMap(_0x5a9eb7, _0x386011),
-        _0x54162c = getSlotKind(_0x4b1533, _0x4a89e5, getKindByNode, _0x3d6773);
-      if (!_0x54162c || _0x4a89e5[_0x4522c7] !== _0x54162c) return;
-      if (!_0x5a9eb7) return;
-      ((_0x5a9eb7._fixedSlotDrag = { edgeId: _0x1aa09b, fromSlot: _0x4522c7, kind: _0x54162c }),
-        clearDropState(_0x38cd8d),
-        _0x4b1533.classList?.add('is-dragging'),
-        setDragData(_0x201be2, _0x1aa09b),
-        _0x201be2.stopPropagation?.());
+  if (!container2 || !store9 || !nodeId3 || !acceptMap) return;
+  if (owner2) owner2._refThumbFixedSlotAcceptMap = acceptMap || null;
+  if (container2.dataset.fixedSlotDragBound === '1') return;
+  ((container2.dataset.fixedSlotDragBound = '1'),
+    container2.addEventListener('dragstart', (event5) => {
+      const el11 = event5.target?.closest?.(THUMB_ITEM_SELECTOR),
+        enabled18 = el11 ? resolveMutableFixedSlotThumb(el11, store9, nodeId3) : null;
+      if (!el11 || !enabled18) return;
+      const edgeId2 = String(enabled18.dragEdgeId || enabled18.rawEdge.id || '').trim(),
+        fromSlot2 = getSlot(el11);
+      if (!edgeId2 || !fromSlot2) return;
+      const fixedSlotAcceptMap = getFixedSlotAcceptMap(owner2, acceptMap),
+        kind = getSlotKind(el11, fixedSlotAcceptMap, getKindByNode, store9);
+      if (!kind || fixedSlotAcceptMap[fromSlot2] !== kind) return;
+      if (!owner2) return;
+      ((owner2._fixedSlotDrag = { edgeId: edgeId2, fromSlot: fromSlot2, kind: kind }),
+        clearDropState(container2),
+        el11.classList?.add('is-dragging'),
+        setDragData(event5, edgeId2),
+        event5.stopPropagation?.());
     }),
-    _0x38cd8d.addEventListener('dragend', (_0x253359) => {
-      const _0x47579d = _0x253359.target?.closest?.(THUMB_ITEM_SELECTOR);
-      (_0x47579d?.classList?.remove('is-dragging'), clearDropState(_0x38cd8d));
-      if (_0x5a9eb7) _0x5a9eb7._fixedSlotDrag = null;
-      _0x253359.stopPropagation?.();
+    container2.addEventListener('dragend', (event6) => {
+      const el12 = event6.target?.closest?.(THUMB_ITEM_SELECTOR);
+      (el12?.classList?.remove('is-dragging'), clearDropState(container2));
+      if (owner2) owner2._fixedSlotDrag = null;
+      event6.stopPropagation?.();
     }),
-    _0x38cd8d.addEventListener('dragover', (_0x36c839) => {
-      const _0x4b2780 = _0x5a9eb7?._fixedSlotDrag;
-      if (!_0x4b2780) return;
-      const _0x3a47b6 = findSlotTarget(_0x36c839),
-        _0x11fe13 = getSlot(_0x3a47b6),
-        _0xfec9d8 = getFixedSlotAcceptMap(_0x5a9eb7, _0x386011);
-      if (!_0x11fe13 || _0xfec9d8[_0x11fe13] !== _0x4b2780.kind) return;
-      (_0x36c839.preventDefault?.(),
-        setDropMove(_0x36c839),
-        clearDropState(_0x38cd8d),
-        _0x3a47b6.classList?.add('is-drop-allow'),
-        _0x36c839.stopPropagation?.());
+    container2.addEventListener('dragover', (event7) => {
+      const enabled19 = owner2?._fixedSlotDrag;
+      if (!enabled19) return;
+      const el13 = findSlotTarget(event7),
+        slot2 = getSlot(el13),
+        fixedSlotAcceptMap2 = getFixedSlotAcceptMap(owner2, acceptMap);
+      if (!slot2 || fixedSlotAcceptMap2[slot2] !== enabled19.kind) return;
+      (event7.preventDefault?.(),
+        setDropMove(event7),
+        clearDropState(container2),
+        el13.classList?.add('is-drop-allow'),
+        event7.stopPropagation?.());
     }),
-    _0x38cd8d.addEventListener('drop', (_0x41e671) => {
-      const _0x4afb31 = _0x5a9eb7?._fixedSlotDrag;
-      if (!_0x4afb31) return;
-      const _0x5cc632 = findSlotTarget(_0x41e671),
-        _0x40fd8d = getSlot(_0x5cc632),
-        _0x5cac29 = getFixedSlotAcceptMap(_0x5a9eb7, _0x386011);
-      if (!_0x40fd8d || _0x5cac29[_0x40fd8d] !== _0x4afb31.kind) return;
-      (_0x41e671.preventDefault?.(), clearDropState(_0x38cd8d));
-      if (_0x40fd8d === _0x4afb31.fromSlot) return;
-      const _0x4fb015 = _0x3d6773.getState?.() || {},
-        _0x1c21ba = resolveMutableFixedSlotEdgeById(_0x3d6773, _0x108a00, _0x4afb31.edgeId),
-        _0x2e0d55 = _0x1c21ba?.rawEdge || null;
-      if (!_0x2e0d55) return;
-      const _0x15d4cf = resolveFixedSlotTargetEdgeContext(_0x5cc632, _0x3d6773, _0x108a00, _0x40fd8d),
-        _0x50b50a = _0x15d4cf?.rawEdge || null,
-        _0x1b5894 = Object.keys(_0x5cac29 || {}).filter(
-          (_0x4db165) => _0x5cac29[_0x4db165] === _0x4afb31.kind,
+    container2.addEventListener('drop', (event8) => {
+      const fromSlot3 = owner2?._fixedSlotDrag;
+      if (!fromSlot3) return;
+      const slotTarget = findSlotTarget(event8),
+        toSlot2 = getSlot(slotTarget),
+        fixedSlotAcceptMap3 = getFixedSlotAcceptMap(owner2, acceptMap);
+      if (!toSlot2 || fixedSlotAcceptMap3[toSlot2] !== fromSlot3.kind) return;
+      (event8.preventDefault?.(), clearDropState(container2));
+      if (toSlot2 === fromSlot3.fromSlot) return;
+      const value50 = store9.getState?.() || {},
+        contextA2 = resolveMutableFixedSlotEdgeById(store9, nodeId3, fromSlot3.edgeId),
+        args4 = contextA2?.rawEdge || null;
+      if (!args4) return;
+      const contextB2 = resolveFixedSlotTargetEdgeContext(slotTarget, store9, nodeId3, toSlot2),
+        args5 = contextB2?.rawEdge || null,
+        slotOrder2 = Object.keys(fixedSlotAcceptMap3 || {}).filter(
+          (item21) => fixedSlotAcceptMap3[item21] === fromSlot3.kind,
         ),
-        _0x5bfff2 = collectFixedSlotGroupOutputUpdates({
-          store: _0x3d6773,
-          nodeId: _0x108a00,
-          slotOrder: _0x1b5894,
-          contextA: _0x1c21ba,
-          contextB: _0x15d4cf,
-          fromSlot: _0x4afb31.fromSlot,
-          toSlot: _0x40fd8d,
+        list19 = collectFixedSlotGroupOutputUpdates({
+          store: store9,
+          nodeId: nodeId3,
+          slotOrder: slotOrder2,
+          contextA: contextA2,
+          contextB: contextB2,
+          fromSlot: fromSlot3.fromSlot,
+          toSlot: toSlot2,
         }),
-        _0x576418 = [],
-        _0xf59b88 = [];
-      if (_0x50b50a?.id && _0x50b50a.id !== _0x2e0d55.id) {
-        const _0x329ef6 = getContextSourceKind(_0x15d4cf, _0x4fb015, getKindByNode);
-        if (!_0x329ef6 || _0x5cac29[_0x4afb31.fromSlot] !== _0x329ef6) return;
-        (_0x1c21ba.kind === 'edge' &&
-          (_0x576418.push(_0x2e0d55.id), _0xf59b88.push({ ..._0x2e0d55, refSlot: _0x40fd8d })),
-          _0x15d4cf.kind === 'edge' &&
-            (_0x576418.push(_0x50b50a.id), _0xf59b88.push({ ..._0x50b50a, refSlot: _0x4afb31.fromSlot })));
+        list20 = [],
+        list21 = [];
+      if (args5?.id && args5.id !== args4.id) {
+        const contextSourceKind = getContextSourceKind(contextB2, value50, getKindByNode);
+        if (!contextSourceKind || fixedSlotAcceptMap3[fromSlot3.fromSlot] !== contextSourceKind) return;
+        (contextA2.kind === 'edge' && (list20.push(args4.id), list21.push({ ...args4, refSlot: toSlot2 })),
+          contextB2.kind === 'edge' &&
+            (list20.push(args5.id), list21.push({ ...args5, refSlot: fromSlot3.fromSlot })));
       } else
-        _0x1c21ba.kind === 'edge' &&
-          (_0x576418.push(_0x2e0d55.id), _0xf59b88.push({ ..._0x2e0d55, refSlot: _0x40fd8d }));
-      _0x5bfff2.forEach((_0x2e1e47) => {
-        (_0x576418.push(_0x2e1e47.removeId), _0xf59b88.push(_0x2e1e47.edge));
+        contextA2.kind === 'edge' && (list20.push(args4.id), list21.push({ ...args4, refSlot: toSlot2 }));
+      list19.forEach((item22) => {
+        (list20.push(item22.removeId), list21.push(item22.edge));
       });
-      if (_0x576418.length === 0) return;
-      _0x3d6773.updateEdgesBatch?.(_0x576418, _0xf59b88);
-      if (_0x5a9eb7) _0x5a9eb7._fixedSlotDrag = null;
-      _0x41e671.stopPropagation?.();
+      if (list20.length === 0) return;
+      store9.updateEdgesBatch?.(list20, list21);
+      if (owner2) owner2._fixedSlotDrag = null;
+      event8.stopPropagation?.();
     }));
 }

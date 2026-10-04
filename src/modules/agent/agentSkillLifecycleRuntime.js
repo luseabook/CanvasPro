@@ -63,35 +63,35 @@ const TEXT = Object['freeze']({
     stopped: 'Skill operation stopped.',
   }),
 });
-function localeKey(_0x473aa9 = '') {
-  return String(_0x473aa9 || '')
+function localeKey(value = '') {
+  return String(value || '')
     ['toLowerCase']()
     ['startsWith']('en')
     ? 'en-US'
     : 'zh-CN';
 }
-function formatText(_0x4a83d6, _0x2cb81a = {}, _0x3bb235 = 'zh-CN') {
-  return (TEXT[localeKey(_0x3bb235)]?.[_0x4a83d6] || TEXT['zh-CN'][_0x4a83d6] || _0x4a83d6)['replace'](
+function formatText(item, key = {}, index = 'zh-CN') {
+  return (TEXT[localeKey(index)]?.[item] || TEXT['zh-CN'][item] || item)['replace'](
     /\{(\w+)\}/g,
-    (_0x2fe272, _0x464c4c) => String(_0x2cb81a[_0x464c4c] ?? ''),
+    (result, data) => String(key[data] ?? ''),
   );
 }
-function compactSkill(_0x2071af = {}) {
+function compactSkill(editable = {}) {
   return {
-    id: String(_0x2071af['id'] || '')['trim'](),
-    title: String(_0x2071af['title'] || _0x2071af['id'] || '')['trim'](),
-    description: String(_0x2071af['description'] || '')['trim'](),
-    triggers: Array['isArray'](_0x2071af['triggers']) ? [..._0x2071af['triggers']] : [],
-    instructions: String(_0x2071af['instructions'] || '')['trim'](),
-    source: String(_0x2071af['source'] || '')['trim'](),
+    id: String(editable['id'] || '')['trim'](),
+    title: String(editable['title'] || editable['id'] || '')['trim'](),
+    description: String(editable['description'] || '')['trim'](),
+    triggers: Array['isArray'](editable['triggers']) ? [...editable['triggers']] : [],
+    instructions: String(editable['instructions'] || '')['trim'](),
+    source: String(editable['source'] || '')['trim'](),
     editable:
-      _0x2071af['editable'] === !![] ||
-      (_0x2071af['source'] === 'installed' && _0x2071af['managedBy'] === 'shuo-canvas'),
-    enabled: _0x2071af['enabled'] !== ![],
+      editable['editable'] === !![] ||
+      (editable['source'] === 'installed' && editable['managedBy'] === 'shuo-canvas'),
+    enabled: editable['enabled'] !== ![],
   };
 }
 export function createAgentSkillLifecycleRuntime({
-  sessionStore: _0x1ddefe,
+  sessionStore: sessionStore,
   skillRegistry: skillRegistry = null,
   author: author = null,
   saveSkill: saveSkill = null,
@@ -100,203 +100,199 @@ export function createAgentSkillLifecycleRuntime({
   localeProvider: localeProvider = () => 'zh-CN',
   isActiveRun: isActiveRun = () => !![],
 } = {}) {
-  const _0x4e9ab6 = () => (skillRegistry?.['listSkills']?.() || [])['map'](compactSkill),
-    _0x159d35 = () => _0x4e9ab6()['filter']((_0xf26380) => _0xf26380['source'] === 'installed'),
-    _0x11bfad = (_0x35390f) =>
-      _0x159d35()['find']((_0x4024aa) => _0x4024aa['id'] === String(_0x35390f || '')) || null,
-    _0x2d0ede = () => {
-      const _0x949c76 = _0x1ddefe?.['getPendingClarification']?.();
-      return _0x949c76?.['targetKind'] === AGENT_SKILL_LIFECYCLE_TARGET_KIND ? _0x949c76 : null;
+  const run = () => (skillRegistry?.['listSkills']?.() || [])['map'](compactSkill),
+    existingSkills = () => run()['filter']((options) => options['source'] === 'installed'),
+    handler = (target) => existingSkills()['find']((source) => source['id'] === String(target || '')) || null,
+    getPending = () => {
+      const next = sessionStore?.['getPendingClarification']?.();
+      return next?.['targetKind'] === AGENT_SKILL_LIFECYCLE_TARGET_KIND ? next : null;
     },
-    _0x2997ca = (_0x16914a, _0x1f08db, _0x70a29b) => {
-      (_0x1ddefe?.['pushHistory']?.({
+    handler2 = (turnId, status, content) => {
+      (sessionStore?.['pushHistory']?.({
         role: 'assistant',
-        status: _0x1f08db,
-        content: _0x70a29b,
-        turnId: _0x16914a,
+        status: status,
+        content: content,
+        turnId: turnId,
       }),
-        _0x1ddefe?.['setCurrentRun']?.({ id: _0x16914a, status: _0x1f08db, stopped: ![] }));
+        sessionStore?.['setCurrentRun']?.({ id: turnId, status: status, stopped: ![] }));
     },
-    _0x5cd835 = (_0x541efc, _0xd4f7ab, _0x5f2c0b, _0x53e23c = {}) => {
+    handler3 = (current, status2, reply, args = {}) => {
       return (
-        _0x2997ca(_0x541efc, _0xd4f7ab, _0x5f2c0b),
+        handler2(current, status2, reply),
         {
-          ok: !['failed', 'stopped']['includes'](_0xd4f7ab),
-          status: _0xd4f7ab,
-          reply: _0x5f2c0b,
+          ok: !['failed', 'stopped']['includes'](status2),
+          status: status2,
+          reply: reply,
           responseChannel: 'skill.lifecycle',
-          ..._0x53e23c,
+          ...args,
         }
       );
     },
-    _0x191b41 = (_0x1ae606) => _0x5cd835(_0x1ae606, 'stopped', formatText('stopped', {}, localeProvider?.())),
-    _0x259d3b = ({
-      originalMessage: _0x4cf3e4,
-      question: _0x48a3d0,
-      operation: _0x33c4d2,
+    handler4 = (entry) => handler3(entry, 'stopped', formatText('stopped', {}, localeProvider?.())),
+    handler5 = ({
+      originalMessage: originalMessage2,
+      question: question,
+      operation: operation2,
       skillId: skillId = '',
-      phase: _0x1aa2c5,
+      phase: phase,
     }) => {
-      _0x1ddefe?.['setPendingClarification']?.({
-        originalMessage: _0x4cf3e4,
-        question: _0x48a3d0,
-        reply: _0x48a3d0,
+      sessionStore?.['setPendingClarification']?.({
+        originalMessage: originalMessage2,
+        question: question,
+        reply: question,
         options: [],
         targetKind: AGENT_SKILL_LIFECYCLE_TARGET_KIND,
-        operation: _0x33c4d2,
+        operation: operation2,
         skillId: skillId,
-        phase: _0x1aa2c5,
+        phase: phase,
       });
     };
-  function _0xd5868d({ operation: _0xc1ddab, originalMessage: _0x2d5a44, runId: _0x572b94 }) {
-    const _0x4f4ec6 = _0x159d35()[0x0]?.['id'] || 'skill-id',
-      _0x417d3a = formatText(
-        'operation' + _0xc1ddab['charAt'](0x0)['toUpperCase']() + _0xc1ddab['slice'](0x1),
+  function run2({ operation: operation3, originalMessage: originalMessage3, runId: runId2 }) {
+    const id = existingSkills()[0x0]?.['id'] || 'skill-id',
+      operation4 = formatText(
+        'operation' + operation3['charAt'](0x0)['toUpperCase']() + operation3['slice'](0x1),
         {},
         localeProvider?.(),
       ),
-      _0xe40628 =
-        formatText('target', { operation: _0x417d3a, id: _0x4f4ec6 }, localeProvider?.()) ||
+      question2 =
+        formatText('target', { operation: operation4, id: id }, localeProvider?.()) ||
         formatText('targetFallback', {}, localeProvider?.());
     return (
-      _0x259d3b({
-        originalMessage: _0x2d5a44,
-        question: _0xe40628,
-        operation: _0xc1ddab,
+      handler5({
+        originalMessage: originalMessage3,
+        question: question2,
+        operation: operation3,
         phase: 'target-selection',
       }),
-      _0x5cd835(_0x572b94, 'need_clarification', _0xe40628, { question: _0xe40628, options: [] })
+      handler3(runId2, 'need_clarification', question2, { question: question2, options: [] })
     );
   }
-  async function _0x5d44e8({
-    operation: _0x5b00c7,
-    targetSkill: _0x22137f,
-    message: _0x42817c,
-    originalMessage: _0x1b25b6,
+  async function run3({
+    operation: operation5,
+    targetSkill: targetSkill,
+    message: message2,
+    originalMessage: originalMessage4,
     clarificationAnswer: clarificationAnswer = '',
-    runId: _0x172437,
-    signal: _0x47f076,
+    runId: runId3,
+    signal: signal2,
   }) {
     if (typeof author !== 'function' || typeof saveSkill !== 'function')
-      return _0x5cd835(_0x172437, 'failed', formatText('unavailable', {}, localeProvider?.()), {
+      return handler3(runId3, 'failed', formatText('unavailable', {}, localeProvider?.()), {
         errorCode: 'SKILL_LIFECYCLE_UNAVAILABLE',
       });
-    if (!_0x22137f['editable'])
-      return _0x5cd835(
-        _0x172437,
+    if (!targetSkill['editable'])
+      return handler3(
+        runId3,
         'failed',
-        formatText('readOnly', { id: _0x22137f['id'] }, localeProvider?.()),
+        formatText('readOnly', { id: targetSkill['id'] }, localeProvider?.()),
         { errorCode: 'SKILL_NOT_EDITABLE' },
       );
-    let _0xc71294;
+    let options2;
     try {
-      _0xc71294 = await requestNormalizedAgentSkillDraft({
+      options2 = await requestNormalizedAgentSkillDraft({
         author: author,
         payload: {
-          operation: _0x5b00c7,
-          message: _0x42817c,
-          originalMessage: _0x1b25b6,
+          operation: operation5,
+          message: message2,
+          originalMessage: originalMessage4,
           clarificationAnswer: clarificationAnswer,
-          targetSkill: _0x22137f,
-          history: _0x1ddefe?.['getHistory']?.() || [],
-          existingSkills: _0x159d35()['map'](({ id: _0x57850d, title: _0x276351 }) => ({
-            id: _0x57850d,
-            title: _0x276351,
+          targetSkill: targetSkill,
+          history: sessionStore?.['getHistory']?.() || [],
+          existingSkills: existingSkills()['map'](({ id: id2, title: title }) => ({
+            id: id2,
+            title: title,
           })),
-          signal: _0x47f076,
-          onTrace: (_0x355ae3) => _0x1ddefe?.['recordTrace']?.(_0x355ae3),
+          signal: signal2,
+          onTrace: (record) => sessionStore?.['recordTrace']?.(record),
         },
-        onTrace: (_0x53fe95) => _0x1ddefe?.['recordTrace']?.(_0x53fe95),
+        onTrace: (payload) => sessionStore?.['recordTrace']?.(payload),
       });
-    } catch (_0x3f5262) {
-      _0xc71294 = {
+    } catch (message3) {
+      options2 = {
         ok: ![],
         status: 'failed',
         errorCode: 'SKILL_AUTHORING_FAILED',
-        message: _0x3f5262?.['message'],
+        message: message3?.['message'],
       };
     }
-    if (!isActiveRun(_0x172437)) return _0x191b41(_0x172437);
-    if (_0xc71294['status'] === 'need_clarification') {
-      const _0x12ae57 = _0xc71294['question'];
+    if (!isActiveRun(runId3)) return handler4(runId3);
+    if (options2['status'] === 'need_clarification') {
+      const question3 = options2['question'];
       return (
-        _0x259d3b({
-          originalMessage: _0x1b25b6,
-          question: _0x12ae57,
-          operation: _0x5b00c7,
-          skillId: _0x22137f['id'],
+        handler5({
+          originalMessage: originalMessage4,
+          question: question3,
+          operation: operation5,
+          skillId: targetSkill['id'],
           phase: 'authoring-clarification',
         }),
-        _0x5cd835(_0x172437, 'need_clarification', _0xc71294['reply'] || _0x12ae57, {
-          question: _0x12ae57,
-          options: _0xc71294['options'] || [],
+        handler3(runId3, 'need_clarification', options2['reply'] || question3, {
+          question: question3,
+          options: options2['options'] || [],
         })
       );
     }
-    if (!_0xc71294['ok'])
-      return _0x5cd835(
-        _0x172437,
-        'failed',
-        _0xc71294['message'] || formatText('failed', {}, localeProvider?.()),
-        { errorCode: _0xc71294['errorCode'] },
-      );
-    const _0x14b069 = _0x159d35()['map']((_0x27da09) => _0x27da09['id']),
-      _0x5ec603 = { ..._0xc71294['definition'], mode: _0x5b00c7 === 'update' ? 'update' : 'create' };
-    if (_0x5b00c7 === 'update')
-      (_0x5ec603['id'] !== _0x22137f['id'] &&
-        _0x1ddefe?.['recordTrace']?.({
+    if (!options2['ok'])
+      return handler3(runId3, 'failed', options2['message'] || formatText('failed', {}, localeProvider?.()), {
+        errorCode: options2['errorCode'],
+      });
+    const args2 = existingSkills()['map']((handle) => handle['id']),
+      requestedId = { ...options2['definition'], mode: operation5 === 'update' ? 'update' : 'create' };
+    if (operation5 === 'update')
+      (requestedId['id'] !== targetSkill['id'] &&
+        sessionStore?.['recordTrace']?.({
           type: 'agent_skill_update_id_repaired',
-          requestedId: _0x5ec603['id'],
-          skillId: _0x22137f['id'],
+          requestedId: requestedId['id'],
+          skillId: targetSkill['id'],
         }),
-        (_0x5ec603['id'] = _0x22137f['id']));
+        (requestedId['id'] = targetSkill['id']));
     else {
-      const _0x4b50fe = _0x5ec603['id'] === _0x22137f['id'] ? _0x22137f['id'] : _0x5ec603['id'],
-        _0x3fda5c = createAvailableAgentSkillId(_0x4b50fe, _0x14b069);
-      (_0x3fda5c !== _0x5ec603['id'] &&
-        _0x1ddefe?.['recordTrace']?.({
+      const state = requestedId['id'] === targetSkill['id'] ? targetSkill['id'] : requestedId['id'],
+        skillId2 = createAvailableAgentSkillId(state, args2);
+      (skillId2 !== requestedId['id'] &&
+        sessionStore?.['recordTrace']?.({
           type: 'agent_skill_duplicate_id_repaired',
-          requestedId: _0x5ec603['id'],
-          skillId: _0x3fda5c,
+          requestedId: requestedId['id'],
+          skillId: skillId2,
         }),
-        (_0x5ec603['id'] = _0x3fda5c));
+        (requestedId['id'] = skillId2));
     }
-    let _0x16d4b4;
+    let errorCode;
     try {
-      _0x16d4b4 = await saveSkill(_0x5ec603);
-      if (_0x5b00c7 === 'clone' && _0x16d4b4?.['errorCode'] === 'SKILL_ALREADY_INSTALLED') {
-        const _0x56b2b3 = createAvailableAgentSkillId(_0x5ec603['id'], [..._0x14b069, _0x5ec603['id']]);
-        (_0x1ddefe?.['recordTrace']?.({
+      errorCode = await saveSkill(requestedId);
+      if (operation5 === 'clone' && errorCode?.['errorCode'] === 'SKILL_ALREADY_INSTALLED') {
+        const skillId3 = createAvailableAgentSkillId(requestedId['id'], [...args2, requestedId['id']]);
+        (sessionStore?.['recordTrace']?.({
           type: 'agent_skill_duplicate_id_repaired',
-          requestedId: _0x5ec603['id'],
-          skillId: _0x56b2b3,
+          requestedId: requestedId['id'],
+          skillId: skillId3,
           reason: 'save-race',
         }),
-          (_0x5ec603['id'] = _0x56b2b3),
-          (_0x16d4b4 = await saveSkill(_0x5ec603)));
+          (requestedId['id'] = skillId3),
+          (errorCode = await saveSkill(requestedId)));
       }
-    } catch (_0x482da3) {
-      _0x16d4b4 = { success: ![], errorCode: 'SKILL_SAVE_FAILED', message: _0x482da3?.['message'] };
+    } catch (message4) {
+      errorCode = { success: ![], errorCode: 'SKILL_SAVE_FAILED', message: message4?.['message'] };
     }
-    if (!isActiveRun(_0x172437)) return _0x191b41(_0x172437);
-    if (_0x16d4b4?.['success'] !== !![])
-      return _0x5cd835(_0x172437, 'failed', formatText('failed', {}, localeProvider?.()), {
-        errorCode: _0x16d4b4?.['errorCode'] || 'SKILL_SAVE_FAILED',
+    if (!isActiveRun(runId3)) return handler4(runId3);
+    if (errorCode?.['success'] !== !![])
+      return handler3(runId3, 'failed', formatText('failed', {}, localeProvider?.()), {
+        errorCode: errorCode?.['errorCode'] || 'SKILL_SAVE_FAILED',
       });
-    _0x1ddefe?.['clearPendingClarification']?.();
-    const _0x999338 = _0x5b00c7 === 'update' ? 'updated' : 'cloned';
-    return _0x5cd835(
-      _0x172437,
+    sessionStore?.['clearPendingClarification']?.();
+    const config = operation5 === 'update' ? 'updated' : 'cloned';
+    return handler3(
+      runId3,
       'success',
       formatText(
-        _0x999338,
-        { id: _0x5ec603['id'], title: _0x5ec603['title'] || _0x5ec603['id'] },
+        config,
+        { id: requestedId['id'], title: requestedId['title'] || requestedId['id'] },
         localeProvider?.(),
       ),
-      { skill: _0x5ec603 },
+      { skill: requestedId },
     );
   }
-  async function _0x4228f3({
+  async function run4({
     message: message = '',
     originalMessage: originalMessage = message,
     clarificationAnswer: clarificationAnswer = '',
@@ -305,91 +301,85 @@ export function createAgentSkillLifecycleRuntime({
     runId: runId = '',
     signal: signal = null,
   } = {}) {
-    const _0x296041 = operation || detectAgentSkillLifecycleIntent(message, _0x4e9ab6());
-    if (!_0x296041) return null;
-    _0x1ddefe?.['recordTrace']?.({
+    const operation6 = operation || detectAgentSkillLifecycleIntent(message, run());
+    if (!operation6) return null;
+    sessionStore?.['recordTrace']?.({
       type: 'agent_turn_routed',
       channel: 'skill.lifecycle',
-      reason: clarificationAnswer ? 'skill-lifecycle-continuation' : 'skill-lifecycle-' + _0x296041,
+      reason: clarificationAnswer ? 'skill-lifecycle-continuation' : 'skill-lifecycle-' + operation6,
     });
-    const _0x324aae = targetSkillId ? _0x11bfad(targetSkillId) : null,
-      _0x30348c = _0x324aae
-        ? { status: 'resolved', skill: _0x324aae }
-        : resolveAgentSkillLifecycleTarget(message, _0x4e9ab6());
-    if (_0x30348c['status'] === 'not_found')
-      return _0x5cd835(
+    const skill = targetSkillId ? handler(targetSkillId) : null,
+      id3 = skill ? { status: 'resolved', skill: skill } : resolveAgentSkillLifecycleTarget(message, run());
+    if (id3['status'] === 'not_found')
+      return handler3(
         runId,
         'failed',
-        formatText('notFound', { id: _0x30348c['requestedId'] }, localeProvider?.()),
+        formatText('notFound', { id: id3['requestedId'] }, localeProvider?.()),
         { errorCode: 'SKILL_NOT_FOUND' },
       );
-    if (_0x30348c['status'] !== 'resolved')
-      return _0xd5868d({ operation: _0x296041, originalMessage: originalMessage, runId: runId });
-    const _0x2a0298 = _0x30348c['skill'];
-    if (_0x296041 === 'inspect') {
-      const _0x3c519e = formatText(
+    if (id3['status'] !== 'resolved')
+      return run2({ operation: operation6, originalMessage: originalMessage, runId: runId });
+    const id4 = id3['skill'];
+    if (operation6 === 'inspect') {
+      const formatText2 = formatText(
         'inspect',
         {
-          id: _0x2a0298['id'],
-          title: _0x2a0298['title'] || _0x2a0298['id'],
-          status: formatText(
-            _0x2a0298['enabled'] ? 'statusEnabled' : 'statusDisabled',
-            {},
-            localeProvider?.(),
-          ),
-          description: _0x2a0298['description'] || '-',
-          triggers: _0x2a0298['triggers']['join']('、') || '-',
-          instructions: _0x2a0298['instructions'] || '-',
+          id: id4['id'],
+          title: id4['title'] || id4['id'],
+          status: formatText(id4['enabled'] ? 'statusEnabled' : 'statusDisabled', {}, localeProvider?.()),
+          description: id4['description'] || '-',
+          triggers: id4['triggers']['join']('、') || '-',
+          instructions: id4['instructions'] || '-',
         },
         localeProvider?.(),
       );
-      return _0x5cd835(runId, 'success', _0x3c519e, { skill: _0x2a0298 });
+      return handler3(runId, 'success', formatText2, { skill: id4 });
     }
-    if (['enable', 'disable']['includes'](_0x296041)) {
-      const _0x1b849e = _0x296041 === 'enable',
-        _0x444569 =
+    if (['enable', 'disable']['includes'](operation6)) {
+      const enabled = operation6 === 'enable',
+        handler6 =
           typeof setSkillEnabled === 'function'
             ? setSkillEnabled
-            : (_0x36f9d0, _0x101d86) => skillRegistry?.['setSkillEnabled']?.(_0x36f9d0, _0x101d86);
-      let _0x10cc21 = ![];
+            : (scope, input) => skillRegistry?.['setSkillEnabled']?.(scope, input);
+      let enabled2 = ![];
       try {
-        _0x10cc21 = await _0x444569(_0x2a0298['id'], _0x1b849e);
+        enabled2 = await handler6(id4['id'], enabled);
       } catch {}
-      if (!_0x10cc21)
-        return _0x5cd835(runId, 'failed', formatText('failed', {}, localeProvider?.()), {
+      if (!enabled2)
+        return handler3(runId, 'failed', formatText('failed', {}, localeProvider?.()), {
           errorCode: 'SKILL_ENABLE_STATE_FAILED',
         });
-      return _0x5cd835(
+      return handler3(
         runId,
         'success',
         formatText(
-          _0x1b849e ? 'enabled' : 'disabled',
-          { id: _0x2a0298['id'], title: _0x2a0298['title'] || _0x2a0298['id'] },
+          enabled ? 'enabled' : 'disabled',
+          { id: id4['id'], title: id4['title'] || id4['id'] },
           localeProvider?.(),
         ),
-        { skillId: _0x2a0298['id'], enabled: _0x1b849e },
+        { skillId: id4['id'], enabled: enabled },
       );
     }
-    if (_0x296041 === 'delete') {
-      const _0x238f81 = formatText(
+    if (operation6 === 'delete') {
+      const question4 = formatText(
         'deleteConfirm',
-        { id: _0x2a0298['id'], title: _0x2a0298['title'] || _0x2a0298['id'] },
+        { id: id4['id'], title: id4['title'] || id4['id'] },
         localeProvider?.(),
       );
       return (
-        _0x259d3b({
+        handler5({
           originalMessage: originalMessage,
-          question: _0x238f81,
-          operation: _0x296041,
-          skillId: _0x2a0298['id'],
+          question: question4,
+          operation: operation6,
+          skillId: id4['id'],
           phase: 'delete-confirmation',
         }),
-        _0x5cd835(runId, 'need_clarification', _0x238f81, { question: _0x238f81, options: [] })
+        handler3(runId, 'need_clarification', question4, { question: question4, options: [] })
       );
     }
-    return _0x5d44e8({
-      operation: _0x296041,
-      targetSkill: _0x2a0298,
+    return run3({
+      operation: operation6,
+      targetSkill: id4,
       message: message,
       originalMessage: originalMessage,
       clarificationAnswer: clarificationAnswer,
@@ -397,22 +387,22 @@ export function createAgentSkillLifecycleRuntime({
       signal: signal,
     });
   }
-  async function _0x56de3a({
+  async function answer2({
     answer: answer = '',
-    pending: pending = _0x2d0ede(),
+    pending: pending = getPending(),
     runId: runId = '',
     signal: signal = null,
   } = {}) {
     if (!pending) return null;
     if (isAgentSkillLifecycleCancelMessage(answer))
       return (
-        _0x1ddefe?.['clearPendingClarification']?.(),
-        _0x5cd835(runId, 'cancelled', formatText('cancelled', {}, localeProvider?.()))
+        sessionStore?.['clearPendingClarification']?.(),
+        handler3(runId, 'cancelled', formatText('cancelled', {}, localeProvider?.()))
       );
     if (pending['phase'] === 'delete-confirmation') {
-      const _0x6a7b40 = _0x11bfad(pending['skillId']);
-      if (!_0x6a7b40)
-        return _0x5cd835(
+      const id5 = handler(pending['skillId']);
+      if (!id5)
+        return handler3(
           runId,
           'failed',
           formatText('notFound', { id: pending['skillId'] }, localeProvider?.()),
@@ -420,53 +410,49 @@ export function createAgentSkillLifecycleRuntime({
         );
       if (!isAgentSkillLifecycleConfirmMessage(answer))
         return (
-          _0x259d3b(pending),
-          _0x5cd835(runId, 'need_clarification', pending['question'], {
+          handler5(pending),
+          handler3(runId, 'need_clarification', pending['question'], {
             question: pending['question'],
             options: [],
           })
         );
       if (typeof deleteSkill !== 'function')
-        return _0x5cd835(runId, 'failed', formatText('unavailable', {}, localeProvider?.()), {
+        return handler3(runId, 'failed', formatText('unavailable', {}, localeProvider?.()), {
           errorCode: 'SKILL_DELETE_UNAVAILABLE',
         });
-      let _0xa18f24;
+      let errorCode2;
       try {
-        _0xa18f24 = await deleteSkill({ id: _0x6a7b40['id'], confirmed: !![] });
-      } catch (_0x1555ef) {
-        _0xa18f24 = { success: ![], errorCode: 'SKILL_DELETE_FAILED', message: _0x1555ef?.['message'] };
+        errorCode2 = await deleteSkill({ id: id5['id'], confirmed: !![] });
+      } catch (message5) {
+        errorCode2 = { success: ![], errorCode: 'SKILL_DELETE_FAILED', message: message5?.['message'] };
       }
-      if (!isActiveRun(runId)) return _0x191b41(runId);
-      if (_0xa18f24?.['success'] !== !![])
-        return _0x5cd835(runId, 'failed', formatText('failed', {}, localeProvider?.()), {
-          errorCode: _0xa18f24?.['errorCode'] || 'SKILL_DELETE_FAILED',
+      if (!isActiveRun(runId)) return handler4(runId);
+      if (errorCode2?.['success'] !== !![])
+        return handler3(runId, 'failed', formatText('failed', {}, localeProvider?.()), {
+          errorCode: errorCode2?.['errorCode'] || 'SKILL_DELETE_FAILED',
         });
       return (
-        _0x1ddefe?.['clearPendingClarification']?.(),
-        _0x5cd835(
+        sessionStore?.['clearPendingClarification']?.(),
+        handler3(
           runId,
           'success',
-          formatText(
-            'deleted',
-            { id: _0x6a7b40['id'], title: _0x6a7b40['title'] || _0x6a7b40['id'] },
-            localeProvider?.(),
-          ),
-          { skillId: _0x6a7b40['id'] },
+          formatText('deleted', { id: id5['id'], title: id5['title'] || id5['id'] }, localeProvider?.()),
+          { skillId: id5['id'] },
         )
       );
     }
     if (pending['phase'] === 'authoring-clarification') {
-      const _0xb57599 = _0x11bfad(pending['skillId']);
-      if (!_0xb57599)
-        return _0x5cd835(
+      const targetSkill2 = handler(pending['skillId']);
+      if (!targetSkill2)
+        return handler3(
           runId,
           'failed',
           formatText('notFound', { id: pending['skillId'] }, localeProvider?.()),
           { errorCode: 'SKILL_NOT_FOUND' },
         );
-      return _0x5d44e8({
+      return run3({
         operation: pending['operation'],
-        targetSkill: _0xb57599,
+        targetSkill: targetSkill2,
         message: answer,
         originalMessage: pending['originalMessage'],
         clarificationAnswer: answer,
@@ -474,7 +460,7 @@ export function createAgentSkillLifecycleRuntime({
         signal: signal,
       });
     }
-    return _0x4228f3({
+    return run4({
       message: answer,
       originalMessage: pending['originalMessage'],
       clarificationAnswer: answer,
@@ -484,9 +470,9 @@ export function createAgentSkillLifecycleRuntime({
     });
   }
   return {
-    getPending: _0x2d0ede,
-    matches: (_0x447e8e) => Boolean(detectAgentSkillLifecycleIntent(_0x447e8e, _0x4e9ab6())),
-    run: _0x4228f3,
-    answer: _0x56de3a,
+    getPending: getPending,
+    matches: (output) => Boolean(detectAgentSkillLifecycleIntent(output, run())),
+    run: run4,
+    answer: answer2,
   };
 }

@@ -10,108 +10,107 @@ import {
 } from './storyProjectPlanning.js';
 import { createStorySummaryRunRecorder } from './storySummaryRun.js';
 import { applyStoryPromptModeVideoModelDefault } from './storyVideoGenerationSettings.js';
-function normalizeText(_0x5c1919) {
-  return String(_0x5c1919 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
 export function createStorySummaryGenerationWorkspaceController({
-  state: _0x37f2f7,
+  state: state,
   windowObject: windowObject = globalThis['window'] || globalThis,
-  generateStory: _0x41f9b4,
-  startReplicationFromHome: _0x3523d8,
-  createProjectToken: _0x2e318e,
-  beginProjectSession: _0x531870,
-  isProjectTaskLive: _0x2808b3,
-  isProjectTaskCurrent: _0x106ae9,
-  registerProjectData: _0x5c2315,
-  startBackgroundTask: _0x2f5fd6,
-  updateBackgroundTask: _0x589383,
-  finishBackgroundTask: _0xa8126e,
-  syncProjectEntry: _0x3572fb,
-  syncCurrentProjectEntry: _0x5645e6,
-  persistNow: _0x36fa72,
-  schedulePersistence: _0x4dd323,
-  requiresDurableRunPersistence: _0x575382,
-  openProject: _0x33313b,
-  render: _0x47ef96,
-  showToast: _0x5ab608,
-  showTaskResultToast: _0x4417bd,
-  notifyTextTaskComplete: _0x144519,
-  requestChoice: _0x357fbf,
-  extractProjectAssets: _0x1a5a7a,
-  resetDownstreamUi: _0x3622c0,
-  reportApiError: _0x2b0811,
+  generateStory: generateStory,
+  startReplicationFromHome: startReplicationFromHome,
+  createProjectToken: createProjectToken,
+  beginProjectSession: beginProjectSession,
+  isProjectTaskLive: isProjectTaskLive,
+  isProjectTaskCurrent: isProjectTaskCurrent,
+  registerProjectData: registerProjectData,
+  startBackgroundTask: startBackgroundTask,
+  updateBackgroundTask: updateBackgroundTask,
+  finishBackgroundTask: finishBackgroundTask,
+  syncProjectEntry: syncProjectEntry,
+  syncCurrentProjectEntry: syncCurrentProjectEntry,
+  persistNow: persistNow,
+  schedulePersistence: schedulePersistence,
+  requiresDurableRunPersistence: requiresDurableRunPersistence,
+  openProject: openProject,
+  render: render,
+  showToast: showToast,
+  showTaskResultToast: showTaskResultToast,
+  notifyTextTaskComplete: notifyTextTaskComplete,
+  requestChoice: requestChoice,
+  extractProjectAssets: extractProjectAssets,
+  resetDownstreamUi: resetDownstreamUi,
+  reportApiError: reportApiError,
 } = {}) {
   if (
-    !_0x37f2f7 ||
-    typeof _0x3523d8 !== 'function' ||
-    typeof _0x2e318e !== 'function' ||
-    typeof _0x531870 !== 'function' ||
-    typeof _0x2808b3 !== 'function' ||
-    typeof _0x106ae9 !== 'function' ||
-    typeof _0x5c2315 !== 'function' ||
-    typeof _0x2f5fd6 !== 'function' ||
-    typeof _0x589383 !== 'function' ||
-    typeof _0xa8126e !== 'function' ||
-    typeof _0x3572fb !== 'function' ||
-    typeof _0x5645e6 !== 'function' ||
-    typeof _0x36fa72 !== 'function' ||
-    typeof _0x4dd323 !== 'function' ||
-    typeof _0x575382 !== 'function' ||
-    typeof _0x33313b !== 'function' ||
-    typeof _0x47ef96 !== 'function' ||
-    typeof _0x5ab608 !== 'function' ||
-    typeof _0x4417bd !== 'function' ||
-    typeof _0x144519 !== 'function' ||
-    typeof _0x357fbf !== 'function' ||
-    typeof _0x1a5a7a !== 'function' ||
-    typeof _0x3622c0 !== 'function' ||
-    typeof _0x2b0811 !== 'function'
+    !state ||
+    typeof startReplicationFromHome !== 'function' ||
+    typeof createProjectToken !== 'function' ||
+    typeof beginProjectSession !== 'function' ||
+    typeof isProjectTaskLive !== 'function' ||
+    typeof isProjectTaskCurrent !== 'function' ||
+    typeof registerProjectData !== 'function' ||
+    typeof startBackgroundTask !== 'function' ||
+    typeof updateBackgroundTask !== 'function' ||
+    typeof finishBackgroundTask !== 'function' ||
+    typeof syncProjectEntry !== 'function' ||
+    typeof syncCurrentProjectEntry !== 'function' ||
+    typeof persistNow !== 'function' ||
+    typeof schedulePersistence !== 'function' ||
+    typeof requiresDurableRunPersistence !== 'function' ||
+    typeof openProject !== 'function' ||
+    typeof render !== 'function' ||
+    typeof showToast !== 'function' ||
+    typeof showTaskResultToast !== 'function' ||
+    typeof notifyTextTaskComplete !== 'function' ||
+    typeof requestChoice !== 'function' ||
+    typeof extractProjectAssets !== 'function' ||
+    typeof resetDownstreamUi !== 'function' ||
+    typeof reportApiError !== 'function'
   )
     throw new TypeError('Story summary generation requires project, persistence, and presentation adapters.');
-  const _0x15c44c = (_0x53b505) => {
-    ((_0x37f2f7['assetSelectionMode'] = ![]),
-      (_0x37f2f7['selectedAssetIds'] = []),
-      (_0x37f2f7['assetAppearanceIndexes'] = {}),
-      (_0x37f2f7['scriptSelectionMode'] = ![]),
-      (_0x37f2f7['selectedScriptEpisodeIds'] = []),
-      (_0x37f2f7['scriptGenerationFocusMode'] = ![]),
-      (_0x37f2f7['outlineSectionOpenState'] = {}),
-      (_0x37f2f7['scriptMode'] = _0x53b505));
+  const run = (item) => {
+    ((state['assetSelectionMode'] = ![]),
+      (state['selectedAssetIds'] = []),
+      (state['assetAppearanceIndexes'] = {}),
+      (state['scriptSelectionMode'] = ![]),
+      (state['selectedScriptEpisodeIds'] = []),
+      (state['scriptGenerationFocusMode'] = ![]),
+      (state['outlineSectionOpenState'] = {}),
+      (state['scriptMode'] = item));
   };
-  function _0x57c6d9(_0x3ad075, _0x57cdce, _0x5eb695) {
-    const _0x147de5 = getStoryBackgroundTasks(_0x3ad075['data'])['find'](
-        (_0x4b8f92) => _0x4b8f92['id'] === _0x5eb695,
-      ),
-      _0x333ac2 = {
-        ..._0x57cdce,
-        fileName: _0x57cdce['fileName'] || _0x57cdce['scriptFileName'],
-        model: _0x57cdce['model'] || _0x57cdce['modelId'],
-        planning: _0x57cdce['planning'] || {
-          episodeCount: _0x57cdce['episodeCount'],
-          sceneMaxSeconds: _0x57cdce['sceneMaxSeconds'],
-          promptMode: _0x57cdce['promptMode'],
+  function createPersistedRun(project, fileName, key) {
+    const resumePayload = getStoryBackgroundTasks(project['data'])['find']((index) => index['id'] === key),
+      request = {
+        ...fileName,
+        fileName: fileName['fileName'] || fileName['scriptFileName'],
+        model: fileName['model'] || fileName['modelId'],
+        planning: fileName['planning'] || {
+          episodeCount: fileName['episodeCount'],
+          sceneMaxSeconds: fileName['sceneMaxSeconds'],
+          promptMode: fileName['promptMode'],
         },
       };
     return createStorySummaryRunRecorder({
-      project: _0x3ad075['data']['project'],
-      request: _0x333ac2,
-      resumePayload: _0x147de5?.['resumePayload'],
-      onChange: async (_0x7037a) => {
-        (_0x589383(_0x3ad075, _0x5eb695, {
-          resumable: _0x7037a['status'] !== 'succeeded',
-          modelId: _0x7037a['input']['execution']['modelId'],
-          provider: _0x7037a['input']['execution']['provider'],
-          resumePayload: { kind: _0x7037a['kind'], run: _0x7037a },
+      project: project['data']['project'],
+      request: request,
+      resumePayload: resumePayload?.['resumePayload'],
+      onChange: async (resumable) => {
+        (updateBackgroundTask(project, key, {
+          resumable: resumable['status'] !== 'succeeded',
+          modelId: resumable['input']['execution']['modelId'],
+          provider: resumable['input']['execution']['provider'],
+          resumePayload: { kind: resumable['kind'], run: resumable },
         }),
-          _0x3572fb(_0x3ad075));
-        const _0x46626f = await _0x36fa72();
-        if (_0x575382() && !_0x46626f) throw new Error('剧本摘要运行记录保存失败，已停止模型请求。');
+          syncProjectEntry(project));
+        const enabled = await persistNow();
+        if (requiresDurableRunPersistence() && !enabled)
+          throw new Error('剧本摘要运行记录保存失败，已停止模型请求。');
       },
     });
   }
-  async function _0x34d633(_0x3e228b) {
-    if (!_0x3e228b['requiresPaidRetry']) return !![];
-    const _0x2d5a8d = await _0x357fbf({
+  async function authorizePaidRetry(enabled2) {
+    if (!enabled2['requiresPaidRetry']) return !![];
+    const result = await requestChoice({
       overlayId: 'story-summary-paid-retry',
       title: '上次剧本摘要请求结果尚未安全提交',
       message: '上次请求可能已经计费，或响应尚未完成本地提交。确认后才会再次调用模型。',
@@ -121,334 +120,345 @@ export function createStorySummaryGenerationWorkspaceController({
         { label: '确认重新请求', value: 'retry', primary: !![] },
       ],
     });
-    if (_0x2d5a8d !== 'retry') return ![];
-    return (await _0x3e228b['authorizePaidRetry'](), !![]);
+    if (result !== 'retry') return ![];
+    return (await enabled2['authorizePaidRetry'](), !![]);
   }
-  function _0x265d83() {
-    const _0xbcb529 = resolveStoryHomeGenerationMode(_0x37f2f7);
+  function run2() {
+    const mode = resolveStoryHomeGenerationMode(state);
     return buildStoryHomeGenerationRequest({
-      mode: _0xbcb529,
-      scriptMode: _0x37f2f7['scriptMode'],
-      modelId: _0x37f2f7['models']['text'],
-      provider: _0x37f2f7['textProvider'],
-      providerProfileId: _0x37f2f7['textProviderProfileId'],
-      scriptFileName: _0x37f2f7['scriptFileName'],
-      scriptText: _0x37f2f7['scriptText'],
-      idea: _0x37f2f7['idea'],
-      rewriteInstruction: _0xbcb529 === 'rewrite' ? _0x37f2f7['idea'] : '',
-      aspectRatio: _0x37f2f7['data']['project']?.['aspectRatio'],
-      styleId: _0x37f2f7['data']['project']?.['videoStyleId'],
-      stylePrompt: _0x37f2f7['data']['project']?.['videoStylePrompt'],
-      videoStyle: _0x37f2f7['data']['project']?.['videoStyle'],
-      episodeCount: _0x37f2f7['data']['project']?.['planning']?.['episodeCount'],
-      sceneMaxSeconds: _0x37f2f7['data']['project']?.['planning']?.['sceneMaxSeconds'],
-      promptMode: _0x37f2f7['data']['project']?.['planning']?.['promptMode'],
-      allowDeveloperPromptModes: _0x37f2f7['developerModeAvailable'],
+      mode: mode,
+      scriptMode: state['scriptMode'],
+      modelId: state['models']['text'],
+      provider: state['textProvider'],
+      providerProfileId: state['textProviderProfileId'],
+      scriptFileName: state['scriptFileName'],
+      scriptText: state['scriptText'],
+      idea: state['idea'],
+      rewriteInstruction: mode === 'rewrite' ? state['idea'] : '',
+      aspectRatio: state['data']['project']?.['aspectRatio'],
+      styleId: state['data']['project']?.['videoStyleId'],
+      stylePrompt: state['data']['project']?.['videoStylePrompt'],
+      videoStyle: state['data']['project']?.['videoStyle'],
+      episodeCount: state['data']['project']?.['planning']?.['episodeCount'],
+      sceneMaxSeconds: state['data']['project']?.['planning']?.['sceneMaxSeconds'],
+      promptMode: state['data']['project']?.['planning']?.['promptMode'],
+      allowDeveloperPromptModes: state['developerModeAvailable'],
     });
   }
-  async function _0x7d5541() {
-    if (_0x37f2f7['isGeneratingStory']) return;
-    if (_0x37f2f7['homeTab'] === 'replication') return _0x3523d8();
-    const _0x42c3df = _0x265d83();
-    if (!_0x42c3df['ok']) {
-      _0x5ab608(_0x42c3df['error'], 'warn');
+  async function generateFromHome() {
+    if (state['isGeneratingStory']) return;
+    if (state['homeTab'] === 'replication') return startReplicationFromHome();
+    const detail = run2();
+    if (!detail['ok']) {
+      showToast(detail['error'], 'warn');
       return;
     }
     (windowObject?.['dispatchEvent']?.(
-      new CustomEvent('storyWorkspace:generateRequested', { detail: _0x42c3df }),
+      new CustomEvent('storyWorkspace:generateRequested', { detail: detail }),
     ),
-      _0x5645e6(),
-      applyStoryPromptModeVideoModelDefault(_0x37f2f7, _0x42c3df['promptMode']));
-    if (_0x42c3df['mode'] === 'upload') {
+      syncCurrentProjectEntry(),
+      applyStoryPromptModeVideoModelDefault(state, detail['promptMode']));
+    if (detail['mode'] === 'upload') {
       try {
-        (_0x531870(),
-          (_0x37f2f7['data'] = createUploadedStoryProjectData({
+        (beginProjectSession(),
+          (state['data'] = createUploadedStoryProjectData({
             projectId: 'story-' + Date['now'](),
-            request: _0x42c3df,
-            allowDeveloperPromptModes: _0x37f2f7['developerModeAvailable'],
+            request: detail,
+            allowDeveloperPromptModes: state['developerModeAvailable'],
           })),
-          (_0x37f2f7['projectTitleEdited'] = ![]),
-          (_0x37f2f7['hasCreatedProject'] = !![]),
-          _0x15c44c('plot'),
-          _0x33313b({ resetStep: !![] }),
-          _0x4dd323({ immediate: !![] }),
+          (state['projectTitleEdited'] = ![]),
+          (state['hasCreatedProject'] = !![]),
+          run('plot'),
+          openProject({ resetStep: !![] }),
+          schedulePersistence({ immediate: !![] }),
           windowObject?.['dispatchEvent']?.(
             new CustomEvent('storyWorkspace:storyImported', {
               detail: {
-                mode: _0x42c3df['mode'],
-                modelId: _0x42c3df['modelId'],
-                provider: _0x42c3df['provider'],
-                episodeCount: _0x37f2f7['data']['episodes']['length'],
+                mode: detail['mode'],
+                modelId: detail['modelId'],
+                provider: detail['provider'],
+                episodeCount: state['data']['episodes']['length'],
               },
             }),
           ),
-          _0x4417bd(
-            '已按原剧本导入 ' + _0x37f2f7['data']['episodes']['length'] + ' 集，未扩写正文。',
+          showTaskResultToast(
+            '已按原剧本导入 ' + state['data']['episodes']['length'] + ' 集，未扩写正文。',
             'success',
           ),
-          await _0x1a5a7a({ advance: !![] }));
-      } catch (_0x4f9dbe) {
-        _0x4417bd(_0x4f9dbe?.['message'] || '剧本导入失败，请检查原始文本。', 'error', _0x4f9dbe);
+          await extractProjectAssets({ advance: !![] }));
+      } catch (error) {
+        showTaskResultToast(error?.['message'] || '剧本导入失败，请检查原始文本。', 'error', error);
       }
       return;
     }
-    if (typeof _0x41f9b4 !== 'function') {
-      _0x5ab608('剧情 Agent 尚未初始化。', 'error');
+    if (typeof generateStory !== 'function') {
+      showToast('剧情 Agent 尚未初始化。', 'error');
       return;
     }
-    (_0x531870(),
-      (_0x37f2f7['data'] = createGeneratedStoryProjectData(
+    (beginProjectSession(),
+      (state['data'] = createGeneratedStoryProjectData(
         {},
         {
           projectId: 'story-' + Date['now'](),
-          request: _0x42c3df,
-          allowDeveloperPromptModes: _0x37f2f7['developerModeAvailable'],
+          request: detail,
+          allowDeveloperPromptModes: state['developerModeAvailable'],
         },
       )),
-      (_0x37f2f7['data']['project']['summaryStatus'] = 'generating'),
-      (_0x37f2f7['projectTitleEdited'] = ![]),
-      (_0x37f2f7['hasCreatedProject'] = !![]));
-    const _0x3d7465 = _0x2e318e(),
-      _0xc13b0 = buildStoryBackgroundTaskId('story-summary'),
-      _0xaeca18 = _0x57c6d9(_0x3d7465, _0x42c3df, _0xc13b0),
-      _0x428c31 = getStoryHomeSummaryTaskCopy(_0x42c3df['mode']);
-    (_0x2f5fd6(_0x3d7465, {
-      id: _0xc13b0,
+      (state['data']['project']['summaryStatus'] = 'generating'),
+      (state['projectTitleEdited'] = ![]),
+      (state['hasCreatedProject'] = !![]));
+    const projectTitleEdited = createProjectToken(),
+      id = buildStoryBackgroundTaskId('story-summary'),
+      resumePayload2 = createPersistedRun(projectTitleEdited, detail, id),
+      label = getStoryHomeSummaryTaskCopy(detail['mode']);
+    (startBackgroundTask(projectTitleEdited, {
+      id: id,
       type: 'story-summary',
-      label: _0x428c31['label'],
-      message: _0x428c31['message'],
+      label: label['label'],
+      message: label['message'],
       resumable: !![],
-      resumePayload: _0xaeca18['payload'](),
+      resumePayload: resumePayload2['payload'](),
     }),
-      _0x15c44c(_0x42c3df['scriptMode']),
-      (_0x37f2f7['isGeneratingStory'] = !![]),
-      (_0x37f2f7['generationStatus'] = _0x428c31['status']),
-      _0x33313b({ resetStep: !![] }),
-      _0x4dd323({ immediate: !![] }));
+      run(detail['scriptMode']),
+      (state['isGeneratingStory'] = !![]),
+      (state['generationStatus'] = label['status']),
+      openProject({ resetStep: !![] }),
+      schedulePersistence({ immediate: !![] }));
     try {
-      await _0xaeca18['start']();
-      const _0x9ae146 =
-        _0xaeca18['candidateArtifact'] ||
-        (await _0x41f9b4({
-          mode: _0x42c3df['mode'],
-          scriptMode: _0x42c3df['scriptMode'],
-          idea: _0x42c3df['idea'],
-          sourceText: _0x42c3df['sourceText'],
-          fileName: _0x42c3df['scriptFileName'],
-          rewriteInstruction: _0x42c3df['rewriteInstruction'],
-          model: _0xaeca18['execution']['modelId'],
-          provider: _0xaeca18['execution']['provider'],
-          providerProfileId: _0xaeca18['execution']['providerProfileId'],
-          aspectRatio: _0x42c3df['aspectRatio'],
-          visualStyle: _0x42c3df['visualStyle'],
+      await resumePayload2['start']();
+      const result2 =
+        resumePayload2['candidateArtifact'] ||
+        (await generateStory({
+          mode: detail['mode'],
+          scriptMode: detail['scriptMode'],
+          idea: detail['idea'],
+          sourceText: detail['sourceText'],
+          fileName: detail['scriptFileName'],
+          rewriteInstruction: detail['rewriteInstruction'],
+          model: resumePayload2['execution']['modelId'],
+          provider: resumePayload2['execution']['provider'],
+          providerProfileId: resumePayload2['execution']['providerProfileId'],
+          aspectRatio: detail['aspectRatio'],
+          visualStyle: detail['visualStyle'],
           planning: {
-            episodeCount: _0x42c3df['episodeCount'],
-            sceneMaxSeconds: _0x42c3df['sceneMaxSeconds'],
-            promptMode: _0x42c3df['promptMode'],
+            episodeCount: detail['episodeCount'],
+            sceneMaxSeconds: detail['sceneMaxSeconds'],
+            promptMode: detail['promptMode'],
           },
-          onInvocation: _0xaeca18['onInvocation'],
-          onProgress: ({ message: _0x2cc5b7 } = {}) => {
-            if (!_0x2808b3(_0x3d7465)) return;
-            const _0x27177f = normalizeText(_0x2cc5b7) || '正在生成剧本摘要';
-            _0x589383(_0x3d7465, _0xc13b0, { status: 'running', message: _0x27177f });
-            if (_0x106ae9(_0x3d7465)) {
-              _0x37f2f7['generationStatus'] = _0x27177f;
-              if (_0x37f2f7['view'] === 'project' && _0x37f2f7['step'] === 0x1) _0x47ef96();
+          onInvocation: resumePayload2['onInvocation'],
+          onProgress: ({ message: message } = {}) => {
+            if (!isProjectTaskLive(projectTitleEdited)) return;
+            const message2 = normalizeText(message) || '正在生成剧本摘要';
+            updateBackgroundTask(projectTitleEdited, id, { status: 'running', message: message2 });
+            if (isProjectTaskCurrent(projectTitleEdited)) {
+              state['generationStatus'] = message2;
+              if (state['view'] === 'project' && state['step'] === 0x1) render();
             }
           },
         }));
-      if (!_0xaeca18['candidateArtifact']) await _0xaeca18['ready'](_0x9ae146);
-      if (!_0x2808b3(_0x3d7465)) return ![];
-      ((_0x3d7465['data'] = applyGeneratedStoryResult(_0x3d7465['data'], _0x9ae146, {
-        projectTitleEdited: _0x3d7465['projectTitleEdited'],
+      if (!resumePayload2['candidateArtifact']) await resumePayload2['ready'](result2);
+      if (!isProjectTaskLive(projectTitleEdited)) return ![];
+      ((projectTitleEdited['data'] = applyGeneratedStoryResult(projectTitleEdited['data'], result2, {
+        projectTitleEdited: projectTitleEdited['projectTitleEdited'],
       })),
-        _0x5c2315(_0x3d7465),
-        (_0x3d7465['data']['project']['summaryStatus'] = 'completed'),
-        (_0x3d7465['data']['project']['outlineStatus'] = 'pending'));
-      _0x106ae9(_0x3d7465) &&
-        ((_0x37f2f7['data'] = _0x3d7465['data']),
-        (_0x37f2f7['isGeneratingStory'] = ![]),
-        (_0x37f2f7['generationStatus'] = ''));
+        registerProjectData(projectTitleEdited),
+        (projectTitleEdited['data']['project']['summaryStatus'] = 'completed'),
+        (projectTitleEdited['data']['project']['outlineStatus'] = 'pending'));
+      isProjectTaskCurrent(projectTitleEdited) &&
+        ((state['data'] = projectTitleEdited['data']),
+        (state['isGeneratingStory'] = ![]),
+        (state['generationStatus'] = ''));
       (windowObject?.['dispatchEvent']?.(
         new CustomEvent('storyWorkspace:storyGenerated', {
           detail: {
-            mode: _0x42c3df['mode'],
-            scriptMode: _0x42c3df['scriptMode'],
-            modelId: _0x42c3df['modelId'],
-            provider: _0x42c3df['provider'],
-            aspectRatio: _0x42c3df['aspectRatio'],
-            styleId: _0x42c3df['styleId'],
-            visualStyle: _0x42c3df['visualStyle'],
-            result: _0x9ae146,
+            mode: detail['mode'],
+            scriptMode: detail['scriptMode'],
+            modelId: detail['modelId'],
+            provider: detail['provider'],
+            aspectRatio: detail['aspectRatio'],
+            styleId: detail['styleId'],
+            visualStyle: detail['visualStyle'],
+            result: result2,
           },
         }),
       ),
-        _0xa8126e(_0x3d7465, _0xc13b0, { status: 'succeeded', message: '剧本摘要生成完成', resumable: ![] }),
-        await _0xaeca18['succeeded'](),
-        _0x144519('剧本摘要生成完成。', _0x3d7465, { step: 0x1, outlineSectionId: 'summary' }),
-        _0x4dd323({ immediate: !![] }));
-      if (_0x106ae9(_0x3d7465)) _0x47ef96();
+        finishBackgroundTask(projectTitleEdited, id, {
+          status: 'succeeded',
+          message: '剧本摘要生成完成',
+          resumable: ![],
+        }),
+        await resumePayload2['succeeded'](),
+        notifyTextTaskComplete('剧本摘要生成完成。', projectTitleEdited, {
+          step: 0x1,
+          outlineSectionId: 'summary',
+        }),
+        schedulePersistence({ immediate: !![] }));
+      if (isProjectTaskCurrent(projectTitleEdited)) render();
       return !![];
-    } catch (_0xf12956) {
-      if (!_0x2808b3(_0x3d7465)) return ![];
+    } catch (error2) {
+      if (!isProjectTaskLive(projectTitleEdited)) return ![];
       return (
-        await _0xaeca18['failed'](_0xf12956)['catch'](() => {}),
-        (_0x3d7465['data']['project']['summaryStatus'] = 'error'),
-        _0xa8126e(_0x3d7465, _0xc13b0, {
+        await resumePayload2['failed'](error2)['catch'](() => {}),
+        (projectTitleEdited['data']['project']['summaryStatus'] = 'error'),
+        finishBackgroundTask(projectTitleEdited, id, {
           status: 'failed',
           message: '剧本摘要生成失败',
-          error: _0xf12956?.['message'] || '剧本摘要生成失败，请稍后重试。',
+          error: error2?.['message'] || '剧本摘要生成失败，请稍后重试。',
           resumable: !![],
-          resumePayload: _0xaeca18['payload'](),
+          resumePayload: resumePayload2['payload'](),
         }),
-        _0x106ae9(_0x3d7465) &&
-          ((_0x37f2f7['isGeneratingStory'] = ![]), (_0x37f2f7['generationStatus'] = ''), _0x47ef96()),
-        _0x4417bd(_0xf12956?.['message'] || '剧本摘要生成失败，请稍后重试。', 'error', _0xf12956),
+        isProjectTaskCurrent(projectTitleEdited) &&
+          ((state['isGeneratingStory'] = ![]), (state['generationStatus'] = ''), render()),
+        showTaskResultToast(error2?.['message'] || '剧本摘要生成失败，请稍后重试。', 'error', error2),
         ![]
       );
     }
   }
-  async function _0x59abc1() {
-    if (_0x37f2f7['isGeneratingStory'] || _0x37f2f7['storyPlanningOperation']) return ![];
-    if (typeof _0x41f9b4 !== 'function') return (_0x5ab608('剧情 Agent 尚未初始化。', 'error'), ![]);
-    const _0x383150 = buildStorySummaryRegenerationRequest(_0x37f2f7['data']['project'], {
-      modelId: _0x37f2f7['models']['text'],
-      provider: _0x37f2f7['textProvider'],
-      providerProfileId: _0x37f2f7['textProviderProfileId'],
-      allowDeveloperPromptModes: _0x37f2f7['developerModeAvailable'],
+  async function regenerateSummary() {
+    if (state['isGeneratingStory'] || state['storyPlanningOperation']) return ![];
+    if (typeof generateStory !== 'function') return (showToast('剧情 Agent 尚未初始化。', 'error'), ![]);
+    const mode2 = buildStorySummaryRegenerationRequest(state['data']['project'], {
+      modelId: state['models']['text'],
+      provider: state['textProvider'],
+      providerProfileId: state['textProviderProfileId'],
+      allowDeveloperPromptModes: state['developerModeAvailable'],
     });
-    if (!_0x383150['ok']) return (_0x5ab608(_0x383150['error'], 'warn'), ![]);
-    const _0x46ec9e = _0x2e318e(),
-      _0x365f04 = buildStoryBackgroundTaskId('story-summary'),
-      _0x242ba2 = _0x57c6d9(_0x46ec9e, _0x383150, _0x365f04);
-    if (!(await _0x34d633(_0x242ba2))) return ![];
-    ((_0x37f2f7['isGeneratingStory'] = !![]),
-      (_0x37f2f7['generationStatus'] = '正在根据原始创意重新生成剧本摘要...'),
-      (_0x37f2f7['data']['project']['summaryStatus'] = 'generating'),
-      _0x2f5fd6(_0x46ec9e, {
-        id: _0x365f04,
+    if (!mode2['ok']) return (showToast(mode2['error'], 'warn'), ![]);
+    const projectTitleEdited2 = createProjectToken(),
+      id2 = buildStoryBackgroundTaskId('story-summary'),
+      resumePayload3 = createPersistedRun(projectTitleEdited2, mode2, id2);
+    if (!(await authorizePaidRetry(resumePayload3))) return ![];
+    ((state['isGeneratingStory'] = !![]),
+      (state['generationStatus'] = '正在根据原始创意重新生成剧本摘要...'),
+      (state['data']['project']['summaryStatus'] = 'generating'),
+      startBackgroundTask(projectTitleEdited2, {
+        id: id2,
         type: 'story-summary',
         label: '重新生成剧本摘要',
-        message: _0x37f2f7['generationStatus'],
+        message: state['generationStatus'],
         resumable: !![],
-        resumePayload: _0x242ba2['payload'](),
+        resumePayload: resumePayload3['payload'](),
       }),
-      _0x47ef96());
+      render());
     try {
-      await _0x242ba2['start']();
-      const _0x247cb6 =
-        _0x242ba2['candidateArtifact'] ||
-        (await _0x41f9b4({
-          ..._0x383150,
-          model: _0x242ba2['execution']['modelId'],
-          provider: _0x242ba2['execution']['provider'],
-          providerProfileId: _0x242ba2['execution']['providerProfileId'],
-          onInvocation: _0x242ba2['onInvocation'],
-          onProgress: ({ message: _0x36b8da } = {}) => {
-            if (!_0x2808b3(_0x46ec9e)) return;
-            const _0x24bf8c = normalizeText(_0x36b8da) || '正在重新生成剧本摘要';
-            _0x589383(_0x46ec9e, _0x365f04, { status: 'running', message: _0x24bf8c });
-            if (_0x106ae9(_0x46ec9e)) {
-              _0x37f2f7['generationStatus'] = _0x24bf8c;
-              if (_0x37f2f7['view'] === 'project' && _0x37f2f7['step'] === 0x1) _0x47ef96();
+      await resumePayload3['start']();
+      const result3 =
+        resumePayload3['candidateArtifact'] ||
+        (await generateStory({
+          ...mode2,
+          model: resumePayload3['execution']['modelId'],
+          provider: resumePayload3['execution']['provider'],
+          providerProfileId: resumePayload3['execution']['providerProfileId'],
+          onInvocation: resumePayload3['onInvocation'],
+          onProgress: ({ message: message3 } = {}) => {
+            if (!isProjectTaskLive(projectTitleEdited2)) return;
+            const message4 = normalizeText(message3) || '正在重新生成剧本摘要';
+            updateBackgroundTask(projectTitleEdited2, id2, { status: 'running', message: message4 });
+            if (isProjectTaskCurrent(projectTitleEdited2)) {
+              state['generationStatus'] = message4;
+              if (state['view'] === 'project' && state['step'] === 0x1) render();
             }
           },
         }));
-      if (!_0x242ba2['candidateArtifact']) await _0x242ba2['ready'](_0x247cb6);
-      if (!_0x2808b3(_0x46ec9e)) return ![];
+      if (!resumePayload3['candidateArtifact']) await resumePayload3['ready'](result3);
+      if (!isProjectTaskLive(projectTitleEdited2)) return ![];
       return (
-        (_0x46ec9e['data'] = applyGeneratedStoryResult(_0x46ec9e['data'], _0x247cb6, {
-          projectTitleEdited: _0x46ec9e['projectTitleEdited'],
+        (projectTitleEdited2['data'] = applyGeneratedStoryResult(projectTitleEdited2['data'], result3, {
+          projectTitleEdited: projectTitleEdited2['projectTitleEdited'],
         })),
-        (_0x46ec9e['data'] = invalidateStoryPlanningDownstream(_0x46ec9e['data'], {
+        (projectTitleEdited2['data'] = invalidateStoryPlanningDownstream(projectTitleEdited2['data'], {
           clearEpisodeOutlines: !![],
         })),
-        _0x5c2315(_0x46ec9e),
-        (_0x46ec9e['data']['project']['summaryStatus'] = 'completed'),
-        _0x106ae9(_0x46ec9e) && ((_0x37f2f7['data'] = _0x46ec9e['data']), _0x3622c0()),
+        registerProjectData(projectTitleEdited2),
+        (projectTitleEdited2['data']['project']['summaryStatus'] = 'completed'),
+        isProjectTaskCurrent(projectTitleEdited2) &&
+          ((state['data'] = projectTitleEdited2['data']), resetDownstreamUi()),
         windowObject?.['dispatchEvent']?.(
           new CustomEvent('storyWorkspace:storyGenerated', {
             detail: {
-              mode: _0x383150['mode'],
-              modelId: _0x383150['model'],
-              provider: _0x383150['provider'],
-              aspectRatio: _0x383150['aspectRatio'],
-              visualStyle: _0x383150['visualStyle'],
+              mode: mode2['mode'],
+              modelId: mode2['model'],
+              provider: mode2['provider'],
+              aspectRatio: mode2['aspectRatio'],
+              visualStyle: mode2['visualStyle'],
               regenerated: !![],
-              result: _0x247cb6,
+              result: result3,
             },
           }),
         ),
-        _0x4dd323({ immediate: !![] }),
-        _0xa8126e(_0x46ec9e, _0x365f04, {
+        schedulePersistence({ immediate: !![] }),
+        finishBackgroundTask(projectTitleEdited2, id2, {
           status: 'succeeded',
           message: '剧本摘要重新生成完成',
           resumable: ![],
         }),
-        await _0x242ba2['succeeded'](),
-        _0x144519('剧本摘要已重新生成。', _0x46ec9e, { step: 0x1, outlineSectionId: 'summary' }),
+        await resumePayload3['succeeded'](),
+        notifyTextTaskComplete('剧本摘要已重新生成。', projectTitleEdited2, {
+          step: 0x1,
+          outlineSectionId: 'summary',
+        }),
         !![]
       );
-    } catch (_0xb53996) {
-      if (!_0x2808b3(_0x46ec9e)) return ![];
+    } catch (error3) {
+      if (!isProjectTaskLive(projectTitleEdited2)) return ![];
       return (
-        await _0x242ba2['failed'](_0xb53996)['catch'](() => {}),
-        (_0x46ec9e['data']['project']['summaryStatus'] = normalizeText(
-          _0x46ec9e['data']['project']['summary'],
+        await resumePayload3['failed'](error3)['catch'](() => {}),
+        (projectTitleEdited2['data']['project']['summaryStatus'] = normalizeText(
+          projectTitleEdited2['data']['project']['summary'],
         )
           ? 'completed'
           : 'error'),
-        _0x2b0811('regenerate-story-summary', _0xb53996, {
-          model: _0x383150['model'],
-          provider: _0x383150['provider'],
+        reportApiError('regenerate-story-summary', error3, {
+          model: mode2['model'],
+          provider: mode2['provider'],
         }),
-        _0xa8126e(_0x46ec9e, _0x365f04, {
+        finishBackgroundTask(projectTitleEdited2, id2, {
           status: 'failed',
           message: '剧本摘要重新生成失败',
-          error: _0xb53996?.['message'] || '剧本摘要重新生成失败。',
+          error: error3?.['message'] || '剧本摘要重新生成失败。',
           resumable: !![],
-          resumePayload: _0x242ba2['payload'](),
+          resumePayload: resumePayload3['payload'](),
         }),
-        _0x4417bd(
-          _0xb53996?.['message'] || '剧本摘要重新生成失败，原摘要和下游内容均已保留。',
+        showTaskResultToast(
+          error3?.['message'] || '剧本摘要重新生成失败，原摘要和下游内容均已保留。',
           'error',
-          _0xb53996,
+          error3,
         ),
         ![]
       );
     } finally {
-      _0x106ae9(_0x46ec9e) &&
-        ((_0x37f2f7['isGeneratingStory'] = ![]), (_0x37f2f7['generationStatus'] = ''), _0x47ef96());
+      isProjectTaskCurrent(projectTitleEdited2) &&
+        ((state['isGeneratingStory'] = ![]), (state['generationStatus'] = ''), render());
     }
   }
   return {
-    preview: async ({ home: home = ![], captureRequest: _0x2e32b2 }) => {
+    preview: async ({ home: home = ![], captureRequest: captureRequest }) => {
       if (windowObject?.['DEV_MODE'] !== !![]) throw new Error('仅开发者模式可调试请求');
-      const _0x3c7e1a = home
-        ? _0x265d83()
-        : buildStorySummaryRegenerationRequest(_0x37f2f7['data']['project'], {
-            modelId: _0x37f2f7['models']['text'],
-            provider: _0x37f2f7['textProvider'],
-            providerProfileId: _0x37f2f7['textProviderProfileId'],
-            allowDeveloperPromptModes: _0x37f2f7['developerModeAvailable'],
+      const model = home
+        ? run2()
+        : buildStorySummaryRegenerationRequest(state['data']['project'], {
+            modelId: state['models']['text'],
+            provider: state['textProvider'],
+            providerProfileId: state['textProviderProfileId'],
+            allowDeveloperPromptModes: state['developerModeAvailable'],
           });
-      if (!_0x3c7e1a['ok']) throw new Error(_0x3c7e1a['error']);
-      if (typeof _0x41f9b4 !== 'function') throw new Error('剧情 Agent 尚未初始化');
-      return _0x41f9b4({
-        ..._0x3c7e1a,
-        model: _0x3c7e1a['model'] || _0x3c7e1a['modelId'],
-        fileName: _0x3c7e1a['fileName'] || _0x3c7e1a['scriptFileName'],
-        planning: _0x3c7e1a['planning'] || {
-          episodeCount: _0x3c7e1a['episodeCount'],
-          sceneMaxSeconds: _0x3c7e1a['sceneMaxSeconds'],
-          promptMode: _0x3c7e1a['promptMode'],
+      if (!model['ok']) throw new Error(model['error']);
+      if (typeof generateStory !== 'function') throw new Error('剧情 Agent 尚未初始化');
+      return generateStory({
+        ...model,
+        model: model['model'] || model['modelId'],
+        fileName: model['fileName'] || model['scriptFileName'],
+        planning: model['planning'] || {
+          episodeCount: model['episodeCount'],
+          sceneMaxSeconds: model['sceneMaxSeconds'],
+          promptMode: model['promptMode'],
         },
-        request: _0x2e32b2,
+        request: captureRequest,
       });
     },
-    authorizePaidRetry: _0x34d633,
-    createPersistedRun: _0x57c6d9,
-    generateFromHome: _0x7d5541,
-    regenerateSummary: _0x59abc1,
+    authorizePaidRetry: authorizePaidRetry,
+    createPersistedRun: createPersistedRun,
+    generateFromHome: generateFromHome,
+    regenerateSummary: regenerateSummary,
   };
 }

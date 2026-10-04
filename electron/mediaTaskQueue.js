@@ -6,46 +6,42 @@ const TERMINAL_STATUSES = new Set(['complete', 'failed', 'cancelled']),
   DEFAULT_SPAWN_MAX_ATTEMPTS = 2,
   MIN_TASK_PRIORITY = -100,
   MAX_TASK_PRIORITY = 100;
-function clampProgress(_0x318914) {
-  const _0x46b4be = Number(_0x318914);
-  if (!Number.isFinite(_0x46b4be)) return 0;
-  return Math.max(0, Math.min(1, _0x46b4be));
+function clampProgress(value) {
+  const item = Number(value);
+  if (!Number.isFinite(item)) return 0;
+  return Math.max(0, Math.min(1, item));
 }
-function normalizeTaskPriority(_0x390a7d) {
-  const _0x50fb20 = Number(_0x390a7d);
-  if (!Number.isFinite(_0x50fb20)) return 0;
-  return Math.max(MIN_TASK_PRIORITY, Math.min(MAX_TASK_PRIORITY, Math.trunc(_0x50fb20)));
+function normalizeTaskPriority(key) {
+  const index = Number(key);
+  if (!Number.isFinite(index)) return 0;
+  return Math.max(MIN_TASK_PRIORITY, Math.min(MAX_TASK_PRIORITY, Math.trunc(index)));
 }
-function buildActiveMigrationIdentity(_0x1dc216, _0x205f3c = {}) {
-  const _0x1e4e90 = String(_0x205f3c?.migrationKey || '').trim();
-  if (!_0x1e4e90) return '';
-  return JSON.stringify([
-    String(_0x1dc216 || '').trim(),
-    String(_0x205f3c?.purpose || '').trim(),
-    _0x1e4e90,
-  ]);
+function buildActiveMigrationIdentity(result, data = {}) {
+  const enabled = String(data?.migrationKey || '').trim();
+  if (!enabled) return '';
+  return JSON.stringify([String(result || '').trim(), String(data?.purpose || '').trim(), enabled]);
 }
-function delay(_0x5612fc) {
-  return new Promise((_0x251c94) => {
-    setTimeout(_0x251c94, _0x5612fc);
+function delay(target) {
+  return new Promise((source) => {
+    setTimeout(source, target);
   });
 }
-function shouldRetrySpawnError(_0x24c393, _0x946fc2, _0x176798) {
-  if (_0x946fc2 >= _0x176798) return false;
-  const _0x2345ee = String(_0x24c393?.code || '').toUpperCase();
-  return RETRYABLE_SPAWN_ERROR_CODES.has(_0x2345ee);
+function shouldRetrySpawnError(next, current, entry) {
+  if (current >= entry) return false;
+  const record = String(next?.code || '').toUpperCase();
+  return RETRYABLE_SPAWN_ERROR_CODES.has(record);
 }
 function createDefaultTaskId() {
   return 'media-task-' + Date.now() + '-' + Math.random().toString(16).slice(2);
 }
-function parseFfmpegTimeSeconds(_0x3a257a) {
-  const _0x298410 = String(_0x3a257a || '').match(/time=(\d{2}):(\d{2}):(\d{2})(?:[.,](\d+))?/);
-  if (!_0x298410) return null;
-  const _0x126415 = Number(_0x298410[1]) || 0,
-    _0x55d0d6 = Number(_0x298410[2]) || 0,
-    _0x5967b7 = Number(_0x298410[3]) || 0,
-    _0x3291a6 = Number('0.' + (_0x298410[4] || '0')) || 0;
-  return _0x126415 * 0xe10 + _0x55d0d6 * 60 + _0x5967b7 + _0x3291a6;
+function parseFfmpegTimeSeconds(payload) {
+  const enabled2 = String(payload || '').match(/time=(\d{2}):(\d{2}):(\d{2})(?:[.,](\d+))?/);
+  if (!enabled2) return null;
+  const handle = Number(enabled2[1]) || 0,
+    state = Number(enabled2[2]) || 0,
+    config = Number(enabled2[3]) || 0,
+    scope = Number('0.' + (enabled2[4] || '0')) || 0;
+  return handle * 0xe10 + state * 60 + config + scope;
 }
 function getCommandLabel(command) {
   const text = String(command || '').trim();
@@ -82,8 +78,8 @@ export class MediaTaskProcessTimeoutError extends Error {
   }
 }
 export class MediaTaskCancelledError extends Error {
-  constructor(_0x31a4f4 = 'Media task cancelled') {
-    (super(_0x31a4f4), (this.name = 'MediaTaskCancelledError'));
+  constructor(input = 'Media task cancelled') {
+    (super(input), (this.name = 'MediaTaskCancelledError'));
   }
 }
 export class MediaTaskQueue {
@@ -108,354 +104,353 @@ export class MediaTaskQueue {
       (this.activeMigrationTasks = new Map()),
       (this.active = 0));
   }
-  ['setHandler'](_0x291651, _0x3ba639) {
-    const _0x103ca0 = String(_0x291651 || '').trim();
-    if (!_0x103ca0 || typeof _0x3ba639 !== 'function') return;
-    this.handlers[_0x103ca0] = _0x3ba639;
+  ['setHandler'](output, value2) {
+    const enabled3 = String(output || '').trim();
+    if (!enabled3 || typeof value2 !== 'function') return;
+    this.handlers[enabled3] = value2;
   }
-  ['enqueue'](_0x1c9f59 = {}) {
-    const _0x390698 = String(_0x1c9f59?.kind || '').trim();
-    if (!_0x390698) throw new Error('Missing media task kind');
-    const _0x374920 = this.handlers[_0x390698];
-    if (typeof _0x374920 !== 'function') throw new Error('Unsupported media task kind: ' + _0x390698);
-    const _0x340ee6 = buildActiveMigrationIdentity(_0x390698, _0x1c9f59);
-    if (_0x340ee6) {
-      const _0x135176 = this.activeMigrationTasks.get(_0x340ee6);
-      if (_0x135176 && !TERMINAL_STATUSES.has(_0x135176.status)) return this._snapshot(_0x135176);
-      this.activeMigrationTasks.delete(_0x340ee6);
+  ['enqueue'](cancellable = {}) {
+    const kind = String(cancellable?.kind || '').trim();
+    if (!kind) throw new Error('Missing media task kind');
+    const value3 = this.handlers[kind];
+    if (typeof value3 !== 'function') throw new Error('Unsupported media task kind: ' + kind);
+    const migrationIdentity = buildActiveMigrationIdentity(kind, cancellable);
+    if (migrationIdentity) {
+      const response = this.activeMigrationTasks.get(migrationIdentity);
+      if (response && !TERMINAL_STATUSES.has(response.status)) return this._snapshot(response);
+      this.activeMigrationTasks.delete(migrationIdentity);
     }
     // The map, cancellation and exact task lookup all use this ID. Reusing it would
     // overwrite the first task while its handler could still be running.
-    const _0x6b29b7 = String(_0x1c9f59?.taskId || '').trim() || String(this.idFactory() || '').trim();
-    if (!/^[a-zA-Z0-9][a-zA-Z0-9_.:-]{0,255}$/.test(_0x6b29b7)) throw new Error('Invalid media task ID');
-    if (this.tasks.has(_0x6b29b7)) throw new Error('Duplicate media task ID; inspect the existing task instead of retrying');
-    const _0x3fc6fe = {
-        id: _0x6b29b7,
-        taskId: _0x6b29b7,
-        kind: _0x390698,
-        nodeId: String(_0x1c9f59?.nodeId || '').trim(),
-        payload: { ..._0x1c9f59, kind: _0x390698, taskId: _0x6b29b7 },
-        cancellable: _0x1c9f59?.cancellable === true,
-        priority: normalizeTaskPriority(_0x1c9f59?.priority),
-        status: 'waiting',
-        progress: 0,
-        stage: '',
-        message: '',
-        error: '',
-        result: null,
-        child: null,
-        cancelRequested: false,
-        migrationIdentity: _0x340ee6,
-        createdAt: Date.now(),
-        startedAt: 0,
-        finishedAt: 0,
-      };
+    const id = String(cancellable?.taskId || '').trim() || String(this.idFactory() || '').trim();
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9_.:-]{0,255}$/.test(id)) throw new Error('Invalid media task ID');
+    if (this.tasks.has(id))
+      throw new Error('Duplicate media task ID; inspect the existing task instead of retrying');
+    const value4 = {
+      id: id,
+      taskId: id,
+      kind: kind,
+      nodeId: String(cancellable?.nodeId || '').trim(),
+      payload: { ...cancellable, kind: kind, taskId: id },
+      cancellable: cancellable?.cancellable === true,
+      priority: normalizeTaskPriority(cancellable?.priority),
+      status: 'waiting',
+      progress: 0,
+      stage: '',
+      message: '',
+      error: '',
+      result: null,
+      child: null,
+      cancelRequested: false,
+      migrationIdentity: migrationIdentity,
+      createdAt: Date.now(),
+      startedAt: 0,
+      finishedAt: 0,
+    };
     return (
-      this.tasks.set(_0x6b29b7, _0x3fc6fe),
-      _0x340ee6 && this.activeMigrationTasks.set(_0x340ee6, _0x3fc6fe),
-      this.waiting.push(_0x3fc6fe),
-      this._emit(_0x3fc6fe),
+      this.tasks.set(id, value4),
+      migrationIdentity && this.activeMigrationTasks.set(migrationIdentity, value4),
+      this.waiting.push(value4),
+      this._emit(value4),
       this._pump(),
-      this._snapshot(_0x3fc6fe)
+      this._snapshot(value4)
     );
   }
-  ['cancel'](_0x4e270e, _0x5c4b7a = {}) {
-    const _0x5478f6 = String(_0x4e270e || '').trim(),
-      _0x5bff47 = this.tasks.get(_0x5478f6);
-    if (!_0x5bff47) return { ok: false, error: 'Task not found' };
-    if (_0x5c4b7a?.onlyIfWaiting === true && _0x5bff47.status !== 'waiting')
+  ['cancel'](value5, value6 = {}) {
+    const value7 = String(value5 || '').trim(),
+      progress = this.tasks.get(value7);
+    if (!progress) return { ok: false, error: 'Task not found' };
+    if (value6?.onlyIfWaiting === true && progress.status !== 'waiting')
       return {
         ok: true,
         skipped: true,
-        reason: TERMINAL_STATUSES.has(_0x5bff47.status)
-          ? 'task-already-finished'
-          : 'task-already-started',
-        task: this._snapshot(_0x5bff47),
+        reason: TERMINAL_STATUSES.has(progress.status) ? 'task-already-finished' : 'task-already-started',
+        task: this._snapshot(progress),
       };
-    if (TERMINAL_STATUSES.has(_0x5bff47.status)) return { ok: true, task: this._snapshot(_0x5bff47) };
-    _0x5bff47.cancelRequested = true;
-    if (_0x5bff47.status === 'waiting')
+    if (TERMINAL_STATUSES.has(progress.status)) return { ok: true, task: this._snapshot(progress) };
+    progress.cancelRequested = true;
+    if (progress.status === 'waiting')
       return (
-        (this.waiting = this.waiting.filter((_0x145116) => _0x145116.id !== _0x5478f6)),
-        this._finish(_0x5bff47, 'cancelled', { progress: _0x5bff47.progress, message: 'Cancelled' }),
+        (this.waiting = this.waiting.filter((item2) => item2.id !== value7)),
+        this._finish(progress, 'cancelled', { progress: progress.progress, message: 'Cancelled' }),
         this._pump(),
-        { ok: true, task: this._snapshot(_0x5bff47) }
+        { ok: true, task: this._snapshot(progress) }
       );
-    if (_0x5bff47.child && typeof _0x5bff47.child.kill === 'function')
+    if (progress.child && typeof progress.child.kill === 'function')
       try {
-        _0x5bff47.child.kill();
+        progress.child.kill();
       } catch {}
-    return (this._emit(_0x5bff47, { message: 'Cancelling' }), { ok: true, task: this._snapshot(_0x5bff47) });
+    return (this._emit(progress, { message: 'Cancelling' }), { ok: true, task: this._snapshot(progress) });
   }
-  ['get'](_0x5c19a3) {
-    const _0x53a1f3 = this.tasks.get(String(_0x5c19a3 || '').trim());
-    return _0x53a1f3 ? this._snapshot(_0x53a1f3) : null;
+  ['get'](value8) {
+    const value9 = this.tasks.get(String(value8 || '').trim());
+    return value9 ? this._snapshot(value9) : null;
   }
   ['list']({ limit: limit = 100, taskId } = {}) {
     // Exact lookup reuses the original in-memory queue, not a persistent history.
     if (taskId !== undefined) {
-      if (typeof taskId !== 'string' || !taskId.trim() || taskId.trim().length > 256 || /[\x00-\x1f\x7f]/.test(taskId)) {
+      if (
+        typeof taskId !== 'string' ||
+        !taskId.trim() ||
+        taskId.trim().length > 256 ||
+        /[\x00-\x1f\x7f]/.test(taskId)
+      ) {
         throw new Error('Invalid media task ID');
       }
       const task = this.get(taskId.trim());
       return task ? [task] : [];
     }
-    const _0x1f31fd = Math.max(1, Math.min(0x1f4, Math.trunc(Number(limit) || 100)));
+    const value10 = Math.max(1, Math.min(0x1f4, Math.trunc(Number(limit) || 100)));
     return [...this.tasks.values()]
-      .sort((_0x4df45d, _0xa0b61a) => Number(_0xa0b61a.createdAt || 0) - Number(_0x4df45d.createdAt || 0))
-      .slice(0, _0x1f31fd)
-      .map((_0x2fd109) => this._snapshot(_0x2fd109));
+      .sort((item3, value11) => Number(value11.createdAt || 0) - Number(item3.createdAt || 0))
+      .slice(0, value10)
+      .map((item4) => this._snapshot(item4));
   }
   ['getActivity']() {
     return this._activitySnapshot();
   }
-  ['emitProgress'](_0x4e6961, _0x2cbbb4, _0x453f19 = '', _0x3a39b0 = {}) {
-    if (!_0x4e6961 || TERMINAL_STATUSES.has(_0x4e6961.status)) return;
-    _0x4e6961.progress = clampProgress(_0x2cbbb4);
-    if (_0x3a39b0.stage != null) _0x4e6961.stage = String(_0x3a39b0.stage || '');
-    if (_0x453f19) _0x4e6961.message = String(_0x453f19);
-    this._emit(_0x4e6961);
+  ['emitProgress'](error2, value12, value13 = '', value14 = {}) {
+    if (!error2 || TERMINAL_STATUSES.has(error2.status)) return;
+    error2.progress = clampProgress(value12);
+    if (value14.stage != null) error2.stage = String(value14.stage || '');
+    if (value13) error2.message = String(value13);
+    this._emit(error2);
   }
-  ['isCancelled'](_0x27ac15) {
-    return _0x27ac15?.cancelRequested === true;
+  ['isCancelled'](value15) {
+    return value15?.cancelRequested === true;
   }
-  ['throwIfCancelled'](_0x5e0641) {
-    if (this.isCancelled(_0x5e0641)) throw new MediaTaskCancelledError();
+  ['throwIfCancelled'](value16) {
+    if (this.isCancelled(value16)) throw new MediaTaskCancelledError();
   }
-  ['runProcess'](_0x47f659, _0x1f3080, _0x458bc1 = [], _0x5de8f9 = {}) {
+  ['runProcess'](value17, value18, value19 = [], cwd = {}) {
     return (
-      this.throwIfCancelled(_0x47f659),
-      new Promise((_0x332c25, _0x582225) => {
-        const _0xde29bb = [],
-          _0x26b4cd = [],
-          _0x14d009 = Number(_0x5de8f9.durationSec || 0),
-          _0x43f8df = _0x5de8f9.input !== null && _0x5de8f9.input !== undefined;
-        let _0x2cee66 = clampProgress(_0x5de8f9.initialProgress || _0x47f659.progress || 0),
-          _0x4d0a1a = false;
-        const _0x52ad3f = (_0xa5b926, _0x404bc1) => {
-            if (_0x4d0a1a) return;
-            ((_0x4d0a1a = true), (_0x47f659.child = null), _0xa5b926(_0x404bc1));
+      this.throwIfCancelled(value17),
+      new Promise((value20, value21) => {
+        const list = [],
+          list2 = [],
+          count = Number(cwd.durationSec || 0),
+          stdio = cwd.input !== null && cwd.input !== undefined;
+        let clampProgress2 = clampProgress(cwd.initialProgress || value17.progress || 0),
+          value22 = false;
+        const run = (handler, value23) => {
+            if (value22) return;
+            ((value22 = true), (value17.child = null), handler(value23));
           },
-          _0x1f5e0c = Math.max(
-            1,
-            Math.trunc(Number(_0x5de8f9.spawnMaxAttempts || DEFAULT_SPAWN_MAX_ATTEMPTS) || 1),
-          ),
-          _0x2d7f4c = Math.max(
+          value24 = Math.max(1, Math.trunc(Number(cwd.spawnMaxAttempts || DEFAULT_SPAWN_MAX_ATTEMPTS) || 1)),
+          value25 = Math.max(
             0,
-            Math.trunc(Number(_0x5de8f9.spawnRetryDelayMs ?? DEFAULT_SPAWN_RETRY_DELAY_MS) || 0),
+            Math.trunc(Number(cwd.spawnRetryDelayMs ?? DEFAULT_SPAWN_RETRY_DELAY_MS) || 0),
           ),
-          _0x223d2b = Math.max(0, Math.trunc(Number(_0x5de8f9.timeoutMs || 0) || 0)),
-          _0x51c6c7 = async (_0x3e8ca2 = 1) => {
-            if (_0x4d0a1a) return;
+          count2 = Math.max(0, Math.trunc(Number(cwd.timeoutMs || 0) || 0)),
+          handler2 = async (value26 = 1) => {
+            if (value22) return;
             try {
-              this.throwIfCancelled(_0x47f659);
-            } catch (_0x3b1e9f) {
-              _0x52ad3f(_0x582225, _0x3b1e9f);
+              this.throwIfCancelled(value17);
+            } catch (value27) {
+              run(value21, value27);
               return;
             }
-            let _0x186dd5 = null;
+            let child = null;
             try {
-              _0x186dd5 = this.spawnImpl(_0x1f3080, _0x458bc1, {
-                cwd: _0x5de8f9.cwd,
-                env: _0x5de8f9.env,
-                stdio: _0x43f8df ? ['pipe', 'pipe', 'pipe'] : ['ignore', 'pipe', 'pipe'],
+              child = this.spawnImpl(value18, value19, {
+                cwd: cwd.cwd,
+                env: cwd.env,
+                stdio: stdio ? ['pipe', 'pipe', 'pipe'] : ['ignore', 'pipe', 'pipe'],
                 windowsHide: true,
               });
-            } catch (_0x2b7d55) {
-              if (shouldRetrySpawnError(_0x2b7d55, _0x3e8ca2, _0x1f5e0c)) {
-                (await delay(_0x2d7f4c), await _0x51c6c7(_0x3e8ca2 + 1));
+            } catch (value28) {
+              if (shouldRetrySpawnError(value28, value26, value24)) {
+                (await delay(value25), await handler2(value26 + 1));
                 return;
               }
-              _0x52ad3f(
-                _0x582225,
-                createProcessStartError(_0x1f3080, _0x458bc1, _0x5de8f9, _0x2b7d55, _0x3e8ca2),
-              );
+              run(value21, createProcessStartError(value18, value19, cwd, value28, value26));
               return;
             }
-            _0x47f659.child = _0x186dd5;
-            let _0x3c0d47 = false,
-              _0x1d1e60 = null;
-            const _0x1bd25c = () => {
-                if (_0x1d1e60) clearTimeout(_0x1d1e60);
-                _0x1d1e60 = null;
+            value17.child = child;
+            let value29 = false,
+              timer = null;
+            const run2 = () => {
+                if (timer) clearTimeout(timer);
+                timer = null;
               },
-              _0x1b1a24 = (_0x4758d5, _0x21ecf7) => {
-                if (_0x3c0d47 || _0x4d0a1a) return;
-                _0x3c0d47 = true;
-                if (_0x47f659.child === _0x186dd5) _0x47f659.child = null;
-                (_0x1bd25c(), _0x52ad3f(_0x4758d5, _0x21ecf7));
+              handler3 = (value30, value31) => {
+                if (value29 || value22) return;
+                value29 = true;
+                if (value17.child === child) value17.child = null;
+                (run2(), run(value30, value31));
               },
-              _0x3bd9ac = async (_0x5b7c42) => {
-                if (_0x3c0d47 || _0x4d0a1a) return;
-                ((_0x3c0d47 = true), _0x1bd25c());
-                if (_0x47f659.child === _0x186dd5) _0x47f659.child = null;
-                if (shouldRetrySpawnError(_0x5b7c42, _0x3e8ca2, _0x1f5e0c) && !this.isCancelled(_0x47f659)) {
-                  (await delay(_0x2d7f4c), await _0x51c6c7(_0x3e8ca2 + 1));
+              handler4 = async (value32) => {
+                if (value29 || value22) return;
+                ((value29 = true), run2());
+                if (value17.child === child) value17.child = null;
+                if (shouldRetrySpawnError(value32, value26, value24) && !this.isCancelled(value17)) {
+                  (await delay(value25), await handler2(value26 + 1));
                   return;
                 }
-                _0x52ad3f(
-                  _0x582225,
-                  createProcessStartError(_0x1f3080, _0x458bc1, _0x5de8f9, _0x5b7c42, _0x3e8ca2),
-                );
+                run(value21, createProcessStartError(value18, value19, cwd, value32, value26));
               };
-            (_0x186dd5.stdout?.on('data', (_0x3fff2f) => _0xde29bb.push(Buffer.from(_0x3fff2f))),
-              _0x186dd5.stderr?.on('data', (_0x415969) => {
-                const _0x5ae9e2 = Buffer.from(_0x415969);
-                _0x26b4cd.push(_0x5ae9e2);
-                if (_0x14d009 > 0) {
-                  const _0x2ba9ec = parseFfmpegTimeSeconds(_0x5ae9e2.toString('utf8'));
-                  if (_0x2ba9ec != null) {
-                    const _0x4560e4 = clampProgress(_0x2ba9ec / _0x14d009);
-                    _0x4560e4 >= _0x2cee66 + 0.01 &&
-                      ((_0x2cee66 = _0x4560e4),
-                      this.emitProgress(_0x47f659, _0x4560e4, _0x5de8f9.progressMessage || ''));
+            (child.stdout?.on('data', (value33) => list.push(Buffer.from(value33))),
+              child.stderr?.on('data', (value34) => {
+                const value35 = Buffer.from(value34);
+                list2.push(value35);
+                if (count > 0) {
+                  const ffmpegTimeSeconds = parseFfmpegTimeSeconds(value35.toString('utf8'));
+                  if (ffmpegTimeSeconds != null) {
+                    const clampProgress3 = clampProgress(ffmpegTimeSeconds / count);
+                    clampProgress3 >= clampProgress2 + 0.01 &&
+                      ((clampProgress2 = clampProgress3),
+                      this.emitProgress(value17, clampProgress3, cwd.progressMessage || ''));
                   }
                 }
               }),
-              _0x186dd5.once('error', (_0x32a540) => {
-                void _0x3bd9ac(_0x32a540);
+              child.once('error', (value36) => {
+                void handler4(value36);
               }),
-              _0x186dd5.once('exit', (_0x1bc62e, _0x173f0f) => {
-                if (_0x3c0d47 || _0x4d0a1a) return;
-                if (this.isCancelled(_0x47f659)) {
-                  _0x1b1a24(_0x582225, new MediaTaskCancelledError());
+              child.once('exit', (code, signal) => {
+                if (value29 || value22) return;
+                if (this.isCancelled(value17)) {
+                  handler3(value21, new MediaTaskCancelledError());
                   return;
                 }
-                if (_0x1bc62e === 0) {
-                  _0x1b1a24(_0x332c25, {
-                    stdout: Buffer.concat(_0xde29bb),
-                    stderr: Buffer.concat(_0x26b4cd),
-                    code: _0x1bc62e,
-                    signal: _0x173f0f,
+                if (code === 0) {
+                  handler3(value20, {
+                    stdout: Buffer.concat(list),
+                    stderr: Buffer.concat(list2),
+                    code: code,
+                    signal: signal,
                   });
                   return;
                 }
-                const _0x3433b2 =
-                  Buffer.concat(_0x26b4cd).toString('utf8').trim() ||
-                  _0x1f3080 + ' exited with ' + (_0x1bc62e ?? _0x173f0f ?? 'unknown');
-                _0x1b1a24(_0x582225, new Error(_0x3433b2));
+                const value37 =
+                  Buffer.concat(list2).toString('utf8').trim() ||
+                  value18 + ' exited with ' + (code ?? signal ?? 'unknown');
+                handler3(value21, new Error(value37));
               }),
-              _0x223d2b > 0 &&
-                ((_0x1d1e60 = setTimeout(() => {
-                  if (_0x3c0d47 || _0x4d0a1a) return;
-                  const _0x2f7457 = new MediaTaskProcessTimeoutError(_0x1f3080, _0x223d2b);
+              count2 > 0 &&
+                ((timer = setTimeout(() => {
+                  if (value29 || value22) return;
+                  const mediaTaskProcessTimeoutError = new MediaTaskProcessTimeoutError(value18, count2);
                   try {
-                    _0x186dd5.kill();
+                    child.kill();
                   } catch {}
-                  _0x1b1a24(_0x582225, _0x2f7457);
-                }, _0x223d2b)),
-                _0x1d1e60.unref?.()),
-              _0x43f8df && _0x186dd5.stdin && _0x186dd5.stdin.end(_0x5de8f9.input));
+                  handler3(value21, mediaTaskProcessTimeoutError);
+                }, count2)),
+                timer.unref?.()),
+              stdio && child.stdin && child.stdin.end(cwd.input));
           };
-        void _0x51c6c7();
+        void handler2();
       })
     );
   }
   ['_pump']() {
     while (this.active < this.concurrency && this.waiting.length > 0) {
-      let _0x22afe2 = 0;
-      for (let _0x219a79 = 1; _0x219a79 < this.waiting.length; _0x219a79 += 1) {
-        const _0x30e06a = normalizeTaskPriority(this.waiting[_0x219a79]?.priority),
-          _0x459c23 = normalizeTaskPriority(this.waiting[_0x22afe2]?.priority);
-        if (_0x30e06a > _0x459c23) _0x22afe2 = _0x219a79;
+      let value38 = 0;
+      for (let value39 = 1; value39 < this.waiting.length; value39 += 1) {
+        const taskPriority = normalizeTaskPriority(this.waiting[value39]?.priority),
+          taskPriority2 = normalizeTaskPriority(this.waiting[value38]?.priority);
+        if (taskPriority > taskPriority2) value38 = value39;
       }
-      const [_0x2f8d3c] = this.waiting.splice(_0x22afe2, 1);
-      if (!_0x2f8d3c || TERMINAL_STATUSES.has(_0x2f8d3c.status)) continue;
-      this._run(_0x2f8d3c);
+      const [response2] = this.waiting.splice(value38, 1);
+      if (!response2 || TERMINAL_STATUSES.has(response2.status)) continue;
+      this._run(response2);
     }
   }
-  async ['_run'](_0xdee02c) {
+  async ['_run'](response3) {
     ((this.active += 1),
-      (_0xdee02c.status = 'processing'),
-      (_0xdee02c.startedAt = Date.now()),
-      (_0xdee02c.progress = Math.max(_0xdee02c.progress, 0.01)),
-      this._emit(_0xdee02c));
+      (response3.status = 'processing'),
+      (response3.startedAt = Date.now()),
+      (response3.progress = Math.max(response3.progress, 0.01)),
+      this._emit(response3));
     try {
-      const _0x5ccc1a = await this.handlers[_0xdee02c.kind](_0xdee02c, this);
-      (this.throwIfCancelled(_0xdee02c),
-        this._finish(_0xdee02c, 'complete', {
+      const result2 = await this.handlers[response3.kind](response3, this);
+      (this.throwIfCancelled(response3),
+        this._finish(response3, 'complete', {
           progress: 1,
           message: 'Complete',
-          result: _0x5ccc1a && typeof _0x5ccc1a === 'object' ? _0x5ccc1a : {},
+          result: result2 && typeof result2 === 'object' ? result2 : {},
         }));
-    } catch (_0x53b066) {
-      _0x53b066 instanceof MediaTaskCancelledError || this.isCancelled(_0xdee02c)
-        ? this._finish(_0xdee02c, 'cancelled', { message: 'Cancelled', error: '' })
-        : this._finish(_0xdee02c, 'failed', {
+    } catch (error3) {
+      error3 instanceof MediaTaskCancelledError || this.isCancelled(response3)
+        ? this._finish(response3, 'cancelled', { message: 'Cancelled', error: '' })
+        : this._finish(response3, 'failed', {
             message: 'Failed',
-            error: String(_0x53b066?.message || _0x53b066),
+            error: String(error3?.message || error3),
           });
     } finally {
       ((this.active -= 1), this._pump());
     }
   }
-  ['_finish'](_0x68ac50, _0x53f4b0, _0x30181e = {}) {
-    _0x68ac50.status = _0x53f4b0;
-    _0x68ac50.migrationIdentity &&
-      this.activeMigrationTasks.get(_0x68ac50.migrationIdentity) === _0x68ac50 &&
-      this.activeMigrationTasks.delete(_0x68ac50.migrationIdentity);
-    ((_0x68ac50.finishedAt = Date.now()), (_0x68ac50.child = null));
-    if (_0x30181e.progress != null) _0x68ac50.progress = clampProgress(_0x30181e.progress);
-    if (_0x30181e.stage != null) _0x68ac50.stage = String(_0x30181e.stage || '');
-    if (_0x30181e.message != null) _0x68ac50.message = String(_0x30181e.message || '');
-    if (_0x30181e.error != null) _0x68ac50.error = String(_0x30181e.error || '');
-    if (_0x30181e.result != null) _0x68ac50.result = _0x30181e.result;
-    this._emit(_0x68ac50);
+  ['_finish'](error4, value40, error5 = {}) {
+    error4.status = value40;
+    error4.migrationIdentity &&
+      this.activeMigrationTasks.get(error4.migrationIdentity) === error4 &&
+      this.activeMigrationTasks.delete(error4.migrationIdentity);
+    ((error4.finishedAt = Date.now()), (error4.child = null));
+    if (error5.progress != null) error4.progress = clampProgress(error5.progress);
+    if (error5.stage != null) error4.stage = String(error5.stage || '');
+    if (error5.message != null) error4.message = String(error5.message || '');
+    if (error5.error != null) error4.error = String(error5.error || '');
+    if (error5.result != null) error4.result = error5.result;
+    this._emit(error4);
   }
-  ['_emit'](_0x45405f, _0x4ce2a1 = {}) {
-    if (!_0x45405f) return;
-    if (_0x4ce2a1.progress != null) _0x45405f.progress = clampProgress(_0x4ce2a1.progress);
-    if (_0x4ce2a1.message != null) _0x45405f.message = String(_0x4ce2a1.message || '');
-    if (_0x4ce2a1.error != null) _0x45405f.error = String(_0x4ce2a1.error || '');
-    if (_0x4ce2a1.result != null) _0x45405f.result = _0x4ce2a1.result;
-    const snapshot = this._snapshot(_0x45405f);
+  ['_emit'](error6, error7 = {}) {
+    if (!error6) return;
+    if (error7.progress != null) error6.progress = clampProgress(error7.progress);
+    if (error7.message != null) error6.message = String(error7.message || '');
+    if (error7.error != null) error6.error = String(error7.error || '');
+    if (error7.result != null) error6.result = error7.result;
+    const snapshot = this._snapshot(error6);
     // History observes a native task identity; it never restores tasks into this queue.
     // Observer/storage failure must not change task execution or trigger a retry.
-    try { this.onSnapshot(snapshot, _0x45405f); } catch { /* The history service exposes its own failure status. */ }
+    try {
+      this.onSnapshot(snapshot, error6);
+    } catch {
+      /* The history service exposes its own failure status. */
+    }
     (this.onUpdate(snapshot), this._emitActivity());
   }
   ['_emitActivity']() {
     this.onActivity(this._activitySnapshot());
   }
   ['_activitySnapshot']() {
-    const _0x5a3df0 = [...this.tasks.values()]
-        .filter((_0x2b25ce) => _0x2b25ce.status === 'processing')
-        .map((_0x21d9e1) => this._snapshot(_0x21d9e1)),
-      _0x3c3cfb = this.waiting.filter((_0x4f4255) => _0x4f4255.status === 'waiting').length,
-      _0x2b4d60 =
-        _0x5a3df0.length > 0
-          ? _0x5a3df0.reduce((_0x334550, _0x25416a) => _0x334550 + clampProgress(_0x25416a.progress), 0) /
-            _0x5a3df0.length
+    const activeCount = [...this.tasks.values()]
+        .filter((response4) => response4.status === 'processing')
+        .map((item5) => this._snapshot(item5)),
+      waitingCount = this.waiting.filter((response5) => response5.status === 'waiting').length,
+      value41 =
+        activeCount.length > 0
+          ? activeCount.reduce((item6, value42) => item6 + clampProgress(value42.progress), 0) /
+            activeCount.length
           : 0;
     return {
-      activeCount: _0x5a3df0.length,
-      waitingCount: _0x3c3cfb,
-      totalCount: _0x5a3df0.length + _0x3c3cfb,
-      progress: clampProgress(_0x2b4d60),
-      activeTasks: _0x5a3df0,
+      activeCount: activeCount.length,
+      waitingCount: waitingCount,
+      totalCount: activeCount.length + waitingCount,
+      progress: clampProgress(value41),
+      activeTasks: activeCount,
     };
   }
-  ['_snapshot'](_0x1266a3) {
+  ['_snapshot'](taskId2) {
     return {
-      taskId: _0x1266a3.id,
-      nodeId: _0x1266a3.nodeId,
-      assetId: _0x1266a3.payload?.assetId || '',
-      kind: _0x1266a3.kind,
-      purpose: String(_0x1266a3.payload?.purpose || ''),
-      cancellable: _0x1266a3.cancellable === true,
-      priority: normalizeTaskPriority(_0x1266a3.priority),
-      status: _0x1266a3.status,
-      progress: clampProgress(_0x1266a3.progress),
-      stage: _0x1266a3.stage || '',
-      message: _0x1266a3.message || '',
-      error: _0x1266a3.error || '',
-      result: _0x1266a3.result || null,
-      createdAt: _0x1266a3.createdAt,
-      startedAt: _0x1266a3.startedAt,
-      finishedAt: _0x1266a3.finishedAt,
+      taskId: taskId2.id,
+      nodeId: taskId2.nodeId,
+      assetId: taskId2.payload?.assetId || '',
+      kind: taskId2.kind,
+      purpose: String(taskId2.payload?.purpose || ''),
+      cancellable: taskId2.cancellable === true,
+      priority: normalizeTaskPriority(taskId2.priority),
+      status: taskId2.status,
+      progress: clampProgress(taskId2.progress),
+      stage: taskId2.stage || '',
+      message: taskId2.message || '',
+      error: taskId2.error || '',
+      result: taskId2.result || null,
+      createdAt: taskId2.createdAt,
+      startedAt: taskId2.startedAt,
+      finishedAt: taskId2.finishedAt,
     };
   }
 }
-export function __parseFfmpegTimeSecondsForTest(_0x5e21aa) {
-  return parseFfmpegTimeSeconds(_0x5e21aa);
+export function __parseFfmpegTimeSecondsForTest(value43) {
+  return parseFfmpegTimeSeconds(value43);
 }

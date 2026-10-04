@@ -11,8 +11,8 @@ import { authorDirectorPath } from './directorPathAuthoring.js';
 import { smoothDirectorKeys, sampleSpatialCurve } from './directorCurves.js';
 import { DirectorCurveEditor } from './directorCurveEditor.js';
 export class DirectorCameraPathController {
-  constructor(_0x39b7a9) {
-    ((this['timeline'] = _0x39b7a9),
+  constructor(value) {
+    ((this['timeline'] = value),
       (this['curves'] = new DirectorCurveEditor(this)),
       (this['active'] = ![]),
       (this['drawing'] = ![]),
@@ -23,22 +23,22 @@ export class DirectorCameraPathController {
       (this['drawDuration'] = 0x3),
       (this['objectId'] = ''),
       (this['frame'] = null),
-      (this['onDown'] = (_0xe7696a) => this['pointerDown'](_0xe7696a)),
-      (this['onMove'] = (_0x2b32f4) => this['pointerMove'](_0x2b32f4)),
-      (this['onUp'] = (_0x228543) => this['pointerEnd'](_0x228543)),
-      (this['onCancel'] = (_0x5a112c) => this['pointerEnd'](_0x5a112c, !![])),
-      (this['onKey'] = (_0xf5cb1) => {
-        if (this['curves']['key'](_0xf5cb1)) return !![];
-        const _0x253eb4 = _0xf5cb1['target']['closest']?.('[data-camera-path-point]');
-        if (this['active'] && _0x253eb4 && ['Enter', '\x20']['includes'](_0xf5cb1['key']))
+      (this['onDown'] = (item) => this['pointerDown'](item)),
+      (this['onMove'] = (key) => this['pointerMove'](key)),
+      (this['onUp'] = (index) => this['pointerEnd'](index)),
+      (this['onCancel'] = (result) => this['pointerEnd'](result, !![])),
+      (this['onKey'] = (event) => {
+        if (this['curves']['key'](event)) return !![];
+        const el = event['target']['closest']?.('[data-camera-path-point]');
+        if (this['active'] && el && ['Enter', '\x20']['includes'](event['key']))
           return (
-            _0xf5cb1['preventDefault'](),
-            _0xf5cb1['stopImmediatePropagation'](),
-            this['select'](this['points']()[Number(_0x253eb4['dataset']['cameraPathPoint'])]?.['id']),
+            event['preventDefault'](),
+            event['stopImmediatePropagation'](),
+            this['select'](this['points']()[Number(el['dataset']['cameraPathPoint'])]?.['id']),
             !![]
           );
-        if (!this['active'] || _0xf5cb1['key'] !== 'Escape') return;
-        (_0xf5cb1['preventDefault'](), _0xf5cb1['stopImmediatePropagation']());
+        if (!this['active'] || event['key'] !== 'Escape') return;
+        (event['preventDefault'](), event['stopImmediatePropagation']());
         if (this['curves']['cancel']) this['curves']['cancel']();
         else {
           if (this['cancelDrawing']) this['cancelDrawing']();
@@ -49,18 +49,18 @@ export class DirectorCameraPathController {
         }
         return !![];
       }),
-      (this['onWheel'] = (_0x584155) => {
+      (this['onWheel'] = (event2) => {
         if (
           this['objectId'] ||
-          !_0x584155['altKey'] ||
-          !_0x584155['target']['closest']?.('[data-camera-path-monitor]') ||
+          !event2['altKey'] ||
+          !event2['target']['closest']?.('[data-camera-path-monitor]') ||
           !this['selected']()
         )
           return;
-        (_0x584155['preventDefault'](),
-          _0x584155['stopImmediatePropagation'](),
+        (event2['preventDefault'](),
+          event2['stopImmediatePropagation'](),
           this['change']({
-            camera: adjustSpatialCamera(this['selected']()['camera'], 0x0, -_0x584155['deltaY'], !![]),
+            camera: adjustSpatialCamera(this['selected']()['camera'], 0x0, -event2['deltaY'], !![]),
           }));
       }));
   }
@@ -68,96 +68,89 @@ export class DirectorCameraPathController {
     return this['timeline']['_context']();
   }
   ['identity']() {
-    const { project: _0x448b20, scene: _0x5b3f8a, shot: _0x4a7a85 } = this['context']();
-    return _0x448b20?.['id'] + ':' + _0x5b3f8a?.['id'] + ':' + _0x4a7a85?.['id'];
+    const { project: project, scene: scene, shot: shot } = this['context']();
+    return project?.['id'] + ':' + scene?.['id'] + ':' + shot?.['id'];
   }
   ['points']() {
-    const _0x42bfd8 = this['context']()['shot']?.['animation'];
-    if (!this['objectId']) return readDirectorCameraPath(_0x42bfd8);
-    const _0x311523 = new Set(_0x42bfd8?.['objectPaths']?.[this['objectId']]?.['pointIds'] || []);
-    return (_0x42bfd8?.['objectTracks']?.['find'](
-      (_0x42e1be) => _0x42e1be['objectId'] === this['objectId'],
-    )?.['positionKeyframes'] || [])
-      ['filter']((_0x5be87a) => _0x311523['has'](_0x5be87a['id']))
-      ['map']((_0x40dfce) => ({
-        ..._0x40dfce,
-        camera: { ...this['context']()['shot']['camera'], position: _0x40dfce['value'] },
+    const data = this['context']()['shot']?.['animation'];
+    if (!this['objectId']) return readDirectorCameraPath(data);
+    const map = new Set(data?.['objectPaths']?.[this['objectId']]?.['pointIds'] || []);
+    return (data?.['objectTracks']?.['find']((options) => options['objectId'] === this['objectId'])?.[
+      'positionKeyframes'
+    ] || [])
+      ['filter']((target) => map['has'](target['id']))
+      ['map']((position) => ({
+        ...position,
+        camera: { ...this['context']()['shot']['camera'], position: position['value'] },
       }));
   }
   ['selected']() {
-    return (
-      this['points']()['find']((_0x23b821) => _0x23b821['id'] === this['selectedId']) || this['points']()[0x0]
-    );
+    return this['points']()['find']((source) => source['id'] === this['selectedId']) || this['points']()[0x0];
   }
-  ['render'](_0x22b0c1) {
-    return renderDirectorCameraPathPanel(this, _0x22b0c1);
+  ['render'](next) {
+    return renderDirectorCameraPathPanel(this, next);
   }
-  ['commit'](_0x1c2d19) {
+  ['commit'](handler) {
     if (
       this['objectId'] &&
-      this['context']()['scene']?.['objects']['find']((_0xdd0ce6) => _0xdd0ce6['id'] === this['objectId'])?.[
+      this['context']()['scene']?.['objects']['find']((current) => current['id'] === this['objectId'])?.[
         'locked'
       ]
     )
       throw new Error('请先解锁物体再编辑路径。');
     (this['timeline']['stopPlayback']({ render: ![] }),
-      this['timeline']['_mutateAnimation']('camera-path', '编辑摄像机轨道', (_0x1bc366) =>
-        normalizeStoryboard3DShotAnimation(_0x1c2d19(_0x1bc366)),
+      this['timeline']['_mutateAnimation']('camera-path', '编辑摄像机轨道', (entry) =>
+        normalizeStoryboard3DShotAnimation(handler(entry)),
       ));
-    const _0x499bf4 = this['selected']();
-    if (_0x499bf4) this['timeline']['_sampleAt'](_0x499bf4['time']);
+    const record = this['selected']();
+    if (record) this['timeline']['_sampleAt'](record['time']);
     this['timeline']['requestRender']?.();
   }
-  ['change'](_0x5f1cb8) {
-    const _0x5bf30b = this['selected']();
-    if (!_0x5bf30b) return;
+  ['change'](args) {
+    const enabled = this['selected']();
+    if (!enabled) return;
     try {
-      this['commit']((_0x164b6d) => {
-        if (!this['objectId']) return updateDirectorCameraPathPoint(_0x164b6d, _0x5bf30b['id'], _0x5f1cb8);
-        const _0x44ab94 = _0x164b6d['objectTracks']['find'](
-            (_0x3c52d0) => _0x3c52d0['objectId'] === this['objectId'],
-          ),
-          _0x3627ab = _0x44ab94?.['positionKeyframes']['find'](
-            (_0x4cbba2) => _0x4cbba2['id'] === _0x5bf30b['id'],
-          );
-        if (!_0x3627ab) return _0x164b6d;
-        if (_0x5f1cb8['camera']) _0x3627ab['value'] = [..._0x5f1cb8['camera']['position']];
-        if (_0x5f1cb8['time'] != null) {
-          const _0x154951 = Math['round'](Number(_0x5f1cb8['time']) * _0x164b6d['fps']) / _0x164b6d['fps'];
+      this['commit']((payload) => {
+        if (!this['objectId']) return updateDirectorCameraPathPoint(payload, enabled['id'], args);
+        const handle = payload['objectTracks']['find']((state) => state['objectId'] === this['objectId']),
+          el2 = handle?.['positionKeyframes']['find']((config) => config['id'] === enabled['id']);
+        if (!el2) return payload;
+        if (args['camera']) el2['value'] = [...args['camera']['position']];
+        if (args['time'] != null) {
+          const count = Math['round'](Number(args['time']) * payload['fps']) / payload['fps'];
           if (
-            _0x154951 < 0x0 ||
-            _0x154951 > 0xe10 ||
-            _0x44ab94['positionKeyframes']['some'](
-              (_0x426eda) =>
-                _0x426eda['id'] !== _0x5bf30b['id'] &&
-                Math['abs'](_0x426eda['time'] - _0x154951) < 0.5 / _0x164b6d['fps'],
+            count < 0x0 ||
+            count > 0xe10 ||
+            handle['positionKeyframes']['some'](
+              (scope) =>
+                scope['id'] !== enabled['id'] && Math['abs'](scope['time'] - count) < 0.5 / payload['fps'],
             )
           )
             throw new Error('该时间无效或已有控制点。');
-          const _0x179b6f = _0x3627ab['time'];
-          _0x3627ab['time'] = _0x154951;
-          const _0x2053a8 = _0x44ab94['rotationKeyframes']['find'](
-            (_0x2447c9) => Math['abs'](_0x2447c9['time'] - _0x179b6f) < 0.5 / _0x164b6d['fps'],
+          const input = el2['time'];
+          el2['time'] = count;
+          const output = handle['rotationKeyframes']['find'](
+            (value2) => Math['abs'](value2['time'] - input) < 0.5 / payload['fps'],
           );
-          if (_0x2053a8) _0x2053a8['time'] = _0x154951;
+          if (output) output['time'] = count;
         }
-        _0x5f1cb8['easing'] && ((_0x3627ab['easing'] = _0x5f1cb8['easing']), delete _0x3627ab['easingCurve']);
-        for (const _0xb6126e of ['inTangent', 'outTangent', 'easingCurve']) {
-          if (Object['hasOwn'](_0x5f1cb8, _0xb6126e)) {
-            if (_0x5f1cb8[_0xb6126e]) _0x3627ab[_0xb6126e] = [..._0x5f1cb8[_0xb6126e]];
-            else delete _0x3627ab[_0xb6126e];
+        args['easing'] && ((el2['easing'] = args['easing']), delete el2['easingCurve']);
+        for (const value3 of ['inTangent', 'outTangent', 'easingCurve']) {
+          if (Object['hasOwn'](args, value3)) {
+            if (args[value3]) el2[value3] = [...args[value3]];
+            else delete el2[value3];
           }
         }
-        return _0x164b6d;
+        return payload;
       });
-    } catch (_0x45011c) {
-      this['timeline']['setMessage']?.(_0x45011c['message']);
+    } catch (error) {
+      this['timeline']['setMessage']?.(error['message']);
     }
   }
-  ['handleClick'](_0x27d484) {
-    if (!_0x27d484['startsWith']('timeline-camera-path-')) return ![];
+  ['handleClick'](enabled2) {
+    if (!enabled2['startsWith']('timeline-camera-path-')) return ![];
     try {
-      if (_0x27d484 === 'timeline-camera-path-edit') {
+      if (enabled2 === 'timeline-camera-path-edit') {
         if (this['active']) this['stop']();
         else
           (this['timeline']['stopPlayback']({ render: ![], clear: !![] }),
@@ -168,65 +161,59 @@ export class DirectorCameraPathController {
             (this['selectedId'] = this['selected']()?.['id'] || ''),
             this['sync']());
       } else {
-        if (_0x27d484 === 'timeline-camera-path-draw') this['drawing'] = !this['drawing'];
+        if (enabled2 === 'timeline-camera-path-draw') this['drawing'] = !this['drawing'];
         else {
-          if (_0x27d484 === 'timeline-camera-path-focus') {
-            const _0x5cf84c = this['viewport']?.['frameSceneView'](
-              this['points']()['map']((_0x19a7dd) => _0x19a7dd['camera']['position']),
+          if (enabled2 === 'timeline-camera-path-focus') {
+            const value4 = this['viewport']?.['frameSceneView'](
+              this['points']()['map']((value5) => value5['camera']['position']),
             );
-            _0x5cf84c &&
+            value4 &&
               (this['timeline']['getRuntime']?.()?.['setViewProjection']('perspective'),
-              this['timeline']['getRuntime']?.()?.['commitSceneView'](_0x5cf84c));
+              this['timeline']['getRuntime']?.()?.['commitSceneView'](value4));
           } else {
-            if (_0x27d484 === 'timeline-camera-path-smooth')
-              this['commit']((_0x5434a5) => {
-                const _0x1f41b1 = new Set(this['points']()['map']((_0x26fe64) => _0x26fe64['id'])),
-                  _0x2ba5fb = this['objectId']
-                    ? _0x5434a5['objectTracks']['find'](
-                        (_0x4adc62) => _0x4adc62['objectId'] === this['objectId'],
-                      )?.['positionKeyframes'] || []
-                    : _0x5434a5['cameraKeyframes'];
-                return (
-                  smoothDirectorKeys(_0x2ba5fb['filter']((_0x3b14a0) => _0x1f41b1['has'](_0x3b14a0['id']))),
-                  _0x5434a5
-                );
+            if (enabled2 === 'timeline-camera-path-smooth')
+              this['commit']((value6) => {
+                const map2 = new Set(this['points']()['map']((value7) => value7['id'])),
+                  list = this['objectId']
+                    ? value6['objectTracks']['find']((value8) => value8['objectId'] === this['objectId'])?.[
+                        'positionKeyframes'
+                      ] || []
+                    : value6['cameraKeyframes'];
+                return (smoothDirectorKeys(list['filter']((value9) => map2['has'](value9['id']))), value6);
               });
             else {
-              if (_0x27d484 === 'timeline-camera-path-linear')
-                this['commit']((_0x499d75) => {
-                  const _0x87c8a7 = new Set(this['points']()['map']((_0x5726d5) => _0x5726d5['id'])),
-                    _0x1e96b8 = this['objectId']
-                      ? _0x499d75['objectTracks']['find'](
-                          (_0x3db35a) => _0x3db35a['objectId'] === this['objectId'],
+              if (enabled2 === 'timeline-camera-path-linear')
+                this['commit']((value10) => {
+                  const map3 = new Set(this['points']()['map']((value11) => value11['id'])),
+                    list2 = this['objectId']
+                      ? value10['objectTracks']['find'](
+                          (value12) => value12['objectId'] === this['objectId'],
                         )?.['positionKeyframes'] || []
-                      : _0x499d75['cameraKeyframes'];
+                      : value10['cameraKeyframes'];
                   return (
-                    _0x1e96b8['filter']((_0x143c6f) => _0x87c8a7['has'](_0x143c6f['id']))['forEach'](
-                      (_0x5233c3) => {
-                        (delete _0x5233c3['inTangent'], delete _0x5233c3['outTangent']);
-                      },
-                    ),
-                    _0x499d75
+                    list2['filter']((value13) => map3['has'](value13['id']))['forEach']((value14) => {
+                      (delete value14['inTangent'], delete value14['outTangent']);
+                    }),
+                    value10
                   );
                 });
               else {
-                if (_0x27d484 === 'timeline-camera-path-delete' && this['selected']())
-                  this['commit']((_0x130f6f) => {
+                if (enabled2 === 'timeline-camera-path-delete' && this['selected']())
+                  this['commit']((value15) => {
                     if (!this['objectId'])
-                      return removeDirectorCameraPathPoint(_0x130f6f, this['selected']()['id']);
-                    const _0x4254ed = _0x130f6f['objectTracks']['find'](
-                        (_0x1411e4) => _0x1411e4['objectId'] === this['objectId'],
+                      return removeDirectorCameraPathPoint(value15, this['selected']()['id']);
+                    const value16 = value15['objectTracks']['find'](
+                        (value17) => value17['objectId'] === this['objectId'],
                       ),
-                      _0x119b8c = this['selected']();
+                      value18 = this['selected']();
                     return (
-                      (_0x4254ed['positionKeyframes'] = _0x4254ed['positionKeyframes']['filter'](
-                        (_0x5b2155) => _0x5b2155['id'] !== _0x119b8c['id'],
+                      (value16['positionKeyframes'] = value16['positionKeyframes']['filter'](
+                        (value19) => value19['id'] !== value18['id'],
                       )),
-                      (_0x4254ed['rotationKeyframes'] = _0x4254ed['rotationKeyframes']['filter'](
-                        (_0x451762) =>
-                          Math['abs'](_0x451762['time'] - _0x119b8c['time']) >= 0.5 / _0x130f6f['fps'],
+                      (value16['rotationKeyframes'] = value16['rotationKeyframes']['filter'](
+                        (value20) => Math['abs'](value20['time'] - value18['time']) >= 0.5 / value15['fps'],
                       )),
-                      _0x130f6f
+                      value15
                     );
                   });
               }
@@ -235,81 +222,81 @@ export class DirectorCameraPathController {
         }
       }
       this['timeline']['requestRender']?.();
-    } catch (_0x407121) {
-      this['timeline']['setMessage']?.(_0x407121['message']);
+    } catch (error2) {
+      this['timeline']['setMessage']?.(error2['message']);
     }
     return !![];
   }
-  ['handleChange'](_0x37134a) {
-    if (this['curves']['change'](_0x37134a)) return !![];
-    const _0x2a3269 = _0x37134a['target'];
-    if (_0x2a3269['matches']?.('[data-camera-path-object]'))
+  ['handleChange'](event3) {
+    if (this['curves']['change'](event3)) return !![];
+    const easing = event3['target'];
+    if (easing['matches']?.('[data-camera-path-object]'))
       return (
         (this['objectId'] =
-          _0x2a3269['value'] === 'camera'
+          easing['value'] === 'camera'
             ? ''
             : this['context']()['scene']['objects']['filter'](
-                (_0x42eb05) => !['camera', 'light', 'group']['includes'](_0x42eb05['type']),
-              )[Number(_0x2a3269['value'])]?.['id'] || ''),
+                (value21) => !['camera', 'light', 'group']['includes'](value21['type']),
+              )[Number(easing['value'])]?.['id'] || ''),
         (this['selectedId'] = ''),
         (this['planeOffset'] =
-          this['context']()['scene']['objects']['find'](
-            (_0x51271d) => _0x51271d['id'] === this['objectId'],
-          )?.['transform']['position'][this['plane']] ?? 1.6),
+          this['context']()['scene']['objects']['find']((value22) => value22['id'] === this['objectId'])?.[
+            'transform'
+          ]['position'][this['plane']] ?? 1.6),
         this['timeline']['requestRender']?.(),
         !![]
       );
-    if (_0x2a3269['matches']?.('[data-camera-path-draw-mode]'))
-      return ((this['drawMode'] = _0x2a3269['value']), !![]);
-    if (_0x2a3269['matches']?.('[data-camera-path-draw-duration]'))
+    if (easing['matches']?.('[data-camera-path-draw-mode]'))
+      return ((this['drawMode'] = easing['value']), !![]);
+    if (easing['matches']?.('[data-camera-path-draw-duration]'))
       return (
-        (this['drawDuration'] = Math['max'](0.1, Math['min'](0xe10, Number(_0x2a3269['value']) || 0x3))),
+        (this['drawDuration'] = Math['max'](0.1, Math['min'](0xe10, Number(easing['value']) || 0x3))),
         !![]
       );
-    if (_0x2a3269['matches']?.('[data-camera-path-selection]'))
-      return (this['select'](this['points']()[Number(_0x2a3269['value'])]?.['id']), !![]);
-    if (_0x2a3269['matches']?.('[data-camera-path-plane]'))
+    if (easing['matches']?.('[data-camera-path-selection]'))
+      return (this['select'](this['points']()[Number(easing['value'])]?.['id']), !![]);
+    if (easing['matches']?.('[data-camera-path-plane]'))
       return (
-        (this['plane'] = Number(_0x2a3269['value'])),
+        (this['plane'] = Number(easing['value'])),
         (this['planeOffset'] = this['selected']()?.['camera']['position'][this['plane']] || 0x0),
         this['timeline']['requestRender']?.(),
         !![]
       );
-    if (_0x2a3269['matches']?.('[data-camera-path-easing]'))
-      return (this['change']({ easing: _0x2a3269['value'] }), !![]);
-    if (!_0x2a3269['matches']?.('[data-camera-path-field]')) return ![];
-    const _0x5b9036 = _0x2a3269['dataset']['cameraPathField'],
-      _0x4e1b84 = Number(_0x2a3269['value']);
-    if (!Number['isFinite'](_0x4e1b84)) return !![];
-    if (_0x5b9036 === 'planeOffset') return ((this['planeOffset'] = _0x4e1b84), !![]);
-    const _0xd9ca76 = this['selected']();
-    if (!_0xd9ca76) return !![];
-    if (_0x5b9036 === 'time') {
-      if (_0xd9ca76['time'] !== _0x4e1b84) this['change']({ time: _0x4e1b84 });
+    if (easing['matches']?.('[data-camera-path-easing]'))
+      return (this['change']({ easing: easing['value'] }), !![]);
+    if (!easing['matches']?.('[data-camera-path-field]')) return ![];
+    const value23 = easing['dataset']['cameraPathField'],
+      time = Number(easing['value']);
+    if (!Number['isFinite'](time)) return !![];
+    if (value23 === 'planeOffset') return ((this['planeOffset'] = time), !![]);
+    const enabled3 = this['selected']();
+    if (!enabled3) return !![];
+    if (value23 === 'time') {
+      if (enabled3['time'] !== time) this['change']({ time: time });
       return !![];
     }
-    const _0x58525b = structuredClone(_0xd9ca76['camera']),
-      [_0x1107e9, _0x35d23d] = _0x5b9036['split']('-');
-    if (_0x35d23d != null) _0x58525b[_0x1107e9][Number(_0x35d23d)] = _0x4e1b84;
+    const camera = structuredClone(enabled3['camera']),
+      [value24, value25] = value23['split']('-');
+    if (value25 != null) camera[value24][Number(value25)] = time;
     else {
-      _0x58525b[_0x1107e9] = _0x1107e9 === 'roll' ? (_0x4e1b84 * Math['PI']) / 0xb4 : _0x4e1b84;
-      if (_0x1107e9 === 'focalLength') delete _0x58525b['fov'];
+      camera[value24] = value24 === 'roll' ? (time * Math['PI']) / 0xb4 : time;
+      if (value24 === 'focalLength') delete camera['fov'];
     }
-    if (JSON['stringify'](_0x58525b) !== JSON['stringify'](_0xd9ca76['camera']))
-      this['change']({ camera: _0x58525b });
+    if (JSON['stringify'](camera) !== JSON['stringify'](enabled3['camera']))
+      this['change']({ camera: camera });
     return !![];
   }
-  ['select'](_0x5a382a) {
-    this['selectedId'] = _0x5a382a || '';
-    const _0x2f2fa0 = this['selected']();
-    if (_0x2f2fa0) this['timeline']['_sampleAt'](_0x2f2fa0['time']);
+  ['select'](value26) {
+    this['selectedId'] = value26 || '';
+    const value27 = this['selected']();
+    if (value27) this['timeline']['_sampleAt'](value27['time']);
     this['timeline']['requestRender']?.();
   }
-  ['preview'](_0x3cd3cf) {
+  ['preview'](args2) {
     if (!this['active']) return ![];
     return (
-      this['timeline']['getRuntime']?.()?.['previewTimelineSample']({ ..._0x3cd3cf, camera: null }),
-      (this['monitorCamera'] = _0x3cd3cf['camera']),
+      this['timeline']['getRuntime']?.()?.['previewTimelineSample']({ ...args2, camera: null }),
+      (this['monitorCamera'] = args2['camera']),
       !![]
     );
   }
@@ -319,18 +306,18 @@ export class DirectorCameraPathController {
       this['stop']();
       return;
     }
-    const _0xbbc2bf = this['timeline']['getRuntime']?.();
-    if (!_0xbbc2bf || _0xbbc2bf['disposed']) return;
-    const _0x16597d = _0xbbc2bf['getDirectorViewport'](),
-      _0x5860e2 = _0x16597d['canvas']['parentElement'];
-    if (this['viewport'] !== _0x16597d || this['layer']?.['parentElement'] !== _0x5860e2) {
-      (this['detach'](), (this['viewport'] = _0x16597d));
-      const _0x65a3bc = _0x5860e2['ownerDocument'];
-      ((this['layer'] = _0x65a3bc['createElement']('div')),
+    const enabled4 = this['timeline']['getRuntime']?.();
+    if (!enabled4 || enabled4['disposed']) return;
+    const canvas = enabled4['getDirectorViewport'](),
+      value28 = canvas['canvas']['parentElement'];
+    if (this['viewport'] !== canvas || this['layer']?.['parentElement'] !== value28) {
+      (this['detach'](), (this['viewport'] = canvas));
+      const el3 = value28['ownerDocument'];
+      ((this['layer'] = el3['createElement']('div')),
         (this['layer']['className'] = 'storyboard-3d-camera-path-overlay'),
         (this['layer']['innerHTML'] =
           '<svg\x20data-camera-path-overlay\x20aria-label=\x22摄像机轨道控制点\x22></svg><div\x20class=\x22storyboard-3d-camera-path-monitor\x22><span>镜头监看</span><canvas\x20data-camera-path-monitor\x20aria-label=\x22镜头监看，拖动调整朝向\x22></canvas></div>'),
-        _0x5860e2['append'](this['layer']),
+        value28['append'](this['layer']),
         (this['svg'] = this['layer']['querySelector']('svg')),
         (this['monitorCanvas'] = this['layer']['querySelector']('canvas')),
         (this['root'] = this['timeline']['getRoot']()),
@@ -338,231 +325,227 @@ export class DirectorCameraPathController {
         this['root']['addEventListener']('wheel', this['onWheel'], { capture: !![], passive: ![] }));
     }
     if (this['frame'] == null) {
-      const _0x1849b3 = () => {
+      const value29 = () => {
         this['frame'] = null;
         if (!this['active'] || this['owner'] !== this['identity']() || !this['layer']?.['isConnected']) {
           this['stop']();
           return;
         }
-        (this['paint'](), (this['frame'] = this['timeline']['window']['requestAnimationFrame'](_0x1849b3)));
+        (this['paint'](), (this['frame'] = this['timeline']['window']['requestAnimationFrame'](value29)));
       };
-      this['frame'] = this['timeline']['window']['requestAnimationFrame'](_0x1849b3);
+      this['frame'] = this['timeline']['window']['requestAnimationFrame'](value29);
     }
   }
   ['paint']() {
-    const _0x5972ce = this['points'](),
-      _0x3b1f8b = _0x5972ce['map'](
-        (_0x10d428) => _0x10d428['id'] + ':' + Boolean(_0x10d428['inTangent'] || _0x10d428['outTangent']),
+    const list3 = this['points'](),
+      value30 = list3['map'](
+        (value31) => value31['id'] + ':' + Boolean(value31['inTangent'] || value31['outTangent']),
       )['join']('|');
-    if (_0x3b1f8b !== this['svg']['dataset']['keys']) {
-      (this['svg']['replaceChildren'](), (this['svg']['dataset']['keys'] = _0x3b1f8b));
-      const _0x4e98cd = this['svg']['ownerDocument'];
-      for (let _0x2dc457 = 0x0; _0x2dc457 < Math['max'](0x0, _0x5972ce['length'] - 0x1); _0x2dc457++) {
-        const _0x1c5b02 = _0x4e98cd['createElementNS'](
+    if (value30 !== this['svg']['dataset']['keys']) {
+      (this['svg']['replaceChildren'](), (this['svg']['dataset']['keys'] = value30));
+      const value32 = this['svg']['ownerDocument'];
+      for (let value33 = 0x0; value33 < Math['max'](0x0, list3['length'] - 0x1); value33++) {
+        const el4 = value32['createElementNS'](
           'http://www.w3.org/2000/svg',
-          _0x5972ce[_0x2dc457]['outTangent'] || _0x5972ce[_0x2dc457 + 0x1]['inTangent'] ? 'path' : 'line',
+          list3[value33]['outTangent'] || list3[value33 + 0x1]['inTangent'] ? 'path' : 'line',
         );
-        ((_0x1c5b02['dataset']['segment'] = String(_0x2dc457)), this['svg']['append'](_0x1c5b02));
+        ((el4['dataset']['segment'] = String(value33)), this['svg']['append'](el4));
       }
-      _0x5972ce['forEach']((_0x5ef537, _0x20e77e) => {
-        const _0x4af1a8 = _0x4e98cd['createElementNS']('http://www.w3.org/2000/svg', 'circle');
-        ((_0x4af1a8['dataset']['cameraPathPoint'] = String(_0x20e77e)),
-          _0x4af1a8['setAttribute']('r', '9'),
-          _0x4af1a8['setAttribute']('tabindex', '0'),
-          _0x4af1a8['setAttribute']('role', 'button'),
-          _0x4af1a8['setAttribute']('aria-label', '摄像机控制点 ' + (_0x20e77e + 0x1)),
-          this['svg']['append'](_0x4af1a8));
+      list3['forEach']((value34, value35) => {
+        const el5 = value32['createElementNS']('http://www.w3.org/2000/svg', 'circle');
+        ((el5['dataset']['cameraPathPoint'] = String(value35)),
+          el5['setAttribute']('r', '9'),
+          el5['setAttribute']('tabindex', '0'),
+          el5['setAttribute']('role', 'button'),
+          el5['setAttribute']('aria-label', '摄像机控制点 ' + (value35 + 0x1)),
+          this['svg']['append'](el5));
       });
     }
-    const _0x3ced3b = _0x5972ce['map']((_0xb238bc) =>
+    const value36 = list3['map']((value37) =>
       this['viewport']['project'](
-        this['drag']?.['id'] === _0xb238bc['id']
+        this['drag']?.['id'] === value37['id']
           ? this['drag']['camera']['position']
-          : _0xb238bc['camera']['position'],
+          : value37['camera']['position'],
       ),
     );
-    (this['svg']['querySelectorAll']('[data-segment]')['forEach']((_0x42b43d, _0x5adeab) => {
-      if (_0x42b43d['tagName'] === 'path') {
-        const _0x2d2797 = Array['from']({ length: 0x19 }, (_0x2c8268, _0x5215a2) =>
+    (this['svg']['querySelectorAll']('[data-segment]')['forEach']((el6, value38) => {
+      if (el6['tagName'] === 'path') {
+        const list4 = Array['from']({ length: 0x19 }, (value39, value40) =>
           this['viewport']['project'](
-            sampleSpatialCurve(_0x5972ce[_0x5adeab], _0x5972ce[_0x5adeab + 0x1], _0x5215a2 / 0x18, 'camera'),
+            sampleSpatialCurve(list3[value38], list3[value38 + 0x1], value40 / 0x18, 'camera'),
           ),
         );
-        let _0x153a80 = ![];
-        const _0x1b384b = _0x2d2797['map']((_0x51559b) => {
-          if (!_0x51559b) return ((_0x153a80 = ![]), '');
-          const _0x3af406 = '' + (_0x153a80 ? 'L' : 'M') + _0x51559b['x'] + '\x20' + _0x51559b['y'];
-          return ((_0x153a80 = !![]), _0x3af406);
+        let enabled5 = ![];
+        const value41 = list4['map']((box) => {
+          if (!box) return ((enabled5 = ![]), '');
+          const value42 = '' + (enabled5 ? 'L' : 'M') + box['x'] + '\x20' + box['y'];
+          return ((enabled5 = !![]), value42);
         })['join']('\x20');
-        _0x42b43d['setAttribute']('d', _0x1b384b);
+        el6['setAttribute']('d', value41);
         return;
       }
-      const _0x5f8aeb = _0x3ced3b[_0x5adeab],
-        _0xc7540d = _0x3ced3b[_0x5adeab + 0x1];
-      _0x42b43d['style']['display'] = _0x5f8aeb && _0xc7540d ? '' : 'none';
-      if (_0x5f8aeb && _0xc7540d) {
-        for (const [_0x2c1138, _0x32cf8d] of Object['entries']({
-          x1: _0x5f8aeb['x'],
-          y1: _0x5f8aeb['y'],
-          x2: _0xc7540d['x'],
-          y2: _0xc7540d['y'],
+      const x1 = value36[value38],
+        x2 = value36[value38 + 0x1];
+      el6['style']['display'] = x1 && x2 ? '' : 'none';
+      if (x1 && x2) {
+        for (const [value43, value44] of Object['entries']({
+          x1: x1['x'],
+          y1: x1['y'],
+          x2: x2['x'],
+          y2: x2['y'],
         }))
-          _0x42b43d['setAttribute'](_0x2c1138, _0x32cf8d);
+          el6['setAttribute'](value43, value44);
       }
     }),
-      this['svg']['querySelectorAll']('circle')['forEach']((_0x2d116d, _0x348c27) => {
-        const _0x2f83ae = _0x3ced3b[_0x348c27];
-        ((_0x2d116d['style']['display'] = _0x2f83ae ? '' : 'none'),
-          _0x2f83ae &&
-            (_0x2d116d['setAttribute']('cx', _0x2f83ae['x']),
-            _0x2d116d['setAttribute']('cy', _0x2f83ae['y'])),
-          _0x2d116d['classList']['toggle'](
-            'is-selected',
-            _0x5972ce[_0x348c27]['id'] === this['selected']()?.['id'],
-          ));
+      this['svg']['querySelectorAll']('circle')['forEach']((el7, value45) => {
+        const box2 = value36[value45];
+        ((el7['style']['display'] = box2 ? '' : 'none'),
+          box2 && (el7['setAttribute']('cx', box2['x']), el7['setAttribute']('cy', box2['y'])),
+          el7['classList']['toggle']('is-selected', list3[value45]['id'] === this['selected']()?.['id']));
       }),
       this['layer']['classList']['toggle']('is-drawing', this['drawing']));
-    const _0x382d9f =
+    const value46 =
         (!this['objectId'] && this['drag']?.['camera']) ||
         this['monitorCamera'] ||
         (!this['objectId'] && this['selected']()?.['camera']) ||
         this['context']()['shot']['camera'],
-      _0x3c588b = this['timeline']['window']['performance']['now']();
+      value47 = this['timeline']['window']['performance']['now']();
     !this['monitorPending'] &&
-      (!this['monitorPaintAt'] || _0x3c588b - this['monitorPaintAt'] > 0x21) &&
-      ((this['monitorPaintAt'] = _0x3c588b),
+      (!this['monitorPaintAt'] || value47 - this['monitorPaintAt'] > 0x21) &&
+      ((this['monitorPaintAt'] = value47),
       (this['monitorPending'] = !![]),
-      Promise['resolve'](this['viewport']['renderMonitor'](this['monitorCanvas'], _0x382d9f))
-        ['catch']((_0x46eee4) => {
-          (this['timeline']['setMessage']?.('镜头监看失败：' + _0x46eee4['message']), this['stop']());
+      Promise['resolve'](this['viewport']['renderMonitor'](this['monitorCanvas'], value46))
+        ['catch']((error3) => {
+          (this['timeline']['setMessage']?.('镜头监看失败：' + error3['message']), this['stop']());
         })
         ['finally'](() => {
           this['monitorPending'] = ![];
         }));
   }
-  ['pointerDown'](_0x616fd0) {
-    if (this['curves']['down'](_0x616fd0)) return;
-    if (!this['active'] || _0x616fd0['button'] !== 0x0 || this['timeline']['playing']) return;
-    const _0x285d66 = _0x616fd0['target']['closest']?.('[data-camera-path-monitor]');
-    if (_0x285d66 && this['objectId']) {
-      (_0x616fd0['preventDefault'](), _0x616fd0['stopImmediatePropagation']());
+  ['pointerDown'](x) {
+    if (this['curves']['down'](x)) return;
+    if (!this['active'] || x['button'] !== 0x0 || this['timeline']['playing']) return;
+    const enabled6 = x['target']['closest']?.('[data-camera-path-monitor]');
+    if (enabled6 && this['objectId']) {
+      (x['preventDefault'](), x['stopImmediatePropagation']());
       return;
     }
-    const _0x19ce4d = _0x616fd0['target']['closest']?.('[data-camera-path-point]'),
-      _0x97aa56 = _0x616fd0['target'] === this['viewport']?.['canvas'] || _0x616fd0['target'] === this['svg'];
-    if (!_0x19ce4d && !_0x285d66 && !(this['drawing'] && _0x97aa56)) return;
-    (_0x616fd0['preventDefault'](), _0x616fd0['stopImmediatePropagation']());
-    if (!_0x19ce4d && !_0x285d66) {
-      const _0x167ecb = this['viewport']['pointOnPlane'](
-        _0x616fd0['clientX'],
-        _0x616fd0['clientY'],
+    const el8 = x['target']['closest']?.('[data-camera-path-point]'),
+      value48 = x['target'] === this['viewport']?.['canvas'] || x['target'] === this['svg'];
+    if (!el8 && !enabled6 && !(this['drawing'] && value48)) return;
+    (x['preventDefault'](), x['stopImmediatePropagation']());
+    if (!el8 && !enabled6) {
+      const enabled7 = this['viewport']['pointOnPlane'](
+        x['clientX'],
+        x['clientY'],
         this['plane'],
         this['planeOffset'],
       );
-      if (!_0x167ecb) {
+      if (!enabled7) {
         this['timeline']['setMessage']?.('当前视角与编辑平面平行，请旋转视角或切换编辑平面。');
         return;
       }
       if (this['drawMode'] === 'freehand') {
-        this['startFreehand'](_0x616fd0, _0x167ecb);
+        this['startFreehand'](x, enabled7);
         return;
       }
       try {
         if (this['objectId']) {
-          const _0x4dd0c0 = this['context']()['scene']['objects']['find'](
-              (_0x3f6846) => _0x3f6846['id'] === this['objectId'],
+          const object = this['context']()['scene']['objects']['find'](
+              (value49) => value49['id'] === this['objectId'],
             ),
-            _0x584011 = this['points']();
-          (this['commit']((_0x3e1b7) =>
-            authorDirectorPath(_0x3e1b7, {
-              object: _0x4dd0c0,
+            start = this['points']();
+          (this['commit']((value50) =>
+            authorDirectorPath(value50, {
+              object: object,
               points: [
-                ...(_0x584011['length']
-                  ? _0x584011['map']((_0x20831e) => _0x20831e['camera']['position'])
-                  : [_0x4dd0c0['transform']['position']]),
-                _0x167ecb,
+                ...(start['length']
+                  ? start['map']((value51) => value51['camera']['position'])
+                  : [object['transform']['position']]),
+                enabled7,
               ],
-              start: _0x584011[0x0]?.['time'] ?? this['timeline']['_timeForShot'](this['context']()['shot']),
-              duration: Math['max'](0x1, _0x584011['length']),
+              start: start[0x0]?.['time'] ?? this['timeline']['_timeForShot'](this['context']()['shot']),
+              duration: Math['max'](0x1, start['length']),
             }),
           ),
             (this['selectedId'] = this['points']()['at'](-0x1)?.['id'] || ''),
             this['select'](this['selectedId']));
           return;
         }
-        const _0x4918c0 = structuredClone(
+        const structuredClone2 = structuredClone(
           this['selected']()?.['camera'] || this['context']()['shot']['camera'],
         );
-        ((_0x4918c0['position'] = _0x167ecb),
-          this['commit']((_0x3e6873) => {
-            const _0x56df18 = addDirectorCameraPathPoint(_0x3e6873, _0x4918c0);
-            return ((this['selectedId'] = _0x56df18['cameraPath']['pointIds']['at'](-0x1)), _0x56df18);
+        ((structuredClone2['position'] = enabled7),
+          this['commit']((value52) => {
+            const addDirectorCameraPathPoint2 = addDirectorCameraPathPoint(value52, structuredClone2);
+            return (
+              (this['selectedId'] = addDirectorCameraPathPoint2['cameraPath']['pointIds']['at'](-0x1)),
+              addDirectorCameraPathPoint2
+            );
           }));
-      } catch (_0x5d0d4e) {
-        this['timeline']['setMessage']?.(_0x5d0d4e['message']);
+      } catch (error4) {
+        this['timeline']['setMessage']?.(error4['message']);
       }
       return;
     }
-    const _0x9777a = _0x19ce4d
-      ? this['points']()[Number(_0x19ce4d['dataset']['cameraPathPoint'])]
-      : this['selected']();
-    if (!_0x9777a) return;
-    ((this['selectedId'] = _0x9777a['id']), this['timeline']['_sampleAt'](_0x9777a['time']));
-    const _0x51302a = structuredClone(_0x9777a['camera']);
+    const id = el8 ? this['points']()[Number(el8['dataset']['cameraPathPoint'])] : this['selected']();
+    if (!id) return;
+    ((this['selectedId'] = id['id']), this['timeline']['_sampleAt'](id['time']));
+    const camera2 = structuredClone(id['camera']);
     ((this['drag'] = {
-      id: _0x9777a['id'],
-      base: structuredClone(_0x51302a),
-      camera: _0x51302a,
-      monitor: Boolean(_0x285d66),
-      x: _0x616fd0['clientX'],
-      y: _0x616fd0['clientY'],
+      id: id['id'],
+      base: structuredClone(camera2),
+      camera: camera2,
+      monitor: Boolean(enabled6),
+      x: x['clientX'],
+      y: x['clientY'],
       origin: this['viewport']['pointOnPlane'](
-        _0x616fd0['clientX'],
-        _0x616fd0['clientY'],
+        x['clientX'],
+        x['clientY'],
         this['plane'],
-        _0x51302a['position'][this['plane']],
+        camera2['position'][this['plane']],
       ),
       snapshot: JSON['stringify'](this['context']()['shot']['animation']),
-      target: _0x616fd0['target'],
-      pointerId: _0x616fd0['pointerId'],
+      target: x['target'],
+      pointerId: x['pointerId'],
     }),
-      _0x616fd0['target']['setPointerCapture']?.(_0x616fd0['pointerId']));
-    const _0x5517e5 = this['timeline']['window'];
-    (_0x5517e5['addEventListener']('pointermove', this['onMove'], !![]),
-      _0x5517e5['addEventListener']('pointerup', this['onUp'], !![]),
-      _0x5517e5['addEventListener']('pointercancel', this['onCancel'], !![]),
-      _0x616fd0['target']['addEventListener']('lostpointercapture', this['onCancel']));
+      x['target']['setPointerCapture']?.(x['pointerId']));
+    const el9 = this['timeline']['window'];
+    (el9['addEventListener']('pointermove', this['onMove'], !![]),
+      el9['addEventListener']('pointerup', this['onUp'], !![]),
+      el9['addEventListener']('pointercancel', this['onCancel'], !![]),
+      x['target']['addEventListener']('lostpointercapture', this['onCancel']));
   }
-  ['pointerMove'](_0x59f71e) {
-    const _0x1d3866 = this['drag'];
-    if (!_0x1d3866 || _0x59f71e['pointerId'] !== _0x1d3866['pointerId']) return;
-    (_0x59f71e['preventDefault'](), _0x59f71e['stopImmediatePropagation']());
-    if (_0x1d3866['monitor'])
-      _0x1d3866['camera'] = adjustSpatialCamera(
-        _0x1d3866['base'],
-        _0x59f71e['clientX'] - _0x1d3866['x'],
-        _0x59f71e['clientY'] - _0x1d3866['y'],
+  ['pointerMove'](event4) {
+    const box3 = this['drag'];
+    if (!box3 || event4['pointerId'] !== box3['pointerId']) return;
+    (event4['preventDefault'](), event4['stopImmediatePropagation']());
+    if (box3['monitor'])
+      box3['camera'] = adjustSpatialCamera(
+        box3['base'],
+        event4['clientX'] - box3['x'],
+        event4['clientY'] - box3['y'],
       );
     else {
-      const _0x555860 = this['viewport']['pointOnPlane'](
-        _0x59f71e['clientX'],
-        _0x59f71e['clientY'],
+      const value53 = this['viewport']['pointOnPlane'](
+        event4['clientX'],
+        event4['clientY'],
         this['plane'],
-        _0x1d3866['base']['position'][this['plane']],
+        box3['base']['position'][this['plane']],
       );
-      if (_0x555860 && _0x1d3866['origin'])
-        _0x1d3866['camera']['position'] = _0x1d3866['base']['position']['map'](
-          (_0x41b7ed, _0x43985f) => _0x41b7ed + _0x555860[_0x43985f] - _0x1d3866['origin'][_0x43985f],
+      if (value53 && box3['origin'])
+        box3['camera']['position'] = box3['base']['position']['map'](
+          (value54, value55) => value54 + value53[value55] - box3['origin'][value55],
         );
     }
   }
-  ['startFreehand'](_0x1b7e87, _0x3286e1) {
-    const _0x27b26f = this['identity'](),
-      _0x43fd5a = JSON['stringify'](this['context']()['shot']['animation']),
-      _0x2d6ef5 = [_0x3286e1],
-      _0x51f056 = new this['timeline']['window']['AbortController']();
+  ['startFreehand'](value56, value57) {
+    const value58 = this['identity'](),
+      value59 = JSON['stringify'](this['context']()['shot']['animation']),
+      points = [value57],
+      signal = new this['timeline']['window']['AbortController']();
     ((this['cancelDrawing'] = () => {
-      (_0x51f056['abort'](),
+      (signal['abort'](),
         (this['cancelDrawing'] = null),
         this['freehandLine']?.['remove'](),
         (this['freehandLine'] = null));
@@ -572,85 +555,83 @@ export class DirectorCameraPathController {
         'polyline',
       )),
       this['svg']['append'](this['freehandLine']));
-    const _0x489f1b = (_0x4c0e69) => {
-      const _0x1b5b21 = this['viewport']['pointOnPlane'](
-        _0x4c0e69['clientX'],
-        _0x4c0e69['clientY'],
+    const value60 = (event5) => {
+      const list5 = this['viewport']['pointOnPlane'](
+        event5['clientX'],
+        event5['clientY'],
         this['plane'],
         this['planeOffset'],
       );
       if (
-        !_0x1b5b21 ||
-        _0x2d6ef5['length'] >= 0x64 ||
-        Math['hypot'](
-          ..._0x1b5b21['map']((_0x1cfdca, _0x453bd4) => _0x1cfdca - _0x2d6ef5['at'](-0x1)[_0x453bd4]),
-        ) < 0.04
+        !list5 ||
+        points['length'] >= 0x64 ||
+        Math['hypot'](...list5['map']((value61, value62) => value61 - points['at'](-0x1)[value62])) < 0.04
       )
         return;
-      (_0x2d6ef5['push'](_0x1b5b21),
+      (points['push'](list5),
         this['freehandLine']['setAttribute'](
           'points',
-          _0x2d6ef5['map']((_0x352b55) => this['viewport']['project'](_0x352b55))
+          points['map']((value63) => this['viewport']['project'](value63))
             ['filter'](Boolean)
-            ['map']((_0x5dc482) => _0x5dc482['x'] + ',' + _0x5dc482['y'])
+            ['map']((box4) => box4['x'] + ',' + box4['y'])
             ['join']('\x20'),
         ));
     };
-    (this['timeline']['window']['addEventListener']('pointermove', _0x489f1b, {
-      signal: _0x51f056['signal'],
+    (this['timeline']['window']['addEventListener']('pointermove', value60, {
+      signal: signal['signal'],
     }),
       this['timeline']['window']['addEventListener']('pointercancel', () => this['cancelDrawing']?.(), {
-        signal: _0x51f056['signal'],
+        signal: signal['signal'],
       }),
       this['timeline']['window']['addEventListener'](
         'pointerup',
         () => {
           this['cancelDrawing']?.();
           if (
-            _0x27b26f !== this['identity']() ||
-            _0x43fd5a !== JSON['stringify'](this['context']()['shot']['animation'])
+            value58 !== this['identity']() ||
+            value59 !== JSON['stringify'](this['context']()['shot']['animation'])
           )
             return;
           try {
-            this['commit']((_0x1f6eb6) =>
-              authorDirectorPath(_0x1f6eb6, {
-                points: _0x2d6ef5,
+            this['commit']((value64) =>
+              authorDirectorPath(value64, {
+                points: points,
                 camera: this['selected']()?.['camera'] || this['context']()['shot']['camera'],
                 object: this['context']()['scene']['objects']['find'](
-                  (_0x657b88) => _0x657b88['id'] === this['objectId'],
+                  (value65) => value65['id'] === this['objectId'],
                 ),
                 start: this['timeline']['_timeForShot'](this['context']()['shot']),
                 duration: this['drawDuration'],
                 smooth: !![],
               }),
             );
-          } catch (_0x17b916) {
-            this['timeline']['setMessage']?.(_0x17b916['message']);
+          } catch (error5) {
+            this['timeline']['setMessage']?.(error5['message']);
           }
         },
-        { once: !![], signal: _0x51f056['signal'] },
+        { once: !![], signal: signal['signal'] },
       ));
   }
-  ['pointerEnd'](_0x3b2dfb, _0x3195cb = ![]) {
-    const _0x51e854 = this['drag'];
-    if (!_0x51e854 || (_0x3b2dfb && _0x3b2dfb['pointerId'] !== _0x51e854['pointerId'])) return;
-    (_0x3b2dfb?.['stopImmediatePropagation'](), (this['drag'] = null));
-    const _0x1f3109 = this['timeline']['window'];
-    (_0x1f3109['removeEventListener']('pointermove', this['onMove'], !![]),
-      _0x1f3109['removeEventListener']('pointerup', this['onUp'], !![]),
-      _0x1f3109['removeEventListener']('pointercancel', this['onCancel'], !![]),
-      _0x51e854['target']['removeEventListener']('lostpointercapture', this['onCancel']));
-    if (_0x51e854['target']['hasPointerCapture']?.(_0x51e854['pointerId']))
-      _0x51e854['target']['releasePointerCapture'](_0x51e854['pointerId']);
+  ['pointerEnd'](event6, value66 = ![]) {
+    const camera3 = this['drag'];
+    if (!camera3 || (event6 && event6['pointerId'] !== camera3['pointerId'])) return;
+    (event6?.['stopImmediatePropagation'](), (this['drag'] = null));
+    const el10 = this['timeline']['window'];
+    (el10['removeEventListener']('pointermove', this['onMove'], !![]),
+      el10['removeEventListener']('pointerup', this['onUp'], !![]),
+      el10['removeEventListener']('pointercancel', this['onCancel'], !![]),
+      camera3['target']['removeEventListener']('lostpointercapture', this['onCancel']));
+    if (camera3['target']['hasPointerCapture']?.(camera3['pointerId']))
+      camera3['target']['releasePointerCapture'](camera3['pointerId']);
     if (
-      _0x3195cb ||
+      value66 ||
       this['owner'] !== this['identity']() ||
-      _0x51e854['snapshot'] !== JSON['stringify'](this['context']()['shot']['animation'])
+      camera3['snapshot'] !== JSON['stringify'](this['context']()['shot']['animation'])
     )
       return;
-    if (JSON['stringify'](_0x51e854['base']) !== JSON['stringify'](_0x51e854['camera']))
-      this['change']({ camera: _0x51e854['camera'] });
-    else this['select'](_0x51e854['id']);
+    if (JSON['stringify'](camera3['base']) !== JSON['stringify'](camera3['camera']))
+      this['change']({ camera: camera3['camera'] });
+    else this['select'](camera3['id']);
   }
   ['detach']() {
     (this['curves']['cancel']?.(),

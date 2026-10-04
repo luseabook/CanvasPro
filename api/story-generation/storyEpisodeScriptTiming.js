@@ -3,44 +3,42 @@ import { parseStrictJson } from '../utils/strictJson.js';
 import { getResultText } from './storyTextRequest.js';
 import { invokeStoryGenerationRequest } from './storyInvocationEvidence.js';
 const MAX_NATURAL_SPOKEN_UNITS_PER_SECOND = 0x5;
-function countSpokenUnits(_0x33e7ca) {
-  const _0x53d6fe = normalizeText(_0x33e7ca),
-    _0xb73875 = (_0x53d6fe['match'](/[\p{Script=Han}]/gu) || [])['length'],
-    _0x1fe886 = (_0x53d6fe['match'](/[A-Za-z0-9]+/g) || [])['length'];
-  return _0xb73875 + _0x1fe886;
+function countSpokenUnits(value) {
+  const text = normalizeText(value),
+    item = (text['match'](/[\p{Script=Han}]/gu) || [])['length'],
+    key = (text['match'](/[A-Za-z0-9]+/g) || [])['length'];
+  return item + key;
 }
-function extractSceneSpokenText(_0x3a2a49) {
-  return normalizeText(_0x3a2a49)
+function extractSceneSpokenText(index) {
+  return normalizeText(index)
     ['split'](/\r?\n/u)
-    ['map']((_0x20782) => _0x20782['trim']())
+    ['map']((result) => result['trim']())
     ['filter'](Boolean)
-    ['flatMap']((_0x3a007e) => {
-      const _0x5c0029 = [_0x3a007e['indexOf']('：'), _0x3a007e['indexOf'](':')]
-        ['filter']((_0x4eae7e) => _0x4eae7e >= 0x0)
-        ['reduce']((_0x277e53, _0x5b9155) => Math['min'](_0x277e53, _0x5b9155), Number['POSITIVE_INFINITY']);
-      if (_0x5c0029 < 0x0 || _0x5c0029 > 0x18) return [];
-      const _0x283dde = _0x3a007e['slice'](0x0, _0x5c0029)['trim']();
-      if (/字幕|屏幕|文字|音效/u['test'](_0x283dde)) return [];
-      const _0x54d5f6 = _0x3a007e['slice'](_0x5c0029 + 0x1)['trim']();
-      if (!_0x54d5f6) return [];
-      const _0x13a4ce = [..._0x54d5f6['matchAll'](/[“"]([^”"]+)[”"]/gu)]['map'](
-        (_0xe3a4dd) => _0xe3a4dd[0x1],
-      );
-      if (_0x13a4ce['length']) return _0x13a4ce;
-      return /^(旁白|VO|OS|画外音)$/iu['test'](_0x283dde) ? [_0x54d5f6] : [];
+    ['flatMap']((list) => {
+      const count = [list['indexOf']('：'), list['indexOf'](':')]
+        ['filter']((count2) => count2 >= 0x0)
+        ['reduce']((data, options) => Math['min'](data, options), Number['POSITIVE_INFINITY']);
+      if (count < 0x0 || count > 0x18) return [];
+      const target = list['slice'](0x0, count)['trim']();
+      if (/字幕|屏幕|文字|音效/u['test'](target)) return [];
+      const args = list['slice'](count + 0x1)['trim']();
+      if (!args) return [];
+      const list2 = [...args['matchAll'](/[“"]([^”"]+)[”"]/gu)]['map']((source) => source[0x1]);
+      if (list2['length']) return list2;
+      return /^(旁白|VO|OS|画外音)$/iu['test'](target) ? [args] : [];
     })
     ['join']('\x0a');
 }
-export function createStoryEpisodeScriptRuntimeGuidance(_0x4564ee = {}) {
-  const _0x1c1fee = normalizePositiveNumber(
-    _0x4564ee?.['estimatedDurationSeconds'] || _0x4564ee?.['durationSeconds'],
+export function createStoryEpisodeScriptRuntimeGuidance(options2 = {}) {
+  const outlineEstimateSeconds = normalizePositiveNumber(
+    options2?.['estimatedDurationSeconds'] || options2?.['durationSeconds'],
   );
   return {
     basis: 'episode-outline-and-current-story-content',
-    outlineEstimateSeconds: _0x1c1fee || null,
-    enforcement: _0x1c1fee ? 'adaptation-budget' : 'content-density',
+    outlineEstimateSeconds: outlineEstimateSeconds || null,
+    enforcement: outlineEstimateSeconds ? 'adaptation-budget' : 'content-density',
     rules: [
-      _0x1c1fee
+      outlineEstimateSeconds
         ? '大纲预计时长是当前分集的改编预算；优先保留核心事件、选择、冲突和结果，压缩说明性内容，不得把小说正文逐句影视化后突破预算。'
         : '没有预计时长时，仍须按有效剧情密度精炼改编，不得逐句搬运描述性正文。',
       '对白必须按角色语气自然说完，动作、反应、停顿和场面调度必须留出真实可拍时间。',
@@ -49,96 +47,96 @@ export function createStoryEpisodeScriptRuntimeGuidance(_0x4564ee = {}) {
     ],
   };
 }
-export function inspectStoryEpisodeScriptTiming(_0x525569 = {}, _0x214b76 = {}) {
-  const _0x13422f = normalizePositiveNumber(
-      _0x214b76?.['estimatedDurationSeconds'] || _0x214b76?.['durationSeconds'],
+export function inspectStoryEpisodeScriptTiming(options3 = {}, next = {}) {
+  const outlineEstimateSeconds2 = normalizePositiveNumber(
+      next?.['estimatedDurationSeconds'] || next?.['durationSeconds'],
     ),
-    _0x39e5ca = (Array['isArray'](_0x525569?.['scenes']) ? _0x525569['scenes'] : [])
-      ['map']((_0x170d9b) => extractSceneSpokenText(_0x170d9b?.['body']))
+    current = (Array['isArray'](options3?.['scenes']) ? options3['scenes'] : [])
+      ['map']((dom) => extractSceneSpokenText(dom?.['body']))
       ['filter'](Boolean)
       ['join']('\x0a'),
-    _0x53aafc = countSpokenUnits(_0x39e5ca),
-    _0xc9086f = _0x53aafc ? Number((_0x53aafc / MAX_NATURAL_SPOKEN_UNITS_PER_SECOND)['toFixed'](0x1)) : 0x0;
+    spokenUnits = countSpokenUnits(current),
+    minimumSpokenDurationSeconds = spokenUnits
+      ? Number((spokenUnits / MAX_NATURAL_SPOKEN_UNITS_PER_SECOND)['toFixed'](0x1))
+      : 0x0;
   return {
     status: 'observed',
-    outlineEstimateSeconds: _0x13422f,
-    spokenUnits: _0x53aafc,
-    minimumSpokenDurationSeconds: _0xc9086f,
-    reason: _0x53aafc
+    outlineEstimateSeconds: outlineEstimateSeconds2,
+    spokenUnits: spokenUnits,
+    minimumSpokenDurationSeconds: minimumSpokenDurationSeconds,
+    reason: spokenUnits
       ? '本集可配音文本按每秒 ' +
         MAX_NATURAL_SPOKEN_UNITS_PER_SECOND +
         ' 字/词的快速自然语速，至少需要 ' +
-        _0xc9086f +
+        minimumSpokenDurationSeconds +
         ' 秒；这只是对白下限，不包含动作、反应、停顿和场面调度。'
       : '本集没有可可靠提取的对白或旁白，完整时长由独立审查根据动作与表演内容估算。',
   };
 }
-export function resolveStoryEpisodeSplitTimingBudget(_0x2578b2 = {}) {
-  const _0x547366 = _0x2578b2?.['script']?.['timingReview'];
-  if (!_0x547366 || _0x547366['verdict'] === 'timing_uncertain') return null;
-  const _0x179556 = normalizePositiveNumber(_0x547366?.['reasonableRangeSeconds']?.['minimum']),
-    _0x485afd = normalizePositiveNumber(_0x547366?.['reasonableRangeSeconds']?.['maximum']);
-  if (!_0x179556 || !_0x485afd || _0x179556 > _0x485afd) return null;
-  const _0x13ec4f = normalizePositiveNumber(_0x547366?.['naturalDurationSeconds']),
-    _0x5e46ae =
-      _0x13ec4f && _0x13ec4f >= _0x179556 && _0x13ec4f <= _0x485afd
-        ? _0x13ec4f
-        : Number(((_0x179556 + _0x485afd) / 0x2)['toFixed'](0x1)),
-    _0x2b0586 = Number((_0x179556 * 0.8)['toFixed'](0x1)),
-    _0x5053c9 = Number((_0x485afd * 1.2)['toFixed'](0x1)),
-    _0x3892f2 = (Array['isArray'](_0x547366?.['sceneTimings']) ? _0x547366['sceneTimings'] : [])
-      ['map']((_0x102df3) => ({
-        sceneRef: normalizeText(_0x102df3?.['sceneRef']),
-        spokenSeconds: normalizeNonNegativeTimingNumber(_0x102df3?.['spokenSeconds']),
-        nonOverlappingActionSeconds: normalizeNonNegativeTimingNumber(
-          _0x102df3?.['nonOverlappingActionSeconds'],
-        ),
-        pauseAndTransitionSeconds: normalizeNonNegativeTimingNumber(_0x102df3?.['pauseAndTransitionSeconds']),
-        concurrentActionNotes: normalizeText(_0x102df3?.['concurrentActionNotes']),
-        totalSeconds: normalizePositiveNumber(_0x102df3?.['totalSeconds']),
-        basis: normalizeText(_0x102df3?.['basis']),
+export function resolveStoryEpisodeSplitTimingBudget(options4 = {}) {
+  const enabled = options4?.['script']?.['timingReview'];
+  if (!enabled || enabled['verdict'] === 'timing_uncertain') return null;
+  const minimum = normalizePositiveNumber(enabled?.['reasonableRangeSeconds']?.['minimum']),
+    maximum = normalizePositiveNumber(enabled?.['reasonableRangeSeconds']?.['maximum']);
+  if (!minimum || !maximum || minimum > maximum) return null;
+  const positiveNumber = normalizePositiveNumber(enabled?.['naturalDurationSeconds']),
+    targetDurationSeconds =
+      positiveNumber && positiveNumber >= minimum && positiveNumber <= maximum
+        ? positiveNumber
+        : Number(((minimum + maximum) / 0x2)['toFixed'](0x1)),
+    minimum2 = Number((minimum * 0.8)['toFixed'](0x1)),
+    maximum2 = Number((maximum * 1.2)['toFixed'](0x1)),
+    sceneTimings = (Array['isArray'](enabled?.['sceneTimings']) ? enabled['sceneTimings'] : [])
+      ['map']((entry) => ({
+        sceneRef: normalizeText(entry?.['sceneRef']),
+        spokenSeconds: normalizeNonNegativeTimingNumber(entry?.['spokenSeconds']),
+        nonOverlappingActionSeconds: normalizeNonNegativeTimingNumber(entry?.['nonOverlappingActionSeconds']),
+        pauseAndTransitionSeconds: normalizeNonNegativeTimingNumber(entry?.['pauseAndTransitionSeconds']),
+        concurrentActionNotes: normalizeText(entry?.['concurrentActionNotes']),
+        totalSeconds: normalizePositiveNumber(entry?.['totalSeconds']),
+        basis: normalizeText(entry?.['basis']),
       }))
-      ['filter']((_0x598e6c) => _0x598e6c['sceneRef'] && _0x598e6c['totalSeconds']);
+      ['filter']((record) => record['sceneRef'] && record['totalSeconds']);
   return {
     basis: 'independent-script-timing-review',
-    targetDurationSeconds: _0x5e46ae,
-    reasonableRangeSeconds: { minimum: _0x179556, maximum: _0x485afd },
-    allowedProductionRangeSeconds: { minimum: _0x2b0586, maximum: _0x5053c9 },
-    sceneTimings: _0x3892f2,
+    targetDurationSeconds: targetDurationSeconds,
+    reasonableRangeSeconds: { minimum: minimum, maximum: maximum },
+    allowedProductionRangeSeconds: { minimum: minimum2, maximum: maximum2 },
+    sceneTimings: sceneTimings,
   };
 }
-export function assertStoryEpisodeSplitTiming(_0x420b27 = {}, _0x2ca70e = {}) {
-  const _0x23686a = resolveStoryEpisodeSplitTimingBudget(_0x2ca70e);
-  if (!_0x23686a) return _0x420b27;
-  const { minimum: _0x30efe3, maximum: _0xdbdc9c } = _0x23686a['reasonableRangeSeconds'],
-    _0x3bee6a =
-      normalizePositiveNumber(_0x420b27?.['totalDurationSeconds']) ||
-      (Array['isArray'](_0x420b27?.['clips']) ? _0x420b27['clips'] : [])['reduce'](
-        (_0x607786, _0x468a7c) => _0x607786 + (normalizePositiveNumber(_0x468a7c?.['durationSec']) || 0x0),
+export function assertStoryEpisodeSplitTiming(options5 = {}, payload = {}) {
+  const storyEpisodeSplitTimingBudget = resolveStoryEpisodeSplitTimingBudget(payload);
+  if (!storyEpisodeSplitTimingBudget) return options5;
+  const { minimum: minimum3, maximum: maximum3 } = storyEpisodeSplitTimingBudget['reasonableRangeSeconds'],
+    totalDurationSeconds =
+      normalizePositiveNumber(options5?.['totalDurationSeconds']) ||
+      (Array['isArray'](options5?.['clips']) ? options5['clips'] : [])['reduce'](
+        (handle, state) => handle + (normalizePositiveNumber(state?.['durationSec']) || 0x0),
         0x0,
       ),
-    { minimum: _0x5e18e1, maximum: _0x1b0b4a } = _0x23686a['allowedProductionRangeSeconds'];
-  if (_0x3bee6a >= _0x5e18e1 && _0x3bee6a <= _0x1b0b4a) return _0x420b27;
-  const _0x548d0f = new Error(
+    { minimum: minimum4, maximum: maximum4 } = storyEpisodeSplitTimingBudget['allowedProductionRangeSeconds'];
+  if (totalDurationSeconds >= minimum4 && totalDurationSeconds <= maximum4) return options5;
+  const error = new Error(
     '分镜总时长 ' +
-      _0x3bee6a +
+      totalDurationSeconds +
       ' 秒偏离本集正文独立审时区间 ' +
-      _0x30efe3 +
+      minimum3 +
       '-' +
-      _0xdbdc9c +
+      maximum3 +
       ' 秒（允许制作浮动 ' +
-      _0x5e18e1 +
+      minimum4 +
       '-' +
-      _0x1b0b4a +
+      maximum4 +
       ' 秒），本次结果未通过。',
   );
-  ((_0x548d0f['code'] = 'STORY_EPISODE_SPLIT_TIMING_MISMATCH'),
-    (_0x548d0f['timing'] = {
-      totalDurationSeconds: _0x3bee6a,
-      reasonableRangeSeconds: { minimum: _0x30efe3, maximum: _0xdbdc9c },
-      allowedRangeSeconds: { minimum: _0x5e18e1, maximum: _0x1b0b4a },
+  ((error['code'] = 'STORY_EPISODE_SPLIT_TIMING_MISMATCH'),
+    (error['timing'] = {
+      totalDurationSeconds: totalDurationSeconds,
+      reasonableRangeSeconds: { minimum: minimum3, maximum: maximum3 },
+      allowedRangeSeconds: { minimum: minimum4, maximum: maximum4 },
     }));
-  throw _0x548d0f;
+  throw error;
 }
 function buildStoryEpisodeScriptTimingReviewPrompt({
   episode: episode = {},
@@ -177,80 +175,79 @@ function buildStoryEpisodeScriptTimingReviewPrompt({
       "verdict('pass'|'needs_revision'),naturalDurationSeconds,reasonableRangeSeconds{minimum,maximum},sceneTimings[{sceneRef,spokenSeconds,nonOverlappingActionSeconds,pauseAndTransitionSeconds,concurrentActionNotes,totalSeconds,basis}],reason,findings string[]",
   });
 }
-function normalizeTimingReviewFinding(_0x3f67ea) {
-  if (_0x3f67ea === null || _0x3f67ea === undefined) return '';
-  if (typeof _0x3f67ea !== 'object' || Array['isArray'](_0x3f67ea)) return normalizeText(_0x3f67ea);
-  const _0x53bb22 = normalizeText(
-      _0x3f67ea['sceneRef'] || _0x3f67ea['scene'] || _0x3f67ea['location'] || _0x3f67ea['ref'],
-    ),
-    _0x56f0d8 = normalizeText(
-      _0x3f67ea['issue'] || _0x3f67ea['problem'] || _0x3f67ea['description'] || _0x3f67ea['reason'],
-    ),
-    _0x17378c = normalizeText(_0x3f67ea['evidence'] || _0x3f67ea['example'] || _0x3f67ea['quote']),
-    _0x28bb64 = normalizeText(_0x3f67ea['suggestion'] || _0x3f67ea['recommendation'] || _0x3f67ea['action']),
-    _0x4ec292 = [
-      _0x53bb22 ? '[' + _0x53bb22 + ']' : '',
-      _0x56f0d8,
-      _0x17378c ? '证据：' + _0x17378c : '',
-      _0x28bb64 ? '建议：' + _0x28bb64 : '',
+function normalizeTimingReviewFinding(config) {
+  if (config === null || config === undefined) return '';
+  if (typeof config !== 'object' || Array['isArray'](config)) return normalizeText(config);
+  const text2 = normalizeText(config['sceneRef'] || config['scene'] || config['location'] || config['ref']),
+    text3 = normalizeText(config['issue'] || config['problem'] || config['description'] || config['reason']),
+    text4 = normalizeText(config['evidence'] || config['example'] || config['quote']),
+    text5 = normalizeText(config['suggestion'] || config['recommendation'] || config['action']),
+    list3 = [
+      text2 ? '[' + text2 + ']' : '',
+      text3,
+      text4 ? '证据：' + text4 : '',
+      text5 ? '建议：' + text5 : '',
     ]['filter'](Boolean);
-  if (_0x4ec292['length']) return _0x4ec292['join']('\x20');
+  if (list3['length']) return list3['join']('\x20');
   try {
-    return normalizeText(JSON['stringify'](_0x3f67ea));
+    return normalizeText(JSON['stringify'](config));
   } catch {
     return '';
   }
 }
-function normalizeNonNegativeTimingNumber(_0x3a00a6) {
-  const _0x8eeeac = Number(_0x3a00a6);
-  if (!Number['isFinite'](_0x8eeeac) || _0x8eeeac < 0x0) return null;
-  return Number(_0x8eeeac['toFixed'](0x1));
+function normalizeNonNegativeTimingNumber(scope) {
+  const count3 = Number(scope);
+  if (!Number['isFinite'](count3) || count3 < 0x0) return null;
+  return Number(count3['toFixed'](0x1));
 }
-function normalizeStoryEpisodeSceneTimings(_0xadf1be = {}, _0x3bb849 = {}, _0x2a782c = 0x0) {
-  const _0xc59df7 = Array['isArray'](_0x3bb849?.['scenes']) ? _0x3bb849['scenes'] : [];
-  if (!_0xc59df7['length']) return [];
-  if (
-    !Array['isArray'](_0xadf1be?.['sceneTimings']) ||
-    _0xadf1be['sceneTimings']['length'] !== _0xc59df7['length']
-  )
+function normalizeStoryEpisodeSceneTimings(options6 = {}, input = {}, output = 0x0) {
+  const list4 = Array['isArray'](input?.['scenes']) ? input['scenes'] : [];
+  if (!list4['length']) return [];
+  if (!Array['isArray'](options6?.['sceneTimings']) || options6['sceneTimings']['length'] !== list4['length'])
     throw new Error('时长审查 Agent 未返回覆盖全部场次的逐场时长账本。');
-  const _0x1cf0bc = _0xc59df7['map']((_0x155f31, _0x7afd1d) => {
-      const _0x40e746 = normalizeText(
-          _0x155f31?.['ref'] || _0x155f31?.['sceneRef'] || 'scene-' + (_0x7afd1d + 0x1),
+  const list5 = list4['map']((value2, value3) => {
+      const text6 = normalizeText(value2?.['ref'] || value2?.['sceneRef'] || 'scene-' + (value3 + 0x1)),
+        value4 = options6['sceneTimings'][value3] || {},
+        sceneRef = normalizeText(value4?.['sceneRef']);
+      if (sceneRef !== text6)
+        throw new Error('时长审查\x20Agent\x20的逐场账本顺序或场次引用无效：应为\x20' + text6 + '。');
+      const spokenSeconds = normalizeNonNegativeTimingNumber(value4?.['spokenSeconds']),
+        nonOverlappingActionSeconds = normalizeNonNegativeTimingNumber(
+          value4?.['nonOverlappingActionSeconds'],
         ),
-        _0x946fe6 = _0xadf1be['sceneTimings'][_0x7afd1d] || {},
-        _0x3e9948 = normalizeText(_0x946fe6?.['sceneRef']);
-      if (_0x3e9948 !== _0x40e746)
-        throw new Error('时长审查\x20Agent\x20的逐场账本顺序或场次引用无效：应为\x20' + _0x40e746 + '。');
-      const _0x52accc = normalizeNonNegativeTimingNumber(_0x946fe6?.['spokenSeconds']),
-        _0xf33bfb = normalizeNonNegativeTimingNumber(_0x946fe6?.['nonOverlappingActionSeconds']),
-        _0x5c2363 = normalizeNonNegativeTimingNumber(_0x946fe6?.['pauseAndTransitionSeconds']),
-        _0x2ed281 = normalizePositiveNumber(_0x946fe6?.['totalSeconds']),
-        _0x3beb7a = normalizeText(_0x946fe6?.['basis']);
-      if (_0x52accc === null || _0xf33bfb === null || _0x5c2363 === null || !_0x2ed281 || !_0x3beb7a)
-        throw new Error('时长审查 Agent 的 ' + _0x40e746 + ' 逐场账本不完整。');
-      const _0x103dd6 = _0x52accc + _0xf33bfb + _0x5c2363,
-        _0x176031 = Math['max'](0x2, _0x2ed281 * 0.05);
-      if (Math['abs'](_0x103dd6 - _0x2ed281) > _0x176031)
-        throw new Error('时长审查 Agent 的 ' + _0x40e746 + '\x20分项时间无法合计到本场总时长。');
+        pauseAndTransitionSeconds = normalizeNonNegativeTimingNumber(value4?.['pauseAndTransitionSeconds']),
+        totalSeconds = normalizePositiveNumber(value4?.['totalSeconds']),
+        basis = normalizeText(value4?.['basis']);
+      if (
+        spokenSeconds === null ||
+        nonOverlappingActionSeconds === null ||
+        pauseAndTransitionSeconds === null ||
+        !totalSeconds ||
+        !basis
+      )
+        throw new Error('时长审查 Agent 的 ' + text6 + ' 逐场账本不完整。');
+      const value5 = spokenSeconds + nonOverlappingActionSeconds + pauseAndTransitionSeconds,
+        value6 = Math['max'](0x2, totalSeconds * 0.05);
+      if (Math['abs'](value5 - totalSeconds) > value6)
+        throw new Error('时长审查 Agent 的 ' + text6 + '\x20分项时间无法合计到本场总时长。');
       return {
-        sceneRef: _0x3e9948,
-        spokenSeconds: _0x52accc,
-        nonOverlappingActionSeconds: _0xf33bfb,
-        pauseAndTransitionSeconds: _0x5c2363,
-        concurrentActionNotes: normalizeText(_0x946fe6?.['concurrentActionNotes']),
-        totalSeconds: _0x2ed281,
-        basis: _0x3beb7a,
+        sceneRef: sceneRef,
+        spokenSeconds: spokenSeconds,
+        nonOverlappingActionSeconds: nonOverlappingActionSeconds,
+        pauseAndTransitionSeconds: pauseAndTransitionSeconds,
+        concurrentActionNotes: normalizeText(value4?.['concurrentActionNotes']),
+        totalSeconds: totalSeconds,
+        basis: basis,
       };
     }),
-    _0x1a2f4d = _0x1cf0bc['reduce']((_0x382f48, _0x43108b) => _0x382f48 + _0x43108b['totalSeconds'], 0x0),
-    _0x24705c = Math['max'](0x5, _0x2a782c * 0.05);
-  if (Math['abs'](_0x1a2f4d - _0x2a782c) > _0x24705c)
+    value7 = list5['reduce']((value8, value9) => value8 + value9['totalSeconds'], 0x0),
+    value10 = Math['max'](0x5, output * 0.05);
+  if (Math['abs'](value7 - output) > value10)
     throw new Error('时长审查 Agent 的逐场总计与整集自然时长不一致。');
-  return _0x1cf0bc;
+  return list5;
 }
 export async function requestStoryEpisodeScriptTimingReview({
-  request: _0x594f4b,
+  request: request,
   requestPayload: requestPayload = {},
   episode: episode = {},
   script: script = {},
@@ -259,8 +256,8 @@ export async function requestStoryEpisodeScriptTimingReview({
   phase: phase = 'timing-review',
   priorReview: priorReview = null,
 } = {}) {
-  const _0x1fd99a = await invokeStoryGenerationRequest({
-      request: _0x594f4b,
+  const invokeStoryGenerationRequest2 = await invokeStoryGenerationRequest({
+      request: request,
       requestPayload: {
         ...requestPayload,
         prompt: buildStoryEpisodeScriptTimingReviewPrompt({
@@ -279,152 +276,156 @@ export async function requestStoryEpisodeScriptTimingReview({
       onInvocation: onInvocation,
       serializeResponse: getResultText,
     }),
-    _0x29def7 = parseStrictJson(getResultText(_0x1fd99a), '时长审查 Agent 未返回有效 JSON。'),
-    _0x3ba8f4 = ['pass', 'needs_revision']['includes'](_0x29def7?.['verdict'])
-      ? _0x29def7['verdict']
+    strictJson = parseStrictJson(
+      getResultText(invokeStoryGenerationRequest2),
+      '时长审查 Agent 未返回有效 JSON。',
+    ),
+    verdict = ['pass', 'needs_revision']['includes'](strictJson?.['verdict'])
+      ? strictJson['verdict']
       : 'needs_revision',
-    _0x268692 = normalizePositiveNumber(_0x29def7?.['naturalDurationSeconds']);
-  if (!_0x268692) throw new Error('时长审查 Agent 未返回有效自然时长。');
-  const _0x4a109e = normalizePositiveNumber(_0x29def7?.['reasonableRangeSeconds']?.['minimum']),
-    _0x29d7cd = normalizePositiveNumber(_0x29def7?.['reasonableRangeSeconds']?.['maximum']);
-  if (!_0x4a109e || !_0x29d7cd || _0x4a109e > _0x268692 || _0x29d7cd < _0x268692)
+    naturalDurationSeconds = normalizePositiveNumber(strictJson?.['naturalDurationSeconds']);
+  if (!naturalDurationSeconds) throw new Error('时长审查 Agent 未返回有效自然时长。');
+  const minimum5 = normalizePositiveNumber(strictJson?.['reasonableRangeSeconds']?.['minimum']),
+    maximum5 = normalizePositiveNumber(strictJson?.['reasonableRangeSeconds']?.['maximum']);
+  if (!minimum5 || !maximum5 || minimum5 > naturalDurationSeconds || maximum5 < naturalDurationSeconds)
     throw new Error('时长审查 Agent 返回的自然时长区间无效。');
-  let _0x64beab = normalizeText(_0x29def7?.['reason']),
-    _0x361ac6 = Array['isArray'](_0x29def7?.['findings'])
-      ? _0x29def7['findings']['map'](normalizeTimingReviewFinding)['filter'](Boolean)['slice'](0x0, 0xc)
+  let reason = normalizeText(strictJson?.['reason']),
+    findings = Array['isArray'](strictJson?.['findings'])
+      ? strictJson['findings']['map'](normalizeTimingReviewFinding)['filter'](Boolean)['slice'](0x0, 0xc)
       : [];
-  if (_0x3ba8f4 !== 'pass' && (!_0x64beab || !_0x361ac6['length']))
+  if (verdict !== 'pass' && (!reason || !findings['length']))
     throw new Error('时长审查 Agent 的问题结论缺少可定位证据。');
-  const _0x3602dc = normalizeStoryEpisodeSceneTimings(_0x29def7, script, _0x268692);
+  const sceneTimings2 = normalizeStoryEpisodeSceneTimings(strictJson, script, naturalDurationSeconds);
   return {
-    verdict: _0x3ba8f4,
-    naturalDurationSeconds: _0x268692,
-    reasonableRangeSeconds: { minimum: _0x4a109e, maximum: _0x29d7cd },
-    sceneTimings: _0x3602dc,
-    reason: _0x64beab,
-    findings: _0x361ac6,
+    verdict: verdict,
+    naturalDurationSeconds: naturalDurationSeconds,
+    reasonableRangeSeconds: { minimum: minimum5, maximum: maximum5 },
+    sceneTimings: sceneTimings2,
+    reason: reason,
+    findings: findings,
   };
 }
-function isOutlineEstimateOutsideReview(_0x7671cd, _0x478272 = {}) {
-  if (!_0x7671cd) return ![];
-  const _0x3615bc = normalizePositiveNumber(_0x478272?.['reasonableRangeSeconds']?.['minimum']),
-    _0x2e304c = normalizePositiveNumber(_0x478272?.['reasonableRangeSeconds']?.['maximum']);
-  return !!_0x3615bc && !!_0x2e304c && (_0x7671cd < _0x3615bc || _0x7671cd > _0x2e304c);
+function isOutlineEstimateOutsideReview(enabled2, value11 = {}) {
+  if (!enabled2) return ![];
+  const positiveNumber2 = normalizePositiveNumber(value11?.['reasonableRangeSeconds']?.['minimum']),
+    positiveNumber3 = normalizePositiveNumber(value11?.['reasonableRangeSeconds']?.['maximum']);
+  return !!positiveNumber2 && !!positiveNumber3 && (enabled2 < positiveNumber2 || enabled2 > positiveNumber3);
 }
-function mergeTimingReviewFindings(..._0x530742) {
-  return [...new Set(_0x530742['flat']()['map'](normalizeTimingReviewFinding)['filter'](Boolean))]['slice'](
+function mergeTimingReviewFindings(...args2) {
+  return [...new Set(args2['flat']()['map'](normalizeTimingReviewFinding)['filter'](Boolean))]['slice'](
     0x0,
     0xc,
   );
 }
-export function preserveStoryEpisodeScriptWithoutTimingReview(_0x221204, _0x5746f6, _0x581ab5 = null) {
-  const _0x191265 = inspectStoryEpisodeScriptTiming(_0x221204, _0x5746f6),
-    _0x16440c = normalizeText(_0x581ab5?.['message'] || _0x581ab5);
+export function preserveStoryEpisodeScriptWithoutTimingReview(args3, value12, error2 = null) {
+  const outlineEstimateSeconds3 = inspectStoryEpisodeScriptTiming(args3, value12),
+    reason2 = normalizeText(error2?.['message'] || error2);
   return {
-    ..._0x221204,
+    ...args3,
     timingReview: {
       verdict: 'timing_uncertain',
       naturalDurationSeconds: null,
       reasonableRangeSeconds: null,
       sceneTimings: [],
-      reason: _0x16440c
-        ? '时长审查未完成，已保留正文，不再阻塞本集。原因：' + _0x16440c
+      reason: reason2
+        ? '时长审查未完成，已保留正文，不再阻塞本集。原因：' + reason2
         : '时长审查未完成，已保留正文，不再阻塞本集。',
       findings: [],
       reviewPasses: 0x0,
       reviewAgreement: 'review-unavailable',
-      outlineEstimateSeconds: _0x191265['outlineEstimateSeconds'] || null,
+      outlineEstimateSeconds: outlineEstimateSeconds3['outlineEstimateSeconds'] || null,
       outlineEstimateMismatch: ![],
-      spokenUnits: _0x191265['spokenUnits'],
-      minimumSpokenDurationSeconds: _0x191265['minimumSpokenDurationSeconds'],
+      spokenUnits: outlineEstimateSeconds3['spokenUnits'],
+      minimumSpokenDurationSeconds: outlineEstimateSeconds3['minimumSpokenDurationSeconds'],
     },
   };
 }
 export async function ensureStoryEpisodeScriptTiming({
-  scriptResult: _0x4151d3,
-  episode: _0x2bfbdf,
-  review: _0xbb8872,
+  scriptResult: scriptResult,
+  episode: episode2,
+  review: review,
 } = {}) {
   try {
-    const _0x3b1e0c = inspectStoryEpisodeScriptTiming(_0x4151d3, _0x2bfbdf),
-      _0x359e08 = await _0xbb8872(_0x4151d3, 'timing-review', null),
-      _0x4a8273 =
-        _0x3b1e0c['minimumSpokenDurationSeconds'] > 0x0 &&
-        _0x359e08['reasonableRangeSeconds']['maximum'] < _0x3b1e0c['minimumSpokenDurationSeconds'],
-      _0xe49648 = _0x359e08['verdict'] !== 'pass' || _0x4a8273;
-    let _0x271636 = _0x359e08,
-      _0x241cbc = 'single-pass';
-    if (_0xe49648) {
-      const _0x79a8d0 = await _0xbb8872(_0x4151d3, 'timing-recheck', _0x359e08),
-        _0x45d879 = _0x359e08['reasonableRangeSeconds'],
-        _0x3758c5 = _0x79a8d0['reasonableRangeSeconds'],
-        _0x10bffd =
-          Math['max'](_0x45d879['minimum'], _0x3758c5['minimum']) <=
-          Math['min'](_0x45d879['maximum'], _0x3758c5['maximum']),
-        _0x569f31 =
-          _0x3b1e0c['minimumSpokenDurationSeconds'] > 0x0 &&
-          _0x3758c5['maximum'] < _0x3b1e0c['minimumSpokenDurationSeconds'];
-      if (_0x10bffd && !_0x569f31) {
-        const _0x5bbf3e = _0x359e08['verdict'] === _0x79a8d0['verdict'],
-          _0x25109c = _0x359e08['verdict'] === 'needs_revision' || _0x79a8d0['verdict'] === 'needs_revision';
-        ((_0x271636 = _0x25109c
+    const outlineEstimateSeconds4 = inspectStoryEpisodeScriptTiming(scriptResult, episode2),
+      previousReview = await review(scriptResult, 'timing-review', null),
+      value13 =
+        outlineEstimateSeconds4['minimumSpokenDurationSeconds'] > 0x0 &&
+        previousReview['reasonableRangeSeconds']['maximum'] <
+          outlineEstimateSeconds4['minimumSpokenDurationSeconds'],
+      reviewPasses = previousReview['verdict'] !== 'pass' || value13;
+    let args4 = previousReview,
+      reviewAgreement = 'single-pass';
+    if (reviewPasses) {
+      const args5 = await review(scriptResult, 'timing-recheck', previousReview),
+        value14 = previousReview['reasonableRangeSeconds'],
+        value15 = args5['reasonableRangeSeconds'],
+        value16 =
+          Math['max'](value14['minimum'], value15['minimum']) <=
+          Math['min'](value14['maximum'], value15['maximum']),
+        enabled3 =
+          outlineEstimateSeconds4['minimumSpokenDurationSeconds'] > 0x0 &&
+          value15['maximum'] < outlineEstimateSeconds4['minimumSpokenDurationSeconds'];
+      if (value16 && !enabled3) {
+        const reason3 = previousReview['verdict'] === args5['verdict'],
+          value17 = previousReview['verdict'] === 'needs_revision' || args5['verdict'] === 'needs_revision';
+        ((args4 = value17
           ? {
-              ..._0x79a8d0,
+              ...args5,
               verdict: 'needs_revision',
-              reason: _0x5bbf3e
-                ? _0x79a8d0['reason']
+              reason: reason3
+                ? args5['reason']
                 : '两次审查对正文质量结论不一致；保留已定位的具体问题，正文不会自动改写。第二次审查：' +
-                  _0x79a8d0['reason'],
-              findings: mergeTimingReviewFindings(_0x359e08['findings'], _0x79a8d0['findings']),
+                  args5['reason'],
+              findings: mergeTimingReviewFindings(previousReview['findings'], args5['findings']),
             }
-          : _0x79a8d0),
-          (_0x241cbc = _0x5bbf3e ? 'overlapping-ranges' : 'quality-disagreement'));
+          : args5),
+          (reviewAgreement = reason3 ? 'overlapping-ranges' : 'quality-disagreement'));
       } else
-        _0x10bffd
-          ? ((_0x271636 = {
-              ..._0x79a8d0,
+        value16
+          ? ((args4 = {
+              ...args5,
               verdict: 'timing_uncertain',
               reason:
                 '两次模型审时均低于对白本身至少需要的 ' +
-                _0x3b1e0c['minimumSpokenDurationSeconds'] +
+                outlineEstimateSeconds4['minimumSpokenDurationSeconds'] +
                 ' 秒。当前只标记时长不确定，不改写正文，也不据此限制后续分镜。',
-              findings: [..._0x79a8d0['findings'], _0x3b1e0c['reason']]['slice'](0x0, 0xc),
+              findings: [...args5['findings'], outlineEstimateSeconds4['reason']]['slice'](0x0, 0xc),
             }),
-            (_0x241cbc = 'below-spoken-floor'))
-          : ((_0x271636 = {
-              ..._0x79a8d0,
+            (reviewAgreement = 'below-spoken-floor'))
+          : ((args4 = {
+              ...args5,
               verdict: 'timing_uncertain',
               reason:
                 '两次独立审时区间不重叠：第一次 ' +
-                _0x45d879['minimum'] +
+                value14['minimum'] +
                 '-' +
-                _0x45d879['maximum'] +
+                value14['maximum'] +
                 ' 秒，第二次 ' +
-                _0x3758c5['minimum'] +
+                value15['minimum'] +
                 '-' +
-                _0x3758c5['maximum'] +
+                value15['maximum'] +
                 ' 秒。当前只标记时长不确定，不改写正文，也不据此限制后续分镜。',
-              findings: [..._0x79a8d0['findings'], '第一次审时：' + _0x359e08['reason']]['slice'](0x0, 0xc),
+              findings: [...args5['findings'], '第一次审时：' + previousReview['reason']]['slice'](0x0, 0xc),
             }),
-            (_0x241cbc = 'conflicting-ranges'));
+            (reviewAgreement = 'conflicting-ranges'));
     }
-    const _0x4198c5 =
-      _0x271636['verdict'] === 'pass' &&
-      isOutlineEstimateOutsideReview(_0x3b1e0c['outlineEstimateSeconds'], _0x271636);
+    const outlineEstimateMismatch =
+      args4['verdict'] === 'pass' &&
+      isOutlineEstimateOutsideReview(outlineEstimateSeconds4['outlineEstimateSeconds'], args4);
     return {
-      ..._0x4151d3,
+      ...scriptResult,
       timingReview: {
-        ..._0x271636,
-        reviewPasses: _0xe49648 ? 0x2 : 0x1,
-        reviewAgreement: _0x241cbc,
-        ...(_0xe49648 ? { previousReview: _0x359e08 } : {}),
-        outlineEstimateSeconds: _0x3b1e0c['outlineEstimateSeconds'] || null,
-        outlineEstimateMismatch: _0x4198c5,
-        spokenUnits: _0x3b1e0c['spokenUnits'],
-        minimumSpokenDurationSeconds: _0x3b1e0c['minimumSpokenDurationSeconds'],
+        ...args4,
+        reviewPasses: reviewPasses ? 0x2 : 0x1,
+        reviewAgreement: reviewAgreement,
+        ...(reviewPasses ? { previousReview: previousReview } : {}),
+        outlineEstimateSeconds: outlineEstimateSeconds4['outlineEstimateSeconds'] || null,
+        outlineEstimateMismatch: outlineEstimateMismatch,
+        spokenUnits: outlineEstimateSeconds4['spokenUnits'],
+        minimumSpokenDurationSeconds: outlineEstimateSeconds4['minimumSpokenDurationSeconds'],
       },
     };
-  } catch (_0x6d1a79) {
-    return preserveStoryEpisodeScriptWithoutTimingReview(_0x4151d3, _0x2bfbdf, _0x6d1a79);
+  } catch (value18) {
+    return preserveStoryEpisodeScriptWithoutTimingReview(scriptResult, episode2, value18);
   }
 }

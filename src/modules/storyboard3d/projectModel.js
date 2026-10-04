@@ -1,1 +1,687 @@
-import{createStoryboard3DShotAnimation,normalizeStoryboard3DShotAnimation,upsertStoryboard3DCameraKeyframe}from'./shotAnimation.js';import{DIRECTOR_CHARACTER_COLORS,normalizeDirectorPoseLibrary}from'./directorCharacterAuthoring.js';import{normalizeDirectorSceneSettings}from'./directorSceneSettings.js';import{normalizeDirectorRecycleBin}from'./directorRecovery.js';import{normalizeDirectorGeneratedLayers,normalizeDirectorGenerationJobs}from'./directorGeneratedLayers.js';export const STORYBOARD_3D_PROJECT_VERSION=0x2;export const STORYBOARD_3D_SHOT_SIZES=Object['freeze'](["EST",'ELS','LS',"MLS","MED","MCU",'CU','ECU']);export const STORYBOARD_3D_SHOT_ANGLES=Object['freeze'](['eye',"high",'low','top',"overShoulder",'profile',"rear"]);const SCENE_ENVIRONMENT_TYPES=new Set(['empty',"outdoor","indoor","studio"]),SCENE_OBJECT_TYPES=new Set(["prop","character",'light',"camera","group"]),LIGHT_TYPES=new Set(["ambient","directional","point",'spot']),SHOT_SIZE_SET=new Set(STORYBOARD_3D_SHOT_SIZES),SHOT_ANGLE_SET=new Set(STORYBOARD_3D_SHOT_ANGLES);function toFiniteNumber(_0x41ff3e,_0x193db4){const _0x178f52=Number(_0x41ff3e);return Number['isFinite'](_0x178f52)?_0x178f52:_0x193db4;}function toPositiveNumber(_0x370bd3,_0x156e1f,_0x3e5ab9=0.0001){return Math["max"](_0x3e5ab9,toFiniteNumber(_0x370bd3,_0x156e1f));}function normalizeString(_0xa4afe7,_0x3feb1d=''){const _0xfa7c9=String(_0xa4afe7??'')["trim"]();return _0xfa7c9||_0x3feb1d;}function normalizeOptionalString(_0x34e6e7){const _0x5b5d0a=String(_0x34e6e7??'')["trim"]();return _0x5b5d0a||undefined;}function normalizeVector3(_0xf763a4,_0xc64388){const _0x586532=Array["isArray"](_0xf763a4)?_0xf763a4:[];return[toFiniteNumber(_0x586532[0x0],_0xc64388[0x0]),toFiniteNumber(_0x586532[0x1],_0xc64388[0x1]),toFiniteNumber(_0x586532[0x2],_0xc64388[0x2])];}function normalizeVector2(_0xc98b,_0x476a6c){const _0x28362d=Array["isArray"](_0xc98b)?_0xc98b:[];return[toFiniteNumber(_0x28362d[0x0],_0x476a6c[0x0]),toFiniteNumber(_0x28362d[0x1],_0x476a6c[0x1])];}function normalizeVector2List(_0x4881ba){return(Array["isArray"](_0x4881ba)?_0x4881ba:[])["slice"](0x0,0x18)["filter"](_0x482c8e=>Array['isArray'](_0x482c8e))['map'](_0xa8b493=>normalizeVector2(_0xa8b493,[0x0,0x0]));}function createDefaultId(_0x59e092="item"){const _0x3a11f2=globalThis["crypto"]?.["randomUUID"]?.();if(_0x3a11f2)return _0x59e092+'_'+_0x3a11f2;return _0x59e092+'_'+Date["now"]()+'_'+Math["random"]()["toString"](0x24)["slice"](0x2,0xa);}function resolveIdFactory(_0x14e3da){return typeof _0x14e3da==="function"?_0x14e3da:createDefaultId;}function normalizeTimestamp(_0x3082c4,_0x26c32b){return Math["max"](0x0,toFiniteNumber(_0x3082c4,_0x26c32b));}export function cloneStoryboard3DProject(_0x17b205){if(typeof structuredClone==="function")return structuredClone(_0x17b205);return JSON["parse"](JSON["stringify"](_0x17b205));}export function createDefaultStoryboard3DTransform(){return{'position':[0x0,0x0,0x0],'rotation':[0x0,0x0,0x0],'scale':[0x1,0x1,0x1]};}export function createDefaultStoryboard3DCameraState(){return{'position':[0x5,0x4,0x7],'target':[0x0,1.2,0x0],'focalLength':0x23,'near':0.1,'far':0x3e8,'aspectRatio':"16:9"};}function cameraRotationFromState(_0x338e74){const _0x7962b6=normalizeVector3(_0x338e74?.["position"],[0x5,0x4,0x7]),_0x1f073b=normalizeVector3(_0x338e74?.["target"],[0x0,1.2,0x0]),_0x5664a3=_0x1f073b["map"]((_0x22e7d2,_0x454d2a)=>_0x22e7d2-_0x7962b6[_0x454d2a]),_0x38cc29=Math["max"](0.0001,Math["hypot"](..._0x5664a3));return[Math['asin'](Math['max'](-0x1,Math["min"](0x1,_0x5664a3[0x1]/_0x38cc29))),Math["atan2"](-_0x5664a3[0x0],-_0x5664a3[0x2]),toFiniteNumber(_0x338e74?.["roll"],0x0)];}function cameraTargetFromRotation(_0x102c6f,_0x36c3b7,_0x456a02){const _0x2d64f3=normalizeVector3(_0x102c6f,[0x5,0x4,0x7]),_0x1a8e9b=normalizeVector3(_0x36c3b7,[0x0,0x0,0x0]),_0x4dee5f=Math["max"](0.25,toFiniteNumber(_0x456a02,0x5)),_0xee94bb=Math['cos'](_0x1a8e9b[0x0]);return[_0x2d64f3[0x0]-Math["sin"](_0x1a8e9b[0x1])*_0xee94bb*_0x4dee5f,_0x2d64f3[0x1]+Math["sin"](_0x1a8e9b[0x0])*_0x4dee5f,_0x2d64f3[0x2]-Math['cos'](_0x1a8e9b[0x1])*_0xee94bb*_0x4dee5f];}function boundCameraName(_0x40695c){return normalizeString(_0x40695c?.["name"],"Shot")+" 摄像机";}export function createStoryboard3DCameraObject({id:_0x31ec74,name:_0x1ff691,camera:_0x15ad0e,visible:visible=!![],locked:locked=![],idFactory:_0x4871f7}={}){const _0x27ba08=resolveIdFactory(_0x4871f7),_0x288137=normalizeCameraState(_0x15ad0e);return{'id':normalizeString(_0x31ec74,_0x27ba08("camera")),'type':'camera','name':normalizeString(_0x1ff691,"摄像机"),'visible':visible!==![],'locked':locked===!![],'transform':{'position':[..._0x288137["position"]],'rotation':cameraRotationFromState(_0x288137),'scale':[0x1,0x1,0x1]},'target':[..._0x288137["target"]],'focalLength':_0x288137["focalLength"],'near':_0x288137["near"],'far':_0x288137["far"],'aspectRatio':_0x288137["aspectRatio"],..._0x288137["fov"]!=null?{'fov':_0x288137['fov']}:{}};}export function getStoryboard3DCameraStateFromObject(_0x29d942,_0x1ce606){const _0x1ee80a=normalizeCameraState(_0x1ce606),_0x2185c7=normalizeCameraState({..._0x1ee80a,'position':_0x29d942?.["transform"]?.['position']??_0x1ee80a["position"],'target':_0x29d942?.["target"]??_0x1ee80a['target'],'focalLength':_0x29d942?.['focalLength']??_0x1ee80a["focalLength"],'near':_0x29d942?.['near']??_0x1ee80a["near"],'far':_0x29d942?.['far']??_0x1ee80a["far"],'aspectRatio':_0x29d942?.["aspectRatio"]??_0x1ee80a["aspectRatio"],'fov':_0x29d942?.["fov"]??_0x1ee80a["fov"],'roll':_0x29d942?.["transform"]?.["rotation"]?.[0x2]??_0x1ee80a["roll"]});return _0x1ce606?.["roll"]==null&&Math["abs"](_0x2185c7["roll"]||0x0)<0.000001&&delete _0x2185c7["roll"],_0x2185c7;}export function syncStoryboard3DCameraObjectFromShot(_0x540504,_0x4a0c2b){const _0x514a04=_0x540504?.["objects"]?.["findIndex"]?.(_0x16a2ce=>_0x16a2ce['id']===_0x4a0c2b?.["cameraId"]&&_0x16a2ce['type']==="camera")??-0x1;if(_0x514a04<0x0||!_0x4a0c2b?.['camera'])return null;const _0x23c99a=_0x540504['objects'][_0x514a04],_0x37243f=normalizeCameraState(_0x4a0c2b["camera"]),_0x441c5d={..._0x23c99a,'name':boundCameraName(_0x4a0c2b),'transform':{'position':[..._0x37243f["position"]],'rotation':cameraRotationFromState(_0x37243f),'scale':[..._0x23c99a["transform"]?.["scale"]||[0x1,0x1,0x1]]},'target':[..._0x37243f["target"]],'focalLength':_0x37243f["focalLength"],'near':_0x37243f['near'],'far':_0x37243f['far'],'aspectRatio':_0x37243f["aspectRatio"]};if(_0x37243f["fov"]!=null)_0x441c5d["fov"]=_0x37243f["fov"];else delete _0x441c5d['fov'];return _0x540504["objects"][_0x514a04]=_0x441c5d,_0x441c5d;}export function syncStoryboard3DShotFromCameraObject(_0x142a5e,_0x5e0d8e,{previousTransform:_0x17b591}={}){const _0x3f4857=_0x142a5e?.["objects"]?.["find"]?.(_0x533d4d=>_0x533d4d['id']===_0x5e0d8e&&_0x533d4d["type"]==="camera"),_0x299f09=_0x142a5e?.["shots"]?.["find"]?.(_0x377460=>_0x377460['cameraId']===_0x5e0d8e);if(!_0x3f4857||!_0x299f09)return null;if(_0x17b591){const _0x3eae32=normalizeVector3(_0x17b591["position"],_0x3f4857["transform"]['position']),_0x437d13=normalizeVector3(_0x3f4857['transform']["position"],_0x3eae32),_0x5b183a=normalizeVector3(_0x17b591["rotation"],_0x3f4857["transform"]["rotation"]),_0xf1c014=normalizeVector3(_0x3f4857["transform"]["rotation"],_0x5b183a),_0x4b9e3d=_0xf1c014["some"]((_0x167142,_0x26f1a0)=>Math["abs"](_0x167142-_0x5b183a[_0x26f1a0])>0.000001),_0x13aca8=Math["max"](0.25,Math["hypot"](...normalizeVector3(_0x3f4857['target'],_0x299f09['camera']["target"])["map"]((_0x1cd9c1,_0x217970)=>_0x1cd9c1-_0x3eae32[_0x217970])));_0x3f4857["target"]=_0x4b9e3d?cameraTargetFromRotation(_0x437d13,_0xf1c014,_0x13aca8):normalizeVector3(_0x3f4857['target'],_0x299f09["camera"]['target'])["map"]((_0x507d53,_0x542c2d)=>_0x507d53+_0x437d13[_0x542c2d]-_0x3eae32[_0x542c2d]);}const _0x3da4c0=getStoryboard3DCameraStateFromObject(_0x3f4857,_0x299f09["camera"]);return _0x299f09["camera"]=_0x3da4c0,_0x299f09['animation']=upsertStoryboard3DCameraKeyframe(_0x299f09["animation"],{'time':0x0,'camera':_0x3da4c0}),_0x299f09;}export function createDefaultStoryboard3DEnvironment(_0x5c8f2a="empty"){return{'type':SCENE_ENVIRONMENT_TYPES["has"](_0x5c8f2a)?_0x5c8f2a:"empty",'showGrid':!![],'showOutline':!![],'enableShadows':!![],'groundSize':0x64};}export function createStoryboard3DShot({id:_0x28d9c0,sceneId:_0x39ba6a,name:name="Shot 1",description:description='',camera:_0x52164e,cameraId:_0x5e8573,order:order=0x0,now:now=Date["now"](),idFactory:_0x29fd28}={}){const _0x566972=resolveIdFactory(_0x29fd28),_0x451eac=normalizeCameraState(_0x52164e),_0x26d019={'id':normalizeString(_0x28d9c0,_0x566972("shot")),'sceneId':normalizeString(_0x39ba6a,"scene"),'name':normalizeString(name,'Shot\x201'),'description':String(description||''),'camera':_0x451eac,'animation':createStoryboard3DShotAnimation({'camera':_0x451eac,'idFactory':_0x566972}),'shotSize':"MED",'shotAngle':'eye','order':Math["max"](0x0,Math["round"](toFiniteNumber(order,0x0))),'createdAt':now,'updatedAt':now},_0x5bc178=normalizeOptionalString(_0x5e8573);if(_0x5bc178)_0x26d019["cameraId"]=_0x5bc178;return _0x26d019;}export function createStoryboard3DScene({id:_0xe8c880,name:name="Scene 1",environmentType:environmentType="empty",shotName:shotName="Shot 1",now:now=Date["now"](),idFactory:_0x579ead}={}){const _0x567bf9=resolveIdFactory(_0x579ead),_0x58eee3=normalizeString(_0xe8c880,_0x567bf9('scene')),_0x1ae56c=createDefaultStoryboard3DCameraState(),_0x5e799a=createStoryboard3DCameraObject({'name':shotName+'\x20摄像机','camera':_0x1ae56c,'idFactory':_0x567bf9}),_0x5bd6ee=createStoryboard3DShot({'sceneId':_0x58eee3,'name':shotName,'camera':_0x1ae56c,'cameraId':_0x5e799a['id'],'now':now,'idFactory':_0x567bf9});return{'id':_0x58eee3,'name':normalizeString(name,'Scene\x201'),'environment':createDefaultStoryboard3DEnvironment(environmentType),'objects':[_0x5e799a],'shots':[_0x5bd6ee],'activeShotId':_0x5bd6ee['id']};}export function createStoryboard3DProject({id:_0x37e7ee,name:name="3D Storyboard",sceneName:sceneName='Scene\x201',shotName:shotName='Shot\x201',environmentType:environmentType="empty",now:now=Date["now"](),idFactory:_0x5a4a99}={}){const _0xdb6ad9=resolveIdFactory(_0x5a4a99),_0x3eacc7=createStoryboard3DScene({'name':sceneName,'shotName':shotName,'environmentType':environmentType,'now':now,'idFactory':_0xdb6ad9});return{'id':normalizeString(_0x37e7ee,_0xdb6ad9('project')),'name':normalizeString(name,"3D Storyboard"),'version':STORYBOARD_3D_PROJECT_VERSION,'scenes':[_0x3eacc7],'activeSceneId':_0x3eacc7['id'],'createdAt':now,'updatedAt':now};}function normalizeTransform(_0x4c6b36){return{'position':normalizeVector3(_0x4c6b36?.["position"],[0x0,0x0,0x0]),'rotation':normalizeVector3(_0x4c6b36?.['rotation'],[0x0,0x0,0x0]),'scale':normalizeVector3(_0x4c6b36?.["scale"],[0x1,0x1,0x1])["map"](_0x39fd12=>Math["max"](0.001,_0x39fd12))};}function normalizeSceneObject(_0x22712d,{idFactory:_0x155547}={}){if(!_0x22712d||!SCENE_OBJECT_TYPES["has"](_0x22712d["type"]))return null;const _0x5e2a76=resolveIdFactory(_0x155547),_0x3d6f99={'id':normalizeString(_0x22712d['id'],_0x5e2a76(_0x22712d['type'])),'name':normalizeString(_0x22712d['name'],_0x22712d["type"]),'visible':_0x22712d['visible']!==![],'locked':_0x22712d["locked"]===!![],'transform':normalizeTransform(_0x22712d["transform"])},_0x1491a4=normalizeOptionalString(_0x22712d['parentId']);if(_0x1491a4)_0x3d6f99['parentId']=_0x1491a4;if(_0x22712d["type"]==='prop')return{..._0x3d6f99,'type':"prop",'assetId':normalizeString(_0x22712d["assetId"],"missing-asset"),...normalizeOptionalString(_0x22712d["tint"])?{'tint':normalizeOptionalString(_0x22712d["tint"])}:{},'castShadow':_0x22712d["castShadow"]!==![],'receiveShadow':_0x22712d["receiveShadow"]!==![]};if(_0x22712d["type"]==="character"){const _0x4a8c5b=Array['isArray'](_0x22712d["attachmentIds"])?_0x22712d["attachmentIds"]["map"](_0x493205=>normalizeString(_0x493205))["filter"](Boolean):[];return{..._0x3d6f99,'type':'character','colorKey':DIRECTOR_CHARACTER_COLORS["includes"](_0x22712d["colorKey"])?_0x22712d['colorKey']:"blue",...Number["isFinite"](_0x22712d["heightCm"])?{'heightCm':Math['max'](0x37,Math["min"](0xe6,_0x22712d["heightCm"]))}:{},'bodyPresetId':normalizeString(_0x22712d["bodyPresetId"],"default"),'characterStyle':_0x22712d['characterStyle']==="anatomical"?"anatomical":"articulated",...normalizeOptionalString(_0x22712d['actionId'])?{'actionId':normalizeOptionalString(_0x22712d["actionId"])}:{},...Number["isFinite"](Number(_0x22712d["actionTime"]))?{'actionTime':Math["max"](0x0,Number(_0x22712d['actionTime']))}:{},'actionPlaying':_0x22712d["actionPlaying"]===!![],...normalizeOptionalString(_0x22712d['leftHandPoseId'])?{'leftHandPoseId':normalizeOptionalString(_0x22712d["leftHandPoseId"])}:{},...normalizeOptionalString(_0x22712d["rightHandPoseId"])?{'rightHandPoseId':normalizeOptionalString(_0x22712d["rightHandPoseId"])}:{},...normalizeOptionalString(_0x22712d["hairId"])?{'hairId':normalizeOptionalString(_0x22712d["hairId"])}:{},..._0x4a8c5b["length"]>0x0?{'attachmentIds':_0x4a8c5b}:{},..._0x22712d['boneOverrides']&&typeof _0x22712d['boneOverrides']==="object"?{'boneOverrides':cloneStoryboard3DProject(_0x22712d['boneOverrides'])}:{}};}if(_0x22712d["type"]==='light')return{..._0x3d6f99,'type':"light",'lightType':LIGHT_TYPES['has'](_0x22712d["lightType"])?_0x22712d["lightType"]:"directional",'color':normalizeString(_0x22712d["color"],'#ffffff'),'intensity':Math["max"](0x0,toFiniteNumber(_0x22712d["intensity"],0x1)),...Number["isFinite"](Number(_0x22712d["distance"]))?{'distance':Math['max'](0x0,Number(_0x22712d["distance"]))}:{},...Number["isFinite"](Number(_0x22712d["decay"]))?{'decay':Math["max"](0x0,Number(_0x22712d["decay"]))}:{},...Number["isFinite"](Number(_0x22712d["angle"]))?{'angle':Math["max"](0x0,Number(_0x22712d['angle']))}:{},'castShadow':_0x22712d['castShadow']===!![]};if(_0x22712d["type"]==="camera")return{..._0x3d6f99,'type':'camera','focalLength':toPositiveNumber(_0x22712d["focalLength"],0x23,0x1),'near':toPositiveNumber(_0x22712d["near"],0.1,0.001),'far':toPositiveNumber(_0x22712d["far"],0x3e8,0x1),'target':normalizeVector3(_0x22712d["target"],[0x0,1.2,0x0]),'aspectRatio':normalizeString(_0x22712d["aspectRatio"],"16:9"),..._0x22712d['fov']!=null&&Number["isFinite"](Number(_0x22712d["fov"]))?{'fov':Math["max"](0x1,Math["min"](0xb3,Number(_0x22712d["fov"])))}:{}};return{..._0x3d6f99,'type':'group'};}function normalizeCameraState(_0x1ca8f3){const _0x1897a4={'position':normalizeVector3(_0x1ca8f3?.["position"],[0x5,0x4,0x7]),'target':normalizeVector3(_0x1ca8f3?.["target"],[0x0,1.2,0x0]),'focalLength':toPositiveNumber(_0x1ca8f3?.["focalLength"],0x23,0x1),'near':toPositiveNumber(_0x1ca8f3?.["near"],0.1,0.001),'far':toPositiveNumber(_0x1ca8f3?.['far'],0x3e8,0x1),'aspectRatio':normalizeString(_0x1ca8f3?.["aspectRatio"],"16:9")};return _0x1ca8f3?.["fov"]!=null&&Number['isFinite'](Number(_0x1ca8f3["fov"]))&&(_0x1897a4["fov"]=Math["max"](0x1,Math["min"](0xb3,Number(_0x1ca8f3["fov"])))),_0x1ca8f3?.["roll"]!=null&&Number["isFinite"](Number(_0x1ca8f3["roll"]))&&(_0x1897a4['roll']=Math["max"](-Math['PI'],Math["min"](Math['PI'],Number(_0x1ca8f3["roll"])))),_0x1897a4;}function normalizeShot(_0x96d5f7,_0x19812c,_0x305711,{now:_0x25c03b,idFactory:_0x5e11a0,objectIds:_0x2ca1da,objectTransforms:_0x5c5829}={}){const _0x10c30c=resolveIdFactory(_0x5e11a0),_0x463a92=normalizeTimestamp(_0x96d5f7?.["createdAt"],_0x25c03b),_0x1ca48a=normalizeCameraState(_0x96d5f7?.["camera"]),_0x11f2b0=normalizeStoryboard3DShotAnimation(_0x96d5f7?.["animation"],{'camera':_0x1ca48a,'objectIds':_0x2ca1da,'objectTransforms':_0x5c5829,'idFactory':_0x10c30c}),_0x37ee39=normalizeCameraState(_0x11f2b0['cameraKeyframes'][0x0]?.["camera"]||_0x1ca48a),_0x2e63d8={'id':normalizeString(_0x96d5f7?.['id'],_0x10c30c("shot")),'sceneId':_0x19812c,'name':normalizeString(_0x96d5f7?.["name"],'Shot\x20'+(_0x305711+0x1)),'description':String(_0x96d5f7?.["description"]||''),'camera':_0x37ee39,'animation':_0x11f2b0,'shotSize':SHOT_SIZE_SET["has"](_0x96d5f7?.["shotSize"])?_0x96d5f7['shotSize']:'MED','shotAngle':SHOT_ANGLE_SET['has'](_0x96d5f7?.["shotAngle"])?_0x96d5f7["shotAngle"]:'eye','order':Math["max"](0x0,Math["round"](toFiniteNumber(_0x96d5f7?.["order"],_0x305711))),'createdAt':_0x463a92,'updatedAt':normalizeTimestamp(_0x96d5f7?.["updatedAt"],_0x463a92)},_0x336148=normalizeOptionalString(_0x96d5f7?.['cameraId']);if(_0x336148)_0x2e63d8["cameraId"]=_0x336148;const _0x3d0e9a=normalizeOptionalString(_0x96d5f7?.["thumbnailUrl"]);if(_0x3d0e9a)_0x2e63d8["thumbnailUrl"]=_0x3d0e9a;return _0x2e63d8;}function normalizeBackground(_0x23337a){const _0x1cda68=normalizeOptionalString(_0x23337a?.["imageUrl"]);if(!_0x1cda68)return undefined;const _0x3648a3=normalizeOptionalString(_0x23337a?.['binaryAssetId']),_0x4387d4={'imageUrl':_0x1cda68,..._0x3648a3?{'binaryAssetId':_0x3648a3}:{},'horizontalFov':toPositiveNumber(_0x23337a?.["horizontalFov"],0x32,0x1),..._0x23337a?.["verticalFov"]!=null&&Number["isFinite"](Number(_0x23337a["verticalFov"]))?{'verticalFov':toPositiveNumber(_0x23337a['verticalFov'],0x23,0x1)}:{},...Number["isFinite"](Number(_0x23337a?.['horizonY']))?{'horizonY':Number(_0x23337a["horizonY"])}:{},...Number['isFinite'](Number(_0x23337a?.["horizonSlope"]))?{'horizonSlope':Math["max"](-0x1,Math["min"](0x1,Number(_0x23337a['horizonSlope'])))}:{},...Array["isArray"](_0x23337a?.["vanishingPoint"])?{'vanishingPoint':normalizeVector2(_0x23337a["vanishingPoint"],[0.5,0.5])}:{},'cameraHeight':toPositiveNumber(_0x23337a?.["cameraHeight"],1.6,0.2),'imageScale':toPositiveNumber(_0x23337a?.["imageScale"],0x1,0.01),'imageOffset':normalizeVector2(_0x23337a?.["imageOffset"],[0x0,0x0]),'lockedCamera':_0x23337a?.["lockedCamera"]===!![],..._0x23337a?.["lockedCameraSnapshot"]?{'lockedCameraSnapshot':normalizeCameraState(_0x23337a["lockedCameraSnapshot"])}:{}},_0x4fa1cc=Math["max"](0x0,Math["round"](toFiniteNumber(_0x23337a?.["imageWidth"],0x0))),_0x3a7450=Math["max"](0x0,Math["round"](toFiniteNumber(_0x23337a?.["imageHeight"],0x0)));if(_0x4fa1cc>0x0)_0x4387d4["imageWidth"]=_0x4fa1cc;if(_0x3a7450>0x0)_0x4387d4["imageHeight"]=_0x3a7450;const _0x35c607=normalizeVector2List(_0x23337a?.["groundRegion"]);if(_0x35c607["length"]>=0x3)_0x4387d4["groundRegion"]=_0x35c607;const _0x5e1fd3=normalizeOptionalString(_0x23337a?.["calibrationMethod"]);if(_0x5e1fd3)_0x4387d4["calibrationMethod"]=_0x5e1fd3;return _0x23337a?.['calibrationConfidence']!=null&&Number["isFinite"](Number(_0x23337a["calibrationConfidence"]))&&(_0x4387d4['calibrationConfidence']=Math["max"](0x0,Math["min"](0x1,Number(_0x23337a["calibrationConfidence"])))),_0x4387d4;}function normalizeScene(_0x214b8f,_0xdd06cf,{now:_0x57f897,idFactory:_0x230a53}={}){const _0x2bcd83=resolveIdFactory(_0x230a53),_0x26a892=normalizeString(_0x214b8f?.['id'],_0x2bcd83("scene")),_0x2d486a=(Array["isArray"](_0x214b8f?.["objects"])?_0x214b8f['objects']:[])["map"](_0x2d68e3=>normalizeSceneObject(_0x2d68e3,{'idFactory':_0x2bcd83}))['filter'](Boolean),_0x23b734=_0x2d486a,_0x1b2660=new Set(_0x23b734["filter"](_0x3601c8=>_0x3601c8['type']!=="camera")["map"](_0x303a98=>_0x303a98['id'])),_0x7b9f0d=Object["fromEntries"](_0x23b734["filter"](_0x4f77d5=>_0x4f77d5['type']!=="camera")["map"](_0x330971=>[_0x330971['id'],_0x330971['transform']])),_0x244c5c=Array["isArray"](_0x214b8f?.["shots"])?_0x214b8f["shots"]:[],_0x5bfe46=_0x244c5c["map"]((_0xab6122,_0x202277)=>normalizeShot(_0xab6122,_0x26a892,_0x202277,{'now':_0x57f897,'idFactory':_0x2bcd83,'objectIds':_0x1b2660,'objectTransforms':_0x7b9f0d})),_0x3e550d=new Set();_0x5bfe46["forEach"](_0x322f12=>{let _0x20d5f=_0x23b734["find"](_0x23d3b3=>_0x23d3b3['id']===_0x322f12['cameraId']&&_0x23d3b3["type"]==="camera");(!_0x20d5f||_0x3e550d["has"](_0x20d5f['id']))&&(_0x20d5f=createStoryboard3DCameraObject({'name':boundCameraName(_0x322f12),'camera':_0x322f12["camera"],'idFactory':_0x2bcd83}),_0x23b734["push"](_0x20d5f),_0x322f12['cameraId']=_0x20d5f['id']),_0x3e550d["add"](_0x20d5f['id']),syncStoryboard3DCameraObjectFromShot({'objects':_0x23b734},_0x322f12);}),_0x23b734["filter"](_0x266339=>_0x266339["type"]==="camera"&&!_0x3e550d["has"](_0x266339['id']))['forEach'](_0x2d9e80=>{const _0x41580d=createStoryboard3DShot({'sceneId':_0x26a892,'name':_0x2d9e80["name"],'camera':getStoryboard3DCameraStateFromObject(_0x2d9e80),'cameraId':_0x2d9e80['id'],'order':_0x5bfe46["length"],'now':_0x57f897,'idFactory':_0x2bcd83});_0x5bfe46["push"](_0x41580d),_0x3e550d["add"](_0x2d9e80['id']),syncStoryboard3DCameraObjectFromShot({'objects':_0x23b734},_0x41580d);});const _0x18c01c=new Set(_0x5bfe46["map"](_0x19066a=>_0x19066a['id'])),_0xeb51d3=SCENE_ENVIRONMENT_TYPES['has'](_0x214b8f?.["environment"]?.["type"])?_0x214b8f["environment"]["type"]:'empty',_0xdce5c8={...createDefaultStoryboard3DEnvironment(_0xeb51d3),'showGrid':_0x214b8f?.["environment"]?.["showGrid"]!==![],'showOutline':_0x214b8f?.["environment"]?.["showOutline"]!==![],'enableShadows':_0x214b8f?.['environment']?.["enableShadows"]!==![],'groundSize':toPositiveNumber(_0x214b8f?.["environment"]?.["groundSize"],0x64,0x1)},_0x1f783f=normalizeOptionalString(_0x214b8f?.["environment"]?.["backgroundColor"]);if(_0x1f783f)_0xdce5c8['backgroundColor']=_0x1f783f;const _0x3abdbf=normalizeBackground(_0x214b8f?.["background"]);return{'id':_0x26a892,'name':normalizeString(_0x214b8f?.["name"],"Scene "+(_0xdd06cf+0x1)),'directorSettings':normalizeDirectorSceneSettings(_0x214b8f?.['directorSettings']),'generatedLayers':normalizeDirectorGeneratedLayers(_0x214b8f?.["generatedLayers"],_0x34f68f=>normalizeSceneObject(_0x34f68f,{'idFactory':_0x2bcd83})),'environment':_0xdce5c8,..._0x3abdbf?{'background':_0x3abdbf}:{},'objects':_0x23b734,'shots':_0x5bfe46,'activeShotId':_0x18c01c["has"](_0x214b8f?.["activeShotId"])?_0x214b8f['activeShotId']:_0x5bfe46[0x0]?.['id']||''};}export function migrateStoryboard3DProject(_0x58267a,{now:now=Date["now"](),idFactory:_0x58b549,fallbackProject:_0x2984c8}={}){const _0x17dd67=resolveIdFactory(_0x58b549);if(!_0x58267a||typeof _0x58267a!=="object"||Array["isArray"](_0x58267a))return _0x2984c8?cloneStoryboard3DProject(_0x2984c8):createStoryboard3DProject({'now':now,'idFactory':_0x17dd67});const _0x422400=Math["max"](0x1,Math["round"](toFiniteNumber(_0x58267a["version"],0x1)));if(_0x422400>STORYBOARD_3D_PROJECT_VERSION)throw new Error("Unsupported 3D storyboard project version: "+_0x422400);const _0x17a2df=Array["isArray"](_0x58267a["scenes"])?_0x58267a["scenes"]:[],_0x4b797e=_0x17a2df["map"]((_0x37e099,_0x5b8ff4)=>normalizeScene(_0x37e099,_0x5b8ff4,{'now':now,'idFactory':_0x17dd67}));_0x4b797e["length"]===0x0&&_0x4b797e["push"](createStoryboard3DScene({'now':now,'idFactory':_0x17dd67}));const _0x5959b4=new Set(_0x4b797e["map"](_0x2ef40e=>_0x2ef40e['id'])),_0x40c9f1=normalizeTimestamp(_0x58267a["createdAt"],now);return{'id':normalizeString(_0x58267a['id'],_0x17dd67('project')),'name':normalizeString(_0x58267a["name"],"3D Storyboard"),'version':STORYBOARD_3D_PROJECT_VERSION,'scenes':_0x4b797e,'poseLibrary':normalizeDirectorPoseLibrary(_0x58267a["poseLibrary"]),'recycleBin':normalizeDirectorRecycleBin(_0x58267a["recycleBin"],(_0x1dffad,_0x3f74ca)=>normalizeScene(_0x1dffad,_0x3f74ca,{'now':now,'idFactory':_0x17dd67})),'generationJobs':normalizeDirectorGenerationJobs(_0x58267a["generationJobs"]),'activeSceneId':_0x5959b4["has"](_0x58267a["activeSceneId"])?_0x58267a["activeSceneId"]:_0x4b797e[0x0]['id'],'createdAt':_0x40c9f1,'updatedAt':normalizeTimestamp(_0x58267a["updatedAt"],_0x40c9f1)};}export function summarizeStoryboard3DProject(_0x442f8a){const _0x39e409=Array["isArray"](_0x442f8a?.["scenes"])?_0x442f8a["scenes"]:[];return{'sceneCount':_0x39e409["length"],'shotCount':_0x39e409["reduce"]((_0x759142,_0x27eadf)=>_0x759142+(Array["isArray"](_0x27eadf?.["shots"])?_0x27eadf["shots"]['length']:0x0),0x0),'objectCount':_0x39e409["reduce"]((_0x3ab4fe,_0x31af89)=>_0x3ab4fe+(Array["isArray"](_0x31af89?.['objects'])?_0x31af89["objects"]["length"]:0x0),0x0)};}export function getActiveStoryboard3DScene(_0x13eeb0){const _0x27e81b=Array["isArray"](_0x13eeb0?.['scenes'])?_0x13eeb0["scenes"]:[];return _0x27e81b["find"](_0xaa674a=>_0xaa674a['id']===_0x13eeb0?.["activeSceneId"])||_0x27e81b[0x0]||null;}export function getActiveStoryboard3DShot(_0x207958){const _0x189e03=getActiveStoryboard3DScene(_0x207958);if(!_0x189e03)return null;return _0x189e03["shots"]?.['find'](_0x131c66=>_0x131c66['id']===_0x189e03["activeShotId"])||_0x189e03['shots']?.[0x0]||null;}
+import {
+  createStoryboard3DShotAnimation,
+  normalizeStoryboard3DShotAnimation,
+  upsertStoryboard3DCameraKeyframe,
+} from './shotAnimation.js';
+import { DIRECTOR_CHARACTER_COLORS, normalizeDirectorPoseLibrary } from './directorCharacterAuthoring.js';
+import { normalizeDirectorSceneSettings } from './directorSceneSettings.js';
+import { normalizeDirectorRecycleBin } from './directorRecovery.js';
+import {
+  normalizeDirectorGeneratedLayers,
+  normalizeDirectorGenerationJobs,
+} from './directorGeneratedLayers.js';
+export const STORYBOARD_3D_PROJECT_VERSION = 0x2;
+export const STORYBOARD_3D_SHOT_SIZES = Object['freeze']([
+  'EST',
+  'ELS',
+  'LS',
+  'MLS',
+  'MED',
+  'MCU',
+  'CU',
+  'ECU',
+]);
+export const STORYBOARD_3D_SHOT_ANGLES = Object['freeze']([
+  'eye',
+  'high',
+  'low',
+  'top',
+  'overShoulder',
+  'profile',
+  'rear',
+]);
+const SCENE_ENVIRONMENT_TYPES = new Set(['empty', 'outdoor', 'indoor', 'studio']),
+  SCENE_OBJECT_TYPES = new Set(['prop', 'character', 'light', 'camera', 'group']),
+  LIGHT_TYPES = new Set(['ambient', 'directional', 'point', 'spot']),
+  SHOT_SIZE_SET = new Set(STORYBOARD_3D_SHOT_SIZES),
+  SHOT_ANGLE_SET = new Set(STORYBOARD_3D_SHOT_ANGLES);
+function toFiniteNumber(value, item) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
+}
+function toPositiveNumber(index, result, data = 0.0001) {
+  return Math['max'](data, toFiniteNumber(index, result));
+}
+function normalizeString(options, target = '') {
+  const source = String(options ?? '')['trim']();
+  return source || target;
+}
+function normalizeOptionalString(next) {
+  const current = String(next ?? '')['trim']();
+  return current || undefined;
+}
+function normalizeVector3(entry, record) {
+  const payload = Array['isArray'](entry) ? entry : [];
+  return [
+    toFiniteNumber(payload[0x0], record[0x0]),
+    toFiniteNumber(payload[0x1], record[0x1]),
+    toFiniteNumber(payload[0x2], record[0x2]),
+  ];
+}
+function normalizeVector2(handle, state) {
+  const config = Array['isArray'](handle) ? handle : [];
+  return [toFiniteNumber(config[0x0], state[0x0]), toFiniteNumber(config[0x1], state[0x1])];
+}
+function normalizeVector2List(scope) {
+  return (Array['isArray'](scope) ? scope : [])
+    ['slice'](0x0, 0x18)
+    ['filter']((input) => Array['isArray'](input))
+    ['map']((output) => normalizeVector2(output, [0x0, 0x0]));
+}
+function createDefaultId(value2 = 'item') {
+  const value3 = globalThis['crypto']?.['randomUUID']?.();
+  if (value3) return value2 + '_' + value3;
+  return value2 + '_' + Date['now']() + '_' + Math['random']()['toString'](0x24)['slice'](0x2, 0xa);
+}
+function resolveIdFactory(value4) {
+  return typeof value4 === 'function' ? value4 : createDefaultId;
+}
+function normalizeTimestamp(value5, value6) {
+  return Math['max'](0x0, toFiniteNumber(value5, value6));
+}
+export function cloneStoryboard3DProject(value7) {
+  if (typeof structuredClone === 'function') return structuredClone(value7);
+  return JSON['parse'](JSON['stringify'](value7));
+}
+export function createDefaultStoryboard3DTransform() {
+  return { position: [0x0, 0x0, 0x0], rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] };
+}
+export function createDefaultStoryboard3DCameraState() {
+  return {
+    position: [0x5, 0x4, 0x7],
+    target: [0x0, 1.2, 0x0],
+    focalLength: 0x23,
+    near: 0.1,
+    far: 0x3e8,
+    aspectRatio: '16:9',
+  };
+}
+function cameraRotationFromState(value8) {
+  const vector3 = normalizeVector3(value8?.['position'], [0x5, 0x4, 0x7]),
+    vector32 = normalizeVector3(value8?.['target'], [0x0, 1.2, 0x0]),
+    args = vector32['map']((value9, value10) => value9 - vector3[value10]),
+    value11 = Math['max'](0.0001, Math['hypot'](...args));
+  return [
+    Math['asin'](Math['max'](-0x1, Math['min'](0x1, args[0x1] / value11))),
+    Math['atan2'](-args[0x0], -args[0x2]),
+    toFiniteNumber(value8?.['roll'], 0x0),
+  ];
+}
+function cameraTargetFromRotation(value12, value13, value14) {
+  const vector33 = normalizeVector3(value12, [0x5, 0x4, 0x7]),
+    vector34 = normalizeVector3(value13, [0x0, 0x0, 0x0]),
+    value15 = Math['max'](0.25, toFiniteNumber(value14, 0x5)),
+    value16 = Math['cos'](vector34[0x0]);
+  return [
+    vector33[0x0] - Math['sin'](vector34[0x1]) * value16 * value15,
+    vector33[0x1] + Math['sin'](vector34[0x0]) * value15,
+    vector33[0x2] - Math['cos'](vector34[0x1]) * value16 * value15,
+  ];
+}
+function boundCameraName(value17) {
+  return normalizeString(value17?.['name'], 'Shot') + ' 摄像机';
+}
+export function createStoryboard3DCameraObject({
+  id: id,
+  name: name2,
+  camera: camera,
+  visible: visible = !![],
+  locked: locked = ![],
+  idFactory: idFactory,
+} = {}) {
+  const run = resolveIdFactory(idFactory),
+    args2 = normalizeCameraState(camera);
+  return {
+    id: normalizeString(id, run('camera')),
+    type: 'camera',
+    name: normalizeString(name2, '摄像机'),
+    visible: visible !== ![],
+    locked: locked === !![],
+    transform: {
+      position: [...args2['position']],
+      rotation: cameraRotationFromState(args2),
+      scale: [0x1, 0x1, 0x1],
+    },
+    target: [...args2['target']],
+    focalLength: args2['focalLength'],
+    near: args2['near'],
+    far: args2['far'],
+    aspectRatio: args2['aspectRatio'],
+    ...(args2['fov'] != null ? { fov: args2['fov'] } : {}),
+  };
+}
+export function getStoryboard3DCameraStateFromObject(value18, value19) {
+  const event = normalizeCameraState(value19),
+    cameraState = normalizeCameraState({
+      ...event,
+      position: value18?.['transform']?.['position'] ?? event['position'],
+      target: value18?.['target'] ?? event['target'],
+      focalLength: value18?.['focalLength'] ?? event['focalLength'],
+      near: value18?.['near'] ?? event['near'],
+      far: value18?.['far'] ?? event['far'],
+      aspectRatio: value18?.['aspectRatio'] ?? event['aspectRatio'],
+      fov: value18?.['fov'] ?? event['fov'],
+      roll: value18?.['transform']?.['rotation']?.[0x2] ?? event['roll'],
+    });
+  return (
+    value19?.['roll'] == null &&
+      Math['abs'](cameraState['roll'] || 0x0) < 0.000001 &&
+      delete cameraState['roll'],
+    cameraState
+  );
+}
+export function syncStoryboard3DCameraObjectFromShot(value20, enabled) {
+  const count =
+    value20?.['objects']?.['findIndex']?.(
+      (value21) => value21['id'] === enabled?.['cameraId'] && value21['type'] === 'camera',
+    ) ?? -0x1;
+  if (count < 0x0 || !enabled?.['camera']) return null;
+  const args3 = value20['objects'][count],
+    args4 = normalizeCameraState(enabled['camera']),
+    value22 = {
+      ...args3,
+      name: boundCameraName(enabled),
+      transform: {
+        position: [...args4['position']],
+        rotation: cameraRotationFromState(args4),
+        scale: [...(args3['transform']?.['scale'] || [0x1, 0x1, 0x1])],
+      },
+      target: [...args4['target']],
+      focalLength: args4['focalLength'],
+      near: args4['near'],
+      far: args4['far'],
+      aspectRatio: args4['aspectRatio'],
+    };
+  if (args4['fov'] != null) value22['fov'] = args4['fov'];
+  else delete value22['fov'];
+  return ((value20['objects'][count] = value22), value22);
+}
+export function syncStoryboard3DShotFromCameraObject(
+  value23,
+  value24,
+  { previousTransform: previousTransform } = {},
+) {
+  const event2 = value23?.['objects']?.['find']?.(
+      (value25) => value25['id'] === value24 && value25['type'] === 'camera',
+    ),
+    enabled2 = value23?.['shots']?.['find']?.((value26) => value26['cameraId'] === value24);
+  if (!event2 || !enabled2) return null;
+  if (previousTransform) {
+    const vector35 = normalizeVector3(previousTransform['position'], event2['transform']['position']),
+      vector36 = normalizeVector3(event2['transform']['position'], vector35),
+      vector37 = normalizeVector3(previousTransform['rotation'], event2['transform']['rotation']),
+      vector38 = normalizeVector3(event2['transform']['rotation'], vector37),
+      value27 = vector38['some']((value28, value29) => Math['abs'](value28 - vector37[value29]) > 0.000001),
+      value30 = Math['max'](
+        0.25,
+        Math['hypot'](
+          ...normalizeVector3(event2['target'], enabled2['camera']['target'])['map'](
+            (value31, value32) => value31 - vector35[value32],
+          ),
+        ),
+      );
+    event2['target'] = value27
+      ? cameraTargetFromRotation(vector36, vector38, value30)
+      : normalizeVector3(event2['target'], enabled2['camera']['target'])['map'](
+          (value33, value34) => value33 + vector36[value34] - vector35[value34],
+        );
+  }
+  const storyboard3DCameraStateFromObject = getStoryboard3DCameraStateFromObject(event2, enabled2['camera']);
+  return (
+    (enabled2['camera'] = storyboard3DCameraStateFromObject),
+    (enabled2['animation'] = upsertStoryboard3DCameraKeyframe(enabled2['animation'], {
+      time: 0x0,
+      camera: storyboard3DCameraStateFromObject,
+    })),
+    enabled2
+  );
+}
+export function createDefaultStoryboard3DEnvironment(value35 = 'empty') {
+  return {
+    type: SCENE_ENVIRONMENT_TYPES['has'](value35) ? value35 : 'empty',
+    showGrid: !![],
+    showOutline: !![],
+    enableShadows: !![],
+    groundSize: 0x64,
+  };
+}
+export function createStoryboard3DShot({
+  id: id2,
+  sceneId: sceneId,
+  name: name = 'Shot 1',
+  description: description = '',
+  camera: camera2,
+  cameraId: cameraId,
+  order: order = 0x0,
+  now: now = Date['now'](),
+  idFactory: idFactory2,
+} = {}) {
+  const run2 = resolveIdFactory(idFactory2),
+    cameraState2 = normalizeCameraState(camera2),
+    value36 = {
+      id: normalizeString(id2, run2('shot')),
+      sceneId: normalizeString(sceneId, 'scene'),
+      name: normalizeString(name, 'Shot\x201'),
+      description: String(description || ''),
+      camera: cameraState2,
+      animation: createStoryboard3DShotAnimation({ camera: cameraState2, idFactory: run2 }),
+      shotSize: 'MED',
+      shotAngle: 'eye',
+      order: Math['max'](0x0, Math['round'](toFiniteNumber(order, 0x0))),
+      createdAt: now,
+      updatedAt: now,
+    },
+    optionalString = normalizeOptionalString(cameraId);
+  if (optionalString) value36['cameraId'] = optionalString;
+  return value36;
+}
+export function createStoryboard3DScene({
+  id: id3,
+  name: name = 'Scene 1',
+  environmentType: environmentType = 'empty',
+  shotName: shotName = 'Shot 1',
+  now: now = Date['now'](),
+  idFactory: idFactory3,
+} = {}) {
+  const run3 = resolveIdFactory(idFactory3),
+    string = normalizeString(id3, run3('scene')),
+    defaultStoryboard3DCameraState = createDefaultStoryboard3DCameraState(),
+    storyboard3DCameraObject = createStoryboard3DCameraObject({
+      name: shotName + '\x20摄像机',
+      camera: defaultStoryboard3DCameraState,
+      idFactory: run3,
+    }),
+    storyboard3DShot = createStoryboard3DShot({
+      sceneId: string,
+      name: shotName,
+      camera: defaultStoryboard3DCameraState,
+      cameraId: storyboard3DCameraObject['id'],
+      now: now,
+      idFactory: run3,
+    });
+  return {
+    id: string,
+    name: normalizeString(name, 'Scene\x201'),
+    environment: createDefaultStoryboard3DEnvironment(environmentType),
+    objects: [storyboard3DCameraObject],
+    shots: [storyboard3DShot],
+    activeShotId: storyboard3DShot['id'],
+  };
+}
+export function createStoryboard3DProject({
+  id: id4,
+  name: name = '3D Storyboard',
+  sceneName: sceneName = 'Scene\x201',
+  shotName: shotName = 'Shot\x201',
+  environmentType: environmentType = 'empty',
+  now: now = Date['now'](),
+  idFactory: idFactory4,
+} = {}) {
+  const run4 = resolveIdFactory(idFactory4),
+    storyboard3DScene = createStoryboard3DScene({
+      name: sceneName,
+      shotName: shotName,
+      environmentType: environmentType,
+      now: now,
+      idFactory: run4,
+    });
+  return {
+    id: normalizeString(id4, run4('project')),
+    name: normalizeString(name, '3D Storyboard'),
+    version: STORYBOARD_3D_PROJECT_VERSION,
+    scenes: [storyboard3DScene],
+    activeSceneId: storyboard3DScene['id'],
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+function normalizeTransform(value37) {
+  return {
+    position: normalizeVector3(value37?.['position'], [0x0, 0x0, 0x0]),
+    rotation: normalizeVector3(value37?.['rotation'], [0x0, 0x0, 0x0]),
+    scale: normalizeVector3(value37?.['scale'], [0x1, 0x1, 0x1])['map']((value38) =>
+      Math['max'](0.001, value38),
+    ),
+  };
+}
+function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
+  if (!error || !SCENE_OBJECT_TYPES['has'](error['type'])) return null;
+  const run5 = resolveIdFactory(idFactory5),
+    args5 = {
+      id: normalizeString(error['id'], run5(error['type'])),
+      name: normalizeString(error['name'], error['type']),
+      visible: error['visible'] !== ![],
+      locked: error['locked'] === !![],
+      transform: normalizeTransform(error['transform']),
+    },
+    optionalString2 = normalizeOptionalString(error['parentId']);
+  if (optionalString2) args5['parentId'] = optionalString2;
+  if (error['type'] === 'prop')
+    return {
+      ...args5,
+      type: 'prop',
+      assetId: normalizeString(error['assetId'], 'missing-asset'),
+      ...(normalizeOptionalString(error['tint']) ? { tint: normalizeOptionalString(error['tint']) } : {}),
+      castShadow: error['castShadow'] !== ![],
+      receiveShadow: error['receiveShadow'] !== ![],
+    };
+  if (error['type'] === 'character') {
+    const args6 = Array['isArray'](error['attachmentIds'])
+      ? error['attachmentIds']['map']((value39) => normalizeString(value39))['filter'](Boolean)
+      : [];
+    return {
+      ...args5,
+      type: 'character',
+      colorKey: DIRECTOR_CHARACTER_COLORS['includes'](error['colorKey']) ? error['colorKey'] : 'blue',
+      ...(Number['isFinite'](error['heightCm'])
+        ? { heightCm: Math['max'](0x37, Math['min'](0xe6, error['heightCm'])) }
+        : {}),
+      bodyPresetId: normalizeString(error['bodyPresetId'], 'default'),
+      characterStyle: error['characterStyle'] === 'anatomical' ? 'anatomical' : 'articulated',
+      ...(normalizeOptionalString(error['actionId'])
+        ? { actionId: normalizeOptionalString(error['actionId']) }
+        : {}),
+      ...(Number['isFinite'](Number(error['actionTime']))
+        ? { actionTime: Math['max'](0x0, Number(error['actionTime'])) }
+        : {}),
+      actionPlaying: error['actionPlaying'] === !![],
+      ...(normalizeOptionalString(error['leftHandPoseId'])
+        ? { leftHandPoseId: normalizeOptionalString(error['leftHandPoseId']) }
+        : {}),
+      ...(normalizeOptionalString(error['rightHandPoseId'])
+        ? { rightHandPoseId: normalizeOptionalString(error['rightHandPoseId']) }
+        : {}),
+      ...(normalizeOptionalString(error['hairId'])
+        ? { hairId: normalizeOptionalString(error['hairId']) }
+        : {}),
+      ...(args6['length'] > 0x0 ? { attachmentIds: args6 } : {}),
+      ...(error['boneOverrides'] && typeof error['boneOverrides'] === 'object'
+        ? { boneOverrides: cloneStoryboard3DProject(error['boneOverrides']) }
+        : {}),
+    };
+  }
+  if (error['type'] === 'light')
+    return {
+      ...args5,
+      type: 'light',
+      lightType: LIGHT_TYPES['has'](error['lightType']) ? error['lightType'] : 'directional',
+      color: normalizeString(error['color'], '#ffffff'),
+      intensity: Math['max'](0x0, toFiniteNumber(error['intensity'], 0x1)),
+      ...(Number['isFinite'](Number(error['distance']))
+        ? { distance: Math['max'](0x0, Number(error['distance'])) }
+        : {}),
+      ...(Number['isFinite'](Number(error['decay']))
+        ? { decay: Math['max'](0x0, Number(error['decay'])) }
+        : {}),
+      ...(Number['isFinite'](Number(error['angle']))
+        ? { angle: Math['max'](0x0, Number(error['angle'])) }
+        : {}),
+      castShadow: error['castShadow'] === !![],
+    };
+  if (error['type'] === 'camera')
+    return {
+      ...args5,
+      type: 'camera',
+      focalLength: toPositiveNumber(error['focalLength'], 0x23, 0x1),
+      near: toPositiveNumber(error['near'], 0.1, 0.001),
+      far: toPositiveNumber(error['far'], 0x3e8, 0x1),
+      target: normalizeVector3(error['target'], [0x0, 1.2, 0x0]),
+      aspectRatio: normalizeString(error['aspectRatio'], '16:9'),
+      ...(error['fov'] != null && Number['isFinite'](Number(error['fov']))
+        ? { fov: Math['max'](0x1, Math['min'](0xb3, Number(error['fov']))) }
+        : {}),
+    };
+  return { ...args5, type: 'group' };
+}
+function normalizeCameraState(value40) {
+  const value41 = {
+    position: normalizeVector3(value40?.['position'], [0x5, 0x4, 0x7]),
+    target: normalizeVector3(value40?.['target'], [0x0, 1.2, 0x0]),
+    focalLength: toPositiveNumber(value40?.['focalLength'], 0x23, 0x1),
+    near: toPositiveNumber(value40?.['near'], 0.1, 0.001),
+    far: toPositiveNumber(value40?.['far'], 0x3e8, 0x1),
+    aspectRatio: normalizeString(value40?.['aspectRatio'], '16:9'),
+  };
+  return (
+    value40?.['fov'] != null &&
+      Number['isFinite'](Number(value40['fov'])) &&
+      (value41['fov'] = Math['max'](0x1, Math['min'](0xb3, Number(value40['fov'])))),
+    value40?.['roll'] != null &&
+      Number['isFinite'](Number(value40['roll'])) &&
+      (value41['roll'] = Math['max'](-Math['PI'], Math['min'](Math['PI'], Number(value40['roll'])))),
+    value41
+  );
+}
+function normalizeShot(
+  value42,
+  value43,
+  value44,
+  { now: now2, idFactory: idFactory6, objectIds: objectIds, objectTransforms: objectTransforms } = {},
+) {
+  const run6 = resolveIdFactory(idFactory6),
+    timestamp = normalizeTimestamp(value42?.['createdAt'], now2),
+    cameraState3 = normalizeCameraState(value42?.['camera']),
+    storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(value42?.['animation'], {
+      camera: cameraState3,
+      objectIds: objectIds,
+      objectTransforms: objectTransforms,
+      idFactory: run6,
+    }),
+    cameraState4 = normalizeCameraState(
+      storyboard3DShotAnimation['cameraKeyframes'][0x0]?.['camera'] || cameraState3,
+    ),
+    value45 = {
+      id: normalizeString(value42?.['id'], run6('shot')),
+      sceneId: value43,
+      name: normalizeString(value42?.['name'], 'Shot\x20' + (value44 + 0x1)),
+      description: String(value42?.['description'] || ''),
+      camera: cameraState4,
+      animation: storyboard3DShotAnimation,
+      shotSize: SHOT_SIZE_SET['has'](value42?.['shotSize']) ? value42['shotSize'] : 'MED',
+      shotAngle: SHOT_ANGLE_SET['has'](value42?.['shotAngle']) ? value42['shotAngle'] : 'eye',
+      order: Math['max'](0x0, Math['round'](toFiniteNumber(value42?.['order'], value44))),
+      createdAt: timestamp,
+      updatedAt: normalizeTimestamp(value42?.['updatedAt'], timestamp),
+    },
+    optionalString3 = normalizeOptionalString(value42?.['cameraId']);
+  if (optionalString3) value45['cameraId'] = optionalString3;
+  const optionalString4 = normalizeOptionalString(value42?.['thumbnailUrl']);
+  if (optionalString4) value45['thumbnailUrl'] = optionalString4;
+  return value45;
+}
+function normalizeBackground(args7) {
+  const optionalString5 = normalizeOptionalString(args7?.['imageUrl']);
+  if (!optionalString5) return undefined;
+  const args8 = normalizeOptionalString(args7?.['binaryAssetId']),
+    value46 = {
+      imageUrl: optionalString5,
+      ...(args8 ? { binaryAssetId: args8 } : {}),
+      horizontalFov: toPositiveNumber(args7?.['horizontalFov'], 0x32, 0x1),
+      ...(args7?.['verticalFov'] != null && Number['isFinite'](Number(args7['verticalFov']))
+        ? { verticalFov: toPositiveNumber(args7['verticalFov'], 0x23, 0x1) }
+        : {}),
+      ...(Number['isFinite'](Number(args7?.['horizonY'])) ? { horizonY: Number(args7['horizonY']) } : {}),
+      ...(Number['isFinite'](Number(args7?.['horizonSlope']))
+        ? { horizonSlope: Math['max'](-0x1, Math['min'](0x1, Number(args7['horizonSlope']))) }
+        : {}),
+      ...(Array['isArray'](args7?.['vanishingPoint'])
+        ? { vanishingPoint: normalizeVector2(args7['vanishingPoint'], [0.5, 0.5]) }
+        : {}),
+      cameraHeight: toPositiveNumber(args7?.['cameraHeight'], 1.6, 0.2),
+      imageScale: toPositiveNumber(args7?.['imageScale'], 0x1, 0.01),
+      imageOffset: normalizeVector2(args7?.['imageOffset'], [0x0, 0x0]),
+      lockedCamera: args7?.['lockedCamera'] === !![],
+      ...(args7?.['lockedCameraSnapshot']
+        ? { lockedCameraSnapshot: normalizeCameraState(args7['lockedCameraSnapshot']) }
+        : {}),
+    },
+    count2 = Math['max'](0x0, Math['round'](toFiniteNumber(args7?.['imageWidth'], 0x0))),
+    count3 = Math['max'](0x0, Math['round'](toFiniteNumber(args7?.['imageHeight'], 0x0)));
+  if (count2 > 0x0) value46['imageWidth'] = count2;
+  if (count3 > 0x0) value46['imageHeight'] = count3;
+  const vector2List = normalizeVector2List(args7?.['groundRegion']);
+  if (vector2List['length'] >= 0x3) value46['groundRegion'] = vector2List;
+  const optionalString6 = normalizeOptionalString(args7?.['calibrationMethod']);
+  if (optionalString6) value46['calibrationMethod'] = optionalString6;
+  return (
+    args7?.['calibrationConfidence'] != null &&
+      Number['isFinite'](Number(args7['calibrationConfidence'])) &&
+      (value46['calibrationConfidence'] = Math['max'](
+        0x0,
+        Math['min'](0x1, Number(args7['calibrationConfidence'])),
+      )),
+    value46
+  );
+}
+function normalizeScene(value47, value48, { now: now3, idFactory: idFactory7 } = {}) {
+  const run7 = resolveIdFactory(idFactory7),
+    string2 = normalizeString(value47?.['id'], run7('scene')),
+    value49 = (Array['isArray'](value47?.['objects']) ? value47['objects'] : [])
+      ['map']((value50) => normalizeSceneObject(value50, { idFactory: run7 }))
+      ['filter'](Boolean),
+    value51 = value49,
+    value52 = new Set(
+      value51['filter']((value53) => value53['type'] !== 'camera')['map']((value54) => value54['id']),
+    ),
+    value55 = Object['fromEntries'](
+      value51['filter']((value56) => value56['type'] !== 'camera')['map']((value57) => [
+        value57['id'],
+        value57['transform'],
+      ]),
+    ),
+    value58 = Array['isArray'](value47?.['shots']) ? value47['shots'] : [],
+    value59 = value58['map']((value60, value61) =>
+      normalizeShot(value60, string2, value61, {
+        now: now3,
+        idFactory: run7,
+        objectIds: value52,
+        objectTransforms: value55,
+      }),
+    ),
+    enabled3 = new Set();
+  (value59['forEach']((value62) => {
+    let storyboard3DCameraObject2 = value51['find'](
+      (value63) => value63['id'] === value62['cameraId'] && value63['type'] === 'camera',
+    );
+    ((!storyboard3DCameraObject2 || enabled3['has'](storyboard3DCameraObject2['id'])) &&
+      ((storyboard3DCameraObject2 = createStoryboard3DCameraObject({
+        name: boundCameraName(value62),
+        camera: value62['camera'],
+        idFactory: run7,
+      })),
+      value51['push'](storyboard3DCameraObject2),
+      (value62['cameraId'] = storyboard3DCameraObject2['id'])),
+      enabled3['add'](storyboard3DCameraObject2['id']),
+      syncStoryboard3DCameraObjectFromShot({ objects: value51 }, value62));
+  }),
+    value51['filter']((value64) => value64['type'] === 'camera' && !enabled3['has'](value64['id']))[
+      'forEach'
+    ]((value65) => {
+      const storyboard3DShot2 = createStoryboard3DShot({
+        sceneId: string2,
+        name: value65['name'],
+        camera: getStoryboard3DCameraStateFromObject(value65),
+        cameraId: value65['id'],
+        order: value59['length'],
+        now: now3,
+        idFactory: run7,
+      });
+      (value59['push'](storyboard3DShot2),
+        enabled3['add'](value65['id']),
+        syncStoryboard3DCameraObjectFromShot({ objects: value51 }, storyboard3DShot2));
+    }));
+  const value66 = new Set(value59['map']((value67) => value67['id'])),
+    value68 = SCENE_ENVIRONMENT_TYPES['has'](value47?.['environment']?.['type'])
+      ? value47['environment']['type']
+      : 'empty',
+    value69 = {
+      ...createDefaultStoryboard3DEnvironment(value68),
+      showGrid: value47?.['environment']?.['showGrid'] !== ![],
+      showOutline: value47?.['environment']?.['showOutline'] !== ![],
+      enableShadows: value47?.['environment']?.['enableShadows'] !== ![],
+      groundSize: toPositiveNumber(value47?.['environment']?.['groundSize'], 0x64, 0x1),
+    },
+    optionalString7 = normalizeOptionalString(value47?.['environment']?.['backgroundColor']);
+  if (optionalString7) value69['backgroundColor'] = optionalString7;
+  const args9 = normalizeBackground(value47?.['background']);
+  return {
+    id: string2,
+    name: normalizeString(value47?.['name'], 'Scene ' + (value48 + 0x1)),
+    directorSettings: normalizeDirectorSceneSettings(value47?.['directorSettings']),
+    generatedLayers: normalizeDirectorGeneratedLayers(value47?.['generatedLayers'], (value70) =>
+      normalizeSceneObject(value70, { idFactory: run7 }),
+    ),
+    environment: value69,
+    ...(args9 ? { background: args9 } : {}),
+    objects: value51,
+    shots: value59,
+    activeShotId: value66['has'](value47?.['activeShotId'])
+      ? value47['activeShotId']
+      : value59[0x0]?.['id'] || '',
+  };
+}
+export function migrateStoryboard3DProject(
+  enabled4,
+  { now: now = Date['now'](), idFactory: idFactory8, fallbackProject: fallbackProject } = {},
+) {
+  const run8 = resolveIdFactory(idFactory8);
+  if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4))
+    return fallbackProject
+      ? cloneStoryboard3DProject(fallbackProject)
+      : createStoryboard3DProject({ now: now, idFactory: run8 });
+  const value71 = Math['max'](0x1, Math['round'](toFiniteNumber(enabled4['version'], 0x1)));
+  if (value71 > STORYBOARD_3D_PROJECT_VERSION)
+    throw new Error('Unsupported 3D storyboard project version: ' + value71);
+  const value72 = Array['isArray'](enabled4['scenes']) ? enabled4['scenes'] : [],
+    value73 = value72['map']((value74, value75) =>
+      normalizeScene(value74, value75, { now: now, idFactory: run8 }),
+    );
+  value73['length'] === 0x0 && value73['push'](createStoryboard3DScene({ now: now, idFactory: run8 }));
+  const value76 = new Set(value73['map']((value77) => value77['id'])),
+    timestamp2 = normalizeTimestamp(enabled4['createdAt'], now);
+  return {
+    id: normalizeString(enabled4['id'], run8('project')),
+    name: normalizeString(enabled4['name'], '3D Storyboard'),
+    version: STORYBOARD_3D_PROJECT_VERSION,
+    scenes: value73,
+    poseLibrary: normalizeDirectorPoseLibrary(enabled4['poseLibrary']),
+    recycleBin: normalizeDirectorRecycleBin(enabled4['recycleBin'], (value78, value79) =>
+      normalizeScene(value78, value79, { now: now, idFactory: run8 }),
+    ),
+    generationJobs: normalizeDirectorGenerationJobs(enabled4['generationJobs']),
+    activeSceneId: value76['has'](enabled4['activeSceneId']) ? enabled4['activeSceneId'] : value73[0x0]['id'],
+    createdAt: timestamp2,
+    updatedAt: normalizeTimestamp(enabled4['updatedAt'], timestamp2),
+  };
+}
+export function summarizeStoryboard3DProject(value80) {
+  const value81 = Array['isArray'](value80?.['scenes']) ? value80['scenes'] : [];
+  return {
+    sceneCount: value81['length'],
+    shotCount: value81['reduce'](
+      (value82, value83) =>
+        value82 + (Array['isArray'](value83?.['shots']) ? value83['shots']['length'] : 0x0),
+      0x0,
+    ),
+    objectCount: value81['reduce'](
+      (value84, value85) =>
+        value84 + (Array['isArray'](value85?.['objects']) ? value85['objects']['length'] : 0x0),
+      0x0,
+    ),
+  };
+}
+export function getActiveStoryboard3DScene(value86) {
+  const value87 = Array['isArray'](value86?.['scenes']) ? value86['scenes'] : [];
+  return value87['find']((value88) => value88['id'] === value86?.['activeSceneId']) || value87[0x0] || null;
+}
+export function getActiveStoryboard3DShot(value89) {
+  const activeStoryboard3DScene = getActiveStoryboard3DScene(value89);
+  if (!activeStoryboard3DScene) return null;
+  return (
+    activeStoryboard3DScene['shots']?.['find'](
+      (value90) => value90['id'] === activeStoryboard3DScene['activeShotId'],
+    ) ||
+    activeStoryboard3DScene['shots']?.[0x0] ||
+    null
+  );
+}

@@ -33,57 +33,56 @@ const PREVIEW_UPLOAD_TYPES = {
     nodeTypes: new Set(['ai-audio']),
   },
 };
-function previewUploadText(_0x9878e6, _0xd3920c = {}) {
-  return t('previewUpload.' + _0x9878e6, _0xd3920c);
+function previewUploadText(value, item = {}) {
+  return t('previewUpload.' + value, item);
 }
-function getPreviewUploadTypeLabel(_0x469858) {
-  return t(_0x469858.labelKey);
+function getPreviewUploadTypeLabel(key) {
+  return t(key.labelKey);
 }
-function getPreviewUploadSuccessMessage(_0x323497) {
-  return t(_0x323497.successMessageKey);
+function getPreviewUploadSuccessMessage(index) {
+  return t(index.successMessageKey);
 }
-function getState(_0x514a3d) {
-  return _0x514a3d?.getState?.() || {};
+function getState(store) {
+  return store?.getState?.() || {};
 }
-function getToast(_0x330a84) {
-  return typeof _0x330a84 === 'function' ? _0x330a84 : globalThis.window?.showToast;
+function getToast(result) {
+  return typeof result === 'function' ? result : globalThis.window?.showToast;
 }
-function setButtonBusy(_0x2e013f, _0x3d845a) {
-  if (!_0x2e013f) return;
-  if (_0x3d845a) {
-    !_0x2e013f.dataset.previewUploadLabel &&
-      (_0x2e013f.dataset.previewUploadLabel = _0x2e013f.textContent || previewUploadText('upload'));
-    ((_0x2e013f.disabled = true), (_0x2e013f.textContent = previewUploadText('uploading')));
+function setButtonBusy(el, data) {
+  if (!el) return;
+  if (data) {
+    !el.dataset.previewUploadLabel &&
+      (el.dataset.previewUploadLabel = el.textContent || previewUploadText('upload'));
+    ((el.disabled = true), (el.textContent = previewUploadText('uploading')));
     return;
   }
-  ((_0x2e013f.disabled = false),
-    (_0x2e013f.textContent = _0x2e013f.dataset.previewUploadLabel || previewUploadText('upload')));
+  ((el.disabled = false), (el.textContent = el.dataset.previewUploadLabel || previewUploadText('upload')));
 }
-export function resolvePreviewUploadTarget(_0xd67159 = {}) {
-  const _0x3c2747 = Array.isArray(_0xd67159.selectedNodeIds) ? _0xd67159.selectedNodeIds.filter(Boolean) : [];
-  if (_0x3c2747.length !== 1) return { ok: false, message: previewUploadText('selectSingleNode') };
-  const _0x42dc44 = _0x3c2747[0],
-    _0x36ccd3 = _0xd67159.nodes?.[_0x42dc44];
-  if (!_0x36ccd3) return { ok: false, message: previewUploadText('selectedNodeMissing') };
-  const _0x208c11 = String(_0x36ccd3.type || '').trim();
-  for (const [_0x3849b5, _0x1816e1] of Object.entries(PREVIEW_UPLOAD_TYPES)) {
-    if (!_0x1816e1.nodeTypes.has(_0x208c11)) continue;
+export function resolvePreviewUploadTarget(options = {}) {
+  const list = Array.isArray(options.selectedNodeIds) ? options.selectedNodeIds.filter(Boolean) : [];
+  if (list.length !== 1) return { ok: false, message: previewUploadText('selectSingleNode') };
+  const nodeId = list[0],
+    node = options.nodes?.[nodeId];
+  if (!node) return { ok: false, message: previewUploadText('selectedNodeMissing') };
+  const target = String(node.type || '').trim();
+  for (const [kind, accept] of Object.entries(PREVIEW_UPLOAD_TYPES)) {
+    if (!accept.nodeTypes.has(target)) continue;
     return {
       ok: true,
-      kind: _0x3849b5,
-      nodeId: _0x42dc44,
-      node: _0x36ccd3,
-      accept: _0x1816e1.accept,
-      mimePrefix: _0x1816e1.mimePrefix,
-      label: getPreviewUploadTypeLabel(_0x1816e1),
-      successMessage: getPreviewUploadSuccessMessage(_0x1816e1),
-      applyResult: _0x1816e1.applyResult,
+      kind: kind,
+      nodeId: nodeId,
+      node: node,
+      accept: accept.accept,
+      mimePrefix: accept.mimePrefix,
+      label: getPreviewUploadTypeLabel(accept),
+      successMessage: getPreviewUploadSuccessMessage(accept),
+      applyResult: accept.applyResult,
     };
   }
   return { ok: false, message: previewUploadText('unsupportedNode') };
 }
 export async function handlePreviewUploadFile({
-  file: _0x1d4bf1,
+  file: file,
   button: button = null,
   storeApi: storeApi = appStore,
   uploadFileImpl: uploadFileImpl = uploadFile,
@@ -91,116 +90,417 @@ export async function handlePreviewUploadFile({
   getProjectId: getProjectId = () => globalThis.window?.currentProjectId || 'default_v2_project',
   applyResults: applyResults = {},
 } = {}) {
-  const _0x42b715 = getToast(showToast),
-    _0x5d3910 = resolvePreviewUploadTarget(getState(storeApi));
-  if (!_0x5d3910.ok) return (_0x42b715?.(_0x5d3910.message, 'warn'), false);
-  if (!_0x1d4bf1) return false;
-  if (!String(_0x1d4bf1.type || '').startsWith(_0x5d3910.mimePrefix))
-    return (_0x42b715?.(previewUploadText('invalidFileType', { label: _0x5d3910.label }), 'error'), false);
+  const toast = getToast(showToast),
+    label = resolvePreviewUploadTarget(getState(storeApi));
+  if (!label.ok) return (toast?.(label.message, 'warn'), false);
+  if (!file) return false;
+  if (!String(file.type || '').startsWith(label.mimePrefix))
+    return (toast?.(previewUploadText('invalidFileType', { label: label.label }), 'error'), false);
   setButtonBusy(button, true);
   try {
-    const _0x2d0a09 = await uploadFileImpl(_0x1d4bf1, getProjectId()),
-      _0x56e87d = applyResults[_0x5d3910.kind] || _0x5d3910.applyResult;
+    const uploadRes = await uploadFileImpl(file, getProjectId()),
+      handler = applyResults[label.kind] || label.applyResult;
     return (
-      _0x56e87d({ nodeId: _0x5d3910.nodeId, uploadRes: _0x2d0a09, fileName: _0x1d4bf1.name }),
-      _0x42b715?.(_0x5d3910.successMessage, 'success'),
+      handler({ nodeId: label.nodeId, uploadRes: uploadRes, fileName: file.name }),
+      toast?.(label.successMessage, 'success'),
       true
     );
-  } catch (_0x5ba80f) {
-    return (_0x42b715?.(_0x5ba80f?.message || previewUploadText('uploadFailed'), 'error'), false);
+  } catch (error) {
+    return (toast?.(error?.message || previewUploadText('uploadFailed'), 'error'), false);
   } finally {
     setButtonBusy(button, false);
   }
 }
 export function bindPreviewUploadEntry({
-  button: _0x5dba32,
-  input: _0x4c3ae4,
+  button: button2,
+  input: input2,
   storeApi: storeApi = appStore,
   uploadFileImpl: uploadFileImpl = uploadFile,
   showToast: showToast = null,
-  getProjectId: _0x14aef5,
-  applyResults: _0xdb71b,
+  getProjectId: getProjectId2,
+  applyResults: applyResults2,
 } = {}) {
-  if (!_0x5dba32 || !_0x4c3ae4) return null;
-  const _0x193157 = getToast(showToast),
-    _0x443307 = () => {
+  if (!button2 || !input2) return null;
+  const toast2 = getToast(showToast),
+    source = () => {
       if (!isPreviewModeEnabled()) return;
-      const _0x3a0705 = resolvePreviewUploadTarget(getState(storeApi));
-      if (!_0x3a0705.ok) {
-        _0x193157?.(_0x3a0705.message, 'warn');
+      const error2 = resolvePreviewUploadTarget(getState(storeApi));
+      if (!error2.ok) {
+        toast2?.(error2.message, 'warn');
         return;
       }
-      ((_0x4c3ae4.accept = _0x3a0705.accept), (_0x4c3ae4.value = ''), _0x4c3ae4.click?.());
+      ((input2.accept = error2.accept), (input2.value = ''), input2.click?.());
     },
-    _0x506ddb = async () => {
-      const _0x535bc8 = _0x4c3ae4.files?.[0];
-      if (!_0x535bc8) return;
+    async2 = async () => {
+      const file2 = input2.files?.[0];
+      if (!file2) return;
       try {
         await handlePreviewUploadFile({
-          file: _0x535bc8,
-          button: _0x5dba32,
+          file: file2,
+          button: button2,
           storeApi: storeApi,
           uploadFileImpl: uploadFileImpl,
           showToast: showToast,
-          getProjectId: _0x14aef5,
-          applyResults: _0xdb71b,
+          getProjectId: getProjectId2,
+          applyResults: applyResults2,
         });
       } finally {
-        _0x4c3ae4.value = '';
+        input2.value = '';
       }
     };
   return (
-    _0x5dba32.addEventListener('click', _0x443307),
-    _0x4c3ae4.addEventListener('change', _0x506ddb),
+    button2.addEventListener('click', source),
+    input2.addEventListener('change', async2),
     () => {
-      (_0x5dba32.removeEventListener?.('click', _0x443307),
-        _0x4c3ae4.removeEventListener?.('change', _0x506ddb));
+      (button2.removeEventListener?.('click', source), input2.removeEventListener?.('change', async2));
     }
   );
 }
 
-const OPTIMISTIC_IMAGE_PREVIEW_SELECTOR = ".preview-upload-optimistic-media";
+const OPTIMISTIC_IMAGE_PREVIEW_SELECTOR = '.preview-upload-optimistic-media';
 const DEFAULT_OPTIMISTIC_PREVIEW_FINALIZE_DELAY_MS = 0x15e;
 const DEFAULT_OPTIMISTIC_PREVIEW_COMMIT_TIMEOUT_MS = 0x7530;
 
-function shouldReadPreviewUploadNaturalSize(_0x4cf582={}){return _0x4cf582["kind"]==='image';}
+function shouldReadPreviewUploadNaturalSize(options2 = {}) {
+  return options2['kind'] === 'image';
+}
 
-function setToolbarUploadButtonBusy(_0x428e01,_0x931827){if(!_0x428e01)return;_0x428e01["disabled"]=_0x931827===!![],_0x428e01["classList"]?.['toggle']?.("is-uploading",_0x931827===!![]),_0x428e01["classList"]?.['toggle']?.("is-task-running",_0x931827===!![]),_0x931827===!![]?_0x428e01["setAttribute"]?.("aria-busy","true"):_0x428e01["removeAttribute"]?.('aria-busy');}
+function setToolbarUploadButtonBusy(enabled, next) {
+  if (!enabled) return;
+  ((enabled['disabled'] = next === !![]),
+    enabled['classList']?.['toggle']?.('is-uploading', next === !![]),
+    enabled['classList']?.['toggle']?.('is-task-running', next === !![]),
+    next === !![]
+      ? enabled['setAttribute']?.('aria-busy', 'true')
+      : enabled['removeAttribute']?.('aria-busy'));
+}
 
-function createToolbarUploadInput(_0xd9b49f){const _0x5c3948=_0xd9b49f?.["ownerDocument"]||globalThis["document"]||null;if(!_0x5c3948?.["createElement"])return null;const _0x31b20b=_0x5c3948["createElement"]("input");_0x31b20b["type"]='file',_0x31b20b['hidden']=!![],_0x31b20b['className']='node-toolbar-upload-input';const _0x323419=_0xd9b49f?.['closest']?.(".node-floating-toolbar")||_0xd9b49f?.["parentNode"]||_0x5c3948["body"]||null;return _0x323419?.["appendChild"]?.(_0x31b20b),_0x31b20b;}
+function createToolbarUploadInput(el2) {
+  const enabled2 = el2?.['ownerDocument'] || globalThis['document'] || null;
+  if (!enabled2?.['createElement']) return null;
+  const el3 = enabled2['createElement']('input');
+  ((el3['type'] = 'file'), (el3['hidden'] = !![]), (el3['className'] = 'node-toolbar-upload-input'));
+  const current =
+    el2?.['closest']?.('.node-floating-toolbar') || el2?.['parentNode'] || enabled2['body'] || null;
+  return (current?.['appendChild']?.(el3), el3);
+}
 
-function getUrlApi(){return globalThis['URL']||globalThis["webkitURL"]||null;}
+function getUrlApi() {
+  return globalThis['URL'] || globalThis['webkitURL'] || null;
+}
 
-function safelyCreateObjectUrl(_0x9f2e23){const _0x58ad11=getUrlApi();if(!_0x9f2e23||typeof _0x58ad11?.["createObjectURL"]!=="function")return'';try{return String(_0x58ad11['createObjectURL'](_0x9f2e23)||'')['trim']();}catch{return'';}}
+function safelyCreateObjectUrl(enabled3) {
+  const urlApi = getUrlApi();
+  if (!enabled3 || typeof urlApi?.['createObjectURL'] !== 'function') return '';
+  try {
+    return String(urlApi['createObjectURL'](enabled3) || '')['trim']();
+  } catch {
+    return '';
+  }
+}
 
-function safelyRevokeObjectUrl(_0x5d3aec){if(!_0x5d3aec||!String(_0x5d3aec)['startsWith']("blob:"))return;const _0x75b201=getUrlApi();try{_0x75b201?.["revokeObjectURL"]?.(_0x5d3aec);}catch{}}
+function safelyRevokeObjectUrl(enabled4) {
+  if (!enabled4 || !String(enabled4)['startsWith']('blob:')) return;
+  const urlApi2 = getUrlApi();
+  try {
+    urlApi2?.['revokeObjectURL']?.(enabled4);
+  } catch {}
+}
 
-function getMountedPreviewElement(_0x24e3a3){const _0x1966e7=String(_0x24e3a3||'')["trim"]();if(!_0x1966e7)return null;const _0x213fd8=globalThis["window"]?.["v2Renderer"];try{_0x213fd8?.['hydrateDeferredNodeForImmediateMedia']?.(_0x1966e7);}catch{}try{const _0x285d53=_0x213fd8?.["queryMountedNodeElement"]?.(_0x1966e7,'.img-node-preview');if(_0x285d53)return _0x285d53;}catch{}const _0x231ee9=globalThis['document'],_0x4d1928=typeof _0x213fd8?.['getMountedWrapper']==='function'?_0x213fd8["getMountedWrapper"](_0x1966e7):null;if(_0x4d1928?.["querySelector"])return _0x4d1928['querySelector'](".img-node-preview");const _0x2b8c5a=typeof _0x231ee9?.["getElementById"]==="function"?_0x231ee9["getElementById"](_0x1966e7):null;return _0x2b8c5a?.["querySelector"]?.(".img-node-preview")||null;}
+function getMountedPreviewElement(entry) {
+  const enabled5 = String(entry || '')['trim']();
+  if (!enabled5) return null;
+  const record = globalThis['window']?.['v2Renderer'];
+  try {
+    record?.['hydrateDeferredNodeForImmediateMedia']?.(enabled5);
+  } catch {}
+  try {
+    const payload = record?.['queryMountedNodeElement']?.(enabled5, '.img-node-preview');
+    if (payload) return payload;
+  } catch {}
+  const handle = globalThis['document'],
+    el4 = typeof record?.['getMountedWrapper'] === 'function' ? record['getMountedWrapper'](enabled5) : null;
+  if (el4?.['querySelector']) return el4['querySelector']('.img-node-preview');
+  const state = typeof handle?.['getElementById'] === 'function' ? handle['getElementById'](enabled5) : null;
+  return state?.['querySelector']?.('.img-node-preview') || null;
+}
 
-function clearExistingOptimisticImagePreview(_0x2f495e){if(!_0x2f495e)return;if(typeof _0x2f495e["_previewUploadOptimisticCleanup"]==="function"){_0x2f495e["_previewUploadOptimisticCleanup"]({'delayMs':0x0,'force':!![]});return;}_0x2f495e["querySelectorAll"]?.(OPTIMISTIC_IMAGE_PREVIEW_SELECTOR)?.["forEach"](_0x48dad4=>_0x48dad4["remove"]?.());}
+function clearExistingOptimisticImagePreview(enabled6) {
+  if (!enabled6) return;
+  if (typeof enabled6['_previewUploadOptimisticCleanup'] === 'function') {
+    enabled6['_previewUploadOptimisticCleanup']({ delayMs: 0x0, force: !![] });
+    return;
+  }
+  enabled6['querySelectorAll']?.(OPTIMISTIC_IMAGE_PREVIEW_SELECTOR)?.['forEach']((config) =>
+    config['remove']?.(),
+  );
+}
 
-function hasClassName(_0x292d6f,_0xb1dc6c){return _0x292d6f?.['classList']?.["contains"]?.(_0xb1dc6c)||String(_0x292d6f?.["className"]||'')["split"](/\s+/)['includes'](_0xb1dc6c);}
+function hasClassName(el5, scope) {
+  return (
+    el5?.['classList']?.['contains']?.(scope) ||
+    String(el5?.['className'] || '')
+      ['split'](/\s+/)
+      ['includes'](scope)
+  );
+}
 
-function getPreviewImageElements(_0x344317){const _0x5f40a4=Array["from"](_0x344317?.["querySelectorAll"]?.("img")||[]);return _0x5f40a4['filter'](_0x3473c6=>!hasClassName(_0x3473c6,"preview-upload-optimistic-media"));}
+function getPreviewImageElements(output) {
+  const list2 = Array['from'](output?.['querySelectorAll']?.('img') || []);
+  return list2['filter']((value2) => !hasClassName(value2, 'preview-upload-optimistic-media'));
+}
 
-function getImageElementSrc(_0x2b4f78){return String(_0x2b4f78?.["currentSrc"]||_0x2b4f78?.["src"]||_0x2b4f78?.["getAttribute"]?.("src")||'')["trim"]();}
+function getImageElementSrc(value3) {
+  return String(value3?.['currentSrc'] || value3?.['src'] || value3?.['getAttribute']?.('src') || '')[
+    'trim'
+  ]();
+}
 
-function getImageElementAttributeSrc(_0x39a500){return String(_0x39a500?.['src']||_0x39a500?.['getAttribute']?.('src')||'')["trim"]();}
+function getImageElementAttributeSrc(value4) {
+  return String(value4?.['src'] || value4?.['getAttribute']?.('src') || '')['trim']();
+}
 
-function normalizeUrlPathForCompare(_0x427fab=''){const _0x2d97cb=String(_0x427fab||'')['trim']();if(!_0x2d97cb)return'';try{return new URL(_0x2d97cb,"http://aic.local")["pathname"]["replace"](/\/+/g,'/');}catch{return _0x2d97cb['split']('?')[0x0]["split"]('#')[0x0]['replace'](/\\/g,'/');}}
+function normalizeUrlPathForCompare(value5 = '') {
+  const enabled7 = String(value5 || '')['trim']();
+  if (!enabled7) return '';
+  try {
+    return new URL(enabled7, 'http://aic.local')['pathname']['replace'](/\/+/g, '/');
+  } catch {
+    return enabled7['split']('?')[0x0]['split']('#')[0x0]['replace'](/\\/g, '/');
+  }
+}
 
-function imageSrcMatchesExpected(_0x373c64='',_0x2baa3f=[]){const _0x4b415e=normalizeUrlPathForCompare(_0x373c64);if(!_0x4b415e)return![];const _0x5b4eec=_0x2baa3f["map"](_0x4f2e51=>normalizeUrlPathForCompare(_0x4f2e51))["filter"](Boolean);if(_0x5b4eec["length"]===0x0)return!![];return _0x5b4eec['some'](_0x53628e=>_0x4b415e===_0x53628e||_0x4b415e["endsWith"](_0x53628e));}
+function imageSrcMatchesExpected(value6 = '', value7 = []) {
+  const urlPathForCompare = normalizeUrlPathForCompare(value6);
+  if (!urlPathForCompare) return ![];
+  const list3 = value7['map']((value8) => normalizeUrlPathForCompare(value8))['filter'](Boolean);
+  if (list3['length'] === 0x0) return !![];
+  return list3['some']((value9) => urlPathForCompare === value9 || urlPathForCompare['endsWith'](value9));
+}
 
-function toUploadedPreviewLocalUrl(_0x50941f=''){const _0x4630bb=String(_0x50941f||'')["trim"]()['replace'](/\\/g,'/');if(!_0x4630bb)return'';if(/^(?:https?:|blob:|data:|aic-local-preview:)/i["test"](_0x4630bb))return _0x4630bb;return _0x4630bb['startsWith']('/')?_0x4630bb:'/'+_0x4630bb;}
+function toUploadedPreviewLocalUrl(value10 = '') {
+  const enabled8 = String(value10 || '')
+    ['trim']()
+    ['replace'](/\\/g, '/');
+  if (!enabled8) return '';
+  if (/^(?:https?:|blob:|data:|aic-local-preview:)/i['test'](enabled8)) return enabled8;
+  return enabled8['startsWith']('/') ? enabled8 : '/' + enabled8;
+}
 
-function resolveUploadedPreviewImageExpectedUrls(_0x1d2efa={}){return Array["from"](new Set([_0x1d2efa?.["displayUrl"],_0x1d2efa?.["originalUrl"],_0x1d2efa?.["url"],toUploadedPreviewLocalUrl(_0x1d2efa?.["displayLocalPath"]),toUploadedPreviewLocalUrl(_0x1d2efa?.['originalLocalPath']),toUploadedPreviewLocalUrl(_0x1d2efa?.["localPath"])]["map"](_0x118dd1=>String(_0x118dd1||'')["trim"]())["filter"](Boolean)));}
+function resolveUploadedPreviewImageExpectedUrls(options3 = {}) {
+  return Array['from'](
+    new Set(
+      [
+        options3?.['displayUrl'],
+        options3?.['originalUrl'],
+        options3?.['url'],
+        toUploadedPreviewLocalUrl(options3?.['displayLocalPath']),
+        toUploadedPreviewLocalUrl(options3?.['originalLocalPath']),
+        toUploadedPreviewLocalUrl(options3?.['localPath']),
+      ]
+        ['map']((value11) => String(value11 || '')['trim']())
+        ['filter'](Boolean),
+    ),
+  );
+}
 
-function getMountedPreviewImageSrc(_0x2e860d){const _0x862de8=getPreviewImageElements(_0x2e860d);for(const _0x243031 of _0x862de8){const _0x48e982=getImageElementSrc(_0x243031);if(_0x48e982)return _0x48e982;}return'';}
+function getMountedPreviewImageSrc(value12) {
+  const previewImageElements = getPreviewImageElements(value12);
+  for (const value13 of previewImageElements) {
+    const imageElementSrc = getImageElementSrc(value13);
+    if (imageElementSrc) return imageElementSrc;
+  }
+  return '';
+}
 
-function waitForUploadedPreviewImageCommit({nodeId:_0x4114f5,previousSrc:previousSrc='',expectedUrls:expectedUrls=[],timeoutMs:timeoutMs=DEFAULT_OPTIMISTIC_PREVIEW_COMMIT_TIMEOUT_MS,onPoll:onPoll=null}={}){const _0x3c22f6=String(_0x4114f5||'')["trim"]();if(!_0x3c22f6)return Promise["resolve"](![]);return new Promise(_0x5dfc93=>{let _0x995784=![],_0x2b3717=null,_0x4c82ca=null;const _0x58ab69=new Set(),_0x341c07=[],_0x23076b=_0x2a2b2d=>{if(_0x995784)return;_0x995784=!![];if(_0x2b3717!==null)clearTimeout(_0x2b3717);if(_0x4c82ca!==null)clearTimeout(_0x4c82ca);for(const _0x5d2841 of _0x341c07['splice'](0x0))_0x5d2841();_0x5dfc93(_0x2a2b2d);},_0x2938fa=_0x90e080=>{if(!_0x90e080?.["addEventListener"]||_0x58ab69['has'](_0x90e080))return;_0x58ab69["add"](_0x90e080);const _0x4d14fc=String(_0x90e080["currentSrc"]||'')["trim"]()||getImageElementAttributeSrc(_0x90e080)||getImageElementSrc(_0x90e080);if(_0x90e080["complete"]&&_0x4d14fc!==previousSrc&&imageSrcMatchesExpected(_0x4d14fc,expectedUrls)){_0x23076b(!![]);return;}const _0x3bdb64=()=>{const _0x186bf2=String(_0x90e080["currentSrc"]||'')["trim"]()||getImageElementSrc(_0x90e080);_0x186bf2!==previousSrc&&imageSrcMatchesExpected(_0x186bf2,expectedUrls)&&_0x23076b(!![]);},_0x531899=()=>{const _0x5f0397=getImageElementAttributeSrc(_0x90e080)||getImageElementSrc(_0x90e080);_0x5f0397!==previousSrc&&imageSrcMatchesExpected(_0x5f0397,expectedUrls)&&_0x23076b(!![]);};_0x90e080['addEventListener']("load",_0x3bdb64,{'once':!![]}),_0x90e080['addEventListener']("error",_0x531899,{'once':!![]}),_0x341c07['push'](()=>{_0x90e080["removeEventListener"]?.("load",_0x3bdb64),_0x90e080["removeEventListener"]?.("error",_0x531899);});},_0x31f620=()=>{if(typeof onPoll==="function")onPoll();const _0x4e6412=getMountedPreviewElement(_0x3c22f6),_0x2309fd=getPreviewImageElements(_0x4e6412);for(const _0x1b0ee5 of _0x2309fd){const _0x406062=getImageElementAttributeSrc(_0x1b0ee5)||getImageElementSrc(_0x1b0ee5);if(!_0x406062||_0x406062===previousSrc)continue;if(!imageSrcMatchesExpected(_0x406062,expectedUrls))continue;return _0x2938fa(_0x1b0ee5),![];}return![];},_0x342007=()=>{if(_0x995784||_0x31f620())return;_0x2b3717=setTimeout(_0x342007,0x50);};_0x4c82ca=setTimeout(()=>_0x23076b(![]),Math["max"](0x0,Number(timeoutMs)||0x0)),_0x342007();});}
+function waitForUploadedPreviewImageCommit({
+  nodeId: nodeId2,
+  previousSrc: previousSrc = '',
+  expectedUrls: expectedUrls = [],
+  timeoutMs: timeoutMs = DEFAULT_OPTIMISTIC_PREVIEW_COMMIT_TIMEOUT_MS,
+  onPoll: onPoll = null,
+} = {}) {
+  const enabled9 = String(nodeId2 || '')['trim']();
+  if (!enabled9) return Promise['resolve'](![]);
+  return new Promise((handler2) => {
+    let value14 = ![],
+      setTimeout2 = null,
+      setTimeout3 = null;
+    const map = new Set(),
+      list4 = [],
+      handler3 = (value15) => {
+        if (value14) return;
+        value14 = !![];
+        if (setTimeout2 !== null) clearTimeout(setTimeout2);
+        if (setTimeout3 !== null) clearTimeout(setTimeout3);
+        for (const run of list4['splice'](0x0)) run();
+        handler2(value15);
+      },
+      handler4 = (el6) => {
+        if (!el6?.['addEventListener'] || map['has'](el6)) return;
+        map['add'](el6);
+        const value16 =
+          String(el6['currentSrc'] || '')['trim']() ||
+          getImageElementAttributeSrc(el6) ||
+          getImageElementSrc(el6);
+        if (el6['complete'] && value16 !== previousSrc && imageSrcMatchesExpected(value16, expectedUrls)) {
+          handler3(!![]);
+          return;
+        }
+        const value17 = () => {
+            const value18 = String(el6['currentSrc'] || '')['trim']() || getImageElementSrc(el6);
+            value18 !== previousSrc && imageSrcMatchesExpected(value18, expectedUrls) && handler3(!![]);
+          },
+          value19 = () => {
+            const imageElementAttributeSrc = getImageElementAttributeSrc(el6) || getImageElementSrc(el6);
+            imageElementAttributeSrc !== previousSrc &&
+              imageSrcMatchesExpected(imageElementAttributeSrc, expectedUrls) &&
+              handler3(!![]);
+          };
+        (el6['addEventListener']('load', value17, { once: !![] }),
+          el6['addEventListener']('error', value19, { once: !![] }),
+          list4['push'](() => {
+            (el6['removeEventListener']?.('load', value17), el6['removeEventListener']?.('error', value19));
+          }));
+      },
+      handler5 = () => {
+        if (typeof onPoll === 'function') onPoll();
+        const mountedPreviewElement = getMountedPreviewElement(enabled9),
+          previewImageElements2 = getPreviewImageElements(mountedPreviewElement);
+        for (const value20 of previewImageElements2) {
+          const imageElementAttributeSrc2 =
+            getImageElementAttributeSrc(value20) || getImageElementSrc(value20);
+          if (!imageElementAttributeSrc2 || imageElementAttributeSrc2 === previousSrc) continue;
+          if (!imageSrcMatchesExpected(imageElementAttributeSrc2, expectedUrls)) continue;
+          return (handler4(value20), ![]);
+        }
+        return ![];
+      },
+      handler6 = () => {
+        if (value14 || handler5()) return;
+        setTimeout2 = setTimeout(handler6, 0x50);
+      };
+    ((setTimeout3 = setTimeout(() => handler3(![]), Math['max'](0x0, Number(timeoutMs) || 0x0))), handler6());
+  });
+}
 
-function applyOptimisticImageUploadPreview({nodeId:_0x1b436d,file:_0x5d99f3}={}){if(!String(_0x5d99f3?.["type"]||'')["startsWith"]("image/"))return null;const _0x1c498d=getMountedPreviewElement(_0x1b436d),_0x2041c3=_0x1c498d?.["ownerDocument"]||globalThis["document"];if(!_0x1c498d?.["appendChild"]||!_0x2041c3?.['createElement'])return null;const _0x33c9c6=safelyCreateObjectUrl(_0x5d99f3);if(!_0x33c9c6)return null;clearExistingOptimisticImagePreview(_0x1c498d);const _0xd7bb27=getMountedPreviewImageSrc(_0x1c498d),_0x3bb9b0=_0x2041c3['createElement']("img");_0x3bb9b0['className']='preview-upload-optimistic-media',_0x3bb9b0["draggable"]=![],_0x3bb9b0["alt"]='',_0x3bb9b0['dataset']['previewUploadOptimistic']='true',_0x3bb9b0["src"]=_0x33c9c6;let _0x15b898=![],_0xd56d93=null,_0x2e8b3a=null;const _0x325c9d=(_0x390d4c=getMountedPreviewElement(_0x1b436d))=>{if(_0x15b898||!_0x390d4c?.["appendChild"])return![];return _0x2e8b3a&&_0x2e8b3a!==_0x390d4c&&_0x2e8b3a["_previewUploadOptimisticCleanup"]===_0x8bfa5f&&delete _0x2e8b3a["_previewUploadOptimisticCleanup"],_0x3bb9b0["parentNode"]!==_0x390d4c&&_0x390d4c['appendChild'](_0x3bb9b0),_0x390d4c["_previewUploadOptimisticCleanup"]=_0x8bfa5f,_0x2e8b3a=_0x390d4c,!![];},_0x3f2619=()=>{if(_0x15b898)return;_0x15b898=!![],_0xd56d93=null,_0x3bb9b0["remove"]?.(),safelyRevokeObjectUrl(_0x33c9c6),_0x2e8b3a?.["_previewUploadOptimisticCleanup"]===_0x8bfa5f&&delete _0x2e8b3a["_previewUploadOptimisticCleanup"];};function _0x8bfa5f({delayMs:delayMs=0x0,force:force=![]}={}){if(_0x15b898)return;_0xd56d93!==null&&(clearTimeout(_0xd56d93),_0xd56d93=null);const _0x41d203=()=>{_0x3f2619();},_0x16ec5f=Math["max"](0x0,Number(delayMs)||0x0);!force&&_0x16ec5f>0x0&&typeof setTimeout==="function"?_0xd56d93=setTimeout(_0x41d203,_0x16ec5f):_0x41d203();}return _0x325c9d(_0x1c498d),{'cleanup':_0x8bfa5f,'ensureMounted':_0x325c9d,'objectUrl':_0x33c9c6,'previousMediaSrc':_0xd7bb27};}
+function applyOptimisticImageUploadPreview({ nodeId: nodeId3, file: file3 } = {}) {
+  if (!String(file3?.['type'] || '')['startsWith']('image/')) return null;
+  const mountedPreviewElement2 = getMountedPreviewElement(nodeId3),
+    el7 = mountedPreviewElement2?.['ownerDocument'] || globalThis['document'];
+  if (!mountedPreviewElement2?.['appendChild'] || !el7?.['createElement']) return null;
+  const safelyCreateObjectUrl2 = safelyCreateObjectUrl(file3);
+  if (!safelyCreateObjectUrl2) return null;
+  clearExistingOptimisticImagePreview(mountedPreviewElement2);
+  const mountedPreviewImageSrc = getMountedPreviewImageSrc(mountedPreviewElement2),
+    el8 = el7['createElement']('img');
+  ((el8['className'] = 'preview-upload-optimistic-media'),
+    (el8['draggable'] = ![]),
+    (el8['alt'] = ''),
+    (el8['dataset']['previewUploadOptimistic'] = 'true'),
+    (el8['src'] = safelyCreateObjectUrl2));
+  let value21 = ![],
+    setTimeout4 = null,
+    value22 = null;
+  const run2 = (el9 = getMountedPreviewElement(nodeId3)) => {
+      if (value21 || !el9?.['appendChild']) return ![];
+      return (
+        value22 &&
+          value22 !== el9 &&
+          value22['_previewUploadOptimisticCleanup'] === run3 &&
+          delete value22['_previewUploadOptimisticCleanup'],
+        el8['parentNode'] !== el9 && el9['appendChild'](el8),
+        (el9['_previewUploadOptimisticCleanup'] = run3),
+        (value22 = el9),
+        !![]
+      );
+    },
+    handler7 = () => {
+      if (value21) return;
+      ((value21 = !![]),
+        (setTimeout4 = null),
+        el8['remove']?.(),
+        safelyRevokeObjectUrl(safelyCreateObjectUrl2),
+        value22?.['_previewUploadOptimisticCleanup'] === run3 &&
+          delete value22['_previewUploadOptimisticCleanup']);
+    };
+  function run3({ delayMs: delayMs = 0x0, force: force = ![] } = {}) {
+    if (value21) return;
+    setTimeout4 !== null && (clearTimeout(setTimeout4), (setTimeout4 = null));
+    const run4 = () => {
+        handler7();
+      },
+      count = Math['max'](0x0, Number(delayMs) || 0x0);
+    !force && count > 0x0 && typeof setTimeout === 'function'
+      ? (setTimeout4 = setTimeout(run4, count))
+      : run4();
+  }
+  return (
+    run2(mountedPreviewElement2),
+    {
+      cleanup: run3,
+      ensureMounted: run2,
+      objectUrl: safelyCreateObjectUrl2,
+      previousMediaSrc: mountedPreviewImageSrc,
+    }
+  );
+}
 
-function flushUploadedPreviewNode(_0x5e4f3e){const _0x167f66=String(_0x5e4f3e||'')["trim"]();if(!_0x167f66)return![];try{return globalThis["window"]?.["v2Renderer"]?.['flushNode']?.(_0x167f66)===!![];}catch{return![];}}
+function flushUploadedPreviewNode(value23) {
+  const enabled10 = String(value23 || '')['trim']();
+  if (!enabled10) return ![];
+  try {
+    return globalThis['window']?.['v2Renderer']?.['flushNode']?.(enabled10) === !![];
+  } catch {
+    return ![];
+  }
+}
 
-export function bindPreviewUploadToolbarAction({button:_0x4c15cf,input:input=null,storeApi:storeApi=appStore,uploadFileImpl:uploadFileImpl=uploadFile,showToast:showToast=null,getProjectId:_0x228652,applyResults:_0x29836f}={}){if(!_0x4c15cf)return()=>{};const _0x3240b9=input||createToolbarUploadInput(_0x4c15cf);if(!_0x3240b9)return()=>{};const _0x48233a=getToast(showToast),_0x28c6a2=_0x30dc62=>{_0x30dc62?.["preventDefault"]?.(),_0x30dc62?.["stopPropagation"]?.();const _0x5f2abe=resolvePreviewUploadTarget(getState(storeApi));if(!_0x5f2abe['ok']){_0x48233a?.(_0x5f2abe["message"],"warn");return;}_0x3240b9["accept"]=_0x5f2abe["accept"],_0x3240b9["value"]='',_0x3240b9['click']?.();},_0x2184d5=async()=>{const _0x58682f=_0x3240b9["files"]?.[0x0];if(!_0x58682f)return;setToolbarUploadButtonBusy(_0x4c15cf,!![]);try{await handlePreviewUploadFile({'file':_0x58682f,'button':null,'storeApi':storeApi,'uploadFileImpl':uploadFileImpl,'showToast':showToast,'getProjectId':_0x228652,'applyResults':_0x29836f});}finally{setToolbarUploadButtonBusy(_0x4c15cf,![]),_0x3240b9["value"]='';}};return _0x4c15cf['addEventListener']("click",_0x28c6a2),_0x3240b9["addEventListener"]('change',_0x2184d5),()=>{_0x4c15cf['removeEventListener']?.("click",_0x28c6a2),_0x3240b9["removeEventListener"]?.('change',_0x2184d5);};}
+export function bindPreviewUploadToolbarAction({
+  button: button3,
+  input: input = null,
+  storeApi: storeApi = appStore,
+  uploadFileImpl: uploadFileImpl = uploadFile,
+  showToast: showToast = null,
+  getProjectId: getProjectId3,
+  applyResults: applyResults3,
+} = {}) {
+  if (!button3) return () => {};
+  const el10 = input || createToolbarUploadInput(button3);
+  if (!el10) return () => {};
+  const toast3 = getToast(showToast),
+    value24 = (value25) => {
+      (value25?.['preventDefault']?.(), value25?.['stopPropagation']?.());
+      const response = resolvePreviewUploadTarget(getState(storeApi));
+      if (!response['ok']) {
+        toast3?.(response['message'], 'warn');
+        return;
+      }
+      ((el10['accept'] = response['accept']), (el10['value'] = ''), el10['click']?.());
+    },
+    async3 = async () => {
+      const enabled11 = el10['files']?.[0x0];
+      if (!enabled11) return;
+      setToolbarUploadButtonBusy(button3, !![]);
+      try {
+        await handlePreviewUploadFile({
+          file: enabled11,
+          button: null,
+          storeApi: storeApi,
+          uploadFileImpl: uploadFileImpl,
+          showToast: showToast,
+          getProjectId: getProjectId3,
+          applyResults: applyResults3,
+        });
+      } finally {
+        (setToolbarUploadButtonBusy(button3, ![]), (el10['value'] = ''));
+      }
+    };
+  return (
+    button3['addEventListener']('click', value24),
+    el10['addEventListener']('change', async3),
+    () => {
+      (button3['removeEventListener']?.('click', value24), el10['removeEventListener']?.('change', async3));
+    }
+  );
+}

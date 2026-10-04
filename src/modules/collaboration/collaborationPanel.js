@@ -7,455 +7,460 @@ import { createContextMenuIcon } from '../../components/contextMenuIcon.js';
 import { ADVANCED_SETTINGS_TUNE_ICON_MARKUP } from '../../components/sharedIconMarkup.js';
 const ROLE_NAMES = { owner: '房主', admin: '管理员', editor: '可编辑', viewer: '只读' },
   QUIET_SYNC_MESSAGES = new Set(['已同步', '正在同步修改', '房主已接收修改\x20·\x20项目文件由房主保存']);
-function element(_0x3955d5, _0x82e11d = '', _0x4c0dd8 = '') {
-  const _0x967ca1 = document['createElement'](_0x3955d5);
-  ((_0x967ca1['className'] = _0x82e11d), (_0x967ca1['textContent'] = _0x4c0dd8));
-  if (_0x3955d5 === 'summary') _0x967ca1['tabIndex'] = 0x0;
-  return _0x967ca1;
+function element(value, item = '', key = '') {
+  const el = document['createElement'](value);
+  ((el['className'] = item), (el['textContent'] = key));
+  if (value === 'summary') el['tabIndex'] = 0x0;
+  return el;
 }
 export function createCollaborationPanel({
-  actions: _0x1fb3ad,
-  getState: _0xf2157,
+  actions: actions,
+  getState: getState,
   anchor: anchor = null,
   keepOpenOnOutside: keepOpenOnOutside = () => ![],
 }) {
-  const _0x303af2 = element('dialog', 'collaboration-dialog');
-  _0x303af2['setAttribute']('aria-labelledby', 'collaboration-title');
-  const _0x3a2f69 = element('div', 'collaboration-heading'),
-    _0x511a86 = element('h2', '', '画布协作');
-  _0x511a86['id'] = 'collaboration-title';
-  const _0x104c24 = element('button', 'collaboration-button collaboration-quiet collaboration-close');
-  ((_0x104c24['type'] = 'button'),
-    _0x104c24['setAttribute']('aria-label', '关闭'),
-    _0x104c24['append'](createContextMenuIcon('cancel')),
-    _0x3a2f69['append'](_0x511a86, _0x104c24));
-  const _0x562e28 = element('p', 'collaboration-feedback');
-  (_0x562e28['setAttribute']('role', 'status'),
-    _0x562e28['setAttribute']('aria-live', 'polite'),
-    _0x3a2f69['insertBefore'](_0x562e28, _0x104c24));
-  const _0x129fe4 = element('div', 'collaboration-body'),
-    _0x55d432 = {};
-  let _0x278e30 = () => {},
-    _0x41ad0f = ![];
-  function _0x2a4279() {
-    !_0x41ad0f &&
-      ((_0x41ad0f = !![]),
-      (_0x278e30 = beginModalInteraction({
-        root: _0x303af2,
-        onClose: _0x1f9d81,
+  const root = element('dialog', 'collaboration-dialog');
+  root['setAttribute']('aria-labelledby', 'collaboration-title');
+  const head = element('div', 'collaboration-heading'),
+    element2 = element('h2', '', '画布协作');
+  element2['id'] = 'collaboration-title';
+  const el2 = element('button', 'collaboration-button collaboration-quiet collaboration-close');
+  ((el2['type'] = 'button'),
+    el2['setAttribute']('aria-label', '关闭'),
+    el2['append'](createContextMenuIcon('cancel')),
+    head['append'](element2, el2));
+  const el3 = element('p', 'collaboration-feedback');
+  (el3['setAttribute']('role', 'status'),
+    el3['setAttribute']('aria-live', 'polite'),
+    head['insertBefore'](el3, el2));
+  const element3 = element('div', 'collaboration-body'),
+    enabled = {};
+  let run = () => {},
+    enabled2 = ![];
+  function run2() {
+    !enabled2 &&
+      ((enabled2 = !![]),
+      (run = beginModalInteraction({
+        root: root,
+        onClose: onClose,
         returnFocus: anchor || undefined,
       })));
   }
-  let _0x190019 = ![],
-    _0xf15485 = ![],
-    _0x1db7c6 = '',
-    _0x2ba0a7 = '',
-    _0x168316 = '';
-  function _0x6a02d(_0x387ba6) {
-    const _0x29c7ba = element('section', 'collaboration-section');
-    return (_0x129fe4['append'](_0x29c7ba), (_0x55d432[_0x387ba6] = _0x29c7ba), _0x29c7ba);
+  let enabled3 = ![],
+    enabled4 = ![],
+    index = '',
+    result = '',
+    data = '';
+  function run3(options) {
+    const element4 = element('section', 'collaboration-section');
+    return (element3['append'](element4), (enabled[options] = element4), element4);
   }
-  function _0x213183(_0x58fb88, _0x1d7a0c, _0x13cd7d, _0x3a7789) {
-    const _0x520bde = element('button', 'collaboration-button', _0x58fb88);
+  function button(target, handler, source, next) {
+    const el4 = element('button', 'collaboration-button', target);
     return (
-      (_0x520bde['type'] = 'button'),
-      _0x520bde['addEventListener']('click', () => {
-        if (_0x3a7789 !== ![]) return _0x36d149(_0x520bde, _0x1d7a0c, _0x3a7789);
+      (el4['type'] = 'button'),
+      el4['addEventListener']('click', () => {
+        if (next !== ![]) return run4(el4, handler, next);
         try {
-          _0x1d7a0c();
-        } catch (_0x32fca7) {
-          ((_0xf15485 = !![]),
-            (_0x562e28['hidden'] = ![]),
-            (_0x562e28['textContent'] = _0x32fca7['message']));
+          handler();
+        } catch (error) {
+          ((enabled4 = !![]), (el3['hidden'] = ![]), (el3['textContent'] = error['message']));
         }
       }),
-      _0x13cd7d['append'](_0x520bde),
-      _0x520bde
+      source['append'](el4),
+      el4
     );
   }
-  function _0x356eb7(_0x2291f2, _0x284fcb, { type: type = 'text', placeholder: placeholder = '' } = {}) {
-    const _0x16e748 = element('label', 'collaboration-field', _0x2291f2),
-      _0x1b4ea8 = element('input', 'collaboration-input');
+  function input(current, entry, { type: type = 'text', placeholder: placeholder = '' } = {}) {
+    const element5 = element('label', 'collaboration-field', current),
+      element6 = element('input', 'collaboration-input');
     return (
-      (_0x1b4ea8['type'] = type),
-      (_0x1b4ea8['placeholder'] = placeholder),
-      (_0x1b4ea8['autocomplete'] = 'off'),
-      _0x16e748['append'](_0x1b4ea8),
-      _0x284fcb['append'](_0x16e748),
-      _0x1b4ea8
+      (element6['type'] = type),
+      (element6['placeholder'] = placeholder),
+      (element6['autocomplete'] = 'off'),
+      element5['append'](element6),
+      entry['append'](element5),
+      element6
     );
   }
-  async function _0x36d149(_0x3bbb7e, _0x572be7, _0x5b5d06 = '正在处理…') {
-    if (_0x190019) return ![];
-    ((_0x190019 = !![]),
-      (_0xf15485 = ![]),
-      (_0x3bbb7e['disabled'] = !![]),
-      _0x3bbb7e['setAttribute']('aria-busy', 'true'),
-      _0x3491c2['setBusy'](!![]),
-      (_0x562e28['hidden'] = ![]),
-      _0x562e28['classList']['add']('is-pending'),
-      (_0x562e28['textContent'] = _0x5b5d06));
+  async function run4(el5, handler2, record = '正在处理…') {
+    if (enabled3) return ![];
+    ((enabled3 = !![]),
+      (enabled4 = ![]),
+      (el5['disabled'] = !![]),
+      el5['setAttribute']('aria-busy', 'true'),
+      collaborationInvitation['setBusy'](!![]),
+      (el3['hidden'] = ![]),
+      el3['classList']['add']('is-pending'),
+      (el3['textContent'] = record));
     try {
-      await _0x572be7();
-      if (_0x562e28['textContent'] === _0x5b5d06)
-        _0x562e28['textContent'] = _0xf2157()['session']?.['message'] || '操作完成';
-    } catch (_0x46b0aa) {
-      ((_0xf15485 = !![]),
-        (_0x562e28['textContent'] =
-          _0x46b0aa['name'] === 'AbortError' ? '操作已取消' : _0x46b0aa['message'] || '操作失败，请重试'));
+      await handler2();
+      if (el3['textContent'] === record)
+        el3['textContent'] = getState()['session']?.['message'] || '操作完成';
+    } catch (error2) {
+      ((enabled4 = !![]),
+        (el3['textContent'] =
+          error2['name'] === 'AbortError' ? '操作已取消' : error2['message'] || '操作失败，请重试'));
     } finally {
-      ((_0x190019 = ![]),
-        (_0x3bbb7e['disabled'] = ![]),
-        _0x3491c2['setBusy'](![]),
-        _0x3bbb7e['removeAttribute']('aria-busy'),
-        _0x562e28['classList']['remove']('is-pending'),
-        _0x15b1b5());
+      ((enabled3 = ![]),
+        (el5['disabled'] = ![]),
+        collaborationInvitation['setBusy'](![]),
+        el5['removeAttribute']('aria-busy'),
+        el3['classList']['remove']('is-pending'),
+        render());
     }
     return !![];
   }
-  const _0x45b84f = _0x6a02d('auth');
-  _0x45b84f['append'](element('p', '', '自动使用当前设备已激活的画布授权，无需再次填写激活码。'));
-  const _0x1c834b = _0x213183('重新验证', () => _0x1fb3ad['authenticate'](), _0x45b84f),
-    _0x1da256 = _0x213183(
+  const payload = run3('auth');
+  payload['append'](element('p', '', '自动使用当前设备已激活的画布授权，无需再次填写激活码。'));
+  const el6 = button('重新验证', () => actions['authenticate'](), payload),
+    el7 = button(
       '激活画布',
       () => {
-        (_0x13c1cc(), _0x1fb3ad['activate']());
+        (run5(), actions['activate']());
       },
-      _0x45b84f,
+      payload,
     ),
-    _0xbcd4ab = _0x6a02d('lobby'),
-    _0x1b3e3a = createCollaborationLobby({
-      root: _0xbcd4ab,
-      head: _0x3a2f69,
-      actions: _0x1fb3ad,
+    root2 = run3('lobby'),
+    collaborationLobby = createCollaborationLobby({
+      root: root2,
+      head: head,
+      actions: actions,
       element: element,
-      button: _0x213183,
-      input: _0x356eb7,
-      run: _0x36d149,
-      isBusy: () => _0x190019,
+      button: button,
+      input: input,
+      run: run4,
+      isBusy: () => enabled3,
     }),
-    _0xb9401e = _0x6a02d('active');
-  _0x1b3e3a['mountSession'](_0xb9401e);
-  const _0x1eb148 = element('div', 'collaboration-room-header');
-  (_0xb9401e['append'](_0x1eb148), _0x1eb148['append'](createContextMenuIcon('source', { size: 0x1c })));
-  const _0x2ca5d0 = element('div', 'collaboration-room-info');
-  _0x1eb148['append'](_0x2ca5d0);
-  const _0xbb91f8 = element('h3'),
-    _0x574a8e = element('span', 'collaboration-room-role-badge'),
-    _0x66df98 = element('p', 'collaboration-subtle collaboration-room-status');
-  _0x2ca5d0['append'](_0xbb91f8, _0x574a8e, _0x66df98);
-  const _0x5d85f0 = element('div', 'collaboration-session-footer');
-  _0x5d85f0['append'](element('span', 'collaboration-subtle', '项目由房主保存'));
-  const _0x3adad1 = element('div', 'collaboration-disconnect-slot');
-  _0x5d85f0['append'](_0x3adad1);
-  const _0x142c4b = element('button', 'collaboration-button', '结束本次联机');
-  _0x142c4b['type'] = 'button';
-  const _0x2a57e8 = element('div', 'collaboration-disconnect-confirm');
-  ((_0x2a57e8['hidden'] = !![]),
-    _0x2a57e8['setAttribute']('role', 'group'),
-    _0x2a57e8['setAttribute']('aria-label', '确定结束本次联机'),
-    _0x3adad1['append'](_0x142c4b, _0x2a57e8));
-  let _0x38b42d = '',
-    _0x5554c6 = null;
-  function _0x144934(_0xe58927 = ![]) {
-    ((_0x38b42d = ''),
-      (_0x142c4b['hidden'] = ![]),
-      (_0x2a57e8['hidden'] = !![]),
-      _0x5d85f0['classList']['remove']('is-confirming'));
-    if (_0xe58927 && _0x303af2['open'] && _0xf2157()['session']) _0x142c4b['focus']();
+    root3 = run3('active');
+  collaborationLobby['mountSession'](root3);
+  const element7 = element('div', 'collaboration-room-header');
+  (root3['append'](element7), element7['append'](createContextMenuIcon('source', { size: 0x1c })));
+  const element8 = element('div', 'collaboration-room-info');
+  element7['append'](element8);
+  const el8 = element('h3'),
+    el9 = element('span', 'collaboration-room-role-badge'),
+    el10 = element('p', 'collaboration-subtle collaboration-room-status');
+  element8['append'](el8, el9, el10);
+  const el11 = element('div', 'collaboration-session-footer');
+  el11['append'](element('span', 'collaboration-subtle', '项目由房主保存'));
+  const element9 = element('div', 'collaboration-disconnect-slot');
+  el11['append'](element9);
+  const el12 = element('button', 'collaboration-button', '结束本次联机');
+  el12['type'] = 'button';
+  const el13 = element('div', 'collaboration-disconnect-confirm');
+  ((el13['hidden'] = !![]),
+    el13['setAttribute']('role', 'group'),
+    el13['setAttribute']('aria-label', '确定结束本次联机'),
+    element9['append'](el12, el13));
+  let enabled5 = '',
+    signal = null;
+  function run6(enabled6 = ![]) {
+    ((enabled5 = ''),
+      (el12['hidden'] = ![]),
+      (el13['hidden'] = !![]),
+      el11['classList']['remove']('is-confirming'));
+    if (enabled6 && root['open'] && getState()['session']) el12['focus']();
   }
-  async function _0x804a5a(_0xa91025 = ![]) {
-    if (!_0x38b42d || _0xf2157()['session']?.['roomId'] !== _0x38b42d) {
-      _0x144934();
+  async function run7(enabled7 = ![]) {
+    if (!enabled5 || getState()['session']?.['roomId'] !== enabled5) {
+      run6();
       return;
     }
-    _0x5554c6 = new AbortController();
+    signal = new AbortController();
     try {
-      if (_0xa91025)
-        (_0x278e30({ restoreFocus: ![] }),
-          (_0x41ad0f = ![]),
-          await _0x1fb3ad['saveAndDisconnect']({ signal: _0x5554c6['signal'] }));
-      else await _0x1fb3ad['disconnect']({ signal: _0x5554c6['signal'], preserveDraft: !![] });
+      if (enabled7)
+        (run({ restoreFocus: ![] }),
+          (enabled2 = ![]),
+          await actions['saveAndDisconnect']({ signal: signal['signal'] }));
+      else await actions['disconnect']({ signal: signal['signal'], preserveDraft: !![] });
     } finally {
-      ((_0x5554c6 = null), _0x144934(!![]));
+      ((signal = null), run6(!![]));
     }
   }
-  const _0x2d48f3 = _0x213183('确定', () => _0x804a5a(), _0x2a57e8, '正在结束联机…');
-  _0x2d48f3['classList']['add']('collaboration-danger');
-  const _0x9b35bd = _0x213183('保存并确定', () => _0x804a5a(!![]), _0x2a57e8, '正在保存项目并结束联机…');
-  _0x9b35bd['classList']['add']('collaboration-primary');
-  const _0x1e3a55 = element('button', 'collaboration-button', '取消');
-  ((_0x1e3a55['type'] = 'button'),
-    _0x1e3a55['addEventListener']('click', () => {
-      if (_0x5554c6) _0x5554c6['abort']();
+  const el14 = button('确定', () => run7(), el13, '正在结束联机…');
+  el14['classList']['add']('collaboration-danger');
+  const el15 = button('保存并确定', () => run7(!![]), el13, '正在保存项目并结束联机…');
+  el15['classList']['add']('collaboration-primary');
+  const el16 = element('button', 'collaboration-button', '取消');
+  ((el16['type'] = 'button'),
+    el16['addEventListener']('click', () => {
+      if (signal) signal['abort']();
       else {
-        if (!_0x190019) _0x144934(!![]);
+        if (!enabled3) run6(!![]);
       }
     }),
-    _0x2a57e8['prepend'](_0x1e3a55),
-    _0x142c4b['addEventListener']('click', () => {
-      if (_0x190019 || !_0xf2157()['session']) return;
-      ((_0x38b42d = _0xf2157()['session']['roomId']),
-        (_0x142c4b['hidden'] = !![]),
-        (_0x2a57e8['hidden'] = ![]),
-        _0x1e3a55['focus'](),
-        _0x5d85f0['classList']['add']('is-confirming'));
+    el13['prepend'](el16),
+    el12['addEventListener']('click', () => {
+      if (enabled3 || !getState()['session']) return;
+      ((enabled5 = getState()['session']['roomId']),
+        (el12['hidden'] = !![]),
+        (el13['hidden'] = ![]),
+        el16['focus'](),
+        el11['classList']['add']('is-confirming'));
     }),
-    _0x2a57e8['addEventListener']('keydown', (_0x2d4959) => {
-      if (_0x2d4959['key'] === 'Escape') {
-        (_0x2d4959['preventDefault'](), _0x2d4959['stopPropagation']());
-        if (_0x5554c6) _0x5554c6['abort']();
+    el13['addEventListener']('keydown', (event) => {
+      if (event['key'] === 'Escape') {
+        (event['preventDefault'](), event['stopPropagation']());
+        if (signal) signal['abort']();
         else {
-          if (!_0x190019) _0x144934(!![]);
+          if (!enabled3) run6(!![]);
         }
       }
     }));
-  const _0x13df22 = element('div', 'collaboration-invite-section');
-  _0xb9401e['append'](_0x13df22);
-  const _0x3491c2 = createCollaborationInvitation({
-      root: _0x13df22,
+  const root4 = element('div', 'collaboration-invite-section');
+  root3['append'](root4);
+  const collaborationInvitation = createCollaborationInvitation({
+      root: root4,
       element: element,
-      button: _0x213183,
-      input: _0x356eb7,
-      actions: _0x1fb3ad,
-      getState: _0xf2157,
-      feedback: (_0x56f1d8) => {
-        _0x562e28['textContent'] = _0x56f1d8;
+      button: button,
+      input: input,
+      actions: actions,
+      getState: getState,
+      feedback: (handle) => {
+        el3['textContent'] = handle;
       },
     }),
-    _0x4c2770 = element('div', 'collaboration-member-heading');
-  _0xb9401e['append'](_0x4c2770);
-  const _0x4e7cc3 = element('h4');
-  _0x4c2770['append'](_0x4e7cc3);
-  const _0x3c675f = element('div', 'collaboration-list\x20collaboration-members');
-  (_0x3c675f['setAttribute']('aria-label', '协作成员'), _0xb9401e['append'](_0x3c675f));
-  const _0x262dfb = _0x213183('召集成员到我的视角', () => _0x1fb3ad['summon'](), _0xb9401e);
-  (_0x262dfb['classList']['add']('collaboration-text-action', 'collaboration-summon'),
-    _0x262dfb['prepend'](createContextMenuIcon('select-all')));
-  const _0x36314e = createCollaborationMembers({
-      root: _0x3c675f,
+    element10 = element('div', 'collaboration-member-heading');
+  root3['append'](element10);
+  const el17 = element('h4');
+  element10['append'](el17);
+  const root5 = element('div', 'collaboration-list\x20collaboration-members');
+  (root5['setAttribute']('aria-label', '协作成员'), root3['append'](root5));
+  const el18 = button('召集成员到我的视角', () => actions['summon'](), root3);
+  (el18['classList']['add']('collaboration-text-action', 'collaboration-summon'),
+    el18['prepend'](createContextMenuIcon('select-all')));
+  const collaborationMembers = createCollaborationMembers({
+      root: root5,
       element: element,
-      button: _0x213183,
-      run: _0x36d149,
-      actions: _0x1fb3ad,
-      confirmAction: _0xe018da,
-      getState: _0xf2157,
+      button: button,
+      run: run4,
+      actions: actions,
+      confirmAction: confirmAction,
+      getState: getState,
     }),
-    _0x3264c1 = element('details', 'collaboration-management'),
-    _0x4b37bc = element('summary', '', '房间设置'),
-    _0x2a0e68 = element('span');
-  ((_0x2a0e68['innerHTML'] = ADVANCED_SETTINGS_TUNE_ICON_MARKUP),
-    _0x4b37bc['prepend'](_0x2a0e68),
-    _0x3264c1['append'](_0x4b37bc));
-  const _0x1701ec = element('div', 'collaboration-actions');
-  _0x3264c1['append'](_0x1701ec);
-  const _0x7738e5 = _0x213183(
+    element11 = element('details', 'collaboration-management'),
+    element12 = element('summary', '', '房间设置'),
+    el19 = element('span');
+  ((el19['innerHTML'] = ADVANCED_SETTINGS_TUNE_ICON_MARKUP),
+    element12['prepend'](el19),
+    element11['append'](element12));
+  const element13 = element('div', 'collaboration-actions');
+  element11['append'](element13);
+  const el20 = button(
       '使所有邀请信息失效',
       async () => {
-        (await _0x1fb3ad['revokeInvites'](), _0x3491c2['invalidate']());
+        (await actions['revokeInvites'](), collaborationInvitation['invalidate']());
       },
-      _0x1701ec,
+      element13,
     ),
-    _0x432897 = _0x213183(
+    el21 = button(
       '关闭协作',
       () =>
-        _0xe018da('关闭后所有成员将无法访问此房间，本机内容保留。确认关闭？', () => _0x1fb3ad['closeRoom']()),
-      _0x1701ec,
+        confirmAction('关闭后所有成员将无法访问此房间，本机内容保留。确认关闭？', () =>
+          actions['closeRoom'](),
+        ),
+      element13,
     ),
-    _0x5d64ca = _0x213183(
+    el22 = button(
       '退出成员列表',
-      () => _0xe018da('退出后需要使用有效邀请重新加入，确认退出？', () => _0x1fb3ad['leaveRoom']()),
-      _0x1701ec,
+      () => confirmAction('退出后需要使用有效邀请重新加入，确认退出？', () => actions['leaveRoom']()),
+      element13,
     ),
-    _0x256ab8 = element('div', 'collaboration-task-list');
-  _0xb9401e['append'](_0x256ab8);
-  const _0x5e4007 = createCollaborationActivity({ root: _0xb9401e, getState: _0xf2157, actions: _0x1fb3ad }),
-    _0x22d3da = element('div', 'collaboration-section');
-  _0xb9401e['append'](_0x22d3da);
-  const _0x21ae20 = element('p');
-  (_0x22d3da['append'](_0x21ae20),
-    _0x213183(
+    element14 = element('div', 'collaboration-task-list');
+  root3['append'](element14);
+  const collaborationActivity = createCollaborationActivity({
+      root: root3,
+      getState: getState,
+      actions: actions,
+    }),
+    el23 = element('div', 'collaboration-section');
+  root3['append'](el23);
+  const el24 = element('p');
+  (el23['append'](el24),
+    button(
       '使用房主版本',
-      () => _0xe018da('放弃这些冲突节点的本机修改，使用房主版本？', () => _0x1fb3ad['resolveConflicts'](![])),
-      _0x22d3da,
+      () =>
+        confirmAction('放弃这些冲突节点的本机修改，使用房主版本？', () => actions['resolveConflicts'](![])),
+      el23,
     ),
-    _0x213183(
+    button(
       '提交本机版本',
       () =>
-        _0xe018da('用本机内容重新提交这些冲突节点？房主会再次检查权限和节点占用。', () =>
-          _0x1fb3ad['resolveConflicts'](!![]),
+        confirmAction('用本机内容重新提交这些冲突节点？房主会再次检查权限和节点占用。', () =>
+          actions['resolveConflicts'](!![]),
         ),
-      _0x22d3da,
+      el23,
     ));
-  const _0x3fc104 = element('p', 'collaboration-subtle');
-  (_0xb9401e['append'](_0x3fc104), _0x1b3e3a['mountSessionControls'](_0x3264c1, _0x5d85f0));
-  const _0x13c6db = _0x6a02d('confirmation');
-  _0x13c6db['hidden'] = !![];
-  const _0x3a0259 = element('p');
-  _0x13c6db['append'](_0x3a0259);
-  let _0x2ee53c = null,
-    _0x196d98 = '';
-  (_0x213183(
+  const el25 = element('p', 'collaboration-subtle');
+  (root3['append'](el25), collaborationLobby['mountSessionControls'](element11, el11));
+  const el26 = run3('confirmation');
+  el26['hidden'] = !![];
+  const el27 = element('p');
+  el26['append'](el27);
+  let value2 = null,
+    state = '';
+  (button(
     '确认',
     async () => {
-      const _0x38ee00 = _0x2ee53c;
-      ((_0x2ee53c = null), (_0x13c6db['hidden'] = !![]));
-      if (_0xf2157()['session']?.['roomId'] === _0x196d98) await _0x38ee00?.();
+      const config = value2;
+      ((value2 = null), (el26['hidden'] = !![]));
+      if (getState()['session']?.['roomId'] === state) await config?.();
     },
-    _0x13c6db,
+    el26,
   ),
-    _0x213183(
+    button(
       '取消',
       () => {
-        ((_0x2ee53c = null), (_0x13c6db['hidden'] = !![]));
+        ((value2 = null), (el26['hidden'] = !![]));
       },
-      _0x13c6db,
+      el26,
     ));
-  function _0xe018da(_0x3a780e, _0x2d7561) {
-    ((_0x196d98 = _0xf2157()['session']?.['roomId']),
-      (_0x3a0259['textContent'] = _0x3a780e),
-      (_0x2ee53c = _0x2d7561),
-      (_0x13c6db['hidden'] = ![]),
-      _0x13c6db['querySelector']('button')['focus']());
+  function confirmAction(scope, output) {
+    ((state = getState()['session']?.['roomId']),
+      (el27['textContent'] = scope),
+      (value2 = output),
+      (el26['hidden'] = ![]),
+      el26['querySelector']('button')['focus']());
   }
-  (_0x303af2['append'](_0x3a2f69, _0x129fe4), document['body']['append'](_0x303af2));
-  let _0x5b6410 = 0x0,
-    _0x2b0e11 = '';
-  function _0x13c1cc(_0x2e87e7 = !![]) {
-    (cancelAnimationFrame(_0x5b6410),
-      _0x3491c2['close'](),
-      _0x36314e['close'](),
-      _0x1b3e3a['resetHostChoice'](),
-      _0x144934(),
-      (_0x2ee53c = null),
-      (_0x13c6db['hidden'] = !![]),
-      _0x278e30({ restoreFocus: _0x2e87e7 }),
-      (_0x41ad0f = ![]),
-      _0x303af2['close'](),
+  (root['append'](head, element3), document['body']['append'](root));
+  let requestAnimationFrame2 = 0x0,
+    value3 = '';
+  function run5(restoreFocus = !![]) {
+    (cancelAnimationFrame(requestAnimationFrame2),
+      collaborationInvitation['close'](),
+      collaborationMembers['close'](),
+      collaborationLobby['resetHostChoice'](),
+      run6(),
+      (value2 = null),
+      (el26['hidden'] = !![]),
+      run({ restoreFocus: restoreFocus }),
+      (enabled2 = ![]),
+      root['close'](),
       anchor?.['setAttribute']('aria-expanded', 'false'));
   }
-  function _0x1f9d81() {
-    _0x13c1cc();
+  function onClose() {
+    run5();
   }
-  (_0x104c24['addEventListener']('click', _0x1f9d81),
-    _0x303af2['addEventListener']('cancel', (_0x494b47) => {
-      (_0x494b47['preventDefault'](), _0x1f9d81());
+  (el2['addEventListener']('click', onClose),
+    root['addEventListener']('cancel', (event2) => {
+      (event2['preventDefault'](), onClose());
     }));
-  const _0x1e975d = (_0x2abdac) => {
-    if (!_0x303af2['open']) return;
-    if (_0x303af2['contains'](_0x2abdac['target'])) {
-      _0x2a4279();
+  const value4 = (event3) => {
+    if (!root['open']) return;
+    if (root['contains'](event3['target'])) {
+      run2();
       return;
     }
-    if (anchor?.['contains'](_0x2abdac['target'])) return;
-    if (keepOpenOnOutside(_0x2abdac['target']))
-      (_0x3491c2['close'](), _0x36314e['close'](), _0x278e30({ restoreFocus: ![] }), (_0x41ad0f = ![]));
-    else _0x13c1cc(![]);
+    if (anchor?.['contains'](event3['target'])) return;
+    if (keepOpenOnOutside(event3['target']))
+      (collaborationInvitation['close'](),
+        collaborationMembers['close'](),
+        run({ restoreFocus: ![] }),
+        (enabled2 = ![]));
+    else run5(![]);
   };
-  document['addEventListener']('pointerdown', _0x1e975d, !![]);
-  function _0x1e962c() {
-    const _0x101ec4 = anchor?.['getBoundingClientRect'](),
-      _0x18812c = Math['min'](_0x101ec4?.['bottom'] || 0x30, window['innerHeight'] / 0x3) + 0xa,
-      _0x52ab10 = Math['max'](
+  document['addEventListener']('pointerdown', value4, !![]);
+  function run8() {
+    const box = anchor?.['getBoundingClientRect'](),
+      value5 = Math['min'](box?.['bottom'] || 0x30, window['innerHeight'] / 0x3) + 0xa,
+      value6 = Math['max'](
         0xc,
         Math['min'](
-          window['innerWidth'] - (_0x101ec4?.['right'] || window['innerWidth'] - 0x10),
-          window['innerWidth'] - _0x303af2['offsetWidth'] - 0xc,
+          window['innerWidth'] - (box?.['right'] || window['innerWidth'] - 0x10),
+          window['innerWidth'] - root['offsetWidth'] - 0xc,
         ),
       ),
-      _0xf279d3 = _0x18812c + ':' + _0x52ab10;
-    _0xf279d3 !== _0x2b0e11 &&
-      ((_0x2b0e11 = _0xf279d3),
-      _0x303af2['style']['setProperty']('--collaboration-top', _0x18812c + 'px'),
-      _0x303af2['style']['setProperty']('--collaboration-right', _0x52ab10 + 'px'));
-    if (_0x303af2['open']) _0x5b6410 = requestAnimationFrame(_0x1e962c);
+      value7 = value5 + ':' + value6;
+    value7 !== value3 &&
+      ((value3 = value7),
+      root['style']['setProperty']('--collaboration-top', value5 + 'px'),
+      root['style']['setProperty']('--collaboration-right', value6 + 'px'));
+    if (root['open']) requestAnimationFrame2 = requestAnimationFrame(run8);
   }
-  function _0x15b1b5() {
-    const _0x48ac9f = _0xf2157();
-    _0x9b35bd['hidden'] = !_0x48ac9f['session']?.['hosting'];
-    const _0x11d300 = _0x48ac9f['session']?.['roomId'] || '';
-    _0x11d300 !== _0x1db7c6 && ((_0x1db7c6 = _0x11d300), (_0xf15485 = ![]));
-    if (_0x38b42d && _0x48ac9f['session']?.['roomId'] !== _0x38b42d) _0x144934();
-    _0x196d98 &&
-      _0x48ac9f['session']?.['roomId'] !== _0x196d98 &&
-      ((_0x2ee53c = null), (_0x13c6db['hidden'] = !![]));
-    ((_0x55d432['auth']['hidden'] = !!_0x48ac9f['authenticated'] && !_0x48ac9f['authenticating']),
-      (_0x55d432['lobby']['hidden'] =
-        (!_0x48ac9f['authenticated'] || !!_0x48ac9f['authenticating']) && !_0x48ac9f['session']),
-      (_0x55d432['active']['hidden'] = !_0x48ac9f['session']),
-      _0x1b3e3a['render'](_0x48ac9f),
-      _0x3491c2['render'](_0x48ac9f),
-      _0x5e4007['render']());
-    const _0x410ff4 = _0x36314e['render'](_0x48ac9f);
-    (_0x303af2['classList']['toggle']('is-lobby', !_0x55d432['lobby']['hidden']),
-      _0x303af2['classList']['toggle']('is-session', !!_0x48ac9f['session']),
-      (_0x1c834b['hidden'] = !!_0x48ac9f['authenticating']),
-      (_0x1da256['hidden'] = _0x48ac9f['authError']?.['code'] !== 'ACTIVATION_REQUIRED'));
-    const _0x30e21d = _0x48ac9f['session']?.['status'] === 'connecting';
-    _0x303af2['setAttribute']('aria-busy', String(_0x190019 || !!_0x48ac9f['authenticating'] || _0x30e21d));
-    if (!_0x190019) {
-      _0x562e28['classList']['toggle']('is-pending', !!_0x48ac9f['authenticating'] || _0x30e21d);
-      if (_0x48ac9f['authenticating']) _0x562e28['textContent'] = '正在验证当前设备的画布授权…';
+  function render() {
+    const enabled8 = getState();
+    el15['hidden'] = !enabled8['session']?.['hosting'];
+    const value8 = enabled8['session']?.['roomId'] || '';
+    value8 !== index && ((index = value8), (enabled4 = ![]));
+    if (enabled5 && enabled8['session']?.['roomId'] !== enabled5) run6();
+    state && enabled8['session']?.['roomId'] !== state && ((value2 = null), (el26['hidden'] = !![]));
+    ((enabled['auth']['hidden'] = !!enabled8['authenticated'] && !enabled8['authenticating']),
+      (enabled['lobby']['hidden'] =
+        (!enabled8['authenticated'] || !!enabled8['authenticating']) && !enabled8['session']),
+      (enabled['active']['hidden'] = !enabled8['session']),
+      collaborationLobby['render'](enabled8),
+      collaborationInvitation['render'](enabled8),
+      collaborationActivity['render']());
+    const value9 = collaborationMembers['render'](enabled8);
+    (root['classList']['toggle']('is-lobby', !enabled['lobby']['hidden']),
+      root['classList']['toggle']('is-session', !!enabled8['session']),
+      (el6['hidden'] = !!enabled8['authenticating']),
+      (el7['hidden'] = enabled8['authError']?.['code'] !== 'ACTIVATION_REQUIRED'));
+    const value10 = enabled8['session']?.['status'] === 'connecting';
+    root['setAttribute']('aria-busy', String(enabled3 || !!enabled8['authenticating'] || value10));
+    if (!enabled3) {
+      el3['classList']['toggle']('is-pending', !!enabled8['authenticating'] || value10);
+      if (enabled8['authenticating']) el3['textContent'] = '正在验证当前设备的画布授权…';
       else {
-        if (_0x48ac9f['authError']) _0x562e28['textContent'] = _0x48ac9f['authError']['message'];
+        if (enabled8['authError']) el3['textContent'] = enabled8['authError']['message'];
         else {
-          if (_0x562e28['textContent'] === '正在验证当前设备的画布授权…') _0x562e28['textContent'] = '';
+          if (el3['textContent'] === '正在验证当前设备的画布授权…') el3['textContent'] = '';
         }
       }
     }
-    const _0x59086d = _0x48ac9f['session']?.['message'] || '';
-    if (!_0x190019 && !_0xf15485 && _0x59086d && _0x59086d !== _0x2ba0a7)
-      _0x562e28['textContent'] = _0x59086d;
-    ((_0x2ba0a7 = _0x59086d),
-      (_0x562e28['hidden'] =
-        !_0x190019 && !_0x48ac9f['authenticating'] && QUIET_SYNC_MESSAGES['has'](_0x562e28['textContent'])));
-    !_0x48ac9f['session'] && ((_0x13c6db['hidden'] = !![]), (_0x2ee53c = null));
-    if (_0x48ac9f['session']) {
-      ((_0xbb91f8['textContent'] = _0x48ac9f['session']['name']),
-        (_0x574a8e['textContent'] = ROLE_NAMES[_0x48ac9f['session']['role']]),
-        (_0x66df98['textContent'] =
-          (_0x48ac9f['session']['hosting'] ? '本机开房' : '已加入房间') + ' · ' + _0x410ff4 + ' 人在线'),
-        (_0x66df98['dataset']['status'] = _0x48ac9f['session']['status'] || 'connecting'),
-        (_0x4e7cc3['textContent'] = '成员\x20·\x20' + (_0x48ac9f['session']['members']?.['length'] || 0x0)),
-        (_0x262dfb['hidden'] = _0x48ac9f['session']['role'] !== 'owner'),
-        (_0x22d3da['hidden'] = !_0x48ac9f['session']['conflicts']?.['length']),
-        (_0x21ae20['textContent'] =
+    const value11 = enabled8['session']?.['message'] || '';
+    if (!enabled3 && !enabled4 && value11 && value11 !== result) el3['textContent'] = value11;
+    ((result = value11),
+      (el3['hidden'] =
+        !enabled3 && !enabled8['authenticating'] && QUIET_SYNC_MESSAGES['has'](el3['textContent'])));
+    !enabled8['session'] && ((el26['hidden'] = !![]), (value2 = null));
+    if (enabled8['session']) {
+      ((el8['textContent'] = enabled8['session']['name']),
+        (el9['textContent'] = ROLE_NAMES[enabled8['session']['role']]),
+        (el10['textContent'] =
+          (enabled8['session']['hosting'] ? '本机开房' : '已加入房间') + ' · ' + value9 + ' 人在线'),
+        (el10['dataset']['status'] = enabled8['session']['status'] || 'connecting'),
+        (el17['textContent'] = '成员\x20·\x20' + (enabled8['session']['members']?.['length'] || 0x0)),
+        (el18['hidden'] = enabled8['session']['role'] !== 'owner'),
+        (el23['hidden'] = !enabled8['session']['conflicts']?.['length']),
+        (el24['textContent'] =
           '以下节点或连线存在冲突，其他内容可继续协作：' +
-          (_0x48ac9f['session']['conflicts'] || [])['map']((_0x40863f) => _0x40863f['id'])['join']('、')),
-        (_0x3fc104['textContent'] = _0x48ac9f['session']['recoveryError'] || ''),
-        (_0x3fc104['hidden'] = !_0x48ac9f['session']['recoveryError']));
-      const _0x4a6f2a = ['owner', 'admin']['includes'](_0x48ac9f['session']['role']);
-      ((_0x7738e5['hidden'] = !_0x4a6f2a),
-        (_0x432897['hidden'] = _0x48ac9f['session']['role'] !== 'owner'),
-        (_0x5d64ca['hidden'] = _0x48ac9f['session']['role'] === 'owner'));
-      const _0x47f369 = JSON['stringify']([_0x48ac9f['session']['jobs'], _0x48ac9f['session']['role']]);
-      if (_0x47f369 !== _0x168316) {
-        ((_0x168316 = _0x47f369), _0x256ab8['replaceChildren']());
-        for (const _0xd47fe3 of (_0x48ac9f['session']['jobs'] || [])['filter'](
-          (_0x431a21) => _0x431a21['status'] === 'running',
+          (enabled8['session']['conflicts'] || [])['map']((value12) => value12['id'])['join']('、')),
+        (el25['textContent'] = enabled8['session']['recoveryError'] || ''),
+        (el25['hidden'] = !enabled8['session']['recoveryError']));
+      const enabled9 = ['owner', 'admin']['includes'](enabled8['session']['role']);
+      ((el20['hidden'] = !enabled9),
+        (el21['hidden'] = enabled8['session']['role'] !== 'owner'),
+        (el22['hidden'] = enabled8['session']['role'] === 'owner'));
+      const value13 = JSON['stringify']([enabled8['session']['jobs'], enabled8['session']['role']]);
+      if (value13 !== data) {
+        ((data = value13), element14['replaceChildren']());
+        for (const value14 of (enabled8['session']['jobs'] || [])['filter'](
+          (response) => response['status'] === 'running',
         )) {
-          _0x256ab8['append'](
+          element14['append'](
             element(
               'p',
               '',
               '节点 ' +
-                _0xd47fe3['node'] +
+                value14['node'] +
                 ' 正在由' +
-                (_0x48ac9f['session']['members']['find'](
-                  (_0x411ae9) => _0x411ae9['id'] === _0xd47fe3['actor'],
-                )?.['name'] || '成员') +
+                (enabled8['session']['members']['find']((value15) => value15['id'] === value14['actor'])?.[
+                  'name'
+                ] || '成员') +
                 '生成',
             ),
           );
-          if (_0xd47fe3['actor'] === _0x48ac9f['actorId'] || _0x48ac9f['session']['role'] === 'owner')
-            _0x213183(
+          if (value14['actor'] === enabled8['actorId'] || enabled8['session']['role'] === 'owner')
+            button(
               '处理离线任务',
               () =>
-                _0xe018da(
+                confirmAction(
                   '请先确认模型服务中的任务已停止或结束。此操作只解除协作占用，不会取消模型服务中的任务，确认已结束？',
-                  () => _0x1fb3ad['resolveTask'](_0xd47fe3),
+                  () => actions['resolveTask'](value14),
                 ),
-              _0x256ab8,
+              element14,
             );
         }
       }
@@ -463,39 +468,36 @@ export function createCollaborationPanel({
   }
   return {
     show() {
-      if (!_0x303af2['open']) _0x562e28['textContent'] = _0xf2157()['session']?.['message'] || '';
-      _0x15b1b5();
-      if (_0x303af2['open']) return;
-      (_0x303af2['show'](), _0x1e962c(), anchor?.['setAttribute']('aria-expanded', 'true'), _0x2a4279());
+      if (!root['open']) el3['textContent'] = getState()['session']?.['message'] || '';
+      render();
+      if (root['open']) return;
+      (root['show'](), run8(), anchor?.['setAttribute']('aria-expanded', 'true'), run2());
     },
     toggle() {
-      if (_0x303af2['open']) _0x1f9d81();
+      if (root['open']) onClose();
       else this['show']();
     },
-    render: _0x15b1b5,
+    render: render,
     renderPresence() {
-      if (!_0x303af2['open']) return;
-      const _0x1a6d5f = _0xf2157(),
-        _0x48cfff = _0x36314e['render'](_0x1a6d5f);
-      if (_0x1a6d5f['session']) {
-        const _0x4b7cfa =
-          (_0x1a6d5f['session']['hosting'] ? '本机开房' : '已加入房间') +
-          '\x20·\x20' +
-          _0x48cfff +
-          '\x20人在线';
-        if (_0x66df98['textContent'] !== _0x4b7cfa) _0x66df98['textContent'] = _0x4b7cfa;
+      if (!root['open']) return;
+      const value16 = getState(),
+        value17 = collaborationMembers['render'](value16);
+      if (value16['session']) {
+        const value18 =
+          (value16['session']['hosting'] ? '本机开房' : '已加入房间') + '\x20·\x20' + value17 + '\x20人在线';
+        if (el10['textContent'] !== value18) el10['textContent'] = value18;
       }
     },
-    feedback(_0x539ce9) {
-      !_0x190019 && !_0xf15485 && ((_0x562e28['hidden'] = ![]), (_0x562e28['textContent'] = _0x539ce9));
+    feedback(value19) {
+      !enabled3 && !enabled4 && ((el3['hidden'] = ![]), (el3['textContent'] = value19));
     },
     destroy() {
-      (cancelAnimationFrame(_0x5b6410),
-        _0x3491c2['close'](),
-        _0x36314e['destroy'](),
-        _0x278e30(),
-        document['removeEventListener']('pointerdown', _0x1e975d, !![]),
-        _0x303af2['remove']());
+      (cancelAnimationFrame(requestAnimationFrame2),
+        collaborationInvitation['close'](),
+        collaborationMembers['destroy'](),
+        run(),
+        document['removeEventListener']('pointerdown', value4, !![]),
+        root['remove']());
     },
   };
 }

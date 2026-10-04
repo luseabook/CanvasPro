@@ -268,7 +268,7 @@ const AGNES_VIDEO_FRAME_RATE = 0x18,
   AGNES_VIDEO_DURATION_VALUES = Object['freeze']([
     ...Array['from'](
       { length: Math['floor'](AGNES_VIDEO_MAX_SECONDS) - AGNES_VIDEO_MIN_SECONDS + 0x1 },
-      (_0x148a58, _0x1d8f4d) => AGNES_VIDEO_MIN_SECONDS + _0x1d8f4d,
+      (value, item) => AGNES_VIDEO_MIN_SECONDS + item,
     ),
     ...(Number['isInteger'](AGNES_VIDEO_MAX_SECONDS) ? [] : [AGNES_VIDEO_MAX_SECONDS]),
   ]),
@@ -489,25 +489,25 @@ const AGNES_VIDEO_FRAME_RATE = 0x18,
     label: '视频时长',
   });
 function createAgnesVideo25FixedSlot({
-  id: _0x49baca,
-  kind: _0x290cd6,
-  label: _0xf6d3a3,
-  description: _0xd35946,
-  mode: _0x3f945e,
-  displayOrder: _0x1d0e61,
+  id: id,
+  kind: kind,
+  label: label,
+  description: description,
+  mode: mode,
+  displayOrder: displayOrder,
 }) {
   return Object['freeze']({
-    id: _0x49baca,
-    kind: _0x290cd6,
-    label: _0xf6d3a3,
-    description: _0xd35946,
-    displayOrder: _0x1d0e61,
+    id: id,
+    kind: kind,
+    label: label,
+    description: description,
+    displayOrder: displayOrder,
     required: ![],
-    showWhen: Object['freeze']({ field: 'mode', value: _0x3f945e }),
+    showWhen: Object['freeze']({ field: 'mode', value: mode }),
   });
 }
 function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
-  const _0x36e36e = [
+  const key = [
     createAgnesVideo25FixedSlot({
       id: 'firstFrame',
       kind: 'image',
@@ -543,7 +543,7 @@ function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
   ];
   return (
     !flash &&
-      _0x36e36e['splice'](
+      key['splice'](
         0x3,
         0x0,
         createAgnesVideo25FixedSlot({
@@ -559,7 +559,7 @@ function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
       image: flash ? 0x5 : 0x9,
       video: flash ? 0x0 : 0x3,
       audio: 0x3,
-      fixedSlots: Object['freeze'](_0x36e36e),
+      fixedSlots: Object['freeze'](key),
       cycleFixedInputWhenFull: !![],
       preserveHiddenInputsByKind: !![],
       preserveHiddenInputsByKindFields: ['mode'],
@@ -615,23 +615,23 @@ const AGNES_VIDEO_25_BODY_MAPPING = createApimartVideoBodyMapping([
   }),
   Object['freeze']({ path: 'n', from: 'constant', value: 0x1 }),
 ]);
-function createAgnesVideo25TaskPolling(_0x2dc826) {
+function createAgnesVideo25TaskPolling(index) {
   return Object['freeze']({
     ...AGNES_VIDEO_TASK_POLLING,
     pollIntervalMs: 0x2 * 0x3e8,
-    urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=' + _0x2dc826,
+    urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=' + index,
   });
 }
 function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
-  const _0x5d08f7 = flash ? 'agnes-video-2.5-flash' : 'agnes-video-2.5',
-    _0x25cbdd = flash ? 'Agnes\x20Video\x202.5\x20Flash' : 'Agnes\x20Video\x202.5';
+  const model = flash ? 'agnes-video-2.5-flash' : 'agnes-video-2.5',
+    displayName = flash ? 'Agnes\x20Video\x202.5\x20Flash' : 'Agnes\x20Video\x202.5';
   return Object['freeze']({
-    modelId: 'agnes/' + _0x5d08f7,
-    executionId: 'agnes.model-api.video.' + _0x5d08f7 + '.v1',
-    displayName: _0x25cbdd,
+    modelId: 'agnes/' + model,
+    executionId: 'agnes.model-api.video.' + model + '.v1',
+    displayName: displayName,
     provider: 'agnes',
     icon: 'AG',
-    model: _0x5d08f7,
+    model: model,
     endpoint: '/v1/videos',
     endpointMode: 'video-generation',
     description: flash
@@ -647,7 +647,7 @@ function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
     inputSlots: createAgnesVideo25InputSlots({ flash: flash }),
     bodyMapping: AGNES_VIDEO_25_BODY_MAPPING,
     responseMapping: AGNES_VIDEO_RESPONSE_MAPPING,
-    taskPolling: createAgnesVideo25TaskPolling(_0x5d08f7),
+    taskPolling: createAgnesVideo25TaskPolling(model),
     resultTaskIdPath: 'video_id',
     executionExtensions: Object['freeze']({
       bodyResolver: 'agnesVideo25',
@@ -685,7 +685,7 @@ function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
       videoMenu: Object['freeze']({
         role: 'agnesModel',
         order: flash ? 0x1e : 0x14,
-        label: _0x25cbdd,
+        label: displayName,
         subtitle: flash ? '高速 · 720P' : '多模态 · 最高 2K',
       }),
       videoInputSurface: Object['freeze']({ hideFixedInputSlots: !![] }),

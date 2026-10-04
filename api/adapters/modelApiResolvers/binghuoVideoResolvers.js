@@ -1,50 +1,50 @@
 import { translateMinimaxH3EditorAssetMentions } from '../minimaxH3Prompt.js';
-function appendUrl(_0x19a916, _0x3cf588) {
-  if (Array['isArray'](_0x3cf588)) {
-    _0x3cf588['forEach']((_0xc16f97) => appendUrl(_0x19a916, _0xc16f97));
+function appendUrl(list, list2) {
+  if (Array['isArray'](list2)) {
+    list2['forEach']((value) => appendUrl(list, value));
     return;
   }
-  const _0x5d57eb =
-      _0x3cf588 && typeof _0x3cf588 === 'object'
-        ? _0x3cf588['url'] || _0x3cf588['src'] || _0x3cf588['fileUrl'] || _0x3cf588['file_url'] || ''
-        : _0x3cf588,
-    _0x981724 = String(_0x5d57eb || '')['trim']();
-  if (_0x981724 && !_0x19a916['includes'](_0x981724)) _0x19a916['push'](_0x981724);
+  const item =
+      list2 && typeof list2 === 'object'
+        ? list2['url'] || list2['src'] || list2['fileUrl'] || list2['file_url'] || ''
+        : list2,
+    key = String(item || '')['trim']();
+  if (key && !list['includes'](key)) list['push'](key);
 }
-function normalizeUrlList(_0x38a723) {
-  const _0x3dabea = [];
-  return (appendUrl(_0x3dabea, _0x38a723), _0x3dabea);
+function normalizeUrlList(index) {
+  const result = [];
+  return (appendUrl(result, index), result);
 }
-function getSlotUrls(_0x591a7b, _0x19bbed) {
-  if (!_0x591a7b || typeof _0x591a7b !== 'object') return [];
-  return normalizeUrlList(_0x591a7b[_0x19bbed]);
+function getSlotUrls(enabled, data) {
+  if (!enabled || typeof enabled !== 'object') return [];
+  return normalizeUrlList(enabled[data]);
 }
-function collectImages(_0x26a063, _0x31e1d0, _0x4aea88 = []) {
-  const _0x42ccdc = [];
+function collectImages(options, target, list3 = []) {
+  const source = [];
   return (
-    _0x4aea88['forEach']((_0x83a653) => appendUrl(_0x42ccdc, getSlotUrls(_0x31e1d0, _0x83a653))),
-    appendUrl(_0x42ccdc, _0x26a063),
-    _0x42ccdc
+    list3['forEach']((next) => appendUrl(source, getSlotUrls(target, next))),
+    appendUrl(source, options),
+    source
   );
 }
-function getPolicy(_0x3c8a73) {
-  const _0x15d11c = _0x3c8a73?.['extensions']?.['binghuoVideo'];
-  return _0x15d11c && typeof _0x15d11c === 'object' && !Array['isArray'](_0x15d11c) ? _0x15d11c : {};
+function getPolicy(current) {
+  const entry = current?.['extensions']?.['binghuoVideo'];
+  return entry && typeof entry === 'object' && !Array['isArray'](entry) ? entry : {};
 }
-function requireMaximum(_0x2b9ef2, _0x4f58e1, _0x79e075) {
-  const _0x29a3b1 = Number(_0x79e075);
-  if (!Number['isFinite'](_0x29a3b1) || _0x29a3b1 < 0x0 || _0x4f58e1['length'] <= _0x29a3b1) return;
-  throw new Error('便宜渠道当前模型最多支持\x20' + _0x29a3b1 + '\x20个' + _0x2b9ef2);
+function requireMaximum(record, list4, handle) {
+  const count = Number(handle);
+  if (!Number['isFinite'](count) || count < 0x0 || list4['length'] <= count) return;
+  throw new Error('便宜渠道当前模型最多支持\x20' + count + '\x20个' + record);
 }
-function requireMinimumImages(_0x1f0bed, _0x2e6f7e) {
-  const _0x166ecc = Number(_0x2e6f7e);
-  if (!Number['isFinite'](_0x166ecc) || _0x166ecc <= 0x0 || _0x1f0bed['length'] >= _0x166ecc) return;
-  throw new Error('便宜渠道当前模型至少需要 ' + _0x166ecc + ' 张参考图');
+function requireMinimumImages(list5, state) {
+  const count2 = Number(state);
+  if (!Number['isFinite'](count2) || count2 <= 0x0 || list5['length'] >= count2) return;
+  throw new Error('便宜渠道当前模型至少需要 ' + count2 + ' 张参考图');
 }
-function getMode(_0x57d9a3, _0x38dbc1) {
-  const _0x189d63 = String(_0x38dbc1['modeField'] || '')['trim']();
-  if (!_0x189d63) return '';
-  return String(_0x57d9a3?.['generationParams']?.[_0x189d63] ?? _0x57d9a3?.[_0x189d63] ?? '')['trim']();
+function getMode(config, scope) {
+  const enabled2 = String(scope['modeField'] || '')['trim']();
+  if (!enabled2) return '';
+  return String(config?.['generationParams']?.[enabled2] ?? config?.[enabled2] ?? '')['trim']();
 }
 const RAW_FIELD_ALIASES = Object['freeze']({
   aspectRatio: Object['freeze'](['aspectRatio', 'aspect_ratio', 'ratio', 'size']),
@@ -53,308 +53,295 @@ const RAW_FIELD_ALIASES = Object['freeze']({
   resolution: Object['freeze'](['resolution']),
   skipReview: Object['freeze'](['skipReview', 'skip_review']),
 });
-function readRawFieldValue(_0x332421, _0x1f024d) {
-  const _0x523e60 = RAW_FIELD_ALIASES[_0x1f024d] || [_0x1f024d],
-    _0x3c0193 =
-      _0x332421?.['generationParams'] &&
-      typeof _0x332421['generationParams'] === 'object' &&
-      !Array['isArray'](_0x332421['generationParams'])
-        ? _0x332421['generationParams']
+function readRawFieldValue(input, output) {
+  const value2 = RAW_FIELD_ALIASES[output] || [output],
+    value3 =
+      input?.['generationParams'] &&
+      typeof input['generationParams'] === 'object' &&
+      !Array['isArray'](input['generationParams'])
+        ? input['generationParams']
         : {};
-  for (const _0x3938e5 of _0x523e60) {
-    if (Object['prototype']['hasOwnProperty']['call'](_0x3c0193, _0x3938e5)) return _0x3c0193[_0x3938e5];
+  for (const value4 of value2) {
+    if (Object['prototype']['hasOwnProperty']['call'](value3, value4)) return value3[value4];
   }
-  for (const _0x568b7b of _0x523e60) {
-    if (Object['prototype']['hasOwnProperty']['call'](_0x332421 || {}, _0x568b7b))
-      return _0x332421[_0x568b7b];
+  for (const value5 of value2) {
+    if (Object['prototype']['hasOwnProperty']['call'](input || {}, value5)) return input[value5];
   }
   return undefined;
 }
-function getFieldOptionValues(_0x5481e1) {
-  return (Array['isArray'](_0x5481e1?.['options']) ? _0x5481e1['options'] : [])['map']((_0x2ea11e) =>
-    _0x2ea11e && typeof _0x2ea11e === 'object' && !Array['isArray'](_0x2ea11e)
-      ? _0x2ea11e['value']
-      : _0x2ea11e,
+function getFieldOptionValues(value6) {
+  return (Array['isArray'](value6?.['options']) ? value6['options'] : [])['map']((el) =>
+    el && typeof el === 'object' && !Array['isArray'](el) ? el['value'] : el,
   );
 }
-function isSameOptionValue(_0x1c57a0, _0x3afc87) {
-  const _0x501ade = Number(_0x1c57a0),
-    _0x5ddc1d = Number(_0x3afc87);
+function isSameOptionValue(value7, value8) {
+  const value9 = Number(value7),
+    value10 = Number(value8);
   if (
-    String(_0x1c57a0)['trim']() !== '' &&
-    String(_0x3afc87)['trim']() !== '' &&
-    Number['isFinite'](_0x501ade) &&
-    Number['isFinite'](_0x5ddc1d)
+    String(value7)['trim']() !== '' &&
+    String(value8)['trim']() !== '' &&
+    Number['isFinite'](value9) &&
+    Number['isFinite'](value10)
   )
-    return _0x501ade === _0x5ddc1d;
+    return value9 === value10;
   return (
-    String(_0x1c57a0 ?? '')
+    String(value7 ?? '')
       ['trim']()
       ['toLowerCase']() ===
-    String(_0x3afc87 ?? '')
+    String(value8 ?? '')
       ['trim']()
       ['toLowerCase']()
   );
 }
-function validateRawFieldValue(_0x30f119, _0x30162c, _0x21f72c) {
-  const _0x240d58 = String(_0x30162c?.['id'] || '')['trim']();
-  if (!_0x240d58) return;
-  const _0x539da3 = readRawFieldValue(_0x30f119, _0x240d58);
-  if (_0x539da3 === undefined || _0x539da3 === null || String(_0x539da3)['trim']() === '') return;
-  const _0x3d0c33 = String(_0x30162c?.['label'] || _0x240d58)['trim'](),
-    _0x1098f1 = String(_0x30162c?.['type'] || '')
+function validateRawFieldValue(value11, value12, value13) {
+  const enabled3 = String(value12?.['id'] || '')['trim']();
+  if (!enabled3) return;
+  const rawFieldValue = readRawFieldValue(value11, enabled3);
+  if (rawFieldValue === undefined || rawFieldValue === null || String(rawFieldValue)['trim']() === '') return;
+  const value14 = String(value12?.['label'] || enabled3)['trim'](),
+    value15 = String(value12?.['type'] || '')
       ['trim']()
       ['toLowerCase'](),
-    _0xbc4ee6 = getFieldOptionValues(_0x30162c);
-  if (_0xbc4ee6['length'] > 0x0 && !_0xbc4ee6['some']((_0x5c75c4) => isSameOptionValue(_0x5c75c4, _0x539da3)))
+    list6 = getFieldOptionValues(value12);
+  if (list6['length'] > 0x0 && !list6['some']((value16) => isSameOptionValue(value16, rawFieldValue)))
     throw new Error(
       '便宜渠道\x20' +
-        _0x21f72c +
+        value13 +
         '\x20的' +
-        _0x3d0c33 +
+        value14 +
         '不支持“' +
-        _0x539da3 +
+        rawFieldValue +
         '”，可选：' +
-        _0xbc4ee6['join'](' / '),
+        list6['join'](' / '),
     );
-  if (_0x1098f1 === 'toggle') {
-    const _0x18abc2 = String(_0x539da3)['trim']()['toLowerCase']();
+  if (value15 === 'toggle') {
+    const value17 = String(rawFieldValue)['trim']()['toLowerCase']();
     if (
-      _0x539da3 !== !![] &&
-      _0x539da3 !== ![] &&
-      !['true', 'false', '1', '0', 'yes', 'no', 'on', 'off']['includes'](_0x18abc2)
+      rawFieldValue !== !![] &&
+      rawFieldValue !== ![] &&
+      !['true', 'false', '1', '0', 'yes', 'no', 'on', 'off']['includes'](value17)
     )
-      throw new Error('便宜渠道 ' + _0x21f72c + '\x20的' + _0x3d0c33 + '只能开启或关闭');
+      throw new Error('便宜渠道 ' + value13 + '\x20的' + value14 + '只能开启或关闭');
     return;
   }
-  if (_0x1098f1 !== 'slider' || _0xbc4ee6['length'] > 0x0) return;
-  const _0x3c6350 = Number(_0x539da3),
-    _0x42d1d8 = Number(_0x30162c?.['min']),
-    _0x3c3ae4 = Number(_0x30162c?.['max']),
-    _0x5b319a = Number(_0x30162c?.['step']);
-  if (!Number['isFinite'](_0x3c6350))
-    throw new Error('便宜渠道 ' + _0x21f72c + '\x20的' + _0x3d0c33 + '必须是数字');
-  if (Number['isFinite'](_0x42d1d8) && _0x3c6350 < _0x42d1d8)
-    throw new Error('便宜渠道 ' + _0x21f72c + '\x20的' + _0x3d0c33 + '不能小于 ' + _0x42d1d8);
-  if (Number['isFinite'](_0x3c3ae4) && _0x3c6350 > _0x3c3ae4)
-    throw new Error('便宜渠道 ' + _0x21f72c + '\x20的' + _0x3d0c33 + '不能大于 ' + _0x3c3ae4);
+  if (value15 !== 'slider' || list6['length'] > 0x0) return;
+  const value18 = Number(rawFieldValue),
+    value19 = Number(value12?.['min']),
+    value20 = Number(value12?.['max']),
+    count3 = Number(value12?.['step']);
+  if (!Number['isFinite'](value18))
+    throw new Error('便宜渠道 ' + value13 + '\x20的' + value14 + '必须是数字');
+  if (Number['isFinite'](value19) && value18 < value19)
+    throw new Error('便宜渠道 ' + value13 + '\x20的' + value14 + '不能小于 ' + value19);
+  if (Number['isFinite'](value20) && value18 > value20)
+    throw new Error('便宜渠道 ' + value13 + '\x20的' + value14 + '不能大于 ' + value20);
   if (
-    Number['isFinite'](_0x5b319a) &&
-    _0x5b319a > 0x0 &&
-    Number['isFinite'](_0x42d1d8) &&
-    Math['abs']((_0x3c6350 - _0x42d1d8) / _0x5b319a - Math['round']((_0x3c6350 - _0x42d1d8) / _0x5b319a)) >
-      1e-9
+    Number['isFinite'](count3) &&
+    count3 > 0x0 &&
+    Number['isFinite'](value19) &&
+    Math['abs']((value18 - value19) / count3 - Math['round']((value18 - value19) / count3)) > 1e-9
   )
-    throw new Error('便宜渠道\x20' + _0x21f72c + '\x20的' + _0x3d0c33 + '必须按\x20' + _0x5b319a + ' 递增');
+    throw new Error('便宜渠道\x20' + value13 + '\x20的' + value14 + '必须按\x20' + count3 + ' 递增');
 }
-function validateRawUiSchemaParams(_0x25b4ca, _0x10bba2) {
-  const _0x1998f7 = Array['isArray'](_0x10bba2?.['uiSchema']?.['fields'])
-      ? _0x10bba2['uiSchema']['fields']
-      : [],
-    _0xc8dec5 = String(_0x10bba2?.['displayName'] || _0x10bba2?.['modelId'] || '当前模型')['trim']();
-  _0x1998f7['forEach']((_0x5ba297) => validateRawFieldValue(_0x25b4ca, _0x5ba297, _0xc8dec5));
+function validateRawUiSchemaParams(value21, value22) {
+  const list7 = Array['isArray'](value22?.['uiSchema']?.['fields']) ? value22['uiSchema']['fields'] : [],
+    value23 = String(value22?.['displayName'] || value22?.['modelId'] || '当前模型')['trim']();
+  list7['forEach']((value24) => validateRawFieldValue(value21, value24, value23));
 }
-function normalizeRawInputList(_0x249398) {
-  return (Array['isArray'](_0x249398) ? _0x249398 : [_0x249398])
-    ['map']((_0x4d7354) => String(_0x4d7354 || '')['trim']())
+function normalizeRawInputList(value25) {
+  return (Array['isArray'](value25) ? value25 : [value25])
+    ['map']((value26) => String(value26 || '')['trim']())
     ['filter'](Boolean);
 }
-function collectRawInputUrls(_0x37a549, _0x1cc2f7) {
-  if (_0x1cc2f7 === 'image') {
-    const _0x2a2721 = Object['values'](
-        _0x37a549?.['inputUrlsBySlot'] &&
-          typeof _0x37a549['inputUrlsBySlot'] === 'object' &&
-          !Array['isArray'](_0x37a549['inputUrlsBySlot'])
-          ? _0x37a549['inputUrlsBySlot']
+function collectRawInputUrls(value27, value28) {
+  if (value28 === 'image') {
+    const args = Object['values'](
+        value27?.['inputUrlsBySlot'] &&
+          typeof value27['inputUrlsBySlot'] === 'object' &&
+          !Array['isArray'](value27['inputUrlsBySlot'])
+          ? value27['inputUrlsBySlot']
           : {},
       )['flatMap'](normalizeRawInputList),
-      _0x34c87d = [
-        ..._0x2a2721,
-        ...normalizeRawInputList(_0x37a549?.['images']),
-        ...normalizeRawInputList(_0x37a549?.['inputUrls']),
+      value29 = [
+        ...args,
+        ...normalizeRawInputList(value27?.['images']),
+        ...normalizeRawInputList(value27?.['inputUrls']),
       ];
-    return Array['from'](new Set(_0x34c87d));
+    return Array['from'](new Set(value29));
   }
-  if (_0x1cc2f7 === 'video')
+  if (value28 === 'video')
     return Array['from'](
       new Set([
-        ...normalizeRawInputList(_0x37a549?.['videoUrl']),
-        ...normalizeRawInputList(_0x37a549?.['videos']),
-        ...normalizeRawInputList(_0x37a549?.['videoUrls']),
-        ...normalizeRawInputList(_0x37a549?.['reference_videos']),
+        ...normalizeRawInputList(value27?.['videoUrl']),
+        ...normalizeRawInputList(value27?.['videos']),
+        ...normalizeRawInputList(value27?.['videoUrls']),
+        ...normalizeRawInputList(value27?.['reference_videos']),
       ]),
     );
   return Array['from'](
     new Set([
-      ...normalizeRawInputList(_0x37a549?.['audioUrl']),
-      ...normalizeRawInputList(_0x37a549?.['audios']),
-      ...normalizeRawInputList(_0x37a549?.['audioUrls']),
-      ...normalizeRawInputList(_0x37a549?.['reference_audios']),
+      ...normalizeRawInputList(value27?.['audioUrl']),
+      ...normalizeRawInputList(value27?.['audios']),
+      ...normalizeRawInputList(value27?.['audioUrls']),
+      ...normalizeRawInputList(value27?.['reference_audios']),
     ]),
   );
 }
-function collectRawActiveImageUrls(_0x15bdfb, _0x3b1a0e, _0x470235) {
-  if (_0x470235 !== !![]) return collectRawInputUrls(_0x15bdfb, 'image');
-  const _0x3831c2 =
-      _0x15bdfb?.['inputUrlsBySlot'] &&
-      typeof _0x15bdfb['inputUrlsBySlot'] === 'object' &&
-      !Array['isArray'](_0x15bdfb['inputUrlsBySlot'])
-        ? _0x15bdfb['inputUrlsBySlot']
+function collectRawActiveImageUrls(value30, value31, value32) {
+  if (value32 !== !![]) return collectRawInputUrls(value30, 'image');
+  const value33 =
+      value30?.['inputUrlsBySlot'] &&
+      typeof value30['inputUrlsBySlot'] === 'object' &&
+      !Array['isArray'](value30['inputUrlsBySlot'])
+        ? value30['inputUrlsBySlot']
         : {},
-    _0x4f9456 = new Set(Object['values'](_0x3831c2)['flatMap'](normalizeRawInputList)),
-    _0x18d586 = [
-      ...normalizeRawInputList(_0x15bdfb?.['images']),
-      ...normalizeRawInputList(_0x15bdfb?.['inputUrls']),
-    ]['filter']((_0x19cb09) => !_0x4f9456['has'](_0x19cb09)),
-    _0x256b09 = _0x3b1a0e === 'frames' ? ['firstFrame', 'lastFrame'] : ['referenceImage'];
+    map = new Set(Object['values'](value33)['flatMap'](normalizeRawInputList)),
+    args2 = [...normalizeRawInputList(value30?.['images']), ...normalizeRawInputList(value30?.['inputUrls'])][
+      'filter'
+    ]((value34) => !map['has'](value34)),
+    list8 = value31 === 'frames' ? ['firstFrame', 'lastFrame'] : ['referenceImage'];
   return Array['from'](
-    new Set([
-      ..._0x256b09['flatMap']((_0xe81962) => normalizeRawInputList(_0x3831c2[_0xe81962])),
-      ..._0x18d586,
-    ]),
+    new Set([...list8['flatMap']((value35) => normalizeRawInputList(value33[value35])), ...args2]),
   );
 }
-function validateRawInputCounts(_0x5b56ff, _0x326a4c) {
-  const _0x23fe2d =
-      _0x326a4c['supportsFrames'] === !![]
-        ? String(readRawFieldValue(_0x5b56ff, _0x326a4c['modeField']) || 'reference')
+function validateRawInputCounts(value36, image) {
+  const value37 =
+      image['supportsFrames'] === !![]
+        ? String(readRawFieldValue(value36, image['modeField']) || 'reference')
             ['trim']()
             ['toLowerCase']()
         : 'reference',
-    _0x264404 =
-      _0x23fe2d === 'frames'
+    value38 =
+      value37 === 'frames'
         ? { image: 0x2, video: 0x0, audio: 0x0 }
-        : { image: _0x326a4c['maxImages'], video: _0x326a4c['maxVideos'], audio: _0x326a4c['maxAudios'] };
-  for (const [_0x1ce093, _0x2af081] of [
+        : { image: image['maxImages'], video: image['maxVideos'], audio: image['maxAudios'] };
+  for (const [value39, value40] of [
     ['image', '参考图'],
     ['video', '参考视频'],
     ['audio', '参考音频'],
   ]) {
-    const _0x160774 =
-        _0x1ce093 === 'image'
-          ? collectRawActiveImageUrls(_0x5b56ff, _0x23fe2d, _0x326a4c['supportsFrames'])
-          : collectRawInputUrls(_0x5b56ff, _0x1ce093),
-      _0x2db7ce = Number(_0x264404[_0x1ce093]);
-    if (Number['isFinite'](_0x2db7ce) && _0x160774['length'] > _0x2db7ce)
+    const list9 =
+        value39 === 'image'
+          ? collectRawActiveImageUrls(value36, value37, image['supportsFrames'])
+          : collectRawInputUrls(value36, value39),
+      value41 = Number(value38[value39]);
+    if (Number['isFinite'](value41) && list9['length'] > value41)
       throw new Error(
         '便宜渠道当前模型最多支持 ' +
-          _0x2db7ce +
+          value41 +
           '\x20个' +
-          _0x2af081 +
+          value40 +
           '，当前传入\x20' +
-          _0x160774['length'] +
+          list9['length'] +
           ' 个，请删减后重试',
       );
   }
 }
-function validateAssetRefs(_0x3dca94, _0x44132c, _0x3812c3, _0x4a8699, _0x42facf) {
-  const _0x10a02f = new Set(
-      Array['isArray'](_0x3dca94['allowAssetRefKinds']) ? _0x3dca94['allowAssetRefKinds'] : [],
-    ),
-    _0x41d6b1 = _0x42facf && typeof _0x42facf === 'object' ? _0x42facf : {},
-    _0x44b6b7 = {
+function validateAssetRefs(value42, value43, value44, value45, value46) {
+  const map2 = new Set(Array['isArray'](value42['allowAssetRefKinds']) ? value42['allowAssetRefKinds'] : []),
+    value47 = value46 && typeof value46 === 'object' ? value46 : {},
+    value48 = {
       image: normalizeUrlList([
-        _0x44132c,
-        _0x41d6b1['firstFrame'],
-        _0x41d6b1['lastFrame'],
-        _0x41d6b1['referenceImage'],
+        value43,
+        value47['firstFrame'],
+        value47['lastFrame'],
+        value47['referenceImage'],
       ]),
-      video: normalizeUrlList([_0x3812c3, _0x41d6b1['referenceVideo']]),
-      audio: normalizeUrlList([_0x4a8699, _0x41d6b1['referenceAudio']]),
+      video: normalizeUrlList([value44, value47['referenceVideo']]),
+      audio: normalizeUrlList([value45, value47['referenceAudio']]),
     };
-  for (const [_0x194e6e, _0x4510ff] of Object['entries'](_0x44b6b7)) {
-    if (_0x10a02f['has'](_0x194e6e)) continue;
-    if (!_0x4510ff['some']((_0x3d49cb) => /^asset:\/\//i['test'](_0x3d49cb))) continue;
+  for (const [value49, list10] of Object['entries'](value48)) {
+    if (map2['has'](value49)) continue;
+    if (!list10['some']((value50) => /^asset:\/\//i['test'](value50))) continue;
     throw new Error(
       '便宜渠道当前模型不支持该 asset:// 预审素材引用；请提供原始素材，系统会先上传到 /v1/assets/uploads',
     );
   }
 }
 function applySeedanceInputs({
-  body: _0x1035ff,
-  payload: _0x5b51a2,
-  policy: _0xcbf075,
-  inputImages: _0x5536b6,
-  inputVideos: _0x590407,
-  inputAudios: _0x31203e,
-  finalUrlsBySlot: _0x4b822e,
+  body: body,
+  payload: payload2,
+  policy: policy,
+  inputImages: inputImages2,
+  inputVideos: inputVideos2,
+  inputAudios: inputAudios2,
+  finalUrlsBySlot: finalUrlsBySlot2,
 }) {
-  const _0x20d2a2 = normalizeUrlList(_0x590407),
-    _0x590e4f = normalizeUrlList(_0x31203e),
-    _0x4a76ed = normalizeUrlList(_0x5536b6);
-  (requireMaximum('参考视频', _0x20d2a2, _0xcbf075['maxVideos']),
-    requireMaximum('参考音频', _0x590e4f, _0xcbf075['maxAudios']),
-    delete _0x1035ff['images'],
-    delete _0x1035ff['start_frame'],
-    delete _0x1035ff['end_frame'],
-    delete _0x1035ff['reference_videos'],
-    delete _0x1035ff['reference_audios']);
-  const _0x2b397c =
-    _0xcbf075['supportsFrames'] === !![] ? getMode(_0x5b51a2, _0xcbf075) || 'reference' : 'reference';
-  if (_0x2b397c === 'frames') {
-    const _0x4add88 = getSlotUrls(_0x4b822e, 'firstFrame'),
-      _0x56ebab = getSlotUrls(_0x4b822e, 'lastFrame'),
-      _0x19cd2b = new Set([..._0x4add88, ..._0x56ebab, ...getSlotUrls(_0x4b822e, 'referenceImage')]),
-      _0xf3b586 = _0x4a76ed['filter']((_0x546f0c) => !_0x19cd2b['has'](_0x546f0c)),
-      _0x2680fc = _0x4add88[0x0] || _0xf3b586[0x0] || '',
-      _0x1058dc = _0x56ebab[0x0] || _0xf3b586[0x1] || '';
-    (requireMaximum('首帧', _0x4add88, 0x1),
-      requireMaximum('尾帧', _0x56ebab, 0x1),
-      requireMaximum('参考视频', _0x20d2a2, 0x0),
-      requireMaximum('参考音频', _0x590e4f, 0x0));
-    if (!_0x2680fc) throw new Error('便宜渠道首尾帧模式至少需要\x201\x20张首帧图片');
-    _0x1035ff['start_frame'] = [_0x2680fc];
-    if (_0x1058dc) _0x1035ff['end_frame'] = [_0x1058dc];
-    return _0x1035ff;
+  const list11 = normalizeUrlList(inputVideos2),
+    list12 = normalizeUrlList(inputAudios2),
+    list13 = normalizeUrlList(inputImages2);
+  (requireMaximum('参考视频', list11, policy['maxVideos']),
+    requireMaximum('参考音频', list12, policy['maxAudios']),
+    delete body['images'],
+    delete body['start_frame'],
+    delete body['end_frame'],
+    delete body['reference_videos'],
+    delete body['reference_audios']);
+  const value51 = policy['supportsFrames'] === !![] ? getMode(payload2, policy) || 'reference' : 'reference';
+  if (value51 === 'frames') {
+    const args3 = getSlotUrls(finalUrlsBySlot2, 'firstFrame'),
+      args4 = getSlotUrls(finalUrlsBySlot2, 'lastFrame'),
+      map3 = new Set([...args3, ...args4, ...getSlotUrls(finalUrlsBySlot2, 'referenceImage')]),
+      value52 = list13['filter']((value53) => !map3['has'](value53)),
+      enabled4 = args3[0x0] || value52[0x0] || '',
+      value54 = args4[0x0] || value52[0x1] || '';
+    (requireMaximum('首帧', args3, 0x1),
+      requireMaximum('尾帧', args4, 0x1),
+      requireMaximum('参考视频', list11, 0x0),
+      requireMaximum('参考音频', list12, 0x0));
+    if (!enabled4) throw new Error('便宜渠道首尾帧模式至少需要\x201\x20张首帧图片');
+    body['start_frame'] = [enabled4];
+    if (value54) body['end_frame'] = [value54];
+    return body;
   }
-  const _0x37346e = new Set(getSlotUrls(_0x4b822e, 'firstFrame')),
-    _0x36ad05 = new Set(getSlotUrls(_0x4b822e, 'lastFrame')),
-    _0x43fd0a = collectImages([], _0x4b822e, ['referenceImage']);
-  (_0x4a76ed['forEach']((_0x2b97cf) => {
-    !_0x37346e['has'](_0x2b97cf) && !_0x36ad05['has'](_0x2b97cf) && appendUrl(_0x43fd0a, _0x2b97cf);
+  const map4 = new Set(getSlotUrls(finalUrlsBySlot2, 'firstFrame')),
+    map5 = new Set(getSlotUrls(finalUrlsBySlot2, 'lastFrame')),
+    list14 = collectImages([], finalUrlsBySlot2, ['referenceImage']);
+  (list13['forEach']((value55) => {
+    !map4['has'](value55) && !map5['has'](value55) && appendUrl(list14, value55);
   }),
-    requireMinimumImages(_0x43fd0a, _0xcbf075['minImages']),
-    requireMaximum('参考图', _0x43fd0a, _0xcbf075['maxImages']));
-  if (_0xcbf075['audioRequiresImage'] === !![] && _0x590e4f['length'] > 0x0 && _0x43fd0a['length'] === 0x0)
+    requireMinimumImages(list14, policy['minImages']),
+    requireMaximum('参考图', list14, policy['maxImages']));
+  if (policy['audioRequiresImage'] === !![] && list12['length'] > 0x0 && list14['length'] === 0x0)
     throw new Error('便宜渠道当前模型使用参考音频时至少需要\x201\x20张参考图');
   if (
-    _0xcbf075['audioRequiresVisual'] === !![] &&
-    _0x590e4f['length'] > 0x0 &&
-    _0x43fd0a['length'] === 0x0 &&
-    _0x20d2a2['length'] === 0x0
+    policy['audioRequiresVisual'] === !![] &&
+    list12['length'] > 0x0 &&
+    list14['length'] === 0x0 &&
+    list11['length'] === 0x0
   )
     throw new Error('便宜渠道当前模型使用参考音频时至少需要\x201\x20张参考图或\x201\x20个参考视频');
-  if (_0x43fd0a['length']) _0x1035ff['images'] = _0x43fd0a;
-  if (_0x20d2a2['length']) _0x1035ff['reference_videos'] = _0x20d2a2;
-  if (_0x590e4f['length']) _0x1035ff['reference_audios'] = _0x590e4f;
-  return _0x1035ff;
+  if (list14['length']) body['images'] = list14;
+  if (list11['length']) body['reference_videos'] = list11;
+  if (list12['length']) body['reference_audios'] = list12;
+  return body;
 }
 function applyHappyHorseInputs({
-  body: _0x2fe4a1,
-  payload: _0x43bf97,
-  policy: _0x2622b3,
-  inputImages: _0x723446,
-  inputVideos: _0x451d32,
-  inputAudios: _0x3aa361,
-  finalUrlsBySlot: _0x3f138b,
+  body: body2,
+  payload: payload3,
+  policy: policy2,
+  inputImages: inputImages3,
+  inputVideos: inputVideos3,
+  inputAudios: inputAudios3,
+  finalUrlsBySlot: finalUrlsBySlot3,
 }) {
-  const _0x29b6c2 = getMode(_0x43bf97, _0x2622b3) || 'auto',
-    _0x1f3d76 = collectImages(_0x723446, _0x3f138b, ['firstFrame', 'referenceImage']),
-    _0x403234 = normalizeUrlList(_0x451d32),
-    _0x1660c0 = normalizeUrlList(_0x3aa361);
-  (requireMaximum('参考图', _0x1f3d76, _0x2622b3['maxImages']),
-    requireMaximum('参考视频', _0x403234, _0x2622b3['maxVideos']),
-    requireMaximum('参考音频', _0x1660c0, _0x2622b3['maxAudios']));
-  if ((_0x29b6c2 === 'image' || _0x29b6c2 === 'reference') && _0x1f3d76['length'] === 0x0)
+  const mode = getMode(payload3, policy2) || 'auto',
+    list15 = collectImages(inputImages3, finalUrlsBySlot3, ['firstFrame', 'referenceImage']),
+    urlList = normalizeUrlList(inputVideos3),
+    list16 = normalizeUrlList(inputAudios3);
+  (requireMaximum('参考图', list15, policy2['maxImages']),
+    requireMaximum('参考视频', urlList, policy2['maxVideos']),
+    requireMaximum('参考音频', list16, policy2['maxAudios']));
+  if ((mode === 'image' || mode === 'reference') && list15['length'] === 0x0)
     throw new Error('便宜渠道 HappyHorse 图像模式需要参考图');
-  if (_0x1f3d76['length']) _0x2fe4a1['images'] = _0x1f3d76;
-  else delete _0x2fe4a1['images'];
-  if (_0x1660c0['length']) _0x2fe4a1['reference_audios'] = _0x1660c0;
-  else delete _0x2fe4a1['reference_audios'];
-  return (delete _0x2fe4a1['reference_videos'], _0x2fe4a1);
+  if (list15['length']) body2['images'] = list15;
+  else delete body2['images'];
+  if (list16['length']) body2['reference_audios'] = list16;
+  else delete body2['reference_audios'];
+  return (delete body2['reference_videos'], body2);
 }
 export function binghuoVideo({
-  currentBody: _0x3c0c3b,
+  currentBody: currentBody,
   payload: payload = {},
   rawPayload: rawPayload = {},
   modelManifest: modelManifest = null,
@@ -365,44 +352,44 @@ export function binghuoVideo({
   executionManifest: executionManifest = null,
 }) {
   validateRawUiSchemaParams(rawPayload, modelManifest);
-  const _0x19ce43 = { ..._0x3c0c3b },
-    _0x38ed9a = getPolicy(executionManifest);
-  (_0x38ed9a['family'] === 'minimax-h3' || _0x38ed9a['component'] === 'minimaxH3') &&
-    (_0x19ce43['prompt'] = translateMinimaxH3EditorAssetMentions(_0x19ce43['prompt']));
-  (validateRawInputCounts(rawPayload, _0x38ed9a),
-    validateAssetRefs(_0x38ed9a, inputImages, inputVideos, inputAudios, finalUrlsBySlot));
-  if (_0x38ed9a['component'] === 'seedance2')
+  const body3 = { ...currentBody },
+    policy3 = getPolicy(executionManifest);
+  (policy3['family'] === 'minimax-h3' || policy3['component'] === 'minimaxH3') &&
+    (body3['prompt'] = translateMinimaxH3EditorAssetMentions(body3['prompt']));
+  (validateRawInputCounts(rawPayload, policy3),
+    validateAssetRefs(policy3, inputImages, inputVideos, inputAudios, finalUrlsBySlot));
+  if (policy3['component'] === 'seedance2')
     return applySeedanceInputs({
-      body: _0x19ce43,
+      body: body3,
       payload: payload,
-      policy: _0x38ed9a,
+      policy: policy3,
       inputImages: inputImages,
       inputVideos: inputVideos,
       inputAudios: inputAudios,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-  if (_0x38ed9a['component'] === 'happyHorse')
+  if (policy3['component'] === 'happyHorse')
     return applyHappyHorseInputs({
-      body: _0x19ce43,
+      body: body3,
       payload: payload,
-      policy: _0x38ed9a,
+      policy: policy3,
       inputImages: inputImages,
       inputVideos: inputVideos,
       inputAudios: inputAudios,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-  const _0x2ae30f = normalizeUrlList(inputImages),
-    _0x3e2a7c = normalizeUrlList(inputVideos),
-    _0x2393e2 = normalizeUrlList(inputAudios);
-  (requireMinimumImages(_0x2ae30f, _0x38ed9a['minImages']),
-    requireMaximum('参考图', _0x2ae30f, _0x38ed9a['maxImages']),
-    requireMaximum('参考视频', _0x3e2a7c, _0x38ed9a['maxVideos']),
-    requireMaximum('参考音频', _0x2393e2, _0x38ed9a['maxAudios']));
-  if (_0x2ae30f['length']) _0x19ce43['images'] = _0x2ae30f;
-  else delete _0x19ce43['images'];
-  if (_0x3e2a7c['length']) _0x19ce43['reference_videos'] = _0x3e2a7c;
-  else delete _0x19ce43['reference_videos'];
-  if (_0x2393e2['length']) _0x19ce43['reference_audios'] = _0x2393e2;
-  else delete _0x19ce43['reference_audios'];
-  return (delete _0x19ce43['start_frame'], delete _0x19ce43['end_frame'], _0x19ce43);
+  const list17 = normalizeUrlList(inputImages),
+    list18 = normalizeUrlList(inputVideos),
+    list19 = normalizeUrlList(inputAudios);
+  (requireMinimumImages(list17, policy3['minImages']),
+    requireMaximum('参考图', list17, policy3['maxImages']),
+    requireMaximum('参考视频', list18, policy3['maxVideos']),
+    requireMaximum('参考音频', list19, policy3['maxAudios']));
+  if (list17['length']) body3['images'] = list17;
+  else delete body3['images'];
+  if (list18['length']) body3['reference_videos'] = list18;
+  else delete body3['reference_videos'];
+  if (list19['length']) body3['reference_audios'] = list19;
+  else delete body3['reference_audios'];
+  return (delete body3['start_frame'], delete body3['end_frame'], body3);
 }

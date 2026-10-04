@@ -14,410 +14,392 @@ import {
 import { toNumber } from './mediaClipUtils.js';
 const TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX = 0x30,
   TIMELINE_DRAG_AUTO_SCROLL_MAX_PX = 0x12;
-export function primeTimelineScroll(_0x586c27, _0x39b817) {
-  if (!_0x39b817) return 0x0;
-  const _0x57421b = Math['max'](
+export function primeTimelineScroll(value, enabled) {
+  if (!enabled) return 0x0;
+  const item = Math['max'](
       0x0,
-      toNumber(_0x586c27['_timelineScrollLeft'], _0x586c27['_timelineView']?.['scrollLeft'] || 0x0),
+      toNumber(value['_timelineScrollLeft'], value['_timelineView']?.['scrollLeft'] || 0x0),
     ),
-    _0x27b9a0 = _0x586c27['_timelineViewportWidth'](),
-    _0x50e939 = _0x586c27['_timelineTrackContentWidth'](),
-    _0x217868 = Math['max'](0x0, _0x586c27['_timelineContentWidth'](_0x50e939) - _0x27b9a0),
-    _0x569a29 = _0x586c27['_clampTimelineScrollLeft'](_0x39b817, _0x57421b, {
-      maxScrollPx: _0x217868,
-      trackWidthPx: _0x50e939,
-      viewportWidthPx: _0x27b9a0,
+    viewportWidthPx = value['_timelineViewportWidth'](),
+    trackWidthPx = value['_timelineTrackContentWidth'](),
+    maxScrollPx = Math['max'](0x0, value['_timelineContentWidth'](trackWidthPx) - viewportWidthPx),
+    key = value['_clampTimelineScrollLeft'](enabled, item, {
+      maxScrollPx: maxScrollPx,
+      trackWidthPx: trackWidthPx,
+      viewportWidthPx: viewportWidthPx,
     });
-  ((_0x586c27['_restoringTimelineScroll'] = _0x39b817),
-    (_0x39b817['scrollLeft'] = _0x569a29),
-    _0x586c27['_syncTimelineScrollFade'](_0x39b817));
-  const _0x253cf8 = () => {
-    _0x586c27['_restoringTimelineScroll'] === _0x39b817 && (_0x586c27['_restoringTimelineScroll'] = null);
+  ((value['_restoringTimelineScroll'] = enabled),
+    (enabled['scrollLeft'] = key),
+    value['_syncTimelineScrollFade'](enabled));
+  const index = () => {
+    value['_restoringTimelineScroll'] === enabled && (value['_restoringTimelineScroll'] = null);
   };
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(_0x253cf8);
-  else setTimeout(_0x253cf8, 0x0);
-  return _0x569a29;
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(index);
+  else setTimeout(index, 0x0);
+  return key;
 }
-export function bindTimelineScroll(_0x1b35d1, _0x1f8649) {
-  if (!_0x1f8649) return;
-  (_0x1f8649['addEventListener'](
+export function bindTimelineScroll(persist, scrollLeft) {
+  if (!scrollLeft) return;
+  (scrollLeft['addEventListener'](
     'wheel',
-    (_0x37e579) => {
-      if (_0x37e579['ctrlKey'] || _0x37e579['metaKey']) {
-        _0x1b35d1['_handleTimelineZoomWheel'](_0x1f8649, _0x37e579);
+    (event) => {
+      if (event['ctrlKey'] || event['metaKey']) {
+        persist['_handleTimelineZoomWheel'](scrollLeft, event);
         return;
       }
-      const _0x49f2c6 = Math['max'](0x0, _0x1f8649['scrollWidth'] - _0x1f8649['clientWidth']);
-      if (_0x49f2c6 <= 0x0) {
-        _0x1b35d1['_mediaClip']['expanded'] === !![] &&
-          (_0x37e579['preventDefault'](), _0x37e579['stopPropagation']());
+      const maxScrollPx2 = Math['max'](0x0, scrollLeft['scrollWidth'] - scrollLeft['clientWidth']);
+      if (maxScrollPx2 <= 0x0) {
+        persist['_mediaClip']['expanded'] === !![] && (event['preventDefault'](), event['stopPropagation']());
         return;
       }
-      const _0x4afbd8 =
-        Math['abs'](_0x37e579['deltaX']) > Math['abs'](_0x37e579['deltaY'])
-          ? _0x37e579['deltaX']
-          : _0x37e579['deltaY'];
-      if (!_0x4afbd8) return;
-      if (_0x1b35d1['_shouldLockTimelineWheelScroll'](_0x1f8649, { maxScrollPx: _0x49f2c6 })) {
-        (_0x37e579['preventDefault'](), _0x37e579['stopPropagation']());
-        Math['abs'](_0x1f8649['scrollLeft']) > 0.5 &&
-          ((_0x1f8649['scrollLeft'] = 0x0),
-          _0x1b35d1['_updateTimelineView']({ scrollLeft: 0x0 }, { persist: !![], renderOnPersist: ![] }));
-        _0x1b35d1['_syncTimelineScrollFade'](_0x1f8649);
+      const enabled2 =
+        Math['abs'](event['deltaX']) > Math['abs'](event['deltaY']) ? event['deltaX'] : event['deltaY'];
+      if (!enabled2) return;
+      if (persist['_shouldLockTimelineWheelScroll'](scrollLeft, { maxScrollPx: maxScrollPx2 })) {
+        (event['preventDefault'](), event['stopPropagation']());
+        Math['abs'](scrollLeft['scrollLeft']) > 0.5 &&
+          ((scrollLeft['scrollLeft'] = 0x0),
+          persist['_updateTimelineView']({ scrollLeft: 0x0 }, { persist: !![], renderOnPersist: ![] }));
+        persist['_syncTimelineScrollFade'](scrollLeft);
         return;
       }
-      (_0x37e579['preventDefault'](),
-        _0x37e579['stopPropagation'](),
-        (_0x1f8649['scrollLeft'] = _0x1b35d1['_clampTimelineScrollLeft'](
-          _0x1f8649,
-          _0x1f8649['scrollLeft'] + _0x4afbd8,
-          { maxScrollPx: _0x49f2c6 },
+      (event['preventDefault'](),
+        event['stopPropagation'](),
+        (scrollLeft['scrollLeft'] = persist['_clampTimelineScrollLeft'](
+          scrollLeft,
+          scrollLeft['scrollLeft'] + enabled2,
+          { maxScrollPx: maxScrollPx2 },
         )),
-        _0x1b35d1['_updateTimelineView'](
-          { scrollLeft: _0x1f8649['scrollLeft'] },
+        persist['_updateTimelineView'](
+          { scrollLeft: scrollLeft['scrollLeft'] },
           { persist: !![], renderOnPersist: ![] },
         ),
-        _0x1b35d1['_syncTimelineScrollFade'](_0x1f8649));
+        persist['_syncTimelineScrollFade'](scrollLeft));
     },
     { passive: ![] },
   ),
-    _0x1f8649['addEventListener']('scroll', () => {
-      const _0x2f7526 = _0x1b35d1['_clampTimelineScrollLeft'](_0x1f8649, _0x1f8649['scrollLeft']);
-      if (Math['abs'](_0x2f7526 - _0x1f8649['scrollLeft']) > 0.5) {
-        _0x1f8649['scrollLeft'] = _0x2f7526;
+    scrollLeft['addEventListener']('scroll', () => {
+      const scrollLeft2 = persist['_clampTimelineScrollLeft'](scrollLeft, scrollLeft['scrollLeft']);
+      if (Math['abs'](scrollLeft2 - scrollLeft['scrollLeft']) > 0.5) {
+        scrollLeft['scrollLeft'] = scrollLeft2;
         return;
       }
-      (_0x1b35d1['_updateTimelineView'](
-        { scrollLeft: _0x2f7526 },
+      (persist['_updateTimelineView'](
+        { scrollLeft: scrollLeft2 },
         {
-          persist: _0x1b35d1['_restoringTimelineScroll'] !== _0x1f8649 && !_0x1b35d1['_timelineDrag'](),
+          persist: persist['_restoringTimelineScroll'] !== scrollLeft && !persist['_timelineDrag'](),
           renderOnPersist: ![],
         },
       ),
-        _0x1b35d1['_syncTimelineScrollFade'](_0x1f8649));
+        persist['_syncTimelineScrollFade'](scrollLeft));
     }));
-  const _0x2fbdf4 = () => {
-    const _0x561d30 = Math['max'](0x0, _0x1f8649['scrollWidth'] - _0x1f8649['clientWidth']);
-    ((_0x1b35d1['_restoringTimelineScroll'] = _0x1f8649),
-      (_0x1f8649['scrollLeft'] = _0x1b35d1['_clampTimelineScrollLeft'](
-        _0x1f8649,
-        _0x1b35d1['_timelineScrollLeft'],
-        { maxScrollPx: _0x561d30 },
+  const result = () => {
+    const maxScrollPx3 = Math['max'](0x0, scrollLeft['scrollWidth'] - scrollLeft['clientWidth']);
+    ((persist['_restoringTimelineScroll'] = scrollLeft),
+      (scrollLeft['scrollLeft'] = persist['_clampTimelineScrollLeft'](
+        scrollLeft,
+        persist['_timelineScrollLeft'],
+        { maxScrollPx: maxScrollPx3 },
       )),
-      _0x1b35d1['_syncTimelineScrollFade'](_0x1f8649));
-    const _0xfa6cfe = () => {
-      _0x1b35d1['_restoringTimelineScroll'] === _0x1f8649 && (_0x1b35d1['_restoringTimelineScroll'] = null);
+      persist['_syncTimelineScrollFade'](scrollLeft));
+    const data = () => {
+      persist['_restoringTimelineScroll'] === scrollLeft && (persist['_restoringTimelineScroll'] = null);
     };
-    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(_0xfa6cfe);
-    else setTimeout(_0xfa6cfe, 0x0);
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(data);
+    else setTimeout(data, 0x0);
   };
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(_0x2fbdf4);
-  else setTimeout(_0x2fbdf4, 0x0);
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(result);
+  else setTimeout(result, 0x0);
 }
-export function shouldLockTimelineWheelScroll(_0x476ef1, _0x230452, _0x226fbd = {}) {
-  if (!_0x230452) return ![];
-  const _0x1cdad1 = Math['max'](
+export function shouldLockTimelineWheelScroll(options, el, target = {}) {
+  if (!el) return ![];
+  const maxScrollPx4 = Math['max'](
       0x0,
-      toNumber(_0x226fbd['maxScrollPx'], _0x230452['scrollWidth'] - _0x230452['clientWidth']),
+      toNumber(target['maxScrollPx'], el['scrollWidth'] - el['clientWidth']),
     ),
-    _0x3f115a = Math['max'](0x1, toNumber(_0x226fbd['viewportWidthPx'], _0x230452['clientWidth'])),
-    _0xc43ed3 = Math['max'](
+    viewportWidthPx2 = Math['max'](0x1, toNumber(target['viewportWidthPx'], el['clientWidth'])),
+    trackWidthPx2 = Math['max'](
       0x0,
-      toNumber(_0x226fbd['trackWidthPx'], _0x476ef1['_timelineTrackContentWidth']()),
+      toNumber(target['trackWidthPx'], options['_timelineTrackContentWidth']()),
     );
   return shouldLockMediaClipTimelineWheelScroll({
-    trackWidthPx: _0xc43ed3,
-    viewportWidthPx: _0x3f115a,
-    maxScrollPx: _0x1cdad1,
+    trackWidthPx: trackWidthPx2,
+    viewportWidthPx: viewportWidthPx2,
+    maxScrollPx: maxScrollPx4,
   });
 }
-export function timelineMaterialRangeSec(_0x588d32) {
-  const _0x49c946 = [],
-    _0x4c1e19 = (_0x201815, _0x1ed872) => {
-      const _0x5ddc43 = Math['max'](0x0, toNumber(_0x201815, 0x0)),
-        _0x47a4fa = Math['max'](_0x5ddc43, toNumber(_0x1ed872, _0x5ddc43));
-      if (_0x47a4fa > _0x5ddc43) _0x49c946['push']({ startSec: _0x5ddc43, endSec: _0x47a4fa });
+export function timelineMaterialRangeSec(source) {
+  const startSec = [],
+    handler = (next, current) => {
+      const startSec2 = Math['max'](0x0, toNumber(next, 0x0)),
+        endSec = Math['max'](startSec2, toNumber(current, startSec2));
+      if (endSec > startSec2) startSec['push']({ startSec: startSec2, endSec: endSec });
     },
-    _0x63923e = _0x588d32['_mediaClip']?.['tracks']?.['video'] || null,
-    _0x16b21b = _0x588d32['_videoTimelineClips'](_0x63923e);
-  if (_0x16b21b['length'])
-    _0x16b21b['forEach']((_0x242bdf) => {
-      _0x4c1e19(_0x242bdf['timelineStartSec'], _0x242bdf['timelineEndSec']);
+    entry = source['_mediaClip']?.['tracks']?.['video'] || null,
+    list = source['_videoTimelineClips'](entry);
+  if (list['length'])
+    list['forEach']((record) => {
+      handler(record['timelineStartSec'], record['timelineEndSec']);
     });
-  else _0x63923e && _0x4c1e19(_0x63923e['startSec'], _0x63923e['endSec'] || _0x63923e['durationSec']);
-  const _0x30ef90 = _0x588d32['_mediaClip']?.['tracks']?.['audio'] || null;
-  if (_0x30ef90) {
-    const _0x2bfb14 = _0x588d32['_audioTimelineClips'](_0x30ef90);
-    _0x2bfb14['length']
-      ? _0x2bfb14['forEach']((_0x1c35a0) => {
-          _0x4c1e19(_0x1c35a0['timelineStartSec'], _0x1c35a0['timelineEndSec']);
+  else entry && handler(entry['startSec'], entry['endSec'] || entry['durationSec']);
+  const payload = source['_mediaClip']?.['tracks']?.['audio'] || null;
+  if (payload) {
+    const list2 = source['_audioTimelineClips'](payload);
+    list2['length']
+      ? list2['forEach']((handle) => {
+          handler(handle['timelineStartSec'], handle['timelineEndSec']);
         })
-      : _0x4c1e19(_0x30ef90['startSec'], _0x30ef90['endSec'] || _0x30ef90['durationSec']);
+      : handler(payload['startSec'], payload['endSec'] || payload['durationSec']);
   }
-  if (!_0x49c946['length']) return { startSec: 0x0, endSec: 0x0 };
-  return _0x49c946['reduce'](
-    (_0x1b6ba2, _0x740a41) => ({
-      startSec: Math['min'](_0x1b6ba2['startSec'], _0x740a41['startSec']),
-      endSec: Math['max'](_0x1b6ba2['endSec'], _0x740a41['endSec']),
+  if (!startSec['length']) return { startSec: 0x0, endSec: 0x0 };
+  return startSec['reduce'](
+    (state, config) => ({
+      startSec: Math['min'](state['startSec'], config['startSec']),
+      endSec: Math['max'](state['endSec'], config['endSec']),
     }),
-    { startSec: _0x49c946[0x0]['startSec'], endSec: _0x49c946[0x0]['endSec'] },
+    { startSec: startSec[0x0]['startSec'], endSec: startSec[0x0]['endSec'] },
   );
 }
-export function timelineMaterialScrollBounds(_0x1957bc, _0x1b91a0, _0x5bf9a6 = {}) {
-  const _0x4f890b = Math['max'](
+export function timelineMaterialScrollBounds(scope, el2, input = {}) {
+  const output = Math['max'](
       0x1,
-      toNumber(
-        _0x5bf9a6['viewportWidthPx'],
-        _0x1b91a0?.['clientWidth'] || _0x1957bc['_timelineViewportWidth'](),
-      ),
+      toNumber(input['viewportWidthPx'], el2?.['clientWidth'] || scope['_timelineViewportWidth']()),
     ),
-    _0x1e35b4 = Math['max'](
-      0x0,
-      toNumber(_0x5bf9a6['maxScrollPx'], (_0x1b91a0?.['scrollWidth'] || 0x0) - _0x4f890b),
-    );
-  if (_0x1e35b4 <= 0x0) return { minScrollLeft: 0x0, maxScrollLeft: 0x0 };
-  const _0x108bbf = _0x1957bc['_timelineMaterialRangeSec']();
-  if (!(_0x108bbf['endSec'] > _0x108bbf['startSec'])) return { minScrollLeft: 0x0, maxScrollLeft: _0x1e35b4 };
-  const _0x512963 = getMediaClipTimelineDisplayDuration(
-      _0x5bf9a6['displayDurationSec'] ?? _0x1957bc['_primaryDuration'](),
+    maxScrollLeft = Math['max'](0x0, toNumber(input['maxScrollPx'], (el2?.['scrollWidth'] || 0x0) - output));
+  if (maxScrollLeft <= 0x0) return { minScrollLeft: 0x0, maxScrollLeft: 0x0 };
+  const startSec3 = scope['_timelineMaterialRangeSec']();
+  if (!(startSec3['endSec'] > startSec3['startSec']))
+    return { minScrollLeft: 0x0, maxScrollLeft: maxScrollLeft };
+  const durationSec = getMediaClipTimelineDisplayDuration(
+      input['displayDurationSec'] ?? scope['_primaryDuration'](),
     ),
-    _0x34f19b = Math['max'](
-      0x1,
-      toNumber(_0x5bf9a6['trackWidthPx'], _0x1957bc['_timelineTrackContentWidth']()),
-    ),
-    _0x5e3b25 = getMediaClipTimelineRangeRect({
-      startSec: _0x108bbf['startSec'],
-      endSec: _0x108bbf['endSec'],
-      durationSec: _0x512963,
-      trackWidthPx: _0x34f19b,
+    trackWidthPx3 = Math['max'](0x1, toNumber(input['trackWidthPx'], scope['_timelineTrackContentWidth']())),
+    mediaClipTimelineRangeRect = getMediaClipTimelineRangeRect({
+      startSec: startSec3['startSec'],
+      endSec: startSec3['endSec'],
+      durationSec: durationSec,
+      trackWidthPx: trackWidthPx3,
       minWidthPct: 0x0,
     }),
-    _0x173b2e = Math['max'](0x0, toNumber(_0x5e3b25['leftPx'], 0x0)),
-    _0x160446 = Math['max'](_0x173b2e, _0x173b2e + toNumber(_0x5e3b25['widthPx'], 0x0)),
-    _0x3ee7e1 =
-      _0x1957bc['_timelineAddSlotLeftPx'](_0x34f19b, {
-        displayDurationSec: _0x512963,
-        materialEndSec: _0x108bbf['endSec'],
+    value2 = Math['max'](0x0, toNumber(mediaClipTimelineRangeRect['leftPx'], 0x0)),
+    value3 = Math['max'](value2, value2 + toNumber(mediaClipTimelineRangeRect['widthPx'], 0x0)),
+    value4 =
+      scope['_timelineAddSlotLeftPx'](trackWidthPx3, {
+        displayDurationSec: durationSec,
+        materialEndSec: startSec3['endSec'],
       }) + MEDIA_CLIP_TIMELINE_ADD_SLOT_WIDTH_PX,
-    _0x4eefa0 = Math['max'](_0x160446, _0x3ee7e1),
-    _0x3e74e3 = Math['max'](0x0, _0x160446 - _0x173b2e);
-  let _0x277134 = 0x0,
-    _0x1e2f52 = _0x1e35b4;
-  if (_0x3e74e3 < _0x4f890b) {
-    _0x1e2f52 = Math['min'](_0x1e35b4, _0x173b2e);
-    const _0x14424b = Math['max'](0x0, _0x4eefa0 - _0x4f890b),
-      _0x3204cb = Math['max'](0x0, _0x160446 - _0x4f890b);
-    _0x277134 = Math['min'](_0x1e35b4, _0x14424b <= _0x1e2f52 ? _0x14424b : _0x3204cb);
+    value5 = Math['max'](value3, value4),
+    value6 = Math['max'](0x0, value3 - value2);
+  let minScrollLeft = 0x0,
+    maxScrollLeft2 = maxScrollLeft;
+  if (value6 < output) {
+    maxScrollLeft2 = Math['min'](maxScrollLeft, value2);
+    const value7 = Math['max'](0x0, value5 - output),
+      value8 = Math['max'](0x0, value3 - output);
+    minScrollLeft = Math['min'](maxScrollLeft, value7 <= maxScrollLeft2 ? value7 : value8);
   } else
-    ((_0x277134 = Math['min'](_0x1e35b4, Math['max'](0x0, _0x173b2e))),
-      (_0x1e2f52 = Math['min'](_0x1e35b4, Math['max'](0x0, _0x4eefa0 - _0x4f890b))));
+    ((minScrollLeft = Math['min'](maxScrollLeft, Math['max'](0x0, value2))),
+      (maxScrollLeft2 = Math['min'](maxScrollLeft, Math['max'](0x0, value5 - output))));
   return (
-    (_0x277134 = Math['max'](0x0, Math['min'](_0x1e35b4, _0x277134))),
-    (_0x1e2f52 = Math['max'](_0x277134, Math['min'](_0x1e35b4, _0x1e2f52))),
-    { minScrollLeft: _0x277134, maxScrollLeft: _0x1e2f52 }
+    (minScrollLeft = Math['max'](0x0, Math['min'](maxScrollLeft, minScrollLeft))),
+    (maxScrollLeft2 = Math['max'](minScrollLeft, Math['min'](maxScrollLeft, maxScrollLeft2))),
+    { minScrollLeft: minScrollLeft, maxScrollLeft: maxScrollLeft2 }
   );
 }
-export function clampTimelineScrollLeft(_0x174a0f, _0x4d8d82, _0x3f5c99 = 0x0, _0x2d41c9 = {}) {
-  if (!_0x4d8d82) return 0x0;
-  const _0x388c67 = Math['max'](
+export function clampTimelineScrollLeft(value9, el3, value10 = 0x0, args = {}) {
+  if (!el3) return 0x0;
+  const maxScrollPx5 = Math['max'](
     0x0,
-    toNumber(_0x2d41c9['maxScrollPx'], _0x4d8d82['scrollWidth'] - _0x4d8d82['clientWidth']),
+    toNumber(args['maxScrollPx'], el3['scrollWidth'] - el3['clientWidth']),
   );
-  if (_0x174a0f['_shouldLockTimelineWheelScroll'](_0x4d8d82, { ..._0x2d41c9, maxScrollPx: _0x388c67 }))
-    return 0x0;
-  const _0x1ec783 = _0x174a0f['_timelineMaterialScrollBounds'](_0x4d8d82, {
-    ..._0x2d41c9,
-    maxScrollPx: _0x388c67,
+  if (value9['_shouldLockTimelineWheelScroll'](el3, { ...args, maxScrollPx: maxScrollPx5 })) return 0x0;
+  const value11 = value9['_timelineMaterialScrollBounds'](el3, {
+    ...args,
+    maxScrollPx: maxScrollPx5,
   });
-  return Math['max'](
-    _0x1ec783['minScrollLeft'],
-    Math['min'](_0x1ec783['maxScrollLeft'], toNumber(_0x3f5c99, 0x0)),
-  );
+  return Math['max'](value11['minScrollLeft'], Math['min'](value11['maxScrollLeft'], toNumber(value10, 0x0)));
 }
-export function handleTimelineZoomWheel(_0x94f22a, _0x86c09c, _0x430c51) {
-  if (!_0x86c09c) return;
-  const _0x55b8f5 = Number(_0x430c51['deltaX']) || 0x0,
-    _0x570e8c = Number(_0x430c51['deltaY']) || 0x0,
-    _0x3f8f92 = Math['abs'](_0x55b8f5) > Math['abs'](_0x570e8c) ? _0x55b8f5 : _0x570e8c;
-  if (!_0x3f8f92) return;
-  (_0x430c51['preventDefault'](), _0x430c51['stopPropagation']());
-  const _0x379ed5 = normalizeMediaClipTimelineView(_0x94f22a['_timelineView']),
-    _0x429ff4 = getMediaClipTimelineNextZoom({
-      currentZoom: _0x379ed5['zoom'],
-      delta: _0x3f8f92,
+export function handleTimelineZoomWheel(durationSec2, width2, event2) {
+  if (!width2) return;
+  const value12 = Number(event2['deltaX']) || 0x0,
+    value13 = Number(event2['deltaY']) || 0x0,
+    delta = Math['abs'](value12) > Math['abs'](value13) ? value12 : value13;
+  if (!delta) return;
+  (event2['preventDefault'](), event2['stopPropagation']());
+  const currentZoom = normalizeMediaClipTimelineView(durationSec2['_timelineView']),
+    zoom = getMediaClipTimelineNextZoom({
+      currentZoom: currentZoom['zoom'],
+      delta: delta,
       minZoom: MEDIA_CLIP_TIMELINE_ZOOM_MIN,
       maxZoom: MEDIA_CLIP_TIMELINE_ZOOM_MAX,
     });
-  if (Math['abs'](_0x429ff4 - _0x379ed5['zoom']) < 0.001) return;
-  const _0x3fae85 = _0x86c09c['getBoundingClientRect']?.() || {
+  if (Math['abs'](zoom - currentZoom['zoom']) < 0.001) return;
+  const box = width2['getBoundingClientRect']?.() || {
       left: 0x0,
-      width: _0x86c09c['clientWidth'] || 0x0,
+      width: width2['clientWidth'] || 0x0,
     },
-    _0x5540ca = Math['max'](0x1, _0x86c09c['clientWidth'] || _0x3fae85['width'] || 0x1),
-    _0xe35076 = Math['max'](
+    viewportWidthPx3 = Math['max'](0x1, width2['clientWidth'] || box['width'] || 0x1),
+    anchorX = Math['max'](
       0x0,
       Math['min'](
-        _0x5540ca,
-        Number['isFinite'](_0x430c51['clientX'])
-          ? _0x430c51['clientX'] - (_0x3fae85['left'] || 0x0)
-          : _0x5540ca / 0x2,
+        viewportWidthPx3,
+        Number['isFinite'](event2['clientX'])
+          ? event2['clientX'] - (box['left'] || 0x0)
+          : viewportWidthPx3 / 0x2,
       ),
     ),
-    _0x240d89 = _0x94f22a['_timelineTrackContentWidth']({ timelineZoom: _0x379ed5['zoom'] }),
-    _0x40df7e = getMediaClipTimelineDisplayDuration(
-      _0x94f22a['_primaryDuration']({ timelineZoom: _0x379ed5['zoom'] }),
+    value14 = durationSec2['_timelineTrackContentWidth']({ timelineZoom: currentZoom['zoom'] }),
+    mediaClipTimelineDisplayDuration = getMediaClipTimelineDisplayDuration(
+      durationSec2['_primaryDuration']({ timelineZoom: currentZoom['zoom'] }),
     ),
-    _0x1390bc = Math['max'](
+    anchorSec = Math['max'](
       0x0,
       Math['min'](
-        _0x40df7e,
-        ((Math['max'](0x0, _0x86c09c['scrollLeft'] || 0x0) + _0xe35076) / Math['max'](0x1, _0x240d89)) *
-          _0x40df7e,
+        mediaClipTimelineDisplayDuration,
+        ((Math['max'](0x0, width2['scrollLeft'] || 0x0) + anchorX) / Math['max'](0x1, value14)) *
+          mediaClipTimelineDisplayDuration,
       ),
     );
-  _0x94f22a['_updateTimelineView']({ zoom: _0x429ff4 }, { persist: ![] });
-  const _0x79b5c7 = _0x94f22a['_timelineTrackContentWidth']({ timelineZoom: _0x429ff4 }),
-    _0x449897 = getMediaClipTimelineDisplayDuration(
-      _0x94f22a['_primaryDuration']({ timelineZoom: _0x429ff4 }),
+  durationSec2['_updateTimelineView']({ zoom: zoom }, { persist: ![] });
+  const trackWidthPx4 = durationSec2['_timelineTrackContentWidth']({ timelineZoom: zoom }),
+    durationSec3 = getMediaClipTimelineDisplayDuration(
+      durationSec2['_primaryDuration']({ timelineZoom: zoom }),
     ),
-    _0x3f05f8 = _0x94f22a['_timelineContentWidth'](_0x79b5c7);
-  _0x94f22a['_syncTimelineContentWidth'](_0x79b5c7);
-  _0x94f22a['_mediaClip']['tracks']?.['video'] &&
-    _0x94f22a['_updateTrackVisuals']('video', {
-      durationSec: _0x94f22a['_videoTimelineDuration'](_0x94f22a['_mediaClip']['tracks']['video'], null, {
-        timelineZoom: _0x429ff4,
-      }),
+    nextContentWidthPx = durationSec2['_timelineContentWidth'](trackWidthPx4);
+  durationSec2['_syncTimelineContentWidth'](trackWidthPx4);
+  durationSec2['_mediaClip']['tracks']?.['video'] &&
+    durationSec2['_updateTrackVisuals']('video', {
+      durationSec: durationSec2['_videoTimelineDuration'](
+        durationSec2['_mediaClip']['tracks']['video'],
+        null,
+        {
+          timelineZoom: zoom,
+        },
+      ),
       syncTimelineWidth: ![],
     });
-  _0x94f22a['_mediaClip']['tracks']?.['audio'] &&
-    _0x94f22a['_updateTrackVisuals']('audio', {
-      durationSec: _0x94f22a['_timelineDurationForKind']('audio', { timelineZoom: _0x429ff4 }),
+  durationSec2['_mediaClip']['tracks']?.['audio'] &&
+    durationSec2['_updateTrackVisuals']('audio', {
+      durationSec: durationSec2['_timelineDurationForKind']('audio', { timelineZoom: zoom }),
       syncTimelineWidth: ![],
     });
-  const _0x463062 = Math['max'](0x0, _0x3f05f8 - _0x5540ca),
-    _0xfbfd61 = _0x94f22a['_clampTimelineScrollLeft'](
-      _0x86c09c,
+  const maxScrollPx6 = Math['max'](0x0, nextContentWidthPx - viewportWidthPx3),
+    scrollLeft3 = durationSec2['_clampTimelineScrollLeft'](
+      width2,
       getMediaClipTimelineZoomScrollLeft({
-        anchorSec: _0x1390bc,
-        anchorX: _0xe35076,
-        durationSec: _0x449897,
-        trackWidthPx: _0x79b5c7,
-        nextContentWidthPx: _0x3f05f8,
-        viewportWidthPx: _0x5540ca,
+        anchorSec: anchorSec,
+        anchorX: anchorX,
+        durationSec: durationSec3,
+        trackWidthPx: trackWidthPx4,
+        nextContentWidthPx: nextContentWidthPx,
+        viewportWidthPx: viewportWidthPx3,
       }),
-      { trackWidthPx: _0x79b5c7, viewportWidthPx: _0x5540ca, maxScrollPx: _0x463062 },
+      { trackWidthPx: trackWidthPx4, viewportWidthPx: viewportWidthPx3, maxScrollPx: maxScrollPx6 },
     );
-  ((_0x86c09c['scrollLeft'] = _0xfbfd61),
-    _0x94f22a['_updateTimelineView']({ scrollLeft: _0xfbfd61 }, { persist: !![], renderOnPersist: ![] }),
-    _0x94f22a['_syncTimelineScrollFade'](_0x86c09c));
+  ((width2['scrollLeft'] = scrollLeft3),
+    durationSec2['_updateTimelineView']({ scrollLeft: scrollLeft3 }, { persist: !![], renderOnPersist: ![] }),
+    durationSec2['_syncTimelineScrollFade'](width2));
 }
-export function syncTimelineScrollFade(_0x3e449b, _0x27ab8e) {
-  if (!_0x27ab8e) return;
-  const _0x425b9c = Math['max'](0x0, _0x27ab8e['scrollWidth'] - _0x27ab8e['clientWidth']),
-    _0x321707 = _0x3e449b['_timelineMaterialScrollBounds'](_0x27ab8e, { maxScrollPx: _0x425b9c }),
-    _0x1a89e2 =
-      !_0x3e449b['_shouldLockTimelineWheelScroll'](_0x27ab8e, { maxScrollPx: _0x425b9c }) &&
-      _0x321707['maxScrollLeft'] > _0x321707['minScrollLeft'] + 0x1 &&
-      _0x27ab8e['scrollLeft'] < _0x321707['maxScrollLeft'] - 0x2;
-  _0x27ab8e['classList']['toggle']('has-right-overflow', _0x1a89e2);
+export function syncTimelineScrollFade(enabled3, el4) {
+  if (!el4) return;
+  const maxScrollPx7 = Math['max'](0x0, el4['scrollWidth'] - el4['clientWidth']),
+    value15 = enabled3['_timelineMaterialScrollBounds'](el4, { maxScrollPx: maxScrollPx7 }),
+    value16 =
+      !enabled3['_shouldLockTimelineWheelScroll'](el4, { maxScrollPx: maxScrollPx7 }) &&
+      value15['maxScrollLeft'] > value15['minScrollLeft'] + 0x1 &&
+      el4['scrollLeft'] < value15['maxScrollLeft'] - 0x2;
+  el4['classList']['toggle']('has-right-overflow', value16);
 }
-export function timelineDragScrollDeltaPx(_0x5b1485, _0x4fe9b2 = _0x5b1485['_timelineDrag']()) {
-  const _0x1b6ed6 = _0x4fe9b2?.['scrollEl'];
-  if (!_0x1b6ed6) return 0x0;
-  return toNumber(_0x1b6ed6['scrollLeft'], 0x0) - toNumber(_0x4fe9b2['startScrollLeft'], 0x0);
+export function timelineDragScrollDeltaPx(value17, value18 = value17['_timelineDrag']()) {
+  const enabled4 = value18?.['scrollEl'];
+  if (!enabled4) return 0x0;
+  return toNumber(enabled4['scrollLeft'], 0x0) - toNumber(value18['startScrollLeft'], 0x0);
 }
-export function timelineDragDeltaPx(_0x739bf9, _0x95bd1b = _0x739bf9['_timelineDrag'](), _0x1bdf25 = {}) {
-  const _0x56dbb8 = toNumber(
-    _0x1bdf25?.['clientX'],
-    toNumber(_0x95bd1b?.['latestClientX'], _0x95bd1b?.['startX']),
-  );
+export function timelineDragDeltaPx(value19, value20 = value19['_timelineDrag'](), event3 = {}) {
+  const toNumber2 = toNumber(event3?.['clientX'], toNumber(value20?.['latestClientX'], value20?.['startX']));
   return (
-    _0x56dbb8 -
-    toNumber(_0x95bd1b?.['startX'], _0x56dbb8) +
-    _0x739bf9['_timelineDragScrollDeltaPx'](_0x95bd1b)
+    toNumber2 - toNumber(value20?.['startX'], toNumber2) + value19['_timelineDragScrollDeltaPx'](value20)
   );
 }
-export function timelineDragAutoScrollVelocity(_0x31139a, _0x2422cd) {
-  if (!_0x31139a || !Number['isFinite'](_0x2422cd)) return 0x0;
-  const _0xb2cb29 = Math['max'](0x0, _0x31139a['scrollWidth'] - _0x31139a['clientWidth']);
-  if (_0xb2cb29 <= 0x0) return 0x0;
-  const _0x2044dc = _0x31139a['getBoundingClientRect']?.() || {},
-    _0xee6072 = toNumber(_0x2044dc['left'], 0x0),
-    _0x3154c6 = Math['max'](0x1, toNumber(_0x2044dc['width'], _0x31139a['clientWidth'] || 0x1)),
-    _0x6cf610 = toNumber(_0x2044dc['right'], _0xee6072 + _0x3154c6);
-  if (_0x2422cd < _0xee6072 + TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX) {
-    const _0x5b478d = Math['max'](
+export function timelineDragAutoScrollVelocity(el5, value21) {
+  if (!el5 || !Number['isFinite'](value21)) return 0x0;
+  const count = Math['max'](0x0, el5['scrollWidth'] - el5['clientWidth']);
+  if (count <= 0x0) return 0x0;
+  const box2 = el5['getBoundingClientRect']?.() || {},
+    toNumber3 = toNumber(box2['left'], 0x0),
+    value22 = Math['max'](0x1, toNumber(box2['width'], el5['clientWidth'] || 0x1)),
+    toNumber4 = toNumber(box2['right'], toNumber3 + value22);
+  if (value21 < toNumber3 + TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX) {
+    const value23 = Math['max'](
       0x0,
       Math['min'](
         0x1,
-        (_0xee6072 + TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX - _0x2422cd) / TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX,
+        (toNumber3 + TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX - value21) / TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX,
       ),
     );
-    return -TIMELINE_DRAG_AUTO_SCROLL_MAX_PX * _0x5b478d;
+    return -TIMELINE_DRAG_AUTO_SCROLL_MAX_PX * value23;
   }
-  if (_0x2422cd > _0x6cf610 - TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX) {
-    const _0x311f22 = Math['max'](
+  if (value21 > toNumber4 - TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX) {
+    const value24 = Math['max'](
       0x0,
       Math['min'](
         0x1,
-        (_0x2422cd - (_0x6cf610 - TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX)) / TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX,
+        (value21 - (toNumber4 - TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX)) / TIMELINE_DRAG_AUTO_SCROLL_EDGE_PX,
       ),
     );
-    return TIMELINE_DRAG_AUTO_SCROLL_MAX_PX * _0x311f22;
+    return TIMELINE_DRAG_AUTO_SCROLL_MAX_PX * value24;
   }
   return 0x0;
 }
-export function scheduleTimelineDragAutoScroll(_0x4d320f, _0x34b91d = _0x4d320f['_timelineDrag']()) {
-  const _0x24a7c8 = _0x34b91d?.['scrollEl'],
-    _0x51c8a5 = toNumber(_0x34b91d?.['latestClientX'], Number['NaN']);
-  if (!_0x24a7c8 || !Number['isFinite'](_0x51c8a5)) return;
-  if (!_0x4d320f['_timelineDragAutoScrollVelocity'](_0x24a7c8, _0x51c8a5)) return;
-  if (_0x4d320f['_timelineDragAutoScrollRaf']) return;
-  const _0x135288 = _0x34b91d['sessionId'],
-    _0x18fd97 = () => {
-      ((_0x4d320f['_timelineDragAutoScrollRaf'] = 0x0), _0x4d320f['_runTimelineDragAutoScroll'](_0x135288));
+export function scheduleTimelineDragAutoScroll(enabled5, value25 = enabled5['_timelineDrag']()) {
+  const enabled6 = value25?.['scrollEl'],
+    toNumber5 = toNumber(value25?.['latestClientX'], Number['NaN']);
+  if (!enabled6 || !Number['isFinite'](toNumber5)) return;
+  if (!enabled5['_timelineDragAutoScrollVelocity'](enabled6, toNumber5)) return;
+  if (enabled5['_timelineDragAutoScrollRaf']) return;
+  const value26 = value25['sessionId'],
+    value27 = () => {
+      ((enabled5['_timelineDragAutoScrollRaf'] = 0x0), enabled5['_runTimelineDragAutoScroll'](value26));
     };
-  _0x4d320f['_timelineDragAutoScrollRaf'] =
-    typeof requestAnimationFrame === 'function'
-      ? requestAnimationFrame(_0x18fd97)
-      : setTimeout(_0x18fd97, 0x10);
+  enabled5['_timelineDragAutoScrollRaf'] =
+    typeof requestAnimationFrame === 'function' ? requestAnimationFrame(value27) : setTimeout(value27, 0x10);
 }
-export function stopTimelineDragAutoScroll(_0x45884b) {
-  const _0x598fb4 = _0x45884b['_timelineDragAutoScrollRaf'];
-  if (!_0x598fb4) return;
+export function stopTimelineDragAutoScroll(value28) {
+  const enabled7 = value28['_timelineDragAutoScrollRaf'];
+  if (!enabled7) return;
   try {
-    if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(_0x598fb4);
+    if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(enabled7);
   } catch {}
   try {
-    clearTimeout(_0x598fb4);
+    clearTimeout(enabled7);
   } catch {}
-  _0x45884b['_timelineDragAutoScrollRaf'] = 0x0;
+  value28['_timelineDragAutoScrollRaf'] = 0x0;
 }
-export function runTimelineDragAutoScroll(_0x3cfc17, _0xd4b841) {
-  const _0x418204 = _0x3cfc17['_timelineDrag']();
-  if (!_0x418204 || _0x418204['sessionId'] !== _0xd4b841) return;
-  const _0x12e8f4 = _0x418204['scrollEl'],
-    _0x484ba7 = toNumber(_0x418204['latestClientX'], Number['NaN']),
-    _0x56e61a = _0x3cfc17['_timelineDragAutoScrollVelocity'](_0x12e8f4, _0x484ba7);
-  if (!_0x12e8f4 || !_0x56e61a) return;
-  const _0x11325f = Math['max'](0x0, _0x12e8f4['scrollWidth'] - _0x12e8f4['clientWidth']),
-    _0xbbd2b4 = toNumber(_0x12e8f4['scrollLeft'], 0x0),
-    _0x1ccfdc = _0x3cfc17['_clampTimelineScrollLeft'](_0x12e8f4, _0xbbd2b4 + _0x56e61a, {
-      maxScrollPx: _0x11325f,
+export function runTimelineDragAutoScroll(value29, value30) {
+  const enabled8 = value29['_timelineDrag']();
+  if (!enabled8 || enabled8['sessionId'] !== value30) return;
+  const el6 = enabled8['scrollEl'],
+    clientX = toNumber(enabled8['latestClientX'], Number['NaN']),
+    enabled9 = value29['_timelineDragAutoScrollVelocity'](el6, clientX);
+  if (!el6 || !enabled9) return;
+  const maxScrollPx8 = Math['max'](0x0, el6['scrollWidth'] - el6['clientWidth']),
+    toNumber6 = toNumber(el6['scrollLeft'], 0x0),
+    scrollLeft4 = value29['_clampTimelineScrollLeft'](el6, toNumber6 + enabled9, {
+      maxScrollPx: maxScrollPx8,
     });
-  if (Math['abs'](_0x1ccfdc - _0xbbd2b4) <= 0.01) return;
-  ((_0x12e8f4['scrollLeft'] = _0x1ccfdc),
-    _0x3cfc17['_updateTimelineView']({ scrollLeft: _0x1ccfdc }, { persist: ![], renderOnPersist: ![] }),
-    _0x3cfc17['_syncTimelineScrollFade'](_0x12e8f4),
-    _0x3cfc17['_applyTimelineDragPreviewFromPointer'](_0x418204, { clientX: _0x484ba7 }),
-    _0x3cfc17['_scheduleTimelineDragAutoScroll'](_0x418204));
+  if (Math['abs'](scrollLeft4 - toNumber6) <= 0.01) return;
+  ((el6['scrollLeft'] = scrollLeft4),
+    value29['_updateTimelineView']({ scrollLeft: scrollLeft4 }, { persist: ![], renderOnPersist: ![] }),
+    value29['_syncTimelineScrollFade'](el6),
+    value29['_applyTimelineDragPreviewFromPointer'](enabled8, { clientX: clientX }),
+    value29['_scheduleTimelineDragAutoScroll'](enabled8));
 }
-export function persistTimelineDragScroll(_0xb788cd, _0x334028 = _0xb788cd['_timelineDrag']()) {
-  const _0x448f64 = _0x334028?.['scrollEl'];
-  if (!_0x448f64) return;
-  const _0x128a8f = _0xb788cd['_clampTimelineScrollLeft'](_0x448f64, _0x448f64['scrollLeft']);
-  (Math['abs'](_0x128a8f - toNumber(_0x448f64['scrollLeft'], 0x0)) > 0.01 &&
-    (_0x448f64['scrollLeft'] = _0x128a8f),
-    _0xb788cd['_syncTimelineScrollFade'](_0x448f64),
-    _0xb788cd['_updateTimelineView']({ scrollLeft: _0x128a8f }, { persist: !![], renderOnPersist: ![] }));
+export function persistTimelineDragScroll(value31, value32 = value31['_timelineDrag']()) {
+  const enabled10 = value32?.['scrollEl'];
+  if (!enabled10) return;
+  const scrollLeft5 = value31['_clampTimelineScrollLeft'](enabled10, enabled10['scrollLeft']);
+  (Math['abs'](scrollLeft5 - toNumber(enabled10['scrollLeft'], 0x0)) > 0.01 &&
+    (enabled10['scrollLeft'] = scrollLeft5),
+    value31['_syncTimelineScrollFade'](enabled10),
+    value31['_updateTimelineView']({ scrollLeft: scrollLeft5 }, { persist: !![], renderOnPersist: ![] }));
 }

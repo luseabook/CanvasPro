@@ -1,62 +1,64 @@
 import { REPLACEMENT_STUDIO_NAME } from './replacementStudioTerminology.js';
 import { PERSON_REPLACEMENT_ORIENTATION_ENABLED } from './personReplacementCapabilities.js';
-function normalizeText(_0x4d06a3) {
-  return String(_0x4d06a3 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function escapeHtml(_0x179980) {
-  return String(_0x179980 ?? '')
+function escapeHtml(item) {
+  return String(item ?? '')
     ['replace'](/&/g, '&amp;')
     ['replace'](/</g, '&lt;')
     ['replace'](/>/g, '&gt;')
     ['replace'](/"/g, '&quot;')
     ['replace'](/'/g, '&#039;');
 }
-function isModelPackReady(_0x2e65d9) {
-  const _0x12beaf = Array['isArray'](_0x2e65d9?.['models']) ? _0x2e65d9['models'] : [],
-    _0x1bc5ef =
-      Boolean(_0x2e65d9?.['reidModel']) ||
-      _0x12beaf['some']((_0x5c7543) =>
-        /osnet|reid/iu['test']((_0x5c7543?.['id'] || '') + '\x20' + (_0x5c7543?.['filename'] || '')),
+function isModelPackReady(key) {
+  const list = Array['isArray'](key?.['models']) ? key['models'] : [],
+    index =
+      Boolean(key?.['reidModel']) ||
+      list['some']((result) =>
+        /osnet|reid/iu['test']((result?.['id'] || '') + '\x20' + (result?.['filename'] || '')),
       ),
-    _0x54bf6f =
-      Boolean(_0x2e65d9?.['orientationModel']) ||
-      _0x12beaf['some']((_0x243269) =>
+    data =
+      Boolean(key?.['orientationModel']) ||
+      list['some']((options) =>
         /pp.?lcnet|orientation|pedestrian.?attribute/iu['test'](
-          (_0x243269?.['id'] || '') + '\x20' + (_0x243269?.['filename'] || ''),
+          (options?.['id'] || '') + '\x20' + (options?.['filename'] || ''),
         ),
       );
   return (
-    _0x2e65d9?.['installed'] === !![] &&
-    Boolean(_0x2e65d9?.['model']) &&
-    _0x1bc5ef &&
-    (!PERSON_REPLACEMENT_ORIENTATION_ENABLED || _0x54bf6f)
+    key?.['installed'] === !![] &&
+    Boolean(key?.['model']) &&
+    index &&
+    (!PERSON_REPLACEMENT_ORIENTATION_ENABLED || data)
   );
 }
-export function formatPersonReplacementModelBytes(_0x74c728) {
-  const _0x3d2bc7 = Math['max'](0x0, Number(_0x74c728) || 0x0);
-  if (!_0x3d2bc7) return '';
-  if (_0x3d2bc7 >= 0x400 * 0x400 * 0x400)
-    return (_0x3d2bc7 / (0x400 * 0x400 * 0x400))['toFixed'](0x1) + ' GB';
-  if (_0x3d2bc7 >= 0x400 * 0x400)
-    return (_0x3d2bc7 / (0x400 * 0x400))['toFixed'](_0x3d2bc7 >= 0x64 * 0x400 * 0x400 ? 0x0 : 0x1) + ' MB';
-  return Math['max'](0x1, Math['round'](_0x3d2bc7 / 0x400)) + '\x20KB';
+export function formatPersonReplacementModelBytes(target) {
+  const enabled = Math['max'](0x0, Number(target) || 0x0);
+  if (!enabled) return '';
+  if (enabled >= 0x400 * 0x400 * 0x400) return (enabled / (0x400 * 0x400 * 0x400))['toFixed'](0x1) + ' GB';
+  if (enabled >= 0x400 * 0x400)
+    return (enabled / (0x400 * 0x400))['toFixed'](enabled >= 0x64 * 0x400 * 0x400 ? 0x0 : 0x1) + ' MB';
+  return Math['max'](0x1, Math['round'](enabled / 0x400)) + '\x20KB';
 }
-function normalizeProgress(_0x26bf3f = {}, _0x169f92 = 0x0) {
-  const _0x1edfcc = Math['max'](0x0, Number(_0x26bf3f['downloadedBytes']) || 0x0),
-    _0x5e6c17 = Math['max'](0x0, Number(_0x26bf3f['totalBytes']) || Number(_0x169f92) || 0x0);
+function normalizeProgress(options2 = {}, source = 0x0) {
+  const downloadedBytes = Math['max'](0x0, Number(options2['downloadedBytes']) || 0x0),
+    totalBytes = Math['max'](0x0, Number(options2['totalBytes']) || Number(source) || 0x0);
   return {
-    state: normalizeText(_0x26bf3f['state']),
-    downloadedBytes: _0x1edfcc,
-    totalBytes: _0x5e6c17,
+    state: normalizeText(options2['state']),
+    downloadedBytes: downloadedBytes,
+    totalBytes: totalBytes,
     percent: Math['min'](
       0x64,
-      Math['max'](0x0, Number(_0x26bf3f['percent']) || (_0x5e6c17 ? (_0x1edfcc / _0x5e6c17) * 0x64 : 0x0)),
+      Math['max'](
+        0x0,
+        Number(options2['percent']) || (totalBytes ? (downloadedBytes / totalBytes) * 0x64 : 0x0),
+      ),
     ),
   };
 }
-function formatProgressMessage(_0x47788a) {
-  if (_0x47788a === 'verifying') return '正在校验下载内容';
-  if (_0x47788a === 'complete') return '准备完成';
+function formatProgressMessage(next) {
+  if (next === 'verifying') return '正在校验下载内容';
+  if (next === 'complete') return '准备完成';
   return '正在下载所需资源';
 }
 export function renderPersonReplacementModelGate({
@@ -65,39 +67,43 @@ export function renderPersonReplacementModelGate({
   installProgress: installProgress = {},
   error: error = '',
 } = {}) {
-  const _0x583eb8 = state === 'installing',
-    _0x19244f = state === 'checking',
-    _0x1804d7 = normalizeProgress(installProgress, downloadBytes),
-    _0x2d5396 = formatPersonReplacementModelBytes(downloadBytes),
-    _0x210f5f = _0x19244f ? '正在检查人物识别模型' : '下载人物识别基础模型',
-    _0x1ec31f = _0x19244f
+  const current = state === 'installing',
+    entry = state === 'checking',
+    progress = normalizeProgress(installProgress, downloadBytes),
+    formatPersonReplacementModelBytes2 = formatPersonReplacementModelBytes(downloadBytes),
+    record = entry ? '正在检查人物识别模型' : '下载人物识别基础模型',
+    payload = entry
       ? '正在确认本机是否已经安装人物替换所需的轻量识别模型。'
       : '人物替换会先在本机识别视频关键帧中的人物。模型只需下载一次，安装完成后才能进入' +
         REPLACEMENT_STUDIO_NAME +
         '。';
   return (
     '<div class="person-replacement-model-gate-backdrop" data-person-replacement-model-gate-dialog role="presentation">\n    <section class="person-replacement-model-gate-dialog" role="dialog" aria-modal="true" aria-labelledby="personReplacementModelGateTitle" aria-describedby="personReplacementModelGateDescription" tabindex="-1">\n      <span class="person-replacement-model-gate-mark" aria-hidden="true">\n        <svg viewBox="0 0 24 24" fill="none"><path d="M7.5 10.25a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"/><path d="M2.75 18.75v-1.5a4.75 4.75 0 0 1 4.75-4.75h1.25"/><path d="M16.5 13.75a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M12.25 20.25v-1.5A3.75 3.75 0 0 1 16 15h1a4.25 4.25 0 0 1 4.25 4.25v1"/></svg>\n      </span>\n      <div class="person-replacement-model-gate-copy">\n        <span class="person-replacement-model-gate-eyebrow">首次使用准备</span>\n        <h2 id="personReplacementModelGateTitle">' +
-    escapeHtml(_0x210f5f) +
+    escapeHtml(record) +
     '</h2>\n        <p id="personReplacementModelGateDescription">' +
-    escapeHtml(_0x1ec31f) +
+    escapeHtml(payload) +
     '</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
-    (_0x583eb8
+    (current
       ? '<div\x20class=\x22person-replacement-model-gate-progress\x22\x20role=\x22status\x22\x20aria-live=\x22polite\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><strong>' +
-        formatProgressMessage(_0x1804d7['state']) +
+        formatProgressMessage(progress['state']) +
         '</strong><span>' +
-        Math['round'](_0x1804d7['percent']) +
+        Math['round'](progress['percent']) +
         '%</span></div>\n              <progress max="100" value="' +
-        _0x1804d7['percent'] +
+        progress['percent'] +
         '" aria-label="人物识别模型下载进度">' +
-        Math['round'](_0x1804d7['percent']) +
+        Math['round'](progress['percent']) +
         '%</progress>\n              <small>' +
-        escapeHtml(formatPersonReplacementModelBytes(_0x1804d7['downloadedBytes']) || '0 KB') +
+        escapeHtml(formatPersonReplacementModelBytes(progress['downloadedBytes']) || '0 KB') +
         ' / ' +
-        escapeHtml(formatPersonReplacementModelBytes(_0x1804d7['totalBytes']) || _0x2d5396 || '计算中') +
+        escapeHtml(
+          formatPersonReplacementModelBytes(progress['totalBytes']) ||
+            formatPersonReplacementModelBytes2 ||
+            '计算中',
+        ) +
         '</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>'
       : '') +
     '\n        ' +
-    (_0x19244f
+    (entry
       ? '<div\x20class=\x22person-replacement-model-gate-checking\x22\x20role=\x22status\x22><span\x20aria-hidden=\x22true\x22></span><small>正在读取本地模型状态…</small></div>'
       : '') +
     '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
@@ -105,14 +111,14 @@ export function renderPersonReplacementModelGate({
       ? '<div class="person-replacement-model-gate-error" role="alert">' + escapeHtml(error) + '</div>'
       : '') +
     '\n      </div>\n      <footer>\n        <button type="button" data-person-replacement-model-gate-action="cancel" ' +
-    (_0x583eb8 ? 'disabled' : '') +
+    (current ? 'disabled' : '') +
     '>取消</button>\n        ' +
-    (_0x19244f
+    (entry
       ? ''
       : '<button\x20type=\x22button\x22\x20class=\x22person-replacement-model-gate-primary\x22\x20data-person-replacement-model-gate-action=\x22install\x22\x20' +
-        (_0x583eb8 ? 'disabled' : '') +
+        (current ? 'disabled' : '') +
         '>' +
-        (_0x583eb8 ? '正在下载…' : error ? '重新下载' : '下载模型并进入') +
+        (current ? '正在下载…' : error ? '重新下载' : '下载模型并进入') +
         '</button>') +
     '\x0a\x20\x20\x20\x20\x20\x20</footer>\x0a\x20\x20\x20\x20</section>\x0a\x20\x20</div>'
   );
@@ -153,9 +159,9 @@ export class ReplacementStudioModelGate {
       (this['_handleClick'] = this['_handleClick']['bind'](this)),
       (this['_handleKeyDown'] = this['_handleKeyDown']['bind'](this)));
   }
-  ['requestOpen'](_0x312091) {
+  ['requestOpen'](handler) {
     if (this['destroyed']) return null;
-    if (this['status']['installed'] === !![]) return typeof _0x312091 === 'function' ? _0x312091() : null;
+    if (this['status']['installed'] === !![]) return typeof handler === 'function' ? handler() : null;
     if (!this['dialogOpen']) this['_captureReturnFocus']();
     return (
       (this['pendingOpen'] = !![]),
@@ -182,14 +188,14 @@ export class ReplacementStudioModelGate {
         this['status']
       );
     ((this['status'] = { ...this['status'], state: 'checking', error: '' }), this['render']());
-    const _0xb711df = Promise['resolve'](this['modelPackApi']['getStatus']())
-      ['then']((_0x6eeaba) => {
+    const handle = Promise['resolve'](this['modelPackApi']['getStatus']())
+      ['then']((args) => {
         return (
-          isModelPackReady(_0x6eeaba)
-            ? this['_unlock'](_0x6eeaba)
+          isModelPackReady(args)
+            ? this['_unlock'](args)
             : ((this['status'] = {
                 ...this['status'],
-                ..._0x6eeaba,
+                ...args,
                 state: 'missing',
                 installed: ![],
                 error: '',
@@ -198,13 +204,13 @@ export class ReplacementStudioModelGate {
           this['status']
         );
       })
-      ['catch']((_0x425f59) => {
+      ['catch']((error2) => {
         return (
           (this['status'] = {
             ...this['status'],
             state: 'error',
             installed: ![],
-            error: normalizeText(_0x425f59?.['message']) || '无法检测人物识别模型状态。',
+            error: normalizeText(error2?.['message']) || '无法检测人物识别模型状态。',
           }),
           this['render'](),
           this['status']
@@ -213,7 +219,7 @@ export class ReplacementStudioModelGate {
       ['finally'](() => {
         this['checkPromise'] = null;
       });
-    return ((this['checkPromise'] = _0xb711df), _0xb711df);
+    return ((this['checkPromise'] = handle), handle);
   }
   async ['install']() {
     if (this['destroyed'] || this['installPromise']) return this['installPromise'];
@@ -238,21 +244,21 @@ export class ReplacementStudioModelGate {
     }),
       (this['dialogOpen'] = !![]),
       this['render']());
-    const _0x2b2ee1 = Promise['resolve'](this['modelPackApi']['install']())
-      ['then']((_0x46e959) => {
-        if (!isModelPackReady(_0x46e959)) throw new Error('人物识别模型下载未完成，请重试。');
+    const config = Promise['resolve'](this['modelPackApi']['install']())
+      ['then']((scope) => {
+        if (!isModelPackReady(scope)) throw new Error('人物识别模型下载未完成，请重试。');
         return (
-          this['_unlock'](_0x46e959),
+          this['_unlock'](scope),
           this['onNotify']?.('人物识别模型下载完成。', 'success'),
           this['status']
         );
       })
-      ['catch'](async (_0x325365) => {
+      ['catch'](async (error3) => {
         try {
-          const _0x3f3135 = await this['modelPackApi']['getStatus']?.();
-          if (isModelPackReady(_0x3f3135))
+          const input = await this['modelPackApi']['getStatus']?.();
+          if (isModelPackReady(input))
             return (
-              this['_unlock'](_0x3f3135),
+              this['_unlock'](input),
               this['onNotify']?.('人物识别模型下载完成。', 'success'),
               this['status']
             );
@@ -263,7 +269,7 @@ export class ReplacementStudioModelGate {
             ...this['status'],
             state: 'error',
             installed: ![],
-            error: normalizeText(_0x325365?.['message']) || '人物识别模型下载失败。',
+            error: normalizeText(error3?.['message']) || '人物识别模型下载失败。',
           }),
           this['render'](),
           this['status']
@@ -272,19 +278,19 @@ export class ReplacementStudioModelGate {
       ['finally'](() => {
         this['installPromise'] = null;
       });
-    return ((this['installPromise'] = _0x2b2ee1), this['_pollProgress'](), _0x2b2ee1);
+    return ((this['installPromise'] = config), this['_pollProgress'](), config);
   }
   ['dismiss']() {
     if (this['status']['state'] === 'installing') return ![];
     return ((this['pendingOpen'] = ![]), (this['dialogOpen'] = ![]), this['render'](), !![]);
   }
-  ['_unlock'](_0x345145) {
+  ['_unlock'](args2) {
     (this['_stopPolling'](),
-      (this['status'] = { ...this['status'], ..._0x345145, state: 'installed', installed: !![], error: '' }),
+      (this['status'] = { ...this['status'], ...args2, state: 'installed', installed: !![], error: '' }),
       (this['dialogOpen'] = ![]),
       this['render']({ restoreFocus: ![] }));
-    const _0x12d94a = this['pendingOpen'];
-    (_0x12d94a && ((this['pendingOpen'] = ![]), this['onReady']?.()), this['_restoreFocus']());
+    const output = this['pendingOpen'];
+    (output && ((this['pendingOpen'] = ![]), this['onReady']?.()), this['_restoreFocus']());
   }
   ['_pollProgress']() {
     if (
@@ -296,16 +302,16 @@ export class ReplacementStudioModelGate {
       return;
     ((this['pollInFlight'] = !![]),
       Promise['resolve'](this['modelPackApi']['getStatus']())
-        ['then']((_0x3ab1a2) => {
-          if (isModelPackReady(_0x3ab1a2)) {
-            this['_unlock'](_0x3ab1a2);
+        ['then']((installProgress2) => {
+          if (isModelPackReady(installProgress2)) {
+            this['_unlock'](installProgress2);
             return;
           }
           this['status']['state'] === 'installing' &&
             ((this['status'] = {
               ...this['status'],
-              downloadBytes: Number(_0x3ab1a2?.['downloadBytes']) || this['status']['downloadBytes'],
-              installProgress: _0x3ab1a2?.['installProgress'] || this['status']['installProgress'],
+              downloadBytes: Number(installProgress2?.['downloadBytes']) || this['status']['downloadBytes'],
+              installProgress: installProgress2?.['installProgress'] || this['status']['installProgress'],
             }),
             this['render']());
         })
@@ -326,110 +332,108 @@ export class ReplacementStudioModelGate {
   }
   ['_ensureRoot']() {
     if (this['root'] || !this['document']?.['body']?.['appendChild']) return this['root'];
-    const _0x296ed8 = this['document']['createElement']('div');
+    const el = this['document']['createElement']('div');
     return (
-      (_0x296ed8['className'] = 'person-replacement-model-gate'),
-      (_0x296ed8['dataset']['personReplacementModelGate'] = ''),
-      _0x296ed8['addEventListener']('click', this['_handleClick']),
-      _0x296ed8['addEventListener']('keydown', this['_handleKeyDown']),
-      this['document']['body']['appendChild'](_0x296ed8),
-      (this['root'] = _0x296ed8),
-      _0x296ed8
+      (el['className'] = 'person-replacement-model-gate'),
+      (el['dataset']['personReplacementModelGate'] = ''),
+      el['addEventListener']('click', this['_handleClick']),
+      el['addEventListener']('keydown', this['_handleKeyDown']),
+      this['document']['body']['appendChild'](el),
+      (this['root'] = el),
+      el
     );
   }
-  ['_handleClick'](_0xe4cd0f) {
-    const _0x2e4fbc = _0xe4cd0f['target']?.['closest']?.('[data-person-replacement-model-gate-action]')?.[
+  ['_handleClick'](event) {
+    const value2 = event['target']?.['closest']?.('[data-person-replacement-model-gate-action]')?.[
       'dataset'
     ]?.['personReplacementModelGateAction'];
-    if (_0x2e4fbc === 'cancel') this['dismiss']();
-    if (_0x2e4fbc === 'install') void this['install']();
+    if (value2 === 'cancel') this['dismiss']();
+    if (value2 === 'install') void this['install']();
   }
-  ['_handleKeyDown'](_0x319049) {
+  ['_handleKeyDown'](event2) {
     if (!this['dialogOpen']) return;
-    if (_0x319049['key'] === 'Escape') {
+    if (event2['key'] === 'Escape') {
       if (this['status']['state'] === 'installing') return;
-      (_0x319049['preventDefault']?.(), _0x319049['stopPropagation']?.(), this['dismiss']());
+      (event2['preventDefault']?.(), event2['stopPropagation']?.(), this['dismiss']());
       return;
     }
-    if (_0x319049['key'] !== 'Tab') return;
-    const _0x45d528 = this['_getFocusableElements'](),
-      _0x263c26 = this['root']?.['querySelector']?.('.person-replacement-model-gate-dialog');
-    if (!_0x45d528['length']) {
-      (_0x319049['preventDefault']?.(), _0x263c26?.['focus']?.({ preventScroll: !![] }));
+    if (event2['key'] !== 'Tab') return;
+    const list2 = this['_getFocusableElements'](),
+      el2 = this['root']?.['querySelector']?.('.person-replacement-model-gate-dialog');
+    if (!list2['length']) {
+      (event2['preventDefault']?.(), el2?.['focus']?.({ preventScroll: !![] }));
       return;
     }
-    const _0x1b770c = _0x45d528['indexOf'](this['document']?.['activeElement']),
-      _0x1aa793 = _0x319049['shiftKey'] && _0x1b770c <= 0x0,
-      _0x5a63b7 = !_0x319049['shiftKey'] && (_0x1b770c === -0x1 || _0x1b770c === _0x45d528['length'] - 0x1);
-    if (!_0x1aa793 && !_0x5a63b7) return;
-    _0x319049['preventDefault']?.();
-    const _0x1d677d = _0x1aa793 ? _0x45d528['at'](-0x1) : _0x45d528[0x0];
-    _0x1d677d?.['focus']?.({ preventScroll: !![] });
+    const count = list2['indexOf'](this['document']?.['activeElement']),
+      enabled2 = event2['shiftKey'] && count <= 0x0,
+      enabled3 = !event2['shiftKey'] && (count === -0x1 || count === list2['length'] - 0x1);
+    if (!enabled2 && !enabled3) return;
+    event2['preventDefault']?.();
+    const el3 = enabled2 ? list2['at'](-0x1) : list2[0x0];
+    el3?.['focus']?.({ preventScroll: !![] });
   }
   ['_getFocusableElements']() {
-    const _0x250b13 = this['root']?.['querySelector']?.('.person-replacement-model-gate-dialog');
-    if (!_0x250b13) return [];
+    const el4 = this['root']?.['querySelector']?.('.person-replacement-model-gate-dialog');
+    if (!el4) return [];
     return Array['from'](
-      _0x250b13['querySelectorAll']?.(
+      el4['querySelectorAll']?.(
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       ) || [],
-    )['filter'](
-      (_0x446e06) => _0x446e06['hidden'] !== !![] && _0x446e06['getAttribute']?.('aria-hidden') !== 'true',
-    );
+    )['filter']((el5) => el5['hidden'] !== !![] && el5['getAttribute']?.('aria-hidden') !== 'true');
   }
   ['_captureReturnFocus']() {
-    const _0x5d0611 = this['document']?.['activeElement'];
-    this['returnFocusElement'] = _0x5d0611 && _0x5d0611 !== this['document']?.['body'] ? _0x5d0611 : null;
+    const value3 = this['document']?.['activeElement'];
+    this['returnFocusElement'] = value3 && value3 !== this['document']?.['body'] ? value3 : null;
   }
-  ['_focusDialog'](_0x1c7e55 = '') {
-    const _0x2257f4 = _0x1c7e55
+  ['_focusDialog'](value4 = '') {
+    const value5 = value4
         ? this['root']?.['querySelector']?.(
-            '[data-person-replacement-model-gate-action=\x22' + _0x1c7e55 + '"]:not([disabled])',
+            '[data-person-replacement-model-gate-action=\x22' + value4 + '"]:not([disabled])',
           )
         : null,
-      _0x11d57c =
-        _0x2257f4 ||
+      el6 =
+        value5 ||
         this['_getFocusableElements']()['find'](
-          (_0x508617) => _0x508617['dataset']?.['personReplacementModelGateAction'] === 'install',
+          (el7) => el7['dataset']?.['personReplacementModelGateAction'] === 'install',
         ) ||
         this['_getFocusableElements']()[0x0] ||
         this['root']?.['querySelector']?.('.person-replacement-model-gate-dialog');
     try {
-      _0x11d57c?.['focus']?.({ preventScroll: !![] });
+      el6?.['focus']?.({ preventScroll: !![] });
     } catch {
-      _0x11d57c?.['focus']?.();
+      el6?.['focus']?.();
     }
   }
   ['_restoreFocus']() {
-    const _0x416847 =
+    const value6 =
         this['returnFocusElement']?.['isConnected'] !== ![] &&
         (typeof this['returnFocusElement']?.['getClientRects'] !== 'function' ||
           this['returnFocusElement']['getClientRects']()['length'] > 0x0)
           ? this['returnFocusElement']
           : null,
-      _0x192716 = this['document']?.['querySelector']?.('.workspace-mode-current'),
-      _0x24be8b = this['document']?.['querySelector']?.('[data-story-workspace-mode="person-replacement"]'),
-      _0x565b43 = _0x416847 || _0x192716 || _0x24be8b;
+      value7 = this['document']?.['querySelector']?.('.workspace-mode-current'),
+      value8 = this['document']?.['querySelector']?.('[data-story-workspace-mode="person-replacement"]'),
+      el8 = value6 || value7 || value8;
     this['returnFocusElement'] = null;
-    if (!_0x565b43 || _0x565b43['isConnected'] === ![]) return ![];
+    if (!el8 || el8['isConnected'] === ![]) return ![];
     try {
-      _0x565b43['focus']?.({ preventScroll: !![] });
+      el8['focus']?.({ preventScroll: !![] });
     } catch {
-      _0x565b43['focus']?.();
+      el8['focus']?.();
     }
-    return this['document']?.['activeElement'] === _0x565b43;
+    return this['document']?.['activeElement'] === el8;
   }
   ['render']({ restoreFocus: restoreFocus = !![] } = {}) {
     if (!this['root'] && this['dialogOpen']) this['_ensureRoot']();
     if (!this['root']) return;
-    const _0x424b5b = this['root']['contains']?.(this['document']?.['activeElement'])
+    const value9 = this['root']['contains']?.(this['document']?.['activeElement'])
       ? normalizeText(this['document']?.['activeElement']?.['dataset']?.['personReplacementModelGateAction'])
       : '';
     ((this['root']['hidden'] = !this['dialogOpen']),
       (this['root']['innerHTML'] = this['dialogOpen']
         ? renderPersonReplacementModelGate(this['status'])
         : ''));
-    if (this['dialogOpen']) this['_focusDialog'](_0x424b5b);
+    if (this['dialogOpen']) this['_focusDialog'](value9);
     else {
       if (restoreFocus) this['_restoreFocus']();
     }

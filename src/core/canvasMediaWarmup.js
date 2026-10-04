@@ -36,140 +36,135 @@ let videoStatProbeQueue = [],
   activeVideoStatProbeCount = 0x0,
   videoWarmupRevision = 0x0,
   latestVideoWarmupContext = null;
-function normalizeNodes(_0x252ea8) {
-  if (Array['isArray'](_0x252ea8)) return _0x252ea8;
-  if (_0x252ea8 && typeof _0x252ea8 === 'object') return Object['values'](_0x252ea8);
+function normalizeNodes(value) {
+  if (Array['isArray'](value)) return value;
+  if (value && typeof value === 'object') return Object['values'](value);
   return [];
 }
-function normalizeViewport(_0x5b04ea) {
+function normalizeViewport(box) {
   return {
-    x: Number['isFinite'](Number(_0x5b04ea?.['x'])) ? Number(_0x5b04ea['x']) : 0x0,
-    y: Number['isFinite'](Number(_0x5b04ea?.['y'])) ? Number(_0x5b04ea['y']) : 0x0,
-    zoom:
-      Number['isFinite'](Number(_0x5b04ea?.['zoom'])) && Number(_0x5b04ea['zoom']) > 0x0
-        ? Number(_0x5b04ea['zoom'])
-        : 0x1,
+    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0x0,
+    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0x0,
+    zoom: Number['isFinite'](Number(box?.['zoom'])) && Number(box['zoom']) > 0x0 ? Number(box['zoom']) : 0x1,
   };
 }
 function shouldUseSharedVideoBlobWarmup() {
-  const _0xce500c = String(
+  const item = String(
     globalThis['location']?.['search'] || globalThis['window']?.['location']?.['search'] || '',
   );
-  if (new URLSearchParams(_0xce500c)['get']('aicRuntime') === 'chrome-shell') return !![];
+  if (new URLSearchParams(item)['get']('aicRuntime') === 'chrome-shell') return !![];
   return !desktopBridge['mediaPreview']['isAvailable']();
 }
-function getElementSize(_0x20bf2f) {
+function getElementSize(el) {
   return {
-    width: Math['max'](0x1, Math['round'](Number(_0x20bf2f?.['clientWidth']) || DEFAULT_CONTAINER_WIDTH)),
-    height: Math['max'](0x1, Math['round'](Number(_0x20bf2f?.['clientHeight']) || DEFAULT_CONTAINER_HEIGHT)),
+    width: Math['max'](0x1, Math['round'](Number(el?.['clientWidth']) || DEFAULT_CONTAINER_WIDTH)),
+    height: Math['max'](0x1, Math['round'](Number(el?.['clientHeight']) || DEFAULT_CONTAINER_HEIGHT)),
   };
 }
-function getViewportWorldCenter(_0xbf12e9, _0x77a5da, _0x5a7583) {
-  const _0x597398 = Math['max'](0.0001, Number(_0xbf12e9?.['zoom']) || 0x1),
-    _0x12d38d = Number['isFinite'](Number(_0xbf12e9?.['x'])) ? Number(_0xbf12e9['x']) : 0x0,
-    _0xec0a9b = Number['isFinite'](Number(_0xbf12e9?.['y'])) ? Number(_0xbf12e9['y']) : 0x0;
+function getViewportWorldCenter(box2, key, index) {
+  const result = Math['max'](0.0001, Number(box2?.['zoom']) || 0x1),
+    data = Number['isFinite'](Number(box2?.['x'])) ? Number(box2['x']) : 0x0,
+    options = Number['isFinite'](Number(box2?.['y'])) ? Number(box2['y']) : 0x0;
   return {
-    x: ((0x0 - _0x12d38d) / _0x597398 + (_0x77a5da - _0x12d38d) / _0x597398) / 0x2,
-    y: ((0x0 - _0xec0a9b) / _0x597398 + (_0x5a7583 - _0xec0a9b) / _0x597398) / 0x2,
+    x: ((0x0 - data) / result + (key - data) / result) / 0x2,
+    y: ((0x0 - options) / result + (index - options) / result) / 0x2,
   };
 }
-function getNodeCenterDistanceSq(_0x3c350d, _0x296fb1) {
-  const _0x51809e = Number['isFinite'](Number(_0x3c350d?.['x'])) ? Number(_0x3c350d['x']) : 0x0,
-    _0x2e78c0 = Number['isFinite'](Number(_0x3c350d?.['y'])) ? Number(_0x3c350d['y']) : 0x0,
-    _0x197286 = Math['max'](0x1, Number(_0x3c350d?.['width']) || 0xa0),
-    _0x1f73d4 = Math['max'](0x1, Number(_0x3c350d?.['height']) || 0x78),
-    _0x2868e7 = _0x51809e + _0x197286 / 0x2 - _0x296fb1['x'],
-    _0x3c25fb = _0x2e78c0 + _0x1f73d4 / 0x2 - _0x296fb1['y'];
-  return _0x2868e7 * _0x2868e7 + _0x3c25fb * _0x3c25fb;
+function getNodeCenterDistanceSq(box3, box4) {
+  const target = Number['isFinite'](Number(box3?.['x'])) ? Number(box3['x']) : 0x0,
+    source = Number['isFinite'](Number(box3?.['y'])) ? Number(box3['y']) : 0x0,
+    next = Math['max'](0x1, Number(box3?.['width']) || 0xa0),
+    current = Math['max'](0x1, Number(box3?.['height']) || 0x78),
+    entry = target + next / 0x2 - box4['x'],
+    record = source + current / 0x2 - box4['y'];
+  return entry * entry + record * record;
 }
-function normalizeSelectedNodeIds(_0xd5d4bb, _0x24721b) {
-  const _0xbd3ec8 =
-    _0x24721b instanceof Set || Array['isArray'](_0x24721b) ? _0x24721b : _0xd5d4bb?.['selectedNodeIds'];
+function normalizeSelectedNodeIds(payload, handle) {
+  const state = handle instanceof Set || Array['isArray'](handle) ? handle : payload?.['selectedNodeIds'];
   return new Set(
-    Array['from'](_0xbd3ec8 || [])
-      ['map']((_0x1b60e9) => String(_0x1b60e9 || ''))
+    Array['from'](state || [])
+      ['map']((config) => String(config || ''))
       ['filter'](Boolean),
   );
 }
-function getDistancePriorityBoost(_0x23ddfb, _0x2d88da, _0xaead2e, _0x589f72) {
-  const _0x5cdb9b = Math['max'](0.0001, Number(_0x2d88da?.['zoom']) || 0x1),
-    _0x559a01 = Math['max'](_0xaead2e / _0x5cdb9b, _0x589f72 / _0x5cdb9b, 0x1),
-    _0x548dd0 = Math['sqrt'](Math['max'](0x0, _0x23ddfb)) / _0x559a01;
-  return Math['max'](0x0, Math['round'](0x12 - _0x548dd0 * 0x12));
+function getDistancePriorityBoost(scope, box5, input, output) {
+  const value2 = Math['max'](0.0001, Number(box5?.['zoom']) || 0x1),
+    value3 = Math['max'](input / value2, output / value2, 0x1),
+    value4 = Math['sqrt'](Math['max'](0x0, scope)) / value3;
+  return Math['max'](0x0, Math['round'](0x12 - value4 * 0x12));
 }
-function getEffectiveWarmupMaxJobs(_0x4a85aa, _0x44bcb5) {
-  const _0xe964b5 = Math['max'](0x0, Math['round'](Number(_0x4a85aa) || 0x0)),
-    _0x411515 = Number(_0x44bcb5?.['zoom']);
-  if (!Number['isFinite'](_0x411515) || _0x411515 <= 0x0) return _0xe964b5;
-  if (_0x411515 <= VERY_LOW_ZOOM_WARMUP_THRESHOLD)
-    return Math['min'](_0xe964b5, VERY_LOW_ZOOM_WARMUP_JOB_LIMIT);
-  if (_0x411515 <= LOW_ZOOM_WARMUP_THRESHOLD) return Math['min'](_0xe964b5, LOW_ZOOM_WARMUP_JOB_LIMIT);
-  return _0xe964b5;
+function getEffectiveWarmupMaxJobs(value5, box6) {
+  const value6 = Math['max'](0x0, Math['round'](Number(value5) || 0x0)),
+    count = Number(box6?.['zoom']);
+  if (!Number['isFinite'](count) || count <= 0x0) return value6;
+  if (count <= VERY_LOW_ZOOM_WARMUP_THRESHOLD) return Math['min'](value6, VERY_LOW_ZOOM_WARMUP_JOB_LIMIT);
+  if (count <= LOW_ZOOM_WARMUP_THRESHOLD) return Math['min'](value6, LOW_ZOOM_WARMUP_JOB_LIMIT);
+  return value6;
 }
-function isWarmupUrl(_0x13895f) {
-  const _0xd3923 = String(_0x13895f || '')['trim']();
-  if (!_0xd3923) return ![];
-  if (/^https?:\/\//i['test'](_0xd3923)) return ![];
+function isWarmupUrl(value7) {
+  const enabled = String(value7 || '')['trim']();
+  if (!enabled) return ![];
+  if (/^https?:\/\//i['test'](enabled)) return ![];
   return (
-    _0xd3923['startsWith']('/') ||
-    _0xd3923['startsWith']('data:image/') ||
-    _0xd3923['startsWith']('blob:') ||
-    _0xd3923['startsWith']('aic-local-preview:')
+    enabled['startsWith']('/') ||
+    enabled['startsWith']('data:image/') ||
+    enabled['startsWith']('blob:') ||
+    enabled['startsWith']('aic-local-preview:')
   );
 }
-function isLikelyVideoUrl(_0x350ba4) {
-  return /\.(?:mp4|mov|webm|m4v|avi|mkv)(?:[?#].*)?$/i['test'](String(_0x350ba4 || '')['trim']());
+function isLikelyVideoUrl(value8) {
+  return /\.(?:mp4|mov|webm|m4v|avi|mkv)(?:[?#].*)?$/i['test'](String(value8 || '')['trim']());
 }
-function toWarmupUrl(_0x5b42fa) {
-  const _0x5b5544 = String(_0x5b42fa || '')['trim']();
-  if (!_0x5b5544) return '';
-  if (isWarmupUrl(_0x5b5544)) return _0x5b5544;
-  return toCanvasLocalUrl(_0x5b5544);
+function toWarmupUrl(value9) {
+  const enabled2 = String(value9 || '')['trim']();
+  if (!enabled2) return '';
+  if (isWarmupUrl(enabled2)) return enabled2;
+  return toCanvasLocalUrl(enabled2);
 }
-function pushWarmupJob(_0x48718b, _0x1d4e7b, _0x1a5d51, _0x27aa27, _0x1093ae, _0x1107a9, _0x1977af = {}) {
-  const _0x3bc1fe = toWarmupUrl(_0x1a5d51);
-  if (!isWarmupUrl(_0x3bc1fe) || _0x1d4e7b['has'](_0x3bc1fe)) return;
-  if (isLikelyVideoUrl(_0x3bc1fe)) return;
-  (_0x1d4e7b['add'](_0x3bc1fe),
-    _0x48718b['push']({
-      url: _0x3bc1fe,
-      priority: _0x27aa27,
-      nodeId: String(_0x1093ae || ''),
-      reason: _0x1107a9,
-      distanceSq: Number['isFinite'](Number(_0x1977af['distanceSq'])) ? Number(_0x1977af['distanceSq']) : 0x0,
-      visible: _0x1977af['visible'] === !![],
-      selected: _0x1977af['selected'] === !![],
-      fetchPriority: _0x1977af['fetchPriority'] === 'high' ? 'high' : 'auto',
-      allowWhenPaused: _0x1977af['allowWhenPaused'] === !![],
-      deferWhenPaused: _0x1977af['deferWhenPaused'] === ![] ? ![] : !![],
-      order: _0x48718b['length'],
+function pushWarmupJob(order, map, value10, priority, value11, reason2, visible = {}) {
+  const url = toWarmupUrl(value10);
+  if (!isWarmupUrl(url) || map['has'](url)) return;
+  if (isLikelyVideoUrl(url)) return;
+  (map['add'](url),
+    order['push']({
+      url: url,
+      priority: priority,
+      nodeId: String(value11 || ''),
+      reason: reason2,
+      distanceSq: Number['isFinite'](Number(visible['distanceSq'])) ? Number(visible['distanceSq']) : 0x0,
+      visible: visible['visible'] === !![],
+      selected: visible['selected'] === !![],
+      fetchPriority: visible['fetchPriority'] === 'high' ? 'high' : 'auto',
+      allowWhenPaused: visible['allowWhenPaused'] === !![],
+      deferWhenPaused: visible['deferWhenPaused'] === ![] ? ![] : !![],
+      order: order['length'],
     }));
 }
-function getPrimaryListItem(_0x5ff170, _0xcef297 = 0x0) {
-  if (!Array['isArray'](_0x5ff170) || _0x5ff170['length'] === 0x0) return null;
-  const _0x2e05e7 = Number['isFinite'](Number(_0xcef297))
-    ? Math['max'](0x0, Math['trunc'](Number(_0xcef297)))
+function getPrimaryListItem(list, value12 = 0x0) {
+  if (!Array['isArray'](list) || list['length'] === 0x0) return null;
+  const value13 = Number['isFinite'](Number(value12))
+    ? Math['max'](0x0, Math['trunc'](Number(value12)))
     : 0x0;
-  return _0x5ff170[_0x2e05e7] || _0x5ff170[0x0] || null;
+  return list[value13] || list[0x0] || null;
 }
-function getKnownMediaSizeBytes(..._0x2e83f5) {
-  for (const _0x97620c of _0x2e83f5) {
-    for (const _0x2c2c7f of [
-      _0x97620c?.['fileSize'],
-      _0x97620c?.['sizeBytes'],
-      _0x97620c?.['byteSize'],
-      _0x97620c?.['contentLength'],
+function getKnownMediaSizeBytes(...args) {
+  for (const value14 of args) {
+    for (const value15 of [
+      value14?.['fileSize'],
+      value14?.['sizeBytes'],
+      value14?.['byteSize'],
+      value14?.['contentLength'],
     ]) {
-      const _0x5156e5 = Number(_0x2c2c7f || 0x0);
-      if (Number['isFinite'](_0x5156e5) && _0x5156e5 > 0x0) return _0x5156e5;
+      const count2 = Number(value15 || 0x0);
+      if (Number['isFinite'](count2) && count2 > 0x0) return count2;
     }
   }
   return 0x0;
 }
 function addImageWarmupJobs(
-  _0x487a4f,
-  _0x2fa280,
-  _0x945b0f,
+  value16,
+  value17,
+  value18,
   {
     primary: primary = !![],
     priorityOffset: priorityOffset = 0x0,
@@ -177,62 +172,62 @@ function addImageWarmupJobs(
     meta: meta = {},
   } = {},
 ) {
-  const _0x3cf12a = primary ? 0x14 : 0x0,
-    _0x50089d = resolveCanvasImageDisplayUrl(_0x945b0f),
-    _0x3e2724 = resolveCanvasImageThumbUrl(_0x945b0f);
+  const value19 = primary ? 0x14 : 0x0,
+    canvasImageDisplayUrl = resolveCanvasImageDisplayUrl(value18),
+    canvasImageThumbUrl = resolveCanvasImageThumbUrl(value18);
   (includeFull &&
-    _0x50089d &&
-    _0x50089d !== _0x3e2724 &&
+    canvasImageDisplayUrl &&
+    canvasImageDisplayUrl !== canvasImageThumbUrl &&
     pushWarmupJob(
-      _0x487a4f,
-      _0x2fa280,
-      _0x50089d,
-      0x82 + _0x3cf12a + priorityOffset,
-      _0x945b0f?.['id'],
+      value16,
+      value17,
+      canvasImageDisplayUrl,
+      0x82 + value19 + priorityOffset,
+      value18?.['id'],
       primary ? 'image-display-primary' : 'image-display-nearby',
       { ...meta, fetchPriority: 'high', allowWhenPaused: !![], deferWhenPaused: ![] },
     ),
     pushWarmupJob(
-      _0x487a4f,
-      _0x2fa280,
-      _0x3e2724 || resolveCanvasImageLowZoomUrl(_0x945b0f),
-      0x5a + _0x3cf12a + priorityOffset,
-      _0x945b0f?.['id'],
+      value16,
+      value17,
+      canvasImageThumbUrl || resolveCanvasImageLowZoomUrl(value18),
+      0x5a + value19 + priorityOffset,
+      value18?.['id'],
       primary ? 'image-thumb-primary' : 'image-thumb-nearby',
       meta,
     ),
     pushWarmupJob(
-      _0x487a4f,
-      _0x2fa280,
-      _0x3e2724,
-      0x46 + _0x3cf12a + priorityOffset,
-      _0x945b0f?.['id'],
+      value16,
+      value17,
+      canvasImageThumbUrl,
+      0x46 + value19 + priorityOffset,
+      value18?.['id'],
       primary ? 'image-thumb-dedupe-primary' : 'image-thumb-dedupe-nearby',
       meta,
     ));
 }
 function addVideoPosterWarmupJobs(
-  _0x1223b3,
-  _0x3ffe7f,
-  _0xd98391,
+  value20,
+  value21,
+  value22,
   { primary: primary = !![], priorityOffset: priorityOffset = 0x0, meta: meta = {} } = {},
 ) {
-  const _0x2b1081 = (primary ? 0x5f : 0x46) + priorityOffset;
-  for (const _0x417681 of [
-    _0xd98391?.['posterLocalPath'],
-    _0xd98391?.['thumbLocalPath'],
-    _0xd98391?.['posterUrl'],
-    _0xd98391?.['thumbUrl'],
-    _0xd98391?.['videoThumbSrc'],
-    _0xd98391?.['capturePreviewUrl'],
+  const value23 = (primary ? 0x5f : 0x46) + priorityOffset;
+  for (const value24 of [
+    value22?.['posterLocalPath'],
+    value22?.['thumbLocalPath'],
+    value22?.['posterUrl'],
+    value22?.['thumbUrl'],
+    value22?.['videoThumbSrc'],
+    value22?.['capturePreviewUrl'],
   ]) {
-    pushWarmupJob(_0x1223b3, _0x3ffe7f, _0x417681, _0x2b1081, _0xd98391?.['id'], 'video-poster', meta);
+    pushWarmupJob(value20, value21, value24, value23, value22?.['id'], 'video-poster', meta);
   }
 }
-function shouldWarmupVideoPosterAtViewport(_0x431939, _0x1fff19) {
-  const _0x59a5dd = Number(_0x1fff19?.['zoom']);
-  if (!Number['isFinite'](_0x59a5dd) || _0x59a5dd > LOW_ZOOM_WARMUP_THRESHOLD) return !![];
-  return _0x431939?.['visible'] === !![] || _0x431939?.['selected'] === !![];
+function shouldWarmupVideoPosterAtViewport(value25, box7) {
+  const value26 = Number(box7?.['zoom']);
+  if (!Number['isFinite'](value26) || value26 > LOW_ZOOM_WARMUP_THRESHOLD) return !![];
+  return value25?.['visible'] === !![] || value25?.['selected'] === !![];
 }
 function collectCanvasNearbyVideoWarmupCandidates({
   canvas: canvas = null,
@@ -244,158 +239,157 @@ function collectCanvasNearbyVideoWarmupCandidates({
   selectedNodeIds: selectedNodeIds = canvas?.['selectedNodeIds'],
   maxVideos: maxVideos = LOW_ZOOM_VIDEO_WARMUP_LIMIT,
 } = {}) {
-  const _0x3721a4 = normalizeViewport(viewport);
-  if (_0x3721a4['zoom'] > LOW_ZOOM_WARMUP_THRESHOLD || !shouldUseSharedVideoBlobWarmup()) return [];
-  const _0x47e94a = normalizeSelectedNodeIds(canvas, selectedNodeIds),
-    _0x29bc9e = getViewportWorldCenter(_0x3721a4, containerWidth, containerHeight),
-    _0x529b6f = [];
-  for (const _0x366a32 of normalizeNodes(nodes)) {
-    if (!_0x366a32?.['id'] || String(_0x366a32['type'] || '')['toLowerCase']() !== 'ai-video') continue;
-    if (isTaskFailed(_0x366a32)) continue;
-    if (!isNodeInsideViewportPadding(_0x366a32, _0x3721a4, containerWidth, containerHeight, padding))
-      continue;
-    const _0x26b39a = Array['isArray'](_0x366a32['videos']) ? _0x366a32['videos'] : [],
-      _0x3c9ef9 = getPrimaryListItem(_0x26b39a, _0x366a32['mainVideoIndex']),
-      _0x481e43 = resolveCanvasVideoUrl(_0x3c9ef9 || {}) || resolveCanvasVideoUrl(_0x366a32);
-    if (!_0x481e43) continue;
-    _0x529b6f['push']({
-      nodeId: String(_0x366a32['id']),
-      sourceUrl: _0x481e43,
-      knownSizeBytes: getKnownMediaSizeBytes(_0x3c9ef9, _0x366a32),
-      selected: _0x47e94a['has'](String(_0x366a32['id'])),
-      visible: isNodeInsideViewportPadding(_0x366a32, _0x3721a4, containerWidth, containerHeight, 0x0),
-      distanceSq: getNodeCenterDistanceSq(_0x366a32, _0x29bc9e),
-      order: _0x529b6f['length'],
+  const box8 = normalizeViewport(viewport);
+  if (box8['zoom'] > LOW_ZOOM_WARMUP_THRESHOLD || !shouldUseSharedVideoBlobWarmup()) return [];
+  const selected = normalizeSelectedNodeIds(canvas, selectedNodeIds),
+    viewportWorldCenter = getViewportWorldCenter(box8, containerWidth, containerHeight),
+    order2 = [];
+  for (const enabled3 of normalizeNodes(nodes)) {
+    if (!enabled3?.['id'] || String(enabled3['type'] || '')['toLowerCase']() !== 'ai-video') continue;
+    if (isTaskFailed(enabled3)) continue;
+    if (!isNodeInsideViewportPadding(enabled3, box8, containerWidth, containerHeight, padding)) continue;
+    const value27 = Array['isArray'](enabled3['videos']) ? enabled3['videos'] : [],
+      primaryListItem = getPrimaryListItem(value27, enabled3['mainVideoIndex']),
+      sourceUrl = resolveCanvasVideoUrl(primaryListItem || {}) || resolveCanvasVideoUrl(enabled3);
+    if (!sourceUrl) continue;
+    order2['push']({
+      nodeId: String(enabled3['id']),
+      sourceUrl: sourceUrl,
+      knownSizeBytes: getKnownMediaSizeBytes(primaryListItem, enabled3),
+      selected: selected['has'](String(enabled3['id'])),
+      visible: isNodeInsideViewportPadding(enabled3, box8, containerWidth, containerHeight, 0x0),
+      distanceSq: getNodeCenterDistanceSq(enabled3, viewportWorldCenter),
+      order: order2['length'],
     });
   }
-  _0x529b6f['sort']((_0x439872, _0x2168b9) => {
-    if (_0x439872['selected'] !== _0x2168b9['selected']) return _0x439872['selected'] ? -0x1 : 0x1;
-    if (_0x439872['visible'] !== _0x2168b9['visible']) return _0x439872['visible'] ? -0x1 : 0x1;
-    if (_0x439872['distanceSq'] !== _0x2168b9['distanceSq'])
-      return _0x439872['distanceSq'] - _0x2168b9['distanceSq'];
-    return _0x439872['order'] - _0x2168b9['order'];
+  order2['sort']((value28, value29) => {
+    if (value28['selected'] !== value29['selected']) return value28['selected'] ? -0x1 : 0x1;
+    if (value28['visible'] !== value29['visible']) return value28['visible'] ? -0x1 : 0x1;
+    if (value28['distanceSq'] !== value29['distanceSq']) return value28['distanceSq'] - value29['distanceSq'];
+    return value28['order'] - value29['order'];
   });
-  const _0x19cae8 = Math['max'](
+  const value30 = Math['max'](
       0x0,
       Math['min'](LOW_ZOOM_VIDEO_WARMUP_LIMIT, Math['trunc'](Number(maxVideos) || 0x0)),
     ),
-    _0x3c6f0a = [],
-    _0x273e16 = new Set();
-  for (const _0x1934ee of _0x529b6f) {
-    if (_0x273e16['has'](_0x1934ee['sourceUrl'])) continue;
-    (_0x273e16['add'](_0x1934ee['sourceUrl']), _0x3c6f0a['push'](_0x1934ee));
-    if (_0x3c6f0a['length'] >= _0x19cae8) break;
+    list2 = [],
+    map2 = new Set();
+  for (const value31 of order2) {
+    if (map2['has'](value31['sourceUrl'])) continue;
+    (map2['add'](value31['sourceUrl']), list2['push'](value31));
+    if (list2['length'] >= value30) break;
   }
-  return _0x3c6f0a;
+  return list2;
 }
-function readCachedVideoStat(_0x5e8b91) {
-  const _0x1f5e5a = videoStatCache['get'](_0x5e8b91);
-  if (!_0x1f5e5a) return null;
-  if (Number(_0x1f5e5a['expiresAt'] || 0x0) <= Date['now']())
-    return (videoStatCache['delete'](_0x5e8b91), null);
-  return _0x1f5e5a['stat'];
+function readCachedVideoStat(value32) {
+  const enabled4 = videoStatCache['get'](value32);
+  if (!enabled4) return null;
+  if (Number(enabled4['expiresAt'] || 0x0) <= Date['now']()) return (videoStatCache['delete'](value32), null);
+  return enabled4['stat'];
 }
-function rememberVideoStat(_0xfa0a0d, _0x35ac1a) {
-  const _0x3f4144 = {
-    exists: _0x35ac1a?.['exists'] === !![],
+function rememberVideoStat(value33, exists) {
+  const stat = {
+    exists: exists?.['exists'] === !![],
     sizeBytes:
-      Number['isSafeInteger'](Number(_0x35ac1a?.['sizeBytes'])) && Number(_0x35ac1a['sizeBytes']) >= 0x0
-        ? Number(_0x35ac1a['sizeBytes'])
+      Number['isSafeInteger'](Number(exists?.['sizeBytes'])) && Number(exists['sizeBytes']) >= 0x0
+        ? Number(exists['sizeBytes'])
         : 0x0,
   };
   return (
-    videoStatCache['set'](_0xfa0a0d, {
-      stat: _0x3f4144,
+    videoStatCache['set'](value33, {
+      stat: stat,
       expiresAt:
-        Date['now']() + (_0x3f4144['exists'] ? VIDEO_STAT_TRUE_CACHE_TTL_MS : VIDEO_STAT_FALSE_CACHE_TTL_MS),
+        Date['now']() + (stat['exists'] ? VIDEO_STAT_TRUE_CACHE_TTL_MS : VIDEO_STAT_FALSE_CACHE_TTL_MS),
     }),
-    _0x3f4144
+    stat
   );
 }
 function drainVideoStatProbeQueue() {
   while (activeVideoStatProbeCount < LOW_ZOOM_VIDEO_STAT_CONCURRENCY && videoStatProbeQueue['length'] > 0x0) {
-    const _0x12b4bc = videoStatProbeQueue['shift']();
-    if (!_0x12b4bc || videoStatProbeBySource['get'](_0x12b4bc['sourceUrl']) !== _0x12b4bc) continue;
-    ((_0x12b4bc['active'] = !![]),
+    const promise = videoStatProbeQueue['shift']();
+    if (!promise || videoStatProbeBySource['get'](promise['sourceUrl']) !== promise) continue;
+    ((promise['active'] = !![]),
       (activeVideoStatProbeCount += 0x1),
-      void statLocalMediaOnServer(_0x12b4bc['sourceUrl'])
-        ['then']((_0x4d95bb) => rememberVideoStat(_0x12b4bc['sourceUrl'], _0x4d95bb))
-        ['catch'](() => rememberVideoStat(_0x12b4bc['sourceUrl'], { exists: ![], sizeBytes: 0x0 }))
-        ['then'](_0x12b4bc['resolve'])
+      void statLocalMediaOnServer(promise['sourceUrl'])
+        ['then']((value34) => rememberVideoStat(promise['sourceUrl'], value34))
+        ['catch'](() => rememberVideoStat(promise['sourceUrl'], { exists: ![], sizeBytes: 0x0 }))
+        ['then'](promise['resolve'])
         ['finally'](() => {
-          ((_0x12b4bc['active'] = ![]),
+          ((promise['active'] = ![]),
             (activeVideoStatProbeCount = Math['max'](0x0, activeVideoStatProbeCount - 0x1)),
-            videoStatProbeBySource['get'](_0x12b4bc['sourceUrl']) === _0x12b4bc &&
-              videoStatProbeBySource['delete'](_0x12b4bc['sourceUrl']),
+            videoStatProbeBySource['get'](promise['sourceUrl']) === promise &&
+              videoStatProbeBySource['delete'](promise['sourceUrl']),
             drainVideoStatProbeQueue());
         }));
   }
 }
-function probeVideoStat(_0x1d53e1) {
-  const _0x18ee0b = readCachedVideoStat(_0x1d53e1);
-  if (_0x18ee0b) return Promise['resolve'](_0x18ee0b);
-  const _0x565bbc = videoStatProbeBySource['get'](_0x1d53e1);
-  if (_0x565bbc) return _0x565bbc['promise'];
-  let _0x23ae87;
-  const _0x4cd491 = new Promise((_0x3c97a1) => {
-      _0x23ae87 = _0x3c97a1;
+function probeVideoStat(sourceUrl2) {
+  const cachedVideoStat = readCachedVideoStat(sourceUrl2);
+  if (cachedVideoStat) return Promise['resolve'](cachedVideoStat);
+  const value35 = videoStatProbeBySource['get'](sourceUrl2);
+  if (value35) return value35['promise'];
+  let resolve;
+  const promise2 = new Promise((value36) => {
+      resolve = value36;
     }),
-    _0x2f9db1 = { sourceUrl: _0x1d53e1, promise: _0x4cd491, resolve: _0x23ae87, active: ![] };
+    value37 = { sourceUrl: sourceUrl2, promise: promise2, resolve: resolve, active: ![] };
   return (
-    videoStatProbeBySource['set'](_0x1d53e1, _0x2f9db1),
-    videoStatProbeQueue['push'](_0x2f9db1),
+    videoStatProbeBySource['set'](sourceUrl2, value37),
+    videoStatProbeQueue['push'](value37),
     drainVideoStatProbeQueue(),
-    _0x4cd491
+    promise2
   );
 }
-function resolveEligibleVideoWarmupSources(_0x159ddc) {
-  const _0x32a39d = [];
-  for (const _0x5c6032 of _0x159ddc) {
-    const _0x493e8e = readCachedVideoStat(_0x5c6032['sourceUrl']),
-      _0x4b1a13 =
-        _0x5c6032['knownSizeBytes'] > 0x0
-          ? _0x5c6032['knownSizeBytes']
-          : _0x493e8e?.['exists'] === !![]
-            ? Number(_0x493e8e['sizeBytes'] || 0x0)
+function resolveEligibleVideoWarmupSources(value38) {
+  const list3 = [];
+  for (const value39 of value38) {
+    const cachedVideoStat2 = readCachedVideoStat(value39['sourceUrl']),
+      count3 =
+        value39['knownSizeBytes'] > 0x0
+          ? value39['knownSizeBytes']
+          : cachedVideoStat2?.['exists'] === !![]
+            ? Number(cachedVideoStat2['sizeBytes'] || 0x0)
             : 0x0;
-    _0x4b1a13 > 0x0 &&
-      _0x4b1a13 <= LOW_ZOOM_VIDEO_WARMUP_MAX_BYTES &&
-      _0x32a39d['push'](_0x5c6032['sourceUrl']);
+    count3 > 0x0 && count3 <= LOW_ZOOM_VIDEO_WARMUP_MAX_BYTES && list3['push'](value39['sourceUrl']);
   }
-  return _0x32a39d;
+  return list3;
 }
-function applyLatestVideoWarmup(_0x405ee6) {
-  if (_0x405ee6 !== videoWarmupRevision || !latestVideoWarmupContext) return null;
-  const _0xbe5580 = collectCanvasNearbyVideoWarmupCandidates(latestVideoWarmupContext);
-  return syncLocalVideoPlaybackWarmupSources(resolveEligibleVideoWarmupSources(_0xbe5580), {
-    scope: CANVAS_VIDEO_WARMUP_SCOPE,
-    maxSources: LOW_ZOOM_VIDEO_WARMUP_LIMIT,
-  });
+function applyLatestVideoWarmup(value40) {
+  if (value40 !== videoWarmupRevision || !latestVideoWarmupContext) return null;
+  const canvasNearbyVideoWarmupCandidates =
+    collectCanvasNearbyVideoWarmupCandidates(latestVideoWarmupContext);
+  return syncLocalVideoPlaybackWarmupSources(
+    resolveEligibleVideoWarmupSources(canvasNearbyVideoWarmupCandidates),
+    {
+      scope: CANVAS_VIDEO_WARMUP_SCOPE,
+      maxSources: LOW_ZOOM_VIDEO_WARMUP_LIMIT,
+    },
+  );
 }
-export function collectCanvasNearbyVideoWarmupSources(_0x17971b = {}) {
-  return resolveEligibleVideoWarmupSources(collectCanvasNearbyVideoWarmupCandidates(_0x17971b));
+export function collectCanvasNearbyVideoWarmupSources(options2 = {}) {
+  return resolveEligibleVideoWarmupSources(collectCanvasNearbyVideoWarmupCandidates(options2));
 }
 export function syncCanvasNearbyVideoWarmup({ canvas: canvas = null, containerEl: containerEl = null } = {}) {
-  const _0x313bc8 = getElementSize(containerEl),
-    _0xa709d8 = ++videoWarmupRevision;
+  const containerWidth2 = getElementSize(containerEl),
+    value41 = ++videoWarmupRevision;
   latestVideoWarmupContext = {
     canvas: canvas,
-    containerWidth: _0x313bc8['width'],
-    containerHeight: _0x313bc8['height'],
+    containerWidth: containerWidth2['width'],
+    containerHeight: containerWidth2['height'],
   };
-  const _0x41389c = collectCanvasNearbyVideoWarmupCandidates(latestVideoWarmupContext),
-    _0x95d082 = applyLatestVideoWarmup(_0xa709d8) || { sources: [], scheduledCount: 0x0 },
-    _0x268380 = _0x41389c['filter'](
-      (_0x2bd45f) => !(_0x2bd45f['knownSizeBytes'] > 0x0) && !readCachedVideoStat(_0x2bd45f['sourceUrl']),
+  const list4 = collectCanvasNearbyVideoWarmupCandidates(latestVideoWarmupContext),
+    args2 = applyLatestVideoWarmup(value41) || { sources: [], scheduledCount: 0x0 },
+    pendingProbeCount = list4['filter'](
+      (value42) => !(value42['knownSizeBytes'] > 0x0) && !readCachedVideoStat(value42['sourceUrl']),
     );
   return (
-    _0x268380['length'] > 0x0 &&
-      void Promise['all'](_0x268380['map']((_0x5ef14b) => probeVideoStat(_0x5ef14b['sourceUrl'])))['then'](
-        () => {
-          applyLatestVideoWarmup(_0xa709d8);
-        },
-      ),
-    { ..._0x95d082, pendingProbeCount: _0x268380['length'] }
+    pendingProbeCount['length'] > 0x0 &&
+      void Promise['all'](pendingProbeCount['map']((value43) => probeVideoStat(value43['sourceUrl'])))[
+        'then'
+      ](() => {
+        applyLatestVideoWarmup(value41);
+      }),
+    { ...args2, pendingProbeCount: pendingProbeCount['length'] }
   );
 }
 export function clearCanvasNearbyVideoWarmup() {
@@ -416,13 +410,13 @@ export const __canvasMediaWarmupForTest = {
   },
   clearVideoStatState() {
     ((videoWarmupRevision += 0x1), (latestVideoWarmupContext = null), videoStatCache['clear']());
-    const _0x2c4347 = videoStatProbeQueue;
+    const value44 = videoStatProbeQueue;
     videoStatProbeQueue = [];
-    for (const _0x159671 of _0x2c4347) {
-      !_0x159671['active'] &&
-        videoStatProbeBySource['get'](_0x159671['sourceUrl']) === _0x159671 &&
-        (videoStatProbeBySource['delete'](_0x159671['sourceUrl']),
-        _0x159671['resolve']({ exists: ![], sizeBytes: 0x0 }));
+    for (const promise3 of value44) {
+      !promise3['active'] &&
+        videoStatProbeBySource['get'](promise3['sourceUrl']) === promise3 &&
+        (videoStatProbeBySource['delete'](promise3['sourceUrl']),
+        promise3['resolve']({ exists: ![], sizeBytes: 0x0 }));
     }
   },
 };
@@ -436,91 +430,89 @@ export function collectCanvasVisibleMediaWarmupJobs({
   maxJobs: maxJobs = DEFAULT_MAX_WARMUP_JOBS,
   selectedNodeIds: selectedNodeIds = canvas?.['selectedNodeIds'],
 } = {}) {
-  const _0x48a15 = normalizeNodes(nodes),
-    _0x569cd1 = normalizeViewport(viewport),
-    _0x1db240 = getEffectiveWarmupMaxJobs(maxJobs, _0x569cd1),
-    _0x3ae439 = normalizeSelectedNodeIds(canvas, selectedNodeIds),
-    _0x4b5d31 = getViewportWorldCenter(_0x569cd1, containerWidth, containerHeight),
-    _0x27e133 = [],
-    _0x9965dc = [],
-    _0x23fd1b = new Set();
-  for (const _0x549426 of _0x48a15) {
-    if (!_0x549426?.['id']) continue;
-    if (!isNodeInsideViewportPadding(_0x549426, _0x569cd1, containerWidth, containerHeight, padding))
-      continue;
-    const _0x129e8a = isNodeInsideViewportPadding(_0x549426, _0x569cd1, containerWidth, containerHeight, 0x0),
-      _0x297ef4 = getNodeCenterDistanceSq(_0x549426, _0x4b5d31);
-    _0x27e133['push']({
-      node: _0x549426,
-      selected: _0x3ae439['has'](String(_0x549426['id'] || '')),
-      visible: _0x129e8a,
-      distanceSq: _0x297ef4,
-      order: _0x27e133['length'],
+  const nodes2 = normalizeNodes(nodes),
+    box9 = normalizeViewport(viewport),
+    effectiveWarmupMaxJobs = getEffectiveWarmupMaxJobs(maxJobs, box9),
+    selected2 = normalizeSelectedNodeIds(canvas, selectedNodeIds),
+    viewportWorldCenter2 = getViewportWorldCenter(box9, containerWidth, containerHeight),
+    order3 = [],
+    list5 = [],
+    value45 = new Set();
+  for (const node of nodes2) {
+    if (!node?.['id']) continue;
+    if (!isNodeInsideViewportPadding(node, box9, containerWidth, containerHeight, padding)) continue;
+    const visible2 = isNodeInsideViewportPadding(node, box9, containerWidth, containerHeight, 0x0),
+      distanceSq = getNodeCenterDistanceSq(node, viewportWorldCenter2);
+    order3['push']({
+      node: node,
+      selected: selected2['has'](String(node['id'] || '')),
+      visible: visible2,
+      distanceSq: distanceSq,
+      order: order3['length'],
     });
   }
-  _0x27e133['sort']((_0x1f9483, _0x2063e2) => {
-    if (_0x1f9483['selected'] !== _0x2063e2['selected']) return _0x1f9483['selected'] ? -0x1 : 0x1;
-    if (_0x1f9483['visible'] !== _0x2063e2['visible']) return _0x1f9483['visible'] ? -0x1 : 0x1;
-    if (_0x1f9483['distanceSq'] !== _0x2063e2['distanceSq'])
-      return _0x1f9483['distanceSq'] - _0x2063e2['distanceSq'];
-    return _0x1f9483['order'] - _0x2063e2['order'];
+  order3['sort']((value46, value47) => {
+    if (value46['selected'] !== value47['selected']) return value46['selected'] ? -0x1 : 0x1;
+    if (value46['visible'] !== value47['visible']) return value46['visible'] ? -0x1 : 0x1;
+    if (value46['distanceSq'] !== value47['distanceSq']) return value46['distanceSq'] - value47['distanceSq'];
+    return value46['order'] - value47['order'];
   });
-  for (const _0x4635de of _0x27e133) {
-    const _0x284ad5 = _0x4635de['node'],
-      _0x1bec7f = String(_0x284ad5['type'] || '')['toLowerCase']();
-    if (_0x1bec7f === 'ai-video' && isTaskFailed(_0x284ad5)) continue;
-    const _0x4f0753 =
-        (_0x4635de['selected'] ? 0x28 : 0x0) +
-        (_0x4635de['visible'] ? 0x12 : 0x0) +
-        getDistancePriorityBoost(_0x4635de['distanceSq'], _0x569cd1, containerWidth, containerHeight),
-      _0x512023 = {
-        selected: _0x4635de['selected'],
-        visible: _0x4635de['visible'],
-        distanceSq: _0x4635de['distanceSq'],
+  for (const selected3 of order3) {
+    const value48 = selected3['node'],
+      list6 = String(value48['type'] || '')['toLowerCase']();
+    if (list6 === 'ai-video' && isTaskFailed(value48)) continue;
+    const priorityOffset2 =
+        (selected3['selected'] ? 0x28 : 0x0) +
+        (selected3['visible'] ? 0x12 : 0x0) +
+        getDistancePriorityBoost(selected3['distanceSq'], box9, containerWidth, containerHeight),
+      meta2 = {
+        selected: selected3['selected'],
+        visible: selected3['visible'],
+        distanceSq: selected3['distanceSq'],
       },
-      _0x9c71ce =
-        _0x569cd1['zoom'] > LOW_ZOOM_WARMUP_THRESHOLD && (_0x4635de['visible'] || _0x4635de['selected']);
-    if (_0x1bec7f['includes']('image')) {
-      addImageWarmupJobs(_0x9965dc, _0x23fd1b, _0x284ad5, {
+      includeFull2 =
+        box9['zoom'] > LOW_ZOOM_WARMUP_THRESHOLD && (selected3['visible'] || selected3['selected']);
+    if (list6['includes']('image')) {
+      addImageWarmupJobs(list5, value45, value48, {
         primary: !![],
-        priorityOffset: _0x4f0753,
-        includeFull: _0x9c71ce,
-        meta: _0x512023,
+        priorityOffset: priorityOffset2,
+        includeFull: includeFull2,
+        meta: meta2,
       });
-      const _0x3135d5 = getPrimaryListItem(_0x284ad5['images'], _0x284ad5['mainImageIndex']);
-      _0x3135d5 &&
-        addImageWarmupJobs(_0x9965dc, _0x23fd1b, _0x3135d5, {
+      const primaryListItem2 = getPrimaryListItem(value48['images'], value48['mainImageIndex']);
+      primaryListItem2 &&
+        addImageWarmupJobs(list5, value45, primaryListItem2, {
           primary: ![],
-          priorityOffset: _0x4f0753,
-          includeFull: _0x9c71ce,
-          meta: _0x512023,
+          priorityOffset: priorityOffset2,
+          includeFull: includeFull2,
+          meta: meta2,
         });
     } else {
-      if (_0x1bec7f['includes']('video')) {
-        if (shouldWarmupVideoPosterAtViewport(_0x4635de, _0x569cd1)) {
-          const _0x48c4b2 = getPrimaryListItem(_0x284ad5['videos'], _0x284ad5['mainVideoIndex']);
-          if (_0x48c4b2)
-            addVideoPosterWarmupJobs(_0x9965dc, _0x23fd1b, _0x48c4b2, {
+      if (list6['includes']('video')) {
+        if (shouldWarmupVideoPosterAtViewport(selected3, box9)) {
+          const primaryListItem3 = getPrimaryListItem(value48['videos'], value48['mainVideoIndex']);
+          if (primaryListItem3)
+            addVideoPosterWarmupJobs(list5, value45, primaryListItem3, {
               primary: !![],
-              priorityOffset: _0x4f0753,
-              meta: _0x512023,
+              priorityOffset: priorityOffset2,
+              meta: meta2,
             });
-          addVideoPosterWarmupJobs(_0x9965dc, _0x23fd1b, _0x284ad5, {
-            primary: !_0x48c4b2,
-            priorityOffset: _0x4f0753,
-            meta: _0x512023,
+          addVideoPosterWarmupJobs(list5, value45, value48, {
+            primary: !primaryListItem3,
+            priorityOffset: priorityOffset2,
+            meta: meta2,
           });
         }
       }
     }
-    if (_0x9965dc['length'] >= _0x1db240) break;
+    if (list5['length'] >= effectiveWarmupMaxJobs) break;
   }
-  return _0x9965dc['sort'](
-    (_0x2b7954, _0x307db6) =>
-      _0x307db6['priority'] - _0x2b7954['priority'] ||
-      _0x2b7954['distanceSq'] - _0x307db6['distanceSq'] ||
-      _0x2b7954['order'] - _0x307db6['order'],
-  )['slice'](0x0, _0x1db240);
+  return list5['sort'](
+    (value49, value50) =>
+      value50['priority'] - value49['priority'] ||
+      value49['distanceSq'] - value50['distanceSq'] ||
+      value49['order'] - value50['order'],
+  )['slice'](0x0, effectiveWarmupMaxJobs);
 }
 export function cancelCanvasVisibleMediaWarmupPreloads({
   includeActive: includeActive = ![],
@@ -540,39 +532,39 @@ export function warmupCanvasVisibleMedia({
   maxJobs: maxJobs = DEFAULT_MAX_WARMUP_JOBS,
   cancelStaleQueued: cancelStaleQueued = !![],
 } = {}) {
-  const _0x26f121 = normalizeViewport(canvas?.['viewport']),
-    _0x2cdb69 = _0x26f121['zoom'] > LOW_ZOOM_WARMUP_THRESHOLD,
-    _0x5b9b33 =
+  const box10 = normalizeViewport(canvas?.['viewport']),
+    belowPriority2 = box10['zoom'] > LOW_ZOOM_WARMUP_THRESHOLD,
+    canceledStaleCount =
       cancelStaleQueued === ![]
         ? 0x0
         : cancelCanvasVisibleMediaWarmupPreloads({
             includeActive: ![],
-            belowPriority: _0x2cdb69 ? HIGH_ZOOM_STALE_WARMUP_CANCEL_PRIORITY_LIMIT : null,
+            belowPriority: belowPriority2 ? HIGH_ZOOM_STALE_WARMUP_CANCEL_PRIORITY_LIMIT : null,
             reason: 'replaced\x20by\x20newer\x20viewport',
           }),
-    _0x43cbcd = getElementSize(containerEl),
-    _0x8b212b = collectCanvasVisibleMediaWarmupJobs({
+    containerWidth3 = getElementSize(containerEl),
+    scheduledCount2 = collectCanvasVisibleMediaWarmupJobs({
       canvas: canvas,
-      containerWidth: _0x43cbcd['width'],
-      containerHeight: _0x43cbcd['height'],
+      containerWidth: containerWidth3['width'],
+      containerHeight: containerWidth3['height'],
       maxJobs: maxJobs,
     }),
-    _0x11a98e = syncCanvasNearbyVideoWarmup({ canvas: canvas, containerEl: containerEl });
-  for (const _0xef5862 of _0x8b212b) {
-    preloadCanvasImage(_0xef5862['url'], {
-      priority: _0xef5862['priority'],
-      fetchPriority: _0xef5862['fetchPriority'],
+    videoWarmupCount = syncCanvasNearbyVideoWarmup({ canvas: canvas, containerEl: containerEl });
+  for (const priority2 of scheduledCount2) {
+    preloadCanvasImage(priority2['url'], {
+      priority: priority2['priority'],
+      fetchPriority: priority2['fetchPriority'],
       scope: CANVAS_MEDIA_WARMUP_SCOPE,
-      allowWhenPaused: _0xef5862['allowWhenPaused'],
-      deferWhenPaused: _0xef5862['deferWhenPaused'],
+      allowWhenPaused: priority2['allowWhenPaused'],
+      deferWhenPaused: priority2['deferWhenPaused'],
     })['catch'](() => {});
   }
   return {
-    scheduledCount: _0x8b212b['length'],
-    canceledStaleCount: _0x5b9b33,
-    jobs: _0x8b212b,
-    videoWarmupCount: _0x11a98e['scheduledCount'],
-    videoWarmupSources: _0x11a98e['sources'],
-    videoWarmupProbeCount: _0x11a98e['pendingProbeCount'] || 0x0,
+    scheduledCount: scheduledCount2['length'],
+    canceledStaleCount: canceledStaleCount,
+    jobs: scheduledCount2,
+    videoWarmupCount: videoWarmupCount['scheduledCount'],
+    videoWarmupSources: videoWarmupCount['sources'],
+    videoWarmupProbeCount: videoWarmupCount['pendingProbeCount'] || 0x0,
   };
 }

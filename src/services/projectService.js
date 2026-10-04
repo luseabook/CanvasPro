@@ -39,8 +39,8 @@ import { assertCanvasProjectSaveAllowed } from './canvasProjectAccess.js';
 import { diagnosticReference, runDiagnosticOperation } from './operationDiagnostics.js';
 const PROJECT_FILE_EXTENSION_RE = /\.(?:aicanvas|json)$/i,
   RETIRED_CANVAS_NODE_TYPES = new Set(['storyboard-3d']);
-function stripProjectFileExtension(_0x501d5c) {
-  return String(_0x501d5c || '')['replace'](PROJECT_FILE_EXTENSION_RE, '');
+function stripProjectFileExtension(value) {
+  return String(value || '')['replace'](PROJECT_FILE_EXTENSION_RE, '');
 }
 function _getActiveProjectIdentity() {
   if (typeof window === 'undefined') return '';
@@ -53,12 +53,12 @@ const DEFAULT_PROJECT_NAME = 'default_v2_project',
   _remoteSaveCache = new Map(),
   _localStagedAssetImportInflight = new Map(),
   enqueueProjectSave = createProjectSaveQueue(
-    ({ projectId: _0x2c7f0d, payload: _0x2111bf, activeIdentity: _0x3fa1fd }) =>
-      _persistProjectSnapshot(_0x2c7f0d, _0x2111bf, _0x3fa1fd),
+    ({ projectId: projectId, payload: payload, activeIdentity: activeIdentity }) =>
+      _persistProjectSnapshot(projectId, payload, activeIdentity),
   );
 let _projectPersistenceBlockedReason = '';
-export function setProjectPersistenceBlocked(_0xf25fe9 = '项目尚未安全加载') {
-  _projectPersistenceBlockedReason = String(_0xf25fe9 || '项目尚未安全加载')['trim']();
+export function setProjectPersistenceBlocked(item = '项目尚未安全加载') {
+  _projectPersistenceBlockedReason = String(item || '项目尚未安全加载')['trim']();
 }
 export function clearProjectPersistenceBlock() {
   _projectPersistenceBlockedReason = '';
@@ -66,248 +66,238 @@ export function clearProjectPersistenceBlock() {
 export function isProjectPersistenceBlocked() {
   return !!_projectPersistenceBlockedReason;
 }
-function _isLocalRelativeUrl(_0x5e9d2e) {
-  const _0x49ff99 = String(_0x5e9d2e || '')['trim']();
-  return _0x49ff99['startsWith']('/') && !_0x49ff99['startsWith']('//');
+function _isLocalRelativeUrl(key) {
+  const enabled = String(key || '')['trim']();
+  return enabled['startsWith']('/') && !enabled['startsWith']('//');
 }
-function _shouldFetchClientSideBeforeSaving(_0x53e9d1) {
-  const _0x4830f8 = String(_0x53e9d1 || '')['trim']();
-  return (
-    _0x4830f8['startsWith']('blob:') || _0x4830f8['startsWith']('data:') || _isLocalRelativeUrl(_0x4830f8)
-  );
+function _shouldFetchClientSideBeforeSaving(index) {
+  const result = String(index || '')['trim']();
+  return result['startsWith']('blob:') || result['startsWith']('data:') || _isLocalRelativeUrl(result);
 }
-function _buildRemoteSaveCacheKey(_0x167824, _0x52e340, _0x3f31e0 = {}) {
-  const _0x1e3b08 = String(_0x52e340 || '')['trim'](),
-    _0x1b3086 = String(
-      _0x3f31e0?.['dedupeKey'] ||
-        (_0x3f31e0?.['taskKey'] ? _0x3f31e0['taskKey'] + ':' + _0x1e3b08 : _0x1e3b08),
-    )['trim']();
-  return (String(_0x167824 || 'media')['trim']() || 'media') + ':' + (_0x1b3086 || _0x1e3b08);
+function _buildRemoteSaveCacheKey(data, options, target = {}) {
+  const source = String(options || '')['trim'](),
+    next = String(target?.['dedupeKey'] || (target?.['taskKey'] ? target['taskKey'] + ':' + source : source))[
+      'trim'
+    ]();
+  return (String(data || 'media')['trim']() || 'media') + ':' + (next || source);
 }
-function _rememberRemoteSave(_0x10cf01, _0x4d1637) {
-  if (!_0x10cf01 || !_0x4d1637 || typeof _0x4d1637 !== 'object') return;
-  _remoteSaveCache['set'](_0x10cf01, _0x4d1637);
+function _rememberRemoteSave(enabled2, enabled3) {
+  if (!enabled2 || !enabled3 || typeof enabled3 !== 'object') return;
+  _remoteSaveCache['set'](enabled2, enabled3);
   if (_remoteSaveCache['size'] > REMOTE_SAVE_CACHE_LIMIT) {
-    const _0x5b6094 = _remoteSaveCache['keys']()['next']()['value'];
-    if (_0x5b6094) _remoteSaveCache['delete'](_0x5b6094);
+    const current = _remoteSaveCache['keys']()['next']()['value'];
+    if (current) _remoteSaveCache['delete'](current);
   }
 }
-function _runRemoteSaveOnce(_0x3d7068, _0x249100) {
-  if (_remoteSaveCache['has'](_0x3d7068)) return Promise['resolve'](_remoteSaveCache['get'](_0x3d7068));
-  if (_remoteSaveInflight['has'](_0x3d7068)) return _remoteSaveInflight['get'](_0x3d7068);
-  const _0x1b5474 = Promise['resolve']()
-    ['then'](_0x249100)
-    ['then']((_0x55e238) => {
-      return (_rememberRemoteSave(_0x3d7068, _0x55e238), _0x55e238);
+function _runRemoteSaveOnce(entry, record) {
+  if (_remoteSaveCache['has'](entry)) return Promise['resolve'](_remoteSaveCache['get'](entry));
+  if (_remoteSaveInflight['has'](entry)) return _remoteSaveInflight['get'](entry);
+  const promise = Promise['resolve']()
+    ['then'](record)
+    ['then']((handle) => {
+      return (_rememberRemoteSave(entry, handle), handle);
     });
   return (
-    _remoteSaveInflight['set'](_0x3d7068, _0x1b5474),
-    _0x1b5474['finally'](() => {
-      _remoteSaveInflight['get'](_0x3d7068) === _0x1b5474 && _remoteSaveInflight['delete'](_0x3d7068);
+    _remoteSaveInflight['set'](entry, promise),
+    promise['finally'](() => {
+      _remoteSaveInflight['get'](entry) === promise && _remoteSaveInflight['delete'](entry);
     })['catch'](() => {}),
-    _0x1b5474
+    promise
   );
 }
-function _isPlainObject(_0x14e7ee) {
-  return !!_0x14e7ee && typeof _0x14e7ee === 'object' && !Array['isArray'](_0x14e7ee);
+function _isPlainObject(enabled4) {
+  return !!enabled4 && typeof enabled4 === 'object' && !Array['isArray'](enabled4);
 }
-function _migratePanoramaNodeInPlace(_0x155edb) {
-  if (!_isPlainObject(_0x155edb)) return;
-  const _0xbc24a0 = String(_0x155edb['type'] || '')['trim']();
-  if (isPanorama360NodeType(_0xbc24a0)) {
-    _0x155edb['type'] = PANORAMA_360_NODE_TYPE;
-    const _0x148f09 = _isPlainObject(_0x155edb['panorama360Node'])
-      ? _0x155edb['panorama360Node']
-      : _0x155edb['sceneNode'];
-    ((_0x155edb['panorama360Node'] = normalizePanorama360State(_0x148f09)), delete _0x155edb['sceneNode']);
-    !String(_0x155edb['name'] || '')['trim']() && (_0x155edb['name'] = getPanorama360DefaultName());
+function _migratePanoramaNodeInPlace(error) {
+  if (!_isPlainObject(error)) return;
+  const state = String(error['type'] || '')['trim']();
+  if (isPanorama360NodeType(state)) {
+    error['type'] = PANORAMA_360_NODE_TYPE;
+    const _isPlainObject2 = _isPlainObject(error['panorama360Node'])
+      ? error['panorama360Node']
+      : error['sceneNode'];
+    ((error['panorama360Node'] = normalizePanorama360State(_isPlainObject2)), delete error['sceneNode']);
+    !String(error['name'] || '')['trim']() && (error['name'] = getPanorama360DefaultName());
     return;
   }
-  if (!isPanoramaSceneNodeType(_0xbc24a0)) return;
-  _0x155edb['type'] = PANORAMA_SCENE_NODE_TYPE;
-  const _0x119b7e = _isPlainObject(_0x155edb['sceneNode'])
-      ? _0x155edb['sceneNode']
-      : _0x155edb['panorama360Node'],
-    _0xf2e7ed = normalizeSceneOnlyPanoramaSceneState(_0x119b7e),
-    _0x7fd6d3 = String(_0x119b7e?.['mode'] || '')
+  if (!isPanoramaSceneNodeType(state)) return;
+  error['type'] = PANORAMA_SCENE_NODE_TYPE;
+  const _isPlainObject3 = _isPlainObject(error['sceneNode']) ? error['sceneNode'] : error['panorama360Node'],
+    sceneOnlyPanoramaSceneState = normalizeSceneOnlyPanoramaSceneState(_isPlainObject3),
+    config = String(_isPlainObject3?.['mode'] || '')
       ['trim']()
       ['toLowerCase'](),
-    _0x5e02c3 = _0x7fd6d3 === 'panorama';
-  if (_0x5e02c3) {
-    ((_0x155edb['type'] = PANORAMA_360_NODE_TYPE),
-      (_0x155edb['panorama360Node'] = normalizePanorama360State(_0x119b7e)),
-      delete _0x155edb['sceneNode']);
-    const _0xd75a7 = String(_0x155edb['name'] || '')['trim'](),
-      _0x5478a4 = getPanoramaSceneDefaultName();
-    (!_0xd75a7 || _0xd75a7 === PANORAMA_SCENE_DEFAULT_NAME || _0xd75a7 === _0x5478a4) &&
-      (_0x155edb['name'] = getPanorama360DefaultName());
+    scope = config === 'panorama';
+  if (scope) {
+    ((error['type'] = PANORAMA_360_NODE_TYPE),
+      (error['panorama360Node'] = normalizePanorama360State(_isPlainObject3)),
+      delete error['sceneNode']);
+    const enabled5 = String(error['name'] || '')['trim'](),
+      panoramaSceneDefaultName = getPanoramaSceneDefaultName();
+    (!enabled5 || enabled5 === PANORAMA_SCENE_DEFAULT_NAME || enabled5 === panoramaSceneDefaultName) &&
+      (error['name'] = getPanorama360DefaultName());
     return;
   }
-  ((_0x155edb['sceneNode'] = _0xf2e7ed),
-    delete _0x155edb['panorama360Node'],
-    !String(_0x155edb['name'] || '')['trim']() && (_0x155edb['name'] = getPanoramaSceneDefaultName()));
+  ((error['sceneNode'] = sceneOnlyPanoramaSceneState),
+    delete error['panorama360Node'],
+    !String(error['name'] || '')['trim']() && (error['name'] = getPanoramaSceneDefaultName()));
 }
-function _migrateCanvasDataInPlace(_0x4c5e2a) {
-  const _0x16d003 = Array['isArray'](_0x4c5e2a?.['canvases']) ? _0x4c5e2a['canvases'] : [];
-  for (const _0x5cce5e of _0x16d003) {
-    if (!_0x5cce5e) continue;
-    if (_0x5cce5e['nodes'] && !Array['isArray'](_0x5cce5e['nodes']))
-      _0x5cce5e['nodes'] = Object['values'](_0x5cce5e['nodes']);
-    if (_0x5cce5e['edges'] && !Array['isArray'](_0x5cce5e['edges']))
-      _0x5cce5e['edges'] = Object['values'](_0x5cce5e['edges']);
-    const _0x5e653f = Array['isArray'](_0x5cce5e['nodes']) ? _0x5cce5e['nodes'] : [],
-      _0x2ee6ad = new Set(
-        _0x5e653f['filter']((_0x2ba0e7) =>
-          RETIRED_CANVAS_NODE_TYPES['has'](String(_0x2ba0e7?.['type'] || '')),
-        )
-          ['map']((_0x3ee9c6) => String(_0x3ee9c6?.['id'] || ''))
+function _migrateCanvasDataInPlace(input) {
+  const output = Array['isArray'](input?.['canvases']) ? input['canvases'] : [];
+  for (const enabled6 of output) {
+    if (!enabled6) continue;
+    if (enabled6['nodes'] && !Array['isArray'](enabled6['nodes']))
+      enabled6['nodes'] = Object['values'](enabled6['nodes']);
+    if (enabled6['edges'] && !Array['isArray'](enabled6['edges']))
+      enabled6['edges'] = Object['values'](enabled6['edges']);
+    const list = Array['isArray'](enabled6['nodes']) ? enabled6['nodes'] : [],
+      map = new Set(
+        list['filter']((value2) => RETIRED_CANVAS_NODE_TYPES['has'](String(value2?.['type'] || '')))
+          ['map']((value3) => String(value3?.['id'] || ''))
           ['filter'](Boolean),
       );
-    _0x5cce5e['nodes'] = _0x5e653f['filter'](
-      (_0x299f5b) => !RETIRED_CANVAS_NODE_TYPES['has'](String(_0x299f5b?.['type'] || '')),
+    enabled6['nodes'] = list['filter'](
+      (value4) => !RETIRED_CANVAS_NODE_TYPES['has'](String(value4?.['type'] || '')),
     );
-    _0x2ee6ad['size'] > 0x0 &&
-      (_0x5cce5e['edges'] = (Array['isArray'](_0x5cce5e['edges']) ? _0x5cce5e['edges'] : [])['filter'](
-        (_0x269db7) =>
-          !_0x2ee6ad['has'](String(_0x269db7?.['sourceId'] || '')) &&
-          !_0x2ee6ad['has'](String(_0x269db7?.['targetId'] || '')),
+    map['size'] > 0x0 &&
+      (enabled6['edges'] = (Array['isArray'](enabled6['edges']) ? enabled6['edges'] : [])['filter'](
+        (value5) =>
+          !map['has'](String(value5?.['sourceId'] || '')) && !map['has'](String(value5?.['targetId'] || '')),
       ));
-    for (const _0x62d3be of _0x5cce5e['nodes']) {
-      _migratePanoramaNodeInPlace(_0x62d3be);
+    for (const value6 of enabled6['nodes']) {
+      _migratePanoramaNodeInPlace(value6);
     }
   }
-  return _0x4c5e2a;
+  return input;
 }
-const getCssVar = (_0x379e46) =>
-  getComputedStyle(document['documentElement'])['getPropertyValue'](_0x379e46)['trim']();
-export function resolveCanvasData(_0xeecc7) {
-  if (!_0xeecc7)
+const getCssVar = (value7) =>
+  getComputedStyle(document['documentElement'])['getPropertyValue'](value7)['trim']();
+export function resolveCanvasData(canvases) {
+  if (!canvases)
     return _migrateCanvasDataInPlace({
       canvases: [
         { id: 'canvas_1', name: '默认画布', nodes: [], edges: [], viewport: { x: 0x0, y: 0x0, zoom: 1.1 } },
       ],
       activeCanvasId: 'canvas_1',
     });
-  if (Array['isArray'](_0xeecc7['canvases']) && _0xeecc7['canvases']['length'] > 0x0) {
-    let _0x4bc6d2 = _0xeecc7['activeCanvasId'] || _0xeecc7['canvases'][0x0]['id'];
-    const _0x270def = _0xeecc7['canvases']['find']((_0x3896a8) => _0x3896a8['id'] === _0x4bc6d2);
+  if (Array['isArray'](canvases['canvases']) && canvases['canvases']['length'] > 0x0) {
+    let activeCanvasId = canvases['activeCanvasId'] || canvases['canvases'][0x0]['id'];
+    const enabled7 = canvases['canvases']['find']((value8) => value8['id'] === activeCanvasId);
     if (
-      _0x270def &&
-      (!_0x270def['nodes'] || _0x270def['nodes']['length'] === 0x0) &&
-      (!_0x270def['storyboard3dProjects'] || _0x270def['storyboard3dProjects']['length'] === 0x0)
+      enabled7 &&
+      (!enabled7['nodes'] || enabled7['nodes']['length'] === 0x0) &&
+      (!enabled7['storyboard3dProjects'] || enabled7['storyboard3dProjects']['length'] === 0x0)
     ) {
-      const _0x4a356 = _0xeecc7['canvases']['find'](
-        (_0x58764d) =>
-          (_0x58764d['nodes'] && _0x58764d['nodes']['length'] > 0x0) ||
-          (_0x58764d['storyboard3dProjects'] && _0x58764d['storyboard3dProjects']['length'] > 0x0),
+      const value9 = canvases['canvases']['find'](
+        (state2) =>
+          (state2['nodes'] && state2['nodes']['length'] > 0x0) ||
+          (state2['storyboard3dProjects'] && state2['storyboard3dProjects']['length'] > 0x0),
       );
-      if (_0x4a356) _0x4bc6d2 = _0x4a356['id'];
+      if (value9) activeCanvasId = value9['id'];
     }
-    return _migrateCanvasDataInPlace({ canvases: _0xeecc7['canvases'], activeCanvasId: _0x4bc6d2 });
+    return _migrateCanvasDataInPlace({ canvases: canvases['canvases'], activeCanvasId: activeCanvasId });
   }
-  let _0x51e73b = _0xeecc7['nodes'] || _0xeecc7['v2_nodes'] || [],
-    _0x302d2b = _0xeecc7['edges'] || _0xeecc7['v2_edges'] || [];
-  if (!Array['isArray'](_0x51e73b)) _0x51e73b = Object['values'](_0x51e73b);
-  if (!Array['isArray'](_0x302d2b)) _0x302d2b = Object['values'](_0x302d2b);
-  const _0x173f61 = {
+  let nodes = canvases['nodes'] || canvases['v2_nodes'] || [],
+    edges = canvases['edges'] || canvases['v2_edges'] || [];
+  if (!Array['isArray'](nodes)) nodes = Object['values'](nodes);
+  if (!Array['isArray'](edges)) edges = Object['values'](edges);
+  const value10 = {
     id: 'canvas_1',
     name: '默认画布',
-    nodes: _0x51e73b,
-    edges: _0x302d2b,
-    viewport: _0xeecc7['viewport'] || { x: 0x0, y: 0x0, zoom: 1.1 },
+    nodes: nodes,
+    edges: edges,
+    viewport: canvases['viewport'] || { x: 0x0, y: 0x0, zoom: 1.1 },
   };
-  return _migrateCanvasDataInPlace({ canvases: [_0x173f61], activeCanvasId: 'canvas_1' });
+  return _migrateCanvasDataInPlace({ canvases: [value10], activeCanvasId: 'canvas_1' });
 }
-export async function loadProject(_0x2e515f, { allowMissing: allowMissing = ![] } = {}) {
+export async function loadProject(value11, { allowMissing: allowMissing = ![] } = {}) {
   try {
-    return await loadProjectStrict(_0x2e515f);
-  } catch (_0xeee347) {
-    console['error']('[projectService] 加载项目异常:', _0xeee347);
-    if (allowMissing === !![] && _0xeee347?.['code'] === 'PROJECT_NOT_FOUND') return resolveCanvasData({});
-    throw _0xeee347;
+    return await loadProjectStrict(value11);
+  } catch (value12) {
+    console['error']('[projectService] 加载项目异常:', value12);
+    if (allowMissing === !![] && value12?.['code'] === 'PROJECT_NOT_FOUND') return resolveCanvasData({});
+    throw value12;
   }
 }
-export async function loadProjectStrict(_0x163fc0) {
-  return runDiagnosticOperation('project.load', { projectRef: diagnosticReference(_0x163fc0) }, () =>
-    _loadProjectStrict(_0x163fc0),
+export async function loadProjectStrict(value13) {
+  return runDiagnosticOperation('project.load', { projectRef: diagnosticReference(value13) }, () =>
+    _loadProjectStrict(value13),
   );
 }
-async function _loadProjectStrict(_0x566c35) {
-  const _0x454697 = PROJECT_FILE_EXTENSION_RE['test'](String(_0x566c35 || ''))
-      ? _0x566c35
-      : _0x566c35 + '.aicanvas',
-    _0x380ce7 = await fetchV2ProjectFromServer(_0x566c35);
-  if (!_0x380ce7) {
-    const _0x165b81 = new Error('Project file not found: ' + _0x454697);
-    _0x165b81['code'] = 'PROJECT_NOT_FOUND';
-    throw _0x165b81;
+async function _loadProjectStrict(value14) {
+  const value15 = PROJECT_FILE_EXTENSION_RE['test'](String(value14 || '')) ? value14 : value14 + '.aicanvas',
+    fetchV2ProjectFromServer2 = await fetchV2ProjectFromServer(value14);
+  if (!fetchV2ProjectFromServer2) {
+    const error2 = new Error('Project file not found: ' + value15);
+    error2['code'] = 'PROJECT_NOT_FOUND';
+    throw error2;
   }
-  const _0xa4cda = resolveCanvasData(_0x380ce7);
+  const canvasData = resolveCanvasData(fetchV2ProjectFromServer2);
   return (
     console['log'](
       '[projectService]\x20项目\x20' +
-        _0x566c35 +
+        value14 +
         ' 已加载，共 ' +
-        _0xa4cda['canvases']['length'] +
+        canvasData['canvases']['length'] +
         '\x20个画布页面',
     ),
-    _0xa4cda
+    canvasData
   );
 }
-async function _persistProjectSnapshot(_0x51ee65, _0x319510, _0x14d9b1) {
+async function _persistProjectSnapshot(value16, value17, value18) {
   try {
-    const _0x3e113c = await saveV2ProjectToServer(_0x319510),
-      _0x42534b = globalThis['window']?.['CanvasTabManager'],
-      _0x2ef527 = _0x42534b?.['getActiveCanvasId']?.() || _0x42534b?.['_activeId'],
-      _0x3b30a1 = !_0x42534b || _0x2ef527 === _0x319510['activeCanvasId'];
+    const response = await saveV2ProjectToServer(value17),
+      enabled8 = globalThis['window']?.['CanvasTabManager'],
+      value19 = enabled8?.['getActiveCanvasId']?.() || enabled8?.['_activeId'],
+      value20 = !enabled8 || value19 === value17['activeCanvasId'];
     return (
-      _0x3e113c &&
-        _0x3e113c['success'] &&
-        _0x3b30a1 &&
-        _getActiveProjectIdentity() === _0x14d9b1 &&
-        ((window['_v2CurrentFile'] = _0x3e113c['filename']),
-        (window['currentProjectId'] = stripProjectFileExtension(_0x3e113c['filename'])),
+      response &&
+        response['success'] &&
+        value20 &&
+        _getActiveProjectIdentity() === value18 &&
+        ((window['_v2CurrentFile'] = response['filename']),
+        (window['currentProjectId'] = stripProjectFileExtension(response['filename'])),
         _clearElectronRecoverySnapshotAfterSave()),
       console['log'](
         '[projectService]\x20项目\x20' +
-          _0x51ee65 +
+          value16 +
           ' 已持久化（' +
-          _0x319510['canvases']['length'] +
+          value17['canvases']['length'] +
           ' 个画布）',
       ),
-      _0x3e113c
+      response
     );
-  } catch (_0x1077a9) {
-    console['error']('[projectService] 存档异常:', _0x1077a9);
-    throw _0x1077a9;
+  } catch (value21) {
+    console['error']('[projectService] 存档异常:', value21);
+    throw value21;
   }
 }
-export async function saveProject(_0x27aac7, _0x58217b) {
+export async function saveProject(value22, value23) {
   return runDiagnosticOperation(
     'project.save',
     {
-      projectRef: diagnosticReference(_0x27aac7),
-      canvasCount: Array['isArray'](_0x58217b?.['canvases']) ? _0x58217b['canvases']['length'] : 0x0,
+      projectRef: diagnosticReference(value22),
+      canvasCount: Array['isArray'](value23?.['canvases']) ? value23['canvases']['length'] : 0x0,
     },
-    () => _saveProject(_0x27aac7, _0x58217b),
+    () => _saveProject(value22, value23),
   );
 }
-async function _saveProject(_0x15b454, _0x5d0590) {
-  assertCanvasProjectSaveAllowed(_0x5d0590);
+async function _saveProject(value24, value25) {
+  assertCanvasProjectSaveAllowed(value25);
   if (_projectPersistenceBlockedReason) throw new Error(_projectPersistenceBlockedReason);
-  const _0x480cf2 = _getActiveProjectIdentity(),
-    _0x4fa6af = sanitizeMultiCanvasDataForPersistence(_0x5d0590 || {}),
-    _0x23e49c = _0x15b454 || DEFAULT_PROJECT_NAME,
-    _0x3cd26a = {
-      projectName: _0x23e49c,
-      activeCanvasId: _0x4fa6af?.['activeCanvasId'] || 'canvas_1',
-      canvases: _0x4fa6af?.['canvases'] || [],
+  const activeIdentity2 = _getActiveProjectIdentity(),
+    activeCanvasId2 = sanitizeMultiCanvasDataForPersistence(value25 || {}),
+    projectName = value24 || DEFAULT_PROJECT_NAME,
+    payload2 = {
+      projectName: projectName,
+      activeCanvasId: activeCanvasId2?.['activeCanvasId'] || 'canvas_1',
+      canvases: activeCanvasId2?.['canvases'] || [],
     },
-    _0x1d6b20 = stripProjectFileExtension(String(_0x23e49c))['trim']()['toLowerCase']();
-  return await enqueueProjectSave(_0x1d6b20, {
-    projectId: _0x23e49c,
-    payload: _0x3cd26a,
-    activeIdentity: _0x480cf2,
+    stripProjectFileExtension2 = stripProjectFileExtension(String(projectName))['trim']()['toLowerCase']();
+  return await enqueueProjectSave(stripProjectFileExtension2, {
+    projectId: projectName,
+    payload: payload2,
+    activeIdentity: activeIdentity2,
   });
 }
 export async function getProjects() {
@@ -317,431 +307,433 @@ export async function getProjects() {
     return [];
   }
 }
-export async function deleteProject(_0x408139) {
+export async function deleteProject(value26) {
   try {
-    return await deleteV2ProjectFromServer(_0x408139);
-  } catch (_0x1e0fca) {
-    return (console['error']('[projectService] 删除项目失败:', _0x1e0fca), ![]);
+    return await deleteV2ProjectFromServer(value26);
+  } catch (value27) {
+    return (console['error']('[projectService] 删除项目失败:', value27), ![]);
   }
 }
 function _getElectronImportAsset() {
   if (!desktopBridge['assetImport']['canImportAsset']()) return null;
-  return (_0x996057) => desktopBridge['assetImport']['importAsset'](_0x996057);
+  return (value28) => desktopBridge['assetImport']['importAsset'](value28);
 }
 function _clearElectronRecoverySnapshotAfterSave() {
   if (!desktopBridge['project']['isAvailable']()) return;
   void Promise['resolve']()
     ['then'](() => desktopBridge['project']['clearRecoverySnapshot']())
-    ['catch']((_0x17ab00) => {
-      console['warn']('[projectService] 清理恢复快照失败:', _0x17ab00);
+    ['catch']((value29) => {
+      console['warn']('[projectService] 清理恢复快照失败:', value29);
     });
 }
-function _getElectronPathForFile(_0x12ac55) {
+function _getElectronPathForFile(value30) {
   if (!desktopBridge['assetImport']['isAvailable']()) return '';
-  const _0x56972b = String(_0x12ac55?.['path'] || '')['trim']();
-  if (_0x56972b) return _0x56972b;
+  const value31 = String(value30?.['path'] || '')['trim']();
+  if (value31) return value31;
   try {
-    return String(desktopBridge['assetImport']['getPathForFile'](_0x12ac55) || '')['trim']();
+    return String(desktopBridge['assetImport']['getPathForFile'](value30) || '')['trim']();
   } catch {
     return '';
   }
 }
-async function _importAssetWithElectron(_0x1d79e4, _0x4d67c0) {
-  const _0x57a8d9 = _getElectronImportAsset();
-  if (!_0x57a8d9 || !_0x1d79e4) return null;
-  const _0x48bad5 = {
-      name: _0x1d79e4['name'] || 'asset',
-      type: _0x1d79e4['type'] || '',
-      projectId: _0x4d67c0,
+async function _importAssetWithElectron(name, projectId2) {
+  const run = _getElectronImportAsset();
+  if (!run || !name) return null;
+  const value32 = {
+      name: name['name'] || 'asset',
+      type: name['type'] || '',
+      projectId: projectId2,
     },
-    _0x1e4c4a = _getElectronPathForFile(_0x1d79e4);
-  if (_0x1e4c4a) _0x48bad5['path'] = _0x1e4c4a;
+    _getElectronPathForFile2 = _getElectronPathForFile(name);
+  if (_getElectronPathForFile2) value32['path'] = _getElectronPathForFile2;
   else {
-    if (typeof _0x1d79e4['arrayBuffer'] === 'function') _0x48bad5['bytes'] = await _0x1d79e4['arrayBuffer']();
+    if (typeof name['arrayBuffer'] === 'function') value32['bytes'] = await name['arrayBuffer']();
     else return null;
   }
-  return _normalizeImageSaveResult(await _0x57a8d9(_0x48bad5));
+  return _normalizeImageSaveResult(await run(value32));
 }
-export function importLocalStagedAsset(_0x5d89dd, _0x3d058f = {}) {
-  const _0xc135c = normalizeLocalPath(_0x5d89dd);
-  if (!_0xc135c['startsWith']('data/uploads/'))
+export function importLocalStagedAsset(value33, projectId3 = {}) {
+  const localPath = normalizeLocalPath(value33);
+  if (!localPath['startsWith']('data/uploads/'))
     throw new Error('Only\x20staged\x20local\x20uploads\x20can\x20be\x20imported\x20as\x20assets');
   if (!desktopBridge['isChromeShell']) return null;
-  const _0xbde6bd = _getElectronImportAsset();
-  if (!_0xbde6bd) return null;
-  const _0x469d04 = _localStagedAssetImportInflight['get'](_0xc135c);
-  if (_0x469d04) return _0x469d04;
-  const _0x4b22b5 = Promise['resolve']()
+  const run2 = _getElectronImportAsset();
+  if (!run2) return null;
+  const value34 = _localStagedAssetImportInflight['get'](localPath);
+  if (value34) return value34;
+  const value35 = Promise['resolve']()
     ['then'](() =>
-      _0xbde6bd({
-        name: String(_0x3d058f?.['name'] || '')['trim']() || _0xc135c['split']('/')['pop']() || 'asset',
-        type: String(_0x3d058f?.['type'] || '')['trim'](),
-        projectId: _0x3d058f?.['projectId'],
-        localPath: _0xc135c,
+      run2({
+        name: String(projectId3?.['name'] || '')['trim']() || localPath['split']('/')['pop']() || 'asset',
+        type: String(projectId3?.['type'] || '')['trim'](),
+        projectId: projectId3?.['projectId'],
+        localPath: localPath,
       }),
     )
-    ['then']((_0x3c5b9e) => {
-      const _0x5d2abd = _normalizeImageSaveResult(_0x3c5b9e);
-      if (!_0x5d2abd?.['success'])
+    ['then']((cause) => {
+      const response2 = _normalizeImageSaveResult(cause);
+      if (!response2?.['success'])
         throw new Error(
           '本地素材导入失败：' +
-            (_stringifyRemoteSaveError(_0x3c5b9e?.['error'] || _0x3c5b9e?.['message']) ||
+            (_stringifyRemoteSaveError(cause?.['error'] || cause?.['message']) ||
               '素材服务未确认导入成功，请重试'),
-          { cause: _0x3c5b9e },
+          { cause: cause },
         );
-      return _0x5d2abd;
+      return response2;
     })
     ['finally'](() => {
-      _localStagedAssetImportInflight['get'](_0xc135c) === _0x4b22b5 &&
-        _localStagedAssetImportInflight['delete'](_0xc135c);
+      _localStagedAssetImportInflight['get'](localPath) === value35 &&
+        _localStagedAssetImportInflight['delete'](localPath);
     });
-  return (_localStagedAssetImportInflight['set'](_0xc135c, _0x4b22b5), _0x4b22b5);
+  return (_localStagedAssetImportInflight['set'](localPath, value35), value35);
 }
-async function _importStagedChromeShellAsset(_0x4b253a, _0xdefee2) {
-  if (!desktopBridge['isChromeShell'] || !_0x4b253a) return null;
-  const _0x4ee176 = _normalizeImageSaveResult(await stageAssetUploadToServer(_0x4b253a)),
-    _0x221150 = pickResultLocalPath(_0x4ee176) || urlToLocalPath(_0x4ee176?.['url']);
-  if (!_0x221150)
+async function _importStagedChromeShellAsset(name2, projectId4) {
+  if (!desktopBridge['isChromeShell'] || !name2) return null;
+  const cause2 = _normalizeImageSaveResult(await stageAssetUploadToServer(name2)),
+    resultLocalPath = pickResultLocalPath(cause2) || urlToLocalPath(cause2?.['url']);
+  if (!resultLocalPath)
     throw new Error(
       '素材暂存失败：' +
-        (_stringifyRemoteSaveError(_0x4ee176?.['error'] || _0x4ee176?.['message']) ||
+        (_stringifyRemoteSaveError(cause2?.['error'] || cause2?.['message']) ||
           '本地服务未返回暂存文件路径，请重试'),
-      { cause: _0x4ee176 },
+      { cause: cause2 },
     );
   try {
-    const _0x5bb14f = await importLocalStagedAsset(_0x221150, {
-      name: _0x4b253a['name'] || _0x4ee176?.['filename'] || 'asset',
-      type: _0x4b253a['type'] || '',
-      projectId: _0xdefee2,
+    const importLocalStagedAsset2 = await importLocalStagedAsset(resultLocalPath, {
+      name: name2['name'] || cause2?.['filename'] || 'asset',
+      type: name2['type'] || '',
+      projectId: projectId4,
     });
     return (
-      _0x4ee176?.['stageId'] &&
-        void discardStagedAssetUploadToServer(_0x4ee176['stageId'])['catch'](() => {}),
-      _0x5bb14f
+      cause2?.['stageId'] && void discardStagedAssetUploadToServer(cause2['stageId'])['catch'](() => {}),
+      importLocalStagedAsset2
     );
-  } catch (_0x3980b5) {
+  } catch (error3) {
     if (
-      !String(_0x4b253a['type'] || '')
+      !String(name2['type'] || '')
         ['toLowerCase']()
         ['startsWith']('video/')
     )
-      throw _0x3980b5;
+      throw error3;
     return {
-      ..._0x4ee176,
+      ...cause2,
       success: !![],
-      stagedUploadId: _0x4ee176['stageId'] || '',
+      stagedUploadId: cause2['stageId'] || '',
       canonicalImportPending: !![],
       canonicalImportStatus: 'failed',
-      canonicalImportError: String(_0x3980b5?.['message'] || _0x3980b5 || ''),
+      canonicalImportError: String(error3?.['message'] || error3 || ''),
     };
   }
 }
-export function discardLocalStagedAsset(_0x184b5b) {
-  return discardStagedAssetUploadToServer(_0x184b5b);
+export function discardLocalStagedAsset(value36) {
+  return discardStagedAssetUploadToServer(value36);
 }
-export async function uploadFile(_0x420d68, _0x2d85d5) {
+export async function uploadFile(value37, value38) {
   return runDiagnosticOperation(
     'asset.upload',
-    { projectRef: diagnosticReference(_0x2d85d5), sizeBytes: Number(_0x420d68?.['size'] || 0x0) },
-    () => _uploadFile(_0x420d68, _0x2d85d5),
+    { projectRef: diagnosticReference(value38), sizeBytes: Number(value37?.['size'] || 0x0) },
+    () => _uploadFile(value37, value38),
   );
 }
-async function _uploadFile(_0x2c592b, _0x3a3511) {
+async function _uploadFile(value39, value40) {
   try {
-    const _0xd0ebc6 = _getElectronPathForFile(_0x2c592b);
-    if (desktopBridge['isChromeShell'] && !_0xd0ebc6) {
-      const _0x29885f = await _importStagedChromeShellAsset(_0x2c592b, _0x3a3511);
-      if (_0x29885f?.['success']) return _0x29885f;
+    const _getElectronPathForFile3 = _getElectronPathForFile(value39);
+    if (desktopBridge['isChromeShell'] && !_getElectronPathForFile3) {
+      const cause3 = await _importStagedChromeShellAsset(value39, value40);
+      if (cause3?.['success']) return cause3;
       throw new Error(
         '本地素材导入失败：' +
-          (_stringifyRemoteSaveError(_0x29885f?.['error'] || _0x29885f?.['message']) ||
+          (_stringifyRemoteSaveError(cause3?.['error'] || cause3?.['message']) ||
             '素材服务未确认导入成功，请重试'),
-        { cause: _0x29885f },
+        { cause: cause3 },
       );
     }
     try {
-      const _0x1eb810 = await _importAssetWithElectron(_0x2c592b, _0x3a3511);
-      if (_0x1eb810?.['success']) return _0x1eb810;
-    } catch (_0x5071f3) {
-      console['warn']('[projectService] Electron 素材导入失败，回退上传流程:', _0x5071f3);
+      const response3 = await _importAssetWithElectron(value39, value40);
+      if (response3?.['success']) return response3;
+    } catch (value41) {
+      console['warn']('[projectService] Electron 素材导入失败，回退上传流程:', value41);
     }
-    return _normalizeImageSaveResult(await uploadFileToServer(_0x2c592b));
-  } catch (_0x5eed69) {
-    console['error']('[projectService] 文件上传异常:', _0x5eed69);
-    throw _0x5eed69;
+    return _normalizeImageSaveResult(await uploadFileToServer(value39));
+  } catch (value42) {
+    console['error']('[projectService] 文件上传异常:', value42);
+    throw value42;
   }
 }
-export async function saveOutputBlob(_0x367e09, _0x5ae111 = {}) {
+export async function saveOutputBlob(value43, value44 = {}) {
   return runDiagnosticOperation(
     'output.save_blob',
-    { sizeBytes: Number(_0x367e09?.['size'] || 0x0) },
-    async () => _normalizeImageSaveResult(await saveOutputToServer(_0x367e09, _0x5ae111)),
+    { sizeBytes: Number(value43?.['size'] || 0x0) },
+    async () => _normalizeImageSaveResult(await saveOutputToServer(value43, value44)),
   );
 }
-export async function cropGridTiles(_0x5619d4 = {}) {
-  const _0x36956c = await cropGridTilesToServer(_0x5619d4);
-  if (!_0x36956c || typeof _0x36956c !== 'object') return _0x36956c;
-  const _0x2f5515 = Array['isArray'](_0x36956c['tiles'])
-    ? _0x36956c['tiles']['map']((_0x444287) => _normalizeImageSaveResult(_0x444287))
+export async function cropGridTiles(options2 = {}) {
+  const args = await cropGridTilesToServer(options2);
+  if (!args || typeof args !== 'object') return args;
+  const tiles = Array['isArray'](args['tiles'])
+    ? args['tiles']['map']((value45) => _normalizeImageSaveResult(value45))
     : [];
-  return { ..._0x36956c, tiles: _0x2f5515 };
+  return { ...args, tiles: tiles };
 }
-export async function saveOutputFromUrl(_0x5ca95a, _0x110a58 = {}) {
-  return runDiagnosticOperation('output.save_url', { resourceRef: diagnosticReference(_0x5ca95a) }, () =>
-    _saveOutputFromUrl(_0x5ca95a, _0x110a58),
+export async function saveOutputFromUrl(value46, value47 = {}) {
+  return runDiagnosticOperation('output.save_url', { resourceRef: diagnosticReference(value46) }, () =>
+    _saveOutputFromUrl(value46, value47),
   );
 }
-async function _saveOutputFromUrl(_0xa7e7b7, _0x285c8a = {}) {
-  const _0x5ad7f0 = String(_0xa7e7b7 || '')['trim']();
-  if (_shouldFetchClientSideBeforeSaving(_0x5ad7f0))
+async function _saveOutputFromUrl(value48, args2 = {}) {
+  const url = String(value48 || '')['trim']();
+  if (_shouldFetchClientSideBeforeSaving(url))
     try {
-      const _0x3f40b9 = await fetchRemoteBlob(_0x5ad7f0);
-      return await saveOutputBlob(_0x3f40b9, _0x285c8a);
-    } catch (_0x2a3408) {
+      const fetchRemoteBlob2 = await fetchRemoteBlob(url);
+      return await saveOutputBlob(fetchRemoteBlob2, args2);
+    } catch (error4) {
       return (
-        console['error']('[projectService]\x20Client-side\x20output\x20blob\x20save\x20failed:', _0x2a3408),
-        { error: 'Client-side\x20output\x20blob\x20save\x20failed:\x20' + _0x2a3408['message'] }
+        console['error']('[projectService]\x20Client-side\x20output\x20blob\x20save\x20failed:', error4),
+        { error: 'Client-side\x20output\x20blob\x20save\x20failed:\x20' + error4['message'] }
       );
     }
-  return _normalizeImageSaveResult(await saveOutputFromUrlToServer({ url: _0x5ad7f0, ..._0x285c8a }));
+  return _normalizeImageSaveResult(await saveOutputFromUrlToServer({ url: url, ...args2 }));
 }
-function _guessAudioExtFromUrl(_0x1b2628) {
+function _guessAudioExtFromUrl(value49) {
   try {
-    const _0x145d88 = new URL(String(_0x1b2628 || ''), 'http://localhost'),
-      _0x450865 = String(_0x145d88['pathname'] || '')['match'](/\.([a-z0-9]{1,5})$/i),
-      _0xc1efde = String(_0x450865?.[0x1] || '')['toLowerCase']();
-    if (['wav', 'mp3', 'm4a', 'flac', 'aac', 'ogg', 'opus', 'wma', 'amr', 'webm']['includes'](_0xc1efde))
-      return _0xc1efde;
+    const uRL = new URL(String(value49 || ''), 'http://localhost'),
+      value50 = String(uRL['pathname'] || '')['match'](/\.([a-z0-9]{1,5})$/i),
+      value51 = String(value50?.[0x1] || '')['toLowerCase']();
+    if (['wav', 'mp3', 'm4a', 'flac', 'aac', 'ogg', 'opus', 'wma', 'amr', 'webm']['includes'](value51))
+      return value51;
   } catch {}
   return '';
 }
-function _guessAudioExtFromMime(_0x4362e3) {
-  const _0x3095e7 = String(_0x4362e3 || '')
+function _guessAudioExtFromMime(value52) {
+  const enabled9 = String(value52 || '')
     ['trim']()
     ['toLowerCase']();
-  if (!_0x3095e7) return '';
-  if (_0x3095e7 === 'audio/mpeg') return 'mp3';
-  if (_0x3095e7 === 'audio/wav' || _0x3095e7 === 'audio/x-wav') return 'wav';
-  if (_0x3095e7 === 'audio/mp4' || _0x3095e7 === 'audio/x-m4a') return 'm4a';
-  if (_0x3095e7 === 'audio/flac' || _0x3095e7 === 'audio/x-flac') return 'flac';
-  if (_0x3095e7 === 'audio/aac') return 'aac';
-  if (_0x3095e7 === 'audio/ogg') return 'ogg';
-  if (_0x3095e7 === 'audio/opus') return 'opus';
-  if (_0x3095e7 === 'audio/webm') return 'webm';
-  if (_0x3095e7 === 'audio/amr') return 'amr';
+  if (!enabled9) return '';
+  if (enabled9 === 'audio/mpeg') return 'mp3';
+  if (enabled9 === 'audio/wav' || enabled9 === 'audio/x-wav') return 'wav';
+  if (enabled9 === 'audio/mp4' || enabled9 === 'audio/x-m4a') return 'm4a';
+  if (enabled9 === 'audio/flac' || enabled9 === 'audio/x-flac') return 'flac';
+  if (enabled9 === 'audio/aac') return 'aac';
+  if (enabled9 === 'audio/ogg') return 'ogg';
+  if (enabled9 === 'audio/opus') return 'opus';
+  if (enabled9 === 'audio/webm') return 'webm';
+  if (enabled9 === 'audio/amr') return 'amr';
   return '';
 }
-function _toLocalAudioResult(_0x22590d) {
-  const _0x270a4b = normalizeLocalPath(
-      _0x22590d?.['localPath'] || _0x22590d?.['originalLocalPath'] || _0x22590d?.['path'],
+function _toLocalAudioResult(value53) {
+  const localPath2 = normalizeLocalPath(
+      value53?.['localPath'] || value53?.['originalLocalPath'] || value53?.['path'],
     ),
-    _0x26cf99 = localPathToUrl(_0x270a4b);
+    localUrl = localPathToUrl(localPath2);
   return {
-    ...(_0x22590d && typeof _0x22590d === 'object' ? _0x22590d : {}),
-    localPath: _0x270a4b,
-    localUrl: _0x26cf99,
+    ...(value53 && typeof value53 === 'object' ? value53 : {}),
+    localPath: localPath2,
+    localUrl: localUrl,
   };
 }
-export async function saveRemoteAudioLocallyDetailed(_0xcaaa6b, _0x287d92 = {}) {
-  const _0xc0a7ca = String(_0xcaaa6b || '')['trim']();
-  if (!_0xc0a7ca) throw new Error('保存音频失败: 缺少 remoteUrl');
-  return _runRemoteSaveOnce(_buildRemoteSaveCacheKey('audio', _0xc0a7ca, _0x287d92), async () => {
-    if (_0xc0a7ca['startsWith']('blob:') || _0xc0a7ca['startsWith']('data:')) {
-      const _0x2707bd = await fetchRemoteBlob(_0xc0a7ca),
-        _0x4e1e6c = _guessAudioExtFromMime(_0x2707bd?.['type']) || 'mp3';
-      return _toLocalAudioResult(await saveOutputBlob(_0x2707bd, { ext: _0x4e1e6c, ..._0x287d92 }));
+export async function saveRemoteAudioLocallyDetailed(value54, args3 = {}) {
+  const enabled10 = String(value54 || '')['trim']();
+  if (!enabled10) throw new Error('保存音频失败: 缺少 remoteUrl');
+  return _runRemoteSaveOnce(_buildRemoteSaveCacheKey('audio', enabled10, args3), async () => {
+    if (enabled10['startsWith']('blob:') || enabled10['startsWith']('data:')) {
+      const fetchRemoteBlob3 = await fetchRemoteBlob(enabled10),
+        ext = _guessAudioExtFromMime(fetchRemoteBlob3?.['type']) || 'mp3';
+      return _toLocalAudioResult(await saveOutputBlob(fetchRemoteBlob3, { ext: ext, ...args3 }));
     }
-    const _0x55cabb = _guessAudioExtFromUrl(_0xc0a7ca) || 'mp3';
+    const ext2 = _guessAudioExtFromUrl(enabled10) || 'mp3';
     try {
       return _toLocalAudioResult(
-        await saveOutputFromUrl(_0xc0a7ca, { ext: _0x55cabb, maxBytes: 0x400 * 0x400 * 0xc8, ..._0x287d92 }),
+        await saveOutputFromUrl(enabled10, { ext: ext2, maxBytes: 0x400 * 0x400 * 0xc8, ...args3 }),
       );
     } catch {}
-    const _0x204ff0 = await fetchRemoteBlob(_0xc0a7ca),
-      _0x1f4f20 = _guessAudioExtFromMime(_0x204ff0?.['type']) || _0x55cabb;
-    return _toLocalAudioResult(await saveOutputBlob(_0x204ff0, { ext: _0x1f4f20, ..._0x287d92 }));
+    const fetchRemoteBlob4 = await fetchRemoteBlob(enabled10),
+      ext3 = _guessAudioExtFromMime(fetchRemoteBlob4?.['type']) || ext2;
+    return _toLocalAudioResult(await saveOutputBlob(fetchRemoteBlob4, { ext: ext3, ...args3 }));
   });
 }
-function _toLocalUrlFromSaveResult(_0x4d5966) {
-  return localPathToUrl(_0x4d5966?.['originalLocalPath']) || localPathToUrl(pickResultLocalPath(_0x4d5966));
+function _toLocalUrlFromSaveResult(value55) {
+  return localPathToUrl(value55?.['originalLocalPath']) || localPathToUrl(pickResultLocalPath(value55));
 }
-function _stringifyRemoteSaveError(_0x25711b) {
-  if (!_0x25711b) return '';
-  if (typeof _0x25711b['getUserMessage'] === 'function')
+function _stringifyRemoteSaveError(error5) {
+  if (!error5) return '';
+  if (typeof error5['getUserMessage'] === 'function')
     try {
-      const _0x258885 = String(_0x25711b['getUserMessage']() || '')['trim']();
-      if (_0x258885) return _0x258885;
+      const value56 = String(error5['getUserMessage']() || '')['trim']();
+      if (value56) return value56;
     } catch {}
-  if (typeof _0x25711b === 'string') return _0x25711b['trim']();
-  const _0x49938e =
-    _0x25711b?.['message'] ||
-    _0x25711b?.['errorMessage'] ||
-    _0x25711b?.['error_message'] ||
-    _0x25711b?.['reason'] ||
-    _0x25711b?.['detail'] ||
-    _0x25711b?.['details'] ||
-    _0x25711b?.['error'];
-  if (_0x49938e !== undefined && _0x49938e !== null && _0x49938e !== _0x25711b)
-    return _stringifyRemoteSaveError(_0x49938e);
+  if (typeof error5 === 'string') return error5['trim']();
+  const value57 =
+    error5?.['message'] ||
+    error5?.['errorMessage'] ||
+    error5?.['error_message'] ||
+    error5?.['reason'] ||
+    error5?.['detail'] ||
+    error5?.['details'] ||
+    error5?.['error'];
+  if (value57 !== undefined && value57 !== null && value57 !== error5)
+    return _stringifyRemoteSaveError(value57);
   try {
-    return JSON['stringify'](_0x25711b);
+    return JSON['stringify'](error5);
   } catch {
-    return String(_0x25711b || '')['trim']();
+    return String(error5 || '')['trim']();
   }
 }
 function _createRemoteImageSaveError({
   serverError: serverError = null,
   clientError: clientError = null,
 } = {}) {
-  const _0x5c356a = [],
-    _0x43e618 = _stringifyRemoteSaveError(serverError),
-    _0x5a10ca = _stringifyRemoteSaveError(clientError);
-  if (_0x43e618) _0x5c356a['push']('服务端下载失败：' + _0x43e618);
-  if (_0x5a10ca) _0x5c356a['push']('浏览器下载失败：' + _0x5a10ca);
-  const _0x5a8af2 = new Error(
-    _0x5c356a['length'] > 0x0 ? '保存到本地失败：' + _0x5c356a['join']('；') : '保存到本地失败',
+  const list2 = [],
+    _stringifyRemoteSaveError2 = _stringifyRemoteSaveError(serverError),
+    _stringifyRemoteSaveError3 = _stringifyRemoteSaveError(clientError);
+  if (_stringifyRemoteSaveError2) list2['push']('服务端下载失败：' + _stringifyRemoteSaveError2);
+  if (_stringifyRemoteSaveError3) list2['push']('浏览器下载失败：' + _stringifyRemoteSaveError3);
+  const error6 = new Error(
+    list2['length'] > 0x0 ? '保存到本地失败：' + list2['join']('；') : '保存到本地失败',
   );
   return (
-    (_0x5a8af2['serverError'] = serverError || null),
-    (_0x5a8af2['clientError'] = clientError || null),
-    _0x5a8af2
+    (error6['serverError'] = serverError || null),
+    (error6['clientError'] = clientError || null),
+    error6
   );
 }
-function _normalizeImageSaveResult(_0x101d00) {
-  if (!_0x101d00 || typeof _0x101d00 !== 'object') return _0x101d00;
-  if (!hasImageDerivativeFields(_0x101d00)) return _0x101d00;
-  const _0x506be1 = buildImageNodeStorageFields(_0x101d00),
-    _0x822e1d = { ..._0x101d00, ..._0x506be1 };
+function _normalizeImageSaveResult(args4) {
+  if (!args4 || typeof args4 !== 'object') return args4;
+  if (!hasImageDerivativeFields(args4)) return args4;
+  const args5 = buildImageNodeStorageFields(args4),
+    response4 = { ...args4, ...args5 };
   return (
-    !String(_0x822e1d['url'] || '')['trim']() &&
-      _0x506be1['localPath'] &&
-      (_0x822e1d['url'] = toLocalPathUrl(_0x506be1['localPath'])),
-    !String(_0x822e1d['originalUrl'] || '')['trim']() &&
-      _0x506be1['originalLocalPath'] &&
-      (_0x822e1d['originalUrl'] = toLocalPathUrl(_0x506be1['originalLocalPath'])),
-    !String(_0x822e1d['displayUrl'] || '')['trim']() &&
-      _0x506be1['displayLocalPath'] &&
-      (_0x822e1d['displayUrl'] = toLocalPathUrl(_0x506be1['displayLocalPath'])),
-    !String(_0x822e1d['thumbUrl'] || '')['trim']() &&
-      _0x506be1['thumbLocalPath'] &&
-      (_0x822e1d['thumbUrl'] = toLocalPathUrl(_0x506be1['thumbLocalPath'])),
-    _0x822e1d
+    !String(response4['url'] || '')['trim']() &&
+      args5['localPath'] &&
+      (response4['url'] = toLocalPathUrl(args5['localPath'])),
+    !String(response4['originalUrl'] || '')['trim']() &&
+      args5['originalLocalPath'] &&
+      (response4['originalUrl'] = toLocalPathUrl(args5['originalLocalPath'])),
+    !String(response4['displayUrl'] || '')['trim']() &&
+      args5['displayLocalPath'] &&
+      (response4['displayUrl'] = toLocalPathUrl(args5['displayLocalPath'])),
+    !String(response4['thumbUrl'] || '')['trim']() &&
+      args5['thumbLocalPath'] &&
+      (response4['thumbUrl'] = toLocalPathUrl(args5['thumbLocalPath'])),
+    response4
   );
 }
-function _guessImageExtFromUrl(_0x5c986c) {
-  const _0x3d0c63 = String(_0x5c986c || '')['trim']();
-  if (!_0x3d0c63) return '';
+function _guessImageExtFromUrl(value58) {
+  const enabled11 = String(value58 || '')['trim']();
+  if (!enabled11) return '';
   try {
-    const _0x50c70d = new URL(_0x3d0c63, window['location']['href']),
-      _0x122b78 = String(_0x50c70d['pathname'] || ''),
-      _0x3b9130 = _0x122b78['match'](/\.([a-z0-9]{1,5})$/i),
-      _0x47bdcd = (_0x3b9130?.[0x1] || '')['toLowerCase']();
-    if (!_0x47bdcd) return '';
-    if (_0x47bdcd === 'jpeg') return 'jpg';
-    if (_0x47bdcd === 'jpg') return 'jpg';
-    if (_0x47bdcd === 'png') return 'png';
-    if (_0x47bdcd === 'webp') return 'webp';
-    if (_0x47bdcd === 'gif') return 'gif';
+    const uRL2 = new URL(enabled11, window['location']['href']),
+      value59 = String(uRL2['pathname'] || ''),
+      value60 = value59['match'](/\.([a-z0-9]{1,5})$/i),
+      enabled12 = (value60?.[0x1] || '')['toLowerCase']();
+    if (!enabled12) return '';
+    if (enabled12 === 'jpeg') return 'jpg';
+    if (enabled12 === 'jpg') return 'jpg';
+    if (enabled12 === 'png') return 'png';
+    if (enabled12 === 'webp') return 'webp';
+    if (enabled12 === 'gif') return 'gif';
     return '';
   } catch {
     return '';
   }
 }
-export async function ensureLocalImageDerivatives(_0x4f1865) {
-  return _normalizeImageSaveResult(await ensureImageDerivativesToServer({ localPath: _0x4f1865 }));
+export async function ensureLocalImageDerivatives(localPath3) {
+  return _normalizeImageSaveResult(await ensureImageDerivativesToServer({ localPath: localPath3 }));
 }
-export async function checkLocalMediaExists(_0x9e8188) {
-  return await checkLocalMediaExistsOnServer({ localPath: _0x9e8188 });
+export async function checkLocalMediaExists(localPath4) {
+  return await checkLocalMediaExistsOnServer({ localPath: localPath4 });
 }
-export async function saveRemoteImageLocallyDetailed(_0x29c016, _0x1e26a7, _0x1d3829 = {}) {
-  const _0x25afe3 = String(_0x29c016 || '')['trim']();
-  if (!_0x25afe3) throw new Error('保存到本地失败: 缺少 remoteUrl');
-  return _runRemoteSaveOnce(_buildRemoteSaveCacheKey('image', _0x25afe3, _0x1d3829), async () => {
-    if (_0x25afe3['startsWith']('blob:') || _0x25afe3['startsWith']('data:')) {
-      let _0x2e58fe = null;
+export async function saveRemoteImageLocallyDetailed(value61, value62, args6 = {}) {
+  const enabled13 = String(value61 || '')['trim']();
+  if (!enabled13) throw new Error('保存到本地失败: 缺少 remoteUrl');
+  return _runRemoteSaveOnce(_buildRemoteSaveCacheKey('image', enabled13, args6), async () => {
+    if (enabled13['startsWith']('blob:') || enabled13['startsWith']('data:')) {
+      let clientError2 = null;
       try {
-        const _0x2033f1 = await fetchRemoteBlob(_0x25afe3);
-        let _0x573980 = 'png';
-        if (_0x2033f1['type'] === 'image/jpeg') _0x573980 = 'jpg';
+        const fetchRemoteBlob5 = await fetchRemoteBlob(enabled13);
+        let ext4 = 'png';
+        if (fetchRemoteBlob5['type'] === 'image/jpeg') ext4 = 'jpg';
         else {
-          if (_0x2033f1['type'] === 'image/webp') _0x573980 = 'webp';
+          if (fetchRemoteBlob5['type'] === 'image/webp') ext4 = 'webp';
           else {
-            if (_0x2033f1['type'] === 'image/png') _0x573980 = 'png';
+            if (fetchRemoteBlob5['type'] === 'image/png') ext4 = 'png';
             else {
-              if (_0x2033f1['type'] === 'image/gif') _0x573980 = 'gif';
+              if (fetchRemoteBlob5['type'] === 'image/gif') ext4 = 'gif';
             }
           }
         }
-        const _0x26fd7f = await saveOutputBlob(_0x2033f1, { ext: _0x573980, ..._0x1d3829 }),
-          _0x2fea20 = _toLocalUrlFromSaveResult(_0x26fd7f);
-        if (_0x2fea20) return { ..._0x26fd7f, localUrl: _0x2fea20 };
+        const args7 = await saveOutputBlob(fetchRemoteBlob5, { ext: ext4, ...args6 }),
+          localUrl2 = _toLocalUrlFromSaveResult(args7);
+        if (localUrl2) return { ...args7, localUrl: localUrl2 };
         throw new Error('服务器未返回本地路径');
-      } catch (_0x57edaa) {
-        _0x2e58fe = _0x57edaa;
+      } catch (value63) {
+        clientError2 = value63;
       }
-      throw _createRemoteImageSaveError({ clientError: _0x2e58fe });
+      throw _createRemoteImageSaveError({ clientError: clientError2 });
     }
-    let _0x1c6011 = null;
+    let serverError2 = null;
     try {
-      const _0x505726 = _guessImageExtFromUrl(_0x25afe3) || 'png',
-        _0x511b00 = await saveOutputFromUrl(_0x25afe3, {
-          ext: _0x505726,
+      const ext5 = _guessImageExtFromUrl(enabled13) || 'png',
+        args8 = await saveOutputFromUrl(enabled13, {
+          ext: ext5,
           maxBytes: REMOTE_IMAGE_MAX_BYTES,
-          ..._0x1d3829,
+          ...args6,
         }),
-        _0x55fac6 = _toLocalUrlFromSaveResult(_0x511b00);
-      if (_0x55fac6) return { ..._0x511b00, localUrl: _0x55fac6 };
+        localUrl3 = _toLocalUrlFromSaveResult(args8);
+      if (localUrl3) return { ...args8, localUrl: localUrl3 };
       throw new Error('服务器未返回本地路径');
-    } catch (_0x3e25f4) {
-      _0x1c6011 = _0x3e25f4;
+    } catch (value64) {
+      serverError2 = value64;
     }
     try {
-      const _0x7e476f = await fetchRemoteBlob(_0x25afe3);
-      let _0x34d94b = 'png';
-      if (_0x7e476f['type'] === 'image/jpeg') _0x34d94b = 'jpg';
+      const fetchRemoteBlob6 = await fetchRemoteBlob(enabled13);
+      let ext6 = 'png';
+      if (fetchRemoteBlob6['type'] === 'image/jpeg') ext6 = 'jpg';
       else {
-        if (_0x7e476f['type'] === 'image/webp') _0x34d94b = 'webp';
+        if (fetchRemoteBlob6['type'] === 'image/webp') ext6 = 'webp';
         else {
-          if (_0x7e476f['type'] === 'image/png') _0x34d94b = 'png';
+          if (fetchRemoteBlob6['type'] === 'image/png') ext6 = 'png';
           else {
-            if (_0x7e476f['type'] === 'image/gif') _0x34d94b = 'gif';
+            if (fetchRemoteBlob6['type'] === 'image/gif') ext6 = 'gif';
           }
         }
       }
-      const _0x328ebe = await saveOutputBlob(_0x7e476f, { ext: _0x34d94b, ..._0x1d3829 }),
-        _0x1d5d8f = _toLocalUrlFromSaveResult(_0x328ebe);
-      if (_0x1d5d8f) return { ..._0x328ebe, localUrl: _0x1d5d8f };
+      const args9 = await saveOutputBlob(fetchRemoteBlob6, { ext: ext6, ...args6 }),
+        localUrl4 = _toLocalUrlFromSaveResult(args9);
+      if (localUrl4) return { ...args9, localUrl: localUrl4 };
       throw new Error('服务器未返回本地路径');
-    } catch (_0x233be3) {
-      throw _createRemoteImageSaveError({ serverError: _0x1c6011, clientError: _0x233be3 });
+    } catch (clientError3) {
+      throw _createRemoteImageSaveError({ serverError: serverError2, clientError: clientError3 });
     }
   });
 }
-export async function saveRemoteImageLocally(_0x3e58c2, _0xa0ae27, _0x44227e = {}) {
-  const _0x4ad3ae = await saveRemoteImageLocallyDetailed(_0x3e58c2, _0xa0ae27, _0x44227e);
-  return String(_0x4ad3ae?.['localUrl'] || '')['trim']() || _toLocalUrlFromSaveResult(_0x4ad3ae);
+export async function saveRemoteImageLocally(value65, value66, value67 = {}) {
+  const saveRemoteImageLocallyDetailed2 = await saveRemoteImageLocallyDetailed(value65, value66, value67);
+  return (
+    String(saveRemoteImageLocallyDetailed2?.['localUrl'] || '')['trim']() ||
+    _toLocalUrlFromSaveResult(saveRemoteImageLocallyDetailed2)
+  );
 }
-export function exportProject(_0x304bc0, _0x5db60c) {
+export function exportProject(filename, value68) {
   return saveTextDownload({
-    filename: _0x304bc0 + '.aicanvas',
-    content: JSON['stringify'](_0x5db60c, null, 0x2),
+    filename: filename + '.aicanvas',
+    content: JSON['stringify'](value68, null, 0x2),
     mimeType: 'application/json',
     filterName: 'SHUO Canvas Project',
   });
 }
-export async function importProject(_0x9b8858) {
-  return new Promise((_0xab9e1f, _0x275b20) => {
-    const _0x56d26f = new FileReader();
-    ((_0x56d26f['onload'] = (_0x47534d) => {
+export async function importProject(value69) {
+  return new Promise((handler, handler2) => {
+    const fileReader = new FileReader();
+    ((fileReader['onload'] = (event) => {
       try {
-        const _0x5b3301 = JSON['parse'](_0x47534d['target']['result']),
-          _0x226628 = resolveCanvasData(_0x5b3301);
-        _0xab9e1f(_0x226628);
-      } catch (_0x4a1628) {
-        _0x275b20(new Error('解析\x20JSON\x20存档失败'));
+        const value70 = JSON['parse'](event['target']['result']),
+          canvasData2 = resolveCanvasData(value70);
+        handler(canvasData2);
+      } catch (value71) {
+        handler2(new Error('解析\x20JSON\x20存档失败'));
       }
     }),
-      (_0x56d26f['onerror'] = () => _0x275b20(new Error('文件读取失败'))),
-      _0x56d26f['readAsText'](_0x9b8858));
+      (fileReader['onerror'] = () => handler2(new Error('文件读取失败'))),
+      fileReader['readAsText'](value69));
   });
 }

@@ -13,58 +13,55 @@ export const STORY_ASSET_EXTRACTION_SCHEMA_VERSION = 0x2;
 export const STORY_ASSET_EXTRACTION_KINDS = Object['freeze'](['character', 'scene', 'prop']);
 const STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS = 0x4b0,
   STORY_ASSET_SOURCE_CHAPTER_MAX_ITEMS = 0x64;
-export function mergeStoryAssetVisualPromptRepair(
-  _0x443412,
-  _0xf2597f,
-  _0x5d2b51 = STORY_ASSET_EXTRACTION_KINDS,
-) {
-  const _0xd659e4 = getStoryAssetExtractionRawAssets(parseStrictJson(getResultText(_0x443412)), _0x5d2b51),
-    _0x44a0d0 = getStoryAssetExtractionRawAssets(parseStrictJson(getResultText(_0xf2597f)), _0x5d2b51),
-    _0x50ad8d = (_0xddddcc) => normalizeText(_0xddddcc?.['ref']) || normalizeText(_0xddddcc?.['name']);
+export function mergeStoryAssetVisualPromptRepair(value, item, key = STORY_ASSET_EXTRACTION_KINDS) {
+  const assets = getStoryAssetExtractionRawAssets(parseStrictJson(getResultText(value)), key),
+    list = getStoryAssetExtractionRawAssets(parseStrictJson(getResultText(item)), key),
+    handler = (error) => normalizeText(error?.['ref']) || normalizeText(error?.['name']);
   return {
-    assets: _0xd659e4['map']((_0x32fea5) => {
-      const _0x5ec281 = _0x44a0d0['filter'](
-          (_0x530098) =>
-            _0x50ad8d(_0x530098) === _0x50ad8d(_0x32fea5) && _0x530098['kind'] === _0x32fea5['kind'],
+    assets: assets['map']((appearances) => {
+      const list2 = list['filter'](
+          (index) => handler(index) === handler(appearances) && index['kind'] === appearances['kind'],
         ),
-        _0x194808 = _0x5ec281['length'] === 0x1 ? _0x5ec281[0x0] : null;
+        result = list2['length'] === 0x1 ? list2[0x0] : null;
       return {
-        ..._0x32fea5,
-        appearances: _0x32fea5['appearances']['map']((_0x49e4c7) => {
-          if (sanitizeStoryAssetPublicPromptText(_0x49e4c7['prompt'])) return _0x49e4c7;
-          const _0x106ddc = (_0x194808?.['appearances'] || [])['filter'](
-            (_0x491ed6) => _0x50ad8d(_0x491ed6) === _0x50ad8d(_0x49e4c7),
-          );
-          return _0x106ddc['length'] === 0x1 ? { ..._0x49e4c7, prompt: _0x106ddc[0x0]['prompt'] } : _0x49e4c7;
+        ...appearances,
+        appearances: appearances['appearances']['map']((args) => {
+          if (sanitizeStoryAssetPublicPromptText(args['prompt'])) return args;
+          const prompt = (result?.['appearances'] || [])['filter']((data) => handler(data) === handler(args));
+          return prompt['length'] === 0x1 ? { ...args, prompt: prompt[0x0]['prompt'] } : args;
         }),
       };
     }),
   };
 }
-export function normalizeStoryAssetReference(_0x6b51e6, _0x17284b) {
-  return normalizeText(_0x6b51e6)['replace'](/\s+/g, '-') || _0x17284b;
+export function normalizeStoryAssetReference(options, target) {
+  return normalizeText(options)['replace'](/\s+/g, '-') || target;
 }
-function assertConciseStoryAssetName(_0x53d7c2, _0x412c6e) {
-  const _0x27ae1f = _0x412c6e === 'character' ? 0xc : 0x14;
+function assertConciseStoryAssetName(args2, source) {
+  const next = source === 'character' ? 0xc : 0x14;
   if (
-    [..._0x53d7c2]['length'] > _0x27ae1f ||
-    /[，,。；;\n]/u['test'](_0x53d7c2) ||
-    /^(?:角色名|人物名|姓名|名称)\s*[:：]/u['test'](_0x53d7c2)
+    [...args2]['length'] > next ||
+    /[，,。；;\n]/u['test'](args2) ||
+    /^(?:角色名|人物名|姓名|名称)\s*[:：]/u['test'](args2)
   ) {
-    const _0x356c42 = _0x412c6e === 'character' ? '角色' : _0x412c6e === 'prop' ? '道具' : '场景';
-    throw new Error(_0x356c42 + '名称必须是姓名或简短身份名，不能包含人物说明：' + _0x53d7c2);
+    const current = source === 'character' ? '角色' : source === 'prop' ? '道具' : '场景';
+    throw new Error(current + '名称必须是姓名或简短身份名，不能包含人物说明：' + args2);
   }
 }
-function assertStoryCharacterRole(_0x932dd2) {
-  if (!['主角', '配角', '反派', '路人']['includes'](normalizeText(_0x932dd2)))
+function assertStoryCharacterRole(entry) {
+  if (!['主角', '配角', '反派', '路人']['includes'](normalizeText(entry)))
     throw new Error('角色 role 只能是主角、配角、反派或路人，人物说明必须写入 description。');
 }
-export function createStoryAssetExtractionResponseSchema(_0x4d436e = STORY_ASSET_EXTRACTION_KINDS) {
-  const _0x1db8b9 = normalizeStringArray(_0x4d436e)['filter']((_0x2891fc) =>
-      STORY_ASSET_EXTRACTION_KINDS['includes'](_0x2891fc),
+export function createStoryAssetExtractionResponseSchema(record = STORY_ASSET_EXTRACTION_KINDS) {
+  const list3 = normalizeStringArray(record)['filter']((payload) =>
+      STORY_ASSET_EXTRACTION_KINDS['includes'](payload),
     ),
-    _0x4878f0 = _0x1db8b9['length'] ? _0x1db8b9 : [...STORY_ASSET_EXTRACTION_KINDS],
-    _0x3ea928 = { type: 'array', maxItems: STORY_ASSET_SOURCE_CHAPTER_MAX_ITEMS, items: { type: 'string' } };
+    enumValue = list3['length'] ? list3 : [...STORY_ASSET_EXTRACTION_KINDS],
+    sourceChapterIds = {
+      type: 'array',
+      maxItems: STORY_ASSET_SOURCE_CHAPTER_MAX_ITEMS,
+      items: { type: 'string' },
+    };
   return {
     type: 'object',
     additionalProperties: ![],
@@ -90,20 +87,20 @@ export function createStoryAssetExtractionResponseSchema(_0x4d436e = STORY_ASSET
           ],
           properties: {
             ref: { type: 'string', maxLength: 0x40 },
-            kind: { type: 'string', enum: _0x4878f0 },
+            kind: { type: 'string', enum: enumValue },
             name: {
               type: 'string',
-              maxLength: _0x4878f0['length'] === 0x1 && _0x4878f0[0x0] === 'character' ? 0xc : 0x14,
+              maxLength: enumValue['length'] === 0x1 && enumValue[0x0] === 'character' ? 0xc : 0x14,
             },
             role: { type: 'string', maxLength: 0x10 },
             description: { type: 'string', maxLength: 0x140 },
             voiceDescription: { type: 'string', maxLength: 0xf0 },
             occurrences: { type: 'string', maxLength: 0xa0 },
-            sourceChapterIds: _0x3ea928,
+            sourceChapterIds: sourceChapterIds,
             appearances: {
               type: 'array',
               minItems: 0x1,
-              maxItems: _0x4878f0['some']((_0x1d3c61) => _0x1d3c61 === 'character' || _0x1d3c61 === 'scene')
+              maxItems: enumValue['some']((handle) => handle === 'character' || handle === 'scene')
                 ? 0x4
                 : 0x1,
               items: {
@@ -115,7 +112,7 @@ export function createStoryAssetExtractionResponseSchema(_0x4d436e = STORY_ASSET
                   name: { type: 'string', maxLength: 0x20 },
                   description: { type: 'string', maxLength: 0x140 },
                   occurrences: { type: 'string', maxLength: 0xa0 },
-                  sourceChapterIds: _0x3ea928,
+                  sourceChapterIds: sourceChapterIds,
                   prompt: {
                     type: 'string',
                     minLength: 0x1,
@@ -131,15 +128,15 @@ export function createStoryAssetExtractionResponseSchema(_0x4d436e = STORY_ASSET
   };
 }
 export function createStoryAssetCompactExtractionResponseSchema(
-  _0xa23aef = STORY_ASSET_EXTRACTION_KINDS,
-  _0x35a813 = [],
+  state = STORY_ASSET_EXTRACTION_KINDS,
+  config = [],
 ) {
-  const _0x3e35fe = normalizeStringArray(_0xa23aef)['filter']((_0x4afd1c) =>
-      STORY_ASSET_EXTRACTION_KINDS['includes'](_0x4afd1c),
+  const list4 = normalizeStringArray(state)['filter']((scope) =>
+      STORY_ASSET_EXTRACTION_KINDS['includes'](scope),
     ),
-    _0x51e896 = _0x3e35fe['length'] === 0x1 ? _0x3e35fe[0x0] : '',
-    _0x4a8c03 = normalizeStringArray(_0x35a813),
-    _0xbac5bd = _0x4a8c03['length'];
+    maxLength = list4['length'] === 0x1 ? list4[0x0] : '',
+    enumValue2 = normalizeStringArray(config),
+    minItems = enumValue2['length'];
   return {
     type: 'object',
     additionalProperties: ![],
@@ -147,8 +144,8 @@ export function createStoryAssetCompactExtractionResponseSchema(
     properties: {
       assets: {
         type: 'array',
-        minItems: _0xbac5bd,
-        maxItems: _0xbac5bd,
+        minItems: minItems,
+        maxItems: minItems,
         items: {
           type: 'object',
           additionalProperties: ![],
@@ -157,24 +154,24 @@ export function createStoryAssetCompactExtractionResponseSchema(
             clientKey: {
               type: 'string',
               maxLength: 0xc,
-              ...(_0x4a8c03['length'] ? { enum: _0x4a8c03 } : {}),
+              ...(enumValue2['length'] ? { enum: enumValue2 } : {}),
             },
             include: { type: 'boolean' },
             description: { type: 'string', maxLength: 0x78 },
             visualPrompt: {
               type: 'string',
-              maxLength: _0x51e896 === 'character' ? 0x168 : _0x51e896 === 'scene' ? 0x140 : 0x118,
+              maxLength: maxLength === 'character' ? 0x168 : maxLength === 'scene' ? 0x140 : 0x118,
             },
-            voiceDescription: { type: 'string', maxLength: _0x51e896 === 'character' ? 0xb4 : 0x0 },
+            voiceDescription: { type: 'string', maxLength: maxLength === 'character' ? 0xb4 : 0x0 },
           },
         },
       },
     },
   };
 }
-function normalizeStoryAssetExtractionKind(_0x5d0561, _0xff3b87 = '') {
-  const _0x33f2ce = normalizeText(_0x5d0561)['toLowerCase'](),
-    _0x5adcb7 = {
+function normalizeStoryAssetExtractionKind(input, output = '') {
+  const text = normalizeText(input)['toLowerCase'](),
+    value2 = {
       character: 'character',
       characters: 'character',
       person: 'character',
@@ -199,230 +196,218 @@ function normalizeStoryAssetExtractionKind(_0x5d0561, _0xff3b87 = '') {
       道具: 'prop',
       物品: 'prop',
     };
-  return _0x5adcb7[_0x33f2ce] || normalizeText(_0xff3b87);
+  return value2[text] || normalizeText(output);
 }
-function getStoryAssetExtractionRawAssets(_0x2a42ca, _0x1bbfd5 = STORY_ASSET_EXTRACTION_KINDS) {
-  if (Array['isArray'](_0x2a42ca)) return _0x2a42ca;
-  if (!_0x2a42ca || typeof _0x2a42ca !== 'object') return [];
-  const _0x52f5a9 = normalizeStringArray(_0x1bbfd5)['filter']((_0x497abb) =>
-      STORY_ASSET_EXTRACTION_KINDS['includes'](_0x497abb),
+function getStoryAssetExtractionRawAssets(enabled, value3 = STORY_ASSET_EXTRACTION_KINDS) {
+  if (Array['isArray'](enabled)) return enabled;
+  if (!enabled || typeof enabled !== 'object') return [];
+  const list5 = normalizeStringArray(value3)['filter']((value4) =>
+      STORY_ASSET_EXTRACTION_KINDS['includes'](value4),
     ),
-    _0x57d471 = _0x52f5a9['length'] === 0x1 ? _0x52f5a9[0x0] : '',
-    _0x137009 = {
+    value5 = list5['length'] === 0x1 ? list5[0x0] : '',
+    value6 = {
       character: ['characters', 'characterAssets', 'roles', '人物', '角色', '角色资产'],
       scene: ['scenes', 'sceneAssets', 'settings', 'locations', '场景', '场景资产'],
       prop: ['props', 'propAssets', 'items', 'objects', '道具', '道具资产'],
     },
-    _0x400b0f = [_0x2a42ca, _0x2a42ca['result'], _0x2a42ca['data']]['filter'](
-      (_0x4bf1c8) => _0x4bf1c8 && typeof _0x4bf1c8 === 'object' && !Array['isArray'](_0x4bf1c8),
+    list6 = [enabled, enabled['result'], enabled['data']]['filter'](
+      (value7) => value7 && typeof value7 === 'object' && !Array['isArray'](value7),
     ),
-    _0xd1cc31 = _0x400b0f['map']((_0x155b21) => _0x155b21['assets']),
-    _0x27ecb8 = _0xd1cc31['find']((_0x61a484) => Array['isArray'](_0x61a484) && _0x61a484['length']);
-  if (_0x27ecb8) return _0x27ecb8;
-  const _0x1bcfa3 = [..._0x400b0f, ..._0x400b0f['map']((_0x454163) => _0x454163['assets'])]['filter'](
-      (_0xaddd6c) => _0xaddd6c && typeof _0xaddd6c === 'object' && !Array['isArray'](_0xaddd6c),
+    list7 = list6['map']((value8) => value8['assets']),
+    value9 = list7['find']((list8) => Array['isArray'](list8) && list8['length']);
+  if (value9) return value9;
+  const value10 = [...list6, ...list6['map']((value11) => value11['assets'])]['filter'](
+      (value12) => value12 && typeof value12 === 'object' && !Array['isArray'](value12),
     ),
-    _0x1b282b = [],
-    _0x17e7b1 = _0x57d471 ? [_0x57d471] : _0x52f5a9;
-  for (const _0x482a41 of _0x17e7b1) {
-    let _0x4cf7d4 = null;
-    for (const _0x34b334 of _0x1bcfa3) {
-      _0x4cf7d4 = _0x137009[_0x482a41]['map']((_0xff65f0) => _0x34b334[_0xff65f0])['find'](
-        (_0x36031d) => Array['isArray'](_0x36031d) && _0x36031d['length'],
+    list9 = [],
+    value13 = value5 ? [value5] : list5;
+  for (const value14 of value13) {
+    let list10 = null;
+    for (const value15 of value10) {
+      list10 = value6[value14]['map']((value16) => value15[value16])['find'](
+        (list11) => Array['isArray'](list11) && list11['length'],
       );
-      if (_0x4cf7d4) break;
+      if (list10) break;
     }
-    if (!_0x4cf7d4) continue;
-    _0x1b282b['push'](
-      ..._0x4cf7d4['map']((_0x399254) =>
-        _0x399254 && typeof _0x399254 === 'object' && !Array['isArray'](_0x399254)
-          ? { ..._0x399254, kind: _0x399254['kind'] || _0x482a41 }
-          : _0x399254,
+    if (!list10) continue;
+    list9['push'](
+      ...list10['map']((kind) =>
+        kind && typeof kind === 'object' && !Array['isArray'](kind)
+          ? { ...kind, kind: kind['kind'] || value14 }
+          : kind,
       ),
     );
   }
-  if (_0x1b282b['length']) return _0x1b282b;
-  const _0x371fcd = [];
-  for (const _0x2831b0 of _0x400b0f) {
-    if (_0x57d471)
-      for (const _0x36775c of _0x137009[_0x57d471]) {
-        _0x371fcd['push'](_0x2831b0[_0x36775c]);
+  if (list9['length']) return list9;
+  const list12 = [];
+  for (const value17 of list6) {
+    if (value5)
+      for (const value18 of value6[value5]) {
+        list12['push'](value17[value18]);
       }
-    _0x371fcd['push'](_0x2831b0['assets']);
+    list12['push'](value17['assets']);
   }
   return (
-    _0x371fcd['find']((_0x161066) => Array['isArray'](_0x161066) && _0x161066['length']) ||
-    _0x371fcd['find'](Array['isArray']) ||
+    list12['find']((list13) => Array['isArray'](list13) && list13['length']) ||
+    list12['find'](Array['isArray']) ||
     []
   );
 }
 export function parseStoryAssetExtractionResult(
-  _0x48c5ef,
+  value19,
   {
     chapterIds: chapterIds = [],
     allowedKinds: allowedKinds = STORY_ASSET_EXTRACTION_KINDS,
     allowEmptyResult: allowEmptyResult = ![],
   } = {},
 ) {
-  const _0x290ef7 = parseStrictJson(getResultText(_0x48c5ef), 'Agent 未返回资产提取结果。'),
-    _0x34f15c = new Set(normalizeStringArray(chapterIds)),
-    _0x50c8d4 = normalizeStringArray(allowedKinds)['filter']((_0x4e9437) =>
-      STORY_ASSET_EXTRACTION_KINDS['includes'](_0x4e9437),
+  const strictJson = parseStrictJson(getResultText(value19), 'Agent 未返回资产提取结果。'),
+    map = new Set(normalizeStringArray(chapterIds)),
+    allowedKinds2 = normalizeStringArray(allowedKinds)['filter']((value20) =>
+      STORY_ASSET_EXTRACTION_KINDS['includes'](value20),
     ),
-    _0x2089a9 = new Set(_0x50c8d4),
-    _0x462cc8 = _0x50c8d4['length'] === 0x1 ? _0x50c8d4[0x0] : '',
-    _0x3a0ac1 = getStoryAssetExtractionRawAssets(_0x290ef7, _0x50c8d4),
-    _0x5ec724 = Array['isArray'](_0x3a0ac1)
-      ? _0x3a0ac1['map']((_0x1bda4a, _0x8d9a1c) => {
-          const _0x226626 = normalizeStoryAssetExtractionKind(_0x1bda4a?.['kind'], _0x462cc8),
-            _0x5f6823 = normalizeText(
-              _0x1bda4a?.['name'] ||
-                _0x1bda4a?.['characterName'] ||
-                _0x1bda4a?.['sceneName'] ||
-                _0x1bda4a?.['propName'] ||
-                _0x1bda4a?.['名称'] ||
-                _0x1bda4a?.['角色名'] ||
-                _0x1bda4a?.['场景名'] ||
-                _0x1bda4a?.['道具名'],
+    map2 = new Set(allowedKinds2),
+    value21 = allowedKinds2['length'] === 0x1 ? allowedKinds2[0x0] : '',
+    returnedAssetCount = getStoryAssetExtractionRawAssets(strictJson, allowedKinds2),
+    assets2 = Array['isArray'](returnedAssetCount)
+      ? returnedAssetCount['map']((error2, value22) => {
+          const kind2 = normalizeStoryAssetExtractionKind(error2?.['kind'], value21),
+            name = normalizeText(
+              error2?.['name'] ||
+                error2?.['characterName'] ||
+                error2?.['sceneName'] ||
+                error2?.['propName'] ||
+                error2?.['名称'] ||
+                error2?.['角色名'] ||
+                error2?.['场景名'] ||
+                error2?.['道具名'],
             );
-          if (!_0x5f6823 || !STORY_ASSET_EXTRACTION_KINDS['includes'](_0x226626)) return null;
-          if (_0x2089a9['size'] && !_0x2089a9['has'](_0x226626))
-            throw new Error('Agent 在本轮返回了未请求的资产类型“' + _0x226626 + '”。');
-          assertConciseStoryAssetName(_0x5f6823, _0x226626);
-          if (_0x226626 === 'character') assertStoryCharacterRole(_0x1bda4a?.['role']);
-          const _0x229b1c = _0x226626 === 'character' ? normalizeText(_0x1bda4a?.['voiceDescription']) : '',
-            _0x1ac65f = normalizeStoryAssetReference(_0x1bda4a?.['ref'], 'asset-' + (_0x8d9a1c + 0x1)),
-            _0x3150d4 = normalizeStringArray(_0x1bda4a?.['sourceChapterIds']);
-          if (_0x34f15c['size']) {
-            const _0x46f0b2 = _0x3150d4['filter']((_0x5e059e) => !_0x34f15c['has'](_0x5e059e));
-            if (_0x46f0b2['length'])
-              throw new Error('资产“' + _0x5f6823 + '”引用了不存在的章节：' + _0x46f0b2['join']('、') + '。');
+          if (!name || !STORY_ASSET_EXTRACTION_KINDS['includes'](kind2)) return null;
+          if (map2['size'] && !map2['has'](kind2))
+            throw new Error('Agent 在本轮返回了未请求的资产类型“' + kind2 + '”。');
+          assertConciseStoryAssetName(name, kind2);
+          if (kind2 === 'character') assertStoryCharacterRole(error2?.['role']);
+          const value23 = kind2 === 'character' ? normalizeText(error2?.['voiceDescription']) : '',
+            ref = normalizeStoryAssetReference(error2?.['ref'], 'asset-' + (value22 + 0x1)),
+            sourceChapterIds2 = normalizeStringArray(error2?.['sourceChapterIds']);
+          if (map['size']) {
+            const list14 = sourceChapterIds2['filter']((value24) => !map['has'](value24));
+            if (list14['length'])
+              throw new Error('资产“' + name + '”引用了不存在的章节：' + list14['join']('、') + '。');
           }
-          const _0x57ad85 = Array['isArray'](_0x1bda4a?.['appearances']) ? _0x1bda4a['appearances'] : [];
-          if (!_0x57ad85['length']) throw new Error('资产“' + _0x5f6823 + '”缺少形象和图片提示词。');
-          const _0x23a5cf =
-              _0x226626 === 'prop' && _0x57ad85['length'] > 0x1
+          const prompt2 = Array['isArray'](error2?.['appearances']) ? error2['appearances'] : [];
+          if (!prompt2['length']) throw new Error('资产“' + name + '”缺少形象和图片提示词。');
+          const list15 =
+              kind2 === 'prop' && prompt2['length'] > 0x1
                 ? [
                     {
-                      ref: _0x1ac65f + '-base',
+                      ref: ref + '-base',
                       name: '基础形象',
                       description: normalizeStringArray(
-                        _0x57ad85['map']((_0x143933) => {
-                          const _0x3643fc = normalizeText(_0x143933?.['name']),
-                            _0x303a4b = normalizeText(_0x143933?.['description']);
-                          if (_0x3643fc && _0x303a4b) return _0x3643fc + '：' + _0x303a4b;
-                          return _0x303a4b || _0x3643fc;
+                        prompt2['map']((error3) => {
+                          const text2 = normalizeText(error3?.['name']),
+                            text3 = normalizeText(error3?.['description']);
+                          if (text2 && text3) return text2 + '：' + text3;
+                          return text3 || text2;
                         }),
                       )['join']('；'),
                       occurrences:
                         normalizeStringArray(
-                          _0x57ad85['map']((_0x2d5e1c) => normalizeText(_0x2d5e1c?.['occurrences'])),
-                        )['join']('、') || _0x1bda4a?.['occurrences'],
+                          prompt2['map']((value25) => normalizeText(value25?.['occurrences'])),
+                        )['join']('、') || error2?.['occurrences'],
                       sourceChapterIds: normalizeStringArray(
-                        _0x57ad85['flatMap']((_0x3475d4) =>
-                          Array['isArray'](_0x3475d4?.['sourceChapterIds'])
-                            ? _0x3475d4['sourceChapterIds']
-                            : [],
+                        prompt2['flatMap']((value26) =>
+                          Array['isArray'](value26?.['sourceChapterIds']) ? value26['sourceChapterIds'] : [],
                         ),
                       )['length']
-                        ? normalizeStringArray(
-                            _0x57ad85['flatMap']((_0x1a6ef9) => _0x1a6ef9['sourceChapterIds']),
-                          )
-                        : _0x3150d4,
-                      prompt: _0x57ad85['map']((_0x218918) => normalizeText(_0x218918?.['prompt']))['find'](
+                        ? normalizeStringArray(prompt2['flatMap']((value27) => value27['sourceChapterIds']))
+                        : sourceChapterIds2,
+                      prompt: prompt2['map']((value28) => normalizeText(value28?.['prompt']))['find'](
                         Boolean,
                       ),
                     },
                   ]
-                : _0x57ad85,
-            _0x282f73 = _0x23a5cf['map']((_0x57c308, _0x3f4d88) => {
-              const _0x18d378 = normalizeText(_0x57c308?.['name']);
-              if (!_0x18d378)
-                throw new Error(
-                  '资产“' + _0x5f6823 + '”的第\x20' + (_0x3f4d88 + 0x1) + ' 个形象缺少具体形象名称。',
-                );
+                : prompt2,
+            appearances2 = list15['map']((error4, value29) => {
+              const name2 = normalizeText(error4?.['name']);
+              if (!name2)
+                throw new Error('资产“' + name + '”的第\x20' + (value29 + 0x1) + ' 个形象缺少具体形象名称。');
               return {
-                ref: normalizeStoryAssetReference(
-                  _0x57c308?.['ref'],
-                  _0x1ac65f + '-appearance-' + (_0x3f4d88 + 0x1),
-                ),
-                name: _0x18d378,
-                description: sanitizeStoryAssetPublicDescriptionText(_0x57c308?.['description']),
+                ref: normalizeStoryAssetReference(error4?.['ref'], ref + '-appearance-' + (value29 + 0x1)),
+                name: name2,
+                description: sanitizeStoryAssetPublicDescriptionText(error4?.['description']),
                 occurrences: sanitizeStoryAssetPublicDescriptionText(
-                  _0x57c308?.['occurrences'] || _0x1bda4a?.['occurrences'],
+                  error4?.['occurrences'] || error2?.['occurrences'],
                 ),
                 sourceChapterIds: normalizeStringArray(
-                  _0x57c308?.['sourceChapterIds']?.['length'] ? _0x57c308['sourceChapterIds'] : _0x3150d4,
+                  error4?.['sourceChapterIds']?.['length'] ? error4['sourceChapterIds'] : sourceChapterIds2,
                 ),
-                prompt: sanitizeStoryAssetPublicPromptText(_0x57c308?.['prompt']),
+                prompt: sanitizeStoryAssetPublicPromptText(error4?.['prompt']),
               };
             });
-          if (_0x282f73['some']((_0x336501) => !_0x336501['prompt'])) {
-            const _0x7c4d03 = new Error('资产“' + _0x5f6823 + '”存在缺少图片提示词的形象。');
-            _0x7c4d03['code'] = 'STORY_ASSET_VISUAL_PROMPT_MISSING';
-            throw _0x7c4d03;
+          if (appearances2['some']((enabled2) => !enabled2['prompt'])) {
+            const error5 = new Error('资产“' + name + '”存在缺少图片提示词的形象。');
+            error5['code'] = 'STORY_ASSET_VISUAL_PROMPT_MISSING';
+            throw error5;
           }
-          for (const _0x248f18 of _0x282f73) {
-            if (!_0x34f15c['size']) continue;
-            const _0x191925 = _0x248f18['sourceChapterIds']['filter'](
-              (_0x3f3aea) => !_0x34f15c['has'](_0x3f3aea),
-            );
-            if (_0x191925['length'])
-              throw new Error(
-                '资产“' + _0x5f6823 + '”的形象引用了不存在的章节：' + _0x191925['join']('、') + '。',
-              );
+          for (const value30 of appearances2) {
+            if (!map['size']) continue;
+            const list16 = value30['sourceChapterIds']['filter']((value31) => !map['has'](value31));
+            if (list16['length'])
+              throw new Error('资产“' + name + '”的形象引用了不存在的章节：' + list16['join']('、') + '。');
           }
           return {
-            ref: _0x1ac65f,
-            kind: _0x226626,
-            name: _0x5f6823,
-            role: normalizeText(_0x1bda4a?.['role']),
-            description: sanitizeStoryAssetPublicDescriptionText(_0x1bda4a?.['description']),
-            voiceDescription: sanitizeStoryAssetPublicDescriptionText(_0x229b1c),
-            occurrences: sanitizeStoryAssetPublicDescriptionText(_0x1bda4a?.['occurrences']),
-            sourceChapterIds: _0x3150d4,
-            appearances: _0x282f73,
+            ref: ref,
+            kind: kind2,
+            name: name,
+            role: normalizeText(error2?.['role']),
+            description: sanitizeStoryAssetPublicDescriptionText(error2?.['description']),
+            voiceDescription: sanitizeStoryAssetPublicDescriptionText(value23),
+            occurrences: sanitizeStoryAssetPublicDescriptionText(error2?.['occurrences']),
+            sourceChapterIds: sourceChapterIds2,
+            appearances: appearances2,
           };
         })['filter'](Boolean)
       : [],
-    _0x3d6b87 = Boolean(allowEmptyResult) || (_0x50c8d4['length'] === 0x1 && _0x50c8d4[0x0] === 'prop');
-  if (!_0x5ec724['length'] && !_0x3d6b87) {
-    const _0x17d0d2 =
-        _0x290ef7 && typeof _0x290ef7 === 'object' && !Array['isArray'](_0x290ef7)
-          ? Object['keys'](_0x290ef7)['slice'](0x0, 0xc)
+    enabled3 =
+      Boolean(allowEmptyResult) || (allowedKinds2['length'] === 0x1 && allowedKinds2[0x0] === 'prop');
+  if (!assets2['length'] && !enabled3) {
+    const topLevelKeys =
+        strictJson && typeof strictJson === 'object' && !Array['isArray'](strictJson)
+          ? Object['keys'](strictJson)['slice'](0x0, 0xc)
           : [],
-      _0x2b389b =
-        _0x50c8d4['length'] === 0x1
-          ? { character: '角色', scene: '场景', prop: '道具' }[_0x50c8d4[0x0]] || '资产'
+      value32 =
+        allowedKinds2['length'] === 0x1
+          ? { character: '角色', scene: '场景', prop: '道具' }[allowedKinds2[0x0]] || '资产'
           : '角色或场景',
-      _0x2835bf = new Error('Agent 返回结果没有可用的' + _0x2b389b + '资产。');
-    _0x2835bf['raw'] = {
-      allowedKinds: _0x50c8d4,
-      topLevelKeys: _0x17d0d2,
-      returnedAssetCount: _0x3a0ac1['length'],
+      error6 = new Error('Agent 返回结果没有可用的' + value32 + '资产。');
+    error6['raw'] = {
+      allowedKinds: allowedKinds2,
+      topLevelKeys: topLevelKeys,
+      returnedAssetCount: returnedAssetCount['length'],
     };
-    throw _0x2835bf;
+    throw error6;
   }
-  const _0xf43ab0 = _0x5ec724['map']((_0x21e1f6) => _0x21e1f6['ref']);
-  if (new Set(_0xf43ab0)['size'] !== _0xf43ab0['length']) throw new Error('Agent 返回了重复的资产引用。');
-  return { schemaVersion: STORY_ASSET_EXTRACTION_SCHEMA_VERSION, assets: _0x5ec724 };
+  const list17 = assets2['map']((value33) => value33['ref']);
+  if (new Set(list17)['size'] !== list17['length']) throw new Error('Agent 返回了重复的资产引用。');
+  return { schemaVersion: STORY_ASSET_EXTRACTION_SCHEMA_VERSION, assets: assets2 };
 }
-function createStoryAssetCompactOccurrence(_0x483ccd = []) {
-  const _0x5b6198 = normalizeStringArray(_0x483ccd)
-    ['map']((_0x2a141e) => {
-      const _0x39a245 = normalizeText(_0x2a141e)['match'](/(\d+)\s*$/u)?.[0x1];
+function createStoryAssetCompactOccurrence(list18 = []) {
+  const list19 = normalizeStringArray(list18)
+    ['map']((value34) => {
+      const text4 = normalizeText(value34)['match'](/(\d+)\s*$/u)?.[0x1];
       return (
-        _0x39a245 ||
-        normalizeText(_0x2a141e)
+        text4 ||
+        normalizeText(value34)
           ['replace'](/^episode[-_\s]*/iu, '')
           ['replace'](/^chapter[-_\s]*/iu, '')
       );
     })
     ['filter'](Boolean);
-  return '第' + (_0x5b6198['join']('、') || '相关') + '集';
+  return '第' + (list19['join']('、') || '相关') + '集';
 }
 export function parseStoryAssetCompactExtractionResult(
-  _0x309ccd,
+  value35,
   {
     assetKinds: assetKinds = STORY_ASSET_EXTRACTION_KINDS,
     chapterIds: chapterIds = [],
@@ -432,9 +417,9 @@ export function parseStoryAssetCompactExtractionResult(
     contractSnapshot: contractSnapshot = null,
   } = {},
 ) {
-  const _0x4b4717 = parseStrictJson(getResultText(_0x309ccd), 'Agent\x20未返回紧凑资产结果。'),
-    _0x3775f4 = Array['isArray'](_0x4b4717?.['assets']) ? _0x4b4717['assets'] : [],
-    _0x211a28 =
+  const strictJson2 = parseStrictJson(getResultText(value35), 'Agent\x20未返回紧凑资产结果。'),
+    list20 = Array['isArray'](strictJson2?.['assets']) ? strictJson2['assets'] : [],
+    value36 =
       contractSnapshot &&
       typeof contractSnapshot === 'object' &&
       Number(contractSnapshot['responseSchemaVersion']) === STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION
@@ -453,124 +438,115 @@ export function parseStoryAssetCompactExtractionResult(
             requiredAssetsByKind,
             { includeClientKeys: !![] },
           )['payload'],
-    _0x5d77dc = Array['isArray'](_0x211a28['requiredAssets']) ? _0x211a28['requiredAssets'] : [],
-    _0x3049a3 = Array['isArray'](_0x211a28['candidateAssets']) ? _0x211a28['candidateAssets'] : [],
-    _0x31135f = [..._0x5d77dc, ..._0x3049a3],
-    _0x1ec81b = new Map(
-      _0x31135f['map']((_0x5a1272) => [normalizeText(_0x5a1272?.['clientKey']), _0x5a1272]),
-    );
-  if (
-    _0x1ec81b['size'] !== _0x31135f['length'] ||
-    [..._0x1ec81b['keys']()]['some']((_0x57bf6e) => !_0x57bf6e)
-  )
+    list21 = Array['isArray'](value36['requiredAssets']) ? value36['requiredAssets'] : [],
+    args3 = Array['isArray'](value36['candidateAssets']) ? value36['candidateAssets'] : [],
+    list22 = [...list21, ...args3],
+    map3 = new Map(list22['map']((value37) => [normalizeText(value37?.['clientKey']), value37]));
+  if (map3['size'] !== list22['length'] || [...map3['keys']()]['some']((enabled4) => !enabled4))
     throw new Error('客户端紧凑资产合同包含空或重复\x20clientKey。');
-  const _0x230106 = new Set(_0x5d77dc['map']((_0x354138) => normalizeText(_0x354138?.['clientKey']))),
-    _0x10f980 = new Map();
-  _0x3775f4['forEach']((_0x4c2b20, _0x3cd25b) => {
-    const _0x53190a = normalizeText(_0x4c2b20?.['clientKey']);
-    if (!_0x1ec81b['has'](_0x53190a))
+  const required = new Set(list21['map']((value38) => normalizeText(value38?.['clientKey']))),
+    map4 = new Map();
+  list20['forEach']((value39, value40) => {
+    const text5 = normalizeText(value39?.['clientKey']);
+    if (!map3['has'](text5))
       throw new Error(
-        'Agent 紧凑结果返回了未知 clientKey：' + (_0x53190a || '第' + (_0x3cd25b + 0x1) + '行') + '。',
+        'Agent 紧凑结果返回了未知 clientKey：' + (text5 || '第' + (value40 + 0x1) + '行') + '。',
       );
-    if (_0x10f980['has'](_0x53190a))
-      throw new Error('Agent\x20紧凑结果重复返回\x20clientKey：' + _0x53190a + '。');
-    if (typeof _0x4c2b20?.['include'] !== 'boolean')
-      throw new Error('Agent\x20紧凑结果中的\x20' + _0x53190a + ' 缺少明确 include 裁决。');
-    if (_0x230106['has'](_0x53190a) && _0x4c2b20['include'] === ![])
-      throw new Error('Agent 紧凑结果试图排除必需资产 ' + _0x53190a + '；必需资产不能排除。');
-    _0x10f980['set'](_0x53190a, _0x4c2b20);
+    if (map4['has'](text5)) throw new Error('Agent\x20紧凑结果重复返回\x20clientKey：' + text5 + '。');
+    if (typeof value39?.['include'] !== 'boolean')
+      throw new Error('Agent\x20紧凑结果中的\x20' + text5 + ' 缺少明确 include 裁决。');
+    if (required['has'](text5) && value39['include'] === ![])
+      throw new Error('Agent 紧凑结果试图排除必需资产 ' + text5 + '；必需资产不能排除。');
+    map4['set'](text5, value39);
   });
-  const _0x160b0e = _0x31135f['filter']((_0x4d6885) => !_0x10f980['has'](_0x4d6885['clientKey']))['map'](
-    (_0x258ba8) => _0x258ba8['clientKey'],
+  const list23 = list22['filter']((value41) => !map4['has'](value41['clientKey']))['map'](
+    (value42) => value42['clientKey'],
   );
-  if (_0x160b0e['length'])
-    throw new Error('Agent 紧凑结果缺少合同裁决：' + _0x160b0e['slice'](0x0, 0x8)['join']('、') + '。');
-  if (_0x3775f4['length'] !== _0x31135f['length'])
+  if (list23['length'])
+    throw new Error('Agent 紧凑结果缺少合同裁决：' + list23['slice'](0x0, 0x8)['join']('、') + '。');
+  if (list20['length'] !== list22['length'])
     throw new Error(
-      'Agent 紧凑结果必须返回 ' +
-        _0x31135f['length'] +
-        ' 条合同裁决，实际返回 ' +
-        _0x3775f4['length'] +
-        ' 条。',
+      'Agent 紧凑结果必须返回 ' + list22['length'] + ' 条合同裁决，实际返回 ' + list20['length'] + ' 条。',
     );
-  const _0x146710 = new Set(),
-    _0x11885e = _0x31135f['map']((_0x46904a) => {
-      const _0x3fce50 = _0x10f980['get'](_0x46904a['clientKey']),
-        _0x57426d = normalizeStoryAssetExtractionKind(_0x46904a['kind']),
-        _0x271c39 = normalizeText(_0x46904a['name']),
-        _0x1f8c8f = _0x57426d + ':' + _0x271c39['normalize']('NFKC')['toLowerCase']();
-      if (!_0x57426d || !_0x271c39)
-        throw new Error('客户端紧凑资产合同 ' + _0x46904a['clientKey'] + '\x20缺少\x20kind\x20或\x20name。');
-      const _0x450f86 = _0x3fce50['include'] === !![],
-        _0x57f89b = sanitizeStoryAssetPublicDescriptionText(_0x3fce50['description']),
-        _0x2d8da9 = sanitizeStoryAssetPublicPromptText(_0x3fce50['visualPrompt']),
-        _0x469812 = sanitizeStoryAssetPublicDescriptionText(_0x3fce50['voiceDescription']);
-      if (_0x450f86 && !_0x57f89b)
-        throw new Error('Agent 紧凑结果中的“' + _0x271c39 + '”缺少最终 description。');
-      if (_0x450f86 && !_0x2d8da9)
-        throw new Error('Agent 紧凑结果中的“' + _0x271c39 + '”缺少最终 visualPrompt。');
-      const _0x1c5520 = _0x450f86 && _0x57426d === 'character' ? _0x469812 : '';
-      if (_0x450f86 && _0x57426d !== 'character' && _0x469812)
-        throw new Error('Agent 紧凑结果中的非角色资产“' + _0x271c39 + '”不得返回 voiceDescription。');
+  const map5 = new Set(),
+    decisions = list22['map']((clientKey) => {
+      const value43 = map4['get'](clientKey['clientKey']),
+        kind3 = normalizeStoryAssetExtractionKind(clientKey['kind']),
+        name3 = normalizeText(clientKey['name']),
+        value44 = kind3 + ':' + name3['normalize']('NFKC')['toLowerCase']();
+      if (!kind3 || !name3)
+        throw new Error('客户端紧凑资产合同 ' + clientKey['clientKey'] + '\x20缺少\x20kind\x20或\x20name。');
+      const include = value43['include'] === !![],
+        description = sanitizeStoryAssetPublicDescriptionText(value43['description']),
+        visualPrompt = sanitizeStoryAssetPublicPromptText(value43['visualPrompt']),
+        sanitizeStoryAssetPublicDescriptionText2 = sanitizeStoryAssetPublicDescriptionText(
+          value43['voiceDescription'],
+        );
+      if (include && !description) throw new Error('Agent 紧凑结果中的“' + name3 + '”缺少最终 description。');
+      if (include && !visualPrompt)
+        throw new Error('Agent 紧凑结果中的“' + name3 + '”缺少最终 visualPrompt。');
+      const voiceDescription =
+        include && kind3 === 'character' ? sanitizeStoryAssetPublicDescriptionText2 : '';
+      if (include && kind3 !== 'character' && sanitizeStoryAssetPublicDescriptionText2)
+        throw new Error('Agent 紧凑结果中的非角色资产“' + name3 + '”不得返回 voiceDescription。');
       return {
-        clientKey: _0x46904a['clientKey'],
-        kind: _0x57426d,
-        name: _0x271c39,
-        required: _0x230106['has'](_0x46904a['clientKey']),
-        include: _0x450f86,
-        description: _0x57f89b,
-        visualPrompt: _0x2d8da9,
-        voiceDescription: _0x1c5520,
-        sourceSceneRefs: normalizeStringArray(_0x46904a['sourceSceneRefs']),
-        sourceChapterIds: normalizeStringArray(_0x46904a['sourceChapterIds']),
+        clientKey: clientKey['clientKey'],
+        kind: kind3,
+        name: name3,
+        required: required['has'](clientKey['clientKey']),
+        include: include,
+        description: description,
+        visualPrompt: visualPrompt,
+        voiceDescription: voiceDescription,
+        sourceSceneRefs: normalizeStringArray(clientKey['sourceSceneRefs']),
+        sourceChapterIds: normalizeStringArray(clientKey['sourceChapterIds']),
       };
     }),
-    _0x57c7c3 = _0x31135f['flatMap']((_0xda8d19) => {
-      const _0x205cdc = _0x11885e['find']((_0x4343ca) => _0x4343ca['clientKey'] === _0xda8d19['clientKey']);
-      if (!_0x205cdc?.['include']) return [];
+    assets3 = list22['flatMap']((value45) => {
+      const enabled5 = decisions['find']((value46) => value46['clientKey'] === value45['clientKey']);
+      if (!enabled5?.['include']) return [];
       const {
-          kind: _0x2551a7,
-          name: _0x2f6db1,
-          description: _0x84715e,
-          visualPrompt: _0x4853cc,
-          voiceDescription: _0x50c4ac,
-        } = _0x205cdc,
-        _0x1eddb8 = _0x2551a7 + ':' + _0x2f6db1['normalize']('NFKC')['toLowerCase']();
-      if (_0x146710['has'](_0x1eddb8))
-        throw new Error('Agent 紧凑结果返回了重复资产名称“' + _0x2f6db1 + '”。');
-      _0x146710['add'](_0x1eddb8);
-      const _0x334043 = normalizeStringArray(_0xda8d19['sourceChapterIds'])['filter'](
-          (_0x336317) => !chapterIds['length'] || chapterIds['includes'](_0x336317),
+          kind: kind4,
+          name: name4,
+          description: description2,
+          visualPrompt: visualPrompt2,
+          voiceDescription: voiceDescription2,
+        } = enabled5,
+        value47 = kind4 + ':' + name4['normalize']('NFKC')['toLowerCase']();
+      if (map5['has'](value47)) throw new Error('Agent 紧凑结果返回了重复资产名称“' + name4 + '”。');
+      map5['add'](value47);
+      const sourceChapterIds3 = normalizeStringArray(value45['sourceChapterIds'])['filter'](
+          (value48) => !chapterIds['length'] || chapterIds['includes'](value48),
         ),
-        _0xbb89b9 = createStoryAssetCompactOccurrence(_0x334043),
-        _0x33cbc4 = normalizeStoryAssetReference(_0xda8d19['clientKey'], _0x2551a7 + '-asset'),
-        _0x48e323 = _0x2551a7 === 'character' ? '日常形象' : _0x2551a7 === 'scene' ? '标准环境' : '标准状态';
+        occurrences = createStoryAssetCompactOccurrence(sourceChapterIds3),
+        ref2 = normalizeStoryAssetReference(value45['clientKey'], kind4 + '-asset'),
+        name5 = kind4 === 'character' ? '日常形象' : kind4 === 'scene' ? '标准环境' : '标准状态';
       return [
         {
-          ref: _0x33cbc4,
-          kind: _0x2551a7,
-          name: _0x2f6db1,
+          ref: ref2,
+          kind: kind4,
+          name: name4,
           role:
-            _0x2551a7 === 'character'
-              ? ['主角', '配角', '反派', '路人']['includes'](normalizeText(_0xda8d19['role']))
-                ? normalizeText(_0xda8d19['role'])
+            kind4 === 'character'
+              ? ['主角', '配角', '反派', '路人']['includes'](normalizeText(value45['role']))
+                ? normalizeText(value45['role'])
                 : '配角'
-              : _0x2551a7 === 'scene'
+              : kind4 === 'scene'
                 ? '剧情场景'
                 : '关键道具',
-          description: _0x84715e,
-          voiceDescription: _0x50c4ac,
-          occurrences: _0xbb89b9,
-          sourceChapterIds: _0x334043,
-          sourceSceneRefs: normalizeStringArray(_0xda8d19['sourceSceneRefs']),
+          description: description2,
+          voiceDescription: voiceDescription2,
+          occurrences: occurrences,
+          sourceChapterIds: sourceChapterIds3,
+          sourceSceneRefs: normalizeStringArray(value45['sourceSceneRefs']),
           appearances: [
             {
-              ref: _0x33cbc4 + '-base',
-              name: _0x48e323,
-              description: _0x84715e,
-              occurrences: _0xbb89b9,
-              sourceChapterIds: _0x334043,
-              prompt: _0x4853cc,
+              ref: ref2 + '-base',
+              name: name5,
+              description: description2,
+              occurrences: occurrences,
+              sourceChapterIds: sourceChapterIds3,
+              prompt: visualPrompt2,
             },
           ],
         },
@@ -579,7 +555,7 @@ export function parseStoryAssetCompactExtractionResult(
   return {
     schemaVersion: STORY_ASSET_EXTRACTION_SCHEMA_VERSION,
     responseSchemaVersion: STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION,
-    assets: _0x57c7c3,
-    decisions: _0x11885e,
+    assets: assets3,
+    decisions: decisions,
   };
 }

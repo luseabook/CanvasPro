@@ -2,71 +2,62 @@ export const DEFAULT_STORYBOARD_3D_TEXTURE_MAX_DIMENSION = 0x1000;
 export const DEFAULT_STORYBOARD_3D_TEXTURE_MAX_PIXELS = 0x1000 * 0x1000;
 export const DEFAULT_STORYBOARD_3D_IMAGE_MAX_BYTES = 0x40 * 0x400 * 0x400;
 const ownedTextureResources = new WeakMap();
-function finitePositiveInteger(_0x506f42, _0x4885c9 = 0x0) {
-  const _0x597643 = Math['floor'](Number(_0x506f42));
-  return Number['isFinite'](_0x597643) && _0x597643 > 0x0 ? _0x597643 : _0x4885c9;
+function finitePositiveInteger(value, item = 0x0) {
+  const count = Math['floor'](Number(value));
+  return Number['isFinite'](count) && count > 0x0 ? count : item;
 }
-function createAbortError(_0xbb54d4 = 'Texture\x20processing\x20was\x20cancelled') {
-  const _0x496bab = new Error(
-    String(_0xbb54d4?.['message'] || _0xbb54d4 || 'Texture\x20processing\x20was\x20cancelled'),
+function createAbortError(error = 'Texture\x20processing\x20was\x20cancelled') {
+  const error2 = new Error(
+    String(error?.['message'] || error || 'Texture\x20processing\x20was\x20cancelled'),
   );
-  return ((_0x496bab['name'] = 'AbortError'), (_0x496bab['code'] = 'ABORT_ERR'), _0x496bab);
+  return ((error2['name'] = 'AbortError'), (error2['code'] = 'ABORT_ERR'), error2);
 }
-function throwIfAborted(_0x56b2d9) {
-  if (_0x56b2d9?.['aborted']) throw createAbortError(_0x56b2d9['reason']);
+function throwIfAborted(key) {
+  if (key?.['aborted']) throw createAbortError(key['reason']);
 }
-function textureSource(_0x410538) {
-  return _0x410538?.['source']?.['data'] ?? _0x410538?.['image'] ?? null;
+function textureSource(index) {
+  return index?.['source']?.['data'] ?? index?.['image'] ?? null;
 }
-function imageDimensions(_0x6ca600) {
-  if (Array['isArray'](_0x6ca600))
-    return _0x6ca600['reduce']((_0x524a41, _0x484b77) => {
-      const _0x3d9d14 = imageDimensions(_0x484b77);
-      if (!_0x3d9d14) return _0x524a41;
-      if (!_0x524a41 || _0x3d9d14['width'] * _0x3d9d14['height'] > _0x524a41['width'] * _0x524a41['height'])
-        return _0x3d9d14;
-      return _0x524a41;
+function imageDimensions(box) {
+  if (Array['isArray'](box))
+    return box['reduce']((box2, result) => {
+      const box3 = imageDimensions(result);
+      if (!box3) return box2;
+      if (!box2 || box3['width'] * box3['height'] > box2['width'] * box2['height']) return box3;
+      return box2;
     }, null);
-  const _0x264324 = finitePositiveInteger(
-      _0x6ca600?.['naturalWidth'] ?? _0x6ca600?.['videoWidth'] ?? _0x6ca600?.['width'],
-    ),
-    _0xac3f0 = finitePositiveInteger(
-      _0x6ca600?.['naturalHeight'] ?? _0x6ca600?.['videoHeight'] ?? _0x6ca600?.['height'],
-    );
-  return _0x264324 && _0xac3f0 ? { width: _0x264324, height: _0xac3f0 } : null;
+  const width = finitePositiveInteger(box?.['naturalWidth'] ?? box?.['videoWidth'] ?? box?.['width']),
+    height = finitePositiveInteger(box?.['naturalHeight'] ?? box?.['videoHeight'] ?? box?.['height']);
+  return width && height ? { width: width, height: height } : null;
 }
-function materialTextures(_0xa374b) {
-  const _0x7fd92c = new Set(),
-    _0x103110 = new WeakSet(),
-    _0x5a56eb = (_0x475752, _0x3bb0b4 = 0x0) => {
-      if (!_0x475752 || _0x3bb0b4 > 0x4) return;
-      if (_0x475752['isTexture']) {
-        _0x7fd92c['add'](_0x475752);
+function materialTextures(data) {
+  const options = new Set(),
+    map = new WeakSet(),
+    handler = (list, count2 = 0x0) => {
+      if (!list || count2 > 0x4) return;
+      if (list['isTexture']) {
+        options['add'](list);
         return;
       }
-      if (_0x475752 instanceof ArrayBuffer || ArrayBuffer['isView'](_0x475752)) return;
-      if (typeof _0x475752 !== 'object' || _0x103110['has'](_0x475752)) return;
-      _0x103110['add'](_0x475752);
-      if (Array['isArray'](_0x475752)) {
-        _0x475752['forEach']((_0x4eba1a) => _0x5a56eb(_0x4eba1a, _0x3bb0b4 + 0x1));
+      if (list instanceof ArrayBuffer || ArrayBuffer['isView'](list)) return;
+      if (typeof list !== 'object' || map['has'](list)) return;
+      map['add'](list);
+      if (Array['isArray'](list)) {
+        list['forEach']((target) => handler(target, count2 + 0x1));
         return;
       }
-      Object['values'](_0x475752)['forEach']((_0xc4cd5f) => _0x5a56eb(_0xc4cd5f, _0x3bb0b4 + 0x1));
+      Object['values'](list)['forEach']((source) => handler(source, count2 + 0x1));
     };
-  return (_0x5a56eb(_0xa374b), _0x7fd92c);
+  return (handler(data), options);
 }
-function computeTargetSize(_0x2b2d29, _0x25f0a6, _0x300f3f) {
-  const _0x1bb568 = Math['min'](
-      0x1,
-      _0x300f3f['maxDimension'] / _0x2b2d29,
-      _0x300f3f['maxDimension'] / _0x25f0a6,
-    ),
-    _0x44f26c = Math['min'](0x1, Math['sqrt'](_0x300f3f['maxPixels'] / (_0x2b2d29 * _0x25f0a6))),
-    _0x4adae7 = Math['min'](_0x1bb568, _0x44f26c);
+function computeTargetSize(next, current, entry) {
+  const record = Math['min'](0x1, entry['maxDimension'] / next, entry['maxDimension'] / current),
+    payload = Math['min'](0x1, Math['sqrt'](entry['maxPixels'] / (next * current))),
+    scale = Math['min'](record, payload);
   return {
-    width: Math['max'](0x1, Math['floor'](_0x2b2d29 * _0x4adae7)),
-    height: Math['max'](0x1, Math['floor'](_0x25f0a6 * _0x4adae7)),
-    scale: _0x4adae7,
+    width: Math['max'](0x1, Math['floor'](next * scale)),
+    height: Math['max'](0x1, Math['floor'](current * scale)),
+    scale: scale,
   };
 }
 export function resolveStoryboard3DTextureLimits({
@@ -74,49 +65,50 @@ export function resolveStoryboard3DTextureLimits({
   policyMaxDimension: policyMaxDimension = DEFAULT_STORYBOARD_3D_TEXTURE_MAX_DIMENSION,
   policyMaxPixels: policyMaxPixels = DEFAULT_STORYBOARD_3D_TEXTURE_MAX_PIXELS,
 } = {}) {
-  const _0x3f7b5f = finitePositiveInteger(renderer?.['capabilities']?.['maxTextureSize']),
-    _0x151f05 = finitePositiveInteger(policyMaxDimension, DEFAULT_STORYBOARD_3D_TEXTURE_MAX_DIMENSION);
+  const maxDimension = finitePositiveInteger(renderer?.['capabilities']?.['maxTextureSize']),
+    policyMaxDimension2 = finitePositiveInteger(
+      policyMaxDimension,
+      DEFAULT_STORYBOARD_3D_TEXTURE_MAX_DIMENSION,
+    );
   return {
-    maxDimension: _0x3f7b5f ? Math['min'](_0x3f7b5f, _0x151f05) : _0x151f05,
+    maxDimension: maxDimension ? Math['min'](maxDimension, policyMaxDimension2) : policyMaxDimension2,
     maxPixels: finitePositiveInteger(policyMaxPixels, DEFAULT_STORYBOARD_3D_TEXTURE_MAX_PIXELS),
-    hardwareMaxTextureSize: _0x3f7b5f || null,
-    policyMaxDimension: _0x151f05,
+    hardwareMaxTextureSize: maxDimension || null,
+    policyMaxDimension: policyMaxDimension2,
   };
 }
-export function inspectStoryboard3DSceneTextures(_0xebaaf2, _0x4fad91 = {}) {
-  const _0x4d6802 = resolveStoryboard3DTextureLimits(_0x4fad91),
-    _0x3de3c0 = new Map(),
-    _0x54dd7c = (_0x16cb4f, _0x200b39) => {
-      if (!_0x16cb4f?.['isTexture']) return;
-      if (!_0x3de3c0['has'](_0x16cb4f)) _0x3de3c0['set'](_0x16cb4f, []);
-      _0x3de3c0['get'](_0x16cb4f)['push'](_0x200b39);
+export function inspectStoryboard3DSceneTextures(handle, state = {}) {
+  const limits = resolveStoryboard3DTextureLimits(state),
+    map2 = new Map(),
+    handler2 = (enabled, config) => {
+      if (!enabled?.['isTexture']) return;
+      if (!map2['has'](enabled)) map2['set'](enabled, []);
+      map2['get'](enabled)['push'](config);
     };
-  (_0x54dd7c(_0xebaaf2?.['background'], 'scene.background'),
-    _0x54dd7c(_0xebaaf2?.['environment'], 'scene.environment'),
-    _0xebaaf2?.['traverse']?.((_0x165570) => {
-      const _0x2ec065 = Array['isArray'](_0x165570?.['material'])
-        ? _0x165570['material']
-        : [_0x165570?.['material']];
-      _0x2ec065['filter'](Boolean)['forEach']((_0x4a5861, _0x24d1e6) => {
-        materialTextures(_0x4a5861)['forEach']((_0x5b2d5a) =>
-          _0x54dd7c(
-            _0x5b2d5a,
-            String(_0x165570?.['name'] || _0x165570?.['uuid'] || _0x165570?.['type'] || 'object') +
+  (handler2(handle?.['background'], 'scene.background'),
+    handler2(handle?.['environment'], 'scene.environment'),
+    handle?.['traverse']?.((error3) => {
+      const list2 = Array['isArray'](error3?.['material']) ? error3['material'] : [error3?.['material']];
+      list2['filter'](Boolean)['forEach']((scope, input) => {
+        materialTextures(scope)['forEach']((output) =>
+          handler2(
+            output,
+            String(error3?.['name'] || error3?.['uuid'] || error3?.['type'] || 'object') +
               '.material[' +
-              _0x24d1e6 +
+              input +
               ']',
           ),
         );
       });
     }));
-  const _0x80bd58 = [..._0x3de3c0['entries']()]['map'](([_0x40e2e7, _0x3c5279], _0x593305) => {
-    const _0x27467e = textureSource(_0x40e2e7),
-      _0x178e9c = imageDimensions(_0x27467e);
-    if (!_0x178e9c)
+  const textures = [...map2['entries']()]['map'](([texture, references], textureIndex) => {
+    const textureSource2 = textureSource(texture),
+      width2 = imageDimensions(textureSource2);
+    if (!width2)
       return {
-        texture: _0x40e2e7,
-        textureIndex: _0x593305,
-        references: _0x3c5279,
+        texture: texture,
+        textureIndex: textureIndex,
+        references: references,
         width: null,
         height: null,
         pixelCount: null,
@@ -125,369 +117,368 @@ export function inspectStoryboard3DSceneTextures(_0xebaaf2, _0x4fad91 = {}) {
         action: 'warning',
         reasons: ['TEXTURE_DIMENSIONS_UNKNOWN'],
       };
-    const _0x307ab3 = computeTargetSize(_0x178e9c['width'], _0x178e9c['height'], _0x4d6802),
-      _0x2c1459 = [];
+    const targetWidth = computeTargetSize(width2['width'], width2['height'], limits),
+      action = [];
     return (
-      (_0x178e9c['width'] > _0x4d6802['maxDimension'] || _0x178e9c['height'] > _0x4d6802['maxDimension']) &&
-        _0x2c1459['push']('TEXTURE_DIMENSION_EXCEEDS_LIMIT'),
-      _0x178e9c['width'] * _0x178e9c['height'] > _0x4d6802['maxPixels'] &&
-        _0x2c1459['push']('TEXTURE_PIXEL_COUNT_EXCEEDS_LIMIT'),
+      (width2['width'] > limits['maxDimension'] || width2['height'] > limits['maxDimension']) &&
+        action['push']('TEXTURE_DIMENSION_EXCEEDS_LIMIT'),
+      width2['width'] * width2['height'] > limits['maxPixels'] &&
+        action['push']('TEXTURE_PIXEL_COUNT_EXCEEDS_LIMIT'),
       {
-        texture: _0x40e2e7,
-        textureIndex: _0x593305,
-        references: _0x3c5279,
-        width: _0x178e9c['width'],
-        height: _0x178e9c['height'],
-        pixelCount: _0x178e9c['width'] * _0x178e9c['height'],
-        targetWidth: _0x307ab3['width'],
-        targetHeight: _0x307ab3['height'],
-        action: _0x2c1459['length'] ? 'downsample' : 'keep',
-        reasons: _0x2c1459,
+        texture: texture,
+        textureIndex: textureIndex,
+        references: references,
+        width: width2['width'],
+        height: width2['height'],
+        pixelCount: width2['width'] * width2['height'],
+        targetWidth: targetWidth['width'],
+        targetHeight: targetWidth['height'],
+        action: action['length'] ? 'downsample' : 'keep',
+        reasons: action,
       }
     );
   });
   return {
-    limits: _0x4d6802,
-    textures: _0x80bd58,
-    total: _0x80bd58['length'],
-    oversized: _0x80bd58['filter']((_0x354dcc) => _0x354dcc['action'] === 'downsample')['length'],
-    warnings: _0x80bd58['filter']((_0x1094b9) => _0x1094b9['action'] === 'warning')['length'],
+    limits: limits,
+    textures: textures,
+    total: textures['length'],
+    oversized: textures['filter']((value2) => value2['action'] === 'downsample')['length'],
+    warnings: textures['filter']((value3) => value3['action'] === 'warning')['length'],
   };
 }
-function closeResource(_0x3a9353) {
+function closeResource(value4) {
   try {
-    _0x3a9353?.['close']?.();
+    value4?.['close']?.();
   } catch {}
 }
-export function releaseStoryboard3DTexturePolicyResource(_0x392e1c) {
-  const _0x351907 = ownedTextureResources['get'](_0x392e1c);
-  if (!_0x351907) return ![];
+export function releaseStoryboard3DTexturePolicyResource(el) {
+  const enabled2 = ownedTextureResources['get'](el);
+  if (!enabled2) return ![];
   return (
-    ownedTextureResources['delete'](_0x392e1c),
-    _0x392e1c?.['removeEventListener']?.('dispose', _0x351907['onDispose']),
-    closeResource(_0x351907['resource']),
+    ownedTextureResources['delete'](el),
+    el?.['removeEventListener']?.('dispose', enabled2['onDispose']),
+    closeResource(enabled2['resource']),
     !![]
   );
 }
-function ownTextureResource(_0x8a0c46, _0x3ff4da) {
-  releaseStoryboard3DTexturePolicyResource(_0x8a0c46);
-  const _0x20571f = () => releaseStoryboard3DTexturePolicyResource(_0x8a0c46);
-  (ownedTextureResources['set'](_0x8a0c46, { resource: _0x3ff4da, onDispose: _0x20571f }),
-    _0x8a0c46?.['addEventListener']?.('dispose', _0x20571f));
+function ownTextureResource(el2, resource) {
+  releaseStoryboard3DTexturePolicyResource(el2);
+  const onDispose = () => releaseStoryboard3DTexturePolicyResource(el2);
+  (ownedTextureResources['set'](el2, { resource: resource, onDispose: onDispose }),
+    el2?.['addEventListener']?.('dispose', onDispose));
 }
 function defaultCreateCanvas(
-  _0xb9d43,
-  _0x3f93fa,
+  value5,
+  value6,
   {
     OffscreenCanvasConstructor: OffscreenCanvasConstructor = globalThis['OffscreenCanvas'],
     documentObject: documentObject = globalThis['document'],
   } = {},
 ) {
-  if (typeof OffscreenCanvasConstructor === 'function')
-    return new OffscreenCanvasConstructor(_0xb9d43, _0x3f93fa);
-  const _0x3f1b11 = documentObject?.['createElement']?.('canvas');
-  if (!_0x3f1b11) return null;
-  return ((_0x3f1b11['width'] = _0xb9d43), (_0x3f1b11['height'] = _0x3f93fa), _0x3f1b11);
+  if (typeof OffscreenCanvasConstructor === 'function') return new OffscreenCanvasConstructor(value5, value6);
+  const box4 = documentObject?.['createElement']?.('canvas');
+  if (!box4) return null;
+  return ((box4['width'] = value5), (box4['height'] = value6), box4);
 }
 async function createDownsampledSource(
-  _0x33a869,
-  _0x51a118,
-  _0x40ba40,
+  value7,
+  resizeWidth,
+  resizeHeight,
   {
-    signal: _0x5807f3,
+    signal: signal,
     createImageBitmapFn: createImageBitmapFn = globalThis['createImageBitmap'],
-    createCanvas: _0x9175d6,
-    OffscreenCanvasConstructor: _0x471ebe,
-    documentObject: _0x4b5880,
+    createCanvas: createCanvas,
+    OffscreenCanvasConstructor: OffscreenCanvasConstructor2,
+    documentObject: documentObject2,
   } = {},
 ) {
-  const _0x4c1c7c = [];
+  const list3 = [];
   if (typeof createImageBitmapFn === 'function')
     try {
-      const _0x483d3e = await createImageBitmapFn(_0x33a869, {
-        resizeWidth: _0x51a118,
-        resizeHeight: _0x40ba40,
+      const source2 = await createImageBitmapFn(value7, {
+        resizeWidth: resizeWidth,
+        resizeHeight: resizeHeight,
         resizeQuality: 'high',
       });
-      if (_0x5807f3?.['aborted']) {
-        closeResource(_0x483d3e);
-        throw createAbortError(_0x5807f3['reason']);
+      if (signal?.['aborted']) {
+        closeResource(source2);
+        throw createAbortError(signal['reason']);
       }
-      return { source: _0x483d3e, ownedResource: _0x483d3e, method: 'createImageBitmap' };
-    } catch (_0x2df075) {
-      if (_0x2df075?.['name'] === 'AbortError') throw _0x2df075;
-      _0x4c1c7c['push'](_0x2df075);
+      return { source: source2, ownedResource: source2, method: 'createImageBitmap' };
+    } catch (error4) {
+      if (error4?.['name'] === 'AbortError') throw error4;
+      list3['push'](error4);
     }
-  throwIfAborted(_0x5807f3);
+  throwIfAborted(signal);
   try {
-    const _0x2966f1 =
-      typeof _0x9175d6 === 'function'
-        ? await _0x9175d6(_0x51a118, _0x40ba40)
-        : defaultCreateCanvas(_0x51a118, _0x40ba40, {
-            OffscreenCanvasConstructor: _0x471ebe,
-            documentObject: _0x4b5880,
+    const source3 =
+      typeof createCanvas === 'function'
+        ? await createCanvas(resizeWidth, resizeHeight)
+        : defaultCreateCanvas(resizeWidth, resizeHeight, {
+            OffscreenCanvasConstructor: OffscreenCanvasConstructor2,
+            documentObject: documentObject2,
           });
-    if (!_0x2966f1) throw new Error('Canvas creation is unavailable');
-    ((_0x2966f1['width'] = _0x51a118), (_0x2966f1['height'] = _0x40ba40));
-    const _0x1b94fb = _0x2966f1['getContext']?.('2d', { alpha: !![] });
-    if (!_0x1b94fb?.['drawImage']) throw new Error('A drawable 2D canvas context is unavailable');
-    (_0x1b94fb['drawImage'](_0x33a869, 0x0, 0x0, _0x51a118, _0x40ba40), throwIfAborted(_0x5807f3));
-    if (typeof _0x2966f1['transferToImageBitmap'] === 'function') {
-      const _0x505b90 = _0x2966f1['transferToImageBitmap']();
-      if (_0x5807f3?.['aborted']) {
-        closeResource(_0x505b90);
-        throw createAbortError(_0x5807f3['reason']);
+    if (!source3) throw new Error('Canvas creation is unavailable');
+    ((source3['width'] = resizeWidth), (source3['height'] = resizeHeight));
+    const ctx = source3['getContext']?.('2d', { alpha: !![] });
+    if (!ctx?.['drawImage']) throw new Error('A drawable 2D canvas context is unavailable');
+    (ctx['drawImage'](value7, 0x0, 0x0, resizeWidth, resizeHeight), throwIfAborted(signal));
+    if (typeof source3['transferToImageBitmap'] === 'function') {
+      const source4 = source3['transferToImageBitmap']();
+      if (signal?.['aborted']) {
+        closeResource(source4);
+        throw createAbortError(signal['reason']);
       }
-      return { source: _0x505b90, ownedResource: _0x505b90, method: 'offscreen-canvas' };
+      return { source: source4, ownedResource: source4, method: 'offscreen-canvas' };
     }
-    return { source: _0x2966f1, ownedResource: null, method: 'canvas' };
-  } catch (_0x30833) {
-    if (_0x30833?.['name'] === 'AbortError') throw _0x30833;
-    _0x4c1c7c['push'](_0x30833);
+    return { source: source3, ownedResource: null, method: 'canvas' };
+  } catch (error5) {
+    if (error5?.['name'] === 'AbortError') throw error5;
+    list3['push'](error5);
   }
-  const _0x507ebe = new Error('Texture cannot be downsampled in this runtime.');
-  ((_0x507ebe['code'] = 'TEXTURE_DOWNSAMPLE_UNAVAILABLE'), (_0x507ebe['causes'] = _0x4c1c7c));
-  throw _0x507ebe;
+  const error6 = new Error('Texture cannot be downsampled in this runtime.');
+  ((error6['code'] = 'TEXTURE_DOWNSAMPLE_UNAVAILABLE'), (error6['causes'] = list3));
+  throw error6;
 }
 export async function downsampleStoryboard3DTexture(
-  _0x3f778d,
-  { width: _0xa59772, height: _0x3f9de4, signal: _0x12309f, ..._0x4cc8d7 } = {},
+  colorSpace,
+  { width: width3, height: height2, signal: signal2, ...args } = {},
 ) {
-  if (!_0x3f778d?.['isTexture']) throw new TypeError('A Three.js texture is required.');
-  const _0x4034c3 = textureSource(_0x3f778d);
+  if (!colorSpace?.['isTexture']) throw new TypeError('A Three.js texture is required.');
+  const textureSource3 = textureSource(colorSpace);
   if (
-    !_0x4034c3 ||
-    Array['isArray'](_0x4034c3) ||
-    _0x3f778d['isCompressedTexture'] ||
-    _0x3f778d['isDataTexture']
+    !textureSource3 ||
+    Array['isArray'](textureSource3) ||
+    colorSpace['isCompressedTexture'] ||
+    colorSpace['isDataTexture']
   ) {
-    const _0x188b9d = new Error('Texture\x20source\x20is\x20not\x20a\x20drawable\x202D\x20image.');
-    _0x188b9d['code'] = 'TEXTURE_DOWNSAMPLE_UNAVAILABLE';
-    throw _0x188b9d;
+    const error7 = new Error('Texture\x20source\x20is\x20not\x20a\x20drawable\x202D\x20image.');
+    error7['code'] = 'TEXTURE_DOWNSAMPLE_UNAVAILABLE';
+    throw error7;
   }
-  const _0x1a8960 = finitePositiveInteger(_0xa59772),
-    _0x483d0b = finitePositiveInteger(_0x3f9de4);
-  if (!_0x1a8960 || !_0x483d0b) throw new TypeError('Positive target dimensions are required.');
-  throwIfAborted(_0x12309f);
-  const _0x2b15fd = { colorSpace: _0x3f778d['colorSpace'], flipY: _0x3f778d['flipY'] },
-    _0x53b921 = await createDownsampledSource(_0x4034c3, _0x1a8960, _0x483d0b, {
-      signal: _0x12309f,
-      ..._0x4cc8d7,
+  const width4 = finitePositiveInteger(width3),
+    height3 = finitePositiveInteger(height2);
+  if (!width4 || !height3) throw new TypeError('Positive target dimensions are required.');
+  throwIfAborted(signal2);
+  const value8 = { colorSpace: colorSpace['colorSpace'], flipY: colorSpace['flipY'] },
+    method = await createDownsampledSource(textureSource3, width4, height3, {
+      signal: signal2,
+      ...args,
     });
-  if (_0x12309f?.['aborted']) {
-    closeResource(_0x53b921['ownedResource']);
-    throw createAbortError(_0x12309f['reason']);
+  if (signal2?.['aborted']) {
+    closeResource(method['ownedResource']);
+    throw createAbortError(signal2['reason']);
   }
   try {
-    ((_0x3f778d['image'] = _0x53b921['source']),
-      (_0x3f778d['colorSpace'] = _0x2b15fd['colorSpace']),
-      (_0x3f778d['flipY'] = _0x2b15fd['flipY']),
-      (_0x3f778d['needsUpdate'] = !![]));
-  } catch (_0x37843d) {
+    ((colorSpace['image'] = method['source']),
+      (colorSpace['colorSpace'] = value8['colorSpace']),
+      (colorSpace['flipY'] = value8['flipY']),
+      (colorSpace['needsUpdate'] = !![]));
+  } catch (value9) {
     try {
-      ((_0x3f778d['image'] = _0x4034c3),
-        (_0x3f778d['colorSpace'] = _0x2b15fd['colorSpace']),
-        (_0x3f778d['flipY'] = _0x2b15fd['flipY']));
+      ((colorSpace['image'] = textureSource3),
+        (colorSpace['colorSpace'] = value8['colorSpace']),
+        (colorSpace['flipY'] = value8['flipY']));
     } catch {}
-    closeResource(_0x53b921['ownedResource']);
-    throw _0x37843d;
+    closeResource(method['ownedResource']);
+    throw value9;
   }
-  if (_0x53b921['ownedResource']) ownTextureResource(_0x3f778d, _0x53b921['ownedResource']);
-  else releaseStoryboard3DTexturePolicyResource(_0x3f778d);
-  return { texture: _0x3f778d, width: _0x1a8960, height: _0x483d0b, method: _0x53b921['method'] };
+  if (method['ownedResource']) ownTextureResource(colorSpace, method['ownedResource']);
+  else releaseStoryboard3DTexturePolicyResource(colorSpace);
+  return { texture: colorSpace, width: width4, height: height3, method: method['method'] };
 }
 export async function applyStoryboard3DTexturePolicy(
-  _0x5331aa,
-  { signal: _0x3dadc7, onProgress: _0x5f1a1b, ..._0x523324 } = {},
+  value10,
+  { signal: signal3, onProgress: onProgress, ...args2 } = {},
 ) {
-  throwIfAborted(_0x3dadc7);
-  const _0x228852 = inspectStoryboard3DSceneTextures(_0x5331aa, _0x523324),
-    _0x4bd55b = [],
-    _0x468868 = _0x228852['textures']
-      ['filter']((_0x97f14c) => _0x97f14c['action'] === 'warning')
-      ['map']((_0x89dd21) => ({
-        code: _0x89dd21['reasons'][0x0],
-        texture: _0x89dd21['texture'],
-        references: _0x89dd21['references'],
+  throwIfAborted(signal3);
+  const inspection = inspectStoryboard3DSceneTextures(value10, args2),
+    optimized = [],
+    warnings = inspection['textures']
+      ['filter']((value11) => value11['action'] === 'warning')
+      ['map']((code) => ({
+        code: code['reasons'][0x0],
+        texture: code['texture'],
+        references: code['references'],
         message:
           'Texture\x20dimensions\x20could\x20not\x20be\x20determined;\x20the\x20texture\x20was\x20kept\x20unchanged.',
       })),
-    _0x400ac3 = _0x228852['textures']['filter']((_0xb92078) => _0xb92078['action'] === 'downsample');
-  for (let _0x1a8f07 = 0x0; _0x1a8f07 < _0x400ac3['length']; _0x1a8f07 += 0x1) {
-    throwIfAborted(_0x3dadc7);
-    const _0x7c2fff = _0x400ac3[_0x1a8f07];
+    total = inspection['textures']['filter']((value12) => value12['action'] === 'downsample');
+  for (let completed = 0x0; completed < total['length']; completed += 0x1) {
+    throwIfAborted(signal3);
+    const width5 = total[completed];
     try {
-      const _0x595dda = await downsampleStoryboard3DTexture(_0x7c2fff['texture'], {
-        width: _0x7c2fff['targetWidth'],
-        height: _0x7c2fff['targetHeight'],
-        signal: _0x3dadc7,
-        ..._0x523324,
+      const method2 = await downsampleStoryboard3DTexture(width5['texture'], {
+        width: width5['targetWidth'],
+        height: width5['targetHeight'],
+        signal: signal3,
+        ...args2,
       });
-      _0x4bd55b['push']({ ..._0x7c2fff, method: _0x595dda['method'] });
-    } catch (_0x10fa4f) {
-      if (_0x10fa4f?.['name'] === 'AbortError') throw _0x10fa4f;
-      _0x468868['push']({
-        code: _0x10fa4f?.['code'] || 'TEXTURE_DOWNSAMPLE_FAILED',
-        texture: _0x7c2fff['texture'],
-        references: _0x7c2fff['references'],
+      optimized['push']({ ...width5, method: method2['method'] });
+    } catch (code2) {
+      if (code2?.['name'] === 'AbortError') throw code2;
+      warnings['push']({
+        code: code2?.['code'] || 'TEXTURE_DOWNSAMPLE_FAILED',
+        texture: width5['texture'],
+        references: width5['references'],
         message:
           'Texture ' +
-          _0x7c2fff['width'] +
+          width5['width'] +
           'x' +
-          _0x7c2fff['height'] +
+          width5['height'] +
           ' exceeds the ' +
-          _0x228852['limits']['maxDimension'] +
+          inspection['limits']['maxDimension'] +
           'px / ' +
-          _0x228852['limits']['maxPixels'] +
+          inspection['limits']['maxPixels'] +
           ' pixel policy but could not be downsampled.',
-        cause: _0x10fa4f,
+        cause: code2,
       });
     }
-    _0x5f1a1b?.({
-      completed: _0x1a8f07 + 0x1,
-      total: _0x400ac3['length'],
-      progress: _0x400ac3['length'] ? (_0x1a8f07 + 0x1) / _0x400ac3['length'] : 0x1,
+    onProgress?.({
+      completed: completed + 0x1,
+      total: total['length'],
+      progress: total['length'] ? (completed + 0x1) / total['length'] : 0x1,
     });
   }
   return {
-    inspection: _0x228852,
-    optimized: _0x4bd55b,
-    warnings: _0x468868,
+    inspection: inspection,
+    optimized: optimized,
+    warnings: warnings,
     disposeOwnedResources() {
-      _0x4bd55b['forEach']((_0x3121e3) => releaseStoryboard3DTexturePolicyResource(_0x3121e3['texture']));
+      optimized['forEach']((value13) => releaseStoryboard3DTexturePolicyResource(value13['texture']));
     },
   };
 }
 export function validateStoryboard3DImageFile(
-  _0x418c93,
+  error8,
   { maxBytes: maxBytes = DEFAULT_STORYBOARD_3D_IMAGE_MAX_BYTES } = {},
 ) {
-  const _0x436189 = [],
-    _0x4e5499 = String(_0x418c93?.['type'] || '')
+  const ok = [],
+    enabled3 = String(error8?.['type'] || '')
       ['trim']()
       ['toLowerCase'](),
-    _0x2b840f = Number(_0x418c93?.['size']);
-  if (!String(_0x418c93?.['name'] || '')['trim']())
-    _0x436189['push']({
+    count3 = Number(error8?.['size']);
+  if (!String(error8?.['name'] || '')['trim']())
+    ok['push']({
       code: 'IMAGE_FILE_NAME_REQUIRED',
       message: 'Image\x20file\x20name\x20is\x20required.',
     });
-  if (!_0x4e5499['startsWith']('image/'))
-    _0x436189['push']({ code: 'IMAGE_FILE_TYPE_INVALID', message: 'The selected file is not an image.' });
-  if (!Number['isFinite'](_0x2b840f) || _0x2b840f <= 0x0)
-    _0x436189['push']({ code: 'IMAGE_FILE_EMPTY', message: 'The image file is empty.' });
+  if (!enabled3['startsWith']('image/'))
+    ok['push']({ code: 'IMAGE_FILE_TYPE_INVALID', message: 'The selected file is not an image.' });
+  if (!Number['isFinite'](count3) || count3 <= 0x0)
+    ok['push']({ code: 'IMAGE_FILE_EMPTY', message: 'The image file is empty.' });
   return (
-    Number['isFinite'](_0x2b840f) &&
-      _0x2b840f > maxBytes &&
-      _0x436189['push']({
+    Number['isFinite'](count3) &&
+      count3 > maxBytes &&
+      ok['push']({
         code: 'IMAGE_FILE_TOO_LARGE',
         message: 'The image file exceeds ' + Math['round'](maxBytes / 0x400 / 0x400) + ' MB.',
       }),
-    { ok: _0x436189['length'] === 0x0, errors: _0x436189 }
+    { ok: ok['length'] === 0x0, errors: ok }
   );
 }
 async function defaultDecodeImageDimensions(
-  _0x404181,
-  { createImageBitmapFn: createImageBitmapFn = globalThis['createImageBitmap'], signal: _0x25eea5 } = {},
+  value14,
+  { createImageBitmapFn: createImageBitmapFn = globalThis['createImageBitmap'], signal: signal4 } = {},
 ) {
   if (typeof createImageBitmapFn !== 'function') {
-    const _0x51cd6e = new Error('Image\x20dimension\x20decoding\x20is\x20unavailable.');
-    _0x51cd6e['code'] = 'IMAGE_DIMENSION_DECODER_UNAVAILABLE';
-    throw _0x51cd6e;
+    const error9 = new Error('Image\x20dimension\x20decoding\x20is\x20unavailable.');
+    error9['code'] = 'IMAGE_DIMENSION_DECODER_UNAVAILABLE';
+    throw error9;
   }
-  throwIfAborted(_0x25eea5);
-  const _0x44982f = await createImageBitmapFn(_0x404181);
+  throwIfAborted(signal4);
+  const imageBitmapFn = await createImageBitmapFn(value14);
   try {
-    throwIfAborted(_0x25eea5);
-    const _0x43c963 = imageDimensions(_0x44982f);
-    if (!_0x43c963) throw new Error('Decoded image dimensions are unavailable.');
-    return _0x43c963;
+    throwIfAborted(signal4);
+    const imageDimensions2 = imageDimensions(imageBitmapFn);
+    if (!imageDimensions2) throw new Error('Decoded image dimensions are unavailable.');
+    return imageDimensions2;
   } finally {
-    closeResource(_0x44982f);
+    closeResource(imageBitmapFn);
   }
 }
 export async function preflightStoryboard3DImageFile(
-  _0x45c75e,
+  value15,
   {
     renderer: renderer = null,
     maxBytes: maxBytes = DEFAULT_STORYBOARD_3D_IMAGE_MAX_BYTES,
-    signal: _0x20f859,
+    signal: signal5,
     createImageBitmapFn: createImageBitmapFn = globalThis['createImageBitmap'],
     decodeImageDimensions: decodeImageDimensions = defaultDecodeImageDimensions,
-    ..._0x389940
+    ...args3
   } = {},
 ) {
-  throwIfAborted(_0x20f859);
-  const _0x55ee44 = validateStoryboard3DImageFile(_0x45c75e, { maxBytes: maxBytes }),
-    _0x465964 = resolveStoryboard3DTextureLimits({ renderer: renderer, ..._0x389940 });
-  if (!_0x55ee44['ok'])
+  throwIfAborted(signal5);
+  const errors = validateStoryboard3DImageFile(value15, { maxBytes: maxBytes }),
+    limits2 = resolveStoryboard3DTextureLimits({ renderer: renderer, ...args3 });
+  if (!errors['ok'])
     return {
       ok: ![],
       action: 'reject',
-      errors: _0x55ee44['errors'],
+      errors: errors['errors'],
       warnings: [],
       width: null,
       height: null,
       targetWidth: null,
       targetHeight: null,
-      limits: _0x465964,
+      limits: limits2,
     };
   try {
-    const _0x136d3f = await decodeImageDimensions(_0x45c75e, {
-      signal: _0x20f859,
+    const box5 = await decodeImageDimensions(value15, {
+      signal: signal5,
       createImageBitmapFn: createImageBitmapFn,
     });
-    throwIfAborted(_0x20f859);
-    const _0x34399e = finitePositiveInteger(_0x136d3f?.['width']),
-      _0x2e19a6 = finitePositiveInteger(_0x136d3f?.['height']);
-    if (!_0x34399e || !_0x2e19a6) throw new Error('Image dimensions are invalid.');
-    const _0x1158de = computeTargetSize(_0x34399e, _0x2e19a6, _0x465964),
-      _0x1e4840 = _0x1158de['width'] !== _0x34399e || _0x1158de['height'] !== _0x2e19a6;
+    throwIfAborted(signal5);
+    const width6 = finitePositiveInteger(box5?.['width']),
+      height4 = finitePositiveInteger(box5?.['height']);
+    if (!width6 || !height4) throw new Error('Image dimensions are invalid.');
+    const targetWidth2 = computeTargetSize(width6, height4, limits2),
+      action2 = targetWidth2['width'] !== width6 || targetWidth2['height'] !== height4;
     return {
       ok: !![],
-      action: _0x1e4840 ? 'downsample' : 'accept',
+      action: action2 ? 'downsample' : 'accept',
       errors: [],
-      warnings: _0x1e4840
+      warnings: action2
         ? [
             {
               code: 'IMAGE_PIXELS_EXCEED_LIMIT',
               message:
                 'Image ' +
-                _0x34399e +
+                width6 +
                 'x' +
-                _0x2e19a6 +
+                height4 +
                 '\x20should\x20be\x20downsampled\x20to\x20' +
-                _0x1158de['width'] +
+                targetWidth2['width'] +
                 'x' +
-                _0x1158de['height'] +
+                targetWidth2['height'] +
                 '.',
             },
           ]
         : [],
-      width: _0x34399e,
-      height: _0x2e19a6,
-      targetWidth: _0x1158de['width'],
-      targetHeight: _0x1158de['height'],
-      limits: _0x465964,
+      width: width6,
+      height: height4,
+      targetWidth: targetWidth2['width'],
+      targetHeight: targetWidth2['height'],
+      limits: limits2,
     };
-  } catch (_0x179d7e) {
-    if (_0x179d7e?.['name'] === 'AbortError') throw _0x179d7e;
+  } catch (code3) {
+    if (code3?.['name'] === 'AbortError') throw code3;
     return {
       ok: !![],
       action: 'accept-with-warning',
       errors: [],
       warnings: [
         {
-          code: _0x179d7e?.['code'] || 'IMAGE_DIMENSION_READ_FAILED',
+          code: code3?.['code'] || 'IMAGE_DIMENSION_READ_FAILED',
           message: 'Image pixel dimensions could not be checked before upload.',
-          cause: _0x179d7e,
+          cause: code3,
         },
       ],
       width: null,
       height: null,
       targetWidth: null,
       targetHeight: null,
-      limits: _0x465964,
+      limits: limits2,
     };
   }
 }

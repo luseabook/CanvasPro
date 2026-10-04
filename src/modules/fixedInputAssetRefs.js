@@ -31,183 +31,174 @@ export function getRhV54VisibleSlots({ hideExtraSlots: hideExtraSlots = false } 
     ? ['sourceVideo', 'refImage']
     : ['sourceVideo', 'refImage', 'firstFrame', 'videoMask'];
 }
-function normalizeFixedSlotId(_0x4be3ab) {
-  const _0x4e8468 = String(_0x4be3ab || '').trim();
-  if (_0x4e8468 === 'maskVideo') return 'videoMask';
-  return _0x4e8468;
+function normalizeFixedSlotId(value) {
+  const item = String(value || '').trim();
+  if (item === 'maskVideo') return 'videoMask';
+  return item;
 }
-export function normalizeFixedInputExclusiveGroups(_0x565eb5 = [], _0x59b470 = null) {
-  const _0x3755bc =
-    Array.isArray(_0x59b470) && _0x59b470.length
-      ? new Set(_0x59b470.map((_0x5b3ca2) => normalizeFixedSlotId(_0x5b3ca2)))
-      : null;
-  return (Array.isArray(_0x565eb5) ? _0x565eb5 : [])
-    .map((_0x1eb2c3, _0x3be0a4) => {
-      const _0x476a31 = Array.isArray(_0x1eb2c3?.slots)
-          ? _0x1eb2c3.slots
-          : Array.isArray(_0x1eb2c3)
-            ? _0x1eb2c3
-            : [],
-        _0x973cef = Array.from(
+export function normalizeFixedInputExclusiveGroups(list = [], list2 = null) {
+  const map =
+    Array.isArray(list2) && list2.length ? new Set(list2.map((item2) => normalizeFixedSlotId(item2))) : null;
+  return (Array.isArray(list) ? list : [])
+    .map((required, key) => {
+      const list3 = Array.isArray(required?.slots) ? required.slots : Array.isArray(required) ? required : [],
+        slots = Array.from(
           new Set(
-            _0x476a31
-              .map((_0x1b5d8a) => normalizeFixedSlotId(_0x1b5d8a))
-              .filter((_0x5f0431) => _0x5f0431 && (!_0x3755bc || _0x3755bc.has(_0x5f0431))),
+            list3
+              .map((item3) => normalizeFixedSlotId(item3))
+              .filter((item4) => item4 && (!map || map.has(item4))),
           ),
         );
-      if (_0x973cef.length < 2) return null;
+      if (slots.length < 2) return null;
       return {
-        id: String(_0x1eb2c3?.id || 'exclusive:' + _0x3be0a4).trim() || 'exclusive:' + _0x3be0a4,
-        slots: _0x973cef,
-        min: Number.isFinite(Number(_0x1eb2c3?.min)) ? Number(_0x1eb2c3.min) : 0,
-        max: Number.isFinite(Number(_0x1eb2c3?.max)) ? Number(_0x1eb2c3.max) : 1,
-        required: _0x1eb2c3?.required === true,
+        id: String(required?.id || 'exclusive:' + key).trim() || 'exclusive:' + key,
+        slots: slots,
+        min: Number.isFinite(Number(required?.min)) ? Number(required.min) : 0,
+        max: Number.isFinite(Number(required?.max)) ? Number(required.max) : 1,
+        required: required?.required === true,
       };
     })
     .filter(Boolean);
 }
-export function getExclusiveSlotsForFixedSlot(_0x192640 = [], _0x49a4e4 = '') {
-  const _0x2a96db = normalizeFixedSlotId(_0x49a4e4);
-  if (!_0x2a96db) return [];
-  const _0x225014 = normalizeFixedInputExclusiveGroups(_0x192640),
-    _0x44679e = _0x225014.find((_0x54fed8) => _0x54fed8.slots.includes(_0x2a96db));
-  return _0x44679e ? _0x44679e.slots.slice() : [_0x2a96db];
+export function getExclusiveSlotsForFixedSlot(list4 = [], index = '') {
+  const fixedSlotId = normalizeFixedSlotId(index);
+  if (!fixedSlotId) return [];
+  const list5 = normalizeFixedInputExclusiveGroups(list4),
+    result = list5.find((item5) => item5.slots.includes(fixedSlotId));
+  return result ? result.slots.slice() : [fixedSlotId];
 }
-function resolveManifestForFixedInputNode(_0x574297 = {}) {
-  const _0x1d53db = [_0x574297?.audioWorkflowKey, _0x574297?.workflowKey, _0x574297?.model]
-    .map((_0x36d922) => String(_0x36d922 || '').trim())
+function resolveManifestForFixedInputNode(providerHint = {}) {
+  const data = [providerHint?.audioWorkflowKey, providerHint?.workflowKey, providerHint?.model]
+    .map((item6) => String(item6 || '').trim())
     .filter(Boolean);
-  for (const _0x4f3b7b of _0x1d53db) {
-    const _0x3738f4 =
-      getModelManifest(_0x4f3b7b) ||
-      resolveModelExecution(_0x4f3b7b, { providerHint: _0x574297?.provider })?.modelManifest ||
-      resolveModelExecution(_0x4f3b7b)?.modelManifest;
-    if (_0x3738f4) return _0x3738f4;
+  for (const options of data) {
+    const modelManifest =
+      getModelManifest(options) ||
+      resolveModelExecution(options, { providerHint: providerHint?.provider })?.modelManifest ||
+      resolveModelExecution(options)?.modelManifest;
+    if (modelManifest) return modelManifest;
   }
   return null;
 }
-function getNodeFieldValue(_0x59816d = {}, _0x19592c = '') {
-  const _0x218cba = String(_0x19592c || '').trim();
-  if (!_0x218cba) return undefined;
-  const _0x3f2db9 =
-    _0x59816d?.generationParams && typeof _0x59816d.generationParams === 'object'
-      ? _0x59816d.generationParams
+function getNodeFieldValue(options2 = {}, target = '') {
+  const enabled = String(target || '').trim();
+  if (!enabled) return undefined;
+  const next =
+    options2?.generationParams && typeof options2.generationParams === 'object'
+      ? options2.generationParams
       : {};
-  if (Object.prototype.hasOwnProperty.call(_0x3f2db9, _0x218cba)) return _0x3f2db9[_0x218cba];
-  if (Object.prototype.hasOwnProperty.call(_0x59816d || {}, _0x218cba)) return _0x59816d[_0x218cba];
-  const _0x208bef = _0x218cba.split('.').filter(Boolean);
-  if (_0x208bef.length <= 1) return undefined;
-  let _0xfb050c = _0x59816d;
-  for (const _0x403cbb of _0x208bef) {
-    if (!_0xfb050c || typeof _0xfb050c !== 'object') return undefined;
-    _0xfb050c = _0xfb050c[_0x403cbb];
+  if (Object.prototype.hasOwnProperty.call(next, enabled)) return next[enabled];
+  if (Object.prototype.hasOwnProperty.call(options2 || {}, enabled)) return options2[enabled];
+  const list6 = enabled.split('.').filter(Boolean);
+  if (list6.length <= 1) return undefined;
+  let enabled2 = options2;
+  for (const current of list6) {
+    if (!enabled2 || typeof enabled2 !== 'object') return undefined;
+    enabled2 = enabled2[current];
   }
-  return _0xfb050c;
+  return enabled2;
 }
-function fixedSlotConditionMatches(_0x24c115, _0x1c173b = {}) {
-  if (Array.isArray(_0x24c115))
-    return _0x24c115.some((_0x597fb9) => fixedSlotConditionMatches(_0x597fb9, _0x1c173b));
-  if (!_0x24c115 || typeof _0x24c115 !== 'object') return false;
-  if (Array.isArray(_0x24c115.any))
-    return _0x24c115.any.some((_0x2e1a6f) => fixedSlotConditionMatches(_0x2e1a6f, _0x1c173b));
-  if (Array.isArray(_0x24c115.all))
-    return _0x24c115.all.every((_0x2c4b5f) => fixedSlotConditionMatches(_0x2c4b5f, _0x1c173b));
-  const _0x290130 = String(_0x24c115.field || '').trim();
-  if (!_0x290130) return false;
-  const _0xaac8ab = getNodeFieldValue(_0x1c173b, _0x290130),
-    _0x3e9ea8 = Array.isArray(_0x24c115.values)
-      ? _0x24c115.values
-      : Object.prototype.hasOwnProperty.call(_0x24c115, 'value')
-        ? [_0x24c115.value]
+function fixedSlotConditionMatches(el, entry = {}) {
+  if (Array.isArray(el)) return el.some((item7) => fixedSlotConditionMatches(item7, entry));
+  if (!el || typeof el !== 'object') return false;
+  if (Array.isArray(el.any)) return el.any.some((item8) => fixedSlotConditionMatches(item8, entry));
+  if (Array.isArray(el.all)) return el.all.every((item9) => fixedSlotConditionMatches(item9, entry));
+  const enabled3 = String(el.field || '').trim();
+  if (!enabled3) return false;
+  const nodeFieldValue = getNodeFieldValue(entry, enabled3),
+    list7 = Array.isArray(el.values)
+      ? el.values
+      : Object.prototype.hasOwnProperty.call(el, 'value')
+        ? [el.value]
         : [];
-  if (_0x3e9ea8.length === 0) return Boolean(_0xaac8ab);
-  return _0x3e9ea8.some(
-    (_0x40fa68) => _0xaac8ab === _0x40fa68 || String(_0xaac8ab ?? '') === String(_0x40fa68 ?? ''),
+  if (list7.length === 0) return Boolean(nodeFieldValue);
+  return list7.some(
+    (item10) => nodeFieldValue === item10 || String(nodeFieldValue ?? '') === String(item10 ?? ''),
   );
 }
 function shouldHideFixedSlotForNode(
-  _0x6856a,
-  _0x352984 = {},
-  _0x543e5a = null,
+  record,
+  payload = {},
+  handle = null,
   { useRhVisibilityFlags: useRhVisibilityFlags = false } = {},
 ) {
-  if (useRhVisibilityFlags && _0x352984?.rhSpecialMode === 'cameraMove')
-    return _0x6856a === 'firstFrame' || _0x6856a === 'videoMask';
-  if (useRhVisibilityFlags && _0x352984?.rhSubtractSubject === true)
-    return _0x6856a === 'firstFrame' || _0x6856a === 'videoMask';
-  if (_0x543e5a?.showWhen && !fixedSlotConditionMatches(_0x543e5a.showWhen, _0x352984)) return true;
-  if (_0x543e5a?.hideWhen && fixedSlotConditionMatches(_0x543e5a.hideWhen, _0x352984)) return true;
+  if (useRhVisibilityFlags && payload?.rhSpecialMode === 'cameraMove')
+    return record === 'firstFrame' || record === 'videoMask';
+  if (useRhVisibilityFlags && payload?.rhSubtractSubject === true)
+    return record === 'firstFrame' || record === 'videoMask';
+  if (handle?.showWhen && !fixedSlotConditionMatches(handle.showWhen, payload)) return true;
+  if (handle?.hideWhen && fixedSlotConditionMatches(handle.hideWhen, payload)) return true;
   return false;
 }
-export function getFixedInputSlotConfigFromManifest(_0x56011b = {}, { manifest: manifest = null } = {}) {
-  const _0x2e1038 = manifest || resolveManifestForFixedInputNode(_0x56011b),
-    _0x456076 = _0x2e1038?.inputSlots?.fixedSlots;
-  if (!Array.isArray(_0x456076) || _0x456076.length === 0) return null;
-  const _0x301210 = {},
-    _0x50d602 = {},
-    _0x1cb0f2 = {},
-    _0x2d52e7 = [];
-  let _0x554bc8 = false;
-  const _0x2531eb = new Set(
-      _0x456076.map((_0x4530a8) => normalizeFixedSlotId(_0x4530a8?.id)).filter(Boolean),
-    ),
-    _0x269b70 = _0x2531eb.has('sourceVideo') && _0x2531eb.has('refImage') && _0x2531eb.has('videoMask');
-  _0x456076.forEach((_0x191dbd, _0x2b5163) => {
-    const _0x3288ff = normalizeFixedSlotId(_0x191dbd?.id),
-      _0x13eb8e = String(_0x191dbd?.kind || '').trim();
-    if (!_0x3288ff || !FIXED_ASSET_INPUT_KINDS.has(_0x13eb8e)) return;
-    if (_0x191dbd?.showWhen || _0x191dbd?.hideWhen) _0x554bc8 = true;
-    if (!Array.isArray(_0x301210[_0x13eb8e])) _0x301210[_0x13eb8e] = [];
-    (_0x301210[_0x13eb8e].push(_0x3288ff), (_0x50d602[_0x3288ff] = _0x13eb8e));
-    const _0x17389e = Number(_0x191dbd?.displayOrder);
-    ((_0x1cb0f2[_0x3288ff] = {
-      ..._0x191dbd,
-      id: _0x3288ff,
-      kind: _0x13eb8e,
-      displayOrder: Number.isFinite(_0x17389e) ? _0x17389e : _0x2b5163,
+export function getFixedInputSlotConfigFromManifest(options3 = {}, { manifest: manifest = null } = {}) {
+  const manifest2 = manifest || resolveManifestForFixedInputNode(options3),
+    list8 = manifest2?.inputSlots?.fixedSlots;
+  if (!Array.isArray(list8) || list8.length === 0) return null;
+  const slotOrderByType2 = {},
+    slotKindById = {},
+    slotById2 = {},
+    visibleSlots2 = [];
+  let visibilityLayoutKey = false;
+  const map2 = new Set(list8.map((item11) => normalizeFixedSlotId(item11?.id)).filter(Boolean)),
+    useRhVisibilityFlags2 = map2.has('sourceVideo') && map2.has('refImage') && map2.has('videoMask');
+  list8.forEach((args, state) => {
+    const id = normalizeFixedSlotId(args?.id),
+      kind2 = String(args?.kind || '').trim();
+    if (!id || !FIXED_ASSET_INPUT_KINDS.has(kind2)) return;
+    if (args?.showWhen || args?.hideWhen) visibilityLayoutKey = true;
+    if (!Array.isArray(slotOrderByType2[kind2])) slotOrderByType2[kind2] = [];
+    (slotOrderByType2[kind2].push(id), (slotKindById[id] = kind2));
+    const config = Number(args?.displayOrder);
+    ((slotById2[id] = {
+      ...args,
+      id: id,
+      kind: kind2,
+      displayOrder: Number.isFinite(config) ? config : state,
     }),
-      !shouldHideFixedSlotForNode(_0x3288ff, _0x56011b, _0x191dbd, { useRhVisibilityFlags: _0x269b70 }) &&
-        _0x2d52e7.push(_0x3288ff));
+      !shouldHideFixedSlotForNode(id, options3, args, { useRhVisibilityFlags: useRhVisibilityFlags2 }) &&
+        visibleSlots2.push(id));
   });
-  if (_0x2d52e7.length === 0) return null;
-  const _0x86e3c2 = (_0x272125, _0x30b308) =>
-    Number(_0x1cb0f2[_0x272125]?.displayOrder ?? 0) - Number(_0x1cb0f2[_0x30b308]?.displayOrder ?? 0);
-  (_0x2d52e7.sort(_0x86e3c2),
-    Object.keys(_0x301210).forEach((_0x1ecf13) => {
-      _0x301210[_0x1ecf13].sort(_0x86e3c2);
+  if (visibleSlots2.length === 0) return null;
+  const item12 = (scope, input) =>
+    Number(slotById2[scope]?.displayOrder ?? 0) - Number(slotById2[input]?.displayOrder ?? 0);
+  (visibleSlots2.sort(item12),
+    Object.keys(slotOrderByType2).forEach((item13) => {
+      slotOrderByType2[item13].sort(item12);
     }));
-  const _0x80fd2d = normalizeFixedInputExclusiveGroups(_0x2e1038?.inputSlots?.exclusiveGroups, _0x2d52e7);
+  const exclusiveGroups2 = normalizeFixedInputExclusiveGroups(
+    manifest2?.inputSlots?.exclusiveGroups,
+    visibleSlots2,
+  );
   return {
-    manifest: _0x2e1038,
-    fixedSlots: Object.values(_0x1cb0f2),
-    slotById: _0x1cb0f2,
-    slotKindById: _0x50d602,
-    slotOrderByType: _0x301210,
-    visibleSlots: _0x2d52e7,
-    visibilityLayoutKey: _0x554bc8 ? _0x2d52e7.join('|') : '',
-    exclusiveGroups: _0x80fd2d,
+    manifest: manifest2,
+    fixedSlots: Object.values(slotById2),
+    slotById: slotById2,
+    slotKindById: slotKindById,
+    slotOrderByType: slotOrderByType2,
+    visibleSlots: visibleSlots2,
+    visibilityLayoutKey: visibilityLayoutKey ? visibleSlots2.join('|') : '',
+    exclusiveGroups: exclusiveGroups2,
   };
 }
-function getSlotsFromOrder(_0x324318 = {}) {
+function getSlotsFromOrder(options4 = {}) {
   return Array.from(
     new Set(
-      Object.values(_0x324318)
+      Object.values(options4)
         .flat()
-        .map((_0x1768b7) => String(_0x1768b7 || ''))
+        .map((item14) => String(item14 || ''))
         .filter(Boolean),
     ),
   );
 }
-function normalizeOccupiedSlots(_0xdfb0cf = null) {
-  const _0x2ecc52 = (_0x2485b5 = []) =>
-    new Set(_0x2485b5.map((_0x59426d) => normalizeFixedSlotId(_0x59426d)).filter(Boolean));
-  if (_0xdfb0cf instanceof Set) return _0x2ecc52(Array.from(_0xdfb0cf));
-  if (Array.isArray(_0xdfb0cf)) return _0x2ecc52(_0xdfb0cf);
-  if (_0xdfb0cf && typeof _0xdfb0cf === 'object')
-    return _0x2ecc52(
-      Object.entries(_0xdfb0cf)
-        .filter(([, _0x42e4c6]) => !!_0x42e4c6)
-        .map(([_0x558306]) => _0x558306),
+function normalizeOccupiedSlots(value2 = null) {
+  const run = (list9 = []) => new Set(list9.map((item15) => normalizeFixedSlotId(item15)).filter(Boolean));
+  if (value2 instanceof Set) return run(Array.from(value2));
+  if (Array.isArray(value2)) return run(value2);
+  if (value2 && typeof value2 === 'object')
+    return run(
+      Object.entries(value2)
+        .filter(([, enabled4]) => !!enabled4)
+        .map(([output]) => output),
     );
   return new Set();
 }
@@ -215,80 +206,76 @@ export function createFixedSlotOccupancyTracker({
   exclusiveGroups: exclusiveGroups = [],
   occupiedSlots: occupiedSlots = null,
 } = {}) {
-  const _0x25ea3d = new Set(normalizeOccupiedSlots(occupiedSlots)),
-    _0x48a017 = normalizeFixedInputExclusiveGroups(exclusiveGroups),
-    _0x32a14f = new Map();
-  _0x48a017.forEach((_0x2b96e7) => {
-    _0x2b96e7.slots.forEach((_0x3d0177) => {
-      _0x32a14f.set(_0x3d0177, _0x2b96e7);
+  const list10 = new Set(normalizeOccupiedSlots(occupiedSlots)),
+    list11 = normalizeFixedInputExclusiveGroups(exclusiveGroups),
+    map3 = new Map();
+  list11.forEach((item16) => {
+    item16.slots.forEach((item17) => {
+      map3.set(item17, item16);
     });
   });
-  const _0x1c9c79 = new Set();
+  const map4 = new Set();
   return (
-    _0x25ea3d.forEach((_0x20a341) => {
-      const _0x33512d = _0x32a14f.get(_0x20a341);
-      if (_0x33512d) _0x1c9c79.add(_0x33512d.id);
+    list10.forEach((item18) => {
+      const value3 = map3.get(item18);
+      if (value3) map4.add(value3.id);
     }),
     {
-      isSlotAvailable(_0x5d8cbb) {
-        const _0x46531b = normalizeFixedSlotId(_0x5d8cbb);
-        if (!_0x46531b || _0x25ea3d.has(_0x46531b)) return false;
-        const _0x3d2bcd = _0x32a14f.get(_0x46531b);
-        return !_0x3d2bcd || !_0x1c9c79.has(_0x3d2bcd.id);
+      isSlotAvailable(value4) {
+        const fixedSlotId2 = normalizeFixedSlotId(value4);
+        if (!fixedSlotId2 || list10.has(fixedSlotId2)) return false;
+        const enabled5 = map3.get(fixedSlotId2);
+        return !enabled5 || !map4.has(enabled5.id);
       },
-      occupySlot(_0x2ed68e) {
-        const _0xa6be1 = normalizeFixedSlotId(_0x2ed68e);
-        if (!_0xa6be1) return;
-        _0x25ea3d.add(_0xa6be1);
-        const _0x25539b = _0x32a14f.get(_0xa6be1);
-        if (_0x25539b) _0x1c9c79.add(_0x25539b.id);
+      occupySlot(value5) {
+        const fixedSlotId3 = normalizeFixedSlotId(value5);
+        if (!fixedSlotId3) return;
+        list10.add(fixedSlotId3);
+        const value6 = map3.get(fixedSlotId3);
+        if (value6) map4.add(value6.id);
       },
-      getExclusiveSlots(_0x2c8974) {
-        const _0x494c31 = normalizeFixedSlotId(_0x2c8974),
-          _0x1b1a67 = _0x32a14f.get(_0x494c31);
-        return _0x1b1a67 ? _0x1b1a67.slots.slice() : _0x494c31 ? [_0x494c31] : [];
+      getExclusiveSlots(value7) {
+        const fixedSlotId4 = normalizeFixedSlotId(value7),
+          value8 = map3.get(fixedSlotId4);
+        return value8 ? value8.slots.slice() : fixedSlotId4 ? [fixedSlotId4] : [];
       },
     }
   );
 }
-function getFixedInputSlotKind(_0x4af9d2 = {}, _0x2d77a9 = '') {
-  const _0x4f2eca = normalizeFixedSlotId(_0x2d77a9);
-  if (!_0x4f2eca) return '';
-  const _0x10b890 = String(_0x4af9d2?.slotKindById?.[_0x4f2eca] || '').trim();
-  if (_0x10b890) return _0x10b890;
-  const _0x3d92b9 =
-    _0x4af9d2?.slotOrderByType && typeof _0x4af9d2.slotOrderByType === 'object'
-      ? _0x4af9d2.slotOrderByType
-      : {};
-  for (const [_0x4f77b8, _0x224f6d] of Object.entries(_0x3d92b9)) {
-    if ((Array.isArray(_0x224f6d) ? _0x224f6d : []).includes(_0x4f2eca))
-      return String(_0x4f77b8 || '').trim();
+function getFixedInputSlotKind(options5 = {}, value9 = '') {
+  const fixedSlotId5 = normalizeFixedSlotId(value9);
+  if (!fixedSlotId5) return '';
+  const value10 = String(options5?.slotKindById?.[fixedSlotId5] || '').trim();
+  if (value10) return value10;
+  const value11 =
+    options5?.slotOrderByType && typeof options5.slotOrderByType === 'object' ? options5.slotOrderByType : {};
+  for (const [value12, value13] of Object.entries(value11)) {
+    if ((Array.isArray(value13) ? value13 : []).includes(fixedSlotId5)) return String(value12 || '').trim();
   }
   return '';
 }
-function isKnownFixedInputSlot(_0x1f7010 = {}, _0x13b877 = '') {
-  const _0x537c16 = normalizeFixedSlotId(_0x13b877);
-  if (!_0x537c16) return false;
-  if (_0x1f7010?.slotById?.[_0x537c16]) return true;
-  return !!getFixedInputSlotKind(_0x1f7010, _0x537c16);
+function isKnownFixedInputSlot(options6 = {}, value14 = '') {
+  const fixedSlotId6 = normalizeFixedSlotId(value14);
+  if (!fixedSlotId6) return false;
+  if (options6?.slotById?.[fixedSlotId6]) return true;
+  return !!getFixedInputSlotKind(options6, fixedSlotId6);
 }
-function sourceHasMaskImage(_0x3547af = null) {
-  const _0x1474d4 =
-    _0x3547af?.nodeData && typeof _0x3547af.nodeData === 'object' ? _0x3547af.nodeData : _0x3547af;
+function sourceHasMaskImage(value15 = null) {
+  const value16 = value15?.nodeData && typeof value15.nodeData === 'object' ? value15.nodeData : value15;
   return !!String(
-    _0x1474d4?.mask ||
-      _0x1474d4?.maskImageDataUrl ||
-      _0x1474d4?.maskImageUrl ||
-      _0x1474d4?.maskUrl ||
-      _0x1474d4?.maskLocalPath ||
+    value16?.mask ||
+      value16?.maskImageDataUrl ||
+      value16?.maskImageUrl ||
+      value16?.maskUrl ||
+      value16?.maskLocalPath ||
       '',
   ).trim();
 }
-export function fixedInputSlotAcceptsSource(_0x6bbbce = {}, _0x2a0405 = '', _0x21d715 = null) {
-  const _0x420988 = normalizeFixedSlotId(_0x2a0405);
-  if (!_0x420988) return false;
-  const _0x1f4fba = _0x6bbbce?.slotById?.[_0x420988] || {};
-  if (_0x1f4fba?.requiresMask === true) return _0x21d715 ? sourceHasMaskImage(_0x21d715) : false;
+export function fixedInputSlotAcceptsSource(options7 = {}, value17 = '', value18 = null) {
+  const fixedSlotId7 = normalizeFixedSlotId(value17);
+  if (!fixedSlotId7) return false;
+  const value19 = options7?.slotById?.[fixedSlotId7] || {};
+  if (value19?.requiresMask === true) return value18 ? sourceHasMaskImage(value18) : false;
   return true;
 }
 export function resolveFixedInputSlotForRef({
@@ -299,50 +286,51 @@ export function resolveFixedInputSlotForRef({
   sourceNode: sourceNode = null,
   source: source = null,
 } = {}) {
-  const _0x34667e = fixedInputConfig || {},
-    _0x548876 = String(kind || '').trim(),
-    _0x4ffe04 = sourceNode || source || null;
-  if (!_0x548876 || _0x548876 === 'text') return { slot: '', reason: 'unsupported' };
-  const _0x3df648 = new Set(
-    Array.isArray(_0x34667e.visibleSlots) && _0x34667e.visibleSlots.length
-      ? _0x34667e.visibleSlots.map((_0x22d007) => normalizeFixedSlotId(_0x22d007)).filter(Boolean)
-      : getSlotsFromOrder(_0x34667e.slotOrderByType).map((_0x54d717) => normalizeFixedSlotId(_0x54d717)),
+  const exclusiveGroups3 = fixedInputConfig || {},
+    enabled6 = String(kind || '').trim(),
+    value20 = sourceNode || source || null;
+  if (!enabled6 || enabled6 === 'text') return { slot: '', reason: 'unsupported' };
+  const map5 = new Set(
+    Array.isArray(exclusiveGroups3.visibleSlots) && exclusiveGroups3.visibleSlots.length
+      ? exclusiveGroups3.visibleSlots.map((item19) => normalizeFixedSlotId(item19)).filter(Boolean)
+      : getSlotsFromOrder(exclusiveGroups3.slotOrderByType).map((item20) => normalizeFixedSlotId(item20)),
   );
-  if (_0x3df648.size === 0) return { slot: '', reason: 'noVisibleSlots' };
-  const _0x2c1103 = createFixedSlotOccupancyTracker({
-      exclusiveGroups: _0x34667e.exclusiveGroups,
+  if (map5.size === 0) return { slot: '', reason: 'noVisibleSlots' };
+  const fixedSlotOccupancyTracker = createFixedSlotOccupancyTracker({
+      exclusiveGroups: exclusiveGroups3.exclusiveGroups,
       occupiedSlots: occupiedSlots,
     }),
-    _0x21a036 = normalizeFixedSlotId(refSlot);
-  if (_0x21a036 && _0x3df648.has(_0x21a036)) {
-    const _0x18437b = getFixedInputSlotKind(_0x34667e, _0x21a036);
-    if (_0x18437b !== _0x548876) return { slot: '', reason: 'kindMismatch', explicitSlot: _0x21a036 };
-    if (!fixedInputSlotAcceptsSource(_0x34667e, _0x21a036, _0x4ffe04))
-      return { slot: '', reason: 'slotConstraint', explicitSlot: _0x21a036 };
-    if (!_0x2c1103.isSlotAvailable(_0x21a036))
-      return { slot: '', reason: 'occupied', explicitSlot: _0x21a036 };
-    return { slot: _0x21a036, reason: 'explicit', explicitSlot: _0x21a036 };
+    explicitSlot = normalizeFixedSlotId(refSlot);
+  if (explicitSlot && map5.has(explicitSlot)) {
+    const fixedInputSlotKind = getFixedInputSlotKind(exclusiveGroups3, explicitSlot);
+    if (fixedInputSlotKind !== enabled6)
+      return { slot: '', reason: 'kindMismatch', explicitSlot: explicitSlot };
+    if (!fixedInputSlotAcceptsSource(exclusiveGroups3, explicitSlot, value20))
+      return { slot: '', reason: 'slotConstraint', explicitSlot: explicitSlot };
+    if (!fixedSlotOccupancyTracker.isSlotAvailable(explicitSlot))
+      return { slot: '', reason: 'occupied', explicitSlot: explicitSlot };
+    return { slot: explicitSlot, reason: 'explicit', explicitSlot: explicitSlot };
   }
-  if (_0x21a036 && isKnownFixedInputSlot(_0x34667e, _0x21a036))
-    return { slot: '', reason: 'hidden', explicitSlot: _0x21a036, hidden: true, knownSlot: true };
-  const _0x4d8d36 = Array.isArray(_0x34667e.slotOrderByType?.[_0x548876])
-      ? _0x34667e.slotOrderByType[_0x548876].map((_0x446808) => normalizeFixedSlotId(_0x446808))
+  if (explicitSlot && isKnownFixedInputSlot(exclusiveGroups3, explicitSlot))
+    return { slot: '', reason: 'hidden', explicitSlot: explicitSlot, hidden: true, knownSlot: true };
+  const list12 = Array.isArray(exclusiveGroups3.slotOrderByType?.[enabled6])
+      ? exclusiveGroups3.slotOrderByType[enabled6].map((item21) => normalizeFixedSlotId(item21))
       : [],
-    _0x56b776 =
-      _0x4d8d36.find(
-        (_0xec5503) =>
-          _0x3df648.has(_0xec5503) &&
-          _0x2c1103.isSlotAvailable(_0xec5503) &&
-          fixedInputSlotAcceptsSource(_0x34667e, _0xec5503, _0x4ffe04),
+    slot =
+      list12.find(
+        (item22) =>
+          map5.has(item22) &&
+          fixedSlotOccupancyTracker.isSlotAvailable(item22) &&
+          fixedInputSlotAcceptsSource(exclusiveGroups3, item22, value20),
       ) || '';
   return {
-    slot: _0x56b776,
-    reason: _0x56b776 ? (_0x21a036 ? 'stale' : 'auto') : 'overflow',
-    explicitSlot: _0x21a036,
+    slot: slot,
+    reason: slot ? (explicitSlot ? 'stale' : 'auto') : 'overflow',
+    explicitSlot: explicitSlot,
   };
 }
 export function buildFixedInputAssetSlotMapFromRefs(
-  _0x444f01 = [],
+  list13 = [],
   {
     slotOrderByType: slotOrderByType = {},
     visibleSlots: visibleSlots = null,
@@ -351,44 +339,44 @@ export function buildFixedInputAssetSlotMapFromRefs(
     slotById: slotById = {},
   } = {},
 ) {
-  const _0x528394 = new Set(
+  const list14 = new Set(
       Array.isArray(visibleSlots) && visibleSlots.length
         ? visibleSlots.map(String)
         : getSlotsFromOrder(slotOrderByType),
     ),
-    _0x4928e0 = normalizeOccupiedSlots(occupiedSlots),
-    _0x43c87a = {};
+    occupiedSlots2 = normalizeOccupiedSlots(occupiedSlots),
+    value21 = {};
   return (
-    _0x528394.forEach((_0xab19f6) => {
-      _0x43c87a[_0xab19f6] = null;
+    list14.forEach((item23) => {
+      value21[item23] = null;
     }),
-    (Array.isArray(_0x444f01) ? _0x444f01 : []).forEach((_0x3e62ea) => {
-      const _0x95525e = String(_0x3e62ea?.type || '').trim(),
-        _0x9e7000 = new Set(_0x4928e0);
-      Object.entries(_0x43c87a).forEach(([_0x354d16, _0x59988e]) => {
-        if (_0x59988e) _0x9e7000.add(_0x354d16);
+    (Array.isArray(list13) ? list13 : []).forEach((refSlot2) => {
+      const kind3 = String(refSlot2?.type || '').trim(),
+        occupiedSlots3 = new Set(occupiedSlots2);
+      Object.entries(value21).forEach(([value22, value23]) => {
+        if (value23) occupiedSlots3.add(value22);
       });
-      const _0x254883 = resolveFixedInputSlotForRef({
+      const fixedInputSlotForRef = resolveFixedInputSlotForRef({
           fixedInputConfig: {
             slotOrderByType: slotOrderByType,
-            visibleSlots: Array.from(_0x528394),
+            visibleSlots: Array.from(list14),
             exclusiveGroups: exclusiveGroups,
             slotById: slotById,
           },
-          refSlot: _0x3e62ea?.refSlot,
-          kind: _0x95525e,
-          occupiedSlots: _0x9e7000,
-          sourceNode: _0x3e62ea?.nodeData || _0x3e62ea,
+          refSlot: refSlot2?.refSlot,
+          kind: kind3,
+          occupiedSlots: occupiedSlots3,
+          sourceNode: refSlot2?.nodeData || refSlot2,
         }),
-        _0x36d8a0 = _0x254883.slot;
-      if (!_0x36d8a0) return;
-      _0x43c87a[_0x36d8a0] = { ..._0x3e62ea, refSlot: _0x36d8a0, virtual: true };
+        refSlot3 = fixedInputSlotForRef.slot;
+      if (!refSlot3) return;
+      value21[refSlot3] = { ...refSlot2, refSlot: refSlot3, virtual: true };
     }),
-    _0x43c87a
+    value21
   );
 }
 export function buildFixedInputAssetSlotMap(
-  _0x2f667e = null,
+  value24 = null,
   {
     slotOrderByType: slotOrderByType = {},
     visibleSlots: visibleSlots = null,
@@ -398,11 +386,11 @@ export function buildFixedInputAssetSlotMap(
     nodeData: nodeData = null,
   } = {},
 ) {
-  const _0x12fe40 = getAssetInputRefsFromPromptAndNode(_0x2f667e, {
+  const assetInputRefsFromPromptAndNode = getAssetInputRefsFromPromptAndNode(value24, {
     nodeData: nodeData,
     allowedTypes: Object.keys(slotOrderByType),
   });
-  return buildFixedInputAssetSlotMapFromRefs(_0x12fe40, {
+  return buildFixedInputAssetSlotMapFromRefs(assetInputRefsFromPromptAndNode, {
     slotOrderByType: slotOrderByType,
     visibleSlots: visibleSlots,
     occupiedSlots: occupiedSlots,
@@ -411,98 +399,98 @@ export function buildFixedInputAssetSlotMap(
   });
 }
 export function buildRhV54AssetSlotMapFromRefs(
-  _0x3c2171 = [],
+  list15 = [],
   { hideExtraSlots: hideExtraSlots = false, occupiedSlots: occupiedSlots = null } = {},
 ) {
-  return buildFixedInputAssetSlotMapFromRefs(_0x3c2171, {
+  return buildFixedInputAssetSlotMapFromRefs(list15, {
     slotOrderByType: RH_V54_ASSET_SLOT_ORDER,
     visibleSlots: getRhV54VisibleSlots({ hideExtraSlots: hideExtraSlots }),
     occupiedSlots: occupiedSlots,
   });
 }
 export function buildRhV54AssetSlotMap(
-  _0x170706 = null,
+  value25 = null,
   {
     hideExtraSlots: hideExtraSlots = false,
     occupiedSlots: occupiedSlots = null,
     nodeData: nodeData = null,
   } = {},
 ) {
-  return buildFixedInputAssetSlotMap(_0x170706, {
+  return buildFixedInputAssetSlotMap(value25, {
     slotOrderByType: RH_V54_ASSET_SLOT_ORDER,
     visibleSlots: getRhV54VisibleSlots({ hideExtraSlots: hideExtraSlots }),
     occupiedSlots: occupiedSlots,
     nodeData: nodeData,
   });
 }
-export function buildRhBasicAssetSlotMap(_0x146133 = null, _0x3a3c65 = {}) {
-  return buildFixedInputAssetSlotMap(_0x146133, {
+export function buildRhBasicAssetSlotMap(value26 = null, occupiedSlots4 = {}) {
+  return buildFixedInputAssetSlotMap(value26, {
     slotOrderByType: RH_BASIC_ASSET_SLOT_ORDER,
     visibleSlots: ['sourceVideo', 'refImage'],
-    occupiedSlots: _0x3a3c65.occupiedSlots,
-    nodeData: _0x3a3c65.nodeData,
+    occupiedSlots: occupiedSlots4.occupiedSlots,
+    nodeData: occupiedSlots4.nodeData,
   });
 }
-export function buildRhLtxAssetSlotMap(_0x3a152e = null, _0x47188e = {}) {
-  return buildFixedInputAssetSlotMap(_0x3a152e, {
+export function buildRhLtxAssetSlotMap(value27 = null, occupiedSlots5 = {}) {
+  return buildFixedInputAssetSlotMap(value27, {
     slotOrderByType: RH_LTX_ASSET_SLOT_ORDER,
     visibleSlots: ['refImage', 'audio'],
-    occupiedSlots: _0x47188e.occupiedSlots,
-    nodeData: _0x47188e.nodeData,
+    occupiedSlots: occupiedSlots5.occupiedSlots,
+    nodeData: occupiedSlots5.nodeData,
   });
 }
-export function buildRhLipSyncAssetSlotMap(_0x2fb567 = null, _0x2b1f17 = {}) {
-  return buildFixedInputAssetSlotMap(_0x2fb567, {
+export function buildRhLipSyncAssetSlotMap(value28 = null, occupiedSlots6 = {}) {
+  return buildFixedInputAssetSlotMap(value28, {
     slotOrderByType: RH_LIPSYNC_ASSET_SLOT_ORDER,
     visibleSlots: ['sourceVideo', 'refImage', 'audio'],
-    occupiedSlots: _0x2b1f17.occupiedSlots,
+    occupiedSlots: occupiedSlots6.occupiedSlots,
     exclusiveGroups: RH_LIPSYNC_VISUAL_EXCLUSIVE_GROUPS,
-    nodeData: _0x2b1f17.nodeData,
+    nodeData: occupiedSlots6.nodeData,
   });
 }
-function getConditionFieldIds(_0xe3c7ac, _0x5a6415 = new Set()) {
-  if (Array['isArray'](_0xe3c7ac))
-    return (_0xe3c7ac['forEach']((_0x354e46) => getConditionFieldIds(_0x354e46, _0x5a6415)), _0x5a6415);
-  if (!_0xe3c7ac || typeof _0xe3c7ac !== 'object') return _0x5a6415;
-  Array['isArray'](_0xe3c7ac['any']) &&
-    _0xe3c7ac['any']['forEach']((_0x5afc29) => getConditionFieldIds(_0x5afc29, _0x5a6415));
-  Array['isArray'](_0xe3c7ac['all']) &&
-    _0xe3c7ac['all']['forEach']((_0x47ada0) => getConditionFieldIds(_0x47ada0, _0x5a6415));
-  const _0x2551d3 = String(_0xe3c7ac['field'] || '')['trim']();
-  if (_0x2551d3) _0x5a6415['add'](_0x2551d3);
-  return _0x5a6415;
+function getConditionFieldIds(list16, value29 = new Set()) {
+  if (Array['isArray'](list16))
+    return (list16['forEach']((value30) => getConditionFieldIds(value30, value29)), value29);
+  if (!list16 || typeof list16 !== 'object') return value29;
+  Array['isArray'](list16['any']) &&
+    list16['any']['forEach']((value31) => getConditionFieldIds(value31, value29));
+  Array['isArray'](list16['all']) &&
+    list16['all']['forEach']((value32) => getConditionFieldIds(value32, value29));
+  const value33 = String(list16['field'] || '')['trim']();
+  if (value33) value29['add'](value33);
+  return value29;
 }
 
 function getHiddenFixedSlotReasonFields(
-  _0x13c8e0,
-  _0x419702 = {},
-  _0x83aa03 = null,
+  value34,
+  value35 = {},
+  value36 = null,
   { useRhVisibilityFlags: useRhVisibilityFlags = ![] } = {},
 ) {
-  const _0x269630 = new Set();
+  const value37 = new Set();
   return (
     useRhVisibilityFlags &&
-      _0x419702?.['rhSpecialMode'] === 'cameraMove' &&
-      (_0x13c8e0 === 'firstFrame' || _0x13c8e0 === 'videoMask') &&
-      _0x269630['add']('rhSpecialMode'),
+      value35?.['rhSpecialMode'] === 'cameraMove' &&
+      (value34 === 'firstFrame' || value34 === 'videoMask') &&
+      value37['add']('rhSpecialMode'),
     useRhVisibilityFlags &&
-      _0x419702?.['rhSubtractSubject'] === !![] &&
-      (_0x13c8e0 === 'firstFrame' || _0x13c8e0 === 'videoMask') &&
-      _0x269630['add']('rhSubtractSubject'),
-    _0x83aa03?.['showWhen'] &&
-      !fixedSlotConditionMatches(_0x83aa03['showWhen'], _0x419702) &&
-      getConditionFieldIds(_0x83aa03['showWhen'], _0x269630),
-    _0x83aa03?.['hideWhen'] &&
-      fixedSlotConditionMatches(_0x83aa03['hideWhen'], _0x419702) &&
-      getConditionFieldIds(_0x83aa03['hideWhen'], _0x269630),
-    Array['from'](_0x269630)
+      value35?.['rhSubtractSubject'] === !![] &&
+      (value34 === 'firstFrame' || value34 === 'videoMask') &&
+      value37['add']('rhSubtractSubject'),
+    value36?.['showWhen'] &&
+      !fixedSlotConditionMatches(value36['showWhen'], value35) &&
+      getConditionFieldIds(value36['showWhen'], value37),
+    value36?.['hideWhen'] &&
+      fixedSlotConditionMatches(value36['hideWhen'], value35) &&
+      getConditionFieldIds(value36['hideWhen'], value37),
+    Array['from'](value37)
   );
 }
 
-export function shouldHideFixedInputSlots(_0x25c29b = null, _0x57d5b3 = {}) {
-  if (_0x25c29b?.['inputSurfaceHidden'] === !![]) return !![];
-  const _0x478c84 = _0x25c29b?.['manifest'] || _0x25c29b,
-    _0x589b3a = _0x478c84?.['extensions']?.['videoInputSurface'];
-  if (_0x589b3a?.['hideFixedInputSlots'] === !![]) return !![];
-  return fixedSlotConditionMatches(_0x589b3a?.['hideFixedInputSlotsWhen'], _0x57d5b3);
+export function shouldHideFixedInputSlots(value38 = null, value39 = {}) {
+  if (value38?.['inputSurfaceHidden'] === !![]) return !![];
+  const value40 = value38?.['manifest'] || value38,
+    value41 = value40?.['extensions']?.['videoInputSurface'];
+  if (value41?.['hideFixedInputSlots'] === !![]) return !![];
+  return fixedSlotConditionMatches(value41?.['hideFixedInputSlotsWhen'], value39);
 }

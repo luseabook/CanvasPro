@@ -11,305 +11,318 @@ import {
   isPersonReplacementVoiceSeparationActive,
   resolvePersonReplacementVoiceSeparationState,
 } from './personReplacementVoiceSeparationState.js';
-function normalizeText(_0x39a044) {
-  return String(_0x39a044 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function escapeHtml(_0x41bd67) {
-  return String(_0x41bd67 ?? '')
+function escapeHtml(item) {
+  return String(item ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
     ['replaceAll']('\x22', '&quot;')
     ['replaceAll']('\x27', '&apos;');
 }
-function normalizeMediaUrl(_0x4043f6) {
-  const _0x9305a = normalizeText(_0x4043f6);
-  if (!_0x9305a) return '';
-  return localPathToUrl(_0x9305a) || _0x9305a;
+function normalizeMediaUrl(key) {
+  const text = normalizeText(key);
+  if (!text) return '';
+  return localPathToUrl(text) || text;
 }
-function formatClock(_0x5971dc) {
-  const _0x341e7d = Math['max'](0x0, Number(_0x5971dc) || 0x0),
-    _0x386a55 = Math['floor'](_0x341e7d / 0x3c),
-    _0x317cc4 = Math['floor'](_0x341e7d % 0x3c);
-  return String(_0x386a55)['padStart'](0x2, '0') + ':' + String(_0x317cc4)['padStart'](0x2, '0');
+function formatClock(index) {
+  const result = Math['max'](0x0, Number(index) || 0x0),
+    data = Math['floor'](result / 0x3c),
+    options = Math['floor'](result % 0x3c);
+  return String(data)['padStart'](0x2, '0') + ':' + String(options)['padStart'](0x2, '0');
 }
-function getCharacterAppearance(_0x6f756f = {}) {
-  const _0x3e5277 = getWorkspaceAssetAppearances(_0x6f756f);
-  return getWorkspaceAssetBaseAppearance(_0x6f756f) || _0x3e5277[0x0] || null;
+function getCharacterAppearance(options2 = {}) {
+  const workspaceAssetAppearances = getWorkspaceAssetAppearances(options2);
+  return getWorkspaceAssetBaseAppearance(options2) || workspaceAssetAppearances[0x0] || null;
 }
-function getCharacterVoiceUrl(_0x3ad679 = {}) {
+function getCharacterVoiceUrl(options3 = {}) {
   return normalizeMediaUrl(
-    _0x3ad679['voiceReference']?.['audioUrl'] ||
-      _0x3ad679['voiceReference']?.['localPath'] ||
-      _0x3ad679['voiceRef'],
+    options3['voiceReference']?.['audioUrl'] ||
+      options3['voiceReference']?.['localPath'] ||
+      options3['voiceRef'],
   );
 }
-export function getPersonReplacementVoiceCloneCharacters(_0x153f0f = {}) {
-  return Array['isArray'](_0x153f0f['characters']) ? _0x153f0f['characters'] : [];
+export function getPersonReplacementVoiceCloneCharacters(options4 = {}) {
+  return Array['isArray'](options4['characters']) ? options4['characters'] : [];
 }
-export function renderPersonReplacementVoiceCloneCharacterCards(_0x41de52) {
-  const _0x360e2a = getPersonReplacementVoiceCloneCharacters(_0x41de52);
-  return _0x360e2a['map']((_0xca9c40) => {
-    const _0x15afb7 = getCharacterAppearance(_0xca9c40),
-      _0x50462b = normalizeMediaUrl(_0x15afb7?.['imageUrl']),
-      _0x3de740 = getCharacterVoiceUrl(_0xca9c40),
-      _0x488bc7 = Boolean(_0x3de740),
-      _0x5bbc10 = renderPersonReplacementVoicePreviewPlayer(
-        { ..._0xca9c40, kind: 'character' },
+export function renderPersonReplacementVoiceCloneCharacterCards(target) {
+  const list = getPersonReplacementVoiceCloneCharacters(target);
+  return list['map']((error) => {
+    const characterAppearance = getCharacterAppearance(error),
+      mediaUrl = normalizeMediaUrl(characterAppearance?.['imageUrl']),
+      characterVoiceUrl = getCharacterVoiceUrl(error),
+      source = Boolean(characterVoiceUrl),
+      renderPersonReplacementVoicePreviewPlayer2 = renderPersonReplacementVoicePreviewPlayer(
+        { ...error, kind: 'character' },
         { className: 'person-replacement-voice-asset-preview', showWaveform: ![] },
       );
     return (
       '<article class="person-replacement-voice-asset-shell' +
-      (_0x488bc7 ? ' has-audio' : ' is-missing-audio') +
+      (source ? ' has-audio' : ' is-missing-audio') +
       '">\n      <button type="button" class="person-replacement-voice-asset-card' +
-      (_0x488bc7 ? '\x20has-audio' : ' is-missing-audio') +
+      (source ? '\x20has-audio' : ' is-missing-audio') +
       '" data-person-replacement-action="select-voice-asset" data-person-replacement-voice-asset-id="' +
-      escapeHtml(_0xca9c40['id']) +
+      escapeHtml(error['id']) +
       '" data-character-id="' +
-      escapeHtml(_0xca9c40['id']) +
+      escapeHtml(error['id']) +
       '\x22\x20' +
-      (_0x488bc7 ? 'draggable=\x22true\x22' : 'disabled') +
+      (source ? 'draggable=\x22true\x22' : 'disabled') +
       ' aria-label="' +
-      escapeHtml(_0x488bc7 ? '加载' + _0xca9c40['name'] + '的人物音频' : _0xca9c40['name'] + '无音频') +
+      escapeHtml(source ? '加载' + error['name'] + '的人物音频' : error['name'] + '无音频') +
       '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-voice-asset-image\x22>' +
-      (_0x50462b
-        ? '<img src="' + escapeHtml(_0x50462b) + '" alt="' + escapeHtml(_0xca9c40['name']) + '\x22>'
+      (mediaUrl
+        ? '<img src="' + escapeHtml(mediaUrl) + '" alt="' + escapeHtml(error['name']) + '\x22>'
         : '<span aria-hidden="true">人</span>') +
       '</span>\n        <span class="person-replacement-voice-asset-copy"><strong>' +
-      escapeHtml(_0xca9c40['name']) +
+      escapeHtml(error['name']) +
       '</strong><small>' +
-      (_0x488bc7 ? '选择人物素材，使用对应声音' : '无音频') +
+      (source ? '选择人物素材，使用对应声音' : '无音频') +
       '</small></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-voice-asset-status' +
-      (_0x488bc7 ? '\x20is-ready' : '\x20is-empty') +
+      (source ? '\x20is-ready' : '\x20is-empty') +
       '\x22>' +
-      (_0x488bc7 ? '可用' : '无音频') +
+      (source ? '可用' : '无音频') +
       '</span>\n      </button>\n      ' +
-      _0x5bbc10 +
+      renderPersonReplacementVoicePreviewPlayer2 +
       '\x0a\x20\x20\x20\x20</article>'
     );
   })['join']('');
 }
-function renderVoiceCloneCharacterAssets(_0x37a4e6) {
-  const _0x223ca9 = renderPersonReplacementVoiceCloneCharacterCards(_0x37a4e6);
+function renderVoiceCloneCharacterAssets(next) {
+  const renderPersonReplacementVoiceCloneCharacterCards2 =
+    renderPersonReplacementVoiceCloneCharacterCards(next);
   return (
     '<aside class="person-replacement-voice-assets" aria-label="人物音频素材">\n    <header class="person-replacement-voice-column-heading"><strong>人物素材</strong><small>显示当前项目的全部人物</small></header>\n    <div class="person-replacement-voice-asset-list">' +
-    (_0x223ca9 || '<p class="person-replacement-inline-empty">暂无人物素材</p>') +
+    (renderPersonReplacementVoiceCloneCharacterCards2 ||
+      '<p class="person-replacement-inline-empty">暂无人物素材</p>') +
     '</div>\n    <p class="person-replacement-voice-column-hint">点击右侧句子的“+”后选择高亮人物，也可将人物直接拖入“+”。</p>\n  </aside>'
   );
 }
-export function renderPersonReplacementVoiceCloneSourceCards(_0x3f3cf2) {
-  const _0x224722 = Array['isArray'](_0x3f3cf2['sources']) ? _0x3f3cf2['sources'] : [],
-    _0x18c2d0 = Array['isArray'](_0x3f3cf2['shots']) ? _0x3f3cf2['shots'] : [];
-  return _0x224722['map']((_0x1bdd05, _0xfcc1be) => {
-    const _0x402c08 = _0x1bdd05['id'] === _0x3f3cf2['workspace']['selectedVoiceSourceId'],
-      _0x53403 =
-        _0x18c2d0['find'](
-          (_0x332c48) => _0x332c48?.['sourceId'] === _0x1bdd05['id'] && _0x332c48?.['keyframeRef'],
-        )?.['keyframeRef'] || '',
-      _0x4ad3f2 = normalizeMediaUrl(_0x1bdd05['thumbnailRef'] || _0x53403),
-      _0x176ce3 = normalizeMediaUrl(
-        _0x3f3cf2['sourcePreviewRefs']?.[_0x1bdd05['id']] || _0x1bdd05['videoRef'],
-      ),
-      _0x3fa2c9 = normalizeMediaUrl(_0x1bdd05['videoRef']),
-      _0x5a8856 = resolvePersonReplacementVoiceSeparationState(_0x3f3cf2, _0x1bdd05['id']),
-      _0x2589b8 = isPersonReplacementVoiceSeparationActive(_0x5a8856),
-      _0x16917c = normalizeMediaUrl(_0x5a8856['vocalsAudioRef'] || _0x5a8856['vocalsAudioUrl']),
-      _0x4bf850 = Boolean(_0x16917c),
-      _0x22cd75 = _0x1bdd05['fileName'] || '视频 ' + (_0xfcc1be + 0x1),
-      _0x3f3144 = Number(_0x1bdd05['durationSec']),
-      _0xa7d1f = Number['isFinite'](_0x3f3144) && _0x3f3144 > 0x0 ? formatClock(_0x3f3144) : '完整视频',
-      _0x10f88e = _0x4ad3f2
+export function renderPersonReplacementVoiceCloneSourceCards(current) {
+  const list2 = Array['isArray'](current['sources']) ? current['sources'] : [],
+    list3 = Array['isArray'](current['shots']) ? current['shots'] : [];
+  return list2['map']((entry, record) => {
+    const payload = entry['id'] === current['workspace']['selectedVoiceSourceId'],
+      handle =
+        list3['find']((state) => state?.['sourceId'] === entry['id'] && state?.['keyframeRef'])?.[
+          'keyframeRef'
+        ] || '',
+      mediaUrl2 = normalizeMediaUrl(entry['thumbnailRef'] || handle),
+      mediaUrl3 = normalizeMediaUrl(current['sourcePreviewRefs']?.[entry['id']] || entry['videoRef']),
+      audioUrl = normalizeMediaUrl(entry['videoRef']),
+      response = resolvePersonReplacementVoiceSeparationState(current, entry['id']),
+      isPersonReplacementVoiceSeparationActive2 = isPersonReplacementVoiceSeparationActive(response),
+      audioUrl2 = normalizeMediaUrl(response['vocalsAudioRef'] || response['vocalsAudioUrl']),
+      config = Boolean(audioUrl2),
+      scope = entry['fileName'] || '视频 ' + (record + 0x1),
+      count = Number(entry['durationSec']),
+      input = Number['isFinite'](count) && count > 0x0 ? formatClock(count) : '完整视频',
+      output = mediaUrl2
         ? '<img src="' +
-          escapeHtml(_0x4ad3f2) +
+          escapeHtml(mediaUrl2) +
           '" alt="' +
-          escapeHtml(_0x22cd75 + '\x20视频封面') +
+          escapeHtml(scope + '\x20视频封面') +
           '\x22\x20decoding=\x22async\x22\x20draggable=\x22false\x22>'
-        : _0x176ce3
-          ? '<video muted playsinline preload="metadata" src="' + escapeHtml(_0x176ce3) + '"></video>'
+        : mediaUrl3
+          ? '<video muted playsinline preload="metadata" src="' + escapeHtml(mediaUrl3) + '"></video>'
           : '<span\x20aria-hidden=\x22true\x22>视频</span>',
-      _0x45e33b = renderAudioPlaybackSurface({
-        audioUrl: _0x3fa2c9,
+      renderAudioPlaybackSurface2 = renderAudioPlaybackSurface({
+        audioUrl: audioUrl,
         className: 'person-replacement-voice-source-player',
-        playLabel: '播放' + _0x22cd75 + '的原始声音',
-        pauseLabel: '暂停' + _0x22cd75 + '的原始声音',
+        playLabel: '播放' + scope + '的原始声音',
+        pauseLabel: '暂停' + scope + '的原始声音',
         dataAttributes: {
           'data-person-replacement-voice-track': 'original',
-          'data-person-replacement-voice-track-source-id': _0x1bdd05['id'],
+          'data-person-replacement-voice-track-source-id': entry['id'],
         },
       }),
-      _0x4b479b = _0x4bf850
+      value2 = config
         ? renderAudioPlaybackSurface({
-            audioUrl: _0x16917c,
+            audioUrl: audioUrl2,
             className: 'person-replacement-voice-source-player\x20is-clean-voice',
-            playLabel: '播放' + _0x22cd75 + '的清晰人声',
-            pauseLabel: '暂停' + _0x22cd75 + '的清晰人声',
+            playLabel: '播放' + scope + '的清晰人声',
+            pauseLabel: '暂停' + scope + '的清晰人声',
             dataAttributes: {
               'data-person-replacement-voice-track': 'vocals',
-              'data-person-replacement-voice-track-source-id': _0x1bdd05['id'],
+              'data-person-replacement-voice-track-source-id': entry['id'],
             },
           })
         : '',
-      _0x5eb66f = _0x2589b8
+      value3 = isPersonReplacementVoiceSeparationActive2
         ? '提取清晰人声'
-        : _0x4bf850
+        : config
           ? '已提取清晰人声'
-          : _0x5a8856['status'] === 'failed'
+          : response['status'] === 'failed'
             ? '重试'
             : '提取清晰人声',
-      _0x5b4d8d = _0x2589b8
-        ? _0x4bf850
+      value4 = isPersonReplacementVoiceSeparationActive2
+        ? config
           ? '正在更新，当前继续使用上次结果'
           : '正在分离人声与背景声…'
-        : _0x4bf850
+        : config
           ? '已自动设为声音克隆输入'
           : '',
-      _0x36c394 = _0x5a8856['status'] === 'failed' ? _0x5a8856['error'] || '提取失败，请重试' : '',
-      _0x259f47 = _0x36c394
+      errorMessage = response['status'] === 'failed' ? response['error'] || '提取失败，请重试' : '',
+      value5 = errorMessage
         ? renderGenerationErrorCardMarkup({
-            errorMessage: _0x36c394,
+            errorMessage: errorMessage,
             title: '提取失败',
             className: 'person-replacement-voice-error-card',
             role: 'alert',
           })
         : '',
-      _0x3dfb90 = _0x2589b8
+      value6 = isPersonReplacementVoiceSeparationActive2
         ? '正在提取清晰人声，点击可取消'
-        : _0x4bf850
+        : config
           ? '已提取清晰人声，点击可重新提取'
-          : _0x5eb66f,
-      _0x7dd25a = _0x2589b8
+          : value3,
+      value7 = isPersonReplacementVoiceSeparationActive2
         ? '<span class="storyboard-script-loading-spinner person-replacement-voice-extraction-spinner" aria-hidden="true"></span>'
         : '';
     return (
       '<article class="person-replacement-voice-source-shell' +
-      (_0x402c08 ? ' is-selected' : '') +
-      (_0x2589b8 ? ' is-extracting' : '') +
+      (payload ? ' is-selected' : '') +
+      (isPersonReplacementVoiceSeparationActive2 ? ' is-extracting' : '') +
       '\x22\x20data-person-replacement-voice-source-shell\x20data-source-id=\x22' +
-      escapeHtml(_0x1bdd05['id']) +
+      escapeHtml(entry['id']) +
       '">\n      <div class="person-replacement-voice-source-summary">\n        <button type="button" class="person-replacement-voice-source-card' +
-      (_0x402c08 ? ' is-selected' : '') +
+      (payload ? ' is-selected' : '') +
       '" data-person-replacement-action="select-voice-source" data-source-id="' +
-      escapeHtml(_0x1bdd05['id']) +
+      escapeHtml(entry['id']) +
       '" aria-pressed="' +
-      _0x402c08 +
+      payload +
       '" aria-label="' +
-      escapeHtml('检测完整原始视频：' + _0x22cd75) +
+      escapeHtml('检测完整原始视频：' + scope) +
       '">\n          <span class="person-replacement-voice-source-thumb">' +
-      _0x10f88e +
+      output +
       '</span>\n          <span class="person-replacement-voice-source-copy"><strong>' +
-      escapeHtml(_0x22cd75) +
+      escapeHtml(scope) +
       '</strong><small>' +
-      escapeHtml(_0xa7d1f) +
+      escapeHtml(input) +
       '\x20·\x20原始上传</small></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-voice-source-state\x22>' +
-      (_0x402c08 ? '当前' : '选择') +
+      (payload ? '当前' : '选择') +
       '</span>\n        </button>\n        <button type="button" class="person-replacement-voice-extraction-action' +
-      (_0x2589b8 ? ' is-cancel is-loading' : '') +
-      (_0x4bf850 && !_0x2589b8 ? ' is-success' : '') +
+      (isPersonReplacementVoiceSeparationActive2 ? ' is-cancel is-loading' : '') +
+      (config && !isPersonReplacementVoiceSeparationActive2 ? ' is-success' : '') +
       '" data-person-replacement-action="' +
-      (_0x2589b8 ? 'cancel-voice-separation' : 'extract-clean-voice') +
+      (isPersonReplacementVoiceSeparationActive2 ? 'cancel-voice-separation' : 'extract-clean-voice') +
       '" data-source-id="' +
-      escapeHtml(_0x1bdd05['id']) +
+      escapeHtml(entry['id']) +
       '\x22\x20title=\x22' +
-      escapeHtml(_0x3dfb90) +
+      escapeHtml(value6) +
       '" aria-label="' +
-      escapeHtml(_0x3dfb90) +
+      escapeHtml(value6) +
       '" aria-busy="' +
-      _0x2589b8 +
+      isPersonReplacementVoiceSeparationActive2 +
       '\x22' +
-      (_0x3fa2c9 ? '' : ' disabled') +
+      (audioUrl ? '' : ' disabled') +
       '>' +
-      _0x7dd25a +
+      value7 +
       '<span>' +
-      escapeHtml(_0x5eb66f) +
+      escapeHtml(value3) +
       '</span></button>\n      </div>\n      <div class="person-replacement-voice-source-details">\n        <section class="person-replacement-voice-track" aria-label="原始声音">\n          <div class="person-replacement-voice-track-heading"><strong>原始声音</strong><small>来自完整原始视频</small></div>\n          ' +
-      _0x45e33b +
+      renderAudioPlaybackSurface2 +
       '\n        </section>\n        ' +
-      (_0x4bf850
+      (config
         ? '<section class="person-replacement-voice-track is-clean-voice" aria-label="清晰人声">\n          <div class="person-replacement-voice-track-heading"><strong>清晰人声</strong><span>克隆输入</span></div>\n          ' +
-          _0x4b479b +
+          value2 +
           '\n        </section>'
         : '') +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
-      _0x259f47 +
+      value5 +
       '\n        ' +
-      (_0x5b4d8d
+      (value4
         ? '<footer class="person-replacement-voice-extraction-footer"><span class="person-replacement-voice-extraction-status" title="' +
-          escapeHtml(_0x5b4d8d) +
+          escapeHtml(value4) +
           '\x22>' +
-          escapeHtml(_0x5b4d8d) +
+          escapeHtml(value4) +
           '</span></footer>'
         : '') +
       '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</article>'
     );
   })['join']('');
 }
-function renderVoiceCloneSources(_0x52a0d9) {
-  const _0x73ad7e = renderPersonReplacementVoiceCloneSourceCards(_0x52a0d9);
+function renderVoiceCloneSources(value8) {
+  const renderPersonReplacementVoiceCloneSourceCards2 = renderPersonReplacementVoiceCloneSourceCards(value8);
   return (
     '<aside\x20class=\x22person-replacement-voice-sources\x22\x20aria-label=\x22原始上传视频\x22>\x0a\x20\x20\x20\x20<header\x20class=\x22person-replacement-voice-column-heading\x22><strong>原始视频</strong><small>声音检测始终使用最初上传的完整视频</small></header>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-voice-source-list\x22>' +
-    (_0x73ad7e || '<p class="person-replacement-inline-empty">请先在项目首页上传视频</p>') +
+    (renderPersonReplacementVoiceCloneSourceCards2 ||
+      '<p class="person-replacement-inline-empty">请先在项目首页上传视频</p>') +
     '</div>\n  </aside>'
   );
 }
-function renderVoiceLayoutSplitter(_0x2f45d0, _0x4d7221) {
-  const _0x1723d7 = _0x2f45d0 === 'assets',
-    _0x40de86 = _0x1723d7 ? _0x4d7221['assetsEnd'] : _0x4d7221['sourcesEnd'],
-    _0x2d0ba5 = _0x1723d7 ? 0x10 : _0x4d7221['assetsEnd'] + 0x10,
-    _0x1b20d2 = _0x1723d7 ? _0x4d7221['sourcesEnd'] - 0x10 : 0x3c,
-    _0xb4d411 = _0x1723d7 ? '调整原始视频栏宽度' : '调整人物素材栏宽度';
+function renderVoiceLayoutSplitter(value9, value10) {
+  const value11 = value9 === 'assets',
+    value12 = value11 ? value10['assetsEnd'] : value10['sourcesEnd'],
+    value13 = value11 ? 0x10 : value10['assetsEnd'] + 0x10,
+    value14 = value11 ? value10['sourcesEnd'] - 0x10 : 0x3c,
+    value15 = value11 ? '调整原始视频栏宽度' : '调整人物素材栏宽度';
   return (
     '<div class="person-replacement-voice-layout-splitter panel-resize-handle panel-resize-handle--transient is-' +
-    _0x2f45d0 +
+    value9 +
     '" data-person-replacement-voice-layout-splitter="' +
-    _0x2f45d0 +
+    value9 +
     '\x22\x20role=\x22separator\x22\x20aria-orientation=\x22vertical\x22\x20aria-label=\x22' +
-    _0xb4d411 +
+    value15 +
     '" aria-valuemin="' +
-    Math['round'](_0x2d0ba5) +
+    Math['round'](value13) +
     '\x22\x20aria-valuemax=\x22' +
-    Math['round'](_0x1b20d2) +
+    Math['round'](value14) +
     '" aria-valuenow="' +
-    Math['round'](_0x40de86) +
+    Math['round'](value12) +
     '" tabindex="0"></div>'
   );
 }
-export function applyPersonReplacementVoiceLayoutToElement(_0x3b796e, _0x341b89) {
-  const _0x7e2774 = normalizePersonReplacementVoiceLayout(_0x341b89);
-  (_0x3b796e?.['style']?.['setProperty']?.(
+export function applyPersonReplacementVoiceLayoutToElement(el, value16) {
+  const personReplacementVoiceLayout = normalizePersonReplacementVoiceLayout(value16);
+  (el?.['style']?.['setProperty']?.(
     '--person-replacement-voice-assets-end',
-    _0x7e2774['assetsEnd'] + '%',
+    personReplacementVoiceLayout['assetsEnd'] + '%',
   ),
-    _0x3b796e?.['style']?.['setProperty']?.(
+    el?.['style']?.['setProperty']?.(
       '--person-replacement-voice-sources-end',
-      _0x7e2774['sourcesEnd'] + '%',
+      personReplacementVoiceLayout['sourcesEnd'] + '%',
     ));
-  const _0x4db41d = _0x3b796e?.['querySelector']?.(
-      '[data-person-replacement-voice-layout-splitter="assets"]',
-    ),
-    _0x48672a = _0x3b796e?.['querySelector']?.('[data-person-replacement-voice-layout-splitter="sources"]');
+  const el2 = el?.['querySelector']?.('[data-person-replacement-voice-layout-splitter="assets"]'),
+    el3 = el?.['querySelector']?.('[data-person-replacement-voice-layout-splitter="sources"]');
   return (
-    _0x4db41d?.['setAttribute']?.('aria-valuemax', String(Math['round'](_0x7e2774['sourcesEnd'] - 0x10))),
-    _0x4db41d?.['setAttribute']?.('aria-valuenow', String(Math['round'](_0x7e2774['assetsEnd']))),
-    _0x48672a?.['setAttribute']?.('aria-valuemin', String(Math['round'](_0x7e2774['assetsEnd'] + 0x10))),
-    _0x48672a?.['setAttribute']?.('aria-valuenow', String(Math['round'](_0x7e2774['sourcesEnd']))),
-    _0x7e2774
+    el2?.['setAttribute']?.(
+      'aria-valuemax',
+      String(Math['round'](personReplacementVoiceLayout['sourcesEnd'] - 0x10)),
+    ),
+    el2?.['setAttribute']?.(
+      'aria-valuenow',
+      String(Math['round'](personReplacementVoiceLayout['assetsEnd'])),
+    ),
+    el3?.['setAttribute']?.(
+      'aria-valuemin',
+      String(Math['round'](personReplacementVoiceLayout['assetsEnd'] + 0x10)),
+    ),
+    el3?.['setAttribute']?.(
+      'aria-valuenow',
+      String(Math['round'](personReplacementVoiceLayout['sourcesEnd'])),
+    ),
+    personReplacementVoiceLayout
   );
 }
-export function renderPersonReplacementVoiceClonePage(_0x9431ce, { footerHtml: footerHtml = '' } = {}) {
-  const _0x471dc4 = normalizePersonReplacementVoiceLayout(_0x9431ce['workspace']['voiceLayout']);
+export function renderPersonReplacementVoiceClonePage(value17, { footerHtml: footerHtml = '' } = {}) {
+  const personReplacementVoiceLayout2 = normalizePersonReplacementVoiceLayout(
+    value17['workspace']['voiceLayout'],
+  );
   return (
     '<div\x20class=\x22person-replacement-voice-page\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-voice-layout\x22\x20data-person-replacement-voice-layout\x20style=\x22--person-replacement-voice-assets-end:' +
-    _0x471dc4['assetsEnd'] +
+    personReplacementVoiceLayout2['assetsEnd'] +
     '%;--person-replacement-voice-sources-end:' +
-    _0x471dc4['sourcesEnd'] +
+    personReplacementVoiceLayout2['sourcesEnd'] +
     '%\x22>\x0a\x20\x20\x20\x20\x20\x20' +
-    renderVoiceCloneSources(_0x9431ce) +
+    renderVoiceCloneSources(value17) +
     '\n      ' +
-    renderVoiceLayoutSplitter('assets', _0x471dc4) +
+    renderVoiceLayoutSplitter('assets', personReplacementVoiceLayout2) +
     '\n      ' +
-    renderVoiceCloneCharacterAssets(_0x9431ce) +
+    renderVoiceCloneCharacterAssets(value17) +
     '\n      ' +
-    renderVoiceLayoutSplitter('sources', _0x471dc4) +
+    renderVoiceLayoutSplitter('sources', personReplacementVoiceLayout2) +
     '\n      <section class="person-replacement-voice-studio-column" aria-label="声音克隆工作区"><div class="person-replacement-voice-studio-host" data-person-replacement-voice-studio-host></div></section>\n    </div>\n    ' +
     footerHtml +
     '\n  </div>'

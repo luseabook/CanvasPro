@@ -44,111 +44,107 @@ const SESSION_EVENT_TYPES = new Set([
   MAX_PROJECTED_RUN_EVENTS = 0x78,
   MAX_PROJECTED_OPERATIONS = 0x78,
   MAX_PROJECTED_TASK_BINDINGS = 0x18;
-function normalizeTimestamp(_0x101b33, _0x5f410f = Date['now']()) {
-  const _0x38f61b = Number(_0x101b33);
-  return Number['isFinite'](_0x38f61b) && _0x38f61b > 0x0 ? _0x38f61b : _0x5f410f;
+function normalizeTimestamp(value, item = Date['now']()) {
+  const count = Number(value);
+  return Number['isFinite'](count) && count > 0x0 ? count : item;
 }
-function normalizeSequence(_0x5e6eec, _0x2d3653 = 0x1) {
-  const _0x4e9f25 = Math['trunc'](Number(_0x5e6eec));
-  return Number['isFinite'](_0x4e9f25) && _0x4e9f25 > 0x0 ? _0x4e9f25 : _0x2d3653;
+function normalizeSequence(key, index = 0x1) {
+  const count2 = Math['trunc'](Number(key));
+  return Number['isFinite'](count2) && count2 > 0x0 ? count2 : index;
 }
-function cloneJson(_0x43f5d7, _0x597ed1 = null) {
+function cloneJson(result, data = null) {
   try {
-    return JSON['parse'](JSON['stringify'](_0x43f5d7));
+    return JSON['parse'](JSON['stringify'](result));
   } catch {
-    return _0x597ed1;
+    return data;
   }
 }
-function normalizeMessageSnapshot(_0x1838df = {}, _0x189530 = Date['now']()) {
-  if (!_0x1838df || typeof _0x1838df !== 'object' || Array['isArray'](_0x1838df)) return null;
-  const _0x4ba5d0 = compactAgentConversationText(
-      _0x1838df['content'] || _0x1838df['reply'] || _0x1838df['message'] || _0x1838df['question'] || '',
+function normalizeMessageSnapshot(error = {}, options = Date['now']()) {
+  if (!error || typeof error !== 'object' || Array['isArray'](error)) return null;
+  const content = compactAgentConversationText(
+      error['content'] || error['reply'] || error['message'] || error['question'] || '',
       MAX_MESSAGE_CONTENT_CHARS,
     ),
-    _0x36d854 = String(_0x1838df['status'] || '')
+    status2 = String(error['status'] || '')
       ['trim']()
       ['slice'](0x0, 0x78);
-  if (!_0x4ba5d0 && !_0x36d854) return null;
-  const _0x11bed2 = {
+  if (!content && !status2) return null;
+  const target = {
       role:
-        String(_0x1838df['role'] || 'assistant')
+        String(error['role'] || 'assistant')
           ['trim']()
           ['slice'](0x0, 0x20) || 'assistant',
-      content: _0x4ba5d0,
-      status: _0x36d854,
-      ts: normalizeTimestamp(_0x1838df['ts'], _0x189530),
+      content: content,
+      status: status2,
+      ts: normalizeTimestamp(error['ts'], options),
     },
-    _0x2ce876 = String(_0x1838df['messageType'] || _0x1838df['type'] || 'text')['trim']();
-  if (_0x2ce876 && _0x2ce876 !== 'text') _0x11bed2['messageType'] = _0x2ce876['slice'](0x0, 0x28);
-  _0x11bed2['role'] === 'user' &&
-    Array['isArray'](_0x1838df['inputRefs']) &&
-    (_0x11bed2['inputRefs'] = cloneJson(_0x1838df['inputRefs']['slice'](0x0, 0xc), []));
-  _0x11bed2['role'] === 'assistant' &&
-    _0x1838df['diagnostic'] &&
-    (_0x11bed2['diagnostic'] = cloneJson(_0x1838df['diagnostic'], null));
-  if (_0x11bed2['role'] === 'assistant') {
-    const _0x7d6246 = normalizeAgentAssistantContext(_0x1838df['assistantContext']);
-    if (_0x7d6246) _0x11bed2['assistantContext'] = _0x7d6246;
-    const _0x49dc5b = normalizeAgentReplyVersions(_0x1838df['replyVersions']);
-    if (_0x49dc5b) _0x11bed2['replyVersions'] = _0x49dc5b;
+    list = String(error['messageType'] || error['type'] || 'text')['trim']();
+  if (list && list !== 'text') target['messageType'] = list['slice'](0x0, 0x28);
+  target['role'] === 'user' &&
+    Array['isArray'](error['inputRefs']) &&
+    (target['inputRefs'] = cloneJson(error['inputRefs']['slice'](0x0, 0xc), []));
+  target['role'] === 'assistant' &&
+    error['diagnostic'] &&
+    (target['diagnostic'] = cloneJson(error['diagnostic'], null));
+  if (target['role'] === 'assistant') {
+    const agentAssistantContext = normalizeAgentAssistantContext(error['assistantContext']);
+    if (agentAssistantContext) target['assistantContext'] = agentAssistantContext;
+    const agentReplyVersions = normalizeAgentReplyVersions(error['replyVersions']);
+    if (agentReplyVersions) target['replyVersions'] = agentReplyVersions;
   }
   return (
-    _0x11bed2['messageType'] && _0x1838df['task'] && (_0x11bed2['task'] = cloneJson(_0x1838df['task'], null)),
-    _0x11bed2
+    target['messageType'] && error['task'] && (target['task'] = cloneJson(error['task'], null)),
+    target
   );
 }
-function normalizePayload(_0xe4638c = {}, _0x4d5f30 = Date['now']()) {
-  const _0x6880f =
-    _0xe4638c['payload'] && typeof _0xe4638c['payload'] === 'object' ? _0xe4638c['payload'] : {};
-  if (_0xe4638c['itemType'] === 'message') {
-    const _0x2904ec = normalizeMessageSnapshot(_0x6880f['message'], _0x4d5f30),
-      _0x245bc7 = normalizeAgentReplyVersionChange(_0x6880f['replyVersionChange']);
-    return _0x2904ec ? { message: _0x2904ec, ...(_0x245bc7 ? { replyVersionChange: _0x245bc7 } : {}) } : null;
+function normalizePayload(options2 = {}, source = Date['now']()) {
+  const error2 = options2['payload'] && typeof options2['payload'] === 'object' ? options2['payload'] : {};
+  if (options2['itemType'] === 'message') {
+    const message2 = normalizeMessageSnapshot(error2['message'], source),
+      replyVersionChange = normalizeAgentReplyVersionChange(error2['replyVersionChange']);
+    return message2
+      ? { message: message2, ...(replyVersionChange ? { replyVersionChange: replyVersionChange } : {}) }
+      : null;
   }
-  if (_0xe4638c['itemType'] === 'tool') {
-    const _0x10accc = normalizeAgentOperation(_0x6880f['operation'], _0x4d5f30);
-    return _0x10accc ? { operation: _0x10accc } : null;
+  if (options2['itemType'] === 'tool') {
+    const operation2 = normalizeAgentOperation(error2['operation'], source);
+    return operation2 ? { operation: operation2 } : null;
   }
-  if (_0xe4638c['itemType'] === 'task') {
-    const _0xbe1789 = normalizeAgentTaskBinding(_0x6880f['taskBinding']);
-    return _0xbe1789 ? { taskBinding: _0xbe1789 } : null;
+  if (options2['itemType'] === 'task') {
+    const taskBinding2 = normalizeAgentTaskBinding(error2['taskBinding']);
+    return taskBinding2 ? { taskBinding: taskBinding2 } : null;
   }
-  const _0x6cb37e = normalizeAgentRunEvent(_0x6880f['runEvent'], _0x4d5f30);
-  return _0x6cb37e ? { runEvent: _0x6cb37e } : null;
+  const runEvent2 = normalizeAgentRunEvent(error2['runEvent'], source);
+  return runEvent2 ? { runEvent: runEvent2 } : null;
 }
 export function normalizeAgentSessionEvent(
-  _0x1715d8 = {},
+  response = {},
   { fallbackTs: fallbackTs = Date['now'](), fallbackSeq: fallbackSeq = 0x1 } = {},
 ) {
-  if (!_0x1715d8 || typeof _0x1715d8 !== 'object' || Array['isArray'](_0x1715d8)) return null;
-  const _0x527093 = String(_0x1715d8['id'] || '')['trim'](),
-    _0xcb05df = String(_0x1715d8['conversationId'] || '')['trim'](),
-    _0x18a904 = String(_0x1715d8['type'] || '')['trim'](),
-    _0x24f3f8 = String(_0x1715d8['itemType'] || 'audit')['trim']();
-  if (
-    !_0x527093 ||
-    !_0xcb05df ||
-    !SESSION_EVENT_TYPES['has'](_0x18a904) ||
-    !SESSION_ITEM_TYPES['has'](_0x24f3f8)
-  )
+  if (!response || typeof response !== 'object' || Array['isArray'](response)) return null;
+  const id2 = String(response['id'] || '')['trim'](),
+    conversationId2 = String(response['conversationId'] || '')['trim'](),
+    type2 = String(response['type'] || '')['trim'](),
+    itemType = String(response['itemType'] || 'audit')['trim']();
+  if (!id2 || !conversationId2 || !SESSION_EVENT_TYPES['has'](type2) || !SESSION_ITEM_TYPES['has'](itemType))
     return null;
-  const _0x4fc40e = normalizeTimestamp(_0x1715d8['ts'], fallbackTs),
-    _0x3d60c8 = normalizePayload({ ..._0x1715d8, itemType: _0x24f3f8 }, _0x4fc40e);
-  if (!_0x3d60c8) return null;
+  const ts = normalizeTimestamp(response['ts'], fallbackTs),
+    payload = normalizePayload({ ...response, itemType: itemType }, ts);
+  if (!payload) return null;
   return {
-    id: _0x527093,
-    seq: normalizeSequence(_0x1715d8['seq'], fallbackSeq),
-    conversationId: _0xcb05df,
-    projectId: String(_0x1715d8['projectId'] || '')['trim'](),
-    turnId: String(_0x1715d8['turnId'] || '')['trim'](),
-    itemId: String(_0x1715d8['itemId'] || '')['trim'](),
-    type: _0x18a904,
-    itemType: _0x24f3f8,
-    status: String(_0x1715d8['status'] || '')
+    id: id2,
+    seq: normalizeSequence(response['seq'], fallbackSeq),
+    conversationId: conversationId2,
+    projectId: String(response['projectId'] || '')['trim'](),
+    turnId: String(response['turnId'] || '')['trim'](),
+    itemId: String(response['itemId'] || '')['trim'](),
+    type: type2,
+    itemType: itemType,
+    status: String(response['status'] || '')
       ['trim']()
       ['slice'](0x0, 0x50),
-    ts: _0x4fc40e,
-    payload: _0x3d60c8,
+    ts: ts,
+    payload: payload,
   };
 }
 export function createAgentMessageSessionEvent({
@@ -161,9 +157,9 @@ export function createAgentMessageSessionEvent({
   message: message = {},
   previousMessage: previousMessage = null,
 } = {}) {
-  const _0x1da5c2 = createAgentReplyVersionChange(message, previousMessage),
-    _0x32943f = { ...message };
-  if (_0x1da5c2) delete _0x32943f['replyVersions'];
+  const replyVersionChange2 = createAgentReplyVersionChange(message, previousMessage),
+    message3 = { ...message };
+  if (replyVersionChange2) delete message3['replyVersions'];
   return normalizeAgentSessionEvent({
     id: id,
     seq: seq,
@@ -175,25 +171,28 @@ export function createAgentMessageSessionEvent({
     itemType: 'message',
     status: String(message['status'] || 'completed')['trim']() || 'completed',
     ts: message['ts'],
-    payload: { message: _0x32943f, ...(_0x1da5c2 ? { replyVersionChange: _0x1da5c2 } : {}) },
+    payload: {
+      message: message3,
+      ...(replyVersionChange2 ? { replyVersionChange: replyVersionChange2 } : {}),
+    },
   });
 }
-function getRunSessionEventShape(_0x564f3f = {}) {
-  const _0x3c3f50 = String(_0x564f3f['type'] || '')['trim'](),
-    _0x59ed71 = String(_0x564f3f['status'] || '')['trim']();
-  if (_0x3c3f50 === 'run.status')
+function getRunSessionEventShape(response2 = {}) {
+  const next = String(response2['type'] || '')['trim'](),
+    type3 = String(response2['status'] || '')['trim']();
+  if (next === 'run.status')
     return {
       type:
-        _0x59ed71 === 'planning'
+        type3 === 'planning'
           ? 'turn.started'
-          : TERMINAL_TURN_STATUSES['has'](_0x59ed71)
+          : TERMINAL_TURN_STATUSES['has'](type3)
             ? 'turn.completed'
             : 'turn.updated',
       itemType: 'audit',
       itemId: '',
     };
-  if (_0x3c3f50 === 'approval.requested') return { type: 'item.started', itemType: 'approval' };
-  if (_0x3c3f50 === 'approval.confirmed' || _0x3c3f50 === 'approval.cancelled')
+  if (next === 'approval.requested') return { type: 'item.started', itemType: 'approval' };
+  if (next === 'approval.confirmed' || next === 'approval.cancelled')
     return { type: 'item.completed', itemType: 'approval' };
   return { type: 'audit.recorded', itemType: 'audit', itemId: '' };
 }
@@ -205,12 +204,12 @@ export function createAgentRunSessionEvent({
   itemId: itemId = '',
   runEvent: runEvent = {},
 } = {}) {
-  const _0x254813 = getRunSessionEventShape(runEvent),
-    _0x4210cd = String(runEvent['commandId'] || '')['trim'](),
-    _0x51959c = Math['max'](0x0, Math['trunc'](Number(runEvent['step'] || 0x0))),
-    _0x2ba855 =
-      _0x254813['itemType'] === 'approval'
-        ? String(runEvent['runId'] || '')['trim']() + ':approval:' + _0x51959c + ':' + (_0x4210cd || 'plan')
+  const type4 = getRunSessionEventShape(runEvent),
+    current = String(runEvent['commandId'] || '')['trim'](),
+    entry = Math['max'](0x0, Math['trunc'](Number(runEvent['step'] || 0x0))),
+    record =
+      type4['itemType'] === 'approval'
+        ? String(runEvent['runId'] || '')['trim']() + ':approval:' + entry + ':' + (current || 'plan')
         : '';
   return normalizeAgentSessionEvent({
     id: id,
@@ -218,18 +217,18 @@ export function createAgentRunSessionEvent({
     conversationId: conversationId,
     projectId: projectId,
     turnId: runEvent['runId'],
-    itemId: itemId || _0x2ba855 || _0x254813['itemId'],
-    type: _0x254813['type'],
-    itemType: _0x254813['itemType'],
+    itemId: itemId || record || type4['itemId'],
+    type: type4['type'],
+    itemType: type4['itemType'],
     status: runEvent['status'],
     ts: runEvent['ts'],
     payload: { runEvent: runEvent },
   });
 }
-function getItemLifecycleType(_0x2950d7 = '') {
-  const _0x512563 = String(_0x2950d7 || '')['trim']();
-  if (TERMINAL_ITEM_STATUSES['has'](_0x512563)) return 'item.completed';
-  if (['pending', 'queued', 'running', 'submitted']['includes'](_0x512563)) return 'item.started';
+function getItemLifecycleType(handle = '') {
+  const state = String(handle || '')['trim']();
+  if (TERMINAL_ITEM_STATUSES['has'](state)) return 'item.completed';
+  if (['pending', 'queued', 'running', 'submitted']['includes'](state)) return 'item.started';
   return 'item.updated';
 }
 export function createAgentOperationSessionEvent({
@@ -274,100 +273,101 @@ export function createAgentTaskSessionEvent({
     payload: { taskBinding: taskBinding },
   });
 }
-function sortSessionEvents(_0x34a5bf = []) {
-  return [..._0x34a5bf]['sort']((_0x450179, _0x32fa0b) => {
-    const _0x44f345 = Number(_0x450179['seq'] || 0x0) - Number(_0x32fa0b['seq'] || 0x0);
-    if (_0x44f345 !== 0x0) return _0x44f345;
-    const _0x2f5889 = Number(_0x450179['ts'] || 0x0) - Number(_0x32fa0b['ts'] || 0x0);
-    if (_0x2f5889 !== 0x0) return _0x2f5889;
-    return String(_0x450179['id'] || '')['localeCompare'](String(_0x32fa0b['id'] || ''));
+function sortSessionEvents(args = []) {
+  return [...args]['sort']((config, scope) => {
+    const count3 = Number(config['seq'] || 0x0) - Number(scope['seq'] || 0x0);
+    if (count3 !== 0x0) return count3;
+    const count4 = Number(config['ts'] || 0x0) - Number(scope['ts'] || 0x0);
+    if (count4 !== 0x0) return count4;
+    return String(config['id'] || '')['localeCompare'](String(scope['id'] || ''));
   });
 }
-export function projectAgentSessionEvents(_0x30bd12 = []) {
-  const _0x5a0fbd = sortSessionEvents(
-      (Array['isArray'](_0x30bd12) ? _0x30bd12 : [])
-        ['map']((_0x42a7d8, _0x556ab9) =>
-          normalizeAgentSessionEvent(_0x42a7d8, { fallbackSeq: _0x556ab9 + 0x1 }),
+export function projectAgentSessionEvents(list2 = []) {
+  const events = sortSessionEvents(
+      (Array['isArray'](list2) ? list2 : [])
+        ['map']((input, fallbackSeq2) =>
+          normalizeAgentSessionEvent(input, { fallbackSeq: fallbackSeq2 + 0x1 }),
         )
         ['filter'](Boolean),
     ),
-    _0x167dc6 = new Map(),
-    _0x1f2779 = [],
-    _0x3daa5b = new Map(),
-    _0x134874 = new Map(),
-    _0x124438 = new Map(),
-    _0x58b211 = new Map();
-  for (const _0x350550 of _0x5a0fbd) {
-    const _0x56d579 = _0x350550['turnId'];
-    if (_0x56d579) {
-      const _0x12ba59 = _0x124438['get'](_0x56d579) || {
-        id: _0x56d579,
+    map = new Map(),
+    runEvents2 = [],
+    map2 = new Map(),
+    map3 = new Map(),
+    map4 = new Map(),
+    map5 = new Map();
+  for (const startedAt2 of events) {
+    const id3 = startedAt2['turnId'];
+    if (id3) {
+      const response3 = map4['get'](id3) || {
+        id: id3,
         status: '',
-        startedAt: _0x350550['ts'],
-        updatedAt: _0x350550['ts'],
+        startedAt: startedAt2['ts'],
+        updatedAt: startedAt2['ts'],
         completedAt: 0x0,
         itemIds: [],
       };
-      _0x12ba59['updatedAt'] = _0x350550['ts'];
-      if (_0x350550['status']) _0x12ba59['status'] = _0x350550['status'];
-      if (_0x350550['type'] === 'turn.started') _0x12ba59['startedAt'] = _0x350550['ts'];
-      if (_0x350550['type'] === 'turn.completed') _0x12ba59['completedAt'] = _0x350550['ts'];
-      (_0x350550['itemId'] &&
-        !_0x12ba59['itemIds']['includes'](_0x350550['itemId']) &&
-        _0x12ba59['itemIds']['push'](_0x350550['itemId']),
-        _0x124438['set'](_0x56d579, _0x12ba59));
+      response3['updatedAt'] = startedAt2['ts'];
+      if (startedAt2['status']) response3['status'] = startedAt2['status'];
+      if (startedAt2['type'] === 'turn.started') response3['startedAt'] = startedAt2['ts'];
+      if (startedAt2['type'] === 'turn.completed') response3['completedAt'] = startedAt2['ts'];
+      (startedAt2['itemId'] &&
+        !response3['itemIds']['includes'](startedAt2['itemId']) &&
+        response3['itemIds']['push'](startedAt2['itemId']),
+        map4['set'](id3, response3));
     }
-    if (_0x350550['itemId']) {
-      const _0x10ce46 = _0x58b211['get'](_0x350550['itemId']) || {
-        id: _0x350550['itemId'],
-        turnId: _0x56d579,
-        type: _0x350550['itemType'],
+    if (startedAt2['itemId']) {
+      const response4 = map5['get'](startedAt2['itemId']) || {
+        id: startedAt2['itemId'],
+        turnId: id3,
+        type: startedAt2['itemType'],
         status: '',
-        startedAt: _0x350550['ts'],
-        updatedAt: _0x350550['ts'],
+        startedAt: startedAt2['ts'],
+        updatedAt: startedAt2['ts'],
         completedAt: 0x0,
       };
-      ((_0x10ce46['turnId'] = _0x56d579 || _0x10ce46['turnId']),
-        (_0x10ce46['type'] = _0x350550['itemType']),
-        (_0x10ce46['status'] = _0x350550['status'] || _0x10ce46['status']),
-        (_0x10ce46['updatedAt'] = _0x350550['ts']));
-      if (_0x350550['type'] === 'item.completed') _0x10ce46['completedAt'] = _0x350550['ts'];
-      _0x58b211['set'](_0x350550['itemId'], _0x10ce46);
+      ((response4['turnId'] = id3 || response4['turnId']),
+        (response4['type'] = startedAt2['itemType']),
+        (response4['status'] = startedAt2['status'] || response4['status']),
+        (response4['updatedAt'] = startedAt2['ts']));
+      if (startedAt2['type'] === 'item.completed') response4['completedAt'] = startedAt2['ts'];
+      map5['set'](startedAt2['itemId'], response4);
     }
-    if (_0x350550['payload']['message']) {
-      const _0xa357f1 = _0x350550['itemId'] || _0x350550['id'],
-        _0xd34e4a = cloneJson(_0x350550['payload']['message'], {});
-      (_0x350550['payload']['replyVersionChange'] &&
-        (_0xd34e4a['replyVersions'] = applyAgentReplyVersionChange(
-          _0x167dc6['get'](_0xa357f1),
-          _0x350550['payload']['replyVersionChange'],
+    if (startedAt2['payload']['message']) {
+      const output = startedAt2['itemId'] || startedAt2['id'],
+        cloneJson2 = cloneJson(startedAt2['payload']['message'], {});
+      (startedAt2['payload']['replyVersionChange'] &&
+        (cloneJson2['replyVersions'] = applyAgentReplyVersionChange(
+          map['get'](output),
+          startedAt2['payload']['replyVersionChange'],
         )),
-        _0x167dc6['set'](_0xa357f1, _0xd34e4a));
+        map['set'](output, cloneJson2));
     }
-    if (_0x350550['payload']['runEvent']) _0x1f2779['push'](cloneJson(_0x350550['payload']['runEvent'], {}));
-    (_0x350550['payload']['operation'] &&
-      _0x3daa5b['set'](
-        _0x350550['payload']['operation']['id'],
-        cloneJson(_0x350550['payload']['operation'], {}),
+    if (startedAt2['payload']['runEvent'])
+      runEvents2['push'](cloneJson(startedAt2['payload']['runEvent'], {}));
+    (startedAt2['payload']['operation'] &&
+      map2['set'](
+        startedAt2['payload']['operation']['id'],
+        cloneJson(startedAt2['payload']['operation'], {}),
       ),
-      _0x350550['payload']['taskBinding'] &&
-        _0x134874['set'](
-          _0x350550['payload']['taskBinding']['id'],
-          cloneJson(_0x350550['payload']['taskBinding'], {}),
+      startedAt2['payload']['taskBinding'] &&
+        map3['set'](
+          startedAt2['payload']['taskBinding']['id'],
+          cloneJson(startedAt2['payload']['taskBinding'], {}),
         ));
   }
   return {
-    events: _0x5a0fbd['map']((_0xc0b745) => cloneJson(_0xc0b745, {})),
-    messages: [..._0x167dc6['values']()],
-    runEvents: _0x1f2779['slice'](-MAX_PROJECTED_RUN_EVENTS),
-    operationLedger: [..._0x3daa5b['values']()]['slice'](-MAX_PROJECTED_OPERATIONS),
-    taskBindings: [..._0x134874['values']()]['slice'](-MAX_PROJECTED_TASK_BINDINGS),
-    turns: [..._0x124438['values']()]['map']((_0x2154e1) => cloneJson(_0x2154e1, {})),
-    items: [..._0x58b211['values']()]['map']((_0x16a68d) => cloneJson(_0x16a68d, {})),
+    events: events['map']((value2) => cloneJson(value2, {})),
+    messages: [...map['values']()],
+    runEvents: runEvents2['slice'](-MAX_PROJECTED_RUN_EVENTS),
+    operationLedger: [...map2['values']()]['slice'](-MAX_PROJECTED_OPERATIONS),
+    taskBindings: [...map3['values']()]['slice'](-MAX_PROJECTED_TASK_BINDINGS),
+    turns: [...map4['values']()]['map']((value3) => cloneJson(value3, {})),
+    items: [...map5['values']()]['map']((value4) => cloneJson(value4, {})),
   };
 }
-function valuesMatch(_0x3eb213, _0x1bdda1) {
-  return JSON['stringify'](_0x3eb213) === JSON['stringify'](_0x1bdda1);
+function valuesMatch(value5, value6) {
+  return JSON['stringify'](value5) === JSON['stringify'](value6);
 }
 export function compareAgentSessionProjection({
   projection: projection = {},
@@ -376,30 +376,30 @@ export function compareAgentSessionProjection({
   operationLedger: operationLedger = [],
   taskBindings: taskBindings = [],
 } = {}) {
-  const _0x250902 = (Array['isArray'](messages) ? messages : [])
-      ['map']((_0x5c1482) => normalizeMessageSnapshot(_0x5c1482, _0x5c1482?.['ts']))
+  const value7 = (Array['isArray'](messages) ? messages : [])
+      ['map']((value8) => normalizeMessageSnapshot(value8, value8?.['ts']))
       ['filter'](Boolean),
-    _0x22855c = (Array['isArray'](runEvents) ? runEvents : [])
-      ['map']((_0x2262aa) => normalizeAgentRunEvent(_0x2262aa, _0x2262aa?.['ts']))
+    value9 = (Array['isArray'](runEvents) ? runEvents : [])
+      ['map']((value10) => normalizeAgentRunEvent(value10, value10?.['ts']))
       ['filter'](Boolean),
-    _0x2a7e15 = (Array['isArray'](operationLedger) ? operationLedger : [])
-      ['map']((_0x27af88) => normalizeAgentOperation(_0x27af88, _0x27af88?.['startedAt']))
+    value11 = (Array['isArray'](operationLedger) ? operationLedger : [])
+      ['map']((value12) => normalizeAgentOperation(value12, value12?.['startedAt']))
       ['filter'](Boolean),
-    _0x5718b0 = (Array['isArray'](taskBindings) ? taskBindings : [])
-      ['map']((_0x18f909) => normalizeAgentTaskBinding(_0x18f909))
+    value13 = (Array['isArray'](taskBindings) ? taskBindings : [])
+      ['map']((value14) => normalizeAgentTaskBinding(value14))
       ['filter'](Boolean),
-    _0x528df9 = {
-      messages: valuesMatch(projection['messages'] || [], _0x250902),
-      runEvents: valuesMatch(projection['runEvents'] || [], _0x22855c),
-      operationLedger: valuesMatch(projection['operationLedger'] || [], _0x2a7e15),
-      taskBindings: valuesMatch(projection['taskBindings'] || [], _0x5718b0),
+    args2 = {
+      messages: valuesMatch(projection['messages'] || [], value7),
+      runEvents: valuesMatch(projection['runEvents'] || [], value9),
+      operationLedger: valuesMatch(projection['operationLedger'] || [], value11),
+      taskBindings: valuesMatch(projection['taskBindings'] || [], value13),
     };
   return {
-    ..._0x528df9,
-    ok: Object['values'](_0x528df9)['every'](Boolean),
-    mismatches: Object['entries'](_0x528df9)
-      ['filter'](([, _0x13155f]) => !_0x13155f)
-      ['map'](([_0x53abab]) => _0x53abab),
+    ...args2,
+    ok: Object['values'](args2)['every'](Boolean),
+    mismatches: Object['entries'](args2)
+      ['filter'](([, enabled]) => !enabled)
+      ['map'](([value15]) => value15),
   };
 }
 export function createAgentSessionEventsFromLegacyState({
@@ -410,36 +410,32 @@ export function createAgentSessionEventsFromLegacyState({
   operationLedger: operationLedger = [],
   taskBindings: taskBindings = [],
 } = {}) {
-  const _0x17ef56 = [];
-  let _0x20ced6 = 0x0;
-  const _0x396ff5 = (_0x2bfce8, _0x51d5d2, _0x288db7, _0x4f362c) => {
-    const _0x42371b = ++_0x20ced6,
-      _0x31bc30 = _0x2bfce8({
-        id: conversationId + ':migrated:' + _0x288db7 + ':' + (_0x4f362c + 0x1),
-        seq: _0x42371b,
+  const list3 = [];
+  let value16 = 0x0;
+  const run = (handler, message4, value17, value18) => {
+    const seq2 = ++value16,
+      value19 = handler({
+        id: conversationId + ':migrated:' + value17 + ':' + (value18 + 0x1),
+        seq: seq2,
         conversationId: conversationId,
         projectId: projectId,
-        ...(_0x288db7 === 'message' ? { itemId: conversationId + ':message:' + (_0x4f362c + 0x1) } : {}),
-        ...(_0x288db7 === 'message' ? { message: _0x51d5d2 } : {}),
-        ...(_0x288db7 === 'run' ? { runEvent: _0x51d5d2 } : {}),
-        ...(_0x288db7 === 'operation' ? { operation: _0x51d5d2 } : {}),
-        ...(_0x288db7 === 'task' ? { taskBinding: _0x51d5d2 } : {}),
+        ...(value17 === 'message' ? { itemId: conversationId + ':message:' + (value18 + 0x1) } : {}),
+        ...(value17 === 'message' ? { message: message4 } : {}),
+        ...(value17 === 'run' ? { runEvent: message4 } : {}),
+        ...(value17 === 'operation' ? { operation: message4 } : {}),
+        ...(value17 === 'task' ? { taskBinding: message4 } : {}),
       });
-    if (_0x31bc30) _0x17ef56['push'](_0x31bc30);
+    if (value19) list3['push'](value19);
   };
   return (
-    messages['forEach']((_0x4b9463, _0x2c9e08) =>
-      _0x396ff5(createAgentMessageSessionEvent, _0x4b9463, 'message', _0x2c9e08),
+    messages['forEach']((value20, value21) =>
+      run(createAgentMessageSessionEvent, value20, 'message', value21),
     ),
-    runEvents['forEach']((_0x4582f5, _0x5ea4e0) =>
-      _0x396ff5(createAgentRunSessionEvent, _0x4582f5, 'run', _0x5ea4e0),
+    runEvents['forEach']((value22, value23) => run(createAgentRunSessionEvent, value22, 'run', value23)),
+    operationLedger['forEach']((value24, value25) =>
+      run(createAgentOperationSessionEvent, value24, 'operation', value25),
     ),
-    operationLedger['forEach']((_0x5e73ec, _0x103f83) =>
-      _0x396ff5(createAgentOperationSessionEvent, _0x5e73ec, 'operation', _0x103f83),
-    ),
-    taskBindings['forEach']((_0x15f15a, _0x2f9619) =>
-      _0x396ff5(createAgentTaskSessionEvent, _0x15f15a, 'task', _0x2f9619),
-    ),
-    _0x17ef56
+    taskBindings['forEach']((value26, value27) => run(createAgentTaskSessionEvent, value26, 'task', value27)),
+    list3
   );
 }

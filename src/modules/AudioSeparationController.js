@@ -16,36 +16,36 @@ const AUDIO_SPLIT_MODEL_ID = RH_AUDIO_SEPARATION_MODEL_ID,
   AUDIO_SPLIT_ROLE_VOCALS = 'vocals',
   AUDIO_SPLIT_ROLE_BACKGROUND = 'background';
 function _resolveAudioSplitModelId() {
-  const _0x3e9362 = resolveModelExecution(AUDIO_SPLIT_MODEL_ID),
-    _0x1ee994 = String(_0x3e9362?.modelManifest?.modelId || '').trim();
-  if (!_0x1ee994) throw new Error('RunningHub audio workflow manifest missing: ' + AUDIO_SPLIT_MODEL_ID);
-  return _0x1ee994;
+  const modelExecution = resolveModelExecution(AUDIO_SPLIT_MODEL_ID),
+    enabled = String(modelExecution?.modelManifest?.modelId || '').trim();
+  if (!enabled) throw new Error('RunningHub audio workflow manifest missing: ' + AUDIO_SPLIT_MODEL_ID);
+  return enabled;
 }
 const AUDIO_SPLIT_MODEL = _resolveAudioSplitModelId();
 let _runAudioSeparationImpl = runAudioSeparation,
   _resumeAudioSeparationTaskImpl = resumeAudioSeparationTask,
   _saveRemoteAudioLocallyDetailedImpl = saveRemoteAudioLocallyDetailed;
 const _runtimeByLeaderId = new Map();
-function audioSeparationText(_0x158e92, _0x560c2b = {}) {
-  return t('mediaProcessing.audioSeparation.' + _0x158e92, _0x560c2b);
+function audioSeparationText(value, item = {}) {
+  return t('mediaProcessing.audioSeparation.' + value, item);
 }
 function _getState() {
   return typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
 }
-function _getNode(_0x2ed587) {
-  return _getState().nodes?.[_0x2ed587] || null;
+function _getNode(key) {
+  return _getState().nodes?.[key] || null;
 }
-function _isAudioNodeType(_0x5b083c) {
-  const _0x36a1af = String(_0x5b083c || '')
+function _isAudioNodeType(index) {
+  const result = String(index || '')
     .trim()
     .toLowerCase();
-  return _0x36a1af === 'source-audio' || _0x36a1af === 'ai-audio' || _0x36a1af === 'audio';
+  return result === 'source-audio' || result === 'ai-audio' || result === 'audio';
 }
-function _fileNameFromPath(_0x4b40a1) {
-  const _0x38f2f0 = normalizeLocalPath(_0x4b40a1);
-  if (!_0x38f2f0) return '';
-  const _0x1eec71 = _0x38f2f0.split('/');
-  return String(_0x1eec71[_0x1eec71.length - 1] || '').trim();
+function _fileNameFromPath(data) {
+  const localPath = normalizeLocalPath(data);
+  if (!localPath) return '';
+  const list = localPath.split('/');
+  return String(list[list.length - 1] || '').trim();
 }
 function _buildRunningHubTaskPatch({
   taskId: taskId = '',
@@ -62,221 +62,214 @@ function _buildRunningHubTaskPatch({
     rhTaskUseOpenapiQuery: useOpenapiQuery === true,
   };
 }
-function _isAudioSplitLeader(_0x319e91) {
-  if (!_0x319e91 || typeof _0x319e91 !== 'object') return false;
+function _isAudioSplitLeader(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object') return false;
   return (
-    String(_0x319e91.type || '')
+    String(enabled2.type || '')
       .trim()
       .toLowerCase() === 'source-audio' &&
-    String(_0x319e91.audioSplitRole || '')
+    String(enabled2.audioSplitRole || '')
       .trim()
       .toLowerCase() === AUDIO_SPLIT_ROLE_VOCALS &&
-    String(_0x319e91.provider || '')
+    String(enabled2.provider || '')
       .trim()
       .toLowerCase() === 'runninghubwf' &&
-    String(_0x319e91.model || '').trim() === AUDIO_SPLIT_MODEL &&
-    !!String(_0x319e91.audioSplitPeerId || '').trim()
+    String(enabled2.model || '').trim() === AUDIO_SPLIT_MODEL &&
+    !!String(enabled2.audioSplitPeerId || '').trim()
   );
 }
-function _isRunningTaskStatus(_0xba60f6) {
-  const _0x5720fd = String(_0xba60f6 || '')
+function _isRunningTaskStatus(options) {
+  const target = String(options || '')
     .trim()
     .toLowerCase();
-  return !['success', 'failed', 'idle', 'cancelled'].includes(_0x5720fd);
+  return !['success', 'failed', 'idle', 'cancelled'].includes(target);
 }
-function _resolveAudioSplitLeaderId(_0x5f30a8) {
-  const _0x614a10 = String(_0x5f30a8 || '').trim();
-  if (!_0x614a10) return '';
-  const _0x187449 = _getNode(_0x614a10);
-  if (_isAudioSplitLeader(_0x187449)) return _0x614a10;
-  const _0x49bdd0 = String(_0x187449?.audioSplitPeerId || '').trim();
-  if (_0x49bdd0 && _isAudioSplitLeader(_getNode(_0x49bdd0))) return _0x49bdd0;
-  const _0x493933 = _getState().nodes || {},
-    _0x1c6178 = Object.values(_0x493933).find(
-      (_0x2f4ef0) =>
-        _isAudioSplitLeader(_0x2f4ef0) &&
-        (String(_0x2f4ef0.audioSplitPeerId || '') === _0x614a10 ||
-          String(_0x2f4ef0.rhSourceNodeId || '') === _0x614a10),
+function _resolveAudioSplitLeaderId(source) {
+  const enabled3 = String(source || '').trim();
+  if (!enabled3) return '';
+  const _getNode2 = _getNode(enabled3);
+  if (_isAudioSplitLeader(_getNode2)) return enabled3;
+  const next = String(_getNode2?.audioSplitPeerId || '').trim();
+  if (next && _isAudioSplitLeader(_getNode(next))) return next;
+  const _getState2 = _getState().nodes || {},
+    current = Object.values(_getState2).find(
+      (item2) =>
+        _isAudioSplitLeader(item2) &&
+        (String(item2.audioSplitPeerId || '') === enabled3 ||
+          String(item2.rhSourceNodeId || '') === enabled3),
     );
-  return String(_0x1c6178?.id || '');
+  return String(current?.id || '');
 }
-function _getSpawnLayout(_0x5df527) {
-  const _0x3c1574 = getNodeDefaultSize('source-audio'),
-    _0x356b14 = Number(_0x5df527?.width) > 0 ? Number(_0x5df527.width) : _0x3c1574.width,
-    _0x2a07a3 = Number(_0x5df527?.height) > 0 ? Number(_0x5df527.height) : _0x3c1574.height,
-    { spacing: _0x15b39b, direction: _0x2ddf74, avoidOverlap: _0xb74726 } = getNodeSpawnPrefs(),
-    _0x34b2c5 = _0x2ddf74 === 'down' ? 'down' : 'right',
-    _0x254057 = Math.max(24, Math.min(80, Math.round(_0x15b39b / 2))),
-    _0x538bbc = Number(_0x5df527?.x) || 0,
-    _0x2aabc6 = Number(_0x5df527?.y) || 0,
-    _0x34344a = Number(_0x5df527?.width) || _0x3c1574.width,
-    _0x5d80f8 = Number(_0x5df527?.height) || _0x3c1574.height;
-  let _0x3774ac =
-      _0x34b2c5 === 'right'
-        ? _0x538bbc + _0x34344a + _0x15b39b
-        : _0x538bbc + Math.round((_0x34344a - _0x356b14) / 2),
-    _0xe25d3d =
-      _0x34b2c5 === 'down'
-        ? _0x2aabc6 + _0x5d80f8 + _0x15b39b
-        : _0x2aabc6 + Math.round((_0x5d80f8 - _0x2a07a3) / 2);
-  const _0x94a756 = _0x34b2c5 === 'right' ? _0x356b14 * 2 + _0x254057 : _0x356b14,
-    _0xca9598 = _0x34b2c5 === 'down' ? _0x2a07a3 * 2 + _0x254057 : _0x2a07a3;
-  if (_0xb74726) {
-    const _0x2afce0 = findAvailablePosition(
+function _getSpawnLayout(box) {
+  const box2 = getNodeDefaultSize('source-audio'),
+    width = Number(box?.width) > 0 ? Number(box.width) : box2.width,
+    height = Number(box?.height) > 0 ? Number(box.height) : box2.height,
+    { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
+    resolvedDirection = direction === 'down' ? 'down' : 'right',
+    innerGap = Math.max(24, Math.min(80, Math.round(spacing / 2))),
+    entry = Number(box?.x) || 0,
+    record = Number(box?.y) || 0,
+    payload = Number(box?.width) || box2.width,
+    handle = Number(box?.height) || box2.height;
+  let x =
+      resolvedDirection === 'right' ? entry + payload + spacing : entry + Math.round((payload - width) / 2),
+    y = resolvedDirection === 'down' ? record + handle + spacing : record + Math.round((handle - height) / 2);
+  const state = resolvedDirection === 'right' ? width * 2 + innerGap : width,
+    config = resolvedDirection === 'down' ? height * 2 + innerGap : height;
+  if (avoidOverlap) {
+    const box3 = findAvailablePosition(
       _getState().nodes || {},
-      _0x3774ac,
-      _0xe25d3d,
-      _0x94a756,
-      _0xca9598,
-      _0x15b39b,
-      _0x34b2c5,
+      x,
+      y,
+      state,
+      config,
+      spacing,
+      resolvedDirection,
     );
-    ((_0x3774ac = _0x2afce0.x), (_0xe25d3d = _0x2afce0.y));
+    ((x = box3.x), (y = box3.y));
   }
   return {
-    width: _0x356b14,
-    height: _0x2a07a3,
-    resolvedDirection: _0x34b2c5,
-    innerGap: _0x254057,
-    vocals: { x: _0x3774ac, y: _0xe25d3d },
+    width: width,
+    height: height,
+    resolvedDirection: resolvedDirection,
+    innerGap: innerGap,
+    vocals: { x: x, y: y },
     background:
-      _0x34b2c5 === 'right'
-        ? { x: _0x3774ac + _0x356b14 + _0x254057, y: _0xe25d3d }
-        : { x: _0x3774ac, y: _0xe25d3d + _0x2a07a3 + _0x254057 },
+      resolvedDirection === 'right' ? { x: x + width + innerGap, y: y } : { x: x, y: y + height + innerGap },
   };
 }
-async function _persistAudioResult(_0xeda105) {
-  const _0x5bef7e = await _saveRemoteAudioLocallyDetailedImpl(_0xeda105),
-    _0x3d3538 = pickResultLocalPath(_0x5bef7e),
-    _0x4ac961 = String(_0x5bef7e?.localUrl || _0x5bef7e?.audioUrl || '').trim(),
-    _0x139843 = buildCanvasLocalAudioFields({ localPath: _0x3d3538, audioUrl: _0x4ac961 });
-  if (!_0x139843.audioUrl || !_0x139843.localPath) throw new Error(audioSeparationText('localSaveFailed'));
-  return { ..._0x139843, fileName: _fileNameFromPath(_0x139843.localPath) };
+async function _persistAudioResult(scope) {
+  const _saveRemoteAudioLocallyDetailedImpl2 = await _saveRemoteAudioLocallyDetailedImpl(scope),
+    localPath2 = pickResultLocalPath(_saveRemoteAudioLocallyDetailedImpl2),
+    audioUrl = String(
+      _saveRemoteAudioLocallyDetailedImpl2?.localUrl || _saveRemoteAudioLocallyDetailedImpl2?.audioUrl || '',
+    ).trim(),
+    args = buildCanvasLocalAudioFields({ localPath: localPath2, audioUrl: audioUrl });
+  if (!args.audioUrl || !args.localPath) throw new Error(audioSeparationText('localSaveFailed'));
+  return { ...args, fileName: _fileNameFromPath(args.localPath) };
 }
-function _updateNodeIfExists(_0x1ae0a3, _0x571132) {
-  if (!String(_0x1ae0a3 || '').trim()) return;
-  if (!_getNode(_0x1ae0a3)) return;
-  appStore.updateNodeData(_0x1ae0a3, _0x571132);
+function _updateNodeIfExists(input, output) {
+  if (!String(input || '').trim()) return;
+  if (!_getNode(input)) return;
+  appStore.updateNodeData(input, output);
 }
-function _focusCreatedNodes(_0x1a2d43, _0x708ad9) {
-  const _0x4f78bd = Array.isArray(_0x708ad9)
-    ? _0x708ad9.map((_0xdb6b3b) => String(_0xdb6b3b || '').trim()).filter(Boolean)
-    : [];
-  if (!_0x4f78bd.length) return;
-  appStore.setSelectedNodes(_0x4f78bd);
-  if (typeof window.v2FocusOnNodes === 'function') window.v2FocusOnNodes([_0x1a2d43, ..._0x4f78bd]);
-  else typeof window.v2FocusOnNode === 'function' && window.v2FocusOnNode(_0x4f78bd[0]);
+function _focusCreatedNodes(value2, list2) {
+  const list3 = Array.isArray(list2) ? list2.map((item3) => String(item3 || '').trim()).filter(Boolean) : [];
+  if (!list3.length) return;
+  appStore.setSelectedNodes(list3);
+  if (typeof window.v2FocusOnNodes === 'function') window.v2FocusOnNodes([value2, ...list3]);
+  else typeof window.v2FocusOnNode === 'function' && window.v2FocusOnNode(list3[0]);
 }
 function _persistLocalCache() {
   try {
     window._triggerLocalCacheSave?.();
   } catch {}
 }
-function _resolveSeparationResultUrls(_0x1ad3fe) {
-  const _0x175c50 = Array.isArray(_0x1ad3fe?.audios) ? _0x1ad3fe.audios : [],
-    _0x1a550e = String(
-      _0x1ad3fe?.vocalsAudioUrl ||
-        _0x175c50.find(
-          (_0x2de3b9) =>
-            String(_0x2de3b9?.role || '')
+function _resolveSeparationResultUrls(value3) {
+  const list4 = Array.isArray(value3?.audios) ? value3.audios : [],
+    vocalsUrl = String(
+      value3?.vocalsAudioUrl ||
+        list4.find(
+          (item4) =>
+            String(item4?.role || '')
               .trim()
-              .toLowerCase() === 'vocals' || String(_0x2de3b9?.nodeId || '').trim() === '5',
+              .toLowerCase() === 'vocals' || String(item4?.nodeId || '').trim() === '5',
         )?.audioUrl ||
-        _0x175c50[0]?.audioUrl ||
+        list4[0]?.audioUrl ||
         '',
     ).trim(),
-    _0x1e84ac = String(
-      _0x1ad3fe?.backgroundAudioUrl ||
-        _0x175c50.find(
-          (_0x3f6433) =>
-            String(_0x3f6433?.role || '')
+    backgroundUrl = String(
+      value3?.backgroundAudioUrl ||
+        list4.find(
+          (item5) =>
+            String(item5?.role || '')
               .trim()
-              .toLowerCase() === 'background' || String(_0x3f6433?.nodeId || '').trim() === '7',
+              .toLowerCase() === 'background' || String(item5?.nodeId || '').trim() === '7',
         )?.audioUrl ||
-        _0x175c50[1]?.audioUrl ||
+        list4[1]?.audioUrl ||
         '',
     ).trim();
-  return { vocalsUrl: _0x1a550e, backgroundUrl: _0x1e84ac };
+  return { vocalsUrl: vocalsUrl, backgroundUrl: backgroundUrl };
 }
-function _createPlaceholderPair(_0x576036) {
-  const _0x2ea89b = _getSpawnLayout(_0x576036),
-    _0x20e24f = Date.now(),
-    _0x3e2ad5 = generateId('source-audio-split-vocals'),
-    _0x342fef = generateId('source-audio-split-background'),
-    _0x28b100 = buildSourceAudioNodePayload({
-      id: _0x3e2ad5,
-      x: _0x2ea89b.vocals.x,
-      y: _0x2ea89b.vocals.y,
-      width: _0x2ea89b.width,
-      height: _0x2ea89b.height,
+function _createPlaceholderPair(rhSourceNodeId) {
+  const x2 = _getSpawnLayout(rhSourceNodeId),
+    startedAt2 = Date.now(),
+    id = generateId('source-audio-split-vocals'),
+    audioSplitPeerId = generateId('source-audio-split-background'),
+    sourceAudioNodePayload = buildSourceAudioNodePayload({
+      id: id,
+      x: x2.vocals.x,
+      y: x2.vocals.y,
+      width: x2.width,
+      height: x2.height,
       name: audioSeparationText('nodeNames.vocalsProcessing'),
       audioSplitRole: AUDIO_SPLIT_ROLE_VOCALS,
-      audioSplitPeerId: _0x342fef,
-      rhSourceNodeId: _0x576036.id,
+      audioSplitPeerId: audioSplitPeerId,
+      rhSourceNodeId: rhSourceNodeId.id,
       rhToolbarTaskType: 'audio-separation',
       provider: 'runninghubwf',
       model: AUDIO_SPLIT_MODEL,
-      rhInstanceType: String(_0x576036?.rhInstanceType || '').trim() === 'plus' ? 'plus' : 'default',
-      ...buildGenerationStartPatch({ startedAt: _0x20e24f }),
+      rhInstanceType: String(rhSourceNodeId?.rhInstanceType || '').trim() === 'plus' ? 'plus' : 'default',
+      ...buildGenerationStartPatch({ startedAt: startedAt2 }),
       ..._buildRunningHubTaskPatch({
         taskId: '',
         status: 'pending',
-        startedAt: _0x20e24f,
+        startedAt: startedAt2,
         recovering: false,
         useOpenapiQuery: true,
       }),
     }),
-    _0x6499a6 = buildSourceAudioNodePayload({
-      id: _0x342fef,
-      x: _0x2ea89b.background.x,
-      y: _0x2ea89b.background.y,
-      width: _0x2ea89b.width,
-      height: _0x2ea89b.height,
+    sourceAudioNodePayload2 = buildSourceAudioNodePayload({
+      id: audioSplitPeerId,
+      x: x2.background.x,
+      y: x2.background.y,
+      width: x2.width,
+      height: x2.height,
       name: audioSeparationText('nodeNames.backgroundProcessing'),
       audioSplitRole: AUDIO_SPLIT_ROLE_BACKGROUND,
-      audioSplitPeerId: _0x3e2ad5,
-      rhSourceNodeId: _0x576036.id,
+      audioSplitPeerId: id,
+      rhSourceNodeId: rhSourceNodeId.id,
       rhToolbarTaskType: 'audio-separation',
-      ...buildGenerationStartPatch({ startedAt: _0x20e24f }),
+      ...buildGenerationStartPatch({ startedAt: startedAt2 }),
     });
   return (
     appStore.batch(() => {
-      (appStore.addNode(_0x28b100), appStore.addNode(_0x6499a6));
+      (appStore.addNode(sourceAudioNodePayload), appStore.addNode(sourceAudioNodePayload2));
     }),
-    _focusCreatedNodes(_0x576036.id, [_0x3e2ad5, _0x342fef]),
+    _focusCreatedNodes(rhSourceNodeId.id, [id, audioSplitPeerId]),
     _persistLocalCache(),
-    { leaderId: _0x3e2ad5, peerId: _0x342fef, startedAt: _0x20e24f }
+    { leaderId: id, peerId: audioSplitPeerId, startedAt: startedAt2 }
   );
 }
 async function _applySuccessResult({
-  leaderId: _0x240f65,
-  peerId: _0x18b0fa,
-  result: _0x1c7653,
-  startedAt: _0x4c1516,
+  leaderId: leaderId,
+  peerId: peerId,
+  result: result2,
+  startedAt: startedAt3,
 }) {
-  const { vocalsUrl: _0x1dd094, backgroundUrl: _0x2c8205 } = _resolveSeparationResultUrls(_0x1c7653);
-  if (!_0x1dd094 || !_0x2c8205) throw new Error(audioSeparationText('missingResultUrls'));
-  const [_0x424a80, _0x4dc756] = await Promise.all([
-      _persistAudioResult(_0x1dd094),
-      _persistAudioResult(_0x2c8205),
+  const { vocalsUrl: vocalsUrl2, backgroundUrl: backgroundUrl2 } = _resolveSeparationResultUrls(result2);
+  if (!vocalsUrl2 || !backgroundUrl2) throw new Error(audioSeparationText('missingResultUrls'));
+  const [value4, value5] = await Promise.all([
+      _persistAudioResult(vocalsUrl2),
+      _persistAudioResult(backgroundUrl2),
     ]),
-    _0x5e53ea = _getNode(_0x240f65),
-    _0x2b75fb = String(_0x5e53ea?.rhTaskId || _0x1c7653?.taskId || '').trim();
+    _getNode3 = _getNode(leaderId),
+    taskId2 = String(_getNode3?.rhTaskId || result2?.taskId || '').trim();
   (appStore.batch(() => {
-    (_updateNodeIfExists(_0x240f65, {
+    (_updateNodeIfExists(leaderId, {
       name: audioSeparationText('nodeNames.vocals'),
-      ...buildLocalAudioGenerationResultPatch(_0x424a80, { startedAt: _0x4c1516 }),
+      ...buildLocalAudioGenerationResultPatch(value4, { startedAt: startedAt3 }),
       ..._buildRunningHubTaskPatch({
-        taskId: _0x2b75fb,
+        taskId: taskId2,
         status: 'success',
-        startedAt: _0x4c1516,
+        startedAt: startedAt3,
         recovering: false,
         useOpenapiQuery: true,
       }),
     }),
-      _updateNodeIfExists(_0x18b0fa, {
+      _updateNodeIfExists(peerId, {
         name: audioSeparationText('nodeNames.background'),
-        ...buildLocalAudioGenerationResultPatch(_0x4dc756, { startedAt: _0x4c1516 }),
+        ...buildLocalAudioGenerationResultPatch(value5, { startedAt: startedAt3 }),
       }));
   }),
     _persistLocalCache(),
@@ -286,89 +279,88 @@ function _buildEmptyAudioFields() {
   return buildCanvasLocalAudioFields({ localPath: '', audioUrl: '', fileName: '' });
 }
 function _applyFailureResult({
-  leaderId: _0x2d4101,
-  peerId: _0x59d51a,
-  startedAt: _0x5ad1ec,
-  message: _0x4968b6,
+  leaderId: leaderId2,
+  peerId: peerId2,
+  startedAt: startedAt4,
+  message: message,
 }) {
-  const _0x37c0dc =
-      String(_0x4968b6 || audioSeparationText('fallback')).trim() || audioSeparationText('fallback'),
-    _0x2ce204 = _getNode(_0x2d4101),
-    _0x5d03d5 = _buildEmptyAudioFields();
+  const error = String(message || audioSeparationText('fallback')).trim() || audioSeparationText('fallback'),
+    _getNode4 = _getNode(leaderId2),
+    args2 = _buildEmptyAudioFields();
   (appStore.batch(() => {
-    (_updateNodeIfExists(_0x2d4101, {
+    (_updateNodeIfExists(leaderId2, {
       name: audioSeparationText('nodeNames.vocalsFailed'),
-      ...buildLocalAudioGenerationResultPatch({ error: _0x37c0dc }, { startedAt: _0x5ad1ec }),
-      ..._0x5d03d5,
-      rhStatusMessage: _0x37c0dc,
+      ...buildLocalAudioGenerationResultPatch({ error: error }, { startedAt: startedAt4 }),
+      ...args2,
+      rhStatusMessage: error,
       rhStatusCode: null,
       ..._buildRunningHubTaskPatch({
-        taskId: String(_0x2ce204?.rhTaskId || '').trim(),
+        taskId: String(_getNode4?.rhTaskId || '').trim(),
         status: 'failed',
-        startedAt: _0x5ad1ec,
+        startedAt: startedAt4,
         recovering: false,
         useOpenapiQuery: true,
       }),
     }),
-      _updateNodeIfExists(_0x59d51a, {
+      _updateNodeIfExists(peerId2, {
         name: audioSeparationText('nodeNames.backgroundFailed'),
-        ...buildLocalAudioGenerationResultPatch({ error: _0x37c0dc }, { startedAt: _0x5ad1ec }),
-        ..._0x5d03d5,
+        ...buildLocalAudioGenerationResultPatch({ error: error }, { startedAt: startedAt4 }),
+        ...args2,
       }));
   }),
     _persistLocalCache(),
-    window.showToast?.(audioSeparationText('failedWithMessage', { message: _0x37c0dc }), 'error'));
+    window.showToast?.(audioSeparationText('failedWithMessage', { message: error }), 'error'));
 }
 async function _executeTask({
-  leaderId: _0x7ec01d,
-  peerId: _0x56021f,
-  sourceAudioUrl: _0x5416db,
+  leaderId: leaderId3,
+  peerId: peerId3,
+  sourceAudioUrl: sourceAudioUrl,
   rhInstanceType: rhInstanceType = 'default',
-  startedAt: _0x1be3f0,
+  startedAt: startedAt5,
   resume: resume = false,
-  runtime: _0x2adb55,
+  runtime: runtime,
 }) {
-  const _0xcf352d = (_0x530399) => {
-    const _0x537f14 = _runtimeByLeaderId.get(_0x7ec01d) || {};
-    _runtimeByLeaderId.set(_0x7ec01d, { ..._0x537f14, taskId: String(_0x530399 || '').trim() });
+  const run = (value6) => {
+    const args3 = _runtimeByLeaderId.get(leaderId3) || {};
+    _runtimeByLeaderId.set(leaderId3, { ...args3, taskId: String(value6 || '').trim() });
   };
   try {
-    let _0x4f156b = null;
+    let result3 = null;
     if (resume) {
-      const _0x5cbcbf = _getNode(_0x7ec01d),
-        _0x1f87a1 = String(_0x5cbcbf?.rhTaskId || _0x2adb55.taskId || '').trim();
-      if (!_0x1f87a1) throw new Error(audioSeparationText('missingTaskId'));
-      _0x4f156b = await _resumeAudioSeparationTaskImpl(
-        _0x1f87a1,
+      const _getNode5 = _getNode(leaderId3),
+        enabled4 = String(_getNode5?.rhTaskId || runtime.taskId || '').trim();
+      if (!enabled4) throw new Error(audioSeparationText('missingTaskId'));
+      result3 = await _resumeAudioSeparationTaskImpl(
+        enabled4,
         { rhInstanceType: rhInstanceType },
-        { signal: _0x2adb55.abortController?.signal },
+        { signal: runtime.abortController?.signal },
       );
     } else
       (window.showToast?.(audioSeparationText('submitting'), 'info'),
-        (_0x4f156b = await _runAudioSeparationImpl(
-          { nodeId: _0x7ec01d, audioUrl: _0x5416db, rhInstanceType: rhInstanceType },
+        (result3 = await _runAudioSeparationImpl(
+          { nodeId: leaderId3, audioUrl: sourceAudioUrl, rhInstanceType: rhInstanceType },
           {
-            signal: _0x2adb55.abortController?.signal,
-            onTaskMeta: ({ taskId: _0x21ecdb, useOpenapiQuery: _0x67bb4 }) => {
-              (_0xcf352d(_0x21ecdb),
-                _updateNodeIfExists(_0x7ec01d, {
+            signal: runtime.abortController?.signal,
+            onTaskMeta: ({ taskId: taskId3, useOpenapiQuery: useOpenapiQuery2 }) => {
+              (run(taskId3),
+                _updateNodeIfExists(leaderId3, {
                   ..._buildRunningHubTaskPatch({
-                    taskId: _0x21ecdb,
+                    taskId: taskId3,
                     status: 'pending',
-                    startedAt: _0x1be3f0,
+                    startedAt: startedAt5,
                     recovering: false,
-                    useOpenapiQuery: _0x67bb4 === true,
+                    useOpenapiQuery: useOpenapiQuery2 === true,
                   }),
                 }),
                 _persistLocalCache());
             },
-            onTaskId: (_0x148106) => {
-              (_0xcf352d(_0x148106),
-                _updateNodeIfExists(_0x7ec01d, {
+            onTaskId: (taskId4) => {
+              (run(taskId4),
+                _updateNodeIfExists(leaderId3, {
                   ..._buildRunningHubTaskPatch({
-                    taskId: _0x148106,
+                    taskId: taskId4,
                     status: 'pending',
-                    startedAt: _0x1be3f0,
+                    startedAt: startedAt5,
                     recovering: false,
                     useOpenapiQuery: true,
                   }),
@@ -378,63 +370,67 @@ async function _executeTask({
           },
         )));
     await _applySuccessResult({
-      leaderId: _0x7ec01d,
-      peerId: _0x56021f,
-      result: _0x4f156b,
-      startedAt: _0x1be3f0,
+      leaderId: leaderId3,
+      peerId: peerId3,
+      result: result3,
+      startedAt: startedAt5,
     });
-  } catch (_0x2b08df) {
-    if (_0x2adb55.abortController?.signal?.aborted) return;
-    const _0xff45a3 =
-      _0x2b08df instanceof Error ? _0x2b08df.message : String(_0x2b08df || audioSeparationText('fallback'));
-    _applyFailureResult({ leaderId: _0x7ec01d, peerId: _0x56021f, startedAt: _0x1be3f0, message: _0xff45a3 });
+  } catch (error2) {
+    if (runtime.abortController?.signal?.aborted) return;
+    const message2 =
+      error2 instanceof Error ? error2.message : String(error2 || audioSeparationText('fallback'));
+    _applyFailureResult({ leaderId: leaderId3, peerId: peerId3, startedAt: startedAt5, message: message2 });
   } finally {
-    const _0x4f9bc2 = _runtimeByLeaderId.get(_0x7ec01d);
-    _0x4f9bc2?.promise === _0x2adb55.promise && _runtimeByLeaderId.delete(_0x7ec01d);
+    const value7 = _runtimeByLeaderId.get(leaderId3);
+    value7?.promise === runtime.promise && _runtimeByLeaderId.delete(leaderId3);
   }
 }
-export async function runAudioSeparationFromNode(_0x29fa33) {
-  const _0x894ff8 = _getNode(_0x29fa33);
-  if (!_0x894ff8 || !_isAudioNodeType(_0x894ff8.type))
+export async function runAudioSeparationFromNode(value8) {
+  const rhInstanceType2 = _getNode(value8);
+  if (!rhInstanceType2 || !_isAudioNodeType(rhInstanceType2.type))
     return (window.showToast?.(audioSeparationText('unsupportedNode'), 'warn'), null);
-  if (_0x894ff8.isGenerating) return (window.showToast?.(audioSeparationText('busy'), 'info'), null);
-  const _0x4fce9d = resolveCanvasAudioUrl(_0x894ff8);
-  if (!_0x4fce9d) return (window.showToast?.(audioSeparationText('missingAudio'), 'warn'), null);
-  const { leaderId: _0x545203, peerId: _0x368d97, startedAt: _0x387c5e } = _createPlaceholderPair(_0x894ff8),
-    _0x37eb95 = { abortController: new AbortController(), promise: null, taskId: '' };
-  _runtimeByLeaderId.set(_0x545203, _0x37eb95);
-  const _0x3d0032 = _executeTask({
-    leaderId: _0x545203,
-    peerId: _0x368d97,
-    sourceAudioUrl: _0x4fce9d,
-    rhInstanceType: _0x894ff8?.rhInstanceType || 'default',
-    startedAt: _0x387c5e,
+  if (rhInstanceType2.isGenerating) return (window.showToast?.(audioSeparationText('busy'), 'info'), null);
+  const sourceAudioUrl2 = resolveCanvasAudioUrl(rhInstanceType2);
+  if (!sourceAudioUrl2) return (window.showToast?.(audioSeparationText('missingAudio'), 'warn'), null);
+  const {
+      leaderId: leaderId4,
+      peerId: peerId4,
+      startedAt: startedAt6,
+    } = _createPlaceholderPair(rhInstanceType2),
+    runtime2 = { abortController: new AbortController(), promise: null, taskId: '' };
+  _runtimeByLeaderId.set(leaderId4, runtime2);
+  const _executeTask2 = _executeTask({
+    leaderId: leaderId4,
+    peerId: peerId4,
+    sourceAudioUrl: sourceAudioUrl2,
+    rhInstanceType: rhInstanceType2?.rhInstanceType || 'default',
+    startedAt: startedAt6,
     resume: false,
-    runtime: _0x37eb95,
+    runtime: runtime2,
   });
   return (
-    (_0x37eb95.promise = _0x3d0032),
-    _runtimeByLeaderId.set(_0x545203, _0x37eb95),
-    await _0x3d0032,
-    { leaderId: _0x545203, peerId: _0x368d97 }
+    (runtime2.promise = _executeTask2),
+    _runtimeByLeaderId.set(leaderId4, runtime2),
+    await _executeTask2,
+    { leaderId: leaderId4, peerId: peerId4 }
   );
 }
-export function getRunningAudioSeparationTaskForNode(_0x2a0bef) {
-  const _0x93b66a = _resolveAudioSplitLeaderId(_0x2a0bef);
-  if (!_0x93b66a) return null;
-  const _0x5a0acf = _getNode(_0x93b66a);
-  if (!_isAudioSplitLeader(_0x5a0acf)) return null;
-  if (!_isRunningTaskStatus(_0x5a0acf?.rhTaskStatus)) return null;
+export function getRunningAudioSeparationTaskForNode(value9) {
+  const outId = _resolveAudioSplitLeaderId(value9);
+  if (!outId) return null;
+  const _getNode6 = _getNode(outId);
+  if (!_isAudioSplitLeader(_getNode6)) return null;
+  if (!_isRunningTaskStatus(_getNode6?.rhTaskStatus)) return null;
   return {
-    sourceNodeId: String(_0x5a0acf.rhSourceNodeId || ''),
-    outId: _0x93b66a,
-    peerId: String(_0x5a0acf.audioSplitPeerId || ''),
-    taskId: String(_0x5a0acf.rhTaskId || _runtimeByLeaderId.get(_0x93b66a)?.taskId || ''),
+    sourceNodeId: String(_getNode6.rhSourceNodeId || ''),
+    outId: outId,
+    peerId: String(_getNode6.audioSplitPeerId || ''),
+    taskId: String(_getNode6.rhTaskId || _runtimeByLeaderId.get(outId)?.taskId || ''),
     mode: 'audio-separation',
   };
 }
-export function hasRunningAudioSeparationTaskForNode(_0x2cccc6) {
-  return !!getRunningAudioSeparationTaskForNode(_0x2cccc6);
+export function hasRunningAudioSeparationTaskForNode(value10) {
+  return !!getRunningAudioSeparationTaskForNode(value10);
 }
 async function _resolveRunningHubWorkflowApiKey() {
   try {
@@ -443,114 +439,120 @@ async function _resolveRunningHubWorkflowApiKey() {
     return '';
   }
 }
-export async function cancelAudioSeparationTaskForNode(_0x321d4f, { notify: notify = false } = {}) {
-  const _0x72875f = getRunningAudioSeparationTaskForNode(_0x321d4f);
-  if (!_0x72875f?.outId) return false;
-  const _0x3e9229 = _0x72875f.outId,
-    _0x250b93 = _0x72875f.peerId,
-    _0x4e101e = _runtimeByLeaderId.get(_0x3e9229);
+export async function cancelAudioSeparationTaskForNode(value11, { notify: notify = false } = {}) {
+  const taskId5 = getRunningAudioSeparationTaskForNode(value11);
+  if (!taskId5?.outId) return false;
+  const value12 = taskId5.outId,
+    value13 = taskId5.peerId,
+    value14 = _runtimeByLeaderId.get(value12);
   try {
-    _0x4e101e?.abortController?.abort?.();
+    value14?.abortController?.abort?.();
   } catch {}
-  _runtimeByLeaderId.delete(_0x3e9229);
-  const _0x7dc931 = _getNode(_0x3e9229),
-    _0x5749b4 = Number(_0x7dc931?.generationStartTime || _0x7dc931?.rhTaskStartedAt || 0) || Date.now(),
-    _0x258dca = Date.now() - _0x5749b4,
-    _0x4ab690 = _buildEmptyAudioFields();
+  _runtimeByLeaderId.delete(value12);
+  const _getNode7 = _getNode(value12),
+    value15 = Number(_getNode7?.generationStartTime || _getNode7?.rhTaskStartedAt || 0) || Date.now(),
+    generationDuration = Date.now() - value15,
+    args4 = _buildEmptyAudioFields();
   (appStore.batch(() => {
-    (_updateNodeIfExists(_0x3e9229, {
+    (_updateNodeIfExists(value12, {
       name: audioSeparationText('nodeNames.vocalsCancelled'),
-      ..._0x4ab690,
+      ...args4,
       isGenerating: false,
       jobStatus: null,
       jobError: null,
-      generationDuration: _0x258dca,
+      generationDuration: generationDuration,
       rhTaskStatus: 'cancelled',
       rhTaskRecovering: false,
       rhStatusMessage: null,
     }),
-      _updateNodeIfExists(_0x250b93, {
+      _updateNodeIfExists(value13, {
         name: audioSeparationText('nodeNames.backgroundCancelled'),
-        ..._0x4ab690,
+        ...args4,
         isGenerating: false,
         jobStatus: null,
         jobError: null,
-        generationDuration: _0x258dca,
+        generationDuration: generationDuration,
       }));
   }),
     _persistLocalCache());
-  const _0x5f3455 = await _resolveRunningHubWorkflowApiKey();
-  if (_0x5f3455 && _0x72875f.taskId)
+  const apiKey = await _resolveRunningHubWorkflowApiKey();
+  if (apiKey && taskId5.taskId)
     try {
-      await cancelRunningHubTask({ apiKey: _0x5f3455, taskId: _0x72875f.taskId });
-    } catch (_0x1ba8bf) {
-      console.warn('[AudioSeparationController] cancel request failed:', _0x1ba8bf);
+      await cancelRunningHubTask({ apiKey: apiKey, taskId: taskId5.taskId });
+    } catch (value16) {
+      console.warn('[AudioSeparationController] cancel request failed:', value16);
     }
   if (notify) window.showToast?.(audioSeparationText('cancelled'), 'info');
   return true;
 }
-export function maybeResumeAudioSeparationLeader(_0x57af96) {
-  const _0x54c624 = _getNode(_0x57af96);
-  if (!_isAudioSplitLeader(_0x54c624)) return null;
-  if (!_isRunningTaskStatus(_0x54c624?.rhTaskStatus)) return null;
-  const _0x3954c8 = String(_0x54c624?.rhTaskId || '').trim();
-  if (!_0x3954c8) return null;
-  const _0x3a07d8 = _runtimeByLeaderId.get(_0x57af96);
-  if (_0x3a07d8?.promise && _0x3a07d8.taskId === _0x3954c8) return _0x3a07d8.promise;
-  const _0x57b991 = Number(_0x54c624?.rhTaskStartedAt || _0x54c624?.generationStartTime || 0) || Date.now();
+export function maybeResumeAudioSeparationLeader(leaderId5) {
+  const useOpenapiQuery3 = _getNode(leaderId5);
+  if (!_isAudioSplitLeader(useOpenapiQuery3)) return null;
+  if (!_isRunningTaskStatus(useOpenapiQuery3?.rhTaskStatus)) return null;
+  const taskId6 = String(useOpenapiQuery3?.rhTaskId || '').trim();
+  if (!taskId6) return null;
+  const value17 = _runtimeByLeaderId.get(leaderId5);
+  if (value17?.promise && value17.taskId === taskId6) return value17.promise;
+  const startedAt7 =
+    Number(useOpenapiQuery3?.rhTaskStartedAt || useOpenapiQuery3?.generationStartTime || 0) || Date.now();
   (appStore.batch(() => {
-    (_updateNodeIfExists(_0x57af96, {
-      ...buildGenerationStartPatch({ startedAt: _0x57b991 }),
+    (_updateNodeIfExists(leaderId5, {
+      ...buildGenerationStartPatch({ startedAt: startedAt7 }),
       ..._buildRunningHubTaskPatch({
-        taskId: _0x3954c8,
+        taskId: taskId6,
         status:
-          String(_0x54c624?.rhTaskStatus || '')
+          String(useOpenapiQuery3?.rhTaskStatus || '')
             .trim()
             .toLowerCase() === 'pending'
             ? 'pending'
             : 'running',
-        startedAt: _0x57b991,
+        startedAt: startedAt7,
         recovering: true,
-        useOpenapiQuery: _0x54c624?.rhTaskUseOpenapiQuery === true,
+        useOpenapiQuery: useOpenapiQuery3?.rhTaskUseOpenapiQuery === true,
       }),
     }),
-      _updateNodeIfExists(_0x54c624?.audioSplitPeerId, {
-        ...buildGenerationStartPatch({ startedAt: _0x57b991 }),
+      _updateNodeIfExists(useOpenapiQuery3?.audioSplitPeerId, {
+        ...buildGenerationStartPatch({ startedAt: startedAt7 }),
         jobError: null,
       }));
   }),
     _persistLocalCache());
-  const _0x32a563 = { abortController: new AbortController(), promise: null, taskId: _0x3954c8 };
-  _runtimeByLeaderId.set(_0x57af96, _0x32a563);
-  const _0x10a00a = _executeTask({
-    leaderId: _0x57af96,
-    peerId: _0x54c624.audioSplitPeerId,
+  const runtime3 = { abortController: new AbortController(), promise: null, taskId: taskId6 };
+  _runtimeByLeaderId.set(leaderId5, runtime3);
+  const _executeTask3 = _executeTask({
+    leaderId: leaderId5,
+    peerId: useOpenapiQuery3.audioSplitPeerId,
     sourceAudioUrl: '',
-    rhInstanceType: _0x54c624?.rhInstanceType || 'default',
-    startedAt: _0x57b991,
+    rhInstanceType: useOpenapiQuery3?.rhInstanceType || 'default',
+    startedAt: startedAt7,
     resume: true,
-    runtime: _0x32a563,
+    runtime: runtime3,
   });
-  return ((_0x32a563.promise = _0x10a00a), _runtimeByLeaderId.set(_0x57af96, _0x32a563), _0x10a00a);
+  return ((runtime3.promise = _executeTask3), _runtimeByLeaderId.set(leaderId5, runtime3), _executeTask3);
 }
 export function __setAudioSeparationDepsForTest({
-  runAudioSeparationImpl: _0x379f86,
-  resumeAudioSeparationTaskImpl: _0x3b76b2,
-  saveRemoteAudioLocallyDetailedImpl: _0x4133ec,
+  runAudioSeparationImpl: runAudioSeparationImpl,
+  resumeAudioSeparationTaskImpl: resumeAudioSeparationTaskImpl,
+  saveRemoteAudioLocallyDetailedImpl: saveRemoteAudioLocallyDetailedImpl,
 } = {}) {
-  ((_runAudioSeparationImpl = typeof _0x379f86 === 'function' ? _0x379f86 : runAudioSeparation),
+  ((_runAudioSeparationImpl =
+    typeof runAudioSeparationImpl === 'function' ? runAudioSeparationImpl : runAudioSeparation),
     (_resumeAudioSeparationTaskImpl =
-      typeof _0x3b76b2 === 'function' ? _0x3b76b2 : resumeAudioSeparationTask),
+      typeof resumeAudioSeparationTaskImpl === 'function'
+        ? resumeAudioSeparationTaskImpl
+        : resumeAudioSeparationTask),
     (_saveRemoteAudioLocallyDetailedImpl =
-      typeof _0x4133ec === 'function' ? _0x4133ec : saveRemoteAudioLocallyDetailed));
+      typeof saveRemoteAudioLocallyDetailedImpl === 'function'
+        ? saveRemoteAudioLocallyDetailedImpl
+        : saveRemoteAudioLocallyDetailed));
 }
 export function __resetAudioSeparationDepsForTest() {
   ((_runAudioSeparationImpl = runAudioSeparation),
     (_resumeAudioSeparationTaskImpl = resumeAudioSeparationTask),
     (_saveRemoteAudioLocallyDetailedImpl = saveRemoteAudioLocallyDetailed),
-    _runtimeByLeaderId.forEach((_0x54f357) => {
+    _runtimeByLeaderId.forEach((item6) => {
       try {
-        _0x54f357?.abortController?.abort?.();
+        item6?.abortController?.abort?.();
       } catch {}
     }),
     _runtimeByLeaderId.clear());

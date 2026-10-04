@@ -4,24 +4,24 @@ import {
   getWorkspaceAssetBaseAppearance,
   getWorkspaceAssetAppearanceStats,
 } from './workspaceAssetAppearance.js';
-function normalizeText(_0x992e03) {
-  return String(_0x992e03 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function escapeHtml(_0x5c3f13) {
-  return String(_0x5c3f13 ?? '')
+function escapeHtml(item) {
+  return String(item ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
     ['replaceAll']('\x22', '&quot;')
     ['replaceAll']('\x27', '&apos;');
 }
-function renderAttributes(_0x5ef3b8 = {}) {
-  return Object['entries'](_0x5ef3b8 && typeof _0x5ef3b8 === 'object' ? _0x5ef3b8 : {})
-    ['filter'](([_0x7b9358, _0x40c259]) => normalizeText(_0x7b9358) && _0x40c259 !== ![] && _0x40c259 != null)
-    ['map'](([_0x559011, _0x55598f]) =>
-      _0x55598f === !![]
-        ? '\x20' + escapeHtml(_0x559011)
-        : '\x20' + escapeHtml(_0x559011) + '=\x22' + escapeHtml(_0x55598f) + '\x22',
+function renderAttributes(options = {}) {
+  return Object['entries'](options && typeof options === 'object' ? options : {})
+    ['filter'](([key, index]) => normalizeText(key) && index !== ![] && index != null)
+    ['map'](([result, data]) =>
+      data === !![]
+        ? '\x20' + escapeHtml(result)
+        : '\x20' + escapeHtml(result) + '=\x22' + escapeHtml(data) + '\x22',
     )
     ['join']('');
 }
@@ -31,10 +31,10 @@ export function renderWorkspaceCardDeleteControl({
   actionAttributes: actionAttributes = {},
   disabled: disabled = ![],
 } = {}) {
-  const _0x4c212b = normalizeText(className);
+  const text = normalizeText(className);
   return (
     '<button\x20type=\x22button\x22\x20class=\x22story-action-icon-button\x20is-danger\x20story-project-delete-trigger\x20story-card-delete-button\x20story-card-delete-control' +
-    (_0x4c212b ? '\x20' + escapeHtml(_0x4c212b) : '') +
+    (text ? '\x20' + escapeHtml(text) : '') +
     '\x22' +
     renderAttributes(actionAttributes) +
     ' aria-label="' +
@@ -47,86 +47,86 @@ export function renderWorkspaceCardDeleteControl({
   );
 }
 export function renderWorkspaceCardImageActions({
-  uploadAttributes: _0x15b326,
-  generateAttributes: _0x3a890a,
+  uploadAttributes: uploadAttributes,
+  generateAttributes: generateAttributes,
   disabled: disabled = ![],
 } = {}) {
   return (
     '<span class="workspace-card-image-actions">' +
     [
-      ['upload', '上传形象', _0x15b326],
-      ['generate', '生成形象', _0x3a890a],
+      ['upload', '上传形象', uploadAttributes],
+      ['generate', '生成形象', generateAttributes],
     ]
       ['map'](
-        ([_0x1c1790, _0x2d91c0, _0x55344a]) =>
+        ([target, source, next]) =>
           '<button type="button" class="story-secondary-button"' +
-          renderAttributes(_0x55344a) +
+          renderAttributes(next) +
           (disabled ? ' disabled' : '') +
           '>' +
-          renderWorkspaceActionIcon(_0x1c1790) +
+          renderWorkspaceActionIcon(target) +
           '<span>' +
-          _0x2d91c0 +
+          source +
           '</span></button>',
       )
       ['join']('') +
     '</span>'
   );
 }
-export function isWorkspaceAssetHoverLandscape(_0x4e4eba, _0x311c0b) {
-  const _0x371608 = Number(_0x4e4eba) || 0x0,
-    _0x2428ae = Number(_0x311c0b) || 0x0;
-  return _0x371608 > 0x0 && _0x2428ae > 0x0 && _0x371608 > _0x2428ae;
+export function isWorkspaceAssetHoverLandscape(current, entry) {
+  const count = Number(current) || 0x0,
+    count2 = Number(entry) || 0x0;
+  return count > 0x0 && count2 > 0x0 && count > count2;
 }
-export function resolveWorkspaceWheelDelta(_0x409508) {
-  const _0x2fc98e = Number(_0x409508?.['deltaX'] || 0x0),
-    _0x417be2 = Number(_0x409508?.['deltaY'] || 0x0),
-    _0x416b40 = Math['abs'](_0x417be2) >= Math['abs'](_0x2fc98e) ? _0x417be2 : _0x2fc98e,
-    _0x24118e = Number(_0x409508?.['deltaMode'] || 0x0),
-    _0x17b60d = _0x24118e === 0x1 ? 0x10 : _0x24118e === 0x2 ? 0x320 : 0x1;
-  return _0x416b40 * _0x17b60d;
+export function resolveWorkspaceWheelDelta(event) {
+  const record = Number(event?.['deltaX'] || 0x0),
+    payload = Number(event?.['deltaY'] || 0x0),
+    handle = Math['abs'](payload) >= Math['abs'](record) ? payload : record,
+    count3 = Number(event?.['deltaMode'] || 0x0),
+    state = count3 === 0x1 ? 0x10 : count3 === 0x2 ? 0x320 : 0x1;
+  return handle * state;
 }
 export function consumeWorkspaceWheelDirection(
-  _0x1f1a3a,
-  _0x30ec5a,
+  config,
+  enabled,
   { threshold: threshold = 0x18, lockDuration: lockDuration = 0xdc, now: now = Date['now']() } = {},
 ) {
-  if (!_0x30ec5a || now < Number(_0x30ec5a['lockedUntil'] || 0x0)) return 0x0;
-  const _0x53fd91 = resolveWorkspaceWheelDelta(_0x1f1a3a);
-  if (!_0x53fd91) return 0x0;
-  _0x30ec5a['accumulator'] &&
-    Math['sign'](_0x30ec5a['accumulator']) !== Math['sign'](_0x53fd91) &&
-    (_0x30ec5a['accumulator'] = 0x0);
-  _0x30ec5a['accumulator'] = Number(_0x30ec5a['accumulator'] || 0x0) + _0x53fd91;
-  if (Math['abs'](_0x30ec5a['accumulator']) < threshold) return 0x0;
-  const _0x4b41a7 = _0x30ec5a['accumulator'] > 0x0 ? 0x1 : -0x1;
-  return ((_0x30ec5a['accumulator'] = 0x0), (_0x30ec5a['lockedUntil'] = now + lockDuration), _0x4b41a7);
+  if (!enabled || now < Number(enabled['lockedUntil'] || 0x0)) return 0x0;
+  const workspaceWheelDelta = resolveWorkspaceWheelDelta(config);
+  if (!workspaceWheelDelta) return 0x0;
+  enabled['accumulator'] &&
+    Math['sign'](enabled['accumulator']) !== Math['sign'](workspaceWheelDelta) &&
+    (enabled['accumulator'] = 0x0);
+  enabled['accumulator'] = Number(enabled['accumulator'] || 0x0) + workspaceWheelDelta;
+  if (Math['abs'](enabled['accumulator']) < threshold) return 0x0;
+  const scope = enabled['accumulator'] > 0x0 ? 0x1 : -0x1;
+  return ((enabled['accumulator'] = 0x0), (enabled['lockedUntil'] = now + lockDuration), scope);
 }
-export function resolveWorkspaceTabTransitionDirection(_0x21dd39, _0x418fd3, _0x15c40d = []) {
-  const _0x2411ef = Array['isArray'](_0x15c40d) ? _0x15c40d['map'](normalizeText) : [],
-    _0x21c956 = _0x2411ef['indexOf'](normalizeText(_0x21dd39)),
-    _0xe83d78 = _0x2411ef['indexOf'](normalizeText(_0x418fd3));
-  if (_0x21c956 < 0x0 || _0xe83d78 < 0x0 || _0x21c956 === _0xe83d78) return 'none';
-  return _0xe83d78 > _0x21c956 ? 'forward' : 'backward';
+export function resolveWorkspaceTabTransitionDirection(input, output, list = []) {
+  const list2 = Array['isArray'](list) ? list['map'](normalizeText) : [],
+    count4 = list2['indexOf'](normalizeText(input)),
+    count5 = list2['indexOf'](normalizeText(output));
+  if (count4 < 0x0 || count5 < 0x0 || count4 === count5) return 'none';
+  return count5 > count4 ? 'forward' : 'backward';
 }
-export function renderWorkspaceAssetTabIcon(_0x394111) {
-  const _0x59bfda = ['character', 'scene', 'prop', 'audio', 'library']['includes'](normalizeText(_0x394111))
-      ? normalizeText(_0x394111)
+export function renderWorkspaceAssetTabIcon(value2) {
+  const value3 = ['character', 'scene', 'prop', 'audio', 'library']['includes'](normalizeText(value2))
+      ? normalizeText(value2)
       : 'character',
-    _0x23cc76 =
-      _0x59bfda === 'scene'
+    value4 =
+      value3 === 'scene'
         ? '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="m6 16 4-4 3 3 2.5-2.5L18 15"/><circle cx="15.5" cy="8.5" r="1.5"/>'
-        : _0x59bfda === 'prop'
+        : value3 === 'prop'
           ? '<path d="m12 3.5 7.5 4.25v8.5L12 20.5l-7.5-4.25v-8.5z"/><path d="m4.5 7.75 7.5 4.5 7.5-4.5M12 12.25v8.25"/>'
-          : _0x59bfda === 'audio'
+          : value3 === 'audio'
             ? '<path d="M5 10v4M8.5 7.5v9M12 4v16M15.5 8.5v7M19 10v4"/>'
-            : _0x59bfda === 'library'
+            : value3 === 'library'
               ? '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>'
               : '<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20c.7-4 3-6 6.5-6s5.8 2 6.5 6"/>';
   return (
     '<span class="story-asset-tab-icon" data-icon="' +
-    _0x59bfda +
+    value3 +
     '" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none">' +
-    _0x23cc76 +
+    value4 +
     '</svg></span>'
   );
 }
@@ -135,35 +135,34 @@ export function renderWorkspaceAssetLoadingOverlay({
   title: title = '图片生成中',
   description: description = '正在等待生成结果，完成后会自动显示。',
 } = {}) {
-  const _0x1961b5 = compact
+  const value5 = compact
       ? ''
       : '<span\x20class=\x22story-asset-loading-copy\x22><strong>' +
         escapeHtml(title) +
         '</strong>' +
         (description ? '<small>' + escapeHtml(description) + '</small>' : '') +
         '</span>',
-    _0x7c5c4d = compact
+    value6 = compact
       ? ''
       : '<div class="storyboard-script-loading-bar" aria-hidden="true"><div class="storyboard-script-loading-bar-fill"></div></div>',
-    _0x3faa44 =
-      '<span\x20class=\x22storyboard-script-loading-spinner\x22\x20aria-hidden=\x22true\x22></span>',
-    _0xe6c717 = compact
-      ? _0x3faa44
+    value7 = '<span\x20class=\x22storyboard-script-loading-spinner\x22\x20aria-hidden=\x22true\x22></span>',
+    value8 = compact
+      ? value7
       : '<div\x20class=\x22story-video-empty\x20story-video-loading\x22>' +
-        _0x3faa44 +
-        _0x1961b5 +
-        _0x7c5c4d +
+        value7 +
+        value5 +
+        value6 +
         '</div>';
   return (
     '<div\x20class=\x22img-loading-overlay\x20story-asset-loading-overlay' +
     (compact ? ' is-compact' : '') +
     '" role="status" aria-busy="true" aria-label="正在生成">' +
-    _0xe6c717 +
+    value8 +
     '</div>'
   );
 }
 export function renderWorkspacePreviewArrow(
-  _0x6688e6,
+  value9,
   {
     action: action = '',
     label: label = '',
@@ -171,20 +170,20 @@ export function renderWorkspacePreviewArrow(
     actionAttributes: actionAttributes = null,
   } = {},
 ) {
-  const _0x1b30e3 = _0x6688e6 === 'previous',
-    _0x427139 = _0x1b30e3 ? 'story-appearance-arrow--previous' : 'story-appearance-arrow--next',
-    _0xfcdce9 = _0x1b30e3 ? 'm14.5\x206.5-5.5\x205.5\x205.5\x205.5' : 'm9.5 6.5 5.5 5.5-5.5 5.5',
-    _0xf90f2 = actionAttributes || (action ? { 'data-workspace-action': action } : {});
+  const value10 = value9 === 'previous',
+    value11 = value10 ? 'story-appearance-arrow--previous' : 'story-appearance-arrow--next',
+    value12 = value10 ? 'm14.5\x206.5-5.5\x205.5\x205.5\x205.5' : 'm9.5 6.5 5.5 5.5-5.5 5.5',
+    value13 = actionAttributes || (action ? { 'data-workspace-action': action } : {});
   return (
     '<button type="button" class="story-appearance-arrow ' +
-    _0x427139 +
+    value11 +
     (className ? '\x20' + escapeHtml(className) : '') +
     '\x22' +
-    renderAttributes(_0xf90f2) +
+    renderAttributes(value13) +
     ' aria-label="' +
     escapeHtml(label) +
     '\x22><svg\x20class=\x22story-appearance-arrow-icon\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22' +
-    _0xfcdce9 +
+    value12 +
     '"/></svg></button>'
   );
 }
@@ -203,7 +202,7 @@ export function renderWorkspaceCardAppearanceNavigation({
   );
 }
 export function buildWorkspaceAssetHoverPreviewContent(
-  _0x38f715,
+  error,
   {
     appearanceId: appearanceId = '',
     selectedAssetId: selectedAssetId = '',
@@ -213,84 +212,81 @@ export function buildWorkspaceAssetHoverPreviewContent(
     hasVoiceReference: hasVoiceReference = () => ![],
   } = {},
 ) {
-  if (!_0x38f715) return null;
-  const _0x109010 = _0x38f715['isLibraryAsset'] ? [_0x38f715] : getAppearances(_0x38f715),
-    _0x3ee092 = normalizeText(appearanceId),
-    _0xb2f377 = _0x109010['filter'](
-      (_0x2adb25) =>
-        Boolean(normalizeText(_0x2adb25?.['imageUrl'])) &&
-        (!_0x3ee092 || normalizeText(_0x2adb25?.['id']) === _0x3ee092),
+  if (!error) return null;
+  const allAppearances = error['isLibraryAsset'] ? [error] : getAppearances(error),
+    text2 = normalizeText(appearanceId),
+    appearances2 = allAppearances['filter'](
+      (value14) =>
+        Boolean(normalizeText(value14?.['imageUrl'])) && (!text2 || normalizeText(value14?.['id']) === text2),
     );
-  if (!_0xb2f377['length']) return null;
-  const _0x51b4da = _0x38f715['kind'] === 'character' && !_0x38f715['isLibraryAsset'],
-    _0x35890b = _0x51b4da && hasVoiceReference(_0x38f715),
-    _0x1395ea = Math['ceil'](Math['sqrt'](Math['max'](0x1, _0xb2f377['length']))),
-    _0x15d370 = mediaOnly
+  if (!appearances2['length']) return null;
+  const value15 = error['kind'] === 'character' && !error['isLibraryAsset'],
+    hasVoice = value15 && hasVoiceReference(error),
+    columns = Math['ceil'](Math['sqrt'](Math['max'](0x1, appearances2['length']))),
+    value16 = mediaOnly
       ? ''
       : '<div class="story-asset-hover-preview-heading"><strong>' +
-        escapeHtml(_0x38f715['hoverTitle'] || _0x38f715['name'] || '素材') +
+        escapeHtml(error['hoverTitle'] || error['name'] || '素材') +
         '</strong><span class="story-asset-hover-summary">已生成 ' +
-        _0xb2f377['length'] +
+        appearances2['length'] +
         '/' +
-        _0x109010['length'] +
+        allAppearances['length'] +
         '</span>' +
-        (_0x51b4da
+        (value15
           ? '<span\x20class=\x22story-character-voice-hover-status\x20' +
-            (_0x35890b ? 'has-reference' : 'is-missing') +
+            (hasVoice ? 'has-reference' : 'is-missing') +
             '\x22><i></i>' +
-            (_0x35890b ? '有声音参考' : '无声音参考') +
+            (hasVoice ? '有声音参考' : '无声音参考') +
             '</span>'
           : '') +
         '</div>',
-    _0xc56be2 =
-      _0x15d370 +
+    html =
+      value16 +
       '\n    <div class="story-asset-hover-preview-grid">\n      ' +
-      _0xb2f377['map']((_0xa4cb76, _0xa24e07) => {
-        const _0x23063e = normalizeText(_0xa4cb76?.['imageUrl']),
-          _0x219fbb = _0xa4cb76?.['name'] || '形象 ' + (_0xa24e07 + 0x1),
-          _0x497236 = [
+      appearances2['map']((error2, value17) => {
+        const text3 = normalizeText(error2?.['imageUrl']),
+          value18 = error2?.['name'] || '形象 ' + (value17 + 0x1),
+          value19 = [
             'story-asset-hover-preview-cell',
-            _0xa4cb76?.['id'] === selectedAppearanceId && _0x38f715['id'] === selectedAssetId
-              ? 'is-current'
-              : '',
-            _0x38f715['baseAppearanceId'] === _0xa4cb76?.['id'] ? 'is-base' : '',
+            error2?.['id'] === selectedAppearanceId && error['id'] === selectedAssetId ? 'is-current' : '',
+            error['baseAppearanceId'] === error2?.['id'] ? 'is-base' : '',
           ]
             ['filter'](Boolean)
             ['join']('\x20'),
-          _0x2f856f = mediaOnly
+          value20 = mediaOnly
             ? ''
-            : '<span\x20class=\x22story-asset-hover-preview-status\x22>' + escapeHtml(_0x219fbb) + '</span>',
-          _0x229af7 = mediaOnly ? '\x20title=\x22' + escapeHtml(_0x219fbb) + '\x22' : '';
+            : '<span\x20class=\x22story-asset-hover-preview-status\x22>' + escapeHtml(value18) + '</span>',
+          value21 = mediaOnly ? '\x20title=\x22' + escapeHtml(value18) + '\x22' : '';
         return (
           '<span\x20class=\x22story-asset-hover-preview-item\x22>' +
-          _0x2f856f +
+          value20 +
           '<span class="' +
-          _0x497236 +
+          value19 +
           '\x22' +
-          _0x229af7 +
+          value21 +
           '><img src="' +
-          escapeHtml(_0x23063e) +
+          escapeHtml(text3) +
           '" alt="' +
-          escapeHtml(_0x38f715['name'] + ' · ' + _0x219fbb) +
+          escapeHtml(error['name'] + ' · ' + value18) +
           '" data-story-asset-hover-image loading="eager" decoding="async" draggable="false"></span></span>'
         );
       })['join']('') +
       '\x0a\x20\x20\x20\x20</div>';
   return {
-    allAppearances: _0x109010,
-    appearances: _0xb2f377,
-    columns: _0x1395ea,
-    hasVoice: _0x35890b,
+    allAppearances: allAppearances,
+    appearances: appearances2,
+    columns: columns,
+    hasVoice: hasVoice,
     mediaOnly: mediaOnly,
-    html: _0xc56be2,
+    html: html,
   };
 }
-export function renderWorkspaceCardVoiceStatus(_0xfabafb) {
+export function renderWorkspaceCardVoiceStatus(value22) {
   return (
     '<span class="workspace-card-voice-status ' +
-    (_0xfabafb ? 'has-reference' : 'is-missing') +
+    (value22 ? 'has-reference' : 'is-missing') +
     '"><i aria-hidden="true"></i>' +
-    (_0xfabafb ? '有声音参考' : '无声音参考') +
+    (value22 ? '有声音参考' : '无声音参考') +
     '</span>'
   );
 }
@@ -322,41 +318,37 @@ export function renderWorkspaceAssetCard({
   roleHtml: roleHtml = '',
   deleteControlHtml: deleteControlHtml = '',
 } = {}) {
-  const _0x104e09 = Array['isArray'](appearances) ? appearances : [],
-    _0x30c89c =
+  const total = Array['isArray'](appearances) ? appearances : [],
+    error3 =
       previewAppearance ||
       getWorkspaceAssetBaseAppearance(asset) ||
-      _0x104e09['find']((_0x40fee5) => normalizeText(_0x40fee5?.['imageUrl'])) ||
-      _0x104e09[0x0] ||
+      total['find']((value23) => normalizeText(value23?.['imageUrl'])) ||
+      total[0x0] ||
       asset,
-    _0x5c3f3d = normalizeText(_0x30c89c?.['imageUrl']),
-    _0x289357 = normalizeText(fallbackImageUrl),
-    _0x1220b6 = workspaceAssetLibraryImage
+    text4 = normalizeText(error3?.['imageUrl']),
+    text5 = normalizeText(fallbackImageUrl),
+    value24 = workspaceAssetLibraryImage
       ? ' data-workspace-asset-library-image' +
-        (_0x289357 && _0x289357 !== _0x5c3f3d
-          ? ' data-workspace-asset-library-fallback-src="' + escapeHtml(_0x289357) + '\x22'
+        (text5 && text5 !== text4
+          ? ' data-workspace-asset-library-fallback-src="' + escapeHtml(text5) + '\x22'
           : '')
       : '',
-    _0x28313e =
+    value25 =
       cardMediaHtml ||
-      (_0x5c3f3d
+      (text4
         ? '<img\x20class=\x22story-asset-card-image\x22\x20src=\x22' +
-          escapeHtml(_0x5c3f3d) +
+          escapeHtml(text4) +
           '" alt="' +
-          escapeHtml(
-            '' + (asset['name'] || '') + (_0x30c89c?.['name'] ? '\x20·\x20' + _0x30c89c['name'] : ''),
-          ) +
+          escapeHtml('' + (asset['name'] || '') + (error3?.['name'] ? '\x20·\x20' + error3['name'] : '')) +
           '" loading="lazy" decoding="async"' +
-          _0x1220b6 +
+          value24 +
           '>'
         : '<div class="story-asset-card-image story-media-empty" role="img" aria-label="' +
           escapeHtml((asset['name'] || '素材') + '待生成') +
           '\x22><span>待生成</span></div>'),
-    _0x219ba5 =
-      stats && typeof stats === 'object'
-        ? stats
-        : { total: _0x104e09['length'], generated: 0x0, failed: 0x0 },
-    _0x712039 =
+    value26 =
+      stats && typeof stats === 'object' ? stats : { total: total['length'], generated: 0x0, failed: 0x0 },
+    value27 =
       '<button type="button" class="story-asset-card ' +
       (selected && !selectionMode ? 'is-selected' : '') +
       '\x20' +
@@ -373,7 +365,7 @@ export function renderWorkspaceAssetCard({
       '" data-story-marquee-id="' +
       escapeHtml(asset['id']) +
       '\x22\x20data-story-appearance-count=\x22' +
-      _0x104e09['length'] +
+      total['length'] +
       '" aria-pressed="' +
       (selectionMode ? String(checked) : 'false') +
       '\x22' +
@@ -390,9 +382,9 @@ export function renderWorkspaceAssetCard({
       '" aria-busy="' +
       loading +
       '">\n      ' +
-      _0x28313e +
+      value25 +
       '\n      ' +
-      (!loading && !_0x5c3f3d && normalizeText(_0x30c89c?.['error'])
+      (!loading && !text4 && normalizeText(error3?.['error'])
         ? '<span\x20class=\x22story-asset-card-failure\x22\x20role=\x22status\x22>生成失败</span>'
         : '') +
       '\n      ' +
@@ -408,20 +400,20 @@ export function renderWorkspaceAssetCard({
       (cardStatusHtml ||
         (statusText
           ? '<span>' + escapeHtml(statusText) + '</span>'
-          : _0x219ba5['total'] > 0x1
-            ? '<span>形象 ' + _0x219ba5['generated'] + '/' + _0x219ba5['total'] + '</span>'
+          : value26['total'] > 0x1
+            ? '<span>形象 ' + value26['generated'] + '/' + value26['total'] + '</span>'
             : '')) +
       '</span>\n      ' +
       cardMetaHtml +
       '\n      <p>' +
       escapeHtml(promptPreview) +
       '</p>\n    </span>\n  </button>';
-  if (!preserveShell && !deleteControlHtml && !accessoryHtml) return _0x712039;
+  if (!preserveShell && !deleteControlHtml && !accessoryHtml) return value27;
   return (
     '<span\x20class=\x22story-asset-card-shell' +
     (shellClassName ? '\x20' + escapeHtml(shellClassName) : '') +
     '">\n    ' +
-    _0x712039 +
+    value27 +
     '\n    ' +
     deleteControlHtml +
     accessoryHtml +

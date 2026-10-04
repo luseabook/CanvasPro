@@ -1,331 +1,322 @@
 import { syncPersonReplacementVideoStageFrame } from './personReplacementVideoPresentation.js';
 import { createPersonReplacementVideoSyncPlayback } from './personReplacementVideoSyncPlayback.js';
 import { createWorkspaceVideoProgressLoop } from '../workspaceVideoPlayback.js';
-function normalizeText(_0x119e5c, _0x13c004 = '') {
-  const _0x5013c5 = String(_0x119e5c ?? '')['trim']();
-  return _0x5013c5 || _0x13c004;
+function normalizeText(value, item = '') {
+  const key = String(value ?? '')['trim']();
+  return key || item;
 }
-function clamp(_0x5ddb85, _0xbe70f2, _0x54ca39, _0x700c76 = _0xbe70f2) {
-  const _0x42dedb = Number(_0x5ddb85);
-  return Number['isFinite'](_0x42dedb)
-    ? Math['min'](_0x54ca39, Math['max'](_0xbe70f2, _0x42dedb))
-    : _0x700c76;
+function clamp(index, result, data, options = result) {
+  const target = Number(index);
+  return Number['isFinite'](target) ? Math['min'](data, Math['max'](result, target)) : options;
 }
-function formatPlaybackTime(_0x6882a) {
-  const _0x171b77 = Math['max'](0x0, Number(_0x6882a) || 0x0),
-    _0x3150be = Math['floor'](_0x171b77 / 0x3c);
-  return _0x3150be + ':' + String(Math['floor'](_0x171b77 % 0x3c))['padStart'](0x2, '0');
+function formatPlaybackTime(source) {
+  const next = Math['max'](0x0, Number(source) || 0x0),
+    current = Math['floor'](next / 0x3c);
+  return current + ':' + String(Math['floor'](next % 0x3c))['padStart'](0x2, '0');
 }
 export function createPersonReplacementVideoPlaybackController({
-  getRoot: _0x2eabdd,
-  getProject: _0x396f18,
-  getSelectedShot: _0x4199e2,
-  createVideoPlayback: _0x2957be,
+  getRoot: getRoot,
+  getProject: getProject,
+  getSelectedShot: getSelectedShot,
+  createVideoPlayback: createVideoPlayback,
   videoClipController: videoClipController = null,
   createProgressLoop: createProgressLoop = createWorkspaceVideoProgressLoop,
   createSyncPlayback: createSyncPlayback = createPersonReplacementVideoSyncPlayback,
   syncStageFrame: syncStageFrame = syncPersonReplacementVideoStageFrame,
 } = {}) {
   if (
-    typeof _0x2eabdd !== 'function' ||
-    typeof _0x396f18 !== 'function' ||
-    typeof _0x4199e2 !== 'function' ||
-    typeof _0x2957be !== 'function'
+    typeof getRoot !== 'function' ||
+    typeof getProject !== 'function' ||
+    typeof getSelectedShot !== 'function' ||
+    typeof createVideoPlayback !== 'function'
   )
     throw new Error('person replacement video playback requires workspace adapters');
-  const _0x37b42a = new Map(),
-    _0x4c83cf = new Map();
-  let _0x470b46 = null,
-    _0x29b464 = ![],
-    _0x596fb9 = null,
-    _0x4db384 = ![],
-    _0x4127e7 = ![];
-  const _0x5c5ffc = () => {
-      (_0x470b46?.['destroy']?.(), (_0x470b46 = null));
+  const map = new Map(),
+    map2 = new Map();
+  let syncPlayback = null,
+    initiallyEnabled = ![],
+    value2 = null,
+    enabled = ![],
+    entry = ![];
+  const stopSyncPlayback = () => {
+      (syncPlayback?.['destroy']?.(), (syncPlayback = null));
     },
-    _0x141579 = (_0x1f8795) => {
-      _0x5c5ffc();
-      const _0x256756 = _0x37b42a['get'](_0x1f8795);
-      (_0x256756?.['destroy']?.(), _0x37b42a['delete'](_0x1f8795));
+    destroyRole = (record) => {
+      stopSyncPlayback();
+      const payload = map['get'](record);
+      (payload?.['destroy']?.(), map['delete'](record));
     },
-    _0x1b0321 = () => {
-      (_0x596fb9?.(), (_0x596fb9 = null));
-      if (_0x4127e7) return ![];
-      const _0x4e85c4 = Array['from'](
-          _0x2eabdd()?.['querySelectorAll']?.('[data-person-replacement-video-center-stage]') || [],
+    bindCenterIndicators = () => {
+      (value2?.(), (value2 = null));
+      if (entry) return ![];
+      const list = Array['from'](
+          getRoot()?.['querySelectorAll']?.('[data-person-replacement-video-center-stage]') || [],
         ),
-        _0x3f6cce = _0x4e85c4['map']((_0x46e2b5) => {
-          const _0xc09d75 = _0x46e2b5['querySelector']?.('[data-person-replacement-video-center-player]');
-          if (!_0xc09d75) return null;
-          const _0x6d4ef6 = () => {
-              const _0x534199 = _0xc09d75['paused'] === ![] && _0xc09d75['ended'] !== !![];
-              (_0x46e2b5['classList']?.['toggle']?.('is-playing', _0x534199),
-                _0x46e2b5['dataset'] &&
-                  (_0x46e2b5['dataset']['personReplacementVideoPlaybackState'] = _0x534199
-                    ? 'playing'
-                    : 'paused'));
+        list2 = list['map']((el) => {
+          const el2 = el['querySelector']?.('[data-person-replacement-video-center-player]');
+          if (!el2) return null;
+          const run = () => {
+              const handle = el2['paused'] === ![] && el2['ended'] !== !![];
+              (el['classList']?.['toggle']?.('is-playing', handle),
+                el['dataset'] &&
+                  (el['dataset']['personReplacementVideoPlaybackState'] = handle ? 'playing' : 'paused'));
             },
-            _0x573017 = ['play', 'playing', 'pause', 'ended', 'emptied'];
+            list3 = ['play', 'playing', 'pause', 'ended', 'emptied'];
           return (
-            _0x573017['forEach']((_0x5d649c) => {
-              _0xc09d75['addEventListener']?.(_0x5d649c, _0x6d4ef6);
+            list3['forEach']((state) => {
+              el2['addEventListener']?.(state, run);
             }),
-            _0x6d4ef6(),
+            run(),
             () => {
-              _0x573017['forEach']((_0x13f38c) => {
-                _0xc09d75['removeEventListener']?.(_0x13f38c, _0x6d4ef6);
+              list3['forEach']((config) => {
+                el2['removeEventListener']?.(config, run);
               });
             }
           );
         })['filter'](Boolean);
       return (
-        (_0x596fb9 = () => {
-          _0x3f6cce['forEach']((_0x5eb9b3) => _0x5eb9b3());
+        (value2 = () => {
+          list2['forEach']((handler) => handler());
         }),
-        _0x3f6cce['length'] > 0x0
+        list2['length'] > 0x0
       );
     },
-    _0x742640 = () => {
-      _0x5c5ffc();
-      if (_0x4127e7) return ![];
-      const _0x4fa456 = _0x37b42a['get']('source'),
-        _0x519de5 = _0x37b42a['get']('result'),
-        _0x25459d = _0x519de5?.['controlsEl']?.['querySelector']?.(
+    handler2 = () => {
+      stopSyncPlayback();
+      if (entry) return ![];
+      const sourceVideo = map['get']('source'),
+        resultVideo = map['get']('result'),
+        button = resultVideo?.['controlsEl']?.['querySelector']?.(
           '[data-person-replacement-video-sync-play]',
         );
-      if (!_0x4fa456?.['videoEl'] || !_0x519de5?.['videoEl'] || !_0x25459d) return ![];
+      if (!sourceVideo?.['videoEl'] || !resultVideo?.['videoEl'] || !button) return ![];
       return (
-        (_0x470b46 = createSyncPlayback({
-          sourceVideo: _0x4fa456['videoEl'],
-          resultVideo: _0x519de5['videoEl'],
-          sourcePlay: _0x4fa456['play'],
-          resultPlay: _0x519de5['play'],
-          button: _0x25459d,
-          initiallyEnabled: _0x29b464,
-          onEnabledChange(_0x4e58a0) {
-            _0x29b464 = _0x4e58a0;
+        (syncPlayback = createSyncPlayback({
+          sourceVideo: sourceVideo['videoEl'],
+          resultVideo: resultVideo['videoEl'],
+          sourcePlay: sourceVideo['play'],
+          resultPlay: resultVideo['play'],
+          button: button,
+          initiallyEnabled: initiallyEnabled,
+          onEnabledChange(scope) {
+            initiallyEnabled = scope;
           },
         })),
         !![]
       );
     },
-    _0x360e72 = ({ closeClip: closeClip = !![] } = {}) => {
-      (_0x5c5ffc(),
-        Array['from'](_0x37b42a['keys']())['forEach'](_0x141579),
-        _0x596fb9?.(),
-        (_0x596fb9 = null),
-        closeClip && _0x4db384 && (videoClipController?.['exit']?.({ silent: !![] }), (_0x4db384 = ![])));
+    stop = ({ closeClip: closeClip = !![] } = {}) => {
+      (stopSyncPlayback(),
+        Array['from'](map['keys']())['forEach'](destroyRole),
+        value2?.(),
+        (value2 = null),
+        closeClip && enabled && (videoClipController?.['exit']?.({ silent: !![] }), (enabled = ![])));
     },
-    _0x1a2545 = ({ roles: roles = ['source', 'result'], reset: reset = !![] } = {}) => {
-      if (_0x4127e7) return ![];
-      const _0x59c811 = [
+    bind = ({ roles: roles = ['source', 'result'], reset: reset = !![] } = {}) => {
+      if (entry) return ![];
+      const list4 = [
         ...new Set(
           (Array['isArray'](roles) ? roles : [])['filter'](
-            (_0x5887a8) => _0x5887a8 === 'source' || _0x5887a8 === 'result',
+            (input) => input === 'source' || input === 'result',
           ),
         ),
       ];
-      reset && Array['from'](_0x37b42a['keys']())['forEach'](_0x141579);
-      _0x1b0321();
-      const _0x377970 = _0x396f18();
-      if (_0x377970?.['workspace']?.['view'] !== 'project' || _0x377970['workspace']['step'] !== 0x3)
-        return ![];
-      const _0xc4f1b5 = _0x2eabdd(),
-        _0x3e78c7 = _0x4199e2(_0x377970);
+      reset && Array['from'](map['keys']())['forEach'](destroyRole);
+      bindCenterIndicators();
+      const output = getProject();
+      if (output?.['workspace']?.['view'] !== 'project' || output['workspace']['step'] !== 0x3) return ![];
+      const el3 = getRoot(),
+        value3 = getSelectedShot(output);
       return (
-        _0x59c811['forEach']((_0x148158) => {
-          _0x141579(_0x148158);
-          const _0x93eb63 = _0xc4f1b5?.['querySelector']?.(
-              '[data-person-replacement-video-player="' + _0x148158 + '\x22]',
+        list4['forEach']((master) => {
+          destroyRole(master);
+          const muted = el3?.['querySelector']?.(
+              '[data-person-replacement-video-player="' + master + '\x22]',
             ),
-            _0x29f51e = _0xc4f1b5?.['querySelector']?.(
-              '[data-person-replacement-video-controls=\x22' + _0x148158 + '\x22]',
+            controlsEl = el3?.['querySelector']?.(
+              '[data-person-replacement-video-controls=\x22' + master + '\x22]',
             ),
-            _0x3d8228 = normalizeText(_0x93eb63?.['dataset']?.['personReplacementVideoUrl']);
-          if (!_0x93eb63 || !_0x29f51e || !_0x3d8228) return;
-          const _0x52b541 = _0x29f51e['querySelector']?.('[data-person-replacement-video-play]'),
-            _0x20fd01 = _0x29f51e['querySelector']?.('[data-person-replacement-video-volume]'),
-            _0xd88831 = _0x29f51e['querySelector']?.('[data-person-replacement-video-volume-toggle]'),
-            _0xb53a55 = _0x29f51e['querySelector']?.('[data-person-replacement-video-progress]'),
-            _0x224c28 = _0x29f51e['querySelector']?.('[data-person-replacement-video-progress-fill]'),
-            _0x542e67 = _0x29f51e['querySelector']?.('[data-person-replacement-video-time-current]'),
-            _0x23abd9 = _0x29f51e['querySelector']?.('[data-person-replacement-video-time-total]'),
-            _0x174743 =
-              normalizeText(_0x29f51e['dataset']?.['personReplacementVideoLabel']) ||
-              (_0x148158 === 'result' ? '替换结果' : '当前片段');
-          let _0x414baa = ![];
-          const _0x420a43 = _0x4c83cf['get'](_0x148158);
-          let _0x2c26c0 = _0x420a43
-            ? clamp(Number(_0x420a43['lastAudibleVolume']), 0x0, 0x1, 0x1) || 0x1
-            : clamp(Number(_0x93eb63['volume']), 0x0, 0x1, 0x1) || 0x1;
-          _0x420a43 &&
-            ((_0x93eb63['volume'] = clamp(Number(_0x420a43['volume']), 0x0, 0x1, 0x1)),
-            (_0x93eb63['muted'] = _0x420a43['muted'] === !![]));
-          const _0x385b9c = () => {
-            const _0x23124b = clamp(Number(_0x93eb63['volume']), 0x0, 0x1, 0x0);
-            if (_0x93eb63['muted'] !== !![] && _0x23124b > 0x0) _0x2c26c0 = _0x23124b;
-            _0x4c83cf['set'](_0x148158, {
-              muted: _0x93eb63['muted'] === !![],
-              volume: _0x23124b,
-              lastAudibleVolume: _0x2c26c0,
+            sourceUrl = normalizeText(muted?.['dataset']?.['personReplacementVideoUrl']);
+          if (!muted || !controlsEl || !sourceUrl) return;
+          const el4 = controlsEl['querySelector']?.('[data-person-replacement-video-play]'),
+            el5 = controlsEl['querySelector']?.('[data-person-replacement-video-volume]'),
+            el6 = controlsEl['querySelector']?.('[data-person-replacement-video-volume-toggle]'),
+            el7 = controlsEl['querySelector']?.('[data-person-replacement-video-progress]'),
+            el8 = controlsEl['querySelector']?.('[data-person-replacement-video-progress-fill]'),
+            el9 = controlsEl['querySelector']?.('[data-person-replacement-video-time-current]'),
+            el10 = controlsEl['querySelector']?.('[data-person-replacement-video-time-total]'),
+            text =
+              normalizeText(controlsEl['dataset']?.['personReplacementVideoLabel']) ||
+              (master === 'result' ? '替换结果' : '当前片段');
+          let value4 = ![];
+          const value5 = map2['get'](master);
+          let lastAudibleVolume = value5
+            ? clamp(Number(value5['lastAudibleVolume']), 0x0, 0x1, 0x1) || 0x1
+            : clamp(Number(muted['volume']), 0x0, 0x1, 0x1) || 0x1;
+          value5 &&
+            ((muted['volume'] = clamp(Number(value5['volume']), 0x0, 0x1, 0x1)),
+            (muted['muted'] = value5['muted'] === !![]));
+          const run2 = () => {
+            const volume = clamp(Number(muted['volume']), 0x0, 0x1, 0x0);
+            if (muted['muted'] !== !![] && volume > 0x0) lastAudibleVolume = volume;
+            map2['set'](master, {
+              muted: muted['muted'] === !![],
+              volume: volume,
+              lastAudibleVolume: lastAudibleVolume,
             });
           };
-          let _0x518e66 = null;
-          const _0x240bb0 = _0x2957be({
-              videoEl: _0x93eb63,
-              sourceUrl: _0x3d8228,
+          let value6 = null;
+          const value7 = createVideoPlayback({
+              videoEl: muted,
+              sourceUrl: sourceUrl,
               ownerId: [
                 'person-replacement',
-                normalizeText(_0x377970['id'], 'project'),
-                normalizeText(_0x3e78c7?.['id'], 'shot'),
-                _0x148158,
+                normalizeText(output['id'], 'project'),
+                normalizeText(value3?.['id'], 'shot'),
+                master,
               ]['join'](':'),
-              allowConcurrentPlayback: () => _0x470b46?.['isEnabled']?.() === !![],
+              allowConcurrentPlayback: () => syncPlayback?.['isEnabled']?.() === !![],
             }),
-            _0x582ba9 = () => {
-              const _0xde4a8c = Number(_0x93eb63['duration']),
-                _0x30eb08 = Number(_0x93eb63['currentTime']),
-                _0x4a1e48 = Number['isFinite'](_0xde4a8c) && _0xde4a8c > 0x0 ? _0xde4a8c : 0x0,
-                _0x2fe292 =
-                  Number['isFinite'](_0x30eb08) && _0x30eb08 > 0x0
-                    ? Math['min'](_0x30eb08, _0x4a1e48 || _0x30eb08)
-                    : 0x0;
+            handler3 = () => {
+              const count = Number(muted['duration']),
+                count2 = Number(muted['currentTime']),
+                duration = Number['isFinite'](count) && count > 0x0 ? count : 0x0,
+                currentTime =
+                  Number['isFinite'](count2) && count2 > 0x0 ? Math['min'](count2, duration || count2) : 0x0;
               return {
-                duration: _0x4a1e48,
-                currentTime: _0x2fe292,
-                ratio: _0x4a1e48 > 0x0 ? clamp(_0x2fe292 / _0x4a1e48, 0x0, 0x1, 0x0) : 0x0,
+                duration: duration,
+                currentTime: currentTime,
+                ratio: duration > 0x0 ? clamp(currentTime / duration, 0x0, 0x1, 0x0) : 0x0,
               };
             },
-            _0xf56d1b = ({ duration: _0x8103db, currentTime: _0x2f6c05, ratio: _0x3580f1 }) => {
-              if (_0x542e67) _0x542e67['textContent'] = formatPlaybackTime(_0x2f6c05);
-              if (_0x23abd9) _0x23abd9['textContent'] = formatPlaybackTime(_0x8103db);
-              if (_0x224c28?.['style']) _0x224c28['style']['width'] = _0x3580f1 * 0x64 + '%';
-              (_0xb53a55?.['setAttribute']?.('aria-valuenow', String(Math['round'](_0x3580f1 * 0x64))),
-                _0xb53a55?.['setAttribute']?.(
+            handler4 = ({ duration: duration2, currentTime: currentTime2, ratio: ratio }) => {
+              if (el9) el9['textContent'] = formatPlaybackTime(currentTime2);
+              if (el10) el10['textContent'] = formatPlaybackTime(duration2);
+              if (el8?.['style']) el8['style']['width'] = ratio * 0x64 + '%';
+              (el7?.['setAttribute']?.('aria-valuenow', String(Math['round'](ratio * 0x64))),
+                el7?.['setAttribute']?.(
                   'aria-valuetext',
-                  formatPlaybackTime(_0x2f6c05) + ' / ' + formatPlaybackTime(_0x8103db),
+                  formatPlaybackTime(currentTime2) + ' / ' + formatPlaybackTime(duration2),
                 ));
             },
-            _0x538bd4 = () => {
-              if (_0x414baa) return;
-              _0x385b9c();
-              const _0x5712f6 = _0x93eb63['paused'] === ![] && _0x93eb63['ended'] !== !![];
-              (_0x52b541?.['classList']?.['toggle']?.('is-playing', _0x5712f6),
-                _0x52b541?.['setAttribute']?.('aria-label', '' + (_0x5712f6 ? '暂停' : '播放') + _0x174743),
-                _0x52b541?.['removeAttribute']?.('title'));
-              const _0x1f7d1a = Math['round'](
-                  clamp(_0x93eb63['muted'] ? 0x0 : Number(_0x93eb63['volume']), 0x0, 0x1, 0x0) * 0x64,
+            handler5 = () => {
+              if (value4) return;
+              run2();
+              const value8 = muted['paused'] === ![] && muted['ended'] !== !![];
+              (el4?.['classList']?.['toggle']?.('is-playing', value8),
+                el4?.['setAttribute']?.('aria-label', '' + (value8 ? '暂停' : '播放') + text),
+                el4?.['removeAttribute']?.('title'));
+              const count3 = Math['round'](
+                  clamp(muted['muted'] ? 0x0 : Number(muted['volume']), 0x0, 0x1, 0x0) * 0x64,
                 ),
-                _0x3ca11b = _0x93eb63['muted'] === !![] || _0x1f7d1a === 0x0;
-              _0x20fd01 &&
-                ((_0x20fd01['value'] = String(_0x1f7d1a)),
-                _0x20fd01['style']?.['setProperty']?.('--story-video-volume-progress', _0x1f7d1a + '%'),
-                _0x20fd01['setAttribute']?.('aria-valuetext', _0x1f7d1a + '%'));
-              (_0xd88831?.['classList']?.['toggle']?.('is-muted', _0x3ca11b),
-                _0xd88831?.['setAttribute']?.('aria-pressed', String(_0x3ca11b)),
-                _0xd88831?.['setAttribute']?.('aria-label', '' + (_0x3ca11b ? '恢复' : '静音') + _0x174743));
-              if (_0x518e66 == null) _0xf56d1b(_0x582ba9());
+                value9 = muted['muted'] === !![] || count3 === 0x0;
+              el5 &&
+                ((el5['value'] = String(count3)),
+                el5['style']?.['setProperty']?.('--story-video-volume-progress', count3 + '%'),
+                el5['setAttribute']?.('aria-valuetext', count3 + '%'));
+              (el6?.['classList']?.['toggle']?.('is-muted', value9),
+                el6?.['setAttribute']?.('aria-pressed', String(value9)),
+                el6?.['setAttribute']?.('aria-label', '' + (value9 ? '恢复' : '静音') + text));
+              if (value6 == null) handler4(handler3());
             },
-            _0x5b9c8b = createProgressLoop({
-              videoEl: _0x93eb63,
+            progressLoop = createProgressLoop({
+              videoEl: muted,
               onFrame: () => {
-                if (_0x518e66 == null) _0xf56d1b(_0x582ba9());
+                if (value6 == null) handler4(handler3());
               },
             }),
-            _0x1d48b5 = async (_0x563689) => {
-              (_0x563689?.['preventDefault']?.(), _0x563689?.['stopPropagation']?.());
-              if (_0x470b46?.['isEnabled']?.()) {
-                (await _0x470b46['togglePlayback']({ master: _0x148158 }), _0x538bd4());
+            async2 = async (event) => {
+              (event?.['preventDefault']?.(), event?.['stopPropagation']?.());
+              if (syncPlayback?.['isEnabled']?.()) {
+                (await syncPlayback['togglePlayback']({ master: master }), handler5());
                 return;
               }
-              if (_0x93eb63['paused'] === ![]) {
-                _0x93eb63['pause']?.();
+              if (muted['paused'] === ![]) {
+                muted['pause']?.();
                 return;
               }
-              if (_0x93eb63['ended']) _0x93eb63['currentTime'] = 0x0;
-              (await _0x240bb0['play'](), _0x538bd4());
+              if (muted['ended']) muted['currentTime'] = 0x0;
+              (await value7['play'](), handler5());
             },
-            _0x282ba6 = (_0x19fca8) => {
-              const _0x5250b1 = Number(_0x93eb63['duration']),
-                _0x190aa3 = _0xb53a55?.['getBoundingClientRect']?.();
-              if (!(_0x5250b1 > 0x0) || !(Number(_0x190aa3?.['width']) > 0x0)) return ![];
-              const _0x3714e8 = clamp(
-                (Number(_0x19fca8) - Number(_0x190aa3['left'] || 0x0)) / Number(_0x190aa3['width']),
+            handler6 = (value10) => {
+              const duration3 = Number(muted['duration']),
+                box = el7?.['getBoundingClientRect']?.();
+              if (!(duration3 > 0x0) || !(Number(box?.['width']) > 0x0)) return ![];
+              const currentTime3 = clamp(
+                (Number(value10) - Number(box['left'] || 0x0)) / Number(box['width']),
                 0x0,
                 0x1,
                 0x0,
               );
               return (
-                (_0x93eb63['currentTime'] = _0x3714e8 * _0x5250b1),
-                _0xf56d1b({ duration: _0x5250b1, currentTime: _0x3714e8 * _0x5250b1, ratio: _0x3714e8 }),
+                (muted['currentTime'] = currentTime3 * duration3),
+                handler4({ duration: duration3, currentTime: currentTime3 * duration3, ratio: currentTime3 }),
                 !![]
               );
             },
-            _0x2b74f6 = () => {
-              const _0x4c18e9 = _0x518e66;
-              _0x518e66 = null;
-              if (_0x4c18e9 == null) return;
+            handler7 = () => {
+              const value11 = value6;
+              value6 = null;
+              if (value11 == null) return;
               try {
-                _0xb53a55?.['releasePointerCapture']?.(_0x4c18e9);
+                el7?.['releasePointerCapture']?.(value11);
               } catch {}
             },
-            _0x42a2be = (_0x2e3396) => {
-              (_0x2e3396['preventDefault']?.(), _0x2e3396['stopPropagation']?.());
-              if (!_0x282ba6(_0x2e3396['clientX'])) return;
-              _0x518e66 = _0x2e3396['pointerId'];
+            value12 = (event2) => {
+              (event2['preventDefault']?.(), event2['stopPropagation']?.());
+              if (!handler6(event2['clientX'])) return;
+              value6 = event2['pointerId'];
               try {
-                _0xb53a55?.['setPointerCapture']?.(_0x2e3396['pointerId']);
+                el7?.['setPointerCapture']?.(event2['pointerId']);
               } catch {}
             },
-            _0x2f86ac = (_0x2cd653) => {
-              if (_0x2cd653['pointerId'] !== _0x518e66) return;
-              (_0x2cd653['preventDefault']?.(),
-                _0x2cd653['stopPropagation']?.(),
-                _0x282ba6(_0x2cd653['clientX']));
+            value13 = (event3) => {
+              if (event3['pointerId'] !== value6) return;
+              (event3['preventDefault']?.(), event3['stopPropagation']?.(), handler6(event3['clientX']));
             },
-            _0x4a585a = (_0x214438) => {
-              if (_0x214438['pointerId'] !== _0x518e66) return;
-              (_0x214438['preventDefault']?.(),
-                _0x214438['stopPropagation']?.(),
-                _0x282ba6(_0x214438['clientX']),
-                _0x2b74f6(),
-                _0x538bd4());
+            value14 = (event4) => {
+              if (event4['pointerId'] !== value6) return;
+              (event4['preventDefault']?.(),
+                event4['stopPropagation']?.(),
+                handler6(event4['clientX']),
+                handler7(),
+                handler5());
             },
-            _0x3e6405 = (_0x48b6b6) => {
-              if (_0x48b6b6['pointerId'] !== _0x518e66) return;
-              (_0x48b6b6['preventDefault']?.(), _0x48b6b6['stopPropagation']?.(), _0x2b74f6(), _0x538bd4());
+            value15 = (event5) => {
+              if (event5['pointerId'] !== value6) return;
+              (event5['preventDefault']?.(), event5['stopPropagation']?.(), handler7(), handler5());
             },
-            _0x1671e1 = (_0x11c47f) => {
-              if (!['ArrowLeft', 'ArrowRight', 'Home', 'End']['includes'](_0x11c47f['key'])) return;
-              const _0x2eb8bf = Number(_0x93eb63['duration']);
-              if (!(_0x2eb8bf > 0x0)) return;
-              (_0x11c47f['preventDefault']?.(), _0x11c47f['stopPropagation']?.());
-              if (_0x11c47f['key'] === 'Home') _0x93eb63['currentTime'] = 0x0;
+            value16 = (event6) => {
+              if (!['ArrowLeft', 'ArrowRight', 'Home', 'End']['includes'](event6['key'])) return;
+              const count4 = Number(muted['duration']);
+              if (!(count4 > 0x0)) return;
+              (event6['preventDefault']?.(), event6['stopPropagation']?.());
+              if (event6['key'] === 'Home') muted['currentTime'] = 0x0;
               else {
-                if (_0x11c47f['key'] === 'End') _0x93eb63['currentTime'] = _0x2eb8bf;
+                if (event6['key'] === 'End') muted['currentTime'] = count4;
                 else {
-                  const _0x5ac823 = _0x11c47f['key'] === 'ArrowLeft' ? -0x5 : 0x5;
-                  _0x93eb63['currentTime'] = clamp(_0x93eb63['currentTime'] + _0x5ac823, 0x0, _0x2eb8bf, 0x0);
+                  const value17 = event6['key'] === 'ArrowLeft' ? -0x5 : 0x5;
+                  muted['currentTime'] = clamp(muted['currentTime'] + value17, 0x0, count4, 0x0);
                 }
               }
-              _0x538bd4();
+              handler5();
             },
-            _0x120d6f = (_0x5817b4) => {
-              _0x5817b4['stopPropagation']?.();
-              const _0x2dcf6f = clamp(Number(_0x5817b4['currentTarget']?.['value']), 0x0, 0x64, 0x0);
-              if (_0x2dcf6f > 0x0) _0x2c26c0 = _0x2dcf6f / 0x64;
-              ((_0x93eb63['muted'] = ![]), (_0x93eb63['volume'] = _0x2dcf6f / 0x64), _0x538bd4());
+            value18 = (event7) => {
+              event7['stopPropagation']?.();
+              const clamp2 = clamp(Number(event7['currentTarget']?.['value']), 0x0, 0x64, 0x0);
+              if (clamp2 > 0x0) lastAudibleVolume = clamp2 / 0x64;
+              ((muted['muted'] = ![]), (muted['volume'] = clamp2 / 0x64), handler5());
             },
-            _0x38a2bc = (_0x493c10) => {
-              (_0x493c10?.['preventDefault']?.(), _0x493c10?.['stopPropagation']?.());
-              const _0x28fb9e = clamp(Number(_0x93eb63['volume']), 0x0, 0x1, 0x0);
-              (_0x93eb63['muted'] !== !![] && _0x28fb9e > 0x0
-                ? ((_0x2c26c0 = _0x28fb9e), (_0x93eb63['muted'] = !![]))
-                : ((_0x93eb63['volume'] = _0x2c26c0), (_0x93eb63['muted'] = ![])),
-                _0x538bd4());
+            value19 = (event8) => {
+              (event8?.['preventDefault']?.(), event8?.['stopPropagation']?.());
+              const clamp3 = clamp(Number(muted['volume']), 0x0, 0x1, 0x0);
+              (muted['muted'] !== !![] && clamp3 > 0x0
+                ? ((lastAudibleVolume = clamp3), (muted['muted'] = !![]))
+                : ((muted['volume'] = lastAudibleVolume), (muted['muted'] = ![])),
+                handler5());
             },
-            _0x161e7d = (_0x1c2ea0) => _0x1c2ea0['stopPropagation']?.(),
-            _0x2fce68 = [
+            value20 = (event9) => event9['stopPropagation']?.(),
+            list5 = [
               'play',
               'pause',
               'timeupdate',
@@ -334,73 +325,73 @@ export function createPersonReplacementVideoPlaybackController({
               'volumechange',
               'ended',
             ],
-            _0x1c98d4 = (_0x222f24) => {
-              if (_0x222f24['type'] === 'loadedmetadata') syncStageFrame(_0x93eb63);
-              _0x538bd4();
-              if (_0x222f24['type'] === 'play') _0x5b9c8b['start']();
-              else (_0x222f24['type'] === 'pause' || _0x222f24['type'] === 'ended') && _0x5b9c8b['stop']();
+            value21 = (value22) => {
+              if (value22['type'] === 'loadedmetadata') syncStageFrame(muted);
+              handler5();
+              if (value22['type'] === 'play') progressLoop['start']();
+              else (value22['type'] === 'pause' || value22['type'] === 'ended') && progressLoop['stop']();
             };
-          (_0x52b541?.['addEventListener']?.('click', _0x1d48b5),
-            _0x93eb63['addEventListener']?.('click', _0x1d48b5),
-            _0x20fd01?.['addEventListener']?.('input', _0x120d6f),
-            _0xd88831?.['addEventListener']?.('click', _0x38a2bc),
-            _0xb53a55?.['addEventListener']?.('pointerdown', _0x42a2be),
-            _0xb53a55?.['addEventListener']?.('pointermove', _0x2f86ac),
-            _0xb53a55?.['addEventListener']?.('pointerup', _0x4a585a),
-            _0xb53a55?.['addEventListener']?.('pointercancel', _0x3e6405),
-            _0xb53a55?.['addEventListener']?.('keydown', _0x1671e1),
-            _0x29f51e['addEventListener']?.('pointerdown', _0x161e7d),
-            _0x2fce68['forEach']((_0x3a0fc6) => {
-              _0x93eb63['addEventListener']?.(_0x3a0fc6, _0x1c98d4);
+          (el4?.['addEventListener']?.('click', async2),
+            muted['addEventListener']?.('click', async2),
+            el5?.['addEventListener']?.('input', value18),
+            el6?.['addEventListener']?.('click', value19),
+            el7?.['addEventListener']?.('pointerdown', value12),
+            el7?.['addEventListener']?.('pointermove', value13),
+            el7?.['addEventListener']?.('pointerup', value14),
+            el7?.['addEventListener']?.('pointercancel', value15),
+            el7?.['addEventListener']?.('keydown', value16),
+            controlsEl['addEventListener']?.('pointerdown', value20),
+            list5['forEach']((value23) => {
+              muted['addEventListener']?.(value23, value21);
             }),
-            syncStageFrame(_0x93eb63),
-            void _0x240bb0['warm']()['then'](_0x538bd4, _0x538bd4),
-            _0x538bd4(),
-            _0x37b42a['set'](_0x148158, {
-              videoEl: _0x93eb63,
-              controlsEl: _0x29f51e,
-              play: () => _0x240bb0['play'](),
-              pause: () => _0x93eb63['pause']?.(),
+            syncStageFrame(muted),
+            void value7['warm']()['then'](handler5, handler5),
+            handler5(),
+            map['set'](master, {
+              videoEl: muted,
+              controlsEl: controlsEl,
+              play: () => value7['play'](),
+              pause: () => muted['pause']?.(),
               destroy() {
-                (_0x385b9c(),
-                  (_0x414baa = !![]),
-                  _0x5b9c8b['destroy'](),
-                  _0x240bb0['destroy'](),
-                  _0x2b74f6(),
-                  _0x52b541?.['removeEventListener']?.('click', _0x1d48b5),
-                  _0x93eb63['removeEventListener']?.('click', _0x1d48b5),
-                  _0x20fd01?.['removeEventListener']?.('input', _0x120d6f),
-                  _0xd88831?.['removeEventListener']?.('click', _0x38a2bc),
-                  _0xb53a55?.['removeEventListener']?.('pointerdown', _0x42a2be),
-                  _0xb53a55?.['removeEventListener']?.('pointermove', _0x2f86ac),
-                  _0xb53a55?.['removeEventListener']?.('pointerup', _0x4a585a),
-                  _0xb53a55?.['removeEventListener']?.('pointercancel', _0x3e6405),
-                  _0xb53a55?.['removeEventListener']?.('keydown', _0x1671e1),
-                  _0x29f51e['removeEventListener']?.('pointerdown', _0x161e7d),
-                  _0x2fce68['forEach']((_0x2bbf7d) => {
-                    _0x93eb63['removeEventListener']?.(_0x2bbf7d, _0x1c98d4);
+                (run2(),
+                  (value4 = !![]),
+                  progressLoop['destroy'](),
+                  value7['destroy'](),
+                  handler7(),
+                  el4?.['removeEventListener']?.('click', async2),
+                  muted['removeEventListener']?.('click', async2),
+                  el5?.['removeEventListener']?.('input', value18),
+                  el6?.['removeEventListener']?.('click', value19),
+                  el7?.['removeEventListener']?.('pointerdown', value12),
+                  el7?.['removeEventListener']?.('pointermove', value13),
+                  el7?.['removeEventListener']?.('pointerup', value14),
+                  el7?.['removeEventListener']?.('pointercancel', value15),
+                  el7?.['removeEventListener']?.('keydown', value16),
+                  controlsEl['removeEventListener']?.('pointerdown', value20),
+                  list5['forEach']((value24) => {
+                    muted['removeEventListener']?.(value24, value21);
                   }));
               },
             }));
         }),
-        _0x742640(),
-        _0x37b42a['size'] > 0x0
+        handler2(),
+        map['size'] > 0x0
       );
     };
   return Object['freeze']({
-    bind: _0x1a2545,
-    bindCenterIndicators: _0x1b0321,
-    destroyRole: _0x141579,
-    stop: _0x360e72,
-    stopSyncPlayback: _0x5c5ffc,
-    toggleSyncEnabled: () => _0x470b46?.['toggleEnabled']?.() ?? ![],
-    setClipActive(_0x1d1290) {
-      return ((_0x4db384 = _0x1d1290 === !![]), _0x4db384);
+    bind: bind,
+    bindCenterIndicators: bindCenterIndicators,
+    destroyRole: destroyRole,
+    stop: stop,
+    stopSyncPlayback: stopSyncPlayback,
+    toggleSyncEnabled: () => syncPlayback?.['toggleEnabled']?.() ?? ![],
+    setClipActive(value25) {
+      return ((enabled = value25 === !![]), enabled);
     },
-    isClipActive: () => _0x4db384,
+    isClipActive: () => enabled,
     destroy() {
-      if (_0x4127e7) return;
-      (_0x360e72(), (_0x4127e7 = !![]));
+      if (entry) return;
+      (stop(), (entry = !![]));
     },
   });
 }

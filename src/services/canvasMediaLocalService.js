@@ -37,58 +37,55 @@ const REMOTE_HTTP_RE = /^https?:\/\//i,
     'videoMetaSrc',
   ],
   AUDIO_TRIGGER_KEYS = ['src', 'audioUrl', 'url', 'resultUrl', 'localPath'];
-function hasOwn(_0x30e500, _0x4f8596) {
-  return !!_0x30e500 && Object.prototype.hasOwnProperty.call(_0x30e500, _0x4f8596);
+function hasOwn(enabled, item) {
+  return !!enabled && Object.prototype.hasOwnProperty.call(enabled, item);
 }
-function normalizeText(_0x168d49) {
-  return String(_0x168d49 || '').trim();
+function normalizeText(key) {
+  return String(key || '').trim();
 }
-function firstNonEmptyString(..._0x424c38) {
-  for (const _0x287bca of _0x424c38) {
-    const _0x37d9bb = normalizeText(_0x287bca);
-    if (_0x37d9bb) return _0x37d9bb;
+function firstNonEmptyString(...args) {
+  for (const index of args) {
+    const text = normalizeText(index);
+    if (text) return text;
   }
   return '';
 }
-function touchesAnyKey(_0x3a45f6, _0x4630e8) {
-  return Array.isArray(_0x4630e8) && _0x4630e8.some((_0x53c2a0) => hasOwn(_0x3a45f6, _0x53c2a0));
+function touchesAnyKey(result, list) {
+  return Array.isArray(list) && list.some((item2) => hasOwn(result, item2));
 }
-function normalizeLocalUrlText(_0x4ecb57) {
-  const _0xcc8672 = normalizeCanvasLocalPath(_0x4ecb57);
-  return localPathToUrl(_0xcc8672);
+function normalizeLocalUrlText(data) {
+  const canvasLocalPath = normalizeCanvasLocalPath(data);
+  return localPathToUrl(canvasLocalPath);
 }
-function pickLocalPath(_0x4678ff, _0xc12d79) {
-  for (const _0x29217b of _0xc12d79) {
-    const _0x43ab29 = normalizeCanvasLocalPath(_0x4678ff?.[_0x29217b]);
-    if (_0x43ab29) return _0x43ab29;
+function pickLocalPath(options, target) {
+  for (const source of target) {
+    const canvasLocalPath2 = normalizeCanvasLocalPath(options?.[source]);
+    if (canvasLocalPath2) return canvasLocalPath2;
   }
   return '';
 }
-function copyCommonImageMeta(_0x25d851, _0x37c661) {
-  if (hasOwn(_0x37c661, 'assetId')) _0x25d851.assetId = normalizeText(_0x37c661.assetId);
-  if (hasOwn(_0x37c661, 'sourceId')) _0x25d851.sourceId = normalizeText(_0x37c661.sourceId);
-  if (hasOwn(_0x37c661, 'thumbId')) _0x25d851.thumbId = normalizeText(_0x37c661.thumbId);
-  if (hasOwn(_0x37c661, 'fileName')) _0x25d851.fileName = _0x37c661.fileName;
-  if (hasOwn(_0x37c661, 'error')) _0x25d851.error = _0x37c661.error;
-  hasOwn(_0x37c661, 'derivativeStatus') &&
-    (_0x25d851.derivativeStatus = normalizeText(_0x37c661.derivativeStatus));
+function copyCommonImageMeta(next, current) {
+  if (hasOwn(current, 'assetId')) next.assetId = normalizeText(current.assetId);
+  if (hasOwn(current, 'sourceId')) next.sourceId = normalizeText(current.sourceId);
+  if (hasOwn(current, 'thumbId')) next.thumbId = normalizeText(current.thumbId);
+  if (hasOwn(current, 'fileName')) next.fileName = current.fileName;
+  if (hasOwn(current, 'error')) next.error = current.error;
+  hasOwn(current, 'derivativeStatus') && (next.derivativeStatus = normalizeText(current.derivativeStatus));
 }
-function copyCommonVideoMeta(_0x93126b, _0x1e132f) {
-  if (hasOwn(_0x1e132f, 'assetId')) _0x93126b.assetId = normalizeText(_0x1e132f.assetId);
-  if (hasOwn(_0x1e132f, 'fileName')) _0x93126b.fileName = _0x1e132f.fileName;
-  if (hasOwn(_0x1e132f, 'thumbId')) _0x93126b.thumbId = normalizeText(_0x1e132f.thumbId);
-  hasOwn(_0x1e132f, 'videoProxyStatus') &&
-    (_0x93126b.videoProxyStatus = normalizeText(_0x1e132f.videoProxyStatus));
-  if (hasOwn(_0x1e132f, 'videoCodec')) _0x93126b.videoCodec = normalizeText(_0x1e132f.videoCodec);
-  if (hasOwn(_0x1e132f, 'videoWidth')) _0x93126b.videoWidth = Number(_0x1e132f.videoWidth || 0) || 0;
-  if (hasOwn(_0x1e132f, 'videoHeight')) _0x93126b.videoHeight = Number(_0x1e132f.videoHeight || 0) || 0;
-  if (hasOwn(_0x1e132f, 'videoDuration')) _0x93126b.videoDuration = Number(_0x1e132f.videoDuration || 0) || 0;
-  if (hasOwn(_0x1e132f, 'videoFps')) _0x93126b.videoFps = Number(_0x1e132f.videoFps || 0) || 0;
-  hasOwn(_0x1e132f, 'derivativeStatus') &&
-    (_0x93126b.derivativeStatus = normalizeText(_0x1e132f.derivativeStatus));
+function copyCommonVideoMeta(entry, record) {
+  if (hasOwn(record, 'assetId')) entry.assetId = normalizeText(record.assetId);
+  if (hasOwn(record, 'fileName')) entry.fileName = record.fileName;
+  if (hasOwn(record, 'thumbId')) entry.thumbId = normalizeText(record.thumbId);
+  hasOwn(record, 'videoProxyStatus') && (entry.videoProxyStatus = normalizeText(record.videoProxyStatus));
+  if (hasOwn(record, 'videoCodec')) entry.videoCodec = normalizeText(record.videoCodec);
+  if (hasOwn(record, 'videoWidth')) entry.videoWidth = Number(record.videoWidth || 0) || 0;
+  if (hasOwn(record, 'videoHeight')) entry.videoHeight = Number(record.videoHeight || 0) || 0;
+  if (hasOwn(record, 'videoDuration')) entry.videoDuration = Number(record.videoDuration || 0) || 0;
+  if (hasOwn(record, 'videoFps')) entry.videoFps = Number(record.videoFps || 0) || 0;
+  hasOwn(record, 'derivativeStatus') && (entry.derivativeStatus = normalizeText(record.derivativeStatus));
 }
-function buildNormalizedImageStorage(_0x488c34 = {}) {
-  const _0x3e730d = pickLocalPath(_0x488c34, [
+function buildNormalizedImageStorage(args2 = {}) {
+  const localPath = pickLocalPath(args2, [
       'localPath',
       'originalLocalPath',
       'displayLocalPath',
@@ -98,7 +95,7 @@ function buildNormalizedImageStorage(_0x488c34 = {}) {
       'url',
       'resultUrl',
     ]),
-    _0x1eb31c = pickLocalPath(_0x488c34, [
+    originalLocalPath = pickLocalPath(args2, [
       'originalLocalPath',
       'localPath',
       'sourceUrl',
@@ -107,71 +104,78 @@ function buildNormalizedImageStorage(_0x488c34 = {}) {
       'url',
       'resultUrl',
     ]),
-    _0x5b50f7 = pickLocalPath(_0x488c34, ['displayLocalPath', 'imageUrl', 'src', 'url', 'resultUrl']),
-    _0x1a1149 = pickLocalPath(_0x488c34, ['thumbLocalPath', 'thumbUrl']);
+    displayLocalPath = pickLocalPath(args2, ['displayLocalPath', 'imageUrl', 'src', 'url', 'resultUrl']),
+    thumbLocalPath = pickLocalPath(args2, ['thumbLocalPath', 'thumbUrl']);
   return buildImageNodeStorageFields({
-    ..._0x488c34,
-    localPath: _0x3e730d,
-    originalLocalPath: _0x1eb31c,
-    displayLocalPath: _0x5b50f7,
-    thumbLocalPath: _0x1a1149,
+    ...args2,
+    localPath: localPath,
+    originalLocalPath: originalLocalPath,
+    displayLocalPath: displayLocalPath,
+    thumbLocalPath: thumbLocalPath,
   });
 }
-export function resolveCanvasImageSourceUrl(_0x3c5a76 = {}) {
-  const _0x2ae896 = buildNormalizedImageStorage(_0x3c5a76),
-    _0x58bca8 = pickPreviewImageLocalPath(_0x2ae896) || _0x2ae896.originalLocalPath || _0x2ae896.localPath;
-  return toLocalPathUrl(_0x58bca8);
+export function resolveCanvasImageSourceUrl(options2 = {}) {
+  const normalizedImageStorage = buildNormalizedImageStorage(options2),
+    previewImageLocalPath =
+      pickPreviewImageLocalPath(normalizedImageStorage) ||
+      normalizedImageStorage.originalLocalPath ||
+      normalizedImageStorage.localPath;
+  return toLocalPathUrl(previewImageLocalPath);
 }
-function resolveCanvasImageDisplayPath(_0xdaa3b2 = {}) {
-  return pickCanvasImageLocalPath(buildNormalizedImageStorage(_0xdaa3b2));
+function resolveCanvasImageDisplayPath(options3 = {}) {
+  return pickCanvasImageLocalPath(buildNormalizedImageStorage(options3));
 }
-function resolveCanvasImageThumbPath(_0x508605 = {}) {
-  return pickCanvasThumbLocalPath(buildNormalizedImageStorage(_0x508605));
+function resolveCanvasImageThumbPath(options4 = {}) {
+  return pickCanvasThumbLocalPath(buildNormalizedImageStorage(options4));
 }
-export function isRemoteHttpUrl(_0x51d791) {
-  return REMOTE_HTTP_RE.test(normalizeText(_0x51d791));
+export function isRemoteHttpUrl(payload) {
+  return REMOTE_HTTP_RE.test(normalizeText(payload));
 }
-export function normalizeCanvasLocalPath(_0x8a4cd7) {
-  return normalizeLocalPath(_0x8a4cd7);
+export function normalizeCanvasLocalPath(handle) {
+  return normalizeLocalPath(handle);
 }
-export function toCanvasLocalUrl(_0x3086c9) {
-  return localPathToUrl(_0x3086c9);
+export function toCanvasLocalUrl(state) {
+  return localPathToUrl(state);
 }
-export function resolveCanvasImageDisplayUrl(_0x3d1278 = {}) {
-  return toLocalPathUrl(resolveCanvasImageDisplayPath(_0x3d1278));
+export function resolveCanvasImageDisplayUrl(options5 = {}) {
+  return toLocalPathUrl(resolveCanvasImageDisplayPath(options5));
 }
-export function resolveCanvasImageThumbUrl(_0x484bf4 = {}) {
-  return toLocalPathUrl(resolveCanvasImageThumbPath(_0x484bf4));
+export function resolveCanvasImageThumbUrl(options6 = {}) {
+  return toLocalPathUrl(resolveCanvasImageThumbPath(options6));
 }
-export function resolveCanvasImageLowZoomUrl(_0x2691d3 = {}) {
+export function resolveCanvasImageLowZoomUrl(options7 = {}) {
   return (
-    resolveCanvasImageThumbUrl(_0x2691d3) ||
-    resolveCanvasImageDisplayUrl(_0x2691d3) ||
-    resolveCanvasImageSourceUrl(_0x2691d3)
+    resolveCanvasImageThumbUrl(options7) ||
+    resolveCanvasImageDisplayUrl(options7) ||
+    resolveCanvasImageSourceUrl(options7)
   );
 }
-export function resolveCanvasImagePreviewUrl(_0x425d4b = {}) {
-  const _0x338c45 = buildNormalizedImageStorage(_0x425d4b),
-    _0x95389 = firstNonEmptyString(
-      pickPreviewImageLocalPath(_0x338c45),
-      pickPreviewFallbackLocalPath(_0x338c45),
+export function resolveCanvasImagePreviewUrl(options8 = {}) {
+  const normalizedImageStorage2 = buildNormalizedImageStorage(options8),
+    nonEmptyString = firstNonEmptyString(
+      pickPreviewImageLocalPath(normalizedImageStorage2),
+      pickPreviewFallbackLocalPath(normalizedImageStorage2),
     );
-  return toLocalPathUrl(_0x95389);
+  return toLocalPathUrl(nonEmptyString);
 }
-export function resolveCanvasVideoLocalPath(_0x3a1870 = {}) {
-  const _0x5bde6d = pickLocalPath(_0x3a1870, ['displayLocalPath']);
-  if (_0x5bde6d) return _0x5bde6d;
-  const _0x18c18e = normalizeText(_0x3a1870?.videoProxyStatus);
-  if (_0x18c18e === 'processing' || _0x18c18e === 'waiting') return '';
-  return pickLocalPath(_0x3a1870, ['src', 'videoUrl', 'url', 'resultUrl', 'localPath']);
+export function resolveCanvasVideoLocalPath(options9 = {}) {
+  const localPath2 = pickLocalPath(options9, ['displayLocalPath']);
+  if (localPath2) return localPath2;
+  const text2 = normalizeText(options9?.videoProxyStatus);
+  if (text2 === 'processing' || text2 === 'waiting') return '';
+  return pickLocalPath(options9, ['src', 'videoUrl', 'url', 'resultUrl', 'localPath']);
 }
-export function resolveCanvasVideoUrl(_0x465994 = {}) {
-  return toCanvasLocalUrl(resolveCanvasVideoLocalPath(_0x465994));
+export function resolveCanvasVideoUrl(options10 = {}) {
+  return toCanvasLocalUrl(resolveCanvasVideoLocalPath(options10));
 }
 function normalizeCanvasVideoPosterUrl(value, { localOnly = false } = {}) {
   const normalized = normalizeText(value);
   if (!normalized) return '';
-  if (/^data:image\//i.test(normalized) || /^blob:/i.test(normalized) || /^aic-local-preview:/i.test(normalized)) {
+  if (
+    /^data:image\//i.test(normalized) ||
+    /^blob:/i.test(normalized) ||
+    /^aic-local-preview:/i.test(normalized)
+  ) {
     return normalized;
   }
   if (/^(?:https?:|file:)/i.test(normalized)) return '';
@@ -179,9 +183,9 @@ function normalizeCanvasVideoPosterUrl(value, { localOnly = false } = {}) {
   if (localUrl) return localUrl;
   return localOnly ? '' : normalized;
 }
-export function resolveCanvasVideoPosterUrl(_0x3ed78b = {}) {
-  const videos = Array.isArray(_0x3ed78b?.videos) ? _0x3ed78b.videos : [],
-    mainIndex = Math.max(0, Number(_0x3ed78b?.mainVideoIndex) || 0),
+export function resolveCanvasVideoPosterUrl(options11 = {}) {
+  const videos = Array.isArray(options11?.videos) ? options11.videos : [],
+    mainIndex = Math.max(0, Number(options11?.mainVideoIndex) || 0),
     mainVideo = videos[mainIndex] || videos[0] || null,
     candidates = [
       [mainVideo?.posterLocalPath, true],
@@ -192,14 +196,14 @@ export function resolveCanvasVideoPosterUrl(_0x3ed78b = {}) {
       [mainVideo?.previewUrl, false],
       [mainVideo?.thumbUrl, false],
       [mainVideo?.thumbnailUrl, false],
-      [_0x3ed78b?.posterLocalPath, true],
-      [_0x3ed78b?.previewLocalPath, true],
-      [_0x3ed78b?.thumbLocalPath, true],
-      [_0x3ed78b?.thumbnailLocalPath, true],
-      [_0x3ed78b?.posterUrl, false],
-      [_0x3ed78b?.previewUrl, false],
-      [_0x3ed78b?.thumbUrl, false],
-      [_0x3ed78b?.thumbnailUrl, false],
+      [options11?.posterLocalPath, true],
+      [options11?.previewLocalPath, true],
+      [options11?.thumbLocalPath, true],
+      [options11?.thumbnailLocalPath, true],
+      [options11?.posterUrl, false],
+      [options11?.previewUrl, false],
+      [options11?.thumbUrl, false],
+      [options11?.thumbnailUrl, false],
     ];
   for (const [value, localOnly] of candidates) {
     const resolved = normalizeCanvasVideoPosterUrl(value, { localOnly });
@@ -207,29 +211,33 @@ export function resolveCanvasVideoPosterUrl(_0x3ed78b = {}) {
   }
   return '';
 }
-export function resolveCanvasAudioLocalPath(_0x20103f = {}) {
-  return pickLocalPath(_0x20103f, ['localPath', 'audioUrl', 'src', 'url', 'resultUrl']);
+export function resolveCanvasAudioLocalPath(options12 = {}) {
+  return pickLocalPath(options12, ['localPath', 'audioUrl', 'src', 'url', 'resultUrl']);
 }
-export function resolveCanvasAudioUrl(_0x17b660 = {}) {
-  return toCanvasLocalUrl(resolveCanvasAudioLocalPath(_0x17b660));
+export function resolveCanvasAudioUrl(options13 = {}) {
+  return toCanvasLocalUrl(resolveCanvasAudioLocalPath(options13));
 }
-export function buildCanvasLocalImageFields(_0x45d21d = {}, _0x43d094 = {}) {
-  const _0x334aa4 = buildNormalizedImageStorage(_0x45d21d),
-    _0x485cf7 = toLocalPathUrl(pickCanvasImageLocalPath(_0x334aa4)),
-    _0x242a24 = resolveCanvasImageSourceUrl(_0x334aa4),
-    _0x2d8914 = toLocalPathUrl(pickCanvasThumbLocalPath(_0x334aa4)),
-    _0x30504e = _0x43d094.includeSrc === true || hasOwn(_0x45d21d, 'src'),
-    _0x37d28a = _0x43d094.includeCanonicalUrl === true || hasOwn(_0x45d21d, 'url'),
-    _0x136b8a = _0x43d094.includeResultUrl === true || hasOwn(_0x45d21d, 'resultUrl'),
-    _0x3b8f49 = {};
-  (hasOwn(_0x45d21d, 'localPath') || _0x334aa4.localPath || _0x334aa4.originalLocalPath) &&
-    ((_0x3b8f49.localPath = _0x334aa4.localPath || ''),
-    (_0x3b8f49.originalLocalPath = _0x334aa4.originalLocalPath || ''));
-  (hasOwn(_0x45d21d, 'displayLocalPath') || _0x334aa4.displayLocalPath) &&
-    (_0x3b8f49.displayLocalPath = _0x334aa4.displayLocalPath || '');
-  (hasOwn(_0x45d21d, 'thumbLocalPath') || hasOwn(_0x45d21d, 'thumbUrl') || _0x334aa4.thumbLocalPath) &&
-    (_0x3b8f49.thumbLocalPath = _0x334aa4.thumbLocalPath || '');
-  (touchesAnyKey(_0x45d21d, [
+export function buildCanvasLocalImageFields(options14 = {}, config = {}) {
+  const normalizedImageStorage3 = buildNormalizedImageStorage(options14),
+    toLocalPathUrl2 = toLocalPathUrl(pickCanvasImageLocalPath(normalizedImageStorage3)),
+    canvasImageSourceUrl = resolveCanvasImageSourceUrl(normalizedImageStorage3),
+    toLocalPathUrl3 = toLocalPathUrl(pickCanvasThumbLocalPath(normalizedImageStorage3)),
+    scope = config.includeSrc === true || hasOwn(options14, 'src'),
+    input = config.includeCanonicalUrl === true || hasOwn(options14, 'url'),
+    output = config.includeResultUrl === true || hasOwn(options14, 'resultUrl'),
+    response = {};
+  (hasOwn(options14, 'localPath') ||
+    normalizedImageStorage3.localPath ||
+    normalizedImageStorage3.originalLocalPath) &&
+    ((response.localPath = normalizedImageStorage3.localPath || ''),
+    (response.originalLocalPath = normalizedImageStorage3.originalLocalPath || ''));
+  (hasOwn(options14, 'displayLocalPath') || normalizedImageStorage3.displayLocalPath) &&
+    (response.displayLocalPath = normalizedImageStorage3.displayLocalPath || '');
+  (hasOwn(options14, 'thumbLocalPath') ||
+    hasOwn(options14, 'thumbUrl') ||
+    normalizedImageStorage3.thumbLocalPath) &&
+    (response.thumbLocalPath = normalizedImageStorage3.thumbLocalPath || '');
+  (touchesAnyKey(options14, [
     'imageUrl',
     'sourceUrl',
     'thumbUrl',
@@ -241,19 +249,19 @@ export function buildCanvasLocalImageFields(_0x45d21d = {}, _0x43d094 = {}) {
     'url',
     'resultUrl',
   ]) ||
-    _0x485cf7 ||
-    _0x242a24 ||
-    _0x2d8914) &&
-    ((_0x3b8f49.imageUrl = _0x485cf7 || ''),
-    (_0x3b8f49.sourceUrl = _0x242a24 || ''),
-    (_0x3b8f49.thumbUrl = _0x2d8914 || ''));
-  if (_0x30504e) _0x3b8f49.src = _0x485cf7 || '';
-  if (_0x37d28a) _0x3b8f49.url = _0x485cf7 || '';
-  if (_0x136b8a) _0x3b8f49.resultUrl = _0x485cf7 || '';
-  return (copyCommonImageMeta(_0x3b8f49, _0x45d21d), _0x3b8f49);
+    toLocalPathUrl2 ||
+    canvasImageSourceUrl ||
+    toLocalPathUrl3) &&
+    ((response.imageUrl = toLocalPathUrl2 || ''),
+    (response.sourceUrl = canvasImageSourceUrl || ''),
+    (response.thumbUrl = toLocalPathUrl3 || ''));
+  if (scope) response.src = toLocalPathUrl2 || '';
+  if (input) response.url = toLocalPathUrl2 || '';
+  if (output) response.resultUrl = toLocalPathUrl2 || '';
+  return (copyCommonImageMeta(response, options14), response);
 }
-export function buildCanvasLocalVideoFields(_0x3ed78b = {}, _0x8ee498 = {}) {
-  const _0x1f8cf3 = pickLocalPath(_0x3ed78b, [
+export function buildCanvasLocalVideoFields(options11 = {}, value2 = {}) {
+  const localPath3 = pickLocalPath(options11, [
       'localPath',
       'originalLocalPath',
       'videoUrl',
@@ -261,117 +269,119 @@ export function buildCanvasLocalVideoFields(_0x3ed78b = {}, _0x8ee498 = {}) {
       'url',
       'resultUrl',
     ]),
-    _0xc990b1 = pickLocalPath(_0x3ed78b, ['originalLocalPath']),
-    _0x25f6a7 = pickLocalPath(_0x3ed78b, ['displayLocalPath']),
-    _0xda53e6 = resolveCanvasVideoLocalPath(_0x3ed78b),
-    _0x19882e = toLocalPathUrl(_0xda53e6),
-    _0x3d6ef2 = toCanvasLocalUrl(_0x3ed78b?.thumbUrl),
-    _0x1c491c = pickLocalPath(_0x3ed78b, ['posterLocalPath']),
-    _0x4f4ea1 = toLocalPathUrl(_0x1c491c),
-    _0x3c2184 = toCanvasLocalUrl(_0x3ed78b?.videoThumbSrc || _0xda53e6),
-    _0x10468b = _0x8ee498.includeCanonicalUrl === true || hasOwn(_0x3ed78b, 'url'),
-    _0x1fcde4 = _0x8ee498.includeResultUrl === true || hasOwn(_0x3ed78b, 'resultUrl'),
-    _0x28a0b8 = {};
-  (hasOwn(_0x3ed78b, 'localPath') ||
-    hasOwn(_0x3ed78b, 'videoUrl') ||
-    hasOwn(_0x3ed78b, 'src') ||
-    hasOwn(_0x3ed78b, 'url') ||
-    hasOwn(_0x3ed78b, 'resultUrl') ||
-    hasOwn(_0x3ed78b, 'displayLocalPath') ||
-    _0xda53e6) &&
-    ((hasOwn(_0x3ed78b, 'localPath') ||
-      hasOwn(_0x3ed78b, 'videoUrl') ||
-      hasOwn(_0x3ed78b, 'src') ||
-      hasOwn(_0x3ed78b, 'url') ||
-      hasOwn(_0x3ed78b, 'resultUrl') ||
-      _0x1f8cf3) &&
-      (_0x28a0b8.localPath = _0x1f8cf3 || ''),
-    (hasOwn(_0x3ed78b, 'originalLocalPath') || _0xc990b1) && (_0x28a0b8.originalLocalPath = _0xc990b1 || ''),
-    (hasOwn(_0x3ed78b, 'displayLocalPath') || _0x25f6a7) && (_0x28a0b8.displayLocalPath = _0x25f6a7 || ''),
-    (_0x28a0b8.videoUrl = _0x19882e || ''),
-    (_0x28a0b8.src = _0x19882e || ''));
-  (hasOwn(_0x3ed78b, 'thumbUrl') || _0x3d6ef2) && (_0x28a0b8.thumbUrl = _0x3d6ef2 || _0x4f4ea1 || '');
-  if (hasOwn(_0x3ed78b, 'posterLocalPath') || _0x1c491c) {
-    _0x28a0b8.posterLocalPath = _0x1c491c || '';
-    if (!_0x28a0b8.thumbUrl) _0x28a0b8.thumbUrl = _0x4f4ea1 || '';
+    localPath4 = pickLocalPath(options11, ['originalLocalPath']),
+    localPath5 = pickLocalPath(options11, ['displayLocalPath']),
+    canvasVideoLocalPath = resolveCanvasVideoLocalPath(options11),
+    toLocalPathUrl4 = toLocalPathUrl(canvasVideoLocalPath),
+    toCanvasLocalUrl2 = toCanvasLocalUrl(options11?.thumbUrl),
+    localPath6 = pickLocalPath(options11, ['posterLocalPath']),
+    toLocalPathUrl5 = toLocalPathUrl(localPath6),
+    toCanvasLocalUrl3 = toCanvasLocalUrl(options11?.videoThumbSrc || canvasVideoLocalPath),
+    value3 = value2.includeCanonicalUrl === true || hasOwn(options11, 'url'),
+    value4 = value2.includeResultUrl === true || hasOwn(options11, 'resultUrl'),
+    response2 = {};
+  (hasOwn(options11, 'localPath') ||
+    hasOwn(options11, 'videoUrl') ||
+    hasOwn(options11, 'src') ||
+    hasOwn(options11, 'url') ||
+    hasOwn(options11, 'resultUrl') ||
+    hasOwn(options11, 'displayLocalPath') ||
+    canvasVideoLocalPath) &&
+    ((hasOwn(options11, 'localPath') ||
+      hasOwn(options11, 'videoUrl') ||
+      hasOwn(options11, 'src') ||
+      hasOwn(options11, 'url') ||
+      hasOwn(options11, 'resultUrl') ||
+      localPath3) &&
+      (response2.localPath = localPath3 || ''),
+    (hasOwn(options11, 'originalLocalPath') || localPath4) &&
+      (response2.originalLocalPath = localPath4 || ''),
+    (hasOwn(options11, 'displayLocalPath') || localPath5) && (response2.displayLocalPath = localPath5 || ''),
+    (response2.videoUrl = toLocalPathUrl4 || ''),
+    (response2.src = toLocalPathUrl4 || ''));
+  (hasOwn(options11, 'thumbUrl') || toCanvasLocalUrl2) &&
+    (response2.thumbUrl = toCanvasLocalUrl2 || toLocalPathUrl5 || '');
+  if (hasOwn(options11, 'posterLocalPath') || localPath6) {
+    response2.posterLocalPath = localPath6 || '';
+    if (!response2.thumbUrl) response2.thumbUrl = toLocalPathUrl5 || '';
   }
-  hasOwn(_0x3ed78b, 'videoThumbSrc') && (_0x28a0b8.videoThumbSrc = _0x3c2184 || '');
-  hasOwn(_0x3ed78b, 'videoMetaSrc') &&
-    (_0x28a0b8.videoMetaSrc = toCanvasLocalUrl(_0x3ed78b.videoMetaSrc || _0xda53e6));
-  if (_0x10468b) _0x28a0b8.url = _0x19882e || '';
-  if (_0x1fcde4) _0x28a0b8.resultUrl = _0x19882e || '';
-  return (copyCommonVideoMeta(_0x28a0b8, _0x3ed78b), _0x28a0b8);
+  hasOwn(options11, 'videoThumbSrc') && (response2.videoThumbSrc = toCanvasLocalUrl3 || '');
+  hasOwn(options11, 'videoMetaSrc') &&
+    (response2.videoMetaSrc = toCanvasLocalUrl(options11.videoMetaSrc || canvasVideoLocalPath));
+  if (value3) response2.url = toLocalPathUrl4 || '';
+  if (value4) response2.resultUrl = toLocalPathUrl4 || '';
+  return (copyCommonVideoMeta(response2, options11), response2);
 }
-export function buildCanvasLocalAudioFields(_0x195920 = {}, _0x478724 = {}) {
-  const _0x1e673f = resolveCanvasAudioLocalPath(_0x195920),
-    _0x49d430 = toLocalPathUrl(_0x1e673f),
-    _0x310a47 = pickLocalPath(_0x195920, ['waveformLocalPath']),
-    _0x2a5e27 = _0x478724.includeCanonicalUrl === true || hasOwn(_0x195920, 'url'),
-    _0x30f698 = _0x478724.includeResultUrl === true || hasOwn(_0x195920, 'resultUrl'),
-    _0xc0e5f = {};
-  (hasOwn(_0x195920, 'localPath') ||
-    hasOwn(_0x195920, 'audioUrl') ||
-    hasOwn(_0x195920, 'src') ||
-    hasOwn(_0x195920, 'url') ||
-    hasOwn(_0x195920, 'resultUrl') ||
-    _0x1e673f) &&
-    ((_0xc0e5f.localPath = _0x1e673f || ''),
-    (_0xc0e5f.audioUrl = _0x49d430 || ''),
-    (_0xc0e5f.src = _0x49d430 || ''));
-  if (_0x2a5e27) _0xc0e5f.url = _0x49d430 || '';
-  if (_0x30f698) _0xc0e5f.resultUrl = _0x49d430 || '';
-  (hasOwn(_0x195920, 'waveformLocalPath') || _0x310a47) && (_0xc0e5f.waveformLocalPath = _0x310a47 || '');
-  if (hasOwn(_0x195920, 'assetId')) _0xc0e5f.assetId = normalizeText(_0x195920.assetId);
-  hasOwn(_0x195920, 'derivativeStatus') &&
-    (_0xc0e5f.derivativeStatus = normalizeText(_0x195920.derivativeStatus));
-  if (hasOwn(_0x195920, 'fileName')) _0xc0e5f.fileName = _0x195920.fileName;
-  return _0xc0e5f;
+export function buildCanvasLocalAudioFields(options15 = {}, value5 = {}) {
+  const canvasAudioLocalPath = resolveCanvasAudioLocalPath(options15),
+    toLocalPathUrl6 = toLocalPathUrl(canvasAudioLocalPath),
+    localPath7 = pickLocalPath(options15, ['waveformLocalPath']),
+    value6 = value5.includeCanonicalUrl === true || hasOwn(options15, 'url'),
+    value7 = value5.includeResultUrl === true || hasOwn(options15, 'resultUrl'),
+    response3 = {};
+  (hasOwn(options15, 'localPath') ||
+    hasOwn(options15, 'audioUrl') ||
+    hasOwn(options15, 'src') ||
+    hasOwn(options15, 'url') ||
+    hasOwn(options15, 'resultUrl') ||
+    canvasAudioLocalPath) &&
+    ((response3.localPath = canvasAudioLocalPath || ''),
+    (response3.audioUrl = toLocalPathUrl6 || ''),
+    (response3.src = toLocalPathUrl6 || ''));
+  if (value6) response3.url = toLocalPathUrl6 || '';
+  if (value7) response3.resultUrl = toLocalPathUrl6 || '';
+  (hasOwn(options15, 'waveformLocalPath') || localPath7) && (response3.waveformLocalPath = localPath7 || '');
+  if (hasOwn(options15, 'assetId')) response3.assetId = normalizeText(options15.assetId);
+  hasOwn(options15, 'derivativeStatus') &&
+    (response3.derivativeStatus = normalizeText(options15.derivativeStatus));
+  if (hasOwn(options15, 'fileName')) response3.fileName = options15.fileName;
+  return response3;
 }
-function normalizeImageCollection(_0x471208) {
-  if (!Array.isArray(_0x471208)) return _0x471208;
-  return _0x471208.map((_0x234dd5) => {
-    if (!_0x234dd5 || typeof _0x234dd5 !== 'object') return _0x234dd5;
+function normalizeImageCollection(list2) {
+  if (!Array.isArray(list2)) return list2;
+  return list2.map((args3) => {
+    if (!args3 || typeof args3 !== 'object') return args3;
     return {
-      ..._0x234dd5,
-      ...buildCanvasLocalImageFields(_0x234dd5, {
-        includeSrc: hasOwn(_0x234dd5, 'src'),
-        includeCanonicalUrl: hasOwn(_0x234dd5, 'url'),
-        includeResultUrl: hasOwn(_0x234dd5, 'resultUrl'),
+      ...args3,
+      ...buildCanvasLocalImageFields(args3, {
+        includeSrc: hasOwn(args3, 'src'),
+        includeCanonicalUrl: hasOwn(args3, 'url'),
+        includeResultUrl: hasOwn(args3, 'resultUrl'),
       }),
     };
   });
 }
-function normalizeVideoCollection(_0x4fee5e) {
-  if (!Array.isArray(_0x4fee5e)) return _0x4fee5e;
-  return _0x4fee5e.map((_0x3437cc) => {
-    if (!_0x3437cc || typeof _0x3437cc !== 'object') return _0x3437cc;
+function normalizeVideoCollection(list3) {
+  if (!Array.isArray(list3)) return list3;
+  return list3.map((args4) => {
+    if (!args4 || typeof args4 !== 'object') return args4;
     return {
-      ..._0x3437cc,
-      ...buildCanvasLocalVideoFields(_0x3437cc, {
-        includeCanonicalUrl: hasOwn(_0x3437cc, 'url'),
-        includeResultUrl: hasOwn(_0x3437cc, 'resultUrl'),
+      ...args4,
+      ...buildCanvasLocalVideoFields(args4, {
+        includeCanonicalUrl: hasOwn(args4, 'url'),
+        includeResultUrl: hasOwn(args4, 'resultUrl'),
       }),
     };
   });
 }
-function validateUrlField(_0x3e7650, _0x3e4fb8) {
-  const _0x1b7dd9 = normalizeText(_0x3e4fb8);
-  if (!_0x1b7dd9) return;
-  if (normalizeLocalUrlText(_0x1b7dd9) !== _0x1b7dd9)
-    throw new Error('[canvasMediaLocalService] ' + _0x3e7650 + ' 必须是本地 URL');
+function validateUrlField(value8, value9) {
+  const text3 = normalizeText(value9);
+  if (!text3) return;
+  if (normalizeLocalUrlText(text3) !== text3)
+    throw new Error('[canvasMediaLocalService] ' + value8 + ' 必须是本地 URL');
 }
-function validatePathField(_0x5a2c98, _0x2efe7f) {
-  const _0x29c20e = normalizeText(_0x2efe7f);
-  if (!_0x29c20e) return;
-  const _0x2f5aef = normalizeCanvasLocalPath(_0x29c20e);
-  if (!_0x2f5aef || !isSafeVirtualLocalPath(_0x2f5aef))
-    throw new Error('[canvasMediaLocalService] ' + _0x5a2c98 + ' 必须是本地路径');
+function validatePathField(value10, value11) {
+  const text4 = normalizeText(value11);
+  if (!text4) return;
+  const canvasLocalPath3 = normalizeCanvasLocalPath(text4);
+  if (!canvasLocalPath3 || !isSafeVirtualLocalPath(canvasLocalPath3))
+    throw new Error('[canvasMediaLocalService] ' + value10 + ' 必须是本地路径');
 }
-export function assertCanvasMediaPatchLocalOnly(_0x3877ee = {}) {
-  if (!_0x3877ee || typeof _0x3877ee !== 'object') return;
-  const _0x26c825 = (_0x393204) => {
-    if (!_0x393204 || typeof _0x393204 !== 'object') return;
-    for (const _0x42b7a9 of [
+export function assertCanvasMediaPatchLocalOnly(enabled2 = {}) {
+  if (!enabled2 || typeof enabled2 !== 'object') return;
+  const run = (enabled3) => {
+    if (!enabled3 || typeof enabled3 !== 'object') return;
+    for (const value12 of [
       'src',
       'imageUrl',
       'sourceUrl',
@@ -383,9 +393,9 @@ export function assertCanvasMediaPatchLocalOnly(_0x3877ee = {}) {
       'videoThumbSrc',
       'videoMetaSrc',
     ]) {
-      if (hasOwn(_0x393204, _0x42b7a9)) validateUrlField(_0x42b7a9, _0x393204[_0x42b7a9]);
+      if (hasOwn(enabled3, value12)) validateUrlField(value12, enabled3[value12]);
     }
-    for (const _0x2a1f9c of [
+    for (const value13 of [
       'localPath',
       'originalLocalPath',
       'displayLocalPath',
@@ -394,85 +404,85 @@ export function assertCanvasMediaPatchLocalOnly(_0x3877ee = {}) {
       'waveformLocalPath',
       'path',
     ]) {
-      if (hasOwn(_0x393204, _0x2a1f9c)) validatePathField(_0x2a1f9c, _0x393204[_0x2a1f9c]);
+      if (hasOwn(enabled3, value13)) validatePathField(value13, enabled3[value13]);
     }
   };
-  _0x26c825(_0x3877ee);
-  if (Array.isArray(_0x3877ee.images)) {
-    for (const _0x531492 of _0x3877ee.images) _0x26c825(_0x531492);
+  run(enabled2);
+  if (Array.isArray(enabled2.images)) {
+    for (const value14 of enabled2.images) run(value14);
   }
-  if (Array.isArray(_0x3877ee.videos)) {
-    for (const _0x55395d of _0x3877ee.videos) _0x26c825(_0x55395d);
+  if (Array.isArray(enabled2.videos)) {
+    for (const value15 of enabled2.videos) run(value15);
   }
 }
-export function sanitizeCanvasNodeMediaPatchForStore(_0x21e4a2 = {}, _0x39b8b9 = null) {
-  if (!_0x21e4a2 || typeof _0x21e4a2 !== 'object' || Array.isArray(_0x21e4a2)) return _0x21e4a2;
-  const _0x3c288 = normalizeText(_0x21e4a2.type || _0x39b8b9?.type),
-    _0x112d1f = { ..._0x21e4a2 };
-  hasOwn(_0x21e4a2, 'images') && (_0x112d1f.images = normalizeImageCollection(_0x21e4a2.images));
-  hasOwn(_0x21e4a2, 'videos') && (_0x112d1f.videos = normalizeVideoCollection(_0x21e4a2.videos));
-  const _0x34ae66 =
-    hasOwn(_0x21e4a2, 'images') ||
-    touchesAnyKey(_0x21e4a2, IMAGE_TRIGGER_KEYS) ||
-    (IMAGE_NODE_TYPES.has(_0x3c288) && touchesAnyKey(_0x21e4a2, ['src', 'localPath', 'fileName']));
-  _0x34ae66 &&
+export function sanitizeCanvasNodeMediaPatchForStore(args5 = {}, value16 = null) {
+  if (!args5 || typeof args5 !== 'object' || Array.isArray(args5)) return args5;
+  const text5 = normalizeText(args5.type || value16?.type),
+    value17 = { ...args5 };
+  hasOwn(args5, 'images') && (value17.images = normalizeImageCollection(args5.images));
+  hasOwn(args5, 'videos') && (value17.videos = normalizeVideoCollection(args5.videos));
+  const hasOwn2 =
+    hasOwn(args5, 'images') ||
+    touchesAnyKey(args5, IMAGE_TRIGGER_KEYS) ||
+    (IMAGE_NODE_TYPES.has(text5) && touchesAnyKey(args5, ['src', 'localPath', 'fileName']));
+  hasOwn2 &&
     Object.assign(
-      _0x112d1f,
-      buildCanvasLocalImageFields(_0x21e4a2, {
-        includeSrc: hasOwn(_0x21e4a2, 'src') || IMAGE_NODE_TYPES.has(_0x3c288),
-        includeCanonicalUrl: hasOwn(_0x21e4a2, 'url'),
-        includeResultUrl: hasOwn(_0x21e4a2, 'resultUrl'),
+      value17,
+      buildCanvasLocalImageFields(args5, {
+        includeSrc: hasOwn(args5, 'src') || IMAGE_NODE_TYPES.has(text5),
+        includeCanonicalUrl: hasOwn(args5, 'url'),
+        includeResultUrl: hasOwn(args5, 'resultUrl'),
       }),
     );
-  const _0x474a11 =
-    hasOwn(_0x21e4a2, 'videos') ||
-    touchesAnyKey(_0x21e4a2, [
+  const hasOwn3 =
+    hasOwn(args5, 'videos') ||
+    touchesAnyKey(args5, [
       'videoUrl',
       'videoThumbSrc',
       'videoMetaSrc',
       'posterLocalPath',
       'videoProxyStatus',
     ]) ||
-    (VIDEO_NODE_TYPES.has(_0x3c288) && touchesAnyKey(_0x21e4a2, VIDEO_TRIGGER_KEYS));
-  _0x474a11 &&
+    (VIDEO_NODE_TYPES.has(text5) && touchesAnyKey(args5, VIDEO_TRIGGER_KEYS));
+  hasOwn3 &&
     Object.assign(
-      _0x112d1f,
-      buildCanvasLocalVideoFields(_0x21e4a2, {
-        includeCanonicalUrl: hasOwn(_0x21e4a2, 'url'),
-        includeResultUrl: hasOwn(_0x21e4a2, 'resultUrl'),
+      value17,
+      buildCanvasLocalVideoFields(args5, {
+        includeCanonicalUrl: hasOwn(args5, 'url'),
+        includeResultUrl: hasOwn(args5, 'resultUrl'),
       }),
     );
-  const _0xeaed5f =
-    hasOwn(_0x21e4a2, 'audioUrl') ||
-    (AUDIO_NODE_TYPES.has(_0x3c288) &&
-      touchesAnyKey(_0x21e4a2, ['src', 'localPath', 'waveformLocalPath', 'fileName']));
+  const hasOwn4 =
+    hasOwn(args5, 'audioUrl') ||
+    (AUDIO_NODE_TYPES.has(text5) &&
+      touchesAnyKey(args5, ['src', 'localPath', 'waveformLocalPath', 'fileName']));
   return (
-    _0xeaed5f &&
+    hasOwn4 &&
       Object.assign(
-        _0x112d1f,
-        buildCanvasLocalAudioFields(_0x21e4a2, {
-          includeCanonicalUrl: hasOwn(_0x21e4a2, 'url'),
-          includeResultUrl: hasOwn(_0x21e4a2, 'resultUrl'),
+        value17,
+        buildCanvasLocalAudioFields(args5, {
+          includeCanonicalUrl: hasOwn(args5, 'url'),
+          includeResultUrl: hasOwn(args5, 'resultUrl'),
         }),
       ),
-    _0x112d1f
+    value17
   );
 }
 export const VIDEO_PROXY_VERSION_V2_1280 = 'v2-1280';
 
-export function resolveCanvasVideoDisplayUrl(_0x236eff = {}) {
-  return resolveCanvasVideoUrl(_0x236eff);
+export function resolveCanvasVideoDisplayUrl(options16 = {}) {
+  return resolveCanvasVideoUrl(options16);
 }
 
-export function buildCanvasVideoProxyPromotionPatch(_0x4ebf43 = {}) {
-  const _0xdf9da9 = pickLocalPath(_0x4ebf43, ['pendingVideoProxyLocalPath']),
-    _0x5c6f7b = normalizeText(_0x4ebf43?.['pendingVideoProxyVersion']);
-  if (!_0xdf9da9 || _0x5c6f7b !== VIDEO_PROXY_VERSION_V2_1280) return null;
+export function buildCanvasVideoProxyPromotionPatch(options17 = {}) {
+  const displayLocalPath2 = pickLocalPath(options17, ['pendingVideoProxyLocalPath']),
+    videoProxyVersion = normalizeText(options17?.['pendingVideoProxyVersion']);
+  if (!displayLocalPath2 || videoProxyVersion !== VIDEO_PROXY_VERSION_V2_1280) return null;
   return {
     ...buildCanvasLocalVideoFields({
-      displayLocalPath: _0xdf9da9,
+      displayLocalPath: displayLocalPath2,
       videoProxyStatus: 'generated',
-      videoProxyVersion: _0x5c6f7b,
+      videoProxyVersion: videoProxyVersion,
     }),
     pendingVideoProxyLocalPath: '',
     pendingVideoProxyVersion: '',
@@ -485,15 +495,15 @@ function normalizeRemoteMediaFallback() {
   return '';
 }
 
-function normalizeAudioCollection(_0x1b2644) {
-  if (!Array['isArray'](_0x1b2644)) return _0x1b2644;
-  return _0x1b2644['map']((_0x56750b) => {
-    if (!_0x56750b || typeof _0x56750b !== 'object') return _0x56750b;
+function normalizeAudioCollection(list4) {
+  if (!Array['isArray'](list4)) return list4;
+  return list4['map']((args6) => {
+    if (!args6 || typeof args6 !== 'object') return args6;
     return {
-      ..._0x56750b,
-      ...buildCanvasLocalAudioFields(_0x56750b, {
-        includeCanonicalUrl: hasOwn(_0x56750b, 'url'),
-        includeResultUrl: hasOwn(_0x56750b, 'resultUrl'),
+      ...args6,
+      ...buildCanvasLocalAudioFields(args6, {
+        includeCanonicalUrl: hasOwn(args6, 'url'),
+        includeResultUrl: hasOwn(args6, 'resultUrl'),
       }),
     };
   });
