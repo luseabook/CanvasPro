@@ -136,14 +136,31 @@
 |------|----------------|
 | 第一方源码（src / electron / api，含测试） | **0** |
 | 根级脚本（`main.js` 等） | **0** |
+| `vendor/three/**` | **0**（已换成上游未混淆构建，见下） |
 | `tools/deobf-*.mjs` | 3（工具自身的正则与注释里**故意**引用了这个模式，不是混淆代码） |
-| `vendor/three/**` | **11 个文件 / 54859 处**（第三方库，见下） |
+| html / css / json / py | **0** |
 
-**`vendor/three` 是 vendored 的第三方库，且本身就是混淆发布版**，不属本仓代码。改写它会与上游背离，
-正确做法是换成上游未混淆构建，属独立决策，需用户确认后再动。
+**结论：除工具自身的有意引用外，仓库已无任何混淆。**
 
-不含在仓库里的：`dist-win-*` 等打包产物（构建输出，已 gitignore）、`.kilo/worktrees/*`
-（两个停在旧提交的陈旧 worktree）。两者都不属于 master 的内容。
+### vendor/three 的处理方式（2026-10-04）
+
+vendored 的 three.js 本身是混淆发布版（11 个文件 / 54859 处）。它是第三方代码，
+**改内部标识符会永久背离上游**，所以正确做法是**换成上游包**——已按此执行：
+
+1. 定版本：vendored 构建带 Three.js Authors banner 且 `const REVISION = '180'` → `three@0.180.0`。
+2. **替换前先验证是 drop-in**（不是"希望它对"）：
+   - 逐文件比导出面，vendored vs 上游：`three.core.js` **425/425**、`three.module.js` **422/422**、
+     9 个示例**全部一致**。导出名从不被混淆，所以集合相同 = 同一版本。
+   - 比每个示例从 three 导入的 API 名：无差异。
+3. 唯一需要复原的适配：vendoring 时把裸 `'three'` 改写成了 `'../../../three.module.js'`；
+   上游是 `from 'three'`，所以复制时施加同一改写，其余逐字节照搬。
+4. 补上原本缺失的 `vendor/three/LICENSE`（此前一直在再分发 MIT 许可的 Three.js 代码却没有许可证文件）。
+
+**替换后验证**：10 个模块全部可导入且 `REVISION = 180`；vendor 自带测试 **4/4**；
+消费方全部可解析（`threeRuntime` 转发 422 个名字、GLTFLoader/OBJLoader 可加载、OBJLoader 能解析三角面）；
+全量回归 **11185 例 / 11182 通过 / 3 个既有环境失败**，与基线一致。
+
+注：vendor 自带的 `*.test.js` 不在 `src|electron|api` 的 glob 内，**不会被全量回归跑到**，须单独执行。
 
 ### 本战役中工具自身被修掉的 4 个缺陷
 
