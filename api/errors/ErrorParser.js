@@ -4,6 +4,9 @@ import * as RunningHubErrorParser from './parsers/RunningHubErrorParser.js';
 import * as RunningHubModelErrorParser from './parsers/RunningHubModelErrorParser.js';
 import * as GrsaiErrorParser from './parsers/GrsaiErrorParser.js';
 import * as AgnesErrorParser from './parsers/AgnesErrorParser.js';
+import * as ComfyUiErrorParser from './parsers/ComfyUiErrorParser.js';
+import * as VolcengineSpeechErrorParser from './parsers/VolcengineSpeechErrorParser.js';
+import * as VolcengineErrorParser from './parsers/VolcengineErrorParser.js';
 import { ApiError, ErrorType } from './ApiError.js';
 const PARSERS = {
   ppio: PpioErrorParser,
@@ -12,16 +15,19 @@ const PARSERS = {
   runninghubwf: RunningHubErrorParser,
   grsai: GrsaiErrorParser,
   agnes: AgnesErrorParser,
+  comfyui: ComfyUiErrorParser,
+  'volcengine-speech': VolcengineSpeechErrorParser,
+  volcengine: VolcengineErrorParser,
   'ppio/gemini': PpioErrorParser,
   'runninghub-model': RunningHubModelErrorParser,
 };
 function getParser(enabled) {
   if (!enabled) return null;
-  const value = enabled.toLowerCase().trim();
+  const value = enabled['toLowerCase']()['trim']();
   return PARSERS[value] || null;
 }
 function isPlainObject(enabled2) {
-  return !!enabled2 && typeof enabled2 === 'object' && !Array.isArray(enabled2);
+  return !!enabled2 && typeof enabled2 === 'object' && !Array['isArray'](enabled2);
 }
 function stringifyErrorValue(error) {
   if (error === undefined || error === null) return '';
@@ -29,19 +35,19 @@ function stringifyErrorValue(error) {
   if (typeof error === 'number' || typeof error === 'boolean') return String(error);
   if (isPlainObject(error)) {
     const item =
-      error.message ||
-      error.errorMessage ||
-      error.error_message ||
-      error.reason ||
-      error.detail ||
-      error.details ||
-      error.msg;
+      error['message'] ||
+      error['errorMessage'] ||
+      error['error_message'] ||
+      error['reason'] ||
+      error['detail'] ||
+      error['details'] ||
+      error['msg'];
     if (item !== undefined && item !== null && item !== error) {
       const stringifyErrorValue2 = stringifyErrorValue(item);
       if (stringifyErrorValue2) return stringifyErrorValue2;
     }
     try {
-      return JSON.stringify(error);
+      return JSON['stringify'](error);
     } catch {
       return '';
     }
@@ -50,184 +56,218 @@ function stringifyErrorValue(error) {
 }
 function firstErrorText(...args) {
   for (const key of args) {
-    const stringifyErrorValue3 = stringifyErrorValue(key).trim();
+    const stringifyErrorValue3 = stringifyErrorValue(key)['trim']();
     if (stringifyErrorValue3) return stringifyErrorValue3;
   }
   return '';
 }
-export function parseError(index, result, data) {
-  const parser = getParser(index);
-  if (parser?.parseError) {
-    const options = parser.parseError(result, data);
-    if (options) return options;
-  }
-  return parseGenericError(index, result, data);
+function preserveRawErrorContext(response, index, result) {
+  if (!response) return response;
+  if (response['raw'] === undefined) response['raw'] = index;
+  const data = Number(result);
+  return (
+    response['status'] == null &&
+      result !== null &&
+      result !== undefined &&
+      result !== '' &&
+      Number['isFinite'](data) &&
+      (response['status'] = data),
+    response
+  );
 }
-export function parseTaskError(target, error2) {
-  const parser2 = getParser(target);
-  if (parser2?.parseTaskError) return parser2.parseTaskError(error2);
+export function parseError(options, target, source) {
+  const parser = getParser(options);
+  if (parser?.['parseError']) {
+    const next = parser['parseError'](target, source);
+    if (next) return preserveRawErrorContext(next, target, source);
+    if (Number(source) < 0x190) return null;
+  }
+  return preserveRawErrorContext(parseGenericError(options, target, source), target, source);
+}
+export function parseTaskError(current, error2) {
+  const parser2 = getParser(current);
+  if (parser2?.['parseTaskError']) return parser2['parseTaskError'](error2);
   if (error2) {
-    const source = (error2.status || '').toLowerCase();
-    if (source === 'failed' || source === 'error') {
+    const entry = (error2['status'] || '')['toLowerCase']();
+    if (entry === 'failed' || entry === 'error') {
       const errorText = firstErrorText(
-        error2.error,
-        error2.errorMessage,
-        error2.message,
-        error2.failure_reason,
+        error2['error'],
+        error2['errorMessage'],
+        error2['message'],
+        error2['failure_reason'],
         '未知错误',
       );
-      return ApiError.taskFailed(target, errorText);
+      return ApiError['taskFailed'](current, errorText);
     }
   }
   return null;
 }
-export function parseNetworkError(provider, raw, next) {
-  const list = raw?.message || '';
-  if (raw?.name === 'AbortError' || list.includes('timeout') || list.includes('TIMEOUT'))
-    return ApiError.timeout(provider, next);
-  if (list.includes('DNS') || list.includes('ENOTFOUND') || list.includes('getaddrinfo'))
+export function parseNetworkError(provider, raw, record) {
+  const list = raw?.['message'] || '';
+  if (
+    raw?.['name'] === 'AbortError' ||
+    list['includes']('timeout') ||
+    list['includes']('TIMEOUT')
+  ) {
+    if (provider === 'local')
+      return new ApiError({
+        type: ErrorType['TIMEOUT'],
+        provider: provider,
+        message:
+          '本地服务响应超时（' +
+          (record ? Math['round'](record / 0x3e8) + '秒' : '未知') +
+          '），请稍后重试；若持续超时，请重启应用后再试',
+        raw: raw,
+        retryable: !![],
+      });
+    return ApiError['timeout'](provider, record);
+  }
+  if (
+    list['includes']('DNS') ||
+    list['includes']('ENOTFOUND') ||
+    list['includes']('getaddrinfo')
+  )
     return new ApiError({
-      type: ErrorType.DNS_ERROR,
+      type: ErrorType['DNS_ERROR'],
       provider: provider,
       message: '无法解析服务器地址，请检查网络配置',
       raw: raw,
-      retryable: true,
+      retryable: !![],
     });
   if (
-    list.includes('Failed to fetch') ||
-    list.includes('NETWORK') ||
-    list.includes('ECONNREFUSED') ||
-    list.includes('ECONNRESET')
+    list['includes']('Failed to fetch') ||
+    list['includes']('NETWORK') ||
+    list['includes']('ECONNREFUSED') ||
+    list['includes']('ECONNRESET')
   )
     return new ApiError({
-      type: ErrorType.NETWORK_ERROR,
+      type: ErrorType['NETWORK_ERROR'],
       provider: provider,
-      message: '网络连接失败，请检查网络或代理设置',
+      message:
+        provider === 'local'
+          ? '无法连接本地服务，请稍后重试；若持续失败，请重启应用后再试'
+          : '网络连接失败，请检查网络或代理设置',
       raw: raw,
-      retryable: true,
+      retryable: !![],
     });
-  return ApiError.networkError(provider, raw);
+  return ApiError['networkError'](provider, raw);
 }
-function parseGenericError(provider2, error3, status) {
-  let message = '',
-    code = status;
-  if (typeof error3 === 'string') message = error3;
-  else
-    error3 &&
-      typeof error3 === 'object' &&
-      ((message = firstErrorText(
-        error3.error?.message,
-        error3.error,
-        error3.message,
-        error3.errorMessage,
-        error3.error_message,
-        error3.failure_reason,
-        error3.reason,
-        error3,
-      )),
-      (code = error3.code || error3.error?.code || error3.errorCode || error3.error_code || status));
-  const list2 = String(message).toUpperCase();
-  if (list2.includes('BALANCE') || list2.includes('余额') || list2.includes('QUOTA'))
-    return ApiError.insufficientBalance(provider2, code);
-  if (list2.includes('RATE') || list2.includes('LIMIT') || status === 0x1ad)
-    return ApiError.rateLimit(provider2, code);
-  if (list2.includes('AUTH') || list2.includes('KEY') || status === 0x191)
-    return ApiError.authError(provider2, code, message);
-  if (list2.includes('CONTENT') || list2.includes('FILTER') || list2.includes('SAFETY'))
-    return ApiError.contentFiltered(provider2, message);
-  if (status >= 0x190) return ApiError.fromHttpStatus(status, provider2, message);
-  return new ApiError({
-    type: ErrorType.UNKNOWN,
-    provider: provider2,
-    code: code,
-    message: message || '未知错误',
-    status: status,
-  });
-}
-export function parseBatchErrors(current, list3) {
-  return list3
-    .map((response, entry) => {
-      if (response.success) return null;
-      const error4 = parseError(current, response.error, response.status);
-      return ((error4.batchIndex = entry), error4);
-    })
-    .filter(Boolean);
-}
-export default {
-  parseError: parseError,
-  parseTaskError: parseTaskError,
-  parseNetworkError: parseNetworkError,
-  parseBatchErrors: parseBatchErrors,
-};
-
-function preserveRawErrorContext(enabled3, record, payload) {
-  if (!enabled3) return enabled3;
-  if (enabled3['raw'] === undefined) enabled3['raw'] = record;
-  const handle = Number(payload);
-  return (
-    enabled3['status'] == null &&
-      payload !== null &&
-      payload !== undefined &&
-      payload !== '' &&
-      Number['isFinite'](handle) &&
-      (enabled3['status'] = handle),
-    enabled3
-  );
-}
-
-export function applyManifestErrorRules(error5, state, config = {}) {
-  if (!error5 || !Array['isArray'](state) || state['length'] === 0x0) return error5;
-  const scope = String(config['phase'] || 'any')
+export function applyManifestErrorRules(code, list2, payload = {}) {
+  if (!code || !Array['isArray'](list2) || list2['length'] === 0x0) return code;
+  const handle = String(payload['phase'] || 'any')
       ['trim']()
       ['toLowerCase'](),
-    input = String(config['provider'] || error5['provider'] || 'unknown')['trim'](),
-    output = Number(error5['status'] ?? error5['code']),
-    value2 = Number['isInteger'](output) ? output : null,
+    provider2 = String(payload['provider'] || code['provider'] || 'unknown')['trim'](),
+    state = Number(code['status'] ?? code['code']),
+    status = Number['isInteger'](state) ? state : null,
     errorText2 = firstErrorText(
-      error5['message'],
-      error5['raw']?.['error']?.['message'],
-      error5['raw']?.['error'],
-      error5['raw']?.['message'],
-      error5['raw'],
+      code['message'],
+      code['raw']?.['error']?.['message'],
+      code['raw']?.['error'],
+      code['raw']?.['message'],
+      code['raw'],
     ),
-    value3 = errorText2['toLocaleLowerCase']();
-  for (const enabled4 of state) {
-    if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4)) continue;
-    const value4 = String(enabled4['phase'] || 'any')
+    list3 = errorText2['toLocaleLowerCase']();
+  for (const retryable of list2) {
+    if (!retryable || typeof retryable !== 'object' || Array['isArray'](retryable)) continue;
+    const config = String(retryable['phase'] || 'any')
       ['trim']()
       ['toLowerCase']();
-    if (value4 !== 'any' && value4 !== scope) continue;
-    const list4 = Array['isArray'](enabled4['httpStatuses'])
-      ? enabled4['httpStatuses']['map'](Number)['filter'](Number['isInteger'])
+    if (config !== 'any' && config !== handle) continue;
+    const list4 = Array['isArray'](retryable['httpStatuses'])
+      ? retryable['httpStatuses']['map'](Number)['filter'](Number['isInteger'])
       : [];
-    if (list4['length'] > 0x0 && (value2 === null || !list4['includes'](value2))) continue;
-    const list5 = Array['isArray'](enabled4['messageIncludesAny'])
-      ? enabled4['messageIncludesAny']
-          ['map']((value5) =>
-            String(value5 || '')
+    if (list4['length'] > 0x0 && (status === null || !list4['includes'](status))) continue;
+    const list5 = Array['isArray'](retryable['messageIncludesAny'])
+      ? retryable['messageIncludesAny']
+          ['map']((scope) =>
+            String(scope || '')
               ['trim']()
               ['toLocaleLowerCase'](),
           )
           ['filter'](Boolean)
       : [];
-    if (list5['length'] > 0x0 && !list5['some']((value6) => value3['includes'](value6))) continue;
+    if (list5['length'] > 0x0 && !list5['some']((input) => list3['includes'](input)))
+      continue;
     if (list4['length'] === 0x0 && list5['length'] === 0x0) continue;
-    const value7 = String(enabled4['userMessage'] || '')['trim'](),
-      value8 = String(enabled4['hint'] || '')['trim'](),
-      list6 = value7 || errorText2 || error5['message'] || '请求失败',
-      value9 = value8 && !list6['includes'](value8) ? list6 + '；' + value8 : list6,
+    const output = String(retryable['userMessage'] || '')['trim'](),
+      value2 = String(retryable['hint'] || '')['trim'](),
+      list6 = output || errorText2 || code['message'] || '请求失败',
+      message = value2 && !list6['includes'](value2) ? list6 + '；' + value2 : list6,
       apiError = new ApiError({
-        type: String(enabled4['type'] || ErrorType['UNKNOWN'])
+        type: String(retryable['type'] || ErrorType['UNKNOWN'])
           ['trim']()
           ['toUpperCase'](),
-        provider: input,
-        code: error5['code'],
-        status: value2 ?? error5['status'],
-        message: value9,
-        retryable: enabled4['retryable'] === !![],
-        raw: error5['raw'] ?? error5,
+        provider: provider2,
+        code: code['code'],
+        status: status ?? code['status'],
+        message: message,
+        retryable: retryable['retryable'] === !![],
+        raw: code['raw'] ?? code,
       });
-    return ((apiError['hint'] = value8), (apiError['manifestRuleMatched'] = !![]), apiError);
+    return ((apiError['hint'] = value2), (apiError['manifestRuleMatched'] = !![]), apiError);
   }
-  return error5;
+  return code;
 }
+function parseGenericError(provider3, error3, status2) {
+  let message2 = '',
+    code2 = status2 >= 0x190 ? status2 : undefined;
+  if (typeof error3 === 'string') message2 = error3;
+  else
+    error3 &&
+      typeof error3 === 'object' &&
+      ((message2 = firstErrorText(
+        error3['error']?.['message'],
+        error3['error'],
+        error3['message'],
+        error3['errorMessage'],
+        error3['error_message'],
+        error3['failure_reason'],
+        error3['reason'],
+        error3['detail'],
+        error3['details'],
+        error3['msg'],
+      )),
+      (code2 =
+        error3['code'] ||
+        error3['error']?.['code'] ||
+        error3['errorCode'] ||
+        error3['error_code'] ||
+        code2));
+  const list7 = String(message2)['toUpperCase']();
+  if (list7['includes']('BALANCE') || list7['includes']('余额') || list7['includes']('QUOTA'))
+    return ApiError['insufficientBalance'](provider3, code2);
+  if (
+    status2 === 0x1ad ||
+    /\b(?:RATE[\s_-]*(?:LIMIT\w*|EXCEEDED)|TOO[\s_-]+MANY[\s_-]+REQUESTS|THROTTL(?:E|ED|ING))\b|请求过于频繁|限流/i[
+      'test'
+    ](message2)
+  )
+    return ApiError['rateLimit'](provider3, code2);
+  if (list7['includes']('AUTH') || list7['includes']('KEY') || status2 === 0x191)
+    return ApiError['authError'](provider3, code2, message2);
+  if (list7['includes']('CONTENT') || list7['includes']('FILTER') || list7['includes']('SAFETY'))
+    return ApiError['contentFiltered'](provider3, message2);
+  if (status2 >= 0x190) return ApiError['fromHttpStatus'](status2, provider3, message2);
+  return new ApiError({
+    type: ErrorType['UNKNOWN'],
+    provider: provider3,
+    code: code2,
+    message: message2 || '未知错误',
+    status: status2,
+  });
+}
+export function parseBatchErrors(value3, list8) {
+  return list8['map']((response2, value4) => {
+    if (response2['success']) return null;
+    const error4 = parseError(value3, response2['error'], response2['status']);
+    return ((error4['batchIndex'] = value4), error4);
+  })['filter'](Boolean);
+}
+export default {
+  parseError: parseError,
+  parseTaskError: parseTaskError,
+  parseNetworkError: parseNetworkError,
+  applyManifestErrorRules: applyManifestErrorRules,
+  parseBatchErrors: parseBatchErrors,
+};

@@ -1,6 +1,6 @@
 # 孤立模块清单（已落地但从入口不可达）
 
-> 由 `docs/TRACKING.md` 维护。**本表是 2026-09-28 第 126 批的实测结果**（第 150–155 批接线后删 47 件、重算 437 / 1238），不再是按批次累加的估算：
+> 由 `docs/TRACKING.md` 维护。**本表是 2026-09-28 第 126 批的实测结果**（第 150–156 批接线后删 47 件、重算 437 / 1238），不再是按批次累加的估算。第 156 批另接通 3 件 `api/errors/parsers/`，属第 126 批之后落地的新文件、不在此快照台账内：
 > 从 `index.html` 的 `<script type="module">`、`package.json` 的 `main`（`electron/main.js`）、以及按运行期加载约定补的入口（`electron/*preload*.cjs`、`db/migrations/*.cjs`、`knexfile.cjs`、`main.js`）出发，
 > 沿相对 `import` / `export … from` / 动态 `import()` / `new URL("…js", import.meta.url)` 做全图遍历，走不到的非测试 JS 模块都列在这里。
 > 脚本与证据：`deobf-tools/b126/reach.mjs`、`reach-report.txt`、`reach-orphans.json`；方法说明见 `docs/b126-reachability.md`。

@@ -253,3 +253,53 @@ manifests 聚合件（modelRegistry gain 5、vendorTextModelApiManifests gain 4 
 **新经验：`execFileSync`/`spawnSync` 在沙箱里会被静默杀掉（`status=null signal=null`，stdout 空）**
 ——大批量目录测试（737 文件）必须用 shell 分批循环跑（每批 ≤150 文件避免 E2BIG），
 而不是 Node 脚本聚合调用。此前手工批次未踩到是因为文件数少、直接命令行传参。
+
+## 12. 第 156 批：manifests/api 聚合层侦察（规格变更型，仅落 1 件）
+
+干净候选清尾后，剩余可接通孤立件 >0 的件全部落在 **manifests 聚合层与 api/adapters**。
+本批取 11 件（含 b150 记录的"不可单件" `vendorVideoModelApiManifests`）：
+
+| 件 | 镜像-仓库导入 | 性质 |
+| --- | --- | --- |
+| `src/manifests/modelRegistry.js` | 25→46 | 聚合 + 校验器升级 |
+| `src/manifests/video/modelApi/vendorVideoModelApiManifests.js` | 0→10 | 内联→拆分聚合 |
+| `src/manifests/text/modelApi/vendorTextModelApiManifests.js` | 1→6 | 聚合 |
+| `src/manifests/image/modelApi/index.js` | 13→17 | barrel |
+| `src/manifests/image/modelApi/apimartImageModelApiManifests.js` | 1→3 | 聚合 |
+| `src/manifests/image/modelApi/grsaiImageModelApiManifests.js` | 1→2 | 聚合 |
+| `src/manifests/video/dreamina/dreaminaVideoManifest.js` | 0→1 | 聚合 |
+| `api/adapters/RunningHubAdapter.js` | 13→14 | 行为 |
+| `api/adapters/ModelApiManifestNormalizer.js` | 9→13 | 规格归一 |
+| `api/adapters/runninghubWorkflowResolvers/index.js` | 0→4 | 解析器注册 |
+| `api/errors/ErrorParser.js` | 7→10 | **纯新增** |
+
+### 闭包对（实测）
+
+`modelRegistry` 与 `vendorVideoModelApiManifests` **必须同批**：新版 `modelRegistry` 求值期校验器
+（`randomSeedRow` 的 `seed` 字段必须用 `stepper` 控件）会拒绝旧版内联的
+`VIDEO_SEED_FIELD = { type: 'text', variant: 'randomSeedRow' }`，二者单落必崩（`pass=0`）。
+批内同时升代后，11 件裸导入（`import('file:///F:/CanvasPro/…')`）**全部通过**。
+
+### 结论：10/11 属「规格变更型」
+
+机械工序 11/11 全过（闸门 PASS、导出面 0 丢弃），但全量 api 域（1000 例）出现 **67 例失败**
+（HEAD 基线 1000/1000 全绿）——全部集中在模型请求构造断言，例如
+`Volcengine Seedance` 的 `body.seed` 由 `42` 变为 `undefined`、`RunningHub 视频擦除/抠像/V5.4`
+的 `nodeInfoList` 映射、`apimart gpt-image-2 4K` 比例回退、`grsai nanobanana` 枚举等。
+
+根因：仓库里 **0.7.16 的叶子 manifest 文件早已作为孤立件落地**，而聚合器
+（`modelRegistry`/`vendor*ModelApiManifests`/`ModelApiManifestNormalizer`）仍是 0.4.12。
+升代聚合器 = 一次性接通 0.7.16 的模型规格 → 请求 body 改变 → 断言 0.4.12 旧规格的测试失败。
+**逐件回滚归因因闭包耦合而失效**（单件回滚会引入自身错配：回滚 `RunningHubAdapter` 反使失败数上升到 55）。
+
+### 逐件实测（8 个失败测试文件，全落地 = 51 失败）
+
+| 单独落地 | 失败数 | 判定 |
+| --- | --- | --- |
+| `api/errors/ErrorParser.js` | **0** | 纯新增，安全 |
+| `api/adapters/runninghubWorkflowResolvers/index.js` | 7 | 规格变更（改动既有 RunningHub 视频工作流解析） |
+| 其余 9 件（含 modelRegistry 闭包对） | 41–55 | 规格变更 |
+
+**b156 最终交付：只落 `api/errors/ErrorParser.js`**（+3 个错误解析器
+`ComfyUiErrorParser`/`VolcengineErrorParser`/`VolcengineSpeechErrorParser`，0 回归），
+孤立 272→**269**，全量 **11185/11182/3**。余 10 件原地待命，是否采纳 0.7.16 模型规格需产品侧裁决。
