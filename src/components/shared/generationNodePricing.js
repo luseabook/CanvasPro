@@ -1,27 +1,27 @@
 import { graphStore } from '../../core/stores/appStore.js';
 import { bindGenerationPriceControl } from './generationPriceControl.js';
 import { resolveGenerationPriceContext } from '../../services/generationPriceContext.js';
-export function bindGenerationNodePricing(_0x59cead, { store: store = graphStore, cache: _0x235439 } = {}) {
-  const _0x26d3f5 = bindGenerationPriceControl(_0x59cead?.['btnEl'], {
-    cache: _0x235439,
+export function bindGenerationNodePricing(value, { store: store = graphStore, cache: cache } = {}) {
+  const bindGenerationPriceControl2 = bindGenerationPriceControl(value?.['btnEl'], {
+    cache: cache,
     getContext() {
-      const _0x4c938f = store['getState']();
-      return resolveGenerationPriceContext(
-        _0x4c938f['nodes']?.[_0x59cead['nodeId']] || _0x59cead['_data'] || {},
-        { edges: store['getIncomingEdges']?.(_0x59cead['nodeId']) || [], nodes: _0x4c938f['nodes'] },
-      );
+      const nodes = store['getState']();
+      return resolveGenerationPriceContext(nodes['nodes']?.[value['nodeId']] || value['_data'] || {}, {
+        edges: store['getIncomingEdges']?.(value['nodeId']) || [],
+        nodes: nodes['nodes'],
+      });
     },
-    subscribe: (_0x5bb20c) =>
+    subscribe: (item) =>
       store['subscribeSelector'](
-        (_0x28ecc7) => [
-          _0x28ecc7['nodes']?.[_0x59cead['nodeId']],
-          _0x28ecc7['_edgesRev'],
-          ...(store['getIncomingEdges']?.(_0x59cead['nodeId']) || [])['map'](
-            (_0x1b26ce) => _0x28ecc7['nodes']?.[_0x1b26ce['sourceId']],
+        (state) => [
+          state['nodes']?.[value['nodeId']],
+          state['_edgesRev'],
+          ...(store['getIncomingEdges']?.(value['nodeId']) || [])['map'](
+            (key) => state['nodes']?.[key['sourceId']],
           ),
         ],
-        _0x5bb20c,
+        item,
       ),
   });
-  return _0x26d3f5['destroy'];
+  return bindGenerationPriceControl2['destroy'];
 }

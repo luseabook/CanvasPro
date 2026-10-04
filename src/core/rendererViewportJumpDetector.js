@@ -1,30 +1,30 @@
-function normalizeViewport(_0x4e55f9 = {}) {
-  const _0x2563d9 = Number(_0x4e55f9?.['zoom']);
+function normalizeViewport(box = {}) {
+  const count = Number(box?.['zoom']);
   return {
-    x: Number['isFinite'](Number(_0x4e55f9?.['x'])) ? Number(_0x4e55f9['x']) : 0x0,
-    y: Number['isFinite'](Number(_0x4e55f9?.['y'])) ? Number(_0x4e55f9['y']) : 0x0,
-    zoom: Number['isFinite'](_0x2563d9) && _0x2563d9 > 0x0 ? _0x2563d9 : 0x1,
+    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0x0,
+    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0x0,
+    zoom: Number['isFinite'](count) && count > 0x0 ? count : 0x1,
   };
 }
 export function createRendererViewportJumpDetector({
   panThreshold: panThreshold = 0xa0,
   zoomThreshold: zoomThreshold = 0.015,
 } = {}) {
-  let _0x5039f8 = null;
+  let value = null;
   return {
-    consume(_0x598a54 = {}) {
-      const _0x5bc893 = normalizeViewport(_0x598a54),
-        _0x4b9605 = _0x5039f8;
-      _0x5039f8 = _0x5bc893;
-      if (!_0x4b9605) return ![];
+    consume(options = {}) {
+      const box2 = normalizeViewport(options),
+        box3 = value;
+      value = box2;
+      if (!box3) return ![];
       return (
-        Math['abs'](_0x5bc893['x'] - _0x4b9605['x']) > panThreshold ||
-        Math['abs'](_0x5bc893['y'] - _0x4b9605['y']) > panThreshold ||
-        Math['abs'](_0x5bc893['zoom'] - _0x4b9605['zoom']) > zoomThreshold
+        Math['abs'](box2['x'] - box3['x']) > panThreshold ||
+        Math['abs'](box2['y'] - box3['y']) > panThreshold ||
+        Math['abs'](box2['zoom'] - box3['zoom']) > zoomThreshold
       );
     },
     reset() {
-      _0x5039f8 = null;
+      value = null;
     },
   };
 }

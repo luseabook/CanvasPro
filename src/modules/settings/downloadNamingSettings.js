@@ -3,24 +3,21 @@ import {
   setDownloadUseOriginalFilename,
 } from '../../services/downloadNamingService.js';
 export function initDownloadNamingSettings() {
-  const _0x33ca76 = document['querySelectorAll'](
+  const list = document['querySelectorAll'](
       '#downloadUseOriginalFilenameGroup [data-download-original-filename]',
     ),
-    _0x2d16f8 = (_0x4d5dfa) => {
-      _0x33ca76['forEach']((_0x56e1f3) => {
-        const _0x4c026d = (_0x56e1f3['dataset']['downloadOriginalFilename'] === 'on') === _0x4d5dfa;
-        (_0x56e1f3['classList']['toggle']('active', _0x4c026d),
-          _0x56e1f3['setAttribute']('aria-pressed', String(_0x4c026d)));
+    handler = (value) => {
+      list['forEach']((el) => {
+        const item = (el['dataset']['downloadOriginalFilename'] === 'on') === value;
+        (el['classList']['toggle']('active', item), el['setAttribute']('aria-pressed', String(item)));
       });
     };
-  (_0x2d16f8(getDownloadUseOriginalFilename()),
-    _0x33ca76['forEach']((_0x3be25d) => {
-      if (_0x3be25d['__downloadNamingBound']) return;
-      ((_0x3be25d['__downloadNamingBound'] = !![]),
-        _0x3be25d['addEventListener']('click', () => {
-          _0x2d16f8(
-            setDownloadUseOriginalFilename(_0x3be25d['dataset']['downloadOriginalFilename'] === 'on'),
-          );
+  (handler(getDownloadUseOriginalFilename()),
+    list['forEach']((el2) => {
+      if (el2['__downloadNamingBound']) return;
+      ((el2['__downloadNamingBound'] = !![]),
+        el2['addEventListener']('click', () => {
+          handler(setDownloadUseOriginalFilename(el2['dataset']['downloadOriginalFilename'] === 'on'));
         }));
     }));
 }

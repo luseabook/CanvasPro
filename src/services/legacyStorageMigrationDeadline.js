@@ -1,26 +1,26 @@
 export const LEGACY_STORAGE_MIGRATION_TIMEOUT_MS = 0x4e20;
-export function createMigrationDeadline(_0x38d40b = LEGACY_STORAGE_MIGRATION_TIMEOUT_MS) {
-  const _0x2f61b6 = new AbortController(),
-    _0x42e8e3 = Object['assign'](new Error('Legacy storage migration timed out'), {
+export function createMigrationDeadline(value = LEGACY_STORAGE_MIGRATION_TIMEOUT_MS) {
+  const abortController = new AbortController(),
+    item = Object['assign'](new Error('Legacy storage migration timed out'), {
       code: 'LEGACY_STORAGE_MIGRATION_TIMEOUT',
     }),
-    _0x9a087b = setTimeout(() => _0x2f61b6['abort'](_0x42e8e3), Math['max'](0x1, _0x38d40b)),
-    { signal: _0x54b863 } = _0x2f61b6;
+    setTimeout2 = setTimeout(() => abortController['abort'](item), Math['max'](0x1, value)),
+    { signal: signal } = abortController;
   return {
-    signal: _0x54b863,
-    dispose: () => clearTimeout(_0x9a087b),
-    wait(_0x528114) {
+    signal: signal,
+    dispose: () => clearTimeout(setTimeout2),
+    wait(handler) {
       return (
-        _0x54b863['throwIfAborted'](),
-        new Promise((_0x304feb, _0x38f213) => {
-          const _0x1b9383 = () => _0x38f213(_0x54b863['reason']);
-          (_0x54b863['addEventListener']('abort', _0x1b9383, { once: !![] }),
+        signal['throwIfAborted'](),
+        new Promise((key, handler2) => {
+          const index = () => handler2(signal['reason']);
+          (signal['addEventListener']('abort', index, { once: !![] }),
             Promise['resolve']()
               ['then'](() => {
-                return (_0x54b863['throwIfAborted'](), _0x528114());
+                return (signal['throwIfAborted'](), handler());
               })
-              ['then'](_0x304feb, _0x38f213)
-              ['finally'](() => _0x54b863['removeEventListener']('abort', _0x1b9383)));
+              ['then'](key, handler2)
+              ['finally'](() => signal['removeEventListener']('abort', index)));
         })
       );
     },

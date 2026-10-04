@@ -1,24 +1,24 @@
-export function buildChatCompletionThinkingOptions(_0x2f7695 = {}, _0xdaedd4 = {}) {
-  const _0x39b00b = String(_0x2f7695['thinking']?.['type'] || '')['trim']();
-  if (_0xdaedd4['reasoningEffortMode'] === 'openai') {
-    const _0x123260 = String(_0x2f7695['reasoningEffort'] || _0x2f7695['reasoning_effort'] || '')
+export function buildChatCompletionThinkingOptions(options = {}, value = {}) {
+  const enable_thinking = String(options['thinking']?.['type'] || '')['trim']();
+  if (value['reasoningEffortMode'] === 'openai') {
+    const item = String(options['reasoningEffort'] || options['reasoning_effort'] || '')
         ['trim']()
         ['toLowerCase'](),
-      _0x235652 = ['none', 'minimal', 'low', 'medium', 'high']['includes'](_0x123260)
-        ? _0x123260
-        : _0x39b00b === 'disabled'
+      reasoning_effort = ['none', 'minimal', 'low', 'medium', 'high']['includes'](item)
+        ? item
+        : enable_thinking === 'disabled'
           ? 'minimal'
-          : _0x39b00b === 'enabled'
+          : enable_thinking === 'enabled'
             ? 'medium'
             : '';
-    if (_0x235652) return { reasoning_effort: _0x235652 };
+    if (reasoning_effort) return { reasoning_effort: reasoning_effort };
   }
   if (
-    _0xdaedd4['thinkingControlMode'] === 'enable_thinking' &&
-    ['enabled', 'disabled']['includes'](_0x39b00b)
+    value['thinkingControlMode'] === 'enable_thinking' &&
+    ['enabled', 'disabled']['includes'](enable_thinking)
   )
-    return { enable_thinking: _0x39b00b === 'enabled' };
-  return _0x39b00b && _0xdaedd4['thinkingControlMode'] === 'thinking'
-    ? { thinking: { type: _0x39b00b } }
+    return { enable_thinking: enable_thinking === 'enabled' };
+  return enable_thinking && value['thinkingControlMode'] === 'thinking'
+    ? { thinking: { type: enable_thinking } }
     : {};
 }

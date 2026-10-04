@@ -24,7 +24,7 @@ export const AGNES_MODEL_API_PROFILES = Object['freeze']({
     apiUrl: 'https://apihub.agnes-ai.com',
   }),
 });
-export function getAgnesModelApiProfile(_0x1c4af1) {
-  const _0x5e256e = String(_0x1c4af1 || '')['trim']();
-  return AGNES_MODEL_API_PROFILES[_0x5e256e] || AGNES_MODEL_API_PROFILES[AGNES_DOMESTIC_PROFILE_ID];
+export function getAgnesModelApiProfile(value) {
+  const item = String(value || '')['trim']();
+  return AGNES_MODEL_API_PROFILES[item] || AGNES_MODEL_API_PROFILES[AGNES_DOMESTIC_PROFILE_ID];
 }

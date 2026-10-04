@@ -1,1 +1,30 @@
-import{findProjectedModelOption,isPublicModelCatalogEntry,projectPublicModelCatalog}from'../modelCatalogProjection.js';export const STORYBOARD_3D_DEFAULT_TEXT_MODEL_ID='volcengine/doubao-seed-2-1-pro-260915';function normalizeText(_0x325d18){return String(_0x325d18||'')['trim']();}export function isStoryboard3DTextModelVisible(_0x37bc83){return isPublicModelCatalogEntry("text",_0x37bc83);}export function getStoryboard3DTextModelOptions(){return projectPublicModelCatalog("text");}export function getStoryboard3DTextModelIds(){return getStoryboard3DTextModelOptions()["map"](_0x21d2a0=>_0x21d2a0["modelId"]);}export function resolveStoryboard3DTextModelSelection(_0x4a7905=''){const _0x214774=getStoryboard3DTextModelOptions(),_0x3fc02a=findProjectedModelOption(_0x214774,normalizeText(_0x4a7905))||findProjectedModelOption(_0x214774,STORYBOARD_3D_DEFAULT_TEXT_MODEL_ID)||_0x214774[0x0]||null;return{'modelId':_0x3fc02a?.["modelId"]||'','provider':_0x3fc02a?.["provider"]||''};}
+import {
+  findProjectedModelOption,
+  isPublicModelCatalogEntry,
+  projectPublicModelCatalog,
+} from '../modelCatalogProjection.js';
+export const STORYBOARD_3D_DEFAULT_TEXT_MODEL_ID = 'volcengine/doubao-seed-2-1-pro-260915';
+function normalizeText(value) {
+  return String(value || '')['trim']();
+}
+export function isStoryboard3DTextModelVisible(item) {
+  return isPublicModelCatalogEntry('text', item);
+}
+export function getStoryboard3DTextModelOptions() {
+  return projectPublicModelCatalog('text');
+}
+export function getStoryboard3DTextModelIds() {
+  return getStoryboard3DTextModelOptions()['map']((key) => key['modelId']);
+}
+export function resolveStoryboard3DTextModelSelection(index = '') {
+  const storyboard3DTextModelOptions = getStoryboard3DTextModelOptions(),
+    projectedModelOption =
+      findProjectedModelOption(storyboard3DTextModelOptions, normalizeText(index)) ||
+      findProjectedModelOption(storyboard3DTextModelOptions, STORYBOARD_3D_DEFAULT_TEXT_MODEL_ID) ||
+      storyboard3DTextModelOptions[0x0] ||
+      null;
+  return {
+    modelId: projectedModelOption?.['modelId'] || '',
+    provider: projectedModelOption?.['provider'] || '',
+  };
+}

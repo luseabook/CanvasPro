@@ -8,19 +8,19 @@ import {
   claimExternalVideoPlayback,
   releaseExternalVideoPlayback,
 } from '../../shared/hoverVideoPlaybackLifecycle.js';
-export function openVideoDepthEditor(_0x1c99ab) {
+export function openVideoDepthEditor(args) {
   return openCanvasGenerationEditor({
-    ..._0x1c99ab,
+    ...args,
     settingsKey: 'videoDepthSettings',
     overlayDataKey: 'videoDepthEditor',
     renderSelector: renderAIGenVideoModelSelectorMarkup,
     bindSelector: bindAIGenVideoModelSelector,
-    selectorOptions: { allowedModelIds: [_0x1c99ab['modelId']], referenceCounts: { videoCount: 0x1 } },
-    acquireMedia({ target: _0x3d709d, source: _0x574392, overlay: _0x34c0d2 }) {
-      const _0x5ceee2 = resolveNodeVideoElement(_0x3d709d, _0x574392['mainVideoIndex']);
+    selectorOptions: { allowedModelIds: [args['modelId']], referenceCounts: { videoCount: 0x1 } },
+    acquireMedia({ target: target, source: source, overlay: overlay }) {
+      const nodeVideoElement = resolveNodeVideoElement(target, source['mainVideoIndex']);
       return (
-        claimExternalVideoPlayback(_0x5ceee2, _0x34c0d2),
-        () => releaseExternalVideoPlayback(_0x5ceee2, _0x34c0d2)
+        claimExternalVideoPlayback(nodeVideoElement, overlay),
+        () => releaseExternalVideoPlayback(nodeVideoElement, overlay)
       );
     },
   });

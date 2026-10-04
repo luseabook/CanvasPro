@@ -4,20 +4,20 @@ const BACKGROUND_THROTTLE_SWITCHES = Object.freeze([
     'disable-backgrounding-occluded-windows',
   ]),
   DISABLED_BACKGROUND_FEATURES = 'CalculateNativeWinOcclusion,IntensiveWakeUpThrottling';
-export function configureRendererResponsiveness(_0x59f534) {
-  const _0x5dd854 = _0x59f534?.commandLine;
-  if (!_0x5dd854?.appendSwitch) return;
-  for (const _0x283de6 of BACKGROUND_THROTTLE_SWITCHES) {
+export function configureRendererResponsiveness(value) {
+  const enabled = value?.commandLine;
+  if (!enabled?.appendSwitch) return;
+  for (const item of BACKGROUND_THROTTLE_SWITCHES) {
     try {
-      _0x5dd854.appendSwitch(_0x283de6);
-    } catch (_0x5e1b4a) {
-      console.warn('[electron] failed to append Chromium switch ' + _0x283de6 + ':', _0x5e1b4a);
+      enabled.appendSwitch(item);
+    } catch (key) {
+      console.warn('[electron] failed to append Chromium switch ' + item + ':', key);
     }
   }
   try {
-    _0x5dd854.appendSwitch('disable-features', DISABLED_BACKGROUND_FEATURES);
-  } catch (_0x2b3b7d) {
-    console.warn('[electron] failed to disable Chromium background features:', _0x2b3b7d);
+    enabled.appendSwitch('disable-features', DISABLED_BACKGROUND_FEATURES);
+  } catch (index) {
+    console.warn('[electron] failed to disable Chromium background features:', index);
   }
 }
 export const __rendererResponsivenessForTest = {

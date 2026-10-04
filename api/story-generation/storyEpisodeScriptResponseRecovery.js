@@ -1,22 +1,22 @@
-function getResponseText(_0x43f515) {
-  return typeof _0x43f515 === 'string' ? _0x43f515 : '';
+function getResponseText(value) {
+  return typeof value === 'string' ? value : '';
 }
-export function repairStoryEpisodeScriptMissingBodyTerminators(_0x49ce4a) {
-  const _0x33fd52 = getResponseText(_0x49ce4a);
-  if (!_0x33fd52) return { text: _0x33fd52, repairedCount: 0x0 };
-  let _0xa5390d = 0x0;
-  const _0x475773 = (_0x49558f, _0x5b7d8b, _0x5d9e57) => {
-    return ((_0xa5390d += 0x1), '' + _0x5b7d8b + _0x5d9e57 + '\x22}');
+export function repairStoryEpisodeScriptMissingBodyTerminators(item) {
+  const text = getResponseText(item);
+  if (!text) return { text: text, repairedCount: 0x0 };
+  let repairedCount = 0x0;
+  const key = (index, result, data) => {
+    return ((repairedCount += 0x1), '' + result + data + '\x22}');
   };
-  let _0x3df02f = _0x33fd52['replace'](
+  let text2 = text['replace'](
     /("body"\s*:\s*")((?:\\.|[^"\\])*?)\}(?=\s*,\s*\{\s*"(?:ref|sceneRef|scene_ref|id)"\s*:)/gu,
-    _0x475773,
+    key,
   );
   return (
-    (_0x3df02f = _0x3df02f['replace'](
+    (text2 = text2['replace'](
       /("body"\s*:\s*")((?:\\.|[^"\\])*?)\}(?=\s*\]\s*,\s*"(?:continuityFacts|facts|continuity_facts|endingState|finalState|continuityState|ending_state)"\s*:)/gu,
-      _0x475773,
+      key,
     )),
-    { text: _0x3df02f, repairedCount: _0xa5390d }
+    { text: text2, repairedCount: repairedCount }
   );
 }

@@ -5,30 +5,29 @@ const GENERATION_RUNTIME_METHODS = Object.freeze([
   'cancelGeneration',
   'resumeGeneration',
 ]);
-function buildNodeGenerationRuntime(_0xc59369) {
-  if (!_0xc59369 || typeof _0xc59369 !== 'object') return null;
-  const _0x163a50 = {};
-  for (const _0x1887ce of GENERATION_RUNTIME_METHODS) {
-    typeof _0xc59369[_0x1887ce] === 'function' &&
-      (_0x163a50[_0x1887ce] = _0xc59369[_0x1887ce].bind(_0xc59369));
+function buildNodeGenerationRuntime(enabled) {
+  if (!enabled || typeof enabled !== 'object') return null;
+  const value = {};
+  for (const item of GENERATION_RUNTIME_METHODS) {
+    typeof enabled[item] === 'function' && (value[item] = enabled[item].bind(enabled));
   }
-  return Object.keys(_0x163a50).length > 0 ? _0x163a50 : null;
+  return Object.keys(value).length > 0 ? value : null;
 }
 export function createRendererNodeRuntimeBridge({
-  getInstance: _0xaa6530,
+  getInstance: getInstance,
   registry: registry = nodeRuntimeRegistry,
 } = {}) {
   return {
-    register(_0x157c47) {
-      const _0x91d073 = buildNodeGenerationRuntime(_0xaa6530?.(_0x157c47));
-      if (!_0x91d073) {
-        registry.unregister(_0x157c47);
+    register(key) {
+      const nodeGenerationRuntime = buildNodeGenerationRuntime(getInstance?.(key));
+      if (!nodeGenerationRuntime) {
+        registry.unregister(key);
         return;
       }
-      registry.register(_0x157c47, _0x91d073);
+      registry.register(key, nodeGenerationRuntime);
     },
-    unregister(_0x435ff8) {
-      registry.unregister(_0x435ff8);
+    unregister(index) {
+      registry.unregister(index);
     },
   };
 }

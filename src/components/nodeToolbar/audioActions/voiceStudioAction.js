@@ -1,23 +1,20 @@
 import { AUDIO_VOICE_PANEL_OPEN_EVENT } from '../../../modules/audioVoicePanelEvents.js';
 export function bindAudioVoiceStudioAction({
-  button: _0x1b0baf,
-  getNodeId: _0x2f1cc6,
+  button: button,
+  getNodeId: getNodeId,
   windowRef: windowRef = globalThis['window'],
 } = {}) {
-  if (!_0x1b0baf) return () => {};
-  const _0x433415 = (_0x3912a6) => {
-    (_0x3912a6?.['preventDefault']?.(), _0x3912a6?.['stopPropagation']?.());
-    const _0x218062 = String(typeof _0x2f1cc6 === 'function' ? _0x2f1cc6() : '')['trim']();
-    if (!_0x218062 || typeof windowRef?.['dispatchEvent'] !== 'function') return;
-    const _0x2c56c9 = { sourceNodeId: _0x218062 },
-      _0x51b661 =
+  if (!button) return () => {};
+  const value = (event) => {
+    (event?.['preventDefault']?.(), event?.['stopPropagation']?.());
+    const sourceNodeId = String(typeof getNodeId === 'function' ? getNodeId() : '')['trim']();
+    if (!sourceNodeId || typeof windowRef?.['dispatchEvent'] !== 'function') return;
+    const detail = { sourceNodeId: sourceNodeId },
+      item =
         typeof globalThis['CustomEvent'] === 'function'
-          ? new globalThis['CustomEvent'](AUDIO_VOICE_PANEL_OPEN_EVENT, { detail: _0x2c56c9 })
-          : { type: AUDIO_VOICE_PANEL_OPEN_EVENT, detail: _0x2c56c9 };
-    windowRef['dispatchEvent'](_0x51b661);
+          ? new globalThis['CustomEvent'](AUDIO_VOICE_PANEL_OPEN_EVENT, { detail: detail })
+          : { type: AUDIO_VOICE_PANEL_OPEN_EVENT, detail: detail };
+    windowRef['dispatchEvent'](item);
   };
-  return (
-    _0x1b0baf['addEventListener']('click', _0x433415),
-    () => _0x1b0baf['removeEventListener']('click', _0x433415)
-  );
+  return (button['addEventListener']('click', value), () => button['removeEventListener']('click', value));
 }

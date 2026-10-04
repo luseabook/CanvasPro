@@ -1,7 +1,7 @@
 import { createToolbarHtml, createToolbarIconButton } from '../nodeToolbar/buttonFactory.js';
 import { t } from '../../i18n/index.js';
-function panoramaSceneText(_0x261547, _0x4c311b = {}) {
-  return t('panoramaSceneNode.' + _0x261547, _0x4c311b);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
 const ICONS = {
   environment:

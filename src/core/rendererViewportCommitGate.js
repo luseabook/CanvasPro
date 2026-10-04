@@ -2,21 +2,21 @@ export function createRendererViewportCommitGate({
   delayMs: delayMs = 0x0,
   shouldDefer: shouldDefer = () => ![],
 } = {}) {
-  let _0x3998ac = null,
-    _0x9b9d8e = ![];
-  function _0x39fe2b(_0x2ad34e, _0x28b96f, _0x31cf7a) {
-    ((_0x3998ac = { mode: _0x2ad34e, nodeCount: _0x28b96f, edgesRev: _0x31cf7a }), (_0x9b9d8e = ![]));
+  let value = null,
+    enabled = ![];
+  function remember(mode, nodeCount, edgesRev) {
+    ((value = { mode: mode, nodeCount: nodeCount, edgesRev: edgesRev }), (enabled = ![]));
   }
-  function _0x52cf4c() {
-    ((_0x3998ac = null), (_0x9b9d8e = ![]));
+  function reset() {
+    ((value = null), (enabled = ![]));
   }
-  function _0x3ac71d(_0x316aa4, _0x1b9aef, _0x1eb196) {
-    if (_0x9b9d8e) return ![];
-    const _0x37ed8c = _0x3998ac;
-    if (!_0x37ed8c || (_0x37ed8c['mode'] !== 'panning' && _0x37ed8c['mode'] !== 'zooming')) return ![];
-    if (_0x37ed8c['nodeCount'] !== _0x316aa4 || _0x37ed8c['edgesRev'] !== _0x1b9aef) return ![];
-    if (!shouldDefer({ nodeCount: _0x316aa4, edgesRev: _0x1b9aef, viewport: _0x1eb196 })) return ![];
-    return ((_0x9b9d8e = !![]), !![]);
+  function consumeShouldDefer(nodeCount2, edgesRev2, viewport) {
+    if (enabled) return ![];
+    const enabled2 = value;
+    if (!enabled2 || (enabled2['mode'] !== 'panning' && enabled2['mode'] !== 'zooming')) return ![];
+    if (enabled2['nodeCount'] !== nodeCount2 || enabled2['edgesRev'] !== edgesRev2) return ![];
+    if (!shouldDefer({ nodeCount: nodeCount2, edgesRev: edgesRev2, viewport: viewport })) return ![];
+    return ((enabled = !![]), !![]);
   }
-  return { consumeShouldDefer: _0x3ac71d, delayMs: delayMs, remember: _0x39fe2b, reset: _0x52cf4c };
+  return { consumeShouldDefer: consumeShouldDefer, delayMs: delayMs, remember: remember, reset: reset };
 }

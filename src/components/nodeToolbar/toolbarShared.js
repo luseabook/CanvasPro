@@ -1,25 +1,23 @@
 import { t } from '../../i18n/index.js';
-function toolbarText(_0x101b70, _0x1be8fb = {}) {
-  return t('nodeToolbar.common.' + _0x101b70, _0x1be8fb);
+function toolbarText(value, item = {}) {
+  return t('nodeToolbar.common.' + value, item);
 }
-export function showDevToast(_0x14b7b1, _0x501380 = '') {
-  document.querySelectorAll('.v2-dev-toast').forEach((_0x1e246c) => _0x1e246c.remove());
-  const _0x45e732 = document.createElement('div');
-  _0x45e732.className = 'v2-dev-toast';
-  if (_0x501380) {
-    const _0x24204b = document.createElement('div');
-    ((_0x24204b.className = 'v2-dev-toast-icon'),
-      (_0x24204b.textContent = _0x501380),
-      _0x45e732.appendChild(_0x24204b));
+export function showDevToast(text, key = '') {
+  document.querySelectorAll('.v2-dev-toast').forEach((el) => el.remove());
+  const el2 = document.createElement('div');
+  el2.className = 'v2-dev-toast';
+  if (key) {
+    const el3 = document.createElement('div');
+    ((el3.className = 'v2-dev-toast-icon'), (el3.textContent = key), el2.appendChild(el3));
   }
-  const _0x443726 = document.createElement('span');
-  ((_0x443726.className = 'v2-dev-toast-text'),
-    (_0x443726.textContent = toolbarText('developmentSuffix', { text: _0x14b7b1 })),
-    _0x45e732.appendChild(_0x443726),
-    document.body.appendChild(_0x45e732),
-    _0x45e732.offsetHeight,
-    _0x45e732.classList.add('is-visible'),
+  const el4 = document.createElement('span');
+  ((el4.className = 'v2-dev-toast-text'),
+    (el4.textContent = toolbarText('developmentSuffix', { text: text })),
+    el2.appendChild(el4),
+    document.body.appendChild(el2),
+    el2.offsetHeight,
+    el2.classList.add('is-visible'),
     setTimeout(() => {
-      (_0x45e732.classList.remove('is-visible'), setTimeout(() => _0x45e732.remove(), 0x12c));
+      (el2.classList.remove('is-visible'), setTimeout(() => el2.remove(), 0x12c));
     }, 0x7d0));
 }

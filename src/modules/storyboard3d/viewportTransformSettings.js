@@ -6,20 +6,23 @@ const DEFAULT_TRANSFORM_SETTINGS = Object['freeze']({
   uniformScale: ![],
   snapEnabled: ![],
 });
-export function loadStoryboard3DTransformSettings(_0x2f372d = globalThis['localStorage']) {
+export function loadStoryboard3DTransformSettings(value = globalThis['localStorage']) {
   try {
-    const _0x40805a = _0x2f372d?.['getItem']?.(STORYBOARD_3D_TRANSFORM_STORAGE_KEY);
+    const item = value?.['getItem']?.(STORYBOARD_3D_TRANSFORM_STORAGE_KEY);
     return normalizeStoryboard3DViewportSettings(
-      _0x40805a ? { ...DEFAULT_TRANSFORM_SETTINGS, ...JSON['parse'](_0x40805a) } : DEFAULT_TRANSFORM_SETTINGS,
+      item ? { ...DEFAULT_TRANSFORM_SETTINGS, ...JSON['parse'](item) } : DEFAULT_TRANSFORM_SETTINGS,
     );
   } catch {
     return normalizeStoryboard3DViewportSettings(DEFAULT_TRANSFORM_SETTINGS);
   }
 }
-export function saveStoryboard3DTransformSettings(_0x28bed9, _0x5d9143 = globalThis['localStorage']) {
-  const _0x25b0b3 = normalizeStoryboard3DViewportSettings(_0x28bed9);
+export function saveStoryboard3DTransformSettings(key, index = globalThis['localStorage']) {
+  const storyboard3DViewportSettings = normalizeStoryboard3DViewportSettings(key);
   try {
-    _0x5d9143?.['setItem']?.(STORYBOARD_3D_TRANSFORM_STORAGE_KEY, JSON['stringify'](_0x25b0b3));
+    index?.['setItem']?.(
+      STORYBOARD_3D_TRANSFORM_STORAGE_KEY,
+      JSON['stringify'](storyboard3DViewportSettings),
+    );
   } catch {}
-  return _0x25b0b3;
+  return storyboard3DViewportSettings;
 }

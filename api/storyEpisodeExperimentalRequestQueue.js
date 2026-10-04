@@ -6,27 +6,27 @@ function drainStoryEpisodeExperimentalRequestQueue() {
     activeRequestCount < STORY_EPISODE_EXPERIMENTAL_REQUEST_CONCURRENCY_LIMIT &&
     pendingRequests['length']
   ) {
-    const _0x17a34c = pendingRequests['shift']();
+    const promise = pendingRequests['shift']();
     ((activeRequestCount += 0x1),
       void (async () => {
         try {
-          _0x17a34c['resolve'](await _0x17a34c['operation']());
-        } catch (_0x5682e3) {
-          _0x17a34c['reject'](_0x5682e3);
+          promise['resolve'](await promise['operation']());
+        } catch (value) {
+          promise['reject'](value);
         } finally {
           ((activeRequestCount -= 0x1), drainStoryEpisodeExperimentalRequestQueue());
         }
       })());
   }
 }
-export function enqueueStoryEpisodeExperimentalRequest(_0x268de4) {
-  if (typeof _0x268de4 !== 'function')
+export function enqueueStoryEpisodeExperimentalRequest(operation) {
+  if (typeof operation !== 'function')
     return Promise['reject'](new TypeError('实验分集请求队列需要可执行的请求函数。'));
-  return new Promise((_0x12b608, _0x574d6c) => {
+  return new Promise((resolve, reject) => {
     (pendingRequests['push']({
-      operation: _0x268de4,
-      resolve: _0x12b608,
-      reject: _0x574d6c,
+      operation: operation,
+      resolve: resolve,
+      reject: reject,
     }),
       drainStoryEpisodeExperimentalRequestQueue());
   });
