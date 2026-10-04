@@ -139,3 +139,31 @@ core 目录 266/266、stores 目录 21/21；孤立模块再接通 **11 件**（3
 （`Cannot access 'legacyKernelStore_2' before initialization`）。
 HEAD 原件同样必挂，属循环导入 + 求值顺序的环境性产物；应用内入口顺序不同所以不炸。
 修复需改在用 `runtime.js` 初始化顺序，须单独授权。bare 导入闸门对 stores 件以目录测试替代。
+
+## 8. 第 152 批续：`api` 干净件（10 取 3）
+
+对 `api` 的 10 个干净候选（onlyRepo=0、非受保护、无受保护下游）升代，逐件落地逐件归因：
+
+| 文件 | 改名 | 归因失败 | 结果 |
+| --- | --- | --- | --- |
+| `imageUploadApi.js` | 136 | 0 | **保留** |
+| `runninghubWorkflowApi.js` | 53 | 0 | **保留** |
+| `sceneDetectionApi.js` | 42 | 0 | **保留** |
+| `adapters/ModelApiManifestNormalizer.js` | 883 | 50 | **回滚** |
+| `aiImageApi.js` | 628 | 38 | **回滚** |
+| `aiVideoApi.js` | 522 | 9 | **回滚** |
+| `adapters/runninghubWorkflowResolvers/index.js` | 240 | +7 | **回滚** |
+| `aiTextApi.js` | 447 | 6 | **回滚** |
+| `providerConnectionTestApi.js` | 379 | 6 | **回滚** |
+| `aiAudioApi.js` | 465 | 1 | **回滚** |
+
+机械工序 10/10 全过（共改名 3,795、闸门 PASS、导出面 0 丢弃、`_0x` 残留 0）。
+保留 3 件后 api 目录 658/658；再接通孤立 **4 件**（368 口径 345 → 341）：
+`api/customProviderAssetUploadApi`、`api/runninghubTaskLifecycle`、
+`api/runningHubUploadResponse`、`api/runningHubWorkflowPollingPolicy`。
+全量 11185/11182/3，失败名单与基线逐条一致，零新增。
+
+**关键结论：`api` 域回归密度远高于 `core`/`commands`**——10 取 7 败 vs core 的 6 取 1 败。
+新代 api 层包含密集真实行为变化（轮询策略、错误分类、请求体组装、探针顺序），
+其单测恰好逐条编码了旧行为。**后续 api 消费方升代（含 `api/index.js` 门面）必须按依赖闭包
+分组推进，先把行为差异当作规格差异逐条裁决，而不是当作「测试侧预期」修正。**

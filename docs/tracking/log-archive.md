@@ -3,6 +3,8 @@
 > 由 `docs/TRACKING.md` §9 第 4 条维护：TRACKING.md §11 只保留最新 10 条，挤出来的旧日志移到这里，最新的在上。
 > 只追加，不改写已有内容。
 
+- 2026-10-04（151 批·接线第 2 小样）：升代 `src/core` 干净件 6 取 5（rendererResizePreview、viewportFocus、viewportPanPreview、stores/legacyKernelStore、stores/facadeStore，改名 1092、导出面不变），再接通孤立 11 件（368 口径 356→345；483 口径删 previewCommitSession 为 473/1238）。generationTaskRuntime 自身测试回归已回滚。发现既有雷：stores/runtime.js 与 legacyKernelStore 循环导入、直连入口 TDZ（HEAD 同挂，非本批引入）。全量 11185/11185/0，基线 3 个 installerSafety 失败本轮未复现（偶发），改动相关新增 0。
+
 - 2026-09-29（暂停跟踪）：提交并推送 `4c3bc6c` 后，按用户要求停止 watcher PID 14788，取消 `.vscode/tasks.json` 的 `folderOpen` 自动启动，并在 `AGENTS.md`、本文件写明暂停状态；恢复前不运行任何跟踪登记命令。
 
 - 2026-09-29（恢复跟踪）：按用户要求移除 `AGENTS.md` 与 `docs/TRACKING.md` 的暂停说明，恢复 `.vscode/tasks.json` 的 `folderOpen` 自动启动；已执行 `--by session-start` 补记暂停期间 #0134，并恢复自动监视进程。
