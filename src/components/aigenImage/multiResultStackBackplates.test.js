@@ -225,7 +225,7 @@ function createClassListHost() {
       assertSourceWiring(_0xb0ea94, /mediaEl\.style\.opacity = showExpandedCard \? "1" : "0"/),
       assertSourceWiring(_0xb0ea94, /this\._loadLazyImageDisplaySource\(mediaEl\)/),
       assertSourceWiring(_0xb0ea94,
-        /this\._scheduleClearLazyImageDisplaySource\(\s*mediaEl,\s*multiStackMotionDurationMs,\s*\)/,
+        /this\._scheduleClearLazyImageDisplaySource\(\s*mediaEl,\s*multiStackMotionDurationMs,?\s*\)/,
       ),
       assertSourceWiring(_0xb0ea94, /this\._clearLazyImageDisplaySource\(mediaEl\)/),
       assertSourceWiring(_0xb0ea94, /this\._setLazyImageDisplaySource\(layerImg,\s*layerDisplayLod\)/),
