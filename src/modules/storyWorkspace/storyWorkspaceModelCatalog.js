@@ -1,1 +1,61 @@
-import{getModelManifest}from'../../manifests/modelRegistry.js';import{isVideoAnalysisModel}from'../../manifests/textVideoUnderstanding.js';import{findProjectedModelOption,getModelCatalogProviderLabel,isPublicModelCatalogEntry,projectPublicModelCatalog}from'../modelCatalogProjection.js';const DEFAULT_MODEL_IDS=Object["freeze"]({'text':'volcengine/doubao-seed-2-1-pro-260915','image':"apimart/seedream-5.0-pro",'video':"apimart/doubao-seedance-2.0"});export const STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_IDS=Object['freeze'](["runninghub/2084286867645755393"]);const STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_ID_SET=new Set(STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_IDS);function isStoryWorkspaceManifestEligible(_0x4e51a9,_0x2c2963){if(!_0x2c2963||_0x2c2963["kind"]!==_0x4e51a9)return![];if(_0x4e51a9==="video"&&_0x2c2963['provider']==="runninghubwf"&&_0x2c2963["adapterType"]==='workflow')return STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_ID_SET["has"](_0x2c2963["modelId"]);return!![];}export function isStoryWorkspaceModelVisible(_0x17fed5,_0x5d4919){const _0x13c207=typeof _0x5d4919==='string'?getModelManifest(_0x5d4919):_0x5d4919;return isPublicModelCatalogEntry(_0x17fed5,_0x13c207)&&isStoryWorkspaceManifestEligible(_0x17fed5,_0x13c207);}export function getStoryWorkspaceModelOptions(_0x2142f0){return projectPublicModelCatalog(_0x2142f0,{'isEligible':_0x4eb0f1=>isStoryWorkspaceManifestEligible(_0x2142f0,_0x4eb0f1)});}export function isStoryVideoInputTextModel(_0x4932b1){return isVideoAnalysisModel(_0x4932b1);}export function getStoryVideoInputTextModelOptions(){return getStoryWorkspaceModelOptions("text")["filter"](_0x94727=>isStoryVideoInputTextModel(_0x94727["modelId"]));}export function resolveStoryVideoInputTextModelId(_0xb970a4=''){const _0x4ec21d=String(_0xb970a4||'')["trim"]();if(_0x4ec21d&&isStoryVideoInputTextModel(_0x4ec21d))return _0x4ec21d;return getStoryVideoInputTextModelOptions()[0x0]?.["modelId"]||'';}export function resolveStoryWorkspaceModelId(_0x57f42e,_0x59c382=''){const _0x24b929=String(_0x59c382||'')["trim"]();if(_0x24b929&&isStoryWorkspaceModelVisible(_0x57f42e,_0x24b929))return _0x24b929;const _0x2ee9b8=DEFAULT_MODEL_IDS[_0x57f42e];if(_0x2ee9b8&&isStoryWorkspaceModelVisible(_0x57f42e,_0x2ee9b8))return _0x2ee9b8;return getStoryWorkspaceModelOptions(_0x57f42e)[0x0]?.['modelId']||'';}export function getStoryWorkspaceModelChoice(_0x2b18ca,_0x276508=''){const _0x2984ee=resolveStoryWorkspaceModelId(_0x2b18ca,_0x276508);return findProjectedModelOption(getStoryWorkspaceModelOptions(_0x2b18ca),_0x2984ee);}export function getStoryWorkspaceProviderLabel(_0x1e5720){return getModelCatalogProviderLabel(_0x1e5720);}
+import { getModelManifest } from '../../manifests/modelRegistry.js';
+import { isVideoAnalysisModel } from '../../manifests/textVideoUnderstanding.js';
+import {
+  findProjectedModelOption,
+  getModelCatalogProviderLabel,
+  isPublicModelCatalogEntry,
+  projectPublicModelCatalog,
+} from '../modelCatalogProjection.js';
+const DEFAULT_MODEL_IDS = Object['freeze']({
+  text: 'volcengine/doubao-seed-2-1-pro-260915',
+  image: 'apimart/seedream-5.0-pro',
+  video: 'apimart/doubao-seedance-2.0',
+});
+export const STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_IDS = Object['freeze']([
+  'runninghub/2084286867645755393',
+]);
+const STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_ID_SET = new Set(
+  STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_IDS,
+);
+function isStoryWorkspaceManifestEligible(value, enabled) {
+  if (!enabled || enabled['kind'] !== value) return ![];
+  if (value === 'video' && enabled['provider'] === 'runninghubwf' && enabled['adapterType'] === 'workflow')
+    return STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_ID_SET['has'](enabled['modelId']);
+  return !![];
+}
+export function isStoryWorkspaceModelVisible(item, key) {
+  const index = typeof key === 'string' ? getModelManifest(key) : key;
+  return isPublicModelCatalogEntry(item, index) && isStoryWorkspaceManifestEligible(item, index);
+}
+export function getStoryWorkspaceModelOptions(result) {
+  return projectPublicModelCatalog(result, {
+    isEligible: (data) => isStoryWorkspaceManifestEligible(result, data),
+  });
+}
+export function isStoryVideoInputTextModel(options) {
+  return isVideoAnalysisModel(options);
+}
+export function getStoryVideoInputTextModelOptions() {
+  return getStoryWorkspaceModelOptions('text')['filter']((target) =>
+    isStoryVideoInputTextModel(target['modelId']),
+  );
+}
+export function resolveStoryVideoInputTextModelId(source = '') {
+  const next = String(source || '')['trim']();
+  if (next && isStoryVideoInputTextModel(next)) return next;
+  return getStoryVideoInputTextModelOptions()[0x0]?.['modelId'] || '';
+}
+export function resolveStoryWorkspaceModelId(current, entry = '') {
+  const record = String(entry || '')['trim']();
+  if (record && isStoryWorkspaceModelVisible(current, record)) return record;
+  const payload = DEFAULT_MODEL_IDS[current];
+  if (payload && isStoryWorkspaceModelVisible(current, payload)) return payload;
+  return getStoryWorkspaceModelOptions(current)[0x0]?.['modelId'] || '';
+}
+export function getStoryWorkspaceModelChoice(handle, state = '') {
+  const storyWorkspaceModelId = resolveStoryWorkspaceModelId(handle, state);
+  return findProjectedModelOption(getStoryWorkspaceModelOptions(handle), storyWorkspaceModelId);
+}
+export function getStoryWorkspaceProviderLabel(config) {
+  return getModelCatalogProviderLabel(config);
+}

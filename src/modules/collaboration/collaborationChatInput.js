@@ -1,55 +1,54 @@
 import { hasActiveModalInteraction } from '../../services/modalInteractionScope.js';
 export function bindCollaborationChatInput({
-  chat: _0x206e7a,
-  store: _0x55d260,
-  resolveShortcutActionForEvent: _0x22bed0,
-  isRecording: _0x397522,
+  chat: chat,
+  store: store,
+  resolveShortcutActionForEvent: resolveShortcutActionForEvent,
+  isRecording: isRecording,
   windowObject: windowObject = window,
 }) {
-  const _0x2ab5cd = (_0x1c6728) =>
-    _0x1c6728?.['closest']?.("input, textarea, [contenteditable='true'], [role='textbox']");
-  function _0x3f228e(_0x27316b) {
+  const run = (el) => el?.['closest']?.("input, textarea, [contenteditable='true'], [role='textbox']");
+  function run2(value) {
     if (
-      _0x27316b['detail'] === 'collaboration-chat-add-selection' &&
-      !_0x397522() &&
+      value['detail'] === 'collaboration-chat-add-selection' &&
+      !isRecording() &&
       !hasActiveModalInteraction()
     )
-      _0x206e7a['addNodes']([...(_0x55d260['getStateRaw']()['selectedNodeIds'] || [])]);
+      chat['addNodes']([...(store['getStateRaw']()['selectedNodeIds'] || [])]);
   }
-  let _0x32f746 = null;
-  function _0x3df361(_0x523315) {
-    _0x32f746 = null;
+  let value2 = null;
+  function run3(event) {
+    value2 = null;
     if (
-      !_0x206e7a['isOpen']() ||
-      _0x523315['button'] !== 0x0 ||
-      _0x397522() ||
+      !chat['isOpen']() ||
+      event['button'] !== 0x0 ||
+      isRecording() ||
       hasActiveModalInteraction() ||
-      _0x2ab5cd(_0x523315['target'])
+      run(event['target'])
     )
       return;
-    if (!_0x22bed0(_0x523315, ['collaboration-chat-pick-node'])) return;
-    const _0x5e1865 = _0x523315['target']?.['closest']?.('.v2-node');
-    if (!_0x5e1865 || !_0x55d260['getStateRaw']()['nodes'][_0x5e1865['id']]) return;
-    _0x206e7a['addNodes']([_0x5e1865['id']]) &&
-      ((_0x32f746 = _0x5e1865), _0x523315['preventDefault'](), _0x523315['stopImmediatePropagation']());
+    if (!resolveShortcutActionForEvent(event, ['collaboration-chat-pick-node'])) return;
+    const enabled = event['target']?.['closest']?.('.v2-node');
+    if (!enabled || !store['getStateRaw']()['nodes'][enabled['id']]) return;
+    chat['addNodes']([enabled['id']]) &&
+      ((value2 = enabled), event['preventDefault'](), event['stopImmediatePropagation']());
   }
-  function _0x190c1a(_0x1574e9) {
-    _0x32f746?.['contains'](_0x1574e9['target']) &&
-      ((_0x32f746 = null), _0x1574e9['preventDefault'](), _0x1574e9['stopImmediatePropagation']());
+  function run4(event2) {
+    value2?.['contains'](event2['target']) &&
+      ((value2 = null), event2['preventDefault'](), event2['stopImmediatePropagation']());
   }
-  function _0x34b469() {
-    _0x32f746 = null;
+  function run5() {
+    value2 = null;
   }
   return (
-    windowObject['addEventListener']('shortcut-action', _0x3f228e),
-    windowObject['addEventListener']('pointerdown', _0x3df361, !![]),
-    windowObject['addEventListener']('click', _0x190c1a, !![]),
-    windowObject['addEventListener']('blur', _0x34b469),
+    windowObject['addEventListener']('shortcut-action', run2),
+    windowObject['addEventListener']('pointerdown', run3, !![]),
+    windowObject['addEventListener']('click', run4, !![]),
+    windowObject['addEventListener']('blur', run5),
     () => {
-      (windowObject['removeEventListener']('shortcut-action', _0x3f228e),
-        windowObject['removeEventListener']('pointerdown', _0x3df361, !![]),
-        windowObject['removeEventListener']('click', _0x190c1a, !![]),
-        windowObject['removeEventListener']('blur', _0x34b469));
+      (windowObject['removeEventListener']('shortcut-action', run2),
+        windowObject['removeEventListener']('pointerdown', run3, !![]),
+        windowObject['removeEventListener']('click', run4, !![]),
+        windowObject['removeEventListener']('blur', run5));
     }
   );
 }

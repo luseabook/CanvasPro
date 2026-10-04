@@ -1,9 +1,9 @@
 import { normalizeNodeIds } from './graphCommands.js';
-function getState(_0x205c88) {
-  return _0x205c88.store?.getStateRaw?.() || _0x205c88.store?.getState?.() || {};
+function getState(value) {
+  return value.store?.getStateRaw?.() || value.store?.getState?.() || {};
 }
-export function registerSelectionCommands(_0x23fde8) {
-  (_0x23fde8.register({
+export function registerSelectionCommands(item) {
+  (item.register({
     id: 'node.select',
     description: 'Select canvas nodes.',
     riskLevel: 'safe',
@@ -13,41 +13,41 @@ export function registerSelectionCommands(_0x23fde8) {
     },
     capabilitySchema: { reads: ['nodes'], writes: ['selection'] },
     returnSchema: { aliasFields: ['ids'] },
-    validate(_0x58aa07 = {}, _0x7f70fb = {}) {
+    validate(options = {}, key = {}) {
       try {
-        return { args: { ids: normalizeNodeIds(_0x58aa07, _0x7f70fb, { min: 1, allowSelection: false }) } };
-      } catch (_0x5abb1c) {
+        return { args: { ids: normalizeNodeIds(options, key, { min: 1, allowSelection: false }) } };
+      } catch (errorCode) {
         return {
           ok: false,
-          errorCode: _0x5abb1c.errorCode || 'INVALID_NODE_SELECTION',
-          message: _0x5abb1c.message,
-          details: _0x5abb1c.details,
+          errorCode: errorCode.errorCode || 'INVALID_NODE_SELECTION',
+          message: errorCode.message,
+          details: errorCode.details,
         };
       }
     },
-    execute(_0x95fabf, _0x22685b) {
-      return (_0x22685b.store?.setSelectedNodes?.(_0x95fabf.ids), { ids: _0x95fabf.ids });
+    execute(ids, index) {
+      return (index.store?.setSelectedNodes?.(ids.ids), { ids: ids.ids });
     },
   }),
-    _0x23fde8.register({
+    item.register({
       id: 'graph.getSelection',
       description: 'Get selected canvas nodes.',
       riskLevel: 'safe',
       argsSchema: {},
       capabilitySchema: { reads: ['selection', 'nodes'], writes: [] },
       returnSchema: { aliasFields: ['selectedNodeIds', 'nodes'] },
-      execute(_0x20be02, _0x4d913d) {
-        const _0x1b685d = getState(_0x4d913d),
-          _0x5ee422 = Array.isArray(_0x1b685d.selectedNodeIds) ? [..._0x1b685d.selectedNodeIds] : [];
+      execute(result, data) {
+        const args = getState(data),
+          selectedNodeIds = Array.isArray(args.selectedNodeIds) ? [...args.selectedNodeIds] : [];
         return {
-          selectedNodeIds: _0x5ee422,
-          nodes: _0x5ee422
-            .map((_0x29a419) => _0x1b685d.nodes?.[_0x29a419])
+          selectedNodeIds: selectedNodeIds,
+          nodes: selectedNodeIds
+            .map((item2) => args.nodes?.[item2])
             .filter(Boolean)
-            .map((_0x3715c4) => ({
-              id: String(_0x3715c4.id || ''),
-              type: String(_0x3715c4.type || ''),
-              name: String(_0x3715c4.name || ''),
+            .map((error) => ({
+              id: String(error.id || ''),
+              type: String(error.type || ''),
+              name: String(error.name || ''),
             })),
         };
       },

@@ -1,55 +1,52 @@
 import { t } from '../i18n/index.js';
 import { showGenerationCompleteNotification } from '../services/completionNotificationService.js';
 import { playCompletionSound } from '../services/completionSoundService.js';
-function panelText(_0xe00e42, _0x3cc100 = {}) {
-  return t('audioVoicePanel.' + _0xe00e42, _0x3cc100);
+function panelText(value, item = {}) {
+  return t('audioVoicePanel.' + value, item);
 }
-export function summarizeAudioVoiceGenerationResults(_0x13c39c = [], _0x47eb1c = 0x0) {
-  const _0x4e2775 = Array['isArray'](_0x13c39c) ? _0x13c39c : [],
-    _0x142662 = Math['max'](_0x4e2775['length'], Math['max'](0x0, Math['trunc'](Number(_0x47eb1c) || 0x0))),
-    _0x495b4e = _0x4e2775['filter']((_0x1523bc) => {
-      if (_0x1523bc?.['status'] !== 'fulfilled') return ![];
-      const _0x457733 = String(_0x1523bc?.['value']?.['status'] || '')
+export function summarizeAudioVoiceGenerationResults(list = [], key = 0x0) {
+  const list2 = Array['isArray'](list) ? list : [],
+    total = Math['max'](list2['length'], Math['max'](0x0, Math['trunc'](Number(key) || 0x0))),
+    succeeded = list2['filter']((el) => {
+      if (el?.['status'] !== 'fulfilled') return ![];
+      const enabled = String(el?.['value']?.['status'] || '')
         ['trim']()
         ['toLowerCase']();
-      return !_0x457733 || _0x457733 === 'success';
+      return !enabled || enabled === 'success';
     })['length'];
-  return { total: _0x142662, succeeded: _0x495b4e, incomplete: Math['max'](0x0, _0x142662 - _0x495b4e) };
+  return { total: total, succeeded: succeeded, incomplete: Math['max'](0x0, total - succeeded) };
 }
-export function buildAudioVoiceGenerationCompletionMessage(_0x5883a8 = {}) {
-  const _0x2022cb = Math['max'](0x1, Math['trunc'](Number(_0x5883a8?.['total']) || 0x0)),
-    _0x11f063 = Math['max'](
-      0x0,
-      Math['min'](_0x2022cb, Math['trunc'](Number(_0x5883a8?.['succeeded']) || 0x0)),
-    ),
-    _0x2f2d7c = Math['max'](
+export function buildAudioVoiceGenerationCompletionMessage(options = {}) {
+  const count = Math['max'](0x1, Math['trunc'](Number(options?.['total']) || 0x0)),
+    succeeded2 = Math['max'](0x0, Math['min'](count, Math['trunc'](Number(options?.['succeeded']) || 0x0))),
+    incomplete = Math['max'](
       0x0,
       Math['min'](
-        _0x2022cb,
-        Number['isFinite'](Number(_0x5883a8?.['incomplete']))
-          ? Math['trunc'](Number(_0x5883a8['incomplete']))
-          : _0x2022cb - _0x11f063,
+        count,
+        Number['isFinite'](Number(options?.['incomplete']))
+          ? Math['trunc'](Number(options['incomplete']))
+          : count - succeeded2,
       ),
     );
-  if (_0x2f2d7c > 0x0)
-    return panelText('toasts.generationBatchSettled', { succeeded: _0x11f063, incomplete: _0x2f2d7c });
-  return _0x2022cb === 0x1
+  if (incomplete > 0x0)
+    return panelText('toasts.generationBatchSettled', { succeeded: succeeded2, incomplete: incomplete });
+  return count === 0x1
     ? panelText('toasts.generationCompleteSingle')
-    : panelText('toasts.generationCompleteBatch', { count: _0x2022cb });
+    : panelText('toasts.generationCompleteBatch', { count: count });
 }
 export function notifyAudioVoiceGenerationComplete(
-  _0x566dfe = {},
+  options2 = {},
   {
     playSound: playSound = playCompletionSound,
     showNotification: showNotification = showGenerationCompleteNotification,
   } = {},
 ) {
-  const _0x227a12 = buildAudioVoiceGenerationCompletionMessage(_0x566dfe),
-    _0x59aaae = [];
+  const body = buildAudioVoiceGenerationCompletionMessage(options2),
+    list3 = [];
   return (
-    Math['max'](0x0, Number(_0x566dfe?.['succeeded']) || 0x0) > 0x0 &&
-      _0x59aaae['push'](Promise['resolve']()['then'](() => playSound?.('generation-success'))),
-    _0x59aaae['push'](Promise['resolve']()['then'](() => showNotification?.({ body: _0x227a12 }))),
-    Promise['allSettled'](_0x59aaae)
+    Math['max'](0x0, Number(options2?.['succeeded']) || 0x0) > 0x0 &&
+      list3['push'](Promise['resolve']()['then'](() => playSound?.('generation-success'))),
+    list3['push'](Promise['resolve']()['then'](() => showNotification?.({ body: body }))),
+    Promise['allSettled'](list3)
   );
 }

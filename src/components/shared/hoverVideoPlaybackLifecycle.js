@@ -1,71 +1,71 @@
 const externalVideoPlaybackOwners = new WeakMap();
-export function claimExternalVideoPlayback(_0x59f667, _0x21a449) {
-  if (!_0x59f667 || !_0x21a449) return ![];
-  return (externalVideoPlaybackOwners['set'](_0x59f667, _0x21a449), !![]);
+export function claimExternalVideoPlayback(enabled, enabled2) {
+  if (!enabled || !enabled2) return ![];
+  return (externalVideoPlaybackOwners['set'](enabled, enabled2), !![]);
 }
-export function releaseExternalVideoPlayback(_0x5dbe63, _0x239f72) {
-  if (!_0x5dbe63) return ![];
-  const _0x507e23 = externalVideoPlaybackOwners['get'](_0x5dbe63);
-  if (!_0x507e23 || (_0x239f72 && _0x507e23 !== _0x239f72)) return ![];
-  return (externalVideoPlaybackOwners['delete'](_0x5dbe63), !![]);
+export function releaseExternalVideoPlayback(enabled3, value) {
+  if (!enabled3) return ![];
+  const enabled4 = externalVideoPlaybackOwners['get'](enabled3);
+  if (!enabled4 || (value && enabled4 !== value)) return ![];
+  return (externalVideoPlaybackOwners['delete'](enabled3), !![]);
 }
-export function isExternallyOwnedVideoPlayback(_0xa4ab94) {
-  return !!_0xa4ab94 && externalVideoPlaybackOwners['has'](_0xa4ab94);
+export function isExternallyOwnedVideoPlayback(enabled5) {
+  return !!enabled5 && externalVideoPlaybackOwners['has'](enabled5);
 }
-export function shouldTakeOverActiveHoverPlayback(_0x3b08b, _0x17c9a4) {
+export function shouldTakeOverActiveHoverPlayback(item, key) {
   return (
-    _0x3b08b?.['_isHovered'] === !![] &&
-    _0x3b08b?.['_isManualControl'] !== !![] &&
-    _0x3b08b?.['_hoverManualPause'] !== !![] &&
-    _0x17c9a4?.['paused'] === ![]
+    item?.['_isHovered'] === !![] &&
+    item?.['_isManualControl'] !== !![] &&
+    item?.['_hoverManualPause'] !== !![] &&
+    key?.['paused'] === ![]
   );
 }
 export function setHoverPlaybackChromeVisible(
   { controlsEl: controlsEl = null, muteEl: muteEl = null, centerEl: centerEl = null } = {},
-  _0x2391a8 = ![],
+  index = ![],
 ) {
-  const _0x414597 = _0x2391a8 ? 'flex' : 'none';
-  if (controlsEl?.['style']) controlsEl['style']['display'] = _0x414597;
-  if (muteEl?.['style']) muteEl['style']['display'] = _0x414597;
-  if (centerEl?.['style']) centerEl['style']['display'] = _0x414597;
+  const result = index ? 'flex' : 'none';
+  if (controlsEl?.['style']) controlsEl['style']['display'] = result;
+  if (muteEl?.['style']) muteEl['style']['display'] = result;
+  if (centerEl?.['style']) centerEl['style']['display'] = result;
 }
-export function shouldKeepManualPlaybackPresentationActive(_0x215e7d, _0x34a6bc) {
+export function shouldKeepManualPlaybackPresentationActive(data, options) {
   return (
-    _0x34a6bc?.['paused'] === ![] &&
-    (_0x215e7d?.['_isManualControl'] === !![] ||
-      _0x215e7d?.['_isManualLoopPlayback'] === !![] ||
-      isExternallyOwnedVideoPlayback(_0x34a6bc))
+    options?.['paused'] === ![] &&
+    (data?.['_isManualControl'] === !![] ||
+      data?.['_isManualLoopPlayback'] === !![] ||
+      isExternallyOwnedVideoPlayback(options))
   );
 }
 export function createHoverVideoPlaybackLifecycle({
-  releaseMedia: _0xd56ca8,
+  releaseMedia: releaseMedia,
   releaseDelayMs: releaseDelayMs = 0x0,
-  schedule: schedule = (_0x12c366, _0x1a5d3a) => globalThis['setTimeout'](_0x12c366, _0x1a5d3a),
-  cancel: cancel = (_0x218173) => globalThis['clearTimeout'](_0x218173),
+  schedule: schedule = (target, source) => globalThis['setTimeout'](target, source),
+  cancel: cancel = (next) => globalThis['clearTimeout'](next),
 } = {}) {
-  let _0x59b3af = ![],
-    _0x5c7e36 = null,
-    _0x3504f5 = 0x0;
-  const _0x4c5eda = () => {
-    _0x3504f5 += 0x1;
-    if (_0x5c7e36 === null) return ![];
-    return (cancel(_0x5c7e36), (_0x5c7e36 = null), !![]);
+  let current = ![],
+    schedule2 = null,
+    entry = 0x0;
+  const run = () => {
+    entry += 0x1;
+    if (schedule2 === null) return ![];
+    return (cancel(schedule2), (schedule2 = null), !![]);
   };
   return {
     activate() {
-      if (_0x59b3af) return ![];
-      return (_0x4c5eda(), !![]);
+      if (current) return ![];
+      return (run(), !![]);
     },
     deactivate({ release: release = !![] } = {}) {
-      if (_0x59b3af) return ![];
-      _0x4c5eda();
-      if (release !== !![] || typeof _0xd56ca8 !== 'function') return ![];
-      const _0xa954f7 = ++_0x3504f5;
+      if (current) return ![];
+      run();
+      if (release !== !![] || typeof releaseMedia !== 'function') return ![];
+      const record = ++entry;
       return (
-        (_0x5c7e36 = schedule(
+        (schedule2 = schedule(
           () => {
-            if (_0x59b3af || _0xa954f7 !== _0x3504f5) return;
-            ((_0x5c7e36 = null), _0xd56ca8());
+            if (current || record !== entry) return;
+            ((schedule2 = null), releaseMedia());
           },
           Math['max'](0x0, Number(releaseDelayMs) || 0x0),
         )),
@@ -73,11 +73,11 @@ export function createHoverVideoPlaybackLifecycle({
       );
     },
     dispose() {
-      if (_0x59b3af) return;
-      (_0x4c5eda(), (_0x59b3af = !![]));
+      if (current) return;
+      (run(), (current = !![]));
     },
     hasPendingRelease() {
-      return _0x5c7e36 !== null;
+      return schedule2 !== null;
     },
   };
 }

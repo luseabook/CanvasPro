@@ -1,1 +1,75 @@
-import{MANY_EDGES_THRESHOLD,createEdgeVisibilityIndex,queryEdgeVisibilityIndex}from'./rendererEdgeVisibilityIndex.js';import{createNodeGeometryOverlay}from'./nodeGeometryOverlay.js';const EDGE_CUT_BOUNDS_EPSILON=0.001,EDGE_CUT_DEFAULT_NODE_WIDTH=0x104,EDGE_CUT_DEFAULT_NODE_HEIGHT=0x64;export function resolveEdgeCutNodeGeometry(_0x87c4f3){if(!_0x87c4f3)return null;return{'x':_0x87c4f3['x'],'y':_0x87c4f3['y'],'width':_0x87c4f3?.['width']||EDGE_CUT_DEFAULT_NODE_WIDTH,'height':_0x87c4f3?.['height']||EDGE_CUT_DEFAULT_NODE_HEIGHT};}export function resolveEdgeCutSegment(_0x25064f,_0x1921ef){const _0x21e771=resolveEdgeCutNodeGeometry(_0x1921ef?.[_0x25064f?.["sourceId"]]),_0x28ee3b=resolveEdgeCutNodeGeometry(_0x1921ef?.[_0x25064f?.['targetId']]);if(!_0x21e771||!_0x28ee3b)return null;return{'startX':_0x21e771['x']+_0x21e771["width"],'startY':_0x21e771['y']+_0x21e771["height"]/0x2,'endX':_0x28ee3b['x'],'endY':_0x28ee3b['y']+_0x28ee3b["height"]/0x2};}export function createEdgeCutCandidateIndex(_0x2c378a,_0x2f745a,{threshold:threshold=MANY_EDGES_THRESHOLD}={}){const _0x2780f8=[],_0x38f809=[],_0x48067e=Object["create"](null);for(const [_0x5a1aa5,_0x55a1de]of Object["entries"](_0x2c378a||{})){const _0x12744=String(_0x5a1aa5||'');if(!_0x12744["trim"]()||!_0x55a1de)continue;_0x38f809['push'](_0x12744),_0x2780f8['push'](_0x55a1de['id']===_0x12744?_0x55a1de:{..._0x55a1de,'id':_0x12744});for(const _0x5ec1b7 of[_0x55a1de["sourceId"],_0x55a1de["targetId"]]){const _0x2c83b8=_0x2f745a?.[_0x5ec1b7];if(!_0x2c83b8||_0x48067e[_0x5ec1b7])continue;const _0xe95779=resolveEdgeCutNodeGeometry(_0x2c83b8);(_0xe95779['width']!==_0x2c83b8["width"]||_0xe95779["height"]!==_0x2c83b8["height"])&&(_0x48067e[_0x5ec1b7]={'width':_0xe95779["width"],'height':_0xe95779["height"]});}}const _0x17c864=Math['max'](0x0,Number(threshold)||0x0),_0x260b8f=_0x2780f8["length"]>=_0x17c864?createEdgeVisibilityIndex(_0x2780f8,createNodeGeometryOverlay(_0x2f745a,_0x48067e)):null;return{'edgeIds':_0x38f809,'index':_0x260b8f};}export function createEdgeCutQueryBounds(_0x2defd1,_0x31d2a1,_0x40ad86,_0x467a67,_0x32e293=EDGE_CUT_BOUNDS_EPSILON){const _0x158f13=[_0x2defd1,_0x31d2a1,_0x40ad86,_0x467a67]["map"](Number);if(!_0x158f13["every"](Number["isFinite"]))return null;const [_0x1a5eac,_0x29aba3,_0x4eafb9,_0x38462a]=_0x158f13,_0xa762d8=Math['max'](EDGE_CUT_BOUNDS_EPSILON,Number(_0x32e293)||0x0);return{'minX':Math["min"](_0x1a5eac,_0x4eafb9)-_0xa762d8,'maxX':Math["max"](_0x1a5eac,_0x4eafb9)+_0xa762d8,'minY':Math['min'](_0x29aba3,_0x38462a)-_0xa762d8,'maxY':Math['max'](_0x29aba3,_0x38462a)+_0xa762d8};}export function queryEdgeCutCandidateIds(_0x87e174,_0x47229a,_0x575e3a,_0x49ee07,_0x24e466){const _0x1cd3aa=Array["isArray"](_0x87e174?.["edgeIds"])?_0x87e174["edgeIds"]:[];if(!_0x87e174?.["index"])return _0x1cd3aa;const _0xe267c3=createEdgeCutQueryBounds(_0x47229a,_0x575e3a,_0x49ee07,_0x24e466);if(!_0xe267c3)return _0x1cd3aa;return queryEdgeVisibilityIndex(_0x87e174['index'],_0xe267c3);}
+import {
+  MANY_EDGES_THRESHOLD,
+  createEdgeVisibilityIndex,
+  queryEdgeVisibilityIndex,
+} from './rendererEdgeVisibilityIndex.js';
+import { createNodeGeometryOverlay } from './nodeGeometryOverlay.js';
+const EDGE_CUT_BOUNDS_EPSILON = 0.001,
+  EDGE_CUT_DEFAULT_NODE_WIDTH = 0x104,
+  EDGE_CUT_DEFAULT_NODE_HEIGHT = 0x64;
+export function resolveEdgeCutNodeGeometry(box) {
+  if (!box) return null;
+  return {
+    x: box['x'],
+    y: box['y'],
+    width: box?.['width'] || EDGE_CUT_DEFAULT_NODE_WIDTH,
+    height: box?.['height'] || EDGE_CUT_DEFAULT_NODE_HEIGHT,
+  };
+}
+export function resolveEdgeCutSegment(value, item) {
+  const box2 = resolveEdgeCutNodeGeometry(item?.[value?.['sourceId']]),
+    box3 = resolveEdgeCutNodeGeometry(item?.[value?.['targetId']]);
+  if (!box2 || !box3) return null;
+  return {
+    startX: box2['x'] + box2['width'],
+    startY: box2['y'] + box2['height'] / 0x2,
+    endX: box3['x'],
+    endY: box3['y'] + box3['height'] / 0x2,
+  };
+}
+export function createEdgeCutCandidateIndex(
+  key,
+  index,
+  { threshold: threshold = MANY_EDGES_THRESHOLD } = {},
+) {
+  const list = [],
+    list2 = [],
+    result = Object['create'](null);
+  for (const [data, args] of Object['entries'](key || {})) {
+    const enabled = String(data || '');
+    if (!enabled['trim']() || !args) continue;
+    (list2['push'](enabled), list['push'](args['id'] === enabled ? args : { ...args, id: enabled }));
+    for (const options of [args['sourceId'], args['targetId']]) {
+      const enabled2 = index?.[options];
+      if (!enabled2 || result[options]) continue;
+      const box4 = resolveEdgeCutNodeGeometry(enabled2);
+      (box4['width'] !== enabled2['width'] || box4['height'] !== enabled2['height']) &&
+        (result[options] = { width: box4['width'], height: box4['height'] });
+    }
+  }
+  const target = Math['max'](0x0, Number(threshold) || 0x0),
+    source =
+      list['length'] >= target
+        ? createEdgeVisibilityIndex(list, createNodeGeometryOverlay(index, result))
+        : null;
+  return { edgeIds: list2, index: source };
+}
+export function createEdgeCutQueryBounds(next, current, entry, record, payload = EDGE_CUT_BOUNDS_EPSILON) {
+  const enabled3 = [next, current, entry, record]['map'](Number);
+  if (!enabled3['every'](Number['isFinite'])) return null;
+  const [handle, state, config, scope] = enabled3,
+    input = Math['max'](EDGE_CUT_BOUNDS_EPSILON, Number(payload) || 0x0);
+  return {
+    minX: Math['min'](handle, config) - input,
+    maxX: Math['max'](handle, config) + input,
+    minY: Math['min'](state, scope) - input,
+    maxY: Math['max'](state, scope) + input,
+  };
+}
+export function queryEdgeCutCandidateIds(enabled4, output, value2, value3, value4) {
+  const value5 = Array['isArray'](enabled4?.['edgeIds']) ? enabled4['edgeIds'] : [];
+  if (!enabled4?.['index']) return value5;
+  const edgeCutQueryBounds = createEdgeCutQueryBounds(output, value2, value3, value4);
+  if (!edgeCutQueryBounds) return value5;
+  return queryEdgeVisibilityIndex(enabled4['index'], edgeCutQueryBounds);
+}

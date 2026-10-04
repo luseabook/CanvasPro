@@ -4,52 +4,52 @@ import {
   applyAudioWorkflowFooterSchemaControls,
   updateAudioModelTriggerIcon,
 } from './audioFooterSchemaSlots.js';
-function getWorkflowKey(_0x1203d1 = {}) {
-  return String(_0x1203d1?.['key'] || _0x1203d1?.['modelId'] || '')['trim']();
+function getWorkflowKey(event = {}) {
+  return String(event?.['key'] || event?.['modelId'] || '')['trim']();
 }
-export function collectAudioWorkflowSchemaSlotElements(_0x1b6cde) {
+export function collectAudioWorkflowSchemaSlotElements(modelTrigger) {
   return {
-    modelTrigger: _0x1b6cde?.['querySelector']?.('.img-model-btn-trigger') || null,
-    modeSlot: _0x1b6cde?.['querySelector']?.('.ui-schema-mode-slot') || null,
-    instanceSlot: _0x1b6cde?.['querySelector']?.('.ui-schema-instance-slot') || null,
-    batchSlot: _0x1b6cde?.['querySelector']?.('.ui-schema-batch-slot') || null,
-    advancedPanel: _0x1b6cde?.['querySelector']?.('.rh-adv-panel') || null,
-    advancedWrap: _0x1b6cde?.['querySelector']?.('.rh-adv-wrap') || null,
-    advancedButton: _0x1b6cde?.['querySelector']?.('.rh-adv-btn') || null,
+    modelTrigger: modelTrigger?.['querySelector']?.('.img-model-btn-trigger') || null,
+    modeSlot: modelTrigger?.['querySelector']?.('.ui-schema-mode-slot') || null,
+    instanceSlot: modelTrigger?.['querySelector']?.('.ui-schema-instance-slot') || null,
+    batchSlot: modelTrigger?.['querySelector']?.('.ui-schema-batch-slot') || null,
+    advancedPanel: modelTrigger?.['querySelector']?.('.rh-adv-panel') || null,
+    advancedWrap: modelTrigger?.['querySelector']?.('.rh-adv-wrap') || null,
+    advancedButton: modelTrigger?.['querySelector']?.('.rh-adv-btn') || null,
   };
 }
-export function closeAudioWorkflowAdvancedPanel(_0x3e97d9 = {}) {
-  if (_0x3e97d9?.['advancedPanel']?.['classList']?.['contains']?.(RH_AI_APP_PERSISTENT_ADVANCED_CLASS)) {
-    (_0x3e97d9['advancedPanel']['classList']['add']('show'),
-      _0x3e97d9?.['advancedButton']?.['classList']?.['remove']?.('active'),
-      _0x3e97d9?.['advancedButton']?.['setAttribute']?.('aria-expanded', 'true'));
+export function closeAudioWorkflowAdvancedPanel(options = {}) {
+  if (options?.['advancedPanel']?.['classList']?.['contains']?.(RH_AI_APP_PERSISTENT_ADVANCED_CLASS)) {
+    (options['advancedPanel']['classList']['add']('show'),
+      options?.['advancedButton']?.['classList']?.['remove']?.('active'),
+      options?.['advancedButton']?.['setAttribute']?.('aria-expanded', 'true'));
     return;
   }
-  (_0x3e97d9?.['advancedPanel']?.['classList']?.['remove']?.('show'),
-    _0x3e97d9?.['advancedButton']?.['classList']?.['remove']?.('active'),
-    _0x3e97d9?.['advancedButton']?.['setAttribute']?.('aria-expanded', 'false'));
+  (options?.['advancedPanel']?.['classList']?.['remove']?.('show'),
+    options?.['advancedButton']?.['classList']?.['remove']?.('active'),
+    options?.['advancedButton']?.['setAttribute']?.('aria-expanded', 'false'));
 }
 export function bindAudioWorkflowSchemaSlotControls({
-  footer: _0x4badbd,
-  nodeId: _0x98881c,
-  nodeData: _0xb89e44,
-  store: _0x1b6459,
+  footer: footer,
+  nodeId: nodeId,
+  nodeData: nodeData2,
+  store: store,
 } = {}) {
-  return bindModelUiSchemaControls(_0x4badbd, { nodeId: _0x98881c, nodeData: _0xb89e44, store: _0x1b6459 });
+  return bindModelUiSchemaControls(footer, { nodeId: nodeId, nodeData: nodeData2, store: store });
 }
 export function syncAudioWorkflowSchemaSlots({
-  root: _0x2dc12a,
-  workflow: _0x348848,
+  root: root,
+  workflow: workflow,
   nodeData: nodeData = {},
   elements: elements = {},
   lastRenderedWorkflowKey: lastRenderedWorkflowKey = '',
 } = {}) {
-  const _0x262a51 = getWorkflowKey(_0x348848),
-    _0x75853b = !!_0x262a51 && lastRenderedWorkflowKey !== _0x262a51;
+  const workflowKey = getWorkflowKey(workflow),
+    rebuilt = !!workflowKey && lastRenderedWorkflowKey !== workflowKey;
   return (
-    _0x75853b &&
+    rebuilt &&
       (applyAudioWorkflowFooterSchemaControls({
-        workflow: _0x348848,
+        workflow: workflow,
         nodeData: nodeData,
         modeSlot: elements?.['modeSlot'],
         advancedPanel: elements?.['advancedPanel'],
@@ -58,8 +58,8 @@ export function syncAudioWorkflowSchemaSlots({
         instanceSlot: elements?.['instanceSlot'],
         batchSlot: elements?.['batchSlot'],
       }),
-      updateAudioModelTriggerIcon(elements?.['modelTrigger'], _0x348848)),
-    syncModelUiSchemaControls(_0x2dc12a, nodeData),
-    { rebuilt: _0x75853b, lastRenderedWorkflowKey: _0x75853b ? _0x262a51 : lastRenderedWorkflowKey }
+      updateAudioModelTriggerIcon(elements?.['modelTrigger'], workflow)),
+    syncModelUiSchemaControls(root, nodeData),
+    { rebuilt: rebuilt, lastRenderedWorkflowKey: rebuilt ? workflowKey : lastRenderedWorkflowKey }
   );
 }

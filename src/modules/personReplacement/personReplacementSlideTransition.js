@@ -1,63 +1,64 @@
 const PERSON_REPLACEMENT_SLIDE_ANIMATION_PREFIX = 'person-replacement-slide-',
   PERSON_REPLACEMENT_SLIDE_DURATION_MS = 0x17c,
   PERSON_REPLACEMENT_SLIDE_EASING = 'cubic-bezier(0.22, 0.72, 0.2, 1)';
-function cancelTaggedSlideAnimations(_0x339f69) {
-  Array['from'](_0x339f69?.['getAnimations']?.() || [])
-    ['filter']((_0x4922f8) =>
-      String(_0x4922f8?.['id'] || '')['startsWith'](PERSON_REPLACEMENT_SLIDE_ANIMATION_PREFIX),
-    )
-    ['forEach']((_0x323d6b) => _0x323d6b['cancel']?.());
+function cancelTaggedSlideAnimations(value) {
+  Array['from'](value?.['getAnimations']?.() || [])
+    ['filter']((item) => String(item?.['id'] || '')['startsWith'](PERSON_REPLACEMENT_SLIDE_ANIMATION_PREFIX))
+    ['forEach']((key) => key['cancel']?.());
 }
-function getSlideKeyframes(_0x45a5e8, _0x1ae3a5) {
-  const _0x5e03be = _0x45a5e8 === 'previous';
-  if (_0x1ae3a5)
+function getSlideKeyframes(index, result) {
+  const transform = index === 'previous';
+  if (result)
     return [
       { transform: 'translate3d(0,\x200,\x200)' },
-      { transform: _0x5e03be ? 'translate3d(100%,\x200,\x200)' : 'translate3d(-100%, 0, 0)' },
+      { transform: transform ? 'translate3d(100%,\x200,\x200)' : 'translate3d(-100%, 0, 0)' },
     ];
   return [
-    { transform: _0x5e03be ? 'translate3d(-100%,\x200,\x200)' : 'translate3d(100%, 0, 0)' },
+    { transform: transform ? 'translate3d(-100%,\x200,\x200)' : 'translate3d(100%, 0, 0)' },
     { transform: 'translate3d(0, 0, 0)' },
   ];
 }
 function startSlideAnimation(
-  _0x42ce70,
-  { direction: _0xb2b640, duration: _0x23aa6d, outgoing: _0x251341 } = {},
+  enabled,
+  { direction: direction2, duration: duration, outgoing: outgoing } = {},
 ) {
-  if (!_0x42ce70 || typeof _0x42ce70['animate'] !== 'function') return null;
-  const _0xb964da = _0x42ce70['animate'](getSlideKeyframes(_0xb2b640, _0x251341), {
-    duration: _0x23aa6d,
+  if (!enabled || typeof enabled['animate'] !== 'function') return null;
+  const data = enabled['animate'](getSlideKeyframes(direction2, outgoing), {
+    duration: duration,
     easing: PERSON_REPLACEMENT_SLIDE_EASING,
     fill: 'both',
   });
   return (
-    (_0xb964da['id'] =
-      '' + PERSON_REPLACEMENT_SLIDE_ANIMATION_PREFIX + (_0x251341 ? 'outgoing' : 'incoming')),
-    _0xb964da
+    (data['id'] = '' + PERSON_REPLACEMENT_SLIDE_ANIMATION_PREFIX + (outgoing ? 'outgoing' : 'incoming')),
+    data
   );
 }
 export function startPersonReplacementSlideTransition({
-  windowObject: _0x3a717a,
-  incomingSlide: _0xab48cc,
+  windowObject: windowObject,
+  incomingSlide: incomingSlide,
   outgoingSlide: outgoingSlide = null,
   direction: direction = 'next',
 } = {}) {
-  (cancelTaggedSlideAnimations(_0xab48cc), cancelTaggedSlideAnimations(outgoingSlide));
-  const _0x4ca249 = _0x3a717a?.['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === !![],
-    _0x17551c = _0x4ca249 ? 0x0 : PERSON_REPLACEMENT_SLIDE_DURATION_MS,
-    _0x5092e4 = startSlideAnimation(_0xab48cc, { direction: direction, duration: _0x17551c, outgoing: ![] }),
-    _0x44e5c8 = startSlideAnimation(outgoingSlide, {
+  (cancelTaggedSlideAnimations(incomingSlide), cancelTaggedSlideAnimations(outgoingSlide));
+  const options = windowObject?.['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === !![],
+    duration2 = options ? 0x0 : PERSON_REPLACEMENT_SLIDE_DURATION_MS,
+    incomingAnimation = startSlideAnimation(incomingSlide, {
       direction: direction,
-      duration: _0x17551c,
+      duration: duration2,
+      outgoing: ![],
+    }),
+    outgoingAnimation = startSlideAnimation(outgoingSlide, {
+      direction: direction,
+      duration: duration2,
       outgoing: !![],
     });
   return {
-    duration: _0x17551c,
-    incomingAnimation: _0x5092e4,
-    outgoingAnimation: _0x44e5c8,
-    finished: _0x5092e4?.['finished']?.['catch']?.(() => {}) || Promise['resolve'](),
+    duration: duration2,
+    incomingAnimation: incomingAnimation,
+    outgoingAnimation: outgoingAnimation,
+    finished: incomingAnimation?.['finished']?.['catch']?.(() => {}) || Promise['resolve'](),
   };
 }
-export function cancelPersonReplacementSlideTransition(_0x3c31a6) {
-  (_0x3c31a6?.['incomingAnimation']?.['cancel']?.(), _0x3c31a6?.['outgoingAnimation']?.['cancel']?.());
+export function cancelPersonReplacementSlideTransition(target) {
+  (target?.['incomingAnimation']?.['cancel']?.(), target?.['outgoingAnimation']?.['cancel']?.());
 }

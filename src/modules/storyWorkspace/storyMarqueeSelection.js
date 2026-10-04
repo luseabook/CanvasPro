@@ -16,43 +16,43 @@ const STORY_MARQUEE_SURFACE_SELECTOR = '[data-story-marquee-surface]',
     "[data-story-action], input, textarea, select, a, [contenteditable='true']",
   STORY_MARQUEE_ITEM_SELECTOR = '[data-story-marquee-item]';
 export function createStoryAssetMarqueeConfig(
-  _0x276d16,
-  { getVisibleAssets: _0x44eff7, beforeCommit: _0x28e207, render: _0x1130a0 },
+  enabled,
+  { getVisibleAssets: getVisibleAssets, beforeCommit: beforeCommit, render: render },
 ) {
   return {
-    enabled: _0x276d16['view'] === 'project' && _0x276d16['step'] === 0x2,
-    selectedIds: _0x276d16['selectedAssetIds'],
-    commit(_0x2b7e88) {
-      _0x28e207();
-      const _0x176e57 = new Set(
-        _0x44eff7(_0x276d16)
+    enabled: enabled['view'] === 'project' && enabled['step'] === 0x2,
+    selectedIds: enabled['selectedAssetIds'],
+    commit(list) {
+      beforeCommit();
+      const map = new Set(
+        getVisibleAssets(enabled)
           ['filter'](
-            (_0xa51ff3) =>
-              _0x276d16['assetFilter'] !== 'library' ||
+            (value) =>
+              enabled['assetFilter'] !== 'library' ||
               (['image', 'audio']['includes'](
-                String(_0xa51ff3['mediaKind'] || '')
+                String(value['mediaKind'] || '')
                   ['trim']()
                   ['toLowerCase'](),
               ) &&
-                String(_0xa51ff3['sourceUrl'] || _0xa51ff3['imageUrl'] || '')['trim']()),
+                String(value['sourceUrl'] || value['imageUrl'] || '')['trim']()),
           )
-          ['map']((_0x18ede) => _0x18ede['id']),
+          ['map']((item) => item['id']),
       );
-      ((_0x276d16['selectedAssetIds'] = _0x2b7e88['filter']((_0x27e99b) => _0x176e57['has'](_0x27e99b))),
-        (_0x276d16['assetSelectionMode'] = _0x276d16['selectedAssetIds']['length'] > 0x0),
-        (_0x276d16['selectedAssetId'] =
-          _0x276d16['selectedAssetIds']['at'](-0x1) || _0x276d16['selectedAssetId']),
-        _0x1130a0());
+      ((enabled['selectedAssetIds'] = list['filter']((key) => map['has'](key))),
+        (enabled['assetSelectionMode'] = enabled['selectedAssetIds']['length'] > 0x0),
+        (enabled['selectedAssetId'] = enabled['selectedAssetIds']['at'](-0x1) || enabled['selectedAssetId']),
+        render());
     },
   };
 }
-export function createStoryMarqueeSelectionController(_0x1c633b = {}) {
+export function createStoryMarqueeSelectionController(surfaceSelector = {}) {
   return createWorkspaceMarqueeSelectionController({
-    ..._0x1c633b,
-    surfaceSelector: _0x1c633b['surfaceSelector'] || STORY_MARQUEE_SURFACE_SELECTOR,
-    blockedControlSelector: _0x1c633b['blockedControlSelector'] || STORY_MARQUEE_BLOCKED_CONTROL_SELECTOR,
-    overlayClassName: _0x1c633b['overlayClassName'] || 'story-marquee-selection',
-    itemSelector: _0x1c633b['itemSelector'] || STORY_MARQUEE_ITEM_SELECTOR,
-    getItemId: _0x1c633b['getItemId'] || ((_0x190f50) => _0x190f50['dataset']?.['storyMarqueeId']),
+    ...surfaceSelector,
+    surfaceSelector: surfaceSelector['surfaceSelector'] || STORY_MARQUEE_SURFACE_SELECTOR,
+    blockedControlSelector:
+      surfaceSelector['blockedControlSelector'] || STORY_MARQUEE_BLOCKED_CONTROL_SELECTOR,
+    overlayClassName: surfaceSelector['overlayClassName'] || 'story-marquee-selection',
+    itemSelector: surfaceSelector['itemSelector'] || STORY_MARQUEE_ITEM_SELECTOR,
+    getItemId: surfaceSelector['getItemId'] || ((el) => el['dataset']?.['storyMarqueeId']),
   });
 }

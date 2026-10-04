@@ -1,16 +1,16 @@
-function normalizeNodeId(_0x2a7d8f) {
-  return String(_0x2a7d8f || '').trim();
+function normalizeNodeId(value) {
+  return String(value || '').trim();
 }
-function hasGenerationRuntimeMethod(_0x2fbfab = {}) {
+function hasGenerationRuntimeMethod(options2 = {}) {
   return (
-    typeof _0x2fbfab.runGeneration === 'function' ||
-    typeof _0x2fbfab.getGenerationStatus === 'function' ||
-    typeof _0x2fbfab.cancelGeneration === 'function' ||
-    typeof _0x2fbfab.resumeGeneration === 'function'
+    typeof options2.runGeneration === 'function' ||
+    typeof options2.getGenerationStatus === 'function' ||
+    typeof options2.cancelGeneration === 'function' ||
+    typeof options2.resumeGeneration === 'function'
   );
 }
 export function createNodeRuntimeRegistry() {
-  const _0x5f51a2 = new Map(),
+  const map = new Map(),
     runtimeResolvers = new Map();
   return {
     registerResolver(nodeType, resolver) {
@@ -29,25 +29,25 @@ export function createNodeRuntimeRegistry() {
           options.store?.getState?.()?.nodes?.[normalizedId];
       if (nodeRecord && runtimeResolvers.has(nodeRecord.type))
         return runtimeResolvers.get(nodeRecord.type)(normalizedId, options);
-      return normalizedId ? _0x5f51a2.get(normalizedId) || null : null;
+      return normalizedId ? map.get(normalizedId) || null : null;
     },
-    register(_0x16f264, _0x23f763 = {}) {
-      const _0x2a3162 = normalizeNodeId(_0x16f264);
-      if (!_0x2a3162 || !_0x23f763 || typeof _0x23f763 !== 'object') return null;
-      if (!hasGenerationRuntimeMethod(_0x23f763)) return null;
-      return (_0x5f51a2.set(_0x2a3162, _0x23f763), _0x23f763);
+    register(item, enabled = {}) {
+      const nodeId2 = normalizeNodeId(item);
+      if (!nodeId2 || !enabled || typeof enabled !== 'object') return null;
+      if (!hasGenerationRuntimeMethod(enabled)) return null;
+      return (map.set(nodeId2, enabled), enabled);
     },
-    unregister(_0x29a4e0) {
-      const _0x1ea6fd = normalizeNodeId(_0x29a4e0);
-      if (!_0x1ea6fd) return false;
-      return _0x5f51a2.delete(_0x1ea6fd);
+    unregister(key) {
+      const nodeId3 = normalizeNodeId(key);
+      if (!nodeId3) return false;
+      return map.delete(nodeId3);
     },
-    get(_0x1102f3) {
-      const _0x40eba6 = normalizeNodeId(_0x1102f3);
-      return _0x40eba6 ? _0x5f51a2.get(_0x40eba6) || null : null;
+    get(index) {
+      const nodeId4 = normalizeNodeId(index);
+      return nodeId4 ? map.get(nodeId4) || null : null;
     },
     clear() {
-      _0x5f51a2.clear();
+      map.clear();
     },
   };
 }

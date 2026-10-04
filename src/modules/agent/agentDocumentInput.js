@@ -5,44 +5,44 @@ const DOCUMENT_CONTENT_TYPES = Object['freeze']({
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   pdf: 'application/pdf',
 });
-function normalizeDocumentMessage(_0xfb0a61 = '') {
-  return String(_0xfb0a61 || '')
+function normalizeDocumentMessage(value = '') {
+  return String(value || '')
     ['replaceAll']('剧本文件', '文档')
     ['replaceAll']('作为剧本读取', '作为文档读取');
 }
-export function validateAgentDocumentFile(_0x75cce6, _0x186266 = null) {
-  if (typeof _0x186266 !== 'function') return _0x75cce6 ? { ok: !![] } : { ok: ![], error: '请选择文档。' };
-  const _0x5b6930 = _0x186266(_0x75cce6);
-  if (_0x5b6930?.['ok'] === !![]) return _0x5b6930;
-  return { ..._0x5b6930, ok: ![], error: normalizeDocumentMessage(_0x5b6930?.['error'] || '文档不可读取。') };
+export function validateAgentDocumentFile(item, handler = null) {
+  if (typeof handler !== 'function') return item ? { ok: !![] } : { ok: ![], error: '请选择文档。' };
+  const response = handler(item);
+  if (response?.['ok'] === !![]) return response;
+  return { ...response, ok: ![], error: normalizeDocumentMessage(response?.['error'] || '文档不可读取。') };
 }
-export function createAgentDocumentSource(_0x436696 = {}, _0x9c639e = null) {
-  const _0x31ac02 = String(_0x436696['fileName'] || _0x9c639e?.['name'] || 'document')
+export function createAgentDocumentSource(truncated = {}, error = null) {
+  const displayName = String(truncated['fileName'] || error?.['name'] || 'document')
       ['trim']()
       ['slice'](0x0, 0xff),
-    _0x4dcdf3 = String(_0x436696['extension'] || _0x31ac02['split']('.')['pop']() || '')
+    extension = String(truncated['extension'] || displayName['split']('.')['pop']() || '')
       ['trim']()
       ['toLowerCase']()
       ['slice'](0x0, 0xc);
   return {
     sourceKind: 'document',
-    displayName: _0x31ac02,
-    title: _0x31ac02,
-    contentType: DOCUMENT_CONTENT_TYPES[_0x4dcdf3] || 'text/plain',
-    extension: _0x4dcdf3,
-    content: String(_0x436696['text'] || ''),
-    characterCount: Number['isFinite'](Number(_0x436696['characterCount']))
-      ? Number(_0x436696['characterCount'])
-      : String(_0x436696['text'] || '')['length'],
-    ...(Number['isFinite'](Number(_0x436696['pageCount']))
-      ? { pageCount: Number(_0x436696['pageCount']) }
+    displayName: displayName,
+    title: displayName,
+    contentType: DOCUMENT_CONTENT_TYPES[extension] || 'text/plain',
+    extension: extension,
+    content: String(truncated['text'] || ''),
+    characterCount: Number['isFinite'](Number(truncated['characterCount']))
+      ? Number(truncated['characterCount'])
+      : String(truncated['text'] || '')['length'],
+    ...(Number['isFinite'](Number(truncated['pageCount']))
+      ? { pageCount: Number(truncated['pageCount']) }
       : {}),
-    warnings: Array['isArray'](_0x436696['warnings'])
-      ? _0x436696['warnings']
-          ['map']((_0x551da8) => String(_0x551da8 || '')['trim']())
+    warnings: Array['isArray'](truncated['warnings'])
+      ? truncated['warnings']
+          ['map']((key) => String(key || '')['trim']())
           ['filter'](Boolean)
           ['slice'](0x0, 0x8)
       : [],
-    truncated: _0x436696['truncated'] === !![],
+    truncated: truncated['truncated'] === !![],
   };
 }

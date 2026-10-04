@@ -5,71 +5,66 @@ function nowMs() {
     : Date['now']();
 }
 function exposeSnapshotReader() {
-  const _0x55da77 = globalThis['window'];
-  if (!_0x55da77 || typeof _0x55da77 !== 'object') return;
-  _0x55da77['__getMediaObjectUrlRegistrySnapshot'] = getMediaObjectUrlRegistrySnapshot;
+  const enabled = globalThis['window'];
+  if (!enabled || typeof enabled !== 'object') return;
+  enabled['__getMediaObjectUrlRegistrySnapshot'] = getMediaObjectUrlRegistrySnapshot;
 }
-function markLifecycle(_0xb31932, _0x141396) {
-  globalThis['window']?.['__runtimeCompareMark']?.('media-object-url:' + _0xb31932, {
-    url: _0x141396['url'],
-    kind: _0x141396['kind'],
-    ownerId: _0x141396['ownerId'],
-    sourceUrl: _0x141396['sourceUrl'],
-    size: _0x141396['size'],
+function markLifecycle(value, url2) {
+  globalThis['window']?.['__runtimeCompareMark']?.('media-object-url:' + value, {
+    url: url2['url'],
+    kind: url2['kind'],
+    ownerId: url2['ownerId'],
+    sourceUrl: url2['sourceUrl'],
+    size: url2['size'],
     activeCount: activeObjectUrls['size'],
-    createDurationMs: Number(_0x141396['createDurationMs'] || 0x0),
+    createDurationMs: Number(url2['createDurationMs'] || 0x0),
   });
 }
 export function createTrackedMediaObjectUrl(
-  _0x2a0779,
+  item,
   { kind: kind = 'media', ownerId: ownerId = '', sourceUrl: sourceUrl = '' } = {},
 ) {
-  const _0x2833e5 = nowMs(),
-    _0x52538a = globalThis['URL']?.['createObjectURL']?.(_0x2a0779) || '';
-  if (!_0x52538a) return '';
-  const _0x36c893 = {
-    url: _0x52538a,
+  const nowMs2 = nowMs(),
+    url3 = globalThis['URL']?.['createObjectURL']?.(item) || '';
+  if (!url3) return '';
+  const key = {
+    url: url3,
     kind: String(kind || 'media'),
     ownerId: String(ownerId || ''),
     sourceUrl: String(sourceUrl || ''),
-    size: Number(_0x2a0779?.['size'] || 0x0),
-    type: String(_0x2a0779?.['type'] || ''),
+    size: Number(item?.['size'] || 0x0),
+    type: String(item?.['type'] || ''),
     createdAt: nowMs(),
-    createDurationMs: Math['max'](0x0, nowMs() - _0x2833e5),
+    createDurationMs: Math['max'](0x0, nowMs() - nowMs2),
   };
-  return (
-    activeObjectUrls['set'](_0x52538a, _0x36c893),
-    exposeSnapshotReader(),
-    markLifecycle('created', _0x36c893),
-    _0x52538a
-  );
+  return (activeObjectUrls['set'](url3, key), exposeSnapshotReader(), markLifecycle('created', key), url3);
 }
-export function revokeTrackedMediaObjectUrl(_0x1f71ea) {
-  const _0x31ad25 = String(_0x1f71ea || '')['trim']();
-  if (!_0x31ad25) return ![];
-  const _0x6b1ec7 = activeObjectUrls['get'](_0x31ad25) || {
-    url: _0x31ad25,
+export function revokeTrackedMediaObjectUrl(index) {
+  const url4 = String(index || '')['trim']();
+  if (!url4) return ![];
+  const result = activeObjectUrls['get'](url4) || {
+    url: url4,
     kind: 'unknown',
     ownerId: '',
     sourceUrl: '',
     size: 0x0,
   };
-  activeObjectUrls['delete'](_0x31ad25);
+  activeObjectUrls['delete'](url4);
   try {
-    globalThis['URL']?.['revokeObjectURL']?.(_0x31ad25);
+    globalThis['URL']?.['revokeObjectURL']?.(url4);
   } catch {}
-  return (exposeSnapshotReader(), markLifecycle('revoked', _0x6b1ec7), !![]);
+  return (exposeSnapshotReader(), markLifecycle('revoked', result), !![]);
 }
 export function getMediaObjectUrlRegistrySnapshot() {
-  const _0x15a349 = Array['from'](activeObjectUrls['values']())['map']((_0x4a47db) => ({ ..._0x4a47db }));
+  const activeCount = Array['from'](activeObjectUrls['values']())['map']((args) => ({ ...args }));
   return {
-    activeCount: _0x15a349['length'],
-    activeVideoCount: _0x15a349['filter']((_0x50f085) => _0x50f085['kind'] === 'video')['length'],
-    activeUrls: _0x15a349['map']((_0x59c0ef) => _0x59c0ef['url']),
-    activeVideoUrls: _0x15a349['filter']((_0x9900e9) => _0x9900e9['kind'] === 'video')['map'](
-      (_0x185436) => _0x185436['url'],
+    activeCount: activeCount['length'],
+    activeVideoCount: activeCount['filter']((data) => data['kind'] === 'video')['length'],
+    activeUrls: activeCount['map']((response) => response['url']),
+    activeVideoUrls: activeCount['filter']((options) => options['kind'] === 'video')['map'](
+      (response2) => response2['url'],
     ),
-    entries: _0x15a349,
+    entries: activeCount,
   };
 }
 export const __mediaObjectUrlRegistryForTest = {

@@ -1,48 +1,64 @@
-export function createLinkCursor(_0x2e69f1 = {}) {
-  const _0x3336bc = _0x2e69f1 && typeof _0x2e69f1 === 'object' ? _0x2e69f1 : {},
-    _0x29224d = { small: 24, medium: 36, large: 48 },
-    _0x49ac73 = { small: 4, medium: 6, large: 8 },
-    _0x402c0e = Object.prototype.hasOwnProperty.call(_0x29224d, _0x3336bc.size) ? _0x3336bc.size : 'small',
-    _0x1ec227 = _0x3336bc.strokeColor || 'white',
-    _0x244652 = _0x3336bc.fillColor || 'white',
-    _0x362e40 = _0x3336bc.fillOpacity ?? '0.18',
-    _0x32e59e = _0x3336bc.fallback || 'crosshair',
-    _0x5ac1b1 = _0x29224d[_0x402c0e],
-    _0x33776b = _0x49ac73[_0x402c0e],
-    _0x52805b =
+export function createLinkCursor(options = {}) {
+  const value = options && typeof options === 'object' ? options : {},
+    item = { small: 24, medium: 36, large: 48 },
+    key = { small: 4, medium: 6, large: 8 },
+    index = Object.prototype.hasOwnProperty.call(item, value.size) ? value.size : 'small',
+    result = value.strokeColor || 'white',
+    data = value.fillColor || 'white',
+    target = value.fillOpacity ?? '0.18',
+    source = value.fallback || 'crosshair',
+    next = item[index],
+    current = key[index],
+    entry =
       '<svg xmlns="http://www.w3.org/2000/svg" width="' +
-      _0x5ac1b1 +
+      next +
       '" height="' +
-      _0x5ac1b1 +
+      next +
       '" viewBox="0 0 24 24" fill="none" stroke="' +
-      _0x1ec227 +
+      result +
       '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l7.07 16.97 2.51-7.39 7.39-2.51L4 4z" fill="' +
-      _0x244652 +
+      data +
       '" fill-opacity="' +
-      _0x362e40 +
+      target +
       '"/><circle cx="20" cy="20" r="2.5" fill="' +
-      _0x1ec227 +
+      result +
       '"/><path d="M12 12 Q 17 12 19 18" stroke-dasharray="3 3"/></svg>';
   return (
     'url("data:image/svg+xml;charset=utf-8,' +
-    encodeURIComponent(_0x52805b) +
+    encodeURIComponent(entry) +
     '") ' +
-    _0x33776b +
+    current +
     ' ' +
-    _0x33776b +
+    current +
     ', ' +
-    _0x32e59e
+    source
   );
 }
 export function getCursorSize() {
   return localStorage.getItem('v2-cursor-style') || localStorage.getItem('cursorSize') || 'small';
 }
-export function applyLinkCursor(_0x5b9516, _0xcf2f18 = {}) {
-  const _0x3c4597 = createLinkCursor(_0xcf2f18);
-  _0x5b9516.style.setProperty('cursor', _0x3c4597, 'important');
+export function applyLinkCursor(el, record = {}) {
+  const linkCursor = createLinkCursor(record);
+  el.style.setProperty('cursor', linkCursor, 'important');
 }
-export function removeLinkCursor(_0x15bc78) {
-  _0x15bc78.style.removeProperty('cursor');
+export function removeLinkCursor(el2) {
+  el2.style.removeProperty('cursor');
 }
 
-export function createRotateCursor(_0x439525={}){const _0x47a12a=_0x439525&&typeof _0x439525==='object'?_0x439525:{},_0x1c5887=_0x47a12a["strokeColor"]||"#17191f",_0x259b72=_0x47a12a["outlineColor"]||"#ffffff",_0x31e3ce=_0x47a12a["fallback"]||"grab",_0x11d4f9="<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 28 28\" fill=\"none\"><path d=\"M20.7 8.1A9 9 0 1 0 22 18.3\" stroke=\""+_0x259b72+'\x22\x20stroke-width=\x224.2\x22\x20stroke-linecap=\x22round\x22/><path\x20d=\x22M20.7\x208.1A9\x209\x200\x201\x200\x2022\x2018.3\x22\x20stroke=\x22'+_0x1c5887+"\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M16.5 7.9h4.6V3.3\" stroke=\""+_0x259b72+'\x22\x20stroke-width=\x224.2\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/><path\x20d=\x22M16.5\x207.9h4.6V3.3\x22\x20stroke=\x22'+_0x1c5887+'\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/></svg>';return'url(\x22data:image/svg+xml;charset=utf-8,'+encodeURIComponent(_0x11d4f9)+"\") 14 14, "+_0x31e3ce;}
+export function createRotateCursor(options2 = {}) {
+  const payload = options2 && typeof options2 === 'object' ? options2 : {},
+    handle = payload['strokeColor'] || '#17191f',
+    state = payload['outlineColor'] || '#ffffff',
+    config = payload['fallback'] || 'grab',
+    scope =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M20.7 8.1A9 9 0 1 0 22 18.3" stroke="' +
+      state +
+      '\x22\x20stroke-width=\x224.2\x22\x20stroke-linecap=\x22round\x22/><path\x20d=\x22M20.7\x208.1A9\x209\x200\x201\x200\x2022\x2018.3\x22\x20stroke=\x22' +
+      handle +
+      '" stroke-width="2" stroke-linecap="round"/><path d="M16.5 7.9h4.6V3.3" stroke="' +
+      state +
+      '\x22\x20stroke-width=\x224.2\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/><path\x20d=\x22M16.5\x207.9h4.6V3.3\x22\x20stroke=\x22' +
+      handle +
+      '\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/></svg>';
+  return 'url(\x22data:image/svg+xml;charset=utf-8,' + encodeURIComponent(scope) + '") 14 14, ' + config;
+}

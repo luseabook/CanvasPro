@@ -12,61 +12,56 @@ export function installRendererStartupDiagnostics({
 } = {}) {
   if (!windowObject?.['addEventListener']) return () => {};
   if (startup['snapshot']()['ready']) return () => {};
-  let _0x895993;
-  const _0x1e3d47 = (_0x4eb453) => {
-    if (
-      _0x4eb453?.['target'] &&
-      _0x4eb453['target'] !== windowObject &&
-      _0x4eb453['target']['tagName'] !== 'SCRIPT'
-    )
+  let evidence;
+  const value = (event) => {
+    if (event?.['target'] && event['target'] !== windowObject && event['target']['tagName'] !== 'SCRIPT')
       return;
-    if (!startup['snapshot']()['failure'])
-      _0x895993 = collectRendererStartupEvidence(_0x4eb453, windowObject);
+    if (!startup['snapshot']()['failure']) evidence = collectRendererStartupEvidence(event, windowObject);
     startup['fail']('entry');
   };
-  let _0x141c1f = ![],
-    _0x535c4a = ![],
-    _0x590f59 = () => {};
-  _0x590f59 = startup['subscribe']((_0x366a19) => {
-    if (_0x366a19['ready']) {
-      _0x1c60d5();
+  let enabled = ![],
+    item = ![],
+    handler = () => {};
+  handler = startup['subscribe']((stage) => {
+    if (stage['ready']) {
+      run();
       return;
     }
-    if (!_0x366a19['failure'] || _0x535c4a) return;
-    _0x535c4a = !![];
-    const _0x5961a4 = String(windowObject['location']?.['href'] || ''),
-      _0x5680a5 = readChromeShellStartupMetadata(_0x5961a4);
-    if (!_0x5680a5) return;
+    if (!stage['failure'] || item) return;
+    item = !![];
+    const href = String(windowObject['location']?.['href'] || ''),
+      args = readChromeShellStartupMetadata(href);
+    if (!args) return;
     void (async () => {
-      for (let _0x39ec0f = 0x0; _0x39ec0f < 0x3 && !_0x141c1f; _0x39ec0f += 0x1) {
+      for (let count = 0x0; count < 0x3 && !enabled; count += 0x1) {
         try {
-          const _0x353db1 = await report({
+          const response = await report({
             type: CHROME_SHELL_STARTUP_FAILED_EVENT,
             source: 'renderer',
             level: 'error',
             message: 'Renderer startup failed',
             context: {
-              href: _0x5961a4,
-              ..._0x5680a5,
-              stage: _0x366a19['phase'],
-              failure: _0x366a19['failure'],
-              ...(_0x895993 ? { evidence: _0x895993 } : {}),
+              href: href,
+              ...args,
+              stage: stage['phase'],
+              failure: stage['failure'],
+              ...(evidence ? { evidence: evidence } : {}),
             },
           });
-          if (_0x353db1?.['success']) break;
+          if (response?.['success']) break;
         } catch {}
       }
     })();
   });
-  function _0x1c60d5() {
-    ((_0x141c1f = !![]),
-      _0x590f59(),
-      windowObject['removeEventListener']('error', _0x1e3d47, !![]),
-      windowObject['removeEventListener']('pagehide', _0x1c60d5));
+  function run() {
+    ((enabled = !![]),
+      handler(),
+      windowObject['removeEventListener']('error', value, !![]),
+      windowObject['removeEventListener']('pagehide', run));
   }
   return (
-    windowObject['addEventListener']('error', _0x1e3d47, !![]),
-    windowObject['addEventListener']('pagehide', _0x1c60d5, { once: !![] }),
-    _0x1c60d5
+    windowObject['addEventListener']('error', value, !![]),
+    windowObject['addEventListener']('pagehide', run, { once: !![] }),
+    run
   );
 }

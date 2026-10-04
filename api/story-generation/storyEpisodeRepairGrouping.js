@@ -1,1 +1,67 @@
-import{normalizeStoryPromptMode}from'../../src/domain/storyGeneration/promptModes.js';const text=_0xd9d58=>String(_0xd9d58??'')["trim"](),duration=_0x1a6d6c=>(_0x1a6d6c["shots"]||[])["reduce"]((_0x29694a,_0x4dcc24)=>_0x29694a+Number(_0x4dcc24['durationSec']||0x0),0x0);function sceneIdentity(_0x51ec23,_0x1322ef){const _0x11bb34=new Set();for(const _0x10ce94 of _0x51ec23["shots"]||[]){let _0x29514e=![];for(const _0x3ef2a8 of _0x10ce94['assetUsages']||[]){const _0xa3dbfd=_0x1322ef["find"](_0x4d207b=>[_0x4d207b["ref"],_0x4d207b['planningRef'],_0x4d207b['id']]["filter"](Boolean)["includes"](_0x3ef2a8["assetRef"]));if(_0xa3dbfd?.["kind"]!=='scene')continue;_0x29514e=!![],_0x11bb34['add']((_0xa3dbfd['id']||_0xa3dbfd["ref"]||_0xa3dbfd["planningRef"])+':'+(_0x3ef2a8["appearanceRef"]||''));}if(!_0x29514e)return'';}return _0x11bb34["size"]===0x1?[..._0x11bb34][0x0]:'';}export function groupStoryEpisodeRepairClips(_0x5420a5,{promptMode:promptMode="seedance-2.0",maxSeconds:maxSeconds=0xf,assets:assets=[],rawClips:rawClips=[]}={}){if(normalizeStoryPromptMode(promptMode,{'allowDeveloperModes':!![]})!=="seedance-2.0")return _0x5420a5;const _0x594713=Math['min'](0xf,Math["max"](0x1,Number(maxSeconds)||0xf)),_0x266ac0=[];for(const _0x4fa651 of _0x5420a5){const _0x300369=_0x266ac0['at'](-0x1),_0x446917=sceneIdentity(_0x4fa651,assets),_0x187b79=rawClips["find"](_0x180a7e=>_0x180a7e['ref']===_0x4fa651['ref'])?.["startsNewNarrativeBeat"]===!![],_0x1a1c37=_0x300369?duration(_0x300369)+duration(_0x4fa651):0x0;if(!_0x300369||_0x187b79||!_0x446917||_0x446917!==sceneIdentity(_0x300369,assets)||_0x1a1c37>_0x594713+1e-9||_0x300369["shots"]["length"]+_0x4fa651["shots"]["length"]>0xc){_0x266ac0["push"](_0x4fa651);continue;}_0x266ac0[_0x266ac0["length"]-0x1]={..._0x300369,'script':[_0x300369["script"],_0x4fa651["script"]]["map"](text)['filter'](Boolean)["join"]('\x0a'),'creativeIntent':[...new Set([_0x300369['creativeIntent'],_0x4fa651["creativeIntent"]]['map'](text)["filter"](Boolean))]["join"]('；'),'transition':[...new Set([_0x300369["transition"],_0x4fa651['transition']]['map'](text)['filter'](Boolean))]["join"]('；'),'shots':[..._0x300369["shots"],..._0x4fa651["shots"]],'durationSec':Number(_0x1a1c37['toFixed'](0x3)),'assetRefs':[...new Set([..._0x300369["assetRefs"]||[],..._0x4fa651["assetRefs"]||[]])]};}return _0x266ac0;}
+import { normalizeStoryPromptMode } from '../../src/domain/storyGeneration/promptModes.js';
+const text = (value) => String(value ?? '')['trim'](),
+  duration = (item) =>
+    (item['shots'] || [])['reduce']((key, index) => key + Number(index['durationSec'] || 0x0), 0x0);
+function sceneIdentity(result, data) {
+  const args = new Set();
+  for (const options of result['shots'] || []) {
+    let enabled = ![];
+    for (const target of options['assetUsages'] || []) {
+      const source = data['find']((next) =>
+        [next['ref'], next['planningRef'], next['id']]['filter'](Boolean)['includes'](target['assetRef']),
+      );
+      if (source?.['kind'] !== 'scene') continue;
+      ((enabled = !![]),
+        args['add'](
+          (source['id'] || source['ref'] || source['planningRef']) + ':' + (target['appearanceRef'] || ''),
+        ));
+    }
+    if (!enabled) return '';
+  }
+  return args['size'] === 0x1 ? [...args][0x0] : '';
+}
+export function groupStoryEpisodeRepairClips(
+  current,
+  {
+    promptMode: promptMode = 'seedance-2.0',
+    maxSeconds: maxSeconds = 0xf,
+    assets: assets = [],
+    rawClips: rawClips = [],
+  } = {},
+) {
+  if (normalizeStoryPromptMode(promptMode, { allowDeveloperModes: !![] }) !== 'seedance-2.0') return current;
+  const entry = Math['min'](0xf, Math['max'](0x1, Number(maxSeconds) || 0xf)),
+    record = [];
+  for (const args2 of current) {
+    const args3 = record['at'](-0x1),
+      sceneIdentity2 = sceneIdentity(args2, assets),
+      payload =
+        rawClips['find']((handle) => handle['ref'] === args2['ref'])?.['startsNewNarrativeBeat'] === !![],
+      state = args3 ? duration(args3) + duration(args2) : 0x0;
+    if (
+      !args3 ||
+      payload ||
+      !sceneIdentity2 ||
+      sceneIdentity2 !== sceneIdentity(args3, assets) ||
+      state > entry + 1e-9 ||
+      args3['shots']['length'] + args2['shots']['length'] > 0xc
+    ) {
+      record['push'](args2);
+      continue;
+    }
+    record[record['length'] - 0x1] = {
+      ...args3,
+      script: [args3['script'], args2['script']]['map'](text)['filter'](Boolean)['join']('\x0a'),
+      creativeIntent: [
+        ...new Set([args3['creativeIntent'], args2['creativeIntent']]['map'](text)['filter'](Boolean)),
+      ]['join']('；'),
+      transition: [...new Set([args3['transition'], args2['transition']]['map'](text)['filter'](Boolean))][
+        'join'
+      ]('；'),
+      shots: [...args3['shots'], ...args2['shots']],
+      durationSec: Number(state['toFixed'](0x3)),
+      assetRefs: [...new Set([...(args3['assetRefs'] || []), ...(args2['assetRefs'] || [])])],
+    };
+  }
+  return record;
+}

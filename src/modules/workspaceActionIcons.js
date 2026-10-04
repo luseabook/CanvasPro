@@ -14,13 +14,13 @@ const WORKSPACE_ACTION_ICON_PATHS = Object['freeze']({
   split: '<path\x20d=\x22M8\x2018V6m0\x200L5\x209m3-3\x203\x203M16\x206v12m0\x200-3-3m3\x203\x203-3\x22/>',
   upload: '<path d="M12 15V4m0 0L8 8m4-4 4 4"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>',
 });
-export function renderWorkspaceActionIcon(_0x36a8f6) {
-  const _0x19b532 = Object['hasOwn'](WORKSPACE_ACTION_ICON_PATHS, _0x36a8f6) ? _0x36a8f6 : 'confirm';
+export function renderWorkspaceActionIcon(value) {
+  const item = Object['hasOwn'](WORKSPACE_ACTION_ICON_PATHS, value) ? value : 'confirm';
   return (
     '<svg class="story-action-icon story-' +
-    _0x19b532 +
+    item +
     '-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
-    WORKSPACE_ACTION_ICON_PATHS[_0x19b532] +
+    WORKSPACE_ACTION_ICON_PATHS[item] +
     '</g></svg>'
   );
 }

@@ -1,62 +1,62 @@
 import { post } from './apiBase.js';
 import { canUseElectronMediaTask, enqueueElectronMediaTask } from './localMediaTaskApi.js';
-function _createLimiter(_0x28e174) {
-  let _0x2ec9d3 = 0;
-  const _0x1fc5b1 = [];
-  return function _0x49915f(_0xf5b49e) {
-    return new Promise((_0x23e0c3, _0xd9225e) => {
-      const _0x244ae9 = () => {
-        (_0x2ec9d3++,
+function _createLimiter(value) {
+  let item = 0;
+  const list = [];
+  return function run(key) {
+    return new Promise((handler, handler2) => {
+      const run2 = () => {
+        (item++,
           Promise.resolve()
-            .then(_0xf5b49e)
+            .then(key)
             .then(
-              (_0x52cdb0) => {
-                _0x2ec9d3--;
-                if (_0x1fc5b1.length && _0x2ec9d3 < _0x28e174) _0x1fc5b1.shift()();
-                _0x23e0c3(_0x52cdb0);
+              (index) => {
+                item--;
+                if (list.length && item < value) list.shift()();
+                handler(index);
               },
-              (_0x3add64) => {
-                _0x2ec9d3--;
-                if (_0x1fc5b1.length && _0x2ec9d3 < _0x28e174) _0x1fc5b1.shift()();
-                _0xd9225e(_0x3add64);
+              (result) => {
+                item--;
+                if (list.length && item < value) list.shift()();
+                handler2(result);
               },
             ));
       };
-      if (_0x2ec9d3 < _0x28e174) _0x244ae9();
-      else _0x1fc5b1.push(_0x244ae9);
+      if (item < value) run2();
+      else list.push(run2);
     });
   };
 }
 const _runLimited = _createLimiter(2),
   _inflight = new Map();
-function buildMediaTaskPayload(_0x569703, _0x5b53b2 = {}) {
-  const _0x2b26f1 = { kind: 'videoFirstFrame', src: _0x569703 },
-    _0x94ac9f = String(_0x5b53b2?.nodeId || '').trim(),
-    _0xff912 = String(_0x5b53b2?.assetId || '').trim();
-  if (_0x94ac9f) _0x2b26f1.nodeId = _0x94ac9f;
-  if (_0xff912) _0x2b26f1.assetId = _0xff912;
-  return _0x2b26f1;
+function buildMediaTaskPayload(src, data = {}) {
+  const options = { kind: 'videoFirstFrame', src: src },
+    target = String(data?.nodeId || '').trim(),
+    source = String(data?.assetId || '').trim();
+  if (target) options.nodeId = target;
+  if (source) options.assetId = source;
+  return options;
 }
-export async function fetchVideoFirstFrameThumbFromServer(_0x17dfbd, _0x1b330e = {}) {
-  const _0x73ce06 = String(_0x17dfbd || '').trim();
-  if (!_0x73ce06) throw new Error('src 不能为空');
+export async function fetchVideoFirstFrameThumbFromServer(next, current = {}) {
+  const src2 = String(next || '').trim();
+  if (!src2) throw new Error('src 不能为空');
   if (canUseElectronMediaTask())
-    return await enqueueElectronMediaTask(buildMediaTaskPayload(_0x73ce06, _0x1b330e), {
+    return await enqueueElectronMediaTask(buildMediaTaskPayload(src2, current), {
       wait: true,
       timeout: 0x1d4c0,
     });
-  const _0x342485 = _inflight.get(_0x73ce06);
-  if (_0x342485) return _0x342485;
-  let _0x3debef;
+  const entry = _inflight.get(src2);
+  if (entry) return entry;
+  let _runLimited2;
   return (
-    (_0x3debef = _runLimited(async () => {
-      const _0xe7b4ed = await post('/api/v2/video/first_frame', { src: _0x73ce06 });
-      if (!_0xe7b4ed.success) throw new Error(_0xe7b4ed.error || '请求失败');
-      return _0xe7b4ed.data;
+    (_runLimited2 = _runLimited(async () => {
+      const response = await post('/api/v2/video/first_frame', { src: src2 });
+      if (!response.success) throw new Error(response.error || '请求失败');
+      return response.data;
     }).finally(() => {
-      if (_inflight.get(_0x73ce06) === _0x3debef) _inflight.delete(_0x73ce06);
+      if (_inflight.get(src2) === _runLimited2) _inflight.delete(src2);
     })),
-    _inflight.set(_0x73ce06, _0x3debef),
-    _0x3debef
+    _inflight.set(src2, _runLimited2),
+    _runLimited2
   );
 }

@@ -33,45 +33,45 @@ function cloneDefaultLayout() {
     more: [...DEFAULT_VIDEO_TOOLBAR_LAYOUT.more],
   };
 }
-function normalizeAction(_0x4a5fc3) {
-  const _0x596a22 = String(_0x4a5fc3 || '').trim();
-  return VIDEO_TOOLBAR_ACTIONS.includes(_0x596a22) ? _0x596a22 : '';
+function normalizeAction(value) {
+  const item = String(value || '').trim();
+  return VIDEO_TOOLBAR_ACTIONS.includes(item) ? item : '';
 }
 export function getDefaultVideoToolbarLayout() {
   return cloneDefaultLayout();
 }
-export function normalizeVideoToolbarLayout(_0x3b1817) {
-  const _0x5dfb1c = cloneDefaultLayout();
-  if (!_0x3b1817 || typeof _0x3b1817 !== 'object') return _0x5dfb1c;
-  const _0x2302c2 = { outsidePrimary: [], outsideSecondary: [], more: [] },
-    _0x43f065 = new Set();
-  for (const _0x2047d1 of ZONE_KEYS) {
-    const _0x1c841d = Array.isArray(_0x3b1817[_0x2047d1]) ? _0x3b1817[_0x2047d1] : [];
-    for (const _0x1c47bb of _0x1c841d) {
-      const _0x3bcc6c = normalizeAction(_0x1c47bb);
-      if (!_0x3bcc6c || _0x43f065.has(_0x3bcc6c)) continue;
-      (_0x43f065.add(_0x3bcc6c), _0x2302c2[_0x2047d1].push(_0x3bcc6c));
+export function normalizeVideoToolbarLayout(enabled) {
+  const cloneDefaultLayout2 = cloneDefaultLayout();
+  if (!enabled || typeof enabled !== 'object') return cloneDefaultLayout2;
+  const key = { outsidePrimary: [], outsideSecondary: [], more: [] },
+    map = new Set();
+  for (const index of ZONE_KEYS) {
+    const result = Array.isArray(enabled[index]) ? enabled[index] : [];
+    for (const data of result) {
+      const action = normalizeAction(data);
+      if (!action || map.has(action)) continue;
+      (map.add(action), key[index].push(action));
     }
   }
-  for (const _0x3f7695 of VIDEO_TOOLBAR_ACTIONS) {
-    if (_0x43f065.has(_0x3f7695)) continue;
-    if (_0x5dfb1c.outsidePrimary.includes(_0x3f7695)) {
-      _0x2302c2.outsidePrimary.push(_0x3f7695);
+  for (const options of VIDEO_TOOLBAR_ACTIONS) {
+    if (map.has(options)) continue;
+    if (cloneDefaultLayout2.outsidePrimary.includes(options)) {
+      key.outsidePrimary.push(options);
       continue;
     }
-    if (_0x5dfb1c.outsideSecondary.includes(_0x3f7695)) {
-      _0x2302c2.outsideSecondary.push(_0x3f7695);
+    if (cloneDefaultLayout2.outsideSecondary.includes(options)) {
+      key.outsideSecondary.push(options);
       continue;
     }
-    _0x2302c2.more.push(_0x3f7695);
+    key.more.push(options);
   }
-  return _0x2302c2;
+  return key;
 }
-export function serializeVideoToolbarLayout(_0x4433da) {
-  const _0x36e5ea = normalizeVideoToolbarLayout(_0x4433da);
+export function serializeVideoToolbarLayout(target) {
+  const outsidePrimary = normalizeVideoToolbarLayout(target);
   return JSON.stringify({
-    outsidePrimary: _0x36e5ea.outsidePrimary,
-    outsideSecondary: _0x36e5ea.outsideSecondary,
-    more: _0x36e5ea.more,
+    outsidePrimary: outsidePrimary.outsidePrimary,
+    outsideSecondary: outsidePrimary.outsideSecondary,
+    more: outsidePrimary.more,
   });
 }

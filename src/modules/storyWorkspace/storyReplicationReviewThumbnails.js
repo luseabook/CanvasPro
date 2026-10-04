@@ -1,77 +1,75 @@
 import { extractClientVideoTimelineFrameUrls } from '../videoTimelineThumbnails.js';
-export function bindStoryReplicationReviewThumbnails(_0x1c3e4c, _0x4ebc04) {
-  const _0x33237a = _0x1c3e4c['querySelector']('[data-replication-segments]'),
-    _0x12b47f = _0x4ebc04['replication']['sourceAnalysis'],
-    _0x58c556 = new Set();
-  let _0x40faf2 = ![],
-    _0x5f188b = ![],
-    _0x1bfc0d = ![];
-  const _0x577477 = () => !_0x40faf2 && _0x4ebc04['replication']['sourceAnalysis'] === _0x12b47f;
-  async function _0x2ec39c() {
-    if (_0x5f188b || _0x1bfc0d || !_0x577477()) return;
-    _0x5f188b = !![];
+export function bindStoryReplicationReviewThumbnails(el, src) {
+  const root = el['querySelector']('[data-replication-segments]'),
+    value = src['replication']['sourceAnalysis'],
+    map = new Set();
+  let enabled = ![],
+    item = ![],
+    enabled2 = ![];
+  const isCurrent = () => !enabled && src['replication']['sourceAnalysis'] === value;
+  async function run() {
+    if (item || enabled2 || !isCurrent()) return;
+    item = !![];
     try {
-      while (_0x58c556['size'] && !_0x1bfc0d && _0x577477()) {
-        const _0x5ce034 = [..._0x58c556]['slice'](0x0, 0x6);
-        _0x5ce034['forEach']((_0x50a37c) => _0x58c556['delete'](_0x50a37c));
-        const _0x311470 = _0x5ce034['map']((_0x1e7c82) => {
-          const _0x3d6b6b = _0x12b47f['events']['find'](
-            (_0x466a5f) => _0x466a5f['id'] === _0x1e7c82['dataset']['replicationSegment'],
+      while (map['size'] && !enabled2 && isCurrent()) {
+        const list = [...map]['slice'](0x0, 0x6);
+        list['forEach']((key) => map['delete'](key));
+        const sampleTimes = list['map']((el2) => {
+          const index = value['events']['find'](
+            (result) => result['id'] === el2['dataset']['replicationSegment'],
           );
-          return (
-            _0x3d6b6b['startSec'] + Math['min'](0.25, (_0x3d6b6b['endSec'] - _0x3d6b6b['startSec']) / 0x2)
-          );
+          return index['startSec'] + Math['min'](0.25, (index['endSec'] - index['startSec']) / 0x2);
         });
         try {
-          const _0x17ed87 = await extractClientVideoTimelineFrameUrls({
-            src: _0x4ebc04['sourceVideo']['videoRef'],
-            sampleTimes: _0x311470,
-            isCurrent: _0x577477,
+          const extractClientVideoTimelineFrameUrls2 = await extractClientVideoTimelineFrameUrls({
+            src: src['sourceVideo']['videoRef'],
+            sampleTimes: sampleTimes,
+            isCurrent: isCurrent,
           });
-          if (!_0x577477()) return;
-          _0x5ce034['forEach']((_0x161f95, _0x43ee4b) => {
-            if (!_0x17ed87[_0x43ee4b]) return;
-            const _0xc41749 = document['createElement']('img');
-            ((_0xc41749['alt'] = ''),
-              (_0xc41749['src'] = _0x17ed87[_0x43ee4b]),
-              _0x161f95['querySelector']('.story-source-segment-frame')['replaceChildren'](_0xc41749));
+          if (!isCurrent()) return;
+          list['forEach']((el3, data) => {
+            if (!extractClientVideoTimelineFrameUrls2[data]) return;
+            const options = document['createElement']('img');
+            ((options['alt'] = ''),
+              (options['src'] = extractClientVideoTimelineFrameUrls2[data]),
+              el3['querySelector']('.story-source-segment-frame')['replaceChildren'](options));
           });
         } catch {}
       }
     } finally {
-      _0x5f188b = ![];
+      item = ![];
     }
   }
-  const _0x426332 = new IntersectionObserver(
-    (_0x2960f2) => {
-      for (const _0x25d5ba of _0x2960f2) {
-        if (!_0x25d5ba['isIntersecting']) {
-          _0x58c556['delete'](_0x25d5ba['target']);
+  const intersectionObserver = new IntersectionObserver(
+    (target) => {
+      for (const event of target) {
+        if (!event['isIntersecting']) {
+          map['delete'](event['target']);
           continue;
         }
-        if (_0x25d5ba['target']['querySelector']('img')) {
-          _0x426332['unobserve'](_0x25d5ba['target']);
+        if (event['target']['querySelector']('img')) {
+          intersectionObserver['unobserve'](event['target']);
           continue;
         }
-        (_0x58c556['add'](_0x25d5ba['target']), _0x426332['unobserve'](_0x25d5ba['target']));
+        (map['add'](event['target']), intersectionObserver['unobserve'](event['target']));
       }
-      void _0x2ec39c();
+      void run();
     },
-    { root: _0x33237a, rootMargin: '120px' },
+    { root: root, rootMargin: '120px' },
   );
   return (
-    _0x33237a['querySelectorAll']('[data-replication-segment]')['forEach']((_0xb74602) =>
-      _0x426332['observe'](_0xb74602),
+    root['querySelectorAll']('[data-replication-segment]')['forEach']((source) =>
+      intersectionObserver['observe'](source),
     ),
     {
       suspend() {
-        _0x1bfc0d = !![];
+        enabled2 = !![];
       },
       resume() {
-        ((_0x1bfc0d = ![]), void _0x2ec39c());
+        ((enabled2 = ![]), void run());
       },
       destroy() {
-        ((_0x40faf2 = !![]), _0x58c556['clear'](), _0x426332['disconnect']());
+        ((enabled = !![]), map['clear'](), intersectionObserver['disconnect']());
       },
     }
   );

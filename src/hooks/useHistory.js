@@ -4,18 +4,17 @@ let _canUndo = false,
   _canRedo = false,
   _listeners = [];
 function _updateHistoryState() {
-  const _0x3c664b = getHistoryInfo(),
-    _0x237d63 = _0x3c664b.undoCount >= 2,
-    _0x1e4885 = _0x3c664b.redoCount > 0;
-  (_0x237d63 !== _canUndo || _0x1e4885 !== _canRedo) &&
-    ((_canUndo = _0x237d63), (_canRedo = _0x1e4885), _notifyListeners());
+  const historyInfo = getHistoryInfo(),
+    value = historyInfo.undoCount >= 2,
+    item = historyInfo.redoCount > 0;
+  (value !== _canUndo || item !== _canRedo) && ((_canUndo = value), (_canRedo = item), _notifyListeners());
 }
 function _notifyListeners() {
-  _listeners.forEach((_0x11baeb) => {
+  _listeners.forEach((handler) => {
     try {
-      _0x11baeb({ canUndo: _canUndo, canRedo: _canRedo });
-    } catch (_0x2d6a71) {
-      console.error('[useHistory] 监听者回调执行异常:', _0x2d6a71);
+      handler({ canUndo: _canUndo, canRedo: _canRedo });
+    } catch (key) {
+      console.error('[useHistory] 监听者回调执行异常:', key);
     }
   });
 }
@@ -27,8 +26,8 @@ export function performRedo() {
   if (!canRedo()) return false;
   return (redo(), _updateHistoryState(), true);
 }
-export function saveState(_0x18ffe9) {
-  (commit(), _updateHistoryState(), _0x18ffe9 && console.log('[useHistory] 已保存状态: ' + _0x18ffe9));
+export function saveState(index) {
+  (commit(), _updateHistoryState(), index && console.log('[useHistory] 已保存状态: ' + index));
 }
 export function canUndo() {
   return _canUndo;
@@ -37,33 +36,33 @@ export function canRedo() {
   return _canRedo;
 }
 export function getHistoryState() {
-  const _0x404abc = getHistoryInfo();
-  return { ..._0x404abc, canUndo: _0x404abc.undoCount >= 2, canRedo: _0x404abc.redoCount > 0 };
+  const canUndo2 = getHistoryInfo();
+  return { ...canUndo2, canUndo: canUndo2.undoCount >= 2, canRedo: canUndo2.redoCount > 0 };
 }
-export function subscribeToHistory(_0x2a5ac9) {
+export function subscribeToHistory(handler2) {
   return (
-    _listeners.push(_0x2a5ac9),
-    _0x2a5ac9({ canUndo: _canUndo, canRedo: _canRedo }),
+    _listeners.push(handler2),
+    handler2({ canUndo: _canUndo, canRedo: _canRedo }),
     () => {
-      const _0xc61276 = _listeners.indexOf(_0x2a5ac9);
-      _0xc61276 > -1 && _listeners.splice(_0xc61276, 1);
+      const result = _listeners.indexOf(handler2);
+      result > -1 && _listeners.splice(result, 1);
     }
   );
 }
-export function batchWithHistory(_0x4b676b, _0x4860f8) {
+export function batchWithHistory(handler3, data) {
   (appStore.batch(() => {
-    _0x4b676b();
+    handler3();
   }),
-    saveState(_0x4860f8));
+    saveState(data));
 }
-export function withHistory(_0x389a6a, _0x90b264) {
-  return function (..._0x4ce11f) {
-    const _0x508c8a = _0x389a6a.apply(this, _0x4ce11f);
-    return (saveState(_0x90b264), _0x508c8a);
+export function withHistory(options, target) {
+  return function (...args) {
+    const source = options.apply(this, args);
+    return (saveState(target), source);
   };
 }
-export function onHistoryCommit(_0x51d5f0) {
-  return onCommit(_0x51d5f0);
+export function onHistoryCommit(next) {
+  return onCommit(next);
 }
 export function clearHistory() {
   (commit(), _updateHistoryState());

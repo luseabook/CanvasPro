@@ -2,49 +2,49 @@ import { buildImageNodeStorageFields } from '../../services/imageDerivativeServi
 import { pickResultLocalPath, urlToLocalPath } from '../../utils/localMediaPath.js';
 import { t } from '../../i18n/index.js';
 export function registerResourceUploadEntry({
-  store: _0x5778e4,
-  uploadFile: _0x3940f0,
-  getBaseName: _0x265564,
-  getCurrentProjectId: _0x91ad41,
+  store: store,
+  uploadFile: uploadFile,
+  getBaseName: getBaseName,
+  getCurrentProjectId: getCurrentProjectId,
 }) {
-  const _0x30b1c4 = async (_0x100910) => {
-    const _0x3d6676 = _0x100910?.detail?.id,
-      _0x4bcace = _0x100910?.detail?.file;
-    if (!_0x3d6676 || !_0x4bcace) return;
-    const _0x5bc365 = _0x5778e4.getState().nodes[_0x3d6676];
-    if (!_0x5bc365) return;
+  const async2 = async (value) => {
+    const enabled = value?.detail?.id,
+      error = value?.detail?.file;
+    if (!enabled || !error) return;
+    const enabled2 = store.getState().nodes[enabled];
+    if (!enabled2) return;
     try {
-      const _0x4fff0a = _0x91ad41?.() || 'default_v2_project',
-        _0x18ecfb = await _0x3940f0(_0x4bcace, _0x4fff0a),
-        _0x7bcef9 = _0x265564(_0x4bcace.name);
-      if (_0x7bcef9) _0x5778e4.renameNode(_0x3d6676, _0x7bcef9);
-      const _0x3c569f = document.getElementById(_0x3d6676),
-        _0x234bdb = _0x3c569f?.__v2_name_el;
-      if (_0x234bdb && _0x7bcef9) _0x234bdb.textContent = _0x7bcef9;
-      const _0x191c68 = _0x18ecfb.url,
-        _0x5f524e = pickResultLocalPath(_0x18ecfb) || urlToLocalPath(_0x191c68);
-      _0x5778e4.updateNodeData(_0x3d6676, {
-        src: _0x191c68,
-        localPath: _0x5f524e,
-        assetId: _0x18ecfb.assetId || '',
-        originalLocalPath: _0x18ecfb.originalLocalPath || _0x18ecfb.localPath || '',
-        posterLocalPath: _0x18ecfb.posterLocalPath || '',
-        waveformLocalPath: _0x18ecfb.waveformLocalPath || '',
-        derivativeStatus: _0x18ecfb.derivativeStatus || _0x18ecfb.status || '',
-        mediaTaskId: _0x18ecfb.mediaTaskId || '',
-        mediaTaskKind: _0x18ecfb.mediaTaskKind || '',
-        mediaTaskStatus: _0x18ecfb.mediaTaskStatus || '',
-        mediaTaskProgress: Number(_0x18ecfb.mediaTaskProgress || 0) || 0,
-        mediaTaskError: _0x18ecfb.mediaTaskError || '',
-        ...buildImageNodeStorageFields(_0x18ecfb),
-        fileName: _0x18ecfb.filename || _0x4bcace.name,
+      const item = getCurrentProjectId?.() || 'default_v2_project',
+        assetId = await uploadFile(error, item),
+        key = getBaseName(error.name);
+      if (key) store.renameNode(enabled, key);
+      const index = document.getElementById(enabled),
+        el = index?.__v2_name_el;
+      if (el && key) el.textContent = key;
+      const src = assetId.url,
+        localPath = pickResultLocalPath(assetId) || urlToLocalPath(src);
+      store.updateNodeData(enabled, {
+        src: src,
+        localPath: localPath,
+        assetId: assetId.assetId || '',
+        originalLocalPath: assetId.originalLocalPath || assetId.localPath || '',
+        posterLocalPath: assetId.posterLocalPath || '',
+        waveformLocalPath: assetId.waveformLocalPath || '',
+        derivativeStatus: assetId.derivativeStatus || assetId.status || '',
+        mediaTaskId: assetId.mediaTaskId || '',
+        mediaTaskKind: assetId.mediaTaskKind || '',
+        mediaTaskStatus: assetId.mediaTaskStatus || '',
+        mediaTaskProgress: Number(assetId.mediaTaskProgress || 0) || 0,
+        mediaTaskError: assetId.mediaTaskError || '',
+        ...buildImageNodeStorageFields(assetId),
+        fileName: assetId.filename || error.name,
       });
-    } catch (_0x240156) {
-      (console.error('上传失败:', _0x240156), window.showToast(t('previewUpload.uploadFailed')));
+    } catch (result) {
+      (console.error('上传失败:', result), window.showToast(t('previewUpload.uploadFailed')));
     }
   };
   return (
-    window.addEventListener('v2:resource-upload', _0x30b1c4),
-    () => window.removeEventListener('v2:resource-upload', _0x30b1c4)
+    window.addEventListener('v2:resource-upload', async2),
+    () => window.removeEventListener('v2:resource-upload', async2)
   );
 }

@@ -1,52 +1,50 @@
 import { worldToScreen } from '../../core/math.js';
 import { readNodeGeometryPreview } from '../../core/nodeGeometryPreview.js';
 export function drawCollaborationMediaStatus({
-  state: _0x401631,
-  nodes: _0x51acd9,
-  viewport: _0x3cbbdb,
-  bounds: _0x501f03,
-  entryFor: _0x1fc584,
-  getSession: _0x193ade,
-  documentObject: _0x2cb691,
+  state: state,
+  nodes: nodes,
+  viewport: viewport,
+  bounds: bounds,
+  entryFor: entryFor,
+  getSession: getSession,
+  documentObject: documentObject,
 }) {
-  for (const _0x164390 of _0x401631?.['mediaNodes'] || []) {
-    if (!_0x164390['failed']) continue;
-    const _0x2f1d2d = readNodeGeometryPreview(_0x164390['id'], _0x51acd9[_0x164390['id']]);
-    if (!_0x2f1d2d || !_0x2f1d2d['width'] || !_0x2f1d2d['height']) continue;
-    const _0x245e03 = worldToScreen(_0x2f1d2d['x'], _0x2f1d2d['y'], _0x3cbbdb),
-      _0x3d7b2f = _0x2f1d2d['width'] * _0x3cbbdb['zoom'],
-      _0x5aa99c = _0x2f1d2d['height'] * _0x3cbbdb['zoom'];
+  for (const error of state?.['mediaNodes'] || []) {
+    if (!error['failed']) continue;
+    const box = readNodeGeometryPreview(error['id'], nodes[error['id']]);
+    if (!box || !box['width'] || !box['height']) continue;
+    const box2 = worldToScreen(box['x'], box['y'], viewport),
+      value = box['width'] * viewport['zoom'],
+      item = box['height'] * viewport['zoom'];
     if (
-      _0x245e03['x'] + _0x3d7b2f < _0x501f03['left'] ||
-      _0x245e03['x'] > _0x501f03['left'] + _0x501f03['width'] ||
-      _0x245e03['y'] + _0x5aa99c < _0x501f03['top'] ||
-      _0x245e03['y'] > _0x501f03['top'] + _0x501f03['height']
+      box2['x'] + value < bounds['left'] ||
+      box2['x'] > bounds['left'] + bounds['width'] ||
+      box2['y'] + item < bounds['top'] ||
+      box2['y'] > bounds['top'] + bounds['height']
     )
       continue;
-    const _0xc76269 = _0x1fc584('media:' + _0x164390['id'], 'collaboration-media-status');
-    if (!_0xc76269['firstChild']) {
-      const _0x317c02 = _0x2cb691['createElement']('span'),
-        _0x4ffb3d = _0x2cb691['createElement']('button');
-      ((_0x4ffb3d['type'] = 'button'),
-        (_0x4ffb3d['textContent'] = '重试'),
-        _0x4ffb3d['addEventListener']('click', (_0x595a26) => {
-          (_0x595a26['stopPropagation'](), _0x193ade()?.['retryMedia'](_0xc76269['dataset']['nodeId']));
+    const el = entryFor('media:' + error['id'], 'collaboration-media-status');
+    if (!el['firstChild']) {
+      const key = documentObject['createElement']('span'),
+        el2 = documentObject['createElement']('button');
+      ((el2['type'] = 'button'),
+        (el2['textContent'] = '重试'),
+        el2['addEventListener']('click', (event) => {
+          (event['stopPropagation'](), getSession()?.['retryMedia'](el['dataset']['nodeId']));
         }),
-        _0xc76269['append'](_0x317c02, _0x4ffb3d),
-        _0xc76269['setAttribute']('role', 'status'));
+        el['append'](key, el2),
+        el['setAttribute']('role', 'status'));
     }
-    ((_0xc76269['dataset']['nodeId'] = _0x164390['id']),
-      _0xc76269['classList']['toggle']('is-failed', _0x164390['failed']),
-      (_0xc76269['firstChild']['textContent'] = _0x164390['message']
-        ? '素材准备失败：' + _0x164390['message']
+    ((el['dataset']['nodeId'] = error['id']),
+      el['classList']['toggle']('is-failed', error['failed']),
+      (el['firstChild']['textContent'] = error['message']
+        ? '素材准备失败：' + error['message']
         : '素材准备失败'),
-      (_0xc76269['lastChild']['hidden'] = !_0x164390['retry']),
-      _0xc76269['lastChild']['setAttribute']('aria-label', '重试 ' + (_0x2f1d2d['name'] || '素材')),
-      (_0xc76269['title'] =
-        _0x164390['failed'] && !_0x164390['retry']
-          ? '请添加此素材的成员重试'
-          : _0xc76269['firstChild']['textContent']),
-      (_0xc76269['style']['transform'] = 'translate(' + _0x245e03['x'] + 'px,\x20' + _0x245e03['y'] + 'px)'),
-      (_0xc76269['style']['maxWidth'] = _0x3d7b2f + 'px'));
+      (el['lastChild']['hidden'] = !error['retry']),
+      el['lastChild']['setAttribute']('aria-label', '重试 ' + (box['name'] || '素材')),
+      (el['title'] =
+        error['failed'] && !error['retry'] ? '请添加此素材的成员重试' : el['firstChild']['textContent']),
+      (el['style']['transform'] = 'translate(' + box2['x'] + 'px,\x20' + box2['y'] + 'px)'),
+      (el['style']['maxWidth'] = value + 'px'));
   }
 }

@@ -1,66 +1,66 @@
 import { toNumber } from './mediaClipUtils.js';
-export function createTimelineInteractionState(_0x4a96f9 = {}) {
-  return { mode: 'idle', hoverKind: '', hoverClipIndex: -1, drag: null, ..._0x4a96f9 };
+export function createTimelineInteractionState(args = {}) {
+  return { mode: 'idle', hoverKind: '', hoverClipIndex: -1, drag: null, ...args };
 }
-export function getTimelineDrag(_0x5a65d2) {
-  return _0x5a65d2._timelineInteractionState?.drag || null;
+export function getTimelineDrag(value) {
+  return value._timelineInteractionState?.drag || null;
 }
-export function nextTimelineDragSessionId(_0x1eafb2) {
+export function nextTimelineDragSessionId(item) {
   return (
-    (_0x1eafb2._timelineDragSessionSeq = toNumber(_0x1eafb2._timelineDragSessionSeq, 0) + 1),
-    _0x1eafb2._timelineDragSessionSeq
+    (item._timelineDragSessionSeq = toNumber(item._timelineDragSessionSeq, 0) + 1),
+    item._timelineDragSessionSeq
   );
 }
-export function isTimelineDragSession(_0x1d8b67, _0x223516) {
-  const _0x3839f9 = _0x1d8b67._timelineDrag();
-  return !!_0x3839f9 && _0x3839f9.sessionId === _0x223516;
+export function isTimelineDragSession(key, index) {
+  const enabled = key._timelineDrag();
+  return !!enabled && enabled.sessionId === index;
 }
-export function setTimelineDrag(_0x33f53a, _0x233310 = null) {
-  _0x33f53a._timelineInteractionState = _0x33f53a._createTimelineInteractionState({
-    mode: _0x233310?.mode || 'idle',
-    drag: _0x233310,
+export function setTimelineDrag(result, mode = null) {
+  result._timelineInteractionState = result._createTimelineInteractionState({
+    mode: mode?.mode || 'idle',
+    drag: mode,
   });
 }
-export function setTimelineHoverSegment(_0x38725e, _0x556421, _0xb72c38, _0x328b0 = '', _0x46b6de = -1) {
-  if (!_0xb72c38) return;
-  const _0x12cee4 = Math.trunc(toNumber(_0x46b6de, -1));
+export function setTimelineHoverSegment(mode2, data, el, hoverKind = '', options = -1) {
+  if (!el) return;
+  const hoverClipIndex = Math.trunc(toNumber(options, -1));
   if (
-    _0x38725e._timelineInteractionState?.hoverKind === _0x328b0 &&
-    _0x38725e._timelineInteractionState?.hoverClipIndex === _0x12cee4 &&
-    _0xb72c38.dataset.trimHover === 'true' &&
-    _0xb72c38.classList.contains('is-hovered')
+    mode2._timelineInteractionState?.hoverKind === hoverKind &&
+    mode2._timelineInteractionState?.hoverClipIndex === hoverClipIndex &&
+    el.dataset.trimHover === 'true' &&
+    el.classList.contains('is-hovered')
   )
     return;
-  const _0x2130f7 = _0x556421 || _0xb72c38.closest?.('.media-clip-track') || _0x38725e.el;
-  (_0x2130f7
+  const el2 = data || el.closest?.('.media-clip-track') || mode2.el;
+  (el2
     ?.querySelectorAll?.('.media-clip-segment[data-trim-hover="true"], .media-clip-segment.is-hovered')
-    ?.forEach((_0xfbf353) => {
-      if (_0xfbf353 === _0xb72c38) return;
-      (delete _0xfbf353.dataset.trimHover, _0xfbf353.classList.remove('is-hovered'));
+    ?.forEach((el3) => {
+      if (el3 === el) return;
+      (delete el3.dataset.trimHover, el3.classList.remove('is-hovered'));
     }),
-    (_0xb72c38.dataset.trimHover = 'true'),
-    _0xb72c38.classList.add('is-hovered'),
-    (_0x38725e._timelineInteractionState = _0x38725e._createTimelineInteractionState({
-      ..._0x38725e._timelineInteractionState,
-      mode: _0x38725e._timelineDrag() ? _0x38725e._timelineInteractionState.mode : 'hover',
-      hoverKind: _0x328b0,
-      hoverClipIndex: _0x12cee4,
+    (el.dataset.trimHover = 'true'),
+    el.classList.add('is-hovered'),
+    (mode2._timelineInteractionState = mode2._createTimelineInteractionState({
+      ...mode2._timelineInteractionState,
+      mode: mode2._timelineDrag() ? mode2._timelineInteractionState.mode : 'hover',
+      hoverKind: hoverKind,
+      hoverClipIndex: hoverClipIndex,
     })));
 }
-export function clearTimelineHoverState(_0x4908cd, _0x24a02d = _0x4908cd.el) {
-  const _0xa471df =
-    _0x4908cd._timelineInteractionState?.hoverKind ||
-    _0x4908cd._timelineInteractionState?.hoverClipIndex !== -1 ||
-    _0x24a02d?.querySelector?.('.media-clip-segment[data-trim-hover="true"], .media-clip-segment.is-hovered');
-  if (!_0xa471df) return;
-  (_0x24a02d
+export function clearTimelineHoverState(mode3, el4 = mode3.el) {
+  const enabled2 =
+    mode3._timelineInteractionState?.hoverKind ||
+    mode3._timelineInteractionState?.hoverClipIndex !== -1 ||
+    el4?.querySelector?.('.media-clip-segment[data-trim-hover="true"], .media-clip-segment.is-hovered');
+  if (!enabled2) return;
+  (el4
     ?.querySelectorAll?.('.media-clip-segment[data-trim-hover="true"], .media-clip-segment.is-hovered')
-    ?.forEach((_0x300240) => {
-      (delete _0x300240.dataset.trimHover, _0x300240.classList.remove('is-hovered'));
+    ?.forEach((el5) => {
+      (delete el5.dataset.trimHover, el5.classList.remove('is-hovered'));
     }),
-    (_0x4908cd._timelineInteractionState = _0x4908cd._createTimelineInteractionState({
-      ..._0x4908cd._timelineInteractionState,
-      mode: _0x4908cd._timelineDrag() ? _0x4908cd._timelineInteractionState.mode : 'idle',
+    (mode3._timelineInteractionState = mode3._createTimelineInteractionState({
+      ...mode3._timelineInteractionState,
+      mode: mode3._timelineDrag() ? mode3._timelineInteractionState.mode : 'idle',
       hoverKind: '',
       hoverClipIndex: -1,
     })));

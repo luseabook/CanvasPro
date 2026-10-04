@@ -1,1 +1,68 @@
-import{REPLICATION_SPEECH_GUIDANCE}from'./videoReplicationSpeech.js';const text=_0x25af2e=>String(_0x25af2e??'')["trim"](),hasSpeech=_0x59f0dd=>Boolean(text(_0x59f0dd?.["text"])||_0x59f0dd?.['uncertain']||_0x59f0dd?.["kind"]==="uncertain"),isUncertain=_0x491ebc=>_0x491ebc?.["uncertain"]||_0x491ebc?.['kind']==="uncertain"||/听不清|无法听清|无法辨认/u['test'](text(_0x491ebc?.["text"]));export const REPLICATION_SPEECH_ROUTING_GUIDANCE=REPLICATION_SPEECH_GUIDANCE+" 复刻按每个事件的 dialogue、voiceover、speechOrder 与 speechRefs 保留声音类型和先后，不使用整集 scriptMode 重新分类。speechPolicy 的 dialogue_only/voiceover_only/mixed/no_speech/uncertain 仅概括声音有无，不替代逐句证据；mixed 不代表同时说话，uncertain 不代表无人声。已确定片段后保持原时间范围和总时长，不能按字数重估或沿语义另拆片段。已翻译人声和已替换人物继续沿用，不改回原语言或原人物。";export function buildVideoReplicationSpeechPolicy(_0x3244ad){if(!_0x3244ad)return null;const _0x2399df=(_0x3244ad['events']||[])["map"](_0x388a89=>{const _0x13d81a=(_0x388a89["dialogue"]||[])["filter"](hasSpeech),_0x5a19f6=(_0x388a89["voiceover"]||[])["filter"](hasSpeech),_0x548dd7=[..._0x13d81a,..._0x5a19f6]["some"](isUncertain)||(_0x388a89['uncertainties']||[])["some"](_0x63bc8e=>/听|人声|旁白|独白|音频|speech|audio/iu["test"](_0x63bc8e)),_0x2f7c87=_0x548dd7?"uncertain":_0x13d81a['length']&&_0x5a19f6["length"]?"mixed":_0x13d81a["length"]?"dialogue_only":_0x5a19f6["length"]?"voiceover_only":"no_speech";return{'eventId':_0x388a89['id'],'startSec':_0x388a89["startSec"],'endSec':_0x388a89["endSec"],'mode':_0x2f7c87,'dialogueCount':_0x13d81a["length"],'voiceoverCount':_0x5a19f6["length"],'voiceoverKinds':[...new Set(_0x5a19f6["map"](_0x11c30c=>_0x11c30c["kind"]))]};});return{'schemaVersion':0x1,'events':_0x2399df};}export function getVideoReplicationSpeechGuidance(_0x9552d){return _0x9552d?.["replication"]?.["sourceAnalysis"]?REPLICATION_SPEECH_ROUTING_GUIDANCE:'';}export function buildVideoReplicationSpeechReviewContext(_0x12c8a0){const _0x5da38e=_0x12c8a0?.["replication"]?.["sourceAnalysis"];if(!_0x5da38e)return{};return{'speechPolicy':buildVideoReplicationSpeechPolicy(_0x5da38e),'speechGuidance':REPLICATION_SPEECH_ROUTING_GUIDANCE,'sourceSpeechEvents':_0x5da38e['events']["map"](({id:_0x4d37b0,visual:_0x3f6b15,dialogue:_0x1257f1,voiceover:_0x9eb574,uncertainties:_0x51478f})=>({'eventId':_0x4d37b0,'visual':_0x3f6b15,'dialogue':_0x1257f1,'voiceover':_0x9eb574,'uncertainties':_0x51478f}))};}
+import { REPLICATION_SPEECH_GUIDANCE } from './videoReplicationSpeech.js';
+const text = (value) => String(value ?? '')['trim'](),
+  hasSpeech = (item) =>
+    Boolean(text(item?.['text']) || item?.['uncertain'] || item?.['kind'] === 'uncertain'),
+  isUncertain = (key) =>
+    key?.['uncertain'] ||
+    key?.['kind'] === 'uncertain' ||
+    /听不清|无法听清|无法辨认/u['test'](text(key?.['text']));
+export const REPLICATION_SPEECH_ROUTING_GUIDANCE =
+  REPLICATION_SPEECH_GUIDANCE +
+  ' 复刻按每个事件的 dialogue、voiceover、speechOrder 与 speechRefs 保留声音类型和先后，不使用整集 scriptMode 重新分类。speechPolicy 的 dialogue_only/voiceover_only/mixed/no_speech/uncertain 仅概括声音有无，不替代逐句证据；mixed 不代表同时说话，uncertain 不代表无人声。已确定片段后保持原时间范围和总时长，不能按字数重估或沿语义另拆片段。已翻译人声和已替换人物继续沿用，不改回原语言或原人物。';
+export function buildVideoReplicationSpeechPolicy(enabled) {
+  if (!enabled) return null;
+  const index = (enabled['events'] || [])['map']((result) => {
+    const list = (result['dialogue'] || [])['filter'](hasSpeech),
+      args = (result['voiceover'] || [])['filter'](hasSpeech),
+      data =
+        [...list, ...args]['some'](isUncertain) ||
+        (result['uncertainties'] || [])['some']((options) =>
+          /听|人声|旁白|独白|音频|speech|audio/iu['test'](options),
+        ),
+      target = data
+        ? 'uncertain'
+        : list['length'] && args['length']
+          ? 'mixed'
+          : list['length']
+            ? 'dialogue_only'
+            : args['length']
+              ? 'voiceover_only'
+              : 'no_speech';
+    return {
+      eventId: result['id'],
+      startSec: result['startSec'],
+      endSec: result['endSec'],
+      mode: target,
+      dialogueCount: list['length'],
+      voiceoverCount: args['length'],
+      voiceoverKinds: [...new Set(args['map']((source) => source['kind']))],
+    };
+  });
+  return { schemaVersion: 0x1, events: index };
+}
+export function getVideoReplicationSpeechGuidance(next) {
+  return next?.['replication']?.['sourceAnalysis'] ? REPLICATION_SPEECH_ROUTING_GUIDANCE : '';
+}
+export function buildVideoReplicationSpeechReviewContext(current) {
+  const enabled2 = current?.['replication']?.['sourceAnalysis'];
+  if (!enabled2) return {};
+  return {
+    speechPolicy: buildVideoReplicationSpeechPolicy(enabled2),
+    speechGuidance: REPLICATION_SPEECH_ROUTING_GUIDANCE,
+    sourceSpeechEvents: enabled2['events']['map'](
+      ({
+        id: id,
+        visual: visual,
+        dialogue: dialogue,
+        voiceover: voiceover,
+        uncertainties: uncertainties,
+      }) => ({
+        eventId: id,
+        visual: visual,
+        dialogue: dialogue,
+        voiceover: voiceover,
+        uncertainties: uncertainties,
+      }),
+    ),
+  };
+}

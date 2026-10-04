@@ -10,31 +10,31 @@ export const STORYBOARD_3D_NAVIGATION_MODE = Object['freeze']({
   FLY_LOOK: 'fly-look',
 });
 export function resolveStoryboard3DNavigationMode(
-  _0x1f609c = {},
+  event = {},
   { flyMode: flyMode = ![], preset: preset = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET } = {},
 ) {
-  const _0x354e42 = Number(_0x1f609c['button']),
-    _0x286ca3 = _0x1f609c['altKey'] === !![],
-    _0x131217 = _0x1f609c['shiftKey'] === !![],
-    _0x2edb76 = _0x1f609c['ctrlKey'] === !![] || _0x1f609c['metaKey'] === !![],
-    _0x13184b = STORYBOARD_3D_NAVIGATION_PRESETS[preset] ? preset : DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET;
-  if (flyMode && _0x354e42 === 0x2) return STORYBOARD_3D_NAVIGATION_MODE['FLY_LOOK'];
-  if (_0x13184b === 'blender') {
-    if (_0x354e42 !== 0x1) return null;
-    if (_0x2edb76) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
-    if (_0x131217) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
+  const count = Number(event['button']),
+    enabled = event['altKey'] === !![],
+    value = event['shiftKey'] === !![],
+    item = event['ctrlKey'] === !![] || event['metaKey'] === !![],
+    key = STORYBOARD_3D_NAVIGATION_PRESETS[preset] ? preset : DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET;
+  if (flyMode && count === 0x2) return STORYBOARD_3D_NAVIGATION_MODE['FLY_LOOK'];
+  if (key === 'blender') {
+    if (count !== 0x1) return null;
+    if (item) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
+    if (value) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
     return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
   }
-  if (_0x13184b === 'unity') {
-    if (_0x354e42 === 0x1) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
-    if (_0x286ca3 && _0x354e42 === 0x0) return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
-    if (_0x286ca3 && _0x354e42 === 0x2) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
+  if (key === 'unity') {
+    if (count === 0x1) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
+    if (enabled && count === 0x0) return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
+    if (enabled && count === 0x2) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
     return null;
   }
-  if (!_0x286ca3) return null;
-  if (_0x354e42 === 0x0) return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
-  if (_0x354e42 === 0x1) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
-  if (_0x354e42 === 0x2) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
+  if (!enabled) return null;
+  if (count === 0x0) return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
+  if (count === 0x1) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
+  if (count === 0x2) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
   return null;
 }
 export function getStoryboard3DNavigationHelpText({
@@ -47,10 +47,9 @@ export function getStoryboard3DNavigationHelpText({
         STORYBOARD_3D_NAVIGATION_PRESETS[DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET]['summary'];
 }
 export function resolveStoryboard3DNavigationTool(
-  _0x10d72c = {},
+  event2 = {},
   { preset: preset = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET } = {},
 ) {
-  if (_0x10d72c['altKey'] || _0x10d72c['ctrlKey'] || _0x10d72c['metaKey'] || _0x10d72c['shiftKey'])
-    return null;
-  return resolveStoryboard3DToolFromShortcut(_0x10d72c['key'], preset);
+  if (event2['altKey'] || event2['ctrlKey'] || event2['metaKey'] || event2['shiftKey']) return null;
+  return resolveStoryboard3DToolFromShortcut(event2['key'], preset);
 }

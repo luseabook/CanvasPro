@@ -36,10 +36,10 @@ export const rhImageHdModelManifest = Object['freeze']({
         label: '分辨率',
         menuTitle: '分辨率',
         defaultValue: 0x780,
-        options: [0x500, 0x780, 0xa00]['map']((_0x2c7fb1) => ({
-          value: _0x2c7fb1,
-          label: String(_0x2c7fb1),
-          selectedLabel: '分辨率' + _0x2c7fb1,
+        options: [0x500, 0x780, 0xa00]['map']((value) => ({
+          value: value,
+          label: String(value),
+          selectedLabel: '分辨率' + value,
         })),
       },
       RH_IMAGE_INSTANCE_FIELD,

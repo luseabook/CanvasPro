@@ -1,67 +1,67 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 export function buildVideoReverseFfmpegArgs({
-  sourceAbs: _0x258d5e,
-  outAbs: _0x50573f,
+  sourceAbs: sourceAbs,
+  outAbs: outAbs,
   hasAudio: hasAudio = false,
 } = {}) {
-  if (!_0x258d5e || !_0x50573f) throw new Error('Invalid video reverse source');
-  const _0x4e62a8 = ['[0:v]reverse,setpts=PTS-STARTPTS,format=yuv420p[v]'];
-  hasAudio && _0x4e62a8.push('[0:a]areverse,asetpts=PTS-STARTPTS[a]');
-  const _0x35f9f5 = ['-y', '-i', _0x258d5e, '-filter_complex', _0x4e62a8.join(';'), '-map', '[v]'];
+  if (!sourceAbs || !outAbs) throw new Error('Invalid video reverse source');
+  const list = ['[0:v]reverse,setpts=PTS-STARTPTS,format=yuv420p[v]'];
+  hasAudio && list.push('[0:a]areverse,asetpts=PTS-STARTPTS[a]');
+  const list2 = ['-y', '-i', sourceAbs, '-filter_complex', list.join(';'), '-map', '[v]'];
   return (
-    hasAudio ? _0x35f9f5.push('-map', '[a]') : _0x35f9f5.push('-an'),
-    _0x35f9f5.push('-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-preset', 'fast'),
-    hasAudio && _0x35f9f5.push('-c:a', 'aac'),
-    _0x35f9f5.push('-movflags', '+faststart', _0x50573f),
-    _0x35f9f5
+    hasAudio ? list2.push('-map', '[a]') : list2.push('-an'),
+    list2.push('-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-preset', 'fast'),
+    hasAudio && list2.push('-c:a', 'aac'),
+    list2.push('-movflags', '+faststart', outAbs),
+    list2
   );
 }
 export function createVideoReverseMediaTaskHandler({
-  createOutputFilename: _0x2454ee,
-  ffprobeHasAudio: _0x13a5a7,
-  ffprobeVideoMeta: _0x50c186,
-  getOutputDir: _0x4d42a4,
-  getRuntimeToolOrFallback: _0x371415,
+  createOutputFilename: createOutputFilename,
+  ffprobeHasAudio: ffprobeHasAudio,
+  ffprobeVideoMeta: ffprobeVideoMeta,
+  getOutputDir: getOutputDir,
+  getRuntimeToolOrFallback: getRuntimeToolOrFallback,
   runFfmpegTask: runFfmpegTask,
-  resolveMediaTaskSource: _0x14127a,
-  toOutputLocalPath: _0xec399,
+  resolveMediaTaskSource: resolveMediaTaskSource,
+  toOutputLocalPath: toOutputLocalPath,
 }) {
-  return async (_0x50ded9, _0x507084) => {
-    const _0x17dd4f = _0x14127a(_0x50ded9.payload.src),
-      _0x3d7819 = await _0x50c186(_0x507084, _0x50ded9, _0x17dd4f);
-    if (!_0x3d7819.width || !_0x3d7819.height) throw new Error('Source video has no video stream');
-    const _0x331cc9 = await _0x13a5a7(_0x507084, _0x50ded9, _0x17dd4f),
-      _0x4ee311 = path.join(_0x4d42a4(), 'ReverseVideo');
-    mkdirSync(_0x4ee311, { recursive: true });
-    const _0x45531e = _0x2454ee('reverse', 'mp4'),
-      _0x43eace = path.join(_0x4ee311, _0x45531e),
-      _0x2d1390 = _0xec399('ReverseVideo', _0x45531e),
-      _0x9f09d5 = buildVideoReverseFfmpegArgs({
-        sourceAbs: _0x17dd4f,
-        outAbs: _0x43eace,
-        hasAudio: _0x331cc9,
+  return async (value, item) => {
+    const sourceAbs2 = resolveMediaTaskSource(value.payload.src),
+      durationSec = await ffprobeVideoMeta(item, value, sourceAbs2);
+    if (!durationSec.width || !durationSec.height) throw new Error('Source video has no video stream');
+    const hasAudio2 = await ffprobeHasAudio(item, value, sourceAbs2),
+      key = path.join(getOutputDir(), 'ReverseVideo');
+    mkdirSync(key, { recursive: true });
+    const filename = createOutputFilename('reverse', 'mp4'),
+      outAbs2 = path.join(key, filename),
+      path2 = toOutputLocalPath('ReverseVideo', filename),
+      videoReverseFfmpegArgs = buildVideoReverseFfmpegArgs({
+        sourceAbs: sourceAbs2,
+        outAbs: outAbs2,
+        hasAudio: hasAudio2,
       }),
       runFfmpeg =
         typeof runFfmpegTask === 'function'
           ? runFfmpegTask
           : (task, queue, args, options) =>
-              queue.runProcess(task, _0x371415('ffmpeg'), args, options);
+              queue.runProcess(task, getRuntimeToolOrFallback('ffmpeg'), args, options);
     return (
-      await runFfmpeg(_0x50ded9, _0x507084, _0x9f09d5, {
-        durationSec: _0x3d7819.duration || 0,
+      await runFfmpeg(value, item, videoReverseFfmpegArgs, {
+        durationSec: durationSec.duration || 0,
         progressMessage: 'Reversing video',
       }),
       {
         success: true,
-        filename: _0x45531e,
-        path: _0x2d1390,
-        localPath: _0x2d1390,
-        url: '/' + _0x2d1390,
-        videoDuration: _0x3d7819.duration || 0,
-        fps: _0x3d7819.fps || 0,
-        videoWidth: _0x3d7819.width,
-        videoHeight: _0x3d7819.height,
+        filename: filename,
+        path: path2,
+        localPath: path2,
+        url: '/' + path2,
+        videoDuration: durationSec.duration || 0,
+        fps: durationSec.fps || 0,
+        videoWidth: durationSec.width,
+        videoHeight: durationSec.height,
       }
     );
   };

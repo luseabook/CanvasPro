@@ -1,71 +1,71 @@
 import { cloneReusableStoryboardCellImage } from './storyboardCellContent.js';
 export function updateStoryboardCellDOM({
-  cellEl: _0x453a94,
-  cell: _0x20a196,
+  cellEl: cellEl,
+  cell: cell,
   reusableImageMap: reusableImageMap = null,
-  getCellDisplayImageUrl: _0x10d792,
-  getCellResidualImageUrl: _0x358a55,
-  createContentNode: _0x4a6ff8,
-  applyCropStyles: _0x12d610,
+  getCellDisplayImageUrl: getCellDisplayImageUrl,
+  getCellResidualImageUrl: getCellResidualImageUrl,
+  createContentNode: createContentNode,
+  applyCropStyles: applyCropStyles,
 } = {}) {
-  if (!_0x20a196) return;
-  const _0x46dce1 = _0x453a94?.querySelector?.('.cell-content-wrap') || null;
-  if (!_0x46dce1) return;
-  const _0x3bbb68 = _0x10d792?.(_0x20a196) || '',
-    _0x5c1f38 = !_0x3bbb68,
-    _0x58c440 = _0x46dce1.firstElementChild;
-  if (_0x5c1f38) {
-    const _0x1b3ec3 = !!_0x358a55?.(_0x20a196),
-      _0x43afc2 = _0x58c440?.classList?.contains('storyboard-empty-residual') === true,
-      _0x54dfb9 = _0x58c440?.classList?.contains('empty-placeholder') === true && !_0x43afc2;
-    if ((_0x1b3ec3 && _0x43afc2) || (!_0x1b3ec3 && _0x54dfb9)) {
-      _0x12d610?.();
+  if (!cell) return;
+  const el = cellEl?.querySelector?.('.cell-content-wrap') || null;
+  if (!el) return;
+  const enabled = getCellDisplayImageUrl?.(cell) || '',
+    enabled2 = !enabled,
+    el2 = el.firstElementChild;
+  if (enabled2) {
+    const enabled3 = !!getCellResidualImageUrl?.(cell),
+      enabled4 = el2?.classList?.contains('storyboard-empty-residual') === true,
+      value = el2?.classList?.contains('empty-placeholder') === true && !enabled4;
+    if ((enabled3 && enabled4) || (!enabled3 && value)) {
+      applyCropStyles?.();
       return;
     }
   } else {
-    if (_0x58c440 && _0x58c440.tagName === 'IMG' && _0x58c440.getAttribute('src') === _0x3bbb68) {
-      _0x12d610?.();
+    if (el2 && el2.tagName === 'IMG' && el2.getAttribute('src') === enabled) {
+      applyCropStyles?.();
       return;
     }
   }
-  if (!_0x5c1f38 && _0x58c440 && _0x58c440.tagName === 'IMG') {
-    const _0x534dc3 = cloneReusableStoryboardCellImage(_0x3bbb68, reusableImageMap);
-    if (_0x534dc3) {
-      (delete _0x46dce1.__storyboardPendingSrc, _0x46dce1.replaceChildren(_0x534dc3), _0x12d610?.());
+  if (!enabled2 && el2 && el2.tagName === 'IMG') {
+    const cloneReusableStoryboardCellImage2 = cloneReusableStoryboardCellImage(enabled, reusableImageMap);
+    if (cloneReusableStoryboardCellImage2) {
+      (delete el.__storyboardPendingSrc,
+        el.replaceChildren(cloneReusableStoryboardCellImage2),
+        applyCropStyles?.());
       return;
     }
   }
-  const _0x10aa0c = _0x4a6ff8?.(_0x20a196);
-  if (!_0x5c1f38 && _0x58c440 && _0x58c440.tagName === 'IMG' && _0x10aa0c?.tagName === 'IMG') {
-    const _0x6f6c24 = _0x3bbb68;
-    ((_0x46dce1.__storyboardPendingSrc = _0x6f6c24),
-      _0x46dce1
-        .querySelectorAll('.storyboard-cell-img.is-cell-preloading')
-        .forEach((_0xee7656) => _0xee7656.remove()));
-    const _0x2ee98f = () => {
-      if (_0x46dce1.__storyboardPendingSrc !== _0x6f6c24) return;
-      (_0x10aa0c.classList.remove('is-cell-preloading', 'is-cell-ready'),
-        _0x46dce1.replaceChildren(_0x10aa0c),
-        _0x12d610?.(),
-        delete _0x46dce1.__storyboardPendingSrc);
+  const el3 = createContentNode?.(cell);
+  if (!enabled2 && el2 && el2.tagName === 'IMG' && el3?.tagName === 'IMG') {
+    const item = enabled;
+    ((el.__storyboardPendingSrc = item),
+      el.querySelectorAll('.storyboard-cell-img.is-cell-preloading').forEach((el4) => el4.remove()));
+    const run = () => {
+      if (el.__storyboardPendingSrc !== item) return;
+      (el3.classList.remove('is-cell-preloading', 'is-cell-ready'),
+        el.replaceChildren(el3),
+        applyCropStyles?.(),
+        delete el.__storyboardPendingSrc);
     };
-    if (_0x10aa0c.complete && _0x10aa0c.naturalWidth > 0) {
-      _0x2ee98f();
+    if (el3.complete && el3.naturalWidth > 0) {
+      run();
       return;
     }
-    let _0x5ec76c = false;
-    const _0x2fcb1a = () => {
-      if (_0x5ec76c) return;
-      if (_0x46dce1.__storyboardPendingSrc !== _0x6f6c24) return;
-      ((_0x5ec76c = true), _0x10aa0c.classList.add('is-cell-ready'), setTimeout(_0x2ee98f, 60));
+    let key = false;
+    const run2 = () => {
+      if (key) return;
+      if (el.__storyboardPendingSrc !== item) return;
+      ((key = true), el3.classList.add('is-cell-ready'), setTimeout(run, 60));
     };
-    (_0x10aa0c.classList.add('is-cell-preloading'),
-      _0x10aa0c.addEventListener('load', _0x2fcb1a, { once: true }),
-      _0x46dce1.appendChild(_0x10aa0c));
-    _0x10aa0c.complete && _0x10aa0c.naturalWidth > 0 && _0x2fcb1a();
+    (el3.classList.add('is-cell-preloading'),
+      el3.addEventListener('load', run2, { once: true }),
+      el.appendChild(el3));
+    el3.complete && el3.naturalWidth > 0 && run2();
     return;
   }
-  (delete _0x46dce1.__storyboardPendingSrc, _0x46dce1.replaceChildren());
-  if (_0x10aa0c) _0x46dce1.appendChild(_0x10aa0c);
-  _0x12d610?.();
+  (delete el.__storyboardPendingSrc, el.replaceChildren());
+  if (el3) el.appendChild(el3);
+  applyCropStyles?.();
 }

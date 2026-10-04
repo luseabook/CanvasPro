@@ -1,1 +1,63 @@
-import{resolveDebugImageSource}from'../utils/debugImagePreview.js';export function renderDebugRequestImages(_0x1c48e6,_0xb0ad51,_0x57186b=[],_0x398bf6){const _0x387d4a=_0x1c48e6["ownerDocument"];_0x398bf6["hidden"]=!![],_0x398bf6["replaceChildren"](),_0x1c48e6["replaceChildren"]();let _0x35572b=0x0;_0x57186b["forEach"](_0x5e00cf=>{const _0x2fc5a2=resolveDebugImageSource(_0x5e00cf["src"]);if(!_0x2fc5a2||_0x5e00cf["start"]<_0x35572b||_0x5e00cf['end']>_0xb0ad51['length']||_0x5e00cf["end"]<=_0x5e00cf["start"])return;_0x1c48e6["append"](_0x387d4a["createTextNode"](_0xb0ad51["slice"](_0x35572b,_0x5e00cf["start"])));const _0x2920b5=_0x387d4a["createElement"]("span");_0x2920b5['className']="request-debug-image-row";const _0x123e66=_0x387d4a["createElement"]("span");_0x123e66["className"]='request-debug-thumbnail',_0x123e66["tabIndex"]=0x0,_0x123e66["setAttribute"]("role","img"),_0x123e66["setAttribute"]("aria-label",_0x5e00cf["label"]+" · "+_0x5e00cf['path']),_0x123e66["dataset"]["label"]=_0x5e00cf['label'],_0x123e66['dataset']['state']="loading";const _0xc88c74=_0x387d4a["createElement"]("img");_0xc88c74["alt"]='',_0xc88c74['loading']="lazy",_0xc88c74["decoding"]="async",_0xc88c74["referrerPolicy"]="no-referrer",_0xc88c74["draggable"]=![],_0xc88c74["addEventListener"]("load",()=>{_0x123e66['dataset']['state']="ready";}),_0xc88c74["addEventListener"]("error",()=>{_0x123e66['dataset']["state"]="error",_0x123e66["setAttribute"]("aria-label",_0x5e00cf['label']+" · 图片加载失败 · "+_0x5e00cf["path"]);}),_0xc88c74["src"]=_0x2fc5a2,_0x123e66['append'](_0xc88c74);const _0x1ff6b8=()=>{if(_0x123e66["dataset"]["state"]!=="ready")return;const _0x4d3be0=_0xc88c74['cloneNode']();_0x4d3be0['removeAttribute']("loading"),_0x4d3be0["alt"]=_0x5e00cf["label"],_0x398bf6["replaceChildren"](_0x4d3be0),_0x398bf6['hidden']=![];},_0x1237ac=()=>{_0x398bf6["hidden"]=!![],_0x398bf6['replaceChildren']();};_0x123e66["addEventListener"]("mouseenter",_0x1ff6b8),_0x123e66['addEventListener']("mouseleave",_0x1237ac),_0x123e66['addEventListener']('focus',_0x1ff6b8),_0x123e66["addEventListener"]("blur",_0x1237ac);const _0x3e4906=_0x387d4a['createElement']("span");_0x3e4906["className"]='request-debug-image-value',_0x3e4906["textContent"]=_0xb0ad51["slice"](_0x5e00cf['start'],_0x5e00cf['end']),_0x2920b5["append"](_0x123e66,_0x3e4906),_0x1c48e6["append"](_0x2920b5),_0x35572b=_0x5e00cf["end"];}),_0x1c48e6["append"](_0x387d4a['createTextNode'](_0xb0ad51["slice"](_0x35572b)));}
+import { resolveDebugImageSource } from '../utils/debugImagePreview.js';
+export function renderDebugRequestImages(value, list, item = [], el) {
+  const el2 = value['ownerDocument'];
+  ((el['hidden'] = !![]), el['replaceChildren'](), value['replaceChildren']());
+  let key = 0x0;
+  (item['forEach']((index) => {
+    const debugImageSource = resolveDebugImageSource(index['src']);
+    if (
+      !debugImageSource ||
+      index['start'] < key ||
+      index['end'] > list['length'] ||
+      index['end'] <= index['start']
+    )
+      return;
+    value['append'](el2['createTextNode'](list['slice'](key, index['start'])));
+    const result = el2['createElement']('span');
+    result['className'] = 'request-debug-image-row';
+    const el3 = el2['createElement']('span');
+    ((el3['className'] = 'request-debug-thumbnail'),
+      (el3['tabIndex'] = 0x0),
+      el3['setAttribute']('role', 'img'),
+      el3['setAttribute']('aria-label', index['label'] + ' · ' + index['path']),
+      (el3['dataset']['label'] = index['label']),
+      (el3['dataset']['state'] = 'loading'));
+    const data = el2['createElement']('img');
+    ((data['alt'] = ''),
+      (data['loading'] = 'lazy'),
+      (data['decoding'] = 'async'),
+      (data['referrerPolicy'] = 'no-referrer'),
+      (data['draggable'] = ![]),
+      data['addEventListener']('load', () => {
+        el3['dataset']['state'] = 'ready';
+      }),
+      data['addEventListener']('error', () => {
+        ((el3['dataset']['state'] = 'error'),
+          el3['setAttribute']('aria-label', index['label'] + ' · 图片加载失败 · ' + index['path']));
+      }),
+      (data['src'] = debugImageSource),
+      el3['append'](data));
+    const options = () => {
+        if (el3['dataset']['state'] !== 'ready') return;
+        const target = data['cloneNode']();
+        (target['removeAttribute']('loading'),
+          (target['alt'] = index['label']),
+          el['replaceChildren'](target),
+          (el['hidden'] = ![]));
+      },
+      source = () => {
+        ((el['hidden'] = !![]), el['replaceChildren']());
+      };
+    (el3['addEventListener']('mouseenter', options),
+      el3['addEventListener']('mouseleave', source),
+      el3['addEventListener']('focus', options),
+      el3['addEventListener']('blur', source));
+    const next = el2['createElement']('span');
+    ((next['className'] = 'request-debug-image-value'),
+      (next['textContent'] = list['slice'](index['start'], index['end'])),
+      result['append'](el3, next),
+      value['append'](result),
+      (key = index['end']));
+  }),
+    value['append'](el2['createTextNode'](list['slice'](key))));
+}

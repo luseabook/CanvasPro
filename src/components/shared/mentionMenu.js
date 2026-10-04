@@ -5,58 +5,50 @@ export function createMentionMenuItem({
   hasSubmenu: hasSubmenu = ![],
   compactVisual: compactVisual = ![],
 } = {}) {
-  const _0x46f666 = document['createElement']('div');
-  _0x46f666['className'] =
+  const item = document['createElement']('div');
+  item['className'] =
     'at-mention-item' +
     (disabled ? ' at-mention-disabled disabled' : '') +
     (hasSubmenu ? ' at-mention-has-submenu' : '') +
     (compactVisual ? ' at-mention-compact-visual' : '');
-  const _0x4d0867 = document['createElement']('span');
-  _0x4d0867['className'] = 'at-mention-copy';
-  const _0xcffe66 = document['createElement']('span');
-  ((_0xcffe66['className'] = 'at-mention-label'), (_0xcffe66['textContent'] = label));
-  const _0x3e43a5 = document['createElement']('span');
+  const copyEl = document['createElement']('span');
+  copyEl['className'] = 'at-mention-copy';
+  const labelEl = document['createElement']('span');
+  ((labelEl['className'] = 'at-mention-label'), (labelEl['textContent'] = label));
+  const subtitleEl = document['createElement']('span');
   return (
-    (_0x3e43a5['className'] = 'at-mention-subtitle'),
-    (_0x3e43a5['textContent'] = subtitle),
-    (_0x3e43a5['hidden'] = !subtitle),
-    _0x4d0867['appendChild'](_0xcffe66),
-    _0x4d0867['appendChild'](_0x3e43a5),
-    _0x46f666['classList']['toggle']('at-mention-has-subtitle', Boolean(subtitle)),
-    { item: _0x46f666, copyEl: _0x4d0867, labelEl: _0xcffe66, subtitleEl: _0x3e43a5 }
+    (subtitleEl['className'] = 'at-mention-subtitle'),
+    (subtitleEl['textContent'] = subtitle),
+    (subtitleEl['hidden'] = !subtitle),
+    copyEl['appendChild'](labelEl),
+    copyEl['appendChild'](subtitleEl),
+    item['classList']['toggle']('at-mention-has-subtitle', Boolean(subtitle)),
+    { item: item, copyEl: copyEl, labelEl: labelEl, subtitleEl: subtitleEl }
   );
 }
-export function positionMentionMenu(_0x37f2ac, _0x29c19d) {
-  const _0x2ba715 = Number(globalThis['window']?.['innerWidth'] || 0x0),
-    _0x44e47d = Number(globalThis['window']?.['innerHeight'] || 0x0),
-    _0x1eb7dd = 0xc,
-    _0x2b461d = 0x5;
-  _0x37f2ac['style']['maxHeight'] = '';
-  const _0xe8415b = _0x37f2ac['getBoundingClientRect']?.(),
-    _0x18e37b = Math['max'](0x0, Number(_0xe8415b?.['width'] || _0x37f2ac['offsetWidth'] || 0x0)),
-    _0x5245bd = Math['max'](0x1, Number(_0xe8415b?.['height'] || _0x37f2ac['offsetHeight'] || 0x0));
-  let _0x4cb5c2 = Number(_0x29c19d['left'] || 0x0),
-    _0x5a66df = Number(_0x29c19d['top'] || 0x0);
-  if (_0x2ba715 > 0x0 && _0x18e37b > 0x0)
-    _0x4cb5c2 = Math['min'](
-      Math['max'](_0x1eb7dd, _0x4cb5c2),
-      Math['max'](_0x1eb7dd, _0x2ba715 - _0x1eb7dd - _0x18e37b),
-    );
-  if (_0x44e47d > 0x0) {
-    const _0x23b59f = Math['max'](0x0, _0x44e47d - _0x1eb7dd - _0x5a66df),
-      _0x4c447e = Number['isFinite'](_0x29c19d['anchorTop'])
-        ? Number(_0x29c19d['anchorTop'])
-        : _0x5a66df - _0x2b461d,
-      _0x447436 = Math['max'](0x0, _0x4c447e - _0x1eb7dd),
-      _0x38abf1 = _0x5245bd > _0x23b59f && _0x447436 > _0x23b59f,
-      _0x30a0f2 = Math['max'](0x1, Math['min'](_0x5245bd, _0x38abf1 ? _0x447436 : _0x23b59f));
-    ((_0x37f2ac['style']['maxHeight'] = _0x30a0f2 + 'px'),
-      (_0x5a66df = _0x38abf1
-        ? Math['max'](_0x1eb7dd, _0x4c447e - _0x2b461d - _0x30a0f2)
-        : Math['min'](
-            Math['max'](_0x1eb7dd, _0x5a66df),
-            Math['max'](_0x1eb7dd, _0x44e47d - _0x1eb7dd - _0x30a0f2),
-          )));
+export function positionMentionMenu(el, box) {
+  const count = Number(globalThis['window']?.['innerWidth'] || 0x0),
+    count2 = Number(globalThis['window']?.['innerHeight'] || 0x0),
+    value = 0xc,
+    key = 0x5;
+  el['style']['maxHeight'] = '';
+  const box2 = el['getBoundingClientRect']?.(),
+    count3 = Math['max'](0x0, Number(box2?.['width'] || el['offsetWidth'] || 0x0)),
+    index = Math['max'](0x1, Number(box2?.['height'] || el['offsetHeight'] || 0x0));
+  let result = Number(box['left'] || 0x0),
+    data = Number(box['top'] || 0x0);
+  if (count > 0x0 && count3 > 0x0)
+    result = Math['min'](Math['max'](value, result), Math['max'](value, count - value - count3));
+  if (count2 > 0x0) {
+    const options = Math['max'](0x0, count2 - value - data),
+      target = Number['isFinite'](box['anchorTop']) ? Number(box['anchorTop']) : data - key,
+      source = Math['max'](0x0, target - value),
+      next = index > options && source > options,
+      current = Math['max'](0x1, Math['min'](index, next ? source : options));
+    ((el['style']['maxHeight'] = current + 'px'),
+      (data = next
+        ? Math['max'](value, target - key - current)
+        : Math['min'](Math['max'](value, data), Math['max'](value, count2 - value - current))));
   }
-  ((_0x37f2ac['style']['left'] = _0x4cb5c2 + 'px'), (_0x37f2ac['style']['top'] = _0x5a66df + 'px'));
+  ((el['style']['left'] = result + 'px'), (el['style']['top'] = data + 'px'));
 }

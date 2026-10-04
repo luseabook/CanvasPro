@@ -1,50 +1,49 @@
 export const CUSTOM_PROVIDER_TUTORIAL_ID = 'api-guide';
 export function createCustomProviderEditorShell({
-  documentObject: _0x3c7d19,
-  editorId: _0x36c978,
+  documentObject: documentObject,
+  editorId: editorId,
   tutorialLabel: tutorialLabel = '',
   discoverLabel: discoverLabel = '',
   deleteAriaLabel: deleteAriaLabel = '',
 } = {}) {
-  if (!_0x3c7d19?.['createElement'])
+  if (!documentObject?.['createElement'])
     throw new TypeError('createCustomProviderEditorShell requires a document');
-  const _0x5de0de = _0x3c7d19['createElement']('div');
-  ((_0x5de0de['className'] = 'custom-provider-editor-item'),
-    (_0x5de0de['dataset']['customProviderEditorId'] = _0x36c978));
-  const _0x3bdb12 = _0x3c7d19['createElement']('div');
-  _0x3bdb12['className'] = 'custom-provider-editor-item-head';
-  const _0x152868 = _0x3c7d19['createElement']('button');
-  ((_0x152868['type'] = 'button'),
-    (_0x152868['className'] = 'custom-provider-editor-tab'),
-    (_0x152868['dataset']['customProviderEditorTab'] = ''),
-    _0x152868['setAttribute']('aria-selected', 'false'));
-  const _0x5ec861 = _0x3c7d19['createElement']('span');
-  ((_0x5ec861['className'] = 'custom-provider-editor-item-title'),
-    (_0x5ec861['dataset']['customProviderEditorTitle'] = ''),
-    _0x152868['append'](_0x5ec861));
-  const _0x24f80a = _0x3c7d19['createElement']('div');
-  _0x24f80a['className'] = 'custom-provider-editor-item-actions';
-  const _0x45bcf5 = _0x3c7d19['createElement']('button');
-  ((_0x45bcf5['type'] = 'button'),
-    (_0x45bcf5['className'] = 'settings-provider-guide-btn custom-provider-tutorial-btn'),
-    (_0x45bcf5['dataset']['customProviderTutorial'] = ''),
-    (_0x45bcf5['dataset']['apiTutorialTrigger'] = CUSTOM_PROVIDER_TUTORIAL_ID),
-    (_0x45bcf5['textContent'] = tutorialLabel));
-  const _0xe11a3a = _0x3c7d19['createElement']('button');
-  ((_0xe11a3a['type'] = 'button'),
-    (_0xe11a3a['className'] = 'custom-provider-primary-btn custom-provider-discover-btn'),
-    (_0xe11a3a['dataset']['customProviderDiscover'] = ''),
-    (_0xe11a3a['textContent'] = discoverLabel));
-  const _0x4de80c = _0x3c7d19['createElement']('button');
+  const el = documentObject['createElement']('div');
+  ((el['className'] = 'custom-provider-editor-item'), (el['dataset']['customProviderEditorId'] = editorId));
+  const value = documentObject['createElement']('div');
+  value['className'] = 'custom-provider-editor-item-head';
+  const el2 = documentObject['createElement']('button');
+  ((el2['type'] = 'button'),
+    (el2['className'] = 'custom-provider-editor-tab'),
+    (el2['dataset']['customProviderEditorTab'] = ''),
+    el2['setAttribute']('aria-selected', 'false'));
+  const el3 = documentObject['createElement']('span');
+  ((el3['className'] = 'custom-provider-editor-item-title'),
+    (el3['dataset']['customProviderEditorTitle'] = ''),
+    el2['append'](el3));
+  const item = documentObject['createElement']('div');
+  item['className'] = 'custom-provider-editor-item-actions';
+  const el4 = documentObject['createElement']('button');
+  ((el4['type'] = 'button'),
+    (el4['className'] = 'settings-provider-guide-btn custom-provider-tutorial-btn'),
+    (el4['dataset']['customProviderTutorial'] = ''),
+    (el4['dataset']['apiTutorialTrigger'] = CUSTOM_PROVIDER_TUTORIAL_ID),
+    (el4['textContent'] = tutorialLabel));
+  const el5 = documentObject['createElement']('button');
+  ((el5['type'] = 'button'),
+    (el5['className'] = 'custom-provider-primary-btn custom-provider-discover-btn'),
+    (el5['dataset']['customProviderDiscover'] = ''),
+    (el5['textContent'] = discoverLabel));
+  const el6 = documentObject['createElement']('button');
   return (
-    (_0x4de80c['type'] = 'button'),
-    (_0x4de80c['className'] = 'custom-provider-delete-btn canvas-tab-close'),
-    (_0x4de80c['dataset']['customProviderDelete'] = ''),
-    _0x4de80c['setAttribute']('aria-label', deleteAriaLabel),
-    (_0x4de80c['textContent'] = '×'),
-    _0x24f80a['append'](_0x45bcf5, _0xe11a3a),
-    _0x3bdb12['append'](_0x152868, _0x4de80c),
-    _0x5de0de['append'](_0x3bdb12, _0x24f80a),
-    _0x5de0de
+    (el6['type'] = 'button'),
+    (el6['className'] = 'custom-provider-delete-btn canvas-tab-close'),
+    (el6['dataset']['customProviderDelete'] = ''),
+    el6['setAttribute']('aria-label', deleteAriaLabel),
+    (el6['textContent'] = '×'),
+    item['append'](el4, el5),
+    value['append'](el2, el6),
+    el['append'](value, item),
+    el
   );
 }

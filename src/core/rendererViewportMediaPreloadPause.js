@@ -8,17 +8,17 @@ function clearRendererViewportMediaPreloadResumeTimer() {
   (clearTimeout(rendererViewportMediaPreloadResumeTimer), (rendererViewportMediaPreloadResumeTimer = 0x0));
 }
 function isViewportBodyBusy() {
-  const _0x524575 = typeof document !== 'undefined' ? document?.['body']?.['classList'] : null;
+  const value = typeof document !== 'undefined' ? document?.['body']?.['classList'] : null;
   return Boolean(
-    _0x524575?.['contains']?.('is-panning') ||
-    _0x524575?.['contains']?.('is-zooming') ||
-    _0x524575?.['contains']?.('is-viewport-animating'),
+    value?.['contains']?.('is-panning') ||
+    value?.['contains']?.('is-zooming') ||
+    value?.['contains']?.('is-viewport-animating'),
   );
 }
-function scheduleRendererViewportMediaPreloadResume(_0x11b1b0) {
+function scheduleRendererViewportMediaPreloadResume(item) {
   clearRendererViewportMediaPreloadResumeTimer();
-  const _0x4f8028 = Number['isFinite'](Number(_0x11b1b0))
-    ? Math['max'](0x0, Number(_0x11b1b0))
+  const key = Number['isFinite'](Number(item))
+    ? Math['max'](0x0, Number(item))
     : DEFAULT_RENDERER_VIEWPORT_MEDIA_PRELOAD_AUTO_RESUME_MS;
   rendererViewportMediaPreloadResumeTimer = setTimeout(() => {
     rendererViewportMediaPreloadResumeTimer = 0x0;
@@ -27,16 +27,16 @@ function scheduleRendererViewportMediaPreloadResume(_0x11b1b0) {
       return;
     }
     syncRendererViewportMediaPreloadPause(![]);
-  }, _0x4f8028);
+  }, key);
 }
-export function syncRendererViewportMediaPreloadPause(_0x468230, _0x554246 = {}) {
-  const _0xe4e0d6 = _0x468230 === !![];
-  _0xe4e0d6
-    ? scheduleRendererViewportMediaPreloadResume(_0x554246['autoResumeMs'])
+export function syncRendererViewportMediaPreloadPause(index, result = {}) {
+  const data = index === !![];
+  data
+    ? scheduleRendererViewportMediaPreloadResume(result['autoResumeMs'])
     : clearRendererViewportMediaPreloadResumeTimer();
-  if (rendererViewportMediaPreloadsPaused === _0xe4e0d6) return;
-  ((rendererViewportMediaPreloadsPaused = _0xe4e0d6),
-    setCanvasMediaSchedulerPaused(_0xe4e0d6, { bypassPriority: 0x3e8, source: 'renderer-viewport' }));
+  if (rendererViewportMediaPreloadsPaused === data) return;
+  ((rendererViewportMediaPreloadsPaused = data),
+    setCanvasMediaSchedulerPaused(data, { bypassPriority: 0x3e8, source: 'renderer-viewport' }));
 }
 export function clearRendererViewportMediaPreloadPause() {
   (clearRendererViewportMediaPreloadResumeTimer(), syncRendererViewportMediaPreloadPause(![]));

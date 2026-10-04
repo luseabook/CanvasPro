@@ -1,75 +1,65 @@
 import { createNodeGeometryOverlay } from './nodeGeometryOverlay.js';
 export function previewNodeGeometry(
-  _0x369bd1,
+  value,
   {
-    snapshot: _0x44734e,
-    bridge: _0x3405f0,
-    ensureEdgeIndex: _0x352ded,
-    nodeToEdgeIds: _0x5652ba,
-    renderEdgesByIds: _0x477a88,
+    snapshot: snapshot,
+    bridge: bridge,
+    ensureEdgeIndex: ensureEdgeIndex,
+    nodeToEdgeIds: nodeToEdgeIds,
+    renderEdgesByIds: renderEdgesByIds,
     cache: cache = new Map(),
   } = {},
 ) {
-  if (!_0x44734e?.['nodes']) return;
-  const _0x5bb1ac = {},
-    _0x551003 = new Set();
-  _0x352ded?.(_0x44734e['edges'] || {}, _0x44734e['_edgesRev'] || 0x0);
-  for (const [_0x4926da, _0x248668] of _0x369bd1) {
-    const _0x2495e2 = _0x44734e['nodes'][_0x4926da];
-    if (!_0x2495e2) {
-      (cache['delete'](_0x4926da),
-        _0x3405f0?.['syncNodeDragPreview']?.(_0x4926da, { active: ![], remove: !![] }));
+  if (!snapshot?.['nodes']) return;
+  const item = {},
+    key = new Set();
+  ensureEdgeIndex?.(snapshot['edges'] || {}, snapshot['_edgesRev'] || 0x0);
+  for (const [index, args] of value) {
+    const box = snapshot['nodes'][index];
+    if (!box) {
+      (cache['delete'](index), bridge?.['syncNodeDragPreview']?.(index, { active: ![], remove: !![] }));
       continue;
     }
-    const _0x4d4fed = { ..._0x2495e2, ..._0x248668 },
-      _0x3fd391 = _0x3405f0?.['getMountedWrapper']?.(_0x4926da),
-      _0x593015 = 'translate(' + _0x4d4fed['x'] + 'px, ' + _0x4d4fed['y'] + 'px)',
-      _0x44ead9 = [
-        _0x4d4fed['x'],
-        _0x4d4fed['y'],
-        _0x4d4fed['width'],
-        _0x4d4fed['height'],
-        _0x2495e2['x'],
-        _0x2495e2['y'],
-        !!_0x248668,
-      ]['join'](':'),
-      _0x4ce567 = cache['get'](_0x4926da);
-    _0x5bb1ac[_0x4926da] = _0x248668 || {};
+    const dx = { ...box, ...args },
+      el = bridge?.['getMountedWrapper']?.(index),
+      result = 'translate(' + dx['x'] + 'px, ' + dx['y'] + 'px)',
+      stamp = [dx['x'], dx['y'], dx['width'], dx['height'], box['x'], box['y'], !!args]['join'](':'),
+      data = cache['get'](index);
+    item[index] = args || {};
     if (
-      _0x248668 &&
-      _0x3fd391 &&
-      _0x4ce567?.['el'] === _0x3fd391 &&
-      _0x4ce567?.['stamp'] === _0x44ead9 &&
-      _0x3fd391['style']['transform'] === _0x593015 &&
-      _0x3fd391['style']['width'] === _0x4d4fed['width'] + 'px' &&
-      _0x3fd391['style']['height'] === _0x4d4fed['height'] + 'px'
+      args &&
+      el &&
+      data?.['el'] === el &&
+      data?.['stamp'] === stamp &&
+      el['style']['transform'] === result &&
+      el['style']['width'] === dx['width'] + 'px' &&
+      el['style']['height'] === dx['height'] + 'px'
     )
       continue;
-    if (_0x248668) cache['set'](_0x4926da, { el: _0x3fd391, stamp: _0x44ead9 });
-    else cache['delete'](_0x4926da);
-    if (_0x3fd391) {
-      _0x3fd391['style']['transform'] = _0x593015;
-      if (Number['isFinite'](_0x4d4fed['width'])) _0x3fd391['style']['width'] = _0x4d4fed['width'] + 'px';
-      if (Number['isFinite'](_0x4d4fed['height'])) _0x3fd391['style']['height'] = _0x4d4fed['height'] + 'px';
-      delete _0x3fd391['_posKey'];
+    if (args) cache['set'](index, { el: el, stamp: stamp });
+    else cache['delete'](index);
+    if (el) {
+      el['style']['transform'] = result;
+      if (Number['isFinite'](dx['width'])) el['style']['width'] = dx['width'] + 'px';
+      if (Number['isFinite'](dx['height'])) el['style']['height'] = dx['height'] + 'px';
+      delete el['_posKey'];
     }
-    const _0x5a67dc = _0x3fd391 && _0x3fd391['dataset']?.['rendererPresentationOwner'] !== 'fast-preview';
-    _0x3405f0?.['syncNodeDragPreview']?.(
-      _0x4926da,
-      _0x5a67dc
+    const options = el && el['dataset']?.['rendererPresentationOwner'] !== 'fast-preview';
+    bridge?.['syncNodeDragPreview']?.(
+      index,
+      options
         ? { remove: !![] }
         : {
-            dx: _0x4d4fed['x'] - _0x2495e2['x'],
-            dy: _0x4d4fed['y'] - _0x2495e2['y'],
-            width: _0x4d4fed['width'],
-            height: _0x4d4fed['height'],
-            active: !!_0x248668,
-            settle: !_0x248668,
-            existingOnly: !_0x3fd391,
+            dx: dx['x'] - box['x'],
+            dy: dx['y'] - box['y'],
+            width: dx['width'],
+            height: dx['height'],
+            active: !!args,
+            settle: !args,
+            existingOnly: !el,
           },
     );
-    for (const _0x3588a2 of _0x5652ba?.['get'](_0x4926da) || []) _0x551003['add'](_0x3588a2);
+    for (const target of nodeToEdgeIds?.['get'](index) || []) key['add'](target);
   }
-  if (_0x551003['size'])
-    _0x477a88?.(_0x551003, createNodeGeometryOverlay(_0x44734e['nodes'], _0x5bb1ac), _0x44734e);
+  if (key['size']) renderEdgesByIds?.(key, createNodeGeometryOverlay(snapshot['nodes'], item), snapshot);
 }

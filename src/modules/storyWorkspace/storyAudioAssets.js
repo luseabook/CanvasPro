@@ -1,1 +1,60 @@
-import{replaceStoryCharacterVoiceReference}from'./storyCharacterVoice.js';import{localPathToUrl}from'../../utils/localMediaPath.js';const text=_0x55f496=>String(_0x55f496??'')['trim']();export const storyAudioUploads=new WeakSet();export const getStoryAudioUrl=_0x12e940=>{const _0x586395=text(_0x12e940?.["audioUrl"]||_0x12e940?.["sourceUrl"]||_0x12e940?.["url"]||_0x12e940?.["localPath"]);return localPathToUrl(_0x586395)||_0x586395;};export const isStoryAudioAsset=_0x198844=>_0x198844?.["mediaKind"]==="audio";export const getStoryProjectAudioAssets=_0x375ca3=>(_0x375ca3?.["audioAssets"]||[])["filter"](isStoryAudioAsset);export const getStoryAudioBoundCharacters=(_0xf6e313,_0x5f04d7)=>(_0xf6e313?.["assets"]||[])["filter"](_0x1700e8=>_0x1700e8["kind"]==="character"&&getStoryAudioUrl(_0x1700e8["voiceReference"])===getStoryAudioUrl(_0x5f04d7));export function addStoryAudioAssets(_0x3d0b15,_0x2009b3){const _0x466079=[...getStoryProjectAudioAssets(_0x3d0b15)],_0x4df612=[];for(const _0x3915e2 of _0x2009b3){const _0x389ce8=getStoryAudioUrl(_0x3915e2);if(!isStoryAudioAsset(_0x3915e2)||!_0x389ce8)continue;let _0x10857c=_0x466079["find"](_0x2541c=>getStoryAudioUrl(_0x2541c)===_0x389ce8);!_0x10857c&&(_0x10857c={'id':"story-audio-"+globalThis['crypto']["randomUUID"](),'mediaKind':'audio','kind':'audio','name':text(_0x3915e2["name"]||_0x3915e2["assetName"])||"未命名音频",'audioUrl':_0x389ce8,'localPath':text(_0x3915e2["localPath"]),'sourceAssetId':text(_0x3915e2["sourceAssetId"]),'sourceItemIndex':_0x3915e2["sourceItemIndex"]||0x0,'waveformUrl':text(_0x3915e2["waveformUrl"]),'description':text(_0x3915e2["description"])},_0x466079["push"](_0x10857c)),_0x4df612["push"](_0x10857c);}return _0x3d0b15["audioAssets"]=_0x466079,_0x4df612;}export function bindStoryAudioToCharacter(_0x452161,_0x538cf4,_0x58a07c){const _0x4dc3a8=_0x452161["assets"]["find"](_0x32ac74=>_0x32ac74['kind']==='character'&&_0x32ac74['id']===_0x58a07c);if(!_0x4dc3a8||!getStoryAudioUrl(_0x538cf4))return![];const [_0x5149db]=addStoryAudioAssets(_0x452161,[_0x538cf4]);return Boolean(_0x5149db&&replaceStoryCharacterVoiceReference(_0x4dc3a8,{'audioUrl':_0x5149db["audioUrl"],'localPath':_0x5149db["localPath"],'fileName':_0x5149db["name"]}));}export function removeStoryAudioAsset(_0x2d79f1,_0x176e50){_0x2d79f1["audioAssets"]=getStoryProjectAudioAssets(_0x2d79f1)["filter"](_0x390d01=>_0x390d01['id']!==_0x176e50);}
+import { replaceStoryCharacterVoiceReference } from './storyCharacterVoice.js';
+import { localPathToUrl } from '../../utils/localMediaPath.js';
+const text = (value) => String(value ?? '')['trim']();
+export const storyAudioUploads = new WeakSet();
+export const getStoryAudioUrl = (item) => {
+  const text2 = text(item?.['audioUrl'] || item?.['sourceUrl'] || item?.['url'] || item?.['localPath']);
+  return localPathToUrl(text2) || text2;
+};
+export const isStoryAudioAsset = (key) => key?.['mediaKind'] === 'audio';
+export const getStoryProjectAudioAssets = (index) =>
+  (index?.['audioAssets'] || [])['filter'](isStoryAudioAsset);
+export const getStoryAudioBoundCharacters = (result, data) =>
+  (result?.['assets'] || [])['filter'](
+    (options) =>
+      options['kind'] === 'character' &&
+      getStoryAudioUrl(options['voiceReference']) === getStoryAudioUrl(data),
+  );
+export function addStoryAudioAssets(target, source) {
+  const next = [...getStoryProjectAudioAssets(target)],
+    current = [];
+  for (const entry of source) {
+    const storyAudioUrl = getStoryAudioUrl(entry);
+    if (!isStoryAudioAsset(entry) || !storyAudioUrl) continue;
+    let enabled = next['find']((record) => getStoryAudioUrl(record) === storyAudioUrl);
+    (!enabled &&
+      ((enabled = {
+        id: 'story-audio-' + globalThis['crypto']['randomUUID'](),
+        mediaKind: 'audio',
+        kind: 'audio',
+        name: text(entry['name'] || entry['assetName']) || '未命名音频',
+        audioUrl: storyAudioUrl,
+        localPath: text(entry['localPath']),
+        sourceAssetId: text(entry['sourceAssetId']),
+        sourceItemIndex: entry['sourceItemIndex'] || 0x0,
+        waveformUrl: text(entry['waveformUrl']),
+        description: text(entry['description']),
+      }),
+      next['push'](enabled)),
+      current['push'](enabled));
+  }
+  return ((target['audioAssets'] = next), current);
+}
+export function bindStoryAudioToCharacter(payload, handle, state) {
+  const enabled2 = payload['assets']['find'](
+    (config) => config['kind'] === 'character' && config['id'] === state,
+  );
+  if (!enabled2 || !getStoryAudioUrl(handle)) return ![];
+  const [scope] = addStoryAudioAssets(payload, [handle]);
+  return Boolean(
+    scope &&
+    replaceStoryCharacterVoiceReference(enabled2, {
+      audioUrl: scope['audioUrl'],
+      localPath: scope['localPath'],
+      fileName: scope['name'],
+    }),
+  );
+}
+export function removeStoryAudioAsset(input, output) {
+  input['audioAssets'] = getStoryProjectAudioAssets(input)['filter']((value2) => value2['id'] !== output);
+}

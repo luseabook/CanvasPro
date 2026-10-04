@@ -1,10 +1,10 @@
 import { t } from '../i18n/index.js';
 export function createContextMenuEl() {
-  const _0x41032f = document.createElement('div');
+  const el = document.createElement('div');
   return (
-    (_0x41032f.id = 'v2-context-menu'),
-    (_0x41032f.dataset.uiStop = '1'),
-    Object.assign(_0x41032f.style, {
+    (el.id = 'v2-context-menu'),
+    (el.dataset.uiStop = '1'),
+    Object.assign(el.style, {
       position: 'absolute',
       display: 'none',
       background: 'var(--preset-menu-bg)',
@@ -19,21 +19,19 @@ export function createContextMenuEl() {
       flexDirection: 'column',
       gap: '2px',
     }),
-    _0x41032f
+    el
   );
 }
-export function renderContextMenu(_0x58101c, _0x3a1fd6) {
-  if (!_0x3a1fd6 || !_0x3a1fd6.visible) {
-    ((_0x58101c.style.display = 'none'), _0x58101c.replaceChildren());
+export function renderContextMenu(el2, box) {
+  if (!box || !box.visible) {
+    ((el2.style.display = 'none'), el2.replaceChildren());
     return;
   }
-  ((_0x58101c.style.display = 'flex'),
-    (_0x58101c.style.left = _0x3a1fd6.x + 'px'),
-    (_0x58101c.style.top = _0x3a1fd6.y + 'px'));
-  if (_0x58101c.children.length > 0) return;
-  const _0x2db54b = document.createElement('div');
-  ((_0x2db54b.textContent = t('coreUi.rendererOverlays.contextMenuTitle')),
-    Object.assign(_0x2db54b.style, {
+  ((el2.style.display = 'flex'), (el2.style.left = box.x + 'px'), (el2.style.top = box.y + 'px'));
+  if (el2.children.length > 0) return;
+  const el3 = document.createElement('div');
+  ((el3.textContent = t('coreUi.rendererOverlays.contextMenuTitle')),
+    Object.assign(el3.style, {
       fontSize: '11px',
       color: 'var(--text-muted)',
       padding: '4px 8px',
@@ -41,11 +39,11 @@ export function renderContextMenu(_0x58101c, _0x3a1fd6) {
       marginBottom: '4px',
       userSelect: 'none',
     }),
-    _0x58101c.appendChild(_0x2db54b));
-  const _0x121ab1 = document.createElement('button');
-  ((_0x121ab1.dataset.cmd = 'delete_nodes'),
-    (_0x121ab1.textContent = t('coreUi.rendererOverlays.delete')),
-    Object.assign(_0x121ab1.style, {
+    el2.appendChild(el3));
+  const el4 = document.createElement('button');
+  ((el4.dataset.cmd = 'delete_nodes'),
+    (el4.textContent = t('coreUi.rendererOverlays.delete')),
+    Object.assign(el4.style, {
       background: 'transparent',
       border: 'none',
       color: 'var(--text-danger)',
@@ -55,15 +53,15 @@ export function renderContextMenu(_0x58101c, _0x3a1fd6) {
       borderRadius: '4px',
       fontSize: '13px',
     }),
-    _0x58101c.appendChild(_0x121ab1));
+    el2.appendChild(el4));
 }
 export function createPickConnectBannerEl() {
-  const _0x4a809e = document.createElement('div');
+  const el5 = document.createElement('div');
   return (
-    (_0x4a809e.id = 'v2-pick-connect-banner'),
-    (_0x4a809e.className = 'v2-pick-connect-banner'),
-    (_0x4a809e.textContent = t('coreUi.rendererOverlays.pickConnectBanner')),
-    Object.assign(_0x4a809e.style, {
+    (el5.id = 'v2-pick-connect-banner'),
+    (el5.className = 'v2-pick-connect-banner'),
+    (el5.textContent = t('coreUi.rendererOverlays.pickConnectBanner')),
+    Object.assign(el5.style, {
       position: 'fixed',
       top: '20px',
       left: '50%',
@@ -80,9 +78,9 @@ export function createPickConnectBannerEl() {
       display: 'none',
       pointerEvents: 'none',
     }),
-    _0x4a809e
+    el5
   );
 }
-export function renderPickConnectBanner(_0x3c3232, _0x101c12) {
-  _0x3c3232.style.display = _0x101c12?.active ? 'block' : 'none';
+export function renderPickConnectBanner(el6, value) {
+  el6.style.display = value?.active ? 'block' : 'none';
 }

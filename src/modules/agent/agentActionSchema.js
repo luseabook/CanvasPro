@@ -8,55 +8,56 @@ export const AGENT_PLAN_STATUSES = Object.freeze([
 export const AGENT_RISK_LEVELS = Object.freeze(['safe', 'confirm', 'danger', 'blocked']);
 export const AGENT_BATCH_CONFIRM_THRESHOLD = 5;
 const AGENT_ACTION_ALIAS_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
-export function normalizeAgentActionAlias(_0x61b878) {
-  const _0x2981fe = String(_0x61b878 || '').trim();
-  return AGENT_ACTION_ALIAS_PATTERN.test(_0x2981fe) ? _0x2981fe : '';
+export function normalizeAgentActionAlias(value) {
+  const item = String(value || '').trim();
+  return AGENT_ACTION_ALIAS_PATTERN.test(item) ? item : '';
 }
-export function normalizeAgentAction(_0x367cba = {}) {
-  if (!_0x367cba || typeof _0x367cba !== 'object' || Array.isArray(_0x367cba)) return null;
-  const _0x14ed0e = String(_0x367cba.type || _0x367cba.commandId || _0x367cba.id || '').trim();
-  if (!_0x14ed0e) return null;
-  const _0x5da4fc = normalizeAgentActionAlias(_0x367cba.alias ?? _0x367cba.resultAlias ?? _0x367cba.as);
+export function normalizeAgentAction(args = {}) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return null;
+  const type = String(args.type || args.commandId || args.id || '').trim();
+  if (!type) return null;
+  const alias = normalizeAgentActionAlias(args.alias ?? args.resultAlias ?? args.as);
   return {
-    type: _0x14ed0e,
-    ...(_0x5da4fc ? { alias: _0x5da4fc } : {}),
-    args:
-      _0x367cba.args && typeof _0x367cba.args === 'object' && !Array.isArray(_0x367cba.args)
-        ? _0x367cba.args
-        : {},
+    type: type,
+    ...(alias ? { alias: alias } : {}),
+    args: args.args && typeof args.args === 'object' && !Array.isArray(args.args) ? args.args : {},
   };
 }
-export function normalizeAgentPlan(_0x2ad288 = {}) {
-  const _0x231eb5 =
-      typeof _0x2ad288 === 'string'
-        ? safeParseJson(_0x2ad288)
-        : _0x2ad288 && typeof _0x2ad288 === 'object'
-          ? _0x2ad288
+export function normalizeAgentPlan(options = {}) {
+  const requiresConfirmation =
+      typeof options === 'string'
+        ? safeParseJson(options)
+        : options && typeof options === 'object'
+          ? options
           : {},
-    _0x3ee577 = AGENT_PLAN_STATUSES.includes(_0x231eb5.status) ? _0x231eb5.status : 'failed';
+    status = AGENT_PLAN_STATUSES.includes(requiresConfirmation.status)
+      ? requiresConfirmation.status
+      : 'failed';
   return {
-    reply: String(_0x231eb5.reply || ''),
-    status: _0x3ee577,
-    question: String(_0x231eb5.question || ''),
-    options: Array.isArray(_0x231eb5.options)
-      ? _0x231eb5.options
-          .map((_0x302ecd) => ({
-            id: String(_0x302ecd?.id || ''),
-            label: String(_0x302ecd?.label || _0x302ecd?.id || ''),
+    reply: String(requiresConfirmation.reply || ''),
+    status: status,
+    question: String(requiresConfirmation.question || ''),
+    options: Array.isArray(requiresConfirmation.options)
+      ? requiresConfirmation.options
+          .map((item2) => ({
+            id: String(item2?.id || ''),
+            label: String(item2?.label || item2?.id || ''),
           }))
-          .filter((_0x575cde) => _0x575cde.id && _0x575cde.label)
+          .filter((item3) => item3.id && item3.label)
       : [],
-    requiresConfirmation: _0x231eb5.requiresConfirmation === true,
-    riskLevel: AGENT_RISK_LEVELS.includes(_0x231eb5.riskLevel) ? _0x231eb5.riskLevel : 'safe',
-    actions: Array.isArray(_0x231eb5.actions)
-      ? _0x231eb5.actions.map(normalizeAgentAction).filter(Boolean)
+    requiresConfirmation: requiresConfirmation.requiresConfirmation === true,
+    riskLevel: AGENT_RISK_LEVELS.includes(requiresConfirmation.riskLevel)
+      ? requiresConfirmation.riskLevel
+      : 'safe',
+    actions: Array.isArray(requiresConfirmation.actions)
+      ? requiresConfirmation.actions.map(normalizeAgentAction).filter(Boolean)
       : [],
-    raw: _0x231eb5,
+    raw: requiresConfirmation,
   };
 }
-function safeParseJson(_0xb862e9) {
+function safeParseJson(key) {
   try {
-    return JSON.parse(_0xb862e9);
+    return JSON.parse(key);
   } catch {
     return { status: 'failed', reply: 'Agent planner returned invalid JSON.' };
   }

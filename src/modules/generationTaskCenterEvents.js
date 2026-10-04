@@ -2,50 +2,46 @@ import { ACTIVE_TASK_STATUSES, pruneTaskCenterRecords } from './taskCenterModel.
 export const GENERATION_TASK_CENTER_EVENT = 'aicanvas:generation-task-center:update';
 const snapshots = new WeakMap();
 
-export function listGenerationTaskCenterUpdates(_0x4c4715 = globalThis['window']) {
-  return _0x4c4715 ? [...(snapshots['get'](_0x4c4715)?.['values']() || [])] : [];
+export function listGenerationTaskCenterUpdates(value = globalThis['window']) {
+  return value ? [...(snapshots['get'](value)?.['values']() || [])] : [];
 }
 
-export function publishTaskCenterSnapshot(_0x3340c7, _0x3c4873, _0x187ed5 = globalThis['window']) {
-  const _0x28f41b = new Set(_0x3c4873['map']((_0x2835e0) => _0x2835e0['taskId']));
-  for (const _0xc165c6 of listGenerationTaskCenterUpdates(_0x187ed5)) {
-    if (_0xc165c6['source'] !== _0x3340c7['source'] || _0xc165c6['projectId'] !== _0x3340c7['projectId'])
-      continue;
-    if (_0x28f41b['has'](_0xc165c6['taskId']) || !ACTIVE_TASK_STATUSES['has'](_0xc165c6['status'])) continue;
+export function publishTaskCenterSnapshot(item, list, key = globalThis['window']) {
+  const map = new Set(list['map']((index) => index['taskId']));
+  for (const response of listGenerationTaskCenterUpdates(key)) {
+    if (response['source'] !== item['source'] || response['projectId'] !== item['projectId']) continue;
+    if (map['has'](response['taskId']) || !ACTIVE_TASK_STATUSES['has'](response['status'])) continue;
     emitGenerationTaskCenterUpdate(
-      { ..._0xc165c6, status: 'untracked', cancellable: ![], message: '', finishedAt: Date['now']() },
-      _0x187ed5,
+      { ...response, status: 'untracked', cancellable: ![], message: '', finishedAt: Date['now']() },
+      key,
     );
   }
-  _0x3c4873['forEach']((_0x4fdd85) => emitGenerationTaskCenterUpdate(_0x4fdd85, _0x187ed5));
+  list['forEach']((result) => emitGenerationTaskCenterUpdate(result, key));
 }
 
-export function emitGenerationTaskCenterUpdate(_0x202ec1 = {}, _0x2e5ecc = globalThis['window']) {
-  if (!_0x202ec1 || typeof _0x202ec1 !== 'object' || !_0x2e5ecc) return ![];
-  if (typeof _0x2e5ecc['dispatchEvent'] !== 'function') return ![];
-  const _0xe88b36 = String(_0x202ec1['taskId'] || '');
-  if (!_0xe88b36) return ![];
-  const _0x494208 = snapshots['get'](_0x2e5ecc) || new Map(),
-    _0x5a1908 = _0x494208['get'](_0xe88b36);
-  if (_0x5a1908 && JSON['stringify'](_0x5a1908) === JSON['stringify'](_0x202ec1)) return ![];
-  (_0x494208['set'](_0xe88b36, _0x202ec1),
+export function emitGenerationTaskCenterUpdate(detail = {}, enabled = globalThis['window']) {
+  if (!detail || typeof detail !== 'object' || !enabled) return ![];
+  if (typeof enabled['dispatchEvent'] !== 'function') return ![];
+  const enabled2 = String(detail['taskId'] || '');
+  if (!enabled2) return ![];
+  const map2 = snapshots['get'](enabled) || new Map(),
+    data = map2['get'](enabled2);
+  if (data && JSON['stringify'](data) === JSON['stringify'](detail)) return ![];
+  (map2['set'](enabled2, detail),
     snapshots['set'](
-      _0x2e5ecc,
+      enabled,
       new Map(
-        pruneTaskCenterRecords([..._0x494208['values']()])['map']((_0x2c202b) => [
-          _0x2c202b['taskId'],
-          _0x2c202b,
-        ]),
+        pruneTaskCenterRecords([...map2['values']()])['map']((options) => [options['taskId'], options]),
       ),
     ));
-  const _0x44cb58 =
+  const run =
       typeof globalThis['CustomEvent'] === 'function'
         ? globalThis['CustomEvent']
-        : typeof _0x2e5ecc['CustomEvent'] === 'function'
-          ? _0x2e5ecc['CustomEvent']
+        : typeof enabled['CustomEvent'] === 'function'
+          ? enabled['CustomEvent']
           : null,
-    _0x54c21f = _0x44cb58
-      ? new _0x44cb58(GENERATION_TASK_CENTER_EVENT, { detail: _0x202ec1 })
-      : { type: GENERATION_TASK_CENTER_EVENT, detail: _0x202ec1 };
-  return (_0x2e5ecc['dispatchEvent'](_0x54c21f), !![]);
+    target = run
+      ? new run(GENERATION_TASK_CENTER_EVENT, { detail: detail })
+      : { type: GENERATION_TASK_CENTER_EVENT, detail: detail };
+  return (enabled['dispatchEvent'](target), !![]);
 }

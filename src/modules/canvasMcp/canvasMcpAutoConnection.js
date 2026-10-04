@@ -1,73 +1,73 @@
 export function createCanvasMcpAutoConnection({
-  createSession: _0x5e161e,
-  getBinding: _0x31d1e3,
-  isReady: _0x2dfba6,
+  createSession: createSession,
+  getBinding: getBinding,
+  isReady: isReady,
   onChange: onChange = () => {},
   schedule: schedule = setTimeout,
   cancel: cancel = clearTimeout,
   allowGeneration = false,
 }) {
-  let _0x446ca4 = ![],
-    _0x12734b = ![],
-    _0xcf4594 = allowGeneration === true,
-    _0x1f629f = '',
-    _0x2a455b = ![],
-    _0x573597 = { enabled: ![] },
-    _0x56c5ab;
+  let enabled = ![],
+    enabled2 = ![],
+    allowGeneration2 = allowGeneration === true,
+    value = '',
+    item = ![],
+    args = { enabled: ![] },
+    schedule2;
   let backendUnavailable = false;
-  const _0x34400a = () => onChange({ ..._0x573597, allowGeneration: _0xcf4594 }),
-    _0x347949 = _0x5e161e((_0x4bf0e5) => {
-      ((_0x573597 = _0x4bf0e5), _0x34400a());
+  const run = () => onChange({ ...args, allowGeneration: allowGeneration2 }),
+    key = createSession((index) => {
+      ((args = index), run());
     });
-  function _0x30d28b(_0x143dc5) {
-    cancel(_0x56c5ab);
-    if (!_0x446ca4 && !backendUnavailable)
-      _0x56c5ab = schedule(() => {
-        void _0x589a4f();
-      }, _0x143dc5);
+  function run2(result) {
+    cancel(schedule2);
+    if (!enabled && !backendUnavailable)
+      schedule2 = schedule(() => {
+        void run3();
+      }, result);
   }
-  async function _0x589a4f() {
-    if (_0x446ca4 || backendUnavailable) return;
-    _0x347949['checkBinding']();
-    if (_0x12734b) {
-      _0x30d28b(0x3e8);
+  async function run3() {
+    if (enabled || backendUnavailable) return;
+    key['checkBinding']();
+    if (enabled2) {
+      run2(0x3e8);
       return;
     }
-    const _0x18ef07 = _0x2dfba6() ? _0x31d1e3() : '';
-    if (!_0x18ef07) {
-      if (_0x573597['enabled']) await _0x347949['disable']();
-      _0x30d28b(0x3e8);
+    const enabled3 = isReady() ? getBinding() : '';
+    if (!enabled3) {
+      if (args['enabled']) await key['disable']();
+      run2(0x3e8);
       return;
     }
-    if (_0x573597['enabled'] && _0x1f629f === _0x18ef07 && _0x2a455b === _0xcf4594) {
-      _0x30d28b(0x3e8);
+    if (args['enabled'] && value === enabled3 && item === allowGeneration2) {
+      run2(0x3e8);
       return;
     }
-    _0x12734b = !![];
-    const _0x49ebf7 = _0xcf4594;
-    let _0x203038 = 0x3e8;
+    enabled2 = !![];
+    const allowGeneration3 = allowGeneration2;
+    let data = 0x3e8;
     try {
-      const _0x49d58a = await _0x347949['enable']({ allowGeneration: _0x49ebf7 });
-      _0x49d58a && ((_0x1f629f = _0x18ef07), (_0x2a455b = _0x49ebf7));
-    } catch (_0x18ccb3) {
-      const status = Number(_0x18ccb3?.status || _0x18ccb3?.statusCode);
-      backendUnavailable = [401, 403, 404, 405, 501].includes(status) || _0x18ccb3?.code === 'UNSUPPORTED';
-      ((_0x573597 = { enabled: ![], reason: _0x18ccb3['message'] }), _0x34400a(), (_0x203038 = 0x1388));
+      const options = await key['enable']({ allowGeneration: allowGeneration3 });
+      options && ((value = enabled3), (item = allowGeneration3));
+    } catch (reason) {
+      const status = Number(reason?.status || reason?.statusCode);
+      backendUnavailable = [401, 403, 404, 405, 501].includes(status) || reason?.code === 'UNSUPPORTED';
+      ((args = { enabled: ![], reason: reason['message'] }), run(), (data = 0x1388));
     } finally {
-      ((_0x12734b = ![]), _0x30d28b(_0x203038));
+      ((enabled2 = ![]), run2(data));
     }
   }
   return (
-    _0x30d28b(0x0),
+    run2(0x0),
     {
       refresh() {
-        (_0x347949['checkBinding'](), _0x30d28b(0x0));
+        (key['checkBinding'](), run2(0x0));
       },
-      setAllowGeneration(_0x5ad1bc) {
-        ((_0xcf4594 = _0x5ad1bc === !![]), void _0x347949['disable'](), _0x30d28b(0x0));
+      setAllowGeneration(target) {
+        ((allowGeneration2 = target === !![]), void key['disable'](), run2(0x0));
       },
       async destroy() {
-        ((_0x446ca4 = !![]), cancel(_0x56c5ab), await _0x347949['destroy']());
+        ((enabled = !![]), cancel(schedule2), await key['destroy']());
       },
     }
   );

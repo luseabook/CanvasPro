@@ -1,61 +1,56 @@
-export const normalizeCurveVector = (_0x2221a5) =>
-  Array['isArray'](_0x2221a5) && _0x2221a5['length'] === 0x3 && _0x2221a5['every'](Number['isFinite'])
-    ? [..._0x2221a5]
+export const normalizeCurveVector = (list) =>
+  Array['isArray'](list) && list['length'] === 0x3 && list['every'](Number['isFinite'])
+    ? [...list]
     : undefined;
-export function normalizeEasingCurve(_0x38ec45) {
-  if (!Array['isArray'](_0x38ec45) || _0x38ec45['length'] !== 0x4 || !_0x38ec45['every'](Number['isFinite']))
+export function normalizeEasingCurve(list2) {
+  if (!Array['isArray'](list2) || list2['length'] !== 0x4 || !list2['every'](Number['isFinite']))
     return undefined;
-  return _0x38ec45['map']((_0x7ea94f, _0x47ddcf) =>
-    _0x47ddcf % 0x2 === 0x0
-      ? Math['max'](0x0, Math['min'](0x1, _0x7ea94f))
-      : Math['max'](-0x4, Math['min'](0x4, _0x7ea94f)),
+  return list2['map']((value, item) =>
+    item % 0x2 === 0x0
+      ? Math['max'](0x0, Math['min'](0x1, value))
+      : Math['max'](-0x4, Math['min'](0x4, value)),
   );
 }
-const cubic = (_0x22274f, _0x31aa74, _0x4ede05, _0x3873e1, _0x5a6d97) =>
-  (0x1 - _0x5a6d97) ** 0x3 * _0x22274f +
-  0x3 * (0x1 - _0x5a6d97) ** 0x2 * _0x5a6d97 * _0x31aa74 +
-  0x3 * (0x1 - _0x5a6d97) * _0x5a6d97 * _0x5a6d97 * _0x4ede05 +
-  _0x5a6d97 ** 0x3 * _0x3873e1;
-export function sampleBezierEase(_0x31bca, _0x5d62d5) {
-  if (_0x31bca <= 0x0 || _0x31bca >= 0x1) return _0x31bca;
-  let _0x5861a3 = 0x0,
-    _0x12a773 = 0x1;
-  for (let _0x3970bf = 0x0; _0x3970bf < 0x18; _0x3970bf++) {
-    const _0x5bfd83 = (_0x5861a3 + _0x12a773) / 0x2;
-    if (cubic(0x0, _0x5d62d5[0x0], _0x5d62d5[0x2], 0x1, _0x5bfd83) < _0x31bca) _0x5861a3 = _0x5bfd83;
-    else _0x12a773 = _0x5bfd83;
+const cubic = (key, index, result, data, options) =>
+  (0x1 - options) ** 0x3 * key +
+  0x3 * (0x1 - options) ** 0x2 * options * index +
+  0x3 * (0x1 - options) * options * options * result +
+  options ** 0x3 * data;
+export function sampleBezierEase(count, target) {
+  if (count <= 0x0 || count >= 0x1) return count;
+  let source = 0x0,
+    next = 0x1;
+  for (let count2 = 0x0; count2 < 0x18; count2++) {
+    const current = (source + next) / 0x2;
+    if (cubic(0x0, target[0x0], target[0x2], 0x1, current) < count) source = current;
+    else next = current;
   }
-  return cubic(0x0, _0x5d62d5[0x1], _0x5d62d5[0x3], 0x1, (_0x5861a3 + _0x12a773) / 0x2);
+  return cubic(0x0, target[0x1], target[0x3], 0x1, (source + next) / 0x2);
 }
-export function sampleSpatialCurve(_0x32a698, _0x5a30bf, _0x103c15, _0x2c3120 = 'value') {
-  const _0x2edd48 = _0x2c3120 === 'camera' ? _0x32a698['camera']['position'] : _0x32a698['value'],
-    _0x450b13 = _0x2c3120 === 'camera' ? _0x5a30bf['camera']['position'] : _0x5a30bf['value'];
-  if (!_0x32a698['outTangent'] && !_0x5a30bf['inTangent'])
-    return _0x2edd48['map'](
-      (_0x58d45c, _0x9fffc5) => _0x58d45c + (_0x450b13[_0x9fffc5] - _0x58d45c) * _0x103c15,
-    );
-  return _0x2edd48['map']((_0xeb5de6, _0x203237) =>
+export function sampleSpatialCurve(el, el2, entry, record = 'value') {
+  const list3 = record === 'camera' ? el['camera']['position'] : el['value'],
+    payload = record === 'camera' ? el2['camera']['position'] : el2['value'];
+  if (!el['outTangent'] && !el2['inTangent'])
+    return list3['map']((handle, state) => handle + (payload[state] - handle) * entry);
+  return list3['map']((config, scope) =>
     cubic(
-      _0xeb5de6,
-      _0xeb5de6 + (_0x32a698['outTangent']?.[_0x203237] ?? (_0x450b13[_0x203237] - _0xeb5de6) / 0x3),
-      _0x450b13[_0x203237] +
-        (_0x5a30bf['inTangent']?.[_0x203237] ?? (_0xeb5de6 - _0x450b13[_0x203237]) / 0x3),
-      _0x450b13[_0x203237],
-      _0x103c15,
+      config,
+      config + (el['outTangent']?.[scope] ?? (payload[scope] - config) / 0x3),
+      payload[scope] + (el2['inTangent']?.[scope] ?? (config - payload[scope]) / 0x3),
+      payload[scope],
+      entry,
     ),
   );
 }
-export function smoothDirectorKeys(_0x3f1b42) {
+export function smoothDirectorKeys(list4) {
   return (
-    _0x3f1b42['forEach']((_0x43e27f, _0x3f1b6d) => {
-      const _0x43f69d = (_0x98fd90) => _0x98fd90['camera']?.['position'] || _0x98fd90['value'],
-        _0x442fc2 = _0x43f69d(_0x3f1b42[Math['max'](0x0, _0x3f1b6d - 0x1)]),
-        _0x25c58f = _0x43f69d(_0x3f1b42[Math['min'](_0x3f1b42['length'] - 0x1, _0x3f1b6d + 0x1)]);
-      ((_0x43e27f['outTangent'] = _0x25c58f['map'](
-        (_0x536802, _0x146225) => (_0x536802 - _0x442fc2[_0x146225]) / 0x6,
-      )),
-        (_0x43e27f['inTangent'] = _0x43e27f['outTangent']['map']((_0xad84ad) => -_0xad84ad)));
+    list4['forEach']((input, output) => {
+      const run = (el3) => el3['camera']?.['position'] || el3['value'],
+        value2 = run(list4[Math['max'](0x0, output - 0x1)]),
+        list5 = run(list4[Math['min'](list4['length'] - 0x1, output + 0x1)]);
+      ((input['outTangent'] = list5['map']((value3, value4) => (value3 - value2[value4]) / 0x6)),
+        (input['inTangent'] = input['outTangent']['map']((value5) => -value5)));
     }),
-    _0x3f1b42
+    list4
   );
 }

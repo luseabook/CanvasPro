@@ -4,66 +4,61 @@ const HOST_PORT_RE = /^[^:/?#\s]+:\d+(?:[/?#]|$)/,
   IPV4_HOST_RE = /^(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?(?:[/?#]|$)/,
   BRACKETED_HOST_RE = /^\[[0-9a-f:.]+\](?::\d+)?(?:[/?#]|$)/i;
 export const WEB_PREVIEW_DEFAULT_SEARCH_URL_TEMPLATE = 'https://www.baidu.com/s?wd={query}';
-export function normalizeWebPreviewUrl(_0x3cd477) {
-  const _0x3219ef = String(_0x3cd477 || '').trim();
-  if (!_0x3219ef) return '';
-  const _0x140b3a = !EXPLICIT_PROTOCOL_RE.test(_0x3219ef) || HOST_PORT_RE.test(_0x3219ef),
-    _0x4448ca = _0x140b3a ? 'https://' + _0x3219ef : _0x3219ef;
+export function normalizeWebPreviewUrl(value) {
+  const enabled = String(value || '').trim();
+  if (!enabled) return '';
+  const item = !EXPLICIT_PROTOCOL_RE.test(enabled) || HOST_PORT_RE.test(enabled),
+    key = item ? 'https://' + enabled : enabled;
   try {
-    const _0x3f7e8f = new URL(_0x4448ca);
-    if (_0x3f7e8f.protocol !== 'http:' && _0x3f7e8f.protocol !== 'https:') return '';
-    return ((_0x3f7e8f.username = ''), (_0x3f7e8f.password = ''), _0x3f7e8f.toString());
+    const uRL = new URL(key);
+    if (uRL.protocol !== 'http:' && uRL.protocol !== 'https:') return '';
+    return ((uRL.username = ''), (uRL.password = ''), uRL.toString());
   } catch {
     return '';
   }
 }
-export function normalizeWebPreviewFaviconUrl(_0x331924) {
-  return normalizeWebPreviewUrl(_0x331924);
+export function normalizeWebPreviewFaviconUrl(index) {
+  return normalizeWebPreviewUrl(index);
 }
-export function isAllowedWebPreviewUrl(_0x4465eb) {
-  return Boolean(normalizeWebPreviewUrl(_0x4465eb));
+export function isAllowedWebPreviewUrl(result) {
+  return Boolean(normalizeWebPreviewUrl(result));
 }
-function hasUnsafeExplicitProtocol(_0x2f3012) {
-  if (HOST_PORT_RE.test(_0x2f3012)) return false;
-  if (!EXPLICIT_PROTOCOL_RE.test(_0x2f3012)) return false;
-  return !/^https?:/i.test(_0x2f3012);
+function hasUnsafeExplicitProtocol(data) {
+  if (HOST_PORT_RE.test(data)) return false;
+  if (!EXPLICIT_PROTOCOL_RE.test(data)) return false;
+  return !/^https?:/i.test(data);
 }
-function hasDomainLikeHost(_0x193207) {
-  if (/\s/.test(_0x193207)) return false;
-  const _0x1b6053 = _0x193207.split(/[/?#]/, 1)[0] || '';
+function hasDomainLikeHost(options) {
+  if (/\s/.test(options)) return false;
+  const list = options.split(/[/?#]/, 1)[0] || '';
+  return list.includes('.') && !list.startsWith('.') && !list.endsWith('.') && !list.includes('..');
+}
+function looksLikeWebPreviewUrlInput(target) {
+  if (EXPLICIT_PROTOCOL_RE.test(target) || HOST_PORT_RE.test(target)) return true;
+  if (/\s/.test(target)) return false;
   return (
-    _0x1b6053.includes('.') &&
-    !_0x1b6053.startsWith('.') &&
-    !_0x1b6053.endsWith('.') &&
-    !_0x1b6053.includes('..')
+    LOCALHOST_RE.test(target) ||
+    IPV4_HOST_RE.test(target) ||
+    BRACKETED_HOST_RE.test(target) ||
+    hasDomainLikeHost(target)
   );
 }
-function looksLikeWebPreviewUrlInput(_0x2962e1) {
-  if (EXPLICIT_PROTOCOL_RE.test(_0x2962e1) || HOST_PORT_RE.test(_0x2962e1)) return true;
-  if (/\s/.test(_0x2962e1)) return false;
-  return (
-    LOCALHOST_RE.test(_0x2962e1) ||
-    IPV4_HOST_RE.test(_0x2962e1) ||
-    BRACKETED_HOST_RE.test(_0x2962e1) ||
-    hasDomainLikeHost(_0x2962e1)
-  );
-}
-export function buildWebPreviewSearchUrl(_0x35a34b, { searchUrlTemplate: searchUrlTemplate = '' } = {}) {
-  const _0x4e2169 = String(_0x35a34b || '').trim();
-  if (!_0x4e2169) return '';
-  const _0x596846 = String(searchUrlTemplate || globalThis.window?.webPreviewSearchUrlTemplate || '')
+export function buildWebPreviewSearchUrl(source, { searchUrlTemplate: searchUrlTemplate = '' } = {}) {
+  const enabled2 = String(source || '').trim();
+  if (!enabled2) return '';
+  const next = String(searchUrlTemplate || globalThis.window?.webPreviewSearchUrlTemplate || '')
     .trim()
     .includes('{query}')
     ? String(searchUrlTemplate || globalThis.window?.webPreviewSearchUrlTemplate || '').trim()
     : WEB_PREVIEW_DEFAULT_SEARCH_URL_TEMPLATE;
-  return normalizeWebPreviewUrl(_0x596846.replace('{query}', encodeURIComponent(_0x4e2169)));
+  return normalizeWebPreviewUrl(next.replace('{query}', encodeURIComponent(enabled2)));
 }
-export function normalizeWebPreviewAddressInput(_0x53e592, _0x259ab6 = {}) {
-  const _0x18f3d9 = String(_0x53e592 || '').trim();
-  if (!_0x18f3d9 || hasUnsafeExplicitProtocol(_0x18f3d9)) return '';
-  if (looksLikeWebPreviewUrlInput(_0x18f3d9)) {
-    const _0x4090a9 = normalizeWebPreviewUrl(_0x18f3d9);
-    if (_0x4090a9) return _0x4090a9;
+export function normalizeWebPreviewAddressInput(current, entry = {}) {
+  const enabled3 = String(current || '').trim();
+  if (!enabled3 || hasUnsafeExplicitProtocol(enabled3)) return '';
+  if (looksLikeWebPreviewUrlInput(enabled3)) {
+    const webPreviewUrl = normalizeWebPreviewUrl(enabled3);
+    if (webPreviewUrl) return webPreviewUrl;
   }
-  return buildWebPreviewSearchUrl(_0x18f3d9, _0x259ab6);
+  return buildWebPreviewSearchUrl(enabled3, entry);
 }

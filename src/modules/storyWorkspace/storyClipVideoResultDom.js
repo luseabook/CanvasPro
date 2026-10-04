@@ -1,55 +1,54 @@
-function normalizeText(_0x448e56) {
-  return String(_0x448e56 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-export function findStoryClipCardShell(_0x2982f3, _0x4c770b) {
-  const _0x1887df = normalizeText(_0x4c770b);
+export function findStoryClipCardShell(el, item) {
+  const text = normalizeText(item);
   return (
-    Array['from'](_0x2982f3?.['querySelectorAll']?.('.story-clip-card-shell[data-story-clip-id]') || [])[
-      'find'
-    ]((_0xd23758) => normalizeText(_0xd23758['dataset']['storyClipId']) === _0x1887df) || null
+    Array['from'](el?.['querySelectorAll']?.('.story-clip-card-shell[data-story-clip-id]') || [])['find'](
+      (el2) => normalizeText(el2['dataset']['storyClipId']) === text,
+    ) || null
   );
 }
 export function syncStoryClipCardVideoInPlace({
-  root: _0x2b48e3,
-  documentObject: _0x300484,
-  clipId: _0x51d8da,
-  resultCount: _0x224ac6,
+  root: root,
+  documentObject: documentObject,
+  clipId: clipId,
+  resultCount: resultCount,
   refreshThumbnail: refreshThumbnail = ![],
   thumbnailMarkup: thumbnailMarkup = '',
 } = {}) {
-  const _0x33257c = findStoryClipCardShell(_0x2b48e3, _0x51d8da),
-    _0x1fc084 = _0x33257c?.['querySelector']('.story-clip-card');
-  if (!_0x33257c || !_0x1fc084) return ![];
-  _0x33257c['dataset']['storyVideoHistory'] = String(Number(_0x224ac6) > 0x1);
+  const el3 = findStoryClipCardShell(root, clipId),
+    el4 = el3?.['querySelector']('.story-clip-card');
+  if (!el3 || !el4) return ![];
+  el3['dataset']['storyVideoHistory'] = String(Number(resultCount) > 0x1);
   if (!refreshThumbnail) return !![];
-  let _0x29cfde = _0x1fc084['querySelector']('.story-clip-card-media');
-  if (!thumbnailMarkup)
-    return (_0x29cfde?.['remove'](), _0x1fc084['classList']['remove']('has-video-thumbnail'), !![]);
+  let el5 = el4['querySelector']('.story-clip-card-media');
+  if (!thumbnailMarkup) return (el5?.['remove'](), el4['classList']['remove']('has-video-thumbnail'), !![]);
   return (
-    !_0x29cfde &&
-      ((_0x29cfde = _0x300484['createElement']('span')),
-      (_0x29cfde['className'] = 'story-clip-card-media'),
-      _0x29cfde['setAttribute']('aria-hidden', 'true'),
-      _0x1fc084['querySelector']('.story-clip-card-copy')?.['before'](_0x29cfde)),
-    (_0x29cfde['innerHTML'] = thumbnailMarkup),
-    _0x1fc084['classList']['add']('has-video-thumbnail'),
+    !el5 &&
+      ((el5 = documentObject['createElement']('span')),
+      (el5['className'] = 'story-clip-card-media'),
+      el5['setAttribute']('aria-hidden', 'true'),
+      el4['querySelector']('.story-clip-card-copy')?.['before'](el5)),
+    (el5['innerHTML'] = thumbnailMarkup),
+    el4['classList']['add']('has-video-thumbnail'),
     !![]
   );
 }
-export function syncSelectedClipVideoMetadataInPlace(_0x2a102e, _0x200a44, _0x39bcba) {
-  const _0x1e290b = _0x2a102e?.['querySelector']?.('.story-video-result[data-story-video-result-index]');
-  if (!_0x1e290b) return ![];
-  ((_0x1e290b['dataset']['storyVideoResultIndex'] = String(_0x200a44)),
-    _0x1e290b['querySelectorAll']('[data-story-video-result-index]')['forEach']((_0x2187c1) => {
-      _0x2187c1['dataset']['storyVideoResultIndex'] = String(_0x200a44);
+export function syncSelectedClipVideoMetadataInPlace(el6, key, index) {
+  const el7 = el6?.['querySelector']?.('.story-video-result[data-story-video-result-index]');
+  if (!el7) return ![];
+  ((el7['dataset']['storyVideoResultIndex'] = String(key)),
+    el7['querySelectorAll']('[data-story-video-result-index]')['forEach']((el8) => {
+      el8['dataset']['storyVideoResultIndex'] = String(key);
     }));
-  const _0xe864c2 = Math['max'](0x1, Number(_0x39bcba) || 0x1),
-    _0x1b5335 = _0x1e290b['querySelector']('.story-video-result-meta\x20span');
-  if (_0x1b5335) _0x1b5335['textContent'] = _0x200a44 + 0x1 + '/' + _0xe864c2;
+  const count = Math['max'](0x1, Number(index) || 0x1),
+    el9 = el7['querySelector']('.story-video-result-meta\x20span');
+  if (el9) el9['textContent'] = key + 0x1 + '/' + count;
   return (
-    _0xe864c2 < 0x2 &&
-      _0x1e290b['querySelectorAll']('.story-video-result-switch')['forEach']((_0x29e626) => {
-        _0x29e626['remove']();
+    count < 0x2 &&
+      el7['querySelectorAll']('.story-video-result-switch')['forEach']((el10) => {
+        el10['remove']();
       }),
     !![]
   );

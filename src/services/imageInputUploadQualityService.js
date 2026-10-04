@@ -6,11 +6,9 @@ export const IMAGE_INPUT_UPLOAD_QUALITY_MODES = Object.freeze({
 });
 export const DEFAULT_IMAGE_INPUT_UPLOAD_QUALITY_MODE = IMAGE_INPUT_UPLOAD_QUALITY_MODES.HIGH_FIDELITY;
 const VALID_IMAGE_INPUT_UPLOAD_QUALITY_MODES = new Set(Object.values(IMAGE_INPUT_UPLOAD_QUALITY_MODES));
-export function normalizeImageInputUploadQualityMode(_0x27d1fa) {
-  const _0x4be7a1 = String(_0x27d1fa || '').trim();
-  return VALID_IMAGE_INPUT_UPLOAD_QUALITY_MODES.has(_0x4be7a1)
-    ? _0x4be7a1
-    : DEFAULT_IMAGE_INPUT_UPLOAD_QUALITY_MODE;
+export function normalizeImageInputUploadQualityMode(value) {
+  const item = String(value || '').trim();
+  return VALID_IMAGE_INPUT_UPLOAD_QUALITY_MODES.has(item) ? item : DEFAULT_IMAGE_INPUT_UPLOAD_QUALITY_MODE;
 }
 export function getImageInputUploadQualityMode() {
   try {
@@ -21,26 +19,26 @@ export function getImageInputUploadQualityMode() {
     return DEFAULT_IMAGE_INPUT_UPLOAD_QUALITY_MODE;
   }
 }
-export function setImageInputUploadQualityMode(_0x579962) {
-  const _0x532794 = normalizeImageInputUploadQualityMode(_0x579962);
+export function setImageInputUploadQualityMode(key) {
+  const imageInputUploadQualityMode = normalizeImageInputUploadQualityMode(key);
   try {
-    globalThis.localStorage?.setItem(IMAGE_INPUT_UPLOAD_QUALITY_STORAGE_KEY, _0x532794);
+    globalThis.localStorage?.setItem(IMAGE_INPUT_UPLOAD_QUALITY_STORAGE_KEY, imageInputUploadQualityMode);
   } catch {}
-  return _0x532794;
+  return imageInputUploadQualityMode;
 }
-export function getImageInputUploadQualityOptions(_0x457a49) {
-  const _0x3208a4 = normalizeImageInputUploadQualityMode(_0x457a49);
-  if (_0x3208a4 === IMAGE_INPUT_UPLOAD_QUALITY_MODES.HIGH_FIDELITY)
+export function getImageInputUploadQualityOptions(index) {
+  const imageInputUploadQualityMode2 = normalizeImageInputUploadQualityMode(index);
+  if (imageInputUploadQualityMode2 === IMAGE_INPUT_UPLOAD_QUALITY_MODES.HIGH_FIDELITY)
     return {
-      imageInputUploadQualityMode: _0x3208a4,
+      imageInputUploadQualityMode: imageInputUploadQualityMode2,
       compress: true,
       maxDim: 0x1000,
       quality: 0.95,
       fallbackCompressOnError: false,
     };
-  if (_0x3208a4 === IMAGE_INPUT_UPLOAD_QUALITY_MODES.ORIGINAL_FIRST)
+  if (imageInputUploadQualityMode2 === IMAGE_INPUT_UPLOAD_QUALITY_MODES.ORIGINAL_FIRST)
     return {
-      imageInputUploadQualityMode: _0x3208a4,
+      imageInputUploadQualityMode: imageInputUploadQualityMode2,
       compress: false,
       maxDim: 0,
       quality: 1,
@@ -56,9 +54,13 @@ export function getImageInputUploadQualityOptions(_0x457a49) {
     fallbackCompressOnError: false,
   };
 }
-export function resolveImageInputUploadQualityOptions(_0x21bd41 = {}) {
-  const _0x2e0718 = normalizeImageInputUploadQualityMode(
-    _0x21bd41.imageInputUploadQualityMode || getImageInputUploadQualityMode(),
+export function resolveImageInputUploadQualityOptions(args = {}) {
+  const imageInputUploadQualityMode3 = normalizeImageInputUploadQualityMode(
+    args.imageInputUploadQualityMode || getImageInputUploadQualityMode(),
   );
-  return { ..._0x21bd41, ...getImageInputUploadQualityOptions(_0x2e0718), applyInputQualityProfile: true };
+  return {
+    ...args,
+    ...getImageInputUploadQualityOptions(imageInputUploadQualityMode3),
+    applyInputQualityProfile: true,
+  };
 }

@@ -18,29 +18,29 @@ import { registerScreenshotIpcHandlers } from './screenshotIpc.js';
 import { registerSecureSettingsIpcHandlers } from './secureSettingsIpc.js';
 import { registerTextPresetIpcHandlers } from './textPresetIpc.js';
 import { registerWebPreviewIpcHandlers } from './webPreviewIpc.js';
-export function registerIpcHandlers(_0x4d2473) {
-  const _0x14a149 = { ipcMain: ipcMain, ..._0x4d2473 };
-  (registerAppIpcHandlers(_0x14a149),
-    registerAgentInformationIpcHandlers(_0x14a149),
-    registerAgentSkillsIpcHandlers(_0x14a149),
-    registerCanvasVisualSnapshotIpcHandlers(_0x14a149),
-    registerCustomAiAppIpcHandlers(_0x14a149),
-    registerSecureSettingsIpcHandlers(_0x14a149),
-    registerClipboardIpcHandlers(_0x14a149),
-    registerScreenshotIpcHandlers(_0x14a149),
-    registerTextPresetIpcHandlers(_0x14a149),
-    registerProjectIpcHandlers(_0x14a149),
-    registerFileIpcHandlers(_0x14a149),
-    registerMediaTaskIpcHandlers(_0x14a149),
-    registerNodeMediaExportIpcHandlers(_0x14a149),
-    registerNodeExportIpcHandlers(_0x14a149),
-    registerTimelineExportIpcHandlers(_0x14a149),
-    registerLocalAssetCleanupIpcHandlers(_0x14a149),
-    registerDiagnosticsIpcHandlers(_0x14a149),
-    registerWebPreviewIpcHandlers(_0x14a149),
+export function registerIpcHandlers(capabilityHandlers) {
+  const value = { ipcMain: ipcMain, ...capabilityHandlers };
+  (registerAppIpcHandlers(value),
+    registerAgentInformationIpcHandlers(value),
+    registerAgentSkillsIpcHandlers(value),
+    registerCanvasVisualSnapshotIpcHandlers(value),
+    registerCustomAiAppIpcHandlers(value),
+    registerSecureSettingsIpcHandlers(value),
+    registerClipboardIpcHandlers(value),
+    registerScreenshotIpcHandlers(value),
+    registerTextPresetIpcHandlers(value),
+    registerProjectIpcHandlers(value),
+    registerFileIpcHandlers(value),
+    registerMediaTaskIpcHandlers(value),
+    registerNodeMediaExportIpcHandlers(value),
+    registerNodeExportIpcHandlers(value),
+    registerTimelineExportIpcHandlers(value),
+    registerLocalAssetCleanupIpcHandlers(value),
+    registerDiagnosticsIpcHandlers(value),
+    registerWebPreviewIpcHandlers(value),
     registerDesktopBridgeIpcHandlers({
       ipcMain: ipcMain,
-      capabilityHandlers: _0x4d2473,
-      logDiagnosticEvent: _0x4d2473.logDiagnosticEvent,
+      capabilityHandlers: capabilityHandlers,
+      logDiagnosticEvent: capabilityHandlers.logDiagnosticEvent,
     }));
 }

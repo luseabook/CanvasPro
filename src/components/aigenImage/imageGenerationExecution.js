@@ -14,14 +14,14 @@ import {
 } from '../../../api/aiImageApi.js';
 import { fetchDreaminaCliStatusFromServer, getCachedDreaminaCliStatus } from '../../../api/dreaminaCliApi.js';
 export function installImageGenerationExecution({
-  store: _0x51a6e8,
-  getScopeId: _0x4354b2,
+  store: store,
+  getScopeId: getScopeId,
   registry: registry = nodeRuntimeRegistry,
   dependencies: dependencies = {},
 }) {
-  const _0x2b5acc = createImageGenerationExecutionOwner({
-      store: _0x51a6e8,
-      getScopeId: _0x4354b2,
+  const resolve = createImageGenerationExecutionOwner({
+      store: store,
+      getScopeId: getScopeId,
       dependencies: {
         getDisplayModelName: getDisplayModelName,
         getRefKindByNodeType: getRefKindByNodeType,
@@ -41,13 +41,11 @@ export function installImageGenerationExecution({
         ...dependencies,
       },
     }),
-    _0x48cc98 = registry['registerResolver']('ai-image', (_0x83155, _0x35fd90) =>
-      _0x2b5acc['resolve'](_0x83155, _0x35fd90),
-    );
+    handler = registry['registerResolver']('ai-image', (value, item) => resolve['resolve'](value, item));
   return {
-    resolve: _0x2b5acc['resolve'],
+    resolve: resolve['resolve'],
     dispose() {
-      (_0x48cc98(), _0x2b5acc['dispose']());
+      (handler(), resolve['dispose']());
     },
   };
 }

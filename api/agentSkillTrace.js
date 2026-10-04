@@ -1,56 +1,55 @@
 const MAX_TRACE_SKILLS = 0x4,
   MAX_TRACE_INSTRUCTIONS_CHARS = 0x7d0,
   MAX_TRACE_RESOURCE_NAMES = 0xc;
-function truncateText(_0x4a07aa, _0x495714) {
-  const _0x277863 = String(_0x4a07aa || '')['trim']();
-  return _0x277863['length'] <= _0x495714
-    ? _0x277863
-    : _0x277863['slice'](0x0, Math['max'](0x0, _0x495714 - 0x3)) + '...';
+function truncateText(value, item) {
+  const list = String(value || '')['trim']();
+  return list['length'] <= item ? list : list['slice'](0x0, Math['max'](0x0, item - 0x3)) + '...';
 }
-function normalizePromptSkill(_0x327fed = {}) {
-  const _0x3853a2 = String(_0x327fed['id'] || '')
+function normalizePromptSkill(options = {}) {
+  const id = String(options['id'] || '')
     ['trim']()
     ['slice'](0x0, 0x40);
-  if (!_0x3853a2) return null;
-  const _0x18e76b = [
-    ...(Array['isArray'](_0x327fed['resourceNames']) ? _0x327fed['resourceNames'] : []),
-    ...(Array['isArray'](_0x327fed['resources'])
-      ? _0x327fed['resources']['map']((_0x4776e1) => _0x4776e1?.['name'])
+  if (!id) return null;
+  const list2 = [
+    ...(Array['isArray'](options['resourceNames']) ? options['resourceNames'] : []),
+    ...(Array['isArray'](options['resources'])
+      ? options['resources']['map']((error) => error?.['name'])
       : []),
   ];
   return {
-    id: _0x3853a2,
-    title: truncateText(_0x327fed['title'] || _0x3853a2, 0x78),
-    description: truncateText(_0x327fed['description'] || '', 0x1f4),
-    source: String(_0x327fed['source'] || '')
+    id: id,
+    title: truncateText(options['title'] || id, 0x78),
+    description: truncateText(options['description'] || '', 0x1f4),
+    source: String(options['source'] || '')
       ['trim']()
       ['slice'](0x0, 0x28),
-    instructions: truncateText(_0x327fed['instructions'] || '', MAX_TRACE_INSTRUCTIONS_CHARS),
-    resourceNames: [
-      ...new Set(_0x18e76b['map']((_0x2f1fa2) => truncateText(_0x2f1fa2, 0xa0))['filter'](Boolean)),
-    ]['slice'](0x0, MAX_TRACE_RESOURCE_NAMES),
+    instructions: truncateText(options['instructions'] || '', MAX_TRACE_INSTRUCTIONS_CHARS),
+    resourceNames: [...new Set(list2['map']((key) => truncateText(key, 0xa0))['filter'](Boolean))]['slice'](
+      0x0,
+      MAX_TRACE_RESOURCE_NAMES,
+    ),
   };
 }
-export function buildInjectedAgentSkillTrace(_0x366d27 = '', { channel: channel = '' } = {}) {
-  let _0x1dd430 = null;
+export function buildInjectedAgentSkillTrace(index = '', { channel: channel = '' } = {}) {
+  let result = null;
   try {
-    _0x1dd430 = JSON['parse'](String(_0x366d27 || ''));
+    result = JSON['parse'](String(index || ''));
   } catch {
     return null;
   }
-  const _0x19b1f9 = Array['isArray'](_0x1dd430?.['skills'])
-      ? _0x1dd430['skills']
-      : Array['isArray'](_0x1dd430?.['context']?.['skills'])
-        ? _0x1dd430['context']['skills']
+  const list3 = Array['isArray'](result?.['skills'])
+      ? result['skills']
+      : Array['isArray'](result?.['context']?.['skills'])
+        ? result['context']['skills']
         : [],
-    _0x19809b = _0x19b1f9['map'](normalizePromptSkill)['filter'](Boolean)['slice'](0x0, MAX_TRACE_SKILLS);
-  if (_0x19809b['length'] === 0x0) return null;
+    skillIds = list3['map'](normalizePromptSkill)['filter'](Boolean)['slice'](0x0, MAX_TRACE_SKILLS);
+  if (skillIds['length'] === 0x0) return null;
   return {
     type: 'agent_skill_context_injected',
     channel: String(channel || '')
       ['trim']()
       ['slice'](0x0, 0x50),
-    skillIds: _0x19809b['map']((_0x2f3678) => _0x2f3678['id']),
-    skills: _0x19809b,
+    skillIds: skillIds['map']((data) => data['id']),
+    skills: skillIds,
   };
 }

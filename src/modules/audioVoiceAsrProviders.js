@@ -43,27 +43,27 @@ const PROVIDERS = Object['freeze']([
   },
   { id: 'funasr', iconName: 'device', icon: '', iconAlt: 'local' },
 ]);
-export function normalizeAudioVoiceAsrProvider(_0x56cfaa) {
-  const _0x2e05f3 = String(_0x56cfaa || '')
+export function normalizeAudioVoiceAsrProvider(value) {
+  const item = String(value || '')
     ['trim']()
     ['toLowerCase']();
-  return PROVIDERS['some']((_0x148c84) => _0x148c84['id'] === _0x2e05f3) ? _0x2e05f3 : 'doubao';
+  return PROVIDERS['some']((key) => key['id'] === item) ? item : 'doubao';
 }
-export function getAudioVoiceAsrProvider(_0x479ad9) {
-  return PROVIDERS['find']((_0x313d10) => _0x313d10['id'] === normalizeAudioVoiceAsrProvider(_0x479ad9));
+export function getAudioVoiceAsrProvider(index) {
+  return PROVIDERS['find']((result) => result['id'] === normalizeAudioVoiceAsrProvider(index));
 }
 export function getAudioVoiceAsrProviderOptions() {
-  return PROVIDERS['map']((_0x1550e5) => ({
-    ..._0x1550e5,
-    label: t('audioVoicePanel.asrProviders.' + _0x1550e5['id'] + '.label'),
-    subtitle: t('audioVoicePanel.asrProviders.' + _0x1550e5['id'] + '.subtitle'),
+  return PROVIDERS['map']((args) => ({
+    ...args,
+    label: t('audioVoicePanel.asrProviders.' + args['id'] + '.label'),
+    subtitle: t('audioVoicePanel.asrProviders.' + args['id'] + '.subtitle'),
   }));
 }
-export function assertAudioVoiceAsrResult(_0x4f24dc, _0x47562c) {
-  const _0x30c0e5 = String(_0x4f24dc?.['asr']?.['provider'] || '')['trim']();
-  if (_0x30c0e5 !== normalizeAudioVoiceAsrProvider(_0x47562c))
+export function assertAudioVoiceAsrResult(data, options) {
+  const target = String(data?.['asr']?.['provider'] || '')['trim']();
+  if (target !== normalizeAudioVoiceAsrProvider(options))
     throw new Error(t('audioVoicePanel.toasts.asrRuntimeMismatch'));
-  const _0x5042f5 = Array['isArray'](_0x4f24dc?.['segments']) ? _0x4f24dc['segments'] : [];
-  if (!_0x5042f5['some']((_0x25ae56) => String(_0x25ae56?.['sourceText'] || '')['trim']()))
+  const list = Array['isArray'](data?.['segments']) ? data['segments'] : [];
+  if (!list['some']((source) => String(source?.['sourceText'] || '')['trim']()))
     throw new Error(t('audioVoicePanel.toasts.asrEmptyTranscript'));
 }

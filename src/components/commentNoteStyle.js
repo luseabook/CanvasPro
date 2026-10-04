@@ -41,21 +41,20 @@ export function createDefaultCommentNoteStyle() {
     writingMode: 'horizontal',
   };
 }
-export function normalizeCommentNoteStyle(_0x2dedee = {}) {
-  const _0x23467e = {
+export function normalizeCommentNoteStyle(options = {}) {
+  const value = {
       ...createDefaultCommentNoteStyle(),
-      ...(_0x2dedee && typeof _0x2dedee === 'object' ? _0x2dedee : {}),
+      ...(options && typeof options === 'object' ? options : {}),
     },
-    _0x39c597 = Number(_0x23467e.fontSize);
-  _0x23467e.fontSize = Number.isFinite(_0x39c597) ? Math.min(56, Math.max(14, _0x39c597)) : 24;
-  const _0x5b96a6 = Number(_0x23467e.strokeWidth);
+    item = Number(value.fontSize);
+  value.fontSize = Number.isFinite(item) ? Math.min(56, Math.max(14, item)) : 24;
+  const key = Number(value.strokeWidth);
   return (
-    (_0x23467e.strokeWidth = Number.isFinite(_0x5b96a6) ? Math.min(6, Math.max(0, _0x5b96a6)) : 0),
-    (_0x23467e.writingMode = 'horizontal'),
-    !COMMENT_NOTE_TEXT_COLOR_MAP[_0x23467e.textColor] && (_0x23467e.textColor = 'white'),
-    !COMMENT_NOTE_BACKGROUND_COLOR_MAP[_0x23467e.backgroundColor] &&
-      (_0x23467e.backgroundColor = 'transparent'),
-    !COMMENT_NOTE_STROKE_COLOR_MAP[_0x23467e.strokeColor] && (_0x23467e.strokeColor = 'canvas-white'),
-    _0x23467e
+    (value.strokeWidth = Number.isFinite(key) ? Math.min(6, Math.max(0, key)) : 0),
+    (value.writingMode = 'horizontal'),
+    !COMMENT_NOTE_TEXT_COLOR_MAP[value.textColor] && (value.textColor = 'white'),
+    !COMMENT_NOTE_BACKGROUND_COLOR_MAP[value.backgroundColor] && (value.backgroundColor = 'transparent'),
+    !COMMENT_NOTE_STROKE_COLOR_MAP[value.strokeColor] && (value.strokeColor = 'canvas-white'),
+    value
   );
 }

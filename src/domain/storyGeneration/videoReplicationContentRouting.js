@@ -1,6 +1,6 @@
 export const REPLICATION_CONTENT_TYPES = ['story', 'narrated_story', 'advertisement', 'unknown'];
-export const normalizeReplicationContentType = (_0x886809) =>
-  REPLICATION_CONTENT_TYPES['includes'](_0x886809) ? _0x886809 : 'unknown';
+export const normalizeReplicationContentType = (value) =>
+  REPLICATION_CONTENT_TYPES['includes'](value) ? value : 'unknown';
 export const REPLICATION_CONTENT_ROUTING_RULE =
   '在本次完整视频观察中同时识别 contentType：story=以人物事件为主的剧情，narrated_story=剧情伴随解说/旁白，advertisement=以产品/品牌展示或销售传播为主的广告（也可包含故事），unknown=证据不足。contentTypeReason 简述画面依据；有人讲话、画面有商品或字幕，不足以单独认定广告。类型用于选择提示词模板，不改变原片内容，不改 ASR 文字，不重新判定每句人声类型，也不增加单独分类或审核请求。';
 const narrative =
@@ -14,19 +14,16 @@ const narrative =
     unknown:
       '类型未确定：保留已观察画面、镜头和人声，画面文字与转录字幕分别记录，不猜成广告或故事；不输出转录字幕生成指令，不追加识别请求、不阻断交付，供用户核对。',
   };
-export function replicationRoutePolicy(_0x4a13a6) {
-  const _0x45e781 = normalizeReplicationContentType(_0x4a13a6);
+export function replicationRoutePolicy(item) {
+  const contentType = normalizeReplicationContentType(item);
   return {
-    contentType: _0x45e781,
+    contentType: contentType,
     includeSpeechSubtitles: ![],
     instruction:
-      rules[_0x45e781] +
+      rules[contentType] +
       '生成提示词不呈现画面文字：字幕、人物介绍、物体文字与广告文案均只保存在 textElements 证据，不进入 visual/camera 或其他生成正文；人声原文照常保留。',
   };
 }
-export function resolveReplicationContentType(..._0x49022c) {
-  return (
-    _0x49022c['map'](normalizeReplicationContentType)['find']((_0x5c5114) => _0x5c5114 !== 'unknown') ||
-    'unknown'
-  );
+export function resolveReplicationContentType(...list) {
+  return list['map'](normalizeReplicationContentType)['find']((key) => key !== 'unknown') || 'unknown';
 }

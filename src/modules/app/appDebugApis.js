@@ -1,55 +1,55 @@
 export function createCanvasCommandsDebugApi({
-  executeCanvasCommand: _0x31c022,
-  executeCanvasCommandPlan: _0x1dfc09,
-  commandContext: _0x14a359,
+  executeCanvasCommand: executeCanvasCommand2,
+  executeCanvasCommandPlan: executeCanvasCommandPlan2,
+  commandContext: commandContext,
 } = {}) {
   return {
-    executeCanvasCommand(_0xf9b738, _0x1a9eae = {}) {
-      return _0x31c022?.(_0xf9b738, _0x1a9eae, _0x14a359);
+    executeCanvasCommand(value, item = {}) {
+      return executeCanvasCommand2?.(value, item, commandContext);
     },
-    executeCanvasCommandPlan(_0x2f00d8 = []) {
-      return _0x1dfc09?.(_0x2f00d8, _0x14a359);
+    executeCanvasCommandPlan(list = []) {
+      return executeCanvasCommandPlan2?.(list, commandContext);
     },
   };
 }
 export function createCanvasAgentDebugApi({
-  agentRuntime: _0x15c103,
-  agentSessionStore: _0x3a0053,
-  agentSkillRegistry: _0x116786,
-  refreshAgentSkills: _0x3bfcdd,
+  agentRuntime: agentRuntime,
+  agentSessionStore: agentSessionStore,
+  agentSkillRegistry: agentSkillRegistry,
+  refreshAgentSkills: refreshAgentSkills,
 } = {}) {
   return {
-    handleUserMessage: (..._0x18b257) => _0x15c103?.['handleUserMessage']?.(..._0x18b257),
-    answerClarification: (..._0x5e8fd) => _0x15c103?.['answerClarification']?.(..._0x5e8fd),
-    confirmPendingPlan: (..._0x8e99b9) => _0x15c103?.['confirmPendingPlan']?.(..._0x8e99b9),
-    cancelPendingPlan: (..._0x3a0b19) => _0x15c103?.['cancelPendingPlan']?.(..._0x3a0b19),
-    retryFailedPlan: (..._0x68a161) => _0x15c103?.['retryFailedPlan']?.(..._0x68a161),
-    keepPreparedPlan: (..._0xbdf17c) => _0x15c103?.['keepPreparedPlan']?.(..._0xbdf17c),
-    discardInterruptedRun: (..._0x28c75d) => _0x15c103?.['discardInterruptedRun']?.(..._0x28c75d),
-    stop: (..._0x1ac620) => _0x15c103?.['stop']?.(..._0x1ac620),
-    resetSession: (..._0x9bb605) => _0x15c103?.['resetSession']?.(..._0x9bb605),
-    startNewConversation: (..._0x177549) => _0x15c103?.['startNewConversation']?.(..._0x177549),
-    switchConversation: (..._0x3a47df) => _0x15c103?.['switchConversation']?.(..._0x3a47df),
-    deleteConversation: (..._0x400877) => _0x15c103?.['deleteConversation']?.(..._0x400877),
-    listConversations: (..._0x9974e1) => _0x15c103?.['listConversations']?.(..._0x9974e1),
-    getActiveConversation: (..._0x3d0275) => _0x15c103?.['getActiveConversation']?.(..._0x3d0275),
-    getSessionState: () => _0x3a0053?.['getState']?.(),
-    listSkills: () => _0x116786?.['listCatalog']?.() || [],
-    getSkillState: () => _0x116786?.['getState']?.() || null,
-    refreshSkills: (..._0x1c954b) => _0x3bfcdd?.(..._0x1c954b),
+    handleUserMessage: (...args) => agentRuntime?.['handleUserMessage']?.(...args),
+    answerClarification: (...args2) => agentRuntime?.['answerClarification']?.(...args2),
+    confirmPendingPlan: (...args3) => agentRuntime?.['confirmPendingPlan']?.(...args3),
+    cancelPendingPlan: (...args4) => agentRuntime?.['cancelPendingPlan']?.(...args4),
+    retryFailedPlan: (...args5) => agentRuntime?.['retryFailedPlan']?.(...args5),
+    keepPreparedPlan: (...args6) => agentRuntime?.['keepPreparedPlan']?.(...args6),
+    discardInterruptedRun: (...args7) => agentRuntime?.['discardInterruptedRun']?.(...args7),
+    stop: (...args8) => agentRuntime?.['stop']?.(...args8),
+    resetSession: (...args9) => agentRuntime?.['resetSession']?.(...args9),
+    startNewConversation: (...args10) => agentRuntime?.['startNewConversation']?.(...args10),
+    switchConversation: (...args11) => agentRuntime?.['switchConversation']?.(...args11),
+    deleteConversation: (...args12) => agentRuntime?.['deleteConversation']?.(...args12),
+    listConversations: (...args13) => agentRuntime?.['listConversations']?.(...args13),
+    getActiveConversation: (...args14) => agentRuntime?.['getActiveConversation']?.(...args14),
+    getSessionState: () => agentSessionStore?.['getState']?.(),
+    listSkills: () => agentSkillRegistry?.['listCatalog']?.() || [],
+    getSkillState: () => agentSkillRegistry?.['getState']?.() || null,
+    refreshSkills: (...args15) => refreshAgentSkills?.(...args15),
   };
 }
 export function installAppDebugApis({
   windowObject: windowObject = globalThis['window'],
-  canvasCommands: _0x3fdb5c,
-  canvasAgent: _0x5e654b,
+  canvasCommands: canvasCommands,
+  canvasAgent: canvasAgent,
 } = {}) {
   if (windowObject?.['DEV_MODE'] !== !![]) return ![];
   return (
     (windowObject['__aiCanvasDebug'] = {
       ...(windowObject['__aiCanvasDebug'] || {}),
-      canvasCommands: _0x3fdb5c,
-      canvasAgent: _0x5e654b,
+      canvasCommands: canvasCommands,
+      canvasAgent: canvasAgent,
     }),
     !![]
   );

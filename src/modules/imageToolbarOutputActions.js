@@ -2,9 +2,9 @@ import { saveOutputFromUrlToServer } from '../../api/projectsV2Api.js';
 import { buildCanvasLocalImageFields } from '../services/canvasMediaLocalService.js';
 import { localPathToUrl, normalizeLocalPath, pickResultLocalPath } from '../utils/localMediaPath.js';
 import { saveRemoteImageLocally } from './project.js';
-function isRemoteLikeUrl(_0x282456) {
-  const _0x1ff948 = String(_0x282456 || '').trim();
-  return /^https?:\/\//i.test(_0x1ff948) || _0x1ff948.startsWith('blob:') || _0x1ff948.startsWith('data:');
+function isRemoteLikeUrl(value) {
+  const item = String(value || '').trim();
+  return /^https?:\/\//i.test(item) || item.startsWith('blob:') || item.startsWith('data:');
 }
 export function buildToolbarImageFields({
   localPath: localPath = '',
@@ -12,52 +12,52 @@ export function buildToolbarImageFields({
   thumbUrl: thumbUrl = '',
   includeSrc: includeSrc = false,
 }) {
-  const _0x50f7eb = { localPath: localPath, imageUrl: resultUrl, sourceUrl: resultUrl, thumbUrl: thumbUrl };
-  if (includeSrc) _0x50f7eb.src = thumbUrl || resultUrl;
-  return buildCanvasLocalImageFields(_0x50f7eb, { includeSrc: includeSrc });
+  const key = { localPath: localPath, imageUrl: resultUrl, sourceUrl: resultUrl, thumbUrl: thumbUrl };
+  if (includeSrc) key.src = thumbUrl || resultUrl;
+  return buildCanvasLocalImageFields(key, { includeSrc: includeSrc });
 }
-export async function saveRemoteImageResultLocally(_0x886c86, _0x5e814c = {}) {
-  const _0x5727e2 = _0x5e814c.projectId || 'default_v2_project',
-    _0x436b83 = await saveRemoteImageLocally(_0x886c86, _0x5727e2, _0x5e814c),
-    _0x14bc17 = isRemoteLikeUrl(_0x436b83) ? '' : normalizeLocalPath(_0x436b83),
-    _0x146caa = localPathToUrl(_0x14bc17) || String(_0x436b83 || '').trim() || _0x886c86;
+export async function saveRemoteImageResultLocally(resultUrl2, includeSrc2 = {}) {
+  const index = includeSrc2.projectId || 'default_v2_project',
+    saveRemoteImageLocally2 = await saveRemoteImageLocally(resultUrl2, index, includeSrc2),
+    localPath2 = isRemoteLikeUrl(saveRemoteImageLocally2) ? '' : normalizeLocalPath(saveRemoteImageLocally2),
+    thumbUrl2 = localPathToUrl(localPath2) || String(saveRemoteImageLocally2 || '').trim() || resultUrl2;
   return {
-    localPath: _0x14bc17,
-    thumbUrl: _0x146caa,
+    localPath: localPath2,
+    thumbUrl: thumbUrl2,
     fields: buildToolbarImageFields({
-      localPath: _0x14bc17,
-      resultUrl: _0x886c86,
-      thumbUrl: _0x146caa,
-      includeSrc: _0x5e814c.includeSrc,
+      localPath: localPath2,
+      resultUrl: resultUrl2,
+      thumbUrl: thumbUrl2,
+      includeSrc: includeSrc2.includeSrc,
     }),
   };
 }
-export async function saveOutputImageResult(_0x14b818, _0x491321 = {}) {
-  const _0xbc45d7 = _0x491321.resumedImage || null;
-  if (_0xbc45d7) {
-    const _0x85b5a2 = buildCanvasLocalImageFields(_0xbc45d7, { includeSrc: _0x491321.includeSrc ?? true }),
-      _0x255b75 = String(_0x85b5a2.localPath || '').trim(),
-      _0xc617a1 = String(_0x85b5a2.thumbUrl || _0x85b5a2.imageUrl || _0x85b5a2.src || '').trim();
-    return { localPath: _0x255b75, thumbUrl: _0xc617a1, fields: _0x85b5a2 };
+export async function saveOutputImageResult(url, includeSrc3 = {}) {
+  const result = includeSrc3.resumedImage || null;
+  if (result) {
+    const fields = buildCanvasLocalImageFields(result, { includeSrc: includeSrc3.includeSrc ?? true }),
+      localPath3 = String(fields.localPath || '').trim(),
+      thumbUrl3 = String(fields.thumbUrl || fields.imageUrl || fields.src || '').trim();
+    return { localPath: localPath3, thumbUrl: thumbUrl3, fields: fields };
   }
-  let _0x186703 = '',
-    _0x1a74f1 = _0x14b818;
-  const _0x265399 = await saveOutputFromUrlToServer({
-      url: _0x14b818,
-      ext: _0x491321.ext || 'png',
-      dedupeKey: _0x491321.dedupeKey || (_0x491321.taskKey ? _0x491321.taskKey + ':' + _0x14b818 : undefined),
+  let localPath4 = '',
+    thumbUrl4 = url;
+  const server = await saveOutputFromUrlToServer({
+      url: url,
+      ext: includeSrc3.ext || 'png',
+      dedupeKey: includeSrc3.dedupeKey || (includeSrc3.taskKey ? includeSrc3.taskKey + ':' + url : undefined),
     }),
-    _0x4d8fad = pickResultLocalPath(_0x265399);
+    resultLocalPath = pickResultLocalPath(server);
   return (
-    _0x4d8fad && ((_0x186703 = _0x4d8fad), (_0x1a74f1 = localPathToUrl(_0x186703))),
+    resultLocalPath && ((localPath4 = resultLocalPath), (thumbUrl4 = localPathToUrl(localPath4))),
     {
-      localPath: _0x186703,
-      thumbUrl: _0x1a74f1,
+      localPath: localPath4,
+      thumbUrl: thumbUrl4,
       fields: buildToolbarImageFields({
-        localPath: _0x186703,
-        resultUrl: _0x14b818,
-        thumbUrl: _0x1a74f1,
-        includeSrc: _0x491321.includeSrc ?? true,
+        localPath: localPath4,
+        resultUrl: url,
+        thumbUrl: thumbUrl4,
+        includeSrc: includeSrc3.includeSrc ?? true,
       }),
     }
   );

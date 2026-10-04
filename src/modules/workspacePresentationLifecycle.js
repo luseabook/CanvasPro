@@ -1,34 +1,34 @@
 export function createWorkspacePresentationLifecycle({
-  getRoot: _0x2112f2,
+  getRoot: getRoot,
   getContentKey: getContentKey = null,
   initiallyActive: initiallyActive = ![],
 } = {}) {
-  let _0x7079b5 = initiallyActive,
-    _0xf479b5 = ![],
-    _0x52d628 = null,
-    _0x101324 = null,
-    _0x460a5f = !![];
-  const _0x2d1a8e = new Set(),
-    _0x4bf510 = (_0x5b9e81) => {
-      if (!['VIDEO', 'AUDIO']['includes'](_0x5b9e81?.['tagName'])) return;
+  let enabled = initiallyActive,
+    enabled2 = ![],
+    el = null,
+    value = null,
+    enabled3 = !![];
+  const map = new Set(),
+    handler = (item) => {
+      if (!['VIDEO', 'AUDIO']['includes'](item?.['tagName'])) return;
       try {
-        _0x5b9e81['pause']();
+        item['pause']();
       } catch {}
     },
-    _0x4381a9 = (_0x4336cb) => {
-      if (!_0x7079b5) _0x4bf510(_0x4336cb['target']);
+    key = (event) => {
+      if (!enabled) handler(event['target']);
     },
-    _0x3a47e9 = () => {
-      const _0x23a05e = _0x2112f2?.() || null;
+    handler2 = () => {
+      const el2 = getRoot?.() || null;
       return (
-        _0x23a05e !== _0x52d628 &&
-          (_0x52d628?.['removeEventListener']?.('play', _0x4381a9, !![]),
-          (_0x52d628 = _0x23a05e),
-          _0x23a05e?.['addEventListener']?.('play', _0x4381a9, !![])),
-        _0x23a05e
+        el2 !== el &&
+          (el?.['removeEventListener']?.('play', key, !![]),
+          (el = el2),
+          el2?.['addEventListener']?.('play', key, !![])),
+        el2
       );
     },
-    _0x2d13cc = () => {
+    handler3 = () => {
       try {
         return getContentKey?.() ?? null;
       } catch {
@@ -36,46 +36,46 @@ export function createWorkspacePresentationLifecycle({
       }
     };
   return {
-    isActive: () => _0x7079b5 && !_0xf479b5,
+    isActive: () => enabled && !enabled2,
     invalidate: () => {
-      _0x460a5f = !![];
+      enabled3 = !![];
     },
     activate() {
-      if (_0xf479b5) return ![];
-      const _0x36adb0 = _0x2d13cc(),
-        _0x37b2cc = _0x460a5f || _0x36adb0 === null || _0x36adb0 !== _0x101324;
-      ((_0x7079b5 = !![]), (_0x460a5f = ![]));
-      const _0x3e9f44 = _0x3a47e9();
-      _0x3e9f44 && ((_0x3e9f44['hidden'] = ![]), _0x3e9f44['setAttribute']?.('aria-hidden', 'false'));
-      for (const _0x338533 of _0x2d1a8e) {
-        if (_0x338533['effect']?.['target']?.['isConnected'] && _0x338533['playState'] === 'paused')
+      if (enabled2) return ![];
+      const index = handler3(),
+        result = enabled3 || index === null || index !== value;
+      ((enabled = !![]), (enabled3 = ![]));
+      const el3 = handler2();
+      el3 && ((el3['hidden'] = ![]), el3['setAttribute']?.('aria-hidden', 'false'));
+      for (const data of map) {
+        if (data['effect']?.['target']?.['isConnected'] && data['playState'] === 'paused')
           try {
-            _0x338533['play']();
+            data['play']();
           } catch {}
       }
-      return (_0x2d1a8e['clear'](), _0x37b2cc);
+      return (map['clear'](), result);
     },
     deactivate() {
-      if (_0xf479b5) return;
-      if (_0x7079b5) _0x101324 = _0x2d13cc();
-      _0x7079b5 = ![];
-      const _0x3d073d = _0x3a47e9();
-      _0x3d073d?.['querySelectorAll']?.('video, audio')['forEach'](_0x4bf510);
-      for (const _0x55a58d of _0x3d073d?.['getAnimations']?.({ subtree: !![] }) || []) {
-        if (_0x55a58d['playState'] !== 'running') continue;
+      if (enabled2) return;
+      if (enabled) value = handler3();
+      enabled = ![];
+      const el4 = handler2();
+      el4?.['querySelectorAll']?.('video, audio')['forEach'](handler);
+      for (const options of el4?.['getAnimations']?.({ subtree: !![] }) || []) {
+        if (options['playState'] !== 'running') continue;
         try {
-          (_0x55a58d['pause'](), _0x2d1a8e['add'](_0x55a58d));
+          (options['pause'](), map['add'](options));
         } catch {}
       }
-      _0x3d073d && ((_0x3d073d['hidden'] = !![]), _0x3d073d['setAttribute']?.('aria-hidden', 'true'));
+      el4 && ((el4['hidden'] = !![]), el4['setAttribute']?.('aria-hidden', 'true'));
     },
     dispose() {
       (this['deactivate'](),
-        (_0xf479b5 = !![]),
-        _0x52d628?.['removeEventListener']?.('play', _0x4381a9, !![]),
-        (_0x52d628 = null),
-        (_0x101324 = null),
-        _0x2d1a8e['clear']());
+        (enabled2 = !![]),
+        el?.['removeEventListener']?.('play', key, !![]),
+        (el = null),
+        (value = null),
+        map['clear']());
     },
   };
 }

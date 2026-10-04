@@ -1,73 +1,71 @@
 export function createCollaborationPresenceChannel({
-  send: _0x3db78d,
-  read: _0x2c3d18,
-  onUpdate: _0x1c3ec3,
-  onError: _0x11f4bb,
-  signal: _0x20193b,
+  send: send,
+  read: read,
+  onUpdate: onUpdate,
+  onError: onError,
+  signal: signal,
   changeDriven: changeDriven = ![],
   now: now = () => performance['now'](),
 }) {
-  let _0x178da5 = null,
-    _0x4f357e = ![],
-    _0x26bd5c = null,
-    _0x35c03f = null,
-    _0x30827a = '',
-    _0x18ef42 = -Infinity;
-  async function _0x332a52() {
-    const _0x3f3835 = now();
-    _0x18ef42 = _0x3f3835;
-    const _0x2583da = _0x2c3d18(),
-      _0x1db611 = JSON['stringify'](_0x2583da);
-    let _0x504998 = 0x32;
+  let setTimeout2 = null,
+    enabled = ![],
+    value = null,
+    item = null,
+    key = '',
+    index = -Infinity;
+  async function run() {
+    const now2 = now();
+    index = now2;
+    const result = read(),
+      data = JSON['stringify'](result);
+    let options = 0x32;
     try {
-      const _0x2647f6 = await _0x3db78d(_0x2583da);
-      if (_0x4f357e || _0x20193b?.['aborted']) return;
-      if (!Array['isArray'](_0x2647f6?.['presence']) || !_0x2647f6['locks'])
+      const presence = await send(result);
+      if (enabled || signal?.['aborted']) return;
+      if (!Array['isArray'](presence?.['presence']) || !presence['locks'])
         throw new Error('鼠标同步响应无效');
-      const _0x541b6d = Math['max'](0x0, now() - _0x3f3835);
-      ((_0x35c03f = _0x35c03f == null ? _0x541b6d : _0x35c03f * 0.7 + _0x541b6d * 0.3),
-        _0x1c3ec3({
-          presence: _0x2647f6['presence'],
-          locks: _0x2647f6['locks'],
-          latencyMs: Math['round'](_0x35c03f),
+      const target = Math['max'](0x0, now() - now2);
+      ((item = item == null ? target : item * 0.7 + target * 0.3),
+        onUpdate({
+          presence: presence['presence'],
+          locks: presence['locks'],
+          latencyMs: Math['round'](item),
           presenceStatus: 'online',
         }),
-        (_0x30827a = _0x1db611),
-        (_0x504998 =
-          changeDriven && JSON['stringify'](_0x2c3d18()) === _0x30827a
-            ? 0xbb8
-            : Math['max'](0x0, 0x21 - _0x541b6d)));
-    } catch (_0x3b9041) {
-      if (!_0x4f357e && !_0x20193b?.['aborted']) _0x11f4bb(_0x3b9041);
-      _0x504998 = 0x3e8;
+        (key = data),
+        (options =
+          changeDriven && JSON['stringify'](read()) === key ? 0xbb8 : Math['max'](0x0, 0x21 - target)));
+    } catch (source) {
+      if (!enabled && !signal?.['aborted']) onError(source);
+      options = 0x3e8;
     } finally {
-      if (!_0x4f357e && !_0x20193b?.['aborted']) _0x178da5 = setTimeout(_0x27aefa, _0x504998);
+      if (!enabled && !signal?.['aborted']) setTimeout2 = setTimeout(start, options);
     }
   }
-  function _0x27aefa() {
-    if (_0x4f357e || _0x20193b?.['aborted']) return Promise['resolve']();
-    if (_0x26bd5c) return _0x26bd5c;
+  function start() {
+    if (enabled || signal?.['aborted']) return Promise['resolve']();
+    if (value) return value;
     return (
-      clearTimeout(_0x178da5),
-      (_0x26bd5c = _0x332a52()['finally'](() => {
-        _0x26bd5c = null;
+      clearTimeout(setTimeout2),
+      (value = run()['finally'](() => {
+        value = null;
       })),
-      _0x26bd5c
+      value
     );
   }
   return {
-    start: _0x27aefa,
+    start: start,
     changed() {
-      if (!changeDriven || _0x4f357e || _0x26bd5c || JSON['stringify'](_0x2c3d18()) === _0x30827a) return;
-      (clearTimeout(_0x178da5),
-        (_0x178da5 = setTimeout(_0x27aefa, Math['max'](0x0, 0x21 - (now() - _0x18ef42)))));
+      if (!changeDriven || enabled || value || JSON['stringify'](read()) === key) return;
+      (clearTimeout(setTimeout2),
+        (setTimeout2 = setTimeout(start, Math['max'](0x0, 0x21 - (now() - index)))));
     },
     async flush() {
-      if (_0x26bd5c) await _0x26bd5c;
-      await _0x27aefa();
+      if (value) await value;
+      await start();
     },
     stop() {
-      ((_0x4f357e = !![]), clearTimeout(_0x178da5));
+      ((enabled = !![]), clearTimeout(setTimeout2));
     },
   };
 }

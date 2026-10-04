@@ -2,54 +2,54 @@ import { captureStoryClipFrameFromSource } from './storyClipFrameCapture.js';
 import { saveVideoFrameSnapshot } from '../../components/videoFrameCapture.js';
 import { uploadFile } from '../../services/projectService.js';
 export async function captureStoryReplicationRepresentativeFrame({
-  videoRef: _0x2197df,
-  timeSec: _0x366f50,
-  projectId: _0x398850,
-  crop: _0x8266d1,
+  videoRef: videoRef,
+  timeSec: timeSec,
+  projectId: projectId,
+  crop: crop,
   isActive: isActive = () => !![],
   capture: capture = captureStoryClipFrameFromSource,
   save: save = uploadFile,
 } = {}) {
-  const _0x3c2fad = await capture({
-    sourceUrl: _0x2197df,
-    currentTimeSec: _0x366f50,
+  const width = await capture({
+    sourceUrl: videoRef,
+    currentTimeSec: timeSec,
     fileNamePrefix: 'story_source_character',
-    crop: _0x8266d1,
+    crop: crop,
   });
   if (!isActive()) return null;
-  const _0x317422 = await saveVideoFrameSnapshot(_0x3c2fad, (_0x17d142) => save(_0x17d142, _0x398850));
+  const url = await saveVideoFrameSnapshot(width, (value) => save(value, projectId));
   if (!isActive()) return null;
   return {
-    url: _0x317422['src'],
-    localPath: _0x317422['localPath'],
-    timeSec: _0x366f50,
-    ...(_0x8266d1 ? { crop: { ..._0x8266d1 }, width: _0x3c2fad['width'], height: _0x3c2fad['height'] } : {}),
+    url: url['src'],
+    localPath: url['localPath'],
+    timeSec: timeSec,
+    ...(crop ? { crop: { ...crop }, width: width['width'], height: width['height'] } : {}),
   };
 }
 export async function collectStoryReplicationRepresentativeFrames({
-  episode: _0x44005a,
-  projectId: _0x2ad9fc,
+  episode: episode,
+  projectId: projectId2,
   isActive: isActive = () => !![],
-  onProgress: _0x3c8359,
+  onProgress: onProgress,
   capture: capture = captureStoryReplicationRepresentativeFrame,
 } = {}) {
-  const _0xb921d1 = _0x44005a['replication']['sourceAnalysis'];
-  for (const [_0x985f7, _0x252ead] of _0xb921d1['characters']['entries']()) {
-    if (!isActive() || _0x44005a['replication']['sourceAnalysis'] !== _0xb921d1) return;
-    if (_0x252ead['frame']?.['localPath']) continue;
-    _0x3c8359?.('正在提取人物代表画面 ' + (_0x985f7 + 0x1) + '/' + _0xb921d1['characters']['length']);
+  const item = episode['replication']['sourceAnalysis'];
+  for (const [key, timeSec2] of item['characters']['entries']()) {
+    if (!isActive() || episode['replication']['sourceAnalysis'] !== item) return;
+    if (timeSec2['frame']?.['localPath']) continue;
+    onProgress?.('正在提取人物代表画面 ' + (key + 0x1) + '/' + item['characters']['length']);
     try {
-      const _0x4e5b5f = await capture({
-        videoRef: _0x44005a['sourceVideo']['videoRef'],
-        timeSec: _0x252ead['representativeTimeSec'],
-        projectId: _0x2ad9fc,
-        isActive: () => isActive() && _0x44005a['replication']['sourceAnalysis'] === _0xb921d1,
+      const capture2 = await capture({
+        videoRef: episode['sourceVideo']['videoRef'],
+        timeSec: timeSec2['representativeTimeSec'],
+        projectId: projectId2,
+        isActive: () => isActive() && episode['replication']['sourceAnalysis'] === item,
       });
-      if (!isActive() || _0x44005a['replication']['sourceAnalysis'] !== _0xb921d1) return;
-      _0x4e5b5f && ((_0x252ead['frame'] = _0x4e5b5f), (_0x252ead['frameError'] = ''));
-    } catch (_0x149eb7) {
-      if (!isActive() || _0x44005a['replication']['sourceAnalysis'] !== _0xb921d1) return;
-      _0x252ead['frameError'] = _0x149eb7?.['message'] || '代表画面提取失败，可播放原片后重新截帧。';
+      if (!isActive() || episode['replication']['sourceAnalysis'] !== item) return;
+      capture2 && ((timeSec2['frame'] = capture2), (timeSec2['frameError'] = ''));
+    } catch (error) {
+      if (!isActive() || episode['replication']['sourceAnalysis'] !== item) return;
+      timeSec2['frameError'] = error?.['message'] || '代表画面提取失败，可播放原片后重新截帧。';
     }
   }
 }

@@ -6,49 +6,48 @@ import { createCanvasMcpAutoConnection } from '../canvasMcp/canvasMcpAutoConnect
 export function initCanvasMcp({
   enabled = false,
   allowGeneration = false,
-  commandContext: _0x77446a,
-  getCanvasIdentity: _0x4aafa2,
+  commandContext: commandContext,
+  getCanvasIdentity: getCanvasIdentity,
   windowObject: windowObject = window,
 }) {
   // This source backend does not advertise canvas MCP. Opt in only after a
   // supporting backend is selected; creating a timer is itself an activation.
   if (enabled !== true) return Object.freeze({ destroy: () => false });
-  let _0x19fa3a;
+  let owner;
   try {
-    ((_0x19fa3a =
-      windowObject['sessionStorage']['getItem']('aic-canvas-mcp-owner') || crypto['randomUUID']()),
-      windowObject['sessionStorage']['setItem']('aic-canvas-mcp-owner', _0x19fa3a));
+    ((owner = windowObject['sessionStorage']['getItem']('aic-canvas-mcp-owner') || crypto['randomUUID']()),
+      windowObject['sessionStorage']['setItem']('aic-canvas-mcp-owner', owner));
   } catch {
-    _0x19fa3a = crypto['randomUUID']();
+    owner = crypto['randomUUID']();
   }
-  const _0x1aba94 = createCanvasMcpAutoConnection({
+  const timer = createCanvasMcpAutoConnection({
     allowGeneration,
-    getBinding: _0x4aafa2,
+    getBinding: getCanvasIdentity,
     isReady: () => windowObject['_isAppLoaded'] === !![],
-    createSession: (_0x11baf2) =>
+    createSession: (onChange) =>
       createCanvasMcpSession({
         request: requestCanvasMcp,
         registry: canvasCommandRegistry,
-        execute: (_0x596ec1, _0x177fb0) =>
-          executeCanvasCommand(_0x596ec1, _0x177fb0, { ..._0x77446a, recordCommand: null }),
-        getBinding: () => (windowObject['_isAppLoaded'] === !![] ? _0x4aafa2() : ''),
+        execute: (value, item) =>
+          executeCanvasCommand(value, item, { ...commandContext, recordCommand: null }),
+        getBinding: () => (windowObject['_isAppLoaded'] === !![] ? getCanvasIdentity() : ''),
         listModels: listModelManifests,
-        owner: _0x19fa3a,
-        onChange: _0x11baf2,
+        owner: owner,
+        onChange: onChange,
       }),
   });
-  windowObject['addEventListener']('aicanvas:active-canvas-changed', _0x1aba94['refresh']);
-  const _0x755330 = () => {
-    void _0x1aba94['destroy']();
+  windowObject['addEventListener']('aicanvas:active-canvas-changed', timer['refresh']);
+  const key = () => {
+    void timer['destroy']();
   };
   return (
-    windowObject['addEventListener']('pagehide', _0x755330),
+    windowObject['addEventListener']('pagehide', key),
     {
       destroy() {
         return (
-          windowObject['removeEventListener']('aicanvas:active-canvas-changed', _0x1aba94['refresh']),
-          windowObject['removeEventListener']('pagehide', _0x755330),
-          _0x1aba94['destroy']()
+          windowObject['removeEventListener']('aicanvas:active-canvas-changed', timer['refresh']),
+          windowObject['removeEventListener']('pagehide', key),
+          timer['destroy']()
         );
       },
     }

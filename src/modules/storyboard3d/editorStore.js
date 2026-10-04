@@ -1,9 +1,9 @@
-function cloneEditorState(_0x359a8c) {
-  return { ..._0x359a8c, selectedObjectIds: [..._0x359a8c['selectedObjectIds']] };
+function cloneEditorState(args) {
+  return { ...args, selectedObjectIds: [...args['selectedObjectIds']] };
 }
-export function createStoryboard3DEditorStore(_0xa3641a = {}) {
-  const _0x436f13 = new Set();
-  let _0x50ecd3 = {
+export function createStoryboard3DEditorStore(args2 = {}) {
+  const map = new Set();
+  let args3 = {
     selectedObjectIds: [],
     activeTool: 'select',
     assetLibraryOpen: ![],
@@ -11,85 +11,76 @@ export function createStoryboard3DEditorStore(_0xa3641a = {}) {
     inspectorTab: 'properties',
     objectOutlineOpen: ![],
     flyMode: ![],
-    ..._0xa3641a,
+    ...args2,
   };
-  _0x50ecd3['selectedObjectIds'] = Array['isArray'](_0x50ecd3['selectedObjectIds'])
+  args3['selectedObjectIds'] = Array['isArray'](args3['selectedObjectIds'])
     ? [
         ...new Set(
-          _0x50ecd3['selectedObjectIds']
-            ['map']((_0x5c69c0) => String(_0x5c69c0 || '')['trim']())
-            ['filter'](Boolean),
+          args3['selectedObjectIds']['map']((value) => String(value || '')['trim']())['filter'](Boolean),
         ),
       ]
     : [];
-  function _0x400664(_0x816c84) {
-    const _0x4504b3 = cloneEditorState(_0x50ecd3);
-    return (_0x436f13['forEach']((_0x391385) => _0x391385(_0x4504b3, { reason: _0x816c84 })), _0x4504b3);
+  function run(reason) {
+    const cloneEditorState2 = cloneEditorState(args3);
+    return (map['forEach']((handler) => handler(cloneEditorState2, { reason: reason })), cloneEditorState2);
   }
   return {
     getSnapshot() {
-      return cloneEditorState(_0x50ecd3);
+      return cloneEditorState(args3);
     },
-    subscribe(_0x2f1f54) {
-      if (typeof _0x2f1f54 !== 'function') return () => {};
-      return (_0x436f13['add'](_0x2f1f54), () => _0x436f13['delete'](_0x2f1f54));
+    subscribe(item) {
+      if (typeof item !== 'function') return () => {};
+      return (map['add'](item), () => map['delete'](item));
     },
-    setSelectedObjects(_0x454843) {
+    setSelectedObjects(list) {
       return (
-        (_0x50ecd3 = {
-          ..._0x50ecd3,
-          selectedObjectIds: Array['isArray'](_0x454843)
-            ? [
-                ...new Set(
-                  _0x454843['map']((_0x523ef7) => String(_0x523ef7 || '')['trim']())['filter'](Boolean),
-                ),
-              ]
+        (args3 = {
+          ...args3,
+          selectedObjectIds: Array['isArray'](list)
+            ? [...new Set(list['map']((key) => String(key || '')['trim']())['filter'](Boolean))]
             : [],
         }),
-        _0x400664('select-objects')
+        run('select-objects')
       );
     },
-    setActiveTool(_0x42d018) {
+    setActiveTool(index) {
       return (
-        (_0x50ecd3 = {
-          ..._0x50ecd3,
-          activeTool: ['select', 'move', 'rotate', 'scale']['includes'](_0x42d018) ? _0x42d018 : 'select',
+        (args3 = {
+          ...args3,
+          activeTool: ['select', 'move', 'rotate', 'scale']['includes'](index) ? index : 'select',
         }),
-        _0x400664('set-tool')
+        run('set-tool')
       );
     },
-    setAssetLibraryOpen(_0x183102) {
+    setAssetLibraryOpen(assetLibraryOpen) {
       return (
-        (_0x50ecd3 = { ..._0x50ecd3, assetLibraryOpen: _0x183102 === !![] }),
-        _0x400664(_0x183102 === !![] ? 'open-asset-library' : 'close-asset-library')
+        (args3 = { ...args3, assetLibraryOpen: assetLibraryOpen === !![] }),
+        run(assetLibraryOpen === !![] ? 'open-asset-library' : 'close-asset-library')
       );
     },
-    setInspectorOpen(_0x531b2a) {
-      return (
-        (_0x50ecd3 = { ..._0x50ecd3, inspectorOpen: _0x531b2a === !![] }),
-        _0x400664('toggle-inspector')
-      );
+    setInspectorOpen(inspectorOpen) {
+      return ((args3 = { ...args3, inspectorOpen: inspectorOpen === !![] }), run('toggle-inspector'));
     },
-    setInspectorTab(_0x1de395) {
+    setInspectorTab(result) {
       return (
-        (_0x50ecd3 = {
-          ..._0x50ecd3,
-          inspectorTab: ['properties', 'shot', 'scene']['includes'](_0x1de395) ? _0x1de395 : 'properties',
+        (args3 = {
+          ...args3,
+          inspectorTab: ['properties', 'shot', 'scene']['includes'](result) ? result : 'properties',
         }),
-        _0x400664('set-inspector-tab')
+        run('set-inspector-tab')
       );
     },
-    setObjectOutlineOpen(_0x59fb31) {
+    setObjectOutlineOpen(objectOutlineOpen) {
       return (
-        (_0x50ecd3 = { ..._0x50ecd3, objectOutlineOpen: _0x59fb31 === !![] }),
-        _0x400664('toggle-object-outline')
+        (args3 = { ...args3, objectOutlineOpen: objectOutlineOpen === !![] }),
+        run('toggle-object-outline')
       );
     },
-    setFlyMode(_0x595f48) {
-      return ((_0x50ecd3 = { ..._0x50ecd3, flyMode: _0x595f48 === !![] }), _0x400664('toggle-fly-mode'));
+    setFlyMode(flyMode) {
+      return ((args3 = { ...args3, flyMode: flyMode === !![] }), run('toggle-fly-mode'));
     },
     destroy() {
-      _0x436f13['clear']();
+      map['clear']();
     },
   };
 }

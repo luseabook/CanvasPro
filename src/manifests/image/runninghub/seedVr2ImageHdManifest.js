@@ -36,10 +36,10 @@ export const seedVr2ImageHdModelManifest = Object['freeze']({
         label: '分辨率',
         menuTitle: '分辨率',
         defaultValue: 0x1000,
-        options: [0x800, 0x1000]['map']((_0xa4af2f) => ({
-          value: _0xa4af2f,
-          label: String(_0xa4af2f),
-          selectedLabel: '分辨率' + _0xa4af2f,
+        options: [0x800, 0x1000]['map']((value) => ({
+          value: value,
+          label: String(value),
+          selectedLabel: '分辨率' + value,
         })),
       },
       RH_IMAGE_INSTANCE_FIELD,

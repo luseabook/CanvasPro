@@ -1,1 +1,80 @@
-import{normalizeStoryboard3DShotAnimation,sampleStoryboard3DShotAnimation}from'./shotAnimation.js';export function createDirectorVideoPlan(_0x3c99fd,_0x5a1ca5,_0x2b8557={}){let _0x17bd3b=0x0;const _0x306828=_0x5a1ca5["map"](_0x2f05d7=>{const _0x3d9c9d=_0x2b8557["scenes"]?.["find"](_0x4207bc=>_0x4207bc['id']===_0x2f05d7['sceneId'])||_0x3c99fd;let _0x137db0=normalizeStoryboard3DShotAnimation({..._0x2f05d7["animation"],'loop':![]},{'camera':_0x2f05d7["camera"]});const _0x2fbdbf=_0x2b8557["videoTrack"]||"all";if(_0x2fbdbf!=="all"){_0x137db0['objectTracks']=_0x137db0["objectTracks"]['filter'](_0x4a57ff=>_0x4a57ff['objectId']===_0x2fbdbf),_0x137db0["actionClips"]=_0x137db0["actionClips"]["filter"](_0x553d09=>_0x553d09['objectId']===_0x2fbdbf);if(_0x2fbdbf!=="camera")_0x137db0["cameraKeyframes"]=[{'id':"video-camera",'time':0x0,'camera':structuredClone(_0x2f05d7["camera"]),'easing':"linear"}];_0x137db0["cameraConstraint"]={},_0x137db0["cameraConstraintClips"]=[],_0x137db0=normalizeStoryboard3DShotAnimation(_0x137db0);}_0x137db0["cameraKeyframes"]["forEach"](_0x1d60f5=>{_0x1d60f5["camera"]["aspectRatio"]=_0x2b8557["aspectRatio"]||"16:9";});const _0xa02cda=Math["max"](0x0,Number(_0x2b8557["videoStart"])||0x0),_0xe45e7c=Number(_0x2b8557['videoEnd'])>0x0?Math["min"](_0x137db0["duration"],Number(_0x2b8557["videoEnd"])):_0x137db0["duration"];if(_0xe45e7c<=_0xa02cda)throw new Error("镜头「"+_0x2f05d7["name"]+'」的导出区间为空，请调整开始与结束时间。');const _0x52fc6f={'shot':_0x2f05d7,'scene':_0x3d9c9d,'objectTransforms':Object['fromEntries'](_0x3d9c9d["objects"]["map"](_0x4c2ba4=>[_0x4c2ba4['id'],_0x4c2ba4["transform"]])),'animation':_0x137db0,'sourceStart':_0xa02cda,'duration':_0xe45e7c-_0xa02cda,'start':_0x17bd3b,'end':_0x17bd3b+_0xe45e7c-_0xa02cda};return _0x17bd3b=_0x52fc6f["end"],_0x52fc6f;});if(!_0x306828["length"])throw new Error('请选择要录制的镜头。');return{'segments':_0x306828,'duration':_0x17bd3b,'track':_0x2b8557["videoTrack"]||"all",'fps':Math["max"](..._0x306828["map"](_0x1c6393=>_0x1c6393['animation']["fps"])),'objectTransforms':Object["fromEntries"](_0x3c99fd['objects']["map"](_0x2a7ec0=>[_0x2a7ec0['id'],_0x2a7ec0["transform"]]))};}export function sampleDirectorVideoPlan(_0xe8678b,_0x4f87b8,_0x3dc427){const _0x13556e=_0xe8678b["segments"]["find"](_0x2f9a62=>_0x4f87b8<_0x2f9a62['end'])||_0xe8678b["segments"]['at'](-0x1);_0x3dc427=_0x13556e["scene"]||_0x3dc427;const _0x4abd21=_0xe8678b['track']==="all"?_0x3dc427["objects"]:_0x3dc427['objects']["map"](_0x207fb7=>_0x207fb7['id']===_0xe8678b["track"]?_0x207fb7:{..._0x207fb7,'actionPlaying':![]});return sampleStoryboard3DShotAnimation(_0x13556e["animation"],_0x13556e['sourceStart']+Math['max'](0x0,Math["min"](_0x13556e["duration"],_0x4f87b8-_0x13556e["start"])),{'camera':_0x13556e["shot"]['camera'],'objectTransforms':_0x13556e["objectTransforms"]||_0xe8678b["objectTransforms"],'objects':_0x4abd21});}
+import { normalizeStoryboard3DShotAnimation, sampleStoryboard3DShotAnimation } from './shotAnimation.js';
+export function createDirectorVideoPlan(value, item, key = {}) {
+  let index = 0x0;
+  const args = item['map']((args2) => {
+    const result = key['scenes']?.['find']((data) => data['id'] === args2['sceneId']) || value;
+    let storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(
+      { ...args2['animation'], loop: ![] },
+      { camera: args2['camera'] },
+    );
+    const options = key['videoTrack'] || 'all';
+    if (options !== 'all') {
+      ((storyboard3DShotAnimation['objectTracks'] = storyboard3DShotAnimation['objectTracks']['filter'](
+        (target) => target['objectId'] === options,
+      )),
+        (storyboard3DShotAnimation['actionClips'] = storyboard3DShotAnimation['actionClips']['filter'](
+          (source) => source['objectId'] === options,
+        )));
+      if (options !== 'camera')
+        storyboard3DShotAnimation['cameraKeyframes'] = [
+          { id: 'video-camera', time: 0x0, camera: structuredClone(args2['camera']), easing: 'linear' },
+        ];
+      ((storyboard3DShotAnimation['cameraConstraint'] = {}),
+        (storyboard3DShotAnimation['cameraConstraintClips'] = []),
+        (storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(storyboard3DShotAnimation)));
+    }
+    storyboard3DShotAnimation['cameraKeyframes']['forEach']((next) => {
+      next['camera']['aspectRatio'] = key['aspectRatio'] || '16:9';
+    });
+    const current = Math['max'](0x0, Number(key['videoStart']) || 0x0),
+      entry =
+        Number(key['videoEnd']) > 0x0
+          ? Math['min'](storyboard3DShotAnimation['duration'], Number(key['videoEnd']))
+          : storyboard3DShotAnimation['duration'];
+    if (entry <= current)
+      throw new Error('镜头「' + args2['name'] + '」的导出区间为空，请调整开始与结束时间。');
+    const record = {
+      shot: args2,
+      scene: result,
+      objectTransforms: Object['fromEntries'](
+        result['objects']['map']((payload) => [payload['id'], payload['transform']]),
+      ),
+      animation: storyboard3DShotAnimation,
+      sourceStart: current,
+      duration: entry - current,
+      start: index,
+      end: index + entry - current,
+    };
+    return ((index = record['end']), record);
+  });
+  if (!args['length']) throw new Error('请选择要录制的镜头。');
+  return {
+    segments: args,
+    duration: index,
+    track: key['videoTrack'] || 'all',
+    fps: Math['max'](...args['map']((handle) => handle['animation']['fps'])),
+    objectTransforms: Object['fromEntries'](
+      value['objects']['map']((state) => [state['id'], state['transform']]),
+    ),
+  };
+}
+export function sampleDirectorVideoPlan(config, scope, input) {
+  const output =
+    config['segments']['find']((value2) => scope < value2['end']) || config['segments']['at'](-0x1);
+  input = output['scene'] || input;
+  const value3 =
+    config['track'] === 'all'
+      ? input['objects']
+      : input['objects']['map']((args3) =>
+          args3['id'] === config['track'] ? args3 : { ...args3, actionPlaying: ![] },
+        );
+  return sampleStoryboard3DShotAnimation(
+    output['animation'],
+    output['sourceStart'] + Math['max'](0x0, Math['min'](output['duration'], scope - output['start'])),
+    {
+      camera: output['shot']['camera'],
+      objectTransforms: output['objectTransforms'] || config['objectTransforms'],
+      objects: value3,
+    },
+  );
+}

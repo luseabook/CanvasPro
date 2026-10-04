@@ -2,57 +2,62 @@ import {
   getPersonReplacementImageResults,
   resolvePersonReplacementImageResultRef,
 } from './personReplacementProject.js';
-function normalizeText(_0x45693f) {
-  return String(_0x45693f ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
 export function setPersonReplacementImageResultAsReference(
-  _0x20912f = {},
+  project = {},
   { shotId: shotId = '', resultIndex: resultIndex = 0x0 } = {},
 ) {
-  const _0x5b5165 = normalizeText(shotId),
-    _0x2c4bf5 = Array['isArray'](_0x20912f?.['shots']) ? _0x20912f['shots'] : [],
-    _0x39b368 = _0x2c4bf5['findIndex']((_0x4be3af) => normalizeText(_0x4be3af?.['id']) === _0x5b5165),
-    _0x2e449b = _0x2c4bf5[_0x39b368],
-    _0x25bbec = getPersonReplacementImageResults(_0x2e449b),
-    _0x1af835 = Math['trunc'](Number(resultIndex)),
-    _0x429723 = resolvePersonReplacementImageResultRef(_0x25bbec[_0x1af835]);
+  const selectedShotId = normalizeText(shotId),
+    shots = Array['isArray'](project?.['shots']) ? project['shots'] : [],
+    count = shots['findIndex']((item) => normalizeText(item?.['id']) === selectedShotId),
+    args = shots[count],
+    results = getPersonReplacementImageResults(args),
+    activeIndex = Math['trunc'](Number(resultIndex)),
+    replacementImageRef = resolvePersonReplacementImageResultRef(results[activeIndex]);
   if (
-    _0x39b368 < 0x0 ||
-    !Number['isInteger'](_0x1af835) ||
-    _0x1af835 < 0x0 ||
-    _0x1af835 >= _0x25bbec['length'] ||
-    !_0x429723
+    count < 0x0 ||
+    !Number['isInteger'](activeIndex) ||
+    activeIndex < 0x0 ||
+    activeIndex >= results['length'] ||
+    !replacementImageRef
   )
-    return { project: _0x20912f, changed: ![], changedShotIds: [], imageRef: '' };
-  const _0x23ad5b = normalizeText(_0x2e449b?.['keyframeRef']),
-    _0x350c1d = normalizeText(_0x2e449b?.['imageIterationReferenceRef']),
-    _0x50d493 = {
-      ..._0x2e449b,
+    return { project: project, changed: ![], changedShotIds: [], imageRef: '' };
+  const imageRef = normalizeText(args?.['keyframeRef']),
+    text = normalizeText(args?.['imageIterationReferenceRef']),
+    args2 = {
+      ...args,
       replacementImage: {
-        ...(_0x2e449b?.['replacementImage'] || {}),
-        results: _0x25bbec,
-        activeIndex: _0x1af835,
+        ...(args?.['replacementImage'] || {}),
+        results: results,
+        activeIndex: activeIndex,
       },
-      replacementImageRef: _0x429723,
+      replacementImageRef: replacementImageRef,
     },
-    _0x136e70 = (_0x5153c9) => ({
-      ..._0x20912f,
-      shots: _0x2c4bf5['map']((_0x17e83b, _0x4efbdc) => (_0x4efbdc === _0x39b368 ? _0x5153c9 : _0x17e83b)),
-      workspace: { ...(_0x20912f?.['workspace'] || {}), selectedShotId: _0x5b5165 },
+    project2 = (key) => ({
+      ...project,
+      shots: shots['map']((index, result) => (result === count ? key : index)),
+      workspace: { ...(project?.['workspace'] || {}), selectedShotId: selectedShotId },
     });
-  if (_0x429723 === _0x350c1d) {
-    const _0x1312be = { ..._0x50d493 };
+  if (replacementImageRef === text) {
+    const data = { ...args2 };
     return (
-      delete _0x1312be['imageIterationReferenceRef'],
+      delete data['imageIterationReferenceRef'],
       {
-        project: _0x136e70(_0x1312be),
+        project: project2(data),
         changed: !![],
-        changedShotIds: [_0x5b5165],
-        imageRef: _0x23ad5b,
+        changedShotIds: [selectedShotId],
+        imageRef: imageRef,
         clearedReference: !![],
       }
     );
   }
-  const _0x1bc8f3 = { ..._0x50d493, imageIterationReferenceRef: _0x429723 };
-  return { project: _0x136e70(_0x1bc8f3), changed: !![], changedShotIds: [_0x5b5165], imageRef: _0x429723 };
+  const options = { ...args2, imageIterationReferenceRef: replacementImageRef };
+  return {
+    project: project2(options),
+    changed: !![],
+    changedShotIds: [selectedShotId],
+    imageRef: replacementImageRef,
+  };
 }

@@ -1,14 +1,14 @@
 export function createStoryboardCellElement({
-  nodeId: _0x2607ba,
-  cell: _0x7e7909,
-  index: _0x51a024,
-  createContentNode: _0x3390a9,
+  nodeId: nodeId,
+  cell: cell,
+  index: index,
+  createContentNode: createContentNode,
 } = {}) {
-  const _0x50bf3b = document.createElement('div');
-  ((_0x50bf3b.className = 'sb-cell'),
-    (_0x50bf3b.id = 'cell-' + _0x2607ba + '-' + _0x51a024),
-    (_0x50bf3b.dataset.index = String(_0x51a024)),
-    Object.assign(_0x50bf3b.style, {
+  const el = document.createElement('div');
+  ((el.className = 'sb-cell'),
+    (el.id = 'cell-' + nodeId + '-' + index),
+    (el.dataset.index = String(index)),
+    Object.assign(el.style, {
       position: 'relative',
       background: 'var(--bg-node)',
       overflow: 'hidden',
@@ -16,70 +16,70 @@ export function createStoryboardCellElement({
       alignItems: 'center',
       justifyContent: 'center',
     }));
-  const _0x1d605b = document.createElement('div');
-  ((_0x1d605b.className = 'cell-content-wrap'),
-    Object.assign(_0x1d605b.style, {
+  const el2 = document.createElement('div');
+  ((el2.className = 'cell-content-wrap'),
+    Object.assign(el2.style, {
       width: '100%',
       height: '100%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
     }),
-    _0x1d605b.appendChild(_0x3390a9?.(_0x7e7909, _0x51a024)));
-  const _0x5016a6 = document.createElement('div');
+    el2.appendChild(createContentNode?.(cell, index)));
+  const el3 = document.createElement('div');
   return (
-    (_0x5016a6.className = 'cell-overlay'),
-    Object.assign(_0x5016a6.style, {
+    (el3.className = 'cell-overlay'),
+    Object.assign(el3.style, {
       position: 'absolute',
       inset: '0',
       pointerEvents: 'none',
       border: '1.5px solid transparent',
       transition: 'all 0.2s',
     }),
-    _0x50bf3b.appendChild(_0x1d605b),
-    _0x50bf3b.appendChild(_0x5016a6),
-    _0x50bf3b
+    el.appendChild(el2),
+    el.appendChild(el3),
+    el
   );
 }
 export function appendStoryboardCellElements({
-  grid: _0x2bba53,
-  nodeId: _0x984d26,
-  cells: _0x50a8f1,
-  createContentNode: _0x1e5d3f,
-  applyCellCropStyles: _0x347166,
+  grid: grid,
+  nodeId: nodeId2,
+  cells: cells,
+  createContentNode: createContentNode2,
+  applyCellCropStyles: applyCellCropStyles,
 } = {}) {
-  const _0x862061 = [];
+  const list = [];
   return (
-    (_0x50a8f1 || []).forEach((_0x258937, _0x968895) => {
-      const _0x5b614c = createStoryboardCellElement({
-        nodeId: _0x984d26,
-        cell: _0x258937,
-        index: _0x968895,
-        createContentNode: _0x1e5d3f,
+    (cells || []).forEach((cell2, index2) => {
+      const storyboardCellElement = createStoryboardCellElement({
+        nodeId: nodeId2,
+        cell: cell2,
+        index: index2,
+        createContentNode: createContentNode2,
       });
-      (_0x2bba53?.appendChild?.(_0x5b614c),
-        _0x862061.push(_0x5b614c),
-        _0x347166?.(_0x5b614c, _0x258937, _0x968895));
+      (grid?.appendChild?.(storyboardCellElement),
+        list.push(storyboardCellElement),
+        applyCellCropStyles?.(storyboardCellElement, cell2, index2));
     }),
-    _0x862061
+    list
   );
 }
 export function rebuildStoryboardGridCellElements({
-  grid: _0x5c8392,
-  nodeId: _0x4321a6,
-  cells: _0x59306f,
-  createContentNode: _0x5ae05a,
-  applyCellCropStyles: _0x2144b9,
+  grid: grid2,
+  nodeId: nodeId3,
+  cells: cells2,
+  createContentNode: createContentNode3,
+  applyCellCropStyles: applyCellCropStyles2,
 } = {}) {
-  if (!_0x5c8392) return [];
+  if (!grid2) return [];
   return (
-    _0x5c8392.replaceChildren(),
+    grid2.replaceChildren(),
     appendStoryboardCellElements({
-      grid: _0x5c8392,
-      nodeId: _0x4321a6,
-      cells: _0x59306f,
-      createContentNode: _0x5ae05a,
-      applyCellCropStyles: _0x2144b9,
+      grid: grid2,
+      nodeId: nodeId3,
+      cells: cells2,
+      createContentNode: createContentNode3,
+      applyCellCropStyles: applyCellCropStyles2,
     })
   );
 }

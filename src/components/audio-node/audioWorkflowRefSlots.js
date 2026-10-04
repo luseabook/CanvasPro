@@ -1,43 +1,41 @@
 import { getModelManifest } from '../../manifests/index.js';
-export function getAudioWorkflowSlots(_0x485c1f = '', { includeImages: includeImages = ![] } = {}) {
-  const _0x3325cb = getModelManifest(_0x485c1f),
-    _0x114198 = _0x3325cb?.['inputSlots'],
-    _0x54fb54 = _0x114198?.['fixedSlots'],
-    _0x559c4b = Number(_0x114198?.['maxByKind']?.['audio']);
-  if (Number['isFinite'](_0x559c4b) && _0x559c4b <= 0x0 && !includeImages) return [];
-  if (Array['isArray'](_0x54fb54) && _0x54fb54['length'] > 0x0)
-    return _0x54fb54['map']((_0x37c9ca) => ({
-      slot: String(_0x37c9ca?.['id'] || '')['trim'](),
-      kind: String(_0x37c9ca?.['kind'] || '')['trim'](),
-      label: _0x37c9ca?.['label'] || _0x37c9ca?.['id'] || '音频参考',
-      required: _0x37c9ca?.['required'] === !![],
+export function getAudioWorkflowSlots(value = '', { includeImages: includeImages = ![] } = {}) {
+  const modelManifest = getModelManifest(value),
+    item = modelManifest?.['inputSlots'],
+    list = item?.['fixedSlots'],
+    count = Number(item?.['maxByKind']?.['audio']);
+  if (Number['isFinite'](count) && count <= 0x0 && !includeImages) return [];
+  if (Array['isArray'](list) && list['length'] > 0x0)
+    return list['map']((label) => ({
+      slot: String(label?.['id'] || '')['trim'](),
+      kind: String(label?.['kind'] || '')['trim'](),
+      label: label?.['label'] || label?.['id'] || '音频参考',
+      required: label?.['required'] === !![],
     }))['filter'](
-      (_0x525fcb) =>
-        _0x525fcb['slot'] &&
-        (!_0x525fcb['kind'] ||
-          _0x525fcb['kind'] === 'audio' ||
-          (includeImages && _0x525fcb['kind'] === 'image')),
+      (enabled) =>
+        enabled['slot'] &&
+        (!enabled['kind'] || enabled['kind'] === 'audio' || (includeImages && enabled['kind'] === 'image')),
     );
-  if (Number['isFinite'](_0x559c4b) && _0x559c4b <= 0x0) return [];
+  if (Number['isFinite'](count) && count <= 0x0) return [];
   return [{ slot: 'audioRef', kind: 'audio', label: '音频参考', required: !![] }];
 }
-export function getAudioWorkflowInputLimit(_0x28eff5 = '') {
-  return getAudioWorkflowSlots(_0x28eff5)['length'] || 0x1;
+export function getAudioWorkflowInputLimit(key = '') {
+  return getAudioWorkflowSlots(key)['length'] || 0x1;
 }
-export function normalizeAudioWorkflowRefSlots(_0x1252a3 = [], _0x18ba74 = '') {
-  const _0x35c60f = Array['isArray'](_0x1252a3) ? _0x1252a3 : [],
-    _0x304b70 = getAudioWorkflowSlots(_0x18ba74)['map']((_0x29a43a) => _0x29a43a['slot']);
-  if (_0x304b70['length'] === 0x0) return _0x35c60f;
-  const _0x2e090b = new Set();
-  return _0x35c60f['map']((_0x1fb0f5) => {
-    const _0x3effe5 = String(_0x1fb0f5?.['refSlot'] || '')['trim']();
-    if (_0x3effe5 && _0x304b70['includes'](_0x3effe5) && !_0x2e090b['has'](_0x3effe5))
-      return (_0x2e090b['add'](_0x3effe5), { ..._0x1fb0f5, refSlot: _0x3effe5 });
-    const _0x4509be = _0x304b70['find']((_0xfc73cd) => !_0x2e090b['has'](_0xfc73cd)) || '';
-    if (!_0x4509be) return { ..._0x1fb0f5, refSlot: _0x304b70['includes'](_0x3effe5) ? _0x3effe5 : '' };
-    return (_0x2e090b['add'](_0x4509be), { ..._0x1fb0f5, refSlot: _0x4509be });
+export function normalizeAudioWorkflowRefSlots(list2 = [], index = '') {
+  const list3 = Array['isArray'](list2) ? list2 : [],
+    refSlot = getAudioWorkflowSlots(index)['map']((result) => result['slot']);
+  if (refSlot['length'] === 0x0) return list3;
+  const map = new Set();
+  return list3['map']((args) => {
+    const refSlot2 = String(args?.['refSlot'] || '')['trim']();
+    if (refSlot2 && refSlot['includes'](refSlot2) && !map['has'](refSlot2))
+      return (map['add'](refSlot2), { ...args, refSlot: refSlot2 });
+    const refSlot3 = refSlot['find']((data) => !map['has'](data)) || '';
+    if (!refSlot3) return { ...args, refSlot: refSlot['includes'](refSlot2) ? refSlot2 : '' };
+    return (map['add'](refSlot3), { ...args, refSlot: refSlot3 });
   });
 }
-export function doesAudioWorkflowSupportMultipleAudioInputs(_0x583cf = '') {
-  return getAudioWorkflowSlots(_0x583cf)['length'] >= 0x2;
+export function doesAudioWorkflowSupportMultipleAudioInputs(options = '') {
+  return getAudioWorkflowSlots(options)['length'] >= 0x2;
 }

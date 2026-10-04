@@ -1,75 +1,73 @@
 import { isStoryCanvasMediaNode } from './storyCanvasMediaSync.js';
-function normalizeText(_0x217981) {
-  return String(_0x217981 || '')['trim']();
+function normalizeText(value) {
+  return String(value || '')['trim']();
 }
-function getMediaNodeRevision(_0x4908b4 = {}) {
+function getMediaNodeRevision(options = {}) {
   return (
-    normalizeText(_0x4908b4['id']) +
+    normalizeText(options['id']) +
     ':' +
-    (Number(_0x4908b4['_bizRev']) || 0x0) +
+    (Number(options['_bizRev']) || 0x0) +
     ':' +
-    normalizeText(_0x4908b4['type'])
+    normalizeText(options['type'])
   );
 }
 export function getStoryCanvasMediaNodeSnapshot({
-  graphStore: _0x3a499e,
-  getActiveCanvasId: _0x2845d7,
+  graphStore: graphStore,
+  getActiveCanvasId: getActiveCanvasId,
 } = {}) {
-  const _0x5ad84a = _0x3a499e?.['getStateRaw']?.() || _0x3a499e?.['getState']?.() || {};
+  const state = graphStore?.['getStateRaw']?.() || graphStore?.['getState']?.() || {};
   return {
-    canvasId: normalizeText(_0x2845d7?.()),
-    nodes: Object['values'](_0x5ad84a['nodes'] || {})['filter'](isStoryCanvasMediaNode),
+    canvasId: normalizeText(getActiveCanvasId?.()),
+    nodes: Object['values'](state['nodes'] || {})['filter'](isStoryCanvasMediaNode),
   };
 }
 export function subscribeStoryCanvasMediaNodeChanges({
-  graphStore: _0x560cb8,
-  getActiveCanvasId: _0x3f2881,
-  listener: _0x4b00d6,
+  graphStore: graphStore2,
+  getActiveCanvasId: getActiveCanvasId2,
+  listener: listener,
 } = {}) {
-  const _0x2f4d3c =
-    typeof _0x560cb8?.['subscribeSelector'] === 'function' ||
-    typeof _0x560cb8?.['subscribeRaw'] === 'function';
-  if (!_0x2f4d3c || typeof _0x4b00d6 !== 'function')
+  const enabled =
+    typeof graphStore2?.['subscribeSelector'] === 'function' ||
+    typeof graphStore2?.['subscribeRaw'] === 'function';
+  if (!enabled || typeof listener !== 'function')
     throw new Error('story canvas media node subscription dependencies are incomplete');
-  let _0x1e4fc4 = '',
-    _0x2fdec5 = new Map();
-  const _0xcc61a7 = (_0x1904c7 = {}) => {
-      const _0x5d67b4 = normalizeText(_0x3f2881?.());
-      if (!_0x5d67b4) {
-        ((_0x1e4fc4 = ''), (_0x2fdec5 = new Map()));
+  let item = '',
+    map = new Map();
+  const run = (state2 = {}) => {
+      const canvasId = normalizeText(getActiveCanvasId2?.());
+      if (!canvasId) {
+        ((item = ''), (map = new Map()));
         return;
       }
-      const _0x1a1609 = Object['values'](_0x1904c7['nodes'] || {})['filter'](isStoryCanvasMediaNode),
-        _0x51da53 = new Map(
-          _0x1a1609['map']((_0x2ff85a) => [normalizeText(_0x2ff85a['id']), getMediaNodeRevision(_0x2ff85a)]),
+      const list = Object['values'](state2['nodes'] || {})['filter'](isStoryCanvasMediaNode),
+        map2 = new Map(list['map']((key) => [normalizeText(key['id']), getMediaNodeRevision(key)]));
+      let nodes = list;
+      if (canvasId === item) {
+        nodes = list['filter'](
+          (index) => map['get'](normalizeText(index['id'])) !== getMediaNodeRevision(index),
         );
-      let _0x4c1d32 = _0x1a1609;
-      if (_0x5d67b4 === _0x1e4fc4) {
-        _0x4c1d32 = _0x1a1609['filter'](
-          (_0x267a86) => _0x2fdec5['get'](normalizeText(_0x267a86['id'])) !== getMediaNodeRevision(_0x267a86),
-        );
-        for (const _0x1be7bd of _0x2fdec5['keys']()) {
-          if (!_0x51da53['has'](_0x1be7bd)) _0x4c1d32['push']({ id: _0x1be7bd });
+        for (const id of map['keys']()) {
+          if (!map2['has'](id)) nodes['push']({ id: id });
         }
       }
-      ((_0x1e4fc4 = _0x5d67b4), (_0x2fdec5 = _0x51da53));
-      if (!_0x4c1d32['length']) return;
+      ((item = canvasId), (map = map2));
+      if (!nodes['length']) return;
       try {
-        _0x4b00d6({ canvasId: _0x5d67b4, nodes: _0x4c1d32 });
-      } catch (_0x26f3e7) {
-        console['warn']('[storyCanvasNodeSubscription] 媒体节点同步失败', _0x26f3e7);
+        listener({ canvasId: canvasId, nodes: nodes });
+      } catch (result) {
+        console['warn']('[storyCanvasNodeSubscription] 媒体节点同步失败', result);
       }
     },
-    _0x295172 = (_0x320527 = {}) =>
-      normalizeText(_0x3f2881?.()) + ':' + (Number(_0x320527['_persistRev']) || 0x0);
-  if (typeof _0x560cb8['subscribeSelector'] === 'function')
-    return _0x560cb8['subscribeSelector'](_0x295172, () =>
-      _0xcc61a7(_0x560cb8['getStateRaw']?.() || _0x560cb8['getState']?.() || {}),
+    handler = (options2 = {}) =>
+      normalizeText(getActiveCanvasId2?.()) + ':' + (Number(options2['_persistRev']) || 0x0);
+  if (typeof graphStore2['subscribeSelector'] === 'function')
+    return graphStore2['subscribeSelector'](handler, () =>
+      run(graphStore2['getStateRaw']?.() || graphStore2['getState']?.() || {}),
     );
-  let _0x1f0f52 = null;
-  return _0x560cb8['subscribeRaw']((_0x111b6a = {}) => {
-    const _0x506115 = _0x295172(_0x111b6a);
-    if (_0x506115 === _0x1f0f52) return;
-    ((_0x1f0f52 = _0x506115), _0xcc61a7(_0x111b6a));
+  let data = null;
+  return graphStore2['subscribeRaw']((options3 = {}) => {
+    const target = handler(options3);
+    if (target === data) return;
+    ((data = target), run(options3));
   });
 }

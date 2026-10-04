@@ -1,57 +1,57 @@
-export function createNodeFieldSubscriptions(_0x499e40) {
-  const _0x3a58b0 = new Map();
-  function _0x2a8748(_0x529d17) {
-    const _0x3aac55 = _0x499e40()[_0x529d17];
-    for (const [_0x4c8da6, _0x17b5e0] of _0x3a58b0) {
-      const _0x277be1 = _0x3aac55?.[_0x4c8da6];
-      if (_0x17b5e0['values']['get'](_0x529d17) === _0x277be1) continue;
-      if (_0x277be1 === undefined) _0x17b5e0['values']['delete'](_0x529d17);
-      else _0x17b5e0['values']['set'](_0x529d17, _0x277be1);
-      _0x17b5e0['dirty'] = !![];
+export function createNodeFieldSubscriptions(handler) {
+  const map = new Map();
+  function touch(value) {
+    const item = handler()[value];
+    for (const [key, map2] of map) {
+      const index = item?.[key];
+      if (map2['values']['get'](value) === index) continue;
+      if (index === undefined) map2['values']['delete'](value);
+      else map2['values']['set'](value, index);
+      map2['dirty'] = !![];
     }
   }
-  function _0x1aab93() {
-    for (const [_0xefabca, _0x202018] of _0x3a58b0) {
-      ((_0x202018['values'] = new Map(
-        Object['values'](_0x499e40())
-          ['filter']((_0x30f9fa) => _0x30f9fa?.[_0xefabca] !== undefined)
-          ['map']((_0x418db8) => [_0x418db8['id'], _0x418db8[_0xefabca]]),
+  function reload() {
+    for (const [result, map3] of map) {
+      ((map3['values'] = new Map(
+        Object['values'](handler())
+          ['filter']((data) => data?.[result] !== undefined)
+          ['map']((options) => [options['id'], options[result]]),
       )),
-        (_0x202018['dirty'] = !![]));
+        (map3['dirty'] = !![]));
     }
   }
   return {
-    touch: _0x2a8748,
-    reload: _0x1aab93,
+    touch: touch,
+    reload: reload,
     flush() {
-      for (const _0x1ace24 of _0x3a58b0['values']()) {
-        if (!_0x1ace24['dirty']) continue;
-        _0x1ace24['dirty'] = ![];
-        const _0x5b77b3 = [..._0x1ace24['values']['values']()];
-        for (const _0x3cbd80 of [..._0x1ace24['listeners']]) _0x3cbd80(_0x5b77b3);
+      for (const map4 of map['values']()) {
+        if (!map4['dirty']) continue;
+        map4['dirty'] = ![];
+        const target = [...map4['values']['values']()];
+        for (const run of [...map4['listeners']]) run(target);
       }
     },
-    subscribe(_0x426705, _0x472052) {
-      if (typeof _0x426705 !== 'string' || !_0x426705 || typeof _0x472052 !== 'function')
+    subscribe(enabled, handler2) {
+      if (typeof enabled !== 'string' || !enabled || typeof handler2 !== 'function')
         throw new TypeError('Expected\x20a\x20node\x20field\x20and\x20listener');
-      let _0x5a4fa6 = _0x3a58b0['get'](_0x426705);
+      let map5 = map['get'](enabled);
       return (
-        !_0x5a4fa6 &&
-          ((_0x5a4fa6 = {
+        !map5 &&
+          ((map5 = {
             values: new Map(
-              Object['values'](_0x499e40())
-                ['filter']((_0x433ded) => _0x433ded?.[_0x426705] !== undefined)
-                ['map']((_0x484f10) => [_0x484f10['id'], _0x484f10[_0x426705]]),
+              Object['values'](handler())
+                ['filter']((source) => source?.[enabled] !== undefined)
+                ['map']((next) => [next['id'], next[enabled]]),
             ),
             listeners: new Set(),
             dirty: ![],
           }),
-          _0x3a58b0['set'](_0x426705, _0x5a4fa6)),
-        _0x5a4fa6['listeners']['add'](_0x472052),
-        _0x472052([..._0x5a4fa6['values']['values']()]),
+          map['set'](enabled, map5)),
+        map5['listeners']['add'](handler2),
+        handler2([...map5['values']['values']()]),
         () => {
-          _0x5a4fa6['listeners']['delete'](_0x472052);
-          if (!_0x5a4fa6['listeners']['size']) _0x3a58b0['delete'](_0x426705);
+          map5['listeners']['delete'](handler2);
+          if (!map5['listeners']['size']) map['delete'](enabled);
         }
       );
     },

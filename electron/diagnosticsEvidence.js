@@ -1,49 +1,49 @@
-export function summarizeBackendLog(_0x1888e2 = '') {
-  const _0x5def7b = String(_0x1888e2)['split'](/\r?\n/),
-    _0xf7d369 = [];
-  let _0x527139 = 0x0;
-  const _0x67062c =
+export function summarizeBackendLog(value = '') {
+  const excerpt = String(value)['split'](/\r?\n/),
+    recentFindings = [];
+  let matchedLineCount = 0x0;
+  const enabled =
     /(?:\[(?:ERROR|CRITICAL|WARN(?:ING)?)\]|\b(?:ERROR|CRITICAL|WARNING):|^Traceback \(most recent call last\):|^\s*[\w.]+(?:Error|Exception):|spawn error:|exited code=(?!0(?:\s|$))\S+)/i;
-  for (let _0x376b33 = 0x0; _0x376b33 < _0x5def7b['length']; _0x376b33 += 0x1) {
-    if (!_0x67062c['test'](_0x5def7b[_0x376b33])) continue;
-    ((_0x527139 += 0x1),
-      _0xf7d369['push']({
-        line: _0x376b33 + 0x1,
-        excerpt: _0x5def7b['slice'](Math['max'](0x0, _0x376b33 - 0x2), _0x376b33 + 0x4)
+  for (let line = 0x0; line < excerpt['length']; line += 0x1) {
+    if (!enabled['test'](excerpt[line])) continue;
+    ((matchedLineCount += 0x1),
+      recentFindings['push']({
+        line: line + 0x1,
+        excerpt: excerpt['slice'](Math['max'](0x0, line - 0x2), line + 0x4)
           ['join']('\x0a')
           ['slice'](0x0, 0x708),
       }));
-    if (_0xf7d369['length'] > 0x1e) _0xf7d369['shift']();
+    if (recentFindings['length'] > 0x1e) recentFindings['shift']();
   }
   return {
     detection: 'text-patterns',
-    matchedLineCount: _0x527139,
-    recentFindings: _0xf7d369,
+    matchedLineCount: matchedLineCount,
+    recentFindings: recentFindings,
     notes: [
       'Matches are possible backend problems, not deduplicated failures or root causes.',
       'Line numbers refer to the included server.log; unmarked errors may not match.',
     ],
   };
 }
-export function mergeDiagnosticEvidence(_0x392e8b, _0x543940) {
-  const _0x4023f1 = new Map();
-  for (const _0x225b42 of [
-    ..._0x392e8b,
-    ..._0x543940['flatMap']((_0x4c6721) => [
-      ...(Array['isArray'](_0x4c6721['precedingEvents']) ? _0x4c6721['precedingEvents'] : []),
-      _0x4c6721['event'],
+export function mergeDiagnosticEvidence(args, list) {
+  const map = new Map();
+  for (const enabled2 of [
+    ...args,
+    ...list['flatMap']((item) => [
+      ...(Array['isArray'](item['precedingEvents']) ? item['precedingEvents'] : []),
+      item['event'],
     ]),
   ]) {
-    if (!_0x225b42 || typeof _0x225b42 !== 'object' || !_0x225b42['ts'] || !_0x225b42['type']) continue;
-    const _0x242afc =
-      _0x225b42['launchSessionId'] && _0x225b42['eventSeq']
-        ? _0x225b42['launchSessionId'] + ':' + _0x225b42['eventSeq']
-        : JSON['stringify'](_0x225b42);
-    if (!_0x4023f1['has'](_0x242afc)) _0x4023f1['set'](_0x242afc, _0x225b42);
+    if (!enabled2 || typeof enabled2 !== 'object' || !enabled2['ts'] || !enabled2['type']) continue;
+    const key =
+      enabled2['launchSessionId'] && enabled2['eventSeq']
+        ? enabled2['launchSessionId'] + ':' + enabled2['eventSeq']
+        : JSON['stringify'](enabled2);
+    if (!map['has'](key)) map['set'](key, enabled2);
   }
-  return [..._0x4023f1['values']()]['sort'](
-    (_0x1e9622, _0x314c5a) =>
-      String(_0x1e9622['ts'])['localeCompare'](String(_0x314c5a['ts'])) ||
-      Number(_0x1e9622['eventSeq'] || 0x0) - Number(_0x314c5a['eventSeq'] || 0x0),
+  return [...map['values']()]['sort'](
+    (index, result) =>
+      String(index['ts'])['localeCompare'](String(result['ts'])) ||
+      Number(index['eventSeq'] || 0x0) - Number(result['eventSeq'] || 0x0),
   );
 }

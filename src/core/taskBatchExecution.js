@@ -1,54 +1,53 @@
-function normalizeConcurrency(_0x5638f9, _0x175b9d) {
-  const _0x5afc83 = Math['trunc'](Number(_0x5638f9));
-  if (!Number['isFinite'](_0x5afc83) || _0x5afc83 <= 0x0) return 0x1;
-  return Math['max'](0x1, Math['min'](_0x5afc83, Math['max'](0x1, _0x175b9d)));
+function normalizeConcurrency(value, item) {
+  const count = Math['trunc'](Number(value));
+  if (!Number['isFinite'](count) || count <= 0x0) return 0x1;
+  return Math['max'](0x1, Math['min'](count, Math['max'](0x1, item)));
 }
 export function createTaskBatchCancellationController() {
-  let _0x5ef23f = ![];
+  let key = ![];
   return Object['freeze']({
     request() {
-      if (_0x5ef23f) return ![];
-      return ((_0x5ef23f = !![]), !![]);
+      if (key) return ![];
+      return ((key = !![]), !![]);
     },
-    isRequested: () => _0x5ef23f,
+    isRequested: () => key,
   });
 }
 export async function runTaskBatchQueue({
   targets: targets = [],
   concurrency: concurrency = 0x1,
   shouldStop: shouldStop = () => ![],
-  runTarget: _0x4a95fe,
+  runTarget: runTarget,
   onTargetStart: onTargetStart = () => {},
   onTargetSettled: onTargetSettled = () => {},
 } = {}) {
-  const _0x4d26d0 = Array['isArray'](targets)
-    ? targets['filter']((_0x2fdde3) => _0x2fdde3 !== null && _0x2fdde3 !== undefined)
+  const total = Array['isArray'](targets)
+    ? targets['filter']((index) => index !== null && index !== undefined)
     : [];
-  if (!_0x4d26d0['length']) return [];
-  if (typeof _0x4a95fe !== 'function') throw new TypeError('runTarget must be a function');
-  const _0x243715 = new Array(_0x4d26d0['length']);
-  let _0x2407cc = 0x0;
-  const _0x3c2dca = normalizeConcurrency(concurrency, _0x4d26d0['length']),
-    _0x1f36ac = Array['from']({ length: _0x3c2dca }, async () => {
-      while (_0x2407cc < _0x4d26d0['length'] && !shouldStop()) {
-        const _0x19ecbd = _0x2407cc;
-        _0x2407cc += 0x1;
-        const _0x442957 = _0x4d26d0[_0x19ecbd];
-        onTargetStart({ target: _0x442957, index: _0x19ecbd, total: _0x4d26d0['length'] });
-        let _0x21d424;
+  if (!total['length']) return [];
+  if (typeof runTarget !== 'function') throw new TypeError('runTarget must be a function');
+  const enabled = new Array(total['length']);
+  let result = 0x0;
+  const length = normalizeConcurrency(concurrency, total['length']),
+    data = Array['from']({ length: length }, async () => {
+      while (result < total['length'] && !shouldStop()) {
+        const index2 = result;
+        result += 0x1;
+        const target = total[index2];
+        onTargetStart({ target: target, index: index2, total: total['length'] });
+        let args;
         try {
-          const _0x54cdb4 = await _0x4a95fe(_0x442957, { index: _0x19ecbd, total: _0x4d26d0['length'] });
-          _0x21d424 = { target: _0x442957, status: 'fulfilled', value: _0x54cdb4 };
-        } catch (_0x3dc700) {
-          _0x21d424 = { target: _0x442957, status: 'rejected', reason: _0x3dc700 };
+          const value2 = await runTarget(target, { index: index2, total: total['length'] });
+          args = { target: target, status: 'fulfilled', value: value2 };
+        } catch (reason) {
+          args = { target: target, status: 'rejected', reason: reason };
         }
-        ((_0x243715[_0x19ecbd] = _0x21d424),
-          await onTargetSettled({ ..._0x21d424, index: _0x19ecbd, total: _0x4d26d0['length'] }));
+        ((enabled[index2] = args), await onTargetSettled({ ...args, index: index2, total: total['length'] }));
       }
     });
-  await Promise['all'](_0x1f36ac);
-  for (let _0x568fde = 0x0; _0x568fde < _0x4d26d0['length']; _0x568fde += 0x1) {
-    !_0x243715[_0x568fde] && (_0x243715[_0x568fde] = { target: _0x4d26d0[_0x568fde], status: 'cancelled' });
+  await Promise['all'](data);
+  for (let options = 0x0; options < total['length']; options += 0x1) {
+    !enabled[options] && (enabled[options] = { target: total[options], status: 'cancelled' });
   }
-  return _0x243715;
+  return enabled;
 }

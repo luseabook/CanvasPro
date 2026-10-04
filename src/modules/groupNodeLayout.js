@@ -4,9 +4,9 @@ export const GROUP_NODE_CONTENT_INSETS = Object['freeze']({
   bottom: 0x20,
   left: 0x20,
 });
-function toFiniteNumber(_0x483251, _0x3b4ad6 = 0x0) {
-  const _0x29fdb9 = Number(_0x483251);
-  return Number['isFinite'](_0x29fdb9) ? _0x29fdb9 : _0x3b4ad6;
+function toFiniteNumber(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
 }
 export function createGroupNodeLayout({
   x: x = 0x0,
@@ -16,29 +16,29 @@ export function createGroupNodeLayout({
   minWidth: minWidth = 0x0,
   minHeight: minHeight = 0x0,
 } = {}) {
-  const _0x2dc5d4 = toFiniteNumber(x),
-    _0xbb0f2c = toFiniteNumber(y),
-    _0x2a57a9 = Math['max'](0x0, toFiniteNumber(contentWidth)),
-    _0x45783c = Math['max'](0x0, toFiniteNumber(contentHeight)),
-    _0x18d60e = Math['max'](
+  const x2 = toFiniteNumber(x),
+    y2 = toFiniteNumber(y),
+    index = Math['max'](0x0, toFiniteNumber(contentWidth)),
+    result = Math['max'](0x0, toFiniteNumber(contentHeight)),
+    width = Math['max'](
       Math['max'](0x0, toFiniteNumber(minWidth)),
-      GROUP_NODE_CONTENT_INSETS['left'] + _0x2a57a9 + GROUP_NODE_CONTENT_INSETS['right'],
+      GROUP_NODE_CONTENT_INSETS['left'] + index + GROUP_NODE_CONTENT_INSETS['right'],
     ),
-    _0x1ffe4e = Math['max'](
+    height = Math['max'](
       Math['max'](0x0, toFiniteNumber(minHeight)),
-      GROUP_NODE_CONTENT_INSETS['top'] + _0x45783c + GROUP_NODE_CONTENT_INSETS['bottom'],
+      GROUP_NODE_CONTENT_INSETS['top'] + result + GROUP_NODE_CONTENT_INSETS['bottom'],
     );
   return {
-    x: _0x2dc5d4,
-    y: _0xbb0f2c,
-    width: _0x18d60e,
-    height: _0x1ffe4e,
-    contentX: _0x2dc5d4 + GROUP_NODE_CONTENT_INSETS['left'],
-    contentY: _0xbb0f2c + GROUP_NODE_CONTENT_INSETS['top'],
+    x: x2,
+    y: y2,
+    width: width,
+    height: height,
+    contentX: x2 + GROUP_NODE_CONTENT_INSETS['left'],
+    contentY: y2 + GROUP_NODE_CONTENT_INSETS['top'],
   };
 }
 export function calculateGroupNodeBounds(
-  _0x4bb598,
+  list,
   {
     defaultNodeWidth: defaultNodeWidth = 0x104,
     defaultNodeHeight: defaultNodeHeight = 0x64,
@@ -46,30 +46,25 @@ export function calculateGroupNodeBounds(
     minHeight: minHeight = 0x0,
   } = {},
 ) {
-  const _0xf7d20e = Array['isArray'](_0x4bb598) ? _0x4bb598['filter'](Boolean) : [];
-  if (!_0xf7d20e['length'])
-    throw new Error('calculateGroupNodeBounds\x20requires\x20at\x20least\x20one\x20node');
-  const _0x1c29b4 = Math['max'](0x0, toFiniteNumber(defaultNodeWidth, 0x104)),
-    _0x2559a4 = Math['max'](0x0, toFiniteNumber(defaultNodeHeight, 0x64)),
-    _0x4b1557 = Math['min'](..._0xf7d20e['map']((_0x4f1494) => toFiniteNumber(_0x4f1494['x']))),
-    _0x571d72 = Math['min'](..._0xf7d20e['map']((_0x361c71) => toFiniteNumber(_0x361c71['y']))),
-    _0x3e1dce = Math['max'](
-      ..._0xf7d20e['map'](
-        (_0x56cb13) => toFiniteNumber(_0x56cb13['x']) + (toFiniteNumber(_0x56cb13['width']) || _0x1c29b4),
-      ),
+  const list2 = Array['isArray'](list) ? list['filter'](Boolean) : [];
+  if (!list2['length']) throw new Error('calculateGroupNodeBounds\x20requires\x20at\x20least\x20one\x20node');
+  const data = Math['max'](0x0, toFiniteNumber(defaultNodeWidth, 0x104)),
+    options = Math['max'](0x0, toFiniteNumber(defaultNodeHeight, 0x64)),
+    x3 = Math['min'](...list2['map']((box) => toFiniteNumber(box['x']))),
+    y3 = Math['min'](...list2['map']((box2) => toFiniteNumber(box2['y']))),
+    contentWidth2 = Math['max'](
+      ...list2['map']((box3) => toFiniteNumber(box3['x']) + (toFiniteNumber(box3['width']) || data)),
     ),
-    _0x338dab = Math['max'](
-      ..._0xf7d20e['map'](
-        (_0x4dd6ce) => toFiniteNumber(_0x4dd6ce['y']) + (toFiniteNumber(_0x4dd6ce['height']) || _0x2559a4),
-      ),
+    contentHeight2 = Math['max'](
+      ...list2['map']((box4) => toFiniteNumber(box4['y']) + (toFiniteNumber(box4['height']) || options)),
     ),
-    _0x3e300c = createGroupNodeLayout({
-      x: _0x4b1557 - GROUP_NODE_CONTENT_INSETS['left'],
-      y: _0x571d72 - GROUP_NODE_CONTENT_INSETS['top'],
-      contentWidth: _0x3e1dce - _0x4b1557,
-      contentHeight: _0x338dab - _0x571d72,
+    x4 = createGroupNodeLayout({
+      x: x3 - GROUP_NODE_CONTENT_INSETS['left'],
+      y: y3 - GROUP_NODE_CONTENT_INSETS['top'],
+      contentWidth: contentWidth2 - x3,
+      contentHeight: contentHeight2 - y3,
       minWidth: minWidth,
       minHeight: minHeight,
     });
-  return { x: _0x3e300c['x'], y: _0x3e300c['y'], width: _0x3e300c['width'], height: _0x3e300c['height'] };
+  return { x: x4['x'], y: x4['y'], width: x4['width'], height: x4['height'] };
 }

@@ -23,48 +23,48 @@ function getRootElement() {
     return null;
   }
 }
-function readCssToken(_0x16c0dd) {
+function readCssToken(value) {
   try {
-    const _0x1b47eb = getRootElement();
-    if (!_0x1b47eb || typeof getComputedStyle !== 'function') return '';
-    if (_0x1b47eb.classList?.contains('is-canvas-theme-light')) {
-      const _0x5dc5de = getComputedStyle(_0x1b47eb).getPropertyValue(_0x16c0dd).trim();
-      if (_0x5dc5de) return _0x5dc5de;
+    const el = getRootElement();
+    if (!el || typeof getComputedStyle !== 'function') return '';
+    if (el.classList?.contains('is-canvas-theme-light')) {
+      const computedStyle = getComputedStyle(el).getPropertyValue(value).trim();
+      if (computedStyle) return computedStyle;
     }
-    const _0x30a462 = document.getElementById?.('v2-wrap');
-    if (_0x30a462?.classList?.contains('theme-light')) {
-      const _0x12ae79 = getComputedStyle(_0x30a462).getPropertyValue(_0x16c0dd).trim();
-      if (_0x12ae79) return _0x12ae79;
+    const el2 = document.getElementById?.('v2-wrap');
+    if (el2?.classList?.contains('theme-light')) {
+      const computedStyle2 = getComputedStyle(el2).getPropertyValue(value).trim();
+      if (computedStyle2) return computedStyle2;
     }
-    return getComputedStyle(_0x1b47eb).getPropertyValue(_0x16c0dd).trim();
+    return getComputedStyle(el).getPropertyValue(value).trim();
   } catch {
     return '';
   }
 }
 export function getPixelToolPalette() {
   return Object.fromEntries(
-    Object.entries(TOKEN_BY_KEY).map(([_0x12464b, _0x5c490f]) => [
-      _0x12464b,
-      readCssToken(_0x5c490f) || FALLBACK_PIXEL_TOOL_PALETTE[_0x12464b],
+    Object.entries(TOKEN_BY_KEY).map(([item, key]) => [
+      item,
+      readCssToken(key) || FALLBACK_PIXEL_TOOL_PALETTE[item],
     ]),
   );
 }
-export function createPixelCheckerboardPattern(_0x578a0b, _0x1c9d1d = 1) {
-  if (!_0x578a0b) return null;
-  const _0x34f38c = (typeof document !== 'undefined' && document) || _0x578a0b.canvas?.ownerDocument || null;
-  if (!_0x34f38c?.createElement) return null;
-  const _0x2a53ee = getPixelToolPalette(),
-    _0x5f1458 = _0x34f38c.createElement('canvas'),
-    _0x135263 = Math.max(4, Math.round(8 * (Number(_0x1c9d1d) || 1)));
-  ((_0x5f1458.width = _0x135263 * 2), (_0x5f1458.height = _0x135263 * 2));
-  const _0x4e9fcd = _0x5f1458.getContext('2d');
-  if (!_0x4e9fcd) return null;
+export function createPixelCheckerboardPattern(canvas, index = 1) {
+  if (!canvas) return null;
+  const el3 = (typeof document !== 'undefined' && document) || canvas.canvas?.ownerDocument || null;
+  if (!el3?.createElement) return null;
+  const pixelToolPalette = getPixelToolPalette(),
+    box = el3.createElement('canvas'),
+    result = Math.max(4, Math.round(8 * (Number(index) || 1)));
+  ((box.width = result * 2), (box.height = result * 2));
+  const ctx = box.getContext('2d');
+  if (!ctx) return null;
   return (
-    (_0x4e9fcd.fillStyle = _0x2a53ee.checkerLight),
-    _0x4e9fcd.fillRect(0, 0, _0x135263 * 2, _0x135263 * 2),
-    (_0x4e9fcd.fillStyle = _0x2a53ee.checkerDark),
-    _0x4e9fcd.fillRect(0, 0, _0x135263, _0x135263),
-    _0x4e9fcd.fillRect(_0x135263, _0x135263, _0x135263, _0x135263),
-    _0x578a0b.createPattern(_0x5f1458, 'repeat')
+    (ctx.fillStyle = pixelToolPalette.checkerLight),
+    ctx.fillRect(0, 0, result * 2, result * 2),
+    (ctx.fillStyle = pixelToolPalette.checkerDark),
+    ctx.fillRect(0, 0, result, result),
+    ctx.fillRect(result, result, result, result),
+    canvas.createPattern(box, 'repeat')
   );
 }

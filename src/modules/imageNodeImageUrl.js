@@ -1,85 +1,87 @@
 import { localPathToUrl } from '../utils/localMediaPath.js';
-const getPrimaryImageItem = (_0x23358c = {}) => {
-    const _0x59ccdc = Array['isArray'](_0x23358c?.['images']) ? _0x23358c['images'] : [],
-      _0x3706e8 = Number['isInteger'](Number(_0x23358c?.['mainImageIndex']))
-        ? Number(_0x23358c['mainImageIndex'])
+const getPrimaryImageItem = (options = {}) => {
+    const value = Array['isArray'](options?.['images']) ? options['images'] : [],
+      item = Number['isInteger'](Number(options?.['mainImageIndex']))
+        ? Number(options['mainImageIndex'])
         : 0x0;
-    return _0x59ccdc[_0x3706e8] || null;
+    return value[item] || null;
   },
-  firstLocalUrl = (_0x7af0a4) => {
-    for (const _0x52de24 of _0x7af0a4) {
-      const _0x1fe57f = localPathToUrl(_0x52de24);
-      if (_0x1fe57f) return _0x1fe57f;
+  firstLocalUrl = (key) => {
+    for (const index of key) {
+      const url = localPathToUrl(index);
+      if (url) return url;
     }
     return '';
   },
-  firstRawUrl = (_0x2670bd) => {
-    for (const _0x2caa30 of _0x2670bd) {
-      const _0x3a9f94 = String(_0x2caa30 || '')['trim']();
-      if (_0x3a9f94) return _0x3a9f94;
+  firstRawUrl = (result) => {
+    for (const data of result) {
+      const target = String(data || '')['trim']();
+      if (target) return target;
     }
     return '';
   };
-export function resolveImageNodePreviewUrl(_0x5d6e7a = {}) {
-  const _0x5b8fce = getPrimaryImageItem(_0x5d6e7a);
+export function resolveImageNodePreviewUrl(options2 = {}) {
+  const primaryImageItem = getPrimaryImageItem(options2);
   return (
     firstLocalUrl([
-      _0x5d6e7a['displayLocalPath'],
-      _0x5b8fce?.['displayLocalPath'],
-      _0x5d6e7a['previewLocalPath'],
-      _0x5b8fce?.['previewLocalPath'],
+      options2['displayLocalPath'],
+      primaryImageItem?.['displayLocalPath'],
+      options2['previewLocalPath'],
+      primaryImageItem?.['previewLocalPath'],
     ]) ||
     firstRawUrl([
-      _0x5d6e7a['displayUrl'],
-      _0x5b8fce?.['displayUrl'],
-      _0x5d6e7a['previewUrl'],
-      _0x5b8fce?.['previewUrl'],
+      options2['displayUrl'],
+      primaryImageItem?.['displayUrl'],
+      options2['previewUrl'],
+      primaryImageItem?.['previewUrl'],
     ])
   );
 }
-export function resolveImageNodeDisplayUrl(_0xae49c7 = {}) {
-  const _0x24b1db = getPrimaryImageItem(_0xae49c7);
+export function resolveImageNodeDisplayUrl(options3 = {}) {
+  const primaryImageItem2 = getPrimaryImageItem(options3);
   return (
-    resolveImageNodePreviewUrl(_0xae49c7) ||
+    resolveImageNodePreviewUrl(options3) ||
     firstLocalUrl([
-      _0xae49c7['thumbLocalPath'],
-      _0x24b1db?.['thumbLocalPath'],
-      _0xae49c7['thumbnailLocalPath'],
-      _0x24b1db?.['thumbnailLocalPath'],
+      options3['thumbLocalPath'],
+      primaryImageItem2?.['thumbLocalPath'],
+      options3['thumbnailLocalPath'],
+      primaryImageItem2?.['thumbnailLocalPath'],
     ]) ||
     firstRawUrl([
-      _0xae49c7['thumbUrl'],
-      _0x24b1db?.['thumbUrl'],
-      _0xae49c7['thumbnailUrl'],
-      _0x24b1db?.['thumbnailUrl'],
+      options3['thumbUrl'],
+      primaryImageItem2?.['thumbUrl'],
+      options3['thumbnailUrl'],
+      primaryImageItem2?.['thumbnailUrl'],
     ])
   );
 }
-export function resolveImageNodeOriginalUrl(_0x4d28cc = {}) {
-  const _0x53273b = getPrimaryImageItem(_0x4d28cc);
+export function resolveImageNodeOriginalUrl(options4 = {}) {
+  const primaryImageItem3 = getPrimaryImageItem(options4);
   return (
     firstLocalUrl([
-      _0x4d28cc['originalLocalPath'],
-      _0x53273b?.['originalLocalPath'],
-      _0x4d28cc['localPath'],
-      _0x53273b?.['localPath'],
+      options4['originalLocalPath'],
+      primaryImageItem3?.['originalLocalPath'],
+      options4['localPath'],
+      primaryImageItem3?.['localPath'],
     ]) ||
     firstRawUrl([
-      _0x4d28cc['src'],
-      _0x53273b?.['src'],
-      _0x4d28cc['sourceUrl'],
-      _0x53273b?.['sourceUrl'],
-      _0x4d28cc['imageUrl'],
-      _0x53273b?.['imageUrl'],
-      _0x4d28cc['displayUrl'],
-      _0x53273b?.['displayUrl'],
-      _0x4d28cc['thumbUrl'],
-      _0x53273b?.['thumbUrl'],
+      options4['src'],
+      primaryImageItem3?.['src'],
+      options4['sourceUrl'],
+      primaryImageItem3?.['sourceUrl'],
+      options4['imageUrl'],
+      primaryImageItem3?.['imageUrl'],
+      options4['displayUrl'],
+      primaryImageItem3?.['displayUrl'],
+      options4['thumbUrl'],
+      primaryImageItem3?.['thumbUrl'],
     ])
   );
 }
-export function resolveImageNodeUrl(_0x40759e = {}, { preferPreview: preferPreview = ![] } = {}) {
-  const _0x5665f7 = resolveImageNodeDisplayUrl(_0x40759e),
-    _0x2fcfc8 = resolveImageNodeOriginalUrl(_0x40759e);
-  return preferPreview ? _0x5665f7 || _0x2fcfc8 : _0x2fcfc8 || _0x5665f7;
+export function resolveImageNodeUrl(options5 = {}, { preferPreview: preferPreview = ![] } = {}) {
+  const imageNodeDisplayUrl = resolveImageNodeDisplayUrl(options5),
+    imageNodeOriginalUrl = resolveImageNodeOriginalUrl(options5);
+  return preferPreview
+    ? imageNodeDisplayUrl || imageNodeOriginalUrl
+    : imageNodeOriginalUrl || imageNodeDisplayUrl;
 }

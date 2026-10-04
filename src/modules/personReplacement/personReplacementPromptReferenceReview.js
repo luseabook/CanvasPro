@@ -1,1 +1,73 @@
-import{buildPersonReplacementPromptPackage}from'./personReplacementPromptCompiler.js';import{localPathToUrl}from'../../utils/localMediaPath.js';function plainReferenceSlots(_0x43ab13=''){let _0x241cd4=0x0,_0x3d6eb8='';for(const [_0x2d27b8]of String(_0x43ab13)["matchAll"](/<[^>]*>|[^<]+/g)){if(/^<span\b/i["test"](_0x2d27b8)){if(_0x241cd4||/\bref-pill\b/['test'](_0x2d27b8))_0x241cd4++;}else{if(/^<\/span\s*>/i['test'](_0x2d27b8)&&_0x241cd4)_0x241cd4--;else{if(!_0x241cd4&&!_0x2d27b8["startsWith"]('<'))_0x3d6eb8+=_0x2d27b8;}}}return[...new Set([..._0x3d6eb8["matchAll"](/图(?:片|像)?\s*(\d+)/gu)]["map"](_0xbb6c5=>Number(_0xbb6c5[0x1])))];}function referenceKey(_0x36265b){if(!_0x36265b)return'';if(_0x36265b['role']==='person-location-guide')return _0x36265b['role'];return localPathToUrl(_0x36265b["originalRef"]||_0x36265b['ref'])||_0x36265b["originalRef"]||_0x36265b["ref"]||'';}function captureReferences(_0x43048d,_0x32e384,_0x5597e2){const _0x3ef8f7=buildPersonReplacementPromptPackage({'project':_0x43048d,'shot':_0x32e384});return _0x5597e2["map"](_0xbe36e2=>({'slot':_0xbe36e2,'key':referenceKey(_0x3ef8f7['referenceImages']["find"](_0x45701d=>_0x45701d["slot"]===_0xbe36e2))}));}export function syncPersonReplacementPromptReferences(_0x437b56,_0x11370a){const _0x589977=new Map(_0x437b56?.['id']===_0x11370a['id']?(_0x437b56["shots"]||[])["map"](_0xd39c26=>[_0xd39c26['id'],_0xd39c26]):[]);return{..._0x11370a,'shots':_0x11370a["shots"]['map'](_0x2e8a0c=>{const _0x2659e9=plainReferenceSlots(_0x2e8a0c['imagePrompt']);if(!_0x2659e9["length"]){if(!_0x2e8a0c['imagePromptReferences'])return _0x2e8a0c;const {imagePromptReferences:_0x2b7030,..._0x37d936}=_0x2e8a0c;return _0x37d936;}const _0x22ab84=_0x589977["get"](_0x2e8a0c['id']),_0xd4462f=_0x22ab84&&_0x22ab84["imagePrompt"]===_0x2e8a0c['imagePrompt'],_0x50a30e=_0xd4462f?_0x22ab84["imagePromptReferences"]||captureReferences(_0x437b56,_0x22ab84,_0x2659e9):_0x22ab84?captureReferences(_0x11370a,_0x2e8a0c,_0x2659e9):_0x2e8a0c["imagePromptReferences"]||captureReferences(_0x11370a,_0x2e8a0c,_0x2659e9);return{..._0x2e8a0c,'imagePromptReferences':_0x50a30e};})};}export function getPersonReplacementPromptReferenceReviewMessage(_0x3c8417,_0x46d66b){const _0x243e57=new Set(plainReferenceSlots(_0x3c8417?.["imagePrompt"])),_0x33d446=(_0x3c8417?.["imagePromptReferences"]||[])["filter"](({slot:_0x3cbd34,key:_0x546be8})=>_0x243e57["has"](_0x3cbd34)&&_0x546be8!==referenceKey(_0x46d66b["referenceImages"]?.["find"](_0x3f5bdd=>_0x3f5bdd["slot"]===_0x3cbd34)));return _0x33d446["length"]?"参考图绑定已变化，请检查并编辑提示词中的"+_0x33d446["map"](_0x3686c8=>'图'+_0x3686c8['slot'])["join"]('、')+"后再生成，或改用 @ 引用素材。":'';}
+import { buildPersonReplacementPromptPackage } from './personReplacementPromptCompiler.js';
+import { localPathToUrl } from '../../utils/localMediaPath.js';
+function plainReferenceSlots(value = '') {
+  let enabled = 0x0,
+    args = '';
+  for (const [enabled2] of String(value)['matchAll'](/<[^>]*>|[^<]+/g)) {
+    if (/^<span\b/i['test'](enabled2)) {
+      if (enabled || /\bref-pill\b/['test'](enabled2)) enabled++;
+    } else {
+      if (/^<\/span\s*>/i['test'](enabled2) && enabled) enabled--;
+      else {
+        if (!enabled && !enabled2['startsWith']('<')) args += enabled2;
+      }
+    }
+  }
+  return [...new Set([...args['matchAll'](/图(?:片|像)?\s*(\d+)/gu)]['map']((item) => Number(item[0x1])))];
+}
+function referenceKey(enabled3) {
+  if (!enabled3) return '';
+  if (enabled3['role'] === 'person-location-guide') return enabled3['role'];
+  return (
+    localPathToUrl(enabled3['originalRef'] || enabled3['ref']) ||
+    enabled3['originalRef'] ||
+    enabled3['ref'] ||
+    ''
+  );
+}
+function captureReferences(key, index, result) {
+  const personReplacementPromptPackage = buildPersonReplacementPromptPackage({ project: key, shot: index });
+  return result['map']((data) => ({
+    slot: data,
+    key: referenceKey(
+      personReplacementPromptPackage['referenceImages']['find']((options) => options['slot'] === data),
+    ),
+  }));
+}
+export function syncPersonReplacementPromptReferences(target, args2) {
+  const source = new Map(
+    target?.['id'] === args2['id'] ? (target['shots'] || [])['map']((next) => [next['id'], next]) : [],
+  );
+  return {
+    ...args2,
+    shots: args2['shots']['map']((args3) => {
+      const plainReferenceSlots2 = plainReferenceSlots(args3['imagePrompt']);
+      if (!plainReferenceSlots2['length']) {
+        if (!args3['imagePromptReferences']) return args3;
+        const { imagePromptReferences: imagePromptReferences, ...args4 } = args3;
+        return args4;
+      }
+      const current = source['get'](args3['id']),
+        entry = current && current['imagePrompt'] === args3['imagePrompt'],
+        record = entry
+          ? current['imagePromptReferences'] || captureReferences(target, current, plainReferenceSlots2)
+          : current
+            ? captureReferences(args2, args3, plainReferenceSlots2)
+            : args3['imagePromptReferences'] || captureReferences(args2, args3, plainReferenceSlots2);
+      return { ...args3, imagePromptReferences: record };
+    }),
+  };
+}
+export function getPersonReplacementPromptReferenceReviewMessage(payload, handle) {
+  const state = new Set(plainReferenceSlots(payload?.['imagePrompt'])),
+    config = (payload?.['imagePromptReferences'] || [])['filter'](
+      ({ slot: slot, key: key2 }) =>
+        state['has'](slot) &&
+        key2 !== referenceKey(handle['referenceImages']?.['find']((scope) => scope['slot'] === slot)),
+    );
+  return config['length']
+    ? '参考图绑定已变化，请检查并编辑提示词中的' +
+        config['map']((input) => '图' + input['slot'])['join']('、') +
+        '后再生成，或改用 @ 引用素材。'
+    : '';
+}

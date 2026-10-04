@@ -1,61 +1,61 @@
-function firstNonEmptySpeakerValue(..._0x23989c) {
-  for (const _0x38df4e of _0x23989c) {
-    if (_0x38df4e === null || _0x38df4e === undefined) continue;
-    const _0x4c042e = String(_0x38df4e)['trim']();
-    if (_0x4c042e) return _0x4c042e;
+function firstNonEmptySpeakerValue(...args) {
+  for (const value of args) {
+    if (value === null || value === undefined) continue;
+    const item = String(value)['trim']();
+    if (item) return item;
   }
   return '';
 }
-function normalizeSharedAnalyzeSegment(_0x2bc44f = {}) {
+function normalizeSharedAnalyzeSegment(args2 = {}) {
   return {
-    ..._0x2bc44f,
-    id: String(_0x2bc44f['id'] || ''),
-    startMs: Number(_0x2bc44f['startMs'] || 0x0),
-    endMs: Number(_0x2bc44f['endMs'] || 0x0),
-    sourceText: String(_0x2bc44f['sourceText'] || ''),
+    ...args2,
+    id: String(args2['id'] || ''),
+    startMs: Number(args2['startMs'] || 0x0),
+    endMs: Number(args2['endMs'] || 0x0),
+    sourceText: String(args2['sourceText'] || ''),
     targetText: '',
-    speakerId: String(_0x2bc44f['speakerId'] || ''),
-    speaker: String(_0x2bc44f['speaker'] || ''),
-    sourceAudioLocalPath: String(_0x2bc44f['sourceAudioLocalPath'] || ''),
-    sourceAudioUrl: String(_0x2bc44f['sourceAudioUrl'] || ''),
+    speakerId: String(args2['speakerId'] || ''),
+    speaker: String(args2['speaker'] || ''),
+    sourceAudioLocalPath: String(args2['sourceAudioLocalPath'] || ''),
+    sourceAudioUrl: String(args2['sourceAudioUrl'] || ''),
   };
 }
-export function normalizeAudioVoiceAnalyzeSegments(_0x555e9f = {}, _0xe02519 = {}) {
-  const _0x2dbba2 = Array['isArray'](_0x555e9f?.['segments']) ? _0x555e9f['segments'] : [],
-    _0x15b1d4 =
-      typeof _0xe02519?.['normalizeSegment'] === 'function'
-        ? _0xe02519['normalizeSegment']
+export function normalizeAudioVoiceAnalyzeSegments(options = {}, key = {}) {
+  const list = Array['isArray'](options?.['segments']) ? options['segments'] : [],
+    handler =
+      typeof key?.['normalizeSegment'] === 'function'
+        ? key['normalizeSegment']
         : normalizeSharedAnalyzeSegment;
-  return _0x2dbba2['map']((_0x739c64, _0x327fe4) => {
-    const _0x53fc9b = firstNonEmptySpeakerValue(
-        _0x739c64?.['speakerId'],
-        _0x739c64?.['speaker'],
-        _0x739c64?.['speaker_id'],
-        _0x739c64?.['spk'],
-        _0x739c64?.['speakerInfo']?.['speakerId'],
-        _0x739c64?.['speakerInfo']?.['speaker_id'],
-        _0x739c64?.['speaker_info']?.['speakerId'],
-        _0x739c64?.['speaker_info']?.['speaker_id'],
-        _0x739c64?.['label'],
+  return list['map']((id, index) => {
+    const speakerId = firstNonEmptySpeakerValue(
+        id?.['speakerId'],
+        id?.['speaker'],
+        id?.['speaker_id'],
+        id?.['spk'],
+        id?.['speakerInfo']?.['speakerId'],
+        id?.['speakerInfo']?.['speaker_id'],
+        id?.['speaker_info']?.['speakerId'],
+        id?.['speaker_info']?.['speaker_id'],
+        id?.['label'],
       ),
-      _0x30c797 = firstNonEmptySpeakerValue(
-        _0x739c64?.['speaker'],
-        _0x739c64?.['spk'],
-        _0x739c64?.['speakerLabel'],
-        _0x739c64?.['speaker_label'],
-        _0x739c64?.['label'],
-        _0x53fc9b,
+      speaker = firstNonEmptySpeakerValue(
+        id?.['speaker'],
+        id?.['spk'],
+        id?.['speakerLabel'],
+        id?.['speaker_label'],
+        id?.['label'],
+        speakerId,
       );
-    return _0x15b1d4({
-      id: _0x739c64?.['id'] || 'audio-voice-segment-' + (_0x327fe4 + 0x1),
-      startMs: _0x739c64?.['startMs'],
-      endMs: _0x739c64?.['endMs'],
-      sourceText: _0x739c64?.['sourceText'] || '',
+    return handler({
+      id: id?.['id'] || 'audio-voice-segment-' + (index + 0x1),
+      startMs: id?.['startMs'],
+      endMs: id?.['endMs'],
+      sourceText: id?.['sourceText'] || '',
       targetText: '',
-      speakerId: _0x53fc9b,
-      speaker: _0x30c797,
-      sourceAudioLocalPath: _0x739c64?.['sourceAudioLocalPath'],
-      sourceAudioUrl: _0x739c64?.['sourceAudioUrl'],
+      speakerId: speakerId,
+      speaker: speaker,
+      sourceAudioLocalPath: id?.['sourceAudioLocalPath'],
+      sourceAudioUrl: id?.['sourceAudioUrl'],
       sourceAudioReady: !![],
       convertedAudioReady: ![],
       activeAudio: 'source',

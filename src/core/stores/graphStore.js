@@ -35,46 +35,41 @@ const GRAPH_ACTION_NAMES = Object.freeze([
   'hydrate',
   'hydrateTrustedSnapshot',
 ]);
-function bindCoreAction(_0x113f0f, _0x4bec55) {
-  const _0x4c3f23 = _0x113f0f?.[_0x4bec55];
-  if (typeof _0x4c3f23 !== 'function') return undefined;
-  return (..._0x356f0e) => _0x4c3f23(..._0x356f0e);
+function bindCoreAction(value, item) {
+  const run = value?.[item];
+  if (typeof run !== 'function') return undefined;
+  return (...args) => run(...args);
 }
-function createGraphStore(_0x329719) {
-  if (!_0x329719 || typeof _0x329719 !== 'object')
+function createGraphStore(store) {
+  if (!store || typeof store !== 'object')
     throw new TypeError('[graphStore] createGraphStore() 需要传入有效的 coreStore');
-  const _0x273a8 = {
-    subscribe(_0x5e10f0) {
-      if (typeof _0x5e10f0 !== 'function') throw new TypeError('[graphStore] subscribe() 的参数必须是函数');
-      return _0x329719.subscribe((_0x40db3c) => _0x5e10f0(selectGraphState(_0x40db3c)));
+  const key = {
+    subscribe(handler) {
+      if (typeof handler !== 'function') throw new TypeError('[graphStore] subscribe() 的参数必须是函数');
+      return store.subscribe((index) => handler(selectGraphState(index)));
     },
-    subscribeRaw(_0x32c2c4) {
-      if (typeof _0x32c2c4 !== 'function')
-        throw new TypeError('[graphStore] subscribeRaw() 的参数必须是函数');
-      return _0x329719.subscribeRaw((_0x2ef28e) => _0x32c2c4(selectGraphState(_0x2ef28e)));
+    subscribeRaw(handler2) {
+      if (typeof handler2 !== 'function') throw new TypeError('[graphStore] subscribeRaw() 的参数必须是函数');
+      return store.subscribeRaw((result) => handler2(selectGraphState(result)));
     },
-    subscribeSelector(_0x27be60, _0x2fed6d, _0x5405d9 = {}) {
-      if (typeof _0x27be60 !== 'function')
+    subscribeSelector(handler3, data, options = {}) {
+      if (typeof handler3 !== 'function')
         throw new TypeError('[graphStore] subscribeSelector() 的 selector 必须是函数');
-      if (typeof _0x2fed6d !== 'function')
+      if (typeof data !== 'function')
         throw new TypeError('[graphStore] subscribeSelector() 的 callback 必须是函数');
-      return _0x329719.subscribeSelector(
-        (_0x2061f5) => _0x27be60(selectGraphState(_0x2061f5)),
-        _0x2fed6d,
-        _0x5405d9,
-      );
+      return store.subscribeSelector((target) => handler3(selectGraphState(target)), data, options);
     },
     getState() {
-      return selectGraphState(_0x329719.getState());
+      return selectGraphState(store.getState());
     },
     getStateRaw() {
-      return selectGraphState(_0x329719.getStateRaw());
+      return selectGraphState(store.getStateRaw());
     },
   };
-  for (const _0x20ee78 of GRAPH_ACTION_NAMES) {
-    const _0x26b9ef = bindCoreAction(_0x329719, _0x20ee78);
-    if (_0x26b9ef) _0x273a8[_0x20ee78] = _0x26b9ef;
+  for (const source of GRAPH_ACTION_NAMES) {
+    const bindCoreAction2 = bindCoreAction(store, source);
+    if (bindCoreAction2) key[source] = bindCoreAction2;
   }
-  return _0x273a8;
+  return key;
 }
 export { GRAPH_ACTION_NAMES, createGraphStore };
