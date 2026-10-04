@@ -207,6 +207,46 @@ function lineOf(source, offset) {
   return source.slice(0, offset).split('\n').length;
 }
 
+// The export surface is the contract with every consumer, so a file-local rename
+// must leave it untouched. Two things are checked:
+//   - the set of exported names must be identical;
+//   - identifiers inside an `export { ... }` clause must not be renamed, because a
+//     bare `export { local }` would otherwise stop referring to an existing binding.
+// Nothing else in the file is visible to other modules, which is what lets a
+// module with consumers be renamed safely.
+function exportSurface(source) {
+  const names = new Set();
+  const clauseIdentifiers = new Set();
+
+  const declaration = /\bexport\s+(?:default\s+)?(?:async\s+)?(function|class|const|let|var)\s+([A-Za-z_$][\w$]*)/g;
+  let match;
+  while ((match = declaration.exec(source))) {
+    names.add(match[2]);
+  }
+  if (/\bexport\s+default\b/.test(source) && !/\bexport\s+default\s+(?:async\s+)?(?:function|class)\s/.test(source)) {
+    names.add('default');
+  }
+  if (/\bexport\s+default\s+(?:async\s+)?(?:function|class)\s/.test(source)) {
+    names.add('default');
+  }
+
+  const clause = /\bexport\s*\{([^}]*)\}/g;
+  while ((match = clause.exec(source))) {
+    for (const part of match[1].split(',')) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+      const pieces = trimmed.split(/\s+as\s+/);
+      const local = pieces[0].trim();
+      const exported = (pieces[1] || pieces[0]).trim();
+      if (!local) continue;
+      clauseIdentifiers.add(local);
+      if (exported) names.add(exported);
+    }
+  }
+
+  return { names: [...names].sort(), clauseIdentifiers };
+}
+
 function main() {
   const args = process.argv.slice(2).filter(arg => arg !== '--explain');
   const explain = process.argv.includes('--explain');
@@ -267,6 +307,21 @@ function main() {
         'inconsistent rename of ' + JSON.stringify(before.value) + ': ' + JSON.stringify(known) +
           ' at one place, ' + JSON.stringify(after.value) + ' at line ' +
           lineOf(originalSource, before.offset),
+      );
+    }
+  }
+
+  const before = exportSurface(originalSource);
+  const after = exportSurface(rewrittenSource);
+  if (before.names.join(',') !== after.names.join(',')) {
+    failures.push(
+      'export surface changed: [' + before.names.join(', ') + '] -> [' + after.names.join(', ') + ']',
+    );
+  }
+  for (const [from, to] of rename) {
+    if (from !== to && before.clauseIdentifiers.has(from)) {
+      failures.push(
+        'identifier ' + JSON.stringify(from) + ' is referenced by an export clause and must not be renamed',
       );
     }
   }
