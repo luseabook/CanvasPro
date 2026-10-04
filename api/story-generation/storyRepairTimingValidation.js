@@ -1,1 +1,37 @@
-import{normalizeStoryEpisodeSpokenTiming}from'./storyEpisodeSpokenTiming.js';import{isStoryContinuousTimelinePromptMode}from'../../src/domain/storyGeneration/promptModes.js';export function canNormalizeStoryRepairTiming(_0x466c03,_0x38bdde){return _0x466c03?.["sourceMode"]!=="video-replication"&&!isStoryContinuousTimelinePromptMode(_0x38bdde?.["promptMode"]);}export async function validateStoryRepairTiming({validateClips:_0xee86d1,..._0xd2462f}){const _0xebcebd=await _0xee86d1(_0xd2462f);if(!Array["isArray"](_0xebcebd)||!canNormalizeStoryRepairTiming(_0xd2462f['project'],_0xd2462f['constraints']))return _0xebcebd;const _0x32dec4=normalizeStoryEpisodeSpokenTiming(_0xebcebd,{'maxClipDurationSeconds':_0xd2462f["constraints"]?.["sceneMaxSeconds"]});if(_0x32dec4["length"]===_0xebcebd["length"]&&_0x32dec4["every"]((_0x1cf958,_0x403bab)=>_0x1cf958===_0xebcebd[_0x403bab]))return _0xebcebd;return _0xee86d1({..._0xd2462f,'clips':_0x32dec4});}export function getStoryRepairResumeCandidates(_0x466815,_0x184c96,_0x485308,_0x6b4285){const _0x179d54={};for(const _0x7fdcbe of _0x184c96){if(_0x466815["pendingRecheck"]?.[_0x7fdcbe])_0x179d54[_0x7fdcbe]=_0x466815["pendingRecheck"][_0x7fdcbe];else{if(canNormalizeStoryRepairTiming(_0x485308,_0x6b4285)&&_0x466815["repairErrorCodes"]?.[_0x7fdcbe]==="STORY_LOCAL_TIMING"&&_0x466815["attemptedClips"]?.[_0x7fdcbe]?.["length"])_0x179d54[_0x7fdcbe]=_0x466815['attemptedClips'][_0x7fdcbe];}}return _0x179d54;}
+import { normalizeStoryEpisodeSpokenTiming } from './storyEpisodeSpokenTiming.js';
+import { isStoryContinuousTimelinePromptMode } from '../../src/domain/storyGeneration/promptModes.js';
+export function canNormalizeStoryRepairTiming(value, item) {
+  return (
+    value?.['sourceMode'] !== 'video-replication' &&
+    !isStoryContinuousTimelinePromptMode(item?.['promptMode'])
+  );
+}
+export async function validateStoryRepairTiming({ validateClips: validateClips, ...args }) {
+  const key = await validateClips(args);
+  if (!Array['isArray'](key) || !canNormalizeStoryRepairTiming(args['project'], args['constraints']))
+    return key;
+  const storyEpisodeSpokenTiming = normalizeStoryEpisodeSpokenTiming(key, {
+    maxClipDurationSeconds: args['constraints']?.['sceneMaxSeconds'],
+  });
+  if (
+    storyEpisodeSpokenTiming['length'] === key['length'] &&
+    storyEpisodeSpokenTiming['every']((index, result) => index === key[result])
+  )
+    return key;
+  return validateClips({ ...args, clips: storyEpisodeSpokenTiming });
+}
+export function getStoryRepairResumeCandidates(data, options, target, source) {
+  const next = {};
+  for (const current of options) {
+    if (data['pendingRecheck']?.[current]) next[current] = data['pendingRecheck'][current];
+    else {
+      if (
+        canNormalizeStoryRepairTiming(target, source) &&
+        data['repairErrorCodes']?.[current] === 'STORY_LOCAL_TIMING' &&
+        data['attemptedClips']?.[current]?.['length']
+      )
+        next[current] = data['attemptedClips'][current];
+    }
+  }
+  return next;
+}

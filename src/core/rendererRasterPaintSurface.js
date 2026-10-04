@@ -1,42 +1,39 @@
 export function createRendererRasterPaintSurface(
-  _0x531553,
+  box,
   {
-    createBackingCanvas: createBackingCanvas = (_0x184a52, _0x6a74f6) =>
+    createBackingCanvas: createBackingCanvas = (value, item) =>
       typeof globalThis['OffscreenCanvas'] === 'function'
-        ? new globalThis['OffscreenCanvas'](_0x184a52, _0x6a74f6)
+        ? new globalThis['OffscreenCanvas'](value, item)
         : null,
   } = {},
 ) {
-  const _0x5d262e = _0x531553['getContext']?.('2d', { alpha: !![] }) || null;
-  let _0x433644 = null,
-    _0x4d72e2 = _0x5d262e;
-  if (_0x5d262e)
+  const ctx = box['getContext']?.('2d', { alpha: !![] }) || null;
+  let box2 = null,
+    context = ctx;
+  if (ctx)
     try {
-      const _0x2926e2 = createBackingCanvas(
-          Math['max'](0x1, _0x531553['width']),
-          Math['max'](0x1, _0x531553['height']),
-        ),
-        _0x35e024 = _0x2926e2?.['getContext']?.('2d', { alpha: !![] });
-      _0x35e024 && ((_0x433644 = _0x2926e2), (_0x4d72e2 = _0x35e024));
+      const el = createBackingCanvas(Math['max'](0x1, box['width']), Math['max'](0x1, box['height'])),
+        key = el?.['getContext']?.('2d', { alpha: !![] });
+      key && ((box2 = el), (context = key));
     } catch {}
   return {
-    context: _0x4d72e2,
-    resize(_0x147ad4, _0x6d483) {
-      if (_0x531553['width'] !== _0x147ad4) _0x531553['width'] = _0x147ad4;
-      if (_0x531553['height'] !== _0x6d483) _0x531553['height'] = _0x6d483;
-      if (_0x433644) {
-        if (_0x433644['width'] !== _0x147ad4) _0x433644['width'] = _0x147ad4;
-        if (_0x433644['height'] !== _0x6d483) _0x433644['height'] = _0x6d483;
+    context: context,
+    resize(index, result) {
+      if (box['width'] !== index) box['width'] = index;
+      if (box['height'] !== result) box['height'] = result;
+      if (box2) {
+        if (box2['width'] !== index) box2['width'] = index;
+        if (box2['height'] !== result) box2['height'] = result;
       }
     },
     present() {
-      if (!_0x433644) return;
-      ((_0x5d262e['globalCompositeOperation'] = 'copy'),
-        (_0x5d262e['imageSmoothingEnabled'] = ![]),
-        _0x5d262e['drawImage'](_0x433644, 0x0, 0x0));
+      if (!box2) return;
+      ((ctx['globalCompositeOperation'] = 'copy'),
+        (ctx['imageSmoothingEnabled'] = ![]),
+        ctx['drawImage'](box2, 0x0, 0x0));
     },
     release() {
-      _0x433644 && ((_0x433644['width'] = 0x1), (_0x433644['height'] = 0x1));
+      box2 && ((box2['width'] = 0x1), (box2['height'] = 0x1));
     },
   };
 }

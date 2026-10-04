@@ -1,39 +1,39 @@
 import { t } from '../../../i18n/index.js';
-function toolbarText(_0x205275) {
-  return t('nodeToolbar.common.' + _0x205275);
+function toolbarText(value) {
+  return t('nodeToolbar.common.' + value);
 }
-export function bindVideoDownloadAction(_0x3308d6) {
+export function bindVideoDownloadAction(item) {
   const {
-      toolbarEl: _0x5c4bf1,
-      fetchRemoteBlob: _0x2eae66,
-      _guessDownloadName: _0x53a26f,
-      _triggerHrefDownload: _0x4d9e1d,
-      _isProbablyLocalUrl: _0x372586,
-      _getCurrentVideoUrl: _0x14d885,
-    } = _0x3308d6,
-    _0x148758 = _0x5c4bf1.querySelector('.act-download');
-  _0x148758 &&
-    _0x148758.addEventListener('click', async (_0x7507b0) => {
-      _0x7507b0.stopPropagation();
-      const _0x1cbcd7 = _0x14d885();
-      if (!_0x1cbcd7) {
+      toolbarEl: toolbarEl,
+      fetchRemoteBlob: fetchRemoteBlob,
+      _guessDownloadName: _guessDownloadName,
+      _triggerHrefDownload: _triggerHrefDownload,
+      _isProbablyLocalUrl: _isProbablyLocalUrl,
+      _getCurrentVideoUrl: _getCurrentVideoUrl,
+    } = item,
+    el = toolbarEl.querySelector('.act-download');
+  el &&
+    el.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      const enabled = _getCurrentVideoUrl();
+      if (!enabled) {
         alert(toolbarText('noDownloadableVideo'));
         return;
       }
-      const _0x2cd70f = _0x53a26f(_0x1cbcd7);
-      if (_0x372586(_0x1cbcd7)) {
-        _0x4d9e1d(_0x1cbcd7, _0x2cd70f);
+      const key = _guessDownloadName(enabled);
+      if (_isProbablyLocalUrl(enabled)) {
+        _triggerHrefDownload(enabled, key);
         return;
       }
       try {
-        const _0x24a22a = new AbortController(),
-          _0x5a3223 = setTimeout(() => _0x24a22a.abort(), 0x4e20),
-          _0x460f14 = await _0x2eae66(_0x1cbcd7, { signal: _0x24a22a.signal });
-        clearTimeout(_0x5a3223);
-        const _0x1ee641 = window.URL.createObjectURL(_0x460f14);
-        (_0x4d9e1d(_0x1ee641, _0x2cd70f), setTimeout(() => window.URL.revokeObjectURL(_0x1ee641), 0x5dc));
+        const signal = new AbortController(),
+          setTimeout2 = setTimeout(() => signal.abort(), 0x4e20),
+          index = await fetchRemoteBlob(enabled, { signal: signal.signal });
+        clearTimeout(setTimeout2);
+        const result = window.URL.createObjectURL(index);
+        (_triggerHrefDownload(result, key), setTimeout(() => window.URL.revokeObjectURL(result), 0x5dc));
       } catch {
-        _0x4d9e1d(_0x1cbcd7, _0x2cd70f);
+        _triggerHrefDownload(enabled, key);
       }
     });
 }

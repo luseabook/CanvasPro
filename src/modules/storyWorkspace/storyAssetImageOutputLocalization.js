@@ -1,1 +1,49 @@
-import{getStoryAssetAppearances}from'./storyAssetAppearances.js';function normalizeText(_0x1bf2f5){return String(_0x1bf2f5??'')["trim"]();}export function createStoryAssetImageLocalization({asset:_0x190760,appearance:_0x3a9eab,projectToken:_0x1d39b7,isLive:_0x2d25c9,applyResult:_0x4a2b2a,onLocalized:onLocalized=()=>{}}){const _0x41ca90=normalizeText(_0x190760?.['id']),_0x15a3a8=normalizeText(_0x3a9eab?.['id']);let _0x10efbb=![],_0x35bef0='',_0x535312=null;const _0x217746=async _0x17fbd5=>{if(!_0x10efbb)return _0x535312=_0x17fbd5,![];if(typeof _0x2d25c9==='function'&&!_0x2d25c9(_0x1d39b7))return![];const _0x47d08b=_0x1d39b7?.["data"]?.["assets"]?.['find'](_0x3fac55=>normalizeText(_0x3fac55?.['id'])===_0x41ca90),_0x529cf6=getStoryAssetAppearances(_0x47d08b)["find"](_0x1306b4=>normalizeText(_0x1306b4?.['id'])===_0x15a3a8);if(!_0x47d08b||!_0x529cf6||normalizeText(_0x529cf6["imageUrl"])!==_0x35bef0)return![];return _0x4a2b2a(_0x47d08b,_0x529cf6,_0x17fbd5),await onLocalized(_0x47d08b,_0x529cf6),!![];};return{'options':{'onOutputLocalized':_0x217746,'onOutputLocalizationFailed':()=>{_0x535312=null;}},'commitRemote'(){_0x35bef0=normalizeText(_0x3a9eab?.["imageUrl"]),_0x10efbb=!![];if(!_0x535312)return;const _0x56418d=_0x535312;_0x535312=null,void _0x217746(_0x56418d)['catch'](()=>{});}};}
+import { getStoryAssetAppearances } from './storyAssetAppearances.js';
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
+}
+export function createStoryAssetImageLocalization({
+  asset: asset,
+  appearance: appearance,
+  projectToken: projectToken,
+  isLive: isLive,
+  applyResult: applyResult,
+  onLocalized: onLocalized = () => {},
+}) {
+  const text = normalizeText(asset?.['id']),
+    text2 = normalizeText(appearance?.['id']);
+  let enabled = ![],
+    text3 = '',
+    enabled2 = null;
+  const run = async (item) => {
+    if (!enabled) return ((enabled2 = item), ![]);
+    if (typeof isLive === 'function' && !isLive(projectToken)) return ![];
+    const enabled3 = projectToken?.['data']?.['assets']?.['find'](
+        (key) => normalizeText(key?.['id']) === text,
+      ),
+      storyAssetAppearances = getStoryAssetAppearances(enabled3)['find'](
+        (index) => normalizeText(index?.['id']) === text2,
+      );
+    if (!enabled3 || !storyAssetAppearances || normalizeText(storyAssetAppearances['imageUrl']) !== text3)
+      return ![];
+    return (
+      applyResult(enabled3, storyAssetAppearances, item),
+      await onLocalized(enabled3, storyAssetAppearances),
+      !![]
+    );
+  };
+  return {
+    options: {
+      onOutputLocalized: run,
+      onOutputLocalizationFailed: () => {
+        enabled2 = null;
+      },
+    },
+    commitRemote() {
+      ((text3 = normalizeText(appearance?.['imageUrl'])), (enabled = !![]));
+      if (!enabled2) return;
+      const result = enabled2;
+      ((enabled2 = null), void run(result)['catch'](() => {}));
+    },
+  };
+}

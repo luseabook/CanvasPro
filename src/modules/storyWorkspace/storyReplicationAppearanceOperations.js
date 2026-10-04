@@ -1,1 +1,34 @@
-import{getStoryAssetAppearances,normalizeStoryAssetAppearance}from'./storyAssetAppearances.js';export function removeStoryReplicationCharacterAppearance(_0x2e7191,_0x514a79,_0x5958da){if(_0x2e7191["data"]?.['project']?.["sourceMode"]!=="video-replication"||!["character","scene","prop"]["includes"](_0x514a79?.["kind"]))return![];const _0x4b0d84=getStoryAssetAppearances(_0x514a79),_0x5ce103=_0x4b0d84["findIndex"](_0x33f7c5=>_0x33f7c5['id']===_0x5958da);if(_0x5ce103<0x0||_0x4b0d84['length']===0x1&&!_0x4b0d84[_0x5ce103]['imageUrl'])return![];const _0xd81b0d=_0x4b0d84[_0x5ce103];return _0x514a79["appearances"]=_0x4b0d84["filter"](_0x178ed2=>_0x178ed2!==_0xd81b0d),!_0x514a79["appearances"]["length"]&&_0x514a79['appearances']['push'](normalizeStoryAssetAppearance({'id':_0x514a79['id']+"-appearance-"+crypto["randomUUID"](),'prompt':_0x514a79["prompt"]||_0xd81b0d["prompt"],'description':_0x514a79["description"]||_0xd81b0d["description"]},{'assetId':_0x514a79['id']})),!_0x514a79["appearances"]["some"](_0x3ed39c=>_0x3ed39c['id']===_0x514a79["baseAppearanceId"])&&(_0x514a79["baseAppearanceId"]=_0x514a79["appearances"][0x0]['id']),_0x2e7191["assetAppearanceIndexes"]={..._0x2e7191["assetAppearanceIndexes"],[_0x514a79['id']]:Math["min"](_0x5ce103,_0x514a79["appearances"]["length"]-0x1)},_0x2e7191['pendingDeleteAssetAppearanceKey']='',!![];}
+import { getStoryAssetAppearances, normalizeStoryAssetAppearance } from './storyAssetAppearances.js';
+export function removeStoryReplicationCharacterAppearance(args, enabled, value) {
+  if (
+    args['data']?.['project']?.['sourceMode'] !== 'video-replication' ||
+    !['character', 'scene', 'prop']['includes'](enabled?.['kind'])
+  )
+    return ![];
+  const list = getStoryAssetAppearances(enabled),
+    count = list['findIndex']((item) => item['id'] === value);
+  if (count < 0x0 || (list['length'] === 0x1 && !list[count]['imageUrl'])) return ![];
+  const key = list[count];
+  return (
+    (enabled['appearances'] = list['filter']((index) => index !== key)),
+    !enabled['appearances']['length'] &&
+      enabled['appearances']['push'](
+        normalizeStoryAssetAppearance(
+          {
+            id: enabled['id'] + '-appearance-' + crypto['randomUUID'](),
+            prompt: enabled['prompt'] || key['prompt'],
+            description: enabled['description'] || key['description'],
+          },
+          { assetId: enabled['id'] },
+        ),
+      ),
+    !enabled['appearances']['some']((result) => result['id'] === enabled['baseAppearanceId']) &&
+      (enabled['baseAppearanceId'] = enabled['appearances'][0x0]['id']),
+    (args['assetAppearanceIndexes'] = {
+      ...args['assetAppearanceIndexes'],
+      [enabled['id']]: Math['min'](count, enabled['appearances']['length'] - 0x1),
+    }),
+    (args['pendingDeleteAssetAppearanceKey'] = ''),
+    !![]
+  );
+}

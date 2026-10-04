@@ -5,29 +5,29 @@ import {
   saveWorkspaceMediaDownload,
 } from './workspaceMediaDownload.js';
 export function buildWorkspaceImageDownloadPayload({
-  imageRef: _0x1531df,
+  imageRef: imageRef,
   filenameBase: filenameBase = '生成图片',
   title: title = '下载图片',
 } = {}) {
   return buildWorkspaceMediaDownloadPayload({
     kind: 'image',
-    mediaRef: _0x1531df,
+    mediaRef: imageRef,
     filenameBase: filenameBase,
     title: title,
   });
 }
 export async function saveWorkspaceImageDownload({
-  imageRef: _0x174c2d,
-  filenameBase: _0x360dee,
-  title: _0x44cbad,
-  saveMedia: _0x50243b,
+  imageRef: imageRef2,
+  filenameBase: filenameBase2,
+  title: title2,
+  saveMedia: saveMedia,
 } = {}) {
   return await saveWorkspaceMediaDownload({
     kind: 'image',
-    mediaRef: _0x174c2d,
-    filenameBase: _0x360dee,
-    title: _0x44cbad,
-    saveMedia: _0x50243b,
+    mediaRef: imageRef2,
+    filenameBase: filenameBase2,
+    title: title2,
+    saveMedia: saveMedia,
   });
 }
 export function renderWorkspaceImageDownloadButton({
@@ -43,6 +43,6 @@ export function renderWorkspaceImageDownloadButton({
     label: label,
   });
 }
-export async function runWorkspaceImageDownloadAction(_0x3926f3, _0x3fab20) {
-  return await runWorkspaceMediaDownloadAction(_0x3926f3, _0x3fab20);
+export async function runWorkspaceImageDownloadAction(value, item) {
+  return await runWorkspaceMediaDownloadAction(value, item);
 }

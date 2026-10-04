@@ -1,1 +1,31 @@
-import{formatPrice,priceText}from'./modelPricingText.js';export function formatBinghuoUnitPrice(_0x4139f8,_0x52e854){const _0x5ce502=priceText(_0x4139f8['billing']==="per_second"?"cnySecond":_0x52e854['kind']==='image'?'cnyImage':"cnyCall");return _0x5ce502["startsWith"]('CNY')?_0x4139f8["amount"]+'\x20'+_0x5ce502:''+_0x4139f8['amount']+_0x5ce502["replace"](/\s/g,'');}export function buildBinghuoPriceView(_0x3c5557,_0x3bf1f8){const _0x34872d=_0x3c5557["billing"]==="per_second",_0x482bb3=priceText(_0x34872d?"cnySecond":_0x3bf1f8["kind"]==='image'?"cnyImage":"cnyCall"),_0x16d2cf=Number(_0x3bf1f8["params"]["batchSize"]??_0x3bf1f8['params']['n']??0x1),_0x42f7bb=Number(_0x3bf1f8['params']["duration"]),_0x4b2192=_0x34872d?_0x42f7bb*_0x16d2cf:_0x16d2cf,_0x3b8925=Number["isInteger"](_0x16d2cf)&&_0x16d2cf>0x0&&(!_0x34872d||_0x42f7bb>0x0)&&Number["isFinite"](_0x4b2192)?_0x3c5557["amount"]*_0x4b2192:null,_0x38b426=priceText("reference"),_0x307d6b=_0x3b8925===null?_0x3c5557['amount']+'\x20'+_0x482bb3:formatPrice(_0x3b8925,"CNY");return{'label':_0x38b426+'\x20'+_0x307d6b,'prefix':_0x38b426,'amountText':_0x307d6b,'estimate':_0x3b8925,'currency':"CNY",'rows':[{'label':_0x3bf1f8["model"],'amount':_0x3c5557['amount'],'unit':_0x482bb3,'section':''}],'notes':[priceText('listed'),priceText("variable")]};}
+import { formatPrice, priceText } from './modelPricingText.js';
+export function formatBinghuoUnitPrice(value, item) {
+  const priceText2 = priceText(
+    value['billing'] === 'per_second' ? 'cnySecond' : item['kind'] === 'image' ? 'cnyImage' : 'cnyCall',
+  );
+  return priceText2['startsWith']('CNY')
+    ? value['amount'] + '\x20' + priceText2
+    : '' + value['amount'] + priceText2['replace'](/\s/g, '');
+}
+export function buildBinghuoPriceView(key, index) {
+  const enabled = key['billing'] === 'per_second',
+    priceText3 = priceText(enabled ? 'cnySecond' : index['kind'] === 'image' ? 'cnyImage' : 'cnyCall'),
+    count = Number(index['params']['batchSize'] ?? index['params']['n'] ?? 0x1),
+    count2 = Number(index['params']['duration']),
+    result = enabled ? count2 * count : count,
+    data =
+      Number['isInteger'](count) && count > 0x0 && (!enabled || count2 > 0x0) && Number['isFinite'](result)
+        ? key['amount'] * result
+        : null,
+    priceText4 = priceText('reference'),
+    options = data === null ? key['amount'] + '\x20' + priceText3 : formatPrice(data, 'CNY');
+  return {
+    label: priceText4 + '\x20' + options,
+    prefix: priceText4,
+    amountText: options,
+    estimate: data,
+    currency: 'CNY',
+    rows: [{ label: index['model'], amount: key['amount'], unit: priceText3, section: '' }],
+    notes: [priceText('listed'), priceText('variable')],
+  };
+}

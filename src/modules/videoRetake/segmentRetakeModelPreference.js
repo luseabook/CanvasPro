@@ -11,23 +11,23 @@ function getRuntimeStorage() {
     return null;
   }
 }
-function normalizeSupportedModelId(_0x2be510) {
-  const _0x26380e = String(_0x2be510 || '')['trim']();
-  return isSegmentRetakeModelSupported(_0x26380e) ? _0x26380e : '';
+function normalizeSupportedModelId(value) {
+  const item = String(value || '')['trim']();
+  return isSegmentRetakeModelSupported(item) ? item : '';
 }
-export function getSegmentRetakePreferredModelId(_0x3a3491 = getRuntimeStorage()) {
-  let _0x2b55f9 = '';
+export function getSegmentRetakePreferredModelId(runtimeStorage = getRuntimeStorage()) {
+  let key = '';
   try {
-    _0x2b55f9 = _0x3a3491?.['getItem']?.(SEGMENT_RETAKE_MODEL_PREFERENCE_STORAGE_KEY);
+    key = runtimeStorage?.['getItem']?.(SEGMENT_RETAKE_MODEL_PREFERENCE_STORAGE_KEY);
   } catch {}
-  return normalizeSupportedModelId(_0x2b55f9) || SEGMENT_RETAKE_DEFAULT_MODEL_ID;
+  return normalizeSupportedModelId(key) || SEGMENT_RETAKE_DEFAULT_MODEL_ID;
 }
-export function rememberSegmentRetakeModelSelection(_0x77378d, _0x1906e9, _0x15a44a = getRuntimeStorage()) {
-  if (!isSegmentRetakeEditing(_0x77378d)) return '';
-  const _0x49a628 = normalizeSupportedModelId(_0x1906e9);
-  if (!_0x49a628) return '';
+export function rememberSegmentRetakeModelSelection(index, result, runtimeStorage2 = getRuntimeStorage()) {
+  if (!isSegmentRetakeEditing(index)) return '';
+  const supportedModelId = normalizeSupportedModelId(result);
+  if (!supportedModelId) return '';
   try {
-    _0x15a44a?.['setItem']?.(SEGMENT_RETAKE_MODEL_PREFERENCE_STORAGE_KEY, _0x49a628);
+    runtimeStorage2?.['setItem']?.(SEGMENT_RETAKE_MODEL_PREFERENCE_STORAGE_KEY, supportedModelId);
   } catch {}
-  return _0x49a628;
+  return supportedModelId;
 }

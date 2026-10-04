@@ -1,28 +1,28 @@
 import { getMediaElementCurrentSource } from '../services/desktopMediaBlobSource.js';
-export function resolveNodeVideoElement(_0x521b27, _0x1b010a = 0x0) {
-  if (!_0x521b27) return null;
-  const _0x48d089 = Array['from'](_0x521b27['querySelectorAll']('video')),
-    _0x567373 = Math['max'](0x0, Math['trunc'](Number(_0x1b010a) || 0x0));
-  let _0x460e06 = null,
-    _0x3cb6f7 = null,
-    _0x51cdf9 = null;
-  for (const _0x5e9943 of _0x48d089) {
-    if (!_0x5e9943) continue;
-    const _0x4122b6 = Number(_0x5e9943['dataset']?.['idx']),
-      _0x5cef6e =
-        _0x5e9943['classList']?.['contains']?.('video-player') === !![] ||
-        (Number['isFinite'](_0x4122b6) && _0x4122b6 === _0x567373),
-      _0x16afef = getMediaElementCurrentSource(_0x5e9943);
-    if (_0x5cef6e && !_0x51cdf9) _0x51cdf9 = _0x5e9943;
-    if (_0x16afef && (!_0x3cb6f7 || _0x5cef6e)) _0x3cb6f7 = _0x5e9943;
-    const _0x49c8f3 = window['getComputedStyle'](_0x5e9943);
-    if (_0x49c8f3['display'] === 'none' || _0x49c8f3['visibility'] === 'hidden') continue;
-    const _0x8b980d = Number(_0x49c8f3['opacity']);
-    if (Number['isFinite'](_0x8b980d) && _0x8b980d <= 0x0) continue;
-    const _0x2c815b = _0x5e9943['getBoundingClientRect']();
-    if (!_0x2c815b['width'] || !_0x2c815b['height']) continue;
-    if (!_0x460e06) _0x460e06 = _0x5e9943;
-    if (_0x16afef) return _0x5e9943;
+export function resolveNodeVideoElement(el, value = 0x0) {
+  if (!el) return null;
+  const item = Array['from'](el['querySelectorAll']('video')),
+    key = Math['max'](0x0, Math['trunc'](Number(value) || 0x0));
+  let enabled = null,
+    enabled2 = null,
+    enabled3 = null;
+  for (const el2 of item) {
+    if (!el2) continue;
+    const index = Number(el2['dataset']?.['idx']),
+      result =
+        el2['classList']?.['contains']?.('video-player') === !![] ||
+        (Number['isFinite'](index) && index === key),
+      mediaElementCurrentSource = getMediaElementCurrentSource(el2);
+    if (result && !enabled3) enabled3 = el2;
+    if (mediaElementCurrentSource && (!enabled2 || result)) enabled2 = el2;
+    const data = window['getComputedStyle'](el2);
+    if (data['display'] === 'none' || data['visibility'] === 'hidden') continue;
+    const count = Number(data['opacity']);
+    if (Number['isFinite'](count) && count <= 0x0) continue;
+    const box = el2['getBoundingClientRect']();
+    if (!box['width'] || !box['height']) continue;
+    if (!enabled) enabled = el2;
+    if (mediaElementCurrentSource) return el2;
   }
-  return _0x3cb6f7 || _0x51cdf9 || _0x460e06 || _0x48d089[0x0] || null;
+  return enabled2 || enabled3 || enabled || item[0x0] || null;
 }

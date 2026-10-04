@@ -1,33 +1,33 @@
 import { createMissingModelCredentialError } from '../../services/modelGenerationReadiness.js';
 import { guardModelGenerationCredentials } from '../modelCredentialUi.js';
-function buildStoryModelCredentialOptions(_0x2d3b79 = {}) {
+function buildStoryModelCredentialOptions(modelId = {}) {
   return {
-    modelId: _0x2d3b79['model'] || _0x2d3b79['modelId'],
-    provider: _0x2d3b79['provider'],
-    providerProfileId: _0x2d3b79['providerProfileId'] || _0x2d3b79['rhProviderProfileId'],
-    adapterType: _0x2d3b79['adapterType'],
-    payload: _0x2d3b79,
+    modelId: modelId['model'] || modelId['modelId'],
+    provider: modelId['provider'],
+    providerProfileId: modelId['providerProfileId'] || modelId['rhProviderProfileId'],
+    adapterType: modelId['adapterType'],
+    payload: modelId,
   };
 }
 export async function requireStoryModelCredentials(
-  _0x2dbbcf = {},
+  options = {},
   {
     guardCredentials: guardCredentials = guardModelGenerationCredentials,
     createCredentialError: createCredentialError = createMissingModelCredentialError,
   } = {},
 ) {
-  const _0x1ab87d = await guardCredentials({
-    ...buildStoryModelCredentialOptions(_0x2dbbcf),
+  const guardCredentials2 = await guardCredentials({
+    ...buildStoryModelCredentialOptions(options),
     waitForConfig: !![],
   });
-  if (_0x1ab87d?.['ready'] !== ![]) return _0x1ab87d;
-  const _0x3cb819 = createCredentialError(_0x1ab87d);
-  _0x3cb819['credentialPromptShown'] = !![];
-  throw _0x3cb819;
+  if (guardCredentials2?.['ready'] !== ![]) return guardCredentials2;
+  const credentialError = createCredentialError(guardCredentials2);
+  credentialError['credentialPromptShown'] = !![];
+  throw credentialError;
 }
-export function guardStoryModelTaskCredentials(_0x36dc69, _0x317427) {
-  if (typeof _0x36dc69 !== 'function') return _0x36dc69;
-  return async (_0x1de6a7 = {}, ..._0x393a23) => {
-    return (await requireStoryModelCredentials(_0x1de6a7, _0x317427), _0x36dc69(_0x1de6a7, ..._0x393a23));
+export function guardStoryModelTaskCredentials(handler, value) {
+  if (typeof handler !== 'function') return handler;
+  return async (options2 = {}, ...args) => {
+    return (await requireStoryModelCredentials(options2, value), handler(options2, ...args));
   };
 }

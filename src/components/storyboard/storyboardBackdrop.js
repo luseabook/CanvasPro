@@ -1,13 +1,13 @@
-export function createStoryboardBackdropImage(_0x6c78a3) {
-  if (!_0x6c78a3) return null;
-  const _0x1aae0b = document.createElement('img');
+export function createStoryboardBackdropImage(enabled) {
+  if (!enabled) return null;
+  const el = document.createElement('img');
   return (
-    (_0x1aae0b.className = 'storyboard-source-backdrop'),
-    _0x1aae0b.setAttribute('src', _0x6c78a3),
-    _0x1aae0b.setAttribute('aria-hidden', 'true'),
-    (_0x1aae0b.decoding = 'async'),
-    (_0x1aae0b.loading = 'eager'),
-    Object.assign(_0x1aae0b.style, {
+    (el.className = 'storyboard-source-backdrop'),
+    el.setAttribute('src', enabled),
+    el.setAttribute('aria-hidden', 'true'),
+    (el.decoding = 'async'),
+    (el.loading = 'eager'),
+    Object.assign(el.style, {
       position: 'absolute',
       inset: '0',
       width: '100%',
@@ -17,25 +17,24 @@ export function createStoryboardBackdropImage(_0x6c78a3) {
       pointerEvents: 'none',
       zIndex: '0',
     }),
-    _0x1aae0b
+    el
   );
 }
 export function syncStoryboardBackdropImage({
-  container: _0x52cc4e,
-  grid: _0x4e47b6,
-  backdropEl: _0x45e064,
-  nextUrl: _0x1d326f,
+  container: container,
+  grid: grid,
+  backdropEl: backdropEl,
+  nextUrl: nextUrl,
 } = {}) {
-  if (!_0x52cc4e) return _0x45e064 || null;
-  let _0x5f08a3 = _0x45e064 || _0x52cc4e.querySelector?.('.storyboard-source-backdrop') || null;
-  if (!_0x1d326f) return (_0x5f08a3?.remove?.(), null);
-  if (!_0x5f08a3) {
-    _0x5f08a3 = createStoryboardBackdropImage(_0x1d326f);
-    const _0x4a8774 =
-      _0x4e47b6 && _0x4e47b6.parentNode === _0x52cc4e ? _0x4e47b6 : _0x52cc4e.firstElementChild || null;
-    typeof _0x52cc4e.insertBefore === 'function' && _0x4a8774
-      ? _0x52cc4e.insertBefore(_0x5f08a3, _0x4a8774)
-      : _0x52cc4e.appendChild(_0x5f08a3);
-  } else _0x5f08a3.getAttribute('src') !== _0x1d326f && _0x5f08a3.setAttribute('src', _0x1d326f);
-  return _0x5f08a3;
+  if (!container) return backdropEl || null;
+  let el2 = backdropEl || container.querySelector?.('.storyboard-source-backdrop') || null;
+  if (!nextUrl) return (el2?.remove?.(), null);
+  if (!el2) {
+    el2 = createStoryboardBackdropImage(nextUrl);
+    const value = grid && grid.parentNode === container ? grid : container.firstElementChild || null;
+    typeof container.insertBefore === 'function' && value
+      ? container.insertBefore(el2, value)
+      : container.appendChild(el2);
+  } else el2.getAttribute('src') !== nextUrl && el2.setAttribute('src', nextUrl);
+  return el2;
 }

@@ -31,23 +31,22 @@ const GRAPH_STATE_KEYS = Object.freeze([
     'workflows',
     'workflowUi',
   ]);
-function pickStateKeys(_0x2d9ef3, _0x24d01a) {
-  if (!_0x2d9ef3 || typeof _0x2d9ef3 !== 'object') return {};
-  const _0x260614 = {};
-  for (const _0x4c9194 of _0x24d01a) {
-    Object.prototype.hasOwnProperty.call(_0x2d9ef3, _0x4c9194) &&
-      (_0x260614[_0x4c9194] = _0x2d9ef3[_0x4c9194]);
+function pickStateKeys(enabled, value) {
+  if (!enabled || typeof enabled !== 'object') return {};
+  const item = {};
+  for (const key of value) {
+    Object.prototype.hasOwnProperty.call(enabled, key) && (item[key] = enabled[key]);
   }
-  return _0x260614;
+  return item;
 }
-function selectGraphState(_0x3e27f8) {
-  return pickStateKeys(_0x3e27f8, GRAPH_STATE_KEYS);
+function selectGraphState(index) {
+  return pickStateKeys(index, GRAPH_STATE_KEYS);
 }
-function selectUiState(_0x301c21) {
-  return pickStateKeys(_0x301c21, UI_STATE_KEYS);
+function selectUiState(result) {
+  return pickStateKeys(result, UI_STATE_KEYS);
 }
-function selectWorkspaceState(_0xceec13) {
-  return pickStateKeys(_0xceec13, WORKSPACE_STATE_KEYS);
+function selectWorkspaceState(data) {
+  return pickStateKeys(data, WORKSPACE_STATE_KEYS);
 }
 export {
   GRAPH_STATE_KEYS,

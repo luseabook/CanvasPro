@@ -1,1 +1,34 @@
-import{stripFlowSubtitleOverlays}from'./videoReplicationFlowPrompt.js';const compact=_0x4c613a=>String(_0x4c613a||'')["replace"](/[\p{P}\p{Z}\s]/gu,'');export function separateReplicationGeneratedFields(_0x5b700e,_0x1d2891){const _0x4ae57e=compact(_0x1d2891),_0x3b5a55=_0x46ee43=>String(_0x46ee43||'')["replace"](/([：:]\s*)[“「"]([^”」"\n]+)[”」"]/gu,(_0x5aaab2,_0x2a817b,_0x184a27,_0x49101c,_0x1812d3)=>{const _0x2f53e5=_0x1812d3["slice"](0x0,_0x49101c)["split"](/[。；;\n]/u)['at'](-0x1);if(/招牌|告示|纸上|纸条|屏幕|字幕|标题|文案|品牌|包装|标识|logo|手机.*显示|文字|写着|写有|标着|印着/iu["test"](_0x2f53e5))return _0x5aaab2;const _0x5b2aec=compact(_0x184a27);if(_0x5b2aec["length"]<0x4||!_0x4ae57e["includes"](_0x5b2aec))return _0x5aaab2;return/^[，,。！？；;]/u["test"](_0x1812d3["slice"](_0x49101c+_0x5aaab2["length"])["trim"]())?'':'。';})['replace'](/([。！？])\1+/gu,'$1'),_0x391bc8=stripFlowSubtitleOverlays(_0x3b5a55(_0x5b700e["camera"]));let _0x18c863=stripFlowSubtitleOverlays(_0x3b5a55(_0x5b700e["visual"]));const _0x18836b=_0x18c863["match"](/[^。\n]+[。\n]?/gu)||[],_0x5cccc4=_0x18836b['at'](-0x1);return _0x18836b['length']>0x1&&!/[“”「」"]/u["test"](_0x5cccc4)&&compact(_0x5cccc4)&&compact(_0x5cccc4)===compact(_0x391bc8)&&(_0x18c863=_0x18836b["slice"](0x0,-0x1)["join"]('')['trim']()),{..._0x5b700e,'visual':_0x18c863,'camera':_0x391bc8};}
+import { stripFlowSubtitleOverlays } from './videoReplicationFlowPrompt.js';
+const compact = (value) => String(value || '')['replace'](/[\p{P}\p{Z}\s]/gu, '');
+export function separateReplicationGeneratedFields(args, item) {
+  const compact2 = compact(item),
+    handler = (key) =>
+      String(key || '')
+        ['replace'](/([：:]\s*)[“「"]([^”」"\n]+)[”」"]/gu, (index, result, data, options, target) => {
+          const source = target['slice'](0x0, options)
+            ['split'](/[。；;\n]/u)
+            ['at'](-0x1);
+          if (
+            /招牌|告示|纸上|纸条|屏幕|字幕|标题|文案|品牌|包装|标识|logo|手机.*显示|文字|写着|写有|标着|印着/iu[
+              'test'
+            ](source)
+          )
+            return index;
+          const compact3 = compact(data);
+          if (compact3['length'] < 0x4 || !compact2['includes'](compact3)) return index;
+          return /^[，,。！？；;]/u['test'](target['slice'](options + index['length'])['trim']()) ? '' : '。';
+        })
+        ['replace'](/([。！？])\1+/gu, '$1'),
+    stripFlowSubtitleOverlays2 = stripFlowSubtitleOverlays(handler(args['camera']));
+  let stripFlowSubtitleOverlays3 = stripFlowSubtitleOverlays(handler(args['visual']));
+  const list = stripFlowSubtitleOverlays3['match'](/[^。\n]+[。\n]?/gu) || [],
+    next = list['at'](-0x1);
+  return (
+    list['length'] > 0x1 &&
+      !/[“”「」"]/u['test'](next) &&
+      compact(next) &&
+      compact(next) === compact(stripFlowSubtitleOverlays2) &&
+      (stripFlowSubtitleOverlays3 = list['slice'](0x0, -0x1)['join']('')['trim']()),
+    { ...args, visual: stripFlowSubtitleOverlays3, camera: stripFlowSubtitleOverlays2 }
+  );
+}

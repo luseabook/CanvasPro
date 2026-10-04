@@ -11,17 +11,17 @@ export const RUNNINGHUB_INSTANCE_TYPE_ALLOWED_VALUES = Object['freeze']([
   RUNNINGHUB_PLUS_INSTANCE_TYPE,
   RUNNINGHUB_ULTRA_INSTANCE_TYPE,
 ]);
-export function normalizeRunningHubInstanceType(_0x500c51) {
-  const _0x51b39c = String(_0x500c51 || '')
+export function normalizeRunningHubInstanceType(value) {
+  const item = String(value || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x51b39c === RUNNINGHUB_PLUS_INSTANCE_TYPE) return RUNNINGHUB_PLUS_INSTANCE_TYPE;
-  if (_0x51b39c === RUNNINGHUB_ULTRA_INSTANCE_TYPE['toLowerCase']()) return RUNNINGHUB_ULTRA_INSTANCE_TYPE;
+  if (item === RUNNINGHUB_PLUS_INSTANCE_TYPE) return RUNNINGHUB_PLUS_INSTANCE_TYPE;
+  if (item === RUNNINGHUB_ULTRA_INSTANCE_TYPE['toLowerCase']()) return RUNNINGHUB_ULTRA_INSTANCE_TYPE;
   return RUNNINGHUB_DEFAULT_INSTANCE_TYPE;
 }
-export function getRunningHubInstanceTypeLabel(_0x288ddf) {
-  const _0x4e08f8 = normalizeRunningHubInstanceType(_0x288ddf);
-  if (_0x4e08f8 === RUNNINGHUB_ULTRA_INSTANCE_TYPE) return '84G';
-  if (_0x4e08f8 === RUNNINGHUB_PLUS_INSTANCE_TYPE) return '48G';
+export function getRunningHubInstanceTypeLabel(key) {
+  const runningHubInstanceType = normalizeRunningHubInstanceType(key);
+  if (runningHubInstanceType === RUNNINGHUB_ULTRA_INSTANCE_TYPE) return '84G';
+  if (runningHubInstanceType === RUNNINGHUB_PLUS_INSTANCE_TYPE) return '48G';
   return '24G';
 }

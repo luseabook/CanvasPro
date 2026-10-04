@@ -1,1 +1,41 @@
-import{openSettingsPanelToField}from'./settings/panelSettings.js';const CLI_LOGIN_ACTION_LABEL="去设置",CLI_LOGIN_SETTINGS_TARGETS=Object["freeze"]({'dreamina':Object["freeze"]({'paneName':"cli-login",'fieldIds':Object["freeze"](['btnDreaminaAuth',"dreaminaSettingsCard"])}),'codex':Object['freeze']({'paneName':'cli-login','fieldIds':Object["freeze"](["btnCodexCliLogin","codexCliSettingsCard"])})});function normalizeProviderId(_0x816138){return String(_0x816138||'')["trim"]()["toLowerCase"]();}export function openCliLoginSettings(_0x4ca50e={}){const _0x48f4f8=normalizeProviderId(_0x4ca50e["providerId"]||_0x4ca50e['provider']),_0x4f0dac=CLI_LOGIN_SETTINGS_TARGETS[_0x48f4f8],_0x4bea73=Array["isArray"](_0x4ca50e["fieldIds"])?_0x4ca50e["fieldIds"]:_0x4f0dac?.['fieldIds']||[];return openSettingsPanelToField({'paneName':_0x4ca50e["paneName"]||_0x4f0dac?.["paneName"]||"cli-login",'fieldIds':_0x4bea73,'select':![],'highlight':!![]});}export function showCliLoginMissingToast(_0x4640f2,_0x54358c={}){const _0x139dba=String(_0x4640f2||'')['trim']()||"请先完成 CLI 登录",_0x391a01=()=>openCliLoginSettings(_0x54358c),_0x4dc7ae=globalThis["window"]?.["showToast"];if(typeof _0x4dc7ae!=="function")return _0x391a01(),!![];return _0x4dc7ae(_0x139dba,_0x54358c["type"]||'warn',_0x54358c["duration"],{'actionLabel':_0x54358c["actionLabel"]||CLI_LOGIN_ACTION_LABEL,'onAction':_0x391a01}),!![];}
+import { openSettingsPanelToField } from './settings/panelSettings.js';
+const CLI_LOGIN_ACTION_LABEL = '去设置',
+  CLI_LOGIN_SETTINGS_TARGETS = Object['freeze']({
+    dreamina: Object['freeze']({
+      paneName: 'cli-login',
+      fieldIds: Object['freeze'](['btnDreaminaAuth', 'dreaminaSettingsCard']),
+    }),
+    codex: Object['freeze']({
+      paneName: 'cli-login',
+      fieldIds: Object['freeze'](['btnCodexCliLogin', 'codexCliSettingsCard']),
+    }),
+  });
+function normalizeProviderId(value) {
+  return String(value || '')
+    ['trim']()
+    ['toLowerCase']();
+}
+export function openCliLoginSettings(options = {}) {
+  const providerId = normalizeProviderId(options['providerId'] || options['provider']),
+    item = CLI_LOGIN_SETTINGS_TARGETS[providerId],
+    key = Array['isArray'](options['fieldIds']) ? options['fieldIds'] : item?.['fieldIds'] || [];
+  return openSettingsPanelToField({
+    paneName: options['paneName'] || item?.['paneName'] || 'cli-login',
+    fieldIds: key,
+    select: ![],
+    highlight: !![],
+  });
+}
+export function showCliLoginMissingToast(index, result = {}) {
+  const data = String(index || '')['trim']() || '请先完成 CLI 登录',
+    handler = () => openCliLoginSettings(result),
+    handler2 = globalThis['window']?.['showToast'];
+  if (typeof handler2 !== 'function') return (handler(), !![]);
+  return (
+    handler2(data, result['type'] || 'warn', result['duration'], {
+      actionLabel: result['actionLabel'] || CLI_LOGIN_ACTION_LABEL,
+      onAction: handler,
+    }),
+    !![]
+  );
+}

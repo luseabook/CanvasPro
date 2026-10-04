@@ -1,22 +1,22 @@
 import { localPathToUrl } from '../utils/localMediaPath.js';
 const STILL_IMAGE = /\.(?:png|jpe?g|webp|avif|bmp)$/i;
-export function resolveTaskCenterThumbnail(_0x317ec6, _0x3417b9 = '') {
-  if (!_0x317ec6 || typeof _0x317ec6 !== 'object') return null;
-  const _0xe5dbb1 = ['images', 'videos', 'audios']['find'](
-      (_0x86424a) => Array['isArray'](_0x317ec6[_0x86424a]) && _0x317ec6[_0x86424a]['length'],
+export function resolveTaskCenterThumbnail(enabled, value = '') {
+  if (!enabled || typeof enabled !== 'object') return null;
+  const item = ['images', 'videos', 'audios']['find'](
+      (key) => Array['isArray'](enabled[key]) && enabled[key]['length'],
     ),
-    _0xd85861 = _0xe5dbb1 ? _0x317ec6[_0xe5dbb1] : [_0x317ec6],
-    _0x161b01 = _0xd85861[0x0] || {},
-    _0x2884d2 = _0xe5dbb1
-      ? { images: 'image', videos: 'video', audios: 'audio' }[_0xe5dbb1]
-      : /video/['test'](_0x3417b9)
+    count = item ? enabled[item] : [enabled],
+    index = count[0x0] || {},
+    kind = item
+      ? { images: 'image', videos: 'video', audios: 'audio' }[item]
+      : /video/['test'](value)
         ? 'video'
-        : /audio/['test'](_0x3417b9)
+        : /audio/['test'](value)
           ? 'audio'
-          : /image|appearance/['test'](_0x3417b9)
+          : /image|appearance/['test'](value)
             ? 'image'
             : 'text',
-    _0x1f5be5 = [
+    list = [
       'thumbLocalPath',
       'thumbnailLocalPath',
       'posterLocalPath',
@@ -26,9 +26,8 @@ export function resolveTaskCenterThumbnail(_0x317ec6, _0x3417b9 = '') {
       'posterUrl',
       'coverUrl',
     ],
-    _0x532428 =
-      _0x1f5be5['map']((_0x44ae31) => localPathToUrl(_0x161b01[_0x44ae31]))['find']((_0x3021f6) =>
-        STILL_IMAGE['test'](_0x3021f6),
-      ) || '';
-  return { src: _0x532428, kind: _0x2884d2, count: _0xd85861['length'] };
+    src =
+      list['map']((result) => localPathToUrl(index[result]))['find']((data) => STILL_IMAGE['test'](data)) ||
+      '';
+  return { src: src, kind: kind, count: count['length'] };
 }

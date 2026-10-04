@@ -24,7 +24,7 @@ export const MINIMAX_MODEL_API_PROFILES = Object['freeze']({
     apiUrl: 'https://api.minimax.io',
   }),
 });
-export function getMinimaxModelApiProfile(_0x1a4fb8) {
-  const _0x28518c = String(_0x1a4fb8 || '')['trim']();
-  return MINIMAX_MODEL_API_PROFILES[_0x28518c] || MINIMAX_MODEL_API_PROFILES[MINIMAX_DOMESTIC_PROFILE_ID];
+export function getMinimaxModelApiProfile(value) {
+  const item = String(value || '')['trim']();
+  return MINIMAX_MODEL_API_PROFILES[item] || MINIMAX_MODEL_API_PROFILES[MINIMAX_DOMESTIC_PROFILE_ID];
 }

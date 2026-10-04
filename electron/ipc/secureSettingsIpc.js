@@ -1,32 +1,32 @@
 export function registerSecureSettingsIpcHandlers({
-  ipcMain: _0x2f8fef,
-  getSecureSettingsStore: _0x542eb3,
-  normalizeSecureSettingsKeys: _0x7198d4,
+  ipcMain: ipcMain,
+  getSecureSettingsStore: getSecureSettingsStore,
+  normalizeSecureSettingsKeys: normalizeSecureSettingsKeys,
 }) {
-  (_0x2f8fef.handle('secureSettings:get', (_0x5b74d9, _0x2fe360 = {}) => {
-    const _0x629566 = _0x542eb3(),
-      _0x5234e4 = _0x629566.isAvailable(),
-      _0x2f518d = _0x7198d4(_0x2fe360);
-    return { ok: true, available: _0x5234e4, values: _0x5234e4 ? _0x629566.getMany(_0x2f518d) : {} };
+  (ipcMain.handle('secureSettings:get', (value, item = {}) => {
+    const key = getSecureSettingsStore(),
+      available = key.isAvailable(),
+      index = normalizeSecureSettingsKeys(item);
+    return { ok: true, available: available, values: available ? key.getMany(index) : {} };
   }),
-    _0x2f8fef.handle('secureSettings:set', (_0x5c9d75, _0x20bfbc = {}) => {
-      const _0x56eddc = _0x542eb3(),
-        _0x5bba7b = _0x56eddc.isAvailable();
-      if (!_0x5bba7b) return { ok: false, available: _0x5bba7b, error: '安全存储不可用' };
+    ipcMain.handle('secureSettings:set', (result, el = {}) => {
+      const map = getSecureSettingsStore(),
+        available2 = map.isAvailable();
+      if (!available2) return { ok: false, available: available2, error: '安全存储不可用' };
       try {
-        return (_0x56eddc.set(_0x20bfbc?.key, _0x20bfbc?.value), { ok: true, available: _0x5bba7b });
-      } catch (_0x2a60d8) {
-        return { ok: false, available: _0x5bba7b, error: String(_0x2a60d8?.message || _0x2a60d8) };
+        return (map.set(el?.key, el?.value), { ok: true, available: available2 });
+      } catch (error) {
+        return { ok: false, available: available2, error: String(error?.message || error) };
       }
     }),
-    _0x2f8fef.handle('secureSettings:delete', (_0x4d3829, _0x4a9160 = {}) => {
-      const _0x483515 = _0x542eb3(),
-        _0x5d2599 = _0x483515.isAvailable();
-      if (!_0x5d2599) return { ok: false, available: _0x5d2599, error: '安全存储不可用' };
+    ipcMain.handle('secureSettings:delete', (data, event = {}) => {
+      const map2 = getSecureSettingsStore(),
+        available3 = map2.isAvailable();
+      if (!available3) return { ok: false, available: available3, error: '安全存储不可用' };
       try {
-        return (_0x483515.delete(_0x4a9160?.key), { ok: true, available: _0x5d2599 });
-      } catch (_0x511951) {
-        return { ok: false, available: _0x5d2599, error: String(_0x511951?.message || _0x511951) };
+        return (map2.delete(event?.key), { ok: true, available: available3 });
+      } catch (error2) {
+        return { ok: false, available: available3, error: String(error2?.message || error2) };
       }
     }));
 }

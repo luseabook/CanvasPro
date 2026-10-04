@@ -1,12 +1,13 @@
 import { resolveModelProvider, sanitizeModelUiSchemaParams } from '../../manifests/index.js';
-function normalizeText(_0x3358a7) {
-  return String(_0x3358a7 ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-export function normalizeCharacterAssetImageGenerationParams(_0x4da8ce, _0x558f3c = {}) {
-  const _0x1dd84a = sanitizeModelUiSchemaParams(_0x4da8ce, _0x558f3c, { includeDefaults: !![] });
+export function normalizeCharacterAssetImageGenerationParams(item, key = {}) {
+  const sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(item, key, { includeDefaults: !![] });
   return (
-    Object['prototype']['hasOwnProperty']['call'](_0x1dd84a, 'batchSize') && (_0x1dd84a['batchSize'] = 0x1),
-    _0x1dd84a
+    Object['prototype']['hasOwnProperty']['call'](sanitizeModelUiSchemaParams2, 'batchSize') &&
+      (sanitizeModelUiSchemaParams2['batchSize'] = 0x1),
+    sanitizeModelUiSchemaParams2
   );
 }
 export function buildCharacterAssetImageGenerationPayload({
@@ -17,11 +18,11 @@ export function buildCharacterAssetImageGenerationPayload({
   generationParams: generationParams = {},
   referenceImageUrls: referenceImageUrls = [],
 } = {}) {
-  const _0x36911b = normalizeText(modelId),
-    _0x11e599 = normalizeCharacterAssetImageGenerationParams(_0x36911b, generationParams);
+  const model = normalizeText(modelId),
+    generationParams2 = normalizeCharacterAssetImageGenerationParams(model, generationParams);
   return {
-    model: _0x36911b,
-    provider: resolveModelProvider(_0x36911b, provider),
+    model: model,
+    provider: resolveModelProvider(model, provider),
     ...(normalizeText(providerProfileId) ? { providerProfileId: normalizeText(providerProfileId) } : {}),
     prompt: normalizeText(prompt),
     inputUrls: [
@@ -31,9 +32,9 @@ export function buildCharacterAssetImageGenerationPayload({
           ['filter'](Boolean),
       ),
     ],
-    generationParams: _0x11e599,
-    aspectRatio: _0x11e599['aspectRatio'] || '1:1',
-    imageSize: _0x11e599['imageSize'] || '2K',
+    generationParams: generationParams2,
+    aspectRatio: generationParams2['aspectRatio'] || '1:1',
+    imageSize: generationParams2['imageSize'] || '2K',
     batchSize: 0x1,
   };
 }

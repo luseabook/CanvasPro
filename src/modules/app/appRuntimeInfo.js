@@ -13,24 +13,24 @@ export function publishAppRuntimeInfo({
       windowObject['dispatchEvent'](new EventCtor('aicanvas:runtime-info', { detail: runtimeInfo })));
 }
 export async function initAppRuntimeInfo({
-  fetchAppRuntimeInfo: _0x2d902f,
-  initDevEntries: _0x4d1a36,
+  fetchAppRuntimeInfo: fetchAppRuntimeInfo,
+  initDevEntries: initDevEntries,
   windowObject: windowObject = globalThis['window'],
   EventCtor: EventCtor = globalThis['CustomEvent'],
 } = {}) {
   try {
-    const _0xefd17e = await _0x2d902f?.();
+    const runtimeInfo2 = await fetchAppRuntimeInfo?.();
     return (
-      publishAppRuntimeInfo({ runtimeInfo: _0xefd17e, windowObject: windowObject, EventCtor: EventCtor }),
-      _0x4d1a36?.({ isDevBuild: Boolean(_0xefd17e?.['isDevBuild']) }),
-      _0xefd17e
+      publishAppRuntimeInfo({ runtimeInfo: runtimeInfo2, windowObject: windowObject, EventCtor: EventCtor }),
+      initDevEntries?.({ isDevBuild: Boolean(runtimeInfo2?.['isDevBuild']) }),
+      runtimeInfo2
     );
-  } catch (_0xcc0209) {
-    const _0x35939a = { isDevBuild: ![], isAdvancedMode: ![] };
+  } catch (value) {
+    const runtimeInfo3 = { isDevBuild: ![], isAdvancedMode: ![] };
     return (
-      publishAppRuntimeInfo({ runtimeInfo: _0x35939a, windowObject: windowObject, EventCtor: EventCtor }),
-      _0x4d1a36?.({ isDevBuild: ![] }),
-      _0x35939a
+      publishAppRuntimeInfo({ runtimeInfo: runtimeInfo3, windowObject: windowObject, EventCtor: EventCtor }),
+      initDevEntries?.({ isDevBuild: ![] }),
+      runtimeInfo3
     );
   }
 }
