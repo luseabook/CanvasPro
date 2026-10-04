@@ -2,46 +2,46 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { __desktopMediaWakeServiceForTest, initDesktopMediaWakeService } from './desktopMediaWakeService.js';
 class FakeCustomEvent {
-  constructor(_0x499e81, _0x34b3c2 = {}) {
-    ((this.type = _0x499e81), (this.detail = _0x34b3c2.detail));
+  constructor(value, item = {}) {
+    ((this.type = value), (this.detail = item.detail));
   }
 }
 (test('desktop media wake: init emits wake notifications without media source resets', () => {
-  const _0x5cd299 = globalThis.window,
-    _0x3d8364 = globalThis.document,
-    _0x209bb1 = globalThis.CustomEvent,
-    _0xaa9932 = new Map(),
-    _0x346311 = new Map(),
-    _0x3bb8e6 = [];
+  const key = globalThis.window,
+    index = globalThis.document,
+    result = globalThis.CustomEvent,
+    map = new Map(),
+    map2 = new Map(),
+    list = [];
   try {
     ((globalThis.CustomEvent = FakeCustomEvent),
       (globalThis.window = {
         electronAPI: {},
-        addEventListener(_0x49af19, _0x5bf94e) {
-          _0xaa9932.set(_0x49af19, _0x5bf94e);
+        addEventListener(data, options) {
+          map.set(data, options);
         },
-        dispatchEvent(_0x1308ee) {
-          _0x3bb8e6.push(_0x1308ee);
+        dispatchEvent(target) {
+          list.push(target);
         },
       }),
       (globalThis.document = {
         visibilityState: 'visible',
-        addEventListener(_0x3e9447, _0x41e6a5) {
-          _0x346311.set(_0x3e9447, _0x41e6a5);
+        addEventListener(source, next) {
+          map2.set(source, next);
         },
       }),
       initDesktopMediaWakeService(),
-      assert.deepEqual([..._0xaa9932.keys()].sort(), ['focus', 'pageshow']),
-      assert.deepEqual([..._0x346311.keys()], ['visibilitychange']),
-      assert.equal(_0xaa9932.has('pause'), false),
-      assert.equal(_0xaa9932.has('pointerover'), false),
-      assert.equal(_0x346311.has('pause'), false),
-      assert.equal(_0x346311.has('pointerover'), false),
-      _0xaa9932.get('focus')(),
-      _0xaa9932.get('pageshow')(),
-      _0x346311.get('visibilitychange')(),
+      assert.deepEqual([...map.keys()].sort(), ['focus', 'pageshow']),
+      assert.deepEqual([...map2.keys()], ['visibilitychange']),
+      assert.equal(map.has('pause'), false),
+      assert.equal(map.has('pointerover'), false),
+      assert.equal(map2.has('pause'), false),
+      assert.equal(map2.has('pointerover'), false),
+      map.get('focus')(),
+      map.get('pageshow')(),
+      map2.get('visibilitychange')(),
       assert.deepEqual(
-        _0x3bb8e6.map((_0x5575da) => [_0x5575da.type, _0x5575da.detail.reason]),
+        list.map((item2) => [item2.type, item2.detail.reason]),
         [
           ['aicanvas:desktop-media-wake', 'focus'],
           ['aicanvas:desktop-media-wake', 'pageshow'],
@@ -49,33 +49,33 @@ class FakeCustomEvent {
         ],
       ));
   } finally {
-    if (typeof _0x5cd299 === 'undefined') delete globalThis.window;
-    else globalThis.window = _0x5cd299;
-    if (typeof _0x3d8364 === 'undefined') delete globalThis.document;
-    else globalThis.document = _0x3d8364;
-    if (typeof _0x209bb1 === 'undefined') delete globalThis.CustomEvent;
-    else globalThis.CustomEvent = _0x209bb1;
+    if (typeof key === 'undefined') delete globalThis.window;
+    else globalThis.window = key;
+    if (typeof index === 'undefined') delete globalThis.document;
+    else globalThis.document = index;
+    if (typeof result === 'undefined') delete globalThis.CustomEvent;
+    else globalThis.CustomEvent = result;
   }
 }),
   test('desktop media wake: direct notification carries reason', () => {
-    const _0x274ca1 = globalThis.window,
-      _0x2fe584 = globalThis.CustomEvent,
-      _0x2fae50 = [];
+    const current = globalThis.window,
+      entry = globalThis.CustomEvent,
+      list2 = [];
     try {
       ((globalThis.CustomEvent = FakeCustomEvent),
         (globalThis.window = {
-          dispatchEvent(_0x2f1663) {
-            _0x2fae50.push(_0x2f1663);
+          dispatchEvent(record) {
+            list2.push(record);
           },
         }),
         __desktopMediaWakeServiceForTest.dispatchRendererWake('manual'),
-        assert.equal(_0x2fae50.length, 1),
-        assert.equal(_0x2fae50[0].type, 'aicanvas:desktop-media-wake'),
-        assert.equal(_0x2fae50[0].detail.reason, 'manual'));
+        assert.equal(list2.length, 1),
+        assert.equal(list2[0].type, 'aicanvas:desktop-media-wake'),
+        assert.equal(list2[0].detail.reason, 'manual'));
     } finally {
-      if (typeof _0x274ca1 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x274ca1;
-      if (typeof _0x2fe584 === 'undefined') delete globalThis.CustomEvent;
-      else globalThis.CustomEvent = _0x2fe584;
+      if (typeof current === 'undefined') delete globalThis.window;
+      else globalThis.window = current;
+      if (typeof entry === 'undefined') delete globalThis.CustomEvent;
+      else globalThis.CustomEvent = entry;
     }
   }));

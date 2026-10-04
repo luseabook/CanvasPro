@@ -9,12 +9,12 @@ const originalFetch = globalThis.fetch;
   globalThis.fetch = originalFetch;
 }),
   test('storyboardVideoFrameApi posts normalized frame extraction options', async () => {
-    let _0x49ae12 = '',
-      _0x2b4caa = null;
-    globalThis.fetch = async (_0x2f0495, _0x854ce5 = {}) => {
+    let value = '',
+      item = null;
+    globalThis.fetch = async (key, dom = {}) => {
       return (
-        (_0x49ae12 = String(_0x2f0495)),
-        (_0x2b4caa = JSON.parse(String(_0x854ce5.body || '{}'))),
+        (value = String(key)),
+        (item = JSON.parse(String(dom.body || '{}'))),
         {
           ok: true,
           status: 200,
@@ -36,15 +36,21 @@ const originalFetch = globalThis.fetch;
         }
       );
     };
-    const _0x159333 = await extractStoryboardVideoFramesFromServer('/output/a.mp4', {
-      maxFrames: 101,
-      exactCount: true,
-    });
-    (assert.equal(_0x49ae12, '/api/v2/video/storyboard_frames'),
-      assert.equal(_0x2b4caa.src, '/output/a.mp4'),
-      assert.equal(_0x2b4caa.options.maxFrames, STORYBOARD_VIDEO_FRAME_LIMIT),
-      assert.equal(_0x2b4caa.options.exactCount, true),
-      assert.equal(_0x159333.frames[0].url, '/output/StoryboardFrames/a/frame_001.jpg'),
-      assert.equal(_0x159333.frames[0].start, 0),
-      assert.equal(_0x159333.frames[0].end, 10));
+    const extractStoryboardVideoFramesFromServer2 = await extractStoryboardVideoFramesFromServer(
+      '/output/a.mp4',
+      {
+        maxFrames: 101,
+        exactCount: true,
+      },
+    );
+    (assert.equal(value, '/api/v2/video/storyboard_frames'),
+      assert.equal(item.src, '/output/a.mp4'),
+      assert.equal(item.options.maxFrames, STORYBOARD_VIDEO_FRAME_LIMIT),
+      assert.equal(item.options.exactCount, true),
+      assert.equal(
+        extractStoryboardVideoFramesFromServer2.frames[0].url,
+        '/output/StoryboardFrames/a/frame_001.jpg',
+      ),
+      assert.equal(extractStoryboardVideoFramesFromServer2.frames[0].start, 0),
+      assert.equal(extractStoryboardVideoFramesFromServer2.frames[0].end, 10));
   }));

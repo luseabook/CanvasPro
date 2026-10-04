@@ -1,53 +1,53 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createLocalRuntimeKeepAliveController } from './localRuntimeKeepAlive.js';
-function createWindowStub(_0x218a0f = {}) {
-  return { isDestroyed: () => false, isMinimized: () => false, isVisible: () => true, ..._0x218a0f };
+function createWindowStub(args = {}) {
+  return { isDestroyed: () => false, isMinimized: () => false, isVisible: () => true, ...args };
 }
 (test('local runtime keep-alive pings visible Electron windows and uses app suspension blocker', async () => {
-  const _0x863e40 = [],
-    _0x2411d9 = [],
-    _0x553da0 = createLocalRuntimeKeepAliveController({
+  const list = [],
+    list2 = [],
+    localRuntimeKeepAliveController = createLocalRuntimeKeepAliveController({
       getWindow: () => createWindowStub(),
       intervalMs: 0xea60,
-      requestLocalJson: async (_0x2c3459, _0x34f4a7) => {
-        _0x863e40.push({ pathname: _0x2c3459, timeoutMs: _0x34f4a7 });
+      requestLocalJson: async (pathname, timeoutMs) => {
+        list.push({ pathname: pathname, timeoutMs: timeoutMs });
       },
-      setPowerSaveBlocker: (..._0x328b23) => _0x2411d9.push(_0x328b23),
+      setPowerSaveBlocker: (...args2) => list2.push(args2),
     });
-  (await _0x553da0.start('focus'),
-    _0x553da0.stop(),
-    assert.deepEqual(_0x863e40, [{ pathname: '/api/v2/runtime/info', timeoutMs: 0x3e8 }]),
-    assert.deepEqual(_0x2411d9[0], ['local-runtime-keepalive', true, 'prevent-app-suspension']),
-    assert.deepEqual(_0x2411d9.at(-1), ['local-runtime-keepalive', false]));
+  (await localRuntimeKeepAliveController.start('focus'),
+    localRuntimeKeepAliveController.stop(),
+    assert.deepEqual(list, [{ pathname: '/api/v2/runtime/info', timeoutMs: 0x3e8 }]),
+    assert.deepEqual(list2[0], ['local-runtime-keepalive', true, 'prevent-app-suspension']),
+    assert.deepEqual(list2.at(-1), ['local-runtime-keepalive', false]));
 }),
   test('local runtime keep-alive skips hidden or minimized windows', async () => {
-    const _0x4751e7 = [],
-      _0x43fe91 = [],
-      _0x5f2cb5 = createLocalRuntimeKeepAliveController({
+    const list3 = [],
+      list4 = [],
+      localRuntimeKeepAliveController2 = createLocalRuntimeKeepAliveController({
         getWindow: () => createWindowStub({ isMinimized: () => true }),
-        requestLocalJson: async () => _0x4751e7.push('ping'),
-        setPowerSaveBlocker: (..._0x4fe020) => _0x43fe91.push(_0x4fe020),
+        requestLocalJson: async () => list3.push('ping'),
+        setPowerSaveBlocker: (...args3) => list4.push(args3),
       }),
-      _0x337e2c = await _0x5f2cb5.start('minimized');
-    (assert.equal(_0x337e2c, false),
-      assert.deepEqual(_0x4751e7, []),
-      assert.deepEqual(_0x43fe91, [['local-runtime-keepalive', false]]));
+      value = await localRuntimeKeepAliveController2.start('minimized');
+    (assert.equal(value, false),
+      assert.deepEqual(list3, []),
+      assert.deepEqual(list4, [['local-runtime-keepalive', false]]));
   }),
   test('local runtime keep-alive logs failed warm pings without throwing', async () => {
-    const _0x364e33 = [],
-      _0x577e85 = createLocalRuntimeKeepAliveController({
+    const list5 = [],
+      localRuntimeKeepAliveController3 = createLocalRuntimeKeepAliveController({
         getWindow: () => createWindowStub(),
         intervalMs: 0xea60,
         requestLocalJson: async () => {
           throw new Error('offline');
         },
-        logDiagnosticEvent: (_0x35bc9c) => _0x364e33.push(_0x35bc9c),
+        logDiagnosticEvent: (item) => list5.push(item),
       }),
-      _0x11e943 = await _0x577e85.start('ready-to-show');
-    (_0x577e85.stop(),
-      assert.equal(_0x11e943, false),
-      assert.equal(_0x364e33.length, 1),
-      assert.equal(_0x364e33[0].type, 'local_runtime.keep_alive_failed'),
-      assert.deepEqual(_0x364e33[0].context, { reason: 'ready-to-show' }));
+      key = await localRuntimeKeepAliveController3.start('ready-to-show');
+    (localRuntimeKeepAliveController3.stop(),
+      assert.equal(key, false),
+      assert.equal(list5.length, 1),
+      assert.equal(list5[0].type, 'local_runtime.keep_alive_failed'),
+      assert.deepEqual(list5[0].context, { reason: 'ready-to-show' }));
   }));

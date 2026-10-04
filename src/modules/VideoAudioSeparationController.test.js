@@ -19,8 +19,8 @@ function installDomStubs() {
 function resetStore() {
   appStore.loadState({ nodes: {}, edges: {}, viewport: { x: 0, y: 0, zoom: 1 } });
 }
-function addSourceVideoNode(_0x246833 = {}) {
-  const _0x16dbd3 = buildSourceMediaNodePayload({
+function addSourceVideoNode(args = {}) {
+  const sourceMediaNodePayload = buildSourceMediaNodePayload({
     id: 'source-video-1',
     type: 'source-video',
     x: 10,
@@ -32,14 +32,12 @@ function addSourceVideoNode(_0x246833 = {}) {
     src: '/output/source-video-1.mp4',
     needsAutoResize: false,
     fixedSize: true,
-    ..._0x246833,
+    ...args,
   });
-  return (appStore.addNode(_0x16dbd3), _0x16dbd3.id);
+  return (appStore.addNode(sourceMediaNodePayload), sourceMediaNodePayload.id);
 }
 function getCreatedNodes() {
-  return Object.values(appStore.getState().nodes || {}).filter(
-    (_0x200e1c) => _0x200e1c.id !== 'source-video-1',
-  );
+  return Object.values(appStore.getState().nodes || {}).filter((item) => item.id !== 'source-video-1');
 }
 (test.beforeEach(() => {
   (installDomStubs(), resetStore(), __resetVideoAudioSeparationDepsForTest());
@@ -49,15 +47,15 @@ function getCreatedNodes() {
   }),
   test('VideoAudioSeparationController: 成功后创建无声视频和音频节点', async () => {
     addSourceVideoNode();
-    let _0x370899 = null,
-      _0x217701 = null;
-    ((globalThis.window.v2FocusOnNodes = (_0x348704) => {
-      _0x217701 = [..._0x348704];
+    let value = null,
+      key = null;
+    ((globalThis.window.v2FocusOnNodes = (args2) => {
+      key = [...args2];
     }),
       __setVideoAudioSeparationDepsForTest({
-        separateVideoAudioImpl: async (_0x2547b2) => {
+        separateVideoAudioImpl: async (index) => {
           return (
-            (_0x370899 = _0x2547b2),
+            (value = index),
             {
               success: true,
               video: {
@@ -74,48 +72,47 @@ function getCreatedNodes() {
           );
         },
       }));
-    const _0x119be9 = await runVideoAudioSeparationFromNode('source-video-1');
-    (assert.deepEqual(_0x370899, { src: 'output/source-video-1.mp4' }),
-      assert.ok(_0x119be9?.videoId),
-      assert.ok(_0x119be9?.audioId));
-    const _0x51ce6f = getCreatedNodes();
-    assert.equal(_0x51ce6f.length, 2);
-    const _0x478bc9 = _0x51ce6f.find((_0x2d2407) => _0x2d2407.type === 'source-video'),
-      _0x333eaa = _0x51ce6f.find((_0x3b6656) => _0x3b6656.type === 'source-audio');
-    (assert.ok(_0x478bc9),
-      assert.ok(_0x333eaa),
-      assert.equal(_0x478bc9.name, '画面自 原始视频'),
-      assert.equal(_0x478bc9.src, '/output/SeparateVideo/video_fixed.mp4'),
-      assert.equal(_0x478bc9.videoUrl, '/output/SeparateVideo/video_fixed.mp4'),
-      assert.equal(_0x478bc9.localPath, 'output/SeparateVideo/video_fixed.mp4'),
-      assert.equal(_0x478bc9.jobStatus, 'success'),
-      assert.equal(_0x478bc9.videos?.[0]?.localPath, 'output/SeparateVideo/video_fixed.mp4'),
-      assert.equal(_0x333eaa.name, '音频自 原始视频'),
-      assert.equal(_0x333eaa.src, '/output/SeparateAudio/audio_fixed.mp3'),
-      assert.equal(_0x333eaa.audioUrl, '/output/SeparateAudio/audio_fixed.mp3'),
-      assert.equal(_0x333eaa.localPath, 'output/SeparateAudio/audio_fixed.mp3'),
-      assert.equal(_0x333eaa.jobStatus, 'success'),
-      assert.deepEqual(appStore.getState().selectedNodeIds, [_0x478bc9.id, _0x333eaa.id]),
-      assert.deepEqual(_0x217701, ['source-video-1', _0x478bc9.id, _0x333eaa.id]));
+    const runVideoAudioSeparationFromNode2 = await runVideoAudioSeparationFromNode('source-video-1');
+    (assert.deepEqual(value, { src: 'output/source-video-1.mp4' }),
+      assert.ok(runVideoAudioSeparationFromNode2?.videoId),
+      assert.ok(runVideoAudioSeparationFromNode2?.audioId));
+    const list = getCreatedNodes();
+    assert.equal(list.length, 2);
+    const error = list.find((item2) => item2.type === 'source-video'),
+      error2 = list.find((item3) => item3.type === 'source-audio');
+    (assert.ok(error),
+      assert.ok(error2),
+      assert.equal(error.name, '画面自 原始视频'),
+      assert.equal(error.src, '/output/SeparateVideo/video_fixed.mp4'),
+      assert.equal(error.videoUrl, '/output/SeparateVideo/video_fixed.mp4'),
+      assert.equal(error.localPath, 'output/SeparateVideo/video_fixed.mp4'),
+      assert.equal(error.jobStatus, 'success'),
+      assert.equal(error.videos?.[0]?.localPath, 'output/SeparateVideo/video_fixed.mp4'),
+      assert.equal(error2.name, '音频自 原始视频'),
+      assert.equal(error2.src, '/output/SeparateAudio/audio_fixed.mp3'),
+      assert.equal(error2.audioUrl, '/output/SeparateAudio/audio_fixed.mp3'),
+      assert.equal(error2.localPath, 'output/SeparateAudio/audio_fixed.mp3'),
+      assert.equal(error2.jobStatus, 'success'),
+      assert.deepEqual(appStore.getState().selectedNodeIds, [error.id, error2.id]),
+      assert.deepEqual(key, ['source-video-1', error.id, error2.id]));
   }),
   test('VideoAudioSeparationController: 失败时不创建结果节点', async () => {
     addSourceVideoNode();
-    const _0x131c7b = [];
-    ((globalThis.window.showToast = (_0x26763c, _0x511d4a) => {
-      _0x131c7b.push({ message: _0x26763c, type: _0x511d4a });
+    const list2 = [];
+    ((globalThis.window.showToast = (message, type) => {
+      list2.push({ message: message, type: type });
     }),
       __setVideoAudioSeparationDepsForTest({
         separateVideoAudioImpl: async () => {
           throw new Error('当前视频没有可分离的音频');
         },
       }));
-    const _0x579928 = await runVideoAudioSeparationFromNode('source-video-1');
-    (assert.equal(_0x579928, null),
+    const runVideoAudioSeparationFromNode3 = await runVideoAudioSeparationFromNode('source-video-1');
+    (assert.equal(runVideoAudioSeparationFromNode3, null),
       assert.equal(getCreatedNodes().length, 0),
       assert.ok(
-        _0x131c7b.some(
-          (_0x3a9cda) =>
-            _0x3a9cda.type === 'error' && String(_0x3a9cda.message).includes('当前视频没有可分离的音频'),
+        list2.some(
+          (error3) => error3.type === 'error' && String(error3.message).includes('当前视频没有可分离的音频'),
         ),
       ));
   }));

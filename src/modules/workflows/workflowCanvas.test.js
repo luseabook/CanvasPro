@@ -24,17 +24,17 @@ const CSS_HASH = String.fromCharCode(35),
 test.afterEach(() => {
   setLocale(DEFAULT_LOCALE, { persist: false, notify: false });
 });
-function cssHexColor(_0x1b39ee) {
-  return '' + CSS_HASH + _0x1b39ee;
+function cssHexColor(value) {
+  return '' + CSS_HASH + value;
 }
-function cssRgbaColor(_0x2c0408, _0x168530, _0x3e147d, _0x4a3de7) {
-  return CSS_RGBA_FUNCTION + '(' + _0x2c0408 + ', ' + _0x168530 + ', ' + _0x3e147d + ', ' + _0x4a3de7 + ')';
+function cssRgbaColor(item, key, index, result) {
+  return CSS_RGBA_FUNCTION + '(' + item + ', ' + key + ', ' + index + ', ' + result + ')';
 }
-function escapeRegexText(_0x19fb64) {
-  return String(_0x19fb64).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function escapeRegexText(data) {
+  return String(data).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-function assertSvgContains(_0x488bcb, _0x1b50dd) {
-  assert.match(_0x488bcb, new RegExp(escapeRegexText(_0x1b50dd)));
+function assertSvgContains(options, target) {
+  assert.match(options, new RegExp(escapeRegexText(target)));
 }
 function sampleCanvas() {
   return {
@@ -47,22 +47,22 @@ function sampleCanvas() {
   };
 }
 (test('workflow: createWorkflowFromCanvas trims and limits metadata', () => {
-  const _0x2ca906 = createWorkflowFromCanvas(sampleCanvas(), {
+  const error = createWorkflowFromCanvas(sampleCanvas(), {
     name: '  ' + 'n'.repeat(60) + '  ',
     note: 'x'.repeat(0x190),
     tags: ['tag', ' tag ', 'LONG_TAG_VALUE', 'B', 'C', 'D', 'E'],
     cover: '/cover.png',
   });
-  (assert.equal(_0x2ca906.name.length, 50),
-    assert.equal(_0x2ca906.note.length, 0x12c),
-    assert.deepEqual(_0x2ca906.tags, ['tag', 'LONG_TAG_VAL', 'B', 'C', 'D']),
-    assert.equal(_0x2ca906.cover, '/cover.png'),
-    assert.equal(_0x2ca906.workflowData.nodes.length, 2),
-    assert.equal(_0x2ca906.workflowData.edges.length, 1),
-    assert.equal('scope' in _0x2ca906, false));
+  (assert.equal(error.name.length, 50),
+    assert.equal(error.note.length, 0x12c),
+    assert.deepEqual(error.tags, ['tag', 'LONG_TAG_VAL', 'B', 'C', 'D']),
+    assert.equal(error.cover, '/cover.png'),
+    assert.equal(error.workflowData.nodes.length, 2),
+    assert.equal(error.workflowData.edges.length, 1),
+    assert.equal('scope' in error, false));
 }),
   test('workflow: createWorkflowFromCanvas syncs single root group name to workflow name', () => {
-    const _0x42194e = createWorkflowFromCanvas(
+    const error2 = createWorkflowFromCanvas(
       {
         nodes: [
           { id: 'g', type: 'group', name: '旧组名', x: 0, y: 0 },
@@ -72,29 +72,29 @@ function sampleCanvas() {
       },
       { name: '123' },
     );
-    (assert.equal(_0x42194e.name, '123'),
-      assert.equal(_0x42194e.workflowData.nodes.find((_0x55974d) => _0x55974d.id === 'g').name, '123'));
+    (assert.equal(error2.name, '123'),
+      assert.equal(error2.workflowData.nodes.find((item2) => item2.id === 'g').name, '123'));
   }),
   test('workflow: updateWorkflowFromCanvas preserves identity and refreshes content', () => {
-    const _0x4d9d9d = createWorkflowFromCanvas(sampleCanvas(), {
+    const existingWorkflow = createWorkflowFromCanvas(sampleCanvas(), {
         id: 'workflow-1',
         name: 'Old',
         tags: ['old'],
       }),
-      _0x541509 = updateWorkflowFromCanvas(
-        _0x4d9d9d.id,
+      error3 = updateWorkflowFromCanvas(
+        existingWorkflow.id,
         { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
-        { existingWorkflow: _0x4d9d9d, name: 'New', tags: ['new'] },
+        { existingWorkflow: existingWorkflow, name: 'New', tags: ['new'] },
       );
-    (assert.equal(_0x541509.id, 'workflow-1'),
-      assert.equal(_0x541509.createdAt, _0x4d9d9d.createdAt),
-      assert.equal(_0x541509.name, 'New'),
-      assert.deepEqual(_0x541509.tags, ['new']),
-      assert.equal(_0x541509.nodeCount, 0),
-      assert.equal('scope' in _0x541509, false));
+    (assert.equal(error3.id, 'workflow-1'),
+      assert.equal(error3.createdAt, existingWorkflow.createdAt),
+      assert.equal(error3.name, 'New'),
+      assert.deepEqual(error3.tags, ['new']),
+      assert.equal(error3.nodeCount, 0),
+      assert.equal('scope' in error3, false));
   }),
   test('workflow: updateWorkflowFromCanvas syncs single root group name to workflow name', () => {
-    const _0x54d5d4 = updateWorkflowFromCanvas(
+    const updateWorkflowFromCanvas2 = updateWorkflowFromCanvas(
       'workflow-1',
       {
         nodes: [
@@ -105,80 +105,85 @@ function sampleCanvas() {
       },
       { name: '新工作流名' },
     );
-    assert.equal(_0x54d5d4.workflowData.nodes.find((_0xe6132) => _0xe6132.id === 'g').name, '新工作流名');
+    assert.equal(
+      updateWorkflowFromCanvas2.workflowData.nodes.find((item3) => item3.id === 'g').name,
+      '新工作流名',
+    );
   }),
   test('workflow: filterWorkflows searches name tags and note', () => {
-    const _0x3f6059 = [
+    const source = [
       { id: '1', name: 'Alpha', tags: ['draw'], note: '', updatedAt: 100 },
       { id: '2', name: 'Mine', tags: ['Scene'], note: 'step by step', updatedAt: 0x12c },
       { id: '3', name: 'Other', tags: [], note: 'nothing', updatedAt: 200 },
     ];
     (assert.deepEqual(
-      filterWorkflows(_0x3f6059, 'scene').map((_0x5536f5) => _0x5536f5.id),
+      filterWorkflows(source, 'scene').map((item4) => item4.id),
       ['2'],
     ),
       assert.deepEqual(
-        filterWorkflows(_0x3f6059, 'draw').map((_0x4cc534) => _0x4cc534.id),
+        filterWorkflows(source, 'draw').map((item5) => item5.id),
         ['1'],
       ),
       assert.deepEqual(
-        filterWorkflows(_0x3f6059, '').map((_0x2dc14e) => _0x2dc14e.id),
+        filterWorkflows(source, '').map((item6) => item6.id),
         ['2', '3', '1'],
       ));
   }),
   test('workflow: extractWorkflowCoverCandidates uses stable node thumbnails', () => {
-    const _0x170514 = extractWorkflowCoverCandidates({
+    const list = extractWorkflowCoverCandidates({
       n1: { id: 'n1', name: 'A', localPath: 'data/uploads/a.png' },
       n2: { id: 'n2', name: 'B', images: [{ imageUrl: '/b.png' }] },
       n3: { id: 'n3', name: 'C', thumbUrl: '/b.png' },
     });
-    (assert.equal(_0x170514.length, 2),
-      assert.equal(_0x170514[0].src, '/data/uploads/a.png'),
-      assert.equal(_0x170514[1].src, '/b.png'));
+    (assert.equal(list.length, 2),
+      assert.equal(list[0].src, '/data/uploads/a.png'),
+      assert.equal(list[1].src, '/b.png'));
   }),
   test('workflow: extractWorkflowCoverCandidates prefers generated output covers', () => {
-    const _0x314493 = extractWorkflowCoverCandidates([
+    const list2 = extractWorkflowCoverCandidates([
       { id: 'input', type: 'source-image', name: '参考图', imageUrl: '/input.png' },
       { id: 'output', type: 'ai-image', name: '生成图', imageUrl: '/output.png' },
       { id: 'video', type: 'ai-video', name: '生成视频', coverUrl: '/video.png' },
     ]);
     assert.deepEqual(
-      _0x314493.map((_0x35eeed) => _0x35eeed.src),
+      list2.map((item7) => item7.src),
       ['/output.png', '/video.png', '/input.png'],
     );
   }),
   test('workflow: createWorkflowSnapshotCoverCandidate renders workflow style cover', () => {
-    const _0xe272a3 = createWorkflowSnapshotCoverCandidate(sampleCanvas(), { title: '组合' });
-    (assert.equal(_0xe272a3.id, WORKFLOW_SNAPSHOT_COVER_ID),
-      assert.equal(_0xe272a3.label, '工作流快照'),
-      assert.match(_0xe272a3.src, /^data:image\/svg\+xml;charset=utf-8,/),
-      assert.equal(isSvgDataImageCover(_0xe272a3.src), true));
-    const _0x157192 = decodeURIComponent(_0xe272a3.src.split(',')[1]);
-    (assert.match(_0x157192, /aria-label="workflow snapshot"/),
-      assert.match(_0x157192, /stroke="url\(#frameGlow\)"/),
-      assert.match(_0x157192, />2 节点 · 1 连线</));
+    const workflowSnapshotCoverCandidate = createWorkflowSnapshotCoverCandidate(sampleCanvas(), {
+      title: '组合',
+    });
+    (assert.equal(workflowSnapshotCoverCandidate.id, WORKFLOW_SNAPSHOT_COVER_ID),
+      assert.equal(workflowSnapshotCoverCandidate.label, '工作流快照'),
+      assert.match(workflowSnapshotCoverCandidate.src, /^data:image\/svg\+xml;charset=utf-8,/),
+      assert.equal(isSvgDataImageCover(workflowSnapshotCoverCandidate.src), true));
+    const decodeURIComponent2 = decodeURIComponent(workflowSnapshotCoverCandidate.src.split(',')[1]);
+    (assert.match(decodeURIComponent2, /aria-label="workflow snapshot"/),
+      assert.match(decodeURIComponent2, /stroke="url\(#frameGlow\)"/),
+      assert.match(decodeURIComponent2, />2 节点 · 1 连线</));
   }),
   test('workflow: createWorkflowSnapshotCoverCandidate uses root group color theme', () => {
-    const _0x2e5e7a = createWorkflowSnapshotCoverCandidate({
+    const workflowSnapshotCoverCandidate2 = createWorkflowSnapshotCoverCandidate({
         nodes: [
           { id: 'g', type: 'group', color: 'var(--red)', x: 0, y: 0, width: 0x168, height: 220 },
           { id: 'text-1', type: 'source-text', parentId: 'g', x: 32, y: 48, width: 120, height: 72 },
         ],
         edges: [],
       }),
-      _0x259f70 = decodeURIComponent(_0x2e5e7a.src.split(',')[1]),
-      _0x34675b = cssHexColor('ef4444'),
-      _0x28e75e = cssRgbaColor(239, 68, 68, 0.6);
-    (assertSvgContains(_0x259f70, '<stop offset="0" stop-color="' + _0x34675b + '"/>'),
-      assertSvgContains(_0x259f70, '<stop offset="1" stop-color="' + _0x28e75e + '"/>'),
-      assertSvgContains(_0x259f70, '<circle cx="320" cy="50" r="9" fill="' + _0x34675b + '"'),
-      assertSvgContains(_0x259f70, 'stroke="' + _0x34675b + '" stroke-width="1" opacity="0.9"'));
+      decodeURIComponent3 = decodeURIComponent(workflowSnapshotCoverCandidate2.src.split(',')[1]),
+      cssHexColor2 = cssHexColor('ef4444'),
+      cssRgbaColor2 = cssRgbaColor(239, 68, 68, 0.6);
+    (assertSvgContains(decodeURIComponent3, '<stop offset="0" stop-color="' + cssHexColor2 + '"/>'),
+      assertSvgContains(decodeURIComponent3, '<stop offset="1" stop-color="' + cssRgbaColor2 + '"/>'),
+      assertSvgContains(decodeURIComponent3, '<circle cx="320" cy="50" r="9" fill="' + cssHexColor2 + '"'),
+      assertSvgContains(decodeURIComponent3, 'stroke="' + cssHexColor2 + '" stroke-width="1" opacity="0.9"'));
   }),
   test('workflow: remapWorkflowNodeIds remaps nodes edges and parentId', () => {
     const {
-      nodes: _0x3b3d34,
-      edges: _0x459ea4,
-      idMap: _0x45ee11,
+      nodes: nodes,
+      edges: edges,
+      idMap: idMap,
     } = remapWorkflowNodeIds(
       [
         { id: 'g', type: 'group', x: 0, y: 0 },
@@ -189,15 +194,15 @@ function sampleCanvas() {
         { id: 'bad', sourceId: 'missing', targetId: 'c' },
       ],
     );
-    (assert.equal(_0x3b3d34.length, 2),
-      assert.notEqual(_0x3b3d34[0].id, 'g'),
-      assert.equal(_0x3b3d34[1].parentId, _0x45ee11.g),
-      assert.equal(_0x459ea4.length, 1),
-      assert.equal(_0x459ea4[0].sourceId, _0x45ee11.g),
-      assert.equal(_0x459ea4[0].targetId, _0x45ee11.c));
+    (assert.equal(nodes.length, 2),
+      assert.notEqual(nodes[0].id, 'g'),
+      assert.equal(nodes[1].parentId, idMap.g),
+      assert.equal(edges.length, 1),
+      assert.equal(edges[0].sourceId, idMap.g),
+      assert.equal(edges[0].targetId, idMap.c));
   }),
   test('workflow: collectWorkflowGroupNodeIds collects group and descendants only', () => {
-    const _0xf3893c = collectWorkflowGroupNodeIds(
+    const args = collectWorkflowGroupNodeIds(
       {
         g: { id: 'g', type: 'group' },
         a: { id: 'a', parentId: 'g' },
@@ -206,10 +211,10 @@ function sampleCanvas() {
       },
       'g',
     );
-    assert.deepEqual([..._0xf3893c].sort(), ['a', 'b', 'g']);
+    assert.deepEqual([...args].sort(), ['a', 'b', 'g']);
   }),
   test('workflow: sliceCanvasStateForWorkflow keeps only selected group nodes and internal edges', () => {
-    const _0x703f38 = sliceCanvasStateForWorkflow(
+    const sliceCanvasStateForWorkflow2 = sliceCanvasStateForWorkflow(
       {
         nodes: [
           { id: 'g', type: 'group', x: 0, y: 0 },
@@ -232,31 +237,34 @@ function sampleCanvas() {
       'g',
     );
     (assert.deepEqual(
-      _0x703f38.nodes.map((_0xf2760e) => _0xf2760e.id),
+      sliceCanvasStateForWorkflow2.nodes.map((item8) => item8.id),
       ['g', 'a', 'b'],
     ),
       assert.deepEqual(
-        _0x703f38.edges.map((_0x4263d0) => _0x4263d0.id),
+        sliceCanvasStateForWorkflow2.edges.map((item9) => item9.id),
         ['e1'],
       ));
   }),
   test('workflow: calcWorkflowCenterOffset aligns bbox center', () => {
-    const _0x250bd7 = calcWorkflowCenterOffset([{ id: 'a', x: 0, y: 0, width: 100, height: 100 }], {
-      x: 0x12c,
-      y: 0x190,
-    });
-    assert.deepEqual(_0x250bd7, { dx: 250, dy: 0x15e });
+    const calcWorkflowCenterOffset2 = calcWorkflowCenterOffset(
+      [{ id: 'a', x: 0, y: 0, width: 100, height: 100 }],
+      {
+        x: 0x12c,
+        y: 0x190,
+      },
+    );
+    assert.deepEqual(calcWorkflowCenterOffset2, { dx: 250, dy: 0x15e });
   }),
   test('workflow: applyWorkflowToCanvas keeps relative layout', () => {
-    const _0x46e902 = createWorkflowFromCanvas(sampleCanvas(), { name: 'Apply' }),
-      _0x533eec = applyWorkflowToCanvas(_0x46e902, { x: 0x1f4, y: 0x1f4 });
-    (assert.equal(_0x533eec.nodes.length, 2), assert.equal(_0x533eec.edges.length, 1));
-    const _0x34b625 = _0x533eec.nodes[1].x - _0x533eec.nodes[0].x,
-      _0x57e346 = _0x533eec.nodes[1].y - _0x533eec.nodes[0].y;
-    (assert.equal(_0x34b625, 160), assert.equal(_0x57e346, 40));
+    const workflowFromCanvas = createWorkflowFromCanvas(sampleCanvas(), { name: 'Apply' }),
+      canvas = applyWorkflowToCanvas(workflowFromCanvas, { x: 0x1f4, y: 0x1f4 });
+    (assert.equal(canvas.nodes.length, 2), assert.equal(canvas.edges.length, 1));
+    const next = canvas.nodes[1].x - canvas.nodes[0].x,
+      current = canvas.nodes[1].y - canvas.nodes[0].y;
+    (assert.equal(next, 160), assert.equal(current, 40));
   }),
   test('workflow: applyWorkflowToCanvas names single root group after workflow name', () => {
-    const _0x4f6269 = {
+    const entry = {
         name: '导入后的组名',
         workflowData: {
           nodes: [
@@ -266,12 +274,12 @@ function sampleCanvas() {
           edges: [],
         },
       },
-      _0x2eb4d5 = applyWorkflowToCanvas(_0x4f6269, { x: 100, y: 100 }),
-      _0xb14b4f = _0x2eb4d5.nodes.find((_0x26d64a) => _0x26d64a.type === 'group');
-    assert.equal(_0xb14b4f.name, '导入后的组名');
+      canvas2 = applyWorkflowToCanvas(entry, { x: 100, y: 100 }),
+      error4 = canvas2.nodes.find((item10) => item10.type === 'group');
+    assert.equal(error4.name, '导入后的组名');
   }),
   test('workflow: applyWorkflowToCanvas does not rename multiple root groups', () => {
-    const _0x3b4f15 = {
+    const record = {
         name: '不要覆盖多个组',
         workflowData: {
           nodes: [
@@ -281,17 +289,17 @@ function sampleCanvas() {
           edges: [],
         },
       },
-      _0x5f334d = applyWorkflowToCanvas(_0x3b4f15, { x: 100, y: 100 });
+      canvas3 = applyWorkflowToCanvas(record, { x: 100, y: 100 });
     assert.deepEqual(
-      _0x5f334d.nodes
-        .filter((_0x6fc07b) => _0x6fc07b.type === 'group')
-        .map((_0x123d8a) => _0x123d8a.name)
+      canvas3.nodes
+        .filter((item11) => item11.type === 'group')
+        .map((error5) => error5.name)
         .sort(),
       ['组1', '组2'],
     );
   }),
   test('workflow: buildWorkflowContentPreviewItems shows node content and skips wrapper group', () => {
-    const _0x54c91f = buildWorkflowContentPreviewItems({
+    const list3 = buildWorkflowContentPreviewItems({
       workflowData: {
         nodes: [
           { id: 'group-1', type: 'group', name: '流程组', x: 0, y: 0 },
@@ -307,18 +315,18 @@ function sampleCanvas() {
         ],
       },
     });
-    (assert.equal(_0x54c91f.length, 2),
-      assert.equal(_0x54c91f[0].id, 'text-1'),
-      assert.equal(_0x54c91f[0].typeLabel, '文本'),
-      assert.equal(_0x54c91f[0].title, '脚本'),
-      assert.equal(_0x54c91f[0].summary, '第一段文案'),
-      assert.equal(_0x54c91f[1].id, 'image-1'),
-      assert.equal(_0x54c91f[1].typeLabel, 'AI 图片'),
-      assert.equal(_0x54c91f[1].summary, '海边人物特写'),
-      assert.equal(_0x54c91f[1].thumbSrc, '/covers/a.png'));
+    (assert.equal(list3.length, 2),
+      assert.equal(list3[0].id, 'text-1'),
+      assert.equal(list3[0].typeLabel, '文本'),
+      assert.equal(list3[0].title, '脚本'),
+      assert.equal(list3[0].summary, '第一段文案'),
+      assert.equal(list3[1].id, 'image-1'),
+      assert.equal(list3[1].typeLabel, 'AI 图片'),
+      assert.equal(list3[1].summary, '海边人物特写'),
+      assert.equal(list3[1].thumbSrc, '/covers/a.png'));
   }),
   test('workflow: buildWorkflowSourceSummary describes source and suggests metadata', () => {
-    const _0xbf8e61 = buildWorkflowSourceSummary(
+    const workflowSourceSummary = buildWorkflowSourceSummary(
       {
         nodes: [
           { id: 'group-1', type: 'group', name: '商品图批处理' },
@@ -329,17 +337,17 @@ function sampleCanvas() {
       },
       { sourceGroupId: 'group-1', sourceName: '商品图批处理' },
     );
-    (assert.equal(_0xbf8e61.sourceLabel, '当前节点组'),
-      assert.equal(_0xbf8e61.nodeCount, 3),
-      assert.equal(_0xbf8e61.contentNodeCount, 2),
-      assert.equal(_0xbf8e61.edgeCount, 1),
-      assert.equal(_0xbf8e61.suggestedName, '商品图批处理工作流'),
-      assert.deepEqual(_0xbf8e61.suggestedTags, ['文本', '图片']),
-      assert.equal(_0xbf8e61.typeSummary, '文本 1 · AI 图片 1'));
+    (assert.equal(workflowSourceSummary.sourceLabel, '当前节点组'),
+      assert.equal(workflowSourceSummary.nodeCount, 3),
+      assert.equal(workflowSourceSummary.contentNodeCount, 2),
+      assert.equal(workflowSourceSummary.edgeCount, 1),
+      assert.equal(workflowSourceSummary.suggestedName, '商品图批处理工作流'),
+      assert.deepEqual(workflowSourceSummary.suggestedTags, ['文本', '图片']),
+      assert.equal(workflowSourceSummary.typeSummary, '文本 1 · AI 图片 1'));
   }),
   test('workflow: preview summaries and cover labels follow active locale', () => {
     setLocale('en-US', { persist: false, notify: false });
-    const _0x40514c = buildWorkflowContentPreviewItems({
+    const workflowContentPreviewItems = buildWorkflowContentPreviewItems({
       workflowData: {
         nodes: [
           { id: 'group-1', type: 'group', name: 'Batch', x: 0, y: 0 },
@@ -347,10 +355,10 @@ function sampleCanvas() {
         ],
       },
     });
-    (assert.equal(_0x40514c[0].typeLabel, 'AI Image'),
-      assert.equal(_0x40514c[0].placeholderLabel, 'Image'),
-      assert.equal(_0x40514c[0].summary, 'Contains Image content'));
-    const _0x1e55f8 = buildWorkflowSourceSummary(
+    (assert.equal(workflowContentPreviewItems[0].typeLabel, 'AI Image'),
+      assert.equal(workflowContentPreviewItems[0].placeholderLabel, 'Image'),
+      assert.equal(workflowContentPreviewItems[0].summary, 'Contains Image content'));
+    const workflowSourceSummary2 = buildWorkflowSourceSummary(
       {
         nodes: [
           { id: 'group-1', type: 'group', name: 'Batch' },
@@ -361,31 +369,31 @@ function sampleCanvas() {
       },
       { sourceGroupId: 'group-1', sourceName: 'Batch' },
     );
-    (assert.equal(_0x1e55f8.sourceLabel, 'Current group'),
-      assert.equal(_0x1e55f8.suggestedName, 'Batch workflow'),
-      assert.deepEqual(_0x1e55f8.suggestedTags, ['Text', 'Image']),
-      assert.match(_0x1e55f8.typeSummary, /AI Image 1/),
-      assert.match(_0x1e55f8.typeSummary, /Text 1/));
-    const _0x333161 = createWorkflowSnapshotCoverCandidate(sampleCanvas());
-    assert.equal(_0x333161.label, 'Workflow snapshot');
-    const _0x27620b = decodeURIComponent(_0x333161.src.split(',')[1]);
-    assert.match(_0x27620b, />Nodes 2 · Connections 1</);
+    (assert.equal(workflowSourceSummary2.sourceLabel, 'Current group'),
+      assert.equal(workflowSourceSummary2.suggestedName, 'Batch workflow'),
+      assert.deepEqual(workflowSourceSummary2.suggestedTags, ['Text', 'Image']),
+      assert.match(workflowSourceSummary2.typeSummary, /AI Image 1/),
+      assert.match(workflowSourceSummary2.typeSummary, /Text 1/));
+    const workflowSnapshotCoverCandidate3 = createWorkflowSnapshotCoverCandidate(sampleCanvas());
+    assert.equal(workflowSnapshotCoverCandidate3.label, 'Workflow snapshot');
+    const decodeURIComponent4 = decodeURIComponent(workflowSnapshotCoverCandidate3.src.split(',')[1]);
+    assert.match(decodeURIComponent4, />Nodes 2 · Connections 1</);
   }),
   test('store: workflow slice manages list and modal state', () => {
-    const _0x43c8d4 = createStore();
-    (_0x43c8d4.setWorkflows([{ id: 'w1', name: 'one' }]),
-      _0x43c8d4.upsertWorkflow({ id: 'w2', name: 'two' }),
-      _0x43c8d4.updateWorkflowLocal('w1', { name: 'one updated' }),
-      _0x43c8d4.markWorkflowUsed('w2', 123),
-      _0x43c8d4.openWorkflowModal({ tab: 'update', sourceGroupId: 'group-1' }),
-      _0x43c8d4.setWorkflowDraft({ name: 'draft', tags: ['a'] }),
-      _0x43c8d4.closeWorkflowModal());
-    const _0x4984ee = _0x43c8d4.getState();
-    (assert.equal(_0x4984ee.workflows.items.length, 2),
-      assert.equal(_0x4984ee.workflows.items.find((_0x519035) => _0x519035.id === 'w1').name, 'one updated'),
-      assert.equal(_0x4984ee.workflows.items.find((_0x4d3aef) => _0x4d3aef.id === 'w2').lastUsedAt, 123),
-      assert.equal(_0x4984ee.workflowUi.modalOpen, false),
-      assert.equal(_0x4984ee.workflowUi.draft.name, ''),
-      assert.equal(_0x4984ee.workflowUi.sourceGroupId, null),
-      assert.equal('activeScope' in _0x4984ee.workflowUi, false));
+    const store = createStore();
+    (store.setWorkflows([{ id: 'w1', name: 'one' }]),
+      store.upsertWorkflow({ id: 'w2', name: 'two' }),
+      store.updateWorkflowLocal('w1', { name: 'one updated' }),
+      store.markWorkflowUsed('w2', 123),
+      store.openWorkflowModal({ tab: 'update', sourceGroupId: 'group-1' }),
+      store.setWorkflowDraft({ name: 'draft', tags: ['a'] }),
+      store.closeWorkflowModal());
+    const payload = store.getState();
+    (assert.equal(payload.workflows.items.length, 2),
+      assert.equal(payload.workflows.items.find((item12) => item12.id === 'w1').name, 'one updated'),
+      assert.equal(payload.workflows.items.find((item13) => item13.id === 'w2').lastUsedAt, 123),
+      assert.equal(payload.workflowUi.modalOpen, false),
+      assert.equal(payload.workflowUi.draft.name, ''),
+      assert.equal(payload.workflowUi.sourceGroupId, null),
+      assert.equal('activeScope' in payload.workflowUi, false));
   }));

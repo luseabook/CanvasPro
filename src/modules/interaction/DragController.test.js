@@ -2,16 +2,16 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createDragController } from './DragController.js';
 import { getPerfProbeSnapshot, resetPerfProbeData, setPerfProbeEnabled } from '../perf/perfProbe.js';
-function isNodeType(_0x13689d, _0x16130c) {
-  if (!_0x13689d) return false;
-  if (Array.isArray(_0x16130c)) return _0x16130c.includes(_0x13689d.type);
-  return _0x13689d.type === _0x16130c;
+function isNodeType(enabled, list) {
+  if (!enabled) return false;
+  if (Array.isArray(list)) return list.includes(enabled.type);
+  return enabled.type === list;
 }
-function identityScreenToWorld(_0x50fb25, _0x761a77) {
-  return { x: _0x50fb25, y: _0x761a77 };
+function identityScreenToWorld(x, y) {
+  return { x: x, y: y };
 }
 (test('DragController: 提取分镜会使用统一资源取图并把源格清为空态', () => {
-  const _0x2292fd = {
+  const draggedCellData = {
     viewport: { x: 0, y: 0, zoom: 1 },
     nodes: {
       'sb-1': {
@@ -37,28 +37,28 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
       },
     },
   };
-  let _0x52f091 = null,
-    _0x1fbd86 = null,
-    _0x3c3220 = null;
-  const _0x4187f0 = {
+  let value = null,
+    item = null,
+    key = null;
+  const store = {
       getStateRaw() {
-        return _0x2292fd;
+        return draggedCellData;
       },
-      batch(_0x23c548) {
-        _0x23c548();
+      batch(handler) {
+        handler();
       },
-      addNode(_0x10e510) {
-        _0x52f091 = _0x10e510;
+      addNode(index) {
+        value = index;
       },
-      setSelectedNodes(_0x892b9b) {
-        _0x1fbd86 = _0x892b9b;
+      setSelectedNodes(result) {
+        item = result;
       },
-      updateNodeData(_0x35360a, _0x782477) {
-        _0x3c3220 = { nodeId: _0x35360a, patch: _0x782477 };
+      updateNodeData(nodeId, patch) {
+        key = { nodeId: nodeId, patch: patch };
       },
     },
-    _0x3d0e8c = createDragController({
-      store: _0x4187f0,
+    dragController = createDragController({
+      store: store,
       isNodeType: isNodeType,
       getShortcuts() {
         return {};
@@ -67,19 +67,19 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         return null;
       },
       screenToWorld: identityScreenToWorld,
-      generateId(_0x52b640) {
-        return _0x52b640 + '-generated';
+      generateId(data) {
+        return data + '-generated';
       },
       cloneNodesWithEdges() {
         return {};
       },
       commit() {},
     }),
-    _0x36d09e = _0x3d0e8c.finishDraggingCell(
+    options = dragController.finishDraggingCell(
       {
         targetNodeId: 'sb-1',
         sourceCellIndex: 0,
-        draggedCellData: _0x2292fd.nodes['sb-1'].cells[0],
+        draggedCellData: draggedCellData.nodes['sb-1'].cells[0],
         ghostEl: null,
         sourceCellEl: null,
         lastHoverNodeId: null,
@@ -87,11 +87,11 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
       180,
       180,
     );
-  (assert.deepEqual(_0x36d09e, { didAct: true, committed: true }),
-    assert.equal(_0x52f091?.src, '/output/thumb.webp'),
-    assert.equal(_0x52f091?.localPath, 'output/thumb.webp'),
-    assert.deepEqual(_0x1fbd86, ['source-image-generated']),
-    assert.deepEqual(_0x3c3220, {
+  (assert.deepEqual(options, { didAct: true, committed: true }),
+    assert.equal(value?.src, '/output/thumb.webp'),
+    assert.equal(value?.localPath, 'output/thumb.webp'),
+    assert.deepEqual(item, ['source-image-generated']),
+    assert.deepEqual(key, {
       nodeId: 'sb-1',
       patch: {
         cells: [
@@ -127,9 +127,9 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
     }));
 }),
   test('DragController: 自定义分割线和宫格间距拖出时按真实宫格区域裁切源图', () => {
-    const _0x46ca90 = globalThis.document,
-      _0x4ce140 = globalThis.window,
-      _0x4f1a61 = {
+    const target = globalThis.document,
+      source = globalThis.window,
+      draggedCellData2 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -158,27 +158,27 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       };
-    let _0x1ca482 = null,
-      _0x2d6064 = null,
-      _0xd7e04c = null,
-      _0x47eed4 = null;
-    const _0x4dea32 = { complete: true, naturalWidth: 0x190, naturalHeight: 0x320 },
-      _0x3d8a2a = {
+    let box = null,
+      next = null,
+      current = null,
+      list2 = null;
+    const entry = { complete: true, naturalWidth: 0x190, naturalHeight: 0x320 },
+      box2 = {
         width: 0,
         height: 0,
         getContext() {
           return {
             imageSmoothingEnabled: false,
             imageSmoothingQuality: '',
-            drawImage(..._0x1df235) {
-              _0x47eed4 = _0x1df235;
+            drawImage(...args) {
+              list2 = args;
             },
           };
         },
-        toDataURL(_0x2e9883, _0x4a85b0) {
+        toDataURL(record, payload) {
           return (
-            assert.equal(_0x2e9883, 'image/jpeg'),
-            assert.equal(_0x4a85b0, 0.9),
+            assert.equal(record, 'image/jpeg'),
+            assert.equal(payload, 0.9),
             'data:image/jpeg;base64,current-crop'
           );
         },
@@ -186,39 +186,39 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
     try {
       (delete globalThis.window,
         (globalThis.document = {
-          getElementById(_0x47e2c0) {
+          getElementById(handle) {
             return (
-              assert.equal(_0x47e2c0, 'cell-sb-1-0'),
+              assert.equal(handle, 'cell-sb-1-0'),
               {
-                querySelector(_0x43d5bf) {
-                  return (assert.equal(_0x43d5bf, 'img.storyboard-cell-img--source-crop'), _0x4dea32);
+                querySelector(state) {
+                  return (assert.equal(state, 'img.storyboard-cell-img--source-crop'), entry);
                 },
               }
             );
           },
-          createElement(_0x3e0e84) {
-            return (assert.equal(_0x3e0e84, 'canvas'), _0x3d8a2a);
+          createElement(config) {
+            return (assert.equal(config, 'canvas'), box2);
           },
         }));
-      const _0x39cc98 = {
+      const store2 = {
           getStateRaw() {
-            return _0x4f1a61;
+            return draggedCellData2;
           },
-          batch(_0x43f7b9) {
-            _0x43f7b9();
+          batch(handler2) {
+            handler2();
           },
-          addNode(_0x420dd7) {
-            _0x1ca482 = _0x420dd7;
+          addNode(scope) {
+            box = scope;
           },
-          setSelectedNodes(_0x1752f4) {
-            _0x2d6064 = _0x1752f4;
+          setSelectedNodes(input) {
+            next = input;
           },
-          updateNodeData(_0x138d91, _0x44690b) {
-            _0xd7e04c = { nodeId: _0x138d91, patch: _0x44690b };
+          updateNodeData(nodeId2, patch2) {
+            current = { nodeId: nodeId2, patch: patch2 };
           },
         },
-        _0x49fbf8 = createDragController({
-          store: _0x39cc98,
+        dragController2 = createDragController({
+          store: store2,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -227,19 +227,19 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x275998) {
-            return _0x275998 + '-generated';
+          generateId(output) {
+            return output + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x211506 = _0x49fbf8.finishDraggingCell(
+        value2 = dragController2.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0x4f1a61.nodes['sb-1'].cells[0],
+            draggedCellData: draggedCellData2.nodes['sb-1'].cells[0],
             ghostEl: null,
             sourceCellEl: null,
             lastHoverNodeId: null,
@@ -247,40 +247,40 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           0x1f4,
           0x1f4,
         );
-      (assert.deepEqual(_0x211506, { didAct: true, committed: true }),
-        assert.deepEqual(_0x47eed4?.slice(1), [0, 0, 0x118, 0x320, 0, 0, 0x118, 0x320]),
-        assert.equal(_0x3d8a2a.width, 0x118),
-        assert.equal(_0x3d8a2a.height, 0x320),
-        assert.equal(_0x1ca482?.src, ''),
-        assert.equal(_0x1ca482?.capturePreviewUrl, 'data:image/jpeg;base64,current-crop'),
-        assert.equal(_0x1ca482?.localPath, ''),
-        assert.equal(_0x1ca482?.width, 0x120),
-        assert.equal(_0x1ca482?.height, 0x337),
-        assert.equal(_0x1ca482?.originalWidth, 0x118),
-        assert.equal(_0x1ca482?.originalHeight, 0x320),
-        assert.equal(_0x1ca482?.sourceLocalPath, null),
-        assert.equal(_0x1ca482?.sourceUrl, ''),
-        assert.equal(_0x1ca482?.sourceWidth, null),
-        assert.equal(_0x1ca482?.sourceHeight, null),
-        assert.equal(_0x1ca482?.storyboardSourceCrop, false),
-        assert.equal(_0x1ca482?.storyboardExtractedCell, true),
-        assert.equal(_0x1ca482?.storyboardSourceIndex, 0),
-        assert.equal(_0x1ca482?.storyboardSourceNodeId, 'sb-1'),
-        assert.equal(_0x1ca482?.storyboardSourceLocalPath, 'output/source.jpg'),
-        assert.equal(_0x1ca482?.storyboardSourceUrl, ''),
-        assert.deepEqual(_0x2d6064, ['source-image-generated']),
-        assert.equal(_0xd7e04c?.nodeId, 'sb-1'),
-        assert.equal(_0xd7e04c?.patch?.cells?.[0]?.isEmpty, true),
-        assert.equal(_0xd7e04c?.patch?.cells?.[0]?.sourceLocalPath, null),
-        assert.equal(_0xd7e04c?.patch?.cells?.[0]?.sourceUrl, ''),
-        (_0x1ca482 = null),
-        (_0x47eed4 = null),
+      (assert.deepEqual(value2, { didAct: true, committed: true }),
+        assert.deepEqual(list2?.slice(1), [0, 0, 0x118, 0x320, 0, 0, 0x118, 0x320]),
+        assert.equal(box2.width, 0x118),
+        assert.equal(box2.height, 0x320),
+        assert.equal(box?.src, ''),
+        assert.equal(box?.capturePreviewUrl, 'data:image/jpeg;base64,current-crop'),
+        assert.equal(box?.localPath, ''),
+        assert.equal(box?.width, 0x120),
+        assert.equal(box?.height, 0x337),
+        assert.equal(box?.originalWidth, 0x118),
+        assert.equal(box?.originalHeight, 0x320),
+        assert.equal(box?.sourceLocalPath, null),
+        assert.equal(box?.sourceUrl, ''),
+        assert.equal(box?.sourceWidth, null),
+        assert.equal(box?.sourceHeight, null),
+        assert.equal(box?.storyboardSourceCrop, false),
+        assert.equal(box?.storyboardExtractedCell, true),
+        assert.equal(box?.storyboardSourceIndex, 0),
+        assert.equal(box?.storyboardSourceNodeId, 'sb-1'),
+        assert.equal(box?.storyboardSourceLocalPath, 'output/source.jpg'),
+        assert.equal(box?.storyboardSourceUrl, ''),
+        assert.deepEqual(next, ['source-image-generated']),
+        assert.equal(current?.nodeId, 'sb-1'),
+        assert.equal(current?.patch?.cells?.[0]?.isEmpty, true),
+        assert.equal(current?.patch?.cells?.[0]?.sourceLocalPath, null),
+        assert.equal(current?.patch?.cells?.[0]?.sourceUrl, ''),
+        (box = null),
+        (list2 = null),
         (globalThis.document.getElementById = () => null));
-      const _0x35368e = _0x49fbf8.finishDraggingCell(
+      const value3 = dragController2.finishDraggingCell(
         {
           targetNodeId: 'sb-1',
           sourceCellIndex: 0,
-          draggedCellData: _0x4f1a61.nodes['sb-1'].cells[0],
+          draggedCellData: draggedCellData2.nodes['sb-1'].cells[0],
           ghostEl: null,
           sourceCellEl: null,
           lastHoverNodeId: null,
@@ -288,23 +288,23 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         0x208,
         0x208,
       );
-      (assert.deepEqual(_0x35368e, { didAct: true, committed: true }),
-        assert.deepEqual(_0x47eed4?.slice(1), [0, 0, 0x118, 0x320, 0, 0, 0x118, 0x320]),
-        assert.equal(_0x1ca482?.src, ''),
-        assert.equal(_0x1ca482?.capturePreviewUrl, 'data:image/jpeg;base64,current-crop'),
-        assert.equal(_0x1ca482?.localPath, ''),
-        assert.equal(_0x1ca482?.storyboardExtractedCell, true),
-        assert.equal(_0x1ca482?.storyboardSourceIndex, 0),
-        assert.equal(_0x1ca482?.storyboardSourceNodeId, 'sb-1'));
+      (assert.deepEqual(value3, { didAct: true, committed: true }),
+        assert.deepEqual(list2?.slice(1), [0, 0, 0x118, 0x320, 0, 0, 0x118, 0x320]),
+        assert.equal(box?.src, ''),
+        assert.equal(box?.capturePreviewUrl, 'data:image/jpeg;base64,current-crop'),
+        assert.equal(box?.localPath, ''),
+        assert.equal(box?.storyboardExtractedCell, true),
+        assert.equal(box?.storyboardSourceIndex, 0),
+        assert.equal(box?.storyboardSourceNodeId, 'sb-1'));
     } finally {
-      (_0x46ca90 === undefined ? delete globalThis.document : (globalThis.document = _0x46ca90),
-        _0x4ce140 === undefined ? delete globalThis.window : (globalThis.window = _0x4ce140));
+      (target === undefined ? delete globalThis.document : (globalThis.document = target),
+        source === undefined ? delete globalThis.window : (globalThis.window = source));
     }
   }),
   test('DragController: 已锁定宫格源图未就绪时拖出会回退到当前预览', () => {
-    const _0x43bc50 = globalThis.document,
-      _0x98a701 = globalThis.window,
-      _0x4a141f = {
+    const value4 = globalThis.document,
+      value5 = globalThis.window,
+      draggedCellData3 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -331,30 +331,30 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       };
-    let _0x2a8f85 = null,
-      _0x23d14e = null,
-      _0x48a18b = null;
+    let value6 = null,
+      value7 = null,
+      value8 = null;
     try {
       (delete globalThis.document, delete globalThis.window);
-      const _0x15c3da = {
+      const store3 = {
           getStateRaw() {
-            return _0x4a141f;
+            return draggedCellData3;
           },
-          batch(_0x3b1a23) {
-            _0x3b1a23();
+          batch(handler3) {
+            handler3();
           },
-          addNode(_0x1a68de) {
-            _0x2a8f85 = _0x1a68de;
+          addNode(value9) {
+            value6 = value9;
           },
-          setSelectedNodes(_0x4d2ac6) {
-            _0x48a18b = _0x4d2ac6;
+          setSelectedNodes(value10) {
+            value8 = value10;
           },
-          updateNodeData(_0x3e0cf5, _0x33f809) {
-            _0x23d14e = { nodeId: _0x3e0cf5, patch: _0x33f809 };
+          updateNodeData(nodeId3, patch3) {
+            value7 = { nodeId: nodeId3, patch: patch3 };
           },
         },
-        _0x2445d6 = createDragController({
-          store: _0x15c3da,
+        dragController3 = createDragController({
+          store: store3,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -363,19 +363,19 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0xd14748) {
-            return _0xd14748 + '-generated';
+          generateId(value11) {
+            return value11 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x272522 = _0x2445d6.finishDraggingCell(
+        value12 = dragController3.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 1,
-            draggedCellData: _0x4a141f.nodes['sb-1'].cells[1],
+            draggedCellData: draggedCellData3.nodes['sb-1'].cells[1],
             ghostEl: null,
             sourceCellEl: null,
             lastHoverNodeId: null,
@@ -383,28 +383,28 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           0x1f4,
           0x1f4,
         );
-      (assert.deepEqual(_0x272522, { didAct: true, committed: true }),
-        assert.equal(_0x2a8f85?.src, ''),
-        assert.equal(_0x2a8f85?.capturePreviewUrl, 'data:image/jpeg;base64,locked-current'),
-        assert.equal(_0x2a8f85?.localPath, ''),
-        assert.equal(_0x2a8f85?.storyboardExtractedCell, true),
-        assert.equal(_0x2a8f85?.storyboardSourceIndex, 0),
-        assert.equal(_0x2a8f85?.storyboardSourceNodeId, 'sb-1'),
-        assert.equal(_0x2a8f85?.storyboardSourceLocalPath, 'output/full-source.jpg'),
-        assert.deepEqual(_0x48a18b, ['source-image-generated']),
-        assert.equal(_0x23d14e?.nodeId, 'sb-1'),
-        assert.equal(_0x23d14e?.patch?.cells?.[1]?.isEmpty, true));
+      (assert.deepEqual(value12, { didAct: true, committed: true }),
+        assert.equal(value6?.src, ''),
+        assert.equal(value6?.capturePreviewUrl, 'data:image/jpeg;base64,locked-current'),
+        assert.equal(value6?.localPath, ''),
+        assert.equal(value6?.storyboardExtractedCell, true),
+        assert.equal(value6?.storyboardSourceIndex, 0),
+        assert.equal(value6?.storyboardSourceNodeId, 'sb-1'),
+        assert.equal(value6?.storyboardSourceLocalPath, 'output/full-source.jpg'),
+        assert.deepEqual(value8, ['source-image-generated']),
+        assert.equal(value7?.nodeId, 'sb-1'),
+        assert.equal(value7?.patch?.cells?.[1]?.isEmpty, true));
     } finally {
-      if (_0x43bc50 === undefined) delete globalThis.document;
-      else globalThis.document = _0x43bc50;
-      if (_0x98a701 === undefined) delete globalThis.window;
-      else globalThis.window = _0x98a701;
+      if (value4 === undefined) delete globalThis.document;
+      else globalThis.document = value4;
+      if (value5 === undefined) delete globalThis.window;
+      else globalThis.window = value5;
     }
   }),
   test('DragController: 宫格内交换后再拖出仍使用交换后的格子预览', () => {
-    const _0x443807 = globalThis.document,
-      _0x4cfdd4 = globalThis.window,
-      _0xb0f3a4 = {
+    const value13 = globalThis.document,
+      value14 = globalThis.window,
+      draggedCellData4 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -431,8 +431,8 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       },
-      _0x4a786b = [],
-      _0x9b3905 = [];
+      list3 = [],
+      list4 = [];
     try {
       (delete globalThis.document,
         (globalThis.window = {
@@ -453,24 +453,24 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             },
           },
         }));
-      const _0x128578 = {
+      const store4 = {
           getStateRaw() {
-            return _0xb0f3a4;
+            return draggedCellData4;
           },
-          updateNodeData(_0x49971b, _0x36da55) {
-            (_0x9b3905.push({ nodeId: _0x49971b, patch: _0x36da55 }),
-              (_0xb0f3a4.nodes[_0x49971b] = { ..._0xb0f3a4.nodes[_0x49971b], ..._0x36da55 }));
+          updateNodeData(nodeId4, patch4) {
+            (list4.push({ nodeId: nodeId4, patch: patch4 }),
+              (draggedCellData4.nodes[nodeId4] = { ...draggedCellData4.nodes[nodeId4], ...patch4 }));
           },
-          batch(_0x59d7f4) {
-            _0x59d7f4();
+          batch(handler4) {
+            handler4();
           },
-          addNode(_0x277ab6) {
-            _0x4a786b.push(_0x277ab6);
+          addNode(value15) {
+            list3.push(value15);
           },
           setSelectedNodes() {},
         },
-        _0x2ad956 = createDragController({
-          store: _0x128578,
+        dragController4 = createDragController({
+          store: store4,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -479,19 +479,19 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x208875) {
-            return _0x208875 + '-generated-' + _0x4a786b.length;
+          generateId(value16) {
+            return value16 + '-generated-' + list3.length;
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x44e449 = _0x2ad956.finishDraggingCell(
+        value17 = dragController4.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0xb0f3a4.nodes['sb-1'].cells[0],
+            draggedCellData: draggedCellData4.nodes['sb-1'].cells[0],
             ghostEl: { remove() {} },
             sourceCellEl: null,
             lastHoverNodeId: null,
@@ -499,14 +499,17 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           150,
           50,
         );
-      (assert.deepEqual(_0x44e449, { didAct: true, committed: true }),
-        assert.equal(_0xb0f3a4.nodes['sb-1'].cells[1].id, 'cell-a'),
-        assert.equal(_0xb0f3a4.nodes['sb-1'].cells[1].capturePreviewUrl, 'data:image/jpeg;base64,cell-a'));
-      const _0x3a1124 = _0x2ad956.finishDraggingCell(
+      (assert.deepEqual(value17, { didAct: true, committed: true }),
+        assert.equal(draggedCellData4.nodes['sb-1'].cells[1].id, 'cell-a'),
+        assert.equal(
+          draggedCellData4.nodes['sb-1'].cells[1].capturePreviewUrl,
+          'data:image/jpeg;base64,cell-a',
+        ));
+      const value18 = dragController4.finishDraggingCell(
         {
           targetNodeId: 'sb-1',
           sourceCellIndex: 1,
-          draggedCellData: _0xb0f3a4.nodes['sb-1'].cells[1],
+          draggedCellData: draggedCellData4.nodes['sb-1'].cells[1],
           ghostEl: null,
           sourceCellEl: null,
           lastHoverNodeId: null,
@@ -514,22 +517,22 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         0x1f4,
         0x1f4,
       );
-      (assert.deepEqual(_0x3a1124, { didAct: true, committed: true }),
-        assert.equal(_0x4a786b.length, 1),
-        assert.equal(_0x4a786b[0].src, ''),
-        assert.equal(_0x4a786b[0].capturePreviewUrl, 'data:image/jpeg;base64,cell-a'),
-        assert.equal(_0xb0f3a4.nodes['sb-1'].cells[1].isEmpty, true),
-        assert.equal(_0x9b3905.length, 2));
+      (assert.deepEqual(value18, { didAct: true, committed: true }),
+        assert.equal(list3.length, 1),
+        assert.equal(list3[0].src, ''),
+        assert.equal(list3[0].capturePreviewUrl, 'data:image/jpeg;base64,cell-a'),
+        assert.equal(draggedCellData4.nodes['sb-1'].cells[1].isEmpty, true),
+        assert.equal(list4.length, 2));
     } finally {
-      if (_0x443807 === undefined) delete globalThis.document;
-      else globalThis.document = _0x443807;
-      if (_0x4cfdd4 === undefined) delete globalThis.window;
-      else globalThis.window = _0x4cfdd4;
+      if (value13 === undefined) delete globalThis.document;
+      else globalThis.document = value13;
+      if (value14 === undefined) delete globalThis.window;
+      else globalThis.window = value14;
     }
   }),
   test('DragController: 拖出分镜时 ghost 预览按真实宫格区域裁切', () => {
-    const _0x47d790 = globalThis.document,
-      _0x454f09 = {
+    const value19 = globalThis.document,
+      value20 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -556,27 +559,27 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       };
-    let _0x1e7e6b = null,
-      _0x326f7f = null;
-    const _0x76bb0f = {
+    let el = null,
+      list5 = null;
+    const value21 = {
         complete: true,
         naturalWidth: 0x190,
         naturalHeight: 0x320,
         currentSrc: '/output/source.jpg',
         src: '/output/source.jpg',
         classList: {
-          contains(_0x5e1b4f) {
-            return _0x5e1b4f === 'storyboard-cell-img--source-crop';
+          contains(value22) {
+            return value22 === 'storyboard-cell-img--source-crop';
           },
         },
-        getAttribute(_0xd74278) {
-          return _0xd74278 === 'src' ? '/output/source.jpg' : '';
+        getAttribute(value23) {
+          return value23 === 'src' ? '/output/source.jpg' : '';
         },
         cloneNode() {
           throw new Error('ghost should use real crop instead of cloning preview img');
         },
       },
-      _0x8c8d3c = {
+      box3 = {
         width: 0,
         height: 0,
         style: {},
@@ -584,8 +587,8 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           return {
             imageSmoothingEnabled: false,
             imageSmoothingQuality: '',
-            drawImage(..._0x17c7a8) {
-              _0x326f7f = _0x17c7a8;
+            drawImage(...args2) {
+              list5 = args2;
             },
           };
         },
@@ -593,10 +596,10 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           return 'data:image/jpeg;base64,ghost-crop';
         },
       },
-      _0x56bbdd = (_0x1a34ee) => {
-        if (_0x1a34ee === 'canvas') return _0x8c8d3c;
+      createElement2 = (value24) => {
+        if (value24 === 'canvas') return box3;
         return {
-          tagName: String(_0x1a34ee).toUpperCase(),
+          tagName: String(value24).toUpperCase(),
           className: '',
           style: {},
           children: [],
@@ -608,15 +611,15 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
               return false;
             },
           },
-          setAttribute(_0x4310e4, _0x485402) {
-            this.attrs[_0x4310e4] = _0x485402;
-            if (_0x4310e4 === 'src') this.src = _0x485402;
+          setAttribute(value25, value26) {
+            this.attrs[value25] = value26;
+            if (value25 === 'src') this.src = value26;
           },
-          getAttribute(_0x6da1b1) {
-            return this.attrs[_0x6da1b1] || '';
+          getAttribute(value27) {
+            return this.attrs[value27] || '';
           },
-          appendChild(_0x14936b) {
-            return (this.children.push(_0x14936b), _0x14936b);
+          appendChild(value28) {
+            return (this.children.push(value28), value28);
           },
           remove() {},
         };
@@ -624,33 +627,33 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
     try {
       globalThis.document = {
         body: {
-          appendChild(_0x2d41db) {
-            return ((_0x1e7e6b = _0x2d41db), _0x2d41db);
+          appendChild(value29) {
+            return ((el = value29), value29);
           },
           classList: { add() {}, remove() {} },
         },
-        getElementById(_0x1ec349) {
+        getElementById(value30) {
           return (
-            assert.equal(_0x1ec349, 'cell-sb-1-0'),
+            assert.equal(value30, 'cell-sb-1-0'),
             {
-              querySelector(_0x4fe1b8) {
+              querySelector(value31) {
                 return (
                   assert.equal(
-                    ['.storyboard-cell-img', 'img.storyboard-cell-img--source-crop'].includes(_0x4fe1b8),
+                    ['.storyboard-cell-img', 'img.storyboard-cell-img--source-crop'].includes(value31),
                     true,
                   ),
-                  _0x76bb0f
+                  value21
                 );
               },
             }
           );
         },
-        createElement: _0x56bbdd,
+        createElement: createElement2,
       };
-      const _0x133791 = createDragController({
+      const dragController5 = createDragController({
           store: {
             getStateRaw() {
-              return _0x454f09;
+              return value20;
             },
           },
           isNodeType: isNodeType,
@@ -661,43 +664,43 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return 'sb-1';
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x47f756) {
-            return _0x47f756 + '-generated';
+          generateId(value32) {
+            return value32 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x6a1654 = { classList: { add() {}, remove() {} } },
-        _0x31595d = {},
-        _0x46c8c4 = _0x133791.tryStartNodeDrag(_0x31595d, 50, 50, 50, 50, false, {
+        value33 = { classList: { add() {}, remove() {} } },
+        value34 = {},
+        value35 = dragController5.tryStartNodeDrag(value34, 50, 50, 50, 50, false, {
           target: {
-            closest(_0x5c066f) {
-              return _0x5c066f === '.sb-cell' ? _0x6a1654 : null;
+            closest(value36) {
+              return value36 === '.sb-cell' ? value33 : null;
             },
           },
         });
-      (assert.equal(_0x46c8c4, true),
-        assert.equal(_0x31595d.ghostEl, _0x1e7e6b),
-        assert.equal(_0x1e7e6b.style.width, '288px'),
-        assert.equal(_0x1e7e6b.style.height, '823px'),
-        assert.equal(_0x1e7e6b.style.transform, 'translate(50px, 50px) translate(-50%, -50%)'),
-        assert.deepEqual(_0x326f7f?.slice(1), [0, 0, 0x118, 0x320, 0, 0, 0x118, 0x320]),
-        assert.equal(_0x8c8d3c.width, 0x118),
-        assert.equal(_0x8c8d3c.height, 0x320),
-        assert.equal(_0x1e7e6b.children[0].attrs.src, 'data:image/jpeg;base64,ghost-crop'),
-        assert.equal(_0x1e7e6b.children[0].style.objectFit, 'contain'));
+      (assert.equal(value35, true),
+        assert.equal(value34.ghostEl, el),
+        assert.equal(el.style.width, '288px'),
+        assert.equal(el.style.height, '823px'),
+        assert.equal(el.style.transform, 'translate(50px, 50px) translate(-50%, -50%)'),
+        assert.deepEqual(list5?.slice(1), [0, 0, 0x118, 0x320, 0, 0, 0x118, 0x320]),
+        assert.equal(box3.width, 0x118),
+        assert.equal(box3.height, 0x320),
+        assert.equal(el.children[0].attrs.src, 'data:image/jpeg;base64,ghost-crop'),
+        assert.equal(el.children[0].style.objectFit, 'contain'));
     } finally {
-      _0x47d790 === undefined ? delete globalThis.document : (globalThis.document = _0x47d790);
+      value19 === undefined ? delete globalThis.document : (globalThis.document = value19);
     }
   }),
   test('DragController: 提取图片放回宫格使用已裁好的图，不再保留源图裁切上下文', () => {
-    const _0x2f1dba = globalThis.document,
-      _0x485396 = globalThis.window,
-      _0x23cb1d = globalThis.requestAnimationFrame,
-      _0x41974f = globalThis.setTimeout,
-      _0x2c050d = {
+    const value37 = globalThis.document,
+      value38 = globalThis.window,
+      value39 = globalThis.requestAnimationFrame,
+      value40 = globalThis.setTimeout,
+      args3 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['n1'],
         edges: {},
@@ -746,41 +749,41 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       },
-      _0x228086 = [];
-    let _0xbd9a9c = null,
-      _0x174cc8 = null,
-      _0x4eab60 = null,
-      _0x1e100a = 0;
-    function _0x2c9243(_0x1ed50f) {
-      const _0x3ce11c = {
-        tagName: String(_0x1ed50f).toUpperCase(),
+      list6 = [];
+    let value41 = null,
+      value42 = null,
+      value43 = null,
+      value44 = 0;
+    function createElement3(value45) {
+      const value46 = {
+        tagName: String(value45).toUpperCase(),
         style: {},
         children: [],
         complete: true,
         naturalWidth: 100,
         naturalHeight: 100,
         className: '',
-        appendChild(_0x34f138) {
-          return (this.children.push(_0x34f138), _0x34f138);
+        appendChild(value47) {
+          return (this.children.push(value47), value47);
         },
-        setAttribute(_0x508aad, _0x5ca014) {
-          this[_0x508aad] = String(_0x5ca014);
+        setAttribute(value48, value49) {
+          this[value48] = String(value49);
         },
-        getAttribute(_0x3aceef) {
-          return this[_0x3aceef] || '';
+        getAttribute(value50) {
+          return this[value50] || '';
         },
         getContext() {
           return { imageSmoothingEnabled: false, imageSmoothingQuality: '', drawImage() {} };
         },
         remove() {},
       };
-      return (_0x228086.push(_0x3ce11c), _0x3ce11c);
+      return (list6.push(value46), value46);
     }
     try {
       ((globalThis.window = globalThis),
         (globalThis.v2Renderer = {
-          getMountedWrapper(_0x245665) {
-            if (_0x245665 !== 'n1') return null;
+          getMountedWrapper(value51) {
+            if (value51 !== 'n1') return null;
             return {
               querySelector() {
                 return {
@@ -797,54 +800,54 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         (globalThis.document = {
           body: {
             classList: createClassList(),
-            appendChild(_0x19438c) {
-              return (_0x228086.push(_0x19438c), _0x19438c);
+            appendChild(value52) {
+              return (list6.push(value52), value52);
             },
           },
-          createElement: _0x2c9243,
-          getElementById(_0x742697) {
-            if (_0x742697 !== 'cell-sb-1-0') return null;
+          createElement: createElement3,
+          getElementById(value53) {
+            if (value53 !== 'cell-sb-1-0') return null;
             return {
               querySelector() {
                 return {
                   complete: true,
                   naturalWidth: 0x190,
-                  getAttribute(_0x3c5f27) {
-                    return _0x3c5f27 === 'src' ? '/output/extracted.jpg' : '';
+                  getAttribute(value54) {
+                    return value54 === 'src' ? '/output/extracted.jpg' : '';
                   },
                 };
               },
             };
           },
         }),
-        (globalThis.requestAnimationFrame = (_0x4d3ab4) => {
-          return (_0x4d3ab4(), 1);
+        (globalThis.requestAnimationFrame = (handler5) => {
+          return (handler5(), 1);
         }),
-        (globalThis.setTimeout = (_0x2c5c1d) => {
-          return (_0x2c5c1d(), 1);
+        (globalThis.setTimeout = (handler6) => {
+          return (handler6(), 1);
         }));
-      const _0x4ab54e = {
+      const store5 = {
           getStateRaw() {
-            return _0x2c050d;
+            return args3;
           },
-          updateNodeData(_0x2d890e, _0x108eaf) {
-            ((_0xbd9a9c = { nodeId: _0x2d890e, patch: _0x108eaf }),
-              (_0x2c050d.nodes[_0x2d890e] = { ..._0x2c050d.nodes[_0x2d890e], ..._0x108eaf }));
+          updateNodeData(nodeId5, patch5) {
+            ((value41 = { nodeId: nodeId5, patch: patch5 }),
+              (args3.nodes[nodeId5] = { ...args3.nodes[nodeId5], ...patch5 }));
           },
-          setSelectedNodes(_0x26ab39) {
-            ((_0x174cc8 = _0x26ab39), (_0x2c050d.selectedNodeIds = [..._0x26ab39]));
+          setSelectedNodes(args4) {
+            ((value42 = args4), (args3.selectedNodeIds = [...args4]));
           },
-          deleteNodes(_0xad7c61) {
-            _0x4eab60 = _0xad7c61;
+          deleteNodes(value55) {
+            value43 = value55;
           },
           moveNodes() {},
-          batch(_0x2bb2e0) {
-            _0x2bb2e0();
+          batch(handler7) {
+            handler7();
           },
           groupNodes() {},
         },
-        _0x1b8d1b = createDragController({
-          store: _0x4ab54e,
+        dragController6 = createDragController({
+          store: store5,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -853,20 +856,20 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x223315) {
-            return _0x223315 + '-generated';
+          generateId(value56) {
+            return value56 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {
-            _0x1e100a += 1;
+            value44 += 1;
           },
         }),
-        _0xbe043d = _0x1b8d1b.finishDraggingNodes(createNodeDragContext(), 125, 50);
-      (assert.deepEqual(_0xbe043d, { earlyCommit: true, didAct: true }),
-        assert.equal(_0xbd9a9c?.nodeId, 'sb-1'),
-        assert.deepEqual(_0xbd9a9c?.patch?.cells?.[0], {
+        value57 = dragController6.finishDraggingNodes(createNodeDragContext(), 125, 50);
+      (assert.deepEqual(value57, { earlyCommit: true, didAct: true }),
+        assert.equal(value41?.nodeId, 'sb-1'),
+        assert.deepEqual(value41?.patch?.cells?.[0], {
           id: 'cell-generated',
           url: '',
           localPath: 'output/extracted.jpg',
@@ -902,27 +905,27 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           col: 0,
           row: 0,
         }),
-        assert.deepEqual(_0x174cc8, []),
-        assert.deepEqual(_0x4eab60, ['n1']),
-        assert.equal(_0x1e100a, 1));
+        assert.deepEqual(value42, []),
+        assert.deepEqual(value43, ['n1']),
+        assert.equal(value44, 1));
     } finally {
-      if (_0x2f1dba === undefined) delete globalThis.document;
-      else globalThis.document = _0x2f1dba;
-      if (_0x485396 === undefined) delete globalThis.window;
-      else globalThis.window = _0x485396;
-      if (_0x23cb1d === undefined) delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0x23cb1d;
-      if (_0x41974f === undefined) delete globalThis.setTimeout;
-      else globalThis.setTimeout = _0x41974f;
+      if (value37 === undefined) delete globalThis.document;
+      else globalThis.document = value37;
+      if (value38 === undefined) delete globalThis.window;
+      else globalThis.window = value38;
+      if (value39 === undefined) delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value39;
+      if (value40 === undefined) delete globalThis.setTimeout;
+      else globalThis.setTimeout = value40;
       delete globalThis.v2Renderer;
     }
   }),
   test('DragController: 图片放回宫格后立刻刷新并清理拖拽残影', () => {
-    const _0x168509 = globalThis.document,
-      _0x3ca469 = globalThis.window,
-      _0xc917d3 = globalThis.requestAnimationFrame,
-      _0xbecc73 = globalThis.setTimeout,
-      _0x3d1c08 = {
+    const value58 = globalThis.document,
+      value59 = globalThis.window,
+      value60 = globalThis.requestAnimationFrame,
+      value61 = globalThis.setTimeout,
+      args5 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['n1'],
         edges: {},
@@ -957,32 +960,32 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       },
-      _0x5784a4 = [],
-      _0x5e18f1 = [];
-    let _0x1cbb4b = null,
-      _0x4fc79e = null,
-      _0x13c51d = null,
-      _0x21e39d = null,
-      _0x2a712a = null,
-      _0x346c7b = 0,
-      _0x1f97ca = 0;
-    function _0x4b4270(_0x3137ae) {
-      const _0x1b6b8b = {
-        tagName: String(_0x3137ae).toUpperCase(),
+      list7 = [],
+      list8 = [];
+    let el2 = null,
+      value62 = null,
+      value63 = null,
+      value64 = null,
+      value65 = null,
+      value66 = 0,
+      value67 = 0;
+    function createElement4(value68) {
+      const value69 = {
+        tagName: String(value68).toUpperCase(),
         style: {},
         children: [],
         className: '',
         complete: true,
         naturalWidth: 120,
         naturalHeight: 240,
-        appendChild(_0x558ba9) {
-          return (this.children.push(_0x558ba9), _0x558ba9);
+        appendChild(value70) {
+          return (this.children.push(value70), value70);
         },
-        setAttribute(_0x2d7cf5, _0x25d3f4) {
-          this[_0x2d7cf5] = String(_0x25d3f4);
+        setAttribute(value71, value72) {
+          this[value71] = String(value72);
         },
-        getAttribute(_0x3b4b87) {
-          return this[_0x3b4b87] || '';
+        getAttribute(value73) {
+          return this[value73] || '';
         },
         getContext() {
           return { imageSmoothingEnabled: false, imageSmoothingQuality: '', drawImage() {} };
@@ -991,13 +994,13 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           this.removed = true;
         },
       };
-      return _0x1b6b8b;
+      return value69;
     }
     try {
       ((globalThis.window = globalThis),
         (globalThis.v2Renderer = {
-          getMountedWrapper(_0x569707) {
-            if (_0x569707 !== 'n1') return null;
+          getMountedWrapper(value74) {
+            if (value74 !== 'n1') return null;
             return {
               querySelector() {
                 return {
@@ -1010,54 +1013,54 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
               },
             };
           },
-          flushNodes(_0x5afdd7) {
-            return ((_0x2a712a = _0x5afdd7), true);
+          flushNodes(value75) {
+            return ((value65 = value75), true);
           },
         }),
         (globalThis.document = {
           body: {
             classList: createClassList(),
-            appendChild(_0xda0dcd) {
-              return (_0xda0dcd.className === 'v2-ghost-image' && (_0x1cbb4b = _0xda0dcd), _0xda0dcd);
+            appendChild(value76) {
+              return (value76.className === 'v2-ghost-image' && (el2 = value76), value76);
             },
           },
-          createElement: _0x4b4270,
+          createElement: createElement4,
           getElementById() {
-            _0x1f97ca += 1;
+            value67 += 1;
             throw new Error('storyboard drop ghost should not wait for cell image');
           },
         }),
-        (globalThis.requestAnimationFrame = (_0x31295d) => {
-          return (_0x5784a4.push(_0x31295d), _0x5784a4.length);
+        (globalThis.requestAnimationFrame = (value77) => {
+          return (list7.push(value77), list7.length);
         }),
-        (globalThis.setTimeout = (_0x3faf38, _0x5686fc = 0) => {
-          return (_0x5e18f1.push({ callback: _0x3faf38, delay: _0x5686fc }), _0x5e18f1.length);
+        (globalThis.setTimeout = (callback, delay = 0) => {
+          return (list8.push({ callback: callback, delay: delay }), list8.length);
         }));
-      const _0x3f4697 = {
+      const store6 = {
           getStateRaw() {
-            return _0x3d1c08;
+            return args5;
           },
-          updateNodeData(_0x5b9a55, _0x22adc1) {
-            ((_0x4fc79e = { nodeId: _0x5b9a55, patch: _0x22adc1 }),
-              (_0x3d1c08.nodes[_0x5b9a55] = { ..._0x3d1c08.nodes[_0x5b9a55], ..._0x22adc1 }));
+          updateNodeData(nodeId6, patch6) {
+            ((value62 = { nodeId: nodeId6, patch: patch6 }),
+              (args5.nodes[nodeId6] = { ...args5.nodes[nodeId6], ...patch6 }));
           },
-          setSelectedNodes(_0xaa0226) {
-            ((_0x13c51d = _0xaa0226), (_0x3d1c08.selectedNodeIds = [..._0xaa0226]));
+          setSelectedNodes(args6) {
+            ((value63 = args6), (args5.selectedNodeIds = [...args6]));
           },
-          deleteNodes(_0x1921f8) {
-            _0x21e39d = _0x1921f8;
-            for (const _0x27cc4a of _0x1921f8) {
-              delete _0x3d1c08.nodes[_0x27cc4a];
+          deleteNodes(value78) {
+            value64 = value78;
+            for (const value79 of value78) {
+              delete args5.nodes[value79];
             }
           },
           moveNodes() {},
-          batch(_0x323808) {
-            _0x323808();
+          batch(handler8) {
+            handler8();
           },
           groupNodes() {},
         },
-        _0x158c7d = createDragController({
-          store: _0x3f4697,
+        dragController7 = createDragController({
+          store: store6,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -1066,56 +1069,56 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x1b7215) {
-            return _0x1b7215 + '-generated';
+          generateId(value80) {
+            return value80 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {
-            _0x346c7b += 1;
+            value66 += 1;
           },
         }),
-        _0x27b391 = _0x158c7d.finishDraggingNodes(createNodeDragContext(), 125, 50);
-      (assert.deepEqual(_0x27b391, { earlyCommit: true, didAct: true }),
-        assert.equal(_0x4fc79e?.nodeId, 'sb-1'),
-        assert.deepEqual(_0x2a712a, ['sb-1']),
-        assert.deepEqual(_0x13c51d, []),
-        assert.deepEqual(_0x21e39d, ['n1']),
-        assert.equal(_0x3d1c08.nodes.n1, undefined),
-        assert.equal(_0x1f97ca, 0),
-        assert.ok(_0x1cbb4b),
-        assert.equal(_0x1cbb4b.removed, undefined),
-        assert.equal(_0x1cbb4b.style.opacity, '0'),
-        assert.match(_0x1cbb4b.style.transition, /opacity 0s/),
-        assert.equal(_0x5e18f1.length, 1),
-        assert.equal(_0x5e18f1[0].delay, 0),
-        _0x5e18f1.shift().callback(),
-        assert.equal(_0x1cbb4b.removed, true),
-        assert.equal(_0x346c7b, 0),
-        assert.equal(_0x5784a4.length, 2));
-      while (_0x5784a4.length) {
-        _0x5784a4.shift()();
+        value81 = dragController7.finishDraggingNodes(createNodeDragContext(), 125, 50);
+      (assert.deepEqual(value81, { earlyCommit: true, didAct: true }),
+        assert.equal(value62?.nodeId, 'sb-1'),
+        assert.deepEqual(value65, ['sb-1']),
+        assert.deepEqual(value63, []),
+        assert.deepEqual(value64, ['n1']),
+        assert.equal(args5.nodes.n1, undefined),
+        assert.equal(value67, 0),
+        assert.ok(el2),
+        assert.equal(el2.removed, undefined),
+        assert.equal(el2.style.opacity, '0'),
+        assert.match(el2.style.transition, /opacity 0s/),
+        assert.equal(list8.length, 1),
+        assert.equal(list8[0].delay, 0),
+        list8.shift().callback(),
+        assert.equal(el2.removed, true),
+        assert.equal(value66, 0),
+        assert.equal(list7.length, 2));
+      while (list7.length) {
+        list7.shift()();
       }
-      (assert.equal(_0x1f97ca, 0),
-        assert.equal(_0x5e18f1.length, 1),
-        assert.equal(_0x5e18f1[0].delay, 0),
-        _0x5e18f1.shift().callback(),
-        assert.equal(_0x346c7b, 1));
+      (assert.equal(value67, 0),
+        assert.equal(list8.length, 1),
+        assert.equal(list8[0].delay, 0),
+        list8.shift().callback(),
+        assert.equal(value66, 1));
     } finally {
-      if (_0x168509 === undefined) delete globalThis.document;
-      else globalThis.document = _0x168509;
-      if (_0x3ca469 === undefined) delete globalThis.window;
-      else globalThis.window = _0x3ca469;
-      if (_0xc917d3 === undefined) delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0xc917d3;
-      if (_0xbecc73 === undefined) delete globalThis.setTimeout;
-      else globalThis.setTimeout = _0xbecc73;
+      if (value58 === undefined) delete globalThis.document;
+      else globalThis.document = value58;
+      if (value59 === undefined) delete globalThis.window;
+      else globalThis.window = value59;
+      if (value60 === undefined) delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value60;
+      if (value61 === undefined) delete globalThis.setTimeout;
+      else globalThis.setTimeout = value61;
       delete globalThis.v2Renderer;
     }
   }),
   test('DragController: source-only image drop into storyboard does not write source fallback', () => {
-    const _0x239f91 = {
+    const value82 = {
       viewport: { x: 0, y: 0, zoom: 1 },
       selectedNodeIds: ['n1'],
       edges: {},
@@ -1150,31 +1153,31 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         },
       },
     };
-    let _0x501037 = false,
-      _0x373539 = false,
-      _0x406e73 = false,
-      _0x3e8d24 = false;
-    const _0x158ea1 = {
+    let value83 = false,
+      value84 = false,
+      value85 = false,
+      value86 = false;
+    const store7 = {
         getStateRaw() {
-          return _0x239f91;
+          return value82;
         },
         updateNodeData() {
-          _0x501037 = true;
+          value83 = true;
         },
         setSelectedNodes() {
-          _0x406e73 = true;
+          value85 = true;
         },
         deleteNodes() {
-          _0x373539 = true;
+          value84 = true;
         },
         moveNodes() {},
-        batch(_0x4b956f) {
-          _0x4b956f();
+        batch(handler9) {
+          handler9();
         },
         groupNodes() {},
       },
-      _0x14e9bf = createDragController({
-        store: _0x158ea1,
+      dragController8 = createDragController({
+        store: store7,
         isNodeType: isNodeType,
         getShortcuts() {
           return {};
@@ -1183,29 +1186,29 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           return null;
         },
         screenToWorld: identityScreenToWorld,
-        generateId(_0x47bdac) {
-          return _0x47bdac + '-generated';
+        generateId(value87) {
+          return value87 + '-generated';
         },
         cloneNodesWithEdges() {
           return {};
         },
         commit() {
-          _0x3e8d24 = true;
+          value86 = true;
         },
       }),
-      _0x37dcbc = _0x14e9bf.finishDraggingNodes(createNodeDragContext(), 125, 50);
-    (assert.deepEqual(_0x37dcbc, { earlyCommit: false, didAct: false }),
-      assert.equal(_0x501037, false),
-      assert.equal(_0x373539, false),
-      assert.equal(_0x406e73, false),
-      assert.equal(_0x3e8d24, false));
+      value88 = dragController8.finishDraggingNodes(createNodeDragContext(), 125, 50);
+    (assert.deepEqual(value88, { earlyCommit: false, didAct: false }),
+      assert.equal(value83, false),
+      assert.equal(value84, false),
+      assert.equal(value85, false),
+      assert.equal(value86, false));
   }),
   test('DragController: 放入宫格时使用拖拽节点当前可见图，不用源图兜底', () => {
-    const _0x2b4073 = globalThis.document,
-      _0x5c0abd = globalThis.window,
-      _0x23f6e9 = globalThis.requestAnimationFrame,
-      _0x505dc0 = globalThis.setTimeout,
-      _0x22cec3 = {
+    const value89 = globalThis.document,
+      value90 = globalThis.window,
+      value91 = globalThis.requestAnimationFrame,
+      value92 = globalThis.setTimeout,
+      args7 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['n1'],
         edges: {},
@@ -1246,37 +1249,37 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       };
-    let _0x2ce6b7 = null,
-      _0x5df9d1 = null,
-      _0x13cc5c = null,
-      _0x2d2736 = 0;
-    function _0x568947(_0x2708ea) {
-      const _0x285206 = {
-        tagName: String(_0x2708ea).toUpperCase(),
+    let value93 = null,
+      value94 = null,
+      value95 = null,
+      value96 = 0;
+    function createElement5(value97) {
+      const value98 = {
+        tagName: String(value97).toUpperCase(),
         style: {},
         children: [],
         className: '',
-        appendChild(_0x37046d) {
-          return (this.children.push(_0x37046d), _0x37046d);
+        appendChild(value99) {
+          return (this.children.push(value99), value99);
         },
-        setAttribute(_0x3c4820, _0x5771fd) {
-          this[_0x3c4820] = String(_0x5771fd);
+        setAttribute(value100, value101) {
+          this[value100] = String(value101);
         },
-        getAttribute(_0x23ec07) {
-          return this[_0x23ec07] || '';
+        getAttribute(value102) {
+          return this[value102] || '';
         },
         getContext() {
           return { imageSmoothingEnabled: false, imageSmoothingQuality: '', drawImage() {} };
         },
         remove() {},
       };
-      return _0x285206;
+      return value98;
     }
     try {
       ((globalThis.window = globalThis),
         (globalThis.v2Renderer = {
-          getMountedWrapper(_0x5edcc2) {
-            if (_0x5edcc2 !== 'n1') return null;
+          getMountedWrapper(value103) {
+            if (value103 !== 'n1') return null;
             return {
               querySelector() {
                 return {
@@ -1293,54 +1296,54 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         (globalThis.document = {
           body: {
             classList: createClassList(),
-            appendChild(_0x3d5938) {
-              return _0x3d5938;
+            appendChild(value104) {
+              return value104;
             },
           },
-          createElement: _0x568947,
-          getElementById(_0x1f900b) {
-            if (_0x1f900b !== 'cell-sb-1-0') return null;
+          createElement: createElement5,
+          getElementById(value105) {
+            if (value105 !== 'cell-sb-1-0') return null;
             return {
               querySelector() {
                 return {
                   complete: true,
                   naturalWidth: 120,
-                  getAttribute(_0x409ba4) {
-                    return _0x409ba4 === 'src' ? '/output/current-visible.jpg' : '';
+                  getAttribute(value106) {
+                    return value106 === 'src' ? '/output/current-visible.jpg' : '';
                   },
                 };
               },
             };
           },
         }),
-        (globalThis.requestAnimationFrame = (_0x3db350) => {
-          return (_0x3db350(), 1);
+        (globalThis.requestAnimationFrame = (handler10) => {
+          return (handler10(), 1);
         }),
-        (globalThis.setTimeout = (_0x2f53e9) => {
-          return (_0x2f53e9(), 1);
+        (globalThis.setTimeout = (handler11) => {
+          return (handler11(), 1);
         }));
-      const _0x26a722 = {
+      const store8 = {
           getStateRaw() {
-            return _0x22cec3;
+            return args7;
           },
-          updateNodeData(_0x57d00a, _0x5d5518) {
-            ((_0x2ce6b7 = { nodeId: _0x57d00a, patch: _0x5d5518 }),
-              (_0x22cec3.nodes[_0x57d00a] = { ..._0x22cec3.nodes[_0x57d00a], ..._0x5d5518 }));
+          updateNodeData(nodeId7, patch7) {
+            ((value93 = { nodeId: nodeId7, patch: patch7 }),
+              (args7.nodes[nodeId7] = { ...args7.nodes[nodeId7], ...patch7 }));
           },
-          setSelectedNodes(_0x410132) {
-            ((_0x5df9d1 = _0x410132), (_0x22cec3.selectedNodeIds = [..._0x410132]));
+          setSelectedNodes(args8) {
+            ((value94 = args8), (args7.selectedNodeIds = [...args8]));
           },
-          deleteNodes(_0x1206b3) {
-            _0x13cc5c = _0x1206b3;
+          deleteNodes(value107) {
+            value95 = value107;
           },
           moveNodes() {},
-          batch(_0x511bbb) {
-            _0x511bbb();
+          batch(handler12) {
+            handler12();
           },
           groupNodes() {},
         },
-        _0x40d3e4 = createDragController({
-          store: _0x26a722,
+        dragController9 = createDragController({
+          store: store8,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -1349,45 +1352,45 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x2ae7e9) {
-            return _0x2ae7e9 + '-generated';
+          generateId(value108) {
+            return value108 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {
-            _0x2d2736 += 1;
+            value96 += 1;
           },
         }),
-        _0x1b97e3 = _0x40d3e4.finishDraggingNodes(createNodeDragContext(), 125, 50);
-      assert.deepEqual(_0x1b97e3, { earlyCommit: true, didAct: true });
-      const _0x125ead = _0x2ce6b7?.patch?.cells?.[0];
-      (assert.equal(_0x2ce6b7?.nodeId, 'sb-1'),
-        assert.equal(_0x125ead?.localPath, 'output/current-visible.jpg'),
-        assert.equal(_0x125ead?.sourceLocalPath, null),
-        assert.equal(_0x125ead?.sourceUrl, ''),
-        assert.equal(_0x125ead?.storyboardSourceCrop, false),
-        assert.equal(_0x125ead?.storyboardPiece, false),
-        assert.equal(_0x125ead?.storyboardSourceIndex, 2),
-        assert.equal(_0x125ead?.storyboardExtractedCell, true),
-        assert.deepEqual(_0x5df9d1, []),
-        assert.deepEqual(_0x13cc5c, ['n1']),
-        assert.equal(_0x2d2736, 1));
+        value109 = dragController9.finishDraggingNodes(createNodeDragContext(), 125, 50);
+      assert.deepEqual(value109, { earlyCommit: true, didAct: true });
+      const value110 = value93?.patch?.cells?.[0];
+      (assert.equal(value93?.nodeId, 'sb-1'),
+        assert.equal(value110?.localPath, 'output/current-visible.jpg'),
+        assert.equal(value110?.sourceLocalPath, null),
+        assert.equal(value110?.sourceUrl, ''),
+        assert.equal(value110?.storyboardSourceCrop, false),
+        assert.equal(value110?.storyboardPiece, false),
+        assert.equal(value110?.storyboardSourceIndex, 2),
+        assert.equal(value110?.storyboardExtractedCell, true),
+        assert.deepEqual(value94, []),
+        assert.deepEqual(value95, ['n1']),
+        assert.equal(value96, 1));
     } finally {
-      if (_0x2b4073 === undefined) delete globalThis.document;
-      else globalThis.document = _0x2b4073;
-      if (_0x5c0abd === undefined) delete globalThis.window;
-      else globalThis.window = _0x5c0abd;
-      if (_0x23f6e9 === undefined) delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0x23f6e9;
-      if (_0x505dc0 === undefined) delete globalThis.setTimeout;
-      else globalThis.setTimeout = _0x505dc0;
+      if (value89 === undefined) delete globalThis.document;
+      else globalThis.document = value89;
+      if (value90 === undefined) delete globalThis.window;
+      else globalThis.window = value90;
+      if (value91 === undefined) delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value91;
+      if (value92 === undefined) delete globalThis.setTimeout;
+      else globalThis.setTimeout = value92;
       delete globalThis.v2Renderer;
     }
   }),
   test('DragController: 临时预览格拖出会落盘回填图片节点', async () => {
-    const _0x363982 = 'data:image/png,storyboard-preview',
-      _0x582d51 = {
+    const capturePreviewUrl = 'data:image/png,storyboard-preview',
+      draggedCellData5 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: [],
         edges: {},
@@ -1404,7 +1407,7 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             cells: [
               {
                 id: 'cell-preview',
-                capturePreviewUrl: _0x363982,
+                capturePreviewUrl: capturePreviewUrl,
                 imageWidth: 80,
                 imageHeight: 40,
                 isEmpty: false,
@@ -1413,29 +1416,29 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       },
-      _0x4466be = [];
-    let _0x5bcfb4 = null,
-      _0x215058 = 0;
-    const _0x534d60 = {
+      list9 = [];
+    let value111 = null,
+      value112 = 0;
+    const store9 = {
         getStateRaw() {
-          return _0x582d51;
+          return draggedCellData5;
         },
-        batch(_0x945b71) {
-          _0x945b71();
+        batch(handler13) {
+          handler13();
         },
-        addNode(_0x1fad8e) {
-          ((_0x5bcfb4 = _0x1fad8e), (_0x582d51.nodes[_0x1fad8e.id] = _0x1fad8e));
+        addNode(value113) {
+          ((value111 = value113), (draggedCellData5.nodes[value113.id] = value113));
         },
-        setSelectedNodes(_0x5945df) {
-          _0x582d51.selectedNodeIds = _0x5945df;
+        setSelectedNodes(value114) {
+          draggedCellData5.selectedNodeIds = value114;
         },
-        updateNodeData(_0x27ca8e, _0x3b9f96) {
-          (_0x4466be.push({ nodeId: _0x27ca8e, patch: _0x3b9f96 }),
-            (_0x582d51.nodes[_0x27ca8e] = { ..._0x582d51.nodes[_0x27ca8e], ..._0x3b9f96 }));
+        updateNodeData(nodeId8, patch8) {
+          (list9.push({ nodeId: nodeId8, patch: patch8 }),
+            (draggedCellData5.nodes[nodeId8] = { ...draggedCellData5.nodes[nodeId8], ...patch8 }));
         },
       },
-      _0x505dbc = createDragController({
-        store: _0x534d60,
+      dragController10 = createDragController({
+        store: store9,
         isNodeType: isNodeType,
         getShortcuts() {
           return {};
@@ -1444,8 +1447,8 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           return null;
         },
         screenToWorld: identityScreenToWorld,
-        generateId(_0x3e0ba3) {
-          return _0x3e0ba3 + '-generated';
+        generateId(value115) {
+          return value115 + '-generated';
         },
         cloneNodesWithEdges() {
           return {};
@@ -1453,7 +1456,7 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         commit() {},
         async saveOutputBlobImpl() {
           return (
-            (_0x215058 += 1),
+            (value112 += 1),
             {
               localPath: 'output/persisted-preview.png',
               url: '/output/persisted-preview.png',
@@ -1464,11 +1467,11 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           );
         },
       }),
-      _0x3895ca = _0x505dbc.finishDraggingCell(
+      value116 = dragController10.finishDraggingCell(
         {
           targetNodeId: 'sb-1',
           sourceCellIndex: 0,
-          draggedCellData: _0x582d51.nodes['sb-1'].cells[0],
+          draggedCellData: draggedCellData5.nodes['sb-1'].cells[0],
           ghostEl: null,
           sourceCellEl: null,
           lastHoverNodeId: null,
@@ -1477,28 +1480,31 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         50,
       );
     (await flushAsyncWork(),
-      assert.deepEqual(_0x3895ca, { didAct: true, committed: true }),
-      assert.equal(_0x5bcfb4?.id, 'source-image-generated'),
-      assert.equal(_0x5bcfb4?.src, ''),
-      assert.equal(_0x5bcfb4?.capturePreviewUrl, _0x363982),
-      assert.equal(_0x215058, 1),
-      assert.equal(_0x582d51.nodes['source-image-generated'].src, '/output/persisted-preview.png'),
-      assert.equal(_0x582d51.nodes['source-image-generated'].localPath, 'output/persisted-preview.png'),
-      assert.equal(_0x582d51.nodes['source-image-generated'].capturePreviewUrl, ''),
-      assert.equal(_0x582d51.nodes['source-image-generated'].imageWidth, 80),
-      assert.equal(_0x582d51.nodes['sb-1'].cells[0].isEmpty, true),
+      assert.deepEqual(value116, { didAct: true, committed: true }),
+      assert.equal(value111?.id, 'source-image-generated'),
+      assert.equal(value111?.src, ''),
+      assert.equal(value111?.capturePreviewUrl, capturePreviewUrl),
+      assert.equal(value112, 1),
+      assert.equal(draggedCellData5.nodes['source-image-generated'].src, '/output/persisted-preview.png'),
       assert.equal(
-        _0x4466be.some((_0x524370) => _0x524370.nodeId === 'source-image-generated'),
+        draggedCellData5.nodes['source-image-generated'].localPath,
+        'output/persisted-preview.png',
+      ),
+      assert.equal(draggedCellData5.nodes['source-image-generated'].capturePreviewUrl, ''),
+      assert.equal(draggedCellData5.nodes['source-image-generated'].imageWidth, 80),
+      assert.equal(draggedCellData5.nodes['sb-1'].cells[0].isEmpty, true),
+      assert.equal(
+        list9.some((item2) => item2.nodeId === 'source-image-generated'),
         true,
       ));
   }),
   test('DragController: 临时预览图放回宫格会落盘回填 cell', async () => {
-    const _0x125c10 = globalThis.document,
-      _0x97e6c0 = globalThis.window,
-      _0x21dca1 = globalThis.requestAnimationFrame,
-      _0x554dff = globalThis.setTimeout,
-      _0x350208 = 'data:image/png,returned-preview',
-      _0x432c0b = {
+    const value117 = globalThis.document,
+      value118 = globalThis.window,
+      value119 = globalThis.requestAnimationFrame,
+      value120 = globalThis.setTimeout,
+      capturePreviewUrl2 = 'data:image/png,returned-preview',
+      args9 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['n1'],
         edges: {},
@@ -1514,7 +1520,7 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             height: 60,
             src: '',
             localPath: null,
-            capturePreviewUrl: _0x350208,
+            capturePreviewUrl: capturePreviewUrl2,
             imageWidth: 80,
             imageHeight: 40,
             storyboardExtractedCell: true,
@@ -1533,21 +1539,21 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       };
-    let _0x1dd289 = 0;
-    function _0x56df5c(_0x182929) {
+    let value121 = 0;
+    function createElement6(value122) {
       return {
-        tagName: String(_0x182929).toUpperCase(),
+        tagName: String(value122).toUpperCase(),
         style: {},
         children: [],
         className: '',
-        appendChild(_0x2a7e28) {
-          return (this.children.push(_0x2a7e28), _0x2a7e28);
+        appendChild(value123) {
+          return (this.children.push(value123), value123);
         },
-        setAttribute(_0x6f6711, _0x15b894) {
-          this[_0x6f6711] = String(_0x15b894);
+        setAttribute(value124, value125) {
+          this[value124] = String(value125);
         },
-        getAttribute(_0x2fd3d4) {
-          return this[_0x2fd3d4] || '';
+        getAttribute(value126) {
+          return this[value126] || '';
         },
         getContext() {
           return { imageSmoothingEnabled: false, imageSmoothingQuality: '', drawImage() {} };
@@ -1558,16 +1564,16 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
     try {
       ((globalThis.window = globalThis),
         (globalThis.v2Renderer = {
-          getMountedWrapper(_0x534cd8) {
-            if (_0x534cd8 !== 'n1') return null;
+          getMountedWrapper(value127) {
+            if (value127 !== 'n1') return null;
             return {
               querySelector() {
                 return {
                   complete: true,
                   naturalWidth: 80,
                   naturalHeight: 40,
-                  currentSrc: _0x350208,
-                  src: _0x350208,
+                  currentSrc: capturePreviewUrl2,
+                  src: capturePreviewUrl2,
                 };
               },
             };
@@ -1576,53 +1582,53 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         (globalThis.document = {
           body: {
             classList: createClassList(),
-            appendChild(_0x2f4e8c) {
-              return _0x2f4e8c;
+            appendChild(value128) {
+              return value128;
             },
           },
-          createElement: _0x56df5c,
-          getElementById(_0x290857) {
-            if (_0x290857 !== 'cell-sb-1-0') return null;
+          createElement: createElement6,
+          getElementById(value129) {
+            if (value129 !== 'cell-sb-1-0') return null;
             return {
               querySelector() {
                 return {
                   complete: true,
                   naturalWidth: 80,
-                  getAttribute(_0x549ad6) {
-                    return _0x549ad6 === 'src' ? _0x350208 : '';
+                  getAttribute(value130) {
+                    return value130 === 'src' ? capturePreviewUrl2 : '';
                   },
                 };
               },
             };
           },
         }),
-        (globalThis.requestAnimationFrame = (_0x2c2a8e) => {
-          return (_0x2c2a8e(), 1);
+        (globalThis.requestAnimationFrame = (handler14) => {
+          return (handler14(), 1);
         }),
-        (globalThis.setTimeout = (_0x26be3c) => {
-          return (_0x26be3c(), 1);
+        (globalThis.setTimeout = (handler15) => {
+          return (handler15(), 1);
         }));
-      const _0x3de14e = {
+      const store10 = {
           getStateRaw() {
-            return _0x432c0b;
+            return args9;
           },
-          updateNodeData(_0x34d991, _0x5892f0) {
-            _0x432c0b.nodes[_0x34d991] = { ..._0x432c0b.nodes[_0x34d991], ..._0x5892f0 };
+          updateNodeData(value131, args10) {
+            args9.nodes[value131] = { ...args9.nodes[value131], ...args10 };
           },
-          setSelectedNodes(_0xb85431) {
-            _0x432c0b.selectedNodeIds = [..._0xb85431];
+          setSelectedNodes(args11) {
+            args9.selectedNodeIds = [...args11];
           },
-          deleteNodes(_0x4c4cad) {
-            for (const _0xce4f15 of _0x4c4cad) delete _0x432c0b.nodes[_0xce4f15];
+          deleteNodes(value132) {
+            for (const value133 of value132) delete args9.nodes[value133];
           },
           moveNodes() {},
-          batch(_0x2ff8c7) {
-            _0x2ff8c7();
+          batch(handler16) {
+            handler16();
           },
           groupNodes() {},
         },
-        _0x4cac75 = createDragController({
-          store: _0x3de14e,
+        dragController11 = createDragController({
+          store: store10,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -1631,8 +1637,8 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x333906) {
-            return _0x333906 + '-generated';
+          generateId(value134) {
+            return value134 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
@@ -1640,7 +1646,7 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           commit() {},
           async saveOutputBlobImpl() {
             return (
-              (_0x1dd289 += 1),
+              (value121 += 1),
               {
                 localPath: 'output/returned-preview.png',
                 url: '/output/returned-preview.png',
@@ -1651,36 +1657,36 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             );
           },
         }),
-        _0x4bc634 = _0x4cac75.finishDraggingNodes(createNodeDragContext(), 125, 50);
+        value135 = dragController11.finishDraggingNodes(createNodeDragContext(), 125, 50);
       (await flushAsyncWork(),
-        assert.deepEqual(_0x4bc634, { earlyCommit: true, didAct: true }),
-        assert.equal(_0x1dd289, 1));
-      const _0x2ff7bc = _0x432c0b.nodes['sb-1'].cells[0];
-      (assert.equal(_0x2ff7bc.localPath, 'output/returned-preview.png'),
-        assert.equal(_0x2ff7bc.capturePreviewUrl, ''),
-        assert.equal(_0x2ff7bc.sourceLocalPath, null),
-        assert.equal(_0x2ff7bc.sourceUrl, ''),
-        assert.equal(_0x2ff7bc.storyboardSourceCrop, false),
-        assert.equal(_0x2ff7bc.storyboardPiece, false),
-        assert.equal(_0x2ff7bc.imageWidth, 80));
+        assert.deepEqual(value135, { earlyCommit: true, didAct: true }),
+        assert.equal(value121, 1));
+      const value136 = args9.nodes['sb-1'].cells[0];
+      (assert.equal(value136.localPath, 'output/returned-preview.png'),
+        assert.equal(value136.capturePreviewUrl, ''),
+        assert.equal(value136.sourceLocalPath, null),
+        assert.equal(value136.sourceUrl, ''),
+        assert.equal(value136.storyboardSourceCrop, false),
+        assert.equal(value136.storyboardPiece, false),
+        assert.equal(value136.imageWidth, 80));
     } finally {
-      if (_0x125c10 === undefined) delete globalThis.document;
-      else globalThis.document = _0x125c10;
-      if (_0x97e6c0 === undefined) delete globalThis.window;
-      else globalThis.window = _0x97e6c0;
-      if (_0x21dca1 === undefined) delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0x21dca1;
-      if (_0x554dff === undefined) delete globalThis.setTimeout;
-      else globalThis.setTimeout = _0x554dff;
+      if (value117 === undefined) delete globalThis.document;
+      else globalThis.document = value117;
+      if (value118 === undefined) delete globalThis.window;
+      else globalThis.window = value118;
+      if (value119 === undefined) delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value119;
+      if (value120 === undefined) delete globalThis.setTimeout;
+      else globalThis.setTimeout = value120;
       delete globalThis.v2Renderer;
     }
   }),
   test('DragController: 提取图片放回自定义槽位使用当前线位命中', () => {
-    const _0x2ffac4 = globalThis.document,
-      _0x39b4e9 = globalThis.window,
-      _0x1b2c0d = globalThis.requestAnimationFrame,
-      _0xec5e1 = globalThis.setTimeout,
-      _0x124194 = {
+    const value137 = globalThis.document,
+      value138 = globalThis.window,
+      value139 = globalThis.requestAnimationFrame,
+      value140 = globalThis.setTimeout,
+      args12 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['n1'],
         edges: {},
@@ -1733,40 +1739,40 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       },
-      _0x56832b = [];
-    let _0x57ec77 = null,
-      _0x4bd72c = null,
-      _0x1fad7a = null,
-      _0x597cbf = 0;
-    function _0x5df194(_0x27f320) {
-      const _0x1b306e = {
-        tagName: String(_0x27f320).toUpperCase(),
+      list10 = [];
+    let value141 = null,
+      value142 = null,
+      value143 = null,
+      value144 = 0;
+    function createElement7(value145) {
+      const value146 = {
+        tagName: String(value145).toUpperCase(),
         style: {},
         children: [],
         complete: true,
         naturalWidth: 100,
         className: '',
-        appendChild(_0x22d696) {
-          return (this.children.push(_0x22d696), _0x22d696);
+        appendChild(value147) {
+          return (this.children.push(value147), value147);
         },
-        setAttribute(_0x172022, _0x5ec76d) {
-          this[_0x172022] = String(_0x5ec76d);
+        setAttribute(value148, value149) {
+          this[value148] = String(value149);
         },
-        getAttribute(_0x428859) {
-          return this[_0x428859] || '';
+        getAttribute(value150) {
+          return this[value150] || '';
         },
         getContext() {
           return { imageSmoothingEnabled: false, imageSmoothingQuality: '', drawImage() {} };
         },
         remove() {},
       };
-      return (_0x56832b.push(_0x1b306e), _0x1b306e);
+      return (list10.push(value146), value146);
     }
     try {
       ((globalThis.window = globalThis),
         (globalThis.v2Renderer = {
-          getMountedWrapper(_0x1e8573) {
-            if (_0x1e8573 !== 'n1') return null;
+          getMountedWrapper(value151) {
+            if (value151 !== 'n1') return null;
             return {
               querySelector() {
                 return {
@@ -1783,54 +1789,54 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         (globalThis.document = {
           body: {
             classList: createClassList(),
-            appendChild(_0x2a43a4) {
-              return (_0x56832b.push(_0x2a43a4), _0x2a43a4);
+            appendChild(value152) {
+              return (list10.push(value152), value152);
             },
           },
-          createElement: _0x5df194,
-          getElementById(_0xf548e7) {
-            if (_0xf548e7 !== 'cell-sb-1-3') return null;
+          createElement: createElement7,
+          getElementById(value153) {
+            if (value153 !== 'cell-sb-1-3') return null;
             return {
               querySelector() {
                 return {
                   complete: true,
                   naturalWidth: 65,
-                  getAttribute(_0x382787) {
-                    return _0x382787 === 'src' ? '/output/extracted-custom.jpg' : '';
+                  getAttribute(value154) {
+                    return value154 === 'src' ? '/output/extracted-custom.jpg' : '';
                   },
                 };
               },
             };
           },
         }),
-        (globalThis.requestAnimationFrame = (_0xca437d) => {
-          return (_0xca437d(), 1);
+        (globalThis.requestAnimationFrame = (handler17) => {
+          return (handler17(), 1);
         }),
-        (globalThis.setTimeout = (_0x2c9f1f) => {
-          return (_0x2c9f1f(), 1);
+        (globalThis.setTimeout = (handler18) => {
+          return (handler18(), 1);
         }));
-      const _0x98483 = {
+      const store11 = {
           getStateRaw() {
-            return _0x124194;
+            return args12;
           },
-          updateNodeData(_0x239e78, _0x652558) {
-            ((_0x57ec77 = { nodeId: _0x239e78, patch: _0x652558 }),
-              (_0x124194.nodes[_0x239e78] = { ..._0x124194.nodes[_0x239e78], ..._0x652558 }));
+          updateNodeData(nodeId9, patch9) {
+            ((value141 = { nodeId: nodeId9, patch: patch9 }),
+              (args12.nodes[nodeId9] = { ...args12.nodes[nodeId9], ...patch9 }));
           },
-          setSelectedNodes(_0x34ffa3) {
-            ((_0x4bd72c = _0x34ffa3), (_0x124194.selectedNodeIds = [..._0x34ffa3]));
+          setSelectedNodes(args13) {
+            ((value142 = args13), (args12.selectedNodeIds = [...args13]));
           },
-          deleteNodes(_0x2b3c80) {
-            _0x1fad7a = _0x2b3c80;
+          deleteNodes(value155) {
+            value143 = value155;
           },
           moveNodes() {},
-          batch(_0x1b3da2) {
-            _0x1b3da2();
+          batch(handler19) {
+            handler19();
           },
           groupNodes() {},
         },
-        _0x2fbd7b = createDragController({
-          store: _0x98483,
+        dragController12 = createDragController({
+          store: store11,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -1839,21 +1845,21 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x39d601) {
-            return _0x39d601 + '-generated';
+          generateId(value156) {
+            return value156 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {
-            _0x597cbf += 1;
+            value144 += 1;
           },
         }),
-        _0x4da5ee = _0x2fbd7b.finishDraggingNodes(createNodeDragContext(), 0x15e, 80);
-      (assert.deepEqual(_0x4da5ee, { earlyCommit: true, didAct: true }),
-        assert.equal(_0x57ec77?.nodeId, 'sb-1'),
-        assert.equal(_0x57ec77?.patch?.cells?.[1]?.id, 'cell-1'),
-        assert.deepEqual(_0x57ec77?.patch?.cells?.[3], {
+        value157 = dragController12.finishDraggingNodes(createNodeDragContext(), 0x15e, 80);
+      (assert.deepEqual(value157, { earlyCommit: true, didAct: true }),
+        assert.equal(value141?.nodeId, 'sb-1'),
+        assert.equal(value141?.patch?.cells?.[1]?.id, 'cell-1'),
+        assert.deepEqual(value141?.patch?.cells?.[3], {
           id: 'cell-generated',
           url: '',
           localPath: 'output/extracted-custom.jpg',
@@ -1889,28 +1895,28 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           col: 1,
           row: 1,
         }),
-        assert.deepEqual(_0x4bd72c, []),
-        assert.deepEqual(_0x1fad7a, ['n1']),
-        assert.equal(_0x597cbf, 1));
+        assert.deepEqual(value142, []),
+        assert.deepEqual(value143, ['n1']),
+        assert.equal(value144, 1));
     } finally {
-      if (_0x2ffac4 === undefined) delete globalThis.document;
-      else globalThis.document = _0x2ffac4;
-      if (_0x39b4e9 === undefined) delete globalThis.window;
-      else globalThis.window = _0x39b4e9;
-      if (_0x1b2c0d === undefined) delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0x1b2c0d;
-      if (_0xec5e1 === undefined) delete globalThis.setTimeout;
-      else globalThis.setTimeout = _0xec5e1;
+      if (value137 === undefined) delete globalThis.document;
+      else globalThis.document = value137;
+      if (value138 === undefined) delete globalThis.window;
+      else globalThis.window = value138;
+      if (value139 === undefined) delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value139;
+      if (value140 === undefined) delete globalThis.setTimeout;
+      else globalThis.setTimeout = value140;
       delete globalThis.v2Renderer;
     }
   }),
   test('DragController: 临时裁切图未落盘时放回宫格保留当前裁切预览', () => {
-    const _0xfec2e4 = globalThis.document,
-      _0x3e9be0 = globalThis.window,
-      _0x477dac = globalThis.requestAnimationFrame,
-      _0x288641 = globalThis.setTimeout,
-      _0x149ca0 = 'data:image/jpeg;base64/current-crop',
-      _0x18733d = {
+    const value158 = globalThis.document,
+      value159 = globalThis.window,
+      value160 = globalThis.requestAnimationFrame,
+      value161 = globalThis.setTimeout,
+      src = 'data:image/jpeg;base64/current-crop',
+      args14 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['n1'],
         edges: {},
@@ -1924,9 +1930,9 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             y: 0,
             width: 120,
             height: 240,
-            src: _0x149ca0,
+            src: src,
             localPath: '',
-            capturePreviewUrl: _0x149ca0,
+            capturePreviewUrl: src,
             sourceLocalPath: 'output/full-source.jpg',
             sourceUrl: '/output/full-source.jpg',
             sourceWidth: 0x190,
@@ -1951,46 +1957,46 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           },
         },
       },
-      _0xb546e5 = [];
-    let _0x7c45b2 = null,
-      _0x15e749 = null;
-    function _0x5a0fb5(_0x463e6e) {
-      const _0x2623ed = {
-        tagName: String(_0x463e6e).toUpperCase(),
+      list11 = [];
+    let value162 = null,
+      value163 = null;
+    function createElement8(value164) {
+      const value165 = {
+        tagName: String(value164).toUpperCase(),
         style: {},
         children: [],
         complete: true,
         naturalWidth: 100,
         className: '',
-        appendChild(_0x563608) {
-          return (this.children.push(_0x563608), _0x563608);
+        appendChild(value166) {
+          return (this.children.push(value166), value166);
         },
-        setAttribute(_0x12f406, _0x291780) {
-          this[_0x12f406] = String(_0x291780);
+        setAttribute(value167, value168) {
+          this[value167] = String(value168);
         },
-        getAttribute(_0x276bbf) {
-          return this[_0x276bbf] || '';
+        getAttribute(value169) {
+          return this[value169] || '';
         },
         getContext() {
           return { imageSmoothingEnabled: false, imageSmoothingQuality: '', drawImage() {} };
         },
         remove() {},
       };
-      return (_0xb546e5.push(_0x2623ed), _0x2623ed);
+      return (list11.push(value165), value165);
     }
     try {
       ((globalThis.window = globalThis),
         (globalThis.v2Renderer = {
-          getMountedWrapper(_0x285a08) {
-            if (_0x285a08 !== 'n1') return null;
+          getMountedWrapper(value170) {
+            if (value170 !== 'n1') return null;
             return {
               querySelector() {
                 return {
                   complete: true,
                   naturalWidth: 120,
                   naturalHeight: 240,
-                  currentSrc: _0x149ca0,
-                  src: _0x149ca0,
+                  currentSrc: src,
+                  src: src,
                 };
               },
             };
@@ -1999,54 +2005,54 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
         (globalThis.document = {
           body: {
             classList: createClassList(),
-            appendChild(_0x256488) {
-              return (_0xb546e5.push(_0x256488), _0x256488);
+            appendChild(value171) {
+              return (list11.push(value171), value171);
             },
           },
-          createElement: _0x5a0fb5,
-          getElementById(_0x5e0c47) {
-            if (_0x5e0c47 !== 'cell-sb-1-0') return null;
+          createElement: createElement8,
+          getElementById(value172) {
+            if (value172 !== 'cell-sb-1-0') return null;
             return {
               querySelector() {
                 return {
                   complete: true,
                   naturalWidth: 120,
-                  getAttribute(_0x2dcf73) {
-                    return _0x2dcf73 === 'src' ? _0x149ca0 : '';
+                  getAttribute(value173) {
+                    return value173 === 'src' ? src : '';
                   },
                 };
               },
             };
           },
         }),
-        (globalThis.requestAnimationFrame = (_0x3f7d32) => {
-          return (_0x3f7d32(), 1);
+        (globalThis.requestAnimationFrame = (handler20) => {
+          return (handler20(), 1);
         }),
-        (globalThis.setTimeout = (_0x5336c7) => {
-          return (_0x5336c7(), 1);
+        (globalThis.setTimeout = (handler21) => {
+          return (handler21(), 1);
         }));
-      const _0x4b5ece = {
+      const store12 = {
           getStateRaw() {
-            return _0x18733d;
+            return args14;
           },
-          updateNodeData(_0x20b775, _0x2e910e) {
-            ((_0x7c45b2 = { nodeId: _0x20b775, patch: _0x2e910e }),
-              (_0x18733d.nodes[_0x20b775] = { ..._0x18733d.nodes[_0x20b775], ..._0x2e910e }));
+          updateNodeData(nodeId10, patch10) {
+            ((value162 = { nodeId: nodeId10, patch: patch10 }),
+              (args14.nodes[nodeId10] = { ...args14.nodes[nodeId10], ...patch10 }));
           },
-          setSelectedNodes(_0x89c7c6) {
-            _0x18733d.selectedNodeIds = [..._0x89c7c6];
+          setSelectedNodes(args15) {
+            args14.selectedNodeIds = [...args15];
           },
-          deleteNodes(_0x513118) {
-            _0x15e749 = _0x513118;
+          deleteNodes(value174) {
+            value163 = value174;
           },
           moveNodes() {},
-          batch(_0x1b25eb) {
-            _0x1b25eb();
+          batch(handler22) {
+            handler22();
           },
           groupNodes() {},
         },
-        _0x4208e0 = createDragController({
-          store: _0x4b5ece,
+        dragController13 = createDragController({
+          store: store12,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -2055,24 +2061,24 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x2f68fe) {
-            return _0x2f68fe + '-generated';
+          generateId(value175) {
+            return value175 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x18e3ba = _0x4208e0.finishDraggingNodes(createNodeDragContext(), 125, 50);
-      (assert.deepEqual(_0x18e3ba, { earlyCommit: true, didAct: true }),
-        assert.equal(_0x7c45b2?.nodeId, 'sb-1'),
-        assert.deepEqual(_0x7c45b2?.patch?.cells?.[0], {
+        value176 = dragController13.finishDraggingNodes(createNodeDragContext(), 125, 50);
+      (assert.deepEqual(value176, { earlyCommit: true, didAct: true }),
+        assert.equal(value162?.nodeId, 'sb-1'),
+        assert.deepEqual(value162?.patch?.cells?.[0], {
           id: 'cell-generated',
           url: '',
           localPath: null,
           originalLocalPath: null,
           displayLocalPath: '',
-          capturePreviewUrl: _0x149ca0,
+          capturePreviewUrl: src,
           fileName: '',
           originalWidth: null,
           originalHeight: null,
@@ -2097,64 +2103,64 @@ function identityScreenToWorld(_0x50fb25, _0x761a77) {
           col: 0,
           row: 0,
         }),
-        assert.deepEqual(_0x15e749, ['n1']));
+        assert.deepEqual(value163, ['n1']));
     } finally {
-      if (_0xfec2e4 === undefined) delete globalThis.document;
-      else globalThis.document = _0xfec2e4;
-      if (_0x3e9be0 === undefined) delete globalThis.window;
-      else globalThis.window = _0x3e9be0;
-      if (_0x477dac === undefined) delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0x477dac;
-      if (_0x288641 === undefined) delete globalThis.setTimeout;
-      else globalThis.setTimeout = _0x288641;
+      if (value158 === undefined) delete globalThis.document;
+      else globalThis.document = value158;
+      if (value159 === undefined) delete globalThis.window;
+      else globalThis.window = value159;
+      if (value160 === undefined) delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value160;
+      if (value161 === undefined) delete globalThis.setTimeout;
+      else globalThis.setTimeout = value161;
       delete globalThis.v2Renderer;
     }
   }));
 function createClassList() {
-  const _0x22a2c6 = new Set();
+  const map = new Set();
   return {
-    add(..._0x1a3283) {
-      _0x1a3283.forEach((_0x5358e8) => _0x22a2c6.add(String(_0x5358e8)));
+    add(...list12) {
+      list12.forEach((item3) => map.add(String(item3)));
     },
-    remove(..._0x3d5122) {
-      _0x3d5122.forEach((_0x19dbac) => _0x22a2c6.delete(String(_0x19dbac)));
+    remove(...list13) {
+      list13.forEach((item4) => map.delete(String(item4)));
     },
-    toggle(_0x4971f8, _0x1d4dd7) {
-      if (_0x1d4dd7 === true) return (_0x22a2c6.add(String(_0x4971f8)), true);
-      if (_0x1d4dd7 === false) return (_0x22a2c6.delete(String(_0x4971f8)), false);
-      if (_0x22a2c6.has(String(_0x4971f8))) return (_0x22a2c6.delete(String(_0x4971f8)), false);
-      return (_0x22a2c6.add(String(_0x4971f8)), true);
+    toggle(value177, value178) {
+      if (value178 === true) return (map.add(String(value177)), true);
+      if (value178 === false) return (map.delete(String(value177)), false);
+      if (map.has(String(value177))) return (map.delete(String(value177)), false);
+      return (map.add(String(value177)), true);
     },
-    contains(_0x2978d0) {
-      return _0x22a2c6.has(String(_0x2978d0));
+    contains(value179) {
+      return map.has(String(value179));
     },
   };
 }
-function createPathRecorder(_0x1683c2, _0x40391e, _0x5378af) {
+function createPathRecorder(list14, id, kind) {
   return {
-    setAttribute(_0x8b1bd2, _0x31f525) {
-      _0x1683c2.push({ id: _0x40391e, kind: _0x5378af, name: _0x8b1bd2, value: _0x31f525 });
+    setAttribute(name, value180) {
+      list14.push({ id: id, kind: kind, name: name, value: value180 });
     },
   };
 }
 function createAttrRecorder() {
-  const _0x7876b1 = new Map();
+  const map2 = new Map();
   return {
-    setAttribute(_0x434377, _0x3fb11d) {
-      _0x7876b1.set(_0x434377, _0x3fb11d);
+    setAttribute(value181, value182) {
+      map2.set(value181, value182);
     },
-    getAttribute(_0x4954dc) {
-      return _0x7876b1.has(_0x4954dc) ? _0x7876b1.get(_0x4954dc) : null;
+    getAttribute(value183) {
+      return map2.has(value183) ? map2.get(value183) : null;
     },
-    removeAttribute(_0x38e7ad) {
-      _0x7876b1.delete(_0x38e7ad);
+    removeAttribute(value184) {
+      map2.delete(value184);
     },
   };
 }
 test('DragController: 多选拖拽从全景、注释、宫格节点发起时保留整组选区', () => {
-  const _0x18fbc2 = globalThis.window,
-    _0x47301f = globalThis.document,
-    _0x451fec = [
+  const value185 = globalThis.window,
+    value186 = globalThis.document,
+    value187 = [
       { nodeId: 'scene-1', type: 'panorama-scene' },
       { nodeId: 'pano-1', type: 'panorama-360' },
       { nodeId: 'comment-1', type: 'comment-note' },
@@ -2175,15 +2181,15 @@ test('DragController: 多选拖拽从全景、注释、宫格节点发起时保�
         },
         _clearSnapGuideLines() {},
       }));
-    for (const _0x1b35da of _0x451fec) {
-      const _0x2e3443 = ['source-1', _0x1b35da.nodeId, 'ai-1'],
-        _0x35e18b = {
+    for (const id2 of value187) {
+      const selectedNodeIds = ['source-1', id2.nodeId, 'ai-1'],
+        value188 = {
           viewport: { x: 0, y: 0, zoom: 1 },
           nodes: {
             'source-1': { id: 'source-1', type: 'source-image', x: 0, y: 0, width: 100, height: 100 },
-            [_0x1b35da.nodeId]: {
-              id: _0x1b35da.nodeId,
-              type: _0x1b35da.type,
+            [id2.nodeId]: {
+              id: id2.nodeId,
+              type: id2.type,
               x: 200,
               y: 0,
               width: 120,
@@ -2192,110 +2198,110 @@ test('DragController: 多选拖拽从全景、注释、宫格节点发起时保�
             'ai-1': { id: 'ai-1', type: 'ai-text', x: 0x190, y: 0, width: 100, height: 100 },
           },
           edges: {},
-          selectedNodeIds: _0x2e3443,
+          selectedNodeIds: selectedNodeIds,
           ui: { snapGuidesEnabled: false },
           _parentToChildren: {},
         },
-        _0x4f9445 = [],
-        _0x2e16a8 = [],
-        _0x4a03ea = {
+        list15 = [],
+        list16 = [],
+        store13 = {
           getStateRaw() {
-            return _0x35e18b;
+            return value188;
           },
-          setSelectedNodes(_0x34cb20) {
-            (_0x4f9445.push([..._0x34cb20]), (_0x35e18b.selectedNodeIds = [..._0x34cb20]));
+          setSelectedNodes(args16) {
+            (list15.push([...args16]), (value188.selectedNodeIds = [...args16]));
           },
-          moveNodes(_0x1a8c1f, _0x4a9d08, _0x1eb8d6) {
-            _0x2e16a8.push({ ids: [..._0x1a8c1f], dx: _0x4a9d08, dy: _0x1eb8d6 });
+          moveNodes(args17, dx, dy) {
+            list16.push({ ids: [...args17], dx: dx, dy: dy });
           },
           updateNodePosition() {
             throw new Error('multi-selected drag should move the selected set');
           },
-          batch(_0x3e17f3) {
-            _0x3e17f3();
+          batch(handler23) {
+            handler23();
           },
           groupNodes() {},
         },
-        _0x5d6d77 = createDragController({
-          store: _0x4a03ea,
+        dragController14 = createDragController({
+          store: store13,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
           },
           hitTestNode() {
-            return _0x1b35da.nodeId;
+            return id2.nodeId;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0xaddf49) {
-            return _0xaddf49 + '-generated';
+          generateId(value189) {
+            return value189 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x2db65c = { isDragging: false, pendingDx: 0, pendingDy: 0, hasMoved: false };
-      (assert.equal(_0x5d6d77.tryStartNodeDrag(_0x2db65c, 200, 0, 200, 0, false, {}), true),
-        assert.deepEqual(_0x4f9445, []),
-        _0x5d6d77.updateDraggingNodes(_0x2db65c, 215, 12, 215, 12, 215, 12, _0x35e18b));
-      const _0x3ce1ac = _0x5d6d77.finishDraggingNodes(_0x2db65c, 215, 12);
-      (assert.deepEqual(_0x3ce1ac, { earlyCommit: false, didAct: true }),
-        assert.deepEqual(_0x2e16a8, [{ ids: _0x2e3443, dx: 15, dy: 12 }]),
-        assert.deepEqual(_0x35e18b.selectedNodeIds, _0x2e3443));
+        value190 = { isDragging: false, pendingDx: 0, pendingDy: 0, hasMoved: false };
+      (assert.equal(dragController14.tryStartNodeDrag(value190, 200, 0, 200, 0, false, {}), true),
+        assert.deepEqual(list15, []),
+        dragController14.updateDraggingNodes(value190, 215, 12, 215, 12, 215, 12, value188));
+      const value191 = dragController14.finishDraggingNodes(value190, 215, 12);
+      (assert.deepEqual(value191, { earlyCommit: false, didAct: true }),
+        assert.deepEqual(list16, [{ ids: selectedNodeIds, dx: 15, dy: 12 }]),
+        assert.deepEqual(value188.selectedNodeIds, selectedNodeIds));
     }
   } finally {
-    if (typeof _0x18fbc2 === 'undefined') delete globalThis.window;
-    else globalThis.window = _0x18fbc2;
-    if (typeof _0x47301f === 'undefined') delete globalThis.document;
-    else globalThis.document = _0x47301f;
+    if (typeof value185 === 'undefined') delete globalThis.window;
+    else globalThis.window = value185;
+    if (typeof value186 === 'undefined') delete globalThis.document;
+    else globalThis.document = value186;
   }
 });
 function createDragEdgeState({ zoom: zoom = 0.3, edgeCount: edgeCount = 6 } = {}) {
-  const _0x1a1038 = { n1: { id: 'n1', type: 'ai-image', x: 0, y: 0, width: 0x104, height: 100 } },
-    _0x1aadf2 = {};
-  for (let _0xbd37b7 = 1; _0xbd37b7 <= edgeCount; _0xbd37b7 += 1) {
-    const _0x5277fe = 'n' + (_0xbd37b7 + 1);
-    ((_0x1a1038[_0x5277fe] = {
-      id: _0x5277fe,
+  const nodes = { n1: { id: 'n1', type: 'ai-image', x: 0, y: 0, width: 0x104, height: 100 } },
+    edges = {};
+  for (let y2 = 1; y2 <= edgeCount; y2 += 1) {
+    const id3 = 'n' + (y2 + 1);
+    ((nodes[id3] = {
+      id: id3,
       type: 'ai-text',
-      x: 0x1f4 + _0xbd37b7 * 20,
-      y: _0xbd37b7 * 120,
+      x: 0x1f4 + y2 * 20,
+      y: y2 * 120,
       width: 0x104,
       height: 100,
     }),
-      (_0x1aadf2['e' + _0xbd37b7] = { id: 'e' + _0xbd37b7, sourceId: 'n1', targetId: _0x5277fe }));
+      (edges['e' + y2] = { id: 'e' + y2, sourceId: 'n1', targetId: id3 }));
   }
   return {
     viewport: { x: 0, y: 0, zoom: zoom },
-    nodes: _0x1a1038,
-    edges: _0x1aadf2,
+    nodes: nodes,
+    edges: edges,
     selectedNodeIds: ['n1'],
     ui: { snapGuidesEnabled: false },
     _parentToChildren: {},
   };
 }
-function createDragEdgeHarness(_0x94bed3) {
-  const _0x171f63 = globalThis.window,
-    _0x3d5ef3 = globalThis.document,
-    _0x243d4e = globalThis.requestAnimationFrame,
-    _0x35c3c0 = globalThis.cancelAnimationFrame,
-    _0x26ee3b = globalThis.innerWidth,
-    _0x4d9071 = globalThis.innerHeight,
-    _0x85ba4e = [],
-    _0x3db952 = new Map();
-  Object.keys(_0x94bed3.nodes).forEach((_0x581aa2) => {
-    _0x3db952.set(_0x581aa2, { style: {}, classList: createClassList(), isConnected: true });
+function createDragEdgeHarness(value192) {
+  const value193 = globalThis.window,
+    value194 = globalThis.document,
+    value195 = globalThis.requestAnimationFrame,
+    value196 = globalThis.cancelAnimationFrame,
+    value197 = globalThis.innerWidth,
+    value198 = globalThis.innerHeight,
+    records = [],
+    wrappers = new Map();
+  Object.keys(value192.nodes).forEach((item5) => {
+    wrappers.set(item5, { style: {}, classList: createClassList(), isConnected: true });
   });
-  const _0x185b38 = new Map();
-  Object.keys(_0x94bed3.edges).forEach((_0x19ee56) => {
-    _0x185b38.set(_0x19ee56, {
+  const edgeDomCache = new Map();
+  Object.keys(value192.edges).forEach((item6) => {
+    edgeDomCache.set(item6, {
       groupEl: createAttrRecorder(),
-      hoverPath: createPathRecorder(_0x85ba4e, _0x19ee56, 'hover'),
-      pathEl: createPathRecorder(_0x85ba4e, _0x19ee56, 'main'),
+      hoverPath: createPathRecorder(records, item6, 'hover'),
+      pathEl: createPathRecorder(records, item6, 'main'),
     });
   });
-  const _0xd8a91f = [];
-  let _0x54cd5b = 0;
+  const list17 = [];
+  let id4 = 0;
   return (
     (globalThis.window = globalThis),
     (globalThis.innerWidth = 0x640),
@@ -2306,59 +2312,55 @@ function createDragEdgeHarness(_0x94bed3) {
         return null;
       },
     }),
-    (globalThis.requestAnimationFrame = (_0x47e617) => {
-      return (
-        (_0x54cd5b += 1),
-        _0xd8a91f.push({ id: _0x54cd5b, callback: _0x47e617, canceled: false }),
-        _0x54cd5b
-      );
+    (globalThis.requestAnimationFrame = (callback2) => {
+      return ((id4 += 1), list17.push({ id: id4, callback: callback2, canceled: false }), id4);
     }),
-    (globalThis.cancelAnimationFrame = (_0x170fef) => {
-      const _0x22c92c = _0xd8a91f.find((_0x3c5d6a) => _0x3c5d6a.id === _0x170fef);
-      if (_0x22c92c) _0x22c92c.canceled = true;
+    (globalThis.cancelAnimationFrame = (value199) => {
+      const value200 = list17.find((item7) => item7.id === value199);
+      if (value200) value200.canceled = true;
     }),
     (globalThis.v2Renderer = {
-      getMountedWrapper(_0x34cabb) {
-        return _0x3db952.get(_0x34cabb) || null;
+      getMountedWrapper(value201) {
+        return wrappers.get(value201) || null;
       },
-      getEdgeIdsForNode(_0x8885f0) {
-        return Object.values(_0x94bed3.edges)
-          .filter((_0x580a05) => _0x580a05.sourceId === _0x8885f0 || _0x580a05.targetId === _0x8885f0)
-          .map((_0xba8f47) => _0xba8f47.id);
+      getEdgeIdsForNode(value202) {
+        return Object.values(value192.edges)
+          .filter((item8) => item8.sourceId === value202 || item8.targetId === value202)
+          .map((item9) => item9.id);
       },
     }),
-    (globalThis._edgeDomCache = _0x185b38),
+    (globalThis._edgeDomCache = edgeDomCache),
     (globalThis._v2MinimapDotMap = new Map()),
     (globalThis._v2MinimapScale = 0),
     (globalThis._clearSnapGuideLines = () => {}),
     {
-      records: _0x85ba4e,
-      wrappers: _0x3db952,
-      edgeDomCache: _0x185b38,
+      records: records,
+      wrappers: wrappers,
+      edgeDomCache: edgeDomCache,
       pendingRafCount() {
-        return _0xd8a91f.filter((_0x3fe6c8) => !_0x3fe6c8.canceled).length;
+        return list17.filter((enabled2) => !enabled2.canceled).length;
       },
       runRaf() {
-        const _0x5185c8 = _0xd8a91f.splice(0);
-        _0x5185c8.forEach((_0x56cc09) => {
-          if (!_0x56cc09.canceled) _0x56cc09.callback();
+        const list18 = list17.splice(0);
+        list18.forEach((enabled3) => {
+          if (!enabled3.canceled) enabled3.callback();
         });
       },
       restore() {
-        if (typeof _0x171f63 === 'undefined') delete globalThis.window;
-        else globalThis.window = _0x171f63;
-        if (typeof _0x3d5ef3 === 'undefined') delete globalThis.document;
-        else globalThis.document = _0x3d5ef3;
-        typeof _0x243d4e === 'undefined'
+        if (typeof value193 === 'undefined') delete globalThis.window;
+        else globalThis.window = value193;
+        if (typeof value194 === 'undefined') delete globalThis.document;
+        else globalThis.document = value194;
+        typeof value195 === 'undefined'
           ? delete globalThis.requestAnimationFrame
-          : (globalThis.requestAnimationFrame = _0x243d4e);
-        typeof _0x35c3c0 === 'undefined'
+          : (globalThis.requestAnimationFrame = value195);
+        typeof value196 === 'undefined'
           ? delete globalThis.cancelAnimationFrame
-          : (globalThis.cancelAnimationFrame = _0x35c3c0);
-        if (typeof _0x26ee3b === 'undefined') delete globalThis.innerWidth;
-        else globalThis.innerWidth = _0x26ee3b;
-        if (typeof _0x4d9071 === 'undefined') delete globalThis.innerHeight;
-        else globalThis.innerHeight = _0x4d9071;
+          : (globalThis.cancelAnimationFrame = value196);
+        if (typeof value197 === 'undefined') delete globalThis.innerWidth;
+        else globalThis.innerWidth = value197;
+        if (typeof value198 === 'undefined') delete globalThis.innerHeight;
+        else globalThis.innerHeight = value198;
         (delete globalThis.v2Renderer,
           delete globalThis._edgeDomCache,
           delete globalThis._v2MinimapDotMap,
@@ -2368,26 +2370,26 @@ function createDragEdgeHarness(_0x94bed3) {
     }
   );
 }
-function createNodeDragController(_0x46dd8d) {
-  const _0x332572 = {
+function createNodeDragController(value203) {
+  const store14 = {
     getStateRaw() {
-      return _0x46dd8d;
+      return value203;
     },
-    updateNodePosition(_0x22484c, _0x5d43c8, _0x34e5a4) {
-      ((_0x46dd8d.nodes[_0x22484c].x += _0x5d43c8), (_0x46dd8d.nodes[_0x22484c].y += _0x34e5a4));
+    updateNodePosition(value204, value205, value206) {
+      ((value203.nodes[value204].x += value205), (value203.nodes[value204].y += value206));
     },
-    moveNodes(_0x279749, _0x5cec69, _0x2f97be) {
-      _0x279749.forEach((_0x453214) => {
-        ((_0x46dd8d.nodes[_0x453214].x += _0x5cec69), (_0x46dd8d.nodes[_0x453214].y += _0x2f97be));
+    moveNodes(list19, value207, value208) {
+      list19.forEach((item10) => {
+        ((value203.nodes[item10].x += value207), (value203.nodes[item10].y += value208));
       });
     },
-    batch(_0x52bfbf) {
-      _0x52bfbf();
+    batch(handler24) {
+      handler24();
     },
     groupNodes() {},
   };
   return createDragController({
-    store: _0x332572,
+    store: store14,
     isNodeType: isNodeType,
     getShortcuts() {
       return {};
@@ -2396,8 +2398,8 @@ function createNodeDragController(_0x46dd8d) {
       return null;
     },
     screenToWorld: identityScreenToWorld,
-    generateId(_0x1d3632) {
-      return _0x1d3632 + '-generated';
+    generateId(value209) {
+      return value209 + '-generated';
     },
     cloneNodesWithEdges() {
       return {};
@@ -2418,13 +2420,13 @@ function createNodeDragContext() {
     titleDragActivated: false,
   };
 }
-async function flushAsyncWork(_0x226424 = 8) {
-  for (let _0x4cc9d6 = 0; _0x4cc9d6 < _0x226424; _0x4cc9d6 += 1) {
+async function flushAsyncWork(value210 = 8) {
+  for (let value211 = 0; value211 < value210; value211 += 1) {
     await Promise.resolve();
   }
 }
 (test('DragController: grid snap aligns the dragged node origin to the canvas grid', () => {
-  const _0x5e1804 = {
+  const value212 = {
       viewport: { x: 0, y: 0, zoom: 1 },
       nodes: { n1: { id: 'n1', type: 'ai-image', x: 13, y: 17, width: 100, height: 80 } },
       edges: {},
@@ -2432,28 +2434,28 @@ async function flushAsyncWork(_0x226424 = 8) {
       ui: { snapGuidesEnabled: false },
       _parentToChildren: {},
     },
-    _0x177c12 = createDragEdgeHarness(_0x5e1804),
-    _0x3cd404 = globalThis.v2SnapToGrid;
+    ctx = createDragEdgeHarness(value212),
+    value213 = globalThis.v2SnapToGrid;
   try {
     globalThis.v2SnapToGrid = true;
-    const _0x873478 = createNodeDragController(_0x5e1804),
-      _0x37dc74 = createNodeDragContext();
-    (_0x873478.updateDraggingNodes(_0x37dc74, 21, 22, 21, 22, 21, 22, _0x5e1804),
-      assert.equal(_0x37dc74.pendingDx, 27),
-      assert.equal(_0x37dc74.pendingDy, 23),
-      assert.equal(_0x177c12.wrappers.get('n1').style.transform, 'translate(40px, 40px)'));
-    const _0x95b28b = _0x873478.finishDraggingNodes(_0x37dc74, 21, 22);
-    (assert.deepEqual(_0x95b28b, { earlyCommit: false, didAct: true }),
-      assert.equal(_0x5e1804.nodes.n1.x, 40),
-      assert.equal(_0x5e1804.nodes.n1.y, 40));
+    const nodeDragController = createNodeDragController(value212),
+      nodeDragContext = createNodeDragContext();
+    (nodeDragController.updateDraggingNodes(nodeDragContext, 21, 22, 21, 22, 21, 22, value212),
+      assert.equal(nodeDragContext.pendingDx, 27),
+      assert.equal(nodeDragContext.pendingDy, 23),
+      assert.equal(ctx.wrappers.get('n1').style.transform, 'translate(40px, 40px)'));
+    const value214 = nodeDragController.finishDraggingNodes(nodeDragContext, 21, 22);
+    (assert.deepEqual(value214, { earlyCommit: false, didAct: true }),
+      assert.equal(value212.nodes.n1.x, 40),
+      assert.equal(value212.nodes.n1.y, 40));
   } finally {
-    if (typeof _0x3cd404 === 'undefined') delete globalThis.v2SnapToGrid;
-    else globalThis.v2SnapToGrid = _0x3cd404;
-    _0x177c12.restore();
+    if (typeof value213 === 'undefined') delete globalThis.v2SnapToGrid;
+    else globalThis.v2SnapToGrid = value213;
+    ctx.restore();
   }
 }),
   test('DragController: grid snap aligns the multi-select bounds to the canvas grid', () => {
-    const _0x408302 = {
+    const value215 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           n1: { id: 'n1', type: 'ai-image', x: 13, y: 17, width: 100, height: 80 },
@@ -2464,195 +2466,196 @@ async function flushAsyncWork(_0x226424 = 8) {
         ui: { snapGuidesEnabled: false },
         _parentToChildren: {},
       },
-      _0x1aa2c7 = createDragEdgeHarness(_0x408302),
-      _0x3ef18f = globalThis.v2SnapToGrid;
+      ctx2 = createDragEdgeHarness(value215),
+      value216 = globalThis.v2SnapToGrid;
     try {
       globalThis.v2SnapToGrid = true;
-      const _0x188730 = createNodeDragController(_0x408302),
-        _0x26368d = createNodeDragContext();
-      (_0x188730.updateDraggingNodes(_0x26368d, 21, 22, 21, 22, 21, 22, _0x408302),
-        assert.equal(_0x26368d.pendingDx, 27),
-        assert.equal(_0x26368d.pendingDy, 23),
-        assert.equal(_0x1aa2c7.wrappers.get('n1').style.transform, 'translate(40px, 40px)'),
-        assert.equal(_0x1aa2c7.wrappers.get('n2').style.transform, 'translate(82px, 93px)'));
-      const _0x3ce149 = _0x188730.finishDraggingNodes(_0x26368d, 21, 22);
-      (assert.deepEqual(_0x3ce149, { earlyCommit: false, didAct: true }),
-        assert.equal(_0x408302.nodes.n1.x, 40),
-        assert.equal(_0x408302.nodes.n1.y, 40),
-        assert.equal(_0x408302.nodes.n2.x, 82),
-        assert.equal(_0x408302.nodes.n2.y, 93));
+      const nodeDragController2 = createNodeDragController(value215),
+        nodeDragContext2 = createNodeDragContext();
+      (nodeDragController2.updateDraggingNodes(nodeDragContext2, 21, 22, 21, 22, 21, 22, value215),
+        assert.equal(nodeDragContext2.pendingDx, 27),
+        assert.equal(nodeDragContext2.pendingDy, 23),
+        assert.equal(ctx2.wrappers.get('n1').style.transform, 'translate(40px, 40px)'),
+        assert.equal(ctx2.wrappers.get('n2').style.transform, 'translate(82px, 93px)'));
+      const value217 = nodeDragController2.finishDraggingNodes(nodeDragContext2, 21, 22);
+      (assert.deepEqual(value217, { earlyCommit: false, didAct: true }),
+        assert.equal(value215.nodes.n1.x, 40),
+        assert.equal(value215.nodes.n1.y, 40),
+        assert.equal(value215.nodes.n2.x, 82),
+        assert.equal(value215.nodes.n2.y, 93));
     } finally {
-      if (typeof _0x3ef18f === 'undefined') delete globalThis.v2SnapToGrid;
-      else globalThis.v2SnapToGrid = _0x3ef18f;
-      _0x1aa2c7.restore();
+      if (typeof value216 === 'undefined') delete globalThis.v2SnapToGrid;
+      else globalThis.v2SnapToGrid = value216;
+      ctx2.restore();
     }
   }),
   test('DragController: 目标缩放区间内 3 条叠线拖拽会合并连线重绘到 RAF', () => {
-    const _0x4cc76c = createDragEdgeState({ zoom: 0.3, edgeCount: 3 }),
-      _0x4d38f8 = createDragEdgeHarness(_0x4cc76c);
+    const dragEdgeState = createDragEdgeState({ zoom: 0.3, edgeCount: 3 }),
+      ctx3 = createDragEdgeHarness(dragEdgeState);
     try {
-      const _0x15417c = createNodeDragController(_0x4cc76c),
-        _0x5d5287 = createNodeDragContext();
-      (_0x15417c.updateDraggingNodes(_0x5d5287, 10, 0, 10, 0, 10, 0, _0x4cc76c),
-        _0x15417c.updateDraggingNodes(_0x5d5287, 20, 0, 20, 0, 20, 0, _0x4cc76c),
-        assert.equal(_0x4d38f8.records.length, 0),
-        assert.equal(_0x4d38f8.pendingRafCount(), 1),
+      const nodeDragController3 = createNodeDragController(dragEdgeState),
+        nodeDragContext3 = createNodeDragContext();
+      (nodeDragController3.updateDraggingNodes(nodeDragContext3, 10, 0, 10, 0, 10, 0, dragEdgeState),
+        nodeDragController3.updateDraggingNodes(nodeDragContext3, 20, 0, 20, 0, 20, 0, dragEdgeState),
+        assert.equal(ctx3.records.length, 0),
+        assert.equal(ctx3.pendingRafCount(), 1),
         assert.equal(document.body.classList.contains('is-edge-interaction-lite'), true),
-        _0x4d38f8.runRaf(),
-        assert.equal(_0x4d38f8.records.length, 3),
+        ctx3.runRaf(),
+        assert.equal(ctx3.records.length, 3),
         assert.equal(
-          _0x4d38f8.records.every((_0x4924da) => _0x4924da.kind === 'main'),
+          ctx3.records.every((item11) => item11.kind === 'main'),
           true,
         ),
-        assert.match(_0x4d38f8.records[0].value, /^M 280 50 C /));
+        assert.match(ctx3.records[0].value, /^M 280 50 C /));
     } finally {
-      _0x4d38f8.restore();
+      ctx3.restore();
     }
   }),
   test('DragController: dense canvas skips live snap guides during node drag', () => {
-    const _0x15ce72 = (_0x578c9a) => {
-        const _0x1cf5be = {
+    const run = (value218) => {
+        const nodes2 = {
           n1: { id: 'n1', type: 'ai-image', x: 0, y: 0, width: 100, height: 80 },
           n2: { id: 'n2', type: 'source-text', x: 112, y: 0, width: 80, height: 80 },
         };
-        for (let _0xba5980 = 0; _0xba5980 < _0x578c9a; _0xba5980 += 1) {
-          _0x1cf5be['dense_' + _0xba5980] = {
-            id: 'dense_' + _0xba5980,
+        for (let value219 = 0; value219 < value218; value219 += 1) {
+          nodes2['dense_' + value219] = {
+            id: 'dense_' + value219,
             type: 'source-text',
-            x: 0x3e8 + _0xba5980 * 8,
-            y: 0x3e8 + _0xba5980 * 8,
+            x: 0x3e8 + value219 * 8,
+            y: 0x3e8 + value219 * 8,
             width: 80,
             height: 60,
           };
         }
         return {
           viewport: { x: 0, y: 0, zoom: 1 },
-          nodes: _0x1cf5be,
+          nodes: nodes2,
           edges: {},
           selectedNodeIds: ['n1'],
           ui: { snapGuidesEnabled: true },
           _parentToChildren: {},
         };
       },
-      _0x352f97 = _0x15ce72(0),
-      _0x47e256 = createDragEdgeHarness(_0x352f97);
+      value220 = run(0),
+      ctx4 = createDragEdgeHarness(value220);
     try {
-      const _0x333ec6 = createNodeDragController(_0x352f97),
-        _0xefa25b = createNodeDragContext();
-      (_0x333ec6.updateDraggingNodes(_0xefa25b, 10, 0, 10, 0, 10, 0, _0x352f97),
-        assert.equal(_0xefa25b.pendingDx, 12));
+      const nodeDragController4 = createNodeDragController(value220),
+        nodeDragContext4 = createNodeDragContext();
+      (nodeDragController4.updateDraggingNodes(nodeDragContext4, 10, 0, 10, 0, 10, 0, value220),
+        assert.equal(nodeDragContext4.pendingDx, 12));
     } finally {
-      _0x47e256.restore();
+      ctx4.restore();
     }
-    const _0x35e858 = _0x15ce72(180),
-      _0x32103e = createDragEdgeHarness(_0x35e858);
+    const value221 = run(180),
+      ctx5 = createDragEdgeHarness(value221);
     try {
-      const _0x29a84d = createNodeDragController(_0x35e858),
-        _0x5c7087 = createNodeDragContext();
-      (_0x29a84d.updateDraggingNodes(_0x5c7087, 10, 0, 10, 0, 10, 0, _0x35e858),
-        assert.equal(_0x5c7087.pendingDx, 10));
+      const nodeDragController5 = createNodeDragController(value221),
+        nodeDragContext5 = createNodeDragContext();
+      (nodeDragController5.updateDraggingNodes(nodeDragContext5, 10, 0, 10, 0, 10, 0, value221),
+        assert.equal(nodeDragContext5.pendingDx, 10));
     } finally {
-      _0x32103e.restore();
+      ctx5.restore();
     }
   }),
   test('DragController: records partial edge redraw samples during connected node drag', () => {
-    const _0x4aa35a = createDragEdgeState({ zoom: 0.3, edgeCount: 3 }),
-      _0x494a4d = createDragEdgeHarness(_0x4aa35a);
+    const dragEdgeState2 = createDragEdgeState({ zoom: 0.3, edgeCount: 3 }),
+      ctx6 = createDragEdgeHarness(dragEdgeState2);
     try {
       (resetPerfProbeData(), setPerfProbeEnabled(true));
-      const _0x38b8d8 = createNodeDragController(_0x4aa35a),
-        _0x30a622 = createNodeDragContext();
-      (_0x38b8d8.updateDraggingNodes(_0x30a622, 10, 0, 10, 0, 10, 0, _0x4aa35a), _0x494a4d.runRaf());
-      const _0x3a0052 = getPerfProbeSnapshot().edgeRedrawSamples,
-        _0x4e470a = _0x3a0052[_0x3a0052.length - 1];
-      (assert.equal(_0x4e470a.mode, 'partial'),
-        assert.equal(_0x4e470a.reason, 'drag-controller'),
-        assert.equal(_0x4e470a.edgeCount, 3),
-        assert.equal(_0x4e470a.visibleEdgeCount, 3),
-        assert.equal(_0x4e470a.updatedCount, 3),
-        assert.equal(_0x4e470a.cacheSize, 3));
+      const nodeDragController6 = createNodeDragController(dragEdgeState2),
+        nodeDragContext6 = createNodeDragContext();
+      (nodeDragController6.updateDraggingNodes(nodeDragContext6, 10, 0, 10, 0, 10, 0, dragEdgeState2),
+        ctx6.runRaf());
+      const list20 = getPerfProbeSnapshot().edgeRedrawSamples,
+        value222 = list20[list20.length - 1];
+      (assert.equal(value222.mode, 'partial'),
+        assert.equal(value222.reason, 'drag-controller'),
+        assert.equal(value222.edgeCount, 3),
+        assert.equal(value222.visibleEdgeCount, 3),
+        assert.equal(value222.updatedCount, 3),
+        assert.equal(value222.cacheSize, 3));
     } finally {
-      (setPerfProbeEnabled(false), resetPerfProbeData(), _0x494a4d.restore());
+      (setPerfProbeEnabled(false), resetPerfProbeData(), ctx6.restore());
     }
   }),
   test('DragController: 目标缩放区间内 3 条叠线拖拽会跳过小位移边重绘', () => {
-    const _0x2202d7 = createDragEdgeState({ zoom: 0.3, edgeCount: 3 }),
-      _0x2cfaf2 = createDragEdgeHarness(_0x2202d7);
+    const dragEdgeState3 = createDragEdgeState({ zoom: 0.3, edgeCount: 3 }),
+      ctx7 = createDragEdgeHarness(dragEdgeState3);
     try {
-      const _0x36c58c = createNodeDragController(_0x2202d7),
-        _0x5db3dd = createNodeDragContext();
-      (_0x36c58c.updateDraggingNodes(_0x5db3dd, 20, 0, 20, 0, 20, 0, _0x2202d7),
-        _0x2cfaf2.runRaf(),
-        assert.equal(_0x2cfaf2.records.length, 3),
-        _0x36c58c.updateDraggingNodes(_0x5db3dd, 21, 0, 21, 0, 21, 0, _0x2202d7),
-        assert.equal(_0x2cfaf2.wrappers.get('n1').style.transform, 'translate(21px, 0px)'),
-        _0x2cfaf2.runRaf(),
-        assert.equal(_0x2cfaf2.records.length, 3));
+      const nodeDragController7 = createNodeDragController(dragEdgeState3),
+        nodeDragContext7 = createNodeDragContext();
+      (nodeDragController7.updateDraggingNodes(nodeDragContext7, 20, 0, 20, 0, 20, 0, dragEdgeState3),
+        ctx7.runRaf(),
+        assert.equal(ctx7.records.length, 3),
+        nodeDragController7.updateDraggingNodes(nodeDragContext7, 21, 0, 21, 0, 21, 0, dragEdgeState3),
+        assert.equal(ctx7.wrappers.get('n1').style.transform, 'translate(21px, 0px)'),
+        ctx7.runRaf(),
+        assert.equal(ctx7.records.length, 3));
     } finally {
-      _0x2cfaf2.restore();
+      ctx7.restore();
     }
   }),
   test('DragController: 叠线拖拽结束会 flush 最后一帧并移除轻量化 class', () => {
-    const _0x2c9e82 = createDragEdgeState({ zoom: 0.3, edgeCount: 3 }),
-      _0x20f80f = createDragEdgeHarness(_0x2c9e82);
+    const dragEdgeState4 = createDragEdgeState({ zoom: 0.3, edgeCount: 3 }),
+      ctx8 = createDragEdgeHarness(dragEdgeState4);
     try {
-      const _0x3d7e84 = createNodeDragController(_0x2c9e82),
-        _0x2ed0f6 = createNodeDragContext();
-      (_0x3d7e84.updateDraggingNodes(_0x2ed0f6, 10, 0, 10, 0, 10, 0, _0x2c9e82),
-        assert.equal(_0x20f80f.records.length, 0),
+      const nodeDragController8 = createNodeDragController(dragEdgeState4),
+        nodeDragContext8 = createNodeDragContext();
+      (nodeDragController8.updateDraggingNodes(nodeDragContext8, 10, 0, 10, 0, 10, 0, dragEdgeState4),
+        assert.equal(ctx8.records.length, 0),
         assert.equal(document.body.classList.contains('is-edge-interaction-lite'), true));
-      const _0x6018c3 = _0x3d7e84.finishDraggingNodes(_0x2ed0f6, 10, 0);
-      (assert.deepEqual(_0x6018c3, { earlyCommit: false, didAct: true }),
-        assert.equal(_0x20f80f.records.length, 6),
+      const value223 = nodeDragController8.finishDraggingNodes(nodeDragContext8, 10, 0);
+      (assert.deepEqual(value223, { earlyCommit: false, didAct: true }),
+        assert.equal(ctx8.records.length, 6),
         assert.equal(document.body.classList.contains('is-edge-interaction-lite'), false),
-        _0x20f80f.runRaf(),
-        assert.equal(_0x20f80f.records.length, 6));
+        ctx8.runRaf(),
+        assert.equal(ctx8.records.length, 6));
     } finally {
-      _0x20f80f.restore();
+      ctx8.restore();
     }
   }),
   test('DragController: 非目标缩放区间或低于 3 条线时保持同步边更新', () => {
-    const _0x5e561b = [
+    const list21 = [
       createDragEdgeState({ zoom: 0.5, edgeCount: 6 }),
       createDragEdgeState({ zoom: 0.2, edgeCount: 6 }),
       createDragEdgeState({ zoom: 0.3, edgeCount: 2 }),
     ];
-    _0x5e561b.forEach((_0x19755b) => {
-      const _0x368467 = createDragEdgeHarness(_0x19755b);
+    list21.forEach((item12) => {
+      const ctx9 = createDragEdgeHarness(item12);
       try {
-        const _0x16f090 = createNodeDragController(_0x19755b),
-          _0x26083d = createNodeDragContext();
-        (_0x16f090.updateDraggingNodes(_0x26083d, 10, 0, 10, 0, 10, 0, _0x19755b),
-          assert.equal(_0x368467.records.length, Object.keys(_0x19755b.edges).length * 2),
-          assert.equal(_0x368467.pendingRafCount(), 0),
+        const nodeDragController9 = createNodeDragController(item12),
+          nodeDragContext9 = createNodeDragContext();
+        (nodeDragController9.updateDraggingNodes(nodeDragContext9, 10, 0, 10, 0, 10, 0, item12),
+          assert.equal(ctx9.records.length, Object.keys(item12.edges).length * 2),
+          assert.equal(ctx9.pendingRafCount(), 0),
           assert.equal(document.body.classList.contains('is-edge-interaction-lite'), false));
       } finally {
-        _0x368467.restore();
+        ctx9.restore();
       }
     });
   }),
   test('DragController: 全局总边数达到阈值时单条受影响边也进入轻量模式', () => {
-    const _0x2d347b = createDragEdgeState({ zoom: 0.3, edgeCount: 3 });
-    ((_0x2d347b.edges.e2 = { id: 'e2', sourceId: 'n3', targetId: 'n4' }),
-      (_0x2d347b.edges.e3 = { id: 'e3', sourceId: 'n4', targetId: 'n3' }));
-    const _0x3c9424 = createDragEdgeHarness(_0x2d347b);
+    const dragEdgeState5 = createDragEdgeState({ zoom: 0.3, edgeCount: 3 });
+    ((dragEdgeState5.edges.e2 = { id: 'e2', sourceId: 'n3', targetId: 'n4' }),
+      (dragEdgeState5.edges.e3 = { id: 'e3', sourceId: 'n4', targetId: 'n3' }));
+    const ctx10 = createDragEdgeHarness(dragEdgeState5);
     try {
-      const _0x4e284b = createNodeDragController(_0x2d347b),
-        _0x333b96 = createNodeDragContext();
-      (_0x4e284b.updateDraggingNodes(_0x333b96, 10, 0, 10, 0, 10, 0, _0x2d347b),
-        assert.equal(_0x3c9424.records.length, 0),
-        assert.equal(_0x3c9424.pendingRafCount(), 1),
+      const nodeDragController10 = createNodeDragController(dragEdgeState5),
+        nodeDragContext10 = createNodeDragContext();
+      (nodeDragController10.updateDraggingNodes(nodeDragContext10, 10, 0, 10, 0, 10, 0, dragEdgeState5),
+        assert.equal(ctx10.records.length, 0),
+        assert.equal(ctx10.pendingRafCount(), 1),
         assert.equal(document.body.classList.contains('is-edge-interaction-lite'), true),
-        _0x3c9424.runRaf(),
-        assert.equal(_0x3c9424.records.length, 1),
-        assert.equal(_0x3c9424.records[0].id, 'e1'),
-        assert.equal(_0x3c9424.records[0].kind, 'main'));
+        ctx10.runRaf(),
+        assert.equal(ctx10.records.length, 1),
+        assert.equal(ctx10.records[0].id, 'e1'),
+        assert.equal(ctx10.records[0].kind, 'main'));
     } finally {
-      _0x3c9424.restore();
+      ctx10.restore();
     }
   }),
   test('DragController: group drag translates internal edges without path recalculation', () => {
-    const _0x2ecbd2 = {
+    const value224 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           group: { id: 'group', type: 'group', x: 0, y: 0, width: 240, height: 160 },
@@ -2664,33 +2667,33 @@ async function flushAsyncWork(_0x226424 = 8) {
         ui: { snapGuidesEnabled: true },
         _parentToChildren: { group: new Set(['n1', 'n2']) },
       },
-      _0x2155c3 = createDragEdgeHarness(_0x2ecbd2),
-      _0x3fdee8 = {
+      ctx11 = createDragEdgeHarness(value224),
+      store15 = {
         getStateRaw() {
-          return _0x2ecbd2;
+          return value224;
         },
-        moveNodes(_0x4bd455, _0xfa1d89, _0x305987) {
-          const _0x1c584e = new Set(_0x4bd455);
-          for (const _0x56ef0c of _0x4bd455) {
-            const _0x322da6 = _0x2ecbd2._parentToChildren[_0x56ef0c];
-            if (!_0x322da6) continue;
-            for (const _0x33f552 of _0x322da6) _0x1c584e.add(_0x33f552);
+        moveNodes(value225, value226, value227) {
+          const list22 = new Set(value225);
+          for (const value228 of value225) {
+            const enabled4 = value224._parentToChildren[value228];
+            if (!enabled4) continue;
+            for (const value229 of enabled4) list22.add(value229);
           }
-          _0x1c584e.forEach((_0x1f6755) => {
-            ((_0x2ecbd2.nodes[_0x1f6755].x += _0xfa1d89), (_0x2ecbd2.nodes[_0x1f6755].y += _0x305987));
+          list22.forEach((item13) => {
+            ((value224.nodes[item13].x += value226), (value224.nodes[item13].y += value227));
           });
         },
         updateNodePosition() {
           throw new Error('group drag should use moveNodes');
         },
-        batch(_0x243342) {
-          _0x243342();
+        batch(handler25) {
+          handler25();
         },
         groupNodes() {},
       };
     try {
-      const _0x5805f2 = createDragController({
-          store: _0x3fdee8,
+      const dragController15 = createDragController({
+          store: store15,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -2699,30 +2702,30 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x20a7ec) {
-            return _0x20a7ec + '-generated';
+          generateId(value230) {
+            return value230 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x235bc9 = { ...createNodeDragContext(), targetNodeId: 'group' };
-      (_0x5805f2.updateDraggingNodes(_0x235bc9, 20, 0, 20, 0, 20, 0, _0x2ecbd2),
-        assert.equal(_0x2155c3.records.length, 0),
-        assert.equal(_0x2155c3.edgeDomCache.get('e1').groupEl.getAttribute('transform'), 'translate(20 0)'));
-      const _0xa58ddd = _0x5805f2.finishDraggingNodes(_0x235bc9, 20, 0);
-      (assert.deepEqual(_0xa58ddd, { earlyCommit: false, didAct: true }),
-        assert.equal(_0x2155c3.edgeDomCache.get('e1').groupEl.getAttribute('transform'), null),
-        assert.equal(_0x2ecbd2.nodes.group.x, 20),
-        assert.equal(_0x2ecbd2.nodes.n1.x, 30),
-        assert.equal(_0x2ecbd2.nodes.n2.x, 140));
+        value231 = { ...createNodeDragContext(), targetNodeId: 'group' };
+      (dragController15.updateDraggingNodes(value231, 20, 0, 20, 0, 20, 0, value224),
+        assert.equal(ctx11.records.length, 0),
+        assert.equal(ctx11.edgeDomCache.get('e1').groupEl.getAttribute('transform'), 'translate(20 0)'));
+      const value232 = dragController15.finishDraggingNodes(value231, 20, 0);
+      (assert.deepEqual(value232, { earlyCommit: false, didAct: true }),
+        assert.equal(ctx11.edgeDomCache.get('e1').groupEl.getAttribute('transform'), null),
+        assert.equal(value224.nodes.group.x, 20),
+        assert.equal(value224.nodes.n1.x, 30),
+        assert.equal(value224.nodes.n2.x, 140));
     } finally {
-      _0x2155c3.restore();
+      ctx11.restore();
     }
   }),
   test('DragController: 宫格间拖拽在分隔线位置会沿用统一命中规则', () => {
-    const _0x2613e4 = {
+    const draggedCellData6 = {
       viewport: { x: 0, y: 0, zoom: 1 },
       nodes: {
         'sb-source': {
@@ -2761,20 +2764,20 @@ async function flushAsyncWork(_0x226424 = 8) {
         },
       },
     };
-    let _0x438c3a = null;
-    const _0x161cb6 = {
+    let value233 = null;
+    const store16 = {
         getStateRaw() {
-          return _0x2613e4;
+          return draggedCellData6;
         },
-        updateNodesData(_0x150425) {
-          _0x438c3a = _0x150425;
+        updateNodesData(value234) {
+          value233 = value234;
         },
         updateNodeData() {
           throw new Error('updateNodeData should not be called in cross-storyboard move');
         },
       },
-      _0x1cbd00 = createDragController({
-        store: _0x161cb6,
+      dragController16 = createDragController({
+        store: store16,
         isNodeType: isNodeType,
         getShortcuts() {
           return {};
@@ -2783,19 +2786,19 @@ async function flushAsyncWork(_0x226424 = 8) {
           return null;
         },
         screenToWorld: identityScreenToWorld,
-        generateId(_0x4ade7b) {
-          return _0x4ade7b + '-generated';
+        generateId(value235) {
+          return value235 + '-generated';
         },
         cloneNodesWithEdges() {
           return {};
         },
         commit() {},
       }),
-      _0x74fe3e = _0x1cbd00.finishDraggingCell(
+      value236 = dragController16.finishDraggingCell(
         {
           targetNodeId: 'sb-source',
           sourceCellIndex: 0,
-          draggedCellData: _0x2613e4.nodes['sb-source'].cells[0],
+          draggedCellData: draggedCellData6.nodes['sb-source'].cells[0],
           ghostEl: null,
           sourceCellEl: null,
           lastHoverNodeId: null,
@@ -2803,11 +2806,11 @@ async function flushAsyncWork(_0x226424 = 8) {
         250,
         25,
       );
-    (assert.deepEqual(_0x74fe3e, { didAct: true, committed: true }),
-      assert.equal(_0x438c3a['sb-target'].cells[0].id, 'cell-src'),
-      assert.equal(_0x438c3a['sb-target'].cells[0].localPath, 'output/source.png'),
-      assert.equal(_0x438c3a['sb-target'].cells[1].id, 'cell-right'),
-      assert.deepEqual(_0x438c3a['sb-source'].cells[0], {
+    (assert.deepEqual(value236, { didAct: true, committed: true }),
+      assert.equal(value233['sb-target'].cells[0].id, 'cell-src'),
+      assert.equal(value233['sb-target'].cells[0].localPath, 'output/source.png'),
+      assert.equal(value233['sb-target'].cells[1].id, 'cell-right'),
+      assert.deepEqual(value233['sb-source'].cells[0], {
         id: 'cell-src',
         localPath: null,
         originalLocalPath: null,
@@ -2835,8 +2838,8 @@ async function flushAsyncWork(_0x226424 = 8) {
       }));
   }),
   test('DragController: 子宫格互换使用显示快照写入 Store', () => {
-    const _0x3672d5 = globalThis.window,
-      _0x135bf0 = {
+    const value237 = globalThis.window,
+      draggedCellData7 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-source': {
@@ -2873,9 +2876,9 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       };
-    let _0x34709a = null,
-      _0xcd647d = null;
-    const _0x586a18 = {
+    let value238 = null,
+      value239 = null;
+    const ghostEl = {
       removed: false,
       remove() {
         this.removed = true;
@@ -2893,25 +2896,25 @@ async function flushAsyncWork(_0x226424 = 8) {
             },
           ],
         ]),
-        flushNodes(_0x1334a6) {
-          return ((_0xcd647d = _0x1334a6), true);
+        flushNodes(value240) {
+          return ((value239 = value240), true);
         },
       },
     };
-    const _0x14458e = {
+    const store17 = {
       getStateRaw() {
-        return _0x135bf0;
+        return draggedCellData7;
       },
-      updateNodesData(_0x19604a) {
-        _0x34709a = _0x19604a;
+      updateNodesData(value241) {
+        value238 = value241;
       },
       updateNodeData() {
         throw new Error('updateNodeData should not be called for cross-storyboard move');
       },
     };
     try {
-      const _0x4b62e1 = createDragController({
-          store: _0x14458e,
+      const dragController17 = createDragController({
+          store: store17,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -2920,45 +2923,45 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x55b0c4) {
-            return _0x55b0c4 + '-generated';
+          generateId(value242) {
+            return value242 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x34cb87 = _0x4b62e1.finishDraggingCell(
+        value243 = dragController17.finishDraggingCell(
           {
             targetNodeId: 'sb-source',
             sourceCellIndex: 0,
-            draggedCellData: _0x135bf0.nodes['sb-source'].cells[0],
-            ghostEl: _0x586a18,
+            draggedCellData: draggedCellData7.nodes['sb-source'].cells[0],
+            ghostEl: ghostEl,
             sourceCellEl: null,
             lastHoverNodeId: null,
           },
           250,
           25,
         );
-      (assert.deepEqual(_0x34cb87, { didAct: true, committed: true }),
-        assert.equal(_0x34709a['sb-target'].cells[0].id, 'cell-src'),
-        assert.equal(_0x34709a['sb-target'].cells[0].localPath, 'output/source.png'),
-        assert.equal(_0x34709a['sb-target'].cells[0].sourceLocalPath, null),
-        assert.equal(_0x34709a['sb-target'].cells[0].sourceUrl, ''),
-        assert.equal(_0x34709a['sb-source'].cells[0].isEmpty, true),
-        assert.deepEqual(_0xcd647d, ['sb-source', 'sb-target']),
-        assert.equal(_0x586a18.removed, true));
+      (assert.deepEqual(value243, { didAct: true, committed: true }),
+        assert.equal(value238['sb-target'].cells[0].id, 'cell-src'),
+        assert.equal(value238['sb-target'].cells[0].localPath, 'output/source.png'),
+        assert.equal(value238['sb-target'].cells[0].sourceLocalPath, null),
+        assert.equal(value238['sb-target'].cells[0].sourceUrl, ''),
+        assert.equal(value238['sb-source'].cells[0].isEmpty, true),
+        assert.deepEqual(value239, ['sb-source', 'sb-target']),
+        assert.equal(ghostEl.removed, true));
     } finally {
-      if (typeof _0x3672d5 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x3672d5;
+      if (typeof value237 === 'undefined') delete globalThis.window;
+      else globalThis.window = value237;
     }
   }),
   test('DragController: 源图像拖入拼图空槽会填充槽位', () => {
-    const _0x6c0bc0 = globalThis.window,
-      _0x52c6b7 = globalThis.document,
-      _0x5d781d = globalThis.requestAnimationFrame,
-      _0x48747e = globalThis.setTimeout,
-      _0x59529d = {
+    const value244 = globalThis.window,
+      value245 = globalThis.document,
+      value246 = globalThis.requestAnimationFrame,
+      value247 = globalThis.setTimeout,
+      args18 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['img-1'],
         edges: {},
@@ -2989,66 +2992,66 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       };
-    let _0x483bb8 = null,
-      _0x3b355c = null,
-      _0x3535ec = null,
-      _0x2647cb = 0,
-      _0x4d5ebe = null;
-    const _0x2e163e = {
+    let value248 = null,
+      value249 = null,
+      value250 = null,
+      value251 = 0,
+      list23 = null;
+    const store18 = {
       getStateRaw() {
-        return _0x59529d;
+        return args18;
       },
-      updateNodeData(_0x2055b2, _0x54ad13) {
-        ((_0x483bb8 = { nodeId: _0x2055b2, patch: _0x54ad13 }),
-          (_0x59529d.nodes[_0x2055b2] = { ..._0x59529d.nodes[_0x2055b2], ..._0x54ad13 }));
+      updateNodeData(nodeId11, patch11) {
+        ((value248 = { nodeId: nodeId11, patch: patch11 }),
+          (args18.nodes[nodeId11] = { ...args18.nodes[nodeId11], ...patch11 }));
       },
-      setSelectedNodes(_0xafe0b6) {
-        ((_0x3b355c = _0xafe0b6), (_0x59529d.selectedNodeIds = _0xafe0b6));
+      setSelectedNodes(value252) {
+        ((value249 = value252), (args18.selectedNodeIds = value252));
       },
-      deleteNodes(_0x14ca41) {
-        _0x3535ec = _0x14ca41;
+      deleteNodes(value253) {
+        value250 = value253;
       },
-      batch(_0x188523) {
-        _0x188523();
+      batch(handler26) {
+        handler26();
       },
       groupNodes() {},
     };
     try {
-      const _0x5ef53c = {
+      const value254 = {
           complete: true,
           naturalWidth: 120,
           naturalHeight: 240,
           currentSrc: '/output/a.jpg',
           src: '/output/a.jpg',
         },
-        _0x4a5df9 = {
+        value255 = {
           complete: true,
           naturalWidth: 120,
           naturalHeight: 240,
-          getAttribute(_0x300dd1) {
-            return _0x300dd1 === 'src' ? '/output/a.jpg' : '';
+          getAttribute(value256) {
+            return value256 === 'src' ? '/output/a.jpg' : '';
           },
         };
-      function _0x3d20de(_0x232144) {
+      function createElement9(value257) {
         return {
-          tagName: String(_0x232144).toUpperCase(),
+          tagName: String(value257).toUpperCase(),
           style: {},
           children: [],
-          appendChild(_0x8bc6e3) {
-            return (this.children.push(_0x8bc6e3), _0x8bc6e3);
+          appendChild(value258) {
+            return (this.children.push(value258), value258);
           },
           remove() {
             this.removed = true;
           },
-          setAttribute(_0x3de0a3, _0x2166e) {
-            this[_0x3de0a3] = String(_0x2166e);
+          setAttribute(value259, value260) {
+            this[value259] = String(value260);
           },
           getContext() {
             return {
               imageSmoothingEnabled: false,
               imageSmoothingQuality: '',
-              drawImage(..._0x443562) {
-                _0x4d5ebe = _0x443562;
+              drawImage(...args19) {
+                list23 = args19;
               },
             };
           },
@@ -3057,11 +3060,11 @@ async function flushAsyncWork(_0x226424 = 8) {
       ((globalThis.window = {
         v2Renderer: {
           nodeInstances: new Map(),
-          getMountedWrapper(_0x5b40dc) {
-            if (_0x5b40dc !== 'img-1') return null;
+          getMountedWrapper(value261) {
+            if (value261 !== 'img-1') return null;
             return {
-              querySelector(_0x1f153c) {
-                return _0x1f153c === 'img' ? _0x5ef53c : null;
+              querySelector(value262) {
+                return value262 === 'img' ? value254 : null;
               },
             };
           },
@@ -3069,42 +3072,42 @@ async function flushAsyncWork(_0x226424 = 8) {
       }),
         (globalThis.document = {
           body: {
-            appendChild(_0x4a89d9) {
-              return _0x4a89d9;
+            appendChild(value263) {
+              return value263;
             },
           },
-          createElement: _0x3d20de,
-          querySelector(_0x441b20) {
-            if (_0x441b20.includes('collage-item'))
+          createElement: createElement9,
+          querySelector(list24) {
+            if (list24.includes('collage-item'))
               return {
                 querySelector() {
-                  return _0x4a5df9;
+                  return value255;
                 },
               };
             return null;
           },
-          getElementById(_0x53877e) {
-            if (_0x53877e !== 'collage-1') return null;
+          getElementById(value264) {
+            if (value264 !== 'collage-1') return null;
             return {
-              querySelector(_0x4a9d4b) {
-                if (!_0x4a9d4b.includes('collage-item')) return null;
+              querySelector(list25) {
+                if (!list25.includes('collage-item')) return null;
                 return {
                   querySelector() {
-                    return _0x4a5df9;
+                    return value255;
                   },
                 };
               },
             };
           },
         }),
-        (globalThis.requestAnimationFrame = (_0x35d174) => {
-          return (_0x35d174(), 1);
+        (globalThis.requestAnimationFrame = (handler27) => {
+          return (handler27(), 1);
         }),
-        (globalThis.setTimeout = (_0x45fb7e) => {
-          return (_0x45fb7e(), 1);
+        (globalThis.setTimeout = (handler28) => {
+          return (handler28(), 1);
         }));
-      const _0x1b8f15 = createDragController({
-          store: _0x2e163e,
+      const dragController18 = createDragController({
+          store: store18,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -3113,52 +3116,52 @@ async function flushAsyncWork(_0x226424 = 8) {
             return 'img-1';
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x13e2a4) {
-            return _0x13e2a4 + '-generated';
+          generateId(value265) {
+            return value265 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {
-            _0x2647cb += 1;
+            value251 += 1;
           },
         }),
-        _0x17f724 = _0x1b8f15.finishDraggingNodes(
+        value266 = dragController18.finishDraggingNodes(
           { targetNodeId: 'img-1', pendingDx: 0, pendingDy: 0 },
           125,
           125,
         );
-      (assert.deepEqual(_0x17f724, { earlyCommit: true, didAct: true }),
-        assert.equal(_0x483bb8.nodeId, 'collage-1'),
-        assert.equal(_0x483bb8.patch.items[0].id, 'collage-item-generated'),
-        assert.equal(_0x483bb8.patch.items[0].url, '/output/a.jpg'),
-        assert.equal(_0x483bb8.patch.items[0].localPath, 'output/a.jpg'),
-        assert.equal(_0x483bb8.patch.items[0].sourceNodeId, 'img-1'),
-        assert.equal(_0x483bb8.patch.items[0].sourceDisplayWidth, 120),
-        assert.equal(_0x483bb8.patch.items[0].sourceDisplayHeight, 240),
-        assert.equal(_0x4d5ebe.length, 9),
-        assert.equal(_0x4d5ebe[0], _0x5ef53c),
-        assert.equal(_0x4d5ebe[5], 0),
-        assert.equal(_0x4d5ebe[6], 0),
-        assert.equal(_0x4d5ebe[7] > 0, true),
-        assert.equal(_0x4d5ebe[8] > 0, true),
-        assert.notEqual(_0x4d5ebe[3], _0x5ef53c.naturalWidth),
-        assert.deepEqual(_0x3b355c, ['collage-1']),
-        assert.deepEqual(_0x3535ec, ['img-1']),
-        assert.equal(_0x2647cb, 1));
+      (assert.deepEqual(value266, { earlyCommit: true, didAct: true }),
+        assert.equal(value248.nodeId, 'collage-1'),
+        assert.equal(value248.patch.items[0].id, 'collage-item-generated'),
+        assert.equal(value248.patch.items[0].url, '/output/a.jpg'),
+        assert.equal(value248.patch.items[0].localPath, 'output/a.jpg'),
+        assert.equal(value248.patch.items[0].sourceNodeId, 'img-1'),
+        assert.equal(value248.patch.items[0].sourceDisplayWidth, 120),
+        assert.equal(value248.patch.items[0].sourceDisplayHeight, 240),
+        assert.equal(list23.length, 9),
+        assert.equal(list23[0], value254),
+        assert.equal(list23[5], 0),
+        assert.equal(list23[6], 0),
+        assert.equal(list23[7] > 0, true),
+        assert.equal(list23[8] > 0, true),
+        assert.notEqual(list23[3], value254.naturalWidth),
+        assert.deepEqual(value249, ['collage-1']),
+        assert.deepEqual(value250, ['img-1']),
+        assert.equal(value251, 1));
     } finally {
-      if (typeof _0x6c0bc0 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x6c0bc0;
-      if (typeof _0x52c6b7 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x52c6b7;
-      if (typeof _0x5d781d === 'undefined') delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0x5d781d;
-      if (typeof _0x48747e === 'undefined') delete globalThis.setTimeout;
-      else globalThis.setTimeout = _0x48747e;
+      if (typeof value244 === 'undefined') delete globalThis.window;
+      else globalThis.window = value244;
+      if (typeof value245 === 'undefined') delete globalThis.document;
+      else globalThis.document = value245;
+      if (typeof value246 === 'undefined') delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value246;
+      if (typeof value247 === 'undefined') delete globalThis.setTimeout;
+      else globalThis.setTimeout = value247;
     }
   }),
   test('DragController: source-only image drop into collage does not write source fallback', () => {
-    const _0x40e233 = {
+    const value267 = {
       viewport: { x: 0, y: 0, zoom: 1 },
       selectedNodeIds: ['img-1'],
       edges: {},
@@ -3188,30 +3191,30 @@ async function flushAsyncWork(_0x226424 = 8) {
         },
       },
     };
-    let _0x455cfa = false,
-      _0x35132a = false,
-      _0x4785e6 = false,
-      _0x3d2f8c = false;
-    const _0x33a14f = {
+    let value268 = false,
+      value269 = false,
+      value270 = false,
+      value271 = false;
+    const store19 = {
         getStateRaw() {
-          return _0x40e233;
+          return value267;
         },
         updateNodeData() {
-          _0x455cfa = true;
+          value268 = true;
         },
         setSelectedNodes() {
-          _0x4785e6 = true;
+          value270 = true;
         },
         deleteNodes() {
-          _0x35132a = true;
+          value269 = true;
         },
-        batch(_0x1b3021) {
-          _0x1b3021();
+        batch(handler29) {
+          handler29();
         },
         groupNodes() {},
       },
-      _0x15826b = createDragController({
-        store: _0x33a14f,
+      dragController19 = createDragController({
+        store: store19,
         isNodeType: isNodeType,
         getShortcuts() {
           return {};
@@ -3220,31 +3223,31 @@ async function flushAsyncWork(_0x226424 = 8) {
           return 'img-1';
         },
         screenToWorld: identityScreenToWorld,
-        generateId(_0x494e63) {
-          return _0x494e63 + '-generated';
+        generateId(value272) {
+          return value272 + '-generated';
         },
         cloneNodesWithEdges() {
           return {};
         },
         commit() {
-          _0x3d2f8c = true;
+          value271 = true;
         },
       }),
-      _0x4f5c5b = _0x15826b.finishDraggingNodes(
+      value273 = dragController19.finishDraggingNodes(
         { targetNodeId: 'img-1', pendingDx: 0, pendingDy: 0 },
         125,
         125,
       );
-    (assert.deepEqual(_0x4f5c5b, { earlyCommit: false, didAct: false }),
-      assert.equal(_0x455cfa, false),
-      assert.equal(_0x35132a, false),
-      assert.equal(_0x4785e6, false),
-      assert.equal(_0x3d2f8c, false));
+    (assert.deepEqual(value273, { earlyCommit: false, didAct: false }),
+      assert.equal(value268, false),
+      assert.equal(value269, false),
+      assert.equal(value270, false),
+      assert.equal(value271, false));
   }),
   test('DragController: collage drop uses current visible image and clears source context', () => {
-    const _0x483209 = globalThis.window,
-      _0x4b8d6a = globalThis.requestAnimationFrame,
-      _0x26e4bc = {
+    const value274 = globalThis.window,
+      value275 = globalThis.requestAnimationFrame,
+      args20 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['img-1'],
         edges: {},
@@ -3279,26 +3282,26 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       };
-    let _0x2aafc3 = null,
-      _0x3553da = null,
-      _0x568625 = null,
-      _0x170a29 = 0;
-    const _0x5582a0 = {
+    let value276 = null,
+      value277 = null,
+      value278 = null,
+      value279 = 0;
+    const store20 = {
       getStateRaw() {
-        return _0x26e4bc;
+        return args20;
       },
-      updateNodeData(_0x3aaa56, _0x2e4027) {
-        ((_0x2aafc3 = { nodeId: _0x3aaa56, patch: _0x2e4027 }),
-          (_0x26e4bc.nodes[_0x3aaa56] = { ..._0x26e4bc.nodes[_0x3aaa56], ..._0x2e4027 }));
+      updateNodeData(nodeId12, patch12) {
+        ((value276 = { nodeId: nodeId12, patch: patch12 }),
+          (args20.nodes[nodeId12] = { ...args20.nodes[nodeId12], ...patch12 }));
       },
-      setSelectedNodes(_0x3f8e1e) {
-        ((_0x3553da = _0x3f8e1e), (_0x26e4bc.selectedNodeIds = _0x3f8e1e));
+      setSelectedNodes(value280) {
+        ((value277 = value280), (args20.selectedNodeIds = value280));
       },
-      deleteNodes(_0x104542) {
-        _0x568625 = _0x104542;
+      deleteNodes(value281) {
+        value278 = value281;
       },
-      batch(_0x23bdf5) {
-        _0x23bdf5();
+      batch(handler30) {
+        handler30();
       },
       groupNodes() {},
     };
@@ -3306,11 +3309,11 @@ async function flushAsyncWork(_0x226424 = 8) {
       ((globalThis.window = {
         v2Renderer: {
           nodeInstances: new Map(),
-          getMountedWrapper(_0x25dd61) {
-            if (_0x25dd61 !== 'img-1') return null;
+          getMountedWrapper(value282) {
+            if (value282 !== 'img-1') return null;
             return {
-              querySelector(_0x674e94) {
-                if (_0x674e94 !== 'img') return null;
+              querySelector(value283) {
+                if (value283 !== 'img') return null;
                 return {
                   complete: true,
                   naturalWidth: 80,
@@ -3323,11 +3326,11 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       }),
-        (globalThis.requestAnimationFrame = (_0x37e7c1) => {
-          return (_0x37e7c1(), 1);
+        (globalThis.requestAnimationFrame = (handler31) => {
+          return (handler31(), 1);
         }));
-      const _0x2e6346 = createDragController({
-          store: _0x5582a0,
+      const dragController20 = createDragController({
+          store: store20,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -3336,47 +3339,47 @@ async function flushAsyncWork(_0x226424 = 8) {
             return 'img-1';
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x32a229) {
-            return _0x32a229 + '-generated';
+          generateId(value284) {
+            return value284 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {
-            _0x170a29 += 1;
+            value279 += 1;
           },
         }),
-        _0x52698a = _0x2e6346.finishDraggingNodes(
+        value285 = dragController20.finishDraggingNodes(
           { targetNodeId: 'img-1', pendingDx: 0, pendingDy: 0 },
           125,
           125,
         );
-      assert.deepEqual(_0x52698a, { earlyCommit: true, didAct: true });
-      const _0x3a05ed = _0x2aafc3?.patch?.items?.[0];
-      (assert.equal(_0x2aafc3?.nodeId, 'collage-1'),
-        assert.equal(_0x3a05ed?.url, '/output/current-visible.jpg'),
-        assert.equal(_0x3a05ed?.localPath, 'output/current-visible.jpg'),
-        assert.equal(_0x3a05ed?.sourceLocalPath, ''),
-        assert.equal(_0x3a05ed?.sourceUrl, ''),
-        assert.equal(_0x3a05ed?.sourceWidth, null),
-        assert.equal(_0x3a05ed?.sourceHeight, null),
-        assert.equal(_0x3a05ed?.imageWidth, 80),
-        assert.equal(_0x3a05ed?.imageHeight, 40),
-        assert.deepEqual(_0x3553da, ['collage-1']),
-        assert.deepEqual(_0x568625, ['img-1']),
-        assert.equal(_0x170a29, 1));
+      assert.deepEqual(value285, { earlyCommit: true, didAct: true });
+      const response = value276?.patch?.items?.[0];
+      (assert.equal(value276?.nodeId, 'collage-1'),
+        assert.equal(response?.url, '/output/current-visible.jpg'),
+        assert.equal(response?.localPath, 'output/current-visible.jpg'),
+        assert.equal(response?.sourceLocalPath, ''),
+        assert.equal(response?.sourceUrl, ''),
+        assert.equal(response?.sourceWidth, null),
+        assert.equal(response?.sourceHeight, null),
+        assert.equal(response?.imageWidth, 80),
+        assert.equal(response?.imageHeight, 40),
+        assert.deepEqual(value277, ['collage-1']),
+        assert.deepEqual(value278, ['img-1']),
+        assert.equal(value279, 1));
     } finally {
-      if (typeof _0x483209 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x483209;
-      if (typeof _0x4b8d6a === 'undefined') delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0x4b8d6a;
+      if (typeof value274 === 'undefined') delete globalThis.window;
+      else globalThis.window = value274;
+      if (typeof value275 === 'undefined') delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value275;
     }
   }),
   test('DragController: 拼图编辑态允许源图像替换已占用槽位', () => {
-    const _0x55b1bf = globalThis.window,
-      _0x46254a = globalThis.requestAnimationFrame,
-      _0x544024 = globalThis.setTimeout,
-      _0x49bedf = {
+    const value286 = globalThis.window,
+      value287 = globalThis.requestAnimationFrame,
+      value288 = globalThis.setTimeout,
+      args21 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['img-1'],
         edges: {},
@@ -3408,39 +3411,39 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       };
-    let _0x28e126 = null,
-      _0xfd4472 = null,
-      _0x28bb3f = null,
-      _0x4a6220 = 0;
-    const _0x48197a = {
+    let value289 = null,
+      value290 = null,
+      value291 = null,
+      value292 = 0;
+    const store21 = {
       getStateRaw() {
-        return _0x49bedf;
+        return args21;
       },
-      updateNodeData(_0x21b989, _0x5a4db5) {
-        ((_0x28e126 = { nodeId: _0x21b989, patch: _0x5a4db5 }),
-          (_0x49bedf.nodes[_0x21b989] = { ..._0x49bedf.nodes[_0x21b989], ..._0x5a4db5 }));
+      updateNodeData(nodeId13, patch13) {
+        ((value289 = { nodeId: nodeId13, patch: patch13 }),
+          (args21.nodes[nodeId13] = { ...args21.nodes[nodeId13], ...patch13 }));
       },
-      setSelectedNodes(_0x29b729) {
-        ((_0xfd4472 = _0x29b729), (_0x49bedf.selectedNodeIds = _0x29b729));
+      setSelectedNodes(value293) {
+        ((value290 = value293), (args21.selectedNodeIds = value293));
       },
-      deleteNodes(_0x49a727) {
-        _0x28bb3f = _0x49a727;
+      deleteNodes(value294) {
+        value291 = value294;
       },
-      batch(_0x54629d) {
-        _0x54629d();
+      batch(handler32) {
+        handler32();
       },
       groupNodes() {},
     };
     try {
       ((globalThis.window = { v2Renderer: { nodeInstances: new Map() } }),
-        (globalThis.requestAnimationFrame = (_0x41d9d8) => {
-          return (_0x41d9d8(), 1);
+        (globalThis.requestAnimationFrame = (handler33) => {
+          return (handler33(), 1);
         }),
-        (globalThis.setTimeout = (_0x2e3cd1) => {
-          return (_0x2e3cd1(), 1);
+        (globalThis.setTimeout = (handler34) => {
+          return (handler34(), 1);
         }));
-      const _0x3d30ff = createDragController({
-          store: _0x48197a,
+      const dragController21 = createDragController({
+          store: store21,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -3449,44 +3452,44 @@ async function flushAsyncWork(_0x226424 = 8) {
             return 'img-1';
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x5766c2) {
-            return _0x5766c2 + '-generated';
+          generateId(value295) {
+            return value295 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {
-            _0x4a6220 += 1;
+            value292 += 1;
           },
         }),
-        _0x2d5bbd = _0x3d30ff.finishDraggingNodes(
+        value296 = dragController21.finishDraggingNodes(
           { targetNodeId: 'img-1', pendingDx: 0, pendingDy: 0 },
           175,
           125,
         );
-      (assert.deepEqual(_0x2d5bbd, { earlyCommit: true, didAct: true }),
-        assert.equal(_0x28e126.nodeId, 'collage-1'),
-        assert.equal(_0x28e126.patch.items[1].id, 'collage-item-generated'),
-        assert.equal(_0x28e126.patch.items[1].url, '/output/a.jpg'),
-        assert.equal(_0x28e126.patch.items[1].localPath, 'output/a.jpg'),
-        assert.equal(_0x28e126.patch.items[1].sourceNodeId, 'img-1'),
-        assert.equal(_0x28e126.patch.items[1].sourceDisplayWidth, 80),
-        assert.equal(_0x28e126.patch.items[1].sourceDisplayHeight, 80),
-        assert.deepEqual(_0xfd4472, ['collage-1']),
-        assert.deepEqual(_0x28bb3f, ['img-1']),
-        assert.equal(_0x4a6220, 1));
+      (assert.deepEqual(value296, { earlyCommit: true, didAct: true }),
+        assert.equal(value289.nodeId, 'collage-1'),
+        assert.equal(value289.patch.items[1].id, 'collage-item-generated'),
+        assert.equal(value289.patch.items[1].url, '/output/a.jpg'),
+        assert.equal(value289.patch.items[1].localPath, 'output/a.jpg'),
+        assert.equal(value289.patch.items[1].sourceNodeId, 'img-1'),
+        assert.equal(value289.patch.items[1].sourceDisplayWidth, 80),
+        assert.equal(value289.patch.items[1].sourceDisplayHeight, 80),
+        assert.deepEqual(value290, ['collage-1']),
+        assert.deepEqual(value291, ['img-1']),
+        assert.equal(value292, 1));
     } finally {
-      if (typeof _0x55b1bf === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x55b1bf;
-      if (typeof _0x46254a === 'undefined') delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0x46254a;
-      if (typeof _0x544024 === 'undefined') delete globalThis.setTimeout;
-      else globalThis.setTimeout = _0x544024;
+      if (typeof value286 === 'undefined') delete globalThis.window;
+      else globalThis.window = value286;
+      if (typeof value287 === 'undefined') delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value287;
+      if (typeof value288 === 'undefined') delete globalThis.setTimeout;
+      else globalThis.setTimeout = value288;
     }
   }),
   test('DragController: 同一宫格互换会先视觉交换再提交 Store', () => {
-    const _0x4f21f0 = globalThis.window,
-      _0x204eb5 = {
+    const value297 = globalThis.window,
+      draggedCellData8 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -3505,11 +3508,11 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       },
-      _0x1177ea = [];
-    let _0x38134f = null,
-      _0x5877f4 = null,
-      _0x43d161 = false;
-    const _0x3452c5 = {
+      list26 = [];
+    let value298 = null,
+      value299 = null,
+      value300 = false;
+    const ghostEl2 = {
       removed: false,
       remove() {
         this.removed = true;
@@ -3521,15 +3524,15 @@ async function flushAsyncWork(_0x226424 = 8) {
           [
             'sb-1',
             {
-              applyImmediateCellSwap(_0x52e165, _0x25b784) {
+              applyImmediateCellSwap(value301, value302) {
                 return (
-                  _0x1177ea.push('visual'),
-                  assert.equal(_0x52e165, 0),
-                  assert.equal(_0x25b784, 1),
+                  list26.push('visual'),
+                  assert.equal(value301, 0),
+                  assert.equal(value302, 1),
                   {
                     ok: true,
                     revert() {
-                      _0x43d161 = true;
+                      value300 = true;
                     },
                   }
                 );
@@ -3537,27 +3540,27 @@ async function flushAsyncWork(_0x226424 = 8) {
             },
           ],
         ]),
-        flushNodes(_0x85df) {
-          return (_0x1177ea.push('flush'), (_0x5877f4 = _0x85df), true);
+        flushNodes(value303) {
+          return (list26.push('flush'), (value299 = value303), true);
         },
       },
     };
-    const _0x5cb7e6 = {
+    const store22 = {
       getStateRaw() {
-        return _0x204eb5;
+        return draggedCellData8;
       },
-      updateNodeData(_0x20bfbd, _0x2aad78) {
-        (_0x1177ea.push('store'),
-          assert.equal(_0x3452c5.removed, true),
-          (_0x38134f = { nodeId: _0x20bfbd, patch: _0x2aad78 }));
+      updateNodeData(nodeId14, patch14) {
+        (list26.push('store'),
+          assert.equal(ghostEl2.removed, true),
+          (value298 = { nodeId: nodeId14, patch: patch14 }));
       },
       updateNodesData() {
         throw new Error('updateNodesData should not be called for same-storyboard move');
       },
     };
     try {
-      const _0x13ca64 = createDragController({
-          store: _0x5cb7e6,
+      const dragController22 = createDragController({
+          store: store22,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -3566,42 +3569,42 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x207282) {
-            return _0x207282 + '-generated';
+          generateId(value304) {
+            return value304 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x151a90 = _0x13ca64.finishDraggingCell(
+        value305 = dragController22.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0x204eb5.nodes['sb-1'].cells[0],
-            ghostEl: _0x3452c5,
+            draggedCellData: draggedCellData8.nodes['sb-1'].cells[0],
+            ghostEl: ghostEl2,
             sourceCellEl: null,
             lastHoverNodeId: null,
           },
           150,
           25,
         );
-      (assert.deepEqual(_0x151a90, { didAct: true, committed: true }),
-        assert.deepEqual(_0x1177ea, ['visual', 'store', 'flush']),
-        assert.equal(_0x38134f.nodeId, 'sb-1'),
-        assert.equal(_0x38134f.patch.cells[0].id, 'cell-b'),
-        assert.equal(_0x38134f.patch.cells[1].id, 'cell-a'),
-        assert.deepEqual(_0x5877f4, ['sb-1']),
-        assert.equal(_0x3452c5.removed, true),
-        assert.equal(_0x43d161, false));
+      (assert.deepEqual(value305, { didAct: true, committed: true }),
+        assert.deepEqual(list26, ['visual', 'store', 'flush']),
+        assert.equal(value298.nodeId, 'sb-1'),
+        assert.equal(value298.patch.cells[0].id, 'cell-b'),
+        assert.equal(value298.patch.cells[1].id, 'cell-a'),
+        assert.deepEqual(value299, ['sb-1']),
+        assert.equal(ghostEl2.removed, true),
+        assert.equal(value300, false));
     } finally {
-      if (typeof _0x4f21f0 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x4f21f0;
+      if (typeof value297 === 'undefined') delete globalThis.window;
+      else globalThis.window = value297;
     }
   }),
   test('DragController: storyboard cell drop in transparent gap swaps nearest cell', () => {
-    const _0x31c8b7 = globalThis.window,
-      _0xdc5760 = {
+    const value306 = globalThis.window,
+      draggedCellData9 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -3622,10 +3625,10 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       };
-    let _0x15f6f9 = null,
-      _0x5e9bea = null,
-      _0x235be1 = null;
-    const _0x1a9720 = {
+    let value307 = null,
+      value308 = null,
+      value309 = null;
+    const ghostEl3 = {
       removed: false,
       remove() {
         this.removed = true;
@@ -3637,9 +3640,9 @@ async function flushAsyncWork(_0x226424 = 8) {
           [
             'sb-1',
             {
-              applyImmediateCellSwap(_0x59d034, _0x36dbca) {
+              applyImmediateCellSwap(value310, value311) {
                 return (
-                  (_0x15f6f9 = [_0x59d034, _0x36dbca]),
+                  (value307 = [value310, value311]),
                   {
                     ok: true,
                     revert() {
@@ -3651,25 +3654,25 @@ async function flushAsyncWork(_0x226424 = 8) {
             },
           ],
         ]),
-        flushNodes(_0x3986e1) {
-          return ((_0x235be1 = _0x3986e1), true);
+        flushNodes(value312) {
+          return ((value309 = value312), true);
         },
       },
     };
-    const _0x12c3d0 = {
+    const store23 = {
       getStateRaw() {
-        return _0xdc5760;
+        return draggedCellData9;
       },
-      updateNodeData(_0x49153d, _0xc723bd) {
-        _0x5e9bea = { nodeId: _0x49153d, patch: _0xc723bd };
+      updateNodeData(nodeId15, patch15) {
+        value308 = { nodeId: nodeId15, patch: patch15 };
       },
       batch() {
         throw new Error('gap drop should resolve to a storyboard cell');
       },
     };
     try {
-      const _0x4570e6 = createDragController({
-          store: _0x12c3d0,
+      const dragController23 = createDragController({
+          store: store23,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -3678,41 +3681,41 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x5c0577) {
-            return _0x5c0577 + '-generated';
+          generateId(value313) {
+            return value313 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x5d39db = _0x4570e6.finishDraggingCell(
+        value314 = dragController23.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0xdc5760.nodes['sb-1'].cells[0],
-            ghostEl: _0x1a9720,
+            draggedCellData: draggedCellData9.nodes['sb-1'].cells[0],
+            ghostEl: ghostEl3,
             sourceCellEl: null,
             lastHoverNodeId: null,
           },
           155,
           50,
         );
-      (assert.deepEqual(_0x5d39db, { didAct: true, committed: true }),
-        assert.deepEqual(_0x15f6f9, [0, 1]),
-        assert.equal(_0x5e9bea.nodeId, 'sb-1'),
-        assert.equal(_0x5e9bea.patch.cells[0].id, 'cell-b'),
-        assert.equal(_0x5e9bea.patch.cells[1].id, 'cell-a'),
-        assert.deepEqual(_0x235be1, ['sb-1']),
-        assert.equal(_0x1a9720.removed, true));
+      (assert.deepEqual(value314, { didAct: true, committed: true }),
+        assert.deepEqual(value307, [0, 1]),
+        assert.equal(value308.nodeId, 'sb-1'),
+        assert.equal(value308.patch.cells[0].id, 'cell-b'),
+        assert.equal(value308.patch.cells[1].id, 'cell-a'),
+        assert.deepEqual(value309, ['sb-1']),
+        assert.equal(ghostEl3.removed, true));
     } finally {
-      if (typeof _0x31c8b7 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x31c8b7;
+      if (typeof value306 === 'undefined') delete globalThis.window;
+      else globalThis.window = value306;
     }
   }),
   test('DragController: storyboard cell pointerup miss reuses last hovered cell', () => {
-    const _0x1c43b6 = globalThis.window,
-      _0x26ea6a = {
+    const value315 = globalThis.window,
+      draggedCellData10 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -3731,10 +3734,10 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       };
-    let _0x126e5a = null,
-      _0x48825e = null,
-      _0x1d3639 = null;
-    const _0xadd9d6 = {
+    let value316 = null,
+      value317 = null,
+      value318 = null;
+    const ghostEl4 = {
       removed: false,
       remove() {
         this.removed = true;
@@ -3746,31 +3749,31 @@ async function flushAsyncWork(_0x226424 = 8) {
           [
             'sb-1',
             {
-              applyImmediateCellSwap(_0x2843d7, _0x5c96cb) {
-                return ((_0x126e5a = [_0x2843d7, _0x5c96cb]), { ok: true, revert() {} });
+              applyImmediateCellSwap(value319, value320) {
+                return ((value316 = [value319, value320]), { ok: true, revert() {} });
               },
             },
           ],
         ]),
-        flushNodes(_0xb68b6c) {
-          return ((_0x1d3639 = _0xb68b6c), true);
+        flushNodes(value321) {
+          return ((value318 = value321), true);
         },
       },
     };
-    const _0xfd4588 = {
+    const store24 = {
       getStateRaw() {
-        return _0x26ea6a;
+        return draggedCellData10;
       },
-      updateNodeData(_0x376539, _0x1f6216) {
-        _0x48825e = { nodeId: _0x376539, patch: _0x1f6216 };
+      updateNodeData(nodeId16, patch16) {
+        value317 = { nodeId: nodeId16, patch: patch16 };
       },
       batch() {
         throw new Error('near miss should recover to hovered storyboard cell');
       },
     };
     try {
-      const _0x147bf9 = createDragController({
-          store: _0xfd4588,
+      const dragController24 = createDragController({
+          store: store24,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -3779,20 +3782,20 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x4b761e) {
-            return _0x4b761e + '-generated';
+          generateId(value322) {
+            return value322 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x4e6f5e = _0x147bf9.finishDraggingCell(
+        value323 = dragController24.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0x26ea6a.nodes['sb-1'].cells[0],
-            ghostEl: _0xadd9d6,
+            draggedCellData: draggedCellData10.nodes['sb-1'].cells[0],
+            ghostEl: ghostEl4,
             sourceCellEl: null,
             lastHoverNodeId: 'sb-1',
             lastHoverCellIndex: 1,
@@ -3801,22 +3804,22 @@ async function flushAsyncWork(_0x226424 = 8) {
           206,
           50,
         );
-      (assert.deepEqual(_0x4e6f5e, { didAct: true, committed: true }),
-        assert.deepEqual(_0x126e5a, [0, 1]),
-        assert.equal(_0x48825e.nodeId, 'sb-1'),
-        assert.equal(_0x48825e.patch.cells[0].id, 'cell-b'),
-        assert.equal(_0x48825e.patch.cells[1].id, 'cell-a'),
-        assert.deepEqual(_0x1d3639, ['sb-1']),
-        assert.equal(_0xadd9d6.removed, true));
+      (assert.deepEqual(value323, { didAct: true, committed: true }),
+        assert.deepEqual(value316, [0, 1]),
+        assert.equal(value317.nodeId, 'sb-1'),
+        assert.equal(value317.patch.cells[0].id, 'cell-b'),
+        assert.equal(value317.patch.cells[1].id, 'cell-a'),
+        assert.deepEqual(value318, ['sb-1']),
+        assert.equal(ghostEl4.removed, true));
     } finally {
-      if (typeof _0x1c43b6 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x1c43b6;
+      if (typeof value315 === 'undefined') delete globalThis.window;
+      else globalThis.window = value315;
     }
   }),
   test('DragController: storyboard cell swap locks current grid pixels', () => {
-    const _0x2b7aeb = globalThis.window,
-      _0x136bfb = globalThis.document,
-      _0x91d23e = {
+    const value324 = globalThis.window,
+      value325 = globalThis.document,
+      draggedCellData11 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -3852,28 +3855,28 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       },
-      _0xf12c97 = [],
-      _0x2e00b2 = {
+      list27 = [],
+      value326 = {
         complete: true,
         naturalWidth: 200,
         naturalHeight: 100,
         currentSrc: '/output/full.png',
         src: '/output/full.png',
-        getAttribute(_0x24e291) {
-          return _0x24e291 === 'src' ? '/output/full.png' : '';
+        getAttribute(value327) {
+          return value327 === 'src' ? '/output/full.png' : '';
         },
       };
     globalThis.document = {
-      getElementById(_0x24820a) {
-        if (_0x24820a !== 'cell-sb-1-0' && _0x24820a !== 'cell-sb-1-1') return null;
+      getElementById(value328) {
+        if (value328 !== 'cell-sb-1-0' && value328 !== 'cell-sb-1-1') return null;
         return {
-          querySelector(_0x289b2d) {
-            return _0x289b2d === 'img.storyboard-cell-img--source-crop' ? _0x2e00b2 : null;
+          querySelector(value329) {
+            return value329 === 'img.storyboard-cell-img--source-crop' ? value326 : null;
           },
         };
       },
-      createElement(_0x4c8a52) {
-        if (_0x4c8a52 !== 'canvas') return { style: {} };
+      createElement(value330) {
+        if (value330 !== 'canvas') return { style: {} };
         return {
           width: 0,
           height: 0,
@@ -3881,8 +3884,8 @@ async function flushAsyncWork(_0x226424 = 8) {
             return {
               imageSmoothingEnabled: false,
               imageSmoothingQuality: '',
-              drawImage(..._0x27fa93) {
-                _0xf12c97.push(_0x27fa93);
+              drawImage(...args22) {
+                list27.push(args22);
               },
             };
           },
@@ -3892,10 +3895,10 @@ async function flushAsyncWork(_0x226424 = 8) {
         };
       },
     };
-    let _0xc47454 = null,
-      _0x2d00ca = false,
-      _0x64a26c = null;
-    const _0x5e6bbc = {
+    let value331 = null,
+      value332 = false,
+      value333 = null;
+    const ghostEl5 = {
       removed: false,
       remove() {
         this.removed = true;
@@ -3913,26 +3916,26 @@ async function flushAsyncWork(_0x226424 = 8) {
             },
           ],
         ]),
-        flushNodes(_0x4747cd) {
-          return ((_0x64a26c = _0x4747cd), true);
+        flushNodes(value334) {
+          return ((value333 = value334), true);
         },
       },
     };
-    const _0x3667cf = {
+    const store25 = {
       getStateRaw() {
-        return _0x91d23e;
+        return draggedCellData11;
       },
-      updateNodeData(_0x588f60, _0x1c60d2) {
-        ((_0xc47454 = { nodeId: _0x588f60, patch: _0x1c60d2 }),
-          (_0x91d23e.nodes[_0x588f60] = { ..._0x91d23e.nodes[_0x588f60], ..._0x1c60d2 }));
+      updateNodeData(nodeId17, patch17) {
+        ((value331 = { nodeId: nodeId17, patch: patch17 }),
+          (draggedCellData11.nodes[nodeId17] = { ...draggedCellData11.nodes[nodeId17], ...patch17 }));
       },
       swapStoryboardCells() {
-        return ((_0x2d00ca = true), true);
+        return ((value332 = true), true);
       },
     };
     try {
-      const _0x4ac3fe = createDragController({
-          store: _0x3667cf,
+      const dragController25 = createDragController({
+          store: store25,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -3941,61 +3944,61 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x5d6d51) {
-            return _0x5d6d51 + '-generated';
+          generateId(value335) {
+            return value335 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0xc0be3b = _0x4ac3fe.finishDraggingCell(
+        value336 = dragController25.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0x91d23e.nodes['sb-1'].cells[0],
-            ghostEl: _0x5e6bbc,
+            draggedCellData: draggedCellData11.nodes['sb-1'].cells[0],
+            ghostEl: ghostEl5,
             sourceCellEl: null,
             lastHoverNodeId: null,
           },
           150,
           50,
         );
-      (assert.deepEqual(_0xc0be3b, { didAct: true, committed: true }),
-        assert.equal(_0x2d00ca, false),
-        assert.deepEqual(_0x64a26c, ['sb-1']),
-        assert.equal(_0x5e6bbc.removed, true),
-        assert.equal(_0xc47454.nodeId, 'sb-1'),
-        assert.equal(_0xc47454.patch.cells[0].id, 'cell-b'),
-        assert.equal(_0xc47454.patch.cells[1].id, 'cell-a'),
-        assert.equal(_0xc47454.patch.cells[0].localPath, null),
-        assert.equal(_0xc47454.patch.cells[1].localPath, null),
-        assert.equal(_0xc47454.patch.cells[0].storyboardLockedCell, true),
-        assert.equal(_0xc47454.patch.cells[1].storyboardLockedCell, true),
-        assert.equal(_0xc47454.patch.cells[0].sourceLocalPath, null),
-        assert.equal(_0xc47454.patch.cells[1].sourceLocalPath, null),
-        assert.equal(_0xc47454.patch.cells[0].sourceUrl, ''),
-        assert.equal(_0xc47454.patch.cells[1].sourceUrl, ''),
-        assert.equal(_0xc47454.patch.cells[0].storyboardSourceCrop, false),
-        assert.equal(_0xc47454.patch.cells[1].storyboardSourceCrop, false),
-        assert.equal(_0xc47454.patch.cells[0].storyboardExtractedCell, false),
-        assert.equal(_0xc47454.patch.cells[1].storyboardExtractedCell, false),
-        assert.equal(_0xc47454.patch.cells[0].capturePreviewUrl, 'data:image/jpeg;base64,90x100'),
-        assert.equal(_0xc47454.patch.cells[1].capturePreviewUrl, 'data:image/jpeg;base64,90x100'),
-        assert.equal(_0xf12c97.length, 2),
-        assert.deepEqual(_0xf12c97[0].slice(1, 5), [0, 0, 90, 100]),
-        assert.deepEqual(_0xf12c97[1].slice(1, 5), [110, 0, 90, 100]));
+      (assert.deepEqual(value336, { didAct: true, committed: true }),
+        assert.equal(value332, false),
+        assert.deepEqual(value333, ['sb-1']),
+        assert.equal(ghostEl5.removed, true),
+        assert.equal(value331.nodeId, 'sb-1'),
+        assert.equal(value331.patch.cells[0].id, 'cell-b'),
+        assert.equal(value331.patch.cells[1].id, 'cell-a'),
+        assert.equal(value331.patch.cells[0].localPath, null),
+        assert.equal(value331.patch.cells[1].localPath, null),
+        assert.equal(value331.patch.cells[0].storyboardLockedCell, true),
+        assert.equal(value331.patch.cells[1].storyboardLockedCell, true),
+        assert.equal(value331.patch.cells[0].sourceLocalPath, null),
+        assert.equal(value331.patch.cells[1].sourceLocalPath, null),
+        assert.equal(value331.patch.cells[0].sourceUrl, ''),
+        assert.equal(value331.patch.cells[1].sourceUrl, ''),
+        assert.equal(value331.patch.cells[0].storyboardSourceCrop, false),
+        assert.equal(value331.patch.cells[1].storyboardSourceCrop, false),
+        assert.equal(value331.patch.cells[0].storyboardExtractedCell, false),
+        assert.equal(value331.patch.cells[1].storyboardExtractedCell, false),
+        assert.equal(value331.patch.cells[0].capturePreviewUrl, 'data:image/jpeg;base64,90x100'),
+        assert.equal(value331.patch.cells[1].capturePreviewUrl, 'data:image/jpeg;base64,90x100'),
+        assert.equal(list27.length, 2),
+        assert.deepEqual(list27[0].slice(1, 5), [0, 0, 90, 100]),
+        assert.deepEqual(list27[1].slice(1, 5), [110, 0, 90, 100]));
     } finally {
-      if (typeof _0x2b7aeb === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x2b7aeb;
-      if (typeof _0x136bfb === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x136bfb;
+      if (typeof value324 === 'undefined') delete globalThis.window;
+      else globalThis.window = value324;
+      if (typeof value325 === 'undefined') delete globalThis.document;
+      else globalThis.document = value325;
     }
   }),
   test('DragController: storyboard cell swap locks custom grid and gap pixels', () => {
-    const _0x1ebe96 = globalThis.window,
-      _0x4f844e = globalThis.document,
-      _0xa4f1a0 = {
+    const value337 = globalThis.window,
+      value338 = globalThis.document,
+      draggedCellData12 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -4050,28 +4053,28 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       },
-      _0x502d78 = [],
-      _0x107693 = {
+      list28 = [],
+      value339 = {
         complete: true,
         naturalWidth: 0x12c,
         naturalHeight: 200,
         currentSrc: '/output/full.png',
         src: '/output/full.png',
-        getAttribute(_0x4959c0) {
-          return _0x4959c0 === 'src' ? '/output/full.png' : '';
+        getAttribute(value340) {
+          return value340 === 'src' ? '/output/full.png' : '';
         },
       };
     globalThis.document = {
-      getElementById(_0x10d357) {
-        if (!/^cell-sb-1-[0-3]$/.test(_0x10d357)) return null;
+      getElementById(value341) {
+        if (!/^cell-sb-1-[0-3]$/.test(value341)) return null;
         return {
-          querySelector(_0x265c62) {
-            return _0x265c62 === 'img.storyboard-cell-img--source-crop' ? _0x107693 : null;
+          querySelector(value342) {
+            return value342 === 'img.storyboard-cell-img--source-crop' ? value339 : null;
           },
         };
       },
-      createElement(_0x15e6df) {
-        if (_0x15e6df !== 'canvas') return { style: {} };
+      createElement(value343) {
+        if (value343 !== 'canvas') return { style: {} };
         return {
           width: 0,
           height: 0,
@@ -4079,8 +4082,8 @@ async function flushAsyncWork(_0x226424 = 8) {
             return {
               imageSmoothingEnabled: false,
               imageSmoothingQuality: '',
-              drawImage(..._0x3ab2cd) {
-                _0x502d78.push(_0x3ab2cd);
+              drawImage(...args23) {
+                list28.push(args23);
               },
             };
           },
@@ -4090,9 +4093,9 @@ async function flushAsyncWork(_0x226424 = 8) {
         };
       },
     };
-    let _0x591de9 = null,
-      _0x878857 = false;
-    const _0xc77e80 = {
+    let value344 = null,
+      value345 = false;
+    const ghostEl6 = {
       removed: false,
       remove() {
         this.removed = true;
@@ -4115,21 +4118,21 @@ async function flushAsyncWork(_0x226424 = 8) {
         },
       },
     };
-    const _0x2fa291 = {
+    const store26 = {
       getStateRaw() {
-        return _0xa4f1a0;
+        return draggedCellData12;
       },
-      updateNodeData(_0x5a2506, _0x52e199) {
-        ((_0x591de9 = { nodeId: _0x5a2506, patch: _0x52e199 }),
-          (_0xa4f1a0.nodes[_0x5a2506] = { ..._0xa4f1a0.nodes[_0x5a2506], ..._0x52e199 }));
+      updateNodeData(nodeId18, patch18) {
+        ((value344 = { nodeId: nodeId18, patch: patch18 }),
+          (draggedCellData12.nodes[nodeId18] = { ...draggedCellData12.nodes[nodeId18], ...patch18 }));
       },
       swapStoryboardCells() {
-        return ((_0x878857 = true), true);
+        return ((value345 = true), true);
       },
     };
     try {
-      const _0x3bfde2 = createDragController({
-          store: _0x2fa291,
+      const dragController26 = createDragController({
+          store: store26,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -4138,47 +4141,47 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x4c7cc0) {
-            return _0x4c7cc0 + '-generated';
+          generateId(value346) {
+            return value346 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x1f58b5 = _0x3bfde2.finishDraggingCell(
+        value347 = dragController26.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0xa4f1a0.nodes['sb-1'].cells[0],
-            ghostEl: _0xc77e80,
+            draggedCellData: draggedCellData12.nodes['sb-1'].cells[0],
+            ghostEl: ghostEl6,
             sourceCellEl: null,
             lastHoverNodeId: null,
           },
           250,
           100,
         );
-      (assert.deepEqual(_0x1f58b5, { didAct: true, committed: true }),
-        assert.equal(_0x878857, false),
-        assert.equal(_0xc77e80.removed, true),
-        assert.equal(_0x591de9.nodeId, 'sb-1'),
-        assert.equal(_0x591de9.patch.cells[0].id, 'cell-d'),
-        assert.equal(_0x591de9.patch.cells[3].id, 'cell-a'),
-        assert.equal(_0x591de9.patch.cells[0].capturePreviewUrl, 'data:image/jpeg;base64,65x140'),
-        assert.equal(_0x591de9.patch.cells[3].capturePreviewUrl, 'data:image/jpeg;base64,215x40'),
-        assert.deepEqual(_0x502d78[0].slice(1, 5), [0, 0, 215, 40]),
-        assert.deepEqual(_0x502d78[1].slice(1, 5), [235, 60, 65, 140]));
+      (assert.deepEqual(value347, { didAct: true, committed: true }),
+        assert.equal(value345, false),
+        assert.equal(ghostEl6.removed, true),
+        assert.equal(value344.nodeId, 'sb-1'),
+        assert.equal(value344.patch.cells[0].id, 'cell-d'),
+        assert.equal(value344.patch.cells[3].id, 'cell-a'),
+        assert.equal(value344.patch.cells[0].capturePreviewUrl, 'data:image/jpeg;base64,65x140'),
+        assert.equal(value344.patch.cells[3].capturePreviewUrl, 'data:image/jpeg;base64,215x40'),
+        assert.deepEqual(list28[0].slice(1, 5), [0, 0, 215, 40]),
+        assert.deepEqual(list28[1].slice(1, 5), [235, 60, 65, 140]));
     } finally {
-      if (typeof _0x1ebe96 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x1ebe96;
-      if (typeof _0x4f844e === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x4f844e;
+      if (typeof value337 === 'undefined') delete globalThis.window;
+      else globalThis.window = value337;
+      if (typeof value338 === 'undefined') delete globalThis.document;
+      else globalThis.document = value338;
     }
   }),
   test('DragController: storyboard swap locks node-level puzzle source pieces', () => {
-    const _0xf0e5d1 = globalThis.window,
-      _0x6d5148 = globalThis.document,
-      _0x278fb9 = {
+    const value348 = globalThis.window,
+      value349 = globalThis.document,
+      draggedCellData13 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-node-source': {
@@ -4228,35 +4231,35 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       },
-      _0x2185d4 = [],
-      _0x4036ef = {
+      list29 = [],
+      value350 = {
         complete: true,
         naturalWidth: 0x12c,
         naturalHeight: 200,
         currentSrc: '/output/full-node.png',
         src: '/output/full-node.png',
-        getAttribute(_0x515813) {
-          return _0x515813 === 'src' ? '/output/full-node.png' : '';
+        getAttribute(value351) {
+          return value351 === 'src' ? '/output/full-node.png' : '';
         },
       };
     globalThis.document = {
-      getElementById(_0x1e0e9d) {
-        if (/^cell-sb-node-source-[0-3]$/.test(_0x1e0e9d))
+      getElementById(value352) {
+        if (/^cell-sb-node-source-[0-3]$/.test(value352))
           return {
             querySelector() {
               return null;
             },
           };
-        if (_0x1e0e9d === 'sb-node-sb-node-source')
+        if (value352 === 'sb-node-sb-node-source')
           return {
-            querySelector(_0x59c734) {
-              return _0x59c734 === '.storyboard-source-backdrop' ? _0x4036ef : null;
+            querySelector(value353) {
+              return value353 === '.storyboard-source-backdrop' ? value350 : null;
             },
           };
         return null;
       },
-      createElement(_0x571af6) {
-        if (_0x571af6 !== 'canvas') return { style: {} };
+      createElement(value354) {
+        if (value354 !== 'canvas') return { style: {} };
         return {
           width: 0,
           height: 0,
@@ -4264,8 +4267,8 @@ async function flushAsyncWork(_0x226424 = 8) {
             return {
               imageSmoothingEnabled: false,
               imageSmoothingQuality: '',
-              drawImage(..._0x3fe17c) {
-                _0x2185d4.push(_0x3fe17c);
+              drawImage(...args24) {
+                list29.push(args24);
               },
             };
           },
@@ -4275,9 +4278,9 @@ async function flushAsyncWork(_0x226424 = 8) {
         };
       },
     };
-    let _0x3d258d = null,
-      _0xddf20e = false;
-    const _0x4c2a32 = {
+    let value355 = null,
+      value356 = false;
+    const ghostEl7 = {
       removed: false,
       remove() {
         this.removed = true;
@@ -4300,21 +4303,21 @@ async function flushAsyncWork(_0x226424 = 8) {
         },
       },
     };
-    const _0x46755b = {
+    const store27 = {
       getStateRaw() {
-        return _0x278fb9;
+        return draggedCellData13;
       },
-      updateNodeData(_0x587fb6, _0x615c4) {
-        ((_0x3d258d = { nodeId: _0x587fb6, patch: _0x615c4 }),
-          (_0x278fb9.nodes[_0x587fb6] = { ..._0x278fb9.nodes[_0x587fb6], ..._0x615c4 }));
+      updateNodeData(nodeId19, patch19) {
+        ((value355 = { nodeId: nodeId19, patch: patch19 }),
+          (draggedCellData13.nodes[nodeId19] = { ...draggedCellData13.nodes[nodeId19], ...patch19 }));
       },
       swapStoryboardCells() {
-        return ((_0xddf20e = true), true);
+        return ((value356 = true), true);
       },
     };
     try {
-      const _0x5a05f4 = createDragController({
-          store: _0x46755b,
+      const dragController27 = createDragController({
+          store: store27,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -4323,47 +4326,47 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x3ae8a9) {
-            return _0x3ae8a9 + '-generated';
+          generateId(value357) {
+            return value357 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x4c7f2c = _0x5a05f4.finishDraggingCell(
+        value358 = dragController27.finishDraggingCell(
           {
             targetNodeId: 'sb-node-source',
             sourceCellIndex: 0,
-            draggedCellData: _0x278fb9.nodes['sb-node-source'].cells[0],
-            ghostEl: _0x4c2a32,
+            draggedCellData: draggedCellData13.nodes['sb-node-source'].cells[0],
+            ghostEl: ghostEl7,
             sourceCellEl: null,
             lastHoverNodeId: null,
           },
           250,
           100,
         );
-      (assert.deepEqual(_0x4c7f2c, { didAct: true, committed: true }),
-        assert.equal(_0xddf20e, false),
-        assert.equal(_0x4c2a32.removed, true),
-        assert.equal(_0x3d258d.nodeId, 'sb-node-source'),
-        assert.equal(_0x3d258d.patch.cells[0].id, 'piece-d'),
-        assert.equal(_0x3d258d.patch.cells[3].id, 'piece-a'),
-        assert.equal(_0x3d258d.patch.cells[0].capturePreviewUrl, 'data:image/jpeg;base64,65x140'),
-        assert.equal(_0x3d258d.patch.cells[3].capturePreviewUrl, 'data:image/jpeg;base64,215x40'),
-        assert.deepEqual(_0x2185d4[0].slice(1, 5), [0, 0, 215, 40]),
-        assert.deepEqual(_0x2185d4[1].slice(1, 5), [235, 60, 65, 140]));
+      (assert.deepEqual(value358, { didAct: true, committed: true }),
+        assert.equal(value356, false),
+        assert.equal(ghostEl7.removed, true),
+        assert.equal(value355.nodeId, 'sb-node-source'),
+        assert.equal(value355.patch.cells[0].id, 'piece-d'),
+        assert.equal(value355.patch.cells[3].id, 'piece-a'),
+        assert.equal(value355.patch.cells[0].capturePreviewUrl, 'data:image/jpeg;base64,65x140'),
+        assert.equal(value355.patch.cells[3].capturePreviewUrl, 'data:image/jpeg;base64,215x40'),
+        assert.deepEqual(list29[0].slice(1, 5), [0, 0, 215, 40]),
+        assert.deepEqual(list29[1].slice(1, 5), [235, 60, 65, 140]));
     } finally {
-      if (typeof _0xf0e5d1 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0xf0e5d1;
-      if (typeof _0x6d5148 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x6d5148;
+      if (typeof value348 === 'undefined') delete globalThis.window;
+      else globalThis.window = value348;
+      if (typeof value349 === 'undefined') delete globalThis.document;
+      else globalThis.document = value349;
     }
   }),
   test('DragController: source-backed storyboard source missing uses actual visible asset', () => {
-    const _0x4cd40b = globalThis.window,
-      _0x722306 = globalThis.document,
-      _0x22fc49 = {
+    const value359 = globalThis.window,
+      value360 = globalThis.document,
+      draggedCellData14 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -4394,11 +4397,11 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       };
-    let _0x34875b = false,
-      _0xa0aced = false,
-      _0x4319ca = false,
-      _0x28429d = false;
-    const _0x2eeaa1 = {
+    let value361 = false,
+      value362 = false,
+      value363 = false,
+      value364 = false;
+    const ghostEl8 = {
       removed: false,
       remove() {
         this.removed = true;
@@ -4408,8 +4411,8 @@ async function flushAsyncWork(_0x226424 = 8) {
       getElementById() {
         return null;
       },
-      createElement(_0x4869e7) {
-        if (_0x4869e7 !== 'canvas') return { style: {} };
+      createElement(value365) {
+        if (value365 !== 'canvas') return { style: {} };
         return {
           width: 0,
           height: 0,
@@ -4429,7 +4432,7 @@ async function flushAsyncWork(_0x226424 = 8) {
                   return {
                     ok: true,
                     revert() {
-                      _0x34875b = true;
+                      value361 = true;
                     },
                   };
                 },
@@ -4437,24 +4440,24 @@ async function flushAsyncWork(_0x226424 = 8) {
             ],
           ]),
           flushNodes() {
-            return ((_0x28429d = true), true);
+            return ((value364 = true), true);
           },
         },
       }));
-    const _0x261ad6 = {
+    const store28 = {
       getStateRaw() {
-        return _0x22fc49;
+        return draggedCellData14;
       },
       updateNodeData() {
-        _0x4319ca = true;
+        value363 = true;
       },
       swapStoryboardCells() {
-        return ((_0xa0aced = true), true);
+        return ((value362 = true), true);
       },
     };
     try {
-      const _0xf924c2 = createDragController({
-          store: _0x261ad6,
+      const dragController28 = createDragController({
+          store: store28,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -4463,42 +4466,42 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x47ecd5) {
-            return _0x47ecd5 + '-generated';
+          generateId(value366) {
+            return value366 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x3e7e70 = _0xf924c2.finishDraggingCell(
+        value367 = dragController28.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0x22fc49.nodes['sb-1'].cells[0],
-            ghostEl: _0x2eeaa1,
+            draggedCellData: draggedCellData14.nodes['sb-1'].cells[0],
+            ghostEl: ghostEl8,
             sourceCellEl: null,
             lastHoverNodeId: null,
           },
           250,
           100,
         );
-      (assert.deepEqual(_0x3e7e70, { didAct: true, committed: true }),
-        assert.equal(_0xa0aced, false),
-        assert.equal(_0x4319ca, true),
-        assert.equal(_0x28429d, true),
-        assert.equal(_0x34875b, false),
-        assert.equal(_0x2eeaa1.removed, true));
+      (assert.deepEqual(value367, { didAct: true, committed: true }),
+        assert.equal(value362, false),
+        assert.equal(value363, true),
+        assert.equal(value364, true),
+        assert.equal(value361, false),
+        assert.equal(ghostEl8.removed, true));
     } finally {
-      if (typeof _0x4cd40b === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x4cd40b;
-      if (typeof _0x722306 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x722306;
+      if (typeof value359 === 'undefined') delete globalThis.window;
+      else globalThis.window = value359;
+      if (typeof value360 === 'undefined') delete globalThis.document;
+      else globalThis.document = value360;
     }
   }),
   test('DragController: 同一宫格视觉互换后 Store 失败会回滚', () => {
-    const _0x4d9582 = globalThis.window,
-      _0x2f1005 = {
+    const value368 = globalThis.window,
+      draggedCellData15 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -4517,9 +4520,9 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       };
-    let _0x121335 = false,
-      _0x32d2f4 = false;
-    const _0x3ef2e5 = {
+    let value369 = false,
+      value370 = false;
+    const ghostEl9 = {
       removed: false,
       remove() {
         this.removed = true;
@@ -4535,7 +4538,7 @@ async function flushAsyncWork(_0x226424 = 8) {
                 return {
                   ok: true,
                   revert() {
-                    _0x121335 = true;
+                    value369 = true;
                   },
                 };
               },
@@ -4543,21 +4546,21 @@ async function flushAsyncWork(_0x226424 = 8) {
           ],
         ]),
         flushNodes() {
-          return ((_0x32d2f4 = true), true);
+          return ((value370 = true), true);
         },
       },
     };
-    const _0x3b0f2d = {
+    const store29 = {
       getStateRaw() {
-        return _0x2f1005;
+        return draggedCellData15;
       },
       swapStoryboardCells() {
         return false;
       },
     };
     try {
-      const _0x13aec0 = createDragController({
-          store: _0x3b0f2d,
+      const dragController29 = createDragController({
+          store: store29,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -4566,41 +4569,41 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x1e504b) {
-            return _0x1e504b + '-generated';
+          generateId(value371) {
+            return value371 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x5e5f9e = _0x13aec0.finishDraggingCell(
+        value372 = dragController29.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0x2f1005.nodes['sb-1'].cells[0],
-            ghostEl: _0x3ef2e5,
+            draggedCellData: draggedCellData15.nodes['sb-1'].cells[0],
+            ghostEl: ghostEl9,
             sourceCellEl: null,
             lastHoverNodeId: null,
           },
           150,
           25,
         );
-      (assert.deepEqual(_0x5e5f9e, { didAct: false, committed: false }),
-        assert.equal(_0x3ef2e5.removed, true),
-        assert.equal(_0x121335, true),
-        assert.equal(_0x32d2f4, false));
+      (assert.deepEqual(value372, { didAct: false, committed: false }),
+        assert.equal(ghostEl9.removed, true),
+        assert.equal(value369, true),
+        assert.equal(value370, false));
     } finally {
-      if (typeof _0x4d9582 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x4d9582;
+      if (typeof value368 === 'undefined') delete globalThis.window;
+      else globalThis.window = value368;
     }
   }),
   test('DragController: 同源提取图放回宫格优先保留实际显示图', () => {
-    const _0x23dbe2 = globalThis.document,
-      _0xc402f4 = globalThis.window,
-      _0x151fc4 = globalThis.requestAnimationFrame,
-      _0xbe2b94 = globalThis.setTimeout,
-      _0x27c9c0 = {
+    const value373 = globalThis.document,
+      value374 = globalThis.window,
+      value375 = globalThis.requestAnimationFrame,
+      value376 = globalThis.setTimeout,
+      args25 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         selectedNodeIds: ['n1'],
         edges: {},
@@ -4651,27 +4654,27 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       },
-      _0x3cdb3d = [];
-    let _0x3d88fd = null,
-      _0x57dc84 = null,
-      _0x32d79b = null,
-      _0x99cad = 0;
-    function _0x4b5a48(_0x5d9e9b) {
-      const _0x56be90 = {
-        tagName: String(_0x5d9e9b).toUpperCase(),
+      list30 = [];
+    let value377 = null,
+      value378 = null,
+      value379 = null,
+      value380 = 0;
+    function createElement10(value381) {
+      const value382 = {
+        tagName: String(value381).toUpperCase(),
         style: {},
         children: [],
         complete: true,
         naturalWidth: 100,
         className: '',
-        appendChild(_0x619150) {
-          return (this.children.push(_0x619150), _0x619150);
+        appendChild(value383) {
+          return (this.children.push(value383), value383);
         },
-        setAttribute(_0x2a470c, _0x559da1) {
-          this[_0x2a470c] = String(_0x559da1);
+        setAttribute(value384, value385) {
+          this[value384] = String(value385);
         },
-        getAttribute(_0x3564f3) {
-          return this[_0x3564f3] || '';
+        getAttribute(value386) {
+          return this[value386] || '';
         },
         getContext() {
           return { drawImage() {} };
@@ -4683,13 +4686,13 @@ async function flushAsyncWork(_0x226424 = 8) {
           this.removed = true;
         },
       };
-      return (_0x3cdb3d.push(_0x56be90), _0x56be90);
+      return (list30.push(value382), value382);
     }
     try {
       ((globalThis.window = globalThis),
         (globalThis.v2Renderer = {
-          getMountedWrapper(_0x5b181b) {
-            if (_0x5b181b !== 'n1') return null;
+          getMountedWrapper(value387) {
+            if (value387 !== 'n1') return null;
             return {
               querySelector() {
                 return {
@@ -4706,54 +4709,54 @@ async function flushAsyncWork(_0x226424 = 8) {
         (globalThis.document = {
           body: {
             classList: createClassList(),
-            appendChild(_0x4ce8ed) {
-              return (_0x3cdb3d.push(_0x4ce8ed), _0x4ce8ed);
+            appendChild(value388) {
+              return (list30.push(value388), value388);
             },
           },
-          createElement: _0x4b5a48,
-          getElementById(_0x197666) {
-            if (_0x197666 !== 'cell-sb-1-0') return null;
+          createElement: createElement10,
+          getElementById(value389) {
+            if (value389 !== 'cell-sb-1-0') return null;
             return {
               querySelector() {
                 return {
                   complete: false,
                   naturalWidth: 0,
-                  getAttribute(_0x5c55a6) {
-                    return _0x5c55a6 === 'src' ? '/output/extracted.jpg' : '';
+                  getAttribute(value390) {
+                    return value390 === 'src' ? '/output/extracted.jpg' : '';
                   },
                 };
               },
             };
           },
         }),
-        (globalThis.requestAnimationFrame = (_0x5762a1) => {
-          return (_0x5762a1(), 1);
+        (globalThis.requestAnimationFrame = (handler35) => {
+          return (handler35(), 1);
         }),
-        (globalThis.setTimeout = (_0x1c1aa5) => {
-          return (_0x1c1aa5(), 1);
+        (globalThis.setTimeout = (handler36) => {
+          return (handler36(), 1);
         }));
-      const _0x1ae414 = {
+      const store30 = {
           getStateRaw() {
-            return _0x27c9c0;
+            return args25;
           },
-          updateNodeData(_0x35ae7a, _0x4dabdb) {
-            ((_0x3d88fd = { nodeId: _0x35ae7a, patch: _0x4dabdb }),
-              (_0x27c9c0.nodes[_0x35ae7a] = { ..._0x27c9c0.nodes[_0x35ae7a], ..._0x4dabdb }));
+          updateNodeData(nodeId20, patch20) {
+            ((value377 = { nodeId: nodeId20, patch: patch20 }),
+              (args25.nodes[nodeId20] = { ...args25.nodes[nodeId20], ...patch20 }));
           },
-          setSelectedNodes(_0x3d6616) {
-            ((_0x57dc84 = _0x3d6616), (_0x27c9c0.selectedNodeIds = [..._0x3d6616]));
+          setSelectedNodes(args26) {
+            ((value378 = args26), (args25.selectedNodeIds = [...args26]));
           },
-          deleteNodes(_0x321917) {
-            _0x32d79b = _0x321917;
+          deleteNodes(value391) {
+            value379 = value391;
           },
           moveNodes() {},
-          batch(_0x5eb5e7) {
-            _0x5eb5e7();
+          batch(handler37) {
+            handler37();
           },
           groupNodes() {},
         },
-        _0xb899b3 = createDragController({
-          store: _0x1ae414,
+        dragController30 = createDragController({
+          store: store30,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -4762,20 +4765,20 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x24611e) {
-            return _0x24611e + '-generated';
+          generateId(value392) {
+            return value392 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {
-            _0x99cad += 1;
+            value380 += 1;
           },
         }),
-        _0x3eef7e = _0xb899b3.finishDraggingNodes(createNodeDragContext(), 125, 50);
-      (assert.deepEqual(_0x3eef7e, { earlyCommit: true, didAct: true }),
-        assert.equal(_0x3d88fd?.nodeId, 'sb-1'),
-        assert.deepEqual(_0x3d88fd?.patch?.cells?.[0], {
+        value393 = dragController30.finishDraggingNodes(createNodeDragContext(), 125, 50);
+      (assert.deepEqual(value393, { earlyCommit: true, didAct: true }),
+        assert.equal(value377?.nodeId, 'sb-1'),
+        assert.deepEqual(value377?.patch?.cells?.[0], {
           id: 'cell-generated',
           url: '',
           localPath: 'output/extracted.jpg',
@@ -4811,25 +4814,25 @@ async function flushAsyncWork(_0x226424 = 8) {
           col: 0,
           row: 0,
         }),
-        assert.deepEqual(_0x57dc84, []),
-        assert.deepEqual(_0x32d79b, ['n1']),
-        assert.equal(_0x99cad, 1));
-      const _0x2a8406 = _0x3cdb3d.find((_0x4cb3e8) => _0x4cb3e8.className === 'v2-ghost-image');
-      assert.equal(_0x2a8406?.removed, true);
+        assert.deepEqual(value378, []),
+        assert.deepEqual(value379, ['n1']),
+        assert.equal(value380, 1));
+      const value394 = list30.find((item14) => item14.className === 'v2-ghost-image');
+      assert.equal(value394?.removed, true);
     } finally {
-      if (_0x23dbe2 === undefined) delete globalThis.document;
-      else globalThis.document = _0x23dbe2;
-      if (_0xc402f4 === undefined) delete globalThis.window;
-      else globalThis.window = _0xc402f4;
-      if (_0x151fc4 === undefined) delete globalThis.requestAnimationFrame;
-      else globalThis.requestAnimationFrame = _0x151fc4;
-      if (_0xbe2b94 === undefined) delete globalThis.setTimeout;
-      else globalThis.setTimeout = _0xbe2b94;
+      if (value373 === undefined) delete globalThis.document;
+      else globalThis.document = value373;
+      if (value374 === undefined) delete globalThis.window;
+      else globalThis.window = value374;
+      if (value375 === undefined) delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = value375;
+      if (value376 === undefined) delete globalThis.setTimeout;
+      else globalThis.setTimeout = value376;
       delete globalThis.v2Renderer;
     }
   }),
   test('DragController: 放回的提取图再次移格会冻结实际图快照', () => {
-    const _0x4d080c = {
+    const draggedCellData16 = {
       viewport: { x: 0, y: 0, zoom: 1 },
       selectedNodeIds: [],
       edges: {},
@@ -4862,23 +4865,23 @@ async function flushAsyncWork(_0x226424 = 8) {
         },
       },
     };
-    let _0x3203f0 = null;
-    const _0x9e5257 = {
+    let value395 = null;
+    const ghostEl10 = {
         remove() {
           this.removed = true;
         },
       },
-      _0x117c1a = {
+      store31 = {
         getStateRaw() {
-          return _0x4d080c;
+          return draggedCellData16;
         },
-        updateNodeData(_0x504d03, _0x558d62) {
-          ((_0x3203f0 = { nodeId: _0x504d03, patch: _0x558d62 }),
-            (_0x4d080c.nodes[_0x504d03] = { ..._0x4d080c.nodes[_0x504d03], ..._0x558d62 }));
+        updateNodeData(nodeId21, patch21) {
+          ((value395 = { nodeId: nodeId21, patch: patch21 }),
+            (draggedCellData16.nodes[nodeId21] = { ...draggedCellData16.nodes[nodeId21], ...patch21 }));
         },
       },
-      _0x6a2fe7 = createDragController({
-        store: _0x117c1a,
+      dragController31 = createDragController({
+        store: store31,
         isNodeType: isNodeType,
         getShortcuts() {
           return {};
@@ -4887,37 +4890,37 @@ async function flushAsyncWork(_0x226424 = 8) {
           return null;
         },
         screenToWorld: identityScreenToWorld,
-        generateId(_0x5499ce) {
-          return _0x5499ce + '-generated';
+        generateId(value396) {
+          return value396 + '-generated';
         },
         cloneNodesWithEdges() {
           return {};
         },
         commit() {},
       }),
-      _0x3ce54b = _0x6a2fe7.finishDraggingCell(
+      value397 = dragController31.finishDraggingCell(
         {
           targetNodeId: 'sb-1',
           sourceCellIndex: 0,
-          draggedCellData: _0x4d080c.nodes['sb-1'].cells[0],
-          ghostEl: _0x9e5257,
+          draggedCellData: draggedCellData16.nodes['sb-1'].cells[0],
+          ghostEl: ghostEl10,
           sourceCellEl: null,
           lastHoverNodeId: null,
         },
         150,
         50,
       );
-    (assert.deepEqual(_0x3ce54b, { didAct: true, committed: true }),
-      assert.equal(_0x3203f0.nodeId, 'sb-1'),
-      assert.equal(_0x4d080c.nodes['sb-1'].cells[1].localPath, 'output/extracted.jpg'),
-      assert.equal(_0x4d080c.nodes['sb-1'].cells[1].sourceLocalPath, null),
-      assert.equal(_0x4d080c.nodes['sb-1'].cells[1].sourceUrl, ''),
-      assert.equal(_0x4d080c.nodes['sb-1'].cells[1].storyboardSourceCrop, false),
-      assert.equal(_0x4d080c.nodes['sb-1'].cells[1].storyboardPiece, false),
-      assert.equal(_0x9e5257.removed, true));
+    (assert.deepEqual(value397, { didAct: true, committed: true }),
+      assert.equal(value395.nodeId, 'sb-1'),
+      assert.equal(draggedCellData16.nodes['sb-1'].cells[1].localPath, 'output/extracted.jpg'),
+      assert.equal(draggedCellData16.nodes['sb-1'].cells[1].sourceLocalPath, null),
+      assert.equal(draggedCellData16.nodes['sb-1'].cells[1].sourceUrl, ''),
+      assert.equal(draggedCellData16.nodes['sb-1'].cells[1].storyboardSourceCrop, false),
+      assert.equal(draggedCellData16.nodes['sb-1'].cells[1].storyboardPiece, false),
+      assert.equal(ghostEl10.removed, true));
   }),
   test('DragController: 多轮交换后拖出仍使用当前显示图', () => {
-    const _0x5de33b = {
+    const draggedCellData17 = {
       viewport: { x: 0, y: 0, zoom: 1 },
       selectedNodeIds: [],
       edges: {},
@@ -4939,26 +4942,26 @@ async function flushAsyncWork(_0x226424 = 8) {
         },
       },
     };
-    let _0x1dd365 = null;
-    const _0x307086 = {
+    let value398 = null;
+    const store32 = {
         getStateRaw() {
-          return _0x5de33b;
+          return draggedCellData17;
         },
-        updateNodeData(_0x196e4e, _0x5e678c) {
-          _0x5de33b.nodes[_0x196e4e] = { ..._0x5de33b.nodes[_0x196e4e], ..._0x5e678c };
+        updateNodeData(value399, args27) {
+          draggedCellData17.nodes[value399] = { ...draggedCellData17.nodes[value399], ...args27 };
         },
-        batch(_0x24139c) {
-          _0x24139c();
+        batch(handler38) {
+          handler38();
         },
-        addNode(_0x52b678) {
-          ((_0x1dd365 = _0x52b678), (_0x5de33b.nodes[_0x52b678.id] = _0x52b678));
+        addNode(value400) {
+          ((value398 = value400), (draggedCellData17.nodes[value400.id] = value400));
         },
-        setSelectedNodes(_0x79bd68) {
-          _0x5de33b.selectedNodeIds = _0x79bd68;
+        setSelectedNodes(value401) {
+          draggedCellData17.selectedNodeIds = value401;
         },
       },
-      _0x120bb5 = createDragController({
-        store: _0x307086,
+      dragController32 = createDragController({
+        store: store32,
         isNodeType: isNodeType,
         getShortcuts() {
           return {};
@@ -4967,8 +4970,8 @@ async function flushAsyncWork(_0x226424 = 8) {
           return null;
         },
         screenToWorld: identityScreenToWorld,
-        generateId(_0x19245f) {
-          return _0x19245f + '-generated';
+        generateId(value402) {
+          return value402 + '-generated';
         },
         cloneNodesWithEdges() {
           return {};
@@ -4976,11 +4979,11 @@ async function flushAsyncWork(_0x226424 = 8) {
         commit() {},
       });
     (assert.deepEqual(
-      _0x120bb5.finishDraggingCell(
+      dragController32.finishDraggingCell(
         {
           targetNodeId: 'sb-1',
           sourceCellIndex: 0,
-          draggedCellData: _0x5de33b.nodes['sb-1'].cells[0],
+          draggedCellData: draggedCellData17.nodes['sb-1'].cells[0],
           ghostEl: null,
           sourceCellEl: null,
           lastHoverNodeId: null,
@@ -4990,13 +4993,13 @@ async function flushAsyncWork(_0x226424 = 8) {
       ),
       { didAct: true, committed: true },
     ),
-      assert.equal(_0x5de33b.nodes['sb-1'].cells[1].localPath, 'output/a.png'),
+      assert.equal(draggedCellData17.nodes['sb-1'].cells[1].localPath, 'output/a.png'),
       assert.deepEqual(
-        _0x120bb5.finishDraggingCell(
+        dragController32.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 1,
-            draggedCellData: _0x5de33b.nodes['sb-1'].cells[1],
+            draggedCellData: draggedCellData17.nodes['sb-1'].cells[1],
             ghostEl: null,
             sourceCellEl: null,
             lastHoverNodeId: null,
@@ -5006,15 +5009,15 @@ async function flushAsyncWork(_0x226424 = 8) {
         ),
         { didAct: true, committed: true },
       ),
-      assert.equal(_0x5de33b.nodes['sb-1'].cells[2].localPath, 'output/a.png'),
-      assert.equal(_0x5de33b.nodes['sb-1'].cells[2].sourceLocalPath, null),
-      assert.equal(_0x5de33b.nodes['sb-1'].cells[2].storyboardPiece, false),
+      assert.equal(draggedCellData17.nodes['sb-1'].cells[2].localPath, 'output/a.png'),
+      assert.equal(draggedCellData17.nodes['sb-1'].cells[2].sourceLocalPath, null),
+      assert.equal(draggedCellData17.nodes['sb-1'].cells[2].storyboardPiece, false),
       assert.deepEqual(
-        _0x120bb5.finishDraggingCell(
+        dragController32.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 2,
-            draggedCellData: _0x5de33b.nodes['sb-1'].cells[2],
+            draggedCellData: draggedCellData17.nodes['sb-1'].cells[2],
             ghostEl: null,
             sourceCellEl: null,
             lastHoverNodeId: null,
@@ -5024,14 +5027,14 @@ async function flushAsyncWork(_0x226424 = 8) {
         ),
         { didAct: true, committed: true },
       ),
-      assert.equal(_0x1dd365?.src, '/output/a.png'),
-      assert.equal(_0x1dd365?.localPath, 'output/a.png'),
-      assert.equal(_0x5de33b.nodes['sb-1'].cells[2].isEmpty, true));
+      assert.equal(value398?.src, '/output/a.png'),
+      assert.equal(value398?.localPath, 'output/a.png'),
+      assert.equal(draggedCellData17.nodes['sb-1'].cells[2].isEmpty, true));
   }),
   test('DragController: source crop without visible image no-ops before visual swap', () => {
-    const _0x19afce = globalThis.window,
-      _0x4995bd = globalThis.document,
-      _0x31451f = {
+    const value403 = globalThis.window,
+      value404 = globalThis.document,
+      draggedCellData18 = {
         viewport: { x: 0, y: 0, zoom: 1 },
         nodes: {
           'sb-1': {
@@ -5050,9 +5053,9 @@ async function flushAsyncWork(_0x226424 = 8) {
           },
         },
       };
-    let _0x461318 = false,
-      _0x288ce6 = false;
-    const _0x21651d = {
+    let value405 = false,
+      value406 = false;
+    const ghostEl11 = {
       removed: false,
       remove() {
         this.removed = true;
@@ -5070,24 +5073,24 @@ async function flushAsyncWork(_0x226424 = 8) {
               'sb-1',
               {
                 applyImmediateCellSwap() {
-                  return ((_0x461318 = true), { ok: true, revert() {} });
+                  return ((value405 = true), { ok: true, revert() {} });
                 },
               },
             ],
           ]),
         },
       }));
-    const _0x360cb9 = {
+    const store33 = {
       getStateRaw() {
-        return _0x31451f;
+        return draggedCellData18;
       },
       updateNodeData() {
-        _0x288ce6 = true;
+        value406 = true;
       },
     };
     try {
-      const _0x291473 = createDragController({
-          store: _0x360cb9,
+      const dragController33 = createDragController({
+          store: store33,
           isNodeType: isNodeType,
           getShortcuts() {
             return {};
@@ -5096,34 +5099,34 @@ async function flushAsyncWork(_0x226424 = 8) {
             return null;
           },
           screenToWorld: identityScreenToWorld,
-          generateId(_0x1af160) {
-            return _0x1af160 + '-generated';
+          generateId(value407) {
+            return value407 + '-generated';
           },
           cloneNodesWithEdges() {
             return {};
           },
           commit() {},
         }),
-        _0x58e141 = _0x291473.finishDraggingCell(
+        value408 = dragController33.finishDraggingCell(
           {
             targetNodeId: 'sb-1',
             sourceCellIndex: 0,
-            draggedCellData: _0x31451f.nodes['sb-1'].cells[0],
-            ghostEl: _0x21651d,
+            draggedCellData: draggedCellData18.nodes['sb-1'].cells[0],
+            ghostEl: ghostEl11,
             sourceCellEl: null,
             lastHoverNodeId: null,
           },
           150,
           50,
         );
-      (assert.deepEqual(_0x58e141, { didAct: false, committed: false }),
-        assert.equal(_0x461318, false),
-        assert.equal(_0x288ce6, false),
-        assert.equal(_0x21651d.removed, true));
+      (assert.deepEqual(value408, { didAct: false, committed: false }),
+        assert.equal(value405, false),
+        assert.equal(value406, false),
+        assert.equal(ghostEl11.removed, true));
     } finally {
-      if (typeof _0x19afce === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x19afce;
-      if (typeof _0x4995bd === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x4995bd;
+      if (typeof value403 === 'undefined') delete globalThis.window;
+      else globalThis.window = value403;
+      if (typeof value404 === 'undefined') delete globalThis.document;
+      else globalThis.document = value404;
     }
   }));

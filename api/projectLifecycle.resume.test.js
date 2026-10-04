@@ -1,41 +1,45 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createProjectLifecycle } from '../src/modules/app/projectLifecycle.js';
-function createMemoryLocalStorage(_0x32d13b = {}) {
-  const _0x5bd367 = new Map(Object.entries(_0x32d13b));
+function createMemoryLocalStorage(options = {}) {
+  const map = new Map(Object.entries(options));
   return {
-    getItem(_0x282feb) {
-      return _0x5bd367.has(_0x282feb) ? String(_0x5bd367.get(_0x282feb)) : null;
+    getItem(value) {
+      return map.has(value) ? String(map.get(value)) : null;
     },
-    setItem(_0x1fa9db, _0x1a34fe) {
-      _0x5bd367.set(_0x1fa9db, String(_0x1a34fe));
+    setItem(item, key) {
+      map.set(item, String(key));
     },
-    removeItem(_0x31febe) {
-      _0x5bd367.delete(_0x31febe);
+    removeItem(index) {
+      map.delete(index);
     },
     dump() {
-      return _0x5bd367;
+      return map;
     },
   };
 }
 (test('projectLifecycle: 仅有 getMultiData 时仍能写入同步恢复备份', { concurrency: false }, async () => {
-  const _0x3e916c = globalThis.window,
-    _0x2acd29 = globalThis.document,
-    _0x32f97a = console.warn;
+  const result = globalThis.window,
+    data = globalThis.document,
+    target = console.warn;
   try {
     console.warn = () => {};
-    const _0x24352f = createMemoryLocalStorage();
-    ((globalThis.window = { localStorage: _0x24352f, currentProjectId: 'proj-legacy', showToast: () => {} }),
+    const localStorage = createMemoryLocalStorage();
+    ((globalThis.window = {
+      localStorage: localStorage,
+      currentProjectId: 'proj-legacy',
+      showToast: () => {},
+    }),
       (globalThis.document = {
-        getElementById(_0x22b95f) {
-          if (_0x22b95f === 'projectNameText') return { textContent: '旧接口测试' };
+        getElementById(source) {
+          if (source === 'projectNameText') return { textContent: '旧接口测试' };
           return null;
         },
         querySelector() {
           return null;
         },
       }));
-    const _0x16f7e8 = {
+    const next = {
         activeCanvasId: 'c1',
         canvases: [
           {
@@ -58,7 +62,7 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
           },
         ],
       },
-      _0x2c550e = createProjectLifecycle({
+      projectLifecycle = createProjectLifecycle({
         store: {
           subscribeSelector() {},
           getStateRaw() {
@@ -68,15 +72,15 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
         },
         CanvasTabManager: {
           getMultiData() {
-            return _0x16f7e8;
+            return next;
           },
           get _canvases() {
             return [];
           },
         },
         project: {
-          resolveCanvasData(_0x10a36e) {
-            return _0x10a36e;
+          resolveCanvasData(current) {
+            return current;
           },
           async loadProject() {
             return { canvases: [], activeCanvasId: null };
@@ -87,48 +91,52 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
           },
         },
         loadCustomPresets() {},
-        async migrateLegacyThumbnailsInMultiData(_0x76e909) {
-          return { changed: false, multiData: _0x76e909 };
+        async migrateLegacyThumbnailsInMultiData(multiData) {
+          return { changed: false, multiData: multiData };
         },
-        sanitizeMultiCanvasDataForPersistence(_0x5e5fa0) {
-          return _0x5e5fa0;
+        sanitizeMultiCanvasDataForPersistence(entry) {
+          return entry;
         },
         commit() {},
         patchStoreSourceNodeNamesFromFileName() {},
         applySourceNamesFromFileNameToCanvas() {},
       });
-    (_0x2c550e.triggerLocalCacheSave(), await new Promise((_0x289166) => setTimeout(_0x289166, 0)));
-    const _0x50a61d = _0x24352f.dump().get('tapnow_v2_dreamina_resume_backup');
-    assert.ok(_0x50a61d);
-    const _0x1101b7 = JSON.parse(_0x50a61d);
-    (assert.equal(_0x1101b7.projectId, 'proj-legacy'),
-      assert.equal(Array.isArray(_0x1101b7.items), true),
-      assert.equal(_0x1101b7.items.length, 1));
+    (projectLifecycle.triggerLocalCacheSave(), await new Promise((record) => setTimeout(record, 0)));
+    const payload = localStorage.dump().get('tapnow_v2_dreamina_resume_backup');
+    assert.ok(payload);
+    const handle = JSON.parse(payload);
+    (assert.equal(handle.projectId, 'proj-legacy'),
+      assert.equal(Array.isArray(handle.items), true),
+      assert.equal(handle.items.length, 1));
   } finally {
-    ((console.warn = _0x32f97a), (globalThis.window = _0x3e916c), (globalThis.document = _0x2acd29));
+    ((console.warn = target), (globalThis.window = result), (globalThis.document = data));
   }
 }),
   test(
     'projectLifecycle: ai-image/ai-audio/source-audio RunningHub 进行中任务会写入同步恢复备份',
     { concurrency: false },
     async () => {
-      const _0xe7a5a6 = globalThis.window,
-        _0x3289bb = globalThis.document,
-        _0x4c250f = console.warn;
+      const state = globalThis.window,
+        config = globalThis.document,
+        scope = console.warn;
       try {
         console.warn = () => {};
-        const _0x515df9 = createMemoryLocalStorage();
-        ((globalThis.window = { localStorage: _0x515df9, currentProjectId: 'proj-rh', showToast: () => {} }),
+        const localStorage2 = createMemoryLocalStorage();
+        ((globalThis.window = {
+          localStorage: localStorage2,
+          currentProjectId: 'proj-rh',
+          showToast: () => {},
+        }),
           (globalThis.document = {
-            getElementById(_0x16db84) {
-              if (_0x16db84 === 'projectNameText') return { textContent: '恢复测试' };
+            getElementById(input) {
+              if (input === 'projectNameText') return { textContent: '恢复测试' };
               return null;
             },
             querySelector() {
               return null;
             },
           }));
-        const _0x455923 = {
+        const output = {
             activeCanvasId: 'c1',
             canvases: [
               {
@@ -200,7 +208,7 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
               },
             ],
           },
-          _0x429c6a = createProjectLifecycle({
+          projectLifecycle2 = createProjectLifecycle({
             store: {
               subscribeSelector() {},
               getStateRaw() {
@@ -210,15 +218,15 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
             },
             CanvasTabManager: {
               getMultiData() {
-                return _0x455923;
+                return output;
               },
               get _canvases() {
                 return [];
               },
             },
             project: {
-              resolveCanvasData(_0x366cf6) {
-                return _0x366cf6;
+              resolveCanvasData(value2) {
+                return value2;
               },
               async loadProject() {
                 return { canvases: [], activeCanvasId: null };
@@ -229,54 +237,54 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
               },
             },
             loadCustomPresets() {},
-            async migrateLegacyThumbnailsInMultiData(_0x42be1c) {
-              return { changed: false, multiData: _0x42be1c };
+            async migrateLegacyThumbnailsInMultiData(multiData2) {
+              return { changed: false, multiData: multiData2 };
             },
-            sanitizeMultiCanvasDataForPersistence(_0x28d299) {
-              return _0x28d299;
+            sanitizeMultiCanvasDataForPersistence(value3) {
+              return value3;
             },
             commit() {},
             patchStoreSourceNodeNamesFromFileName() {},
             applySourceNamesFromFileNameToCanvas() {},
           });
-        (_0x429c6a.triggerLocalCacheSave(), await new Promise((_0x2739bb) => setTimeout(_0x2739bb, 0)));
-        const _0x1b3075 = _0x515df9.dump().get('tapnow_v2_dreamina_resume_backup');
-        assert.ok(_0x1b3075);
-        const _0x1224bc = JSON.parse(_0x1b3075);
-        assert.equal(_0x1224bc.projectId, 'proj-rh');
-        const _0xb0e5f3 = Array.isArray(_0x1224bc.items) ? _0x1224bc.items : [];
-        assert.equal(_0xb0e5f3.length, 5);
-        const _0x2b5ee8 = _0xb0e5f3.find((_0xb2c804) => _0xb2c804.nodeId === 'img-running'),
-          _0x373b68 = _0xb0e5f3.find((_0x5b4dac) => _0x5b4dac.nodeId === 'aud-running'),
-          _0x144f9d = _0xb0e5f3.find((_0x51a726) => _0x51a726.nodeId === 'src-video-running'),
-          _0x96cf08 = _0xb0e5f3.find((_0x1f1c36) => _0x1f1c36.nodeId === 'src-image-running'),
-          _0x2f65f0 = _0xb0e5f3.find((_0x5165a6) => _0x5165a6.nodeId === 'src-audio-running');
-        (assert.ok(_0x2b5ee8),
-          assert.equal(_0x2b5ee8.kind, 'runninghub'),
-          assert.equal(_0x2b5ee8.nodeType, 'ai-image'),
-          assert.equal(_0x2b5ee8.rhTaskId, 'rh-img-1'),
-          assert.ok(_0x373b68),
-          assert.equal(_0x373b68.kind, 'runninghub'),
-          assert.equal(_0x373b68.nodeType, 'ai-audio'),
-          assert.equal(_0x373b68.rhTaskId, 'rh-aud-1'),
-          assert.ok(_0x144f9d),
-          assert.equal(_0x144f9d.kind, 'runninghub'),
-          assert.equal(_0x144f9d.nodeType, 'source-video'),
-          assert.equal(_0x144f9d.rhTaskId, 'rh-video-1'),
-          assert.ok(_0x96cf08),
-          assert.equal(_0x96cf08.kind, 'runninghub'),
-          assert.equal(_0x96cf08.nodeType, 'source-image'),
-          assert.equal(_0x96cf08.rhTaskId, 'rh-src-image-1'),
-          assert.ok(_0x2f65f0),
-          assert.equal(_0x2f65f0.kind, 'runninghub'),
-          assert.equal(_0x2f65f0.nodeType, 'source-audio'),
-          assert.equal(_0x2f65f0.rhTaskId, 'rh-src-audio-1'),
+        (projectLifecycle2.triggerLocalCacheSave(), await new Promise((value4) => setTimeout(value4, 0)));
+        const value5 = localStorage2.dump().get('tapnow_v2_dreamina_resume_backup');
+        assert.ok(value5);
+        const value6 = JSON.parse(value5);
+        assert.equal(value6.projectId, 'proj-rh');
+        const list = Array.isArray(value6.items) ? value6.items : [];
+        assert.equal(list.length, 5);
+        const value7 = list.find((item2) => item2.nodeId === 'img-running'),
+          value8 = list.find((item3) => item3.nodeId === 'aud-running'),
+          value9 = list.find((item4) => item4.nodeId === 'src-video-running'),
+          value10 = list.find((item5) => item5.nodeId === 'src-image-running'),
+          value11 = list.find((item6) => item6.nodeId === 'src-audio-running');
+        (assert.ok(value7),
+          assert.equal(value7.kind, 'runninghub'),
+          assert.equal(value7.nodeType, 'ai-image'),
+          assert.equal(value7.rhTaskId, 'rh-img-1'),
+          assert.ok(value8),
+          assert.equal(value8.kind, 'runninghub'),
+          assert.equal(value8.nodeType, 'ai-audio'),
+          assert.equal(value8.rhTaskId, 'rh-aud-1'),
+          assert.ok(value9),
+          assert.equal(value9.kind, 'runninghub'),
+          assert.equal(value9.nodeType, 'source-video'),
+          assert.equal(value9.rhTaskId, 'rh-video-1'),
+          assert.ok(value10),
+          assert.equal(value10.kind, 'runninghub'),
+          assert.equal(value10.nodeType, 'source-image'),
+          assert.equal(value10.rhTaskId, 'rh-src-image-1'),
+          assert.ok(value11),
+          assert.equal(value11.kind, 'runninghub'),
+          assert.equal(value11.nodeType, 'source-audio'),
+          assert.equal(value11.rhTaskId, 'rh-src-audio-1'),
           assert.equal(
-            _0xb0e5f3.some((_0x1a5a68) => _0x1a5a68.nodeId === 'img-success'),
+            list.some((item7) => item7.nodeId === 'img-success'),
             false,
           ));
       } finally {
-        ((console.warn = _0x4c250f), (globalThis.window = _0xe7a5a6), (globalThis.document = _0x3289bb));
+        ((console.warn = scope), (globalThis.window = state), (globalThis.document = config));
       }
     },
   ),
@@ -284,27 +292,27 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
     'projectLifecycle: Dreamina 图片与 async 进行中任务会写入同步恢复备份',
     { concurrency: false },
     async () => {
-      const _0x53ba5a = globalThis.window,
-        _0x23c145 = globalThis.document,
-        _0x42999e = console.warn;
+      const value12 = globalThis.window,
+        value13 = globalThis.document,
+        value14 = console.warn;
       try {
         console.warn = () => {};
-        const _0x4870d7 = createMemoryLocalStorage();
+        const localStorage3 = createMemoryLocalStorage();
         ((globalThis.window = {
-          localStorage: _0x4870d7,
+          localStorage: localStorage3,
           currentProjectId: 'proj-async',
           showToast: () => {},
         }),
           (globalThis.document = {
-            getElementById(_0x21eb50) {
-              if (_0x21eb50 === 'projectNameText') return { textContent: '恢复测试2' };
+            getElementById(value15) {
+              if (value15 === 'projectNameText') return { textContent: '恢复测试2' };
               return null;
             },
             querySelector() {
               return null;
             },
           }));
-        const _0x13d4bf = {
+        const value16 = {
             activeCanvasId: 'c1',
             canvases: [
               {
@@ -407,7 +415,7 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
               },
             ],
           },
-          _0x20ece6 = createProjectLifecycle({
+          projectLifecycle3 = createProjectLifecycle({
             store: {
               subscribeSelector() {},
               getStateRaw() {
@@ -417,15 +425,15 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
             },
             CanvasTabManager: {
               getMultiData() {
-                return _0x13d4bf;
+                return value16;
               },
               get _canvases() {
                 return [];
               },
             },
             project: {
-              resolveCanvasData(_0x584f5a) {
-                return _0x584f5a;
+              resolveCanvasData(value17) {
+                return value17;
               },
               async loadProject() {
                 return { canvases: [], activeCanvasId: null };
@@ -436,70 +444,66 @@ function createMemoryLocalStorage(_0x32d13b = {}) {
               },
             },
             loadCustomPresets() {},
-            async migrateLegacyThumbnailsInMultiData(_0x24526a) {
-              return { changed: false, multiData: _0x24526a };
+            async migrateLegacyThumbnailsInMultiData(multiData3) {
+              return { changed: false, multiData: multiData3 };
             },
-            sanitizeMultiCanvasDataForPersistence(_0x5ee3a8) {
-              return _0x5ee3a8;
+            sanitizeMultiCanvasDataForPersistence(value18) {
+              return value18;
             },
             commit() {},
             patchStoreSourceNodeNamesFromFileName() {},
             applySourceNamesFromFileNameToCanvas() {},
           });
-        (_0x20ece6.triggerLocalCacheSave(), await new Promise((_0xd931a8) => setTimeout(_0xd931a8, 0)));
-        const _0x12faa2 = _0x4870d7.dump().get('tapnow_v2_dreamina_resume_backup');
-        assert.ok(_0x12faa2);
-        const _0x45cefe = JSON.parse(_0x12faa2),
-          _0x5b5dd7 = Array.isArray(_0x45cefe.items) ? _0x45cefe.items : [];
-        assert.equal(_0x5b5dd7.length, 6);
-        const _0x7f506b = _0x5b5dd7.find((_0x447f3a) => _0x447f3a.nodeId === 'dreamina-img-running'),
-          _0x413b60 = _0x5b5dd7.find((_0x50d2b2) => _0x50d2b2.nodeId === 'async-video-running'),
-          _0x19e9c9 = _0x5b5dd7.find((_0x89f0e) => _0x89f0e.nodeId === 'async-ppio-model-only'),
-          _0x299c4f = _0x5b5dd7.find(
-            (_0x171f02) => _0x171f02.nodeId === 'async-ppio-model-with-stale-provider',
-          ),
-          _0x2bcc7d = _0x5b5dd7.find((_0x1470ad) => _0x1470ad.nodeId === 'async-image-running'),
-          _0x231a20 = _0x5b5dd7.find(
-            (_0x489c94) => _0x489c94.nodeId === 'async-grsai-bare-model-with-stale-provider',
-          );
-        (assert.ok(_0x7f506b),
-          assert.equal(_0x7f506b.kind, 'dreamina'),
-          assert.equal(_0x7f506b.dreaminaSubmitId, 'dm-submit-1'),
-          assert.ok(_0x413b60),
-          assert.equal(_0x413b60.kind, 'async'),
-          assert.equal(_0x413b60.asyncTaskProvider, 'apimart'),
-          assert.equal(_0x413b60.asyncTaskKind, 'video'),
-          assert.equal(_0x413b60.asyncTaskId, 'async-video-1'),
-          assert.ok(_0x19e9c9),
-          assert.equal(_0x19e9c9.kind, 'async'),
-          assert.equal(_0x19e9c9.asyncTaskProvider, 'ppio'),
-          assert.equal(_0x19e9c9.asyncTaskKind, 'image'),
-          assert.equal(_0x19e9c9.asyncTaskId, 'async-ppio-1'),
-          assert.ok(_0x299c4f),
-          assert.equal(_0x299c4f.kind, 'async'),
-          assert.equal(_0x299c4f.asyncTaskProvider, 'ppio'),
-          assert.equal(_0x299c4f.asyncTaskKind, 'image'),
-          assert.equal(_0x299c4f.asyncTaskId, 'async-ppio-2'),
-          assert.ok(_0x2bcc7d),
-          assert.equal(_0x2bcc7d.kind, 'async'),
-          assert.equal(_0x2bcc7d.asyncTaskProvider, 'grsai'),
-          assert.equal(_0x2bcc7d.asyncTaskKind, 'image'),
-          assert.equal(_0x2bcc7d.asyncTaskId, 'async-image-1'),
-          assert.ok(_0x231a20),
-          assert.equal(_0x231a20.kind, 'async'),
-          assert.equal(_0x231a20.asyncTaskProvider, 'grsai'),
-          assert.equal(_0x231a20.asyncTaskKind, 'image'),
-          assert.equal(_0x231a20.asyncTaskId, 'async-grsai-1'),
+        (projectLifecycle3.triggerLocalCacheSave(), await new Promise((value19) => setTimeout(value19, 0)));
+        const value20 = localStorage3.dump().get('tapnow_v2_dreamina_resume_backup');
+        assert.ok(value20);
+        const value21 = JSON.parse(value20),
+          list2 = Array.isArray(value21.items) ? value21.items : [];
+        assert.equal(list2.length, 6);
+        const value22 = list2.find((item8) => item8.nodeId === 'dreamina-img-running'),
+          value23 = list2.find((item9) => item9.nodeId === 'async-video-running'),
+          value24 = list2.find((item10) => item10.nodeId === 'async-ppio-model-only'),
+          value25 = list2.find((item11) => item11.nodeId === 'async-ppio-model-with-stale-provider'),
+          value26 = list2.find((item12) => item12.nodeId === 'async-image-running'),
+          value27 = list2.find((item13) => item13.nodeId === 'async-grsai-bare-model-with-stale-provider');
+        (assert.ok(value22),
+          assert.equal(value22.kind, 'dreamina'),
+          assert.equal(value22.dreaminaSubmitId, 'dm-submit-1'),
+          assert.ok(value23),
+          assert.equal(value23.kind, 'async'),
+          assert.equal(value23.asyncTaskProvider, 'apimart'),
+          assert.equal(value23.asyncTaskKind, 'video'),
+          assert.equal(value23.asyncTaskId, 'async-video-1'),
+          assert.ok(value24),
+          assert.equal(value24.kind, 'async'),
+          assert.equal(value24.asyncTaskProvider, 'ppio'),
+          assert.equal(value24.asyncTaskKind, 'image'),
+          assert.equal(value24.asyncTaskId, 'async-ppio-1'),
+          assert.ok(value25),
+          assert.equal(value25.kind, 'async'),
+          assert.equal(value25.asyncTaskProvider, 'ppio'),
+          assert.equal(value25.asyncTaskKind, 'image'),
+          assert.equal(value25.asyncTaskId, 'async-ppio-2'),
+          assert.ok(value26),
+          assert.equal(value26.kind, 'async'),
+          assert.equal(value26.asyncTaskProvider, 'grsai'),
+          assert.equal(value26.asyncTaskKind, 'image'),
+          assert.equal(value26.asyncTaskId, 'async-image-1'),
+          assert.ok(value27),
+          assert.equal(value27.kind, 'async'),
+          assert.equal(value27.asyncTaskProvider, 'grsai'),
+          assert.equal(value27.asyncTaskKind, 'image'),
+          assert.equal(value27.asyncTaskId, 'async-grsai-1'),
           assert.equal(
-            _0x5b5dd7.some((_0x503732) => _0x503732.nodeId === 'async-success'),
+            list2.some((item14) => item14.nodeId === 'async-success'),
             false,
           ),
           assert.equal(
-            _0x5b5dd7.some((_0xd3ee6d) => _0xd3ee6d.nodeId === 'dreamina-img-error-result'),
+            list2.some((item15) => item15.nodeId === 'dreamina-img-error-result'),
             false,
           ));
       } finally {
-        ((console.warn = _0x42999e), (globalThis.window = _0x53ba5a), (globalThis.document = _0x23c145));
+        ((console.warn = value14), (globalThis.window = value12), (globalThis.document = value13));
       }
     },
   ));

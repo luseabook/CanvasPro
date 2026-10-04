@@ -7,20 +7,20 @@ import { bindReadonlyTextSelection, hasActiveReadonlyTextSelection } from './rea
 const __dirname = dirname(fileURLToPath(import.meta.url)),
   nodeTypesCss = readFileSync(join(__dirname, '../../../styles/node-types.css'), 'utf8');
 function createClassList() {
-  const _0x51a8c3 = new Set();
+  const map = new Set();
   return {
-    add(..._0x25d8f7) {
-      _0x25d8f7.forEach((_0x286e35) => _0x51a8c3.add(String(_0x286e35 || '')));
+    add(...list) {
+      list.forEach((item) => map.add(String(item || '')));
     },
-    remove(..._0xe3ddfa) {
-      _0xe3ddfa.forEach((_0x26d04f) => _0x51a8c3.delete(String(_0x26d04f || '')));
+    remove(...list2) {
+      list2.forEach((item2) => map.delete(String(item2 || '')));
     },
-    contains(_0x341ca6) {
-      return _0x51a8c3.has(String(_0x341ca6 || ''));
+    contains(value) {
+      return map.has(String(value || ''));
     },
   };
 }
-function createFakeEvent(_0x4caf2b = {}) {
+function createFakeEvent(args = {}) {
   return {
     button: 0,
     clientX: 10,
@@ -34,112 +34,112 @@ function createFakeEvent(_0x4caf2b = {}) {
     stopPropagation() {
       this.propagationStopped = true;
     },
-    ..._0x4caf2b,
+    ...args,
   };
 }
 function createFakeSelectionDom() {
-  const _0x34b08f = {},
-    _0x24bba4 = new Map(),
-    _0x4b2d65 = new Map(),
-    _0xe5e7d6 = { classList: createClassList() },
-    _0x3a44da = {
-      body: _0xe5e7d6,
+  const startContainer = {},
+    map2 = new Map(),
+    map3 = new Map(),
+    body = { classList: createClassList() },
+    ownerDocument = {
+      body: body,
       defaultView: { getSelection: () => ({ removeAllRanges() {}, setBaseAndExtent() {} }) },
-      addEventListener(_0x202402, _0x473525) {
-        const _0xdfa97a = _0x24bba4.get(_0x202402) || [];
-        (_0xdfa97a.push(_0x473525), _0x24bba4.set(_0x202402, _0xdfa97a));
+      addEventListener(key, index) {
+        const list3 = map2.get(key) || [];
+        (list3.push(index), map2.set(key, list3));
       },
-      removeEventListener(_0xfbf5, _0x32a582) {
-        const _0x552bf7 = _0x24bba4.get(_0xfbf5) || [];
-        _0x24bba4.set(
-          _0xfbf5,
-          _0x552bf7.filter((_0x407228) => _0x407228 !== _0x32a582),
+      removeEventListener(result, data) {
+        const list4 = map2.get(result) || [];
+        map2.set(
+          result,
+          list4.filter((item3) => item3 !== data),
         );
       },
       caretRangeFromPoint() {
-        return { startContainer: _0x34b08f, startOffset: 0 };
+        return { startContainer: startContainer, startOffset: 0 };
       },
     },
-    _0x2eac97 = {
-      ownerDocument: _0x3a44da,
+    el = {
+      ownerDocument: ownerDocument,
       classList: createClassList(),
-      addEventListener(_0x302cae, _0x41a185) {
-        const _0x3958eb = _0x4b2d65.get(_0x302cae) || [];
-        (_0x3958eb.push(_0x41a185), _0x4b2d65.set(_0x302cae, _0x3958eb));
+      addEventListener(options, target) {
+        const list5 = map3.get(options) || [];
+        (list5.push(target), map3.set(options, list5));
       },
-      removeEventListener(_0xa06852, _0x67e5b8) {
-        const _0x53dd08 = _0x4b2d65.get(_0xa06852) || [];
-        _0x4b2d65.set(
-          _0xa06852,
-          _0x53dd08.filter((_0x48a08) => _0x48a08 !== _0x67e5b8),
+      removeEventListener(source, next) {
+        const list6 = map3.get(source) || [];
+        map3.set(
+          source,
+          list6.filter((item4) => item4 !== next),
         );
       },
-      contains(_0x34d235) {
-        return _0x34d235 === _0x2eac97 || _0x34d235 === _0x34b08f;
+      contains(current) {
+        return current === el || current === startContainer;
       },
-      dispatch(_0x18f3a5, _0xeb9e3f) {
-        for (const _0x3232a8 of _0x4b2d65.get(_0x18f3a5) || []) _0x3232a8(_0xeb9e3f);
+      dispatch(entry, record) {
+        for (const run of map3.get(entry) || []) run(record);
       },
     };
   return {
-    doc: _0x3a44da,
-    el: _0x2eac97,
-    dispatchDocument(_0x277738, _0x2174e5) {
-      for (const _0x3a4730 of _0x24bba4.get(_0x277738) || []) _0x3a4730(_0x2174e5);
+    doc: ownerDocument,
+    el: el,
+    dispatchDocument(payload, handle) {
+      for (const run2 of map2.get(payload) || []) run2(handle);
     },
   };
 }
 (test('readonly text selection activates on double click, not plain pointerdown', () => {
-  const { el: _0x2daca3, doc: _0x4715b0, dispatchDocument: _0x4297e3 } = createFakeSelectionDom();
-  let _0x41a665 = 0,
-    _0x5e883f = 0;
-  const _0x302872 = bindReadonlyTextSelection(_0x2daca3, {
+  const { el: el2, doc: doc, dispatchDocument: dispatchDocument2 } = createFakeSelectionDom();
+  let state = 0,
+    config = 0;
+  const run3 = bindReadonlyTextSelection(el2, {
       onActivate: () => {
-        _0x41a665 += 1;
+        state += 1;
       },
       onDeactivate: () => {
-        _0x5e883f += 1;
+        config += 1;
       },
     }),
-    _0x18dec2 = createFakeEvent({ target: _0x2daca3 });
-  (_0x2daca3.dispatch('pointerdown', _0x18dec2),
-    assert.equal(_0x18dec2.defaultPrevented, false),
-    assert.equal(_0x18dec2.propagationStopped, false),
-    assert.equal(_0x2daca3.classList.contains('is-text-selection-active'), false));
-  const _0x48d5e9 = createFakeEvent({ target: _0x2daca3 });
-  (_0x2daca3.dispatch('dblclick', _0x48d5e9),
-    assert.equal(_0x48d5e9.defaultPrevented, true),
-    assert.equal(_0x48d5e9.propagationStopped, true),
-    assert.equal(_0x41a665, 1),
-    assert.equal(_0x2daca3.classList.contains('is-text-selection-active'), true));
-  const _0x4527c1 = createFakeEvent({ target: _0x2daca3 });
-  (_0x2daca3.dispatch('pointerdown', _0x4527c1),
-    assert.equal(_0x4527c1.defaultPrevented, true),
-    assert.equal(_0x4527c1.propagationStopped, true),
-    assert.equal(_0x4715b0.body.classList.contains('is-aigen-text-selecting'), true),
-    _0x4297e3('pointerdown', createFakeEvent({ target: {} })),
-    assert.equal(_0x5e883f, 1),
-    assert.equal(_0x2daca3.classList.contains('is-text-selection-active'), false),
-    assert.equal(_0x4715b0.body.classList.contains('is-aigen-text-selecting'), false),
-    _0x302872());
+    fakeEvent = createFakeEvent({ target: el2 });
+  (el2.dispatch('pointerdown', fakeEvent),
+    assert.equal(fakeEvent.defaultPrevented, false),
+    assert.equal(fakeEvent.propagationStopped, false),
+    assert.equal(el2.classList.contains('is-text-selection-active'), false));
+  const fakeEvent2 = createFakeEvent({ target: el2 });
+  (el2.dispatch('dblclick', fakeEvent2),
+    assert.equal(fakeEvent2.defaultPrevented, true),
+    assert.equal(fakeEvent2.propagationStopped, true),
+    assert.equal(state, 1),
+    assert.equal(el2.classList.contains('is-text-selection-active'), true));
+  const fakeEvent3 = createFakeEvent({ target: el2 });
+  (el2.dispatch('pointerdown', fakeEvent3),
+    assert.equal(fakeEvent3.defaultPrevented, true),
+    assert.equal(fakeEvent3.propagationStopped, true),
+    assert.equal(doc.body.classList.contains('is-aigen-text-selecting'), true),
+    dispatchDocument2('pointerdown', createFakeEvent({ target: {} })),
+    assert.equal(config, 1),
+    assert.equal(el2.classList.contains('is-text-selection-active'), false),
+    assert.equal(doc.body.classList.contains('is-aigen-text-selecting'), false),
+    run3());
 }),
   test('readonly text selection detects active non-empty output selection', () => {
-    const _0x18c6ef = {
+    const parentElement = {
         nodeType: 1,
         classList: {
-          contains(_0x28edbd) {
-            return _0x28edbd === 'aigen-text-output' || _0x28edbd === 'is-text-selection-active';
+          contains(scope) {
+            return scope === 'aigen-text-output' || scope === 'is-text-selection-active';
           },
         },
         parentElement: null,
-        contains(_0x119b5f) {
-          return _0x119b5f === _0x18c6ef || _0x119b5f === _0xa9e417;
+        contains(input) {
+          return input === parentElement || input === commonAncestorContainer;
         },
       },
-      _0xa9e417 = { nodeType: 3, parentElement: _0x18c6ef },
-      _0x4a88dc = {
-        querySelectorAll(_0x4b7ce5) {
-          return _0x4b7ce5 === '.aigen-text-output.is-text-selection-active' ? [_0x18c6ef] : [];
+      commonAncestorContainer = { nodeType: 3, parentElement: parentElement },
+      output = {
+        querySelectorAll(value2) {
+          return value2 === '.aigen-text-output.is-text-selection-active' ? [parentElement] : [];
         },
         getSelection() {
           return {
@@ -147,30 +147,30 @@ function createFakeSelectionDom() {
             rangeCount: 1,
             toString: () => 'selected output',
             getRangeAt: () => ({
-              commonAncestorContainer: _0xa9e417,
-              startContainer: _0xa9e417,
-              endContainer: _0xa9e417,
-              intersectsNode(_0x31e92) {
-                return _0x31e92 === _0x18c6ef;
+              commonAncestorContainer: commonAncestorContainer,
+              startContainer: commonAncestorContainer,
+              endContainer: commonAncestorContainer,
+              intersectsNode(value3) {
+                return value3 === parentElement;
               },
             }),
           };
         },
       };
-    assert.equal(hasActiveReadonlyTextSelection(_0x4a88dc), true);
+    assert.equal(hasActiveReadonlyTextSelection(output), true);
   }),
   test('readonly text selection ignores collapsed or inactive selections', () => {
-    const _0x50d532 = {
+    const parentElement2 = {
         nodeType: 1,
         classList: {
-          contains(_0x10979d) {
-            return _0x10979d === 'aigen-text-output';
+          contains(value4) {
+            return value4 === 'aigen-text-output';
           },
         },
         parentElement: null,
       },
-      _0x22ca17 = { nodeType: 3, parentElement: _0x50d532 },
-      _0x56a278 = {
+      commonAncestorContainer2 = { nodeType: 3, parentElement: parentElement2 },
+      value5 = {
         querySelectorAll: () => [],
         getSelection() {
           return {
@@ -178,14 +178,14 @@ function createFakeSelectionDom() {
             rangeCount: 1,
             toString: () => 'selected output',
             getRangeAt: () => ({
-              commonAncestorContainer: _0x22ca17,
-              startContainer: _0x22ca17,
-              endContainer: _0x22ca17,
+              commonAncestorContainer: commonAncestorContainer2,
+              startContainer: commonAncestorContainer2,
+              endContainer: commonAncestorContainer2,
             }),
           };
         },
       };
-    (assert.equal(hasActiveReadonlyTextSelection(_0x56a278), false),
+    (assert.equal(hasActiveReadonlyTextSelection(value5), false),
       assert.equal(
         hasActiveReadonlyTextSelection({
           getSelection: () => ({ isCollapsed: true, rangeCount: 0, toString: () => '' }),

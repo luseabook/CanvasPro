@@ -25,23 +25,23 @@ function createButtonStub() {
   return { dataset: {}, disabled: false, textContent: '上传' };
 }
 function createEventTargetStub() {
-  const _0x2b411d = new Map();
+  const map = new Map();
   return {
     accept: '',
     value: '',
     files: [],
     clicked: false,
-    addEventListener(_0x5705f5, _0xe3cc45) {
-      _0x2b411d.set(_0x5705f5, _0xe3cc45);
+    addEventListener(value, item) {
+      map.set(value, item);
     },
-    removeEventListener(_0x4817ab, _0x5c3b25) {
-      if (_0x2b411d.get(_0x4817ab) === _0x5c3b25) _0x2b411d.delete(_0x4817ab);
+    removeEventListener(key, index) {
+      if (map.get(key) === index) map.delete(key);
     },
     click() {
       this.clicked = true;
     },
-    async dispatch(_0x5eb7ac) {
-      await _0x2b411d.get(_0x5eb7ac)?.();
+    async dispatch(result) {
+      await map.get(result)?.();
     },
   };
 }
@@ -65,47 +65,47 @@ function createStoreState({ selectedNodeIds: selectedNodeIds = [], nodes: nodes 
     ));
 }),
   test('previewUploadEntry: 图片、视频、音频按选中节点类型分发', async () => {
-    const _0xefac11 = [],
-      _0x228e54 = async (_0x15b06f, _0x262520) => {
+    const list = [],
+      uploadFileImpl = async (error, data) => {
         return (
-          _0xefac11.push(['upload', _0x15b06f.name, _0x262520]),
-          { url: '/data/uploads/' + _0x15b06f.name, localPath: 'data/uploads/' + _0x15b06f.name }
+          list.push(['upload', error.name, data]),
+          { url: '/data/uploads/' + error.name, localPath: 'data/uploads/' + error.name }
         );
       },
-      _0x4c5ddf = {
-        image: (_0xcc3bab) => _0xefac11.push(['image', _0xcc3bab.nodeId, _0xcc3bab.fileName]),
-        video: (_0x36caca) => _0xefac11.push(['video', _0x36caca.nodeId, _0x36caca.fileName]),
-        audio: (_0x248a43) => _0xefac11.push(['audio', _0x248a43.nodeId, _0x248a43.fileName]),
+      applyResults = {
+        image: (options) => list.push(['image', options.nodeId, options.fileName]),
+        video: (target) => list.push(['video', target.nodeId, target.fileName]),
+        audio: (source) => list.push(['audio', source.nodeId, source.fileName]),
       },
-      _0x18f49b = (_0x391016, _0x2b9116) => _0xefac11.push(['toast', _0x391016, _0x2b9116]),
-      _0x2795cd = [
+      showToast = (next, current) => list.push(['toast', next, current]),
+      entry = [
         ['image', 'ai-image', createFile({ name: 'p.png', type: 'image/png' })],
         ['image', 'source-image', createFile({ name: 'source-p.png', type: 'image/png' })],
         ['video', 'ai-video', createFile({ name: 'v.mp4', type: 'video/mp4' })],
         ['video', 'source-video', createFile({ name: 'source-v.mp4', type: 'video/mp4' })],
         ['audio', 'ai-audio', createFile({ name: 'a.mp3', type: 'audio/mpeg' })],
       ];
-    for (const [_0x2b0a8c, _0x2df99e, _0x3c0fbe] of _0x2795cd) {
-      _0xefac11.length = 0;
-      const _0x2b5c26 = await handlePreviewUploadFile({
-        file: _0x3c0fbe,
+    for (const [record, type2, file] of entry) {
+      list.length = 0;
+      const handlePreviewUploadFile2 = await handlePreviewUploadFile({
+        file: file,
         storeApi: createStoreState({
-          selectedNodeIds: ['node-' + _0x2b0a8c],
-          nodes: { ['node-' + _0x2b0a8c]: { id: 'node-' + _0x2b0a8c, type: _0x2df99e } },
+          selectedNodeIds: ['node-' + record],
+          nodes: { ['node-' + record]: { id: 'node-' + record, type: type2 } },
         }),
-        uploadFileImpl: _0x228e54,
-        applyResults: _0x4c5ddf,
-        showToast: _0x18f49b,
+        uploadFileImpl: uploadFileImpl,
+        applyResults: applyResults,
+        showToast: showToast,
         getProjectId: () => 'project-1',
       });
-      (assert.equal(_0x2b5c26, true),
-        assert.deepEqual(_0xefac11, [
-          ['upload', _0x3c0fbe.name, 'project-1'],
-          [_0x2b0a8c, 'node-' + _0x2b0a8c, _0x3c0fbe.name],
+      (assert.equal(handlePreviewUploadFile2, true),
+        assert.deepEqual(list, [
+          ['upload', file.name, 'project-1'],
+          [record, 'node-' + record, file.name],
           [
             'toast',
             '已将上传' +
-              (_0x2b0a8c === 'image' ? '图片' : _0x2b0a8c === 'video' ? '视频' : '音频') +
+              (record === 'image' ? '图片' : record === 'video' ? '视频' : '音频') +
               '写入当前节点',
             'success',
           ],
@@ -118,17 +118,17 @@ function createStoreState({ selectedNodeIds: selectedNodeIds = [], nodes: nodes 
         resolvePreviewUploadTarget(createStoreState().getState()).message,
         'Select one node to receive the upload',
       ));
-    const _0x360fd4 = resolvePreviewUploadTarget(
+    const response = resolvePreviewUploadTarget(
       createStoreState({
         selectedNodeIds: ['node-image'],
         nodes: { 'node-image': { id: 'node-image', type: 'ai-image' } },
       }).getState(),
     );
-    (assert.equal(_0x360fd4.ok, true),
-      assert.equal(_0x360fd4.label, 'image'),
-      assert.equal(_0x360fd4.successMessage, 'Uploaded image applied to the current node'));
-    const _0x252aff = [],
-      _0x54f17a = await handlePreviewUploadFile({
+    (assert.equal(response.ok, true),
+      assert.equal(response.label, 'image'),
+      assert.equal(response.successMessage, 'Uploaded image applied to the current node'));
+    const list2 = [],
+      handlePreviewUploadFile3 = await handlePreviewUploadFile({
         file: createFile({ name: 'bad.mp4', type: 'video/mp4' }),
         storeApi: createStoreState({
           selectedNodeIds: ['node-image'],
@@ -137,68 +137,68 @@ function createStoreState({ selectedNodeIds: selectedNodeIds = [], nodes: nodes 
         uploadFileImpl: async () => {
           throw new Error('should not upload');
         },
-        showToast: (_0x9957b3, _0x14a861) => _0x252aff.push([_0x9957b3, _0x14a861]),
+        showToast: (payload, handle) => list2.push([payload, handle]),
       });
-    (assert.equal(_0x54f17a, false), assert.deepEqual(_0x252aff, [['Upload image file', 'error']]));
+    (assert.equal(handlePreviewUploadFile3, false),
+      assert.deepEqual(list2, [['Upload image file', 'error']]));
   }),
   test('previewUploadEntry: 文件类型错误与上传失败不会写入结果且按钮会恢复', async () => {
-    const _0x9a450b = [],
-      _0x6c324b = createButtonStub(),
-      _0x1be89e = createStoreState({
+    const list3 = [],
+      button = createButtonStub(),
+      storeApi = createStoreState({
         selectedNodeIds: ['node-image'],
         nodes: { 'node-image': { id: 'node-image', type: 'ai-image' } },
       }),
-      _0x3ecee3 = (_0x1cd06f, _0x55d955) => _0x9a450b.push([_0x1cd06f, _0x55d955]),
-      _0x41f5cd = await handlePreviewUploadFile({
+      showToast2 = (state, config) => list3.push([state, config]),
+      handlePreviewUploadFile4 = await handlePreviewUploadFile({
         file: createFile({ name: 'bad.mp4', type: 'video/mp4' }),
-        button: _0x6c324b,
-        storeApi: _0x1be89e,
+        button: button,
+        storeApi: storeApi,
         uploadFileImpl: async () => {
           throw new Error('不应上传');
         },
-        applyResults: { image: () => _0x9a450b.push(['apply']) },
-        showToast: _0x3ecee3,
+        applyResults: { image: () => list3.push(['apply']) },
+        showToast: showToast2,
       });
-    (assert.equal(_0x41f5cd, false),
-      assert.equal(_0x6c324b.disabled, false),
-      assert.deepEqual(_0x9a450b, [['请上传图片文件', 'error']]),
-      (_0x9a450b.length = 0));
-    const _0x1cc3f7 = await handlePreviewUploadFile({
+    (assert.equal(handlePreviewUploadFile4, false),
+      assert.equal(button.disabled, false),
+      assert.deepEqual(list3, [['请上传图片文件', 'error']]),
+      (list3.length = 0));
+    const handlePreviewUploadFile5 = await handlePreviewUploadFile({
       file: createFile({ name: 'p.png', type: 'image/png' }),
-      button: _0x6c324b,
-      storeApi: _0x1be89e,
+      button: button,
+      storeApi: storeApi,
       uploadFileImpl: async () => {
         throw new Error('上传失败');
       },
-      applyResults: { image: () => _0x9a450b.push(['apply']) },
-      showToast: _0x3ecee3,
+      applyResults: { image: () => list3.push(['apply']) },
+      showToast: showToast2,
     });
-    (assert.equal(_0x1cc3f7, false),
-      assert.equal(_0x6c324b.disabled, false),
-      assert.equal(_0x6c324b.textContent, '上传'),
-      assert.deepEqual(_0x9a450b, [['上传失败', 'error']]));
+    (assert.equal(handlePreviewUploadFile5, false),
+      assert.equal(button.disabled, false),
+      assert.equal(button.textContent, '上传'),
+      assert.deepEqual(list3, [['上传失败', 'error']]));
   }),
   test('previewUploadEntry: 绑定按钮会按当前选中节点设置 accept 并打开文件选择', async () => {
     setPreviewMode(true);
-    const _0x173f85 = createEventTargetStub();
-    ((_0x173f85.dataset = {}), (_0x173f85.textContent = '上传'));
-    const _0x49ec81 = createEventTargetStub();
+    const button2 = createEventTargetStub();
+    ((button2.dataset = {}), (button2.textContent = '上传'));
+    const input = createEventTargetStub();
     (bindPreviewUploadEntry({
-      button: _0x173f85,
-      input: _0x49ec81,
+      button: button2,
+      input: input,
       storeApi: createStoreState({
         selectedNodeIds: ['node-video'],
         nodes: { 'node-video': { id: 'node-video', type: 'ai-video' } },
       }),
       showToast: () => {},
     }),
-      await _0x173f85.dispatch('click'),
-      assert.equal(_0x49ec81.accept, 'video/*'),
-      assert.equal(_0x49ec81.clicked, true));
+      await button2.dispatch('click'),
+      assert.equal(input.accept, 'video/*'),
+      assert.equal(input.clicked, true));
   }),
   test('previewUploadEntry: 节点工具栏不再包含预览上传按钮', () => {
-    for (const _0xe953d7 of [IMAGE_TOOLBAR_HTML, VIDEO_TOOLBAR_HTML, AUDIO_TOOLBAR_HTML]) {
-      (assert.doesNotMatch(_0xe953d7, /act-preview-upload/),
-        assert.doesNotMatch(_0xe953d7, /preview-upload-btn/));
+    for (const scope of [IMAGE_TOOLBAR_HTML, VIDEO_TOOLBAR_HTML, AUDIO_TOOLBAR_HTML]) {
+      (assert.doesNotMatch(scope, /act-preview-upload/), assert.doesNotMatch(scope, /preview-upload-btn/));
     }
   }));

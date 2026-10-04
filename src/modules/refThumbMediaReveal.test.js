@@ -12,86 +12,87 @@ const ORIGINAL_IMAGE = globalThis.Image,
 // Match real timer cancellation: the shared scheduler cancels its timeout after decode.
 function installTimerQueue(queue) {
   let sequence = 0;
-  globalThis.setTimeout = callback => {
-    const entry = () => callback(); entry.timerId = ++sequence;
-    queue.push(entry); return entry.timerId;
+  globalThis.setTimeout = (callback) => {
+    const entry = () => callback();
+    entry.timerId = ++sequence;
+    queue.push(entry);
+    return entry.timerId;
   };
-  globalThis.clearTimeout = id => {
-    const index = queue.findIndex(entry => entry.timerId === id);
+  globalThis.clearTimeout = (id) => {
+    const index = queue.findIndex((entry) => entry.timerId === id);
     if (index >= 0) queue.splice(index, 1);
   };
 }
 function flushMicrotasks() {
-  let _0x5723a6 = Promise.resolve();
-  for (let _0xc18070 = 0; _0xc18070 < 8; _0xc18070 += 1) {
-    _0x5723a6 = _0x5723a6.then(() => Promise.resolve());
+  let promise = Promise.resolve();
+  for (let count = 0; count < 8; count += 1) {
+    promise = promise.then(() => Promise.resolve());
   }
-  return _0x5723a6;
+  return promise;
 }
-function createClassList(..._0x49b5bc) {
-  const _0x4c65cc = new Set(_0x49b5bc);
+function createClassList(...args) {
+  const map = new Set(args);
   return {
-    add(..._0x58970d) {
-      _0x58970d.forEach((_0x202473) => _0x4c65cc.add(String(_0x202473 || '')));
+    add(...list) {
+      list.forEach((item) => map.add(String(item || '')));
     },
-    remove(..._0x1f5896) {
-      _0x1f5896.forEach((_0x536408) => _0x4c65cc.delete(String(_0x536408 || '')));
+    remove(...list2) {
+      list2.forEach((item2) => map.delete(String(item2 || '')));
     },
-    contains(_0x5c2bee) {
-      return _0x4c65cc.has(String(_0x5c2bee || ''));
+    contains(value) {
+      return map.has(String(value || ''));
     },
   };
 }
-function createImg(_0x58fed4 = '/output/ref-thumb.jpg') {
-  const _0x4f4c43 = {
-    _src: _0x58fed4,
+function createImg(_src = '/output/ref-thumb.jpg') {
+  const key = {
+    _src: _src,
     isConnected: true,
     complete: false,
     naturalWidth: 0,
     dataset: {},
     classList: createClassList('ref-thumb-media', 'is-pending'),
-    getAttribute(_0x2b498f) {
-      return _0x2b498f === 'src' ? this._src : '';
+    getAttribute(result) {
+      return result === 'src' ? this._src : '';
     },
-    set src(_0x26115b) {
-      this._src = String(_0x26115b || '');
+    set src(data) {
+      this._src = String(data || '');
     },
     get src() {
       return this._src || '';
     },
   };
-  return _0x4f4c43;
+  return key;
 }
-function createWrap(_0x5310b7, _0x4d5c8f = 'sig-1') {
+function createWrap(el, sig = 'sig-1') {
   return {
-    dataset: { sig: _0x4d5c8f },
-    querySelectorAll(_0x3bcc69) {
-      if (_0x3bcc69 === 'img.ref-thumb-media.is-pending' && _0x5310b7.classList.contains('is-pending'))
-        return [_0x5310b7];
+    dataset: { sig: sig },
+    querySelectorAll(options) {
+      if (options === 'img.ref-thumb-media.is-pending' && el.classList.contains('is-pending')) return [el];
       return [];
     },
   };
 }
-function installFakeImage(_0x4cabde) {
-  const _0x365768 = Array.from(_0x4cabde),
-    _0xf34f1e = [];
+function installFakeImage(target) {
+  const list3 = Array.from(target),
+    list4 = [];
   return (
-    (globalThis.Image = class _0x1ff109 {
+    (globalThis.Image = class source {
       constructor() {
-        _0xf34f1e.push(this);
+        list4.push(this);
       }
-      set ['src'](_0x4d32e7) {
-        this._src = String(_0x4d32e7 || '');
+      set ['src'](next) {
+        this._src = String(next || '');
       }
       get ['src']() {
         return this._src || '';
       }
       ['decode']() {
-        const _0x2e9023 = _0x365768.length ? _0x365768.shift() : true;
-        return _0x2e9023 ? Promise.resolve() : Promise.reject(new Error('decode failed'));
+        const current = list3.length ? list3.shift() : true;
+        return current ? Promise.resolve() : Promise.reject(new Error('decode failed'));
       }
     }),
-    _0xf34f1e
+    list4
   );
 }
 (test.afterEach(() => {
@@ -105,109 +106,109 @@ function installFakeImage(_0x4cabde) {
     (globalThis.clearTimeout = ORIGINAL_CLEAR_TIMEOUT));
 }),
   test('ensureThumbDecoded retries the same src after a failed decode', async () => {
-    const _0x288184 = installFakeImage([false, true]);
+    const list5 = installFakeImage([false, true]);
     (assert.equal(await ensureThumbDecoded('/output/thumb.jpg'), false),
       assert.equal(await ensureThumbDecoded('/output/thumb.jpg'), true),
       assert.equal(await ensureThumbDecoded('/output/thumb.jpg'), true),
-      assert.equal(_0x288184.length, 2));
+      assert.equal(list5.length, 2));
   }),
   test('revealRefThumbMedia keeps a failed thumbnail hidden', async () => {
     installFakeImage([false, false, false, false]);
-    const _0x553053 = [];
-    ((globalThis.requestAnimationFrame = (_0x5791c7) => {
-      return (_0x5791c7(), 1);
+    const list6 = [];
+    ((globalThis.requestAnimationFrame = (handler) => {
+      return (handler(), 1);
     }),
-      (installTimerQueue(_0x553053)));
-    const _0x30a2c8 = createImg(),
-      _0x3e4125 = createWrap(_0x30a2c8);
-    (revealRefThumbMedia(_0x3e4125, 'sig-1'),
+      installTimerQueue(list6));
+    const el2 = createImg(),
+      el3 = createWrap(el2);
+    (revealRefThumbMedia(el3, 'sig-1'),
       await flushMicrotasks(),
-      assert.equal(_0x30a2c8.classList.contains('is-pending'), true),
-      assert.equal(_0x30a2c8.classList.contains('is-ready'), false),
-      assert.equal(_0x30a2c8.dataset.thumbError, undefined));
-    while (_0x553053.length) {
-      (_0x553053.shift()(), await flushMicrotasks());
+      assert.equal(el2.classList.contains('is-pending'), true),
+      assert.equal(el2.classList.contains('is-ready'), false),
+      assert.equal(el2.dataset.thumbError, undefined));
+    while (list6.length) {
+      (list6.shift()(), await flushMicrotasks());
     }
-    (assert.equal(_0x30a2c8.classList.contains('is-pending'), true),
-      assert.equal(_0x30a2c8.classList.contains('is-ready'), false),
-      assert.equal(_0x30a2c8.dataset.thumbError, '1'),
-      assert.equal(_0x3e4125.dataset.thumbError, '1'));
+    (assert.equal(el2.classList.contains('is-pending'), true),
+      assert.equal(el2.classList.contains('is-ready'), false),
+      assert.equal(el2.dataset.thumbError, '1'),
+      assert.equal(el3.dataset.thumbError, '1'));
   }),
   test('revealRefThumbMedia reveals only after a retry succeeds', async () => {
     installFakeImage([false, true]);
-    const _0x19de00 = [];
-    ((globalThis.requestAnimationFrame = (_0x484b85) => {
-      return (_0x484b85(), 1);
+    const list7 = [];
+    ((globalThis.requestAnimationFrame = (handler2) => {
+      return (handler2(), 1);
     }),
-      (installTimerQueue(_0x19de00)));
-    const _0x4c8ff5 = createImg(),
-      _0x42e601 = createWrap(_0x4c8ff5);
-    (revealRefThumbMedia(_0x42e601, 'sig-1'),
+      installTimerQueue(list7));
+    const el4 = createImg(),
+      el5 = createWrap(el4);
+    (revealRefThumbMedia(el5, 'sig-1'),
       await flushMicrotasks(),
-      assert.equal(_0x4c8ff5.classList.contains('is-pending'), true),
-      assert.equal(_0x19de00.length, 1),
-      _0x19de00.shift()(),
+      assert.equal(el4.classList.contains('is-pending'), true),
+      assert.equal(list7.length, 1),
+      list7.shift()(),
       await flushMicrotasks(),
-      assert.equal(_0x4c8ff5.classList.contains('is-pending'), false),
-      assert.equal(_0x4c8ff5.classList.contains('is-ready'), true),
-      assert.equal(_0x4c8ff5.dataset.thumbError, undefined),
-      assert.equal(_0x42e601.dataset.thumbError, undefined));
+      assert.equal(el4.classList.contains('is-pending'), false),
+      assert.equal(el4.classList.contains('is-ready'), true),
+      assert.equal(el4.dataset.thumbError, undefined),
+      assert.equal(el5.dataset.thumbError, undefined));
   }),
   test('revealRefThumbMedia waits for a newly created thumbnail to attach', async () => {
-    const _0x25136b = installFakeImage([true]),
-      _0x328a72 = [];
-    ((globalThis.requestAnimationFrame = (_0x317f71) => {
-      return (_0x317f71(), 1);
+    const list8 = installFakeImage([true]),
+      list9 = [];
+    ((globalThis.requestAnimationFrame = (handler3) => {
+      return (handler3(), 1);
     }),
-      (installTimerQueue(_0x328a72)));
-    const _0x122bc5 = createImg();
-    _0x122bc5.isConnected = false;
-    const _0x31d79f = createWrap(_0x122bc5);
-    (revealRefThumbMedia(_0x31d79f, 'sig-1'),
+      installTimerQueue(list9));
+    const el6 = createImg();
+    el6.isConnected = false;
+    const wrap = createWrap(el6);
+    (revealRefThumbMedia(wrap, 'sig-1'),
       await flushMicrotasks(),
-      assert.equal(_0x25136b.length, 0),
-      assert.equal(_0x122bc5.classList.contains('is-pending'), true),
-      assert.equal(_0x328a72.length, 1),
-      (_0x122bc5.isConnected = true),
-      _0x328a72.shift()(),
+      assert.equal(list8.length, 0),
+      assert.equal(el6.classList.contains('is-pending'), true),
+      assert.equal(list9.length, 1),
+      (el6.isConnected = true),
+      list9.shift()(),
       await flushMicrotasks(),
-      assert.equal(_0x25136b.length, 1),
-      assert.equal(_0x122bc5.classList.contains('is-pending'), false),
-      assert.equal(_0x122bc5.classList.contains('is-ready'), true));
+      assert.equal(list8.length, 1),
+      assert.equal(el6.classList.contains('is-pending'), false),
+      assert.equal(el6.classList.contains('is-ready'), true));
   }),
   test('revealRefThumbMedia ignores stale retries after the signature changes', async () => {
     installFakeImage([false, true]);
-    const _0x175308 = [];
-    ((globalThis.requestAnimationFrame = (_0x39c633) => {
-      return (_0x39c633(), 1);
+    const record = [];
+    ((globalThis.requestAnimationFrame = (handler4) => {
+      return (handler4(), 1);
     }),
-      (installTimerQueue(_0x175308)));
-    const _0x5585b8 = createImg(),
-      _0x193910 = createWrap(_0x5585b8);
-    (revealRefThumbMedia(_0x193910, 'sig-1'),
+      installTimerQueue(record));
+    const el7 = createImg(),
+      el8 = createWrap(el7);
+    (revealRefThumbMedia(el8, 'sig-1'),
       await flushMicrotasks(),
-      (_0x193910.dataset.sig = 'sig-2'),
-      _0x175308.shift()(),
+      (el8.dataset.sig = 'sig-2'),
+      record.shift()(),
       await flushMicrotasks(),
-      assert.equal(_0x5585b8.classList.contains('is-pending'), true),
-      assert.equal(_0x5585b8.classList.contains('is-ready'), false),
-      assert.equal(_0x5585b8.dataset.thumbError, undefined));
+      assert.equal(el7.classList.contains('is-pending'), true),
+      assert.equal(el7.classList.contains('is-ready'), false),
+      assert.equal(el7.dataset.thumbError, undefined));
   }),
   test('revealRefThumbMedia ignores stale retries after the image disconnects', async () => {
     installFakeImage([false, true]);
-    const _0x38c21b = [];
-    ((globalThis.requestAnimationFrame = (_0x4261cc) => {
-      return (_0x4261cc(), 1);
+    const payload = [];
+    ((globalThis.requestAnimationFrame = (handler5) => {
+      return (handler5(), 1);
     }),
-      (installTimerQueue(_0x38c21b)));
-    const _0x3cd63b = createImg(),
-      _0x9c2857 = createWrap(_0x3cd63b);
-    (revealRefThumbMedia(_0x9c2857, 'sig-1'),
+      installTimerQueue(payload));
+    const el9 = createImg(),
+      wrap2 = createWrap(el9);
+    (revealRefThumbMedia(wrap2, 'sig-1'),
       await flushMicrotasks(),
-      (_0x3cd63b.isConnected = false),
-      _0x38c21b.shift()(),
+      (el9.isConnected = false),
+      payload.shift()(),
       await flushMicrotasks(),
-      assert.equal(_0x3cd63b.classList.contains('is-pending'), true),
-      assert.equal(_0x3cd63b.classList.contains('is-ready'), false),
-      assert.equal(_0x3cd63b.dataset.thumbError, undefined));
+      assert.equal(el9.classList.contains('is-pending'), true),
+      assert.equal(el9.classList.contains('is-ready'), false),
+      assert.equal(el9.dataset.thumbError, undefined));
   }));

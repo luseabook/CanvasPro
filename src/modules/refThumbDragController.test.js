@@ -2,26 +2,26 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bindRefThumbFixedSlotDrag, bindRefThumbOrderDrag } from './refThumbDragController.js';
 class FakeClassList {
-  constructor(_0x271570) {
-    this.owner = _0x271570;
+  constructor(value) {
+    this.owner = value;
   }
   ['_tokens']() {
     return String(this.owner.className || '')
       .split(/\s+/)
       .filter(Boolean);
   }
-  ['contains'](_0x1bd022) {
-    return this._tokens().includes(String(_0x1bd022 || ''));
+  ['contains'](item) {
+    return this._tokens().includes(String(item || ''));
   }
-  ['add'](..._0x41a96a) {
-    const _0x4efcd6 = new Set(this._tokens());
-    (_0x41a96a.forEach((_0x3305b9) => _0x4efcd6.add(String(_0x3305b9 || ''))),
-      (this.owner.className = Array.from(_0x4efcd6).join(' ')));
+  ['add'](...list) {
+    const key = new Set(this._tokens());
+    (list.forEach((item2) => key.add(String(item2 || ''))),
+      (this.owner.className = Array.from(key).join(' ')));
   }
-  ['remove'](..._0x2d8ccd) {
-    const _0x34623b = new Set(_0x2d8ccd.map((_0x109de1) => String(_0x109de1 || '')));
+  ['remove'](...list2) {
+    const map = new Set(list2.map((item3) => String(item3 || '')));
     this.owner.className = this._tokens()
-      .filter((_0x402520) => !_0x34623b.has(_0x402520))
+      .filter((item4) => !map.has(item4))
       .join(' ');
   }
 }
@@ -40,111 +40,106 @@ class FakeElement {
   }
   get ['nextSibling']() {
     if (!this.parentNode) return null;
-    const _0x445ddb = this.parentNode.children,
-      _0x39b6d6 = _0x445ddb.indexOf(this);
-    return _0x39b6d6 >= 0 ? _0x445ddb[_0x39b6d6 + 1] || null : null;
+    const list3 = this.parentNode.children,
+      count = list3.indexOf(this);
+    return count >= 0 ? list3[count + 1] || null : null;
   }
-  ['appendChild'](_0x3399af) {
-    if (_0x3399af.parentNode) _0x3399af.remove();
-    return (
-      this.children.push(_0x3399af),
-      (_0x3399af.parentNode = this),
-      (_0x3399af.parentElement = this),
-      _0x3399af
-    );
+  ['appendChild'](el) {
+    if (el.parentNode) el.remove();
+    return (this.children.push(el), (el.parentNode = this), (el.parentElement = this), el);
   }
-  ['insertBefore'](_0x3e4378, _0x3983ec) {
-    if (_0x3e4378.parentNode) _0x3e4378.remove();
-    const _0x2d7969 = _0x3983ec ? this.children.indexOf(_0x3983ec) : -1;
-    if (_0x2d7969 >= 0) this.children.splice(_0x2d7969, 0, _0x3e4378);
-    else this.children.push(_0x3e4378);
-    return ((_0x3e4378.parentNode = this), (_0x3e4378.parentElement = this), _0x3e4378);
+  ['insertBefore'](el2, index) {
+    if (el2.parentNode) el2.remove();
+    const count2 = index ? this.children.indexOf(index) : -1;
+    if (count2 >= 0) this.children.splice(count2, 0, el2);
+    else this.children.push(el2);
+    return ((el2.parentNode = this), (el2.parentElement = this), el2);
   }
   ['remove']() {
     if (!this.parentNode) return;
-    const _0x7a858 = this.parentNode.children,
-      _0x20f820 = _0x7a858.indexOf(this);
-    if (_0x20f820 >= 0) _0x7a858.splice(_0x20f820, 1);
+    const list4 = this.parentNode.children,
+      count3 = list4.indexOf(this);
+    if (count3 >= 0) list4.splice(count3, 1);
     ((this.parentNode = null), (this.parentElement = null));
   }
-  ['setAttribute'](_0x4b43cd, _0x15673d) {
-    this.attributes[String(_0x4b43cd)] = String(_0x15673d);
+  ['setAttribute'](result, data) {
+    this.attributes[String(result)] = String(data);
   }
-  ['getAttribute'](_0x544f24) {
-    return this.attributes[String(_0x544f24)];
+  ['getAttribute'](options) {
+    return this.attributes[String(options)];
   }
-  ['addEventListener'](_0x5b78af, _0x3becea) {
-    if (!this.listeners.has(_0x5b78af)) this.listeners.set(_0x5b78af, []);
-    this.listeners.get(_0x5b78af).push(_0x3becea);
+  ['addEventListener'](target, source) {
+    if (!this.listeners.has(target)) this.listeners.set(target, []);
+    this.listeners.get(target).push(source);
   }
-  ['dispatch'](_0x34ec07, _0x494634) {
-    for (const _0x4cc945 of this.listeners.get(_0x34ec07) || []) {
-      _0x4cc945(_0x494634);
+  ['dispatch'](next, current) {
+    for (const run of this.listeners.get(next) || []) {
+      run(current);
     }
   }
-  ['matches'](_0x4ac0f5) {
-    if (_0x4ac0f5 === '.ref-thumb-container') return this.classList.contains('ref-thumb-container');
-    if (_0x4ac0f5 === '.ref-thumb-wrap') return this.classList.contains('ref-thumb-wrap');
-    if (_0x4ac0f5 === '[data-slot]') return !!this.dataset.slot;
+  ['matches'](entry) {
+    if (entry === '.ref-thumb-container') return this.classList.contains('ref-thumb-container');
+    if (entry === '.ref-thumb-wrap') return this.classList.contains('ref-thumb-wrap');
+    if (entry === '[data-slot]') return !!this.dataset.slot;
     return false;
   }
-  ['closest'](_0x36577b) {
-    let _0x598f0e = this;
-    while (_0x598f0e) {
-      if (_0x598f0e.matches(_0x36577b)) return _0x598f0e;
-      _0x598f0e = _0x598f0e.parentElement;
+  ['closest'](record) {
+    let payload = this;
+    while (payload) {
+      if (payload.matches(record)) return payload;
+      payload = payload.parentElement;
     }
     return null;
   }
-  ['querySelector'](_0x5ca955) {
-    return this.querySelectorAll(_0x5ca955)[0] || null;
+  ['querySelector'](handle) {
+    return this.querySelectorAll(handle)[0] || null;
   }
-  ['querySelectorAll'](_0x3c7676) {
-    const _0x385381 = [],
-      _0x16a16c = (_0xac0c5) => {
-        if (matchesFakeSelector(_0xac0c5, _0x3c7676)) _0x385381.push(_0xac0c5);
-        _0xac0c5.children.forEach(_0x16a16c);
+  ['querySelectorAll'](state) {
+    const list5 = [],
+      item5 = (el3) => {
+        if (matchesFakeSelector(el3, state)) list5.push(el3);
+        el3.children.forEach(item5);
       };
-    return (this.children.forEach(_0x16a16c), _0x385381);
+    return (this.children.forEach(item5), list5);
   }
   ['getBoundingClientRect']() {
-    const _0x2839ef = this.parentNode ? this.parentNode.children.indexOf(this) : 0;
-    return { left: Math.max(0, _0x2839ef) * 100, top: 0, width: 100, height: 40 };
+    const config = this.parentNode ? this.parentNode.children.indexOf(this) : 0;
+    return { left: Math.max(0, config) * 100, top: 0, width: 100, height: 40 };
   }
 }
-function matchesFakeSelector(_0x3e49ab, _0x53f70f) {
-  if (_0x53f70f === '.ref-thumb-wrap') return _0x3e49ab.classList.contains('ref-thumb-wrap');
-  if (_0x53f70f === '.ref-thumb-container') return _0x3e49ab.classList.contains('ref-thumb-container');
-  if (_0x53f70f === '.ref-thumb-wrap.is-drop-allow')
-    return _0x3e49ab.classList.contains('ref-thumb-wrap') && _0x3e49ab.classList.contains('is-drop-allow');
-  if (_0x53f70f === '[data-slot]') return !!_0x3e49ab.dataset.slot;
+function matchesFakeSelector(el4, scope) {
+  if (scope === '.ref-thumb-wrap') return el4.classList.contains('ref-thumb-wrap');
+  if (scope === '.ref-thumb-container') return el4.classList.contains('ref-thumb-container');
+  if (scope === '.ref-thumb-wrap.is-drop-allow')
+    return el4.classList.contains('ref-thumb-wrap') && el4.classList.contains('is-drop-allow');
+  if (scope === '[data-slot]') return !!el4.dataset.slot;
   return false;
 }
-function createThumb(_0x2bc21d, _0x575003 = {}) {
+function createThumb(edgeId, className2 = {}) {
   return new FakeElement({
-    className: _0x575003.className || 'ref-thumb-wrap',
+    className: className2.className || 'ref-thumb-wrap',
     dataset: {
-      edgeId: _0x2bc21d,
-      sourceId: _0x575003.sourceId || 'src-' + _0x2bc21d,
-      slot: _0x575003.slot || '',
-      kind: _0x575003.kind || '',
-      refOrigin: _0x575003.refOrigin || '',
-      refKey: _0x575003.refKey || '',
-      assetId: _0x575003.assetId || '',
+      edgeId: edgeId,
+      sourceId: className2.sourceId || 'src-' + edgeId,
+      slot: className2.slot || '',
+      kind: className2.kind || '',
+      refOrigin: className2.refOrigin || '',
+      refKey: className2.refKey || '',
+      assetId: className2.assetId || '',
     },
-    tagName: _0x575003.tagName || 'div',
+    tagName: className2.tagName || 'div',
   });
 }
-function createEvent(_0x2e9a9a, _0x200f09 = 0) {
+function createEvent(target2, clientX = 0) {
   return {
-    target: _0x2e9a9a,
-    clientX: _0x200f09,
+    target: target2,
+    clientX: clientX,
     dataTransfer: {
       effectAllowed: '',
       dropEffect: '',
       data: {},
-      setData(_0x1f9c2e, _0x1a8233) {
-        this.data[_0x1f9c2e] = _0x1a8233;
+      setData(input, output) {
+        this.data[input] = output;
       },
     },
     defaultPrevented: false,
@@ -157,139 +152,139 @@ function createEvent(_0x2e9a9a, _0x200f09 = 0) {
     },
   };
 }
-function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 }) {
-  const _0x40bd32 = [];
+function createStore({ edges: edges, nodes: nodes = {}, incoming: incoming }) {
+  const calls = [];
   return {
-    calls: _0x40bd32,
+    calls: calls,
     getState() {
-      return { edges: _0x22fa3e, nodes: nodes };
+      return { edges: edges, nodes: nodes };
     },
     getIncomingEdges() {
-      return _0x30d620 || Object.values(_0x22fa3e);
+      return incoming || Object.values(edges);
     },
-    updateEdgesBatch(_0xd7b6d0, _0xae5f2d) {
-      _0x40bd32.push({ removeIds: _0xd7b6d0, addedEdges: _0xae5f2d });
+    updateEdgesBatch(removeIds, addedEdges) {
+      calls.push({ removeIds: removeIds, addedEdges: addedEdges });
     },
   };
 }
 (test('refThumbDragController: order drag commits DOM order once', () => {
-  const _0x1873a4 = new FakeElement({ className: 'ref-thumb-container' }),
-    _0x25e123 = createThumb('e1'),
-    _0x161e8d = createThumb('e2'),
-    _0x55d159 = createThumb('e3');
-  (_0x1873a4.appendChild(_0x25e123), _0x1873a4.appendChild(_0x161e8d), _0x1873a4.appendChild(_0x55d159));
-  const _0x3ee7b6 = {
+  const container = new FakeElement({ className: 'ref-thumb-container' }),
+    store = createThumb('e1'),
+    thumb = createThumb('e2'),
+    store2 = createThumb('e3');
+  (container.appendChild(store), container.appendChild(thumb), container.appendChild(store2));
+  const edges2 = {
       e1: { id: 'e1', sourceId: 's1', targetId: 'target' },
       e2: { id: 'e2', sourceId: 's2', targetId: 'target' },
       e3: { id: 'e3', sourceId: 's3', targetId: 'target' },
     },
-    _0xcca943 = createStore({ edges: _0x3ee7b6 }),
-    _0x854c25 = {};
-  (bindRefThumbOrderDrag({ owner: _0x854c25, container: _0x1873a4, store: _0xcca943, nodeId: 'target' }),
-    _0x55d159.dispatch('dragstart', createEvent(_0x55d159)),
-    _0x25e123.dispatch('dragover', createEvent(_0x25e123, 0)),
-    _0x55d159.dispatch('dragend', createEvent(_0x55d159)),
-    assert.equal(_0xcca943.calls.length, 1),
-    assert.deepEqual(_0xcca943.calls[0].removeIds, ['e1', 'e2', 'e3']),
+    store3 = createStore({ edges: edges2 }),
+    owner = {};
+  (bindRefThumbOrderDrag({ owner: owner, container: container, store: store3, nodeId: 'target' }),
+    store2.dispatch('dragstart', createEvent(store2)),
+    store.dispatch('dragover', createEvent(store, 0)),
+    store2.dispatch('dragend', createEvent(store2)),
+    assert.equal(store3.calls.length, 1),
+    assert.deepEqual(store3.calls[0].removeIds, ['e1', 'e2', 'e3']),
     assert.deepEqual(
-      _0xcca943.calls[0].addedEdges.map((_0xe5aea5) => _0xe5aea5.id),
+      store3.calls[0].addedEdges.map((item6) => item6.id),
       ['e3', 'e1', 'e2'],
     ),
-    assert.equal(_0x854c25._isDraggingSorting, false));
+    assert.equal(owner._isDraggingSorting, false));
 }),
   test('refThumbDragController: unchanged order does not commit', () => {
-    const _0x54fce8 = new FakeElement({ className: 'ref-thumb-container' }),
-      _0xb39059 = createThumb('e1'),
-      _0x42f1ac = createThumb('e2');
-    (_0x54fce8.appendChild(_0xb39059), _0x54fce8.appendChild(_0x42f1ac));
-    const _0x424268 = {
+    const container2 = new FakeElement({ className: 'ref-thumb-container' }),
+      store4 = createThumb('e1'),
+      thumb2 = createThumb('e2');
+    (container2.appendChild(store4), container2.appendChild(thumb2));
+    const edges3 = {
         e1: { id: 'e1', sourceId: 's1', targetId: 'target' },
         e2: { id: 'e2', sourceId: 's2', targetId: 'target' },
       },
-      _0x5d837a = createStore({ edges: _0x424268 });
-    (bindRefThumbOrderDrag({ owner: {}, container: _0x54fce8, store: _0x5d837a, nodeId: 'target' }),
-      _0xb39059.dispatch('dragstart', createEvent(_0xb39059)),
-      _0xb39059.dispatch('dragend', createEvent(_0xb39059)),
-      assert.equal(_0x5d837a.calls.length, 0));
+      store5 = createStore({ edges: edges3 });
+    (bindRefThumbOrderDrag({ owner: {}, container: container2, store: store5, nodeId: 'target' }),
+      store4.dispatch('dragstart', createEvent(store4)),
+      store4.dispatch('dragend', createEvent(store4)),
+      assert.equal(store5.calls.length, 0));
   }),
   test('refThumbDragController: incrementally bound thumbs share drag state', () => {
-    const _0x403080 = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x1558d5 = createThumb('e1');
-    _0x403080.appendChild(_0x1558d5);
-    const _0x537f47 = {
+    const container3 = new FakeElement({ className: 'ref-thumb-container' }),
+      store6 = createThumb('e1');
+    container3.appendChild(store6);
+    const edges4 = {
         e1: { id: 'e1', sourceId: 's1', targetId: 'target' },
         e2: { id: 'e2', sourceId: 's2', targetId: 'target' },
       },
-      _0x192b08 = createStore({ edges: _0x537f47 });
-    bindRefThumbOrderDrag({ owner: {}, container: _0x403080, store: _0x192b08, nodeId: 'target' });
-    const _0x2043c7 = createThumb('e2');
-    (_0x403080.appendChild(_0x2043c7),
-      bindRefThumbOrderDrag({ owner: {}, container: _0x403080, store: _0x192b08, nodeId: 'target' }),
-      _0x1558d5.dispatch('dragstart', createEvent(_0x1558d5)),
-      _0x2043c7.dispatch('dragover', createEvent(_0x2043c7, 0x3e7)),
-      _0x1558d5.dispatch('dragend', createEvent(_0x1558d5)),
+      store7 = createStore({ edges: edges4 });
+    bindRefThumbOrderDrag({ owner: {}, container: container3, store: store7, nodeId: 'target' });
+    const store8 = createThumb('e2');
+    (container3.appendChild(store8),
+      bindRefThumbOrderDrag({ owner: {}, container: container3, store: store7, nodeId: 'target' }),
+      store6.dispatch('dragstart', createEvent(store6)),
+      store8.dispatch('dragover', createEvent(store8, 0x3e7)),
+      store6.dispatch('dragend', createEvent(store6)),
       assert.deepEqual(
-        _0x403080.children.map((_0x2f4185) => _0x2f4185.dataset.edgeId),
+        container3.children.map((el5) => el5.dataset.edgeId),
         ['e2', 'e1'],
       ),
-      assert.equal(_0x192b08.calls.length, 1),
+      assert.equal(store7.calls.length, 1),
       assert.deepEqual(
-        _0x192b08.calls[0].addedEdges.map((_0x3bc335) => _0x3bc335.id),
+        store7.calls[0].addedEdges.map((item7) => item7.id),
         ['e2', 'e1'],
       ));
   }),
   test('refThumbDragController: asset and empty refs do not participate in order', () => {
-    const _0x1881e7 = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x522f5c = createThumb('e1'),
-      _0x37edb3 = createThumb('', { refOrigin: 'asset', assetId: 'asset-1' }),
-      _0x1b7050 = createThumb(''),
-      _0x3a73da = createThumb('e2');
-    (_0x1881e7.appendChild(_0x522f5c),
-      _0x1881e7.appendChild(_0x37edb3),
-      _0x1881e7.appendChild(_0x1b7050),
-      _0x1881e7.appendChild(_0x3a73da));
-    const _0xbdb979 = {
+    const container4 = new FakeElement({ className: 'ref-thumb-container' }),
+      store9 = createThumb('e1'),
+      el6 = createThumb('', { refOrigin: 'asset', assetId: 'asset-1' }),
+      el7 = createThumb(''),
+      store10 = createThumb('e2');
+    (container4.appendChild(store9),
+      container4.appendChild(el6),
+      container4.appendChild(el7),
+      container4.appendChild(store10));
+    const edges5 = {
         e1: { id: 'e1', sourceId: 's1', targetId: 'target' },
         e2: { id: 'e2', sourceId: 's2', targetId: 'target' },
       },
-      _0x3ecbe8 = createStore({ edges: _0xbdb979 });
-    (bindRefThumbOrderDrag({ owner: {}, container: _0x1881e7, store: _0x3ecbe8, nodeId: 'target' }),
-      assert.equal(_0x37edb3.dataset.dragBound, undefined),
-      assert.equal(_0x1b7050.dataset.dragBound, undefined),
-      _0x3a73da.dispatch('dragstart', createEvent(_0x3a73da)),
-      _0x522f5c.dispatch('dragover', createEvent(_0x522f5c, 0)),
-      _0x3a73da.dispatch('dragend', createEvent(_0x3a73da)),
-      assert.equal(_0x3ecbe8.calls.length, 1),
-      assert.deepEqual(_0x3ecbe8.calls[0].removeIds, ['e1', 'e2']),
+      store11 = createStore({ edges: edges5 });
+    (bindRefThumbOrderDrag({ owner: {}, container: container4, store: store11, nodeId: 'target' }),
+      assert.equal(el6.dataset.dragBound, undefined),
+      assert.equal(el7.dataset.dragBound, undefined),
+      store10.dispatch('dragstart', createEvent(store10)),
+      store9.dispatch('dragover', createEvent(store9, 0)),
+      store10.dispatch('dragend', createEvent(store10)),
+      assert.equal(store11.calls.length, 1),
+      assert.deepEqual(store11.calls[0].removeIds, ['e1', 'e2']),
       assert.deepEqual(
-        _0x3ecbe8.calls[0].addedEdges.map((_0x16e70c) => _0x16e70c.id),
+        store11.calls[0].addedEdges.map((item8) => item8.id),
         ['e2', 'e1'],
       ));
   }),
   test('refThumbDragController: group shared refs reorder backing group input edges', () => {
-    const _0x39e060 = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x5d5d1b = createThumb('groupEdgeA', { sourceId: 's1' }),
-      _0x15e7e6 = createThumb('groupEdgeB', { sourceId: 's2' });
-    (_0x39e060.appendChild(_0x5d5d1b), _0x39e060.appendChild(_0x15e7e6));
-    const _0x37a298 = {
+    const container5 = new FakeElement({ className: 'ref-thumb-container' }),
+      store12 = createThumb('groupEdgeA', { sourceId: 's1' }),
+      store13 = createThumb('groupEdgeB', { sourceId: 's2' });
+    (container5.appendChild(store12), container5.appendChild(store13));
+    const edges6 = {
         groupEdgeA: { id: 'groupEdgeA', sourceId: 's1', targetId: 'group' },
         groupEdgeB: { id: 'groupEdgeB', sourceId: 's2', targetId: 'group' },
       },
-      _0x458aa1 = [
-        { ..._0x37a298.groupEdgeA, isGroupShared: true, sharedGroupId: 'group', effectiveTargetId: 'target' },
-        { ..._0x37a298.groupEdgeB, isGroupShared: true, sharedGroupId: 'group', effectiveTargetId: 'target' },
+      incoming2 = [
+        { ...edges6.groupEdgeA, isGroupShared: true, sharedGroupId: 'group', effectiveTargetId: 'target' },
+        { ...edges6.groupEdgeB, isGroupShared: true, sharedGroupId: 'group', effectiveTargetId: 'target' },
       ],
-      _0x197b8c = createStore({ edges: _0x37a298, incoming: _0x458aa1 });
-    (bindRefThumbOrderDrag({ owner: {}, container: _0x39e060, store: _0x197b8c, nodeId: 'target' }),
-      assert.equal(_0x5d5d1b.getAttribute('draggable'), 'true'),
-      assert.equal(_0x15e7e6.getAttribute('draggable'), 'true'),
-      _0x15e7e6.dispatch('dragstart', createEvent(_0x15e7e6)),
-      _0x5d5d1b.dispatch('dragover', createEvent(_0x5d5d1b, 0)),
-      _0x15e7e6.dispatch('dragend', createEvent(_0x15e7e6)),
-      assert.equal(_0x197b8c.calls.length, 1),
-      assert.deepEqual(_0x197b8c.calls[0].removeIds, ['groupEdgeA', 'groupEdgeB']),
+      store14 = createStore({ edges: edges6, incoming: incoming2 });
+    (bindRefThumbOrderDrag({ owner: {}, container: container5, store: store14, nodeId: 'target' }),
+      assert.equal(store12.getAttribute('draggable'), 'true'),
+      assert.equal(store13.getAttribute('draggable'), 'true'),
+      store13.dispatch('dragstart', createEvent(store13)),
+      store12.dispatch('dragover', createEvent(store12, 0)),
+      store13.dispatch('dragend', createEvent(store13)),
+      assert.equal(store14.calls.length, 1),
+      assert.deepEqual(store14.calls[0].removeIds, ['groupEdgeA', 'groupEdgeB']),
       assert.deepEqual(
-        _0x197b8c.calls[0].addedEdges.map((_0xbccab) => [_0xbccab.id, _0xbccab.targetId]),
+        store14.calls[0].addedEdges.map((item9) => [item9.id, item9.targetId]),
         [
           ['groupEdgeB', 'group'],
           ['groupEdgeA', 'group'],
@@ -297,46 +292,46 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
       ));
   }),
   test('refThumbDragController: fixed slot refs do not participate in free order', () => {
-    const _0x5d545b = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x2c8f1e = createThumb('e1', { slot: 'sourceVideo', sourceId: 'videoA' }),
-      _0x4e76a0 = createThumb('e2', { slot: 'refImage', sourceId: 'imageB' });
-    (_0x2c8f1e.setAttribute('draggable', 'true'),
-      _0x4e76a0.setAttribute('draggable', 'true'),
-      _0x5d545b.appendChild(_0x2c8f1e),
-      _0x5d545b.appendChild(_0x4e76a0));
-    const _0x132da1 = {
+    const container6 = new FakeElement({ className: 'ref-thumb-container' }),
+      el8 = createThumb('e1', { slot: 'sourceVideo', sourceId: 'videoA' }),
+      el9 = createThumb('e2', { slot: 'refImage', sourceId: 'imageB' });
+    (el8.setAttribute('draggable', 'true'),
+      el9.setAttribute('draggable', 'true'),
+      container6.appendChild(el8),
+      container6.appendChild(el9));
+    const edges7 = {
         e1: { id: 'e1', sourceId: 'videoA', targetId: 'target', refSlot: 'sourceVideo' },
         e2: { id: 'e2', sourceId: 'imageB', targetId: 'target', refSlot: 'refImage' },
       },
-      _0x4d1b2e = createStore({ edges: _0x132da1 });
-    (bindRefThumbOrderDrag({ owner: {}, container: _0x5d545b, store: _0x4d1b2e, nodeId: 'target' }),
-      assert.equal(_0x2c8f1e.dataset.dragBound, undefined),
-      assert.equal(_0x4e76a0.dataset.dragBound, undefined),
-      assert.equal(_0x2c8f1e.getAttribute('draggable'), 'true'),
-      assert.equal(_0x4e76a0.getAttribute('draggable'), 'true'),
-      _0x4e76a0.dispatch('dragstart', createEvent(_0x4e76a0)),
-      _0x2c8f1e.dispatch('dragover', createEvent(_0x2c8f1e, 0)),
-      _0x4e76a0.dispatch('dragend', createEvent(_0x4e76a0)),
+      store15 = createStore({ edges: edges7 });
+    (bindRefThumbOrderDrag({ owner: {}, container: container6, store: store15, nodeId: 'target' }),
+      assert.equal(el8.dataset.dragBound, undefined),
+      assert.equal(el9.dataset.dragBound, undefined),
+      assert.equal(el8.getAttribute('draggable'), 'true'),
+      assert.equal(el9.getAttribute('draggable'), 'true'),
+      el9.dispatch('dragstart', createEvent(el9)),
+      el8.dispatch('dragover', createEvent(el8, 0)),
+      el9.dispatch('dragend', createEvent(el9)),
       assert.deepEqual(
-        _0x5d545b.children.map((_0x559a68) => _0x559a68.dataset.edgeId),
+        container6.children.map((el10) => el10.dataset.edgeId),
         ['e1', 'e2'],
       ),
-      assert.equal(_0x4d1b2e.calls.length, 0));
+      assert.equal(store15.calls.length, 0));
   }),
   test('refThumbDragController: group output refs persist source order on base edge', () => {
-    const _0x21d152 = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x1ca0cf = 'groupEdge::group-output::image-1',
-      _0xfb552b = 'groupEdge::group-output::image-2',
-      _0x58db67 = createThumb(_0x1ca0cf, { sourceId: 'image-1' }),
-      _0x4b48ea = createThumb(_0xfb552b, { sourceId: 'image-2' });
-    (_0x21d152.appendChild(_0x58db67), _0x21d152.appendChild(_0x4b48ea));
-    const _0x5c0a32 = {
+    const container7 = new FakeElement({ className: 'ref-thumb-container' }),
+      id = 'groupEdge::group-output::image-1',
+      id2 = 'groupEdge::group-output::image-2',
+      store16 = createThumb(id, { sourceId: 'image-1' }),
+      store17 = createThumb(id2, { sourceId: 'image-2' });
+    (container7.appendChild(store16), container7.appendChild(store17));
+    const edges8 = {
         groupEdge: { id: 'groupEdge', sourceId: 'group', targetId: 'target', isGroupOutputLink: true },
       },
-      _0x2cd16f = [
+      incoming3 = [
         {
-          ..._0x5c0a32.groupEdge,
-          id: _0x1ca0cf,
+          ...edges8.groupEdge,
+          id: id,
           sourceId: 'image-1',
           isGroupOutput: true,
           outputGroupId: 'group',
@@ -344,8 +339,8 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           effectiveTargetId: 'target',
         },
         {
-          ..._0x5c0a32.groupEdge,
-          id: _0xfb552b,
+          ...edges8.groupEdge,
+          id: id2,
           sourceId: 'image-2',
           isGroupOutput: true,
           outputGroupId: 'group',
@@ -353,39 +348,39 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           effectiveTargetId: 'target',
         },
       ],
-      _0x3cf566 = createStore({ edges: _0x5c0a32, incoming: _0x2cd16f });
-    (bindRefThumbOrderDrag({ owner: {}, container: _0x21d152, store: _0x3cf566, nodeId: 'target' }),
-      assert.equal(_0x58db67.getAttribute('draggable'), 'true'),
-      assert.equal(_0x4b48ea.getAttribute('draggable'), 'true'),
-      _0x4b48ea.dispatch('dragstart', createEvent(_0x4b48ea)),
-      _0x58db67.dispatch('dragover', createEvent(_0x58db67, 0)),
-      _0x4b48ea.dispatch('dragend', createEvent(_0x4b48ea)),
+      store18 = createStore({ edges: edges8, incoming: incoming3 });
+    (bindRefThumbOrderDrag({ owner: {}, container: container7, store: store18, nodeId: 'target' }),
+      assert.equal(store16.getAttribute('draggable'), 'true'),
+      assert.equal(store17.getAttribute('draggable'), 'true'),
+      store17.dispatch('dragstart', createEvent(store17)),
+      store16.dispatch('dragover', createEvent(store16, 0)),
+      store17.dispatch('dragend', createEvent(store17)),
       assert.deepEqual(
-        _0x21d152.children.map((_0x415257) => _0x415257.dataset.edgeId),
-        [_0xfb552b, _0x1ca0cf],
+        container7.children.map((el11) => el11.dataset.edgeId),
+        [id2, id],
       ),
-      assert.equal(_0x3cf566.calls.length, 1),
-      assert.deepEqual(_0x3cf566.calls[0].removeIds, ['groupEdge']),
+      assert.equal(store18.calls.length, 1),
+      assert.deepEqual(store18.calls[0].removeIds, ['groupEdge']),
       assert.deepEqual(
-        _0x3cf566.calls[0].addedEdges.map((_0x373a5d) => _0x373a5d.id),
+        store18.calls[0].addedEdges.map((item10) => item10.id),
         ['groupEdge'],
       ),
-      assert.deepEqual(_0x3cf566.calls[0].addedEdges[0].groupOutputSourceOrder, ['image-2', 'image-1']));
+      assert.deepEqual(store18.calls[0].addedEdges[0].groupOutputSourceOrder, ['image-2', 'image-1']));
   }),
   test('refThumbDragController: shared group output refs persist source order per target', () => {
-    const _0x46a8b1 = new FakeElement({ className: 'ref-thumb-container' }),
-      _0xbf6a3f = 'groupEdge::group-output::image-1',
-      _0x2865ee = 'groupEdge::group-output::image-2',
-      _0xb72a0a = createThumb(_0xbf6a3f, { sourceId: 'image-1' }),
-      _0x40bad4 = createThumb(_0x2865ee, { sourceId: 'image-2' });
-    (_0x46a8b1.appendChild(_0xb72a0a), _0x46a8b1.appendChild(_0x40bad4));
-    const _0xca52b5 = {
+    const container8 = new FakeElement({ className: 'ref-thumb-container' }),
+      id3 = 'groupEdge::group-output::image-1',
+      id4 = 'groupEdge::group-output::image-2',
+      store19 = createThumb(id3, { sourceId: 'image-1' }),
+      store20 = createThumb(id4, { sourceId: 'image-2' });
+    (container8.appendChild(store19), container8.appendChild(store20));
+    const edges9 = {
         groupEdge: { id: 'groupEdge', sourceId: 'groupA', targetId: 'groupB', isGroupOutputLink: true },
       },
-      _0x59e33d = [
+      incoming4 = [
         {
-          ..._0xca52b5.groupEdge,
-          id: _0xbf6a3f,
+          ...edges9.groupEdge,
+          id: id3,
           sourceId: 'image-1',
           isGroupOutput: true,
           isGroupShared: true,
@@ -395,8 +390,8 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           effectiveTargetId: 'target',
         },
         {
-          ..._0xca52b5.groupEdge,
-          id: _0x2865ee,
+          ...edges9.groupEdge,
+          id: id4,
           sourceId: 'image-2',
           isGroupOutput: true,
           isGroupShared: true,
@@ -406,36 +401,36 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           effectiveTargetId: 'target',
         },
       ],
-      _0x4605f7 = createStore({ edges: _0xca52b5, incoming: _0x59e33d });
-    (bindRefThumbOrderDrag({ owner: {}, container: _0x46a8b1, store: _0x4605f7, nodeId: 'target' }),
-      assert.equal(_0xb72a0a.getAttribute('draggable'), 'true'),
-      assert.equal(_0x40bad4.getAttribute('draggable'), 'true'),
-      _0x40bad4.dispatch('dragstart', createEvent(_0x40bad4)),
-      _0xb72a0a.dispatch('dragover', createEvent(_0xb72a0a, 0)),
-      _0x40bad4.dispatch('dragend', createEvent(_0x40bad4)),
+      store21 = createStore({ edges: edges9, incoming: incoming4 });
+    (bindRefThumbOrderDrag({ owner: {}, container: container8, store: store21, nodeId: 'target' }),
+      assert.equal(store19.getAttribute('draggable'), 'true'),
+      assert.equal(store20.getAttribute('draggable'), 'true'),
+      store20.dispatch('dragstart', createEvent(store20)),
+      store19.dispatch('dragover', createEvent(store19, 0)),
+      store20.dispatch('dragend', createEvent(store20)),
       assert.deepEqual(
-        _0x46a8b1.children.map((_0x26b384) => _0x26b384.dataset.edgeId),
-        [_0x2865ee, _0xbf6a3f],
+        container8.children.map((el12) => el12.dataset.edgeId),
+        [id4, id3],
       ),
-      assert.equal(_0x4605f7.calls.length, 1),
-      assert.deepEqual(_0x4605f7.calls[0].removeIds, ['groupEdge']),
+      assert.equal(store21.calls.length, 1),
+      assert.deepEqual(store21.calls[0].removeIds, ['groupEdge']),
       assert.deepEqual(
-        _0x4605f7.calls[0].addedEdges.map((_0x5b71c5) => _0x5b71c5.id),
+        store21.calls[0].addedEdges.map((item11) => item11.id),
         ['groupEdge'],
       ),
-      assert.equal(_0x4605f7.calls[0].addedEdges[0].groupOutputSourceOrder, undefined),
-      assert.deepEqual(_0x4605f7.calls[0].addedEdges[0].groupOutputSourceOrderByTarget, {
+      assert.equal(store21.calls[0].addedEdges[0].groupOutputSourceOrder, undefined),
+      assert.deepEqual(store21.calls[0].addedEdges[0].groupOutputSourceOrderByTarget, {
         target: ['image-2', 'image-1'],
       }));
   }),
   test('refThumbDragController: shared group output order keeps sibling targets isolated', () => {
-    const _0x23aedc = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x40236e = 'groupEdge::group-output::image-1',
-      _0x1b2ac1 = 'groupEdge::group-output::image-2',
-      _0xba9b48 = createThumb(_0x40236e, { sourceId: 'image-1' }),
-      _0x5bd0f7 = createThumb(_0x1b2ac1, { sourceId: 'image-2' });
-    (_0x23aedc.appendChild(_0xba9b48), _0x23aedc.appendChild(_0x5bd0f7));
-    const _0x266ebd = {
+    const container9 = new FakeElement({ className: 'ref-thumb-container' }),
+      id5 = 'groupEdge::group-output::image-1',
+      id6 = 'groupEdge::group-output::image-2',
+      store22 = createThumb(id5, { sourceId: 'image-1' }),
+      store23 = createThumb(id6, { sourceId: 'image-2' });
+    (container9.appendChild(store22), container9.appendChild(store23));
+    const edges10 = {
         groupEdge: {
           id: 'groupEdge',
           sourceId: 'groupA',
@@ -444,10 +439,10 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           groupOutputSourceOrderByTarget: { nodeB: ['image-1', 'image-2'] },
         },
       },
-      _0xb5fe34 = [
+      incoming5 = [
         {
-          ..._0x266ebd.groupEdge,
-          id: _0x40236e,
+          ...edges10.groupEdge,
+          id: id5,
           sourceId: 'image-1',
           isGroupOutput: true,
           isGroupShared: true,
@@ -457,8 +452,8 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           effectiveTargetId: 'nodeA',
         },
         {
-          ..._0x266ebd.groupEdge,
-          id: _0x1b2ac1,
+          ...edges10.groupEdge,
+          id: id6,
           sourceId: 'image-2',
           isGroupOutput: true,
           isGroupShared: true,
@@ -468,75 +463,75 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           effectiveTargetId: 'nodeA',
         },
       ],
-      _0xb6792d = createStore({ edges: _0x266ebd, incoming: _0xb5fe34 });
-    (bindRefThumbOrderDrag({ owner: {}, container: _0x23aedc, store: _0xb6792d, nodeId: 'nodeA' }),
-      _0x5bd0f7.dispatch('dragstart', createEvent(_0x5bd0f7)),
-      _0xba9b48.dispatch('dragover', createEvent(_0xba9b48, 0)),
-      _0x5bd0f7.dispatch('dragend', createEvent(_0x5bd0f7)),
-      assert.equal(_0xb6792d.calls.length, 1),
-      assert.deepEqual(_0xb6792d.calls[0].addedEdges[0].groupOutputSourceOrderByTarget, {
+      store24 = createStore({ edges: edges10, incoming: incoming5 });
+    (bindRefThumbOrderDrag({ owner: {}, container: container9, store: store24, nodeId: 'nodeA' }),
+      store23.dispatch('dragstart', createEvent(store23)),
+      store22.dispatch('dragover', createEvent(store22, 0)),
+      store23.dispatch('dragend', createEvent(store23)),
+      assert.equal(store24.calls.length, 1),
+      assert.deepEqual(store24.calls[0].addedEdges[0].groupOutputSourceOrderByTarget, {
         nodeA: ['image-2', 'image-1'],
         nodeB: ['image-1', 'image-2'],
       }));
   }),
   test('refThumbDragController: fixed slot swap exchanges refSlot', () => {
-    const _0x128ae1 = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x17f5d5 = createThumb('e1', { slot: 'slotA', sourceId: 'audioA' }),
-      _0x162494 = createThumb('e2', { slot: 'slotB', sourceId: 'audioB' });
-    (_0x128ae1.appendChild(_0x17f5d5), _0x128ae1.appendChild(_0x162494));
-    const _0x1892ab = {
+    const container10 = new FakeElement({ className: 'ref-thumb-container' }),
+      thumb3 = createThumb('e1', { slot: 'slotA', sourceId: 'audioA' }),
+      thumb4 = createThumb('e2', { slot: 'slotB', sourceId: 'audioB' });
+    (container10.appendChild(thumb3), container10.appendChild(thumb4));
+    const edges11 = {
         e1: { id: 'e1', sourceId: 'audioA', targetId: 'target', refSlot: 'slotA' },
         e2: { id: 'e2', sourceId: 'audioB', targetId: 'target', refSlot: 'slotB' },
       },
-      _0x35fd4e = { audioA: { type: 'source-audio' }, audioB: { type: 'ai-audio' } },
-      _0x7b2d98 = createStore({ edges: _0x1892ab, nodes: _0x35fd4e }),
-      _0xfac60b = {};
+      nodes2 = { audioA: { type: 'source-audio' }, audioB: { type: 'ai-audio' } },
+      store25 = createStore({ edges: edges11, nodes: nodes2 }),
+      owner2 = {};
     (bindRefThumbFixedSlotDrag({
-      owner: _0xfac60b,
-      container: _0x128ae1,
-      store: _0x7b2d98,
+      owner: owner2,
+      container: container10,
+      store: store25,
       nodeId: 'target',
       acceptMap: { slotA: 'audio', slotB: 'audio' },
     }),
-      _0x128ae1.dispatch('dragstart', createEvent(_0x17f5d5)),
-      _0x128ae1.dispatch('drop', createEvent(_0x162494)),
-      assert.equal(_0x7b2d98.calls.length, 1),
-      assert.deepEqual(_0x7b2d98.calls[0].removeIds, ['e1', 'e2']),
+      container10.dispatch('dragstart', createEvent(thumb3)),
+      container10.dispatch('drop', createEvent(thumb4)),
+      assert.equal(store25.calls.length, 1),
+      assert.deepEqual(store25.calls[0].removeIds, ['e1', 'e2']),
       assert.deepEqual(
-        _0x7b2d98.calls[0].addedEdges.map((_0x5dc32b) => [_0x5dc32b.id, _0x5dc32b.refSlot]),
+        store25.calls[0].addedEdges.map((item12) => [item12.id, item12.refSlot]),
         [
           ['e1', 'slotB'],
           ['e2', 'slotA'],
         ],
       ),
-      assert.equal(_0xfac60b._fixedSlotDrag, null));
+      assert.equal(owner2._fixedSlotDrag, null));
   }),
   test('refThumbDragController: fixed slot drag still works when order binding also runs', () => {
-    const _0x4198d8 = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x58f74c = createThumb('e1', { slot: 'slotA', sourceId: 'audioA' }),
-      _0x477783 = createThumb('e2', { slot: 'slotB', sourceId: 'audioB' });
-    (_0x4198d8.appendChild(_0x58f74c), _0x4198d8.appendChild(_0x477783));
-    const _0x20fa6d = {
+    const container11 = new FakeElement({ className: 'ref-thumb-container' }),
+      thumb5 = createThumb('e1', { slot: 'slotA', sourceId: 'audioA' }),
+      thumb6 = createThumb('e2', { slot: 'slotB', sourceId: 'audioB' });
+    (container11.appendChild(thumb5), container11.appendChild(thumb6));
+    const edges12 = {
         e1: { id: 'e1', sourceId: 'audioA', targetId: 'target', refSlot: 'slotA' },
         e2: { id: 'e2', sourceId: 'audioB', targetId: 'target', refSlot: 'slotB' },
       },
-      _0xb36851 = { audioA: { type: 'source-audio' }, audioB: { type: 'ai-audio' } },
-      _0x27a2d3 = createStore({ edges: _0x20fa6d, nodes: _0xb36851 }),
-      _0x3a3718 = {};
-    (bindRefThumbOrderDrag({ owner: _0x3a3718, container: _0x4198d8, store: _0x27a2d3, nodeId: 'target' }),
+      nodes3 = { audioA: { type: 'source-audio' }, audioB: { type: 'ai-audio' } },
+      store26 = createStore({ edges: edges12, nodes: nodes3 }),
+      owner3 = {};
+    (bindRefThumbOrderDrag({ owner: owner3, container: container11, store: store26, nodeId: 'target' }),
       bindRefThumbFixedSlotDrag({
-        owner: _0x3a3718,
-        container: _0x4198d8,
-        store: _0x27a2d3,
+        owner: owner3,
+        container: container11,
+        store: store26,
         nodeId: 'target',
         acceptMap: { slotA: 'audio', slotB: 'audio' },
       }),
-      _0x4198d8.dispatch('dragstart', createEvent(_0x58f74c)),
-      _0x4198d8.dispatch('drop', createEvent(_0x477783)),
-      assert.equal(_0x27a2d3.calls.length, 1),
-      assert.deepEqual(_0x27a2d3.calls[0].removeIds, ['e1', 'e2']),
+      container11.dispatch('dragstart', createEvent(thumb5)),
+      container11.dispatch('drop', createEvent(thumb6)),
+      assert.equal(store26.calls.length, 1),
+      assert.deepEqual(store26.calls[0].removeIds, ['e1', 'e2']),
       assert.deepEqual(
-        _0x27a2d3.calls[0].addedEdges.map((_0x16ce8a) => [_0x16ce8a.id, _0x16ce8a.refSlot]),
+        store26.calls[0].addedEdges.map((item13) => [item13.id, item13.refSlot]),
         [
           ['e1', 'slotB'],
           ['e2', 'slotA'],
@@ -544,35 +539,35 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
       ));
   }),
   test('refThumbDragController: fixed image slots swap refSlot', () => {
-    const _0x41ea0e = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x573045 = createThumb('e1', { slot: 'replaceTarget', kind: 'image', sourceId: 'imageA' }),
-      _0x3162ae = createThumb('e2', { slot: 'replacedImage', kind: 'image', sourceId: 'imageB' });
-    (_0x41ea0e.appendChild(_0x573045), _0x41ea0e.appendChild(_0x3162ae));
-    const _0x51fe62 = {
+    const container12 = new FakeElement({ className: 'ref-thumb-container' }),
+      el13 = createThumb('e1', { slot: 'replaceTarget', kind: 'image', sourceId: 'imageA' }),
+      el14 = createThumb('e2', { slot: 'replacedImage', kind: 'image', sourceId: 'imageB' });
+    (container12.appendChild(el13), container12.appendChild(el14));
+    const edges13 = {
         e1: { id: 'e1', sourceId: 'imageA', targetId: 'target', refSlot: 'replaceTarget' },
         e2: { id: 'e2', sourceId: 'imageB', targetId: 'target', refSlot: 'replacedImage' },
       },
-      _0x223aa7 = { imageA: { type: 'source-image' }, imageB: { type: 'ai-image' } },
-      _0x17d5c8 = createStore({ edges: _0x51fe62, nodes: _0x223aa7 });
+      nodes4 = { imageA: { type: 'source-image' }, imageB: { type: 'ai-image' } },
+      store27 = createStore({ edges: edges13, nodes: nodes4 });
     (bindRefThumbFixedSlotDrag({
       owner: {},
-      container: _0x41ea0e,
-      store: _0x17d5c8,
+      container: container12,
+      store: store27,
       nodeId: 'target',
       acceptMap: { replaceTarget: 'image', replacedImage: 'image' },
     }),
-      _0x41ea0e.dispatch('dragstart', createEvent(_0x573045)),
-      _0x41ea0e.dispatch('dragover', createEvent(_0x3162ae)),
+      container12.dispatch('dragstart', createEvent(el13)),
+      container12.dispatch('dragover', createEvent(el14)),
       assert.deepEqual(
-        _0x41ea0e.children.map((_0x4a2341) => _0x4a2341.dataset.edgeId),
+        container12.children.map((el15) => el15.dataset.edgeId),
         ['e1', 'e2'],
       ),
-      assert.equal(String(_0x573045.style.transform || ''), ''),
-      assert.equal(String(_0x3162ae.style.transform || ''), ''),
-      _0x41ea0e.dispatch('drop', createEvent(_0x3162ae)),
-      assert.equal(_0x17d5c8.calls.length, 1),
+      assert.equal(String(el13.style.transform || ''), ''),
+      assert.equal(String(el14.style.transform || ''), ''),
+      container12.dispatch('drop', createEvent(el14)),
+      assert.equal(store27.calls.length, 1),
       assert.deepEqual(
-        _0x17d5c8.calls[0].addedEdges.map((_0x1f2f05) => [_0x1f2f05.id, _0x1f2f05.refSlot]),
+        store27.calls[0].addedEdges.map((item14) => [item14.id, item14.refSlot]),
         [
           ['e1', 'replacedImage'],
           ['e2', 'replaceTarget'],
@@ -580,45 +575,45 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
       ));
   }),
   test('refThumbDragController: fixed slot drop to empty slot moves one edge', () => {
-    const _0x2d9f3e = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x472666 = createThumb('e1', { slot: 'slotA', sourceId: 'audioA' }),
-      _0xf65eb4 = createThumb('', { slot: 'slotB', tagName: 'button' });
-    (_0x2d9f3e.appendChild(_0x472666), _0x2d9f3e.appendChild(_0xf65eb4));
-    const _0x5219a3 = { e1: { id: 'e1', sourceId: 'audioA', targetId: 'target', refSlot: 'slotA' } },
-      _0x31da9f = { audioA: { type: 'source-audio' } },
-      _0x94de63 = createStore({ edges: _0x5219a3, nodes: _0x31da9f });
+    const container13 = new FakeElement({ className: 'ref-thumb-container' }),
+      thumb7 = createThumb('e1', { slot: 'slotA', sourceId: 'audioA' }),
+      thumb8 = createThumb('', { slot: 'slotB', tagName: 'button' });
+    (container13.appendChild(thumb7), container13.appendChild(thumb8));
+    const edges14 = { e1: { id: 'e1', sourceId: 'audioA', targetId: 'target', refSlot: 'slotA' } },
+      nodes5 = { audioA: { type: 'source-audio' } },
+      store28 = createStore({ edges: edges14, nodes: nodes5 });
     (bindRefThumbFixedSlotDrag({
       owner: {},
-      container: _0x2d9f3e,
-      store: _0x94de63,
+      container: container13,
+      store: store28,
       nodeId: 'target',
       acceptMap: { slotA: 'audio', slotB: 'audio' },
     }),
-      _0x2d9f3e.dispatch('dragstart', createEvent(_0x472666)),
-      _0x2d9f3e.dispatch('dragover', createEvent(_0xf65eb4)),
+      container13.dispatch('dragstart', createEvent(thumb7)),
+      container13.dispatch('dragover', createEvent(thumb8)),
       assert.deepEqual(
-        _0x2d9f3e.children.map((_0x14663a) => _0x14663a.dataset.edgeId || ''),
+        container13.children.map((el16) => el16.dataset.edgeId || ''),
         ['e1', ''],
       ),
-      _0x2d9f3e.dispatch('drop', createEvent(_0xf65eb4)),
-      assert.equal(_0x94de63.calls.length, 1),
-      assert.deepEqual(_0x94de63.calls[0].removeIds, ['e1']),
+      container13.dispatch('drop', createEvent(thumb8)),
+      assert.equal(store28.calls.length, 1),
+      assert.deepEqual(store28.calls[0].removeIds, ['e1']),
       assert.deepEqual(
-        _0x94de63.calls[0].addedEdges.map((_0xd1519a) => [_0xd1519a.id, _0xd1519a.refSlot]),
+        store28.calls[0].addedEdges.map((item15) => [item15.id, item15.refSlot]),
         [['e1', 'slotB']],
       ));
   }),
   test('refThumbDragController: fixed slot rejects type mismatch and invalid edges', () => {
-    const _0xaedb0d = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x25d4ba = createThumb('imageEdge', { slot: 'imageSlot', sourceId: 'img' }),
-      _0x175606 = createThumb('', { slot: 'audioSlot', tagName: 'button' }),
-      _0x426a00 = createThumb('otherEdge', { slot: 'imageSlot', sourceId: 'img2' }),
-      _0x28a8b7 = createThumb('groupEdge', { slot: 'imageSlot', sourceId: 'img3' });
-    (_0xaedb0d.appendChild(_0x25d4ba),
-      _0xaedb0d.appendChild(_0x175606),
-      _0xaedb0d.appendChild(_0x426a00),
-      _0xaedb0d.appendChild(_0x28a8b7));
-    const _0x2ba3b3 = {
+    const container14 = new FakeElement({ className: 'ref-thumb-container' }),
+      thumb9 = createThumb('imageEdge', { slot: 'imageSlot', sourceId: 'img' }),
+      thumb10 = createThumb('', { slot: 'audioSlot', tagName: 'button' }),
+      thumb11 = createThumb('otherEdge', { slot: 'imageSlot', sourceId: 'img2' }),
+      thumb12 = createThumb('groupEdge', { slot: 'imageSlot', sourceId: 'img3' });
+    (container14.appendChild(thumb9),
+      container14.appendChild(thumb10),
+      container14.appendChild(thumb11),
+      container14.appendChild(thumb12));
+    const edges15 = {
         imageEdge: { id: 'imageEdge', sourceId: 'img', targetId: 'target', refSlot: 'imageSlot' },
         otherEdge: { id: 'otherEdge', sourceId: 'img2', targetId: 'other', refSlot: 'imageSlot' },
         groupEdge: {
@@ -629,100 +624,96 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           isGroupShared: true,
         },
       },
-      _0x722da8 = {
+      nodes6 = {
         img: { type: 'source-image' },
         img2: { type: 'source-image' },
         img3: { type: 'source-image' },
       },
-      _0x3ba26f = createStore({ edges: _0x2ba3b3, nodes: _0x722da8 });
+      store29 = createStore({ edges: edges15, nodes: nodes6 });
     (bindRefThumbFixedSlotDrag({
       owner: {},
-      container: _0xaedb0d,
-      store: _0x3ba26f,
+      container: container14,
+      store: store29,
       nodeId: 'target',
       acceptMap: { imageSlot: 'image', audioSlot: 'audio' },
     }),
-      _0xaedb0d.dispatch('dragstart', createEvent(_0x25d4ba)),
-      _0xaedb0d.dispatch('drop', createEvent(_0x175606)),
-      _0xaedb0d.dispatch('dragstart', createEvent(_0x426a00)),
-      _0xaedb0d.dispatch('drop', createEvent(_0x175606)),
-      _0xaedb0d.dispatch('dragstart', createEvent(_0x28a8b7)),
-      _0xaedb0d.dispatch('drop', createEvent(_0x175606)),
-      assert.equal(_0x3ba26f.calls.length, 0));
+      container14.dispatch('dragstart', createEvent(thumb9)),
+      container14.dispatch('drop', createEvent(thumb10)),
+      container14.dispatch('dragstart', createEvent(thumb11)),
+      container14.dispatch('drop', createEvent(thumb10)),
+      container14.dispatch('dragstart', createEvent(thumb12)),
+      container14.dispatch('drop', createEvent(thumb10)),
+      assert.equal(store29.calls.length, 0));
   }),
   test('refThumbDragController: fixed slot group shared edge moves backing group input ref', () => {
-    const _0x1e54d3 = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x1fef6d = createThumb('groupEdge', { slot: 'imageSlot', sourceId: 'img' }),
-      _0x5ab823 = createThumb('', { slot: 'otherImageSlot', tagName: 'button' });
-    (_0x1e54d3.appendChild(_0x1fef6d), _0x1e54d3.appendChild(_0x5ab823));
-    const _0x6d76c = {
+    const container15 = new FakeElement({ className: 'ref-thumb-container' }),
+      thumb13 = createThumb('groupEdge', { slot: 'imageSlot', sourceId: 'img' }),
+      thumb14 = createThumb('', { slot: 'otherImageSlot', tagName: 'button' });
+    (container15.appendChild(thumb13), container15.appendChild(thumb14));
+    const edges16 = {
         groupEdge: { id: 'groupEdge', sourceId: 'img', targetId: 'group', refSlot: 'imageSlot' },
       },
-      _0x27bfa0 = [{ ..._0x6d76c.groupEdge, isGroupShared: true, effectiveTargetId: 'target' }],
-      _0x94ab20 = {},
-      _0x2642ef = createStore({
-        edges: _0x6d76c,
-        incoming: _0x27bfa0,
+      incoming6 = [{ ...edges16.groupEdge, isGroupShared: true, effectiveTargetId: 'target' }],
+      owner4 = {},
+      store30 = createStore({
+        edges: edges16,
+        incoming: incoming6,
         nodes: { img: { type: 'source-image' } },
       });
     (bindRefThumbFixedSlotDrag({
-      owner: _0x94ab20,
-      container: _0x1e54d3,
-      store: _0x2642ef,
+      owner: owner4,
+      container: container15,
+      store: store30,
       nodeId: 'target',
       acceptMap: { imageSlot: 'image', otherImageSlot: 'image' },
     }),
-      _0x1e54d3.dispatch('dragstart', createEvent(_0x1fef6d)),
-      _0x1e54d3.dispatch('drop', createEvent(_0x5ab823)),
-      assert.equal(_0x94ab20._fixedSlotDrag, null),
-      assert.equal(_0x2642ef.calls.length, 1),
-      assert.deepEqual(_0x2642ef.calls[0].removeIds, ['groupEdge']),
+      container15.dispatch('dragstart', createEvent(thumb13)),
+      container15.dispatch('drop', createEvent(thumb14)),
+      assert.equal(owner4._fixedSlotDrag, null),
+      assert.equal(store30.calls.length, 1),
+      assert.deepEqual(store30.calls[0].removeIds, ['groupEdge']),
       assert.deepEqual(
-        _0x2642ef.calls[0].addedEdges.map((_0x1f6a54) => [
-          _0x1f6a54.id,
-          _0x1f6a54.targetId,
-          _0x1f6a54.refSlot,
-          _0x1f6a54.isGroupShared,
+        store30.calls[0].addedEdges.map((item16) => [
+          item16.id,
+          item16.targetId,
+          item16.refSlot,
+          item16.isGroupShared,
         ]),
         [['groupEdge', 'group', 'otherImageSlot', undefined]],
       ));
   }),
   test('refThumbDragController: fixed slot group shared refs swap backing group input refs', () => {
-    const _0x322d4b = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x4ac807 = createThumb('groupEdgeA', { slot: 'replaceTarget', sourceId: 'imageA' }),
-      _0x1d00bd = createThumb('groupEdgeB', { slot: 'replacedImage', sourceId: 'imageB' });
-    (_0x322d4b.appendChild(_0x4ac807), _0x322d4b.appendChild(_0x1d00bd));
-    const _0x4c7e0d = {
+    const container16 = new FakeElement({ className: 'ref-thumb-container' }),
+      thumb15 = createThumb('groupEdgeA', { slot: 'replaceTarget', sourceId: 'imageA' }),
+      thumb16 = createThumb('groupEdgeB', { slot: 'replacedImage', sourceId: 'imageB' });
+    (container16.appendChild(thumb15), container16.appendChild(thumb16));
+    const edges17 = {
         groupEdgeA: { id: 'groupEdgeA', sourceId: 'imageA', targetId: 'group' },
         groupEdgeB: { id: 'groupEdgeB', sourceId: 'imageB', targetId: 'group' },
       },
-      _0x378616 = [
-        { ..._0x4c7e0d.groupEdgeA, isGroupShared: true, sharedGroupId: 'group', effectiveTargetId: 'target' },
-        { ..._0x4c7e0d.groupEdgeB, isGroupShared: true, sharedGroupId: 'group', effectiveTargetId: 'target' },
+      incoming7 = [
+        { ...edges17.groupEdgeA, isGroupShared: true, sharedGroupId: 'group', effectiveTargetId: 'target' },
+        { ...edges17.groupEdgeB, isGroupShared: true, sharedGroupId: 'group', effectiveTargetId: 'target' },
       ],
-      _0x2a91f6 = {},
-      _0x404802 = createStore({
-        edges: _0x4c7e0d,
-        incoming: _0x378616,
+      owner5 = {},
+      store31 = createStore({
+        edges: edges17,
+        incoming: incoming7,
         nodes: { imageA: { type: 'source-image' }, imageB: { type: 'ai-image' } },
       });
     (bindRefThumbFixedSlotDrag({
-      owner: _0x2a91f6,
-      container: _0x322d4b,
-      store: _0x404802,
+      owner: owner5,
+      container: container16,
+      store: store31,
       nodeId: 'target',
       acceptMap: { replaceTarget: 'image', replacedImage: 'image' },
     }),
-      _0x322d4b.dispatch('dragstart', createEvent(_0x4ac807)),
-      _0x322d4b.dispatch('drop', createEvent(_0x1d00bd)),
-      assert.equal(_0x404802.calls.length, 1),
-      assert.deepEqual(_0x404802.calls[0].removeIds, ['groupEdgeA', 'groupEdgeB']),
+      container16.dispatch('dragstart', createEvent(thumb15)),
+      container16.dispatch('drop', createEvent(thumb16)),
+      assert.equal(store31.calls.length, 1),
+      assert.deepEqual(store31.calls[0].removeIds, ['groupEdgeA', 'groupEdgeB']),
       assert.deepEqual(
-        _0x404802.calls[0].addedEdges.map((_0x1ad643) => [
-          _0x1ad643.id,
-          _0x1ad643.targetId,
-          _0x1ad643.refSlot,
-        ]),
+        store31.calls[0].addedEdges.map((item17) => [item17.id, item17.targetId, item17.refSlot]),
         [
           ['groupEdgeA', 'group', 'replacedImage'],
           ['groupEdgeB', 'group', 'replaceTarget'],
@@ -730,19 +721,19 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
       ));
   }),
   test('refThumbDragController: fixed slot group output refs swap by source order', () => {
-    const _0x1f404a = new FakeElement({ className: 'ref-thumb-container' }),
-      _0x322528 = 'groupEdge::group-output::imageA',
-      _0xb35b98 = 'groupEdge::group-output::imageB',
-      _0x18e1c3 = createThumb(_0x322528, { slot: 'replaceTarget', sourceId: 'imageA' }),
-      _0x9b8746 = createThumb(_0xb35b98, { slot: 'replacedImage', sourceId: 'imageB' });
-    (_0x1f404a.appendChild(_0x18e1c3), _0x1f404a.appendChild(_0x9b8746));
-    const _0xca3145 = {
+    const container17 = new FakeElement({ className: 'ref-thumb-container' }),
+      id7 = 'groupEdge::group-output::imageA',
+      id8 = 'groupEdge::group-output::imageB',
+      thumb17 = createThumb(id7, { slot: 'replaceTarget', sourceId: 'imageA' }),
+      thumb18 = createThumb(id8, { slot: 'replacedImage', sourceId: 'imageB' });
+    (container17.appendChild(thumb17), container17.appendChild(thumb18));
+    const edges18 = {
         groupEdge: { id: 'groupEdge', sourceId: 'group', targetId: 'target', isGroupOutputLink: true },
       },
-      _0x1e9000 = [
+      incoming8 = [
         {
-          ..._0xca3145.groupEdge,
-          id: _0x322528,
+          ...edges18.groupEdge,
+          id: id7,
           sourceId: 'imageA',
           refSlot: 'replaceTarget',
           isGroupOutput: true,
@@ -751,8 +742,8 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           effectiveTargetId: 'target',
         },
         {
-          ..._0xca3145.groupEdge,
-          id: _0xb35b98,
+          ...edges18.groupEdge,
+          id: id8,
           sourceId: 'imageB',
           refSlot: 'replacedImage',
           isGroupOutput: true,
@@ -761,56 +752,56 @@ function createStore({ edges: _0x22fa3e, nodes: nodes = {}, incoming: _0x30d620 
           effectiveTargetId: 'target',
         },
       ],
-      _0x52fc42 = {},
-      _0x835b9f = createStore({
-        edges: _0xca3145,
-        incoming: _0x1e9000,
+      owner6 = {},
+      store32 = createStore({
+        edges: edges18,
+        incoming: incoming8,
         nodes: { imageA: { type: 'source-image' }, imageB: { type: 'ai-image' } },
       });
     (bindRefThumbFixedSlotDrag({
-      owner: _0x52fc42,
-      container: _0x1f404a,
-      store: _0x835b9f,
+      owner: owner6,
+      container: container17,
+      store: store32,
       nodeId: 'target',
       acceptMap: { replaceTarget: 'image', replacedImage: 'image' },
     }),
-      _0x1f404a.dispatch('dragstart', createEvent(_0x18e1c3)),
-      _0x1f404a.dispatch('drop', createEvent(_0x9b8746)),
-      assert.equal(_0x835b9f.calls.length, 1),
-      assert.deepEqual(_0x835b9f.calls[0].removeIds, ['groupEdge']),
+      container17.dispatch('dragstart', createEvent(thumb17)),
+      container17.dispatch('drop', createEvent(thumb18)),
+      assert.equal(store32.calls.length, 1),
+      assert.deepEqual(store32.calls[0].removeIds, ['groupEdge']),
       assert.deepEqual(
-        _0x835b9f.calls[0].addedEdges.map((_0x418ad5) => [_0x418ad5.id, _0x418ad5.groupOutputSourceOrder]),
+        store32.calls[0].addedEdges.map((item18) => [item18.id, item18.groupOutputSourceOrder]),
         [['groupEdge', ['imageB', 'imageA']]],
       ));
   }),
   test('refThumbDragController: fixed slot binding refreshes accept map', () => {
-    const _0x5cb67e = new FakeElement({ className: 'ref-thumb-container' }),
-      _0xc02fbc = createThumb('e1', { slot: 'slotA', sourceId: 'audioA' }),
-      _0x6aa989 = createThumb('', { slot: 'slotB', tagName: 'button' });
-    (_0x5cb67e.appendChild(_0xc02fbc), _0x5cb67e.appendChild(_0x6aa989));
-    const _0xbd1c4e = { e1: { id: 'e1', sourceId: 'audioA', targetId: 'target', refSlot: 'slotA' } },
-      _0x3f6ff9 = { audioA: { type: 'source-audio' } },
-      _0x5a33bd = createStore({ edges: _0xbd1c4e, nodes: _0x3f6ff9 }),
-      _0x505001 = {};
+    const container18 = new FakeElement({ className: 'ref-thumb-container' }),
+      thumb19 = createThumb('e1', { slot: 'slotA', sourceId: 'audioA' }),
+      thumb20 = createThumb('', { slot: 'slotB', tagName: 'button' });
+    (container18.appendChild(thumb19), container18.appendChild(thumb20));
+    const edges19 = { e1: { id: 'e1', sourceId: 'audioA', targetId: 'target', refSlot: 'slotA' } },
+      nodes7 = { audioA: { type: 'source-audio' } },
+      store33 = createStore({ edges: edges19, nodes: nodes7 }),
+      owner7 = {};
     (bindRefThumbFixedSlotDrag({
-      owner: _0x505001,
-      container: _0x5cb67e,
-      store: _0x5a33bd,
+      owner: owner7,
+      container: container18,
+      store: store33,
       nodeId: 'target',
       acceptMap: { slotA: 'audio', slotB: 'image' },
     }),
       bindRefThumbFixedSlotDrag({
-        owner: _0x505001,
-        container: _0x5cb67e,
-        store: _0x5a33bd,
+        owner: owner7,
+        container: container18,
+        store: store33,
         nodeId: 'target',
         acceptMap: { slotA: 'audio', slotB: 'audio' },
       }),
-      _0x5cb67e.dispatch('dragstart', createEvent(_0xc02fbc)),
-      _0x5cb67e.dispatch('drop', createEvent(_0x6aa989)),
-      assert.equal(_0x5a33bd.calls.length, 1),
+      container18.dispatch('dragstart', createEvent(thumb19)),
+      container18.dispatch('drop', createEvent(thumb20)),
+      assert.equal(store33.calls.length, 1),
       assert.deepEqual(
-        _0x5a33bd.calls[0].addedEdges.map((_0x13d116) => [_0x13d116.id, _0x13d116.refSlot]),
+        store33.calls[0].addedEdges.map((item19) => [item19.id, item19.refSlot]),
         [['e1', 'slotB']],
       ));
   }));

@@ -352,11 +352,11 @@ const wrap = document.getElementById('v2-wrap'),
   canvas = document.getElementById('v2-canvas'),
   canvasStage = canvas?.closest?.('.v2-canvas-stage') || wrap,
   debug = document.getElementById('v2-debug'),
-  translateAppText = (_0x33c9a8, _0xd96e48 = {}) => t('app.' + _0x33c9a8, _0xd96e48),
+  translateAppText = (value, item = {}) => t('app.' + value, item),
   appProjectContext = createAppProjectContext({ windowObject: window }),
   syncCanvasViewportScreenOrigin = () => {
-    const _0x5cba12 = canvasStage?.getBoundingClientRect?.();
-    graphStore.setViewportScreenOrigin?.(_0x5cba12?.left || 0, _0x5cba12?.top || 0);
+    const box = canvasStage?.getBoundingClientRect?.();
+    graphStore.setViewportScreenOrigin?.(box?.left || 0, box?.top || 0);
   };
 syncCanvasViewportScreenOrigin();
 const canvasStageResizeObserver =
@@ -365,10 +365,12 @@ const canvasStageResizeObserver =
     : null;
 (canvasStageResizeObserver?.observe(canvasStage),
   window.addEventListener('resize', syncCanvasViewportScreenOrigin),
-  registerPageTeardown(window, () => runCleanupSteps([
-    () => canvasStageResizeObserver?.disconnect(),
-    () => window.removeEventListener('resize', syncCanvasViewportScreenOrigin),
-  ])),
+  registerPageTeardown(window, () =>
+    runCleanupSteps([
+      () => canvasStageResizeObserver?.disconnect(),
+      () => window.removeEventListener('resize', syncCanvasViewportScreenOrigin),
+    ]),
+  ),
   installRendererEventBindingGuard(),
   installImageGenerationExecution({
     store: appStore,
@@ -458,12 +460,12 @@ let workspaceModeCoordinator = null,
   storyWorkspaceApi = null,
   workspaceProjectPackageCoordinator = null;
 const workspaceProjectPackages = {
-    exportProject: (..._0x5e7bbb) => workspaceProjectPackageCoordinator?.exportProject?.(..._0x5e7bbb),
-    importProject: (..._0xca325b) => workspaceProjectPackageCoordinator?.importProject?.(..._0xca325b),
-    hasProjectPackageDrag: (..._0x589156) =>
-      workspaceProjectPackageCoordinator?.hasProjectPackageDrag?.(..._0x589156) === true,
-    importProjectFromDrop: (..._0x212805) =>
-      workspaceProjectPackageCoordinator?.importProjectFromDrop?.(..._0x212805) === true,
+    exportProject: (...args) => workspaceProjectPackageCoordinator?.exportProject?.(...args),
+    importProject: (...args2) => workspaceProjectPackageCoordinator?.importProject?.(...args2),
+    hasProjectPackageDrag: (...args3) =>
+      workspaceProjectPackageCoordinator?.hasProjectPackageDrag?.(...args3) === true,
+    importProjectFromDrop: (...args4) =>
+      workspaceProjectPackageCoordinator?.importProjectFromDrop?.(...args4) === true,
   },
   agentModelSettings = createAgentModelSettings({ windowObject: window }),
   replacementStudioApplication = createReplacementStudioApplication({
@@ -484,17 +486,17 @@ const workspaceProjectPackages = {
     loadWorkspace: fetchReplacementStudioWorkspaceFromServer,
     saveWorkspace: saveReplacementStudioWorkspaceToServer,
     projectPackages: workspaceProjectPackages,
-    createOutputCanvas: (_0x1f5f3e) => createPersonReplacementOutputCanvasFromWorkspace(_0x1f5f3e),
-    saveAssetPackageItem: (_0x5cbeda) =>
-      assetManagerModulePromise.then(({ assetManager: _0x58ddcf }) =>
-        _0x58ddcf.upsertMediaAssetPackage(_0x5cbeda),
+    createOutputCanvas: (key) => createPersonReplacementOutputCanvasFromWorkspace(key),
+    saveAssetPackageItem: (index) =>
+      assetManagerModulePromise.then(({ assetManager: assetManager }) =>
+        assetManager.upsertMediaAssetPackage(index),
       ),
     persistOutputFromUrl: saveOutputFromUrl,
     onRequestClose: () => {
       workspaceModeCoordinator?.getMode?.() === REPLACEMENT_STUDIO_MODE_ID &&
         workspaceModeCoordinator.setMode('canvas');
     },
-    showToast: (..._0x142903) => window.showToast?.(..._0x142903),
+    showToast: (...args5) => window.showToast?.(...args5),
   }),
   replacementStudioModelGate = new ReplacementStudioModelGate({
     documentObject: document,
@@ -505,7 +507,7 @@ const workspaceProjectPackages = {
     onReady: () => {
       workspaceModeCoordinator?.resumePendingMode?.(REPLACEMENT_STUDIO_MODE_ID);
     },
-    onNotify: (..._0x5c6a53) => window.showToast?.(..._0x5c6a53),
+    onNotify: (...args6) => window.showToast?.(...args6),
   }),
   storyboard3DWorkspaceController = createStoryboard3DWorkspaceController({
     documentObject: document,
@@ -531,40 +533,40 @@ storyWorkspaceApi = initStoryWorkspace({
   splitEpisodeExperimental: guardStoryModelTaskCredentials(splitStoryEpisodeExperimental),
   extractDocumentText: extractStoryDocumentText,
   analyzeSourceVideo: guardStoryModelTaskCredentials(analyzeVideoReplicationClip),
-  createEpisodeCanvas: (_0x4b6612) => createStoryEpisodeCanvasFromWorkspace(_0x4b6612),
-  createProjectCanvas: (_0xbcb385) => createStoryProjectCanvasFromWorkspace(_0xbcb385),
-  subscribeCanvasNodeDeletions: (_0x2f8b67) =>
-    subscribeNodeDeletions((_0xdfd5fc) =>
-      _0x2f8b67({ canvasId: CanvasTabManager.getActiveCanvasId(), nodes: _0xdfd5fc }),
+  createEpisodeCanvas: (result) => createStoryEpisodeCanvasFromWorkspace(result),
+  createProjectCanvas: (data) => createStoryProjectCanvasFromWorkspace(data),
+  subscribeCanvasNodeDeletions: (handler) =>
+    subscribeNodeDeletions((nodes) =>
+      handler({ canvasId: CanvasTabManager.getActiveCanvasId(), nodes: nodes }),
     ),
-  subscribeCanvasMediaNodeChanges: (_0x38ccf4) =>
+  subscribeCanvasMediaNodeChanges: (listener) =>
     subscribeStoryCanvasMediaNodeChanges({
       graphStore: graphStore,
       getActiveCanvasId: () => CanvasTabManager.getActiveCanvasId(),
-      listener: _0x38ccf4,
+      listener: listener,
     }),
   getCanvasMediaSnapshot: () =>
     getStoryCanvasMediaNodeSnapshot({
       graphStore: graphStore,
       getActiveCanvasId: () => CanvasTabManager.getActiveCanvasId(),
     }),
-  syncClipFrameToCanvas: (_0x43f002) => syncStoryClipFrameToCanvasFromWorkspace(_0x43f002),
-  deleteCanvasNodes: (_0x19d7b2) => deleteStoryCanvasNodesFromWorkspace(_0x19d7b2),
+  syncClipFrameToCanvas: (options) => syncStoryClipFrameToCanvasFromWorkspace(options),
+  deleteCanvasNodes: (target) => deleteStoryCanvasNodesFromWorkspace(target),
   generateAssetImage: guardStoryModelTaskCredentials(generateImage),
-  saveAssetPackageItem: (_0x1a83d8) =>
-    assetManagerModulePromise.then(({ assetManager: _0x456e02 }) =>
-      _0x456e02.upsertMediaAssetPackage(_0x1a83d8),
+  saveAssetPackageItem: (source) =>
+    assetManagerModulePromise.then(({ assetManager: assetManager2 }) =>
+      assetManager2.upsertMediaAssetPackage(source),
     ),
   loadWorkspace: fetchStoryWorkspaceFromServer,
   saveWorkspace: saveStoryWorkspaceToServer,
   projectPackages: workspaceProjectPackages,
-  requestWorkspaceMode: (..._0x495b3d) => workspaceModeCoordinator?.setMode?.(..._0x495b3d),
+  requestWorkspaceMode: (...args7) => workspaceModeCoordinator?.setMode?.(...args7),
 });
 const getCanvasPresentationContext = () => {
-  const _0x1c57c3 = graphStore.getStateRaw?.() || graphStore.getState?.() || {};
+  const viewport = graphStore.getStateRaw?.() || graphStore.getState?.() || {};
   return {
-    nodeCount: Object.keys(_0x1c57c3.nodes || {}).length,
-    viewport: _0x1c57c3.viewport || null,
+    nodeCount: Object.keys(viewport.nodes || {}).length,
+    viewport: viewport.viewport || null,
   };
 };
 ((workspaceModeCoordinator = createWorkspaceModeCoordinator({
@@ -573,16 +575,14 @@ const getCanvasPresentationContext = () => {
   getCanvasPresentationContext: getCanvasPresentationContext,
   canvasWorkspace: canvasWorkspacePresentation,
   storyWorkspace: {
-    activate: (_0x18a144) => storyWorkspaceApi?.activate?.({ ..._0x18a144, surface: 'story' }),
-    deactivate: (_0x595fb5) => storyWorkspaceApi?.deactivate?.(_0x595fb5),
-    onActivated: () =>
-      showStoryWorkspaceBetaNotice({ documentObject: document, windowObject: window }),
+    activate: (args8) => storyWorkspaceApi?.activate?.({ ...args8, surface: 'story' }),
+    deactivate: (next) => storyWorkspaceApi?.deactivate?.(next),
+    onActivated: () => showStoryWorkspaceBetaNotice({ documentObject: document, windowObject: window }),
   },
   replicationWorkspace: {
-    activate: (_0x4079be) => storyWorkspaceApi?.activate?.({ ..._0x4079be, surface: 'replication' }),
-    deactivate: (_0x4a4e95) => storyWorkspaceApi?.deactivate?.(_0x4a4e95),
-    onActivated: () =>
-      showReplicationWorkspaceBetaNotice({ documentObject: document, windowObject: window }),
+    activate: (args9) => storyWorkspaceApi?.activate?.({ ...args9, surface: 'replication' }),
+    deactivate: (current) => storyWorkspaceApi?.deactivate?.(current),
+    onActivated: () => showReplicationWorkspaceBetaNotice({ documentObject: document, windowObject: window }),
   },
   storyboard3DWorkspace: {
     isAvailable: () => isStoryboard3DWorkspaceAvailable(window),
@@ -591,43 +591,44 @@ const getCanvasPresentationContext = () => {
   },
   replacementStudio: {
     canActivate: () => isReplacementStudioAuthorized(window),
-    requestActivation: ({ retry: _0x460d79 }) =>
-      requestReplacementStudioAuthorization({ windowObject: window, onSuccess: _0x460d79 }),
+    requestActivation: ({ retry: retry }) =>
+      requestReplacementStudioAuthorization({ windowObject: window, onSuccess: retry }),
     activate: () => replacementStudioModelGate.requestOpen(() => replacementStudioApplication.open()),
     deactivate: () => replacementStudioApplication.close(),
-    onActivated: () =>
-      showReplacementStudioBetaNotice({ documentObject: document, windowObject: window }),
+    onActivated: () => showReplacementStudioBetaNotice({ documentObject: document, windowObject: window }),
   },
 })),
   (workspaceProjectPackageCoordinator = createWorkspaceProjectPackageCoordinator({
     windowObject: window,
     getStoryWorkspace: () => storyWorkspaceApi,
     getReplacementStudio: () => replacementStudioApplication,
-    requestWorkspaceMode: (..._0x1b0d61) => workspaceModeCoordinator?.setMode?.(..._0x1b0d61),
+    requestWorkspaceMode: (...args10) => workspaceModeCoordinator?.setMode?.(...args10),
   })));
 const completionNavigation = createCompletionNavigation({
   canvasTabs: CanvasTabManager,
   store: appStore,
-  viewport: { focusNode: (..._0x177753) => appViewport.focusNode(..._0x177753) },
+  viewport: { focusNode: (...args11) => appViewport.focusNode(...args11) },
   replacementStudio: replacementStudioApplication,
   prepareReplacement: () => replacementStudioModelGate.checkStatus(),
-  requestWorkspaceMode: (..._0x140606) => workspaceModeCoordinator?.setMode?.(..._0x140606),
-  showToast: (..._0x277820) => window.showToast?.(..._0x277820),
+  requestWorkspaceMode: (...args12) => workspaceModeCoordinator?.setMode?.(...args12),
+  showToast: (...args13) => window.showToast?.(...args13),
 });
 const workspaceCloseGuard = installWorkspaceCloseGuard({
   windowObject: window,
   getWorkspaces: () => [storyWorkspaceApi],
 });
-registerPageTeardown(window, () => runCleanupSteps([
-  () => workspaceCloseGuard.destroy(),
-  () => workspaceModeCoordinator?.destroy?.(),
-  () => completionNavigation?.destroy?.(),
-  () => canvasWorkspacePresentation?.destroy?.(),
-  () => storyWorkspaceApi?.destroy?.(),
-  () => storyboard3DWorkspaceController?.dispose?.(),
-  () => replacementStudioModelGate?.destroy?.(),
-  () => replacementStudioApplication?.destroy?.(),
-]));
+registerPageTeardown(window, () =>
+  runCleanupSteps([
+    () => workspaceCloseGuard.destroy(),
+    () => workspaceModeCoordinator?.destroy?.(),
+    () => completionNavigation?.destroy?.(),
+    () => canvasWorkspacePresentation?.destroy?.(),
+    () => storyWorkspaceApi?.destroy?.(),
+    () => storyboard3DWorkspaceController?.dispose?.(),
+    () => replacementStudioModelGate?.destroy?.(),
+    () => replacementStudioApplication?.destroy?.(),
+  ]),
+);
 
 const appViewport = createAppViewport({
   graphStore: graphStore,
@@ -640,19 +641,19 @@ const appViewport = createAppViewport({
   fitActionEl: document.getElementById('btnFitAction'),
 });
 (appViewport.installWindowBindings(window),
-  assetManagerModulePromise.then(({ assetManager: _0x30cc90 }) => {}));
+  assetManagerModulePromise.then(({ assetManager: assetManager3 }) => {}));
 const workflowEntryButton = document.getElementById('btnWorkflows');
 workflowEntryButton &&
   ((workflowEntryButton.hidden = !SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED),
   (workflowEntryButton.disabled = !SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED),
   workflowEntryButton.setAttribute('aria-hidden', String(!SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED)));
 SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED &&
-  import('./src/modules/workflows/WorkflowManager.js').then(({ workflowManager: _0x515d08 }) => {});
+  import('./src/modules/workflows/WorkflowManager.js').then(({ workflowManager: workflowManager }) => {});
 (import('./src/modules/runninghubAiApp/RunningHubAiAppManager.js').then(
-  ({ runningHubAiAppManager: _0x3f7c91 }) => {},
+  ({ runningHubAiAppManager: runningHubAiAppManager }) => {},
 ),
   import('./src/modules/GenerationHistoryFileManager.js').then(
-    ({ generationHistoryFileManager: _0xab858d }) => {},
+    ({ generationHistoryFileManager: generationHistoryFileManager }) => {},
   ),
   initAppNodeEntry({
     graphStore: graphStore,
@@ -704,61 +705,60 @@ const appCanvasNodeFlows = createAppCanvasNodeFlows({
     getCurrentProjectId: appProjectContext.getCurrentProjectIdOrNull,
     getCanvasIdentity: () =>
       appProjectContext.getCurrentProjectId() + ':' + CanvasTabManager.getActiveCanvasId(),
-    showToast: (..._0xe3e14) => window.showToast?.(..._0xe3e14),
+    showToast: (...args14) => window.showToast?.(...args14),
   }),
   storyEpisodeCanvasAdapter = createStoryEpisodeCanvasAdapter({
     canvasTabManager: CanvasTabManager,
-    createNodeAtCursor: (..._0x161f7c) => appCanvasNodeFlows.createNodeAtCursor(..._0x161f7c),
+    createNodeAtCursor: (...args15) => appCanvasNodeFlows.createNodeAtCursor(...args15),
     getGraphState: () => graphStore.getStateRaw?.() || graphStore.getState?.() || {},
     getGraphSnapshot: () => graphStore.getState?.() || {},
-    restoreGraphSnapshot: (_0x3cbe5a) => graphStore.loadState(_0x3cbe5a),
-    updateNodeData: (_0x63244c, _0x444065) => graphStore.updateNodeData(_0x63244c, _0x444065),
-    deleteNodes: (_0x39c33d) => graphStore.deleteNodes(_0x39c33d),
-    focusNodes: (..._0x1f11e2) => appViewport.focusNodes(..._0x1f11e2),
+    restoreGraphSnapshot: (entry) => graphStore.loadState(entry),
+    updateNodeData: (record, payload) => graphStore.updateNodeData(record, payload),
+    deleteNodes: (handle) => graphStore.deleteNodes(handle),
+    focusNodes: (...args16) => appViewport.focusNodes(...args16),
     commit: commit,
   });
-createStoryEpisodeCanvasFromWorkspace = (_0x4a3216 = {}) =>
-  createStoryEpisodeCanvas({ ..._0x4a3216, adapter: storyEpisodeCanvasAdapter });
+createStoryEpisodeCanvasFromWorkspace = (args17 = {}) =>
+  createStoryEpisodeCanvas({ ...args17, adapter: storyEpisodeCanvasAdapter });
 const workspaceCanvasMaterializationAdapter = createWorkspaceCanvasMaterializationAdapter({
   canvasTabManager: CanvasTabManager,
-  createNodeAtCursor: (..._0x524dfd) => appCanvasNodeFlows.createNodeAtCursor(..._0x524dfd),
+  createNodeAtCursor: (...args18) => appCanvasNodeFlows.createNodeAtCursor(...args18),
   getGraphState: () => graphStore.getStateRaw?.() || graphStore.getState?.() || {},
   getGraphSnapshot: () => graphStore.getState?.() || {},
-  restoreGraphSnapshot: (_0x330f60) => graphStore.loadState(_0x330f60),
-  updateNodeData: (_0x569f7a, _0x32aaf) => graphStore.updateNodeData(_0x569f7a, _0x32aaf),
-  moveNode: (_0x21a6c8, _0x4baffc, _0xf2b128) =>
-    graphStore.updateNodePosition(_0x21a6c8, _0x4baffc, _0xf2b128),
-  deleteNodes: (_0x52b3a6) => graphStore.deleteNodes(_0x52b3a6),
+  restoreGraphSnapshot: (state) => graphStore.loadState(state),
+  updateNodeData: (config, scope) => graphStore.updateNodeData(config, scope),
+  moveNode: (input, output, value2) => graphStore.updateNodePosition(input, output, value2),
+  deleteNodes: (value3) => graphStore.deleteNodes(value3),
   connectNodes: addEdgeWithPolicies,
-  groupNodes: (_0x54f528, _0x11ddaa) => graphStore.groupNodes(_0x54f528, _0x11ddaa),
-  focusNodes: (..._0x1d63d6) => appViewport.focusNodes(..._0x1d63d6),
-  getNodeSize: (_0x37faef) => getNodeDefaultSize(_0x37faef),
+  groupNodes: (value4, value5) => graphStore.groupNodes(value4, value5),
+  focusNodes: (...args19) => appViewport.focusNodes(...args19),
+  getNodeSize: (value6) => getNodeDefaultSize(value6),
   projectBindingPolicies: [
     storyWorkspaceCanvasMaterializationBindingPolicy,
     personReplacementCanvasMaterializationBindingPolicy,
   ],
   commit: commit,
 });
-((createStoryProjectCanvasFromWorkspace = (_0x4be50f = {}) =>
-  syncStoryProjectCanvas({ ..._0x4be50f, adapter: workspaceCanvasMaterializationAdapter })),
-  (createPersonReplacementOutputCanvasFromWorkspace = (_0x154dbc = {}) =>
+((createStoryProjectCanvasFromWorkspace = (args20 = {}) =>
+  syncStoryProjectCanvas({ ...args20, adapter: workspaceCanvasMaterializationAdapter })),
+  (createPersonReplacementOutputCanvasFromWorkspace = (args21 = {}) =>
     syncPersonReplacementCanvas({
-      ..._0x154dbc,
+      ...args21,
       adapter: workspaceCanvasMaterializationAdapter,
       saveOutputBlob: project.saveOutputBlob,
     })));
 const storyClipFrameCanvasAdapter = createStoryClipFrameCanvasAdapter({
   canvasTabManager: CanvasTabManager,
-  createNodeAtCursor: (..._0x3a9cce) => appCanvasNodeFlows.createNodeAtCursor(..._0x3a9cce),
+  createNodeAtCursor: (...args22) => appCanvasNodeFlows.createNodeAtCursor(...args22),
   getGraphState: () => graphStore.getStateRaw?.() || graphStore.getState?.() || {},
-  updateNodeData: (_0x19e3c3, _0x547d56) => graphStore.updateNodeData(_0x19e3c3, _0x547d56),
-  getNodeSize: (_0x355b3a) => getNodeDefaultSize(_0x355b3a),
+  updateNodeData: (value7, value8) => graphStore.updateNodeData(value7, value8),
+  getNodeSize: (value9) => getNodeDefaultSize(value9),
   commit: commit,
 });
-((syncStoryClipFrameToCanvasFromWorkspace = (_0x321fbc = {}) =>
-  syncStoryClipFrameToCanvas({ ..._0x321fbc, adapter: storyClipFrameCanvasAdapter })),
-  (deleteStoryCanvasNodesFromWorkspace = (_0x530b4d = {}) =>
-    deleteStoryCanvasMediaNodes({ ..._0x530b4d, adapter: storyClipFrameCanvasAdapter })));
+((syncStoryClipFrameToCanvasFromWorkspace = (args23 = {}) =>
+  syncStoryClipFrameToCanvas({ ...args23, adapter: storyClipFrameCanvasAdapter })),
+  (deleteStoryCanvasNodesFromWorkspace = (args24 = {}) =>
+    deleteStoryCanvasMediaNodes({ ...args24, adapter: storyClipFrameCanvasAdapter })));
 const agentConversationStore = createAgentConversationStore({
     windowObject: window,
     getProjectId: appProjectContext.getCurrentProjectId,
@@ -791,9 +791,9 @@ const agentConversationStore = createAgentConversationStore({
       runVideoReverseFromNode: runVideoReverseFromNode,
     },
     translate: t,
-    showToast: (..._0x3dfcd9) => window.showToast?.(..._0x3dfcd9),
-    scheduleFrame: (_0x312866) => requestAnimationFrame(_0x312866),
-    recordCommand: (_0x11df7d) => agentSessionStore.recordCommand(_0x11df7d),
+    showToast: (...args25) => window.showToast?.(...args25),
+    scheduleFrame: (value10) => requestAnimationFrame(value10),
+    recordCommand: (value11) => agentSessionStore.recordCommand(value11),
     history: {
       createCheckpoint: createHistoryCheckpoint,
       undoToCheckpoint: undoToHistoryCheckpoint,
@@ -809,35 +809,35 @@ const agentConversationStore = createAgentConversationStore({
     requestPlanner: requestAgentActionPlan,
   }),
   agentExternalToolRegistry = createDefaultAgentExternalToolRegistry({
-    readUrl: (_0x18f107) => desktopBridge.agentInformation.readUrl(_0x18f107),
+    readUrl: (value12) => desktopBridge.agentInformation.readUrl(value12),
     readDocument: extractStoryDocumentText,
     validateDocument: validateStoryDocumentFile,
   }),
   agentSkillRegistry = createAgentSkillRegistry(),
   refreshAgentSkills = () => refreshInstalledAgentSkills({ registry: agentSkillRegistry }),
   installAgentSkill = () => installAgentSkillFromFolder({ registry: agentSkillRegistry }),
-  saveAgentSkill = (_0x36c78e) =>
-    saveManagedAgentSkill({ registry: agentSkillRegistry, definition: _0x36c78e }),
-  deleteAgentSkill = async (_0x195fa0) => {
-    const _0x4d7481 = await deleteInstalledAgentSkill({
+  saveAgentSkill = (definition) =>
+    saveManagedAgentSkill({ registry: agentSkillRegistry, definition: definition }),
+  deleteAgentSkill = async (request) => {
+    const skillId = await deleteInstalledAgentSkill({
       registry: agentSkillRegistry,
-      request: _0x195fa0,
+      request: request,
     });
     return (
-      _0x4d7481?.success === true &&
+      skillId?.success === true &&
         forgetAgentSkillPreference({
           registry: agentSkillRegistry,
-          skillId: _0x4d7481.skillId,
+          skillId: skillId.skillId,
           windowObject: window,
         }),
-      _0x4d7481
+      skillId
     );
   },
-  setAgentSkillEnabled = (_0x1fd696, _0x34b1e9) =>
+  setAgentSkillEnabled = (skillId2, enabled) =>
     setAgentSkillEnabledPreference({
       registry: agentSkillRegistry,
-      skillId: _0x1fd696,
-      enabled: _0x34b1e9,
+      skillId: skillId2,
+      enabled: enabled,
       windowObject: window,
     });
 void refreshAgentSkills();
@@ -851,39 +851,39 @@ const agentRuntime = createAgentRuntime({
   skillRegistry: agentSkillRegistry,
   assistant: agentModelRequests.assistant,
   skillAuthor: ({
-    message: _0x4201cc,
-    originalMessage: _0x3dace2,
-    clarificationAnswer: _0x589c32,
-    history: _0x4570b7,
-    existingSkills: _0xf32975,
-    operation: _0x1dc8fc,
-    targetSkill: _0x5e3751,
-    repairReason: _0x4eeaa7,
-    signal: _0x4138b4,
-    onTrace: _0x438ea6,
+    message: message,
+    originalMessage: originalMessage,
+    clarificationAnswer: clarificationAnswer,
+    history: history,
+    existingSkills: existingSkills,
+    operation: operation,
+    targetSkill: targetSkill,
+    repairReason: repairReason,
+    signal: signal,
+    onTrace: onTrace,
   }) =>
     requestAgentSkillDraft({
-      message: _0x4201cc,
-      originalMessage: _0x3dace2,
-      clarificationAnswer: _0x589c32,
-      history: _0x4570b7,
-      existingSkills: _0xf32975,
-      operation: _0x1dc8fc,
-      targetSkill: _0x5e3751,
-      repairReason: _0x4eeaa7,
-      signal: _0x4138b4,
-      onTrace: _0x438ea6,
+      message: message,
+      originalMessage: originalMessage,
+      clarificationAnswer: clarificationAnswer,
+      history: history,
+      existingSkills: existingSkills,
+      operation: operation,
+      targetSkill: targetSkill,
+      repairReason: repairReason,
+      signal: signal,
+      onTrace: onTrace,
       settings: { ...agentModelSettings.getSettings(), locale: getLocale() },
     }),
   saveSkill: saveAgentSkill,
   deleteSkill: deleteAgentSkill,
   setSkillEnabled: setAgentSkillEnabled,
-  planner: ({ message: _0x56d82c, context: _0x4d715d, history: _0x2b2bb6, onTrace: _0x2e9753 }) =>
+  planner: ({ message: message2, context: context, history: history2, onTrace: onTrace2 }) =>
     requestAgentActionPlan({
-      message: _0x56d82c,
-      context: _0x4d715d,
-      history: _0x2b2bb6,
-      onTrace: _0x2e9753,
+      message: message2,
+      context: context,
+      history: history2,
+      onTrace: onTrace2,
       settings: { ...agentModelSettings.getSettings(), locale: getLocale() },
     }),
 });
@@ -940,12 +940,12 @@ const uploadAgentMaterial = createAgentMaterialUploader({
   installGlobalScreenshotBridge({
     screenshotApi: desktopBridge.screenshot.isAvailable() ? desktopBridge.screenshot : null,
     createMediaNodeFromBlob: appCanvasNodeFlows.createMediaNodeFromBlob,
-    showToast: (..._0x551463) => window.showToast?.(..._0x551463),
+    showToast: (...args26) => window.showToast?.(...args26),
     translate: translateAppText,
-    executeCanvasCommand: (_0xb9d33c, _0x1f4c87) =>
-      executeCanvasCommand_2(_0xb9d33c, _0x1f4c87, canvasCommandContext),
-    isNodeMounted: (_0x3ecfdd) => window.v2Renderer?.isNodeMounted?.(_0x3ecfdd) === true,
-    scheduleFrame: (_0x2d61bf) => window.requestAnimationFrame(_0x2d61bf),
+    executeCanvasCommand: (value13, value14) =>
+      executeCanvasCommand_2(value13, value14, canvasCommandContext),
+    isNodeMounted: (value15) => window.v2Renderer?.isNodeMounted?.(value15) === true,
+    scheduleFrame: (value16) => window.requestAnimationFrame(value16),
     getCanvasIdentity: () =>
       appProjectContext.getCurrentProjectId() + ':' + CanvasTabManager.getActiveCanvasId(),
   }),
@@ -953,32 +953,32 @@ const uploadAgentMaterial = createAgentMaterialUploader({
     getCanvasIdentity: () =>
       appProjectContext.getCurrentProjectId() + ':' + CanvasTabManager.getActiveCanvasId(),
     textPresetApi: desktopBridge.textPreset.isAvailable() ? desktopBridge.textPreset : null,
-    showToast: (..._0x38ffef) => window.showToast?.(..._0x38ffef),
+    showToast: (...args27) => window.showToast?.(...args27),
     translate: translateAppText,
-    executeCanvasCommand: (_0x16b448, _0x3de349) =>
-      executeCanvasCommand_2(_0x16b448, _0x3de349, canvasCommandContext),
-    isNodeMounted: (_0x234f2b) => window.v2Renderer?.isNodeMounted?.(_0x234f2b) === true,
-    scheduleFrame: (_0x20bb16) => window.requestAnimationFrame(_0x20bb16),
+    executeCanvasCommand: (value17, value18) =>
+      executeCanvasCommand_2(value17, value18, canvasCommandContext),
+    isNodeMounted: (value19) => window.v2Renderer?.isNodeMounted?.(value19) === true,
+    scheduleFrame: (value20) => window.requestAnimationFrame(value20),
   }),
   installStoryboard3DExportCanvasBridge({
     windowObject: window,
     createMediaNodeFromBlob: appCanvasNodeFlows.createMediaNodeFromBlob,
-    showToast: (..._0x4ad810) => window.showToast?.(..._0x4ad810),
+    showToast: (...args28) => window.showToast?.(...args28),
   }));
 const openCanvasFileUploadFromShortcut = () => {
-    const _0x196a58 = appCanvasPointerBindings.getCursorScreenPosition?.() || {};
+    const clientX = appCanvasPointerBindings.getCursorScreenPosition?.() || {};
     openAppCanvasFilePicker({
       documentObject: document,
       projectId: appProjectContext.getCurrentProjectId(),
       handleFileDrop: handleFileDrop,
       commit: commit,
-      clientX: _0x196a58.x,
-      clientY: _0x196a58.y,
+      clientX: clientX.x,
+      clientY: clientX.y,
       onUnsupported: () => {
         window.showToast?.(t('canvasInteraction.toasts.unsupportedUpload'), 'warning');
       },
-      onError: (_0x593dee) => {
-        (console.error('[Canvas] shortcut file import failed:', _0x593dee),
+      onError: (value21) => {
+        (console.error('[Canvas] shortcut file import failed:', value21),
           window.showToast?.(t('previewUpload.uploadFailed'), 'warning'));
       },
     });
@@ -1017,8 +1017,8 @@ const appTopbarAndConfig = createAppTopbarAndConfig({
   saveApiConfigToServer: saveApiConfigToServer,
   testProviderConnections: testProviderConnections,
   discoverCustomProvider: discoverCustomProvider,
-  analyzeCustomProviderDocumentation: (_0x2f86e6) =>
-    analyzeCustomProviderDocumentation(_0x2f86e6, {
+  analyzeCustomProviderDocumentation: (value22) =>
+    analyzeCustomProviderDocumentation(value22, {
       settings: { ...agentModelSettings.getSettings(), locale: getLocale() },
     }),
   buildCustomProviderManifestDraft: buildCustomProviderManifestDraft,
@@ -1027,8 +1027,8 @@ const appTopbarAndConfig = createAppTopbarAndConfig({
   listCustomProviderManifestBundles: listCustomProviderManifestBundles,
   deleteCustomProviderManifestBundle: deleteCustomProviderManifestBundle,
   refreshManifestModelNodeUis: () => {
-    const _0x10aaef = refreshManifestModelNodeUis();
-    if (_0x10aaef.remountedNodeIds.length > 0) appStore.invalidateUi();
+    const refreshManifestModelNodeUis2 = refreshManifestModelNodeUis();
+    if (refreshManifestModelNodeUis2.remountedNodeIds.length > 0) appStore.invalidateUi();
   },
   fetchDreaminaCliStatusFromServer: fetchDreaminaCliStatusFromServer,
   fetchDreaminaCliLoginRuntimeFromServer: fetchDreaminaCliLoginRuntimeFromServer,
@@ -1046,7 +1046,7 @@ const modelCatalogService = createModelCatalogService({ store: workspaceStore })
     store: appStore,
     setTextWithLineBreaks: setTextWithLineBreaks,
     executeCommand: executeCommand,
-    focusNodes: (..._0x2ab5c2) => appViewport.focusNodes(..._0x2ab5c2),
+    focusNodes: (...args29) => appViewport.focusNodes(...args29),
     commit: commit,
     getNodeDefaultSize: getNodeDefaultSize,
     getAIGenerationDefaultSizeByType: getAIGenerationDefaultSizeByType,
@@ -1072,7 +1072,7 @@ const modelCatalogService = createModelCatalogService({ store: workspaceStore })
     ensureInstallId: ensureInstallId,
     ensureDeviceId: ensureDeviceId,
     resetHistory: resetHistory,
-    focusNode: (..._0x441d41) => appViewport.focusNode(..._0x441d41),
+    focusNode: (...args30) => appViewport.focusNode(...args30),
   }));
 const canvasProjectOperations = createCanvasProjectOperations({
   getCanvasManager: () => CanvasTabManager,
@@ -1088,8 +1088,8 @@ const canvasProjectOperations = createCanvasProjectOperations({
   onProjectHydrated: appProjectLifecycle.resumeProjectPersistenceAfterHydration,
   renameTemporaryProject: appProjectLifecycle.renameCurrentProject,
   pauseActiveWorkspaceTasks: pauseActiveWorkspaceTasks,
-  onWorkspaceProjectPackageImported: (_0x517277) =>
-    workspaceProjectPackageCoordinator?.applyImportedProject?.(_0x517277),
+  onWorkspaceProjectPackageImported: (value23) =>
+    workspaceProjectPackageCoordinator?.applyImportedProject?.(value23),
   getCanvasToolbarPlacement: () => uiStore.getState?.()?.ui?.canvasToolbarPlacement,
 }),
   SettingsManager.init({
@@ -1111,8 +1111,8 @@ const nodeManagerPanel = createNodeManagerPanel({
   MascotManager.init({ bindFabButton: false }),
   initAutoUpdate(),
   rendererStartupState.complete('entry'),
-  void rendererStartupState.settled.then(({ ready: _0x225a6c }) => {
-    if (_0x225a6c)
+  void rendererStartupState.settled.then(({ ready: ready }) => {
+    if (ready)
       scheduleChromeShellStartupReady({
         windowObject: window,
         diagnostics: desktopBridge.diagnostics,

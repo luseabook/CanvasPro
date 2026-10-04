@@ -21,119 +21,122 @@ const originalWindow = globalThis.window,
   console.warn = originalConsoleWarn;
 }),
   test('completionSoundService: normalizes defaults to built-in sound', () => {
-    const _0x2ad321 = normalizeCompletionSoundSettings({});
-    (assert.equal(_0x2ad321.enabled, true),
-      assert.equal(_0x2ad321.notificationEnabled, true),
-      assert.equal(_0x2ad321.volume, 0.7),
-      assert.equal(_0x2ad321.builtInPath, BUILT_IN_COMPLETION_SOUND_PATH),
-      assert.equal(_0x2ad321.selectedFilePath, BUILT_IN_COMPLETION_SOUND_PATH));
+    const completionSoundSettings = normalizeCompletionSoundSettings({});
+    (assert.equal(completionSoundSettings.enabled, true),
+      assert.equal(completionSoundSettings.notificationEnabled, true),
+      assert.equal(completionSoundSettings.volume, 0.7),
+      assert.equal(completionSoundSettings.builtInPath, BUILT_IN_COMPLETION_SOUND_PATH),
+      assert.equal(completionSoundSettings.selectedFilePath, BUILT_IN_COMPLETION_SOUND_PATH));
   }),
   test('completionSoundService: plays built-in sound from relative asset path', async () => {
-    const _0x1e5ddf = [];
+    const list = [];
     (setCompletionSoundSettingsCache({ enabled: true, volume: 0.35 }),
-      __completionSoundServiceForTest.setAudioFactory((_0x122ad5) => ({
-        set volume(_0x3c93ed) {
-          _0x1e5ddf.push(['volume', _0x3c93ed]);
+      __completionSoundServiceForTest.setAudioFactory((value) => ({
+        set volume(item) {
+          list.push(['volume', item]);
         },
         play: async () => {
-          _0x1e5ddf.push(['play', _0x122ad5]);
+          list.push(['play', value]);
         },
       })),
       await playCompletionSound('generation-success'),
-      assert.deepEqual(_0x1e5ddf, [
+      assert.deepEqual(list, [
         ['volume', 0.35],
         ['play', BUILT_IN_COMPLETION_SOUND_PATH],
       ]));
   }),
   test('completionSoundService: custom sound uses desktop preview URL', async () => {
-    const _0x1284bb = [],
-      _0x1c6f61 = [];
+    const list2 = [],
+      list3 = [];
     ((globalThis.window = {
       electronAPI: {
-        getLocalPreviewUrl: async (_0x2113e1) => {
-          return (_0x1284bb.push(_0x2113e1), { url: 'aic-local-preview://preview/custom.mp3' });
+        getLocalPreviewUrl: async (key) => {
+          return (list2.push(key), { url: 'aic-local-preview://preview/custom.mp3' });
         },
       },
     }),
-      __completionSoundServiceForTest.setAudioFactory((_0x176274) => ({
-        set volume(_0xd04870) {
-          _0x1c6f61.push(['volume', _0xd04870]);
+      __completionSoundServiceForTest.setAudioFactory((index) => ({
+        set volume(result) {
+          list3.push(['volume', result]);
         },
         play: async () => {
-          _0x1c6f61.push(['play', _0x176274]);
+          list3.push(['play', index]);
         },
       })));
-    const _0x56046e = await previewCompletionSound({
+    const response = await previewCompletionSound({
       enabled: true,
       volume: 0.8,
       selectedFilePath: 'D:/sounds/custom.mp3',
     });
-    (assert.equal(_0x56046e.ok, true),
-      assert.deepEqual(_0x1284bb, [{ path: 'D:/sounds/custom.mp3', type: 'audio/mpeg' }]),
-      assert.deepEqual(_0x1c6f61, [
+    (assert.equal(response.ok, true),
+      assert.deepEqual(list2, [{ path: 'D:/sounds/custom.mp3', type: 'audio/mpeg' }]),
+      assert.deepEqual(list3, [
         ['volume', 0.8],
         ['play', 'aic-local-preview://preview/custom.mp3'],
       ]));
   }),
   test('completionSoundService: preview failure is contained', async () => {
-    const _0x2a8ae2 = [];
+    const list4 = [];
     ((console.warn = () => {}),
-      (globalThis.window = { showToast: (_0x81dafd, _0x3cfee4) => _0x2a8ae2.push([_0x81dafd, _0x3cfee4]) }),
+      (globalThis.window = { showToast: (data, options) => list4.push([data, options]) }),
       __completionSoundServiceForTest.setAudioFactory(() => ({
-        set volume(_0x449751) {},
+        set volume(target) {},
         play: async () => {
           throw new Error('blocked');
         },
       })));
-    const _0xb1ea9a = await previewCompletionSound({ enabled: true });
-    (assert.equal(_0xb1ea9a.ok, false),
-      assert.equal(_0xb1ea9a.error.message, 'blocked'),
-      assert.deepEqual(_0x2a8ae2, [['提示音播放失败，请检查文件', 'warn']]));
+    const response2 = await previewCompletionSound({ enabled: true });
+    (assert.equal(response2.ok, false),
+      assert.equal(response2.error.message, 'blocked'),
+      assert.deepEqual(list4, [['提示音播放失败，请检查文件', 'warn']]));
   }),
   test('completionSoundService: native playback rescues a blocked browser play', async () => {
-    const _0x4c1f0b = [];
+    const list5 = [];
     ((console.warn = () => {}),
       (globalThis.window = {
         electronAPI: {
           notificationSound: {
-            play: async (_0x5f9a3c) => {
-              return (_0x4c1f0b.push(_0x5f9a3c), { success: true, played: true });
+            play: async (source) => {
+              return (list5.push(source), { success: true, played: true });
             },
           },
         },
       }),
       __completionSoundServiceForTest.setAudioFactory(() => ({
-        set volume(_0x3d0f9a) {},
+        set volume(next) {},
         play: async () => {
           throw new Error('autoplay-blocked');
         },
       })));
-    const _0x1b6c52 = await previewCompletionSound({
+    const response3 = await previewCompletionSound({
       enabled: true,
       volume: 0.8,
       selectedFilePath: 'D:/sounds/custom.mp3',
     });
-    (assert.equal(_0x1b6c52.ok, true),
-      assert.equal(_0x1b6c52.native, true),
-      assert.deepEqual(_0x4c1f0b, [
+    (assert.equal(response3.ok, true),
+      assert.equal(response3.native, true),
+      assert.deepEqual(list5, [
         { filePath: 'D:/sounds/custom.mp3', volume: 0.8, reason: 'generation-success' },
       ]));
   }),
   test('completionSoundService: native playback failure keeps the original error', async () => {
-    const _0x2951e8 = [];
+    const list6 = [];
     ((console.warn = () => {}),
       (globalThis.window = {
         electronAPI: { notificationSound: { play: async () => ({ success: false, reason: 'player-exit' }) } },
-        showToast: (_0x2f6f80, _0x591d31) => _0x2951e8.push([_0x2f6f80, _0x591d31]),
+        showToast: (current, entry) => list6.push([current, entry]),
       }),
       __completionSoundServiceForTest.setAudioFactory(() => ({
-        set volume(_0x3f0d29) {},
+        set volume(record) {},
         play: async () => {
           throw new Error('blocked');
         },
       })));
-    const _0x2e06fd = await previewCompletionSound({ enabled: true, selectedFilePath: 'D:/sounds/custom.mp3' });
-    (assert.equal(_0x2e06fd.ok, false),
-      assert.equal(_0x2e06fd.error.message, 'blocked'),
-      assert.deepEqual(_0x2951e8, [['提示音播放失败，请检查文件', 'warn']]));
+    const response4 = await previewCompletionSound({
+      enabled: true,
+      selectedFilePath: 'D:/sounds/custom.mp3',
+    });
+    (assert.equal(response4.ok, false),
+      assert.equal(response4.error.message, 'blocked'),
+      assert.deepEqual(list6, [['提示音播放失败，请检查文件', 'warn']]));
   }));

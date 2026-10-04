@@ -2,36 +2,36 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildImageRequest, buildVideoRequest } from './ApimartAdapter.js';
 function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) {
-  const _0x2e1ec0 = [];
+  const calls = [];
   return {
-    calls: _0x2e1ec0,
-    getProviderConfig(_0x4de251) {
-      if (_0x4de251 === 'apimart') return { apiUrl: apiUrl, apiKey: 'k' };
+    calls: calls,
+    getProviderConfig(value) {
+      if (value === 'apimart') return { apiUrl: apiUrl, apiKey: 'k' };
       return {};
     },
-    async processInputImages(_0x525436 = [], _0x83cdd4, _0x5ea1e2 = {}) {
+    async processInputImages(inputUrls = [], apiKey, options = {}) {
       return (
-        _0x2e1ec0.push({ type: 'images', inputUrls: _0x525436, apiKey: _0x83cdd4, options: _0x5ea1e2 }),
-        _0x525436.map((_0x24bc9e) => 'https://uploaded.example/' + String(_0x24bc9e).split('/').pop())
+        calls.push({ type: 'images', inputUrls: inputUrls, apiKey: apiKey, options: options }),
+        inputUrls.map((item) => 'https://uploaded.example/' + String(item).split('/').pop())
       );
     },
-    async processInputVideos(_0xc9ffc8 = [], _0x40b4d1, _0x2d4661 = {}) {
+    async processInputVideos(videoUrls = [], apiKey2, options2 = {}) {
       return (
-        _0x2e1ec0.push({ type: 'videos', videoUrls: _0xc9ffc8, apiKey: _0x40b4d1, options: _0x2d4661 }),
-        _0xc9ffc8.map((_0x1ab561) => 'https://uploaded.example/' + String(_0x1ab561).split('/').pop())
+        calls.push({ type: 'videos', videoUrls: videoUrls, apiKey: apiKey2, options: options2 }),
+        videoUrls.map((item2) => 'https://uploaded.example/' + String(item2).split('/').pop())
       );
     },
-    async processInputAudios(_0x42389e = [], _0x4426fb, _0x4f027c = {}) {
+    async processInputAudios(audioUrls = [], apiKey3, options3 = {}) {
       return (
-        _0x2e1ec0.push({ type: 'audios', audioUrls: _0x42389e, apiKey: _0x4426fb, options: _0x4f027c }),
-        _0x42389e.map((_0x2cdb1f) => 'https://uploaded.example/' + String(_0x2cdb1f).split('/').pop())
+        calls.push({ type: 'audios', audioUrls: audioUrls, apiKey: apiKey3, options: options3 }),
+        audioUrls.map((item3) => 'https://uploaded.example/' + String(item3).split('/').pop())
       );
     },
   };
 }
 (test('ApimartAdapter: 多图输入按上传处理后的顺序写入 image_urls', async () => {
-  const _0x68ac79 = createCtx(),
-    _0x4aacaa = await buildImageRequest(
+  const ctx = createCtx(),
+    dom = await buildImageRequest(
       {
         model: 'apimart/nano-banana-pro',
         prompt: 'p',
@@ -44,27 +44,27 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
         ],
       },
       'p',
-      _0x68ac79,
+      ctx,
     );
-  (assert.deepEqual(_0x4aacaa.body.image_urls, [
+  (assert.deepEqual(dom.body.image_urls, [
     'https://uploaded.example/target.png',
     'https://uploaded.example/source.png',
     'https://uploaded.example/style.png',
   ]),
-    assert.equal(_0x68ac79.calls[0].options.provider, 'apimart'));
+    assert.equal(ctx.calls[0].options.provider, 'apimart'));
 }),
   test('ApimartAdapter: APIMart /v1 base URL is not duplicated', async () => {
-    const _0x5eab08 = createCtx({ apiUrl: 'https://api.apimart.example.com/v1' }),
-      _0xe430be = await buildVideoRequest(
+    const ctx2 = createCtx({ apiUrl: 'https://api.apimart.example.com/v1' }),
+      dom2 = await buildVideoRequest(
         { model: 'apimart/doubao-seedance-2.0', prompt: 'p', aspectRatio: '16:9', duration: 5 },
         'p',
-        _0x5eab08,
+        ctx2,
       );
-    assert.equal(_0xe430be.body.apiUrl, 'https://api.apimart.example.com/v1/videos/generations');
+    assert.equal(dom2.body.apiUrl, 'https://api.apimart.example.com/v1/videos/generations');
   }),
   test('ApimartAdapter: GPT image 2 使用官方模型名并透传小写 resolution/size', async () => {
-    const _0x383410 = createCtx(),
-      _0x3f56d6 = await buildImageRequest(
+    const ctx3 = createCtx(),
+      dom3 = await buildImageRequest(
         {
           model: 'apimart/gpt-image-2',
           prompt: 'p',
@@ -74,21 +74,21 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           inputUrls: ['https://local.example/target.png', 'https://local.example/source.png'],
         },
         'p',
-        _0x383410,
+        ctx3,
       );
-    (assert.equal(_0x3f56d6.url, '/api/v2/proxy/image'),
-      assert.equal(_0x3f56d6.body.apiUrl, 'https://api.apimart.example.com/v1/images/generations'),
-      assert.equal(_0x3f56d6.body.model, 'gpt-image-2'),
-      assert.equal(_0x3f56d6.body.resolution, '2k'),
-      assert.equal(_0x3f56d6.body.size, '16:9'),
-      assert.deepEqual(_0x3f56d6.body.image_urls, [
+    (assert.equal(dom3.url, '/api/v2/proxy/image'),
+      assert.equal(dom3.body.apiUrl, 'https://api.apimart.example.com/v1/images/generations'),
+      assert.equal(dom3.body.model, 'gpt-image-2'),
+      assert.equal(dom3.body.resolution, '2k'),
+      assert.equal(dom3.body.size, '16:9'),
+      assert.deepEqual(dom3.body.image_urls, [
         'https://uploaded.example/target.png',
         'https://uploaded.example/source.png',
       ]),
-      assert.equal(_0x383410.calls[0].options.provider, 'apimart'));
+      assert.equal(ctx3.calls[0].options.provider, 'apimart'));
   }),
   test('ApimartAdapter: GPT image 2 支持 4K 可用横竖比例', async () => {
-    const _0x4f2898 = await buildImageRequest(
+    const dom4 = await buildImageRequest(
       {
         model: 'apimart/gpt-image-2',
         prompt: 'p',
@@ -100,8 +100,8 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
       'p',
       createCtx(),
     );
-    (assert.equal(_0x4f2898.body.resolution, '4k'), assert.equal(_0x4f2898.body.size, '16:9'));
-    const _0x23d920 = await buildImageRequest(
+    (assert.equal(dom4.body.resolution, '4k'), assert.equal(dom4.body.size, '16:9'));
+    const dom5 = await buildImageRequest(
       {
         model: 'apimart/gpt-image-2',
         prompt: 'p',
@@ -113,11 +113,11 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
       'p',
       createCtx(),
     );
-    (assert.equal(_0x23d920.body.resolution, '4k'), assert.equal(_0x23d920.body.size, '9:21'));
+    (assert.equal(dom5.body.resolution, '4k'), assert.equal(dom5.body.size, '9:21'));
   }),
   test('ApimartAdapter: GPT image 2 4K 不支持比例回退到可用比例', async () => {
-    const _0xb9ca6a = createCtx(),
-      _0x52c025 = await buildImageRequest(
+    const ctx4 = createCtx(),
+      dom6 = await buildImageRequest(
         {
           model: 'apimart/gpt-image-2',
           prompt: 'p',
@@ -127,15 +127,15 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           inputUrls: [],
         },
         'p',
-        _0xb9ca6a,
+        ctx4,
       );
-    (assert.equal(_0x52c025.body.model, 'gpt-image-2'),
-      assert.equal(_0x52c025.body.resolution, '4k'),
-      assert.equal(_0x52c025.body.size, '16:9'));
+    (assert.equal(dom6.body.model, 'gpt-image-2'),
+      assert.equal(dom6.body.resolution, '4k'),
+      assert.equal(dom6.body.size, '16:9'));
   }),
   test('ApimartAdapter: GPT image 2 历史 3K 画质回退到 2k', async () => {
-    const _0x25dbf3 = createCtx(),
-      _0x1ac913 = await buildImageRequest(
+    const ctx5 = createCtx(),
+      dom7 = await buildImageRequest(
         {
           model: 'apimart/gpt-image-2',
           prompt: 'p',
@@ -145,15 +145,15 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           inputUrls: [],
         },
         'p',
-        _0x25dbf3,
+        ctx5,
       );
-    (assert.equal(_0x1ac913.body.model, 'gpt-image-2'),
-      assert.equal(_0x1ac913.body.resolution, '2k'),
-      assert.equal(_0x1ac913.body.size, '1:1'));
+    (assert.equal(dom7.body.model, 'gpt-image-2'),
+      assert.equal(dom7.body.resolution, '2k'),
+      assert.equal(dom7.body.size, '1:1'));
   }),
   test('ApimartAdapter: 视频源和参考图使用 APIMART 上传后写入请求', async () => {
-    const _0x98f980 = createCtx(),
-      _0x2e6889 = await buildVideoRequest(
+    const ctx6 = createCtx(),
+      dom8 = await buildVideoRequest(
         {
           model: 'apimart/happyhorse-1.0',
           prompt: 'p',
@@ -163,21 +163,21 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           inputUrls: ['/data/uploads/style.png'],
         },
         'p',
-        _0x98f980,
+        ctx6,
       );
-    (assert.equal(_0x2e6889.url, '/api/v2/proxy/image'),
-      assert.equal(_0x2e6889.body.apiUrl, 'https://api.apimart.example.com/v1/videos/generations'),
-      assert.equal(_0x2e6889.body.model, 'happyhorse-1.0'),
-      assert.equal(_0x2e6889.body.video_url, 'https://uploaded.example/source.mp4'),
-      assert.deepEqual(_0x2e6889.body.image_urls, ['https://uploaded.example/style.png']),
-      assert.equal(_0x98f980.calls[0].type, 'videos'),
-      assert.equal(_0x98f980.calls[0].options.provider, 'apimart'),
-      assert.equal(_0x98f980.calls[1].type, 'images'),
-      assert.equal(_0x98f980.calls[1].options.provider, 'apimart'));
+    (assert.equal(dom8.url, '/api/v2/proxy/image'),
+      assert.equal(dom8.body.apiUrl, 'https://api.apimart.example.com/v1/videos/generations'),
+      assert.equal(dom8.body.model, 'happyhorse-1.0'),
+      assert.equal(dom8.body.video_url, 'https://uploaded.example/source.mp4'),
+      assert.deepEqual(dom8.body.image_urls, ['https://uploaded.example/style.png']),
+      assert.equal(ctx6.calls[0].type, 'videos'),
+      assert.equal(ctx6.calls[0].options.provider, 'apimart'),
+      assert.equal(ctx6.calls[1].type, 'images'),
+      assert.equal(ctx6.calls[1].options.provider, 'apimart'));
   }),
   test('ApimartAdapter: Seedance 文生视频映射到 APIMart 官方字段', async () => {
-    const _0x1bf430 = createCtx(),
-      _0x31ba2f = await buildVideoRequest(
+    const ctx7 = createCtx(),
+      dom9 = await buildVideoRequest(
         {
           model: 'apimart/doubao-seedance-2.0-fast',
           prompt: 'p',
@@ -186,20 +186,20 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           duration: 8,
         },
         'p',
-        _0x1bf430,
+        ctx7,
       );
-    (assert.equal(_0x31ba2f.body.apiUrl, 'https://api.apimart.example.com/v1/videos/generations'),
-      assert.equal(_0x31ba2f.body.model, 'doubao-seedance-2.0-fast'),
-      assert.equal(_0x31ba2f.body.prompt, 'p'),
-      assert.equal(_0x31ba2f.body.size, '21:9'),
-      assert.equal(_0x31ba2f.body.resolution, '720p'),
-      assert.equal(_0x31ba2f.body.duration, 8),
-      assert.equal('quality' in _0x31ba2f.body, false),
-      assert.deepEqual(_0x1bf430.calls, []));
+    (assert.equal(dom9.body.apiUrl, 'https://api.apimart.example.com/v1/videos/generations'),
+      assert.equal(dom9.body.model, 'doubao-seedance-2.0-fast'),
+      assert.equal(dom9.body.prompt, 'p'),
+      assert.equal(dom9.body.size, '21:9'),
+      assert.equal(dom9.body.resolution, '720p'),
+      assert.equal(dom9.body.duration, 8),
+      assert.equal('quality' in dom9.body, false),
+      assert.deepEqual(ctx7.calls, []));
   }),
   test('ApimartAdapter: Seedance 首尾帧写入 image_with_roles', async () => {
-    const _0x3f9c88 = createCtx(),
-      _0x59d6c5 = await buildVideoRequest(
+    const ctx8 = createCtx(),
+      dom10 = await buildVideoRequest(
         {
           model: 'apimart/doubao-seedance-2.0',
           prompt: 'transition',
@@ -211,31 +211,31 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           inputUrls: ['/data/uploads/first.png', '/data/uploads/last.png'],
         },
         'transition',
-        _0x3f9c88,
+        ctx8,
       );
-    (assert.equal(_0x59d6c5.body.model, 'doubao-seedance-2.0'),
-      assert.deepEqual(_0x59d6c5.body.image_with_roles, [
+    (assert.equal(dom10.body.model, 'doubao-seedance-2.0'),
+      assert.deepEqual(dom10.body.image_with_roles, [
         { url: 'https://uploaded.example/first.png', role: 'first_frame' },
         { url: 'https://uploaded.example/last.png', role: 'last_frame' },
       ]),
-      assert.equal('image_urls' in _0x59d6c5.body, false),
-      assert.equal('video_urls' in _0x59d6c5.body, false),
-      assert.equal(_0x3f9c88.calls.length, 1),
-      assert.equal(_0x3f9c88.calls[0].type, 'images'));
+      assert.equal('image_urls' in dom10.body, false),
+      assert.equal('video_urls' in dom10.body, false),
+      assert.equal(ctx8.calls.length, 1),
+      assert.equal(ctx8.calls[0].type, 'images'));
   }),
   test('ApimartAdapter: Seedance 2.0 使用通过人脸检测的 asset URL', async () => {
-    const _0x534872 = createCtx();
-    _0x534872.processInputImages = async (_0x319890 = [], _0x257684, _0x56108d = {}) => {
+    const ctx9 = createCtx();
+    ctx9.processInputImages = async (inputUrls2 = [], apiKey4, options4 = {}) => {
       return (
-        _0x534872.calls.push({ type: 'images', inputUrls: _0x319890, apiKey: _0x257684, options: _0x56108d }),
-        _0x319890.map((_0x1f55a6) =>
-          String(_0x1f55a6).startsWith('asset://')
-            ? _0x1f55a6
-            : 'https://uploaded.example/' + String(_0x1f55a6).split('/').pop(),
+        ctx9.calls.push({ type: 'images', inputUrls: inputUrls2, apiKey: apiKey4, options: options4 }),
+        inputUrls2.map((item4) =>
+          String(item4).startsWith('asset://')
+            ? item4
+            : 'https://uploaded.example/' + String(item4).split('/').pop(),
         )
       );
     };
-    const _0x1ec3e3 = await buildVideoRequest(
+    const dom11 = await buildVideoRequest(
       {
         model: 'apimart/doubao-seedance-2.0-fast',
         prompt: 'transition',
@@ -262,17 +262,17 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
         ],
       },
       'transition',
-      _0x534872,
+      ctx9,
     );
-    (assert.deepEqual(_0x534872.calls[0].inputUrls, ['asset://private-first', 'asset://private-last']),
-      assert.deepEqual(_0x1ec3e3.body.image_with_roles, [
+    (assert.deepEqual(ctx9.calls[0].inputUrls, ['asset://private-first', 'asset://private-last']),
+      assert.deepEqual(dom11.body.image_with_roles, [
         { url: 'asset://private-first', role: 'first_frame' },
         { url: 'asset://private-last', role: 'last_frame' },
       ]));
   }),
   test('ApimartAdapter: 非 Seedance 2.0 不使用人脸检测 asset URL', async () => {
-    const _0x268d93 = createCtx(),
-      _0x3a51b1 = await buildVideoRequest(
+    const ctx10 = createCtx(),
+      dom12 = await buildVideoRequest(
         {
           model: 'apimart/doubao-seedance-1-5-pro',
           prompt: 'transition',
@@ -290,17 +290,17 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           ],
         },
         'transition',
-        _0x268d93,
+        ctx10,
       );
-    (assert.deepEqual(_0x268d93.calls[0].inputUrls, ['/data/uploads/first.png', '/data/uploads/last.png']),
-      assert.deepEqual(_0x3a51b1.body.image_with_roles, [
+    (assert.deepEqual(ctx10.calls[0].inputUrls, ['/data/uploads/first.png', '/data/uploads/last.png']),
+      assert.deepEqual(dom12.body.image_with_roles, [
         { url: 'https://uploaded.example/first.png', role: 'first_frame' },
         { url: 'https://uploaded.example/last.png', role: 'last_frame' },
       ]));
   }),
   test('ApimartAdapter: Seedance 多模态参考映射图片视频音频数组', async () => {
-    const _0x4c64b7 = createCtx(),
-      _0x16f619 = await buildVideoRequest(
+    const ctx11 = createCtx(),
+      dom13 = await buildVideoRequest(
         {
           model: 'apimart/doubao-seedance-2.0-fast-face',
           prompt: 'product ad',
@@ -312,24 +312,24 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           audios: ['/data/uploads/ref.mp3'],
         },
         'product ad',
-        _0x4c64b7,
+        ctx11,
       );
-    (assert.equal(_0x16f619.body.model, 'doubao-seedance-2.0-fast-face'),
-      assert.equal(_0x16f619.body.size, 'adaptive'),
-      assert.deepEqual(_0x16f619.body.image_urls, [
+    (assert.equal(dom13.body.model, 'doubao-seedance-2.0-fast-face'),
+      assert.equal(dom13.body.size, 'adaptive'),
+      assert.deepEqual(dom13.body.image_urls, [
         'https://uploaded.example/a.png',
         'https://uploaded.example/b.png',
       ]),
-      assert.deepEqual(_0x16f619.body.video_urls, ['https://uploaded.example/ref.mp4']),
-      assert.deepEqual(_0x16f619.body.audio_urls, ['https://uploaded.example/ref.mp3']),
+      assert.deepEqual(dom13.body.video_urls, ['https://uploaded.example/ref.mp4']),
+      assert.deepEqual(dom13.body.audio_urls, ['https://uploaded.example/ref.mp3']),
       assert.deepEqual(
-        _0x4c64b7.calls.map((_0x2ec715) => _0x2ec715.type),
+        ctx11.calls.map((item5) => item5.type),
         ['videos', 'images', 'audios'],
       ));
   }),
   test('ApimartAdapter: Seedance 1.5 Pro 使用 aspect_ratio 和生成音频字段', async () => {
-    const _0x379b52 = createCtx(),
-      _0x13f101 = await buildVideoRequest(
+    const ctx12 = createCtx(),
+      dom14 = await buildVideoRequest(
         {
           model: 'apimart/doubao-seedance-1-5-pro',
           prompt: 'p',
@@ -341,20 +341,20 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           last: '/data/uploads/end.png',
         },
         'p',
-        _0x379b52,
+        ctx12,
       );
-    (assert.equal(_0x13f101.body.model, 'doubao-seedance-1-5-pro'),
-      assert.equal(_0x13f101.body.aspect_ratio, '9:16'),
-      assert.equal('size' in _0x13f101.body, false),
-      assert.equal(_0x13f101.body.audio, true),
-      assert.deepEqual(_0x13f101.body.image_with_roles, [
+    (assert.equal(dom14.body.model, 'doubao-seedance-1-5-pro'),
+      assert.equal(dom14.body.aspect_ratio, '9:16'),
+      assert.equal('size' in dom14.body, false),
+      assert.equal(dom14.body.audio, true),
+      assert.deepEqual(dom14.body.image_with_roles, [
         { url: 'https://uploaded.example/start.png', role: 'first_frame' },
         { url: 'https://uploaded.example/end.png', role: 'last_frame' },
       ]));
   }),
   test('ApimartAdapter: Seedance 1.0 Pro Quality 使用 aspect_ratio 和首尾帧', async () => {
-    const _0x34d251 = createCtx(),
-      _0x31cb88 = await buildVideoRequest(
+    const ctx13 = createCtx(),
+      dom15 = await buildVideoRequest(
         {
           model: 'apimart/doubao-seedance-1-0-pro-quality',
           prompt: 'p',
@@ -364,18 +364,18 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
           last: '/data/uploads/night.png',
         },
         'p',
-        _0x34d251,
+        ctx13,
       );
-    (assert.equal(_0x31cb88.body.model, 'doubao-seedance-1-0-pro-quality'),
-      assert.equal(_0x31cb88.body.aspect_ratio, '4:3'),
-      assert.equal(_0x31cb88.body.resolution, '1080p'),
-      assert.deepEqual(_0x31cb88.body.image_with_roles, [
+    (assert.equal(dom15.body.model, 'doubao-seedance-1-0-pro-quality'),
+      assert.equal(dom15.body.aspect_ratio, '4:3'),
+      assert.equal(dom15.body.resolution, '1080p'),
+      assert.deepEqual(dom15.body.image_with_roles, [
         { url: 'https://uploaded.example/day.png', role: 'first_frame' },
         { url: 'https://uploaded.example/night.png', role: 'last_frame' },
       ]));
   }),
   test('ApimartAdapter: Seedance 1.0 Pro Fast 不接收尾帧', async () => {
-    const _0x4dd3bf = createCtx();
+    const ctx14 = createCtx();
     await assert.rejects(
       () =>
         buildVideoRequest(
@@ -386,7 +386,7 @@ function createCtx({ apiUrl: apiUrl = 'https://api.apimart.example.com' } = {}) 
             last: '/data/uploads/night.png',
           },
           'p',
-          _0x4dd3bf,
+          ctx14,
         ),
       /Fast 不支持尾帧图/,
     );

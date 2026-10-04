@@ -23,20 +23,20 @@ function createProto() {
   });
 }
 (test('video reference input: ai-video 可从 videos 主项读取缩略图', () => {
-  const _0x5eae42 = {
+  const value = {
       type: 'ai-video',
       mainVideoIndex: 0,
       videos: [
         { localPath: 'output/dreamina-video.mp4', thumbUrl: '/output/VideoThumbs/dreamina-video.jpg' },
       ],
     },
-    _0x590f44 = __videoReferenceInputTest.getVideoThumbCandidate(_0x5eae42, {
+    item = __videoReferenceInputTest.getVideoThumbCandidate(value, {
       sourceMediaKey: 'output/dreamina-video.mp4',
     });
-  assert.equal(_0x590f44.thumbUrl, '/output/VideoThumbs/dreamina-video.jpg');
+  assert.equal(item.thumbUrl, '/output/VideoThumbs/dreamina-video.jpg');
 }),
   test('video reference input: sourceMediaKey 指向多视频非主项时不误用顶层缩略图', () => {
-    const _0x1cfb36 = {
+    const key = {
         type: 'ai-video',
         mainVideoIndex: 0,
         thumbUrl: '/output/VideoThumbs/main.jpg',
@@ -45,13 +45,13 @@ function createProto() {
           { localPath: 'output/second.mp4', thumbUrl: '/output/VideoThumbs/second.jpg' },
         ],
       },
-      _0x23a519 = __videoReferenceInputTest.getVideoThumbCandidate(_0x1cfb36, {
+      index = __videoReferenceInputTest.getVideoThumbCandidate(key, {
         sourceMediaKey: 'output/second.mp4',
       });
-    assert.equal(_0x23a519.thumbUrl, '/output/VideoThumbs/second.jpg');
+    assert.equal(index.thumbUrl, '/output/VideoThumbs/second.jpg');
   }),
   test('video reference input: 缩略图缺失时按选中视频项返回可回填路径', () => {
-    const _0x21f2e6 = {
+    const result = {
         type: 'ai-video',
         mainVideoIndex: 0,
         videos: [
@@ -59,50 +59,50 @@ function createProto() {
           { localPath: 'output/second.mp4' },
         ],
       },
-      _0xf5cb49 = __videoReferenceInputTest.getVideoThumbCandidate(_0x21f2e6, {
+      data = __videoReferenceInputTest.getVideoThumbCandidate(result, {
         sourceMediaKey: 'output/second.mp4',
       }),
-      _0x57b36f = __videoReferenceInputTest.getVideoSourcePathForThumb(_0x21f2e6, {
+      options = __videoReferenceInputTest.getVideoSourcePathForThumb(result, {
         sourceMediaKey: 'output/second.mp4',
       });
-    (assert.equal(_0xf5cb49.thumbUrl, ''), assert.equal(_0x57b36f, '/output/second.mp4'));
+    (assert.equal(data.thumbUrl, ''), assert.equal(options, '/output/second.mp4'));
   }),
   test('video reference input: display local paths can resolve fallback video refs', () => {
-    const _0x265164 = { type: 'source-video', displayLocalPath: 'data/assets/display.mp4' };
+    const target = { type: 'source-video', displayLocalPath: 'data/assets/display.mp4' };
     (assert.equal(
-      __videoReferenceInputTest.getVideoSourcePathForThumb(_0x265164, {}),
+      __videoReferenceInputTest.getVideoSourcePathForThumb(target, {}),
       '/data/assets/display.mp4',
     ),
       assert.equal(
-        __videoReferenceInputTest.getVideoRefMediaSignature(_0x265164, {}),
+        __videoReferenceInputTest.getVideoRefMediaSignature(target, {}),
         'data/assets/display.mp4',
       ));
   }),
   test('video reference input: 来源状态签名随 videos 缩略图变化', () => {
-    const _0x1f8f1b = createProto(),
-      _0x5b6e45 = {
+    const proto = createProto(),
+      source = {
         type: 'ai-video',
         mainVideoIndex: 0,
         videos: [{ localPath: 'output/dreamina-video.mp4' }],
       },
-      _0x5581a9 = {
+      next = {
         type: 'ai-video',
         mainVideoIndex: 0,
         videos: [
           { localPath: 'output/dreamina-video.mp4', thumbUrl: '/output/VideoThumbs/dreamina-video.jpg' },
         ],
       };
-    assert.notEqual(_0x1f8f1b._getRefSourceStateKey(_0x5b6e45), _0x1f8f1b._getRefSourceStateKey(_0x5581a9));
+    assert.notEqual(proto._getRefSourceStateKey(source), proto._getRefSourceStateKey(next));
   }),
   test('video reference input: 来源状态签名随视频元数据变化', () => {
-    const _0x58ff4f = createProto(),
-      _0x2c0911 = { type: 'source-video', localPath: 'output/CutVideo/cut.mp4' },
-      _0x1cac41 = { ..._0x2c0911, videoFrameCount: 59, videoDuration: 2.46, videoFps: 24 };
-    assert.notEqual(_0x58ff4f._getRefSourceStateKey(_0x2c0911), _0x58ff4f._getRefSourceStateKey(_0x1cac41));
+    const proto2 = createProto(),
+      args = { type: 'source-video', localPath: 'output/CutVideo/cut.mp4' },
+      current = { ...args, videoFrameCount: 59, videoDuration: 2.46, videoFps: 24 };
+    assert.notEqual(proto2._getRefSourceStateKey(args), proto2._getRefSourceStateKey(current));
   }),
   test('video reference input: 来源状态签名忽略任务轮询状态', () => {
-    const _0x5bfa18 = createProto(),
-      _0x3215a3 = {
+    const proto3 = createProto(),
+      args2 = {
         type: 'ai-video',
         _bizRev: 12,
         mainVideoIndex: 0,
@@ -112,86 +112,84 @@ function createProto() {
           { localPath: 'output/dreamina-video.mp4', thumbUrl: '/output/VideoThumbs/dreamina-video.jpg' },
         ],
       },
-      _0x284007 = {
-        ..._0x3215a3,
+      args3 = {
+        ...args2,
         _bizRev: 19,
         rhTaskStatus: 'pending',
         dreaminaTaskLastCheckedAt: 0x18e23f19a20,
       },
-      _0x166432 = {
-        ..._0x284007,
+      entry = {
+        ...args3,
         videos: [
           { localPath: 'output/dreamina-video.mp4', thumbUrl: '/output/VideoThumbs/dreamina-video-new.jpg' },
         ],
       };
-    (assert.equal(_0x5bfa18._getRefSourceStateKey(_0x3215a3), _0x5bfa18._getRefSourceStateKey(_0x284007)),
-      assert.notEqual(
-        _0x5bfa18._getRefSourceStateKey(_0x3215a3),
-        _0x5bfa18._getRefSourceStateKey(_0x166432),
-      ));
+    (assert.equal(proto3._getRefSourceStateKey(args2), proto3._getRefSourceStateKey(args3)),
+      assert.notEqual(proto3._getRefSourceStateKey(args2), proto3._getRefSourceStateKey(entry)));
   }),
   test('video reference input: text/audio fallback thumbnails use shared blue labels', () => {
-    const _0x4ca260 = createReferenceFallbackThumbHtml('text'),
-      _0x5977e6 = createReferenceFallbackThumbHtml('audio'),
-      _0x1fa65c = __videoReferenceInputTest.createRunningHubAudioFallbackThumbHtml();
-    (assert.match(_0x4ca260, /class="[^"]*\bref-thumb-media\b[^"]*\bref-thumb-fallback\b[^"]*"/),
-      assert.match(_0x4ca260, />TEXT<\/div>/),
-      assert.doesNotMatch(_0x4ca260, /<svg|style=/),
-      assert.match(_0x5977e6, /class="[^"]*\bref-thumb-media\b[^"]*\bref-thumb-fallback\b[^"]*"/),
-      assert.match(_0x5977e6, />AUDIO<\/div>/),
-      assert.doesNotMatch(_0x5977e6, /<svg|style=/),
+    const referenceFallbackThumbHtml = createReferenceFallbackThumbHtml('text'),
+      referenceFallbackThumbHtml2 = createReferenceFallbackThumbHtml('audio'),
+      record = __videoReferenceInputTest.createRunningHubAudioFallbackThumbHtml();
+    (assert.match(
+      referenceFallbackThumbHtml,
+      /class="[^"]*\bref-thumb-media\b[^"]*\bref-thumb-fallback\b[^"]*"/,
+    ),
+      assert.match(referenceFallbackThumbHtml, />TEXT<\/div>/),
+      assert.doesNotMatch(referenceFallbackThumbHtml, /<svg|style=/),
       assert.match(
-        _0x1fa65c,
+        referenceFallbackThumbHtml2,
+        /class="[^"]*\bref-thumb-media\b[^"]*\bref-thumb-fallback\b[^"]*"/,
+      ),
+      assert.match(referenceFallbackThumbHtml2, />AUDIO<\/div>/),
+      assert.doesNotMatch(referenceFallbackThumbHtml2, /<svg|style=/),
+      assert.match(
+        record,
         /class="[^"]*\bref-thumb-media\b[^"]*\brh-v5-ref-media-fallback\b[^"]*\bref-thumb-fallback\b[^"]*"/,
       ),
-      assert.match(_0x1fa65c, />AUDIO<\/div>/),
-      assert.doesNotMatch(_0x1fa65c, /<svg|style=/));
+      assert.match(record, />AUDIO<\/div>/),
+      assert.doesNotMatch(record, /<svg|style=/));
   }));
-function makeAssetPill({
-  assetId: _0x433ae4,
-  assetIndex: _0x387ae2,
-  type: _0x2e4069,
-  label: label = '@asset',
-}) {
+function makeAssetPill({ assetId: assetId2, assetIndex: assetIndex, type: type, label: label = '@asset' }) {
   return {
     dataset: {
       refOrigin: 'asset',
-      assetId: _0x433ae4,
-      assetIndex: String(_0x387ae2),
-      refType: _0x2e4069,
+      assetId: assetId2,
+      assetIndex: String(assetIndex),
+      refType: type,
       label: label,
     },
     classList: {
-      contains(_0x51fa62) {
-        return _0x51fa62 === 'ref-pill';
+      contains(payload) {
+        return payload === 'ref-pill';
       },
     },
     textContent: label,
   };
 }
-function makePromptEl(_0x777e98 = []) {
+function makePromptEl(innerText = []) {
   return {
-    innerText: _0x777e98.map((_0x519c40) => _0x519c40.textContent || '').join(' '),
-    querySelectorAll(_0xd2a65c) {
-      return _0xd2a65c === '.ref-pill' ? _0x777e98 : [];
+    innerText: innerText.map((el) => el.textContent || '').join(' '),
+    querySelectorAll(handle) {
+      return handle === '.ref-pill' ? innerText : [];
     },
   };
 }
 (test('video reference input: V5 源视频帧数优先显示真实 videoFrameCount', () => {
-  const _0xac2515 = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
+  const state = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
     inEdges: [{ id: 'e-source', sourceId: 'source-video', refSlot: 'sourceVideo' }],
     nodes: { 'source-video': { type: 'source-video', videoFrameCount: 96, videoDuration: 10 } },
     targetFps: 24,
   });
-  assert.equal(_0xac2515, 96);
+  assert.equal(state, 96);
 }),
   test('video reference input: V5 源视频缺少真实帧数时按时长兜底估算', () => {
-    const _0x121a61 = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
+    const config = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
       inEdges: [{ id: 'e-source', sourceId: 'source-video', refSlot: 'sourceVideo' }],
       nodes: { 'source-video': { type: 'source-video', videoDuration: 3.5 } },
       targetFps: 24,
     });
-    assert.equal(_0x121a61, 84);
+    assert.equal(config, 84);
   }),
   test('video reference input: V5 无连线时从隐藏资产源视频读取真实帧数', () => {
     setAssetMentionAssets([
@@ -206,11 +204,11 @@ function makePromptEl(_0x777e98 = []) {
         ],
       },
     ]);
-    const _0x113508 = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
+    const scope = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
       nodeData: { promptAssetInputRefs: [{ assetId: 'asset-source-video', itemIndex: 0, type: 'video' }] },
       targetFps: 24,
     });
-    assert.equal(_0x113508, 72);
+    assert.equal(scope, 72);
   }),
   test('video reference input: V5 无连线时从提示词资产源视频读取真实帧数', () => {
     setAssetMentionAssets([
@@ -229,7 +227,7 @@ function makePromptEl(_0x777e98 = []) {
         ],
       },
     ]);
-    const _0x584d76 = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
+    const input = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
       promptEl: makePromptEl([
         makeAssetPill({
           assetId: 'asset-prompt-video',
@@ -240,45 +238,45 @@ function makePromptEl(_0x777e98 = []) {
       ]),
       targetFps: 24,
     });
-    assert.equal(_0x584d76, 88);
+    assert.equal(input, 88);
   }),
   test('video reference input: V5 源视频没有有效帧数或时长时返回空', () => {
-    const _0x469e52 = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
+    const output = __videoReferenceInputTest.getRhV5SourceVideoFrameCount({
       inEdges: [{ id: 'e-source', sourceId: 'source-video', refSlot: 'sourceVideo' }],
       nodes: { 'source-video': { type: 'source-video', localPath: 'data/assets/source.mp4' } },
       targetFps: 24,
     });
-    assert.equal(_0x469e52, null);
+    assert.equal(output, null);
   }));
-function makeClassList(_0x4a3d36) {
+function makeClassList(value2) {
   return {
-    contains(_0x3c8e54) {
-      return String(_0x4a3d36.className || '')
+    contains(value3) {
+      return String(value2.className || '')
         .split(/\s+/)
         .filter(Boolean)
-        .includes(String(_0x3c8e54 || ''));
+        .includes(String(value3 || ''));
     },
-    add(..._0x43827c) {
-      const _0x29682e = new Set(
-        String(_0x4a3d36.className || '')
+    add(...list) {
+      const value4 = new Set(
+        String(value2.className || '')
           .split(/\s+/)
           .filter(Boolean),
       );
-      (_0x43827c.forEach((_0x2a5405) => _0x29682e.add(String(_0x2a5405 || ''))),
-        (_0x4a3d36.className = Array.from(_0x29682e).join(' ')));
+      (list.forEach((item2) => value4.add(String(item2 || ''))),
+        (value2.className = Array.from(value4).join(' ')));
     },
-    remove(..._0x5110aa) {
-      const _0x108fe1 = new Set(_0x5110aa.map((_0x533356) => String(_0x533356 || '')));
-      _0x4a3d36.className = String(_0x4a3d36.className || '')
+    remove(...list2) {
+      const map = new Set(list2.map((item3) => String(item3 || '')));
+      value2.className = String(value2.className || '')
         .split(/\s+/)
-        .filter((_0x19d282) => _0x19d282 && !_0x108fe1.has(_0x19d282))
+        .filter((item4) => item4 && !map.has(item4))
         .join(' ');
     },
   };
 }
-function createFakeElement(_0x1e0242 = 'div') {
-  const _0x1945d6 = {
-    tagName: String(_0x1e0242 || 'div').toUpperCase(),
+function createFakeElement(value5 = 'div') {
+  const el2 = {
+    tagName: String(value5 || 'div').toUpperCase(),
     className: '',
     dataset: {},
     attributes: {},
@@ -288,108 +286,104 @@ function createFakeElement(_0x1e0242 = 'div') {
     _innerHTML: '',
     _innerHTMLSetCount: 0,
     classList: null,
-    set innerHTML(_0xf6c96e) {
-      ((_0x1945d6._innerHTMLSetCount += 1),
-        (_0x1945d6._innerHTML = String(_0xf6c96e || '')),
-        (_0x1945d6.childNodes = []));
-      if (_0x1945d6._innerHTML.includes('rh-v5-ref-container')) {
-        const _0x4aa167 = createFakeElement('div');
-        ((_0x4aa167.className = 'prompt-attachment-btn'), _0x1945d6.appendChild(_0x4aa167));
-        const _0x430934 = createFakeElement('div');
-        _0x430934.className = 'ref-thumb-container rh-v5-ref-container';
-        const _0x32a669 = Array.from(_0x1945d6._innerHTML.matchAll(/data-slot="([^"]+)"/g)).map(
-          (_0x355522) => _0x355522[1],
-        );
-        (_0x32a669.forEach((_0x2af26e) => {
-          const _0x3e7141 = createFakeElement('button');
-          ((_0x3e7141.className = 'ref-thumb-wrap ref-upload-slot rh-v5-ref-box'),
-            (_0x3e7141.dataset.slot = _0x2af26e),
-            _0x430934.appendChild(_0x3e7141));
+    set innerHTML(value6) {
+      ((el2._innerHTMLSetCount += 1), (el2._innerHTML = String(value6 || '')), (el2.childNodes = []));
+      if (el2._innerHTML.includes('rh-v5-ref-container')) {
+        const fakeElement = createFakeElement('div');
+        ((fakeElement.className = 'prompt-attachment-btn'), el2.appendChild(fakeElement));
+        const el3 = createFakeElement('div');
+        el3.className = 'ref-thumb-container rh-v5-ref-container';
+        const list3 = Array.from(el2._innerHTML.matchAll(/data-slot="([^"]+)"/g)).map((item5) => item5[1]);
+        (list3.forEach((item6) => {
+          const el4 = createFakeElement('button');
+          ((el4.className = 'ref-thumb-wrap ref-upload-slot rh-v5-ref-box'),
+            (el4.dataset.slot = item6),
+            el3.appendChild(el4));
         }),
-          _0x1945d6.appendChild(_0x430934));
+          el2.appendChild(el3));
       } else {
-        if (_0x1945d6._innerHTML.includes('ref-thumb-container')) {
-          const _0x824c62 = createFakeElement('div');
-          ((_0x824c62.className = 'prompt-attachment-btn'), _0x1945d6.appendChild(_0x824c62));
-          const _0x566847 = createFakeElement('div');
-          ((_0x566847.className = 'ref-thumb-container'), _0x1945d6.appendChild(_0x566847));
+        if (el2._innerHTML.includes('ref-thumb-container')) {
+          const fakeElement2 = createFakeElement('div');
+          ((fakeElement2.className = 'prompt-attachment-btn'), el2.appendChild(fakeElement2));
+          const fakeElement3 = createFakeElement('div');
+          ((fakeElement3.className = 'ref-thumb-container'), el2.appendChild(fakeElement3));
         }
       }
     },
     get innerHTML() {
-      return _0x1945d6._innerHTML;
+      return el2._innerHTML;
     },
-    appendChild(_0xe34c58) {
-      if (_0xe34c58.parentElement) {
-        const _0xad3b56 = _0xe34c58.parentElement.childNodes.indexOf(_0xe34c58);
-        if (_0xad3b56 >= 0) _0xe34c58.parentElement.childNodes.splice(_0xad3b56, 1);
+    appendChild(value7) {
+      if (value7.parentElement) {
+        const count = value7.parentElement.childNodes.indexOf(value7);
+        if (count >= 0) value7.parentElement.childNodes.splice(count, 1);
       }
-      return ((_0xe34c58.parentElement = _0x1945d6), _0x1945d6.childNodes.push(_0xe34c58), _0xe34c58);
+      return ((value7.parentElement = el2), el2.childNodes.push(value7), value7);
     },
-    insertBefore(_0x2f8e27, _0x5ca625) {
-      if (!_0x5ca625) return _0x1945d6.appendChild(_0x2f8e27);
-      if (_0x2f8e27.parentElement) {
-        const _0x48c791 = _0x2f8e27.parentElement.childNodes.indexOf(_0x2f8e27);
-        if (_0x48c791 >= 0) _0x2f8e27.parentElement.childNodes.splice(_0x48c791, 1);
+    insertBefore(value8, enabled) {
+      if (!enabled) return el2.appendChild(value8);
+      if (value8.parentElement) {
+        const count2 = value8.parentElement.childNodes.indexOf(value8);
+        if (count2 >= 0) value8.parentElement.childNodes.splice(count2, 1);
       }
-      const _0x5a9a5e = _0x1945d6.childNodes.indexOf(_0x5ca625);
-      _0x2f8e27.parentElement = _0x1945d6;
-      if (_0x5a9a5e < 0) _0x1945d6.childNodes.push(_0x2f8e27);
-      else _0x1945d6.childNodes.splice(_0x5a9a5e, 0, _0x2f8e27);
-      return _0x2f8e27;
+      const count3 = el2.childNodes.indexOf(enabled);
+      value8.parentElement = el2;
+      if (count3 < 0) el2.childNodes.push(value8);
+      else el2.childNodes.splice(count3, 0, value8);
+      return value8;
     },
     remove() {
-      const _0x224e6c = _0x1945d6.parentElement;
-      if (!_0x224e6c) return;
-      const _0x1428b1 = _0x224e6c.childNodes.indexOf(_0x1945d6);
-      if (_0x1428b1 >= 0) _0x224e6c.childNodes.splice(_0x1428b1, 1);
-      _0x1945d6.parentElement = null;
+      const enabled2 = el2.parentElement;
+      if (!enabled2) return;
+      const count4 = enabled2.childNodes.indexOf(el2);
+      if (count4 >= 0) enabled2.childNodes.splice(count4, 1);
+      el2.parentElement = null;
     },
-    replaceWith(_0x495a13) {
-      const _0xcf1270 = _0x1945d6.parentElement;
-      if (!_0xcf1270) return;
-      const _0x8bb158 = _0xcf1270.childNodes.indexOf(_0x1945d6);
-      if (_0x8bb158 < 0) return;
-      ((_0x495a13.parentElement = _0xcf1270), (_0xcf1270.childNodes[_0x8bb158] = _0x495a13));
+    replaceWith(value9) {
+      const enabled3 = el2.parentElement;
+      if (!enabled3) return;
+      const count5 = enabled3.childNodes.indexOf(el2);
+      if (count5 < 0) return;
+      ((value9.parentElement = enabled3), (enabled3.childNodes[count5] = value9));
     },
-    setAttribute(_0x77b151, _0xc1af0a) {
-      _0x1945d6.attributes[_0x77b151] = String(_0xc1af0a || '');
+    setAttribute(value10, value11) {
+      el2.attributes[value10] = String(value11 || '');
     },
     addEventListener() {},
-    querySelector(_0x1e0b4) {
-      return _0x1945d6.querySelectorAll(_0x1e0b4)[0] || null;
+    querySelector(value12) {
+      return el2.querySelectorAll(value12)[0] || null;
     },
-    querySelectorAll(_0x564c5e) {
-      const _0x30c870 = [],
-        _0x8c8272 = (_0x40afa6) => {
-          if (_0x564c5e.startsWith('.')) return _0x40afa6.classList?.contains(_0x564c5e.slice(1));
-          const _0x544c8a = _0x564c5e.match(/^\[data-slot(?:="([^"]+)")?\]$/);
-          if (_0x544c8a) {
-            if (!('slot' in _0x40afa6.dataset)) return false;
-            return _0x544c8a[1] ? _0x40afa6.dataset.slot === _0x544c8a[1] : true;
+    querySelectorAll(list4) {
+      const list5 = [],
+        handler = (el5) => {
+          if (list4.startsWith('.')) return el5.classList?.contains(list4.slice(1));
+          const value13 = list4.match(/^\[data-slot(?:="([^"]+)")?\]$/);
+          if (value13) {
+            if (!('slot' in el5.dataset)) return false;
+            return value13[1] ? el5.dataset.slot === value13[1] : true;
           }
           return false;
         },
-        _0x560c6a = (_0x34480c) => {
-          _0x34480c.childNodes.forEach((_0x46e6b2) => {
-            if (_0x8c8272(_0x46e6b2)) _0x30c870.push(_0x46e6b2);
-            _0x560c6a(_0x46e6b2);
+        handler2 = (value14) => {
+          value14.childNodes.forEach((item7) => {
+            if (handler(item7)) list5.push(item7);
+            handler2(item7);
           });
         };
-      return (_0x560c6a(_0x1945d6), _0x30c870);
+      return (handler2(el2), list5);
     },
   };
-  return ((_0x1945d6.classList = makeClassList(_0x1945d6)), _0x1945d6);
+  return ((el2.classList = makeClassList(el2)), el2);
 }
 (test('video reference input: HappyHorse mode change refreshes visible fixed slots', async () => {
-  const _0x5ed0c6 = globalThis.document;
+  const value15 = globalThis.document;
   globalThis.document = { createElement: createFakeElement };
   try {
-    const _0x18460a = 'node-happyhorse',
-      _0x2ee908 = {
+    const id = 'node-happyhorse',
+      _data = {
         nodes: {
-          [_0x18460a]: {
-            id: _0x18460a,
+          [id]: {
+            id: id,
             type: 'ai-video',
             model: 'apimart/happyhorse-1.0',
             provider: 'apimart',
@@ -397,52 +391,52 @@ function createFakeElement(_0x1e0242 = 'div') {
           },
         },
       },
-      _0x17c8fa = createVideoNodeReferenceInputModule({
-        store: { getState: () => _0x2ee908, getIncomingEdges: () => [] },
+      videoNodeReferenceInputModule = createVideoNodeReferenceInputModule({
+        store: { getState: () => _data, getIncomingEdges: () => [] },
         api: {},
         _syncPillLabels: () => {},
         getImage: async () => null,
         ensureThumbDecoded: () => {},
         revealRefThumbMedia: () => {},
       }),
-      _0x20023b = Object.assign(Object.create(_0x17c8fa), {
-        nodeId: _0x18460a,
-        _data: _0x2ee908.nodes[_0x18460a],
+      value16 = Object.assign(Object.create(videoNodeReferenceInputModule), {
+        nodeId: id,
+        _data: _data.nodes[id],
         refBarEl: createFakeElement('div'),
         promptEl: makePromptEl(),
         _fixedSlotRefThumbObjectUrls: new Map(),
         _videoThumbPending: new Set(),
         _isRunninghubWorkflowModel: () => false,
-        _resolveMediaUrl: (_0xdf46d1) => String(_0xdf46d1 || ''),
+        _resolveMediaUrl: (value17) => String(value17 || ''),
         _syncBtnIconState: () => {},
       });
-    await _0x17c8fa._renderRefBarImpl.call(_0x20023b);
-    let _0x4474c5 = _0x20023b.refBarEl.querySelector('.rh-v5-ref-container');
-    (assert.ok(_0x4474c5.querySelector('[data-slot="firstFrame"]')),
-      assert.equal(_0x4474c5.querySelector('[data-slot="lastFrame"]'), null),
-      assert.equal(_0x4474c5.querySelector('[data-slot="referenceImage"]'), null),
-      (_0x2ee908.nodes[_0x18460a] = {
-        ..._0x2ee908.nodes[_0x18460a],
+    await videoNodeReferenceInputModule._renderRefBarImpl.call(value16);
+    let el6 = value16.refBarEl.querySelector('.rh-v5-ref-container');
+    (assert.ok(el6.querySelector('[data-slot="firstFrame"]')),
+      assert.equal(el6.querySelector('[data-slot="lastFrame"]'), null),
+      assert.equal(el6.querySelector('[data-slot="referenceImage"]'), null),
+      (_data.nodes[id] = {
+        ..._data.nodes[id],
         generationParams: { happyhorse_mode: 'reference' },
       }),
-      await _0x17c8fa._renderRefBarImpl.call(_0x20023b),
-      (_0x4474c5 = _0x20023b.refBarEl.querySelector('.rh-v5-ref-container')),
-      assert.equal(_0x4474c5.querySelector('[data-slot="firstFrame"]'), null),
-      assert.ok(_0x4474c5.querySelector('[data-slot="referenceImage"]')));
+      await videoNodeReferenceInputModule._renderRefBarImpl.call(value16),
+      (el6 = value16.refBarEl.querySelector('.rh-v5-ref-container')),
+      assert.equal(el6.querySelector('[data-slot="firstFrame"]'), null),
+      assert.ok(el6.querySelector('[data-slot="referenceImage"]')));
   } finally {
-    if (typeof _0x5ed0c6 === 'undefined') delete globalThis.document;
-    else globalThis.document = _0x5ed0c6;
+    if (typeof value15 === 'undefined') delete globalThis.document;
+    else globalThis.document = value15;
   }
 }),
   test('video reference input: Hailuo 2.3 refreshes stale last-frame refbar slot', async () => {
-    const _0x1a30ff = globalThis.document;
+    const value18 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x19d2b6 = 'node-hailuo-23',
-        _0x26a393 = {
+      const id2 = 'node-hailuo-23',
+        _data2 = {
           nodes: {
-            [_0x19d2b6]: {
-              id: _0x19d2b6,
+            [id2]: {
+              id: id2,
               type: 'ai-video',
               model: 'apimart/minimax-hailuo-2.3',
               provider: 'apimart',
@@ -450,57 +444,57 @@ function createFakeElement(_0x1e0242 = 'div') {
             },
           },
         },
-        _0x57eeae = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x26a393, getIncomingEdges: () => [] },
+        videoNodeReferenceInputModule2 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data2, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x3cac73 = Object.assign(Object.create(_0x57eeae), {
-          nodeId: _0x19d2b6,
-          _data: _0x26a393.nodes[_0x19d2b6],
+        value19 = Object.assign(Object.create(videoNodeReferenceInputModule2), {
+          nodeId: id2,
+          _data: _data2.nodes[id2],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => false,
           _refBarLayoutKey: 'fixed',
-          _resolveMediaUrl: (_0xf586b) => String(_0xf586b || ''),
+          _resolveMediaUrl: (value20) => String(value20 || ''),
           _syncBtnIconState: () => {},
         });
-      _0x3cac73.refBarEl.innerHTML = [
+      value19.refBarEl.innerHTML = [
         '<div class="prompt-attachment-btn"></div>',
         '<div class="ref-thumb-container rh-v5-ref-container">',
         '<button data-slot="firstFrame"></button>',
         '<button data-slot="lastFrame"></button>',
         '</div>',
       ].join('');
-      const _0x5c7f20 = _0x3cac73.refBarEl._innerHTMLSetCount;
-      await _0x57eeae._renderRefBarImpl.call(_0x3cac73);
-      const _0x40f17f = _0x3cac73.refBarEl.querySelector('.rh-v5-ref-container');
-      (assert.equal(_0x3cac73.refBarEl._innerHTMLSetCount, _0x5c7f20),
+      const value21 = value19.refBarEl._innerHTMLSetCount;
+      await videoNodeReferenceInputModule2._renderRefBarImpl.call(value19);
+      const el7 = value19.refBarEl.querySelector('.rh-v5-ref-container');
+      (assert.equal(value19.refBarEl._innerHTMLSetCount, value21),
         assert.deepEqual(
-          Array.from(_0x40f17f.querySelectorAll('[data-slot]')).map((_0x226ad3) => _0x226ad3.dataset.slot),
+          Array.from(el7.querySelectorAll('[data-slot]')).map((el8) => el8.dataset.slot),
           ['firstFrame'],
         ),
-        assert.ok(_0x40f17f.querySelector('[data-slot="firstFrame"]')),
-        assert.equal(_0x40f17f.querySelector('[data-slot="lastFrame"]'), null));
+        assert.ok(el7.querySelector('[data-slot="firstFrame"]')),
+        assert.equal(el7.querySelector('[data-slot="lastFrame"]'), null));
     } finally {
-      if (typeof _0x1a30ff === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x1a30ff;
+      if (typeof value18 === 'undefined') delete globalThis.document;
+      else globalThis.document = value18;
     }
   }),
   test('video reference input: Wan2.7 mode change refreshes fixed slots', async () => {
-    const _0x5bd992 = globalThis.document;
+    const value22 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x2a8264 = 'node-wan27',
-        _0x3e0c17 = {
+      const id3 = 'node-wan27',
+        _data3 = {
           nodes: {
-            [_0x2a8264]: {
-              id: _0x2a8264,
+            [id3]: {
+              id: id3,
               type: 'ai-video',
               model: 'apimart/wan2.7',
               provider: 'apimart',
@@ -508,51 +502,51 @@ function createFakeElement(_0x1e0242 = 'div') {
             },
           },
         },
-        _0x3ef83b = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x3e0c17, getIncomingEdges: () => [] },
+        videoNodeReferenceInputModule3 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data3, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x350b78 = Object.assign(Object.create(_0x3ef83b), {
-          nodeId: _0x2a8264,
-          _data: _0x3e0c17.nodes[_0x2a8264],
+        value23 = Object.assign(Object.create(videoNodeReferenceInputModule3), {
+          nodeId: id3,
+          _data: _data3.nodes[id3],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => false,
-          _resolveMediaUrl: (_0x53973f) => String(_0x53973f || ''),
+          _resolveMediaUrl: (value24) => String(value24 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x3ef83b._renderRefBarImpl.call(_0x350b78);
-      let _0x1f8553 = _0x350b78.refBarEl.querySelector('.rh-v5-ref-container');
-      const _0x3367af = _0x350b78.refBarEl._innerHTMLSetCount;
+      await videoNodeReferenceInputModule3._renderRefBarImpl.call(value23);
+      let el9 = value23.refBarEl.querySelector('.rh-v5-ref-container');
+      const value25 = value23.refBarEl._innerHTMLSetCount;
       (assert.deepEqual(
-        Array.from(_0x1f8553.querySelectorAll('[data-slot]')).map((_0x33479f) => _0x33479f.dataset.slot),
+        Array.from(el9.querySelectorAll('[data-slot]')).map((el10) => el10.dataset.slot),
         ['firstFrame', 'lastFrame', 'audio'],
       ),
-        assert.ok(_0x1f8553.querySelector('[data-slot="firstFrame"]')),
-        assert.ok(_0x1f8553.querySelector('[data-slot="lastFrame"]')),
-        assert.ok(_0x1f8553.querySelector('[data-slot="audio"]')),
-        assert.equal(_0x1f8553.querySelector('[data-slot="sourceVideo"]'), null),
-        (_0x3e0c17.nodes[_0x2a8264] = {
-          ..._0x3e0c17.nodes[_0x2a8264],
+        assert.ok(el9.querySelector('[data-slot="firstFrame"]')),
+        assert.ok(el9.querySelector('[data-slot="lastFrame"]')),
+        assert.ok(el9.querySelector('[data-slot="audio"]')),
+        assert.equal(el9.querySelector('[data-slot="sourceVideo"]'), null),
+        (_data3.nodes[id3] = {
+          ..._data3.nodes[id3],
           generationParams: { wan27_mode: 'video' },
         }),
-        await _0x3ef83b._renderRefBarImpl.call(_0x350b78),
-        (_0x1f8553 = _0x350b78.refBarEl.querySelector('.rh-v5-ref-container')),
-        assert.equal(_0x350b78.refBarEl._innerHTMLSetCount, _0x3367af),
+        await videoNodeReferenceInputModule3._renderRefBarImpl.call(value23),
+        (el9 = value23.refBarEl.querySelector('.rh-v5-ref-container')),
+        assert.equal(value23.refBarEl._innerHTMLSetCount, value25),
         assert.deepEqual(
-          Array.from(_0x1f8553.querySelectorAll('[data-slot]')).map((_0x481490) => _0x481490.dataset.slot),
+          Array.from(el9.querySelectorAll('[data-slot]')).map((el11) => el11.dataset.slot),
           ['sourceVideo'],
         ),
-        assert.equal(_0x1f8553.querySelector('[data-slot="firstFrame"]'), null),
-        assert.equal(_0x1f8553.querySelector('[data-slot="audio"]'), null),
-        assert.ok(_0x1f8553.querySelector('[data-slot="sourceVideo"]')),
-        (_0x350b78.refBarEl.innerHTML = [
+        assert.equal(el9.querySelector('[data-slot="firstFrame"]'), null),
+        assert.equal(el9.querySelector('[data-slot="audio"]'), null),
+        assert.ok(el9.querySelector('[data-slot="sourceVideo"]')),
+        (value23.refBarEl.innerHTML = [
           '<div class="prompt-attachment-btn"></div>',
           '<div class="ref-thumb-container rh-v5-ref-container">',
           '<button data-slot="lastFrame"></button>',
@@ -564,97 +558,101 @@ function createFakeElement(_0x1e0242 = 'div') {
           '<button data-slot="referenceAudio"></button>',
           '</div>',
         ].join('')));
-      const _0x1a52b7 = _0x350b78.refBarEl._innerHTMLSetCount;
-      (await _0x3ef83b._renderRefBarImpl.call(_0x350b78),
-        (_0x1f8553 = _0x350b78.refBarEl.querySelector('.rh-v5-ref-container')),
-        assert.equal(_0x350b78.refBarEl._innerHTMLSetCount, _0x1a52b7),
+      const value26 = value23.refBarEl._innerHTMLSetCount;
+      (await videoNodeReferenceInputModule3._renderRefBarImpl.call(value23),
+        (el9 = value23.refBarEl.querySelector('.rh-v5-ref-container')),
+        assert.equal(value23.refBarEl._innerHTMLSetCount, value26),
         assert.deepEqual(
-          Array.from(_0x1f8553.querySelectorAll('[data-slot]')).map((_0x2c882b) => _0x2c882b.dataset.slot),
+          Array.from(el9.querySelectorAll('[data-slot]')).map((el12) => el12.dataset.slot),
           ['sourceVideo'],
         ),
-        assert.equal(_0x1f8553.querySelector('[data-slot="lastFrame"]'), null),
-        assert.equal(_0x1f8553.querySelector('[data-slot="referenceImage"]'), null),
-        assert.equal(_0x1f8553.querySelector('[data-slot="originalVideo"]'), null),
-        assert.equal(_0x1f8553.querySelector('[data-slot="referenceVideo"]'), null),
-        assert.equal(_0x1f8553.querySelector('[data-slot="audio"]'), null),
-        assert.equal(_0x1f8553.querySelector('[data-slot="referenceAudio"]'), null));
-      const _0x724a44 = _0x350b78.refBarEl._innerHTMLSetCount;
-      ((_0x3e0c17.nodes[_0x2a8264] = {
-        ..._0x3e0c17.nodes[_0x2a8264],
+        assert.equal(el9.querySelector('[data-slot="lastFrame"]'), null),
+        assert.equal(el9.querySelector('[data-slot="referenceImage"]'), null),
+        assert.equal(el9.querySelector('[data-slot="originalVideo"]'), null),
+        assert.equal(el9.querySelector('[data-slot="referenceVideo"]'), null),
+        assert.equal(el9.querySelector('[data-slot="audio"]'), null),
+        assert.equal(el9.querySelector('[data-slot="referenceAudio"]'), null));
+      const value27 = value23.refBarEl._innerHTMLSetCount;
+      ((_data3.nodes[id3] = {
+        ..._data3.nodes[id3],
         generationParams: { wan27_mode: 'reference' },
       }),
-        (_0x350b78._data = _0x3e0c17.nodes[_0x2a8264]));
-      const _0x926038 = getFixedInputSlotConfigFromManifest(_0x3e0c17.nodes[_0x2a8264]);
-      (assert.deepEqual(_0x926038?.visibleSlots, ['referenceImage', 'referenceVideo', 'referenceAudio']),
-        assert.ok(_0x926038?.fixedSlots?.some((_0x770645) => _0x770645.id === 'firstFrame')),
-        assert.ok(_0x926038?.slotById?.firstFrame),
-        await _0x3ef83b._renderRefBarImpl.call(_0x350b78),
-        (_0x1f8553 = _0x350b78.refBarEl.querySelector('.rh-v5-ref-container')),
-        assert.equal(_0x350b78.refBarEl._innerHTMLSetCount, _0x724a44),
+        (value23._data = _data3.nodes[id3]));
+      const fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(_data3.nodes[id3]);
+      (assert.deepEqual(fixedInputSlotConfigFromManifest?.visibleSlots, [
+        'referenceImage',
+        'referenceVideo',
+        'referenceAudio',
+      ]),
+        assert.ok(fixedInputSlotConfigFromManifest?.fixedSlots?.some((item8) => item8.id === 'firstFrame')),
+        assert.ok(fixedInputSlotConfigFromManifest?.slotById?.firstFrame),
+        await videoNodeReferenceInputModule3._renderRefBarImpl.call(value23),
+        (el9 = value23.refBarEl.querySelector('.rh-v5-ref-container')),
+        assert.equal(value23.refBarEl._innerHTMLSetCount, value27),
         assert.deepEqual(
-          Array.from(_0x1f8553.querySelectorAll('[data-slot]')).map((_0x1b9df3) => _0x1b9df3.dataset.slot),
+          Array.from(el9.querySelectorAll('[data-slot]')).map((el13) => el13.dataset.slot),
           ['referenceImage', 'referenceVideo', 'referenceAudio'],
         ),
-        assert.equal(_0x1f8553.querySelector('[data-slot="firstFrame"]'), null),
-        assert.equal(_0x1f8553.querySelector('[data-slot="lastFrame"]'), null),
-        assert.ok(_0x1f8553.querySelector('[data-slot="referenceAudio"]')),
-        assert.equal(_0x1f8553.querySelector('[data-slot="sourceVideo"]'), null),
-        assert.ok(_0x1f8553.querySelector('[data-slot="referenceVideo"]')),
-        assert.equal(_0x1f8553.querySelector('[data-slot="originalVideo"]'), null),
-        assert.ok(_0x1f8553.querySelector('[data-slot="referenceImage"]')));
-      const _0x53fad3 = _0x350b78.refBarEl._innerHTMLSetCount;
-      ((_0x3e0c17.nodes[_0x2a8264] = {
-        ..._0x3e0c17.nodes[_0x2a8264],
+        assert.equal(el9.querySelector('[data-slot="firstFrame"]'), null),
+        assert.equal(el9.querySelector('[data-slot="lastFrame"]'), null),
+        assert.ok(el9.querySelector('[data-slot="referenceAudio"]')),
+        assert.equal(el9.querySelector('[data-slot="sourceVideo"]'), null),
+        assert.ok(el9.querySelector('[data-slot="referenceVideo"]')),
+        assert.equal(el9.querySelector('[data-slot="originalVideo"]'), null),
+        assert.ok(el9.querySelector('[data-slot="referenceImage"]')));
+      const value28 = value23.refBarEl._innerHTMLSetCount;
+      ((_data3.nodes[id3] = {
+        ..._data3.nodes[id3],
         generationParams: { wan27_mode: 'edit' },
       }),
-        (_0x350b78._data = _0x3e0c17.nodes[_0x2a8264]),
-        await _0x3ef83b._renderRefBarImpl.call(_0x350b78),
-        (_0x1f8553 = _0x350b78.refBarEl.querySelector('.rh-v5-ref-container')),
-        assert.equal(_0x350b78.refBarEl._innerHTMLSetCount, _0x53fad3),
+        (value23._data = _data3.nodes[id3]),
+        await videoNodeReferenceInputModule3._renderRefBarImpl.call(value23),
+        (el9 = value23.refBarEl.querySelector('.rh-v5-ref-container')),
+        assert.equal(value23.refBarEl._innerHTMLSetCount, value28),
         assert.deepEqual(
-          Array.from(_0x1f8553.querySelectorAll('[data-slot]')).map((_0x3d9f23) => _0x3d9f23.dataset.slot),
+          Array.from(el9.querySelectorAll('[data-slot]')).map((el14) => el14.dataset.slot),
           ['originalVideo', 'referenceVideo'],
         ),
-        assert.equal(_0x1f8553.querySelector('[data-slot="referenceImage"]'), null),
-        assert.ok(_0x1f8553.querySelector('[data-slot="originalVideo"]')),
-        assert.ok(_0x1f8553.querySelector('[data-slot="referenceVideo"]')),
-        (_0x3e0c17.nodes[_0x2a8264] = {
-          ..._0x3e0c17.nodes[_0x2a8264],
+        assert.equal(el9.querySelector('[data-slot="referenceImage"]'), null),
+        assert.ok(el9.querySelector('[data-slot="originalVideo"]')),
+        assert.ok(el9.querySelector('[data-slot="referenceVideo"]')),
+        (_data3.nodes[id3] = {
+          ..._data3.nodes[id3],
           model: 'wan2.7',
           generationParams: { wan27_mode: 'image' },
         }),
-        (_0x350b78._data = _0x3e0c17.nodes[_0x2a8264]),
-        await _0x3ef83b._renderRefBarImpl.call(_0x350b78),
-        (_0x1f8553 = _0x350b78.refBarEl.querySelector('.rh-v5-ref-container')),
-        assert.ok(_0x1f8553.querySelector('[data-slot="firstFrame"]')),
-        assert.ok(_0x1f8553.querySelector('[data-slot="lastFrame"]')),
-        assert.ok(_0x1f8553.querySelector('[data-slot="audio"]')),
-        assert.equal(_0x1f8553.querySelector('[data-slot="sourceVideo"]'), null),
-        (_0x3e0c17.nodes[_0x2a8264] = {
-          ..._0x3e0c17.nodes[_0x2a8264],
+        (value23._data = _data3.nodes[id3]),
+        await videoNodeReferenceInputModule3._renderRefBarImpl.call(value23),
+        (el9 = value23.refBarEl.querySelector('.rh-v5-ref-container')),
+        assert.ok(el9.querySelector('[data-slot="firstFrame"]')),
+        assert.ok(el9.querySelector('[data-slot="lastFrame"]')),
+        assert.ok(el9.querySelector('[data-slot="audio"]')),
+        assert.equal(el9.querySelector('[data-slot="sourceVideo"]'), null),
+        (_data3.nodes[id3] = {
+          ..._data3.nodes[id3],
           model: 'apimart/wan2.7',
           provider: 'apimartr',
           generationParams: { wan27_mode: 'video' },
         }),
-        (_0x350b78._data = _0x3e0c17.nodes[_0x2a8264]),
-        await _0x3ef83b._renderRefBarImpl.call(_0x350b78),
-        (_0x1f8553 = _0x350b78.refBarEl.querySelector('.rh-v5-ref-container')),
-        assert.equal(_0x1f8553.querySelector('[data-slot="firstFrame"]'), null),
-        assert.ok(_0x1f8553.querySelector('[data-slot="sourceVideo"]')));
+        (value23._data = _data3.nodes[id3]),
+        await videoNodeReferenceInputModule3._renderRefBarImpl.call(value23),
+        (el9 = value23.refBarEl.querySelector('.rh-v5-ref-container')),
+        assert.equal(el9.querySelector('[data-slot="firstFrame"]'), null),
+        assert.ok(el9.querySelector('[data-slot="sourceVideo"]')));
     } finally {
-      if (typeof _0x5bd992 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x5bd992;
+      if (typeof value22 === 'undefined') delete globalThis.document;
+      else globalThis.document = value22;
     }
   }),
   test('video reference input: Kling V3 Omni mode change refreshes fixed slots', async () => {
-    const _0x34078d = globalThis.document;
+    const value29 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x30c2ea = 'node-kling-v3-omni',
-        _0x4786c3 = {
+      const id4 = 'node-kling-v3-omni',
+        _data4 = {
           nodes: {
-            [_0x30c2ea]: {
-              id: _0x30c2ea,
+            [id4]: {
+              id: id4,
               type: 'ai-video',
               model: 'apimart/kling-v3-omni',
               provider: 'apimart',
@@ -662,128 +660,128 @@ function createFakeElement(_0x1e0242 = 'div') {
             },
           },
         },
-        _0x55e5ee = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x4786c3, getIncomingEdges: () => [] },
+        videoNodeReferenceInputModule4 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data4, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x26b171 = Object.assign(Object.create(_0x55e5ee), {
-          nodeId: _0x30c2ea,
-          _data: _0x4786c3.nodes[_0x30c2ea],
+        value30 = Object.assign(Object.create(videoNodeReferenceInputModule4), {
+          nodeId: id4,
+          _data: _data4.nodes[id4],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => false,
-          _resolveMediaUrl: (_0x47750a) => String(_0x47750a || ''),
+          _resolveMediaUrl: (value31) => String(value31 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x55e5ee._renderRefBarImpl.call(_0x26b171);
-      let _0x73de69 = _0x26b171.refBarEl.querySelector('.rh-v5-ref-container');
+      await videoNodeReferenceInputModule4._renderRefBarImpl.call(value30);
+      let el15 = value30.refBarEl.querySelector('.rh-v5-ref-container');
       (assert.deepEqual(
-        Array.from(_0x73de69.querySelectorAll('[data-slot]')).map((_0x5dbaca) => _0x5dbaca.dataset.slot),
+        Array.from(el15.querySelectorAll('[data-slot]')).map((el16) => el16.dataset.slot),
         ['firstFrame', 'lastFrame'],
       ),
-        assert.ok(_0x73de69.querySelector('[data-slot="firstFrame"]')),
-        assert.ok(_0x73de69.querySelector('[data-slot="lastFrame"]')));
-      const _0x4ac33f = _0x26b171.refBarEl._innerHTMLSetCount;
-      ((_0x4786c3.nodes[_0x30c2ea] = {
-        ..._0x4786c3.nodes[_0x30c2ea],
+        assert.ok(el15.querySelector('[data-slot="firstFrame"]')),
+        assert.ok(el15.querySelector('[data-slot="lastFrame"]')));
+      const value32 = value30.refBarEl._innerHTMLSetCount;
+      ((_data4.nodes[id4] = {
+        ..._data4.nodes[id4],
         generationParams: { kling_v3_omni_mode: 'reference' },
       }),
-        (_0x26b171._data = _0x4786c3.nodes[_0x30c2ea]),
-        await _0x55e5ee._renderRefBarImpl.call(_0x26b171),
-        (_0x73de69 = _0x26b171.refBarEl.querySelector('.rh-v5-ref-container')),
-        assert.equal(_0x26b171.refBarEl._innerHTMLSetCount, _0x4ac33f),
+        (value30._data = _data4.nodes[id4]),
+        await videoNodeReferenceInputModule4._renderRefBarImpl.call(value30),
+        (el15 = value30.refBarEl.querySelector('.rh-v5-ref-container')),
+        assert.equal(value30.refBarEl._innerHTMLSetCount, value32),
         assert.deepEqual(
-          Array.from(_0x73de69.querySelectorAll('[data-slot]')).map((_0x5ef923) => _0x5ef923.dataset.slot),
+          Array.from(el15.querySelectorAll('[data-slot]')).map((el17) => el17.dataset.slot),
           ['referenceImage', 'referenceVideo'],
         ),
-        assert.equal(_0x73de69.querySelector('[data-slot="firstFrame"]'), null),
-        assert.equal(_0x73de69.querySelector('[data-slot="lastFrame"]'), null),
-        assert.ok(_0x73de69.querySelector('[data-slot="referenceImage"]')),
-        assert.ok(_0x73de69.querySelector('[data-slot="referenceVideo"]')));
-      const _0x5c1b6d = _0x26b171.refBarEl._innerHTMLSetCount;
-      ((_0x4786c3.nodes[_0x30c2ea] = {
-        ..._0x4786c3.nodes[_0x30c2ea],
+        assert.equal(el15.querySelector('[data-slot="firstFrame"]'), null),
+        assert.equal(el15.querySelector('[data-slot="lastFrame"]'), null),
+        assert.ok(el15.querySelector('[data-slot="referenceImage"]')),
+        assert.ok(el15.querySelector('[data-slot="referenceVideo"]')));
+      const value33 = value30.refBarEl._innerHTMLSetCount;
+      ((_data4.nodes[id4] = {
+        ..._data4.nodes[id4],
         generationParams: { kling_v3_omni_mode: 'edit' },
       }),
-        (_0x26b171._data = _0x4786c3.nodes[_0x30c2ea]),
-        await _0x55e5ee._renderRefBarImpl.call(_0x26b171),
-        (_0x73de69 = _0x26b171.refBarEl.querySelector('.rh-v5-ref-container')),
-        assert.equal(_0x26b171.refBarEl._innerHTMLSetCount, _0x5c1b6d),
+        (value30._data = _data4.nodes[id4]),
+        await videoNodeReferenceInputModule4._renderRefBarImpl.call(value30),
+        (el15 = value30.refBarEl.querySelector('.rh-v5-ref-container')),
+        assert.equal(value30.refBarEl._innerHTMLSetCount, value33),
         assert.deepEqual(
-          Array.from(_0x73de69.querySelectorAll('[data-slot]')).map((_0x278feb) => _0x278feb.dataset.slot),
+          Array.from(el15.querySelectorAll('[data-slot]')).map((el18) => el18.dataset.slot),
           ['editVideo'],
         ),
-        assert.equal(_0x73de69.querySelector('[data-slot="referenceImage"]'), null),
-        assert.equal(_0x73de69.querySelector('[data-slot="referenceVideo"]'), null),
-        assert.ok(_0x73de69.querySelector('[data-slot="editVideo"]')));
+        assert.equal(el15.querySelector('[data-slot="referenceImage"]'), null),
+        assert.equal(el15.querySelector('[data-slot="referenceVideo"]'), null),
+        assert.ok(el15.querySelector('[data-slot="editVideo"]')));
     } finally {
-      if (typeof _0x34078d === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x34078d;
+      if (typeof value29 === 'undefined') delete globalThis.document;
+      else globalThis.document = value29;
     }
   }),
   test('video reference input: Kling O1 renders fixed reference slots', async () => {
-    const _0x38599f = globalThis.document;
+    const value34 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x1a3f54 = 'node-kling-o1',
-        _0x847418 = {
+      const id5 = 'node-kling-o1',
+        _data5 = {
           nodes: {
-            [_0x1a3f54]: {
-              id: _0x1a3f54,
+            [id5]: {
+              id: id5,
               type: 'ai-video',
               model: 'apimart/kling-video-o1',
               provider: 'apimart',
             },
           },
         },
-        _0x116bf3 = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x847418, getIncomingEdges: () => [] },
+        videoNodeReferenceInputModule5 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data5, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x4e05c9 = Object.assign(Object.create(_0x116bf3), {
-          nodeId: _0x1a3f54,
-          _data: _0x847418.nodes[_0x1a3f54],
+        value35 = Object.assign(Object.create(videoNodeReferenceInputModule5), {
+          nodeId: id5,
+          _data: _data5.nodes[id5],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => false,
-          _resolveMediaUrl: (_0x33057f) => String(_0x33057f || ''),
+          _resolveMediaUrl: (value36) => String(value36 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x116bf3._renderRefBarImpl.call(_0x4e05c9);
-      const _0x535c92 = _0x4e05c9.refBarEl.querySelector('.rh-v5-ref-container');
+      await videoNodeReferenceInputModule5._renderRefBarImpl.call(value35);
+      const el19 = value35.refBarEl.querySelector('.rh-v5-ref-container');
       (assert.deepEqual(
-        Array.from(_0x535c92.querySelectorAll('[data-slot]')).map((_0x37a223) => _0x37a223.dataset.slot),
+        Array.from(el19.querySelectorAll('[data-slot]')).map((el20) => el20.dataset.slot),
         ['editVideo', 'featureReferenceVideo', 'referenceImage'],
       ),
-        assert.ok(_0x535c92.querySelector('[data-slot="editVideo"]')),
-        assert.ok(_0x535c92.querySelector('[data-slot="featureReferenceVideo"]')),
-        assert.ok(_0x535c92.querySelector('[data-slot="referenceImage"]')));
+        assert.ok(el19.querySelector('[data-slot="editVideo"]')),
+        assert.ok(el19.querySelector('[data-slot="featureReferenceVideo"]')),
+        assert.ok(el19.querySelector('[data-slot="referenceImage"]')));
     } finally {
-      if (typeof _0x38599f === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x38599f;
+      if (typeof value34 === 'undefined') delete globalThis.document;
+      else globalThis.document = value34;
     }
   }),
   test('video reference input: RunningHub Kling O1 reference mode puts video slot first', async () => {
-    const _0x9a48f7 = globalThis.document;
+    const value37 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x12cc09 = 'node-runninghub-kling-o1',
-        _0x504da4 = {
+      const id6 = 'node-runninghub-kling-o1',
+        _data6 = {
           nodes: {
-            [_0x12cc09]: {
-              id: _0x12cc09,
+            [id6]: {
+              id: id6,
               type: 'ai-video',
               model: 'runninghub-model/kling-video-o1',
               provider: 'runninghub',
@@ -791,47 +789,47 @@ function createFakeElement(_0x1e0242 = 'div') {
             },
           },
         },
-        _0x4e5c4b = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x504da4, getIncomingEdges: () => [] },
+        videoNodeReferenceInputModule6 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data6, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x588845 = Object.assign(Object.create(_0x4e5c4b), {
-          nodeId: _0x12cc09,
-          _data: _0x504da4.nodes[_0x12cc09],
+        value38 = Object.assign(Object.create(videoNodeReferenceInputModule6), {
+          nodeId: id6,
+          _data: _data6.nodes[id6],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => false,
-          _resolveMediaUrl: (_0x5ed8a0) => String(_0x5ed8a0 || ''),
+          _resolveMediaUrl: (value39) => String(value39 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x4e5c4b._renderRefBarImpl.call(_0x588845);
-      const _0x3dc338 = _0x588845.refBarEl.querySelector('.rh-v5-ref-container');
+      await videoNodeReferenceInputModule6._renderRefBarImpl.call(value38);
+      const el21 = value38.refBarEl.querySelector('.rh-v5-ref-container');
       (assert.deepEqual(
-        Array.from(_0x3dc338.querySelectorAll('[data-slot]')).map((_0x3163ac) => _0x3163ac.dataset.slot),
+        Array.from(el21.querySelectorAll('[data-slot]')).map((el22) => el22.dataset.slot),
         ['referenceVideo', 'referenceImage'],
       ),
-        assert.ok(_0x3dc338.querySelector('[data-slot="referenceVideo"]')),
-        assert.ok(_0x3dc338.querySelector('[data-slot="referenceImage"]')));
+        assert.ok(el21.querySelector('[data-slot="referenceVideo"]')),
+        assert.ok(el21.querySelector('[data-slot="referenceImage"]')));
     } finally {
-      if (typeof _0x9a48f7 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x9a48f7;
+      if (typeof value37 === 'undefined') delete globalThis.document;
+      else globalThis.document = value37;
     }
   }),
   test('video reference input: RunningHub Kling O3 reference mode puts video slot first', async () => {
-    const _0x130f96 = globalThis.document;
+    const value40 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0xd389f9 = 'node-runninghub-kling-o3',
-        _0x113888 = {
+      const id7 = 'node-runninghub-kling-o3',
+        _data7 = {
           nodes: {
-            [_0xd389f9]: {
-              id: _0xd389f9,
+            [id7]: {
+              id: id7,
               type: 'ai-video',
               model: 'runninghub-model/kling-o3',
               provider: 'runninghub',
@@ -839,139 +837,143 @@ function createFakeElement(_0x1e0242 = 'div') {
             },
           },
         },
-        _0x8db728 = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x113888, getIncomingEdges: () => [] },
+        videoNodeReferenceInputModule7 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data7, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x1839d7 = Object.assign(Object.create(_0x8db728), {
-          nodeId: _0xd389f9,
-          _data: _0x113888.nodes[_0xd389f9],
+        value41 = Object.assign(Object.create(videoNodeReferenceInputModule7), {
+          nodeId: id7,
+          _data: _data7.nodes[id7],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => false,
-          _resolveMediaUrl: (_0x362808) => String(_0x362808 || ''),
+          _resolveMediaUrl: (value42) => String(value42 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x8db728._renderRefBarImpl.call(_0x1839d7);
-      const _0x524630 = _0x1839d7.refBarEl.querySelector('.rh-v5-ref-container');
+      await videoNodeReferenceInputModule7._renderRefBarImpl.call(value41);
+      const el23 = value41.refBarEl.querySelector('.rh-v5-ref-container');
       (assert.deepEqual(
-        Array.from(_0x524630.querySelectorAll('[data-slot]')).map((_0x35817c) => _0x35817c.dataset.slot),
+        Array.from(el23.querySelectorAll('[data-slot]')).map((el24) => el24.dataset.slot),
         ['referenceVideo', 'referenceImage'],
       ),
-        assert.ok(_0x524630.querySelector('[data-slot="referenceVideo"]')),
-        assert.ok(_0x524630.querySelector('[data-slot="referenceImage"]')));
+        assert.ok(el23.querySelector('[data-slot="referenceVideo"]')),
+        assert.ok(el23.querySelector('[data-slot="referenceImage"]')));
     } finally {
-      if (typeof _0x130f96 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x130f96;
+      if (typeof value40 === 'undefined') delete globalThis.document;
+      else globalThis.document = value40;
     }
   }),
   test('video reference input: RunningHub Seedance 2.0 switches route slots', () => {
-    const _0x313e3d = getFixedInputSlotConfigFromManifest({
+    const fixedInputSlotConfigFromManifest2 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'runninghub-model/seedance-2.0',
       provider: 'runninghub',
       generationParams: { rh_seedance_2_mode: 'text2video' },
     });
-    assert.deepEqual(_0x313e3d?.visibleSlots || [], []);
-    const _0x53f206 = getFixedInputSlotConfigFromManifest({
+    assert.deepEqual(fixedInputSlotConfigFromManifest2?.visibleSlots || [], []);
+    const fixedInputSlotConfigFromManifest3 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'runninghub-model/seedance-2.0',
       provider: 'runninghub',
       generationParams: { rh_seedance_2_mode: 'image2video' },
     });
-    assert.deepEqual(_0x53f206?.visibleSlots, ['firstFrame']);
-    const _0x40999f = getFixedInputSlotConfigFromManifest({
+    assert.deepEqual(fixedInputSlotConfigFromManifest3?.visibleSlots, ['firstFrame']);
+    const fixedInputSlotConfigFromManifest4 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'runninghub-model/seedance-2.0',
       provider: 'runninghub',
       generationParams: { rh_seedance_2_mode: 'frames2video' },
     });
-    assert.deepEqual(_0x40999f?.visibleSlots, ['firstFrame', 'lastFrame']);
-    const _0x943508 = getFixedInputSlotConfigFromManifest({
+    assert.deepEqual(fixedInputSlotConfigFromManifest4?.visibleSlots, ['firstFrame', 'lastFrame']);
+    const fixedInputSlotConfigFromManifest5 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'runninghub-model/seedance-2.0',
       provider: 'runninghub',
       generationParams: { rh_seedance_2_mode: 'multimodal2video' },
     });
-    (assert.deepEqual(_0x943508?.visibleSlots, ['referenceVideo', 'referenceImage', 'referenceAudio']),
-      assert.equal(_0x943508?.slotById?.referenceVideo?.kind, 'video'),
-      assert.equal(_0x943508?.slotById?.referenceImage?.kind, 'image'),
-      assert.equal(_0x943508?.slotById?.referenceAudio?.kind, 'audio'));
+    (assert.deepEqual(fixedInputSlotConfigFromManifest5?.visibleSlots, [
+      'referenceVideo',
+      'referenceImage',
+      'referenceAudio',
+    ]),
+      assert.equal(fixedInputSlotConfigFromManifest5?.slotById?.referenceVideo?.kind, 'video'),
+      assert.equal(fixedInputSlotConfigFromManifest5?.slotById?.referenceImage?.kind, 'image'),
+      assert.equal(fixedInputSlotConfigFromManifest5?.slotById?.referenceAudio?.kind, 'audio'));
   }),
   test('video reference input: Volcengine Seedance 2.0 reuses Dreamina generic refbar', () => {
-    const _0x40d397 = getFixedInputSlotConfigFromManifest({
+    const fixedInputSlotConfigFromManifest6 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'volcengine/seedance-2.0-fast',
       provider: 'volcengine',
       generationParams: { dreaminaRouteMode: 'multimodal2video' },
     });
-    assert.equal(_0x40d397, null);
-    const _0x4397d2 = getFixedInputSlotConfigFromManifest({
+    assert.equal(fixedInputSlotConfigFromManifest6, null);
+    const fixedInputSlotConfigFromManifest7 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'volcengine/seedance-2.0-fast',
       provider: 'volcengine',
       generationParams: { dreaminaRouteMode: 'frames2video' },
     });
-    assert.equal(_0x4397d2, null);
+    assert.equal(fixedInputSlotConfigFromManifest7, null);
   }),
   test('video reference input: Agnes Video uses fixed slots only in first-last-frame mode', () => {
-    const _0x21fecb = getFixedInputSlotConfigFromManifest({
+    const fixedInputSlotConfigFromManifest8 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'agnes/agnes-video-v2.0',
       provider: 'agnes',
     });
-    assert.equal(_0x21fecb, null);
-    const _0x2901fa = getFixedInputSlotConfigFromManifest({
+    assert.equal(fixedInputSlotConfigFromManifest8, null);
+    const fixedInputSlotConfigFromManifest9 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'agnes/agnes-video-v2.0',
       provider: 'agnes',
       generationParams: { agnes_video_mode: 'reference' },
     });
-    assert.equal(_0x2901fa, null);
-    const _0x1b2ada = getFixedInputSlotConfigFromManifest({
+    assert.equal(fixedInputSlotConfigFromManifest9, null);
+    const fixedInputSlotConfigFromManifest10 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'agnes/agnes-video-v2.0',
       provider: 'agnes',
       generationParams: { agnes_video_mode: 'keyframes' },
     });
-    (assert.deepEqual(_0x1b2ada?.visibleSlots, ['firstFrame', 'lastFrame']),
-      assert.equal(_0x1b2ada?.slotById?.firstFrame?.required, true),
-      assert.equal(_0x1b2ada?.slotById?.lastFrame?.required, false));
+    (assert.deepEqual(fixedInputSlotConfigFromManifest10?.visibleSlots, ['firstFrame', 'lastFrame']),
+      assert.equal(fixedInputSlotConfigFromManifest10?.slotById?.firstFrame?.required, true),
+      assert.equal(fixedInputSlotConfigFromManifest10?.slotById?.lastFrame?.required, false));
   }),
   test('video submit button: Agnes keyframes mode enables with first frame only', () => {
-    const _0x56de6a = 'node-agnes-keyframes-first-only-submit',
-      _0xa50fac = 'node-agnes-first-frame',
-      _0x1fdb5b = 'node-agnes-last-frame',
-      _0x23787f = {
+    const id8 = 'node-agnes-keyframes-first-only-submit',
+      id9 = 'node-agnes-first-frame',
+      id10 = 'node-agnes-last-frame',
+      _data8 = {
         nodes: {
-          [_0x56de6a]: {
-            id: _0x56de6a,
+          [id8]: {
+            id: id8,
             type: 'ai-video',
             model: 'agnes/agnes-video-v2.0',
             provider: 'agnes',
             generationParams: { agnes_video_mode: 'keyframes' },
           },
-          [_0xa50fac]: {
-            id: _0xa50fac,
+          [id9]: {
+            id: id9,
             type: 'source-image',
             originalLocalPath: 'data/assets/agnes-first.png',
           },
-          [_0x1fdb5b]: {
-            id: _0x1fdb5b,
+          [id10]: {
+            id: id10,
             type: 'source-image',
             originalLocalPath: 'data/assets/agnes-last.png',
           },
         },
       },
-      _0x2722b2 = (_0x3d47e9) =>
+      handler3 = (value43) =>
         createVideoNodeParameterPanelModule({
-          store: { getState: () => _0x23787f, getIncomingEdges: () => _0x3d47e9 },
+          store: { getState: () => _data8, getIncomingEdges: () => value43 },
           api: {},
           getDisplayModelName: () => '',
           PROVIDERS_META: {},
@@ -980,137 +982,133 @@ function createFakeElement(_0x1e0242 = 'div') {
           activateMenuKeyboard: () => {},
           isVideoVipModel: () => false,
         }),
-      _0x3b6d60 = (_0x30ed8b) =>
-        Object.assign(Object.create(_0x30ed8b), {
-          nodeId: _0x56de6a,
-          _data: _0x23787f.nodes[_0x56de6a],
+      handler4 = (value44) =>
+        Object.assign(Object.create(value44), {
+          nodeId: id8,
+          _data: _data8.nodes[id8],
           promptEl: makePromptEl([]),
           btnEl: { disabled: true, style: {} },
           _isGenerating: false,
           _isDreaminaVideoNode: () => false,
           _isRunninghubWorkflowModel: () => false,
         }),
-      _0x513795 = [
-        { id: 'edge-agnes-first-only', sourceId: _0xa50fac, targetId: _0x56de6a, refSlot: 'firstFrame' },
-      ],
-      _0x49a3a0 = _0x2722b2(_0x513795),
-      _0x459bc6 = _0x3b6d60(_0x49a3a0);
-    (_0x49a3a0._updateSubmitButtonState.call(_0x459bc6),
-      assert.equal(_0x459bc6.btnEl.disabled, false),
-      assert.equal(_0x459bc6.btnEl.style.cursor, ''));
-    const _0x35291c = [
-        { id: 'edge-agnes-last-only', sourceId: _0x1fdb5b, targetId: _0x56de6a, refSlot: 'lastFrame' },
-      ],
-      _0x3a766d = _0x2722b2(_0x35291c),
-      _0x2c7cb6 = _0x3b6d60(_0x3a766d);
-    (_0x3a766d._updateSubmitButtonState.call(_0x2c7cb6),
-      assert.equal(_0x2c7cb6.btnEl.disabled, true),
-      assert.equal(_0x2c7cb6.btnEl.style.cursor, 'var(--unavailable-cursor)'));
+      value45 = [{ id: 'edge-agnes-first-only', sourceId: id9, targetId: id8, refSlot: 'firstFrame' }],
+      value46 = handler3(value45),
+      value47 = handler4(value46);
+    (value46._updateSubmitButtonState.call(value47),
+      assert.equal(value47.btnEl.disabled, false),
+      assert.equal(value47.btnEl.style.cursor, ''));
+    const value48 = [{ id: 'edge-agnes-last-only', sourceId: id10, targetId: id8, refSlot: 'lastFrame' }],
+      value49 = handler3(value48),
+      value50 = handler4(value49);
+    (value49._updateSubmitButtonState.call(value50),
+      assert.equal(value50.btnEl.disabled, true),
+      assert.equal(value50.btnEl.style.cursor, 'var(--unavailable-cursor)'));
   }),
   test('video reference input: APIMart fixed slots ignore stale RunningHub visibility flags', () => {
-    const _0x2f3ce9 = [{ rhSpecialMode: 'cameraMove' }, { rhSubtractSubject: true }];
-    for (const _0x9339fa of _0x2f3ce9) {
-      const _0x109097 = getFixedInputSlotConfigFromManifest({
+    const value51 = [{ rhSpecialMode: 'cameraMove' }, { rhSubtractSubject: true }];
+    for (const args4 of value51) {
+      const fixedInputSlotConfigFromManifest11 = getFixedInputSlotConfigFromManifest({
         type: 'ai-video',
         model: 'apimart/veo3-fast',
         provider: 'apimart',
         generationParams: { mode: 'fast', generation_type: 'frame' },
-        ..._0x9339fa,
+        ...args4,
       });
-      assert.deepEqual(_0x109097?.visibleSlots, ['firstFrame', 'lastFrame']);
-      const _0x3b1279 = getFixedInputSlotConfigFromManifest({
+      assert.deepEqual(fixedInputSlotConfigFromManifest11?.visibleSlots, ['firstFrame', 'lastFrame']);
+      const fixedInputSlotConfigFromManifest12 = getFixedInputSlotConfigFromManifest({
         type: 'ai-video',
         model: 'apimart/minimax-hailuo',
         provider: 'apimart',
         generationParams: {},
-        ..._0x9339fa,
+        ...args4,
       });
-      assert.deepEqual(_0x3b1279?.visibleSlots, ['firstFrame', 'lastFrame']);
-      const _0x369604 = getFixedInputSlotConfigFromManifest({
+      assert.deepEqual(fixedInputSlotConfigFromManifest12?.visibleSlots, ['firstFrame', 'lastFrame']);
+      const fixedInputSlotConfigFromManifest13 = getFixedInputSlotConfigFromManifest({
         type: 'ai-video',
         model: 'apimart/minimax-hailuo-2.3',
         provider: 'apimart',
         generationParams: { mode: 'fast' },
-        ..._0x9339fa,
+        ...args4,
       });
-      assert.deepEqual(_0x369604?.visibleSlots, ['firstFrame']);
+      assert.deepEqual(fixedInputSlotConfigFromManifest13?.visibleSlots, ['firstFrame']);
     }
   }),
   test('video reference input: RunningHub Hailuo 02 hides tail frame outside standard mode', () => {
-    const _0x4322b7 = getFixedInputSlotConfigFromManifest({
+    const fixedInputSlotConfigFromManifest14 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'runninghub-model/hailuo-02',
       provider: 'runninghub',
       generationParams: { rh_hailuo_02_quality: 'standard' },
     });
-    assert.deepEqual(_0x4322b7?.visibleSlots, ['firstFrame', 'lastFrame']);
-    const _0x53689b = getFixedInputSlotConfigFromManifest({
+    assert.deepEqual(fixedInputSlotConfigFromManifest14?.visibleSlots, ['firstFrame', 'lastFrame']);
+    const fixedInputSlotConfigFromManifest15 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'runninghub-model/hailuo-02',
       provider: 'runninghub',
       generationParams: { rh_hailuo_02_quality: 'pro' },
     });
-    assert.deepEqual(_0x53689b?.visibleSlots, ['firstFrame']);
-    const _0x4b0584 = getFixedInputSlotConfigFromManifest({
+    assert.deepEqual(fixedInputSlotConfigFromManifest15?.visibleSlots, ['firstFrame']);
+    const fixedInputSlotConfigFromManifest16 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'runninghub-model/hailuo-02',
       provider: 'runninghub',
       generationParams: { rh_hailuo_02_quality: 'fast' },
     });
-    assert.deepEqual(_0x4b0584?.visibleSlots, ['firstFrame']);
+    assert.deepEqual(fixedInputSlotConfigFromManifest16?.visibleSlots, ['firstFrame']);
   }),
   test('video reference input: RunningHub Hailuo 2.3 only exposes first-frame slot', () => {
-    for (const _0x1a5b48 of ['standard', 'pro', 'fast', 'fastPro']) {
-      const _0x5bcbde = getFixedInputSlotConfigFromManifest({
+    for (const rh_hailuo_23_quality of ['standard', 'pro', 'fast', 'fastPro']) {
+      const fixedInputSlotConfigFromManifest17 = getFixedInputSlotConfigFromManifest({
         type: 'ai-video',
         model: 'runninghub-model/hailuo-2.3',
         provider: 'runninghub',
-        generationParams: { rh_hailuo_23_quality: _0x1a5b48 },
+        generationParams: { rh_hailuo_23_quality: rh_hailuo_23_quality },
       });
-      assert.deepEqual(_0x5bcbde?.visibleSlots, ['firstFrame']);
+      assert.deepEqual(fixedInputSlotConfigFromManifest17?.visibleSlots, ['firstFrame']);
     }
   }),
   test('video reference input: VEO3 reference mode does not use fixed slots', () => {
-    const _0x53d774 = getFixedInputSlotConfigFromManifest({
+    const fixedInputSlotConfigFromManifest18 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'apimart/veo3-fast',
       provider: 'apimart',
       generationParams: { mode: 'fast', generation_type: 'frame' },
     });
-    assert.deepEqual(_0x53d774?.visibleSlots, ['firstFrame', 'lastFrame']);
-    const _0x1024a0 = getFixedInputSlotConfigFromManifest({
+    assert.deepEqual(fixedInputSlotConfigFromManifest18?.visibleSlots, ['firstFrame', 'lastFrame']);
+    const fixedInputSlotConfigFromManifest19 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'apimart/veo3-fast',
       provider: 'apimart',
       generationParams: { mode: 'fast', generation_type: 'reference' },
     });
-    assert.equal(_0x1024a0, null);
+    assert.equal(fixedInputSlotConfigFromManifest19, null);
   }),
   test('video reference input: Vidu Q3 hides fixed slots in reference mode', () => {
-    const _0x50a710 = getFixedInputSlotConfigFromManifest({
+    const fixedInputSlotConfigFromManifest20 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'apimart/viduq3',
       provider: 'apimart',
       generationParams: { vidu_q3_generation_mode: 'video', mode: 'viduq3-turbo' },
     });
-    assert.deepEqual(_0x50a710?.visibleSlots, ['firstFrame', 'lastFrame']);
-    const _0x5f479d = getFixedInputSlotConfigFromManifest({
+    assert.deepEqual(fixedInputSlotConfigFromManifest20?.visibleSlots, ['firstFrame', 'lastFrame']);
+    const fixedInputSlotConfigFromManifest21 = getFixedInputSlotConfigFromManifest({
       type: 'ai-video',
       model: 'apimart/viduq3',
       provider: 'apimart',
       generationParams: { vidu_q3_generation_mode: 'reference', mode: 'viduq3' },
     });
-    assert.equal(_0x5f479d, null);
+    assert.equal(fixedInputSlotConfigFromManifest21, null);
   }),
   test('video reference input: manifest fixed-slot overflow media shows in refbar', async () => {
-    const _0x2c5c0a = globalThis.document;
+    const value52 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x881358 = 'node-happyhorse-reference',
-        _0x5db560 = {
+      const id11 = 'node-happyhorse-reference',
+        _data9 = {
           nodes: {
-            [_0x881358]: {
-              id: _0x881358,
+            [id11]: {
+              id: id11,
               type: 'ai-video',
               model: 'apimart/happyhorse-1.0',
               provider: 'apimart',
@@ -1120,52 +1118,52 @@ function createFakeElement(_0x1e0242 = 'div') {
             img2: { id: 'img2', type: 'source-image', localPath: 'data/assets/hh-ref-2.png' },
           },
         },
-        _0x132de8 = [
-          { id: 'edge-img1', sourceId: 'img1', targetId: _0x881358, refSlot: 'referenceImage' },
-          { id: 'edge-img2', sourceId: 'img2', targetId: _0x881358 },
+        value53 = [
+          { id: 'edge-img1', sourceId: 'img1', targetId: id11, refSlot: 'referenceImage' },
+          { id: 'edge-img2', sourceId: 'img2', targetId: id11 },
         ],
-        _0xefe2b9 = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x5db560, getIncomingEdges: () => _0x132de8 },
+        videoNodeReferenceInputModule8 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data9, getIncomingEdges: () => value53 },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x2b5340 = Object.assign(Object.create(_0xefe2b9), {
-          nodeId: _0x881358,
-          _data: _0x5db560.nodes[_0x881358],
+        value54 = Object.assign(Object.create(videoNodeReferenceInputModule8), {
+          nodeId: id11,
+          _data: _data9.nodes[id11],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => false,
-          _resolveMediaUrl: (_0x50f7c6) => String(_0x50f7c6 || ''),
+          _resolveMediaUrl: (value55) => String(value55 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0xefe2b9._renderRefBarImpl.call(_0x2b5340);
-      const _0x547240 = _0x2b5340.refBarEl.querySelector('.rh-v5-ref-container'),
-        _0x4fbb03 = _0x547240.querySelector('[data-slot="referenceImage"]'),
-        _0x17ba94 = _0x547240.querySelectorAll('.rh-fixed-extra-ref');
-      (assert.equal(_0x4fbb03.dataset.sourceId, 'img1'),
+      await videoNodeReferenceInputModule8._renderRefBarImpl.call(value54);
+      const el25 = value54.refBarEl.querySelector('.rh-v5-ref-container'),
+        el26 = el25.querySelector('[data-slot="referenceImage"]'),
+        list6 = el25.querySelectorAll('.rh-fixed-extra-ref');
+      (assert.equal(el26.dataset.sourceId, 'img1'),
         assert.ok(
-          _0x17ba94.some((_0xd8e277) => _0xd8e277.dataset.sourceId === 'img2'),
+          list6.some((el27) => el27.dataset.sourceId === 'img2'),
           'second reference image should render as an extra thumbnail',
         ));
     } finally {
-      if (typeof _0x2c5c0a === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x2c5c0a;
+      if (typeof value52 === 'undefined') delete globalThis.document;
+      else globalThis.document = value52;
     }
   }),
   test('video reference input: stale refSlot from previous model fills current modelApi slot', async () => {
-    const _0x2a3f95 = globalThis.document;
+    const value56 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x292951 = 'node-veo3-stale-refslot',
-        _0x1eba3f = {
+      const id12 = 'node-veo3-stale-refslot',
+        _data10 = {
           nodes: {
-            [_0x292951]: {
-              id: _0x292951,
+            [id12]: {
+              id: id12,
               type: 'ai-video',
               model: 'apimart/veo3-fast',
               provider: 'apimart',
@@ -1174,47 +1172,47 @@ function createFakeElement(_0x1e0242 = 'div') {
             img1: { id: 'img1', type: 'source-image', localPath: 'data/assets/old-ref.png' },
           },
         },
-        _0x16088d = [{ id: 'edge-stale-ref', sourceId: 'img1', targetId: _0x292951, refSlot: 'refImage' }],
-        _0x1ca135 = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x1eba3f, getIncomingEdges: () => _0x16088d },
+        value57 = [{ id: 'edge-stale-ref', sourceId: 'img1', targetId: id12, refSlot: 'refImage' }],
+        videoNodeReferenceInputModule9 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data10, getIncomingEdges: () => value57 },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x248ff9 = Object.assign(Object.create(_0x1ca135), {
-          nodeId: _0x292951,
-          _data: _0x1eba3f.nodes[_0x292951],
+        value58 = Object.assign(Object.create(videoNodeReferenceInputModule9), {
+          nodeId: id12,
+          _data: _data10.nodes[id12],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => false,
-          _resolveMediaUrl: (_0x3df57c) => String(_0x3df57c || ''),
+          _resolveMediaUrl: (value59) => String(value59 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x1ca135._renderRefBarImpl.call(_0x248ff9);
-      const _0x2c8f03 = _0x248ff9.refBarEl.querySelector('.rh-v5-ref-container'),
-        _0x2f162e = _0x2c8f03.querySelector('[data-slot="firstFrame"]'),
-        _0x399240 = _0x2c8f03.querySelector('[data-slot="lastFrame"]');
-      (assert.equal(_0x2f162e.dataset.edgeId, 'edge-stale-ref'),
-        assert.equal(_0x2f162e.dataset.sourceId, 'img1'),
-        assert.equal(_0x399240.dataset.refOrigin, ''));
+      await videoNodeReferenceInputModule9._renderRefBarImpl.call(value58);
+      const el28 = value58.refBarEl.querySelector('.rh-v5-ref-container'),
+        el29 = el28.querySelector('[data-slot="firstFrame"]'),
+        el30 = el28.querySelector('[data-slot="lastFrame"]');
+      (assert.equal(el29.dataset.edgeId, 'edge-stale-ref'),
+        assert.equal(el29.dataset.sourceId, 'img1'),
+        assert.equal(el30.dataset.refOrigin, ''));
     } finally {
-      if (typeof _0x2a3f95 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x2a3f95;
+      if (typeof value56 === 'undefined') delete globalThis.document;
+      else globalThis.document = value56;
     }
   }),
   test('video reference input: V5.4 asset mentions render as virtual fixed-slot thumbnails', async () => {
-    const _0x428800 = globalThis.document;
+    const value60 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x2caf40 = 'node-v54-assets',
-        _0x2ac4f9 = {
+      const id13 = 'node-v54-assets',
+        _data11 = {
           nodes: {
-            [_0x2caf40]: {
-              id: _0x2caf40,
+            [id13]: {
+              id: id13,
               type: 'ai-video',
               model: 'runninghub/2041741496667348994',
               provider: 'runninghubwf',
@@ -1253,17 +1251,17 @@ function createFakeElement(_0x1e0242 = 'div') {
           ],
         },
       ]);
-      const _0x2a9769 = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x2ac4f9, getIncomingEdges: () => [] },
+      const videoNodeReferenceInputModule10 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data11, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x250909 = Object.assign(Object.create(_0x2a9769), {
-          nodeId: _0x2caf40,
-          _data: _0x2ac4f9.nodes[_0x2caf40],
+        value61 = Object.assign(Object.create(videoNodeReferenceInputModule10), {
+          nodeId: id13,
+          _data: _data11.nodes[id13],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl([
             makeAssetPill({ assetId: 'asset-v54', assetIndex: 0, type: 'video', label: 'source clip' }),
@@ -1274,42 +1272,42 @@ function createFakeElement(_0x1e0242 = 'div') {
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => true,
-          _resolveMediaUrl: (_0x2d19f6) => String(_0x2d19f6 || ''),
+          _resolveMediaUrl: (value62) => String(value62 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x2a9769._renderRefBarImpl.call(_0x250909);
-      const _0x1c457e = _0x250909.refBarEl.querySelector('.rh-v5-ref-container'),
-        _0x1942f4 = _0x1c457e.querySelector('[data-slot="sourceVideo"]'),
-        _0x3946f0 = _0x1c457e.querySelector('[data-slot="videoMask"]'),
-        _0x50d51a = _0x1c457e.querySelector('[data-slot="refImage"]'),
-        _0xdee3af = _0x1c457e.querySelector('[data-slot="firstFrame"]');
-      (assert.equal(_0x1942f4.dataset.refOrigin, 'asset'),
-        assert.equal(_0x3946f0.dataset.refOrigin, 'asset'),
-        assert.equal(_0x50d51a.dataset.refOrigin, 'asset'),
-        assert.equal(_0xdee3af.dataset.refOrigin, 'asset'),
-        assert.equal(_0x1942f4.dataset.assetId, 'asset-v54'),
-        assert.equal(_0x1942f4.dataset.assetIndex, '0'),
-        assert.equal(_0x1942f4.dataset.assetOccurrence, '0'),
-        assert.equal(_0x1942f4.dataset.refType, 'video'),
-        assert.match(_0x1942f4.innerHTML, /source-thumb/),
-        assert.match(_0x3946f0.innerHTML, /mask-thumb/),
-        assert.match(_0x50d51a.innerHTML, /ref-thumb/),
-        assert.match(_0xdee3af.innerHTML, /first-thumb/),
-        assert.match(_0x1942f4.innerHTML, /ref-thumb-delete/));
+      await videoNodeReferenceInputModule10._renderRefBarImpl.call(value61);
+      const el31 = value61.refBarEl.querySelector('.rh-v5-ref-container'),
+        el32 = el31.querySelector('[data-slot="sourceVideo"]'),
+        el33 = el31.querySelector('[data-slot="videoMask"]'),
+        el34 = el31.querySelector('[data-slot="refImage"]'),
+        el35 = el31.querySelector('[data-slot="firstFrame"]');
+      (assert.equal(el32.dataset.refOrigin, 'asset'),
+        assert.equal(el33.dataset.refOrigin, 'asset'),
+        assert.equal(el34.dataset.refOrigin, 'asset'),
+        assert.equal(el35.dataset.refOrigin, 'asset'),
+        assert.equal(el32.dataset.assetId, 'asset-v54'),
+        assert.equal(el32.dataset.assetIndex, '0'),
+        assert.equal(el32.dataset.assetOccurrence, '0'),
+        assert.equal(el32.dataset.refType, 'video'),
+        assert.match(el32.innerHTML, /source-thumb/),
+        assert.match(el33.innerHTML, /mask-thumb/),
+        assert.match(el34.innerHTML, /ref-thumb/),
+        assert.match(el35.innerHTML, /first-thumb/),
+        assert.match(el32.innerHTML, /ref-thumb-delete/));
     } finally {
-      if (typeof _0x428800 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x428800;
+      if (typeof value60 === 'undefined') delete globalThis.document;
+      else globalThis.document = value60;
     }
   }),
   test('video reference input: V5.4 hidden asset refs render as virtual fixed-slot thumbnails', async () => {
-    const _0x3805bd = globalThis.document;
+    const value63 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x3a74c7 = 'node-v54-hidden-assets',
-        _0x3fdcbc = {
+      const id14 = 'node-v54-hidden-assets',
+        _data12 = {
           nodes: {
-            [_0x3a74c7]: {
-              id: _0x3a74c7,
+            [id14]: {
+              id: id14,
               type: 'ai-video',
               model: 'runninghub/2041741496667348994',
               provider: 'runninghubwf',
@@ -1339,51 +1337,51 @@ function createFakeElement(_0x1e0242 = 'div') {
           ],
         },
       ]);
-      const _0x3eb51d = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x3fdcbc, getIncomingEdges: () => [] },
+      const videoNodeReferenceInputModule11 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data12, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x2a3bf3 = Object.assign(Object.create(_0x3eb51d), {
-          nodeId: _0x3a74c7,
-          _data: _0x3fdcbc.nodes[_0x3a74c7],
+        value64 = Object.assign(Object.create(videoNodeReferenceInputModule11), {
+          nodeId: id14,
+          _data: _data12.nodes[id14],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => true,
-          _resolveMediaUrl: (_0x52d7cc) => String(_0x52d7cc || ''),
+          _resolveMediaUrl: (value65) => String(value65 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x3eb51d._renderRefBarImpl.call(_0x2a3bf3);
-      const _0x17ac5e = _0x2a3bf3.refBarEl.querySelector('.rh-v5-ref-container'),
-        _0x546169 = _0x17ac5e.querySelector('[data-slot="sourceVideo"]'),
-        _0xebe588 = _0x17ac5e.querySelector('[data-slot="refImage"]');
-      (assert.equal(_0x546169.dataset.refOrigin, 'asset'),
-        assert.equal(_0x546169.dataset.assetRefSource, 'hidden'),
-        assert.equal(_0x546169.dataset.assetId, 'asset-v54-hidden'),
-        assert.equal(_0x546169.dataset.refType, 'video'),
-        assert.equal(_0xebe588.dataset.refOrigin, 'asset'),
-        assert.equal(_0xebe588.dataset.assetRefSource, 'hidden'),
-        assert.equal(_0xebe588.dataset.refType, 'image'),
-        assert.match(_0x546169.innerHTML, /source-thumb/),
-        assert.match(_0xebe588.innerHTML, /ref-thumb/));
+      await videoNodeReferenceInputModule11._renderRefBarImpl.call(value64);
+      const el36 = value64.refBarEl.querySelector('.rh-v5-ref-container'),
+        el37 = el36.querySelector('[data-slot="sourceVideo"]'),
+        el38 = el36.querySelector('[data-slot="refImage"]');
+      (assert.equal(el37.dataset.refOrigin, 'asset'),
+        assert.equal(el37.dataset.assetRefSource, 'hidden'),
+        assert.equal(el37.dataset.assetId, 'asset-v54-hidden'),
+        assert.equal(el37.dataset.refType, 'video'),
+        assert.equal(el38.dataset.refOrigin, 'asset'),
+        assert.equal(el38.dataset.assetRefSource, 'hidden'),
+        assert.equal(el38.dataset.refType, 'image'),
+        assert.match(el37.innerHTML, /source-thumb/),
+        assert.match(el38.innerHTML, /ref-thumb/));
     } finally {
-      if (typeof _0x3805bd === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x3805bd;
+      if (typeof value63 === 'undefined') delete globalThis.document;
+      else globalThis.document = value63;
     }
   }),
   test('video reference input: asset mentions render as generic thumbnails with delete', async () => {
-    const _0x30e869 = globalThis.document;
+    const value66 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x26c06f = 'node-generic-assets',
-        _0x182c78 = {
+      const id15 = 'node-generic-assets',
+        _data13 = {
           nodes: {
-            [_0x26c06f]: { id: _0x26c06f, type: 'ai-video', model: 'generic/video', provider: 'grsai' },
+            [id15]: { id: id15, type: 'ai-video', model: 'generic/video', provider: 'grsai' },
           },
         };
       setAssetMentionAssets([
@@ -1399,17 +1397,17 @@ function createFakeElement(_0x1e0242 = 'div') {
           ],
         },
       ]);
-      const _0x12be60 = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x182c78, getIncomingEdges: () => [] },
+      const videoNodeReferenceInputModule12 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data13, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x355087 = Object.assign(Object.create(_0x12be60), {
-          nodeId: _0x26c06f,
-          _data: _0x182c78.nodes[_0x26c06f],
+        value67 = Object.assign(Object.create(videoNodeReferenceInputModule12), {
+          nodeId: id15,
+          _data: _data13.nodes[id15],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl([
             makeAssetPill({
@@ -1422,32 +1420,32 @@ function createFakeElement(_0x1e0242 = 'div') {
           _refThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => false,
-          _resolveMediaUrl: (_0x4462fa) => String(_0x4462fa || ''),
+          _resolveMediaUrl: (value68) => String(value68 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x12be60._renderRefBarImpl.call(_0x355087);
-      const _0x256016 = _0x355087.refBarEl.querySelector('.ref-thumb-container'),
-        _0x4223f6 = _0x256016.childNodes.find((_0x2ff92b) => _0x2ff92b.dataset?.refOrigin === 'asset');
-      (assert.equal(_0x4223f6.dataset.refOrigin, 'asset'),
-        assert.equal(_0x4223f6.dataset.assetId, 'asset-generic'),
-        assert.equal(_0x4223f6.dataset.assetIndex, '0'),
-        assert.equal(_0x4223f6.dataset.assetOccurrence, '0'),
-        assert.equal(_0x4223f6.dataset.refType, 'image'),
-        assert.match(_0x4223f6.innerHTML, /ref-thumb-delete/),
-        assert.match(_0x4223f6.innerHTML, /ref-thumb/));
+      await videoNodeReferenceInputModule12._renderRefBarImpl.call(value67);
+      const value69 = value67.refBarEl.querySelector('.ref-thumb-container'),
+        el39 = value69.childNodes.find((el40) => el40.dataset?.refOrigin === 'asset');
+      (assert.equal(el39.dataset.refOrigin, 'asset'),
+        assert.equal(el39.dataset.assetId, 'asset-generic'),
+        assert.equal(el39.dataset.assetIndex, '0'),
+        assert.equal(el39.dataset.assetOccurrence, '0'),
+        assert.equal(el39.dataset.refType, 'image'),
+        assert.match(el39.innerHTML, /ref-thumb-delete/),
+        assert.match(el39.innerHTML, /ref-thumb/));
     } finally {
-      if (typeof _0x30e869 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x30e869;
+      if (typeof value66 === 'undefined') delete globalThis.document;
+      else globalThis.document = value66;
     }
   }),
   test('video reference input: generic image refs show mask badge only for masked sources', async () => {
-    const _0x1dfe8e = globalThis.document;
+    const value70 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x240e80 = 'node-video-generic-mask-refbar',
-        _0x290f16 = {
+      const id16 = 'node-video-generic-mask-refbar',
+        _data14 = {
           nodes: {
-            [_0x240e80]: { id: _0x240e80, type: 'ai-video' },
+            [id16]: { id: id16, type: 'ai-video' },
             masked: {
               id: 'masked',
               type: 'source-image',
@@ -1457,50 +1455,50 @@ function createFakeElement(_0x1e0242 = 'div') {
             plain: { id: 'plain', type: 'source-image', localPath: 'data/assets/plain.png' },
           },
         },
-        _0x5af154 = [
-          { id: 'edge-masked', sourceId: 'masked', targetId: _0x240e80 },
-          { id: 'edge-plain', sourceId: 'plain', targetId: _0x240e80 },
+        value71 = [
+          { id: 'edge-masked', sourceId: 'masked', targetId: id16 },
+          { id: 'edge-plain', sourceId: 'plain', targetId: id16 },
         ],
-        _0x4924f1 = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x290f16, getIncomingEdges: () => _0x5af154 },
+        videoNodeReferenceInputModule13 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data14, getIncomingEdges: () => value71 },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x3ff51f = Object.assign(Object.create(_0x4924f1), {
-          nodeId: _0x240e80,
-          _data: _0x290f16.nodes[_0x240e80],
+        value72 = Object.assign(Object.create(videoNodeReferenceInputModule13), {
+          nodeId: id16,
+          _data: _data14.nodes[id16],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl(),
           _refThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
-          _resolveMediaUrl: (_0x22db90) => String(_0x22db90 || ''),
+          _resolveMediaUrl: (value73) => String(value73 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x4924f1._renderRefBarImpl.call(_0x3ff51f);
-      const _0x53a9ad = _0x3ff51f.refBarEl
+      await videoNodeReferenceInputModule13._renderRefBarImpl.call(value72);
+      const list7 = value72.refBarEl
         .querySelector('.ref-thumb-container')
         .querySelectorAll('.ref-thumb-wrap');
-      (assert.equal(_0x53a9ad.length, 2),
-        assert.match(_0x53a9ad[0].innerHTML, /ref-thumb-mask-badge/),
-        assert.match(_0x53a9ad[0].innerHTML, />遮罩<\/span>/),
-        assert.doesNotMatch(_0x53a9ad[1].innerHTML, /ref-thumb-mask-badge/));
+      (assert.equal(list7.length, 2),
+        assert.match(list7[0].innerHTML, /ref-thumb-mask-badge/),
+        assert.match(list7[0].innerHTML, />遮罩<\/span>/),
+        assert.doesNotMatch(list7[1].innerHTML, /ref-thumb-mask-badge/));
     } finally {
-      if (typeof _0x1dfe8e === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x1dfe8e;
+      if (typeof value70 === 'undefined') delete globalThis.document;
+      else globalThis.document = value70;
     }
   }),
   test('video reference input: fixed-slot asset mentions fill other RH models and trail text', async () => {
-    const _0xf058fd = globalThis.document;
+    const value74 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x1763e9 = 'node-ltx-assets',
-        _0x5bf820 = {
+      const id17 = 'node-ltx-assets',
+        _data15 = {
           nodes: {
-            [_0x1763e9]: {
-              id: _0x1763e9,
+            [id17]: {
+              id: id17,
               type: 'ai-video',
               model: 'runninghub/2039336644536442882',
               provider: 'runninghubwf',
@@ -1526,17 +1524,17 @@ function createFakeElement(_0x1e0242 = 'div') {
           ],
         },
       ]);
-      const _0x3bbc16 = createVideoNodeReferenceInputModule({
-          store: { getState: () => _0x5bf820, getIncomingEdges: () => [] },
+      const videoNodeReferenceInputModule14 = createVideoNodeReferenceInputModule({
+          store: { getState: () => _data15, getIncomingEdges: () => [] },
           api: {},
           _syncPillLabels: () => {},
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
         }),
-        _0x46e69d = Object.assign(Object.create(_0x3bbc16), {
-          nodeId: _0x1763e9,
-          _data: _0x5bf820.nodes[_0x1763e9],
+        value75 = Object.assign(Object.create(videoNodeReferenceInputModule14), {
+          nodeId: id17,
+          _data: _data15.nodes[id17],
           refBarEl: createFakeElement('div'),
           promptEl: makePromptEl([
             makeAssetPill({ assetId: 'asset-ltx', assetIndex: 0, type: 'image', label: 'reference image' }),
@@ -1546,34 +1544,34 @@ function createFakeElement(_0x1e0242 = 'div') {
           _fixedSlotRefThumbObjectUrls: new Map(),
           _videoThumbPending: new Set(),
           _isRunninghubWorkflowModel: () => true,
-          _resolveMediaUrl: (_0x1ec39b) => String(_0x1ec39b || ''),
+          _resolveMediaUrl: (value76) => String(value76 || ''),
           _syncBtnIconState: () => {},
         });
-      await _0x3bbc16._renderRefBarImpl.call(_0x46e69d);
-      const _0x2c85fc = _0x46e69d.refBarEl.querySelector('.rh-v5-ref-container'),
-        _0x1295d4 = _0x2c85fc.querySelector('[data-slot="refImage"]'),
-        _0x43981a = _0x2c85fc.querySelector('[data-slot="audio"]'),
-        _0x3a818f = _0x2c85fc.querySelector('.rh-fixed-extra-ref');
-      (assert.equal(_0x1295d4.dataset.refOrigin, 'asset'),
-        assert.equal(_0x1295d4.dataset.refType, 'image'),
-        assert.equal(_0x43981a.dataset.refOrigin, 'asset'),
-        assert.equal(_0x43981a.dataset.refType, 'audio'),
-        assert.equal(_0x3a818f.dataset.refOrigin, 'asset'),
-        assert.equal(_0x3a818f.dataset.refType, 'text'),
-        assert.ok(_0x2c85fc.childNodes.indexOf(_0x3a818f) > _0x2c85fc.childNodes.indexOf(_0x43981a)),
-        assert.match(_0x3a818f.innerHTML, /ref-thumb-delete/));
+      await videoNodeReferenceInputModule14._renderRefBarImpl.call(value75);
+      const el41 = value75.refBarEl.querySelector('.rh-v5-ref-container'),
+        el42 = el41.querySelector('[data-slot="refImage"]'),
+        el43 = el41.querySelector('[data-slot="audio"]'),
+        el44 = el41.querySelector('.rh-fixed-extra-ref');
+      (assert.equal(el42.dataset.refOrigin, 'asset'),
+        assert.equal(el42.dataset.refType, 'image'),
+        assert.equal(el43.dataset.refOrigin, 'asset'),
+        assert.equal(el43.dataset.refType, 'audio'),
+        assert.equal(el44.dataset.refOrigin, 'asset'),
+        assert.equal(el44.dataset.refType, 'text'),
+        assert.ok(el41.childNodes.indexOf(el44) > el41.childNodes.indexOf(el43)),
+        assert.match(el44.innerHTML, /ref-thumb-delete/));
     } finally {
-      if (typeof _0xf058fd === 'undefined') delete globalThis.document;
-      else globalThis.document = _0xf058fd;
+      if (typeof value74 === 'undefined') delete globalThis.document;
+      else globalThis.document = value74;
     }
   }),
   test('video reference input: LTX display area follows manifest refImage ratio', async () => {
-    const _0x28a823 = globalThis.document;
+    const value77 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x4f7ba5 = 'node-ltx-ref-ratio',
-        { state: _0x363ebb } = await renderFixedRefBarForTest({
-          targetId: _0x4f7ba5,
+      const targetId2 = 'node-ltx-ref-ratio',
+        { state: state2 } = await renderFixedRefBarForTest({
+          targetId: targetId2,
           model: 'runninghub/2039336644536442882',
           nodeData: { width: 0x12c, height: 0x12c, x: 100, y: 200 },
           nodes: {
@@ -1587,27 +1585,27 @@ function createFakeElement(_0x1e0242 = 'div') {
             'source-audio': { id: 'source-audio', type: 'source-audio', localPath: 'data/assets/voice.mp3' },
           },
           incomingEdges: [
-            { id: 'edge-ref', sourceId: 'source-ref-image', targetId: _0x4f7ba5, refSlot: 'refImage' },
-            { id: 'edge-audio', sourceId: 'source-audio', targetId: _0x4f7ba5, refSlot: 'audio' },
+            { id: 'edge-ref', sourceId: 'source-ref-image', targetId: targetId2, refSlot: 'refImage' },
+            { id: 'edge-audio', sourceId: 'source-audio', targetId: targetId2, refSlot: 'audio' },
           ],
         });
-      (assert.equal(_0x363ebb.nodes[_0x4f7ba5].width, 0x12c),
-        assert.equal(_0x363ebb.nodes[_0x4f7ba5].height, 0x1f4),
-        assert.equal(_0x363ebb.nodes[_0x4f7ba5].x, 100),
-        assert.equal(_0x363ebb.nodes[_0x4f7ba5].y, 0),
-        assert.equal(_0x363ebb.nodes[_0x4f7ba5].aspectRatio, '自适应'));
+      (assert.equal(state2.nodes[targetId2].width, 0x12c),
+        assert.equal(state2.nodes[targetId2].height, 0x1f4),
+        assert.equal(state2.nodes[targetId2].x, 100),
+        assert.equal(state2.nodes[targetId2].y, 0),
+        assert.equal(state2.nodes[targetId2].aspectRatio, '自适应'));
     } finally {
-      if (typeof _0x28a823 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x28a823;
+      if (typeof value77 === 'undefined') delete globalThis.document;
+      else globalThis.document = value77;
     }
   }),
   test('video reference input: LipSync display area follows source video ratio', async () => {
-    const _0x40ebec = globalThis.document;
+    const value78 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x57be94 = 'node-lipsync-video-ratio',
-        { state: _0x3d07ae } = await renderFixedRefBarForTest({
-          targetId: _0x57be94,
+      const targetId3 = 'node-lipsync-video-ratio',
+        { state: state3 } = await renderFixedRefBarForTest({
+          targetId: targetId3,
           model: 'runninghub/2054101324521844738',
           nodeData: { width: 0x12c, height: 0x12c, x: 100, y: 200 },
           nodes: {
@@ -1622,27 +1620,27 @@ function createFakeElement(_0x1e0242 = 'div') {
             'source-audio': { id: 'source-audio', type: 'source-audio', localPath: 'data/assets/voice.mp3' },
           },
           incomingEdges: [
-            { id: 'edge-video', sourceId: 'source-video', targetId: _0x57be94, refSlot: 'sourceVideo' },
-            { id: 'edge-audio', sourceId: 'source-audio', targetId: _0x57be94, refSlot: 'audio' },
+            { id: 'edge-video', sourceId: 'source-video', targetId: targetId3, refSlot: 'sourceVideo' },
+            { id: 'edge-audio', sourceId: 'source-audio', targetId: targetId3, refSlot: 'audio' },
           ],
         });
-      (assert.equal(_0x3d07ae.nodes[_0x57be94].width, 0x215),
-        assert.equal(_0x3d07ae.nodes[_0x57be94].height, 0x12c),
-        assert.equal(_0x3d07ae.nodes[_0x57be94].x, -16),
-        assert.equal(_0x3d07ae.nodes[_0x57be94].y, 200),
-        assert.equal(_0x3d07ae.nodes[_0x57be94].aspectRatio, '自适应'));
+      (assert.equal(state3.nodes[targetId3].width, 0x215),
+        assert.equal(state3.nodes[targetId3].height, 0x12c),
+        assert.equal(state3.nodes[targetId3].x, -16),
+        assert.equal(state3.nodes[targetId3].y, 200),
+        assert.equal(state3.nodes[targetId3].aspectRatio, '自适应'));
     } finally {
-      if (typeof _0x40ebec === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x40ebec;
+      if (typeof value78 === 'undefined') delete globalThis.document;
+      else globalThis.document = value78;
     }
   }),
   test('video reference input: LipSync display area follows ref image ratio', async () => {
-    const _0xb5231b = globalThis.document;
+    const value79 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x131c13 = 'node-lipsync-image-ratio',
-        { state: _0x42c29b } = await renderFixedRefBarForTest({
-          targetId: _0x131c13,
+      const targetId4 = 'node-lipsync-image-ratio',
+        { state: state4 } = await renderFixedRefBarForTest({
+          targetId: targetId4,
           model: 'runninghub/2054101324521844738',
           nodeData: { width: 0x12c, height: 0x12c, x: 100, y: 200 },
           nodes: {
@@ -1656,23 +1654,23 @@ function createFakeElement(_0x1e0242 = 'div') {
             'source-audio': { id: 'source-audio', type: 'source-audio', localPath: 'data/assets/voice.mp3' },
           },
           incomingEdges: [
-            { id: 'edge-ref', sourceId: 'source-ref-image', targetId: _0x131c13, refSlot: 'refImage' },
-            { id: 'edge-audio', sourceId: 'source-audio', targetId: _0x131c13, refSlot: 'audio' },
+            { id: 'edge-ref', sourceId: 'source-ref-image', targetId: targetId4, refSlot: 'refImage' },
+            { id: 'edge-audio', sourceId: 'source-audio', targetId: targetId4, refSlot: 'audio' },
           ],
         });
-      (assert.equal(_0x42c29b.nodes[_0x131c13].width, 0x12c),
-        assert.equal(_0x42c29b.nodes[_0x131c13].height, 0x1f4),
-        assert.equal(_0x42c29b.nodes[_0x131c13].x, 100),
-        assert.equal(_0x42c29b.nodes[_0x131c13].y, 0),
-        assert.equal(_0x42c29b.nodes[_0x131c13].aspectRatio, '自适应'));
+      (assert.equal(state4.nodes[targetId4].width, 0x12c),
+        assert.equal(state4.nodes[targetId4].height, 0x1f4),
+        assert.equal(state4.nodes[targetId4].x, 100),
+        assert.equal(state4.nodes[targetId4].y, 0),
+        assert.equal(state4.nodes[targetId4].aspectRatio, '自适应'));
     } finally {
-      if (typeof _0xb5231b === 'undefined') delete globalThis.document;
-      else globalThis.document = _0xb5231b;
+      if (typeof value79 === 'undefined') delete globalThis.document;
+      else globalThis.document = value79;
     }
   }));
 async function renderFixedRefBarForTest({
   targetId: targetId = 'node-fixed-refbar',
-  model: _0x311381,
+  model: model,
   nodeData: nodeData = {},
   nodes: nodes = {},
   incomingEdges: incomingEdges = [],
@@ -1682,30 +1680,30 @@ async function renderFixedRefBarForTest({
   api: api = {},
 } = {}) {
   assetId && assetItems.length && setAssetMentionAssets([{ id: assetId, items: assetItems }]);
-  const _0x5010b4 = {
+  const _data16 = {
       nodes: {
         ...nodes,
         [targetId]: {
           id: targetId,
           type: 'ai-video',
-          model: _0x311381,
+          model: model,
           provider: 'runninghubwf',
           ...nodeData,
         },
       },
     },
-    _0x4fff1d = createVideoNodeReferenceInputModule({
+    videoNodeReferenceInputModule15 = createVideoNodeReferenceInputModule({
       store: {
-        getState: () => _0x5010b4,
+        getState: () => _data16,
         getIncomingEdges: () => incomingEdges,
-        removeEdge: (_0x377b74) => {
-          const _0x41efd1 = incomingEdges.findIndex((_0x406582) => _0x406582.id === _0x377b74);
-          if (_0x41efd1 >= 0) incomingEdges.splice(_0x41efd1, 1);
+        removeEdge: (value80) => {
+          const count6 = incomingEdges.findIndex((item9) => item9.id === value80);
+          if (count6 >= 0) incomingEdges.splice(count6, 1);
         },
-        updateNodeData: (_0x2acda7, _0x352ed8) => {
-          _0x5010b4.nodes[_0x2acda7] = { ...(_0x5010b4.nodes[_0x2acda7] || {}), ...(_0x352ed8 || {}) };
+        updateNodeData: (value81, value82) => {
+          _data16.nodes[value81] = { ...(_data16.nodes[value81] || {}), ...(value82 || {}) };
         },
-        batch: (_0x38de42) => _0x38de42(),
+        batch: (handler5) => handler5(),
       },
       api: api,
       _syncPillLabels: () => {},
@@ -1713,35 +1711,35 @@ async function renderFixedRefBarForTest({
       ensureThumbDecoded: () => {},
       revealRefThumbMedia: () => {},
     }),
-    _0xb727c4 = Object.assign(Object.create(_0x4fff1d), {
+    ctx = Object.assign(Object.create(videoNodeReferenceInputModule15), {
       nodeId: targetId,
-      _data: _0x5010b4.nodes[targetId],
+      _data: _data16.nodes[targetId],
       refBarEl: createFakeElement('div'),
       promptEl: makePromptEl(
-        pills.map((_0x5dd0de) =>
+        pills.map((assetIndex2) =>
           makeAssetPill({
             assetId: assetId,
-            assetIndex: _0x5dd0de.assetIndex,
-            type: _0x5dd0de.type,
-            label: _0x5dd0de.label,
+            assetIndex: assetIndex2.assetIndex,
+            type: assetIndex2.type,
+            label: assetIndex2.label,
           }),
         ),
       ),
       _fixedSlotRefThumbObjectUrls: new Map(),
       _videoThumbPending: new Set(),
-      _resolveMediaUrl: (_0x4530e5) => String(_0x4530e5 || ''),
+      _resolveMediaUrl: (value83) => String(value83 || ''),
       _syncBtnIconState: () => {},
     });
   return (
-    await _0x4fff1d._renderRefBarImpl.call(_0xb727c4),
-    { ctx: _0xb727c4, container: _0xb727c4.refBarEl.querySelector('.rh-v5-ref-container'), state: _0x5010b4 }
+    await videoNodeReferenceInputModule15._renderRefBarImpl.call(ctx),
+    { ctx: ctx, container: ctx.refBarEl.querySelector('.rh-v5-ref-container'), state: _data16 }
   );
 }
 (test('video reference input: Basic, Scail2, and LipSync fixed slots are manifest-rendered from asset pills', async () => {
-  const _0x352e8f = globalThis.document;
+  const value84 = globalThis.document;
   globalThis.document = { createElement: createFakeElement };
   try {
-    const _0x625587 = [
+    const value85 = [
       {
         label: 'basic',
         model: 'runninghub/1971148165531475969',
@@ -1823,105 +1821,97 @@ async function renderFixedRefBarForTest({
         ],
       },
     ];
-    for (const _0x43612a of _0x625587) {
+    for (const model2 of value85) {
       _resetAssetMentionRegistryForTests();
-      const { container: _0x530c91 } = await renderFixedRefBarForTest({
-        targetId: 'node-' + _0x43612a.label + '-refbar-assets',
-        model: _0x43612a.model,
-        assetId: _0x43612a.assetId,
-        assetItems: _0x43612a.items,
-        pills: _0x43612a.pills,
+      const { container: container } = await renderFixedRefBarForTest({
+        targetId: 'node-' + model2.label + '-refbar-assets',
+        model: model2.model,
+        assetId: model2.assetId,
+        assetItems: model2.items,
+        pills: model2.pills,
       });
-      assert.ok(_0x530c91, _0x43612a.label);
-      for (const [_0x3e30f0, _0x1c62f1] of _0x43612a.slots) {
-        const _0x720ad0 = _0x530c91.querySelector('[data-slot="' + _0x3e30f0 + '"]');
-        (assert.equal(_0x720ad0.dataset.refOrigin, 'asset', _0x43612a.label + ':' + _0x3e30f0),
-          assert.equal(_0x720ad0.dataset.kind, _0x1c62f1, _0x43612a.label + ':' + _0x3e30f0),
-          assert.equal(_0x720ad0.dataset.refType, _0x1c62f1, _0x43612a.label + ':' + _0x3e30f0),
-          assert.equal(_0x720ad0.dataset.assetId, _0x43612a.assetId, _0x43612a.label + ':' + _0x3e30f0));
+      assert.ok(container, model2.label);
+      for (const [value86, value87] of model2.slots) {
+        const el45 = container.querySelector('[data-slot="' + value86 + '"]');
+        (assert.equal(el45.dataset.refOrigin, 'asset', model2.label + ':' + value86),
+          assert.equal(el45.dataset.kind, value87, model2.label + ':' + value86),
+          assert.equal(el45.dataset.refType, value87, model2.label + ':' + value86),
+          assert.equal(el45.dataset.assetId, model2.assetId, model2.label + ':' + value86));
       }
     }
   } finally {
-    if (typeof _0x352e8f === 'undefined') delete globalThis.document;
-    else globalThis.document = _0x352e8f;
+    if (typeof value84 === 'undefined') delete globalThis.document;
+    else globalThis.document = value84;
   }
 }),
   test('video reference input: HD VIP and Matting render fixed slots from manifest', async () => {
-    const _0x361713 = globalThis.document;
+    const value88 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
       {
-        const { container: _0x3c647e } = await renderFixedRefBarForTest({
+        const { container: container2 } = await renderFixedRefBarForTest({
             targetId: 'node-watermark-v2-refbar',
             model: 'runninghub/2060613773890768898',
           }),
-          _0x26b8c5 = Array.from(_0x3c647e.querySelectorAll('[data-slot]')).map(
-            (_0x8413c5) => _0x8413c5.dataset.slot,
-          );
-        (assert.deepEqual(_0x26b8c5, ['sourceVideo']),
-          assert.equal(_0x3c647e.querySelector('[data-slot="sourceVideo"]').dataset.kind, 'video'),
-          assert.equal(_0x3c647e.querySelector('[data-slot="maskImage"]'), null));
+          value89 = Array.from(container2.querySelectorAll('[data-slot]')).map((el46) => el46.dataset.slot);
+        (assert.deepEqual(value89, ['sourceVideo']),
+          assert.equal(container2.querySelector('[data-slot="sourceVideo"]').dataset.kind, 'video'),
+          assert.equal(container2.querySelector('[data-slot="maskImage"]'), null));
       }
       {
-        const { container: _0x1183cc } = await renderFixedRefBarForTest({
+        const { container: container3 } = await renderFixedRefBarForTest({
             targetId: 'node-watermark-v2-mode2-refbar',
             model: 'runninghub/2060613773890768898',
             nodeData: { generationParams: { rhWatermarkRemoveMode: 'mode2' } },
           }),
-          _0x42c3e6 = Array.from(_0x1183cc.querySelectorAll('[data-slot]')).map(
-            (_0x2cb3ec) => _0x2cb3ec.dataset.slot,
-          );
-        (assert.deepEqual(_0x42c3e6, ['sourceVideo', 'maskImage']),
-          assert.equal(_0x1183cc.querySelector('[data-slot="maskImage"]').dataset.kind, 'image'));
+          value90 = Array.from(container3.querySelectorAll('[data-slot]')).map((el47) => el47.dataset.slot);
+        (assert.deepEqual(value90, ['sourceVideo', 'maskImage']),
+          assert.equal(container3.querySelector('[data-slot="maskImage"]').dataset.kind, 'image'));
       }
       {
-        const { container: _0x3a8eff } = await renderFixedRefBarForTest({
+        const { container: container4 } = await renderFixedRefBarForTest({
             targetId: 'node-hd-vip-refbar',
             model: 'runninghub/2047787809091620866',
           }),
-          _0x386326 = Array.from(_0x3a8eff.querySelectorAll('[data-slot]')).map(
-            (_0x468024) => _0x468024.dataset.slot,
-          );
-        (assert.deepEqual(_0x386326, ['sourceVideo']),
-          assert.equal(_0x3a8eff.querySelector('[data-slot="sourceVideo"]').dataset.kind, 'video'));
+          value91 = Array.from(container4.querySelectorAll('[data-slot]')).map((el48) => el48.dataset.slot);
+        (assert.deepEqual(value91, ['sourceVideo']),
+          assert.equal(container4.querySelector('[data-slot="sourceVideo"]').dataset.kind, 'video'));
       }
       {
-        const { container: _0x4c1e6e } = await renderFixedRefBarForTest({
+        const { container: container5 } = await renderFixedRefBarForTest({
             targetId: 'node-matting-refbar',
             model: 'runninghub/video_matting',
           }),
-          _0x5ba352 = Array.from(_0x4c1e6e.querySelectorAll('[data-slot]')).map(
-            (_0x4e1776) => _0x4e1776.dataset.slot,
-          );
-        (assert.deepEqual(_0x5ba352, ['sourceVideo', 'maskImage']),
-          assert.equal(_0x4c1e6e.querySelector('[data-slot="sourceVideo"]').dataset.kind, 'video'),
-          assert.equal(_0x4c1e6e.querySelector('[data-slot="maskImage"]').dataset.kind, 'image'));
+          value92 = Array.from(container5.querySelectorAll('[data-slot]')).map((el49) => el49.dataset.slot);
+        (assert.deepEqual(value92, ['sourceVideo', 'maskImage']),
+          assert.equal(container5.querySelector('[data-slot="sourceVideo"]').dataset.kind, 'video'),
+          assert.equal(container5.querySelector('[data-slot="maskImage"]').dataset.kind, 'image'));
       }
     } finally {
-      if (typeof _0x361713 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x361713;
+      if (typeof value88 === 'undefined') delete globalThis.document;
+      else globalThis.document = value88;
     }
   }),
   test('video reference input: 视频去字幕V2 hides and prunes mask slot outside mode2', async () => {
-    const _0x5ddb89 = globalThis.document;
+    const value93 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x4f0a1d = 'node-watermark-v2-mode-switch',
-        _0x5136e0 = [
+      const targetId5 = 'node-watermark-v2-mode-switch',
+        incomingEdges2 = [
           {
             id: 'edge-watermark-source',
             sourceId: 'sourceVideo',
-            targetId: _0x4f0a1d,
+            targetId: targetId5,
             refSlot: 'sourceVideo',
           },
-          { id: 'edge-watermark-mask', sourceId: 'maskImage', targetId: _0x4f0a1d, refSlot: 'maskImage' },
+          { id: 'edge-watermark-mask', sourceId: 'maskImage', targetId: targetId5, refSlot: 'maskImage' },
         ],
         {
-          ctx: _0x2a0d1e,
-          state: _0xf345d7,
-          container: _0x4bb99e,
+          ctx: ctx2,
+          state: state5,
+          container: container6,
         } = await renderFixedRefBarForTest({
-          targetId: _0x4f0a1d,
+          targetId: targetId5,
           model: 'runninghub/2060613773890768898',
           nodeData: { generationParams: { rhWatermarkRemoveMode: 'mode2' } },
           nodes: {
@@ -1938,43 +1928,43 @@ async function renderFixedRefBarForTest({
               maskLocalPath: 'output/mask/manual-mask.png',
             },
           },
-          incomingEdges: _0x5136e0,
+          incomingEdges: incomingEdges2,
         });
       assert.deepEqual(
-        Array.from(_0x4bb99e.querySelectorAll('[data-slot]')).map((_0x9f03ef) => _0x9f03ef.dataset.slot),
+        Array.from(container6.querySelectorAll('[data-slot]')).map((el50) => el50.dataset.slot),
         ['sourceVideo', 'maskImage'],
       );
-      const _0x464ec7 = _0x2a0d1e.refBarEl._innerHTMLSetCount;
-      (assert.equal(_0x5136e0.length, 2),
-        (_0xf345d7.nodes[_0x4f0a1d] = {
-          ..._0xf345d7.nodes[_0x4f0a1d],
+      const value94 = ctx2.refBarEl._innerHTMLSetCount;
+      (assert.equal(incomingEdges2.length, 2),
+        (state5.nodes[targetId5] = {
+          ...state5.nodes[targetId5],
           generationParams: { rhWatermarkRemoveMode: 'mode1' },
         }),
-        (_0x2a0d1e._data = _0xf345d7.nodes[_0x4f0a1d]),
-        await _0x2a0d1e._renderRefBarImpl());
-      const _0x482432 = _0x2a0d1e.refBarEl.querySelector('.rh-v5-ref-container');
-      (assert.equal(_0x2a0d1e.refBarEl._innerHTMLSetCount, _0x464ec7),
+        (ctx2._data = state5.nodes[targetId5]),
+        await ctx2._renderRefBarImpl());
+      const el51 = ctx2.refBarEl.querySelector('.rh-v5-ref-container');
+      (assert.equal(ctx2.refBarEl._innerHTMLSetCount, value94),
         assert.deepEqual(
-          Array.from(_0x482432.querySelectorAll('[data-slot]')).map((_0x158a42) => _0x158a42.dataset.slot),
+          Array.from(el51.querySelectorAll('[data-slot]')).map((el52) => el52.dataset.slot),
           ['sourceVideo'],
         ),
-        assert.equal(_0x482432.querySelector('[data-slot="maskImage"]'), null),
+        assert.equal(el51.querySelector('[data-slot="maskImage"]'), null),
         assert.equal(
-          _0x5136e0.some((_0x535528) => _0x535528.id === 'edge-watermark-mask'),
+          incomingEdges2.some((item10) => item10.id === 'edge-watermark-mask'),
           false,
         ));
     } finally {
-      if (typeof _0x5ddb89 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x5ddb89;
+      if (typeof value93 === 'undefined') delete globalThis.document;
+      else globalThis.document = value93;
     }
   }),
   test('video reference input: fixed image slots show mask badge for masked sources', async () => {
-    const _0x4ac6bf = globalThis.document;
+    const value95 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x24e3ed = 'node-watermark-mask-badge',
-        { container: _0x2427ac } = await renderFixedRefBarForTest({
-          targetId: _0x24e3ed,
+      const targetId6 = 'node-watermark-mask-badge',
+        { container: container7 } = await renderFixedRefBarForTest({
+          targetId: targetId6,
           model: 'runninghub/2060613773890768898',
           nodeData: { generationParams: { rhWatermarkRemoveMode: 'mode2' } },
           nodes: {
@@ -1992,112 +1982,108 @@ async function renderFixedRefBarForTest({
             },
           },
           incomingEdges: [
-            { id: 'edge-source', sourceId: 'sourceVideo', targetId: _0x24e3ed, refSlot: 'sourceVideo' },
-            { id: 'edge-mask', sourceId: 'maskImage', targetId: _0x24e3ed, refSlot: 'maskImage' },
+            { id: 'edge-source', sourceId: 'sourceVideo', targetId: targetId6, refSlot: 'sourceVideo' },
+            { id: 'edge-mask', sourceId: 'maskImage', targetId: targetId6, refSlot: 'maskImage' },
           ],
         }),
-        _0x1be65b = _0x2427ac.querySelector('[data-slot="sourceVideo"]'),
-        _0x4db633 = _0x2427ac.querySelector('[data-slot="maskImage"]');
-      (assert.doesNotMatch(_0x1be65b.innerHTML, /ref-thumb-mask-badge/),
-        assert.match(_0x4db633.innerHTML, /ref-thumb-mask-badge/),
-        assert.match(_0x4db633.innerHTML, />遮罩<\/span>/));
+        el53 = container7.querySelector('[data-slot="sourceVideo"]'),
+        el54 = container7.querySelector('[data-slot="maskImage"]');
+      (assert.doesNotMatch(el53.innerHTML, /ref-thumb-mask-badge/),
+        assert.match(el54.innerHTML, /ref-thumb-mask-badge/),
+        assert.match(el54.innerHTML, />遮罩<\/span>/));
     } finally {
-      if (typeof _0x4ac6bf === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x4ac6bf;
+      if (typeof value95 === 'undefined') delete globalThis.document;
+      else globalThis.document = value95;
     }
   }),
   test('video reference input: V5.4 cameraMove renders only required slots', async () => {
-    const _0x1d3104 = globalThis.document;
+    const value96 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const { container: _0x40b43a } = await renderFixedRefBarForTest({
+      const { container: container8 } = await renderFixedRefBarForTest({
           targetId: 'node-v54-camera',
           model: 'runninghub/2041741496667348994',
           nodeData: { rhSpecialMode: 'cameraMove' },
         }),
-        _0x303860 = Array.from(_0x40b43a.querySelectorAll('[data-slot]')).map(
-          (_0x5f0121) => _0x5f0121.dataset.slot,
-        );
-      (assert.deepEqual(_0x303860, ['sourceVideo', 'refImage']),
-        assert.equal(_0x40b43a.querySelector('[data-slot="firstFrame"]'), null),
-        assert.equal(_0x40b43a.querySelector('[data-slot="videoMask"]'), null));
+        value97 = Array.from(container8.querySelectorAll('[data-slot]')).map((el55) => el55.dataset.slot);
+      (assert.deepEqual(value97, ['sourceVideo', 'refImage']),
+        assert.equal(container8.querySelector('[data-slot="firstFrame"]'), null),
+        assert.equal(container8.querySelector('[data-slot="videoMask"]'), null));
     } finally {
-      if (typeof _0x1d3104 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x1d3104;
+      if (typeof value96 === 'undefined') delete globalThis.document;
+      else globalThis.document = value96;
     }
   }),
   test('video reference input: V5.4 subtract hides mask video and first frame slots', async () => {
-    const _0x15794c = globalThis.document;
+    const value98 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const { container: _0x559c7b } = await renderFixedRefBarForTest({
+      const { container: container9 } = await renderFixedRefBarForTest({
           targetId: 'node-v54-subtract',
           model: 'runninghub/2041741496667348994',
           nodeData: { rhSubtractSubject: true },
         }),
-        _0x36bd2e = Array.from(_0x559c7b.querySelectorAll('[data-slot]')).map(
-          (_0x411f21) => _0x411f21.dataset.slot,
-        );
-      (assert.deepEqual(_0x36bd2e, ['sourceVideo', 'refImage']),
-        assert.equal(_0x559c7b.querySelector('[data-slot="firstFrame"]'), null),
-        assert.equal(_0x559c7b.querySelector('[data-slot="videoMask"]'), null));
+        value99 = Array.from(container9.querySelectorAll('[data-slot]')).map((el56) => el56.dataset.slot);
+      (assert.deepEqual(value99, ['sourceVideo', 'refImage']),
+        assert.equal(container9.querySelector('[data-slot="firstFrame"]'), null),
+        assert.equal(container9.querySelector('[data-slot="videoMask"]'), null));
     } finally {
-      if (typeof _0x15794c === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x15794c;
+      if (typeof value98 === 'undefined') delete globalThis.document;
+      else globalThis.document = value98;
     }
   }),
   test('video reference input: V5.4 subtract toggle reuses visible fixed slots', async () => {
-    const _0xeeb6ea = globalThis.document;
+    const value100 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x4b49e7 = 'node-v54-subtract-toggle',
-        { ctx: _0x3ab56f, state: _0x2594af } = await renderFixedRefBarForTest({
-          targetId: _0x4b49e7,
+      const targetId7 = 'node-v54-subtract-toggle',
+        { ctx: ctx3, state: state6 } = await renderFixedRefBarForTest({
+          targetId: targetId7,
           model: 'runninghub/2041741496667348994',
           nodeData: { rhSubtractSubject: false },
         }),
-        _0x1bfd46 = _0x3ab56f.refBarEl,
-        _0x1d54f5 = _0x1bfd46.querySelector('.rh-v5-ref-container'),
-        _0x29b645 = _0x1d54f5.querySelector('[data-slot="sourceVideo"]'),
-        _0x32f766 = _0x1d54f5.querySelector('[data-slot="refImage"]'),
-        _0x525ec6 = _0x1bfd46._innerHTMLSetCount;
-      (assert.ok(_0x525ec6 >= 1),
-        (_0x2594af.nodes[_0x4b49e7].rhSubtractSubject = true),
-        (_0x3ab56f._data = _0x2594af.nodes[_0x4b49e7]),
-        await _0x3ab56f._renderRefBarImpl(),
-        assert.equal(_0x1bfd46._innerHTMLSetCount, _0x525ec6),
+        el57 = ctx3.refBarEl,
+        el58 = el57.querySelector('.rh-v5-ref-container'),
+        value101 = el58.querySelector('[data-slot="sourceVideo"]'),
+        value102 = el58.querySelector('[data-slot="refImage"]'),
+        count7 = el57._innerHTMLSetCount;
+      (assert.ok(count7 >= 1),
+        (state6.nodes[targetId7].rhSubtractSubject = true),
+        (ctx3._data = state6.nodes[targetId7]),
+        await ctx3._renderRefBarImpl(),
+        assert.equal(el57._innerHTMLSetCount, count7),
         assert.deepEqual(
-          Array.from(_0x1d54f5.querySelectorAll('[data-slot]')).map((_0x142ddf) => _0x142ddf.dataset.slot),
+          Array.from(el58.querySelectorAll('[data-slot]')).map((el59) => el59.dataset.slot),
           ['sourceVideo', 'refImage'],
         ),
-        assert.equal(_0x1d54f5.querySelector('[data-slot="sourceVideo"]'), _0x29b645),
-        assert.equal(_0x1d54f5.querySelector('[data-slot="refImage"]'), _0x32f766),
-        (_0x2594af.nodes[_0x4b49e7].rhSubtractSubject = false),
-        (_0x3ab56f._data = _0x2594af.nodes[_0x4b49e7]),
-        await _0x3ab56f._renderRefBarImpl(),
-        assert.equal(_0x1bfd46._innerHTMLSetCount, _0x525ec6),
+        assert.equal(el58.querySelector('[data-slot="sourceVideo"]'), value101),
+        assert.equal(el58.querySelector('[data-slot="refImage"]'), value102),
+        (state6.nodes[targetId7].rhSubtractSubject = false),
+        (ctx3._data = state6.nodes[targetId7]),
+        await ctx3._renderRefBarImpl(),
+        assert.equal(el57._innerHTMLSetCount, count7),
         assert.deepEqual(
-          Array.from(_0x1d54f5.querySelectorAll('[data-slot]')).map((_0x209ec0) => _0x209ec0.dataset.slot),
+          Array.from(el58.querySelectorAll('[data-slot]')).map((el60) => el60.dataset.slot),
           ['sourceVideo', 'refImage', 'firstFrame', 'videoMask'],
         ),
-        assert.equal(_0x1d54f5.querySelector('[data-slot="sourceVideo"]'), _0x29b645),
-        assert.equal(_0x1d54f5.querySelector('[data-slot="refImage"]'), _0x32f766));
+        assert.equal(el58.querySelector('[data-slot="sourceVideo"]'), value101),
+        assert.equal(el58.querySelector('[data-slot="refImage"]'), value102));
     } finally {
-      if (typeof _0xeeb6ea === 'undefined') delete globalThis.document;
-      else globalThis.document = _0xeeb6ea;
+      if (typeof value100 === 'undefined') delete globalThis.document;
+      else globalThis.document = value100;
     }
   }),
   test('video reference input: 同构固定入参模型切换不清空缩略图 DOM', async () => {
-    const _0x33e01e = globalThis.document;
+    const value103 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x18c0a3 = 'node-fixed-model-switch',
+      const targetId8 = 'node-fixed-model-switch',
         {
-          ctx: _0x5463fe,
-          state: _0x10556d,
-          container: _0x4a7dfd,
+          ctx: ctx4,
+          state: state7,
+          container: container10,
         } = await renderFixedRefBarForTest({
-          targetId: _0x18c0a3,
+          targetId: targetId8,
           model: 'runninghub/1971148165531475969',
           nodes: {
             sourceVideo: {
@@ -2114,51 +2100,51 @@ async function renderFixedRefBarForTest({
             },
           },
           incomingEdges: [
-            { id: 'edge-source', sourceId: 'sourceVideo', targetId: _0x18c0a3, refSlot: 'sourceVideo' },
-            { id: 'edge-ref', sourceId: 'refImage', targetId: _0x18c0a3, refSlot: 'refImage' },
+            { id: 'edge-source', sourceId: 'sourceVideo', targetId: targetId8, refSlot: 'sourceVideo' },
+            { id: 'edge-ref', sourceId: 'refImage', targetId: targetId8, refSlot: 'refImage' },
           ],
         }),
-        _0x268560 = _0x5463fe.refBarEl,
-        _0x3a1a0f = _0x4a7dfd.querySelector('[data-slot="sourceVideo"]'),
-        _0x541711 = _0x4a7dfd.querySelector('[data-slot="refImage"]'),
-        _0xb5157e = _0x268560._innerHTMLSetCount;
-      ((_0x10556d.nodes[_0x18c0a3] = {
-        ..._0x10556d.nodes[_0x18c0a3],
+        value104 = ctx4.refBarEl,
+        value105 = container10.querySelector('[data-slot="sourceVideo"]'),
+        value106 = container10.querySelector('[data-slot="refImage"]'),
+        value107 = value104._innerHTMLSetCount;
+      ((state7.nodes[targetId8] = {
+        ...state7.nodes[targetId8],
         model: 'runninghub/2041741496667348994',
         rhSubtractSubject: true,
       }),
-        (_0x5463fe._data = _0x10556d.nodes[_0x18c0a3]),
-        await _0x5463fe._renderRefBarImpl(),
-        assert.equal(_0x268560._innerHTMLSetCount, _0xb5157e),
-        assert.equal(_0x4a7dfd.querySelector('[data-slot="sourceVideo"]'), _0x3a1a0f),
-        assert.equal(_0x4a7dfd.querySelector('[data-slot="refImage"]'), _0x541711),
-        (_0x10556d.nodes[_0x18c0a3] = {
-          ..._0x10556d.nodes[_0x18c0a3],
+        (ctx4._data = state7.nodes[targetId8]),
+        await ctx4._renderRefBarImpl(),
+        assert.equal(value104._innerHTMLSetCount, value107),
+        assert.equal(container10.querySelector('[data-slot="sourceVideo"]'), value105),
+        assert.equal(container10.querySelector('[data-slot="refImage"]'), value106),
+        (state7.nodes[targetId8] = {
+          ...state7.nodes[targetId8],
           model: 'runninghub/2064961300823896065',
           generationParams: { rhScail2ReplaceSubject: false },
         }),
-        (_0x5463fe._data = _0x10556d.nodes[_0x18c0a3]),
-        await _0x5463fe._renderRefBarImpl(),
-        assert.equal(_0x268560._innerHTMLSetCount, _0xb5157e),
-        assert.equal(_0x4a7dfd.querySelector('[data-slot="sourceVideo"]'), _0x3a1a0f),
-        assert.equal(_0x4a7dfd.querySelector('[data-slot="refImage"]'), _0x541711));
+        (ctx4._data = state7.nodes[targetId8]),
+        await ctx4._renderRefBarImpl(),
+        assert.equal(value104._innerHTMLSetCount, value107),
+        assert.equal(container10.querySelector('[data-slot="sourceVideo"]'), value105),
+        assert.equal(container10.querySelector('[data-slot="refImage"]'), value106));
     } finally {
-      if (typeof _0x33e01e === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x33e01e;
+      if (typeof value103 === 'undefined') delete globalThis.document;
+      else globalThis.document = value103;
     }
   }),
   test('video reference input: failed video thumb backfill keeps source video usable', async () => {
-    const _0x4b0fe6 = globalThis.document;
+    const value108 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x50245d = 'node-v54-thumb-failure-target',
-        _0xf412ae = 'node-v54-keyed-source',
-        { state: _0x506047 } = await renderFixedRefBarForTest({
-          targetId: _0x50245d,
+      const targetId9 = 'node-v54-thumb-failure-target',
+        id18 = 'node-v54-keyed-source',
+        { state: state8 } = await renderFixedRefBarForTest({
+          targetId: targetId9,
           model: 'runninghub/2041741496667348994',
           nodes: {
-            [_0xf412ae]: {
-              id: _0xf412ae,
+            [id18]: {
+              id: id18,
               type: 'source-video',
               localPath: 'output/keyed.mp4',
               videoUrl: '/output/keyed.mp4',
@@ -2173,8 +2159,8 @@ async function renderFixedRefBarForTest({
           incomingEdges: [
             {
               id: 'edge-v54-keyed-source',
-              sourceId: _0xf412ae,
-              targetId: _0x50245d,
+              sourceId: id18,
+              targetId: targetId9,
               refSlot: 'videoMask',
               sourceMediaKey: 'output/keyed.mp4',
             },
@@ -2186,22 +2172,22 @@ async function renderFixedRefBarForTest({
           },
         });
       (await Promise.resolve(), await Promise.resolve());
-      const _0xbaabcf = _0x506047.nodes[_0xf412ae];
-      (assert.notEqual(_0xbaabcf.mediaUnavailable, true),
-        assert.equal(_0xbaabcf.mediaUnavailableSource, undefined),
-        assert.equal(_0xbaabcf.videoThumbUnavailableSource, '/output/keyed.mp4'),
-        assert.equal(hasUsableInputNodeSource(_0xbaabcf), true));
+      const value109 = state8.nodes[id18];
+      (assert.notEqual(value109.mediaUnavailable, true),
+        assert.equal(value109.mediaUnavailableSource, undefined),
+        assert.equal(value109.videoThumbUnavailableSource, '/output/keyed.mp4'),
+        assert.equal(hasUsableInputNodeSource(value109), true));
     } finally {
-      if (typeof _0x4b0fe6 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x4b0fe6;
+      if (typeof value108 === 'undefined') delete globalThis.document;
+      else globalThis.document = value108;
     }
   }),
   test('video reference input: fixed-slot edges win over asset refs and text stays trailing', async () => {
-    const _0x1e84cb = globalThis.document;
+    const value110 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const _0x4fa1b1 = 'asset-fixed-priority',
-        { container: _0xa43206 } = await renderFixedRefBarForTest({
+      const assetId3 = 'asset-fixed-priority',
+        { container: container11 } = await renderFixedRefBarForTest({
           targetId: 'node-fixed-priority',
           model: 'runninghub/1971148165531475969',
           nodes: {
@@ -2220,7 +2206,7 @@ async function renderFixedRefBarForTest({
               refSlot: 'sourceVideo',
             },
           ],
-          assetId: _0x4fa1b1,
+          assetId: assetId3,
           assetItems: [
             {
               name: 'asset source',
@@ -2246,27 +2232,27 @@ async function renderFixedRefBarForTest({
             { assetIndex: 2, type: 'text', label: 'asset text' },
           ],
         }),
-        _0x24f38f = _0xa43206.querySelector('[data-slot="sourceVideo"]'),
-        _0x21ce94 = _0xa43206.querySelector('[data-slot="refImage"]'),
-        _0x1d421d = _0xa43206.querySelector('.rh-fixed-extra-ref');
-      (assert.equal(_0x24f38f.dataset.refOrigin, 'node'),
-        assert.equal(_0x24f38f.dataset.edgeId, 'edge-source'),
-        assert.equal(_0x21ce94.dataset.refOrigin, 'asset'),
-        assert.equal(_0x21ce94.dataset.assetId, _0x4fa1b1),
-        assert.equal(_0x21ce94.dataset.refType, 'image'),
-        assert.equal(_0x1d421d.dataset.refOrigin, 'asset'),
-        assert.equal(_0x1d421d.dataset.refType, 'text'),
-        assert.ok(_0xa43206.childNodes.indexOf(_0x1d421d) > _0xa43206.childNodes.indexOf(_0x21ce94)));
+        el61 = container11.querySelector('[data-slot="sourceVideo"]'),
+        el62 = container11.querySelector('[data-slot="refImage"]'),
+        el63 = container11.querySelector('.rh-fixed-extra-ref');
+      (assert.equal(el61.dataset.refOrigin, 'node'),
+        assert.equal(el61.dataset.edgeId, 'edge-source'),
+        assert.equal(el62.dataset.refOrigin, 'asset'),
+        assert.equal(el62.dataset.assetId, assetId3),
+        assert.equal(el62.dataset.refType, 'image'),
+        assert.equal(el63.dataset.refOrigin, 'asset'),
+        assert.equal(el63.dataset.refType, 'text'),
+        assert.ok(container11.childNodes.indexOf(el63) > container11.childNodes.indexOf(el62)));
     } finally {
-      if (typeof _0x1e84cb === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x1e84cb;
+      if (typeof value110 === 'undefined') delete globalThis.document;
+      else globalThis.document = value110;
     }
   }),
   test('video reference input: fixed-slot explicit refSlot wins before same-kind empty slots', async () => {
-    const _0x33e53f = globalThis.document;
+    const value111 = globalThis.document;
     globalThis.document = { createElement: createFakeElement };
     try {
-      const { container: _0x4c89bb } = await renderFixedRefBarForTest({
+      const { container: container12 } = await renderFixedRefBarForTest({
         targetId: 'node-v54-edge-slots',
         model: 'runninghub/2041741496667348994',
         nodes: {
@@ -2288,19 +2274,19 @@ async function renderFixedRefBarForTest({
           { id: 'edge-source', sourceId: 'sourceVideo', targetId: 'node-v54-edge-slots', refSlot: '' },
         ],
       });
-      (assert.equal(_0x4c89bb.querySelector('[data-slot="videoMask"]').dataset.edgeId, 'edge-mask'),
-        assert.equal(_0x4c89bb.querySelector('[data-slot="sourceVideo"]').dataset.edgeId, 'edge-source'));
+      (assert.equal(container12.querySelector('[data-slot="videoMask"]').dataset.edgeId, 'edge-mask'),
+        assert.equal(container12.querySelector('[data-slot="sourceVideo"]').dataset.edgeId, 'edge-source'));
     } finally {
-      if (typeof _0x33e53f === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x33e53f;
+      if (typeof value111 === 'undefined') delete globalThis.document;
+      else globalThis.document = value111;
     }
   }),
   test('video submit button: V5.4 asset mentions satisfy required fixed inputs', () => {
-    const _0x11759d = 'node-v54-submit-assets',
-      _0xe6cc8f = {
+    const id19 = 'node-v54-submit-assets',
+      _data17 = {
         nodes: {
-          [_0x11759d]: {
-            id: _0x11759d,
+          [id19]: {
+            id: id19,
             type: 'ai-video',
             model: 'runninghub/2041741496667348994',
             provider: 'runninghubwf',
@@ -2324,8 +2310,8 @@ async function renderFixedRefBarForTest({
         ],
       },
     ]);
-    const _0x392a45 = createVideoNodeParameterPanelModule({
-        store: { getState: () => _0xe6cc8f, getIncomingEdges: () => [] },
+    const videoNodeParameterPanelModule = createVideoNodeParameterPanelModule({
+        store: { getState: () => _data17, getIncomingEdges: () => [] },
         api: {},
         getDisplayModelName: () => '',
         PROVIDERS_META: {},
@@ -2334,9 +2320,9 @@ async function renderFixedRefBarForTest({
         activateMenuKeyboard: () => {},
         isVideoVipModel: () => false,
       }),
-      _0x200d49 = Object.assign(Object.create(_0x392a45), {
-        nodeId: _0x11759d,
-        _data: _0xe6cc8f.nodes[_0x11759d],
+      value112 = Object.assign(Object.create(videoNodeParameterPanelModule), {
+        nodeId: id19,
+        _data: _data17.nodes[id19],
         promptEl: makePromptEl([
           makeAssetPill({ assetId: 'asset-submit', assetIndex: 0, type: 'video', label: 'source clip' }),
           makeAssetPill({ assetId: 'asset-submit', assetIndex: 1, type: 'image', label: 'reference image' }),
@@ -2346,10 +2332,11 @@ async function renderFixedRefBarForTest({
         _isDreaminaVideoNode: () => false,
         _isRunninghubWorkflowModel: () => true,
       });
-    (_0x392a45._updateSubmitButtonState.call(_0x200d49), assert.equal(_0x200d49.btnEl.disabled, false));
+    (videoNodeParameterPanelModule._updateSubmitButtonState.call(value112),
+      assert.equal(value112.btnEl.disabled, false));
   }),
   test('video submit button: other fixed-slot models accept asset mentions', () => {
-    const _0x1d2b81 = [
+    const value113 = [
       {
         label: 'basic',
         model: 'runninghub/1971148165531475969',
@@ -2411,22 +2398,22 @@ async function renderFixedRefBarForTest({
         ],
       },
     ];
-    for (const _0x570f85 of _0x1d2b81) {
+    for (const model3 of value113) {
       _resetAssetMentionRegistryForTests();
-      const _0x42b171 = 'node-' + _0x570f85.label + '-submit-assets',
-        _0x48afba = {
+      const id20 = 'node-' + model3.label + '-submit-assets',
+        _data18 = {
           nodes: {
-            [_0x42b171]: {
-              id: _0x42b171,
+            [id20]: {
+              id: id20,
               type: 'ai-video',
-              model: _0x570f85.model,
+              model: model3.model,
               provider: 'runninghubwf',
             },
           },
         };
-      setAssetMentionAssets([{ id: 'asset-' + _0x570f85.label, items: _0x570f85.items }]);
-      const _0x47351f = createVideoNodeParameterPanelModule({
-          store: { getState: () => _0x48afba, getIncomingEdges: () => [] },
+      setAssetMentionAssets([{ id: 'asset-' + model3.label, items: model3.items }]);
+      const videoNodeParameterPanelModule2 = createVideoNodeParameterPanelModule({
+          store: { getState: () => _data18, getIncomingEdges: () => [] },
           api: {},
           getDisplayModelName: () => '',
           PROVIDERS_META: {},
@@ -2435,16 +2422,16 @@ async function renderFixedRefBarForTest({
           activateMenuKeyboard: () => {},
           isVideoVipModel: () => false,
         }),
-        _0x306722 = Object.assign(Object.create(_0x47351f), {
-          nodeId: _0x42b171,
-          _data: _0x48afba.nodes[_0x42b171],
+        value114 = Object.assign(Object.create(videoNodeParameterPanelModule2), {
+          nodeId: id20,
+          _data: _data18.nodes[id20],
           promptEl: makePromptEl(
-            _0x570f85.pills.map((_0x1c3068) =>
+            model3.pills.map((assetIndex3) =>
               makeAssetPill({
-                assetId: 'asset-' + _0x570f85.label,
-                assetIndex: _0x1c3068.assetIndex,
-                type: _0x1c3068.type,
-                label: _0x1c3068.label,
+                assetId: 'asset-' + model3.label,
+                assetIndex: assetIndex3.assetIndex,
+                type: assetIndex3.type,
+                label: assetIndex3.label,
               }),
             ),
           ),
@@ -2453,27 +2440,27 @@ async function renderFixedRefBarForTest({
           _isDreaminaVideoNode: () => false,
           _isRunninghubWorkflowModel: () => true,
         });
-      (_0x47351f._updateSubmitButtonState.call(_0x306722),
-        assert.equal(_0x306722.btnEl.disabled, false, _0x570f85.label));
+      (videoNodeParameterPanelModule2._updateSubmitButtonState.call(value114),
+        assert.equal(value114.btnEl.disabled, false, model3.label));
     }
   }),
   test('video submit button: empty editor can generate from non-empty text input', () => {
-    const _0x231f7b = 'node-video-text-input-submit',
-      _0x5636af = 'node-video-text-input-source',
-      _0x405dd0 = {
+    const id21 = 'node-video-text-input-submit',
+      id22 = 'node-video-text-input-source',
+      _data19 = {
         nodes: {
-          [_0x231f7b]: {
-            id: _0x231f7b,
+          [id21]: {
+            id: id21,
             type: 'ai-video',
             model: 'apimart/seedance-1.0',
             provider: 'apimart',
           },
-          [_0x5636af]: { id: _0x5636af, type: 'source-text', content: '用文本入参生成视频' },
+          [id22]: { id: id22, type: 'source-text', content: '用文本入参生成视频' },
         },
       },
-      _0x4ec62c = [{ id: 'edge-video-text-input', sourceId: _0x5636af, targetId: _0x231f7b }],
-      _0x4861ec = createVideoNodeParameterPanelModule({
-        store: { getState: () => _0x405dd0, getIncomingEdges: () => _0x4ec62c },
+      value115 = [{ id: 'edge-video-text-input', sourceId: id22, targetId: id21 }],
+      videoNodeParameterPanelModule3 = createVideoNodeParameterPanelModule({
+        store: { getState: () => _data19, getIncomingEdges: () => value115 },
         api: {},
         getDisplayModelName: () => '',
         PROVIDERS_META: {},
@@ -2482,25 +2469,25 @@ async function renderFixedRefBarForTest({
         activateMenuKeyboard: () => {},
         isVideoVipModel: () => false,
       }),
-      _0x50fcdf = Object.assign(Object.create(_0x4861ec), {
-        nodeId: _0x231f7b,
-        _data: _0x405dd0.nodes[_0x231f7b],
+      value116 = Object.assign(Object.create(videoNodeParameterPanelModule3), {
+        nodeId: id21,
+        _data: _data19.nodes[id21],
         promptEl: makePromptEl([]),
         btnEl: { disabled: true, style: {} },
         _isGenerating: false,
         _isDreaminaVideoNode: () => false,
         _isRunninghubWorkflowModel: () => false,
       });
-    (_0x4861ec._updateSubmitButtonState.call(_0x50fcdf),
-      assert.equal(_0x50fcdf.btnEl.disabled, false),
-      assert.equal(_0x50fcdf.btnEl.style.cursor, ''));
+    (videoNodeParameterPanelModule3._updateSubmitButtonState.call(value116),
+      assert.equal(value116.btnEl.disabled, false),
+      assert.equal(value116.btnEl.style.cursor, ''));
   }),
   test('video submit button: running task state is read from unified selector', () => {
-    const _0x4da6a5 = 'node-video-running-button-state',
-      _0x29bc52 = {
+    const id23 = 'node-video-running-button-state',
+      _data20 = {
         nodes: {
-          [_0x4da6a5]: {
-            id: _0x4da6a5,
+          [id23]: {
+            id: id23,
             type: 'ai-video',
             model: 'runninghub/1971148165531475969',
             provider: 'runninghubwf',
@@ -2509,8 +2496,8 @@ async function renderFixedRefBarForTest({
           },
         },
       },
-      _0x6e627c = createVideoNodeParameterPanelModule({
-        store: { getState: () => _0x29bc52, getIncomingEdges: () => [] },
+      videoNodeParameterPanelModule4 = createVideoNodeParameterPanelModule({
+        store: { getState: () => _data20, getIncomingEdges: () => [] },
         api: {},
         getDisplayModelName: () => '',
         PROVIDERS_META: {},
@@ -2519,9 +2506,9 @@ async function renderFixedRefBarForTest({
         activateMenuKeyboard: () => {},
         isVideoVipModel: () => false,
       }),
-      _0x355ff2 = Object.assign(Object.create(_0x6e627c), {
-        nodeId: _0x4da6a5,
-        _data: _0x29bc52.nodes[_0x4da6a5],
+      value117 = Object.assign(Object.create(videoNodeParameterPanelModule4), {
+        nodeId: id23,
+        _data: _data20.nodes[id23],
         promptEl: makePromptEl([]),
         btnEl: { disabled: true, style: {} },
         _isGenerating: false,
@@ -2529,16 +2516,16 @@ async function renderFixedRefBarForTest({
         _isDreaminaVideoNode: () => false,
         _isRunninghubWorkflowModel: () => true,
       });
-    (_0x6e627c._updateSubmitButtonState.call(_0x355ff2),
-      assert.equal(_0x355ff2.btnEl.disabled, false),
-      assert.equal(_0x355ff2.btnEl.style.cursor, ''));
+    (videoNodeParameterPanelModule4._updateSubmitButtonState.call(value117),
+      assert.equal(value117.btnEl.disabled, false),
+      assert.equal(value117.btnEl.style.cursor, ''));
   }),
   test('video submit button: non-cancellable async running state stays disabled', () => {
-    const _0x4ff317 = 'node-video-async-running-button-state',
-      _0x46e0b8 = {
+    const id24 = 'node-video-async-running-button-state',
+      _data21 = {
         nodes: {
-          [_0x4ff317]: {
-            id: _0x4ff317,
+          [id24]: {
+            id: id24,
             type: 'ai-video',
             model: 'apimart/seedance-1.0',
             provider: 'apimart',
@@ -2547,8 +2534,8 @@ async function renderFixedRefBarForTest({
           },
         },
       },
-      _0x735735 = createVideoNodeParameterPanelModule({
-        store: { getState: () => _0x46e0b8, getIncomingEdges: () => [] },
+      videoNodeParameterPanelModule5 = createVideoNodeParameterPanelModule({
+        store: { getState: () => _data21, getIncomingEdges: () => [] },
         api: {},
         getDisplayModelName: () => '',
         PROVIDERS_META: {},
@@ -2557,25 +2544,25 @@ async function renderFixedRefBarForTest({
         activateMenuKeyboard: () => {},
         isVideoVipModel: () => false,
       }),
-      _0x32addd = Object.assign(Object.create(_0x735735), {
-        nodeId: _0x4ff317,
-        _data: _0x46e0b8.nodes[_0x4ff317],
+      value118 = Object.assign(Object.create(videoNodeParameterPanelModule5), {
+        nodeId: id24,
+        _data: _data21.nodes[id24],
         promptEl: { innerText: 'prompt', querySelectorAll: () => [] },
         btnEl: { disabled: false, style: {} },
         _isGenerating: false,
         _isDreaminaVideoNode: () => false,
         _isRunninghubWorkflowModel: () => false,
       });
-    (_0x735735._updateSubmitButtonState.call(_0x32addd),
-      assert.equal(_0x32addd.btnEl.disabled, true),
-      assert.equal(_0x32addd.btnEl.style.cursor, 'var(--unavailable-cursor)'));
+    (videoNodeParameterPanelModule5._updateSubmitButtonState.call(value118),
+      assert.equal(value118.btnEl.disabled, true),
+      assert.equal(value118.btnEl.style.cursor, 'var(--unavailable-cursor)'));
   }),
   test('video submit button: Dreamina-style API running state stays disabled', () => {
-    const _0x3c8966 = 'node-video-seedance-api-running-button-state',
-      _0x5c75e7 = {
+    const id25 = 'node-video-seedance-api-running-button-state',
+      _data22 = {
         nodes: {
-          [_0x3c8966]: {
-            id: _0x3c8966,
+          [id25]: {
+            id: id25,
             type: 'ai-video',
             model: 'apimart/doubao-seedance-2.0-fast',
             provider: 'apimart',
@@ -2586,8 +2573,8 @@ async function renderFixedRefBarForTest({
           },
         },
       },
-      _0x1366b9 = createVideoNodeParameterPanelModule({
-        store: { getState: () => _0x5c75e7, getIncomingEdges: () => [] },
+      videoNodeParameterPanelModule6 = createVideoNodeParameterPanelModule({
+        store: { getState: () => _data22, getIncomingEdges: () => [] },
         api: {},
         getDisplayModelName: () => '',
         PROVIDERS_META: {},
@@ -2596,39 +2583,39 @@ async function renderFixedRefBarForTest({
         activateMenuKeyboard: () => {},
         isVideoVipModel: () => false,
       }),
-      _0x35700f = {
+      btnEl = {
         disabled: false,
         className: '',
         dataset: {},
         innerHTML: '',
         style: {},
         title: '',
-        setAttribute(_0x184539, _0x56075d) {
-          this.attributes = { ...(this.attributes || {}), [_0x184539]: String(_0x56075d || '') };
+        setAttribute(value119, value120) {
+          this.attributes = { ...(this.attributes || {}), [value119]: String(value120 || '') };
         },
-        removeAttribute(_0x4596dd) {
-          delete this.attributes?.[_0x4596dd];
+        removeAttribute(value121) {
+          delete this.attributes?.[value121];
         },
       };
-    _0x35700f.classList = makeClassList(_0x35700f);
-    const _0x1172a3 = Object.assign(Object.create(_0x1366b9), {
-      nodeId: _0x3c8966,
-      _data: _0x5c75e7.nodes[_0x3c8966],
+    btnEl.classList = makeClassList(btnEl);
+    const value122 = Object.assign(Object.create(videoNodeParameterPanelModule6), {
+      nodeId: id25,
+      _data: _data22.nodes[id25],
       promptEl: { innerText: 'prompt', querySelectorAll: () => [] },
-      btnEl: _0x35700f,
+      btnEl: btnEl,
       _isGenerating: false,
       _rhCancelInFlight: false,
       _isDreaminaVideoNode: () => true,
       _isRunninghubWorkflowModel: () => false,
       _syncDreaminaTaskState: () => ({
-        nodeData: _0x5c75e7.nodes[_0x3c8966],
+        nodeData: _data22.nodes[id25],
         summary: { imageCount: 1, videoCount: 0, audioCount: 0 },
         resolvedTaskType: 'multimodal2video',
         routeMode: 'multimodal2video',
       }),
     });
-    (_0x1366b9._updateSubmitButtonState.call(_0x1172a3),
-      assert.equal(_0x1172a3.btnEl.disabled, true),
-      assert.equal(_0x1172a3.btnEl.style.cursor, 'var(--unavailable-cursor)'),
-      assert.equal(_0x1172a3.btnEl.classList.contains('is-task-cancel'), false));
+    (videoNodeParameterPanelModule6._updateSubmitButtonState.call(value122),
+      assert.equal(value122.btnEl.disabled, true),
+      assert.equal(value122.btnEl.style.cursor, 'var(--unavailable-cursor)'),
+      assert.equal(value122.btnEl.classList.contains('is-task-cancel'), false));
   }));

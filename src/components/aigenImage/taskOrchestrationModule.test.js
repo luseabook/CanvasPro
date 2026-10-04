@@ -6,7 +6,10 @@ import {
   isPreviewNodeLoading,
   stopPreviewNodeLoading,
 } from '../../modules/previewMode.js';
-import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../../tools/dom-test-environment.mjs';
+import {
+  createPreviewContainer as createFakePreviewContainer,
+  installDomEnvironment as installPreviewDomStubs,
+} from '../../../tools/dom-test-environment.mjs';
 import {
   _resetAssetMentionRegistryForTests,
   setAssetMentionAssets,
@@ -34,22 +37,22 @@ typeof globalThis.window.showToast !== 'function' && (globalThis.window.showToas
   test.afterEach(() => {
     (_resetPreviewRuntimeForTests(), _resetAssetMentionRegistryForTests());
   }));
-function createStore(_0x23e6ce, _0x22775f = []) {
+function createStore(value, list = []) {
   return {
     getState() {
-      return _0x23e6ce;
+      return value;
     },
-    getIncomingEdges(_0x280853) {
-      return _0x22775f.filter((_0x19d0db) => _0x19d0db.targetId === _0x280853);
+    getIncomingEdges(item) {
+      return list.filter((item2) => item2.targetId === item);
     },
-    updateNodeData(_0x4a6565, _0x13e050) {
-      const _0x283b6e = _0x23e6ce.nodes?.[_0x4a6565] || {};
-      _0x23e6ce.nodes[_0x4a6565] = { ..._0x283b6e, ..._0x13e050 };
+    updateNodeData(key, args) {
+      const args2 = value.nodes?.[key] || {};
+      value.nodes[key] = { ...args2, ...args };
     },
   };
 }
-function createPromptTextNode(_0x349bef = '') {
-  return { nodeType: Node.TEXT_NODE, textContent: String(_0x349bef || '') };
+function createPromptTextNode(index = '') {
+  return { nodeType: Node.TEXT_NODE, textContent: String(index || '') };
 }
 function createPromptElementNode({
   tagName: tagName = 'SPAN',
@@ -58,7 +61,7 @@ function createPromptElementNode({
   textContent: textContent = '',
   childNodes: childNodes = [],
 } = {}) {
-  const _0x5c839b = String(className || '')
+  const list2 = String(className || '')
     .split(/\s+/)
     .filter(Boolean);
   return {
@@ -66,8 +69,8 @@ function createPromptElementNode({
     tagName: tagName,
     className: className,
     classList: {
-      contains(_0x1f1df4) {
-        return _0x5c839b.includes(String(_0x1f1df4 || ''));
+      contains(result) {
+        return list2.includes(String(result || ''));
       },
     },
     dataset: { ...dataset },
@@ -75,52 +78,56 @@ function createPromptElementNode({
     childNodes: Array.isArray(childNodes) ? childNodes : [],
   };
 }
-function createAssetPromptPillNode(_0x76067a, _0x2b1490, _0x4facf5, _0xf532c3) {
+function createAssetPromptPillNode(data, options, target, source) {
   return createPromptElementNode({
     className: 'ref-pill',
     dataset: {
-      label: String(_0x76067a || ''),
+      label: String(data || ''),
       refOrigin: 'asset',
-      assetId: String(_0x2b1490 || ''),
-      assetIndex: String(_0x4facf5),
-      refType: String(_0xf532c3 || ''),
+      assetId: String(options || ''),
+      assetIndex: String(target),
+      refType: String(source || ''),
     },
-    textContent: String(_0x76067a || ''),
+    textContent: String(data || ''),
   });
 }
-function createNodePromptPillNode(_0x10841b, _0x8a9efc, _0x104338 = 'image') {
+function createNodePromptPillNode(next, current, entry = 'image') {
   return createPromptElementNode({
     className: 'ref-pill',
     dataset: {
-      label: String(_0x10841b || ''),
-      nodeId: String(_0x8a9efc || ''),
-      refType: String(_0x104338 || ''),
+      label: String(next || ''),
+      nodeId: String(current || ''),
+      refType: String(entry || ''),
     },
-    textContent: String(_0x10841b || ''),
+    textContent: String(next || ''),
   });
 }
-function collectPromptInnerText(_0xf1dcd3) {
-  return (Array.isArray(_0xf1dcd3) ? _0xf1dcd3 : [])
-    .map((_0x1a16d6) => {
-      const _0x8d2ec = Number(_0x1a16d6?.nodeType);
-      if (_0x8d2ec === Node.TEXT_NODE) return String(_0x1a16d6?.textContent || '');
-      if (_0x8d2ec !== Node.ELEMENT_NODE) return '';
-      if (String(_0x1a16d6?.tagName || '').toUpperCase() === 'BR') return '\n';
-      const _0x236c68 = Array.isArray(_0x1a16d6?.childNodes) ? _0x1a16d6.childNodes : [];
-      if (_0x236c68.length > 0) return collectPromptInnerText(_0x236c68);
-      return String(_0x1a16d6?.textContent || '');
+function collectPromptInnerText(record) {
+  return (Array.isArray(record) ? record : [])
+    .map((el) => {
+      const payload = Number(el?.nodeType);
+      if (payload === Node.TEXT_NODE) return String(el?.textContent || '');
+      if (payload !== Node.ELEMENT_NODE) return '';
+      if (String(el?.tagName || '').toUpperCase() === 'BR') return '\n';
+      const list3 = Array.isArray(el?.childNodes) ? el.childNodes : [];
+      if (list3.length > 0) return collectPromptInnerText(list3);
+      return String(el?.textContent || '');
     })
     .join('');
 }
-function createPromptEl(_0x66b7e6 = 'test prompt') {
-  if (Array.isArray(_0x66b7e6)) {
-    const _0x315e06 = collectPromptInnerText(_0x66b7e6);
-    return { innerText: _0x315e06, textContent: _0x315e06, childNodes: _0x66b7e6 };
+function createPromptEl(childNodes2 = 'test prompt') {
+  if (Array.isArray(childNodes2)) {
+    const innerText = collectPromptInnerText(childNodes2);
+    return { innerText: innerText, textContent: innerText, childNodes: childNodes2 };
   }
-  return { innerText: _0x66b7e6, textContent: _0x66b7e6, childNodes: [createPromptTextNode(_0x66b7e6)] };
+  return {
+    innerText: childNodes2,
+    textContent: childNodes2,
+    childNodes: [createPromptTextNode(childNodes2)],
+  };
 }
 function createButtonStub() {
-  const _0x2a6594 = new Set();
+  const map = new Set();
   return {
     disabled: false,
     title: '',
@@ -128,27 +135,27 @@ function createButtonStub() {
     style: { color: '', cursor: '' },
     _attrs: new Map(),
     classList: {
-      add(_0xd0c089) {
-        _0x2a6594.add(String(_0xd0c089 || ''));
+      add(handle) {
+        map.add(String(handle || ''));
       },
-      remove(_0x4d024d) {
-        _0x2a6594.delete(String(_0x4d024d || ''));
+      remove(state) {
+        map.delete(String(state || ''));
       },
-      contains(_0x25cd51) {
-        return _0x2a6594.has(String(_0x25cd51 || ''));
+      contains(config) {
+        return map.has(String(config || ''));
       },
     },
-    setAttribute(_0x35f30c, _0x50b156) {
-      this._attrs.set(String(_0x35f30c || ''), String(_0x50b156 || ''));
+    setAttribute(scope, input) {
+      this._attrs.set(String(scope || ''), String(input || ''));
     },
-    removeAttribute(_0x4894c0) {
-      this._attrs.delete(String(_0x4894c0 || ''));
+    removeAttribute(output) {
+      this._attrs.delete(String(output || ''));
     },
   };
 }
 function createTestContext({
-  targetId: _0x463842,
-  nodeData: _0x235d21,
+  targetId: targetId,
+  nodeData: nodeData,
   nodes: nodes = {},
   incomingEdges: incomingEdges = [],
   promptText: promptText = 'mountain',
@@ -162,37 +169,37 @@ function createTestContext({
   storeImpl: storeImpl = null,
   stateOverride: stateOverride = null,
 }) {
-  const _0x15b2e7 = (_0x1a69ba) => {
-      const _0x392ac2 = getModelManifest(_0x1a69ba?.model),
-        _0x49c3e5 = Array.isArray(_0x392ac2?.uiSchema?.fields) ? _0x392ac2.uiSchema.fields : [];
-      if (!_0x49c3e5.length) return { ..._0x1a69ba };
-      const _0x45e693 =
-        _0x1a69ba?.generationParams &&
-        typeof _0x1a69ba.generationParams === 'object' &&
-        !Array.isArray(_0x1a69ba.generationParams)
-          ? { ..._0x1a69ba.generationParams }
+  const run = (args3) => {
+      const modelManifest = getModelManifest(args3?.model),
+        list4 = Array.isArray(modelManifest?.uiSchema?.fields) ? modelManifest.uiSchema.fields : [];
+      if (!list4.length) return { ...args3 };
+      const generationParams =
+        args3?.generationParams &&
+        typeof args3.generationParams === 'object' &&
+        !Array.isArray(args3.generationParams)
+          ? { ...args3.generationParams }
           : {};
       return (
-        _0x49c3e5.forEach((_0x2c5b89) => {
-          const _0x53c510 = String(_0x2c5b89?.id || '').trim();
-          _0x53c510 &&
-            _0x45e693[_0x53c510] === undefined &&
-            Object.prototype.hasOwnProperty.call(_0x1a69ba, _0x53c510) &&
-            (_0x45e693[_0x53c510] = _0x1a69ba[_0x53c510]);
+        list4.forEach((item3) => {
+          const value2 = String(item3?.id || '').trim();
+          value2 &&
+            generationParams[value2] === undefined &&
+            Object.prototype.hasOwnProperty.call(args3, value2) &&
+            (generationParams[value2] = args3[value2]);
         }),
-        { ..._0x1a69ba, generationParams: _0x45e693 }
+        { ...args3, generationParams: generationParams }
       );
     },
-    _0x2ea73b = stateOverride || { nodes: { ...nodes, [_0x463842]: _0x15b2e7(_0x235d21) } };
-  if (!_0x2ea73b.nodes || typeof _0x2ea73b.nodes !== 'object') _0x2ea73b.nodes = {};
-  !_0x2ea73b.nodes?.[_0x463842] && (_0x2ea73b.nodes[_0x463842] = _0x15b2e7(_0x235d21));
-  const _0x27e9a9 = storeImpl || createStore(_0x2ea73b, incomingEdges),
-    _0x143726 = createAIGenerateNodeTaskOrchestrationModule({
-      store: _0x27e9a9,
-      getRefKindByNodeType: (_0x19d98d) =>
-        _0x19d98d === 'source-image' || _0x19d98d === 'image' || _0x19d98d === 'ai-image'
+    _data = stateOverride || { nodes: { ...nodes, [targetId]: run(nodeData) } };
+  if (!_data.nodes || typeof _data.nodes !== 'object') _data.nodes = {};
+  !_data.nodes?.[targetId] && (_data.nodes[targetId] = run(nodeData));
+  const store = storeImpl || createStore(_data, incomingEdges),
+    proto = createAIGenerateNodeTaskOrchestrationModule({
+      store: store,
+      getRefKindByNodeType: (value3) =>
+        value3 === 'source-image' || value3 === 'image' || value3 === 'ai-image'
           ? 'image'
-          : _0x19d98d === 'source-text' || _0x19d98d === 'ai-text'
+          : value3 === 'source-text' || value3 === 'ai-text'
             ? 'text'
             : null,
       getImage: async () => null,
@@ -202,28 +209,28 @@ function createTestContext({
       startLoading: startLoadingImpl,
       stopLoading: stopLoadingImpl,
     }),
-    _0x54d314 = Object.assign(Object.create(_0x143726), {
-      nodeId: _0x463842,
-      _data: _0x2ea73b.nodes[_0x463842],
+    ctx = Object.assign(Object.create(proto), {
+      nodeId: targetId,
+      _data: _data.nodes[targetId],
       promptEl: promptEl || createPromptEl(promptText),
-      _isRunninghubWorkflowModel(_0xd384da, _0x220fbc) {
+      _isRunninghubWorkflowModel(value4, value5) {
         if (typeof isRunninghubWorkflowModelImpl === 'function')
-          return isRunninghubWorkflowModelImpl(_0xd384da, _0x220fbc);
+          return isRunninghubWorkflowModelImpl(value4, value5);
         return false;
       },
     });
-  return { ctx: _0x54d314, proto: _0x143726, state: _0x2ea73b, store: _0x27e9a9 };
+  return { ctx: ctx, proto: proto, state: _data, store: store };
 }
 (test('aigenImage task orchestration: running RH store state cancels even when local flag is stale', async () => {
-  const _0x33c700 = 'node-image-running-store-cancels',
+  const targetId2 = 'node-image-running-store-cancels',
     {
-      proto: _0x407f65,
-      ctx: _0x2893e5,
-      state: _0x1e5801,
+      proto: proto2,
+      ctx: ctx2,
+      state: state2,
     } = createTestContext({
-      targetId: _0x33c700,
+      targetId: targetId2,
       nodeData: {
-        id: _0x33c700,
+        id: targetId2,
         model: 'runninghub/2044874075721441281',
         provider: 'runninghubwf',
         rhTaskId: 'rh-running',
@@ -233,32 +240,32 @@ function createTestContext({
       },
       isRunninghubWorkflowModelImpl: () => true,
     });
-  let _0x5926a8 = 0,
-    _0x21c3b6 = 0;
-  ((_0x2893e5._isGenerating = false),
-    (_0x2893e5._cancelRunningHubWorkflowTask = async () => {
-      _0x5926a8 += 1;
+  let value6 = 0,
+    value7 = 0;
+  ((ctx2._isGenerating = false),
+    (ctx2._cancelRunningHubWorkflowTask = async () => {
+      value6 += 1;
     }),
-    (_0x2893e5._onGenerate = async () => {
-      _0x21c3b6 += 1;
+    (ctx2._onGenerate = async () => {
+      value7 += 1;
     }),
-    (_0x1e5801.nodes[_0x33c700] = {
-      ..._0x1e5801.nodes[_0x33c700],
+    (state2.nodes[targetId2] = {
+      ...state2.nodes[targetId2],
       rhTaskId: 'rh-running',
       rhTaskStatus: 'running',
       jobStatus: 'running',
       isGenerating: true,
     }),
-    await _0x407f65._handleGenerateOrCancel.call(_0x2893e5),
-    assert.equal(_0x5926a8, 1),
-    assert.equal(_0x21c3b6, 0));
+    await proto2._handleGenerateOrCancel.call(ctx2),
+    assert.equal(value6, 1),
+    assert.equal(value7, 0));
 }),
   test('aigenImage task orchestration: /预设模板在空输入时回退默认值且不残留占位符', async () => {
-    const _0x2c3ffc = 'node-ai-image-template-default-fallback',
-      { proto: _0x350dc2, ctx: _0x334ba3 } = createTestContext({
-        targetId: _0x2c3ffc,
+    const targetId3 = 'node-ai-image-template-default-fallback',
+      { proto: proto3, ctx: ctx3 } = createTestContext({
+        targetId: targetId3,
         nodeData: {
-          id: _0x2c3ffc,
+          id: targetId3,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -267,23 +274,23 @@ function createTestContext({
         },
         promptText: '',
       }),
-      _0x291ae3 = await _0x350dc2._buildPayload.call(_0x334ba3, '故事/描述：{用户输入 || 一段简短剧情}');
-    (assert.ok(_0x291ae3),
-      assert.equal(_0x291ae3.prompt, '故事/描述：一段简短剧情'),
-      assert.equal(_0x291ae3.prompt.includes('{{'), false));
+      value8 = await proto3._buildPayload.call(ctx3, '故事/描述：{用户输入 || 一段简短剧情}');
+    (assert.ok(value8),
+      assert.equal(value8.prompt, '故事/描述：一段简短剧情'),
+      assert.equal(value8.prompt.includes('{{'), false));
   }),
   test('aigenImage task orchestration: 图像内置对象预设无输入时不生成', async () => {
-    const _0x771e1 = globalThis.window.showToast,
-      _0x4b6d43 = [];
-    globalThis.window.showToast = (_0x31ea5a, _0x15cd91) => {
-      _0x4b6d43.push({ message: _0x31ea5a, type: _0x15cd91 });
+    const value9 = globalThis.window.showToast,
+      list5 = [];
+    globalThis.window.showToast = (message, type) => {
+      list5.push({ message: message, type: type });
     };
     try {
-      const _0x1ad5f4 = 'node-ai-image-static-template-empty',
-        { proto: _0x265777, ctx: _0x45cecb } = createTestContext({
-          targetId: _0x1ad5f4,
+      const targetId4 = 'node-ai-image-static-template-empty',
+        { proto: proto4, ctx: ctx4 } = createTestContext({
+          targetId: targetId4,
           nodeData: {
-            id: _0x1ad5f4,
+            id: targetId4,
             model: 'nano-banana-pro-vt',
             provider: 'grsai',
             aspectRatio: '1:1',
@@ -292,49 +299,49 @@ function createTestContext({
           },
           promptText: '',
         }),
-        _0x5257c8 = await _0x265777._buildPayload.call(_0x45cecb, {
+        value10 = await proto4._buildPayload.call(ctx4, {
           type: 'static',
           text: '故事/描述：{用户输入 || 一段简短剧情}',
           requireInput: true,
           emptyInputMessage: '请输入提示词或添加参考图片',
         });
-      (assert.equal(_0x5257c8, null),
-        assert.deepEqual(_0x4b6d43, [{ message: '请输入提示词或添加参考图片', type: 'warn' }]));
+      (assert.equal(value10, null),
+        assert.deepEqual(list5, [{ message: '请输入提示词或添加参考图片', type: 'warn' }]));
     } finally {
-      globalThis.window.showToast = _0x771e1;
+      globalThis.window.showToast = value9;
     }
   }),
   test('aigenImage task orchestration: 图像内置对象预设使用连线文本入参', async () => {
-    const _0x278721 = 'node-ai-image-static-template-linked-text',
-      _0x57177c = 'source-text-for-static-template',
-      { proto: _0x1b6fe, ctx: _0x6f1c54 } = createTestContext({
-        targetId: _0x278721,
+    const targetId5 = 'node-ai-image-static-template-linked-text',
+      id = 'source-text-for-static-template',
+      { proto: proto5, ctx: ctx5 } = createTestContext({
+        targetId: targetId5,
         nodeData: {
-          id: _0x278721,
+          id: targetId5,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '1:1',
           imageSize: '2K',
           batchSize: 1,
         },
-        nodes: { [_0x57177c]: { id: _0x57177c, type: 'ai-text', outputText: '雨夜赛博街区' } },
-        incomingEdges: [{ id: 'edge-linked-text-static-template', sourceId: _0x57177c, targetId: _0x278721 }],
+        nodes: { [id]: { id: id, type: 'ai-text', outputText: '雨夜赛博街区' } },
+        incomingEdges: [{ id: 'edge-linked-text-static-template', sourceId: id, targetId: targetId5 }],
         promptText: '',
       }),
-      _0x39c64f = await _0x1b6fe._buildPayload.call(_0x6f1c54, {
+      value11 = await proto5._buildPayload.call(ctx5, {
         type: 'static',
         text: '故事/描述：{用户输入 || 一段简短剧情}',
         requireInput: true,
         emptyInputMessage: '请输入提示词或添加参考图片',
       });
-    (assert.ok(_0x39c64f), assert.equal(_0x39c64f.prompt, '故事/描述：雨夜赛博街区'));
+    (assert.ok(value11), assert.equal(value11.prompt, '故事/描述：雨夜赛博街区'));
   }),
   test('aigenImage task orchestration: /预设模板在有输入时注入用户输入且不残留占位符', async () => {
-    const _0xa502de = 'node-ai-image-template-use-user-input',
-      { proto: _0x186bcb, ctx: _0x50f0e4 } = createTestContext({
-        targetId: _0xa502de,
+    const targetId6 = 'node-ai-image-template-use-user-input',
+      { proto: proto6, ctx: ctx6 } = createTestContext({
+        targetId: targetId6,
         nodeData: {
-          id: _0xa502de,
+          id: targetId6,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -343,25 +350,25 @@ function createTestContext({
         },
         promptText: '夜雨中的街道追逐',
       }),
-      _0x2e3217 = await _0x186bcb._buildPayload.call(_0x50f0e4, '故事/描述：{用户输入 || 一段简短剧情}');
-    (assert.ok(_0x2e3217),
-      assert.equal(_0x2e3217.prompt, '故事/描述：夜雨中的街道追逐'),
-      assert.equal(_0x2e3217.prompt.includes('{{'), false));
+      value12 = await proto6._buildPayload.call(ctx6, '故事/描述：{用户输入 || 一段简短剧情}');
+    (assert.ok(value12),
+      assert.equal(value12.prompt, '故事/描述：夜雨中的街道追逐'),
+      assert.equal(value12.prompt.includes('{{'), false));
   }),
   test('aigenImage task orchestration: 开发者模式下 /预设 仅回填最终提示词不直接生成', async () => {
-    const _0x397cc1 = globalThis.window.DEV_MODE;
+    const value13 = globalThis.window.DEV_MODE;
     globalThis.window.DEV_MODE = true;
     try {
-      const _0x2d305a = 'node-ai-image-template-dev-preview';
-      let _0x439887 = false;
+      const targetId7 = 'node-ai-image-template-dev-preview';
+      let value14 = false;
       const {
-        proto: _0x5110b3,
-        ctx: _0x5679c1,
-        state: _0x386929,
+        proto: proto7,
+        ctx: ctx7,
+        state: state3,
       } = createTestContext({
-        targetId: _0x2d305a,
+        targetId: targetId7,
         nodeData: {
-          id: _0x2d305a,
+          id: targetId7,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -371,28 +378,28 @@ function createTestContext({
         promptText: '夜雨中的街道追逐',
         apiImpl: {
           generateImage: async () => {
-            return ((_0x439887 = true), { imageUrl: '/output/test.png' });
+            return ((value14 = true), { imageUrl: '/output/test.png' });
           },
         },
       });
-      (await _0x5110b3._onGenerate.call(_0x5679c1, '故事/描述：{用户输入 || 一段简短剧情}'),
-        assert.equal(_0x439887, false),
-        assert.equal(_0x386929.nodes[_0x2d305a].prompt, '故事/描述：夜雨中的街道追逐'),
-        assert.equal(_0x5679c1.promptEl.innerHTML, '故事/描述：夜雨中的街道追逐'));
+      (await proto7._onGenerate.call(ctx7, '故事/描述：{用户输入 || 一段简短剧情}'),
+        assert.equal(value14, false),
+        assert.equal(state3.nodes[targetId7].prompt, '故事/描述：夜雨中的街道追逐'),
+        assert.equal(ctx7.promptEl.innerHTML, '故事/描述：夜雨中的街道追逐'));
     } finally {
-      globalThis.window.DEV_MODE = _0x397cc1;
+      globalThis.window.DEV_MODE = value13;
     }
   }),
   test('aigenImage task orchestration: 预览模式下点击生成只启动假加载不发请求', async () => {
-    const _0x266bad = globalThis.window.PREVIEW_MODE;
+    const value15 = globalThis.window.PREVIEW_MODE;
     globalThis.window.PREVIEW_MODE = true;
     try {
-      const _0x454a99 = 'node-ai-image-preview-loading';
-      let _0x284389 = false;
-      const { proto: _0x53d376, ctx: _0x382ff5 } = createTestContext({
-        targetId: _0x454a99,
+      const targetId8 = 'node-ai-image-preview-loading';
+      let value16 = false;
+      const { proto: proto8, ctx: ctx8 } = createTestContext({
+        targetId: targetId8,
         nodeData: {
-          id: _0x454a99,
+          id: targetId8,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -401,26 +408,26 @@ function createTestContext({
         },
         apiImpl: {
           generateImage: async () => {
-            return ((_0x284389 = true), { imageUrl: '/output/test.png' });
+            return ((value16 = true), { imageUrl: '/output/test.png' });
           },
         },
       });
-      ((_0x382ff5.previewEl = createFakePreviewContainer()),
-        (_0x382ff5.btnEl = createButtonStub()),
-        await _0x53d376._onGenerate.call(_0x382ff5),
-        assert.equal(_0x284389, false),
-        assert.equal(isPreviewNodeLoading(_0x454a99), true),
-        assert.equal(_0x382ff5.btnEl.disabled, true),
-        assert.match(_0x382ff5.btnEl.innerHTML, /animation:spin/),
-        stopPreviewNodeLoading(_0x454a99),
-        assert.equal(_0x382ff5.btnEl.disabled, false),
-        assert.doesNotMatch(_0x382ff5.btnEl.innerHTML, /animation:spin/));
+      ((ctx8.previewEl = createFakePreviewContainer()),
+        (ctx8.btnEl = createButtonStub()),
+        await proto8._onGenerate.call(ctx8),
+        assert.equal(value16, false),
+        assert.equal(isPreviewNodeLoading(targetId8), true),
+        assert.equal(ctx8.btnEl.disabled, true),
+        assert.match(ctx8.btnEl.innerHTML, /animation:spin/),
+        stopPreviewNodeLoading(targetId8),
+        assert.equal(ctx8.btnEl.disabled, false),
+        assert.doesNotMatch(ctx8.btnEl.innerHTML, /animation:spin/));
     } finally {
-      globalThis.window.PREVIEW_MODE = _0x266bad;
+      globalThis.window.PREVIEW_MODE = value15;
     }
   }),
   test('aigenImage task orchestration: asset image mentions send type placeholders in prompt order', async () => {
-    const _0x2937d3 = 'node-ai-image-asset-mentions';
+    const targetId9 = 'node-ai-image-asset-mentions';
     setAssetMentionAssets([
       {
         id: 'asset-people',
@@ -438,10 +445,10 @@ function createTestContext({
         ],
       },
     ]);
-    const { proto: _0x31b53d, ctx: _0x468b11 } = createTestContext({
-        targetId: _0x2937d3,
+    const { proto: proto9, ctx: ctx9 } = createTestContext({
+        targetId: targetId9,
         nodeData: {
-          id: _0x2937d3,
+          id: targetId9,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -454,18 +461,18 @@ function createTestContext({
           createAssetPromptPillNode('person2', 'asset-people', 1, 'image'),
         ]),
       }),
-      _0x32cfcb = await _0x31b53d._buildPayload.call(_0x468b11);
-    (assert.equal(_0x32cfcb.prompt, '@图片1 and @图片2'),
-      assert.deepEqual(_0x32cfcb.inputUrls, ['/data/assets/person1.png', '/data/assets/person2.png']));
+      value17 = await proto9._buildPayload.call(ctx9);
+    (assert.equal(value17.prompt, '@图片1 and @图片2'),
+      assert.deepEqual(value17.inputUrls, ['/data/assets/person1.png', '/data/assets/person2.png']));
   }),
   test('aigenImage task orchestration: thumbnail reorder keeps inputUrls aligned with image labels', async () => {
-    const _0xf1d53f = 'node-ai-image-reordered-thumb-labels',
-      _0x5f5720 = 'node-ref-scene-image',
-      _0x55c55a = 'node-ref-woman-image',
-      { proto: _0x5cd927, ctx: _0x4b9473 } = createTestContext({
-        targetId: _0xf1d53f,
+    const targetId10 = 'node-ai-image-reordered-thumb-labels',
+      id2 = 'node-ref-scene-image',
+      id3 = 'node-ref-woman-image',
+      { proto: proto10, ctx: ctx10 } = createTestContext({
+        targetId: targetId10,
         nodeData: {
-          id: _0xf1d53f,
+          id: targetId10,
           model: 'apimart/gpt-image-2',
           provider: 'apimart',
           aspectRatio: '1:1',
@@ -474,15 +481,15 @@ function createTestContext({
           generationParams: { mode: 'official', aspectRatio: '1:1', imageSize: '1K' },
         },
         nodes: {
-          [_0x5f5720]: {
-            id: _0x5f5720,
+          [id2]: {
+            id: id2,
             type: 'source-image',
             originalLocalPath: 'data/uploads/scene.png',
             width: 0x640,
             height: 0x384,
           },
-          [_0x55c55a]: {
-            id: _0x55c55a,
+          [id3]: {
+            id: id3,
             type: 'source-image',
             originalLocalPath: 'data/uploads/woman.png',
             width: 0x384,
@@ -490,22 +497,22 @@ function createTestContext({
           },
         },
         incomingEdges: [
-          { id: 'edge-scene-first-after-drag', sourceId: _0x5f5720, targetId: _0xf1d53f },
-          { id: 'edge-woman-second-after-drag', sourceId: _0x55c55a, targetId: _0xf1d53f },
+          { id: 'edge-scene-first-after-drag', sourceId: id2, targetId: targetId10 },
+          { id: 'edge-woman-second-after-drag', sourceId: id3, targetId: targetId10 },
         ],
         promptEl: createPromptEl([
-          createNodePromptPillNode('@图片2', _0x55c55a, 'image'),
+          createNodePromptPillNode('@图片2', id3, 'image'),
           createPromptTextNode(' 的女人替换到 '),
-          createNodePromptPillNode('@图片1', _0x5f5720, 'image'),
+          createNodePromptPillNode('@图片1', id2, 'image'),
           createPromptTextNode(' 的场景里面'),
         ]),
       }),
-      _0x2a4e44 = await _0x5cd927._buildPayload.call(_0x4b9473);
-    (assert.equal(_0x2a4e44.prompt, '@图片2 的女人替换到 @图片1 的场景里面'),
-      assert.deepEqual(_0x2a4e44.inputUrls, ['/data/uploads/scene.png', '/data/uploads/woman.png']));
+      value18 = await proto10._buildPayload.call(ctx10);
+    (assert.equal(value18.prompt, '@图片2 的女人替换到 @图片1 的场景里面'),
+      assert.deepEqual(value18.inputUrls, ['/data/uploads/scene.png', '/data/uploads/woman.png']));
   }),
   test('aigenImage task orchestration: RunningHub workflow payload reads hidden image asset refs', async () => {
-    const _0x291f30 = 'node-ai-image-hidden-asset';
+    const targetId11 = 'node-ai-image-hidden-asset';
     setAssetMentionAssets([
       {
         id: 'asset-hidden-image',
@@ -518,10 +525,10 @@ function createTestContext({
         ],
       },
     ]);
-    const { proto: _0x54a1bf, ctx: _0x1dbb70 } = createTestContext({
-        targetId: _0x291f30,
+    const { proto: proto11, ctx: ctx11 } = createTestContext({
+        targetId: targetId11,
         nodeData: {
-          id: _0x291f30,
+          id: targetId11,
           model: 'runninghub/1994718111704158209',
           provider: 'runninghubwf',
           aspectRatio: '1:1',
@@ -531,202 +538,198 @@ function createTestContext({
         },
         promptText: 'portrait',
       }),
-      _0x301cf5 = await _0x54a1bf._buildPayload.call(_0x1dbb70);
-    (assert.equal(_0x301cf5.prompt, 'portrait'),
-      assert.equal(_0x301cf5.rhAnimeRealResolution, 0x6e0),
-      assert.equal(_0x301cf5.rhResolution, 0x6e0),
-      assert.equal(_0x301cf5.rhInstanceType, 'plus'),
-      assert.deepEqual(_0x301cf5.inputUrls, ['/data/assets/hidden-person.png']));
+      value19 = await proto11._buildPayload.call(ctx11);
+    (assert.equal(value19.prompt, 'portrait'),
+      assert.equal(value19.rhAnimeRealResolution, 0x6e0),
+      assert.equal(value19.rhResolution, 0x6e0),
+      assert.equal(value19.rhInstanceType, 'plus'),
+      assert.deepEqual(value19.inputUrls, ['/data/assets/hidden-person.png']));
   }),
   test('aigenImage task orchestration: person replace payload uses refSlot order for manifest model ids', async () => {
-    const _0x131b97 = ['runninghub/2041177685895946242', 'runninghub/2050313968069165058'];
-    for (const _0x412792 of _0x131b97) {
-      const _0xddcd13 = 'node-person-replace-' + _0x412792.slice(-4),
-        _0xc51146 = _0xddcd13 + '-target',
-        _0x1c362b = _0xddcd13 + '-source',
-        { proto: _0x80facd, ctx: _0x3aaecf } = createTestContext({
-          targetId: _0xddcd13,
+    const value20 = ['runninghub/2041177685895946242', 'runninghub/2050313968069165058'];
+    for (const model of value20) {
+      const targetId12 = 'node-person-replace-' + model.slice(-4),
+        id4 = targetId12 + '-target',
+        id5 = targetId12 + '-source',
+        { proto: proto12, ctx: ctx12 } = createTestContext({
+          targetId: targetId12,
           nodeData: {
-            id: _0xddcd13,
-            model: _0x412792,
+            id: targetId12,
+            model: model,
             provider: 'runninghubwf',
             aspectRatio: '1:1',
             batchSize: 1,
             generationParams: {
-              rhResolution: _0x412792.endsWith('5058') ? 0x500 : 0x640,
+              rhResolution: model.endsWith('5058') ? 0x500 : 0x640,
               rhInstanceType: 'plus',
             },
           },
           nodes: {
-            [_0xc51146]: {
-              id: _0xc51146,
+            [id4]: {
+              id: id4,
               type: 'source-image',
               originalLocalPath: 'data/uploads/target.png',
             },
-            [_0x1c362b]: {
-              id: _0x1c362b,
+            [id5]: {
+              id: id5,
               type: 'source-image',
               originalLocalPath: 'data/uploads/source.png',
             },
           },
           incomingEdges: [
             {
-              id: _0xddcd13 + '-edge-source',
-              sourceId: _0x1c362b,
-              targetId: _0xddcd13,
+              id: targetId12 + '-edge-source',
+              sourceId: id5,
+              targetId: targetId12,
               refSlot: 'replacedImage',
             },
             {
-              id: _0xddcd13 + '-edge-target',
-              sourceId: _0xc51146,
-              targetId: _0xddcd13,
+              id: targetId12 + '-edge-target',
+              sourceId: id4,
+              targetId: targetId12,
               refSlot: 'replaceTarget',
             },
           ],
           promptText: 'replace',
         }),
-        _0x582435 = await _0x80facd._buildPayload.call(_0x3aaecf);
-      (assert.deepEqual(
-        _0x582435.inputUrls,
-        ['/data/uploads/target.png', '/data/uploads/source.png'],
-        _0x412792,
-      ),
-        assert.equal(_0x582435.rhResolution, _0x412792.endsWith('5058') ? 0x500 : 0x640),
-        assert.equal(_0x582435.rhInstanceType, 'plus'));
+        value21 = await proto12._buildPayload.call(ctx12);
+      (assert.deepEqual(value21.inputUrls, ['/data/uploads/target.png', '/data/uploads/source.png'], model),
+        assert.equal(value21.rhResolution, model.endsWith('5058') ? 0x500 : 0x640),
+        assert.equal(value21.rhInstanceType, 'plus'));
     }
   }),
   test('aigenImage task orchestration: modelApi fixed image slots produce inputUrlsBySlot', async () => {
-    const _0x21f6a6 = 'node-youchuan-v6-slots',
-      _0x8f3a1e = 'node-youchuan-main',
-      _0xdbae4e = 'node-youchuan-cref',
-      _0x8792bb = 'node-youchuan-sref',
-      { proto: _0x1b0a07, ctx: _0x362172 } = createTestContext({
-        targetId: _0x21f6a6,
+    const targetId13 = 'node-youchuan-v6-slots',
+      id6 = 'node-youchuan-main',
+      id7 = 'node-youchuan-cref',
+      id8 = 'node-youchuan-sref',
+      { proto: proto13, ctx: ctx13 } = createTestContext({
+        targetId: targetId13,
         nodeData: {
-          id: _0x21f6a6,
+          id: targetId13,
           type: 'ai-image',
           model: 'runninghub-model/youchuan-v6',
           provider: 'runninghub',
           generationParams: { aspectRatio: '1:1', quality: '1' },
         },
         nodes: {
-          [_0x8f3a1e]: { id: _0x8f3a1e, type: 'source-image', originalLocalPath: 'data/uploads/main.png' },
-          [_0xdbae4e]: { id: _0xdbae4e, type: 'source-image', originalLocalPath: 'data/uploads/cref.png' },
-          [_0x8792bb]: { id: _0x8792bb, type: 'source-image', originalLocalPath: 'data/uploads/sref.png' },
+          [id6]: { id: id6, type: 'source-image', originalLocalPath: 'data/uploads/main.png' },
+          [id7]: { id: id7, type: 'source-image', originalLocalPath: 'data/uploads/cref.png' },
+          [id8]: { id: id8, type: 'source-image', originalLocalPath: 'data/uploads/sref.png' },
         },
         incomingEdges: [
-          { id: 'edge-sref', sourceId: _0x8792bb, targetId: _0x21f6a6, refSlot: 'sref' },
-          { id: 'edge-main', sourceId: _0x8f3a1e, targetId: _0x21f6a6, refSlot: 'imageUrl' },
-          { id: 'edge-cref', sourceId: _0xdbae4e, targetId: _0x21f6a6, refSlot: 'cref' },
+          { id: 'edge-sref', sourceId: id8, targetId: targetId13, refSlot: 'sref' },
+          { id: 'edge-main', sourceId: id6, targetId: targetId13, refSlot: 'imageUrl' },
+          { id: 'edge-cref', sourceId: id7, targetId: targetId13, refSlot: 'cref' },
         ],
         promptText: 'portrait',
         getProviderConfigImpl: () => ({ modelApiKey: 'mk' }),
       }),
-      _0x2465f1 = await _0x1b0a07._buildPayload.call(_0x362172);
-    (assert.deepEqual(_0x2465f1.inputUrlsBySlot, {
+      value22 = await proto13._buildPayload.call(ctx13);
+    (assert.deepEqual(value22.inputUrlsBySlot, {
       imageUrl: '/data/uploads/main.png',
       cref: '/data/uploads/cref.png',
       sref: '/data/uploads/sref.png',
     }),
-      assert.deepEqual(_0x2465f1.inputUrls, [
+      assert.deepEqual(value22.inputUrls, [
         '/data/uploads/sref.png',
         '/data/uploads/main.png',
         '/data/uploads/cref.png',
       ]));
   }),
   test('aigenImage task orchestration: Midjourney V7 fixed image slots omit missing role slot', async () => {
-    const _0x4d242a = 'node-youchuan-v7-slots',
-      _0x33fc28 = 'node-youchuan-v7-main',
-      _0x4a4ecb = 'node-youchuan-v7-sref',
-      { proto: _0x3bd89f, ctx: _0x46098b } = createTestContext({
-        targetId: _0x4d242a,
+    const targetId14 = 'node-youchuan-v7-slots',
+      id9 = 'node-youchuan-v7-main',
+      id10 = 'node-youchuan-v7-sref',
+      { proto: proto14, ctx: ctx14 } = createTestContext({
+        targetId: targetId14,
         nodeData: {
-          id: _0x4d242a,
+          id: targetId14,
           type: 'ai-image',
           model: 'runninghub-model/youchuan-v7',
           provider: 'runninghub',
           generationParams: { aspectRatio: '1:1', quality: '1' },
         },
         nodes: {
-          [_0x33fc28]: { id: _0x33fc28, type: 'source-image', originalLocalPath: 'data/uploads/v7-main.png' },
-          [_0x4a4ecb]: { id: _0x4a4ecb, type: 'source-image', originalLocalPath: 'data/uploads/v7-sref.png' },
+          [id9]: { id: id9, type: 'source-image', originalLocalPath: 'data/uploads/v7-main.png' },
+          [id10]: { id: id10, type: 'source-image', originalLocalPath: 'data/uploads/v7-sref.png' },
         },
         incomingEdges: [
-          { id: 'edge-v7-sref', sourceId: _0x4a4ecb, targetId: _0x4d242a, refSlot: 'sref' },
-          { id: 'edge-v7-main', sourceId: _0x33fc28, targetId: _0x4d242a, refSlot: 'imageUrl' },
+          { id: 'edge-v7-sref', sourceId: id10, targetId: targetId14, refSlot: 'sref' },
+          { id: 'edge-v7-main', sourceId: id9, targetId: targetId14, refSlot: 'imageUrl' },
         ],
         promptText: 'portrait',
         getProviderConfigImpl: () => ({ modelApiKey: 'mk' }),
       }),
-      _0x164941 = await _0x3bd89f._buildPayload.call(_0x46098b);
-    (assert.deepEqual(_0x164941.inputUrlsBySlot, {
+      value23 = await proto14._buildPayload.call(ctx14);
+    (assert.deepEqual(value23.inputUrlsBySlot, {
       imageUrl: '/data/uploads/v7-main.png',
       sref: '/data/uploads/v7-sref.png',
     }),
-      assert.equal(_0x164941.inputUrlsBySlot.cref, undefined),
-      assert.deepEqual(_0x164941.inputUrls, ['/data/uploads/v7-sref.png', '/data/uploads/v7-main.png']));
+      assert.equal(value23.inputUrlsBySlot.cref, undefined),
+      assert.deepEqual(value23.inputUrls, ['/data/uploads/v7-sref.png', '/data/uploads/v7-main.png']));
   }),
   test('aigenImage task orchestration: RunningHub image X single fixed slot produces imageUrl input', async () => {
-    const _0x379b1d = 'node-rh-image-x-slot',
-      _0x1a0d54 = 'node-rh-image-x-ref',
-      { proto: _0x1082b7, ctx: _0xa1ca95 } = createTestContext({
-        targetId: _0x379b1d,
+    const targetId15 = 'node-rh-image-x-slot',
+      id11 = 'node-rh-image-x-ref',
+      { proto: proto15, ctx: ctx15 } = createTestContext({
+        targetId: targetId15,
         nodeData: {
-          id: _0x379b1d,
+          id: targetId15,
           type: 'ai-image',
           model: 'runninghub-model/rhart-image-g',
           provider: 'runninghub',
         },
         nodes: {
-          [_0x1a0d54]: {
-            id: _0x1a0d54,
+          [id11]: {
+            id: id11,
             type: 'source-image',
             originalLocalPath: 'data/uploads/image-x-ref.png',
           },
         },
         incomingEdges: [
-          { id: 'edge-image-x-main', sourceId: _0x1a0d54, targetId: _0x379b1d, refSlot: 'imageUrl' },
+          { id: 'edge-image-x-main', sourceId: id11, targetId: targetId15, refSlot: 'imageUrl' },
         ],
         promptText: 'polish the reference',
         getProviderConfigImpl: () => ({ modelApiKey: 'mk' }),
       }),
-      _0x1518e6 = await _0x1082b7._buildPayload.call(_0xa1ca95);
-    (assert.deepEqual(_0x1518e6.inputUrlsBySlot, { imageUrl: '/data/uploads/image-x-ref.png' }),
-      assert.deepEqual(_0x1518e6.inputUrls, ['/data/uploads/image-x-ref.png']),
-      assert.equal(_0x1518e6.provider, 'runninghub'),
-      assert.equal(_0x1518e6.rhModelRoute, 'low'),
-      assert.equal(_0x1518e6.imageSize, '1K'),
-      assert.equal(_0x1518e6.aspectRatio, '1:1'),
-      assert.equal(_0x1518e6.batchSize, 1),
-      assert.equal(_0x1518e6.numImages, undefined),
-      assert.equal(_0x1518e6.outputFormat, undefined),
-      assert.equal(_0x1518e6.suppressAspectRatio, undefined));
+      value24 = await proto15._buildPayload.call(ctx15);
+    (assert.deepEqual(value24.inputUrlsBySlot, { imageUrl: '/data/uploads/image-x-ref.png' }),
+      assert.deepEqual(value24.inputUrls, ['/data/uploads/image-x-ref.png']),
+      assert.equal(value24.provider, 'runninghub'),
+      assert.equal(value24.rhModelRoute, 'low'),
+      assert.equal(value24.imageSize, '1K'),
+      assert.equal(value24.aspectRatio, '1:1'),
+      assert.equal(value24.batchSize, 1),
+      assert.equal(value24.numImages, undefined),
+      assert.equal(value24.outputFormat, undefined),
+      assert.equal(value24.suppressAspectRatio, undefined));
   }),
   test('aigenImage task orchestration: person replace adaptive ratio uses manifest source slot', async () => {
-    const _0x2ee65c = ['runninghub/2041177685895946242', 'runninghub/2050313968069165058'];
-    for (const _0x58b38c of _0x2ee65c) {
-      const _0x1cc149 = 'node-person-replace-ratio-' + _0x58b38c.slice(-4),
-        _0x3cd286 = _0x1cc149 + '-target',
-        _0x1b5325 = _0x1cc149 + '-source',
-        { proto: _0x20ffb8, ctx: _0x1fdf3b } = createTestContext({
-          targetId: _0x1cc149,
+    const value25 = ['runninghub/2041177685895946242', 'runninghub/2050313968069165058'];
+    for (const model2 of value25) {
+      const targetId16 = 'node-person-replace-ratio-' + model2.slice(-4),
+        id12 = targetId16 + '-target',
+        id13 = targetId16 + '-source',
+        { proto: proto16, ctx: ctx16 } = createTestContext({
+          targetId: targetId16,
           nodeData: {
-            id: _0x1cc149,
-            model: _0x58b38c,
+            id: targetId16,
+            model: model2,
             provider: 'runninghubwf',
             batchSize: 1,
-            generationParams: { rhResolution: _0x58b38c.endsWith('5058') ? 0x500 : 0x640 },
+            generationParams: { rhResolution: model2.endsWith('5058') ? 0x500 : 0x640 },
           },
           nodes: {
-            [_0x3cd286]: {
-              id: _0x3cd286,
+            [id12]: {
+              id: id12,
               type: 'source-image',
               originalLocalPath: 'data/uploads/target.png',
               width: 0x640,
               height: 0x384,
             },
-            [_0x1b5325]: {
-              id: _0x1b5325,
+            [id13]: {
+              id: id13,
               type: 'source-image',
               originalLocalPath: 'data/uploads/source.png',
               width: 0x384,
@@ -735,35 +738,31 @@ function createTestContext({
           },
           incomingEdges: [
             {
-              id: _0x1cc149 + '-edge-target',
-              sourceId: _0x3cd286,
-              targetId: _0x1cc149,
+              id: targetId16 + '-edge-target',
+              sourceId: id12,
+              targetId: targetId16,
               refSlot: 'replaceTarget',
             },
             {
-              id: _0x1cc149 + '-edge-source',
-              sourceId: _0x1b5325,
-              targetId: _0x1cc149,
+              id: targetId16 + '-edge-source',
+              sourceId: id13,
+              targetId: targetId16,
               refSlot: 'replacedImage',
             },
           ],
           promptText: 'replace',
         }),
-        _0x5e89c4 = await _0x20ffb8._buildPayload.call(_0x1fdf3b);
-      (assert.deepEqual(
-        _0x5e89c4.inputUrls,
-        ['/data/uploads/target.png', '/data/uploads/source.png'],
-        _0x58b38c,
-      ),
-        assert.equal(_0x5e89c4.resolvedRatioLabel, '9:16', _0x58b38c),
-        assert.equal(_0x5e89c4.adaptiveSource, 'input-media', _0x58b38c));
+        value26 = await proto16._buildPayload.call(ctx16);
+      (assert.deepEqual(value26.inputUrls, ['/data/uploads/target.png', '/data/uploads/source.png'], model2),
+        assert.equal(value26.resolvedRatioLabel, '9:16', model2),
+        assert.equal(value26.adaptiveSource, 'input-media', model2));
     }
   }),
   test('aigenImage task orchestration: GRSAI 有参考图+自适应时透传 API auto', async () => {
-    const _0x25f5f2 = 'node-ai-image-1',
-      _0x5eff4c = 'node-ref-image-1',
-      { proto: _0x57cbb0, ctx: _0x476626 } = createTestContext({
-        targetId: _0x25f5f2,
+    const targetId17 = 'node-ai-image-1',
+      id14 = 'node-ref-image-1',
+      { proto: proto17, ctx: ctx17 } = createTestContext({
+        targetId: targetId17,
         nodeData: {
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
@@ -772,31 +771,31 @@ function createTestContext({
           batchSize: 1,
         },
         nodes: {
-          [_0x5eff4c]: {
-            id: _0x5eff4c,
+          [id14]: {
+            id: id14,
             type: 'source-image',
             imageUrl: 'https://img.example.com/ref.png',
             width: 0x640,
             height: 0x384,
           },
         },
-        incomingEdges: [{ id: 'edge-1', sourceId: _0x5eff4c, targetId: _0x25f5f2, refSlot: '' }],
+        incomingEdges: [{ id: 'edge-1', sourceId: id14, targetId: targetId17, refSlot: '' }],
       }),
-      _0x3be02d = await _0x57cbb0._buildPayload.call(_0x476626);
-    (assert.equal(_0x3be02d.aspectRatio, 'auto'),
-      assert.equal(_0x3be02d.suppressAspectRatio, undefined),
-      assert.equal(_0x3be02d.resolvedRatioLabel, 'auto'),
-      assert.equal(_0x3be02d.adaptiveSource, 'input-media'),
-      assert.equal(_0x3be02d.ratioCapability, 'aspectRatio'),
-      assert.deepEqual(_0x3be02d.inputUrls, ['https://img.example.com/ref.png']));
+      value27 = await proto17._buildPayload.call(ctx17);
+    (assert.equal(value27.aspectRatio, 'auto'),
+      assert.equal(value27.suppressAspectRatio, undefined),
+      assert.equal(value27.resolvedRatioLabel, 'auto'),
+      assert.equal(value27.adaptiveSource, 'input-media'),
+      assert.equal(value27.ratioCapability, 'aspectRatio'),
+      assert.deepEqual(value27.inputUrls, ['https://img.example.com/ref.png']));
   }),
   test('aigenImage task orchestration: source-image 生成入参优先使用原图本地路径', async () => {
-    const _0x4bcd3d = 'node-ai-image-source-original-first',
-      _0x269c23 = 'node-ref-image-source-original-first',
-      { proto: _0x4f27f0, ctx: _0x27125a } = createTestContext({
-        targetId: _0x4bcd3d,
+    const targetId18 = 'node-ai-image-source-original-first',
+      id15 = 'node-ref-image-source-original-first',
+      { proto: proto18, ctx: ctx18 } = createTestContext({
+        targetId: targetId18,
         nodeData: {
-          id: _0x4bcd3d,
+          id: targetId18,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -804,8 +803,8 @@ function createTestContext({
           batchSize: 1,
         },
         nodes: {
-          [_0x269c23]: {
-            id: _0x269c23,
+          [id15]: {
+            id: id15,
             type: 'source-image',
             originalLocalPath: 'data/uploads/original.png',
             displayLocalPath: 'data/uploads/display.webp',
@@ -816,21 +815,21 @@ function createTestContext({
           },
         },
         incomingEdges: [
-          { id: 'edge-source-original-first', sourceId: _0x269c23, targetId: _0x4bcd3d, refSlot: '' },
+          { id: 'edge-source-original-first', sourceId: id15, targetId: targetId18, refSlot: '' },
         ],
       }),
-      _0x379f0c = await _0x4f27f0._buildPayload.call(_0x27125a);
-    assert.deepEqual(_0x379f0c.inputUrls, ['/data/uploads/original.png']);
+      value28 = await proto18._buildPayload.call(ctx18);
+    assert.deepEqual(value28.inputUrls, ['/data/uploads/original.png']);
   }),
   test('aigenImage task orchestration: localized reference parser keeps Chinese aliases in English locale', async () => {
     setLocale('en-US', { persist: false, notify: false });
     try {
-      const _0x20dc39 = 'node-ai-image-source-alias-en',
-        _0xca6d65 = 'node-ref-image-source-alias-en',
-        { proto: _0x57b892, ctx: _0x5f3115 } = createTestContext({
-          targetId: _0x20dc39,
+      const targetId19 = 'node-ai-image-source-alias-en',
+        id16 = 'node-ref-image-source-alias-en',
+        { proto: proto19, ctx: ctx19 } = createTestContext({
+          targetId: targetId19,
           nodeData: {
-            id: _0x20dc39,
+            id: targetId19,
             model: 'nano-banana-pro-vt',
             provider: 'grsai',
             aspectRatio: '1:1',
@@ -838,30 +837,28 @@ function createTestContext({
             batchSize: 1,
           },
           nodes: {
-            [_0xca6d65]: {
-              id: _0xca6d65,
+            [id16]: {
+              id: id16,
               type: 'source-image',
               originalLocalPath: 'data/uploads/alias-original.png',
             },
           },
-          incomingEdges: [
-            { id: 'edge-source-alias-en', sourceId: _0xca6d65, targetId: _0x20dc39, refSlot: '' },
-          ],
+          incomingEdges: [{ id: 'edge-source-alias-en', sourceId: id16, targetId: targetId19, refSlot: '' }],
           promptText: 'edit @图片1',
         }),
-        _0x2eac15 = await _0x57b892._buildPayload.call(_0x5f3115);
-      assert.deepEqual(_0x2eac15.inputUrls, ['/data/uploads/alias-original.png']);
+        value29 = await proto19._buildPayload.call(ctx19);
+      assert.deepEqual(value29.inputUrls, ['/data/uploads/alias-original.png']);
     } finally {
       setLocale(DEFAULT_LOCALE, { persist: false, notify: false });
     }
   }),
   test('aigenImage task orchestration: ai-image 生成入参优先使用主图原图本地路径', async () => {
-    const _0x2705d9 = 'node-ai-image-ai-original-first',
-      _0xcb078c = 'node-ref-ai-image-original-first',
-      { proto: _0x5a7690, ctx: _0x3a9bd9 } = createTestContext({
-        targetId: _0x2705d9,
+    const targetId20 = 'node-ai-image-ai-original-first',
+      id17 = 'node-ref-ai-image-original-first',
+      { proto: proto20, ctx: ctx20 } = createTestContext({
+        targetId: targetId20,
         nodeData: {
-          id: _0x2705d9,
+          id: targetId20,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -869,8 +866,8 @@ function createTestContext({
           batchSize: 1,
         },
         nodes: {
-          [_0xcb078c]: {
-            id: _0xcb078c,
+          [id17]: {
+            id: id17,
             type: 'ai-image',
             mainImageIndex: 1,
             localPath: 'data/uploads/node-local.png',
@@ -889,45 +886,43 @@ function createTestContext({
             height: 0x4b0,
           },
         },
-        incomingEdges: [
-          { id: 'edge-ai-original-first', sourceId: _0xcb078c, targetId: _0x2705d9, refSlot: '' },
-        ],
+        incomingEdges: [{ id: 'edge-ai-original-first', sourceId: id17, targetId: targetId20, refSlot: '' }],
       }),
-      _0x19ae8a = await _0x5a7690._buildPayload.call(_0x3a9bd9);
-    assert.deepEqual(_0x19ae8a.inputUrls, ['/data/uploads/main-original.png']);
+      value30 = await proto20._buildPayload.call(ctx20);
+    assert.deepEqual(value30.inputUrls, ['/data/uploads/main-original.png']);
   }),
   test('aigenImage task orchestration: PPIO 有参考图+自适应时不设置 suppressAspectRatio', async () => {
-    const _0x327749 = 'node-ai-image-2',
-      _0x5d8ef6 = 'node-ref-image-2',
-      { proto: _0x3cf21c, ctx: _0x56b05b } = createTestContext({
-        targetId: _0x327749,
+    const targetId21 = 'node-ai-image-2',
+      id18 = 'node-ref-image-2',
+      { proto: proto21, ctx: ctx21 } = createTestContext({
+        targetId: targetId21,
         nodeData: { model: 'ppio/seedream-5.0-lite', aspectRatio: '自适应', imageSize: '2K', batchSize: 1 },
         nodes: {
-          [_0x5d8ef6]: {
-            id: _0x5d8ef6,
+          [id18]: {
+            id: id18,
             type: 'source-image',
             imageUrl: 'https://img.example.com/ref-ppio.png',
             width: 0x438,
             height: 0x546,
           },
         },
-        incomingEdges: [{ id: 'edge-2', sourceId: _0x5d8ef6, targetId: _0x327749, refSlot: '' }],
+        incomingEdges: [{ id: 'edge-2', sourceId: id18, targetId: targetId21, refSlot: '' }],
       }),
-      _0x25eafa = await _0x3cf21c._buildPayload.call(_0x56b05b),
-      _0x44b20f = await _0x3cf21c._buildResumePayload.call(_0x56b05b, _0x56b05b._data);
-    (assert.equal(_0x25eafa.aspectRatio, '4:5'),
-      assert.equal(_0x25eafa.suppressAspectRatio, undefined),
-      assert.equal(_0x25eafa.provider, 'ppio'),
-      assert.equal(_0x44b20f.provider, 'ppio'),
-      assert.deepEqual(_0x25eafa.inputUrls, ['https://img.example.com/ref-ppio.png']));
+      value31 = await proto21._buildPayload.call(ctx21),
+      value32 = await proto21._buildResumePayload.call(ctx21, ctx21._data);
+    (assert.equal(value31.aspectRatio, '4:5'),
+      assert.equal(value31.suppressAspectRatio, undefined),
+      assert.equal(value31.provider, 'ppio'),
+      assert.equal(value32.provider, 'ppio'),
+      assert.deepEqual(value31.inputUrls, ['https://img.example.com/ref-ppio.png']));
   }),
   test('aigenImage task orchestration: grsai 有入参时自适应保持 API auto', async () => {
-    const _0x37097d = 'node-ai-image-grsai-input-first',
-      _0x423912 = 'node-ref-image-grsai-input-first',
-      { proto: _0x477314, ctx: _0x209a3e } = createTestContext({
-        targetId: _0x37097d,
+    const targetId22 = 'node-ai-image-grsai-input-first',
+      id19 = 'node-ref-image-grsai-input-first',
+      { proto: proto22, ctx: ctx22 } = createTestContext({
+        targetId: targetId22,
         nodeData: {
-          id: _0x37097d,
+          id: targetId22,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '自适应',
@@ -937,30 +932,28 @@ function createTestContext({
           height: 0x384,
         },
         nodes: {
-          [_0x423912]: {
-            id: _0x423912,
+          [id19]: {
+            id: id19,
             type: 'source-image',
             imageUrl: 'https://img.example.com/ref-grsai-169.png',
             width: 0x640,
             height: 0x384,
           },
         },
-        incomingEdges: [
-          { id: 'edge-grsai-input-first', sourceId: _0x423912, targetId: _0x37097d, refSlot: '' },
-        ],
+        incomingEdges: [{ id: 'edge-grsai-input-first', sourceId: id19, targetId: targetId22, refSlot: '' }],
       }),
-      _0x2543f4 = await _0x477314._buildPayload.call(_0x209a3e);
-    (assert.equal(_0x2543f4.provider, 'grsai'),
-      assert.equal(_0x2543f4.aspectRatio, 'auto'),
-      assert.equal(_0x2543f4.resolvedRatioLabel, 'auto'),
-      assert.equal(_0x2543f4.adaptiveSource, 'input-media'));
+      value33 = await proto22._buildPayload.call(ctx22);
+    (assert.equal(value33.provider, 'grsai'),
+      assert.equal(value33.aspectRatio, 'auto'),
+      assert.equal(value33.resolvedRatioLabel, 'auto'),
+      assert.equal(value33.adaptiveSource, 'input-media'));
   }),
   test('aigenImage task orchestration: GRSAI 未设置 aspectRatio 时默认 API auto', async () => {
-    const _0x44ccfb = 'node-ai-image-default-adaptive',
-      { proto: _0x41c34e, ctx: _0x56db7b } = createTestContext({
-        targetId: _0x44ccfb,
+    const targetId23 = 'node-ai-image-default-adaptive',
+      { proto: proto23, ctx: ctx23 } = createTestContext({
+        targetId: targetId23,
         nodeData: {
-          id: _0x44ccfb,
+          id: targetId23,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           imageSize: '2K',
@@ -970,18 +963,18 @@ function createTestContext({
         },
         incomingEdges: [],
       }),
-      _0x49813a = await _0x41c34e._buildPayload.call(_0x56db7b);
-    (assert.equal(_0x49813a.aspectRatio, 'auto'),
-      assert.equal(_0x49813a.resolvedRatioLabel, 'auto'),
-      assert.equal(_0x49813a.adaptiveSource, 'display'));
+      value34 = await proto23._buildPayload.call(ctx23);
+    (assert.equal(value34.aspectRatio, 'auto'),
+      assert.equal(value34.resolvedRatioLabel, 'auto'),
+      assert.equal(value34.adaptiveSource, 'display'));
   }),
   test('aigenImage task orchestration: 自适应无图像入参时使用显示区域比例映射', async () => {
-    const _0x308128 = 'node-ai-image-3',
-      _0x328f0c = 'node-ref-text-3',
-      { proto: _0x1e086a, ctx: _0x5e4a91 } = createTestContext({
-        targetId: _0x308128,
+    const targetId24 = 'node-ai-image-3',
+      id20 = 'node-ref-text-3',
+      { proto: proto24, ctx: ctx24 } = createTestContext({
+        targetId: targetId24,
         nodeData: {
-          id: _0x308128,
+          id: targetId24,
           model: 'ppio/seedream-5.0-lite',
           aspectRatio: '自适应',
           imageSize: '2K',
@@ -990,42 +983,42 @@ function createTestContext({
           height: 0x384,
         },
         nodes: {
-          [_0x328f0c]: { id: _0x328f0c, type: 'source-text', text: 'hello', width: 0x834, height: 0x12c },
+          [id20]: { id: id20, type: 'source-text', text: 'hello', width: 0x834, height: 0x12c },
         },
-        incomingEdges: [{ id: 'edge-3', sourceId: _0x328f0c, targetId: _0x308128, refSlot: '' }],
+        incomingEdges: [{ id: 'edge-3', sourceId: id20, targetId: targetId24, refSlot: '' }],
       }),
-      _0x31d026 = await _0x1e086a._buildPayload.call(_0x5e4a91);
-    (assert.equal(_0x31d026.aspectRatio, '16:9'),
-      assert.equal(_0x31d026.adaptiveSource, 'display'),
-      assert.equal(_0x31d026.resolvedRatioLabel, '16:9'));
+      value35 = await proto24._buildPayload.call(ctx24);
+    (assert.equal(value35.aspectRatio, '16:9'),
+      assert.equal(value35.adaptiveSource, 'display'),
+      assert.equal(value35.resolvedRatioLabel, '16:9'));
   }),
   test('aigenImage task orchestration: ai-text 入参无输出时使用 prompt 作为文本内容', async () => {
-    const _0x37c429 = 'node-ai-image-text-prompt-ref',
-      _0x3ca58e = 'node-ai-text-prompt-ref',
-      { proto: _0x32d555, ctx: _0x9549a4 } = createTestContext({
-        targetId: _0x37c429,
+    const targetId25 = 'node-ai-image-text-prompt-ref',
+      id21 = 'node-ai-text-prompt-ref',
+      { proto: proto25, ctx: ctx25 } = createTestContext({
+        targetId: targetId25,
         nodeData: {
-          id: _0x37c429,
+          id: targetId25,
           model: 'ppio/seedream-5.0-lite',
           aspectRatio: '1:1',
           imageSize: '2K',
           batchSize: 1,
         },
-        nodes: { [_0x3ca58e]: { id: _0x3ca58e, type: 'ai-text', prompt: '来自生成文本节点的提示词' } },
+        nodes: { [id21]: { id: id21, type: 'ai-text', prompt: '来自生成文本节点的提示词' } },
         incomingEdges: [
-          { id: 'edge-ai-image-text-prompt', sourceId: _0x3ca58e, targetId: _0x37c429, refSlot: '' },
+          { id: 'edge-ai-image-text-prompt', sourceId: id21, targetId: targetId25, refSlot: '' },
         ],
         promptText: '主体画面',
       }),
-      _0x1ddc07 = await _0x32d555._buildPayload.call(_0x9549a4);
-    (assert.equal(_0x1ddc07.prompt, '来自生成文本节点的提示词\n主体画面'),
-      assert.deepEqual(_0x1ddc07.inputUrls, []));
+      value36 = await proto25._buildPayload.call(ctx25);
+    (assert.equal(value36.prompt, '来自生成文本节点的提示词\n主体画面'),
+      assert.deepEqual(value36.inputUrls, []));
   }),
   test('aigenImage task orchestration: Dreamina 自适应 + 16:9 入参图透传 16:9', async () => {
-    const _0x50c2fb = 'node-ai-image-dreamina-1',
-      _0x257d0c = 'node-ref-image-dreamina-1',
-      { proto: _0x5045b7, ctx: _0x486c73 } = createTestContext({
-        targetId: _0x50c2fb,
+    const targetId26 = 'node-ai-image-dreamina-1',
+      id22 = 'node-ref-image-dreamina-1',
+      { proto: proto26, ctx: ctx26 } = createTestContext({
+        targetId: targetId26,
         nodeData: {
           model: 'dreamina/5.0',
           provider: 'dreamina',
@@ -1034,24 +1027,24 @@ function createTestContext({
           batchSize: 1,
         },
         nodes: {
-          [_0x257d0c]: {
-            id: _0x257d0c,
+          [id22]: {
+            id: id22,
             type: 'source-image',
             imageUrl: 'https://img.example.com/dreamina-169.png',
             width: 0x640,
             height: 0x384,
           },
         },
-        incomingEdges: [{ id: 'edge-dreamina-1', sourceId: _0x257d0c, targetId: _0x50c2fb, refSlot: '' }],
+        incomingEdges: [{ id: 'edge-dreamina-1', sourceId: id22, targetId: targetId26, refSlot: '' }],
       }),
-      _0x5974e5 = await _0x5045b7._buildPayload.call(_0x486c73);
-    (assert.equal(_0x5974e5.provider, 'dreamina'), assert.equal(_0x5974e5.aspectRatio, '16:9'));
+      value37 = await proto26._buildPayload.call(ctx26);
+    (assert.equal(value37.provider, 'dreamina'), assert.equal(value37.aspectRatio, '16:9'));
   }),
   test('aigenImage task orchestration: 自适应入参优先使用真实媒体尺寸', async () => {
-    const _0x5f2a98 = 'node-ai-image-real-media-size',
-      _0x63e467 = 'node-ref-image-real-media-size',
-      { proto: _0x37969c, ctx: _0x15c760 } = createTestContext({
-        targetId: _0x5f2a98,
+    const targetId27 = 'node-ai-image-real-media-size',
+      id23 = 'node-ref-image-real-media-size',
+      { proto: proto27, ctx: ctx27 } = createTestContext({
+        targetId: targetId27,
         nodeData: {
           model: 'dreamina/5.0',
           provider: 'dreamina',
@@ -1062,8 +1055,8 @@ function createTestContext({
           height: 0x384,
         },
         nodes: {
-          [_0x63e467]: {
-            id: _0x63e467,
+          [id23]: {
+            id: id23,
             type: 'source-image',
             imageUrl: 'https://img.example.com/portrait-real.png',
             width: 0x640,
@@ -1072,23 +1065,21 @@ function createTestContext({
             imageHeight: 0x640,
           },
         },
-        incomingEdges: [
-          { id: 'edge-real-media-size', sourceId: _0x63e467, targetId: _0x5f2a98, refSlot: '' },
-        ],
+        incomingEdges: [{ id: 'edge-real-media-size', sourceId: id23, targetId: targetId27, refSlot: '' }],
       }),
-      _0x39c41f = await _0x37969c._buildPayload.call(_0x15c760);
-    (assert.equal(_0x39c41f.provider, 'dreamina'),
-      assert.equal(_0x39c41f.aspectRatio, '9:16'),
-      assert.equal(_0x39c41f.resolvedRatioLabel, '9:16'),
-      assert.equal(_0x39c41f.adaptiveSource, 'input-media'));
+      value38 = await proto27._buildPayload.call(ctx27);
+    (assert.equal(value38.provider, 'dreamina'),
+      assert.equal(value38.aspectRatio, '9:16'),
+      assert.equal(value38.resolvedRatioLabel, '9:16'),
+      assert.equal(value38.adaptiveSource, 'input-media'));
   }),
   test('aigenImage task orchestration: Dreamina 生成入参保留原图本地路径', async () => {
-    const _0x3d382a = 'node-ai-image-dreamina-original-first',
-      _0xd3ccee = 'node-ref-image-dreamina-original-first',
-      { proto: _0x1b8680, ctx: _0x8d2670 } = createTestContext({
-        targetId: _0x3d382a,
+    const targetId28 = 'node-ai-image-dreamina-original-first',
+      id24 = 'node-ref-image-dreamina-original-first',
+      { proto: proto28, ctx: ctx28 } = createTestContext({
+        targetId: targetId28,
         nodeData: {
-          id: _0x3d382a,
+          id: targetId28,
           model: 'dreamina/5.0',
           provider: 'dreamina',
           aspectRatio: '自适应',
@@ -1096,8 +1087,8 @@ function createTestContext({
           batchSize: 1,
         },
         nodes: {
-          [_0xd3ccee]: {
-            id: _0xd3ccee,
+          [id24]: {
+            id: id24,
             type: 'source-image',
             originalLocalPath: 'data/uploads/dreamina-original.png',
             displayLocalPath: 'data/uploads/dreamina-display.webp',
@@ -1108,18 +1099,18 @@ function createTestContext({
           },
         },
         incomingEdges: [
-          { id: 'edge-dreamina-original-first', sourceId: _0xd3ccee, targetId: _0x3d382a, refSlot: '' },
+          { id: 'edge-dreamina-original-first', sourceId: id24, targetId: targetId28, refSlot: '' },
         ],
       }),
-      _0x4f210c = await _0x1b8680._buildPayload.call(_0x8d2670);
-    (assert.equal(_0x4f210c.provider, 'dreamina'),
-      assert.deepEqual(_0x4f210c.inputUrls, ['/data/uploads/dreamina-original.png']));
+      value39 = await proto28._buildPayload.call(ctx28);
+    (assert.equal(value39.provider, 'dreamina'),
+      assert.deepEqual(value39.inputUrls, ['/data/uploads/dreamina-original.png']));
   }),
   test('aigenImage task orchestration: Dreamina 自适应 + 非标准比例映射最近支持比例', async () => {
-    const _0x23eb46 = 'node-ai-image-dreamina-2',
-      _0x2847e9 = 'node-ref-image-dreamina-2',
-      { proto: _0x17b0ad, ctx: _0x3337d7 } = createTestContext({
-        targetId: _0x23eb46,
+    const targetId29 = 'node-ai-image-dreamina-2',
+      id25 = 'node-ref-image-dreamina-2',
+      { proto: proto29, ctx: ctx29 } = createTestContext({
+        targetId: targetId29,
         nodeData: {
           model: 'dreamina/4.5',
           provider: 'dreamina',
@@ -1128,23 +1119,23 @@ function createTestContext({
           batchSize: 1,
         },
         nodes: {
-          [_0x2847e9]: {
-            id: _0x2847e9,
+          [id25]: {
+            id: id25,
             type: 'source-image',
             imageUrl: 'https://img.example.com/dreamina-non-standard.png',
             width: 0x4e2,
             height: 0x3e8,
           },
         },
-        incomingEdges: [{ id: 'edge-dreamina-2', sourceId: _0x2847e9, targetId: _0x23eb46, refSlot: '' }],
+        incomingEdges: [{ id: 'edge-dreamina-2', sourceId: id25, targetId: targetId29, refSlot: '' }],
       }),
-      _0x17182a = await _0x17b0ad._buildPayload.call(_0x3337d7);
-    (assert.equal(_0x17182a.provider, 'dreamina'), assert.equal(_0x17182a.aspectRatio, '4:3'));
+      value40 = await proto29._buildPayload.call(ctx29);
+    (assert.equal(value40.provider, 'dreamina'), assert.equal(value40.aspectRatio, '4:3'));
   }),
   test('aigenImage task orchestration: Dreamina 自适应 + 无图像入参时 fallback 为 1:1', async () => {
-    const _0x3c1adf = 'node-ai-image-dreamina-3',
-      { proto: _0x2a690b, ctx: _0x14879e } = createTestContext({
-        targetId: _0x3c1adf,
+    const targetId30 = 'node-ai-image-dreamina-3',
+      { proto: proto30, ctx: ctx30 } = createTestContext({
+        targetId: targetId30,
         nodeData: {
           model: 'dreamina/4.1',
           provider: 'dreamina',
@@ -1155,15 +1146,15 @@ function createTestContext({
         nodes: {},
         incomingEdges: [],
       }),
-      _0x59bce7 = await _0x2a690b._buildPayload.call(_0x14879e);
-    (assert.equal(_0x59bce7.provider, 'dreamina'), assert.equal(_0x59bce7.aspectRatio, '1:1'));
+      value41 = await proto30._buildPayload.call(ctx30);
+    (assert.equal(value41.provider, 'dreamina'), assert.equal(value41.aspectRatio, '1:1'));
   }),
   test('aigenImage task orchestration: 无入参时自适应优先使用显示区域比例', async () => {
-    const _0x58542c = 'node-ai-image-display-ratio',
-      { proto: _0x7889db, ctx: _0xb8b8f0 } = createTestContext({
-        targetId: _0x58542c,
+    const targetId31 = 'node-ai-image-display-ratio',
+      { proto: proto31, ctx: ctx31 } = createTestContext({
+        targetId: targetId31,
         nodeData: {
-          id: _0x58542c,
+          id: targetId31,
           model: 'dreamina/5.0',
           provider: 'dreamina',
           aspectRatio: '自适应',
@@ -1174,15 +1165,15 @@ function createTestContext({
         },
         incomingEdges: [],
       }),
-      _0xd0d818 = await _0x7889db._buildPayload.call(_0xb8b8f0);
-    (assert.equal(_0xd0d818.aspectRatio, '16:9'),
-      assert.equal(_0xd0d818.adaptiveSource, 'display'),
-      assert.equal(_0xd0d818.resolvedRatioLabel, '16:9'));
+      value42 = await proto31._buildPayload.call(ctx31);
+    (assert.equal(value42.aspectRatio, '16:9'),
+      assert.equal(value42.adaptiveSource, 'display'),
+      assert.equal(value42.resolvedRatioLabel, '16:9'));
   }),
   test('aigenImage task orchestration: async pending 且无 taskId 时触发兜底重提', async () => {
-    const _0x297ef7 = 'node-ai-image-fallback-1',
-      { proto: _0x1f98a3, ctx: _0x383997 } = createTestContext({
-        targetId: _0x297ef7,
+    const targetId32 = 'node-ai-image-fallback-1',
+      { proto: proto32, ctx: ctx32 } = createTestContext({
+        targetId: targetId32,
         nodeData: {
           model: 'ppio/seedream-4.0',
           provider: 'ppio',
@@ -1195,19 +1186,19 @@ function createTestContext({
           images: [],
         },
       });
-    let _0x32f30a = 0;
-    ((_0x383997._onGenerate = async () => {
-      _0x32f30a += 1;
+    let value43 = 0;
+    ((ctx32._onGenerate = async () => {
+      value43 += 1;
     }),
-      (_0x383997._stopAsyncRecovery = () => {}),
-      (_0x383997._isGenerating = false),
-      await _0x1f98a3._maybeResumeAsyncTaskImpl.call(_0x383997),
-      assert.equal(_0x32f30a, 1));
+      (ctx32._stopAsyncRecovery = () => {}),
+      (ctx32._isGenerating = false),
+      await proto32._maybeResumeAsyncTaskImpl.call(ctx32),
+      assert.equal(value43, 1));
   }),
   test('aigenImage task orchestration: async pending 且无 taskId 但已有结果时不触发重提', async () => {
-    const _0x44d452 = 'node-ai-image-fallback-2',
-      { proto: _0x1ed43c, ctx: _0x4b7e86 } = createTestContext({
-        targetId: _0x44d452,
+    const targetId33 = 'node-ai-image-fallback-2',
+      { proto: proto33, ctx: ctx33 } = createTestContext({
+        targetId: targetId33,
         nodeData: {
           model: 'ppio/seedream-4.0',
           provider: 'ppio',
@@ -1221,48 +1212,48 @@ function createTestContext({
           images: [{ imageUrl: '/output/ok.png' }],
         },
       });
-    let _0x597a2e = 0,
-      _0x2b1454 = 0;
-    ((_0x4b7e86._onGenerate = async () => {
-      _0x597a2e += 1;
+    let value44 = 0,
+      value45 = 0;
+    ((ctx33._onGenerate = async () => {
+      value44 += 1;
     }),
-      (_0x4b7e86._stopAsyncRecovery = () => {
-        _0x2b1454 += 1;
+      (ctx33._stopAsyncRecovery = () => {
+        value45 += 1;
       }),
-      (_0x4b7e86._isGenerating = false),
-      await _0x1ed43c._maybeResumeAsyncTaskImpl.call(_0x4b7e86),
-      assert.equal(_0x597a2e, 0),
-      assert.equal(_0x2b1454, 1));
+      (ctx33._isGenerating = false),
+      await proto33._maybeResumeAsyncTaskImpl.call(ctx33),
+      assert.equal(value44, 0),
+      assert.equal(value45, 1));
   }),
   test('aigenImage task orchestration: RunningHub recovery writes terminal state through runtime', async () => {
-    const _0xbaee84 = 'node-ai-image-rh-runtime-recovery',
-      _0x3d1244 = Date.now() - 0xea60,
+    const targetId34 = 'node-ai-image-rh-runtime-recovery',
+      rhTaskStartedAt = Date.now() - 0xea60,
       {
-        proto: _0x567ff6,
-        ctx: _0x5e179d,
-        state: _0x55f681,
+        proto: proto34,
+        ctx: ctx34,
+        state: state4,
       } = createTestContext({
-        targetId: _0xbaee84,
+        targetId: targetId34,
         nodeData: {
-          id: _0xbaee84,
+          id: targetId34,
           model: 'runninghub/1994718111704158209',
           provider: 'runninghubwf',
           rhTaskId: 'rh-image-resume-success',
           rhTaskStatus: 'running',
-          rhTaskStartedAt: _0x3d1244,
+          rhTaskStartedAt: rhTaskStartedAt,
           rhTaskUseOpenapiQuery: true,
-          generationStartTime: _0x3d1244,
+          generationStartTime: rhTaskStartedAt,
           generationDuration: null,
           isGenerating: true,
           images: [],
         },
         isRunninghubWorkflowModelImpl: () => true,
         apiImpl: {
-          resumeRunningHubImageTask: async (_0x3b44b3, _0x5093a9, _0x425f0d) => {
+          resumeRunningHubImageTask: async (value46, value47, value48) => {
             return (
-              assert.equal(_0x3b44b3, 'rh-image-resume-success'),
-              assert.equal(_0x5093a9.provider, 'runninghubwf'),
-              assert.equal(_0x425f0d.useOpenapiQuery, true),
+              assert.equal(value46, 'rh-image-resume-success'),
+              assert.equal(value47.provider, 'runninghubwf'),
+              assert.equal(value48.useOpenapiQuery, true),
               {
                 images: [
                   {
@@ -1276,57 +1267,57 @@ function createTestContext({
           },
         },
       });
-    ((_0x5e179d._isGenerating = false),
-      (_0x5e179d._buildResumePayload = async () => ({
+    ((ctx34._isGenerating = false),
+      (ctx34._buildResumePayload = async () => ({
         model: 'runninghub/1994718111704158209',
         provider: 'runninghubwf',
         apiKey: 'k_rh',
       })),
-      (_0x5e179d._persistRunningHubResumeCache = () => {}),
-      (_0x5e179d._updateSubmitButtonState = () => {}),
-      await _0x567ff6._maybeResumeRunningHubTaskImpl.call(_0x5e179d));
-    _0x5e179d._rhResumePromise && (await _0x5e179d._rhResumePromise);
-    const _0x205ad0 = _0x55f681.nodes[_0xbaee84];
-    (assert.equal(_0x205ad0.isGenerating, false),
-      assert.equal(_0x205ad0.jobStatus, 'success'),
-      assert.equal(_0x205ad0.rhTaskId, 'rh-image-resume-success'),
-      assert.equal(_0x205ad0.rhTaskStatus, 'success'),
-      assert.equal(_0x205ad0.rhTaskRecovering, false),
-      assert.equal(_0x205ad0.imageUrl, '/output/resumed.png'),
-      assert.equal(_0x205ad0.thumbUrl, '/output/resumed-thumb.png'),
-      assert.equal(_0x205ad0.localPath, 'output/resumed.png'));
+      (ctx34._persistRunningHubResumeCache = () => {}),
+      (ctx34._updateSubmitButtonState = () => {}),
+      await proto34._maybeResumeRunningHubTaskImpl.call(ctx34));
+    ctx34._rhResumePromise && (await ctx34._rhResumePromise);
+    const value49 = state4.nodes[targetId34];
+    (assert.equal(value49.isGenerating, false),
+      assert.equal(value49.jobStatus, 'success'),
+      assert.equal(value49.rhTaskId, 'rh-image-resume-success'),
+      assert.equal(value49.rhTaskStatus, 'success'),
+      assert.equal(value49.rhTaskRecovering, false),
+      assert.equal(value49.imageUrl, '/output/resumed.png'),
+      assert.equal(value49.thumbUrl, '/output/resumed-thumb.png'),
+      assert.equal(value49.localPath, 'output/resumed.png'));
   }),
   test('aigenImage task orchestration: async recovery writes terminal state through runtime', async () => {
-    const _0x5a8497 = 'node-ai-image-async-runtime-recovery',
-      _0x396722 = Date.now() - 0xea60;
-    let _0x2ee9c5 = 0;
+    const targetId35 = 'node-ai-image-async-runtime-recovery',
+      asyncTaskStartedAt = Date.now() - 0xea60;
+    let value50 = 0;
     const {
-      proto: _0x1131ed,
-      ctx: _0x25edac,
-      state: _0x26f0ac,
+      proto: proto35,
+      ctx: ctx35,
+      state: state5,
     } = createTestContext({
-      targetId: _0x5a8497,
+      targetId: targetId35,
       nodeData: {
-        id: _0x5a8497,
+        id: targetId35,
         model: 'ppio/seedream-4.0',
         provider: 'ppio',
         asyncTaskProvider: 'ppio',
         asyncTaskKind: 'image',
         asyncTaskId: 'async-image-resume-success',
         asyncTaskStatus: 'running',
-        asyncTaskStartedAt: _0x396722,
-        generationStartTime: _0x396722,
+        asyncTaskStartedAt: asyncTaskStartedAt,
+        generationStartTime: asyncTaskStartedAt,
         generationDuration: null,
         isGenerating: true,
         images: [],
       },
       apiImpl: {
-        resumeAsyncImageTask: async (_0x20aefb, _0x9d0401, _0x193c15) => {
+        resumeAsyncImageTask: async (value51, value52, value53) => {
           return (
-            (_0x2ee9c5 += 1),
-            assert.equal(_0x20aefb, 'async-image-resume-success'),
-            assert.equal(_0x9d0401.provider, 'ppio'),
-            assert.ok(_0x193c15?.signal),
+            (value50 += 1),
+            assert.equal(value51, 'async-image-resume-success'),
+            assert.equal(value52.provider, 'ppio'),
+            assert.ok(value53?.signal),
             {
               images: [
                 {
@@ -1340,122 +1331,122 @@ function createTestContext({
         },
       },
     });
-    ((_0x25edac._isGenerating = false),
-      (_0x25edac._buildResumePayload = async () => ({
+    ((ctx35._isGenerating = false),
+      (ctx35._buildResumePayload = async () => ({
         model: 'ppio/seedream-4.0',
         provider: 'ppio',
         apiKey: 'k_ppio',
       })),
-      (_0x25edac._persistAsyncResumeCache = () => {}),
-      (_0x25edac._updateSubmitButtonState = () => {}),
-      await _0x1131ed._maybeResumeAsyncTaskImpl.call(_0x25edac));
-    _0x25edac._asyncResumePromise && (await _0x25edac._asyncResumePromise);
-    const _0x32686c = _0x26f0ac.nodes[_0x5a8497];
-    (assert.equal(_0x2ee9c5, 1),
-      assert.equal(_0x32686c.isGenerating, false),
-      assert.equal(_0x32686c.jobStatus, 'success'),
-      assert.equal(_0x32686c.asyncTaskId, 'async-image-resume-success'),
-      assert.equal(_0x32686c.asyncTaskStatus, 'success'),
-      assert.equal(_0x32686c.asyncTaskProvider, 'ppio'),
-      assert.equal(_0x32686c.asyncTaskKind, 'image'),
-      assert.equal(_0x32686c.asyncTaskRecovering, false),
-      assert.equal(_0x32686c.imageUrl, '/output/async-resumed.png'),
-      assert.equal(_0x32686c.thumbUrl, '/output/async-resumed-thumb.png'),
-      assert.equal(_0x32686c.localPath, 'output/async-resumed.png'));
+      (ctx35._persistAsyncResumeCache = () => {}),
+      (ctx35._updateSubmitButtonState = () => {}),
+      await proto35._maybeResumeAsyncTaskImpl.call(ctx35));
+    ctx35._asyncResumePromise && (await ctx35._asyncResumePromise);
+    const value54 = state5.nodes[targetId35];
+    (assert.equal(value50, 1),
+      assert.equal(value54.isGenerating, false),
+      assert.equal(value54.jobStatus, 'success'),
+      assert.equal(value54.asyncTaskId, 'async-image-resume-success'),
+      assert.equal(value54.asyncTaskStatus, 'success'),
+      assert.equal(value54.asyncTaskProvider, 'ppio'),
+      assert.equal(value54.asyncTaskKind, 'image'),
+      assert.equal(value54.asyncTaskRecovering, false),
+      assert.equal(value54.imageUrl, '/output/async-resumed.png'),
+      assert.equal(value54.thumbUrl, '/output/async-resumed-thumb.png'),
+      assert.equal(value54.localPath, 'output/async-resumed.png'));
   }),
   test('aigenImage task orchestration: async recovery local abort keeps timer running', async () => {
-    const _0x3b227f = 'node-ai-image-async-runtime-pause',
-      _0x1f8a8b = Date.now() - 0xea60;
-    let _0xdc5bdd = null;
+    const targetId36 = 'node-ai-image-async-runtime-pause',
+      asyncTaskStartedAt2 = Date.now() - 0xea60;
+    let el2 = null;
     const {
-      proto: _0x572912,
-      ctx: _0x1d9881,
-      state: _0x39acb1,
+      proto: proto36,
+      ctx: ctx36,
+      state: state6,
     } = createTestContext({
-      targetId: _0x3b227f,
+      targetId: targetId36,
       nodeData: {
-        id: _0x3b227f,
+        id: targetId36,
         model: 'ppio/seedream-4.0',
         provider: 'ppio',
         asyncTaskProvider: 'ppio',
         asyncTaskKind: 'image',
         asyncTaskId: 'async-image-resume-pause',
         asyncTaskStatus: 'running',
-        asyncTaskStartedAt: _0x1f8a8b,
-        generationStartTime: _0x1f8a8b,
+        asyncTaskStartedAt: asyncTaskStartedAt2,
+        generationStartTime: asyncTaskStartedAt2,
         generationDuration: null,
         isGenerating: true,
         images: [],
       },
       apiImpl: {
-        resumeAsyncImageTask: async (_0x36f6ba, _0x4c36cb, _0x3e1751) =>
-          new Promise((_0x414ed3, _0x174ee7) => {
-            ((_0xdc5bdd = _0x3e1751?.signal || null),
-              _0xdc5bdd?.addEventListener?.('abort', () => {
-                const _0x3892f8 = new Error('CANCELLED');
-                ((_0x3892f8.name = 'AbortError'), _0x174ee7(_0x3892f8));
+        resumeAsyncImageTask: async (value55, value56, value57) =>
+          new Promise((value58, handler) => {
+            ((el2 = value57?.signal || null),
+              el2?.addEventListener?.('abort', () => {
+                const error = new Error('CANCELLED');
+                ((error.name = 'AbortError'), handler(error));
               }));
           }),
       },
     });
-    ((_0x1d9881._isGenerating = false),
-      (_0x1d9881._buildResumePayload = async () => ({
+    ((ctx36._isGenerating = false),
+      (ctx36._buildResumePayload = async () => ({
         model: 'ppio/seedream-4.0',
         provider: 'ppio',
         apiKey: 'k_ppio',
       })),
-      (_0x1d9881._persistAsyncResumeCache = () => {}),
-      (_0x1d9881._updateSubmitButtonState = () => {}),
-      await _0x572912._maybeResumeAsyncTaskImpl.call(_0x1d9881));
-    for (let _0x482d25 = 0; _0x482d25 < 5 && !_0xdc5bdd; _0x482d25 += 1) {
-      await new Promise((_0x291881) => setImmediate(_0x291881));
+      (ctx36._persistAsyncResumeCache = () => {}),
+      (ctx36._updateSubmitButtonState = () => {}),
+      await proto36._maybeResumeAsyncTaskImpl.call(ctx36));
+    for (let count = 0; count < 5 && !el2; count += 1) {
+      await new Promise((value59) => setImmediate(value59));
     }
-    assert.ok(_0xdc5bdd);
-    const _0x755cd3 = _0x1d9881._asyncResumePromise;
-    _0x1d9881._stopAsyncRecovery(false);
-    if (_0x755cd3) await _0x755cd3;
-    const _0x2005e2 = _0x39acb1.nodes[_0x3b227f];
-    (assert.equal(_0x2005e2.isGenerating, true),
-      assert.equal(_0x2005e2.jobStatus, 'running'),
-      assert.equal(_0x2005e2.generationStartTime, _0x1f8a8b),
-      assert.equal(_0x2005e2.generationDuration, null),
-      assert.equal(_0x2005e2.asyncTaskId, 'async-image-resume-pause'),
-      assert.equal(_0x2005e2.asyncTaskStatus, 'running'),
-      assert.equal(_0x2005e2.asyncTaskRecovering, false));
+    assert.ok(el2);
+    const value60 = ctx36._asyncResumePromise;
+    ctx36._stopAsyncRecovery(false);
+    if (value60) await value60;
+    const value61 = state6.nodes[targetId36];
+    (assert.equal(value61.isGenerating, true),
+      assert.equal(value61.jobStatus, 'running'),
+      assert.equal(value61.generationStartTime, asyncTaskStartedAt2),
+      assert.equal(value61.generationDuration, null),
+      assert.equal(value61.asyncTaskId, 'async-image-resume-pause'),
+      assert.equal(value61.asyncTaskStatus, 'running'),
+      assert.equal(value61.asyncTaskRecovering, false));
   }),
   test('aigenImage task orchestration: Dreamina recovery writes terminal state through runtime', async () => {
-    const _0x8e60bd = 'node-ai-image-dreamina-runtime-recovery',
-      _0x132abc = Date.now() - 0xea60;
-    let _0x5d18f6 = 0;
+    const targetId37 = 'node-ai-image-dreamina-runtime-recovery',
+      dreaminaTaskStartedAt = Date.now() - 0xea60;
+    let value62 = 0;
     const {
-      proto: _0x1be6f3,
-      ctx: _0x2ad89c,
-      state: _0x2d4450,
+      proto: proto37,
+      ctx: ctx37,
+      state: state7,
     } = createTestContext({
-      targetId: _0x8e60bd,
+      targetId: targetId37,
       nodeData: {
-        id: _0x8e60bd,
+        id: targetId37,
         model: 'dreamina/4.1',
         provider: 'dreamina',
         dreaminaSubmitId: 'sid-dreamina-success',
         dreaminaTaskStatus: 'pending',
         dreaminaTaskPhase: 'generating',
         dreaminaTaskLabel: '生成中',
-        dreaminaTaskStartedAt: _0x132abc,
+        dreaminaTaskStartedAt: dreaminaTaskStartedAt,
         dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
         dreaminaTaskRecovering: false,
-        generationStartTime: _0x132abc,
+        generationStartTime: dreaminaTaskStartedAt,
         generationDuration: null,
         isGenerating: true,
         images: [],
       },
       apiImpl: {
-        resumeDreaminaImageTask: async (_0x2bc526, _0x19d122, _0x23a2e0) => {
+        resumeDreaminaImageTask: async (value63, value64, value65) => {
           return (
-            (_0x5d18f6 += 1),
-            assert.equal(_0x2bc526, 'sid-dreamina-success'),
-            assert.equal(_0x19d122.provider, 'dreamina'),
-            assert.ok(_0x23a2e0?.signal),
+            (value62 += 1),
+            assert.equal(value63, 'sid-dreamina-success'),
+            assert.equal(value64.provider, 'dreamina'),
+            assert.ok(value65?.signal),
             {
               imageUrl: '/output/dreamina-resumed.png',
               thumbUrl: '/output/dreamina-resumed-thumb.png',
@@ -1465,186 +1456,186 @@ function createTestContext({
         },
       },
     });
-    ((_0x2ad89c._isGenerating = false),
-      (_0x2ad89c._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
-      (_0x2ad89c._persistDreaminaResumeCache = () => {}),
-      (_0x2ad89c._updateSubmitButtonState = () => {}),
-      await _0x1be6f3._maybeResumeDreaminaTaskImpl.call(_0x2ad89c));
-    _0x2ad89c._dreaminaResumePromise && (await _0x2ad89c._dreaminaResumePromise);
-    const _0x642bc1 = _0x2d4450.nodes[_0x8e60bd];
-    (assert.equal(_0x5d18f6, 1),
-      assert.equal(_0x642bc1.isGenerating, false),
-      assert.equal(_0x642bc1.jobStatus, 'success'),
-      assert.equal(_0x642bc1.dreaminaSubmitId, 'sid-dreamina-success'),
-      assert.equal(_0x642bc1.dreaminaTaskStatus, 'success'),
-      assert.equal(_0x642bc1.dreaminaTaskPhase, 'done'),
-      assert.equal(_0x642bc1.dreaminaTaskLabel, '已完成'),
-      assert.equal(_0x642bc1.dreaminaTaskRecovering, false),
-      assert.equal(_0x642bc1.imageUrl, '/output/dreamina-resumed.png'),
-      assert.equal(_0x642bc1.thumbUrl, '/output/dreamina-resumed-thumb.png'),
-      assert.equal(_0x642bc1.localPath, 'output/dreamina-resumed.png'));
+    ((ctx37._isGenerating = false),
+      (ctx37._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
+      (ctx37._persistDreaminaResumeCache = () => {}),
+      (ctx37._updateSubmitButtonState = () => {}),
+      await proto37._maybeResumeDreaminaTaskImpl.call(ctx37));
+    ctx37._dreaminaResumePromise && (await ctx37._dreaminaResumePromise);
+    const value66 = state7.nodes[targetId37];
+    (assert.equal(value62, 1),
+      assert.equal(value66.isGenerating, false),
+      assert.equal(value66.jobStatus, 'success'),
+      assert.equal(value66.dreaminaSubmitId, 'sid-dreamina-success'),
+      assert.equal(value66.dreaminaTaskStatus, 'success'),
+      assert.equal(value66.dreaminaTaskPhase, 'done'),
+      assert.equal(value66.dreaminaTaskLabel, '已完成'),
+      assert.equal(value66.dreaminaTaskRecovering, false),
+      assert.equal(value66.imageUrl, '/output/dreamina-resumed.png'),
+      assert.equal(value66.thumbUrl, '/output/dreamina-resumed-thumb.png'),
+      assert.equal(value66.localPath, 'output/dreamina-resumed.png'));
   }),
   test('aigenImage task orchestration: stale Dreamina running task resumes and surfaces fail reason', async () => {
-    const _0x7475c4 = 'node-ai-image-dreamina-stale-recovery',
-      _0x4fae83 = Date.now() - 0xea60,
+    const targetId38 = 'node-ai-image-dreamina-stale-recovery',
+      dreaminaTaskStartedAt2 = Date.now() - 0xea60,
       {
-        proto: _0x2c3bc0,
-        ctx: _0x1d1fb2,
-        state: _0x3a846a,
+        proto: proto38,
+        ctx: ctx38,
+        state: state8,
       } = createTestContext({
-        targetId: _0x7475c4,
+        targetId: targetId38,
         nodeData: {
-          id: _0x7475c4,
+          id: targetId38,
           model: 'dreamina/4.1',
           provider: 'dreamina',
           dreaminaSubmitId: 'sid-dreamina-fail',
           dreaminaTaskStatus: 'pending',
           dreaminaTaskPhase: 'generating',
           dreaminaTaskLabel: '生成中',
-          dreaminaTaskStartedAt: _0x4fae83,
+          dreaminaTaskStartedAt: dreaminaTaskStartedAt2,
           dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
           dreaminaTaskRecovering: false,
-          generationStartTime: _0x4fae83,
+          generationStartTime: dreaminaTaskStartedAt2,
           generationDuration: null,
           isGenerating: true,
           images: [],
         },
         apiImpl: {
-          resumeDreaminaImageTask: async (_0x270264) => {
-            assert.equal(_0x270264, 'sid-dreamina-fail');
+          resumeDreaminaImageTask: async (value67) => {
+            assert.equal(value67, 'sid-dreamina-fail');
             throw new Error('generation failed: final generation failed');
           },
         },
       });
-    ((_0x1d1fb2._isGenerating = true),
-      (_0x1d1fb2._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
-      (_0x1d1fb2._persistDreaminaResumeCache = () => {}),
-      (_0x1d1fb2._updateSubmitButtonState = () => {}),
-      await _0x2c3bc0._maybeResumeDreaminaTaskImpl.call(_0x1d1fb2),
-      assert.ok(_0x1d1fb2._dreaminaResumePromise),
-      await _0x1d1fb2._dreaminaResumePromise);
-    const _0x1b14eb = _0x3a846a.nodes[_0x7475c4];
-    (assert.equal(_0x1b14eb.isGenerating, false),
-      assert.equal(_0x1b14eb.jobStatus, 'error'),
-      assert.equal(_0x1b14eb.jobError, 'generation failed: final generation failed'),
-      assert.equal(_0x1b14eb.dreaminaTaskStatus, 'failed'),
-      assert.equal(_0x1b14eb.dreaminaTaskPhase, 'failed'),
-      assert.equal(_0x1b14eb.dreaminaTaskLabel, 'generation failed: final generation failed'),
-      assert.equal(_0x1b14eb.dreaminaTaskRecovering, false));
+    ((ctx38._isGenerating = true),
+      (ctx38._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
+      (ctx38._persistDreaminaResumeCache = () => {}),
+      (ctx38._updateSubmitButtonState = () => {}),
+      await proto38._maybeResumeDreaminaTaskImpl.call(ctx38),
+      assert.ok(ctx38._dreaminaResumePromise),
+      await ctx38._dreaminaResumePromise);
+    const value68 = state8.nodes[targetId38];
+    (assert.equal(value68.isGenerating, false),
+      assert.equal(value68.jobStatus, 'error'),
+      assert.equal(value68.jobError, 'generation failed: final generation failed'),
+      assert.equal(value68.dreaminaTaskStatus, 'failed'),
+      assert.equal(value68.dreaminaTaskPhase, 'failed'),
+      assert.equal(value68.dreaminaTaskLabel, 'generation failed: final generation failed'),
+      assert.equal(value68.dreaminaTaskRecovering, false));
   }),
   test('aigenImage task orchestration: persisted Dreamina running task resumes even with fresh lastChecked', async () => {
-    const _0x5d171f = 'node-ai-image-dreamina-persisted-recovery',
-      _0x59e59b = Date.now() - 0xea60,
+    const targetId39 = 'node-ai-image-dreamina-persisted-recovery',
+      dreaminaTaskStartedAt3 = Date.now() - 0xea60,
       {
-        proto: _0x2a15e8,
-        ctx: _0x2a5c1a,
-        state: _0x4e0ce3,
+        proto: proto39,
+        ctx: ctx39,
+        state: state9,
       } = createTestContext({
-        targetId: _0x5d171f,
+        targetId: targetId39,
         nodeData: {
-          id: _0x5d171f,
+          id: targetId39,
           model: 'dreamina/4.1',
           provider: 'dreamina',
           dreaminaSubmitId: 'sid-dreamina-persisted-fail',
           dreaminaTaskStatus: 'pending',
           dreaminaTaskPhase: 'syncing',
           dreaminaTaskLabel: '正在同步结果',
-          dreaminaTaskStartedAt: _0x59e59b,
+          dreaminaTaskStartedAt: dreaminaTaskStartedAt3,
           dreaminaTaskLastCheckedAt: Date.now(),
           dreaminaTaskRecovering: false,
-          generationStartTime: _0x59e59b,
+          generationStartTime: dreaminaTaskStartedAt3,
           generationDuration: null,
           isGenerating: true,
           images: [],
         },
         apiImpl: {
-          resumeDreaminaImageTask: async (_0x4efc45) => {
-            assert.equal(_0x4efc45, 'sid-dreamina-persisted-fail');
+          resumeDreaminaImageTask: async (value69) => {
+            assert.equal(value69, 'sid-dreamina-persisted-fail');
             throw new Error('generation failed: final generation failed');
           },
         },
       });
-    ((_0x2a5c1a._isGenerating = true),
-      (_0x2a5c1a._dreaminaActiveSubmitId = ''),
-      (_0x2a5c1a._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
-      (_0x2a5c1a._persistDreaminaResumeCache = () => {}),
-      (_0x2a5c1a._updateSubmitButtonState = () => {}),
-      await _0x2a15e8._maybeResumeDreaminaTaskImpl.call(_0x2a5c1a),
-      assert.ok(_0x2a5c1a._dreaminaResumePromise),
-      await _0x2a5c1a._dreaminaResumePromise);
-    const _0x50629b = _0x4e0ce3.nodes[_0x5d171f];
-    (assert.equal(_0x50629b.isGenerating, false),
-      assert.equal(_0x50629b.jobStatus, 'error'),
-      assert.equal(_0x50629b.dreaminaTaskStatus, 'failed'),
-      assert.equal(_0x50629b.dreaminaTaskPhase, 'failed'));
+    ((ctx39._isGenerating = true),
+      (ctx39._dreaminaActiveSubmitId = ''),
+      (ctx39._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
+      (ctx39._persistDreaminaResumeCache = () => {}),
+      (ctx39._updateSubmitButtonState = () => {}),
+      await proto39._maybeResumeDreaminaTaskImpl.call(ctx39),
+      assert.ok(ctx39._dreaminaResumePromise),
+      await ctx39._dreaminaResumePromise);
+    const value70 = state9.nodes[targetId39];
+    (assert.equal(value70.isGenerating, false),
+      assert.equal(value70.jobStatus, 'error'),
+      assert.equal(value70.dreaminaTaskStatus, 'failed'),
+      assert.equal(value70.dreaminaTaskPhase, 'failed'));
   }),
   test('aigenImage task orchestration: Dreamina recovery does not abort itself on reentrant state update', async () => {
-    const _0x187ab1 = 'node-ai-image-dreamina-reentrant-recovery',
-      _0x275580 = Date.now() - 0xea60,
+    const targetId40 = 'node-ai-image-dreamina-reentrant-recovery',
+      dreaminaTaskStartedAt4 = Date.now() - 0xea60,
       {
-        proto: _0x3ec7d6,
-        ctx: _0x6e037e,
-        state: _0x17c723,
-        store: _0x347420,
+        proto: proto40,
+        ctx: ctx40,
+        state: state10,
+        store: store2,
       } = createTestContext({
-        targetId: _0x187ab1,
+        targetId: targetId40,
         nodeData: {
-          id: _0x187ab1,
+          id: targetId40,
           model: 'dreamina/4.1',
           provider: 'dreamina',
           dreaminaSubmitId: 'sid-dreamina-reentrant-fail',
           dreaminaTaskStatus: 'pending',
           dreaminaTaskPhase: 'generating',
           dreaminaTaskLabel: '生成中',
-          dreaminaTaskStartedAt: _0x275580,
+          dreaminaTaskStartedAt: dreaminaTaskStartedAt4,
           dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
           dreaminaTaskRecovering: false,
-          generationStartTime: _0x275580,
+          generationStartTime: dreaminaTaskStartedAt4,
           generationDuration: null,
           isGenerating: true,
           images: [],
         },
         apiImpl: {
-          resumeDreaminaImageTask: async (_0x5c3777) => {
-            (assert.equal(_0x5c3777, 'sid-dreamina-reentrant-fail'), await Promise.resolve());
+          resumeDreaminaImageTask: async (value71) => {
+            (assert.equal(value71, 'sid-dreamina-reentrant-fail'), await Promise.resolve());
             throw new Error('generation failed: final generation failed');
           },
         },
       });
-    ((_0x6e037e._isGenerating = true),
-      (_0x6e037e._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
-      (_0x6e037e._persistDreaminaResumeCache = () => {}),
-      (_0x6e037e._updateSubmitButtonState = () => {}));
-    const _0x14ddbf = _0x347420.updateNodeData.bind(_0x347420);
-    let _0xe7fd4a = false;
-    ((_0x347420.updateNodeData = (_0x3e0428, _0x2fbee6) => {
-      (_0x14ddbf(_0x3e0428, _0x2fbee6),
-        !_0xe7fd4a &&
-          _0x2fbee6?.dreaminaTaskRecovering === true &&
-          ((_0xe7fd4a = true), void _0x3ec7d6._maybeResumeDreaminaTaskImpl.call(_0x6e037e)));
+    ((ctx40._isGenerating = true),
+      (ctx40._buildResumePayload = async () => ({ model: 'dreamina/4.1', provider: 'dreamina' })),
+      (ctx40._persistDreaminaResumeCache = () => {}),
+      (ctx40._updateSubmitButtonState = () => {}));
+    const run2 = store2.updateNodeData.bind(store2);
+    let enabled = false;
+    ((store2.updateNodeData = (value72, value73) => {
+      (run2(value72, value73),
+        !enabled &&
+          value73?.dreaminaTaskRecovering === true &&
+          ((enabled = true), void proto40._maybeResumeDreaminaTaskImpl.call(ctx40)));
     }),
-      await _0x3ec7d6._maybeResumeDreaminaTaskImpl.call(_0x6e037e),
-      await _0x6e037e._dreaminaResumePromise);
-    const _0x49c049 = _0x17c723.nodes[_0x187ab1];
-    (assert.equal(_0xe7fd4a, true),
-      assert.equal(_0x49c049.isGenerating, false),
-      assert.equal(_0x49c049.jobStatus, 'error'),
-      assert.equal(_0x49c049.dreaminaTaskStatus, 'failed'),
-      assert.equal(_0x49c049.dreaminaTaskRecovering, false));
+      await proto40._maybeResumeDreaminaTaskImpl.call(ctx40),
+      await ctx40._dreaminaResumePromise);
+    const value74 = state10.nodes[targetId40];
+    (assert.equal(enabled, true),
+      assert.equal(value74.isGenerating, false),
+      assert.equal(value74.jobStatus, 'error'),
+      assert.equal(value74.dreaminaTaskStatus, 'failed'),
+      assert.equal(value74.dreaminaTaskRecovering, false));
   }),
   test('aigenImage task orchestration: Dreamina failed progress finalizes and stops loading', async () => {
-    const _0x575287 = 'node-ai-image-dreamina-progress-fail',
-      _0x4fb274 = {};
-    let _0x1f2c82 = 0,
-      _0x4d6034 = 0;
+    const targetId41 = 'node-ai-image-dreamina-progress-fail',
+      value75 = {};
+    let value76 = 0,
+      count2 = 0;
     const {
-      proto: _0x58db53,
-      ctx: _0x4b0a18,
-      state: _0x2429ec,
+      proto: proto41,
+      ctx: ctx41,
+      state: state11,
     } = createTestContext({
-      targetId: _0x575287,
+      targetId: targetId41,
       nodeData: {
-        id: _0x575287,
+        id: targetId41,
         model: 'dreamina/4.1',
         provider: 'dreamina',
         aspectRatio: '1:1',
@@ -1652,9 +1643,9 @@ function createTestContext({
         batchSize: 1,
       },
       apiImpl: {
-        generateImage: async (_0x2c856c, _0x49f881 = {}) => {
-          (_0x49f881.onTaskMeta?.({ taskId: 'sid-dreamina-progress-fail' }),
-            _0x49f881.onProgress?.({
+        generateImage: async (value77, value78 = {}) => {
+          (value78.onTaskMeta?.({ taskId: 'sid-dreamina-progress-fail' }),
+            value78.onProgress?.({
               submitId: 'sid-dreamina-progress-fail',
               status: 'failed',
               phase: 'failed',
@@ -1662,52 +1653,52 @@ function createTestContext({
               failReason: 'policy rejected',
               raw: { status: 'failed' },
             }));
-          const _0x171aa3 = _0x2429ec.nodes[_0x575287];
-          (assert.equal(_0x171aa3.isGenerating, false),
-            assert.equal(_0x171aa3.jobStatus, 'error'),
-            assert.equal(_0x171aa3.jobError, 'policy rejected'),
-            assert.equal(_0x171aa3.dreaminaTaskStatus, 'failed'),
-            assert.equal(_0x171aa3.dreaminaTaskPhase, 'failed'),
-            assert.equal(_0x4d6034, 1));
+          const value79 = state11.nodes[targetId41];
+          (assert.equal(value79.isGenerating, false),
+            assert.equal(value79.jobStatus, 'error'),
+            assert.equal(value79.jobError, 'policy rejected'),
+            assert.equal(value79.dreaminaTaskStatus, 'failed'),
+            assert.equal(value79.dreaminaTaskPhase, 'failed'),
+            assert.equal(count2, 1));
           throw new Error('policy rejected');
         },
       },
-      startLoadingImpl: (_0x54dcd9) => {
-        (assert.equal(_0x54dcd9, _0x4fb274), (_0x1f2c82 += 1));
+      startLoadingImpl: (value80) => {
+        (assert.equal(value80, value75), (value76 += 1));
       },
-      stopLoadingImpl: (_0x93455b) => {
-        (assert.equal(_0x93455b, _0x4fb274), (_0x4d6034 += 1));
+      stopLoadingImpl: (value81) => {
+        (assert.equal(value81, value75), (count2 += 1));
       },
     });
-    ((_0x4b0a18.previewEl = _0x4fb274),
-      (_0x4b0a18.btnEl = createButtonStub()),
-      (_0x4b0a18._updateSubmitButtonState = () => {}),
-      await _0x58db53._onGenerate.call(_0x4b0a18));
-    const _0x36d4da = _0x2429ec.nodes[_0x575287];
-    (assert.equal(_0x1f2c82, 1),
-      assert.ok(_0x4d6034 >= 1),
-      assert.equal(_0x4b0a18._isGenerating, false),
-      assert.equal(_0x4b0a18.btnEl.classList.contains('is-rh-busy'), false),
-      assert.doesNotMatch(_0x4b0a18.btnEl.innerHTML, /animation:spin/),
-      assert.equal(_0x36d4da.isGenerating, false),
-      assert.equal(_0x36d4da.jobStatus, 'error'),
-      assert.equal(_0x36d4da.jobError, 'policy rejected'),
-      assert.equal(_0x36d4da.dreaminaTaskRecovering, false),
-      assert.ok(Number(_0x36d4da.generationDuration) >= 0),
-      assert.equal(_0x36d4da.images?.[0]?.error, 'policy rejected'),
-      assert.equal(_0x36d4da.mainImageIndex, 0),
-      assert.equal(_0x36d4da.imageUrl, ''));
+    ((ctx41.previewEl = value75),
+      (ctx41.btnEl = createButtonStub()),
+      (ctx41._updateSubmitButtonState = () => {}),
+      await proto41._onGenerate.call(ctx41));
+    const value82 = state11.nodes[targetId41];
+    (assert.equal(value76, 1),
+      assert.ok(count2 >= 1),
+      assert.equal(ctx41._isGenerating, false),
+      assert.equal(ctx41.btnEl.classList.contains('is-rh-busy'), false),
+      assert.doesNotMatch(ctx41.btnEl.innerHTML, /animation:spin/),
+      assert.equal(value82.isGenerating, false),
+      assert.equal(value82.jobStatus, 'error'),
+      assert.equal(value82.jobError, 'policy rejected'),
+      assert.equal(value82.dreaminaTaskRecovering, false),
+      assert.ok(Number(value82.generationDuration) >= 0),
+      assert.equal(value82.images?.[0]?.error, 'policy rejected'),
+      assert.equal(value82.mainImageIndex, 0),
+      assert.equal(value82.imageUrl, ''));
   }),
   test('aigenImage task orchestration: APIMart 错误结果会结束加载并标记失败', async () => {
-    const _0x239e3d = 'node-ai-image-apimart-error',
+    const targetId42 = 'node-ai-image-apimart-error',
       {
-        proto: _0x242224,
-        ctx: _0x47e6e3,
-        state: _0x1d1e60,
+        proto: proto42,
+        ctx: ctx42,
+        state: state12,
       } = createTestContext({
-        targetId: _0x239e3d,
+        targetId: targetId42,
         nodeData: {
-          id: _0x239e3d,
+          id: targetId42,
           model: 'apimart/nano-banana-2',
           provider: 'apimart',
           aspectRatio: '1:1',
@@ -1720,24 +1711,24 @@ function createTestContext({
           ],
         },
       });
-    await _0x242224._onGenerate.call(_0x47e6e3);
-    const _0x5d7e51 = _0x1d1e60.nodes[_0x239e3d];
-    (assert.equal(_0x5d7e51.isGenerating, false),
-      assert.equal(_0x5d7e51.jobStatus, 'error'),
-      assert.equal(_0x5d7e51.jobError, 'APIMart 任务报错：找不到任务 id'),
-      assert.equal(_0x5d7e51.asyncTaskStatus, 'failed'),
-      assert.equal(_0x5d7e51.images?.[0]?.error, 'APIMart 任务报错：找不到任务 id'));
+    await proto42._onGenerate.call(ctx42);
+    const value83 = state12.nodes[targetId42];
+    (assert.equal(value83.isGenerating, false),
+      assert.equal(value83.jobStatus, 'error'),
+      assert.equal(value83.jobError, 'APIMart 任务报错：找不到任务 id'),
+      assert.equal(value83.asyncTaskStatus, 'failed'),
+      assert.equal(value83.images?.[0]?.error, 'APIMart 任务报错：找不到任务 id'));
   }),
   test('aigenImage task orchestration: mixed batch failure keeps successful images', async () => {
-    const _0x684cad = 'node-ai-image-mixed-batch',
+    const targetId43 = 'node-ai-image-mixed-batch',
       {
-        proto: _0x30b743,
-        ctx: _0x16c730,
-        state: _0x2343b7,
+        proto: proto43,
+        ctx: ctx43,
+        state: state13,
       } = createTestContext({
-        targetId: _0x684cad,
+        targetId: targetId43,
         nodeData: {
-          id: _0x684cad,
+          id: targetId43,
           model: 'gpt-image-2',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -1756,29 +1747,29 @@ function createTestContext({
           }),
         },
       });
-    await _0x30b743._onGenerate.call(_0x16c730);
-    const _0xdc473 = _0x2343b7.nodes[_0x684cad];
-    (assert.equal(_0xdc473.isGenerating, false),
-      assert.equal(_0xdc473.jobStatus, 'success'),
-      assert.equal(_0xdc473.jobError, null),
-      assert.equal(_0xdc473.images?.length, 4),
-      assert.equal(_0xdc473.images?.[0]?.error, 'policy rejected'),
-      assert.equal(_0xdc473.mainImageIndex, 1),
-      assert.equal(_0xdc473.imageUrl, '/output/a.png'),
-      assert.equal(_0xdc473.localPath, 'output/a.png'));
+    await proto43._onGenerate.call(ctx43);
+    const value84 = state13.nodes[targetId43];
+    (assert.equal(value84.isGenerating, false),
+      assert.equal(value84.jobStatus, 'success'),
+      assert.equal(value84.jobError, null),
+      assert.equal(value84.images?.length, 4),
+      assert.equal(value84.images?.[0]?.error, 'policy rejected'),
+      assert.equal(value84.mainImageIndex, 1),
+      assert.equal(value84.imageUrl, '/output/a.png'),
+      assert.equal(value84.localPath, 'output/a.png'));
   }),
   test('aigenImage task orchestration: Volcengine 直连生成不伪装成异步任务', async () => {
-    const _0x4b9163 = 'node-ai-image-volcengine-loading',
-      _0xe3d8f0 = {};
-    let _0x2ace1e = 0;
+    const targetId44 = 'node-ai-image-volcengine-loading',
+      value85 = {};
+    let value86 = 0;
     const {
-      proto: _0x3cc5b6,
-      ctx: _0x4834f9,
-      state: _0x473a35,
+      proto: proto44,
+      ctx: ctx44,
+      state: state14,
     } = createTestContext({
-      targetId: _0x4b9163,
+      targetId: targetId44,
       nodeData: {
-        id: _0x4b9163,
+        id: targetId44,
         model: 'volcengine/seedream-4.0',
         provider: 'volcengine',
         aspectRatio: '1:1',
@@ -1786,15 +1777,15 @@ function createTestContext({
         batchSize: 1,
       },
       apiImpl: {
-        generateImage: async (_0x414828, _0x145102 = {}) => {
-          assert.equal(Boolean(_0x145102.signal), false);
-          const _0x1a77fb = _0x473a35.nodes[_0x4b9163];
+        generateImage: async (value87, value88 = {}) => {
+          assert.equal(Boolean(value88.signal), false);
+          const value89 = state14.nodes[targetId44];
           return (
-            assert.equal(_0x1a77fb.isGenerating, true),
-            assert.equal(_0x1a77fb.jobStatus, 'running'),
-            assert.equal(_0x1a77fb.asyncTaskProvider, ''),
-            assert.equal(_0x1a77fb.asyncTaskStatus, 'idle'),
-            _0x145102.onTaskMeta?.({
+            assert.equal(value89.isGenerating, true),
+            assert.equal(value89.jobStatus, 'running'),
+            assert.equal(value89.asyncTaskProvider, ''),
+            assert.equal(value89.asyncTaskStatus, 'idle'),
+            value88.onTaskMeta?.({
               taskId: 'ark-direct-response-1',
               provider: 'volcengine',
               kind: 'image',
@@ -1807,42 +1798,42 @@ function createTestContext({
           );
         },
       },
-      startLoadingImpl: (_0x3b9854) => {
-        (assert.equal(_0x3b9854, _0xe3d8f0), (_0x2ace1e += 1));
+      startLoadingImpl: (value90) => {
+        (assert.equal(value90, value85), (value86 += 1));
       },
     });
-    ((_0x4834f9.previewEl = _0xe3d8f0),
-      (_0x4834f9.btnEl = createButtonStub()),
-      (_0x4834f9._updateSubmitButtonState = () => {}),
-      await _0x3cc5b6._onGenerate.call(_0x4834f9));
-    const _0x10fe79 = _0x473a35.nodes[_0x4b9163];
-    (assert.equal(_0x2ace1e, 1),
-      assert.equal(_0x10fe79.isGenerating, false),
-      assert.equal(_0x10fe79.jobStatus, 'success'),
-      assert.equal(_0x10fe79.asyncTaskProvider, ''),
-      assert.equal(_0x10fe79.asyncTaskKind, 'image'),
-      assert.equal(_0x10fe79.asyncTaskStatus, 'idle'),
-      assert.equal(_0x10fe79.imageUrl, '/output/volcengine.png'));
+    ((ctx44.previewEl = value85),
+      (ctx44.btnEl = createButtonStub()),
+      (ctx44._updateSubmitButtonState = () => {}),
+      await proto44._onGenerate.call(ctx44));
+    const value91 = state14.nodes[targetId44];
+    (assert.equal(value86, 1),
+      assert.equal(value91.isGenerating, false),
+      assert.equal(value91.jobStatus, 'success'),
+      assert.equal(value91.asyncTaskProvider, ''),
+      assert.equal(value91.asyncTaskKind, 'image'),
+      assert.equal(value91.asyncTaskStatus, 'idle'),
+      assert.equal(value91.imageUrl, '/output/volcengine.png'));
   }),
   test('aigenImage task orchestration: Volcengine 缺少 API Key 时生成前拦截', async () => {
-    const _0x2ff6b0 = 'node-ai-image-volcengine-missing-key',
-      _0x322893 = {},
-      _0xbf0d70 = globalThis.window.showToast,
-      _0x407488 = [];
-    let _0x2e687f = 0,
-      _0x21513a = 0;
+    const targetId45 = 'node-ai-image-volcengine-missing-key',
+      value92 = {},
+      value93 = globalThis.window.showToast,
+      list6 = [];
+    let value94 = 0,
+      value95 = 0;
     try {
-      globalThis.window.showToast = (_0x34e4a6, _0x21dba0) => {
-        _0x407488.push({ message: _0x34e4a6, type: _0x21dba0 });
+      globalThis.window.showToast = (message2, type2) => {
+        list6.push({ message: message2, type: type2 });
       };
       const {
-        proto: _0xbd18c2,
-        ctx: _0x5dc427,
-        state: _0x2f68c1,
+        proto: proto45,
+        ctx: ctx45,
+        state: state15,
       } = createTestContext({
-        targetId: _0x2ff6b0,
+        targetId: targetId45,
         nodeData: {
-          id: _0x2ff6b0,
+          id: targetId45,
           model: 'volcengine/seedream-4.0',
           provider: 'volcengine',
           aspectRatio: '1:1',
@@ -1853,31 +1844,31 @@ function createTestContext({
         getProviderConfigImpl: () => ({ apiKey: '' }),
         apiImpl: {
           generateImage: async () => {
-            return ((_0x2e687f += 1), { imageUrl: '/output/should-not-run.png' });
+            return ((value94 += 1), { imageUrl: '/output/should-not-run.png' });
           },
         },
-        startLoadingImpl: (_0x14970e) => {
-          (assert.equal(_0x14970e, _0x322893), (_0x21513a += 1));
+        startLoadingImpl: (value96) => {
+          (assert.equal(value96, value92), (value95 += 1));
         },
       });
-      ((_0x5dc427.previewEl = _0x322893),
-        (_0x5dc427.btnEl = createButtonStub()),
-        await _0xbd18c2._onGenerate.call(_0x5dc427));
-      const _0x297aeb = _0x2f68c1.nodes[_0x2ff6b0];
-      (assert.equal(_0x2e687f, 0),
-        assert.equal(_0x21513a, 0),
-        assert.equal(_0x297aeb.isGenerating, undefined),
-        assert.deepEqual(_0x407488, [{ message: '请先在设置里填写火山方舟 API Key', type: 'warn' }]));
+      ((ctx45.previewEl = value92),
+        (ctx45.btnEl = createButtonStub()),
+        await proto45._onGenerate.call(ctx45));
+      const value97 = state15.nodes[targetId45];
+      (assert.equal(value94, 0),
+        assert.equal(value95, 0),
+        assert.equal(value97.isGenerating, undefined),
+        assert.deepEqual(list6, [{ message: '请先在设置里填写火山方舟 API Key', type: 'warn' }]));
     } finally {
-      globalThis.window.showToast = _0xbf0d70;
+      globalThis.window.showToast = value93;
     }
   }),
   test('aigenImage task orchestration: manifest modelApi reads ordinary params from generationParams', async () => {
-    const _0x104b79 = 'node-ai-image-apimart-manifest-params',
-      { proto: _0x10ef12, ctx: _0x347fcd } = createTestContext({
-        targetId: _0x104b79,
+    const targetId46 = 'node-ai-image-apimart-manifest-params',
+      { proto: proto46, ctx: ctx46 } = createTestContext({
+        targetId: targetId46,
         nodeData: {
-          id: _0x104b79,
+          id: targetId46,
           model: 'apimart/nano-banana-2',
           provider: 'apimart',
           aspectRatio: '16:9',
@@ -1894,35 +1885,35 @@ function createTestContext({
         },
         promptText: 'manifest params',
       }),
-      _0x18f307 = await _0x10ef12._buildPayload.call(_0x347fcd);
-    (assert.equal(_0x18f307.model, 'apimart/nano-banana-2'),
-      assert.equal(_0x18f307.provider, 'apimart'),
-      assert.equal(_0x18f307.mode, 'official'),
-      assert.equal(_0x18f307.imageSize, '4K'),
-      assert.equal(_0x18f307.aspectRatio, '1:8'),
-      assert.equal(_0x18f307.google_search, true),
-      assert.equal(_0x18f307.google_image_search, true),
-      assert.equal(_0x18f307.batchSize, 2));
+      value98 = await proto46._buildPayload.call(ctx46);
+    (assert.equal(value98.model, 'apimart/nano-banana-2'),
+      assert.equal(value98.provider, 'apimart'),
+      assert.equal(value98.mode, 'official'),
+      assert.equal(value98.imageSize, '4K'),
+      assert.equal(value98.aspectRatio, '1:8'),
+      assert.equal(value98.google_search, true),
+      assert.equal(value98.google_image_search, true),
+      assert.equal(value98.batchSize, 2));
   }),
   test('aigenImage task orchestration: Agnes image input starts loading without prompt', async () => {
-    const _0x241058 = 'node-ai-image-agnes-image-input',
-      _0x4ecebe = 'node-ai-image-agnes-source',
-      _0x1685c0 = {};
-    let _0x57b933 = 0,
-      _0x36d550 = 0,
-      _0x21a20e = null;
+    const targetId47 = 'node-ai-image-agnes-image-input',
+      id26 = 'node-ai-image-agnes-source',
+      value99 = {};
+    let value100 = 0,
+      value101 = 0,
+      value102 = null;
     const {
-      proto: _0x411e3e,
-      ctx: _0x13a17a,
-      state: _0x43899d,
+      proto: proto47,
+      ctx: ctx47,
+      state: state16,
     } = createTestContext({
-      targetId: _0x241058,
+      targetId: targetId47,
       nodes: {
-        [_0x4ecebe]: { id: _0x4ecebe, type: 'source-image', imageUrl: 'https://cdn.example.com/input.png' },
+        [id26]: { id: id26, type: 'source-image', imageUrl: 'https://cdn.example.com/input.png' },
       },
-      incomingEdges: [{ id: 'edge-agnes-image', sourceId: _0x4ecebe, targetId: _0x241058 }],
+      incomingEdges: [{ id: 'edge-agnes-image', sourceId: id26, targetId: targetId47 }],
       nodeData: {
-        id: _0x241058,
+        id: targetId47,
         model: 'agnes/agnes-image-2.0-flash',
         provider: 'agnes',
         generationParams: { aspectRatio: '16:9', imageSize: '1K', batchSize: 1 },
@@ -1930,39 +1921,39 @@ function createTestContext({
       promptText: '',
       getProviderConfigImpl: () => ({ apiKey: 'k_agnes' }),
       apiImpl: {
-        generateImage: async (_0x116a3e) => {
-          return ((_0x21a20e = _0x116a3e), { imageUrl: '/output/agnes.png' });
+        generateImage: async (value103) => {
+          return ((value102 = value103), { imageUrl: '/output/agnes.png' });
         },
       },
-      startLoadingImpl: (_0x242c58) => {
-        (assert.equal(_0x242c58, _0x1685c0), (_0x57b933 += 1));
+      startLoadingImpl: (value104) => {
+        (assert.equal(value104, value99), (value100 += 1));
       },
-      stopLoadingImpl: (_0x4c73df) => {
-        (assert.equal(_0x4c73df, _0x1685c0), (_0x36d550 += 1));
+      stopLoadingImpl: (value105) => {
+        (assert.equal(value105, value99), (value101 += 1));
       },
     });
-    ((_0x13a17a.previewEl = _0x1685c0),
-      (_0x13a17a.btnEl = createButtonStub()),
-      await _0x411e3e._onGenerate.call(_0x13a17a),
-      assert.equal(_0x57b933, 1),
-      assert.equal(_0x36d550, 1),
-      assert.equal(_0x21a20e?.provider, 'agnes'),
-      assert.equal(_0x21a20e?.model, 'agnes/agnes-image-2.0-flash'),
-      assert.deepEqual(_0x21a20e?.inputUrls, ['https://cdn.example.com/input.png']),
-      assert.equal(_0x43899d.nodes[_0x241058].jobStatus, 'success'));
+    ((ctx47.previewEl = value99),
+      (ctx47.btnEl = createButtonStub()),
+      await proto47._onGenerate.call(ctx47),
+      assert.equal(value100, 1),
+      assert.equal(value101, 1),
+      assert.equal(value102?.provider, 'agnes'),
+      assert.equal(value102?.model, 'agnes/agnes-image-2.0-flash'),
+      assert.deepEqual(value102?.inputUrls, ['https://cdn.example.com/input.png']),
+      assert.equal(state16.nodes[targetId47].jobStatus, 'success'));
   }),
   test('aigenImage task orchestration: generation start keeps existing preview under loading overlay', async () => {
-    const _0x5a0fc9 = 'node-ai-image-stale-error-start';
-    let _0x412c20 = null,
-      _0x3d9641 = 0;
+    const targetId48 = 'node-ai-image-stale-error-start';
+    let value106 = null,
+      value107 = 0;
     const {
-      proto: _0x459447,
-      ctx: _0x3832a3,
-      state: _0x129c42,
+      proto: proto48,
+      ctx: ctx48,
+      state: state17,
     } = createTestContext({
-      targetId: _0x5a0fc9,
+      targetId: targetId48,
       nodeData: {
-        id: _0x5a0fc9,
+        id: targetId48,
         model: 'agnes/agnes-image-2.1-flash',
         provider: 'agnes',
         generationParams: { aspectRatio: '16:9', imageSize: '1K', batchSize: 1 },
@@ -1976,35 +1967,35 @@ function createTestContext({
       getProviderConfigImpl: () => ({ apiKey: 'k_agnes' }),
       apiImpl: {
         generateImage: async () => {
-          return ((_0x412c20 = _0x129c42.nodes[_0x5a0fc9]), { imageUrl: '/output/retry.png' });
+          return ((value106 = state17.nodes[targetId48]), { imageUrl: '/output/retry.png' });
         },
       },
       startLoadingImpl: () => {
-        _0x3d9641 += 1;
+        value107 += 1;
       },
     });
-    ((_0x3832a3.btnEl = createButtonStub()),
-      await _0x459447._onGenerate.call(_0x3832a3),
-      assert.equal(_0x3d9641, 1),
-      assert.deepEqual(_0x412c20?.images, [{ error: 'previous failure', imageUrl: '', thumbUrl: '' }]),
-      assert.equal(_0x412c20?.imageUrl, ''),
-      assert.equal(_0x412c20?.jobStatus, 'running'),
-      assert.equal(_0x129c42.nodes[_0x5a0fc9].jobStatus, 'success'),
-      assert.equal(_0x129c42.nodes[_0x5a0fc9].imageUrl, '/output/retry.png'));
+    ((ctx48.btnEl = createButtonStub()),
+      await proto48._onGenerate.call(ctx48),
+      assert.equal(value107, 1),
+      assert.deepEqual(value106?.images, [{ error: 'previous failure', imageUrl: '', thumbUrl: '' }]),
+      assert.equal(value106?.imageUrl, ''),
+      assert.equal(value106?.jobStatus, 'running'),
+      assert.equal(state17.nodes[targetId48].jobStatus, 'success'),
+      assert.equal(state17.nodes[targetId48].imageUrl, '/output/retry.png'));
   }),
   test('aigenImage task orchestration: Agnes image start clears stale task family terminal states', async () => {
-    const _0x186e42 = 'node-ai-image-agnes-stale-task-family-start',
-      _0x4a836a = {};
-    let _0x2114cf = null,
-      _0x1b4937 = 0;
+    const targetId49 = 'node-ai-image-agnes-stale-task-family-start',
+      value108 = {};
+    let value109 = null,
+      value110 = 0;
     const {
-      proto: _0x55dcb3,
-      ctx: _0x30d2bb,
-      state: _0x1add25,
+      proto: proto49,
+      ctx: ctx49,
+      state: state18,
     } = createTestContext({
-      targetId: _0x186e42,
+      targetId: targetId49,
       nodeData: {
-        id: _0x186e42,
+        id: targetId49,
         model: 'agnes/agnes-image-2.1-flash',
         provider: 'agnes',
         generationParams: { aspectRatio: '16:9', imageSize: '1K', batchSize: 1 },
@@ -2022,40 +2013,40 @@ function createTestContext({
       getProviderConfigImpl: () => ({ apiKey: 'k_agnes' }),
       apiImpl: {
         generateImage: async () => {
-          return ((_0x2114cf = _0x1add25.nodes[_0x186e42]), { imageUrl: '/output/agnes-retry.png' });
+          return ((value109 = state18.nodes[targetId49]), { imageUrl: '/output/agnes-retry.png' });
         },
       },
-      startLoadingImpl: (_0x32a658) => {
-        (assert.equal(_0x32a658, _0x4a836a), (_0x1b4937 += 1));
+      startLoadingImpl: (value111) => {
+        (assert.equal(value111, value108), (value110 += 1));
       },
     });
-    ((_0x30d2bb.previewEl = _0x4a836a),
-      (_0x30d2bb.btnEl = createButtonStub()),
-      await _0x55dcb3._onGenerate.call(_0x30d2bb),
-      assert.equal(_0x1b4937, 1),
-      assert.equal(_0x2114cf?.isGenerating, true),
-      assert.equal(_0x2114cf?.jobStatus, 'running'),
-      assert.equal(_0x2114cf?.rhTaskId, ''),
-      assert.equal(_0x2114cf?.rhTaskStatus, 'idle'),
-      assert.equal(_0x2114cf?.dreaminaSubmitId, ''),
-      assert.equal(_0x2114cf?.dreaminaTaskStatus, 'idle'),
-      assert.equal(_0x2114cf?.dreaminaTaskPhase, 'idle'),
-      assert.equal(_0x2114cf?.asyncTaskId, ''),
-      assert.equal(_0x2114cf?.asyncTaskStatus, 'idle'),
-      assert.equal(shouldShowGenerationBusyUi(_0x2114cf), true),
-      assert.equal(_0x1add25.nodes[_0x186e42].jobStatus, 'success'),
-      assert.equal(_0x1add25.nodes[_0x186e42].imageUrl, '/output/agnes-retry.png'));
+    ((ctx49.previewEl = value108),
+      (ctx49.btnEl = createButtonStub()),
+      await proto49._onGenerate.call(ctx49),
+      assert.equal(value110, 1),
+      assert.equal(value109?.isGenerating, true),
+      assert.equal(value109?.jobStatus, 'running'),
+      assert.equal(value109?.rhTaskId, ''),
+      assert.equal(value109?.rhTaskStatus, 'idle'),
+      assert.equal(value109?.dreaminaSubmitId, ''),
+      assert.equal(value109?.dreaminaTaskStatus, 'idle'),
+      assert.equal(value109?.dreaminaTaskPhase, 'idle'),
+      assert.equal(value109?.asyncTaskId, ''),
+      assert.equal(value109?.asyncTaskStatus, 'idle'),
+      assert.equal(shouldShowGenerationBusyUi(value109), true),
+      assert.equal(state18.nodes[targetId49].jobStatus, 'success'),
+      assert.equal(state18.nodes[targetId49].imageUrl, '/output/agnes-retry.png'));
   }),
   test('aigenImage task orchestration: API throw 会结束加载并标记失败', async () => {
-    const _0x59533d = 'node-ai-image-throw-error',
+    const targetId50 = 'node-ai-image-throw-error',
       {
-        proto: _0x5b46be,
-        ctx: _0x5af32e,
-        state: _0x3e4549,
+        proto: proto50,
+        ctx: ctx50,
+        state: state19,
       } = createTestContext({
-        targetId: _0x59533d,
+        targetId: targetId50,
         nodeData: {
-          id: _0x59533d,
+          id: targetId50,
           model: 'ppio/seedream-5.0-lite',
           provider: 'ppio',
           aspectRatio: '1:1',
@@ -2068,26 +2059,26 @@ function createTestContext({
           },
         },
       });
-    await _0x5b46be._onGenerate.call(_0x5af32e);
-    const _0x377fa7 = _0x3e4549.nodes[_0x59533d];
-    (assert.equal(_0x377fa7.isGenerating, false),
-      assert.equal(_0x377fa7.jobStatus, 'error'),
-      assert.equal(_0x377fa7.jobError, 'PPIO 创建任务失败'),
-      assert.equal(_0x377fa7.asyncTaskStatus, 'failed'),
-      assert.equal(_0x377fa7.images?.[0]?.error, 'PPIO 创建任务失败'),
-      assert.equal(_0x377fa7.mainImageIndex, 0),
-      assert.equal(_0x377fa7.imageUrl, ''));
+    await proto50._onGenerate.call(ctx50);
+    const value112 = state19.nodes[targetId50];
+    (assert.equal(value112.isGenerating, false),
+      assert.equal(value112.jobStatus, 'error'),
+      assert.equal(value112.jobError, 'PPIO 创建任务失败'),
+      assert.equal(value112.asyncTaskStatus, 'failed'),
+      assert.equal(value112.images?.[0]?.error, 'PPIO 创建任务失败'),
+      assert.equal(value112.mainImageIndex, 0),
+      assert.equal(value112.imageUrl, ''));
   }),
   test('aigenImage task orchestration: API 返回单个错误对象会结束加载并标记失败', async () => {
-    const _0x25751b = 'node-ai-image-object-error',
+    const targetId51 = 'node-ai-image-object-error',
       {
-        proto: _0x2f9a60,
-        ctx: _0x3eec46,
-        state: _0x4a3177,
+        proto: proto51,
+        ctx: ctx51,
+        state: state20,
       } = createTestContext({
-        targetId: _0x25751b,
+        targetId: targetId51,
         nodeData: {
-          id: _0x25751b,
+          id: targetId51,
           model: 'nano-banana',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -2098,23 +2089,23 @@ function createTestContext({
           generateImage: async () => ({ error: 'GRSAI 无法解析图片地址', imageUrl: '', thumbUrl: '' }),
         },
       });
-    await _0x2f9a60._onGenerate.call(_0x3eec46);
-    const _0x13543a = _0x4a3177.nodes[_0x25751b];
-    (assert.equal(_0x13543a.isGenerating, false),
-      assert.equal(_0x13543a.jobStatus, 'error'),
-      assert.equal(_0x13543a.jobError, 'GRSAI 无法解析图片地址'),
-      assert.equal(_0x13543a.asyncTaskStatus, 'failed'));
+    await proto51._onGenerate.call(ctx51);
+    const value113 = state20.nodes[targetId51];
+    (assert.equal(value113.isGenerating, false),
+      assert.equal(value113.jobStatus, 'error'),
+      assert.equal(value113.jobError, 'GRSAI 无法解析图片地址'),
+      assert.equal(value113.asyncTaskStatus, 'failed'));
   }),
   test('aigenImage task orchestration: 缺少 taskId 错误会结束加载并标记失败', async () => {
-    const _0x4a6e14 = 'node-ai-image-missing-task-id',
+    const targetId52 = 'node-ai-image-missing-task-id',
       {
-        proto: _0x55aae1,
-        ctx: _0x206390,
-        state: _0x30cf2f,
+        proto: proto52,
+        ctx: ctx52,
+        state: state21,
       } = createTestContext({
-        targetId: _0x4a6e14,
+        targetId: targetId52,
         nodeData: {
-          id: _0x4a6e14,
+          id: targetId52,
           model: 'apimart/nano-banana-2',
           provider: 'apimart',
           aspectRatio: '1:1',
@@ -2127,23 +2118,23 @@ function createTestContext({
           },
         },
       });
-    await _0x55aae1._onGenerate.call(_0x206390);
-    const _0x475194 = _0x30cf2f.nodes[_0x4a6e14];
-    (assert.equal(_0x475194.isGenerating, false),
-      assert.equal(_0x475194.jobStatus, 'error'),
-      assert.equal(_0x475194.jobError, '缺少异步图片任务ID，无法恢复'),
-      assert.equal(_0x475194.asyncTaskStatus, 'failed'));
+    await proto52._onGenerate.call(ctx52);
+    const value114 = state21.nodes[targetId52];
+    (assert.equal(value114.isGenerating, false),
+      assert.equal(value114.jobStatus, 'error'),
+      assert.equal(value114.jobError, '缺少异步图片任务ID，无法恢复'),
+      assert.equal(value114.asyncTaskStatus, 'failed'));
   }),
   test('aigenImage task orchestration: 成功结果会结束加载并标记成功', async () => {
-    const _0x34cabd = 'node-ai-image-success',
+    const targetId53 = 'node-ai-image-success',
       {
-        proto: _0x5b0eb4,
-        ctx: _0x280873,
-        state: _0x37fa26,
+        proto: proto53,
+        ctx: ctx53,
+        state: state22,
       } = createTestContext({
-        targetId: _0x34cabd,
+        targetId: targetId53,
         nodeData: {
-          id: _0x34cabd,
+          id: targetId53,
           model: 'nano-banana-pro-vt',
           provider: 'grsai',
           aspectRatio: '1:1',
@@ -2158,28 +2149,28 @@ function createTestContext({
           }),
         },
       });
-    await _0x5b0eb4._onGenerate.call(_0x280873);
-    const _0x4f380c = _0x37fa26.nodes[_0x34cabd];
-    (assert.equal(_0x4f380c.isGenerating, false),
-      assert.equal(_0x4f380c.jobStatus, 'success'),
-      assert.equal(_0x4f380c.jobError, null),
-      assert.equal(_0x4f380c.asyncTaskStatus, 'success'),
-      assert.equal(_0x4f380c.imageUrl, '/output/success.png'));
+    await proto53._onGenerate.call(ctx53);
+    const value115 = state22.nodes[targetId53];
+    (assert.equal(value115.isGenerating, false),
+      assert.equal(value115.jobStatus, 'success'),
+      assert.equal(value115.jobError, null),
+      assert.equal(value115.asyncTaskStatus, 'success'),
+      assert.equal(value115.imageUrl, '/output/success.png'));
   }),
   test('aigenImage task orchestration: GRSAI direct success unlocks repeated generation', async () => {
-    const _0x25398f = 'node-ai-image-grsai-repeat-success',
-      _0x2a6671 = {};
-    let _0x42d09e = 0,
-      _0x4f91a3 = 0,
-      _0x2961b3 = 0;
+    const targetId54 = 'node-ai-image-grsai-repeat-success',
+      value116 = {};
+    let value117 = 0,
+      value118 = 0,
+      value119 = 0;
     const {
-      proto: _0x1e9e4c,
-      ctx: _0x57ffe5,
-      state: _0x186988,
+      proto: proto54,
+      ctx: ctx54,
+      state: state23,
     } = createTestContext({
-      targetId: _0x25398f,
+      targetId: targetId54,
       nodeData: {
-        id: _0x25398f,
+        id: targetId54,
         model: 'nano-banana-2',
         provider: 'grsai',
         aspectRatio: '1:1',
@@ -2188,61 +2179,61 @@ function createTestContext({
       },
       promptText: 'repeatable prompt',
       apiImpl: {
-        generateImage: async (_0xcc9f96, _0x30a7c5 = {}) => {
+        generateImage: async (value120, value121 = {}) => {
           return (
-            (_0x42d09e += 1),
-            _0x30a7c5.onTaskMeta?.({ taskId: 'grsai-direct-' + _0x42d09e, provider: 'grsai' }),
+            (value117 += 1),
+            value121.onTaskMeta?.({ taskId: 'grsai-direct-' + value117, provider: 'grsai' }),
             {
-              imageUrl: '/output/grsai-direct-' + _0x42d09e + '.png',
-              sourceUrl: 'https://img.example.com/grsai-direct-' + _0x42d09e + '.png',
-              thumbUrl: '/output/grsai-direct-' + _0x42d09e + '.png',
+              imageUrl: '/output/grsai-direct-' + value117 + '.png',
+              sourceUrl: 'https://img.example.com/grsai-direct-' + value117 + '.png',
+              thumbUrl: '/output/grsai-direct-' + value117 + '.png',
             }
           );
         },
       },
-      startLoadingImpl: (_0x106e8c) => {
-        (assert.equal(_0x106e8c, _0x2a6671), (_0x4f91a3 += 1));
+      startLoadingImpl: (value122) => {
+        (assert.equal(value122, value116), (value118 += 1));
       },
-      stopLoadingImpl: (_0x4a33bd) => {
-        (assert.equal(_0x4a33bd, _0x2a6671), (_0x2961b3 += 1));
+      stopLoadingImpl: (value123) => {
+        (assert.equal(value123, value116), (value119 += 1));
       },
     });
-    ((_0x57ffe5.previewEl = _0x2a6671),
-      (_0x57ffe5.btnEl = createButtonStub()),
-      await _0x1e9e4c._onGenerate.call(_0x57ffe5),
-      assert.equal(_0x57ffe5._isGenerating, false),
-      assert.equal(_0x57ffe5.btnEl.disabled, false),
-      assert.doesNotMatch(_0x57ffe5.btnEl.innerHTML, /animation:spin/),
-      await _0x1e9e4c._onGenerate.call(_0x57ffe5));
-    const _0x47d34f = _0x186988.nodes[_0x25398f];
-    (assert.equal(_0x42d09e, 2),
-      assert.equal(_0x4f91a3, 2),
-      assert.equal(_0x2961b3, 2),
-      assert.equal(_0x57ffe5._isGenerating, false),
-      assert.equal(_0x57ffe5.btnEl.disabled, false),
-      assert.equal(_0x47d34f.isGenerating, false),
-      assert.equal(_0x47d34f.jobStatus, 'success'),
-      assert.equal(_0x47d34f.asyncTaskId, 'grsai-direct-2'),
-      assert.equal(_0x47d34f.asyncTaskStatus, 'success'),
-      assert.equal(_0x47d34f.imageUrl, '/output/grsai-direct-2.png'));
+    ((ctx54.previewEl = value116),
+      (ctx54.btnEl = createButtonStub()),
+      await proto54._onGenerate.call(ctx54),
+      assert.equal(ctx54._isGenerating, false),
+      assert.equal(ctx54.btnEl.disabled, false),
+      assert.doesNotMatch(ctx54.btnEl.innerHTML, /animation:spin/),
+      await proto54._onGenerate.call(ctx54));
+    const value124 = state23.nodes[targetId54];
+    (assert.equal(value117, 2),
+      assert.equal(value118, 2),
+      assert.equal(value119, 2),
+      assert.equal(ctx54._isGenerating, false),
+      assert.equal(ctx54.btnEl.disabled, false),
+      assert.equal(value124.isGenerating, false),
+      assert.equal(value124.jobStatus, 'success'),
+      assert.equal(value124.asyncTaskId, 'grsai-direct-2'),
+      assert.equal(value124.asyncTaskStatus, 'success'),
+      assert.equal(value124.imageUrl, '/output/grsai-direct-2.png'));
   }),
   test('aigenImage task orchestration: RunningHub cancel writes visible interruption message', async () => {
-    const _0x3c98fb = 'node-ai-image-rh-cancel-visible';
-    let _0x55cdc2 = 0;
-    const _0x28ab06 = {
+    const targetId55 = 'node-ai-image-rh-cancel-visible';
+    let value125 = 0;
+    const value126 = {
         signal: { aborted: false },
         abort() {
           this.signal.aborted = true;
         },
       },
       {
-        proto: _0x49822a,
-        ctx: _0x1bfb51,
-        state: _0xf24a59,
+        proto: proto55,
+        ctx: ctx55,
+        state: state24,
       } = createTestContext({
-        targetId: _0x3c98fb,
+        targetId: targetId55,
         nodeData: {
-          id: _0x3c98fb,
+          id: targetId55,
           model: 'runninghub/2041177685895946242',
           provider: 'runninghubwf',
           generationStartTime: 0x3e8,
@@ -2254,66 +2245,66 @@ function createTestContext({
           jobStatus: 'running',
         },
         apiImpl: {
-          cancelRunningHubWorkflowTask: async ({ apiKey: _0x4cd715, taskId: _0x40a0f7 }) => {
+          cancelRunningHubWorkflowTask: async ({ apiKey: apiKey, taskId: taskId }) => {
             return (
-              assert.equal(_0x4cd715, 'k_rh'),
-              assert.equal(_0x40a0f7, 'rh-cancel-visible'),
+              assert.equal(apiKey, 'k_rh'),
+              assert.equal(taskId, 'rh-cancel-visible'),
               { code: 0, msg: 'cancelled by user' }
             );
           },
         },
         stopLoadingImpl: () => {
-          _0x55cdc2 += 1;
+          value125 += 1;
         },
       });
-    ((_0x1bfb51._isGenerating = true),
-      (_0x1bfb51._rhApiKey = 'k_rh'),
-      (_0x1bfb51._rhTaskId = 'rh-cancel-visible'),
-      (_0x1bfb51._rhAbortController = _0x28ab06),
-      (_0x1bfb51.btnEl = createButtonStub()),
-      (_0x1bfb51._updateSubmitButtonState = () => {}),
-      await _0x49822a._cancelRunningHubWorkflowTask.call(_0x1bfb51));
-    const _0x124d17 = _0xf24a59.nodes[_0x3c98fb];
-    (assert.equal(_0x124d17.isGenerating, false),
-      assert.equal(_0x124d17.jobStatus, 'cancelled'),
-      assert.equal(_0x124d17.rhTaskStatus, 'cancelled'),
-      assert.equal(_0x124d17.rhStatusMessage, 'cancelled by user'),
-      assert.equal(_0x124d17.rhStatusCode, 0),
-      assert.equal(_0x124d17.rhTaskRecovering, false),
-      assert.equal(_0x28ab06.signal.aborted, true),
-      assert.equal(_0x55cdc2, 1),
-      assert.equal(_0x1bfb51._isGenerating, false),
-      assert.doesNotMatch(_0x1bfb51.btnEl.innerHTML, /animation:spin/));
+    ((ctx55._isGenerating = true),
+      (ctx55._rhApiKey = 'k_rh'),
+      (ctx55._rhTaskId = 'rh-cancel-visible'),
+      (ctx55._rhAbortController = value126),
+      (ctx55.btnEl = createButtonStub()),
+      (ctx55._updateSubmitButtonState = () => {}),
+      await proto55._cancelRunningHubWorkflowTask.call(ctx55));
+    const value127 = state24.nodes[targetId55];
+    (assert.equal(value127.isGenerating, false),
+      assert.equal(value127.jobStatus, 'cancelled'),
+      assert.equal(value127.rhTaskStatus, 'cancelled'),
+      assert.equal(value127.rhStatusMessage, 'cancelled by user'),
+      assert.equal(value127.rhStatusCode, 0),
+      assert.equal(value127.rhTaskRecovering, false),
+      assert.equal(value126.signal.aborted, true),
+      assert.equal(value125, 1),
+      assert.equal(ctx55._isGenerating, false),
+      assert.doesNotMatch(ctx55.btnEl.innerHTML, /animation:spin/));
   }),
   test('aigenImage task orchestration: unmount aborts local generation polling', () => {
-    const _0x4f6bc4 = 'node-ai-image-unmount-preserves-task',
-      _0x1119cf = {
+    const targetId56 = 'node-ai-image-unmount-preserves-task',
+      value128 = {
         signal: { aborted: false },
         abort() {
           this.signal.aborted = true;
         },
       },
-      { proto: _0x23e759, ctx: _0x21ef59 } = createTestContext({
-        targetId: _0x4f6bc4,
+      { proto: proto56, ctx: ctx56 } = createTestContext({
+        targetId: targetId56,
         nodeData: {
-          id: _0x4f6bc4,
+          id: targetId56,
           model: 'runninghub/2041177685895946242',
           provider: 'runninghubwf',
           isGenerating: true,
           jobStatus: 'running',
         },
       });
-    ((_0x21ef59._rhAbortController = _0x1119cf),
-      _0x23e759.unmount.call(_0x21ef59),
-      assert.equal(_0x1119cf.signal.aborted, true),
-      assert.equal(_0x21ef59._rhAbortController, null));
+    ((ctx56._rhAbortController = value128),
+      proto56.unmount.call(ctx56),
+      assert.equal(value128.signal.aborted, true),
+      assert.equal(ctx56._rhAbortController, null));
   }),
   test('aigenImage task orchestration: RunningHub NanoBanana 自适应无参考图时按显示区 1600x900 映射 16:9', async () => {
-    const _0x26bdd8 = 'node-ai-image-rh-nano-1',
-      { proto: _0x1e0b88, ctx: _0x4bd3a0 } = createTestContext({
-        targetId: _0x26bdd8,
+    const targetId57 = 'node-ai-image-rh-nano-1',
+      { proto: proto57, ctx: ctx57 } = createTestContext({
+        targetId: targetId57,
         nodeData: {
-          id: _0x26bdd8,
+          id: targetId57,
           model: 'runninghub-model/rhart-image-v1',
           provider: 'runninghub',
           aspectRatio: '自适应',
@@ -2325,15 +2316,15 @@ function createTestContext({
         nodes: {},
         incomingEdges: [],
       }),
-      _0x1f7361 = await _0x1e0b88._buildPayload.call(_0x4bd3a0);
-    (assert.equal(_0x1f7361.provider, 'runninghub'), assert.equal(_0x1f7361.aspectRatio, '16:9'));
+      value129 = await proto57._buildPayload.call(ctx57);
+    (assert.equal(value129.provider, 'runninghub'), assert.equal(value129.aspectRatio, '16:9'));
   }),
   test('aigenImage task orchestration: RunningHub NanoBanana 自适应无参考图时非标准 1700x900 就近映射 16:9', async () => {
-    const _0xbc0e97 = 'node-ai-image-rh-nano-2',
-      { proto: _0x4ae185, ctx: _0x221fc0 } = createTestContext({
-        targetId: _0xbc0e97,
+    const targetId58 = 'node-ai-image-rh-nano-2',
+      { proto: proto58, ctx: ctx58 } = createTestContext({
+        targetId: targetId58,
         nodeData: {
-          id: _0xbc0e97,
+          id: targetId58,
           model: 'runninghub-model/rhart-image-v1-official',
           provider: 'runninghub',
           aspectRatio: 'auto',
@@ -2345,15 +2336,15 @@ function createTestContext({
         nodes: {},
         incomingEdges: [],
       }),
-      _0x4e5780 = await _0x4ae185._buildPayload.call(_0x221fc0);
-    (assert.equal(_0x4e5780.provider, 'runninghub'), assert.equal(_0x4e5780.aspectRatio, '16:9'));
+      value130 = await proto58._buildPayload.call(ctx58);
+    (assert.equal(value130.provider, 'runninghub'), assert.equal(value130.aspectRatio, '16:9'));
   }),
   test('aigenImage task orchestration: RunningHub GPT image 2 official 使用扩展比例', async () => {
-    const _0x5d32a6 = 'node-ai-image-rh-gpt2-official',
-      { proto: _0x457c17, ctx: _0x30979c } = createTestContext({
-        targetId: _0x5d32a6,
+    const targetId59 = 'node-ai-image-rh-gpt2-official',
+      { proto: proto59, ctx: ctx59 } = createTestContext({
+        targetId: targetId59,
         nodeData: {
-          id: _0x5d32a6,
+          id: targetId59,
           model: 'runninghub-model/rhart-image-g-2-official',
           provider: 'runninghub',
           aspectRatio: '1:8',
@@ -2365,17 +2356,17 @@ function createTestContext({
         nodes: {},
         incomingEdges: [],
       }),
-      _0x3aa28d = await _0x457c17._buildPayload.call(_0x30979c);
-    (assert.equal(_0x3aa28d.provider, 'runninghub'),
-      assert.equal(_0x3aa28d.model, 'runninghub-model/rhart-image-g-2-official'),
-      assert.equal(_0x3aa28d.aspectRatio, '9:21'));
+      value131 = await proto59._buildPayload.call(ctx59);
+    (assert.equal(value131.provider, 'runninghub'),
+      assert.equal(value131.model, 'runninghub-model/rhart-image-g-2-official'),
+      assert.equal(value131.aspectRatio, '9:21'));
   }),
   test('aigenImage task orchestration: RunningHub GPT image 2 official 保留 1K', async () => {
-    const _0x5bc4b2 = 'node-ai-image-rh-gpt2-official-1k',
-      { proto: _0x223737, ctx: _0x132dc5 } = createTestContext({
-        targetId: _0x5bc4b2,
+    const targetId60 = 'node-ai-image-rh-gpt2-official-1k',
+      { proto: proto60, ctx: ctx60 } = createTestContext({
+        targetId: targetId60,
         nodeData: {
-          id: _0x5bc4b2,
+          id: targetId60,
           model: 'runninghub-model/rhart-image-g-2-official',
           provider: 'runninghub',
           aspectRatio: '1:1',
@@ -2387,18 +2378,18 @@ function createTestContext({
         nodes: {},
         incomingEdges: [],
       }),
-      _0x1079b6 = await _0x223737._buildPayload.call(_0x132dc5);
-    (assert.equal(_0x1079b6.provider, 'runninghub'),
-      assert.equal(_0x1079b6.model, 'runninghub-model/rhart-image-g-2-official'),
-      assert.equal(_0x1079b6.imageSize, '1K'),
-      assert.equal(_0x1079b6.aspectRatio, '1:1'));
+      value132 = await proto60._buildPayload.call(ctx60);
+    (assert.equal(value132.provider, 'runninghub'),
+      assert.equal(value132.model, 'runninghub-model/rhart-image-g-2-official'),
+      assert.equal(value132.imageSize, '1K'),
+      assert.equal(value132.aspectRatio, '1:1'));
   }),
   test('aigenImage task orchestration: 非 NanoBanana 模型自适应无参考图按显示区域映射', async () => {
-    const _0xc675c4 = 'node-ai-image-non-nano-1',
-      { proto: _0x1e4d69, ctx: _0x45a1c1 } = createTestContext({
-        targetId: _0xc675c4,
+    const targetId61 = 'node-ai-image-non-nano-1',
+      { proto: proto61, ctx: ctx61 } = createTestContext({
+        targetId: targetId61,
         nodeData: {
-          id: _0xc675c4,
+          id: targetId61,
           model: 'ppio/seedream-5.0-lite',
           provider: 'ppio',
           aspectRatio: '自适应',
@@ -2410,11 +2401,11 @@ function createTestContext({
         nodes: {},
         incomingEdges: [],
       }),
-      _0x4a3b18 = await _0x1e4d69._buildPayload.call(_0x45a1c1);
-    (assert.equal(_0x4a3b18.provider, 'ppio'), assert.equal(_0x4a3b18.aspectRatio, '16:9'));
+      value133 = await proto61._buildPayload.call(ctx61);
+    (assert.equal(value133.provider, 'ppio'), assert.equal(value133.aspectRatio, '16:9'));
   }),
   test('aigenImage task orchestration: _buildResumePayload 按模型前缀推断 provider 与 key', async () => {
-    const _0x6a4127 = {
+    const value134 = {
         runninghub: { apiKey: 'k_runninghub', modelApiKey: 'k_runninghub_model' },
         runninghubwf: { apiKey: 'k_runninghub_wf' },
         dreamina: { apiKey: 'k_dreamina' },
@@ -2422,7 +2413,7 @@ function createTestContext({
         apimart: { apiKey: 'k_apimart' },
         grsai: { apiKey: 'k_grsai' },
       },
-      _0x3c0c54 = [
+      value135 = [
         {
           name: 'runninghub-model 使用 modelApiKey',
           model: 'runninghub-model/rhart-image-v1',
@@ -2461,27 +2452,27 @@ function createTestContext({
           expectedApiKey: 'k_grsai',
         },
       ];
-    for (const _0x125cb5 of _0x3c0c54) {
-      const { proto: _0x1c1948, ctx: _0x21ae6d } = createTestContext({
-          targetId: 'node-ai-image-model-resume-' + _0x125cb5.expectedProvider,
+    for (const model3 of value135) {
+      const { proto: proto62, ctx: ctx62 } = createTestContext({
+          targetId: 'node-ai-image-model-resume-' + model3.expectedProvider,
           nodeData: {
-            id: 'node-ai-image-model-resume-' + _0x125cb5.expectedProvider,
-            model: _0x125cb5.model,
+            id: 'node-ai-image-model-resume-' + model3.expectedProvider,
+            model: model3.model,
             provider: '',
             imageSize: '2K',
             batchSize: 1,
           },
-          getProviderConfigImpl: (_0x551dd1) => _0x6a4127[_0x551dd1] || {},
-          isRunninghubWorkflowModelImpl: () => _0x125cb5.isWorkflow === true,
+          getProviderConfigImpl: (value136) => value134[value136] || {},
+          isRunninghubWorkflowModelImpl: () => model3.isWorkflow === true,
         }),
-        _0x3cb07a = await _0x1c1948._buildResumePayload.call(_0x21ae6d, _0x21ae6d._data);
-      (assert.equal(_0x3cb07a.provider, _0x125cb5.expectedProvider, _0x125cb5.name),
-        assert.equal(_0x3cb07a.apiKey, _0x125cb5.expectedApiKey, _0x125cb5.name),
-        assert.equal(_0x3cb07a.model, _0x125cb5.expectedModel || _0x125cb5.model, _0x125cb5.name));
+        value137 = await proto62._buildResumePayload.call(ctx62, ctx62._data);
+      (assert.equal(value137.provider, model3.expectedProvider, model3.name),
+        assert.equal(value137.apiKey, model3.expectedApiKey, model3.name),
+        assert.equal(value137.model, model3.expectedModel || model3.model, model3.name));
     }
   }),
   test('aigenImage task orchestration: RunningHub model API payload does not use workflow key', async () => {
-    const { proto: _0xbc7bf0, ctx: _0x497cf1 } = createTestContext({
+    const { proto: proto63, ctx: ctx63 } = createTestContext({
         targetId: 'node-ai-image-runninghub-model-no-key-fallback',
         nodeData: {
           id: 'node-ai-image-runninghub-model-no-key-fallback',
@@ -2492,14 +2483,14 @@ function createTestContext({
           batchSize: 1,
         },
         promptText: 'prompt',
-        getProviderConfigImpl: (_0x59f15b) =>
-          _0x59f15b === 'runninghub' ? { apiKey: 'k_runninghub_workflow_only' } : {},
+        getProviderConfigImpl: (value138) =>
+          value138 === 'runninghub' ? { apiKey: 'k_runninghub_workflow_only' } : {},
       }),
-      _0x2967ea = await _0xbc7bf0._buildPayload.call(_0x497cf1);
-    (assert.equal(_0x2967ea.provider, 'runninghub'), assert.equal(_0x2967ea.apiKey, ''));
+      value139 = await proto63._buildPayload.call(ctx63);
+    (assert.equal(value139.provider, 'runninghub'), assert.equal(value139.apiKey, ''));
   }),
   test('aigenImage task orchestration: 模型族恢复分类稳定', () => {
-    const { proto: _0x1038f6, ctx: _0x405c13 } = createTestContext({
+    const { proto: proto64, ctx: ctx64 } = createTestContext({
       targetId: 'node-ai-image-recovery-matrix',
       nodeData: {
         id: 'node-ai-image-recovery-matrix',
@@ -2508,10 +2499,10 @@ function createTestContext({
         imageSize: '2K',
         batchSize: 1,
       },
-      isRunninghubWorkflowModelImpl: (_0x395f4e) => String(_0x395f4e || '').startsWith('runninghub/'),
+      isRunninghubWorkflowModelImpl: (value140) => String(value140 || '').startsWith('runninghub/'),
     });
     (assert.equal(
-      _0x1038f6._isRunningHubRecoverableRunningTask.call(_0x405c13, {
+      proto64._isRunningHubRecoverableRunningTask.call(ctx64, {
         model: 'runninghub-model/rhart-image-v1',
         provider: 'runninghub',
         rhTaskId: 'rh-task-1',
@@ -2520,7 +2511,7 @@ function createTestContext({
       true,
     ),
       assert.equal(
-        _0x1038f6._isRunningHubRecoverableRunningTask.call(_0x405c13, {
+        proto64._isRunningHubRecoverableRunningTask.call(ctx64, {
           model: 'runninghub/2041177685895946242',
           provider: '',
           rhTaskId: 'rh-task-2',
@@ -2529,7 +2520,7 @@ function createTestContext({
         true,
       ),
       assert.equal(
-        _0x1038f6._isRunningHubRecoverableRunningTask.call(_0x405c13, {
+        proto64._isRunningHubRecoverableRunningTask.call(ctx64, {
           model: 'runninghub-model/rhart-image-v1',
           provider: 'runninghub',
           rhTaskId: 'rh-task-3',
@@ -2538,7 +2529,7 @@ function createTestContext({
         false,
       ),
       assert.equal(
-        _0x1038f6._isDreaminaRecoverableRunningTask.call(_0x405c13, {
+        proto64._isDreaminaRecoverableRunningTask.call(ctx64, {
           model: 'dreamina/4.5',
           provider: 'dreamina',
           dreaminaSubmitId: 'dm-task-1',
@@ -2548,7 +2539,7 @@ function createTestContext({
         true,
       ),
       assert.equal(
-        _0x1038f6._isDreaminaRecoverableRunningTask.call(_0x405c13, {
+        proto64._isDreaminaRecoverableRunningTask.call(ctx64, {
           model: 'dreamina/4.5',
           provider: 'dreamina',
           dreaminaSubmitId: 'dm-task-2',
@@ -2558,7 +2549,7 @@ function createTestContext({
         false,
       ),
       assert.equal(
-        _0x1038f6._isDreaminaRecoverableRunningTask.call(_0x405c13, {
+        proto64._isDreaminaRecoverableRunningTask.call(ctx64, {
           model: 'dreamina/4.5',
           provider: 'dreamina',
           dreaminaSubmitId: 'dm-task-error',
@@ -2569,7 +2560,7 @@ function createTestContext({
         false,
       ),
       assert.equal(
-        _0x1038f6._isDreaminaRecoverableRunningTask.call(_0x405c13, {
+        proto64._isDreaminaRecoverableRunningTask.call(ctx64, {
           model: 'dreamina/4.5',
           provider: 'dreamina',
           dreaminaSubmitId: 'dm-task-status-error',
@@ -2579,7 +2570,7 @@ function createTestContext({
         false,
       ),
       assert.equal(
-        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+        proto64._isAsyncRecoverableRunningTask.call(ctx64, {
           model: 'ppio/seedream-5.0-lite',
           asyncTaskProvider: 'ppio',
           asyncTaskKind: 'image',
@@ -2589,7 +2580,7 @@ function createTestContext({
         true,
       ),
       assert.equal(
-        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+        proto64._isAsyncRecoverableRunningTask.call(ctx64, {
           model: 'apimart/flux-kontext-pro',
           asyncTaskProvider: 'apimart',
           asyncTaskKind: 'image',
@@ -2599,7 +2590,7 @@ function createTestContext({
         true,
       ),
       assert.equal(
-        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+        proto64._isAsyncRecoverableRunningTask.call(ctx64, {
           model: 'runninghub-model/rhart-image-v1',
           asyncTaskProvider: 'runninghub',
           asyncTaskKind: 'image',
@@ -2609,7 +2600,7 @@ function createTestContext({
         false,
       ),
       assert.equal(
-        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+        proto64._isAsyncRecoverableRunningTask.call(ctx64, {
           model: 'grsai/seedream-4.0',
           asyncTaskProvider: 'grsai',
           asyncTaskKind: 'image',
@@ -2619,7 +2610,7 @@ function createTestContext({
         true,
       ),
       assert.equal(
-        _0x1038f6._isAsyncRecoverableRunningTask.call(_0x405c13, {
+        proto64._isAsyncRecoverableRunningTask.call(ctx64, {
           model: 'ppio/seedream-5.0-lite',
           asyncTaskProvider: 'ppio',
           asyncTaskKind: 'video',
@@ -2630,12 +2621,12 @@ function createTestContext({
       ));
   }),
   test('aigenImage task orchestration: RunningHub 工作流模型可空提示词生成', async () => {
-    const _0x45e9e0 = 'node-ai-image-rh-workflow-empty-prompt',
-      _0x2e46d2 = { runninghubwf: { apiKey: 'k_runninghub_wf' } },
-      { proto: _0x27725d, ctx: _0x33f0fc } = createTestContext({
-        targetId: _0x45e9e0,
+    const targetId62 = 'node-ai-image-rh-workflow-empty-prompt',
+      value141 = { runninghubwf: { apiKey: 'k_runninghub_wf' } },
+      { proto: proto65, ctx: ctx65 } = createTestContext({
+        targetId: targetId62,
         nodeData: {
-          id: _0x45e9e0,
+          id: targetId62,
           model: 'runninghub/2050306122774532097',
           provider: '',
           aspectRatio: '1:1',
@@ -2650,30 +2641,30 @@ function createTestContext({
           },
         },
         incomingEdges: [
-          { id: 'edge-rh-workflow-ref', sourceId: 'node-rh-workflow-ref', targetId: _0x45e9e0, refSlot: '' },
+          { id: 'edge-rh-workflow-ref', sourceId: 'node-rh-workflow-ref', targetId: targetId62, refSlot: '' },
         ],
         promptText: '',
-        getProviderConfigImpl: (_0x2a9fc5) => _0x2e46d2[_0x2a9fc5] || {},
-        isRunninghubWorkflowModelImpl: (_0x48ca45) => _0x48ca45 === 'runninghub/2050306122774532097',
+        getProviderConfigImpl: (value142) => value141[value142] || {},
+        isRunninghubWorkflowModelImpl: (value143) => value143 === 'runninghub/2050306122774532097',
       }),
-      _0x9a5ad3 = await _0x27725d._buildPayload.call(_0x33f0fc);
-    (assert.ok(_0x9a5ad3),
-      assert.equal(_0x9a5ad3.provider, 'runninghubwf'),
-      assert.equal(_0x9a5ad3.apiKey, 'k_runninghub_wf'),
-      assert.equal(_0x9a5ad3.prompt, ''));
+      value144 = await proto65._buildPayload.call(ctx65);
+    (assert.ok(value144),
+      assert.equal(value144.provider, 'runninghubwf'),
+      assert.equal(value144.apiKey, 'k_runninghub_wf'),
+      assert.equal(value144.prompt, ''));
   }),
   test('aigenImage task orchestration: Qwen image edit requires at least one reference image', async () => {
-    const _0x4887fc = 'node-ai-image-qwen-edit-no-ref',
-      _0x43c593 = globalThis.window.showToast,
-      _0x563283 = [];
-    globalThis.window.showToast = (_0x8e52ee, _0x408d04) => {
-      _0x563283.push({ message: _0x8e52ee, type: _0x408d04 });
+    const targetId63 = 'node-ai-image-qwen-edit-no-ref',
+      value145 = globalThis.window.showToast,
+      list7 = [];
+    globalThis.window.showToast = (message3, type3) => {
+      list7.push({ message: message3, type: type3 });
     };
     try {
-      const { proto: _0x74c9f4, ctx: _0x4ff723 } = createTestContext({
-          targetId: _0x4887fc,
+      const { proto: proto66, ctx: ctx66 } = createTestContext({
+          targetId: targetId63,
           nodeData: {
-            id: _0x4887fc,
+            id: targetId63,
             model: 'runninghub/2050306122774532097',
             provider: 'runninghubwf',
             aspectRatio: '16:9',
@@ -2682,35 +2673,35 @@ function createTestContext({
           },
           promptText: 'edit',
           incomingEdges: [],
-          isRunninghubWorkflowModelImpl: (_0x28ebbe) => String(_0x28ebbe || '').startsWith('runninghub/'),
+          isRunninghubWorkflowModelImpl: (value146) => String(value146 || '').startsWith('runninghub/'),
         }),
-        _0x58d18c = await _0x74c9f4._buildPayload.call(_0x4ff723);
-      (assert.equal(_0x58d18c, null),
-        assert.deepEqual(_0x563283, [{ message: '请先添加至少一张参考图再生成', type: 'warn' }]));
+        value147 = await proto66._buildPayload.call(ctx66);
+      (assert.equal(value147, null),
+        assert.deepEqual(list7, [{ message: '请先添加至少一张参考图再生成', type: 'warn' }]));
     } finally {
-      globalThis.window.showToast = _0x43c593;
+      globalThis.window.showToast = value145;
     }
   }),
   test('aigenImage task orchestration: Qwen image edit reads schema params and normalizes unsupported 4K size', async () => {
-    const _0x5edc50 = 'node-ai-image-qwen-edit-defaults',
-      _0x3f9024 = ['qwen-ref-1', 'qwen-ref-2', 'qwen-ref-3', 'qwen-ref-4'],
-      _0x309950 = Object.fromEntries(
-        _0x3f9024.map((_0x4edbf5, _0x26e516) => [
-          _0x4edbf5,
+    const targetId64 = 'node-ai-image-qwen-edit-defaults',
+      incomingEdges2 = ['qwen-ref-1', 'qwen-ref-2', 'qwen-ref-3', 'qwen-ref-4'],
+      nodes2 = Object.fromEntries(
+        incomingEdges2.map((id27, value148) => [
+          id27,
           {
-            id: _0x4edbf5,
+            id: id27,
             type: 'source-image',
-            originalLocalPath: 'data/uploads/qwen-' + (_0x26e516 + 1) + '.png',
+            originalLocalPath: 'data/uploads/qwen-' + (value148 + 1) + '.png',
             width: 0x640,
             height: 0x384,
           },
         ]),
       ),
-      _0x3448a6 = { runninghubwf: { apiKey: 'k_runninghub_wf' } },
-      { proto: _0x47acbf, ctx: _0x2d0bd6 } = createTestContext({
-        targetId: _0x5edc50,
+      value149 = { runninghubwf: { apiKey: 'k_runninghub_wf' } },
+      { proto: proto67, ctx: ctx67 } = createTestContext({
+        targetId: targetId64,
         nodeData: {
-          id: _0x5edc50,
+          id: targetId64,
           model: 'runninghub/2050306122774532097',
           provider: 'runninghubwf',
           aspectRatio: '16:9',
@@ -2723,179 +2714,179 @@ function createTestContext({
             rhQwenFirstImageMode: 'depth',
           },
         },
-        nodes: _0x309950,
-        incomingEdges: _0x3f9024.map((_0x5302d8, _0x37b587) => ({
-          id: 'edge-qwen-' + (_0x37b587 + 1),
-          sourceId: _0x5302d8,
-          targetId: _0x5edc50,
+        nodes: nodes2,
+        incomingEdges: incomingEdges2.map((sourceId, value150) => ({
+          id: 'edge-qwen-' + (value150 + 1),
+          sourceId: sourceId,
+          targetId: targetId64,
         })),
         promptText: 'keep identity',
-        getProviderConfigImpl: (_0x3cc751) => _0x3448a6[_0x3cc751] || {},
-        isRunninghubWorkflowModelImpl: (_0x283887) => String(_0x283887 || '').startsWith('runninghub/'),
+        getProviderConfigImpl: (value151) => value149[value151] || {},
+        isRunninghubWorkflowModelImpl: (value152) => String(value152 || '').startsWith('runninghub/'),
       }),
-      _0x9e9dd2 = await _0x47acbf._buildPayload.call(_0x2d0bd6);
-    (assert.ok(_0x9e9dd2),
-      assert.equal(_0x9e9dd2.provider, 'runninghubwf'),
-      assert.equal(_0x9e9dd2.model, 'runninghub/2050306122774532097'),
-      assert.equal(_0x9e9dd2.apiKey, 'k_runninghub_wf'),
-      assert.equal(_0x9e9dd2.prompt, 'keep identity'),
-      assert.equal(_0x9e9dd2.imageSize, '2K'),
-      assert.equal(_0x9e9dd2.aspectRatio, '16:9'),
-      assert.equal(_0x9e9dd2.batchSize, 1),
-      assert.equal(_0x9e9dd2.ratioCapability, 'dimensions'),
-      assert.equal(_0x9e9dd2.rhInstanceType, 'plus'),
-      assert.equal(_0x9e9dd2.rhQwenEditMode, 'qwen2509'),
-      assert.equal(_0x9e9dd2.rhQwenFirstImageMode, 'depth'),
-      assert.deepEqual(_0x9e9dd2.inputUrls, [
+      value153 = await proto67._buildPayload.call(ctx67);
+    (assert.ok(value153),
+      assert.equal(value153.provider, 'runninghubwf'),
+      assert.equal(value153.model, 'runninghub/2050306122774532097'),
+      assert.equal(value153.apiKey, 'k_runninghub_wf'),
+      assert.equal(value153.prompt, 'keep identity'),
+      assert.equal(value153.imageSize, '2K'),
+      assert.equal(value153.aspectRatio, '16:9'),
+      assert.equal(value153.batchSize, 1),
+      assert.equal(value153.ratioCapability, 'dimensions'),
+      assert.equal(value153.rhInstanceType, 'plus'),
+      assert.equal(value153.rhQwenEditMode, 'qwen2509'),
+      assert.equal(value153.rhQwenFirstImageMode, 'depth'),
+      assert.deepEqual(value153.inputUrls, [
         '/data/uploads/qwen-1.png',
         '/data/uploads/qwen-2.png',
         '/data/uploads/qwen-3.png',
       ]));
   }),
   test('aigenImage task orchestration: GRSAI NanobananaPRO legacy VIP/4K uses supported payload', async () => {
-    const _0x381263 = async ({
-      imageSize: _0x58f16b,
-      model: _0x4ccf1,
-      expectedModel: expectedModel = _0x4ccf1,
+    const run3 = async ({
+      imageSize: imageSize,
+      model: model4,
+      expectedModel: expectedModel = model4,
       expectedMode: expectedMode = 'vip',
       expectedImageSize: expectedImageSize = '2K',
     }) => {
-      const _0x23866b = 'node-ai-image-nb-pro-vip-' + _0x58f16b + '-' + _0x4ccf1,
-        { proto: _0x144511, ctx: _0x38e6ad } = createTestContext({
-          targetId: _0x23866b,
+      const targetId65 = 'node-ai-image-nb-pro-vip-' + imageSize + '-' + model4,
+        { proto: proto68, ctx: ctx68 } = createTestContext({
+          targetId: targetId65,
           nodeData: {
-            id: _0x23866b,
-            model: _0x4ccf1,
+            id: targetId65,
+            model: model4,
             provider: 'grsai',
             aspectRatio: '1:1',
-            imageSize: _0x58f16b,
+            imageSize: imageSize,
             batchSize: 1,
           },
         }),
-        _0x31a6e1 = await _0x144511._buildPayload.call(_0x38e6ad),
-        _0x5a5879 = await _0x144511._buildResumePayload.call(_0x38e6ad, _0x38e6ad._data);
-      (assert.equal(_0x31a6e1.model, expectedModel),
-        assert.equal(_0x5a5879.model, expectedModel),
-        assert.equal(_0x31a6e1.provider, 'grsai'),
-        assert.equal(_0x5a5879.provider, 'grsai'),
-        assert.equal(_0x31a6e1.mode, expectedMode),
-        assert.equal(_0x31a6e1.imageSize, expectedImageSize),
-        assert.equal(Object.prototype.hasOwnProperty.call(_0x5a5879, 'mode'), false));
+        value154 = await proto68._buildPayload.call(ctx68),
+        value155 = await proto68._buildResumePayload.call(ctx68, ctx68._data);
+      (assert.equal(value154.model, expectedModel),
+        assert.equal(value155.model, expectedModel),
+        assert.equal(value154.provider, 'grsai'),
+        assert.equal(value155.provider, 'grsai'),
+        assert.equal(value154.mode, expectedMode),
+        assert.equal(value154.imageSize, expectedImageSize),
+        assert.equal(Object.prototype.hasOwnProperty.call(value155, 'mode'), false));
     };
-    (await _0x381263({ imageSize: '2K', model: 'nano-banana-pro-vip' }),
-      await _0x381263({ imageSize: '4K', model: 'nano-banana-pro-vip' }),
-      await _0x381263({ imageSize: '2K', model: 'nano-banana-pro-4k-vip', expectedImageSize: '4K' }));
+    (await run3({ imageSize: '2K', model: 'nano-banana-pro-vip' }),
+      await run3({ imageSize: '4K', model: 'nano-banana-pro-vip' }),
+      await run3({ imageSize: '2K', model: 'nano-banana-pro-4k-vip', expectedImageSize: '4K' }));
   }),
   test('aigenImage task orchestration: GRSAI Nanobanana2 CL keeps CL and disables 4K payload', async () => {
-    const _0x447da4 = async ({
-      imageSize: _0x2c1e12,
-      model: _0x4405a6,
-      expectedModel: expectedModel = _0x4405a6,
+    const run4 = async ({
+      imageSize: imageSize2,
+      model: model5,
+      expectedModel: expectedModel = model5,
       expectedMode: expectedMode = 'cl',
       expectedImageSize: expectedImageSize = '2K',
     }) => {
-      const _0x40aa68 = 'node-ai-image-nb2-cl-' + _0x2c1e12 + '-' + _0x4405a6,
-        { proto: _0x424647, ctx: _0x173b9c } = createTestContext({
-          targetId: _0x40aa68,
+      const targetId66 = 'node-ai-image-nb2-cl-' + imageSize2 + '-' + model5,
+        { proto: proto69, ctx: ctx69 } = createTestContext({
+          targetId: targetId66,
           nodeData: {
-            id: _0x40aa68,
-            model: _0x4405a6,
+            id: targetId66,
+            model: model5,
             provider: 'grsai',
             aspectRatio: '1:1',
-            imageSize: _0x2c1e12,
+            imageSize: imageSize2,
             batchSize: 1,
           },
         }),
-        _0x2f0f9a = await _0x424647._buildPayload.call(_0x173b9c),
-        _0x4c84c0 = await _0x424647._buildResumePayload.call(_0x173b9c, _0x173b9c._data);
-      (assert.equal(_0x2f0f9a.model, expectedModel),
-        assert.equal(_0x4c84c0.model, expectedModel),
-        assert.equal(_0x2f0f9a.provider, 'grsai'),
-        assert.equal(_0x4c84c0.provider, 'grsai'),
-        assert.equal(_0x2f0f9a.mode, expectedMode),
-        assert.equal(_0x2f0f9a.imageSize, expectedImageSize),
-        assert.equal(Object.prototype.hasOwnProperty.call(_0x4c84c0, 'mode'), false));
+        value156 = await proto69._buildPayload.call(ctx69),
+        value157 = await proto69._buildResumePayload.call(ctx69, ctx69._data);
+      (assert.equal(value156.model, expectedModel),
+        assert.equal(value157.model, expectedModel),
+        assert.equal(value156.provider, 'grsai'),
+        assert.equal(value157.provider, 'grsai'),
+        assert.equal(value156.mode, expectedMode),
+        assert.equal(value156.imageSize, expectedImageSize),
+        assert.equal(Object.prototype.hasOwnProperty.call(value157, 'mode'), false));
     };
-    (await _0x447da4({ imageSize: '2K', model: 'nano-banana-2-cl' }),
-      await _0x447da4({ imageSize: '4K', model: 'nano-banana-2-cl' }),
-      await _0x447da4({ imageSize: '2K', model: 'nano-banana-2-4k-cl', expectedImageSize: '4K' }));
+    (await run4({ imageSize: '2K', model: 'nano-banana-2-cl' }),
+      await run4({ imageSize: '4K', model: 'nano-banana-2-cl' }),
+      await run4({ imageSize: '2K', model: 'nano-banana-2-4k-cl', expectedImageSize: '4K' }));
   }),
   test('aigenImage task orchestration: manifest GRSAI nano-banana-2 passes mode selector and normalizes 4K', async () => {
-    const _0x9c78d2 = async ({
-      imageSize: _0x3229c8,
-      mode: _0x353154,
-      expectedMode: expectedMode = _0x353154,
-      expectedImageSize: expectedImageSize = _0x3229c8,
+    const run5 = async ({
+      imageSize: imageSize3,
+      mode: mode,
+      expectedMode: expectedMode = mode,
+      expectedImageSize: expectedImageSize = imageSize3,
     }) => {
-      const _0x108d44 = 'node-ai-image-grsai-manifest-mode-' + _0x3229c8 + '-' + _0x353154,
-        { proto: _0x13a1d0, ctx: _0x59b236 } = createTestContext({
-          targetId: _0x108d44,
+      const targetId67 = 'node-ai-image-grsai-manifest-mode-' + imageSize3 + '-' + mode,
+        { proto: proto70, ctx: ctx70 } = createTestContext({
+          targetId: targetId67,
           nodeData: {
-            id: _0x108d44,
+            id: targetId67,
             model: 'nano-banana-2',
             provider: 'grsai',
-            generationParams: { imageSize: _0x3229c8, aspectRatio: '1:1', mode: _0x353154 },
+            generationParams: { imageSize: imageSize3, aspectRatio: '1:1', mode: mode },
             batchSize: 1,
           },
         }),
-        _0x278ce3 = await _0x13a1d0._buildPayload.call(_0x59b236),
-        _0x21c5df = await _0x13a1d0._buildResumePayload.call(_0x59b236, _0x59b236._data);
-      (assert.equal(_0x278ce3.model, 'nano-banana-2'),
-        assert.equal(_0x21c5df.model, 'nano-banana-2'),
-        assert.equal(_0x278ce3.provider, 'grsai'),
-        assert.equal(_0x21c5df.provider, 'grsai'),
-        assert.equal(_0x278ce3.mode, expectedMode),
-        assert.equal(_0x278ce3.imageSize, expectedImageSize),
-        assert.equal(Object.prototype.hasOwnProperty.call(_0x21c5df, 'mode'), false));
+        value158 = await proto70._buildPayload.call(ctx70),
+        value159 = await proto70._buildResumePayload.call(ctx70, ctx70._data);
+      (assert.equal(value158.model, 'nano-banana-2'),
+        assert.equal(value159.model, 'nano-banana-2'),
+        assert.equal(value158.provider, 'grsai'),
+        assert.equal(value159.provider, 'grsai'),
+        assert.equal(value158.mode, expectedMode),
+        assert.equal(value158.imageSize, expectedImageSize),
+        assert.equal(Object.prototype.hasOwnProperty.call(value159, 'mode'), false));
     };
-    (await _0x9c78d2({ imageSize: '2K', mode: 'normal' }),
-      await _0x9c78d2({ imageSize: '2K', mode: 'cl' }),
-      await _0x9c78d2({ imageSize: '4K', mode: 'cl' }),
-      await _0x9c78d2({ imageSize: '4K', mode: 'normal', expectedImageSize: '2K' }));
+    (await run5({ imageSize: '2K', mode: 'normal' }),
+      await run5({ imageSize: '2K', mode: 'cl' }),
+      await run5({ imageSize: '4K', mode: 'cl' }),
+      await run5({ imageSize: '4K', mode: 'normal', expectedImageSize: '2K' }));
   }),
   test('aigenImage task orchestration: manifest GRSAI pro modes keep VT/CL/VIP and normalize 4K', async () => {
-    const _0xbbc9df = async ({
-      imageSize: _0x274013,
-      mode: _0x32fc18,
-      expectedMode: expectedMode = _0x32fc18,
-      expectedImageSize: expectedImageSize = _0x274013,
+    const run6 = async ({
+      imageSize: imageSize4,
+      mode: mode2,
+      expectedMode: expectedMode = mode2,
+      expectedImageSize: expectedImageSize = imageSize4,
     }) => {
-      const _0x44710f = 'node-ai-image-grsai-pro-manifest-mode-' + _0x274013 + '-' + _0x32fc18,
-        { proto: _0x480fbd, ctx: _0x52d467 } = createTestContext({
-          targetId: _0x44710f,
+      const targetId68 = 'node-ai-image-grsai-pro-manifest-mode-' + imageSize4 + '-' + mode2,
+        { proto: proto71, ctx: ctx71 } = createTestContext({
+          targetId: targetId68,
           nodeData: {
-            id: _0x44710f,
+            id: targetId68,
             model: 'nano-banana-pro',
             provider: 'grsai',
-            generationParams: { imageSize: _0x274013, aspectRatio: '1:1', mode: _0x32fc18 },
+            generationParams: { imageSize: imageSize4, aspectRatio: '1:1', mode: mode2 },
             batchSize: 1,
           },
         }),
-        _0x4eeb64 = await _0x480fbd._buildPayload.call(_0x52d467),
-        _0x46806f = await _0x480fbd._buildResumePayload.call(_0x52d467, _0x52d467._data);
-      (assert.equal(_0x4eeb64.model, 'nano-banana-pro'),
-        assert.equal(_0x46806f.model, 'nano-banana-pro'),
-        assert.equal(_0x4eeb64.provider, 'grsai'),
-        assert.equal(_0x46806f.provider, 'grsai'),
-        assert.equal(_0x4eeb64.mode, expectedMode),
-        assert.equal(_0x4eeb64.imageSize, expectedImageSize),
-        assert.equal(Object.prototype.hasOwnProperty.call(_0x46806f, 'mode'), false));
+        value160 = await proto71._buildPayload.call(ctx71),
+        value161 = await proto71._buildResumePayload.call(ctx71, ctx71._data);
+      (assert.equal(value160.model, 'nano-banana-pro'),
+        assert.equal(value161.model, 'nano-banana-pro'),
+        assert.equal(value160.provider, 'grsai'),
+        assert.equal(value161.provider, 'grsai'),
+        assert.equal(value160.mode, expectedMode),
+        assert.equal(value160.imageSize, expectedImageSize),
+        assert.equal(Object.prototype.hasOwnProperty.call(value161, 'mode'), false));
     };
-    (await _0xbbc9df({ imageSize: '2K', mode: 'normal' }),
-      await _0xbbc9df({ imageSize: '2K', mode: 'vt' }),
-      await _0xbbc9df({ imageSize: '2K', mode: 'cl' }),
-      await _0xbbc9df({ imageSize: '2K', mode: 'vip' }),
-      await _0xbbc9df({ imageSize: '4K', mode: 'vip' }),
-      await _0xbbc9df({ imageSize: '4K', mode: 'normal', expectedImageSize: '2K' }),
-      await _0xbbc9df({ imageSize: '4K', mode: 'vt', expectedImageSize: '2K' }),
-      await _0xbbc9df({ imageSize: '4K', mode: 'cl', expectedImageSize: '2K' }));
+    (await run6({ imageSize: '2K', mode: 'normal' }),
+      await run6({ imageSize: '2K', mode: 'vt' }),
+      await run6({ imageSize: '2K', mode: 'cl' }),
+      await run6({ imageSize: '2K', mode: 'vip' }),
+      await run6({ imageSize: '4K', mode: 'vip' }),
+      await run6({ imageSize: '4K', mode: 'normal', expectedImageSize: '2K' }),
+      await run6({ imageSize: '4K', mode: 'vt', expectedImageSize: '2K' }),
+      await run6({ imageSize: '4K', mode: 'cl', expectedImageSize: '2K' }));
   }),
   test('aigenImage task orchestration: GRSAI nanobanana cleans legacy UI params', async () => {
-    const _0x52a2df = 'node-ai-image-grsai-nano-clean-legacy-params',
-      { proto: _0x47c405, ctx: _0x1bd3ea } = createTestContext({
-        targetId: _0x52a2df,
+    const targetId69 = 'node-ai-image-grsai-nano-clean-legacy-params',
+      { proto: proto72, ctx: ctx72 } = createTestContext({
+        targetId: targetId69,
         nodeData: {
-          id: _0x52a2df,
+          id: targetId69,
           model: 'nano-banana',
           provider: 'grsai',
           width: 0x640,
@@ -2903,78 +2894,78 @@ function createTestContext({
           generationParams: { imageSize: '3K', aspectRatio: '自适应', mode: 'normal', batchSize: 1 },
         },
       }),
-      _0x24f806 = await _0x47c405._buildPayload.call(_0x1bd3ea);
-    (assert.equal(_0x24f806.imageSize, '2K'),
-      assert.equal(_0x24f806.aspectRatio, 'auto'),
-      assert.equal(_0x24f806.resolvedRatioLabel, 'auto'));
+      value162 = await proto72._buildPayload.call(ctx72);
+    (assert.equal(value162.imageSize, '2K'),
+      assert.equal(value162.aspectRatio, 'auto'),
+      assert.equal(value162.resolvedRatioLabel, 'auto'));
   }),
   test('aigenImage task orchestration: GRSAI GPT image 2 常规模式只保留 1K', async () => {
-    for (const { storedModel: _0x552adc, imageSize: _0x194715 } of [
+    for (const { storedModel: storedModel, imageSize: imageSize5 } of [
       { storedModel: 'gpt-image-2', imageSize: '1K' },
       { storedModel: 'gpt-image-2', imageSize: '2K' },
       { storedModel: 'gpt-image-2', imageSize: '4K' },
       { storedModel: 'gpt-image-2', imageSize: undefined },
     ]) {
-      const _0x3957b0 = 'node-ai-image-gpt-image-2-1k-' + _0x552adc + '-' + (_0x194715 || 'default'),
-        { proto: _0x273cbd, ctx: _0x103b3e } = createTestContext({
-          targetId: _0x3957b0,
+      const targetId70 = 'node-ai-image-gpt-image-2-1k-' + storedModel + '-' + (imageSize5 || 'default'),
+        { proto: proto73, ctx: ctx73 } = createTestContext({
+          targetId: targetId70,
           nodeData: {
-            id: _0x3957b0,
-            model: _0x552adc,
+            id: targetId70,
+            model: storedModel,
             provider: 'grsai',
             generationParams: {
               mode: 'normal',
               aspectRatio: '9:21',
-              ...(_0x194715 ? { imageSize: _0x194715 } : {}),
+              ...(imageSize5 ? { imageSize: imageSize5 } : {}),
               batchSize: 1,
             },
           },
         }),
-        _0x103af5 = await _0x273cbd._buildPayload.call(_0x103b3e),
-        _0x484d0d = await _0x273cbd._buildResumePayload.call(_0x103b3e, _0x103b3e._data);
-      (assert.equal(_0x103af5.model, _0x552adc),
-        assert.equal(_0x484d0d.model, _0x552adc),
-        assert.equal(_0x103af5.provider, 'grsai'),
-        assert.equal(_0x484d0d.provider, 'grsai'),
-        assert.equal(_0x103af5.mode, 'normal'),
-        assert.equal(_0x103af5.imageSize, '1K'),
-        assert.equal(_0x103af5.aspectRatio, '9:21'),
-        assert.equal(_0x103af5.resolvedRatioLabel, '9:21'));
+        value163 = await proto73._buildPayload.call(ctx73),
+        value164 = await proto73._buildResumePayload.call(ctx73, ctx73._data);
+      (assert.equal(value163.model, storedModel),
+        assert.equal(value164.model, storedModel),
+        assert.equal(value163.provider, 'grsai'),
+        assert.equal(value164.provider, 'grsai'),
+        assert.equal(value163.mode, 'normal'),
+        assert.equal(value163.imageSize, '1K'),
+        assert.equal(value163.aspectRatio, '9:21'),
+        assert.equal(value163.resolvedRatioLabel, '9:21'));
     }
   }),
   test('aigenImage task orchestration: GRSAI GPT image 2 VIP 模式保留全部画质', async () => {
-    const _0x465a87 = async ({ imageSize: _0x462d7c, storedModel: _0x35ca38, aspectRatio: _0x371004 }) => {
-      const _0x1f0da1 = 'node-ai-image-gpt-image-2-vip-mode-' + _0x462d7c + '-' + _0x35ca38,
-        { proto: _0x2df8d1, ctx: _0x267110 } = createTestContext({
-          targetId: _0x1f0da1,
+    const run7 = async ({ imageSize: imageSize6, storedModel: storedModel2, aspectRatio: aspectRatio }) => {
+      const targetId71 = 'node-ai-image-gpt-image-2-vip-mode-' + imageSize6 + '-' + storedModel2,
+        { proto: proto74, ctx: ctx74 } = createTestContext({
+          targetId: targetId71,
           nodeData: {
-            id: _0x1f0da1,
-            model: _0x35ca38,
+            id: targetId71,
+            model: storedModel2,
             provider: 'grsai',
-            generationParams: { mode: 'vip', aspectRatio: _0x371004, imageSize: _0x462d7c, batchSize: 1 },
+            generationParams: { mode: 'vip', aspectRatio: aspectRatio, imageSize: imageSize6, batchSize: 1 },
           },
         }),
-        _0x535fa6 = await _0x2df8d1._buildPayload.call(_0x267110),
-        _0x4ad36b = await _0x2df8d1._buildResumePayload.call(_0x267110, _0x267110._data);
-      (assert.equal(_0x535fa6.model, _0x35ca38),
-        assert.equal(_0x4ad36b.model, _0x35ca38),
-        assert.equal(_0x535fa6.provider, 'grsai'),
-        assert.equal(_0x535fa6.mode, 'vip'),
-        assert.equal(_0x535fa6.imageSize, _0x462d7c),
-        assert.equal(_0x535fa6.aspectRatio, _0x371004),
-        assert.equal(_0x535fa6.resolvedRatioLabel, _0x371004));
+        value165 = await proto74._buildPayload.call(ctx74),
+        value166 = await proto74._buildResumePayload.call(ctx74, ctx74._data);
+      (assert.equal(value165.model, storedModel2),
+        assert.equal(value166.model, storedModel2),
+        assert.equal(value165.provider, 'grsai'),
+        assert.equal(value165.mode, 'vip'),
+        assert.equal(value165.imageSize, imageSize6),
+        assert.equal(value165.aspectRatio, aspectRatio),
+        assert.equal(value165.resolvedRatioLabel, aspectRatio));
     };
-    (await _0x465a87({ imageSize: '1K', storedModel: 'gpt-image-2', aspectRatio: '9:16' }),
-      await _0x465a87({ imageSize: '2K', storedModel: 'gpt-image-2', aspectRatio: '9:21' }),
-      await _0x465a87({ imageSize: '4K', storedModel: 'gpt-image-2', aspectRatio: '2:1' }),
-      await _0x465a87({ imageSize: '4K', storedModel: 'gpt-image-2-vip', aspectRatio: '9:21' }));
+    (await run7({ imageSize: '1K', storedModel: 'gpt-image-2', aspectRatio: '9:16' }),
+      await run7({ imageSize: '2K', storedModel: 'gpt-image-2', aspectRatio: '9:21' }),
+      await run7({ imageSize: '4K', storedModel: 'gpt-image-2', aspectRatio: '2:1' }),
+      await run7({ imageSize: '4K', storedModel: 'gpt-image-2-vip', aspectRatio: '9:21' }));
   }),
   test('aigenImage task orchestration: GRSAI GPT image 2 4K 保留官方支持比例', async () => {
-    const _0x189f20 = 'node-ai-image-gpt-image-2-4k-fallback',
-      { proto: _0x209859, ctx: _0x22e895 } = createTestContext({
-        targetId: _0x189f20,
+    const targetId72 = 'node-ai-image-gpt-image-2-4k-fallback',
+      { proto: proto75, ctx: ctx75 } = createTestContext({
+        targetId: targetId72,
         nodeData: {
-          id: _0x189f20,
+          id: targetId72,
           model: 'gpt-image-2',
           provider: 'grsai',
           generationParams: { mode: 'vip', aspectRatio: '1:1', imageSize: '4K', batchSize: 1 },
@@ -2982,20 +2973,20 @@ function createTestContext({
           height: 0x1f4,
         },
       }),
-      _0x365977 = await _0x209859._buildPayload.call(_0x22e895);
-    (assert.equal(_0x365977.model, 'gpt-image-2'),
-      assert.equal(_0x365977.provider, 'grsai'),
-      assert.equal(_0x365977.mode, 'vip'),
-      assert.equal(_0x365977.imageSize, '4K'),
-      assert.equal(_0x365977.aspectRatio, '1:1'),
-      assert.equal(_0x365977.resolvedRatioLabel, '1:1'));
+      value167 = await proto75._buildPayload.call(ctx75);
+    (assert.equal(value167.model, 'gpt-image-2'),
+      assert.equal(value167.provider, 'grsai'),
+      assert.equal(value167.mode, 'vip'),
+      assert.equal(value167.imageSize, '4K'),
+      assert.equal(value167.aspectRatio, '1:1'),
+      assert.equal(value167.resolvedRatioLabel, '1:1'));
   }),
   test('aigenImage task orchestration: APIMart Seedream 5 lite 保留 3K 和支持比例', async () => {
-    const _0x52d39 = 'node-ai-image-apimart-seedream-5-lite',
-      { proto: _0x43e415, ctx: _0x1bc0e9 } = createTestContext({
-        targetId: _0x52d39,
+    const targetId73 = 'node-ai-image-apimart-seedream-5-lite',
+      { proto: proto76, ctx: ctx76 } = createTestContext({
+        targetId: targetId73,
         nodeData: {
-          id: _0x52d39,
+          id: targetId73,
           model: 'apimart/seedream-5.0-lite',
           provider: 'apimart',
           aspectRatio: '21:9',
@@ -3004,20 +2995,20 @@ function createTestContext({
           batchSize: 4,
         },
       }),
-      _0x3e5d37 = await _0x43e415._buildPayload.call(_0x1bc0e9);
-    (assert.equal(_0x3e5d37.provider, 'apimart'),
-      assert.equal(_0x3e5d37.model, 'apimart/seedream-5.0-lite'),
-      assert.equal(_0x3e5d37.imageSize, '3K'),
-      assert.equal(_0x3e5d37.aspectRatio, '21:9'),
-      assert.equal(_0x3e5d37.resolvedRatioLabel, '21:9'),
-      assert.equal(_0x3e5d37.batchSize, 4));
+      value168 = await proto76._buildPayload.call(ctx76);
+    (assert.equal(value168.provider, 'apimart'),
+      assert.equal(value168.model, 'apimart/seedream-5.0-lite'),
+      assert.equal(value168.imageSize, '3K'),
+      assert.equal(value168.aspectRatio, '21:9'),
+      assert.equal(value168.resolvedRatioLabel, '21:9'),
+      assert.equal(value168.batchSize, 4));
   }),
   test('aigenImage task orchestration: APIMart Qwen image 2.0 使用文档比例和生成数量', async () => {
-    const _0x50f3ed = 'node-ai-image-apimart-qwen-image',
-      { proto: _0x1f3ee7, ctx: _0x2f1fb4 } = createTestContext({
-        targetId: _0x50f3ed,
+    const targetId74 = 'node-ai-image-apimart-qwen-image',
+      { proto: proto77, ctx: ctx77 } = createTestContext({
+        targetId: targetId74,
         nodeData: {
-          id: _0x50f3ed,
+          id: targetId74,
           model: 'apimart/qwen-image-2.0',
           provider: 'apimart',
           aspectRatio: '自适应',
@@ -3028,21 +3019,21 @@ function createTestContext({
           batchSize: 1,
         },
       }),
-      _0x3e98df = await _0x1f3ee7._buildPayload.call(_0x2f1fb4);
-    (assert.equal(_0x3e98df.provider, 'apimart'),
-      assert.equal(_0x3e98df.model, 'apimart/qwen-image-2.0'),
-      assert.equal(_0x3e98df.mode, 'pro'),
-      assert.equal(_0x3e98df.imageSize, '1K'),
-      assert.equal(_0x3e98df.aspectRatio, '16:9'),
-      assert.equal(_0x3e98df.resolvedRatioLabel, '16:9'),
-      assert.equal(_0x3e98df.batchSize, 6));
+      value169 = await proto77._buildPayload.call(ctx77);
+    (assert.equal(value169.provider, 'apimart'),
+      assert.equal(value169.model, 'apimart/qwen-image-2.0'),
+      assert.equal(value169.mode, 'pro'),
+      assert.equal(value169.imageSize, '1K'),
+      assert.equal(value169.aspectRatio, '16:9'),
+      assert.equal(value169.resolvedRatioLabel, '16:9'),
+      assert.equal(value169.batchSize, 6));
   }),
   test('aigenImage task orchestration: APIMart Z-Image-Turbo 自适应转为真实比例并透传智能改写', async () => {
-    const _0x390b6c = 'node-ai-image-apimart-z-image-turbo',
-      { proto: _0x57043a, ctx: _0x3a1e2e } = createTestContext({
-        targetId: _0x390b6c,
+    const targetId75 = 'node-ai-image-apimart-z-image-turbo',
+      { proto: proto78, ctx: ctx78 } = createTestContext({
+        targetId: targetId75,
         nodeData: {
-          id: _0x390b6c,
+          id: targetId75,
           model: 'apimart/z-image-turbo',
           provider: 'apimart',
           aspectRatio: '自适应',
@@ -3053,22 +3044,22 @@ function createTestContext({
           batchSize: 1,
         },
       }),
-      _0x166865 = await _0x57043a._buildPayload.call(_0x3a1e2e);
-    (assert.equal(_0x166865.provider, 'apimart'),
-      assert.equal(_0x166865.model, 'apimart/z-image-turbo'),
-      assert.equal(_0x166865.imageSize, '1K'),
-      assert.equal(_0x166865.aspectRatio, '16:9'),
-      assert.equal(_0x166865.resolvedRatioLabel, '16:9'),
-      assert.equal(_0x166865.prompt_extend, true),
-      assert.equal(_0x166865.batchSize, 4));
+      value170 = await proto78._buildPayload.call(ctx78);
+    (assert.equal(value170.provider, 'apimart'),
+      assert.equal(value170.model, 'apimart/z-image-turbo'),
+      assert.equal(value170.imageSize, '1K'),
+      assert.equal(value170.aspectRatio, '16:9'),
+      assert.equal(value170.resolvedRatioLabel, '16:9'),
+      assert.equal(value170.prompt_extend, true),
+      assert.equal(value170.batchSize, 4));
   }),
   test('aigenImage task orchestration: APIMart Wan 2.7 收集图片入参并按入参比例自适应', async () => {
-    const _0x4f5ca3 = 'node-ai-image-apimart-wan',
-      _0x1575d7 = 'node-ref-apimart-wan',
-      { proto: _0x556c23, ctx: _0x411306 } = createTestContext({
-        targetId: _0x4f5ca3,
+    const targetId76 = 'node-ai-image-apimart-wan',
+      id28 = 'node-ref-apimart-wan',
+      { proto: proto79, ctx: ctx79 } = createTestContext({
+        targetId: targetId76,
         nodeData: {
-          id: _0x4f5ca3,
+          id: targetId76,
           model: 'apimart/wan2.7-image',
           provider: 'apimart',
           aspectRatio: '自适应',
@@ -3085,34 +3076,34 @@ function createTestContext({
           batchSize: 1,
         },
         nodes: {
-          [_0x1575d7]: {
-            id: _0x1575d7,
+          [id28]: {
+            id: id28,
             type: 'source-image',
             imageUrl: 'https://cdn.apimart.ai/ref-wan.png',
             width: 0x384,
             height: 0x640,
           },
         },
-        incomingEdges: [{ id: 'edge-apimart-wan', sourceId: _0x1575d7, targetId: _0x4f5ca3, refSlot: '' }],
+        incomingEdges: [{ id: 'edge-apimart-wan', sourceId: id28, targetId: targetId76, refSlot: '' }],
       }),
-      _0x32c556 = await _0x556c23._buildPayload.call(_0x411306);
-    (assert.equal(_0x32c556.provider, 'apimart'),
-      assert.equal(_0x32c556.model, 'apimart/wan2.7-image'),
-      assert.equal(_0x32c556.mode, 'pro'),
-      assert.equal(_0x32c556.imageSize, '4K'),
-      assert.equal(_0x32c556.aspectRatio, '9:16'),
-      assert.equal(_0x32c556.resolvedRatioLabel, '9:16'),
-      assert.equal(_0x32c556.thinking_mode, false),
-      assert.equal(_0x32c556.batchSize, 4),
-      assert.deepEqual(_0x32c556.inputUrls, ['https://cdn.apimart.ai/ref-wan.png']));
+      value171 = await proto79._buildPayload.call(ctx79);
+    (assert.equal(value171.provider, 'apimart'),
+      assert.equal(value171.model, 'apimart/wan2.7-image'),
+      assert.equal(value171.mode, 'pro'),
+      assert.equal(value171.imageSize, '4K'),
+      assert.equal(value171.aspectRatio, '9:16'),
+      assert.equal(value171.resolvedRatioLabel, '9:16'),
+      assert.equal(value171.thinking_mode, false),
+      assert.equal(value171.batchSize, 4),
+      assert.deepEqual(value171.inputUrls, ['https://cdn.apimart.ai/ref-wan.png']));
   }),
   test('aigenImage task orchestration: APIMart Seedream 有参考图时自适应透传 API auto', async () => {
-    const _0xb36093 = 'node-ai-image-apimart-seedream-auto',
-      _0x447dc4 = 'node-ref-apimart-seedream-auto',
-      { proto: _0xd4f48b, ctx: _0x12a060 } = createTestContext({
-        targetId: _0xb36093,
+    const targetId77 = 'node-ai-image-apimart-seedream-auto',
+      id29 = 'node-ref-apimart-seedream-auto',
+      { proto: proto80, ctx: ctx80 } = createTestContext({
+        targetId: targetId77,
         nodeData: {
-          id: _0xb36093,
+          id: targetId77,
           model: 'apimart/seedream-4.0',
           provider: 'apimart',
           aspectRatio: 'auto',
@@ -3121,8 +3112,8 @@ function createTestContext({
           batchSize: 1,
         },
         nodes: {
-          [_0x447dc4]: {
-            id: _0x447dc4,
+          [id29]: {
+            id: id29,
             type: 'source-image',
             imageUrl: 'https://img.example.com/seedream-ref.png',
             width: 0x640,
@@ -3130,23 +3121,23 @@ function createTestContext({
           },
         },
         incomingEdges: [
-          { id: 'edge-apimart-seedream-auto', sourceId: _0x447dc4, targetId: _0xb36093, refSlot: '' },
+          { id: 'edge-apimart-seedream-auto', sourceId: id29, targetId: targetId77, refSlot: '' },
         ],
       }),
-      _0x26ecf3 = await _0xd4f48b._buildPayload.call(_0x12a060);
-    (assert.equal(_0x26ecf3.provider, 'apimart'),
-      assert.equal(_0x26ecf3.model, 'apimart/seedream-4.0'),
-      assert.equal(_0x26ecf3.aspectRatio, 'auto'),
-      assert.equal(_0x26ecf3.resolvedRatioLabel, 'auto'),
-      assert.equal(_0x26ecf3.ratioCapability, 'size'),
-      assert.deepEqual(_0x26ecf3.inputUrls, ['https://img.example.com/seedream-ref.png']));
+      value172 = await proto80._buildPayload.call(ctx80);
+    (assert.equal(value172.provider, 'apimart'),
+      assert.equal(value172.model, 'apimart/seedream-4.0'),
+      assert.equal(value172.aspectRatio, 'auto'),
+      assert.equal(value172.resolvedRatioLabel, 'auto'),
+      assert.equal(value172.ratioCapability, 'size'),
+      assert.deepEqual(value172.inputUrls, ['https://img.example.com/seedream-ref.png']));
   }),
   test('aigenImage task orchestration: APIMart GPT image 2 透传新增比例', async () => {
-    const _0x436807 = 'node-ai-image-apimart-gpt-image-2-ratio',
-      { proto: _0x36d173, ctx: _0x33e193 } = createTestContext({
-        targetId: _0x436807,
+    const targetId78 = 'node-ai-image-apimart-gpt-image-2-ratio',
+      { proto: proto81, ctx: ctx81 } = createTestContext({
+        targetId: targetId78,
         nodeData: {
-          id: _0x436807,
+          id: targetId78,
           model: 'apimart/gpt-image-2',
           provider: 'apimart',
           aspectRatio: '2:1',
@@ -3155,21 +3146,21 @@ function createTestContext({
           batchSize: 1,
         },
       }),
-      _0x464a67 = await _0x36d173._buildPayload.call(_0x33e193);
-    (assert.equal(_0x464a67.provider, 'apimart'),
-      assert.equal(_0x464a67.model, 'apimart/gpt-image-2'),
-      assert.equal(_0x464a67.mode, 'official'),
-      assert.equal(_0x464a67.imageSize, '2K'),
-      assert.equal(_0x464a67.quality, 'high'),
-      assert.equal(_0x464a67.aspectRatio, '2:1'),
-      assert.equal(_0x464a67.resolvedRatioLabel, '2:1'));
+      value173 = await proto81._buildPayload.call(ctx81);
+    (assert.equal(value173.provider, 'apimart'),
+      assert.equal(value173.model, 'apimart/gpt-image-2'),
+      assert.equal(value173.mode, 'official'),
+      assert.equal(value173.imageSize, '2K'),
+      assert.equal(value173.quality, 'high'),
+      assert.equal(value173.aspectRatio, '2:1'),
+      assert.equal(value173.resolvedRatioLabel, '2:1'));
   }),
   test('aigenImage task orchestration: APIMart GPT image 2 4K 不生成非法比例', async () => {
-    const _0x124e03 = 'node-ai-image-apimart-gpt-image-2-4k',
-      { proto: _0xacb716, ctx: _0x216672 } = createTestContext({
-        targetId: _0x124e03,
+    const targetId79 = 'node-ai-image-apimart-gpt-image-2-4k',
+      { proto: proto82, ctx: ctx82 } = createTestContext({
+        targetId: targetId79,
         nodeData: {
-          id: _0x124e03,
+          id: targetId79,
           model: 'apimart/gpt-image-2',
           provider: 'apimart',
           aspectRatio: '1:1',
@@ -3180,17 +3171,17 @@ function createTestContext({
           batchSize: 1,
         },
       }),
-      _0x4ba784 = await _0xacb716._buildPayload.call(_0x216672);
-    (assert.equal(_0x4ba784.imageSize, '4K'),
-      assert.equal(_0x4ba784.aspectRatio, '16:9'),
-      assert.equal(_0x4ba784.resolvedRatioLabel, '16:9'));
+      value174 = await proto82._buildPayload.call(ctx82);
+    (assert.equal(value174.imageSize, '4K'),
+      assert.equal(value174.aspectRatio, '16:9'),
+      assert.equal(value174.resolvedRatioLabel, '16:9'));
   }),
   test('aigenImage task orchestration: APIMart GPT image 2 4K 自适应只解析到可用比例', async () => {
-    const _0x4b9843 = 'node-ai-image-apimart-gpt-image-2-4k-auto',
-      { proto: _0x1d3aa0, ctx: _0x24b85e } = createTestContext({
-        targetId: _0x4b9843,
+    const targetId80 = 'node-ai-image-apimart-gpt-image-2-4k-auto',
+      { proto: proto83, ctx: ctx83 } = createTestContext({
+        targetId: targetId80,
         nodeData: {
-          id: _0x4b9843,
+          id: targetId80,
           model: 'apimart/gpt-image-2',
           provider: 'apimart',
           aspectRatio: '自适应',
@@ -3201,8 +3192,8 @@ function createTestContext({
           batchSize: 1,
         },
       }),
-      _0x4e116d = await _0x1d3aa0._buildPayload.call(_0x24b85e);
-    (assert.equal(_0x4e116d.imageSize, '4K'),
-      assert.equal(_0x4e116d.aspectRatio, '16:9'),
-      assert.equal(_0x4e116d.resolvedRatioLabel, '16:9'));
+      value175 = await proto83._buildPayload.call(ctx83);
+    (assert.equal(value175.imageSize, '4K'),
+      assert.equal(value175.aspectRatio, '16:9'),
+      assert.equal(value175.resolvedRatioLabel, '16:9'));
   }));

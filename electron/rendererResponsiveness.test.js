@@ -5,18 +5,18 @@ import {
   configureRendererResponsiveness,
 } from './rendererResponsiveness.js';
 test('configureRendererResponsiveness installs Electron background throttling switches', () => {
-  const _0x47bfdc = [];
+  const list = [];
   configureRendererResponsiveness({
-    commandLine: { appendSwitch: (..._0x167fff) => _0x47bfdc.push(_0x167fff) },
+    commandLine: { appendSwitch: (...args) => list.push(args) },
   });
-  for (const _0x17a46a of __rendererResponsivenessForTest.BACKGROUND_THROTTLE_SWITCHES) {
-    assert.ok(_0x47bfdc.some((_0x3314d7) => _0x3314d7[0] === _0x17a46a));
+  for (const value of __rendererResponsivenessForTest.BACKGROUND_THROTTLE_SWITCHES) {
+    assert.ok(list.some((item) => item[0] === value));
   }
   assert.ok(
-    _0x47bfdc.some(
-      (_0x4bc8c9) =>
-        _0x4bc8c9[0] === 'disable-features' &&
-        _0x4bc8c9[1] === __rendererResponsivenessForTest.DISABLED_BACKGROUND_FEATURES,
+    list.some(
+      (item2) =>
+        item2[0] === 'disable-features' &&
+        item2[1] === __rendererResponsivenessForTest.DISABLED_BACKGROUND_FEATURES,
     ),
   );
 });

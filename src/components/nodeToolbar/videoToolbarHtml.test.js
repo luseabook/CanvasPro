@@ -9,16 +9,16 @@ import { VIDEO_TOOLBAR_HTML } from './videoToolbarHtml.js';
     assert.doesNotMatch(VIDEO_TOOLBAR_HTML, /is-dev act-replace|act-replace is-dev/));
 }),
   test('videoToolbarHtml: replace 图标为双人拖影补帧图标', () => {
-    const _0x341784 = VIDEO_TOOLBAR_HTML.match(
+    const value = VIDEO_TOOLBAR_HTML.match(
       /<button class="[^"]*\bact-replace\b[^"]*"[^>]*>.*?<\/button>/s,
     )?.[0];
-    (assert.ok(_0x341784),
+    (assert.ok(value),
       assert.match(
-        _0x341784,
+        value,
         /<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"/,
       ),
-      assert.equal(_0x341784.match(/<circle\b/g)?.length, 2),
-      assert.match(_0x341784, /<path d="M9\.4 11\.4c1\.3-.9 3\.9-.9 5\.2 0" opacity="\.6"\/>/));
+      assert.equal(value.match(/<circle\b/g)?.length, 2),
+      assert.match(value, /<path d="M9\.4 11\.4c1\.3-.9 3\.9-.9 5\.2 0" opacity="\.6"\/>/));
   }),
   test('videoToolbarHtml: 音画分离按钮保留在视频工具池中', () => {
     (assert.match(VIDEO_TOOLBAR_HTML, /act-separate-av/),
@@ -27,14 +27,14 @@ import { VIDEO_TOOLBAR_HTML } from './videoToolbarHtml.js';
       assert.ok(VIDEO_TOOLBAR_HTML.indexOf('act-clip') < VIDEO_TOOLBAR_HTML.indexOf('act-separate-av')));
   }),
   test('videoToolbarHtml: 视频倒放按钮在裁剪之后并使用倒放图标', () => {
-    const _0x48a7d3 = VIDEO_TOOLBAR_HTML.match(
+    const item = VIDEO_TOOLBAR_HTML.match(
       /<button class="[^"]*\bact-reverse\b[^"]*"[^>]*>.*?<\/button>/s,
     )?.[0];
-    (assert.ok(_0x48a7d3),
-      assert.match(_0x48a7d3, /data-tooltip="视频倒放"/),
-      assert.match(_0x48a7d3, /aria-label="视频倒放"/),
-      assert.doesNotMatch(_0x48a7d3, /\[0:v\]/),
-      assert.match(_0x48a7d3, /<path d="M5 5v14"\/>/),
+    (assert.ok(item),
+      assert.match(item, /data-tooltip="视频倒放"/),
+      assert.match(item, /aria-label="视频倒放"/),
+      assert.doesNotMatch(item, /\[0:v\]/),
+      assert.match(item, /<path d="M5 5v14"\/>/),
       assert.ok(VIDEO_TOOLBAR_HTML.indexOf('act-clip') < VIDEO_TOOLBAR_HTML.indexOf('act-reverse')),
       assert.ok(
         VIDEO_TOOLBAR_HTML.indexOf('act-reverse') < VIDEO_TOOLBAR_HTML.indexOf('act-extract-keyframes'),
@@ -82,11 +82,11 @@ import { VIDEO_TOOLBAR_HTML } from './videoToolbarHtml.js';
       assert.match(VIDEO_TOOLBAR_HTML, /data-role="button-pool" hidden/));
   }),
   test('videoToolbarHtml: 按钮池包含全部可自定义视频工具', () => {
-    const _0x59d45f = VIDEO_TOOLBAR_HTML.match(
+    const key = VIDEO_TOOLBAR_HTML.match(
       /<div class="v2-img-toolbar-button-pool v2-video-toolbar-button-pool"[\s\S]*?<\/div>/,
     )?.[0];
-    assert.ok(_0x59d45f);
-    for (const _0x10a345 of [
+    assert.ok(key);
+    for (const index of [
       'clip',
       'reverse',
       'extract-keyframes',
@@ -101,6 +101,6 @@ import { VIDEO_TOOLBAR_HTML } from './videoToolbarHtml.js';
       'remove',
       'separate-av',
     ]) {
-      assert.match(_0x59d45f, new RegExp('act-' + _0x10a345));
+      assert.match(key, new RegExp('act-' + index));
     }
   }));

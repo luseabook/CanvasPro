@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { installNodeResizeGeometryPreviewer, previewNodeResizeGeometry } from './rendererResizePreview.js';
 (test('previewNodeResizeGeometry rerenders affected edges with preview size', () => {
-  const _0x419fa4 = {
+  const snapshot = {
       _edgesRev: 7,
       viewport: { zoom: 1 },
       nodes: {
@@ -11,42 +11,42 @@ import { installNodeResizeGeometryPreviewer, previewNodeResizeGeometry } from '.
       },
       edges: { 'edge-1': { id: 'edge-1', sourceId: 'node-1', targetId: 'node-2' } },
     },
-    _0x5f52bc = new Map([['node-1', new Set(['edge-1'])]]),
-    _0x54a86d = [],
-    _0x6aebf5 = [],
-    _0x39630d = previewNodeResizeGeometry(
+    nodeToEdgeIds = new Map([['node-1', new Set(['edge-1'])]]),
+    list = [],
+    list2 = [],
+    previewNodeResizeGeometry2 = previewNodeResizeGeometry(
       { nodeId: 'node-1', width: 240, height: 150 },
       {
-        snapshot: _0x419fa4,
-        nodeToEdgeIds: _0x5f52bc,
-        ensureEdgeIndex: (_0x2a49d2, _0xc747f6) => _0x54a86d.push({ edges: _0x2a49d2, rev: _0xc747f6 }),
-        renderEdgesByIds: (_0x5f4fbe, _0x599c2f, _0x3e1e48) =>
-          _0x6aebf5.push({ edgeIds: _0x5f4fbe, nodes: _0x599c2f, usedSnapshot: _0x3e1e48 }),
+        snapshot: snapshot,
+        nodeToEdgeIds: nodeToEdgeIds,
+        ensureEdgeIndex: (edges, rev) => list.push({ edges: edges, rev: rev }),
+        renderEdgesByIds: (edgeIds, nodes, usedSnapshot) =>
+          list2.push({ edgeIds: edgeIds, nodes: nodes, usedSnapshot: usedSnapshot }),
       },
     );
-  (assert.equal(_0x39630d, true),
-    assert.deepEqual(_0x54a86d, [{ edges: _0x419fa4.edges, rev: 7 }]),
-    assert.equal(_0x6aebf5.length, 1),
-    assert.deepEqual([..._0x6aebf5[0].edgeIds], ['edge-1']),
-    assert.equal(_0x6aebf5[0].nodes['node-1'].width, 240),
-    assert.equal(_0x6aebf5[0].nodes['node-1'].height, 150),
-    assert.equal(_0x6aebf5[0].nodes['node-2'], _0x419fa4.nodes['node-2']),
-    assert.equal(_0x6aebf5[0].usedSnapshot, _0x419fa4),
-    assert.equal(_0x419fa4.nodes['node-1'].width, 200));
+  (assert.equal(previewNodeResizeGeometry2, true),
+    assert.deepEqual(list, [{ edges: snapshot.edges, rev: 7 }]),
+    assert.equal(list2.length, 1),
+    assert.deepEqual([...list2[0].edgeIds], ['edge-1']),
+    assert.equal(list2[0].nodes['node-1'].width, 240),
+    assert.equal(list2[0].nodes['node-1'].height, 150),
+    assert.equal(list2[0].nodes['node-2'], snapshot.nodes['node-2']),
+    assert.equal(list2[0].usedSnapshot, snapshot),
+    assert.equal(snapshot.nodes['node-1'].width, 200));
 }),
   test('installNodeResizeGeometryPreviewer exposes renderer bridge', () => {
-    const _0x1967b2 = {},
-      _0xbfbd6d = { nodes: { 'node-1': { id: 'node-1', width: 100, height: 100 } }, edges: {} },
-      _0x40badb = installNodeResizeGeometryPreviewer(
-        _0x1967b2,
-        () => _0xbfbd6d,
+    const value = {},
+      item = { nodes: { 'node-1': { id: 'node-1', width: 100, height: 100 } }, edges: {} },
+      installNodeResizeGeometryPreviewer2 = installNodeResizeGeometryPreviewer(
+        value,
+        () => item,
         () => {},
         new Map(),
         () => {},
       );
-    (assert.equal(_0x40badb, true),
+    (assert.equal(installNodeResizeGeometryPreviewer2, true),
       assert.equal(
-        _0x1967b2.v2Renderer.previewNodeResizeGeometry({ nodeId: 'node-1', width: 120, height: 130 }),
+        value.v2Renderer.previewNodeResizeGeometry({ nodeId: 'node-1', width: 120, height: 130 }),
         true,
       ));
   }));

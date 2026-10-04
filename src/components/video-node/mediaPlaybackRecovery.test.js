@@ -34,31 +34,31 @@ class FakeVideoElement {
   get ['src']() {
     return this.getAttribute('src');
   }
-  set ['src'](_0x11a320) {
-    this.setAttribute('src', _0x11a320);
+  set ['src'](value) {
+    this.setAttribute('src', value);
   }
-  ['getAttribute'](_0x3427d3) {
-    return this._attrs.get(String(_0x3427d3)) || '';
+  ['getAttribute'](item) {
+    return this._attrs.get(String(item)) || '';
   }
-  ['setAttribute'](_0x543cef, _0x21b2ef) {
-    this._attrs.set(String(_0x543cef), String(_0x21b2ef));
+  ['setAttribute'](key, index) {
+    this._attrs.set(String(key), String(index));
   }
-  ['addEventListener'](_0xb01bf5, _0x1996e6) {
-    const _0x28521e = String(_0xb01bf5),
-      _0x5e137e = this._listeners.get(_0x28521e) || [];
-    (_0x5e137e.push(_0x1996e6), this._listeners.set(_0x28521e, _0x5e137e));
+  ['addEventListener'](result, data) {
+    const options = String(result),
+      list = this._listeners.get(options) || [];
+    (list.push(data), this._listeners.set(options, list));
   }
-  ['removeEventListener'](_0x5c3fb4, _0x2d9e44) {
-    const _0x3e498b = String(_0x5c3fb4),
-      _0x17471e = this._listeners.get(_0x3e498b) || [];
+  ['removeEventListener'](target, source) {
+    const next = String(target),
+      list2 = this._listeners.get(next) || [];
     this._listeners.set(
-      _0x3e498b,
-      _0x17471e.filter((_0x1e8955) => _0x1e8955 !== _0x2d9e44),
+      next,
+      list2.filter((item2) => item2 !== source),
     );
   }
-  ['dispatchEventName'](_0x3885b4) {
-    for (const _0x166f28 of this._listeners.get(String(_0x3885b4)) || []) {
-      _0x166f28({ type: _0x3885b4 });
+  ['dispatchEventName'](type) {
+    for (const run of this._listeners.get(String(type)) || []) {
+      run({ type: type });
     }
   }
   ['load']() {
@@ -75,104 +75,106 @@ class FakeVideoElement {
   __resetVideoPlaybackRecoveryForTest();
 }),
   test('getVideoBufferedAhead returns buffered seconds at current time', () => {
-    const _0x41cabd = new FakeVideoElement();
-    ((_0x41cabd.currentTime = 3),
-      (_0x41cabd.buffered = {
+    const fakeVideoElement = new FakeVideoElement();
+    ((fakeVideoElement.currentTime = 3),
+      (fakeVideoElement.buffered = {
         length: 2,
-        start(_0x41a91e) {
-          return _0x41a91e === 0 ? 0 : 2.5;
+        start(count) {
+          return count === 0 ? 0 : 2.5;
         },
-        end(_0x507eac) {
-          return _0x507eac === 0 ? 1 : 6;
+        end(count2) {
+          return count2 === 0 ? 1 : 6;
         },
       }),
-      assert.equal(getVideoBufferedAhead(_0x41cabd), 3));
+      assert.equal(getVideoBufferedAhead(fakeVideoElement), 3));
   }),
   test('playVideoWithRecovery ensures source, sets preload, then plays', async () => {
-    const _0x21b11d = new FakeVideoElement(),
-      _0x4222e7 = await playVideoWithRecovery(_0x21b11d, {
+    const fakeVideoElement2 = new FakeVideoElement(),
+      playVideoWithRecovery2 = await playVideoWithRecovery(fakeVideoElement2, {
         ensureSrc() {
-          _0x21b11d.src = '/output/sample.mp4';
+          fakeVideoElement2.src = '/output/sample.mp4';
         },
       });
-    (assert.equal(_0x4222e7, true),
-      assert.equal(_0x21b11d.preload, 'auto'),
-      assert.equal(_0x21b11d.loadCount, 0),
-      assert.equal(_0x21b11d.playCount, 1),
-      assert.equal(_0x21b11d.paused, false));
+    (assert.equal(playVideoWithRecovery2, true),
+      assert.equal(fakeVideoElement2.preload, 'auto'),
+      assert.equal(fakeVideoElement2.loadCount, 0),
+      assert.equal(fakeVideoElement2.playCount, 1),
+      assert.equal(fakeVideoElement2.paused, false));
   }),
   test('playVideoWithRecovery requests play during an active media load without restarting it', async () => {
-    const _0xe3f63c = new FakeVideoElement();
-    ((_0xe3f63c.src = '/output/sample.mp4'), (_0xe3f63c.readyState = 0), (_0xe3f63c.networkState = 2));
-    const _0x190833 = playVideoWithRecovery(_0xe3f63c, { readyTimeoutMs: 0x3e8 });
+    const fakeVideoElement3 = new FakeVideoElement();
+    ((fakeVideoElement3.src = '/output/sample.mp4'),
+      (fakeVideoElement3.readyState = 0),
+      (fakeVideoElement3.networkState = 2));
+    const playVideoWithRecovery3 = playVideoWithRecovery(fakeVideoElement3, { readyTimeoutMs: 0x3e8 });
     (await Promise.resolve(),
       await Promise.resolve(),
-      assert.equal(_0xe3f63c.playCount, 1),
-      (_0xe3f63c.readyState = 2),
-      (_0xe3f63c.networkState = 1),
-      _0xe3f63c.dispatchEventName('loadeddata'));
-    const _0x3fd1c5 = await _0x190833;
-    (assert.equal(_0x3fd1c5, true),
-      assert.equal(_0xe3f63c.preload, 'auto'),
-      assert.equal(_0xe3f63c.loadCount, 0),
-      assert.equal(_0xe3f63c.playCount, 1),
-      assert.equal(_0xe3f63c.paused, false));
+      assert.equal(fakeVideoElement3.playCount, 1),
+      (fakeVideoElement3.readyState = 2),
+      (fakeVideoElement3.networkState = 1),
+      fakeVideoElement3.dispatchEventName('loadeddata'));
+    const current = await playVideoWithRecovery3;
+    (assert.equal(current, true),
+      assert.equal(fakeVideoElement3.preload, 'auto'),
+      assert.equal(fakeVideoElement3.loadCount, 0),
+      assert.equal(fakeVideoElement3.playCount, 1),
+      assert.equal(fakeVideoElement3.paused, false));
   }),
   test('playVideoWithRecovery does not reload an idle metadata-ready video', async () => {
-    const _0x5b52fb = new FakeVideoElement();
-    ((_0x5b52fb.src = '/output/sample.mp4'),
-      (_0x5b52fb.readyState = 1),
-      (_0x5b52fb.networkState = 1),
+    const fakeVideoElement4 = new FakeVideoElement();
+    ((fakeVideoElement4.src = '/output/sample.mp4'),
+      (fakeVideoElement4.readyState = 1),
+      (fakeVideoElement4.networkState = 1),
       setTimeout(() => {
-        ((_0x5b52fb.readyState = 2), _0x5b52fb.dispatchEventName('loadeddata'));
+        ((fakeVideoElement4.readyState = 2), fakeVideoElement4.dispatchEventName('loadeddata'));
       }, 0));
-    const _0x3eb7aa = await playVideoWithRecovery(_0x5b52fb, { readyTimeoutMs: 0x3e8 });
-    (assert.equal(_0x3eb7aa, true),
-      assert.equal(_0x5b52fb.preload, 'auto'),
-      assert.equal(_0x5b52fb.loadCount, 0),
-      assert.equal(_0x5b52fb.playCount, 1),
-      assert.equal(_0x5b52fb.paused, false));
+    const playVideoWithRecovery4 = await playVideoWithRecovery(fakeVideoElement4, { readyTimeoutMs: 0x3e8 });
+    (assert.equal(playVideoWithRecovery4, true),
+      assert.equal(fakeVideoElement4.preload, 'auto'),
+      assert.equal(fakeVideoElement4.loadCount, 0),
+      assert.equal(fakeVideoElement4.playCount, 1),
+      assert.equal(fakeVideoElement4.paused, false));
   }),
   test('playVideoWithRecovery defers stalled reload during playback startup', async () => {
-    const _0x532411 = new FakeVideoElement();
-    ((_0x532411.src = '/output/sample.mp4'), (_0x532411.readyState = 1));
-    const _0x2140a1 = await playVideoWithRecovery(_0x532411, {
+    const fakeVideoElement5 = new FakeVideoElement();
+    ((fakeVideoElement5.src = '/output/sample.mp4'), (fakeVideoElement5.readyState = 1));
+    const playVideoWithRecovery5 = await playVideoWithRecovery(fakeVideoElement5, {
       recoveryDebounceMs: 50,
       startupRecoveryGraceMs: 180,
       startupRecoveryMinPlayedSeconds: 0.08,
     });
-    (assert.equal(_0x2140a1, true),
-      assert.equal(_0x532411.paused, false),
-      (_0x532411.readyState = 1),
-      _0x532411.dispatchEventName('waiting'),
-      await new Promise((_0xb655b8) => setTimeout(_0xb655b8, 90)),
-      assert.equal(_0x532411.loadCount, 0),
-      await new Promise((_0x4c248c) => setTimeout(_0x4c248c, 170)),
-      assert.equal(_0x532411.loadCount, 1));
+    (assert.equal(playVideoWithRecovery5, true),
+      assert.equal(fakeVideoElement5.paused, false),
+      (fakeVideoElement5.readyState = 1),
+      fakeVideoElement5.dispatchEventName('waiting'),
+      await new Promise((entry) => setTimeout(entry, 90)),
+      assert.equal(fakeVideoElement5.loadCount, 0),
+      await new Promise((record) => setTimeout(record, 170)),
+      assert.equal(fakeVideoElement5.loadCount, 1));
   }),
   test('playVideoWithRecovery pauses the previous active video before playing another', async () => {
-    const _0x2c52c0 = new FakeVideoElement();
-    ((_0x2c52c0.readyState = 2), (_0x2c52c0.src = '/output/first.mp4'));
-    const _0x77ec7b = new FakeVideoElement();
-    ((_0x77ec7b.readyState = 2),
-      (_0x77ec7b.src = '/output/second.mp4'),
-      assert.equal(await playVideoWithRecovery(_0x2c52c0), true),
-      assert.equal(_0x2c52c0.paused, false),
-      assert.equal(await playVideoWithRecovery(_0x77ec7b), true),
-      assert.equal(_0x2c52c0.paused, true),
-      assert.equal(_0x2c52c0.pauseCount, 1),
-      assert.equal(_0x77ec7b.paused, false));
+    const fakeVideoElement6 = new FakeVideoElement();
+    ((fakeVideoElement6.readyState = 2), (fakeVideoElement6.src = '/output/first.mp4'));
+    const fakeVideoElement7 = new FakeVideoElement();
+    ((fakeVideoElement7.readyState = 2),
+      (fakeVideoElement7.src = '/output/second.mp4'),
+      assert.equal(await playVideoWithRecovery(fakeVideoElement6), true),
+      assert.equal(fakeVideoElement6.paused, false),
+      assert.equal(await playVideoWithRecovery(fakeVideoElement7), true),
+      assert.equal(fakeVideoElement6.paused, true),
+      assert.equal(fakeVideoElement6.pauseCount, 1),
+      assert.equal(fakeVideoElement7.paused, false));
   }),
   test('playVideoWithRecovery can allow concurrent video playback', async () => {
-    const _0x42e789 = new FakeVideoElement();
-    ((_0x42e789.readyState = 2), (_0x42e789.src = '/output/first.mp4'));
-    const _0x1d995c = new FakeVideoElement();
-    ((_0x1d995c.readyState = 2),
-      (_0x1d995c.src = '/output/second.mp4'),
-      assert.equal(await playVideoWithRecovery(_0x42e789), true),
-      assert.equal(_0x42e789.paused, false),
-      assert.equal(await playVideoWithRecovery(_0x1d995c, { allowConcurrent: true }), true),
-      assert.equal(_0x42e789.paused, false),
-      assert.equal(_0x42e789.pauseCount, 0),
-      assert.equal(_0x1d995c.paused, false));
+    const fakeVideoElement8 = new FakeVideoElement();
+    ((fakeVideoElement8.readyState = 2), (fakeVideoElement8.src = '/output/first.mp4'));
+    const fakeVideoElement9 = new FakeVideoElement();
+    ((fakeVideoElement9.readyState = 2),
+      (fakeVideoElement9.src = '/output/second.mp4'),
+      assert.equal(await playVideoWithRecovery(fakeVideoElement8), true),
+      assert.equal(fakeVideoElement8.paused, false),
+      assert.equal(await playVideoWithRecovery(fakeVideoElement9, { allowConcurrent: true }), true),
+      assert.equal(fakeVideoElement8.paused, false),
+      assert.equal(fakeVideoElement8.pauseCount, 0),
+      assert.equal(fakeVideoElement9.paused, false));
   }));

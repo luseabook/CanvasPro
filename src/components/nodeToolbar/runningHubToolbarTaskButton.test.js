@@ -14,55 +14,55 @@ function installDomStubs() {
     typeof globalThis.window.removeEventListener !== 'function' &&
       (globalThis.window.removeEventListener = () => {}),
     typeof globalThis.CustomEvent !== 'function' &&
-      (globalThis.CustomEvent = class _0x38a3e8 {
-        constructor(_0x5685d1, _0x5a95f6 = {}) {
-          ((this.type = _0x5685d1), (this.detail = _0x5a95f6.detail));
+      (globalThis.CustomEvent = class value {
+        constructor(item, key = {}) {
+          ((this.type = item), (this.detail = key.detail));
         }
       }));
 }
-function resetStore(_0x141894 = {}) {
-  appStore.loadState({ nodes: _0x141894, edges: {}, viewport: { x: 0, y: 0, zoom: 1 } });
+function resetStore(nodes = {}) {
+  appStore.loadState({ nodes: nodes, edges: {}, viewport: { x: 0, y: 0, zoom: 1 } });
 }
 function createClassList() {
-  const _0x48c0f5 = new Set();
+  const map = new Set();
   return {
-    add: (..._0x599a08) => _0x599a08.forEach((_0x1d608a) => _0x48c0f5.add(_0x1d608a)),
-    remove: (..._0x489a23) => _0x489a23.forEach((_0x1ebcde) => _0x48c0f5.delete(_0x1ebcde)),
-    contains: (_0x3dbc79) => _0x48c0f5.has(_0x3dbc79),
-    toggle(_0x2332e2, _0x2eac26) {
-      const _0x12337b = _0x2eac26 === undefined ? !_0x48c0f5.has(_0x2332e2) : !!_0x2eac26;
-      if (_0x12337b) _0x48c0f5.add(_0x2332e2);
-      else _0x48c0f5.delete(_0x2332e2);
-      return _0x12337b;
+    add: (...list) => list.forEach((item2) => map.add(item2)),
+    remove: (...list2) => list2.forEach((item3) => map.delete(item3)),
+    contains: (index) => map.has(index),
+    toggle(result, enabled) {
+      const data = enabled === undefined ? !map.has(result) : !!enabled;
+      if (data) map.add(result);
+      else map.delete(result);
+      return data;
     },
   };
 }
 function createButton() {
-  const _0x1e12f4 = new Map([['aria-label', '高清']]),
-    _0x207078 = new Map();
+  const map2 = new Map([['aria-label', '高清']]),
+    map3 = new Map();
   return {
     innerHTML: '<svg data-original></svg>',
     style: { color: '' },
     dataset: { tooltip: '高清' },
     title: '',
     classList: createClassList(),
-    addEventListener(_0x24db99, _0x5c5a92) {
-      _0x207078.set(_0x24db99, _0x5c5a92);
+    addEventListener(options, target) {
+      map3.set(options, target);
     },
-    removeEventListener(_0x3e4dd8) {
-      _0x207078.delete(_0x3e4dd8);
+    removeEventListener(source) {
+      map3.delete(source);
     },
-    getAttribute(_0x3e7607) {
-      return _0x1e12f4.get(_0x3e7607) || '';
+    getAttribute(next) {
+      return map2.get(next) || '';
     },
-    setAttribute(_0xd69236, _0x41905c) {
-      _0x1e12f4.set(_0xd69236, String(_0x41905c));
+    setAttribute(current, entry) {
+      map2.set(current, String(entry));
     },
-    removeAttribute(_0xebe0d6) {
-      _0x1e12f4.delete(_0xebe0d6);
+    removeAttribute(record) {
+      map2.delete(record);
     },
-    dispatch(_0x3ac402) {
-      _0x207078.get(_0x3ac402)?.({
+    dispatch(payload) {
+      map3.get(payload)?.({
         preventDefault() {},
         stopPropagation() {},
         stopImmediatePropagation() {},
@@ -92,17 +92,17 @@ function createButton() {
         isGenerating: true,
       },
     });
-    const _0x43411e = findRunningHubToolbarTaskForNode('sourceA', {
+    const runningHubToolbarTaskForNode = findRunningHubToolbarTaskForNode('sourceA', {
         models: ['runninghub/2012862147813974018'],
         outputTextIncludes: ['RH高清放大'],
       }),
-      _0x1b9e37 = findRunningHubToolbarTaskForNode('sourceB', {
+      runningHubToolbarTaskForNode2 = findRunningHubToolbarTaskForNode('sourceB', {
         models: ['runninghub/2012862147813974018'],
         outputTextIncludes: ['RH高清放大'],
       });
-    (assert.equal(_0x43411e.outId, 'outA'),
-      assert.equal(_0x43411e.taskId, 'task-a'),
-      assert.equal(_0x1b9e37, null));
+    (assert.equal(runningHubToolbarTaskForNode.outId, 'outA'),
+      assert.equal(runningHubToolbarTaskForNode.taskId, 'task-a'),
+      assert.equal(runningHubToolbarTaskForNode2, null));
   }),
   test('RunningHub toolbar task button reads active state through unified selector', () => {
     (assert.equal(
@@ -156,25 +156,25 @@ function createButton() {
         isGenerating: true,
       },
     });
-    const _0x54c1de = createButton();
-    let _0x5f2ad3 = null;
+    const button = createButton();
+    let handle = null;
     (bindRunningHubToolbarTaskButton({
-      button: _0x54c1de,
+      button: button,
       getTask: () =>
         findRunningHubToolbarTaskForNode('sourceA', {
           models: ['runninghub/2047784060881211393'],
           outputTextIncludes: ['RH视频补帧'],
         }),
-      cancelTask: (_0x5e1929) => {
-        _0x5f2ad3 = _0x5e1929;
+      cancelTask: (state) => {
+        handle = state;
       },
       cancelTooltip: '取消补帧',
     }),
-      assert.equal(_0x54c1de.classList.contains('is-task-cancel'), true),
-      assert.match(_0x54c1de.innerHTML, /v2-task-cancel-spin/),
-      assert.equal(_0x54c1de.dataset.tooltip, '取消补帧'),
-      _0x54c1de.dispatch('click'),
-      assert.equal(_0x5f2ad3.outId, 'outA'));
+      assert.equal(button.classList.contains('is-task-cancel'), true),
+      assert.match(button.innerHTML, /v2-task-cancel-spin/),
+      assert.equal(button.dataset.tooltip, '取消补帧'),
+      button.dispatch('click'),
+      assert.equal(handle.outId, 'outA'));
   }),
   test('RunningHub toolbar task button restores inline color after cancellation', async () => {
     resetStore({
@@ -191,25 +191,25 @@ function createButton() {
         isGenerating: true,
       },
     });
-    const _0x57bed1 = createButton();
+    const button2 = createButton();
     (bindRunningHubToolbarTaskButton({
-      button: _0x57bed1,
+      button: button2,
       getTask: () =>
         findRunningHubToolbarTaskForNode('sourceA', {
           models: ['runninghub/2047784060881211393'],
           taskTypes: ['video-frame'],
         }),
-      cancelTask: (_0x5ba5e1) => {
-        ((_0x57bed1.style.color = 'var(--red)'),
-          appStore.updateNodeData(_0x5ba5e1.outId, { isGenerating: false, rhTaskStatus: 'cancelled' }));
+      cancelTask: (config) => {
+        ((button2.style.color = 'var(--red)'),
+          appStore.updateNodeData(config.outId, { isGenerating: false, rhTaskStatus: 'cancelled' }));
       },
       cancelTooltip: '取消补帧',
     }),
-      _0x57bed1.dispatch('click'),
-      await new Promise((_0xefce44) => setTimeout(_0xefce44, 0)),
-      assert.equal(_0x57bed1.classList.contains('is-task-cancel'), false),
-      assert.equal(_0x57bed1.style.color, ''),
-      assert.match(_0x57bed1.innerHTML, /data-original/));
+      button2.dispatch('click'),
+      await new Promise((scope) => setTimeout(scope, 0)),
+      assert.equal(button2.classList.contains('is-task-cancel'), false),
+      assert.equal(button2.style.color, ''),
+      assert.match(button2.innerHTML, /data-original/));
   }),
   test('RunningHub toolbar task button matches stable task type from source and result nodes', () => {
     resetStore({
@@ -227,17 +227,18 @@ function createButton() {
         isGenerating: true,
       },
     });
-    for (const _0x2e7167 of ['imageSource', 'panoramaOut']) {
-      const _0x16ed6a = findRunningHubToolbarTaskForNode(_0x2e7167, {
+    for (const input of ['imageSource', 'panoramaOut']) {
+      const runningHubToolbarTaskForNode3 = findRunningHubToolbarTaskForNode(input, {
         models: ['runninghub/2044874075721441281'],
         taskTypes: ['image-panorama-360'],
         outputTextIncludes: ['360°全景图'],
       });
-      (assert.equal(_0x16ed6a.outId, 'panoramaOut'), assert.equal(_0x16ed6a.taskId, 'pano-task'));
+      (assert.equal(runningHubToolbarTaskForNode3.outId, 'panoramaOut'),
+        assert.equal(runningHubToolbarTaskForNode3.taskId, 'pano-task'));
     }
   }),
   test('RunningHub toolbar task button covers all source-toolbar RH task types', () => {
-    const _0x4f6e09 = [
+    const list3 = [
         {
           sourceId: 'img-subject-src',
           outId: 'img-subject-out',
@@ -287,29 +288,29 @@ function createButton() {
           taskType: 'video-hd',
         },
       ],
-      _0x3c7097 = {};
-    (_0x4f6e09.forEach((_0x53a2a7) => {
-      ((_0x3c7097[_0x53a2a7.sourceId] = { id: _0x53a2a7.sourceId, type: 'source-image' }),
-        (_0x3c7097[_0x53a2a7.outId] = {
-          id: _0x53a2a7.outId,
+      output = {};
+    (list3.forEach((id) => {
+      ((output[id.sourceId] = { id: id.sourceId, type: 'source-image' }),
+        (output[id.outId] = {
+          id: id.outId,
           type: 'source-image',
           provider: 'runninghubwf',
-          model: _0x53a2a7.model,
-          rhSourceNodeId: _0x53a2a7.sourceId,
-          rhToolbarTaskType: _0x53a2a7.taskType,
-          rhTaskId: _0x53a2a7.taskType + '-task',
+          model: id.model,
+          rhSourceNodeId: id.sourceId,
+          rhToolbarTaskType: id.taskType,
+          rhTaskId: id.taskType + '-task',
           rhTaskStatus: 'running',
           isGenerating: true,
         }));
     }),
-      resetStore(_0x3c7097),
-      _0x4f6e09.forEach((_0x9ad49c) => {
-        for (const _0x3169ed of [_0x9ad49c.sourceId, _0x9ad49c.outId]) {
-          const _0x5e2a6c = findRunningHubToolbarTaskForNode(_0x3169ed, {
-            models: [_0x9ad49c.model],
-            taskTypes: [_0x9ad49c.taskType],
+      resetStore(output),
+      list3.forEach((item4) => {
+        for (const value2 of [item4.sourceId, item4.outId]) {
+          const runningHubToolbarTaskForNode4 = findRunningHubToolbarTaskForNode(value2, {
+            models: [item4.model],
+            taskTypes: [item4.taskType],
           });
-          assert.equal(_0x5e2a6c.outId, _0x9ad49c.outId, _0x9ad49c.taskType + ':' + _0x3169ed);
+          assert.equal(runningHubToolbarTaskForNode4.outId, item4.outId, item4.taskType + ':' + value2);
         }
       }));
   }));

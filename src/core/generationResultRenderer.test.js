@@ -32,68 +32,69 @@ import {
       assert.equal(firstNonEmptyString('', null, ' ok '), 'ok'));
   }),
   test('generationResultRenderer: builds success and failure collection patches', () => {
-    const _0x19b82a = buildGenerationCollectionResultPatch(
+    const generationCollectionResultPatch = buildGenerationCollectionResultPatch(
       { videos: [{ videoUrl: '/out.mp4', localPath: 'output/out.mp4' }] },
       {
         collectionField: 'videos',
         mainIndexField: 'mainVideoIndex',
         expandedField: 'isVideosExpanded',
         startedAt: Date.now() - 10,
-        buildFirstItemPatch: (_0x12ab1c) => ({
-          videoUrl: _0x12ab1c.videoUrl,
-          localPath: _0x12ab1c.localPath,
+        buildFirstItemPatch: (videoUrl) => ({
+          videoUrl: videoUrl.videoUrl,
+          localPath: videoUrl.localPath,
         }),
         extraPatch: { rhStatusMessage: null },
       },
     );
-    (assert.equal(_0x19b82a.jobStatus, 'success'),
-      assert.equal(_0x19b82a.mainVideoIndex, 0),
-      assert.equal(_0x19b82a.isVideosExpanded, false),
-      assert.equal(_0x19b82a.videoUrl, '/out.mp4'),
-      assert.equal(_0x19b82a.localPath, 'output/out.mp4'),
-      assert.equal(_0x19b82a.rhStatusMessage, null));
-    const _0x3f22c7 = buildGenerationCollectionResultPatch(
+    (assert.equal(generationCollectionResultPatch.jobStatus, 'success'),
+      assert.equal(generationCollectionResultPatch.mainVideoIndex, 0),
+      assert.equal(generationCollectionResultPatch.isVideosExpanded, false),
+      assert.equal(generationCollectionResultPatch.videoUrl, '/out.mp4'),
+      assert.equal(generationCollectionResultPatch.localPath, 'output/out.mp4'),
+      assert.equal(generationCollectionResultPatch.rhStatusMessage, null));
+    const generationCollectionResultPatch2 = buildGenerationCollectionResultPatch(
       { error: 'provider failed' },
       { collectionField: 'videos', mainIndexField: 'mainVideoIndex', singleItemFields: ['videoUrl'] },
     );
-    (assert.equal(_0x3f22c7.jobStatus, 'error'),
-      assert.equal(_0x3f22c7.jobError, 'provider failed'),
-      assert.equal(_0x3f22c7.videos.length, 1));
+    (assert.equal(generationCollectionResultPatch2.jobStatus, 'error'),
+      assert.equal(generationCollectionResultPatch2.jobError, 'provider failed'),
+      assert.equal(generationCollectionResultPatch2.videos.length, 1));
   }),
   test('generationResultRenderer: collection patch can select a nonzero main item', () => {
-    const _0x246f1d = buildGenerationCollectionResultPatch(
+    const generationCollectionResultPatch3 = buildGenerationCollectionResultPatch(
       { videos: [{ error: 'provider failed' }, { videoUrl: '/out.mp4', localPath: 'output/out.mp4' }] },
       {
         collectionField: 'videos',
         mainIndexField: 'mainVideoIndex',
         selectMainIndex: () => 1,
-        buildFirstItemPatch: (_0x4f12ea) => ({
-          videoUrl: _0x4f12ea.videoUrl,
-          localPath: _0x4f12ea.localPath,
+        buildFirstItemPatch: (videoUrl2) => ({
+          videoUrl: videoUrl2.videoUrl,
+          localPath: videoUrl2.localPath,
         }),
       },
     );
-    (assert.equal(_0x246f1d.jobStatus, 'success'),
-      assert.equal(_0x246f1d.mainVideoIndex, 1),
-      assert.equal(_0x246f1d.videoUrl, '/out.mp4'),
-      assert.equal(_0x246f1d.localPath, 'output/out.mp4'));
+    (assert.equal(generationCollectionResultPatch3.jobStatus, 'success'),
+      assert.equal(generationCollectionResultPatch3.mainVideoIndex, 1),
+      assert.equal(generationCollectionResultPatch3.videoUrl, '/out.mp4'),
+      assert.equal(generationCollectionResultPatch3.localPath, 'output/out.mp4'));
   }),
   test('generationResultRenderer: builds single result patch without collection fields', () => {
-    const _0x19c968 = buildGenerationSingleResultPatch(
+    const generationSingleResultPatch = buildGenerationSingleResultPatch(
       { audioUrl: '/output/final.mp3', localPath: 'output/final.mp3' },
       {
         singleItemFields: ['audioUrl', 'localPath'],
-        buildItemPatch: (_0x21c058) => ({ audioUrl: _0x21c058.audioUrl, localPath: _0x21c058.localPath }),
+        buildItemPatch: (audioUrl) => ({ audioUrl: audioUrl.audioUrl, localPath: audioUrl.localPath }),
         extraPatch: { rhStatusMessage: null },
       },
     );
-    (assert.equal(_0x19c968.jobStatus, 'success'),
-      assert.equal(_0x19c968.audioUrl, '/output/final.mp3'),
-      assert.equal(_0x19c968.localPath, 'output/final.mp3'),
-      assert.equal(_0x19c968.rhStatusMessage, null));
-    const _0x1bd89e = buildGenerationSingleResultPatch(
+    (assert.equal(generationSingleResultPatch.jobStatus, 'success'),
+      assert.equal(generationSingleResultPatch.audioUrl, '/output/final.mp3'),
+      assert.equal(generationSingleResultPatch.localPath, 'output/final.mp3'),
+      assert.equal(generationSingleResultPatch.rhStatusMessage, null));
+    const generationSingleResultPatch2 = buildGenerationSingleResultPatch(
       { error: 'provider failed' },
       { singleItemFields: ['audioUrl'] },
     );
-    (assert.equal(_0x1bd89e.jobStatus, 'error'), assert.equal(_0x1bd89e.jobError, 'provider failed'));
+    (assert.equal(generationSingleResultPatch2.jobStatus, 'error'),
+      assert.equal(generationSingleResultPatch2.jobError, 'provider failed'));
   }));

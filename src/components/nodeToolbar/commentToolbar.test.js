@@ -8,43 +8,43 @@ afterEach(() => {
     typeof originalWindow === 'undefined' ? delete globalThis.window : (globalThis.window = originalWindow));
 });
 class FakeClassList {
-  constructor(_0x671343, _0x3bcf5f = '') {
-    ((this.owner = _0x671343), (this.values = new Set(String(_0x3bcf5f).split(/\s+/).filter(Boolean))));
+  constructor(value, item = '') {
+    ((this.owner = value), (this.values = new Set(String(item).split(/\s+/).filter(Boolean))));
   }
   ['_sync']() {
     this.owner.className = [...this.values].join(' ');
   }
-  ['add'](..._0x135bda) {
-    (_0x135bda.forEach((_0x222c53) => this.values.add(_0x222c53)), this._sync());
+  ['add'](...list) {
+    (list.forEach((item2) => this.values.add(item2)), this._sync());
   }
-  ['remove'](..._0x1f5132) {
-    (_0x1f5132.forEach((_0x21b684) => this.values.delete(_0x21b684)), this._sync());
+  ['remove'](...list2) {
+    (list2.forEach((item3) => this.values.delete(item3)), this._sync());
   }
-  ['contains'](_0x158a6e) {
-    return this.values.has(_0x158a6e);
+  ['contains'](key) {
+    return this.values.has(key);
   }
-  ['toggle'](_0x995536, _0x76df3e) {
-    const _0x16186f = _0x76df3e === undefined ? !this.values.has(_0x995536) : !!_0x76df3e;
-    if (_0x16186f) this.values.add(_0x995536);
-    else this.values.delete(_0x995536);
-    return (this._sync(), _0x16186f);
+  ['toggle'](index, enabled) {
+    const result = enabled === undefined ? !this.values.has(index) : !!enabled;
+    if (result) this.values.add(index);
+    else this.values.delete(index);
+    return (this._sync(), result);
   }
 }
 class FakeButton {
-  constructor(_0x231ccd) {
-    ((this.className = _0x231ccd),
+  constructor(data) {
+    ((this.className = data),
       (this.dataset = {}),
       (this.attrs = new Map()),
-      (this.classList = new FakeClassList(this, _0x231ccd)));
+      (this.classList = new FakeClassList(this, data)));
   }
-  ['setAttribute'](_0x23a160, _0x5a771b) {
-    this.attrs.set(_0x23a160, String(_0x5a771b));
+  ['setAttribute'](options, target) {
+    this.attrs.set(options, String(target));
   }
-  ['getAttribute'](_0x33d7d4) {
-    return this.attrs.get(_0x33d7d4) || '';
+  ['getAttribute'](source) {
+    return this.attrs.get(source) || '';
   }
-  ['closest'](_0x1c8b60) {
-    return _0x1c8b60 === 'button' ? this : null;
+  ['closest'](next) {
+    return next === 'button' ? this : null;
   }
 }
 class FakeToolbar {
@@ -55,21 +55,21 @@ class FakeToolbar {
       (this.markdownBtn = new FakeButton('ftb-btn icon-only act-convert-markdown')),
       (this.listeners = new Map()));
   }
-  ['addEventListener'](_0x42fc3c, _0x2e7d74) {
-    this.listeners.set(_0x42fc3c, _0x2e7d74);
+  ['addEventListener'](current, entry) {
+    this.listeners.set(current, entry);
   }
   ['contains']() {
     return false;
   }
-  ['querySelector'](_0x796570) {
-    if (_0x796570 === '.act-convert-markdown') return this.markdownBtn;
+  ['querySelector'](record) {
+    if (record === '.act-convert-markdown') return this.markdownBtn;
     return null;
   }
   ['querySelectorAll']() {
     return [];
   }
-  ['click'](_0x118373) {
-    this.listeners.get('click')?.({ target: _0x118373, stopPropagation() {} });
+  ['click'](target2) {
+    this.listeners.get('click')?.({ target: target2, stopPropagation() {} });
   }
 }
 (test('commentToolbar: Markdown 转换按钮位于注释节点工具栏', () => {
@@ -80,10 +80,10 @@ class FakeToolbar {
     assert.doesNotMatch(COMMENT_NOTE_TOOLBAR_HTML, /act-copy-node/));
 }),
   test('commentToolbar: Markdown 按钮可切换注释格式', () => {
-    let _0x5c8c68 = '';
+    let payload = '';
     ((globalThis.window = {
-      showToast(_0x21d657) {
-        _0x5c8c68 = _0x21d657;
+      showToast(handle) {
+        payload = handle;
       },
     }),
       appStore.loadState({
@@ -99,27 +99,27 @@ class FakeToolbar {
         edges: {},
         viewport: { x: 0, y: 0, zoom: 1 },
       }));
-    const _0x129f12 = new FakeToolbar(),
-      _0x33a067 = { id: 'comment-1', type: 'comment-note', content: '## 标题', width: 0x104, height: 120 };
+    const toolbarEl = new FakeToolbar(),
+      state = { id: 'comment-1', type: 'comment-note', content: '## 标题', width: 0x104, height: 120 };
     (bindCommentNoteToolbarEvents({
-      toolbarEl: _0x129f12,
+      toolbarEl: toolbarEl,
       nodeId: 'comment-1',
       getCurrentStyle: () => ({}),
       enterEditMode: () => {},
-      getNodeSnapshot: () => _0x33a067,
+      getNodeSnapshot: () => state,
     }),
-      _0x129f12.click(_0x129f12.markdownBtn));
-    const _0x524957 = appStore.getStateRaw().nodes['comment-1'];
-    (assert.equal(_0x524957.content, '## 标题'),
-      assert.equal(_0x524957.contentFormat, 'markdown'),
-      assert.equal(_0x129f12.markdownBtn.classList.contains('is-active'), true),
-      assert.equal(_0x129f12.markdownBtn.getAttribute('aria-label'), '切回普通注释'),
-      assert.equal(_0x5c8c68, '已转为 Markdown 注释'),
-      _0x129f12.click(_0x129f12.markdownBtn));
-    const _0x513ca3 = appStore.getStateRaw().nodes['comment-1'];
-    (assert.equal(_0x513ca3.content, '## 标题'),
-      assert.equal(_0x513ca3.contentFormat, 'plain'),
-      assert.equal(_0x129f12.markdownBtn.classList.contains('is-active'), false),
-      assert.equal(_0x129f12.markdownBtn.getAttribute('aria-label'), '转为 Markdown 注释'),
-      assert.equal(_0x5c8c68, '已切回普通注释'));
+      toolbarEl.click(toolbarEl.markdownBtn));
+    const config = appStore.getStateRaw().nodes['comment-1'];
+    (assert.equal(config.content, '## 标题'),
+      assert.equal(config.contentFormat, 'markdown'),
+      assert.equal(toolbarEl.markdownBtn.classList.contains('is-active'), true),
+      assert.equal(toolbarEl.markdownBtn.getAttribute('aria-label'), '切回普通注释'),
+      assert.equal(payload, '已转为 Markdown 注释'),
+      toolbarEl.click(toolbarEl.markdownBtn));
+    const scope = appStore.getStateRaw().nodes['comment-1'];
+    (assert.equal(scope.content, '## 标题'),
+      assert.equal(scope.contentFormat, 'plain'),
+      assert.equal(toolbarEl.markdownBtn.classList.contains('is-active'), false),
+      assert.equal(toolbarEl.markdownBtn.getAttribute('aria-label'), '转为 Markdown 注释'),
+      assert.equal(payload, '已切回普通注释'));
   }));

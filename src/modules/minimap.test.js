@@ -5,8 +5,8 @@ import { calcWorldBounds } from '../core/math.js';
 import { getPerfProbeSnapshot, resetPerfProbeData, setPerfProbeEnabled } from './perf/perfProbe.js';
 function createStyle() {
   return {
-    removeProperty(_0xc0bee9) {
-      delete this[String(_0xc0bee9 || '')];
+    removeProperty(value) {
+      delete this[String(value || '')];
     },
   };
 }
@@ -17,7 +17,7 @@ function createFakeElement({
   left: left = 0,
   top: top = 0,
 } = {}) {
-  const _0x2c6bfa = new Map();
+  const map = new Map();
   return {
     id: id,
     style: createStyle(),
@@ -26,25 +26,25 @@ function createFakeElement({
     clientWidth: width,
     clientHeight: height,
     parentNode: null,
-    appendChild(_0x5f5916) {
-      return (this.children.push(_0x5f5916), (_0x5f5916.parentNode = this), _0x5f5916);
+    appendChild(el) {
+      return (this.children.push(el), (el.parentNode = this), el);
     },
-    removeChild(_0x5e778d) {
-      const _0x5e8de6 = this.children.indexOf(_0x5e778d);
-      if (_0x5e8de6 >= 0) this.children.splice(_0x5e8de6, 1);
-      _0x5e778d.parentNode = null;
+    removeChild(el2) {
+      const count = this.children.indexOf(el2);
+      if (count >= 0) this.children.splice(count, 1);
+      el2.parentNode = null;
     },
     remove() {
       this.parentNode?.removeChild?.(this);
     },
-    addEventListener(_0x2728d3, _0x3e4573) {
-      const _0x3a8b25 = String(_0x2728d3 || ''),
-        _0x17f2bc = _0x2c6bfa.get(_0x3a8b25) || [];
-      (_0x17f2bc.push(_0x3e4573), _0x2c6bfa.set(_0x3a8b25, _0x17f2bc));
+    addEventListener(item, key) {
+      const index = String(item || ''),
+        list = map.get(index) || [];
+      (list.push(key), map.set(index, list));
     },
-    dispatch(_0x21b072, _0x13bee2 = {}) {
-      const _0x4249a9 = _0x2c6bfa.get(String(_0x21b072 || '')) || [];
-      for (const _0x2dc48e of _0x4249a9) _0x2dc48e(_0x13bee2);
+    dispatch(result, data = {}) {
+      const options = map.get(String(result || '')) || [];
+      for (const run of options) run(data);
     },
     setPointerCapture() {},
     releasePointerCapture() {},
@@ -61,84 +61,84 @@ function createFakeElement({
   };
 }
 function computeExpectedViewportBox({
-  viewport: _0x5a0a5d,
-  mapW: _0x19fdd4,
-  mapH: _0x590268,
-  innerWidth: _0x4cefd6,
-  innerHeight: _0x1a6830,
+  viewport: viewport,
+  mapW: mapW,
+  mapH: mapH,
+  innerWidth: innerWidth,
+  innerHeight: innerHeight,
 }) {
-  const _0x226c02 = calcWorldBounds({}, _0x5a0a5d),
-    _0x2a0246 = Math.max(_0x226c02.width, 0x3e8),
-    _0x57bda2 = Math.max(_0x226c02.height, 0x3e8),
-    _0x56c43a = Math.min(_0x19fdd4 / _0x2a0246, _0x590268 / _0x57bda2),
-    _0x4cb445 = (_0x19fdd4 - _0x2a0246 * _0x56c43a) / 2,
-    _0x57d54f = (_0x590268 - _0x57bda2 * _0x56c43a) / 2,
-    _0xe8f994 = _0x4cefd6 / _0x5a0a5d.zoom,
-    _0x14fdb8 = _0x1a6830 / _0x5a0a5d.zoom,
-    _0x1eba90 = -_0x5a0a5d.x / _0x5a0a5d.zoom,
-    _0x591e07 = -_0x5a0a5d.y / _0x5a0a5d.zoom;
+  const bounds = calcWorldBounds({}, viewport),
+    target = Math.max(bounds.width, 0x3e8),
+    source = Math.max(bounds.height, 0x3e8),
+    scale = Math.min(mapW / target, mapH / source),
+    offsetX = (mapW - target * scale) / 2,
+    offsetY = (mapH - source * scale) / 2,
+    width2 = innerWidth / viewport.zoom,
+    height2 = innerHeight / viewport.zoom,
+    next = -viewport.x / viewport.zoom,
+    current = -viewport.y / viewport.zoom;
   return {
-    bounds: _0x226c02,
-    scale: _0x56c43a,
-    offsetX: _0x4cb445,
-    offsetY: _0x57d54f,
-    left: _0x4cb445 + (_0x1eba90 - _0x226c02.minX) * _0x56c43a,
-    top: _0x57d54f + (_0x591e07 - _0x226c02.minY) * _0x56c43a,
-    width: _0xe8f994 * _0x56c43a,
-    height: _0x14fdb8 * _0x56c43a,
+    bounds: bounds,
+    scale: scale,
+    offsetX: offsetX,
+    offsetY: offsetY,
+    left: offsetX + (next - bounds.minX) * scale,
+    top: offsetY + (current - bounds.minY) * scale,
+    width: width2 * scale,
+    height: height2 * scale,
   };
 }
-function createStore(_0x39c0f1) {
-  let _0x133fd4 = _0x39c0f1;
-  const _0x170082 = [],
-    _0x32539e = [],
-    _0x58fd90 = () => {
-      _0x170082.forEach((_0xf7ebe5) => {
-        const _0x30b556 = _0xf7ebe5.selector(_0x133fd4);
-        if (Object.is(_0xf7ebe5.lastValue, _0x30b556)) return;
-        ((_0xf7ebe5.lastValue = _0x30b556), _0xf7ebe5.callback(_0x30b556));
+function createStore(entry) {
+  let args = entry;
+  const list2 = [],
+    list3 = [],
+    handler = () => {
+      list2.forEach((item2) => {
+        const record = item2.selector(args);
+        if (Object.is(item2.lastValue, record)) return;
+        ((item2.lastValue = record), item2.callback(record));
       });
     };
   return {
     getStateRaw() {
-      return _0x133fd4;
+      return args;
     },
-    subscribeSelector(_0x24844b, _0x1864cf) {
-      const _0x338793 = { selector: _0x24844b, callback: _0x1864cf, lastValue: _0x24844b(_0x133fd4) };
+    subscribeSelector(selector, callback) {
+      const payload = { selector: selector, callback: callback, lastValue: selector(args) };
       return (
-        _0x170082.push(_0x338793),
+        list2.push(payload),
         () => {
-          const _0x49e338 = _0x170082.indexOf(_0x338793);
-          if (_0x49e338 >= 0) _0x170082.splice(_0x49e338, 1);
+          const count2 = list2.indexOf(payload);
+          if (count2 >= 0) list2.splice(count2, 1);
         }
       );
     },
-    setState(_0x124710 = {}) {
-      ((_0x133fd4 = { ..._0x133fd4, ..._0x124710 }), _0x58fd90());
+    setState(args2 = {}) {
+      ((args = { ...args, ...args2 }), handler());
     },
-    updateViewport(_0x3e09f2, _0x113284, _0x449c0b) {
-      (_0x32539e.push({ x: _0x3e09f2, y: _0x113284, zoom: _0x449c0b }),
-        (_0x133fd4 = { ..._0x133fd4, viewport: { x: _0x3e09f2, y: _0x113284, zoom: _0x449c0b } }),
-        _0x58fd90());
+    updateViewport(x, y, zoom) {
+      (list3.push({ x: x, y: y, zoom: zoom }),
+        (args = { ...args, viewport: { x: x, y: y, zoom: zoom } }),
+        handler());
     },
     getViewportUpdates() {
-      return _0x32539e.slice();
+      return list3.slice();
     },
   };
 }
 function installMinimapDomStubs() {
-  const _0x22fe14 = globalThis.window,
-    _0x11d1b8 = globalThis.document,
-    _0x31496d = globalThis.requestAnimationFrame,
-    _0x17f972 = globalThis.cancelAnimationFrame,
-    _0x5d12e1 = createFakeElement({ id: 'minimap', width: 200, height: 140, left: 10, top: 20 }),
-    _0x26e074 = createFakeElement({ id: 'minimapViewport' }),
-    _0x3d61f8 = createFakeElement({ id: 'minimapWrapper' }),
-    _0x6766be = createFakeElement({ id: 'v2-wrap' }),
-    _0x5c46d8 = new Map([
-      ['minimapViewport', _0x26e074],
-      ['minimapWrapper', _0x3d61f8],
-      ['v2-wrap', _0x6766be],
+  const handle = globalThis.window,
+    state = globalThis.document,
+    config = globalThis.requestAnimationFrame,
+    scope = globalThis.cancelAnimationFrame,
+    minimap = createFakeElement({ id: 'minimap', width: 200, height: 140, left: 10, top: 20 }),
+    minimapViewport = createFakeElement({ id: 'minimapViewport' }),
+    minimapWrapper = createFakeElement({ id: 'minimapWrapper' }),
+    fakeElement = createFakeElement({ id: 'v2-wrap' }),
+    map2 = new Map([
+      ['minimapViewport', minimapViewport],
+      ['minimapWrapper', minimapWrapper],
+      ['v2-wrap', fakeElement],
     ]);
   return (
     (globalThis.window = { innerWidth: 0x4b0, innerHeight: 0x320, _v2MinimapScale: 0 }),
@@ -146,249 +146,249 @@ function installMinimapDomStubs() {
       createElement() {
         return createFakeElement();
       },
-      getElementById(_0x26eeea) {
-        return _0x5c46d8.get(String(_0x26eeea || '')) || null;
+      getElementById(input) {
+        return map2.get(String(input || '')) || null;
       },
     }),
-    (globalThis.requestAnimationFrame = (_0x595523) => {
-      return (_0x595523(), 1);
+    (globalThis.requestAnimationFrame = (handler2) => {
+      return (handler2(), 1);
     }),
     (globalThis.cancelAnimationFrame = () => {}),
     {
-      minimap: _0x5d12e1,
-      minimapViewport: _0x26e074,
-      minimapWrapper: _0x3d61f8,
+      minimap: minimap,
+      minimapViewport: minimapViewport,
+      minimapWrapper: minimapWrapper,
       restore() {
-        if (typeof _0x22fe14 === 'undefined') delete globalThis.window;
-        else globalThis.window = _0x22fe14;
-        if (typeof _0x11d1b8 === 'undefined') delete globalThis.document;
-        else globalThis.document = _0x11d1b8;
-        (typeof _0x31496d === 'undefined'
+        if (typeof handle === 'undefined') delete globalThis.window;
+        else globalThis.window = handle;
+        if (typeof state === 'undefined') delete globalThis.document;
+        else globalThis.document = state;
+        (typeof config === 'undefined'
           ? delete globalThis.requestAnimationFrame
-          : (globalThis.requestAnimationFrame = _0x31496d),
-          typeof _0x17f972 === 'undefined'
+          : (globalThis.requestAnimationFrame = config),
+          typeof scope === 'undefined'
             ? delete globalThis.cancelAnimationFrame
-            : (globalThis.cancelAnimationFrame = _0x17f972));
+            : (globalThis.cancelAnimationFrame = scope));
       },
     }
   );
 }
 (test('minimap: 空画布平移会刷新 viewport 框投影', () => {
-  const _0x36720f = installMinimapDomStubs(),
-    _0x159f21 = createStore({ nodes: {}, viewport: { x: 0, y: 0, zoom: 1 }, _persistRev: 0, _nodeCount: 0 });
-  let _0xe93ffc = null;
+  const mapW2 = installMinimapDomStubs(),
+    viewport2 = createStore({ nodes: {}, viewport: { x: 0, y: 0, zoom: 1 }, _persistRev: 0, _nodeCount: 0 });
+  let initMinimap2 = null;
   try {
-    _0xe93ffc = initMinimap(_0x36720f.minimap, _0x159f21);
-    const _0x1045a5 = computeExpectedViewportBox({
-      viewport: _0x159f21.getStateRaw().viewport,
-      mapW: _0x36720f.minimap.clientWidth,
-      mapH: _0x36720f.minimap.clientHeight,
+    initMinimap2 = initMinimap(mapW2.minimap, viewport2);
+    const box = computeExpectedViewportBox({
+      viewport: viewport2.getStateRaw().viewport,
+      mapW: mapW2.minimap.clientWidth,
+      mapH: mapW2.minimap.clientHeight,
       innerWidth: globalThis.window.innerWidth,
       innerHeight: globalThis.window.innerHeight,
     });
-    (assert.equal(_0x36720f.minimapViewport.style.left, _0x1045a5.left + 'px'),
-      assert.equal(_0x36720f.minimapViewport.style.top, _0x1045a5.top + 'px'),
-      _0x159f21.setState({ viewport: { x: 240, y: -120, zoom: 1 } }));
-    const _0x1a1852 = computeExpectedViewportBox({
-      viewport: _0x159f21.getStateRaw().viewport,
-      mapW: _0x36720f.minimap.clientWidth,
-      mapH: _0x36720f.minimap.clientHeight,
+    (assert.equal(mapW2.minimapViewport.style.left, box.left + 'px'),
+      assert.equal(mapW2.minimapViewport.style.top, box.top + 'px'),
+      viewport2.setState({ viewport: { x: 240, y: -120, zoom: 1 } }));
+    const box2 = computeExpectedViewportBox({
+      viewport: viewport2.getStateRaw().viewport,
+      mapW: mapW2.minimap.clientWidth,
+      mapH: mapW2.minimap.clientHeight,
       innerWidth: globalThis.window.innerWidth,
       innerHeight: globalThis.window.innerHeight,
     });
-    (assert.equal(_0x36720f.minimapViewport.style.left, _0x1a1852.left + 'px'),
-      assert.equal(_0x36720f.minimapViewport.style.top, _0x1a1852.top + 'px'));
+    (assert.equal(mapW2.minimapViewport.style.left, box2.left + 'px'),
+      assert.equal(mapW2.minimapViewport.style.top, box2.top + 'px'));
   } finally {
-    (_0xe93ffc?.(), _0x36720f.restore());
+    (initMinimap2?.(), mapW2.restore());
   }
 }),
   test('minimap: canvas pan preview throttles viewport box updates', () => {
-    const _0x2b984e = globalThis.setTimeout,
-      _0x282c09 = globalThis.clearTimeout,
-      _0x543e4e = Object.prototype.hasOwnProperty.call(globalThis, 'performance'),
-      _0x3bbba2 = globalThis.performance,
-      _0x16b4c5 = [];
-    let _0x3292e2 = 0x3e8;
-    ((globalThis.setTimeout = (_0x295438, _0x5743e2) => {
-      const _0x2ebacf = { callback: _0x295438, delay: _0x5743e2, cancelled: false };
-      return (_0x16b4c5.push(_0x2ebacf), _0x2ebacf);
+    const output = globalThis.setTimeout,
+      value2 = globalThis.clearTimeout,
+      value3 = Object.prototype.hasOwnProperty.call(globalThis, 'performance'),
+      value4 = globalThis.performance,
+      list4 = [];
+    let value5 = 0x3e8;
+    ((globalThis.setTimeout = (callback2, delay) => {
+      const value6 = { callback: callback2, delay: delay, cancelled: false };
+      return (list4.push(value6), value6);
     }),
-      (globalThis.clearTimeout = (_0xaf5ff7) => {
-        if (_0xaf5ff7) _0xaf5ff7.cancelled = true;
+      (globalThis.clearTimeout = (value7) => {
+        if (value7) value7.cancelled = true;
       }),
       Object.defineProperty(globalThis, 'performance', {
         configurable: true,
-        value: { now: () => _0x3292e2 },
+        value: { now: () => value5 },
       }));
-    const _0x2e888b = installMinimapDomStubs(),
-      _0x22a7eb = createStore({
+    const mapW3 = installMinimapDomStubs(),
+      store = createStore({
         nodes: {},
         viewport: { x: 0, y: 0, zoom: 1 },
         _persistRev: 0,
         _nodeCount: 0,
       });
-    let _0x14685e = null;
+    let initMinimap3 = null;
     try {
-      _0x14685e = initMinimap(_0x2e888b.minimap, _0x22a7eb);
-      const _0x1e29b8 = { x: 120, y: -60, zoom: 1 };
-      globalThis.window._v2ScheduleMinimapViewportPreview(_0x1e29b8, { force: true });
-      const _0x4c037b = _0x2e888b.minimapViewport.style.left,
-        _0x223283 = _0x2e888b.minimapViewport.style.top;
-      _0x3292e2 = 0x3fc;
-      const _0x46d236 = { x: 0x104, y: -90, zoom: 1 };
-      (globalThis.window._v2ScheduleMinimapViewportPreview(_0x46d236),
-        assert.equal(_0x2e888b.minimapViewport.style.left, _0x4c037b),
-        assert.equal(_0x2e888b.minimapViewport.style.top, _0x223283),
-        assert.equal(_0x16b4c5.length, 1),
-        assert.ok(_0x16b4c5[0].delay > 0),
-        assert.ok(_0x16b4c5[0].delay <= 96),
-        (_0x3292e2 = 0x44c),
-        _0x16b4c5[0].callback());
-      const _0x37dd5e = computeExpectedViewportBox({
-        viewport: _0x46d236,
-        mapW: _0x2e888b.minimap.clientWidth,
-        mapH: _0x2e888b.minimap.clientHeight,
+      initMinimap3 = initMinimap(mapW3.minimap, store);
+      const value8 = { x: 120, y: -60, zoom: 1 };
+      globalThis.window._v2ScheduleMinimapViewportPreview(value8, { force: true });
+      const value9 = mapW3.minimapViewport.style.left,
+        value10 = mapW3.minimapViewport.style.top;
+      value5 = 0x3fc;
+      const viewport3 = { x: 0x104, y: -90, zoom: 1 };
+      (globalThis.window._v2ScheduleMinimapViewportPreview(viewport3),
+        assert.equal(mapW3.minimapViewport.style.left, value9),
+        assert.equal(mapW3.minimapViewport.style.top, value10),
+        assert.equal(list4.length, 1),
+        assert.ok(list4[0].delay > 0),
+        assert.ok(list4[0].delay <= 96),
+        (value5 = 0x44c),
+        list4[0].callback());
+      const box3 = computeExpectedViewportBox({
+        viewport: viewport3,
+        mapW: mapW3.minimap.clientWidth,
+        mapH: mapW3.minimap.clientHeight,
         innerWidth: globalThis.window.innerWidth,
         innerHeight: globalThis.window.innerHeight,
       });
-      (assert.equal(_0x2e888b.minimapViewport.style.left, _0x37dd5e.left + 'px'),
-        assert.equal(_0x2e888b.minimapViewport.style.top, _0x37dd5e.top + 'px'),
-        assert.deepEqual(_0x22a7eb.getViewportUpdates(), []));
+      (assert.equal(mapW3.minimapViewport.style.left, box3.left + 'px'),
+        assert.equal(mapW3.minimapViewport.style.top, box3.top + 'px'),
+        assert.deepEqual(store.getViewportUpdates(), []));
     } finally {
-      (_0x14685e?.(),
-        _0x2e888b.restore(),
-        (globalThis.setTimeout = _0x2b984e),
-        (globalThis.clearTimeout = _0x282c09),
-        _0x543e4e
-          ? Object.defineProperty(globalThis, 'performance', { configurable: true, value: _0x3bbba2 })
+      (initMinimap3?.(),
+        mapW3.restore(),
+        (globalThis.setTimeout = output),
+        (globalThis.clearTimeout = value2),
+        value3
+          ? Object.defineProperty(globalThis, 'performance', { configurable: true, value: value4 })
           : delete globalThis.performance);
     }
   }),
   test('minimap: viewport-only store updates do not refresh node dots', () => {
-    const _0xa2cf49 = installMinimapDomStubs(),
-      _0x52ecb3 = [];
-    let _0x13843c = 1;
-    ((globalThis.requestAnimationFrame = (_0x17e1fe) => {
-      const _0x574eba = _0x13843c;
-      return ((_0x13843c += 1), _0x52ecb3.push({ id: _0x574eba, callback: _0x17e1fe }), _0x574eba);
+    const ctx = installMinimapDomStubs(),
+      list5 = [];
+    let value11 = 1;
+    ((globalThis.requestAnimationFrame = (callback3) => {
+      const id2 = value11;
+      return ((value11 += 1), list5.push({ id: id2, callback: callback3 }), id2);
     }),
-      (globalThis.cancelAnimationFrame = (_0x8c313) => {
-        const _0x369123 = _0x52ecb3.findIndex((_0x350e59) => _0x350e59.id === _0x8c313);
-        if (_0x369123 >= 0) _0x52ecb3.splice(_0x369123, 1);
+      (globalThis.cancelAnimationFrame = (value12) => {
+        const count3 = list5.findIndex((item3) => item3.id === value12);
+        if (count3 >= 0) list5.splice(count3, 1);
       }));
-    const _0x4bd9ae = () => {
-        const _0x2f8865 = _0x52ecb3.splice(0);
-        _0x2f8865.forEach((_0x4bc313) => _0x4bc313.callback?.());
+    const run2 = () => {
+        const list6 = list5.splice(0);
+        list6.forEach((item4) => item4.callback?.());
       },
-      _0x3b2074 = createStore({
+      store2 = createStore({
         nodes: { node_a: { id: 'node_a', type: 'source-image', x: 100, y: 120, width: 240, height: 160 } },
         viewport: { x: 0, y: 0, zoom: 1 },
         _persistRev: 1,
         _nodeCount: 1,
       });
-    let _0x4c3b93 = null;
+    let initMinimap4 = null;
     try {
       (setPerfProbeEnabled(true),
-        (_0x4c3b93 = initMinimap(_0xa2cf49.minimap, _0x3b2074)),
-        _0x4bd9ae(),
+        (initMinimap4 = initMinimap(ctx.minimap, store2)),
+        run2(),
         resetPerfProbeData());
-      let _0x49609b = 0;
-      (Object.defineProperty(_0xa2cf49.minimap, 'clientWidth', {
+      let value13 = 0;
+      (Object.defineProperty(ctx.minimap, 'clientWidth', {
         configurable: true,
         get() {
-          return ((_0x49609b += 1), 200);
+          return ((value13 += 1), 200);
         },
       }),
-        Object.defineProperty(_0xa2cf49.minimap, 'clientHeight', {
+        Object.defineProperty(ctx.minimap, 'clientHeight', {
           configurable: true,
           get() {
-            return ((_0x49609b += 1), 140);
+            return ((value13 += 1), 140);
           },
         }),
-        _0x3b2074.setState({ viewport: { x: 80, y: -40, zoom: 1.2 } }),
-        _0x4bd9ae());
-      const _0x41bcb2 = getPerfProbeSnapshot().minimapUpdateSamples;
-      (assert.equal(_0x41bcb2.length, 1),
-        assert.equal(_0x41bcb2[0].mode, 'viewport'),
-        assert.equal(_0x41bcb2[0].viewportOnly, true),
-        assert.equal(_0x41bcb2[0].updatedCount, 0),
-        assert.equal(_0x49609b, 0));
+        store2.setState({ viewport: { x: 80, y: -40, zoom: 1.2 } }),
+        run2());
+      const list7 = getPerfProbeSnapshot().minimapUpdateSamples;
+      (assert.equal(list7.length, 1),
+        assert.equal(list7[0].mode, 'viewport'),
+        assert.equal(list7[0].viewportOnly, true),
+        assert.equal(list7[0].updatedCount, 0),
+        assert.equal(value13, 0));
     } finally {
-      (_0x4c3b93?.(), resetPerfProbeData(), setPerfProbeEnabled(false), _0xa2cf49.restore());
+      (initMinimap4?.(), resetPerfProbeData(), setPerfProbeEnabled(false), ctx.restore());
     }
   }),
   test('minimap: persist-only updates reuse node dot layout', () => {
-    const _0x3c2679 = installMinimapDomStubs(),
-      _0x57f22e = [];
-    let _0x47d93e = 1;
-    ((globalThis.requestAnimationFrame = (_0x36b396) => {
-      const _0x58b209 = _0x47d93e;
-      return ((_0x47d93e += 1), _0x57f22e.push({ id: _0x58b209, callback: _0x36b396 }), _0x58b209);
+    const ctx2 = installMinimapDomStubs(),
+      list8 = [];
+    let value14 = 1;
+    ((globalThis.requestAnimationFrame = (callback4) => {
+      const id3 = value14;
+      return ((value14 += 1), list8.push({ id: id3, callback: callback4 }), id3);
     }),
-      (globalThis.cancelAnimationFrame = (_0x5041ab) => {
-        const _0xa7f92 = _0x57f22e.findIndex((_0x1da15e) => _0x1da15e.id === _0x5041ab);
-        if (_0xa7f92 >= 0) _0x57f22e.splice(_0xa7f92, 1);
+      (globalThis.cancelAnimationFrame = (value15) => {
+        const count4 = list8.findIndex((item5) => item5.id === value15);
+        if (count4 >= 0) list8.splice(count4, 1);
       }));
-    const _0x1b8c85 = () => {
-        const _0x40426f = _0x57f22e.splice(0);
-        _0x40426f.forEach((_0x1c95b5) => _0x1c95b5.callback?.());
+    const run3 = () => {
+        const list9 = list8.splice(0);
+        list9.forEach((item6) => item6.callback?.());
       },
-      _0x10cebb = createStore({
+      store3 = createStore({
         nodes: { node_a: { id: 'node_a', type: 'source-video', x: 100, y: 120, width: 240, height: 160 } },
         viewport: { x: 0, y: 0, zoom: 1 },
         _persistRev: 1,
         _nodeCount: 1,
       });
-    let _0x1bd1d9 = null;
+    let initMinimap5 = null;
     try {
       (setPerfProbeEnabled(true),
-        (_0x1bd1d9 = initMinimap(_0x3c2679.minimap, _0x10cebb)),
-        _0x1b8c85(),
+        (initMinimap5 = initMinimap(ctx2.minimap, store3)),
+        run3(),
         resetPerfProbeData(),
-        _0x10cebb.setState({ _persistRev: 2, viewport: { x: 0, y: 0, zoom: 1 } }),
-        _0x1b8c85());
-      const _0x22d527 = getPerfProbeSnapshot().minimapUpdateSamples;
-      (assert.equal(_0x22d527.length, 1),
-        assert.equal(_0x22d527[0].mode, 'viewport'),
-        assert.equal(_0x22d527[0].viewportOnly, true),
-        assert.equal(_0x22d527[0].updatedCount, 0));
+        store3.setState({ _persistRev: 2, viewport: { x: 0, y: 0, zoom: 1 } }),
+        run3());
+      const list10 = getPerfProbeSnapshot().minimapUpdateSamples;
+      (assert.equal(list10.length, 1),
+        assert.equal(list10[0].mode, 'viewport'),
+        assert.equal(list10[0].viewportOnly, true),
+        assert.equal(list10[0].updatedCount, 0));
     } finally {
-      (_0x1bd1d9?.(), resetPerfProbeData(), setPerfProbeEnabled(false), _0x3c2679.restore());
+      (initMinimap5?.(), resetPerfProbeData(), setPerfProbeEnabled(false), ctx2.restore());
     }
   }),
   test('minimap: 空画布平移后点击小地图使用最新 bounds', () => {
-    const _0x347767 = installMinimapDomStubs(),
-      _0xd4c7ad = createStore({
+    const mapW4 = installMinimapDomStubs(),
+      store4 = createStore({
         nodes: {},
         viewport: { x: 180, y: -60, zoom: 1.25 },
         _persistRev: 0,
         _nodeCount: 0,
       });
-    let _0x356758 = null;
+    let initMinimap6 = null;
     try {
-      _0x356758 = initMinimap(_0x347767.minimap, _0xd4c7ad);
-      const _0x2e2088 = { clientX: 128, clientY: 104, pointerId: 7, stopPropagation() {} };
-      _0x347767.minimapWrapper.dispatch('pointerdown', _0x2e2088);
-      const _0x50f160 = computeExpectedViewportBox({
+      initMinimap6 = initMinimap(mapW4.minimap, store4);
+      const event = { clientX: 128, clientY: 104, pointerId: 7, stopPropagation() {} };
+      mapW4.minimapWrapper.dispatch('pointerdown', event);
+      const box4 = computeExpectedViewportBox({
           viewport: { x: 180, y: -60, zoom: 1.25 },
-          mapW: _0x347767.minimap.clientWidth,
-          mapH: _0x347767.minimap.clientHeight,
+          mapW: mapW4.minimap.clientWidth,
+          mapH: mapW4.minimap.clientHeight,
           innerWidth: globalThis.window.innerWidth,
           innerHeight: globalThis.window.innerHeight,
         }),
-        _0x33308c = _0x347767.minimap.getBoundingClientRect(),
-        _0x90bba0 = _0x2e2088.clientX - _0x33308c.left - _0x50f160.offsetX,
-        _0x2824e2 = _0x2e2088.clientY - _0x33308c.top - _0x50f160.offsetY,
-        _0x2ce0f2 = _0x50f160.bounds.minX + _0x90bba0 / _0x50f160.scale,
-        _0x537f30 = _0x50f160.bounds.minY + _0x2824e2 / _0x50f160.scale,
-        _0x5516d2 = {
-          x: globalThis.window.innerWidth / 2 - _0x2ce0f2 * 1.25,
-          y: globalThis.window.innerHeight / 2 - _0x537f30 * 1.25,
+        box5 = mapW4.minimap.getBoundingClientRect(),
+        value16 = event.clientX - box5.left - box4.offsetX,
+        value17 = event.clientY - box5.top - box4.offsetY,
+        value18 = box4.bounds.minX + value16 / box4.scale,
+        value19 = box4.bounds.minY + value17 / box4.scale,
+        value20 = {
+          x: globalThis.window.innerWidth / 2 - value18 * 1.25,
+          y: globalThis.window.innerHeight / 2 - value19 * 1.25,
           zoom: 1.25,
         },
-        [_0x43d313] = _0xd4c7ad.getViewportUpdates();
-      assert.deepEqual(_0x43d313, _0x5516d2);
+        [value21] = store4.getViewportUpdates();
+      assert.deepEqual(value21, value20);
     } finally {
-      (_0x356758?.(), _0x347767.restore());
+      (initMinimap6?.(), mapW4.restore());
     }
   }));

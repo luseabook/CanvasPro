@@ -3,31 +3,31 @@ import assert from 'node:assert/strict';
 import { buildImageRequest } from './PpioAdapter.js';
 function createCtx() {
   return {
-    getProviderConfig(_0x139a55) {
-      if (_0x139a55 === 'ppio') return { apiUrl: 'https://api.ppio.example.com', apiKey: 'k_ppio' };
-      if (_0x139a55 === 'grsai') return { apiUrl: 'https://api.grsai.example.com', apiKey: 'k_grsai' };
+    getProviderConfig(value) {
+      if (value === 'ppio') return { apiUrl: 'https://api.ppio.example.com', apiKey: 'k_ppio' };
+      if (value === 'grsai') return { apiUrl: 'https://api.grsai.example.com', apiKey: 'k_grsai' };
       return {};
     },
-    async processInputImages(_0x58c9af = []) {
-      return Array.isArray(_0x58c9af) ? _0x58c9af.filter(Boolean) : [];
+    async processInputImages(list = []) {
+      return Array.isArray(list) ? list.filter(Boolean) : [];
     },
   };
 }
-function parseSize(_0x2b7f31) {
-  const _0x3e1344 = String(_0x2b7f31 || ''),
-    _0x56f4a3 = _0x3e1344.match(/^(\d+)x(\d+)$/);
-  if (!_0x56f4a3) return null;
-  return { width: Number(_0x56f4a3[1]), height: Number(_0x56f4a3[2]) };
+function parseSize(item) {
+  const key = String(item || ''),
+    enabled = key.match(/^(\d+)x(\d+)$/);
+  if (!enabled) return null;
+  return { width: Number(enabled[1]), height: Number(enabled[2]) };
 }
 (test('PpioAdapter: 自适应默认回退 1:1，但支持 resolvedRatioLabel 覆盖', async () => {
-  const _0x1659ea = createCtx(),
-    _0x5542ef = await buildImageRequest(
+  const ctx = createCtx(),
+    dom = await buildImageRequest(
       { model: 'ppio/seedream-4.0', prompt: 'p', imageSize: '2K', aspectRatio: '自适应', inputUrls: [] },
       'p',
-      _0x1659ea,
+      ctx,
     );
-  assert.equal(_0x5542ef.body.size, '2048x2048');
-  const _0x2d61f9 = await buildImageRequest(
+  assert.equal(dom.body.size, '2048x2048');
+  const dom2 = await buildImageRequest(
     {
       model: 'ppio/seedream-4.0',
       prompt: 'p',
@@ -37,62 +37,62 @@ function parseSize(_0x2b7f31) {
       inputUrls: [],
     },
     'p',
-    _0x1659ea,
+    ctx,
   );
-  assert.equal(_0x2d61f9.body.size, '2752x1536');
-  const _0x5bb557 = await buildImageRequest(
+  assert.equal(dom2.body.size, '2752x1536');
+  const dom3 = await buildImageRequest(
     { model: 'ppio/seedream-4.0', prompt: 'p', imageSize: '2K', aspectRatio: '', inputUrls: [] },
     'p',
-    _0x1659ea,
+    ctx,
   );
-  assert.equal(_0x5bb557.body.size, '2048x2048');
+  assert.equal(dom3.body.size, '2048x2048');
 }),
   test('PpioAdapter: all quality and ratio mappings satisfy pixel bounds and 64 alignment', async () => {
-    const _0x294423 = createCtx(),
-      _0x3f7cb3 = ['1K', '2K', '3K', '4K'],
-      _0x51ba86 = ['1:1', '9:16', '16:9', '3:4', '4:3', '3:2', '2:3', '5:4', '4:5', '21:9'],
-      _0x2742c2 = 0xa00 * 0x5a0,
-      _0x4eb2fb = 0x9ec290,
-      _0x2ff52f = 1 / 16,
-      _0x29141c = 16;
-    for (const _0x5bc967 of _0x3f7cb3) {
-      for (const _0x2c7cf7 of _0x51ba86) {
-        const _0x480f37 = await buildImageRequest(
+    const ctx2 = createCtx(),
+      index = ['1K', '2K', '3K', '4K'],
+      result = ['1:1', '9:16', '16:9', '3:4', '4:3', '3:2', '2:3', '5:4', '4:5', '21:9'],
+      data = 0xa00 * 0x5a0,
+      options = 0x9ec290,
+      target = 1 / 16,
+      source = 16;
+    for (const imageSize of index) {
+      for (const aspectRatio of result) {
+        const dom4 = await buildImageRequest(
             {
               model: 'ppio/seedream-5.0-lite',
               prompt: 'p',
-              imageSize: _0x5bc967,
-              aspectRatio: _0x2c7cf7,
+              imageSize: imageSize,
+              aspectRatio: aspectRatio,
               inputUrls: [],
             },
             'p',
-            _0x294423,
+            ctx2,
           ),
-          _0x2b11b6 = parseSize(_0x480f37.body.size);
-        assert.ok(_0x2b11b6, 'invalid size format: ' + _0x480f37.body.size);
-        const _0x309629 = _0x2b11b6.width * _0x2b11b6.height,
-          _0x3a5335 = _0x2b11b6.width / _0x2b11b6.height;
-        (assert.equal(_0x2b11b6.width % 64, 0, '瀹芥湭64瀵归綈: ' + _0x480f37.body.size),
-          assert.equal(_0x2b11b6.height % 64, 0, 'height is not 64-aligned: ' + _0x480f37.body.size),
-          assert.ok(_0x309629 >= _0x2742c2, 'pixel count is too small: ' + _0x480f37.body.size),
-          assert.ok(_0x309629 <= _0x4eb2fb, 'pixel count is too large: ' + _0x480f37.body.size),
-          assert.ok(_0x3a5335 >= _0x2ff52f, 'ratio is too small: ' + _0x480f37.body.size),
-          assert.ok(_0x3a5335 <= _0x29141c, 'ratio is too large: ' + _0x480f37.body.size));
+          box = parseSize(dom4.body.size);
+        assert.ok(box, 'invalid size format: ' + dom4.body.size);
+        const next = box.width * box.height,
+          current = box.width / box.height;
+        (assert.equal(box.width % 64, 0, '瀹芥湭64瀵归綈: ' + dom4.body.size),
+          assert.equal(box.height % 64, 0, 'height is not 64-aligned: ' + dom4.body.size),
+          assert.ok(next >= data, 'pixel count is too small: ' + dom4.body.size),
+          assert.ok(next <= options, 'pixel count is too large: ' + dom4.body.size),
+          assert.ok(current >= target, 'ratio is too small: ' + dom4.body.size),
+          assert.ok(current <= source, 'ratio is too large: ' + dom4.body.size));
       }
     }
   }),
   test('PpioAdapter: 多图输入按上传处理后的顺序写入请求体', async () => {
-    const _0x166eb5 = [],
-      _0x52f8cd = {
+    const list2 = [],
+      entry = {
         ...createCtx(),
-        async processInputImages(_0x31f562 = []) {
+        async processInputImages(list3 = []) {
           return (
-            _0x166eb5.push(..._0x31f562),
-            _0x31f562.map((_0x212d30) => 'https://uploaded.example/' + String(_0x212d30).split('/').pop())
+            list2.push(...list3),
+            list3.map((item2) => 'https://uploaded.example/' + String(item2).split('/').pop())
           );
         },
       },
-      _0x3ab13d = await buildImageRequest(
+      dom5 = await buildImageRequest(
         {
           model: 'ppio/seedream-4.0',
           prompt: 'p',
@@ -105,14 +105,14 @@ function parseSize(_0x2b7f31) {
           ],
         },
         'p',
-        _0x52f8cd,
+        entry,
       );
-    (assert.deepEqual(_0x166eb5, [
+    (assert.deepEqual(list2, [
       'https://local.example/target.png',
       'https://local.example/source.png',
       'https://local.example/style.png',
     ]),
-      assert.deepEqual(_0x3ab13d.body.images, [
+      assert.deepEqual(dom5.body.images, [
         'https://uploaded.example/target.png',
         'https://uploaded.example/source.png',
         'https://uploaded.example/style.png',

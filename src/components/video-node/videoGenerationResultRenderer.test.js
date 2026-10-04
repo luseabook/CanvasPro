@@ -9,19 +9,19 @@ import {
 } from './videoGenerationResultRenderer.js';
 import { setLocale } from '../../i18n/index.js';
 (test('video generation result renderer: normalizes single video result', () => {
-  const _0x563ae4 = normalizeVideoGenerationResult({
+  const videoGenerationResult = normalizeVideoGenerationResult({
     url: 'https://cdn.example.com/final.mp4',
     localPath: 'output/final.mp4',
     thumbUrl: '/output/final.jpg',
   });
-  (assert.equal(_0x563ae4.outputType, 'video'),
-    assert.equal(_0x563ae4.items.length, 1),
-    assert.equal(_0x563ae4.items[0].videoUrl, 'https://cdn.example.com/final.mp4'),
-    assert.equal(_0x563ae4.items[0].localPath, 'output/final.mp4'),
-    assert.equal(_0x563ae4.items[0].thumbUrl, '/output/final.jpg'));
+  (assert.equal(videoGenerationResult.outputType, 'video'),
+    assert.equal(videoGenerationResult.items.length, 1),
+    assert.equal(videoGenerationResult.items[0].videoUrl, 'https://cdn.example.com/final.mp4'),
+    assert.equal(videoGenerationResult.items[0].localPath, 'output/final.mp4'),
+    assert.equal(videoGenerationResult.items[0].thumbUrl, '/output/final.jpg'));
 }),
   test('video generation result renderer: builds success patch from batch', () => {
-    const _0x43382d = buildVideoGenerationResultPatch(
+    const videoGenerationResultPatch = buildVideoGenerationResultPatch(
       {
         isBatch: true,
         videos: [
@@ -38,51 +38,51 @@ import { setLocale } from '../../i18n/index.js';
       },
       { startedAt: Date.now() - 10 },
     );
-    (assert.equal(_0x43382d.jobStatus, 'success'),
-      assert.equal(_0x43382d.jobError, null),
-      assert.equal(_0x43382d.videos.length, 2),
-      assert.equal(_0x43382d.videoUrl, '/output/a.mp4'),
-      assert.equal(_0x43382d.localPath, 'output/a.mp4'),
-      assert.equal(_0x43382d.displayLocalPath, 'data/assets/derived/video/a.proxy.mp4'),
-      assert.equal(_0x43382d.posterLocalPath, 'data/assets/derived/video/a.poster.jpg'),
-      assert.equal(_0x43382d.videoProxyStatus, 'generated'),
-      assert.equal(_0x43382d.thumbId, 'thumb-a'),
-      assert.equal(_0x43382d.mainVideoIndex, 0),
-      assert.equal(_0x43382d.isVideosExpanded, false));
+    (assert.equal(videoGenerationResultPatch.jobStatus, 'success'),
+      assert.equal(videoGenerationResultPatch.jobError, null),
+      assert.equal(videoGenerationResultPatch.videos.length, 2),
+      assert.equal(videoGenerationResultPatch.videoUrl, '/output/a.mp4'),
+      assert.equal(videoGenerationResultPatch.localPath, 'output/a.mp4'),
+      assert.equal(videoGenerationResultPatch.displayLocalPath, 'data/assets/derived/video/a.proxy.mp4'),
+      assert.equal(videoGenerationResultPatch.posterLocalPath, 'data/assets/derived/video/a.poster.jpg'),
+      assert.equal(videoGenerationResultPatch.videoProxyStatus, 'generated'),
+      assert.equal(videoGenerationResultPatch.thumbId, 'thumb-a'),
+      assert.equal(videoGenerationResultPatch.mainVideoIndex, 0),
+      assert.equal(videoGenerationResultPatch.isVideosExpanded, false));
   }),
   test('video generation result renderer: builds failure patch', () => {
-    const _0x3cc897 = buildVideoGenerationFailurePatch({
+    const videoGenerationFailurePatch = buildVideoGenerationFailurePatch({
       error: 'provider rejected',
       startedAt: Date.now() - 10,
     });
-    (assert.equal(_0x3cc897.jobStatus, 'error'),
-      assert.equal(_0x3cc897.jobError, 'provider rejected'),
-      assert.equal(_0x3cc897.videos.length, 1),
-      assert.equal(_0x3cc897.videos[0].error, 'provider rejected'),
-      assert.equal(_0x3cc897.videoUrl, ''),
-      assert.equal(_0x3cc897.localPath, ''),
+    (assert.equal(videoGenerationFailurePatch.jobStatus, 'error'),
+      assert.equal(videoGenerationFailurePatch.jobError, 'provider rejected'),
+      assert.equal(videoGenerationFailurePatch.videos.length, 1),
+      assert.equal(videoGenerationFailurePatch.videos[0].error, 'provider rejected'),
+      assert.equal(videoGenerationFailurePatch.videoUrl, ''),
+      assert.equal(videoGenerationFailurePatch.localPath, ''),
       assert.equal(getVideoGenerationResultError({ error: 'provider rejected' }), 'provider rejected'),
       assert.deepEqual(getSuccessfulVideoGenerationItems({ error: 'provider rejected' }), []));
   }),
   test('video generation result renderer: failure helper can preserve media fields', () => {
-    const _0x1a4e2a = buildVideoGenerationFailurePatch({
+    const videoGenerationFailurePatch2 = buildVideoGenerationFailurePatch({
       error: 'resume failed',
       duration: 0x4b0,
       clearMediaFields: false,
     });
-    (assert.equal(_0x1a4e2a.jobStatus, 'error'),
-      assert.equal(_0x1a4e2a.jobError, 'resume failed'),
-      assert.equal(_0x1a4e2a.videos[0].error, 'resume failed'),
-      assert.equal(Object.prototype.hasOwnProperty.call(_0x1a4e2a, 'videoUrl'), false),
-      assert.equal(Object.prototype.hasOwnProperty.call(_0x1a4e2a, 'localPath'), false));
+    (assert.equal(videoGenerationFailurePatch2.jobStatus, 'error'),
+      assert.equal(videoGenerationFailurePatch2.jobError, 'resume failed'),
+      assert.equal(videoGenerationFailurePatch2.videos[0].error, 'resume failed'),
+      assert.equal(Object.prototype.hasOwnProperty.call(videoGenerationFailurePatch2, 'videoUrl'), false),
+      assert.equal(Object.prototype.hasOwnProperty.call(videoGenerationFailurePatch2, 'localPath'), false));
   }),
   test('video generation result renderer: localizes default failure message', () => {
     setLocale('en-US', { persist: false, notify: false });
     try {
-      const _0x58b1c7 = buildVideoGenerationFailurePatch();
-      (assert.equal(_0x58b1c7.jobStatus, 'error'),
-        assert.equal(_0x58b1c7.jobError, 'Generation failed'),
-        assert.equal(_0x58b1c7.videos[0].error, 'Generation failed'));
+      const videoGenerationFailurePatch3 = buildVideoGenerationFailurePatch();
+      (assert.equal(videoGenerationFailurePatch3.jobStatus, 'error'),
+        assert.equal(videoGenerationFailurePatch3.jobError, 'Generation failed'),
+        assert.equal(videoGenerationFailurePatch3.videos[0].error, 'Generation failed'));
     } finally {
       setLocale('zh-CN', { persist: false, notify: false });
     }

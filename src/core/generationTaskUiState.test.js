@@ -40,13 +40,13 @@ import {
       assert.equal(isTaskCancelled({ asyncTaskStatus: 'canceled' }), true));
   }),
   test('generationTaskUiState: failure beats stale running flags', () => {
-    const _0x50eebb = { isGenerating: true, jobStatus: 'running', rhTaskStatus: 'failed' };
-    (assert.equal(resolveGenerationUiState(_0x50eebb), 'error'),
-      assert.equal(isTaskTerminal(_0x50eebb), true),
-      assert.equal(isTaskRunning(_0x50eebb), false));
+    const value = { isGenerating: true, jobStatus: 'running', rhTaskStatus: 'failed' };
+    (assert.equal(resolveGenerationUiState(value), 'error'),
+      assert.equal(isTaskTerminal(value), true),
+      assert.equal(isTaskRunning(value), false));
   }),
   test('generationTaskUiState: active task family ignores stale inactive provider fields', () => {
-    const _0x376945 = {
+    const item = {
       isGenerating: true,
       jobStatus: 'running',
       rhTaskStatus: 'pending',
@@ -54,12 +54,12 @@ import {
       dreaminaTaskPhase: 'done',
       asyncTaskStatus: 'idle',
     };
-    (assert.equal(resolveGenerationUiState(_0x376945), 'running'),
-      assert.equal(isTaskRunning(_0x376945), true),
-      assert.equal(isTaskTerminal(_0x376945), false));
+    (assert.equal(resolveGenerationUiState(item), 'running'),
+      assert.equal(isTaskRunning(item), true),
+      assert.equal(isTaskTerminal(item), false));
   }),
   test('generationTaskUiState: active provider task ignores stale media terminal state', () => {
-    const _0x3d666f = {
+    const key = {
       isGenerating: true,
       jobStatus: 'running',
       rhTaskStatus: 'pending',
@@ -67,9 +67,9 @@ import {
       generationStartTime: 0x3e8,
       generationDuration: null,
     };
-    (assert.equal(resolveGenerationUiState(_0x3d666f), 'running'),
-      assert.equal(shouldShowGenerationBusyUi(_0x3d666f), true),
-      assert.deepEqual(resolveGenerationButtonMode(_0x3d666f, { cancellable: true }), {
+    (assert.equal(resolveGenerationUiState(key), 'running'),
+      assert.equal(shouldShowGenerationBusyUi(key), true),
+      assert.deepEqual(resolveGenerationButtonMode(key, { cancellable: true }), {
         state: 'running',
         busy: true,
         canCancel: true,
@@ -99,17 +99,17 @@ import {
       assert.equal(getTaskMessage({}), ''));
   }),
   test('generationTaskUiState: button helpers derive busy and cancel state', () => {
-    const _0x3618ba = { rhTaskStatus: 'running', rhTaskId: 'rh-1' };
-    (assert.equal(shouldShowGenerationBusyUi(_0x3618ba), true),
-      assert.equal(shouldAllowCancel(_0x3618ba, { cancellable: true }), true),
-      assert.deepEqual(resolveGenerationButtonMode(_0x3618ba, { cancellable: true }), {
+    const index = { rhTaskStatus: 'running', rhTaskId: 'rh-1' };
+    (assert.equal(shouldShowGenerationBusyUi(index), true),
+      assert.equal(shouldAllowCancel(index, { cancellable: true }), true),
+      assert.deepEqual(resolveGenerationButtonMode(index, { cancellable: true }), {
         state: 'running',
         busy: true,
         canCancel: true,
         disabled: false,
         cursor: '',
       }),
-      assert.deepEqual(resolveGenerationButtonMode(_0x3618ba, { cancellable: true, cancelInFlight: true }), {
+      assert.deepEqual(resolveGenerationButtonMode(index, { cancellable: true, cancelInFlight: true }), {
         state: 'running',
         busy: true,
         canCancel: false,

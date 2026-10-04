@@ -9,19 +9,19 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
     assert.equal(getRunningHubWorkflowPayloadResolver('unknownResolver'), null));
 }),
   test('RunningHubAdapter 人物替换图片编辑 V3: nodeInfoList 映射正确', async () => {
-    const _0x4a3eab = resolveModelExecution('runninghub/2041177685895946242');
-    assert.equal(_0x4a3eab?.executionManifest?.mapping?.imageNodes?.[0], '45');
-    const _0x323c42 = {
+    const modelExecution = resolveModelExecution('runninghub/2041177685895946242');
+    assert.equal(modelExecution?.executionManifest?.mapping?.imageNodes?.[0], '45');
+    const value = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_target', 'u_source'],
-        processInputImagesPreserveOrder: async (_0x1a7f98) =>
-          Array.isArray(_0x1a7f98) && _0x1a7f98[0] === '' && _0x1a7f98[1] === ''
+        processInputImagesPreserveOrder: async (item) =>
+          Array.isArray(item) && item[0] === '' && item[1] === ''
             ? ['', '']
-            : Array.isArray(_0x1a7f98) && _0x1a7f98[0] === 'm_target' && _0x1a7f98[1] === 'm_source'
+            : Array.isArray(item) && item[0] === 'm_target' && item[1] === 'm_source'
               ? ['mask_0', 'mask_1']
               : ['u_target', 'u_source'],
       },
-      _0x46246c = await buildImageRequest(
+      dom = await buildImageRequest(
         {
           model: 'runninghub/2041177685895946242',
           inputUrls: ['local_target', 'local_source'],
@@ -29,27 +29,23 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'plus',
         },
         'a prompt',
-        _0x323c42,
+        value,
       );
-    (assert.equal(_0x46246c.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x46246c.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2041177685895946242',
-      ),
-      assert.equal(_0x46246c.body.apiKey, 'k'),
-      assert.equal(_0x46246c.body.instanceType, 'plus'),
-      assert.ok(Array.isArray(_0x46246c.body.nodeInfoList)));
-    const _0x42103e = _0x46246c.body.nodeInfoList,
-      _0x2d70a4 = (_0x4e4fa0, _0x1fd385) =>
-        _0x42103e.find((_0x8aa3df) => _0x8aa3df.nodeId === _0x4e4fa0 && _0x8aa3df.fieldName === _0x1fd385);
-    (assert.equal(_0x2d70a4('45', 'image')?.fieldValue, 'u_target'),
-      assert.equal(_0x2d70a4('40', 'image')?.fieldValue, 'u_source'),
-      assert.equal(_0x2d70a4('594', 'value')?.fieldValue, 'a prompt'),
-      assert.equal(_0x2d70a4('400', 'value')?.fieldValue, '1600'),
-      assert.equal(_0x2d70a4('1180', 'image'), undefined),
-      assert.equal(_0x2d70a4('1185', 'boolean'), undefined),
-      assert.equal(_0x2d70a4('1177', 'image'), undefined),
-      assert.equal(_0x2d70a4('1186', 'boolean'), undefined));
+    (assert.equal(dom.url, '/api/v2/proxy/image'),
+      assert.equal(dom.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2041177685895946242'),
+      assert.equal(dom.body.apiKey, 'k'),
+      assert.equal(dom.body.instanceType, 'plus'),
+      assert.ok(Array.isArray(dom.body.nodeInfoList)));
+    const list = dom.body.nodeInfoList,
+      handler = (key, index) => list.find((item2) => item2.nodeId === key && item2.fieldName === index);
+    (assert.equal(handler('45', 'image')?.fieldValue, 'u_target'),
+      assert.equal(handler('40', 'image')?.fieldValue, 'u_source'),
+      assert.equal(handler('594', 'value')?.fieldValue, 'a prompt'),
+      assert.equal(handler('400', 'value')?.fieldValue, '1600'),
+      assert.equal(handler('1180', 'image'), undefined),
+      assert.equal(handler('1185', 'boolean'), undefined),
+      assert.equal(handler('1177', 'image'), undefined),
+      assert.equal(handler('1186', 'boolean'), undefined));
   }),
   test('RunningHubAdapter image workflow: missing manifest throws instead of fallback', async () => {
     await assert.rejects(
@@ -67,10 +63,10 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
     );
   }),
   test('RunningHubAdapter 控制摄像机: nodeInfoList 映射图片和 <sks> 提示词', async () => {
-    const _0x4bc2f1 = resolveModelExecution('runninghub/2053902968243671041');
-    (assert.equal(_0x4bc2f1?.modelManifest?.displayName, '控制摄像机'),
-      assert.equal(_0x4bc2f1?.executionManifest?.mapping?.promptNode?.prefix, '<sks> '));
-    const _0x23faf6 = await buildImageRequest(
+    const modelExecution2 = resolveModelExecution('runninghub/2053902968243671041');
+    (assert.equal(modelExecution2?.modelManifest?.displayName, '控制摄像机'),
+      assert.equal(modelExecution2?.executionManifest?.mapping?.promptNode?.prefix, '<sks> '));
+    const dom2 = await buildImageRequest(
       { model: 'runninghub/2053902968243671041', inputUrls: ['local_image'] },
       'switch the camera perspective: wide shot, front view, eye-level shot',
       {
@@ -79,42 +75,36 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
         processInputImagesPreserveOrder: async () => ['uploaded_image'],
       },
     );
-    (assert.equal(_0x23faf6.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x23faf6.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2053902968243671041',
-      ),
-      assert.equal(_0x23faf6.body.apiKey, 'k'),
-      assert.equal(_0x23faf6.body.instanceType, 'default'),
-      assert.equal(_0x23faf6.body.usePersonalQueue, 'false'));
-    const _0x500668 = _0x23faf6.body.nodeInfoList,
-      _0x28821c = (_0x16c61d, _0x393e00) =>
-        _0x500668.find((_0xf6212) => _0xf6212.nodeId === _0x16c61d && _0xf6212.fieldName === _0x393e00);
+    (assert.equal(dom2.url, '/api/v2/proxy/image'),
+      assert.equal(dom2.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2053902968243671041'),
+      assert.equal(dom2.body.apiKey, 'k'),
+      assert.equal(dom2.body.instanceType, 'default'),
+      assert.equal(dom2.body.usePersonalQueue, 'false'));
+    const list2 = dom2.body.nodeInfoList,
+      handler2 = (result, data) => list2.find((item3) => item3.nodeId === result && item3.fieldName === data);
     (assert.deepEqual(
-      _0x500668.map((_0x574e56) => _0x574e56.nodeId),
+      list2.map((item4) => item4.nodeId),
       ['16', '23'],
     ),
-      assert.equal(_0x28821c('16', 'image')?.fieldValue, 'uploaded_image'),
-      assert.equal(_0x28821c('16', 'image')?.description, '载入图像'),
-      assert.equal(_0x28821c('23', 'value')?.description, '提示词'),
+      assert.equal(handler2('16', 'image')?.fieldValue, 'uploaded_image'),
+      assert.equal(handler2('16', 'image')?.description, '载入图像'),
+      assert.equal(handler2('23', 'value')?.description, '提示词'),
       assert.equal(
-        _0x28821c('23', 'value')?.fieldValue,
+        handler2('23', 'value')?.fieldValue,
         '<sks> switch the camera perspective: wide shot, front view, eye-level shot',
       ));
   }),
   test('RunningHubAdapter 人物替换人物替换 V2.1: nodeInfoList 映射正确', async () => {
-    const _0x1c3e95 = resolveModelExecution('runninghub/2050313968069165058');
-    (assert.equal(_0x1c3e95?.modelManifest?.displayName, '人物替换人物替换V2.1'),
-      assert.equal(_0x1c3e95?.executionManifest?.mapping?.imageNodes?.[0], '258'));
-    const _0x288719 = {
+    const modelExecution3 = resolveModelExecution('runninghub/2050313968069165058');
+    (assert.equal(modelExecution3?.modelManifest?.displayName, '人物替换人物替换V2.1'),
+      assert.equal(modelExecution3?.executionManifest?.mapping?.imageNodes?.[0], '258'));
+    const options = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_target', 'u_source'],
-        processInputImagesPreserveOrder: async (_0x30d218) =>
-          Array.isArray(_0x30d218) && _0x30d218[0] === '' && _0x30d218[1] === ''
-            ? ['', '']
-            : ['u_target', 'u_source'],
+        processInputImagesPreserveOrder: async (target) =>
+          Array.isArray(target) && target[0] === '' && target[1] === '' ? ['', ''] : ['u_target', 'u_source'],
       },
-      _0x3d8a62 = await buildImageRequest(
+      dom3 = await buildImageRequest(
         {
           model: 'runninghub/2050313968069165058',
           inputUrls: ['local_target', 'local_source'],
@@ -122,41 +112,37 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'plus',
         },
         'a prompt',
-        _0x288719,
+        options,
       );
-    (assert.equal(_0x3d8a62.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x3d8a62.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2050313968069165058',
-      ),
-      assert.equal(_0x3d8a62.body.apiKey, 'k'),
-      assert.equal(_0x3d8a62.body.instanceType, 'plus'),
-      assert.deepEqual(_0x3d8a62.adapterTrace, {
+    (assert.equal(dom3.url, '/api/v2/proxy/image'),
+      assert.equal(dom3.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2050313968069165058'),
+      assert.equal(dom3.body.apiKey, 'k'),
+      assert.equal(dom3.body.instanceType, 'plus'),
+      assert.deepEqual(dom3.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.person-replace-v21.v1',
         modelId: 'runninghub/2050313968069165058',
       }));
-    const _0x15eef8 = _0x3d8a62.body.nodeInfoList,
-      _0x21cf1a = (_0x1bf7e9, _0x28e1f2) =>
-        _0x15eef8.find((_0x287c45) => _0x287c45.nodeId === _0x1bf7e9 && _0x287c45.fieldName === _0x28e1f2);
-    (assert.equal(_0x21cf1a('258', 'image')?.fieldValue, 'u_target'),
-      assert.equal(_0x21cf1a('265', 'image')?.fieldValue, 'u_source'),
-      assert.equal(_0x21cf1a('232', 'value')?.fieldValue, 'a prompt'),
-      assert.equal(_0x21cf1a('233', 'value')?.fieldValue, '1600'),
-      assert.equal(_0x21cf1a('257', 'image'), undefined),
-      assert.equal(_0x21cf1a('259', 'boolean'), undefined),
-      assert.equal(_0x21cf1a('255', 'image'), undefined),
-      assert.equal(_0x21cf1a('262', 'boolean'), undefined));
+    const list3 = dom3.body.nodeInfoList,
+      handler3 = (source, next) => list3.find((item5) => item5.nodeId === source && item5.fieldName === next);
+    (assert.equal(handler3('258', 'image')?.fieldValue, 'u_target'),
+      assert.equal(handler3('265', 'image')?.fieldValue, 'u_source'),
+      assert.equal(handler3('232', 'value')?.fieldValue, 'a prompt'),
+      assert.equal(handler3('233', 'value')?.fieldValue, '1600'),
+      assert.equal(handler3('257', 'image'), undefined),
+      assert.equal(handler3('259', 'boolean'), undefined),
+      assert.equal(handler3('255', 'image'), undefined),
+      assert.equal(handler3('262', 'boolean'), undefined));
   }),
   test('RunningHubAdapter 漫画转真人：使用新版 ai-app 并映射节点参数', async () => {
-    const _0x4b88b4 = resolveModelExecution('runninghub/1994718111704158209');
-    (assert.equal(_0x4b88b4?.modelManifest?.displayName, '漫画转真人'),
-      assert.equal(_0x4b88b4?.executionManifest?.mapping?.imageNodes?.[0], '851'));
-    const _0x1752c2 = {
+    const modelExecution4 = resolveModelExecution('runninghub/1994718111704158209');
+    (assert.equal(modelExecution4?.modelManifest?.displayName, '漫画转真人'),
+      assert.equal(modelExecution4?.executionManifest?.mapping?.imageNodes?.[0], '851'));
+    const current = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_ref'],
       },
-      _0x2a2809 = await buildImageRequest(
+      dom4 = await buildImageRequest(
         {
           model: 'runninghub/1994718111704158209',
           inputUrls: ['local_ref'],
@@ -164,37 +150,34 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'plus',
         },
         'realistic portrait',
-        _0x1752c2,
+        current,
       );
-    (assert.equal(_0x2a2809.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x2a2809.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/1994718111704158209',
-      ),
-      assert.equal(_0x2a2809.body.apiKey, 'k'),
-      assert.equal(_0x2a2809.body.instanceType, 'plus'),
-      assert.deepEqual(_0x2a2809.adapterTrace, {
+    (assert.equal(dom4.url, '/api/v2/proxy/image'),
+      assert.equal(dom4.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/1994718111704158209'),
+      assert.equal(dom4.body.apiKey, 'k'),
+      assert.equal(dom4.body.instanceType, 'plus'),
+      assert.deepEqual(dom4.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.anime-real.v1',
         modelId: 'runninghub/1994718111704158209',
       }),
-      assert.ok(Array.isArray(_0x2a2809.body.nodeInfoList)));
-    const _0x7d8e7d = _0x2a2809.body.nodeInfoList,
-      _0x1ab75b = (_0x652f53, _0xc4cc3b) =>
-        _0x7d8e7d.find((_0x49ec6a) => _0x49ec6a.nodeId === _0x652f53 && _0x49ec6a.fieldName === _0xc4cc3b);
-    (assert.equal(_0x1ab75b('851', 'image')?.fieldValue, 'u_ref'),
-      assert.equal(_0x1ab75b('945', 'value')?.fieldValue, '1600'),
-      assert.equal(_0x1ab75b('967', 'value')?.fieldValue, 'realistic portrait'));
+      assert.ok(Array.isArray(dom4.body.nodeInfoList)));
+    const list4 = dom4.body.nodeInfoList,
+      handler4 = (entry, record) =>
+        list4.find((item6) => item6.nodeId === entry && item6.fieldName === record);
+    (assert.equal(handler4('851', 'image')?.fieldValue, 'u_ref'),
+      assert.equal(handler4('945', 'value')?.fieldValue, '1600'),
+      assert.equal(handler4('967', 'value')?.fieldValue, 'realistic portrait'));
   }),
   test('RunningHubAdapter Qwen image edit: maps one image with default mode values and 1.5K size', async () => {
-    const _0x3b9979 = resolveModelExecution('runninghub/2050306122774532097');
-    (assert.equal(_0x3b9979?.modelManifest?.displayName, 'Qwen-图像编辑'),
-      assert.equal(_0x3b9979?.executionManifest?.submitMode, 'openapi-v2-ai-app'));
-    const _0x6a5ac4 = {
+    const modelExecution5 = resolveModelExecution('runninghub/2050306122774532097');
+    (assert.equal(modelExecution5?.modelManifest?.displayName, 'Qwen-图像编辑'),
+      assert.equal(modelExecution5?.executionManifest?.submitMode, 'openapi-v2-ai-app'));
+    const payload = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_ref_1'],
       },
-      _0xcf5698 = await buildImageRequest(
+      dom5 = await buildImageRequest(
         {
           model: 'runninghub/2050306122774532097',
           inputUrls: ['local_ref_1'],
@@ -203,39 +186,36 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'default',
         },
         'edit the image',
-        _0x6a5ac4,
+        payload,
       );
-    (assert.equal(_0xcf5698.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0xcf5698.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2050306122774532097',
-      ),
-      assert.equal(_0xcf5698.body.apiKey, 'k'),
-      assert.equal(_0xcf5698.body.instanceType, 'default'),
-      assert.deepEqual(_0xcf5698.adapterTrace, {
+    (assert.equal(dom5.url, '/api/v2/proxy/image'),
+      assert.equal(dom5.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2050306122774532097'),
+      assert.equal(dom5.body.apiKey, 'k'),
+      assert.equal(dom5.body.instanceType, 'default'),
+      assert.deepEqual(dom5.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.qwen-image-edit.v1',
         modelId: 'runninghub/2050306122774532097',
       }));
-    const _0xee5036 = _0xcf5698.body.nodeInfoList,
-      _0x4c9878 = (_0x19fe20, _0x1dad6f) =>
-        _0xee5036.find((_0x437e01) => _0x437e01.nodeId === _0x19fe20 && _0x437e01.fieldName === _0x1dad6f);
-    (assert.equal(_0x4c9878('151', 'image')?.fieldValue, 'u_ref_1'),
-      assert.equal(_0x4c9878('152', 'image'), undefined),
-      assert.equal(_0x4c9878('157', 'image'), undefined),
-      assert.equal(_0x4c9878('148', 'value')?.fieldValue, 'edit the image'),
-      assert.equal(_0x4c9878('112', 'width')?.fieldValue, '1536'),
-      assert.equal(_0x4c9878('112', 'height')?.fieldValue, '1536'),
-      assert.equal(_0x4c9878('227', 'index')?.fieldValue, '0'),
-      assert.equal(_0x4c9878('231', 'index')?.fieldValue, '1'),
-      assert.equal(_0x4c9878('265', 'value')?.fieldValue, '0'));
+    const list5 = dom5.body.nodeInfoList,
+      handler5 = (handle, state) =>
+        list5.find((item7) => item7.nodeId === handle && item7.fieldName === state);
+    (assert.equal(handler5('151', 'image')?.fieldValue, 'u_ref_1'),
+      assert.equal(handler5('152', 'image'), undefined),
+      assert.equal(handler5('157', 'image'), undefined),
+      assert.equal(handler5('148', 'value')?.fieldValue, 'edit the image'),
+      assert.equal(handler5('112', 'width')?.fieldValue, '1536'),
+      assert.equal(handler5('112', 'height')?.fieldValue, '1536'),
+      assert.equal(handler5('227', 'index')?.fieldValue, '0'),
+      assert.equal(handler5('231', 'index')?.fieldValue, '1'),
+      assert.equal(handler5('265', 'value')?.fieldValue, '0'));
   }),
   test('RunningHubAdapter Qwen image edit: maps three images, 2509 mode, depth control, and 16:9 2K size', async () => {
-    const _0x1ab1aa = {
+    const config = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_ref_1', 'u_ref_2', 'u_ref_3', 'u_ref_4'],
       },
-      _0x34510f = await buildImageRequest(
+      dom6 = await buildImageRequest(
         {
           model: 'runninghub/2050306122774532097',
           inputUrls: ['local_ref_1', 'local_ref_2', 'local_ref_3', 'local_ref_4'],
@@ -246,45 +226,44 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'plus',
         },
         'keep the product consistent',
-        _0x1ab1aa,
+        config,
       );
-    assert.equal(_0x34510f.body.instanceType, 'plus');
-    const _0x7f0438 = _0x34510f.body.nodeInfoList,
-      _0x1e304b = (_0x27a87a, _0x178122) =>
-        _0x7f0438.find((_0x48f8a6) => _0x48f8a6.nodeId === _0x27a87a && _0x48f8a6.fieldName === _0x178122);
-    (assert.equal(_0x1e304b('151', 'image')?.fieldValue, 'u_ref_1'),
-      assert.equal(_0x1e304b('152', 'image')?.fieldValue, 'u_ref_2'),
-      assert.equal(_0x1e304b('157', 'image')?.fieldValue, 'u_ref_3'),
+    assert.equal(dom6.body.instanceType, 'plus');
+    const list6 = dom6.body.nodeInfoList,
+      handler6 = (scope, input) => list6.find((item8) => item8.nodeId === scope && item8.fieldName === input);
+    (assert.equal(handler6('151', 'image')?.fieldValue, 'u_ref_1'),
+      assert.equal(handler6('152', 'image')?.fieldValue, 'u_ref_2'),
+      assert.equal(handler6('157', 'image')?.fieldValue, 'u_ref_3'),
       assert.equal(
-        _0x7f0438.some((_0x2cb795) => _0x2cb795.fieldValue === 'u_ref_4'),
+        list6.some((item9) => item9.fieldValue === 'u_ref_4'),
         false,
       ),
-      assert.equal(_0x1e304b('148', 'value')?.fieldValue, 'keep the product consistent'),
-      assert.equal(_0x1e304b('112', 'width')?.fieldValue, '1920'),
-      assert.equal(_0x1e304b('112', 'height')?.fieldValue, '1088'),
-      assert.equal(_0x1e304b('227', 'index')?.fieldValue, '2'),
-      assert.equal(_0x1e304b('231', 'index')?.fieldValue, '0'),
-      assert.equal(_0x1e304b('265', 'value')?.fieldValue, '2'));
+      assert.equal(handler6('148', 'value')?.fieldValue, 'keep the product consistent'),
+      assert.equal(handler6('112', 'width')?.fieldValue, '1920'),
+      assert.equal(handler6('112', 'height')?.fieldValue, '1088'),
+      assert.equal(handler6('227', 'index')?.fieldValue, '2'),
+      assert.equal(handler6('231', 'index')?.fieldValue, '0'),
+      assert.equal(handler6('265', 'value')?.fieldValue, '2'));
   }),
   test('RunningHubAdapter Qwen image edit: requires at least one image', async () => {
-    const _0x2d6677 = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] };
+    const output = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] };
     await assert.rejects(
-      () => buildImageRequest({ model: 'runninghub/2050306122774532097', inputUrls: [] }, 'edit', _0x2d6677),
+      () => buildImageRequest({ model: 'runninghub/2050306122774532097', inputUrls: [] }, 'edit', output),
       /请先添加至少一张参考图再生成/,
     );
   }),
   test('RunningHubAdapter 人物替换图片编辑 V3: mask 存在时写入 1180/1185 与 1177/1186', async () => {
-    const _0x26d087 = {
+    const value2 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_target', 'u_source'],
-        processInputImagesPreserveOrder: async (_0x76a0fc) =>
-          Array.isArray(_0x76a0fc) && _0x76a0fc[0] === '' && _0x76a0fc[1] === ''
+        processInputImagesPreserveOrder: async (value3) =>
+          Array.isArray(value3) && value3[0] === '' && value3[1] === ''
             ? ['', '']
-            : Array.isArray(_0x76a0fc) && _0x76a0fc[0] === 'm_target' && _0x76a0fc[1] === 'm_source'
+            : Array.isArray(value3) && value3[0] === 'm_target' && value3[1] === 'm_source'
               ? ['mask_0', 'mask_1']
               : ['u_target', 'u_source'],
       },
-      _0x1d1b3a = await buildImageRequest(
+      dom7 = await buildImageRequest(
         {
           model: 'runninghub/2041177685895946242',
           inputUrls: ['local_target', 'local_source'],
@@ -293,26 +272,24 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'default',
         },
         'p',
-        _0x26d087,
+        value2,
       ),
-      _0x2be31e = _0x1d1b3a.body.nodeInfoList,
-      _0x44ef89 = (_0x201ee6, _0x34238d) =>
-        _0x2be31e.find((_0x21ecb6) => _0x21ecb6.nodeId === _0x201ee6 && _0x21ecb6.fieldName === _0x34238d);
-    (assert.equal(_0x44ef89('1180', 'image')?.fieldValue, 'mask_0'),
-      assert.equal(_0x44ef89('1185', 'boolean')?.fieldValue, 'true'),
-      assert.equal(_0x44ef89('1177', 'image')?.fieldValue, 'mask_1'),
-      assert.equal(_0x44ef89('1186', 'boolean')?.fieldValue, 'true'));
+      list7 = dom7.body.nodeInfoList,
+      handler7 = (value4, value5) =>
+        list7.find((item10) => item10.nodeId === value4 && item10.fieldName === value5);
+    (assert.equal(handler7('1180', 'image')?.fieldValue, 'mask_0'),
+      assert.equal(handler7('1185', 'boolean')?.fieldValue, 'true'),
+      assert.equal(handler7('1177', 'image')?.fieldValue, 'mask_1'),
+      assert.equal(handler7('1186', 'boolean')?.fieldValue, 'true'));
   }),
   test('RunningHubAdapter 人物替换图片编辑 V3: 提示词为空时 594 使用默认 "4k,高清画质"', async () => {
-    const _0x5a583e = {
+    const value6 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_target', 'u_source'],
-        processInputImagesPreserveOrder: async (_0x4197f0) =>
-          Array.isArray(_0x4197f0) && _0x4197f0[0] === '' && _0x4197f0[1] === ''
-            ? ['', '']
-            : ['u_target', 'u_source'],
+        processInputImagesPreserveOrder: async (value7) =>
+          Array.isArray(value7) && value7[0] === '' && value7[1] === '' ? ['', ''] : ['u_target', 'u_source'],
       },
-      _0x27ce17 = await buildImageRequest(
+      dom8 = await buildImageRequest(
         {
           model: 'runninghub/2041177685895946242',
           inputUrls: ['local_target', 'local_source'],
@@ -320,25 +297,25 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'default',
         },
         '   ',
-        _0x5a583e,
+        value6,
       ),
-      _0x15df24 = _0x27ce17.body.nodeInfoList,
-      _0xd6610f = (_0x487703, _0x1c5c60) =>
-        _0x15df24.find((_0x455611) => _0x455611.nodeId === _0x487703 && _0x455611.fieldName === _0x1c5c60);
-    assert.equal(_0xd6610f('594', 'value')?.fieldValue, '4k,高清画质');
+      list8 = dom8.body.nodeInfoList,
+      handler8 = (value8, value9) =>
+        list8.find((item11) => item11.nodeId === value8 && item11.fieldName === value9);
+    assert.equal(handler8('594', 'value')?.fieldValue, '4k,高清画质');
   }),
   test('RunningHubAdapter 人物替换人物替换 V2.1: mask 与默认提示词映射正确', async () => {
-    const _0x2a39a7 = {
+    const value10 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_target', 'u_source'],
-        processInputImagesPreserveOrder: async (_0x592989) =>
-          Array.isArray(_0x592989) && _0x592989[0] === 'm_target' && _0x592989[1] === 'm_source'
+        processInputImagesPreserveOrder: async (value11) =>
+          Array.isArray(value11) && value11[0] === 'm_target' && value11[1] === 'm_source'
             ? ['mask_0', 'mask_1']
-            : Array.isArray(_0x592989) && _0x592989[0] === '' && _0x592989[1] === ''
+            : Array.isArray(value11) && value11[0] === '' && value11[1] === ''
               ? ['', '']
               : ['u_target', 'u_source'],
       },
-      _0x269385 = await buildImageRequest(
+      dom9 = await buildImageRequest(
         {
           model: 'runninghub/2050313968069165058',
           inputUrls: ['local_target', 'local_source'],
@@ -347,58 +324,58 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'default',
         },
         '   ',
-        _0x2a39a7,
+        value10,
       ),
-      _0x5da773 = _0x269385.body.nodeInfoList,
-      _0x561077 = (_0x3cb8f0, _0x1098c2) =>
-        _0x5da773.find((_0x4219fe) => _0x4219fe.nodeId === _0x3cb8f0 && _0x4219fe.fieldName === _0x1098c2);
-    (assert.equal(_0x561077('257', 'image')?.fieldValue, 'mask_0'),
-      assert.equal(_0x561077('259', 'boolean')?.fieldValue, 'true'),
-      assert.equal(_0x561077('255', 'image')?.fieldValue, 'mask_1'),
-      assert.equal(_0x561077('262', 'boolean')?.fieldValue, 'true'),
-      assert.equal(_0x561077('232', 'value')?.fieldValue, '4K'),
-      assert.equal(_0x561077('233', 'value')?.fieldValue, '1440'));
+      list9 = dom9.body.nodeInfoList,
+      handler9 = (value12, value13) =>
+        list9.find((item12) => item12.nodeId === value12 && item12.fieldName === value13);
+    (assert.equal(handler9('257', 'image')?.fieldValue, 'mask_0'),
+      assert.equal(handler9('259', 'boolean')?.fieldValue, 'true'),
+      assert.equal(handler9('255', 'image')?.fieldValue, 'mask_1'),
+      assert.equal(handler9('262', 'boolean')?.fieldValue, 'true'),
+      assert.equal(handler9('232', 'value')?.fieldValue, '4K'),
+      assert.equal(handler9('233', 'value')?.fieldValue, '1440'));
   }),
   test('RunningHubAdapter 人物替换人物替换 V2.1: 默认模式允许 1440/1600/1920', async () => {
-    const _0xf5ad5b = globalThis.window;
+    const value14 = globalThis.window;
     globalThis.window = { ADVANCED_MODE: false };
     try {
-      const _0x38b5eb = {
+      const value15 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_target', 'u_source'],
-        processInputImagesPreserveOrder: async (_0x4320e0) =>
-          Array.isArray(_0x4320e0) && _0x4320e0[0] === '' && _0x4320e0[1] === ''
+        processInputImagesPreserveOrder: async (value16) =>
+          Array.isArray(value16) && value16[0] === '' && value16[1] === ''
             ? ['', '']
             : ['u_target', 'u_source'],
       };
-      for (const _0xfe870c of [0x5a0, 0x640, 0x780]) {
-        const _0x417f81 = await buildImageRequest(
+      for (const rhResolution of [0x5a0, 0x640, 0x780]) {
+        const dom10 = await buildImageRequest(
             {
               model: 'runninghub/2050313968069165058',
               inputUrls: ['local_target', 'local_source'],
-              rhResolution: _0xfe870c,
+              rhResolution: rhResolution,
             },
             'prompt',
-            _0x38b5eb,
+            value15,
           ),
-          _0x56cc7e = _0x417f81.body.nodeInfoList.find(
-            (_0x53b4f7) => _0x53b4f7.nodeId === '233' && _0x53b4f7.fieldName === 'value',
+          value17 = dom10.body.nodeInfoList.find(
+            (item13) => item13.nodeId === '233' && item13.fieldName === 'value',
           );
-        assert.equal(_0x56cc7e?.fieldValue, String(_0xfe870c));
+        assert.equal(value17?.fieldValue, String(rhResolution));
       }
     } finally {
-      if (typeof _0xf5ad5b === 'undefined') delete globalThis.window;
-      else globalThis.window = _0xf5ad5b;
+      if (typeof value14 === 'undefined') delete globalThis.window;
+      else globalThis.window = value14;
     }
   }),
   test('RunningHubAdapter 视频擦除：nodeInfoList 映射正确（117/122/105/63）', async () => {
-    const _0x810b62 = {
+    const value18 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputVideos: async () => ['https://www.runninghub.cn/uploaded-video.mp4'],
         processInputImages: async () => ['https://www.runninghub.cn/uploaded-mask.png'],
       },
-      { buildVideoRequest: _0x57e29e } = await import('./RunningHubAdapter.js'),
-      _0x20efb7 = await _0x57e29e(
+      { buildVideoRequest: buildVideoRequest2 } = await import('./RunningHubAdapter.js'),
+      dom11 = await buildVideoRequest2(
         {
           model: 'runninghub/video_matting',
           videoUrl: 'https://www.runninghub.cn/test.mp4',
@@ -406,50 +383,50 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           sourceFrameCount: 77,
         },
         '',
-        _0x810b62,
+        value18,
       );
-    (assert.equal(_0x20efb7.url, '/api/v2/video/matting/run'),
-      assert.equal(_0x20efb7.useOpenapiQuery, true),
-      assert.equal(_0x20efb7.body.apiKey, 'k'),
-      assert.equal(_0x20efb7.body.appId, '2042569732972355585'),
-      assert.equal(_0x20efb7.body.instanceType, 'default'),
-      assert.equal(_0x20efb7.body.usePersonalQueue, 'false'),
-      assert.ok(Array.isArray(_0x20efb7.body.nodeInfoList)));
-    const _0x3854ab = _0x20efb7.body.nodeInfoList,
-      _0x3d114f = (_0x1f6bd8, _0x29007b) =>
-        _0x3854ab.find((_0x493286) => _0x493286.nodeId === _0x1f6bd8 && _0x493286.fieldName === _0x29007b);
-    (assert.equal(_0x3d114f('117', 'video')?.fieldValue, 'https://www.runninghub.cn/uploaded-video.mp4'),
-      assert.equal(_0x3d114f('117', 'frame_load_cap')?.fieldValue, '77'),
-      assert.equal(_0x3d114f('122', 'value')?.fieldValue, '24'),
-      assert.equal(_0x3d114f('105', 'value')?.fieldValue, '1024'),
-      assert.equal(_0x3d114f('63', 'image')?.fieldValue, 'https://www.runninghub.cn/uploaded-mask.png'),
+    (assert.equal(dom11.url, '/api/v2/video/matting/run'),
+      assert.equal(dom11.useOpenapiQuery, true),
+      assert.equal(dom11.body.apiKey, 'k'),
+      assert.equal(dom11.body.appId, '2042569732972355585'),
+      assert.equal(dom11.body.instanceType, 'default'),
+      assert.equal(dom11.body.usePersonalQueue, 'false'),
+      assert.ok(Array.isArray(dom11.body.nodeInfoList)));
+    const list10 = dom11.body.nodeInfoList,
+      handler10 = (value19, value20) =>
+        list10.find((item14) => item14.nodeId === value19 && item14.fieldName === value20);
+    (assert.equal(handler10('117', 'video')?.fieldValue, 'https://www.runninghub.cn/uploaded-video.mp4'),
+      assert.equal(handler10('117', 'frame_load_cap')?.fieldValue, '77'),
+      assert.equal(handler10('122', 'value')?.fieldValue, '24'),
+      assert.equal(handler10('105', 'value')?.fieldValue, '1024'),
+      assert.equal(handler10('63', 'image')?.fieldValue, 'https://www.runninghub.cn/uploaded-mask.png'),
       assert.equal(
-        _0x3854ab.some((_0x24eb56) => _0x24eb56.nodeId === '71'),
+        list10.some((item15) => item15.nodeId === '71'),
         false,
       ),
       assert.equal(
-        _0x3854ab.some((_0x2c24ca) => _0x2c24ca.nodeId === '72'),
+        list10.some((item16) => item16.nodeId === '72'),
         false,
       ),
       assert.equal(
-        _0x3854ab.some((_0x3b2bb9) => _0x3b2bb9.nodeId === '67'),
+        list10.some((item17) => item17.nodeId === '67'),
         false,
       ),
       assert.equal(
-        _0x3854ab.some((_0x229cc7) => _0x229cc7.nodeId === '35'),
+        list10.some((item18) => item18.nodeId === '35'),
         false,
       ));
   }),
   test('RunningHubAdapter 视频抠像：默认模式允许 30 帧', async () => {
-    const _0x5edd41 = globalThis.window;
+    const value21 = globalThis.window;
     globalThis.window = { ADVANCED_MODE: false };
     try {
-      const _0x59ee2a = {
+      const value22 = {
           getProviderConfig: () => ({ apiKey: 'k' }),
           processInputVideos: async () => ['https://www.runninghub.cn/uploaded-video.mp4'],
           processInputImages: async () => ['https://www.runninghub.cn/uploaded-mask.png'],
         },
-        _0x1bda3f = await buildVideoRequest(
+        dom12 = await buildVideoRequest(
           {
             model: 'runninghub/video_matting',
             videoUrl: 'https://www.runninghub.cn/test.mp4',
@@ -458,24 +435,22 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
             rhVideoFps: 30,
           },
           '',
-          _0x59ee2a,
+          value22,
         ),
-        _0x1aee0e = (_0x3b0abd, _0x18753b) =>
-          _0x1bda3f.body.nodeInfoList.find(
-            (_0x5d9616) => _0x5d9616.nodeId === _0x3b0abd && _0x5d9616.fieldName === _0x18753b,
-          );
-      assert.equal(_0x1aee0e('122', 'value')?.fieldValue, '30');
+        handler11 = (value23, value24) =>
+          dom12.body.nodeInfoList.find((item19) => item19.nodeId === value23 && item19.fieldName === value24);
+      assert.equal(handler11('122', 'value')?.fieldValue, '30');
     } finally {
-      if (typeof _0x5edd41 === 'undefined') delete globalThis.window;
-      else globalThis.window = _0x5edd41;
+      if (typeof value21 === 'undefined') delete globalThis.window;
+      else globalThis.window = value21;
     }
   }),
   test('RunningHubAdapter 视频抠像：上传源视频并正确映射抠像模式（55/video + 67/index）', async () => {
-    const _0x46fbbe = {
+    const value25 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputVideos: async () => ['https://www.runninghub.cn/uploaded-video.mp4'],
       },
-      _0x32a1fd = [
+      value26 = [
         { rhMaskMode: 'Sec', expected: '0' },
         { rhMaskMode: 'Sam3', expected: '1' },
         { rhMaskMode: 'MA2', expected: '2' },
@@ -483,28 +458,28 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
         { rhMaskMode: undefined, expected: '0' },
         { rhMaskMode: 'unknown', expected: '0' },
       ];
-    for (const { rhMaskMode: _0x52244c, expected: _0x474f5b } of _0x32a1fd) {
-      const _0x188777 = await buildVideoRequest(
+    for (const { rhMaskMode: rhMaskMode, expected: expected } of value26) {
+      const dom13 = await buildVideoRequest(
           {
             model: 'runninghub/video_matting',
             videoUrl: 'https://www.runninghub.cn/test.mp4',
             pos_points: '[{"x":1,"y":2}]',
             neg_points: '[]',
             frame_index: 12,
-            rhMaskMode: _0x52244c,
+            rhMaskMode: rhMaskMode,
           },
           '',
-          _0x46fbbe,
+          value25,
         ),
-        _0x3d1d40 = _0x188777.body.nodeInfoList,
-        _0x23361c = (_0x20da2a, _0x4b925e) =>
-          _0x3d1d40.find((_0x2f50c0) => _0x2f50c0.nodeId === _0x20da2a && _0x2f50c0.fieldName === _0x4b925e);
-      (assert.equal(_0x23361c('55', 'video')?.fieldValue, 'https://www.runninghub.cn/uploaded-video.mp4'),
-        assert.equal(_0x23361c('67', 'index')?.fieldValue, _0x474f5b, 'rhMaskMode=' + String(_0x52244c)));
+        list11 = dom13.body.nodeInfoList,
+        handler12 = (value27, value28) =>
+          list11.find((item20) => item20.nodeId === value27 && item20.fieldName === value28);
+      (assert.equal(handler12('55', 'video')?.fieldValue, 'https://www.runninghub.cn/uploaded-video.mp4'),
+        assert.equal(handler12('67', 'index')?.fieldValue, expected, 'rhMaskMode=' + String(rhMaskMode)));
     }
   }),
   test('RunningHubAdapter 视频抠像: 缺少视频上传能力时抛错', async () => {
-    const _0x17818a = { getProviderConfig: () => ({ apiKey: 'k' }) };
+    const value29 = { getProviderConfig: () => ({ apiKey: 'k' }) };
     await assert.rejects(
       buildVideoRequest(
         {
@@ -515,13 +490,13 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           frame_index: 12,
         },
         '',
-        _0x17818a,
+        value29,
       ),
       /缺少 RunningHUB 视频上传能力/,
     );
   }),
   test('RunningHubAdapter 视频抠像: 视频上传失败时抛错', async () => {
-    const _0x49853d = { getProviderConfig: () => ({ apiKey: 'k' }), processInputVideos: async () => [] };
+    const value30 = { getProviderConfig: () => ({ apiKey: 'k' }), processInputVideos: async () => [] };
     await assert.rejects(
       buildVideoRequest(
         {
@@ -532,31 +507,31 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           frame_index: 12,
         },
         '',
-        _0x49853d,
+        value30,
       ),
       /源视频上传失败/,
     );
   }),
   test('RunningHubAdapter LTX2.3: nodeInfoList 映射正确', async () => {
-    const _0x4ce55c = resolveModelExecution('runninghub/2039336644536442882');
-    (assert.equal(_0x4ce55c?.modelManifest?.displayName, 'LTX2.3唱歌数字人'),
-      assert.equal(_0x4ce55c?.executionManifest?.mapping?.preset, undefined),
+    const modelExecution6 = resolveModelExecution('runninghub/2039336644536442882');
+    (assert.equal(modelExecution6?.modelManifest?.displayName, 'LTX2.3唱歌数字人'),
+      assert.equal(modelExecution6?.executionManifest?.mapping?.preset, undefined),
       assert.equal(
-        _0x4ce55c?.executionManifest?.mapping?.nodeInfoList?.find((_0x19f33d) => _0x19f33d.nodeId === '303')
+        modelExecution6?.executionManifest?.mapping?.nodeInfoList?.find((item21) => item21.nodeId === '303')
           ?.source,
         'prompt',
       ),
       assert.equal(
-        _0x4ce55c?.executionManifest?.mapping?.nodeInfoList?.find((_0x1e8a28) => _0x1e8a28.nodeId === '332')
+        modelExecution6?.executionManifest?.mapping?.nodeInfoList?.find((item22) => item22.nodeId === '332')
           ?.source,
         'audioInput',
       ));
-    const _0x2ae54d = {
+    const value31 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_img'],
       },
-      { buildVideoRequest: _0x3ab858 } = await import('./RunningHubAdapter.js'),
-      _0x402a3f = await _0x3ab858(
+      { buildVideoRequest: buildVideoRequest3 } = await import('./RunningHubAdapter.js'),
+      dom14 = await buildVideoRequest3(
         {
           model: 'runninghub/2039336644536442882',
           inputUrls: ['local_img'],
@@ -567,48 +542,48 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'default',
         },
         'a prompt',
-        _0x2ae54d,
+        value31,
       );
-    (assert.equal(_0x402a3f.url, '/api/v2/runninghubwf/run'),
-      assert.equal(_0x402a3f.body.apiKey, 'k'),
-      assert.equal(_0x402a3f.body.workflowId, '2039336644536442882'),
-      assert.equal(_0x402a3f.body.instanceType, 'default'),
-      assert.deepEqual(_0x402a3f.adapterTrace, {
+    (assert.equal(dom14.url, '/api/v2/runninghubwf/run'),
+      assert.equal(dom14.body.apiKey, 'k'),
+      assert.equal(dom14.body.workflowId, '2039336644536442882'),
+      assert.equal(dom14.body.instanceType, 'default'),
+      assert.deepEqual(dom14.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.video-ltx23.v1',
         modelId: 'runninghub/2039336644536442882',
       }),
-      assert.ok(Array.isArray(_0x402a3f.body.nodeInfoList)));
-    const _0x694617 = _0x402a3f.body.nodeInfoList,
-      _0x37bd12 = (_0x4f31f5, _0x4fc892) =>
-        _0x694617.find((_0x48ffe4) => _0x48ffe4.nodeId === _0x4f31f5 && _0x48ffe4.fieldName === _0x4fc892);
-    (assert.equal(_0x37bd12('303', 'value')?.fieldValue, 'a prompt'),
-      assert.equal(_0x37bd12('347', 'value')?.fieldValue, '1024'),
-      assert.equal(_0x37bd12('346', 'value')?.fieldValue, '24'),
-      assert.equal(_0x37bd12('349', 'value')?.fieldValue, '6'),
-      assert.equal(_0x37bd12('269', 'image')?.fieldValue, 'u_img'),
-      assert.equal(_0x37bd12('332', 'audio')?.fieldValue, 'https://www.runninghub.cn/test.mp3'));
+      assert.ok(Array.isArray(dom14.body.nodeInfoList)));
+    const list12 = dom14.body.nodeInfoList,
+      handler13 = (value32, value33) =>
+        list12.find((item23) => item23.nodeId === value32 && item23.fieldName === value33);
+    (assert.equal(handler13('303', 'value')?.fieldValue, 'a prompt'),
+      assert.equal(handler13('347', 'value')?.fieldValue, '1024'),
+      assert.equal(handler13('346', 'value')?.fieldValue, '24'),
+      assert.equal(handler13('349', 'value')?.fieldValue, '6'),
+      assert.equal(handler13('269', 'image')?.fieldValue, 'u_img'),
+      assert.equal(handler13('332', 'audio')?.fieldValue, 'https://www.runninghub.cn/test.mp3'));
   }),
   test('RunningHubAdapter 商业级数字人：ai-app 节点映射正确', async () => {
-    const _0x2591f0 = resolveModelExecution('runninghub/2055639633148563458');
-    (assert.equal(_0x2591f0?.modelManifest?.displayName, '商业级数字人'),
-      assert.equal(_0x2591f0?.modelManifest?.description, '主攻唱歌音频'),
-      assert.equal(_0x2591f0?.executionManifest?.mapping?.preset, undefined),
+    const modelExecution7 = resolveModelExecution('runninghub/2055639633148563458');
+    (assert.equal(modelExecution7?.modelManifest?.displayName, '商业级数字人'),
+      assert.equal(modelExecution7?.modelManifest?.description, '主攻唱歌音频'),
+      assert.equal(modelExecution7?.executionManifest?.mapping?.preset, undefined),
       assert.equal(
-        _0x2591f0?.executionManifest?.mapping?.nodeInfoList?.find((_0x34951d) => _0x34951d.nodeId === '100')
+        modelExecution7?.executionManifest?.mapping?.nodeInfoList?.find((item24) => item24.nodeId === '100')
           ?.source,
         'imageInput',
       ),
       assert.equal(
-        _0x2591f0?.executionManifest?.mapping?.nodeInfoList?.find((_0x1f3b75) => _0x1f3b75.nodeId === '119')
+        modelExecution7?.executionManifest?.mapping?.nodeInfoList?.find((item25) => item25.nodeId === '119')
           ?.source,
         'audioInput',
       ));
-    const _0x53be8a = {
+    const value34 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_img'],
       },
-      _0x3137d8 = await buildVideoRequest(
+      dom15 = await buildVideoRequest(
         {
           model: 'runninghub/2055639633148563458',
           inputUrls: ['local_img'],
@@ -621,51 +596,48 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'plus',
         },
         '',
-        _0x53be8a,
+        value34,
       );
-    (assert.equal(_0x3137d8.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x3137d8.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2055639633148563458',
-      ),
-      assert.equal(_0x3137d8.body.apiKey, 'k'),
-      assert.equal(_0x3137d8.body.instanceType, 'plus'),
-      assert.equal(_0x3137d8.body.usePersonalQueue, 'false'),
-      assert.deepEqual(_0x3137d8.adapterTrace, {
+    (assert.equal(dom15.url, '/api/v2/proxy/image'),
+      assert.equal(dom15.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2055639633148563458'),
+      assert.equal(dom15.body.apiKey, 'k'),
+      assert.equal(dom15.body.instanceType, 'plus'),
+      assert.equal(dom15.body.usePersonalQueue, 'false'),
+      assert.deepEqual(dom15.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.video-commercial-digital-human.v1',
         modelId: 'runninghub/2055639633148563458',
       }));
-    const _0x2dfc68 = _0x3137d8.body.nodeInfoList,
-      _0x3c7808 = (_0x27b64e, _0x4cea56) =>
-        _0x2dfc68.find((_0xfe7cc9) => _0xfe7cc9.nodeId === _0x27b64e && _0xfe7cc9.fieldName === _0x4cea56);
-    (assert.equal(_0x3c7808('100', 'image')?.fieldValue, 'u_img'),
-      assert.equal(_0x3c7808('119', 'audio')?.fieldValue, 'https://www.runninghub.cn/song.mp3'),
-      assert.equal(_0x3c7808('114', 'value')?.fieldValue, '1280'),
-      assert.equal(_0x3c7808('118', 'value')?.fieldValue, '150'),
-      assert.equal(_0x3c7808('117', 'value')?.fieldValue, '女人在唱歌，镜头晃动'),
-      assert.equal(_0x3c7808('201', 'value')?.fieldValue, '2'),
-      assert.equal(_0x3c7808('204', 'value')?.fieldValue, '1'));
+    const list13 = dom15.body.nodeInfoList,
+      handler14 = (value35, value36) =>
+        list13.find((item26) => item26.nodeId === value35 && item26.fieldName === value36);
+    (assert.equal(handler14('100', 'image')?.fieldValue, 'u_img'),
+      assert.equal(handler14('119', 'audio')?.fieldValue, 'https://www.runninghub.cn/song.mp3'),
+      assert.equal(handler14('114', 'value')?.fieldValue, '1280'),
+      assert.equal(handler14('118', 'value')?.fieldValue, '150'),
+      assert.equal(handler14('117', 'value')?.fieldValue, '女人在唱歌，镜头晃动'),
+      assert.equal(handler14('201', 'value')?.fieldValue, '2'),
+      assert.equal(handler14('204', 'value')?.fieldValue, '1'));
   }),
   test('RunningHubAdapter 视频编辑-基础版：manifest 映射源视频和参考图', async () => {
-    const _0x40da33 = resolveModelExecution('runninghub/1971148165531475969');
-    (assert.equal(_0x40da33?.modelManifest?.displayName, '视频编辑-基础版'),
-      assert.equal(_0x40da33?.executionManifest?.mapping?.preset, undefined),
+    const modelExecution8 = resolveModelExecution('runninghub/1971148165531475969');
+    (assert.equal(modelExecution8?.modelManifest?.displayName, '视频编辑-基础版'),
+      assert.equal(modelExecution8?.executionManifest?.mapping?.preset, undefined),
       assert.equal(
-        _0x40da33?.executionManifest?.mapping?.nodeInfoList?.find((_0x1fe9b0) => _0x1fe9b0.nodeId === '237')
+        modelExecution8?.executionManifest?.mapping?.nodeInfoList?.find((item27) => item27.nodeId === '237')
           ?.source,
         'videoInput',
       ),
       assert.equal(
-        _0x40da33?.executionManifest?.mapping?.nodeInfoList?.find((_0x51733a) => _0x51733a.nodeId === '234')
+        modelExecution8?.executionManifest?.mapping?.nodeInfoList?.find((item28) => item28.nodeId === '234')
           ?.source,
         'imageInput',
       ));
-    const _0x171643 = {
+    const value37 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_ref'],
       },
-      _0x28c047 = await buildVideoRequest(
+      dom16 = await buildVideoRequest(
         {
           model: 'runninghub/1971148165531475969',
           videoUrl: 'https://www.runninghub.cn/source.mp4',
@@ -676,48 +648,45 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhEnableMask: true,
         },
         'basic prompt',
-        _0x171643,
+        value37,
       );
-    (assert.equal(_0x28c047.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x28c047.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/1971148165531475969',
-      ),
-      assert.deepEqual(_0x28c047.adapterTrace, {
+    (assert.equal(dom16.url, '/api/v2/proxy/image'),
+      assert.equal(dom16.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/1971148165531475969'),
+      assert.deepEqual(dom16.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.video-basic.v1',
         modelId: 'runninghub/1971148165531475969',
       }));
-    const _0x240d87 = _0x28c047.body.nodeInfoList,
-      _0x5df407 = (_0x314885, _0x3a46ab) =>
-        _0x240d87.find((_0x4f6b22) => _0x4f6b22.nodeId === _0x314885 && _0x4f6b22.fieldName === _0x3a46ab);
-    (assert.equal(_0x5df407('237', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
-      assert.equal(_0x5df407('234', 'image')?.fieldValue, 'u_ref'),
-      assert.equal(_0x5df407('397', 'value')?.fieldValue, '16'),
-      assert.equal(_0x5df407('222', 'value')?.fieldValue, '1024'),
-      assert.equal(_0x5df407('392', 'value')?.fieldValue, '90'),
-      assert.equal(_0x5df407('235', 'value')?.fieldValue, 'basic prompt'),
-      assert.equal(_0x5df407('396', 'value')?.fieldValue, 'true'));
+    const list14 = dom16.body.nodeInfoList,
+      handler15 = (value38, value39) =>
+        list14.find((item29) => item29.nodeId === value38 && item29.fieldName === value39);
+    (assert.equal(handler15('237', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
+      assert.equal(handler15('234', 'image')?.fieldValue, 'u_ref'),
+      assert.equal(handler15('397', 'value')?.fieldValue, '16'),
+      assert.equal(handler15('222', 'value')?.fieldValue, '1024'),
+      assert.equal(handler15('392', 'value')?.fieldValue, '90'),
+      assert.equal(handler15('235', 'value')?.fieldValue, 'basic prompt'),
+      assert.equal(handler15('396', 'value')?.fieldValue, 'true'));
   }),
   test('RunningHubAdapter 视频去字幕V2：通用 manifest 映射单视频和高级参数', async () => {
-    const _0x578270 = resolveModelExecution('runninghub/2060613773890768898');
-    (assert.equal(_0x578270?.modelManifest?.displayName, '视频去字幕V2'),
-      assert.equal(_0x578270?.executionManifest?.extensions?.payloadResolver, undefined),
-      assert.equal(_0x578270?.executionManifest?.appId, '2060613773890768898'),
+    const modelExecution9 = resolveModelExecution('runninghub/2060613773890768898');
+    (assert.equal(modelExecution9?.modelManifest?.displayName, '视频去字幕V2'),
+      assert.equal(modelExecution9?.executionManifest?.extensions?.payloadResolver, undefined),
+      assert.equal(modelExecution9?.executionManifest?.appId, '2060613773890768898'),
       assert.equal(
-        _0x578270?.executionManifest?.mapping?.nodeInfoList?.find(
-          (_0x30c557) => _0x30c557.nodeId === '1' && _0x30c557.fieldName === 'video',
+        modelExecution9?.executionManifest?.mapping?.nodeInfoList?.find(
+          (item30) => item30.nodeId === '1' && item30.fieldName === 'video',
         )?.source,
         'videoInput',
       ));
-    let _0x39037c = [];
-    const _0x533190 = {
+    let value40 = [];
+    const value41 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
-        processInputImages: async (_0x4b2d8b) => {
-          return ((_0x39037c = _0x4b2d8b), ['https://www.runninghub.cn/uploaded-mask.png']);
+        processInputImages: async (value42) => {
+          return ((value40 = value42), ['https://www.runninghub.cn/uploaded-mask.png']);
         },
       },
-      _0x118751 = await buildVideoRequest(
+      dom17 = await buildVideoRequest(
         {
           model: 'runninghub/2060613773890768898',
           videoUrl: 'https://www.runninghub.cn/source.mp4',
@@ -728,74 +697,69 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhVideoResolution: 0x3c0,
         },
         '',
-        _0x533190,
+        value41,
       );
-    (assert.deepEqual(_0x39037c, ['/data/mask/manual-mask.png']),
-      assert.equal(_0x118751.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x118751.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2060613773890768898',
-      ),
-      assert.equal(_0x118751.body.apiKey, 'k'),
-      assert.equal(_0x118751.body.instanceType, 'default'),
-      assert.equal(_0x118751.body.usePersonalQueue, 'false'),
-      assert.deepEqual(_0x118751.adapterTrace, {
+    (assert.deepEqual(value40, ['/data/mask/manual-mask.png']),
+      assert.equal(dom17.url, '/api/v2/proxy/image'),
+      assert.equal(dom17.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2060613773890768898'),
+      assert.equal(dom17.body.apiKey, 'k'),
+      assert.equal(dom17.body.instanceType, 'default'),
+      assert.equal(dom17.body.usePersonalQueue, 'false'),
+      assert.deepEqual(dom17.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.video-watermark-removal-v2.v1',
         modelId: 'runninghub/2060613773890768898',
       }));
-    const _0x3ce0c8 = _0x118751.body.nodeInfoList,
-      _0xb1c5f = (_0x130b5a, _0x36d658) =>
-        _0x3ce0c8.find((_0x1a8188) => _0x1a8188.nodeId === _0x130b5a && _0x1a8188.fieldName === _0x36d658);
-    (assert.equal(_0xb1c5f('1', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
-      assert.equal(_0xb1c5f('134', 'value')?.fieldValue, '1'),
-      assert.equal(_0xb1c5f('1', 'frame_load_cap')?.fieldValue, '12'),
-      assert.equal(_0xb1c5f('85', 'value')?.fieldValue, '30'),
-      assert.equal(_0xb1c5f('31', 'value')?.fieldValue, '960'),
-      assert.equal(_0xb1c5f('144', 'value')?.fieldValue, 'true'),
-      assert.equal(_0xb1c5f('326', 'index')?.fieldValue, '1'),
-      assert.equal(_0xb1c5f('329', 'image')?.fieldValue, 'https://www.runninghub.cn/uploaded-mask.png'));
+    const list15 = dom17.body.nodeInfoList,
+      handler16 = (value43, value44) =>
+        list15.find((item31) => item31.nodeId === value43 && item31.fieldName === value44);
+    (assert.equal(handler16('1', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
+      assert.equal(handler16('134', 'value')?.fieldValue, '1'),
+      assert.equal(handler16('1', 'frame_load_cap')?.fieldValue, '12'),
+      assert.equal(handler16('85', 'value')?.fieldValue, '30'),
+      assert.equal(handler16('31', 'value')?.fieldValue, '960'),
+      assert.equal(handler16('144', 'value')?.fieldValue, 'true'),
+      assert.equal(handler16('326', 'index')?.fieldValue, '1'),
+      assert.equal(handler16('329', 'image')?.fieldValue, 'https://www.runninghub.cn/uploaded-mask.png'));
   }),
   test('RunningHubAdapter 视频去字幕V2：缺省参数保持接口示例默认值', async () => {
-    const _0x3a138c = { getProviderConfig: () => ({ apiKey: 'k' }) },
-      _0x7cfb24 = await buildVideoRequest(
+    const value45 = { getProviderConfig: () => ({ apiKey: 'k' }) },
+      dom18 = await buildVideoRequest(
         { model: 'runninghub/2060613773890768898', videoUrl: 'https://www.runninghub.cn/source.mp4' },
         '',
-        _0x3a138c,
+        value45,
       ),
-      _0x3e8dcb = (_0x2ca157, _0x28222b) =>
-        _0x7cfb24.body.nodeInfoList.find(
-          (_0x40e5b8) => _0x40e5b8.nodeId === _0x2ca157 && _0x40e5b8.fieldName === _0x28222b,
-        );
-    (assert.equal(_0x3e8dcb('134', 'value')?.fieldValue, '0'),
-      assert.equal(_0x3e8dcb('1', 'frame_load_cap')?.fieldValue, '0'),
-      assert.equal(_0x3e8dcb('85', 'value')?.fieldValue, '24'),
-      assert.equal(_0x3e8dcb('31', 'value')?.fieldValue, '960'),
-      assert.equal(_0x3e8dcb('144', 'value')?.fieldValue, 'false'),
-      assert.equal(_0x3e8dcb('326', 'index'), undefined),
-      assert.equal(_0x3e8dcb('329', 'image'), undefined));
+      handler17 = (value46, value47) =>
+        dom18.body.nodeInfoList.find((item32) => item32.nodeId === value46 && item32.fieldName === value47);
+    (assert.equal(handler17('134', 'value')?.fieldValue, '0'),
+      assert.equal(handler17('1', 'frame_load_cap')?.fieldValue, '0'),
+      assert.equal(handler17('85', 'value')?.fieldValue, '24'),
+      assert.equal(handler17('31', 'value')?.fieldValue, '960'),
+      assert.equal(handler17('144', 'value')?.fieldValue, 'false'),
+      assert.equal(handler17('326', 'index'), undefined),
+      assert.equal(handler17('329', 'image'), undefined));
   }),
   test('RunningHubAdapter 视频对口型：ai-app 节点映射正确', async () => {
-    const _0x2a5587 = resolveModelExecution('runninghub/2054101324521844738');
-    (assert.equal(_0x2a5587?.modelManifest?.displayName, '视频对口型'),
-      assert.equal(_0x2a5587?.executionManifest?.mapping?.preset, undefined),
+    const modelExecution10 = resolveModelExecution('runninghub/2054101324521844738');
+    (assert.equal(modelExecution10?.modelManifest?.displayName, '视频对口型'),
+      assert.equal(modelExecution10?.executionManifest?.mapping?.preset, undefined),
       assert.equal(
-        _0x2a5587?.executionManifest?.mapping?.nodeInfoList?.find((_0x3152a9) => _0x3152a9.nodeId === '383')
+        modelExecution10?.executionManifest?.mapping?.nodeInfoList?.find((item33) => item33.nodeId === '383')
           ?.source,
         'videoInput',
       ),
       assert.equal(
-        _0x2a5587?.executionManifest?.mapping?.nodeInfoList?.find((_0x1a9269) => _0x1a9269.nodeId === '390')
+        modelExecution10?.executionManifest?.mapping?.nodeInfoList?.find((item34) => item34.nodeId === '390')
           ?.source,
         'imageInput',
       ),
       assert.equal(
-        _0x2a5587?.executionManifest?.mapping?.nodeInfoList?.find((_0x5c8622) => _0x5c8622.nodeId === '367')
+        modelExecution10?.executionManifest?.mapping?.nodeInfoList?.find((item35) => item35.nodeId === '367')
           ?.source,
         'audioInput',
       ));
-    const _0x2902dc = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] },
-      _0x22d8f9 = await buildVideoRequest(
+    const value48 = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] },
+      dom19 = await buildVideoRequest(
         {
           model: 'runninghub/2054101324521844738',
           videoUrl: 'https://www.runninghub.cn/source.mp4',
@@ -807,38 +771,35 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           prompt: 'lip sync prompt',
         },
         'ignored fallback',
-        _0x2902dc,
+        value48,
       );
-    (assert.equal(_0x22d8f9.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x22d8f9.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2054101324521844738',
-      ),
-      assert.equal(_0x22d8f9.body.apiKey, 'k'),
-      assert.equal(_0x22d8f9.body.instanceType, 'plus'),
-      assert.equal(_0x22d8f9.body.usePersonalQueue, 'false'),
-      assert.deepEqual(_0x22d8f9.adapterTrace, {
+    (assert.equal(dom19.url, '/api/v2/proxy/image'),
+      assert.equal(dom19.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2054101324521844738'),
+      assert.equal(dom19.body.apiKey, 'k'),
+      assert.equal(dom19.body.instanceType, 'plus'),
+      assert.equal(dom19.body.usePersonalQueue, 'false'),
+      assert.deepEqual(dom19.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.video-lipsync.v1',
         modelId: 'runninghub/2054101324521844738',
       }));
-    const _0x4dbf8b = _0x22d8f9.body.nodeInfoList,
-      _0x3df287 = (_0x3106e6, _0x4ee6e1) =>
-        _0x4dbf8b.find((_0x3934df) => _0x3934df.nodeId === _0x3106e6 && _0x3934df.fieldName === _0x4ee6e1);
-    (assert.equal(_0x3df287('383', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
-      assert.equal(_0x3df287('390', 'image'), undefined),
-      assert.equal(_0x3df287('410', 'value')?.fieldValue, '120'),
-      assert.equal(_0x3df287('392', 'value')?.fieldValue, '832'),
-      assert.equal(_0x3df287('367', 'audio')?.fieldValue, 'https://www.runninghub.cn/audio.mp3'),
-      assert.equal(_0x3df287('393', 'value')?.fieldValue, 'lip sync prompt'),
-      assert.equal(_0x3df287('409', 'index')?.fieldValue, '1'));
+    const list16 = dom19.body.nodeInfoList,
+      handler18 = (value49, value50) =>
+        list16.find((item36) => item36.nodeId === value49 && item36.fieldName === value50);
+    (assert.equal(handler18('383', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
+      assert.equal(handler18('390', 'image'), undefined),
+      assert.equal(handler18('410', 'value')?.fieldValue, '120'),
+      assert.equal(handler18('392', 'value')?.fieldValue, '832'),
+      assert.equal(handler18('367', 'audio')?.fieldValue, 'https://www.runninghub.cn/audio.mp3'),
+      assert.equal(handler18('393', 'value')?.fieldValue, 'lip sync prompt'),
+      assert.equal(handler18('409', 'index')?.fieldValue, '1'));
   }),
   test('RunningHubAdapter 视频对口型：图片入参写入参考图节点并切 index=0', async () => {
-    const _0x1c4f88 = {
+    const value51 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
         processInputImages: async () => ['u_ref'],
       },
-      _0x2e8488 = await buildVideoRequest(
+      dom20 = await buildVideoRequest(
         {
           model: 'runninghub/2054101324521844738',
           inputUrls: ['local-ref'],
@@ -849,30 +810,30 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           prompt: 'lip sync from image',
         },
         '',
-        _0x1c4f88,
+        value51,
       ),
-      _0x566cea = _0x2e8488.body.nodeInfoList,
-      _0x28d7ad = (_0x1668aa, _0x5df943) =>
-        _0x566cea.find((_0x42e10f) => _0x42e10f.nodeId === _0x1668aa && _0x42e10f.fieldName === _0x5df943);
-    (assert.equal(_0x28d7ad('390', 'image')?.fieldValue, 'u_ref'),
-      assert.equal(_0x28d7ad('383', 'video'), undefined),
-      assert.equal(_0x28d7ad('410', 'value')?.fieldValue, '20'),
-      assert.equal(_0x28d7ad('392', 'value')?.fieldValue, '1024'),
-      assert.equal(_0x28d7ad('367', 'audio')?.fieldValue, 'https://www.runninghub.cn/audio.mp3'),
-      assert.equal(_0x28d7ad('393', 'value')?.fieldValue, 'lip sync from image'),
-      assert.equal(_0x28d7ad('409', 'index')?.fieldValue, '0'));
+      list17 = dom20.body.nodeInfoList,
+      handler19 = (value52, value53) =>
+        list17.find((item37) => item37.nodeId === value52 && item37.fieldName === value53);
+    (assert.equal(handler19('390', 'image')?.fieldValue, 'u_ref'),
+      assert.equal(handler19('383', 'video'), undefined),
+      assert.equal(handler19('410', 'value')?.fieldValue, '20'),
+      assert.equal(handler19('392', 'value')?.fieldValue, '1024'),
+      assert.equal(handler19('367', 'audio')?.fieldValue, 'https://www.runninghub.cn/audio.mp3'),
+      assert.equal(handler19('393', 'value')?.fieldValue, 'lip sync from image'),
+      assert.equal(handler19('409', 'index')?.fieldValue, '0'));
   }),
   test('RunningHubAdapter 视频高清 VIP：通用 manifest 映射模式和源视频', async () => {
-    const _0x31b08e = resolveModelExecution('runninghub/2047787809091620866');
-    (assert.equal(_0x31b08e?.modelManifest?.displayName, '视频高清 VIP'),
-      assert.equal(_0x31b08e?.executionManifest?.mapping?.preset, undefined),
+    const modelExecution11 = resolveModelExecution('runninghub/2047787809091620866');
+    (assert.equal(modelExecution11?.modelManifest?.displayName, '视频高清 VIP'),
+      assert.equal(modelExecution11?.executionManifest?.mapping?.preset, undefined),
       assert.equal(
-        _0x31b08e?.executionManifest?.mapping?.nodeInfoList?.find((_0x131de9) => _0x131de9.nodeId === '10')
+        modelExecution11?.executionManifest?.mapping?.nodeInfoList?.find((item38) => item38.nodeId === '10')
           ?.source,
         'param',
       ));
-    const _0x2270aa = { getProviderConfig: () => ({ apiKey: 'k' }) },
-      _0x43327b = await buildVideoRequest(
+    const value54 = { getProviderConfig: () => ({ apiKey: 'k' }) },
+      dom21 = await buildVideoRequest(
         {
           model: 'runninghub/2047787809091620866',
           videoUrl: 'https://www.runninghub.cn/source.mp4',
@@ -880,42 +841,39 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'plus',
         },
         '',
-        _0x2270aa,
+        value54,
       );
-    (assert.equal(_0x43327b.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x43327b.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2047787809091620866',
-      ),
-      assert.equal(_0x43327b.body.instanceType, 'plus'),
-      assert.deepEqual(_0x43327b.adapterTrace, {
+    (assert.equal(dom21.url, '/api/v2/proxy/image'),
+      assert.equal(dom21.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2047787809091620866'),
+      assert.equal(dom21.body.instanceType, 'plus'),
+      assert.deepEqual(dom21.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.video-hd-vip.v1',
         modelId: 'runninghub/2047787809091620866',
       }));
-    const _0x107592 = _0x43327b.body.nodeInfoList,
-      _0x46ffda = (_0x3a8b77, _0xbf1d11) =>
-        _0x107592.find((_0x4593ba) => _0x4593ba.nodeId === _0x3a8b77 && _0x4593ba.fieldName === _0xbf1d11);
-    (assert.equal(_0x46ffda('10', 'index')?.fieldValue, '1'),
-      assert.equal(_0x46ffda('12', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'));
+    const list18 = dom21.body.nodeInfoList,
+      handler20 = (value55, value56) =>
+        list18.find((item39) => item39.nodeId === value55 && item39.fieldName === value56);
+    (assert.equal(handler20('10', 'index')?.fieldValue, '1'),
+      assert.equal(handler20('12', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'));
   }),
   test('RunningHubAdapter 视频编辑 V5.4 使用 ai-app 并按节点规则映射', async () => {
-    const _0x3feb84 = resolveModelExecution('runninghub/2041741496667348994');
-    (assert.equal(_0x3feb84?.modelManifest?.displayName, '视频编辑V5.4'),
-      assert.equal(_0x3feb84?.executionManifest?.mapping?.preset, undefined),
-      assert.equal(_0x3feb84?.executionManifest?.extensions?.payloadResolver, 'runninghubVideoV54'),
-      assert.equal(_0x3feb84?.executionManifest?.mapping?.sourceVideoNode?.nodeId, '237'),
-      assert.equal(_0x3feb84?.executionManifest?.mapping?.specialModeNode?.nodeId, '1063'));
-    const _0x1eed7f = {
+    const modelExecution12 = resolveModelExecution('runninghub/2041741496667348994');
+    (assert.equal(modelExecution12?.modelManifest?.displayName, '视频编辑V5.4'),
+      assert.equal(modelExecution12?.executionManifest?.mapping?.preset, undefined),
+      assert.equal(modelExecution12?.executionManifest?.extensions?.payloadResolver, 'runninghubVideoV54'),
+      assert.equal(modelExecution12?.executionManifest?.mapping?.sourceVideoNode?.nodeId, '237'),
+      assert.equal(modelExecution12?.executionManifest?.mapping?.specialModeNode?.nodeId, '1063'));
+    const value57 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
-        processInputImages: async (_0x3097f7) => {
-          const _0x46beb9 = String(_0x3097f7?.[0] || '');
-          if (_0x46beb9 === 'ref_local') return ['u_ref'];
-          if (_0x46beb9 === 'first_local') return ['u_first'];
+        processInputImages: async (value58) => {
+          const value59 = String(value58?.[0] || '');
+          if (value59 === 'ref_local') return ['u_ref'];
+          if (value59 === 'first_local') return ['u_first'];
           return [];
         },
       },
-      _0x5e18d5 = await buildVideoRequest(
+      dom22 = await buildVideoRequest(
         {
           model: 'runninghub/2041741496667348994',
           videoUrl: 'https://www.runninghub.cn/source.mp4',
@@ -934,46 +892,43 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhInstanceType: 'plus',
         },
         'a prompt',
-        _0x1eed7f,
+        value57,
       );
-    (assert.equal(_0x5e18d5.url, '/api/v2/proxy/image'),
-      assert.equal(
-        _0x5e18d5.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2041741496667348994',
-      ),
-      assert.equal(_0x5e18d5.body.apiKey, 'k'),
-      assert.equal(_0x5e18d5.body.instanceType, 'plus'),
-      assert.deepEqual(_0x5e18d5.adapterTrace, {
+    (assert.equal(dom22.url, '/api/v2/proxy/image'),
+      assert.equal(dom22.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2041741496667348994'),
+      assert.equal(dom22.body.apiKey, 'k'),
+      assert.equal(dom22.body.instanceType, 'plus'),
+      assert.deepEqual(dom22.adapterTrace, {
         source: 'manifest',
         executionId: 'runninghub.workflow.video-v54.v1',
         modelId: 'runninghub/2041741496667348994',
       }));
-    const _0x13f018 = _0x5e18d5.body.nodeInfoList,
-      _0x408912 = (_0x4b4368, _0x10ba6a) =>
-        _0x13f018.find((_0x10ef1f) => _0x10ef1f.nodeId === _0x4b4368 && _0x10ef1f.fieldName === _0x10ba6a);
-    (assert.equal(_0x408912('235', 'value')?.fieldValue, 'a prompt'),
-      assert.equal(_0x408912('915', 'value')?.fieldValue, 'true'),
-      assert.equal(_0x408912('977', 'value')?.fieldValue, '1'),
-      assert.equal(_0x408912('222', 'value')?.fieldValue, '1280'),
-      assert.equal(_0x408912('1077', 'value')?.fieldValue, '30'),
-      assert.equal(_0x408912('237', 'frame_load_cap')?.fieldValue, '88'),
-      assert.equal(_0x408912('237', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
-      assert.equal(_0x408912('234', 'image')?.fieldValue, 'u_ref'),
-      assert.equal(_0x408912('1021', 'video')?.fieldValue, 'https://www.runninghub.cn/mask.mp4'),
-      assert.equal(_0x408912('429', 'image')?.fieldValue, 'u_first'),
-      assert.equal(_0x408912('988', 'value')?.fieldValue, '1'),
-      assert.equal(_0x408912('1078', 'value'), undefined),
-      assert.equal(_0x408912('240', 'value'), undefined),
-      assert.equal(_0x408912('979', 'index'), undefined),
-      assert.equal(_0x408912('1076', 'value'), undefined),
-      assert.equal(_0x408912('1063', 'index')?.fieldValue, '2'),
-      assert.equal(_0x408912('1081', 'index'), undefined),
-      assert.equal(_0x408912('1113', 'value'), undefined),
-      assert.equal(_0x408912('1100', 'value'), undefined));
+    const list19 = dom22.body.nodeInfoList,
+      handler21 = (value60, value61) =>
+        list19.find((item40) => item40.nodeId === value60 && item40.fieldName === value61);
+    (assert.equal(handler21('235', 'value')?.fieldValue, 'a prompt'),
+      assert.equal(handler21('915', 'value')?.fieldValue, 'true'),
+      assert.equal(handler21('977', 'value')?.fieldValue, '1'),
+      assert.equal(handler21('222', 'value')?.fieldValue, '1280'),
+      assert.equal(handler21('1077', 'value')?.fieldValue, '30'),
+      assert.equal(handler21('237', 'frame_load_cap')?.fieldValue, '88'),
+      assert.equal(handler21('237', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
+      assert.equal(handler21('234', 'image')?.fieldValue, 'u_ref'),
+      assert.equal(handler21('1021', 'video')?.fieldValue, 'https://www.runninghub.cn/mask.mp4'),
+      assert.equal(handler21('429', 'image')?.fieldValue, 'u_first'),
+      assert.equal(handler21('988', 'value')?.fieldValue, '1'),
+      assert.equal(handler21('1078', 'value'), undefined),
+      assert.equal(handler21('240', 'value'), undefined),
+      assert.equal(handler21('979', 'index'), undefined),
+      assert.equal(handler21('1076', 'value'), undefined),
+      assert.equal(handler21('1063', 'index')?.fieldValue, '2'),
+      assert.equal(handler21('1081', 'index'), undefined),
+      assert.equal(handler21('1113', 'value'), undefined),
+      assert.equal(handler21('1100', 'value'), undefined));
   }),
   test('RunningHubAdapter 视频编辑V5.4：长视频叠加开启 1081 且抖胸幅度大于 0 时写入节点', async () => {
-    const _0x5402a2 = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] },
-      _0x44adcf = await buildVideoRequest(
+    const value62 = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] },
+      dom23 = await buildVideoRequest(
         {
           model: 'runninghub/2041741496667348994',
           videoUrl: 'https://www.runninghub.cn/source.mp4',
@@ -985,21 +940,21 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhBreastJiggle: 0.35,
         },
         'overlay prompt',
-        _0x5402a2,
+        value62,
       ),
-      _0x2ebbcb = _0x44adcf.body.nodeInfoList,
-      _0x106056 = (_0x36bea9, _0x5e6e86) =>
-        _0x2ebbcb.find((_0x54900b) => _0x54900b.nodeId === _0x36bea9 && _0x54900b.fieldName === _0x5e6e86);
-    (assert.equal(_0x106056('1063', 'index')?.fieldValue, '1'),
-      assert.equal(_0x106056('1081', 'index')?.fieldValue, '1'),
-      assert.equal(_0x106056('1113', 'value')?.fieldValue, '0.35'),
-      assert.equal(_0x106056('1113', 'value')?.description, '抖胸幅度'),
-      assert.equal(_0x106056('1100', 'value')?.fieldValue, 'true'),
-      assert.equal(_0x106056('1100', 'value')?.description, '是否开抖胸'));
+      list20 = dom23.body.nodeInfoList,
+      handler22 = (value63, value64) =>
+        list20.find((item41) => item41.nodeId === value63 && item41.fieldName === value64);
+    (assert.equal(handler22('1063', 'index')?.fieldValue, '1'),
+      assert.equal(handler22('1081', 'index')?.fieldValue, '1'),
+      assert.equal(handler22('1113', 'value')?.fieldValue, '0.35'),
+      assert.equal(handler22('1113', 'value')?.description, '抖胸幅度'),
+      assert.equal(handler22('1100', 'value')?.fieldValue, 'true'),
+      assert.equal(handler22('1100', 'value')?.description, '是否开抖胸'));
   }),
   test('RunningHubAdapter 视频编辑V5.4：仅在满足条件时加入可选节点并回退默认提示词', async () => {
-    const _0x1359d6 = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] },
-      _0x5cf407 = await buildVideoRequest(
+    const value65 = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] },
+      dom24 = await buildVideoRequest(
         {
           model: 'runninghub/2041741496667348994',
           videoUrl: 'https://www.runninghub.cn/source.mp4',
@@ -1010,24 +965,24 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           rhVideoResolution: 0x340,
         },
         '   ',
-        _0x1359d6,
+        value65,
       ),
-      _0x5c1244 = _0x5cf407.body.nodeInfoList,
-      _0x5a96de = (_0x4dba2c, _0x3e5811) =>
-        _0x5c1244.find((_0x24344c) => _0x24344c.nodeId === _0x4dba2c && _0x24344c.fieldName === _0x3e5811);
-    (assert.equal(_0x5a96de('235', 'value')?.fieldValue, '4K，高质量'),
-      assert.equal(_0x5a96de('977', 'value')?.fieldValue, '0'),
-      assert.equal(_0x5a96de('1021', 'video'), undefined),
-      assert.equal(_0x5a96de('429', 'image'), undefined),
-      assert.equal(_0x5a96de('988', 'value'), undefined),
-      assert.equal(_0x5a96de('1078', 'value'), undefined),
-      assert.equal(_0x5a96de('240', 'value'), undefined),
-      assert.equal(_0x5a96de('979', 'index'), undefined),
-      assert.equal(_0x5a96de('1076', 'value'), undefined),
-      assert.equal(_0x5a96de('1063', 'index'), undefined),
-      assert.equal(_0x5a96de('1081', 'index'), undefined),
-      assert.equal(_0x5a96de('1113', 'value'), undefined),
-      assert.equal(_0x5a96de('1100', 'value'), undefined));
+      list21 = dom24.body.nodeInfoList,
+      handler23 = (value66, value67) =>
+        list21.find((item42) => item42.nodeId === value66 && item42.fieldName === value67);
+    (assert.equal(handler23('235', 'value')?.fieldValue, '4K，高质量'),
+      assert.equal(handler23('977', 'value')?.fieldValue, '0'),
+      assert.equal(handler23('1021', 'video'), undefined),
+      assert.equal(handler23('429', 'image'), undefined),
+      assert.equal(handler23('988', 'value'), undefined),
+      assert.equal(handler23('1078', 'value'), undefined),
+      assert.equal(handler23('240', 'value'), undefined),
+      assert.equal(handler23('979', 'index'), undefined),
+      assert.equal(handler23('1076', 'value'), undefined),
+      assert.equal(handler23('1063', 'index'), undefined),
+      assert.equal(handler23('1081', 'index'), undefined),
+      assert.equal(handler23('1113', 'value'), undefined),
+      assert.equal(handler23('1100', 'value'), undefined));
   }),
   [
     {
@@ -1047,24 +1002,24 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
     },
   ].forEach(
     ({
-      name: _0x58c832,
-      modelId: _0xc2e03c,
-      displayName: _0x26fcbe,
-      appId: _0x34c3c2,
-      executionId: _0x19db26,
+      name: name,
+      modelId: modelId,
+      displayName: displayName,
+      appId: appId,
+      executionId: executionId,
       hasEnhancedMotionControl: hasEnhancedMotionControl = false,
     }) => {
-      test('RunningHubAdapter ' + _0x58c832 + ' uses generic ai-app nodeInfoList mapping', async () => {
-        const _0x540bce = resolveModelExecution(_0xc2e03c);
-        (assert.equal(_0x540bce?.modelManifest?.displayName, _0x26fcbe),
-          assert.equal(_0x540bce?.executionManifest?.mapping?.preset, undefined),
-          assert.equal(_0x540bce?.executionManifest?.extensions?.payloadResolver, undefined));
-        const _0x358481 = {
+      test('RunningHubAdapter ' + name + ' uses generic ai-app nodeInfoList mapping', async () => {
+        const modelExecution13 = resolveModelExecution(modelId);
+        (assert.equal(modelExecution13?.modelManifest?.displayName, displayName),
+          assert.equal(modelExecution13?.executionManifest?.mapping?.preset, undefined),
+          assert.equal(modelExecution13?.executionManifest?.extensions?.payloadResolver, undefined));
+        const value68 = {
             getProviderConfig: () => ({ apiKey: 'k' }),
-            processInputImages: async (_0x45b9b5) =>
-              String(_0x45b9b5?.[0] || '') === 'ref_local' ? ['u_ref'] : [],
+            processInputImages: async (value69) =>
+              String(value69?.[0] || '') === 'ref_local' ? ['u_ref'] : [],
           },
-          _0x5223f9 = {
+          generationParams = {
             rhVideoResolution: 0x340,
             rhVideoFps: 24,
             rhVideoFrames: 0x12c,
@@ -1072,29 +1027,29 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
             rhScailDetectPrompt: 'person, face',
             rhScail2ReplaceSubject: true,
           };
-        hasEnhancedMotionControl && (_0x5223f9.rhScailV2EnhancedMotionControl = true);
-        const _0x2e0f51 = await buildVideoRequest(
+        hasEnhancedMotionControl && (generationParams.rhScailV2EnhancedMotionControl = true);
+        const dom25 = await buildVideoRequest(
           {
-            model: _0xc2e03c,
+            model: modelId,
             videoUrl: 'https://www.runninghub.cn/source.mp4',
             inputUrls: ['ref_local'],
-            generationParams: _0x5223f9,
+            generationParams: generationParams,
             rhInstanceType: 'plus',
           },
           '   ',
-          _0x358481,
+          value68,
         );
-        (assert.equal(_0x2e0f51.url, '/api/v2/proxy/image'),
-          assert.equal(_0x2e0f51.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/' + _0x34c3c2),
-          assert.equal(_0x2e0f51.body.apiKey, 'k'),
-          assert.equal(_0x2e0f51.body.instanceType, 'plus'),
-          assert.deepEqual(_0x2e0f51.adapterTrace, {
+        (assert.equal(dom25.url, '/api/v2/proxy/image'),
+          assert.equal(dom25.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/' + appId),
+          assert.equal(dom25.body.apiKey, 'k'),
+          assert.equal(dom25.body.instanceType, 'plus'),
+          assert.deepEqual(dom25.adapterTrace, {
             source: 'manifest',
-            executionId: _0x19db26,
-            modelId: _0xc2e03c,
+            executionId: executionId,
+            modelId: modelId,
           }));
-        const _0x9956b4 = _0x2e0f51.body.nodeInfoList,
-          _0x1baf33 = [
+        const list22 = dom25.body.nodeInfoList,
+          list23 = [
             ['336', 'video'],
             ['338', 'image'],
             ['444', 'value'],
@@ -1105,58 +1060,54 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
             ['336', 'force_rate'],
             ['336', 'frame_load_cap'],
           ];
-        hasEnhancedMotionControl && _0x1baf33.push(['458', 'value']);
+        hasEnhancedMotionControl && list23.push(['458', 'value']);
         assert.deepEqual(
-          _0x9956b4.map((_0x562697) => [_0x562697.nodeId, _0x562697.fieldName]),
-          _0x1baf33,
+          list22.map((item43) => [item43.nodeId, item43.fieldName]),
+          list23,
         );
-        const _0xd39884 = (_0x4ad999, _0x358cb9) =>
-          _0x9956b4.find((_0x5dc58a) => _0x5dc58a.nodeId === _0x4ad999 && _0x5dc58a.fieldName === _0x358cb9);
-        (assert.equal(_0xd39884('336', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
-          assert.equal(_0xd39884('338', 'image')?.fieldValue, 'u_ref'),
-          assert.equal(_0xd39884('444', 'value')?.fieldValue, 'true'),
-          assert.equal(_0xd39884('324', 'value')?.fieldValue, '832'),
-          assert.equal(_0xd39884('383', 'value')?.fieldValue, '2'),
-          assert.equal(_0xd39884('318', 'value')?.fieldValue, 'person, face'),
-          assert.equal(_0xd39884('317', 'value')?.fieldValue, ''),
-          assert.equal(_0xd39884('336', 'force_rate')?.fieldValue, '24'),
-          assert.equal(_0xd39884('336', 'frame_load_cap')?.fieldValue, '300'),
-          assert.equal(_0xd39884('458', 'value')?.fieldValue, hasEnhancedMotionControl ? 'true' : undefined));
+        const run = (value70, value71) =>
+          list22.find((item44) => item44.nodeId === value70 && item44.fieldName === value71);
+        (assert.equal(run('336', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'),
+          assert.equal(run('338', 'image')?.fieldValue, 'u_ref'),
+          assert.equal(run('444', 'value')?.fieldValue, 'true'),
+          assert.equal(run('324', 'value')?.fieldValue, '832'),
+          assert.equal(run('383', 'value')?.fieldValue, '2'),
+          assert.equal(run('318', 'value')?.fieldValue, 'person, face'),
+          assert.equal(run('317', 'value')?.fieldValue, ''),
+          assert.equal(run('336', 'force_rate')?.fieldValue, '24'),
+          assert.equal(run('336', 'frame_load_cap')?.fieldValue, '300'),
+          assert.equal(run('458', 'value')?.fieldValue, hasEnhancedMotionControl ? 'true' : undefined));
       });
     },
   ),
   test('RunningHubAdapter Scail V2 defaults enhanced motion control to false', async () => {
-    const _0x1eb9f2 = {
+    const value72 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
-        processInputImages: async (_0x480e18) =>
-          String(_0x480e18?.[0] || '') === 'ref_local' ? ['u_ref'] : [],
+        processInputImages: async (value73) => (String(value73?.[0] || '') === 'ref_local' ? ['u_ref'] : []),
       },
-      _0x2bd002 = await buildVideoRequest(
+      dom26 = await buildVideoRequest(
         {
           model: 'runninghub/2065463417577762818',
           videoUrl: 'https://www.runninghub.cn/source.mp4',
           inputUrls: ['ref_local'],
         },
         '',
-        _0x1eb9f2,
+        value72,
       ),
-      _0x437d51 = (_0x596fb7, _0x88fcaa) =>
-        _0x2bd002.body.nodeInfoList.find(
-          (_0x702130) => _0x702130.nodeId === _0x596fb7 && _0x702130.fieldName === _0x88fcaa,
-        );
-    (assert.equal(_0x437d51('458', 'value')?.fieldValue, 'false'),
-      assert.equal(_0x437d51('458', 'value')?.description, '强化动作控制'),
-      assert.equal(_0x437d51('324', 'value')?.fieldValue, '1024'),
-      assert.equal(_0x437d51('318', 'value')?.fieldValue, 'person'),
-      assert.equal(_0x437d51('318', 'value')?.description, '检测识别提示词'));
+      handler24 = (value74, value75) =>
+        dom26.body.nodeInfoList.find((item45) => item45.nodeId === value74 && item45.fieldName === value75);
+    (assert.equal(handler24('458', 'value')?.fieldValue, 'false'),
+      assert.equal(handler24('458', 'value')?.description, '强化动作控制'),
+      assert.equal(handler24('324', 'value')?.fieldValue, '1024'),
+      assert.equal(handler24('318', 'value')?.fieldValue, 'person'),
+      assert.equal(handler24('318', 'value')?.description, '检测识别提示词'));
   }),
   test('RunningHubAdapter Scail detect prompt preserves explicit empty value', async () => {
-    const _0x24c28a = {
+    const value76 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
-        processInputImages: async (_0x2151fa) =>
-          String(_0x2151fa?.[0] || '') === 'ref_local' ? ['u_ref'] : [],
+        processInputImages: async (value77) => (String(value77?.[0] || '') === 'ref_local' ? ['u_ref'] : []),
       },
-      _0x227f32 = await buildVideoRequest(
+      dom27 = await buildVideoRequest(
         {
           model: 'runninghub/2064961300823896065',
           videoUrl: 'https://www.runninghub.cn/source.mp4',
@@ -1164,24 +1115,22 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           generationParams: { rhScailDetectPrompt: '' },
         },
         '',
-        _0x24c28a,
+        value76,
       ),
-      _0x1e94c3 = (_0x40214d, _0x376c08) =>
-        _0x227f32.body.nodeInfoList.find(
-          (_0x1e5200) => _0x1e5200.nodeId === _0x40214d && _0x1e5200.fieldName === _0x376c08,
-        );
-    (assert.equal(_0x1e94c3('318', 'value')?.fieldValue, ''),
-      assert.equal(_0x1e94c3('324', 'value')?.fieldValue, '1024'));
+      handler25 = (value78, value79) =>
+        dom27.body.nodeInfoList.find((item46) => item46.nodeId === value78 && item46.fieldName === value79);
+    (assert.equal(handler25('318', 'value')?.fieldValue, ''),
+      assert.equal(handler25('324', 'value')?.fieldValue, '1024'));
   }),
   test('RunningHubAdapter 视频编辑V5.4：源视频转传失败时给出网络或上传提示', async () => {
-    const _0x1340d8 = globalThis.fetch,
-      _0x35be9b = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] };
+    const value80 = globalThis.fetch,
+      value81 = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] };
     try {
-      ((globalThis.fetch = async (_0x4f927d) => {
-        const _0x19b476 = String(_0x4f927d || '');
-        if (_0x19b476 === 'https://video.example/fail.mp4')
+      ((globalThis.fetch = async (value82) => {
+        const value83 = String(value82 || '');
+        if (value83 === 'https://video.example/fail.mp4')
           return new Response('network timeout', { status: 0x1f8 });
-        throw new Error('unexpected fetch url: ' + _0x19b476);
+        throw new Error('unexpected fetch url: ' + value83);
       }),
         await assert.rejects(
           () =>
@@ -1196,108 +1145,102 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
                 rhVideoResolution: 0x340,
               },
               'a prompt',
-              _0x35be9b,
+              value81,
             ),
           /源视频上传失败，可能是网络延迟/,
         ));
     } finally {
-      globalThis.fetch = _0x1340d8;
+      globalThis.fetch = value80;
     }
   }),
   test('RunningHubAdapter BERNINI V1: maps input modes, fixed params, and 8-aligned dimensions', async () => {
-    const _0xd3098c = resolveModelExecution('runninghub/2062515720147259393');
-    (assert.equal(_0xd3098c?.modelManifest?.displayName, '新全能视频替换BERNINI V1'),
+    const modelExecution14 = resolveModelExecution('runninghub/2062515720147259393');
+    (assert.equal(modelExecution14?.modelManifest?.displayName, '新全能视频替换BERNINI V1'),
       assert.equal(
-        _0xd3098c?.executionManifest?.extensions?.payloadResolver,
+        modelExecution14?.executionManifest?.extensions?.payloadResolver,
         'runninghubBerniniVideoReplaceV1',
       ));
-    const _0x52a61f = {
+    const value84 = {
         getProviderConfig: () => ({ apiKey: 'k' }),
-        processInputImages: async (_0x2fddd2) =>
-          String(_0x2fddd2?.[0] || '') === 'ref_local' ? ['u_ref'] : [],
+        processInputImages: async (value85) => (String(value85?.[0] || '') === 'ref_local' ? ['u_ref'] : []),
       },
-      _0x5b28ae = async (_0x5ded93, _0x251d18 = 'bernini prompt') =>
+      handler26 = async (args, value86 = 'bernini prompt') =>
         buildVideoRequest(
           {
             model: 'runninghub/2062515720147259393',
             rhVideoResolution: 0x340,
             rhBerniniAspectRatio: '16:9',
             rhInstanceType: 'plus',
-            ..._0x5ded93,
+            ...args,
           },
-          _0x251d18,
-          _0x52a61f,
+          value86,
+          value84,
         ),
-      _0x400174 = (_0xc1f8d3, _0x1ecf8c, _0xef6817) =>
-        _0xc1f8d3.body.nodeInfoList.find(
-          (_0x4102ce) => _0x4102ce.nodeId === _0x1ecf8c && _0x4102ce.fieldName === _0xef6817,
-        ),
-      _0x1e681a = await _0x5b28ae({}, 'text only');
-    (assert.equal(_0x1e681a.body.instanceType, 'plus'),
-      assert.equal(
-        _0x1e681a.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/run/ai-app/2062515720147259393',
-      ),
-      assert.equal(_0x400174(_0x1e681a, '34', 'value')?.fieldValue, '0'),
-      assert.equal(_0x400174(_0x1e681a, '31', 'video'), undefined),
-      assert.equal(_0x400174(_0x1e681a, '32', 'image'), undefined),
-      assert.equal(_0x400174(_0x1e681a, '31', 'force_rate')?.fieldValue, '24'),
-      assert.equal(_0x400174(_0x1e681a, '19', 'value')?.fieldValue, '121'),
-      assert.equal(_0x400174(_0x1e681a, '17', 'value')?.fieldValue, '832'),
-      assert.equal(_0x400174(_0x1e681a, '18', 'value')?.fieldValue, '472'),
-      assert.equal(_0x400174(_0x1e681a, '53', 'value')?.fieldValue, 'text only'));
-    const _0x1789ba = await _0x5b28ae({ rhVideoFps: 30, rhVideoFrames: 180 });
-    (assert.equal(_0x400174(_0x1789ba, '31', 'force_rate')?.fieldValue, '30'),
-      assert.equal(_0x400174(_0x1789ba, '19', 'value')?.fieldValue, '180'));
-    const _0x5004a5 = await _0x5b28ae({ rhBerniniAspectRatio: '自适应', resolvedRatioLabel: '9:16' });
-    (assert.equal(_0x400174(_0x5004a5, '17', 'value')?.fieldValue, '472'),
-      assert.equal(_0x400174(_0x5004a5, '18', 'value')?.fieldValue, '832'));
-    const _0x594ad4 = await _0x5b28ae({ inputUrls: ['ref_local'] });
-    (assert.equal(_0x400174(_0x594ad4, '34', 'value')?.fieldValue, '1'),
-      assert.equal(_0x400174(_0x594ad4, '32', 'image')?.fieldValue, 'u_ref'));
-    const _0x2fb26e = await _0x5b28ae({ inputUrls: ['ref_local'], rhBerniniFunction: 'r2v' });
-    assert.equal(_0x400174(_0x2fb26e, '34', 'value')?.fieldValue, '3');
-    const _0x5f0871 = await _0x5b28ae({ videoUrl: 'https://www.runninghub.cn/source.mp4' });
-    (assert.equal(_0x400174(_0x5f0871, '34', 'value')?.fieldValue, '2'),
-      assert.equal(_0x400174(_0x5f0871, '31', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'));
-    const _0xb1ede = await _0x5b28ae({
+      handler27 = (dom28, value87, value88) =>
+        dom28.body.nodeInfoList.find((item47) => item47.nodeId === value87 && item47.fieldName === value88),
+      dom29 = await handler26({}, 'text only');
+    (assert.equal(dom29.body.instanceType, 'plus'),
+      assert.equal(dom29.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/run/ai-app/2062515720147259393'),
+      assert.equal(handler27(dom29, '34', 'value')?.fieldValue, '0'),
+      assert.equal(handler27(dom29, '31', 'video'), undefined),
+      assert.equal(handler27(dom29, '32', 'image'), undefined),
+      assert.equal(handler27(dom29, '31', 'force_rate')?.fieldValue, '24'),
+      assert.equal(handler27(dom29, '19', 'value')?.fieldValue, '121'),
+      assert.equal(handler27(dom29, '17', 'value')?.fieldValue, '832'),
+      assert.equal(handler27(dom29, '18', 'value')?.fieldValue, '472'),
+      assert.equal(handler27(dom29, '53', 'value')?.fieldValue, 'text only'));
+    const value89 = await handler26({ rhVideoFps: 30, rhVideoFrames: 180 });
+    (assert.equal(handler27(value89, '31', 'force_rate')?.fieldValue, '30'),
+      assert.equal(handler27(value89, '19', 'value')?.fieldValue, '180'));
+    const value90 = await handler26({ rhBerniniAspectRatio: '自适应', resolvedRatioLabel: '9:16' });
+    (assert.equal(handler27(value90, '17', 'value')?.fieldValue, '472'),
+      assert.equal(handler27(value90, '18', 'value')?.fieldValue, '832'));
+    const value91 = await handler26({ inputUrls: ['ref_local'] });
+    (assert.equal(handler27(value91, '34', 'value')?.fieldValue, '1'),
+      assert.equal(handler27(value91, '32', 'image')?.fieldValue, 'u_ref'));
+    const value92 = await handler26({ inputUrls: ['ref_local'], rhBerniniFunction: 'r2v' });
+    assert.equal(handler27(value92, '34', 'value')?.fieldValue, '3');
+    const value93 = await handler26({ videoUrl: 'https://www.runninghub.cn/source.mp4' });
+    (assert.equal(handler27(value93, '34', 'value')?.fieldValue, '2'),
+      assert.equal(handler27(value93, '31', 'video')?.fieldValue, 'https://www.runninghub.cn/source.mp4'));
+    const value94 = await handler26({
       videoUrl: 'https://www.runninghub.cn/source.mp4',
       rhBerniniFunction: 'mv2v',
     });
-    assert.equal(_0x400174(_0xb1ede, '34', 'value')?.fieldValue, '8');
-    const _0x5ded7c = await _0x5b28ae({
+    assert.equal(handler27(value94, '34', 'value')?.fieldValue, '8');
+    const value95 = await handler26({
       videoUrl: 'https://www.runninghub.cn/source.mp4',
       inputUrls: ['ref_local'],
     });
-    (assert.equal(_0x400174(_0x5ded7c, '34', 'value')?.fieldValue, '4'),
-      assert.equal(_0x400174(_0x5ded7c, '32', 'image')?.fieldValue, 'u_ref'),
-      assert.equal(_0x400174(_0x5ded7c, '100', 'video'), undefined));
-    const _0x3bebcb = await _0x5b28ae({
+    (assert.equal(handler27(value95, '34', 'value')?.fieldValue, '4'),
+      assert.equal(handler27(value95, '32', 'image')?.fieldValue, 'u_ref'),
+      assert.equal(handler27(value95, '100', 'video'), undefined));
+    const value96 = await handler26({
       videoUrl: 'https://www.runninghub.cn/source.mp4',
       inputUrls: ['ref_local'],
       rhBerniniFunction: 'rv2v',
     });
-    assert.equal(_0x400174(_0x3bebcb, '34', 'value')?.fieldValue, '5');
-    const _0x1c1db6 = await _0x5b28ae({
+    assert.equal(handler27(value96, '34', 'value')?.fieldValue, '5');
+    const value97 = await handler26({
       videoUrl: 'https://www.runninghub.cn/source.mp4',
       inputUrls: ['ref_local'],
       rhBerniniFunction: 'vrc2v',
     });
-    assert.equal(_0x400174(_0x1c1db6, '34', 'value')?.fieldValue, '7');
-    const _0x3550df = await _0x5b28ae({
+    assert.equal(handler27(value97, '34', 'value')?.fieldValue, '7');
+    const value98 = await handler26({
       videoUrl: 'https://www.runninghub.cn/source.mp4',
       inputUrls: ['ref_local'],
       referenceVideoUrl: 'https://www.runninghub.cn/reference.mp4',
     });
-    (assert.equal(_0x400174(_0x3550df, '34', 'value')?.fieldValue, '6'),
-      assert.equal(_0x400174(_0x3550df, '32', 'image'), undefined),
+    (assert.equal(handler27(value98, '34', 'value')?.fieldValue, '6'),
+      assert.equal(handler27(value98, '32', 'image'), undefined),
       assert.equal(
-        _0x400174(_0x3550df, '100', 'video')?.fieldValue,
+        handler27(value98, '100', 'video')?.fieldValue,
         'https://www.runninghub.cn/reference.mp4',
       ));
   }),
   test('RunningHubAdapter 视频工作流旧 ID 缺少 manifest 时直接报错', async () => {
-    const _0x4864cb = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] };
+    const value99 = { getProviderConfig: () => ({ apiKey: 'k' }), processInputImages: async () => [] };
     await assert.rejects(
       () =>
         buildVideoRequest(
@@ -1310,17 +1253,17 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
             controlMode: 'efficiency',
           },
           'legacy prompt',
-          _0x4864cb,
+          value99,
         ),
       /video workflow manifest missing/,
     );
   }),
   test('RunningHubAdapter 模型 API 在自适应比例下不透传 aspectRatio（兼容扩图）', async () => {
-    const _0x489ba3 = {
+    const value100 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => ['https://example.com/expand.png'],
       },
-      _0x33b4b5 = await buildModelRequest(
+      dom30 = await buildModelRequest(
         {
           model: 'runninghub-model/rhart-image-v1',
           inputUrls: ['blob:expand'],
@@ -1329,16 +1272,16 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           imageSize: '2K',
         },
         '保持主体不变，扩展黑边区域',
-        _0x489ba3,
+        value100,
       );
-    (assert.equal(_0x33b4b5.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/rhart-image-v1/edit'),
-      assert.equal(_0x33b4b5.body.apiKey, 'mk'),
-      assert.equal(_0x33b4b5.body.aspectRatio, '16:9'),
-      assert.deepEqual(_0x33b4b5.body.imageUrls, ['https://example.com/expand.png']),
-      assert.equal(_0x33b4b5.adapterTrace?.source, 'manifest'));
+    (assert.equal(dom30.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/rhart-image-v1/edit'),
+      assert.equal(dom30.body.apiKey, 'mk'),
+      assert.equal(dom30.body.aspectRatio, '16:9'),
+      assert.deepEqual(dom30.body.imageUrls, ['https://example.com/expand.png']),
+      assert.equal(dom30.adapterTrace?.source, 'manifest'));
   }),
   test('RunningHubAdapter 模型 API 缺少 manifest 时直接报错', async () => {
-    const _0x307b63 = {
+    const value101 = {
       getProviderConfig: () => ({ modelApiKey: 'mk' }),
       processInputImages: async () => [],
     };
@@ -1347,29 +1290,29 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
         buildModelRequest(
           { model: 'runninghub-model/unregistered-model', imageSize: '2K' },
           'test',
-          _0x307b63,
+          value101,
         ),
       /RunningHub model API manifest missing/,
     );
   }),
   test('RunningHubAdapter 模型API会规范化全角比例分隔符（非 seedream）', async () => {
-    const _0x5dff36 = {
+    const value102 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x1ed0f5 = await buildModelRequest(
+      dom31 = await buildModelRequest(
         { model: 'runninghub-model/rhart-image-n-g31-flash', aspectRatio: '16：9', imageSize: '4K' },
         'test',
-        _0x5dff36,
+        value102,
       );
-    (assert.equal(_0x1ed0f5.body.aspectRatio, '16:9'), assert.equal(_0x1ed0f5.body.resolution, '4k'));
+    (assert.equal(dom31.body.aspectRatio, '16:9'), assert.equal(dom31.body.resolution, '4k'));
   }),
   test('RunningHubAdapter GPT image 2 有参考图时走 image-to-image 且透传 resolution', async () => {
-    const _0x2f8103 = {
+    const value103 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => ['https://example.com/gpt-image-2-ref.png'],
       },
-      _0x3d3b15 = await buildModelRequest(
+      dom32 = await buildModelRequest(
         {
           model: 'runninghub-model/rhart-image-g-2',
           inputUrls: ['blob:ref'],
@@ -1377,25 +1320,22 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           imageSize: '2K',
         },
         'test',
-        _0x2f8103,
+        value103,
       );
-    (assert.equal(
-      _0x3d3b15.body.apiUrl,
-      'https://www.runninghub.cn/openapi/v2/rhart-image-g-2/image-to-image',
-    ),
-      assert.equal(_0x3d3b15.body.aspectRatio, '1:1'),
-      assert.equal(_0x3d3b15.body.resolution, '2k'),
-      assert.deepEqual(_0x3d3b15.body.imageUrls, ['https://example.com/gpt-image-2-ref.png']));
+    (assert.equal(dom32.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/rhart-image-g-2/image-to-image'),
+      assert.equal(dom32.body.aspectRatio, '1:1'),
+      assert.equal(dom32.body.resolution, '2k'),
+      assert.deepEqual(dom32.body.imageUrls, ['https://example.com/gpt-image-2-ref.png']));
   }),
   test('RunningHubAdapter grok 4.2 低价版有参考图时走 image-to-image 且转换 aspectRatio', async () => {
-    let _0xfaca32 = [];
-    const _0xbf4066 = {
+    let value104 = [];
+    const value105 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
-        processInputImages: async (_0x2eff83) => {
-          return ((_0xfaca32 = _0x2eff83), ['https://example.com/image-x-ref.png']);
+        processInputImages: async (value106) => {
+          return ((value104 = value106), ['https://example.com/image-x-ref.png']);
         },
       },
-      _0x1e5a98 = await buildModelRequest(
+      dom33 = await buildModelRequest(
         {
           model: 'runninghub-model/rhart-image-g',
           inputUrlsBySlot: { imageUrl: 'blob:image-x-ref' },
@@ -1403,42 +1343,39 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           imageSize: '2K',
         },
         'test',
-        _0xbf4066,
+        value105,
       );
-    (assert.deepEqual(_0xfaca32, ['blob:image-x-ref']),
-      assert.equal(
-        _0x1e5a98.body.apiUrl,
-        'https://www.runninghub.cn/openapi/v2/rhart-image-g/image-to-image',
-      ),
-      assert.equal(_0x1e5a98.body.model, 'g-4.2'),
-      assert.equal(_0x1e5a98.body.imageUrl, 'https://example.com/image-x-ref.png'),
-      assert.equal(_0x1e5a98.body.imageUrls, undefined),
-      assert.equal(_0x1e5a98.body.resolution, undefined),
-      assert.equal(_0x1e5a98.body.aspectRatio, '960x960'));
+    (assert.deepEqual(value104, ['blob:image-x-ref']),
+      assert.equal(dom33.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/rhart-image-g/image-to-image'),
+      assert.equal(dom33.body.model, 'g-4.2'),
+      assert.equal(dom33.body.imageUrl, 'https://example.com/image-x-ref.png'),
+      assert.equal(dom33.body.imageUrls, undefined),
+      assert.equal(dom33.body.resolution, undefined),
+      assert.equal(dom33.body.aspectRatio, '960x960'));
   }),
   test('RunningHubAdapter grok 4.2 低价版无参考图时走 text-to-image 且转换比例枚举', async () => {
-    const _0x25acf2 = {
+    const value107 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x4b0c28 = await buildModelRequest(
+      dom34 = await buildModelRequest(
         { model: 'runninghub-model/rhart-image-g', aspectRatio: '16:9', imageSize: '4K' },
         'test',
-        _0x25acf2,
+        value107,
       );
-    (assert.equal(_0x4b0c28.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/rhart-image-g/text-to-image'),
-      assert.equal(_0x4b0c28.body.model, 'g-4.2'),
-      assert.equal(_0x4b0c28.body.imageUrl, undefined),
-      assert.equal(_0x4b0c28.body.imageUrls, undefined),
-      assert.equal(_0x4b0c28.body.resolution, undefined),
-      assert.equal(_0x4b0c28.body.aspectRatio, '1280x720'));
+    (assert.equal(dom34.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/rhart-image-g/text-to-image'),
+      assert.equal(dom34.body.model, 'g-4.2'),
+      assert.equal(dom34.body.imageUrl, undefined),
+      assert.equal(dom34.body.imageUrls, undefined),
+      assert.equal(dom34.body.resolution, undefined),
+      assert.equal(dom34.body.aspectRatio, '1280x720'));
   }),
   test('RunningHubAdapter grok 4.2 官方版文生图走 official text-to-image', async () => {
-    const _0x5b4d05 = {
+    const value108 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x143c55 = await buildModelRequest(
+      dom35 = await buildModelRequest(
         {
           model: 'runninghub-model/rhart-image-g',
           rhModelRoute: 'official',
@@ -1446,26 +1383,26 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           imageSize: '2K',
         },
         'test',
-        _0x5b4d05,
+        value108,
       );
     (assert.equal(
-      _0x143c55.body.apiUrl,
+      dom35.body.apiUrl,
       'https://www.runninghub.cn/openapi/v2/rhart-image-x-official/text-to-image',
     ),
-      assert.equal(_0x143c55.body.aspectRatio, '16:9'),
-      assert.equal(_0x143c55.body.outputFormat, undefined),
-      assert.equal(_0x143c55.body.resolution, undefined),
-      assert.equal(_0x143c55.body.model, undefined));
+      assert.equal(dom35.body.aspectRatio, '16:9'),
+      assert.equal(dom35.body.outputFormat, undefined),
+      assert.equal(dom35.body.resolution, undefined),
+      assert.equal(dom35.body.model, undefined));
   }),
   test('RunningHubAdapter grok 4.2 官方版图片编辑走 edit 且使用 image 字段', async () => {
-    let _0x5e2d80 = [];
-    const _0x285cc5 = {
+    let value109 = [];
+    const value110 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
-        processInputImages: async (_0x51e75e) => {
-          return ((_0x5e2d80 = _0x51e75e), ['https://example.com/official-x-ref.png']);
+        processInputImages: async (value111) => {
+          return ((value109 = value111), ['https://example.com/official-x-ref.png']);
         },
       },
-      _0x1b4073 = await buildModelRequest(
+      dom36 = await buildModelRequest(
         {
           model: 'runninghub-model/rhart-image-g',
           rhModelRoute: 'official',
@@ -1473,29 +1410,29 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           aspectRatio: '9:16',
         },
         'test',
-        _0x285cc5,
+        value110,
       );
-    (assert.deepEqual(_0x5e2d80, ['blob:official-x-ref']),
-      assert.equal(_0x1b4073.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/rhart-image-x-official/edit'),
-      assert.equal(_0x1b4073.body.image, 'https://example.com/official-x-ref.png'),
-      assert.equal(_0x1b4073.body.imageUrl, undefined),
-      assert.equal(_0x1b4073.body.aspectRatio, undefined),
-      assert.equal(_0x1b4073.body.outputFormat, undefined),
-      assert.equal(_0x1b4073.body.resolution, undefined),
-      assert.equal(_0x1b4073.body.model, undefined));
+    (assert.deepEqual(value109, ['blob:official-x-ref']),
+      assert.equal(dom36.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/rhart-image-x-official/edit'),
+      assert.equal(dom36.body.image, 'https://example.com/official-x-ref.png'),
+      assert.equal(dom36.body.imageUrl, undefined),
+      assert.equal(dom36.body.aspectRatio, undefined),
+      assert.equal(dom36.body.outputFormat, undefined),
+      assert.equal(dom36.body.resolution, undefined),
+      assert.equal(dom36.body.model, undefined));
   }),
   test('RunningHubAdapter Midjourney V6 使用具名图片插槽和条件权重参数', async () => {
-    let _0x352f3b = [];
-    const _0x49b46a = {
+    let value112 = [];
+    const value113 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
-        processInputImages: async (_0x15cf5f) => {
+        processInputImages: async (value114) => {
           return (
-            (_0x352f3b = _0x15cf5f),
+            (value112 = value114),
             ['https://example.com/main.png', 'https://example.com/char.png', 'https://example.com/style.png']
           );
         },
       },
-      _0x16aa35 = await buildModelRequest(
+      dom37 = await buildModelRequest(
         {
           model: 'runninghub-model/youchuan-v6',
           inputUrlsBySlot: { imageUrl: 'blob:main', cref: 'blob:char', sref: 'blob:style' },
@@ -1515,77 +1452,77 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           hd: 'true',
         },
         'test',
-        _0x49b46a,
+        value113,
       );
-    (assert.deepEqual(_0x352f3b, ['blob:main', 'blob:char', 'blob:style']),
-      assert.equal(_0x16aa35.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v6'),
-      assert.equal(_0x16aa35.body.resolution, undefined),
-      assert.equal(_0x16aa35.body.imageUrls, undefined),
-      assert.equal(_0x16aa35.body.imageUrl, 'https://example.com/main.png'),
-      assert.equal(_0x16aa35.body.cref, 'https://example.com/char.png'),
-      assert.equal(_0x16aa35.body.sref, 'https://example.com/style.png'),
-      assert.equal(_0x16aa35.body.quality, '2'),
-      assert.equal(_0x16aa35.body.raw, true),
-      assert.equal(_0x16aa35.body.tile, false),
-      assert.equal(_0x16aa35.body.iw, 2),
-      assert.equal(_0x16aa35.body.cw, 80),
-      assert.equal(_0x16aa35.body.sw, 250),
-      assert.equal(_0x16aa35.body.sv, 4),
-      assert.equal(_0x16aa35.body.stop, 90),
-      assert.equal(_0x16aa35.body.ow, undefined),
-      assert.equal(_0x16aa35.body.hd, undefined));
+    (assert.deepEqual(value112, ['blob:main', 'blob:char', 'blob:style']),
+      assert.equal(dom37.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v6'),
+      assert.equal(dom37.body.resolution, undefined),
+      assert.equal(dom37.body.imageUrls, undefined),
+      assert.equal(dom37.body.imageUrl, 'https://example.com/main.png'),
+      assert.equal(dom37.body.cref, 'https://example.com/char.png'),
+      assert.equal(dom37.body.sref, 'https://example.com/style.png'),
+      assert.equal(dom37.body.quality, '2'),
+      assert.equal(dom37.body.raw, true),
+      assert.equal(dom37.body.tile, false),
+      assert.equal(dom37.body.iw, 2),
+      assert.equal(dom37.body.cw, 80),
+      assert.equal(dom37.body.sw, 250),
+      assert.equal(dom37.body.sv, 4),
+      assert.equal(dom37.body.stop, 90),
+      assert.equal(dom37.body.ow, undefined),
+      assert.equal(dom37.body.hd, undefined));
   }),
   test('RunningHubAdapter Midjourney V6 连接参考图时补官方默认数值', async () => {
-    let _0xd9282f = [];
-    const _0x131cea = {
+    let value115 = [];
+    const value116 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
-        processInputImages: async (_0x24467a) => {
+        processInputImages: async (value117) => {
           return (
-            (_0xd9282f = _0x24467a),
+            (value115 = value117),
             ['https://example.com/main.png', 'https://example.com/char.png', 'https://example.com/style.png']
           );
         },
       },
-      _0x72305d = await buildModelRequest(
+      dom38 = await buildModelRequest(
         {
           model: 'runninghub-model/youchuan-v6',
           inputUrlsBySlot: { imageUrl: 'blob:main', cref: 'blob:char', sref: 'blob:style' },
           aspectRatio: '16:9',
         },
         'test',
-        _0x131cea,
+        value116,
       );
-    (assert.deepEqual(_0xd9282f, ['blob:main', 'blob:char', 'blob:style']),
-      assert.equal(_0x72305d.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v6'),
-      assert.equal(_0x72305d.body.imageUrl, 'https://example.com/main.png'),
-      assert.equal(_0x72305d.body.cref, 'https://example.com/char.png'),
-      assert.equal(_0x72305d.body.sref, 'https://example.com/style.png'),
-      assert.equal(_0x72305d.body.quality, '1'),
-      assert.equal(_0x72305d.body.chaos, 0),
-      assert.equal(_0x72305d.body.stylize, 0),
-      assert.equal(_0x72305d.body.weird, 0),
-      assert.equal(_0x72305d.body.raw, false),
-      assert.equal(_0x72305d.body.iw, 1),
-      assert.equal(_0x72305d.body.cw, 100),
-      assert.equal(_0x72305d.body.sw, 100),
-      assert.equal(_0x72305d.body.sv, 4),
-      assert.equal(_0x72305d.body.stop, 100),
-      assert.equal(_0x72305d.body.tile, false),
-      assert.equal(_0x72305d.body.ow, undefined),
-      assert.equal(_0x72305d.body.hd, undefined));
+    (assert.deepEqual(value115, ['blob:main', 'blob:char', 'blob:style']),
+      assert.equal(dom38.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v6'),
+      assert.equal(dom38.body.imageUrl, 'https://example.com/main.png'),
+      assert.equal(dom38.body.cref, 'https://example.com/char.png'),
+      assert.equal(dom38.body.sref, 'https://example.com/style.png'),
+      assert.equal(dom38.body.quality, '1'),
+      assert.equal(dom38.body.chaos, 0),
+      assert.equal(dom38.body.stylize, 0),
+      assert.equal(dom38.body.weird, 0),
+      assert.equal(dom38.body.raw, false),
+      assert.equal(dom38.body.iw, 1),
+      assert.equal(dom38.body.cw, 100),
+      assert.equal(dom38.body.sw, 100),
+      assert.equal(dom38.body.sv, 4),
+      assert.equal(dom38.body.stop, 100),
+      assert.equal(dom38.body.tile, false),
+      assert.equal(dom38.body.ow, undefined),
+      assert.equal(dom38.body.hd, undefined));
   }),
   test('RunningHubAdapter Midjourney V7 使用具名图片插槽和 V7 参数', async () => {
-    let _0xd80bea = [];
-    const _0x2a73f3 = {
+    let value118 = [];
+    const value119 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
-        processInputImages: async (_0x54f118) => {
+        processInputImages: async (value120) => {
           return (
-            (_0xd80bea = _0x54f118),
+            (value118 = value120),
             ['https://example.com/main-v7.png', 'https://example.com/style-v7.png']
           );
         },
       },
-      _0xe3278c = await buildModelRequest(
+      dom39 = await buildModelRequest(
         {
           model: 'runninghub-model/youchuan-v7',
           inputUrlsBySlot: { imageUrl: 'blob:main', sref: 'blob:style' },
@@ -1605,32 +1542,32 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           tile: 'false',
         },
         'test',
-        _0x2a73f3,
+        value119,
       );
-    (assert.deepEqual(_0xd80bea, ['blob:main', 'blob:style']),
-      assert.equal(_0xe3278c.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v7'),
-      assert.equal(_0xe3278c.body.resolution, undefined),
-      assert.equal(_0xe3278c.body.imageUrls, undefined),
-      assert.equal(_0xe3278c.body.imageUrl, 'https://example.com/main-v7.png'),
-      assert.equal(_0xe3278c.body.sref, 'https://example.com/style-v7.png'),
-      assert.equal(_0xe3278c.body.cref, undefined),
-      assert.equal(_0xe3278c.body.cw, undefined),
-      assert.equal(_0xe3278c.body.stop, undefined),
-      assert.equal(_0xe3278c.body.hd, undefined),
-      assert.equal(_0xe3278c.body.quality, '2'),
-      assert.equal(_0xe3278c.body.raw, true),
-      assert.equal(_0xe3278c.body.tile, false),
-      assert.equal(_0xe3278c.body.iw, 2),
-      assert.equal(_0xe3278c.body.sw, 250),
-      assert.equal(_0xe3278c.body.sv, 4),
-      assert.equal(_0xe3278c.body.ow, 150));
+    (assert.deepEqual(value118, ['blob:main', 'blob:style']),
+      assert.equal(dom39.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v7'),
+      assert.equal(dom39.body.resolution, undefined),
+      assert.equal(dom39.body.imageUrls, undefined),
+      assert.equal(dom39.body.imageUrl, 'https://example.com/main-v7.png'),
+      assert.equal(dom39.body.sref, 'https://example.com/style-v7.png'),
+      assert.equal(dom39.body.cref, undefined),
+      assert.equal(dom39.body.cw, undefined),
+      assert.equal(dom39.body.stop, undefined),
+      assert.equal(dom39.body.hd, undefined),
+      assert.equal(dom39.body.quality, '2'),
+      assert.equal(dom39.body.raw, true),
+      assert.equal(dom39.body.tile, false),
+      assert.equal(dom39.body.iw, 2),
+      assert.equal(dom39.body.sw, 250),
+      assert.equal(dom39.body.sv, 4),
+      assert.equal(dom39.body.ow, 150));
   }),
   test('RunningHubAdapter Midjourney V7 未连接风格图时不发送 sw', async () => {
-    const _0x2f0010 = {
+    const value121 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => ['https://example.com/main-v7.png'],
       },
-      _0x22d47a = await buildModelRequest(
+      dom40 = await buildModelRequest(
         {
           model: 'runninghub-model/youchuan-v7',
           inputUrlsBySlot: { imageUrl: 'blob:main' },
@@ -1639,59 +1576,59 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           sw: '999',
         },
         'test',
-        _0x2f0010,
+        value121,
       );
-    (assert.equal(_0x22d47a.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v7'),
-      assert.equal(_0x22d47a.body.imageUrl, 'https://example.com/main-v7.png'),
-      assert.equal(_0x22d47a.body.sref, undefined),
-      assert.equal(_0x22d47a.body.sw, undefined),
-      assert.equal(_0x22d47a.body.iw, 2),
-      assert.equal(_0x22d47a.body.quality, '1'),
-      assert.equal(_0x22d47a.body.chaos, 0),
-      assert.equal(_0x22d47a.body.stylize, 0),
-      assert.equal(_0x22d47a.body.weird, 0),
-      assert.equal(_0x22d47a.body.raw, false),
-      assert.equal(_0x22d47a.body.sv, 4),
-      assert.equal(_0x22d47a.body.ow, 100),
-      assert.equal(_0x22d47a.body.tile, false));
+    (assert.equal(dom40.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v7'),
+      assert.equal(dom40.body.imageUrl, 'https://example.com/main-v7.png'),
+      assert.equal(dom40.body.sref, undefined),
+      assert.equal(dom40.body.sw, undefined),
+      assert.equal(dom40.body.iw, 2),
+      assert.equal(dom40.body.quality, '1'),
+      assert.equal(dom40.body.chaos, 0),
+      assert.equal(dom40.body.stylize, 0),
+      assert.equal(dom40.body.weird, 0),
+      assert.equal(dom40.body.raw, false),
+      assert.equal(dom40.body.sv, 4),
+      assert.equal(dom40.body.ow, 100),
+      assert.equal(dom40.body.tile, false));
   }),
   test('RunningHubAdapter Midjourney V7 连接参考图时补官方默认数值', async () => {
-    const _0x5aaf9f = {
+    const value122 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [
           'https://example.com/main-v7.png',
           'https://example.com/style-v7.png',
         ],
       },
-      _0x14ef48 = await buildModelRequest(
+      dom41 = await buildModelRequest(
         {
           model: 'runninghub-model/youchuan-v7',
           inputUrlsBySlot: { imageUrl: 'blob:main', sref: 'blob:style' },
           aspectRatio: '16:9',
         },
         'test',
-        _0x5aaf9f,
+        value122,
       );
-    (assert.equal(_0x14ef48.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v7'),
-      assert.equal(_0x14ef48.body.imageUrl, 'https://example.com/main-v7.png'),
-      assert.equal(_0x14ef48.body.sref, 'https://example.com/style-v7.png'),
-      assert.equal(_0x14ef48.body.quality, '1'),
-      assert.equal(_0x14ef48.body.chaos, 0),
-      assert.equal(_0x14ef48.body.stylize, 0),
-      assert.equal(_0x14ef48.body.weird, 0),
-      assert.equal(_0x14ef48.body.raw, false),
-      assert.equal(_0x14ef48.body.iw, 1),
-      assert.equal(_0x14ef48.body.sw, 100),
-      assert.equal(_0x14ef48.body.sv, 4),
-      assert.equal(_0x14ef48.body.ow, 100),
-      assert.equal(_0x14ef48.body.tile, false));
+    (assert.equal(dom41.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v7'),
+      assert.equal(dom41.body.imageUrl, 'https://example.com/main-v7.png'),
+      assert.equal(dom41.body.sref, 'https://example.com/style-v7.png'),
+      assert.equal(dom41.body.quality, '1'),
+      assert.equal(dom41.body.chaos, 0),
+      assert.equal(dom41.body.stylize, 0),
+      assert.equal(dom41.body.weird, 0),
+      assert.equal(dom41.body.raw, false),
+      assert.equal(dom41.body.iw, 1),
+      assert.equal(dom41.body.sw, 100),
+      assert.equal(dom41.body.sv, 4),
+      assert.equal(dom41.body.ow, 100),
+      assert.equal(dom41.body.tile, false));
   }),
   test('RunningHubAdapter Midjourney V8.1 使用官方 iw/sw 参数并过滤其他版本残留', async () => {
-    const _0x2ba9dd = {
+    const value123 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => ['https://example.com/main.png'],
       },
-      _0x4fa79c = await buildModelRequest(
+      dom42 = await buildModelRequest(
         {
           model: 'runninghub-model/youchuan-v81',
           inputUrlsBySlot: { imageUrl: 'blob:main' },
@@ -1706,74 +1643,71 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           tile: 'true',
         },
         'test',
-        _0x2ba9dd,
+        value123,
       );
-    (assert.equal(_0x4fa79c.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v81'),
-      assert.equal(_0x4fa79c.body.imageUrl, 'https://example.com/main.png'),
-      assert.equal(_0x4fa79c.body.sref, undefined),
-      assert.equal(_0x4fa79c.body.sw, 0x3e7),
-      assert.equal(_0x4fa79c.body.iw, 3),
-      assert.equal(_0x4fa79c.body.quality, '4'),
-      assert.equal(_0x4fa79c.body.hd, true),
-      assert.equal(_0x4fa79c.body.sv, 6),
-      assert.equal(_0x4fa79c.body.weird, undefined),
-      assert.equal(_0x4fa79c.body.stop, undefined),
-      assert.equal(_0x4fa79c.body.ow, undefined),
-      assert.equal(_0x4fa79c.body.tile, undefined));
+    (assert.equal(dom42.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v81'),
+      assert.equal(dom42.body.imageUrl, 'https://example.com/main.png'),
+      assert.equal(dom42.body.sref, undefined),
+      assert.equal(dom42.body.sw, 0x3e7),
+      assert.equal(dom42.body.iw, 3),
+      assert.equal(dom42.body.quality, '4'),
+      assert.equal(dom42.body.hd, true),
+      assert.equal(dom42.body.sv, 6),
+      assert.equal(dom42.body.weird, undefined),
+      assert.equal(dom42.body.stop, undefined),
+      assert.equal(dom42.body.ow, undefined),
+      assert.equal(dom42.body.tile, undefined));
   }),
   test('RunningHubAdapter Midjourney V8.1 纯文生图使用官方默认 iw/sw body', async () => {
-    const _0x1b7d61 = {
+    const value124 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x3e6804 = await buildModelRequest({ model: 'runninghub-model/youchuan-v81' }, 'test', _0x1b7d61);
-    (assert.equal(_0x3e6804.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v81'),
-      assert.equal(_0x3e6804.body.imageUrl, undefined),
-      assert.equal(_0x3e6804.body.sref, undefined),
-      assert.equal(_0x3e6804.body.iw, 1),
-      assert.equal(_0x3e6804.body.sw, 100),
-      assert.equal(_0x3e6804.body.quality, '1'),
-      assert.equal(_0x3e6804.body.chaos, 0),
-      assert.equal(_0x3e6804.body.stylize, 0),
-      assert.equal(_0x3e6804.body.raw, false),
-      assert.equal(_0x3e6804.body.hd, false),
-      assert.equal(_0x3e6804.body.sv, 6));
+      dom43 = await buildModelRequest({ model: 'runninghub-model/youchuan-v81' }, 'test', value124);
+    (assert.equal(dom43.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v81'),
+      assert.equal(dom43.body.imageUrl, undefined),
+      assert.equal(dom43.body.sref, undefined),
+      assert.equal(dom43.body.iw, 1),
+      assert.equal(dom43.body.sw, 100),
+      assert.equal(dom43.body.quality, '1'),
+      assert.equal(dom43.body.chaos, 0),
+      assert.equal(dom43.body.stylize, 0),
+      assert.equal(dom43.body.raw, false),
+      assert.equal(dom43.body.hd, false),
+      assert.equal(dom43.body.sv, 6));
   }),
   test('RunningHubAdapter Midjourney 自适应比例发送解析后的官方比例', async () => {
-    const _0x313904 = {
+    const value125 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x259fb1 = await buildModelRequest(
+      dom44 = await buildModelRequest(
         { model: 'runninghub-model/youchuan-v81', aspectRatio: '自适应', resolvedRatioLabel: '3:4' },
         'test',
-        _0x313904,
+        value125,
       );
-    (assert.equal(_0x259fb1.body.aspectRatio, '3:4'), assert.notEqual(_0x259fb1.body.aspectRatio, '自适应'));
+    (assert.equal(dom44.body.aspectRatio, '3:4'), assert.notEqual(dom44.body.aspectRatio, '自适应'));
   }),
   test('RunningHubAdapter GPT image 2 无参考图时走 text-to-image 且透传 resolution', async () => {
-    const _0x1a4641 = {
+    const value126 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x38b50c = await buildModelRequest(
+      dom45 = await buildModelRequest(
         { model: 'runninghub-model/rhart-image-g-2', imageSize: '4K' },
         'test',
-        _0x1a4641,
+        value126,
       );
-    (assert.equal(
-      _0x38b50c.body.apiUrl,
-      'https://www.runninghub.cn/openapi/v2/rhart-image-g-2/text-to-image',
-    ),
-      assert.equal(_0x38b50c.body.resolution, '4k'),
-      assert.equal(_0x38b50c.body.imageUrls, undefined));
+    (assert.equal(dom45.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/rhart-image-g-2/text-to-image'),
+      assert.equal(dom45.body.resolution, '4k'),
+      assert.equal(dom45.body.imageUrls, undefined));
   }),
   test('RunningHubAdapter GPT image 2 official 有参考图时走 official image-to-image', async () => {
-    const _0x3766c0 = {
+    const value127 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => ['https://example.com/gpt-image-2-ref.png'],
       },
-      _0xaadf78 = await buildModelRequest(
+      dom46 = await buildModelRequest(
         {
           model: 'runninghub-model/rhart-image-g-2-official',
           inputUrls: ['blob:ref'],
@@ -1781,42 +1715,42 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           imageSize: '4K',
         },
         'test',
-        _0x3766c0,
+        value127,
       );
     (assert.equal(
-      _0xaadf78.body.apiUrl,
+      dom46.body.apiUrl,
       'https://www.runninghub.cn/openapi/v2/rhart-image-g-2-official/image-to-image',
     ),
-      assert.equal(_0xaadf78.body.aspectRatio, '2:1'),
-      assert.equal(_0xaadf78.body.resolution, '4k'),
-      assert.equal(_0xaadf78.body.quality, 'medium'),
-      assert.deepEqual(_0xaadf78.body.imageUrls, ['https://example.com/gpt-image-2-ref.png']));
+      assert.equal(dom46.body.aspectRatio, '2:1'),
+      assert.equal(dom46.body.resolution, '4k'),
+      assert.equal(dom46.body.quality, 'medium'),
+      assert.deepEqual(dom46.body.imageUrls, ['https://example.com/gpt-image-2-ref.png']));
   }),
   test('RunningHubAdapter GPT image 2 official 无参考图时走 official text-to-image', async () => {
-    const _0x47ac67 = {
+    const value128 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x10bbe2 = await buildModelRequest(
+      dom47 = await buildModelRequest(
         { model: 'runninghub-model/rhart-image-g-2-official', aspectRatio: '9:21', imageSize: '2K' },
         'test',
-        _0x47ac67,
+        value128,
       );
     (assert.equal(
-      _0x10bbe2.body.apiUrl,
+      dom47.body.apiUrl,
       'https://www.runninghub.cn/openapi/v2/rhart-image-g-2-official/text-to-image',
     ),
-      assert.equal(_0x10bbe2.body.aspectRatio, '9:21'),
-      assert.equal(_0x10bbe2.body.resolution, '2k'),
-      assert.equal(_0x10bbe2.body.quality, 'medium'),
-      assert.equal(_0x10bbe2.body.imageUrls, undefined));
+      assert.equal(dom47.body.aspectRatio, '9:21'),
+      assert.equal(dom47.body.resolution, '2k'),
+      assert.equal(dom47.body.quality, 'medium'),
+      assert.equal(dom47.body.imageUrls, undefined));
   }),
   test('RunningHubAdapter GPT image 2 父模型官方 route 携带官方 quality', async () => {
-    const _0x7394a8 = {
+    const value129 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => ['https://example.com/gpt-image-2-ref.png'],
       },
-      _0x4829bb = await buildModelRequest(
+      dom48 = await buildModelRequest(
         {
           model: 'runninghub-model/rhart-image-g-2',
           rhModelRoute: 'official',
@@ -1824,16 +1758,16 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           imageSize: '2K',
         },
         'test',
-        _0x7394a8,
+        value129,
       );
     (assert.equal(
-      _0x4829bb.body.apiUrl,
+      dom48.body.apiUrl,
       'https://www.runninghub.cn/openapi/v2/rhart-image-g-2-official/text-to-image',
     ),
-      assert.equal(_0x4829bb.body.resolution, '2k'),
-      assert.equal(_0x4829bb.body.aspectRatio, '16:9'),
-      assert.equal(_0x4829bb.body.quality, 'medium'));
-    const _0x450d39 = await buildModelRequest(
+      assert.equal(dom48.body.resolution, '2k'),
+      assert.equal(dom48.body.aspectRatio, '16:9'),
+      assert.equal(dom48.body.quality, 'medium'));
+    const dom49 = await buildModelRequest(
       {
         model: 'runninghub-model/rhart-image-g-2',
         rhModelRoute: 'official',
@@ -1842,94 +1776,94 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
         imageSize: '4K',
       },
       'test',
-      _0x7394a8,
+      value129,
     );
     (assert.equal(
-      _0x450d39.body.apiUrl,
+      dom49.body.apiUrl,
       'https://www.runninghub.cn/openapi/v2/rhart-image-g-2-official/image-to-image',
     ),
-      assert.equal(_0x450d39.body.resolution, '4k'),
-      assert.equal(_0x450d39.body.aspectRatio, '2:1'),
-      assert.equal(_0x450d39.body.quality, 'medium'),
-      assert.deepEqual(_0x450d39.body.imageUrls, ['https://example.com/gpt-image-2-ref.png']));
+      assert.equal(dom49.body.resolution, '4k'),
+      assert.equal(dom49.body.aspectRatio, '2:1'),
+      assert.equal(dom49.body.quality, 'medium'),
+      assert.deepEqual(dom49.body.imageUrls, ['https://example.com/gpt-image-2-ref.png']));
   }),
   test('RunningHubAdapter GPT image 2 official 保留 1K resolution', async () => {
-    const _0x39eac8 = {
+    const value130 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x545a2f = await buildModelRequest(
+      dom50 = await buildModelRequest(
         { model: 'runninghub-model/rhart-image-g-2-official', aspectRatio: '1:1', imageSize: '1K' },
         'test',
-        _0x39eac8,
+        value130,
       );
-    (assert.equal(_0x545a2f.body.resolution, '1k'), assert.equal(_0x545a2f.body.aspectRatio, '1:1'));
+    (assert.equal(dom50.body.resolution, '1k'), assert.equal(dom50.body.aspectRatio, '1:1'));
   }),
   test('RunningHubAdapter GPT image 2 official 4K 会回落到支持比例', async () => {
-    const _0x3af5e1 = {
+    const value131 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x1c954b = await buildModelRequest(
+      dom51 = await buildModelRequest(
         { model: 'runninghub-model/rhart-image-g-2-official', aspectRatio: '1:1', imageSize: '4K' },
         'test',
-        _0x3af5e1,
+        value131,
       );
-    (assert.equal(_0x1c954b.body.resolution, '4k'), assert.equal(_0x1c954b.body.aspectRatio, '16:9'));
+    (assert.equal(dom51.body.resolution, '4k'), assert.equal(dom51.body.aspectRatio, '16:9'));
   }),
   test('RunningHubAdapter seedream 三个模型均不透传 aspectRatio', async () => {
-    const _0x1c4d65 = {
+    const value132 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x543829 = [
+      value133 = [
         'runninghub-model/seedream-v4',
         'runninghub-model/seedream-v4.5',
         'runninghub-model/seedream-v5-lite',
       ];
-    for (const _0x4d840e of _0x543829) {
-      const _0xd5ab4e = await buildModelRequest(
-        { model: _0x4d840e, aspectRatio: '16:9', imageSize: '2K' },
+    for (const model of value133) {
+      const dom52 = await buildModelRequest(
+        { model: model, aspectRatio: '16:9', imageSize: '2K' },
         'test',
-        _0x1c4d65,
+        value132,
       );
-      (assert.equal(_0xd5ab4e.body.aspectRatio, undefined, 'model=' + _0x4d840e),
-        assert.equal(_0xd5ab4e.body.resolution, undefined, 'model=' + _0x4d840e),
-        assert.equal(_0xd5ab4e.body.width, 0xaa8, 'model=' + _0x4d840e),
-        assert.equal(_0xd5ab4e.body.height, 0x600, 'model=' + _0x4d840e));
+      (assert.equal(dom52.body.aspectRatio, undefined, 'model=' + model),
+        assert.equal(dom52.body.resolution, undefined, 'model=' + model),
+        assert.equal(dom52.body.width, 0xaa8, 'model=' + model),
+        assert.equal(dom52.body.height, 0x600, 'model=' + model));
     }
   }),
   test('RunningHubAdapter 模型 API 在默认 1:1 比例下不透传 aspectRatio', async () => {
-    const _0xfe21c8 = {
+    const value134 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x45f822 = await buildModelRequest(
+      dom53 = await buildModelRequest(
         { model: 'runninghub-model/seedream-v4', aspectRatio: '1:1', imageSize: '2K' },
         'test',
-        _0xfe21c8,
+        value134,
       );
-    (assert.equal(_0x45f822.body.aspectRatio, undefined),
-      assert.equal(_0x45f822.body.resolution, undefined),
-      assert.equal(_0x45f822.body.width, 0x800),
-      assert.equal(_0x45f822.body.height, 0x800));
+    (assert.equal(dom53.body.aspectRatio, undefined),
+      assert.equal(dom53.body.resolution, undefined),
+      assert.equal(dom53.body.width, 0x800),
+      assert.equal(dom53.body.height, 0x800));
   }),
   test('RunningHubAdapter seedream 宽高满足官方约束：8倍数且在512-8192', async () => {
-    const _0x1aeb94 = {
+    const value135 = {
         getProviderConfig: () => ({ modelApiKey: 'mk' }),
         processInputImages: async () => [],
       },
-      _0x53b2d8 = await buildModelRequest(
+      dom54 = await buildModelRequest(
         { model: 'runninghub-model/seedream-v5-lite', aspectRatio: '21:9', imageSize: '4K' },
         'test',
-        _0x1aeb94,
+        value135,
       );
-    (assert.equal(_0x53b2d8.body.aspectRatio, undefined),
-      assert.equal(_0x53b2d8.body.resolution, undefined),
-      assert.ok(Number.isInteger(_0x53b2d8.body.width)),
-      assert.ok(Number.isInteger(_0x53b2d8.body.height)),
-      assert.equal(_0x53b2d8.body.width % 8, 0),
-      assert.equal(_0x53b2d8.body.height % 8, 0),
-      assert.ok(_0x53b2d8.body.width >= 0x200 && _0x53b2d8.body.width <= 0x2000),
-      assert.ok(_0x53b2d8.body.height >= 0x200 && _0x53b2d8.body.height <= 0x2000));
+    (assert.equal(dom54.body.aspectRatio, undefined),
+      assert.equal(dom54.body.resolution, undefined),
+      assert.ok(Number.isInteger(dom54.body.width)),
+      assert.ok(Number.isInteger(dom54.body.height)),
+      assert.equal(dom54.body.width % 8, 0),
+      assert.equal(dom54.body.height % 8, 0),
+      assert.ok(dom54.body.width >= 0x200 && dom54.body.width <= 0x2000),
+      assert.ok(dom54.body.height >= 0x200 && dom54.body.height <= 0x2000));
   }));

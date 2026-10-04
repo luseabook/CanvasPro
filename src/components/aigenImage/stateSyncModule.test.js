@@ -3,27 +3,27 @@ import assert from 'node:assert/strict';
 import { createAIGenerateNodeStateSyncModule, resolveRefImageRenderSources } from './stateSyncModule.js';
 import { createAIGenerateNodeUiModule } from './uiModule.js';
 function createButtonStub() {
-  const _0x975765 = new Set(['is-rh-busy']);
+  const map = new Set(['is-rh-busy']);
   return {
     disabled: true,
     title: 'busy',
     innerHTML: '<svg style="animation:spin 1s linear infinite"></svg>',
     style: { color: 'var(--white)', cursor: '' },
     classList: {
-      add(_0x1355df) {
-        _0x975765.add(String(_0x1355df || ''));
+      add(value) {
+        map.add(String(value || ''));
       },
-      remove(_0x21202c) {
-        _0x975765.delete(String(_0x21202c || ''));
+      remove(item) {
+        map.delete(String(item || ''));
       },
-      contains(_0xf630f6) {
-        return _0x975765.has(String(_0xf630f6 || ''));
+      contains(key) {
+        return map.has(String(key || ''));
       },
     },
   };
 }
 function createIdleButtonStub() {
-  const _0xd20871 = new Set();
+  const map2 = new Set();
   return {
     disabled: false,
     title: '',
@@ -31,61 +31,61 @@ function createIdleButtonStub() {
     style: { color: '', cursor: '' },
     dataset: {},
     classList: {
-      add(..._0x562a7a) {
-        _0x562a7a.forEach((_0x4643c0) => _0xd20871.add(String(_0x4643c0 || '')));
+      add(...list) {
+        list.forEach((item2) => map2.add(String(item2 || '')));
       },
-      remove(..._0xb4ea85) {
-        _0xb4ea85.forEach((_0x4ee748) => _0xd20871.delete(String(_0x4ee748 || '')));
+      remove(...list2) {
+        list2.forEach((item3) => map2.delete(String(item3 || '')));
       },
-      toggle(_0x95cec1, _0x3df5e4) {
-        const _0x940a2a = String(_0x95cec1 || '');
-        if (_0x3df5e4 === true) return (_0xd20871.add(_0x940a2a), true);
-        if (_0x3df5e4 === false) return (_0xd20871.delete(_0x940a2a), false);
-        if (_0xd20871.has(_0x940a2a)) return (_0xd20871.delete(_0x940a2a), false);
-        return (_0xd20871.add(_0x940a2a), true);
+      toggle(index, result) {
+        const data = String(index || '');
+        if (result === true) return (map2.add(data), true);
+        if (result === false) return (map2.delete(data), false);
+        if (map2.has(data)) return (map2.delete(data), false);
+        return (map2.add(data), true);
       },
-      contains(_0x192c3a) {
-        return _0xd20871.has(String(_0x192c3a || ''));
+      contains(options) {
+        return map2.has(String(options || ''));
       },
     },
-    setAttribute(_0x5ec390, _0xbe655d) {
-      this.dataset[String(_0x5ec390 || '')] = String(_0xbe655d || '');
+    setAttribute(target, source) {
+      this.dataset[String(target || '')] = String(source || '');
     },
-    removeAttribute(_0x2f7817) {
-      delete this.dataset[String(_0x2f7817 || '')];
+    removeAttribute(next) {
+      delete this.dataset[String(next || '')];
     },
   };
 }
 class FakeClassList {
-  constructor(_0x1631f5) {
-    this.owner = _0x1631f5;
+  constructor(current) {
+    this.owner = current;
   }
   ['_tokens']() {
     return String(this.owner.className || '')
       .split(/\s+/)
       .filter(Boolean);
   }
-  ['contains'](_0x2f49e9) {
-    return this._tokens().includes(String(_0x2f49e9 || ''));
+  ['contains'](entry) {
+    return this._tokens().includes(String(entry || ''));
   }
-  ['add'](..._0xd11679) {
-    const _0x31e5ec = new Set(this._tokens());
-    (_0xd11679.forEach((_0x4932d6) => _0x31e5ec.add(String(_0x4932d6 || ''))),
-      (this.owner.className = Array.from(_0x31e5ec).join(' ')));
+  ['add'](...list3) {
+    const record = new Set(this._tokens());
+    (list3.forEach((item4) => record.add(String(item4 || ''))),
+      (this.owner.className = Array.from(record).join(' ')));
   }
-  ['remove'](..._0x3ee8c8) {
-    const _0x5851f0 = new Set(_0x3ee8c8.map((_0x50a922) => String(_0x50a922 || '')));
+  ['remove'](...list4) {
+    const map3 = new Set(list4.map((item5) => String(item5 || '')));
     this.owner.className = this._tokens()
-      .filter((_0x1584b4) => !_0x5851f0.has(_0x1584b4))
+      .filter((item6) => !map3.has(item6))
       .join(' ');
   }
-  ['toggle'](_0x422156, _0x19072f) {
-    const _0x11d796 = String(_0x422156 || ''),
-      _0x248362 = this.contains(_0x11d796),
-      _0x272188 = _0x19072f === undefined ? !_0x248362 : Boolean(_0x19072f);
-    if (_0x272188) this.add(_0x11d796);
-    else this.remove(_0x11d796);
-    return _0x272188;
+  ['toggle'](payload, handle) {
+    const state = String(payload || ''),
+      enabled = this.contains(state),
+      config = handle === undefined ? !enabled : Boolean(handle);
+    if (config) this.add(state);
+    else this.remove(state);
+    return config;
   }
 }
 class FakeElement {
@@ -105,16 +105,16 @@ class FakeElement {
   get ['innerHTML']() {
     return this._innerHTML;
   }
-  set ['innerHTML'](_0x580516) {
-    this._innerHTML = String(_0x580516 || '');
+  set ['innerHTML'](scope) {
+    this._innerHTML = String(scope || '');
     if (!this._innerHTML.includes('ref-thumb-container')) return;
     this.children = [];
-    const _0x30b2b6 = new FakeElement({ className: 'prompt-attachment-btn' }),
-      _0x48662e = new FakeElement({ className: 'ref-thumb-container' });
-    (this.appendChild(_0x30b2b6),
-      this.appendChild(_0x48662e),
+    const fakeElement = new FakeElement({ className: 'prompt-attachment-btn' }),
+      el = new FakeElement({ className: 'ref-thumb-container' });
+    (this.appendChild(fakeElement),
+      this.appendChild(el),
       this._innerHTML.includes('data-ref-slot="replaceTarget"') &&
-        _0x48662e.appendChild(
+        el.appendChild(
           new FakeElement({
             className: 'ref-thumb-wrap ref-upload-slot',
             dataset: {
@@ -125,7 +125,7 @@ class FakeElement {
           }),
         ),
       this._innerHTML.includes('data-ref-slot="replacedImage"') &&
-        _0x48662e.appendChild(
+        el.appendChild(
           new FakeElement({
             className: 'ref-thumb-wrap ref-upload-slot',
             dataset: {
@@ -138,130 +138,130 @@ class FakeElement {
   }
   get ['nextSibling']() {
     if (!this.parentNode) return null;
-    const _0x56ed83 = this.parentNode.children,
-      _0x16ac73 = _0x56ed83.indexOf(this);
-    return _0x16ac73 >= 0 ? _0x56ed83[_0x16ac73 + 1] || null : null;
+    const list5 = this.parentNode.children,
+      count = list5.indexOf(this);
+    return count >= 0 ? list5[count + 1] || null : null;
   }
-  ['appendChild'](_0x46545c) {
-    if (_0x46545c.parentNode) _0x46545c.remove();
-    return (
-      this.children.push(_0x46545c),
-      (_0x46545c.parentNode = this),
-      (_0x46545c.parentElement = this),
-      _0x46545c
-    );
+  ['appendChild'](el2) {
+    if (el2.parentNode) el2.remove();
+    return (this.children.push(el2), (el2.parentNode = this), (el2.parentElement = this), el2);
   }
-  ['insertBefore'](_0x53eac6, _0x439788) {
-    if (_0x53eac6.parentNode) _0x53eac6.remove();
-    const _0x3fc389 = _0x439788 ? this.children.indexOf(_0x439788) : -1;
-    if (_0x3fc389 >= 0) this.children.splice(_0x3fc389, 0, _0x53eac6);
-    else this.children.push(_0x53eac6);
-    return ((_0x53eac6.parentNode = this), (_0x53eac6.parentElement = this), _0x53eac6);
+  ['insertBefore'](el3, input) {
+    if (el3.parentNode) el3.remove();
+    const count2 = input ? this.children.indexOf(input) : -1;
+    if (count2 >= 0) this.children.splice(count2, 0, el3);
+    else this.children.push(el3);
+    return ((el3.parentNode = this), (el3.parentElement = this), el3);
   }
   ['remove']() {
     if (!this.parentNode) return;
-    const _0x57bbb6 = this.parentNode.children,
-      _0x448d8e = _0x57bbb6.indexOf(this);
-    if (_0x448d8e >= 0) _0x57bbb6.splice(_0x448d8e, 1);
+    const list6 = this.parentNode.children,
+      count3 = list6.indexOf(this);
+    if (count3 >= 0) list6.splice(count3, 1);
     ((this.parentNode = null), (this.parentElement = null));
   }
-  ['replaceWith'](_0x30e228) {
+  ['replaceWith'](el4) {
     if (!this.parentNode) return;
-    const _0x1d4a96 = this.parentNode,
-      _0x149638 = _0x1d4a96.children,
-      _0x4cf79a = _0x149638.indexOf(this);
-    if (_0x4cf79a < 0) return;
-    if (_0x30e228.parentNode) _0x30e228.remove();
-    ((_0x149638[_0x4cf79a] = _0x30e228),
-      (_0x30e228.parentNode = _0x1d4a96),
-      (_0x30e228.parentElement = _0x1d4a96),
+    const el5 = this.parentNode,
+      list7 = el5.children,
+      count4 = list7.indexOf(this);
+    if (count4 < 0) return;
+    if (el4.parentNode) el4.remove();
+    ((list7[count4] = el4),
+      (el4.parentNode = el5),
+      (el4.parentElement = el5),
       (this.parentNode = null),
       (this.parentElement = null));
   }
-  ['setAttribute'](_0x1b606c, _0x2015a9) {
-    this.attributes[String(_0x1b606c)] = String(_0x2015a9);
+  ['setAttribute'](output, value2) {
+    this.attributes[String(output)] = String(value2);
   }
-  ['getAttribute'](_0x44c1d5) {
-    return this.attributes[String(_0x44c1d5)];
+  ['getAttribute'](value3) {
+    return this.attributes[String(value3)];
   }
-  ['addEventListener'](_0x16f127, _0x23aaac) {
-    if (!this.listeners.has(_0x16f127)) this.listeners.set(_0x16f127, []);
-    this.listeners.get(_0x16f127).push(_0x23aaac);
+  ['addEventListener'](value4, value5) {
+    if (!this.listeners.has(value4)) this.listeners.set(value4, []);
+    this.listeners.get(value4).push(value5);
   }
-  ['dispatch'](_0x162edd, _0x330b10) {
-    for (const _0x586d5a of this.listeners.get(_0x162edd) || []) _0x586d5a(_0x330b10);
+  ['dispatch'](value6, value7) {
+    for (const run of this.listeners.get(value6) || []) run(value7);
   }
-  ['matches'](_0x1f9102) {
-    if (_0x1f9102 === '.ref-thumb-wrap') return this.classList.contains('ref-thumb-wrap');
-    if (_0x1f9102 === '.ref-thumb-container') return this.classList.contains('ref-thumb-container');
-    if (_0x1f9102 === '[data-slot]') return !!this.dataset.slot;
-    return matchesFakeSelector(this, _0x1f9102);
+  ['matches'](value8) {
+    if (value8 === '.ref-thumb-wrap') return this.classList.contains('ref-thumb-wrap');
+    if (value8 === '.ref-thumb-container') return this.classList.contains('ref-thumb-container');
+    if (value8 === '[data-slot]') return !!this.dataset.slot;
+    return matchesFakeSelector(this, value8);
   }
-  ['closest'](_0x1306f6) {
-    let _0x1b1923 = this;
-    while (_0x1b1923) {
-      if (_0x1b1923.matches(_0x1306f6)) return _0x1b1923;
-      _0x1b1923 = _0x1b1923.parentElement;
+  ['closest'](value9) {
+    let value10 = this;
+    while (value10) {
+      if (value10.matches(value9)) return value10;
+      value10 = value10.parentElement;
     }
     return null;
   }
-  ['querySelector'](_0x4c94ad) {
-    return this.querySelectorAll(_0x4c94ad)[0] || null;
+  ['querySelector'](value11) {
+    return this.querySelectorAll(value11)[0] || null;
   }
-  ['querySelectorAll'](_0xe3a63a) {
-    const _0x3f45bb = [],
-      _0x4e2542 = (_0x22dedc) => {
-        if (matchesFakeSelector(_0x22dedc, _0xe3a63a)) _0x3f45bb.push(_0x22dedc);
-        _0x22dedc.children.forEach(_0x4e2542);
+  ['querySelectorAll'](value12) {
+    const list8 = [],
+      item7 = (el6) => {
+        if (matchesFakeSelector(el6, value12)) list8.push(el6);
+        el6.children.forEach(item7);
       };
-    return (this.children.forEach(_0x4e2542), _0x3f45bb);
+    return (this.children.forEach(item7), list8);
   }
 }
-function matchesFakeSelector(_0x89ffc3, _0x175ba8) {
-  if (_0x175ba8 === '.prompt-attachment-btn') return _0x89ffc3.classList.contains('prompt-attachment-btn');
-  if (_0x175ba8 === '.ref-thumb-container') return _0x89ffc3.classList.contains('ref-thumb-container');
-  if (_0x175ba8 === '.ref-thumb-wrap') return _0x89ffc3.classList.contains('ref-thumb-wrap');
-  if (_0x175ba8 === '.ref-thumb-wrap.is-drop-allow')
-    return _0x89ffc3.classList.contains('ref-thumb-wrap') && _0x89ffc3.classList.contains('is-drop-allow');
-  const _0x34c6e6 = _0x175ba8.match(/^\.ref-upload-slot\[data-ref-slot="([^"]+)"\]$/);
-  if (_0x34c6e6)
-    return _0x89ffc3.classList.contains('ref-upload-slot') && _0x89ffc3.dataset.refSlot === _0x34c6e6[1];
-  const _0x58c343 = _0x175ba8.match(/^\[data-ref-slot="([^"]+)"\]$/);
-  if (_0x58c343) return _0x89ffc3.dataset.refSlot === _0x58c343[1];
-  const _0x5ec186 = _0x175ba8.match(/^\[data-slot="([^"]+)"\]$/);
-  if (_0x5ec186) return _0x89ffc3.dataset.slot === _0x5ec186[1];
-  if (_0x175ba8 === '[data-slot]') return !!_0x89ffc3.dataset.slot;
+function matchesFakeSelector(el7, value13) {
+  if (value13 === '.prompt-attachment-btn') return el7.classList.contains('prompt-attachment-btn');
+  if (value13 === '.ref-thumb-container') return el7.classList.contains('ref-thumb-container');
+  if (value13 === '.ref-thumb-wrap') return el7.classList.contains('ref-thumb-wrap');
+  if (value13 === '.ref-thumb-wrap.is-drop-allow')
+    return el7.classList.contains('ref-thumb-wrap') && el7.classList.contains('is-drop-allow');
+  const value14 = value13.match(/^\.ref-upload-slot\[data-ref-slot="([^"]+)"\]$/);
+  if (value14) return el7.classList.contains('ref-upload-slot') && el7.dataset.refSlot === value14[1];
+  const value15 = value13.match(/^\[data-ref-slot="([^"]+)"\]$/);
+  if (value15) return el7.dataset.refSlot === value15[1];
+  const value16 = value13.match(/^\[data-slot="([^"]+)"\]$/);
+  if (value16) return el7.dataset.slot === value16[1];
+  if (value13 === '[data-slot]') return !!el7.dataset.slot;
   return false;
 }
-function createDragEvent(_0x2ed3a6) {
+function createDragEvent(target2) {
   return {
-    target: _0x2ed3a6,
+    target: target2,
     dataTransfer: { effectAllowed: '', dropEffect: '', setData() {} },
     preventDefault() {},
     stopPropagation() {},
   };
 }
 (test('aigenImage state sync: 列表缩略图优先 thumbLocalPath，hover 预览优先 displayLocalPath', () => {
-  const _0x35c474 = resolveRefImageRenderSources({
+  const refImageRenderSources = resolveRefImageRenderSources({
     id: 'src-image-1',
     type: 'source-image',
     originalLocalPath: 'output/original.png',
     displayLocalPath: 'output/display.jpg',
     thumbLocalPath: 'output/thumb.jpg',
   });
-  assert.deepEqual(_0x35c474, { thumbSrc: '/output/thumb.jpg', previewSrc: '/output/display.jpg' });
+  assert.deepEqual(refImageRenderSources, {
+    thumbSrc: '/output/thumb.jpg',
+    previewSrc: '/output/display.jpg',
+  });
 }),
   test('aigenImage state sync: hover 预览缺少 displayLocalPath 时回退 originalLocalPath', () => {
-    const _0x29d376 = resolveRefImageRenderSources({
+    const refImageRenderSources2 = resolveRefImageRenderSources({
       id: 'src-image-2',
       type: 'source-image',
       originalLocalPath: 'output/original.png',
       thumbLocalPath: 'output/thumb.jpg',
     });
-    assert.deepEqual(_0x29d376, { thumbSrc: '/output/thumb.jpg', previewSrc: '/output/original.png' });
+    assert.deepEqual(refImageRenderSources2, {
+      thumbSrc: '/output/thumb.jpg',
+      previewSrc: '/output/original.png',
+    });
   }),
   test('aigenImage state sync: ai-image 顶层缺失时回退 main image 的本地派生图', () => {
-    const _0xc8cfd8 = resolveRefImageRenderSources({
+    const refImageRenderSources3 = resolveRefImageRenderSources({
       id: 'src-ai-image-1',
       type: 'ai-image',
       images: [
@@ -274,13 +274,13 @@ function createDragEvent(_0x2ed3a6) {
       ],
       mainImageIndex: 1,
     });
-    assert.deepEqual(_0xc8cfd8, {
+    assert.deepEqual(refImageRenderSources3, {
       thumbSrc: '/output/final-thumb.jpg',
       previewSrc: '/output/final-display.jpg',
     });
   }),
   test('aigenImage state sync: 顶层本地字段仍优先于 main image', () => {
-    const _0x2b1596 = resolveRefImageRenderSources({
+    const refImageRenderSources4 = resolveRefImageRenderSources({
       id: 'src-ai-image-2',
       type: 'ai-image',
       localPath: 'output/top-level.png',
@@ -295,66 +295,69 @@ function createDragEvent(_0x2ed3a6) {
       ],
       mainImageIndex: 0,
     });
-    assert.deepEqual(_0x2b1596, {
+    assert.deepEqual(refImageRenderSources4, {
       thumbSrc: '/output/top-level-thumb.jpg',
       previewSrc: '/output/top-level-display.jpg',
     });
   }),
   test('aigenImage state sync: 旧节点只有 blob 缩略图时 hover 预览回退到同一张图', () => {
-    const _0x3ea528 = resolveRefImageRenderSources(
+    const refImageRenderSources5 = resolveRefImageRenderSources(
       { id: 'src-image-legacy-blob', type: 'source-image' },
       { thumbBlobUrl: 'blob:legacy-thumb' },
     );
-    assert.deepEqual(_0x3ea528, { thumbSrc: 'blob:legacy-thumb', previewSrc: 'blob:legacy-thumb' });
+    assert.deepEqual(refImageRenderSources5, {
+      thumbSrc: 'blob:legacy-thumb',
+      previewSrc: 'blob:legacy-thumb',
+    });
   }),
   test('aigenImage state sync: terminal Dreamina state clears loading UI', () => {
-    const _0xf6838c = globalThis.document;
+    const value17 = globalThis.document;
     globalThis.document = { activeElement: null };
     try {
-      const _0x2199a3 = 'node-state-sync-dreamina-terminal',
-        _0x3cf8d8 = {
+      const id = 'node-state-sync-dreamina-terminal',
+        _data = {
           selectedNodeIds: [],
           pickConnectMode: {},
-          nodes: { [_0x2199a3]: { id: _0x2199a3, model: 'dreamina/4.1', provider: 'dreamina' } },
+          nodes: { [id]: { id: id, model: 'dreamina/4.1', provider: 'dreamina' } },
           edges: {},
         };
-      let _0x12757f = 0,
-        _0x2fb788 = 0,
-        _0x3501df = 0,
-        _0x195ff4 = 0;
-      const _0x54b6b9 = createAIGenerateNodeStateSyncModule({
-          store: { getState: () => _0x3cf8d8, getIncomingEdges: () => [] },
+      let value18 = 0,
+        value19 = 0,
+        value20 = 0,
+        value21 = 0;
+      const aIGenerateNodeStateSyncModule = createAIGenerateNodeStateSyncModule({
+          store: { getState: () => _data, getIncomingEdges: () => [] },
           getImage: async () => null,
-          getDisplayModelName: (_0x5a458a) => _0x5a458a,
+          getDisplayModelName: (value22) => value22,
           stopLoading: () => {
-            _0x12757f += 1;
+            value18 += 1;
           },
         }),
-        _0x2a3e33 = Object.assign(Object.create(_0x54b6b9), {
-          nodeId: _0x2199a3,
-          _data: _0x3cf8d8.nodes[_0x2199a3],
+        value23 = Object.assign(Object.create(aIGenerateNodeStateSyncModule), {
+          nodeId: id,
+          _data: _data.nodes[id],
           _isGenerating: true,
           _dreaminaActiveSubmitId: 'sid-terminal',
           _refThumbObjectUrls: new Map(),
           previewEl: {},
           btnEl: createButtonStub(),
           promptEl: { innerHTML: '', innerText: 'prompt' },
-          _normalizeDreaminaNodeData: (_0x58daad) => _0x58daad,
+          _normalizeDreaminaNodeData: (value24) => value24,
           _loadAndDisplayImage: () => {},
           _applyMaskPreview: () => {},
           _applyModelParamVisibility: () => {},
           _stopDreaminaRecovery: () => {
-            _0x2fb788 += 1;
+            value19 += 1;
           },
           _maybeResumeDreaminaTaskImpl: () => {
-            _0x3501df += 1;
+            value20 += 1;
           },
           _updateSubmitButtonState: () => {
-            _0x195ff4 += 1;
+            value21 += 1;
           },
         });
-      (_0x54b6b9.update.call(_0x2a3e33, {
-        id: _0x2199a3,
+      (aIGenerateNodeStateSyncModule.update.call(value23, {
+        id: id,
         model: 'dreamina/4.1',
         provider: 'dreamina',
         jobStatus: 'error',
@@ -362,67 +365,67 @@ function createDragEvent(_0x2ed3a6) {
         dreaminaTaskPhase: 'generating',
         isGenerating: false,
       }),
-        assert.equal(_0x2a3e33._isGenerating, false),
-        assert.equal(_0x2a3e33._dreaminaActiveSubmitId, ''),
-        assert.equal(_0x12757f, 1),
-        assert.equal(_0x2fb788, 1),
-        assert.equal(_0x3501df, 0),
-        assert.equal(_0x195ff4, 1),
-        assert.equal(_0x2a3e33.btnEl.classList.contains('is-rh-busy'), false),
-        assert.equal(_0x2a3e33.btnEl.title, '生成'),
-        assert.doesNotMatch(_0x2a3e33.btnEl.innerHTML, /animation:spin/));
+        assert.equal(value23._isGenerating, false),
+        assert.equal(value23._dreaminaActiveSubmitId, ''),
+        assert.equal(value18, 1),
+        assert.equal(value19, 1),
+        assert.equal(value20, 0),
+        assert.equal(value21, 1),
+        assert.equal(value23.btnEl.classList.contains('is-rh-busy'), false),
+        assert.equal(value23.btnEl.title, '生成'),
+        assert.doesNotMatch(value23.btnEl.innerHTML, /animation:spin/));
     } finally {
-      typeof _0xf6838c === 'undefined' ? delete globalThis.document : (globalThis.document = _0xf6838c);
+      typeof value17 === 'undefined' ? delete globalThis.document : (globalThis.document = value17);
     }
   }),
   test('aigenImage state sync: running RH task keeps loading when inactive Dreamina fields are done', () => {
-    const _0x45f2b2 = globalThis.document;
+    const value25 = globalThis.document;
     globalThis.document = { activeElement: null };
     try {
-      const _0x452646 = 'node-state-sync-rh-running',
-        _0x2e2c6a = {
+      const id2 = 'node-state-sync-rh-running',
+        _data2 = {
           selectedNodeIds: [],
           pickConnectMode: {},
           nodes: {
-            [_0x452646]: { id: _0x452646, model: 'runninghub/2044874075721441281', provider: 'runninghubwf' },
+            [id2]: { id: id2, model: 'runninghub/2044874075721441281', provider: 'runninghubwf' },
           },
           edges: {},
         };
-      let _0xa71e70 = 0,
-        _0x51ea4b = 0,
-        _0x1b74d4 = 0;
-      const _0x3594fd = createAIGenerateNodeStateSyncModule({
-          store: { getState: () => _0x2e2c6a, getIncomingEdges: () => [] },
+      let value26 = 0,
+        value27 = 0,
+        value28 = 0;
+      const aIGenerateNodeStateSyncModule2 = createAIGenerateNodeStateSyncModule({
+          store: { getState: () => _data2, getIncomingEdges: () => [] },
           getImage: async () => null,
-          getDisplayModelName: (_0x1ea2bf) => _0x1ea2bf,
+          getDisplayModelName: (value29) => value29,
           startLoading: () => {
-            _0xa71e70 += 1;
+            value26 += 1;
           },
           stopLoading: () => {
-            _0x51ea4b += 1;
+            value27 += 1;
           },
         }),
-        _0xe1d71b = Object.assign(Object.create(_0x3594fd), {
-          nodeId: _0x452646,
-          _data: _0x2e2c6a.nodes[_0x452646],
+        value30 = Object.assign(Object.create(aIGenerateNodeStateSyncModule2), {
+          nodeId: id2,
+          _data: _data2.nodes[id2],
           _isGenerating: true,
           _refThumbObjectUrls: new Map(),
           previewEl: {},
           btnEl: createButtonStub(),
           promptEl: { innerHTML: '', innerText: 'prompt' },
-          _normalizeDreaminaNodeData: (_0x3f3217) => _0x3f3217,
+          _normalizeDreaminaNodeData: (value31) => value31,
           _loadAndDisplayImage: () => {},
           _applyMaskPreview: () => {},
           _applyModelParamVisibility: () => {},
           _maybeResumeRunningHubTaskImpl: () => {
-            _0x1b74d4 += 1;
+            value28 += 1;
           },
           _maybeResumeDreaminaTaskImpl: () => {},
           _maybeResumeAsyncTaskImpl: () => {},
           _updateSubmitButtonState: () => {},
         });
-      (_0x3594fd.update.call(_0xe1d71b, {
-        id: _0x452646,
+      (aIGenerateNodeStateSyncModule2.update.call(value30, {
+        id: id2,
         model: 'runninghub/2044874075721441281',
         provider: 'runninghubwf',
         imageUrl: '/output/previous.png',
@@ -433,49 +436,49 @@ function createDragEvent(_0x2ed3a6) {
         dreaminaTaskPhase: 'done',
         asyncTaskStatus: 'idle',
       }),
-        assert.equal(_0xe1d71b._isGenerating, true),
-        assert.equal(_0xa71e70, 1),
-        assert.equal(_0x51ea4b, 0),
-        assert.equal(_0x1b74d4, 1),
-        assert.equal(_0xe1d71b.btnEl.classList.contains('is-rh-busy'), true),
-        assert.match(_0xe1d71b.btnEl.innerHTML, /animation:spin/));
+        assert.equal(value30._isGenerating, true),
+        assert.equal(value26, 1),
+        assert.equal(value27, 0),
+        assert.equal(value28, 1),
+        assert.equal(value30.btnEl.classList.contains('is-rh-busy'), true),
+        assert.match(value30.btnEl.innerHTML, /animation:spin/));
     } finally {
-      typeof _0x45f2b2 === 'undefined' ? delete globalThis.document : (globalThis.document = _0x45f2b2);
+      typeof value25 === 'undefined' ? delete globalThis.document : (globalThis.document = value25);
     }
   }),
   test('aigenImage state sync: live running state restarts loading after remount', () => {
-    const _0x1015af = globalThis.document;
+    const value32 = globalThis.document;
     globalThis.document = { activeElement: null };
     try {
-      const _0x20c7e7 = 'node-state-sync-live-running',
-        _0x53cf8a = {
+      const id3 = 'node-state-sync-live-running',
+        _data3 = {
           selectedNodeIds: [],
           pickConnectMode: {},
-          nodes: { [_0x20c7e7]: { id: _0x20c7e7, model: 'volcengine/seedream-4.0', provider: 'volcengine' } },
+          nodes: { [id3]: { id: id3, model: 'volcengine/seedream-4.0', provider: 'volcengine' } },
           edges: {},
         };
-      let _0x1dfa70 = 0,
-        _0x174fcd = 0;
-      const _0x432620 = createAIGenerateNodeStateSyncModule({
-          store: { getState: () => _0x53cf8a, getIncomingEdges: () => [] },
+      let value33 = 0,
+        value34 = 0;
+      const aIGenerateNodeStateSyncModule3 = createAIGenerateNodeStateSyncModule({
+          store: { getState: () => _data3, getIncomingEdges: () => [] },
           getImage: async () => null,
-          getDisplayModelName: (_0x8634e7) => _0x8634e7,
+          getDisplayModelName: (value35) => value35,
           startLoading: () => {
-            _0x1dfa70 += 1;
+            value33 += 1;
           },
           stopLoading: () => {
-            _0x174fcd += 1;
+            value34 += 1;
           },
         }),
-        _0x433195 = Object.assign(Object.create(_0x432620), {
-          nodeId: _0x20c7e7,
-          _data: _0x53cf8a.nodes[_0x20c7e7],
+        value36 = Object.assign(Object.create(aIGenerateNodeStateSyncModule3), {
+          nodeId: id3,
+          _data: _data3.nodes[id3],
           _isGenerating: false,
           _refThumbObjectUrls: new Map(),
           previewEl: {},
           btnEl: createIdleButtonStub(),
           promptEl: { innerHTML: '', innerText: 'prompt' },
-          _normalizeDreaminaNodeData: (_0x23bca6) => _0x23bca6,
+          _normalizeDreaminaNodeData: (value37) => value37,
           _loadAndDisplayImage: () => {},
           _applyMaskPreview: () => {},
           _applyModelParamVisibility: () => {},
@@ -484,8 +487,8 @@ function createDragEvent(_0x2ed3a6) {
           _maybeResumeAsyncTaskImpl: () => {},
           _updateSubmitButtonState: () => {},
         });
-      (_0x432620.update.call(_0x433195, {
-        id: _0x20c7e7,
+      (aIGenerateNodeStateSyncModule3.update.call(value36, {
+        id: id3,
         model: 'volcengine/seedream-4.0',
         provider: 'volcengine',
         isGenerating: true,
@@ -493,19 +496,19 @@ function createDragEvent(_0x2ed3a6) {
         generationStartTime: 0x3e8,
         generationDuration: null,
       }),
-        assert.equal(_0x433195._isGenerating, true),
-        assert.equal(_0x1dfa70, 1),
-        assert.equal(_0x174fcd, 0));
+        assert.equal(value36._isGenerating, true),
+        assert.equal(value33, 1),
+        assert.equal(value34, 0));
     } finally {
-      typeof _0x1015af === 'undefined' ? delete globalThis.document : (globalThis.document = _0x1015af);
+      typeof value32 === 'undefined' ? delete globalThis.document : (globalThis.document = value32);
     }
   }),
   test('aigenImage submit button: running RH state renders cancel button from unified state', () => {
-    const _0x4e3a46 = 'node-image-rh-running-button-state',
-      _0x1ebd7f = {
+    const id4 = 'node-image-rh-running-button-state',
+      _data4 = {
         nodes: {
-          [_0x4e3a46]: {
-            id: _0x4e3a46,
+          [id4]: {
+            id: id4,
             model: 'runninghub/2044874075721441281',
             provider: 'runninghubwf',
             rhTaskId: 'rh-image-running',
@@ -515,45 +518,45 @@ function createDragEvent(_0x2ed3a6) {
           },
         },
       },
-      _0x572b02 = createAIGenerateNodeUiModule({
-        store: { getState: () => _0x1ebd7f, getIncomingEdges: () => [] },
+      aIGenerateNodeUiModule = createAIGenerateNodeUiModule({
+        store: { getState: () => _data4, getIncomingEdges: () => [] },
       }),
-      _0x9e6dbe = Object.assign(Object.create(_0x572b02), {
-        nodeId: _0x4e3a46,
-        _data: _0x1ebd7f.nodes[_0x4e3a46],
+      value38 = Object.assign(Object.create(aIGenerateNodeUiModule), {
+        nodeId: id4,
+        _data: _data4.nodes[id4],
         _rhCancelInFlight: false,
         promptEl: { innerText: 'prompt' },
         btnEl: createIdleButtonStub(),
         _isRunninghubWorkflowModel: () => true,
       });
-    (_0x572b02._updateSubmitButtonState.call(_0x9e6dbe),
-      assert.equal(_0x9e6dbe.btnEl.disabled, false),
-      assert.equal(_0x9e6dbe.btnEl.style.cursor, ''),
-      assert.equal(_0x9e6dbe.btnEl.classList.contains('is-task-cancel'), true),
-      assert.match(_0x9e6dbe.btnEl.innerHTML, /v2-task-cancel-spin/),
-      (_0x9e6dbe._rhCancelInFlight = true),
-      _0x572b02._updateSubmitButtonState.call(_0x9e6dbe),
-      assert.equal(_0x9e6dbe.btnEl.disabled, true),
-      assert.equal(_0x9e6dbe.btnEl.style.cursor, 'var(--unavailable-cursor)'),
-      assert.equal(_0x9e6dbe.btnEl.classList.contains('is-task-cancel'), true),
-      (_0x1ebd7f.nodes[_0x4e3a46] = {
-        ..._0x1ebd7f.nodes[_0x4e3a46],
+    (aIGenerateNodeUiModule._updateSubmitButtonState.call(value38),
+      assert.equal(value38.btnEl.disabled, false),
+      assert.equal(value38.btnEl.style.cursor, ''),
+      assert.equal(value38.btnEl.classList.contains('is-task-cancel'), true),
+      assert.match(value38.btnEl.innerHTML, /v2-task-cancel-spin/),
+      (value38._rhCancelInFlight = true),
+      aIGenerateNodeUiModule._updateSubmitButtonState.call(value38),
+      assert.equal(value38.btnEl.disabled, true),
+      assert.equal(value38.btnEl.style.cursor, 'var(--unavailable-cursor)'),
+      assert.equal(value38.btnEl.classList.contains('is-task-cancel'), true),
+      (_data4.nodes[id4] = {
+        ..._data4.nodes[id4],
         rhTaskStatus: 'failed',
         jobStatus: 'error',
         isGenerating: true,
       }),
-      (_0x9e6dbe._data = _0x1ebd7f.nodes[_0x4e3a46]),
-      (_0x9e6dbe._rhCancelInFlight = false),
-      _0x572b02._updateSubmitButtonState.call(_0x9e6dbe),
-      assert.equal(_0x9e6dbe.btnEl.classList.contains('is-task-cancel'), false),
-      assert.doesNotMatch(_0x9e6dbe.btnEl.innerHTML, /v2-task-cancel-spin/));
+      (value38._data = _data4.nodes[id4]),
+      (value38._rhCancelInFlight = false),
+      aIGenerateNodeUiModule._updateSubmitButtonState.call(value38),
+      assert.equal(value38.btnEl.classList.contains('is-task-cancel'), false),
+      assert.doesNotMatch(value38.btnEl.innerHTML, /v2-task-cancel-spin/));
   }),
   test('aigenImage submit button: finished async status is terminal and unlocks generation', () => {
-    const _0x709995 = 'node-image-grsai-finished-button-state',
-      _0x47ebac = {
+    const id5 = 'node-image-grsai-finished-button-state',
+      _data5 = {
         nodes: {
-          [_0x709995]: {
-            id: _0x709995,
+          [id5]: {
+            id: id5,
             type: 'ai-image',
             model: 'nano-banana-2',
             provider: 'grsai',
@@ -566,113 +569,113 @@ function createDragEvent(_0x2ed3a6) {
           },
         },
       },
-      _0x4153c0 = createAIGenerateNodeUiModule({
-        store: { getState: () => _0x47ebac, getIncomingEdges: () => [] },
+      aIGenerateNodeUiModule2 = createAIGenerateNodeUiModule({
+        store: { getState: () => _data5, getIncomingEdges: () => [] },
       }),
-      _0x410155 = Object.assign(Object.create(_0x4153c0), {
-        nodeId: _0x709995,
-        _data: _0x47ebac.nodes[_0x709995],
+      value39 = Object.assign(Object.create(aIGenerateNodeUiModule2), {
+        nodeId: id5,
+        _data: _data5.nodes[id5],
         promptEl: { innerText: 'prompt' },
         btnEl: createIdleButtonStub(),
         _isRunninghubWorkflowModel: () => false,
       });
-    (_0x4153c0._updateSubmitButtonState.call(_0x410155),
-      assert.equal(_0x410155.btnEl.disabled, false),
-      assert.equal(_0x410155.btnEl.style.cursor, ''),
-      assert.doesNotMatch(_0x410155.btnEl.innerHTML, /animation:spin/));
+    (aIGenerateNodeUiModule2._updateSubmitButtonState.call(value39),
+      assert.equal(value39.btnEl.disabled, false),
+      assert.equal(value39.btnEl.style.cursor, ''),
+      assert.doesNotMatch(value39.btnEl.innerHTML, /animation:spin/));
   }),
   test('aigenImage submit button: empty editor can generate from non-empty text input', () => {
-    const _0x1fc360 = 'node-image-text-input-button',
-      _0x5641ce = 'node-image-text-input-source',
-      _0x19d72e = {
+    const id6 = 'node-image-text-input-button',
+      id7 = 'node-image-text-input-source',
+      _data6 = {
         nodes: {
-          [_0x1fc360]: { id: _0x1fc360, type: 'ai-image', model: 'gpt-image-2', provider: 'grsai' },
-          [_0x5641ce]: { id: _0x5641ce, type: 'source-text', text: '用文本入参生成一张海报' },
+          [id6]: { id: id6, type: 'ai-image', model: 'gpt-image-2', provider: 'grsai' },
+          [id7]: { id: id7, type: 'source-text', text: '用文本入参生成一张海报' },
         },
       },
-      _0x293889 = [{ id: 'edge-image-text-input', sourceId: _0x5641ce, targetId: _0x1fc360 }],
-      _0xb99df5 = createAIGenerateNodeUiModule({
-        store: { getState: () => _0x19d72e, getIncomingEdges: () => _0x293889 },
+      value40 = [{ id: 'edge-image-text-input', sourceId: id7, targetId: id6 }],
+      aIGenerateNodeUiModule3 = createAIGenerateNodeUiModule({
+        store: { getState: () => _data6, getIncomingEdges: () => value40 },
       }),
-      _0x3fc97f = Object.assign(Object.create(_0xb99df5), {
-        nodeId: _0x1fc360,
-        _data: _0x19d72e.nodes[_0x1fc360],
+      value41 = Object.assign(Object.create(aIGenerateNodeUiModule3), {
+        nodeId: id6,
+        _data: _data6.nodes[id6],
         promptEl: { innerText: '', childNodes: [] },
         btnEl: createIdleButtonStub(),
         _isRunninghubWorkflowModel: () => false,
       });
-    (_0xb99df5._updateSubmitButtonState.call(_0x3fc97f),
-      assert.equal(_0x3fc97f.btnEl.disabled, false),
-      assert.equal(_0x3fc97f.btnEl.style.cursor, ''));
+    (aIGenerateNodeUiModule3._updateSubmitButtonState.call(value41),
+      assert.equal(value41.btnEl.disabled, false),
+      assert.equal(value41.btnEl.style.cursor, ''));
   }),
   test('aigenImage submit button: Agnes image input can generate without prompt', () => {
-    const _0x2d87d5 = 'node-agnes-image-input-button',
-      _0x2290ce = 'node-agnes-image-input-source',
-      _0xe8657f = {
+    const id8 = 'node-agnes-image-input-button',
+      id9 = 'node-agnes-image-input-source',
+      _data7 = {
         nodes: {
-          [_0x2d87d5]: {
-            id: _0x2d87d5,
+          [id8]: {
+            id: id8,
             type: 'ai-image',
             model: 'agnes/agnes-image-2.0-flash',
             provider: 'agnes',
           },
-          [_0x2290ce]: { id: _0x2290ce, type: 'source-image', imageUrl: 'https://cdn.example.com/input.png' },
+          [id9]: { id: id9, type: 'source-image', imageUrl: 'https://cdn.example.com/input.png' },
         },
         edges: {
           'edge-agnes-image-input': {
             id: 'edge-agnes-image-input',
-            sourceId: _0x2290ce,
-            targetId: _0x2d87d5,
+            sourceId: id9,
+            targetId: id8,
           },
         },
       },
-      _0x4bfce4 = Object.values(_0xe8657f.edges),
-      _0x5c9a8a = createAIGenerateNodeUiModule({
-        store: { getState: () => _0xe8657f, getIncomingEdges: () => _0x4bfce4 },
+      value42 = Object.values(_data7.edges),
+      aIGenerateNodeUiModule4 = createAIGenerateNodeUiModule({
+        store: { getState: () => _data7, getIncomingEdges: () => value42 },
       }),
-      _0x4ba98e = Object.assign(Object.create(_0x5c9a8a), {
-        nodeId: _0x2d87d5,
-        _data: _0xe8657f.nodes[_0x2d87d5],
+      value43 = Object.assign(Object.create(aIGenerateNodeUiModule4), {
+        nodeId: id8,
+        _data: _data7.nodes[id8],
         promptEl: { innerText: '', childNodes: [] },
         btnEl: createIdleButtonStub(),
         _isRunninghubWorkflowModel: () => false,
       });
-    (_0x5c9a8a._updateSubmitButtonState.call(_0x4ba98e),
-      assert.equal(_0x4ba98e.btnEl.disabled, false),
-      assert.equal(_0x4ba98e.btnEl.style.cursor, ''));
+    (aIGenerateNodeUiModule4._updateSubmitButtonState.call(value43),
+      assert.equal(value43.btnEl.disabled, false),
+      assert.equal(value43.btnEl.style.cursor, ''));
   }),
   test('aigenImage ui normalize: APIMart Seedream manifest models are preserved', () => {
-    const _0x4e1c81 = 'node-apimart-seedream-preserve',
-      _0x26f9c6 = {
+    const id10 = 'node-apimart-seedream-preserve',
+      value44 = {
         nodes: {
-          [_0x4e1c81]: { id: _0x4e1c81, model: 'apimart/seedream-4.0', provider: 'apimart', imageSize: '4K' },
+          [id10]: { id: id10, model: 'apimart/seedream-4.0', provider: 'apimart', imageSize: '4K' },
         },
       },
-      _0x50be3c = [],
-      _0x50a697 = createAIGenerateNodeUiModule({
+      list9 = [],
+      aIGenerateNodeUiModule5 = createAIGenerateNodeUiModule({
         store: {
-          getState: () => _0x26f9c6,
-          updateNodeData: (_0x4ff014, _0x418030) => _0x50be3c.push({ id: _0x4ff014, patch: _0x418030 }),
+          getState: () => value44,
+          updateNodeData: (id11, patch) => list9.push({ id: id11, patch: patch }),
         },
       }),
-      _0x2b7606 = Object.assign(Object.create(_0x50a697), { nodeId: _0x4e1c81 }),
-      _0x58a07d = _0x50a697._normalizeLegacySeedreamModel.call(_0x2b7606, _0x26f9c6.nodes[_0x4e1c81]);
-    (assert.equal(_0x58a07d.model, 'apimart/seedream-4.0'),
-      assert.equal(_0x58a07d.provider, 'apimart'),
-      assert.equal(_0x58a07d.imageSize, '4K'),
-      assert.deepEqual(_0x50be3c, []));
+      value45 = Object.assign(Object.create(aIGenerateNodeUiModule5), { nodeId: id10 }),
+      value46 = aIGenerateNodeUiModule5._normalizeLegacySeedreamModel.call(value45, value44.nodes[id10]);
+    (assert.equal(value46.model, 'apimart/seedream-4.0'),
+      assert.equal(value46.provider, 'apimart'),
+      assert.equal(value46.imageSize, '4K'),
+      assert.deepEqual(list9, []));
   }),
   test('aigenImage state sync: person replace V3 fixed image slots can swap', async () => {
-    const _0x35a46b = globalThis.document;
-    globalThis.document = { createElement: (_0x5354a3) => new FakeElement({ tagName: _0x5354a3 }) };
-    const _0x28e85b = 'node-person-replace-v3';
+    const value47 = globalThis.document;
+    globalThis.document = { createElement: (tagName2) => new FakeElement({ tagName: tagName2 }) };
+    const id12 = 'node-person-replace-v3';
     try {
-      const _0x43ab1f = {
+      const _data8 = {
           selectedNodeIds: [],
           pickConnectMode: {},
           nodes: {
-            [_0x28e85b]: {
-              id: _0x28e85b,
+            [id12]: {
+              id: id12,
               type: 'ai-image',
               model: 'runninghub/2041177685895946242',
               provider: 'runninghubwf',
@@ -693,96 +696,96 @@ function createDragEvent(_0x2ed3a6) {
             },
           },
           edges: {
-            edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x28e85b, refSlot: 'replaceTarget' },
-            edgeB: { id: 'edgeB', sourceId: 'imageB', targetId: _0x28e85b, refSlot: 'replacedImage' },
+            edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: id12, refSlot: 'replaceTarget' },
+            edgeB: { id: 'edgeB', sourceId: 'imageB', targetId: id12, refSlot: 'replacedImage' },
           },
         },
-        _0x442289 = [],
-        _0x8b05a = {
-          getState: () => _0x43ab1f,
-          getIncomingEdges: (_0x58af13) =>
-            Object.values(_0x43ab1f.edges).filter((_0x28fc0d) => _0x28fc0d.targetId === _0x58af13),
-          updateEdgesBatch(_0x376e61, _0x33c401) {
-            _0x442289.push({ removeIds: _0x376e61, addedEdges: _0x33c401 });
+        list10 = [],
+        store = {
+          getState: () => _data8,
+          getIncomingEdges: (value48) =>
+            Object.values(_data8.edges).filter((item8) => item8.targetId === value48),
+          updateEdgesBatch(removeIds, addedEdges) {
+            list10.push({ removeIds: removeIds, addedEdges: addedEdges });
           },
         },
-        _0x587776 = createAIGenerateNodeStateSyncModule({
-          store: _0x8b05a,
+        aIGenerateNodeStateSyncModule4 = createAIGenerateNodeStateSyncModule({
+          store: store,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         }),
-        _0x4625a0 = new FakeElement({ className: 'node-ref-bar' }),
-        _0x3eb4e9 = Object.assign(Object.create(_0x587776), {
-          nodeId: _0x28e85b,
-          _data: _0x43ab1f.nodes[_0x28e85b],
+        refBarEl = new FakeElement({ className: 'node-ref-bar' }),
+        value49 = Object.assign(Object.create(aIGenerateNodeStateSyncModule4), {
+          nodeId: id12,
+          _data: _data8.nodes[id12],
           _refThumbObjectUrls: new Map(),
-          refBarEl: _0x4625a0,
+          refBarEl: refBarEl,
           promptEl: { innerText: '', querySelectorAll: () => [] },
         });
-      await _0x587776._renderRefBarImpl.call(_0x3eb4e9);
-      const _0xb86ac4 = _0x4625a0.querySelector('[data-ref-slot="replaceTarget"]'),
-        _0x107e38 = _0x4625a0.querySelector('[data-ref-slot="replacedImage"]'),
-        _0x125490 = _0x4625a0.querySelector('.ref-thumb-container');
-      (assert.equal(_0xb86ac4.dataset.slot, 'replaceTarget'),
-        assert.equal(_0x107e38.dataset.slot, 'replacedImage'),
-        assert.equal(_0xb86ac4.dataset.kind, 'image'),
-        assert.equal(_0x107e38.dataset.kind, 'image'),
-        assert.equal(_0xb86ac4.getAttribute('draggable'), 'true'),
-        assert.equal(_0x107e38.getAttribute('draggable'), 'true'),
-        assert.equal(_0xb86ac4.classList.contains('ref-upload-slot'), false),
-        assert.equal(_0x107e38.classList.contains('ref-upload-slot'), false),
-        _0x125490.dispatch('dragstart', createDragEvent(_0xb86ac4)),
-        assert.equal(_0xb86ac4.classList.contains('is-dragging'), true),
-        _0x125490.dispatch('dragover', createDragEvent(_0x107e38)),
-        assert.equal(_0x107e38.classList.contains('is-drop-allow'), true),
+      await aIGenerateNodeStateSyncModule4._renderRefBarImpl.call(value49);
+      const el8 = refBarEl.querySelector('[data-ref-slot="replaceTarget"]'),
+        el9 = refBarEl.querySelector('[data-ref-slot="replacedImage"]'),
+        el10 = refBarEl.querySelector('.ref-thumb-container');
+      (assert.equal(el8.dataset.slot, 'replaceTarget'),
+        assert.equal(el9.dataset.slot, 'replacedImage'),
+        assert.equal(el8.dataset.kind, 'image'),
+        assert.equal(el9.dataset.kind, 'image'),
+        assert.equal(el8.getAttribute('draggable'), 'true'),
+        assert.equal(el9.getAttribute('draggable'), 'true'),
+        assert.equal(el8.classList.contains('ref-upload-slot'), false),
+        assert.equal(el9.classList.contains('ref-upload-slot'), false),
+        el10.dispatch('dragstart', createDragEvent(el8)),
+        assert.equal(el8.classList.contains('is-dragging'), true),
+        el10.dispatch('dragover', createDragEvent(el9)),
+        assert.equal(el9.classList.contains('is-drop-allow'), true),
         assert.deepEqual(
-          _0x125490.children.map((_0x4df815) => _0x4df815.dataset.edgeId || ''),
+          el10.children.map((el11) => el11.dataset.edgeId || ''),
           ['edgeA', 'edgeB'],
         ),
-        _0x125490.dispatch('drop', createDragEvent(_0x107e38)),
-        assert.equal(_0x107e38.classList.contains('is-drop-allow'), false),
-        _0x125490.dispatch('dragend', createDragEvent(_0xb86ac4)),
-        assert.equal(_0xb86ac4.classList.contains('is-dragging'), false),
-        assert.equal(_0x442289.length, 1),
-        assert.deepEqual(_0x442289[0].removeIds, ['edgeA', 'edgeB']),
+        el10.dispatch('drop', createDragEvent(el9)),
+        assert.equal(el9.classList.contains('is-drop-allow'), false),
+        el10.dispatch('dragend', createDragEvent(el8)),
+        assert.equal(el8.classList.contains('is-dragging'), false),
+        assert.equal(list10.length, 1),
+        assert.deepEqual(list10[0].removeIds, ['edgeA', 'edgeB']),
         assert.deepEqual(
-          _0x442289[0].addedEdges.map((_0x5c534f) => [_0x5c534f.id, _0x5c534f.refSlot]),
+          list10[0].addedEdges.map((item9) => [item9.id, item9.refSlot]),
           [
             ['edgeA', 'replacedImage'],
             ['edgeB', 'replaceTarget'],
           ],
         ));
-      for (const _0xb0fa64 of _0x442289[0].removeIds) {
-        delete _0x43ab1f.edges[_0xb0fa64];
+      for (const value50 of list10[0].removeIds) {
+        delete _data8.edges[value50];
       }
-      for (const _0x3242ac of _0x442289[0].addedEdges) {
-        _0x43ab1f.edges[_0x3242ac.id] = _0x3242ac;
+      for (const value51 of list10[0].addedEdges) {
+        _data8.edges[value51.id] = value51;
       }
-      await _0x587776._renderRefBarImpl.call(_0x3eb4e9);
-      const _0x2477b2 = _0x4625a0.querySelector('[data-ref-slot="replaceTarget"]'),
-        _0x1c964e = _0x4625a0.querySelector('[data-ref-slot="replacedImage"]');
-      (assert.equal(_0x2477b2.dataset.edgeId, 'edgeB'),
-        assert.equal(_0x2477b2.dataset.sourceId, 'imageB'),
-        assert.equal(_0x1c964e.dataset.edgeId, 'edgeA'),
-        assert.equal(_0x1c964e.dataset.sourceId, 'imageA'));
+      await aIGenerateNodeStateSyncModule4._renderRefBarImpl.call(value49);
+      const el12 = refBarEl.querySelector('[data-ref-slot="replaceTarget"]'),
+        el13 = refBarEl.querySelector('[data-ref-slot="replacedImage"]');
+      (assert.equal(el12.dataset.edgeId, 'edgeB'),
+        assert.equal(el12.dataset.sourceId, 'imageB'),
+        assert.equal(el13.dataset.edgeId, 'edgeA'),
+        assert.equal(el13.dataset.sourceId, 'imageA'));
     } finally {
-      if (typeof _0x35a46b === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x35a46b;
+      if (typeof value47 === 'undefined') delete globalThis.document;
+      else globalThis.document = value47;
     }
   }),
   test('aigenImage state sync: modelApi fixed image slots render from manifest', async () => {
-    const _0x434712 = globalThis.document;
-    globalThis.document = { createElement: (_0x38c30d) => new FakeElement({ tagName: _0x38c30d }) };
-    const _0x541f48 = 'node-youchuan-fixed-slots';
+    const value52 = globalThis.document;
+    globalThis.document = { createElement: (tagName3) => new FakeElement({ tagName: tagName3 }) };
+    const id13 = 'node-youchuan-fixed-slots';
     try {
-      const _0x10d4cd = {
-          selectedNodeIds: [_0x541f48],
+      const _data9 = {
+          selectedNodeIds: [id13],
           pickConnectMode: {},
           nodes: {
-            [_0x541f48]: {
-              id: _0x541f48,
+            [id13]: {
+              id: id13,
               type: 'ai-image',
               model: 'runninghub-model/youchuan-v6',
               provider: 'runninghub',
@@ -803,57 +806,57 @@ function createDragEvent(_0x2ed3a6) {
             },
           },
           edges: {
-            edgeMain: { id: 'edgeMain', sourceId: 'mainImage', targetId: _0x541f48, refSlot: 'imageUrl' },
-            edgeStyle: { id: 'edgeStyle', sourceId: 'styleImage', targetId: _0x541f48, refSlot: 'sref' },
+            edgeMain: { id: 'edgeMain', sourceId: 'mainImage', targetId: id13, refSlot: 'imageUrl' },
+            edgeStyle: { id: 'edgeStyle', sourceId: 'styleImage', targetId: id13, refSlot: 'sref' },
           },
         },
-        _0xc061d1 = {
-          getState: () => _0x10d4cd,
-          getStateRaw: () => _0x10d4cd,
-          getIncomingEdges: (_0x2b8f2b) =>
-            Object.values(_0x10d4cd.edges).filter((_0x1895f8) => _0x1895f8.targetId === _0x2b8f2b),
+        store2 = {
+          getState: () => _data9,
+          getStateRaw: () => _data9,
+          getIncomingEdges: (value53) =>
+            Object.values(_data9.edges).filter((item10) => item10.targetId === value53),
           updateEdgesBatch() {},
         },
-        _0x499dfc = createAIGenerateNodeStateSyncModule({
-          store: _0xc061d1,
+        aIGenerateNodeStateSyncModule5 = createAIGenerateNodeStateSyncModule({
+          store: store2,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         }),
-        _0x2837ef = new FakeElement({ className: 'node-ref-bar' }),
-        _0x7d5e6c = Object.assign(Object.create(_0x499dfc), {
-          nodeId: _0x541f48,
-          _data: _0x10d4cd.nodes[_0x541f48],
+        refBarEl2 = new FakeElement({ className: 'node-ref-bar' }),
+        value54 = Object.assign(Object.create(aIGenerateNodeStateSyncModule5), {
+          nodeId: id13,
+          _data: _data9.nodes[id13],
           _refThumbObjectUrls: new Map(),
-          refBarEl: _0x2837ef,
+          refBarEl: refBarEl2,
           promptEl: { innerText: '', querySelectorAll: () => [] },
         });
-      await _0x499dfc._renderRefBarImpl.call(_0x7d5e6c);
-      const _0xd6504b = _0x2837ef.querySelector('[data-ref-slot="imageUrl"]'),
-        _0xb32198 = _0x2837ef.querySelector('[data-ref-slot="cref"]'),
-        _0x40e18c = _0x2837ef.querySelector('[data-ref-slot="sref"]');
-      (assert.equal(_0xd6504b.dataset.edgeId, 'edgeMain'),
-        assert.equal(_0xd6504b.dataset.kind, 'image'),
-        assert.equal(_0xb32198.classList.contains('ref-upload-slot'), true),
-        assert.equal(_0x40e18c.dataset.edgeId, 'edgeStyle'),
-        assert.equal(_0x40e18c.dataset.sourceId, 'styleImage'));
+      await aIGenerateNodeStateSyncModule5._renderRefBarImpl.call(value54);
+      const el14 = refBarEl2.querySelector('[data-ref-slot="imageUrl"]'),
+        el15 = refBarEl2.querySelector('[data-ref-slot="cref"]'),
+        el16 = refBarEl2.querySelector('[data-ref-slot="sref"]');
+      (assert.equal(el14.dataset.edgeId, 'edgeMain'),
+        assert.equal(el14.dataset.kind, 'image'),
+        assert.equal(el15.classList.contains('ref-upload-slot'), true),
+        assert.equal(el16.dataset.edgeId, 'edgeStyle'),
+        assert.equal(el16.dataset.sourceId, 'styleImage'));
     } finally {
-      if (typeof _0x434712 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x434712;
+      if (typeof value52 === 'undefined') delete globalThis.document;
+      else globalThis.document = value52;
     }
   }),
   test('aigenImage state sync: Midjourney V7 renders only main and style fixed slots', async () => {
-    const _0xfabdf8 = globalThis.document;
-    globalThis.document = { createElement: (_0x8ccf66) => new FakeElement({ tagName: _0x8ccf66 }) };
-    const _0x2666e6 = 'node-youchuan-v7-fixed-slots';
+    const value55 = globalThis.document;
+    globalThis.document = { createElement: (tagName4) => new FakeElement({ tagName: tagName4 }) };
+    const id14 = 'node-youchuan-v7-fixed-slots';
     try {
-      const _0x1d5575 = {
-          selectedNodeIds: [_0x2666e6],
+      const _data10 = {
+          selectedNodeIds: [id14],
           pickConnectMode: {},
           nodes: {
-            [_0x2666e6]: {
-              id: _0x2666e6,
+            [id14]: {
+              id: id14,
               type: 'ai-image',
               model: 'runninghub-model/youchuan-v7',
               provider: 'runninghub',
@@ -874,57 +877,57 @@ function createDragEvent(_0x2ed3a6) {
             },
           },
           edges: {
-            edgeMain: { id: 'edgeMain', sourceId: 'mainImage', targetId: _0x2666e6, refSlot: 'imageUrl' },
-            edgeStyle: { id: 'edgeStyle', sourceId: 'styleImage', targetId: _0x2666e6, refSlot: 'sref' },
+            edgeMain: { id: 'edgeMain', sourceId: 'mainImage', targetId: id14, refSlot: 'imageUrl' },
+            edgeStyle: { id: 'edgeStyle', sourceId: 'styleImage', targetId: id14, refSlot: 'sref' },
           },
         },
-        _0xe38013 = {
-          getState: () => _0x1d5575,
-          getStateRaw: () => _0x1d5575,
-          getIncomingEdges: (_0x36d3c9) =>
-            Object.values(_0x1d5575.edges).filter((_0x3c93e2) => _0x3c93e2.targetId === _0x36d3c9),
+        store3 = {
+          getState: () => _data10,
+          getStateRaw: () => _data10,
+          getIncomingEdges: (value56) =>
+            Object.values(_data10.edges).filter((item11) => item11.targetId === value56),
           updateEdgesBatch() {},
         },
-        _0x4efddc = createAIGenerateNodeStateSyncModule({
-          store: _0xe38013,
+        aIGenerateNodeStateSyncModule6 = createAIGenerateNodeStateSyncModule({
+          store: store3,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         }),
-        _0x1cc0b6 = new FakeElement({ className: 'node-ref-bar' }),
-        _0x2a21f9 = Object.assign(Object.create(_0x4efddc), {
-          nodeId: _0x2666e6,
-          _data: _0x1d5575.nodes[_0x2666e6],
+        refBarEl3 = new FakeElement({ className: 'node-ref-bar' }),
+        value57 = Object.assign(Object.create(aIGenerateNodeStateSyncModule6), {
+          nodeId: id14,
+          _data: _data10.nodes[id14],
           _refThumbObjectUrls: new Map(),
-          refBarEl: _0x1cc0b6,
+          refBarEl: refBarEl3,
           promptEl: { innerText: '', querySelectorAll: () => [] },
         });
-      await _0x4efddc._renderRefBarImpl.call(_0x2a21f9);
-      const _0x36dcb = _0x1cc0b6.querySelector('[data-ref-slot="imageUrl"]'),
-        _0x1ff559 = _0x1cc0b6.querySelector('[data-ref-slot="cref"]'),
-        _0x11cdce = _0x1cc0b6.querySelector('[data-ref-slot="sref"]');
-      (assert.equal(_0x36dcb.dataset.edgeId, 'edgeMain'),
-        assert.equal(_0x36dcb.dataset.kind, 'image'),
-        assert.equal(_0x1ff559, null),
-        assert.equal(_0x11cdce.dataset.edgeId, 'edgeStyle'),
-        assert.equal(_0x11cdce.dataset.sourceId, 'styleImage'));
+      await aIGenerateNodeStateSyncModule6._renderRefBarImpl.call(value57);
+      const el17 = refBarEl3.querySelector('[data-ref-slot="imageUrl"]'),
+        value58 = refBarEl3.querySelector('[data-ref-slot="cref"]'),
+        el18 = refBarEl3.querySelector('[data-ref-slot="sref"]');
+      (assert.equal(el17.dataset.edgeId, 'edgeMain'),
+        assert.equal(el17.dataset.kind, 'image'),
+        assert.equal(value58, null),
+        assert.equal(el18.dataset.edgeId, 'edgeStyle'),
+        assert.equal(el18.dataset.sourceId, 'styleImage'));
     } finally {
-      if (typeof _0xfabdf8 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0xfabdf8;
+      if (typeof value55 === 'undefined') delete globalThis.document;
+      else globalThis.document = value55;
     }
   }),
   test('aigenImage state sync: RunningHub image X renders one manifest fixed image slot', async () => {
-    const _0x457f63 = globalThis.document;
-    globalThis.document = { createElement: (_0x10438a) => new FakeElement({ tagName: _0x10438a }) };
-    const _0x3170ec = 'node-rh-image-x-fixed-slot';
+    const value59 = globalThis.document;
+    globalThis.document = { createElement: (tagName5) => new FakeElement({ tagName: tagName5 }) };
+    const id15 = 'node-rh-image-x-fixed-slot';
     try {
-      const _0x372c4a = {
-          selectedNodeIds: [_0x3170ec],
+      const _data11 = {
+          selectedNodeIds: [id15],
           pickConnectMode: {},
           nodes: {
-            [_0x3170ec]: {
-              id: _0x3170ec,
+            [id15]: {
+              id: id15,
               type: 'ai-image',
               model: 'runninghub-model/rhart-image-g',
               provider: 'runninghub',
@@ -938,51 +941,51 @@ function createDragEvent(_0x2ed3a6) {
             },
           },
           edges: {
-            edgeRef: { id: 'edgeRef', sourceId: 'refImage', targetId: _0x3170ec, refSlot: 'imageUrl' },
+            edgeRef: { id: 'edgeRef', sourceId: 'refImage', targetId: id15, refSlot: 'imageUrl' },
           },
         },
-        _0x291b45 = {
-          getState: () => _0x372c4a,
-          getStateRaw: () => _0x372c4a,
-          getIncomingEdges: (_0x1ed13c) =>
-            Object.values(_0x372c4a.edges).filter((_0x33efd1) => _0x33efd1.targetId === _0x1ed13c),
+        store4 = {
+          getState: () => _data11,
+          getStateRaw: () => _data11,
+          getIncomingEdges: (value60) =>
+            Object.values(_data11.edges).filter((item12) => item12.targetId === value60),
           updateEdgesBatch() {},
         },
-        _0x44567c = createAIGenerateNodeStateSyncModule({
-          store: _0x291b45,
+        aIGenerateNodeStateSyncModule7 = createAIGenerateNodeStateSyncModule({
+          store: store4,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         }),
-        _0x40b651 = new FakeElement({ className: 'node-ref-bar' }),
-        _0x3bc42f = Object.assign(Object.create(_0x44567c), {
-          nodeId: _0x3170ec,
-          _data: _0x372c4a.nodes[_0x3170ec],
+        refBarEl4 = new FakeElement({ className: 'node-ref-bar' }),
+        value61 = Object.assign(Object.create(aIGenerateNodeStateSyncModule7), {
+          nodeId: id15,
+          _data: _data11.nodes[id15],
           _refThumbObjectUrls: new Map(),
-          refBarEl: _0x40b651,
+          refBarEl: refBarEl4,
           promptEl: { innerText: '', querySelectorAll: () => [] },
         });
-      await _0x44567c._renderRefBarImpl.call(_0x3bc42f);
-      const _0x139a9b = _0x40b651.querySelector('[data-ref-slot="imageUrl"]'),
-        _0x1fc669 = _0x40b651.querySelector('[data-ref-slot="sref"]');
-      (assert.equal(_0x139a9b.dataset.edgeId, 'edgeRef'),
-        assert.equal(_0x139a9b.dataset.kind, 'image'),
-        assert.equal(_0x1fc669, null));
+      await aIGenerateNodeStateSyncModule7._renderRefBarImpl.call(value61);
+      const el19 = refBarEl4.querySelector('[data-ref-slot="imageUrl"]'),
+        value62 = refBarEl4.querySelector('[data-ref-slot="sref"]');
+      (assert.equal(el19.dataset.edgeId, 'edgeRef'),
+        assert.equal(el19.dataset.kind, 'image'),
+        assert.equal(value62, null));
     } finally {
-      if (typeof _0x457f63 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x457f63;
+      if (typeof value59 === 'undefined') delete globalThis.document;
+      else globalThis.document = value59;
     }
   }),
   test('aigenImage state sync: refSlot changes trigger immediate ref bar refresh', () => {
-    const _0x5d25b3 = globalThis.document,
-      _0x391207 = 'node-person-replace-v3-refresh',
-      _0x571ee4 = {
-        selectedNodeIds: [_0x391207],
+    const value63 = globalThis.document,
+      id16 = 'node-person-replace-v3-refresh',
+      _data12 = {
+        selectedNodeIds: [id16],
         pickConnectMode: {},
         nodes: {
-          [_0x391207]: {
-            id: _0x391207,
+          [id16]: {
+            id: id16,
             type: 'ai-image',
             model: 'runninghub/2041177685895946242',
             provider: 'runninghubwf',
@@ -991,59 +994,59 @@ function createDragEvent(_0x2ed3a6) {
           imageB: { id: 'imageB', type: 'source-image', _bizRev: 1 },
         },
         edges: {
-          edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x391207, refSlot: 'replaceTarget' },
-          edgeB: { id: 'edgeB', sourceId: 'imageB', targetId: _0x391207, refSlot: 'replacedImage' },
+          edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: id16, refSlot: 'replaceTarget' },
+          edgeB: { id: 'edgeB', sourceId: 'imageB', targetId: id16, refSlot: 'replacedImage' },
         },
       };
     try {
       globalThis.document = { activeElement: null };
-      const _0x379a21 = {
-          getState: () => _0x571ee4,
-          getStateRaw: () => _0x571ee4,
-          getIncomingEdges: (_0x558abe) =>
-            Object.values(_0x571ee4.edges).filter((_0x42135c) => _0x42135c.targetId === _0x558abe),
+      const store5 = {
+          getState: () => _data12,
+          getStateRaw: () => _data12,
+          getIncomingEdges: (value64) =>
+            Object.values(_data12.edges).filter((item13) => item13.targetId === value64),
         },
-        _0x20dc03 = createAIGenerateNodeStateSyncModule({
-          store: _0x379a21,
+        aIGenerateNodeStateSyncModule8 = createAIGenerateNodeStateSyncModule({
+          store: store5,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         });
-      let _0x3f6928 = 0;
-      const _0x11c3eb = Object.assign(Object.create(_0x20dc03), {
-        nodeId: _0x391207,
-        _data: _0x571ee4.nodes[_0x391207],
+      let value65 = 0;
+      const value66 = Object.assign(Object.create(aIGenerateNodeStateSyncModule8), {
+        nodeId: id16,
+        _data: _data12.nodes[id16],
         promptEl: { innerHTML: '', querySelectorAll: () => [] },
-        _normalizeDreaminaNodeData: (_0x4dbd41) => _0x4dbd41,
+        _normalizeDreaminaNodeData: (value67) => value67,
         _loadAndDisplayImage: () => {},
         _applyMaskPreview: () => {},
         _applyModelParamVisibility: () => {},
         _updateSubmitButtonState: () => {},
         _renderRefBar: () => {
-          _0x3f6928 += 1;
+          value65 += 1;
         },
       });
-      (_0x20dc03.update.call(_0x11c3eb, _0x571ee4.nodes[_0x391207]),
-        assert.equal(_0x3f6928, 1),
-        (_0x571ee4.edges.edgeA = { ..._0x571ee4.edges.edgeA, refSlot: 'replacedImage' }),
-        (_0x571ee4.edges.edgeB = { ..._0x571ee4.edges.edgeB, refSlot: 'replaceTarget' }),
-        _0x20dc03.update.call(_0x11c3eb, _0x571ee4.nodes[_0x391207]),
-        assert.equal(_0x3f6928, 2));
+      (aIGenerateNodeStateSyncModule8.update.call(value66, _data12.nodes[id16]),
+        assert.equal(value65, 1),
+        (_data12.edges.edgeA = { ..._data12.edges.edgeA, refSlot: 'replacedImage' }),
+        (_data12.edges.edgeB = { ..._data12.edges.edgeB, refSlot: 'replaceTarget' }),
+        aIGenerateNodeStateSyncModule8.update.call(value66, _data12.nodes[id16]),
+        assert.equal(value65, 2));
     } finally {
-      if (typeof _0x5d25b3 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x5d25b3;
+      if (typeof value63 === 'undefined') delete globalThis.document;
+      else globalThis.document = value63;
     }
   }),
   test('aigenImage state sync: thumbnail order changes trigger immediate ref bar refresh', () => {
-    const _0x4d61f4 = globalThis.document,
-      _0x3628fd = 'node-image-order-refresh',
-      _0x583a8d = {
-        selectedNodeIds: [_0x3628fd],
+    const value68 = globalThis.document,
+      id17 = 'node-image-order-refresh',
+      _data13 = {
+        selectedNodeIds: [id17],
         pickConnectMode: {},
         nodes: {
-          [_0x3628fd]: {
-            id: _0x3628fd,
+          [id17]: {
+            id: id17,
             type: 'ai-image',
             model: 'apimart/nano-banana-2',
             provider: 'apimart',
@@ -1052,60 +1055,60 @@ function createDragEvent(_0x2ed3a6) {
           imageB: { id: 'imageB', type: 'source-image', _bizRev: 1 },
         },
         edges: {
-          edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x3628fd },
-          edgeB: { id: 'edgeB', sourceId: 'imageB', targetId: _0x3628fd },
+          edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: id17 },
+          edgeB: { id: 'edgeB', sourceId: 'imageB', targetId: id17 },
         },
       };
     try {
       globalThis.document = { activeElement: null };
-      const _0xae1aa2 = {
-          getState: () => _0x583a8d,
-          getStateRaw: () => _0x583a8d,
-          getIncomingEdges: (_0x127c52) =>
-            Object.values(_0x583a8d.edges).filter((_0x10db6f) => _0x10db6f.targetId === _0x127c52),
+      const store6 = {
+          getState: () => _data13,
+          getStateRaw: () => _data13,
+          getIncomingEdges: (value69) =>
+            Object.values(_data13.edges).filter((item14) => item14.targetId === value69),
         },
-        _0x579f74 = createAIGenerateNodeStateSyncModule({
-          store: _0xae1aa2,
+        aIGenerateNodeStateSyncModule9 = createAIGenerateNodeStateSyncModule({
+          store: store6,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         });
-      let _0x3ad9ff = 0;
-      const _0x38c430 = Object.assign(Object.create(_0x579f74), {
-        nodeId: _0x3628fd,
-        _data: _0x583a8d.nodes[_0x3628fd],
+      let value70 = 0;
+      const value71 = Object.assign(Object.create(aIGenerateNodeStateSyncModule9), {
+        nodeId: id17,
+        _data: _data13.nodes[id17],
         promptEl: { innerHTML: '', querySelectorAll: () => [] },
-        _normalizeDreaminaNodeData: (_0x3e248d) => _0x3e248d,
+        _normalizeDreaminaNodeData: (value72) => value72,
         _loadAndDisplayImage: () => {},
         _applyMaskPreview: () => {},
         _applyModelParamVisibility: () => {},
         _updateSubmitButtonState: () => {},
         _renderRefBar: () => {
-          _0x3ad9ff += 1;
+          value70 += 1;
         },
       });
-      (_0x579f74.update.call(_0x38c430, _0x583a8d.nodes[_0x3628fd]),
-        assert.equal(_0x3ad9ff, 1),
-        (_0x583a8d.edges = { edgeB: _0x583a8d.edges.edgeB, edgeA: _0x583a8d.edges.edgeA }),
-        _0x579f74.update.call(_0x38c430, _0x583a8d.nodes[_0x3628fd]),
-        assert.equal(_0x3ad9ff, 2));
+      (aIGenerateNodeStateSyncModule9.update.call(value71, _data13.nodes[id17]),
+        assert.equal(value70, 1),
+        (_data13.edges = { edgeB: _data13.edges.edgeB, edgeA: _data13.edges.edgeA }),
+        aIGenerateNodeStateSyncModule9.update.call(value71, _data13.nodes[id17]),
+        assert.equal(value70, 2));
     } finally {
-      if (typeof _0x4d61f4 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x4d61f4;
+      if (typeof value68 === 'undefined') delete globalThis.document;
+      else globalThis.document = value68;
     }
   }),
   test('aigenImage state sync: person replace V2.1 model keeps empty upload slot', async () => {
-    const _0x590a0b = globalThis.document;
-    globalThis.document = { createElement: (_0xead6d5) => new FakeElement({ tagName: _0xead6d5 }) };
-    const _0x4c2b5f = 'node-person-replace-v21';
+    const value73 = globalThis.document;
+    globalThis.document = { createElement: (tagName6) => new FakeElement({ tagName: tagName6 }) };
+    const id18 = 'node-person-replace-v21';
     try {
-      const _0x544d62 = {
+      const _data14 = {
           selectedNodeIds: [],
           pickConnectMode: {},
           nodes: {
-            [_0x4c2b5f]: {
-              id: _0x4c2b5f,
+            [id18]: {
+              id: id18,
               type: 'ai-image',
               model: 'runninghub/2050313968069165058',
               provider: 'runninghubwf',
@@ -1119,53 +1122,53 @@ function createDragEvent(_0x2ed3a6) {
             },
           },
           edges: {
-            edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x4c2b5f, refSlot: 'replaceTarget' },
+            edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: id18, refSlot: 'replaceTarget' },
           },
         },
-        _0x109f91 = {
-          getState: () => _0x544d62,
-          getIncomingEdges: (_0x4d9fa5) =>
-            Object.values(_0x544d62.edges).filter((_0x104a1f) => _0x104a1f.targetId === _0x4d9fa5),
+        store7 = {
+          getState: () => _data14,
+          getIncomingEdges: (value74) =>
+            Object.values(_data14.edges).filter((item15) => item15.targetId === value74),
           updateEdgesBatch() {},
         },
-        _0x8ea6c7 = createAIGenerateNodeStateSyncModule({
-          store: _0x109f91,
+        aIGenerateNodeStateSyncModule10 = createAIGenerateNodeStateSyncModule({
+          store: store7,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         }),
-        _0x5767e7 = new FakeElement({ className: 'node-ref-bar' }),
-        _0x422329 = Object.assign(Object.create(_0x8ea6c7), {
-          nodeId: _0x4c2b5f,
-          _data: _0x544d62.nodes[_0x4c2b5f],
+        refBarEl5 = new FakeElement({ className: 'node-ref-bar' }),
+        value75 = Object.assign(Object.create(aIGenerateNodeStateSyncModule10), {
+          nodeId: id18,
+          _data: _data14.nodes[id18],
           _refThumbObjectUrls: new Map(),
-          refBarEl: _0x5767e7,
+          refBarEl: refBarEl5,
           promptEl: { innerText: '', querySelectorAll: () => [] },
         });
-      await _0x8ea6c7._renderRefBarImpl.call(_0x422329);
-      const _0x11b0c0 = _0x5767e7.querySelector('[data-ref-slot="replaceTarget"]'),
-        _0x4c88ee = _0x5767e7.querySelector('[data-ref-slot="replacedImage"]');
-      (assert.equal(_0x11b0c0.classList.contains('ref-upload-slot'), false),
-        assert.equal(_0x11b0c0.getAttribute('draggable'), 'true'),
-        assert.equal(_0x4c88ee.classList.contains('ref-upload-slot'), true),
-        assert.equal(_0x4c88ee.dataset.refSlot, 'replacedImage'),
-        assert.equal(_0x4c88ee.dataset.slot, 'replacedImage'),
-        assert.equal(_0x4c88ee.dataset.kind, 'image'),
-        assert.equal(_0x4c88ee.getAttribute('draggable'), 'false'));
+      await aIGenerateNodeStateSyncModule10._renderRefBarImpl.call(value75);
+      const el20 = refBarEl5.querySelector('[data-ref-slot="replaceTarget"]'),
+        el21 = refBarEl5.querySelector('[data-ref-slot="replacedImage"]');
+      (assert.equal(el20.classList.contains('ref-upload-slot'), false),
+        assert.equal(el20.getAttribute('draggable'), 'true'),
+        assert.equal(el21.classList.contains('ref-upload-slot'), true),
+        assert.equal(el21.dataset.refSlot, 'replacedImage'),
+        assert.equal(el21.dataset.slot, 'replacedImage'),
+        assert.equal(el21.dataset.kind, 'image'),
+        assert.equal(el21.getAttribute('draggable'), 'false'));
     } finally {
-      if (typeof _0x590a0b === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x590a0b;
+      if (typeof value73 === 'undefined') delete globalThis.document;
+      else globalThis.document = value73;
     }
   }),
   test('aigenImage state sync: anime real image input changes trigger adaptive ratio', async () => {
-    const _0xb3bf0c = globalThis.document,
-      _0x3577bb = 'anime-real-node',
-      _0xdadbc1 = {
+    const value76 = globalThis.document,
+      id19 = 'anime-real-node',
+      _data15 = {
         pickConnectMode: {},
         nodes: {
-          [_0x3577bb]: {
-            id: _0x3577bb,
+          [id19]: {
+            id: id19,
             type: 'ai-image',
             model: 'runninghub/1994718111704158209',
             provider: 'runninghubwf',
@@ -1174,56 +1177,56 @@ function createDragEvent(_0x2ed3a6) {
           imageA: { id: 'imageA', type: 'source-image', width: 0x384, height: 0x640, _bizRev: 1 },
           imageB: { id: 'imageB', type: 'source-image', width: 0x640, height: 0x384, _bizRev: 1 },
         },
-        edges: { edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x3577bb } },
+        edges: { edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: id19 } },
       };
     try {
       globalThis.document = {
         activeElement: null,
-        createElement: (_0x37ddfa) => new FakeElement({ tagName: _0x37ddfa }),
+        createElement: (tagName7) => new FakeElement({ tagName: tagName7 }),
       };
-      const _0x176c53 = {
-          getState: () => _0xdadbc1,
-          getIncomingEdges: (_0x520aea) =>
-            Object.values(_0xdadbc1.edges).filter((_0x15d31e) => _0x15d31e.targetId === _0x520aea),
+      const store8 = {
+          getState: () => _data15,
+          getIncomingEdges: (value77) =>
+            Object.values(_data15.edges).filter((item16) => item16.targetId === value77),
         },
-        _0x323957 = createAIGenerateNodeStateSyncModule({
-          store: _0x176c53,
+        aIGenerateNodeStateSyncModule11 = createAIGenerateNodeStateSyncModule({
+          store: store8,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         });
-      let _0x2b0796 = 0;
-      const _0x3dec7c = Object.assign(Object.create(_0x323957), {
-        nodeId: _0x3577bb,
-        _data: _0xdadbc1.nodes[_0x3577bb],
+      let value78 = 0;
+      const value79 = Object.assign(Object.create(aIGenerateNodeStateSyncModule11), {
+        nodeId: id19,
+        _data: _data15.nodes[id19],
         refBarEl: new FakeElement(),
         _refThumbObjectUrls: new Map(),
         runAdaptiveRatio: () => {
-          _0x2b0796 += 1;
+          value78 += 1;
         },
         promptEl: { innerText: '', querySelectorAll: () => [] },
       });
-      (await _0x323957._renderRefBarImpl.call(_0x3dec7c),
-        await new Promise((_0x3cb921) => setTimeout(_0x3cb921, 70)),
-        assert.equal(_0x2b0796, 1),
-        (_0xdadbc1.edges.edgeA = { ..._0xdadbc1.edges.edgeA, sourceId: 'imageB' }),
-        await _0x323957._renderRefBarImpl.call(_0x3dec7c),
-        await new Promise((_0x54c533) => setTimeout(_0x54c533, 70)),
-        assert.equal(_0x2b0796, 2));
+      (await aIGenerateNodeStateSyncModule11._renderRefBarImpl.call(value79),
+        await new Promise((value80) => setTimeout(value80, 70)),
+        assert.equal(value78, 1),
+        (_data15.edges.edgeA = { ..._data15.edges.edgeA, sourceId: 'imageB' }),
+        await aIGenerateNodeStateSyncModule11._renderRefBarImpl.call(value79),
+        await new Promise((value81) => setTimeout(value81, 70)),
+        assert.equal(value78, 2));
     } finally {
-      if (typeof _0xb3bf0c === 'undefined') delete globalThis.document;
-      else globalThis.document = _0xb3bf0c;
+      if (typeof value76 === 'undefined') delete globalThis.document;
+      else globalThis.document = value76;
     }
   }),
   test('aigenImage state sync: group output order changes trigger adaptive ratio', async () => {
-    const _0x1f8fc7 = globalThis.document,
-      _0x332819 = 'schema-image-node',
-      _0x584ca0 = {
+    const value82 = globalThis.document,
+      id20 = 'schema-image-node',
+      _data16 = {
         pickConnectMode: {},
         nodes: {
-          [_0x332819]: {
-            id: _0x332819,
+          [id20]: {
+            id: id20,
             type: 'ai-image',
             model: 'apimart/nano-banana-2',
             provider: 'apimart',
@@ -1251,72 +1254,72 @@ function createDragEvent(_0x2ed3a6) {
           groupEdge: {
             id: 'groupEdge',
             sourceId: 'group',
-            targetId: _0x332819,
+            targetId: id20,
             groupOutputSourceOrder: ['imageA', 'imageB'],
           },
         },
       },
-      _0x9e15ff = () =>
-        _0x584ca0.edges.groupEdge.groupOutputSourceOrder.map((_0x44d013) => ({
-          ..._0x584ca0.edges.groupEdge,
-          id: 'groupEdge::group-output::' + _0x44d013,
-          sourceId: _0x44d013,
+      handler = () =>
+        _data16.edges.groupEdge.groupOutputSourceOrder.map((sourceId) => ({
+          ..._data16.edges.groupEdge,
+          id: 'groupEdge::group-output::' + sourceId,
+          sourceId: sourceId,
           isGroupOutput: true,
           outputGroupId: 'group',
           groupOutputEdgeId: 'groupEdge',
-          effectiveTargetId: _0x332819,
+          effectiveTargetId: id20,
         }));
     try {
       globalThis.document = {
         activeElement: null,
-        createElement: (_0x5a6d3d) => new FakeElement({ tagName: _0x5a6d3d }),
+        createElement: (tagName8) => new FakeElement({ tagName: tagName8 }),
       };
-      const _0x5b4053 = {
-          getState: () => _0x584ca0,
-          getIncomingEdges: (_0x2ca069) => (_0x2ca069 === _0x332819 ? _0x9e15ff() : []),
+      const store9 = {
+          getState: () => _data16,
+          getIncomingEdges: (value83) => (value83 === id20 ? handler() : []),
         },
-        _0x1ba444 = createAIGenerateNodeStateSyncModule({
-          store: _0x5b4053,
+        aIGenerateNodeStateSyncModule12 = createAIGenerateNodeStateSyncModule({
+          store: store9,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         });
-      let _0x100959 = 0;
-      const _0x2c0b46 = Object.assign(Object.create(_0x1ba444), {
-        nodeId: _0x332819,
-        _data: _0x584ca0.nodes[_0x332819],
+      let value84 = 0;
+      const value85 = Object.assign(Object.create(aIGenerateNodeStateSyncModule12), {
+        nodeId: id20,
+        _data: _data16.nodes[id20],
         refBarEl: new FakeElement(),
         _refThumbObjectUrls: new Map(),
         runAdaptiveRatio: () => {
-          _0x100959 += 1;
+          value84 += 1;
         },
         promptEl: { innerText: '', querySelectorAll: () => [] },
       });
-      (await _0x1ba444._renderRefBarImpl.call(_0x2c0b46),
-        await new Promise((_0x421f4c) => setTimeout(_0x421f4c, 70)),
-        assert.equal(_0x100959, 1),
-        (_0x584ca0.edges.groupEdge = {
-          ..._0x584ca0.edges.groupEdge,
+      (await aIGenerateNodeStateSyncModule12._renderRefBarImpl.call(value85),
+        await new Promise((value86) => setTimeout(value86, 70)),
+        assert.equal(value84, 1),
+        (_data16.edges.groupEdge = {
+          ..._data16.edges.groupEdge,
           groupOutputSourceOrder: ['imageB', 'imageA'],
         }),
-        await _0x1ba444._renderRefBarImpl.call(_0x2c0b46),
-        await new Promise((_0x46d55c) => setTimeout(_0x46d55c, 70)),
-        assert.equal(_0x100959, 2));
+        await aIGenerateNodeStateSyncModule12._renderRefBarImpl.call(value85),
+        await new Promise((value87) => setTimeout(value87, 70)),
+        assert.equal(value84, 2));
     } finally {
-      if (typeof _0x1f8fc7 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x1f8fc7;
+      if (typeof value82 === 'undefined') delete globalThis.document;
+      else globalThis.document = value82;
     }
   }),
   test('aigenImage state sync: group first output removal triggers adaptive ratio while ref bar hidden', async () => {
-    const _0x748806 = globalThis.document,
-      _0x4d6adb = 'schema-image-node',
-      _0x3563dc = {
+    const value88 = globalThis.document,
+      id21 = 'schema-image-node',
+      _data17 = {
         pickConnectMode: {},
         selectedNodeIds: [],
         nodes: {
-          [_0x4d6adb]: {
-            id: _0x4d6adb,
+          [id21]: {
+            id: id21,
             type: 'ai-image',
             model: 'apimart/nano-banana-2',
             provider: 'apimart',
@@ -1344,82 +1347,82 @@ function createDragEvent(_0x2ed3a6) {
           groupEdge: {
             id: 'groupEdge',
             sourceId: 'group',
-            targetId: _0x4d6adb,
+            targetId: id21,
             groupOutputSourceOrder: ['imageA', 'imageB'],
           },
         },
       },
-      _0x33d009 = () =>
-        _0x3563dc.edges.groupEdge.groupOutputSourceOrder
-          .filter((_0x412029) => _0x3563dc.nodes[_0x412029]?.parentId === 'group')
-          .map((_0x421dd6) => ({
-            ..._0x3563dc.edges.groupEdge,
-            id: 'groupEdge::group-output::' + _0x421dd6,
-            sourceId: _0x421dd6,
+      handler2 = () =>
+        _data17.edges.groupEdge.groupOutputSourceOrder
+          .filter((item17) => _data17.nodes[item17]?.parentId === 'group')
+          .map((sourceId2) => ({
+            ..._data17.edges.groupEdge,
+            id: 'groupEdge::group-output::' + sourceId2,
+            sourceId: sourceId2,
             isGroupOutput: true,
             outputGroupId: 'group',
             groupOutputEdgeId: 'groupEdge',
-            effectiveTargetId: _0x4d6adb,
+            effectiveTargetId: id21,
           }));
     try {
       globalThis.document = {
         activeElement: null,
-        createElement: (_0x22b251) => new FakeElement({ tagName: _0x22b251 }),
+        createElement: (tagName9) => new FakeElement({ tagName: tagName9 }),
       };
-      const _0x421c20 = {
-          getState: () => _0x3563dc,
-          getIncomingEdges: (_0x47c5ff) => (_0x47c5ff === _0x4d6adb ? _0x33d009() : []),
+      const store10 = {
+          getState: () => _data17,
+          getIncomingEdges: (value89) => (value89 === id21 ? handler2() : []),
         },
-        _0x60a7bb = createAIGenerateNodeStateSyncModule({
-          store: _0x421c20,
+        aIGenerateNodeStateSyncModule13 = createAIGenerateNodeStateSyncModule({
+          store: store10,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
-          getDisplayModelName: (_0x57af56) => _0x57af56,
+          getDisplayModelName: (value90) => value90,
         });
-      let _0x33947d = 0,
-        _0x1c61a4 = 0;
-      const _0x4c117e = Object.assign(Object.create(_0x60a7bb), {
-        nodeId: _0x4d6adb,
-        _data: _0x3563dc.nodes[_0x4d6adb],
+      let value91 = 0,
+        value92 = 0;
+      const value93 = Object.assign(Object.create(aIGenerateNodeStateSyncModule13), {
+        nodeId: id21,
+        _data: _data17.nodes[id21],
         _root: new FakeElement(),
         _refThumbObjectUrls: new Map(),
-        _normalizeDreaminaNodeData: (_0x4a3204) => _0x4a3204,
+        _normalizeDreaminaNodeData: (value94) => value94,
         _loadAndDisplayImage: () => {},
         _applyMaskPreview: () => {},
         _applyModelParamVisibility: () => {},
         _updateSubmitButtonState: () => {},
         _renderRefBar: () => {
-          _0x1c61a4 += 1;
+          value92 += 1;
         },
         runAdaptiveRatio: () => {
-          _0x33947d += 1;
+          value91 += 1;
         },
         promptEl: { innerHTML: '', innerText: '', querySelectorAll: () => [] },
       });
-      (_0x60a7bb.update.call(_0x4c117e, _0x3563dc.nodes[_0x4d6adb]),
-        await new Promise((_0x393ec3) => setTimeout(_0x393ec3, 70)),
-        assert.equal(_0x33947d, 1),
-        assert.equal(_0x1c61a4, 0),
-        (_0x3563dc.nodes.imageA = { ..._0x3563dc.nodes.imageA, parentId: '' }),
-        _0x60a7bb.update.call(_0x4c117e, _0x3563dc.nodes[_0x4d6adb]),
-        await new Promise((_0x5a187b) => setTimeout(_0x5a187b, 70)),
-        assert.equal(_0x33947d, 2),
-        assert.equal(_0x1c61a4, 0));
+      (aIGenerateNodeStateSyncModule13.update.call(value93, _data17.nodes[id21]),
+        await new Promise((value95) => setTimeout(value95, 70)),
+        assert.equal(value91, 1),
+        assert.equal(value92, 0),
+        (_data17.nodes.imageA = { ..._data17.nodes.imageA, parentId: '' }),
+        aIGenerateNodeStateSyncModule13.update.call(value93, _data17.nodes[id21]),
+        await new Promise((value96) => setTimeout(value96, 70)),
+        assert.equal(value91, 2),
+        assert.equal(value92, 0));
     } finally {
-      if (typeof _0x748806 === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x748806;
+      if (typeof value88 === 'undefined') delete globalThis.document;
+      else globalThis.document = value88;
     }
   }),
   test('aigenImage state sync: schema adaptive ratio triggers display resize on input change', async () => {
-    const _0x5d0f3e = globalThis.document,
-      _0x1d8c8c = 'schema-image-node',
-      _0x467780 = {
+    const value97 = globalThis.document,
+      id22 = 'schema-image-node',
+      _data18 = {
         pickConnectMode: {},
         nodes: {
-          [_0x1d8c8c]: {
-            id: _0x1d8c8c,
+          [id22]: {
+            id: id22,
             type: 'ai-image',
             model: 'apimart/nano-banana-2',
             provider: 'apimart',
@@ -1428,46 +1431,46 @@ function createDragEvent(_0x2ed3a6) {
           imageA: { id: 'imageA', type: 'source-image', width: 0x384, height: 0x640, _bizRev: 1 },
           imageB: { id: 'imageB', type: 'source-image', width: 0x640, height: 0x384, _bizRev: 1 },
         },
-        edges: { edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: _0x1d8c8c } },
+        edges: { edgeA: { id: 'edgeA', sourceId: 'imageA', targetId: id22 } },
       };
     try {
       globalThis.document = {
         activeElement: null,
-        createElement: (_0x1fb288) => new FakeElement({ tagName: _0x1fb288 }),
+        createElement: (tagName10) => new FakeElement({ tagName: tagName10 }),
       };
-      const _0x2128f4 = {
-          getState: () => _0x467780,
-          getIncomingEdges: (_0x48526f) =>
-            Object.values(_0x467780.edges).filter((_0x46697d) => _0x46697d.targetId === _0x48526f),
+      const store11 = {
+          getState: () => _data18,
+          getIncomingEdges: (value98) =>
+            Object.values(_data18.edges).filter((item18) => item18.targetId === value98),
         },
-        _0x419840 = createAIGenerateNodeStateSyncModule({
-          store: _0x2128f4,
+        aIGenerateNodeStateSyncModule14 = createAIGenerateNodeStateSyncModule({
+          store: store11,
           getImage: async () => null,
           ensureThumbDecoded: () => {},
           revealRefThumbMedia: () => {},
           _syncPillLabels: () => {},
         });
-      let _0x350a3c = 0;
-      const _0x20abc2 = Object.assign(Object.create(_0x419840), {
-        nodeId: _0x1d8c8c,
-        _data: _0x467780.nodes[_0x1d8c8c],
+      let value99 = 0;
+      const value100 = Object.assign(Object.create(aIGenerateNodeStateSyncModule14), {
+        nodeId: id22,
+        _data: _data18.nodes[id22],
         refBarEl: new FakeElement(),
         _refThumbObjectUrls: new Map(),
         runAdaptiveRatio: () => {
-          _0x350a3c += 1;
+          value99 += 1;
         },
         promptEl: { innerText: '', querySelectorAll: () => [] },
       });
-      (await _0x419840._renderRefBarImpl.call(_0x20abc2),
-        await new Promise((_0x4ae5c8) => setTimeout(_0x4ae5c8, 70)),
-        assert.equal(_0x350a3c, 1),
-        (_0x467780.nodes[_0x1d8c8c].generationParams.aspectRatio = '16:9'),
-        (_0x467780.edges.edgeA = { ..._0x467780.edges.edgeA, sourceId: 'imageB' }),
-        await _0x419840._renderRefBarImpl.call(_0x20abc2),
-        await new Promise((_0x4ad844) => setTimeout(_0x4ad844, 70)),
-        assert.equal(_0x350a3c, 1));
+      (await aIGenerateNodeStateSyncModule14._renderRefBarImpl.call(value100),
+        await new Promise((value101) => setTimeout(value101, 70)),
+        assert.equal(value99, 1),
+        (_data18.nodes[id22].generationParams.aspectRatio = '16:9'),
+        (_data18.edges.edgeA = { ..._data18.edges.edgeA, sourceId: 'imageB' }),
+        await aIGenerateNodeStateSyncModule14._renderRefBarImpl.call(value100),
+        await new Promise((value102) => setTimeout(value102, 70)),
+        assert.equal(value99, 1));
     } finally {
-      if (typeof _0x5d0f3e === 'undefined') delete globalThis.document;
-      else globalThis.document = _0x5d0f3e;
+      if (typeof value97 === 'undefined') delete globalThis.document;
+      else globalThis.document = value97;
     }
   }));

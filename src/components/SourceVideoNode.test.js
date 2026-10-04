@@ -23,10 +23,10 @@ function installDomStubs() {
     !globalThis.document.body && (globalThis.document.body = { appendChild() {}, removeChild() {} }),
     !globalThis.Node && (globalThis.Node = { TEXT_NODE: 3, ELEMENT_NODE: 1 }));
 }
-function resetStore(_0x5a105b = {}) {
-  appStore.loadState({ nodes: _0x5a105b, edges: {}, viewport: { x: 0, y: 0, zoom: 1 } });
+function resetStore(nodes = {}) {
+  appStore.loadState({ nodes: nodes, edges: {}, viewport: { x: 0, y: 0, zoom: 1 } });
 }
-function createFrameInterpolationNode(_0x3c21bc = {}) {
+function createFrameInterpolationNode(args = {}) {
   return {
     id: 'source-video-frame-rh',
     type: 'source-video',
@@ -43,20 +43,20 @@ function createFrameInterpolationNode(_0x3c21bc = {}) {
     isGenerating: true,
     jobStatus: 'running',
     generationStartTime: 123,
-    ..._0x3c21bc,
+    ...args,
   };
 }
 function createFakeClassList() {
-  const _0xf8be9a = new Set();
+  const map = new Set();
   return {
-    add: (..._0x2004ab) => _0x2004ab.forEach((_0x15f383) => _0xf8be9a.add(_0x15f383)),
-    remove: (..._0x5f2a3c) => _0x5f2a3c.forEach((_0x56d6da) => _0xf8be9a.delete(_0x56d6da)),
-    contains: (_0x32148b) => _0xf8be9a.has(_0x32148b),
-    toggle(_0x4c8ef2, _0x3ef701) {
-      const _0x31bf87 = _0x3ef701 === undefined ? !_0xf8be9a.has(_0x4c8ef2) : !!_0x3ef701;
-      if (_0x31bf87) _0xf8be9a.add(_0x4c8ef2);
-      else _0xf8be9a.delete(_0x4c8ef2);
-      return _0x31bf87;
+    add: (...list) => list.forEach((item) => map.add(item)),
+    remove: (...list2) => list2.forEach((item2) => map.delete(item2)),
+    contains: (value) => map.has(value),
+    toggle(key, enabled) {
+      const index = enabled === undefined ? !map.has(key) : !!enabled;
+      if (index) map.add(key);
+      else map.delete(key);
+      return index;
     },
   };
 }
@@ -65,42 +65,42 @@ function createFakeButton({
   tooltip: tooltip = '抠像',
   aria: aria = '抠像',
 } = {}) {
-  const _0x3b1d82 = {},
-    _0x2ead0f = new Map([['aria-label', aria]]);
+  const el = {},
+    map2 = new Map([['aria-label', aria]]);
   return {
     innerHTML: html,
     dataset: { tooltip: tooltip },
     title: '',
     classList: createFakeClassList(),
-    addEventListener(_0x25f5b2, _0x260b9d) {
-      _0x3b1d82[_0x25f5b2] = _0x260b9d;
+    addEventListener(result, data) {
+      el[result] = data;
     },
-    getAttribute(_0x372441) {
-      return _0x2ead0f.get(_0x372441) || '';
+    getAttribute(options) {
+      return map2.get(options) || '';
     },
-    setAttribute(_0x43df91, _0x5937be) {
-      _0x2ead0f.set(_0x43df91, String(_0x5937be));
+    setAttribute(target, source) {
+      map2.set(target, String(source));
     },
-    removeAttribute(_0xaf2d1c) {
-      _0x2ead0f.delete(_0xaf2d1c);
+    removeAttribute(next) {
+      map2.delete(next);
     },
     dispatchClick() {
-      _0x3b1d82.click?.({ preventDefault() {}, stopPropagation() {} });
+      el.click?.({ preventDefault() {}, stopPropagation() {} });
     },
   };
 }
-function createFakeToolbar(_0x36aff8) {
+function createFakeToolbar(current) {
   return {
     isConnected: true,
     addEventListener() {},
-    querySelector(_0x4b4572) {
-      return _0x4b4572 === '.act-keying' ? _0x36aff8 : null;
+    querySelector(entry) {
+      return entry === '.act-keying' ? current : null;
     },
   };
 }
 function createFakeVideoElement() {
-  const _0x5a607d = new Map([['src', '']]);
-  let _0x36a8df = 0;
+  const map3 = new Map([['src', '']]);
+  let record = 0;
   return {
     style: { display: '' },
     preload: 'auto',
@@ -110,46 +110,46 @@ function createFakeVideoElement() {
     paused: true,
     addEventListener() {},
     removeEventListener() {},
-    getAttribute(_0x15ad5c) {
-      return _0x5a607d.get(_0x15ad5c) || '';
+    getAttribute(payload) {
+      return map3.get(payload) || '';
     },
-    setAttribute(_0x2546d4, _0x2aeeb5) {
-      const _0x1d848d = String(_0x2aeeb5 || '');
-      _0x5a607d.set(_0x2546d4, _0x1d848d);
-      if (_0x2546d4 === 'src') this.src = _0x1d848d;
-      if (_0x2546d4 === 'poster') this.poster = _0x1d848d;
+    setAttribute(handle, state) {
+      const config = String(state || '');
+      map3.set(handle, config);
+      if (handle === 'src') this.src = config;
+      if (handle === 'poster') this.poster = config;
     },
-    removeAttribute(_0x43b8d7) {
-      _0x5a607d.delete(_0x43b8d7);
-      _0x43b8d7 === 'src' && ((this.src = ''), (this.currentSrc = ''));
-      if (_0x43b8d7 === 'poster') this.poster = '';
+    removeAttribute(scope) {
+      map3.delete(scope);
+      scope === 'src' && ((this.src = ''), (this.currentSrc = ''));
+      if (scope === 'poster') this.poster = '';
     },
     load() {
-      ((_0x36a8df += 1), (this.currentSrc = this.src));
+      ((record += 1), (this.currentSrc = this.src));
     },
     pause() {
       this.paused = true;
     },
     get loadCalls() {
-      return _0x36a8df;
+      return record;
     },
   };
 }
 function createFakeImageElement() {
-  const _0x6b484 = new Map();
+  const map4 = new Map();
   return {
     src: '',
     classList: createFakeClassList(),
-    setAttribute(_0x214655, _0x27db30) {
-      _0x6b484.set(String(_0x214655), String(_0x27db30 || ''));
-      if (_0x214655 === 'src') this.src = String(_0x27db30 || '');
+    setAttribute(input, output) {
+      map4.set(String(input), String(output || ''));
+      if (input === 'src') this.src = String(output || '');
     },
-    removeAttribute(_0x51a367) {
-      _0x6b484.delete(String(_0x51a367));
-      if (_0x51a367 === 'src') this.src = '';
+    removeAttribute(value2) {
+      map4.delete(String(value2));
+      if (value2 === 'src') this.src = '';
     },
-    getAttribute(_0x523e91) {
-      return _0x6b484.get(String(_0x523e91)) || '';
+    getAttribute(value3) {
+      return map4.get(String(value3)) || '';
     },
   };
 }
@@ -167,37 +167,37 @@ function createFakeLoadingCard() {
 }
 (test('SourceVideoNode: RunningHub 补帧恢复失败时同步失败标题', async () => {
   installDomStubs();
-  const { SourceVideoNode: _0x3e7328 } = await import('./SourceVideoNode.js'),
-    _0x9dabdb = createFrameInterpolationNode();
-  resetStore({ [_0x9dabdb.id]: _0x9dabdb });
-  const _0xe633d8 = Object.create(_0x3e7328.prototype);
-  (Object.assign(_0xe633d8, {
-    id: _0x9dabdb.id,
-    _data: _0x9dabdb,
+  const { SourceVideoNode: SourceVideoNode } = await import('./SourceVideoNode.js'),
+    id = createFrameInterpolationNode();
+  resetStore({ [id.id]: id });
+  const value4 = Object.create(SourceVideoNode.prototype);
+  (Object.assign(value4, {
+    id: id.id,
+    _data: id,
     _rhResumeAbortController: null,
     _rhResumeTaskId: '',
     _rhResumePromise: null,
   }),
-    (_0xe633d8._resumeRunningHubTaskPoller = async () => {
+    (value4._resumeRunningHubTaskPoller = async () => {
       throw new Error('官方任务失败');
     }),
-    _0xe633d8._maybeResumeRunningHubTask(),
-    await _0xe633d8._rhResumePromise);
-  const _0x54eb1a = appStore.getState().nodes[_0x9dabdb.id];
-  (assert.equal(_0x54eb1a.name, '补帧视频 (失败)'),
-    assert.equal(_0x54eb1a.jobStatus, 'error'),
-    assert.equal(_0x54eb1a.isGenerating, false),
-    assert.equal(_0x54eb1a.rhTaskStatus, 'failed'),
-    assert.equal(_0x54eb1a.rhTaskRecovering, false),
-    assert.equal(_0x54eb1a.jobError, '官方任务失败'),
-    assert.equal(_0x54eb1a.videos?.[0]?.error, '官方任务失败'),
-    assert.equal(_0x54eb1a.mainVideoIndex, 0),
+    value4._maybeResumeRunningHubTask(),
+    await value4._rhResumePromise);
+  const error = appStore.getState().nodes[id.id];
+  (assert.equal(error.name, '补帧视频 (失败)'),
+    assert.equal(error.jobStatus, 'error'),
+    assert.equal(error.isGenerating, false),
+    assert.equal(error.rhTaskStatus, 'failed'),
+    assert.equal(error.rhTaskRecovering, false),
+    assert.equal(error.jobError, '官方任务失败'),
+    assert.equal(error.videos?.[0]?.error, '官方任务失败'),
+    assert.equal(error.mainVideoIndex, 0),
     resetStore());
 }),
   test('SourceVideoNode: RunningHub 恢复轮询被卸载中止时保持可恢复状态', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x514c1a } = await import('./SourceVideoNode.js'),
-      _0x5aa7c3 = createFrameInterpolationNode({
+    const { SourceVideoNode: SourceVideoNode2 } = await import('./SourceVideoNode.js'),
+      id2 = createFrameInterpolationNode({
         id: 'source-video-hd-recover-abort',
         model: 'runninghub/2047787809091620866',
         name: '高清视频 (处理中)',
@@ -205,38 +205,38 @@ function createFakeLoadingCard() {
         rhTaskStatus: 'running',
         rhTaskUseOpenapiQuery: true,
       });
-    resetStore({ [_0x5aa7c3.id]: _0x5aa7c3 });
-    const _0x238d85 = Object.create(_0x514c1a.prototype);
-    (Object.assign(_0x238d85, {
-      id: _0x5aa7c3.id,
-      _data: _0x5aa7c3,
+    resetStore({ [id2.id]: id2 });
+    const value5 = Object.create(SourceVideoNode2.prototype);
+    (Object.assign(value5, {
+      id: id2.id,
+      _data: id2,
       _rhResumeAbortController: null,
       _rhResumeTaskId: '',
       _rhResumePromise: null,
     }),
-      (_0x238d85._resumeRunningHubTaskPoller = async (_0x49564e, _0x103aa6, { signal: _0x34e375 }) =>
-        new Promise((_0x46354e, _0x48ec16) => {
-          if (_0x34e375.aborted) {
-            _0x48ec16(new Error('CANCELLED'));
+      (value5._resumeRunningHubTaskPoller = async (value6, value7, { signal: signal }) =>
+        new Promise((value8, handler) => {
+          if (signal.aborted) {
+            handler(new Error('CANCELLED'));
             return;
           }
-          _0x34e375.addEventListener('abort', () => _0x48ec16(new Error('CANCELLED')), { once: true });
+          signal.addEventListener('abort', () => handler(new Error('CANCELLED')), { once: true });
         })),
-      _0x238d85._maybeResumeRunningHubTask());
-    const _0x49e753 = _0x238d85._rhResumePromise;
-    (_0x238d85._stopRunningHubRecovery(false), await _0x49e753);
-    const _0x44c954 = appStore.getState().nodes[_0x5aa7c3.id];
-    (assert.equal(_0x44c954.name, '高清视频 (处理中)'),
-      assert.equal(_0x44c954.jobStatus, 'running'),
-      assert.equal(_0x44c954.isGenerating, true),
-      assert.equal(_0x44c954.rhTaskStatus, 'running'),
-      assert.equal(_0x44c954.rhTaskRecovering, false),
+      value5._maybeResumeRunningHubTask());
+    const value9 = value5._rhResumePromise;
+    (value5._stopRunningHubRecovery(false), await value9);
+    const error2 = appStore.getState().nodes[id2.id];
+    (assert.equal(error2.name, '高清视频 (处理中)'),
+      assert.equal(error2.jobStatus, 'running'),
+      assert.equal(error2.isGenerating, true),
+      assert.equal(error2.rhTaskStatus, 'running'),
+      assert.equal(error2.rhTaskRecovering, false),
       resetStore());
   }),
   test('SourceVideoNode: async 恢复失败保留已有视频并写入错误结果', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x22cf8a } = await import('./SourceVideoNode.js'),
-      _0x551327 = {
+    const { SourceVideoNode: SourceVideoNode3 } = await import('./SourceVideoNode.js'),
+      id3 = {
         id: 'source-video-async-failed',
         type: 'source-video',
         x: 0,
@@ -256,39 +256,39 @@ function createFakeLoadingCard() {
         jobStatus: 'running',
         generationStartTime: 123,
       };
-    resetStore({ [_0x551327.id]: _0x551327 });
-    const _0x59c08c = Object.create(_0x22cf8a.prototype);
-    (Object.assign(_0x59c08c, {
-      id: _0x551327.id,
-      _data: _0x551327,
+    resetStore({ [id3.id]: id3 });
+    const value10 = Object.create(SourceVideoNode3.prototype);
+    (Object.assign(value10, {
+      id: id3.id,
+      _data: id3,
       _asyncResumeAbortController: null,
       _asyncResumeTaskId: '',
       _asyncResumePromise: null,
       _computeGenerationDuration: () => 0x28e,
     }),
-      (_0x59c08c._resumeAsyncTaskPoller = async () => {
+      (value10._resumeAsyncTaskPoller = async () => {
         throw new Error('异步视频恢复失败');
       }),
-      _0x59c08c._maybeResumeAsyncTask(),
-      await _0x59c08c._asyncResumePromise);
-    const _0x1d1d17 = appStore.getState().nodes[_0x551327.id];
-    (assert.equal(_0x1d1d17.isGenerating, false),
-      assert.equal(_0x1d1d17.jobStatus, 'error'),
-      assert.equal(_0x1d1d17.jobError, '异步视频恢复失败'),
-      assert.equal(_0x1d1d17.generationDuration, 0x28e),
-      assert.equal(_0x1d1d17.asyncTaskStatus, 'failed'),
-      assert.equal(_0x1d1d17.asyncTaskRecovering, false),
-      assert.equal(_0x1d1d17.videos?.[0]?.error, '异步视频恢复失败'),
-      assert.equal(_0x1d1d17.mainVideoIndex, 0),
-      assert.equal(_0x1d1d17.videoUrl, '/output/previous.mp4'),
-      assert.equal(_0x1d1d17.thumbUrl, '/output/previous.jpg'),
-      assert.match(_0x1d1d17.outputText, /恢复失败: 异步视频恢复失败/),
+      value10._maybeResumeAsyncTask(),
+      await value10._asyncResumePromise);
+    const value11 = appStore.getState().nodes[id3.id];
+    (assert.equal(value11.isGenerating, false),
+      assert.equal(value11.jobStatus, 'error'),
+      assert.equal(value11.jobError, '异步视频恢复失败'),
+      assert.equal(value11.generationDuration, 0x28e),
+      assert.equal(value11.asyncTaskStatus, 'failed'),
+      assert.equal(value11.asyncTaskRecovering, false),
+      assert.equal(value11.videos?.[0]?.error, '异步视频恢复失败'),
+      assert.equal(value11.mainVideoIndex, 0),
+      assert.equal(value11.videoUrl, '/output/previous.mp4'),
+      assert.equal(value11.thumbUrl, '/output/previous.jpg'),
+      assert.match(value11.outputText, /恢复失败: 异步视频恢复失败/),
       resetStore());
   }),
   test('SourceVideoNode: async 恢复轮询被卸载中止时保持可恢复状态', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x201dbe } = await import('./SourceVideoNode.js'),
-      _0x548206 = {
+    const { SourceVideoNode: SourceVideoNode4 } = await import('./SourceVideoNode.js'),
+      id4 = {
         id: 'source-video-async-recover-abort',
         type: 'source-video',
         provider: 'apimart',
@@ -301,161 +301,167 @@ function createFakeLoadingCard() {
         jobStatus: 'running',
         generationStartTime: 123,
       };
-    resetStore({ [_0x548206.id]: _0x548206 });
-    const _0x58aea5 = Object.create(_0x201dbe.prototype);
-    (Object.assign(_0x58aea5, {
-      id: _0x548206.id,
-      _data: _0x548206,
+    resetStore({ [id4.id]: id4 });
+    const value12 = Object.create(SourceVideoNode4.prototype);
+    (Object.assign(value12, {
+      id: id4.id,
+      _data: id4,
       _asyncResumeAbortController: null,
       _asyncResumeTaskId: '',
       _asyncResumePromise: null,
     }),
-      (_0x58aea5._resumeAsyncTaskPoller = async (_0x440d65, _0x499753, { signal: _0x155e17 }) =>
-        new Promise((_0x486024, _0x377f2b) => {
-          if (_0x155e17.aborted) {
-            _0x377f2b(new Error('CANCELLED'));
+      (value12._resumeAsyncTaskPoller = async (value13, value14, { signal: signal2 }) =>
+        new Promise((value15, handler2) => {
+          if (signal2.aborted) {
+            handler2(new Error('CANCELLED'));
             return;
           }
-          _0x155e17.addEventListener('abort', () => _0x377f2b(new Error('CANCELLED')), { once: true });
+          signal2.addEventListener('abort', () => handler2(new Error('CANCELLED')), { once: true });
         })),
-      _0x58aea5._maybeResumeAsyncTask());
-    const _0x1687fb = _0x58aea5._asyncResumePromise;
-    (_0x58aea5._stopAsyncRecovery(false), await _0x1687fb);
-    const _0x14220d = appStore.getState().nodes[_0x548206.id];
-    (assert.equal(_0x14220d.jobStatus, 'running'),
-      assert.equal(_0x14220d.isGenerating, true),
-      assert.equal(_0x14220d.asyncTaskStatus, 'running'),
-      assert.equal(_0x14220d.asyncTaskRecovering, false),
+      value12._maybeResumeAsyncTask());
+    const value16 = value12._asyncResumePromise;
+    (value12._stopAsyncRecovery(false), await value16);
+    const value17 = appStore.getState().nodes[id4.id];
+    (assert.equal(value17.jobStatus, 'running'),
+      assert.equal(value17.isGenerating, true),
+      assert.equal(value17.asyncTaskStatus, 'running'),
+      assert.equal(value17.asyncTaskRecovering, false),
       resetStore());
   }),
   test('VideoKeyingController: 按结果节点取消只影响当前抠像任务', async () => {
     installDomStubs();
-    const _0x9edda6 = (await import('../modules/VideoKeyingController.js')).default,
-      _0x1c87cb = createFrameInterpolationNode({ id: 'source-video-a', model: 'runninghub/video_matting' }),
-      _0x1b1165 = createFrameInterpolationNode({ id: 'source-video-b', model: 'runninghub/video_matting' }),
-      _0x32254d = createFrameInterpolationNode({
+    const value18 = (await import('../modules/VideoKeyingController.js')).default,
+      sourceNodeId = createFrameInterpolationNode({
+        id: 'source-video-a',
+        model: 'runninghub/video_matting',
+      }),
+      sourceNodeId2 = createFrameInterpolationNode({
+        id: 'source-video-b',
+        model: 'runninghub/video_matting',
+      }),
+      outId = createFrameInterpolationNode({
         id: 'source-video-matting-a',
         model: 'runninghub/video_matting',
         rhTaskStatus: 'running',
         outputText: '模型: RH视频抠像\n状态: 处理中',
       }),
-      _0x507efd = createFrameInterpolationNode({
+      outId2 = createFrameInterpolationNode({
         id: 'source-video-matting-b',
         model: 'runninghub/video_matting',
         rhTaskStatus: 'running',
         outputText: '模型: RH视频抠像\n状态: 处理中',
       });
     (resetStore({
-      [_0x1c87cb.id]: _0x1c87cb,
-      [_0x1b1165.id]: _0x1b1165,
-      [_0x32254d.id]: _0x32254d,
-      [_0x507efd.id]: _0x507efd,
+      [sourceNodeId.id]: sourceNodeId,
+      [sourceNodeId2.id]: sourceNodeId2,
+      [outId.id]: outId,
+      [outId2.id]: outId2,
     }),
-      _0x9edda6._rhTasks.clear(),
-      _0x9edda6._rhTasks.set(_0x1c87cb.id, {
+      value18._rhTasks.clear(),
+      value18._rhTasks.set(sourceNodeId.id, {
         id: 'ctx-a',
         running: true,
-        sourceNodeId: _0x1c87cb.id,
-        outId: _0x32254d.id,
+        sourceNodeId: sourceNodeId.id,
+        outId: outId.id,
         mode: 'keying',
         abort: { abort() {} },
       }),
-      _0x9edda6._rhTasks.set(_0x1b1165.id, {
+      value18._rhTasks.set(sourceNodeId2.id, {
         id: 'ctx-b',
         running: true,
-        sourceNodeId: _0x1b1165.id,
-        outId: _0x507efd.id,
+        sourceNodeId: sourceNodeId2.id,
+        outId: outId2.id,
         mode: 'keying',
         abort: { abort() {} },
       }));
-    const _0x29adee = await _0x9edda6.cancelRunningKeyingTaskForNode(_0x32254d.id);
-    (assert.equal(_0x29adee, true),
-      assert.equal(_0x9edda6._rhTasks.has(_0x1c87cb.id), false),
-      assert.equal(_0x9edda6._rhTasks.has(_0x1b1165.id), true),
-      assert.equal(appStore.getState().nodes[_0x32254d.id].rhTaskStatus, 'cancelled'),
-      assert.equal(appStore.getState().nodes[_0x507efd.id].rhTaskStatus, 'running'),
-      _0x9edda6._rhTasks.clear(),
+    const value19 = await value18.cancelRunningKeyingTaskForNode(outId.id);
+    (assert.equal(value19, true),
+      assert.equal(value18._rhTasks.has(sourceNodeId.id), false),
+      assert.equal(value18._rhTasks.has(sourceNodeId2.id), true),
+      assert.equal(appStore.getState().nodes[outId.id].rhTaskStatus, 'cancelled'),
+      assert.equal(appStore.getState().nodes[outId2.id].rhTaskStatus, 'running'),
+      value18._rhTasks.clear(),
       resetStore());
   }),
   test('videoToolbar: 结果节点抠像按钮在任务中显示并触发取消', async () => {
     installDomStubs();
-    const _0x3b466b = (await import('../modules/VideoKeyingController.js')).default,
-      { bindVideoToolbarEvents: _0x4bbef3 } = await import('./nodeToolbar/videoToolbar.js'),
-      _0x190089 = 'source-video-keying-source',
-      _0x1d1183 = 'source-video-keying-output';
+    const value20 = (await import('../modules/VideoKeyingController.js')).default,
+      { bindVideoToolbarEvents: bindVideoToolbarEvents } = await import('./nodeToolbar/videoToolbar.js'),
+      id5 = 'source-video-keying-source',
+      id6 = 'source-video-keying-output';
     (resetStore({
-      [_0x190089]: createFrameInterpolationNode({ id: _0x190089, model: 'runninghub/video_matting' }),
-      [_0x1d1183]: createFrameInterpolationNode({
-        id: _0x1d1183,
+      [id5]: createFrameInterpolationNode({ id: id5, model: 'runninghub/video_matting' }),
+      [id6]: createFrameInterpolationNode({
+        id: id6,
         model: 'runninghub/video_matting',
         rhTaskStatus: 'running',
         outputText: '模型: RH视频抠像\n状态: 处理中',
       }),
     }),
-      _0x3b466b._rhTasks.clear(),
-      _0x3b466b._rhTasks.set(_0x190089, {
+      value20._rhTasks.clear(),
+      value20._rhTasks.set(id5, {
         id: 'ctx-keying',
         running: true,
-        sourceNodeId: _0x190089,
-        outId: _0x1d1183,
+        sourceNodeId: id5,
+        outId: id6,
         mode: 'keying',
         abort: { abort() {} },
       }));
-    const _0x33fb5e = createFakeButton(),
-      _0x489352 = createFakeToolbar(_0x33fb5e);
-    (_0x4bbef3(_0x489352, { id: _0x1d1183, type: 'source-video' }),
-      assert.equal(_0x33fb5e.classList.contains('is-task-cancel'), true),
-      assert.match(_0x33fb5e.innerHTML, /v2-task-cancel-spin/),
-      assert.equal(_0x33fb5e.dataset.tooltip, '取消抠像任务'),
-      _0x33fb5e.dispatchClick(),
-      await new Promise((_0x46a265) => setTimeout(_0x46a265, 0)),
-      assert.equal(_0x3b466b._rhTasks.has(_0x190089), false),
-      assert.equal(_0x33fb5e.classList.contains('is-task-cancel'), false),
-      assert.match(_0x33fb5e.innerHTML, /data-original-keying/),
-      assert.equal(appStore.getState().nodes[_0x1d1183].rhTaskStatus, 'cancelled'),
-      _0x3b466b._rhTasks.clear(),
+    const el2 = createFakeButton(),
+      fakeToolbar = createFakeToolbar(el2);
+    (bindVideoToolbarEvents(fakeToolbar, { id: id6, type: 'source-video' }),
+      assert.equal(el2.classList.contains('is-task-cancel'), true),
+      assert.match(el2.innerHTML, /v2-task-cancel-spin/),
+      assert.equal(el2.dataset.tooltip, '取消抠像任务'),
+      el2.dispatchClick(),
+      await new Promise((value21) => setTimeout(value21, 0)),
+      assert.equal(value20._rhTasks.has(id5), false),
+      assert.equal(el2.classList.contains('is-task-cancel'), false),
+      assert.match(el2.innerHTML, /data-original-keying/),
+      assert.equal(appStore.getState().nodes[id6].rhTaskStatus, 'cancelled'),
+      value20._rhTasks.clear(),
       resetStore());
   }),
   test('videoToolbar: 只靠 Store 中的抠像结果节点也显示取消态', async () => {
     installDomStubs();
-    const _0x27b37d = (await import('../modules/VideoKeyingController.js')).default,
-      { bindVideoToolbarEvents: _0xaec84 } = await import('./nodeToolbar/videoToolbar.js'),
-      _0x44d203 = 'source-video-store-keying-source',
-      _0x274437 = 'source-video-store-keying-output';
+    const value22 = (await import('../modules/VideoKeyingController.js')).default,
+      { bindVideoToolbarEvents: bindVideoToolbarEvents2 } = await import('./nodeToolbar/videoToolbar.js'),
+      id7 = 'source-video-store-keying-source',
+      id8 = 'source-video-store-keying-output';
     (resetStore({
-      [_0x44d203]: createFrameInterpolationNode({ id: _0x44d203, model: 'runninghub/video_matting' }),
-      [_0x274437]: createFrameInterpolationNode({
-        id: _0x274437,
+      [id7]: createFrameInterpolationNode({ id: id7, model: 'runninghub/video_matting' }),
+      [id8]: createFrameInterpolationNode({
+        id: id8,
         model: 'runninghub/video_matting',
-        rhSourceNodeId: _0x44d203,
+        rhSourceNodeId: id7,
         rhTaskId: 'rh-keying-store-task',
         rhTaskStatus: 'running',
         isGenerating: true,
         outputText: '模型: RH视频抠像\n状态: 处理中',
       }),
     }),
-      _0x27b37d._rhTasks.clear());
-    const _0x17171e = createFakeButton(),
-      _0x10db7a = createFakeToolbar(_0x17171e);
-    (_0xaec84(_0x10db7a, { id: _0x274437, type: 'source-video' }),
-      assert.equal(_0x17171e.classList.contains('is-task-cancel'), true),
-      assert.match(_0x17171e.innerHTML, /v2-task-cancel-spin/),
-      assert.equal(_0x17171e.dataset.tooltip, '取消抠像任务'),
-      _0x17171e._cleanupKeyingButtonState?.(),
+      value22._rhTasks.clear());
+    const el3 = createFakeButton(),
+      fakeToolbar2 = createFakeToolbar(el3);
+    (bindVideoToolbarEvents2(fakeToolbar2, { id: id8, type: 'source-video' }),
+      assert.equal(el3.classList.contains('is-task-cancel'), true),
+      assert.match(el3.innerHTML, /v2-task-cancel-spin/),
+      assert.equal(el3.dataset.tooltip, '取消抠像任务'),
+      el3._cleanupKeyingButtonState?.(),
       resetStore());
   }),
   test('videoToolbar: 抠像终态会压过 stale isGenerating', async () => {
     installDomStubs();
-    const _0x533b16 = (await import('../modules/VideoKeyingController.js')).default,
-      { bindVideoToolbarEvents: _0x1767b3 } = await import('./nodeToolbar/videoToolbar.js'),
-      _0x51717f = 'source-video-terminal-keying-source',
-      _0x1814f0 = 'source-video-terminal-keying-output';
+    const value23 = (await import('../modules/VideoKeyingController.js')).default,
+      { bindVideoToolbarEvents: bindVideoToolbarEvents3 } = await import('./nodeToolbar/videoToolbar.js'),
+      id9 = 'source-video-terminal-keying-source',
+      id10 = 'source-video-terminal-keying-output';
     (resetStore({
-      [_0x51717f]: createFrameInterpolationNode({ id: _0x51717f, model: 'runninghub/video_matting' }),
-      [_0x1814f0]: createFrameInterpolationNode({
-        id: _0x1814f0,
+      [id9]: createFrameInterpolationNode({ id: id9, model: 'runninghub/video_matting' }),
+      [id10]: createFrameInterpolationNode({
+        id: id10,
         model: 'runninghub/video_matting',
-        rhSourceNodeId: _0x51717f,
+        rhSourceNodeId: id9,
         rhTaskId: 'rh-keying-terminal-task',
         rhTaskStatus: 'success',
         isGenerating: true,
@@ -463,50 +469,49 @@ function createFakeLoadingCard() {
         outputText: '模型: RH视频抠像\n状态: 完成',
       }),
     }),
-      _0x533b16._rhTasks.clear());
-    const _0x327b2f = createFakeButton(),
-      _0x3967f9 = createFakeToolbar(_0x327b2f);
-    (_0x1767b3(_0x3967f9, { id: _0x1814f0, type: 'source-video' }),
-      assert.equal(_0x327b2f.classList.contains('is-task-cancel'), false),
-      assert.equal(_0x327b2f.dataset.tooltip, '抠像'),
-      _0x327b2f._cleanupKeyingButtonState?.(),
+      value23._rhTasks.clear());
+    const el4 = createFakeButton(),
+      fakeToolbar3 = createFakeToolbar(el4);
+    (bindVideoToolbarEvents3(fakeToolbar3, { id: id10, type: 'source-video' }),
+      assert.equal(el4.classList.contains('is-task-cancel'), false),
+      assert.equal(el4.dataset.tooltip, '抠像'),
+      el4._cleanupKeyingButtonState?.(),
       resetStore());
   }),
   test('SourceVideoNode: 无本地路径时使用 capturePreviewUrl', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x184ee3 } = await import('./SourceVideoNode.js'),
-      _0x47a8ea = Object.create(_0x184ee3.prototype);
-    (Object.assign(_0x47a8ea, {
+    const { SourceVideoNode: SourceVideoNode5 } = await import('./SourceVideoNode.js'),
+      value24 = Object.create(SourceVideoNode5.prototype);
+    (Object.assign(value24, {
       _data: {
         id: 'source-video-preview',
         type: 'source-video',
         capturePreviewUrl: 'blob:pending-video-preview',
       },
     }),
-      assert.equal(_0x47a8ea._resolveVideoSrc(_0x47a8ea._data), 'blob:pending-video-preview'));
+      assert.equal(value24._resolveVideoSrc(value24._data), 'blob:pending-video-preview'));
   }),
   test('SourceVideoNode: accepts electron local capture preview URL', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x380a5a } = await import('./SourceVideoNode.js'),
-      _0x25f5d2 = Object.create(_0x380a5a.prototype);
-    (Object.assign(_0x25f5d2, {
+    const { SourceVideoNode: SourceVideoNode6 } = await import('./SourceVideoNode.js'),
+      value25 = Object.create(SourceVideoNode6.prototype);
+    (Object.assign(value25, {
       _data: {
         id: 'source-video-electron-preview',
         type: 'source-video',
         capturePreviewUrl: 'aic-local-preview://preview/token/clip.mp4',
       },
     }),
-      assert.equal(
-        _0x25f5d2._resolveVideoSrc(_0x25f5d2._data),
-        'aic-local-preview://preview/token/clip.mp4',
-      ));
+      assert.equal(value25._resolveVideoSrc(value25._data), 'aic-local-preview://preview/token/clip.mp4'));
   }),
   test('SourceVideoNode: media task source ignores electron capture preview URL', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x5f3700, resolveSourceVideoMediaTaskSrc: _0x4bb269 } =
-        await import('./SourceVideoNode.js'),
-      _0x4bd616 = Object.create(_0x5f3700.prototype);
-    (Object.assign(_0x4bd616, {
+    const {
+        SourceVideoNode: SourceVideoNode7,
+        resolveSourceVideoMediaTaskSrc: resolveSourceVideoMediaTaskSrc,
+      } = await import('./SourceVideoNode.js'),
+      value26 = Object.create(SourceVideoNode7.prototype);
+    (Object.assign(value26, {
       _data: {
         id: 'source-video-task-source',
         type: 'source-video',
@@ -514,83 +519,88 @@ function createFakeLoadingCard() {
         capturePreviewUrl: 'aic-local-preview://preview/token/source.mp4',
       },
     }),
-      assert.equal(_0x4bb269(_0x4bd616._data), 'data/assets/original/hash/source.mp4'),
-      assert.equal(_0x4bd616._resolveVideoSrc(_0x4bd616._data), _0x4bd616._data.capturePreviewUrl),
-      assert.equal(_0x4bd616._resolveVideoMetaSrc(_0x4bd616._data), 'data/assets/original/hash/source.mp4'));
+      assert.equal(resolveSourceVideoMediaTaskSrc(value26._data), 'data/assets/original/hash/source.mp4'),
+      assert.equal(value26._resolveVideoSrc(value26._data), value26._data.capturePreviewUrl),
+      assert.equal(value26._resolveVideoMetaSrc(value26._data), 'data/assets/original/hash/source.mp4'));
   }),
   test('SourceVideoNode: media task source rejects preview-only video', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x3e9a8c, resolveSourceVideoMediaTaskSrc: _0x379868 } =
-        await import('./SourceVideoNode.js'),
-      _0x15c181 = Object.create(_0x3e9a8c.prototype);
-    (Object.assign(_0x15c181, {
+    const {
+        SourceVideoNode: SourceVideoNode8,
+        resolveSourceVideoMediaTaskSrc: resolveSourceVideoMediaTaskSrc2,
+      } = await import('./SourceVideoNode.js'),
+      value27 = Object.create(SourceVideoNode8.prototype);
+    (Object.assign(value27, {
       _data: {
         id: 'source-video-preview-only-task-source',
         type: 'source-video',
         capturePreviewUrl: 'aic-local-preview://preview/token/source.mp4',
       },
     }),
-      assert.equal(_0x379868(_0x15c181._data), ''),
-      assert.equal(
-        _0x15c181._resolveVideoSrc(_0x15c181._data),
-        'aic-local-preview://preview/token/source.mp4',
-      ),
-      assert.equal(_0x15c181._resolveVideoMetaSrc(_0x15c181._data), ''));
+      assert.equal(resolveSourceVideoMediaTaskSrc2(value27._data), ''),
+      assert.equal(value27._resolveVideoSrc(value27._data), 'aic-local-preview://preview/token/source.mp4'),
+      assert.equal(value27._resolveVideoMetaSrc(value27._data), ''));
   }),
   test('SourceVideoNode: mute preference persists in node data', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x2ab36e } = await import('./SourceVideoNode.js'),
-      _0x5bfcbb = globalThis.document.createElement;
+    const { SourceVideoNode: SourceVideoNode9 } = await import('./SourceVideoNode.js'),
+      value28 = globalThis.document.createElement;
     globalThis.document.createElement = () => ({ className: '' });
-    const _0x467b9e = 'source-video-muted-preference';
-    resetStore({ [_0x467b9e]: { id: _0x467b9e, type: 'source-video', videoMuted: false } });
+    const id11 = 'source-video-muted-preference';
+    resetStore({ [id11]: { id: id11, type: 'source-video', videoMuted: false } });
     try {
-      const _0x3fea27 = { muted: true },
-        _0xb40974 = Object.create(_0x2ab36e.prototype);
-      (Object.assign(_0xb40974, {
-        id: _0x467b9e,
-        _data: appStore.getState().nodes[_0x467b9e],
-        _video: _0x3fea27,
+      const _video = { muted: true },
+        value29 = Object.create(SourceVideoNode9.prototype);
+      (Object.assign(value29, {
+        id: id11,
+        _data: appStore.getState().nodes[id11],
+        _video: _video,
         _iconMuted: { style: { display: '' } },
         _iconUnmuted: { style: { display: '' } },
       }),
-        _0xb40974._syncMutedStateFromData(_0xb40974._data),
-        assert.equal(_0xb40974._isMuted, false),
-        assert.equal(_0x3fea27.muted, false),
-        assert.equal(_0xb40974._iconMuted.style.display, 'none'),
-        assert.equal(_0xb40974._iconUnmuted.style.display, 'block'),
-        _0xb40974._setMuted(true, { persist: true }));
-      const _0x4cc333 = appStore.getState().nodes[_0x467b9e];
-      (assert.equal(_0x4cc333.videoMuted, true),
-        assert.equal(_0x3fea27.muted, true),
-        assert.equal(_0xb40974._iconMuted.style.display, 'block'),
-        assert.equal(_0xb40974._iconUnmuted.style.display, 'none'),
-        assert.equal(new _0x2ab36e(_0x4cc333)._isMuted, true));
+        value29._syncMutedStateFromData(value29._data),
+        assert.equal(value29._isMuted, false),
+        assert.equal(_video.muted, false),
+        assert.equal(value29._iconMuted.style.display, 'none'),
+        assert.equal(value29._iconUnmuted.style.display, 'block'),
+        value29._setMuted(true, { persist: true }));
+      const value30 = appStore.getState().nodes[id11];
+      (assert.equal(value30.videoMuted, true),
+        assert.equal(_video.muted, true),
+        assert.equal(value29._iconMuted.style.display, 'block'),
+        assert.equal(value29._iconUnmuted.style.display, 'none'),
+        assert.equal(new SourceVideoNode9(value30)._isMuted, true));
     } finally {
-      (_0x5bfcbb === undefined
+      (value28 === undefined
         ? delete globalThis.document.createElement
-        : (globalThis.document.createElement = _0x5bfcbb),
+        : (globalThis.document.createElement = value28),
         resetStore());
     }
   }),
   test('SourceVideoNode: resolves poster from local poster path', async () => {
     installDomStubs();
-    const { resolveSourceVideoPosterSrc: _0x574feb } = await import('./SourceVideoNode.js');
+    const { resolveSourceVideoPosterSrc: resolveSourceVideoPosterSrc } = await import('./SourceVideoNode.js');
     (assert.equal(
-      _0x574feb({ posterLocalPath: 'output/VideoThumbs/source-poster.jpg' }),
+      resolveSourceVideoPosterSrc({ posterLocalPath: 'output/VideoThumbs/source-poster.jpg' }),
       '/output/VideoThumbs/source-poster.jpg',
     ),
-      assert.equal(_0x574feb({ posterLocalPath: 'C:/Users/example/source-poster.jpg' }), ''),
       assert.equal(
-        _0x574feb({
+        resolveSourceVideoPosterSrc({ posterLocalPath: 'C:/Users/example/source-poster.jpg' }),
+        '',
+      ),
+      assert.equal(
+        resolveSourceVideoPosterSrc({
           thumbUrl: 'https://example.invalid/remote-thumb.jpg',
           posterLocalPath: 'output/VideoThumbs/local-poster.jpg',
         }),
         '/output/VideoThumbs/local-poster.jpg',
       ),
-      assert.equal(_0x574feb({ posterUrl: 'https://example.invalid/remote-poster.jpg' }), ''),
       assert.equal(
-        _0x574feb({
+        resolveSourceVideoPosterSrc({ posterUrl: 'https://example.invalid/remote-poster.jpg' }),
+        '',
+      ),
+      assert.equal(
+        resolveSourceVideoPosterSrc({
           mainVideoIndex: 0,
           posterLocalPath: 'output/VideoThumbs/second-poster.jpg',
           videos: [
@@ -603,23 +613,23 @@ function createFakeLoadingCard() {
   }),
   test('SourceVideoNode: poster frame is populated before mount connection', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x223e43 } = await import('./SourceVideoNode.js'),
-      _0xc76ab4 = createFakeImageElement();
-    _0xc76ab4.isConnected = false;
-    const _0x3f4304 = Object.create(_0x223e43.prototype);
-    (Object.assign(_0x3f4304, { _video: null, _posterFrame: _0xc76ab4, _lastPosterSrc: '' }),
-      _0x3f4304._applyVideoPoster({ posterLocalPath: 'output/source-thumb.jpg' }),
-      assert.equal(_0xc76ab4.src, '/output/source-thumb.jpg'),
-      assert.equal(_0xc76ab4.classList.contains('is-visible'), true),
-      assert.equal(_0x3f4304._lastPosterSrc, '/output/source-thumb.jpg'));
+    const { SourceVideoNode: SourceVideoNode10 } = await import('./SourceVideoNode.js'),
+      _posterFrame = createFakeImageElement();
+    _posterFrame.isConnected = false;
+    const value31 = Object.create(SourceVideoNode10.prototype);
+    (Object.assign(value31, { _video: null, _posterFrame: _posterFrame, _lastPosterSrc: '' }),
+      value31._applyVideoPoster({ posterLocalPath: 'output/source-thumb.jpg' }),
+      assert.equal(_posterFrame.src, '/output/source-thumb.jpg'),
+      assert.equal(_posterFrame.classList.contains('is-visible'), true),
+      assert.equal(value31._lastPosterSrc, '/output/source-thumb.jpg'));
   }),
   test('SourceVideoNode: poster-backed load does not create video element', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x225cd0 } = await import('./SourceVideoNode.js'),
-      _0x86be4e = createFakeImageElement();
-    let _0x15fcc6 = 0;
-    const _0x5b1e66 = Object.create(_0x225cd0.prototype);
-    (Object.assign(_0x5b1e66, {
+    const { SourceVideoNode: SourceVideoNode11 } = await import('./SourceVideoNode.js'),
+      _posterFrame2 = createFakeImageElement();
+    let value32 = 0;
+    const value33 = Object.create(SourceVideoNode11.prototype);
+    (Object.assign(value33, {
       id: 'source-video-poster-no-video',
       _data: {
         id: 'source-video-poster-no-video',
@@ -628,7 +638,7 @@ function createFakeLoadingCard() {
         thumbUrl: '/output/source-thumb.jpg',
       },
       _video: null,
-      _posterFrame: _0x86be4e,
+      _posterFrame: _posterFrame2,
       _card: createFakeLoadingCard(),
       _controls: { style: { opacity: '' } },
       _muteBtn: { style: { display: '' } },
@@ -640,26 +650,26 @@ function createFakeLoadingCard() {
       _activeCapturePreviewUrl: '',
       _lastPosterSrc: '',
       _ensureVideoElement() {
-        return ((_0x15fcc6 += 1), createFakeVideoElement());
+        return ((value32 += 1), createFakeVideoElement());
       },
     }),
-      _0x5b1e66._loadVideo('/output/source.mp4'),
-      assert.equal(_0x5b1e66._currentSrc, '/output/source.mp4'),
-      assert.equal(_0x5b1e66._video, null),
-      assert.equal(_0x15fcc6, 0),
-      assert.equal(_0x86be4e.src, '/output/source-thumb.jpg'),
-      assert.equal(_0x86be4e.classList.contains('is-visible'), true),
-      assert.equal(_0x5b1e66._controls.style.opacity, '1'),
-      assert.equal(_0x5b1e66._muteBtn.style.display, 'flex'));
+      value33._loadVideo('/output/source.mp4'),
+      assert.equal(value33._currentSrc, '/output/source.mp4'),
+      assert.equal(value33._video, null),
+      assert.equal(value32, 0),
+      assert.equal(_posterFrame2.src, '/output/source-thumb.jpg'),
+      assert.equal(_posterFrame2.classList.contains('is-visible'), true),
+      assert.equal(value33._controls.style.opacity, '1'),
+      assert.equal(value33._muteBtn.style.display, 'flex'));
   }),
   test('SourceVideoNode: poster-backed video defers media load until needed', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x49e50e } = await import('./SourceVideoNode.js'),
-      _0x2c807f = createFakeVideoElement(),
-      _0x2864f3 = createFakeImageElement();
-    _0x2c807f.duration = 7;
-    const _0x17f769 = Object.create(_0x49e50e.prototype);
-    (Object.assign(_0x17f769, {
+    const { SourceVideoNode: SourceVideoNode12 } = await import('./SourceVideoNode.js'),
+      _video2 = createFakeVideoElement(),
+      _posterFrame3 = createFakeImageElement();
+    _video2.duration = 7;
+    const value34 = Object.create(SourceVideoNode12.prototype);
+    (Object.assign(value34, {
       id: 'source-video-lazy-poster',
       _data: {
         id: 'source-video-lazy-poster',
@@ -667,8 +677,8 @@ function createFakeLoadingCard() {
         src: '/output/source.mp4',
         thumbUrl: '/output/source-thumb.jpg',
       },
-      _video: _0x2c807f,
-      _posterFrame: _0x2864f3,
+      _video: _video2,
+      _posterFrame: _posterFrame3,
       _card: createFakeLoadingCard(),
       _controls: { style: { opacity: '' } },
       _muteBtn: { style: { display: '' } },
@@ -680,37 +690,37 @@ function createFakeLoadingCard() {
       _activeCapturePreviewUrl: '',
       _lastPosterSrc: '',
     }),
-      _0x17f769._loadVideo('/output/source.mp4'),
-      assert.equal(_0x17f769._currentSrc, '/output/source.mp4'),
-      assert.equal(_0x2c807f.poster, '/output/source-thumb.jpg'),
-      assert.equal(_0x2864f3.src, '/output/source-thumb.jpg'),
-      assert.equal(_0x2864f3.classList.contains('is-visible'), true),
-      assert.equal(_0x2c807f.preload, 'none'),
-      assert.equal(_0x2c807f.src, ''),
-      assert.equal(_0x2c807f.currentSrc, ''),
-      assert.equal(_0x2c807f.loadCalls, 0),
-      assert.equal(_0x2c807f.style.opacity, '0'),
-      assert.equal(_0x2c807f.style.visibility, 'hidden'),
-      assert.equal(_0x17f769._timeTotal.textContent, '0:07'),
-      assert.equal(_0x17f769._controls.style.opacity, '1'),
-      assert.equal(_0x17f769._muteBtn.style.display, 'flex'));
-    const _0x362482 = _0x2c807f.loadCalls;
-    (assert.equal(await _0x17f769._ensurePlaybackVideoSrc(), true),
-      assert.equal(_0x2c807f.preload, 'metadata'),
-      assert.equal(_0x2c807f.src, '/output/source.mp4'),
-      assert.equal(_0x2c807f.loadCalls, _0x362482 + 1),
-      assert.equal(await _0x17f769._ensurePlaybackVideoSrc({ forPlayback: true }), true),
-      assert.equal(_0x2c807f.preload, 'auto'),
-      assert.equal(_0x2c807f.src, '/output/source.mp4'),
-      assert.equal(_0x2c807f.loadCalls, _0x362482 + 1));
+      value34._loadVideo('/output/source.mp4'),
+      assert.equal(value34._currentSrc, '/output/source.mp4'),
+      assert.equal(_video2.poster, '/output/source-thumb.jpg'),
+      assert.equal(_posterFrame3.src, '/output/source-thumb.jpg'),
+      assert.equal(_posterFrame3.classList.contains('is-visible'), true),
+      assert.equal(_video2.preload, 'none'),
+      assert.equal(_video2.src, ''),
+      assert.equal(_video2.currentSrc, ''),
+      assert.equal(_video2.loadCalls, 0),
+      assert.equal(_video2.style.opacity, '0'),
+      assert.equal(_video2.style.visibility, 'hidden'),
+      assert.equal(value34._timeTotal.textContent, '0:07'),
+      assert.equal(value34._controls.style.opacity, '1'),
+      assert.equal(value34._muteBtn.style.display, 'flex'));
+    const value35 = _video2.loadCalls;
+    (assert.equal(await value34._ensurePlaybackVideoSrc(), true),
+      assert.equal(_video2.preload, 'metadata'),
+      assert.equal(_video2.src, '/output/source.mp4'),
+      assert.equal(_video2.loadCalls, value35 + 1),
+      assert.equal(await value34._ensurePlaybackVideoSrc({ forPlayback: true }), true),
+      assert.equal(_video2.preload, 'auto'),
+      assert.equal(_video2.src, '/output/source.mp4'),
+      assert.equal(_video2.loadCalls, value35 + 1));
   }),
   test('SourceVideoNode: renderer-deferred media waits for hydration', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0xc71eb6 } = await import('./SourceVideoNode.js'),
-      _0x671512 = createFakeVideoElement(),
-      _0x3caa3a = createFakeImageElement(),
-      _0x5f3035 = Object.create(_0xc71eb6.prototype);
-    (Object.assign(_0x5f3035, {
+    const { SourceVideoNode: SourceVideoNode13 } = await import('./SourceVideoNode.js'),
+      _video3 = createFakeVideoElement(),
+      _posterFrame4 = createFakeImageElement(),
+      value36 = Object.create(SourceVideoNode13.prototype);
+    (Object.assign(value36, {
       id: 'source-video-defer-media',
       _data: {
         id: 'source-video-defer-media',
@@ -719,8 +729,8 @@ function createFakeLoadingCard() {
         posterLocalPath: 'output/source-thumb.jpg',
         [RENDERER_DEFER_MEDIA_ON_MOUNT_FLAG]: true,
       },
-      _video: _0x671512,
-      _posterFrame: _0x3caa3a,
+      _video: _video3,
+      _posterFrame: _posterFrame4,
       _card: createFakeLoadingCard(),
       _controls: { style: { opacity: '' } },
       _muteBtn: { style: { display: '' } },
@@ -733,40 +743,40 @@ function createFakeLoadingCard() {
       _lastPosterSrc: '',
       _rendererMediaDeferred: true,
     }),
-      _0x5f3035._loadVideo('/output/source.mp4'),
-      assert.equal(_0x5f3035._currentSrc, '/output/source.mp4'),
-      assert.equal(_0x671512.poster, '/output/source-thumb.jpg'),
-      assert.equal(_0x3caa3a.src, '/output/source-thumb.jpg'),
-      assert.equal(_0x671512.src, ''),
-      _0x5f3035.hydrateDeferredMedia(),
-      assert.equal(_0x671512.poster, '/output/source-thumb.jpg'),
-      assert.equal(_0x3caa3a.src, '/output/source-thumb.jpg'),
-      assert.equal(_0x5f3035._rendererMediaDeferred, false),
-      assert.equal(_0x3caa3a.classList.contains('is-visible'), true),
-      assert.equal(_0x671512.style.opacity, '0'),
-      assert.equal(_0x671512.style.visibility, 'hidden'));
+      value36._loadVideo('/output/source.mp4'),
+      assert.equal(value36._currentSrc, '/output/source.mp4'),
+      assert.equal(_video3.poster, '/output/source-thumb.jpg'),
+      assert.equal(_posterFrame4.src, '/output/source-thumb.jpg'),
+      assert.equal(_video3.src, ''),
+      value36.hydrateDeferredMedia(),
+      assert.equal(_video3.poster, '/output/source-thumb.jpg'),
+      assert.equal(_posterFrame4.src, '/output/source-thumb.jpg'),
+      assert.equal(value36._rendererMediaDeferred, false),
+      assert.equal(_posterFrame4.classList.contains('is-visible'), true),
+      assert.equal(_video3.style.opacity, '0'),
+      assert.equal(_video3.style.visibility, 'hidden'));
   }),
   test('SourceVideoNode: deferred update keeps video source empty until hydration', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x596ad5 } = await import('./SourceVideoNode.js'),
-      _0x5ba469 = 'source-video-defer-update',
-      _0x18c84d = {
-        id: _0x5ba469,
+    const { SourceVideoNode: SourceVideoNode14 } = await import('./SourceVideoNode.js'),
+      id12 = 'source-video-defer-update',
+      _data = {
+        id: id12,
         type: 'source-video',
         src: '/output/source.mp4',
         posterLocalPath: 'output/source-thumb.jpg',
         [RENDERER_DEFER_MEDIA_ON_MOUNT_FLAG]: true,
       };
-    resetStore({ [_0x5ba469]: _0x18c84d });
-    const _0x5b538d = createFakeVideoElement(),
-      _0x258305 = createFakeImageElement();
-    let _0x2ffe0b = 0;
-    const _0x2c3399 = Object.create(_0x596ad5.prototype);
-    (Object.assign(_0x2c3399, {
-      id: _0x5ba469,
-      _data: _0x18c84d,
-      _video: _0x5b538d,
-      _posterFrame: _0x258305,
+    resetStore({ [id12]: _data });
+    const _video4 = createFakeVideoElement(),
+      _posterFrame5 = createFakeImageElement();
+    let value37 = 0;
+    const value38 = Object.create(SourceVideoNode14.prototype);
+    (Object.assign(value38, {
+      id: id12,
+      _data: _data,
+      _video: _video4,
+      _posterFrame: _posterFrame5,
       _card: createFakeLoadingCard(),
       _controls: { style: { opacity: '' } },
       _muteBtn: { style: { display: '' } },
@@ -783,30 +793,30 @@ function createFakeLoadingCard() {
       _maybeResumeRunningHubTask: () => {},
       _maybeResumeAsyncTask: () => {},
       _maybeFetchVideoMeta: () => {
-        _0x2ffe0b += 1;
+        value37 += 1;
       },
     }),
-      _0x2c3399.update({ ..._0x18c84d, name: 'Deferred source video' }),
-      assert.equal(_0x2c3399._currentSrc, '/output/source.mp4'),
-      assert.equal(_0x5b538d.preload, 'none'),
-      assert.equal(_0x5b538d.src, ''),
-      assert.equal(_0x5b538d.loadCalls, 0),
-      assert.equal(_0x5b538d.poster, '/output/source-thumb.jpg'),
-      assert.equal(_0x258305.src, '/output/source-thumb.jpg'),
-      assert.equal(_0x2ffe0b, 0),
-      _0x2c3399.hydrateDeferredMedia(),
-      assert.equal(_0x2c3399._rendererMediaDeferred, false),
-      assert.equal(_0x2ffe0b, 1),
+      value38.update({ ..._data, name: 'Deferred source video' }),
+      assert.equal(value38._currentSrc, '/output/source.mp4'),
+      assert.equal(_video4.preload, 'none'),
+      assert.equal(_video4.src, ''),
+      assert.equal(_video4.loadCalls, 0),
+      assert.equal(_video4.poster, '/output/source-thumb.jpg'),
+      assert.equal(_posterFrame5.src, '/output/source-thumb.jpg'),
+      assert.equal(value37, 0),
+      value38.hydrateDeferredMedia(),
+      assert.equal(value38._rendererMediaDeferred, false),
+      assert.equal(value37, 1),
       resetStore());
   }),
   test('SourceVideoNode: poster refresh preserves already loaded matching video source', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x38337e } = await import('./SourceVideoNode.js'),
-      _0x133212 = createFakeVideoElement(),
-      _0x578aaf = createFakeImageElement();
-    ((_0x133212.src = '/output/source.mp4'), (_0x133212.currentSrc = '/output/source.mp4'));
-    const _0x2bb97b = Object.create(_0x38337e.prototype);
-    Object.assign(_0x2bb97b, {
+    const { SourceVideoNode: SourceVideoNode15 } = await import('./SourceVideoNode.js'),
+      _video5 = createFakeVideoElement(),
+      _posterFrame6 = createFakeImageElement();
+    ((_video5.src = '/output/source.mp4'), (_video5.currentSrc = '/output/source.mp4'));
+    const value39 = Object.create(SourceVideoNode15.prototype);
+    Object.assign(value39, {
       id: 'source-video-preserve-loaded',
       _data: {
         id: 'source-video-preserve-loaded',
@@ -814,8 +824,8 @@ function createFakeLoadingCard() {
         src: '/output/source.mp4',
         posterLocalPath: 'output/source-thumb.jpg',
       },
-      _video: _0x133212,
-      _posterFrame: _0x578aaf,
+      _video: _video5,
+      _posterFrame: _posterFrame6,
       _card: createFakeLoadingCard(),
       _controls: { style: { opacity: '' } },
       _muteBtn: { style: { display: '' } },
@@ -827,162 +837,160 @@ function createFakeLoadingCard() {
       _activeCapturePreviewUrl: '',
       _lastPosterSrc: '',
     });
-    const _0x19b09f = _0x133212.loadCalls;
-    (_0x2bb97b._loadVideo('/output/source.mp4'),
-      assert.equal(_0x2bb97b._currentSrc, '/output/source.mp4'),
-      assert.equal(_0x133212.src, '/output/source.mp4'),
-      assert.equal(_0x133212.currentSrc, '/output/source.mp4'),
-      assert.equal(_0x133212.loadCalls, _0x19b09f),
-      assert.equal(_0x133212.poster, '/output/source-thumb.jpg'),
-      assert.equal(_0x578aaf.classList.contains('is-visible'), true));
+    const value40 = _video5.loadCalls;
+    (value39._loadVideo('/output/source.mp4'),
+      assert.equal(value39._currentSrc, '/output/source.mp4'),
+      assert.equal(_video5.src, '/output/source.mp4'),
+      assert.equal(_video5.currentSrc, '/output/source.mp4'),
+      assert.equal(_video5.loadCalls, value40),
+      assert.equal(_video5.poster, '/output/source-thumb.jpg'),
+      assert.equal(_posterFrame6.classList.contains('is-visible'), true));
   }),
   test('SourceVideoNode: poster frame swaps only after the next poster decodes', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x74dc72 } = await import('./SourceVideoNode.js'),
-      _0x3f220d = Object.prototype.hasOwnProperty.call(globalThis, 'Image'),
-      _0x1d7d44 = globalThis.Image,
-      _0x5a5448 = [];
-    class _0x26746e {
+    const { SourceVideoNode: SourceVideoNode16 } = await import('./SourceVideoNode.js'),
+      value41 = Object.prototype.hasOwnProperty.call(globalThis, 'Image'),
+      value42 = globalThis.Image,
+      list3 = [];
+    class value43 {
       constructor() {
         ((this.onload = null),
           (this.onerror = null),
           (this.naturalWidth = 0x140),
           (this.naturalHeight = 180));
       }
-      set ['src'](_0x37d43b) {
-        ((this._src = _0x37d43b), _0x5a5448.push({ src: _0x37d43b, resolve: () => this.onload?.() }));
+      set ['src'](src) {
+        ((this._src = src), list3.push({ src: src, resolve: () => this.onload?.() }));
       }
       get ['src']() {
         return this._src || '';
       }
     }
-    ((globalThis.Image = _0x26746e), resetCanvasMediaSchedulerForTests());
+    ((globalThis.Image = value43), resetCanvasMediaSchedulerForTests());
     try {
-      const _0x223cfb = createFakeVideoElement(),
-        _0x4c6905 = createFakeImageElement();
-      _0x4c6905.setAttribute('src', '/output/old-thumb.jpg');
-      const _0x32afc1 = Object.create(_0x74dc72.prototype);
-      (Object.assign(_0x32afc1, {
-        _video: _0x223cfb,
-        _posterFrame: _0x4c6905,
+      const _video6 = createFakeVideoElement(),
+        _posterFrame7 = createFakeImageElement();
+      _posterFrame7.setAttribute('src', '/output/old-thumb.jpg');
+      const value44 = Object.create(SourceVideoNode16.prototype);
+      (Object.assign(value44, {
+        _video: _video6,
+        _posterFrame: _posterFrame7,
         _lastPosterSrc: '/output/old-thumb.jpg',
       }),
-        _0x32afc1._applyVideoPoster({ posterLocalPath: 'output/new-thumb.jpg' }),
-        assert.equal(_0x223cfb.poster, '/output/new-thumb.jpg'),
-        assert.equal(_0x4c6905.src, '/output/old-thumb.jpg'),
-        assert.equal(_0x4c6905.classList.contains('is-visible'), true),
-        assert.equal(_0x5a5448[0]?.src, '/output/new-thumb.jpg'),
-        _0x5a5448.shift()?.resolve());
-      for (let _0x148486 = 0; _0x148486 < 8; _0x148486 += 1) await Promise.resolve();
-      assert.equal(_0x4c6905.src, '/output/new-thumb.jpg');
+        value44._applyVideoPoster({ posterLocalPath: 'output/new-thumb.jpg' }),
+        assert.equal(_video6.poster, '/output/new-thumb.jpg'),
+        assert.equal(_posterFrame7.src, '/output/old-thumb.jpg'),
+        assert.equal(_posterFrame7.classList.contains('is-visible'), true),
+        assert.equal(list3[0]?.src, '/output/new-thumb.jpg'),
+        list3.shift()?.resolve());
+      for (let count = 0; count < 8; count += 1) await Promise.resolve();
+      assert.equal(_posterFrame7.src, '/output/new-thumb.jpg');
     } finally {
-      (resetCanvasMediaSchedulerForTests(),
-        _0x3f220d ? (globalThis.Image = _0x1d7d44) : delete globalThis.Image);
+      (resetCanvasMediaSchedulerForTests(), value41 ? (globalThis.Image = value42) : delete globalThis.Image);
     }
   }),
   test('SourceVideoNode: poster frame ignores stale decode after disconnect', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x1c37a2 } = await import('./SourceVideoNode.js'),
-      _0x3eacbc = Object.prototype.hasOwnProperty.call(globalThis, 'Image'),
-      _0x29425a = globalThis.Image,
-      _0x3027c2 = [];
-    class _0x259ce3 {
+    const { SourceVideoNode: SourceVideoNode17 } = await import('./SourceVideoNode.js'),
+      value45 = Object.prototype.hasOwnProperty.call(globalThis, 'Image'),
+      value46 = globalThis.Image,
+      list4 = [];
+    class value47 {
       constructor() {
         this.onload = null;
       }
-      set ['src'](_0x600a58) {
-        ((this._src = _0x600a58), _0x3027c2.push({ resolve: () => this.onload?.() }));
+      set ['src'](value48) {
+        ((this._src = value48), list4.push({ resolve: () => this.onload?.() }));
       }
     }
-    ((globalThis.Image = _0x259ce3), resetCanvasMediaSchedulerForTests());
+    ((globalThis.Image = value47), resetCanvasMediaSchedulerForTests());
     try {
-      const _0x136fb0 = createFakeImageElement();
-      ((_0x136fb0.isConnected = false), _0x136fb0.setAttribute('src', '/output/old-thumb.jpg'));
-      const _0xf78932 = Object.create(_0x1c37a2.prototype);
-      (Object.assign(_0xf78932, {
+      const _posterFrame8 = createFakeImageElement();
+      ((_posterFrame8.isConnected = false), _posterFrame8.setAttribute('src', '/output/old-thumb.jpg'));
+      const value49 = Object.create(SourceVideoNode17.prototype);
+      (Object.assign(value49, {
         _video: createFakeVideoElement(),
-        _posterFrame: _0x136fb0,
+        _posterFrame: _posterFrame8,
         _lastPosterSrc: '/output/old-thumb.jpg',
       }),
-        _0xf78932._applyVideoPoster({ posterLocalPath: 'output/new-thumb.jpg' }),
-        _0x3027c2.shift()?.resolve());
-      for (let _0x25c8aa = 0; _0x25c8aa < 8; _0x25c8aa += 1) await Promise.resolve();
-      assert.equal(_0x136fb0.src, '/output/old-thumb.jpg');
+        value49._applyVideoPoster({ posterLocalPath: 'output/new-thumb.jpg' }),
+        list4.shift()?.resolve());
+      for (let count2 = 0; count2 < 8; count2 += 1) await Promise.resolve();
+      assert.equal(_posterFrame8.src, '/output/old-thumb.jpg');
     } finally {
-      (resetCanvasMediaSchedulerForTests(),
-        _0x3eacbc ? (globalThis.Image = _0x29425a) : delete globalThis.Image);
+      (resetCanvasMediaSchedulerForTests(), value45 ? (globalThis.Image = value46) : delete globalThis.Image);
     }
   }),
   test('SourceVideoNode: 播放首帧 ready 后立即隐藏低清封面层', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x43fbf8 } = await import('./SourceVideoNode.js'),
-      _0x44d0ba = createFakeVideoElement(),
-      _0x46f0dd = createFakeImageElement(),
-      _0x29e574 = Object.create(_0x43fbf8.prototype);
-    (Object.assign(_0x29e574, {
-      _video: _0x44d0ba,
-      _posterFrame: _0x46f0dd,
+    const { SourceVideoNode: SourceVideoNode18 } = await import('./SourceVideoNode.js'),
+      _video7 = createFakeVideoElement(),
+      _posterFrame9 = createFakeImageElement(),
+      value50 = Object.create(SourceVideoNode18.prototype);
+    (Object.assign(value50, {
+      _video: _video7,
+      _posterFrame: _posterFrame9,
       _currentSrc: '/output/source.mp4',
       _lastPosterSrc: '/output/source-thumb.jpg',
     }),
-      (_0x44d0ba.readyState = 2),
-      (_0x44d0ba.currentTime = 0),
-      (_0x44d0ba.paused = true),
-      _0x29e574._syncPosterFrameVisibility(),
-      assert.equal(_0x46f0dd.classList.contains('is-visible'), true),
-      assert.equal(_0x44d0ba.style.opacity, '0'),
-      assert.equal(_0x44d0ba.style.visibility, 'hidden'),
-      (_0x44d0ba.paused = false),
-      _0x29e574._syncPosterFrameVisibility(),
-      assert.equal(_0x46f0dd.classList.contains('is-visible'), false),
-      assert.equal(_0x44d0ba.style.opacity, '1'),
-      assert.equal(_0x44d0ba.style.visibility, 'visible'));
+      (_video7.readyState = 2),
+      (_video7.currentTime = 0),
+      (_video7.paused = true),
+      value50._syncPosterFrameVisibility(),
+      assert.equal(_posterFrame9.classList.contains('is-visible'), true),
+      assert.equal(_video7.style.opacity, '0'),
+      assert.equal(_video7.style.visibility, 'hidden'),
+      (_video7.paused = false),
+      value50._syncPosterFrameVisibility(),
+      assert.equal(_posterFrame9.classList.contains('is-visible'), false),
+      assert.equal(_video7.style.opacity, '1'),
+      assert.equal(_video7.style.visibility, 'visible'));
   }),
   test('SourceVideoNode: paused video at first frame keeps poster fallback visible', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x16e440 } = await import('./SourceVideoNode.js'),
-      _0xcd04ba = createFakeVideoElement(),
-      _0x43d846 = createFakeImageElement(),
-      _0x30bcf9 = Object.create(_0x16e440.prototype);
-    (Object.assign(_0x30bcf9, {
-      _video: _0xcd04ba,
-      _posterFrame: _0x43d846,
+    const { SourceVideoNode: SourceVideoNode19 } = await import('./SourceVideoNode.js'),
+      _video8 = createFakeVideoElement(),
+      _posterFrame10 = createFakeImageElement(),
+      value51 = Object.create(SourceVideoNode19.prototype);
+    (Object.assign(value51, {
+      _video: _video8,
+      _posterFrame: _posterFrame10,
       _currentSrc: '/output/source.mp4',
       _lastPosterSrc: '/output/source-thumb.jpg',
     }),
-      (_0xcd04ba.readyState = 2),
-      (_0xcd04ba.currentTime = 0),
-      (_0xcd04ba.paused = true),
-      _0x30bcf9._syncPosterFrameVisibility(),
-      assert.equal(_0x43d846.classList.contains('is-visible'), true),
-      assert.equal(_0xcd04ba.style.opacity, '0'),
-      assert.equal(_0xcd04ba.style.visibility, 'hidden'),
-      (_0xcd04ba.currentTime = 0.2),
-      _0x30bcf9._syncPosterFrameVisibility(),
-      assert.equal(_0x43d846.classList.contains('is-visible'), false),
-      assert.equal(_0xcd04ba.style.opacity, '1'),
-      assert.equal(_0xcd04ba.style.visibility, 'visible'));
+      (_video8.readyState = 2),
+      (_video8.currentTime = 0),
+      (_video8.paused = true),
+      value51._syncPosterFrameVisibility(),
+      assert.equal(_posterFrame10.classList.contains('is-visible'), true),
+      assert.equal(_video8.style.opacity, '0'),
+      assert.equal(_video8.style.visibility, 'hidden'),
+      (_video8.currentTime = 0.2),
+      value51._syncPosterFrameVisibility(),
+      assert.equal(_posterFrame10.classList.contains('is-visible'), false),
+      assert.equal(_video8.style.opacity, '1'),
+      assert.equal(_video8.style.visibility, 'visible'));
   }),
   test('SourceVideoNode: desktop video thumb extraction waits for idle', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x2da7c8 } = await import('./SourceVideoNode.js'),
-      _0xefce0a = globalThis.window.electronAPI,
-      _0x2c3077 = globalThis.window.requestIdleCallback,
-      _0x24f8be = globalThis.window.cancelIdleCallback;
-    let _0x5654c5 = null;
+    const { SourceVideoNode: SourceVideoNode20 } = await import('./SourceVideoNode.js'),
+      value52 = globalThis.window.electronAPI,
+      value53 = globalThis.window.requestIdleCallback,
+      value54 = globalThis.window.cancelIdleCallback;
+    let run = null;
     ((globalThis.window.electronAPI = {}),
-      (globalThis.window.requestIdleCallback = (_0x58682b) => {
-        return ((_0x5654c5 = _0x58682b), 11);
+      (globalThis.window.requestIdleCallback = (value55) => {
+        return ((run = value55), 11);
       }),
       (globalThis.window.cancelIdleCallback = () => {}));
     try {
-      const _0x27b17d = createFakeVideoElement();
-      let _0x2b41d7 = 0;
-      const _0x429095 = Object.create(_0x2da7c8.prototype);
-      (Object.assign(_0x429095, {
+      const _video9 = createFakeVideoElement();
+      let value56 = 0;
+      const value57 = Object.create(SourceVideoNode20.prototype);
+      (Object.assign(value57, {
         id: 'source-video-idle-thumb',
         _data: { id: 'source-video-idle-thumb', type: 'source-video', src: '/output/source.mp4' },
-        _video: _0x27b17d,
+        _video: _video9,
         _posterFrame: createFakeImageElement(),
         _card: createFakeLoadingCard(),
         _controls: { style: { opacity: '' } },
@@ -997,44 +1005,44 @@ function createFakeLoadingCard() {
         _showPausedCenterIndicator() {},
         _attachPlaybackRecovery() {},
         _maybeEnsureVideoThumb() {
-          _0x2b41d7 += 1;
+          value56 += 1;
         },
       }),
-        _0x429095._loadVideo('/output/source.mp4'),
-        assert.equal(_0x2b41d7, 0),
-        assert.equal(typeof _0x5654c5, 'function'),
-        assert.equal(_0x27b17d.preload, 'none'),
-        assert.equal(_0x27b17d.src, ''),
-        _0x5654c5(),
-        assert.equal(_0x2b41d7, 1));
+        value57._loadVideo('/output/source.mp4'),
+        assert.equal(value56, 0),
+        assert.equal(typeof run, 'function'),
+        assert.equal(_video9.preload, 'none'),
+        assert.equal(_video9.src, ''),
+        run(),
+        assert.equal(value56, 1));
     } finally {
-      (_0xefce0a === undefined
+      (value52 === undefined
         ? delete globalThis.window.electronAPI
-        : (globalThis.window.electronAPI = _0xefce0a),
-        _0x2c3077 === undefined
+        : (globalThis.window.electronAPI = value52),
+        value53 === undefined
           ? delete globalThis.window.requestIdleCallback
-          : (globalThis.window.requestIdleCallback = _0x2c3077),
-        _0x24f8be === undefined
+          : (globalThis.window.requestIdleCallback = value53),
+        value54 === undefined
           ? delete globalThis.window.cancelIdleCallback
-          : (globalThis.window.cancelIdleCallback = _0x24f8be));
+          : (globalThis.window.cancelIdleCallback = value54));
     }
   }),
   test('SourceVideoNode: no-poster video handles immediate loadeddata during load', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x1c8617 } = await import('./SourceVideoNode.js'),
-      _0x44339b = createFakeVideoElement(),
-      _0x33620a = _0x44339b.load.bind(_0x44339b);
-    ((_0x44339b.readyState = 0),
-      (_0x44339b.load = function _0x3d66c0() {
-        (_0x33620a(), (this.readyState = 2), this.onloadeddata?.());
+    const { SourceVideoNode: SourceVideoNode21 } = await import('./SourceVideoNode.js'),
+      _video10 = createFakeVideoElement(),
+      handler3 = _video10.load.bind(_video10);
+    ((_video10.readyState = 0),
+      (_video10.load = function run2() {
+        (handler3(), (this.readyState = 2), this.onloadeddata?.());
       }));
-    let _0x2d8f88 = 0,
-      _0x2258c9 = false;
-    const _0x579338 = Object.create(_0x1c8617.prototype);
-    (Object.assign(_0x579338, {
+    let value58 = 0,
+      value59 = false;
+    const value60 = Object.create(SourceVideoNode21.prototype);
+    (Object.assign(value60, {
       id: 'source-video-cut-load',
       _data: { id: 'source-video-cut-load', type: 'source-video', src: '/output/CutVideo/cut.mp4' },
-      _video: _0x44339b,
+      _video: _video10,
       _card: createFakeLoadingCard(),
       _controls: { style: { opacity: '' } },
       _muteBtn: { style: { display: '' } },
@@ -1047,34 +1055,34 @@ function createFakeLoadingCard() {
       _attachPlaybackRecovery() {},
       _clearMediaUnavailableAfterPlayback() {},
       _maybeEnsureVideoThumb() {
-        _0x2d8f88 += 1;
+        value58 += 1;
       },
       _showPausedCenterIndicator() {
-        _0x2258c9 = true;
+        value59 = true;
       },
     }),
-      _0x579338._loadVideo('/output/CutVideo/cut.mp4'),
-      assert.equal(_0x44339b.preload, 'auto'),
-      assert.equal(_0x44339b.src, '/output/CutVideo/cut.mp4'),
-      assert.equal(_0x579338._controls.style.opacity, '1'),
-      assert.equal(_0x579338._muteBtn.style.display, 'flex'),
-      assert.equal(_0x579338._centerIndicator.style.display, 'flex'),
-      assert.equal(_0x2258c9, true),
-      assert.equal(_0x2d8f88, 1));
+      value60._loadVideo('/output/CutVideo/cut.mp4'),
+      assert.equal(_video10.preload, 'auto'),
+      assert.equal(_video10.src, '/output/CutVideo/cut.mp4'),
+      assert.equal(value60._controls.style.opacity, '1'),
+      assert.equal(value60._muteBtn.style.display, 'flex'),
+      assert.equal(value60._centerIndicator.style.display, 'flex'),
+      assert.equal(value59, true),
+      assert.equal(value58, 1));
   }),
   test('SourceVideoNode: switching to final poster source releases capture preview', async () => {
     installDomStubs();
-    const _0x39ff14 = globalThis.window.URL,
-      _0xd781a2 = [];
+    const value61 = globalThis.window.URL,
+      list5 = [];
     globalThis.window.URL = {
-      revokeObjectURL(_0xa5628c) {
-        _0xd781a2.push(_0xa5628c);
+      revokeObjectURL(value62) {
+        list5.push(value62);
       },
     };
-    const { SourceVideoNode: _0x4c3665 } = await import('./SourceVideoNode.js'),
-      _0x13ce6e = createFakeVideoElement(),
-      _0x15d100 = Object.create(_0x4c3665.prototype);
-    Object.assign(_0x15d100, {
+    const { SourceVideoNode: SourceVideoNode22 } = await import('./SourceVideoNode.js'),
+      _video11 = createFakeVideoElement(),
+      value63 = Object.create(SourceVideoNode22.prototype);
+    Object.assign(value63, {
       id: 'source-video-release-preview',
       _data: {
         id: 'source-video-release-preview',
@@ -1083,7 +1091,7 @@ function createFakeLoadingCard() {
         thumbUrl: '/output/source-thumb.jpg',
         capturePreviewUrl: 'blob:pending-video-preview',
       },
-      _video: _0x13ce6e,
+      _video: _video11,
       _card: createFakeLoadingCard(),
       _controls: { style: { opacity: '' } },
       _muteBtn: { style: { display: '' } },
@@ -1095,19 +1103,19 @@ function createFakeLoadingCard() {
       _lastPosterSrc: '',
     });
     try {
-      (_0x15d100._loadVideo('/output/source.mp4'),
-        assert.deepEqual(_0xd781a2, ['blob:pending-video-preview']),
-        assert.equal(_0x15d100._activeCapturePreviewUrl, ''),
-        assert.equal(_0x13ce6e.poster, '/output/source-thumb.jpg'));
+      (value63._loadVideo('/output/source.mp4'),
+        assert.deepEqual(list5, ['blob:pending-video-preview']),
+        assert.equal(value63._activeCapturePreviewUrl, ''),
+        assert.equal(_video11.poster, '/output/source-thumb.jpg'));
     } finally {
-      globalThis.window.URL = _0x39ff14;
+      globalThis.window.URL = value61;
     }
   }),
   test('SourceVideoNode: 正式视频路径优先于 capturePreviewUrl', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x3136a9 } = await import('./SourceVideoNode.js'),
-      _0x48c18f = Object.create(_0x3136a9.prototype);
-    (Object.assign(_0x48c18f, {
+    const { SourceVideoNode: SourceVideoNode23 } = await import('./SourceVideoNode.js'),
+      value64 = Object.create(SourceVideoNode23.prototype);
+    (Object.assign(value64, {
       _data: {
         id: 'source-video-final',
         type: 'source-video',
@@ -1115,12 +1123,12 @@ function createFakeLoadingCard() {
         capturePreviewUrl: 'blob:pending-video-preview',
       },
     }),
-      assert.equal(_0x48c18f._resolveVideoSrc(_0x48c18f._data), '/output/final.mp4'));
+      assert.equal(value64._resolveVideoSrc(value64._data), '/output/final.mp4'));
   }),
   test('SourceVideoNode: loaded playback clears stale media unavailable marker', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x4ebd69 } = await import('./SourceVideoNode.js'),
-      _0x311c31 = {
+    const { SourceVideoNode: SourceVideoNode24 } = await import('./SourceVideoNode.js'),
+      id13 = {
         id: 'source-video-keyed-loaded',
         type: 'source-video',
         localPath: 'output/keyed.mp4',
@@ -1128,18 +1136,18 @@ function createFakeLoadingCard() {
         mediaUnavailable: true,
         mediaUnavailableSource: 'output/keyed.mp4',
       };
-    resetStore({ [_0x311c31.id]: _0x311c31 });
-    const _0x231350 = Object.create(_0x4ebd69.prototype);
-    (Object.assign(_0x231350, { id: _0x311c31.id, _data: _0x311c31 }),
-      _0x231350._clearMediaUnavailableAfterPlayback('/output/keyed.mp4'));
-    const _0x38a852 = appStore.getState().nodes[_0x311c31.id];
-    (assert.equal(_0x38a852.mediaUnavailable, false), assert.equal(_0x38a852.mediaUnavailableSource, ''));
+    resetStore({ [id13.id]: id13 });
+    const value65 = Object.create(SourceVideoNode24.prototype);
+    (Object.assign(value65, { id: id13.id, _data: id13 }),
+      value65._clearMediaUnavailableAfterPlayback('/output/keyed.mp4'));
+    const value66 = appStore.getState().nodes[id13.id];
+    (assert.equal(value66.mediaUnavailable, false), assert.equal(value66.mediaUnavailableSource, ''));
   }),
   test('SourceVideoNode: Alt 播放按钮进入手动循环，停止时退出循环', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x47ad41 } = await import('./SourceVideoNode.js'),
-      _0x355f5e = [],
-      _0xd4d1e0 = {
+    const { SourceVideoNode: SourceVideoNode25 } = await import('./SourceVideoNode.js'),
+      list6 = [],
+      _video12 = {
         paused: true,
         loop: false,
         currentTime: 0,
@@ -1148,46 +1156,46 @@ function createFakeLoadingCard() {
           this.paused = true;
         },
       },
-      _0x2042df = Object.create(_0x47ad41.prototype);
-    (Object.assign(_0x2042df, {
+      value67 = Object.create(SourceVideoNode25.prototype);
+    (Object.assign(value67, {
       id: 'source-video-loop-playback',
       _data: { id: 'source-video-loop-playback', type: 'source-video' },
-      _video: _0xd4d1e0,
+      _video: _video12,
       _currentSrc: '/output/source-loop.mp4',
       _isManualControl: false,
       _hoverManualPause: false,
       _isManualLoopPlayback: false,
       _autoPlayToken: 0,
-      _flashCenterIndicator(_0x59ed2a) {
-        _0x355f5e.push(_0x59ed2a);
+      _flashCenterIndicator(value68) {
+        list6.push(value68);
       },
       _playVideoWithRecovery: async () => {
-        return ((_0xd4d1e0.paused = false), true);
+        return ((_video12.paused = false), true);
       },
     }),
-      _0x2042df._toggleManualPlayback({ loop: true }),
+      value67._toggleManualPlayback({ loop: true }),
       await Promise.resolve(),
-      assert.equal(_0x2042df._isManualLoopPlayback, true),
-      assert.equal(_0x2042df._isManualControl, true),
-      assert.equal(_0xd4d1e0.loop, true),
-      assert.deepEqual(_0x355f5e, ['play']),
-      (_0x355f5e.length = 0),
-      _0x2042df._toggleManualPlayback(),
-      assert.equal(_0x2042df._isManualLoopPlayback, false),
-      assert.equal(_0xd4d1e0.loop, false),
-      assert.equal(_0xd4d1e0.paused, true),
-      assert.equal(_0x2042df._hoverManualPause, true),
-      assert.deepEqual(_0x355f5e, ['pause']));
+      assert.equal(value67._isManualLoopPlayback, true),
+      assert.equal(value67._isManualControl, true),
+      assert.equal(_video12.loop, true),
+      assert.deepEqual(list6, ['play']),
+      (list6.length = 0),
+      value67._toggleManualPlayback(),
+      assert.equal(value67._isManualLoopPlayback, false),
+      assert.equal(_video12.loop, false),
+      assert.equal(_video12.paused, true),
+      assert.equal(value67._hoverManualPause, true),
+      assert.deepEqual(list6, ['pause']));
   }),
   test('SourceVideoNode: manual playback lazily creates video element', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x15e897 } = await import('./SourceVideoNode.js'),
-      _0x330a1a = createFakeVideoElement();
-    _0x330a1a.duration = 8;
-    let _0x17f9b7 = 0,
-      _0x34d21d = 0;
-    const _0x40da31 = Object.create(_0x15e897.prototype);
-    (Object.assign(_0x40da31, {
+    const { SourceVideoNode: SourceVideoNode26 } = await import('./SourceVideoNode.js'),
+      fakeVideoElement = createFakeVideoElement();
+    fakeVideoElement.duration = 8;
+    let value69 = 0,
+      value70 = 0;
+    const value71 = Object.create(SourceVideoNode26.prototype);
+    (Object.assign(value71, {
       id: 'source-video-lazy-manual-play',
       _data: { id: 'source-video-lazy-manual-play', type: 'source-video' },
       _video: null,
@@ -1197,24 +1205,24 @@ function createFakeLoadingCard() {
       _isManualLoopPlayback: false,
       _autoPlayToken: 0,
       _ensureVideoElement() {
-        return ((_0x17f9b7 += 1), (this._video = _0x330a1a), _0x330a1a);
+        return ((value69 += 1), (this._video = fakeVideoElement), fakeVideoElement);
       },
       _playVideoWithRecovery() {
-        return ((_0x34d21d += 1), Promise.resolve(true));
+        return ((value70 += 1), Promise.resolve(true));
       },
       _flashCenterIndicator() {},
     }),
-      _0x40da31._toggleManualPlayback(),
+      value71._toggleManualPlayback(),
       await Promise.resolve(),
-      assert.equal(_0x17f9b7, 1),
-      assert.equal(_0x34d21d, 1),
-      assert.equal(_0x40da31._video, _0x330a1a),
-      assert.equal(_0x40da31._isManualControl, true));
+      assert.equal(value69, 1),
+      assert.equal(value70, 1),
+      assert.equal(value71._video, fakeVideoElement),
+      assert.equal(value71._isManualControl, true));
   }),
   test('SourceVideoNode: manual click keeps fresh hover playback instead of pausing', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x2a27a5 } = await import('./SourceVideoNode.js'),
-      _0x1cfcf5 = {
+    const { SourceVideoNode: SourceVideoNode27 } = await import('./SourceVideoNode.js'),
+      _video13 = {
         paused: false,
         loop: false,
         currentTime: 0,
@@ -1223,12 +1231,12 @@ function createFakeLoadingCard() {
           this.paused = true;
         },
       };
-    let _0x181956 = 0;
-    const _0x2d156e = Object.create(_0x2a27a5.prototype);
-    (Object.assign(_0x2d156e, {
+    let value72 = 0;
+    const value73 = Object.create(SourceVideoNode27.prototype);
+    (Object.assign(value73, {
       id: 'source-video-hover-click',
       _data: { id: 'source-video-hover-click', type: 'source-video' },
-      _video: _0x1cfcf5,
+      _video: _video13,
       _currentSrc: '/output/source-hover.mp4',
       _isHovered: true,
       _isManualControl: false,
@@ -1237,21 +1245,22 @@ function createFakeLoadingCard() {
       _autoPlayToken: 0,
       _flashCenterIndicator() {},
       _playVideoWithRecovery: async () => {
-        return ((_0x181956 += 1), (_0x1cfcf5.paused = false), true);
+        return ((value72 += 1), (_video13.paused = false), true);
       },
     }),
-      assert.equal(_0x2d156e._shouldKeepHoverPlaybackOnManualClick(), true),
-      _0x2d156e._toggleManualPlayback({ forcePlay: true }),
+      assert.equal(value73._shouldKeepHoverPlaybackOnManualClick(), true),
+      value73._toggleManualPlayback({ forcePlay: true }),
       await Promise.resolve(),
-      assert.equal(_0x1cfcf5.paused, false),
-      assert.equal(_0x2d156e._hoverManualPause, false),
-      assert.equal(_0x2d156e._isManualControl, true),
-      assert.equal(_0x181956, 1));
+      assert.equal(_video13.paused, false),
+      assert.equal(value73._hoverManualPause, false),
+      assert.equal(value73._isManualControl, true),
+      assert.equal(value72, 1));
   }),
   test('SourceVideoNode: upload size patch preserves landscape ratio', async () => {
     installDomStubs();
-    const { buildSourceVideoUploadSizePatch: _0x90db9f } = await import('./SourceVideoNode.js');
-    assert.deepEqual(_0x90db9f({ width: 0x780, height: 0x438 }), {
+    const { buildSourceVideoUploadSizePatch: buildSourceVideoUploadSizePatch } =
+      await import('./SourceVideoNode.js');
+    assert.deepEqual(buildSourceVideoUploadSizePatch({ width: 0x780, height: 0x438 }), {
       width: 0x200,
       height: 0x120,
       videoWidth: 0x780,
@@ -1261,8 +1270,9 @@ function createFakeLoadingCard() {
   }),
   test('SourceVideoNode: upload size patch preserves portrait ratio', async () => {
     installDomStubs();
-    const { buildSourceVideoUploadSizePatch: _0x9ec928 } = await import('./SourceVideoNode.js');
-    assert.deepEqual(_0x9ec928({ width: 0x438, height: 0x780 }), {
+    const { buildSourceVideoUploadSizePatch: buildSourceVideoUploadSizePatch2 } =
+      await import('./SourceVideoNode.js');
+    assert.deepEqual(buildSourceVideoUploadSizePatch2({ width: 0x438, height: 0x780 }), {
       width: 0x120,
       height: 0x200,
       videoWidth: 0x438,
@@ -1272,27 +1282,28 @@ function createFakeLoadingCard() {
   }),
   test('SourceVideoNode: upload size patch waits for auto resize when metadata is missing', async () => {
     installDomStubs();
-    const { buildSourceVideoUploadSizePatch: _0x2d0f5b } = await import('./SourceVideoNode.js');
-    assert.deepEqual(_0x2d0f5b({ width: 0, height: 0 }), { needsAutoResize: true });
+    const { buildSourceVideoUploadSizePatch: buildSourceVideoUploadSizePatch3 } =
+      await import('./SourceVideoNode.js');
+    assert.deepEqual(buildSourceVideoUploadSizePatch3({ width: 0, height: 0 }), { needsAutoResize: true });
   }),
   test('SourceVideoNode: upload starts after preview paint without waiting for metadata', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x115590 } = await import('./SourceVideoNode.js'),
-      _0x37e7b6 = globalThis.window,
-      _0x179c27 = 'source-video-upload-order',
-      _0x3854b7 = [],
-      _0x29805c = { name: 'clip.mp4', type: 'video/mp4' };
-    let _0x4ebcb5 = false,
-      _0x59e1b0 = null;
-    const _0x58f492 = () => ({ cloneNode: _0x58f492 }),
-      _0x2c00d3 = {
+    const { SourceVideoNode: SourceVideoNode28 } = await import('./SourceVideoNode.js'),
+      value74 = globalThis.window,
+      id14 = 'source-video-upload-order',
+      list7 = [],
+      value75 = { name: 'clip.mp4', type: 'video/mp4' };
+    let value76 = false,
+      handler4 = null;
+    const cloneNode = () => ({ cloneNode: cloneNode }),
+      _card = {
         classList: {
-          add(..._0x2eff72) {
-            _0x3854b7.push('loading:' + _0x2eff72.join(','));
+          add(...list8) {
+            list7.push('loading:' + list8.join(','));
           },
           remove() {},
-          contains(_0x1d5607) {
-            return _0x1d5607 === 'img-preview-loading';
+          contains(value77) {
+            return value77 === 'img-preview-loading';
           },
         },
         querySelector() {
@@ -1305,8 +1316,8 @@ function createFakeLoadingCard() {
       };
     (appStore.loadState({
       nodes: {
-        [_0x179c27]: {
-          id: _0x179c27,
+        [id14]: {
+          id: id14,
           type: 'source-video',
           x: 0,
           y: 0,
@@ -1319,56 +1330,56 @@ function createFakeLoadingCard() {
       viewport: { x: 0, y: 0, zoom: 1 },
     }),
       (globalThis.window = {
-        ...(_0x37e7b6 || {}),
+        ...(value74 || {}),
         currentProjectId: 'project-video',
         showToast() {},
         URL: {
-          createObjectURL(_0x5b7504) {
+          createObjectURL(value78) {
             return (
-              assert.equal(_0x5b7504, _0x29805c),
-              _0x3854b7.push('preview-url'),
+              assert.equal(value78, value75),
+              list7.push('preview-url'),
               'blob:source-video-upload-preview'
             );
           },
           revokeObjectURL() {},
         },
       }));
-    const _0x4f1f94 = Object.create(_0x115590.prototype);
-    Object.assign(_0x4f1f94, {
-      id: _0x179c27,
-      _data: { id: _0x179c27, type: 'source-video' },
-      _card: _0x2c00d3,
+    const value79 = Object.create(SourceVideoNode28.prototype);
+    Object.assign(value79, {
+      id: id14,
+      _data: { id: id14, type: 'source-video' },
+      _card: _card,
       _video: { style: { display: 'block' } },
       _controls: { style: { opacity: '1' } },
       _uploadBtn: {
-        childNodes: [{ cloneNode: _0x58f492 }],
+        childNodes: [{ cloneNode: cloneNode }],
         textContent: '上传',
         style: {},
-        replaceChildren(..._0x1c93ce) {
-          _0x3854b7.push('restore:' + _0x1c93ce.length);
+        replaceChildren(...list9) {
+          list7.push('restore:' + list9.length);
         },
       },
       _input: { value: 'selected' },
       _currentSrc: '',
-      _loadVideo(_0x3744cf) {
-        (_0x3854b7.push('load:' + _0x3744cf), (this._currentSrc = _0x3744cf));
+      _loadVideo(value80) {
+        (list7.push('load:' + value80), (this._currentSrc = value80));
       },
       _waitForUploadPaint: async () => {
-        _0x3854b7.push('paint');
+        list7.push('paint');
       },
       _readUploadVideoNaturalSize: () => {
         return (
-          _0x3854b7.push('size:start'),
-          new Promise((_0x47273f) => {
-            _0x59e1b0 = (_0x3ea46e) => {
-              ((_0x4ebcb5 = true), _0x3854b7.push('size:resolve'), _0x47273f(_0x3ea46e));
+          list7.push('size:start'),
+          new Promise((handler5) => {
+            handler4 = (value81) => {
+              ((value76 = true), list7.push('size:resolve'), handler5(value81));
             };
           })
         );
       },
-      _uploadSourceVideoFile: async (_0x199de9, _0x39816b) => {
+      _uploadSourceVideoFile: async (value82, value83) => {
         return (
-          _0x3854b7.push('upload:start:' + _0x39816b + ':sizeResolved=' + _0x4ebcb5),
+          list7.push('upload:start:' + value83 + ':sizeResolved=' + value76),
           {
             url: '/data/assets/original/clip.mp4',
             localPath: 'data/assets/original/clip.mp4',
@@ -1380,27 +1391,27 @@ function createFakeLoadingCard() {
       },
     });
     try {
-      const _0x2eddbf = _0x4f1f94._handleUploadInputFile(_0x29805c);
+      const value84 = value79._handleUploadInputFile(value75);
       (await Promise.resolve(),
         await Promise.resolve(),
-        assert.ok(_0x3854b7.includes('loading:img-preview-loading')),
-        assert.ok(_0x3854b7.includes('loading:img-preview-loading--static')),
-        assert.ok(_0x3854b7.includes('load:blob:source-video-upload-preview')),
-        assert.ok(_0x3854b7.includes('paint')),
-        assert.ok(_0x3854b7.includes('upload:start:project-video:sizeResolved=false')),
-        assert.equal(typeof _0x59e1b0, 'function'),
-        _0x59e1b0({ width: 0x780, height: 0x438 }),
-        await _0x2eddbf);
-      const _0x4070a6 = appStore.getState().nodes[_0x179c27];
-      (assert.equal(_0x4070a6.localPath, 'data/assets/original/clip.mp4'),
-        assert.equal(_0x4070a6.width, 0x200),
-        assert.equal(_0x4070a6.height, 0x120),
-        assert.equal(_0x4070a6.videoWidth, 0x780),
-        assert.equal(_0x4070a6.videoHeight, 0x438),
-        assert.equal(_0x4f1f94._input.value, ''),
-        assert.ok(_0x3854b7.includes('restore:1')));
+        assert.ok(list7.includes('loading:img-preview-loading')),
+        assert.ok(list7.includes('loading:img-preview-loading--static')),
+        assert.ok(list7.includes('load:blob:source-video-upload-preview')),
+        assert.ok(list7.includes('paint')),
+        assert.ok(list7.includes('upload:start:project-video:sizeResolved=false')),
+        assert.equal(typeof handler4, 'function'),
+        handler4({ width: 0x780, height: 0x438 }),
+        await value84);
+      const box = appStore.getState().nodes[id14];
+      (assert.equal(box.localPath, 'data/assets/original/clip.mp4'),
+        assert.equal(box.width, 0x200),
+        assert.equal(box.height, 0x120),
+        assert.equal(box.videoWidth, 0x780),
+        assert.equal(box.videoHeight, 0x438),
+        assert.equal(value79._input.value, ''),
+        assert.ok(list7.includes('restore:1')));
     } finally {
-      ((globalThis.window = _0x37e7b6),
+      ((globalThis.window = value74),
         appStore.loadState({ nodes: {}, edges: {}, viewport: { x: 0, y: 0, zoom: 1 } }));
     }
   }),
@@ -1408,18 +1419,18 @@ function createFakeLoadingCard() {
     installDomStubs();
     typeof globalThis.document.createElement !== 'function' &&
       (globalThis.document.createElement = () => ({ className: '', appendChild() {}, remove() {} }));
-    const { SourceVideoNode: _0x133d63 } = await import('./SourceVideoNode.js');
-    let _0x54a6cb = 0;
-    const _0x493ee3 = [],
-      _0x2bc6c2 = Object.create(_0x133d63.prototype);
-    (Object.assign(_0x2bc6c2, {
+    const { SourceVideoNode: SourceVideoNode29 } = await import('./SourceVideoNode.js');
+    let value85 = 0;
+    const list10 = [],
+      value86 = Object.create(SourceVideoNode29.prototype);
+    (Object.assign(value86, {
       id: 'source-video-rh-running',
       _data: { id: 'source-video-rh-running', type: 'source-video' },
       _video: {},
       _card: {
         classList: {
-          add(..._0x6684c2) {
-            _0x493ee3.push(..._0x6684c2);
+          add(...args2) {
+            list10.push(...args2);
           },
           remove() {},
         },
@@ -1427,7 +1438,7 @@ function createFakeLoadingCard() {
           return null;
         },
         querySelectorAll() {
-          return ((_0x54a6cb += 1), []);
+          return ((value85 += 1), []);
         },
         appendChild() {},
       },
@@ -1440,7 +1451,7 @@ function createFakeLoadingCard() {
       _maybeResumeRunningHubTask: () => {},
       _maybeResumeAsyncTask: () => {},
     }),
-      _0x2bc6c2.update({
+      value86.update({
         id: 'source-video-rh-running',
         type: 'source-video',
         provider: 'runninghubwf',
@@ -1452,17 +1463,17 @@ function createFakeLoadingCard() {
         dreaminaTaskPhase: 'done',
         asyncTaskStatus: 'idle',
       }),
-      await new Promise((_0x239dc0) => setTimeout(_0x239dc0, 60)),
-      assert.equal(_0x54a6cb, 0),
-      assert.equal(_0x2bc6c2._uploadBtn.disabled, true),
-      assert.ok(_0x493ee3.includes('img-preview-loading')));
+      await new Promise((value87) => setTimeout(value87, 60)),
+      assert.equal(value85, 0),
+      assert.equal(value86._uploadBtn.disabled, true),
+      assert.ok(list10.includes('img-preview-loading')));
   }),
   test('SourceVideoNode: resolved source video clears stale running timer', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x337985 } = await import('./SourceVideoNode.js'),
-      _0x469ca5 = 'source-video-stale-timer',
-      _0x60cf2d = {
-        id: _0x469ca5,
+    const { SourceVideoNode: SourceVideoNode30 } = await import('./SourceVideoNode.js'),
+      id15 = 'source-video-stale-timer',
+      _data2 = {
+        id: id15,
         type: 'source-video',
         src: '/output/source.mp4',
         isGenerating: true,
@@ -1470,11 +1481,11 @@ function createFakeLoadingCard() {
         generationStartTime: 123,
         generationDuration: null,
       };
-    resetStore({ [_0x469ca5]: _0x60cf2d });
-    const _0x4753ce = Object.create(_0x337985.prototype);
-    (Object.assign(_0x4753ce, {
-      id: _0x469ca5,
-      _data: _0x60cf2d,
+    resetStore({ [id15]: _data2 });
+    const value88 = Object.create(SourceVideoNode30.prototype);
+    (Object.assign(value88, {
+      id: id15,
+      _data: _data2,
       _video: { paused: true },
       _card: createFakeLoadingCard(),
       _hint: { style: { display: '' } },
@@ -1488,19 +1499,19 @@ function createFakeLoadingCard() {
       _maybeResumeRunningHubTask: () => {},
       _maybeResumeAsyncTask: () => {},
     }),
-      _0x4753ce.update(_0x60cf2d));
-    const _0x3ec848 = appStore.getState().nodes[_0x469ca5];
-    (assert.equal(_0x3ec848.generationStartTime, null),
-      assert.equal(Number.isFinite(Number(_0x3ec848.generationDuration)), true),
-      assert.equal(_0x3ec848.isGenerating, false),
+      value88.update(_data2));
+    const value89 = appStore.getState().nodes[id15];
+    (assert.equal(value89.generationStartTime, null),
+      assert.equal(Number.isFinite(Number(value89.generationDuration)), true),
+      assert.equal(value89.isGenerating, false),
       resetStore());
   }),
   test('SourceVideoNode: active video task with existing result keeps running timer', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x5a0b2d } = await import('./SourceVideoNode.js'),
-      _0x129c5e = 'source-video-active-task-timer',
-      _0x27df0b = {
-        id: _0x129c5e,
+    const { SourceVideoNode: SourceVideoNode31 } = await import('./SourceVideoNode.js'),
+      id16 = 'source-video-active-task-timer',
+      _data3 = {
+        id: id16,
         type: 'source-video',
         videoUrl: '/output/previous.mp4',
         asyncTaskId: 'async-video-task',
@@ -1512,11 +1523,11 @@ function createFakeLoadingCard() {
         generationStartTime: 123,
         generationDuration: null,
       };
-    resetStore({ [_0x129c5e]: _0x27df0b });
-    const _0x18a0ae = Object.create(_0x5a0b2d.prototype);
-    (Object.assign(_0x18a0ae, {
-      id: _0x129c5e,
-      _data: _0x27df0b,
+    resetStore({ [id16]: _data3 });
+    const value90 = Object.create(SourceVideoNode31.prototype);
+    (Object.assign(value90, {
+      id: id16,
+      _data: _data3,
       _video: { paused: true },
       _card: createFakeLoadingCard(),
       _hint: { style: { display: '' } },
@@ -1530,19 +1541,19 @@ function createFakeLoadingCard() {
       _maybeResumeRunningHubTask: () => {},
       _maybeResumeAsyncTask: () => {},
     }),
-      _0x18a0ae.update(_0x27df0b));
-    const _0x1da1b2 = appStore.getState().nodes[_0x129c5e];
-    (assert.equal(_0x1da1b2.generationStartTime, 123),
-      assert.equal(_0x1da1b2.generationDuration, null),
-      assert.equal(_0x1da1b2.isGenerating, true),
+      value90.update(_data3));
+    const value91 = appStore.getState().nodes[id16];
+    (assert.equal(value91.generationStartTime, 123),
+      assert.equal(value91.generationDuration, null),
+      assert.equal(value91.isGenerating, true),
       resetStore());
   }),
   test('SourceVideoNode: terminal failure stops loading over stale generating flag', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x455217 } = await import('./SourceVideoNode.js');
-    let _0x2c0282 = 0;
-    const _0x3ffa86 = Object.create(_0x455217.prototype);
-    (Object.assign(_0x3ffa86, {
+    const { SourceVideoNode: SourceVideoNode32 } = await import('./SourceVideoNode.js');
+    let value92 = 0;
+    const value93 = Object.create(SourceVideoNode32.prototype);
+    (Object.assign(value93, {
       id: 'source-video-stale-failed',
       _data: { id: 'source-video-stale-failed', type: 'source-video' },
       _video: {},
@@ -1552,7 +1563,7 @@ function createFakeLoadingCard() {
           return null;
         },
         querySelectorAll() {
-          return ((_0x2c0282 += 1), []);
+          return ((value92 += 1), []);
         },
       },
       _hint: { style: { display: '' } },
@@ -1564,7 +1575,7 @@ function createFakeLoadingCard() {
       _maybeResumeRunningHubTask: () => {},
       _maybeResumeAsyncTask: () => {},
     }),
-      _0x3ffa86.update({
+      value93.update({
         id: 'source-video-stale-failed',
         type: 'source-video',
         provider: 'runninghubwf',
@@ -1573,35 +1584,34 @@ function createFakeLoadingCard() {
         jobStatus: 'running',
         rhTaskStatus: 'failed',
       }),
-      assert.equal(_0x2c0282, 1),
-      assert.equal(_0x3ffa86._uploadBtn.disabled, false));
+      assert.equal(value92, 1),
+      assert.equal(value93._uploadBtn.disabled, false));
   }),
   test('SourceVideoNode: 旧失败补帧节点 update 时纠正处理中标题', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x2f948a } = await import('./SourceVideoNode.js'),
-      _0x2095b7 = createFrameInterpolationNode({
+    const { SourceVideoNode: SourceVideoNode33 } = await import('./SourceVideoNode.js'),
+      id17 = createFrameInterpolationNode({
         rhTaskStatus: 'failed',
         name: '补帧视频 (处理中)',
         isGenerating: true,
         jobStatus: 'running',
         rhTaskRecovering: true,
       });
-    resetStore({ [_0x2095b7.id]: _0x2095b7 });
-    const _0x4a9bc5 = Object.create(_0x2f948a.prototype);
-    (Object.assign(_0x4a9bc5, { id: _0x2095b7.id, _data: _0x2095b7, _video: null }),
-      _0x4a9bc5.update(_0x2095b7));
-    const _0x1df802 = appStore.getState().nodes[_0x2095b7.id];
-    (assert.equal(_0x1df802.name, '补帧视频 (失败)'),
-      assert.equal(_0x1df802.jobStatus, 'error'),
-      assert.equal(_0x1df802.isGenerating, false),
-      assert.equal(_0x1df802.rhTaskStatus, 'failed'),
-      assert.equal(_0x1df802.rhTaskRecovering, false),
+    resetStore({ [id17.id]: id17 });
+    const value94 = Object.create(SourceVideoNode33.prototype);
+    (Object.assign(value94, { id: id17.id, _data: id17, _video: null }), value94.update(id17));
+    const error3 = appStore.getState().nodes[id17.id];
+    (assert.equal(error3.name, '补帧视频 (失败)'),
+      assert.equal(error3.jobStatus, 'error'),
+      assert.equal(error3.isGenerating, false),
+      assert.equal(error3.rhTaskStatus, 'failed'),
+      assert.equal(error3.rhTaskRecovering, false),
       resetStore());
   }),
   test('SourceVideoNode: RunningHub 高清失败时使用高清失败标题', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x5075a3 } = await import('./SourceVideoNode.js'),
-      _0x51ae2e = createFrameInterpolationNode({
+    const { SourceVideoNode: SourceVideoNode34 } = await import('./SourceVideoNode.js'),
+      id18 = createFrameInterpolationNode({
         id: 'source-video-hd-rh',
         rhTaskStatus: 'failed',
         name: '高清视频 (处理中)',
@@ -1609,66 +1619,63 @@ function createFakeLoadingCard() {
         jobStatus: 'running',
         rhTaskRecovering: true,
       });
-    resetStore({ [_0x51ae2e.id]: _0x51ae2e });
-    const _0x536275 = Object.create(_0x5075a3.prototype);
-    (Object.assign(_0x536275, { id: _0x51ae2e.id, _data: _0x51ae2e, _video: null }),
-      _0x536275.update(_0x51ae2e));
-    const _0xf547a1 = appStore.getState().nodes[_0x51ae2e.id];
-    (assert.equal(_0xf547a1.name, '高清视频 (失败)'),
-      assert.equal(_0xf547a1.jobStatus, 'error'),
-      assert.equal(_0xf547a1.isGenerating, false),
-      assert.equal(_0xf547a1.rhTaskStatus, 'failed'),
-      assert.equal(_0xf547a1.rhTaskRecovering, false),
+    resetStore({ [id18.id]: id18 });
+    const value95 = Object.create(SourceVideoNode34.prototype);
+    (Object.assign(value95, { id: id18.id, _data: id18, _video: null }), value95.update(id18));
+    const error4 = appStore.getState().nodes[id18.id];
+    (assert.equal(error4.name, '高清视频 (失败)'),
+      assert.equal(error4.jobStatus, 'error'),
+      assert.equal(error4.isGenerating, false),
+      assert.equal(error4.rhTaskStatus, 'failed'),
+      assert.equal(error4.rhTaskRecovering, false),
       resetStore());
   }),
   test('SourceVideoNode: RunningHub 成功终态会清掉处理中标题', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0xc60f28 } = await import('./SourceVideoNode.js'),
-      _0x5ab7cc = createFrameInterpolationNode({
+    const { SourceVideoNode: SourceVideoNode35 } = await import('./SourceVideoNode.js'),
+      id19 = createFrameInterpolationNode({
         rhTaskStatus: 'success',
         name: '补帧视频 (处理中)',
         isGenerating: true,
         jobStatus: 'running',
         rhTaskRecovering: true,
       });
-    resetStore({ [_0x5ab7cc.id]: _0x5ab7cc });
-    const _0x39700b = Object.create(_0xc60f28.prototype);
-    (Object.assign(_0x39700b, { id: _0x5ab7cc.id, _data: _0x5ab7cc, _video: null }),
-      _0x39700b.update(_0x5ab7cc));
-    const _0x1cc1f6 = appStore.getState().nodes[_0x5ab7cc.id];
-    (assert.equal(_0x1cc1f6.name, '补帧视频'),
-      assert.equal(_0x1cc1f6.jobStatus, 'success'),
-      assert.equal(_0x1cc1f6.isGenerating, false),
-      assert.equal(_0x1cc1f6.rhTaskStatus, 'success'),
-      assert.equal(_0x1cc1f6.rhTaskRecovering, false),
+    resetStore({ [id19.id]: id19 });
+    const value96 = Object.create(SourceVideoNode35.prototype);
+    (Object.assign(value96, { id: id19.id, _data: id19, _video: null }), value96.update(id19));
+    const error5 = appStore.getState().nodes[id19.id];
+    (assert.equal(error5.name, '补帧视频'),
+      assert.equal(error5.jobStatus, 'success'),
+      assert.equal(error5.isGenerating, false),
+      assert.equal(error5.rhTaskStatus, 'success'),
+      assert.equal(error5.rhTaskRecovering, false),
       resetStore());
   }),
   test('SourceVideoNode: RunningHub 取消终态会修正补帧取消标题', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x1d590c } = await import('./SourceVideoNode.js'),
-      _0x2b429f = createFrameInterpolationNode({
+    const { SourceVideoNode: SourceVideoNode36 } = await import('./SourceVideoNode.js'),
+      id20 = createFrameInterpolationNode({
         rhTaskStatus: 'cancelled',
         name: '补帧视频 (处理中)',
         isGenerating: true,
         jobStatus: 'running',
         rhTaskRecovering: true,
       });
-    resetStore({ [_0x2b429f.id]: _0x2b429f });
-    const _0x397f6c = Object.create(_0x1d590c.prototype);
-    (Object.assign(_0x397f6c, { id: _0x2b429f.id, _data: _0x2b429f, _video: null }),
-      _0x397f6c.update(_0x2b429f));
-    const _0xb99505 = appStore.getState().nodes[_0x2b429f.id];
-    (assert.equal(_0xb99505.name, '补帧视频 (已取消)'),
-      assert.equal(_0xb99505.jobStatus, null),
-      assert.equal(_0xb99505.isGenerating, false),
-      assert.equal(_0xb99505.rhTaskStatus, 'cancelled'),
-      assert.equal(_0xb99505.rhTaskRecovering, false),
+    resetStore({ [id20.id]: id20 });
+    const value97 = Object.create(SourceVideoNode36.prototype);
+    (Object.assign(value97, { id: id20.id, _data: id20, _video: null }), value97.update(id20));
+    const error6 = appStore.getState().nodes[id20.id];
+    (assert.equal(error6.name, '补帧视频 (已取消)'),
+      assert.equal(error6.jobStatus, null),
+      assert.equal(error6.isGenerating, false),
+      assert.equal(error6.rhTaskStatus, 'cancelled'),
+      assert.equal(error6.rhTaskRecovering, false),
       resetStore());
   }),
   test('SourceVideoNode: RunningHub 视频擦除失败终态会修正生成中标题', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x2dcbea } = await import('./SourceVideoNode.js'),
-      _0x4519ab = createFrameInterpolationNode({
+    const { SourceVideoNode: SourceVideoNode37 } = await import('./SourceVideoNode.js'),
+      id21 = createFrameInterpolationNode({
         id: 'source-video-erase-rh',
         model: 'runninghub/video_matting',
         rhTaskStatus: 'failed',
@@ -1678,36 +1685,34 @@ function createFakeLoadingCard() {
         jobStatus: 'running',
         rhTaskRecovering: true,
       });
-    resetStore({ [_0x4519ab.id]: _0x4519ab });
-    const _0x3d94bd = Object.create(_0x2dcbea.prototype);
-    (Object.assign(_0x3d94bd, { id: _0x4519ab.id, _data: _0x4519ab, _video: null }),
-      _0x3d94bd.update(_0x4519ab));
-    const _0x442c0d = appStore.getState().nodes[_0x4519ab.id];
-    (assert.equal(_0x442c0d.name, '视频擦除失败'),
-      assert.equal(_0x442c0d.jobStatus, 'error'),
-      assert.equal(_0x442c0d.isGenerating, false),
-      assert.equal(_0x442c0d.rhTaskStatus, 'failed'),
-      assert.equal(_0x442c0d.rhTaskRecovering, false),
+    resetStore({ [id21.id]: id21 });
+    const value98 = Object.create(SourceVideoNode37.prototype);
+    (Object.assign(value98, { id: id21.id, _data: id21, _video: null }), value98.update(id21));
+    const error7 = appStore.getState().nodes[id21.id];
+    (assert.equal(error7.name, '视频擦除失败'),
+      assert.equal(error7.jobStatus, 'error'),
+      assert.equal(error7.isGenerating, false),
+      assert.equal(error7.rhTaskStatus, 'failed'),
+      assert.equal(error7.rhTaskRecovering, false),
       resetStore());
   }),
   test('SourceVideoNode: RunningHub 终态不会覆盖用户自定义标题', async () => {
     installDomStubs();
-    const { SourceVideoNode: _0x2a2c37 } = await import('./SourceVideoNode.js'),
-      _0x32c85d = createFrameInterpolationNode({
+    const { SourceVideoNode: SourceVideoNode38 } = await import('./SourceVideoNode.js'),
+      id22 = createFrameInterpolationNode({
         rhTaskStatus: 'failed',
         name: '我的自定义补帧版本',
         isGenerating: true,
         jobStatus: 'running',
         rhTaskRecovering: true,
       });
-    resetStore({ [_0x32c85d.id]: _0x32c85d });
-    const _0x31fb79 = Object.create(_0x2a2c37.prototype);
-    (Object.assign(_0x31fb79, { id: _0x32c85d.id, _data: _0x32c85d, _video: null }),
-      _0x31fb79.update(_0x32c85d));
-    const _0x254ca0 = appStore.getState().nodes[_0x32c85d.id];
-    (assert.equal(_0x254ca0.name, '我的自定义补帧版本'),
-      assert.equal(_0x254ca0.jobStatus, 'error'),
-      assert.equal(_0x254ca0.isGenerating, false),
-      assert.equal(_0x254ca0.rhTaskStatus, 'failed'),
+    resetStore({ [id22.id]: id22 });
+    const value99 = Object.create(SourceVideoNode38.prototype);
+    (Object.assign(value99, { id: id22.id, _data: id22, _video: null }), value99.update(id22));
+    const error8 = appStore.getState().nodes[id22.id];
+    (assert.equal(error8.name, '我的自定义补帧版本'),
+      assert.equal(error8.jobStatus, 'error'),
+      assert.equal(error8.isGenerating, false),
+      assert.equal(error8.rhTaskStatus, 'failed'),
       resetStore());
   }));

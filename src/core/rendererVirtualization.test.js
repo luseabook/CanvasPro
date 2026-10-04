@@ -7,24 +7,24 @@ import {
   resolveRendererVirtualizationPadding,
 } from './rendererVirtualization.js';
 (test('rendererVirtualization: viewport padding 命中进入阈值', () => {
-  const _0x249b33 = isNodeInsideViewportPadding(
+  const isNodeInsideViewportPadding2 = isNodeInsideViewportPadding(
       { id: 'n1', x: 0x384, y: 0, width: 200, height: 120 },
       { x: 0, y: 0, zoom: 1 },
       0x3e8,
       0x320,
       120,
     ),
-    _0x1497ab = isNodeInsideViewportPadding(
+    isNodeInsideViewportPadding3 = isNodeInsideViewportPadding(
       { id: 'n2', x: 0x514, y: 0, width: 200, height: 120 },
       { x: 0, y: 0, zoom: 1 },
       0x3e8,
       0x320,
       80,
     );
-  (assert.equal(_0x249b33, true), assert.equal(_0x1497ab, false));
+  (assert.equal(isNodeInsideViewportPadding2, true), assert.equal(isNodeInsideViewportPadding3, false));
 }),
   test('rendererVirtualization: keepAlive 会覆盖选中 拖拽 descendants 与 pin', () => {
-    const _0x2979e6 = collectVirtualKeepAliveNodeIds({
+    const virtualKeepAliveNodeIds = collectVirtualKeepAliveNodeIds({
       selectedNodeIds: ['a'],
       dragContext: { isDragging: true, targetNodeId: 'dragRoot' },
       connOverlay: { srcId: 'src', hoverId: 'hover' },
@@ -33,7 +33,7 @@ import {
       pinnedNodeIds: new Set(['pinned']),
     });
     assert.deepEqual(
-      new Set(_0x2979e6),
+      new Set(virtualKeepAliveNodeIds),
       new Set([
         'a',
         'a-child',
@@ -48,7 +48,7 @@ import {
     );
   }),
   test('rendererVirtualization: 双阈值滞回会分离 mount 与 park 候选', () => {
-    const _0x19ac39 = buildVirtualizationCandidateSets({
+    const virtualizationCandidateSets = buildVirtualizationCandidateSets({
       nodes: {
         near: { id: 'near', x: 0x4b0, y: 0, width: 200, height: 120 },
         far: { id: 'far', x: 0x7d0, y: 0, width: 200, height: 120 },
@@ -61,15 +61,15 @@ import {
       mountPadding: 0x258,
       parkPadding: 0x384,
     });
-    (assert.equal(_0x19ac39.mountCandidateIds.has('near'), true),
-      assert.equal(_0x19ac39.parkCandidateIds.has('near'), false),
-      assert.equal(_0x19ac39.mountCandidateIds.has('far'), false),
-      assert.equal(_0x19ac39.parkCandidateIds.has('far'), true),
-      assert.equal(_0x19ac39.mountCandidateIds.has('pinned'), true),
-      assert.equal(_0x19ac39.parkCandidateIds.has('pinned'), false));
+    (assert.equal(virtualizationCandidateSets.mountCandidateIds.has('near'), true),
+      assert.equal(virtualizationCandidateSets.parkCandidateIds.has('near'), false),
+      assert.equal(virtualizationCandidateSets.mountCandidateIds.has('far'), false),
+      assert.equal(virtualizationCandidateSets.parkCandidateIds.has('far'), true),
+      assert.equal(virtualizationCandidateSets.mountCandidateIds.has('pinned'), true),
+      assert.equal(virtualizationCandidateSets.parkCandidateIds.has('pinned'), false));
   }),
   test('rendererVirtualization: 深层 descendants 仍会被全部纳入 keepAlive', () => {
-    const _0x5795cf = collectVirtualKeepAliveNodeIds({
+    const virtualKeepAliveNodeIds2 = collectVirtualKeepAliveNodeIds({
       selectedNodeIds: ['root'],
       parentToChildren: {
         root: new Set(['child-1']),
@@ -79,14 +79,14 @@ import {
         })(),
       },
     });
-    assert.deepEqual(new Set(_0x5795cf), new Set(['root', 'child-1', 'child-2', 'child-3']));
+    assert.deepEqual(new Set(virtualKeepAliveNodeIds2), new Set(['root', 'child-1', 'child-2', 'child-3']));
   }),
   test('rendererVirtualization: 重复 child 不会重复入队', () => {
-    const _0x534b4d = collectVirtualKeepAliveNodeIds({
+    const virtualKeepAliveNodeIds3 = collectVirtualKeepAliveNodeIds({
       selectedNodeIds: ['root'],
       parentToChildren: { root: ['dup', 'dup', 'dup-child'], dup: ['dup-child'], 'dup-child': [] },
     });
-    assert.deepEqual(new Set(_0x534b4d), new Set(['root', 'dup', 'dup-child']));
+    assert.deepEqual(new Set(virtualKeepAliveNodeIds3), new Set(['root', 'dup', 'dup-child']));
   }),
   test('rendererVirtualization: dense low zoom uses tighter parking buffers', () => {
     (assert.deepEqual(

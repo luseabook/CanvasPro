@@ -3,70 +3,70 @@ import assert from 'node:assert/strict';
 import { bindApimartPrivateAvatarAction } from './apimartPrivateAvatarAction.js';
 import { APIMART_PRIVATE_AVATAR_ASSET_KEY } from '../../modules/apimartPrivateAvatarAssets.js';
 function createClassList() {
-  const _0x40dd4f = new Set();
+  const map = new Set();
   return {
-    add(_0x564788) {
-      _0x40dd4f.add(_0x564788);
+    add(value) {
+      map.add(value);
     },
-    remove(_0xabb51f) {
-      _0x40dd4f.delete(_0xabb51f);
+    remove(item) {
+      map.delete(item);
     },
-    toggle(_0xd0d96c, _0xbff5e1) {
-      if (_0xbff5e1) _0x40dd4f.add(_0xd0d96c);
-      else _0x40dd4f.delete(_0xd0d96c);
+    toggle(key, index) {
+      if (index) map.add(key);
+      else map.delete(key);
     },
-    contains(_0x42e882) {
-      return _0x40dd4f.has(_0x42e882);
+    contains(result) {
+      return map.has(result);
     },
   };
 }
 function createButtonStub() {
-  let _0x445bc9 = null;
-  const _0x2f054d = createClassList(),
-    _0x55157c = {
+  let data = null;
+  const classList = createClassList(),
+    button = {
       dataset: {},
       disabled: false,
       attrs: {},
       classList: createClassList(),
-      addEventListener(_0x1eee0e, _0x59ae4c) {
-        if (_0x1eee0e === 'click') _0x445bc9 = _0x59ae4c;
+      addEventListener(options, target) {
+        if (options === 'click') data = target;
       },
-      querySelector(_0x16804b) {
-        if (_0x16804b === 'svg') return { classList: _0x2f054d };
+      querySelector(source) {
+        if (source === 'svg') return { classList: classList };
         return null;
       },
-      setAttribute(_0x35d717, _0x5bb13f) {
-        this.attrs[_0x35d717] = _0x5bb13f;
+      setAttribute(next, current) {
+        this.attrs[next] = current;
       },
       click() {
-        return _0x445bc9?.({ preventDefault() {}, stopPropagation() {} });
+        return data?.({ preventDefault() {}, stopPropagation() {} });
       },
     };
-  return { button: _0x55157c, svgClassList: _0x2f054d };
+  return { button: button, svgClassList: classList };
 }
-function createToolbar(_0x28ab1d) {
+function createToolbar(entry) {
   return {
-    querySelector(_0x111434) {
-      return _0x111434 === '.act-apimart-face-detect' ? _0x28ab1d : null;
+    querySelector(record) {
+      return record === '.act-apimart-face-detect' ? entry : null;
     },
   };
 }
-function withWindow(_0x1cb299) {
-  const _0x2dad42 = global.window;
+function withWindow(payload) {
+  const handle = global.window;
   return (
     (global.window = { showToast() {} }),
     Promise.resolve()
-      .then(_0x1cb299)
+      .then(payload)
       .finally(() => {
-        global.window = _0x2dad42;
+        global.window = handle;
       })
   );
 }
 (test('apimart private avatar action: processing state spins toolbar icon', () => {
-  const { button: _0x294ef9, svgClassList: _0x55d5d0 } = createButtonStub();
+  const { button: button2, svgClassList: svgClassList } = createButtonStub();
   (bindApimartPrivateAvatarAction({
     nodeId: 'node-1',
-    toolbarEl: createToolbar(_0x294ef9),
+    toolbarEl: createToolbar(button2),
     getStateSnapshot() {
       return {
         nodes: {
@@ -80,57 +80,54 @@ function withWindow(_0x1cb299) {
       },
     },
   }),
-    assert.equal(_0x294ef9.dataset.loading, 'true'),
-    assert.equal(_0x294ef9.disabled, true),
-    assert.equal(_0x294ef9.attrs['aria-busy'], 'true'),
-    assert.equal(_0x55d5d0.contains('v2-spinning'), true));
+    assert.equal(button2.dataset.loading, 'true'),
+    assert.equal(button2.disabled, true),
+    assert.equal(button2.attrs['aria-busy'], 'true'),
+    assert.equal(svgClassList.contains('v2-spinning'), true));
 }),
   test('apimart private avatar action: click shows spinner until failure result', async () => {
     await withWindow(async () => {
-      const { button: _0x271697, svgClassList: _0x1f4775 } = createButtonStub(),
-        _0x28ddcf = { id: 'node-1', imageUrl: '/output/face.png' },
-        _0x312451 = [];
-      let _0x4dd252;
-      const _0x5b4699 = new Promise((_0x293c38) => {
-          _0x4dd252 = _0x293c38;
+      const { button: button3, svgClassList: svgClassList2 } = createButtonStub(),
+        state = { id: 'node-1', imageUrl: '/output/face.png' },
+        list = [];
+      let run;
+      const config = new Promise((scope) => {
+          run = scope;
         }),
-        _0x17369c = bindApimartPrivateAvatarAction({
+        bindApimartPrivateAvatarAction2 = bindApimartPrivateAvatarAction({
           nodeId: 'node-1',
           mediaKind: 'image',
-          toolbarEl: createToolbar(_0x271697),
+          toolbarEl: createToolbar(button3),
           getStateSnapshot() {
-            return { nodes: { 'node-1': _0x28ddcf } };
+            return { nodes: { 'node-1': state } };
           },
           store: {
-            updateNodeData(_0x4bdc3a, _0x49329f) {
-              (_0x312451.push({ id: _0x4bdc3a, patch: _0x49329f }), Object.assign(_0x28ddcf, _0x49329f));
+            updateNodeData(id, patch) {
+              (list.push({ id: id, patch: patch }), Object.assign(state, patch));
             },
             subscribeSelector() {
               return () => {};
             },
           },
           ensureConfig() {
-            return _0x5b4699;
+            return config;
           },
           getProviderConfig() {
             return {};
           },
         });
-      assert.equal(_0x17369c, undefined);
-      const _0x111eea = _0x271697.click();
+      assert.equal(bindApimartPrivateAvatarAction2, undefined);
+      const input = button3.click();
       (assert.equal(
-        _0x312451.at(-1).patch.providerAssetRefs[APIMART_PRIVATE_AVATAR_ASSET_KEY].status,
+        list.at(-1).patch.providerAssetRefs[APIMART_PRIVATE_AVATAR_ASSET_KEY].status,
         'processing',
       ),
-        assert.equal(_0x271697.dataset.loading, 'true'),
-        assert.equal(_0x1f4775.contains('v2-spinning'), true),
-        _0x4dd252(),
-        await _0x111eea,
-        assert.equal(
-          _0x312451.at(-1).patch.providerAssetRefs[APIMART_PRIVATE_AVATAR_ASSET_KEY].status,
-          'failed',
-        ),
-        assert.equal(_0x271697.dataset.loading, 'false'),
-        assert.equal(_0x1f4775.contains('v2-spinning'), false));
+        assert.equal(button3.dataset.loading, 'true'),
+        assert.equal(svgClassList2.contains('v2-spinning'), true),
+        run(),
+        await input,
+        assert.equal(list.at(-1).patch.providerAssetRefs[APIMART_PRIVATE_AVATAR_ASSET_KEY].status, 'failed'),
+        assert.equal(button3.dataset.loading, 'false'),
+        assert.equal(svgClassList2.contains('v2-spinning'), false));
     });
   }));

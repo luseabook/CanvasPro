@@ -3,17 +3,15 @@ import assert from 'node:assert/strict';
 import { createVideoNodePreviewControlsModule } from './previewControlsModule.js';
 import { setLocale } from '../../i18n/index.js';
 async function flushAsyncSave() {
-  (await Promise.resolve(),
-    await Promise.resolve(),
-    await new Promise((_0x15442a) => setTimeout(_0x15442a, 0)));
+  (await Promise.resolve(), await Promise.resolve(), await new Promise((value) => setTimeout(value, 0)));
 }
 (test('previewControlsModule: capture frame adds preview node before async save', async () => {
-  const _0x498b76 = globalThis.document,
-    _0x53929a = globalThis.window,
-    _0x5e14f6 = globalThis.URL,
-    _0x5e118a = [],
-    _0x456ace = [],
-    _0x7f7c8a = {
+  const item = globalThis.document,
+    key = globalThis.window,
+    index = globalThis.URL,
+    list = [],
+    list2 = [],
+    args = {
       nodes: {
         videoNode: {
           id: 'videoNode',
@@ -27,22 +25,22 @@ async function flushAsyncSave() {
         },
       },
     };
-  let _0x23c856;
-  const _0x2e7a17 = new Promise((_0x396249) => {
-    _0x23c856 = _0x396249;
+  let run;
+  const result = new Promise((data) => {
+    run = data;
   });
   ((globalThis.document = {
-    createElement(_0x3cb0d3) {
+    createElement(options) {
       return (
-        assert.equal(_0x3cb0d3, 'canvas'),
+        assert.equal(options, 'canvas'),
         {
           width: 0,
           height: 0,
-          getContext(_0x28e8e1) {
-            return (assert.equal(_0x28e8e1, '2d'), { drawImage() {} });
+          getContext(target) {
+            return (assert.equal(target, '2d'), { drawImage() {} });
           },
-          toBlob(_0x11d6d4, _0x5cc8ed) {
-            _0x11d6d4(new Blob(['frame'], { type: _0x5cc8ed }));
+          toBlob(handler, type) {
+            handler(new Blob(['frame'], { type: type }));
           },
         }
       );
@@ -54,40 +52,39 @@ async function flushAsyncSave() {
       },
     }),
     (globalThis.window = { URL: globalThis.URL, showToast() {} }));
-  const _0xc8ac2c = {
+  const store = {
     getState() {
-      return _0x7f7c8a;
+      return args;
     },
     getStateRaw() {
-      return _0x7f7c8a;
+      return args;
     },
-    addNode(_0xa4385d) {
-      (_0x5e118a.push(_0xa4385d), (_0x7f7c8a.nodes[_0xa4385d.id] = _0xa4385d));
+    addNode(source) {
+      (list.push(source), (args.nodes[source.id] = source));
     },
-    updateNodeData(_0x33f24b, _0x36eae0) {
-      (_0x456ace.push({ id: _0x33f24b, patch: _0x36eae0 }),
-        (_0x7f7c8a.nodes[_0x33f24b] = { ..._0x7f7c8a.nodes[_0x33f24b], ..._0x36eae0 }));
+    updateNodeData(id, patch) {
+      (list2.push({ id: id, patch: patch }), (args.nodes[id] = { ...args.nodes[id], ...patch }));
     },
   };
   setLocale('en-US', { persist: false, notify: false });
   try {
-    const _0x45d6d8 = createVideoNodePreviewControlsModule({
-        store: _0xc8ac2c,
-        saveOutputBlob: () => _0x2e7a17,
+    const videoNodePreviewControlsModule = createVideoNodePreviewControlsModule({
+        store: store,
+        saveOutputBlob: () => result,
         VideoKeyingController: null,
         getAutoMediaSizeByShortSide: () => ({ width: 160, height: 90 }),
-        buildSourceMediaNodePayload: (_0x19373d) => ({
+        buildSourceMediaNodePayload: (args2) => ({
           localPath: '',
           originalLocalPath: '',
           displayLocalPath: '',
           thumbLocalPath: '',
-          ..._0x19373d,
+          ...args2,
         }),
         calcSafeSpawnPosNearNode: () => ({ x: 120, y: 240 }),
       }),
-      _0x4607c0 = Object.create(_0x45d6d8);
-    ((_0x4607c0.nodeId = 'videoNode'),
-      (_0x4607c0._getActivePreviewVideoEl = () => ({
+      next = Object.create(videoNodePreviewControlsModule);
+    ((next.nodeId = 'videoNode'),
+      (next._getActivePreviewVideoEl = () => ({
         src: 'video.mp4',
         currentSrc: '',
         readyState: 2,
@@ -95,16 +92,16 @@ async function flushAsyncSave() {
         videoHeight: 0x168,
         currentTime: 0.5,
       })),
-      (_0x4607c0._getActiveVideoDuration = () => 2),
-      await _0x4607c0._captureCurrentFrameFromActiveVideo(),
-      assert.equal(_0x5e118a.length, 1),
-      assert.equal(_0x5e118a[0].type, 'source-image'),
-      assert.equal(_0x5e118a[0].name, 'Captured frame 13'),
-      assert.equal(_0x5e118a[0].capturePreviewUrl, 'blob:ai-video-frame'),
-      assert.equal(_0x5e118a[0].captureSavePending, true),
-      assert.equal(_0x5e118a[0].localPath, ''),
-      assert.equal(_0x456ace.length, 0),
-      _0x23c856({
+      (next._getActiveVideoDuration = () => 2),
+      await next._captureCurrentFrameFromActiveVideo(),
+      assert.equal(list.length, 1),
+      assert.equal(list[0].type, 'source-image'),
+      assert.equal(list[0].name, 'Captured frame 13'),
+      assert.equal(list[0].capturePreviewUrl, 'blob:ai-video-frame'),
+      assert.equal(list[0].captureSavePending, true),
+      assert.equal(list[0].localPath, ''),
+      assert.equal(list2.length, 0),
+      run({
         url: '/output/ai-frame.png',
         localPath: 'output/ai-frame.png',
         originalLocalPath: 'output/ai-frame.png',
@@ -115,48 +112,47 @@ async function flushAsyncSave() {
         filename: 'ai-frame.png',
       }),
       await flushAsyncSave());
-    const _0x2766f1 = _0x7f7c8a.nodes[_0x5e118a[0].id];
-    (assert.equal(_0x2766f1.captureSavePending, false),
-      assert.equal(_0x2766f1.captureSaveError, null),
-      assert.equal(_0x2766f1.localPath, 'output/ai-frame.png'),
-      assert.equal(_0x2766f1.displayLocalPath, 'output/_derived/display/ai-frame.display.jpg'),
-      assert.equal(_0x2766f1.thumbLocalPath, 'output/_derived/thumb/ai-frame.thumb.jpg'),
-      assert.equal(_0x2766f1.fileName, 'ai-frame.png'));
+    const current = args.nodes[list[0].id];
+    (assert.equal(current.captureSavePending, false),
+      assert.equal(current.captureSaveError, null),
+      assert.equal(current.localPath, 'output/ai-frame.png'),
+      assert.equal(current.displayLocalPath, 'output/_derived/display/ai-frame.display.jpg'),
+      assert.equal(current.thumbLocalPath, 'output/_derived/thumb/ai-frame.thumb.jpg'),
+      assert.equal(current.fileName, 'ai-frame.png'));
   } finally {
-    (typeof _0x498b76 === 'undefined' ? delete globalThis.document : (globalThis.document = _0x498b76),
-      typeof _0x53929a === 'undefined' ? delete globalThis.window : (globalThis.window = _0x53929a),
-      typeof _0x5e14f6 === 'undefined' ? delete globalThis.URL : (globalThis.URL = _0x5e14f6),
+    (typeof item === 'undefined' ? delete globalThis.document : (globalThis.document = item),
+      typeof key === 'undefined' ? delete globalThis.window : (globalThis.window = key),
+      typeof index === 'undefined' ? delete globalThis.URL : (globalThis.URL = index),
       setLocale('zh-CN', { persist: false, notify: false }));
   }
 }),
   test('previewControlsModule: mute preference persists in node data', () => {
-    const _0x209a3b = { nodes: { videoNode: { id: 'videoNode', videoMuted: false } } },
-      _0x21caa6 = [],
-      _0x409bab = {
+    const _data = { nodes: { videoNode: { id: 'videoNode', videoMuted: false } } },
+      list3 = [],
+      store2 = {
         getState() {
-          return _0x209a3b;
+          return _data;
         },
-        updateNodeData(_0x4ac8e4, _0x2c7a64) {
-          (_0x21caa6.push({ id: _0x4ac8e4, patch: _0x2c7a64 }),
-            (_0x209a3b.nodes[_0x4ac8e4] = { ..._0x209a3b.nodes[_0x4ac8e4], ..._0x2c7a64 }));
+        updateNodeData(id2, patch2) {
+          (list3.push({ id: id2, patch: patch2 }), (_data.nodes[id2] = { ..._data.nodes[id2], ...patch2 }));
         },
       },
-      _0x23f6d7 = createVideoNodePreviewControlsModule({
-        store: _0x409bab,
+      videoNodePreviewControlsModule2 = createVideoNodePreviewControlsModule({
+        store: store2,
         saveOutputBlob: async () => ({}),
         VideoKeyingController: { isActiveFor: () => false },
         getAutoMediaSizeByShortSide: () => ({ width: 160, height: 90 }),
-        buildSourceMediaNodePayload: (_0x1f3757) => _0x1f3757,
+        buildSourceMediaNodePayload: (entry) => entry,
         calcSafeSpawnPosNearNode: () => ({ x: 0, y: 0 }),
       }),
-      _0x25fc23 = { muted: true },
-      _0x1cf356 = Object.create(_0x23f6d7);
-    (Object.assign(_0x1cf356, {
+      record = { muted: true },
+      payload = Object.create(videoNodePreviewControlsModule2);
+    (Object.assign(payload, {
       nodeId: 'videoNode',
-      _data: _0x209a3b.nodes.videoNode,
+      _data: _data.nodes.videoNode,
       previewEl: {
-        querySelectorAll(_0x31015b) {
-          return (assert.equal(_0x31015b, 'video'), [_0x25fc23]);
+        querySelectorAll(handle) {
+          return (assert.equal(handle, 'video'), [record]);
         },
       },
       _multiLayerEls: [],
@@ -164,77 +160,77 @@ async function flushAsyncSave() {
       _muteIconMutedEl: { style: { display: '' } },
       _muteIconUnmutedEl: { style: { display: '' } },
       _syncMuteBtnIcon() {
-        return _0x23f6d7._syncMuteBtnIconImpl.call(this);
+        return videoNodePreviewControlsModule2._syncMuteBtnIconImpl.call(this);
       },
     }),
-      _0x1cf356._syncMutedStateFromNodeData(_0x209a3b.nodes.videoNode),
-      assert.equal(_0x1cf356._isMuted, false),
-      assert.equal(_0x25fc23.muted, false),
-      assert.equal(_0x1cf356._muteIconMutedEl.style.display, 'none'),
-      assert.equal(_0x1cf356._muteIconUnmutedEl.style.display, ''),
-      _0x1cf356._setPreviewMuted(true, { persist: true }),
-      _0x1cf356._applyMuteStateToPreviewVideos(),
-      _0x1cf356._syncMuteBtnIcon(),
-      assert.deepEqual(_0x21caa6, [{ id: 'videoNode', patch: { videoMuted: true } }]),
-      assert.equal(_0x209a3b.nodes.videoNode.videoMuted, true),
-      assert.equal(_0x25fc23.muted, true),
-      assert.equal(_0x1cf356._muteIconMutedEl.style.display, ''),
-      assert.equal(_0x1cf356._muteIconUnmutedEl.style.display, 'none'));
+      payload._syncMutedStateFromNodeData(_data.nodes.videoNode),
+      assert.equal(payload._isMuted, false),
+      assert.equal(record.muted, false),
+      assert.equal(payload._muteIconMutedEl.style.display, 'none'),
+      assert.equal(payload._muteIconUnmutedEl.style.display, ''),
+      payload._setPreviewMuted(true, { persist: true }),
+      payload._applyMuteStateToPreviewVideos(),
+      payload._syncMuteBtnIcon(),
+      assert.deepEqual(list3, [{ id: 'videoNode', patch: { videoMuted: true } }]),
+      assert.equal(_data.nodes.videoNode.videoMuted, true),
+      assert.equal(record.muted, true),
+      assert.equal(payload._muteIconMutedEl.style.display, ''),
+      assert.equal(payload._muteIconUnmutedEl.style.display, 'none'));
   }),
   test('previewControlsModule: Alt 播放按钮开启循环，暂停时清理循环状态', async () => {
-    const _0x43b164 = createVideoNodePreviewControlsModule({
+    const videoNodePreviewControlsModule3 = createVideoNodePreviewControlsModule({
         store: { getState: () => ({ nodes: {} }) },
         saveOutputBlob: async () => ({}),
         VideoKeyingController: { isActiveFor: () => false },
         getAutoMediaSizeByShortSide: () => ({ width: 160, height: 90 }),
-        buildSourceMediaNodePayload: (_0x2207ac) => _0x2207ac,
+        buildSourceMediaNodePayload: (state) => state,
         calcSafeSpawnPosNearNode: () => ({ x: 0, y: 0 }),
       }),
-      _0x4a1d33 = {
+      config = {
         paused: true,
         loop: false,
-        getAttribute(_0x595f87) {
-          return _0x595f87 === 'src' ? 'video.mp4' : '';
+        getAttribute(scope) {
+          return scope === 'src' ? 'video.mp4' : '';
         },
         pause() {
           this.paused = true;
         },
       };
-    let _0x5ca810 = 0;
-    const _0x44b363 = [],
-      _0x280055 = Object.create(_0x43b164);
-    (Object.assign(_0x280055, {
+    let input = 0;
+    const list4 = [],
+      output = Object.create(videoNodePreviewControlsModule3);
+    (Object.assign(output, {
       _isManualControl: false,
       _hoverManualPause: false,
       _isManualLoopPlayback: false,
       _autoPlayToken: 0,
       _playPreviewVideoWithRecovery: async () => {
-        return ((_0x4a1d33.paused = false), true);
+        return ((config.paused = false), true);
       },
-      _flashCenterIndicator(_0x49bfb8) {
-        _0x44b363.push(_0x49bfb8);
+      _flashCenterIndicator(value2) {
+        list4.push(value2);
       },
       _showPausedCenterIndicator() {
-        _0x44b363.push('paused');
+        list4.push('paused');
       },
       _syncVideoControlsFromVideo() {
-        _0x5ca810 += 1;
+        input += 1;
       },
     }),
-      _0x280055._toggleVideoPlayPause(_0x4a1d33, { loop: true }),
+      output._toggleVideoPlayPause(config, { loop: true }),
       await Promise.resolve(),
-      assert.equal(_0x280055._isManualLoopPlayback, true),
-      assert.equal(_0x280055._isManualControl, true),
-      assert.equal(_0x4a1d33.loop, true),
-      assert.equal(_0x4a1d33.paused, false),
-      assert.deepEqual(_0x44b363, ['play']),
-      assert.equal(_0x5ca810, 1),
-      (_0x44b363.length = 0),
-      _0x280055._toggleVideoPlayPause(_0x4a1d33),
-      assert.equal(_0x280055._isManualLoopPlayback, false),
-      assert.equal(_0x4a1d33.loop, false),
-      assert.equal(_0x4a1d33.paused, true),
-      assert.equal(_0x280055._hoverManualPause, true),
-      assert.deepEqual(_0x44b363, ['paused']),
-      assert.equal(_0x5ca810, 2));
+      assert.equal(output._isManualLoopPlayback, true),
+      assert.equal(output._isManualControl, true),
+      assert.equal(config.loop, true),
+      assert.equal(config.paused, false),
+      assert.deepEqual(list4, ['play']),
+      assert.equal(input, 1),
+      (list4.length = 0),
+      output._toggleVideoPlayPause(config),
+      assert.equal(output._isManualLoopPlayback, false),
+      assert.equal(config.loop, false),
+      assert.equal(config.paused, true),
+      assert.equal(output._hoverManualPause, true),
+      assert.deepEqual(list4, ['paused']),
+      assert.equal(input, 2));
   }));

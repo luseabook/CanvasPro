@@ -14,37 +14,42 @@ function createConfig() {
   };
 }
 (test('fixed input slot resolver keeps visible explicit slots', () => {
-  const _0x18420a = resolveFixedInputSlotForRef({
+  const fixedInputSlotForRef = resolveFixedInputSlotForRef({
     fixedInputConfig: createConfig(),
     refSlot: 'firstFrame',
     kind: 'image',
   });
-  assert.deepEqual(_0x18420a, { slot: 'firstFrame', reason: 'explicit', explicitSlot: 'firstFrame' });
+  assert.deepEqual(fixedInputSlotForRef, {
+    slot: 'firstFrame',
+    reason: 'explicit',
+    explicitSlot: 'firstFrame',
+  });
 }),
   test('fixed input slot resolver ignores current hidden slots', () => {
-    const _0x2738f8 = resolveFixedInputSlotForRef({
+    const fixedInputSlotForRef2 = resolveFixedInputSlotForRef({
       fixedInputConfig: createConfig(),
       refSlot: 'lastFrame',
       kind: 'image',
     });
-    (assert.equal(_0x2738f8.slot, ''),
-      assert.equal(_0x2738f8.reason, 'hidden'),
-      assert.equal(_0x2738f8.knownSlot, true));
+    (assert.equal(fixedInputSlotForRef2.slot, ''),
+      assert.equal(fixedInputSlotForRef2.reason, 'hidden'),
+      assert.equal(fixedInputSlotForRef2.knownSlot, true));
   }),
   test('fixed input slot resolver migrates stale unknown slots by kind', () => {
-    const _0xeef357 = resolveFixedInputSlotForRef({
+    const fixedInputSlotForRef3 = resolveFixedInputSlotForRef({
       fixedInputConfig: createConfig(),
       refSlot: 'refImage',
       kind: 'image',
     });
-    (assert.equal(_0xeef357.slot, 'firstFrame'), assert.equal(_0xeef357.reason, 'stale'));
+    (assert.equal(fixedInputSlotForRef3.slot, 'firstFrame'),
+      assert.equal(fixedInputSlotForRef3.reason, 'stale'));
   }),
   test('fixed input slot resolver respects occupied slots', () => {
-    const _0x3e8462 = resolveFixedInputSlotForRef({
+    const fixedInputSlotForRef4 = resolveFixedInputSlotForRef({
       fixedInputConfig: createConfig(),
       refSlot: 'refImage',
       kind: 'image',
       occupiedSlots: { firstFrame: true },
     });
-    (assert.equal(_0x3e8462.slot, ''), assert.equal(_0x3e8462.reason, 'overflow'));
+    (assert.equal(fixedInputSlotForRef4.slot, ''), assert.equal(fixedInputSlotForRef4.reason, 'overflow'));
   }));

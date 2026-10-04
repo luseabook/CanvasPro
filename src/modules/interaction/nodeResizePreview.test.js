@@ -3,45 +3,45 @@ import assert from 'node:assert/strict';
 import { startNodeResizePreview } from './nodeResizePreview.js';
 import { getPerfProbeSnapshot, resetPerfProbeData, setPerfProbeEnabled } from '../perf/perfProbe.js';
 function createClassList() {
-  const _0x46f2f9 = new Set();
+  const map = new Set();
   return {
-    add(..._0x2002cf) {
-      _0x2002cf.forEach((_0x539811) => _0x46f2f9.add(String(_0x539811)));
+    add(...list) {
+      list.forEach((item) => map.add(String(item)));
     },
-    remove(..._0x274986) {
-      _0x274986.forEach((_0x4205e7) => _0x46f2f9.delete(String(_0x4205e7)));
+    remove(...list2) {
+      list2.forEach((item2) => map.delete(String(item2)));
     },
-    contains(_0x597b36) {
-      return _0x46f2f9.has(String(_0x597b36));
+    contains(value) {
+      return map.has(String(value));
     },
   };
 }
-function withFakeBrowser(_0x124af8) {
-  const _0x287884 = {
+function withFakeBrowser(handler) {
+  const key = {
       window: globalThis.window,
       document: globalThis.document,
       requestAnimationFrame: globalThis.requestAnimationFrame,
       cancelAnimationFrame: globalThis.cancelAnimationFrame,
     },
-    _0x13d1f4 = {
+    index = {
       window: Object.prototype.hasOwnProperty.call(globalThis, 'window'),
       document: Object.prototype.hasOwnProperty.call(globalThis, 'document'),
       requestAnimationFrame: Object.prototype.hasOwnProperty.call(globalThis, 'requestAnimationFrame'),
       cancelAnimationFrame: Object.prototype.hasOwnProperty.call(globalThis, 'cancelAnimationFrame'),
     },
-    _0x117aa0 = createClassList(),
-    _0x539fa9 = createClassList(),
-    _0x41c157 = { style: {}, classList: _0x539fa9 },
-    _0x2f4062 = {},
-    _0x50e2bb = [],
-    _0x50a310 = [],
-    _0x5d2f22 = [];
-  let _0x3c1351 = 1,
-    _0x1400c0 = 0;
+    classList = createClassList(),
+    classList2 = createClassList(),
+    nodeEl = { style: {}, classList: classList2 },
+    listeners = {},
+    list3 = [],
+    rendererCalls = [],
+    sidePlusCalls = [];
+  let result = 1,
+    data = 0;
   ((globalThis.document = {
-    body: { classList: _0x117aa0 },
-    getElementById(_0x579513) {
-      return _0x579513 === 'node-1' ? _0x41c157 : null;
+    body: { classList: classList },
+    getElementById(options) {
+      return options === 'node-1' ? nodeEl : null;
     },
     querySelectorAll() {
       return [];
@@ -55,120 +55,118 @@ function withFakeBrowser(_0x124af8) {
       _lastMx: 0x14d,
       _lastMy: 0x1bc,
       v2Renderer: {
-        previewNodeResizeGeometry(_0x26c818) {
-          _0x50a310.push(_0x26c818);
+        previewNodeResizeGeometry(target) {
+          rendererCalls.push(target);
         },
       },
-      _v2UpdateSidePlusNow(_0x4c6e73, _0x1b6330, _0x569b56) {
-        _0x5d2f22.push({ x: _0x4c6e73, y: _0x1b6330, options: _0x569b56 });
+      _v2UpdateSidePlusNow(x, y, options2) {
+        sidePlusCalls.push({ x: x, y: y, options: options2 });
       },
-      addEventListener(_0x42671a, _0x33c6d9) {
-        _0x2f4062[_0x42671a] = _0x33c6d9;
+      addEventListener(source, next) {
+        listeners[source] = next;
       },
-      removeEventListener(_0x322235, _0x5c1ae1) {
-        if (_0x2f4062[_0x322235] === _0x5c1ae1) delete _0x2f4062[_0x322235];
+      removeEventListener(current, entry) {
+        if (listeners[current] === entry) delete listeners[current];
       },
     }),
-    (globalThis.requestAnimationFrame = (_0x3ec6c3) => {
-      const _0x3f8121 = _0x3c1351;
-      return (
-        (_0x3c1351 += 1),
-        _0x50e2bb.push({ id: _0x3f8121, callback: _0x3ec6c3, cancelled: false }),
-        _0x3f8121
-      );
+    (globalThis.requestAnimationFrame = (callback) => {
+      const id = result;
+      return ((result += 1), list3.push({ id: id, callback: callback, cancelled: false }), id);
     }),
-    (globalThis.cancelAnimationFrame = (_0x3c0282) => {
-      const _0x4c68ea = _0x50e2bb.find((_0x3bec7d) => _0x3bec7d.id === _0x3c0282);
-      if (_0x4c68ea) _0x4c68ea.cancelled = true;
+    (globalThis.cancelAnimationFrame = (record) => {
+      const payload = list3.find((item3) => item3.id === record);
+      if (payload) payload.cancelled = true;
     }));
-  const _0x231bc5 = {
-    bodyClassList: _0x117aa0,
-    nodeClassList: _0x539fa9,
-    nodeEl: _0x41c157,
-    listeners: _0x2f4062,
-    rendererCalls: _0x50a310,
-    sidePlusCalls: _0x5d2f22,
+  const handle = {
+    bodyClassList: classList,
+    nodeClassList: classList2,
+    nodeEl: nodeEl,
+    listeners: listeners,
+    rendererCalls: rendererCalls,
+    sidePlusCalls: sidePlusCalls,
     flushRaf() {
-      const _0x37785f = _0x50e2bb.splice(0);
-      for (const _0x89d16d of _0x37785f) {
-        if (_0x89d16d.cancelled) continue;
-        ((_0x1400c0 += 16), _0x89d16d.callback(_0x1400c0));
+      const state = list3.splice(0);
+      for (const config of state) {
+        if (config.cancelled) continue;
+        ((data += 16), config.callback(data));
       }
     },
   };
   try {
-    return _0x124af8(_0x231bc5);
+    return handler(handle);
   } finally {
-    for (const _0x2a772e of Object.keys(_0x287884)) {
-      if (_0x13d1f4[_0x2a772e]) globalThis[_0x2a772e] = _0x287884[_0x2a772e];
-      else delete globalThis[_0x2a772e];
+    for (const scope of Object.keys(key)) {
+      if (index[scope]) globalThis[scope] = key[scope];
+      else delete globalThis[scope];
     }
   }
 }
 (test('node resize preview updates DOM per frame and commits once', () => {
   withFakeBrowser(
     ({
-      bodyClassList: _0x4664df,
-      nodeClassList: _0x444087,
-      nodeEl: _0x24dd60,
-      listeners: _0x4ebcd4,
-      rendererCalls: _0xdbd50f,
-      sidePlusCalls: _0x261953,
-      flushRaf: _0x240fd1,
+      bodyClassList: bodyClassList,
+      nodeClassList: nodeClassList,
+      nodeEl: nodeEl2,
+      listeners: listeners2,
+      rendererCalls: rendererCalls2,
+      sidePlusCalls: sidePlusCalls2,
+      flushRaf: flushRaf2,
     }) => {
-      const _0x49fdaa = [];
-      let _0x1136ae = 0,
-        _0x46de82 = 0;
-      const _0x1c1a96 = startNodeResizePreview({
+      const list4 = [];
+      let input = 0,
+        output = 0;
+      const startNodeResizePreview2 = startNodeResizePreview({
         event: { clientX: 100, clientY: 100, preventDefault() {}, stopPropagation() {} },
         nodeId: 'node-1',
         getNode: () => ({ id: 'node-1', width: 200, height: 120 }),
         getViewport: () => ({ zoom: 2 }),
-        resolveSize: ({ startWidth: _0x458b89, startHeight: _0x36ec2e, dx: _0xad584a, dy: _0x40ddf0 }) => ({
-          width: _0x458b89 + _0xad584a,
-          height: _0x36ec2e + _0x40ddf0,
+        resolveSize: ({ startWidth: startWidth, startHeight: startHeight, dx: dx, dy: dy }) => ({
+          width: startWidth + dx,
+          height: startHeight + dy,
         }),
-        applyPatch: (_0x4fdd91) => _0x49fdaa.push(_0x4fdd91),
+        applyPatch: (value2) => list4.push(value2),
         onPreview: () => {
-          _0x46de82 += 1;
+          output += 1;
         },
         commit: () => {
-          _0x1136ae += 1;
+          input += 1;
         },
       });
-      (assert.equal(_0x1c1a96, true),
-        assert.equal(_0x4664df.contains('is-node-resizing'), true),
-        assert.equal(_0x444087.contains('is-resizing'), true),
-        _0x4ebcd4.pointermove({ clientX: 120, clientY: 110 }),
-        _0x4ebcd4.pointermove({ clientX: 160, clientY: 140 }),
-        assert.deepEqual(_0x49fdaa, []),
-        assert.deepEqual(_0x24dd60.style, {}),
-        _0x240fd1(),
-        assert.equal(_0x24dd60.style.width, '230px'),
-        assert.equal(_0x24dd60.style.height, '140px'),
-        assert.equal(_0x46de82, 1),
-        assert.deepEqual(_0xdbd50f, [{ nodeId: 'node-1', width: 230, height: 140 }]),
-        assert.equal(_0x261953.length, 1),
-        assert.equal(_0x261953[0].x, 0x14d),
-        assert.equal(_0x261953[0].y, 0x1bc),
-        assert.deepEqual(_0x261953[0].options.nodeSizeOverrides, { 'node-1': { width: 230, height: 140 } }),
-        _0x4ebcd4.pointerup(),
-        assert.deepEqual(_0x49fdaa, [{ width: 230, height: 140 }]),
-        assert.equal(_0x1136ae, 1),
-        assert.equal(_0xdbd50f.length, 2),
-        assert.deepEqual(_0xdbd50f.at(-1), { nodeId: 'node-1', width: 230, height: 140 }),
-        assert.equal(_0x261953.length, 2),
-        assert.deepEqual(_0x261953.at(-1).options.nodeSizeOverrides, {
+      (assert.equal(startNodeResizePreview2, true),
+        assert.equal(bodyClassList.contains('is-node-resizing'), true),
+        assert.equal(nodeClassList.contains('is-resizing'), true),
+        listeners2.pointermove({ clientX: 120, clientY: 110 }),
+        listeners2.pointermove({ clientX: 160, clientY: 140 }),
+        assert.deepEqual(list4, []),
+        assert.deepEqual(nodeEl2.style, {}),
+        flushRaf2(),
+        assert.equal(nodeEl2.style.width, '230px'),
+        assert.equal(nodeEl2.style.height, '140px'),
+        assert.equal(output, 1),
+        assert.deepEqual(rendererCalls2, [{ nodeId: 'node-1', width: 230, height: 140 }]),
+        assert.equal(sidePlusCalls2.length, 1),
+        assert.equal(sidePlusCalls2[0].x, 0x14d),
+        assert.equal(sidePlusCalls2[0].y, 0x1bc),
+        assert.deepEqual(sidePlusCalls2[0].options.nodeSizeOverrides, {
           'node-1': { width: 230, height: 140 },
         }),
-        assert.equal(_0x4664df.contains('is-node-resizing'), false),
-        assert.equal(_0x444087.contains('is-resizing'), false),
-        assert.equal(_0x4ebcd4.pointermove, undefined));
+        listeners2.pointerup(),
+        assert.deepEqual(list4, [{ width: 230, height: 140 }]),
+        assert.equal(input, 1),
+        assert.equal(rendererCalls2.length, 2),
+        assert.deepEqual(rendererCalls2.at(-1), { nodeId: 'node-1', width: 230, height: 140 }),
+        assert.equal(sidePlusCalls2.length, 2),
+        assert.deepEqual(sidePlusCalls2.at(-1).options.nodeSizeOverrides, {
+          'node-1': { width: 230, height: 140 },
+        }),
+        assert.equal(bodyClassList.contains('is-node-resizing'), false),
+        assert.equal(nodeClassList.contains('is-resizing'), false),
+        assert.equal(listeners2.pointermove, undefined));
     },
   );
 }),
   test('node resize preview records resize fps sessions', () => {
-    withFakeBrowser(({ listeners: _0x544a3a, flushRaf: _0x18ca80 }) => {
+    withFakeBrowser(({ listeners: listeners3, flushRaf: flushRaf3 }) => {
       (setPerfProbeEnabled(true),
         resetPerfProbeData(),
         startNodeResizePreview({
@@ -176,21 +174,21 @@ function withFakeBrowser(_0x124af8) {
           nodeId: 'node-1',
           getNode: () => ({ id: 'node-1', width: 100, height: 100 }),
           getViewport: () => ({ zoom: 1 }),
-          resolveSize: ({ startWidth: _0x272abf, startHeight: _0x48fd9a, dx: _0x45429e, dy: _0x2462cc }) => ({
-            width: _0x272abf + _0x45429e,
-            height: _0x48fd9a + _0x2462cc,
+          resolveSize: ({ startWidth: startWidth2, startHeight: startHeight2, dx: dx2, dy: dy2 }) => ({
+            width: startWidth2 + dx2,
+            height: startHeight2 + dy2,
           }),
           applyPatch() {},
           commit() {},
           label: 'test-resize',
         }),
-        _0x544a3a.pointermove({ clientX: 10, clientY: 10 }),
-        _0x18ca80(),
-        _0x18ca80(),
-        _0x544a3a.pointerup());
-      const _0x54dc74 = getPerfProbeSnapshot();
-      (assert.equal(_0x54dc74.resizeFpsSessions.length, 1),
-        assert.equal(_0x54dc74.resizeFpsSessions[0].label, 'test-resize'),
+        listeners3.pointermove({ clientX: 10, clientY: 10 }),
+        flushRaf3(),
+        flushRaf3(),
+        listeners3.pointerup());
+      const perfProbeSnapshot = getPerfProbeSnapshot();
+      (assert.equal(perfProbeSnapshot.resizeFpsSessions.length, 1),
+        assert.equal(perfProbeSnapshot.resizeFpsSessions[0].label, 'test-resize'),
         resetPerfProbeData(),
         setPerfProbeEnabled(false));
     });

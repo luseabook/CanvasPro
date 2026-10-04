@@ -13,52 +13,69 @@ import {
   isModelAllowed,
 } from './subscriptionAccess.js';
 (test('subscription access: VIP gate 清单来自共享 manifest', () => {
-  (assert.deepEqual(SUBSCRIPTION_GATE_MANIFESTS.map(gate => gate.key).sort(), ['runninghubVideoV54','runninghubVideoBerniniV1','runninghubVideoScail2V1','runninghubVideoScailV2','runninghubVideoHd','runninghubCommercialDigitalHuman','runninghubAdvancedVoiceClone','dreaminaVideoVip','audioVoiceStudio','replacementStudio','runninghubAiApp','binghuoVideo','customProvider'].sort()),
+  (assert.deepEqual(
+    SUBSCRIPTION_GATE_MANIFESTS.map((gate) => gate.key).sort(),
+    [
+      'runninghubVideoV54',
+      'runninghubVideoBerniniV1',
+      'runninghubVideoScail2V1',
+      'runninghubVideoScailV2',
+      'runninghubVideoHd',
+      'runninghubCommercialDigitalHuman',
+      'runninghubAdvancedVoiceClone',
+      'dreaminaVideoVip',
+      'audioVoiceStudio',
+      'replacementStudio',
+      'runninghubAiApp',
+      'binghuoVideo',
+      'customProvider',
+    ].sort(),
+  ),
     assert.ok(
       SUBSCRIPTION_GATE_MANIFESTS.some(
-        (_0xe6774c) =>
-          _0xe6774c.key === 'dreaminaVideoVip' &&
-          _0xe6774c.modelId === DREAMINA_VIDEO_VIP_MODEL_ID &&
-          _0xe6774c.providers.includes('dreamina'),
+        (event) =>
+          event.key === 'dreaminaVideoVip' &&
+          event.modelId === DREAMINA_VIDEO_VIP_MODEL_ID &&
+          event.providers.includes('dreamina'),
       ),
     ),
     assert.ok(
       SUBSCRIPTION_GATE_MANIFESTS.some(
-        (_0x45dd88) =>
-          _0x45dd88.key === 'runninghubAdvancedVoiceClone' &&
-          _0x45dd88.modelId === RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID &&
-          _0x45dd88.aliases.includes('advanced_voice_clone'),
+        (event2) =>
+          event2.key === 'runninghubAdvancedVoiceClone' &&
+          event2.modelId === RH_ADVANCED_VOICE_CLONE_VIP_MODEL_ID &&
+          event2.aliases.includes('advanced_voice_clone'),
       ),
     ),
     assert.ok(
       SUBSCRIPTION_GATE_MANIFESTS.some(
-        (_0x240298) =>
-          _0x240298.key === 'runninghubCommercialDigitalHuman' &&
-          _0x240298.modelId === 'runninghub/2055639633148563458' &&
-          _0x240298.aliases.includes('commercial_digital_human'),
+        (event3) =>
+          event3.key === 'runninghubCommercialDigitalHuman' &&
+          event3.modelId === 'runninghub/2055639633148563458' &&
+          event3.aliases.includes('commercial_digital_human'),
       ),
     ),
     assert.ok(
       SUBSCRIPTION_GATE_MANIFESTS.some(
-        (_0x27ef2e) =>
-          _0x27ef2e.key === 'runninghubVideoScail2V1' &&
-          _0x27ef2e.modelId === 'runninghub/2064961300823896065' &&
-          _0x27ef2e.aliases.includes('video_edit_v54') &&
-          _0x27ef2e.aliases.includes('ai-app/2064961300823896065'),
+        (event4) =>
+          event4.key === 'runninghubVideoScail2V1' &&
+          event4.modelId === 'runninghub/2064961300823896065' &&
+          event4.aliases.includes('video_edit_v54') &&
+          event4.aliases.includes('ai-app/2064961300823896065'),
       ),
     ),
     assert.ok(
       SUBSCRIPTION_GATE_MANIFESTS.some(
-        (_0x1f1c02) =>
-          _0x1f1c02.key === 'runninghubVideoScailV2' &&
-          _0x1f1c02.modelId === 'runninghub/2065463417577762818' &&
-          _0x1f1c02.aliases.includes('video_edit_v54') &&
-          _0x1f1c02.aliases.includes('ai-app/2065463417577762818'),
+        (event5) =>
+          event5.key === 'runninghubVideoScailV2' &&
+          event5.modelId === 'runninghub/2065463417577762818' &&
+          event5.aliases.includes('video_edit_v54') &&
+          event5.aliases.includes('ai-app/2065463417577762818'),
       ),
     ),
     assert.ok(
-      SUBSCRIPTION_GATE_MANIFESTS.every((_0x81e874) =>
-        _0x81e874.legacyAliases.every((_0x1b3828) => _0x1b3828.value && _0x1b3828.deleteWhen),
+      SUBSCRIPTION_GATE_MANIFESTS.every((item) =>
+        item.legacyAliases.every((el) => el.value && el.deleteWhen),
       ),
     ));
 }),
@@ -67,49 +84,31 @@ import {
       assert.equal(resolveVipGateModelId('whatever', 'dreamina'), DREAMINA_VIDEO_VIP_MODEL_ID));
   }),
   test('subscription access: BERNINI V1 复用 V5.4 授权别名但保持独立 gate model', () => {
-    const _0x1015e1 = 'runninghub/2062515720147259393';
-    (assert.equal(resolveVipGateModelId(_0x1015e1), _0x1015e1),
+    const value = 'runninghub/2062515720147259393';
+    (assert.equal(resolveVipGateModelId(value), value),
       assert.equal(resolveVipGateModelId('2062515720147259393'), '2062515720147259393'),
-      assert.equal(resolveVipGateModelId('ai-app/2062515720147259393'), _0x1015e1),
-      assert.equal(isVipModel(_0x1015e1), true),
-      assert.equal(
-        isModelAllowed(_0x1015e1, { status: 'none', entitledModelKeys: ['video_edit_v54'] }),
-        false,
-      ),
-      assert.equal(
-        isModelAllowed(_0x1015e1, { status: 'active', entitledModelKeys: ['video_edit_v54'] }),
-        true,
-      ));
+      assert.equal(resolveVipGateModelId('ai-app/2062515720147259393'), value),
+      assert.equal(isVipModel(value), true),
+      assert.equal(isModelAllowed(value, { status: 'none', entitledModelKeys: ['video_edit_v54'] }), false),
+      assert.equal(isModelAllowed(value, { status: 'active', entitledModelKeys: ['video_edit_v54'] }), true));
   }),
   test('subscription access: Scail V1 reuses V5.4 aliases with independent gate model', () => {
-    const _0x5b2420 = 'runninghub/2064961300823896065';
-    (assert.equal(resolveVipGateModelId(_0x5b2420), _0x5b2420),
+    const key = 'runninghub/2064961300823896065';
+    (assert.equal(resolveVipGateModelId(key), key),
       assert.equal(resolveVipGateModelId('2064961300823896065'), '2064961300823896065'),
-      assert.equal(resolveVipGateModelId('ai-app/2064961300823896065'), _0x5b2420),
-      assert.equal(isVipModel(_0x5b2420), true),
-      assert.equal(
-        isModelAllowed(_0x5b2420, { status: 'none', entitledModelKeys: ['video_edit_v54'] }),
-        false,
-      ),
-      assert.equal(
-        isModelAllowed(_0x5b2420, { status: 'active', entitledModelKeys: ['video_edit_v54'] }),
-        true,
-      ));
+      assert.equal(resolveVipGateModelId('ai-app/2064961300823896065'), key),
+      assert.equal(isVipModel(key), true),
+      assert.equal(isModelAllowed(key, { status: 'none', entitledModelKeys: ['video_edit_v54'] }), false),
+      assert.equal(isModelAllowed(key, { status: 'active', entitledModelKeys: ['video_edit_v54'] }), true));
   }),
   test('subscription access: Scail V2 reuses V5.4 aliases with independent gate model', () => {
-    const _0x41f2a2 = 'runninghub/2065463417577762818';
-    (assert.equal(resolveVipGateModelId(_0x41f2a2), _0x41f2a2),
+    const index = 'runninghub/2065463417577762818';
+    (assert.equal(resolveVipGateModelId(index), index),
       assert.equal(resolveVipGateModelId('2065463417577762818'), '2065463417577762818'),
-      assert.equal(resolveVipGateModelId('ai-app/2065463417577762818'), _0x41f2a2),
-      assert.equal(isVipModel(_0x41f2a2), true),
-      assert.equal(
-        isModelAllowed(_0x41f2a2, { status: 'none', entitledModelKeys: ['video_edit_v54'] }),
-        false,
-      ),
-      assert.equal(
-        isModelAllowed(_0x41f2a2, { status: 'active', entitledModelKeys: ['video_edit_v54'] }),
-        true,
-      ));
+      assert.equal(resolveVipGateModelId('ai-app/2065463417577762818'), index),
+      assert.equal(isVipModel(index), true),
+      assert.equal(isModelAllowed(index, { status: 'none', entitledModelKeys: ['video_edit_v54'] }), false),
+      assert.equal(isModelAllowed(index, { status: 'active', entitledModelKeys: ['video_edit_v54'] }), true));
   }),
   test('subscription access: runninghub 模型维持原有 gate model', () => {
     (assert.equal(resolveVipGateModelId(DEFAULT_VIP_GATE_MODEL_ID), DEFAULT_VIP_GATE_MODEL_ID),
@@ -155,37 +154,37 @@ import {
       ));
   }),
   test('subscription access: 漫画转真人不再进入 VIP gate', () => {
-    const _0x4b69da = 'runninghub/1994718111704158209',
-      _0x59bf7f = 'ai-app/1994718111704158209',
-      _0x2d3ecb = 'runninghub/1994711386552999938';
+    const result = 'runninghub/1994718111704158209',
+      data = 'ai-app/1994718111704158209',
+      options = 'runninghub/1994711386552999938';
     (assert.equal(
-      SUBSCRIPTION_GATE_MANIFESTS.some((_0x3e3808) => _0x3e3808.key === 'runninghubAnimeReal'),
+      SUBSCRIPTION_GATE_MANIFESTS.some((event6) => event6.key === 'runninghubAnimeReal'),
       false,
     ),
-      assert.equal(resolveVipGateModelId(_0x4b69da), _0x4b69da),
-      assert.equal(resolveVipGateModelId(_0x59bf7f), _0x59bf7f),
-      assert.equal(resolveVipGateModelId(_0x2d3ecb), _0x2d3ecb),
-      assert.equal(isVipModel(_0x4b69da), false),
-      assert.equal(isVipModel(_0x59bf7f), false),
-      assert.equal(isVipModel(_0x2d3ecb), false),
-      assert.equal(isModelAllowed(_0x4b69da, { status: 'none', entitledModelIds: [] }), true));
+      assert.equal(resolveVipGateModelId(result), result),
+      assert.equal(resolveVipGateModelId(data), data),
+      assert.equal(resolveVipGateModelId(options), options),
+      assert.equal(isVipModel(result), false),
+      assert.equal(isVipModel(data), false),
+      assert.equal(isVipModel(options), false),
+      assert.equal(isModelAllowed(result, { status: 'none', entitledModelIds: [] }), true));
   }),
   test('subscription access: 即梦模型授权判定读取 dreamina/video_vip', () => {
-    const _0x185e71 = {
+    const target = {
       status: 'active',
       entitledModelIds: [DREAMINA_VIDEO_VIP_MODEL_ID],
       entitledModelKeys: [],
     };
-    (assert.equal(isModelAllowed('dreamina/seedance2.0_vip', _0x185e71, 'dreamina'), true),
-      assert.equal(isModelAllowed('dreamina/seedance2.0fast', _0x185e71, 'dreamina'), true));
-    const _0x446782 = {
+    (assert.equal(isModelAllowed('dreamina/seedance2.0_vip', target, 'dreamina'), true),
+      assert.equal(isModelAllowed('dreamina/seedance2.0fast', target, 'dreamina'), true));
+    const source = {
       status: 'active',
       entitledModelIds: [DEFAULT_VIP_GATE_MODEL_ID],
       entitledModelKeys: [],
     };
-    assert.equal(isModelAllowed('dreamina/seedance2.0fast', _0x446782, 'dreamina'), false);
+    assert.equal(isModelAllowed('dreamina/seedance2.0fast', source, 'dreamina'), false);
   }),
   test('subscription access: 即梦模型授权支持 key alias', () => {
-    const _0x258162 = { status: 'active', entitledModelIds: [], entitledModelKeys: ['dreamina_video_vip'] };
-    assert.equal(isModelAllowed('dreamina/3.5pro', _0x258162), true);
+    const next = { status: 'active', entitledModelIds: [], entitledModelKeys: ['dreamina_video_vip'] };
+    assert.equal(isModelAllowed('dreamina/3.5pro', next), true);
   }));

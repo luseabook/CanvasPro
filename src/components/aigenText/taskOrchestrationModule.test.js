@@ -6,7 +6,10 @@ import {
   isPreviewNodeLoading,
   stopPreviewNodeLoading,
 } from '../../modules/previewMode.js';
-import { createPreviewContainer as createFakePreviewContainer, installDomEnvironment as installPreviewDomStubs } from '../../../tools/dom-test-environment.mjs';
+import {
+  createPreviewContainer as createFakePreviewContainer,
+  installDomEnvironment as installPreviewDomStubs,
+} from '../../../tools/dom-test-environment.mjs';
 import { DEFAULT_LOCALE, setLocale } from '../../i18n/index.js';
 const originalWindow = globalThis.window,
   originalNodeCtor = globalThis.Node,
@@ -21,22 +24,22 @@ typeof globalThis.window.showToast !== 'function' && (globalThis.window.showToas
     restorePreviewDom());
 }),
   test('aigenText task orchestration: 预览模式下点击生成只启动假加载不发请求', async () => {
-    const _0x27e5d4 = globalThis.window.PREVIEW_MODE;
+    const value = globalThis.window.PREVIEW_MODE;
     globalThis.window.PREVIEW_MODE = true;
     try {
-      const _0x393dc9 = 'node-ai-text-preview-loading';
-      let _0x24eb89 = false;
-      const _0x4795a4 = createAIGenTextNodeTaskOrchestrationModule({
+      const id = 'node-ai-text-preview-loading';
+      let item = false;
+      const aIGenTextNodeTaskOrchestrationModule = createAIGenTextNodeTaskOrchestrationModule({
           store: {
             getState: () => ({
-              nodes: { [_0x393dc9]: { id: _0x393dc9, model: 'gpt-4o', provider: 'openai' } },
+              nodes: { [id]: { id: id, model: 'gpt-4o', provider: 'openai' } },
             }),
             getIncomingEdges: () => [],
             updateNodeData() {},
           },
           api: {
             generateText: async () => {
-              return ((_0x24eb89 = true), { text: '不会执行' });
+              return ((item = true), { text: '不会执行' });
             },
           },
           ensureThumbDecoded: () => {},
@@ -49,76 +52,76 @@ typeof globalThis.window.showToast !== 'function' && (globalThis.window.showToas
           getCustomTextModels: () => [],
           saveCustomTextModels: () => {},
         }),
-        _0x15a2ec = Object.assign(Object.create(_0x4795a4), {
-          nodeId: _0x393dc9,
-          _data: { id: _0x393dc9, model: 'gpt-4o', provider: 'openai' },
+        key = Object.assign(Object.create(aIGenTextNodeTaskOrchestrationModule), {
+          nodeId: id,
+          _data: { id: id, model: 'gpt-4o', provider: 'openai' },
           previewEl: createFakePreviewContainer(),
           promptEl: createPromptEl('请总结这张图'),
           btnEl: createButtonStub(),
         });
-      (await _0x4795a4._onGenerate.call(_0x15a2ec),
-        assert.equal(_0x24eb89, false),
-        assert.equal(isPreviewNodeLoading(_0x393dc9), true),
-        assert.equal(_0x15a2ec.btnEl.disabled, true),
-        assert.match(_0x15a2ec.btnEl.innerHTML, /animation:spin/),
-        stopPreviewNodeLoading(_0x393dc9),
-        assert.equal(_0x15a2ec.btnEl.disabled, false),
-        assert.doesNotMatch(_0x15a2ec.btnEl.innerHTML, /animation:spin/));
+      (await aIGenTextNodeTaskOrchestrationModule._onGenerate.call(key),
+        assert.equal(item, false),
+        assert.equal(isPreviewNodeLoading(id), true),
+        assert.equal(key.btnEl.disabled, true),
+        assert.match(key.btnEl.innerHTML, /animation:spin/),
+        stopPreviewNodeLoading(id),
+        assert.equal(key.btnEl.disabled, false),
+        assert.doesNotMatch(key.btnEl.innerHTML, /animation:spin/));
     } finally {
-      globalThis.window.PREVIEW_MODE = _0x27e5d4;
+      globalThis.window.PREVIEW_MODE = value;
     }
   }),
   test('aigenText task orchestration: 加入提示词模式只回填预设不发请求', async () => {
-    const _0x48ecb5 = globalThis.window.showToast,
-      _0x14fe9f = [];
-    globalThis.window.showToast = (..._0x337aaf) => {
-      _0x14fe9f.push(_0x337aaf);
+    const index = globalThis.window.showToast,
+      list = [];
+    globalThis.window.showToast = (...args) => {
+      list.push(args);
     };
     try {
-      const _0x200740 = 'node-ai-text-insert-prompt-preset';
-      let _0x5e811e = false;
+      const targetId = 'node-ai-text-insert-prompt-preset';
+      let result = false;
       const {
-        proto: _0x6229be,
-        ctx: _0x397022,
-        state: _0x37edc4,
+        proto: proto,
+        ctx: ctx,
+        state: state,
       } = createTestContext({
-        targetId: _0x200740,
-        nodeData: { id: _0x200740, model: 'gpt-4o', provider: 'openai' },
+        targetId: targetId,
+        nodeData: { id: targetId, model: 'gpt-4o', provider: 'openai' },
         promptText: '夜雨追逐',
         apiImpl: {
           generateText: async () => {
-            return ((_0x5e811e = true), { text: '不应生成' });
+            return ((result = true), { text: '不应生成' });
           },
         },
       });
-      (await _0x6229be._onGenerate.call(_0x397022, '改写成分镜：{用户输入}', { insertPrompt: true }),
-        assert.equal(_0x5e811e, false),
-        assert.equal(_0x37edc4.nodes[_0x200740].prompt, '改写成分镜：夜雨追逐'),
-        assert.equal(_0x397022.promptEl.innerHTML, '改写成分镜：夜雨追逐'),
-        assert.equal(_0x14fe9f.length, 0));
+      (await proto._onGenerate.call(ctx, '改写成分镜：{用户输入}', { insertPrompt: true }),
+        assert.equal(result, false),
+        assert.equal(state.nodes[targetId].prompt, '改写成分镜：夜雨追逐'),
+        assert.equal(ctx.promptEl.innerHTML, '改写成分镜：夜雨追逐'),
+        assert.equal(list.length, 0));
     } finally {
-      globalThis.window.showToast = _0x48ecb5;
+      globalThis.window.showToast = index;
     }
   }),
   test.afterEach(() => {
     _resetPreviewRuntimeForTests();
   }),
   test('aigenText task orchestration: start patch enters running and success exits', async () => {
-    const _0x377bd8 = 'node-ai-text-start-running';
-    let _0xbb638d = 0,
-      _0x431f33 = 0,
-      _0x364fca;
-    const _0xfb3d15 = new Promise((_0x365e88) => {
-        _0x364fca = _0x365e88;
+    const targetId2 = 'node-ai-text-start-running';
+    let data = 0,
+      options = 0,
+      handler;
+    const target = new Promise((source) => {
+        handler = source;
       }),
       {
-        proto: _0x401c65,
-        ctx: _0x9d919f,
-        state: _0x52afad,
+        proto: proto2,
+        ctx: ctx2,
+        state: state2,
       } = createTestContext({
-        targetId: _0x377bd8,
+        targetId: targetId2,
         nodeData: {
-          id: _0x377bd8,
+          id: targetId2,
           model: 'gpt-4o',
           provider: 'openai',
           outputText: 'old text',
@@ -127,107 +130,107 @@ typeof globalThis.window.showToast !== 'function' && (globalThis.window.showToas
           generationDuration: 0x4d2,
         },
         promptText: 'write summary',
-        apiImpl: { generateText: async () => _0xfb3d15 },
+        apiImpl: { generateText: async () => target },
         startLoadingImpl: () => {
-          _0xbb638d += 1;
+          data += 1;
         },
         stopLoadingImpl: () => {
-          _0x431f33 += 1;
+          options += 1;
         },
       });
-    ((_0x9d919f._isGenerating = false),
-      (_0x9d919f.btnEl = createButtonStub()),
-      (_0x9d919f.previewEl = {}),
-      (_0x9d919f._updateSubmitButtonState = () => {}));
-    const _0x3ff16d = _0x401c65._onGenerate.call(_0x9d919f);
+    ((ctx2._isGenerating = false),
+      (ctx2.btnEl = createButtonStub()),
+      (ctx2.previewEl = {}),
+      (ctx2._updateSubmitButtonState = () => {}));
+    const next = proto2._onGenerate.call(ctx2);
     (await Promise.resolve(), await Promise.resolve());
-    const _0x19f500 = _0x52afad.nodes[_0x377bd8];
-    (assert.equal(_0xbb638d, 1),
-      assert.equal(_0x431f33, 0),
-      assert.equal(_0x19f500.isGenerating, true),
-      assert.equal(_0x19f500.jobStatus, 'running'),
-      assert.equal(_0x19f500.jobError, null),
-      assert.equal(_0x19f500.generationDuration, null),
-      _0x364fca({ text: 'new text' }),
-      await _0x3ff16d);
-    const _0x564509 = _0x52afad.nodes[_0x377bd8];
-    (assert.equal(_0x564509.isGenerating, false),
-      assert.equal(_0x564509.jobStatus, 'success'),
-      assert.equal(_0x564509.jobError, null),
-      assert.equal(_0x564509.outputText, 'new text'),
-      assert.equal(_0x431f33, 1));
+    const current = state2.nodes[targetId2];
+    (assert.equal(data, 1),
+      assert.equal(options, 0),
+      assert.equal(current.isGenerating, true),
+      assert.equal(current.jobStatus, 'running'),
+      assert.equal(current.jobError, null),
+      assert.equal(current.generationDuration, null),
+      handler({ text: 'new text' }),
+      await next);
+    const entry = state2.nodes[targetId2];
+    (assert.equal(entry.isGenerating, false),
+      assert.equal(entry.jobStatus, 'success'),
+      assert.equal(entry.jobError, null),
+      assert.equal(entry.outputText, 'new text'),
+      assert.equal(options, 1));
   }),
   test('aigenText task orchestration: timeout failure stays visible in text output', async () => {
-    const _0x196c00 = globalThis.window.showToast,
-      _0x581b16 = console.error,
-      _0x3885da = [];
-    ((globalThis.window.showToast = (..._0x422d04) => {
-      _0x3885da.push(_0x422d04);
+    const record = globalThis.window.showToast,
+      payload = console.error,
+      list2 = [];
+    ((globalThis.window.showToast = (...args2) => {
+      list2.push(args2);
     }),
       (console.error = () => {}));
     try {
-      const _0x4b9276 = 'node-ai-text-timeout-output',
-        _0x1169df = new Error('请求超时（300秒）');
-      _0x1169df.type = 'TIMEOUT';
-      let _0x447b4f = '',
-        _0x3accfd = 0;
+      const targetId3 = 'node-ai-text-timeout-output',
+        error = new Error('请求超时（300秒）');
+      error.type = 'TIMEOUT';
+      let handle = '',
+        config = 0;
       const {
-        proto: _0x1c12a5,
-        ctx: _0x2d7063,
-        state: _0x51d787,
+        proto: proto3,
+        ctx: ctx3,
+        state: state3,
       } = createTestContext({
-        targetId: _0x4b9276,
-        nodeData: { id: _0x4b9276, model: 'gemini-3.1-pro', provider: 'grsai' },
+        targetId: targetId3,
+        nodeData: { id: targetId3, model: 'gemini-3.1-pro', provider: 'grsai' },
         promptText: '你好',
         apiImpl: {
           generateText: async () => {
-            throw _0x1169df;
+            throw error;
           },
         },
         stopLoadingImpl: () => {
-          _0x3accfd += 1;
+          config += 1;
         },
       });
-      ((_0x2d7063._isGenerating = false),
-        (_0x2d7063.btnEl = createButtonStub()),
-        (_0x2d7063.previewEl = {}),
-        (_0x2d7063.outputEl = {}),
-        (_0x2d7063._updateSubmitButtonState = () => {}),
-        (_0x2d7063._renderOutputText = (_0x1ed241) => {
-          _0x447b4f = String(_0x1ed241 || '');
+      ((ctx3._isGenerating = false),
+        (ctx3.btnEl = createButtonStub()),
+        (ctx3.previewEl = {}),
+        (ctx3.outputEl = {}),
+        (ctx3._updateSubmitButtonState = () => {}),
+        (ctx3._renderOutputText = (scope) => {
+          handle = String(scope || '');
         }));
-      const _0x34eb29 = await _0x1c12a5._onGenerate.call(_0x2d7063),
-        _0x3ba322 = _0x51d787.nodes[_0x4b9276];
-      (assert.equal(_0x34eb29.status, 'failed'),
-        assert.equal(_0x3ba322.jobStatus, 'error'),
-        assert.equal(_0x3ba322.jobError, '请求超时（300秒）'),
-        assert.match(_0x3ba322.outputText, /生成超时/),
-        assert.match(_0x447b4f, /生成超时/),
-        assert.equal(_0x3885da.length, 0),
-        assert.equal(_0x3accfd, 1));
+      const response = await proto3._onGenerate.call(ctx3),
+        input = state3.nodes[targetId3];
+      (assert.equal(response.status, 'failed'),
+        assert.equal(input.jobStatus, 'error'),
+        assert.equal(input.jobError, '请求超时（300秒）'),
+        assert.match(input.outputText, /生成超时/),
+        assert.match(handle, /生成超时/),
+        assert.equal(list2.length, 0),
+        assert.equal(config, 1));
     } finally {
-      ((globalThis.window.showToast = _0x196c00), (console.error = _0x581b16));
+      ((globalThis.window.showToast = record), (console.error = payload));
     }
   }));
-function createStore(_0xa75ea8, _0x220fbc = []) {
+function createStore(output, list3 = []) {
   return {
     getState() {
-      return _0xa75ea8;
+      return output;
     },
-    getIncomingEdges(_0x1eb3ca) {
-      return _0x220fbc.filter((_0x5adfd9) => _0x5adfd9.targetId === _0x1eb3ca);
+    getIncomingEdges(value2) {
+      return list3.filter((item2) => item2.targetId === value2);
     },
-    updateNodeData(_0x3bb6f3, _0x5472d4) {
-      const _0x2f9117 = _0xa75ea8.nodes?.[_0x3bb6f3] || {};
-      _0xa75ea8.nodes[_0x3bb6f3] = { ..._0x2f9117, ..._0x5472d4 };
+    updateNodeData(value3, args3) {
+      const args4 = output.nodes?.[value3] || {};
+      output.nodes[value3] = { ...args4, ...args3 };
     },
   };
 }
-function createPromptEl(_0x48856a = 'describe @图片1') {
-  return { innerText: _0x48856a, childNodes: [{ nodeType: Node.TEXT_NODE, textContent: _0x48856a }] };
+function createPromptEl(innerText = 'describe @图片1') {
+  return { innerText: innerText, childNodes: [{ nodeType: Node.TEXT_NODE, textContent: innerText }] };
 }
 function createButtonStub() {
-  const _0x2dfb39 = new Set();
+  const map = new Set();
   return {
     disabled: false,
     title: '',
@@ -235,27 +238,27 @@ function createButtonStub() {
     style: { color: '', cursor: '' },
     _attrs: new Map(),
     classList: {
-      add(_0x4edc93) {
-        _0x2dfb39.add(String(_0x4edc93 || ''));
+      add(value4) {
+        map.add(String(value4 || ''));
       },
-      remove(_0x172062) {
-        _0x2dfb39.delete(String(_0x172062 || ''));
+      remove(value5) {
+        map.delete(String(value5 || ''));
       },
-      contains(_0xb1eeb0) {
-        return _0x2dfb39.has(String(_0xb1eeb0 || ''));
+      contains(value6) {
+        return map.has(String(value6 || ''));
       },
     },
-    setAttribute(_0x3181cc, _0x28cb77) {
-      this._attrs.set(String(_0x3181cc || ''), String(_0x28cb77 || ''));
+    setAttribute(value7, value8) {
+      this._attrs.set(String(value7 || ''), String(value8 || ''));
     },
-    removeAttribute(_0x9ad963) {
-      this._attrs.delete(String(_0x9ad963 || ''));
+    removeAttribute(value9) {
+      this._attrs.delete(String(value9 || ''));
     },
   };
 }
 function createTestContext({
-  targetId: _0x5a68f1,
-  nodeData: _0x204a8c,
+  targetId: targetId4,
+  nodeData: nodeData,
   nodes: nodes = {},
   incomingEdges: incomingEdges = [],
   promptText: promptText = 'describe @图片1',
@@ -264,10 +267,10 @@ function createTestContext({
   startLoadingImpl: startLoadingImpl = () => {},
   stopLoadingImpl: stopLoadingImpl = () => {},
 }) {
-  const _0x3586bf = { nodes: { ...nodes, [_0x5a68f1]: { ..._0x204a8c } } },
-    _0x10e9ab = createStore(_0x3586bf, incomingEdges),
-    _0x4c6413 = createAIGenTextNodeTaskOrchestrationModule({
-      store: _0x10e9ab,
+  const _data = { nodes: { ...nodes, [targetId4]: { ...nodeData } } },
+    store = createStore(_data, incomingEdges),
+    proto4 = createAIGenTextNodeTaskOrchestrationModule({
+      store: store,
       api: apiImpl,
       ensureThumbDecoded: () => {},
       revealRefThumbMedia: () => {},
@@ -279,22 +282,22 @@ function createTestContext({
       getCustomTextModels: () => customTextModels,
       saveCustomTextModels: () => {},
     }),
-    _0x3c6908 = Object.assign(Object.create(_0x4c6413), {
-      nodeId: _0x5a68f1,
-      _data: _0x3586bf.nodes[_0x5a68f1],
+    ctx4 = Object.assign(Object.create(proto4), {
+      nodeId: targetId4,
+      _data: _data.nodes[targetId4],
       promptEl: createPromptEl(promptText),
     });
-  return { proto: _0x4c6413, ctx: _0x3c6908, state: _0x3586bf, store: _0x10e9ab };
+  return { proto: proto4, ctx: ctx4, state: _data, store: store };
 }
 (test('aigenText task orchestration: 图片引用优先使用原图本地路径', async () => {
-  const _0x46a1a5 = 'node-ai-text-image-original-first',
-    _0x446dcc = 'node-ref-image-text-original-first',
-    { proto: _0x1b6af0, ctx: _0x1fae5b } = createTestContext({
-      targetId: _0x46a1a5,
-      nodeData: { id: _0x46a1a5, model: 'gpt-4o', provider: 'openai' },
+  const targetId5 = 'node-ai-text-image-original-first',
+    id2 = 'node-ref-image-text-original-first',
+    { proto: proto5, ctx: ctx5 } = createTestContext({
+      targetId: targetId5,
+      nodeData: { id: targetId5, model: 'gpt-4o', provider: 'openai' },
       nodes: {
-        [_0x446dcc]: {
-          id: _0x446dcc,
+        [id2]: {
+          id: id2,
           type: 'source-image',
           originalLocalPath: 'data/uploads/text-original.png',
           displayLocalPath: 'data/uploads/text-display.webp',
@@ -302,162 +305,162 @@ function createTestContext({
           thumbUrl: 'https://img.example.com/text-thumb.png',
         },
       },
-      incomingEdges: [{ id: 'edge-text-original-first', sourceId: _0x446dcc, targetId: _0x46a1a5 }],
+      incomingEdges: [{ id: 'edge-text-original-first', sourceId: id2, targetId: targetId5 }],
     }),
-    _0x36a909 = await _0x1b6af0._buildPayload.call(_0x1fae5b);
-  (assert.deepEqual(_0x36a909.inputUrls, ['/data/uploads/text-original.png']),
-    assert.deepEqual(_0x36a909.inputImageUrls, ['/data/uploads/text-original.png']));
+    value10 = await proto5._buildPayload.call(ctx5);
+  (assert.deepEqual(value10.inputUrls, ['/data/uploads/text-original.png']),
+    assert.deepEqual(value10.inputImageUrls, ['/data/uploads/text-original.png']));
 }),
   test('aigenText task orchestration: pending web image url is usable before remote import finishes', async () => {
-    const _0x26f2b6 = 'node-ai-text-web-image-pending',
-      _0x201c7d = 'node-ref-web-image-pending',
-      { proto: _0xc00ee, ctx: _0x413504 } = createTestContext({
-        targetId: _0x26f2b6,
-        nodeData: { id: _0x26f2b6, model: 'gpt-4o', provider: 'openai' },
+    const targetId6 = 'node-ai-text-web-image-pending',
+      id3 = 'node-ref-web-image-pending',
+      { proto: proto6, ctx: ctx6 } = createTestContext({
+        targetId: targetId6,
+        nodeData: { id: targetId6, model: 'gpt-4o', provider: 'openai' },
         nodes: {
-          [_0x201c7d]: {
-            id: _0x201c7d,
+          [id3]: {
+            id: id3,
             type: 'source-image',
             capturePreviewUrl: 'https://cdn.example.com/pending-web-image.png',
             webSourceUrl: 'https://cdn.example.com/pending-web-image.png',
             isGenerating: true,
           },
         },
-        incomingEdges: [{ id: 'edge-text-web-image-pending', sourceId: _0x201c7d, targetId: _0x26f2b6 }],
+        incomingEdges: [{ id: 'edge-text-web-image-pending', sourceId: id3, targetId: targetId6 }],
         promptText: 'reverse prompt',
       }),
-      _0x4a890a = await _0xc00ee._buildPayload.call(_0x413504);
-    (assert.deepEqual(_0x4a890a.inputUrls, ['https://cdn.example.com/pending-web-image.png']),
-      assert.deepEqual(_0x4a890a.inputImageUrls, ['https://cdn.example.com/pending-web-image.png']));
+      value11 = await proto6._buildPayload.call(ctx6);
+    (assert.deepEqual(value11.inputUrls, ['https://cdn.example.com/pending-web-image.png']),
+      assert.deepEqual(value11.inputImageUrls, ['https://cdn.example.com/pending-web-image.png']));
   }),
   test('aigenText task orchestration: localized reference parser keeps Chinese aliases in English locale', async () => {
     setLocale('en-US', { persist: false, notify: false });
     try {
-      const _0x24cb5c = 'node-ai-text-image-alias-en',
-        _0x290d5c = 'node-ref-image-alias-en',
-        { proto: _0x34be06, ctx: _0x3134ab } = createTestContext({
-          targetId: _0x24cb5c,
-          nodeData: { id: _0x24cb5c, model: 'gpt-4o', provider: 'openai' },
+      const targetId7 = 'node-ai-text-image-alias-en',
+        id4 = 'node-ref-image-alias-en',
+        { proto: proto7, ctx: ctx7 } = createTestContext({
+          targetId: targetId7,
+          nodeData: { id: targetId7, model: 'gpt-4o', provider: 'openai' },
           nodes: {
-            [_0x290d5c]: {
-              id: _0x290d5c,
+            [id4]: {
+              id: id4,
               type: 'source-image',
               originalLocalPath: 'data/uploads/text-alias.png',
             },
           },
-          incomingEdges: [{ id: 'edge-text-alias-en', sourceId: _0x290d5c, targetId: _0x24cb5c }],
+          incomingEdges: [{ id: 'edge-text-alias-en', sourceId: id4, targetId: targetId7 }],
           promptText: 'describe @图片1',
         }),
-        _0x267672 = await _0x34be06._buildPayload.call(_0x3134ab);
-      (assert.deepEqual(_0x267672.inputUrls, ['/data/uploads/text-alias.png']),
-        assert.deepEqual(_0x267672.inputImageUrls, ['/data/uploads/text-alias.png']));
+        value12 = await proto7._buildPayload.call(ctx7);
+      (assert.deepEqual(value12.inputUrls, ['/data/uploads/text-alias.png']),
+        assert.deepEqual(value12.inputImageUrls, ['/data/uploads/text-alias.png']));
     } finally {
       setLocale(DEFAULT_LOCALE, { persist: false, notify: false });
     }
   }),
   test('aigenText task orchestration: 视频引用优先使用原视频本地路径', async () => {
-    const _0x1c3ba6 = 'node-ai-text-video-original-first',
-      _0x53d18d = 'node-ref-video-text-original-first',
-      { proto: _0x27cf5b, ctx: _0x1e43f5 } = createTestContext({
-        targetId: _0x1c3ba6,
-        nodeData: { id: _0x1c3ba6, model: 'gemini-3-flash-preview-nothinking', provider: 'apimart' },
+    const targetId8 = 'node-ai-text-video-original-first',
+      id5 = 'node-ref-video-text-original-first',
+      { proto: proto8, ctx: ctx8 } = createTestContext({
+        targetId: targetId8,
+        nodeData: { id: targetId8, model: 'gemini-3-flash-preview-nothinking', provider: 'apimart' },
         nodes: {
-          [_0x53d18d]: {
-            id: _0x53d18d,
+          [id5]: {
+            id: id5,
             type: 'source-video',
             localPath: 'data/uploads/text-source-video.mp4',
             thumbUrl: 'https://img.example.com/video-thumb.jpg',
             imageUrl: 'https://img.example.com/video-poster.jpg',
           },
         },
-        incomingEdges: [{ id: 'edge-text-video-original-first', sourceId: _0x53d18d, targetId: _0x1c3ba6 }],
+        incomingEdges: [{ id: 'edge-text-video-original-first', sourceId: id5, targetId: targetId8 }],
         promptText: '分析 @视频1',
       }),
-      _0x4edc14 = await _0x27cf5b._buildPayload.call(_0x1e43f5);
-    (assert.deepEqual(_0x4edc14.inputUrls, ['/data/uploads/text-source-video.mp4']),
-      assert.deepEqual(_0x4edc14.inputImageUrls, []),
-      assert.deepEqual(_0x4edc14.inputVideoUrls, ['/data/uploads/text-source-video.mp4']));
+      value13 = await proto8._buildPayload.call(ctx8);
+    (assert.deepEqual(value13.inputUrls, ['/data/uploads/text-source-video.mp4']),
+      assert.deepEqual(value13.inputImageUrls, []),
+      assert.deepEqual(value13.inputVideoUrls, ['/data/uploads/text-source-video.mp4']));
   }),
   test('aigenText task orchestration: ai-text 入参无输出时使用 prompt 作为文本内容', async () => {
-    const _0x3846c8 = 'node-ai-text-text-prompt-ref',
-      _0x4d6206 = 'node-ai-text-prompt-source',
-      { proto: _0x50ea86, ctx: _0x55fb51 } = createTestContext({
-        targetId: _0x3846c8,
-        nodeData: { id: _0x3846c8, model: 'gpt-4o', provider: 'openai' },
-        nodes: { [_0x4d6206]: { id: _0x4d6206, type: 'ai-text', prompt: '来自另一个生成文本节点的提示词' } },
-        incomingEdges: [{ id: 'edge-ai-text-prompt-ref', sourceId: _0x4d6206, targetId: _0x3846c8 }],
+    const targetId9 = 'node-ai-text-text-prompt-ref',
+      id6 = 'node-ai-text-prompt-source',
+      { proto: proto9, ctx: ctx9 } = createTestContext({
+        targetId: targetId9,
+        nodeData: { id: targetId9, model: 'gpt-4o', provider: 'openai' },
+        nodes: { [id6]: { id: id6, type: 'ai-text', prompt: '来自另一个生成文本节点的提示词' } },
+        incomingEdges: [{ id: 'edge-ai-text-prompt-ref', sourceId: id6, targetId: targetId9 }],
         promptText: '继续扩写',
       }),
-      _0x342c06 = await _0x50ea86._buildPayload.call(_0x55fb51);
-    (assert.equal(_0x342c06.prompt, '来自另一个生成文本节点的提示词\n继续扩写'),
-      assert.deepEqual(_0x342c06.inputUrls, []));
+      value14 = await proto9._buildPayload.call(ctx9);
+    (assert.equal(value14.prompt, '来自另一个生成文本节点的提示词\n继续扩写'),
+      assert.deepEqual(value14.inputUrls, []));
   }),
   test('aigenText task orchestration: 自定义模型会按顺序收集多张图片入参', async () => {
-    const _0x32b7dd = 'node-ai-text-custom-multimodal',
-      _0x580c8d = 'node-ref-image-custom-first',
-      _0x277757 = 'node-ref-image-custom-second',
-      _0x35fbce = 'doubao-seed-2-0-pro',
-      { proto: _0x9fa7a6, ctx: _0x63cc41 } = createTestContext({
-        targetId: _0x32b7dd,
-        nodeData: { id: _0x32b7dd, model: _0x35fbce },
-        customTextModels: [_0x35fbce],
+    const targetId10 = 'node-ai-text-custom-multimodal',
+      id7 = 'node-ref-image-custom-first',
+      id8 = 'node-ref-image-custom-second',
+      model = 'doubao-seed-2-0-pro',
+      { proto: proto10, ctx: ctx10 } = createTestContext({
+        targetId: targetId10,
+        nodeData: { id: targetId10, model: model },
+        customTextModels: [model],
         nodes: {
-          [_0x580c8d]: {
-            id: _0x580c8d,
+          [id7]: {
+            id: id7,
             type: 'source-image',
             originalLocalPath: 'data/uploads/custom-first.png',
           },
-          [_0x277757]: {
-            id: _0x277757,
+          [id8]: {
+            id: id8,
             type: 'source-image',
             originalLocalPath: 'data/uploads/custom-second.png',
           },
         },
         incomingEdges: [
-          { id: 'edge-custom-first', sourceId: _0x580c8d, targetId: _0x32b7dd },
-          { id: 'edge-custom-second', sourceId: _0x277757, targetId: _0x32b7dd },
+          { id: 'edge-custom-first', sourceId: id7, targetId: targetId10 },
+          { id: 'edge-custom-second', sourceId: id8, targetId: targetId10 },
         ],
         promptText: 'compare @图片1 with @图片2',
       }),
-      _0x3a2366 = await _0x9fa7a6._buildPayload.call(_0x63cc41);
-    (assert.equal(_0x3a2366.provider, 'custom'),
-      assert.equal(_0x3a2366.model, _0x35fbce),
-      assert.deepEqual(_0x3a2366.inputUrls, [
+      value15 = await proto10._buildPayload.call(ctx10);
+    (assert.equal(value15.provider, 'custom'),
+      assert.equal(value15.model, model),
+      assert.deepEqual(value15.inputUrls, [
         '/data/uploads/custom-first.png',
         '/data/uploads/custom-second.png',
       ]),
-      assert.deepEqual(_0x3a2366.inputImageUrls, [
+      assert.deepEqual(value15.inputImageUrls, [
         '/data/uploads/custom-first.png',
         '/data/uploads/custom-second.png',
       ]));
   }),
   test('aigenText task orchestration: 自定义模型即使有图片也需要提示词', async () => {
-    const _0x4dcc79 = 'node-ai-text-custom-needs-prompt',
-      _0xce863e = 'node-ref-image-custom-needs-prompt',
-      _0x34301a = 'doubao-seed-2-0-pro',
-      _0x4ac452 = globalThis.window.showToast,
-      _0x2bb6dd = [];
-    globalThis.window.showToast = (..._0x510488) => {
-      _0x2bb6dd.push(_0x510488);
+    const targetId11 = 'node-ai-text-custom-needs-prompt',
+      id9 = 'node-ref-image-custom-needs-prompt',
+      model2 = 'doubao-seed-2-0-pro',
+      value16 = globalThis.window.showToast,
+      list4 = [];
+    globalThis.window.showToast = (...args5) => {
+      list4.push(args5);
     };
     try {
-      const { proto: _0x4cea23, ctx: _0x3b24ef } = createTestContext({
-          targetId: _0x4dcc79,
-          nodeData: { id: _0x4dcc79, model: _0x34301a },
-          customTextModels: [_0x34301a],
+      const { proto: proto11, ctx: ctx11 } = createTestContext({
+          targetId: targetId11,
+          nodeData: { id: targetId11, model: model2 },
+          customTextModels: [model2],
           nodes: {
-            [_0xce863e]: {
-              id: _0xce863e,
+            [id9]: {
+              id: id9,
               type: 'source-image',
               originalLocalPath: 'data/uploads/custom-needs-prompt.png',
             },
           },
-          incomingEdges: [{ id: 'edge-custom-needs-prompt', sourceId: _0xce863e, targetId: _0x4dcc79 }],
+          incomingEdges: [{ id: 'edge-custom-needs-prompt', sourceId: id9, targetId: targetId11 }],
           promptText: '',
         }),
-        _0x584847 = await _0x4cea23._buildPayload.call(_0x3b24ef);
-      (assert.equal(_0x584847, null), assert.deepEqual(_0x2bb6dd, [['请输入提示词后再生成', 'warn']]));
+        value17 = await proto11._buildPayload.call(ctx11);
+      (assert.equal(value17, null), assert.deepEqual(list4, [['请输入提示词后再生成', 'warn']]));
     } finally {
-      globalThis.window.showToast = _0x4ac452;
+      globalThis.window.showToast = value16;
     }
   }));
